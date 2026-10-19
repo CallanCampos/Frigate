@@ -413,8 +413,8 @@ u32 PokeGra_LoadClActChars(ArcTool *arc, u32 species, u32 form, u32 sex, BOOL ra
 
 u32 PokeGra_LoadClActCellAnims(u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg, u32 mapping, u32 vramType,
                                HeapID heapId) {
-    u32 cellFile = func_0202d90c(mapping);
-    u32 animFile = func_0202d910(mapping);
+    u32 cellFile = AppMenuCommon_GetPokemonSpriteCellFile(mapping);
+    u32 animFile = AppMenuCommon_GetPokemonSpriteAnimFile(mapping);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     u32 cellAnims = func_0204bde0(arc, cellFile, animFile, heapId);
 
@@ -466,8 +466,8 @@ u32 TrGra_LoadClActChars(ArcTool *arc, u32 trainerClass, u32 vramType, HeapID he
 }
 
 u32 TrGra_LoadClActCellAnims(u32 trainerClass, u32 mapping, u32 vramType, HeapID heapId) {
-    u32 cellFile = func_0202d914(mapping);
-    u32 animFile = func_0202d918(mapping);
+    u32 cellFile = AppMenuCommon_GetTrainerSpriteCellFile(mapping);
+    u32 animFile = AppMenuCommon_GetTrainerSpriteAnimFile(mapping);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     u32 cellAnims = func_0204bde0(arc, cellFile, animFile, heapId);
 

@@ -257,9 +257,9 @@ void func_ov194_021b76e0(PokemonTradeWork *wk) {
 }
 
 static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
-    void *save = func_02009790(wk->gameData);
+    void *save = MailBox_GetFromGameData(wk->gameData);
     BOOL ret = FALSE;
-    if (func_020097c4(save, 0) == -1) {
+    if (MailBox_GetFreeSlot(save, 0) == -1) {
         ret = TRUE;
     }
     return ret;
@@ -671,9 +671,9 @@ static void func_ov194_021b7fa8(int netId, int size, const void *data, void *wor
         validCountry = Country_GetValidCountry(country, province, TrainerInfo_GetRegion(&profile.info));
         validProvince = Country_GetValidRegion(country, province, TrainerInfo_GetRegion(&profile.info));
         if (country == validCountry && province == validProvince) {
-            func_02008c14(&profile.info, country, province);
+            PlayerInfo_SetCountryAndProvince(&profile.info, country, province);
         } else {
-            func_02008c14(&profile.info, 0, 0);
+            PlayerInfo_SetCountryAndProvince(&profile.info, 0, 0);
         }
         UnityTowerSurvey_RegisterTrade(survey, &profile);
     }
@@ -2578,8 +2578,8 @@ static void func_ov194_021bb104(PokemonTradeWork *wk) {
 static void func_ov194_021bb180(PokemonTradeWork *wk) {
     func_ov194_021c43c0(wk);
     wk->mcssSys = MCSSSys_Create(4, HEAPID_TAIL(wk->heapId));
-    func_0201aefc(wk->mcssSys, 0x30000);
-    func_0201aacc(wk->mcssSys);
+    MCSSSys_SetTexBase(wk->mcssSys, 0x30000);
+    MCSSSys_EnableOrtho(wk->mcssSys);
 }
 
 static void func_ov194_021bb1bc(PokemonTradeWork *wk) {
@@ -2642,9 +2642,9 @@ static void func_ov194_021bb2cc(PokemonTradeWork *wk, GameData *gameData, u16 fr
         wk->party = GameData_GetParty(gameData);
         if (wk->partnerInfo == NULL) {
             if (PokemonTrade_IsNetwork(wk)) {
-                wk->partnerInfo = func_02017378(gameData, 1 - func_0203ffc4());
+                wk->partnerInfo = GameData_GetPlayerInfoByNetID(gameData, 1 - func_0203ffc4());
             } else {
-                wk->partnerInfo = func_02017378(gameData, 1);
+                wk->partnerInfo = GameData_GetPlayerInfoByNetID(gameData, 1);
             }
         }
     }
@@ -2853,7 +2853,7 @@ static BOOL func_ov194_021bb868(GameProc *proc, u32 *state, void *param, void *w
         wk->unk1048[i] = 0;
         wk->unk1050[i] = 1;
     }
-    wk->partnerInfo = func_02017378(trade->gameData, 1 - func_0203ffc4());
+    wk->partnerInfo = GameData_GetPlayerInfoByNetID(trade->gameData, 1 - func_0203ffc4());
     return PokemonTrade_Init(proc, state, trade, wk, 1);
 }
 
@@ -2974,7 +2974,7 @@ static BOOL PokemonTrade_ProcMain(GameProc *proc, u32 *state, void *param, void 
         GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
         GFL_TCBExMgrUpdate(wk->tcbEx);
         GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
     }
     func_ov194_021be720(wk);
     GFL_G3DSysReset();
@@ -2986,7 +2986,7 @@ static BOOL PokemonTrade_ProcMain(GameProc *proc, u32 *state, void *param, void 
     GFL_G3DSysReqSwapBuffers();
     if (PokemonTrade_IsNetwork(wk) && wk->netSave == NULL && GFL_NetErrCheck()) {
         if (wk->unk11F7) {
-            func_02011d04(0x29);
+            GFL_NetErrShowWifi(0x29);
         }
         if (wk->unk0 != NULL) {
             NHttpRap_EndRequest(wk->unk0);

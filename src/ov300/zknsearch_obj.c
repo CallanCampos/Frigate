@@ -200,10 +200,12 @@ static void ZknSearchObj_LoadResources(ZknSearchWork *wk) {
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
-    wk->charRes[CHAR_RES_TOUCHBAR] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_TOUCHBAR] =
+        func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
     wk->paletteRes[CHAR_RES_TOUCHBAR] =
-        func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, 5 * 0x20, HEAPID_ZUKAN_SEARCH);
-    wk->cellRes[CELL_RES_TOUCHBAR] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), HEAPID_ZUKAN_SEARCH);
+        func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 5 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->cellRes[CELL_RES_TOUCHBAR] = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                   AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_ZUKAN_SEARCH);
     GFL_ArcToolFree(arc);
 }
 

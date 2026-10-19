@@ -398,7 +398,7 @@ static void ZukanHabitatGraphic_InitObj(ZukanHabitatGraphic *graphic) {
 
 static void ZukanHabitatGraphic_InitWindows(ZukanHabitatGraphic *graphic) {
     BmpWin_InitAllocator(HEAPID_ZUKAN_HABITAT);
-    graphic->printQueue = func_02021998(HEAPID_ZUKAN_HABITAT);
+    graphic->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_HABITAT);
 
     graphic->windows[ZUKAN_HABITAT_WIN_MAIN] = BmpWin_CreateDynamic(0, 0, 0, 32, 24, 15, FALSE);
     BmpWin_FlushMap(graphic->windows[ZUKAN_HABITAT_WIN_MAIN]);
@@ -475,10 +475,10 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
     barSetup.vramType = CLACT_SURFACE_MAIN;
     barSetup.flags = 0;
     barSetup.arcId = getUINarcIdx();
-    barSetup.paletteFile = func_0202d810();
-    barSetup.charFile = func_0202d814();
-    barSetup.cellFile = func_0202d818(2);
-    barSetup.animFile = func_0202d81c(2);
+    barSetup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    barSetup.charFile = AppMenuCommon_GetTouchBarCharFile();
+    barSetup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    barSetup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
     barSetup.paletteOffset = 8;
     barSetup.paletteCount = 3;
     barSetup.paletteStart = 0;
@@ -666,8 +666,8 @@ static void ZukanHabitatGraphic_FreeBlink(ZukanHabitatGraphic *graphic) {
 }
 
 static void ZukanHabitatGraphic_FreeWindows(ZukanHabitatGraphic *graphic) {
-    func_02021c44(graphic->printQueue);
-    func_02021a18(graphic->printQueue);
+    PrintQueue_Clear(graphic->printQueue);
+    PrintQueue_Free(graphic->printQueue);
     GFL_FontFree(graphic->font);
     KeyCursor_Free(graphic->keyCursor);
     GFL_TCBExMgrFree(graphic->tcbManager);
@@ -711,7 +711,7 @@ static void ZukanHabitatGraphic_UpdatePrints(ZukanHabitatGraphic *graphic) {
     int i;
 
     graphic->printed = TRUE;
-    func_02021a3c(graphic->printQueue);
+    PrintQueue_Main(graphic->printQueue);
     for (i = 0; i < ZUKAN_HABITAT_WIN_COUNT; i++) {
         PrintWindow_Flush(&graphic->prints[i], graphic->printQueue);
         if (PrintWindow_IsPrinted(&graphic->prints[i]) == FALSE) {
@@ -899,8 +899,8 @@ void ZukanHabitatGraphic_StartMessage(StrBuf *strbuf, ZukanHabitatGraphic *graph
     BmpWin_FlushMap(win);
     LoadSysMsgBox(1, 1, 12, 0, HEAPID_ZUKAN_HABITAT);
     BmpWin_DrawFrame(win, TRUE, 1, 12);
-    graphic->stream = func_02022268(graphic->windows[ZUKAN_HABITAT_WIN_MESSAGE], 0, 0, strbuf, graphic->font,
-                                    func_02017bcc(), graphic->tcbManager, 0, HEAPID_ZUKAN_HABITAT, 15);
+    graphic->stream = PrintStream_Create(graphic->windows[ZUKAN_HABITAT_WIN_MESSAGE], 0, 0, strbuf, graphic->font,
+                                         TextSpeed_GetCurrentWait(), graphic->tcbManager, 0, HEAPID_ZUKAN_HABITAT, 15);
     graphic->messageWaiting = FALSE;
     GFL_BGSysQueueScrLoad(1);
     BmpWin_FlushChar(win);
@@ -909,7 +909,7 @@ void ZukanHabitatGraphic_StartMessage(StrBuf *strbuf, ZukanHabitatGraphic *graph
 void ZukanHabitatGraphic_CloseMessage(ZukanHabitatGraphic *graphic) {
     BmpWin *win = ZukanHabitatGraphic_GetWindow(graphic, ZUKAN_HABITAT_WIN_MESSAGE);
 
-    func_020223cc(graphic->stream);
+    PrintStream_Delete(graphic->stream);
     BmpWin_ClearFrame(win, TRUE);
     BmpWin_ClearScreen(win);
     GFL_BGSysQueueScrLoad(0);
@@ -919,7 +919,7 @@ void ZukanHabitatGraphic_CloseMessage(ZukanHabitatGraphic *graphic) {
 }
 
 u32 ZukanHabitatGraphic_GetMessageState(ZukanHabitatGraphic *graphic) {
-    return func_020223b4(graphic->stream);
+    return PrintStream_GetState(graphic->stream);
 }
 
 void ZukanHabitatGraphic_WaitMessage(ZukanHabitatGraphic *graphic) {

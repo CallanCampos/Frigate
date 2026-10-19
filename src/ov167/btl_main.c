@@ -129,8 +129,8 @@ BOOL func_ov167_021998c0(GameProc *proc, u32 *state, void *param, void *work) {
         notInitialized = FALSE;
         mainModule->viewCore = NULL;
         mainModule->result = 7;
-        mainModule->unk43C = func_02008a14(mainModule->setup->config);
-        if (!func_02008a4c(setup->config)) {
+        mainModule->unk43C = Config_GetTextSpeed(mainModule->setup->config);
+        if (!Config_GetBattleScene(setup->config)) {
             notInitialized = TRUE;
         }
         mainModule->unk473_2 = (u8)notInitialized;
@@ -158,7 +158,7 @@ BOOL func_ov167_021998c0(GameProc *proc, u32 *state, void *param, void *work) {
             }
         }
         func_ov167_021bda58(&mainModule->unk448);
-        flag = func_02008a68(setup->config);
+        flag = Config_GetBattleStyle(setup->config);
         isSet = FALSE;
         if (flag) {
             isSet = TRUE;
@@ -287,7 +287,7 @@ BOOL func_ov167_02199cd4(GameProc *proc, u32 *state, void *param, void *work) {
             if (GFL_SndBGMIsFading()) {
                 break;
             }
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             (*state)++;
         } else {
             (*state)++;
@@ -1545,14 +1545,14 @@ u8 func_ov167_0219bd98(BtlMainModule *mainModule) {
 BOOL IsSwitchMode(BtlMainModule *mainModule) {
     if (BtlSetup_GetBattleType(mainModule) == 1 && BtlSetup_GetBattleStyle(mainModule) == 0 &&
         func_ov167_0219bee4(mainModule) == 0 && func_ov167_0219c988(mainModule) == 0 &&
-        func_02008a68(mainModule->setup->config) == 0) {
+        Config_GetBattleStyle(mainModule->setup->config) == 0) {
         return TRUE;
     }
     return FALSE;
 }
 
 s32 func_ov167_0219bde0(BtlMainModule *mainModule) {
-    return func_02017c50(mainModule->unk43C);
+    return TextSpeed_GetWait(mainModule->unk43C);
 }
 
 void func_ov167_0219bdf0(BtlMainModule *mainModule) {
@@ -3069,11 +3069,11 @@ void func_ov167_0219d72c(BtlTrainerData *trainer, HeapID heapId, PlayerInfo *src
     u16 trainerClass;
     u8 version;
 
-    trainer->playerInfo = func_02008b0c(heapId);
-    func_02008b34(src, trainer->playerInfo);
+    trainer->playerInfo = PlayerInfo_Create(heapId);
+    PlayerInfo_Copy(src, trainer->playerInfo);
     trainerClass = 0;
     trainer->unk0A = 0;
-    version = func_02008bfc(src);
+    version = PlayerInfo_GetVersion(src);
     if (version == VERSION_WHITE2 || version == VERSION_BLACK2) {
         if (getTrainerGender(trainer->playerInfo)) {
             trainerClass = 1;
@@ -3500,7 +3500,7 @@ void func_ov167_0219dfa8(BtlMainModule *mainModule, u8 clientId, const PlayerInf
     u8 index = func_ov167_0219e048(mainModule->playerClientId, clientId);
 
     if (mainModule->setup->unk34[index] != NULL) {
-        func_02008b34(src, mainModule->setup->unk34[index]);
+        PlayerInfo_Copy(src, mainModule->setup->unk34[index]);
     }
 }
 

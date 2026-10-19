@@ -160,7 +160,7 @@ Demo3DGraphic *Demo3DGraphic_Create(u32 layout, u32 demoId, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     if (!graphic->dual3D) {
         Demo3DBG_Init(&graphic->bg, heapId);
         Demo3DClAct_Init(&graphic->clact, &sDemo3DVRAMConfigs[0], heapId);
@@ -179,7 +179,7 @@ void Demo3DGraphic_Free(Demo3DGraphic *graphic) {
         Demo3DClAct_Free(&graphic->clact);
         Demo3DBG_Free(&graphic->bg);
     }
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

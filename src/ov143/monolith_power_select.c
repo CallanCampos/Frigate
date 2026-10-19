@@ -470,7 +470,7 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
                 getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
                 mpw->ids[mpw->selected], 0);
             comm = GSYS_GetGameCommSystem(screen->param->gsys);
-            func_0202bf68(comm, func_020175cc(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
+            func_0202bf68(comm, GameData_GetNetID(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
             mpw->selected = MONOLITH_POWER_NONE;
             MonolithTool_SetPanelPulse(screen, TRUE, 1);
             MonolithTool_SetTextCursor(screen, &mpw->receiveButton, 1, 0xff, 3);
@@ -548,14 +548,14 @@ static BOOL MonolithPower_Exit(GameProc *proc, u32 *state, void *param, void *wo
     MonolithScreenParam *screen = param;
     MonolithPowerWork *mpw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     MonolithPower_SaveEquipped(screen, mpw);
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG3);
     GFL_TCBRemove(mpw->vblankTask);
     if (mpw->print_stream != NULL) {
-        func_020223cc(mpw->print_stream);
+        PrintStream_Delete(mpw->print_stream);
     }
     if (mpw->msgStr != NULL) {
         GFL_StrBufFree(mpw->msgStr);
@@ -646,8 +646,8 @@ static void MonolithPower_ShowMessage(MonolithPowerWork *mpw, MonolithWork *wk, 
     GFL_ASSERT(mpw->print_stream == NULL);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     mpw->msgStr = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, msgId);
-    mpw->print_stream = func_02022268(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, func_02017bcc(), wk->tcbMgr, 10,
-                                      HEAPID_MONOLITH, 15);
+    mpw->print_stream = PrintStream_Create(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, TextSpeed_GetCurrentWait(),
+                                           wk->tcbMgr, 10, HEAPID_MONOLITH, 15);
     BmpWin_FlushMap(mpw->windows[0]);
     BmpWin_DrawFrame(mpw->windows[0], TRUE, 1, 11);
 }
@@ -661,8 +661,8 @@ static void MonolithPower_ShowMessageExpanded(MonolithPowerWork *mpw, MonolithWo
     mpw->msgStr = GFL_StrBufCreate(256, HEAPID_MONOLITH);
     GFL_WordSetFormatStrbuf(wk->wordSet, mpw->msgStr, str);
     GFL_StrBufFree(str);
-    mpw->print_stream = func_02022268(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, func_02017bcc(), wk->tcbMgr, 10,
-                                      HEAPID_MONOLITH, 15);
+    mpw->print_stream = PrintStream_Create(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, TextSpeed_GetCurrentWait(),
+                                           wk->tcbMgr, 10, HEAPID_MONOLITH, 15);
     BmpWin_FlushMap(mpw->windows[0]);
     BmpWin_DrawFrame(mpw->windows[0], TRUE, 1, 11);
 }
@@ -678,7 +678,7 @@ static void MonolithPower_ClearMessage(MonolithPowerWork *mpw) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(mpw->windows[0]);
 
     GFL_ASSERT(mpw->print_stream != NULL);
-    func_020223cc(mpw->print_stream);
+    PrintStream_Delete(mpw->print_stream);
     mpw->print_stream = NULL;
     GFL_StrBufFree(mpw->msgStr);
     mpw->msgStr = NULL;

@@ -129,7 +129,7 @@ static BOOL TDownload_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->wordSet = GFL_WordSetSystemCreate(8, 40, wk->heapId);
     wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_DOWNLOAD, wk->heapId);
     wk->msgData[1] = NULL;
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->tcbEx = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
     wk->stream = NULL;
     wk->streamStr = NULL;
@@ -155,7 +155,7 @@ static BOOL TDownload_Exit(GameProc *proc, u32 *state, void *param, void *work) 
         }
     }
     TDownloadSave_FreeWaitIcon(wk);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->font);
     GFL_TCBExMgrFree(wk->tcbEx);
@@ -177,7 +177,7 @@ static BOOL TDownload_Main(GameProc *proc, u32 *state, void *param, void *work) 
         }
         break;
     case 1:
-        if (wk->seq == T_DOWNLOAD_SEQ_END && func_02021c0c(wk->printQueue) == TRUE) {
+        if (wk->seq == T_DOWNLOAD_SEQ_END && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -312,7 +312,7 @@ static void TDownload_RunMode(TDownloadWork *wk) {
 static void TDownload_FlushWindows(TDownloadWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < T_DOWNLOAD_WINDOW_COUNT; i++) {
         if (wk->windows[i].window != NULL) {
             PrintWindow_Flush(&wk->windows[i], wk->printQueue);
@@ -373,7 +373,7 @@ static void TDownload_InitSelect(TDownloadWork *wk) {
 }
 
 static void TDownload_SelectMain(TDownloadWork *wk) {
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (TDownload_SelectTouch(wk) == FALSE) {
             TDownload_SelectKeys(wk);
         }
@@ -523,7 +523,7 @@ static void TDownload_Select(TDownloadWork *wk) {
         }
         break;
     case 130:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
@@ -624,7 +624,7 @@ static void TDownload_InitDetail(TDownloadWork *wk) {
 }
 
 static void TDownload_DetailMain(TDownloadWork *wk) {
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (TDownload_DetailTouch(wk) == FALSE) {
             TDownload_DetailKeys(wk);
         }
@@ -943,7 +943,7 @@ static void TDownload_ReceivedMain(TDownloadWork *wk) {
     BOOL handled = FALSE;
     int result;
 
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (func_0203d554() == TRUE && GCTX_HIDGetPressedKeys()) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1086,7 +1086,7 @@ static void TDownload_Received(TDownloadWork *wk) {
         }
         break;
     case 130:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
@@ -1234,7 +1234,7 @@ static void TDownload_InitSaved(TDownloadWork *wk) {
 }
 
 static void TDownload_SavedMain(TDownloadWork *wk) {
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (TDownload_SavedTouch(wk) == FALSE) {
             TDownload_SavedKeys(wk);
         }
@@ -1411,7 +1411,7 @@ static void TDownload_Saved(TDownloadWork *wk) {
         }
         break;
     case 130:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
@@ -1527,14 +1527,14 @@ static void TDownload_Saved(TDownloadWork *wk) {
         }
         break;
     case 405:
-        if (func_02021c0c(wk->printQueue)) {
+        if (PrintQueue_IsEmpty(wk->printQueue)) {
             TDownloadSave_StartSave(wk, wk->listPos[2], TDownloadSave_FindFreeSlot(wk));
             TDownloadSave_CreateWaitIcon(wk);
             wk->seq = 500;
         }
         break;
     case 410:
-        if (func_02021c0c(wk->printQueue)) {
+        if (PrintQueue_IsEmpty(wk->printQueue)) {
             TDownloadSave_StartSave(wk, wk->listPos[2], wk->slotCursor);
             TDownloadSave_CreateWaitIcon(wk);
             wk->seq = 500;

@@ -165,10 +165,13 @@ static void BPlistObj_LoadTypeIconRes(BPlistWork *wk) {
     wk->plttRes[3] = func_0204bba0(arc, 33, CLACT_VRAM_SUB, 0xa0, wk->param->heapId);
     wk->cellRes[3] = func_0204bde0(arc, 59, 62, wk->param->heapId);
     for (i = 8; i <= 21; i++) {
-        wk->charRes[i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+        wk->charRes[i] =
+            func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     }
-    wk->charRes[22] = func_0204b81c(arc, func_0202d80c(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->charRes[23] = func_0204b81c(arc, func_0202d80c(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->charRes[22] =
+        func_0204b81c(arc, AppMenuCommon_GetCategoryIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->charRes[23] =
+        func_0204b81c(arc, AppMenuCommon_GetCategoryIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -263,12 +266,13 @@ static void BPlistObj_SetPokeIconPalettes(BPlistWork *wk) {
 static void BPlistObj_LoadTypeIcon(BPlistWork *wk, ClActor *actor, u32 chars, u32 type) {
     NNSG2dCharacterData *charData;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
-    void *file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d7f4(type), FALSE, &charData, HEAPID_TAIL(wk->param->heapId));
+    void *file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, &charData,
+                                         HEAPID_TAIL(wk->param->heapId));
 
     func_0204ba40(wk->charRes[chars], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(actor, func_0202d7e8(type), 1);
+    func_0204c378(actor, AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void BPlistObj_LoadCategoryIcon(BPlistWork *wk, u32 actor, u32 chars, u32 category) {
@@ -279,11 +283,12 @@ static void BPlistObj_LoadCategoryIcon(BPlistWork *wk, u32 actor, u32 chars, u32
     actor += wk->categoryIconBuf;
     chars += wk->categoryIconBuf;
     arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
-    file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d80c(category), FALSE, &charData, HEAPID_TAIL(wk->param->heapId));
+    file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetCategoryIconCharFile(category), FALSE, &charData,
+                                   HEAPID_TAIL(wk->param->heapId));
     func_0204ba40(wk->charRes[chars], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->actors[actor], func_0202d800(category), 1);
+    func_0204c378(wk->actors[actor], AppMenuCommon_GetCategoryIconPaletteIndex(category), 1);
     wk->categoryIconBuf ^= 1;
 }
 

@@ -281,8 +281,8 @@ DupFittingWork *DupFitting_Create(MusicalDressUpParam *param, HeapID heapId) {
     work->autoScroll = TRUE;
     work->scrolled = 0;
     work->scrollTarget = work->angle % DUP_FITTING_RING_STEP + 0x10000;
-    if (func_0200af44(work->param->save) == FALSE) {
-        func_0200af50(work->param->save, TRUE);
+    if (MusicalSave_GetDressingRoomVisited(work->param->save) == FALSE) {
+        MusicalSave_SetDressingRoomVisited(work->param->save, TRUE);
         work->showDemo = TRUE;
     } else {
         work->showDemo = FALSE;
@@ -296,8 +296,8 @@ void DupFitting_Free(DupFittingWork *work) {
     u8 i;
 
     func_0203d564(TRUE);
-    func_0200ae14(work->param->save);
-    func_02005d8c();
+    MusicalSave_ClearNewProps(work->param->save);
+    GFL_SndBGMStopImmediate();
     DupFitting_FreeMessages(work);
     DupFitting_FreeSparkles(work);
     func_0204c108(work->buttons[0]);
@@ -471,7 +471,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
         loadBGScrToVramByNarcNoReserveNegAlign(ARCID_MUSICAL_SHOT, 13, 7, 0, 0, FALSE, work->heapId);
         GFL_BGSysQueueScrLoad(7);
         work->printing = FALSE;
-        func_02021c44(work->printQueue);
+        PrintQueue_Clear(work->printQueue);
         BmpWin_Free(work->bmpWin);
         work->bmpWin = NULL;
         DupFitting_Trace(work, 6);
@@ -491,7 +491,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
         }
     }
     DupFitting_Trace(work, 10);
-    if (work->printing == TRUE && func_02021c0c(work->printQueue) == TRUE) {
+    if (work->printing == TRUE && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
         work->printing = FALSE;
         BmpWin_Transfer(work->bmpWin);
         GFL_BGSysSetBGPriority(4, 1);
@@ -501,7 +501,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
     }
     DupFitting_Trace(work, 12);
     if (work->printQueue != NULL) {
-        func_02021a3c(work->printQueue);
+        PrintQueue_Main(work->printQueue);
     }
     DupFitting_Trace(work, 14);
     if (work->sndCooldown != 0) {
@@ -846,10 +846,10 @@ static void DupFitting_InitItems(DupFittingWork *work) {
 
     work->entryCount = 0;
     for (n = 0; n < DUP_FITTING_ENTRY_MAX; n++) {
-        if (func_0200ad60(work->param->save, n) == TRUE) {
+        if (MusicalSave_HasProp(work->param->save, n) == TRUE) {
             work->entries[work->entryCount].itemId = n;
             work->entries[work->entryCount].used = FALSE;
-            if (func_0200ad9c(work->param->save, n) == TRUE) {
+            if (MusicalSave_IsPropNew(work->param->save, n) == TRUE) {
                 work->entries[work->entryCount].isNew = TRUE;
             } else {
                 work->entries[work->entryCount].isNew = FALSE;
@@ -2353,12 +2353,12 @@ static void DupFitting_InitMessages(DupFittingWork *work) {
     work->categoryMsg =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, work->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 0x1c0, 0x20, work->heapId);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     LoadSysMsgBox(7, 0x80, 12, 0, work->heapId);
 }
 
 static void DupFitting_FreeMessages(DupFittingWork *work) {
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_MsgDataFree(work->itemMsg);
     GFL_MsgDataFree(work->categoryMsg);
     GFL_MsgDataFree(work->dressMsg);
@@ -2368,7 +2368,7 @@ static void DupFitting_FreeMessages(DupFittingWork *work) {
 static void DupFitting_PrintMessage(DupFittingWork *work, u32 messageId, WordSet *wordSet) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(work->dressMsg, messageId);
 
-    func_02021c44(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(work->bmpWin), 15);
     if (wordSet != NULL) {
         StrBuf *formatted = GFL_StrBufCreate(128, work->heapId);
@@ -2377,7 +2377,8 @@ static void DupFitting_PrintMessage(DupFittingWork *work, u32 messageId, WordSet
         GFL_StrBufFree(str);
         str = formatted;
     }
-    func_02021c7c(work->printQueue, BmpWin_GetBitmap(work->bmpWin), 2, 2, str, work->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(work->printQueue, BmpWin_GetBitmap(work->bmpWin), 2, 2, str, work->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     work->printing = TRUE;
 }

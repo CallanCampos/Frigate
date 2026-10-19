@@ -159,7 +159,7 @@ MysteryGraphic *MysteryGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MysteryGraphicBG_Init(&graphic->bg, heapId);
     MysteryGraphicClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(MysteryGraphic_VBlank, graphic, 0);
@@ -170,7 +170,7 @@ void MysteryGraphic_Delete(MysteryGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     MysteryGraphicClAct_Free(&graphic->clact);
     MysteryGraphicBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

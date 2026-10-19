@@ -278,9 +278,9 @@ static void ItemMenu_ChangePocket(ItemMenuWork *work, u32 oldPocket, u32 newPock
     s16 row;
     s16 scroll;
 
-    func_020088a4(work->cursor, oldPocket);
-    func_02008894(work->cursor, oldPocket, work->cursorRow, work->scroll + 1);
-    func_0200887c(work->cursor, newPocket, &row, &scroll);
+    BagCursor_SetPocket(work->cursor, oldPocket);
+    BagCursor_SetPocketPosition(work->cursor, oldPocket, work->cursorRow, work->scroll + 1);
+    BagCursor_GetPocketPosition(work->cursor, newPocket, &row, &scroll);
     work->cursorRow = row;
     work->scroll = scroll - 1;
     ItemMenuDisp_UpdateScrollBar(work);
@@ -514,7 +514,7 @@ static void ItemMenu_StateMoveItem(ItemMenuWork *work) {
     s32 from;
 
     BlinkPalAnm_Main(work->paletteAnim);
-    if (func_02021c0c(work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == FALSE) {
         return;
     }
     from = ItemMenu_GetCursorIndex(work);
@@ -930,7 +930,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
     u32 keys;
     s32 pocket;
 
-    if (func_02021c0c(work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == FALSE) {
         return;
     }
     if (func_0203da2c() == FALSE) {
@@ -2096,7 +2096,7 @@ static void ItemMenu_VBlank(TCB *tcb, void *data) {
 
 // Fades the bag in
 static void ItemMenu_StateFadeIn(ItemMenuWork *work) {
-    if (func_02021c0c(work->printQueue)) {
+    if (PrintQueue_IsEmpty(work->printQueue)) {
         GFL_WipeSet(0, 1, 1, 0, 6, 1, work->heapId);
         GFL_SndSEPlay(SEQ_SE_SYS_90);
         ItemMenu_SetState(work, ItemMenu_StateWaitFadeIn);
@@ -2172,9 +2172,9 @@ static BOOL ItemMenuProc_Init(GameProc *proc, u32 *state, void *param, void *dat
     work->freeSpaceFilter = bag->freeSpaceFilter;
     sortItemBlocks(work->bag);
     BagItemList_Init(&work->itemList, bag->bag, work->freeSpaceFilter, work->heapId);
-    work->pocket = func_02008890(work->cursor);
+    work->pocket = BagCursor_GetPocket(work->cursor);
     for (pocket = 0; pocket < 6; pocket++) {
-        func_0200887c(work->cursor, pocket, &row, &scroll);
+        BagCursor_GetPocketPosition(work->cursor, pocket, &row, &scroll);
         count = BagItemList_CountShown(&work->itemList, pocket);
         while (TRUE) {
             if (row == 0 && scroll == 0) {
@@ -2196,14 +2196,14 @@ static BOOL ItemMenuProc_Init(GameProc *proc, u32 *state, void *param, void *dat
             work->cursorRow = row;
             work->scroll = scroll - 1;
         }
-        func_02008894(work->cursor, pocket, row, scroll);
+        BagCursor_SetPocketPosition(work->cursor, pocket, row, scroll);
     }
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN, work->heapId);
     work->strbuf = GFL_StrBufCreate(200, work->heapId);
     work->expandBuf = GFL_StrBufCreate(200, work->heapId);
     work->tempBuf = GFL_StrBufCreate(64, work->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
-    work->printQueue = func_020219a8(0x1000, work->heapId);
+    work->printQueue = PrintQueue_Create(0x1000, work->heapId);
     work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, work->heapId);
     work->font = GFL_FontCreate(23, 0, 0, FALSE, work->heapId);
     ItemMenuDisp_Init(work);
@@ -2256,13 +2256,13 @@ static BOOL ItemMenuProc_Exit(GameProc *proc, u32 *state, void *param, void *dat
     if (GFL_WipeIsFinished() != TRUE) {
         return FALSE;
     }
-    if (func_02021c0c(work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_TCBRemove(work->vblankTask);
     BagItemList_Exit(&work->itemList);
-    func_020088a4(work->cursor, work->pocket);
-    func_02008894(work->cursor, work->pocket, work->cursorRow, work->scroll + 1);
+    BagCursor_SetPocket(work->cursor, work->pocket);
+    BagCursor_SetPocketPosition(work->cursor, work->pocket, work->cursorRow, work->scroll + 1);
     AppTaskMenuRes_Free(work->taskMenuRes);
     ItemMenuDisp_Exit(work);
     ItemMenuDisp_FreeBGChars(work);
@@ -2280,8 +2280,8 @@ static BOOL ItemMenuProc_Exit(GameProc *proc, u32 *state, void *param, void *dat
     GFL_BGSysFreeFilledChar(3, 1, 0);
     GFL_FontFree(work->font);
     KeyCursor_Free(work->keyCursor);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     ItemMenu_FreePaletteFade(work);
     ItemMenu_FreePaletteAnim(work);
     GFL_BMN_Delete(work->buttonMan);
@@ -2848,10 +2848,10 @@ static void ItemMenu_SaveFreeSpaceFilter(void *cursor, u32 mode, u32 result, u32
     case 0:
         break;
     case 1:
-        func_020088ec(cursor, BAG_ITEM_FILTER_ALL);
+        BagCursor_SetFreeSpaceFilter(cursor, BAG_ITEM_FILTER_ALL);
         break;
     case 2:
-        func_020088ec(cursor, freeSpaceFilter);
+        BagCursor_SetFreeSpaceFilter(cursor, freeSpaceFilter);
         break;
     }
 }

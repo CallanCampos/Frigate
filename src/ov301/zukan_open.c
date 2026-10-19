@@ -312,11 +312,11 @@ static void ZukanOpen_LoadSkin(ZukanOpenWork *work) {
     void *characters;
     void *palette;
 
-    if (func_020074ec(save, SKIN_BLOCK, HEAPID_TAIL(HEAPID_ZUKAN_OPEN)) == TRUE) {
+    if (SaveControl_OpenExtraBlock(save, SKIN_BLOCK, HEAPID_TAIL(HEAPID_ZUKAN_OPEN)) == TRUE) {
         block = getAddressOfExtraSaveBlk(save, SKIN_BLOCK, 0);
-        if (block != NULL && func_0200f18c(block) == TRUE) {
-            characters = func_0200f180(block);
-            palette = func_0200f184(block);
+        if (block != NULL && PokedexSkinSave_IsValid(block) == TRUE) {
+            characters = PokedexSkinSave_GetChars(block);
+            palette = PokedexSkinSave_GetPalette(block);
             GFL_BGSysLoadChar(BG_COVER_BACK, characters, SKIN_CHAR_SIZE, 0);
             GFL_BGSysUploadStdPalette(BG_COVER_BACK, palette, SKIN_PALETTE_SIZE, 0);
             GFL_BGSysUploadStdPalette(BG_COVER_SUB, palette, SKIN_PALETTE_SIZE, 0);

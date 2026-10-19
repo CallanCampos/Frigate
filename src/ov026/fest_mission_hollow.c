@@ -28,7 +28,7 @@ static const FesMissionHollowPerson data_ov026_0216fa50[] = {
 
 void FesMissionHollow_Setup(RivalSelectContext *context) {
     FestMission *mission = GetFestMissionCfg(context->entryOwner);
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     MATHRandContext32 rand;
     u8 hollows[20];
     int i;

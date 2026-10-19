@@ -217,7 +217,7 @@ static void func_ov194_021bedfc(PokemonTradeWork *wk) {
         sent = PokemonTrade_GetPkm(wk, 1);
         received = PokemonTrade_GetPkm(wk, 0);
     }
-    func_02008b34(GetGameDataPlayerInfo(wk->gameData), &profile.info);
+    PlayerInfo_Copy(GetGameDataPlayerInfo(wk->gameData), &profile.info);
     if (PokeParty_GetParam(sent, PKM_PARAM_IS_EGG, NULL)) {
         profile.sentSpecies = SPECIES_EGG;
     } else {
@@ -229,7 +229,7 @@ static void func_ov194_021bedfc(PokemonTradeWork *wk) {
         profile.receivedSpecies = PokeParty_GetParam(received, PKM_PARAM_SPECIES, NULL);
     }
     profile.hobby = getPlayerSurveys(survey);
-    profile.countryCount = func_02009ca0(survey);
+    profile.countryCount = UnityTower_GetCountryCount(survey);
     profile.unk26_0 = func_02009d28(survey);
     if (PokemonTrade_IsNetwork(wk)) {
         if (func_02042be8(func_02040440(), TRADE_NET_CMD_UNK12, sizeof(profile), &profile)) {
@@ -250,29 +250,30 @@ static inline void GFL_STD_MemCopy(const void *src, void *dest, u32 size) {
 // The copies of the mail and of the records are inlined, and not `static`: each has a file name string of its own
 // in `.data`, ahead of the one the file's other allocations share, which MWCC gives only to an external inline
 inline void *BackupMail(GameData *gameData, HeapID heapId) {
-    void *copy = GFL_HeapAllocate(heapId, func_020097a0(), FALSE, "pokemontrade_save.c", 370);
-    u32 size = func_020097a0();
-    GFL_STD_MemCopy(func_02009790(gameData), copy, size);
+    void *copy = GFL_HeapAllocate(heapId, MailBox_GetSize(), FALSE, "pokemontrade_save.c", 370);
+    u32 size = MailBox_GetSize();
+    GFL_STD_MemCopy(MailBox_GetFromGameData(gameData), copy, size);
     return copy;
 }
 
 inline void *BackupRecords(GameData *gameData, HeapID heapId) {
-    void *copy = GFL_HeapAllocate(heapId, func_020093d0(), FALSE, "pokemontrade_save.c", 401);
-    u32 size = func_020093d0();
+    void *copy = GFL_HeapAllocate(heapId, GameRecords_GetSize(), FALSE, "pokemontrade_save.c", 401);
+    u32 size = GameRecords_GetSize();
     GFL_STD_MemCopy(GameData_GetRecords(gameData), copy, size);
     return copy;
 }
 
 static void *func_ov194_021bef14(GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    void *copy = GFL_HeapAllocate(heapId, func_02009b5c(), FALSE, "pokemontrade_save.c", 431);
-    u32 size = func_02009b5c();
+    void *copy = GFL_HeapAllocate(heapId, UnityTower_GetSurveySaveSize(), FALSE, "pokemontrade_save.c", 431);
+    u32 size = UnityTower_GetSurveySaveSize();
     MI_CpuCopy8(getUnityTower_SurveySaveBlkAddrress(save), copy, size);
     return copy;
 }
 
 static void func_ov194_021bef58(GameData *gameData, void *copy) {
-    MI_CpuCopy8(copy, getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), func_02009b5c());
+    MI_CpuCopy8(copy, getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)),
+                UnityTower_GetSurveySaveSize());
     GFL_HeapFree(copy);
 }
 
@@ -289,14 +290,14 @@ static void func_ov194_021befbc(GameData *gameData, void *copy) {
 }
 
 static void *func_ov194_021befdc(GameData *gameData, HeapID heapId) {
-    void *copy = GFL_HeapAllocate(heapId, func_0200a4b8(), FALSE, "pokemontrade_save.c", 489);
-    u32 size = func_0200a4b8();
-    MI_CpuCopy8(func_02017980(gameData), copy, size);
+    void *copy = GFL_HeapAllocate(heapId, PalPadFriendList_GetSize(), FALSE, "pokemontrade_save.c", 489);
+    u32 size = PalPadFriendList_GetSize();
+    MI_CpuCopy8(GameData_GetPalPadFriendList(gameData), copy, size);
     return copy;
 }
 
 static void func_ov194_021bf01c(GameData *gameData, void *copy) {
-    MI_CpuCopy8(copy, func_02017980(gameData), func_0200a4b8());
+    MI_CpuCopy8(copy, GameData_GetPalPadFriendList(gameData), PalPadFriendList_GetSize());
     GFL_HeapFree(copy);
 }
 
@@ -336,13 +337,13 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
         void *block;
         // The save is fetched and left unused, as if the block once came from it
         GameData_GetSaveControl(gameData);
-        block = func_02009790(gameData);
-        MI_CpuCopy8(copy, block, func_020097a0());
+        block = MailBox_GetFromGameData(gameData);
+        MI_CpuCopy8(copy, block, MailBox_GetSize());
         GFL_HeapFree(copy);
     }
     if ((copy = wk->backup.records) != NULL) {
         GameRecords *records = GameData_GetRecords(wk->gameData);
-        MI_CpuCopy8(copy, records, func_020093d0());
+        MI_CpuCopy8(copy, records, GameRecords_GetSize());
         GFL_HeapFree(copy);
     }
     if (wk->backup.survey != NULL) {
@@ -356,7 +357,7 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
     }
     if (wk->backup.party != NULL) {
         PokeParty_Copy(wk->backup.party, wk->party);
-        func_02008d98(func_02017a40(wk->gameData), &wk->backup.unk1C);
+        PlayTime_SetLastSaved(GameData_GetPlayTime(wk->gameData), &wk->backup.unk1C);
         GFL_HeapFree(wk->backup.party);
         wk->backup.party = NULL;
     }
@@ -405,7 +406,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
         wk->backup.survey = func_ov194_021bef14(wk->gameData, wk->heapId);
         wk->backup.pokedex = func_ov194_021bef7c(wk->gameData, wk->heapId);
         wk->backup.playersMet = func_ov194_021befdc(wk->gameData, wk->heapId);
-        func_02008d90(func_02017a40(wk->gameData), &wk->backup.unk1C);
+        PlayTime_GetLastSaved(GameData_GetPlayTime(wk->gameData), &wk->backup.unk1C);
         if (wk->param->box == BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
             wk->backup.party = PokeParty_Create(wk->heapId);
             PokeParty_Copy(wk->party, wk->backup.party);
@@ -428,12 +429,12 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
         if (param->box != BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
             pkm = PokeParty_GetPkm(param->party, 0);
             if (PML_ItemIsMail(PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL))) {
-                void *block = func_02009790(wk->gameData);
-                int mailSlot = func_020097c4(block, 0);
+                void *block = MailBox_GetFromGameData(wk->gameData);
+                int mailSlot = MailBox_GetFreeSlot(block, 0);
                 if (mailSlot != -1) {
                     MailData *mail = CreateMailData(wk->heapId);
                     PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
-                    func_020097e0(block, 0, mailSlot, mail);
+                    MailBox_SetMail(block, 0, mailSlot, mail);
                     ResetMailData(mail);
                     PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
                     PokeParty_SetParam(pkm, PKM_PARAM_ITEM, 0);
@@ -448,14 +449,14 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
         u32 validCountry = Country_GetValidCountry(country, province, TrainerInfo_GetRegion(wk->partnerInfo));
         u32 validProvince = Country_GetValidRegion(country, province, TrainerInfo_GetRegion(wk->partnerInfo));
         if (country != validCountry || province != validProvince) {
-            func_02008c14(wk->partnerInfo, 0, 0);
+            PlayerInfo_SetCountryAndProvince(wk->partnerInfo, 0, 0);
         }
     }
-    func_0200a504(func_02017980(wk->gameData), wk->partnerInfo);
+    PalPadFriendList_AddPlayer(GameData_GetPalPadFriendList(wk->gameData), wk->partnerInfo);
     {
         // A trade with a game of the other colour
         BOOL medal = FALSE;
-        u8 version = func_02008bfc(wk->partnerInfo);
+        u8 version = PlayerInfo_GetVersion(wk->partnerInfo);
 #ifdef BLACK2
         if (version == VERSION_WHITE || version == VERSION_WHITE2) {
             medal = TRUE;
@@ -482,8 +483,8 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
                 u8 province = UnityTowerVisitor_GetProvince(info);
                 // The region is read and left unused
                 TrainerInfo_GetRegion(info);
-                if (!func_02009ba4(survey, country, province)) {
-                    func_02009be0(survey, country, province, TRUE);
+                if (!UnityTower_GetRegionState(survey, country, province)) {
+                    UnityTower_SetRegionState(survey, country, province, TRUE);
                 }
             }
         }
@@ -511,7 +512,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
     }
     addPkmToDex(GameData_GetPokedex(wk->gameData), pkm);
     if (wk->type == 3) {
-        func_0200a5cc(func_02017980(wk->gameData));
+        PalPadFriendList_IncrementTradeCount(GameData_GetPalPadFriendList(wk->gameData));
     }
     if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) == SPECIES_SHAYMIN &&
         PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL) == 1) {
@@ -525,13 +526,13 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
     }
     switch (wk->type) {
     case 2:
-        func_0200a2d4(GameData_GetWifiList(wk->gameData), wk->param->friendIndex - 1, 0, 0, 1);
+        WifiList_AddFriendRecord(GameData_GetWifiList(wk->gameData), wk->param->friendIndex - 1, 0, 0, 1);
         break;
     case 0:
     case 1: {
         u32 index;
-        if (func_0200a438(GameData_GetWifiList(wk->gameData), wk->partnerInfo, &index)) {
-            func_0200a2d4(GameData_GetWifiList(wk->gameData), index, 0, 0, 1);
+        if (WifiList_FindFriendByPlayerInfo(GameData_GetWifiList(wk->gameData), wk->partnerInfo, &index)) {
+            WifiList_AddFriendRecord(GameData_GetWifiList(wk->gameData), index, 0, 0, 1);
         }
         break;
     }
@@ -653,7 +654,7 @@ static void func_ov194_021bf9ec(PokemonTradeWork *wk) {
     if (func_ov194_021c00b0(wk)) {
         if (PokemonTrade_IsNetwork(wk)) {
             func_ov194_021bf278(wk);
-            wk->netSave = func_02012f1c(wk->heapId, wk->gameData, func_ov194_021bf03c, wk);
+            wk->netSave = NetSave_CreateWithCallback(wk->heapId, wk->gameData, func_ov194_021bf03c, wk);
             PokemonTrade_SetState(wk, func_ov194_021bfa48);
         } else {
             PokemonTrade_SetState(wk, func_ov194_021bfa7c);
@@ -662,9 +663,9 @@ static void func_ov194_021bf9ec(PokemonTradeWork *wk) {
 }
 
 static void func_ov194_021bfa48(PokemonTradeWork *wk) {
-    if (func_02012f5c(wk->netSave)) {
+    if (NetSave_Update(wk->netSave)) {
         func_ov194_021bf0c4(wk);
-        func_02012f8c(wk->netSave);
+        NetSave_Free(wk->netSave);
         wk->netSave = NULL;
         PokemonTrade_SetState(wk, func_ov194_021bfa7c);
     }

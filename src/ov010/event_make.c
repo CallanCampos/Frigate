@@ -128,7 +128,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case 8:
         procWork->vsPlayerLoaded = TRUE;
-        func_0200bb24(HEAPID_BATTLE_PROC);
+        BattleRec_Init(HEAPID_BATTLE_PROC);
         QueueGameProc(procWork->manager, -1, &data_ov167_021d6ce0, battle->setup);
         *state = 9;
         break;
@@ -153,9 +153,9 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         procWork->commandsSet = FALSE;
         GFL_OvlUnload(OVERLAY_ID(167));
         procWork->ov167Loaded = FALSE;
-        func_0200c1f0();
+        BattleRec_LoadToolOverlay();
         BattleRecTool_StoreSetup(battle->setup);
-        func_0200c200();
+        BattleRec_UnloadToolOverlay();
         *state = 13;
         break;
     case 13:
@@ -230,7 +230,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         if (battle->setup->unkB0 == NULL) {
             saved = FALSE;
         } else {
-            saved = func_0200c1d0(battle->setup->unkAD) ? TRUE : FALSE;
+            saved = BattleRec_IsVersionSupported(battle->setup->unkAD) ? TRUE : FALSE;
         }
         battle->ov306Param.gameData = battle->gameData;
         battle->ov306Param.unk4 = saved;

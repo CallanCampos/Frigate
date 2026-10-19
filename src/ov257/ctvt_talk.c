@@ -334,7 +334,7 @@ static inline void CtvtTalk_ClearWindow(BmpWin *window) {
 }
 
 void CtvtTalk_Leave(CommTvtWork *sys, CtvtTalk *talk) {
-    func_02021c44(CommTvt_GetPrintQueue(sys));
+    PrintQueue_Clear(CommTvt_GetPrintQueue(sys));
     if (talk->exitMenu != NULL) {
         AppTaskMenu_Free(talk->exitMenu);
     }
@@ -765,7 +765,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->messagePending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(talk->messageWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(talk->messageWindow))) {
             BmpWin_FlushChar(talk->messageWindow);
             BmpWin_FlushMap(talk->messageWindow);
             GFL_BGSysLoadScr(4);
@@ -779,7 +779,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->gameWindowPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(talk->gameWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(talk->gameWindow))) {
             BmpWin_DrawFrame(talk->gameWindow, 1, 0x200, 9);
             BmpWin_FlushChar(talk->gameWindow);
             BmpWin_FlushMap(talk->gameWindow);
@@ -790,7 +790,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->gameWindowSubPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(talk->gameWindowSub))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(talk->gameWindowSub))) {
             BmpWin_FlushChar(talk->gameWindowSub);
             BmpWin_FlushMap(talk->gameWindowSub);
             GFL_BGSysLoadScr(4);
@@ -1177,10 +1177,10 @@ static void CtvtTalk_PrintMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgId) {
     PrintQueue *queue = CommTvt_GetPrintQueue(sys);
     StrBuf *str;
 
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(talk->messageWindow), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-    func_02021c7c(queue, BmpWin_GetBitmap(talk->messageWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(talk->messageWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(talk->messageWindow);
     BmpWin_FlushMap(talk->messageWindow);
@@ -1206,7 +1206,7 @@ static void CtvtTalk_PrintCountdown(CommTvtWork *sys, CtvtTalk *talk, u32 msgId,
     WordSetNumber(wordSet, 1, count, 2, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, talk->expanded, talk->message);
     GFL_StrBufFree(gameName);
-    func_02021c7c(queue, BmpWin_GetBitmap(talk->gameWindow), 0, 0, talk->expanded, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(talk->gameWindow), 0, 0, talk->expanded, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     talk->gameWindowPending = TRUE;
 }
@@ -1222,7 +1222,7 @@ static void CtvtTalk_PrintGameMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgI
     StrBuf *message;
     StrBuf *gameName;
 
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(talk->gameWindowSub), 15);
     message = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     if (name != NULL) {
@@ -1234,7 +1234,7 @@ static void CtvtTalk_PrintGameMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgI
     GFL_StrBufFree(gameName);
     GFL_WordSetFormatStrbuf(wordSet, talk->expanded, message);
     GFL_StrBufFree(message);
-    func_02021c7c(queue, BmpWin_GetBitmap(talk->gameWindowSub), 0, 0, talk->expanded, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(talk->gameWindowSub), 0, 0, talk->expanded, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(talk->gameWindowSub);
     BmpWin_FlushMap(talk->gameWindowSub);

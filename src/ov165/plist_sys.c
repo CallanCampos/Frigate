@@ -371,7 +371,7 @@ BOOL PokeList_Main(PokeListWork *wk) {
         PokeListMenu_UpdateButton(wk->buttons[0]);
         PokeListMenu_UpdateButton(wk->buttons[1]);
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     func_0204b794();
     return FALSE;
 }
@@ -629,13 +629,13 @@ static void PokeList_InitText(PokeListWork *wk) {
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_11, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x1c0, 0x20, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, wk->heapId);
-    wk->printQueue = func_020219a8(0x1800, wk->heapId);
-    func_020232d8();
+    wk->printQueue = PrintQueue_Create(0x1800, wk->heapId);
+    GFL_TextRndResetColorIndexLUT();
 }
 
 static void PokeList_ExitText(PokeListWork *wk) {
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->smallFont);
     GFL_FontFree(wk->font);
@@ -672,27 +672,33 @@ static void PokeList_LoadResources(PokeListWork *wk) {
     // BUG: The BG of the common bar is loaded from the closed handle of the first archive, rather than the common
     // archive's, which works as long as the handle's memory is given to the new handle
 #ifdef BUGFIX
-    GFL_G2DIOLoadArcNCLRDefault(commonArc, func_0202d820(), 0, 0x160, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(commonArc, func_0202d824(), 1, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(commonArc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0x160, 0x20, wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(commonArc, AppMenuCommon_GetBarBgCharFile(), 1, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(commonArc, func_0202d82c(), 1, 0, 0, FALSE, wk->heapId);
 #else
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 0, 0x160, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), 1, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0x160, 0x20, wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), 1, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d82c(), 1, 0, 0, FALSE, wk->heapId);
 #endif
     GFL_BGSysSetScrPaletteNo(1, 0, 0, 0x40, 0x20, 0xb);
     wk->clResources[CL_RES_PLTT(5)] = func_0204bbb8(commonArc, func_0202d954(), 0, 0xa0, 0, 1, wk->heapId);
     wk->clResources[CL_RES_CHAR(6)] = func_0204b81c(commonArc, func_0202d958(2), FALSE, 0, wk->heapId);
     wk->clResources[CL_RES_CELL(6)] = func_0204bde0(commonArc, func_0202d95c(2), func_0202d960(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(1)] = func_0204bbb8(commonArc, func_0202d810(), 0, 0x120, 0, 3, wk->heapId);
-    wk->clResources[CL_RES_CHAR(2)] = func_0204b81c(commonArc, func_0202d814(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(2)] = func_0204bde0(commonArc, func_0202d818(2), func_0202d81c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(1)] =
+        func_0204bbb8(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x120, 0, 3, wk->heapId);
+    wk->clResources[CL_RES_CHAR(2)] =
+        func_0204b81c(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(2)] = func_0204bde0(commonArc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                    AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
     wk->clResources[CL_RES_PLTT(2)] = func_0204bbb8(commonArc, func_0202d890(), 0, 0x60, 0, 1, wk->heapId);
     wk->clResources[CL_RES_CHAR(3)] = func_0204b81c(commonArc, func_0202d894(), FALSE, 0, wk->heapId);
     wk->clResources[CL_RES_CELL(3)] = func_0204bde0(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(4)] = func_0204bbb8(commonArc, func_0202d8b0(), 0, 0x80, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(5)] = func_0204b81c(commonArc, func_0202d8b4(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(5)] = func_0204bde0(commonArc, func_0202d8b8(2), func_0202d8bc(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(4)] =
+        func_0204bbb8(commonArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(5)] =
+        func_0204b81c(commonArc, AppMenuCommon_GetStatusIconCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(5)] = func_0204bde0(commonArc, AppMenuCommon_GetStatusIconCellFile(2),
+                                                    AppMenuCommon_GetStatusIconAnimFile(2), wk->heapId);
     GFL_ArcToolFree(commonArc);
     MIi_CpuCopy16((void *)(HW_BG_PLTT + 0xc0), wk->baseColors, sizeof(wk->baseColors));
 }
@@ -978,7 +984,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
 
             if (result == 2) {
                 if (used) {
-                    func_02038bc8(9);
+                    JoinAvenue_RecordActivity(9);
                 }
                 PokeListPlate_SetPkm(wk, wk->plates[wk->cursorPos], wk->pkm, 0);
             } else {
@@ -1087,7 +1093,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
     }
     case 14:
         if (PokeParty_GetParam(wk->pkm, PKM_PARAM_ITEM, NULL) == 0) {
-            MailData *mail = func_020097f4(wk->param->unk08, 0, wk->param->unk6C, wk->heapId);
+            MailData *mail = MailBox_CopyMail(wk->param->unk08, 0, wk->param->unk6C, wk->heapId);
 
             PokeParty_SetParam(wk->pkm, PKM_PARAM_MAIL, (u32)mail);
             GFL_HeapFree(mail);
@@ -2603,14 +2609,14 @@ BOOL PokeList_CanEvolveWithItem(PokeListWork *wk, PartyPkm *pkm, u16 item) {
 void PokeList_PrintString(PokeListWork *wk, BmpWin *window, u16 msgId, u16 x, s16 y, u16 color) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->font, color);
     GFL_StrBufFree(str);
 }
 
 void PokeList_PrintStringSmall(PokeListWork *wk, BmpWin *window, u32 msgId, int x, s16 y, u16 color) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->smallFont, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->smallFont, color);
     GFL_StrBufFree(str);
 }
 
@@ -2628,7 +2634,7 @@ void PokeList_PrintWordSetString(PokeListWork *wk, BmpWin *window, WordSet *word
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wordSet, buf, str);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->font, color);
     GFL_StrBufFree(str);
     GFL_StrBufFree(buf);
 }
@@ -2639,7 +2645,7 @@ void PokeList_PrintWordSetStringSmall(PokeListWork *wk, BmpWin *window, WordSet 
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wordSet, buf, str);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->smallFont, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->smallFont, color);
     GFL_StrBufFree(str);
     GFL_StrBufFree(buf);
 }
@@ -2866,13 +2872,13 @@ static void PokeList_AskTakeMail(PokeListWork *wk) {
 static void PokeList_AnswerTakeMail(PokeListWork *wk, u32 item) {
     PokeListMessage_Close(wk, wk->message);
     if (item == 14) {
-        s32 slot = func_020097c4(wk->param->unk08, 0);
+        s32 slot = MailBox_GetFreeSlot(wk->param->unk08, 0);
 
         if (slot >= 0) {
             MailData *mail = CreateMailData(wk->heapId);
 
             PokeParty_GetParam(wk->pkm, PKM_PARAM_MAIL, mail);
-            func_020097e0(wk->param->unk08, 0, slot, mail);
+            MailBox_SetMail(wk->param->unk08, 0, slot, mail);
             GFL_HeapFree(mail);
             PokeParty_SetParam(wk->pkm, PKM_PARAM_ITEM, 0);
             PokeListPlate_Redraw(wk, wk->plates[wk->cursorPos]);

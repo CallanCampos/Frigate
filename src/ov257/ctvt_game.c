@@ -601,7 +601,7 @@ void CtvtGame_Leave(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
     u8 j;
 
-    func_02021c44(CommTvt_GetPrintQueue(sys));
+    PrintQueue_Clear(CommTvt_GetPrintQueue(sys));
     CtvtGameCam_Delete(game->cam);
     for (i = 0; i < 3; i++) {
         if (game->members[i].hasCamera == TRUE && !canPlayerExchangePhotos()) {
@@ -689,7 +689,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     if (game->messagePending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(game->messageWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(game->messageWindow))) {
             BmpWin_FlushChar(game->messageWindow);
             BmpWin_FlushMap(game->messageWindow);
             GFL_BGSysLoadScr(2);
@@ -699,7 +699,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     if (game->titlePending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(game->titleWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(game->titleWindow))) {
             BmpWin_FlushChar(game->titleWindow);
             BmpWin_FlushMap(game->titleWindow);
             GFL_BGSysLoadScr(3);
@@ -709,7 +709,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     if (game->infoPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(game->infoWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(game->infoWindow))) {
             BmpWin_FlushChar(game->infoWindow);
             BmpWin_FlushMap(game->infoWindow);
             GFL_BGSysLoadScr(3);
@@ -717,7 +717,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
         }
     }
     func_0204b794();
-    func_02021a3c(CommTvt_GetPrintQueue(sys));
+    PrintQueue_Main(CommTvt_GetPrintQueue(sys));
     return COMM_TVT_MODE_GAME;
 }
 
@@ -1166,7 +1166,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
     case CTVT_GAME_PLAY_INTRO:
         if (CtvtGame_UpdateIntro(sys, game)) {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, game->heapId);
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             game->playState = CTVT_GAME_PLAY_WAIT_INTRO_FADE_OUT;
         }
         break;
@@ -1221,14 +1221,14 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
                 break;
             }
             RecordAddOne(game->records, 0x81);
-            func_02038bc8(25);
+            JoinAvenue_RecordActivity(25);
         }
         break;
     case CTVT_GAME_PLAY_TARGETS:
         if (CtvtGame_UpdateTargets(sys, game)) {
             game->playing = FALSE;
             game->playState = CTVT_GAME_PLAY_TARGETS_END;
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
         }
         break;
     case CTVT_GAME_PLAY_TARGETS_END:
@@ -1256,7 +1256,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         if (CtvtGame_UpdateBalloons(sys, game)) {
             game->playing = FALSE;
             game->playState = CTVT_GAME_PLAY_SYNC_END;
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
         }
         break;
     case CTVT_GAME_PLAY_SYNC_END:
@@ -1640,7 +1640,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     queue = CommTvt_GetPrintQueue(sys);
     str = GFL_MsgDataLoadStrbufNew(msgData, 64);
     width = GFL_FontGetBlockWidth(str, font, 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(game->titleWindow);
     BmpWin_FlushMap(game->titleWindow);
@@ -1654,14 +1654,14 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(game->infoWindow);
     BmpWin_FlushMap(game->infoWindow);
     BmpWin_DrawFrame(game->infoWindow, 1, 1, 14);
     game->infoPending = TRUE;
-    sndHeap = func_02005ce4();
+    sndHeap = GFL_SndGetHeap();
     NNS_SndHeapSaveState(sndHeap);
     NNS_SndArcLoadGroup(1, sndHeap);
 }
@@ -1784,14 +1784,14 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     queue = CommTvt_GetPrintQueue(sys);
     str = GFL_MsgDataLoadStrbufNew(msgData, 64);
     width = GFL_FontGetBlockWidth(str, font, 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(game->titleWindow);
     BmpWin_FlushMap(game->titleWindow);
     game->titlePending = TRUE;
     GFL_BitmapFill(BmpWin_GetBitmap(game->infoWindow), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, 60);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(game->infoWindow);
     BmpWin_FlushMap(game->infoWindow);
@@ -1803,7 +1803,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     game->leftPuff = 0;
     game->rightPuff = 0;
     game->pumpSeq = 41;
-    sndHeap = func_02005ce4();
+    sndHeap = GFL_SndGetHeap();
     NNS_SndHeapSaveState(sndHeap);
     NNS_SndArcLoadGroup(2, sndHeap);
 }
@@ -2121,7 +2121,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     ClActorSetup setup;
     ClActorSetupEx setupEx;
 
-    sndHeap = func_02005ce4();
+    sndHeap = GFL_SndGetHeap();
     NNS_SndHeapLoadState(sndHeap, NNS_SndHeapGetCurrentLevel(sndHeap));
     func_0204c124(game->scoreFrame, FALSE);
     func_0204c124(game->hurrySign, FALSE);
@@ -2450,7 +2450,7 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
 
 static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
     u8 selfNetId = func_02042a6c(func_02040440());
-    NNSSndHeapHandle sndHeap = func_02005ce4();
+    NNSSndHeapHandle sndHeap = GFL_SndGetHeap();
     int level = NNS_SndHeapGetCurrentLevel(sndHeap);
     u8 i;
 
@@ -2587,11 +2587,11 @@ static void CtvtGame_FreeBalloons(CommTvtWork *sys, CtvtGame *game) {
 static BOOL CtvtGame_CheckError(CommTvtWork *sys, CtvtGame *game) {
     CommTvt_GetComm(sys);
     if (CommTvt_IsErrorShown(sys) == TRUE) {
-        func_020120f0(14);
+        GFL_NetErrRecordWifi(14);
         return TRUE;
     }
     if (CommTvt_GetMemberCount(sys) <= 1) {
-        func_020120f0(14);
+        GFL_NetErrRecordWifi(14);
         return TRUE;
     }
     return FALSE;
@@ -2887,7 +2887,7 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
     StrBuf *format;
     StrBuf *name;
 
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(game->messageWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     name = GFL_MsgDataLoadStrbufNew(msgData, CtvtGame_GetType(game) + 62);
@@ -2895,7 +2895,7 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->messageWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->messageWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(game->messageWindow);
@@ -3360,7 +3360,7 @@ static void CtvtGamePlayer_Show(CommTvtWork *sys, CtvtGamePlayer *player) {
     queue = player->queue;
     y = (player->pos + 1) * 2 + 8;
     textCopy((const u16 *)CtvtComm_GetMemberInfo(sys, CommTvt_GetComm(sys), player->netId)->playerInfo, player->name);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
     BmpWin_FlushChar(player->nameWindow);
     BmpWin_FlushMap(player->nameWindow);
     player->namePending = TRUE;
@@ -3368,7 +3368,7 @@ static void CtvtGamePlayer_Show(CommTvtWork *sys, CtvtGamePlayer *player) {
     GFL_MsgDataLoadStrbuf(msgData, 66, player->scoreFormat);
     WordSetNumber(wordSet, 0, player->score, 3, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, player->scoreStr, player->scoreFormat);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(player->scoreWindow);
     BmpWin_FlushMap(player->scoreWindow);
@@ -3410,7 +3410,7 @@ static void CtvtGame_SetScore(CtvtGame *game, u8 netId, u8 score) {
     GFL_MsgDataLoadStrbuf(msgData, 66, player->scoreFormat);
     WordSetNumber(wordSet, 0, score, 3, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, player->scoreStr, player->scoreFormat);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     player->scorePending = TRUE;
 }
@@ -3532,7 +3532,7 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
     queue = player->queue;
     y = player->rank * 2 + 8;
     GFL_BitmapFill(BmpWin_GetBitmap(player->nameWindow), 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
     BmpWin_FlushChar(player->nameWindow);
     BmpWin_FlushMap(player->nameWindow);
     player->namePending = TRUE;
@@ -3541,7 +3541,7 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
     WordSetNumber(wordSet, 0, player->score, 3, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, player->scoreStr, player->scoreFormat);
     GFL_BitmapFill(BmpWin_GetBitmap(player->scoreWindow), 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(player->scoreWindow);
     BmpWin_FlushMap(player->scoreWindow);
@@ -3552,11 +3552,13 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
 static void CtvtGamePlayer_Task(TCB *tcb, void *data) {
     CtvtGamePlayer *player = data;
 
-    if (player->namePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
+    if (player->namePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
         player->namePending = FALSE;
         BmpWin_Transfer(player->nameWindow);
     }
-    if (player->scorePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
+    if (player->scorePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
         player->scorePending = FALSE;
         BmpWin_TransferNow(player->scoreWindow);
     }
@@ -3679,7 +3681,7 @@ static void CtvtGamePlayer_InitResult(CommTvtWork *sys, CtvtGamePlayer *player) 
         GFL_BGSysSetBGEnabled(5, FALSE);
         player->nameWindow = BmpWin_CreateDynamic(3, player->pos * 8, 20, 14, 4, 15, TRUE);
         GFL_BitmapFill(BmpWin_GetBitmap(player->nameWindow), 0);
-        func_02021c7c(queue, BmpWin_GetBitmap(player->nameWindow), 32 - width / 2, 0, name, font, 0x440);
+        PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->nameWindow), 32 - width / 2, 0, name, font, 0x440);
         GFL_StrBufFree(name);
         BmpWin_FlushChar(player->nameWindow);
         BmpWin_FlushMap(player->nameWindow);
@@ -3693,11 +3695,13 @@ static void CtvtGamePlayer_ResultTask(TCB *tcb, void *data) {
     if (player->absent == TRUE) {
         return;
     }
-    if (player->namePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
+    if (player->namePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
         player->namePending = FALSE;
         BmpWin_Transfer(player->nameWindow);
     }
-    if (player->scorePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
+    if (player->scorePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
         player->scorePending = FALSE;
         BmpWin_TransferNow(player->scoreWindow);
     }

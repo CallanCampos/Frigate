@@ -1514,9 +1514,9 @@ static u32 UnionOneself_GetCardVersion(UnionSystem *unisys, BOOL remote) {
         if (remote) {
             info = &unisys->colosseum_sys->members[i].info;
         } else {
-            info = func_02017378(gameData, i);
+            info = GameData_GetPlayerInfoByNetID(gameData, i);
         }
-        u32 version = func_02008bfc(info);
+        u32 version = PlayerInfo_GetVersion(info);
 
         if (version == VERSION_WHITE || version == VERSION_BLACK) {
             return 0x15;
@@ -1637,7 +1637,8 @@ static BOOL UnionOneself_StepTradeRun(UnionSystem *unisys, UnionSelf *situ, Fiel
             GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
             RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
 
-            Misc_AddMetTrainer(rival, getIDAsUInt(func_02017378(gameData, func_02042a6c(func_02040440()) ^ 1)));
+            Misc_AddMetTrainer(
+                rival, getIDAsUInt(GameData_GetPlayerInfoByNetID(gameData, func_02042a6c(func_02040440()) ^ 1)));
             (*seq)++;
         }
         break;
@@ -2879,7 +2880,7 @@ static BOOL UnionOneself_StepColosseumCardRun(UnionSystem *unisys, UnionSelf *si
         u32 version;
 
         UnionOneself_SetUpdateDisabled(unisys, field, TRUE);
-        version = func_02008bfc(&clsys->members[clsys->unk17C[0]].info);
+        version = PlayerInfo_GetVersion(&clsys->members[clsys->unk17C[0]].info);
         if (version - VERSION_WHITE <= 3) {
             int stars = clsys->cardCheck[clsys->unk17C[0]]->stars;
 

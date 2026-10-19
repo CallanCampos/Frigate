@@ -79,7 +79,7 @@ void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir) {
 
     Field_SetController(field, controller);
     controller->player = Field_GetPlayer(field);
-    isRail = func_0201753c(playerState);
+    isRail = PlayerState_IsRail(playerState);
     controller->activeType = 2;
     actor = FieldPlayer_GetActor(controller->player);
     func_ov036_0219634c(actor, &a5, &a6);

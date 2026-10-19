@@ -376,8 +376,8 @@ void MailBox_LoadMails(MailBoxWork *work) {
     work->view->mailCount = 0;
     for (i = 0; i < MAIL_COUNT; i++) {
         work->view->pageMails[i] = 0xff;
-        work->view->mails[i] = func_020097f4(work->mails, 0, i, HEAPID_MAILBOX_VIEW);
-        if (func_020096a8(work->view->mails[i]) == TRUE) {
+        work->view->mails[i] = MailBox_CopyMail(work->mails, 0, i, HEAPID_MAILBOX_VIEW);
+        if (MailData_IsValid(work->view->mails[i]) == TRUE) {
             work->view->pageMails[work->view->mailCount] = i;
             work->view->mailCount++;
         }
@@ -459,7 +459,7 @@ BOOL MailBox_UpdatePaletteFx(MailBoxWork *work) {
 
 void MailBox_LoadMailGraphics(MailBoxWork *work) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAILBOX, HEAPID_MAILBOX_VIEW);
-    u8 design = func_02009750(work->view->mails[work->mailIndex]);
+    u8 design = MailData_GetDesign(work->view->mails[work->mailIndex]);
 
     GFL_BGSysLoadArcNCGRStatic(arc, design + 12, 5, 0, 0, TRUE, HEAPID_MAILBOX_VIEW);
     GFL_G2DIOLoadArcNCLRDefault(arc, design, PALTYPE_SUB_BG, 0, 0x40, HEAPID_MAILBOX_VIEW);
@@ -468,7 +468,7 @@ void MailBox_LoadMailGraphics(MailBoxWork *work) {
 }
 
 void MailBox_CreatePMSDraw(MailBoxWork *work) {
-    work->view->pmsPrintQueue = func_02021998(HEAPID_MAILBOX_VIEW);
+    work->view->pmsPrintQueue = PrintQueue_CreateDefault(HEAPID_MAILBOX_VIEW);
     work->view->pmsClActUnit = func_0204bf1c(8, 2, HEAPID_MAILBOX_VIEW);
     work->view->pmsDraw = PMSDraw_Create(work->view->pmsClActUnit, CLACT_VRAM_SUB, work->view->pmsPrintQueue,
                                          work->font, 4, 4, HEAPID_MAILBOX_VIEW);
@@ -477,6 +477,6 @@ void MailBox_CreatePMSDraw(MailBoxWork *work) {
 
 void MailBox_FreePMSDraw(MailBoxWork *work) {
     PMSDraw_Delete(work->view->pmsDraw);
-    func_02021a18(work->view->pmsPrintQueue);
+    PrintQueue_Free(work->view->pmsPrintQueue);
     func_0204bf98(work->view->pmsClActUnit);
 }

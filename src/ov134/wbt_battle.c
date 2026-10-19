@@ -529,17 +529,17 @@ void WbtBattle_EndBattle(WbtSystem *sys, GameData *gameData, BtlSetup *setup) {
         u8 slot = WbtBattle_GetRoundSlot(sys->round);
 
         if (opponent->unk2 == 53) {
-            func_0200ff28(save, slot, 0xff);
+            WbtSave_SetSlot(save, slot, 0xff);
         } else {
-            func_0200ff28(save, slot, opponent->unk2);
+            WbtSave_SetSlot(save, slot, opponent->unk2);
         }
-        func_0200fefc(save, opponent->unk2);
+        WbtSave_SetTrainerBeaten(save, opponent->unk2);
     } else if (sys->tournament == 11 && opponent->unk2 == 56) {
-        func_0200fefc(save, 0);
+        WbtSave_SetTrainerBeaten(save, 0);
     }
     if (result == 0 || sys->unk4 == 1) {
         for (i = 0; i < 3; i++) {
-            func_0200ff28(save, i, 0xff);
+            WbtSave_SetSlot(save, i, 0xff);
         }
     }
     *resultVar = result;

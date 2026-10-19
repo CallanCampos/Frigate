@@ -59,7 +59,7 @@ static BOOL BrBvSend_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
     p_wk->seq = BrSeq_Init(p_wk, BrBvSend_SeqFadeIn, p_wk->heapId);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     p_wk->text = BrText_Init(p_param->res, p_wk->que, p_wk->heapId);
     BrText_Print(p_wk->text, p_param->res, 0x6f);
     for (i = 0; i < 2; i++) {
@@ -82,7 +82,7 @@ static BOOL BrBvSend_ProcExit(GameProc *proc, u32 *state, void *param, void *wor
         BrBallEff_Exit(p_wk->ballEff[i]);
     }
     BrText_Exit(p_wk->text, p_param->res);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     BrSeq_Exit(p_wk->seq);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -105,7 +105,7 @@ static BOOL BrBvSend_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     BrText_Main(p_wk->text);
     return FALSE;
 }
@@ -174,7 +174,8 @@ static void BrBvSend_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     case SEQ_LOAD: {
         u32 result;
 
-        func_0200bc9c(GameData_GetSaveControl(p_wk->p_param->gameData), HEAPID_BATTLE_RECORDER_SYS, &result, 0);
+        BattleRec_LoadToCurrent(GameData_GetSaveControl(p_wk->p_param->gameData), HEAPID_BATTLE_RECORDER_SYS, &result,
+                                0);
         if (result == 1) {
             *p_seq = SEQ_UPLOAD_START;
         } else {

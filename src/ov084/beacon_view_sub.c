@@ -567,7 +567,7 @@ static void BeaconViewPanel_SetColors(BeaconViewWork *work, BeaconViewPanel *pan
     u16 colors[7];
 
     MI_CpuCopy16(&work->commonPalette.colors[panel->colorSet * 16], colors, 5 * sizeof(u16));
-    func_02013d38(&colors[5], beacon);
+    GameBeacon_GetFavoriteColorRGB(&colors[5], beacon);
     BlendColors(&colors[5], &colors[6], 1, 3, 0);
     PaletteFade_LoadData(work->paletteFade, colors, 3, (panel->id + 4) * 16 + 1, sizeof(colors));
 }
@@ -670,11 +670,11 @@ void BeaconViewPanel_SetBeacon(BeaconViewWork *work, BeaconViewPanel *panel, con
     case 0:
         switch (GameBeacon_GetType(beacon)) {
         case 24:
-            func_02013df4(beacon, work->strTemplate);
+            GameBeacon_GetMessage(beacon, work->strTemplate);
             BeaconViewPanel_PrintText(work, panel, work->strTemplate, pending);
             break;
         case 49:
-            func_02013e14(beacon, work->strTemplate);
+            GameBeacon_GetTextMessage(beacon, work->strTemplate);
             BeaconViewPanel_PrintText(work, panel, work->strTemplate, pending);
             break;
         }
@@ -1262,7 +1262,7 @@ static void BeaconView_MissionTask(TCBEx *task, void *data) {
             offer->seq = 4;
             return;
         case 2:
-            func_02014964(work->festival, &offer->config);
+            LinkFestival_AddRecord(work->festival, &offer->config);
             offer->seq = 5;
             return;
         }
@@ -1408,7 +1408,7 @@ static void BeaconViewPanel_Print(BeaconViewWork *work, BeaconViewPanel *panel, 
         GFL_TextRendererDrawToBitmapEx(oam->bitmap, 0, 0, strbuf, work->font, color);
         BmpOam_ActorBmpTrans(oam->actor);
     } else {
-        func_02021c7c(work->printQueue, oam->bitmap, 0, 0, strbuf, work->font, color);
+        PrintQueue_PrintColor(work->printQueue, oam->bitmap, 0, 0, strbuf, work->font, color);
         BeaconViewPanel_StartPrintTask(work, panel, pending);
     }
 }
@@ -1431,7 +1431,7 @@ static void BeaconViewPanel_StartPrintTask(BeaconViewWork *work, BeaconViewPanel
 static void BeaconViewPanel_PrintTask(TCBEx *task, void *data) {
     BeaconViewPrintTask *print = data;
 
-    if (!func_02021c1c(print->work->printQueue, print->oam->bitmap)) {
+    if (!PrintQueue_IsBitmapPending(print->work->printQueue, print->oam->bitmap)) {
         BmpOam_ActorBmpTrans(print->oam->actor);
         if (print->pending != NULL) {
             (*print->pending)--;

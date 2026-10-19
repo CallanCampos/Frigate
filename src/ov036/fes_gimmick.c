@@ -41,7 +41,7 @@ void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
     gimmick->gameData = GSYS_GetGameData(gsys);
     gimmick->festival = GSYS_GetLinkFestival(gsys);
     gimmick->mission = GetFestMissionCfg(gimmick->festival);
-    gimmick->work = (FesMissionWork *)func_02014864(gimmick->festival);
+    gimmick->work = (FesMissionWork *)LinkFestival_GetEntries(gimmick->festival);
     gimmick->field = field;
     gimmick->eventData = GameData_GetEventData(gimmick->gameData);
     gimmick->eventWork = GameData_GetEventWork(gimmick->gameData);
@@ -120,7 +120,7 @@ void func_ov036_021b65e8(void *gimmick) {
     FesGimmick *fes = gimmick;
 
     if (getStatusOfFesMission(fes->festival)) {
-        MI_CpuFill8(func_02014864(fes->festival), 0, sizeof(FesMissionWork));
+        MI_CpuFill8(LinkFestival_GetEntries(fes->festival), 0, sizeof(FesMissionWork));
         switch (fes->mission->header.kind) {
         case MISSION_FLAGS:
             ClearFesEventFlags(fes);
@@ -162,7 +162,7 @@ void func_ov036_021b6660(void *gimmick) {
 
 BOOL func_ov036_021b6690(void *gimmick) {
     FesGimmick *fes = gimmick;
-    RivalEntry *work = func_02014864(fes->festival);
+    RivalEntry *work = LinkFestival_GetEntries(fes->festival);
 
     if (!getStatusOfFesMission(fes->festival)) {
         return FALSE;
@@ -229,7 +229,7 @@ BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height) {
 
 void DeleteFunfestActor(void *gimmick, u16 zoneId, u8 actorIndex) {
     FesGimmick *fes = gimmick;
-    RivalEntry *work = func_02014864(fes->festival);
+    RivalEntry *work = LinkFestival_GetEntries(fes->festival);
 
     if (getStatusOfFesMission(fes->festival)) {
         if (fes->mission->header.kind == MISSION_PEOPLE) {

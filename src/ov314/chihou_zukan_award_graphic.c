@@ -124,7 +124,7 @@ ChihouZukanAwardGraphic *ChihouZukanAwardGraphic_Create(u32 layout, HeapID heapI
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     ChihouZukanAwardBG_Init(&graphic->bg, heapId);
     ChihouZukanAwardClAct_Init(&graphic->clact, &sChihouZukanAwardVRAMConfig, heapId);
     ChihouZukanAwardG3dSys_Init(&graphic->g3d, heapId);
@@ -137,7 +137,7 @@ void ChihouZukanAwardGraphic_Free(ChihouZukanAwardGraphic *graphic) {
     ChihouZukanAwardG3dSys_Free(&graphic->g3d);
     ChihouZukanAwardClAct_Free(&graphic->clact);
     ChihouZukanAwardBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

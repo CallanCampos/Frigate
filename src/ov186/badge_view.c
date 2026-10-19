@@ -541,9 +541,10 @@ static void BadgeView_LoadBG(BadgeViewWork *wk) {
     GFL_G2DIOLoadArcNCLR(arc, 0, 4, 0x100, 0x100, 0x20, HEAPID_TRAINER_CARD_SCREEN);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, 4, 0, 0x100, HEAPID_TRAINER_CARD_SCREEN);
     barArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TRAINER_CARD_SCREEN);
-    GFL_BGSysLoadArcNCGRStatic(barArc, func_0202d824(), 5, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
-    loadBGScrToVramByFileNoReserveNegAlign(barArc, func_0202d828(), 5, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
-    GFL_G2DIOLoadArcNCLR(barArc, func_0202d820(), 4, 0, 0x180, 0x20, HEAPID_TRAINER_CARD_SCREEN);
+    GFL_BGSysLoadArcNCGRStatic(barArc, AppMenuCommon_GetBarBgCharFile(), 5, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
+    loadBGScrToVramByFileNoReserveNegAlign(barArc, AppMenuCommon_GetBarScreenFile(), 5, 0, 0, FALSE,
+                                           HEAPID_TRAINER_CARD_SCREEN);
+    GFL_G2DIOLoadArcNCLR(barArc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0, 0x180, 0x20, HEAPID_TRAINER_CARD_SCREEN);
     GFL_BGSysSetScrPaletteNo(5, 0, 21, 32, 3, 12);
     GFL_BGSysLoadScr(5);
     GFL_ArcToolFree(barArc);
@@ -577,11 +578,11 @@ static void BadgeView_InitObj(BadgeViewWork *wk) {
     wk->res[BADGE_RES_PALETTE] = func_0204bba0(wk->arc, 4, CLACT_VRAM_SUB, 0, HEAPID_TRAINER_CARD_SCREEN);
     wk->res[BADGE_RES_CELLS] = func_0204bde0(wk->arc, 52, 54, HEAPID_TRAINER_CARD_SCREEN);
     wk->res[BADGE_RES_BAR_CHARS] =
-        func_0204b81c(barArc, func_0202d814(), FALSE, CLACT_VRAM_SUB, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_BAR_PALETTE] =
-        func_0204bbb8(barArc, func_0202d810(), CLACT_VRAM_SUB, 0x160, 0, 3, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_BAR_CELLS] =
-        func_0204bde0(barArc, func_0202d818(0), func_0202d81c(0), HEAPID_TRAINER_CARD_SCREEN);
+        func_0204b81c(barArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_BAR_PALETTE] = func_0204bbb8(barArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB,
+                                                   0x160, 0, 3, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_BAR_CELLS] = func_0204bde0(barArc, AppMenuCommon_GetTouchBarCellFile(0),
+                                                 AppMenuCommon_GetTouchBarAnimFile(0), HEAPID_TRAINER_CARD_SCREEN);
     GFL_ArcToolFree(barArc);
     BadgeView_LoadLeaders(wk, CLACT_VRAM_MAIN);
 }
@@ -832,17 +833,17 @@ static void BadgeView_FlushWin(BadgeViewWork *wk) {
 
 static void BadgeView_InitPrint(BadgeViewWork *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
-    wk->queue = func_02021998(HEAPID_TRAINER_CARD_SCREEN);
+    wk->queue = PrintQueue_CreateDefault(HEAPID_TRAINER_CARD_SCREEN);
     PrintWindow_Init(&wk->printWin, wk->win);
 }
 
 static void BadgeView_ExitPrint(BadgeViewWork *wk) {
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_FontFree(wk->font);
 }
 
 static void BadgeView_UpdatePrint(BadgeViewWork *wk) {
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     PrintWindow_Flush(&wk->printWin, wk->queue);
 }
 
@@ -858,7 +859,7 @@ static BOOL BadgeView_SeqFadeIn(BadgeViewWork *wk) {
 }
 
 static BOOL BadgeView_SeqMain(BadgeViewWork *wk) {
-    if (!func_02021c0c(wk->queue)) {
+    if (!PrintQueue_IsEmpty(wk->queue)) {
         return TRUE;
     }
     BadgeView_Input(wk);
@@ -924,7 +925,7 @@ static void BadgeView_DrawMessage(BadgeViewWork *wk, int kind, int badge, int pa
     GFL_BitmapFill(BmpWin_GetBitmap(wk->win), 0);
     switch (kind) {
     case 0: {
-        TimeSigBadgeDate date = func_02009230(wk->timeSig, badge);
+        TimeSigBadgeDate date = TimeSigSave_GetBadgeDate(wk->timeSig, badge);
 
         WordSetNumber(wk->wordSet, 0, date.year + 2000, 4, 0, TRUE);
         WordSetNumber(wk->wordSet, 1, date.month, 2, 0, TRUE);
@@ -1008,7 +1009,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
     case BADGE_HIT_BADGE + 5:
     case BADGE_HIT_BADGE + 6:
     case BADGE_HIT_BADGE + 7:
-        if (func_02021c0c(wk->queue) && wk->hasBadge[hit] && wk->mode <= BADGE_MODE_BADGE) {
+        if (PrintQueue_IsEmpty(wk->queue) && wk->hasBadge[hit] && wk->mode <= BADGE_MODE_BADGE) {
             slide = FALSE;
             if (wk->mode != BADGE_MODE_BADGE) {
                 slide = TRUE;
@@ -1038,7 +1039,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
     case BADGE_HIT_LEADER + 5:
     case BADGE_HIT_LEADER + 6:
     case BADGE_HIT_LEADER + 7:
-        if (func_02021c0c(wk->queue) && (wk->mode == BADGE_MODE_NONE || wk->mode == BADGE_MODE_LEADER)) {
+        if (PrintQueue_IsEmpty(wk->queue) && (wk->mode == BADGE_MODE_NONE || wk->mode == BADGE_MODE_LEADER)) {
             slide = FALSE;
             if (wk->mode != BADGE_MODE_LEADER) {
                 slide = TRUE;
@@ -1184,7 +1185,7 @@ static void BadgeView_SavePolish(BadgeViewWork *wk) {
     seconds = RTC_ConvertDateTimeToSecond(&date, &time);
     saveSecondsTime(wk->timeSig, seconds, seconds >> 32);
     for (i = 0; i < BADGE_COUNT; i++) {
-        func_020092b8(wk->timeSig, i, wk->polish[i]);
+        TimeSigSave_SetBadgePolish(wk->timeSig, i, wk->polish[i]);
     }
 }
 
@@ -1207,7 +1208,7 @@ static void BadgeView_LoadPolish(BadgeViewWork *wk) {
     }
     decay = hours * 2;
     for (i = 0; i < BADGE_COUNT; i++) {
-        wk->polish[i] = func_020092a8(wk->timeSig, i);
+        wk->polish[i] = TimeSigSave_GetBadgePolish(wk->timeSig, i);
         wk->polish[i] -= decay;
         if (wk->polish[i] < 0) {
             wk->polish[i] = 0;

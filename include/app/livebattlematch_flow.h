@@ -21,7 +21,7 @@ struct LiveBattleMatchPlayerData {
     PlayerInfo info;
     u8 mac[6];
     u8 unk26[2];
-    // The record's results 1, 2 and 0 (func_0200f1d8)
+    // The record's results 1, 2 and 0 (LiveMatchData_GetCount)
     u32 record1;
     u32 record2;
     u32 record0;
@@ -83,10 +83,10 @@ void TournamentTeam_SetFromParty(void *record, PokeParty *party);
 BOOL func_0200bb80(void);
 // The live competition's record: clears it and gives it this console's address, adds to a result by an amount, gets and
 // sets the 6-byte address of a result by its place and a byte after it, and whether an address is among the results
-void func_0200f1c4(void *record);
-void func_0200f1e0(void *record, u32 index, int amount);
-void func_0200f218(void *record, u32 place, const u8 *mac);
-void func_0200f238(void *record, u32 place, u32 byte, u8 value);
-BOOL func_0200f254(void *record, const u8 *mac);
+void LiveMatchData_Init(void *record);
+void LiveMatchData_AddCount(void *record, u32 index, int amount);
+void LiveMatchData_SetOpponentMacAddress(void *record, u32 place, const u8 *mac);
+void LiveMatchData_SetOpponentParam(void *record, u32 place, u32 byte, u8 value);
+BOOL LiveMatchData_HasOpponent(void *record, const u8 *mac);
 
 #endif // POKEBW2_APP_LIVEBATTLEMATCH_FLOW_H

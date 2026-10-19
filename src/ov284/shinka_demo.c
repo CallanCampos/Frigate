@@ -774,7 +774,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             TwoChoiceMenu_Main(wk->menu);
         }
         ShinkaDemo_UpdateMsg(param, wk);
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
         ShinkaDemoView_Update(wk->view);
         ShinkaDemoEffect_Update(wk->effect);
         ShinkaDemoGraphic_Update(wk->graphic);
@@ -798,7 +798,7 @@ static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
     wk->graphic = ShinkaDemoGraphic_Create(1, wk->graphicHeapId);
     ShinkaDemoGraphic_InitSubBG(wk->graphic);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->graphicHeapId);
-    wk->printQueue = func_02021998(wk->graphicHeapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->graphicHeapId);
     ShinkaDemo_InitMsg(param, wk);
     wk->menu = NULL;
     ShinkaDemo_InitMenu(param, wk);
@@ -845,8 +845,8 @@ static void ShinkaDemo_FreeGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
     ShinkaDemo_FreeBG(param, wk);
     ShinkaDemo_FreeMenu(param, wk);
     ShinkaDemo_FreeMsg(param, wk);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ShinkaDemoGraphic_FreeSubBG(wk->graphic);
     ShinkaDemoGraphic_Free(wk->graphic);
@@ -882,18 +882,18 @@ static void ShinkaDemo_UpdateBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
         }
         break;
     case BGM_LOAD_KOUKAN:
-        if (func_02006424(SEQ_BGM_KOUKAN, &wk->bgmStep, FALSE)) {
+        if (GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, FALSE)) {
             wk->bgm = BGM_KOUKAN;
         }
         break;
     case BGM_FADE_OUT_END:
         if (GFL_SndBGMIsFading() == FALSE) {
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             wk->bgm = BGM_IDLE;
         }
         break;
     case BGM_LOAD_FANFARE:
-        if (func_02006424(SEQ_ME_SHINKAOME, &wk->bgmStep, FALSE)) {
+        if (GFL_SndBGMLoadStep(SEQ_ME_SHINKAOME, &wk->bgmStep, FALSE)) {
             wk->bgm = BGM_FANFARE;
         }
         break;
@@ -937,7 +937,7 @@ static BOOL ShinkaDemo_IsBGMPlaying(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
 static void ShinkaDemo_PlayKoukan(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     if (wk->bgm == BGM_IDLE) {
         wk->bgmStep = 0;
-        func_02006424(SEQ_BGM_KOUKAN, &wk->bgmStep, TRUE);
+        GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, TRUE);
         wk->bgm = BGM_LOAD_KOUKAN;
     }
 }
@@ -977,7 +977,7 @@ static BOOL ShinkaDemo_IsBGMFadingOutEnd(ShinkaDemoParam *param, ShinkaDemoWork 
 static void ShinkaDemo_PlayFanfare(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     if (wk->bgm == BGM_PUSHED) {
         wk->bgmStep = 0;
-        func_02006424(SEQ_ME_SHINKAOME, &wk->bgmStep, TRUE);
+        GFL_SndBGMLoadStep(SEQ_ME_SHINKAOME, &wk->bgmStep, TRUE);
         wk->bgm = BGM_LOAD_FANFARE;
     }
 }
@@ -998,7 +998,7 @@ static void ShinkaDemo_PlayLevelUp(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
 static void ShinkaDemo_DiscardBGM(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     if (wk->bgm == BGM_PUSHED) {
         GFL_SndBGMPop();
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
         wk->bgm = BGM_IDLE;
     }
 }
@@ -1128,7 +1128,7 @@ static void ShinkaDemo_InitMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
 static void ShinkaDemo_FreeMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     KeyCursor_Free(wk->keyCursor);
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     GFL_TCBExMgrFree(wk->tcbExManager);
     if (wk->message != NULL) {
@@ -1162,17 +1162,18 @@ static void ShinkaDemo_Print(ShinkaDemoWork *wk, MsgData *msgData, u32 messageId
                              u32 type0, void *word0, u32 type1, void *word1) {
     ShinkaDemo_ClearWindow(wk, 15);
     wk->message = ShinkaDemo_FormatMessage(wk->graphicHeapId, msgData, messageId, type0, word0, type1, word1);
-    wk->printStream = func_02022294(wk->window, 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbExManager, 2,
-                                    wk->graphicHeapId, 15, callback);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->window, 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbExManager, 2, wk->graphicHeapId, 15, callback);
 }
 
 static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk) {
     BOOL done = FALSE;
 
-    switch (func_020223b4(wk->printStream)) {
+    switch (PrintStream_GetState(wk->printStream)) {
     case PRINT_STREAM_RUNNING:
         if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(wk->printStream, 0);
+            PrintStream_SkipWait(wk->printStream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                 func_0203d564(FALSE);
             } else {
@@ -1183,7 +1184,7 @@ static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk) {
     case PRINT_STREAM_PAUSED:
         if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            func_020223bc(wk->printStream);
+            PrintStream_Continue(wk->printStream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                 func_0203d564(FALSE);
             } else {
@@ -1220,7 +1221,7 @@ static void ShinkaDemo_ClearWindow(ShinkaDemoWork *wk, u8 color) {
     BmpWin_FlushMap(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     if (wk->message != NULL) {
         GFL_StrBufFree(wk->message);

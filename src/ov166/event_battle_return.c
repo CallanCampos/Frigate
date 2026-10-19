@@ -303,7 +303,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                     GFL_SndBGMFadeOut(30);
                     wk->musicFading = TRUE;
                 } else if (!GFL_SndBGMIsFading()) {
-                    func_02005d8c();
+                    GFL_SndBGMStopImmediate();
                     wk->musicDone = TRUE;
                 }
             } else {

@@ -210,7 +210,7 @@ GameData *GameData_Create(HeapID heapId) {
     gameData->fieldStatus = FieldStatus_Create(heapId);
 
     gameData->bagCursor = BagCursor_Create(heapId);
-    func_020088ec(gameData->bagCursor, 0);
+    BagCursor_SetFreeSpaceFilter(gameData->bagCursor, 0);
     gameData->bag = SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BAG);
     gameData->party = SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_PARTY);
     gameData->config = &getTrainerDataBlkAddress(gameData->saveControl)->config;
@@ -271,7 +271,7 @@ void GameData_Free(GameData *gameData) {
     GFL_HeapFree(gameData);
 }
 
-PlayerState *func_020171e8(GameData *gameData, s32 index) {
+PlayerState *GameData_GetPlayerStateByNetID(GameData *gameData, s32 index) {
     return &gameData->playerStates[index];
 }
 
@@ -279,23 +279,23 @@ PlayerState *GameData_GetPlayerState(GameData *gameData) {
     return &gameData->playerStates[GAME_DATA_PLAYER_MINE];
 }
 
-void *func_020171fc(GameData *gameData, u32 netId) {
+void *GameData_GetPassPowerLevels(GameData *gameData, u32 netId) {
     return &gameData->levels[netId];
 }
 
-void *func_02017208(GameData *gameData) {
-    return func_020171fc(gameData, GAME_DATA_LEVELS_MINE);
+void *GameData_GetMyPassPowerLevels(GameData *gameData) {
+    return GameData_GetPassPowerLevels(gameData, GAME_DATA_LEVELS_MINE);
 }
 
 CityState *GameData_GetMyCityState(GameData *gameData) {
-    return func_0201722c(gameData, GAME_DATA_CITY_MINE);
+    return GameData_GetCityState(gameData, GAME_DATA_CITY_MINE);
 }
 
-u16 func_02017220(GameData *gameData) {
+u16 GameData_GetMyCity(GameData *gameData) {
     return GameData_GetMyCityState(gameData)->city;
 }
 
-CityState *func_0201722c(GameData *gameData, u32 index) {
+CityState *GameData_GetCityState(GameData *gameData, u32 index) {
     return &gameData->cityStates[index];
 }
 
@@ -372,7 +372,7 @@ u16 GetReturnLocationIdx(GameData *gameData) {
     return respawnLocation;
 }
 
-void *func_0201734c(GameData *gameData) {
+void *GameData_GetBagCursor(GameData *gameData) {
     return gameData->bagCursor;
 }
 
@@ -392,7 +392,7 @@ PlayerInfo *GetGameDataPlayerInfo(GameData *gameData) {
     return &GameData_GetPlayerState(gameData)->playerInfo;
 }
 
-PlayerInfo *func_02017378(GameData *gameData, u32 netId) {
+PlayerInfo *GameData_GetPlayerInfoByNetID(GameData *gameData, u32 netId) {
     return &gameData->playerStates[netId].playerInfo;
 }
 
@@ -448,11 +448,11 @@ void func_020173f8(GameData *gameData, u8 value) {
     gameData->unk1CB = value;
 }
 
-u8 func_02017404(GameData *gameData) {
+u8 GameData_GetCGearPowerRequest(GameData *gameData) {
     return gameData->cGearPowerRequest;
 }
 
-void func_0201740c(GameData *gameData, u8 value) {
+void GameData_SetCGearPowerRequest(GameData *gameData, u8 value) {
     gameData->cGearPowerRequest = value;
 }
 
@@ -521,7 +521,7 @@ u8 func_020174c8(GameData *gameData) {
     return gameData->unk1C1;
 }
 
-BeaconStatus *func_020174d4(GameData *gameData) {
+BeaconStatus *GameData_GetBeaconStatus(GameData *gameData) {
     return gameData->beaconStatus;
 }
 
@@ -563,7 +563,7 @@ void PlayerState_SetIsRail(PlayerState *playerState, BOOL isRail) {
     playerState->isRail = isRail;
 }
 
-u8 func_0201753c(PlayerState *playerState) {
+u8 PlayerState_IsRail(PlayerState *playerState) {
     return playerState->isRail;
 }
 
@@ -579,7 +579,7 @@ void PlayerState_SetRotation(PlayerState *playerState, u16 angle) {
     playerState->rotation = angle;
 }
 
-u16 func_0201754c(PlayerState *playerState) {
+u16 PlayerState_GetRotation(PlayerState *playerState) {
     return playerState->rotation;
 }
 
@@ -621,19 +621,19 @@ FieldStatus *GameData_GetFieldStatus(GameData *gameData) {
     return gameData->fieldStatus;
 }
 
-u8 func_020175bc(GameData *gameData) {
+u8 GameData_GetPlayerCount(GameData *gameData) {
     return gameData->playerCount;
 }
 
-void func_020175c4(GameData *gameData, u32 playerCount) {
+void GameData_SetPlayerCount(GameData *gameData, u32 playerCount) {
     gameData->playerCount = playerCount;
 }
 
-u8 func_020175cc(GameData *gameData) {
+u8 GameData_GetNetID(GameData *gameData) {
     return gameData->netId;
 }
 
-void func_020175d8(GameData *gameData, u32 netId) {
+void GameData_SetNetID(GameData *gameData, u32 netId) {
     gameData->netId = netId;
 }
 
@@ -645,23 +645,23 @@ void GameData_SetForceSeasonSync(GameData *gameData, BOOL force) {
     gameData->forceSeasonSync = force;
 }
 
-u8 func_020175fc(GameData *gameData) {
+u8 GameData_GetBeaconNetID(GameData *gameData) {
     return gameData->beaconNetId;
 }
 
-void func_02017608(GameData *gameData, u32 netId) {
+void GameData_SetBeaconNetID(GameData *gameData, u32 netId) {
     gameData->beaconNetId = netId;
 }
 
-BOOL func_02017614(GameData *gameData) {
-    if (func_02008ae8(gameData->config) == 1) {
+BOOL GameData_IsCGearOn(GameData *gameData) {
+    if (Config_GetCGearOn(gameData->config) == 1) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_0201762c(GameData *gameData, BOOL flag) {
-    func_02008af0(gameData->config, flag ? 1 : 0);
+void GameData_SetCGearOn(GameData *gameData, BOOL flag) {
+    Config_SetCGearOn(gameData->config, flag ? 1 : 0);
 }
 
 void GameData_SetKeyItemRegistration(GameData *gameData, u32 item, BOOL registered) {
@@ -673,7 +673,7 @@ BOOL GameData_IsShortcutRegistered(GameData *gameData, u32 item) {
     return ShortcutSave_IsRegistered(SaveControl_GetShortcutSave(GameData_GetSaveControl_(gameData)), item);
 }
 
-void *func_02017670(GameData *gameData) {
+void *GameData_GetShortcutMenuPos(GameData *gameData) {
     return &gameData->shortcutMenuPos;
 }
 
@@ -690,13 +690,13 @@ static void GameData_LoadBackup(GameData *gameData) {
     }
 
     playerState = GameData_GetPlayerState(gameData);
-    func_02008ea8(gameData->saveControl, playerState);
+    TrainerDataSave_LoadPlayerInfo(gameData->saveControl, playerState);
     SaveControl_LoadPlayerState(gameData->saveControl, playerState);
 
     mmSys = GameData_GetMMSys(gameData);
     ActorSave_Load(mmSys, SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_FIELD_ACTORS));
 
-    func_0200c650(gameData->saveControl, func_02017208(gameData));
+    HighLinkSave_GetLevels(gameData->saveControl, GameData_GetMyPassPowerLevels(gameData));
     cityState = GameData_GetMyCityState(gameData);
     func_0200af9c(getReshZekBlkAddress(gameData->saveControl), (u32 *)cityState);
     GimmickState_LoadSave(gameData->saveControl, &gameData->gimmickState);
@@ -707,11 +707,11 @@ static void GameData_LoadBackup(GameData *gameData) {
     PlayerSave_LoadFollowWk(playerSave, gameData->followWk);
 
     wifiList = GameData_GetWifiList(gameData);
-    copyWifilist(func_0200a424(gameData->saveControl), wifiList);
+    copyWifilist(SaveControl_GetWifiList(gameData->saveControl), wifiList);
 
     PlayerSave_LoadWeather(gameData->playerSave, &gameData->weather);
     UnityTowerSave_Load(gameData->saveControl, &gameData->unityTowerFloor);
-    func_02008cdc(gameData->playTime, func_02008de8(gameData->saveControl));
+    PlayTime_Copy(gameData->playTime, SaveControl_GetPlayTime(gameData->saveControl));
 }
 
 // Copies the game data's copies back into the save's blocks
@@ -724,13 +724,13 @@ static void GameData_SaveBackup(GameData *gameData) {
     PlayTime *playTime;
 
     playerState = GameData_GetPlayerState(gameData);
-    func_02008e88(gameData->saveControl, playerState);
+    TrainerDataSave_StorePlayerInfo(gameData->saveControl, playerState);
     SaveControl_SavePlayerState(gameData->saveControl, playerState);
 
     mmSys = GameData_GetMMSys(gameData);
     ActorSave_Save(mmSys, SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_FIELD_ACTORS));
 
-    func_0200c638(gameData->saveControl, func_02017208(gameData));
+    HighLinkSave_SetLevels(gameData->saveControl, GameData_GetMyPassPowerLevels(gameData));
     cityState = GameData_GetMyCityState(gameData);
     func_0200af8c(getReshZekBlkAddress(gameData->saveControl), (u32 *)cityState);
     GimmickState_StoreSave(&gameData->gimmickState, gameData->saveControl);
@@ -741,47 +741,47 @@ static void GameData_SaveBackup(GameData *gameData) {
     PlayerSave_SaveFollowWk(playerSave, gameData->followWk);
 
     wifiList = GameData_GetWifiList(gameData);
-    copyWifilist(wifiList, func_0200a424(gameData->saveControl));
+    copyWifilist(wifiList, SaveControl_GetWifiList(gameData->saveControl));
 
     PlayerSave_SaveWeather(gameData->playerSave, gameData->weather);
     UnityTowerSave_Store(&gameData->unityTowerFloor, gameData->saveControl);
 
-    playTime = func_02008de8(gameData->saveControl);
-    func_02008cf8(gameData->playTime);
-    func_02008cdc(playTime, gameData->playTime);
+    playTime = SaveControl_GetPlayTime(gameData->saveControl);
+    PlayTime_SetLastSavedToNow(gameData->playTime);
+    PlayTime_Copy(playTime, gameData->playTime);
 }
 
-void func_0201782c(GameData *gameData) {
+void GameData_StartSave(GameData *gameData) {
     GameData_SaveBackup(gameData);
-    func_020129e0();
+    WihDwc_Pause();
     gameData->saving = TRUE;
     GCTX_HIDBlockSoftReset(SOFT_RESET_BLOCK_SAVE);
-    func_020073ac(gameData->saveControl);
+    SaveControl_StartSave(gameData->saveControl);
 }
 
-int func_02017850(GameData *gameData) {
+int GameData_UpdateSave(GameData *gameData) {
     int result;
 
     if (func_02005cbc() == TRUE) {
         return 0;
     }
 
-    result = func_020073c4(gameData->saveControl);
+    result = SaveControl_ContinueSave(gameData->saveControl);
     if (result == SAVE_RESULT_OK || result == SAVE_RESULT_NG) {
         GCTX_HIDUnblockSoftReset(SOFT_RESET_BLOCK_SAVE);
-        func_020129f8();
+        WihDwc_Resume();
         gameData->saving = FALSE;
     }
     return result;
 }
 
 // Cancels a save that is being written
-void func_02017884(GameData *gameData) {
+void GameData_CancelSave(GameData *gameData) {
     if (gameData->saving == TRUE) {
         GCTX_HIDUnblockSoftReset(SOFT_RESET_BLOCK_SAVE);
-        func_020129f8();
+        WihDwc_Resume();
         gameData->saving = FALSE;
-        func_02007424(gameData->saveControl);
+        SaveControl_CancelSave(gameData->saveControl);
         if (GCTX_HIDIsSleepBlocked(SLEEP_BLOCK_SAVE) == TRUE) {
             GCTX_HIDUnblockSleep(SLEEP_BLOCK_SAVE);
         }
@@ -792,26 +792,26 @@ BOOL GameData_CheckEventsPaused(GameData *gameData) {
     return gameData->saving;
 }
 
-void func_020178c4(GameData *gameData, u32 block) {
+void GameData_StartSaveBlock(GameData *gameData, u32 block) {
     GCTX_HIDBlockSleep(SLEEP_BLOCK_SAVE);
     GameData_SaveBackup(gameData);
-    func_020129e0();
+    WihDwc_Pause();
     gameData->saving = TRUE;
     GCTX_HIDBlockSoftReset(SOFT_RESET_BLOCK_SAVE);
-    func_0200760c(gameData->saveControl, block);
+    SaveControl_StartExtraSave(gameData->saveControl, block);
 }
 
-u32 func_020178f4(GameData *gameData, u32 block) {
+u32 GameData_UpdateSaveBlock(GameData *gameData, u32 block) {
     u32 result;
 
     if (func_02005cbc() == TRUE) {
         return 0;
     }
 
-    result = func_0200764c(gameData->saveControl, block);
+    result = SaveControl_ContinueExtraSave(gameData->saveControl, block);
     if (result == SAVE_RESULT_OK || result == SAVE_RESULT_NG) {
         GCTX_HIDUnblockSoftReset(SOFT_RESET_BLOCK_SAVE);
-        func_020129f8();
+        WihDwc_Resume();
         gameData->saving = FALSE;
         GCTX_HIDUnblockSleep(SLEEP_BLOCK_SAVE);
     }
@@ -834,15 +834,15 @@ PleasureBoat **GameData_GetPleasureBoatPtr(GameData *gameData) {
     return &gameData->pleasureBoat;
 }
 
-BSubwayScrWork *func_0201794c(GameData *gameData) {
+BSubwayScrWork *GameData_GetBSubwayScrWork(GameData *gameData) {
     return gameData->bsubwayScrWork;
 }
 
-void func_02017954(GameData *gameData, BSubwayScrWork *bsw) {
+void GameData_SetBSubwayScrWork(GameData *gameData, BSubwayScrWork *bsw) {
     gameData->bsubwayScrWork = bsw;
 }
 
-BSubwayScoreData *func_0201795c(GameData *gameData) {
+BSubwayScoreData *GameData_GetBSubwayScoreData(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BSUBWAY_SCORE);
 }
 
@@ -854,7 +854,7 @@ TrainerCardSave *getTrainerCardDataBlkAddress(GameData *gameData) {
     return getTrainerGameInfoAddress(gameData->saveControl);
 }
 
-PalPadFriendList *func_02017980(GameData *gameData) {
+PalPadFriendList *GameData_GetPalPadFriendList(GameData *gameData) {
     return getPalPadFriendListAddress(gameData->saveControl);
 }
 
@@ -886,27 +886,27 @@ void *func_020179c8(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_40);
 }
 
-void func_020179d4(GameData *gameData, MusicalCommWork *work) {
+void GameData_SetMusicalCommWork(GameData *gameData, MusicalCommWork *work) {
     gameData->musicalCommWork = work;
 }
 
-MusicalCommWork *func_020179dc(GameData *gameData) {
+MusicalCommWork *GameData_GetMusicalCommWork(GameData *gameData) {
     return gameData->musicalCommWork;
 }
 
-DreamWorldSave *func_020179e4(GameData *gameData) {
+DreamWorldSave *GameData_GetDreamWorldSave(GameData *gameData) {
     return getDreamWorldStuffAddress(gameData->saveControl);
 }
 
-WbtSystem **func_020179f0(GameData *gameData) {
+WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData) {
     return &gameData->wbtSystem;
 }
 
 void *func_020179f8(GameData *gameData) {
-    return func_0200fea0(gameData->saveControl);
+    return TrialHouseSave_GetWbtSave(gameData->saveControl);
 }
 
-PokewoodSystem **func_02017a04(GameData *gameData) {
+PokewoodSystem **GameData_GetPokewoodSystemPtr(GameData *gameData) {
     return &gameData->pokewoodSystem;
 }
 
@@ -914,11 +914,11 @@ void *getChatterDataAddress(GameData *gameData) {
     return getChatterBlockAddress(gameData->saveControl);
 }
 
-void func_02017a18(GameData *gameData, u8 area) {
+void GameData_SetEntreeForestArea(GameData *gameData, u8 area) {
     gameData->entreeForestArea = area;
 }
 
-u8 func_02017a24(GameData *gameData) {
+u8 GameData_GetEntreeForestArea(GameData *gameData) {
     return gameData->entreeForestArea;
 }
 
@@ -926,7 +926,7 @@ void GameData_UpdateTime(GameData *gameData, u32 seconds) {
     updateGameTime(gameData->playTime, seconds);
 }
 
-PlayTime *func_02017a40(GameData *gameData) {
+PlayTime *GameData_GetPlayTime(GameData *gameData) {
     return gameData->playTime;
 }
 
@@ -1005,11 +1005,11 @@ void GameData_SetLensFlareRequested(GameData *gameData, BOOL requested) {
     gameData->lensFlareRequested = requested;
 }
 
-BOOL func_02017b34(GameData *gameData) {
+BOOL GameData_IsFunfestMission(GameData *gameData) {
     return gameData->funfestMission;
 }
 
-void func_02017b40(GameData *gameData, BOOL flag) {
+void GameData_SetFunfestMission(GameData *gameData, BOOL flag) {
     gameData->funfestMission = flag;
 }
 
@@ -1033,19 +1033,19 @@ JoinAvenuePersonList **GameData_GetJoinAvenuePersonListPtr(GameData *gameData) {
     return &gameData->joinAvenuePersonList;
 }
 
-ResortWork *func_02017b84(GameData *gameData) {
+ResortWork *GameData_GetResortWork(GameData *gameData) {
     return gameData->resortWork;
 }
 
-u8 func_02017b8c(GameData *gameData) {
+u8 GameData_GetCounter(GameData *gameData) {
     return gameData->counter;
 }
 
-void func_02017b98(GameData *gameData) {
+void GameData_IncCounter(GameData *gameData) {
     gameData->counter++;
     gameData->counter = gameData->counter > GAME_DATA_COUNTER_MAX ? GAME_DATA_COUNTER_MAX : gameData->counter;
 }
 
-void func_02017bb4(GameData *gameData) {
+void GameData_ResetCounter(GameData *gameData) {
     gameData->counter = 0;
 }

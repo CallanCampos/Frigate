@@ -297,7 +297,7 @@ BOOL Guru2Receipt_Init(GameProc *proc, u32 *state, void *param, void *work) {
         Guru2Receipt_LoadBG(wk, arc);
         wk->vblankTcb = GFL_VBlankTCBAdd(Guru2Receipt_VBlank, wk, 1);
         wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_GURU2, HEAPID_GURU2, 32, 32);
-        wk->printQueue = func_02021998(HEAPID_GURU2);
+        wk->printQueue = PrintQueue_CreateDefault(HEAPID_GURU2);
         Guru2Receipt_InitWork(wk, arc);
         Guru2Receipt_InitActorSys(wk, arc);
         Guru2Receipt_CreateActors(wk);
@@ -395,8 +395,8 @@ BOOL Guru2Receipt_Exit(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_TCBExMgrFreeTasks(wk->tcbManager);
     GFL_TCBExMgrFree(wk->tcbManager);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     Guru2Receipt_ExitActorSys(wk);
     Guru2Receipt_FreeWindows(wk);
     Guru2Receipt_ExitBG();
@@ -451,7 +451,7 @@ static void Guru2Receipt_VBlank(TCB *tcb, void *data) {
 
 static void Guru2Receipt_UpdatePrint(Guru2ReceiptWork *wk) {
     if (wk->printQueue != NULL) {
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
     }
     GFL_TCBExMgrUpdate(wk->tcbManager);
 }
@@ -1193,7 +1193,7 @@ void Guru2Receipt_SetSeq(Guru2ReceiptWork *wk, int seq, u8 netId) {
         break;
     case GURU2_RECEIPT_SEQ_START:
         if (!Guru2Receipt_IsMessageDone(wk)) {
-            func_02022390(wk->stream);
+            PrintStream_Pause(wk->stream);
         }
         if (wk->yesNo != NULL) {
             ConfirmDialog_Free(wk->yesNo);
@@ -1351,9 +1351,9 @@ static void Guru2Receipt_PrintMessage(Guru2ReceiptWork *wk, u32 messageId, int u
     GFL_BitmapFill(BmpWin_GetBitmap(wk->msgWindow), 15);
     BmpWin_DrawFrame(wk->msgWindow, FALSE, 1, 10);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
-    wk->stream = func_02022268(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, 0, wk->tcbManager, 0, HEAPID_GURU2, 15);
+    wk->stream = PrintStream_Create(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, 0, wk->tcbManager, 0, HEAPID_GURU2, 15);
     BmpWin_TransferNow(wk->msgWindow);
 }
 
@@ -1363,17 +1363,17 @@ static BOOL Guru2Receipt_IsMessageDone(Guru2ReceiptWork *wk) {
     if (wk->stream == NULL) {
         return TRUE;
     }
-    state = func_020223b4(wk->stream);
+    state = PrintStream_GetState(wk->stream);
     if (state == PRINT_STREAM_RUNNING) {
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) {
-            func_020223e0(wk->stream, 0);
+            PrintStream_SkipWait(wk->stream, 0);
         }
     } else if (state == PRINT_STREAM_PAUSED) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-            func_020223bc(wk->stream);
+            PrintStream_Continue(wk->stream);
         }
     } else if (state == PRINT_STREAM_DONE) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
         return TRUE;
     }

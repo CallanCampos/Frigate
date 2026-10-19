@@ -252,7 +252,7 @@ static BOOL Monolith_Main(GameProc *proc, u32 *state, void *param, void *work) {
         return TRUE;
     }
     GFL_TCBExMgrUpdate(wk->tcbMgr);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     func_0204b794();
     return FALSE;
 }
@@ -372,7 +372,7 @@ static void Monolith_CreateText(MonolithWork *wk) {
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
     wk->tcbMgr = GFL_TCBExMgrCreate(HEAPID_MONOLITH, HEAPID_MONOLITH, 4, 0x20);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_MONOLITH);
-    wk->printQueue = func_02021998(HEAPID_MONOLITH);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_MONOLITH);
     wk->wordSet = GFL_WordSetSystemCreate(4, 64, HEAPID_MONOLITH);
     wk->msgBlank = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_8, HEAPID_MONOLITH);
     wk->msgPowerNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PASS_POWERS, HEAPID_MONOLITH);
@@ -386,8 +386,8 @@ static void Monolith_FreeText(MonolithWork *wk) {
     GFL_MsgDataFree(wk->msgPowerInfo);
     GFL_MsgDataFree(wk->msgMonolith);
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     GFL_TCBExMgrFree(wk->tcbMgr);
 }

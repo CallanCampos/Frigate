@@ -78,8 +78,8 @@ struct ReportScreen {
     // What func_020074b8 gives: the size of the blocks that changed and of all of them
     u32 changedSize;
     u32 totalSize;
-    // func_0200743c's count, times 256, at which the bar's next icon shows, and the step between two: a tenth of
-    // the changed size times 512
+    // SaveControl_GetBytesWritten's count, times 256, at which the bar's next icon shows, and the step between two: a
+    // tenth of the changed size times 512
     u32 barThreshold;
     u32 barStep;
     u16 barCount;
@@ -138,7 +138,7 @@ void Report_Update(ReportScreen *wk) {
     PokeParty *party;
     u32 i;
 
-    if (!(wk->doneFlags & REPORT_DONE_ICONS) && func_02021c0c(wk->printQueue) == TRUE) {
+    if (!(wk->doneFlags & REPORT_DONE_ICONS) && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
         party = GameData_GetParty(GSYS_GetGameData(wk->gsys));
         for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
             func_0204c124(wk->actors[i], TRUE);
@@ -150,7 +150,7 @@ void Report_Update(ReportScreen *wk) {
 void Report_UpdateAltFrame(ReportScreen *wk) {
     u32 i;
 
-    if (!(wk->doneFlags & REPORT_DONE_WINDOWS) && func_02021c0c(wk->printQueue) == TRUE) {
+    if (!(wk->doneFlags & REPORT_DONE_WINDOWS) && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
         GFL_BGSysSetBGEnabled(4, TRUE);
         GFL_BGSysSetBGEnabled(5, TRUE);
         GFL_BGSysSetBGEnabled(6, TRUE);
@@ -160,7 +160,7 @@ void Report_UpdateAltFrame(ReportScreen *wk) {
         GFL_BGSysQueueScrLoad(5);
         wk->doneFlags |= REPORT_DONE_WINDOWS;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
         PrintWindow_Flush(&wk->windows[i], wk->printQueue);
     }
@@ -323,7 +323,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
     SaveControl *save;
     u32 i;
 
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
         wk->windows[i].window =
             BmpWin_CreateDynamic(sWindowSetups[i].bg, sWindowSetups[i].x, sWindowSetups[i].y, sWindowSetups[i].width,
@@ -415,9 +415,9 @@ static void Report_PrintWindows(ReportScreen *wk) {
         PlayTime *playTime;
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_PLAY_TIME);
-        playTime = func_02017a40(gameData);
-        WordSetNumber(wordSet, 0, func_02008cec(playTime), 3, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 1, func_02008cf0(playTime), 2, NUM_PAD_ZERO, TRUE);
+        playTime = GameData_GetPlayTime(gameData);
+        WordSetNumber(wordSet, 0, PlayTime_GetHours(playTime), 3, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 1, PlayTime_GetMinutes(playTime), 2, NUM_PAD_ZERO, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, strbuf, fmt);
         PrintWindow_Print(&wk->windows[REPORT_WINDOW_PLAY_TIME], wk->printQueue, 0, 0, strbuf, wk->font,
                           PRINT_COLOR(15, 14, 0));
@@ -426,14 +426,14 @@ static void Report_PrintWindows(ReportScreen *wk) {
 
     // The date and time of the last save, when there is one
     if (!func_0200746c(save) && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
-        PlayTime *saveTime = func_02008de8(save);
+        PlayTime *saveTime = SaveControl_GetPlayTime(save);
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_LAST_SAVE);
-        WordSetNumber(wordSet, 0, func_02008d68(saveTime), 2, NUM_PAD_ZERO, TRUE);
-        WordSetNumber(wordSet, 1, func_02008d70(saveTime), 2, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 2, func_02008d78(saveTime), 2, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 3, func_02008d80(saveTime), 2, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 4, func_02008d88(saveTime), 2, NUM_PAD_ZERO, TRUE);
+        WordSetNumber(wordSet, 0, PlayTime_GetLastSavedYear(saveTime), 2, NUM_PAD_ZERO, TRUE);
+        WordSetNumber(wordSet, 1, PlayTime_GetLastSavedMonth(saveTime), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 2, PlayTime_GetLastSavedDay(saveTime), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 3, PlayTime_GetLastSavedHour(saveTime), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 4, PlayTime_GetLastSavedMinute(saveTime), 2, NUM_PAD_ZERO, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, strbuf, fmt);
         PrintWindow_Print(&wk->windows[REPORT_WINDOW_LAST_SAVE], wk->printQueue, 0, 4, strbuf, wk->font,
                           PRINT_COLOR(13, 12, 0));
@@ -454,7 +454,7 @@ static void Report_FreeWindows(ReportScreen *wk) {
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
         BmpWin_Free(wk->windows[i].window);
     }
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
 }
 
 // The first of the party's icons, and the first of the bar's
@@ -551,7 +551,7 @@ static void Report_VBlank(TCB *tcb, void *data) {
     u32 written;
 
     if (wk->barActive) {
-        written = func_0200743c(wk->save) << 8;
+        written = SaveControl_GetBytesWritten(wk->save) << 8;
         if (wk->barWait != REPORT_BAR_WAIT) {
             wk->barWait++;
         }

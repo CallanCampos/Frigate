@@ -120,7 +120,7 @@ WbtDownloadGraphic *WbtDownloadGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     WbtDownloadBG_Init(&graphic->bg, heapId);
     WbtDownloadClAct_Init(&graphic->clact, &sWbtDownloadVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(WbtDownloadGraphic_VBlank, graphic, 0);
@@ -131,7 +131,7 @@ void WbtDownloadGraphic_Free(WbtDownloadGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     WbtDownloadClAct_Free(&graphic->clact);
     WbtDownloadBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

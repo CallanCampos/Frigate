@@ -372,9 +372,9 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         if (self->activity == 0x19) {
             param = subproc->arg;
             if (param->unk14 == 1) {
-                func_02005e08((u16)GetMapBGMIDByPlayerState2(unisys->param->gameData, ZONE_UNION_ROOM,
-                                                             GameData_GetSeason(unisys->param->gameData)),
-                              0xffff, 6, 0x3c);
+                GFL_SndBGMRequestChange((u16)GetMapBGMIDByPlayerState2(unisys->param->gameData, ZONE_UNION_ROOM,
+                                                                       GameData_GetSeason(unisys->param->gameData)),
+                                        0xffff, 6, 0x3c);
                 *step = 15;
             } else {
                 *step = 16;
@@ -608,21 +608,21 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
                 if (i == selfId) {
                     continue;
                 }
-                if (func_0200a438(wifiList, &colosseum->members[i].info, &friendIndex) != TRUE) {
+                if (WifiList_FindFriendByPlayerInfo(wifiList, &colosseum->members[i].info, &friendIndex) != TRUE) {
                     continue;
                 }
                 if (isRedTeam == (colosseum->unk16C[i] & 1)) {
-                    func_0200a29c(wifiList, friendIndex);
+                    WifiList_SetFriendLastDateToNow(wifiList, friendIndex);
                 } else {
                     switch (battle->players.battle.result) {
                     case 0:
-                        func_0200a2d4(wifiList, friendIndex, 1, 0, 0);
+                        WifiList_AddFriendRecord(wifiList, friendIndex, 1, 0, 0);
                         break;
                     case 1:
-                        func_0200a2d4(wifiList, friendIndex, 0, 1, 0);
+                        WifiList_AddFriendRecord(wifiList, friendIndex, 0, 1, 0);
                         break;
                     case 2:
-                        func_0200a29c(wifiList, friendIndex);
+                        WifiList_SetFriendLastDateToNow(wifiList, friendIndex);
                         break;
                     }
                 }

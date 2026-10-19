@@ -3755,12 +3755,12 @@ static void BtlvEffvm_PlaySENow(u32 se, u32 player, int pan, int arg3, int arg4,
     } else {
         GFL_SEPlayKeepVol(se, player);
     }
-    NNS_SndPlayerSetVolume(func_020061a8(player), arg4);
+    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), arg4);
     GFL_SndPlayerSetParams(player, -1, -1, pan);
     GFL_SndPlayerSetParams(player, -1, arg3, -1);
     if (vol != 0) {
-        NNS_SndPlayerSetTrackModDepth(func_020061a8(player), 0xffff, vol);
-        NNS_SndPlayerSetTrackModSpeed(func_020061a8(player), 0xffff, pitch);
+        NNS_SndPlayerSetTrackModDepth(GFL_SndPlayerGetHandle(player), 0xffff, vol);
+        NNS_SndPlayerSetTrackModSpeed(GFL_SndPlayerGetHandle(player), 0xffff, pitch);
     }
 }
 
@@ -4211,7 +4211,7 @@ static void BtlvEffvm_SeMoveTask(TCB *tcb, void *data) {
             GFL_SndPlayerSetParams(work->player, -1, value, -1);
             break;
         case 1:
-            NNS_SndPlayerSetVolume(func_020061a8(work->player), value);
+            NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(work->player), value);
             break;
         case 2:
             GFL_SndPlayerSetParams(work->player, -1, -1, value);
@@ -4279,7 +4279,7 @@ static void BtlvEffvm_BgmFadeTask(TCB *tcb, void *data) {
     BOOL done = TRUE;
 
     BtlvEffTool_Step(&work->volume, &work->step, &work->target, &done);
-    func_02011bdc(0xffff, work->volume >> FX32_SHIFT);
+    NetBgmVolume_Set(0xffff, work->volume >> FX32_SHIFT);
     if (done) {
         BtlvEffect_EndTask(tcb);
     }

@@ -252,7 +252,7 @@ BOOL func_ov012_02157814(VM *vm, FieldScriptEnv *env) {
     saveBytes = param->powerFlags;
     highLink = getHighLinkBlockAddress(GameData_GetSaveControl(gameData));
     MI_CpuFill8(saveBytes, 0, sizeof(param->powerFlags));
-    func_0200c6d8(highLink, saveBytes, 2);
+    HighLinkSave_GetSpecialFlags(highLink, saveBytes, 2);
     saveBytes[2] = 1;
     param->unk31 = 0;
     param->gsys = gsys;

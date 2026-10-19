@@ -562,7 +562,7 @@ static void CommTvtField_InitUI(CommTvtFieldWork *wk) {
 }
 
 static void CommTvtField_FreeGraphics(CommTvtFieldWork *wk) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     CommTvtField_FreeWindows(wk);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, (u16)wk->frameChars, (u16)(wk->frameChars >> 16));
@@ -809,7 +809,7 @@ static void CommTvtField_SetCallMode(CommTvtFieldWork *wk) {
 }
 
 static void CommTvtField_UpdateCalls(CommTvtFieldWork *wk) {
-    int found = func_02012e54(GameData_GetWifiList(wk->gameData));
+    int found = WihDwc_FindFriendInvite(GameData_GetWifiList(wk->gameData));
 
     if (found != -1) {
         void *beacon = func_020428a8(found);
@@ -924,7 +924,7 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     GX_DispOn();
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sCommTvtFieldVRAMConfig);
     {
         BGSysLCDConfig lcdConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -940,7 +940,7 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     CommTvtField_InitGraphics(wk);
     wk->wordSet = GFL_WordSetSystemCreate(11, 200, wk->heapId);
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 1, 0);
-    wk->queue = func_02021998(wk->heapId);
+    wk->queue = PrintQueue_CreateDefault(wk->heapId);
     wk->taskMenuRes = AppTaskMenuRes_Create(5, 13, wk->font, wk->queue, wk->heapId);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
     GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
@@ -977,12 +977,12 @@ static BOOL CommTvtFieldApp_Main(GameProc *proc, u32 *state, void *param, void *
     func_0204b794();
     if (func_02042788()) {
         wk->prevWifiState = wk->wifiState;
-        wk->wifiState = func_02012be4(GameData_GetWifiList(wk->gameData));
+        wk->wifiState = WihDwc_GetStatus(GameData_GetWifiList(wk->gameData));
         wk->prevCallCount = wk->callCount;
         wk->callCount = CommTvtField_CountCalls(wk);
     }
     GFL_TCBExMgrUpdate(wk->tcbManager);
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->scroll);
     wk->scroll--;
     if (GFL_WipeIsFinished() && !wk->leaving) {
@@ -1012,8 +1012,8 @@ static BOOL CommTvtFieldApp_Exit(GameProc *proc, u32 *state, void *param, void *
     fieldParam->mode = wk->mode;
     GFL_TCBExMgrFree(wk->tcbManager);
     GFL_BGSysReleaseBG(5);
-    func_02021c44(wk->queue);
-    func_02021a18(wk->queue);
+    PrintQueue_Clear(wk->queue);
+    PrintQueue_Free(wk->queue);
     for (i = 0; i < 3; i++) {
         func_0204c108(wk->actors[i]);
     }
@@ -1027,7 +1027,7 @@ static BOOL CommTvtFieldApp_Exit(GameProc *proc, u32 *state, void *param, void *
     func_0204bf98(wk->unit);
     func_0204b758();
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     GFL_WordSetSystemFree(wk->wordSet);
     if (wk->taskMenu != NULL) {

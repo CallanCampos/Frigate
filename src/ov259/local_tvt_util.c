@@ -266,9 +266,10 @@ LocalTvtReturnBar *LocalTvtReturnBar_Create(ClActUnit *unit, HeapID heapId) {
 
     LocalTvtReturnIcon_Init(&bar->icon, unit, heapId);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_SUB_BG, PALETTE_BAR * 0x20, 0x20, heapId);
-    bar->chars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), BG_SUB_PANEL, 0, FALSE, heapId);
-    file = GFL_G2DIOReadNSCRArc(arc, func_0202d828(), FALSE, &screen, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_SUB_BG, PALETTE_BAR * 0x20, 0x20,
+                                heapId);
+    bar->chars = GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), BG_SUB_PANEL, 0, FALSE, heapId);
+    file = GFL_G2DIOReadNSCRArc(arc, AppMenuCommon_GetBarScreenFile(), FALSE, &screen, heapId);
     for (i = 0; i < 32 * 24; i++) {
         ((u16 *)screen->rawData)[i] += (u16)bar->chars;
     }
@@ -1029,9 +1030,10 @@ static void LocalTvtReturnIcon_Init(LocalTvtReturnIcon *icon, ClActUnit *unit, H
 
     MI_CpuFill8(icon, 0, sizeof(LocalTvtReturnIcon));
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    icon->palette = func_0204bbb8(arc, func_0202d810(), 1, 11 * 0x20, 0, 3, heapId);
-    icon->chars = func_0204b81c(arc, func_0202d814(), FALSE, 1, heapId);
-    icon->cellAnims = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), heapId);
+    icon->palette = func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), 1, 11 * 0x20, 0, 3, heapId);
+    icon->chars = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 1, heapId);
+    icon->cellAnims =
+        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 224;

@@ -122,7 +122,7 @@ LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *
         WifiBattleMatchLinkIcon_Create(WifiBattleMatchGraphic_GetClActUnit(wk->param.net), wk->param.seq, heapId);
     WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
     wk->entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(wk->param.gameData)), 1);
-    wk->record = func_0200f2d8(getRecordBlkAddress(GameData_GetSaveControl(wk->param.gameData)));
+    wk->record = RecordSave_GetLiveMatch(getRecordBlkAddress(GameData_GetSaveControl(wk->param.gameData)));
     wk->party = PokeParty_Create(heapId);
     if (wk->param.mode == 0) {
         GCTX_HIDBlockSoftReset(8);
@@ -386,15 +386,15 @@ static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, v
         void *records = TournamentBlock_GetTeam(block, 1);
 
         TournamentEntry_SetField(wk->delivered, 10, 1);
-        func_0200f1c4(wk->record);
+        LiveMatchData_Init(wk->record);
         TournamentTeam_Clear(records);
         TournamentBlock_SetEntry(block, 1, wk->delivered);
-        func_0201782c(wk->param.gameData);
+        GameData_StartSave(wk->param.gameData);
         *seq = 24;
         break;
     }
     case 24:
-        if (func_02017850(wk->param.gameData) == 2) {
+        if (GameData_UpdateSave(wk->param.gameData) == 2) {
             *seq = 29;
         }
         break;
@@ -585,11 +585,11 @@ static void LiveBattleMatchFlow_StepTeam(WifiBattleMatchTask *task, u32 *seq, vo
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 10, 2, 21, 15);
         break;
     case 15:
-        func_0201782c(wk->param.gameData);
+        GameData_StartSave(wk->param.gameData);
         *seq = 16;
         break;
     case 16:
-        if (func_02017850(wk->param.gameData) == 2) {
+        if (GameData_UpdateSave(wk->param.gameData) == 2) {
             *seq = 17;
         }
         break;
@@ -655,7 +655,7 @@ static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 4: {
         Regulation *regulation = func_0200b530(wk->entry);
-        u32 played = func_0200f1d8(wk->record, 0);
+        u32 played = LiveMatchData_GetCount(wk->record, 0);
 
         if (played >= Regulation_GetParam(regulation, 0x16)) {
             WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepQuit);
@@ -753,11 +753,11 @@ static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, vo
     case 15:
         TournamentEntry_SetField(wk->entry, 10, 4);
         BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(wk->param.gameData)), 2);
-        func_0201782c(wk->param.gameData);
+        GameData_StartSave(wk->param.gameData);
         *seq = 16;
         break;
     case 16:
-        switch (func_02017850(wk->param.gameData)) {
+        switch (GameData_UpdateSave(wk->param.gameData)) {
         case 0:
         case 1:
             break;
@@ -778,7 +778,7 @@ static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, vo
         }
         break;
     case 19:
-        if (func_0200c1d0((u8)wk->param.partnerData->unk44)) {
+        if (BattleRec_IsVersionSupported((u8)wk->param.partnerData->unk44)) {
             *seq = 20;
         } else {
             *seq = 21;
@@ -921,7 +921,7 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
     case 15:
         if (wk->param.playerData->entryField2 == wk->param.partnerData->entryField2) {
             u32 field12 = TournamentEntry_GetField(wk->entry, 12);
-            BOOL known = func_0200f254(wk->record, wk->param.partnerData->mac);
+            BOOL known = LiveMatchData_HasOpponent(wk->record, wk->param.partnerData->mac);
 
             wk->readySent = (field12 != 0 || (field12 == 0 && !known));
             *seq = 16;
@@ -1083,11 +1083,11 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
     case 3: {
         u8 won;
         u8 lost;
-        u8 played = func_0200f1d8(wk->record, 0);
+        u8 played = LiveMatchData_GetCount(wk->record, 0);
 
-        func_0200f218(wk->record, played, wk->param.partnerData->mac);
-        func_0200f238(wk->record, played, 0, wk->param.matchResult->unk08);
-        func_0200f238(wk->record, played, 1, wk->param.matchResult->unk09);
+        LiveMatchData_SetOpponentMacAddress(wk->record, played, wk->param.partnerData->mac);
+        LiveMatchData_SetOpponentParam(wk->record, played, 0, wk->param.matchResult->unk08);
+        LiveMatchData_SetOpponentParam(wk->record, played, 1, wk->param.matchResult->unk09);
         won = 0;
         lost = 0;
         switch (wk->param.matchResult->result) {
@@ -1106,9 +1106,9 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
                            wk->param.matchResult->result);
             break;
         }
-        func_0200f1e0(wk->record, 1, won);
-        func_0200f1e0(wk->record, 2, lost);
-        func_0200f1e0(wk->record, 0, 1);
+        LiveMatchData_AddCount(wk->record, 1, won);
+        LiveMatchData_AddCount(wk->record, 2, lost);
+        LiveMatchData_AddCount(wk->record, 0, 1);
         LiveBattleMatchFlow_PlayerCardCreateWait(wk);
         *seq = 4;
         break;
@@ -1117,11 +1117,11 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 10, 2, 8, 5);
         break;
     case 5:
-        func_0201782c(wk->param.gameData);
+        GameData_StartSave(wk->param.gameData);
         *seq = 6;
         break;
     case 6:
-        if (func_02017850(wk->param.gameData) == 2) {
+        if (GameData_UpdateSave(wk->param.gameData) == 2) {
             *seq = 7;
         }
         break;
@@ -1156,7 +1156,7 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 1: {
         Regulation *regulation = func_0200b530(wk->entry);
-        u32 played = func_0200f1d8(wk->record, 0);
+        u32 played = LiveMatchData_GetCount(wk->record, 0);
 
         if (played >= Regulation_GetParam(regulation, 0x16)) {
             *seq = 2;
@@ -1171,11 +1171,11 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
     case 3:
         TournamentEntry_SetField(wk->entry, 10, 3);
         BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(wk->param.gameData)), 2);
-        func_0201782c(wk->param.gameData);
+        GameData_StartSave(wk->param.gameData);
         *seq = 4;
         break;
     case 4:
-        switch (func_02017850(wk->param.gameData)) {
+        switch (GameData_UpdateSave(wk->param.gameData)) {
         case 0:
         case 1:
             break;
@@ -1228,7 +1228,7 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
         }
         break;
     case 11:
-        if (func_0200c1d0((u8)wk->param.partnerData->unk44)) {
+        if (BattleRec_IsVersionSupported((u8)wk->param.partnerData->unk44)) {
             *seq = 12;
         } else {
             *seq = 13;
@@ -1376,9 +1376,9 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         WifiBattleMatchLiveCardInfo card;
 
         MI_CpuFill8(&card, 0, sizeof(WifiBattleMatchLiveCardInfo));
-        card.unkA0 = func_0200f1d8(wk->record, 1);
-        card.unkA2 = func_0200f1d8(wk->record, 2);
-        card.unkA4 = func_0200f1d8(wk->record, 0);
+        card.unkA0 = LiveMatchData_GetCount(wk->record, 1);
+        card.unkA2 = LiveMatchData_GetCount(wk->record, 2);
+        card.unkA4 = LiveMatchData_GetCount(wk->record, 0);
         card.unkA6 = Regulation_GetParam(regulation, 0x16);
         card.look = func_02008bf4(info);
         MI_CpuCopy8(func_0200b794(wk->entry), card.data, sizeof(card.data));
@@ -1488,9 +1488,9 @@ static void LiveBattleMatchFlow_FillPlayerData(LiveBattleMatchPlayerData *data, 
     party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(gameData)), HEAPID_LIVEBATTLEMATCH_TEAM);
     MI_CpuCopy8(party, (u8 *)data + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);
-    data->record1 = func_0200f1d8(wk->record, 1);
-    data->record2 = func_0200f1d8(wk->record, 2);
-    data->record0 = func_0200f1d8(wk->record, 0);
+    data->record1 = LiveMatchData_GetCount(wk->record, 1);
+    data->record2 = LiveMatchData_GetCount(wk->record, 2);
+    data->record0 = LiveMatchData_GetCount(wk->record, 0);
     data->entryField2 = TournamentEntry_GetField(wk->entry, 2);
 }
 

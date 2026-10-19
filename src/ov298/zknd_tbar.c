@@ -290,14 +290,17 @@ static void ZkndTbarResource_Load(ZkndTbarResource *resource, u8 bg, u32 engine,
     resource->bg = bg;
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     if (!noBG) {
-        GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), palType, bgPalette * 32, 32, heapId);
-        resource->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), resource->bg, 32 * 64, FALSE, heapId);
-        ZkndTbar_LoadScreen(arc, func_0202d828(), resource->bg, CHAR_POS(resource->bgChars), 0, 21, 32, 24, 0, 21, 32,
-                            3, bgPalette, FALSE, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), palType, bgPalette * 32, 32, heapId);
+        resource->bgChars =
+            GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), resource->bg, 32 * 64, FALSE, heapId);
+        ZkndTbar_LoadScreen(arc, AppMenuCommon_GetBarScreenFile(), resource->bg, CHAR_POS(resource->bgChars), 0, 21, 32,
+                            24, 0, 21, 32, 3, bgPalette, FALSE, heapId);
     }
-    resource->objRes[OBJRES_PALETTE] = func_0204bbb8(arc, func_0202d810(), engine, objPalette * 32, 0, 3, heapId);
-    resource->objRes[OBJRES_CHARS] = func_0204b81c(arc, func_0202d814(), FALSE, engine, heapId);
-    resource->objRes[OBJRES_CELLANIMS] = func_0204bde0(arc, func_0202d818(mapping), func_0202d81c(mapping), heapId);
+    resource->objRes[OBJRES_PALETTE] =
+        func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), engine, objPalette * 32, 0, 3, heapId);
+    resource->objRes[OBJRES_CHARS] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, engine, heapId);
+    resource->objRes[OBJRES_CELLANIMS] = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(mapping),
+                                                       AppMenuCommon_GetTouchBarAnimFile(mapping), heapId);
     GFL_ArcToolFree(arc);
 }
 

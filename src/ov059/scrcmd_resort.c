@@ -62,7 +62,7 @@ BOOL func_ov059_021e58c0(VM *vm, FieldScriptEnv *env) {
     func_ov137_021f10dc(person, 27, 1);
     func_ov137_021f0f84(person, 1);
     if (checkForMidnight(GSYS_GetGameData(gsys)) && func_ov137_021f10f4(person, 0) == 0) {
-        func_0203640c(func_ov137_021f0fa8(person), 3, -1);
+        JoinAvenueShop_SetField(func_ov137_021f0fa8(person), 3, -1);
     }
     return FALSE;
 }
@@ -107,7 +107,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         *var = (u16)func_ov137_021f10e8(person, 0, NULL) + 80;
         break;
     case 1: {
-        JoinAvenueRecord *a = func_020388c0(occupants);
+        JoinAvenueRecord *a = JoinAvenueOccupants_GetEmptyRecord(occupants);
         u32 b = JoinAvenue_GetParam(info, 12, 0);
 
         *var = a == NULL && b != 0 ? TRUE : FALSE;
@@ -118,8 +118,8 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         u16 b = func_ov137_021f10e8(person, 14, NULL);
         u16 c = func_ov137_021f10e8(person, 15, NULL);
         u16 d = func_ov137_021f10e8(person, 18, NULL);
-        u16 id1 = func_020394b0(a, b, c, d, info, shops);
-        u16 id2 = func_020363e0(func_ov137_021f0fa8(person), 0);
+        u16 id1 = JoinAvenue_ChooseShop(a, b, c, d, info, shops);
+        u16 id2 = JoinAvenueShop_GetField(func_ov137_021f0fa8(person), 0);
         const u16 *row1 = ResortShopData_GetShop(shops, id1);
         const u16 *row2 = ResortShopData_GetShop(shops, id2);
         u16 kind1 = ResortShopData_GetShopParam(row1, 0);
@@ -142,7 +142,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 6:
-        *var = func_02038868(occupants) == 0 ? TRUE : FALSE;
+        *var = JoinAvenueOccupants_CountPeople(occupants) == 0 ? TRUE : FALSE;
         break;
     case 7:
         *var = func_ov137_021f10e8(person, 32, NULL);
@@ -151,19 +151,19 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         *var = func_ov137_021f10e8(person, 31, NULL);
         break;
     case 9:
-        *var = func_02036434(func_02038470(func_ov137_021f1980(data)), 0);
+        *var = JoinAvenueShop_GetFlag(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 0);
         break;
     case 10:
-        *var = func_02038868(occupants) == 8 ? TRUE : FALSE;
+        *var = JoinAvenueOccupants_CountPeople(occupants) == 8 ? TRUE : FALSE;
         break;
     case 11: {
-        u16 id = func_020363e0(func_ov137_021f0fa8(person), 0);
+        u16 id = JoinAvenueShop_GetField(func_ov137_021f0fa8(person), 0);
 
         *var = ResortShopData_GetShopParam(ResortShopData_GetShop(shops, id), 0);
         break;
     }
     case 15: {
-        BOOL flag = func_02036e4c(func_ov137_021f0f58(person), 4);
+        BOOL flag = JoinAvenuePerson_HasExtraData(func_ov137_021f0f58(person), 4);
         JoinAvenuePersonParam param;
 
         *var = 0;
@@ -177,7 +177,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 13: {
-        BOOL flag = func_02036e4c(func_ov137_021f0f58(person), 0);
+        BOOL flag = JoinAvenuePerson_HasExtraData(func_ov137_021f0f58(person), 0);
         u32 unk29 = func_ov137_021f10e8(person, 41, NULL);
 
         *var = flag && unk29 != 255 ? TRUE : FALSE;
@@ -229,7 +229,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     case 31:
     case 32:
         which -= 25;
-        *var = JoinAvenuePerson_IsEmpty(func_02038860(occupants, which)) == FALSE ? TRUE : FALSE;
+        *var = JoinAvenuePerson_IsEmpty(JoinAvenueOccupants_GetPerson(occupants, which)) == FALSE ? TRUE : FALSE;
         break;
     case 33:
         *var = JoinAvenue_GetParam(info, 11, 0);
@@ -241,10 +241,10 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         u32 value = 0;
 
         for (i = 0; i < 4; i++) {
-            void *record = func_0203888c(occupants, i);
+            void *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-            if (!func_020384e0(record) && func_020385a8(record, 31, NULL) == 0) {
-                value = func_020385a8(record, 2, NULL);
+            if (!JoinAvenueRecord_IsEmpty(record) && JoinAvenueRecord_GetParam(record, 31, NULL) == 0) {
+                value = JoinAvenueRecord_GetParam(record, 2, NULL);
                 break;
             }
         }
@@ -255,10 +255,10 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         u32 value = 0;
 
         for (i = 0; i < 4; i++) {
-            void *record = func_0203888c(occupants, i);
+            void *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-            if (!func_020384e0(record) && func_020385a8(record, 31, NULL) == 2) {
-                value = func_020385a8(record, 2, NULL);
+            if (!JoinAvenueRecord_IsEmpty(record) && JoinAvenueRecord_GetParam(record, 31, NULL) == 2) {
+                value = JoinAvenueRecord_GetParam(record, 2, NULL);
                 break;
             }
         }
@@ -267,9 +267,9 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     }
     case 37:
         for (i = 0; i < 4; i++) {
-            void *record = func_0203888c(occupants, i);
+            void *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-            if (!func_020384e0(record) && func_020385a8(record, 31, NULL) == 0) {
+            if (!JoinAvenueRecord_IsEmpty(record) && JoinAvenueRecord_GetParam(record, 31, NULL) == 0) {
                 *var = i;
                 break;
             }
@@ -277,9 +277,9 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         break;
     case 38:
         for (i = 0; i < 4; i++) {
-            void *record = func_0203888c(occupants, i);
+            void *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-            if (!func_020384e0(record) && func_020385a8(record, 31, NULL) == 2) {
+            if (!JoinAvenueRecord_IsEmpty(record) && JoinAvenueRecord_GetParam(record, 31, NULL) == 2) {
                 *var = i;
                 break;
             }
@@ -303,7 +303,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     case 50:
     case 51:
         which -= 44;
-        *var = (u16)joinAveTextHandler(func_02038860(occupants, which), 0, NULL) + 80;
+        *var = (u16)joinAveTextHandler(JoinAvenueOccupants_GetPerson(occupants, which), 0, NULL) + 80;
         break;
     case 52:
     case 53:
@@ -316,7 +316,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         u16 id;
 
         which -= 52;
-        id = func_020363e0(func_02038470(func_02038860(occupants, which)), 0);
+        id = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(JoinAvenueOccupants_GetPerson(occupants, which)), 0);
         *var = ResortShopData_GetShopParam(ResortShopData_GetShop(shops, id), 5);
         break;
     }
@@ -337,7 +337,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         *var = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, 0)), 6) - 1753;
         break;
     case 64:
-        *var = func_02038868(occupants);
+        *var = JoinAvenueOccupants_CountPeople(occupants);
         break;
     }
     return FALSE;
@@ -484,7 +484,7 @@ BOOL func_ov059_021e619c(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
-    value = func_020363e0(func_ov137_021f0fa8(person), 0);
+    value = JoinAvenueShop_GetField(func_ov137_021f0fa8(person), 0);
     func_ov137_021f10dc(person, 19, value);
     return FALSE;
 }
@@ -575,7 +575,7 @@ BOOL func_ov059_021e6318(VM *vm, FieldScriptEnv *env) {
         }
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         exp = PML_UtilGetPkmLvExp(species, PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL), level);
-        func_02038bc8(9);
+        JoinAvenue_RecordActivity(9);
         PokeParty_SetParam(pkm, PKM_PARAM_EXP, exp);
         PokeParty_RecalcStats(pkm);
         *var = TRUE;
@@ -693,9 +693,9 @@ BOOL func_ov059_021e64a0(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov059_021e65fc(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
-    func_02036448(func_02038470(func_ov137_021f0f58(ResortSys_GetScriptPerson(
-                      env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))))),
-                  0, TRUE);
+    JoinAvenueShop_SetFlag(JoinAvenuePerson_GetShop(func_ov137_021f0f58(ResortSys_GetScriptPerson(
+                               env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))))),
+                           0, TRUE);
     return FALSE;
 }
 
@@ -720,7 +720,7 @@ BOOL func_ov059_021e6630(VM *vm, FieldScriptEnv *env) {
     RecordAdd(records, 0x16, cost);
     RecordAddOne(records, 0x15);
     WordSetNumber(wordSet, 1, cost, 6, 0, 1);
-    func_02036448(func_02038470(func_ov137_021f0f58(person)), bit, TRUE);
+    JoinAvenueShop_SetFlag(JoinAvenuePerson_GetShop(func_ov137_021f0f58(person)), bit, TRUE);
     return FALSE;
 }
 
@@ -749,8 +749,8 @@ BOOL func_ov059_021e66d8(VM *vm, FieldScriptEnv *env) {
     var2 = ScriptReadVar(vm, env);
     var3 = ScriptReadVar(vm, env);
     var4 = ScriptReadVar(vm, env);
-    *var =
-        ResortSys_GetPersonVisit(func_ov137_021f1110(person), func_02038860(occupants, index), sys, var2, var3, var4);
+    *var = ResortSys_GetPersonVisit(func_ov137_021f1110(person), JoinAvenueOccupants_GetPerson(occupants, index), sys,
+                                    var2, var3, var4);
     return FALSE;
 }
 
@@ -775,7 +775,7 @@ BOOL func_ov059_021e6778(VM *vm, FieldScriptEnv *env) {
     a2 = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
     var2 = ScriptReadVar(vm, env);
-    *var = ResortSys_AddShopExperience(func_02038860(occupants, index), sys, a2, var2);
+    *var = ResortSys_AddShopExperience(JoinAvenueOccupants_GetPerson(occupants, index), sys, a2, var2);
     return FALSE;
 }
 
@@ -805,7 +805,7 @@ BOOL func_ov059_021e6868(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     occupants = ResortSys_GetOccupants(ResortSys_Get(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
-    func_02038a0c(occupants, ScriptReadAny(vm, env));
+    JoinAvenueOccupants_SetLocked(occupants, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -969,7 +969,7 @@ BOOL func_ov059_021e6b68(VM *vm, FieldScriptEnv *env) {
         u32 result = ResortSys_GetUnlockForRank(sys, gameData, 100);
 
         if (result != 0 && result != 8) {
-            func_02039064(info, result + 15, 1);
+            JoinAvenueInfo_SetParam(info, result + 15, 1);
             *var = TRUE;
         }
     }
@@ -1094,7 +1094,7 @@ BOOL func_ov059_021e6d50(VM *vm, FieldScriptEnv *env) {
     heapId = Field_GetHeapID(field);
     *var = 0;
     for (i = 7; i >= 0; i--) {
-        person = func_02038860(occupants, i);
+        person = JoinAvenueOccupants_GetPerson(occupants, i);
         if (!JoinAvenuePerson_IsEmpty(person) && joinAveTextHandler(person, param + 64, NULL) != 0) {
             count++;
         }
@@ -1107,7 +1107,7 @@ BOOL func_ov059_021e6d50(VM *vm, FieldScriptEnv *env) {
     }
     i = 7;
     while (TRUE) {
-        person = func_02038860(occupants, i);
+        person = JoinAvenueOccupants_GetPerson(occupants, i);
         if (!JoinAvenuePerson_IsEmpty(person)) {
             u32 value = joinAveTextHandler(person, param + 64, NULL);
 
@@ -1214,7 +1214,7 @@ BOOL func_ov059_021e6fc8(VM *vm, FieldScriptEnv *env) {
     index = ScriptReadAny(vm, env);
     mode = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
-    person = func_02038860(occupants, index);
+    person = JoinAvenueOccupants_GetPerson(occupants, index);
     switch (mode) {
     case 0:
         date = joinAveTextHandler(person, 44, NULL);
@@ -1424,7 +1424,7 @@ BOOL func_ov059_021e74cc(VM *vm, FieldScriptEnv *env) {
     u32 param = ScriptReadAny(vm, env);
     u16 value = ScriptReadAny(vm, env);
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
-    JoinAvenuePerson *own = func_02038a18(getAddressOfBeginningOfOccupants(joinAvenue));
+    JoinAvenuePerson *own = JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(joinAvenue));
     JoinAvenueInfo *info = JoinAvenue_GetInfo(joinAvenue);
 
     switch (param) {
@@ -1450,20 +1450,20 @@ BOOL func_ov059_021e74cc(VM *vm, FieldScriptEnv *env) {
         JoinAvenuePerson_SetParam(own, 19, sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]);
         break;
     case 17:
-        func_02039064(info, 5, value);
+        JoinAvenueInfo_SetParam(info, 5, value);
         break;
     case 18:
-        func_02039064(info, 7, value);
+        JoinAvenueInfo_SetParam(info, 7, value);
         if (value == 0) {
             func_ov137_021eef24(field);
         }
         break;
     case 21:
-        func_02039064(info, value + 15, 0);
-        func_02039064(info, value + 7, 1);
+        JoinAvenueInfo_SetParam(info, value + 15, 0);
+        JoinAvenueInfo_SetParam(info, value + 7, 1);
         break;
     case 22:
-        func_02039064(info, 25, value);
+        JoinAvenueInfo_SetParam(info, 25, value);
         break;
     case 23:
         if (Field_CheckGimmickWorkPassword(field, 1)) {
@@ -1504,7 +1504,7 @@ BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     info = JoinAvenue_GetInfo(joinAvenue);
-    own = func_02038a18(occupants);
+    own = JoinAvenueOccupants_GetPlayerPerson(occupants);
     sys = ResortSys_Get(field);
     switch (param) {
     case 0:
@@ -1526,7 +1526,7 @@ BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
         *var = joinAveTextHandler(own, (u16)param + 64, NULL);
         break;
     case 16:
-        *var = func_02038a20(own, GetGameDataPlayerInfo(gameData));
+        *var = JoinAvenuePerson_GetShopId(own, GetGameDataPlayerInfo(gameData));
         break;
     case 19:
         *var = ResortSys_GetInfoFlag1b(sys);
@@ -1638,7 +1638,7 @@ static BOOL func_ov059_021e7834(VM *vm, void *data) {
         wk->state++;
         break;
     case 1:
-        ResortWork_UpdateRecords(func_02017b84(gameData), GameData_GetSaveControl(gameData));
+        ResortWork_UpdateRecords(GameData_GetResortWork(gameData), GameData_GetSaveControl(gameData));
         ResortRecords_PrintPage(wk->window, ResortSys_GetOccupants(sys), msgBGSys, wordSet, gameData, wk->page, heapId);
         wk->state++;
         break;
@@ -1733,7 +1733,7 @@ BOOL func_ov059_021e7a28(VM *vm, FieldScriptEnv *env) {
     case 2:
     case 3:
         key.data = func_ov137_021f1b94(unk30, 1, index);
-        key.zone = func_02039518(zoneId);
+        key.zone = ResortLayout_GetZoneIndex(zoneId);
         *var = (u16)func_ov137_021f10e8(func_ov137_021f14a8(people, &key), 0, NULL) + 80;
         break;
     }

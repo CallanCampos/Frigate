@@ -105,7 +105,7 @@ static BOOL WorldTradeProc_Init(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysInitVRAM(0);
     WorldTrade_InitGraphics(wk);
     GFL_SndBGMSetPaused(FALSE);
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     return TRUE;
 }
 
@@ -164,7 +164,7 @@ static BOOL WorldTradeProc_Main(GameProc *proc, u32 *state, void *param, void *w
 static BOOL WorldTradeProc_End(GameProc *proc, u32 *state, void *param, void *work) {
     WorldTradeWork *wk = work;
 
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     WorldTrade_ExitGraphics(wk);
     WorldTrade_FreeWork(wk);
 
@@ -483,7 +483,7 @@ void WorldTrade_SubProcessUpdate(WorldTradeWork *wk) {
 }
 
 int WorldTrade_GetTalkSpeed(WorldTradeWork *wk) {
-    return func_02017bcc();
+    return TextSpeed_GetCurrentWait();
 }
 
 static const BGSysVRAMConfig sWorldTradeVRAMConfig = {
@@ -613,6 +613,6 @@ void WorldTrade_ExitGraphics(WorldTradeWork *wk) {
 }
 
 void WorldTrade_ShowFatalError(WorldTradeWork *wk) {
-    func_02017884(GSYS_GetGameData(wk->param->gsys));
-    func_02011d04(0x29);
+    GameData_CancelSave(GSYS_GetGameData(wk->param->gsys));
+    GFL_NetErrShowWifi(0x29);
 }

@@ -244,7 +244,7 @@ static BOOL CGHelp_Update(CGHelp *help) {
         }
         break;
     }
-    func_02021a3c(help->printQueue);
+    PrintQueue_Main(help->printQueue);
     func_0204b794();
     if (help->nextButton != NULL) {
         AppTaskMenuWin_Update(help->nextButton);
@@ -253,7 +253,7 @@ static BOOL CGHelp_Update(CGHelp *help) {
         AppTaskMenuWin_Update(help->previousButton);
     }
     AppTaskMenuWin_Update(help->quitButton);
-    if (help->printing == TRUE && func_02021c0c(help->printQueue) == TRUE) {
+    if (help->printing == TRUE && PrintQueue_IsEmpty(help->printQueue) == TRUE) {
         if (AppTaskMenuWin_IsFlashFinished(help->nextButton) == TRUE ||
             AppTaskMenuWin_IsFlashFinished(help->previousButton) == TRUE || help->redraw == TRUE) {
             BmpWin_FlushChar(help->textWindow);
@@ -388,8 +388,8 @@ static void CGHelp_InitText(CGHelp *help) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 15 * 32, 0x20, help->heapId);
     LoadSysMsgBox(BG_MESSAGE, 1, 13, 0, help->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(0), 4, 13 * 32, 0x40, help->heapId);
-    func_020232d8();
-    help->printQueue = func_02021998(help->heapId);
+    GFL_TextRndResetColorIndexLUT();
+    help->printQueue = PrintQueue_CreateDefault(help->heapId);
     help->taskMenuRes = AppTaskMenuRes_Create(BG_TEXT, 11, help->font, help->printQueue, help->heapId);
     help->titleWindow = BmpWin_CreateDynamic(BG_MESSAGE, 2, 4, 28, 4, 15, 1);
     help->textWindow = BmpWin_CreateDynamic(BG_MESSAGE, 2, 9, 28, 12, 15, 1);
@@ -428,12 +428,12 @@ static void CGHelp_FreeText(CGHelp *help) {
     }
     AppTaskMenuWin_Free(help->quitButton);
     AppTaskMenuRes_Free(help->taskMenuRes);
-    func_02021a18(help->printQueue);
+    PrintQueue_Free(help->printQueue);
     BmpWin_Free(help->textWindow);
     BmpWin_Free(help->titleWindow);
     GFL_MsgDataFree(help->msgData);
     GFL_FontFree(help->font);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
 }
 
 static void CGHelp_HandleInput(CGHelp *help) {
@@ -480,11 +480,12 @@ static void CGHelp_DrawPage(CGHelp *help, u8 page) {
     GFL_BitmapFill(BmpWin_GetBitmap(help->titleWindow), 1);
     GFL_BitmapFill(BmpWin_GetBitmap(help->textWindow), 0);
     title = GFL_MsgDataLoadStrbufNew(help->msgData, TITLE_MESSAGE(page));
-    func_02021c7c(help->printQueue, BmpWin_GetBitmap(help->titleWindow), 40, 8, title, help->font,
-                  PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(help->printQueue, BmpWin_GetBitmap(help->titleWindow), 40, 8, title, help->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(title);
     text = GFL_MsgDataLoadStrbufNew(help->msgData, TEXT_MESSAGE(page));
-    func_02021c7c(help->printQueue, BmpWin_GetBitmap(help->textWindow), 0, 0, text, help->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(help->printQueue, BmpWin_GetBitmap(help->textWindow), 0, 0, text, help->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(text);
     help->printing = TRUE;
 }
@@ -505,7 +506,7 @@ static BOOL CGHelp_Init(GameProc *proc, u32 *state, void *param, void *work) {
     help = GFL_ProcInitSubsystem(proc, sizeof(CGHelp), HEAPID_CG_HELP);
     if (helpParam == NULL) {
         helpParam = GFL_HeapAllocate(HEAPID_CG_HELP, 8, TRUE, "cg_help.c", 801);
-        helpParam->playerInfo = func_02008b0c(HEAPID_CG_HELP);
+        helpParam->playerInfo = PlayerInfo_Create(HEAPID_CG_HELP);
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_R) {
             setTrainerGender(helpParam->playerInfo, 1);
         } else {

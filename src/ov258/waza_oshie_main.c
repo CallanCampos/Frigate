@@ -504,7 +504,7 @@ static BOOL WazaOshieProc_Main(GameProc *proc, u32 *state, void *param, void *wo
     WazaOshie_UpdateButtons(wk);
     func_0204b794();
     GFL_TCBExMgrUpdate(wk->tcbManager);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     return FALSE;
 }
 
@@ -522,7 +522,7 @@ static BOOL WazaOshieProc_Exit(GameProc *proc, u32 *state, void *param, void *wo
 static void WazaOshie_InitMenu(WazaOshieWork *work) {
     int i;
 
-    work->printQueue = func_02021998(HEAPID_WAZA_OSHIE);
+    work->printQueue = PrintQueue_CreateDefault(HEAPID_WAZA_OSHIE);
     work->menuRes = AppTaskMenuRes_Create(4, 10, work->font, work->printQueue, HEAPID_WAZA_OSHIE);
     for (i = 0; i < 2; i++) {
         work->buttonItems[i].str = GFL_MsgDataLoadStrbufNew(work->msgData, sWazaOshieButtonItems[i].msg);
@@ -545,7 +545,7 @@ static void WazaOshie_FreeMenu(WazaOshieWork *work) {
     GFL_StrBufFree(work->yesNoItems[0].str);
     GFL_StrBufFree(work->yesNoItems[1].str);
     AppTaskMenuRes_Free(work->menuRes);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
 }
 
 static void WazaOshie_UpdateButtons(WazaOshieWork *work) {
@@ -868,19 +868,19 @@ static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
 }
 
 static u32 WazaOshie_SeqMessage(WazaOshieWork *work) {
-    u32 state = func_020223b4(work->stream);
+    u32 state = PrintStream_GetState(work->stream);
 
     KeyCursor_Update(work->keyCursor, work->stream, work->windows[WINDOW_MESSAGE]);
     if (state == PRINT_STREAM_RUNNING) {
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) {
-            func_020223e0(work->stream, 0);
+            PrintStream_SkipWait(work->stream, 0);
         }
     } else if (state == PRINT_STREAM_DONE) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
         return work->nextSeq;
     } else if (state == PRINT_STREAM_PAUSED) {
         if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-            func_020223bc(work->stream);
+            PrintStream_Continue(work->stream);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
         }
     }
@@ -1238,8 +1238,9 @@ static void WazaOshie_PrintMessage(WazaOshieWork *work, u32 msg) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_MESSAGE]), 15);
     BmpWin_DrawFrame(work->windows[WINDOW_MESSAGE], 0, 1, 13);
     WazaOshie_FormatMessage(work, msg);
-    work->stream = func_02022294(work->windows[WINDOW_MESSAGE], 0, 0, work->strbuf, work->font, func_02017bcc(),
-                                 work->tcbManager, 0, HEAPID_WAZA_OSHIE, 0xffff, WazaOshie_StreamCallback);
+    work->stream = PrintStream_CreateWithCallback(work->windows[WINDOW_MESSAGE], 0, 0, work->strbuf, work->font,
+                                                  TextSpeed_GetCurrentWait(), work->tcbManager, 0, HEAPID_WAZA_OSHIE,
+                                                  0xffff, WazaOshie_StreamCallback);
     BmpWin_TransferNow(work->windows[WINDOW_MESSAGE]);
 }
 
@@ -1371,20 +1372,27 @@ static void WazaOshie_LoadActorResources(WazaOshieWork *work, ArcTool *arc) {
     u32 i;
 
     commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_WAZA_OSHIE);
-    work->chars[0] = func_0204b81c(commonArc, func_0202d814(), FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+    work->chars[0] =
+        func_0204b81c(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
     work->chars[1] = func_0204b81c(arc, 17, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
     work->chars[2] = func_0204b81c(arc, 26, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
     for (i = 4; i < 8; i++) {
-        work->chars[i] = func_0204b81c(commonArc, func_0202d7f4(0), FALSE, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
+        work->chars[i] =
+            func_0204b81c(commonArc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
     }
     work->chars[3] = func_0204b81c(arc, 23, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
-    work->palettes[0] = func_0204bbb8(commonArc, func_0202d810(), CLACT_VRAM_SUB, 0, 0, 4, HEAPID_WAZA_OSHIE);
+    work->palettes[0] =
+        func_0204bbb8(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 4, HEAPID_WAZA_OSHIE);
     work->palettes[1] = func_0204bbb8(arc, 5, CLACT_VRAM_SUB, 4 * 0x20, 0, 1, HEAPID_WAZA_OSHIE);
-    work->palettes[2] = func_0204bbb8(commonArc, func_0202d7e4(), CLACT_VRAM_SUB, 6 * 0x20, 0, 3, HEAPID_WAZA_OSHIE);
-    work->palettes[3] = func_0204bba0(commonArc, func_0202d7e4(), CLACT_VRAM_MAIN, 0, HEAPID_WAZA_OSHIE);
-    work->cellAnims[0] = func_0204bde0(commonArc, func_0202d818(1), func_0202d81c(1), HEAPID_WAZA_OSHIE);
+    work->palettes[2] = func_0204bbb8(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB, 6 * 0x20, 0, 3,
+                                      HEAPID_WAZA_OSHIE);
+    work->palettes[3] =
+        func_0204bba0(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_WAZA_OSHIE);
+    work->cellAnims[0] = func_0204bde0(commonArc, AppMenuCommon_GetTouchBarCellFile(1),
+                                       AppMenuCommon_GetTouchBarAnimFile(1), HEAPID_WAZA_OSHIE);
     work->cellAnims[1] = func_0204bde0(arc, 7, 8, HEAPID_WAZA_OSHIE);
-    work->cellAnims[2] = func_0204bde0(commonArc, func_0202d7f8(1), func_0202d7fc(1), HEAPID_WAZA_OSHIE);
+    work->cellAnims[2] = func_0204bde0(commonArc, AppMenuCommon_GetTypeIconCellFile(1),
+                                       AppMenuCommon_GetTypeIconAnimFile(1), HEAPID_WAZA_OSHIE);
     work->cellAnims[3] = func_0204bde0(arc, 24, 25, HEAPID_WAZA_OSHIE);
     work->cellAnims[4] = func_0204bde0(arc, 27, 28, HEAPID_WAZA_OSHIE);
     GFL_ArcToolFree(commonArc);
@@ -1414,7 +1422,7 @@ static void WazaOshie_SetKnownMoveType(WazaOshieWork *work, u16 move, u16 index)
 
     work->typeIcons[index].type = type;
     work->typeIcons[index].dirty = TRUE;
-    func_0204c378(work->actors[ACTOR_KNOWN_TYPE + index], func_0202d7e8(type), 1);
+    func_0204c378(work->actors[ACTOR_KNOWN_TYPE + index], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void WazaOshie_LoadTypeIcons(WazaOshieWork *work) {
@@ -1422,7 +1430,8 @@ static void WazaOshie_LoadTypeIcons(WazaOshieWork *work) {
 
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
         if (work->typeIcons[i].dirty) {
-            WazaOshie_ReplaceChars(work->commonArc, work->chars[4 + i], func_0202d7f4(work->typeIcons[i].type), FALSE,
+            WazaOshie_ReplaceChars(work->commonArc, work->chars[4 + i],
+                                   AppMenuCommon_GetTypeIconCharFile(work->typeIcons[i].type), FALSE,
                                    HEAPID_WAZA_OSHIE);
             work->typeIcons[i].dirty = FALSE;
         }

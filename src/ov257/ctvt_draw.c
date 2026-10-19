@@ -163,7 +163,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     GX_SetDispSelect(0);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     GFL_BGSysClearScr(0);
-    GFL_G2DIOLoadNSCRSync(arc, func_0202d828(), 0, 0x60, 0, 0x600, FALSE, heapId);
+    GFL_G2DIOLoadNSCRSync(arc, AppMenuCommon_GetBarScreenFile(), 0, 0x60, 0, 0x600, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(0, 0, 21, 32, 3, 0);
     GFL_BGSysLoadScr(0);
     GFL_BGSysMoveBG(0, 3, 0);
@@ -248,7 +248,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     draw->titleWindow = BmpWin_CreateDynamic(4, 3, 1, 28, 2, 10, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(draw->titleWindow), 0);
     str = GFL_MsgDataLoadStrbufNew(msgData, 11);
-    func_02021c7c(queue, BmpWin_GetBitmap(draw->titleWindow), 1, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(draw->titleWindow), 1, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     draw->titleWindowPending = TRUE;
     draw->state = DRAW_STATE_FADE_IN;
@@ -455,7 +455,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     if (draw->menuWindowPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(draw->menuWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(draw->menuWindow))) {
             BmpWin_DrawFrame(draw->menuWindow, 2, 0x140, 9);
             BmpWin_FlushChar(draw->menuWindow);
             BmpWin_FlushMap(draw->menuWindow);
@@ -475,7 +475,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     if (draw->titleWindowPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(draw->titleWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(draw->titleWindow))) {
             BmpWin_FlushChar(draw->titleWindow);
             BmpWin_FlushMap(draw->titleWindow);
             GFL_BGSysLoadScr(4);
@@ -485,7 +485,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     if (draw->messageWindowPending == TRUE && draw->messageWindow != NULL) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(draw->messageWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(draw->messageWindow))) {
             BmpWin_FlushChar(draw->messageWindow);
             BmpWin_FlushMap(draw->messageWindow);
             GFL_BGSysLoadScr(0);
@@ -899,7 +899,7 @@ static inline void CtvtDraw_PrintMenuItem(PrintQueue *queue, CtvtDraw *draw, Msg
                                           Font *font) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
 
-    func_02021c7c(queue, BmpWin_GetBitmap(draw->menuWindow), x, y, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(draw->menuWindow), x, y, str, font, 0x440);
     GFL_StrBufFree(str);
 }
 
@@ -910,7 +910,7 @@ static void CtvtDraw_PrintMenu(CommTvtWork *sys, CtvtDraw *draw, BOOL expanded) 
     BmpWin *oldWindow = draw->menuWindow;
 
     if (oldWindow != NULL) {
-        func_02021c44(queue);
+        PrintQueue_Clear(queue);
         BmpWin_ClearFrame(draw->menuWindow, 2);
         BmpWin_ClearScreen(draw->menuWindow);
     }
@@ -972,10 +972,10 @@ static void CtvtDraw_PrintMessage(CommTvtWork *sys, CtvtDraw *draw, u32 msgId) {
         y = 1;
     }
     draw->messageWindow = BmpWin_CreateDynamic(0, 1, y, 30, 4, 10, TRUE);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(draw->messageWindow), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-    func_02021c7c(queue, BmpWin_GetBitmap(draw->messageWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(draw->messageWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(draw->messageWindow);
     BmpWin_FlushMap(draw->messageWindow);

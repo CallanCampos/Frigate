@@ -104,7 +104,7 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
     list->heapId = heapId;
     list->touchY = -1;
     list->prevTouchY = -1;
-    list->printQueue = func_020219a8(0x800, heapId);
+    list->printQueue = PrintQueue_Create(0x800, heapId);
     list->blinkAnm = BlinkPalAnm_Create(list->setup.layout.palette << 4, 16, list->setup.layout.bg, list->heapId);
     list->items = GFL_HeapAllocate(list->heapId, list->setup.count * sizeof(FrameListItem), TRUE, "frame_list.c", 265);
     if (list->setup.screenCount != 0) {
@@ -181,7 +181,7 @@ void FrameList_Free(FrameList *list) {
     }
     GFL_HeapFree(list->items);
     BlinkPalAnm_Free(list->blinkAnm);
-    func_02021a18(list->printQueue);
+    PrintQueue_Free(list->printQueue);
     GFL_HeapFree(list);
 }
 
@@ -223,7 +223,7 @@ BOOL FrameList_Draw(FrameList *list) {
         list->state++;
         break;
     case 1:
-        if (func_02021c0c(list->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(list->printQueue) == TRUE) {
             list->state = 0;
             return FALSE;
         }
@@ -527,7 +527,7 @@ static int KeyEvent(FrameList *list) {
 static int HandleEvent(FrameList *list) {
     s16 rows;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return FRAMELIST_NONE;
     }
     {
@@ -675,7 +675,7 @@ static void StartScroll(FrameList *list, s8 step, u8 count, u16 nextState, BOOL 
 static BOOL UpdateScroll(FrameList *list) {
     s32 touched;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return TRUE;
     }
     if (list->nextState == LIST_STATE_DRAG && list->flicking == TRUE) {
@@ -946,7 +946,7 @@ static BOOL UpdateBar(FrameList *list) {
     u32 target;
     u32 diff;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return TRUE;
     }
     if (func_0203d9c8(&list->barTouch[0]) == TOUCH_RECT_NONE && list->barTouchY == -1) {
@@ -987,7 +987,7 @@ static void StartDrag(FrameList *list, u32 item) {
 static BOOL UpdateDrag(FrameList *list) {
     s32 touched;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return TRUE;
     }
     touched = func_0203d9c8(list->touchRects);
@@ -1326,7 +1326,7 @@ static void SetCursorRow(FrameList *list, u16 newCursor, u16 oldCursor) {
 static void FlushWindows(FrameList *list) {
     u32 i;
 
-    func_02021a3c(list->printQueue);
+    PrintQueue_Main(list->printQueue);
     for (i = 0; i < list->rowCount; i++) {
         PrintWindow_Flush(&list->printWindows[i], list->printQueue);
     }

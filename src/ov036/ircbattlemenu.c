@@ -532,7 +532,7 @@ static void func_ov036_0218d7a8(IrcMenuWork *wk) {
 }
 
 static void func_ov036_0218d824(IrcMenuWork *wk) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     func_ov036_0218d50c(wk);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, CHAR_POS(wk->frameChars), CHAR_SIZE(wk->frameChars));
@@ -565,7 +565,7 @@ static void func_ov036_0218d8c0(IrcMenuWork *wk) {
         }
     }
     if (wk->mode >= 1 && wk->mode <= 8) {
-        func_02038bc8(30);
+        JoinAvenue_RecordActivity(30);
     }
     func_ov036_0218d0ec(wk, func_ov036_0218d878, 901);
 }
@@ -578,7 +578,7 @@ static void func_ov036_0218d938(u32 param, fx32 frame) {
         func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 917);
         return;
     }
-    if (func_02008ac8((const Config *)getTrainerDataBlkAddress(func_ov012_02150cf4(wk->param))) == 1) {
+    if (Config_GetSaveBeforeIR((const Config *)getTrainerDataBlkAddress(func_ov012_02150cf4(wk->param))) == 1) {
         func_ov036_0218d0ec(wk, func_ov036_0218e7cc, 920);
         return;
     }
@@ -1116,20 +1116,20 @@ static BOOL func_ov036_0218e69c(IrcMenuWork *wk) {
         if (wk->msgWin != NULL) {
             KeyCursor_Update(wk->keyCursor, wk->printStream, wk->msgWin);
         }
-        switch (func_020223b4(wk->printStream)) {
+        switch (PrintStream_GetState(wk->printStream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(wk->printStream);
+            PrintStream_Delete(wk->printStream);
             wk->printStream = NULL;
             break;
         case PRINT_STREAM_PAUSED:
             if (func_0203da48()) {
                 GFL_SndSEPlay(1351);
-                func_020223bc(wk->printStream);
+                PrintStream_Continue(wk->printStream);
             }
             break;
         case PRINT_STREAM_RUNNING:
             if (func_0203da2c()) {
-                func_020223e0(wk->printStream, 0);
+                PrintStream_SkipWait(wk->printStream, 0);
             }
             break;
         }
@@ -1149,8 +1149,8 @@ static void func_ov036_0218e710(IrcMenuWork *wk, BOOL instant) {
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     if (!instant) {
-        wk->printStream =
-            func_02022268(win, 0, 0, wk->strBuf, wk->font, func_02017bcc(), wk->tcbMgr, 2, wk->heapId, 15);
+        wk->printStream = PrintStream_Create(win, 0, 0, wk->strBuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2,
+                                             wk->heapId, 15);
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(win), 0, 0, wk->strBuf, wk->font);
         wk->printStream = NULL;
@@ -1170,7 +1170,7 @@ static void func_ov036_0218e7cc(IrcMenuWork *wk) {
 }
 
 static void func_ov036_0218e804(IrcMenuWork *wk) {
-    if (func_02017850(wk->gameData) == 2) {
+    if (GameData_UpdateSave(wk->gameData) == 2) {
         func_ov036_0218d2e0(wk, FALSE);
         BmpWin_ClearFrame(wk->msgWin, 2);
         BmpWin_ClearScreen(wk->msgWin);
@@ -1186,7 +1186,7 @@ static void func_ov036_0218e804(IrcMenuWork *wk) {
 
 static void func_ov036_0218e864(IrcMenuWork *wk) {
     if (func_ov036_0218e69c(wk)) {
-        func_0201782c(wk->gameData);
+        GameData_StartSave(wk->gameData);
         func_ov036_0218d0ec(wk, func_ov036_0218e804, 0x797);
     }
 }
@@ -1246,7 +1246,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     wk->heapId = HEAPID_IRC_BATTLE_MENU;
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sIrcMenuVRAMConfig);
     {
         BGSysLCDConfig lcd = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -1263,7 +1263,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     wk->bgPalettes = GFL_HeapAllocate(wk->heapId, 0x200, FALSE, "ircbattlemenu.c", 0x833);
     wk->tcbMgr = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 2, 0);
     wk->keyCursor = KeyCursor_Create(15, FALSE, TRUE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
     func_ov036_0218e0c8(wk);
     func_ov036_0218e568(wk, 0x39, 0x9a, 0, 10);
@@ -1285,7 +1285,7 @@ static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *w
     IrcMenuStateFunc func = wk->state;
     BOOL done = TRUE;
 
-    func_02012be4(GameData_GetWifiList(wk->gameData));
+    WihDwc_GetStatus(GameData_GetWifiList(wk->gameData));
     if (func != NULL) {
         func(wk);
         done = FALSE;
@@ -1299,7 +1299,7 @@ static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->bgScroll);
     wk->bgScroll--;
     GFL_TCBExMgrUpdate(wk->tcbMgr);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     func_0204b794();
     if (!wk->ending) {
         GSYS_TryBootGameComm(func_ov012_02150cf0(wk->param));
@@ -1331,13 +1331,13 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
     GFL_HeapFree(wk->bgPalettes);
     func_ov036_0218e56c(wk);
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     KeyCursor_Free(wk->keyCursor);
     GFL_TCBExMgrFree(wk->tcbMgr);
     GFL_BGSysReleaseBG(7);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     if (wk->msgWin != NULL) {
         BmpWin_Free(wk->msgWin);
     }

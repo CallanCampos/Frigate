@@ -229,12 +229,12 @@ void DDemoMain_ExitMsg(DDemoWork *wk) {
 }
 
 void DDemoMain_InitSound(DDemoWork *wk) {
-    wk->seHandle = func_02005af4(sDDemoPreloadSE, NELEMS(sDDemoPreloadSE));
+    wk->seHandle = GFL_SndBGMStack_Preload(sDDemoPreloadSE, NELEMS(sDDemoPreloadSE));
     GFL_SndBGMPlay(SEQ_BGM_E_DENDOUIRI, 0xffff);
 }
 
 void DDemoMain_ExitSound(DDemoWork *wk) {
-    func_02005b60(wk->seHandle);
+    GFL_SndBGMStack_Unload(wk->seHandle);
 }
 
 // Lists the team's Pokémon that are not Eggs
@@ -406,8 +406,8 @@ static void DDemoMain_SetParticleCamera(DDemoWork *wk, ParticleSystem *ptc, BOOL
 
 void DDemoMain_InitMcss(DDemoWork *wk) {
     wk->mcssSys = MCSSSys_Create(1, HEAPID_DENDOU_DEMO);
-    func_0201aefc(wk->mcssSys, 0);
-    func_0201aacc(wk->mcssSys);
+    MCSSSys_SetTexBase(wk->mcssSys, 0);
+    MCSSSys_EnableOrtho(wk->mcssSys);
     wk->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, FX32_CONST(96), -FX32_CONST(96), -FX32_CONST(128),
                                      FX32_CONST(128), FX32_ONE, FX32_CONST(1024), 0, &sDDemoCameraPos,
                                      &sDDemoCameraTarget, &sDDemoCameraUp, HEAPID_DENDOU_DEMO);
@@ -425,7 +425,7 @@ void DDemoMain_AddMcss(DDemoWork *wk) {
     MCSSLoadInfo info;
     VecFx32 scale = { FX32_CONST(16), FX32_CONST(16), FX32_ONE };
 
-    func_0201bfdc(wk->mons[wk->monIndex], &info, 0);
+    SetupPokemonLoaderByPartyPkm(wk->mons[wk->monIndex], &info, 0);
     wk->mcss = MCSSSys_Add(wk->mcssSys, FX32_CONST(176), -FX32_CONST(48), 0, &info);
     MCSS_SetScale(wk->mcss, &scale);
     MCSS_PauseAnimation(wk->mcss);

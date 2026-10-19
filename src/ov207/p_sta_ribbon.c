@@ -118,7 +118,7 @@ void PStaRibbon_Free(PStatusWork *wk, PStaRibbonWork *ribbon) {
 void PStaRibbon_Main(PStatusWork *wk, PStaRibbonWork *ribbon) {
     PStaRibbon_HandleInput(wk, ribbon);
     if (ribbon->isDetailPending == TRUE) {
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             PStaRibbon_HideDetail(wk, ribbon);
             PStaRibbon_ShowDetail(wk, ribbon);
             ribbon->isDetailPending = FALSE;
@@ -563,7 +563,7 @@ static void PStaRibbon_DrawRow(PStatusWork *wk, PStaRibbonWork *ribbon, RibbonRo
         GFL_WordSetFormatStrbuf(wordSet, str, format);
         GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
         GFL_TextRendererDrawToBitmap(row->bitmap, 10, 6, str, wk->font);
-        func_020232d8();
+        GFL_TextRndResetColorIndexLUT();
         GFL_StrBufFree(format);
         GFL_StrBufFree(str);
         GFL_WordSetSystemFree(wordSet);
@@ -592,7 +592,8 @@ static void PStaRibbon_Update(PStatusWork *wk, PStaRibbonWork *ribbon) {
                 PStaOam_SetVisible(ribbon->rows[i].oam, TRUE);
             }
         }
-        if (ribbon->rows[i].isPrinting == TRUE && func_02021c1c(wk->printQueue, ribbon->rows[i].bitmap) == FALSE) {
+        if (ribbon->rows[i].isPrinting == TRUE &&
+            PrintQueue_IsBitmapPending(wk->printQueue, ribbon->rows[i].bitmap) == FALSE) {
             ribbon->rows[i].isPrinting = FALSE;
             PStaOam_Upload(ribbon->rows[i].oam);
         }
@@ -658,10 +659,12 @@ static void PStaRibbon_PrintDetail(PStatusWork *wk, PStaRibbonWork *ribbon) {
     ribbon->descWindow = BmpWin_CreateDynamic(4, 1, 16, 30, 4, 14, 1);
     id = ribbon->entries[ribbon->cursorEntry].ribbon;
     str = GFL_MsgDataLoadStrbufNew(ribbon->msgData, Ribbon_GetData(id, RIBBON_DATA_NAME));
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(ribbon->nameWindow), 1, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(ribbon->nameWindow), 1, 1, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     str = GFL_MsgDataLoadStrbufNew(ribbon->msgData, Ribbon_GetDescription(id));
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(ribbon->descWindow), 1, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(ribbon->descWindow), 1, 1, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     ribbon->isDetailPending = TRUE;
 }

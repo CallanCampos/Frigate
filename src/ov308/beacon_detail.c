@@ -169,7 +169,7 @@ static BOOL BeaconDetail_Main(GameProc *proc, u32 *state, void *param, void *dat
         return TRUE;
     }
     GFL_TCBExMgrUpdate(work->tcbManager);
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     BeaconDetail_UpdatePMSDraw(work);
     BeaconDetailGraphic_Update(work->graphic);
     return FALSE;
@@ -194,7 +194,7 @@ static u32 BeaconDetail_SeqInit(BeaconDetailWork *work) {
         work->seq++;
         break;
     case 1:
-        if (func_02021c0c(work->printQueue)) {
+        if (PrintQueue_IsEmpty(work->printQueue)) {
             work->seq = 0;
             return BEACON_DETAIL_SEQ_FADE_IN;
         }
@@ -248,8 +248,8 @@ static void BeaconDetail_InitData(BeaconDetailWork *work) {
     int count;
 
     work->beacon = GameBeacon_Alloc(work->heapId);
-    work->beaconStatus = func_020174d4(work->param->gameData);
-    work->infoTable = func_0202d7a8(work->beaconStatus);
+    work->beaconStatus = GameData_GetBeaconStatus(work->param->gameData);
+    work->infoTable = BeaconStatus_GetInfoTable(work->beaconStatus);
     count = GameBeaconInfoTable_GetCount(work->infoTable);
     work->index = 0xff;
     for (i = 0; i < count; i++) {
@@ -294,7 +294,7 @@ static void BeaconDetail_InitSystems(BeaconDetailWork *work) {
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 64, 128);
     work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON, work->heapId);
     GFL_TextRndUpdateColorIndexLUT(7, 8, 15);
-    work->printQueue = func_020219a8(0x800, work->heapId);
+    work->printQueue = PrintQueue_Create(0x800, work->heapId);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, work->heapId);
     work->wordSet = GFL_WordSetSystemCreate(8, 64, work->heapId);
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU, work->heapId);
@@ -313,9 +313,9 @@ static void BeaconDetail_FreeSystems(BeaconDetailWork *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_WordSetSystemFree(work->wordSet);
     GFL_FontFree(work->font);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
-    func_020232d8();
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
+    GFL_TextRndResetColorIndexLUT();
     GFL_TCBExMgrFree(work->tcbManager);
     GFL_ArcToolFree(work->arc);
 }

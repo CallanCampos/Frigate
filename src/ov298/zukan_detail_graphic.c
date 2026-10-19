@@ -147,7 +147,7 @@ ZukanDetailGraphic *ZukanDetailGraphic_Create(u32 layout, HeapID heapId, BOOL wi
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     graphic->g3dCreated = FALSE;
     ZukanDetailBG_Init(&graphic->bg, heapId);
     ZukanDetailClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
@@ -163,7 +163,7 @@ void ZukanDetailGraphic_Free(ZukanDetailGraphic *graphic) {
     ZukanDetailGraphic_Free3D(graphic);
     ZukanDetailClAct_Free(&graphic->clact);
     ZukanDetailBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

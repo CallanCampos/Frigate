@@ -261,7 +261,7 @@ void FMissionAppDraw_Free(FMissionApp *work) {
         work->message = NULL;
     }
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
         work->stream = NULL;
     }
     FMissionAppDraw_FreeObj(work);
@@ -309,9 +309,10 @@ static void FMissionAppDraw_LoadTouchBar(FMissionApp *work, u32 bg, u32 palette)
     int x;
     int y;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, palette * 32, 32, work->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, work->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, work->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, palette * 32, 32,
+                                work->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, work->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, work->heapId);
     screen = GFL_BGSysIsScrHeapExists(bg);
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 32; x++) {
@@ -445,10 +446,10 @@ static void FMissionAppDraw_LoadCommonObjResources(FMissionApp *work, u32 vramTy
     u32 anims;
 
     FMissionAppGra_GetClActUnit(work->graphic);
-    palette = func_0202d810();
-    chars = func_0202d814();
-    cells = func_0202d818(2);
-    anims = func_0202d81c(2);
+    palette = AppMenuCommon_GetTouchBarPaletteFile();
+    chars = AppMenuCommon_GetTouchBarCharFile();
+    cells = AppMenuCommon_GetTouchBarCellFile(2);
+    anims = AppMenuCommon_GetTouchBarAnimFile(2);
     work->resources[3] = func_0204bbb8(arc, palette, vramType, 0, 0, 4, work->heapId);
     work->resources[4] = func_0204b81c(arc, chars, FALSE, vramType, work->heapId);
     work->resources[5] = func_0204bde0(arc, cells, anims, work->heapId);
@@ -659,7 +660,7 @@ static inline BOOL FMissionAppDraw_SetCountWord(FMissionApp *work, int count) {
 
 static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int message) {
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
         work->stream = NULL;
     }
     if (work->message != NULL) {
@@ -757,8 +758,8 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
     } else {
         work->message = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
     }
-    work->stream = func_02022268(work->windows[window].window, 0, 0, work->message, work->font, func_02017bcc(),
-                                 work->tcbManager, 4, work->heapId, 15);
+    work->stream = PrintStream_Create(work->windows[window].window, 0, 0, work->message, work->font,
+                                      TextSpeed_GetCurrentWait(), work->tcbManager, 4, work->heapId, 15);
 }
 
 BOOL FMissionAppDraw_UpdateMessage(FMissionApp *work) {

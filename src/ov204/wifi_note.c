@@ -974,7 +974,7 @@ static void WifiNoteData_Init(WifiNoteData *data, WifiNoteParam *param, HeapID h
     data->name = GFL_StrBufCreate(128, heapId);
     data->code = GFL_StrBufCreate(128, heapId);
     data->touch = func_0203d554();
-    data->textSpeed = func_02017bcc();
+    data->textSpeed = TextSpeed_GetCurrentWait();
     data->frameType = 0;
     data->lrEnabled = TRUE;
 }
@@ -1004,24 +1004,24 @@ static void WifiNoteData_SetEntered(WifiNoteData *data, const StrBuf *name, cons
 static u32 WifiNoteData_AddFriend(WifiNoteData *data, StrBuf *code, StrBuf *name) {
     int i;
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
-    u64 myKey = DWC_CreateFriendKey(func_02009f7c(wifiList));
+    u64 myKey = DWC_CreateFriendKey(WifiList_GetMyUserData(wifiList));
 
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        if (!func_0200a138(wifiList, i)) {
+        if (!WifiList_IsFriendValid(wifiList, i)) {
             BOOL valid;
             int index;
             u64 key = WifiNote_StrToFriendKey(code, &valid);
 
             if (valid == TRUE && key != myKey) {
-                if (!DWC_CheckFriendKey(func_02009f7c(wifiList), key)) {
+                if (!DWC_CheckFriendKey(WifiList_GetMyUserData(wifiList), key)) {
                     return 1;
                 }
                 if (!func_02011980(wifiList, key, &index)) {
                     return 2;
                 }
-                DWC_CreateFriendKeyToken(func_0200a0e4(wifiList, i), key);
-                func_0200a11c(wifiList, i, name);
-                func_0200a034(wifiList, i, WIFI_LIST_FRIEND_GENDER, WIFI_LIST_GENDER_UNKNOWN);
+                DWC_CreateFriendKeyToken(WifiList_GetFriendData(wifiList, i), key);
+                WifiList_StoreFriendName(wifiList, i, name);
+                WifiList_SetFriendParam(wifiList, i, WIFI_LIST_FRIEND_GENDER, WIFI_LIST_GENDER_UNKNOWN);
                 return 0;
             }
             return 1;
@@ -1047,9 +1047,9 @@ static void WifiNoteData_MakeFriends(WifiNoteData *data) {
     wifiList = GameData_GetWifiList(data->gameData);
     data->friends.count = 0;
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        if (func_0200a138(wifiList, i) == TRUE) {
+        if (WifiList_IsFriendValid(wifiList, i) == TRUE) {
             data->friends.index[data->friends.count] = i;
-            if (func_02009f80(wifiList, i, WIFI_LIST_FRIEND_GENDER) == WIFI_LIST_GENDER_UNKNOWN) {
+            if (WifiList_GetFriendParam(wifiList, i, WIFI_LIST_FRIEND_GENDER) == WIFI_LIST_GENDER_UNKNOWN) {
                 data->friends.number[data->friends.count] = 0xff;
             } else {
                 data->friends.number[data->friends.count] = data->friends.metCount++;
@@ -1084,7 +1084,7 @@ static void WifiNoteDraw_Init(WifiNoteDraw *draw, WifiNoteData *data, HeapID hea
 
 static void WifiNoteDraw_Main(WifiNoteDraw *draw) {
     if (draw->queue != NULL) {
-        func_02021a3c(draw->queue);
+        PrintQueue_Main(draw->queue);
         WifiNoteDraw_FlushPrintWindows(draw);
     }
     if (draw->tcbManager != NULL) {
@@ -1161,9 +1161,10 @@ static void WifiNoteDraw_InitClAct(WifiNoteDraw *draw, HeapID heapId) {
     draw->palettes[0] = func_0204bba0(draw->arc, 1, CLACT_VRAM_MAIN, 0, heapId);
     draw->cellAnims[0] = func_0204bde0(draw->arc, 15, 16, heapId);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    draw->chars[1] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, heapId);
-    draw->palettes[1] = func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, 0x60, heapId);
-    draw->cellAnims[1] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), heapId);
+    draw->chars[1] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, heapId);
+    draw->palettes[1] = func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x60, heapId);
+    draw->cellAnims[1] =
+        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -1186,21 +1187,21 @@ static void WifiNoteDraw_ExitClAct(WifiNoteDraw *draw) {
 }
 
 static void WifiNoteDraw_InitMsg(WifiNoteDraw *draw, HeapID heapId) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     draw->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     draw->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_NOTE, heapId);
     draw->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     draw->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 3, 0x100);
     draw->stream = NULL;
-    draw->queue = func_02021998(heapId);
+    draw->queue = PrintQueue_CreateDefault(heapId);
 }
 
 static void WifiNoteDraw_ExitMsg(WifiNoteDraw *draw) {
-    func_02021c44(draw->queue);
-    func_02021a18(draw->queue);
+    PrintQueue_Clear(draw->queue);
+    PrintQueue_Free(draw->queue);
     draw->queue = NULL;
     if (draw->stream != NULL) {
-        func_020223cc(draw->stream);
+        PrintStream_Delete(draw->stream);
         draw->stream = NULL;
     }
     GFL_TCBExMgrFree(draw->tcbManager);
@@ -1271,10 +1272,10 @@ static void WifiNoteDraw_SetFriendCode(WifiNoteDraw *draw, u64 code) {
 // Sets a friend's name as the word 0
 static void WifiNoteDraw_SetFriendName(WifiNoteDraw *draw, WifiNoteData *data, u32 index, HeapID heapId) {
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
-    PlayerInfo *playerInfo = func_02008b0c(heapId);
+    PlayerInfo *playerInfo = PlayerInfo_Create(heapId);
     StrBuf *name = GFL_StrBufCreate(10, heapId);
 
-    GFL_StrBufLoadString(name, func_0200a0f0(wifiList, index));
+    GFL_StrBufLoadString(name, WifiList_GetFriendName(wifiList, index));
     copyTrainerNameFromStrbuf(playerInfo, name);
     GFL_StrBufFree(name);
     copyVarForText(draw->wordSet, 0, playerInfo);
@@ -1287,14 +1288,14 @@ static BOOL WifiNoteDraw_SetLastDate(WifiNoteDraw *draw, WifiNoteData *data, u32
     BOOL result = TRUE;
     u32 number;
 
-    number = func_02009f80(wifiList, index, WIFI_LIST_FRIEND_LAST_DAY);
+    number = WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_LAST_DAY);
     if (number == 0) {
         result = FALSE;
     }
     WordSetNumber(draw->wordSet, 2, number, 2, 0, TRUE);
-    number = func_02009f80(wifiList, index, WIFI_LIST_FRIEND_LAST_YEAR);
+    number = WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_LAST_YEAR);
     WordSetNumber(draw->wordSet, 0, number, 4, 1, TRUE);
-    number = func_02009f80(wifiList, index, WIFI_LIST_FRIEND_LAST_MONTH);
+    number = WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_LAST_MONTH);
     WordSetNumber(draw->wordSet, 1, number, 2, 0, TRUE);
     return result;
 }
@@ -1470,7 +1471,7 @@ static BOOL WifiNoteModeSelect_Main(WifiNoteModeSelect *select, WifiNoteData *da
         break;
     case MODE_SELECT_SEQ_CODE_FADE_IN:
         if (GFL_WipeIsFinished()) {
-            PlayerInfo *playerInfo = func_02008b0c(heapId);
+            PlayerInfo *playerInfo = PlayerInfo_Create(heapId);
             u64 code;
 
             copyTrainerNameFromStrbuf(playerInfo, data->name);
@@ -1688,15 +1689,15 @@ static void WifiNoteModeSelect_StartMessage(WifiNoteModeSelect *select, WifiNote
     StrBuf *temp;
 
     if (draw->stream != NULL) {
-        func_020223cc(draw->stream);
+        PrintStream_Delete(draw->stream);
         draw->stream = NULL;
     }
     temp = GFL_StrBufCreate(128, heapId);
     GFL_BitmapFill(BmpWin_GetBitmap(select->msgWindow.window), 15);
     GFL_MsgDataLoadStrbuf(draw->msgData, msg, temp);
     GFL_WordSetFormatStrbuf(draw->wordSet, select->msgStr, temp);
-    draw->stream = func_02022268(select->msgWindow.window, 0, 0, select->msgStr, draw->font, func_02017bcc(),
-                                 draw->tcbManager, 10, draw->heapId, 0);
+    draw->stream = PrintStream_Create(select->msgWindow.window, 0, 0, select->msgStr, draw->font,
+                                      TextSpeed_GetCurrentWait(), draw->tcbManager, 10, draw->heapId, 0);
     BmpWin_DrawFrame(select->msgWindow.window, 2, 70, 11);
     WifiNote_ShowWindowNow(select->msgWindow.window);
     GFL_StrBufFree(temp);
@@ -1706,10 +1707,10 @@ static void WifiNoteModeSelect_StartMessage(WifiNoteModeSelect *select, WifiNote
 // Runs a message's stream, which the A and B buttons and the touch screen speed up and continue. Returns FALSE once
 // the message is over
 static BOOL WifiNote_UpdateStream(PrintStream *stream, BOOL *paused) {
-    switch (func_020223b4(stream)) {
+    switch (PrintStream_GetState(stream)) {
     case 0:
         if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
-            func_020223e0(stream, 0);
+            PrintStream_SkipWait(stream, 0);
         }
         *paused = FALSE;
         break;
@@ -1717,13 +1718,13 @@ static BOOL WifiNote_UpdateStream(PrintStream *stream, BOOL *paused) {
         if (*paused == FALSE) {
             if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(stream);
+                PrintStream_Continue(stream);
                 *paused = TRUE;
             }
         }
         break;
     case 2:
-        func_020223cc(stream);
+        PrintStream_Delete(stream);
         *paused = FALSE;
         return FALSE;
     }
@@ -1751,7 +1752,7 @@ static BOOL WifiNoteModeSelect_CanEnter(WifiNoteModeSelect *select, WifiNoteData
         WifiList *wifiList = GameData_GetWifiList(data->gameData);
 
         for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-            if (!func_0200a138(wifiList, i)) {
+            if (!WifiList_IsFriendValid(wifiList, i)) {
                 return TRUE;
             }
         }
@@ -1863,7 +1864,7 @@ static BOOL WifiNoteFriendList_Main(WifiNoteFriendList *list, WifiNoteData *data
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, heapId);
         friend = WifiNoteFriendList_GetFriend(list);
         wifiList = GameData_GetWifiList(data->gameData);
-        WifiNoteData_SetOldName(data, func_0200a0f0(wifiList, data->friends.index[friend]));
+        WifiNoteData_SetOldName(data, WifiList_GetFriendName(wifiList, data->friends.index[friend]));
         data->seq = FRIEND_LIST_SEQ_NAME_WAIT;
         break;
     }
@@ -1879,7 +1880,7 @@ static BOOL WifiNoteFriendList_Main(WifiNoteFriendList *list, WifiNoteData *data
         s32 friend = WifiNoteFriendList_GetFriend(list);
         WifiList *wifiList = GameData_GetWifiList(data->gameData);
 
-        func_0200a11c(wifiList, data->friends.index[friend], data->name);
+        WifiList_StoreFriendName(wifiList, data->friends.index[friend], data->name);
     }
         // fallthrough
     case FRIEND_LIST_SEQ_NAME_CANCEL:
@@ -1924,7 +1925,7 @@ static BOOL WifiNoteFriendList_Main(WifiNoteFriendList *list, WifiNoteData *data
         if (WifiNoteFriendList_UpdateErase(list, draw) == TRUE) {
             WifiList *wifiList = GameData_GetWifiList(data->gameData);
 
-            func_0200a190(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)]);
+            WifiList_RemoveFriend(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)]);
             WifiNoteData_MakeFriends(data);
             WifiNoteFriendList_DrawPage(list, data, draw, list->page, list->pos, 0, heapId);
             data->seq = FRIEND_LIST_SEQ_DELETE_END;
@@ -2279,7 +2280,7 @@ static BOOL WifiNoteFriendList_Scroll(WifiNoteFriendList *list, WifiNoteData *da
     ClActorPos pos;
     s32 scroll;
 
-    if (!func_02021c0c(draw->queue)) {
+    if (!PrintQueue_IsEmpty(draw->queue)) {
         return FALSE;
     }
     if (list->scrollCount > FRIEND_LIST_SCROLL_FRAMES) {
@@ -2319,7 +2320,7 @@ static BOOL WifiNoteFriendList_Scroll(WifiNoteFriendList *list, WifiNoteData *da
 }
 
 static BOOL WifiNoteFriendList_ScrollEnd(WifiNoteFriendList *list, WifiNoteDraw *draw) {
-    if (func_02021c0c(draw->queue) == TRUE) {
+    if (PrintQueue_IsEmpty(draw->queue) == TRUE) {
         GFL_BGSysMoveBGReq(2, 0, 0);
         GFL_BGSysMoveBGReq(3, 0, 0);
         WifiNote_ShowWindow(list->areas[0].nameWindow->window);
@@ -2332,7 +2333,7 @@ static BOOL WifiNoteFriendList_ScrollEnd(WifiNoteFriendList *list, WifiNoteDraw 
 static u64 WifiNoteFriendList_GetFriendKey(WifiNoteFriendList *list, WifiNoteData *data) {
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
 
-    return DWC_GetFriendKey(func_0200a0e4(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)]));
+    return DWC_GetFriendKey(WifiList_GetFriendData(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)]));
 }
 
 static void WifiNoteFriendList_StartMenuMessage(WifiNoteFriendList *list, WifiNoteData *data, WifiNoteDraw *draw,
@@ -2344,8 +2345,8 @@ static void WifiNoteFriendList_StartMenuMessage(WifiNoteFriendList *list, WifiNo
 static void WifiNoteFriendList_OpenMenu(WifiNoteFriendList *list, WifiNoteData *data, WifiNoteDraw *draw,
                                         HeapID heapId) {
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
-    u32 gender =
-        func_02009f80(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)], WIFI_LIST_FRIEND_GENDER);
+    u32 gender = WifiList_GetFriendParam(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)],
+                                         WIFI_LIST_FRIEND_GENDER);
     AppTaskMenuInit init;
 
     init.heapId = heapId;
@@ -2467,15 +2468,15 @@ static void WifiNoteFriendList_StartMessage(WifiNoteFriendList *list, WifiNoteDr
     StrBuf *temp;
 
     if (draw->stream != NULL) {
-        func_020223cc(draw->stream);
+        PrintStream_Delete(draw->stream);
         draw->stream = NULL;
     }
     GFL_BitmapFill(BmpWin_GetBitmap(list->msgWindow.window), 15);
     temp = GFL_StrBufCreate(128, heapId);
     GFL_MsgDataLoadStrbuf(draw->msgData, msg, temp);
     GFL_WordSetFormatStrbuf(draw->wordSet, list->msgStr, temp);
-    draw->stream = func_02022268(list->msgWindow.window, 0, 0, list->msgStr, draw->font, func_02017bcc(),
-                                 draw->tcbManager, 10, draw->heapId, 0);
+    draw->stream = PrintStream_Create(list->msgWindow.window, 0, 0, list->msgStr, draw->font,
+                                      TextSpeed_GetCurrentWait(), draw->tcbManager, 10, draw->heapId, 0);
     BmpWin_DrawFrame(list->msgWindow.window, 2, 70, 11);
     WifiNote_ShowWindowNow(list->msgWindow.window);
     GFL_StrBufFree(temp);
@@ -2632,8 +2633,8 @@ static void WifiNoteListArea_DrawFriend(WifiNoteListArea *area, WF_2DCSYS *charS
     colors[0] = 0x14c0;
     colors[1] = 0xc80;
     colors[2] = WIFI_NOTE_COLOR_BLACK;
-    view = func_02009f80(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW);
-    gender = func_02009f80(wifiList, index, WIFI_LIST_FRIEND_GENDER);
+    view = WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW);
+    gender = WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_GENDER);
     if (gender == WIFI_LIST_GENDER_UNKNOWN) {
         WifiNoteListArea_DrawFrame(area, draw, screens, pos, heapId);
     } else {
@@ -2645,7 +2646,7 @@ static void WifiNoteListArea_DrawFriend(WifiNoteListArea *area, WF_2DCSYS *charS
         WF_2DC_WkPatAnmStart(area->chars[pos], 0, 1);
     }
     name = GFL_StrBufCreate(128, heapId);
-    GFL_StrBufLoadString(name, func_0200a0f0(wifiList, index));
+    GFL_StrBufLoadString(name, WifiList_GetFriendName(wifiList, index));
     PrintStrAligned(area->nameWindow, draw->queue, sWifiNoteFriendListPos[pos].x * 8,
                     sWifiNoteFriendListPos[pos].y * 8 - 24, name, draw->font, colors[gender], PRINT_ALIGN_LEFT);
     GFL_StrBufFree(name);
@@ -2747,14 +2748,15 @@ static NameEntryParam *WifiNoteCodeIn_CreateNameParam(WifiNoteCodeIn *codeIn, Wi
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(data->gameData));
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
     u32 index = data->friends.index[data->friendPos];
-    u32 gender = func_02009f80(wifiList, index, WIFI_LIST_FRIEND_GENDER);
+    u32 gender = WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_GENDER);
     NameEntryParam *param;
 
     if (isNew == TRUE || gender == WIFI_LIST_GENDER_UNKNOWN) {
         param = setupNameEntry(heapId, NAME_ENTRY_FRIEND, 0xffff, 0, 7, NULL, gameInfo);
     } else {
-        param = setupNameEntry(heapId, NAME_ENTRY_FRIEND, func_02009f80(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW),
-                               0, 7, NULL, gameInfo);
+        param = setupNameEntry(heapId, NAME_ENTRY_FRIEND,
+                               WifiList_GetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW), 0, 7, NULL,
+                               gameInfo);
     }
     if (data->hasOldName == TRUE) {
         GFL_StrBufLoadString(param->name, data->oldName);
@@ -2870,7 +2872,7 @@ static void WifiNoteMyCode_InitDraw(WifiNoteMyCode *myCode, WifiNoteData *data, 
     WifiNote_CreateWindow(draw, &myCode->codeWindow, 3, 9, 6, 14, 2, 10, 241, 0);
     str = GFL_StrBufCreate(192, heapId);
     temp = GFL_StrBufCreate(128, heapId);
-    code = DWC_CreateFriendKey(func_02009f7c(GameData_GetWifiList(data->gameData)));
+    code = DWC_CreateFriendKey(WifiList_GetMyUserData(GameData_GetWifiList(data->gameData)));
     if (code != 0) {
         GFL_MsgDataLoadStrbuf(draw->msgData, WifiNote_Text_ByExchangingFriendCodes, str);
         PrintStrAligned(&myCode->msgWindow, draw->queue, 4, 0, str, draw->font, WIFI_NOTE_COLOR_BLACK,
@@ -2944,7 +2946,7 @@ static BOOL WifiNoteFriendInfo_Main(WifiNoteFriendInfo *info, WifiNoteData *data
         }
         break;
     case FRIEND_INFO_SEQ_SCROLL_END:
-        if (func_02021c0c(draw->queue) == TRUE) {
+        if (PrintQueue_IsEmpty(draw->queue) == TRUE) {
             GFL_BGSysMoveBGReq(2, 0, 0);
             GFL_BGSysMoveBGReq(3, 0, 0);
             data->seq = FRIEND_INFO_SEQ_MAIN;
@@ -3072,7 +3074,7 @@ static u32 WifiNoteFriendInfo_Input(WifiNoteFriendInfo *info, WifiNoteData *data
     BOOL touched = FALSE;
     u32 seq;
 
-    if (!func_02021c0c(draw->queue)) {
+    if (!PrintQueue_IsEmpty(draw->queue)) {
         return FRIEND_INFO_SEQ_MAIN;
     }
     seq = WifiNoteFriendInfo_Touch(info, data, draw, &touched);
@@ -3206,7 +3208,7 @@ static void WifiNoteFriendInfo_Draw(WifiNoteFriendInfo *info, WifiNoteData *data
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
     u32 i;
 
-    func_02009f80(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_GENDER);
+    WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_GENDER);
     for (i = 0; i < FRIEND_INFO_WINDOW_COUNT; i++) {
         GFL_BitmapFill(BmpWin_GetBitmap(info->windows[i].window), 0);
     }
@@ -3215,13 +3217,15 @@ static void WifiNoteFriendInfo_Draw(WifiNoteFriendInfo *info, WifiNoteData *data
     WifiNoteFriendInfo_Print(&info->windows[1], data, draw, WifiNote_Text_BattleRecord, 0, 0, WIFI_NOTE_COLOR_WHITE);
     WifiNoteFriendInfo_Print(&info->windows[2], data, draw, WifiNote_Text_Win, 0, 0, WIFI_NOTE_COLOR_WHITE);
     WifiNoteFriendInfo_Print(&info->windows[3], data, draw, WifiNote_Text_Lose, 0, 0, WIFI_NOTE_COLOR_WHITE);
-    WifiNoteDraw_SetNumber(draw, func_02009f80(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_WINS));
+    WifiNoteDraw_SetNumber(
+        draw, WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_WINS));
     WifiNoteFriendInfo_Print(&info->windows[4], data, draw, WifiNote_Text_Empty_9, 0, 0, WIFI_NOTE_COLOR_WHITE);
-    WifiNoteDraw_SetNumber(draw,
-                           func_02009f80(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_LOSSES));
+    WifiNoteDraw_SetNumber(
+        draw, WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_LOSSES));
     WifiNoteFriendInfo_Print(&info->windows[5], data, draw, WifiNote_Text_Empty_9, 0, 0, WIFI_NOTE_COLOR_WHITE);
     WifiNoteFriendInfo_Print(&info->windows[6], data, draw, WifiNote_Text_PokemonTrades, 0, 0, WIFI_NOTE_COLOR_WHITE);
-    WifiNoteDraw_SetNumber(draw, func_02009f80(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_DRAWS));
+    WifiNoteDraw_SetNumber(
+        draw, WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_DRAWS));
     WifiNoteFriendInfo_Print(&info->windows[7], data, draw, WifiNote_Text_Empty_10, 0, 0, WIFI_NOTE_COLOR_WHITE);
     WifiNoteFriendInfo_Print(&info->windows[8], data, draw, WifiNote_Text_DateLastPlayed, 0, 0, WIFI_NOTE_COLOR_WHITE);
     if (WifiNoteDraw_SetLastDate(draw, data, data->friends.index[data->friendPos])) {
@@ -3234,8 +3238,8 @@ static void WifiNoteFriendInfo_Draw(WifiNoteFriendInfo *info, WifiNoteData *data
     }
     {
         ClActorSetup setup = { 56, 80, 0, 0, 0 };
-        u32 trainerClass =
-            func_0202b5e8(func_02009f80(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_TRAINER_VIEW));
+        u32 trainerClass = func_0202b5e8(
+            WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_TRAINER_VIEW));
         ArcTool *arc = MakeTrGraArcHandle(heapId);
 
         info->trainerChars = TrGra_LoadClActChars(arc, trainerClass, CLACT_VRAM_MAIN, heapId);
@@ -3301,7 +3305,7 @@ static BOOL WifiNoteData_MoveFriend(WifiNoteData *data, u32 dir) {
             if (pos < 0) {
                 pos += data->friends.count;
             }
-            if (func_02009f80(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
+            if (WifiList_GetFriendParam(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
                 WIFI_LIST_GENDER_UNKNOWN) {
                 data->friendPos = pos;
                 return TRUE;
@@ -3310,7 +3314,7 @@ static BOOL WifiNoteData_MoveFriend(WifiNoteData *data, u32 dir) {
     } else {
         for (i = 0; i < data->friends.count - 1; i++) {
             pos = (pos + 1) % data->friends.count;
-            if (func_02009f80(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
+            if (WifiList_GetFriendParam(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
                 WIFI_LIST_GENDER_UNKNOWN) {
                 data->friendPos = pos;
                 return TRUE;
@@ -3334,7 +3338,7 @@ static BOOL WifiNoteData_CanMoveFriend(WifiNoteData *data, u32 dir) {
             if (data->friendPos == pos) {
                 break;
             }
-            if (func_02009f80(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
+            if (WifiList_GetFriendParam(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
                 WIFI_LIST_GENDER_UNKNOWN) {
                 return TRUE;
             }
@@ -3345,7 +3349,7 @@ static BOOL WifiNoteData_CanMoveFriend(WifiNoteData *data, u32 dir) {
             if (data->friendPos == pos) {
                 break;
             }
-            if (func_02009f80(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
+            if (WifiList_GetFriendParam(wifiList, data->friends.index[pos], WIFI_LIST_FRIEND_GENDER) !=
                 WIFI_LIST_GENDER_UNKNOWN) {
                 return TRUE;
             }

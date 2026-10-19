@@ -34,6 +34,6 @@ typedef struct {
 } WmIconFiles;
 
 u32 getWifiIconNarcIdxNum(void);
-void func_020116b0(WmIconFiles *files);
+void WmIconFiles_Init(WmIconFiles *files);
 
 #endif // POKEBW2_GFL_WM_ICON_H

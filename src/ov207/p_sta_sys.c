@@ -253,7 +253,7 @@ int PStatus_Main(PStatusWork *wk) {
         }
         break;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     func_0204b794();
     MCSSSys_Update(wk->mcssSys);
     GFL_G3DSysReset();
@@ -340,8 +340,8 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
     GFL_G3DSysSetSwapBufferParams(0, 0);
     GFL_BGSysSet3DBGPriority(0);
     wk->mcssSys = MCSSSys_Create(2, wk->heapId);
-    func_0201aefc(wk->mcssSys, 0);
-    func_0201af9c(wk->mcssSys, 0x10000);
+    MCSSSys_SetTexBase(wk->mcssSys, 0);
+    MCSSSys_SetOffsetScale(wk->mcssSys, 0x10000);
 }
 
 static void PStatus_ExitGraphics(PStatusWork *wk) {
@@ -398,38 +398,48 @@ static void PStatus_LoadResources(PStatusWork *wk) {
     wk->clResources[PSTA_RES_CELL(12)] = func_0204bde0(arc, 81, 132, wk->heapId);
 
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
-    GFL_G2DIOLoadArcNCLRDefault(uiArc, func_0202d820(), 0, 0x120, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(uiArc, func_0202d824(), 1, 0, 0, FALSE, wk->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(uiArc, func_0202d828(), 1, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(uiArc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0x120, 0x20, wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(uiArc, AppMenuCommon_GetBarBgCharFile(), 1, 0, 0, FALSE, wk->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(uiArc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE, wk->heapId);
     GFL_BGSysSetScrPaletteNo(1, 0, 21, 32, 3, 9);
     GFL_G2DIOLoadArcNCLRDefault(uiArc, 0, 4, 0x1a0, 0x20, wk->heapId);
     wk->clResources[PSTA_RES_PLTT(5)] = func_0204bbb8(uiArc, 1, 1, 0x100, 0, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(7)] = func_0204b81c(uiArc, 2, FALSE, 1, wk->heapId);
     wk->clResources[PSTA_RES_CELL(6)] = func_0204bde0(uiArc, 5, 8, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(3)] = func_0204bbb8(uiArc, func_0202d7e4(), 0, 0x100, 0, 3, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(4)] = func_0204bbb8(uiArc, func_0202d7e4(), 1, 0xa0, 0, 3, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(4)] = func_0204bde0(uiArc, func_0202d7f8(2), func_0202d7fc(2), wk->heapId);
-    wk->clResources[PSTA_RES_CELL(5)] = func_0204bde0(uiArc, func_0202d7f8(0), func_0202d7fc(0), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(3)] =
+        func_0204bbb8(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 0, 0x100, 0, 3, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(4)] =
+        func_0204bbb8(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0xa0, 0, 3, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(4)] =
+        func_0204bde0(uiArc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), wk->heapId);
+    wk->clResources[PSTA_RES_CELL(5)] =
+        func_0204bde0(uiArc, AppMenuCommon_GetTypeIconCellFile(0), AppMenuCommon_GetTypeIconAnimFile(0), wk->heapId);
     for (i = 0; i < PSTA_TYPE_COUNT; i++) {
-        wk->typeIconChars[i] = func_0204b81c(uiArc, func_0202d7f4(i), FALSE, 0, wk->heapId);
+        wk->typeIconChars[i] = func_0204b81c(uiArc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, 0, wk->heapId);
     }
     wk->clResources[PSTA_RES_CHAR(4)] = func_0204b81c(uiArc, 56, FALSE, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(5)] = func_0204b81c(uiArc, 57, FALSE, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(6)] = func_0204b81c(uiArc, 58, FALSE, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(1)] = func_0204b81c(uiArc, func_0202d814(), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(1)] = func_0204bde0(uiArc, func_0202d818(2), func_0202d81c(2), wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(1)] = func_0204b81c(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(1)] =
+        func_0204bde0(uiArc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
     wk->clResources[PSTA_RES_PLTT(9)] = func_0204bbb8(uiArc, func_0202d964(), 0, 0xa0, 0, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(10)] = func_0204b81c(uiArc, func_0202d968(2), FALSE, 0, wk->heapId);
     wk->clResources[PSTA_RES_CELL(9)] = func_0204bde0(uiArc, func_0202d96c(2), func_0202d970(2), wk->heapId);
     wk->clResources[PSTA_RES_PLTT(2)] = func_0204bbb8(uiArc, func_0202d944(), 0, 0xc0, 0, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(3)] = func_0204b81c(uiArc, func_0202d948(2), FALSE, 0, wk->heapId);
     wk->clResources[PSTA_RES_CELL(3)] = func_0204bde0(uiArc, func_0202d94c(2), func_0202d950(2), wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(10)] = func_0204bbb8(uiArc, func_0202d8b0(), 0, 0x80, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(11)] = func_0204b81c(uiArc, func_0202d8b4(), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(10)] = func_0204bde0(uiArc, func_0202d8b8(2), func_0202d8bc(2), wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(1)] = func_0204bbb8(uiArc, func_0202d91c(1), 0, 0xe0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(2)] = func_0204b81c(uiArc, func_0202d928(1), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(2)] = func_0204bde0(uiArc, func_0202d934(1, 2), func_0202d93c(1, 2), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(10)] =
+        func_0204bbb8(uiArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(11)] =
+        func_0204b81c(uiArc, AppMenuCommon_GetStatusIconCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(10)] = func_0204bde0(uiArc, AppMenuCommon_GetStatusIconCellFile(2),
+                                                       AppMenuCommon_GetStatusIconAnimFile(2), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(1)] =
+        func_0204bbb8(uiArc, AppMenuCommon_GetBallPaletteFile(1), 0, 0xe0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(2)] = func_0204b81c(uiArc, AppMenuCommon_GetBallCharFile(1), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(2)] =
+        func_0204bde0(uiArc, AppMenuCommon_GetBallCellFile(1, 2), AppMenuCommon_GetBallAnimFile(1, 2), wk->heapId);
     GFL_ArcToolFree(uiArc);
 
     PStaSub_LoadResources(wk, wk->sub, arc);
@@ -536,12 +546,12 @@ static void PStatus_InitText(PStatusWork *wk) {
     pltt = (GXRgb *)(HW_DB_BG_PLTT + 0x1c0);
     pltt[9] = GX_RGB(25, 18, 19);
     pltt[10] = GX_RGB(18, 18, 26);
-    wk->printQueue = func_020219a8(0x1000, wk->heapId);
+    wk->printQueue = PrintQueue_Create(0x1000, wk->heapId);
 }
 
 static void PStatus_ExitText(PStatusWork *wk) {
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
 }
@@ -564,7 +574,7 @@ static void PStatus_CheckTouch(PStatusWork *wk) {
 }
 
 static void PStatus_HandleInput(PStatusWork *wk) {
-    if (wk->isInputEnabled == TRUE && func_02021c0c(wk->printQueue) == TRUE && PStatus_HandleKeys(wk) == FALSE) {
+    if (wk->isInputEnabled == TRUE && PrintQueue_IsEmpty(wk->printQueue) == TRUE && PStatus_HandleKeys(wk) == FALSE) {
         PStatus_HandleTouch(wk);
     }
 }
@@ -1026,7 +1036,7 @@ static void PStatus_UpdateRedraw(PStatusWork *wk) {
             return;
         }
     }
-    if (func_02021c0c(wk->printQueue) != TRUE ||
+    if (PrintQueue_IsEmpty(wk->printQueue) != TRUE ||
         (wk->mosaicState != PSTA_MOSAIC_REDRAW && wk->mosaicState != PSTA_MOSAIC_NONE)) {
         return;
     }
@@ -1178,7 +1188,7 @@ void PStatus_SetDecrypted(PStatusWork *wk, BOOL decrypt) {
 void PStatus_Print(PStatusWork *wk, GFLBitmap *bitmap, u32 msgId, u16 x, u16 y, u16 color) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
-    func_02021c7c(wk->printQueue, bitmap, x, y, str, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, bitmap, x, y, str, wk->font, color);
     GFL_StrBufFree(str);
 }
 
@@ -1190,7 +1200,7 @@ void PStatus_PrintCentered(PStatusWork *wk, GFLBitmap *bitmap, u32 msgId, u16 x,
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
     u32 width = GFL_FontGetBlockWidth(str, wk->font, 0);
 
-    func_02021c7c(wk->printQueue, bitmap, x - width / 2, y, str, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, bitmap, x - width / 2, y, str, wk->font, color);
     GFL_StrBufFree(str);
 }
 
@@ -1199,7 +1209,7 @@ void PStatus_PrintFormatted(PStatusWork *wk, GFLBitmap *bitmap, WordSet *wordSet
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wordSet, str, format);
-    func_02021c7c(wk->printQueue, bitmap, x, y, str, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, bitmap, x, y, str, wk->font, color);
     GFL_StrBufFree(format);
     GFL_StrBufFree(str);
 }
@@ -1217,7 +1227,7 @@ void PStatus_PrintFormattedRight(PStatusWork *wk, GFLBitmap *bitmap, WordSet *wo
 
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     width = GFL_FontGetBlockWidth(str, wk->font, 0);
-    func_02021c7c(wk->printQueue, bitmap, x - width, y, str, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, bitmap, x - width, y, str, wk->font, color);
     GFL_StrBufFree(format);
     GFL_StrBufFree(str);
 }

@@ -684,7 +684,7 @@ static void ZukanDetailVoice_CreatePokemon(ZukanDetailVoiceParam *param, ZukanDe
     ArcTool *arc;
     ClActorSetupEx setup;
 
-    func_0200d3c8(pokedex, species, &sex, &rare, &form, param->heapId);
+    PokeDex_GetShownSexRareForm(pokedex, species, &sex, &rare, &form, param->heapId);
     if (species == SPECIES_SPINDA) {
         personality = func_0200da18(pokedex, personality);
     }
@@ -807,7 +807,7 @@ static void ZukanDetailVoice_CreateName(ZukanDetailVoiceParam *param, ZukanDetai
 static void ZukanDetailVoice_FreeName(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                       ZukanDetailCommon *common) {
     wk->nameFlushPending = FALSE;
-    func_02021c44(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
     BmpWin_Free(wk->nameWindow);
 }
 
@@ -818,7 +818,8 @@ static void ZukanDetailVoice_PrintName(ZukanDetailVoiceParam *param, ZukanDetail
     int windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->nameWindow));
     u16 x = (windowWidth - width) / 2;
 
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow), x, 1, name, wk->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow), x, 1, name, wk->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(name);
     wk->nameFlushPending = TRUE;
     ZukanDetailVoice_FlushName(param, wk, common);
@@ -827,13 +828,13 @@ static void ZukanDetailVoice_PrintName(ZukanDetailVoiceParam *param, ZukanDetail
 static void ZukanDetailVoice_ClearName(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                        ZukanDetailCommon *common) {
     wk->nameFlushPending = FALSE;
-    func_02021c44(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->nameWindow), 0);
 }
 
 static void ZukanDetailVoice_FlushName(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                        ZukanDetailCommon *common) {
-    if (wk->nameFlushPending && !func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow))) {
+    if (wk->nameFlushPending && !PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow))) {
         BmpWin_Transfer(wk->nameWindow);
         wk->nameFlushPending = FALSE;
     }
@@ -947,7 +948,7 @@ static void ZukanDetailVoice_CheckInput(ZukanDetailVoiceParam *param, ZukanDetai
         u32 sex;
         u32 rare;
 
-        func_0200d3c8(pokedex, species, &sex, &rare, &form, param->heapId);
+        PokeDex_GetShownSexRareForm(pokedex, species, &sex, &rare, &form, param->heapId);
         wk->voice = PokeVoice_Play(species, form, 64, 0, 0, 0, 0, NULL);
         wk->time = 0;
         wk->startTime = OS_GetTick();

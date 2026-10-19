@@ -667,7 +667,7 @@ static void func_ov012_0215179c(MusicalEventWork *work) {
         numProps = 0;
         for (i = 0; i < 40; i++) {
             prop = data_ov012_0216ae1c[program][i];
-            if (func_0200ad60(work->musicalSave, prop) == FALSE) {
+            if (MusicalSave_HasProp(work->musicalSave, prop) == FALSE) {
                 props[numProps] = prop;
                 numProps++;
             }
@@ -804,7 +804,7 @@ static u8 func_ov012_02151b14(MusicalEventWork *work, u8 pos) {
 }
 
 static u32 func_ov012_02151b4c(PlayerInfo *info) {
-    u8 version = func_02008bfc(info);
+    u8 version = PlayerInfo_GetVersion(info);
     u32 gender = getTrainerGender(info);
 
     if (version == VERSION_WHITE2 || version == VERSION_BLACK2) {

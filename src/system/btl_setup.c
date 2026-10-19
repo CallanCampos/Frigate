@@ -229,7 +229,7 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     }
     setup->unk34[0] = GetGameDataPlayerInfo(gameData);
     setup->bag = GameData_GetBag(gameData);
-    setup->unk7C = func_0201734c(gameData);
+    setup->unk7C = GameData_GetBagCursor(gameData);
     setup->pokedex = GameData_GetPokedex(gameData);
     setup->unk88 = GameData_GetCommPlayerSupport(gameData);
     setup->records = GameData_GetRecords(gameData);
@@ -327,7 +327,7 @@ static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, 
     for (i = 0; i < 4; i++) {
         if (i != 0) {
             if (setup->unk34[i] == NULL) {
-                setup->unk34[i] = func_02008b0c(heapId);
+                setup->unk34[i] = PlayerInfo_Create(heapId);
             }
             if (setup->party[i] == NULL) {
                 setup->party[i] = PokeParty_Create(heapId);
@@ -426,12 +426,12 @@ void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId) 
     MI_CpuFill8(setup, 0, sizeof(BtlSetup));
     for (i = 0; i < 4; i++) {
         setup->party[i] = PokeParty_Create(heapId);
-        setup->unk34[i] = func_02008b0c(heapId);
+        setup->unk34[i] = PlayerInfo_Create(heapId);
         setup->trainers[i] = TrainerBattleSetup_Create(heapId);
     }
     setup->gameData = gameData;
     trainerData = getTrainerDataBlkAddress(GameData_GetSaveControl(gameData));
-    setup->config = func_0200898c(heapId);
+    setup->config = Config_Create(heapId);
     initConfig(&trainerData->config, setup->config);
     setup->pokedex = GameData_GetPokedex(gameData);
     setup->fieldSituation.unk1b = 1;

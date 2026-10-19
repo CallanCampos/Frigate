@@ -352,7 +352,7 @@ void func_ov137_021eec80(Field *field) {
 
     heapId = Field_GetHeapID(field);
     gameData = GSYS_GetGameData(Field_GetGameSystem(field));
-    unk = func_02017b84(gameData);
+    unk = GameData_GetResortWork(gameData);
     work = Field_AllocGimmickWorkBlock(field, 1, heapId, sizeof(ResortFieldWork));
     bubblesEnabled = TRUE;
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
@@ -361,7 +361,7 @@ void func_ov137_021eec80(Field *field) {
     sysSetup.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     sysSetup.list = JoinAvenue_GetPersonList(joinAvenue);
     sysSetup.list2 = *list2;
-    sysSetup.entries = func_02010054(joinAvenue);
+    sysSetup.entries = JoinAvenue_GetEntryList(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
     work->sys = ResortSys_Create(&sysSetup, unk, heapId);
     flag = JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL);
@@ -376,7 +376,7 @@ void func_ov137_021eec80(Field *field) {
     npcSetup.mmSys = GameData_GetMMSys(gameData);
     npcSetup.unk4 = 16;
     npcSetup.info = ResortSys_GetInfo(work->sys);
-    npcSetup.zone = func_02039518(Field_GetPlayerStateZoneID(field));
+    npcSetup.zone = ResortLayout_GetZoneIndex(Field_GetPlayerStateZoneID(field));
     npcSetup.table = ResortSys_GetShopOpenings(work->sys);
     work->npc = func_ov137_021f1c24(&npcSetup, heapId);
 
@@ -393,10 +393,10 @@ void func_ov137_021eec80(Field *field) {
 
     block = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
     entries = ResortSys_GetEntries(work->sys);
-    for (i = 0; i < func_02037ed4(entries); i++) {
-        void *entry = func_02037f04(entries, i);
-        if (!func_02037a90(entry) && (u16)func_02037b38(entry, 3, NULL) == 223) {
-            func_0200ff50(block, 2, 15);
+    for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
+        void *entry = JoinAvenueEntryList_Get(entries, i);
+        if (!JoinAvenueEntry_IsEmpty(entry) && (u16)JoinAvenueEntry_GetParam(entry, 3, NULL) == 223) {
+            HollowRivalSave_SetValue(block, 2, 15);
             return;
         }
     }
@@ -538,9 +538,9 @@ static void func_ov137_021ef004(ResortWatch *watch) {
 static void func_ov137_021ef0dc(ResortWatch *watch) {
     if (watch->changed) {
         u32 i;
-        for (i = 0; i < func_02037ed4(watch->entries); i++) {
-            void *entry = func_02037f04(watch->entries, i);
-            if (!func_02037a90(entry)) {
+        for (i = 0; i < JoinAvenueEntryList_GetCount(watch->entries); i++) {
+            void *entry = JoinAvenueEntryList_Get(watch->entries, i);
+            if (!JoinAvenueEntry_IsEmpty(entry)) {
                 watch->setup.callback(watch->setup.context, entry, 1, 2);
             }
         }
@@ -989,7 +989,7 @@ static void func_ov137_021ef9a8(ResortWalker *walker, void *shops, void *unkb1c,
 
     GetGPosZ(func_ov137_021f110c(walker->person));
     for (i = 0; i < RESORT_WALKER_STOPS; i++) {
-        JoinAvenuePerson *occupant = func_02038860(occupants, i);
+        JoinAvenuePerson *occupant = JoinAvenueOccupants_GetPerson(occupants, i);
         if (!JoinAvenuePerson_IsEmpty(occupant) &&
             shop == ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shops, occupant), 0)) {
             u16 z = ResortBinary_Get(unkb1c, i, 2);
@@ -1471,14 +1471,14 @@ static void func_ov137_021f02f0(ResortBubble *bubble, void *msgBGSys, ResortPers
     }
     case 4: {
         u16 text[9];
-        joinAveTextHandler(func_02038a18(occupants), 88, text);
+        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), 88, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
     }
     case 5: {
         u16 text[9];
-        joinAveTextHandler(func_02038a18(occupants), 89, text);
+        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), 89, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
@@ -1678,7 +1678,7 @@ static BOOL func_ov137_021f0720(void *context, void *person, u32 a2, u32 event) 
     BOOL handle = FALSE;
 
     if (a2 == 1) {
-        u32 value = func_02037b38(person, 31, NULL);
+        u32 value = JoinAvenueEntry_GetParam(person, 31, NULL);
         if (value == 2 || value == 3) {
             handle = TRUE;
         }
@@ -1848,7 +1848,7 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
         int tries;
 
         ResortSys_GetEntries(sys);
-        entry = func_02037a40(HEAPID_TAIL(heapId));
+        entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
         unk = func_ov012_02169b78(gameData);
         badges = getBadgeCount(getTrainerGameInfoAddress(save));
         rank = MedalBox_GetRank(SaveControl_GetMedalBox(save));
@@ -1873,7 +1873,7 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
         while (added < count) {
             u32 result;
             ResortSys_MakeShopEntry(sys, gameData, entry, 4, tries, heapId);
-            result = func_02010078(joinAvenue, gameData, entry, 2);
+            result = JoinAvenue_Add(joinAvenue, gameData, entry, 2);
             if (result == 2) {
                 added++;
             }
@@ -1881,8 +1881,8 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
                 break;
             }
         }
-        func_02037a68(entry);
-        func_02039064(info, 6, 1);
+        JoinAvenueEntry_Free(entry);
+        JoinAvenueInfo_SetParam(info, 6, 1);
     }
 }
 
@@ -1899,24 +1899,24 @@ static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapI
         u32 i;
 
         add = TRUE;
-        for (i = 0; i < func_02037ed4(entries); i++) {
-            void *entry = func_02037f04(entries, i);
-            if (!func_02037a90(entry) && func_02037b38(entry, 31, NULL) == 5) {
+        for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
+            void *entry = JoinAvenueEntryList_Get(entries, i);
+            if (!JoinAvenueEntry_IsEmpty(entry) && JoinAvenueEntry_GetParam(entry, 31, NULL) == 5) {
                 add = FALSE;
                 break;
             }
         }
-        func_02039064(info, 24, 1);
+        JoinAvenueInfo_SetParam(info, 24, 1);
     }
     if (add) {
         u16 chance = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, NULL)), 10);
-        if (func_020393e4(info, 21, 100) < chance) {
-            void *entry = func_02037a40(HEAPID_TAIL(heapId));
+        if (JoinAvenueInfo_Random(info, 21, 100) < chance) {
+            void *entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
             ResortSys_MakeShopEntry(sys, gameData, entry, 5, 0, heapId);
-            if (func_02010078(joinAvenue, gameData, entry, 2) == 2) {
-                func_02039064(info, 25, 0);
+            if (JoinAvenue_Add(joinAvenue, gameData, entry, 2) == 2) {
+                JoinAvenueInfo_SetParam(info, 25, 0);
             }
-            func_02037a68(entry);
+            JoinAvenueEntry_Free(entry);
         }
     }
 }
@@ -1935,7 +1935,7 @@ void func_ov137_021f0d10(Field *field) {
     heapId = Field_GetHeapID(field);
     gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
-    unk = func_02017b84(gameData);
+    unk = GameData_GetResortWork(gameData);
     fill = FALSE;
     work = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(ResortFieldWork0));
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
@@ -1943,7 +1943,7 @@ void func_ov137_021f0d10(Field *field) {
     sysSetup.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     sysSetup.list = JoinAvenue_GetPersonList(joinAvenue);
     sysSetup.list2 = NULL;
-    sysSetup.entries = func_02010054(joinAvenue);
+    sysSetup.entries = JoinAvenue_GetEntryList(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
     work->sys = ResortSys_Create(&sysSetup, unk, heapId);
     if (JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL) == 0) {

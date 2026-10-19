@@ -61,13 +61,13 @@ static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorRes
     survey = getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     for (country = 1; country < UNITY_TOWER_COUNTRY_MAX + 1; country++) {
         i = country - 1;
-        if (func_02009eb0(survey, country)) {
+        if (UnityTower_HasMetCountry(survey, country)) {
             work->param.countryVisited[i] = TRUE;
         } else {
             work->param.countryVisited[i] = FALSE;
         }
     }
-    count = func_02009ce4(survey);
+    count = UnityTower_CountVisitors(survey);
     if (count > UNITY_TOWER_VISITOR_MAX) {
         count = UNITY_TOWER_VISITOR_MAX;
     }

@@ -317,9 +317,9 @@ static void BScenarioMain_Task(TCB *tcb, void *data) {
 static BOOL BScenarioMain_Finish(TCB *tcb, BScenarioWork *work) {
     int i;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         if (work->param->abort == 1) {
-            func_02021c44(work->printQueue);
+            PrintQueue_Clear(work->printQueue);
         } else {
             return FALSE;
         }
@@ -343,7 +343,7 @@ static BOOL BScenarioMain_Finish(TCB *tcb, BScenarioWork *work) {
     GFL_HeapFree(work->positions);
     GFL_WordSetSystemFree(work->wordSet);
     BScenarioGraphic_FreeWindows(work);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_FontFree(work->smallFont);
     work->param->done = TRUE;
     func_0203d564(!(work->flags & BSCENARIO_FLAG_KEY_CLOSE));
@@ -384,7 +384,7 @@ static void BScenarioMain_Init(BScenarioWork *work) {
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, work->param->heapId);
-    work->printQueue = func_020219a8(0x800, work->param->heapId);
+    work->printQueue = PrintQueue_Create(0x800, work->param->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->param->heapId);
     work->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD, FILE_POSITIONS, work->param->heapId);
     work->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEWOOD_LINES, work->param->heapId);
@@ -601,7 +601,7 @@ static void BScenarioMain_SummaryInput(BScenarioWork *work) {
     BOOL touched = FALSE;
     BOOL refresh = FALSE;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         return;
     }
     if (work->flags & BSCENARIO_FLAG_REFRESH) {
@@ -799,7 +799,7 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
     BOOL touched = FALSE;
     BOOL redraw = FALSE;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         return;
     }
     if (work->flags & BSCENARIO_FLAG_REFRESH) {
@@ -1086,7 +1086,7 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
     BOOL touched = FALSE;
     BOOL refresh = FALSE;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         return;
     }
     if (work->flags & BSCENARIO_FLAG_REFRESH) {

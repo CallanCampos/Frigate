@@ -165,7 +165,7 @@ void WbtSubscreen_Update(WbtSubscreen *work) {
     if (work->func != NULL) {
         work->func(work);
     }
-    func_02012be4(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
+    WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
 }
 
 void func_ov081_021ea934(WbtSubscreen *work) {
@@ -263,7 +263,7 @@ static void WbtSubscreen_FreeWindows(WbtSubscreen *work) {
 
 static void WbtSubscreen_PrintTournament(WbtSubscreen *work) {
     StrBuf *strbuf;
-    WbtSystem **sys = func_020179f0(GSYS_GetGameData(work->gsys));
+    WbtSystem **sys = GameData_GetWbtSystemPtr(GSYS_GetGameData(work->gsys));
 
     if (sys == NULL || *sys == NULL) {
         return;

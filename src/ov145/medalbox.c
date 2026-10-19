@@ -476,7 +476,7 @@ static BOOL MedalBoxApp_ProcMain(GameProc *proc, u32 *state, void *param, void *
     MedalBoxApp_UpdateBGScroll(work);
     MedalBoxApp_UpdatePrint(work);
     work->printing = FALSE;
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&work->printWindows[i], work->printQueue);
         if (PrintWindow_IsPrinted(&work->printWindows[i]) == FALSE) {
@@ -551,7 +551,7 @@ static void MedalBoxApp_InitGraphics(MedalBoxApp *work) {
     GFL_BGSysSetDisplayLayout(0);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MedalBoxApp_InitBG(work);
     MedalBoxApp_InitObj(work);
     AppPrintsysCommon_Init(&work->printCommon, 6);
@@ -994,7 +994,7 @@ static void MedalBoxApp_SetSeq(MedalBoxApp *work, int seq) {
 static void MedalBoxApp_InitPrint(MedalBoxApp *work) {
     work->stream = NULL;
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 1, 0);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, work->heapId);
 }
 
@@ -1006,7 +1006,7 @@ static void MedalBoxApp_UpdatePrint(MedalBoxApp *work) {
         if (AppPrintsysCommon_Update(&work->printCommon, work->stream) == TRUE) {
             if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223cc(work->stream);
+                PrintStream_Delete(work->stream);
                 work->stream = NULL;
             } else {
                 KeyCursor_Draw(work->keyCursor, BmpWin_GetBitmap(work->messageWindow), 15);
@@ -1018,8 +1018,8 @@ static void MedalBoxApp_UpdatePrint(MedalBoxApp *work) {
 
 static void MedalBoxApp_FreePrint(MedalBoxApp *work) {
     KeyCursor_Free(work->keyCursor);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     work->printQueue = NULL;
     GFL_TCBExMgrFree(work->tcbManager);
 }
@@ -2513,8 +2513,8 @@ static void MedalBoxApp_ShowMessage(MedalBoxApp *work, StrBuf *str) {
     BmpWin_DrawFrame(work->messageWindow, 1, 1, 12);
     GFL_BitmapFill(BmpWin_GetBitmap(work->messageWindow), 15);
     BmpWin_FlushChar(work->messageWindow);
-    work->stream = func_02022268(work->messageWindow, 0, 0, str, work->font, func_02017bcc(), work->tcbManager, 0,
-                                 work->heapId, 15);
+    work->stream = PrintStream_Create(work->messageWindow, 0, 0, str, work->font, TextSpeed_GetCurrentWait(),
+                                      work->tcbManager, 0, work->heapId, 15);
     BmpWin_FlushChar(work->messageWindow);
     GFL_BGSysQueueScrLoad(MedalBoxApp_GetBG(BG_MAIN_MESSAGE));
 }

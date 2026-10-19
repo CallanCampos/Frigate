@@ -182,7 +182,7 @@ static BOOL MonolithMissionInfo_Main(GameProc *proc, u32 *state, void *param, vo
     for (i = 0; i < MONOLITH_MISSION_INFO_WINDOW_COUNT; i++) {
         PrintWindow_Flush(&miw->prints[i], screen->work->printQueue);
     }
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     if (screen->state->missionIndex != miw->mission || screen->state->missionLevel != miw->level) {
@@ -205,7 +205,7 @@ static BOOL MonolithMissionInfo_Exit(GameProc *proc, u32 *state, void *param, vo
     MonolithScreenParam *screen = param;
     MonolithMissionInfoWork *miw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_BGSysSetEnabledBGsA(GX_PLANEMASK_BG3);
@@ -372,7 +372,7 @@ static void MonolithMissionInfo_DrawValue(MonolithWork *wk, MonolithMissionInfoW
 // Draws the player's records of the mission, if it has been played
 static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, MonolithMissionInfoWork *miw, int mission) {
     BOOL unplayed = FALSE;
-    void *records = func_02010dec(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    void *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
     FestMission data;
     MonolithMissionInfoRecord record;
     StrBuf *str;
@@ -381,11 +381,11 @@ static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, Monolit
     s16 msgId;
 
     func_ov027_02170cf8(miw->festText, mission, 0, &data);
-    record.best = func_02010f14(records, mission);
+    record.best = FestRecords_GetMissionBest(records, mission);
     if (record.best == 0) {
         unplayed = TRUE;
     } else {
-        record.count = func_02010ebc(records, mission);
+        record.count = FestRecords_GetMissionCount(records, mission);
     }
     MonolithMissionInfo_ClearWindow(miw, MONOLITH_MISSION_INFO_WINDOW_BEST_LABEL);
     MonolithMissionInfo_ClearWindow(miw, MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT_LABEL);

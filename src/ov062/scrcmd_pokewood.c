@@ -76,17 +76,17 @@ static u16 func_ov062_021e5850(u32 movie, u32 field) {
 }
 
 static PokewoodSave *Pokewood_GetSave(FieldScriptEnv *env) {
-    return func_02011040(FieldScriptEnv_GetGameData(env));
+    return PokewoodSave_Get(FieldScriptEnv_GetGameData(env));
 }
 
 static PokewoodSystem *Pokewood_GetSystem(FieldScriptEnv *env) {
-    return *func_02017a04(FieldScriptEnv_GetGameData(env));
+    return *GameData_GetPokewoodSystemPtr(FieldScriptEnv_GetGameData(env));
 }
 
 static BOOL PokewoodCmd_Create(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
-    PokewoodSave *save = func_02011040(gameData);
-    PokewoodSystem **sys = func_02017a04(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
+    PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
 
     *sys = PokewoodSystem_Create(HEAPID_GAMEEVENT);
     GFL_OvlLoad(OVERLAY_EVENT_POKEWOOD);
@@ -96,7 +96,7 @@ static BOOL PokewoodCmd_Create(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL PokewoodCmd_Free(VM *vm, FieldScriptEnv *env) {
-    PokewoodSystem **sys = func_02017a04(FieldScriptEnv_GetGameData(env));
+    PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(FieldScriptEnv_GetGameData(env));
 
     PokewoodSystem_Free(*sys);
     *sys = NULL;
@@ -170,7 +170,7 @@ static BOOL func_ov062_021e5aa8(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 *var = ScriptReadVar(vm, env);
-    PokewoodSystem **sys = func_02017a04(gameData);
+    PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
     void *param = func_ov062_021e6680(heapId, gsys, var);
     GameEvent *event =
         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateMoviePickerEvent, param);
@@ -203,7 +203,7 @@ static BOOL Pokewood_CheckDownloadedMovie(FieldScriptEnv *env, u32 slot) {
     BOOL loads = FALSE;
 
     allocatePokewoodBlk(heapId);
-    if (func_02010644(save, heapId, slot) == 1 && func_020107b0() == TRUE) {
+    if (Pokewood_LoadDownloadedMovie(save, heapId, slot) == 1 && Pokewood_IsLoadedMovieValid() == TRUE) {
         loads = TRUE;
     }
     freeAndClearPokewoodBlk();
@@ -219,7 +219,7 @@ static u32 Pokewood_CountDownloadedMovies(FieldScriptEnv *env) {
 
     allocatePokewoodBlk(heapId);
     for (slot = 0; slot < 8; slot++) {
-        if (func_02010644(save, heapId, slot) == 1 && func_020107b0() == TRUE) {
+        if (Pokewood_LoadDownloadedMovie(save, heapId, slot) == 1 && Pokewood_IsLoadedMovieValid() == TRUE) {
             count++;
         }
     }
@@ -234,8 +234,8 @@ static u32 Pokewood_GetDownloadedMovieField(FieldScriptEnv *env, u32 slot, u32 f
     u32 value;
 
     allocatePokewoodBlk(heapId);
-    if (func_02010644(save, heapId, slot) == 1) {
-        value = func_020107f0(field, a3);
+    if (Pokewood_LoadDownloadedMovie(save, heapId, slot) == 1) {
+        value = Pokewood_GetLoadedMovieField(field, a3);
     } else {
         value = 0;
     }
@@ -294,7 +294,7 @@ static BOOL PokewoodCmd_GetMovieFlag(VM *vm, FieldScriptEnv *env) {
     u16 movie = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_020110ac(save, list, movie);
+    *var = PokewoodSave_CheckFlag(save, list, movie);
     return FALSE;
 }
 
@@ -303,7 +303,7 @@ static BOOL PokewoodCmd_SetMovieFlag(VM *vm, FieldScriptEnv *env) {
     u16 list = ScriptReadAny(vm, env);
     u16 movie = ScriptReadAny(vm, env);
 
-    func_020110d4(save, list, movie);
+    PokewoodSave_SetFlag(save, list, movie);
     return FALSE;
 }
 
@@ -312,7 +312,7 @@ static BOOL PokewoodCmd_CountMovieFlags(VM *vm, FieldScriptEnv *env) {
     u16 list = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_020112d8(save, list);
+    *var = PokewoodSave_CountFlags(save, list);
     return FALSE;
 }
 
@@ -330,8 +330,8 @@ static BOOL func_ov062_021e5de4(VM *vm, FieldScriptEnv *env) {
     u16 *doneVar = ScriptReadVar(vm, env);
 
     *doneVar = FALSE;
-    if (func_020110ac(save, 0, movie) == TRUE && func_020110ac(save, 3, movie) == FALSE) {
-        func_020110d4(save, 3, movie);
+    if (PokewoodSave_CheckFlag(save, 0, movie) == TRUE && PokewoodSave_CheckFlag(save, 3, movie) == FALSE) {
+        PokewoodSave_SetFlag(save, 3, movie);
         GFL_OvlLoad(OVERLAY_EVENT_POKEWOOD);
         switch (EventPokewood_GetUnlockKind(movie)) {
         case 0:
@@ -369,8 +369,8 @@ static BOOL func_ov062_021e5e94(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u32 level = func_020111ec(func_020111b0(save));
 
-    *var = func_0201122c(save, level);
-    func_02011240(save, level, 1);
+    *var = PokewoodSave_GetLevelBit(save, level);
+    PokewoodSave_SetLevelBit(save, level, 1);
     return FALSE;
 }
 
@@ -433,7 +433,7 @@ static BOOL func_ov062_021e6010(VM *vm, FieldScriptEnv *env) {
     PokewoodSave *save = Pokewood_GetSave(env);
     u16 *var = ScriptReadVar(vm, env);
 
-    if (func_020112d8(save, 2) == POKEWOOD_MOVIE_COUNT) {
+    if (PokewoodSave_CountFlags(save, 2) == POKEWOOD_MOVIE_COUNT) {
         *var = TRUE;
     } else {
         *var = FALSE;
@@ -447,7 +447,7 @@ static BOOL func_ov062_021e6040(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 *var = ScriptReadVar(vm, env);
-    PokewoodSystem **sys = func_02017a04(gameData);
+    PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
     void *param = func_ov062_021e6714(heapId, gsys);
     GameEvent *event =
         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateScreenEvent, param);

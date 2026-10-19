@@ -140,7 +140,7 @@ static int ZknSearchSeq_Init(ZknSearchWork *wk) {
     GFL_BGSysSetDisplayLayout(0);
     GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
-    if (func_0200d1f8(wk->param->pokedex) == 1) {
+    if (PokeDex_GetMode(wk->param->pokedex) == 1) {
         wk->param->criteria->regional = 0;
     } else {
         wk->param->criteria->regional = 1;

@@ -152,7 +152,7 @@ GameEvent *func_ov012_02162eb4(GameSystem *gsys, u32 a1, u32 a2) {
     data->gsys = gsys;
     data->field = GSYS_GetField(gsys);
     data->param.gender = getTrainerGender(GetGameDataPlayerInfo(gameData));
-    data->param.save = func_0200f1b8(GameData_GetSaveControl(gameData));
+    data->param.save = TrialHouseSave_Get(GameData_GetSaveControl(gameData));
     data->param.downloaded = a1;
     data->param.playJingle = a2;
     return event;

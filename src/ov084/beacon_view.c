@@ -134,7 +134,7 @@ void BeaconView_Update(BeaconViewWork *work, BOOL active) {
 }
 
 BOOL BeaconView_Draw(BeaconViewWork *work) {
-    return func_02021a3c(work->printQueue);
+    return PrintQueue_Main(work->printQueue);
 }
 
 GameEvent *BeaconView_CheckEvent(BeaconViewWork *work, BOOL enabled) {
@@ -388,7 +388,7 @@ static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU_COMM);
         return TRUE;
     }
-    if (func_02012be4(work->wifiList) & 8) {
+    if (WihDwc_GetStatus(work->wifiList) & 8) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU_WIFI);
         return TRUE;
     }

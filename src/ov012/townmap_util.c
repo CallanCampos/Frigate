@@ -66,7 +66,7 @@ BOOL func_ov012_02160f74(GameData *gameData, u16 flag) {
         return isOneShotDRObtained(trainerCard, 1, info);
     case TOWNMAP_FLAG_UNITY_TOWER_VISITED:
         result = FALSE;
-        if (func_02009cac(survey, info, 0) >= 1) {
+        if (UnityTower_GetCountryCountForPlayer(survey, info, 0) >= 1) {
             result = TRUE;
         }
         return result;

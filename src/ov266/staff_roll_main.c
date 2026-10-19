@@ -359,7 +359,7 @@ static u32 StaffRollSeq_Init(StaffRollWork *work) {
     StaffRoll_InitWindows(work);
     StaffRoll_LoadLines(work);
     StaffRoll_InitVBlank(work);
-    func_020051d8(TRUE);
+    SetMainMemoryPriorityBlocked(TRUE);
     return SEQ_LOGO;
 }
 
@@ -371,7 +371,7 @@ static u32 StaffRollSeq_WaitWipe(StaffRollWork *work) {
 }
 
 static u32 StaffRollSeq_Exit(StaffRollWork *work) {
-    func_020051d8(FALSE);
+    SetMainMemoryPriorityBlocked(FALSE);
     StaffRoll_FreeVBlank(work);
     StaffRoll_FreeLines(work);
     if (work->arc != NULL) {

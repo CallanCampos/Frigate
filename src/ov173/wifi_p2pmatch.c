@@ -943,7 +943,7 @@ static u32 sWifiP2PMatchRegulationFiles[8] = { 5, 6, 7, 8, 0x18, 0x19, 0x1a, 0x1
 
 // Opens the yes/no menu; WifiP2PMatch_YesNoMain gives the answer
 static void WifiP2PMatch_YesNoStart(WIFIP2PMATCH_WORK *wk) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     wk->yesNoMenu = ShopUI_CreateConfirmDialog(&sWifiP2PMatchYesNoSetup, wk->talkFrameChars, 14, 0, WIFIP2PMATCH_HEAP);
 }
 
@@ -960,9 +960,9 @@ static u32 WifiP2PMatch_YesNoMain(WIFIP2PMATCH_WORK *wk) {
 // Puts a friend's name in the first word of the messages
 static void WifiP2PMatch_SetFriendNameWord(WIFIP2PMATCH_WORK *wk, int friendIndex) {
     if (friendIndex != -1) {
-        u32 gender = func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
+        u32 gender = WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
 
-        func_0200a100(wk->wifiList, friendIndex, wk->expStrBuf);
+        WifiList_LoadFriendName(wk->wifiList, friendIndex, wk->expStrBuf);
         func_0202437c(wk->wordSet, 0, wk->expStrBuf, gender, 1, 2);
     }
 }
@@ -986,11 +986,11 @@ static void WifiP2PMatch_FreeWaitIcon(WIFIP2PMATCH_WORK *wk) {
 // Ends the message and frees its window
 static void WifiP2PMatch_EndMessage(WIFIP2PMATCH_WORK *wk) {
     WifiP2PMatch_FreeWaitIcon(wk);
-    if (!func_02021c0c(wk->printQueue)) {
-        func_02021c44(wk->printQueue);
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
+        PrintQueue_Clear(wk->printQueue);
     }
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         wk->printStream = NULL;
     }
     wk->msgWin = WifiP2PMatch_FreeWindow(wk->msgWin);
@@ -1007,7 +1007,7 @@ static BOOL WifiP2PMatch_IsMessageEnd(WIFIP2PMATCH_WORK *wk) {
         ret = AppPrintsysCommon_Update(&wk->printCommon, wk->printStream);
         if (ret) {
             if (wk->printStream != NULL) {
-                func_020223cc(wk->printStream);
+                PrintStream_Delete(wk->printStream);
                 wk->printStream = NULL;
             }
         }
@@ -1018,14 +1018,14 @@ static BOOL WifiP2PMatch_IsMessageEnd(WIFIP2PMATCH_WORK *wk) {
 // Prints a message of the match board's bank, or of the Wi-Fi error bank, in a new message window, a character at a
 // time or at once
 static void WifiP2PMatch_PrintMessageCore(WIFIP2PMATCH_WORK *wk, u32 msgId, BOOL sysMsg, BOOL stream) {
-    func_02017bcc();
+    TextSpeed_GetCurrentWait();
     WifiP2PMatch_FreeWaitIcon(wk);
     wk->msgWin = WifiP2PMatch_FreeWindow(wk->msgWin);
-    if (!func_02021c0c(wk->printQueue)) {
-        func_02021c44(wk->printQueue);
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
+        PrintQueue_Clear(wk->printQueue);
     }
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         wk->printStream = NULL;
     }
     wk->msgWin = BmpWin_CreateDynamic(2, 2, 19, 27, 4, 15, 1);
@@ -1040,8 +1040,8 @@ static void WifiP2PMatch_PrintMessageCore(WIFIP2PMATCH_WORK *wk, u32 msgId, BOOL
     if (!stream) {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->msgWin), 0, 0, wk->talkString, wk->font);
     } else {
-        wk->printStream = func_02022268(wk->msgWin, 0, 0, wk->talkString, wk->font, func_02017bcc(), wk->tcbManager, 2,
-                                        WIFIP2PMATCH_HEAP, 15);
+        wk->printStream = PrintStream_Create(wk->msgWin, 0, 0, wk->talkString, wk->font, TextSpeed_GetCurrentWait(),
+                                             wk->tcbManager, 2, WIFIP2PMATCH_HEAP, 15);
         AppPrintsysCommon_Init(&wk->printCommon, 2);
     }
     BmpWin_FlushChar(wk->msgWin);
@@ -1058,7 +1058,7 @@ static void WifiP2PMatch_PrintMessage(WIFIP2PMATCH_WORK *wk, u32 msgId, BOOL sys
 // Prints a message at once
 static void WifiP2PMatch_PrintMessageNow(WIFIP2PMATCH_WORK *wk, u32 msgId, BOOL sysMsg) {
     wk->sysMsgWin = WifiP2PMatch_FreeWindow(wk->sysMsgWin);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     WifiP2PMatch_PrintMessageCore(wk, msgId, sysMsg, FALSE);
 }
 
@@ -1075,7 +1075,7 @@ static void WifiP2PMatch_PrintSystemMessage(WIFIP2PMATCH_WORK *wk, u32 msgId) {
     BmpWin_DrawFrame(wk->sysMsgWin, WINFRAME_TRANSFER_VBLANK, wk->talkFrameChars, 14);
     GFL_MsgDataLoadStrbuf(wk->sysMsgData, msgId, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->talkString, wk->expStrBuf);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->sysMsgWin), 4, 4, wk->talkString, wk->font);
     BmpWin_FlushChar(wk->sysMsgWin);
 }
@@ -1107,8 +1107,8 @@ static void WifiP2PMatch_OpenListMenu(WIFIP2PMATCH_WORK *wk, BmpMenuListHeader *
     int i;
     int y;
 
-    func_02021c44(wk->listPrintQueue);
-    func_020232d8();
+    PrintQueue_Clear(wk->listPrintQueue);
+    GFL_TextRndResetColorIndexLUT();
     wk->menuOptions = ListMenuCore_CreateOptionList(count, WIFIP2PMATCH_HEAP);
     for (i = 0; i < count; i++) {
         ListMenuCore_AppendMsgOption(wk->menuOptions, wk->msgData, options[i].msg, options[i].value, WIFIP2PMATCH_HEAP);
@@ -1128,8 +1128,8 @@ static void WifiP2PMatch_OpenListMenu(WIFIP2PMATCH_WORK *wk, BmpMenuListHeader *
     header->font = wk->font;
     header->work = wk;
     wk->list = BmpMenuList_Create(header, 0, wk->menuCursor[type], WIFIP2PMATCH_HEAP);
-    while (!func_02021c0c(wk->listPrintQueue)) {
-        func_02021a3c(wk->listPrintQueue);
+    while (!PrintQueue_IsEmpty(wk->listPrintQueue)) {
+        PrintQueue_Main(wk->listPrintQueue);
     }
     BmpMenuList_LoadCursor(wk->list, WIFIP2PMATCH_HEAP);
     GFL_BGSysQueueScrLoad(2);
@@ -1174,8 +1174,8 @@ static void WifiP2PMatch_OpenFriendMenu(WIFIP2PMATCH_WORK *wk) {
     header.printWindow = &wk->listPrintWindow;
     header.font = wk->font;
     wk->list = BmpMenuList_Create(&header, 0, 0, WIFIP2PMATCH_HEAP);
-    while (!func_02021c0c(wk->listPrintQueue)) {
-        func_02021a3c(wk->listPrintQueue);
+    while (!PrintQueue_IsEmpty(wk->listPrintQueue)) {
+        PrintQueue_Main(wk->listPrintQueue);
     }
     BmpMenuList_LoadCursor(wk->list, WIFIP2PMATCH_HEAP);
     BmpWin_FlushMap(wk->listWin);
@@ -1195,7 +1195,7 @@ static void WifiP2PMatch_DrawMyInfo(WIFIP2PMATCH_WORK *wk) {
     u32 icon;
 
     if (wk->myInfoWin != NULL) {
-        func_020232d8();
+        GFL_TextRndResetColorIndexLUT();
         name = copyTrainerNameToNewStrbuf(info->name, WIFIP2PMATCH_HEAP);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->myInfoWin), 0xff);
         if (getTrainerGender(info) == 0) {
@@ -1212,14 +1212,14 @@ static void WifiP2PMatch_DrawMyInfo(WIFIP2PMATCH_WORK *wk) {
             if (DWCRap_GetFriendIndex() == -1) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, msgId, wk->expStrBuf);
             } else {
-                u32 gender = func_02009f80(wk->wifiList, DWCRap_GetFriendIndex(), WIFI_LIST_FRIEND_GENDER);
+                u32 gender = WifiList_GetFriendParam(wk->wifiList, DWCRap_GetFriendIndex(), WIFI_LIST_FRIEND_GENDER);
 
                 if (gender == 0) {
                     GFL_TextRndUpdateColorIndexLUT(5, 6, 0);
                 } else if (gender == 1) {
                     GFL_TextRndUpdateColorIndexLUT(3, 4, 0);
                 }
-                func_0200a100(wk->wifiList, DWCRap_GetFriendIndex(), wk->expStrBuf);
+                WifiList_LoadFriendName(wk->wifiList, DWCRap_GetFriendIndex(), wk->expStrBuf);
             }
         } else {
             GFL_MsgDataLoadStrbuf(wk->msgData, msgId, wk->expStrBuf);
@@ -1304,8 +1304,8 @@ static void WifiP2PMatch_InitMessages(WIFIP2PMATCH_WORK *wk) {
     wk->unk0FC = GFL_StrBufCreate(380, WIFIP2PMATCH_HEAP);
     wk->expStrBuf = GFL_StrBufCreate(380, WIFIP2PMATCH_HEAP);
     wk->titleString = GFL_StrBufCreate(180, WIFIP2PMATCH_HEAP);
-    wk->printQueue = func_02021998(WIFIP2PMATCH_HEAP);
-    wk->listPrintQueue = func_02021998(WIFIP2PMATCH_HEAP);
+    wk->printQueue = PrintQueue_CreateDefault(WIFIP2PMATCH_HEAP);
+    wk->listPrintQueue = PrintQueue_CreateDefault(WIFIP2PMATCH_HEAP);
     wk->tcbManager = GFL_TCBExMgrCreate(WIFIP2PMATCH_HEAP, WIFIP2PMATCH_HEAP, 2, 0);
     wk->keyCursor = KeyCursor_Create(15, TRUE, FALSE, WIFIP2PMATCH_HEAP);
 }
@@ -1318,21 +1318,21 @@ static void WifiP2PMatch_ExitMessages(WIFIP2PMATCH_WORK *wk) {
     GFL_StrBufFree(wk->talkString);
     GFL_StrBufFree(wk->unk0FC);
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         wk->printStream = NULL;
     }
     GFL_StrBufFree(wk->expStrBuf);
     GFL_TCBExMgrFree(wk->tcbManager);
-    func_02021c44(wk->printQueue);
-    func_02021c44(wk->listPrintQueue);
-    func_02021a18(wk->printQueue);
-    func_02021a18(wk->listPrintQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Clear(wk->listPrintQueue);
+    PrintQueue_Free(wk->printQueue);
+    PrintQueue_Free(wk->listPrintQueue);
     wk->printQueue = NULL;
 }
 
 // Draws the detail page of the friend whose button was touched again
 static void WifiP2PMatch_RedrawFriendDetail(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
-    func_02009f80(wk->wifiList, wk->view.touchFriendNo - 1, WIFI_LIST_FRIEND_GENDER);
+    WifiList_GetFriendParam(wk->wifiList, wk->view.touchFriendNo - 1, WIFI_LIST_FRIEND_GENDER);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->view.detailWin[0]), 0);
     WifiP2PMatch_DrawFriendDetail(wk, heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG1, FALSE);
@@ -1341,7 +1341,7 @@ static void WifiP2PMatch_RedrawFriendDetail(WIFIP2PMATCH_WORK *wk, HeapID heapId
 
 // Opens the detail page of the friend whose button was touched, in place of the buttons
 static void WifiP2PMatch_OpenFriendDetail(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
-    func_02009f80(wk->wifiList, wk->view.touchFriendNo - 1, WIFI_LIST_FRIEND_GENDER);
+    WifiList_GetFriendParam(wk->wifiList, wk->view.touchFriendNo - 1, WIFI_LIST_FRIEND_GENDER);
     GFL_BGSysBufferScr(6, wk->view.backScrn->rawData, wk->view.backScrn->size, 0);
     GFL_BGSysClearBG(7);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->view.detailWin[1]), 0);
@@ -1363,7 +1363,7 @@ static void WifiP2PMatch_CreateTrainerActor(WIFIP2PMATCH_WORK *wk, int friendInd
     if (wk->trainerActor != NULL) {
         WifiP2PMatch_FreeTrainerActor(wk);
     }
-    trainerClass = func_0202b5e8(func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_TRAINER_VIEW));
+    trainerClass = func_0202b5e8(WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_TRAINER_VIEW));
     arc = MakeTrGraArcHandle(heapId);
     wk->trainerChars = TrGra_LoadClActChars(arc, trainerClass, 1, heapId);
     wk->trainerPalette = TrGra_LoadClActPalette(arc, trainerClass, 1, 0, heapId);
@@ -1435,9 +1435,9 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
     u32 day;
     u32 icon;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     friendIndex = wk->view.touchFriendNo - 1;
-    func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
+    WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
     WifiP2PMatch_ViewSetFriendNameWord(wk, friendIndex);
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_17, wk->expStrBuf);
@@ -1459,12 +1459,14 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_BattleRecord, wk->titleString);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 104, 0, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
-    WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_WINS), 4, 1, TRUE);
+    WordSetNumber(wk->view.wordSet, 0, WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_WINS), 4, 1,
+                  TRUE);
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_W, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 176, 24, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
-    WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LOSSES), 4, 1, TRUE);
+    WordSetNumber(wk->view.wordSet, 0, WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LOSSES), 4,
+                  1, TRUE);
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_L, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 176, 40, wk->titleString, wk->font,
@@ -1473,7 +1475,8 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_PokemonTrades, wk->titleString);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 104, 64, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
-    WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_DRAWS), 4, 1, TRUE);
+    WordSetNumber(wk->view.wordSet, 0, WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_DRAWS), 4, 1,
+                  TRUE);
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_19, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 188, 64, wk->titleString, wk->font,
@@ -1482,13 +1485,13 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
     GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_DateLastPlayed, wk->titleString);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 8, 96, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
-    day = func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_DAY);
+    day = WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_DAY);
     if (day != 0) {
         WordSetNumber(wk->view.wordSet, 2, day, 2, 0, TRUE);
-        WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_YEAR), 4, 1,
-                      TRUE);
-        WordSetNumber(wk->view.wordSet, 1, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_MONTH), 2, 0,
-                      TRUE);
+        WordSetNumber(wk->view.wordSet, 0,
+                      WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_YEAR), 4, 1, TRUE);
+        WordSetNumber(wk->view.wordSet, 1,
+                      WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_MONTH), 2, 0, TRUE);
         GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_23, wk->expStrBuf);
         GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
         GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 152, 96, wk->titleString, wk->font,
@@ -1764,7 +1767,7 @@ static void WifiP2PMatch_DrawRulesWindow(WIFIP2PMATCH_WORK *wk, u32 failBits, BO
     BmpWin_ClearScreen(wk->sysMsgWin);
     BmpWin_FlushMap(wk->sysMsgWin);
     BmpWin_DrawFrame(wk->sysMsgWin, WINFRAME_TRANSFER_VBLANK, wk->talkFrameChars, 14);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     wk->regulationPrintMsg = PokeRegulation_CreatePrintMsg(wk->regulation, wk->wordSet, WIFIP2PMATCH_HEAP, shooter);
     if (kind == WIFIP2PMATCH_RULES_BATTLE_TYPE) {
         StrBuf *title = makeStrbufLoadBattleTypeText(wk->regulation, WIFIP2PMATCH_HEAP);
@@ -1872,7 +1875,7 @@ static int WifiP2PMatch_StatePlayYesNoStart(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StatePlayYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -2101,7 +2104,7 @@ static int WifiP2PMatch_StateAnswerYesNoStart(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateAnswerYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -2631,7 +2634,7 @@ static int WifiP2PMatch_StateBattleOfferYesNoStart(WIFIP2PMATCH_WORK *wk, int se
 static int WifiP2PMatch_StateBattleOfferYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -2934,7 +2937,7 @@ static int WifiP2PMatch_StatePlayAgainYesNoStart(WIFIP2PMATCH_WORK *wk, int seq)
 static int WifiP2PMatch_StatePlayAgainYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -3092,7 +3095,7 @@ static int WifiP2PMatch_StateVChatDiffYesNoStart(WIFIP2PMATCH_WORK *wk, int seq)
 static int WifiP2PMatch_StateVChatDiffYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -3216,7 +3219,7 @@ static int WifiP2PMatch_StateReturnYesNoStart(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateReturnYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -3361,19 +3364,19 @@ static GFLNetInitData sWifiP2PMatchNetInit = {
 static int WifiP2PMatch_GetUserData(void *work) {
     WIFIP2PMATCH_WORK *wk = work;
 
-    return (int)func_02009f7c(GameData_GetWifiList(wk->gameData));
+    return (int)WifiList_GetMyUserData(GameData_GetWifiList(wk->gameData));
 }
 
 static int WifiP2PMatch_GetFriendData(void *work) {
     WIFIP2PMATCH_WORK *wk = work;
 
-    return (int)func_0200a0e4(GameData_GetWifiList(wk->gameData), 0);
+    return (int)WifiList_GetFriendData(GameData_GetWifiList(wk->gameData), 0);
 }
 
 static void WifiP2PMatch_OnFriendCode(int code, int param, void *work) {
     WIFIP2PMATCH_WORK *wk = work;
 
-    func_0200a340(GameData_GetWifiList(wk->gameData), code, param);
+    WifiList_MergeFriendRecord(GameData_GetWifiList(wk->gameData), code, param);
 }
 
 // Starts the network with the Wi-Fi heap of the machine, or only gives it the init data again
@@ -3932,7 +3935,7 @@ static void WifiP2PMatch_ClActInit(WIFIP2PMATCH_WORK *wk, ArcTool *arc) {
 static int WifiP2PMatch_StateInit(WIFIP2PMATCH_WORK *wk, int seq) {
     if (wk->parent->mode != 0) {
         WifiP2PMatch_BgmVolumeInit(wk, 4);
-        func_0200a29c(wk->wifiList, DWCRap_GetFriendIndex());
+        WifiList_SetFriendLastDateToNow(wk->wifiList, DWCRap_GetFriendIndex());
         if ((wk->result == 3 || wk->result == 4) && !DWCRap_IsEnding()) {
             DWCRap_StopVoiceChat();
             WifiP2PMatch_StartRoom(wk);
@@ -3948,7 +3951,7 @@ static int WifiP2PMatch_StateInit(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->seq = WIFIP2PMATCH_SEQ_LOGIN_WAIT;
         WifiP2PMatch_BgmVolumeInit(wk, 1);
     }
-    if (func_02005ca4() != SEQ_BGM_POKECEN) {
+    if (GFL_SndBGMGetRequestedID() != SEQ_BGM_POKECEN) {
         GFL_SndBGMPlay(SEQ_BGM_POKECEN, 0xffff);
     }
     return seq;
@@ -3986,7 +3989,7 @@ static void WifiP2PMatch_InitMyStatus(WIFIP2PMATCH_WORK *wk, u32 status, u32 gam
     WIFI_STATUS_SetUseVChat(wk->myStatus, wk->parent->unk46);
     // WIFI_STATUS.unk0 is the trainer ID after the GameSpy profile ID
     wk->myStatus->trainerId = getIDAsUInt(info);
-    wk->myStatus->profileId = func_02008bdc(info);
+    wk->myStatus->profileId = PlayerInfo_GetProfileId(info);
     WifiP2PMatch_SendMyStatus(wk);
 }
 
@@ -4040,10 +4043,10 @@ static int WifiP2PMatch_CheckFriendStatusChange(WIFIP2PMATCH_WORK *wk) {
                 } else if (wasRecruiting == FALSE && isRecruiting == TRUE) {
                     WIFI_MCR_NpcMoveSet(&wk->room, obj, WIFI_MCR_NPC_MOVE_JUMP);
                 }
-                func_0200a034(wk->wifiList, i, WIFI_LIST_FRIEND_TRAINER_VIEW, status->trainerView);
-                func_0200a034(wk->wifiList, i, WIFI_LIST_FRIEND_GENDER, status->gender);
-                func_0200a034(wk->wifiList, i, WIFI_LIST_FRIEND_PROFILE_ID, status->profileId);
-                func_0200a034(wk->wifiList, i, WIFI_LIST_FRIEND_ID, status->trainerId);
+                WifiList_SetFriendParam(wk->wifiList, i, WIFI_LIST_FRIEND_TRAINER_VIEW, status->trainerView);
+                WifiList_SetFriendParam(wk->wifiList, i, WIFI_LIST_FRIEND_GENDER, status->gender);
+                WifiList_SetFriendParam(wk->wifiList, i, WIFI_LIST_FRIEND_PROFILE_ID, status->profileId);
+                WifiList_SetFriendParam(wk->wifiList, i, WIFI_LIST_FRIEND_ID, status->trainerId);
             }
             wk->matchStatus[i] = wifiStatus;
             wk->matchGameMode[i] = gameMode;
@@ -4166,7 +4169,7 @@ static int WifiP2PMatch_StateUserDataSaveStart(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (DWCRap_IsUserDataDirty()) {
-        func_0201782c(wk->gameData);
+        GameData_StartSave(wk->gameData);
         wk->seq = WIFIP2PMATCH_SEQ_USER_DATA_SAVE;
         return seq;
     }
@@ -4186,7 +4189,7 @@ static int WifiP2PMatch_StateUserDataSaveStart(WIFIP2PMATCH_WORK *wk, int seq) {
 
 static int WifiP2PMatch_StateUserDataSave(WIFIP2PMATCH_WORK *wk, int seq) {
     if (DWCRap_IsUserDataDirty()) {
-        int result = func_02017850(wk->gameData);
+        int result = GameData_UpdateSave(wk->gameData);
 
         if (result != 0 && result != 1) {
             DWCRap_ClearUserDataDirty();
@@ -4251,7 +4254,7 @@ static int WifiP2PMatch_StateUserInfoNotice(WIFIP2PMATCH_WORK *wk, int seq) {
 
 static int WifiP2PMatch_StateUserInfoNoticeKeyWait(WIFIP2PMATCH_WORK *wk, int seq) {
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-        if (func_0200a150(wk->wifiList) == 0) {
+        if (WifiList_CountFriends(wk->wifiList) == 0) {
             WifiP2PMatch_PrintMessage(wk, WifiError_Text_DisconnectingFromNintendoWi, TRUE);
             wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT;
             wk->timer = 1;
@@ -4327,7 +4330,7 @@ static void WifiP2PMatch_StartRoom(WIFIP2PMATCH_WORK *wk) {
         } else {
             view = 0x11;
         }
-        wk->friendNum = func_0200a170(wk->wifiList);
+        wk->friendNum = WifiList_GetFriendSlotCount(wk->wifiList);
         WIFI_MCR_Init(&wk->room, WIFIP2PMATCH_HEAP, arc, view, wk->friendNum, ARCID_WIFIP2PMATCH, wk->clActUnit,
                       wk->clActRenderer);
         WifiP2PMatch_AddMoveObj(wk, WIFI_MCR_SetPlayer(&wk->room, view));
@@ -4858,7 +4861,7 @@ static int WifiP2PMatch_StateVChatInvitedWait(WIFIP2PMATCH_WORK *wk, int seq) {
 // The voice chat starts
 static int WifiP2PMatch_StateVChatStart(WIFIP2PMATCH_WORK *wk, int seq) {
     func_02040624(func_02040440(), 0x13, 10);
-    func_0200a29c(wk->wifiList, DWCRap_GetFriendIndex());
+    WifiList_SetFriendLastDateToNow(wk->wifiList, DWCRap_GetFriendIndex());
     wk->seq = WIFIP2PMATCH_SEQ_VCHAT;
     return seq;
 }
@@ -5954,8 +5957,8 @@ void WifiP2PMatch_RecvPlayerInfo(int netId, int size, const void *data, void *wo
     PlayerInfo *info;
 
     if (handle == func_02040440()) {
-        info = func_02017378(wk->gameData, netId);
-        func_02008b34(data, info);
+        info = GameData_GetPlayerInfoByNetID(wk->gameData, netId);
+        PlayerInfo_Copy(data, info);
         Misc_AddMetTrainer(getHollow_RivalData(wk->save), getIDAsUInt(info));
     }
 }
@@ -6095,7 +6098,7 @@ static int WifiP2PMatch_StateConnectEnd(WIFIP2PMATCH_WORK *wk, int seq) {
 
     if (!WifiP2PMatch_CheckDisconnect(wk) && func_02040664(func_02040440(), 0x12, 10) &&
         WifiP2PMatch_IsMessageEndOrNone(wk) == TRUE) {
-        func_02011a28(func_0200a0e4(GameData_GetWifiList(wk->gameData), 0));
+        func_02011a28(WifiList_GetFriendData(GameData_GetWifiList(wk->gameData), 0));
         WifiP2PMatch_EndMessage(wk);
         status = WifiP2PMatch_GetFriendStatusData(DWCRap_GetFriendIndex());
         WifiP2PMatch_GetStatus(wk, status);
@@ -6189,7 +6192,7 @@ static int WifiP2PMatch_StateDisconnect(WIFIP2PMATCH_WORK *wk, int seq) {
         func_02042860(NULL);
     }
     if (!func_02042788()) {
-        func_0200a258(wk->wifiList);
+        WifiList_CompactFriends(wk->wifiList);
         WifiP2PMatch_PrintMessage(wk, WifiError_Text_HaveBeenDisconnectedFrom, TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_END;
         wk->timer = 30;
@@ -6265,7 +6268,7 @@ static int WifiP2PMatch_StateVChatChangeYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     MCR_MOVEOBJ *obj = WifiP2PMatch_GetMoveObj(wk, WIFI_MCR_PlayerSelect(&wk->room));
     u32 ret;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     ret = WifiP2PMatch_YesNoMain(wk);
     if (ret == BMPMENU_NULL) {
         return seq;
@@ -6306,7 +6309,7 @@ static void WifiP2PMatch_ChangeMyStatus(WIFIP2PMATCH_WORK *wk, u32 status, int g
             WIFI_STATUS_ResetVChatMac(wk->myStatus);
         }
         if (status == WIFIP2PMATCH_STATUS_PLAYING && gameMode < 3) {
-            func_0200a29c(wk->wifiList, DWCRap_GetFriendIndex());
+            WifiList_SetFriendLastDateToNow(wk->wifiList, DWCRap_GetFriendIndex());
         }
         WifiP2PMatch_SetMyStatus(wk, status, gameMode);
         WifiP2PMatch_SendMyStatus(wk);
@@ -6651,7 +6654,7 @@ static void WifiP2PMatch_ViewDrawButtons(WIFIP2PMATCH_WORK *wk) {
     for (i = 0; i < WIFIP2PMATCH_VIEW_FRIEND_NUM; i++) {
         friendNo = wk->view.page * WIFIP2PMATCH_VIEW_FRIEND_NUM + i + 1;
         if (wk->view.friendState[friendNo - 1] != 0) {
-            if (func_02009f80(wk->wifiList, friendNo - 1, 9) == 0) {
+            if (WifiList_GetFriendParam(wk->wifiList, friendNo - 1, 9) == 0) {
                 type = WIFIP2PMATCH_VIEW_BUTTON_MALE;
             } else {
                 type = WIFIP2PMATCH_VIEW_BUTTON_FEMALE;
@@ -6749,8 +6752,8 @@ static void WifiP2PMatch_ViewSetFriendNameWord(WIFIP2PMATCH_WORK *wk, int friend
     u32 sex;
 
     if (friendIndex != -1) {
-        sex = func_02009f80(wk->wifiList, friendIndex, 9);
-        func_0200a100(wk->wifiList, friendIndex, wk->expStrBuf);
+        sex = WifiList_GetFriendParam(wk->wifiList, friendIndex, 9);
+        WifiList_LoadFriendName(wk->wifiList, friendIndex, wk->expStrBuf);
         func_0202437c(wk->view.wordSet, 0, wk->expStrBuf, sex, 1, 2);
     }
 }
@@ -7096,10 +7099,10 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
         GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
         GFL_TCBExMgrUpdate(wk->tcbManager);
         GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
     }
     if (wk->listPrintQueue != NULL) {
-        func_02021a3c(wk->listPrintQueue);
+        PrintQueue_Main(wk->listPrintQueue);
     }
     WifiP2PMatch_BgmVolumeFadeMain(wk);
     return FALSE;

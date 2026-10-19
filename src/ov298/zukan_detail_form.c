@@ -743,10 +743,10 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         ZukanDetailForm_ChangePokemon(param, wk, common);
         func_0204c318(wk->iconActors[wk->icon], 1);
         MCSS_Hide(wk->sprites[SPRITE_CUR_FRONT].mcss);
-        func_0201ae2c(wk->sprites[SPRITE_CUR_FRONT].mcss, 16, 16, 0, 0);
+        MCSS_StartFade(wk->sprites[SPRITE_CUR_FRONT].mcss, 16, 16, 0, 0);
         if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL) {
             MCSS_Hide(wk->sprites[SPRITE_NEXT_FRONT].mcss);
-            func_0201ae2c(wk->sprites[SPRITE_NEXT_FRONT].mcss, 16, 16, 0, 0);
+            MCSS_StartFade(wk->sprites[SPRITE_NEXT_FRONT].mcss, 16, 16, 0, 0);
         }
         wk->bgChars = ZukanDetail_LoadBG(FALSE, param->heapId, 7, 1, 1, 0, ARCID_ZUKAN_GRA, 2, 12, 36, 0);
         wk->backgroundMain = ZukanDetailBackground_Create(param->heapId, 3, 3, 1, 2);
@@ -767,10 +767,10 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
     case FORM_SEQ_START_PALFADE: {
         BOOL ready = TRUE;
 
-        if (func_0201aee8(wk->sprites[SPRITE_CUR_FRONT].mcss)) {
+        if (MCSS_IsFading(wk->sprites[SPRITE_CUR_FRONT].mcss)) {
             ready = FALSE;
         }
-        if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL && func_0201aee8(wk->sprites[SPRITE_NEXT_FRONT].mcss)) {
+        if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL && MCSS_IsFading(wk->sprites[SPRITE_NEXT_FRONT].mcss)) {
             ready = FALSE;
         }
         if (ready) {
@@ -791,10 +791,10 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
                 ZukanDetailHeadbar_Appear(headbar);
             }
             MCSS_Show(wk->sprites[SPRITE_CUR_FRONT].mcss);
-            func_0201ae2c(wk->sprites[SPRITE_CUR_FRONT].mcss, 16, 0, -2, 0);
+            MCSS_StartFade(wk->sprites[SPRITE_CUR_FRONT].mcss, 16, 0, -2, 0);
             if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL) {
                 MCSS_Show(wk->sprites[SPRITE_NEXT_FRONT].mcss);
-                func_0201ae2c(wk->sprites[SPRITE_NEXT_FRONT].mcss, 16, 0, -2, 0);
+                MCSS_StartFade(wk->sprites[SPRITE_NEXT_FRONT].mcss, 16, 0, -2, 0);
             }
         }
         break;
@@ -802,10 +802,10 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
     case FORM_SEQ_WAIT_FADE_IN: {
         BOOL ready = TRUE;
 
-        if (func_0201aee8(wk->sprites[SPRITE_CUR_FRONT].mcss)) {
+        if (MCSS_IsFading(wk->sprites[SPRITE_CUR_FRONT].mcss)) {
             ready = FALSE;
         }
-        if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL && func_0201aee8(wk->sprites[SPRITE_NEXT_FRONT].mcss)) {
+        if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL && MCSS_IsFading(wk->sprites[SPRITE_NEXT_FRONT].mcss)) {
             ready = FALSE;
         }
         if (!ZukanDetailPalFade_IsFading(wk->palFade) &&
@@ -824,7 +824,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
             *seq = FORM_SEQ_FADE_OUT_POKEMON;
             for (i = 0; i < SPRITE_COUNT; i++) {
                 if (wk->sprites[i].mcss != NULL) {
-                    func_0201ae2c(wk->sprites[i].mcss, 0, 0, 0, 0);
+                    MCSS_StartFade(wk->sprites[i].mcss, 0, 0, 0, 0);
                 }
             }
         } else {
@@ -836,7 +836,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         u8 i;
 
         for (i = 0; i < SPRITE_COUNT; i++) {
-            if (wk->sprites[i].mcss != NULL && func_0201aee8(wk->sprites[i].mcss)) {
+            if (wk->sprites[i].mcss != NULL && MCSS_IsFading(wk->sprites[i].mcss)) {
                 ready = FALSE;
                 break;
             }
@@ -850,7 +850,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
             }
             for (i = 0; i < SPRITE_COUNT; i++) {
                 if (wk->sprites[i].mcss != NULL) {
-                    func_0201ae2c(wk->sprites[i].mcss, 0, 16, -2, 0);
+                    MCSS_StartFade(wk->sprites[i].mcss, 0, 16, -2, 0);
                 }
             }
         }
@@ -862,7 +862,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         u8 i;
 
         for (i = 0; i < SPRITE_COUNT; i++) {
-            if (wk->sprites[i].mcss != NULL && func_0201aee8(wk->sprites[i].mcss)) {
+            if (wk->sprites[i].mcss != NULL && MCSS_IsFading(wk->sprites[i].mcss)) {
                 ready = FALSE;
                 break;
             }
@@ -1253,10 +1253,10 @@ static void ZukanDetailForm_CreateText(ZukanDetailFormParam *param, ZukanDetailF
 
     bitmap = BmpWin_GetBitmap(wk->windows[WINDOW_LABELS]);
     strbuf1 = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlServerFlowTitle_Text_FormsSeen);
-    func_02021c7c(wk->printQueues[WINDOW_LABELS], bitmap, 0, 1, strbuf1, wk->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueues[WINDOW_LABELS], bitmap, 0, 1, strbuf1, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(strbuf1);
     strbuf2 = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlServerFlowTitle_Text_ShinySeen);
-    func_02021c7c(wk->printQueues[WINDOW_LABELS], bitmap, 0, 17, strbuf2, wk->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueues[WINDOW_LABELS], bitmap, 0, 17, strbuf2, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(strbuf2);
     wk->flushPending[WINDOW_LABELS] = TRUE;
     ZukanDetailForm_FlushWindow(param, wk, common, WINDOW_LABELS);
@@ -1271,7 +1271,7 @@ static void ZukanDetailForm_FreeText(ZukanDetailFormParam *param, ZukanDetailFor
 
     for (i = 0; i < WINDOW_COUNT; i++) {
         wk->flushPending[i] = FALSE;
-        func_02021c44(wk->printQueues[i]);
+        PrintQueue_Clear(wk->printQueues[i]);
         BmpWin_Free(wk->windows[i]);
     }
     for (i = 0; i < STRBUF_COUNT; i++) {
@@ -1287,7 +1287,7 @@ static void ZukanDetailForm_CreatePrintQueues(ZukanDetailFormParam *param, Zukan
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        wk->printQueues[i] = func_02021998(param->heapId);
+        wk->printQueues[i] = PrintQueue_CreateDefault(param->heapId);
         wk->flushPending[i] = FALSE;
     }
 }
@@ -1298,8 +1298,8 @@ static void ZukanDetailForm_FreePrintQueues(ZukanDetailFormParam *param, ZukanDe
 
     for (i = 0; i < WINDOW_COUNT; i++) {
         wk->flushPending[i] = FALSE;
-        func_02021c44(wk->printQueues[i]);
-        func_02021a18(wk->printQueues[i]);
+        PrintQueue_Clear(wk->printQueues[i]);
+        PrintQueue_Free(wk->printQueues[i]);
     }
 }
 
@@ -1308,14 +1308,15 @@ static void ZukanDetailForm_UpdateText(ZukanDetailFormParam *param, ZukanDetailF
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        func_02021a3c(wk->printQueues[i]);
+        PrintQueue_Main(wk->printQueues[i]);
         ZukanDetailForm_FlushWindow(param, wk, common, i);
     }
 }
 
 static void ZukanDetailForm_FlushWindow(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common,
                                         u8 window) {
-    if (wk->flushPending[window] && !func_02021c1c(wk->printQueues[window], BmpWin_GetBitmap(wk->windows[window]))) {
+    if (wk->flushPending[window] &&
+        !PrintQueue_IsBitmapPending(wk->printQueues[window], BmpWin_GetBitmap(wk->windows[window]))) {
         BmpWin_Transfer(wk->windows[window]);
         wk->flushPending[window] = FALSE;
     }
@@ -1326,7 +1327,7 @@ static void ZukanDetailForm_PrintName(ZukanDetailFormParam *param, ZukanDetailFo
 
     for (i = WINDOW_NAME; i <= WINDOW_COUNTS; i++) {
         wk->flushPending[i] = FALSE;
-        func_02021c44(wk->printQueues[i]);
+        PrintQueue_Clear(wk->printQueues[i]);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[i]), 0);
     }
 
@@ -1338,7 +1339,7 @@ static void ZukanDetailForm_PrintName(ZukanDetailFormParam *param, ZukanDetailFo
         int windowWidth = GFL_BitmapGetWidth(bitmap);
         u16 x = (windowWidth - width) / 2;
 
-        func_02021c7c(wk->printQueues[WINDOW_NAME], bitmap, x, 1, name, wk->font, PRINT_COLOR(15, 2, 0));
+        PrintQueue_PrintColor(wk->printQueues[WINDOW_NAME], bitmap, x, 1, name, wk->font, PRINT_COLOR(15, 2, 0));
         wk->flushPending[WINDOW_NAME] = TRUE;
         GFL_StrBufFree(name);
     }
@@ -1353,7 +1354,8 @@ static void ZukanDetailForm_PrintName(ZukanDetailFormParam *param, ZukanDetailFo
 
             WordSetNumber(wordSet, 0, wk->nameCount, 2, 1, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, strbuf, template);
-            func_02021c7c(wk->printQueues[WINDOW_COUNTS], bitmap, 0, 1, strbuf, wk->font, PRINT_COLOR(15, 2, 0));
+            PrintQueue_PrintColor(wk->printQueues[WINDOW_COUNTS], bitmap, 0, 1, strbuf, wk->font,
+                                  PRINT_COLOR(15, 2, 0));
             GFL_StrBufFree(strbuf);
             GFL_WordSetSystemFree(wordSet);
         }
@@ -1364,7 +1366,8 @@ static void ZukanDetailForm_PrintName(ZukanDetailFormParam *param, ZukanDetailFo
 
             WordSetNumber(wordSet, 0, wk->rareCount, 2, 1, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, strbuf, template);
-            func_02021c7c(wk->printQueues[WINDOW_COUNTS], bitmap, 0, 17, strbuf, wk->font, PRINT_COLOR(15, 2, 0));
+            PrintQueue_PrintColor(wk->printQueues[WINDOW_COUNTS], bitmap, 0, 17, strbuf, wk->font,
+                                  PRINT_COLOR(15, 2, 0));
             GFL_StrBufFree(strbuf);
             GFL_WordSetSystemFree(wordSet);
         }
@@ -1398,13 +1401,13 @@ static void ZukanDetailForm_PrintEntry(ZukanDetailFormParam *param, ZukanDetailF
         u16 width = GFL_FontGetBlockWidth(name, wk->font, 0);
         u16 x = (windowWidth - width) / 2;
 
-        func_02021c7c(printQueue, bitmap, x, y, name, wk->font, PRINT_COLOR(15, 2, 0));
+        PrintQueue_PrintColor(printQueue, bitmap, x, y, name, wk->font, PRINT_COLOR(15, 2, 0));
     }
     if (color != NULL) {
         u16 width = GFL_FontGetBlockWidth(color, wk->font, 0);
         u16 x = (windowWidth - width) / 2;
 
-        func_02021c7c(printQueue, bitmap, x, colorY, color, wk->font, PRINT_COLOR(15, 2, 0));
+        PrintQueue_PrintColor(printQueue, bitmap, x, colorY, color, wk->font, PRINT_COLOR(15, 2, 0));
     }
     if (name != NULL && freeName) {
         GFL_StrBufFree(name);
@@ -1418,7 +1421,7 @@ static void ZukanDetailForm_PrintEntry(ZukanDetailFormParam *param, ZukanDetailF
 
 static void ZukanDetailForm_PrintCur(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common) {
     wk->flushPending[WINDOW_CUR] = FALSE;
-    func_02021c44(wk->printQueues[WINDOW_CUR]);
+    PrintQueue_Clear(wk->printQueues[WINDOW_CUR]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_CUR]), 0);
     ZukanDetailForm_PrintEntry(param, wk, common, WINDOW_CUR, wk->printQueues[WINDOW_CUR], wk->windows[WINDOW_CUR],
                                &wk->flushPending[WINDOW_CUR], wk->cur);
@@ -1426,7 +1429,7 @@ static void ZukanDetailForm_PrintCur(ZukanDetailFormParam *param, ZukanDetailFor
 
 static void ZukanDetailForm_PrintNext(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common) {
     wk->flushPending[WINDOW_NEXT] = FALSE;
-    func_02021c44(wk->printQueues[WINDOW_NEXT]);
+    PrintQueue_Clear(wk->printQueues[WINDOW_NEXT]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_NEXT]), 0);
     switch (wk->mode) {
     case FORM_MODE_SINGLE:
@@ -1461,17 +1464,17 @@ static void ZukanDetailForm_ScrollNextBG(ZukanDetailFormParam *param, ZukanDetai
 static void ZukanDetailForm_CreateMCSS(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
                                        ZukanDetailCommon *common) {
     wk->mcssSys = MCSSSys_Create(SPRITE_COUNT, param->heapId);
-    func_0201aefc(wk->mcssSys, 0);
-    func_0201aacc(wk->mcssSys);
-    func_02019b98(wk->mcssSys, GetPokemonGraphicsARCID());
+    MCSSSys_SetTexBase(wk->mcssSys, 0);
+    MCSSSys_EnableOrtho(wk->mcssSys);
+    MCSSSys_OpenArc(wk->mcssSys, GetPokemonGraphicsARCID());
     wk->tcbBuffer =
         GFL_HeapAllocate(param->heapId, GFL_TCBMgrCalcAllocSize(SPRITE_COUNT), FALSE, "zukan_detail_form.c", 2643);
     wk->tcbMgr = GFL_TCBMgrCreate(SPRITE_COUNT, wk->tcbBuffer);
-    func_02019bcc(wk->mcssSys, wk->tcbMgr);
+    MCSSSys_SetTCBManager(wk->mcssSys, wk->tcbMgr);
 }
 
 static void ZukanDetailForm_FreeMCSS(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common) {
-    func_02019bb4(wk->mcssSys);
+    MCSSSys_CloseArc(wk->mcssSys);
     MCSSSys_Free(wk->mcssSys);
     func_0203a610(wk->tcbMgr);
     GFL_HeapFree(wk->tcbBuffer);
@@ -1484,11 +1487,11 @@ static MCSS *ZukanDetailForm_AddMCSS(MCSSSystem *system, u32 species, u32 form, 
     MCSS *mcss;
 
     if (species == SPECIES_SPINDA) {
-        func_0201c188(system, personality);
+        MCSSSys_SetSpindaLoadCallback(system, personality);
     }
     SetupPokemonLoaderFSTool(species, form, sex, rare, a6, &info, back);
     mcss = MCSSSys_Add(system, 0, 0, 0, &info);
-    func_0201aecc(mcss, 1);
+    MCSS_SetNoShadow(mcss, 1);
     MCSS_PauseAnimation(mcss);
     MCSS_SetScale(mcss, &scale);
     ZukanDetailForm_SetShadow(mcss);
@@ -1507,7 +1510,7 @@ static void ZukanDetailForm_SetShadow(MCSS *mcss) {
     offset.x = FX32_CONST(x);
     offset.y = 0;
     offset.z = 0;
-    func_0201ab54(mcss, &offset);
+    MCSS_SetPositionOffset(mcss, &offset);
 }
 
 static void ZukanDetailForm_GetBesidePos(MCSS *mcss, VecFx32 *pos) {
@@ -1523,8 +1526,9 @@ static void ZukanDetailForm_CreateSprite(Sprite *sprite, HeapID heapId, MCSSSyst
                                          u32 sex, u32 rare, u32 a6, u32 back, u32 personality) {
     sprite->mcss = ZukanDetailForm_AddMCSS(system, species, form, sex, rare, a6, back, personality);
     sprite->anim = GFL_HeapAllocate(heapId, sizeof(SpriteAnim), TRUE, "zukan_detail_form.c", 2737);
-    NNS_G2dSetAnimCtrlCallBackFunctor(&func_0201adc4(sprite->mcss)->animCtrl, NNS_G2D_ANMCALLBACKTYPE_LAST_FRM,
-                                      (u32)sprite->anim, ZukanDetailForm_SpriteAnimEnd);
+    NNS_G2dSetAnimCtrlCallBackFunctor(&MCSS_GetMultiCellAnimation(sprite->mcss)->animCtrl,
+                                      NNS_G2D_ANMCALLBACKTYPE_LAST_FRM, (u32)sprite->anim,
+                                      ZukanDetailForm_SpriteAnimEnd);
     ZukanDetailForm_InitSpritePositions(sprite->pos, species, form, sex, rare, a6, back, personality);
 }
 
@@ -1548,7 +1552,7 @@ static void ZukanDetailForm_InitSpriteAnim(SpriteAnim *anim, int sprite, ZukanDe
 
 static void ZukanDetailForm_PlaySpriteAnim(Sprite *sprite) {
     if (sprite->mcss != NULL && sprite->anim != NULL) {
-        NNSG2dMultiCellAnimation *mcAnim = func_0201adc4(sprite->mcss);
+        NNSG2dMultiCellAnimation *mcAnim = MCSS_GetMultiCellAnimation(sprite->mcss);
 
         sprite->anim->loops = 0;
         sprite->anim->stop = FALSE;
@@ -1565,7 +1569,7 @@ static void ZukanDetailForm_StopSpriteAnim(Sprite *sprite) {
 
 static void ZukanDetailForm_UpdateSprite(Sprite *sprite) {
     if (sprite->mcss != NULL && sprite->anim != NULL) {
-        NNSG2dMultiCellAnimation *mcAnim = func_0201adc4(sprite->mcss);
+        NNSG2dMultiCellAnimation *mcAnim = MCSS_GetMultiCellAnimation(sprite->mcss);
 
         if (sprite->anim->stop) {
             MCSS_PauseAnimation(sprite->mcss);
@@ -1583,7 +1587,7 @@ static void ZukanDetailForm_SpriteAnimEnd(u32 param, fx32 frame) {
     if (anim->loops >= ANIM_LOOPS) {
         anim->stop = TRUE;
     }
-    func_0201b25c(wk->sprites[anim->sprite].mcss);
+    MCSS_RequestRestart(wk->sprites[anim->sprite].mcss);
 }
 
 static void ZukanDetailForm_Turn(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common) {
@@ -1678,7 +1682,7 @@ static void ZukanDetailForm_GatherEntries(ZukanDetailFormParam *param, ZukanDeta
     sexRatio = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
     PML_PersonalFree(personal);
     formCount = getNumberOfForms(species);
-    func_0200d3c8(pokedex, species, &shownSex, &shownRare, &shownForm, param->heapId);
+    PokeDex_GetShownSexRareForm(pokedex, species, &shownSex, &shownRare, &shownForm, param->heapId);
     shownEntry = 0;
     {
         BOOL hasSex[3] = { FALSE, FALSE, FALSE };
@@ -1716,7 +1720,7 @@ static void ZukanDetailForm_GatherEntries(ZukanDetailFormParam *param, ZukanDeta
                             found = TRUE;
                         } else if (formCount >= 2 && shownForm == form && shownRare == rare) {
                             // Every form is listed once in each color, as the one shown
-                        } else if (func_0200d8d4(pokedex, species, sex, rare, form)) {
+                        } else if (PokeDex_HasSeenVariant(pokedex, species, sex, rare, form)) {
                             found = TRUE;
                         }
                         if (found && ((formCount >= 2 && !seenRare[j]) || formCount < 2)) {
@@ -1873,7 +1877,7 @@ static void ZukanDetailForm_LoadTurnedSprites(ZukanDetailFormParam *param, Zukan
     int place;
     VecFx32 pos;
 
-    func_02019bcc(wk->mcssSys, NULL);
+    MCSSSys_SetTCBManager(wk->mcssSys, NULL);
     frontSprite = SPRITE_CUR_FRONT;
     if (wk->sprites[SPRITE_CUR_FRONT].mcss != NULL) {
         frontSprite = SPRITE_NONE;
@@ -1927,7 +1931,7 @@ static void ZukanDetailForm_LoadTurnedSprites(ZukanDetailFormParam *param, Zukan
             MCSS_SetPosition(wk->sprites[SPRITE_NEXT_BACK].mcss, &pos);
         }
     }
-    func_02019bcc(wk->mcssSys, wk->tcbMgr);
+    MCSSSys_SetTCBManager(wk->mcssSys, wk->tcbMgr);
     if (wk->mode == FORM_MODE_SINGLE) {
         wk->slideFromRight = TRUE;
         ZukanDetailForm_PlaceNext(param, wk, common);
@@ -1942,7 +1946,7 @@ static void ZukanDetailForm_LoadAllSprites(ZukanDetailFormParam *param, ZukanDet
     int place;
     VecFx32 pos;
 
-    func_02019bcc(wk->mcssSys, NULL);
+    MCSSSys_SetTCBManager(wk->mcssSys, NULL);
     if (wk->sprites[SPRITE_CUR_FRONT].mcss != NULL) {
         frontSprite = SPRITE_NONE;
     }
@@ -1988,7 +1992,7 @@ static void ZukanDetailForm_LoadAllSprites(ZukanDetailFormParam *param, ZukanDet
         ZukanDetailForm_GetPlacePos(&wk->sprites[SPRITE_NEXT_BACK], PLACE_RIGHT, &pos);
         MCSS_SetPosition(wk->sprites[SPRITE_NEXT_BACK].mcss, &pos);
     }
-    func_02019bcc(wk->mcssSys, wk->tcbMgr);
+    MCSSSys_SetTCBManager(wk->mcssSys, wk->tcbMgr);
     if (wk->mode == FORM_MODE_SINGLE) {
         wk->slideFromRight = TRUE;
         ZukanDetailForm_PlaceNext(param, wk, common);
@@ -3215,7 +3219,7 @@ static void ZukanDetailForm_LoadNext(ZukanDetailFormParam *param, ZukanDetailFor
 
         ZukanDetailForm_FreeSprite(&wk->sprites[SPRITE_NEXT_FRONT], wk->mcssSys);
         ZukanDetailForm_FreeSprite(&wk->sprites[SPRITE_NEXT_BACK], wk->mcssSys);
-        func_02019bcc(wk->mcssSys, NULL);
+        MCSSSys_SetTCBManager(wk->mcssSys, NULL);
         frontSprite = wk->front ? SPRITE_NEXT_FRONT : SPRITE_NONE;
         backSprite = wk->front ? SPRITE_NONE : SPRITE_NEXT_BACK;
         ZukanDetailForm_CreateSprites(param, wk, common, frontSprite, backSprite, PLACE_RIGHT, wk->next);
@@ -3225,7 +3229,7 @@ static void ZukanDetailForm_LoadNext(ZukanDetailFormParam *param, ZukanDetailFor
         if (backSprite != SPRITE_NONE) {
             ZukanDetailForm_InitSpriteAnim(wk->sprites[SPRITE_NEXT_BACK].anim, SPRITE_NEXT_BACK, wk);
         }
-        func_02019bcc(wk->mcssSys, wk->tcbMgr);
+        MCSSSys_SetTCBManager(wk->mcssSys, wk->tcbMgr);
     }
 }
 

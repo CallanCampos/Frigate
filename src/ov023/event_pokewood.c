@@ -335,10 +335,10 @@ static void EventPokewood_SetupRecordTrainer(u32 movie, BtlSetupTrainer *trainer
 static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, HeapID heapId, u8 movie) {
     GameData *gameData = GSYS_GetGameData(gsys);
     BtlSetup *setup = BtlSetup_Create(heapId);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     void *buffer = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), TRUE, "event_pokewood.c", 329);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSystem **sys = func_02017a04(gameData);
+    PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(gameData);
     BtlFieldStatus status;
     u32 grade;
 
@@ -380,14 +380,14 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
     BtlSetup *setup;
     u32 movie;
 
-    if (func_02010644(GameData_GetSaveControl(gameData), heapId, slot) == 1) {
+    if (Pokewood_LoadDownloadedMovie(GameData_GetSaveControl(gameData), heapId, slot) == 1) {
         setup = BtlSetup_Create(heapId);
         BtlSetup_Reset(setup);
         BtlSetup_InitForRecord(setup, gameData, heapId);
-        func_0200c1f0();
-        movie = func_020107f0(0, 0);
+        BattleRec_LoadToolOverlay();
+        movie = Pokewood_GetLoadedMovieField(0, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
-        func_0200c200();
+        BattleRec_UnloadToolOverlay();
         EventPokewood_FinishWatchSetup(gameData, setup, movie, heapId);
         return setup;
     }
@@ -402,9 +402,9 @@ static BtlSetup *EventPokewood_LoadBlockSetup(GameSystem *gsys, Field *field, He
     setup = BtlSetup_Create(heapId);
     BtlSetup_Reset(setup);
     BtlSetup_InitForRecord(setup, gameData, heapId);
-    func_0200c1f0();
+    BattleRec_LoadToolOverlay();
     BattleRecTool_LoadSetup(setup, 1, heapId);
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
     EventPokewood_FinishWatchSetup(gameData, setup, setup->unkDF, heapId);
     return setup;
 }
@@ -444,7 +444,7 @@ static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *set
 // Sets up the battle of the movie that the event runs
 static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem *gsys, GameData *gameData,
                                            Field *field, HeapID heapId) {
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     BtlSetup *setup;
     PokewoodMovieFile *file;
 
@@ -465,7 +465,7 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
         setup->unk13a = file->unk2c;
         EventPokewood_LoadIntroText(param, setup, setup->unkDF, POKEWOOD_KIND_WATCH, heapId);
         GFL_HeapFree(file);
-        func_02008a54(setup->config, 0);
+        Config_SetBattleScene(setup->config, 0);
         setup->unkDD_7 = 1;
         if (setup->unkDF < POKEWOOD_MOVIE_COUNT && func_020111a0(save, param->slot) != 0) {
             setup->unkDD_7 = 0;
@@ -486,12 +486,12 @@ static void EventPokewood_FreeSetup(BtlSetup *setup) {
 
 // Keeps the battle of the film as a recording that can be watched
 static void EventPokewood_StoreRecordedSetup(GameData *gameData, BtlSetup *setup, HeapID heapId) {
-    func_02017a04(gameData);
-    func_0200c1f0();
+    GameData_GetPokewoodSystemPtr(gameData);
+    BattleRec_LoadToolOverlay();
     setup->trainers[0] = TrainerBattleSetup_Create(heapId);
     EventPokewood_SetupRecordTrainer(setup->unkDF, setup->trainers[0], setup->unk34[0], heapId);
     BattleRecTool_StoreSetup(setup);
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
 }
 
 static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *setup) {
@@ -500,14 +500,14 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     u32 species;
     MsgData *msgData;
 
-    func_0200c1f0();
-    func_020107f0(2, (u32)pkm);
+    BattleRec_LoadToolOverlay();
+    Pokewood_GetLoadedMovieField(2, (u32)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
     GFL_MsgDataFree(msgData);
     title->title = name;
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
     GFL_HeapFree(pkm);
     title->movie = setup->unkDF;
     title->gender = getTrainerGender(setup->unk34[0]);
@@ -559,7 +559,7 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
     GameData *gameData = GSYS_GetGameData(gsys);
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(gameData);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
 
     switch (*state) {
     case 0:
@@ -620,14 +620,14 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
 
         GFL_StrBufFree(param->introText);
         if (wk->setup->unkDF < POKEWOOD_MOVIE_COUNT) {
-            sys = *func_02017a04(gameData);
+            sys = *GameData_GetPokewoodSystemPtr(gameData);
             var = PokewoodSystem_GetResultVar(sys);
             if (var != NULL) {
                 *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
                 if (*var != 0) {
                     func_ov062_021e636c(sys, gameData, wk->setup->unkDF, wk->setup->unk124);
                     func_ov062_021e65b4(gameData, sys, wk->setup->unk124, param->slot);
-                    func_020110d4(save, 5, wk->setup->unkDF);
+                    PokewoodSave_SetFlag(save, 5, wk->setup->unkDF);
                     Pokewood_CheckMedals(gameData);
                     EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->unk124, wk->setup->unk130);
                 }
@@ -645,19 +645,19 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
 
 // Looks up which of the downloaded movies of the slots load, and what each is shown as
 static void EventPokewood_LoadSlotInfo(GameData *gameData, HeapID heapId, PokewoodMovieParam *param) {
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     SaveControl *saveControl = GameData_GetSaveControl(gameData);
     int slot;
 
-    func_0200c1f0();
+    BattleRec_LoadToolOverlay();
     for (slot = 0; slot < 8; slot++) {
-        if (func_02010644(saveControl, heapId, slot) == 1) {
-            param->slotInfo[slot] = sSlotInfo[func_020107f0(0, 0)] + 1;
+        if (Pokewood_LoadDownloadedMovie(saveControl, heapId, slot) == 1) {
+            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(0, 0)] + 1;
         } else {
             param->slotInfo[slot] = 0;
         }
     }
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
 }
 
 // Runs a movie that the player films: the battle, and what it records
@@ -716,7 +716,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
         u16 *var;
 
         GFL_StrBufFree(param->introText);
-        sys = *func_02017a04(gameData);
+        sys = *GameData_GetPokewoodSystemPtr(gameData);
         GameData_GetRecords(gameData);
         var = PokewoodSystem_GetResultVar(sys);
         if (var != NULL) {
@@ -752,7 +752,7 @@ static GameEvent *EventPokewood_CreateRunEvent(GameSystem *gsys, PokewoodMoviePa
 static GameEventReturnCode EventPokewood_RunMovie(GameEvent *event, u32 *state, void *data) {
     PokewoodMovieParam *param = data;
     GameSystem *gsys = param->gsys;
-    PokewoodSystem *sys = *func_02017a04(GSYS_GetGameData(gsys));
+    PokewoodSystem *sys = *GameData_GetPokewoodSystemPtr(GSYS_GetGameData(gsys));
 
     switch (*state) {
     case 0:
@@ -833,7 +833,7 @@ static GameEventReturnCode EventPokewood_RunPicker(GameEvent *event, u32 *state,
         if (wk->param.result != NULL && *wk->param.result == -1) {
             *wk->param.result = 41;
         } else {
-            PokewoodSystem **sys = func_02017a04(GSYS_GetGameData(wk->gsys));
+            PokewoodSystem **sys = GameData_GetPokewoodSystemPtr(GSYS_GetGameData(wk->gsys));
 
             PokewoodSystem_SetMovie(*sys, *wk->param.result);
         }
@@ -934,53 +934,53 @@ void EventPokewood_UnlockMovies(PokewoodSave *save, GameData *gameData, u32 movi
         u32 count = 0;
         int j;
 
-        if (func_020110ac(save, 0, i)) {
+        if (PokewoodSave_CheckFlag(save, 0, i)) {
             continue;
         }
         switch (sMovieUnlocks[i].kind) {
         case 1:
             if (movie == sMovieUnlocks[i].param && result == 1) {
-                func_020110d4(save, 0, i);
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;
         case 3:
             if (func_020111ec(func_020111b0(save)) >= sMovieUnlocks[i].param) {
-                func_020110d4(save, 0, i);
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;
         case 4:
             if (score >= 5000) {
-                func_020110d4(save, 0, i);
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;
         case 2:
             if (EventWork_FlagGet(GameData_GetEventWork(gameData), EVENT_FLAG_0x0960)) {
-                func_020110d4(save, 0, i);
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;
         case 7:
-            if (func_020110ac(save, 2, sMovieUnlocks[i].param) &&
+            if (PokewoodSave_CheckFlag(save, 2, sMovieUnlocks[i].param) &&
                 EventWork_FlagGet(GameData_GetEventWork(gameData), EVENT_FLAG_0x0960)) {
-                func_020110d4(save, 0, i);
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;
         case 5:
             for (j = 0; j < POKEWOOD_MOVIE_COUNT - 1; j++) {
-                count += func_020110ac(save, 2, j);
+                count += PokewoodSave_CheckFlag(save, 2, j);
             }
             if (count == POKEWOOD_MOVIE_COUNT - 1) {
-                func_020110d4(save, 0, i);
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;
         case 6:
-            if (func_020110ac(save, 5, 0)) {
-                func_020110d4(save, 0, i);
+            if (PokewoodSave_CheckFlag(save, 5, 0)) {
+                PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }
             break;

@@ -224,7 +224,7 @@ void func_ov167_021ce668(HeapID heapId) {
 void func_ov167_021ce678(HeapID heapId) {
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&data_ov167_021da900);
     G2_BlendNone();
     G2S_BlendNone();
@@ -982,8 +982,8 @@ u8 func_ov167_021cf908(BtlvCore *core) {
 
 void func_ov167_021cf914(BtlvCore *core) {
     if (core->ov286.item != 0 && core->ov287.partyIndex != 6 && core->ov286.mode != 1) {
-        func_020088c4(core->ov286.bagCursor, core->ov286.rows, core->ov286.pages);
-        func_020088e0(core->ov286.bagCursor, core->ov286.item, core->ov286.pocket);
+        BagCursor_SetBattlePositions(core->ov286.bagCursor, core->ov286.rows, core->ov286.pages);
+        BagCursor_SetBattleLastItem(core->ov286.bagCursor, core->ov286.item, core->ov286.pocket);
     }
 }
 

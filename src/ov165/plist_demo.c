@@ -169,7 +169,7 @@ static void PokeListDemo_Setup(PokeListWork *wk) {
     case 5: {
         int zekrom = FALSE;
 
-        if (PokeParty_GetParam(func_0200afa8(wk->param->reshZek), PKM_PARAM_SPECIES, NULL) == SPECIES_ZEKROM) {
+        if (PokeParty_GetParam(ReshZekSave_GetPkm(wk->param->reshZek), PKM_PARAM_SPECIES, NULL) == SPECIES_ZEKROM) {
             zekrom = TRUE;
         }
         PokeListDemo_CreateParticles(wk, 0, zekrom + 5, wk->cursorPos);
@@ -451,7 +451,7 @@ u32 PokeListDemo_CheckSeparate(PokeListWork *wk, PartyPkm *pkm) {
 static void PokeListDemo_Fuse(PokeListWork *wk, int form, int kyuremPos, int partnerPos) {
     PartyPkm *kyurem = PokeParty_GetPkm(wk->param->party, kyuremPos);
 
-    func_0200afac(wk->param->reshZek, PokeParty_GetPkm(wk->param->party, partnerPos));
+    ReshZekSave_SetPkm(wk->param->reshZek, PokeParty_GetPkm(wk->param->party, partnerPos));
     PokeListDemo_ChangeKyuremMoves(kyurem, 0, form + 1);
     // PokeParty_ChangeForme takes a u16
     PokeParty_ChangeForme(kyurem, form + 1);
@@ -464,7 +464,7 @@ static void PokeListDemo_Fuse(PokeListWork *wk, int form, int kyuremPos, int par
 static void PokeListDemo_Separate(PokeListWork *wk, PartyPkm *kyurem) {
     PokeListDemo_ChangeKyuremMoves(kyurem, PokeParty_GetParam(kyurem, PKM_PARAM_FORM, NULL), 0);
     PokeParty_ChangeForme(kyurem, 0);
-    PokeParty_AddPkm(wk->param->party, func_0200afa8(wk->param->reshZek));
+    PokeParty_AddPkm(wk->param->party, ReshZekSave_GetPkm(wk->param->reshZek));
     BagSave_SwitchOwnedDNASplicers(wk->param->bag, 1);
     func_0200cc34(wk->param->shortcut, 8);
 }

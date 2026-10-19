@@ -215,7 +215,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         return GAMEEVENT_DONE;
     case 10:
         RecordAddOne(work->records, 8);
-        func_02038bc8(13);
+        JoinAvenue_RecordActivity(13);
         battleMode = work->isPhenomenon == 1 ? 1 : 4;
         next = EventWildBattleCall_Create(work->gsys, work->field, work->battleSetup, 0, battleMode);
         GameEvent_Replace(event, next);

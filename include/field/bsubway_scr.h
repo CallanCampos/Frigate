@@ -11,7 +11,7 @@
 #include "struct_decls.h"
 #include "system/pms.h"
 
-// The Battle Subway's work while the player is on the subway, which func_0201794c returns. Overlay 33's
+// The Battle Subway's work while the player is on the subway, which GameData_GetBSubwayScrWork returns. Overlay 33's
 // bsubway_scr.c and overlay 12 keep it, and script plugin 1 (overlay 50) drives it
 
 // A Pokémon of a Battle Subway Trainer, which genSubwayBtlInstitutePoke makes a party Pokémon of. The fields are

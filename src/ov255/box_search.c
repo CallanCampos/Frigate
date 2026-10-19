@@ -511,7 +511,7 @@ static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *w
     wk->abilityNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_NAMES, wk->heapId);
     wk->abilityInfo = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, wk->heapId);
     wk->speciesNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     func_ov255_021d3df0(wk->heapId);
     func_ov255_021d5bc4(wk);
@@ -540,7 +540,7 @@ static BOOL func_ov255_021d3c90(GameProc *proc, u32 *state, void *param, void *w
     GFL_MsgDataFree(wk->abilityNames);
     GFL_MsgDataFree(wk->abilityInfo);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     func_ov255_021d6dc8(wk->graphic);
     heapId = wk->heapId;
@@ -562,7 +562,7 @@ static BOOL func_ov255_021d3d00(GameProc *proc, u32 *state, void *param, void *w
         }
         break;
     case 1:
-        if (func_02021c0c(wk->printQueue)) {
+        if (PrintQueue_IsEmpty(wk->printQueue)) {
             wk->seq = data_ov255_021d92ec[wk->seq](wk, wk->seq);
             if (wk->seq == SEQ_END) {
                 *state = 2;
@@ -580,7 +580,7 @@ static BOOL func_ov255_021d3d00(GameProc *proc, u32 *state, void *param, void *w
         }
         break;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < BOX_SEARCH_WINDOW_COUNT; i++) {
         PrintWindow_Flush(&wk->printWindows[i], wk->printQueue);
     }
@@ -668,10 +668,10 @@ static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapI
     setup.paletteStart = 0;
     setup.paletteCount = 1;
     UIObjRes_Load(&wk->objRes[1], &setup, unit, heapId);
-    setup.paletteFile = func_0202d810();
-    setup.charFile = func_0202d814();
-    setup.cellFile = func_0202d818(2);
-    setup.animFile = func_0202d81c(2);
+    setup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    setup.charFile = AppMenuCommon_GetTouchBarCharFile();
+    setup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    setup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
     setup.paletteOffset = 10;
     setup.paletteStart = 0;
     setup.paletteCount = 3;
@@ -2020,7 +2020,7 @@ static void func_ov255_021d6000(void *work, u32 index, PrintWindow *window, s16 
     BoxSearchWork *wk = work;
     PrintQueue *queue = FrameList_GetPrintQueue(wk->list);
 
-    func_02021c7c(queue, BmpWin_GetBitmap(window->window), 0, 4, wk->strings[6], wk->font, 0);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(window->window), 0, 4, wk->strings[6], wk->font, 0);
     window->flushPending = TRUE;
 }
 

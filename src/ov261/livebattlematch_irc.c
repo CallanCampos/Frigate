@@ -126,9 +126,9 @@ BOOL LiveBattleMatchIrc_CheckError(LiveBattleMatchIrc *irc) {
             func_ov012_02153150(irc->p_delivery);
             irc->p_delivery = NULL;
         }
-        func_02012154();
-        func_02011de0();
-        func_02012144();
+        GFL_NetErrShutdown();
+        GFL_NetErrShowScreen();
+        GFL_NetErrClear();
         return TRUE;
     }
     return FALSE;

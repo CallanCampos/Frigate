@@ -605,7 +605,7 @@ static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, Pa
         offset.y = 0;
         offset.z = 0;
     }
-    func_0201ab54(mcss, &offset);
+    MCSS_SetPositionOffset(mcss, &offset);
 }
 
 void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror) {
@@ -628,16 +628,16 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
         DWCRap_SetMic(TRUE);
     }
     if (front) {
-        wk->mcss[side] = func_0201c14c(wk->mcssSys, pkm, 0, x[side], FX32_CONST(-28), 0);
+        wk->mcss[side] = MCSSSys_AddPartyPkm(wk->mcssSys, pkm, 0, x[side], FX32_CONST(-28), 0);
     } else {
-        wk->mcss[side] = func_0201c14c(wk->mcssSys, pkm, 1, x[side], FX32_CONST(-28), 0);
+        wk->mcss[side] = MCSSSys_AddPartyPkm(wk->mcssSys, pkm, 1, x[side], FX32_CONST(-28), 0);
     }
     if (wk->type == 2) {
         DWCRap_SetMic(FALSE);
     }
-    func_0201c290(wk->mcss[side]);
+    MCSS_SetLoopAnimation(wk->mcss[side]);
     MCSS_SetScale(wk->mcss[side], &scale);
-    func_0201aecc(wk->mcss[side], 1);
+    MCSS_SetNoShadow(wk->mcss[side], 1);
     func_ov194_021c2200(wk->mcss[side], &scale, front, pkm);
 }
 

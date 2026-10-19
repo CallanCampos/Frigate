@@ -83,13 +83,13 @@ static BOOL BrMusicalSend_ProcInit(GameProc *proc, u32 *state, void *param, void
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
     wk->param = p;
 
-    wk->que = func_02021998(wk->heapId);
+    wk->que = PrintQueue_CreateDefault(wk->heapId);
     unit = BrGraphic_GetClunit(p->graphic);
     wk->bmpoam = BmpOam_Init(wk->heapId, unit);
     for (i = 0; i < 2; i++) {
         wk->ballEff[i] = BrBallEff_Init(unit, p->res, i, wk->heapId);
     }
-    wk->shot = func_0200ad5c(getAddressOfMusicalDataInfo(GameData_GetSaveControl(p->gameData)));
+    wk->shot = MusicalSave_GetShot(getAddressOfMusicalDataInfo(GameData_GetSaveControl(p->gameData)));
 
     BrMusicalSend_CreatePhoto(wk, p);
     BrMusicalSend_CreateButtons(wk, p);
@@ -114,7 +114,7 @@ static BOOL BrMusicalSend_ProcExit(GameProc *proc, u32 *state, void *param, void
         wk->text = NULL;
     }
     BmpOam_Exit(wk->bmpoam);
-    func_02021a18(wk->que);
+    PrintQueue_Free(wk->que);
 
     GFL_ProcReleaseSubsystem(proc);
     GFL_OvlUnload(OVERLAY_ID(209));
@@ -139,7 +139,7 @@ static BOOL BrMusicalSend_ProcMain(GameProc *proc, u32 *state, void *param, void
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(wk->ballEff[i]);
     }
-    func_02021a3c(wk->que);
+    PrintQueue_Main(wk->que);
     if (wk->text != NULL) {
         BrText_Main(wk->text);
     }

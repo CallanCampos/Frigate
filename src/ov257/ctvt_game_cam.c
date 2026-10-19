@@ -223,7 +223,7 @@ CtvtGameCamTask *CtvtGameCam_StartTask(CtvtGameCam *cam, HeapID heapId) {
     task->cam = cam;
     task->heapId = heapId;
     task->font = GFL_FontCreate(23, 0, 0, FALSE, heapId);
-    task->printQueue = func_020219a8(0x800, heapId);
+    task->printQueue = PrintQueue_Create(0x800, heapId);
     task->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW, heapId);
     task->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     task->graphic = CtvtGameCamGraphic_Create(1, heapId);
@@ -253,7 +253,7 @@ int CtvtGameCam_UpdateTask(CtvtGameCamTask *task) {
     }
     CtvtGameCamSeq_Update(&task->seq);
     CtvtGameCamExchange_Update(&task->exchange, task->cam->members);
-    func_02021a3c(task->printQueue);
+    PrintQueue_Main(task->printQueue);
     if (CtvtGameCamSeq_IsDone(&task->seq) && CtvtGameCamExchange_IsDone(&task->exchange)) {
         return 1;
     }
@@ -277,8 +277,8 @@ void CtvtGameCam_EndTask(CtvtGameCamTask *task) {
     CtvtGameCamGraphic_Free(task->graphic);
     GFL_WordSetSystemFree(task->wordSet);
     GFL_MsgDataFree(task->msgData);
-    func_02021c44(task->printQueue);
-    func_02021a18(task->printQueue);
+    PrintQueue_Clear(task->printQueue);
+    PrintQueue_Free(task->printQueue);
     GFL_FontFree(task->font);
     GFL_HeapFree(task);
 }
@@ -456,7 +456,7 @@ static BOOL CtvtGameCamMsgWin_Update(CtvtGameCamMsgWin *win) {
     PrintQueue *printQueue = win->printQueue;
 
     if (win->printing) {
-        if (!func_02021c1c(printQueue, BmpWin_GetBitmap(win->printWindow))) {
+        if (!PrintQueue_IsBitmapPending(printQueue, BmpWin_GetBitmap(win->printWindow))) {
             BmpWin_FlushChar(win->printWindow);
             win->printing = FALSE;
         }
@@ -474,7 +474,7 @@ static void CtvtGameCamMsg_Init(CtvtGameCamMsg *msg, HeapID heapId) {
 
 static void CtvtGameCamMsg_Free(CtvtGameCamMsg *msg) {
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
     }
     GFL_TCBExMgrFree(msg->tcbManager);
     MI_CpuFill8(msg, 0, sizeof(CtvtGameCamMsg));
@@ -484,15 +484,15 @@ static void CtvtGameCamMsg_Print(CtvtGameCamMsg *msg, CtvtGameCamMsgWin *win, Ct
                                  HeapID heapId) {
     GFL_MsgDataLoadStrbuf(win->msgData, msgId, win->strbuf);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), win->color);
     BmpWin_FlushChar(win->window);
-    msg->stream = func_02022268(win->window, 0, 0, win->strbuf, win->font, func_02017bcc(), msg->tcbManager, 2, heapId,
-                                win->color);
+    msg->stream = PrintStream_Create(win->window, 0, 0, win->strbuf, win->font, TextSpeed_GetCurrentWait(),
+                                     msg->tcbManager, 2, heapId, win->color);
     BmpWin_FlushMap(win->window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(win->window));
-    func_02022410(msg->stream, 0);
+    PrintStream_SetFastWait(msg->stream, 0);
     msg->next = next;
     msg->wait = 90;
     msg->timer = 0;
@@ -504,15 +504,15 @@ static void CtvtGameCamMsg_PrintNumber(CtvtGameCamMsg *msg, CtvtGameCamMsgWin *w
     WordSetNumber(win->wordSet, 0, number, 1, 1, TRUE);
     GFL_WordSetFormatStrbuf(win->wordSet, win->expanded, win->strbuf);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), win->color);
     BmpWin_FlushChar(win->window);
-    msg->stream = func_02022268(win->window, 0, 0, win->expanded, win->font, func_02017bcc(), msg->tcbManager, 2,
-                                heapId, win->color);
+    msg->stream = PrintStream_Create(win->window, 0, 0, win->expanded, win->font, TextSpeed_GetCurrentWait(),
+                                     msg->tcbManager, 2, heapId, win->color);
     BmpWin_FlushMap(win->window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(win->window));
-    func_02022410(msg->stream, 0);
+    PrintStream_SetFastWait(msg->stream, 0);
     msg->next = next;
     msg->wait = 60;
     msg->timer = 0;
@@ -902,7 +902,7 @@ static void CtvtGameCam_SeqWaitMessage(CtvtGameCamSeq *seq, int *state, CtvtGame
 
     switch (*state) {
     case 0: {
-        u32 result = func_020223b4(msg->stream);
+        u32 result = PrintStream_GetState(msg->stream);
 
         GFL_TCBExMgrUpdate(msg->tcbManager);
         switch (result) {
@@ -923,10 +923,10 @@ static void CtvtGameCam_SeqWaitMessage(CtvtGameCamSeq *seq, int *state, CtvtGame
         }
         break;
     case 2:
-        if (func_02022458(msg->stream) == TRUE) {
-            func_0202243c(msg->stream);
+        if (PrintStream_IsFast(msg->stream) == TRUE) {
+            PrintStream_ClearFast(msg->stream);
         }
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
         CtvtGameCamSeq_Set(seq, msg->next);
         break;

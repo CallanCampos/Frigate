@@ -84,10 +84,10 @@ void MonolithTool_CreateText(MonolithWork *wk, MonolithTextActor *text, int sub,
         StrBuf *expanded = GFL_StrBufCreate(128, HEAPID_MONOLITH);
 
         GFL_WordSetFormatStrbuf(wordSet, expanded, str);
-        func_02021c54(wk->printQueue, text->bitmap, 0, 0, expanded, wk->font);
+        PrintQueue_Print(wk->printQueue, text->bitmap, 0, 0, expanded, wk->font);
         GFL_StrBufFree(expanded);
     } else {
-        func_02021c54(wk->printQueue, text->bitmap, 0, 0, str, wk->font);
+        PrintQueue_Print(wk->printQueue, text->bitmap, 0, 0, str, wk->font);
     }
     GFL_StrBufFree(str);
     text->printing = TRUE;
@@ -140,10 +140,10 @@ void MonolithTool_CreateTextCentered(MonolithWork *wk, MonolithTextActor *text, 
         StrBuf *expanded = GFL_StrBufCreate(128, HEAPID_MONOLITH);
 
         GFL_WordSetFormatStrbuf(wordSet, expanded, str);
-        func_02021c7c(wk->printQueue, text->bitmap, textX, 0, expanded, wk->font, color);
+        PrintQueue_PrintColor(wk->printQueue, text->bitmap, textX, 0, expanded, wk->font, color);
         GFL_StrBufFree(expanded);
     } else {
-        func_02021c7c(wk->printQueue, text->bitmap, textX, 0, str, wk->font, color);
+        PrintQueue_PrintColor(wk->printQueue, text->bitmap, textX, 0, str, wk->font, color);
     }
     GFL_StrBufFree(str);
     text->printing = TRUE;
@@ -164,7 +164,7 @@ void MonolithTool_SetTextVisible(MonolithTextActor *text, BOOL visible) {
 }
 
 BOOL MonolithTool_UpdateText(MonolithWork *wk, MonolithTextActor *text) {
-    if (text->printing == TRUE && func_02021c1c(wk->printQueue, text->bitmap) == FALSE) {
+    if (text->printing == TRUE && PrintQueue_IsBitmapPending(wk->printQueue, text->bitmap) == FALSE) {
         BmpOam_ActorBmpTrans(text->text);
         text->printing = FALSE;
         return TRUE;
@@ -318,7 +318,7 @@ PlayerInfo *MonolithTool_GetPlayerInfo(MonolithScreenParam *param) {
 }
 
 PassPowerLevel *MonolithTool_GetLevels(MonolithScreenParam *param) {
-    return func_02017208(GSYS_GetGameData(param->param->gsys));
+    return GameData_GetMyPassPowerLevels(GSYS_GetGameData(param->param->gsys));
 }
 
 void MonolithTool_CreateReturnButton(MonolithWork *wk, MonolithReturnButton *button) {

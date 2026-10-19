@@ -861,7 +861,7 @@ BattleAction func_ov167_0219f2b4(const BtlClientActions *clientActions, u8 clien
 
 void func_ov167_0219f2c0(BtlServer *server, BattleMon *mon) {
     PokeParty_GetParam(GetSrcData(mon), PKM_PARAM_NICKNAME, server->strBuf);
-    func_0202d2c8(server->strBuf);
+    GameBeaconSys_SendNickname(server->strBuf);
 }
 
 void func_ov167_0219f2e0(BtlServer *server, BattleMon *mon) {
@@ -872,7 +872,7 @@ void func_ov167_0219f2e0(BtlServer *server, BattleMon *mon) {
     GameBeaconSys_SendCapture(species, a, b);
     func_ov167_0219dad0(server->mainModule, 7);
     func_ov167_0219dad0(server->mainModule, 0x54);
-    func_02038bc8(0x1f);
+    JoinAvenue_RecordActivity(0x1f);
 }
 
 void func_ov167_0219f330(BtlServer *server, u32 money) {

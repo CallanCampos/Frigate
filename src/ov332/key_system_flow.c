@@ -134,9 +134,9 @@ void KeySystemFlow_SeqGameClear(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 4:
-        func_020104b0(wk->keyInfo, wk->param->key);
+        KeyInfo_UnlockKey(wk->keyInfo, wk->param->key);
         if (wk->param->key != KEY_SYSTEM_KEY_CITY) {
-            func_020104e0(wk->keyInfo, wk->param->key);
+            KeyInfo_EnableKey(wk->keyInfo, wk->param->key);
         }
         (*state)++;
         break;
@@ -668,7 +668,8 @@ static void KeySystemFlow_SeqChamber(KeySystemSeq *seq, int *state, void *work) 
         }
         break;
     case 5:
-        KeySystemMsgWin_PrintMsg(wk->msgWin, wk->msgData, func_020105a0(wk->keyInfo) + 117, KEY_SYSTEM_MSG_STREAM);
+        KeySystemMsgWin_PrintMsg(wk->msgWin, wk->msgData, KeyInfo_GetChamberKey(wk->keyInfo) + 117,
+                                 KEY_SYSTEM_MSG_STREAM);
         (*state)++;
         break;
     case 6:
@@ -864,7 +865,7 @@ static void KeySystemFlow_SeqSave(KeySystemSeq *seq, int *state, void *work) {
         if (KeySystemMsgWin_IsDone(wk->msgWin)) {
             GFL_BGSysQueueScrLoad(0);
             if (SaveControl_IsDataAlreadyPresent(GameData_GetSaveControl(wk->param->gameData))) {
-                func_0201782c(wk->param->gameData);
+                GameData_StartSave(wk->param->gameData);
             } else {
                 SaveOutside_StartSave(wk->ov331Work);
             }
@@ -875,7 +876,7 @@ static void KeySystemFlow_SeqSave(KeySystemSeq *seq, int *state, void *work) {
     case 2:
         wk->timer++;
         if (SaveControl_IsDataAlreadyPresent(GameData_GetSaveControl(wk->param->gameData))) {
-            if (func_02017850(wk->param->gameData) == 2) {
+            if (GameData_UpdateSave(wk->param->gameData) == 2) {
                 (*state)++;
             }
         } else if (SaveOutside_Save(wk->ov331Work)) {

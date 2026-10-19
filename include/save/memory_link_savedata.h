@@ -67,21 +67,21 @@ enum {
 // Clears the data
 void zero476Bytes(MemoryLinkSave *link);
 // Links a Black or White save: TRUE when it unlocked a memory
-BOOL func_020108dc(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save);
+BOOL MemoryLinkSave_Merge(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save);
 // TRUE when no save is linked yet, or when the save's player (ID, name, gender) is the one of every part that the
 // save would change
-BOOL func_0201090c(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save);
+BOOL MemoryLinkSave_CanMerge(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save);
 // A value of a kind, MEMORY_LINK_KIND_*, copied to dest for some kinds
 u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest);
 // A flag and a variable of the memories
-BOOL func_02010b90(MemoryLinkSave *link, int index);
-u16 func_02010bc0(MemoryLinkSave *link, u32 index);
+BOOL MemoryLinkSave_IsMemoryFlagSet(MemoryLinkSave *link, int index);
+u16 MemoryLinkSave_GetVar(MemoryLinkSave *link, u32 index);
 // Whether a player's slot is linked, and the player's gender and name
-BOOL func_02010bcc(MemoryLinkSave *link, int index);
-u8 func_02010bd8(MemoryLinkSave *link, u32 index);
-const u16 *func_02010be4(MemoryLinkSave *link, u32 index);
+BOOL MemoryLinkSave_IsPlayerLinked(MemoryLinkSave *link, int index);
+u8 MemoryLinkSave_GetPlayerGender(MemoryLinkSave *link, u32 index);
+const u16 *MemoryLinkSave_GetPlayerName(MemoryLinkSave *link, u32 index);
 // Whether a memory is unlocked, and the event work that marks it seen
-BOOL func_02010c54(MemoryLinkSave *link, u32 memory);
-u32 func_02010c6c(u32 memory);
+BOOL MemoryLinkSave_CheckMemoryCondition(MemoryLinkSave *link, u32 memory);
+u32 MemoryLink_GetMemoryEventWork(u32 memory);
 
 #endif // POKEBW2_SAVE_MEMORY_LINK_SAVEDATA_H

@@ -56,7 +56,7 @@ tools that show the differences.
   as `btlv_clact.c`'s move and scale task ends do, and `btlv_stage.c`'s vanish flags use `(1 << side) ^ 3`.
   That expression builds the -1 from the shift's 1 (`sub rY, rX, #2`), one register more. Where the original builds
   the -1 on its own (`mov r4, #0; mvn r4, r4` among `mov r3, #1; lsl r3, r2`), the mask was a local set to all ones
-  first: `key_data_savedata.c`'s `func_02010304` and `func_02010354` clear with
+  first: `key_data_savedata.c`'s `KeyDataSave_SetTrainerDefeated` and `KeyDataSave_SetFlag` clear with
   `mask = 0xffffffff; mask ^= 1 << bit; keyData->flags &= mask;`, and set with
   `mask = 1; mask <<= bit; keyData->flags |= mask;`, where `|= 1 << bit` adds a register copy.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
@@ -372,7 +372,7 @@ Same instructions, registers swapped.
   written `sample <<= 4; return sample;` does not match.
 - A pointer an inline advances in two statements and returns from its `if`, `const u16 *end = cmd + 3; end +=
   cmd[2]; return end;` with `return cmd;` after the `if`, compiles to the instructions of `return cmd + 3 + cmd[2];`
-  but colors its caller's registers in another order. `printsys.c`'s `func_02022900` copies a command with
+  but colors its caller's registers in another order. `printsys.c`'s `GFL_FontCopyLine` copies a command with
   `end = StrCmd_Skip(str)` and needs that body: with it the string stays in `r5` and `end` takes `r4`, and the
   caller's `end = str` copy lands in the `else` arm, where the inline's test reuses the outer test's flags; with the
   one expression, `str` takes `r4`, and without the return in the `if`, the copy is made before the test. The
@@ -1551,7 +1551,7 @@ Same instructions, scheduled in another order.
   so the shape survives only where the address keeps a second use. That is a read-modify-write (`f[i].b += v`, or
   `list->table[i].f--` through a loaded base, as in `bgwinfrm.c`'s `BGWinFrame_MoveStep` and `heapsys.c`'s
   `GFL_HeapAllocateCore`), two stores to one element, a read and a copy into the element (`pokewood_savedata.c`'s
-  `func_02011130` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
+  `PokewoodSave_UpdateRecord` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
   one `save + 0x28`, and tests `hasRecord` and sets it from one `save + 0x38`, while `isNewRecord`, set once, indexes
   first), or a store in the other arm of the `if` whose condition reads
   it: overlay 143's `MonolithPower_Equip` reads the array member `screen->state->equipped[slot]` in its condition and
@@ -1683,7 +1683,7 @@ Same instructions, scheduled in another order.
   (`mb_wm.c`) needed.
 - A member's address kept in a callee-saved register from an early store to a later call's argument, where ours
   recomputes it: `btlv_mcss.c`'s `BtlvMcss_Transform` needed a pointer local declared at the top but assigned just
-  before the call, `MCSSLoadInfo *dst; ... dst = &work->entries[index].info; func_02019bd8(..., dst);`. Initializing
+  before the call, `MCSSLoadInfo *dst; ... dst = &work->entries[index].info; MCSS_Reload(..., dst);`. Initializing
   `dst` at its declaration gives the base in the right register but adds a `mov ip, r0` spill, and passing the
   expression straight to the call drops the CSE entirely.
 - A trailing `mov r1, #0` after a 32-bit result is a function returning `u64`: DWC's `DivWords` (`crypt.c`) returns
@@ -2080,8 +2080,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `table[item / (sizeof(u32) * 8)] & (1 << (item % 32))`; `item >> 5` gives `asr` (pml_item.c).
 - A `u8` parameter divided with `asr`/`ror` (signed `/ 4` and `% 4`) while its callers pass a `u8` with no
   conversion is a `u8` parameter copied to an `s32` local first: `s32 r = region;` in unity_tower_savedata.c's
-  `func_02009ba4` and `func_02009be0`. Declaring the parameter `int` or `s8` matches the function but moves the
-  callers' argument loads (`Upload_WifiHistoryDataSet`) or masks a `u8` passed on (`func_02009b84`); a plain `u8`
+  `UnityTower_GetRegionState` and `UnityTower_SetRegionState`. Declaring the parameter `int` or `s8` matches the function but moves the
+  callers' argument loads (`Upload_WifiHistoryDataSet`) or masks a `u8` passed on (`UnityTower_SetOwnRegion`); a plain `u8`
   used directly divides with `lsr`.
 - A result computed into the parameter's own callee-saved register comes from a compound assignment to the parameter
   (`item -= ITEM_TM93 - TM_INDEX_TM93;` in `PML_ItemGetTMWazaID`); `item = item - X` or a new local computes into r0.
@@ -2349,7 +2349,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same label. `return;` statements share the return label, while the end of an `if` body and a `break` out of a
   `switch` jump to the label after that statement, even when both labels end at the same epilogue. An early
   return that takes the wrong one of two `b` trampolines shows which nearby exits were `return` and which were
-  `break` or the end of an `if`. `printsys.c`'s `func_02022464` matches with `if (stream->paused) { return; }`
+  `break` or the end of an `if`. `printsys.c`'s `PrintStream_Task` matches with `if (stream->paused) { return; }`
   before its switch, whose `b` the callback's early `return` above it then shares, and `break;` ending its cases;
   with the switch inside `if (!stream->paused) { ... }` and the running case ending in `return;`, that `bne` took
   a later `b` the case's `return` had put on the return label.

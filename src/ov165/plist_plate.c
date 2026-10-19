@@ -163,7 +163,8 @@ BOOL PokeListPlate_IsPrinting(PokeListPlate *plate) {
 
 void PokeListPlate_Update(PokeListWork *wk, PokeListPlate *plate) {
     if (plate->isEmpty == FALSE) {
-        if (plate->nameDirty == TRUE && func_02021c1c(wk->printQueue, BmpWin_GetBitmap(plate->window)) == FALSE) {
+        if (plate->nameDirty == TRUE &&
+            PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(plate->window)) == FALSE) {
             plate->nameDirty = FALSE;
             BmpWin_Transfer(plate->window);
         }

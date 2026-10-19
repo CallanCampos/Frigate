@@ -300,11 +300,11 @@ u32 MysteryNet_GetError(MysteryNet *net) {
 
 void MysteryNet_ClearError(MysteryNet *net) {
     if (net->wifiWork != NULL) {
-        func_02012994(net->wifiWork);
+        WihDwc_Destroy(net->wifiWork);
         net->wifiWork = NULL;
     }
     MysteryNet_ChangeState(net, MYSTERY_NET_STATE_IDLE);
-    func_02012144();
+    GFL_NetErrClear();
 }
 
 static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
@@ -323,9 +323,9 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
             }
             func_020424e4();
             DWC_ClearError();
-            func_02012154();
-            func_02011de0();
-            func_02012144();
+            GFL_NetErrShutdown();
+            GFL_NetErrShowScreen();
+            GFL_NetErrClear();
             error = MYSTERY_NET_ERROR_FATAL;
             break;
         case 7:
@@ -342,9 +342,9 @@ static u32 MysteryNet_CheckErrorWireless(MysteryNet *net) {
     u32 error = MYSTERY_NET_ERROR_NONE;
 
     if (GFL_NetErrCheck()) {
-        func_02012154();
-        func_02011de0();
-        func_02012144();
+        GFL_NetErrShutdown();
+        GFL_NetErrShowScreen();
+        GFL_NetErrClear();
         error = MYSTERY_NET_ERROR_FATAL;
     }
     return error;
@@ -354,9 +354,9 @@ static u32 MysteryNet_CheckErrorIrc(MysteryNet *net) {
     u32 error = MYSTERY_NET_ERROR_NONE;
 
     if (GFL_NetErrCheck()) {
-        func_02012154();
-        func_02011de0();
-        func_02012144();
+        GFL_NetErrShutdown();
+        GFL_NetErrShowScreen();
+        GFL_NetErrClear();
         error = MYSTERY_NET_ERROR_FATAL;
     }
     return error;
@@ -377,7 +377,7 @@ static void MysteryNet_WirelessStart(MysteryNetSeq *seq, int *state, void *work)
     case 1:
         if (func_02042788()) {
             func_02042ba8(TRUE, net->heapId);
-            net->wifiWork = func_02012908(4, net->heapId);
+            net->wifiWork = WihDwc_Create(4, net->heapId);
             func_02042968();
             *state = 2;
         }
@@ -394,7 +394,7 @@ static void MysteryNet_WirelessEnd(MysteryNetSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        func_02012994(net->wifiWork);
+        WihDwc_Destroy(net->wifiWork);
         net->wifiWork = NULL;
         *state = 1;
         break;
@@ -420,8 +420,8 @@ static void MysteryNet_WirelessEnd(MysteryNetSeq *seq, int *state, void *work) {
 static void MysteryNet_WirelessReady(MysteryNetSeq *seq, int *state, void *work) {
     MysteryNet *net = work;
 
-    func_02012a4c();
-    net->beaconFlags = func_02012be4(NULL);
+    WihDwc_TickTimers();
+    net->beaconFlags = WihDwc_GetStatus(NULL);
 }
 
 static void MysteryNet_BeaconStart(MysteryNetSeq *seq, int *state, void *work) {

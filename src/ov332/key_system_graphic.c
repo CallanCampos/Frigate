@@ -158,7 +158,7 @@ KeySystemGraphic *KeySystemGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     KeySystemGraphicBG_Init(&graphic->bg, heapId);
     KeySystemGraphicClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(KeySystemGraphic_VBlank, graphic, 0);
@@ -169,7 +169,7 @@ void KeySystemGraphic_Free(KeySystemGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     KeySystemGraphicClAct_Free(&graphic->clact);
     KeySystemGraphicBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

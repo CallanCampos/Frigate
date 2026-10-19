@@ -347,9 +347,9 @@ static void BChoiceMain_Task(TCB *tcb, void *data) {
 }
 
 static BOOL BChoiceMain_Finish(TCB *tcb, BChoiceWork *work) {
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         if (work->param->skip == 1) {
-            func_02021c44(work->printQueue);
+            PrintQueue_Clear(work->printQueue);
         } else {
             return FALSE;
         }
@@ -366,7 +366,7 @@ static BOOL BChoiceMain_Finish(TCB *tcb, BChoiceWork *work) {
     GFL_TCBExMgrFree(work->tcbManager);
     GFL_HeapFree(work->positions);
     BChoiceMain_FreeWindows(work);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     work->param->done = TRUE;
     func_0203d564(!(work->flags & FLAG_KEY_CHOICE));
     if (work->param->result != NULL) {
@@ -417,7 +417,7 @@ static void BChoiceMain_Init(BChoiceWork *work) {
     G2S_BlendNone();
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
-    work->printQueue = func_02021998(work->param->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->param->heapId);
     work->positions = GFL_ArcSysReadHeapNew(ARCID_B_CHOICE, FILE_POSITIONS, work->param->heapId);
     BChoiceMain_InitBG(work);
     BChoiceMain_LoadGraphics(work, work->layout);
@@ -687,8 +687,8 @@ static void BChoiceMain_PrintText(BChoiceWork *work, u32 window, int x, int y, S
     u16 offset = BChoiceMain_GetAlignOffset(str, work->param->font, align);
     PrintQueue *printQueue = work->printQueue;
 
-    func_02021c7c(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str, work->param->font,
-                  color);
+    PrintQueue_PrintColor(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str,
+                          work->param->font, color);
     work->windows[window].dirty = TRUE;
 }
 
@@ -705,12 +705,12 @@ static u16 BChoiceMain_GetAlignOffset(StrBuf *str, Font *font, u32 align) {
 static void BChoiceMain_UpdatePrint(BChoiceWork *work) {
     int i;
 
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < WINDOW_MAX; i++) {
         PrintQueue *printQueue = work->printQueue;
 
         if (work->windows[i].dirty) {
-            if (!func_02021c1c(printQueue, BmpWin_GetBitmap(work->windows[i].window))) {
+            if (!PrintQueue_IsBitmapPending(printQueue, BmpWin_GetBitmap(work->windows[i].window))) {
                 BmpWin_FlushChar(work->windows[i].window);
                 work->windows[i].dirty = FALSE;
             }

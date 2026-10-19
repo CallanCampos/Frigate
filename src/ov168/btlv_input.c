@@ -1385,11 +1385,12 @@ static void BtlvInput_LoadGraphics(BtlvInput *work) {
     work->cellAnims2 = func_0204bde0(work->arc, 0x1a9, 0x1aa, work->heapId);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(work->heapId));
-    work->moveCellAnims = func_0204bde0(arc, func_0202d7f8(0), func_0202d7fc(0), work->heapId);
-    work->movePalette = func_0204bba0(arc, func_0202d7e4(), 1, 0x100, work->heapId);
+    work->moveCellAnims =
+        func_0204bde0(arc, AppMenuCommon_GetTypeIconCellFile(0), AppMenuCommon_GetTypeIconAnimFile(0), work->heapId);
+    work->movePalette = func_0204bba0(arc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0x100, work->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, func_0204bdc0(work->movePalette, TRUE) / 2, 0x60);
     for (i = 0; i < 4; i++) {
-        work->moveChars[i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, 1, work->heapId);
+        work->moveChars[i] = func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, 1, work->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -2530,9 +2531,9 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
             work->moveActors[i] = func_0204c040(work->moveUnit, work->moveChars[i], work->movePalette,
                                                 work->moveCellAnims, &data_ov168_021f35f2, 1, work->heapId);
             func_0204c140(work->moveActors[i], &data_ov168_021f3638[i], 1);
-            charBuf = GFL_G2DIOReadOBJNCGR(getUINarcIdx(), func_0202d7f4(type), FALSE, &character,
+            charBuf = GFL_G2DIOReadOBJNCGR(getUINarcIdx(), AppMenuCommon_GetTypeIconCharFile(type), FALSE, &character,
                                            BtlvInput_TempHeapId(work));
-            func_0204c378(work->moveActors[i], func_0202d7e8(type), 1);
+            func_0204c378(work->moveActors[i], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
             func_0204c40c(work->moveActors[i], &proxy);
             MI_CpuCopy16(character->rawData,
                          (u8 *)G2S_GetOBJCharPtr() + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB], 0x100);

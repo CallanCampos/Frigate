@@ -42,6 +42,6 @@ u32 func_ov012_0215365c(GameCommSys *comm);
 BOOL func_ov012_02153660(GameCommSys *comm, StrBuf *name);
 
 // The index of the friend who calls, or -1
-int func_02012e54(WifiList *wifiList);
+int WihDwc_FindFriendInvite(WifiList *wifiList);
 
 #endif // POKEBW2_APP_COMM_TVT_FIELD_H

@@ -167,7 +167,7 @@ BrBtnSys *BrBtnSys_Init(int menuID, ClActUnit *unit, BrRes *res, BrRecordInfo *r
     p_wk->heapId = heapId;
     p_wk->recovery = recovery;
     p_wk->bmpoam = BmpOam_Init(heapId, unit);
-    p_wk->que = func_02021998(heapId);
+    p_wk->que = PrintQueue_CreateDefault(heapId);
     p_wk->ballEff = ballEff;
     p_wk->isBusy = TRUE;
     {
@@ -256,13 +256,13 @@ void BrBtnSys_Exit(BrBtnSys *p_wk) {
     BrRes_UnloadOBJ(p_wk->res, p_wk->objID + 1);
     BrBtnData_Exit(p_wk->btnData);
     BmpOam_Exit(p_wk->bmpoam);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_HeapFree(p_wk);
 }
 
 void BrBtnSys_Main(BrBtnSys *p_wk) {
     BrSeq_Main(p_wk->seq);
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }

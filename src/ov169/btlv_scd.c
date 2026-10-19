@@ -461,7 +461,7 @@ BtlvScd *BtlvScd_Create(BtlvCore *core, BtlMainModule *mainModule, BtlPokeCon *p
     scd->typeMask = func_ov167_021b919c(client);
     scd->noCancel = func_ov167_0219c9c0(mainModule);
     scd->keyCursorFlag = func_020174c8(func_ov167_0219bf98(scd->mainModule));
-    scd->printQueue = func_02021998(scd->heapId);
+    scd->printQueue = PrintQueue_CreateDefault(scd->heapId);
     BtlvScd_ClearProcs(scd);
     return scd;
 }
@@ -533,7 +533,7 @@ BOOL BtlvScd_IsIdle(BtlvScd *scd) {
 
 void BtlvScd_Delete(BtlvScd *scd) {
     func_020174bc(func_ov167_0219bf98(scd->mainModule), scd->keyCursorFlag);
-    func_02021a18(scd->printQueue);
+    PrintQueue_Free(scd->printQueue);
     GFL_StrBufFree(scd->strbuf);
     BtlvInput_Delete(scd->input);
     GFL_HeapFree(scd);

@@ -659,7 +659,7 @@ void FieldScript_ThrowOpcodeAccessError(void) {
         } while (!func_020427a4());
     }
     while (TRUE) {
-        func_02005430();
+        Machine_ProcessExitRequest();
     }
 }
 

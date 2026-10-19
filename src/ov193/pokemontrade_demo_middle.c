@@ -243,7 +243,7 @@ static void PokemonTradeDemoMiddle_StateSetUpMoves(PokemonTradeWork *wk) {
     TradeMcssMove_Free(wk->mcssMoves[1]);
     wk->mcssMoves[1] = TradeMcssMove_Create(wk->mcss[1], PokemonTradeDemoMiddle_Frame(84), &second, wk->heapId);
     MCSS_SetAnimationEndCallback(wk->mcss[0], (u32)wk, (MCSSAnimationCallback)func_ov194_021beab4, TRUE);
-    func_0201ae2c(wk->mcss[1], 0, 16, (s8)(PokemonTradeDemoMiddle_Frame(14) / 16), 0);
+    MCSS_StartFade(wk->mcss[1], 0, 16, (s8)(PokemonTradeDemoMiddle_Frame(14) / 16), 0);
     func_ov194_021bfe70(wk);
     GFL_BGSysResetStdPalette(1, 0);
     GFL_BGSysResetStdPalette(5, 0);
@@ -431,7 +431,7 @@ static void PokemonTradeDemoMiddle_ShowSprite(PokemonTradeWork *wk, int index) {
     pos.z = FX32_CONST(10);
     MCSS_SetPosition(wk->mcss[index], &pos);
     MCSS_PauseAnimation(wk->mcss[index]);
-    func_0201ab70(wk->mcss[index], &pos);
+    MCSS_GetScale(wk->mcss[index], &pos);
     if (pos.x < 0) {
         pos.x = -FX32_ONE * 16;
     } else {
@@ -516,10 +516,10 @@ static void PokemonTradeDemoMiddle_Init(PokemonTradeWork *wk) {
         func_ov194_021c24cc(wk, 2, FALSE, PokemonTrade_GetPkm(wk, 0), FALSE);
         func_ov194_021c24cc(wk, 3, TRUE, PokemonTrade_GetPkm(wk, 1), FALSE);
     }
-    func_0201ab70(wk->mcss[0], &wk->work3D->spriteSizes[0]);
-    func_0201ab70(wk->mcss[1], &wk->work3D->spriteSizes[1]);
-    func_0201ab70(wk->mcss[2], &wk->work3D->spriteSizes[2]);
-    func_0201ab70(wk->mcss[3], &wk->work3D->spriteSizes[3]);
+    MCSS_GetScale(wk->mcss[0], &wk->work3D->spriteSizes[0]);
+    MCSS_GetScale(wk->mcss[1], &wk->work3D->spriteSizes[1]);
+    MCSS_GetScale(wk->mcss[2], &wk->work3D->spriteSizes[2]);
+    MCSS_GetScale(wk->mcss[3], &wk->work3D->spriteSizes[3]);
     MCSS_Hide(wk->mcss[1]);
     MCSS_Hide(wk->mcss[2]);
     MCSS_Hide(wk->mcss[3]);
@@ -564,10 +564,10 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
         func_ov194_021c200c(wk, 5);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(1)) {
-        func_0201ae2c(wk->mcss[0], 8, 8, 0, 0xffff);
+        MCSS_StartFade(wk->mcss[0], 8, 8, 0, 0xffff);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(2)) {
-        func_0201ae2c(wk->mcss[0], 16, 16, 0, 0xffff);
+        MCSS_StartFade(wk->mcss[0], 16, 16, 0, 0xffff);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(3)) {
         PokemonTradeDemoMiddle_LoadSprite(wk);
@@ -623,7 +623,7 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
         } else {
             func_ov194_021c24cc(wk, 0, TRUE, PokemonTrade_GetPkm(wk, 0), FALSE);
         }
-        func_0201ab70(wk->mcss[0], &wk->work3D->spriteSizes[0]);
+        MCSS_GetScale(wk->mcss[0], &wk->work3D->spriteSizes[0]);
         MCSS_Hide(wk->mcss[0]);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x14a)) {
@@ -715,7 +715,7 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
         GFL_HeapFree(wk->mcssMoves[0]);
         wk->mcssMoves[0] = NULL;
         MCSS_Show(wk->mcss[index3]);
-        func_0201ae2c(wk->mcss[index3], 0, 0, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[index3], 0, 0, 0, 0x7fff);
         pos5.x = FX32_CONST(-150);
         pos5.y = FX32_CONST(5);
         pos5.z = FX32_CONST(-10);
@@ -798,20 +798,20 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
         if (wk->unk11EE == 0) {
             PokemonTradeDemoMiddle_ShowSprite(wk, index);
             PokemonTradeDemoMiddle_StartMove(wk, index);
-            func_0201ae2c(wk->mcss[index], 16, 16, 0, 0x7fff);
+            MCSS_StartFade(wk->mcss[index], 16, 16, 0, 0x7fff);
         } else {
             PokemonTradeDemoMiddle_ShowSprite(wk, index);
             MCSS_Hide(wk->mcss[index]);
             PokemonTradeDemoMiddle_ShowSprite(wk, other);
             PokemonTradeDemoMiddle_StartMove(wk, index);
-            func_0201ae2c(wk->mcss[other], 16, 16, 0, 0x7fff);
+            MCSS_StartFade(wk->mcss[other], 16, 16, 0, 0x7fff);
         }
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x48f)) {
-        func_0201ae2c(wk->mcss[index], 8, 8, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[index], 8, 8, 0, 0x7fff);
     }
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x490)) {
-        func_0201ae2c(wk->mcss[index], 0, 0, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[index], 0, 0, 0, 0x7fff);
     }
     if (PokemonTradeDemoMiddle_Frame(0x48e) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL &&
         wk->mcssMoves[3]->frame == 9) {

@@ -65,14 +65,14 @@ ZukanDetailHeadbar *ZukanDetailHeadbar_Create(HeapID heapId, Font *font) {
     ZukanDetailHeadbar_InitBG(headbar);
     ZukanDetailHeadbar_PrintTitle(headbar);
     headbar->vblankTcb = GFL_VBlankTCBAdd(ZukanDetailHeadbar_VBlank, headbar, 1);
-    headbar->printQueue = func_02021998(headbar->heapId);
+    headbar->printQueue = PrintQueue_CreateDefault(headbar->heapId);
     headbar->transferPending = FALSE;
     return headbar;
 }
 
 void ZukanDetailHeadbar_Free(ZukanDetailHeadbar *headbar) {
-    func_02021c44(headbar->printQueue);
-    func_02021a18(headbar->printQueue);
+    PrintQueue_Clear(headbar->printQueue);
+    PrintQueue_Free(headbar->printQueue);
     GFL_TCBRemove(headbar->vblankTcb);
     ZukanDetailHeadbar_ClearTitle(headbar);
     ZukanDetailHeadbar_FreeBG(headbar);
@@ -113,7 +113,7 @@ void ZukanDetailHeadbar_Update(ZukanDetailHeadbar *headbar) {
     }
 
     ZukanDetailHeadbar_TransferTitle(headbar);
-    func_02021a3c(headbar->printQueue);
+    PrintQueue_Main(headbar->printQueue);
 }
 
 void ZukanDetailHeadbar_SetTitle(ZukanDetailHeadbar *headbar, int title) {
@@ -177,7 +177,8 @@ static void ZukanDetailHeadbar_PrintTitle(ZukanDetailHeadbar *headbar) {
         GFL_BitmapCopy(bitmap, headbar->bitmap);
         GFL_BitmapFree(bitmap);
         strbuf = GFL_MsgDataLoadStrbufNew(headbar->msgData, BtlServerFlowTitle_Text_Info + headbar->title);
-        func_02021c7c(headbar->printQueue, headbar->bitmap, 24, 5, strbuf, headbar->font, PRINT_COLOR(15, 14, 0));
+        PrintQueue_PrintColor(headbar->printQueue, headbar->bitmap, 24, 5, strbuf, headbar->font,
+                              PRINT_COLOR(15, 14, 0));
         GFL_StrBufFree(strbuf);
         headbar->transferPending = TRUE;
         ZukanDetailHeadbar_TransferTitle(headbar);
@@ -189,7 +190,7 @@ static void ZukanDetailHeadbar_ClearTitle(ZukanDetailHeadbar *headbar) {
 
 // Loads the bar's characters once the title has been printed on them
 static void ZukanDetailHeadbar_TransferTitle(ZukanDetailHeadbar *headbar) {
-    if (headbar->transferPending && !func_02021c1c(headbar->printQueue, headbar->bitmap)) {
+    if (headbar->transferPending && !PrintQueue_IsBitmapPending(headbar->printQueue, headbar->bitmap)) {
         GFL_BGSysLoadChar(HEADBAR_BG, GFL_BitmapGetPixelData(headbar->bitmap), headbar->charSize, headbar->charPos);
         GFL_BGSysQueueScrLoad(HEADBAR_BG);
         headbar->transferPending = FALSE;

@@ -189,8 +189,8 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
             case 2:
                 if (a0 == 0) {
                     DWCRapCommon_ShutdownLibrary();
-                    func_02011de0();
-                    func_02012144();
+                    GFL_NetErrShowScreen();
+                    GFL_NetErrClear();
                     return 1;
                 }
                 DWC_ClearError();
@@ -199,13 +199,13 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
             case 4:
             case 5:
                 GFL_NetErrMarkShown();
-                func_020120f0(13);
+                GFL_NetErrRecordWifi(13);
                 return 2;
             case 6:
                 GFL_NetErrMarkShown();
                 return 2;
             case 7:
-                func_02011d04(15);
+                GFL_NetErrShowWifi(15);
                 return 3;
             }
         }
@@ -213,15 +213,15 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
         type = error->type;
         if (type == 0x3f0 || type == 0x3f1) {
             if (a1 != 0) {
-                func_02012050();
+                GFL_NetErrRecord();
                 DWCRapCommon_ShutdownLibrary();
                 func_020421ac(TRUE);
-                func_02011de0();
-                func_02012144();
+                GFL_NetErrShowScreen();
+                GFL_NetErrClear();
                 return 4;
             }
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             func_020421ac(TRUE);
             return 0;
@@ -229,17 +229,17 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
         if (type == 0x3f2 || type == 0x3f3 || type == 0x3f4 || type == 0x3f6) {
             if (a0 == 0) {
                 DWCRapCommon_ShutdownLibrary();
-                func_02011de0();
-                func_02012144();
+                GFL_NetErrShowScreen();
+                GFL_NetErrClear();
                 return 1;
             }
             GFL_NetErrMarkShown();
-            func_020120f0(13);
+            GFL_NetErrRecordWifi(13);
             return 2;
         }
         if (type == 0x3ee || type == 0x3f7 || type == 0x3f5) {
             GFL_NetErrMarkShown();
-            func_020120f0(13);
+            GFL_NetErrRecordWifi(13);
             return 2;
         }
     }

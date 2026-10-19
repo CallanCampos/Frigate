@@ -20,7 +20,7 @@ typedef struct {
     u8 removed[4];
 } FesMissionZone;
 
-// The work of a type 5 mission, kept by the festival (func_02014864)
+// The work of a type 5 mission, kept by the festival (LinkFestival_GetEntries)
 typedef struct {
     LinkFestival *festival;
     u16 zoneId;

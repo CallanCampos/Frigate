@@ -167,13 +167,13 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
 #endif
     if (wk->param->timerEnabled == TRUE) {
 #ifdef BUGFIX
-        GFL_G2DIOLoadArcNCLRDefault(commonArc, func_0202d820(), 4, 0x40, 0x20, wk->heapId);
-        GFL_BGSysLoadArcNCGRStatic(commonArc, func_0202d824(), 5, 0, 0, FALSE, wk->heapId);
-        loadBGScrToVramByFileNoReserveNegAlign(commonArc, func_0202d828(), 5, 0, 0, FALSE, wk->heapId);
+        GFL_G2DIOLoadArcNCLRDefault(commonArc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0x40, 0x20, wk->heapId);
+        GFL_BGSysLoadArcNCGRStatic(commonArc, AppMenuCommon_GetBarBgCharFile(), 5, 0, 0, FALSE, wk->heapId);
+        loadBGScrToVramByFileNoReserveNegAlign(commonArc, AppMenuCommon_GetBarScreenFile(), 5, 0, 0, FALSE, wk->heapId);
 #else
-        GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 4, 0x40, 0x20, wk->heapId);
-        GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), 5, 0, 0, FALSE, wk->heapId);
-        loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 5, 0, 0, FALSE, wk->heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0x40, 0x20, wk->heapId);
+        GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), 5, 0, 0, FALSE, wk->heapId);
+        loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 5, 0, 0, FALSE, wk->heapId);
 #endif
         GFL_BGSysSetScrPaletteNo(5, 0, 0, 32, 32, 2);
         GFL_BGSysQueueScrLoad(5);
@@ -219,7 +219,7 @@ static PokeListPartner *PokeListBattle_CreatePartner(PokeListWork *wk, PokeListP
     partner->window = BmpWin_CreateDynamic(4, x + 1 + spacing / 2, y + 1, 10, 2, 14, TRUE);
     name = GFL_StrBufCreate(16, wk->heapId);
     GFL_StrBufLoadString(name, partnerParam->name);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(partner->window), 0, 0, name, wk->font, 0x3c40);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(partner->window), 0, 0, name, wk->font, 0x3c40);
     GFL_StrBufFree(name);
     partner->dirty = TRUE;
     return partner;
@@ -245,7 +245,8 @@ static void PokeListBattle_UpdatePartner(PokeListWork *wk, PokeListPartner *part
             PokeListBattle_UpdatePartnerPkm(wk, partner->pkms[i]);
         }
     }
-    if (partner->dirty == TRUE && func_02021c1c(wk->printQueue, BmpWin_GetBitmap(partner->window)) == FALSE) {
+    if (partner->dirty == TRUE &&
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(partner->window)) == FALSE) {
         partner->dirty = FALSE;
         BmpWin_Transfer(partner->window);
     }
@@ -345,8 +346,9 @@ static void PokeListBattle_FreePartnerPkm(PokeListWork *wk, PokeListPartnerPkm *
 }
 
 static void PokeListBattle_UpdatePartnerPkm(PokeListWork *wk, PokeListPartnerPkm *partnerPkm) {
-    if (partnerPkm->dirty == TRUE && func_02021c1c(wk->printQueue, BmpWin_GetBitmap(partnerPkm->sexWindow)) == FALSE &&
-        func_02021c1c(wk->printQueue, BmpWin_GetBitmap(partnerPkm->levelWindow)) == FALSE) {
+    if (partnerPkm->dirty == TRUE &&
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(partnerPkm->sexWindow)) == FALSE &&
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(partnerPkm->levelWindow)) == FALSE) {
         partnerPkm->dirty = FALSE;
         BmpWin_Transfer(partnerPkm->sexWindow);
         BmpWin_Transfer(partnerPkm->levelWindow);
@@ -385,7 +387,7 @@ static void PokeListBattle_CreateTimer(PokeListWork *wk) {
     wk->timerWindows[0] = BmpWin_CreateDynamic(4, 7, 21, 11, 3, 14, TRUE);
     wk->timerWindows[1] = BmpWin_CreateDynamic(4, 20, 21, 5, 3, 14, TRUE);
     label = GFL_MsgDataLoadStrbufNew(wk->msgData, 0xb9);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[0]), 0, 4, label, wk->font, 0x3c40);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[0]), 0, 4, label, wk->font, 0x3c40);
     GFL_StrBufFree(label);
     wk->timerWindowDirty[0] = TRUE;
 }
@@ -398,7 +400,7 @@ static void PokeListBattle_FreeTimer(PokeListWork *wk) {
 // Prints the time left once it changes, and makes the timer blink red for the last ten seconds
 static void PokeListBattle_UpdateTimer(PokeListWork *wk) {
     if (wk->shownTime != wk->param->timeLeft &&
-        func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[1])) == FALSE) {
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[1])) == FALSE) {
         u16 time = wk->param->timeLeft;
         u8 minutes = time / 60;
         u8 seconds = time % 60;
@@ -418,7 +420,8 @@ static void PokeListBattle_UpdateTimer(PokeListWork *wk) {
         GFL_BitmapFill(BmpWin_GetBitmap(wk->timerWindows[1]), 0);
         GFL_WordSetFormatStrbuf(wordSet, str, format);
         width = GFL_FontGetBlockWidth(str, wk->font, 0);
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[1]), 36 - width, 4, str, wk->font, 0x3c40);
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[1]), 36 - width, 4, str, wk->font,
+                              0x3c40);
         GFL_WordSetSystemFree(wordSet);
         GFL_StrBufFree(str);
         GFL_StrBufFree(format);
@@ -429,12 +432,12 @@ static void PokeListBattle_UpdateTimer(PokeListWork *wk) {
         PokeList_TimeUp(wk);
     }
     if (wk->timerWindowDirty[1] == TRUE &&
-        func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[1])) == FALSE) {
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[1])) == FALSE) {
         wk->timerWindowDirty[1] = FALSE;
         BmpWin_Transfer(wk->timerWindows[1]);
     }
     if (wk->timerWindowDirty[0] == TRUE &&
-        func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[0])) == FALSE) {
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->timerWindows[0])) == FALSE) {
         wk->timerWindowDirty[0] = FALSE;
         BmpWin_Transfer(wk->timerWindows[0]);
     }

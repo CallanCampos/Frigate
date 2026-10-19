@@ -107,7 +107,7 @@ PdcMsg *PdcMsg_Create(Font *font, const Config *config, TCBExManager *tcbManager
     msg->tcbManager = tcbManager;
     msg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_10, msg->heapId);
     msg->font = font;
-    msg->printWait = func_02017c50(func_02008a14(config));
+    msg->printWait = TextSpeed_GetWait(Config_GetTextSpeed(config));
     msg->strbuf = GFL_StrBufCreate(256, heapId);
     msg->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     GFL_BGSysFillScrArea(PDC_MSG_BG, 0, 0, 0, 32, 32, 17);
@@ -127,7 +127,7 @@ void PdcMsg_Free(PdcMsg *msg) {
     GFL_StrBufFree(msg->strbuf);
     GFL_WordSetSystemFree(msg->wordSet);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
     }
     GFL_BGSysReleaseBG(PDC_MSG_BG);
     GFL_MsgDataFree(msg->msgData);
@@ -195,13 +195,13 @@ BOOL PdcMsg_Step(PdcMsg *msg) {
             break;
         }
         if (msg->stream != NULL) {
-            func_020223a4(msg->stream);
+            PrintStream_Resume(msg->stream);
         }
         msg->step++;
         // fallthrough
     case PDC_MSG_STEP_PRINT:
         if (msg->stream != NULL) {
-            msg->streamState = func_020223b4(msg->stream);
+            msg->streamState = PrintStream_GetState(msg->stream);
             if (msg->streamState != PRINT_STREAM_RUNNING) {
                 msg->step = PDC_MSG_STEP_WAIT_KEY;
                 if (msg->streamState == PRINT_STREAM_DONE) {
@@ -230,13 +230,13 @@ BOOL PdcMsg_Step(PdcMsg *msg) {
         break;
     case PDC_MSG_STEP_NEXT_PAGE:
         if (msg->streamState == PRINT_STREAM_DONE) {
-            func_020232d8();
-            func_020223cc(msg->stream);
+            GFL_TextRndResetColorIndexLUT();
+            PrintStream_Delete(msg->stream);
             msg->stream = NULL;
             msg->step = PDC_MSG_STEP_DONE;
             return TRUE;
         }
-        func_020223bc(msg->stream);
+        PrintStream_Continue(msg->stream);
         msg->step = PDC_MSG_STEP_PRINT;
         msg->timer = msg->timerReset;
         break;
@@ -267,9 +267,9 @@ static void PdcMsg_Print(PdcMsg *msg, int waitFrames) {
     GFL_TextRndUpdateColorIndexLUT(1, 9, 12);
     GFL_BGSysSetBGEnabled(PDC_MSG_BG, TRUE);
     if (waitFrames != 0) {
-        msg->stream =
-            func_02022268(msg->win, 0, 0, msg->strbuf, msg->font, msg->printWait, msg->tcbManager, 0, msg->heapId, 12);
-        func_02022390(msg->stream);
+        msg->stream = PrintStream_Create(msg->win, 0, 0, msg->strbuf, msg->font, msg->printWait, msg->tcbManager, 0,
+                                         msg->heapId, 12);
+        PrintStream_Pause(msg->stream);
         msg->instant = FALSE;
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(msg->win), 0, 0, msg->strbuf, msg->font);

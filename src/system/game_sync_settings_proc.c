@@ -50,7 +50,7 @@ static BOOL GameSyncSettings_Init(GameProc *proc, u32 *state, void *param, void 
     MI_CpuFill8(wk, 0, sizeof(GameSyncSettingsWork));
     wk->heapId = HEAPID_GAMESYNC;
     wk->gameData = GameData_Create(HEAPID_GAMESYNC);
-    if (func_020099f4(getDreamWorldStuffAddress(GameData_GetSaveControl(wk->gameData)))) {
+    if (DreamWorldSave_GetIDShown(getDreamWorldStuffAddress(GameData_GetSaveControl(wk->gameData)))) {
         wk->state = GAME_SYNC_SETTINGS_ACCOUNT;
         wk->account.mode = PDWACC_MODE_SHOW_ID;
     } else {

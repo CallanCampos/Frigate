@@ -114,7 +114,7 @@ BeaconDetailGraphic *BeaconDetailGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     BeaconDetailBG_Init(&graphic->bg, heapId);
     BeaconDetailClAct_Init(&graphic->clact, &sBeaconDetailVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(BeaconDetailGraphic_VBlank, graphic, 0);
@@ -125,7 +125,7 @@ void BeaconDetailGraphic_Free(BeaconDetailGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     BeaconDetailClAct_Free(&graphic->clact);
     BeaconDetailBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

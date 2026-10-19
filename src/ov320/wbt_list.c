@@ -441,7 +441,7 @@ static BOOL WbtListProc_Init(GameProc *proc, u32 *state, void *param, void *work
     list->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, list->heapId);
     list->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_LIST, list->heapId);
     list->unk7C = NULL;
-    list->queue = func_02021998(list->heapId);
+    list->queue = PrintQueue_CreateDefault(list->heapId);
     list->tcbManager = GFL_TCBExMgrCreate(list->heapId, list->heapId, 32, 32);
     list->stream = NULL;
     list->strbuf = NULL;
@@ -463,7 +463,7 @@ static BOOL WbtListProc_Exit(GameProc *proc, u32 *state, void *param, void *work
     if (list->unk7C != NULL) {
         GFL_MsgDataFree(list->unk7C);
     }
-    func_02021a18(list->queue);
+    PrintQueue_Free(list->queue);
     GFL_FontFree(list->font);
     GFL_TCBExMgrFree(list->tcbManager);
     WbtListGraphic_Free(list->graphic);
@@ -484,7 +484,7 @@ static BOOL WbtListProc_Main(GameProc *proc, u32 *state, void *param, void *work
         }
         break;
     case 1:
-        if (list->state == STATE_END && func_02021c0c(list->queue) == TRUE) {
+        if (list->state == STATE_END && PrintQueue_IsEmpty(list->queue) == TRUE) {
             (*state)++;
         }
         break;
@@ -626,7 +626,7 @@ static void WbtList_FreeView(WbtList *work) {
 static void WbtList_FlushWindows(WbtList *work) {
     s32 i;
 
-    func_02021a3c(work->queue);
+    PrintQueue_Main(work->queue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&work->windows[i], work->queue);
     }
@@ -820,7 +820,7 @@ static void WbtList_FreeWindows(WbtList *work) {
         GFL_StrBufFree(work->strbuf);
     }
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     KeyCursor_Free(work->keyCursor);
 }
@@ -1190,7 +1190,7 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
         }
     }
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     if (work->strbuf != NULL) {
         GFL_StrBufFree(work->strbuf);
@@ -1198,8 +1198,8 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
     }
     src = GFL_MsgDataLoadStrbufNew(work->msgData, messageId);
     GFL_WordSetFormatStrbuf(wordSet, work->strbuf, src);
-    work->stream = func_02022268(work->windows[WINDOW_MESSAGE].window, 0, 0, work->strbuf, work->font, func_02017bcc(),
-                                 work->tcbManager, 4, work->heapId, 15);
+    work->stream = PrintStream_Create(work->windows[WINDOW_MESSAGE].window, 0, 0, work->strbuf, work->font,
+                                      TextSpeed_GetCurrentWait(), work->tcbManager, 4, work->heapId, 15);
     window = work->windows[WINDOW_MESSAGE].window;
     BmpWin_TransferNow(window);
     GFL_WordSetSystemFree(wordSet);

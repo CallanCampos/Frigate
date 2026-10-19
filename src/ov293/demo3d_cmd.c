@@ -280,7 +280,7 @@ static void Demo3DCmd_BgmPlay(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *para
 }
 
 static void Demo3DCmd_BgmStop(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *params) {
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
 }
 
 // Fades the BGM in (0) or out, in a number of frames
@@ -350,7 +350,7 @@ static void Demo3DCmd_BgmChangeTask(TCBEx *task, void *data) {
                 work->sys->bgmPushed = TRUE;
             }
         } else {
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             if (work->type == DEMO3D_BGM_CHANGE_STOP) {
                 break;
             }
@@ -532,8 +532,8 @@ static void Demo3DCmd_MessageTask(TCBEx *task, void *data) {
 
         work->strbuf = GFL_MsgDataLoadStrbufNew(msgData, work->message);
         GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
-        work->stream =
-            func_02022268(work->window, 0, 0, work->strbuf, sys->font, sys->textSpeed, sys->tcbMgr, 0, sys->heapId, 15);
+        work->stream = PrintStream_Create(work->window, 0, 0, work->strbuf, sys->font, sys->textSpeed, sys->tcbMgr, 0,
+                                          sys->heapId, 15);
         window = work->window;
         BmpWin_FlushChar(window);
         BmpWin_FlushMap(window);
@@ -570,10 +570,10 @@ static void Demo3DCmd_InitMessage(Demo3DCmdSys *sys, Demo3DMessage *work, u32 te
 
 static void Demo3DCmd_FreeMessage(Demo3DMessage *work) {
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     GFL_StrBufFree(work->strbuf);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     BmpWin_ClearFrame(work->window, 1);
     BmpWin_Free(work->window);
     FreeCursorImageEndOfHeap(1, work->frameChars);

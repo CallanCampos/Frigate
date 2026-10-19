@@ -219,7 +219,7 @@ void UnionSubdisp_Free(UnionSubdisp *work) {
 // a BOOL the compiler folds it into the caller's test, and the original keeps it as a value
 static inline u32 UnionSubdisp_FlushPrint(PrintWindow *print, PrintQueue *queue) {
     if (print->flushPending != 0) {
-        if (func_02021c1c(queue, BmpWin_GetBitmap(print->window)) == 0) {
+        if (PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(print->window)) == 0) {
             BmpWin_FlushChar(print->window);
             print->flushPending = 0;
         }
@@ -240,7 +240,7 @@ void UnionSubdisp_Update(UnionSubdisp *work, BOOL active) {
     } else {
         G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x3f, -8);
     }
-    func_02021a3c(work->queue);
+    PrintQueue_Main(work->queue);
     PMSDraw_Main(work->pmsDraw);
     for (i = 0; i < LINE_COUNT; i++) {
         if (work->content[i] == CONTENT_MESSAGE) {
@@ -306,7 +306,7 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
 
 static void UnionSubdisp_InitUnit(UnionSubdisp *work) {
     work->unit = func_0204bf1c(12, 5, HEAPID_FIELDMAP);
-    work->queue = func_02021998(HEAPID_FIELDMAP);
+    work->queue = PrintQueue_CreateDefault(HEAPID_FIELDMAP);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_FIELDMAP);
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_UNION_SUBDISP, HEAPID_FIELDMAP);
 }
@@ -314,8 +314,8 @@ static void UnionSubdisp_InitUnit(UnionSubdisp *work) {
 static void UnionSubdisp_FreeUnit(UnionSubdisp *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_FontFree(work->font);
-    func_02021c44(work->queue);
-    func_02021a18(work->queue);
+    PrintQueue_Clear(work->queue);
+    PrintQueue_Free(work->queue);
     func_0204bf98(work->unit);
 }
 
@@ -595,7 +595,7 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
     }
     name = GFL_StrBufCreate(8, HEAPID_FIELDMAP);
     GFL_StrBufLoadString(name, chat->name);
-    func_02021c7c(work->queue, BmpWin_GetBitmap(*window), 0, 0, name, work->font, PRINT_COLOR_LINE);
+    PrintQueue_PrintColor(work->queue, BmpWin_GetBitmap(*window), 0, 0, name, work->font, PRINT_COLOR_LINE);
     GFL_StrBufFree(name);
     if (chat->subKind != 0) {
         u32 message = UnionSubdisp_Text_Friend;
@@ -604,7 +604,7 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
             message = UnionSubdisp_Text_Player;
         }
         strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, message);
-        func_02021c7c(work->queue, BmpWin_GetBitmap(*window), 0x74, 0, strbuf, work->font, PRINT_COLOR_LINE);
+        PrintQueue_PrintColor(work->queue, BmpWin_GetBitmap(*window), 0x74, 0, strbuf, work->font, PRINT_COLOR_LINE);
         GFL_StrBufFree(strbuf);
     }
 }

@@ -77,44 +77,44 @@ static const ResortDataRange sRanges[RESORT_KIND_COUNT] = {
 // clang-format on
 static const ResortPersonFuncs sFuncs[] = {
     {
-        (ResortPersonCreateFunc)func_02036d94,
-        (ResortPersonFunc)func_02036db8,
-        (ResortPersonFunc)func_02036e14,
+        (ResortPersonCreateFunc)JoinAvenuePerson_Create,
+        (ResortPersonFunc)JoinAvenuePerson_Free,
+        (ResortPersonFunc)JoinAvenuePerson_Clear,
         (ResortPersonIsEmptyFunc)JoinAvenuePerson_IsEmpty,
         (ResortPersonGetParamFunc)joinAveTextHandler,
         (ResortPersonSetParamFunc)JoinAvenuePerson_SetParam,
         NULL,
-        (ResortPersonUnk1cFunc)func_020378f8,
+        (ResortPersonUnk1cFunc)JoinAvenuePerson_Random,
     },
     {
-        (ResortPersonCreateFunc)func_02037a40,
-        (ResortPersonFunc)func_02037a68,
-        (ResortPersonFunc)func_02037a70,
-        (ResortPersonIsEmptyFunc)func_02037a90,
-        (ResortPersonGetParamFunc)func_02037b38,
-        (ResortPersonSetParamFunc)func_02037c70,
+        (ResortPersonCreateFunc)JoinAvenueEntry_Create,
+        (ResortPersonFunc)JoinAvenueEntry_Free,
+        (ResortPersonFunc)JoinAvenueEntry_Clear,
+        (ResortPersonIsEmptyFunc)JoinAvenueEntry_IsEmpty,
+        (ResortPersonGetParamFunc)JoinAvenueEntry_GetParam,
+        (ResortPersonSetParamFunc)JoinAvenueEntry_SetParam,
         NULL,
-        (ResortPersonUnk1cFunc)func_02037e34,
+        (ResortPersonUnk1cFunc)JoinAvenueEntry_Random,
     },
     {
-        (ResortPersonCreateFunc)func_02036d94,
-        (ResortPersonFunc)func_02036db8,
-        (ResortPersonFunc)func_02036e14,
+        (ResortPersonCreateFunc)JoinAvenuePerson_Create,
+        (ResortPersonFunc)JoinAvenuePerson_Free,
+        (ResortPersonFunc)JoinAvenuePerson_Clear,
         (ResortPersonIsEmptyFunc)JoinAvenuePerson_IsEmpty,
         (ResortPersonGetParamFunc)joinAveTextHandler,
         (ResortPersonSetParamFunc)JoinAvenuePerson_SetParam,
         NULL,
-        (ResortPersonUnk1cFunc)func_020378f8,
+        (ResortPersonUnk1cFunc)JoinAvenuePerson_Random,
     },
     {
-        (ResortPersonCreateFunc)func_020384a4,
-        (ResortPersonFunc)func_020384cc,
-        (ResortPersonFunc)func_020384d4,
-        (ResortPersonIsEmptyFunc)func_020384e0,
-        (ResortPersonGetParamFunc)func_020385a8,
-        (ResortPersonSetParamFunc)func_02038680,
+        (ResortPersonCreateFunc)JoinAvenueRecord_Create,
+        (ResortPersonFunc)JoinAvenueRecord_Free,
+        (ResortPersonFunc)JoinAvenueRecord_Clear,
+        (ResortPersonIsEmptyFunc)JoinAvenueRecord_IsEmpty,
+        (ResortPersonGetParamFunc)JoinAvenueRecord_GetParam,
+        (ResortPersonSetParamFunc)JoinAvenueRecord_SetParam,
         NULL,
-        (ResortPersonUnk1cFunc)func_020387f4,
+        (ResortPersonUnk1cFunc)JoinAvenueRecord_Random,
     },
 };
 
@@ -270,7 +270,7 @@ u32 func_ov137_021f1990(ResortPersonData *data, u32 a1, u32 a2) {
 }
 
 u32 func_ov137_021f199c(ResortPersonData *data, ResortPersonData *other, u32 a2, u32 a3) {
-    return func_0203941c(func_ov137_021f1968(data, 7, NULL) + func_ov137_021f1968(other, 7, NULL), a2, a3);
+    return JoinAvenue_RandomFromSeed(func_ov137_021f1968(data, 7, NULL) + func_ov137_021f1968(other, 7, NULL), a2, a3);
 }
 
 ResortPersonData **func_ov137_021f19c4(const ResortSysSetup *setup, HeapID heapId) {
@@ -281,12 +281,12 @@ ResortPersonData **func_ov137_021f19c4(const ResortSysSetup *setup, HeapID heapI
     for (i = 0; i < 8; i++) {
         u16 index = i;
 
-        datas[i] = func_ov137_021f18f0(heapId, func_02038860(setup->occupants, index), 0, index);
+        datas[i] = func_ov137_021f18f0(heapId, JoinAvenueOccupants_GetPerson(setup->occupants, index), 0, index);
     }
     for (i = 8; i < 12; i++) {
         u16 index = i - 8;
 
-        datas[i] = func_ov137_021f18f0(heapId, func_0203888c(setup->occupants, index), 1, index);
+        datas[i] = func_ov137_021f18f0(heapId, JoinAvenueOccupants_GetRecord(setup->occupants, index), 1, index);
     }
     for (i = 12; i < 20; i++) {
         u16 index = i - 12;
@@ -303,7 +303,7 @@ ResortPersonData **func_ov137_021f19c4(const ResortSysSetup *setup, HeapID heapI
     for (i = 28; i < 40; i++) {
         u16 index = i - 28;
 
-        datas[i] = func_ov137_021f18f0(heapId, func_02037f04(setup->entries, index), 4, index);
+        datas[i] = func_ov137_021f18f0(heapId, JoinAvenueEntryList_Get(setup->entries, index), 4, index);
     }
     return datas;
 }

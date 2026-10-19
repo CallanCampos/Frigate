@@ -223,7 +223,7 @@ static ZukanAreaListWork *ZukanAreaList_CreateWork(GameProc *proc, ZukanHabitatS
     MI_CpuFill8(wk, 0, sizeof(ZukanAreaListWork));
     wk->param = param;
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZUKAN_HABITAT, HEAPID_ZUKAN_AREA_LIST);
-    wk->habitatSave = func_02010cb8(GameData_GetSaveControl(param->gameData));
+    wk->habitatSave = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(param->gameData));
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_AREA_LIST);
     return wk;
 }
@@ -238,7 +238,7 @@ static void ZukanAreaList_InitList(ZukanAreaListWork *wk) {
     ZukanHabitatSummaryParam *param = wk->param;
     u8 count = param->count;
 
-    ZukanAreaListView_InitList(&wk->view, count, param->areas, func_02010d78(wk->habitatSave), 0);
+    ZukanAreaListView_InitList(&wk->view, count, param->areas, ZukanHabitatSave_GetZone(wk->habitatSave), 0);
 }
 
 static void ZukanAreaList_ExitList(ZukanAreaListWork *wk) {
@@ -350,7 +350,7 @@ static void ZukanAreaList_StateEnd(ZukanAreaListWork *wk) {
     s16 cursor = ZukanAreaListView_GetListCursor(&wk->view);
     ZukanHabitatSummary *area = ZukanAreaListView_GetArea(&wk->view, scroll + cursor);
 
-    func_02010d70(wk->habitatSave, area->zone);
+    ZukanHabitatSave_SetZone(wk->habitatSave, area->zone);
     wk->end = TRUE;
 }
 

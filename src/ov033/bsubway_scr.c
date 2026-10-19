@@ -37,7 +37,7 @@ static const u8 sBattlePointRewards[7][10] = {
 // clang-format on
 
 void func_ov033_0217b468(GameSystem *gsys) {
-    func_02017954(GSYS_GetGameData(gsys), NULL);
+    GameData_SetBSubwayScrWork(GSYS_GetGameData(gsys), NULL);
 }
 
 BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2) {
@@ -65,7 +65,7 @@ BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2) {
     bsw->unk74 = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     bsw->unk78 = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_3A);
     BSubwayPlayData_SetSaveFlag(bsw->unk70, 0);
-    func_02017954(gameData, bsw);
+    GameData_SetBSubwayScrWork(gameData, bsw);
     if (a1 == 0) {
         bsw->playMode = a2;
         bsw->memberCount = func_ov033_0217bdc0(bsw->playMode);
@@ -124,7 +124,7 @@ void func_ov033_0217b664(GameSystem *gsys, BSubwayScrWork *bsw) {
         MI_CpuFill8(bsw, 0, sizeof(BSubwayScrWork));
         GFL_HeapFree(bsw);
     }
-    func_02017954(GSYS_GetGameData(gsys), NULL);
+    GameData_SetBSubwayScrWork(GSYS_GetGameData(gsys), NULL);
 }
 
 void func_ov033_0217b6b4(BSubwayScrWork *bsw) {

@@ -86,7 +86,7 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
 
     wordIndex = ScriptReadAny(vm, env);
-    data = func_0200afbc(GameData_GetSaveControl(gameData));
+    data = TrainerLogSave_Get(GameData_GetSaveControl(gameData));
     date = getAddressAdventureTimeBlk(gameData);
     OS_GetOwnerInfo(&ownerInfo);
     index = func_0200b05c(data, ownerInfo.birthday.month, ownerInfo.birthday.day, date);
@@ -95,7 +95,7 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     } else {
         article = TRUE;
     }
-    name = func_0200afe4(data, index);
+    name = TrainerLogSave_GetEntryName(data, index);
     wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     strBuf = GFL_StrBufCreate(8, HEAPID_TAIL(HEAPID_USER));
     GFL_StrBufLoadString(strBuf, name);
@@ -108,7 +108,7 @@ BOOL func_ov036_021afd9c(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_0200afc8(func_0200afbc(GameData_GetSaveControl(gameData)));
+    *result = TrainerLogSave_CountEntries(TrainerLogSave_Get(GameData_GetSaveControl(gameData)));
     return FALSE;
 }
 

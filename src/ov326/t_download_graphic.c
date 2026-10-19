@@ -113,7 +113,7 @@ TDownloadGraphic *TDownloadGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     TDownloadGraphic_BGInit(&graphic->bg, heapId);
     TDownloadGraphic_ClActInit(&graphic->clact, &sTDownloadVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(TDownloadGraphic_VBlank, graphic, 0);
@@ -124,7 +124,7 @@ void TDownloadGraphic_Delete(TDownloadGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     TDownloadGraphic_ClActExit(&graphic->clact);
     TDownloadGraphic_BGExit(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

@@ -322,7 +322,7 @@ static void GtsNego_OnRecvPerson(int netId, int size, const void *data, void *wo
     }
     JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_26, 2);
     JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_NAME, (u32)GetPlayerName(param->playerInfo2));
-    func_02010078(joinAvenue, param->gameData, person, 1);
+    JoinAvenue_Add(joinAvenue, param->gameData, person, 1);
 }
 
 static void *GtsNego_GetPersonBuffer(int netId, void *work, int size) {
@@ -531,7 +531,7 @@ static void GtsNego_StateSendPerson(GtsNegoWork *wk) {
     // The other machine of the two
     int target = func_02042a6c(func_02040440()) == 0;
 
-    func_02036dc0(&wk->myPerson, param->gameData);
+    JoinAvenuePerson_InitPlayer(&wk->myPerson, param->gameData);
     if (func_02042c18(func_02040440(), target, GTSNEGO_NET_CMD_PERSON, sizeof(JoinAvenuePerson), &wk->myPerson, TRUE,
                       FALSE, TRUE)) {
         func_02040624(func_02040440(), 4, GTSNEGO_TIMING_NO);
@@ -559,10 +559,10 @@ static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
             copyTrainerNameFromStrbuf(partner, name);
             GFL_StrBufFree(name);
         }
-        func_02008b34(partner, func_02017378(wk->gameData, 1 - func_0203ffc4()));
+        PlayerInfo_Copy(partner, GameData_GetPlayerInfoByNetID(wk->gameData, 1 - func_0203ffc4()));
         id = getIDAsUInt(partner);
         Misc_AddMetTrainer(getHollow_RivalData(wk->save), id);
-        if (func_02008bfc(partner) == 22 || func_02008bfc(partner) == 23) {
+        if (PlayerInfo_GetVersion(partner) == 22 || PlayerInfo_GetVersion(partner) == 23) {
             GtsNego_ChangeState(wk, GtsNego_StateSendPerson, 740);
         } else {
             GtsNego_ChangeState(wk, GtsNego_StateShowPartner, 745);
@@ -648,7 +648,7 @@ static void GtsNego_StateStartExchange(GtsNegoWork *wk) {
             param->unk4[0].unk0 = wk->level;
             param->unk4[0].unk4 = wk->myKind;
             CGearPhrases_Get(phrases, 0, &wk->send.phrase);
-            wk->send.tradeCount = func_0200a5c4(func_02017980(wk->gameData));
+            wk->send.tradeCount = PalPadFriendList_GetTradeCount(GameData_GetPalPadFriendList(wk->gameData));
             func_02040624(func_02040440(), 2, GTSNEGO_TIMING_NO);
             GtsNego_ChangeState(wk, GtsNego_StateSendRequest, 898);
         }
@@ -731,7 +731,7 @@ static int GtsNego_EvalMatch(int index, void *work) {
     if (wk->mode == GTSNEGO_MODE_RENDEZVOUS) {
         if (level == GTSNEGO_LEVEL_RENDEZVOUS) {
             if (wk->friendIndex == -1) {
-                if (func_0200a590(getPalPadFriendListAddress(wk->save), id)) {
+                if (PalPadFriendList_HasPlayer(getPalPadFriendListAddress(wk->save), id)) {
                     score = 100;
                 }
             } else if (wk->friendId == id) {
@@ -739,7 +739,7 @@ static int GtsNego_EvalMatch(int index, void *work) {
             }
         } else if (friendId == getIDAsUInt(GetGameDataPlayerInfo(param->gameData))) {
             if (wk->friendIndex == -1) {
-                if (func_0200a590(getPalPadFriendListAddress(wk->save), id)) {
+                if (PalPadFriendList_HasPlayer(getPalPadFriendListAddress(wk->save), id)) {
                     score = 100;
                 }
             } else if (wk->friendId == id) {
@@ -786,7 +786,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
         friend = NULL;
         func_02042d8c(FALSE);
         // The token is made in the values' buffer, which they then overwrite
-        func_0200a3c4(&wk->wifiList->myUserData, (DWCFriendData *)values);
+        WifiList_CreateExchangeTokenFromUserData(&wk->wifiList->myUserData, (DWCFriendData *)values);
         values[GTSNEGO_KEY_MY_ID] = wk->myId;
         values[GTSNEGO_KEY_MODE] = wk->mode;
         values[GTSNEGO_KEY_LEVEL] = wk->level;
@@ -946,17 +946,17 @@ static void GtsNego_StateOpenSearchMenu(GtsNegoWork *wk) {
 }
 
 PlayerInfo *GtsNego_GetFriend(GameData *gameData, int index) {
-    int count = func_0200a5a8(func_02017980(gameData));
+    int count = PalPadFriendList_CountPlayers(GameData_GetPalPadFriendList(gameData));
 
     if (index >= count || index < 0) {
         return NULL;
     }
-    return func_0200a570(func_02017980(gameData), index);
+    return PalPadFriendList_GetPlayer(GameData_GetPalPadFriendList(gameData), index);
 }
 
 // The person at index, or the first or last when it is past the list's ends
 static PlayerInfo *GtsNego_GetFriendClamped(GameData *gameData, int index) {
-    int count = func_0200a5a8(func_02017980(gameData));
+    int count = PalPadFriendList_CountPlayers(GameData_GetPalPadFriendList(gameData));
 
     if (index < 0) {
         index = 0;
@@ -964,7 +964,7 @@ static PlayerInfo *GtsNego_GetFriendClamped(GameData *gameData, int index) {
     if (index >= count) {
         index = count - 1;
     }
-    return func_0200a570(func_02017980(gameData), index);
+    return PalPadFriendList_GetPlayer(GameData_GetPalPadFriendList(gameData), index);
 }
 
 static void GtsNego_StateReturnToMainMenu(GtsNegoWork *wk) {
@@ -1315,7 +1315,7 @@ static void GtsNego_StateWaitNoFriends(GtsNegoWork *wk) {
 
 static void GtsNego_StateOpenFriendList(GtsNegoWork *wk) {
     BOOL scrollable = TRUE;
-    int count = func_0200a5a8(func_02017980(wk->gameData));
+    int count = PalPadFriendList_CountPlayers(GameData_GetPalPadFriendList(wk->gameData));
 
     wk->mode = GTSNEGO_MODE_RENDEZVOUS;
     if (count == 0) {
@@ -1352,7 +1352,7 @@ static void GtsNego_StateOpenMainMenu(GtsNegoWork *wk) {
         if (wk->errorFrames++ < 3) {
             return;
         }
-        func_02011da4();
+        GFL_NetErrApplyBrightness();
         wk->errorShown = FALSE;
     }
     if (!func_0203d554()) {
@@ -1543,7 +1543,7 @@ static BOOL GtsNegoProc_Init(GameProc *proc, u32 *state, void *param, void *work
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     GFL_SndBGMPlay(SEQ_BGM_GTS, 0xffff);
     func_02042ba8(TRUE, wk->heapId);
-    func_02011d8c(TRUE);
+    GFL_NetErrSetKeepDark(TRUE);
     GtsNego_ChangeState(wk, GtsNego_StateOpenMainMenu, 2520);
     return TRUE;
 }
@@ -1598,7 +1598,7 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
 static BOOL GtsNegoProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GtsNegoWork *wk = work;
 
-    func_02011d98();
+    GFL_NetErrClearKeepDark();
     if (!GFL_WipeIsFinished()) {
         return FALSE;
     }

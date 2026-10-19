@@ -318,15 +318,15 @@ void BScenarioGraphic_Print(BScenarioWork *work, u32 window, int x, int y, StrBu
         u16 offset = BScenarioGraphic_GetAlignOffset(str, work->param->font, align);
         PrintQueue *printQueue = work->printQueue;
 
-        func_02021c7c(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str, work->param->font,
-                      color);
+        PrintQueue_PrintColor(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str,
+                              work->param->font, color);
         work->windows[window].dirty = TRUE;
     } else {
         u16 offset = BScenarioGraphic_GetAlignOffset(str, work->smallFont, align);
         PrintQueue *printQueue = work->printQueue;
 
-        func_02021c7c(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str, work->smallFont,
-                      color);
+        PrintQueue_PrintColor(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str,
+                              work->smallFont, color);
         work->windows[window].dirty = TRUE;
     }
 }
@@ -371,13 +371,13 @@ static inline BOOL BScenarioGraphic_IsWindowPrinted(BScenarioWindow *window) {
 void BScenarioGraphic_UpdatePrint(BScenarioWork *work) {
     int i;
 
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < BSCENARIO_WINDOW_MAX; i++) {
         if (work->windows[i].window != NULL) {
             PrintQueue *printQueue = work->printQueue;
 
             if (work->windows[i].dirty) {
-                if (!func_02021c1c(printQueue, BmpWin_GetBitmap(work->windows[i].window))) {
+                if (!PrintQueue_IsBitmapPending(printQueue, BmpWin_GetBitmap(work->windows[i].window))) {
                     BmpWin_FlushChar(work->windows[i].window);
                     work->windows[i].dirty = FALSE;
                 }
@@ -414,7 +414,8 @@ static void BScenarioGraphic_LoadTypeResources(BScenarioWork *work) {
     work->palettes[BSCENARIO_RES_TYPE] = func_0204bbb8(arc, FILE_TYPE_PALETTE, 1, 0x80, 0, 3, work->param->heapId);
     work->cells[BSCENARIO_RES_TYPE] = func_0204bde0(arc, FILE_TYPE_CELLS, FILE_TYPE_ANIMS, work->param->heapId);
     for (i = 0; i < 6; i++) {
-        work->chars[BSCENARIO_CHARS_TYPE + i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, 1, work->param->heapId);
+        work->chars[BSCENARIO_CHARS_TYPE + i] =
+            func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, 1, work->param->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -462,12 +463,13 @@ static void BScenarioGraphic_LoadButtonResources(BScenarioWork *work) {
 void BScenarioGraphic_SetTypeIcon(BScenarioWork *work, int index, u32 unused, u32 type) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(work->param->heapId));
     NNSG2dCharacterData *character;
-    void *file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d7f4(type), FALSE, &character, HEAPID_TAIL(work->param->heapId));
+    void *file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, &character,
+                                         HEAPID_TAIL(work->param->heapId));
 
     func_0204ba40(work->chars[BSCENARIO_CHARS_TYPE + index], character);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(work->typeActors[index], func_0202d7e8(type), 1);
+    func_0204c378(work->typeActors[index], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 void BScenarioGraphic_SetIconPalette(BScenarioWork *work, int index, u32 species, u32 sex) {

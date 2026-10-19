@@ -357,9 +357,9 @@ void func_ov127_021efde0(InfinityDungeonRoomChange *roomChange, InfinityDungeonR
 
 GameEvent *func_ov127_021efeec(GameSystem *gsys, Field *field, u8 a2) {
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
-    u32 mode = func_02010378(keyData);
+    u32 mode = KeyDataSave_GetArea(keyData);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(field);
-    u32 floor = func_020102d4(keyData);
+    u32 floor = KeyDataSave_GetFloorInArea(keyData);
     u16 seed = func_ov127_021f08a8(dungeon, floor, a2);
     u16 trainerId = InfinityDungeon_GetTrainerId(dungeon, floor, a2);
     u8 version = func_ov127_021f0dd8(dungeon);
@@ -395,12 +395,12 @@ GameEvent *func_ov127_021efeec(GameSystem *gsys, Field *field, u8 a2) {
 void func_ov127_021f0040(KeyDataSave *keyData, InfinityDungeon *dungeon) {
     u32 width;
     u32 height;
-    u8 rank = func_02010378(keyData);
+    u8 rank = KeyDataSave_GetArea(keyData);
     u8 floorCount;
 
     if (!func_ov127_021f00a8(keyData, dungeon)) {
         InfinityDungeon_GetFloorSize(rank, &width, &height);
-        floorCount = func_020103c4(rank);
+        floorCount = KeyDataSave_GetAreaFloorCount(rank);
         InfinityDungeon_LayoutFloors(dungeon, rank, dungeon->layoutSeed, width, height, floorCount);
         InfinityDungeonCreator_Create(dungeon, rank, dungeon->trainerSeed, floorCount, HEAPID_FIELDMAP);
     } else {
@@ -410,9 +410,9 @@ void func_ov127_021f0040(KeyDataSave *keyData, InfinityDungeon *dungeon) {
 }
 
 static BOOL func_ov127_021f00a8(KeyDataSave *keyData, InfinityDungeon *dungeon) {
-    u32 progress0 = func_02010274(keyData, 0);
-    u32 progress1 = func_02010274(keyData, 1);
-    u32 rank = func_02010378(keyData);
+    u32 progress0 = KeyDataSave_GetProgress(keyData, 0);
+    u32 progress1 = KeyDataSave_GetProgress(keyData, 1);
+    u32 rank = KeyDataSave_GetArea(keyData);
     u32 mode;
     int floor;
     int i;
@@ -432,7 +432,7 @@ static BOOL func_ov127_021f00a8(KeyDataSave *keyData, InfinityDungeon *dungeon) 
         mode = 1;
         break;
     }
-    mode = func_02010274(keyData, mode);
+    mode = KeyDataSave_GetProgress(keyData, mode);
     {
         const InfinityDungeonFloor *white2Floors[2] = { &sFloorWhite2Mode0, &sFloorWhite2Mode1 };
         const InfinityDungeonFloor *black2Floors[2] = { &sFloorBlack2Mode0, &sFloorBlack2Mode1 };
@@ -469,7 +469,7 @@ static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon) 
         index = 1;
         break;
     }
-    mode = func_02010274(keyData, index);
+    mode = KeyDataSave_GetProgress(keyData, index);
     {
         const u16 *white2Lists[2][2] = { { sWhite2Trainers0, sWhite2Specials0 },
                                          { sWhite2Trainers1, sWhite2Specials1 } };
@@ -539,7 +539,7 @@ static u32 func_ov127_021f031c(InfinityDungeon *dungeon) {
 
 u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *dungeon, u16 objCode, u8 a3) {
     InfinityDungeonNpcScriptArg arg;
-    u8 floor = func_020102d4(keyData);
+    u8 floor = KeyDataSave_GetFloorInArea(keyData);
     InfinityDungeonNpcScriptFunc firstTimeScripts[9] = {
         func_ov127_021f0654, func_ov127_021f03fc, func_ov127_021f0724, func_ov127_021f0798, func_ov127_021f07e4,
         func_ov127_021f057c, func_ov127_021f0570, func_ov127_021f0878, func_ov127_021f089c,
@@ -572,7 +572,7 @@ u32 func_ov127_021f03dc(KeyDataSave *keyData, InfinityDungeon *dungeon, u16 objC
 }
 
 static u32 func_ov127_021f03fc(InfinityDungeonNpcScriptArg *arg) {
-    u32 floor = func_020102d4(arg->keyData);
+    u32 floor = KeyDataSave_GetFloorInArea(arg->keyData);
     u32 script;
 
     if (floor < arg->dungeon->targetFloor) {
@@ -594,7 +594,7 @@ static u32 func_ov127_021f03fc(InfinityDungeonNpcScriptArg *arg) {
 }
 
 static u32 func_ov127_021f0440(InfinityDungeonNpcScriptArg *arg) {
-    u32 floor = func_020102d4(arg->keyData);
+    u32 floor = KeyDataSave_GetFloorInArea(arg->keyData);
     u8 goalFloor = func_ov127_021f02e0(arg->dungeon);
 
     if (floor != goalFloor) {
@@ -604,10 +604,10 @@ static u32 func_ov127_021f0440(InfinityDungeonNpcScriptArg *arg) {
 }
 
 static u32 func_ov127_021f046c(InfinityDungeonNpcScriptArg *arg) {
-    u32 floor = func_020102d4(arg->keyData);
+    u32 floor = KeyDataSave_GetFloorInArea(arg->keyData);
     u8 goalFloor = func_ov127_021f02e0(arg->dungeon);
     u8 goalRoom = func_ov127_021f031c(arg->dungeon);
-    u8 room = func_020102ec(arg->keyData);
+    u8 room = KeyDataSave_GetRoom(arg->keyData);
     u32 script = 0x1d8;
 
     if (floor == goalFloor) {
@@ -676,8 +676,8 @@ static u32 func_ov127_021f0570(InfinityDungeonNpcScriptArg *arg) {
 }
 
 static u32 func_ov127_021f057c(InfinityDungeonNpcScriptArg *arg) {
-    u32 floor = func_020102d4(arg->keyData);
-    u8 room = func_020102ec(arg->keyData);
+    u32 floor = KeyDataSave_GetFloorInArea(arg->keyData);
+    u8 room = KeyDataSave_GetRoom(arg->keyData);
     u8 specialRoom = arg->dungeon->specialRoom[floor];
     u32 version = func_ov127_021f0dd8(arg->dungeon);
     u8 x = 0;
@@ -708,8 +708,8 @@ static u32 func_ov127_021f057c(InfinityDungeonNpcScriptArg *arg) {
 }
 
 static u32 func_ov127_021f0654(InfinityDungeonNpcScriptArg *arg) {
-    u32 floor = func_020102d4(arg->keyData);
-    u8 room = func_020102ec(arg->keyData);
+    u32 floor = KeyDataSave_GetFloorInArea(arg->keyData);
+    u8 room = KeyDataSave_GetRoom(arg->keyData);
     u8 targetRoom = arg->dungeon->targetRoom;
     u8 targetFloor = arg->dungeon->targetFloor;
     u8 x = 0;
@@ -815,7 +815,7 @@ static u32 func_ov127_021f07e4(InfinityDungeonNpcScriptArg *arg) {
 }
 
 static u32 func_ov127_021f0878(InfinityDungeonNpcScriptArg *arg) {
-    if (func_020103c4(func_02010378(arg->keyData)) <= 1) {
+    if (KeyDataSave_GetAreaFloorCount(KeyDataSave_GetArea(arg->keyData)) <= 1) {
         return func_ov127_021f046c(arg);
     }
     return func_ov127_021f0440(arg);
@@ -876,7 +876,7 @@ BOOL func_ov127_021f093c(InfinityDungeon *dungeon, u32 floor, u32 room) {
 }
 
 BOOL func_ov127_021f096c(InfinityDungeon *dungeon, KeyDataSave *keyData) {
-    return func_02010288(keyData, dungeon->targetFloor, dungeon->targetSlot);
+    return KeyDataSave_IsTrainerDefeated(keyData, dungeon->targetFloor, dungeon->targetSlot);
 }
 
 static const u16 sRewardItemsRank0to4[6] = {

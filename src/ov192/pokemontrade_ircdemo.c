@@ -29,7 +29,7 @@ void PokemonTradeIrcDemo_Init(PokemonTradeWork *wk) {
     func_ov194_021c24cc(wk, 1, FALSE, PokemonTrade_GetPkm(wk, 1), TRUE);
     func_ov194_021c24cc(wk, 2, FALSE, PokemonTrade_GetPkm(wk, 0), TRUE);
     func_ov194_021c24cc(wk, 3, TRUE, PokemonTrade_GetPkm(wk, 1), TRUE);
-    func_0201ab70(wk->mcss[3], &wk->work3D->ircSpriteSizes[1]);
+    MCSS_GetScale(wk->mcss[3], &wk->work3D->ircSpriteSizes[1]);
     MCSS_Hide(wk->mcss[1]);
     MCSS_Hide(wk->mcss[2]);
     MCSS_Hide(wk->mcss[3]);
@@ -47,10 +47,10 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
     VecFx32 pos3;
 
     if (wk->timer == PokemonTradeIrcDemo_Frames(1)) {
-        func_0201ae2c(wk->mcss[0], 8, 8, 0, 0xffff);
+        MCSS_StartFade(wk->mcss[0], 8, 8, 0, 0xffff);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(2)) {
-        func_0201ae2c(wk->mcss[0], 16, 16, 0, 0xffff);
+        MCSS_StartFade(wk->mcss[0], 16, 16, 0, 0xffff);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(3)) {
         PokemonTradeIrcDemo_LoadResources(wk);
@@ -101,7 +101,7 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
         pos1.z = FX32_CONST(10);
         TradeMcssMove_Free(wk->mcssMoves[0]);
         wk->mcssMoves[0] = TradeMcssMove_Create(wk->mcss[2], PokemonTradeIrcDemo_Frames(150), &pos1, wk->heapId);
-        func_0201ab70(wk->mcss[2], &pos1);
+        MCSS_GetScale(wk->mcss[2], &pos1);
         pos1.x *= 2;
         pos1.y *= 2;
         MCSS_SetScale(wk->mcss[2], &pos1);
@@ -118,11 +118,11 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
         TradeMcssMove_Free(wk->mcssMoves[1]);
         wk->mcssMoves[1] = TradeMcssMove_Create(wk->mcss[3], PokemonTradeIrcDemo_Frames(150), &pos2, wk->heapId);
         MCSS_SetScale(wk->mcss[3], &wk->work3D->ircSpriteSizes[1]);
-        func_0201ab70(wk->mcss[3], &pos2);
+        MCSS_GetScale(wk->mcss[3], &pos2);
         wk->work3D->ircSpriteSizes[0].x = pos2.x;
         wk->work3D->ircSpriteSizes[0].y = pos2.y;
         wk->work3D->ircSpriteSizes[0].z = pos2.z;
-        func_0201ab70(wk->mcss[3], &size);
+        MCSS_GetScale(wk->mcss[3], &size);
     }
     PokemonTradeIrcDemo_Frames(0xfc);
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x267)) {
@@ -139,12 +139,12 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
         PokemonTradeIrcDemo_StartMove(wk, 3);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x268)) {
-        func_0201ae2c(wk->mcss[3], 8, 8, 0, 0x7fff);
-        func_0201ae2c(wk->mcss[1], 8, 8, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[3], 8, 8, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[1], 8, 8, 0, 0x7fff);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x269)) {
-        func_0201ae2c(wk->mcss[3], 0, 0, 0, 0x7fff);
-        func_0201ae2c(wk->mcss[1], 0, 0, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[3], 0, 0, 0, 0x7fff);
+        MCSS_StartFade(wk->mcss[1], 0, 0, 0, 0x7fff);
     }
     if (PokemonTradeIrcDemo_Frames(0x267) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL &&
         wk->mcssMoves[3]->frame == 9) {

@@ -483,8 +483,8 @@ static void IrcBattleMatch_RecvPlayerInfo(int netId, int size, const void *data,
     RivalDataSave *rival;
 
     if (handle == func_02040440()) {
-        info = func_02017378(work->param->gameData, netId);
-        func_02008b34(data, info);
+        info = GameData_GetPlayerInfoByNetID(work->param->gameData, netId);
+        PlayerInfo_Copy(data, info);
         rival = getHollow_RivalData(GameData_GetSaveControl(work->param->gameData));
         Misc_AddMetTrainer(rival, getIDAsUInt(info));
     }
@@ -518,7 +518,7 @@ static void IrcBattleMatch_RecvFriendData(int netId, int size, const void *data,
 
     if (handle == func_02040440()) {
         if (netId != func_0203ffc4()) {
-            PlayerInfo *info = func_02017378(gameData, netId);
+            PlayerInfo *info = GameData_GetPlayerInfoByNetID(gameData, netId);
 
             work->friendResult = func_02011b30(gameData, info, data, work->heapId);
         }
@@ -560,7 +560,7 @@ static void IrcBattleMatch_RecvJoinAvenuePerson(int netId, int size, const void 
     if (handle == func_02040440()) {
         if (netId != func_0203ffc4()) {
             JoinAvenuePerson_SetParam((JoinAvenuePerson *)data, JOIN_AVE_PARAM_UNK_26, 4);
-            func_02010078(joinAvenue, gameData, (void *)data, 1);
+            JoinAvenue_Add(joinAvenue, gameData, (void *)data, 1);
         }
     }
 }
@@ -701,7 +701,7 @@ static void IrcBattleMatch_StateSendFriendData(IrcBattleMatch *work) {
     DWCFriendData data;
 
     if (work->mode == IRCBATTLEMATCH_MODE_FRIEND) {
-        func_0200a3c4(&GameData_GetWifiList(work->param->gameData)->myUserData, &data);
+        WifiList_CreateExchangeTokenFromUserData(&GameData_GetWifiList(work->param->gameData)->myUserData, &data);
         if (func_02042be8(func_02040440(), IRCMATCH_CMD_FRIEND_DATA, sizeof(data), &data)) {
             func_02040624(func_02040440(), IRCMATCH_TIMING_FRIEND_DATA, IRCMATCH_TIMING_GROUP);
             IrcBattleMatch_SetState(work, IrcBattleMatch_StateSendMac);
@@ -733,9 +733,9 @@ static void IrcBattleMatch_StateCheckVersions(IrcBattleMatch *work) {
             allSameGame = FALSE;
         }
         for (i = 0; i < count; i++) {
-            PlayerInfo *info = func_02017378(work->param->gameData, i);
+            PlayerInfo *info = GameData_GetPlayerInfoByNetID(work->param->gameData, i);
 
-            if (func_02008bfc(info) != VERSION_WHITE2 && func_02008bfc(info) != VERSION_BLACK2) {
+            if (PlayerInfo_GetVersion(info) != VERSION_WHITE2 && PlayerInfo_GetVersion(info) != VERSION_BLACK2) {
                 allSameGame = FALSE;
             }
         }
@@ -814,12 +814,12 @@ static void IrcBattleMatch_StateShowQuitPrompt(IrcBattleMatch *work) {
     IrcBattleMatch_ShowMessage(&msg, work);
     work->currentMsgId = currentMsgId;
     IrcBattleMatch_CreateYesNoMenu(work);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateQuitPromptAnswer);
 }
 
 static void IrcBattleMatch_StateSendJoinAvenue(IrcBattleMatch *work) {
-    func_02036dc0(&work->person, work->param->gameData);
+    JoinAvenuePerson_InitPlayer(&work->person, work->param->gameData);
     if (func_02042c18(func_02040440(), 0xff, IRCMATCH_CMD_JOIN_AVENUE, sizeof(work->person), &work->person, 1, FALSE,
                       TRUE)) {
         func_02040624(func_02040440(), IRCMATCH_TIMING_JOIN_AVENUE, IRCMATCH_TIMING_GROUP);
@@ -1056,7 +1056,7 @@ static void IrcBattleMatch_ShowFriendCount(u32 msgId, IrcBattleMatch *work) {
     }
     GFL_BitmapFill(BmpWin_GetBitmap(work->countWindow), 0xff);
     GFL_MsgDataLoadStrbuf(work->msgData, msgId, work->strbuf);
-    count = func_0200a150(GameData_GetWifiList(work->param->gameData));
+    count = WifiList_CountFriends(GameData_GetWifiList(work->param->gameData));
     WordSetNumber(work->wordSet, 0, count, 2, 1, TRUE);
     WordSetNumber(work->wordSet, 1, 32, 2, 1, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->strbufFormatted, work->strbuf);
@@ -1094,7 +1094,7 @@ static void IrcBattleMatch_FreeWindows(IrcBattleMatch *work) {
 static void IrcBattleMatch_InitGraphics(IrcBattleMatch *work) {
     GFL_BGSysCreate(work->heapId);
     BmpWin_InitAllocator(work->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
 }
 
 static void IrcBattleMatch_FreeGraphics(IrcBattleMatch *work) {
@@ -1116,7 +1116,7 @@ static void IrcBattleMatch_ShowConnectMessage(IrcBattleMatch *work) {
 
         IrcBattleMatch_ShowMessage(&msg, work);
     } else if (work->mode == IRCBATTLEMATCH_MODE_FRIEND) {
-        if (func_0200a150(GameData_GetWifiList(work->param->gameData)) == 32) {
+        if (WifiList_CountFriends(GameData_GetWifiList(work->param->gameData)) == 32) {
             IrcBattleMatchMsg msg = { IRCMATCH_MSG_FRIEND_ROSTER_FULL };
 
             IrcBattleMatch_ShowMessage(&msg, work);
@@ -1160,7 +1160,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     void *paletteFile;
     NNSG2dPaletteData *palette;
 
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     work->wordSet = GFL_WordSetSystemCreate(11, 200, work->heapId);
     IrcBattleMatch_InitGraphics(work);
     IrcBattleMatch_SetupBGs(work);
@@ -1189,7 +1189,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     ClActSys_Create(&data_02093f08, &sIrcBattleMatchVRAMConfig, work->heapId);
     work->actUnit = func_0204bf1c(40, 0, work->heapId);
     work->vblankTcb = GFL_VBlankTCBAdd(IrcBattleMatch_VBlank, work, 0);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     work->menuRes = AppTaskMenuRes_Create(6, 9, work->font, work->printQueue, work->heapId);
     IrcBattleMatch_LoadActorResources(work);
     if (work->mode != IRCBATTLEMATCH_MODE_MULTI) {
@@ -1224,7 +1224,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
 static void IrcBattleMatch_StateWaitFade(IrcBattleMatch *work) {
     if (GFL_FadeIsRunning()) {
         if (work->mode == IRCBATTLEMATCH_MODE_FRIEND &&
-            func_0200a150(GameData_GetWifiList(work->param->gameData)) == 32) {
+            WifiList_CountFriends(GameData_GetWifiList(work->param->gameData)) == 32) {
             IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitFriendFull);
             work->counter = 180;
             return;
@@ -1308,7 +1308,7 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
 }
 
 static void IrcBattleMatch_FreeScreen(IrcBattleMatch *work) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     IrcBattleMatch_FreeWindows(work);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, CHAR_POS(work->windowFrameChars), CHAR_SIZE(work->windowFrameChars));
@@ -1444,7 +1444,7 @@ static void IrcBattleMatch_StateShowQuitPromptConnect(IrcBattleMatch *work) {
     IrcBattleMatch_ShowMessage(&msg, work);
     work->currentMsgId = currentMsgId;
     IrcBattleMatch_CreateYesNoMenu(work);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     if (work->buttonMan != NULL) {
         GFL_BMN_Delete(work->buttonMan);
     }
@@ -1460,7 +1460,7 @@ static void IrcBattleMatch_StateShowConfirmPrompt(IrcBattleMatch *work) {
     IrcBattleMatch_ShowMessage(&msg, work);
     work->currentMsgId = currentMsgId;
     IrcBattleMatch_CreateYesNoMenu(work);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateConfirmAnswer);
 }
 
@@ -1509,7 +1509,7 @@ static void IrcBattleMatch_StateShowQuitPromptWaiting(IrcBattleMatch *work) {
     IrcBattleMatch_ShowMessage(&msg, work);
     work->currentMsgId = currentMsgId;
     IrcBattleMatch_CreateYesNoMenu(work);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     if (work->buttonMan != NULL) {
         GFL_BMN_Delete(work->buttonMan);
     }
@@ -1733,7 +1733,7 @@ static BOOL IrcBattleMatch_Main(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysMoveBG(4, 3, work->scrollY);
     work->scrollY--;
     func_0204b794();
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     if (GFL_NetErrCheck()) {
         GFL_NetErrMarkShown();
         work->param->result = IRCBATTLEMATCH_RESULT_QUIT;
@@ -1773,8 +1773,8 @@ static BOOL IrcBattleMatch_Exit(GameProc *proc, u32 *state, void *param, void *w
     GFL_TCBRemove(work->vblankTcb);
     func_0204bf98(work->actUnit);
     func_0204b758();
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     if (work->unk30C != NULL) {
         GFL_TCBRemove(work->unk30C);
         work->unk30C = NULL;

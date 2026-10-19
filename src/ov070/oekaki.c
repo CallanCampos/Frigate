@@ -556,11 +556,12 @@ static void Oekaki_LoadActorResources(OekakiWork *wk, ArcTool *arc) {
     wk->resources[OEKAKI_RES_MAIN].chars = func_0204b81c(arc, 3, FALSE, 0, HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_MAIN].palette = func_0204bba0(arc, 0, 0, 0, HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_MAIN].cellAnims = func_0204bde0(arc, 5, 8, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_COMMON].chars = func_0204b81c(commonArc, func_0202d814(), FALSE, 0, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_COMMON].chars =
+        func_0204b81c(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_COMMON].palette =
-        func_0204bbb8(commonArc, func_0202d810(), 0, 11 * 0x20, 0, 3, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_COMMON].cellAnims =
-        func_0204bde0(commonArc, func_0202d818(0), func_0202d81c(0), HEAPID_OEKAKI);
+        func_0204bbb8(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 11 * 0x20, 0, 3, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_COMMON].cellAnims = func_0204bde0(commonArc, AppMenuCommon_GetTouchBarCellFile(0),
+                                                               AppMenuCommon_GetTouchBarAnimFile(0), HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_SUB].chars = func_0204b81c(arc, 3, FALSE, 1, HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_SUB].palette = func_0204bba0(arc, 0, 1, 0, HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_SUB].cellAnims = func_0204bde0(arc, 5, 8, HEAPID_OEKAKI);
@@ -638,8 +639,8 @@ static void Oekaki_CreateWindows(OekakiWork *wk, GameProc *proc) {
     wk->drawWindow = BmpWin_CreateDynamic(1, 1, 2, 30, 15, 0, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->drawWindow), 2);
     wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_OEKAKI, HEAPID_OEKAKI, 32, 32);
-    wk->nameQueue = func_02021998(HEAPID_OEKAKI);
-    wk->printQueue = func_02021998(HEAPID_OEKAKI);
+    wk->nameQueue = PrintQueue_CreateDefault(HEAPID_OEKAKI);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_OEKAKI);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         wk->nameWindows[i] = BmpWin_CreateDynamic(4, 5, i * 4 + 3, 10, 2, 13, TRUE);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->nameWindows[i]), 0);
@@ -654,10 +655,10 @@ static void Oekaki_FreeWindows(OekakiWork *wk) {
 
     GFL_TCBExMgrFreeTasks(wk->tcbManager);
     GFL_TCBExMgrFree(wk->tcbManager);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
-    func_02021c44(wk->nameQueue);
-    func_02021a18(wk->nameQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
+    PrintQueue_Clear(wk->nameQueue);
+    PrintQueue_Free(wk->nameQueue);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         BmpWin_Free(wk->nameWindows[i]);
     }
@@ -1499,7 +1500,7 @@ static void Oekaki_PrintNames(BmpWin **windows, u16 color, OekakiWork *wk) {
             func_0204c124(wk->nameActors[i], TRUE);
         }
     }
-    func_02021c44(wk->nameQueue);
+    PrintQueue_Clear(wk->nameQueue);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         GFL_BitmapFillArea(BmpWin_GetBitmap(windows[i]), 0, 0, 80, 16, 0);
     }
@@ -1572,29 +1573,29 @@ static void Oekaki_PrintMessage(OekakiWork *wk, int messageId, BOOL stream) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->msgWindow), 15);
     BmpWin_DrawFrame(wk->msgWindow, FALSE, 1, 10);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
     }
     if (!stream) {
         PrintWindow_Print(&wk->msgPrint, wk->printQueue, 0, 0, wk->msgBuf, wk->font, OEKAKI_COLOR_TEXT);
     } else {
-        wk->stream = func_02022268(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, func_02017bcc(), wk->tcbManager, 1,
-                                   HEAPID_OEKAKI, 0xf0f);
+        wk->stream = PrintStream_Create(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, TextSpeed_GetCurrentWait(),
+                                        wk->tcbManager, 1, HEAPID_OEKAKI, 0xf0f);
     }
     BmpWin_TransferNow(wk->msgWindow);
 }
 
 static BOOL Oekaki_IsMessageDone(OekakiWork *wk) {
-    u32 state = func_020223b4(wk->stream);
+    u32 state = PrintStream_GetState(wk->stream);
 
     if (state == PRINT_STREAM_PAUSED) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-            func_020223bc(wk->stream);
+            PrintStream_Continue(wk->stream);
         }
         return FALSE;
     }
     if (state == PRINT_STREAM_DONE) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
         return TRUE;
     }
@@ -1826,8 +1827,8 @@ static void Oekaki_RecordMetTrainers(OekakiWork *wk) {
 static void Oekaki_FlushPrint(OekakiWork *wk) {
     int i;
 
-    func_02021a3c(wk->nameQueue);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->nameQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         PrintWindow_Flush(&wk->namePrint[i], wk->nameQueue);
     }

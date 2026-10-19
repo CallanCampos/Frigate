@@ -383,7 +383,7 @@ static BOOL TownMap_ProcInit(GameProc *proc, u32 *state, void *paramPtr, void *w
                            work->msgData, 0, 21, 24, 3, HEAPID_TOWNMAP);
         GFL_TextRndUpdateColorIndexLUT(15, 1, 0);
         TownMapMsgWin_Print(&work->msgWin, TownMap_Text_FlyWhere, 16, 0);
-        func_020232d8();
+        GFL_TextRndResetColorIndexLUT();
     }
     TownMapAppBar_Init(&work->appBar, work->param->mode, TownMapGraphic_GetUnit(work->graphic, TOWNMAP_UNIT_MAIN),
                        TownMapGraphic_GetBG(work->graphic, TOWNMAP_BG_BAR), 15, 8, gameData, HEAPID_TOWNMAP);
@@ -1007,7 +1007,7 @@ static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZone
 
         // Black City's place is followed by White Forest's, which is shown in its stead
         if (zone == ZONE_BLACK_CITY) {
-            switch (func_02017220(gameData)) {
+            switch (GameData_GetMyCity(gameData)) {
             case CITY_BLACK_CITY:
                 break;
             case CITY_WHITE_FOREST:
@@ -1617,7 +1617,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
 
     getAddressOfBeginningOfOccupants(joinAvenue);
     persons = JoinAvenue_GetPersonList(joinAvenue);
-    entries = func_02010054(joinAvenue);
+    entries = JoinAvenue_GetEntryList(joinAvenue);
     visitors = GameData_GetJoinAvenuePersonListPtr(info->gameData);
     GFL_BitmapFill(bitmap, 0);
     if (place != NULL) {
@@ -1669,11 +1669,11 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                 rank = JoinAvenue_GetParam(avenueInfo, 2, NULL);
                 record7F = RecordGet(records, 0x7f);
                 record80 = RecordGet(records, 0x80);
-                people = func_02038030(persons) + func_02037ed8(entries);
+                people = JoinAvenuePersonList_CountUsed(persons) + JoinAvenueEntryList_CountUsed(entries);
                 format = GFL_StrBufCreate(128, HEAPID_TOWNMAP);
 
                 if (*visitors != NULL) {
-                    people += func_02038030(*visitors);
+                    people += JoinAvenuePersonList_CountUsed(*visitors);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 3);
                 if (messageId != 0xffff) {

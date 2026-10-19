@@ -51,13 +51,13 @@ BOOL func_ov012_02155608(VM *vm, FieldScriptEnv *env) {
     gameData = FieldScriptEnv_GetGameData(env);
     save = GameData_GetSaveControl(gameData);
     trainerData = (Config *)getTrainerDataBlkAddress(save);
-    mode = func_02008a84(trainerData);
+    mode = Config_GetKanji(trainerData);
     if (mode == 0) {
         mode = 1;
     } else if (mode == 1) {
         mode = 0;
     }
-    func_02008a8c(trainerData, mode);
+    Config_SetKanji(trainerData, mode);
     return FALSE;
 }
 
@@ -71,7 +71,7 @@ BOOL func_ov012_02155638(VM *vm, FieldScriptEnv *env) {
     save = GameData_GetSaveControl(gameData);
     trainerData = (Config *)getTrainerDataBlkAddress(save);
     value = ScriptReadVar(vm, env);
-    *value = func_02008a84(trainerData);
+    *value = Config_GetKanji(trainerData);
     return FALSE;
 }
 
@@ -425,7 +425,7 @@ BOOL s00E2_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env) {
     Config *config = (Config *)getTrainerDataBlkAddress(save);
     u16 *value = ScriptReadVar(vm, env);
 
-    switch (func_02008ac8(config)) {
+    switch (Config_GetSaveBeforeIR(config)) {
     case 0:
         *value = 0;
         break;
@@ -469,14 +469,17 @@ BOOL func_ov012_02155d80(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = (func_0200ca50(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) & 1) ? TRUE : FALSE;
+    *result =
+        (TrainerGameInfo_GetStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) & 1)
+            ? TRUE
+            : FALSE;
     return FALSE;
 }
 
 BOOL func_ov012_02155db4(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
 
-    func_0200ca38(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item, 1);
+    TrainerGameInfo_AddStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item, 1);
     return FALSE;
 }
 
@@ -484,7 +487,8 @@ BOOL func_ov012_02155dd4(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    if (func_0200ca50(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) == 3) {
+    if (TrainerGameInfo_GetStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) ==
+        3) {
         *result = TRUE;
     } else {
         *result = FALSE;
@@ -500,7 +504,7 @@ BOOL s00EA_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env) {
 
     if (EventWork_FlagGet(eventWork, 0x960)) {
         save = GameData_GetSaveControl(gameData);
-        switch (func_020074ec(save, 8, HEAPID_GAMEEVENT)) {
+        switch (SaveControl_OpenExtraBlock(save, 8, HEAPID_GAMEEVENT)) {
         case 0:
             *result = 0;
             break;

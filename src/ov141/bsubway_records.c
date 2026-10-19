@@ -416,10 +416,11 @@ static void BSubwayRecords_LoadBG(BSubwayRecordsWork *wk) {
     GFL_BGSysLoadArcNCGRStatic(arc, 1, 1, 0, 0, TRUE, HEAPID_BSUBWAY_RECORDS);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 0, 1, 0, 0, TRUE, HEAPID_BSUBWAY_RECORDS);
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_BSUBWAY_RECORDS);
-    GFL_BGSysLoadArcNCGRStatic(uiArc, func_0202d824(), 1, 0, 0, FALSE, HEAPID_BSUBWAY_RECORDS);
-    loadBGScrToVramByFileNoReserveNegAlign(uiArc, func_0202d828(), 1, 0, 0, FALSE, HEAPID_BSUBWAY_RECORDS);
+    GFL_BGSysLoadArcNCGRStatic(uiArc, AppMenuCommon_GetBarBgCharFile(), 1, 0, 0, FALSE, HEAPID_BSUBWAY_RECORDS);
+    loadBGScrToVramByFileNoReserveNegAlign(uiArc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE,
+                                           HEAPID_BSUBWAY_RECORDS);
     offset = 0x1c0;
-    GFL_G2DIOLoadArcNCLR(uiArc, func_0202d820(), 0, 0, offset, 0x20, HEAPID_BSUBWAY_RECORDS);
+    GFL_G2DIOLoadArcNCLR(uiArc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0, offset, 0x20, HEAPID_BSUBWAY_RECORDS);
     GFL_BGSysSetScrPaletteNo(1, 0, 21, 32, 3, 14);
     GFL_BGSysLoadScr(1);
     GFL_ArcToolFree(uiArc);
@@ -449,9 +450,12 @@ static void BSubwayRecords_InitObjRes(BSubwayRecordsWork *wk) {
     wk->objRes[1] = func_0204b81c(wk->arc, 7, TRUE, CLACT_VRAM_BOTH, HEAPID_BSUBWAY_RECORDS);
     wk->objRes[0] = func_0204bba0(wk->arc, 10, CLACT_VRAM_BOTH, 0, HEAPID_BSUBWAY_RECORDS);
     wk->objRes[2] = func_0204bde0(wk->arc, 8, 9, HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[4] = func_0204b81c(uiArc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[3] = func_0204bbb8(uiArc, func_0202d810(), CLACT_VRAM_MAIN, 0x160, 0, 3, HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[5] = func_0204bde0(uiArc, func_0202d818(0), func_0202d81c(0), HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[4] =
+        func_0204b81c(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[3] = func_0204bbb8(uiArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x160, 0, 3,
+                                  HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[5] = func_0204bde0(uiArc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0),
+                                  HEAPID_BSUBWAY_RECORDS);
     GFL_ArcToolFree(uiArc);
 }
 
@@ -519,7 +523,7 @@ static void BSubwayRecords_InitText(BSubwayRecordsWork *wk) {
     int i;
 
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_BSUBWAY_RECORDS);
-    wk->printQueue = func_02021998(HEAPID_BSUBWAY_RECORDS);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_BSUBWAY_RECORDS);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Init(&wk->printWindows[i], wk->windows[i]);
     }
@@ -532,14 +536,14 @@ static void BSubwayRecords_InitText(BSubwayRecordsWork *wk) {
 }
 
 static void BSubwayRecords_FreeText(BSubwayRecordsWork *wk) {
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
 }
 
 static void BSubwayRecords_FlushText(BSubwayRecordsWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&wk->printWindows[i], wk->printQueue);
     }
@@ -559,7 +563,7 @@ static BOOL BSubwayRecords_StateFadeIn(BSubwayRecordsWork *wk) {
 static BOOL BSubwayRecords_StateInput(BSubwayRecordsWork *wk) {
     int input;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return TRUE;
     }
     input = BSubwayRecords_GetInput(wk);

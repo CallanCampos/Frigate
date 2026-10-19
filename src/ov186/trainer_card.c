@@ -192,7 +192,7 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->data = cardParam->shownData;
     wk->ownData = cardParam->data;
     wk->touchMode = func_0203d554();
-    wk->msgSpeed = func_02017bcc();
+    wk->msgSpeed = TextSpeed_GetCurrentWait();
     wk->frameType = 0;
     if (wk->data->clearMonth != 0) {
         wk->isCleared = TRUE;
@@ -352,7 +352,7 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
     }
     func_0204b794();
     PMSDraw_Main(wk->pmsDraw);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     if (wk->tcbl != NULL) {
         GFL_TCBExMgrUpdate(wk->tcbl);
     }
@@ -555,8 +555,9 @@ static void TrainerCard_LoadGraphics(TrainerCardWork *wk) {
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_TRAINER_CARD_GRA, 47, 3, 0, 0, FALSE, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_TRAINER_CARD_GRA, 18, 0, 0, 0x20, wk->heapId);
     TrainerCard_UnpackSign(wk->data->unk74, wk->signPixels);
-    GFL_BGSysLoadNCGRStatic(getUINarcIdx(), func_0202d824(), 4, 0, 0, FALSE, wk->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(getUINarcIdx(), func_0202d828(), 4, 0, 0, FALSE, wk->heapId);
+    GFL_BGSysLoadNCGRStatic(getUINarcIdx(), AppMenuCommon_GetBarBgCharFile(), 4, 0, 0, FALSE, wk->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(getUINarcIdx(), AppMenuCommon_GetBarScreenFile(), 4, 0, 0, FALSE,
+                                           wk->heapId);
     GFL_BGSysSetScrPaletteNo(4, 0, 21, 32, 3, 12);
     GFL_BGSysLoadScr(4);
 }

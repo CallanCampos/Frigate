@@ -158,7 +158,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
 
     work->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_4, heapId);
     work->menuFont = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    work->menuQueue = func_020219a8(0x1000, heapId);
+    work->menuQueue = PrintQueue_Create(0x1000, heapId);
     shortcut = SaveControl_GetShortcutSaveCore(GameData_GetSaveControl(gameData));
     SetupMenu(work, work->listPos, work->menuMsgData, work->menuFont, work->menuQueue, shortcut, work->clactActors,
               heapId);
@@ -187,8 +187,8 @@ void func_ov036_021bf004(void *app) {
     for (i = 0; i < ACTORS; i++) {
         func_0204c108(work->clactActors[i]);
     }
-    func_02021c44(work->menuQueue);
-    func_02021a18(work->menuQueue);
+    PrintQueue_Clear(work->menuQueue);
+    PrintQueue_Free(work->menuQueue);
     GFL_FontFree(work->menuFont);
     GFL_MsgDataFree(work->menuMsgData);
     func_0204bcd0(work->palette);
@@ -259,7 +259,7 @@ void func_ov036_021bf088(void *app) {
 u32 func_ov036_021bf198(void *app) {
     ShortcutMenuApp *work = app;
 
-    func_02021a3c(work->menuQueue);
+    PrintQueue_Main(work->menuQueue);
     return PrintDone(work);
 }
 
@@ -463,7 +463,8 @@ static BOOL PrintDone(ShortcutMenuApp *work) {
     PrintQueue *queue = work->queue;
     BOOL done = TRUE;
 
-    if (work->printWindow.flushPending && !func_02021c1c(queue, BmpWin_GetBitmap(work->printWindow.window))) {
+    if (work->printWindow.flushPending &&
+        !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(work->printWindow.window))) {
         BmpWin_FlushChar(work->printWindow.window);
         work->printWindow.flushPending = FALSE;
     }

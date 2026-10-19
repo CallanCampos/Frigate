@@ -88,7 +88,7 @@ static int (*sMyPokeSubSeqTable[])(WorldTradeWork *wk) = {
 };
 
 int WorldTrade_MyPoke_Init(WorldTradeWork *wk, int seq) {
-    PartyPkm *pkm = func_0200b4d0(wk->param->worldtrade_data);
+    PartyPkm *pkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
 
     MyPoke_InitWork(wk);
     MyPoke_BgInit();
@@ -318,7 +318,7 @@ static int MyPoke_SubSeqStart(WorldTradeWork *wk) {
 }
 
 static int MyPoke_SubSeqMain(WorldTradeWork *wk) {
-    PartyPkm *pkm = func_0200b4d0(wk->param->worldtrade_data);
+    PartyPkm *pkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
 
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || func_0203da48()) {
         MyPoke_SubSeqMessagePrint(wk, 5, 1, 0, 0xf0f, pkm);
@@ -381,7 +381,7 @@ static int MyPoke_SubSeqSelectWait(WorldTradeWork *wk) {
     if (ret == 1) {
         WorldTrade_SelBoxEnd(wk);
         ListMenuCore_FreeOptionList(wk->menuList);
-        pkm = func_0200b4d0(wk->param->worldtrade_data);
+        pkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         // A Pokémon with mail goes to the party, which must have room
         if (WorldTrade_PokemonMailCheck(pkm) && PokeParty_GetPkmCount(wk->param->myparty) == 6) {
             MyPoke_SubSeqMessagePrint(wk, 0x2a, 1, 0, 0xf0f, pkm);

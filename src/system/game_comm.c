@@ -345,17 +345,17 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
     PlayerInfo *info2;
     GameCommLogEntry *entry;
 
-    if (netId1 == func_020175cc(comm->gameData)) {
+    if (netId1 == GameData_GetNetID(comm->gameData)) {
         info1 = GetGameDataPlayerInfo(comm->gameData);
     } else {
-        info1 = func_02017378(comm->gameData, netId1);
+        info1 = GameData_GetPlayerInfoByNetID(comm->gameData, netId1);
     }
-    if (netId2 == func_020175cc(comm->gameData)) {
+    if (netId2 == GameData_GetNetID(comm->gameData)) {
         info2 = GetGameDataPlayerInfo(comm->gameData);
     } else {
-        info2 = func_02017378(comm->gameData, netId2);
+        info2 = GameData_GetPlayerInfoByNetID(comm->gameData, netId2);
     }
-    if (func_02008b5c(info1) == TRUE || func_02008b5c(info2) == TRUE) {
+    if (PlayerInfo_IsNameEmpty(info1) == TRUE || PlayerInfo_IsNameEmpty(info2) == TRUE) {
         return;
     }
 
@@ -387,7 +387,7 @@ void func_0202bf68(GameCommSys *comm, u32 netId1, u32 netId2) {
 }
 
 void func_0202bf7c(GameCommSys *comm) {
-    u32 netId = func_020175cc(comm->gameData);
+    u32 netId = GameData_GetNetID(comm->gameData);
 
     GameCommSys_LogPlayers(comm, netId, netId, 0x37);
 }

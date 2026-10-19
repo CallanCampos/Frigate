@@ -21,11 +21,11 @@ void WorldTradeData_Init(WorldTradeData *data) {
     MIi_CpuClearFast(0, data, sizeof(WorldTradeData));
 }
 
-u16 func_0200b4a8(WorldTradeData *data) {
+u16 WorldTradeData_GetFlag(WorldTradeData *data) {
     return data->flag;
 }
 
-void func_0200b4b0(WorldTradeData *data, u16 flag) {
+void WorldTradeData_SetFlag(WorldTradeData *data, u16 flag) {
     data->flag = flag;
 }
 
@@ -33,7 +33,7 @@ void WorldTradeData_GetPkm(WorldTradeData *data, PartyPkm *pkm) {
     MI_CpuCopy8(&data->pkm, pkm, PokeParty_GetPkmRawSize());
 }
 
-PartyPkm *func_0200b4d0(WorldTradeData *data) {
+PartyPkm *WorldTradeData_GetPkmPtr(WorldTradeData *data) {
     return &data->pkm;
 }
 

@@ -91,24 +91,24 @@ static const SaveBlockDef SAVEDATA_INIT[SAVE_BLOCK_MAX] = {
     { SAVE_BLOCK_BOX_TRAY + 23, getSizeofBox, initFullBox },
     { SAVE_BLOCK_BAG, BagSave_GetBlockSize, (SaveBlockInit)BagSave_Init },
     { SAVE_BLOCK_PARTY, PokeParty_GetSaveDataSize, (SaveBlockInit)PokeParty_Init },
-    { SAVE_BLOCK_TRAINER_DATA, getSizeofTrainerData, (SaveBlockInit)func_02008da4 },
+    { SAVE_BLOCK_TRAINER_DATA, getSizeofTrainerData, (SaveBlockInit)TrainerDataSave_Init },
     { SAVE_BLOCK_PLAYER, PlayerSave_GetBlockSize, (SaveBlockInit)PlayerSave_Init },
-    { SAVE_BLOCK_UNITY_TOWER_SURVEY, func_02009b5c, (SaveBlockInit)func_02009b64 },
+    { SAVE_BLOCK_UNITY_TOWER_SURVEY, UnityTower_GetSurveySaveSize, (SaveBlockInit)UnityTower_InitSurveySave },
     { SAVE_BLOCK_WIFI_LIST, getSizeofWifiData, (SaveBlockInit)initWifi },
-    { SAVE_BLOCK_PAL_PAD, func_0200a4b8, (SaveBlockInit)func_0200a4c0 },
-    { SAVE_BLOCK_CGEAR, func_02009854, (SaveBlockInit)func_02009858 },
-    { SAVE_BLOCK_TIMESIG, func_02009184, (SaveBlockInit)func_0200918c },
-    { SAVE_BLOCK_MYSTERY_GIFT, func_0200a5f0, (SaveBlockInit)func_0200a5f8 },
-    { SAVE_BLOCK_DREAM_WORLD, func_02009930, (SaveBlockInit)func_02009938 },
+    { SAVE_BLOCK_PAL_PAD, PalPadFriendList_GetSize, (SaveBlockInit)PalPadFriendList_Init },
+    { SAVE_BLOCK_CGEAR, CGearSave_GetSize, (SaveBlockInit)CGearSave_Init },
+    { SAVE_BLOCK_TIMESIG, TimeSigSave_GetSize, (SaveBlockInit)TimeSigSave_Init },
+    { SAVE_BLOCK_MYSTERY_GIFT, MysteryGiftSaveData_GetSize, (SaveBlockInit)MysteryGiftSaveData_Init },
+    { SAVE_BLOCK_DREAM_WORLD, DreamWorldSave_GetSize, (SaveBlockInit)DreamWorldSave_Init },
     { SAVE_BLOCK_CHATTER, PerapVoice_GetSize, (SaveBlockInit)initChatotChatter },
     { SAVE_BLOCK_ADVENTURE, getSizeofAdventureDataBlk, (SaveBlockInit)initAdventureDataBlk },
-    { SAVE_BLOCK_RECORDS, func_020093d0, (SaveBlockInit)initTrainerCardInfoBlk },
+    { SAVE_BLOCK_RECORDS, GameRecords_GetSize, (SaveBlockInit)initTrainerCardInfoBlk },
     { SAVE_BLOCK_PMS, PMSWordSave_GetSize, (SaveBlockInit)PMSWordSave_Init },
-    { SAVE_BLOCK_MAIL, func_020097a0, (SaveBlockInit)func_020097a8 },
+    { SAVE_BLOCK_MAIL, MailBox_GetSize, (SaveBlockInit)func_020097a8 },
     { SAVE_BLOCK_FIELD_ACTORS, ActorSave_GetBlockSize, (SaveBlockInit)ActorSave_Init },
-    { SAVE_BLOCK_MUSICAL, func_0200ac58, (SaveBlockInit)func_0200ac60 },
-    { SAVE_BLOCK_RESH_ZEK, func_0200af74, (SaveBlockInit)func_0200af78 },
-    { SAVE_BLOCK_TRAINER_LOG, func_0200b240, (SaveBlockInit)func_0200b248 },
+    { SAVE_BLOCK_MUSICAL, MusicalSave_GetSize, (SaveBlockInit)MusicalSave_Init },
+    { SAVE_BLOCK_RESH_ZEK, ReshZekSave_GetSize, (SaveBlockInit)ReshZekSave_Init },
+    { SAVE_BLOCK_TRAINER_LOG, TrainerLogSave_GetSize, (SaveBlockInit)TrainerLogSave_Init },
     { SAVE_BLOCK_EVENT_WORK, EventWork_GetBlockSize, (SaveBlockInit)EventWork_Init },
     { SAVE_BLOCK_WORLDTRADE, WorldTradeData_GetBlockSize, (SaveBlockInit)WorldTradeData_Init },
     { SAVE_BLOCK_TOURNAMENT, getSizeofTourneyBlock, clearTournamentBlock },
@@ -124,19 +124,19 @@ static const SaveBlockDef SAVEDATA_INIT[SAVE_BLOCK_MAX] = {
     { SAVE_BLOCK_BSUBWAY_PLAY, BSubwayPlayData_GetSize, (SaveBlockInit)BSubwayPlayData_Init },
     { SAVE_BLOCK_BSUBWAY_SCORE, BSubwayScoreData_GetSize, (SaveBlockInit)BSubwayScoreData_Init },
     { SAVE_BLOCK_BSUBWAY_3A, BSubwayWifiData_GetSize, (SaveBlockInit)BSubwayWifiData_Init },
-    { SAVE_BLOCK_RECORD, func_0200f29c, (SaveBlockInit)func_0200f2a0 },
+    { SAVE_BLOCK_RECORD, RecordSave_GetSize, (SaveBlockInit)RecordSave_Init },
     { SAVE_BLOCK_SYMBOL, getSizeofNpcData, (SaveBlockInit)initNpcData },
-    { SAVE_BLOCK_SURVEY, func_0200ec00, (SaveBlockInit)func_0200ec08 },
+    { SAVE_BLOCK_SURVEY, SurveySave_GetSize, (SaveBlockInit)SurveySave_Init },
     { SAVE_BLOCK_UNITY_TOWER_FLOOR, UnityTowerSave_GetBlockSize, (SaveBlockInit)UnityTowerSave_Init },
-    { SAVE_BLOCK_TRIAL_HOUSE, func_0200f19c, (SaveBlockInit)func_0200f1a0 },
+    { SAVE_BLOCK_TRIAL_HOUSE, TrialHouseSave_GetSize, (SaveBlockInit)TrialHouseSave_Init },
     { SAVE_BLOCK_40, HallOfFameTeam_GetSize, (SaveBlockInit)HallOfFameTeam_Init },
     { SAVE_BLOCK_TRADED_POKEMON, TradedPokemonSave_GetSize, (SaveBlockInit)TradedPokemonSave_Init },
     { SAVE_BLOCK_MISC, getSizeofHollow_RivalData, (SaveBlockInit)clearHollowRivalData },
-    { SAVE_BLOCK_JOIN_AVENUE, func_0200fffc, (SaveBlockInit)func_02010004 },
+    { SAVE_BLOCK_JOIN_AVENUE, JoinAvenueSave_GetSize, (SaveBlockInit)JoinAvenueSave_Init },
     { SAVE_BLOCK_MEDAL_BOX, MedalBox_GetBlockSize, (SaveBlockInit)MedalBox_Init },
-    { SAVE_BLOCK_KEY_DATA, func_02010230, (SaveBlockInit)func_02010234 },
-    { SAVE_BLOCK_FUNFEST, func_02010dc0, (SaveBlockInit)func_02010dc4 },
-    { SAVE_BLOCK_POKEWOOD, func_02010ff4, (SaveBlockInit)func_02010ffc },
+    { SAVE_BLOCK_KEY_DATA, KeyDataSave_GetSize, (SaveBlockInit)KeyDataSave_Init },
+    { SAVE_BLOCK_FUNFEST, FestRecords_GetSize, (SaveBlockInit)FestRecords_Init },
+    { SAVE_BLOCK_POKEWOOD, PokewoodSave_GetSize, (SaveBlockInit)PokewoodSave_Init },
     { SAVE_BLOCK_DREAM_RADAR, getDreamRadarSaveSize, (SaveBlockInit)initDreamRadarSave },
 };
 
@@ -158,7 +158,7 @@ static const SaveBlockDef sExtraBattleRec3[] = {
 };
 
 static const SaveBlockDef sExtraCGearPicture[] = {
-    { 0, func_0200ce50, (SaveBlockInit)func_0200ce58 },
+    { 0, CGearPictureSave_GetSize, (SaveBlockInit)CGearPictureSave_Init },
 };
 
 static const SaveBlockDef sExtraBattleExamination[] = {
@@ -166,11 +166,11 @@ static const SaveBlockDef sExtraBattleExamination[] = {
 };
 
 static const SaveBlockDef sExtraMusicalDist[] = {
-    { 0, func_0200cc94, func_0200cc9c },
+    { 0, MusicalDist_GetSaveSize, MusicalDist_InitBlock },
 };
 
 static const SaveBlockDef sExtraPokedexSkin[] = {
-    { 0, func_0200f164, func_0200f16c },
+    { 0, PokedexSkinSave_GetSize, PokedexSkinSave_Init },
 };
 
 static const SaveBlockDef sExtraHallOfFame[] = {
@@ -182,15 +182,15 @@ static const SaveBlockDef sExtraPokewood[] = {
 };
 
 static const SaveBlockDef sExtraTournament0[] = {
-    { 0, func_0201040c, func_02010414 },
+    { 0, WbtDownloadData_GetSize, WbtDownloadData_Clear },
 };
 
 static const SaveBlockDef sExtraTournament1[] = {
-    { 0, func_0201040c, func_02010414 },
+    { 0, WbtDownloadData_GetSize, WbtDownloadData_Clear },
 };
 
 static const SaveBlockDef sExtraTournament2[] = {
-    { 0, func_0201040c, func_02010414 },
+    { 0, WbtDownloadData_GetSize, WbtDownloadData_Clear },
 };
 
 static const SaveBlockDef sExtraBlock20[] = {

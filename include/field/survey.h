@@ -36,11 +36,11 @@ struct SurveyTextWork {
 
 // The hours since the survey started, up to 24
 u16 detectLengthSinceLastSession(SaveControl *save);
-void func_0200ca84(TrainerGameInfoSave *info, u8 value);
-void func_0200ca94(TrainerGameInfoSave *info, u8 index, u8 value);
-void func_0200caa8(TrainerGameInfoSave *info, u8 index, u16 value);
+void TrainerGameInfo_SetSurveyQuestion(TrainerGameInfoSave *info, u8 value);
+void TrainerGameInfo_SetSurveyAnswer(TrainerGameInfoSave *info, u8 index, u8 value);
+void TrainerGameInfo_SetSurveyCount(TrainerGameInfoSave *info, u8 index, u16 value);
 // Whether the survey's answer of the index has been given
-BOOL func_0200ca9c(TrainerGameInfoSave *info, u8 index);
+BOOL TrainerGameInfo_GetSurveyCount(TrainerGameInfoSave *info, u8 index);
 BOOL func_0201148c(u8 question);
 BOOL func_ov012_0216538c(GameData *gameData);
 // Overlay 12's survey.c: the questions of the surveys, and whether one is done

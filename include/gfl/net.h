@@ -185,48 +185,49 @@ BOOL func_02040c94(int netId);
 void GFL_NetHeapInit(void);
 void GFL_NetErrInit(u32 heapId);
 // Finds the network's error, each frame
-void func_02011c78(void);
+void GFL_NetErrUpdate(void);
 // What the game is to do about the network's error, if there is one: 1 to go on, 2 to end the connection
 BOOL GFL_NetErrCheck(void);
 void GFL_NetErrMarkShown(void);
 BOOL GFL_NetErrShow(u32 a0);
 // Shows the fatal error screen for a Wi-Fi error with the message given
-void func_02011d04(u32 message);
+void GFL_NetErrShowWifi(u32 message);
 // GFL_NetErrShow(1)
 void func_02011d20(void);
 // Records a Wi-Fi error with the message given, to show it
-void func_020120f0(u32 message);
+void GFL_NetErrRecordWifi(u32 message);
 // The message for a server's result
-u32 func_02011d2c(int result);
-// Whether func_02011de0 leaves the screens dark, for the caller to set the brightness with func_02011da4
-void func_02011d8c(BOOL keepDark);
-void func_02011d98(void);
-void func_02011da4(void);
+u32 GFL_NetErrGetServerMessage(int result);
+// Whether GFL_NetErrShowScreen leaves the screens dark, for the caller to set the brightness with
+// GFL_NetErrApplyBrightness
+void GFL_NetErrSetKeepDark(BOOL keepDark);
+void GFL_NetErrClearKeepDark(void);
+void GFL_NetErrApplyBrightness(void);
 // Shows the error screen until A or B is pressed, with the wireless icon
-void func_02011de0(void);
+void GFL_NetErrShowScreen(void);
 // Whether the error was handled, after shutting the connection down
-BOOL func_02012154(void);
-void func_02012144(void);
+BOOL GFL_NetErrShutdown(void);
+void GFL_NetErrClear(void);
 // The state of the wireless connections, as bits: 0x2 a local wireless one, 0x3c the signal, 0x3c0 Wi-Fi
-u32 func_02012be4(WifiList *wifiList);
-void *func_02012908(int num, HeapID heapId);
-void func_02012994(void *work);
-void func_02012a4c(void);
+u32 WihDwc_GetStatus(WifiList *wifiList);
+void *WihDwc_Create(int num, HeapID heapId);
+void WihDwc_Destroy(void *work);
+void WihDwc_TickTimers(void);
 void GFL_NetErrAbort(void);
-void func_02012050(void);
+void GFL_NetErrRecord(void);
 // Shows the error screen for an assertion that failed
 void AssertFailErrorDisp(void);
 // The wireless signal level of the DS Download Play, and the record of the best level a scan saw, which it sets and
 // clears
-u16 func_02012ea0(void);
-void func_02012ebc(u8 linkLevel);
+u16 WihDwc_GetLinkLevel(void);
+void WihDwc_SetBestLinkLevel(u8 linkLevel);
 void func_02012edc(void);
 
 // The device table for a GFL_NET_TYPE_*, from outside the library
-const GFLNetDevTable *func_020116c0(int type);
-void func_02011778(int type);
+const GFLNetDevTable *NetDefine_LoadDevice(int type);
+void NetDefine_UnloadDevice(int type);
 // GFL_SndBGMSetVolume, unless a connection is up and overlay 11's func_ov011_02151dec returns TRUE
-void func_02011bdc(u16 trackMask, s32 volume);
+void NetBgmVolume_Set(u16 trackMask, s32 volume);
 
 // net.c: starts and ends the network, and passes calls to the device and the other parts of the library
 void func_020425a0(int a0, int a1, HeapID parentHeapId, HeapID heapId);

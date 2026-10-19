@@ -336,7 +336,7 @@ ZukanInfo *func_ov296_0219d768(HeapID heapId, u16 species, u16 form, u16 sex, u1
     info->bgPriority = bgPriority;
     info->unit = unit;
     info->font = font;
-    info->printQueue = func_02021998(info->heapId);
+    info->printQueue = PrintQueue_CreateDefault(info->heapId);
     info->givenMsgs[0] = msgData0;
     info->givenMsgs[1] = msgData1;
     info->givenMsgs[2] = msgData2;
@@ -488,8 +488,8 @@ void func_ov296_0219dbcc(ZukanInfo *info) {
     GFL_BGSysFreeCharMemory(info->backBG, CHAR_POS(info->backChars), CHAR_SIZE(info->backChars));
     GFL_BGSysFreeCharMemory(info->midBG, CHAR_POS(info->midChars), CHAR_SIZE(info->midChars));
     ZukanInfo_FreeResources(info);
-    func_02021c44(info->printQueue);
-    func_02021a18(info->printQueue);
+    PrintQueue_Clear(info->printQueue);
+    PrintQueue_Free(info->printQueue);
     GFL_HeapFree(info);
 }
 
@@ -564,7 +564,7 @@ void func_ov296_0219dc74(ZukanInfo *info) {
     if (info->mode == ZUKAN_INFO_MODE_MAIN || info->mode == ZUKAN_INFO_MODE_DETAIL) {
         ZukanInfo_FlushWindows(info);
     }
-    func_02021a3c(info->printQueue);
+    PrintQueue_Main(info->printQueue);
 }
 
 void func_ov296_0219ddcc(ZukanInfo *info) {
@@ -822,7 +822,7 @@ static void ZukanInfo_InitWindows(ZukanInfo *info) {
 static void ZukanInfo_FreeWindows(ZukanInfo *info) {
     int i;
 
-    func_02021c44(info->printQueue);
+    PrintQueue_Clear(info->printQueue);
     for (i = 0; i < ZUKAN_INFO_WINDOW_COUNT; i++) {
         info->flushed[i] = TRUE;
         BmpWin_Free(info->windows[i]);
@@ -859,7 +859,7 @@ static void ZukanInfo_PrintStrbuf(HeapID heapId, BmpWin *window, PrintQueue *pri
         left = (GFL_BitmapGetWidth(bitmap) - width) / 2;
         break;
     }
-    func_02021c7c(printQueue, bitmap, left, y, formatted, font, color);
+    PrintQueue_PrintColor(printQueue, bitmap, left, y, formatted, font, color);
 
     if (wordSet != NULL) {
         GFL_StrBufFree(formatted);
@@ -924,8 +924,8 @@ static void ZukanInfo_PrintEntry(ZukanInfo *info) {
     }
 
     name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, info->species);
-    func_02021c7c(info->printQueue, BmpWin_GetBitmap(info->windows[ZUKAN_INFO_WINDOW_NAME]), 0x30, 5, name, info->font,
-                  COLOR_LABEL);
+    PrintQueue_PrintColor(info->printQueue, BmpWin_GetBitmap(info->windows[ZUKAN_INFO_WINDOW_NAME]), 0x30, 5, name,
+                          info->font, COLOR_LABEL);
     GFL_StrBufFree(name);
 
     messageId = 0;
@@ -1056,7 +1056,7 @@ static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, u32 language) {
 static void ZukanInfo_ClearWindows(ZukanInfo *info) {
     int i;
 
-    func_02021c44(info->printQueue);
+    PrintQueue_Clear(info->printQueue);
     for (i = 0; i < ZUKAN_INFO_WINDOW_COUNT; i++) {
         info->flushed[i] = TRUE;
         GFL_BitmapFill(BmpWin_GetBitmap(info->windows[i]), 0);
@@ -1067,7 +1067,7 @@ static void ZukanInfo_FlushWindows(ZukanInfo *info) {
     int i;
 
     for (i = 0; i < ZUKAN_INFO_WINDOW_COUNT; i++) {
-        if (!info->flushed[i] && !func_02021c1c(info->printQueue, BmpWin_GetBitmap(info->windows[i]))) {
+        if (!info->flushed[i] && !PrintQueue_IsBitmapPending(info->printQueue, BmpWin_GetBitmap(info->windows[i]))) {
             BmpWin_Transfer(info->windows[i]);
             info->flushed[i] = TRUE;
         }
@@ -1198,8 +1198,9 @@ static void ZukanInfo_InitTypeIcons(ZukanInfo *info) {
         }
     }
     info->typeSlot = 0;
-    info->typePalette = func_0204bbb8(arc, func_0202d7e4(), draw, 0x40, 0, 3, info->heapId);
-    info->typeCellAnims = func_0204bde0(arc, func_0202d7f8(2), func_0202d7fc(2), info->heapId);
+    info->typePalette = func_0204bbb8(arc, AppMenuCommon_GetTypeIconPaletteFile(), draw, 0x40, 0, 3, info->heapId);
+    info->typeCellAnims =
+        func_0204bde0(arc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), info->heapId);
 
     if (info->mode == ZUKAN_INFO_MODE_DETAIL && info->engine == 0) {
         setup.x = 0;
@@ -1211,10 +1212,10 @@ static void ZukanInfo_InitTypeIcons(ZukanInfo *info) {
         info->shownTypes[0] = TYPE_NULL;
         info->shownTypes[1] = TYPE_NULL;
         for (i = 0; i < TYPE_NULL; i++) {
-            info->allTypeChars[i] = func_0204b81c(arc, func_0202d7f4(i), FALSE, draw, info->heapId);
+            info->allTypeChars[i] = func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, draw, info->heapId);
             info->allTypeActors[i] = func_0204c040(info->unit, info->allTypeChars[i], info->typePalette,
                                                    info->typeCellAnims, &setup, surface, info->heapId);
-            func_0204c378(info->allTypeActors[i], func_0202d7e8(i), TRUE);
+            func_0204c378(info->allTypeActors[i], AppMenuCommon_GetTypeIconPaletteIndex(i), TRUE);
             func_0204c438(info->allTypeActors[i], 2);
             func_0204c318(info->allTypeActors[i], 1);
             func_0204c124(info->allTypeActors[i], FALSE);
@@ -1326,14 +1327,15 @@ static void ZukanInfo_ShowTypesInGameLanguage(ZukanInfo *info, u32 type1, u32 ty
         for (i = 0; i < 2; i++) {
             info->typeChars[slot][i] = -1;
             if (types[i] != TYPE_NULL) {
-                info->typeChars[slot][i] = func_0204b81c(arc, func_0202d7f4(types[i]), FALSE, draw, info->heapId);
+                info->typeChars[slot][i] =
+                    func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(types[i]), FALSE, draw, info->heapId);
             }
         }
         for (i = 0; i < 2; i++) {
             if (info->typeChars[slot][i] != -1) {
                 info->typeActors[slot][i] = func_0204c040(info->unit, info->typeChars[slot][i], info->typePalette,
                                                           info->typeCellAnims, &setups[i], surface, info->heapId);
-                func_0204c378(info->typeActors[slot][i], func_0202d7e8(types[i]), TRUE);
+                func_0204c378(info->typeActors[slot][i], AppMenuCommon_GetTypeIconPaletteIndex(types[i]), TRUE);
                 func_0204c438(info->typeActors[slot][i], 2);
                 func_0204c318(info->typeActors[slot][i], 1);
             }
@@ -1374,7 +1376,8 @@ static void ZukanInfo_ShowTypesInLanguage(ZukanInfo *info, u32 type1, u32 type2,
         info->typeChars[slot][i] = -1;
         type = types[i];
         if (type != TYPE_NULL) {
-            info->typeChars[slot][i] = func_0204b81c(arc, func_0202d7f4(type), FALSE, draw, info->heapId);
+            info->typeChars[slot][i] =
+                func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, draw, info->heapId);
             column = sTypeIconTiles[type][1] << 7;
             row = sTypeIconTiles[type][0] << 11;
             func_0204bab8(info->typeChars[slot][i], &tiles[row + column], 0x80, 0, draw);
@@ -1387,7 +1390,7 @@ static void ZukanInfo_ShowTypesInLanguage(ZukanInfo *info, u32 type1, u32 type2,
         if (info->typeChars[slot][i] != -1) {
             info->typeActors[slot][i] = func_0204c040(info->unit, info->typeChars[slot][i], info->typePalette,
                                                       info->typeCellAnims, &setups[i], surface, info->heapId);
-            func_0204c378(info->typeActors[slot][i], func_0202d7e8(types[i]), TRUE);
+            func_0204c378(info->typeActors[slot][i], AppMenuCommon_GetTypeIconPaletteIndex(types[i]), TRUE);
             func_0204c438(info->typeActors[slot][i], 2);
             func_0204c318(info->typeActors[slot][i], 1);
         }

@@ -91,7 +91,8 @@ void func_ov137_021f1d04(ResortNPC *npc, BOOL visible) {
     u32 index = 0;
     FieldActor *actor;
     while (NextActor(npc->setup.mmSys, &actor, &index) == TRUE) {
-        if (func_ov137_021f1f0c(GetActorUID(actor)) && GetActorZoneID(actor) == func_0203950c(npc->setup.zone)) {
+        if (func_ov137_021f1f0c(GetActorUID(actor)) &&
+            GetActorZoneID(actor) == ResortLayout_GetZoneId(npc->setup.zone)) {
             SetActorHidden(actor, !visible);
         }
     }
@@ -127,7 +128,7 @@ static void func_ov137_021f1d7c(ResortNPC *npc) {
             zoneNpc.areaH = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_AREA_H);
             func_ov012_021682c0(&zoneNpc, ResortBinary_Get(npc->table, i, RESORT_NPC_COL_X),
                                 ResortBinary_Get(npc->table, i, RESORT_NPC_COL_Z), 0);
-            CreateNewActorByEntityNoWKOBJCODE(npc->setup.mmSys, &zoneNpc, func_0203950c(npc->setup.zone));
+            CreateNewActorByEntityNoWKOBJCODE(npc->setup.mmSys, &zoneNpc, ResortLayout_GetZoneId(npc->setup.zone));
             npc->count++;
         }
     }
@@ -138,7 +139,8 @@ static u32 func_ov137_021f1e90(ResortNPC *npc, BOOL stop) {
     FieldActor *actor;
     u32 count = 0;
     while (NextActor(npc->setup.mmSys, &actor, &index) == TRUE) {
-        if (func_ov137_021f1f0c(GetActorUID(actor)) && GetActorZoneID(actor) == func_0203950c(npc->setup.zone)) {
+        if (func_ov137_021f1f0c(GetActorUID(actor)) &&
+            GetActorZoneID(actor) == ResortLayout_GetZoneId(npc->setup.zone)) {
             if (IsActorFlag16(actor)) {
                 count++;
             } else if (stop) {

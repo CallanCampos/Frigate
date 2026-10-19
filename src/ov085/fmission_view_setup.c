@@ -357,10 +357,10 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
     SaveControl *save;
     PlayerInfo *info;
 
-    view->beaconStatus = func_020174d4(view->gameData);
-    view->newLog = func_020146fc(view->festival);
+    view->beaconStatus = GameData_GetBeaconStatus(view->gameData);
+    view->newLog = LinkFestival_GetLog(view->festival);
     view->log = func_02014708(view->festival);
-    view->passPowers = func_02014710(view->festival);
+    view->passPowers = LinkFestival_GetPassPowers(view->festival);
     view->logCount = FMissionLogFV_GetCount(view->log);
     view->logTop = FMissionLogFV_GetTop(view->log);
     if (view->logCount < FMISSION_VIEW_PANEL_COUNT) {
@@ -402,11 +402,11 @@ static void FMissionViewSetup_InitSystems(FMissionView *view) {
     view->fade = PaletteFade_Create(view->heapId);
     PaletteFade_AllocBuffer(view->fade, PALFADE_BUFFER_SUB_BG, 0x1c0, view->heapId);
     PaletteFade_AllocBuffer(view->fade, PALFADE_BUFFER_SUB_OBJ, 0x200, view->heapId);
-    view->printQueue = func_02021998(view->heapId);
-    func_02021a20(view->printQueue, TRUE);
-    func_02021a34(view->printQueue, 500);
+    view->printQueue = PrintQueue_CreateDefault(view->heapId);
+    PrintQueue_SetQueueAlways(view->printQueue, TRUE);
+    PrintQueue_SetTimeLimit(view->printQueue, 500);
     view->font = func_ov036_0218799c(Field_GetMsgBGSys(view->field));
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     view->wordSet = GFL_WordSetSystemCreateDefault(view->heapId);
     view->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_FMISSION_VIEW_SETUP, view->heapId);
     view->tmpStr = GFL_StrBufCreate(217, view->heapId);
@@ -420,9 +420,9 @@ static void FMissionViewSetup_FreeSystems(FMissionView *view) {
     GFL_StrBufFree(view->tmpStr);
     GFL_MsgDataFree(view->msgData);
     GFL_WordSetSystemFree(view->wordSet);
-    func_02021c44(view->printQueue);
-    func_02021a18(view->printQueue);
-    func_020232d8();
+    PrintQueue_Clear(view->printQueue);
+    PrintQueue_Free(view->printQueue);
+    GFL_TextRndResetColorIndexLUT();
     PaletteFade_FreeBuffer(view->fade, PALFADE_BUFFER_SUB_OBJ);
     PaletteFade_FreeBuffer(view->fade, PALFADE_BUFFER_SUB_BG);
     PaletteFade_Free(view->fade);

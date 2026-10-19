@@ -775,13 +775,13 @@ static void ZukanHabitat_SeqButton(ZukanHabitatWork *wk) {
     } else if (wk->action == ACTION_INFO) {
         actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO);
         ZukanHabitat_SetResult(wk, ZUKAN_HABITAT_RESULT_INFO);
-        func_02010d90(wk->habitat, (u16)wk->type);
-        func_02010d80(wk->habitat, (u16)wk->season);
+        ZukanHabitatSave_SetType(wk->habitat, (u16)wk->type);
+        ZukanHabitatSave_SetSeason(wk->habitat, (u16)wk->season);
     }
 
     switch (wk->step) {
     case 0:
-        func_02010d70(wk->habitat, ZukanHabitat_GetArea(wk)->zone);
+        ZukanHabitatSave_SetZone(wk->habitat, ZukanHabitat_GetArea(wk)->zone);
         if (wk->action == ACTION_EXIT) {
             func_0204c488(actor, 8);
             GFL_SndSEPlay(SEQ_SE_CLOSE1);
@@ -792,7 +792,7 @@ static void ZukanHabitat_SeqButton(ZukanHabitatWork *wk) {
             int species = ZukanHabitat_GetSpecies(wk, wk->cursor);
 
             if (species >= 0) {
-                func_0200d200(wk->pokedex, species);
+                PokeDex_SetLastSpecies(wk->pokedex, species);
             }
             func_0204c488(actor, 29);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -883,7 +883,7 @@ static void ZukanHabitat_SeqChangeArea(ZukanHabitatWork *wk) {
 
     switch (wk->step) {
     case 0:
-        wk->season = func_02010d88(wk->habitat);
+        wk->season = ZukanHabitatSave_GetSeason(wk->habitat);
         wk->type = wk->chosenType;
         if (wk->action == ACTION_UP) {
             wk->area--;
@@ -932,7 +932,7 @@ static void ZukanHabitat_UpdateStamp(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
     ClActor *actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_STAMP);
 
-    switch (func_02010cc4(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone), wk->type)) {
+    switch (ZukanHabitatSave_GetHabitatField(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone), wk->type)) {
     case AWARD_NONE:
         func_0204c124(actor, FALSE);
         break;
@@ -1153,7 +1153,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
             GFL_StrBufFree(strbuf);
             GFL_SndBGMPush();
             GFL_SndBGMPlay(SEQ_ME_ZUKAN_01, 0xffff);
-            func_02010d08(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone));
+            ZukanHabitatSave_SetHabitatFlag(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone));
             wk->step++;
         } else {
             wk->step = 3;
@@ -1177,7 +1177,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
             award = ZukanHabitat_GetAward(wk);
             habitat = ZukanHabitat_GetHabitatIndex(area->zone);
             for (type = TYPE_LAND; type < TYPE_COUNT; type++) {
-                func_02010d14(wk->habitat, habitat, type, AWARD_CAUGHT);
+                ZukanHabitatSave_SetHabitatField(wk->habitat, habitat, type, AWARD_CAUGHT);
             }
             if (award != AWARD_NONE) {
                 wk->step++;
@@ -1215,7 +1215,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
         if (wk->award != AWARD_AREA) {
             int habitat = ZukanHabitat_GetHabitatIndex(area->zone);
 
-            func_02010d14(wk->habitat, habitat, wk->type, wk->award);
+            ZukanHabitatSave_SetHabitatField(wk->habitat, habitat, wk->type, wk->award);
         }
         ZukanHabitat_UpdateNewMarks(wk);
         wk->step++;
@@ -1362,9 +1362,9 @@ static void ZukanHabitat_LoadSpecies(ZukanHabitatWork *wk) {
                 u32 form;
                 u32 rare;
 
-                func_0200d3c8(wk->pokedex, species->species, &sex, &rare, &form, HEAPID_ZUKAN_HABITAT);
-                if (func_0200d8d4(wk->pokedex, species->species, sex, rare, species->other[wk->season][wk->type]) ==
-                    TRUE) {
+                PokeDex_GetShownSexRareForm(wk->pokedex, species->species, &sex, &rare, &form, HEAPID_ZUKAN_HABITAT);
+                if (PokeDex_HasSeenVariant(wk->pokedex, species->species, sex, rare,
+                                           species->other[wk->season][wk->type]) == TRUE) {
                     form = species->other[wk->season][wk->type];
                 }
                 ZukanHabitatGraphic_RequestIcon(&wk->graphic, species->species, form, sex, count);
@@ -1572,8 +1572,8 @@ static void ZukanHabitat_LoadSave(ZukanHabitatWork *wk) {
     int i;
     GameData *gameData = wk->param->gameData;
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
-    ZukanHabitatSave *habitat = func_02010cb8(GameData_GetSaveControl(gameData));
-    u16 zone = func_02010d78(habitat);
+    ZukanHabitatSave *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
+    u16 zone = ZukanHabitatSave_GetZone(habitat);
 
     wk->pokedex = pokedex;
     wk->habitat = habitat;
@@ -1584,8 +1584,8 @@ static void ZukanHabitat_LoadSave(ZukanHabitatWork *wk) {
             wk->area = i;
         }
     }
-    wk->chosenType = func_02010d98(wk->habitat);
-    wk->season = func_02010d88(wk->habitat);
+    wk->chosenType = ZukanHabitatSave_GetType(wk->habitat);
+    wk->season = ZukanHabitatSave_GetSeason(wk->habitat);
     wk->type = wk->chosenType;
 }
 
@@ -1604,7 +1604,8 @@ static int ZukanHabitat_GetSpecies(ZukanHabitatWork *wk, u8 cell) {
 static u32 ZukanHabitat_GetAward(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
 
-    if (area->complete == TRUE && func_02010cfc(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone)) == FALSE) {
+    if (area->complete == TRUE &&
+        ZukanHabitatSave_IsHabitatFlagSet(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone)) == FALSE) {
         return AWARD_AREA;
     }
     return ZukanHabitat_GetTypeAward(wk, wk->type);
@@ -1612,7 +1613,7 @@ static u32 ZukanHabitat_GetAward(ZukanHabitatWork *wk) {
 
 static u32 ZukanHabitat_GetTypeAward(ZukanHabitatWork *wk, u32 type) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
-    int done = func_02010cc4(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone), type);
+    int done = ZukanHabitatSave_GetHabitatField(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone), type);
     u32 *state = area->states;
 
     state += type;

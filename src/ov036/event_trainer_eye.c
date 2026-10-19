@@ -578,7 +578,7 @@ static BOOL CheckTrainerAlreadyDefeated(Field *field, FieldActor *actor) {
     }
     index = GetNPCTrainerID(actor) - 0xb0;
     keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
-    return func_02010288(keyData, func_020102d4(keyData), index);
+    return KeyDataSave_IsTrainerDefeated(keyData, KeyDataSave_GetFloorInArea(keyData), index);
 }
 
 static void InitFieldScriptTrainerSetup(TrainerClashData *data, FieldActor *actor, int range, u16 dir) {

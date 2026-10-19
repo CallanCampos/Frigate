@@ -155,8 +155,9 @@ ZukanNickname *ZukanNickname_Create(HeapID heapId, PartyPkm *pkm, StrBuf *boxMes
     nickname->messageWindow = BmpWin_CreateDynamic(BG_TEXT, 1, 19, 30, 4, PALETTE_FONT, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(nickname->messageWindow), COLOR_BACKGROUND);
     GFL_TextRndUpdateColorIndexLUT(COLOR_LETTER, COLOR_SHADOW, COLOR_BACKGROUND);
-    nickname->stream = func_02022268(nickname->messageWindow, 0, 0, nickname->message, nickname->font, func_02017bcc(),
-                                     nickname->tcbManager, 2, nickname->heapId, COLOR_BACKGROUND);
+    nickname->stream =
+        PrintStream_Create(nickname->messageWindow, 0, 0, nickname->message, nickname->font, TextSpeed_GetCurrentWait(),
+                           nickname->tcbManager, 2, nickname->heapId, COLOR_BACKGROUND);
     nickname->frameChars = LoadCursorImageEndOfHeap(BG_TEXT, PALETTE_FRAME, 0, nickname->heapId);
     keyCursor = TRUE;
     if (func_0203d554()) {
@@ -171,7 +172,7 @@ ZukanNickname *ZukanNickname_Create(HeapID heapId, PartyPkm *pkm, StrBuf *boxMes
 void ZukanNickname_Free(ZukanNickname *nickname) {
     ZukanNickname_FreeInput(nickname);
     GFL_TCBRemove(nickname->vblankTask);
-    func_020223cc(nickname->stream);
+    PrintStream_Delete(nickname->stream);
     GFL_BGSysFreeCharMemory(BG_TEXT, CHAR_POS(nickname->frameChars), CHAR_SIZE(nickname->frameChars));
     BmpWin_Free(nickname->messageWindow);
     GFL_StrBufFree(nickname->message);
@@ -191,7 +192,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
         break;
     case STEP_ASK:
         GFL_TCBExMgrUpdate(nickname->tcbManager);
-        state = func_020223b4(nickname->stream);
+        state = PrintStream_GetState(nickname->stream);
         if (state == PRINT_STREAM_DONE) {
             nickname->step = STEP_ANSWER;
             if (nickname->isNPokemon) {
@@ -212,7 +213,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
                 func_0203d564(TRUE);
             }
             if (pressed) {
-                func_020223e0(nickname->stream, 0);
+                PrintStream_SkipWait(nickname->stream, 0);
             }
             break;
         case PRINT_STREAM_PAUSED:
@@ -225,7 +226,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
                 func_0203d564(TRUE);
             }
             if (pressed) {
-                func_020223bc(nickname->stream);
+                PrintStream_Continue(nickname->stream);
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             break;
@@ -241,7 +242,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
                 break;
             }
             GFL_BitmapFill(BmpWin_GetBitmap(nickname->messageWindow), COLOR_BACKGROUND);
-            func_020223cc(nickname->stream);
+            PrintStream_Delete(nickname->stream);
             GFL_StrBufFree(nickname->message);
             wordSet = GFL_WordSetSystemCreateDefault(nickname->heapId);
             loadPokemonNicknameToStrbuf(wordSet, 0, nickname->pkm);
@@ -249,9 +250,9 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
             nickname->message = GFL_StrBufCreate(0x60, nickname->heapId);
             GFL_WordSetFormatStrbuf(wordSet, nickname->message, nickname->boxMessage);
             GFL_WordSetSystemFree(wordSet);
-            nickname->stream =
-                func_02022268(nickname->messageWindow, 0, 0, nickname->message, nickname->font, func_02017bcc(),
-                              nickname->tcbManager, 2, nickname->heapId, COLOR_BACKGROUND);
+            nickname->stream = PrintStream_Create(nickname->messageWindow, 0, 0, nickname->message, nickname->font,
+                                                  TextSpeed_GetCurrentWait(), nickname->tcbManager, 2, nickname->heapId,
+                                                  COLOR_BACKGROUND);
             nickname->step = STEP_BOX_MESSAGE;
         } else {
             nickname->step = STEP_DONE;
@@ -259,7 +260,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
         break;
     case STEP_BOX_MESSAGE:
         GFL_TCBExMgrUpdate(nickname->tcbManager);
-        state = func_020223b4(nickname->stream);
+        state = PrintStream_GetState(nickname->stream);
         if (state == PRINT_STREAM_DONE) {
             nickname->step = STEP_BOX_MESSAGE_WAIT;
             break;
@@ -275,7 +276,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
                 func_0203d564(TRUE);
             }
             if (pressed) {
-                func_020223e0(nickname->stream, 0);
+                PrintStream_SkipWait(nickname->stream, 0);
             }
             break;
         case PRINT_STREAM_PAUSED:
@@ -288,7 +289,7 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
                 func_0203d564(TRUE);
             }
             if (pressed) {
-                func_020223bc(nickname->stream);
+                PrintStream_Continue(nickname->stream);
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             break;

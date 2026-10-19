@@ -181,7 +181,7 @@ static void ManualTop_FreeGraphics(ManualTop *top) {
 static void ManualTop_FreeMenu(ManualTop *top) {
     u8 i;
 
-    func_02021c44(top->common->queue);
+    PrintQueue_Clear(top->common->queue);
     for (i = 0; i < BUTTON_COUNT; i++) {
         AppTaskMenuWin_Free(top->wins[i]);
     }

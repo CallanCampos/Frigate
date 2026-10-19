@@ -505,7 +505,7 @@ void func_ov012_0215b284(u32 arg0, ShortcutMenuWork *work) {
             func_ov036_02187834();
         }
         gameData = GSYS_GetGameData(work->gameSystem);
-        param = func_02017670(gameData);
+        param = GameData_GetShortcutMenuPos(gameData);
         work->app = func_ov036_021bedd8(gameData, arg0, param, 0x50, 0x15);
     }
 }

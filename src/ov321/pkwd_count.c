@@ -323,7 +323,7 @@ static BOOL PkwdCount_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->param = param;
     wk->graphic = PkwdCountGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     PkwdCount_InitScreen(wk);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     return TRUE;
@@ -333,11 +333,11 @@ static BOOL PkwdCount_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     PkwdCountWork *wk = work;
     HeapID heapId;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return FALSE;
     }
     PkwdCount_FreeScreen(wk);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     PkwdCountGraphic_Free(wk->graphic);
     heapId = wk->heapId;
@@ -888,11 +888,11 @@ static void PkwdCount_FreeWindows(PkwdCountWork *wk) {
 static void PkwdCount_UpdateText(PkwdCountWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintQueue *queue = wk->printQueue;
 
-        if (wk->windows[i].printing && !func_02021c1c(queue, BmpWin_GetBitmap(wk->windows[i].window))) {
+        if (wk->windows[i].printing && !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(wk->windows[i].window))) {
             BmpWin_FlushChar(wk->windows[i].window);
             wk->windows[i].printing = FALSE;
         }
@@ -905,7 +905,7 @@ static void PkwdCount_PrintText(PkwdCountWork *wk, u32 window, s32 x, s32 y, con
     u16 offset = PkwdCount_GetAlignOffset(strbuf, wk->font, align);
     PrintQueue *queue = wk->printQueue;
 
-    func_02021c7c(queue, BmpWin_GetBitmap(wk->windows[window].window), x - offset, y, strbuf, wk->font, color);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(wk->windows[window].window), x - offset, y, strbuf, wk->font, color);
     wk->windows[window].printing = TRUE;
 }
 

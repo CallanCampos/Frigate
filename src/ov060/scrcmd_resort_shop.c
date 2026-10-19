@@ -418,7 +418,7 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
         shop->work.destroy = func_ov060_021e7f58;
         shop->work.cursorCallback = func_ov060_021e7f5c;
         shop->work.printCallback = func_ov060_021e7a70;
-        shop->work.flags = func_02038470(func_ov137_021f0f58(shop->work.person));
+        shop->work.flags = JoinAvenuePerson_GetShop(func_ov137_021f0f58(shop->work.person));
         shop->work.row = ResortShopData_GetPersonShop(shop->work.shops, func_ov137_021f0f58(shop->work.person));
         break;
     case 1:
@@ -550,7 +550,7 @@ static u32 func_ov060_021e5d84(ResortShopWork *wk) {
 static void func_ov060_021e5d90(ResortShopWork *wk) {
     u32 cash = func_ov060_021e5d84(wk);
 
-    if (func_02036434(wk->flags, wk->selected->id) == TRUE) {
+    if (JoinAvenueShop_GetFlag(wk->flags, wk->selected->id) == TRUE) {
         if (wk->selected->kind == 0) {
             func_ov060_021e7bc8(wk, wk->msgBase + 17);
         } else {
@@ -648,18 +648,18 @@ static void func_ov060_021e5ee0(ResortShopWork *wk) {
 
 // Prints the message, returning the next state once it is done
 static u8 func_ov060_021e5f88(ResortShopWork *wk) {
-    u32 state = func_020223b4(wk->printStream);
+    u32 state = PrintStream_GetState(wk->printStream);
 
     if (wk->keyCursor != NULL) {
         KeyCursor_Update(wk->keyCursor, wk->printStream, wk->windows[6]);
     }
     if (state == PRINT_STREAM_DONE) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         return wk->nextState;
     }
     if (state == PRINT_STREAM_RUNNING) {
         if ((GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) || (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B)) {
-            func_020223e0(wk->printStream, 0);
+            PrintStream_SkipWait(wk->printStream, 0);
         }
     } else if (state == PRINT_STREAM_PAUSED) {
         BOOL next = FALSE;
@@ -673,7 +673,7 @@ static u8 func_ov060_021e5f88(ResortShopWork *wk) {
             next = TRUE;
         }
         if (next) {
-            func_020223bc(wk->printStream);
+            PrintStream_Continue(wk->printStream);
             GFL_SndSEPlay(1351);
         }
     }
@@ -702,7 +702,7 @@ static void func_ov060_021e6064(ResortShop *shop) {
 static BOOL func_ov060_021e60ac(ResortShop *shop) {
     ResortShopWork *wk = &shop->work;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return FALSE;
     }
     if (wk->listShown == 0) {
@@ -782,7 +782,7 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
             func_ov060_021e6044(wk, wk->selected->price);
             func_ov060_021e77d4(wk);
             BagSave_AddItem(wk->bag, wk->selected->item, wk->selected->count, wk->heapId);
-            func_02036448(wk->flags, wk->selected->id, TRUE);
+            JoinAvenueShop_SetFlag(wk->flags, wk->selected->id, TRUE);
             wk->state = 8;
             wk->nextState = 2;
         } else if (wk->selected->kind == 11) {
@@ -790,7 +790,7 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
             func_ov060_021e7e00(wk, wk->msgBase + 61, wk->selected);
             func_ov060_021e6044(wk, wk->selected->price);
             func_ov060_021e77d4(wk);
-            func_02036448(wk->flags, wk->selected->id, TRUE);
+            JoinAvenueShop_SetFlag(wk->flags, wk->selected->id, TRUE);
             wk->state = 8;
             wk->nextState = 7;
         } else {
@@ -839,7 +839,7 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         }
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PrintWindow_Flush(&wk->printWindow, wk->printQueue);
     GFL_TCBExMgrUpdate(wk->tcbManager);
     GFL_TCBExMgrUpdate(wk->tcbManager);
@@ -927,7 +927,7 @@ static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         }
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PrintWindow_Flush(&wk->printWindow, wk->printQueue);
     GFL_TCBExMgrUpdate(wk->tcbManager);
     GFL_TCBExMgrUpdate(wk->tcbManager);
@@ -1002,7 +1002,7 @@ static BOOL func_ov060_021e66c4(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         *wk->vars[0] = GFL_STD_MemCmp(wk->order, wk->initialOrder, sizeof(wk->order)) != 0 ? TRUE : FALSE;
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PrintWindow_Flush(&wk->printWindow, wk->printQueue);
     GFL_TCBExMgrUpdate(wk->tcbManager);
     GFL_TCBExMgrUpdate(wk->tcbManager);
@@ -1064,11 +1064,11 @@ static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode) {
     int n;
     u16 name[8];
 
-    count = func_0203889c(wk->occupants);
+    count = JoinAvenueOccupants_CountRecords(wk->occupants);
     wk->options = ListMenuCore_CreateOptionList(count + 1, wk->heapId);
     n = 0;
     for (i = 0; i < 4; i++) {
-        void *record = func_0203888c(wk->occupants, i);
+        void *record = JoinAvenueOccupants_GetRecord(wk->occupants, i);
         u16 a;
         u16 b;
         u16 c;
@@ -1081,22 +1081,22 @@ static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode) {
 
         wk->initialOrder[i] = i;
         wk->order[i] = i;
-        if (func_020384e0(record)) {
+        if (JoinAvenueRecord_IsEmpty(record)) {
             continue;
         }
         wk->entries[n].id = i;
         wk->entries[n].kind = 0;
         wk->entries[n].price = 0;
-        wk->entries[n].item = func_020385a8(record, 3, NULL);
+        wk->entries[n].item = JoinAvenueRecord_GetParam(record, 3, NULL);
         wk->entries[n].count = 0;
         wk->entries[n].person = record;
-        a = func_020385a8(record, 21, NULL);
-        b = func_020385a8(record, 22, NULL);
-        c = func_020385a8(record, 23, NULL);
+        a = JoinAvenueRecord_GetParam(record, 21, NULL);
+        b = JoinAvenueRecord_GetParam(record, 22, NULL);
+        c = JoinAvenueRecord_GetParam(record, 23, NULL);
         labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_10);
         descriptionFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, n + 37);
-        gender = func_020385a8(record, 2, NULL);
-        func_020385a8(record, 4, name);
+        gender = JoinAvenueRecord_GetParam(record, 2, NULL);
+        JoinAvenueRecord_GetParam(record, 4, name);
         nameBuf = GFL_StrBufCreate(8, wk->heapId);
         GFL_StrBufLoadString(nameBuf, name);
         label = GFL_StrBufCreate(64, wk->heapId);
@@ -1123,14 +1123,14 @@ static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode) {
 
 // The avenue's people, from the last
 static void func_ov060_021e6c90(ResortShopWork *wk, u8 mode, u8 subMode) {
-    int count = func_02038868(wk->occupants);
+    int count = JoinAvenueOccupants_CountPeople(wk->occupants);
     int n;
     int i;
 
     wk->options = ListMenuCore_CreateOptionList(count + 1, wk->heapId);
     n = 0;
     for (i = 7; i >= 0; i--) {
-        JoinAvenuePerson *person = func_02038860(wk->occupants, i);
+        JoinAvenuePerson *person = JoinAvenueOccupants_GetPerson(wk->occupants, i);
         ResortPersonData *data;
 
         if (JoinAvenuePerson_IsEmpty(person)) {
@@ -1169,13 +1169,13 @@ static void func_ov060_021e6d94(ResortShopWork *wk, u8 mode, u8 subMode) {
         void *record = wk->entries[i].person;
         StrBuf *labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_10);
         StrBuf *descriptionFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, i + 37);
-        u8 gender = func_020385a8(record, 2, NULL);
-        u16 a = func_020385a8(record, 21, NULL);
-        u16 b = func_020385a8(record, 22, NULL);
-        u16 c = func_020385a8(record, 23, NULL);
+        u8 gender = JoinAvenueRecord_GetParam(record, 2, NULL);
+        u16 a = JoinAvenueRecord_GetParam(record, 21, NULL);
+        u16 b = JoinAvenueRecord_GetParam(record, 22, NULL);
+        u16 c = JoinAvenueRecord_GetParam(record, 23, NULL);
         StrBuf *nameBuf;
 
-        func_020385a8(record, 4, name);
+        JoinAvenueRecord_GetParam(record, 4, name);
         nameBuf = GFL_StrBufCreate(8, wk->heapId);
         GFL_StrBufLoadString(nameBuf, name);
         WordSetNumber(wk->wordSet, 1, i + 1, 1, NUM_PAD_NONE, 1);
@@ -1398,7 +1398,7 @@ static void func_ov060_021e76d0(ResortShopWork *wk) {
     }
     wk->printWindow.window = wk->windows[2];
     wk->printWindow.flushPending = FALSE;
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     BmpWin_TransferNow(wk->windows[1]);
 }
 
@@ -1413,8 +1413,8 @@ static void func_ov060_021e7750(ResortShopWork *wk) {
 static void func_ov060_021e77a8(ResortShopWork *wk) {
     int i;
 
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     for (i = 0; i < 7; i++) {
         BmpWin_Free(wk->windows[i]);
     }
@@ -1502,7 +1502,7 @@ static void func_ov060_021e7a2c(PrintQueue *queue, GFLBitmap *bitmap, int x, int
     if (y <= 8) {
         GFL_TextRendererDrawToBitmapEx(bitmap, x, y, strbuf, font, color);
     } else {
-        func_02021c7c(queue, bitmap, x, y, strbuf, font, color);
+        PrintQueue_PrintColor(queue, bitmap, x, y, strbuf, font, color);
     }
 }
 
@@ -1515,7 +1515,7 @@ static void func_ov060_021e7a70(BmpMenuList *list, s32 value, u8 y) {
     if (value == BMPMENULIST_CANCEL) {
         return;
     }
-    if (func_02036434(wk->flags, wk->entries[value].id)) {
+    if (JoinAvenueShop_GetFlag(wk->flags, wk->entries[value].id)) {
         width = GFL_FontGetBlockWidth(wk->boughtLabel, wk->font, 0);
         windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[2]));
         func_ov060_021e7a2c(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->boughtLabel,
@@ -1560,8 +1560,9 @@ static void func_ov060_021e7bc8(ResortShopWork *wk, u32 msgId) {
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, func_ov060_021e7b7c);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov060_021e7b7c);
     if (wk->keyCursor != NULL) {
         KeyCursor_Free(wk->keyCursor);
         wk->keyCursor = NULL;
@@ -1579,8 +1580,9 @@ static void func_ov060_021e7c94(ResortShopWork *wk, u32 msgId) {
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, func_ov060_021e7b7c);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov060_021e7b7c);
     BmpWin_TransferNow(wk->windows[6]);
 }
 
@@ -1595,8 +1597,9 @@ static void func_ov060_021e7d58(ResortShopWork *wk, u32 msgId) {
 
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, NULL);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, NULL);
     if (wk->keyCursor != NULL) {
         KeyCursor_Free(wk->keyCursor);
         wk->keyCursor = NULL;
@@ -1698,7 +1701,7 @@ static void func_ov060_021e803c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
 
 // A person's shop, its level and the date, as the description of the person
 static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person) {
-    void *flags = func_02038470(person);
+    void *flags = JoinAvenuePerson_GetShop(person);
     StrBuf *strbuf = GFL_StrBufCreate(128, wk->heapId);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(wk->shops, person), 0);
     MsgData *msgData =
@@ -1707,7 +1710,7 @@ static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person)
     u16 a = joinAveTextHandler(person, 21, NULL);
     u16 b = joinAveTextHandler(person, 22, NULL);
     u16 c = joinAveTextHandler(person, 23, NULL);
-    u32 level = func_020363e0(flags, 1);
+    u32 level = JoinAvenueShop_GetField(flags, 1);
     StrBuf *shopName = GFL_MsgDataLoadStrbufNew(msgData, shop + 280);
 
     func_0202437c(wk->wordSet, 1, shopName, 2, 1, 2);
@@ -1726,7 +1729,7 @@ static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person)
 // Makes a person's entry's strings, or remakes them
 static void func_ov060_021e8190(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry) {
     JoinAvenuePerson *person = func_ov137_021f1980(data);
-    u16 flag = func_020363e0(func_02038470(person), 0);
+    u16 flag = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
     StrBuf *label = GFL_StrBufCreate(64, wk->heapId);
     StrBuf *name = ResortSys_FormatShopText(wk->shops, data, flag, wk->heapId);
     StrBuf *description = func_ov060_021e8040(wk, person);
@@ -1840,21 +1843,21 @@ static void func_ov060_021e841c(ResortShopWork *wk, u8 mode, u8 subMode) {
         for (i = 0; i < wk->entryCount; i++) {
             if (i != wk->entries[i].id) {
                 u16 otherId = wk->entries[wk->entries[i].id].id;
-                void *a = func_0203888c(wk->occupants, wk->entries[i].id);
-                u32 a1 = func_020385a8(a, 1, NULL);
-                u16 a0 = func_020385a8(a, 0, NULL);
-                u16 a31 = func_020385a8(a, 31, NULL);
-                void *b = func_0203888c(wk->occupants, otherId);
-                u32 b1 = func_020385a8(b, 1, NULL);
-                u16 b0 = func_020385a8(b, 0, NULL);
-                u16 b31 = func_020385a8(b, 31, NULL);
+                void *a = JoinAvenueOccupants_GetRecord(wk->occupants, wk->entries[i].id);
+                u32 a1 = JoinAvenueRecord_GetParam(a, 1, NULL);
+                u16 a0 = JoinAvenueRecord_GetParam(a, 0, NULL);
+                u16 a31 = JoinAvenueRecord_GetParam(a, 31, NULL);
+                void *b = JoinAvenueOccupants_GetRecord(wk->occupants, otherId);
+                u32 b1 = JoinAvenueRecord_GetParam(b, 1, NULL);
+                u16 b0 = JoinAvenueRecord_GetParam(b, 0, NULL);
+                u16 b31 = JoinAvenueRecord_GetParam(b, 31, NULL);
 
-                func_02038680(a, 0, b0);
-                func_02038680(a, 1, b1);
-                func_02038680(a, 31, b31);
-                func_02038680(b, 0, a0);
-                func_02038680(b, 1, a1);
-                func_02038680(b, 31, a31);
+                JoinAvenueRecord_SetParam(a, 0, b0);
+                JoinAvenueRecord_SetParam(a, 1, b1);
+                JoinAvenueRecord_SetParam(a, 31, b31);
+                JoinAvenueRecord_SetParam(b, 0, a0);
+                JoinAvenueRecord_SetParam(b, 1, a1);
+                JoinAvenueRecord_SetParam(b, 31, a31);
                 MI_CpuCopy8(a, record, sizeof(record));
                 MI_CpuCopy8(b, a, sizeof(record));
                 MI_CpuCopy8(record, b, sizeof(record));
@@ -1885,10 +1888,10 @@ static void func_ov060_021e85b0(ResortShopWork *wk, u8 mode, u8 subMode) {
 
             if (i != j) {
                 u16 otherId = ResortShop_GetEntry(wk, j)->id;
-                JoinAvenuePerson *a = func_02038860(wk->occupants, wk->entries[i].id);
+                JoinAvenuePerson *a = JoinAvenueOccupants_GetPerson(wk->occupants, wk->entries[i].id);
                 u32 a1 = joinAveTextHandler(a, 1, NULL);
                 u16 a0 = joinAveTextHandler(a, 0, NULL);
-                JoinAvenuePerson *b = func_02038860(wk->occupants, otherId);
+                JoinAvenuePerson *b = JoinAvenueOccupants_GetPerson(wk->occupants, otherId);
                 u32 b1 = joinAveTextHandler(b, 1, NULL);
                 u16 b0 = joinAveTextHandler(b, 0, NULL);
 
@@ -1971,7 +1974,7 @@ static void func_ov060_021e8804(ResortShop *shop, Field *field, u16 cameraMode) 
         JoinAvenuePerson *person = func_ov137_021f0f58(shop->work.person);
 
         for (camIndex = 0; camIndex < 8; camIndex++) {
-            if (func_02038860(shop->work.occupants, camIndex) == person) {
+            if (JoinAvenueOccupants_GetPerson(shop->work.occupants, camIndex) == person) {
                 break;
             }
         }

@@ -162,11 +162,13 @@ static void DpcObj_InitResources(DendouPCWork *wk) {
     }
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(HEAPID_DENDOU_PC));
-    wk->chars[DPCOBJ_RES_BUTTON] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_DENDOU_PC);
-    wk->palettes[DPCOBJ_RES_BUTTON] =
-        func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, DPCOBJ_RES_BUTTON * 0x20, HEAPID_DENDOU_PC);
+    wk->chars[DPCOBJ_RES_BUTTON] =
+        func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_DENDOU_PC);
+    wk->palettes[DPCOBJ_RES_BUTTON] = func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN,
+                                                    DPCOBJ_RES_BUTTON * 0x20, HEAPID_DENDOU_PC);
     wk->cellAnims[DPCOBJ_RES_BUTTON] =
-        func_0204bde0(arc, func_0202d818(DPCOBJ_MAPPING_128K), func_0202d81c(DPCOBJ_MAPPING_128K), HEAPID_DENDOU_PC);
+        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(DPCOBJ_MAPPING_128K),
+                      AppMenuCommon_GetTouchBarAnimFile(DPCOBJ_MAPPING_128K), HEAPID_DENDOU_PC);
     GFL_ArcToolFree(arc);
 }
 

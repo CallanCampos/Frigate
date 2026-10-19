@@ -185,8 +185,8 @@ static void ManualExplain_CreateWindows(ManualExplain *explain) {
     explain->queues[WINDOW_TITLE] = explain->common->titleQueue;
     explain->queues[WINDOW_TEXT] = explain->common->queue;
     str = GFL_MsgDataLoadStrbufNew(explain->common->msgManual, explain->param->titleMsg);
-    func_02021c7c(explain->queues[WINDOW_TITLE], BmpWin_GetBitmap(explain->windows[WINDOW_TITLE]), 0, 1, str,
-                  explain->common->font, TITLE_COLOR);
+    PrintQueue_PrintColor(explain->queues[WINDOW_TITLE], BmpWin_GetBitmap(explain->windows[WINDOW_TITLE]), 0, 1, str,
+                          explain->common->font, TITLE_COLOR);
     GFL_StrBufFree(str);
     explain->printing[WINDOW_TITLE] = TRUE;
     ManualExplain_UpdateWindows(explain);
@@ -197,7 +197,7 @@ static void ManualExplain_FreeWindows(ManualExplain *explain) {
 
     for (i = 0; i < WINDOW_COUNT; i++) {
         explain->printing[i] = FALSE;
-        func_02021c44(explain->queues[i]);
+        PrintQueue_Clear(explain->queues[i]);
         BmpWin_ClearScreen(explain->windows[i]);
         BmpWin_Free(explain->windows[i]);
     }
@@ -210,7 +210,7 @@ static void ManualExplain_UpdateWindows(ManualExplain *explain) {
 
     for (i = 0; i < WINDOW_COUNT; i++) {
         if (explain->printing[i]) {
-            if (!func_02021c1c(explain->queues[i], BmpWin_GetBitmap(explain->windows[i]))) {
+            if (!PrintQueue_IsBitmapPending(explain->queues[i], BmpWin_GetBitmap(explain->windows[i]))) {
                 BmpWin *window = explain->windows[i];
 
                 BmpWin_FlushChar(window);
@@ -225,11 +225,11 @@ static void ManualExplain_UpdateWindows(ManualExplain *explain) {
 static void ManualExplain_PrintPage(ManualExplain *explain) {
     StrBuf *str;
 
-    func_02021c44(explain->queues[WINDOW_TEXT]);
+    PrintQueue_Clear(explain->queues[WINDOW_TEXT]);
     GFL_BitmapFill(BmpWin_GetBitmap(explain->windows[WINDOW_TEXT]), 0);
     str = GFL_MsgDataLoadStrbufNew(explain->common->msgManual, explain->param->pages[explain->page].msg);
-    func_02021c7c(explain->queues[WINDOW_TEXT], BmpWin_GetBitmap(explain->windows[WINDOW_TEXT]), 4, 6, str,
-                  explain->common->font, TEXT_COLOR);
+    PrintQueue_PrintColor(explain->queues[WINDOW_TEXT], BmpWin_GetBitmap(explain->windows[WINDOW_TEXT]), 4, 6, str,
+                          explain->common->font, TEXT_COLOR);
     GFL_StrBufFree(str);
     explain->printing[WINDOW_TEXT] = TRUE;
     ManualExplain_UpdateWindows(explain);

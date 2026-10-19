@@ -16,7 +16,7 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
-// The musical's communication work, which func_020179d4 keeps in the game data
+// The musical's communication work, which GameData_SetMusicalCommWork keeps in the game data
 struct MusicalCommWork {
     MusicalEventWork *event;
     // Overlay 211's communication work
@@ -28,8 +28,8 @@ struct MusicalCommWork {
     u16 value;
 };
 
-MusicalCommWork *func_020179dc(GameData *gameData);
-void func_020179d4(GameData *gameData, MusicalCommWork *work);
+MusicalCommWork *GameData_GetMusicalCommWork(GameData *gameData);
+void GameData_SetMusicalCommWork(GameData *gameData, MusicalCommWork *work);
 
 // Overlay 12's musical_event.c
 GameEvent *func_ov012_02150cf8(GameSystem *gsys, GameData *gameData, u8 slot, BOOL online, MusicalCommWork *comm);

@@ -87,7 +87,7 @@ MarineTubeBoardGraphic *MarineTubeBoardGraphic_Create(u32 layout, HeapID heapId)
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MarineTubeBoardBG_Init(&graphic->bg, heapId);
     MarineTubeBoardClAct_Init(&graphic->clact, &sMarineTubeBoardVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(MarineTubeBoardGraphic_VBlank, graphic, 0);
@@ -98,7 +98,7 @@ void MarineTubeBoardGraphic_Free(MarineTubeBoardGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     MarineTubeBoardClAct_Free(&graphic->clact);
     MarineTubeBoardBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

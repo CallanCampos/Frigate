@@ -122,7 +122,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             records = GameData_GetRecords(prm->gameData);
             RecordAddOne(records, 7);
             RecordAddOne(records, 0x54);
-            func_02038bc8(0x1f);
+            JoinAvenue_RecordActivity(0x1f);
             textCopy(playerInfo->name, wk->name);
             PokeParty_SetParam(prm->pkm, PKM_PARAM_OT_NAME, (u32)wk->name);
             if (PokeParty_GetPkmCount(party) >= PokeParty_GetCapacity(party)) {

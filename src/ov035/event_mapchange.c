@@ -1186,8 +1186,8 @@ GameEvent *EventEntralinkWarpIn_Create(GameSystem *gsys, u16 zoneId, const VecFx
 
     EventEntralinkWarp_CreateReturnLocation(&returnSpawn, field);
     GameData_SetEntralinkParentSpawnInfo(gameData, &returnSpawn);
-    HighLinkSave_CountPlaySeconds(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), func_02017a40(gameData),
-                                  0);
+    HighLinkSave_CountPlaySeconds(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)),
+                                  GameData_GetPlayTime(gameData), 0);
     CreateZoneChangeData(&spawn, zoneId, ConvDirToWarpDir(0), spawnPos.x, spawnPos.y, spawnPos.z);
     return EventEntralinkWarpIn_CreateCore(gsys, field, &spawn, a3, 0);
 }
@@ -1203,9 +1203,9 @@ GameEvent *EventEntralinkWarp_CreateOut(GameSystem *gsys) {
         func_0202be00(comm);
     }
     GameData_SetForceSeasonSync(gameData, FALSE);
-    func_020175d8(gameData, 0);
-    func_02017608(gameData, 0);
-    func_020175c4(gameData, 1);
+    GameData_SetNetID(gameData, 0);
+    GameData_SetBeaconNetID(gameData, 0);
+    GameData_SetPlayerCount(gameData, 1);
     return event;
 }
 
@@ -1458,7 +1458,7 @@ void GameData_DeleteAllActors(GameData *gameData) {
 
 // Allocates a list of people while in Join Avenue and frees it elsewhere, then resets the people in it and in the save
 void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
-    ResortWork *unk = func_02017b84(gameData);
+    ResortWork *unk = GameData_GetResortWork(gameData);
     JoinAvenuePersonList **personList;
 
     if (IsZoneJoinAvenue(zoneId) || IsZoneJoinAvenueSubZone(zoneId)) {
@@ -1478,7 +1478,7 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
         u16 param =
             JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), 5, 0);
         func_02017b64(gameData, param);
-        func_02038bc8(0x18);
+        JoinAvenue_RecordActivity(0x18);
     }
 
     ResortWork_Set(unk, 8, 0);
@@ -1510,7 +1510,7 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
 
 // Sets flag 8 when the zone changed, which GameData_UpdateJoinAvenueForZone clears
 void GameData_UpdateZoneChangeFlag(GameData *gameData, u16 zoneId, u16 prevZoneId) {
-    ResortWork *unk = func_02017b84(gameData);
+    ResortWork *unk = GameData_GetResortWork(gameData);
 
     if (zoneId != prevZoneId) {
         ResortWork_Set(unk, 8, 1);
@@ -1704,7 +1704,7 @@ GameEventReturnCode EventEntralinkWarpIn_Callback(GameEvent *event, u32 *state, 
         if (!GameCommSys_BootCheck(comm)) {
             func_0202be00(comm);
             GameData_SetForceSeasonSync(wk->gameData, TRUE);
-            func_020175d8(wk->gameData, func_0203ffc4());
+            GameData_SetNetID(wk->gameData, func_0203ffc4());
             GameEvent_ChainNext(event, EventEntralinkWarp_Create(wk->gsys, wk->field, &wk->spawn));
             *state = 2;
         }

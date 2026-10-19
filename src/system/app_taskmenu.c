@@ -140,8 +140,8 @@ void AppTaskMenu_Free(AppTaskMenu *menu) {
     u8 i;
 
     for (i = 0; i < menu->init.itemCount; i++) {
-        while (func_02021c1c(menu->res->queue, BmpWin_GetBitmap(menu->windows[i]))) {
-            func_02021a3c(menu->res->queue);
+        while (PrintQueue_IsBitmapPending(menu->res->queue, BmpWin_GetBitmap(menu->windows[i]))) {
+            PrintQueue_Main(menu->res->queue);
         }
     }
     for (i = 0; i < menu->init.itemCount; i++) {
@@ -160,7 +160,7 @@ void AppTaskMenu_UpdateText(AppTaskMenu *menu) {
         u8 i;
 
         for (i = 0; i < menu->init.itemCount; i++) {
-            if (func_02021c1c(menu->res->queue, BmpWin_GetBitmap(menu->windows[i])) == TRUE) {
+            if (PrintQueue_IsBitmapPending(menu->res->queue, BmpWin_GetBitmap(menu->windows[i])) == TRUE) {
                 printed = FALSE;
             }
         }
@@ -227,8 +227,8 @@ static void AppTaskMenu_CreateWindows(AppTaskMenu *menu, AppTaskMenuRes *res) {
         menu->windows[i] = BmpWin_CreateDynamic(menu->res->bg, x, y + i * menu->init.height, menu->init.width,
                                                 menu->init.height, menu->res->palette + 1, TRUE);
         AppTaskMenu_DrawFrame(menu->windows[i], res, menu->items[i].type);
-        func_02021c7c(res->queue, BmpWin_GetBitmap(menu->windows[i]), TEXT_X, TEXT_Y, menu->items[i].str, res->font,
-                      menu->items[i].color);
+        PrintQueue_PrintColor(res->queue, BmpWin_GetBitmap(menu->windows[i]), TEXT_X, TEXT_Y, menu->items[i].str,
+                              res->font, menu->items[i].color);
         BmpWin_Transfer(menu->windows[i]);
     }
 }
@@ -474,7 +474,8 @@ static AppTaskMenuWin *AppTaskMenuWin_CreateCore(AppTaskMenuRes *res, const AppT
     if (centered == TRUE) {
         textX = (width * 8 - GFL_FontGetBlockWidth(item->str, res->font, 0) - 16) / 2;
     }
-    func_02021c7c(res->queue, BmpWin_GetBitmap(win->window), textX + 8, TEXT_Y, item->str, res->font, item->color);
+    PrintQueue_PrintColor(res->queue, BmpWin_GetBitmap(win->window), textX + 8, TEXT_Y, item->str, res->font,
+                          item->color);
     win->color1 = GX_RGB(5, 10, 13);
     win->color2 = GX_RGB(12, 25, 30);
     return win;
@@ -496,7 +497,7 @@ static void AppTaskMenuWin_FreeCore(AppTaskMenuWin *win) {
 
 void AppTaskMenuWin_Update(AppTaskMenuWin *win) {
     if (win->isUpdatingText) {
-        if (func_02021c1c(win->res->queue, BmpWin_GetBitmap(win->window)) == FALSE) {
+        if (PrintQueue_IsBitmapPending(win->res->queue, BmpWin_GetBitmap(win->window)) == FALSE) {
             BmpWin_Transfer(win->window);
             win->isUpdatingText = FALSE;
         }

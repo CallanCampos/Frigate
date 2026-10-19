@@ -109,7 +109,7 @@ BoxSearchGraphic *func_ov255_021d6d28(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     func_ov255_021d6e58(&graphic->bg, heapId);
     func_ov255_021d6efc(&graphic->clact, &data_ov255_021d94bc, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(func_ov255_021d6e44, graphic, 0);
@@ -120,7 +120,7 @@ void func_ov255_021d6dc8(BoxSearchGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     func_ov255_021d6f3c(&graphic->clact);
     func_ov255_021d6eb8(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

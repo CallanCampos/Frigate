@@ -343,7 +343,7 @@ static int DDemoSeq_Exit2nd(DDemoWork *wk) {
 // and again, until A, B or a touch ends the demo
 static int DDemoSeq_Main2nd(DDemoWork *wk) {
     if (wk->end == TRUE && GFL_WipeIsFinished() == TRUE && GFL_SndBGMIsFading() == FALSE) {
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
         return SEQ_2ND_EXIT;
     }
     switch (wk->subSeq) {

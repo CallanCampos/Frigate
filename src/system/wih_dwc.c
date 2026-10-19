@@ -72,7 +72,7 @@ static BOOL isLocked(WMBssDesc *bss);
 static WifiConfig *_localcfg;
 static WihDwcWork *_localWork;
 
-void *func_02012908(int num, HeapID heapId) {
+void *WihDwc_Create(int num, HeapID heapId) {
     WihDwcWork *work;
 
     GFL_ASSERT(num <= _ALLBEACON_MAX);
@@ -89,7 +89,7 @@ void *func_02012908(int num, HeapID heapId) {
     return work;
 }
 
-void func_02012994(void *work) {
+void WihDwc_Destroy(void *work) {
     WihDwcWork *wk = work;
 
     GFL_ASSERT(_localWork);
@@ -100,13 +100,13 @@ void func_02012994(void *work) {
     GFL_OvlUnload(OVERLAY_ID(31));
 }
 
-void func_020129e0(void) {
+void WihDwc_Pause(void) {
     if (_localWork != NULL) {
         _localWork->paused = TRUE;
     }
 }
 
-void func_020129f8(void) {
+void WihDwc_Resume(void) {
     if (_localWork != NULL) {
         _localWork->paused = FALSE;
     }
@@ -119,7 +119,7 @@ static void scanInfoCallback(const void *beacon, void *work, u16 linkLevel) {
     }
 }
 
-void func_02012a4c(void) {
+void WihDwc_TickTimers(void) {
     if (_localWork != NULL && _localWork->paused) {
         return;
     }
@@ -192,7 +192,7 @@ static BOOL isLocked(WMBssDesc *bss) {
     return FALSE;
 }
 
-u32 func_02012be4(WifiList *wifiList) {
+u32 WihDwc_GetStatus(WifiList *wifiList) {
     u32 status = 0;
     GFLNetInitData *init = func_02042e84();
     int i;
@@ -201,7 +201,7 @@ u32 func_02012be4(WifiList *wifiList) {
     if (_localWork == NULL) {
         return status;
     }
-    if (func_02012e54(wifiList) != -1) {
+    if (WihDwc_FindFriendInvite(wifiList) != -1) {
         status |= 0x8;
     }
     if (init->gameCommandBase == 0x35 && func_02042a78() > 1) {
@@ -289,7 +289,7 @@ void downloadPlayConfigForWifi(void) {
     func_0205e038(_localcfg, 0);
 }
 
-int func_02012e54(WifiList *wifiList) {
+int WihDwc_FindFriendInvite(WifiList *wifiList) {
     int i;
     u8 mac[6];
 
@@ -305,14 +305,14 @@ int func_02012e54(WifiList *wifiList) {
     return -1;
 }
 
-u16 func_02012ea0(void) {
+u16 WihDwc_GetLinkLevel(void) {
     if (_localWork != NULL) {
         return _localWork->linkLevel;
     }
     return 0;
 }
 
-void func_02012ebc(u8 linkLevel) {
+void WihDwc_SetBestLinkLevel(u8 linkLevel) {
     if (_localWork != NULL && _localWork->bestLinkLevel < linkLevel && linkLevel < LINK_LEVEL_MAX) {
         _localWork->bestLinkLevel = linkLevel;
     }

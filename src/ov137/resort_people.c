@@ -144,7 +144,7 @@ static void func_ov137_021f0f88(ResortPerson *person, const ResortPersonSetup *s
 }
 
 void *func_ov137_021f0fa8(ResortPerson *person) {
-    return func_02038470(func_ov137_021f1980(person->data));
+    return JoinAvenuePerson_GetShop(func_ov137_021f1980(person->data));
 }
 
 void func_ov137_021f0fb8(ResortPerson *person) {
@@ -252,7 +252,7 @@ static void func_ov137_021f1114(ResortPerson *person, const ResortPersonSetup *s
 
 static void func_ov137_021f113c(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
     u16 index = func_ov137_021f198c(person->data);
-    u16 id = func_020363e0(func_ov137_021f0fa8(person), 0);
+    u16 id = JoinAvenueShop_GetField(func_ov137_021f0fa8(person), 0);
     u32 column = 0;
     const u16 *row = ResortShopData_GetShop(person->shops, id);
 
@@ -295,7 +295,7 @@ static void func_ov137_021f122c(ResortPerson *person, const ResortPersonSetup *s
     npc.scrId = ResortBinary_GetFoundValue(person->row);
     npc.uid = setup->index + RESORT_PERSON_UID_FIRST;
     person->funcs->setupNpc(person, setup, &npc);
-    person->actor = CreateNewActorByEntityNoWKOBJCODE(setup->mmSys, &npc, func_0203950c(setup->zone));
+    person->actor = CreateNewActorByEntityNoWKOBJCODE(setup->mmSys, &npc, ResortLayout_GetZoneId(setup->zone));
     func_ov137_021f10dc(person, 0, setup->index);
     func_ov137_021f10dc(person, 1, setup->zone);
     person->visible = !func_ov012_02167520(person->actor);
@@ -507,7 +507,8 @@ static void func_ov137_021f1670(ResortPeople *people) {
     u32 index = 0;
 
     while (NextActor(people->setup.mmSys, &actor, &index) == TRUE) {
-        if (func_ov137_021f1700(GetActorUID(actor)) && GetActorZoneID(actor) == func_0203950c(people->setup.zone)) {
+        if (func_ov137_021f1700(GetActorUID(actor)) &&
+            GetActorZoneID(actor) == ResortLayout_GetZoneId(people->setup.zone)) {
             if (func_ov137_021f15cc(people, actor) == NULL) {
                 DeleteActor(actor);
             }

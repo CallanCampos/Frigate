@@ -177,7 +177,7 @@ void func_ov080_021eaa98(NoGearWork *work) {
         work->func(work);
     }
     // The connection state is fetched but not used
-    func_02012be4(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
+    WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
 }
 
 void func_ov080_021eaab4(NoGearWork *work) {

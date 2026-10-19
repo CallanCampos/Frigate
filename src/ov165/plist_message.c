@@ -53,7 +53,7 @@ PokeListMessage *PokeListMessage_Create(PokeListWork *wk) {
     msg->waitIcon = NULL;
     msg->wantWaitIcon = FALSE;
     msg->keyCursor = KeyCursor_Create(15, 1, 1, wk->heapId);
-    msg->printQueue = func_02021998(wk->heapId);
+    msg->printQueue = PrintQueue_CreateDefault(wk->heapId);
     return msg;
 }
 
@@ -65,11 +65,11 @@ void PokeListMessage_Free(PokeListWork *wk, PokeListMessage *msg) {
         WaitIcon_Free(msg->waitIcon);
     }
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         GFL_StrBufFree(msg->str);
     }
-    func_02021c44(msg->printQueue);
-    func_02021a18(msg->printQueue);
+    PrintQueue_Clear(msg->printQueue);
+    PrintQueue_Free(msg->printQueue);
     KeyCursor_Free(msg->keyCursor);
     GFL_TCBExMgrFree(msg->tcbMgr);
     GFL_HeapFree(msg);
@@ -85,7 +85,7 @@ void PokeListMessage_Update(PokeListWork *wk, PokeListMessage *msg) {
                 if (msg->waitInput == TRUE) {
                     GFL_SndSEPlay(SEQ_SE_MESSAGE);
                 }
-                func_020223cc(msg->stream);
+                PrintStream_Delete(msg->stream);
                 msg->stream = NULL;
                 GFL_StrBufFree(msg->str);
             } else {
@@ -94,7 +94,7 @@ void PokeListMessage_Update(PokeListWork *wk, PokeListMessage *msg) {
             }
         }
     }
-    if (msg->dirty == TRUE && func_02021c1c(msg->printQueue, BmpWin_GetBitmap(msg->window)) == FALSE) {
+    if (msg->dirty == TRUE && PrintQueue_IsBitmapPending(msg->printQueue, BmpWin_GetBitmap(msg->window)) == FALSE) {
         msg->dirty = FALSE;
         BmpWin_Transfer(msg->window);
         if (msg->wantWaitIcon == TRUE) {
@@ -102,7 +102,7 @@ void PokeListMessage_Update(PokeListWork *wk, PokeListMessage *msg) {
             msg->waitIcon = WaitIcon_CreateTCBEx(msg->tcbMgr, msg->window, 15, 16, wk->heapId);
         }
     }
-    func_02021a3c(msg->printQueue);
+    PrintQueue_Main(msg->printQueue);
 }
 
 void PokeListMessage_Open(PokeListWork *wk, PokeListMessage *msg, u32 windowType) {
@@ -133,7 +133,7 @@ void PokeListMessage_Close(PokeListWork *wk, PokeListMessage *msg) {
         }
         BmpWin_ClearFrame(msg->window, WINFRAME_TRANSFER_VBLANK);
         BmpWin_Free(msg->window);
-        func_02021c44(msg->printQueue);
+        PrintQueue_Clear(msg->printQueue);
         msg->windowType = POKELIST_MESSAGE_WINDOW_NONE;
     }
 }
@@ -157,8 +157,8 @@ void PokeListMessage_Print(PokeListWork *wk, PokeListMessage *msg, u32 msgId) {
         str = expanded;
     }
     PokeListMessage_Clear(wk, msg);
-    func_02021c44(msg->printQueue);
-    func_02021c7c(msg->printQueue, BmpWin_GetBitmap(msg->window), 1, 1, str, wk->font, 0x440);
+    PrintQueue_Clear(msg->printQueue);
+    PrintQueue_PrintColor(msg->printQueue, BmpWin_GetBitmap(msg->window), 1, 1, str, wk->font, 0x440);
     msg->dirty = TRUE;
     GFL_StrBufFree(str);
 }
@@ -175,16 +175,16 @@ void PokeListMessage_PrintStream(PokeListWork *wk, PokeListMessage *msg, u32 msg
         str = expanded;
     }
     PokeListMessage_Clear(wk, msg);
-    func_02021c44(msg->printQueue);
+    PrintQueue_Clear(msg->printQueue);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         GFL_StrBufFree(msg->str);
     }
     msg->waitInput = waitInput;
     msg->str = str;
     AppPrintsysCommon_Init(&msg->printWait, APP_PRINTSYS_COMMON_KEYS | APP_PRINTSYS_COMMON_TOUCH);
-    msg->stream = func_02022294(msg->window, 0, 0, msg->str, wk->font, func_02017bcc(), msg->tcbMgr, 0, wk->heapId, 15,
-                                PokeListMessage_StreamCallback);
+    msg->stream = PrintStream_CreateWithCallback(msg->window, 0, 0, msg->str, wk->font, TextSpeed_GetCurrentWait(),
+                                                 msg->tcbMgr, 0, wk->heapId, 15, PokeListMessage_StreamCallback);
 }
 
 BOOL PokeListMessage_IsDone(PokeListWork *wk, PokeListMessage *msg) {

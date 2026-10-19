@@ -902,7 +902,7 @@ BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field) {
     if (unisys->alloc.rpm == NULL) {
         return TRUE;
     }
-    return func_02021c0c(queue);
+    return PrintQueue_IsEmpty(queue);
 }
 
 void UnionMsg_FreeRulesWindow(UnionSystem *unisys) {

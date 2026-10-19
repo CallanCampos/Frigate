@@ -468,7 +468,8 @@ static int Upload_SubSeqEvilCheckStart(WorldTradeWork *wk) {
         wk->uploadPokemonData.countryCode, wk->uploadPokemonData.localCode, wk->uploadPokemonData.langCode);
     wk->uploadPokemonData.localCode = Country_GetValidRegion(
         wk->uploadPokemonData.countryCode, wk->uploadPokemonData.localCode, wk->uploadPokemonData.langCode);
-    wk->evilCheck = NHttpRap_Create(HEAPID_WORLDTRADE, func_02008bdc(wk->param->mystatus), wk->wifiLoginBuffer);
+    wk->evilCheck =
+        NHttpRap_Create(HEAPID_WORLDTRADE, PlayerInfo_GetProfileId(wk->param->mystatus), wk->wifiLoginBuffer);
     NHttpRap_BeginPost(wk->evilCheck, HEAPID_WORLDTRADE, PokeParty_GetPkmRawSize(), 1);
     NHttpRap_AddPostData(wk->evilCheck, pkm, PokeParty_GetPkmRawSize());
     ret = NHttpRap_SendValidate(wk->evilCheck);
@@ -488,7 +489,7 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
 
         switch (status) {
         case HTTP_STATUS_BAD_REQUEST:
-            func_020120f0(0x41);
+            GFL_NetErrRecordWifi(0x41);
             GFL_NetErrShow(0);
             NHttpRap_EndRequest(wk->evilCheck);
             NHttpRap_FreePostData(wk->evilCheck);
@@ -496,7 +497,7 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         case HTTP_STATUS_UNAUTHORIZED:
-            func_020120f0(0x42);
+            GFL_NetErrRecordWifi(0x42);
             GFL_NetErrShow(0);
             NHttpRap_EndRequest(wk->evilCheck);
             NHttpRap_FreePostData(wk->evilCheck);
@@ -504,7 +505,7 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         case HTTP_STATUS_REQUEST_TIMEOUT:
-            func_020120f0(0x44);
+            GFL_NetErrRecordWifi(0x44);
             GFL_NetErrShow(0);
             NHttpRap_EndRequest(wk->evilCheck);
             NHttpRap_FreePostData(wk->evilCheck);
@@ -512,7 +513,7 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         default:
-            func_020120f0(0x43);
+            GFL_NetErrRecordWifi(0x43);
             GFL_NetErrShow(0);
             NHttpRap_EndRequest(wk->evilCheck);
             NHttpRap_FreePostData(wk->evilCheck);
@@ -552,9 +553,9 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
         wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
         NHttpRap_FreePostData(wk->evilCheck);
         NHttpRap_Destroy(wk->evilCheck);
-        func_02012154();
+        GFL_NetErrShutdown();
         func_020424e4();
-        func_02012144();
+        GFL_NetErrClear();
         func_02042478();
     }
     return WT_SEQ_MAIN;
@@ -616,9 +617,9 @@ static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
     } else if (wk->timeoutCount++ == UPLOAD_TIMEOUT) {
         wk->connectErrorNo = -5;
         wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-        func_02012154();
+        GFL_NetErrShutdown();
         func_020424e4();
-        func_02012144();
+        GFL_NetErrClear();
         func_02042478();
     }
     return WT_SEQ_MAIN;
@@ -646,9 +647,9 @@ static int Upload_SubSeqUploadResult(WorldTradeWork *wk) {
         case -1:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -5:
@@ -671,9 +672,9 @@ static int Upload_SubSeqUploadResult(WorldTradeWork *wk) {
         case -15:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -13:
@@ -746,23 +747,23 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
                 // Traded in the meantime: take back the Pokémon it was traded for
                 wk->subprocessSeq = UPLOAD_SEQ_SERVER_TRADE_CHECK;
             } else {
-                Upload_DownloadPokemonDataAdd(wk, func_0200b4d0(wk->param->worldtrade_data),
+                Upload_DownloadPokemonDataAdd(wk, WorldTradeData_GetPkmPtr(wk->param->worldtrade_data),
                                               func_0200b4fc(wk->param->worldtrade_data), wk->uploadPokemonData.isTrade);
                 wk->subprocessSeq = UPLOAD_SEQ_SAVE;
             }
             break;
         case -3:
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -4:
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -12:
@@ -774,9 +775,9 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
         case -15:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -13:
@@ -872,9 +873,9 @@ static int Upload_SubSeqExchangeResult(WorldTradeWork *wk) {
         case -15:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -13:
@@ -963,7 +964,7 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
         case -3:
             // The deposited Pokémon is gone from the server: take back the save's copy
             wk->depositFlag = 0;
-            if (func_0200b4a8(wk->param->worldtrade_data)) {
+            if (WorldTradeData_GetFlag(wk->param->worldtrade_data)) {
                 PartyPkm *pkm = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
 
                 WorldTradeData_GetPkm(wk->param->worldtrade_data, pkm);
@@ -971,7 +972,7 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
                 wk->errorMesNo = 2;
                 wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE;
                 Upload_DownloadPokemonDataAdd(wk, pkm, func_0200b4fc(wk->param->worldtrade_data), FALSE);
-                func_0200b4b0(wk->param->worldtrade_data, 0);
+                WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
                 GFL_HeapFree(pkm);
             } else {
                 Upload_ReturnProcess(wk);
@@ -979,14 +980,14 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
             break;
         case -4:
             wk->depositFlag = 0;
-            if (func_0200b4a8(wk->param->worldtrade_data)) {
+            if (WorldTradeData_GetFlag(wk->param->worldtrade_data)) {
                 PartyPkm *pkm = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
 
                 WorldTradeData_GetPkm(wk->param->worldtrade_data, pkm);
                 loadPokemonNicknameToStrbuf(wk->wordSet, 0, pkm);
                 wk->errorMesNo = 3;
                 wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE;
-                func_0200b4b0(wk->param->worldtrade_data, 0);
+                WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
                 GFL_HeapFree(pkm);
             }
             break;
@@ -996,9 +997,9 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
         case -15:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -13:
@@ -1048,9 +1049,9 @@ static int Upload_SubSeqServerDownloadResult(WorldTradeWork *wk) {
         case -15:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             return WT_SEQ_MAIN;
         case -13:
@@ -1103,12 +1104,12 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
     Misc_AddMetTrainer(getHollow_RivalData(wk->param->savedata), trData->trainerID);
 
     partner = WorldTrade_MakePartnerStatus(trData);
-    func_0200a504(getPalPadFriendListAddress(wk->param->savedata), partner);
+    PalPadFriendList_AddPlayer(getPalPadFriendListAddress(wk->param->savedata), partner);
     GFL_HeapFree(partner);
 
     visitorInfo = WorldTrade_MakePartnerStatus(trData);
     MI_CpuFill8(&visitor, 0, sizeof(UnityTowerVisitor));
-    func_02008b34(visitorInfo, &visitor.info);
+    PlayerInfo_Copy(visitorInfo, &visitor.info);
     visitor.sentSpecies =
         sent != NULL ? (u16)PokeParty_GetParam(sent, PKM_PARAM_SPECIES, NULL) : (u16)trData->postSimple.characterNo;
     otherColor = FALSE;
@@ -1122,10 +1123,10 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
     gameData = GSYS_GetGameData(wk->param->gsys);
     avenuePartner = WorldTrade_MakePartnerStatus(trData);
     joinAvenue = SaveControl_GetJoinAvenue(wk->param->savedata);
-    entry = func_02037a40(HEAPID_TAIL(HEAPID_WORLDTRADE));
-    func_02037ab4(entry, avenuePartner, PokeParty_GetParam(received, PKM_PARAM_SPECIES, NULL), 6);
-    func_02010078(joinAvenue, gameData, entry, 2);
-    func_02037a68(entry);
+    entry = JoinAvenueEntry_Create(HEAPID_TAIL(HEAPID_WORLDTRADE));
+    JoinAvenueEntry_Init(entry, avenuePartner, PokeParty_GetParam(received, PKM_PARAM_SPECIES, NULL), 6);
+    JoinAvenue_Add(joinAvenue, gameData, entry, 2);
+    JoinAvenueEntry_Free(entry);
     GFL_HeapFree(avenuePartner);
 
     // A trade with the other color earns a medal
@@ -1178,7 +1179,7 @@ static int Upload_SubSeqDownloadExStart(WorldTradeWork *wk) {
                                   func_0200b4fc(wk->param->worldtrade_data), wk->uploadPokemonData.isTrade);
     Upload_WifiHistoryDataSet(wk->param->wifihistory, &wk->uploadPokemonData);
     Upload_MakeTradeExchangeInfo(wk, (PartyPkm *)wk->uploadPokemonData.postData, &wk->uploadPokemonData, NULL);
-    func_0200b4b0(wk->param->worldtrade_data, 0);
+    WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
     wk->subprocessSeq = UPLOAD_SEQ_SAVE;
     Upload_SetSaveNextSequence(wk, UPLOAD_SEQ_DOWNLOAD_EX_FINISH, UPLOAD_SEQ_DOWNLOAD_SUCCESS_MESSAGE);
     return WT_SEQ_MAIN;
@@ -1203,9 +1204,9 @@ static int Upload_SubSeqDownloadExFinishResult(WorldTradeWork *wk) {
         case -3:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -4:
@@ -1283,9 +1284,9 @@ static int Upload_SubSeqServerPokeDeleteWait(WorldTradeWork *wk) {
         case -5:
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -2:
@@ -1409,7 +1410,7 @@ static int Upload_SubSeqNowSaveMessage(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqSave(WorldTradeWork *wk) {
-    func_0201782c(GSYS_GetGameData(wk->param->gsys));
+    GameData_StartSave(GSYS_GetGameData(wk->param->gsys));
     wk->subprocessSeq = UPLOAD_SEQ_SAVE_RANDOM_WAIT;
     wk->wait = GFL_RandomLC(60) + 2;
     return WT_SEQ_MAIN;
@@ -1423,14 +1424,14 @@ static int Upload_SubSeqSaveRandomWait(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqSaveWait(WorldTradeWork *wk) {
-    if (func_02017850(GSYS_GetGameData(wk->param->gsys)) == 1) {
+    if (GameData_UpdateSave(GSYS_GetGameData(wk->param->gsys)) == 1) {
         wk->subprocessSeq = wk->saveNextSeq1st;
     }
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqSaveLast(WorldTradeWork *wk) {
-    if (func_02017850(GSYS_GetGameData(wk->param->gsys)) == 2) {
+    if (GameData_UpdateSave(GSYS_GetGameData(wk->param->gsys)) == 2) {
         wk->subprocessSeq = wk->saveNextSeq2nd;
         WorldTrade_TimeIconDel(wk);
     }
@@ -1438,13 +1439,13 @@ static int Upload_SubSeqSaveLast(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqTimeoutSave(WorldTradeWork *wk) {
-    func_0201782c(GSYS_GetGameData(wk->param->gsys));
+    GameData_StartSave(GSYS_GetGameData(wk->param->gsys));
     wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE_WAIT;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqTimeoutSaveWait(WorldTradeWork *wk) {
-    if (func_02017850(GSYS_GetGameData(wk->param->gsys)) == 2) {
+    if (GameData_UpdateSave(GSYS_GetGameData(wk->param->gsys)) == 2) {
         WorldTrade_SubProcessChange(wk, WORLDTRADE_TITLE, 0);
         WorldTrade_TimeIconDel(wk);
         Enter_MessagePrintNoStream(wk, wk->msgManager, wk->errorMesNo, 1, 0xf0f);
@@ -1506,7 +1507,7 @@ static void Upload_UploadPokemonDataDelete(WorldTradeWork *wk, BOOL keep) {
         checkChatotInParty(getChatterDataAddress(gameData), GameData_GetParty(gameData));
     }
     if (keep) {
-        func_0200b4b0(wk->param->worldtrade_data, 1);
+        WorldTradeData_SetFlag(wk->param->worldtrade_data, 1);
     }
 }
 
@@ -1541,7 +1542,7 @@ static void Upload_DownloadPokemonDataAdd(WorldTradeWork *wk, PartyPkm *pkm, int
         wk->evoPokeInfo.boxNo = boxNo;
         wk->evoPokeInfo.pos = pos;
     }
-    func_0200b4b0(wk->param->worldtrade_data, 0);
+    WorldTradeData_SetFlag(wk->param->worldtrade_data, 0);
 }
 
 static void Upload_ExchangePokemonDataAdd(WorldTradeWork *wk, PartyPkm *pkm, Dpw_Tr_Data *upload, Dpw_Tr_Data *exchange,
@@ -1593,8 +1594,8 @@ static void Upload_WifiHistoryDataSet(UnityTowerSurveySave *save, Dpw_Tr_Data *t
     u8 region = trData->localCode;
     u8 country = trData->countryCode;
 
-    if (!func_02009ba4(save, country, region)) {
-        func_02009be0(save, country, region, 1);
+    if (!UnityTower_GetRegionState(save, country, region)) {
+        UnityTower_SetRegionState(save, country, region, 1);
     }
 }
 
@@ -1616,7 +1617,7 @@ static void Upload_SetSaveNextSequence(WorldTradeWork *wk, u16 nextSeq1st, u16 n
 
 // Whether the save took the Pokémon back while the server still had it
 static BOOL Upload_DuplicateCheck(WorldTradeWork *wk) {
-    if (func_0200b4a8(wk->param->worldtrade_data) == 0 && wk->depositFlag != 0) {
+    if (WorldTradeData_GetFlag(wk->param->worldtrade_data) == 0 && wk->depositFlag != 0) {
         return TRUE;
     }
     return FALSE;
@@ -1636,7 +1637,7 @@ static void Upload_ReplaceBadName(PartyPkm *pkm, HeapID heapId) {
         MailData *mail = CreateMailData(HEAPID_TAIL(heapId));
 
         PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
-        func_02009738(mail, GFL_StrBufGetStringPtr(name));
+        MailData_SetTrainerName(mail, GFL_StrBufGetStringPtr(name));
         PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
         GFL_HeapFree(mail);
     }

@@ -157,7 +157,7 @@ FMissionAppGra *FMissionAppGra_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     FMissionAppBG_Init(&graphic->bg, heapId);
     FMissionAppClAct_Init(&graphic->clact, &sFMissionAppVRAMConfig, heapId);
     FMissionAppG3dSys_Init(&graphic->g3d, heapId);
@@ -170,7 +170,7 @@ void FMissionAppGra_Free(FMissionAppGra *graphic) {
     FMissionAppG3dSys_Free(&graphic->g3d);
     FMissionAppClAct_Free(&graphic->clact);
     FMissionAppBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

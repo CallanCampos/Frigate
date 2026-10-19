@@ -876,7 +876,7 @@ static BOOL PkwdBook_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->graphic = PkwdBookGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 64, wk->heapId);
     wk->menu = NULL;
     wk->menuRes = AppTaskMenuRes_Create(4, 11, wk->font, wk->printQueue, wk->heapId);
@@ -889,7 +889,7 @@ static BOOL PkwdBook_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBookWork *wk = work;
     HeapID heapId;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return FALSE;
     }
     if (wk->param->result != NULL) {
@@ -898,7 +898,7 @@ static BOOL PkwdBook_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBook_FreeScreen(wk);
     AppTaskMenuRes_Free(wk->menuRes);
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     GFL_FontFree(wk->smallFont);
     PkwdBookGraphic_Free(wk->graphic);
@@ -1128,9 +1128,10 @@ static void PkwdBook_LoadTouchBarBG(PkwdBookWork *wk, u32 bg, u32 palette) {
     int row;
     int col;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_SUB_BG, palette << 5, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, wk->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_SUB_BG, palette << 5, 0x20,
+                                wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, wk->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, wk->heapId);
     screenBuf = GFL_BGSysIsScrHeapExists(bg);
     for (row = 0; row < 24; row++) {
         for (col = 0; col < 32; col++) {
@@ -1195,10 +1196,10 @@ static void PkwdBook_LoadBarRes(PkwdBookWork *wk, u32 surface) {
     u32 animFile;
 
     PkwdBookGraphic_GetClActUnit(wk->graphic);
-    paletteFile = func_0202d810();
-    charsFile = func_0202d814();
-    cellFile = func_0202d818(2);
-    animFile = func_0202d81c(2);
+    paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    charsFile = AppMenuCommon_GetTouchBarCharFile();
+    cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    animFile = AppMenuCommon_GetTouchBarAnimFile(2);
     wk->resources.named.barPalette = func_0204bbb8(arc, paletteFile, surface, 4 * 0x20, 0, 4, wk->heapId);
     wk->resources.named.barChars = func_0204b81c(arc, charsFile, FALSE, surface, wk->heapId);
     wk->resources.named.barCells = func_0204bde0(arc, cellFile, animFile, wk->heapId);
@@ -1240,7 +1241,8 @@ static void PkwdBook_LoadTypeIconRes(PkwdBookWork *wk) {
     wk->resources.named.typeIconPalette = func_0204bbb8(arc, 33, CLACT_VRAM_SUB, 8 * 0x20, 0, 3, wk->heapId);
     wk->resources.named.typeIconCells = func_0204bde0(arc, 61, 64, wk->heapId);
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
-        wk->resources.named.typeIconChars[i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        wk->resources.named.typeIconChars[i] =
+            func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -1249,12 +1251,13 @@ static void PkwdBook_LoadTypeIconRes(PkwdBookWork *wk) {
 static void PkwdBook_SetTypeIcon(PkwdBookWork *wk, u32 slot, u32 unused, u32 type) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->heapId));
     NNSG2dCharacterData *charData;
-    void *file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d7f4(type), FALSE, &charData, HEAPID_TAIL(wk->heapId));
+    void *file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, &charData,
+                                         HEAPID_TAIL(wk->heapId));
 
     func_0204ba40(wk->resources.named.typeIconChars[slot], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->typeIcons[slot], func_0202d7e8(type), 1);
+    func_0204c378(wk->typeIcons[slot], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void PkwdBook_LoadTrainerRes(PkwdBookWork *wk, u32 surface, u32 trainerClass) {
@@ -1632,7 +1635,7 @@ static void PkwdBook_FreeWindows(PkwdBookWork *wk, BOOL isSub) {
 static void PkwdBook_UpdateText(PkwdBookWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         if (wk->subWindows[i].window != NULL) {
             PrintWindow_Flush(&wk->subWindows[i], wk->printQueue);
@@ -1747,7 +1750,7 @@ static void PkwdBook_PrintLabels(PkwdBookWork *wk, BOOL isSub, u32 page) {
 // Scrolls the lower screen's BG to the page once its text is printed
 static void PkwdBook_UpdateScroll(PkwdBookWork *wk) {
     if (wk->flags & FLAG_SCROLL_PENDING) {
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             PkwdBook_ScrollBG(wk, wk->page);
             wk->flags &= ~FLAG_SCROLL_PENDING;
         }
@@ -1838,7 +1841,7 @@ static void PkwdBook_RunList(PkwdBookWork *wk) {
         }
         break;
     case PAGE_STEP_LIST_WAIT_PRINT:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             if (wk->flags & FLAG_SHOW_MOVIE) {
                 PkwdBook_ShowMovie(wk, TRUE);
                 wk->flags &= ~FLAG_SHOW_MOVIE;
@@ -1903,7 +1906,7 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
     BOOL cancel = FALSE;
     s32 result;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     result = PkwdBook_HandleListResult(wk, PkwdBook_UpdateList(wk));
@@ -2054,7 +2057,7 @@ static void PkwdBook_CastInput(PkwdBookWork *wk) {
     s32 action = 0;
     s32 touch;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     touch = PkwdBook_ReadTouch(wk, wk->page);
@@ -2203,7 +2206,7 @@ static void PkwdBook_PokemonInput(PkwdBookWork *wk) {
     s32 action = 0;
     s32 touch;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     touch = PkwdBook_ReadTouch(wk, wk->page);

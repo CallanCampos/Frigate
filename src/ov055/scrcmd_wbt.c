@@ -17,7 +17,7 @@
 // The commands of the Pokémon World Tournament's script plugins (plugins 6 and 7), from 1000, that both plugins use
 
 WbtSystem *func_ov055_021e5800(FieldScriptEnv *env) {
-    return *func_020179f0(FieldScriptEnv_GetGameData(env));
+    return *GameData_GetWbtSystemPtr(FieldScriptEnv_GetGameData(env));
 }
 
 // Counts a win of the tournament in the save
@@ -26,7 +26,7 @@ static void func_ov055_021e5810(WbtSystem *sys, FieldScriptEnv *env) {
     int record = func_ov055_021e6750(func_ov055_021e5ca4(sys), func_ov055_021e5cb4(sys));
 
     if (record < 29) {
-        func_0200feb4(save, record);
+        WbtSave_IncrementCount(save, record);
     }
 }
 
@@ -55,7 +55,7 @@ static u16 func_ov055_021e5844(FieldScriptEnv *env, int tournament, u8 type) {
         end = start + 1;
     }
     for (i = start; i < end; i++) {
-        total += func_0200feac(save, i);
+        total += WbtSave_GetCount(save, i);
         if (total >= 9999) {
             total = 9999;
             break;
@@ -67,7 +67,7 @@ static u16 func_ov055_021e5844(FieldScriptEnv *env, int tournament, u8 type) {
 static BOOL WbtCmd_Create(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     BOOL flag = EventWork_FlagGet(GameData_GetEventWork(gameData), 2441);
-    WbtSystem **sys = func_020179f0(gameData);
+    WbtSystem **sys = GameData_GetWbtSystemPtr(gameData);
 
     *sys = WbtSystem_Create(HEAPID_GAMEEVENT, flag);
     WbtMakeMatch_LoadBattleBoxParty(*sys, gameData);
@@ -75,7 +75,7 @@ static BOOL WbtCmd_Create(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL WbtCmd_Free(VM *vm, FieldScriptEnv *env) {
-    WbtSystem **sys = func_020179f0(FieldScriptEnv_GetGameData(env));
+    WbtSystem **sys = GameData_GetWbtSystemPtr(FieldScriptEnv_GetGameData(env));
 
     WbtSystem_Free(*sys);
     *sys = NULL;
@@ -83,7 +83,7 @@ static BOOL WbtCmd_Free(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL WbtCmd_IsCreated(VM *vm, FieldScriptEnv *env) {
-    WbtSystem **sys = func_020179f0(FieldScriptEnv_GetGameData(env));
+    WbtSystem **sys = GameData_GetWbtSystemPtr(FieldScriptEnv_GetGameData(env));
     u16 *var = ScriptReadVar(vm, env);
 
     *var = *sys != NULL ? TRUE : FALSE;

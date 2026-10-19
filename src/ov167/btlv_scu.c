@@ -114,7 +114,7 @@ struct BtlvScu {
     u8 clientId;                       // 0x140 only stored
     u8 msgFinished;                    // 0x141 set when the stream reports PRINT_STREAM_DONE, read and cleared by
                                        //       func_ov167_021d2ec4
-    u32 streamState;                   // 0x144 func_020223b4
+    u32 streamState;                   // 0x144 PrintStream_GetState
     u16 waitTimer;                     // 0x148
     u16 pageWait;                      // 0x14A the wait after a paused page
     u16 endWait;                       // 0x14C the wait after the last page
@@ -390,7 +390,7 @@ BtlvScu *func_ov167_021d0c24(BtlvCore *core, BtlMainModule *mainModule, BtlPokeC
     scu->lineStrbuf = GFL_StrBufCreate(0x180, heapId);
     scu->unk14E = 0;
     scu->abilityCharFile = NULL;
-    scu->printQueue = func_02021998(scu->heapId);
+    scu->printQueue = PrintQueue_CreateDefault(scu->heapId);
     PrintWindow_Init(&scu->printWindow, scu->msgWin);
     return scu;
 }
@@ -471,7 +471,7 @@ void func_ov167_021d0f84(BtlvScu *scu) {
     GFL_BGSysReleaseBG(2);
     GFL_BGSysReleaseBG(3);
     if (scu->printQueue != NULL) {
-        func_02021a18(scu->printQueue);
+        PrintQueue_Free(scu->printQueue);
         scu->printQueue = NULL;
     }
     if (scu->lineStrbuf != NULL) {
@@ -1807,9 +1807,10 @@ void func_ov167_021d2e20(BtlvScu *scu, const StrBuf *strbuf, u16 wait, BtlvMsgCa
 
     GFL_BitmapFill(scu->msgBitmap, color);
     GFL_TextRndUpdateColorIndexLUT(1, 9, color);
-    scu->printStream = func_02022294(scu->msgWin, 0, 0, strbuf, scu->font, func_ov167_0219bde0(scu->mainModule),
-                                     scu->tcbManager, 0, scu->heapId, color, callback);
-    func_02022390(scu->printStream);
+    scu->printStream =
+        PrintStream_CreateWithCallback(scu->msgWin, 0, 0, strbuf, scu->font, func_ov167_0219bde0(scu->mainModule),
+                                       scu->tcbManager, 0, scu->heapId, color, callback);
+    PrintStream_Pause(scu->printStream);
     scu->msgSeq = 0;
     scu->printedAtOnce = FALSE;
     if (wait == 0xff) {
@@ -1846,21 +1847,21 @@ BOOL func_ov167_021d2edc(BtlvScu *scu) {
             break;
         }
         if (scu->printStream != NULL) {
-            func_020223a4(scu->printStream);
+            PrintStream_Resume(scu->printStream);
         }
         scu->msgSeq++;
     case 2:
         if (scu->printStream != NULL) {
             if (!func_ov167_0219bee4(scu->mainModule)) {
                 if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-                    if (!func_02022458(scu->printStream)) {
-                        func_02022410(scu->printStream, func_02017c50(2));
+                    if (!PrintStream_IsFast(scu->printStream)) {
+                        PrintStream_SetFastWait(scu->printStream, TextSpeed_GetWait(2));
                     }
-                } else if (func_02022458(scu->printStream)) {
-                    func_0202243c(scu->printStream);
+                } else if (PrintStream_IsFast(scu->printStream)) {
+                    PrintStream_ClearFast(scu->printStream);
                 }
             }
-            scu->streamState = func_020223b4(scu->printStream);
+            scu->streamState = PrintStream_GetState(scu->printStream);
             if (scu->streamState != 0) {
                 if (!func_ov167_0219bee4(scu->mainModule)) {
                     scu->msgSeq = 3;
@@ -1895,12 +1896,12 @@ BOOL func_ov167_021d2edc(BtlvScu *scu) {
         break;
     case 5:
         if (scu->streamState == 2) {
-            func_020232d8();
-            func_020223cc(scu->printStream);
+            GFL_TextRndResetColorIndexLUT();
+            PrintStream_Delete(scu->printStream);
             scu->printStream = NULL;
             scu->msgSeq = 6;
         } else {
-            func_020223bc(scu->printStream);
+            PrintStream_Continue(scu->printStream);
             GFL_SndSEPlay(0x547);
             scu->msgSeq = 2;
             scu->waitTimer = scu->pageWait;
@@ -2644,7 +2645,7 @@ static void func_ov167_021d3ddc(BtlvScuAbilityWin *win) {
     MIi_CpuCopy32((u8 *)win->scu->abilityChars->rawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap), size);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     func_ov167_021d4ec0(scu->abilityStrbuf, 0x67, 2, win->monId, win->ability);
-    if ((u8)func_020228c0(scu->abilityStrbuf, scu->smallFont, 0, widths, 2) > 1) {
+    if ((u8)GFL_FontGetLineWidths(scu->abilityStrbuf, scu->smallFont, 0, widths, 2) > 1) {
         // Two lines, the first from the left and the second to the right, at least 12 pixels apart
         end = widths[0] + 8;
         x2 = 0x84 - widths[1];
@@ -2662,9 +2663,9 @@ static void func_ov167_021d3ddc(BtlvScuAbilityWin *win) {
         if (x2 < 0) {
             x2 = 0;
         }
-        func_02022900(scu->abilityStrbuf, scu->lineStrbuf, 0);
+        GFL_FontCopyLine(scu->abilityStrbuf, scu->lineStrbuf, 0);
         GFL_TextRendererDrawToBitmap(win->bitmap, x1, 7, scu->lineStrbuf, scu->smallFont);
-        func_02022900(scu->abilityStrbuf, scu->lineStrbuf, 1);
+        GFL_FontCopyLine(scu->abilityStrbuf, scu->lineStrbuf, 1);
         GFL_TextRendererDrawToBitmap(win->bitmap, x2, 0x12, scu->lineStrbuf, scu->smallFont);
     } else {
         x1 = (0x88 - GFL_FontGetBlockWidth(scu->abilityStrbuf, scu->smallFont, 0)) / 2;

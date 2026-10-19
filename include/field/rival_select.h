@@ -23,7 +23,7 @@ struct RivalSelectContext {
     MMSys *actors;
 };
 
-RivalEntry *func_02014864(void *owner);
+RivalEntry *LinkFestival_GetEntries(void *owner);
 u8 getHollowNum(RivalDataSave *save);
 
 RivalEntry *func_ov073_021e8be0(RivalSelectContext *context, u32 id);

@@ -103,17 +103,17 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        info = func_02017378(gameData, i);
+        info = GameData_GetPlayerInfoByNetID(gameData, i);
         if (i != func_02042a6c(func_02040440()) && info != NULL &&
-            func_0200a438(GameData_GetWifiList(gameData), info, &friendIndex)) {
+            WifiList_FindFriendByPlayerInfo(GameData_GetWifiList(gameData), info, &friendIndex)) {
             if (i == partner) {
-                func_0200a29c(GameData_GetWifiList(gameData), friendIndex);
+                WifiList_SetFriendLastDateToNow(GameData_GetWifiList(gameData), friendIndex);
             } else if (work->players.result == 0) {
-                func_0200a2d4(GameData_GetWifiList(gameData), friendIndex, 1, 0, 0);
+                WifiList_AddFriendRecord(GameData_GetWifiList(gameData), friendIndex, 1, 0, 0);
             } else if (work->players.result == 1) {
-                func_0200a2d4(GameData_GetWifiList(gameData), friendIndex, 0, 1, 0);
+                WifiList_AddFriendRecord(GameData_GetWifiList(gameData), friendIndex, 0, 1, 0);
             } else {
-                func_0200a29c(GameData_GetWifiList(gameData), friendIndex);
+                WifiList_SetFriendLastDateToNow(GameData_GetWifiList(gameData), friendIndex);
             }
         }
     }
@@ -127,7 +127,8 @@ void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
 
             for (; i < 4; i++) {
                 work->players.players[work->ircMatch.order[i]].party = work->parties[i];
-                work->players.players[work->ircMatch.order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
+                work->players.players[work->ircMatch.order[i]].info =
+                    GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
             }
         } else {
             s32 i = 0;
@@ -135,7 +136,8 @@ void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
 
             for (; i < 4; i++) {
                 work->players.players[places[work->ircMatch.order[i]]].party = work->parties[i];
-                work->players.players[places[work->ircMatch.order[i]]].info = func_02017378(GSYS_GetGameData(gsys), i);
+                work->players.players[places[work->ircMatch.order[i]]].info =
+                    GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
             }
         }
     } else if (func_02042a6c(func_02040440()) == 0) {
@@ -143,7 +145,8 @@ void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
 
         for (; i < 2; i++) {
             work->players.players[work->ircMatch.order[i]].party = work->parties[i];
-            work->players.players[work->ircMatch.order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
+            work->players.players[work->ircMatch.order[i]].info =
+                GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
         }
     } else {
         s32 i = 0;
@@ -151,7 +154,8 @@ void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
 
         for (; i < 2; i++) {
             work->players.players[places[work->ircMatch.order[i]]].party = work->parties[i];
-            work->players.players[places[work->ircMatch.order[i]]].info = func_02017378(GSYS_GetGameData(gsys), i);
+            work->players.players[places[work->ircMatch.order[i]]].info =
+                GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
         }
     }
 }
@@ -237,8 +241,8 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             (*state)++;
         }
         if (GFL_NetErrCheck()) {
-            if (func_02012154() == TRUE) {
-                func_02011de0();
+            if (GFL_NetErrShutdown() == TRUE) {
+                GFL_NetErrShowScreen();
             } else {
                 GFL_NetErrAbort();
             }
@@ -288,7 +292,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         BtlSetup_SetParty(work->btlSetup, work->party, 0);
         BtlSetup_AllocRecBuffer(work->btlSetup, 1);
         work->bgm = GFL_SndBGMGetID();
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
         func_02040624(func_02040440(), 10, 12);
         (*state)++;
         break;
@@ -296,8 +300,8 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         if (GFL_NetErrCheck()) {
             BtlSetup_Free(work->btlSetup);
             work->btlSetup = NULL;
-            if (func_02012154() == TRUE) {
-                func_02011de0();
+            if (GFL_NetErrShutdown() == TRUE) {
+                GFL_NetErrShowScreen();
             } else {
                 GFL_NetErrAbort();
             }
@@ -331,7 +335,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         func_ov012_021504a4(work, GSYS_GetGameData(gsys));
         BtlSetup_Free(work->btlSetup);
         work->btlSetup = NULL;
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
         func_ov012_02150ccc(work);
         *state = 17;
         break;
@@ -401,7 +405,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         break;
     case 20:
         if (!func_02042788()) {
-            func_02012144();
+            GFL_NetErrClear();
             *state = 21;
         }
         break;

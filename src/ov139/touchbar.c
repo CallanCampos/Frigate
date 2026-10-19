@@ -258,14 +258,18 @@ static void TouchBarGfx_Load(TouchBarGfx *gfx, u8 bg, u32 vramType, u32 bgScreen
     gfx->bg = bg;
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     if (!noBg) {
-        GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), bgScreenType, bgPalette * 32, 0x20, heapId);
-        gfx->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), gfx->bg, 0x20 << 6, FALSE, heapId);
-        LoadBarScreen(arc, func_0202d828(), gfx->bg, CHAR_POS(gfx->bgChars), 0, 21, 32, 24, 0, 21, 32, 3, bgPalette,
-                      FALSE, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), bgScreenType, bgPalette * 32, 0x20,
+                                    heapId);
+        gfx->bgChars =
+            GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), gfx->bg, 0x20 << 6, FALSE, heapId);
+        LoadBarScreen(arc, AppMenuCommon_GetBarScreenFile(), gfx->bg, CHAR_POS(gfx->bgChars), 0, 21, 32, 24, 0, 21, 32,
+                      3, bgPalette, FALSE, heapId);
     }
-    gfx->res[TOUCHBAR_RES_PALETTE] = func_0204bbb8(arc, func_0202d810(), vramType, objPalette * 32, 0, 3, heapId);
-    gfx->res[TOUCHBAR_RES_CHARS] = func_0204b81c(arc, func_0202d814(), FALSE, vramType, heapId);
-    gfx->res[TOUCHBAR_RES_CELL_ANIMS] = func_0204bde0(arc, func_0202d818(mapping), func_0202d81c(mapping), heapId);
+    gfx->res[TOUCHBAR_RES_PALETTE] =
+        func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), vramType, objPalette * 32, 0, 3, heapId);
+    gfx->res[TOUCHBAR_RES_CHARS] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, vramType, heapId);
+    gfx->res[TOUCHBAR_RES_CELL_ANIMS] = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(mapping),
+                                                      AppMenuCommon_GetTouchBarAnimFile(mapping), heapId);
     GFL_ArcToolFree(arc);
 }
 

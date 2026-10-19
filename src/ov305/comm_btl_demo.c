@@ -409,7 +409,7 @@ static BOOL CommBtlDemoProc_Init(GameProc *proc, u32 *state, void *param, void *
     wk->graphic = CommBtlDemoGraphic_Create(GX_DISP_SELECT_SUB_MAIN, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_INTRO_BTL_SERVER_FLOW, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->scene = UIScene_Create(wk->heapId, sCommBtlDemoSteps, 3, CommBtlDemo_GetFirstScene(prm), wk);
     CommBtlDemo_LoadBG(&wk->back, wk->heapId, wk->param->competition);
     CommBtlDemoG3D_Init(&wk->g3d, wk->graphic, wk->heapId);
@@ -432,7 +432,7 @@ static BOOL CommBtlDemoProc_End(GameProc *proc, u32 *state, void *param, void *w
     }
     UIScene_Free(wk->scene);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     CommBtlDemoObj_Free(&wk->obj);
     CommBtlDemoG3D_Free(&wk->g3d);
@@ -451,7 +451,7 @@ static BOOL CommBtlDemoProc_Main(GameProc *proc, u32 *state, void *param, void *
     if (UIScene_Main(wk->scene)) {
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     CommBtlDemoGraphic_Update(wk->graphic);
     wk->scroll++;
     GFL_BGSysMoveBGReq(3, BG_MOVE_SET_X, wk->scroll / 2);

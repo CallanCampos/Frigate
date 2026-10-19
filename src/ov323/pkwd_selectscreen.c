@@ -126,7 +126,7 @@ typedef struct {
 // A screen of the theater and its movie: the fields of the downloaded movie in its slot
 typedef struct {
     u32 screen;
-    // func_02010644's result, 1 when the slot has a movie
+    // Pokewood_LoadDownloadedMovie's result, 1 when the slot has a movie
     u32 loaded;
     s32 movie;
     // In tenths of a billion
@@ -543,7 +543,7 @@ static BOOL PkwdSelectScreen_Main(GameProc *proc, u32 *state, void *param, void 
     if (wk->tcbManager != NULL) {
         GFL_TCBExMgrUpdate(wk->tcbManager);
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PkwdSelectScreen_FlushWindows(wk);
     if (wk->cursor >= 0) {
         BlinkPalAnm_Main(wk->blinks[wk->cursor]);
@@ -828,26 +828,26 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
     s32 loadedCount = 0;
     s32 emptyIdx = SCREEN_COUNT - 1;
 
-    func_0200c1f0();
+    BattleRec_LoadToolOverlay();
     allocatePokewoodBlk(HEAPID_PKWD_SELECTSCREEN);
     for (i = 0; i < SCREEN_COUNT; i++) {
         wk->movies[i].screen = i;
-        wk->movies[i].loaded = func_02010644(param->saveControl, HEAPID_PKWD_SELECTSCREEN, i);
+        wk->movies[i].loaded = Pokewood_LoadDownloadedMovie(param->saveControl, HEAPID_PKWD_SELECTSCREEN, i);
         if (wk->movies[i].loaded == 1) {
             PartyPkm *pkm = GFL_HeapAllocate(HEAPID_PKWD_SELECTSCREEN, PokeParty_GetPkmRawSize(), FALSE,
                                              "pkwd_selectscreen.c", 1570);
 
-            wk->movies[i].movie = func_020107f0(0, 0);
-            wk->movies[i].gross = func_020107f0(12, 0);
-            wk->movies[i].rank = func_020107f0(1, 0);
-            wk->movies[i].date = func_020107f0(10, 0);
-            wk->movies[i].time = func_020107f0(11, 0);
+            wk->movies[i].movie = Pokewood_GetLoadedMovieField(0, 0);
+            wk->movies[i].gross = Pokewood_GetLoadedMovieField(12, 0);
+            wk->movies[i].rank = Pokewood_GetLoadedMovieField(1, 0);
+            wk->movies[i].date = Pokewood_GetLoadedMovieField(10, 0);
+            wk->movies[i].time = Pokewood_GetLoadedMovieField(11, 0);
             wk->movies[i].watched = func_020111a0(param->save, i);
             for (j = 0; j < CAST_COUNT; j++) {
-                func_020107f0(2 + j, (u32)pkm);
+                Pokewood_GetLoadedMovieField(2 + j, (u32)pkm);
                 wk->movies[i].cast[j] = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
             }
-            func_020107f0(2, (u32)pkm);
+            Pokewood_GetLoadedMovieField(2, (u32)pkm);
             setPartyPokemonSpeciesNameToStrbuf(wk->movies[i].wordSet, 0, pkm);
             GFL_HeapFree(pkm);
         } else {
@@ -864,7 +864,7 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
         }
     }
     freeAndClearPokewoodBlk();
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
 }
 
 // The row with a movie that was touched this frame, which takes the cursor, or CURSOR_NONE
@@ -915,7 +915,7 @@ static void PkwdSelectScreen_InitText(PkwdSelectScreenWork *wk) {
         wk->movies[i].wordSet = GFL_WordSetSystemCreateDefault(HEAPID_PKWD_SELECTSCREEN);
     }
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_PKWD_SELECTSCREEN);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
 }
 
@@ -924,7 +924,7 @@ static void PkwdSelectScreen_FreeText(PkwdSelectScreenWork *wk) {
 
     GFL_TCBExMgrFree(wk->tcbManager);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     for (i = 0; i < SCREEN_COUNT; i++) {
         GFL_WordSetSystemFree(wk->sorted[i]->wordSet);
@@ -1055,8 +1055,8 @@ static void PkwdSelectScreen_PrintMessage(PkwdSelectScreenWork *wk, u32 messageI
     BmpWin_DrawFrame(window, 2, 0x20, 14);
     GFL_BitmapFill(BmpWin_GetBitmap(window), 0xff);
     GFL_MsgDataLoadStrbuf(wk->msgData, messageId, wk->strbuf);
-    wk->stream = func_02022268(window, 0, 0, wk->strbuf, wk->font, func_02017bcc(), wk->tcbManager, 4,
-                               HEAPID_PKWD_SELECTSCREEN, 15);
+    wk->stream = PrintStream_Create(window, 0, 0, wk->strbuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbManager, 4,
+                                    HEAPID_PKWD_SELECTSCREEN, 15);
     BmpWin_TransferNow(window);
 }
 
@@ -1161,7 +1161,7 @@ static s32 PkwdSelectScreen_GetLastCursor(PkwdSelectScreenWork *wk) {
 static BOOL PkwdSelectScreen_Input(PkwdSelectScreenWork *wk) {
     s32 picked = CURSOR_NONE;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return FALSE;
     }
     if (!TouchBar_IsTouching(wk->touchBar)) {
@@ -1210,14 +1210,14 @@ static BOOL PkwdSelectScreen_WaitBlink(PkwdSelectScreenWork *wk) {
 }
 
 static BOOL PkwdSelectScreen_WaitMessage(PkwdSelectScreenWork *wk) {
-    switch (func_020223b4(wk->stream)) {
+    switch (PrintStream_GetState(wk->stream)) {
     case PRINT_STREAM_DONE:
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->state = wk->nextState;
         break;
     case PRINT_STREAM_RUNNING:
         if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(wk->stream, 0);
+            PrintStream_SkipWait(wk->stream, 0);
         }
         break;
     }

@@ -345,7 +345,7 @@ static BOOL IrcCompatMenu_Init(GameProc *proc, u32 *state, void *param, void *wo
     } else {
         save = SaveControl_GetInstance();
     }
-    log = func_0200afbc(save);
+    log = TrainerLogSave_Get(save);
     IrcCompatMenuHearts_Init(&wk->hearts, &wk->graphic, log, HEAP_ID);
     unit = IrcCompatMenuGraphic_GetUnit(&wk->graphic);
     font = IrcCompatMenuText_GetFont(&wk->text);
@@ -362,7 +362,7 @@ static BOOL IrcCompatMenu_Init(GameProc *proc, u32 *state, void *param, void *wo
         IrcCompatMenu_SetStep(wk, IrcCompatMenu_StepMenu);
         break;
     }
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     CompatibleIrcSys_SetCount(wk->param->sys, 0);
     return TRUE;
 }
@@ -580,9 +580,9 @@ static ClActUnit *IrcCompatMenuClAct_GetUnit(IrcCompatMenuClAct *clact) {
 
 static void IrcCompatMenuText_Init(IrcCompatMenuText *text, HeapID heapId) {
     MI_CpuFill8(text, 0, sizeof(IrcCompatMenuText));
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    text->queue = func_02021998(heapId);
+    text->queue = PrintQueue_CreateDefault(heapId);
     text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_4, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 0, 0x20, heapId);
@@ -592,13 +592,13 @@ static void IrcCompatMenuText_Init(IrcCompatMenuText *text, HeapID heapId) {
 static void IrcCompatMenuText_Free(IrcCompatMenuText *text) {
     GFL_WordSetSystemFree(text->wordSet);
     GFL_MsgDataFree(text->msgData);
-    func_02021a18(text->queue);
+    PrintQueue_Free(text->queue);
     GFL_FontFree(text->font);
     MI_CpuFill8(text, 0, sizeof(IrcCompatMenuText));
 }
 
 static BOOL IrcCompatMenuText_Update(IrcCompatMenuText *text) {
-    return func_02021a3c(text->queue);
+    return PrintQueue_Main(text->queue);
 }
 
 static Font *IrcCompatMenuText_GetFont(IrcCompatMenuText *text) {
@@ -669,7 +669,7 @@ static void IrcCompatMenuWindow_PrintMsgCentered(IrcCompatMenuWindow *win, IrcCo
     y = BmpWin_GetSizeY(win->window) * 4;
     x -= (u16)(GFL_FontGetBlockWidth(win->strbuf, font, 0) / 2);
     y -= (u16)(GFL_FontGetBlockHeight(win->strbuf, font) / 2);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     PrintWindow_Print(&win->printWindow, queue, x, y, win->strbuf, font, PRINT_COLOR(15, 14, 1));
 }
 
@@ -970,7 +970,7 @@ static void IrcCompatMenuButtons_Init(IrcCompatMenuButtons *buttons, u8 bg, cons
         GFL_StrBufFree(label);
         BmpWin_FlushChar(buttons->windows[i]);
     }
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
 }
 
 static void IrcCompatMenuButtons_Free(IrcCompatMenuButtons *buttons) {
@@ -1174,7 +1174,7 @@ static void IrcCompatMenuHearts_Init(IrcCompatMenuHearts *hearts, IrcCompatMenuG
     if (log == NULL) {
         hearts->count = HEART_COUNT;
     } else {
-        hearts->count = func_0200afc8(log);
+        hearts->count = TrainerLogSave_CountEntries(log);
     }
     for (i = 0; i < hearts->count; i++) {
         ClActor *actor = IrcCompatMenuGraphic_GetActor(graphic, i);

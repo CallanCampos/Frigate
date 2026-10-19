@@ -243,11 +243,11 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
     switch (*state) {
     case 0:
         save = GameData_GetSaveControl(work->gameData);
-        records = func_02010dec(save);
+        records = FestRecords_GetFromSave(save);
         medalBox = SaveControl_GetMedalBox(save);
         if (work->joined) {
             joinedCount = FestRecords_AddJoined(records);
-            func_0201472c(work->festival, &work->mission, work->joined);
+            LinkFestival_StartMission(work->festival, &work->mission, work->joined);
             work->mission = *(FestMission *)GetFestMissionCfg(work->festival);
             FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
             if (joinedCount >= 1) {
@@ -268,9 +268,10 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
             next = EventMEPlay_Create(work->gsys, SEQ_ME_MISSION_START);
         }
         GameEvent_ChainNext(event, next);
-        FestMissionLog_AddPlayer(func_020146fc(work->festival), work->gameData, work->joined);
-        func_02038bc8(7);
-        func_02014844(work->festival, func_ov012_02160eb4(work->gameData, Field_GetPlayerStateZoneID(work->field)));
+        FestMissionLog_AddPlayer(LinkFestival_GetLog(work->festival), work->gameData, work->joined);
+        JoinAvenue_RecordActivity(7);
+        LinkFestival_IsNewZoneFromOutside(work->festival,
+                                          func_ov012_02160eb4(work->gameData, Field_GetPlayerStateZoneID(work->field)));
         work->window = func_ov036_02187ca0(work->msgBGSys, work->msgData, 1, 1, 30, 20);
         func_ov036_02187d38(work->window);
         FestMission_PrintStart(work);
@@ -336,7 +337,7 @@ static GameEventReturnCode EventFestMissionMessage_Callback(GameEvent *event, u3
         break;
     case 1:
         FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
-        func_02014964(work->festival, &work->mission);
+        LinkFestival_AddRecord(work->festival, &work->mission);
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
     }

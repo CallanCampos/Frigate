@@ -106,7 +106,7 @@ void func_ov255_021cdf9c(Box2AppWork *app) {
 void func_ov255_021cdfe8(Box2AppWork *app) {
     u32 i;
 
-    func_02021a3c(app->printQueue);
+    PrintQueue_Main(app->printQueue);
     for (i = 0; i < BOX2_WIN_MAX; i++) {
         PrintWindow_Flush(&app->windows[i], app->printQueue);
     }

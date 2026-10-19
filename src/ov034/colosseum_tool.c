@@ -172,7 +172,7 @@ void UnionEff_UpdateColosseumCommPlayers(UnionColosseum *colosseum) {
 }
 
 static u16 UnionEff_GetMemberLook(PlayerInfo *info) {
-    u32 look = func_02008bfc(info);
+    u32 look = PlayerInfo_GetVersion(info);
     u32 gender = getTrainerGender(info);
 
     if ((u8)(look + 0xea) <= 1) {

@@ -96,7 +96,7 @@ static void *func_ov012_02161858(void *work) {
     BSubwayScrWork *bsw = work;
     BSubwayBeacon *beacon = &bsw->beacon;
 
-    func_02008b34(GetGameDataPlayerInfo(bsw->gameData), &beacon->playerInfo);
+    PlayerInfo_Copy(GetGameDataPlayerInfo(bsw->gameData), &beacon->playerInfo);
     OS_GetMacAddress(beacon->mac);
     beacon->gameId = 0x3a0b;
     return beacon;
@@ -185,7 +185,7 @@ void func_ov012_02161990(BSubwayScrWork *bsw, u16 mode, u16 value) {
         break;
     case 3:
         bsw->sendCommand = BSUBWAY_COMM_PLAYER_INFO;
-        func_02008b34(GetGameDataPlayerInfo(gameData), (PlayerInfo *)bsw->sendBuf);
+        PlayerInfo_Copy(GetGameDataPlayerInfo(gameData), (PlayerInfo *)bsw->sendBuf);
         break;
     case 4:
         bsw->sendCommand = BSUBWAY_COMM_PLAY_MODE;

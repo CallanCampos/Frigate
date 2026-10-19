@@ -259,7 +259,7 @@ void func_ov036_021b5064(PlaceName *wk) {
         _endColorBlending(wk);
         break;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
 }
 
 void func_ov036_021b50c8(PlaceName *wk, s32 zoneId) {
@@ -797,8 +797,8 @@ void func_ov036_021b5a0c(PlaceName *wk) {
 }
 
 void func_ov036_021b5a14(PlaceName *wk) {
-    wk->printQueue = func_02021998(FieldPlaceName_GetHeapID(wk));
-    func_02021a20(wk->printQueue, TRUE);
+    wk->printQueue = PrintQueue_CreateDefault(FieldPlaceName_GetHeapID(wk));
+    PrintQueue_SetQueueAlways(wk->printQueue, TRUE);
 }
 
 void func_ov036_021b5a2c(PlaceName *wk) {
@@ -811,7 +811,7 @@ void func_ov036_021b5a44(PlaceName *wk) {
 
 void func_ov036_021b5a58(PlaceName *wk) {
     if (wk->printQueue != NULL) {
-        func_02021a18(wk->printQueue);
+        PrintQueue_Free(wk->printQueue);
         wk->printQueue = NULL;
     }
 }

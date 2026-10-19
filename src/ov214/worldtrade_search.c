@@ -819,9 +819,9 @@ static int Search_SubSeqServerResult(WorldTradeWork *wk) {
             GFL_SndStop();
             wk->searchResult = 0;
             wk->subprocessSeq = SEARCH_SEQ_ERROR_DISCONNECT_MES1;
-            func_02012154();
+            GFL_NetErrShutdown();
             func_020424e4();
-            func_02012144();
+            GFL_NetErrClear();
             func_02042478();
             break;
         case -13:

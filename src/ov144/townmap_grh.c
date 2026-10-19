@@ -149,7 +149,7 @@ static void TownMapGraphic_InitDisplay(void) {
     GFL_BGSysSetDisplayLayout(0);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
 }
 
 static void TownMapGraphic_VBlank(TCB *tcb, void *data) {

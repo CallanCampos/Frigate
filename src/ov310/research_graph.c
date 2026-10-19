@@ -2400,10 +2400,10 @@ static u8 ResearchGraph_GetSurveyID(ResearchGraph *wk) {
     int i;
     u8 questions[RESEARCH_QUESTION_COUNT];
     u8 id;
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
 
     for (i = 0; i < RESEARCH_QUESTION_COUNT; i++) {
-        questions[i] = func_0200ece4(survey, i);
+        questions[i] = SurveySave_GetQuestion(survey, i);
     }
     for (id = 0; id < SURVEY_COUNT; id++) {
         if (questions[0] == sGraphSurveyQuestions1[id] && questions[1] == sGraphSurveyQuestions2[id] &&
@@ -2416,7 +2416,7 @@ static u8 ResearchGraph_GetSurveyID(ResearchGraph *wk) {
 
 // The ID of the player's answer to the question, or 0 if the player hasn't answered it
 static u8 ResearchGraph_GetPlayerAnswer(ResearchGraph *wk) {
-    void *answers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk))));
+    void *answers = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk))));
     u8 questionId = ResearchGraph_GetQuestionID(wk);
     u16 answer;
 
@@ -2424,7 +2424,7 @@ static u8 ResearchGraph_GetPlayerAnswer(ResearchGraph *wk) {
         return ResearchGraph_GetPlayTimeAnswer(wk);
     }
 
-    answer = func_0200ec3c(answers, questionId);
+    answer = SurveySave_ReadAnswer(answers, questionId);
     if (answer == 0) {
         return 0;
     }
@@ -2433,7 +2433,7 @@ static u8 ResearchGraph_GetPlayerAnswer(ResearchGraph *wk) {
 }
 
 static u8 ResearchGraph_GetPlayTimeAnswer(ResearchGraph *wk) {
-    u16 hours = func_02008cec(func_02017a40(ResearchGraph_GetGameData(wk)));
+    u16 hours = PlayTime_GetHours(GameData_GetPlayTime(ResearchGraph_GetGameData(wk)));
 
     if (hours < 10) {
         return ANSWER_PLAY_TIME_FIRST;
@@ -2460,9 +2460,9 @@ static u8 ResearchGraph_GetPlayTimeAnswer(ResearchGraph *wk) {
 }
 
 static u32 ResearchGraph_GetSavedTodayTotal(ResearchGraph *wk) {
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
 
-    return func_0200ecf0(survey, ResearchGraph_GetQuestionID(wk));
+    return SurveySave_GetTodayCount(survey, ResearchGraph_GetQuestionID(wk));
 }
 
 static u32 ResearchGraph_GetObjRes(ResearchGraph *wk, u32 index) {
@@ -2621,7 +2621,7 @@ static void ResearchGraph_ClearData(ResearchGraph *wk) {
 
 // Reads the survey's questions and the counts of their answers from the save, adding today's to those of before
 static void ResearchGraph_LoadData(ResearchGraph *wk) {
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
     int count;
     int q, i;
     u8 surveyId = ResearchGraph_GetSurveyID(wk);
@@ -2633,18 +2633,18 @@ static void ResearchGraph_LoadData(ResearchGraph *wk) {
     u8 questions[RESEARCH_QUESTION_COUNT];
     u8 answerCounts[RESEARCH_QUESTION_COUNT];
 
-    questions[0] = func_0200ece4(survey, 0);
-    questions[1] = func_0200ece4(survey, 1);
-    questions[2] = func_0200ece4(survey, 2);
+    questions[0] = SurveySave_GetQuestion(survey, 0);
+    questions[1] = SurveySave_GetQuestion(survey, 1);
+    questions[2] = SurveySave_GetQuestion(survey, 2);
     answerCounts[0] = GetSurveyAnswerMsgIDCount(questions[0]);
     answerCounts[1] = GetSurveyAnswerMsgIDCount(questions[1]);
     answerCounts[2] = GetSurveyAnswerMsgIDCount(questions[2]);
-    todayTotals[0] = func_0200ecf0(survey, questions[0]);
-    todayTotals[1] = func_0200ecf0(survey, questions[1]);
-    todayTotals[2] = func_0200ecf0(survey, questions[2]);
-    pastTotals[0] = func_0200ed14(survey, questions[0]);
-    pastTotals[1] = func_0200ed14(survey, questions[1]);
-    pastTotals[2] = func_0200ed14(survey, questions[2]);
+    todayTotals[0] = SurveySave_GetTodayCount(survey, questions[0]);
+    todayTotals[1] = SurveySave_GetTodayCount(survey, questions[1]);
+    todayTotals[2] = SurveySave_GetTodayCount(survey, questions[2]);
+    pastTotals[0] = SurveySave_GetTotalCount(survey, questions[0]);
+    pastTotals[1] = SurveySave_GetTotalCount(survey, questions[1]);
+    pastTotals[2] = SurveySave_GetTotalCount(survey, questions[2]);
 
     for (q = 0; q < RESEARCH_QUESTION_COUNT; q++) {
         u8 question = questions[q];
@@ -2652,8 +2652,8 @@ static void ResearchGraph_LoadData(ResearchGraph *wk) {
         count = answerCounts[q];
         for (i = 0; i < count; i++) {
             answerIds[q][i] = GetSurveyAnswerMsgID(question, i);
-            todayCounts[q][i] = func_0200ed48(survey, question, i + 1);
-            pastCounts[q][i] = func_0200ed90(survey, question, i + 1);
+            todayCounts[q][i] = SurveySave_GetTodayAnswerCount(survey, question, i + 1);
+            pastCounts[q][i] = SurveySave_GetTotalAnswerCount(survey, question, i + 1);
         }
     }
 

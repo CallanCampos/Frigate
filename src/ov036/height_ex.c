@@ -155,7 +155,7 @@ GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data
         break;
     case 1:
         if (func_020427a4() == TRUE) {
-            func_02012144();
+            GFL_NetErrClear();
             func_02016b0c(gsys, 0);
             (*state)++;
         }

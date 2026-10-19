@@ -616,7 +616,7 @@ static void CGearSw_SetLampPattern(CGearSw *work, int pattern, int lamp, BOOL in
         slow = 0;
         light = 0;
     }
-    bits = func_02012be4(GameData_GetWifiList(work->gameData));
+    bits = WihDwc_GetStatus(GameData_GetWifiList(work->gameData));
     intrude = func_ov012_02153658(comm);
     if (alert) {
         if (intrude == 3) {
@@ -1187,7 +1187,7 @@ static void CGearSw_DragMarker(CGearSw *work) {
 
         if (pos != 0xff) {
             work->markerPos[work->marker] = pos;
-            func_020098f4(work->settings, work->marker, pos);
+            CGearSettings_SetColor(work->settings, work->marker, pos);
         }
         CGearSw_PlaceMarker(work, work->marker, work->markerPos[work->marker]);
         CGearSw_SetDragging(work, work->marker, FALSE);
@@ -1269,7 +1269,7 @@ static void CGearSw_UpdateTouch(CGearSw *work) {
         GFL_SndSEPlay(SEQ_SE_MSCL_07);
         work->panels[panel]++;
         work->panels[panel] %= 6;
-        func_020098dc(work->settings, panel, work->panels[panel]);
+        CGearSettings_SetPanel(work->settings, panel, work->panels[panel]);
         if (panel == PANEL_COUNT) {
             CGearSw_LoadSkinColors(work, work->panels[panel]);
         } else {
@@ -1783,7 +1783,7 @@ static void CGearSw_LoadColors(CGearSw *work) {
     int i;
 
     for (i = 0; i < PANEL_COUNT + 1; i++) {
-        work->panels[i] = func_020098e8(work->settings, (u8)i);
+        work->panels[i] = CGearSettings_GetPanel(work->settings, (u8)i);
         if (i < PANEL_COUNT) {
             CGearSw_LoadPanelColors(work, i, work->panels[i]);
         } else {
@@ -1818,7 +1818,7 @@ static void CGearSw_PlaceMarkers(CGearSw *work) {
     int i;
 
     for (i = 0; i < MARKER_COUNT; i++) {
-        work->markerPos[i] = func_02009900(work->settings, i);
+        work->markerPos[i] = CGearSettings_GetColor(work->settings, i);
         CGearSw_PlaceMarker(work, i, work->markerPos[i]);
     }
 }
@@ -1902,7 +1902,7 @@ static void CGearSw_InitGraphics(CGearSw *work, BOOL startup) {
     work->gender = getTrainerGender(GetGameDataPlayerInfo(work->gameData)) & 1;
     work->skin = func_020098c8(work->settings);
     for (i = 0; i < PANEL_COUNT + 1; i++) {
-        work->panels[i] = func_020098e8(work->settings, (u8)i);
+        work->panels[i] = CGearSettings_GetPanel(work->settings, (u8)i);
     }
     work->unit = func_0204bf1c(84, 0, work->heapId);
     work->renderer = func_0204be9c(&sSurfaceSetup, 1, work->heapId);
@@ -2069,11 +2069,11 @@ static BOOL CGearSw_LoadSkin(CGearSw *work, GameSystem *gsys) {
     CGearPictureSave *picture = GFL_HeapAllocate(HEAPID_FIELD_MENU, 0x2800, FALSE, "c_gear_sw.c", 3980);
     SaveControl *save = GameData_GetSaveControl(work->gameData);
 
-    if (func_02007560(save, 4, HEAPID_FIELD_MENU, picture, 0x2800) == 1) {
+    if (SaveControl_LoadExtraBlock(save, 4, HEAPID_FIELD_MENU, picture, 0x2800) == 1) {
         u16 crc = getCRC16(picture, sizeof(CGearPictureSave));
 
-        if (crc == func_020098d8(func_02009918(save))) {
-            if (func_0200ce5c(picture)) {
+        if (crc == CGearSettings_GetSkinCrc(CGearSettings_GetFromSave(save))) {
+            if (CGearPictureSave_IsValid(picture)) {
                 loaded = TRUE;
                 GFL_BGSysLoadChar(5, picture, 0x1fe0, 0);
                 GFL_BGSysUploadStdPalette(5, &picture->chars[0x1fe0], 0x20, 13 * 0x20);
@@ -2127,7 +2127,7 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
     work->gsys = gsys;
     work->gameData = GSYS_GetGameData(gsys);
     work->active = TRUE;
-    work->beacons = func_02016b34(work->gsys);
+    work->beacons = GSYS_IsCGearOn(work->gsys);
     work->unk30d = TRUE;
     work->touchAction = ACTION_NONE;
     work->action = ACTION_NONE;
@@ -2143,7 +2143,7 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
     }
     CGearSw_InitBG(work);
     CGearSw_InitGraphics(work, startup);
-    if (func_020098d0(work->settings)) {
+    if (CGearSettings_GetSkinValid(work->settings)) {
         CGearSw_LoadSkin(work, gsys);
     }
     work->fade = PaletteFade_Create(HEAPID_FIELD_MENU);
@@ -2582,7 +2582,7 @@ static GameEventReturnCode CGearSw_EventMain(GameEvent *event, u32 *state, void 
         break;
     case ACTION_LOG:
         GameBeaconSys_ClearNotice(1);
-        func_0201740c(work->gameData, 1);
+        GameData_SetCGearPowerRequest(work->gameData, 1);
         next = EventFieldMenuReturn_Create(work->gsys, field, 4);
         break;
     case ACTION_HELP: {
@@ -2670,7 +2670,7 @@ static void CGearSw_UpdateIntrudeAlert(CGearSw *work, u32 state) {
 // Rings while the Xtransceiver is called
 static void CGearSw_UpdateCallAlert(CGearSw *work, u32 state) {
     if (state == 0) {
-        u32 bits = func_02012be4(GameData_GetWifiList(work->gameData));
+        u32 bits = WihDwc_GetStatus(GameData_GetWifiList(work->gameData));
         FieldSound *fieldSound = GameData_GetFieldSoundSystem(work->gameData);
 
         if (bits & 8) {

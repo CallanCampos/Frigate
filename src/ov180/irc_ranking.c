@@ -396,7 +396,7 @@ static BOOL IrcRanking_Init(GameProc *proc, u32 *state, void *param, void *work)
     } else {
         wk->gameData = GameData_Create(HEAPID_USER);
     }
-    wk->queue = func_02021998(HEAP_ID);
+    wk->queue = PrintQueue_CreateDefault(HEAP_ID);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAP_ID);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_5, HEAP_ID);
     wk->ranking = IrcRankingData_Create(wk->gameData, HEAP_ID);
@@ -448,7 +448,7 @@ static BOOL IrcRanking_Exit(GameProc *proc, u32 *state, void *param, void *work)
     IrcRankingData_Free(wk->ranking);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     if (rankingParam->gsys == NULL) {
         GameData_Free(wk->gameData);
     }
@@ -463,7 +463,7 @@ static BOOL IrcRanking_Main(GameProc *proc, u32 *state, void *param, void *work)
 
     IrcRankingStepMan_Run(&wk->stepMan);
     IrcRankingGraphic_Update(&wk->graphic);
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     for (i = 0; i < LABEL_COUNT; i++) {
         IrcRankingLabel_Update(wk->labels[i]);
     }
@@ -739,7 +739,7 @@ static void IrcRankingGraphic_Create(IrcRankingGraphic *graphic, GameData *gameD
     GFL_BGSysSetDisplayLayout(1);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     IrcRankingBG_Init(&graphic->bg, gameData, heapId);
     IrcRankingClAct_Init(&graphic->clact, &sIrcRankingVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(IrcRankingGraphic_VBlank, graphic, 0);
@@ -1148,8 +1148,8 @@ static void IrcRankingScreens_Load(const IrcRankingScreens *screens, u8 bg, u32 
 
 // Reads the trainer log, and ranks its trainers by value
 static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) {
-    TrainerLogSave *log = func_0200afbc(GameData_GetSaveControl(gameData));
-    u16 count = func_0200afc8(log);
+    TrainerLogSave *log = TrainerLogSave_Get(GameData_GetSaveControl(gameData));
+    u16 count = TrainerLogSave_CountEntries(log);
     IrcRankingData *ranking =
         GFL_HeapAllocate(heapId, sizeof(u32) + count * sizeof(IrcRankingEntry), FALSE, "irc_ranking.c", 2724);
     IrcRankingEntry *entry;
@@ -1163,15 +1163,15 @@ static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) 
     if (count != 0) {
         prevValue = 0x80;
         prevRank = 0;
-        self = func_0200b04c(log);
+        self = TrainerLogSave_GetLastSlot(log);
         for (i = 0; i < ranking->count; i++) {
             u8 met;
 
             entry = &ranking->entries[i];
             entry->name = GFL_StrBufCreate(8, heapId);
-            GFL_StrBufLoadString(entry->name, func_0200afe4(log, i));
-            entry->value = func_0200afec(log, i);
-            entry->count = func_0200b000(log, i);
+            GFL_StrBufLoadString(entry->name, TrainerLogSave_GetEntryName(log, i));
+            entry->value = TrainerLogSave_GetEntryValue(log, i);
+            entry->count = TrainerLogSave_GetEntryCount(log, i);
             if (entry->value < prevValue) {
                 entry->rank = i + 1;
             } else if (entry->value == prevValue) {
@@ -1471,7 +1471,7 @@ static void IrcRankingLabel_PrintMsg(IrcRankingLabel *label, MsgData *msgData, u
     GFL_BitmapFill(label->bitmap, label->color & 0x1f);
     GFL_MsgDataLoadStrbuf(msgData, msgId, label->strbuf);
     IrcRankingLabel_GetPosition(label, font, &pos);
-    func_02021c7c(label->queue, label->bitmap, pos.x, pos.y, label->strbuf, font, label->color);
+    PrintQueue_PrintColor(label->queue, label->bitmap, pos.x, pos.y, label->strbuf, font, label->color);
     label->busy = TRUE;
 }
 
@@ -1487,7 +1487,7 @@ static void IrcRankingLabel_SetPos(IrcRankingLabel *label, int x, int y, int ali
 
 static BOOL IrcRankingLabel_Update(IrcRankingLabel *label) {
     if (label->busy) {
-        if (!func_02021c1c(label->queue, label->bitmap)) {
+        if (!PrintQueue_IsBitmapPending(label->queue, label->bitmap)) {
             BmpOam_ActorBmpTrans(label->actor);
             label->busy = FALSE;
         }

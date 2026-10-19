@@ -195,7 +195,7 @@ static BOOL ThAward_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->param = param;
     wk->graphic = ThAwardGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(1, 2);
     GFL_BGSysSetBGPriority(2, 1);
     GFL_BGSysSetBGPriority(3, 0);
@@ -255,8 +255,8 @@ static BOOL ThAward_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     ThAward_FreeIcons(wk);
     ThAward_Unused(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ThAwardGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -327,7 +327,7 @@ static BOOL ThAward_Main(GameProc *proc, u32 *state, void *param, void *work) {
     case STEP_END:
         return TRUE;
     }
-    if (func_02021a3c(wk->printQueue) && !wk->transferred) {
+    if (PrintQueue_Main(wk->printQueue) && !wk->transferred) {
         for (i = 1; i < WINDOW_COUNT; i++) {
             BmpWin_Transfer(wk->windows[i]);
         }
@@ -527,11 +527,11 @@ static void ThAward_InitText(ThAwardWork *wk) {
     if (windowWidth >= totalWidth) {
         x = (windowWidth - totalWidth) / 2;
     }
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_BATTLE_KIND]), x,
-                  sThAwardTextY[WINDOW_BATTLE_KIND], kind, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_BATTLE_KIND]), x,
+                          sThAwardTextY[WINDOW_BATTLE_KIND], kind, wk->font, PRINT_COLOR(1, 2, 0));
     labelX = x + kindWidth + 8;
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_BATTLE_KIND]), labelX,
-                  sThAwardTextY[WINDOW_BATTLE_KIND], label, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_BATTLE_KIND]), labelX,
+                          sThAwardTextY[WINDOW_BATTLE_KIND], label, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(label);
     GFL_StrBufFree(kind);
 
@@ -554,11 +554,11 @@ static void ThAward_InitText(ThAwardWork *wk) {
     if (windowWidth >= totalWidth) {
         x = (windowWidth - totalWidth) / 2;
     }
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]), x, sThAwardTextY[WINDOW_POINTS],
-                  pointsText, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]), x, sThAwardTextY[WINDOW_POINTS],
+                          pointsText, wk->font, PRINT_COLOR(1, 2, 0));
     labelX = x + pointsWidth + 8;
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]), labelX, sThAwardTextY[WINDOW_POINTS],
-                  pointsLabel, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]), labelX,
+                          sThAwardTextY[WINDOW_POINTS], pointsLabel, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(pointsLabel);
     GFL_StrBufFree(pointsText);
     GFL_StrBufFree(format);
@@ -569,8 +569,8 @@ static void ThAward_InitText(ThAwardWork *wk) {
     totalWidth = GFL_FontGetBlockWidth(rank, wk->font, 0);
     windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_RANK]));
     x = (windowWidth - totalWidth) / 2;
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_RANK]), x, sThAwardTextY[WINDOW_RANK], rank,
-                  wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_RANK]), x, sThAwardTextY[WINDOW_RANK],
+                          rank, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(rank);
 
     for (i = 1; i < WINDOW_COUNT; i++) {
@@ -597,7 +597,7 @@ static void ThAward_TransferPrinted(ThAwardWork *wk) {
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        if (!wk->printed[i] && !func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->windows[i]))) {
+        if (!wk->printed[i] && !PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->windows[i]))) {
             BmpWin_Transfer(wk->windows[i]);
             wk->printed[i] = TRUE;
         }
