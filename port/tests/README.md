@@ -24,8 +24,9 @@ ROM (the replays, the oracle's sequences and the port's checks of their hashes, 
 `integrate_launch_never_asked`, the `frame_times_*` routes, and the smoke test, which passes without a ROM too, stopping
 where the program looks for one); `oracle`, the tests that need the melonDS oracle or the saves it makes; and `timing`,
 the tests that hold the host's time to a limit, which a slow or loaded machine can fail: the `frame_times_*` routes,
-whose scenes' frames must stay within a budget ([../cmake/frame_times.cmake](../cmake/frame_times.cmake)), and the
-renderers' timing gates, which exist only with `PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`. So
+whose scenes' frames must stay within a budget in an optimized build
+([../cmake/frame_times.cmake](../cmake/frame_times.cmake)), and the renderers' timing gates, which exist only with
+`PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`. So
 `ctest -L route -LE oracle` runs the routes that need no oracle, `ctest -LE route` the rest, and `ctest -LE timing`
 leaves out the timing; ctest adds the fixtures they need (`oracle_saves`, the replays' `*_clean`). A test gets its
 labels where it is defined, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): a new test
@@ -66,6 +67,9 @@ sections of every program that links the game. The `frame_times_*` routes
 ([../cmake/frame_times.cmake](../cmake/frame_times.cmake)) play the title screen, New Game (Black 2) and the field
 menu's apps 3 times each with `--frame-times`, alone, and fail when a scene's 95th percentile, each frame's least time
 over the runs without the pacing wait, is above `PORT_FRAME_TIME_BUDGET_MS` (half the DS's frame, 8.36 ms, by default).
+They skip such a scene instead when the machine's load average, before a run or after the last, was above its cores:
+other programs had them, so the times measure the machine. Only an optimized build has them (`CMAKE_BUILD_TYPE`
+`Release`, `RelWithDebInfo` or `MinSizeRel`): a Debug build, or one with no build type, runs the frames unoptimized.
 
 ## Writing a test
 

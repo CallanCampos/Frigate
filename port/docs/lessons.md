@@ -5,10 +5,22 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 
 ## 2026-10-19: frame times and the hot paths
 
-- **On a loaded machine, a replay's frame times are the least of a few runs.** A replay does the same work at every
-  run, so what other programs take from one run doesn't take it from the others: each frame's least time over 3 runs
-  matched a quiet run's to 0.01 ms while single runs at a load of 30 doubled their 95th percentile.
-  `port/tools/frame_times.py` does that, and the `frame_times_*` tests run alone.
+- **A replay's least of a few runs removes load that comes and goes, not load that stays.** A replay does the same work
+  at every run, so what a burst of other work takes from one run it doesn't take from the others: in one measurement at
+  a load of 30, each frame's least time over 3 runs matched a quiet run's to 0.01 ms while single runs doubled their
+  95th percentile, each frame having been spared in one run at least. Steady load takes from every run alike, and other
+  Frigate programs are the worst of it: since `8aef262f2` every one of them, tests included, runs its game thread at
+  user-interactive QoS, so a timing test has no priority over the routes beside it. With 4 White 2 routes running beside
+  it, the title's 95th percentile, each frame's least of 3, was 4.88 ms against 2.03 quiet; with 8, 8.45 in the review
+  and 7.39 in a run of its own, single runs 11 to 13.4, against the 8.36 ms budget. So `port/tools/frame_times.py`'s
+  `check` skips a scene over the budget when the 1-minute load average, read before each run and after the last, was
+  above the cores, and the `frame_times_*` tests run alone. Read the load during the runs, not only before them: the
+  average lags by about a minute. Under those 8 routes, started 5 s before the test, it read 3.86 before the first run,
+  7.93 and 9.99 before the next two and 12.26 after the last, on 8 cores.
+- **A timing budget holds only in the build it was set in.** The `frame_times_*` budget is set for an optimized build:
+  a Debug build, or one configured with no `CMAKE_BUILD_TYPE` (as `sync_upstream.sh` makes a new `build/port`), runs
+  the title's frames at 10.44 ms at the 95th percentile and the start menu's at 9.62, against 2.04 and 1.86, and
+  fails it. Such builds have no timing tests.
 - **A frame's cost is in the renderers.** The game's C is about 0.1 ms of a frame; the 3D rasterizer, the geometry
   engine and the 2D lines are the rest. Measure before guessing: the profile put the 3D renderer at 70% of the title's
   samples, and showed `ParamCount` and the geometry queue, the capture's per-pixel page lookups and `ensure_ready`

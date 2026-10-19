@@ -225,7 +225,8 @@ A settings file, and menus to change settings in the program, come with the mod 
 - **How fast it runs:** a change to the renderers, or to anything a frame runs, can cost the frames' time.
   `--frame-times FILE` writes each frame's host time and its parts, and `python3 port/tools/frame_times.py summary`
   compares runs of a route scene by scene, each frame the least of the runs; `ctest -L timing` runs the
-  `frame_times_*` tests, which hold the title, New Game and the field menu's apps to half a frame. The hot paths are in
+  `frame_times_*` tests, which hold the title, New Game and the field menu's apps to half a frame in an optimized
+  build (`-DCMAKE_BUILD_TYPE=RelWithDebInfo`, as the README's; a Debug build has none). The hot paths are in
   [ARCHITECTURE.md](ARCHITECTURE.md#where-a-frames-time-goes). The 3D renderer draws in bands of lines on several
   threads, so a change there keeps each pixel a function of its own line and the polygons' order
   ([ADR 0016](adr/0016-3d-frame-in-bands-on-worker-threads.md)); `g3d_ds3d_bands` checks it.

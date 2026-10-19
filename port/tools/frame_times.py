@@ -5,19 +5,24 @@ is the work the program did for it, and its parts), and reports the median, 95th
 frames. Nothing of the game is touched: the program's frames are the same with --frame-times as without.
 
     frame_times.py summary FILE... [--scene NAME=FIRST-LAST]...
-    frame_times.py check [--runs N] [--budget-ms MS] [--report-only] [--scene NAME=FIRST-LAST]...
+    frame_times.py check [--runs N] [--budget-ms MS] [--report-only] [--max-load LOAD] [--scene NAME=FIRST-LAST]...
                          [--save FILE --save-name NAME] [--work DIR] -- PROGRAM ARG...
 
 summary reads one or more files of the same route: a replay does the same work at every run, so each frame's time is
-the least of its runs', which leaves out what other programs on a loaded machine took from it. A scene is a range of
-the program's frame numbers (both included); without --scene the whole run is one.
+the least of its runs', which leaves out what other programs took from it in bursts that came and went. Load that
+stays, such as other Frigate programs running beside it, at the same priority (port/app/main.c's user-interactive
+QoS), takes from every run alike, and the least keeps it. A scene is a range of the program's frame numbers (both
+included); without --scene the whole run is one.
 
 check runs PROGRAM ARG... --runs times (3 by default), each with --frame-times and a save directory of its own in
 --work (a temporary directory by default), holding --save under the name --save-name when given, then reports as
 summary does and fails (status 1) when a scene's 95th percentile without the pacing wait is above --budget-ms, unless
---report-only. It exits 77 (skipped) when PROGRAM has no ROM (its status 66) or --save doesn't exist, as the tests'
-other checks do; a run that ends with another status than 0 fails. The timing tests of port/cmake/app.cmake run it.
-Standard library only.
+--report-only. A scene over the budget skips the check instead (77) when the host's 1-minute load average, read before
+each run and after the last, was above --max-load (the number of cores by default): other programs had the cores, so
+the times measure the machine. A pass stands at any load, and a host without a load average (Windows) never skips.
+It exits 77 too when PROGRAM has no ROM (its status 66) or --save doesn't exist, as the tests' other checks do; a run
+that ends with another status than 0 fails. The timing tests of port/cmake/frame_times.cmake run it. Standard library
+only.
 """
 
 from __future__ import annotations
@@ -69,6 +74,15 @@ def quantile(values: list[int], q: float) -> int:
     return ordered[min(max(rank, 1), len(ordered)) - 1]
 
 
+def load_average() -> float | None:
+    """The host's load average over the last minute, the threads running or waiting for a core; None on a host without
+    one (Windows)"""
+    try:
+        return os.getloadavg()[0]
+    except (AttributeError, OSError):
+        return None
+
+
 def parse_scene(text: str) -> tuple[str, int, int]:
     name, _, span = text.partition("=")
     first, _, last = span.partition("-")
@@ -116,8 +130,10 @@ def check(args: argparse.Namespace) -> int:
     work = args.work or tempfile.mkdtemp(prefix="frigate-frame-times-")
     os.makedirs(work, exist_ok=True)
     runs = []
+    loads = []
     try:
         for n in range(args.runs):
+            loads.append(load_average())
             saves = os.path.join(work, f"saves_{n}")
             times = os.path.join(work, f"frame_times_{n}.tsv")
             shutil.rmtree(saves, ignore_errors=True)
@@ -137,6 +153,7 @@ def check(args: argparse.Namespace) -> int:
             print(f"run {n + 1}: " + next((line[line.find("port: frame times"):] for line in reversed(lines)
                                            if "port: frame times" in line), "no summary"))
             runs.append(read(times))
+        loads.append(load_average())
     finally:
         if not args.work:
             shutil.rmtree(work, ignore_errors=True)
@@ -147,10 +164,18 @@ def check(args: argparse.Namespace) -> int:
               f"{args.budget_ms:g} ms" + (" (reported only)" if args.report_only else ""))
     if not over:
         print(f"frame_times.py: every scene's 95th percentile is within the budget of {args.budget_ms:g} ms")
+    known = [load for load in loads if load is not None]
+    if known:
+        print("frame_times.py: the load average before each run and after the last: " +
+              ", ".join(f"{load:.2f}" for load in known) + f", on {os.cpu_count()} cores")
+    if over and not args.report_only and known and max(known) > args.max_load:
+        print(f"frame_times.py: skipped: the load average reached {max(known):.2f}, above {args.max_load:g}, so other "
+              f"programs had the cores and the times measure the machine")
+        return SKIP
     return 1 if over and not args.report_only else 0
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="action", required=True)
     s = commands.add_parser("summary", help="report the frame times of one or more runs of a route")
@@ -163,13 +188,16 @@ def main() -> int:
                    help=f"the most a scene's 95th percentile may take, in ms (half the DS's frame, "
                         f"{DS_FRAME_MS / 2:.2f})")
     c.add_argument("--report-only", action="store_true", help="report a scene over the budget without failing")
+    c.add_argument("--max-load", type=float, default=float(os.cpu_count() or 1),
+                   help=f"skip (77) rather than fail a scene over the budget when the 1-minute load average before a "
+                        f"run or after the last was above this (the cores, {os.cpu_count() or 1}; inf never skips)")
     c.add_argument("--scene", action="append", default=[], type=parse_scene, help="NAME=FIRST-LAST, frame numbers")
     c.add_argument("--save", help="the save each run starts from")
     c.add_argument("--save-name", default="IREO.sav", help="its name in the save directory (IREO.sav, IRDO.sav)")
     c.add_argument("--work", help="where the runs' save directories and files go (kept); a temporary one otherwise")
     c.add_argument("command", nargs=argparse.REMAINDER, help="-- the program and its arguments")
     c.set_defaults(run=check)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if getattr(args, "runs", 1) < 1:
         parser.error("--runs needs 1 or more")
     return args.run(args)

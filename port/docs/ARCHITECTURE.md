@@ -124,11 +124,11 @@ The DS gives each frame 16.715 ms. Nearly all the host's time for one goes to th
 own C on its fibers takes about 0.1 ms a frame outside loading. `--frame-times FILE` writes each frame's host time with
 and without the pacing wait and its parts, timed where their work is ([../hal/os/frame_time.h](../hal/os/frame_time.h)),
 and [../tools/frame_times.py](../tools/frame_times.py) reports a route scene by scene
-([../README.md](../README.md#quick-start)); the `frame_times_*` tests hold the heaviest scenes to half a frame. The hot
-paths, and their cost on an M2 MacBook Air (Black 2, headless, each frame the least of 3 runs, medians in ms; the last
-row is the frame without the pacing wait, median and 95th percentile; before this work, on 2026-10-19, the five frames
-were 4.24 and 4.45, 2.53 and 3.95, 3.78 and 4.68, 0.82 and 1.23, 2.54 and 2.69 ms; White 2's title, start menu, bag and
-card are within 0.1 ms of Black 2's, and it has no New Game route):
+([../README.md](../README.md#quick-start)); the `frame_times_*` tests hold the heaviest scenes to half a frame in an
+optimized build. The hot paths, and their cost on an M2 MacBook Air (Black 2, headless, each frame the least of 3 runs,
+medians in ms; the last row is the frame without the pacing wait, median and 95th percentile; before this work, on
+2026-10-19, the five frames were 4.24 and 4.45, 2.53 and 3.95, 3.78 and 4.68, 0.82 and 1.23, 2.54 and 2.69 ms;
+White 2's title, start menu, bag and card are within 0.1 ms of Black 2's, and it has no New Game route):
 
 | Part | Where its time goes | Title's 3D | Start menu | New Game's 3D flight | Juniper's intro | Bag and card |
 | --- | --- | --- | --- | --- | --- | --- |

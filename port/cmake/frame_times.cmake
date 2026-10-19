@@ -3,9 +3,13 @@
 # timing tests play routes of the game from power-on, the title screen's 3D, New Game's intro and 3D flight, and the
 # field menu's apps on Frigate's test launcher, 3 times each, take each frame's least time over the runs and fail when
 # a scene's 95th percentile, without the pacing wait, is above PORT_FRAME_TIME_BUDGET_MS. They run alone (RUN_SERIAL),
-# skip without the ROM (or the oracle's save, for the apps) like every route, and are labelled timing, so that a slow
-# or loaded machine leaves them out with ctest -LE timing; PORT_FRAME_TIME_REPORT_ONLY makes them report only. The
-# sanitized build has none: it times the sanitizers.
+# skip without the ROM (or the oracle's save, for the apps) like every route, and skip too when a scene is over the
+# budget while the machine's load average was above its cores, since other programs had them then (frame_times.py's
+# --max-load). They are labelled timing, so that a slow or loaded machine leaves them out with ctest -LE timing;
+# PORT_FRAME_TIME_REPORT_ONLY makes them report only. Only an optimized build has them (CMAKE_BUILD_TYPE Release,
+# RelWithDebInfo or MinSizeRel): a build without a type, as the sync's, or a Debug one runs the game's C and the
+# renderers unoptimized, the title's frames at about 10.5 ms. The sanitized build has none either: it times the
+# sanitizers.
 set(PORT_FRAME_TIME_BUDGET_MS 8.36 CACHE STRING
     "The most a timing test's scene may take at its 95th percentile, in ms (half the DS's frame by default)")
 option(PORT_FRAME_TIME_REPORT_ONLY "Make the frame-time tests report their scenes without failing" OFF)
@@ -16,7 +20,8 @@ add_test(NAME frame_times_tool
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_frame_times.py")
 set_tests_properties(frame_times_tool PROPERTIES TIMEOUT 120)
 
-if(NOT PORT_SANITIZE)
+string(TOUPPER "${CMAKE_BUILD_TYPE}" port_frame_times_build_type)
+if(NOT PORT_SANITIZE AND port_frame_times_build_type MATCHES "^(RELEASE|RELWITHDEBINFO|MINSIZEREL)$")
     set(port_frame_times_report "")
     if(PORT_FRAME_TIME_REPORT_ONLY)
         set(port_frame_times_report --report-only)

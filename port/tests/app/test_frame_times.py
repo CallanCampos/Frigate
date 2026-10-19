@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """The test of port/tools/frame_times.py, the reader of the files the program's --frame-times writes
 (port/hal/os/frame_time.h), on files made up here: each frame's least time over several runs, the nearest-rank
-quantiles the program's own summary takes, the scenes, and check's budget, report-only mode and skips, with a stand-in
-program that writes its --frame-times file as Frigate does. Nothing of the game runs. Standard library only.
+quantiles the program's own summary takes, the scenes, and check's budget, report-only mode and skips, the skip of a
+scene over the budget on a loaded machine among them (with the load average made up), with a stand-in program that
+writes its --frame-times file as Frigate does. Nothing of the game runs. Standard library only.
 """
 
 from __future__ import annotations
 
+import contextlib
+import io
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOOL = os.path.join(HERE, "..", "..", "tools", "frame_times.py")
@@ -80,12 +84,24 @@ class FrameTimesTest(unittest.TestCase):
         self.assertEqual(p95s, {"light": 1000, "heavy": 5000})
         self.assertEqual(frame_times.parse_scene("title=1110-3100"), ("title", 1110, 3100))
 
-    def run_check(self, busy: str, status: int, *options: str) -> subprocess.CompletedProcess:
+    def stand_in(self) -> str:
         stand_in = self.path("stand_in.py")
         with open(stand_in, "w") as f:
             f.write(STAND_IN)
-        return subprocess.run([sys.executable, TOOL, "check", "--runs", "2", *options, "--", sys.executable, stand_in,
-                               busy, str(status)], capture_output=True, text=True)
+        return stand_in
+
+    def run_check(self, busy: str, status: int, *options: str) -> subprocess.CompletedProcess:
+        """check run as a program, on whatever load the machine has, which --max-load inf keeps from skipping"""
+        return subprocess.run([sys.executable, TOOL, "check", "--runs", "2", "--max-load", "inf", *options, "--",
+                               sys.executable, self.stand_in(), busy, str(status)], capture_output=True, text=True)
+
+    def check_at_load(self, load: float | None, busy: str, *options: str) -> tuple[int, str]:
+        """check run in this process, with the host's load average made up: its status and what it printed"""
+        out = io.StringIO()
+        with mock.patch.object(frame_times, "load_average", return_value=load), contextlib.redirect_stdout(out):
+            status = frame_times.main(["check", "--runs", "2", *options, "--", sys.executable, self.stand_in(), busy,
+                                       "0"])
+        return status, out.getvalue()
 
     def test_check_holds_the_budget(self) -> None:
         done = self.run_check("1000,2000,3000", 0, "--budget-ms", "3")
@@ -98,6 +114,23 @@ class FrameTimesTest(unittest.TestCase):
         # Only the scene's frames count
         done = self.run_check("1000,2000,3500", 0, "--budget-ms", "3", "--scene", "first=1-2")
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+
+    def test_check_skips_over_the_budget_on_a_loaded_machine(self) -> None:
+        over = ("1000,2000,3500", "--budget-ms", "3")
+        status, out = self.check_at_load(9.0, *over, "--max-load", "8")
+        self.assertEqual(status, 77, out)
+        self.assertIn("skipped: the load average reached 9.00", out)
+        # A load at or under the limit, or none to read (Windows), fails as before
+        self.assertEqual(self.check_at_load(8.0, *over, "--max-load", "8")[0], 1)
+        self.assertEqual(self.check_at_load(None, *over, "--max-load", "8")[0], 1)
+        self.assertEqual(self.check_at_load(1e9, *over, "--max-load", "inf")[0], 1)
+        # The limit is the host's cores by default
+        cores = os.cpu_count() or 1
+        self.assertEqual(self.check_at_load(cores + 0.5, *over)[0], 77)
+        self.assertEqual(self.check_at_load(cores - 0.5, *over)[0], 1)
+        # A pass stands at any load, and report-only reports
+        self.assertEqual(self.check_at_load(1e9, "1000,2000,3000", "--budget-ms", "3")[0], 0)
+        self.assertEqual(self.check_at_load(1e9, *over, "--report-only")[0], 0)
 
     def test_check_skips_and_fails(self) -> None:
         self.assertEqual(self.run_check("1000", 66).returncode, 77)
