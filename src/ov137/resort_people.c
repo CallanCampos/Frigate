@@ -53,39 +53,40 @@ struct ResortPeople {
     ResortPerson *persons[];
 };
 
-static void func_ov137_021f0f3c(ResortPerson *person);
-static BOOL func_ov137_021f0f44(ResortPerson *person, FieldActor *actor);
-static void func_ov137_021f0f88(ResortPerson *person, const ResortPersonSetup *setup);
-static BOOL func_ov137_021f1048(ResortPerson *person, JoinAvenuePerson *joinPerson);
-static BOOL func_ov137_021f1060(ResortPerson *person, ResortPersonData *data);
-static void func_ov137_021f1114(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
-static void func_ov137_021f113c(ResortPerson *person, u16 *x, u16 *z, u16 *dir);
-static void func_ov137_021f11b8(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
-static void func_ov137_021f11cc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
-static void func_ov137_021f11e0(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
-static void func_ov137_021f1208(ResortPerson *person, u16 *x, u16 *z, u16 *dir);
-static void func_ov137_021f122c(ResortPerson *person, const ResortPersonSetup *setup);
-static ResortPerson *func_ov137_021f1464(ResortPeople *people, const ResortPersonSource *source, BOOL unk20, u16 index);
-static void func_ov137_021f14d8(ResortPeople *people, ResortPerson *person);
-static void func_ov137_021f1504(ResortPeople *people);
-static void func_ov137_021f1670(ResortPeople *people);
-static void func_ov137_021f16d0(ResortPeople *people, const ResortPersonSource *source, u32 index,
-                                ResortPersonSetup *setup);
-static BOOL func_ov137_021f1700(int uid);
+static void ResortPerson_Free(ResortPerson *person);
+static BOOL ResortPerson_HasActor(ResortPerson *person, FieldActor *actor);
+static void ResortPerson_Recreate(ResortPerson *person, const ResortPersonSetup *setup);
+static BOOL ResortPerson_IsJoinAvenuePerson(ResortPerson *person, JoinAvenuePerson *joinPerson);
+static BOOL ResortPerson_HasData(ResortPerson *person, ResortPersonData *data);
+static void ResortPerson_SetupOccupantNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
+static void ResortPerson_GetOccupantPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir);
+static void ResortPerson_SetupEntryNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
+static void ResortPerson_SetupListNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
+static void ResortPerson_SetupRecordNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
+static void ResortPerson_GetRecordPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir);
+static void ResortPerson_CreateActor(ResortPerson *person, const ResortPersonSetup *setup);
+static ResortPerson *ResortPeople_AddPerson(ResortPeople *people, const ResortPersonSource *source, BOOL unk20,
+                                            u16 index);
+static void ResortPeople_RemovePerson(ResortPeople *people, ResortPerson *person);
+static void ResortPeople_FreeAll(ResortPeople *people);
+static void ResortPeople_DeleteOrphanActors(ResortPeople *people);
+static void ResortPeople_MakeSetup(ResortPeople *people, const ResortPersonSource *source, u32 index,
+                                   ResortPersonSetup *setup);
+static BOOL ResortPeople_IsPersonUID(int uid);
 
 static const u32 sKinds[] = { 0, 4 };
 // clang-format off
 static const ResortPersonType sTypes[] = {
-    {func_ov137_021f1114, func_ov137_021f113c},
-    {func_ov137_021f11b8, NULL},
-    {func_ov137_021f11cc, NULL},
-    {func_ov137_021f11e0, func_ov137_021f1208},
+    {ResortPerson_SetupOccupantNpc, ResortPerson_GetOccupantPos},
+    {ResortPerson_SetupEntryNpc, NULL},
+    {ResortPerson_SetupListNpc, NULL},
+    {ResortPerson_SetupRecordNpc, ResortPerson_GetRecordPos},
 };
 
 // clang-format on
 static const ZoneNPC sNpcTemplate = { 0 };
 
-static ResortPerson *func_ov137_021f0e98(HeapID heapId, const ResortPersonSetup *setup) {
+static ResortPerson *ResortPerson_Create(HeapID heapId, const ResortPersonSetup *setup) {
     u32 a;
     u32 b;
     ResortPerson *person = GFL_HeapAllocate(heapId, sizeof(ResortPerson), TRUE, "resort_people.c", 166);
@@ -96,64 +97,64 @@ static ResortPerson *func_ov137_021f0e98(HeapID heapId, const ResortPersonSetup 
     person->unk10 = setup->unk20;
     person->shops = setup->shops;
     person->unk2c = setup->unk18;
-    person->type = func_ov137_021f1984(person->data);
-    a = func_ov137_021f1968(person->data, 31, NULL);
-    b = func_ov137_021f1968(person->data, 2, NULL);
+    person->type = ResortData_GetType(person->data);
+    a = ResortData_GetParam(person->data, 31, NULL);
+    b = ResortData_GetParam(person->data, 2, NULL);
     person->row = ResortBinary_FindRow(setup->table, person->type, a, b);
     person->funcs = &sTypes[person->type];
     person->actor = FindFieldActor(person->mmSys, person->index + RESORT_PERSON_UID_FIRST);
     if (person->actor == NULL) {
-        func_ov137_021f122c(person, setup);
+        ResortPerson_CreateActor(person, setup);
     }
     person->visible = !IsActorHidden(person->actor);
     return person;
 }
 
-static void func_ov137_021f0f3c(ResortPerson *person) {
+static void ResortPerson_Free(ResortPerson *person) {
     GFL_HeapFree(person);
 }
 
-static BOOL func_ov137_021f0f44(ResortPerson *person, FieldActor *actor) {
-    if (actor == func_ov137_021f110c(person)) {
+static BOOL ResortPerson_HasActor(ResortPerson *person, FieldActor *actor) {
+    if (actor == ResortPerson_GetActor(person)) {
         return TRUE;
     }
     return FALSE;
 }
 
-JoinAvenuePerson *func_ov137_021f0f58(ResortPerson *person) {
-    return func_ov137_021f1980(person->data);
+JoinAvenuePerson *ResortPerson_GetJoinAvenuePerson(ResortPerson *person) {
+    return ResortData_GetPerson(person->data);
 }
 
-void func_ov137_021f0f64(ResortPerson *person) {
-    FieldActor *actor = func_ov137_021f110c(person);
-    u16 objCode = func_ov137_021f1968(person->data, 3, NULL);
+void ResortPerson_UpdateObjCode(ResortPerson *person) {
+    FieldActor *actor = ResortPerson_GetActor(person);
+    u16 objCode = ResortData_GetParam(person->data, 3, NULL);
 
     FldAct_UpdateBlInfoForNewObjCode(actor, objCode);
 }
 
-void func_ov137_021f0f84(ResortPerson *person, u32 value) {
+void ResortPerson_SetTalking(ResortPerson *person, u32 value) {
     person->unk8 = value;
 }
 
-static void func_ov137_021f0f88(ResortPerson *person, const ResortPersonSetup *setup) {
+static void ResortPerson_Recreate(ResortPerson *person, const ResortPersonSetup *setup) {
     if (person->actor != NULL) {
         DeleteActor(person->actor);
         person->actor = NULL;
     }
-    func_ov137_021f122c(person, setup);
+    ResortPerson_CreateActor(person, setup);
 }
 
-void *func_ov137_021f0fa8(ResortPerson *person) {
-    return JoinAvenuePerson_GetShop(func_ov137_021f1980(person->data));
+void *ResortPerson_GetShop(ResortPerson *person) {
+    return JoinAvenuePerson_GetShop(ResortData_GetPerson(person->data));
 }
 
-void func_ov137_021f0fb8(ResortPerson *person) {
+void ResortPerson_MoveToHome(ResortPerson *person) {
     if (person->funcs->getPos != NULL) {
         u16 x;
         u16 z;
         u16 dir;
         VecFx32 pos;
-        FieldActor *actor = func_ov137_021f110c(person);
+        FieldActor *actor = ResortPerson_GetActor(person);
 
         person->funcs->getPos(person, &x, &z, &dir);
         pos.x = (x << 16) + 0x8000;
@@ -166,7 +167,7 @@ void func_ov137_021f0fb8(ResortPerson *person) {
     }
 }
 
-void func_ov137_021f1020(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
+void ResortPerson_GetFacingPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
     person->funcs->getPos(person, x, z, dir);
     if (*dir == DIR_LEFT) {
         *x -= 1;
@@ -177,29 +178,29 @@ void func_ov137_021f1020(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
     }
 }
 
-static BOOL func_ov137_021f1048(ResortPerson *person, JoinAvenuePerson *joinPerson) {
-    if (func_ov137_021f1980(person->data) == joinPerson) {
+static BOOL ResortPerson_IsJoinAvenuePerson(ResortPerson *person, JoinAvenuePerson *joinPerson) {
+    if (ResortData_GetPerson(person->data) == joinPerson) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov137_021f1060(ResortPerson *person, ResortPersonData *data) {
+static BOOL ResortPerson_HasData(ResortPerson *person, ResortPersonData *data) {
     if (person->data == data) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov137_021f1070(ResortPerson *person, BOOL visible) {
-    FieldActor *actor = func_ov137_021f110c(person);
+void ResortPerson_SetVisible(ResortPerson *person, BOOL visible) {
+    FieldActor *actor = ResortPerson_GetActor(person);
     SetActorHidden(actor, visible == FALSE);
     SetActorCollisionEnabled(actor, visible);
     person->visible = visible;
 }
 
-void func_ov137_021f1098(ResortPerson *person, u32 mode) {
-    FieldActor *actor = func_ov137_021f110c(person);
+void ResortPerson_ApplyVisibility(ResortPerson *person, u32 mode) {
+    FieldActor *actor = ResortPerson_GetActor(person);
     IsActorHidden(actor);
     switch (mode) {
     case 0:
@@ -214,15 +215,15 @@ void func_ov137_021f1098(ResortPerson *person, u32 mode) {
     }
 }
 
-void func_ov137_021f10dc(ResortPerson *person, JoinAvenuePersonParam param, u32 value) {
-    func_ov137_021f1974(person->data, param, value);
+void ResortPerson_SetParam(ResortPerson *person, JoinAvenuePersonParam param, u32 value) {
+    ResortData_SetParam(person->data, param, value);
 }
 
-u32 func_ov137_021f10e8(ResortPerson *person, JoinAvenuePersonParam param, void *buffer) {
-    return func_ov137_021f1968(person->data, param, buffer);
+u32 ResortPerson_GetParam(ResortPerson *person, JoinAvenuePersonParam param, void *buffer) {
+    return ResortData_GetParam(person->data, param, buffer);
 }
 
-u32 func_ov137_021f10f4(ResortPerson *person, u32 which) {
+u32 ResortPerson_GetAttr(ResortPerson *person, u32 which) {
     switch (which) {
     case 0:
         return person->type;
@@ -232,27 +233,27 @@ u32 func_ov137_021f10f4(ResortPerson *person, u32 which) {
     return 0;
 }
 
-FieldActor *func_ov137_021f110c(ResortPerson *person) {
+FieldActor *ResortPerson_GetActor(ResortPerson *person) {
     return person->actor;
 }
 
-ResortPersonData *func_ov137_021f1110(ResortPerson *person) {
+ResortPersonData *ResortPerson_GetData(ResortPerson *person) {
     return person->data;
 }
 
-static void func_ov137_021f1114(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
+static void ResortPerson_SetupOccupantNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
     u16 x;
     u16 z;
     u16 dir;
 
-    func_ov137_021f113c(person, &x, &z, &dir);
+    ResortPerson_GetOccupantPos(person, &x, &z, &dir);
     npc->direction = dir;
     ZoneNPC_SetGridPos(npc, x, z, 0);
 }
 
-static void func_ov137_021f113c(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
-    u16 index = func_ov137_021f198c(person->data);
-    u16 id = JoinAvenueShop_GetField(func_ov137_021f0fa8(person), 0);
+static void ResortPerson_GetOccupantPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
+    u16 index = ResortData_GetIndex(person->data);
+    u16 id = JoinAvenueShop_GetField(ResortPerson_GetShop(person), 0);
     u32 column = 0;
     const u16 *row = ResortShopData_GetShop(person->shops, id);
 
@@ -264,44 +265,44 @@ static void func_ov137_021f113c(ResortPerson *person, u16 *x, u16 *z, u16 *dir) 
     *z += ResortBinary_Get(person->unk2c, index, 2);
 }
 
-static void func_ov137_021f11b8(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
+static void ResortPerson_SetupEntryNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
     npc->direction = 0;
     ZoneNPC_SetGridPos(npc, 0, 0, 0);
 }
 
-static void func_ov137_021f11cc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
+static void ResortPerson_SetupListNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
     npc->direction = 0;
     ZoneNPC_SetGridPos(npc, 0, 0, 0);
 }
 
-static void func_ov137_021f11e0(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
+static void ResortPerson_SetupRecordNpc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
     u16 x;
     u16 z;
     u16 dir;
 
-    func_ov137_021f1208(person, &x, &z, &dir);
+    ResortPerson_GetRecordPos(person, &x, &z, &dir);
     npc->direction = dir;
     ZoneNPC_SetGridPos(npc, x, z, 0);
 }
 
-static void func_ov137_021f1208(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
-    func_02039578(func_ov137_021f1968(person->data, 31, NULL), x, z, dir);
+static void ResortPerson_GetRecordPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
+    func_02039578(ResortData_GetParam(person->data, 31, NULL), x, z, dir);
 }
 
-static void func_ov137_021f122c(ResortPerson *person, const ResortPersonSetup *setup) {
+static void ResortPerson_CreateActor(ResortPerson *person, const ResortPersonSetup *setup) {
     ZoneNPC npc = sNpcTemplate;
 
-    npc.modelId = (u8)func_ov137_021f1968(person->data, 3, NULL);
+    npc.modelId = (u8)ResortData_GetParam(person->data, 3, NULL);
     npc.scrId = ResortBinary_GetFoundValue(person->row);
     npc.uid = setup->index + RESORT_PERSON_UID_FIRST;
     person->funcs->setupNpc(person, setup, &npc);
     person->actor = CreateNewActorByEntityNoWKOBJCODE(setup->mmSys, &npc, ResortLayout_GetZoneId(setup->zone));
-    func_ov137_021f10dc(person, 0, setup->index);
-    func_ov137_021f10dc(person, 1, setup->zone);
+    ResortPerson_SetParam(person, 0, setup->index);
+    ResortPerson_SetParam(person, 1, setup->zone);
     person->visible = !IsActorHidden(person->actor);
 }
 
-ResortPeople *func_ov137_021f12b4(const ResortPeopleSetup *setup, HeapID heapId) {
+ResortPeople *ResortPeople_Create(const ResortPeopleSetup *setup, HeapID heapId) {
     ResortPeople *people = GFL_HeapAllocate(heapId, sizeof(ResortPeople) + sizeof(ResortPerson *) * setup->count, TRUE,
                                             "resort_people.c", 712);
     people->setup = *setup;
@@ -310,48 +311,48 @@ ResortPeople *func_ov137_021f12b4(const ResortPeopleSetup *setup, HeapID heapId)
     return people;
 }
 
-void func_ov137_021f1300(ResortPeople *people) {
+void ResortPeople_Free(ResortPeople *people) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
-        ResortPerson *person = func_ov137_021f1634(people, i);
+        ResortPerson *person = ResortPeople_GetByIndex(people, i);
         if (person != NULL) {
-            FieldActor *actor = func_ov137_021f110c(person);
+            FieldActor *actor = ResortPerson_GetActor(person);
             if (FldAct_GetAcmd(actor) == 0xbe) {
                 FldAct_FreeAcmd(actor);
             }
         }
     }
-    func_ov137_021f1504(people);
+    ResortPeople_FreeAll(people);
     ResortBinary_Free(people->table);
     GFL_HeapFree(people);
 }
 
-void func_ov137_021f1348(ResortPeople *people, FieldPlayer *player) {
+void ResortPeople_Update(ResortPeople *people, FieldPlayer *player) {
 }
 
-u32 func_ov137_021f134c(ResortPeople *people) {
+u32 ResortPeople_GetCount(ResortPeople *people) {
     return people->setup.count;
 }
 
-void func_ov137_021f1350(ResortPeople *people) {
+void ResortPeople_CreateFromSlots(ResortPeople *people) {
     u32 row = people->setup.zone;
     int pos;
 
     for (pos = 0; pos < 64; pos++) {
-        if (!func_ov137_021f1808(people->setup.slots, row, pos)) {
+        if (!ResortSlots_IsEmpty(people->setup.slots, row, pos)) {
             ResortPersonSource source;
             MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
-            source.data = func_ov137_021f1824(people->setup.slots, row, pos);
+            source.data = ResortSlots_GetData(people->setup.slots, row, pos);
             source.zone = people->setup.zone;
-            func_ov137_021f1464(people, &source, TRUE, pos);
+            ResortPeople_AddPerson(people, &source, TRUE, pos);
         }
     }
-    func_ov137_021f1670(people);
+    ResortPeople_DeleteOrphanActors(people);
 }
 
-void func_ov137_021f13a4(ResortPeople *people) {
+void ResortPeople_CreateFromDatas(ResortPeople *people) {
     u32 row = people->setup.zone;
-    ResortDataIter iter = func_ov137_021f1ae0(people->setup.datas, sKinds, 2);
+    ResortDataIter iter = ResortDatas_StartIter(people->setup.datas, sKinds, 2);
     ResortPersonSource source;
     ResortPersonData *data;
 
@@ -360,20 +361,20 @@ void func_ov137_021f13a4(ResortPeople *people) {
         u32 pos;
         u16 unk;
 
-        data = func_ov137_021f1b0c(people->setup.datas, &iter, sKinds, 2);
+        data = ResortDatas_NextIter(people->setup.datas, &iter, sKinds, 2);
         if (data == NULL) {
             break;
         }
-        if (func_ov137_021f195c(data)) {
+        if (ResortData_IsEmpty(data)) {
             continue;
         }
         create = FALSE;
-        pos = func_ov137_021f1968(data, 0, NULL);
-        if (!func_ov137_021f1808(people->setup.slots, row, pos)) {
+        pos = ResortData_GetParam(data, 0, NULL);
+        if (!ResortSlots_IsEmpty(people->setup.slots, row, pos)) {
             create = TRUE;
         }
-        unk = func_ov137_021f1968(data, 31, NULL);
-        if (func_ov137_021f1988(data) == 4) {
+        unk = ResortData_GetParam(data, 31, NULL);
+        if (ResortData_GetKind(data) == 4) {
             if (unk == 2 || unk == 3) {
                 create |= TRUE;
             } else {
@@ -384,117 +385,117 @@ void func_ov137_021f13a4(ResortPeople *people) {
             MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
             source.data = data;
             source.zone = people->setup.zone;
-            func_ov137_021f1464(people, &source, FALSE, pos);
+            ResortPeople_AddPerson(people, &source, FALSE, pos);
         }
     }
-    func_ov137_021f1670(people);
+    ResortPeople_DeleteOrphanActors(people);
 }
 
 static inline ResortPerson *ResortPeople_GetPerson(ResortPeople *people, int index) {
     return people->persons[index];
 }
 
-static ResortPerson *func_ov137_021f1464(ResortPeople *people, const ResortPersonSource *source, BOOL unk20,
-                                         u16 index) {
+static ResortPerson *ResortPeople_AddPerson(ResortPeople *people, const ResortPersonSource *source, BOOL unk20,
+                                            u16 index) {
     if (ResortPeople_GetPerson(people, index) == NULL) {
         ResortPersonSetup setup;
-        func_ov137_021f16d0(people, source, index, &setup);
+        ResortPeople_MakeSetup(people, source, index, &setup);
         setup.unk20 = unk20;
-        people->persons[index] = func_ov137_021f0e98(people->heapId, &setup);
-        func_ov137_021f1748(people->setup.slots);
+        people->persons[index] = ResortPerson_Create(people->heapId, &setup);
+        ResortSlots_Fill(people->setup.slots);
         return people->persons[index];
     }
     return NULL;
 }
 
-ResortPerson *func_ov137_021f14a8(ResortPeople *people, const ResortPersonSource *source) {
-    u32 pos = func_ov137_021f184c(people->setup.slots, source->zone);
+ResortPerson *ResortPeople_AddAtEmptySlot(ResortPeople *people, const ResortPersonSource *source) {
+    u32 pos = ResortSlots_FindEmpty(people->setup.slots, source->zone);
     if (pos != 0xffff) {
-        return func_ov137_021f1464(people, source, FALSE, pos);
+        return ResortPeople_AddPerson(people, source, FALSE, pos);
     }
     return NULL;
 }
 
-static void func_ov137_021f14d8(ResortPeople *people, ResortPerson *person) {
+static void ResortPeople_RemovePerson(ResortPeople *people, ResortPerson *person) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
         if (person == people->persons[i]) {
-            func_ov137_021f0f3c(person);
+            ResortPerson_Free(person);
             people->persons[i] = NULL;
             return;
         }
     }
 }
 
-static void func_ov137_021f1504(ResortPeople *people) {
+static void ResortPeople_FreeAll(ResortPeople *people) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
         if (people->persons[i] != NULL) {
-            func_ov137_021f0f3c(people->persons[i]);
+            ResortPerson_Free(people->persons[i]);
             people->persons[i] = NULL;
         }
     }
 }
 
-void func_ov137_021f152c(ResortPeople *people) {
+void ResortPeople_ApplyVisibility(ResortPeople *people) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
         if (people->persons[i] != NULL) {
-            func_ov137_021f1098(people->persons[i], 2);
+            ResortPerson_ApplyVisibility(people->persons[i], 2);
         }
     }
 }
 
-void func_ov137_021f1554(ResortPeople *people, ResortPerson *person) {
-    u32 pos = func_ov137_021f10e8(person, 0, NULL);
+void ResortPeople_Recreate(ResortPeople *people, ResortPerson *person) {
+    u32 pos = ResortPerson_GetParam(person, 0, NULL);
     ResortPersonSource source;
     ResortPersonSetup setup;
 
     MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
-    source.data = func_ov137_021f1110(person);
-    source.zone = func_ov137_021f10e8(person, 1, NULL);
-    func_ov137_021f16d0(people, &source, pos, &setup);
-    setup.unk20 = func_ov137_021f10f4(person, 1);
-    func_ov137_021f0f88(person, &setup);
+    source.data = ResortPerson_GetData(person);
+    source.zone = ResortPerson_GetParam(person, 1, NULL);
+    ResortPeople_MakeSetup(people, &source, pos, &setup);
+    setup.unk20 = ResortPerson_GetAttr(person, 1);
+    ResortPerson_Recreate(person, &setup);
 }
 
-void func_ov137_021f15ac(ResortPeople *people, ResortPerson *person) {
-    DeleteActor(func_ov137_021f110c(person));
-    func_ov137_021f14d8(people, person);
-    func_ov137_021f1748(people->setup.slots);
+void ResortPeople_Delete(ResortPeople *people, ResortPerson *person) {
+    DeleteActor(ResortPerson_GetActor(person));
+    ResortPeople_RemovePerson(people, person);
+    ResortSlots_Fill(people->setup.slots);
 }
 
-ResortPerson *func_ov137_021f15cc(ResortPeople *people, FieldActor *actor) {
+ResortPerson *ResortPeople_FindByActor(ResortPeople *people, FieldActor *actor) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
         ResortPerson *person = people->persons[i];
-        if (person != NULL && func_ov137_021f0f44(person, actor)) {
+        if (person != NULL && ResortPerson_HasActor(person, actor)) {
             return person;
         }
     }
     return NULL;
 }
 
-ResortPerson *func_ov137_021f1600(ResortPeople *people, JoinAvenuePerson *joinPerson) {
+ResortPerson *ResortPeople_FindByJoinAvenuePerson(ResortPeople *people, JoinAvenuePerson *joinPerson) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
         ResortPerson *person = people->persons[i];
-        if (person != NULL && func_ov137_021f1048(person, joinPerson)) {
+        if (person != NULL && ResortPerson_IsJoinAvenuePerson(person, joinPerson)) {
             return person;
         }
     }
     return NULL;
 }
 
-ResortPerson *func_ov137_021f1634(ResortPeople *people, u32 index) {
+ResortPerson *ResortPeople_GetByIndex(ResortPeople *people, u32 index) {
     return people->persons[index];
 }
 
-ResortPerson *func_ov137_021f163c(ResortPeople *people, ResortPersonData *data) {
+ResortPerson *ResortPeople_FindByData(ResortPeople *people, ResortPersonData *data) {
     u32 i;
     for (i = 0; i < people->setup.count; i++) {
         ResortPerson *person = people->persons[i];
-        if (person != NULL && func_ov137_021f1060(person, data)) {
+        if (person != NULL && ResortPerson_HasData(person, data)) {
             return person;
         }
     }
@@ -502,22 +503,22 @@ ResortPerson *func_ov137_021f163c(ResortPeople *people, ResortPersonData *data) 
 }
 
 // Deletes the actors of the zone's people that no person has
-static void func_ov137_021f1670(ResortPeople *people) {
+static void ResortPeople_DeleteOrphanActors(ResortPeople *people) {
     FieldActor *actor;
     u32 index = 0;
 
     while (NextActor(people->setup.mmSys, &actor, &index) == TRUE) {
-        if (func_ov137_021f1700(GetActorUID(actor)) &&
+        if (ResortPeople_IsPersonUID(GetActorUID(actor)) &&
             GetActorZoneID(actor) == ResortLayout_GetZoneId(people->setup.zone)) {
-            if (func_ov137_021f15cc(people, actor) == NULL) {
+            if (ResortPeople_FindByActor(people, actor) == NULL) {
                 DeleteActor(actor);
             }
         }
     }
 }
 
-static void func_ov137_021f16d0(ResortPeople *people, const ResortPersonSource *source, u32 index,
-                                ResortPersonSetup *setup) {
+static void ResortPeople_MakeSetup(ResortPeople *people, const ResortPersonSource *source, u32 index,
+                                   ResortPersonSetup *setup) {
     MI_CpuFill8(setup, 0, sizeof(ResortPersonSetup));
     setup->data = source->data;
     setup->index = index;
@@ -528,6 +529,6 @@ static void func_ov137_021f16d0(ResortPeople *people, const ResortPersonSource *
     setup->unk18 = people->setup.unk18;
 }
 
-static BOOL func_ov137_021f1700(int uid) {
+static BOOL ResortPeople_IsPersonUID(int uid) {
     return uid >= RESORT_PERSON_UID_FIRST && uid < RESORT_PERSON_UID_END;
 }

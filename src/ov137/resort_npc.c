@@ -34,26 +34,26 @@ struct ResortNPC {
     BOOL changed;
 };
 
-static void func_ov137_021f1d7c(ResortNPC *npc);
-static u32 func_ov137_021f1e90(ResortNPC *npc, BOOL stop);
-static BOOL func_ov137_021f1f0c(int uid);
+static void ResortNPC_CreateActors(ResortNPC *npc);
+static u32 ResortNPC_SetMovementStopped(ResortNPC *npc, BOOL stop);
+static BOOL ResortNPC_IsNPCUID(int uid);
 
-ResortNPC *func_ov137_021f1c24(const ResortNPCSetup *setup, HeapID heapId) {
+ResortNPC *ResortNPC_Create(const ResortNPCSetup *setup, HeapID heapId) {
     ResortNPC *npc = GFL_HeapAllocate(heapId, sizeof(ResortNPC), TRUE, "resort_npc.c", 66);
     npc->setup = *setup;
     npc->table = setup->table;
     npc->unk4 = 0;
     npc->texts = ResortBinary_Load(6, 20, heapId);
-    func_ov137_021f1d7c(npc);
+    ResortNPC_CreateActors(npc);
     return npc;
 }
 
-void func_ov137_021f1c74(ResortNPC *npc) {
+void ResortNPC_Free(ResortNPC *npc) {
     ResortBinary_Free(npc->texts);
     GFL_HeapFree(npc);
 }
 
-void func_ov137_021f1c88(ResortNPC *npc, Field *field) {
+void ResortNPC_Update(ResortNPC *npc, Field *field) {
     if (Field_IsEventRunning(field)) {
         if (npc->eventRunning == FALSE) {
             npc->changed = TRUE;
@@ -66,13 +66,13 @@ void func_ov137_021f1c88(ResortNPC *npc, Field *field) {
         }
     }
     if (npc->changed) {
-        if (func_ov137_021f1e90(npc, npc->eventRunning) == 0) {
+        if (ResortNPC_SetMovementStopped(npc, npc->eventRunning) == 0) {
             npc->changed = FALSE;
         }
     }
 }
 
-FieldActor *func_ov137_021f1cc8(ResortNPC *npc, u32 index) {
+FieldActor *ResortNPC_GetActor(ResortNPC *npc, u32 index) {
     u32 i;
     for (i = 0; i < ResortBinary_GetRowCount(npc->table); i++) {
         FieldActor *actor = FindFieldActor(npc->setup.mmSys, i + RESORT_NPC_UID_FIRST);
@@ -83,26 +83,26 @@ FieldActor *func_ov137_021f1cc8(ResortNPC *npc, u32 index) {
     return NULL;
 }
 
-u32 func_ov137_021f1d00(ResortNPC *npc) {
+u32 ResortNPC_GetCount(ResortNPC *npc) {
     return npc->count;
 }
 
-void func_ov137_021f1d04(ResortNPC *npc, BOOL visible) {
+void ResortNPC_SetVisible(ResortNPC *npc, BOOL visible) {
     u32 index = 0;
     FieldActor *actor;
     while (NextActor(npc->setup.mmSys, &actor, &index) == TRUE) {
-        if (func_ov137_021f1f0c(GetActorUID(actor)) &&
+        if (ResortNPC_IsNPCUID(GetActorUID(actor)) &&
             GetActorZoneID(actor) == ResortLayout_GetZoneId(npc->setup.zone)) {
             SetActorHidden(actor, !visible);
         }
     }
 }
 
-u16 func_ov137_021f1d60(ResortNPC *npc, u32 row, u32 column) {
+u16 ResortNPC_GetTextEntry(ResortNPC *npc, u32 row, u32 column) {
     return ResortBinary_Get(npc->texts, ResortBinary_Get(npc->table, row, RESORT_NPC_COL_TEXT_ROW), column);
 }
 
-static void func_ov137_021f1d7c(ResortNPC *npc) {
+static void ResortNPC_CreateActors(ResortNPC *npc) {
     u32 i;
     for (i = 0; i < ResortBinary_GetRowCount(npc->table); i++) {
         u16 rank = JoinAvenue_GetParam(npc->setup.info, 2, 0);
@@ -134,12 +134,12 @@ static void func_ov137_021f1d7c(ResortNPC *npc) {
     }
 }
 
-static u32 func_ov137_021f1e90(ResortNPC *npc, BOOL stop) {
+static u32 ResortNPC_SetMovementStopped(ResortNPC *npc, BOOL stop) {
     u32 index = 0;
     FieldActor *actor;
     u32 count = 0;
     while (NextActor(npc->setup.mmSys, &actor, &index) == TRUE) {
-        if (func_ov137_021f1f0c(GetActorUID(actor)) &&
+        if (ResortNPC_IsNPCUID(GetActorUID(actor)) &&
             GetActorZoneID(actor) == ResortLayout_GetZoneId(npc->setup.zone)) {
             if (IsActorFlag16(actor)) {
                 count++;
@@ -153,10 +153,10 @@ static u32 func_ov137_021f1e90(ResortNPC *npc, BOOL stop) {
     return count;
 }
 
-u16 func_ov137_021f1f00(ResortNPC *npc, u32 row) {
+u16 ResortNPC_GetTextRow(ResortNPC *npc, u32 row) {
     return ResortBinary_Get(npc->table, row, RESORT_NPC_COL_TEXT_ROW);
 }
 
-static BOOL func_ov137_021f1f0c(int uid) {
+static BOOL ResortNPC_IsNPCUID(int uid) {
     return uid >= RESORT_NPC_UID_FIRST && uid < RESORT_NPC_UID_END;
 }
