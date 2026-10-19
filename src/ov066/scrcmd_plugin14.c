@@ -94,7 +94,7 @@ static BOOL Plugin14Cmd_ResetLCDToBlack(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL Plugin14Cmd_StartAspertiaSeasonAnimations(VM *vm, FieldScriptEnv *env) {
-    func_ov112_021eed04(FieldScriptEnv_GetGameSystem(env));
+    AspertiaCity_PlaySeasonModel(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -135,7 +135,7 @@ static BOOL Plugin14_SeqFadeOutTask(void *data) {
 }
 
 static BOOL Plugin14Cmd_LoadAspertiaBG3Picture(VM *vm, FieldScriptEnv *env) {
-    func_ov112_021eed44(FieldScriptEnv_GetGameSystem(env));
+    AspertiaCity_RequestBG(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 

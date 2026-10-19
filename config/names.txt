@@ -9953,6 +9953,17 @@ overlays/ov111 0x021eef88 MarineTube_InitModel
 overlays/ov111 0x021ef010 MarineTube_ShowModel
 overlays/ov111 0x021ef074 MarineTube_SaveFrames
 overlays/ov111 0x021ef0c8 MarineTube_LoadFrames
+overlays/ov112 0x021eec80 AspertiaCity_Init
+overlays/ov112 0x021eecb8 AspertiaCity_End
+overlays/ov112 0x021eece0 AspertiaCity_Update
+overlays/ov112 0x021eed04 AspertiaCity_PlaySeasonModel
+overlays/ov112 0x021eed44 AspertiaCity_RequestBG
+overlays/ov112 0x021eed60 AspertiaCity_LoadBG
+overlays/ov112 0x021eee00 AspertiaCity_FreeBG
+overlays/ov112 0x021eee0c AspertiaCity_LoadModels
+overlays/ov112 0x021eeec8 AspertiaCity_FreeScene
+overlays/ov112 0x021eeed4 AspertiaCity_StepAnimations
+overlays/ov112 0x021eeee0 AspertiaCity_ShowSeasonModel
 overlays/ov116 0x021eec80 GimmickGC6_Setup
 overlays/ov116 0x021eecb0 GimmickGC6_End
 overlays/ov116 0x021eecc8 GimmickGC6_Update
