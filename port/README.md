@@ -45,9 +45,19 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
 - **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
-  `--input FILE` plays a replay, and `--launch APPS` opens the field menu's apps for the tests
-  ([the test launcher](#the-test-launcher)).
+  `--input FILE` plays a replay, `--launch APPS` opens the field menu's apps for the tests
+  ([the test launcher](#the-test-launcher)), and `--frame-times FILE` writes how long each frame took on this machine.
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
+- **How fast it runs:** `--frame-times FILE` writes a row a frame, the frame's host time with and without the pacing
+  wait and its parts (the 3D frame, the geometry engine, the 2D lines, capture, the ARM7, the window), and prints the
+  median, 95th percentile and most frame; [tools/frame_times.py](tools/frame_times.py) reports runs of a route scene by
+  scene, each frame the least of the runs, and its `check` holds them to a budget, as the `frame_times_*` tests do:
+
+  ```sh
+  build/port/frigate-black2 --headless --frames 3600 --input port/tests/oracle/title_b2_us.pbwinput \
+      --save-dir /tmp/saves --frame-times /tmp/title.tsv
+  python3 port/tools/frame_times.py summary /tmp/title.tsv --scene title=1110-3100 --scene start_menu=3110-3599
+  ```
 - **The sanitized build**, `cmake -S port -B build/port-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
   -DPORT_SANITIZE=ON`, runs the game and every test under AddressSanitizer and UndefinedBehaviorSanitizer, the game's
   own heaps included, and stops at the first report; `ctest -L route` runs its routes. How to read a report, and the

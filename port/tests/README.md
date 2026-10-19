@@ -8,8 +8,8 @@ belong to (T0 to T7) are in [../CLAUDE.md](../CLAUDE.md#testing-planmd-6) and
 
 Most tests need nothing but the build. The ones that need the player's ROM (`orig/baserom_<version>.nds`, or the
 `FRIGATE_ROM` variable) skip without it, so CI, which has no ROM, passes; they are the `rom_game_*` tests, most of the
-`rom_*` ones, `nnsys_g2d_rom_equivalence`, `snd_rom_*`, the `replay_*` tests, `integrate_launch_never_asked` and the
-`oracle_*` and `launch_*` tests that run the game. `asm_oracle` also needs the extracted ROM, its own Python
+`rom_*` ones, `nnsys_g2d_rom_equivalence`, `snd_rom_*`, the `replay_*` tests, `integrate_launch_never_asked`, the
+`frame_times_*` routes and the `oracle_*` and `launch_*` tests that run the game. `asm_oracle` also needs the extracted ROM, its own Python
 environment and a host build directory configured with `-G Ninja`, whose `build.ninja` it reads the game's flags from
 (it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup), and on macOS
 in one with no slice for its Python's architecture, such as an x86_64 build on Apple Silicon), and the
@@ -19,15 +19,18 @@ saves the oracle makes (`oracle_saves`). The oracle counts game frames with the 
 (`build/<version>/arm9.o.xMAP`), so those tests need `python3 configure.py && ninja` to have run: without it they fail
 at once ("counts game frames, which need --counter") rather than skip. A skipped test says so in ctest's summary.
 
-Three labels pick tests by what they need: `route`, the tests whose program runs the game from power-on on the
-player's ROM (the replays, the oracle's sequences and the port's checks of their hashes, the test launcher's routes,
-`integrate_launch_never_asked`, and the smoke test, which passes without a ROM too, stopping where the program looks
-for one); `oracle`, the tests that need the melonDS oracle or the saves it makes; and `timing`, the renderers' timing
-gates, which exist only with `PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`. So `ctest -L route -LE oracle` runs the
-routes that need no oracle, and `ctest -LE route` the rest; ctest adds the fixtures they need (`oracle_saves`, the
-replays' `*_clean`). A test gets its labels where it is defined, with `port_test_labels(TEST LABEL...)`
-([../CMakeLists.txt](../CMakeLists.txt)): a new test that runs the game from power-on gets `route` in the fragment that
-adds it, and `oracle` too when it needs the oracle or its saves.
+Three labels pick tests by what they need: `route`, the tests whose program runs the game from power-on on the player's
+ROM (the replays, the oracle's sequences and the port's checks of their hashes, the test launcher's routes,
+`integrate_launch_never_asked`, the `frame_times_*` routes, and the smoke test, which passes without a ROM too, stopping
+where the program looks for one); `oracle`, the tests that need the melonDS oracle or the saves it makes; and `timing`,
+the tests that hold the host's time to a limit, which a slow or loaded machine can fail: the `frame_times_*` routes,
+whose scenes' frames must stay within a budget ([../cmake/frame_times.cmake](../cmake/frame_times.cmake)), and the
+renderers' timing gates, which exist only with `PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`. So
+`ctest -L route -LE oracle` runs the routes that need no oracle, `ctest -LE route` the rest, and `ctest -LE timing`
+leaves out the timing; ctest adds the fixtures they need (`oracle_saves`, the replays' `*_clean`). A test gets its
+labels where it is defined, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): a new test
+that runs the game from power-on gets `route` in the fragment that adds it, and `oracle` too when it needs the oracle or
+its saves.
 In the sanitized build (`-DPORT_SANITIZE=ON`, [../docs/sanitizers.md](../docs/sanitizers.md)) every test runs under
 AddressSanitizer and UndefinedBehaviorSanitizer, and a report fails it on every host: the program aborts, where the
 runtime's own default off macOS is status 1, which a test that passes on its output or expects a failure would
@@ -38,7 +41,7 @@ report whatever ending it wants. The routes are that build's T5 runs.
 
 | Directory | What it tests | Game functionality covered | Tests |
 | --- | --- | --- | --- |
-| [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read and the options it describes, the test launcher's option and the kinds of field menu (`test_launcher_spec.c`); the macOS app's scripts, bundle identifier and log, with stand-in programs and projects, and a universal program's two slices running the opening the same (`test_universal_slices.sh`); and `check_exit.py`, which runs the program and checks its exit status, or that it crashed or aborted, since ctest's `PASS_REGULAR_EXPRESSION` ignores the status and fails a crash, and fails a run with a sanitizer's report whatever ending it wants (`test_check_exit.py` tests it) | The controls; the oracle's comparisons; the field menu's items; the app | `app_*` (`app_check_exit`), and the `integrate_unknown_option`, `integrate_launch_*`, `host_*`, `nnsys_ds_read_outside` and launcher tests that run through `check_exit.py` |
+| [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read and the options it describes, the test launcher's option and the kinds of field menu (`test_launcher_spec.c`), the reader of `--frame-times`' files ([../tools/frame_times.py](../tools/frame_times.py), `test_frame_times.py`); the macOS app's scripts, bundle identifier and log, with stand-in programs and projects, and a universal program's two slices running the opening the same (`test_universal_slices.sh`); and `check_exit.py`, which runs the program and checks its exit status, or that it crashed or aborted, since ctest's `PASS_REGULAR_EXPRESSION` ignores the status and fails a crash, and fails a run with a sanitizer's report whatever ending it wants (`test_check_exit.py` tests it) | The controls; the oracle's comparisons; the field menu's items; the app | `app_*` (`app_check_exit`), `frame_times_tool`, and the `integrate_unknown_option`, `integrate_launch_*`, `host_*`, `nnsys_ds_read_outside` and launcher tests that run through `check_exit.py` |
 | [asm_oracle/](asm_oracle/README.md) | The C that replaces the SDK's assembly, against the ROM's own machine code run in Unicorn (a test tool only) on seeded random inputs | Copies, fills, decompression, matrices, sorting, SHA-1, RC4 | `asm_oracle` |
 | [assets/](assets) | Frigate's artwork as committed: each SVG is what its generator writes, the PNG masters' sizes, and the small images' ships pixel for pixel | None: the program's look | `assets_branding` |
 | [fx/](fx) | The decomp's libfx C as the host compiles it | 3D maths | `fx_libfx` |
@@ -59,7 +62,10 @@ report whatever ending it wants. The routes are that build's T5 runs.
 
 `smoke_reaches_game_main` ([../CMakeLists.txt](../CMakeLists.txt)) runs the program's first frame, and the
 `overlay_sections_*` tests ([../cmake/overlay_sections.cmake](../cmake/overlay_sections.cmake)) check the overlay
-sections of every program that links the game.
+sections of every program that links the game. The `frame_times_*` routes
+([../cmake/frame_times.cmake](../cmake/frame_times.cmake)) play the title screen, New Game (Black 2) and the field
+menu's apps 3 times each with `--frame-times`, alone, and fail when a scene's 95th percentile, each frame's least time
+over the runs without the pacing wait, is above `PORT_FRAME_TIME_BUDGET_MS` (half the DS's frame, 8.36 ms, by default).
 
 ## Writing a test
 

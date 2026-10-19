@@ -103,7 +103,7 @@ while it waits is the platform layer's:
      touch screen ([../app/present.c](../app/present.c), [../hal/input](../hal/input/port_input.h),
      [../hal/tp](../hal/tp/tp_host.h)), or plays a replay's frame instead ([../app/replay.c](../app/replay.c)),
      writes the run directory's row, presents both screens, stops at `--frames N`, paces to 59.8261 frames a second
-     unless `--headless`, and kicks the watchdog;
+     unless `--headless`, ends the frame's row of `--frame-times`, and kicks the watchdog;
    - the ARM7's frame ([../hal/pxi/arm7.c](../hal/pxi/arm7.c)): touch sampling, the sound driver catching up to the
      clock ([../hal/snd7/snd7.c](../hal/snd7/snd7.c)), whose samples go to [../audio](../audio/README.md), and the
      microphone;
@@ -115,6 +115,30 @@ while it waits is the platform layer's:
 Interrupts are taken only at defined points: a halt, interrupts enabled again with one pending, a modelled busy wait
 (`OS_GetTick`, `OS_SpinWaitSysCycles`, `SVC_WaitByLoop`), and `port_os_poll_irq`
 ([../hal/os/port_os.h](../hal/os/port_os.h)).
+
+### Where a frame's time goes
+
+The DS gives each frame 16.715 ms. Nearly all the host's time for one goes to the renderers, not to the game: the
+game's own C on its fibers takes about 0.1 ms a frame outside loading. `--frame-times FILE` writes each frame's host
+time with and without the pacing wait and its parts, timed where their work is
+([../hal/os/frame_time.h](../hal/os/frame_time.h)), and [../tools/frame_times.py](../tools/frame_times.py) reports a
+route scene by scene ([../README.md](../README.md#quick-start)); the `frame_times_*` tests hold the heaviest scenes to
+half a frame. The hot paths, and their cost on an M2 MacBook Air (Black 2, headless, each frame the least of 3 runs,
+medians in ms; the last row is the frame without the pacing wait, median and 95th percentile):
+
+| Part | Where its time goes | Title's 3D | Start menu | New Game's 3D flight | Juniper's intro | Bag and card |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3D frame | [../gfx/ref/ds3d.c](../gfx/ref/ds3d.c), before line 0: `DrawPixel`, `DrawSpan` and `PerspValue` for every pixel of every polygon (the title's Kyurem is about 1,160 polygons and 170,000 pixels a frame, 3.5 screens), `Texel` and `PaletteRead` for its textures; then edge marking, fog and anti-aliasing over the picture. A list stays drawn every frame until the next swap ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)) | 2.99 | 1.89 | 2.69 | 0.21 | 1.88 |
+| Geometry engine | [../gfx/ge/ge.c](../gfx/ge/ge.c): the logged writes decoded and queued (`Decode`, `Enqueue`, `Execute`), the matrices, lighting and the clipper (`RunCommand`, `Vertex`, `Submit`) | 0.50 | 0 | 0.63 | 0.01 | 0 |
+| 2D lines | [../gfx/ref/ds2d.c](../gfx/ref/ds2d.c) (`Compose`, `DrawTextBg`, `DrawObjs`) and each line's sources, [../hal/gx/vram.c](../hal/gx/vram.c)'s `port_vram_fill_source` | 0.45 | 0.56 | 0.22 | 0.44 | 0.49 |
+| Capture | [../gfx/capture.c](../gfx/capture.c), every line while the game captures (the title's picture into VRAM D) | 0.18 | 0 | 0 | 0 | 0 |
+| ARM7 | [../hal/snd7](../hal/snd7/snd7_internal.h): the sound driver catching up and the mixer, at each VBlank and at its alarms | 0.02 | 0.02 | 0.13 | 0.09 | 0.11 |
+| Window | [../app/present.c](../app/present.c): SDL's texture upload and present, about 0.2 ms with a window (none headless) | 0 | 0 | 0 | 0 | 0 |
+| The rest | The game's C on its fibers, the dispatcher, the interrupt handlers, the other frame hooks | 0.08 | 0.04 | 0.09 | 0.05 | 0.04 |
+| The frame | | 4.24, 4.45 | 2.53, 3.95 | 3.78, 4.68 | 0.82, 1.23 | 2.54, 2.69 |
+
+Windowed, paced, the same frames cost about 1.4 times as much: the core slows down while the program sleeps through
+the rest of each frame. The x86_64 slice under Rosetta takes about 1.7 times the arm64 time.
 
 ### Threads and stacks
 
@@ -230,6 +254,7 @@ which Frigate's test launcher opens in the field's place for the tests.
 | **Microphone** | `src/system/snd_mic.c`, `src/ov253/mictest.c`, `src/ov257/ctvt_mic.c` (the Xtransceiver) | [hal/mic/mic.c](../hal/mic/mic.c) | `pxi_mic_silence` | Silence; host input is planned |
 | **Wireless, Wi-Fi, infrared, the genuine-card check** | `src/gfl/net*.c`, `src/gfl/wm_icon.c`; `lib/nitro/src/wm`, `lib/twl/src/nwm`, `lib/dwc`, `lib/nitrowifi`, `lib/poke_net`, `lib/irc` (the infrared library, overlay 31); overlays 11, 181, 182; `src/ov338/ir_check.c` (the genuine-card check, at every CONTINUE and NEW GAME and when a Pokémon faints in battle: on failure the C-Gear's new-beacon marks are hidden for good and battles give no experience) | [hal/pxi](../hal/pxi/pxi_bus.h) (the wireless tags answer with the error bit), [hal/dwc/ov011_pending.c](../hal/dwc/ov011_pending.c), [hal/crypto/rc4.c](../hal/crypto/rc4.c) (RC4 for DWC's WDS code), four DWC files left out ([hal/replaced.txt](../hal/replaced.txt)); [hal/card/card_spi.c](../hal/card/card_spi.c), the card slot's SPI bus and the cartridge's infrared chip ([ADR 0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md)) | `asm_oracle` (RC4), `hal_card_spi_*`, `rom_game_ir_genuine_card`, whole program | The genuine-card check passes as on melonDS; the infrared chip has no partner, as on melonDS; wireless isn't modelled, multiplayer is phase 7 |
 | **DS Protect, DSi features** | `lib/dsprot`; `src/system/dsi.c`, `lib/twl` | [hal/stubs/dsprot.c](../hal/stubs/dsprot.c) (a genuine cartridge), [hal/os/os_emulator.c](../hal/os/os_emulator.c) (`OS_IsRunOnTwl` is FALSE) | `os_console`, whole program | Every DSi path is skipped, as on a DS |
+| **Frame times** (how fast the frames are made) | — | [hal/os/frame_time.c](../hal/os/frame_time.c) (`--frame-times`: each frame's host time and parts, timed in [gfx/screens.c](../gfx/screens.c), [gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c), [hal/pxi/arm7.c](../hal/pxi/arm7.c), [hal/os/core.c](../hal/os/core.c) and [app/main.c](../app/main.c)), [hal/host](../hal/host/host.h) (the clock), [tools/frame_times.py](../tools/frame_times.py) (scenes, each frame the least of several runs; the budget's check) | `frame_times_tool`; `frame_times_title`, `frame_times_new_game` (Black 2), `frame_times_party_menus` (label `timing`, each scene's 95th percentile within `PORT_FRAME_TIME_BUDGET_MS`, half a frame) | Every route within a third of the DS's frame on an M2 ([Where a frame's time goes](#where-a-frames-time-goes)) |
 | **Program options and messages** | — | [app/main.c](../app/main.c) (the options, `sOptions`, and the exit statuses, both in `--help`), [hal/os/app_options.c](../hal/os/app_options.c) (`port_app_option`), each module's reader; [app/message_log.c](../app/message_log.c) (the macOS app's log) | `integrate_unknown_option`, `integrate_launch_bad_option`, `app_about` (`--help` names Frigate as the build does and describes every option), `app_message_log` | No settings file yet; messages start with `port:` |
 | **The sanitized build** (T5) | `src/system/gf_font.c`, `src/system/printsys.c`, `src/gfl/arc_util.c`'s dynamic load (the game's three memory bugs it found, fixed under `PLATFORM_PC`), `src/system/scroll_bar.c` (a division by a list's zero `max`, given the DS's result under `PLATFORM_PC`), `src/gfl/arc_util.c`'s static load (the copyright screen's read past a heap block, which the title screen shows, kept as the DS's and let through) | `PORT_SANITIZE` ([../CMakeLists.txt](../CMakeLists.txt)), [cmake/sanitizer_ignorelist.txt](../cmake/sanitizer_ignorelist.txt) (the checks left out, and why), [hal/os/sanitizers.c](../hal/os/sanitizers.c) (UBSan's reports with stacks that follow the fibers), [hal/os/fiber.c](../hal/os/fiber.c) (the switches, fake stacks, LeakSanitizer's roots), [hal/nnsys/fnd_hooks.c](../hal/nnsys/fnd_hooks.c) (the game's heaps poisoned block by block, and the DS's one read past a block let through, once it is checked to stay in the game's heaps or the main arena), [hal/trap.c](../hal/trap.c) (the placeholders readable at exit, through [hal/host](../hal/host/host.h)), [tests/app/check_exit.py](../tests/app/check_exit.py) (a report fails a run whatever ending it wants; no test has `WILL_FAIL`) | Every test in `build/port-san`; the routes are `ctest -L route`; `nnsys_ds_reads`, `nnsys_ds_read_outside`, `app_check_exit`; CI's `sanitize` job (macOS and Linux) | Every route clean in both versions, the test launcher's Pokédex and White 2's routes from its starter save included; the distribution build's options build sanitized too ([sanitizers.md](sanitizers.md)) |
 | **Replays and the oracle** | — | [app/replay.c](../app/replay.c), [app/run_dir.c](../app/run_dir.c) (with the globals by name from [hal/host](../hal/host/host.h)), [tools/oracle](../tools/oracle/README.md), [hal/gfl/gfl_frame.h](../hal/gfl/gfl_frame.h) (GFL's frame count) | `app_run_dir_*`, `oracle_pbwinput_*`, `oracle_compare`, `oracle_*` | Inputs counted in the game's frames, compared with melonDS |

@@ -1,11 +1,12 @@
 // macOS's and Linux's half of the host's services (host.h): pages through mmap and mprotect, faults as SIGSEGV and
 // SIGBUS on an alternate signal stack, backtraces through execinfo, names through dladdr, the watchdog as SIGALRM, and
 // the program's static data and globals from its own image (Mach-O's __DATA segment and export trie, ELF's linker
-// symbols and symbol table). It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers'
-// guards (port/hal/os/fiber.c), the PXI pointers into static data (port/hal/pxi/pointer.c), --run-dump's globals
-// (port/app/main.c) and the watchdog (port/app/main.c) stand on it. Windows has host_windows.c instead. glibc hides
-// dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs from strict C11, so port/CMakeLists.txt defines
-// _GNU_SOURCE for this file on the command line, ahead of any header (port_host.h, which some targets force-include)
+// symbols and symbol table), and the monotonic clock. It touches no part of the game: the trap placeholders
+// (port/hal/trap.c), the fibers' guards (port/hal/os/fiber.c), the PXI pointers into static data
+// (port/hal/pxi/pointer.c), --run-dump's globals (port/app/main.c) and the watchdog (port/app/main.c) stand on it.
+// Windows has host_windows.c instead. glibc hides dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs
+// from strict C11, so port/CMakeLists.txt defines _GNU_SOURCE for this file on the command line, ahead of any header
+// (port_host.h, which some targets force-include)
 #ifndef _WIN32
 
 #include "hal/host/host.h"
@@ -19,6 +20,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 
 #if defined(__APPLE__)
@@ -335,6 +337,20 @@ void port_host_watchdog_kick(void) {
     if (sWatchdogSeconds != 0) {
         alarm(sWatchdogSeconds);
     }
+}
+
+// --- Time -----------------------------------------------------------------------------------------------------------
+
+// macOS's clock of the time awake (mach_absolute_time's, in nanoseconds); Linux's monotonic clock
+uint64_t port_host_now_ns(void) {
+#if defined(__APPLE__)
+    return clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+#else
+    struct timespec now;
+
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    return (uint64_t)now.tv_sec * 1000000000u + (uint64_t)now.tv_nsec;
+#endif
 }
 
 // --- Files and the environment ---------------------------------------------------------------------------------------

@@ -25,6 +25,7 @@
 #include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
+#include "hal/os/frame_time.h"
 #include "hal/os/port_app.h"
 #include "hal/os/port_os.h"
 #include "hal/rom/port_rom.h"
@@ -94,6 +95,12 @@ static const Option sOptions[] = {
     { "sound-trace", "PATH", 0,
       "writes the sound driver's state after each run of its thread, as pbw-oracle's --sound-trace does the DS's "
       "(port/app/sound_trace.h)" },
+    { "frame-times", "FILE", 0,
+      "writes how long each frame took on this machine to FILE when the run ends, a row a frame in microseconds: the "
+      "whole frame, the frame without the pacing wait, and its parts (the 3D frame, the geometry engine, the 2D lines, "
+      "display capture, the ARM7, the window, the pacing wait, the rest); prints the median, 95th percentile and most "
+      "of the frames without the wait (port/hal/os/frame_time.h, port/tools/frame_times.py). One that can't be "
+      "written is a bad option (status 2)" },
     { "watchdog", "SECONDS", 0,
       "stops with a report and status 73 when a frame takes longer than that in host time: the game hangs in a loop "
       "that never reaches the platform layer (30 by default with --headless; 0 is off, the default with a window)" },
@@ -125,7 +132,8 @@ static const ExitStatus sExitStatuses[] = {
     { 1,
       "it can't go on or didn't do what it was asked, each cause with a \"port:\" line: the window didn't open, a "
       "write to the run directory failed during the run (a frame's row in frames.tsv, a screen's PNG file or "
-      "memory.txt, which stops the run at once), a write to the sound trace failed, a module ran out of host memory "
+      "memory.txt, which stops the run at once), a write to the sound trace or of --frame-times' file failed, a "
+      "module ran out of host memory "
       "(an arena, the geometry engine or its command log, the files over memory) or found a build that can't work "
       "(no overlay sections, an archive or a file over memory read through an address cut to 32 bits), or --launch's "
       "launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped aside, or "
@@ -415,17 +423,23 @@ static int AddRunDumps(void) {
 // The program's frame hook, at each VBlank on the dispatcher's stack: the scanline hook has drawn the frame's 192
 // lines by now. The input taken here is what the game's VBlank work and next frame read
 static void AppFrame(void) {
+    uint64_t begin;
+
     sFrames++;
+    begin = port_frame_time_begin();
     if (sWindowOpen) {
         port_present_poll();
     }
+    port_frame_time_end(PORT_FRAME_TIME_PRESENT, begin);
     // The game clock, and a replay's input in place of what the window took
     port_replay_vblank((uint32_t)sFrames);
     if (port_run_dir_active()) {
         RunDirFrame();
     }
     if (port_app_present != NULL) {
+        begin = port_frame_time_begin();
         port_app_present();
+        port_frame_time_end(PORT_FRAME_TIME_PRESENT, begin);
     }
     if (sFrameLimit != 0 && sFrames >= sFrameLimit) {
         WriteScreenshot();
@@ -437,8 +451,12 @@ static void AppFrame(void) {
         port_os_stop();
     }
     if (!sHeadless) {
+        begin = port_frame_time_begin();
         Pace();
+        port_frame_time_end(PORT_FRAME_TIME_PACE, begin);
     }
+    // The frame ends here for --frame-times, after the wait for its time
+    port_frame_time_frame((uint32_t)sFrames);
     KickWatchdog();
 }
 
@@ -448,6 +466,7 @@ int main(int argc, char **argv) {
     long long arenaSize;
     const char *audioDump;
     const char *soundTrace;
+    const char *frameTimes;
     const char *inputPath;
     const char *runDir;
     PortOsResult result;
@@ -499,6 +518,12 @@ int main(int argc, char **argv) {
     soundTrace = port_app_option("sound-trace");
     if (soundTrace != NULL && *soundTrace == '\0') {
         fprintf(stderr, "port: --sound-trace needs a path\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    frameTimes = port_app_option("frame-times");
+    if (frameTimes != NULL && (*frameTimes == '\0' || !port_frame_time_open(frameTimes))) {
+        fprintf(stderr, "port: --frame-times needs a file it can write\n");
         Usage();
         return EXIT_BAD_OPTIONS;
     }
@@ -586,6 +611,7 @@ int main(int argc, char **argv) {
     // The ROM before the game, so that its check (and the message when there is none) comes first; the CARD library
     // would open it at CARD_Init otherwise
     port_rom_boot();
+    port_frame_time_start();
     result = port_os_run(NitroMain);
     switch (result) {
     case PORT_OS_STOPPED:
@@ -606,6 +632,10 @@ int main(int argc, char **argv) {
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
     if (!port_sound_trace_close() || sRunDirFailed) {
+        status = 1;
+    }
+    // --frame-times' file, written now that the run is over
+    if (!port_frame_time_close()) {
         status = 1;
     }
     // Frigate's test launcher's status, when nothing else went wrong: whether the launch finished

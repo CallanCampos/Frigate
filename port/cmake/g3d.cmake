@@ -28,7 +28,9 @@ endfunction()
 
 port_g3d_test(ge "${port_g3d_tests}/test_ge.c" ${port_g3d_ge})
 port_g3d_test(ds3d "${port_g3d_tests}/test_ds3d.c" ${port_g3d_ge} ${port_g3d_ds3d})
-port_g3d_test(hal "${port_g3d_tests}/test_g3d_hal.c" ${port_g3d_ge} ${port_g3d_ds3d} ${port_g3d_hal})
+# The glue times the geometry engine's runs for --frame-times (port/hal/os/frame_time.c, with the host's clock)
+port_g3d_test(hal "${port_g3d_tests}/test_g3d_hal.c" ${port_g3d_ge} ${port_g3d_ds3d} ${port_g3d_hal}
+    "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/frame_time.c" ${port_host_sources})
 
 # The timing, always at -O2 (a later -O wins). The bench is always built, so that it compiles on every host, but it is a
 # test only with PORT_G3D_TIMING_GATE (or the 2D renderer's PORT_GFX_TIMING_GATE) on: wall-clock limits depend on the

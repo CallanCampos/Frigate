@@ -2,7 +2,8 @@
 // vectored exception handler that moves the report to a stack of its own, crashes nobody handles through the
 // unhandled-exception filter, backtraces by unwinding the x64 stack with the image's unwind tables, the names of the
 // program's functions and globals from the COFF symbol table that lld keeps in an unstripped MinGW program, the
-// watchdog as a thread, and the program's static data from the PE image's writable sections. It also sets up every
+// watchdog as a thread, the program's static data from the PE image's writable sections, and the performance counter
+// as the monotonic clock. It also sets up every
 // program that links it before main(): stdout and stderr in binary mode, so that "\n" stays "\n" as on macOS and
 // Linux; no error dialog on a crash or abort(), which would hold a test or a CI run forever; and both exception
 // handlers. It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers' guards
@@ -688,6 +689,21 @@ void port_host_watchdog_kick(void) {
     if (sWatchdogKick != NULL) {
         SetEvent(sWatchdogKick);
     }
+}
+
+// --- Time -----------------------------------------------------------------------------------------------------------
+
+// The performance counter, in nanoseconds: its frequency (10 MHz on current Windows) is read once
+uint64_t port_host_now_ns(void) {
+    static LARGE_INTEGER frequency;
+    LARGE_INTEGER now;
+
+    if (frequency.QuadPart == 0) {
+        QueryPerformanceFrequency(&frequency);
+    }
+    QueryPerformanceCounter(&now);
+    return (uint64_t)(now.QuadPart / frequency.QuadPart) * 1000000000u +
+           (uint64_t)(now.QuadPart % frequency.QuadPart) * 1000000000u / (uint64_t)frequency.QuadPart;
 }
 
 // --- Files and the environment ---------------------------------------------------------------------------------------

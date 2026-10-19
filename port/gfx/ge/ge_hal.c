@@ -1,12 +1,14 @@
 // The geometry engine and the 3D renderer in the running program (ge_hal.h): one engine fed from the platform layer's
 // log of geometry writes (port/hal/hw), the readback registers' values for hw.c's accessors, the swap at each
 // VBlank, and the 3D frame rasterized before line 0 for engine A's BG0. Every 3D scene of the game (the title screen,
-// the field, battles, Pokémon sprites) reaches the screens through here.
+// the field, battles, Pokémon sprites) reaches the screens through here. With --frame-times, the geometry engine's runs
+// are timed here (port/hal/os/frame_time.h).
 #include "gfx/ge/ge_hal.h"
 #include "gfx/ge/ge.h"
 #include "gfx/ref/ds3d.h"
 #include "hal/gx/vram.h"
 #include "hal/hw/hw.h"
+#include "hal/os/frame_time.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -78,7 +80,10 @@ void port_g3d_sync(void) {
     const PortG3Write *writes = port_hw_g3_take(&count);
     ApplyGxStatWrite();
     port_ge_set_1dot_depth(ge, Read16(REG_DISP_1DOT_DEPTH));
+    // Timed only when there are commands: the readbacks sync before each read
+    uint64_t begin = count != 0 ? port_frame_time_begin() : 0;
     port_ge_run(ge, writes, count);
+    port_frame_time_end(PORT_FRAME_TIME_GEOMETRY, begin);
 }
 
 // The rendering registers are latched at every VBlank, with the swap when there is one, and the frame after it is

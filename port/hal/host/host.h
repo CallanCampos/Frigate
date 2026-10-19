@@ -1,17 +1,18 @@
 // The host operating system's services that the platform layer, the program and the tests share, where macOS, Linux
 // and Windows differ: memory pages and their protection, faults (a trap placeholder touched, a fiber's stack
 // overflowing into its guard, a crash), backtraces and the names of the program's functions and globals, the watchdog
-// that stops a frame which never ends, writes to stderr that take no lock, directories, the environment and the
-// program's static data. It touches no part of the game itself: it is what the code above it stands on, so that
-// trap.c, fiber.c and the tests are the same on every host (port/docs/adr/0013). A module whose own feature is a
-// host's keeps its branches instead (the saves' folder and files in port/hal/card/backup.c, the VRAM's aliasing in
-// port/hal/gx/vram_os.c, the mapped ROM in port/hal/rom/rom.c, the overlays' sections by object format in
-// port/hal/fs/ovsec.c, the RTC's local time, the macOS app's log, the window's icon); port/hal/README.md lists them.
-// Each host's half is one file, chosen by the compiler: host_posix.c for macOS and Linux, host_windows.c for Windows;
-// the other compiles to nothing. Its users: port/hal/trap.c (traps and crashes), port/hal/os/fiber.c (the fibers'
-// stacks and guards), port/hal/pxi/pointer.c (the static data), port/hal/os/os_terminate.c (backtraces),
-// port/hal/gx (the page size), port/app/main.c (the watchdog, --run-dump's globals), port/app/run_dir.c, and the tests'
-// harnesses. Plain C types only.
+// that stops a frame which never ends, the monotonic clock that times the frames, writes to stderr that take no lock,
+// directories, the environment and the program's static data. It touches no part of the game itself: it is what the
+// code above it stands on, so that trap.c, fiber.c and the tests are the same on every host (port/docs/adr/0013). A
+// module whose own feature is a host's keeps its branches instead (the saves' folder and files in
+// port/hal/card/backup.c, the VRAM's aliasing in port/hal/gx/vram_os.c, the mapped ROM in port/hal/rom/rom.c, the
+// overlays' sections by object format in port/hal/fs/ovsec.c, the RTC's local time, the macOS app's log, the window's
+// icon); port/hal/README.md lists them. Each host's half is one file, chosen by the compiler: host_posix.c for macOS
+// and Linux, host_windows.c for Windows; the other compiles to nothing. Its users: port/hal/trap.c (traps and crashes),
+// port/hal/os/fiber.c (the fibers' stacks and guards), port/hal/pxi/pointer.c (the static data),
+// port/hal/os/os_terminate.c (backtraces), port/hal/gx (the page size), port/hal/os/frame_time.c (the clock),
+// port/app/main.c (the watchdog, --run-dump's globals), port/app/run_dir.c, and the tests' harnesses. Plain C types
+// only.
 //
 // On Windows, every program that links host_windows.c also gets, before main(): stdout and stderr in binary mode, no
 // error dialog on a crash or abort(), and both exception handlers, which report the crashes nobody handles (see
@@ -123,6 +124,12 @@ void port_host_watchdog_start(unsigned seconds, const char *message, int status)
 
 // Starts the watchdog's seconds again (port/app/main.c kicks it each frame)
 void port_host_watchdog_kick(void);
+
+// --- Time -----------------------------------------------------------------------------------------------------------
+
+// The host's monotonic clock in nanoseconds, from an arbitrary start: how long the program's own work takes, for
+// --frame-times (port/hal/os/frame_time.h). Nothing of the game reads it, so a run stays the same
+uint64_t port_host_now_ns(void);
 
 // --- Files and the environment ---------------------------------------------------------------------------------------
 
