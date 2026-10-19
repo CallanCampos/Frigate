@@ -7,17 +7,6 @@
 // reads the game card's data differently from the real thing. The ROM doesn't name this file; it is named for what it
 // does.
 
-// The card's registers, which the flashcart check reads the ROM through, as offsets from the register block at
-// 0x04000000: the original builds that base at run time rather than loading each address
-#define REG_BASE_SHIFT 26
-#define OFFSET_AUXSPICNT_H 0x1a1
-#define OFFSET_ROMCTRL 0x1a4
-#define OFFSET_ROMCMD 0x1a8
-#define OFFSET_EXMEMCNT 0x204
-#define OFFSET_SCFG_A9ROM 0x4000
-#define OFFSET_CARD_DATA 0x100010
-#define REG_ROMCMD(n) (*(vu8 *)(0x04000000 + OFFSET_ROMCMD + (n)))
-
 // Bytes of the first MAC address whose reversed bits an emulator has
 static const u8 sEmulatorMac[6] = { 0xff, 0xf6, 0x40, 0xff, 0xff, 0xce };
 
