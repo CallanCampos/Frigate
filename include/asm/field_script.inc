@@ -4780,7 +4780,7 @@
 
     // Plugin 8, with overlay 60 loaded
 
-    // func_ov060_021e58c0
+    // ResortShopCmd_Open
     .macro Plugin8Ov60_Cmd1000 a0, a1, a2, a3, a4, a5, a6, a7
     FieldCommand 1000
     .2byte \a0
@@ -4793,7 +4793,7 @@
     .2byte \a7
     .endm
 
-    // func_ov060_021e58c0
+    // ResortShopCmd_Open
     .macro Plugin8Ov60_Cmd1011 a0, a1, a2, a3, a4, a5, a6, a7
     FieldCommand 1011
     .2byte \a0
