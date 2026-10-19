@@ -296,11 +296,14 @@ at the DS's colour depth (each channel >> 2), or with `--depth 5` at its palette
 low bit (green's takes bit 15 of the colour in some renderers). A screen without 3D in the oracle's frame must be
 **exact**, whatever the other screen shows. A screen with 3D passes when at most `--tolerance` (0.5%) of its own
 pixels differ by more than `--pixel-tolerance` (2) steps from every pixel of the other picture within one pixel of the
-same place, which forgives a rasterizer drawing an edge one pixel over. `--report DIR` writes, for each frame that
-isn't exact, the oracle's screens, the port's and the differences side by side (the oracle's picture dimmed, forgiven
-differences yellow, the others red). Without a PNG on one side, `frames.tsv`'s hashes decide a screen at 6 bits
-without 3D (they are of the 8-bit output, the 6 bits widened); a screen with 3D or at `--depth 5` whose hashes differ
-is reported "not compared", which fails the run as a difference does.
+same place, which forgives a rasterizer drawing an edge one pixel over. On the port frames `--close` lists, the frames
+held close, a screen with 3D must also have at most `--close-tolerance` (1%) of its pixels differ at all: a 2D layer
+over the 3D that differs by a step or two everywhere, as in a fade from black, is within the pixel tolerance at every
+pixel, and only this catches it. `--report DIR` writes, for each frame that isn't exact, the oracle's screens, the
+port's and the differences side by side (the oracle's picture dimmed, forgiven differences yellow, the others red).
+Without a PNG on one side, `frames.tsv`'s hashes decide a screen at 6 bits without 3D (they are of the 8-bit output,
+the 6 bits widened); a screen with 3D or at `--depth 5` whose hashes differ is reported "not compared", which fails the
+run as a difference does.
 
 `compare.py memory ORACLE PORT` compares `memory.txt` by frame and label, for values whose bytes are the same on both:
 counters, flags, random number states, arrays of plain numbers, NNS G3D's state (`NNS_G3dGlb`, 612 bytes). Pointers and
@@ -383,6 +386,15 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
 - **continue_starter**: continue's input file from the starter save ([below](#saves)): the start menu's saved game has
   the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout. The port stops on the same
   trap. White 2 has no starter save measured yet, so its test skips with the reason.
+
+The opening and the title hold the title's first 34 frames of 3D close (their `close`, compare.py's `--close`): port
+frames 3527-3560 of the opening, 1116-1149 of the title. There the title's bottom screen fades in over its 3D, and the
+tiles that the copyright screen read past its file's end show as a band over lines 38 to 95, a step or two from black,
+which the 3D's tolerance forgives everywhere ([../../docs/sanitizers.md](../../docs/sanitizers.md), H1). The 3D there
+differs from the oracle's in at most 235 pixels (Black 2) of the 491 a frame held close may; a build without the band
+differed in 14,330 at the first frame, 1,823 at the fourth, and passed the tolerance. continue and continue_starter
+start from a save, which leaves other bytes after the copyright screen's file on the port than on the DS
+([below](#known-differences-from-the-hardware)), so they don't hold those frames close.
 
 Each is two ctest tests, but continue and continue_starter, whose saves only the oracle can make, have only the
 first:
@@ -805,6 +817,15 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
     the title above line 173 or so and white below, and no port frame shows it;
   - the opening's first frame in White 2, oracle 1283, black above line 77, which no port frame shows (in Black 2 it
     comes whole).
+- **Memory the game reads past a heap block.** The copyright screen loads 0x8000 bytes of a smaller file's
+  characters, so the tiles past them are whatever the heap held after the file's block
+  ([../../docs/sanitizers.md](../../docs/sanitizers.md), H1), and the title's bottom screen shows them as a band over
+  lines 38 to 95 as it fades in (port frames 3527-3536 of the opening, 1116-1125 of the title). From a blank save the
+  port's heap holds the DS's bytes there, 8 pixels apart at the first frame, and the opening and the title hold those
+  frames close. From a save (continue, continue_starter) it holds other bytes there than the DS's heap does, most
+  likely because what the start-up's earlier allocations left there sits elsewhere in the host's larger heaps and
+  blocks, and the band's noise differs: 10,764 of the bottom screen's pixels at port frame 1116 in Black 2, a step or
+  two from black, within the 3D's tolerance, and fewer each frame as it fades.
 - **A frame the DS drops where the game steps by VBlanks.** The title moves its camera once for each VBlank since its
   last pass (`Title_Update` in `src/ov162/title.c`) and Kyurem's animation once a pass. The DS's pass at START
   (count 3100) takes two frames, so from then on its camera is a step ahead of the animation, which on the port,

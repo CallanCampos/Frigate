@@ -133,6 +133,8 @@ add_test(NAME replay_start_menu
         --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/start_menu.pbwinput")
 set_tests_properties(replay_start_menu PROPERTIES FIXTURES_REQUIRED replay_start_menu_saves
     SKIP_RETURN_CODE 66 PASS_REGULAR_EXPRESSION "stopped after 4300 frames" TIMEOUT 900)
+port_test_labels(replay_start_menu_clean route)
+port_test_labels(replay_start_menu route)
 
 # Black 2 only: the screens it checks are the oracle's hashes of Black 2's
 if(PORT_VERSION STREQUAL "b2_us")
@@ -154,6 +156,8 @@ if(PORT_VERSION STREQUAL "b2_us")
             --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game.pbwinput")
     set_tests_properties(replay_new_game PROPERTIES
         FIXTURES_REQUIRED replay_new_game_saves SKIP_RETURN_CODE 66 TIMEOUT 1800)
+    port_test_labels(replay_new_game_clean route)
+    port_test_labels(replay_new_game route)
 endif()
 
 # The port's saves depend only on the input file and the clock it names (T3, T6): New Game's formatting of the blank
@@ -178,3 +182,4 @@ add_test(NAME replay_same_save
         $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 5600 --watchdog 30
         --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput")
 set_tests_properties(replay_same_save PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 1200)
+port_test_labels(replay_same_save route)

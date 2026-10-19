@@ -1,8 +1,8 @@
 // Force-included into every decomp C file of the host build (port/CMakeLists.txt), so all of the game's C sees it: what
 // MWCC provides built in and clang spells differently, the translation of the DS's fixed addresses into host memory,
-// and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes, the particle systems'
-// work, the sound data's handles, the Wi-Fi ID's seed, Frigate's test launcher's seam in CONTINUE's event). Nothing
-// here may change what a file means on the DS.
+// and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes, a read the DS makes
+// past a heap block, the particle systems' work, the sound data's handles, the Wi-Fi ID's seed, Frigate's test
+// launcher's seam in CONTINUE's event). Nothing here may change what a file means on the DS.
 #ifndef PORT_HOST_H
 #define PORT_HOST_H
 
@@ -55,6 +55,15 @@ void *port_hw_auxspidata(void);
 // it is the game's struct GameEvent and not one local to the prototype
 struct GameEvent;
 int port_launcher_take_field_open(struct GameEvent *event);
+
+// A read the DS makes past the end of one of the game's heap blocks, into what its heap holds after the block, whose
+// bytes the game uses as the DS does (src/gfl/arc_util.c: the copyright screen's characters, which the title screen's
+// bottom screen shows). In the sanitized build, which poisons the game's heaps between their blocks
+// (port/hal/nnsys/fnd_hooks.c), the reads between the two calls may reach [start, start + size), and what was poisoned
+// there is poisoned again at the end; elsewhere both do nothing. One at a time, with nothing allocated or freed in
+// between. The size is u32
+void port_heap_ds_read_begin(const void *start, unsigned int size);
+void port_heap_ds_read_end(void);
 
 // The size the host gives one of the game's heaps (src/gfl/heapsys.c), larger than the DS's for 64-bit structs
 // (port/hal/gfl/heap_policy.c). The arguments are u32, u32 and BOOL

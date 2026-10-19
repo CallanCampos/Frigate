@@ -3,6 +3,28 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the sanitized build, after review
+
+- **A sanitizer's report in the game's code isn't yet a bug to fix: find what the DS does with the bytes.** The
+  copyright screen's read past its file's heap block looked unused, and a fix loaded the file's characters alone. The
+  tiles it read stay in VRAM, and the title screen's bottom screen shows them for some ten frames as it fades in: the
+  fix drew the background where the DS draws a band. From a blank save the host read the same bytes as the DS, so the
+  read was a DS-ism to keep, and the sanitized build is told so instead (`port_heap_ds_read_begin`). From a save the
+  heap holds other bytes there on the host, and the band's noise differs: a read past a block reproduces the DS only
+  as far as the heap's contents do.
+- **The 3D tolerance forgives a 2D layer in a fade.** A screen with 3D passes when few pixels differ by more than two
+  steps; in a fade from black a whole band differs by one or two, and 14,330 differing pixels passed. A game change
+  that should leave the picture alone is checked by comparing its run's `frames.tsv` with the base build's on the
+  routes, frame by frame, not by the oracle's verdict; and frames where a 2D layer shows over 3D are held close
+  (`compare.py --close`, a sequence's `close`).
+- **Off Apple, a sanitizer's report ends the program with status 1.** The runtime's `abort_on_error` defaults to on
+  only on Apple's platforms; elsewhere a report, LeakSanitizer's at exit included, is `_exit(1)`, which a ctest test
+  that passes on its output (`PASS_REGULAR_EXPRESSION`) or on a failure (`WILL_FAIL`, a wrapper expecting 1) accepts.
+  `__asan_default_options` returning `abort_on_error=1` makes it SIGABRT everywhere, which ctest always fails.
+- **An allocator's own sizes say nothing of what the game asked for.** FND's resize returns the host's size, a
+  multiple of 8, and keeps the old one when it refuses a small shrink, so poisoning only when that size changed left a
+  shrunk block's tail addressable. Poison and unpoison from the size the game asked for, on every successful call.
+
 ## 2026-10-18: the sanitized build
 
 - **Apple clang accepts `-fsanitize=function` for C and emits nothing.** Upstream clang (17 and later) checks every
@@ -18,7 +40,8 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 - **ASan sees a game's own allocator as one block.** All of the game's heaps were inside one `calloc`, so an overrun
   between two of its allocations was invisible. Poison between the blocks in the allocator's wrappers, with the
   allocator itself built without ASan, and unpoison what the DS gives a block (its size rounded to 4), not the host's
-  rounding. The first run found three of the game's own memory bugs that the DS's heap tolerates.
+  rounding. The first run found three places where the game's code reaches past its blocks, which the DS's heap
+  tolerates (two of them bugs, the third a read whose bytes the screen shows: below).
 - **A survey run reports each place once**, and a place is the access's PC: a shared copy loop (`MIi_DmaCopy32`) or
   reader reports its first caller's overrun only. Survey in rounds, fixing between them, until a round is clean.
 - **Read the whole report before fixing the line it names.** The font's first report looked like a bit reader's

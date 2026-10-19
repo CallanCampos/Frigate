@@ -8,8 +8,9 @@
 #   cmake --build build/port
 #   ctest --test-dir build/port
 #
-# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_FETCH_SDL3 and -DPORT_SANITIZE (the sanitized build)
-# here; the others are in the fragments of port/cmake/, included at the end, and port/cmake/README.md lists them all.
+# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_FETCH_SDL3, and -DPORT_SANITIZE with
+# -DPORT_SANITIZE_RECOVER (the sanitized build) here; the others are in the fragments of port/cmake/, included at the
+# end, and port/cmake/README.md lists them all. Each fragment labels its tests where it defines them (port_test_labels).
 cmake_minimum_required(VERSION 3.28)
 
 # The product's name, description and disclaimer, which port/hal/os/port_app.h sets for the C (port/CLAUDE.md, "The
@@ -121,13 +122,21 @@ endif()
 
 # The sanitized build (port/docs/sanitizers.md): every target from here on, the game, the platform layer, the program
 # and the tests, under AddressSanitizer and UndefinedBehaviorSanitizer, with every report fatal, so that a test that
-# reaches one fails. SDL3, above, stays as it was built. The ignorelist leaves out the checks of the few places where
-# the game is right on every host and only C's rules call it undefined, each said there; port/hal/os/sanitizers.c and
+# reaches one fails (a report aborts the program, port/hal/os/sanitizers.c, and the tests' output is checked for one,
+# at the end of this file). SDL3, above, stays as it was built, and so does the oracle, a project of its own
+# (port/cmake/oracle.cmake, PORT_ORACLE_SANITIZE). The ignorelist leaves out the checks of the few places where the
+# game is right on every host and only C's rules call it undefined, each said there; port/hal/os/sanitizers.c and
 # port/hal/os/fiber.c tell the runtime about the fibers, and port/hal/nnsys/fnd_hooks.c about the game's heaps. Use a
-# build directory of its own (build/port-san). Apple clang emits no function check for C; upstream clang does
-# PORT_SANITIZE_RECOVER instead lets a run go on after each report, to survey every report of a route in one run
+# build directory of its own (build/port-san). Apple clang emits no function check for C; upstream clang does.
+#
+# PORT_SANITIZE_RECOVER, with PORT_SANITIZE, instead lets a run go on after each report, to survey every report of a
+# route in one run
 option(PORT_SANITIZE "Build everything under AddressSanitizer and UndefinedBehaviorSanitizer, every report fatal" OFF)
 option(PORT_SANITIZE_RECOVER "With PORT_SANITIZE, go on after a report instead of stopping, to survey them all" OFF)
+if(PORT_SANITIZE_RECOVER AND NOT PORT_SANITIZE)
+    message(FATAL_ERROR "PORT_SANITIZE_RECOVER makes the sanitized build's checks recover: configure it with "
+        "-DPORT_SANITIZE=ON")
+endif()
 if(PORT_SANITIZE)
     if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
         message(FATAL_ERROR "PORT_SANITIZE needs clang, for its ignorelist and runtime, not ${CMAKE_C_COMPILER_ID}")
@@ -240,12 +249,30 @@ add_executable(${PORT_PROGRAM}
 target_include_directories(${PORT_PROGRAM} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
 
+# Labels, so that a part of the tests can be run by what it needs (ctest -L LABEL, or -LE LABEL to leave it out;
+# port/tests/README.md). A test gets its labels where it is defined, with port_test_labels(TEST LABEL...):
+#   route   the program runs the game from power-on on the player's ROM, and the test skips without it: the replays,
+#           the oracle's sequences and the port's checks of their hashes, the test launcher's routes, the smoke test
+#           (which passes without a ROM too, stopping where the program looks for one). In the sanitized build these
+#           are its routes (port/docs/sanitizers.md)
+#   oracle  needs the melonDS oracle, or the saves it makes (skips without them). The routes that need no oracle are
+#           ctest -L route -LE oracle
+#   timing  a timing gate (PORT_G3D_TIMING_GATE, PORT_GFX_TIMING_GATE), which a loaded machine can fail
+function(port_test_labels test)
+    set_property(TEST ${test} APPEND PROPERTY LABELS ${ARGN})
+endfunction()
+
 # Modules' own build rules (per-file definitions, generated inputs): every port/cmake/*.cmake, in name order
 file(GLOB port_cmake_fragments CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/*.cmake")
 list(SORT port_cmake_fragments)
 foreach(fragment IN LISTS port_cmake_fragments)
     include("${fragment}")
 endforeach()
+# The timing gates' limits are for the renderers as the plain build compiles them, not instrumented
+if(PORT_SANITIZE AND (PORT_G3D_TIMING_GATE OR PORT_GFX_TIMING_GATE))
+    message(FATAL_ERROR "The timing gates (PORT_G3D_TIMING_GATE, PORT_GFX_TIMING_GATE) would time the renderers under "
+        "the sanitizers: configure them in a build without PORT_SANITIZE")
+endif()
 
 # Tests (ctest --test-dir build/port). The smoke test runs the game's first frame: it passes once the program enters
 # the game's main() and the frame ends without a crash (a trap stub stopping it is still accepted). Like every test that
@@ -255,27 +282,20 @@ add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless --frame
     --save-dir "${CMAKE_CURRENT_BINARY_DIR}/smoke_saves")
 set_tests_properties(smoke_reaches_game_main PROPERTIES
     PASS_REGULAR_EXPRESSION "entering the game's main\\(\\)" TIMEOUT 60)
+port_test_labels(smoke_reaches_game_main route)
 
-# Labels, so that a part of the tests can be run by what it needs (ctest -L LABEL, or -LE LABEL to leave it out;
-# port/tests/README.md), given here from the tests' names once every test is defined:
-#   route   the program runs the game from power-on on the player's ROM: the replays, the oracle's sequences and the
-#           port's own runs of them, the test launcher's routes, the smoke test (each skips without the ROM). In the
-#           sanitized build these are its routes (port/docs/sanitizers.md)
-#   oracle  needs the melonDS oracle, or the saves it makes (skips without them). The routes that need no oracle are
-#           ctest -L route -LE oracle
-get_property(port_all_tests DIRECTORY PROPERTY TESTS)
-foreach(test IN LISTS port_all_tests)
-    set(labels)
-    if(test MATCHES "^(replay_|launch_|smoke_reaches_game_main$|integrate_(launch_never_asked|boot_logos)$)"
-       OR test MATCHES "^oracle_(opening|title|continue|continue_starter|port_save|launch_[a-z_]+)(_hashes)?$"
-       OR test MATCHES "^oracle_sound_(opening|title)(_hashes)?$")
-        list(APPEND labels route)
-    endif()
-    if((test MATCHES "^(oracle_|launch_)" AND NOT test MATCHES "_hashes$")
-       AND NOT test MATCHES "^oracle_(pbwinput|display3d)_(plain|sanitized)$|^oracle_(compare|sound_tool)$")
-        list(APPEND labels oracle)
-    endif()
-    if(labels)
-        set_property(TEST ${test} APPEND PROPERTY LABELS ${labels})
-    endif()
-endforeach()
+# In the sanitized build a sanitizer's report in a test's output fails the test, whatever else the test expects. A
+# report aborts the programs that link the platform layer (port/hal/os/sanitizers.c), which ctest fails, but a test
+# program without it ends a report with status 1 off macOS, which a test that passes on its output or on a failure
+# accepts. Deferred to the end of this directory, after the tests port/cmake/overlay_sections.cmake adds there
+function(port_fail_on_sanitizer_reports)
+    get_property(tests DIRECTORY PROPERTY TESTS)
+    foreach(test IN LISTS tests)
+        set_property(TEST ${test} APPEND PROPERTY FAIL_REGULAR_EXPRESSION
+            "ERROR: (Address|Leak)Sanitizer" "SUMMARY: [A-Za-z]+Sanitizer" "runtime error: "
+            "LeakSanitizer has encountered a fatal error")
+    endforeach()
+endfunction()
+if(PORT_SANITIZE)
+    cmake_language(DEFER CALL port_fail_on_sanitizer_reports)
+endif()

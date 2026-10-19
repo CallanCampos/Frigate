@@ -9,9 +9,9 @@
 
 T5 runs the replays under AddressSanitizer and UndefinedBehaviorSanitizer. Until now a sanitized build was a build
 directory with hand-set `CMAKE_C_FLAGS`, which the header of `port/cmake/os.cmake` gave, and nothing ran it but
-sessions by hand. A survey of every route in both versions, with Apple clang 21 and upstream clang 23
-([STATUS.md](../STATUS.md), 2026-10-18), found no ASan error, four UBSan reports, and gaps in what the sanitizers
-could see. Two of the gaps decide how the build works:
+sessions by hand. A survey ([STATUS.md](../STATUS.md), 2026-10-18), every route of both versions under Apple clang
+21 and Black 2's tests and routes under upstream clang 23, found no ASan error, four UBSan reports, and gaps in what the
+sanitizers could see. Two of the gaps decide how the build works:
 
 - **The game's heaps are invisible to ASan.** Every GFL heap and the sound heap are NitroSystem FND heaps inside one
   16 MiB `calloc`'d arena, which ASan sees as one block: an overrun from one of the game's allocations into the next,
@@ -31,7 +31,9 @@ could see. Two of the gaps decide how the build works:
   unpoisons a block for the bytes the DS gives it when it is allocated, and poisons it when it is freed.
 - **A DS-ism that is right on every host is left out by an ignorelist** (`port/cmake/sanitizer_ignorelist.txt`), by
   check and function, each with its reason; a defect is never listed, it is fixed: in Frigate's code directly, in the
-  game's code under `PLATFORM_PC` with its row in game-changes.md.
+  game's code under `PLATFORM_PC` with its row in game-changes.md. A read the DS makes past a heap block whose bytes
+  the game then shows is neither: the read stays the DS's, and `fnd_hooks.c`'s `port_heap_ds_read_begin` and
+  `port_heap_ds_read_end`, called around it under `PLATFORM_PC`, let that one read through.
 
 ## Alternatives
 
@@ -49,8 +51,9 @@ could see. Two of the gaps decide how the build works:
 ## Consequences
 
 - An access outside one of the game's expanded or frame heap blocks is a report naming the game's code. The first
-  survey found three of the game's own memory bugs this way (an over-read at the copyright screen, a font cell too
-  short for its copy, a write after free in the print stream), each fixed under `PLATFORM_PC`.
+  survey found three such places this way: two memory bugs of the game (a font cell too short for its copy, a write
+  after free in the print stream), fixed under `PLATFORM_PC`, and the copyright screen's read past a file's block,
+  whose tiles the title screen's bottom screen shows as it fades in, kept and let through.
 - The `OS_Alloc` heaps, unit heaps, VRAM and the DS's windows are still plain memory to ASan, and an overrun within the
   DS's 4-byte rounding of a block is not seen ([sanitizers.md](../sanitizers.md)).
 - A new FND function that frees or allocates needs its wrapper to poison or unpoison, as it already needs one to

@@ -35,8 +35,8 @@ Each is given at configure time, `cmake -S port -B build/port -DNAME=VALUE`.
 | --- | --- | --- | --- |
 | `PORT_VERSION` | `b2_us` | [../CMakeLists.txt](../CMakeLists.txt) | The game: `b2_us` (Black 2, `frigate-black2`) or `w2_us` (White 2, `frigate-white2`). One build directory per version |
 | `PORT_FETCH_SDL3` | `ON` | [../CMakeLists.txt](../CMakeLists.txt) | Builds SDL3's pinned release when no installed SDL3 3.4 is found |
-| `PORT_SANITIZE` | `OFF` | [../CMakeLists.txt](../CMakeLists.txt) | The sanitized build: every target but SDL3 under AddressSanitizer and UndefinedBehaviorSanitizer, every report fatal, with [sanitizer_ignorelist.txt](sanitizer_ignorelist.txt)'s checks left out, the game's heaps poisoned ([nnsys.cmake](nnsys.cmake)) and the OS tests run again on fake stacks ([os.cmake](os.cmake)); clang only. [../docs/sanitizers.md](../docs/sanitizers.md) |
-| `PORT_SANITIZE_RECOVER` | `OFF` | [../CMakeLists.txt](../CMakeLists.txt) | With `PORT_SANITIZE`, a run goes on after a report, so that one run lists every report of a route |
+| `PORT_SANITIZE` | `OFF` | [../CMakeLists.txt](../CMakeLists.txt) | The sanitized build: every target of this project but SDL3 under AddressSanitizer and UndefinedBehaviorSanitizer, every report fatal (the program aborts, and a report in a test's output fails it), with [sanitizer_ignorelist.txt](sanitizer_ignorelist.txt)'s checks left out, the game's heaps poisoned ([nnsys.cmake](nnsys.cmake)) and the OS tests run again on fake stacks ([os.cmake](os.cmake)); clang only. The oracle, a project of its own, stays as `PORT_ORACLE_SANITIZE` builds it; the modules' `*_sanitized` test variants keep their own flags, and their `*_plain` twins are sanitized too; the timing gates are refused with it; its macOS app links the toolchain's ASan runtime, for testing only. [../docs/sanitizers.md](../docs/sanitizers.md) |
+| `PORT_SANITIZE_RECOVER` | `OFF` | [../CMakeLists.txt](../CMakeLists.txt) | With `PORT_SANITIZE` (refused without it), a run goes on after a report, so that one run lists every report of a route; the `*_sanitized` test variants stay fatal |
 | `PORT_MACOS_APP` | `OFF` | [macos_app.cmake](macos_app.cmake) | Makes the macOS app with every build, not only with its target |
 | `PORT_MACOS_BUNDLE_ID_PREFIX` | `io.github.callancampos.frigate` | [../app/macos/bundle_id.cmake](../app/macos/bundle_id.cmake) | The app's bundle identifier before `.black2` or `.white2`; a build that isn't Frigate's gives its own. A build directory's old placeholder, `com.example.pokebw2-native`, is moved to the default |
 | `PORT_BUILD_ORACLE` | `OFF` | [oracle.cmake](oracle.cmake) | Fetches melonDS and builds the test oracle, `pbw-oracle` |
@@ -49,10 +49,12 @@ Each is given at configure time, `cmake -S port -B build/port -DNAME=VALUE`.
 
 The sanitized build is a build directory of its own (`-DPORT_SANITIZE=ON`, in `build/port-san`);
 [sanitizer_ignorelist.txt](sanitizer_ignorelist.txt) lists, for clang, the checks it leaves out of the game's code,
-each with the reason it is safe on a host. The tests carry labels by what they need, given at the end of
-[../CMakeLists.txt](../CMakeLists.txt): `route` (the program runs the game from power-on on the player's ROM) and
-`oracle` (the melonDS oracle or its saves), so that `ctest -L route -LE oracle` runs the routes that need no oracle
-([../tests/README.md](../tests/README.md)).
+each with the reason it is safe on a host. The tests carry labels by what they need, which each fragment gives its
+tests where it defines them, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): `route`
+(the program runs the game from power-on on the player's ROM), `oracle` (the melonDS oracle or its saves) and `timing`
+(a timing gate), so that `ctest -L route -LE oracle` runs the routes that need no oracle
+([../tests/README.md](../tests/README.md)). A new fragment's test that runs the game from power-on gets `route` there,
+and `oracle` too when it needs the oracle.
 
 ## Adding a fragment
 

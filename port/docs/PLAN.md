@@ -196,8 +196,9 @@ mods/examples/           sample mods, one per extension point
   accesses, double frees and use-after-frees (about 18 of the decomp's `// BUG:` comments) hit different data once
   64-bit layouts move, so the host build fixes those under `PLATFORM_PC`, each with a comment, even when gameplay
   bugs stay vanilla.
-- **Configurations:** Debug (ASan and UBSan available), RelWithDebInfo (default), Release. Game code is optimized
-  (`-O2`); the Platinum port's unoptimized game code is a mistake not to copy.
+- **Configurations:** Debug, RelWithDebInfo (default), Release. Game code is optimized (`-O2`); the Platinum port's
+  unoptimized game code is a mistake not to copy. ASan and UBSan are an option of any configuration, `PORT_SANITIZE`,
+  in a build directory of its own ([sanitizers.md](sanitizers.md)).
 
 ### 4.5 HAL and display model
 

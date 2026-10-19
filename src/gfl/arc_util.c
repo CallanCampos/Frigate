@@ -47,9 +47,12 @@ static u32 GFL_BGSysLoadNCGRStaticCore(void *file, u32 bg, u32 offset, u32 size,
         }
 #ifdef PLATFORM_PC
         // A size larger than the file's characters (the copyright screen's 0x8000, src/ov162/boot_screens.c) loads
-        // what follows them in memory too, past the end of the file's heap block, into tiles the screen doesn't show.
-        // The host loads the characters alone (port/docs/sanitizers.md)
-        GFL_BGSysLoadChar(bg, character->rawData, size > character->size ? character->size : size, offset);
+        // what follows them in the heap too, past the end of the file's block, as on the DS: those tiles show on the
+        // bottom screen as the title screen fades in. The host loads the same bytes; the hooks tell the sanitized
+        // build that this read past the block is the DS's (port/docs/sanitizers.md)
+        port_heap_ds_read_begin(character->rawData, size);
+        GFL_BGSysLoadChar(bg, character->rawData, size, offset);
+        port_heap_ds_read_end();
 #else
         GFL_BGSysLoadChar(bg, character->rawData, size, offset);
 #endif

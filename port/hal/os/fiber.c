@@ -13,6 +13,7 @@
 #include "hal/os/fiber.h"
 
 #define MCO_NO_MULTITHREAD
+#include "hal/os/mco_impl.h"
 #include "minicoro.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -123,9 +124,6 @@ static void ProtectNone(unsigned char *p, size_t size) {
 }
 
 #ifdef PORT_LSAN
-// The saved stack pointer of a suspended coroutine (mco_impl.c), or NULL where it can't be read
-void *port_mco_saved_stack_pointer(mco_coro *co);
-
 // The bytes under the stack pointer that a function may still use without moving it, the red zone of the arm64 and
 // x86-64 System V ABIs
 #define RED_ZONE_BYTES 128

@@ -24,21 +24,39 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   The oracle's need its program and the ROM build's link map, as in the plain build
   ([../tests/README.md](../tests/README.md)); without the ROM they skip, as in CI.
 - **One route by hand:** `build/port-san/frigate-black2 --headless --frames 4300 --watchdog 60 --save-dir
-  /tmp/san-saves --input port/tests/replay/start_menu.pbwinput`. A run that hits a report ends with SIGABRT, status 134
-  (a test that runs the program fails).
+  /tmp/san-saves --input port/tests/replay/start_menu.pbwinput`. A run that hits a report aborts (SIGABRT, status 134)
+  on every host: [../hal/os/sanitizers.c](../hal/os/sanitizers.c) makes `abort_on_error=1` the runtime's default.
+  That is macOS's own default; elsewhere the runtime ends a report with status 1, the status of the program's own
+  failures, which a test that passes on its output (`PASS_REGULAR_EXPRESSION`) or on a failure (`WILL_FAIL`, a wrapper
+  that expects 1) would accept. ctest fails a test whose program aborts, whatever the test expects, and in this build
+  also any test whose output has a sanitizer's report in it (`FAIL_REGULAR_EXPRESSION`, set at the end of
+  [../CMakeLists.txt](../CMakeLists.txt)), for the test programs that don't link the platform layer.
 - **The compiler** is the one CMake finds, Apple clang on macOS. Apple clang emits no function check for C
   (`-fsanitize=function`, in `undefined` since upstream clang 17) and its runtime has no LeakSanitizer; upstream clang
   has both: `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` on macOS, with `ASAN_OPTIONS=detect_leaks=1` for
   the leak check at exit, which Linux runs by default.
 - **CI** builds the sanitized Black 2 on macOS and Linux on every push and pull request (the `sanitize` job of
-  `.github/workflows/port-ci.yml`) and runs every test that isn't a route, then the routes that need no oracle, which
-  skip there since CI has no ROM.
-- **A survey** of every report of a route, rather than the first: `-DPORT_SANITIZE_RECOVER=ON` in another build
-  directory makes every check go on after a report, and ASan's `halt_on_error=0` the default
-  ([../hal/os/sanitizers.c](../hal/os/sanitizers.c)). ASan reports each place once (`suppress_equal_pcs`), as UBSan
-  does, so a place that two callers reach shows the first; fix and run again until a run is clean.
-  `ASAN_OPTIONS=log_path=DIR/san` and `UBSAN_OPTIONS=log_path=DIR/san` keep the reports of programs whose output a
-  test captures.
+  `.github/workflows/port-ci.yml`) and runs every test that isn't a route, then the routes that need no oracle. CI has
+  no ROM, so of those only the smoke test runs, as far as the program's look for the ROM, and the replays' fixtures,
+  which empty their save directories; the replays and the port's checks of the oracle's hashes skip. The smoke test is
+  CI's one run of the program into the game's `main()`, which LeakSanitizer checks at its exit on Linux. The routes
+  themselves run only on a machine with the ROM (a nightly run of them is still to come).
+- **A survey** of every report of a route, rather than the first: `-DPORT_SANITIZE=ON -DPORT_SANITIZE_RECOVER=ON` in
+  another build directory (the second alone is refused) makes every check go on after a report, and ASan's
+  `halt_on_error=0` the default ([../hal/os/sanitizers.c](../hal/os/sanitizers.c)). ASan reports each place once
+  (`suppress_equal_pcs`), as UBSan does, so a place that two callers reach shows the first; fix and run again until a
+  run is clean. `ASAN_OPTIONS=log_path=DIR/san` and `UBSAN_OPTIONS=log_path=DIR/san` keep the reports of programs
+  whose output a test captures.
+- **With the other options:**
+  - The oracle is a project of its own (an `ExternalProject`, [../cmake/oracle.cmake](../cmake/oracle.cmake)), which
+    `PORT_SANITIZE` leaves alone: `-DPORT_ORACLE_SANITIZE=ON` builds its own sources under the sanitizers, apart.
+  - The modules' own sanitized test variants (the `*_sanitized` tests of `gfx`, `g3d`, `app` and `oracle`) set their
+    flags themselves: they stay fatal in a survey build, and in this build their `*_plain` twins are sanitized too,
+    by the build's flags.
+  - The timing gates (`PORT_G3D_TIMING_GATE`, `PORT_GFX_TIMING_GATE`) would time instrumented renderers against the
+    plain build's limits: configuring one with `PORT_SANITIZE` is refused.
+  - The macOS app and its disk image built here link the toolchain's ASan runtime: they are for testing, never for
+    giving out.
 
 ## Reading a report
 
@@ -51,6 +69,19 @@ ctest --test-dir build/port-san -L route                       # every route, wi
 - **UBSan** prints `port: UndefinedBehaviorSanitizer: <check> at FILE:LINE:COLUMN, from this stack:`, the stack, then
   its own `runtime error:` line. The stack is ASan's: UBSan's own (`UBSAN_OPTIONS=print_stacktrace=1`) stops at the
   report's frame on a fiber.
+- **LeakSanitizer** (upstream clang, Linux by default, or `ASAN_OPTIONS=detect_leaks=1` with upstream clang on
+  macOS) checks at each program's exit and prints `ERROR: LeakSanitizer: detected memory leaks`, then each leaked
+  block with the stack that allocated it: a `Direct leak` is a block nothing points to any more, an `Indirect leak` one
+  that only leaked blocks point to, so fix the direct ones first. Its roots are the program's data, the host thread's
+  stack and registers, and the live frames and saved registers of every suspended fiber
+  ([../hal/os/fiber.c](../hal/os/fiber.c)); the game's heaps are inside the arena, which a static keeps, so nothing
+  the game allocates there is ever a leak. A report is therefore a host allocation that nothing reaches: a real leak.
+  A leak in Frigate's or the game's code is fixed, never suppressed. One inside SDL3 or a system library (the likeliest
+  first report on CI's Linux leg) would go in an LSan suppressions file, `port/cmake/lsan_suppressions.txt` (none is
+  needed yet, so none exists), each line a `leak:` pattern naming the library's function with its reason above it,
+  given to every test through `LSAN_OPTIONS=suppressions=` in the tests' `ENVIRONMENT_MODIFICATION` at the end of
+  [../CMakeLists.txt](../CMakeLists.txt). A run that ends on a trap stub or the watchdog leaves through `_Exit` and gets
+  no leak check.
 - **A trap** (status 70) or the watchdog (73) end a sanitized run as they end a plain one.
 
 ## What Frigate tells the sanitizers
@@ -62,6 +93,7 @@ ctest --test-dir build/port-san -L route                       # every route, wi
 | The live frames and saved registers of suspended fibers | `fiber.c` (`ScanStackForLeaks`), with the saved stack pointer from `mco_impl.c` | LeakSanitizer scans threads' stacks, not fibers': an allocation only a suspended fiber holds would be a leak. Only the live frames, from the saved stack pointer up, so that the dead frames under them don't hide one |
 | UBSan's reports, with ASan's stack | [../hal/os/sanitizers.c](../hal/os/sanitizers.c) (`__ubsan_on_report`) | UBSan unwinds only within the host thread's own stack, so its trace stopped at the report's frame on a fiber |
 | The game's expanded and frame heaps, block by block | [../hal/nnsys/fnd_hooks.c](../hal/nnsys/fnd_hooks.c), with FND's heaps built without ASan ([../cmake/nnsys.cmake](../cmake/nnsys.cmake)) | Every GFL heap and the sound heap live inside one 16 MiB arena, which ASan sees as one block: an overrun from one of the game's allocations into the next was invisible. A new heap's memory is poisoned, a block made addressable for the bytes the DS gives it (the size asked for, rounded up to 4) when it is allocated, and poisoned when it is freed; a destroyed heap's memory is its owner's again |
+| A read the DS makes past one of the game's heap blocks, whose bytes it uses | `fnd_hooks.c` (`port_heap_ds_read_begin`, `port_heap_ds_read_end`), from `src/gfl/arc_util.c` under `PLATFORM_PC` | The copyright screen loads 0x8000 bytes of a smaller file's characters, past the file's block into what follows it in the heap, as the DS does, and the title screen's bottom screen shows those tiles as it fades in (H1, below): the read stays the DS's, and ASan lets it reach the span it names and poisons again after it what was poisoned |
 | The trap's data placeholders at exit | [../hal/trap.c](../hal/trap.c) | LeakSanitizer scans the program's writable data by the protection it was loaded with, so it read the placeholders' inaccessible pages at exit, and its check never ended. They become readable at exit, before the check |
 | The overlays' sections | [../hal/fs/ovsec.c](../hal/fs/ovsec.c) | Its snapshot and reset copy whole sections, ASan's redzones between the statics included, in loops without ASan |
 | Another fiber's stack | `fiber.c` (`port_fiber_stack_used`) | Read without ASan, since dead frames there may still be poisoned |
@@ -78,6 +110,10 @@ there: it is fixed (below).
 | --- | --- | --- |
 | `alignment` | `ApplyCurrentAnimResult_` (`lib/nnsys/src/g2d/g2d_CellAnimation.c`), `SetCurrentFrameMultiCell_` (`g2d_MultiCellAnimation.c`) | NitroSystem reads an animation frame's cell index, a `u16` and the first field of every element type, through a pointer to the largest type, `NNSG2dAnimDataSRT`, which needs 4-byte alignment. An index-only animation's NANR file packs 2-byte elements, so the element is 2-aligned: a 2-byte load from a 2-aligned address, which arm64 and x86-64 make (and the DS's ARM9) |
 | `function` | `runSaveBlkInitializers` (`src/gfl/savedata.c`) | Each save block's initializer is called through `SaveBlockDef.init`, a `void (*)(void *)`, to which `src/system/save_table.c` casts the 56 initializers, each taking a pointer to its own block. The call passes one pointer, in the same register whatever its type, in every host ABI. Fixing it would take a wrapper for each of the 56 in a game file, for no change in what runs |
+
+The game's one read past a heap block whose bytes it uses, the copyright screen's (H1), isn't left out by the
+ignorelist, which would hide every access of the function that makes it: the hooks above let that one read reach what
+follows the block.
 
 The build also leaves out:
 
@@ -103,8 +139,11 @@ The build also leaves out:
 
 ## What it found
 
-The survey of 2026-10-18 (port/docs/STATUS.md) ran every route of both versions under ASan and UBSan, with Apple's
-clang and upstream clang 23. Its reports, and what this build does about each:
+The survey of 2026-10-18 (port/docs/STATUS.md) ran the strict build, which stops at the first report, under Apple's
+clang on every route of both versions (Black 2's 24, and White 2's 20 but the two that need its starter save, which
+skip); under upstream clang 23, which adds the function check, with LeakSanitizer, on Black 2's 244 tests that aren't
+routes and its 24 routes; and the survey build (`PORT_SANITIZE_RECOVER`), which goes on after each report, on Black 2's
+18 routes. The sanitizers' reports, and what this build does about each:
 
 | Report | Where | Cause | Fix |
 | --- | --- | --- | --- |
@@ -112,6 +151,12 @@ clang and upstream clang 23. Its reports, and what this build does about each:
 | R2 | `g2d_MultiCellAnimation.c:119`, New Game's intro | The same | The same |
 | R3 | `savedata.c:57`, every route at boot, upstream clang only | A call through `void (*)(void *)` to a typed initializer (above) | Left out by the ignorelist: safe on every host ABI |
 | R4 | `port/hal/os/os_irqTable.c:58`, `os_timed_work`, upstream clang only | Frigate's `OS_SetIrqFunction`, as the SDK's, cast a DMA channel's or timer's handler (`void (void)`) to a callback (`void (void *)`), which `OSi_IrqCallback` called as one | Fixed in Frigate's code: [../hal/os/os_interrupt.c](../hal/os/os_interrupt.c) keeps such a handler with its type and calls it through `CallIrqFunction`, and `OSi_CountUpTick` ([../hal/os/os_tick.c](../hal/os/os_tick.c)) has the SDK's type again |
+
+What the sanitizers couldn't see or do on the fibers and in the game's heaps, the gaps this build closes or works
+around:
+
+| Gap | Where | Cause | What the build does |
+| --- | --- | --- | --- |
 | G1 | Every UBSan report on a fiber | UBSan's trace stopped at the report's frame | [../hal/os/sanitizers.c](../hal/os/sanitizers.c) prints ASan's |
 | G2 | Apple clang | No function check for C, no LeakSanitizer | Upstream clang locally; CI's Linux job |
 | G3 | Every program at exit, with LeakSanitizer | The scan of the program's data read the trap's inaccessible placeholders, and never ended | The placeholders become readable at exit ([../hal/trap.c](../hal/trap.c)) |
@@ -120,13 +165,13 @@ clang and upstream clang 23. Its reports, and what this build does about each:
 | G6 | The game's heaps | ASan saw the arena as one block | Poisoned block by block ([../hal/nnsys/fnd_hooks.c](../hal/nnsys/fnd_hooks.c)); what it then found is below |
 | G7 | Any place reached twice | UBSan reports a place once a process | Not fixable in the runtime; moot in a build that stops at the first report |
 
-With the game's heaps poisoned (G6), ASan found memory bugs of the game itself: the DS has them too, but its heap
-tolerates them, or the bytes they touch are never used. Each is fixed in the game's file under `PLATFORM_PC`, with its
-row in [game-changes.md](game-changes.md) and its finding in [decomp-findings.md](decomp-findings.md); the DS's code
-is unchanged:
+With the game's heaps poisoned (G6), ASan found three places where the game's code reaches outside its heap blocks;
+the DS does the same, and the code under `#else` is unchanged. Two are memory bugs whose bytes the game never uses,
+fixed in the game's file under `PLATFORM_PC`; the third is a read whose bytes the DS shows, which Frigate keeps. Each
+has its row in [game-changes.md](game-changes.md) and its finding in [decomp-findings.md](decomp-findings.md):
 
-| Report | Where | What the game does | Fix |
+| Report | Where | What the game does | What the host does |
 | --- | --- | --- | --- |
-| H1 | `src/gfl/arc_util.c`, `GFL_BGSysLoadNCGRStaticCore`, from the copyright screen (`src/ov162/boot_screens.c`): every route | Loads 0x8000 bytes of a file's characters, more than the file has, reading past its heap block into tiles the screen doesn't show | The host loads the file's characters alone |
+| H1 | `src/gfl/arc_util.c`, `GFL_BGSysLoadNCGRStaticCore`, from the copyright screen (`src/ov162/boot_screens.c`): every route | Loads 0x8000 bytes of a file's characters, more than the file has, reading past its heap block into what follows it in the heap. Those tiles stay in VRAM, and the title screen's bottom screen shows them as it fades in, a lighter band over its lines 38 to 95 (the opening sequence's port frames 3527 to 3536 in Black 2) | The same read, which the hooks tell ASan is the DS's ([above](#what-frigate-tells-the-sanitizers)). From a blank save the host's heap holds there what the DS's does, and frame 3527's bottom screen differs from melonDS's in 8 pixels; from a save it holds other bytes there, and the band's noise differs from the DS's (10,764 pixels at its first frame, within the 3D's tolerance). A first fix loaded the characters alone and drew the background there (14,330 pixels apart from a blank save); the oracle comparison's 3D tolerance let it through, so the opening's and the title's first 34 frames of 3D are now held close (a sequence's `close` in [../tools/oracle/oracle.py](../tools/oracle/oracle.py), [../tools/oracle/README.md](../tools/oracle/README.md#comparing)) |
 | H2 | `src/system/gf_font.c`, `GFL_FontBitmapCopy_16x16` and the bit reader, at the title screen's first text: every route past it | The glyph copy reads 16 rows of a 15-row font's cell, and the byte after its last bits: 4 bytes past the cell's block (the 16th row is never drawn) | The host's cell has room for every row the copy reads, zeroed |
 | H3 | `src/system/printsys.c`, `func_020223cc`, New Game's intro | Ends a print stream's task, which frees the stream when the task's data was allocated, then clears the stream's task field: a write to freed memory | The host clears the field first |

@@ -85,6 +85,7 @@ add_test(NAME oracle_boot
             --work "${CMAKE_BINARY_DIR}/oracle-check"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(oracle_boot PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1200)
+port_test_labels(oracle_boot oracle)
 
 # The comparison sequences (port/tools/oracle/README.md, "The comparison sequences"), each an input file
 # port/tests/oracle/<name>_<version>.pbwinput: opening, power-on through the boot screens, the Game Freak logo and the
@@ -117,6 +118,7 @@ add_test(NAME oracle_saves
     WORKING_DIRECTORY "${REPO_ROOT}")
 # Each save from scratch runs the oracle some 18,000 frames
 set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600 FIXTURES_SETUP oracle_saves)
+port_test_labels(oracle_saves oracle)
 foreach(sequence IN ITEMS opening title continue continue_starter)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
@@ -126,6 +128,7 @@ foreach(sequence IN ITEMS opening title continue continue_starter)
                     --work "${CMAKE_BINARY_DIR}/oracle-${sequence}-check"
             WORKING_DIRECTORY "${REPO_ROOT}")
         set_tests_properties(oracle_${sequence}_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 600)
+        port_test_labels(oracle_${sequence}_hashes route)
     endif()
     add_test(NAME oracle_${sequence}
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -134,6 +137,7 @@ foreach(sequence IN ITEMS opening title continue continue_starter)
                 --save-cache "${port_oracle_saves}"
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
+    port_test_labels(oracle_${sequence} route oracle)
 endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
 set_tests_properties(oracle_continue oracle_continue_starter PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
@@ -155,6 +159,7 @@ foreach(route IN ITEMS field_menus party_menus)
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_launch_${route} PROPERTIES
         FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 3600)
+    port_test_labels(oracle_launch_${route} route oracle)
 endforeach()
 
 # The launcher on the port alone, from the starter save the oracle made: --launch summary opens Tepig's summary as the
@@ -171,6 +176,7 @@ if(PORT_VERSION STREQUAL "b2_us")
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(launch_summary_standalone PROPERTIES
         FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+    port_test_labels(launch_summary_standalone route oracle)
 
     # Each app opens as the field menu's choice by a key leaves it, whatever the app before it did: here the trainer
     # card closed by a touch, which sets the UI's touch flag, then the party list, which must show the oracle's party
@@ -187,6 +193,7 @@ if(PORT_VERSION STREQUAL "b2_us")
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(launch_touch_then_party PROPERTIES
         FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+    port_test_labels(launch_touch_then_party route oracle)
 endif()
 
 # The launcher's other exit statuses (port/app/launcher.h), from the first save the oracle made, in both versions:
@@ -218,6 +225,8 @@ add_test(NAME launch_not_offered
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(launch_unfinished launch_not_offered PROPERTIES
     FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+port_test_labels(launch_unfinished route oracle)
+port_test_labels(launch_not_offered route oracle)
 
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the
@@ -229,6 +238,7 @@ add_test(NAME oracle_port_save
             --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(oracle_port_save PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
+port_test_labels(oracle_port_save route oracle)
 
 # The same sequences' sound (port/tools/oracle/README.md, "Sound"), held to the oracle in two ways too:
 # - oracle_sound_<name>_hashes, every build: the port alone, with its sound trace and WAV dump, against
@@ -247,6 +257,7 @@ foreach(sequence IN ITEMS opening title)
                     --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
             WORKING_DIRECTORY "${REPO_ROOT}")
         set_tests_properties(oracle_sound_${sequence}_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)
+        port_test_labels(oracle_sound_${sequence}_hashes route)
     endif()
     add_test(NAME oracle_sound_${sequence}
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -254,4 +265,5 @@ foreach(sequence IN ITEMS opening title)
                 --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_sound_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
+    port_test_labels(oracle_sound_${sequence} route oracle)
 endforeach()

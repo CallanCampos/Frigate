@@ -66,11 +66,13 @@ jobs:
         run: cmake --build build/port --target frigate-black2_app
 
   # Frigate's sanitized build (port/docs/sanitizers.md): Black 2 under AddressSanitizer and UndefinedBehaviorSanitizer,
-  # every report fatal, with its tests run under them. CI has no ROM, so the routes that need no oracle (ctest -L route
-  # -LE oracle: the replays and the port's checks of the oracle's hashes) skip as they do in the host job, and what
-  # runs is everything else: the OS core's scenarios on the fibers, the platform layer's scenarios on the whole
-  # program's objects, the units. Linux adds what Apple clang lacks: UndefinedBehaviorSanitizer's function check for C,
-  # and LeakSanitizer at every program's exit
+  # every report fatal (the program aborts on every host, and a report in a test's output fails the test), with its
+  # tests run under them: the OS core's scenarios on the fibers, the platform layer's scenarios on the whole program's
+  # objects, the units. CI has no ROM, so of the routes that need no oracle (ctest -L route -LE oracle) only the smoke
+  # test runs, as far as the program's look for the ROM, with the replays' fixtures; the replays and the port's checks
+  # of the oracle's hashes skip, as in the host job, and the routes themselves run only where the ROM is. Linux adds
+  # what Apple clang lacks: UndefinedBehaviorSanitizer's function check for C, and LeakSanitizer at every program's
+  # exit, the smoke test's included, which is CI's one run of the program into the game's main()
   sanitize:
     name: Sanitized build (${{ matrix.os }})
     strategy:
@@ -111,7 +113,7 @@ jobs:
       - name: Test, but the routes
         run: ctest --test-dir build/port-san -LE route --output-on-failure
 
-      # The replays and the port's own runs of the oracle's sequences; those that need the oracle, which CI doesn't
-      # build, are left out
-      - name: The routes that need no oracle, which skip without the ROM
+      # The routes that need no oracle (those that need it are left out, since CI doesn't build it). Without the ROM
+      # only the smoke test runs, and the replays' fixtures, which empty their save directories; the rest skip
+      - name: The smoke test, the one route that runs without the ROM
         run: ctest --test-dir build/port-san -L route -LE oracle --output-on-failure

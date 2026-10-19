@@ -11,6 +11,9 @@
 #
 # A name the file no longer defines fails the link (a wrapper calls port_sdk_<name>, or two definitions meet); a new
 # function of one of these files that frees memory or relocates a file needs a line here and a host version.
+#
+# In the sanitized build (PORT_SANITIZE, port/docs/sanitizers.md) FND's heap files are compiled without AddressSanitizer
+# and fnd_hooks.c with PORT_POISON_HEAPS, so that ASan sees the blocks of the game's expanded and frame heaps.
 
 set(port_nnsys_renamed_expheap NNS_FndCreateExpHeapEx NNS_FndAllocFromExpHeapEx
     NNS_FndDestroyExpHeap NNS_FndResizeForMBlockExpHeap NNS_FndFreeToExpHeap)

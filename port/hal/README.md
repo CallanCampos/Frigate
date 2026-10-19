@@ -61,8 +61,8 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [port_os.h](os/port_os.h) | The OS core's interface for the program, the tests and the other modules: running the game, the frame and scanline hooks, the virtual clock, and timed work at a cycle of it (`port_os_set_timed_work`) |
 | [core.c](os/core.c) | The OS core: the dispatcher, the CPU state (contexts, the CPSR), interrupts at defined points, the halt, the virtual clock's lines, VBlank, the HBlank interrupt as DISPSTAT's HBlank flag sets, and timers, other modules' timed work (the sound driver's next alarm), and the frame and scanline hooks |
 | [fiber.c](os/fiber.c), [fiber.h](os/fiber.h) | Fibers over minicoro, one per SDK thread, switched on the one host thread; it tells AddressSanitizer about every switch, frees the fake stack of a fiber destroyed while suspended, and gives LeakSanitizer the live frames of suspended fibers ([../docs/sanitizers.md](../docs/sanitizers.md)) |
-| [mco_impl.c](os/mco_impl.c) | minicoro's implementation, in a file of its own so that a sanitizer build leaves it uninstrumented, and a suspended coroutine's saved stack pointer for fiber.c |
-| [sanitizers.c](os/sanitizers.c) | The sanitized build's runtime hooks: UndefinedBehaviorSanitizer's reports with AddressSanitizer's stack trace, which follows the fibers; with `PORT_SANITIZE_RECOVER`, ASan going on after a report. Empty in other builds ([../docs/sanitizers.md](../docs/sanitizers.md)) |
+| [mco_impl.c](os/mco_impl.c), [mco_impl.h](os/mco_impl.h) | minicoro's implementation, in a file of its own so that a sanitizer build leaves it uninstrumented, and a suspended coroutine's saved stack pointer for fiber.c, declared in the header |
+| [sanitizers.c](os/sanitizers.c) | The sanitized build's runtime hooks: UndefinedBehaviorSanitizer's reports with AddressSanitizer's stack trace, which follows the fibers; the runtime's defaults, a report aborting the program on every host (`abort_on_error=1`) and, with `PORT_SANITIZE_RECOVER`, ASan going on after a report. Empty in other builds ([../docs/sanitizers.md](../docs/sanitizers.md)) |
 | [os_thread_host.c](os/os_thread_host.c) | The decomp's `os_thread.c` (the scheduler) compiled through, with the context switch given to the fibers |
 | [os_init.c](os/os_init.c) | `OS_Init`: the SDK's boot sequence (PXI, the card, the tick, alarms) as the decomp's file has it, on the host |
 | [os_interrupt.c](os/os_interrupt.c) | Interrupt handlers and masks (`OS_SetIrqFunction`, IE, IME), with the effects the hardware has; a DMA channel's or timer's handler is called with its own type, where the SDK casts it to a callback |
@@ -166,7 +166,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [input/port_input.h](input/port_input.h), [input/input.c](input/input.c) | The buttons and the lid, written where the game's `PAD_Read` reads them |
 | [nnsys/reloc.h](nnsys/reloc.h), [nnsys/reloc.c](nnsys/reloc.c) | The registry of host-layout trees built for NitroSystem files the DS relocates in place |
 | [nnsys/g2d_load.h](nnsys/g2d_load.h), [nnsys/g2d_load.c](nnsys/g2d_load.c), [nnsys/g2d_file.h](nnsys/g2d_file.h) | The G2D file loaders (characters, palettes, cells, multi-cells, animations, fonts) building those trees from the files' DS layouts |
-| [nnsys/fnd_hooks.c](nnsys/fnd_hooks.c) | NitroSystem's heap frees, wrapped so that a file's trees go with its memory; the heaps aligned for 64-bit structs; in the sanitized build, the expanded and frame heaps' blocks shown to AddressSanitizer, so that an access outside one is a report ([../docs/sanitizers.md](../docs/sanitizers.md)) |
+| [nnsys/fnd_hooks.c](nnsys/fnd_hooks.c) | NitroSystem's heap frees, wrapped so that a file's trees go with its memory; the heaps aligned for 64-bit structs; in the sanitized build, the expanded and frame heaps' blocks shown to AddressSanitizer, so that an access outside one is a report, and the one read the game makes past a block as the DS does, whose bytes it shows, let through (`port_heap_ds_read_begin`, `port_heap_ds_read_end`) ([../docs/sanitizers.md](../docs/sanitizers.md)) |
 | [gfl/heap_policy.c](gfl/heap_policy.c) | The host's heap sizes (`port_heap_size`, `--heap-scale-root`, `--heap-scale-child`) |
 | [gfl/particle_work.c](gfl/particle_work.c) | The particle systems' work, sized for 64-bit structs |
 | [gfl/gfl_frame.h](gfl/gfl_frame.h), [gfl/gfl_use_host.c](gfl/gfl_use_host.c) | GFL's frame count for replays; the decomp's `gfl_use.c` compiled through to read it |
@@ -214,6 +214,7 @@ Some headers are named for the interface rather than the file that implements it
 | [snd7/snd_handle.h](snd7/snd_handle.h) | `snd7/snd_bank_host.c` |
 | [gfl/gfl_frame.h](gfl/gfl_frame.h) | `gfl/gfl_use_host.c` |
 | [../include/port_host.h](../include/port_host.h)'s `port_heap_size` and particle hooks | `gfl/heap_policy.c`, `gfl/particle_work.c` |
+| [../include/port_host.h](../include/port_host.h)'s `port_heap_ds_read_begin` and `port_heap_ds_read_end` (a read the DS makes past a heap block) | `nnsys/fnd_hooks.c` |
 
 ## Adding a module
 
