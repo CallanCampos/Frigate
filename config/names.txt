@@ -9933,6 +9933,9 @@ overlays/ov109 0x021ef0d0 SkyarrowBridge_RaiseBGMVolume
 overlays/ov109 0x021ef0e0 SkyarrowBridge_LowerBGMVolume
 overlays/ov109 0x021ef0f0 PassingSE_Init
 overlays/ov109 0x021ef100 PassingSE_Update
+overlays/ov110 0x021eec80 TubelineBridge_Setup
+overlays/ov110 0x021eecc4 TubelineBridge_End
+overlays/ov110 0x021eecfc TubelineBridge_Update
 overlays/ov110 0x021eed74 TubelineBridge_Init
 overlays/ov110 0x021eee34 TubelineBridge_LoadWaitRanges
 overlays/ov110 0x021eee70 TubelineBridge_SaveFrames
