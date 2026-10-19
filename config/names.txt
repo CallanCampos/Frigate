@@ -6879,6 +6879,9 @@ overlays/ov020 0x0216e714 EventMusicalPokeSelect_Create
 overlays/ov020 0x0216e7ac EventPokeSelect_Callback
 overlays/ov020 0x0216e87c EventPokeMoveReplace_Create
 overlays/ov020 0x0216e90c EventPokeMoveReplace_Callback
+overlays/ov021 0x0216e660 EventFestival_Callback
+overlays/ov021 0x0216e80c EventFestival_Create
+overlays/ov021 0x0216e848 EventFestival_SetupParam
 overlays/ov022 0x0216e660 EventWbtPokeSelect_Callback
 overlays/ov022 0x0216e6e8 EventWbtPokeSelect_Create
 overlays/ov022 0x0216e73c EventWbtList_Create

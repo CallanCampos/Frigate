@@ -359,8 +359,8 @@ static GameEventReturnCode EventFestMissionMenu_Callback(GameEvent *event, u32 *
         break;
     case 2:
         menuArgs = 1;
-        GameEvent_ChainNext(
-            event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL, func_ov021_0216e80c, &menuArgs));
+        GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL,
+                                                                   EventFestival_Create, &menuArgs));
         (*state)++;
         break;
     default:

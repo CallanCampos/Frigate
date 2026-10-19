@@ -205,7 +205,7 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         u32 args = 0;
 
         event = FMissionViewSetup_CreateCallEvent(
-            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_FESTIVAL, func_ov021_0216e80c, &args),
+            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_FESTIVAL, EventFestival_Create, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_INFO);
         break;
     }
