@@ -44,6 +44,13 @@ static void after_vramcnt(const char *name) {
         return banks;                                                                                                  \
     }
 #define WRAP_DISABLE(name)                                                                                             \
+    u32 port_sdk_##name(void);                                                                                         \
+    u32 name(void) {                                                                                                   \
+        u32 banks = port_sdk_##name();                                                                                 \
+        after_vramcnt(#name);                                                                                          \
+        return banks;                                                                                                  \
+    }
+#define WRAP_VOID(name)                                                                                                \
     void port_sdk_##name(void);                                                                                        \
     void name(void) {                                                                                                  \
         port_sdk_##name();                                                                                             \
@@ -103,7 +110,7 @@ WRAP_GET(GX_GetBankForSubOBJ, u16)
 WRAP_GET(GX_GetBankForSubOBJExtPltt, u32)
 
 // gx_state.c: every use loses its banks and every VRAMCNT goes to 0, so every bank is in no place
-WRAP_DISABLE(GX_InitGXState)
+WRAP_VOID(GX_InitGXState)
 
 // mi_wram.c: WRAMCNT, which sits between VRAMCNT_G and VRAMCNT_H, gives the shared WRAM's two 16 KiB halves to the
 // ARM9 or the ARM7. The host's ARM7 side is host code with memory of its own, so nothing is applied: region 0x03's
