@@ -410,18 +410,18 @@ u32 DupFitting_Main(DupFittingWork *work) {
                 work->msgClosed = TRUE;
             } else {
                 DupFitting_PrintMessage(work, Title3_Text_WaitingOtherParticipantsDress, NULL);
-                func_ov211_021ef988(work->param->comm, 0x45);
+                MusComm_SendTiming(work->param->comm, 0x45);
                 work->state = DUP_FITTING_STATE_WAIT_TIMING;
             }
         }
         break;
     case DUP_FITTING_STATE_WAIT_TIMING:
-        if (func_ov211_021ef99c(work->param->comm, 0x45) == TRUE) {
+        if (MusComm_IsTimingReached(work->param->comm, 0x45) == TRUE) {
             work->state = DUP_FITTING_STATE_WAIT_SOUND;
         }
         break;
     case DUP_FITTING_STATE_WAIT_SOUND:
-        if (func_ov211_021f0240(work->param->comm) == TRUE) {
+        if (MusComm_IsSoundReceived(work->param->comm) == TRUE) {
             GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_WHITE, 18, 1, work->heapId);
             GFL_SndBGMFadeOut(60);
             work->state = DUP_FITTING_STATE_FADE_OUT;

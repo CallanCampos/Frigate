@@ -579,7 +579,7 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
         allowed = TRUE;
         if (commWork->comm != NULL && arg == 0x8e) {
             for (i = 0; i < 4; i++) {
-                info = func_ov211_021ef9c4(commWork->comm, i);
+                info = MusComm_GetPlayerInfo(commWork->comm, i);
                 if (info != NULL &&
                     (u32)(PlayerInfo_GetVersion(info) - VERSION_WHITE) <= VERSION_BLACK - VERSION_WHITE) {
                     allowed = FALSE;
@@ -591,7 +591,7 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
         }
         if (allowed) {
             commWork->value = arg;
-            func_ov211_021ef988(commWork->comm, commWork->value);
+            MusComm_SendTiming(commWork->comm, commWork->value);
             VM_SetNativeCallback(vm, ScriptNative_MusicalTimingWait);
             return TRUE;
         }
@@ -618,7 +618,7 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
         holder->work = commWork;
         commWork->result = result;
         commWork->ircMatch.gameData = gameData;
-        commWork->ircMatch.musicalNetInit = func_ov211_021f0608(gameData);
+        commWork->ircMatch.musicalNetInit = MusComm_GetNetInitData(gameData);
         commWork->ircMatch.netError = 0;
         if (arg == 0) {
             commWork->ircMatch.result = IRCBATTLEMATCH_MODE_MUSICAL_ARG0;
@@ -696,12 +696,12 @@ void MusicalCommWork_Free(MusicalCommWork *work, GameData *gameData) {
 }
 
 void MusicalCommWork_BootComm(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value) {
-    func_ov211_021ef1e0(HEAPID_GAMEEVENT, gsys, comm, value);
+    MusComm_Boot(HEAPID_GAMEEVENT, gsys, comm, value);
 }
 
 void MusicalCommWork_QuitComm(MusicalCommWork *work) {
     if (work->comm != NULL) {
-        func_ov211_021ef220(work->comm);
+        MusComm_Quit(work->comm);
         work->comm = NULL;
     }
 }
@@ -794,7 +794,7 @@ void MusicalIrcMatch_OnReturn(void *arg) {
     if (holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_QUIT &&
         holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_BACK) {
         *holder->work->result = 1;
-        func_ov211_021ef3b8(holder->work->comm);
+        MusComm_RegisterCommands(holder->work->comm);
     } else {
         *holder->work->result = 0;
     }
@@ -813,7 +813,7 @@ BOOL func_ov012_02158de8(VM *vm, void *arg) {
     switch (choice) {
     case 1:
         *commWork->result = 0;
-        func_ov211_021ef3a0(commWork->comm);
+        MusComm_UpdateRole(commWork->comm);
         done = TRUE;
         break;
     case 2:
@@ -843,7 +843,7 @@ BOOL func_ov012_02158e44(VM *vm, void *arg) {
     switch (func_ov036_021c3f98(commWork->menu)) {
     case 1:
         *commWork->result = 3;
-        func_ov211_021ef3a0(commWork->comm);
+        MusComm_UpdateRole(commWork->comm);
         done = TRUE;
         break;
     case 2:
@@ -874,7 +874,7 @@ BOOL ScriptNative_MusicalTimingWait(VM *vm, void *arg) {
             return TRUE;
         }
     }
-    if (func_ov211_021ef99c(commWork->comm, commWork->value) == TRUE) {
+    if (MusComm_IsTimingReached(commWork->comm, commWork->value) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -890,7 +890,7 @@ BOOL ScriptNative_MusicalScriptRecvWait(VM *vm, void *arg) {
     if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
         return TRUE;
     }
-    if (func_ov211_021f03e0(commWork->comm) == TRUE) {
+    if (MusComm_IsScriptReceived(commWork->comm) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -949,7 +949,7 @@ BOOL ScriptNative_MusicalPokesRecvWait(VM *vm, void *arg) {
     if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
         return TRUE;
     }
-    if (func_ov211_021f04ac(commWork->comm) == TRUE) {
+    if (MusComm_AreAllPokesReceived(commWork->comm) == TRUE) {
         return TRUE;
     }
     return FALSE;

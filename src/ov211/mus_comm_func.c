@@ -284,7 +284,7 @@ static GFLNetInitData sMusCommInitData = {
 
 // clang-format on
 
-void func_ov211_021ef1e0(HeapID heapId, GameSystem *gsys, GameCommSys *comm, u16 value) {
+void MusComm_Boot(HeapID heapId, GameSystem *gsys, GameCommSys *comm, u16 value) {
     MusCommWork *work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MusCommWork), TRUE, "mus_comm_func.c", 332);
 
     work->netMode = value;
@@ -296,12 +296,12 @@ void func_ov211_021ef1e0(HeapID heapId, GameSystem *gsys, GameCommSys *comm, u16
     GameCommSys_Boot(comm, GAME_COMM_NO_MUSICAL, work);
 }
 
-void func_ov211_021ef220(MusCommWork *comm) {
+void MusComm_Quit(MusCommWork *comm) {
     MusComm_Free(comm);
     GameCommSys_ExitReq(comm->comm);
 }
 
-void *func_ov211_021ef230(u32 *seq, void *param) {
+void *MusComm_Init(u32 *seq, void *param) {
     MusCommWork *work = param;
 
     work->playerInfo = GetGameDataPlayerInfo(work->gameData);
@@ -317,7 +317,7 @@ void *func_ov211_021ef230(u32 *seq, void *param) {
     return work;
 }
 
-BOOL func_ov211_021ef288(u32 *seq, void *param, void *work_) {
+BOOL MusComm_Exit(u32 *seq, void *param, void *work_) {
     MusCommWork *work = param;
 
     switch ((int)*seq) {
@@ -331,14 +331,14 @@ BOOL func_ov211_021ef288(u32 *seq, void *param, void *work_) {
         }
         if (work->ready == 1) {
             func_02042e9c(FALSE);
-            func_ov211_021ef988(work, MUS_COMM_TIMING_START);
+            MusComm_SendTiming(work, MUS_COMM_TIMING_START);
             *seq = 1;
         } else {
             *seq = 2;
         }
         break;
     case 1:
-        if (func_ov211_021ef99c(work, MUS_COMM_TIMING_START) == TRUE) {
+        if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_START) == TRUE) {
             *seq = 2;
         }
         if (GFL_NetGetNegotiatedCount() <= 1 || GFL_NetErrCheck()) {
@@ -372,7 +372,7 @@ BOOL func_ov211_021ef288(u32 *seq, void *param, void *work_) {
     return FALSE;
 }
 
-BOOL func_ov211_021ef378(u32 *seq, void *param, void *work) {
+BOOL MusComm_ExitWait(u32 *seq, void *param, void *work) {
     if (GFL_NetIsEnded() == 1) {
         GFL_HeapFree(work);
         return TRUE;
@@ -380,11 +380,11 @@ BOOL func_ov211_021ef378(u32 *seq, void *param, void *work) {
     return FALSE;
 }
 
-void func_ov211_021ef394(u32 *seq, void *param, void *work) {
+void MusComm_Update(u32 *seq, void *param, void *work) {
     MusComm_Main(work);
 }
 
-void func_ov211_021ef3a0(MusCommWork *comm) {
+void MusComm_UpdateRole(MusCommWork *comm) {
     if (GFL_NetIsParent() == 1) {
         comm->role = 1;
     } else {
@@ -392,7 +392,7 @@ void func_ov211_021ef3a0(MusCommWork *comm) {
     }
 }
 
-void func_ov211_021ef3b8(MusCommWork *comm) {
+void MusComm_RegisterCommands(MusCommWork *comm) {
     NetCommand_AddTable(MUS_COMM_CMD_MSG, sMusCommCommands, NELEMS(sMusCommCommands), comm);
     if (GFL_NetIsParent() == 1) {
         comm->role = 1;
@@ -401,8 +401,8 @@ void func_ov211_021ef3b8(MusCommWork *comm) {
     }
 }
 
-void func_ov211_021ef3e4(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameCommSys *gameComm, Ov210Work *ov210,
-                         HeapID heapId) {
+void MusComm_SetUp(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameCommSys *gameComm, Ov210Work *ov210,
+                   HeapID heapId) {
     MusicalSave *musical = getMusicalInfoBlkAddress(comm->gameData);
     u8 i;
     u8 j;
@@ -524,11 +524,11 @@ static void MusComm_Main(MusCommWork *work) {
         return;
     case MUS_COMM_STATE_BOOT:
         func_02042e9c(TRUE);
-        func_ov211_021ef988(work, MUS_COMM_TIMING_BOOT);
+        MusComm_SendTiming(work, MUS_COMM_TIMING_BOOT);
         work->state = MUS_COMM_STATE_BOOT_WAIT;
         break;
     case MUS_COMM_STATE_BOOT_WAIT:
-        if (func_ov211_021ef99c(work, MUS_COMM_TIMING_BOOT) == 1 && MusComm_SendPlayerData(work) == 1) {
+        if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_BOOT) == 1 && MusComm_SendPlayerData(work) == 1) {
             if (work->role == 1) {
                 work->state = MUS_COMM_STATE_SEND_POSITIONS;
             } else {
@@ -555,7 +555,7 @@ static void MusComm_Main(MusCommWork *work) {
     case MUS_COMM_STATE_WAIT_REQUEST:
         break;
     case MUS_COMM_STATE_DATA_TIMING:
-        if (func_ov211_021ef99c(work, MUS_COMM_TIMING_DATA) == 1) {
+        if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_DATA) == 1) {
             if (work->role == 1) {
                 work->state = MUS_COMM_STATE_SEND_UNK144;
             } else {
@@ -586,7 +586,7 @@ static void MusComm_Main(MusCommWork *work) {
     case MUS_COMM_STATE_WAIT_PROGRAM:
         break;
     case MUS_COMM_STATE_PROGRAM_TIMING:
-        if (func_ov211_021ef99c(work, MUS_COMM_TIMING_PROGRAM) == 1) {
+        if (MusComm_IsTimingReached(work, MUS_COMM_TIMING_PROGRAM) == 1) {
             if (work->role == 1) {
                 if (MusComm_SendMsgArcSize(work) == 1) {
                     work->state = MUS_COMM_STATE_SEND_MSG_ARC_SIZE;
@@ -616,7 +616,7 @@ static void MusComm_Main(MusCommWork *work) {
         break;
     case MUS_COMM_STATE_SHOW:
         if (work->scriptReceived == 1) {
-            func_ov211_021f0240(work);
+            MusComm_IsSoundReceived(work);
         }
         break;
     case MUS_COMM_STATE_SEND_POKE:
@@ -700,11 +700,11 @@ static void MusComm_Main(MusCommWork *work) {
     MusComm_SendSoundData(work);
 }
 
-void func_ov211_021ef988(MusCommWork *comm, u8 timing) {
+void MusComm_SendTiming(MusCommWork *comm, u8 timing) {
     NetHandle_SendTimingPair(NetHandle_GetOwn(), timing, 0x11);
 }
 
-BOOL func_ov211_021ef99c(MusCommWork *comm, u8 timing) {
+BOOL MusComm_IsTimingReached(MusCommWork *comm, u8 timing) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), timing, 0x11) == 1) {
         return TRUE;
     }
@@ -714,14 +714,14 @@ BOOL func_ov211_021ef99c(MusCommWork *comm, u8 timing) {
     return FALSE;
 }
 
-PlayerInfo *func_ov211_021ef9c4(MusCommWork *comm, u8 index) {
+PlayerInfo *MusComm_GetPlayerInfo(MusCommWork *comm, u8 index) {
     if (comm->state != 0 && comm->players[index].hasInfo == 1) {
         return comm->players[index].info;
     }
     return NULL;
 }
 
-BoxPkm *func_ov211_021ef9e0(MusCommWork *comm, u8 index) {
+BoxPkm *MusComm_GetPlayerPkm(MusCommWork *comm, u8 index) {
     if (comm->state != 0 && comm->players[index].hasInfo == 1) {
         return comm->players[index].pkm;
     }
@@ -1023,7 +1023,7 @@ static void *MusComm_GetAllPokesBuffer(int netId, void *work, int size) {
     return comm->allPokeData;
 }
 
-MusicalPoke *func_ov211_021f0094(MusCommWork *comm, u8 index) {
+MusicalPoke *MusComm_GetPokeByPos(MusCommWork *comm, u8 index) {
     u8 i;
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
@@ -1034,7 +1034,7 @@ MusicalPoke *func_ov211_021f0094(MusCommWork *comm, u8 index) {
     return NULL;
 }
 
-void func_ov211_021f00c8(MusCommWork *comm) {
+void MusComm_StartSendingSound(MusCommWork *comm) {
     if (comm->soundStarted == 0) {
         comm->soundStarted = TRUE;
         comm->soundChunk = 0;
@@ -1106,7 +1106,7 @@ static void *MusComm_GetSoundBuffer(int netId, void *work, int size) {
     return (u8 *)comm->ov210->soundData + comm->soundChunk * MUS_COMM_SOUND_CHUNK_SIZE;
 }
 
-BOOL func_ov211_021f0240(MusCommWork *comm) {
+BOOL MusComm_IsSoundReceived(MusCommWork *comm) {
     if (comm->ov210->soundDataSize / MUS_COMM_SOUND_CHUNK_SIZE < comm->soundChunk) {
         return TRUE;
     }
@@ -1191,11 +1191,11 @@ static void *MusComm_GetScriptBuffer(int netId, void *work, int size) {
     return comm->ov210->script;
 }
 
-BOOL func_ov211_021f03d8(MusCommWork *comm) {
+BOOL MusComm_IsProgramReceived(MusCommWork *comm) {
     return comm->programReceived;
 }
 
-BOOL func_ov211_021f03e0(MusCommWork *comm) {
+BOOL MusComm_IsScriptReceived(MusCommWork *comm) {
     return comm->scriptReceived;
 }
 
@@ -1223,64 +1223,64 @@ static BOOL MusComm_SendPositions(MusCommWork *work) {
     return MusComm_SendMsg(work, MUS_MSG_POSITIONS, positions, 0xff);
 }
 
-BOOL func_ov211_021f0460(MusCommWork *comm, u8 equip) {
+BOOL MusComm_RequestEquip(MusCommWork *comm, u8 equip) {
     return MusComm_SendMsgSelf(comm, MUS_MSG_EQUIP_REQUEST, equip, 0xff);
 }
 
-u8 func_ov211_021f0470(MusCommWork *comm) {
+u8 MusComm_GetSelfPos(MusCommWork *comm) {
     return comm->players[GFL_NetGetHandleNetId(NetHandle_GetOwn())].pos;
 }
 
-u8 func_ov211_021f0488(MusCommWork *comm, u8 index) {
+u8 MusComm_GetPlayerPos(MusCommWork *comm, u8 index) {
     return comm->players[index].pos;
 }
 
-u16 *func_ov211_021f0494(MusCommWork *comm, u8 index) {
+u16 *MusComm_GetPlayerMusicalId(MusCommWork *comm, u8 index) {
     return comm->players[index].musicalId;
 }
 
-BOOL func_ov211_021f04a0(MusCommWork *comm) {
+BOOL MusComm_IsParent(MusCommWork *comm) {
     return comm->role;
 }
 
-BOOL func_ov211_021f04a4(MusCommWork *comm) {
+BOOL MusComm_AreAllInfoReceived(MusCommWork *comm) {
     return comm->allInfoReceived;
 }
 
-BOOL func_ov211_021f04ac(MusCommWork *comm) {
+BOOL MusComm_AreAllPokesReceived(MusCommWork *comm) {
     return comm->allPokesReceived;
 }
 
-void func_ov211_021f04b4(MusCommWork *comm, u32 a1, u32 a2) {
-    func_ov211_021ef988(comm, MUS_COMM_TIMING_DATA);
+void MusComm_BeginDataTiming(MusCommWork *comm, u32 a1, u32 a2) {
+    MusComm_SendTiming(comm, MUS_COMM_TIMING_DATA);
     comm->state = MUS_COMM_STATE_DATA_TIMING;
     comm->unk144 = a1;
     comm->unk148 = a2;
 }
 
-void func_ov211_021f04d4(MusCommWork *comm) {
-    func_ov211_021ef988(comm, MUS_COMM_TIMING_PROGRAM);
+void MusComm_BeginProgramTiming(MusCommWork *comm) {
+    MusComm_SendTiming(comm, MUS_COMM_TIMING_PROGRAM);
     comm->state = MUS_COMM_STATE_PROGRAM_TIMING;
 }
 
-void func_ov211_021f04e4(MusCommWork *comm, MusicalPoke *poke) {
+void MusComm_BeginSendPoke(MusCommWork *comm, MusicalPoke *poke) {
     comm->state = MUS_COMM_STATE_SEND_POKE;
     comm->poke = poke;
 }
 
-u32 func_ov211_021f04f0(MusCommWork *comm) {
+u32 MusComm_GetUnk144(MusCommWork *comm) {
     return comm->unk144;
 }
 
-u32 func_ov211_021f04f8(MusCommWork *comm) {
+u32 MusComm_GetUnk148(MusCommWork *comm) {
     return comm->unk148;
 }
 
-u8 func_ov211_021f0500(MusCommWork *comm, u8 index, u8 a2) {
+u8 MusComm_GetPlayerEquip(MusCommWork *comm, u8 index, u8 a2) {
     return comm->players[index].equips[a2];
 }
 
-void func_ov211_021f0510(MusCommWork *comm, u8 pos, u8 equip) {
+void MusComm_SetEquipRequest(MusCommWork *comm, u8 pos, u8 equip) {
     u8 i;
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
@@ -1291,7 +1291,7 @@ void func_ov211_021f0510(MusCommWork *comm, u8 pos, u8 equip) {
     }
 }
 
-u8 func_ov211_021f053c(MusCommWork *comm, u8 pos) {
+u8 MusComm_GetEquipUsed(MusCommWork *comm, u8 pos) {
     u8 i;
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
@@ -1302,7 +1302,7 @@ u8 func_ov211_021f053c(MusCommWork *comm, u8 pos) {
     return MUS_COMM_EQUIP_NONE;
 }
 
-void func_ov211_021f056c(MusCommWork *comm, u8 pos) {
+void MusComm_ClearEquipUsed(MusCommWork *comm, u8 pos) {
     u8 i;
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
@@ -1312,18 +1312,18 @@ void func_ov211_021f056c(MusCommWork *comm, u8 pos) {
     }
 }
 
-u8 func_ov211_021f0598(MusCommWork *comm) {
+u8 MusComm_GetLimelightPos(MusCommWork *comm) {
     if (comm->limelightPos < MUS_COMM_PLAYER_MAX) {
         return comm->players[comm->limelightPos].pos;
     }
     return MUS_COMM_PLAYER_MAX;
 }
 
-void func_ov211_021f05b4(MusCommWork *comm) {
+void MusComm_ClearLimelightPos(MusCommWork *comm) {
     comm->limelightPos = MUS_COMM_PLAYER_MAX;
 }
 
-void func_ov211_021f05c0(MusCommWork *comm, u8 pos, u8 equip, u32 result) {
+void MusComm_QueueEquipResult(MusCommWork *comm, u8 pos, u8 equip, u32 result) {
     u8 i;
 
     for (i = 0; i < MUS_COMM_EQUIP_QUEUE_MAX; i++) {
@@ -1335,7 +1335,7 @@ void func_ov211_021f05c0(MusCommWork *comm, u8 pos, u8 equip, u32 result) {
     }
 }
 
-const GFLNetInitData *func_ov211_021f0608(GameData *gameData) {
+const GFLNetInitData *MusComm_GetNetInitData(GameData *gameData) {
     return &sMusCommInitData;
 }
 

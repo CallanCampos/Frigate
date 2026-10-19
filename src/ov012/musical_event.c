@@ -145,15 +145,15 @@ GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BO
     work->shot = NULL;
     work->musicalSave = getMusicalInfoBlkAddress(gameData);
     work->ov210 = MusicalSystem_InitProgramData(HEAPID_GAMEEVENT);
-    if (work->online == FALSE || func_ov211_021f04a0(work->commWork->comm) == TRUE) {
+    if (work->online == FALSE || MusComm_IsParent(work->commWork->comm) == TRUE) {
         MusicalSystem_LoadProgramData(work->ov210, work->save, work->gameData, func_0200aee4(work->musicalSave),
                                       HEAPID_MUSICAL_EVENT);
     }
     if (work->online == TRUE) {
         work->state = 11;
         work->subState = 0;
-        func_ov211_021ef3e4(work->comm, GetGameDataPlayerInfo(work->gameData), func_0201d620(work->pkm), work->gameComm,
-                            work->ov210, HEAPID_GAMEEVENT);
+        MusComm_SetUp(work->comm, GetGameDataPlayerInfo(work->gameData), func_0201d620(work->pkm), work->gameComm,
+                      work->ov210, HEAPID_GAMEEVENT);
     } else {
         shots = func_0200af38(work->musicalSave);
         for (i = 0; i < 4; i++) {
@@ -181,23 +181,23 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
     MusicalEvent_CheckNetError(work);
     switch (work->state) {
     case 11:
-        if (func_ov211_021f04a4(work->commWork->comm) == TRUE) {
+        if (MusComm_AreAllInfoReceived(work->commWork->comm) == TRUE) {
             u32 program = 0;
             u32 cpus = 0;
             u8 i;
             RivalDataSave *rivals;
 
-            if (func_ov211_021f04a0(work->commWork->comm) == TRUE) {
+            if (MusComm_IsParent(work->commWork->comm) == TRUE) {
                 work->program = MusicalProgram_Create(HEAPID_GAMEEVENT, work->ov210, func_0200af38(work->musicalSave));
                 program = MusicalProgram_PackPoints(work->program);
                 cpus = MusicalProgram_PackNpcs(work->program);
             }
-            func_ov211_021f04b4(work->commWork->comm, program, cpus);
+            MusComm_BeginDataTiming(work->commWork->comm, program, cpus);
             work->state = 12;
             rivals = getHollow_RivalData(work->save);
             for (i = 0; i < 4; i++) {
-                if (func_ov211_021f0470(work->commWork->comm) != func_ov211_021f0488(work->commWork->comm, i)) {
-                    PlayerInfo *info = func_ov211_021ef9c4(work->commWork->comm, i);
+                if (MusComm_GetSelfPos(work->commWork->comm) != MusComm_GetPlayerPos(work->commWork->comm, i)) {
+                    PlayerInfo *info = MusComm_GetPlayerInfo(work->commWork->comm, i);
 
                     if (info != NULL) {
                         Misc_AddMetTrainer(rivals, getIDAsUInt(info));
@@ -209,14 +209,14 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
         }
         break;
     case 12:
-        if (func_ov211_021f03d8(work->commWork->comm) == TRUE) {
+        if (MusComm_IsProgramReceived(work->commWork->comm) == TRUE) {
             u8 i;
 
             work->state = 13;
             for (i = 0; i < 4; i++) {
-                work->order[i] = func_ov211_021f0488(work->commWork->comm, i);
+                work->order[i] = MusComm_GetPlayerPos(work->commWork->comm, i);
             }
-            work->playerPos = func_ov211_021f0470(work->commWork->comm);
+            work->playerPos = MusComm_GetSelfPos(work->commWork->comm);
             MusicalEvent_SetReceivedProgram(work);
         } else if (work->error == TRUE) {
             work->state = 23;
@@ -362,8 +362,8 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
 static void MusicalEvent_InitPoke(MusicalEventWork *work) {
     work->poke = MusicalSystem_InitPokeFromPkm(work->pkm, HEAPID_GAMEEVENT);
     if (work->online) {
-        func_ov211_021f04a0(work->commWork->comm);
-        func_ov211_021f04d4(work->commWork->comm);
+        MusComm_IsParent(work->commWork->comm);
+        MusComm_BeginProgramTiming(work->commWork->comm);
     }
 }
 
@@ -397,7 +397,7 @@ static void MusicalEvent_CreateDressUpParam(MusicalEventWork *work) {
 
 static void MusicalEvent_SendPoke(MusicalEventWork *work) {
     if (work->online == TRUE) {
-        func_ov211_021f04e4(work->comm, work->poke);
+        MusComm_BeginSendPoke(work->comm, work->poke);
     }
 }
 
@@ -418,7 +418,7 @@ static void MusicalEvent_CreateStageParam(MusicalEventWork *work) {
     } else {
         cpu = 0;
         for (i = 0; i < 4; i++) {
-            poke = func_ov211_021f0094(work->comm, work->order[i]);
+            poke = MusComm_GetPokeByPos(work->comm, work->order[i]);
             if (poke != NULL) {
                 MusicalStageParam_SetCommPoke(work->stage, work->order[i], poke);
             } else {
@@ -445,7 +445,7 @@ static void MusicalEvent_AddLikedPropPoints(MusicalEventWork *work) {
         for (i = 0; i < 4; i++) {
             poke = work->stage->pokes[i];
             for (j = 0; j < 2; j++) {
-                slot = func_ov211_021f0500(work->comm, i, j);
+                slot = MusComm_GetPlayerEquip(work->comm, i, j);
                 if (slot != 0xff) {
                     poke->unk54[slot] = TRUE;
                 }
@@ -523,7 +523,7 @@ static void MusicalEvent_TakeShot(MusicalEventWork *work) {
         if (pos == work->playerPos) {
             info = GetGameDataPlayerInfo(work->gameData);
         } else if (work->online == TRUE) {
-            info = func_ov211_021ef9c4(work->comm, MusicalEvent_GetEntryIndex(work, pos));
+            info = MusComm_GetPlayerInfo(work->comm, MusicalEvent_GetEntryIndex(work, pos));
         }
         if (info != NULL) {
             MI_CpuCopy8(info, shot->pokes[pos].name, sizeof(shot->pokes[pos].name));
@@ -650,8 +650,8 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
         total = func_0200af38(work->musicalSave) + MusicalEvent_GetPoints(work, work->playerPos);
     } else {
         for (i = 0; i < 4; i++) {
-            otherTotal = func_ov211_021f0494(work->comm, MusicalEvent_GetEntryIndex(work, i));
-            if (func_ov211_021f0094(work->comm, i) != NULL) {
+            otherTotal = MusComm_GetPlayerMusicalId(work->comm, MusicalEvent_GetEntryIndex(work, i));
+            if (MusComm_GetPokeByPos(work->comm, i) != NULL) {
                 total += *otherTotal;
                 total += MusicalEvent_GetPoints(work, i);
             }
@@ -797,7 +797,7 @@ static u8 MusicalEvent_GetNpcIndex(MusicalEventWork *work, u8 pos) {
             if (i != 0) {
                 count++;
             }
-        } else if (func_ov211_021ef9c4(work->comm, i) == NULL) {
+        } else if (MusComm_GetPlayerInfo(work->comm, i) == NULL) {
             count++;
         }
     }
@@ -921,7 +921,7 @@ u8 MusicalEvent_GetOwnerTrainerClass(MusicalEventWork *work, u8 pos) {
         return 0;
     }
     if (work->online == TRUE) {
-        info = func_ov211_021ef9c4(work->comm, index);
+        info = MusComm_GetPlayerInfo(work->comm, index);
         if (info != NULL) {
             return MusicalEvent_GetPlayerTrainerClass(info);
         }
@@ -941,7 +941,7 @@ void MusicalEvent_WordSetOwnerName(MusicalEventWork *work, u8 pos, WordSet *word
         copyVarForText(wordSet, wordIndex, GetGameDataPlayerInfo(work->gameData));
         done = TRUE;
     } else if (work->online == TRUE) {
-        info = func_ov211_021ef9c4(work->comm, index);
+        info = MusComm_GetPlayerInfo(work->comm, index);
         if (info != NULL) {
             copyVarForText(wordSet, wordIndex, info);
             done = TRUE;
@@ -970,7 +970,7 @@ void MusicalEvent_WordSetPokeName(MusicalEventWork *work, u8 pos, WordSet *wordS
         loadPokemonNicknameToStrbuf(wordSet, wordIndex, work->pkm);
         done = TRUE;
     } else if (work->online == TRUE) {
-        pkm = func_ov211_021ef9e0(work->comm, index);
+        pkm = MusComm_GetPlayerPkm(work->comm, index);
         if (pkm != NULL) {
             loadBoxPokemonNameToStrbuf(wordSet, wordIndex, pkm);
             done = TRUE;
@@ -987,8 +987,8 @@ void MusicalEvent_WordSetPokeName(MusicalEventWork *work, u8 pos, WordSet *wordS
 }
 
 static void MusicalEvent_SetReceivedProgram(MusicalEventWork *work) {
-    u32 program = func_ov211_021f04f0(work->comm);
-    u32 cpus = func_ov211_021f04f8(work->comm);
+    u32 program = MusComm_GetUnk144(work->comm);
+    u32 cpus = MusComm_GetUnk148(work->comm);
 
     if (work->program == NULL) {
         work->program = MusicalProgram_Create(HEAPID_GAMEEVENT, work->ov210, 0);
