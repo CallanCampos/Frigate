@@ -1010,7 +1010,10 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row.
+arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row. The lever never applies to a function
+whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
+`addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
+placement helps them.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").
