@@ -1017,7 +1017,10 @@ subexpression, loaded into a").
 `#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3` around one function alone matched
 overlay 139's `UpdateScroll`, a field's offset added before the index for two merged reads, where
 `opt_common_subs off` made it 4 bytes longer and `opt_lifetimes`, `opt_loop_invariants` and `opt_strength_reduction`
-off changed nothing (matching.md: "that MWCC shares between two accesses").
+off changed nothing (matching.md: "that MWCC shares between two accesses"). The same three matched overlay 332's
+`CygnusData_GetEntry` with its type stored first (an array member's offset, `data + 0x18` indexed by `r4`), where
+`opt_common_subs off` did not. Both files also match whole at `-O3,p`, with only that function changed; a per-file
+`-O3,p` that nothing else shows is evidence, like the pragma, not a fix.
 
 An empty `if (a && b && c) {}` (three operands or more; two are removed early) or a discarded ternary statement
 splits the block where it stands and emits nothing. When a register or CSE difference looks like a missing block
