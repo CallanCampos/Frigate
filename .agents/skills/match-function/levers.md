@@ -768,6 +768,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
   once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
+- A local struct's address recomputed at each call inside a loop where the original keeps it in one register: check
+  for enough register pressure from elsewhere in the function first, since the hoist comes from that, not from a
+  named pointer alias (which is rejected as naming nothing). (matching.md: "A local struct's address, taken only to
+  pass it as a function argument")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.

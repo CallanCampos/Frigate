@@ -27,17 +27,18 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckFlashcartA + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckFlashcartAStub + 0x2200);
-    args.failed = 0;
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -77,17 +78,18 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckFlashcartB + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckFlashcartBStub + 0x2200);
-    args.failed = 0;
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -127,17 +129,18 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckEmulatorA + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckEmulatorAStub + 0x2200);
-    args.failed = 0;
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -177,17 +180,18 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckEmulatorB + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckEmulatorBStub + 0x2200);
-    args.failed = 0;
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {

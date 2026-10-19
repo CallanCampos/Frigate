@@ -2663,6 +2663,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the entry test (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`). libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the samples
   it stores through `s16 *mic` by an `sEcho.attenuation` loaded once only with `shift = sEcho.attenuation;` before
   the loop; the original's load is below the test, which no spelling found gives.
+- A local struct's address, taken only to pass it as a function argument called on every pass of a loop, is hoisted
+  to a dedicated register across the loop by register pressure, not by naming it: enough live temporaries ahead of
+  the loop (from an unrelated fix elsewhere in the same prologue) make the allocator keep the address in a register
+  across the loop on its own, the same effect a `local *p = &local;` used only at the call gets (MWCC recomputes
+  `&local` at each call otherwise), without a local that corresponds to nothing in the original. DS Protect's
+  `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) hoist `&args` to `fp` across the per-check call this way, once the
+  function has enough live registers from the `callbacks` data-bias fix and the right declaration order for its
+  `args`/`checks[]` field writes; a named pointer local reaches the same hoist alone but is rejected as a local that
+  names nothing, in favor of the declaration order. See the function's row for what still differs.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
