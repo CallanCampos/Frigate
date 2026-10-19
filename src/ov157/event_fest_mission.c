@@ -138,7 +138,7 @@ GameEvent *EventFestMissionInfo_Create(GameSystem *gsys, void *args) {
     return event;
 }
 
-GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args) {
+GameEvent *EventFestMissionRetire_Create(GameSystem *gsys, void *args) {
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFestMissionEnd_Callback, sizeof(FestMissionEventWork));
     FestMissionEventWork *work = GameEvent_GetData(event);
@@ -148,7 +148,7 @@ GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args) {
     return event;
 }
 
-GameEvent *func_ov157_021f5b18(GameSystem *gsys, void *args) {
+GameEvent *EventFestMissionDisconnect_Create(GameSystem *gsys, void *args) {
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFestMissionEnd_Callback, sizeof(FestMissionEventWork));
     FestMissionEventWork *work = GameEvent_GetData(event);

@@ -12007,6 +12007,8 @@ overlays/ov157 0x021f59e0 EventFestMissionStart_Create
 overlays/ov157 0x021f5a28 EventFestMissionMessage_Create
 overlays/ov157 0x021f5a7c EventFestMissionMenu_Create
 overlays/ov157 0x021f5aa4 EventFestMissionInfo_Create
+overlays/ov157 0x021f5ae4 EventFestMissionRetire_Create
+overlays/ov157 0x021f5b18 EventFestMissionDisconnect_Create
 overlays/ov157 0x021f5b4c FestMissionEvent_Init
 overlays/ov157 0x021f5be4 FestMissionEvent_Exit
 overlays/ov157 0x021f5c1c FestMissionMsg_Call

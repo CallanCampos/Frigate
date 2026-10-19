@@ -210,10 +210,11 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         break;
     }
     case FMISSION_VIEW_EVENT_QUIT:
-        event = FMissionViewSetup_CreateCallEvent(
-            view,
-            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION, func_ov157_021f5ae4, view->field),
-            CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
+        event = FMissionViewSetup_CreateCallEvent(view,
+                                                  GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION,
+                                                                                  EventFestMissionRetire_Create,
+                                                                                  view->field),
+                                                  CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
         break;
     case FMISSION_VIEW_EVENT_PASS_POWER: {
         u32 args = 1;
