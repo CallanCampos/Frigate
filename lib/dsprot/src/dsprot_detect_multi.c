@@ -47,16 +47,15 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                break;
+                code = 0xf1;
+                // style-ok: goto-return pret's pokeheartgold DS Protect (mac_owner.c) jumps to its exit the same way
+                goto end;
             }
         }
-        if (j == 6) {
-            DSProt_Tamper(args, 0xfb);
-            code = 0xfb;
-        } else {
-            code = 0xf1;
-        }
+        DSProt_Tamper(args, 0xfb);
+        code = 0xfb;
     }
+end:
     return code * 0xbf;
 }
 
@@ -83,16 +82,15 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                break;
+                code = 0xfb;
+                // style-ok: goto-return pret's pokeheartgold DS Protect (mac_owner.c) jumps to its exit the same way
+                goto end;
             }
         }
-        if (j == 6) {
-            DSProt_Tamper(args, 0x78);
-            code = 0xf1;
-        } else {
-            code = 0xfb;
-        }
+        DSProt_Tamper(args, 0x78);
+        code = 0xf1;
     }
+end:
     return code * 0xb5;
 }
 
