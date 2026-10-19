@@ -167,6 +167,10 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     return 0;
 }
 
+static inline GdbRequest *Gdb_GetCurrentRequest(void) {
+    return &sGdbRequests[sGdb.requestIndex];
+}
+
 int Gdb_Cancel(void) {
     if (sGdb.state != GDB_STATE_BUSY) {
         Gdb_Printf(335, "not in async process.\n");
@@ -175,43 +179,42 @@ int Gdb_Cancel(void) {
     sGdb.state = GDB_STATE_CANCELING;
     switch (sGdb.operation) {
     case GDB_OPERATION_CREATE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_DELETE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_UPDATE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_MY_RECORDS:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_RECORD_LIMIT:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_SPECIFIC_RECORDS:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_RATE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_SEARCH_RECORDS:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_RANDOM_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_RECORD_COUNT:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_DOWNLOAD_FILE:
-        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState((int)sGdbRequests[sGdb.requestIndex].request));
-        ghttpCancelRequest((int)sGdbRequests[sGdb.requestIndex].request);
+        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState((int)Gdb_GetCurrentRequest()->request));
+        ghttpCancelRequest((int)Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_UPLOAD_FILE:
-        Gdb_Printf(392, "cancel ghttp. state[%d]\n",
-                   ghttpGetState((int)sGdbRequests[sGdb.requestIndex].u.delete.table));
-        ghttpCancelRequest((int)sGdbRequests[sGdb.requestIndex].u.delete.table);
+        Gdb_Printf(392, "cancel ghttp. state[%d]\n", ghttpGetState((int)Gdb_GetCurrentRequest()->u.delete.table));
+        ghttpCancelRequest((int)Gdb_GetCurrentRequest()->u.delete.table);
         break;
     default:
         Gdb_Printf(399, "illegal process[%d].\n", sGdb.operation);
@@ -427,7 +430,6 @@ static void Gdb_RunLibrary(void) {
 
 static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *input, void *output, void *userData) {
     GdbRequest *slot;
-    int operation = sGdb.operation;
     SakeGetRecordsOutput *records = output;
     int *values = output;
 
@@ -435,6 +437,7 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
         return;
     }
     if (error == 0) {
+        int operation = sGdb.operation;
         sGdb.result = 1;
         sGdb.state = GDB_STATE_IDLE;
         sGdb.operation = 0;

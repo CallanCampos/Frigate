@@ -1592,6 +1592,9 @@ Same instructions, scheduled in another order.
   into a new register. The union room's `UnionMsg_UpdateRuleMenu` reads
   `sMenuInfo[ruleSel[3]].rows[UnionMsg_GetMenuInfo(ruleSel[3])->count - 1]`, with `UnionMsg_GetMenuInfo(int kind)`
   returning `&sMenuInfo[kind]`; the getter with a `u8` index is 14 bytes off and with `s8` folds again.
+  DWC's `Gdb_Cancel` (`gdb.c`) is the same with a global index: its ghttp case reads `u.delete.table` at offset 4 of
+  the current request, which folds into `sGdbRequests+4` written plainly, and matches only through
+  `Gdb_GetCurrentRequest()` returning `&sGdbRequests[sGdb.requestIndex]`.
 - A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
