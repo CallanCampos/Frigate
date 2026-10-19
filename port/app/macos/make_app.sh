@@ -30,6 +30,9 @@
 # (--help) as each of its slices that this Mac can run (an x86_64 slice on Apple Silicon needs Rosetta). The app is
 # built next to its final path and moved there once it is signed and verified, so that a failed build leaves no
 # half-made app behind. port/tests/app/test_make_app.sh tests it, and port/app/macos/check_app.sh checks the app made.
+# A sanitized build's program (PORT_SANITIZE) loads the toolchain's sanitizer runtime, which goes into Frameworks as
+# any other library does: that app is made, for testing on this Mac, but port/tools/package_macos.sh puts none in a
+# disk image (port/docs/sanitizers.md).
 set -eu
 
 program=

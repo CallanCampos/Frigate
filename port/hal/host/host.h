@@ -90,11 +90,18 @@ void port_host_static_data(uintptr_t *start, uintptr_t *end);
 typedef void (*PortHostFaultHandler)(const void *address, const char *fault);
 
 // Sets the one handler of memory faults, in place of any earlier one. On macOS and Linux that is every SIGSEGV and
-// SIGBUS, from any code. On Windows it is a memory fault at an address port_host_protect_none or
-// port_host_protect_stack_guard made inaccessible, any memory fault on a fiber or in the program's own code, and one
-// that nothing else handled; Windows also reports, with or without a handler, every exception nobody handles (an
-// illegal instruction, a division by zero, a memory fault without a handler), as "port: crash: exception ... at
-// address ..." with a backtrace, on a fiber too, where the system itself would end the process silently
+// SIGBUS, from any code; from then on the seam also reports, itself, the processor's other faults that end a program,
+// on any stack, a fiber's too: SIGFPE (an integer division by zero, which faults on x86-64; arm64 gives 0 instead),
+// SIGILL (an illegal instruction, x86-64's __builtin_trap among them) and SIGTRAP (a breakpoint, arm64's __builtin_trap
+// among them), as "port: crash: signal N at address ..." with the instruction's address, then "  in NAME+0xOFFSET", the
+// function that holds it, when port_host_function_at names one (a backtrace taken in the signal's handler may not show
+// that function: under Rosetta it doesn't), and a backtrace, after which the signal ends the program as it would have.
+// On Windows it is a memory fault at an address port_host_protect_none or port_host_protect_stack_guard made
+// inaccessible, any memory fault on a fiber or in the program's own code, and one that nothing else handled; Windows
+// also reports, with or without a handler, every exception nobody handles (an illegal instruction, a division by zero,
+// a breakpoint, a memory fault without a handler), as "port: crash: exception ... at address ..." with a backtrace
+// unwound from the faulting instruction, whose first frame names its function, on a fiber too, where the system itself
+// would end the process silently
 void port_host_set_fault_handler(PortHostFaultHandler handler);
 
 // Prints "Backtrace:" and the frames of the running code to stderr, innermost first, each with its function's name
@@ -102,9 +109,11 @@ void port_host_set_fault_handler(PortHostFaultHandler handler);
 void port_host_print_backtrace(void);
 
 // The function whose code holds address: its name and how far into it address is. 0 when no symbol covers it: on
-// macOS and Linux, dladdr names the exported functions of any library loaded (the C library's, SDL's) besides the
-// program's; on Windows, only the program's own COFF symbols name anything, so another module's code gives 0. A
-// stripped program gives 0 for its own code too
+// macOS and Linux, dladdr names the exported functions of any library loaded (the C library's, SDL's); on macOS it
+// names the program's own functions too, static ones among them, from its symbol table, but Linux's reads only the
+// symbols a program exports, and an ELF program exports none of its functions without --export-dynamic, which
+// Frigate's don't link with; on Windows, only the program's own COFF symbols name anything, so another module's code
+// gives 0. A stripped program gives 0 for its own code too
 int port_host_function_at(const void *address, const char **name, uintptr_t *offset);
 
 // The address of the program's global (a function or an object, by its C name), from the program's own symbols, for

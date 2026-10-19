@@ -1,14 +1,15 @@
 // macOS's and Linux's half of the host's services (host.h): pages through mmap and mprotect, faults as SIGSEGV and
-// SIGBUS on an alternate signal stack, backtraces through execinfo, names through dladdr, the watchdog as SIGALRM, and
-// the program's static data and globals from its own image (Mach-O's __DATA segment and export trie, ELF's linker
-// symbols and symbol table), the monotonic clock, and the renderer's threads (pthreads, at macOS's user-interactive
-// QoS) with their signals (a mutex and a condition variable). It touches no part of the game: the trap placeholders
-// (port/hal/trap.c), the fibers' guards (port/hal/os/fiber.c), the PXI pointers into static data
-// (port/hal/pxi/pointer.c), --run-dump's globals (port/app/main.c), the watchdog (port/app/main.c), --frame-times'
-// clock (port/hal/os/frame_time.c) and the 3D renderer's workers (port/gfx/workers.c) stand on it. Windows has
-// host_windows.c instead. glibc hides dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs from strict
-// C11, so port/CMakeLists.txt defines _GNU_SOURCE for this file on the command line, ahead of any header
-// (port_host.h, which some targets force-include)
+// SIGBUS and the processor's other crashes as SIGFPE, SIGILL and SIGTRAP, on an alternate signal stack, backtraces
+// through execinfo, names through dladdr, the watchdog as SIGALRM, the program's static data and globals from its own
+// image (Mach-O's __DATA segment and export trie, ELF's linker symbols and symbol table), the monotonic clock, and the
+// renderer's threads (pthreads, at macOS's user-interactive QoS) with their signals (a mutex and a condition variable).
+// It touches no part of the game: the trap placeholders (port/hal/trap.c), the crash reports, the fibers' guards
+// (port/hal/os/fiber.c), the PXI pointers into static data (port/hal/pxi/pointer.c), --run-dump's globals
+// (port/app/main.c), the watchdog (port/app/main.c), --frame-times' clock (port/hal/os/frame_time.c) and the 3D
+// renderer's workers (port/gfx/workers.c) stand on it. Windows has host_windows.c instead. glibc hides dladdr, Dl_info,
+// dl_iterate_phdr, MAP_ANON, the signals' structs and the saved registers' names (REG_RIP) from strict C11, so
+// port/CMakeLists.txt defines _GNU_SOURCE for this file on the command line, ahead of any header (port_host.h, which
+// some targets force-include)
 #ifndef _WIN32
 
 #include "hal/host/host.h"
@@ -35,6 +36,7 @@
 #elif defined(__linux__)
 #include <elf.h>
 #include <link.h>
+#include <sys/ucontext.h>
 // The start of the executable's writable data and the end of its .bss, which the GNU and LLVM linkers define
 extern char __data_start[];
 extern char _end[];
@@ -136,15 +138,69 @@ void port_host_static_data(uintptr_t *start, uintptr_t *end) {
 
 static PortHostFaultHandler sFaultHandler;
 
-// A fault: the handler reports it, and unless it ends the program, the signal's default action does, as it would have
+// The signals by which a crash ends a program, all reported: the memory faults, SIGSEGV and SIGBUS, which go to the
+// program's handler, since a trap placeholder touched is its to name (port/hal/trap.c); and the processor's other
+// faults, which the seam reports itself, as Windows reports an exception that isn't a memory fault (host_windows.c):
+// SIGFPE, an integer division by zero on x86-64 (arm64 divides by zero without a fault, and gives 0); SIGILL, an
+// illegal instruction (x86-64's __builtin_trap, UD2, among them); and SIGTRAP, a breakpoint (arm64's __builtin_trap,
+// BRK, __builtin_debugtrap, and the traps of the system's own libraries). A debugger takes a breakpoint of its own
+// before the program sees a signal
+static const int sFaultSignals[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL, SIGTRAP };
+
+// Where the thread stopped, from the program counter the system saved for the handler: the instruction that raised a
+// SIGFPE or SIGILL, a breakpoint's own or, after x86-64's INT3, the next one. macOS's si_addr says the same, but
+// Linux's is 0 for INT3, and for a signal that a process sent (raise, kill) it shares its place with the sender's pid.
+// NULL on another processor, where si_addr stands in
+static const void *InstructionAddress(const void *context) {
+    const ucontext_t *registers = context;
+
+#if defined(__APPLE__) && defined(__aarch64__)
+    return (const void *)__darwin_arm_thread_state64_get_pc(registers->uc_mcontext->__ss);
+#elif defined(__APPLE__) && defined(__x86_64__)
+    return (const void *)registers->uc_mcontext->__ss.__rip;
+#elif defined(__linux__) && defined(__x86_64__)
+    return (const void *)registers->uc_mcontext.gregs[REG_RIP];
+#elif defined(__linux__) && defined(__aarch64__)
+    return (const void *)registers->uc_mcontext.pc;
+#else
+    (void)registers;
+    return NULL;
+#endif
+}
+
+// A crash: a memory fault goes to the handler, with the address accessed; any other is reported here, with the address
+// of the instruction that raised it, the function that holds it when the program's symbols name one, and a backtrace.
+// The function is named apart because the backtrace may not show it: backtrace() walks the frames up from this
+// handler's, through the system's signal trampoline, and what follows _sigtramp depends on the system. On arm64 macOS
+// it is the faulting function's frame, at the faulting instruction; on x86_64 under Rosetta it is a frame at 0, then
+// that function's callers without the function itself, or on a fiber nothing more. Then, unless the handler ended the
+// program, the signal's default action ends it, as it would have without a handler: the signal stays blocked until
+// this returns, and is delivered then, before the faulting instruction could run again
 static void OnFault(int signal, siginfo_t *info, void *context) {
     char fault[32];
     struct sigaction action;
 
-    (void)context;
     snprintf(fault, sizeof(fault), "signal %d", signal);
-    if (sFaultHandler != NULL) {
-        sFaultHandler(info->si_addr, fault);
+    if (signal == SIGSEGV || signal == SIGBUS) {
+        if (sFaultHandler != NULL) {
+            sFaultHandler(info->si_addr, fault);
+        }
+    } else {
+        const void *instruction = InstructionAddress(context);
+        const char *name;
+        uintptr_t offset;
+
+        if (instruction == NULL) {
+            instruction = info->si_addr;
+        }
+        // Not async-signal-safe, as the handler's report isn't, but the process is about to end, and this is the
+        // report it exists for
+        fprintf(stderr, "\nport: crash: %s at address %p\n", fault, instruction);
+        if (port_host_function_at(instruction, &name, &offset)) {
+            fprintf(stderr, "  in %s+0x%lx\n", name, (unsigned long)offset);
+        }
+        port_host_print_backtrace();
+        fflush(stderr);
     }
     memset(&action, 0, sizeof(action));
     action.sa_handler = SIG_DFL;
@@ -167,8 +223,9 @@ void port_host_set_fault_handler(PortHostFaultHandler handler) {
     action.sa_sigaction = OnFault;
     action.sa_flags = SA_SIGINFO | SA_ONSTACK;
     sigemptyset(&action.sa_mask);
-    sigaction(SIGSEGV, &action, NULL);
-    sigaction(SIGBUS, &action, NULL);
+    for (size_t i = 0; i < sizeof(sFaultSignals) / sizeof(sFaultSignals[0]); i++) {
+        sigaction(sFaultSignals[i], &action, NULL);
+    }
 }
 
 // write(2) is async-signal-safe, and takes no lock of the C library's stderr

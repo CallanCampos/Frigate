@@ -140,10 +140,19 @@ which of these it was:
   `port: os: ...`, `port: fiber: ...` or `port: PXI: ...` before it: something the platform layer relies on didn't hold.
   That is a Frigate bug; report it with the message and how to get there (an input file, `--input`, makes it
   repeatable).
-- **A crash (SIGSEGV, SIGBUS; on Windows an exception's status).** `port: crash: signal N at address ...` (on Windows
-  `port: crash: exception 0xc0000005 at address ...`) and a backtrace: a real crash, in the game's C or Frigate's. Run
-  it again in the sanitized build on macOS or Linux ([sanitizers.md](sanitizers.md)), which stops at the first access
-  that goes wrong, the game's heaps included, and says where (Windows has none set up yet,
+- **A crash (SIGSEGV, SIGBUS, SIGFPE, SIGILL, SIGTRAP; on Windows an exception's status).**
+  `port: crash: signal N at address ...` (on Windows `port: crash: exception 0xCODE at address ...`) and a backtrace,
+  and the program ends by that signal or with that exception's status: a real crash, in the game's C or Frigate's. The
+  number says which. A memory fault is SIGSEGV (11) or SIGBUS (10 on macOS, 7 on Linux), exception 0xc0000005 on
+  Windows, at the address accessed; the others are at the instruction's address. A division by zero is SIGFPE (8),
+  0xc0000094, which only x86-64 faults on (arm64 gives 0 and goes on; the sanitized build reports it on both); an
+  illegal instruction is SIGILL (4), 0xc000001d; a breakpoint is SIGTRAP (5), 0x80000003; and `__builtin_trap` is an
+  illegal instruction on x86-64 and a breakpoint on arm64. For a crash that isn't a memory fault, macOS and Linux add
+  the function that holds the instruction under the first line, `  in FUNCTION+0xOFFSET`, when the program's symbols
+  name it (on macOS they do; on Linux only a library's exported functions are named), since the backtrace there may not
+  show it (the x86_64 slice's under Rosetta doesn't); on Windows the backtrace's first frame is that function. Run it
+  again in the sanitized build on macOS or Linux ([sanitizers.md](sanitizers.md)), which stops at the first access that
+  goes wrong, the game's heaps included, or at the division, and says where (Windows has none set up yet,
   [ADR 0013](adr/0013-windows-build-with-msys2-clang64.md)); a game bug that a 64-bit layout made worse is fixed under
   `PLATFORM_PC` ([below](#changing-the-games-code-here)).
 - **Bad options (status 2).** An option the program doesn't know (`port: unknown option ...`) or a value it can't use,

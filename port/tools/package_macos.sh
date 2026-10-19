@@ -4,13 +4,18 @@
 # signed ad hoc, and hdiutil makes a compressed disk image named after it, with the app and a link to /Applications to
 # drag it onto. The image is checked before the script ends: it verifies, the app in it passes codesign's strict check,
 # its program has the slices and its Info.plist the minimum macOS the build was configured for, and it holds no ROM,
-# save or other file of the game's. It is only ever made locally: the port's compiled game code is never uploaded or
-# distributed (port/CLAUDE.md).
+# save or other file of the game's, and no sanitizer's runtime; an image that fails a check, or that the script stops
+# before checking, is removed. A sanitized build (-DPORT_SANITIZE=ON, or -fsanitize= in any of the compiler's or the
+# linker's flags its cache holds, a configuration's such as CMAKE_C_FLAGS_RELWITHDEBINFO among them) is refused before
+# anything is built: its app carries the toolchain's sanitizer runtime, which make_app.sh copies into it, and is for
+# testing on this Mac only (port/docs/sanitizers.md). It is only ever made locally: the port's compiled game code is
+# never uploaded or distributed (port/CLAUDE.md).
 #
 #   port/tools/package_macos.sh [--build-dir DIR] [--out PATH]
 #   port/tools/package_macos.sh --distribution [--version b2_us|w2_us] [--build-dir DIR] [--out PATH]
 #
-#   --build-dir DIR  a host build configured with CMake (build/port by default); its PORT_VERSION picks the app
+#   --build-dir DIR  a host build configured with CMake (build/port by default), not a sanitized one; its
+#                    PORT_VERSION picks the app
 #   --out PATH       the disk image (by default DIR/<app> <version>.dmg, "Frigate Black 2 0.0.N.dmg"). A path in a git
 #                    work tree, this one or another, must be one git ignores, such as one under build/, so that the
 #                    image is never committed
@@ -109,6 +114,14 @@ cache_value() {
     sed -n "s/^$1:[A-Z]*=//p" "$build_dir/CMakeCache.txt"
 }
 
+# Whether an option of the build's cache is on, as CMake reads it: ON, YES, TRUE, Y or a number but 0, in any case
+cache_on() {
+    case "$(cache_value "$1" | tr '[:upper:]' '[:lower:]')" in
+    on | yes | true | y | [1-9]*) return 0 ;;
+    *) return 1 ;;
+    esac
+}
+
 # The distribution build: configured here when it isn't yet, refused when it was configured as another build. The first
 # configure downloads SDL3's pinned release from GitHub (it needs the network) and configures it; the build compiles it
 # for both slices along with everything else
@@ -117,14 +130,11 @@ if [ -n "$distribution" ]; then
         cmake -S "$repo/port" -B "$build_dir" -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_MACOS_DISTRIBUTION=ON \
             -DPORT_VERSION="${version:-b2_us}"
     fi
-    case "$(cache_value PORT_MACOS_DISTRIBUTION)" in
-    ON | on | TRUE | true | YES | yes | 1) ;;
-    *)
+    if ! cache_on PORT_MACOS_DISTRIBUTION; then
         echo "package_macos.sh: $build_dir is configured without -DPORT_MACOS_DISTRIBUTION=ON; give --distribution" \
             "a build directory of its own" >&2
         exit 2
-        ;;
-    esac
+    fi
     if [ -n "$version" ] && [ "$(cache_value PORT_VERSION)" != "$version" ]; then
         echo "package_macos.sh: $build_dir builds $(cache_value PORT_VERSION), not $version" >&2
         exit 2
@@ -132,6 +142,28 @@ if [ -n "$distribution" ]; then
 fi
 if [ ! -f "$build_dir/CMakeCache.txt" ]; then
     echo "package_macos.sh: $build_dir isn't a configured build; run cmake -S port -B $build_dir -G Ninja first" >&2
+    exit 2
+fi
+
+# A sanitized build's app links the toolchain's AddressSanitizer runtime, which make_app.sh copies into it with the
+# other libraries the program loads: an app for testing on this Mac, never one to give out (port/docs/sanitizers.md).
+# So no disk image is made of it, whether the build was configured with PORT_SANITIZE or with -fsanitize= in any of
+# CMake's flags in its cache: every CMAKE_*FLAGS* entry, the compilers' and the linkers' (an executable's, a shared
+# library's), for every configuration (CMAKE_C_FLAGS_RELWITHDEBINFO and its kin), whichever the build uses
+sanitized=
+if cache_on PORT_SANITIZE; then
+    sanitized="-DPORT_SANITIZE=ON"
+else
+    flags=$(sed -n 's/^\(CMAKE_[A-Z_]*FLAGS[A-Z_]*\):[A-Z]*=.*-fsanitize=.*/\1/p' "$build_dir/CMakeCache.txt" |
+        head -n 1)
+    if [ -n "$flags" ]; then
+        sanitized="-fsanitize= in $flags"
+    fi
+fi
+if [ -n "$sanitized" ]; then
+    echo "package_macos.sh: $build_dir is a sanitized build ($sanitized): its app carries the sanitizer runtime and" \
+        "is for testing on this Mac only. Package a build configured without it: build/port, or build/port-dist" \
+        "with --distribution" >&2
     exit 2
 fi
 
@@ -160,9 +192,16 @@ mkdir -p "$(dirname "$out")"
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/package_macos.XXXXXX")
 mount_point="$work/mount"
+# Set from the image's making until it has passed every check: an image that fails one (a sanitizer's runtime in it,
+# say), or that the script stops before checking, is removed on the way out, so that none is left to give out
+unchecked=
 cleanup() {
     if [ -d "$mount_point" ]; then
         hdiutil detach -quiet "$mount_point" 2>/dev/null || true
+    fi
+    if [ -n "$unchecked" ] && [ -e "$out" ]; then
+        rm -f "$out"
+        echo "package_macos.sh: removed $out, which didn't pass its checks" >&2
     fi
     rm -rf "$work"
 }
@@ -175,6 +214,7 @@ ditto "$app" "$work/image/$app_name.app"
 ln -s /Applications "$work/image/Applications"
 # hdiutil create fails now and then for no reason of the image's ("Resource busy", on GitHub's macOS runners above all),
 # so it gets three tries, a few seconds apart, before its last message stops the script
+unchecked=yes
 attempt=1
 while :; do
     rm -f "$out"
@@ -226,8 +266,17 @@ if [ -n "$found" ]; then
     echo "$found" >&2
     exit 1
 fi
+# No sanitizer's runtime (libclang_rt.asan_osx_dynamic.dylib and its kin), whatever made the program load one: the
+# refusal of a sanitized build above knows only what the build's cache says
+found=$(find "$mount_point" -name 'libclang_rt.*' -print)
+if [ -n "$found" ]; then
+    echo "package_macos.sh: the image holds a sanitizer's runtime, so its program is a sanitized one:" >&2
+    echo "$found" >&2
+    exit 1
+fi
 hdiutil detach -quiet "$mount_point"
 rmdir "$mount_point"
+unchecked=
 
 size=$(du -h "$out" | cut -f1)
 echo "package_macos.sh: $out ($size): $app_name.app $app_version, $slices, macOS $app_minimum or later, signed ad hoc"

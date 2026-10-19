@@ -38,6 +38,36 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   every polygon (its stencil clears, its edges' walk) and edge marking waits for all of them. A test that draws random
   scenes both ways, pixel for pixel, is what holds it.
 
+## 2026-10-19: the crash reports and the sanitized build's packaging, after review
+
+- **A check of a CMake cache by a variable's name misses its kin.** CMake keeps each configuration's flags
+  (`CMAKE_C_FLAGS_RELWITHDEBINFO`, `CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO`) and a shared library's linker flags
+  (`CMAKE_SHARED_LINKER_FLAGS`) apart from `CMAKE_C_FLAGS` and `CMAKE_EXE_LINKER_FLAGS`, so a refusal that read those
+  two let a build configured with `-DCMAKE_C_FLAGS_RELWITHDEBINFO="... -fsanitize=address"` through, to build everything
+  and fail only at the image. Match the family (`CMAKE_*FLAGS*`), and give the test one case of each member.
+- **A check after a script writes its output removes the output when it fails.** `package_macos.sh` checked the image
+  it had written, failed with status 1, and left the image where it would have been given out. Whatever a later check
+  can fail is removed on the way out (the `EXIT` trap) until every check has passed.
+- **A backtrace taken in a signal handler may not show the function that faulted.** What `backtrace()` finds after
+  `_sigtramp` is the system's doing: on arm64 macOS the faulting function's frame, at the faulting instruction; on
+  x86_64 under Rosetta a frame at 0 and then only that function's callers, and on a fiber nothing more. The report
+  names the function from the saved program counter instead, as the trap stubs name their caller.
+- **A document that says a test covers something is checked against the test.** sanitizers.md named the test of the
+  image's check before any test reached that check; the test that existed only fed caches to the refusals before it.
+
+## 2026-10-19: the crash reports of SIGFPE, SIGILL and SIGTRAP, and no disk image of a sanitized build
+
+- **On arm64, `__builtin_trap` is a breakpoint.** It is BRK, SIGTRAP on macOS and Linux, where x86-64's UD2 is SIGILL:
+  the host test named `illegal_instruction_fiber` had raised SIGTRAP on Apple Silicon all along, and a handler that
+  took SIGILL alone would have missed the compiler's own traps there. An illegal instruction on arm64 is UDF.
+- **A test of a division's fault divides two opaque operands.** LLVM turns `1 / x` into a comparison (x when it is 1
+  or -1, else 0), so `1 / volatile_zero` never faulted, even as x86-64 code under Rosetta; `10 / volatile_zero`, with
+  the dividend volatile too, did. And arm64 never faults on a division, so a test that wants SIGFPE there raises it.
+- **A crash's address comes from the saved registers, not `si_addr`.** macOS on Apple Silicon gives a raised signal
+  `si_code` 0, as it gives a breakpoint (and Rosetta gave a raised SIGFPE a division's code, 7), so no code tells a
+  sent signal from a trap there; Linux's `si_addr` is 0 for INT3 and holds the sender's pid for a sent signal. The
+  program counter in the handler's context is right in every case.
+
 ## 2026-10-19: the sanitized build's merge, after review
 
 - **A change to what a function does in every build reaches every description of it.** `port_heap_ds_read_begin`

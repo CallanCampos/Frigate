@@ -2,9 +2,12 @@
 // upstream writes its C. Function stubs call port_trap_function; data placeholders sit on pages with no access, and the
 // fault handler names the placeholder that was touched. Either way the program stops with status 70, its message naming
 // the symbol, its address and its caller. It also tells Frigate's test launcher whether a symbol is still a placeholder
-// (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012). The
-// host's pages, faults, backtraces and names come from port/hal/host, the same code on every host here. In the
-// sanitized build the placeholders become readable again at exit, for LeakSanitizer (port/docs/sanitizers.md).
+// (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012). Any
+// other memory fault is a crash, which the fault handler reports as "port: crash: ..." with a backtrace; the crashes
+// that aren't memory faults (a division by zero, an illegal instruction, a breakpoint) the host's seam reports itself,
+// the same way, once the handler is set (port/hal/host/host.h). The host's pages, faults, backtraces and names come
+// from port/hal/host, the same code on every host here. In the sanitized build the placeholders become readable again
+// at exit, for LeakSanitizer (port/docs/sanitizers.md).
 #include "hal/trap.h"
 #include "hal/host/host.h"
 #include <stdio.h>
@@ -139,6 +142,6 @@ void port_trap_protect_data(void) {
     atexit(unprotect_data_at_exit);
 #endif
     // The handler runs on a stack of its own, so that a thread's stack overflowing (the game's threads run on fibers
-    // with guard pages) is still reported
+    // with guard pages) is still reported. From here on the seam reports the processor's other crashes too
     port_host_set_fault_handler(on_fault);
 }

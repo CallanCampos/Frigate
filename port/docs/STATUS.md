@@ -189,6 +189,164 @@ level that doesn't exist yet says "not yet"; no field is left out.
 - **Blockers:** as the last entries: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
   to 14 have no runner and no virtual machine here.
 
+## 2026-10-19: the crash reports and the sanitized build's packaging, after review
+
+- **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-hygiene` after `503080025`; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to
+  rebuild). No file outside `port/` changed.
+- **Host build:** the last entry's machine and builds. `build/port` (Black 2), `build/port-w2` (White 2) and
+  `build/port-san` (Black 2, `-DPORT_SANITIZE=ON`) built again; only `port/`'s files compiled, with no warning, so each
+  build's count stays the last entry's 264, the decomp's. Two more here:
+  - `build/port-x86`, a development build of the x86_64 slice alone (`-DCMAKE_OSX_ARCHITECTURES=x86_64`), with the
+    pinned SDL3 built along from its release's source, copied from the verify tree's distribution build; its
+    `port_host_tests` only (1,872 steps), run under Rosetta.
+  - `build/cfgsan`, configured only, with `-DCMAKE_C_FLAGS_RELWITHDEBINFO="-O2 -g -DNDEBUG -fsanitize=address"`: the
+    review's case.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle and the cached saves, the two builds at once: Black 2, 291 pass
+    and 1 skip of 292 (541 s); White 2, 289 pass and 1 skip of 290 (532 s). Each version's 15 `oracle` tests pass,
+    White 2's starter-save routes among them. The skip is `app_universal_slices`, which a development build's one slice
+    skips. After a last edit of comments in `host.h` and the guides, every build was built again and the 20 tests this
+    round touches (the 18 `host_*`, `app_check_exit`, `app_package_macos_out`) ran again in each, and pass.
+  - T5, `build/port-san`, with the same oracle and Black 2's saves copied in, every test, after that last build: 292
+    pass and 1 skip (the same) of 293 (565 s), its 24 `route` and 15 `oracle` tests among them, with no report of the
+    runtime's. White 2's sanitized build wasn't built in this round.
+  - The x86_64 slice under Rosetta, `build/port-x86`: the 18 `host_*` pass; the division faults there (SIGFPE, no
+    raise) and each report names its scenario's function (`DivideByZero`, `IllegalInstruction`, `Breakpoint`, `Trap`),
+    as the backtrace, which shows `OnFault`, `_sigtramp` and a frame at 0, doesn't. The same POSIX half in a scratch
+    driver of both slices named each function too.
+  - `package_macos.sh --build-dir build/cfgsan` stops with status 2 and the refusal naming
+    `CMAKE_C_FLAGS_RELWITHDEBINFO`, before building anything, where the review found `503080025`'s script building
+    everything.
+    `test_package_macos.sh` passes its 44 checks in about 16 s; run against `503080025`'s script (in a scratch
+    repository), it fails 5: the three new kinds of flag let through, and the stand-in's image kept.
+  - Every run passed `--save-dir` where it runs the program, with `HOME` a scratch directory, and nothing under
+    `~/Library`'s `Application Support/Frigate` or `Logs/Frigate` is newer than 16:33 on 2026-10-18. macOS's crash
+    reporter writes its reports of the crash tests' programs under `~/Library/Logs/DiagnosticReports`, as before. T7
+    not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** as the last entry: 457 function stubs and 46 data placeholders in each version.
+- **64-bit warnings:** as the last entry.
+- **Work done:** the review of `503080025` found the crash handler sound on both macOS slices, on the host's stack and
+  on fibers, and four problems, all fixed:
+  - **The up-front refusal missed flags, and a failed image stayed** (`port/tools/package_macos.sh`). It read
+    `CMAKE_C_FLAGS` and `CMAKE_EXE_LINKER_FLAGS` alone, so a build with `-fsanitize=` in
+    `CMAKE_C_FLAGS_RELWITHDEBINFO`, `CMAKE_EXE_LINKER_FLAGS_<CONFIG>` or `CMAKE_SHARED_LINKER_FLAGS` was built in full;
+    the image's own check then failed with status 1 and left the image in place (the cleanup removed only its work
+    directory). The refusal now reads every `CMAKE_*FLAGS*` entry of the cache and names the one that has
+    `-fsanitize=`; and an image is removed on the way out, with a line saying so, from its making until it has passed
+    every check, so that one that fails a check, or that the script stops before checking, isn't left.
+  - **The image's check had no test**, though sanitizers.md said `app_package_macos_out` covered it.
+    `test_package_macos.sh` now also builds a small CMake project of its own with the build's CMake, generator and
+    compiler: a stand-in app, signed ad hoc, with a library named `libclang_rt.stand_in_osx_dynamic.dylib` in its
+    `Frameworks` and nothing of a sanitizer in its cache. The script packages it, fails with status 1 and the image's
+    message, and leaves no image; the same app without the library is packaged, and its image stays. The refusal's
+    cases cover each kind of flag (`CMAKE_C_FLAGS`, a configuration's, an executable's and a shared library's linker's)
+    and a cache whose comment and `-ADVANCED` entry mention none. The test makes two real images now, so its timeout
+    is 120 s (`port/cmake/macos_app.cmake`).
+  - **The report didn't name the crashing function on x86_64** (`port/hal/host/host_posix.c`). A backtrace taken in
+    the handler shows after `_sigtramp` a frame at 0 and the function's callers under Rosetta, or nothing more on a
+    fiber; on arm64 macOS it does show the faulting frame. The seam's report of SIGFPE, SIGILL and SIGTRAP now names
+    the function from the saved program counter, `  in NAME+0xOFFSET` under the first line, as `trap.c`'s stubs name
+    their caller, when `port_host_function_at` names one: on macOS any of the program's functions, on Linux only an
+    exported one (an ELF program exports none of its own). The host tests check that line on macOS
+    (`port/cmake/host.cmake`): the scenario's function, or `__pthread_kill` for arm64's raised SIGFPE; the scenarios'
+    functions are `noinline` now, so that the name is theirs (`port/tests/host/test_host.c`). Windows' backtrace
+    already starts at the faulting instruction. SIGSEGV and SIGBUS reports, which `trap.c` prints with the address
+    accessed and no instruction, are unchanged.
+  - **The texts:** `tests/README.md`, `test_host.c`'s and `cmake/host.cmake`'s headers said `__builtin_trap` runs on
+    a fiber too; it runs on the host's stack only. `hal/README.md`'s `host_windows.c` row said the vectored handler
+    moves a division by zero, an illegal instruction or a breakpoint off the stack everywhere: off the fibers those go
+    to the unhandled-exception filter, on the faulting stack, which the row and the `host/` row now say. The docstrings
+    of `check_exit.py` and `test_check_exit.py` are wrapped again. host.h, MODDING.md's "When the game stops",
+    sanitizers.md, `README.md`'s macOS app and `tools/README.md` say what changed.
+  - lessons.md has the round's four lessons.
+- **Next:** as the last entry, the user's review of ADR 0014's acceptance first; CI on a branch with these commits for
+  the host tests on Linux and Windows. A SIGSEGV or SIGBUS crash could name its function too, once the fault handler
+  is given the instruction's address as well as the address accessed.
+- **Blockers:** as the last entries.
+
+## 2026-10-19: SIGFPE, SIGILL and SIGTRAP reported on macOS and Linux, and no disk image of a sanitized build
+
+- **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
+- **Port:** `503080025`, on the branch `port-hygiene` from `main` at `607ccd1a6`; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, from nothing in
+  this worktree). No file outside `port/` changed.
+- **Host build:** macOS 26.5.1 on an M2, Xcode 26.6 (Apple clang 21.0.0), RelWithDebInfo, Ninja:
+  - `build/port` (Black 2) and `build/port-w2` (White 2), plain, from nothing, with the oracle (`pbw-oracle`) and each
+    version's `oracle-saves` copied in from the verify tree's builds (White 2's starter save, SHA-1 `3b9dac231d1f`).
+  - `build/port-san` (Black 2), `-DPORT_SANITIZE=ON`, from nothing, its `port_host_tests` only.
+  - The POSIX half alone, `host_posix.c` with a small driver in a scratch directory, built as each macOS slice, the
+    x86_64 one run under Rosetta: a division by zero faults there (SIGFPE, reported at the division), `__builtin_trap`
+    is SIGILL and `__builtin_debugtrap` SIGTRAP, each reported and ending the program by its signal; and the x86_64
+    division again under ASan and UBSan, its check off as in the host test, reported by Frigate's handler (status 136).
+  - Warnings: 264 in each, the decomp's, as the last entries; none in `port/`.
+  - Not built here: Linux and Windows (no Linux or Windows machine here; CI's jobs build and run the new tests on both
+    once a branch with this commit is pushed). The Windows change is one exception added to a list
+    (`host_windows.c`), not compiled here.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle and the cached saves, the two builds at once for most of their
+    runs: Black 2, 291 pass and 1 skip of 292 (621 s); White 2, 289 pass and 1 skip of 290 (598 s). Each version's
+    15 `oracle` tests pass, White 2's starter-save routes among them. The 6 tests more than the last entry's are the
+    new host tests; the skip is `app_universal_slices`, which a development build's one slice skips. After the last
+    edit of a comment in `host_posix.c`, both builds built again and the 20 tests this change touches ran again, and
+    pass.
+  - T5, `build/port-san`, the tests this change touches: the 18 `host_*`, `app_check_exit` and
+    `app_package_macos_out`, all 20 pass, before and after that edit; the runtime reports nothing, the division's
+    scenario reaching Frigate's handler past UBSan's divide check, which the scenario turns off for its one division,
+    and past ASan's own SIGFPE handler, which Frigate's replaces as it replaces ASan's SIGSEGV one.
+  - Every run passed `--save-dir`, with `HOME` a scratch directory, and nothing under `~/Library`'s
+    `Application Support/Frigate` or `Logs/Frigate` is newer than 16:33 on 2026-10-18. macOS's own crash reporter
+    keeps writing a report of each crash test's program under `~/Library/Logs/DiagnosticReports`, as for the crash
+    tests before (up to 25 a program a day); the new tests are seven more such crashes a run. T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** as the last entry: 457 function stubs and 46 data placeholders in each version.
+- **64-bit warnings:** as the last entry.
+- **Work done:** the two follow-ups of the sanitized build's integration (the last entries' Next):
+  - **The crash handler on macOS and Linux reports SIGFPE, SIGILL and SIGTRAP** (`port/hal/host/host_posix.c`). A
+    division by zero on x86-64 (as the Pokédex's scroll bar had, R5 in sanitizers.md) or an illegal instruction ended
+    the program with no word, since only SIGSEGV and SIGBUS were taken; on Apple Silicon `__builtin_trap` is a
+    breakpoint (BRK), SIGTRAP, so the compiler's own traps went unreported there too. The seam now takes all five
+    signals on its alternate stack once the program sets its fault handler (`port_trap_protect_data`, at start-up).
+    SIGSEGV and SIGBUS go to the handler as before (`port/hal/trap.c`: a placeholder's name, or a crash); the other
+    three the seam reports itself, as Windows reports an exception that isn't a memory fault:
+    `port: crash: signal N at address ...`, at the program counter from the handler's saved registers (Linux's
+    `si_addr` is 0 for INT3 and the sender's pid for a sent signal), with the backtrace, then the signal's default
+    action ends the program by that signal (status 128 + N from a shell), as the docs give.
+  - **Windows** reported a division by zero and an illegal instruction everywhere, a fiber included, but a breakpoint
+    (0x80000003) only off the fibers, through the unhandled-exception filter: on a fiber the process ended unreported.
+    `EXCEPTION_BREAKPOINT` is now among `IsFatal`'s exceptions, so the vectored handler reports it on a fiber too.
+  - **Host tests** (`port/tests/host/test_host.c`, `port/cmake/host.cmake`): `divide_by_zero`, `illegal_instruction`,
+    `breakpoint` and `trap`, on the host's stack, and `divide_by_zero_fiber` and `breakpoint_fiber` on a fiber, with
+    `illegal_instruction_fiber` now an illegal instruction on arm64 too (UDF; it had been `__builtin_trap`, a
+    breakpoint there) and its report checked on every host. Each expects the report and the backtrace; the signal on
+    macOS and Linux (SIGFPE 8, SIGILL 4, SIGTRAP 5, and 4 or 5 for `__builtin_trap` by the slice), the exception on
+    Windows (0xc0000094, 0xc000001d, 0x80000003). arm64 divides by zero without a fault, so there the scenario raises
+    SIGFPE itself; the division's operands are both volatile, since LLVM turns `1 / x` into a comparison.
+    `port/tests/app/check_exit.py`'s `--crash` now also requires the program to end by the signal or exception its
+    report names, which `test_check_exit.py` checks both ways.
+  - **`port/tools/package_macos.sh` refuses a sanitized build** before it builds anything: one configured with
+    `PORT_SANITIZE`, or with `-fsanitize=` in its C or linker flags, whose app carries the toolchain's ASan runtime
+    (`make_app.sh` copies it into `Contents/Frameworks`), with a message that names the build and what to package
+    instead; and its checks of the image fail on any `libclang_rt.*` in it. It reads a cache's options as CMake does,
+    in any case (`PORT_MACOS_DISTRIBUTION` too). `make_app.sh` still makes a sanitized build's app, for testing on
+    this Mac, as sanitizers.md has it, and its header says so. `test_package_macos.sh` checks the refusals
+    (`PORT_SANITIZE`, with and without `--distribution`, the flags) and that a build with `PORT_SANITIZE` off goes on.
+  - The guides: `hal/README.md`, `tools/README.md`, `tests/README.md`, `app/README.md`, `README.md`'s macOS app,
+    ARCHITECTURE.md's exit statuses and feature map, MODDING.md's "When the game stops" (each signal and exception by
+    number) and sanitizers.md (the app, the packaging refusal, and a crash in the sanitized build reported as in the
+    plain one); the headers of the files changed and of `cmake/host.cmake`, `cmake/app.cmake` and
+    `cmake/macos_app.cmake`. lessons.md has the round's three lessons. No ADR: the seam's design
+    ([ADR 0013](adr/0013-windows-build-with-msys2-clang64.md)) is unchanged, and its POSIX half now reports what the
+    Windows half did.
+- **Next:** as the last entry, the user's review of ADR 0014's acceptance first; for T5, a nightly run of both
+  versions' sanitized routes and of the x86_64 slice's; CI on a branch with this commit, for the new host tests on
+  Linux and Windows. Then the apps no route reaches yet, and a save with an adventure made by the port, once overlay
+  36 lets it into the field.
+- **Blockers:** as the last entries: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
+  to 14 have no runner and no virtual machine here.
+
 ## 2026-10-19: the sanitized build's merge after review: the read check and CI's smoke test described as they are
 
 - **Upstream:** `56ee36977` (merge of PR #391), as merged into the port's `main` by `6b50636b1`; no sync in this task.

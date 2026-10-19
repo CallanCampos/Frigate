@@ -498,7 +498,9 @@ static int IsMemoryFault(DWORD code) {
            code == EXCEPTION_IN_PAGE_ERROR;
 }
 
-// The exceptions that end a program unless a handler takes them: the memory faults and the processor's other faults
+// The exceptions that end a program unless a handler takes them: the memory faults and the processor's other faults,
+// a breakpoint among them (INT3: __builtin_debugtrap, __debugbreak), as macOS and Linux report SIGTRAP
+// (host_posix.c). A debugger takes a breakpoint of its own before any handler of the program's sees it
 static int IsFatal(DWORD code) {
     switch (code) {
     case EXCEPTION_ILLEGAL_INSTRUCTION:
@@ -507,6 +509,7 @@ static int IsFatal(DWORD code) {
     case EXCEPTION_INT_OVERFLOW:
     case EXCEPTION_DATATYPE_MISALIGNMENT:
     case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+    case EXCEPTION_BREAKPOINT:
         return 1;
     default:
         return IsMemoryFault(code);
