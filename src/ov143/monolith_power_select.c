@@ -270,7 +270,7 @@ static BOOL MonolithPower_Init(GameProc *proc, u32 *state, void *param, void *wo
         if (MonolithPower_DrawList(mpw, screen->work) == TRUE) {
             MonolithPower_UpdateRows(mpw);
             mpw->rowsChanged = TRUE;
-            if (func_0203d554() == FALSE) {
+            if (GCTX_HIDIsUsingTouch() == FALSE) {
                 MonolithPower_SetCursor(mpw, 1, MONOLITH_POWER_CURSOR_DRAG);
             } else {
                 MonolithPower_SetCursor(mpw, MONOLITH_POWER_NONE, MONOLITH_POWER_CURSOR_DRAG);
@@ -324,18 +324,18 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
         break;
     case MONOLITH_POWER_SEQ_WAIT_HELP:
         if (MonolithPower_UpdateMessage(screen->work, mpw) == TRUE &&
-            (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             BOOL visible;
 
             MonolithPower_ClearMessage(mpw);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            if (func_0203da48() == FALSE) {
+            if (GFL_HIDIsTouchPressed() == FALSE) {
                 MonolithPower_SetCursor(mpw, 1, MONOLITH_POWER_CURSOR_DRAG);
             } else {
                 MonolithPower_SetCursor(mpw, MONOLITH_POWER_NONE, MONOLITH_POWER_CURSOR_DRAG);
             }
             visible = TRUE;
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 visible = FALSE;
             }
             MonolithTool_SetTextVisible(&mpw->receiveButton, visible);
@@ -343,19 +343,19 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         break;
     case MONOLITH_POWER_SEQ_WAIT_RELEASE:
-        if (!func_0203da2c() && !(GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (!GFL_HIDIsTouchHeld() && !(GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             *state = MONOLITH_POWER_SEQ_INPUT;
         }
         break;
     case MONOLITH_POWER_SEQ_INPUT:
         pressed = GCTX_HIDGetPressedKeys();
-        hit = func_0203da0c(sMonolithPowerTouchRects);
+        hit = GFL_HIDGetTouchPressedRect(sMonolithPowerTouchRects);
         if (hit == 0 || (pressed & PAD_BUTTON_B)) {
             MonolithTool_PressReturnButton(&mpw->returnButton);
             if (hit == 0) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             } else {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             *state = MONOLITH_POWER_SEQ_RETURN;
@@ -464,17 +464,17 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         break;
     case MONOLITH_POWER_SEQ_UNUSED_SAVE:
-        if (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             MonolithPower_ClearMessage(mpw);
             HighLinkSave_SetPassPower(
                 getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
                 mpw->ids[mpw->selected], 0);
             comm = GSYS_GetGameCommSystem(screen->param->gsys);
-            func_0202bf68(comm, func_020175cc(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
+            func_0202bf68(comm, GameData_GetNetID(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
             mpw->selected = MONOLITH_POWER_NONE;
             MonolithTool_SetPanelPulse(screen, TRUE, 1);
             MonolithTool_SetTextCursor(screen, &mpw->receiveButton, 1, 0xff, 3);
-            if (func_0203da48()) {
+            if (GFL_HIDIsTouchPressed()) {
                 *state = MONOLITH_POWER_SEQ_WAIT_TOUCH_RELEASE;
             } else {
                 *state = MONOLITH_POWER_SEQ_RETURN;
@@ -482,7 +482,7 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         break;
     case MONOLITH_POWER_SEQ_WAIT_TOUCH_RELEASE:
-        if (!func_0203da2c()) {
+        if (!GFL_HIDIsTouchHeld()) {
             *state = MONOLITH_POWER_SEQ_RETURN;
         }
         break;
@@ -548,14 +548,14 @@ static BOOL MonolithPower_Exit(GameProc *proc, u32 *state, void *param, void *wo
     MonolithScreenParam *screen = param;
     MonolithPowerWork *mpw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     MonolithPower_SaveEquipped(screen, mpw);
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG3);
     GFL_TCBRemove(mpw->vblankTask);
     if (mpw->print_stream != NULL) {
-        func_020223cc(mpw->print_stream);
+        PrintStream_Delete(mpw->print_stream);
     }
     if (mpw->msgStr != NULL) {
         GFL_StrBufFree(mpw->msgStr);
@@ -646,8 +646,8 @@ static void MonolithPower_ShowMessage(MonolithPowerWork *mpw, MonolithWork *wk, 
     GFL_ASSERT(mpw->print_stream == NULL);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     mpw->msgStr = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, msgId);
-    mpw->print_stream = func_02022268(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, func_02017bcc(), wk->tcbMgr, 10,
-                                      HEAPID_MONOLITH, 15);
+    mpw->print_stream = PrintStream_Create(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, TextSpeed_GetCurrentWait(),
+                                           wk->tcbMgr, 10, HEAPID_MONOLITH, 15);
     BmpWin_FlushMap(mpw->windows[0]);
     BmpWin_DrawFrame(mpw->windows[0], TRUE, 1, 11);
 }
@@ -661,8 +661,8 @@ static void MonolithPower_ShowMessageExpanded(MonolithPowerWork *mpw, MonolithWo
     mpw->msgStr = GFL_StrBufCreate(256, HEAPID_MONOLITH);
     GFL_WordSetFormatStrbuf(wk->wordSet, mpw->msgStr, str);
     GFL_StrBufFree(str);
-    mpw->print_stream = func_02022268(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, func_02017bcc(), wk->tcbMgr, 10,
-                                      HEAPID_MONOLITH, 15);
+    mpw->print_stream = PrintStream_Create(mpw->windows[0], 0, 0, mpw->msgStr, wk->font, TextSpeed_GetCurrentWait(),
+                                           wk->tcbMgr, 10, HEAPID_MONOLITH, 15);
     BmpWin_FlushMap(mpw->windows[0]);
     BmpWin_DrawFrame(mpw->windows[0], TRUE, 1, 11);
 }
@@ -678,7 +678,7 @@ static void MonolithPower_ClearMessage(MonolithPowerWork *mpw) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(mpw->windows[0]);
 
     GFL_ASSERT(mpw->print_stream != NULL);
-    func_020223cc(mpw->print_stream);
+    PrintStream_Delete(mpw->print_stream);
     mpw->print_stream = NULL;
     GFL_StrBufFree(mpw->msgStr);
     mpw->msgStr = NULL;
@@ -784,7 +784,7 @@ static void MonolithPower_DeleteRowActors(MonolithPowerWork *mpw) {
 
 static void MonolithPower_CreateReceiveButton(MonolithScreenParam *screen, MonolithPowerWork *mpw) {
     MonolithTool_CreateText(screen->work, &mpw->receiveButton, 1, MONOLITH_TEXT_NARROW, 64, 180, 37, NULL);
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         MonolithTool_SetTextVisible(&mpw->receiveButton, FALSE);
     }
 }
@@ -812,8 +812,8 @@ static void MonolithPower_UpdateReturnButton(MonolithPowerWork *mpw) {
 static void MonolithPower_CreateArrows(MonolithScreenParam *screen, MonolithPowerWork *mpw) {
     mpw->arrowUp = MonolithTool_CreateActor(screen->work, 128, 28, 9);
     mpw->arrowDown = MonolithTool_CreateActor(screen->work, 128, 164, 10);
-    func_0204c124(mpw->arrowUp, FALSE);
-    func_0204c124(mpw->arrowDown, FALSE);
+    ClActor_SetVisible(mpw->arrowUp, FALSE);
+    ClActor_SetVisible(mpw->arrowDown, FALSE);
 }
 
 static void MonolithPower_DeleteArrows(MonolithPowerWork *mpw) {
@@ -824,14 +824,14 @@ static void MonolithPower_DeleteArrows(MonolithPowerWork *mpw) {
 // Shows the arrows where the list goes on
 static void MonolithPower_UpdateArrows(MonolithPowerWork *mpw) {
     if (mpw->scroll <= (8 << 8)) {
-        func_0204c124(mpw->arrowUp, FALSE);
+        ClActor_SetVisible(mpw->arrowUp, FALSE);
     } else {
-        func_0204c124(mpw->arrowUp, TRUE);
+        ClActor_SetVisible(mpw->arrowUp, TRUE);
     }
     if ((mpw->scroll >> 8) >= mpw->count * MONOLITH_POWER_ROW_HEIGHT - 200) {
-        func_0204c124(mpw->arrowDown, FALSE);
+        ClActor_SetVisible(mpw->arrowDown, FALSE);
     } else {
-        func_0204c124(mpw->arrowDown, TRUE);
+        ClActor_SetVisible(mpw->arrowDown, TRUE);
     }
     MonolithTool_UpdateActor(mpw->arrowUp);
     MonolithTool_UpdateActor(mpw->arrowDown);
@@ -850,7 +850,7 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
     int diff;
 
     mpw->keyScroll = 0;
-    touching = func_0203da84(&x, &y);
+    touching = GFL_HIDGetTouchHeldPoint(&x, &y);
     if (mpw->dragFrames == 0 && (x < 24 || x > 224)) {
         touching = FALSE;
     }
@@ -876,7 +876,7 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             MonolithPower_SetCursor(mpw, mpw->cursor, MONOLITH_POWER_CURSOR_KEYS);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (mpw->states[mpw->cursor] == 0) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             } else {
@@ -915,11 +915,11 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
                 mpw->lastY = y;
                 mpw->tapY = y;
                 MonolithPower_SetCursor(mpw, MONOLITH_POWER_NONE, MONOLITH_POWER_CURSOR_DRAG);
-            } else if (func_0203da48() == TRUE && mpw->cursor != MONOLITH_POWER_NONE && x >= 16 && x <= 112 &&
+            } else if (GFL_HIDIsTouchPressed() == TRUE && mpw->cursor != MONOLITH_POWER_NONE && x >= 16 && x <= 112 &&
                        y >= 172 && y <= 188) {
                 picked = TRUE;
                 index = mpw->cursor;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         } else if (mpw->velocity != 0) {
             if (mpw->velocity > 0) {
@@ -1152,7 +1152,7 @@ static int MonolithPower_WaitReceived(MonolithScreenParam *screen, MonolithPower
     int slot;
 
     MonolithPower_UpdateKeyCursor(mpw, FALSE);
-    if (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+    if (GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
         MonolithPower_ClearMessage(mpw);
         mpw->selected = MONOLITH_POWER_NONE;
         MonolithTool_SetPanelPulse(screen, TRUE, 1);

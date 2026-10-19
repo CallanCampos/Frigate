@@ -63,8 +63,8 @@ void CARDi_InitTwlRom(void) {
         CARD_LockRom(lockId);
 
         header = CARD_GetOwnRomHeaderTWL();
-        func_02767a14(sSecureWork, header, sSecureAreaStart, sSecureAreaSize, CARDi_ReadRomWithCPU, CARDi_ReadSecureRomWithDMA,
-                      sSecureWork);
+        func_02767a14(sSecureWork, header, sSecureAreaStart, sSecureAreaSize, CARDi_ReadRomWithCPU,
+                      CARDi_ReadSecureRomWithDMA, sSecureWork);
 
         sSecureAreaStart = 0;
         sSecureAreaSize = 0;

@@ -1,9 +1,9 @@
-func_ov155_021f59e0 kind:function(thumb,size=0xd8) addr:0x021f5a20
+EventFaceUpStart_Create kind:function(thumb,size=0xd8) addr:0x021f5a20
 EventFaceUpStart_Callback kind:function(thumb,size=0x7a) addr:0x021f5af8
 FaceUp_LoadGraphics kind:function(thumb,size=0x19c) addr:0x021f5b74
-func_ov155_021f5cd0 kind:function(thumb,size=0x28) addr:0x021f5d10
-func_ov155_021f5cf8 kind:function(thumb,size=0x12) addr:0x021f5d38
-func_ov155_021f5d0c kind:function(thumb,size=0x12) addr:0x021f5d4c
+EventFaceUpEnd_Create kind:function(thumb,size=0x28) addr:0x021f5d10
+FaceUp_FreeNow kind:function(thumb,size=0x12) addr:0x021f5d38
+FaceUp_StartTalk kind:function(thumb,size=0x12) addr:0x021f5d4c
 EventFaceUpEnd_Callback kind:function(thumb,size=0xa6) addr:0x021f5d60
 FaceUp_Free kind:function(thumb,size=0x78) addr:0x021f5e08
 FaceUp_SaveBGPriorities kind:function(thumb,size=0x18) addr:0x021f5e80

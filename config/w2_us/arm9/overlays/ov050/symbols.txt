@@ -1,6 +1,6 @@
-func_ov050_021e5800 kind:function(thumb,size=0x38) addr:0x021e5840
-func_ov050_021e5838 kind:function(thumb,size=0x1c) addr:0x021e5878
-func_ov050_021e5854 kind:function(thumb,size=0x2a) addr:0x021e5894
+BSubwayCmd_CreateWork kind:function(thumb,size=0x38) addr:0x021e5840
+BSubwayCmd_ClearWork kind:function(thumb,size=0x1c) addr:0x021e5878
+BSubwayCmd_FreeWork kind:function(thumb,size=0x2a) addr:0x021e5894
 BSubwayCmd_Tool kind:function(thumb,size=0x1128) addr:0x021e58c0
 .L_021e5e6a kind:label(thumb) addr:0x021e5e6a local
 .L_021e6312 kind:label(thumb) addr:0x021e6312
@@ -54,23 +54,23 @@ BSubwayCmd_Tool kind:function(thumb,size=0x1128) addr:0x021e58c0
 .L_021e69d4 kind:label(thumb) addr:0x021e69d4 local
 .L_021e69d6 kind:label(thumb) addr:0x021e69d6
 .L_021e69d8 kind:label(thumb) addr:0x021e69d8 local
-func_ov050_021e69a8 kind:function(thumb,size=0x24) addr:0x021e69e8
-func_ov050_021e69cc kind:function(thumb,size=0x54) addr:0x021e6a0c
-func_ov050_021e6a20 kind:function(thumb,size=0x94) addr:0x021e6a60
-func_ov050_021e6ab4 kind:function(thumb,size=0x84) addr:0x021e6af4
-func_ov050_021e6b38 kind:function(thumb,size=0x40) addr:0x021e6b78
-func_ov050_021e6b78 kind:function(thumb,size=0x66) addr:0x021e6bb8
-func_ov050_021e6be0 kind:function(thumb,size=0x20) addr:0x021e6c20
-func_ov050_021e6c00 kind:function(thumb,size=0x86) addr:0x021e6c40
-func_ov050_021e6c88 kind:function(thumb,size=0x28) addr:0x021e6cc8
-func_ov050_021e6cb0 kind:function(thumb,size=0x1bc) addr:0x021e6cf0
+ScriptNative_BSubwaySendWait kind:function(thumb,size=0x24) addr:0x021e69e8
+ScriptNative_BSubwayTimingWait kind:function(thumb,size=0x54) addr:0x021e6a0c
+ScriptNative_BSubwayParentEntryMenuWait kind:function(thumb,size=0x94) addr:0x021e6a60
+ScriptNative_BSubwayChildEntryMenuWait kind:function(thumb,size=0x84) addr:0x021e6af4
+ScriptNative_BSubwayRecvWait kind:function(thumb,size=0x40) addr:0x021e6b78
+EventBSubwayCommEnd_Callback kind:function(thumb,size=0x66) addr:0x021e6bb8
+EventBSubwayCommEnd_Create kind:function(thumb,size=0x20) addr:0x021e6c20
+EventBSubwayMsgWindow_Callback kind:function(thumb,size=0x86) addr:0x021e6c40
+EventBSubwayMsgWindow_Create kind:function(thumb,size=0x28) addr:0x021e6cc8
+BSubway_PlacePassengers kind:function(thumb,size=0x1bc) addr:0x021e6cf0
 func_ov050_021e6e6c kind:function(thumb,size=0xc) addr:0x021e6eac
 func_ov050_021e6e78 kind:function(thumb,size=0x24) addr:0x021e6eb8
 func_ov050_021e6e9c kind:function(thumb,size=0x44) addr:0x021e6edc
-func_ov050_021e6ee0 kind:function(thumb,size=0x80) addr:0x021e6f20
-func_ov050_021e6f60 kind:function(thumb,size=0x2e) addr:0x021e6fa0
-func_ov050_021e6f90 kind:function(thumb,size=0x44) addr:0x021e6fd0
-func_ov050_021e6fd4 kind:function(thumb,size=0x32) addr:0x021e7014
+ScriptNative_BSubwayBattleRecSaveWait kind:function(thumb,size=0x80) addr:0x021e6f20
+BSubway_GetModeRegulation kind:function(thumb,size=0x2e) addr:0x021e6fa0
+BSubway_GetZonePlayMode kind:function(thumb,size=0x44) addr:0x021e6fd0
+BSubway_GetPlayerObjCode kind:function(thumb,size=0x32) addr:0x021e7014
 data_ov050_021e7008 kind:data(any) addr:0x021e7048
 data_ov050_021e701a kind:data(any) addr:0x021e705a
 data_ov050_021e702c kind:data(any) addr:0x021e706c

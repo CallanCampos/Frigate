@@ -1,14 +1,14 @@
-func_ov098_021eec80 kind:function(thumb,size=0x138) addr:0x021eec80
-func_ov098_021eedb8 kind:function(thumb,size=0x24) addr:0x021eedb8
-func_ov098_021eeddc kind:function(thumb,size=0x2e) addr:0x021eeddc
-func_ov098_021eee0c kind:function(thumb,size=0x3c) addr:0x021eee0c
-func_ov098_021eee48 kind:function(thumb,size=0x3c) addr:0x021eee48
-func_ov098_021eee84 kind:function(thumb,size=0x44) addr:0x021eee84
-func_ov098_021eeec8 kind:function(thumb,size=0x30) addr:0x021eeec8
-func_ov098_021eeef8 kind:function(thumb,size=0x6e) addr:0x021eeef8
-func_ov098_021eef68 kind:function(thumb,size=0x10) addr:0x021eef68
-func_ov098_021eef78 kind:function(thumb,size=0xae) addr:0x021eef78
-func_ov098_021ef028 kind:function(thumb,size=0xce) addr:0x021ef028
+GymIcirrus_Init kind:function(thumb,size=0x138) addr:0x021eec80
+GymIcirrus_End kind:function(thumb,size=0x24) addr:0x021eedb8
+GymIcirrus_Update kind:function(thumb,size=0x2e) addr:0x021eeddc
+GymIcirrus_CreateSwitchAnimEvent kind:function(thumb,size=0x3c) addr:0x021eee0c
+GymIcirrus_CreateFlipSwitchEvent kind:function(thumb,size=0x3c) addr:0x021eee48
+GymIcirrus_ToggleMovementAtPlace kind:function(thumb,size=0x44) addr:0x021eee84
+GymIcirrus_IsPlaceSwitchReady kind:function(thumb,size=0x30) addr:0x021eeec8
+GymIcirrus_ShowSwitchState kind:function(thumb,size=0x6e) addr:0x021eeef8
+GymIcirrus_IsSwitchFlipped kind:function(thumb,size=0x10) addr:0x021eef68
+GymIcirrus_SwitchAnimEvent kind:function(thumb,size=0xae) addr:0x021eef78
+GymIcirrus_FlipSwitchEvent kind:function(thumb,size=0xce) addr:0x021ef028
 data_ov098_021ef0f8 kind:data(any) addr:0x021ef0f8
 data_ov098_021ef100 kind:data(any) addr:0x021ef100
 data_ov098_021ef105 kind:data(any) addr:0x021ef105 ambiguous

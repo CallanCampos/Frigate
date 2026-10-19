@@ -226,13 +226,13 @@ void BBagBmp_PrintPageNumber(BBagWork *work) {
     str = GFL_MsgDataLoadStrbufNew(work->msgData, 28);
     slashWidth = GFL_FontGetBlockWidth(str, work->param->font, 0);
     x = (BmpWin_GetSizeX(win) * 8 - slashWidth) / 2;
-    func_02021c7c(work->printQueue, bitmap, x, 4, str, work->param->font, BBAG_COLOR);
+    PrintQueue_PrintColor(work->printQueue, bitmap, x, 4, str, work->param->font, BBAG_COLOR);
     GFL_StrBufFree(str);
 
     str = GFL_MsgDataLoadStrbufNew(work->msgData, 29);
     WordSetNumber(work->wordSet, 0, work->lastPage[work->pocket] + 1, 2, NUM_PAD_NONE, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->strBuf, str);
-    func_02021c7c(work->printQueue, bitmap, x + slashWidth, 4, work->strBuf, work->param->font, BBAG_COLOR);
+    PrintQueue_PrintColor(work->printQueue, bitmap, x + slashWidth, 4, work->strBuf, work->param->font, BBAG_COLOR);
     GFL_StrBufFree(str);
 
     str = GFL_MsgDataLoadStrbufNew(work->msgData, 30);
@@ -318,8 +318,8 @@ void BBagBmp_OpenMessage(BBagWork *work) {
 
 static void BBagBmp_StartMessageStream(BBagWork *work) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
-    work->printStream = func_02022268(work->msgWin, 0, 0, work->strBuf, work->param->font, func_02017bcc(),
-                                      work->tcbExMgr, 10, work->param->heapId, 15);
+    work->printStream = PrintStream_Create(work->msgWin, 0, 0, work->strBuf, work->param->font,
+                                           TextSpeed_GetCurrentWait(), work->tcbExMgr, 10, work->param->heapId, 15);
     BmpWin_Transfer(work->msgWin);
 }
 

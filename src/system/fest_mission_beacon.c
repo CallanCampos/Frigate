@@ -19,7 +19,7 @@
 // fest_mission.c's in .rodata, so it is a file of its own that starts between FestMissionConfig_FromBeacon and
 // FestMissionLog_Add.
 
-// What func_020157dc returns for a beacon's mission: an offer's index, or one of these
+// What FestMissionOffers_Find returns for a beacon's mission: an offer's index, or one of these
 #define FEST_MISSION_OFFER_NEW FEST_MISSION_OFFER_MAX
 #define FEST_MISSION_OFFER_REJECT 4
 
@@ -39,15 +39,15 @@ typedef BOOL (*FestMissionCheckFunc)(const FestMissionInfo *info);
 
 static int FestMissionLog_Add(FestMissionLog *log, const FestMissionLogEntry *entry);
 static void FestMissionOffer_Clear(FestMissionOffer *offer);
-static BOOL func_0201560c(const FestMissionInfo *info);
-static BOOL func_0201562c(const FestMissionInfo *info);
-static BOOL func_02015658(const FestMissionInfo *info);
-static BOOL func_02015684(const FestMissionInfo *info);
-static BOOL func_0201569c(const FestMissionInfo *info);
-static u8 func_020156c8(const GameBeacon *beacon, u32 mode);
-static BOOL func_020156f8(LinkFestival *festival, FestMissionLogEntry *entry, const GameBeacon *beacon, u32 score,
-                          u32 mode, u32 own);
-static int func_020157dc(LinkFestival *festival, const GameBeacon *beacon);
+static BOOL FestMission_IsKind1TargetInvalid(const FestMissionInfo *info);
+static BOOL FestMission_IsKind2TargetInvalid(const FestMissionInfo *info);
+static BOOL FestMission_IsKind3TargetInvalid(const FestMissionInfo *info);
+static BOOL FestMission_IsKind4TargetInvalid(const FestMissionInfo *info);
+static BOOL FestMission_IsKind5TargetInvalid(const FestMissionInfo *info);
+static u8 FestMissionLog_GetKind(const GameBeacon *beacon, u32 mode);
+static BOOL FestMissionLogEntry_FromBeacon(LinkFestival *festival, FestMissionLogEntry *entry, const GameBeacon *beacon,
+                                           u32 score, u32 mode, u32 own);
+static int FestMissionOffers_Find(LinkFestival *festival, const GameBeacon *beacon);
 
 // What unk0_20 has to be below for each target of a mission of kind 5, or 0 when it can be anything
 static const u16 FestMission_Kind5Max[10] = { 0, 0, 3, 5, 0, 0, 3, 2, 20, 0 };
@@ -56,11 +56,11 @@ static const u16 FestMission_Kind5Max[10] = { 0, 0, 3, 5, 0, 0, 3, 2, 20, 0 };
 // clang-format off
 static const FestMissionCheckFunc FestMission_CheckFuncs[6] = {
     NULL,
-    func_0201560c,
-    func_0201562c,
-    func_02015658,
-    func_02015684,
-    func_0201569c,
+    FestMission_IsKind1TargetInvalid,
+    FestMission_IsKind2TargetInvalid,
+    FestMission_IsKind3TargetInvalid,
+    FestMission_IsKind4TargetInvalid,
+    FestMission_IsKind5TargetInvalid,
 };
 
 // clang-format on
@@ -80,7 +80,7 @@ void FestMissionLogEntry_Clear(FestMissionLogEntry *entry) {
     MIi_CpuClear16(terminator, entry->text, sizeof(entry->text));
 }
 
-void func_02015018(const FestMissionLogEntry *entry, StrBuf *dest) {
+void FestMissionLogEntry_GetName(const FestMissionLogEntry *entry, StrBuf *dest) {
     GFL_StrBufLoadFixedString(dest, entry->name, 8);
 }
 
@@ -109,7 +109,7 @@ static int FestMissionLog_Add(FestMissionLog *log, const FestMissionLogEntry *en
 void FestMissionLog_AddBeacon(LinkFestival *festival, const GameBeacon *beacon, u32 score, u32 mode, u32 own) {
     FestMissionLogEntry entry;
 
-    if (func_020156f8(festival, &entry, beacon, score, mode, own)) {
+    if (FestMissionLogEntry_FromBeacon(festival, &entry, beacon, score, mode, own)) {
         FestMissionLog_Add(&festival->log, &entry);
     }
 }
@@ -137,7 +137,7 @@ void FestMissionPassPower_Clear(FestMissionPassPower *passPower) {
     MIi_CpuClear16(GFL_StrBufGetTerminator(), passPower->name, sizeof(passPower->name));
 }
 
-void func_02015198(FestMissionPassPowers *passPowers) {
+void FestMissionPassPowers_Clear(FestMissionPassPowers *passPowers) {
     int i;
 
     FestMissionPassPower_Clear(&passPowers->own);
@@ -175,7 +175,7 @@ BOOL FestMissionPassPowers_AddBeacon(FestMissionPassPowers *passPowers, const Ga
     return TRUE;
 }
 
-u16 func_02015248(FestMissionPassPower *passPower, const FestMissionLogEntry *entry) {
+u16 FestMissionPassPower_FromLogEntry(FestMissionPassPower *passPower, const FestMissionLogEntry *entry) {
     FestMissionPassPower_Clear(passPower);
     passPower->passPower = entry->value;
     passPower->received = FALSE;
@@ -197,7 +197,7 @@ void FestMissionOffers_AddBeacon(LinkFestival *festival, const GameBeacon *beaco
     if (!func_0202cf98(beacon)) {
         return;
     }
-    index = func_020157dc(festival, beacon);
+    index = FestMissionOffers_Find(festival, beacon);
     if (index == FEST_MISSION_OFFER_REJECT) {
         return;
     }
@@ -260,7 +260,7 @@ void FestMissionOffers_Remove(LinkFestival *festival, FestMissionConfig *config)
     }
 }
 
-u8 func_02015444(u32 kind) {
+u8 FestMission_GetLogCategory(u32 kind) {
     if (kind >= LOG_KIND_MAX) {
         return 0;
     }
@@ -300,11 +300,11 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
             return TRUE;
         }
     }
-    kind = func_020156c8(beacon, 2);
+    kind = FestMissionLog_GetKind(beacon, 2);
     if (kind == LOG_KIND_NONE) {
         return FALSE;
     }
-    switch (func_02015444(kind)) {
+    switch (FestMission_GetLogCategory(kind)) {
     case 1:
         if (PML_ItemIsDummy(info->unkC_0)) {
             return TRUE;
@@ -329,14 +329,14 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
     return FALSE;
 }
 
-static BOOL func_0201560c(const FestMissionInfo *info) {
+static BOOL FestMission_IsKind1TargetInvalid(const FestMissionInfo *info) {
     if (info->target > SPECIES_GENESECT || info->unk0_20 != 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_0201562c(const FestMissionInfo *info) {
+static BOOL FestMission_IsKind2TargetInvalid(const FestMissionInfo *info) {
     // BUG: the target can't be both, so only a target of 0 is valid
 #ifdef BUGFIX
     if (info->target != 0 && info->target != 590 && info->target != 591) {
@@ -351,7 +351,7 @@ static BOOL func_0201562c(const FestMissionInfo *info) {
     return FALSE;
 }
 
-static BOOL func_02015658(const FestMissionInfo *info) {
+static BOOL FestMission_IsKind3TargetInvalid(const FestMissionInfo *info) {
     if (info->target >= 6) {
         return TRUE;
     }
@@ -365,14 +365,14 @@ static BOOL func_02015658(const FestMissionInfo *info) {
     return FALSE;
 }
 
-static BOOL func_02015684(const FestMissionInfo *info) {
+static BOOL FestMission_IsKind4TargetInvalid(const FestMissionInfo *info) {
     if (info->target >= 17 || info->unk0_20 != 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_0201569c(const FestMissionInfo *info) {
+static BOOL FestMission_IsKind5TargetInvalid(const FestMissionInfo *info) {
     u16 max;
 
     if (info->target >= 9) {
@@ -386,7 +386,7 @@ static BOOL func_0201569c(const FestMissionInfo *info) {
 }
 
 // The kind of a log entry: mode 0 is the start of the mission, 1 a player met, and 2 what the beacon's type says
-static u8 func_020156c8(const GameBeacon *beacon, u32 mode) {
+static u8 FestMissionLog_GetKind(const GameBeacon *beacon, u32 mode) {
     switch (mode) {
     case 0:
         return LOG_KIND_START;
@@ -402,9 +402,9 @@ static u8 func_020156c8(const GameBeacon *beacon, u32 mode) {
 }
 
 // Fills a log entry from a beacon; FALSE when the beacon is not to be logged
-static BOOL func_020156f8(LinkFestival *festival, FestMissionLogEntry *entry, const GameBeacon *beacon, u32 score,
-                          u32 mode, u32 own) {
-    u8 kind = func_020156c8(beacon, mode);
+static BOOL FestMissionLogEntry_FromBeacon(LinkFestival *festival, FestMissionLogEntry *entry, const GameBeacon *beacon,
+                                           u32 score, u32 mode, u32 own) {
+    u8 kind = FestMissionLog_GetKind(beacon, mode);
 
     if (kind == LOG_KIND_NONE) {
         return FALSE;
@@ -438,7 +438,7 @@ static BOOL func_020156f8(LinkFestival *festival, FestMissionLogEntry *entry, co
 
 // Where the mission of a beacon goes in the offers: the index of its offer when the beacon is newer,
 // FEST_MISSION_OFFER_NEW, or FEST_MISSION_OFFER_REJECT
-static int func_020157dc(LinkFestival *festival, const GameBeacon *beacon) {
+static int FestMissionOffers_Find(LinkFestival *festival, const GameBeacon *beacon) {
     FestMissionOffers *offers = &festival->offers;
     FestMissionConfig config;
     int i;

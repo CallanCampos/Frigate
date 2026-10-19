@@ -133,14 +133,14 @@ static void func_ov036_021c6834(FieldEffectTask *task, void *work) {
     HideTaskParams *params = func_ov036_021a3ac8(task);
 
     hideTask->params = *params;
-    func_ov012_02167d88(hideTask->params.actor, &hideTask->identity);
+    FldAct_GetIdentity(hideTask->params.actor, &hideTask->identity);
     hideTask->objIdx = hideTask->params.effect->objIdx[hideTask->params.kind];
 }
 
 static void func_ov036_021c6860(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
 
-    if (func_ov012_02167da8(hideTask->params.actor, &hideTask->identity) == TRUE) {
+    if (FldAct_CheckIdentity(hideTask->params.actor, &hideTask->identity) == TRUE) {
         func_ov036_02193110(hideTask->params.actor, NULL);
     }
 }
@@ -150,7 +150,7 @@ static void func_ov036_021c687c(FieldEffectTask *task, void *work) {
     VecFx32 pos;
     fx32 height;
 
-    if (func_ov012_02167da8(hideTask->params.actor, &hideTask->identity) == FALSE) {
+    if (FldAct_CheckIdentity(hideTask->params.actor, &hideTask->identity) == FALSE) {
         func_ov036_021a3a70(task);
         return;
     }

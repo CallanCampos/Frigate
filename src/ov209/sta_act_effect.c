@@ -12,7 +12,7 @@ StaActEffectSys *StaActEffect_InitSystem(HeapID heapId) {
     StaActEffectSys *sys = GFL_HeapAllocate(heapId, sizeof(StaActEffectSys), FALSE, "sta_act_effect.c", 76);
 
     sys->heapId = heapId;
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     for (i = 0; i < STA_ACT_EFFECT_MAX; i++) {
         sys->effects[i].active = FALSE;
     }
@@ -27,16 +27,16 @@ void StaActEffect_TermSystem(StaActEffectSys *sys) {
             StaActEffect_DelEffect(sys, &sys->effects[i]);
         }
     }
-    func_0204fb4c();
+    Particle_Free();
     GFL_HeapFree(sys);
 }
 
 void StaActEffect_UpdateSystem(StaActEffectSys *sys) {
-    func_02050044();
+    Particle_UpdateAll();
 }
 
 void StaActEffect_DrawSystem(StaActEffectSys *sys) {
-    func_0205001c();
+    Particle_DrawAll();
 }
 
 StaActEffect *StaActEffect_AddEffect(StaActEffectSys *sys, u32 fileId) {
@@ -49,9 +49,9 @@ StaActEffect *StaActEffect_AddEffect(StaActEffectSys *sys, u32 fileId) {
             effect = &sys->effects[i];
         }
     }
-    effect->ptc = func_0204f968(effect->ptcWork, sizeof(effect->ptcWork), FALSE, sys->heapId);
-    res = func_0204fdf8(ARCID_MUSICAL, fileId, sys->heapId);
-    func_0204fe04(effect->ptc, res, FALSE, GFL_VBlankGetTCBMgr());
+    effect->ptc = Particle_CreateSystem(effect->ptcWork, sizeof(effect->ptcWork), FALSE, sys->heapId);
+    res = Particle_ReadResource(ARCID_MUSICAL, fileId, sys->heapId);
+    Particle_SetResource(effect->ptc, res, FALSE, GFL_VBlankGetTCBMgr());
     for (i = 0; i < STA_ACT_EFFECT_EMITTER_MAX; i++) {
         effect->emitters[i].emitter = NULL;
     }
@@ -61,12 +61,12 @@ StaActEffect *StaActEffect_AddEffect(StaActEffectSys *sys, u32 fileId) {
 
 void StaActEffect_DelEffect(StaActEffectSys *sys, StaActEffect *effect) {
     effect->active = FALSE;
-    func_020500b0(effect->ptc);
-    func_0204fa84(effect->ptc);
+    Particle_DeleteAllEmitters(effect->ptc);
+    Particle_DeleteSystem(effect->ptc);
 }
 
 void StaActEffect_CreateEmitter(StaActEffect *effect, u16 emitterNo, VecFx32 *pos) {
-    SPLEmitter *emitter = func_0205006c(effect->ptc, emitterNo, pos);
+    SPLEmitter *emitter = Particle_CreateEmitter(effect->ptc, emitterNo, pos);
 
     if (emitter == NULL || emitterNo < STA_ACT_EFFECT_EMITTER_MAX) {
         effect->emitters[emitterNo].emitter = emitter;
@@ -76,12 +76,12 @@ void StaActEffect_CreateEmitter(StaActEffect *effect, u16 emitterNo, VecFx32 *po
 
 void StaActEffect_DeleteEmitter(StaActEffect *effect, u16 emitterNo) {
     if (effect->emitters[emitterNo].emitter != NULL) {
-        func_020500bc(effect->ptc, effect->emitters[emitterNo].emitter);
+        Particle_DeleteEmitter(effect->ptc, effect->emitters[emitterNo].emitter);
     }
 }
 
 void StaActEffect_SetPosition(StaActEffect *effect, u16 emitterNo, VecFx32 *pos) {
     if (effect->emitters[emitterNo].emitter != NULL) {
-        func_02050208(effect->emitters[emitterNo].emitter, pos);
+        ParticleEmitter_SetPosition(effect->emitters[emitterNo].emitter, pos);
     }
 }

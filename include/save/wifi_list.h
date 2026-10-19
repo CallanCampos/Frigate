@@ -16,7 +16,7 @@
 #define PAL_PAD_PLAYER_MAX 100
 #define PAL_PAD_TRADE_COUNT_MAX 99999
 
-// What func_02009f80 gives and func_0200a034 sets of a friend
+// What WifiList_GetFriendParam gives and WifiList_SetFriendParam sets of a friend
 #define WIFI_LIST_FRIEND_ID 0
 #define WIFI_LIST_FRIEND_PROFILE_ID 1
 #define WIFI_LIST_FRIEND_WINS 2
@@ -69,55 +69,55 @@ WifiList *populateWifiList(u32 heapId);
 void copyWifilist(const WifiList *src, WifiList *dest);
 void initWifi(WifiList *wifiList);
 // The player's DWC user data
-DWCUserData *func_02009f7c(WifiList *wifiList);
+DWCUserData *WifiList_GetMyUserData(WifiList *wifiList);
 // A friend's WIFI_LIST_FRIEND_* field; the record fields can't be set
-u32 func_02009f80(WifiList *wifiList, u32 index, u32 param);
-void func_0200a034(WifiList *wifiList, u32 index, u32 param, u32 value);
-DWCFriendData *func_0200a0e4(WifiList *wifiList, u32 index);
+u32 WifiList_GetFriendParam(WifiList *wifiList, u32 index, u32 param);
+void WifiList_SetFriendParam(WifiList *wifiList, u32 index, u32 param, u32 value);
+DWCFriendData *WifiList_GetFriendData(WifiList *wifiList, u32 index);
 // A friend's name, and loading or storing it through a StrBuf
-u16 *func_0200a0f0(WifiList *wifiList, u32 index);
-void func_0200a100(WifiList *wifiList, u32 index, StrBuf *dest);
-void func_0200a11c(WifiList *wifiList, u32 index, const StrBuf *src);
+u16 *WifiList_GetFriendName(WifiList *wifiList, u32 index);
+void WifiList_LoadFriendName(WifiList *wifiList, u32 index, StrBuf *dest);
+void WifiList_StoreFriendName(WifiList *wifiList, u32 index, const StrBuf *src);
 // Whether the slot holds a friend, how many there are and the last used slot plus one
-BOOL func_0200a138(WifiList *wifiList, u32 index);
-u32 func_0200a150(WifiList *wifiList);
-u32 func_0200a170(WifiList *wifiList);
+BOOL WifiList_IsFriendValid(WifiList *wifiList, u32 index);
+u32 WifiList_CountFriends(WifiList *wifiList);
+u32 WifiList_GetFriendSlotCount(WifiList *wifiList);
 // Deletes a friend and moves the later ones down
-void func_0200a190(WifiList *wifiList, u32 index);
+void WifiList_RemoveFriend(WifiList *wifiList, u32 index);
 // Moves the friends into the empty slots
-void func_0200a258(WifiList *wifiList);
+void WifiList_CompactFriends(WifiList *wifiList);
 // Stamps today on a friend
-void func_0200a29c(WifiList *wifiList, u32 index);
+void WifiList_SetFriendLastDateToNow(WifiList *wifiList, u32 index);
 // Adds to a friend's record and stamps today; and adds one friend's record to another's, clearing the first
-void func_0200a2d4(WifiList *wifiList, s32 index, u32 wins, u32 losses, u32 draws);
-void func_0200a340(WifiList *wifiList, s32 srcIndex, s32 destIndex);
+void WifiList_AddFriendRecord(WifiList *wifiList, s32 index, u32 wins, u32 losses, u32 draws);
+void WifiList_MergeFriendRecord(WifiList *wifiList, s32 srcIndex, s32 destIndex);
 // A token for exchanging friend data, from user data or the player's
-void func_0200a3c4(const DWCUserData *userData, DWCFriendData *token);
-void func_0200a3cc(WifiList *wifiList, DWCFriendData *token);
+void WifiList_CreateExchangeTokenFromUserData(const DWCUserData *userData, DWCFriendData *token);
+void WifiList_CreateExchangeToken(WifiList *wifiList, DWCFriendData *token);
 s32 WifiList_GetMyGSID(WifiList *wifiList);
 // Adds the friend whose 12 bytes of friend data a player gave, with the player's info, to the first free place of the
 // Friend Roster; TRUE if there was one, FALSE if the friend was in it already or it was full. heapId is a scratch heap
 BOOL func_02011b30(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId);
 // Whether the player's DWC user data has a profile and is this console's
-BOOL func_0200a400(WifiList *wifiList);
-WifiList *func_0200a424(SaveControl *save);
+BOOL WifiList_HasValidProfile(WifiList *wifiList);
+WifiList *SaveControl_GetWifiList(SaveControl *save);
 // Finds the player among the friends
-BOOL func_0200a438(WifiList *wifiList, PlayerInfo *info, u32 *friendIndex);
+BOOL WifiList_FindFriendByPlayerInfo(WifiList *wifiList, PlayerInfo *info, u32 *friendIndex);
 // Finds a friend by ID and gender; the name is not compared
-BOOL func_0200a46c(WifiList *wifiList, const u16 *name, u32 id, u32 gender, u32 *friendIndex);
+BOOL WifiList_FindFriend(WifiList *wifiList, const u16 *name, u32 id, u32 gender, u32 *friendIndex);
 
-u32 func_0200a4b8(void);
-void func_0200a4c0(PalPadFriendList *list);
+u32 PalPadFriendList_GetSize(void);
+void PalPadFriendList_Init(PalPadFriendList *list);
 // The slot of the player with the ID, or -1
-s32 func_0200a4d4(PalPadFriendList *list, u32 id);
+s32 PalPadFriendList_FindPlayer(PalPadFriendList *list, u32 id);
 // Records a trainer the player traded with
-void func_0200a504(PalPadFriendList *list, PlayerInfo *info);
-u32 func_0200a55c(PalPadFriendList *list, u32 index);
-PlayerInfo *func_0200a570(PalPadFriendList *list, u32 index);
-BOOL func_0200a590(PalPadFriendList *list, u32 id);
-u32 func_0200a5a8(PalPadFriendList *list);
-u32 func_0200a5c4(PalPadFriendList *list);
-void func_0200a5cc(PalPadFriendList *list);
+void PalPadFriendList_AddPlayer(PalPadFriendList *list, PlayerInfo *info);
+u32 PalPadFriendList_GetPlayerId(PalPadFriendList *list, u32 index);
+PlayerInfo *PalPadFriendList_GetPlayer(PalPadFriendList *list, u32 index);
+BOOL PalPadFriendList_HasPlayer(PalPadFriendList *list, u32 id);
+u32 PalPadFriendList_CountPlayers(PalPadFriendList *list);
+u32 PalPadFriendList_GetTradeCount(PalPadFriendList *list);
+void PalPadFriendList_IncrementTradeCount(PalPadFriendList *list);
 PalPadFriendList *getPalPadFriendListAddress(SaveControl *save);
 
 #endif // POKEBW2_SAVE_WIFI_LIST_H

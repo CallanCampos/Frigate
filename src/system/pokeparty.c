@@ -176,7 +176,7 @@ BOOL PokeParty_SwapPkms(PokeParty *party, u32 indexA, u32 indexB, HeapID heapId)
 }
 
 // Reorders the party: order[i] is the slot of the Pokémon that goes to slot i. Does nothing to a full party
-void func_0201fff8(PokeParty *party, u32 *order, HeapID heapId) {
+void PokeParty_Reorder(PokeParty *party, u32 *order, HeapID heapId) {
     PartyPkm *pkms[PARTY_SIZE];
     BOOL exists[PARTY_SIZE];
     u32 i;

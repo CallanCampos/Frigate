@@ -128,7 +128,7 @@ static BOOL KeySystem_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     KeySystemTags_Init(wk->tags, HEAPID_KEY_SYSTEM);
     wk->seq = KeySystemSeq_Create(12, wk, NULL, HEAPID_KEY_SYSTEM);
     first = sStartSeqs[wk->param->mode];
-    if (func_02007464(GameData_GetSaveControl(wk->param->gameData)) & 2) {
+    if (SaveControl_GetErrors(GameData_GetSaveControl(wk->param->gameData)) & 2) {
         first = KeySystem_SeqSaveCorrupted;
     }
     KeySystemSeq_Set(wk->seq, first);
@@ -203,7 +203,7 @@ static BOOL KeySystem_ProcMain(GameProc *proc, u32 *state, void *param, void *wo
         KeySystemBG_Update(wk->bg);
     }
     if (wk->printQueue != NULL) {
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
     }
     if (wk->titleWin != NULL) {
         KeySystemMsgWin_Update(wk->titleWin);
@@ -493,16 +493,16 @@ static void KeySystemClAct_Init(KeySystemClAct *clact, KeySystemGraphic *graphic
 static void KeySystemClAct_LoadResources(KeySystemClAct *clact, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_KEY_SYSTEM, heapId);
 
-    clact->resources[1] = func_0204b81c(arc, 5, FALSE, 0, heapId);
-    clact->resources[0] = func_0204bbb8(arc, 2, 0, 0, 0, 4, heapId);
-    clact->resources[2] = func_0204bde0(arc, 13, 14, heapId);
+    clact->resources[1] = ClActSys_LoadChars(arc, 5, FALSE, 0, heapId);
+    clact->resources[0] = ClActSys_LoadPlttRange(arc, 2, 0, 0, 0, 4, heapId);
+    clact->resources[2] = ClActSys_LoadCellAnims(arc, 13, 14, heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void KeySystemClAct_FreeResources(KeySystemClAct *clact) {
-    func_0204bcd0(clact->resources[0]);
-    func_0204b98c(clact->resources[1]);
-    func_0204be64(clact->resources[2]);
+    ClActSys_FreePltt(clact->resources[0]);
+    ClActSys_FreeChars(clact->resources[1]);
+    ClActSys_FreeCellAnims(clact->resources[2]);
 }
 
 ClActor *KeySystemClAct_Create(KeySystemClAct *clact, u32 id, HeapID heapId) {
@@ -644,17 +644,17 @@ ClActor *KeySystemClAct_Create(KeySystemClAct *clact, u32 id, HeapID heapId) {
     default:
         return NULL;
     }
-    clact->actors[id] = func_0204c040(clact->unit, clact->resources[1], clact->resources[0], clact->resources[2],
-                                      &setup, surface, heapId);
+    clact->actors[id] = ClActor_Create(clact->unit, clact->resources[1], clact->resources[0], clact->resources[2],
+                                       &setup, surface, heapId);
     func_0204c520(clact->actors[id], autoAnim);
-    func_0204c124(clact->actors[id], visible);
-    func_0204c244(clact->actors[id], affineMode);
+    ClActor_SetVisible(clact->actors[id], visible);
+    ClActor_SetAffineMode(clact->actors[id], affineMode);
     return clact->actors[id];
 }
 
 void KeySystemClAct_Delete(KeySystemClAct *clact, u32 id) {
     if (clact->actors[id] != NULL) {
-        func_0204c108(clact->actors[id]);
+        ClActor_Delete(clact->actors[id]);
         clact->actors[id] = NULL;
     }
 }
@@ -739,15 +739,15 @@ void KeySystem_Setup(KeySystemWork *wk, HeapID heapId) {
     wk->ov331Work = SaveOutside_Load(heapId);
     data = SaveOutside_GetKeyData(wk->ov331Work);
     save = GameData_GetSaveControl(wk->param->gameData);
-    wk->memoryLink = func_02010470(data);
+    wk->memoryLink = KeySystemData_GetMemoryLink(data);
     if (SaveControl_IsDataAlreadyPresent(save)) {
         wk->keyInfo = getKeyInfoSaveBlk(save);
     } else {
-        wk->keyInfo = func_0201046c(data);
+        wk->keyInfo = KeySystemData_GetKeyInfo(data);
     }
     wk->graphic = KeySystemGraphic_Create(1, heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    wk->printQueue = func_02021998(heapId);
+    wk->printQueue = PrintQueue_CreateDefault(heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_2, heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     wk->strBuf = GFL_StrBufCreate(128, heapId);
@@ -761,15 +761,15 @@ void KeySystem_Setup(KeySystemWork *wk, HeapID heapId) {
     CygnusFlow_Init(wk, HEAPID_KEY_SYSTEM);
     KeySystem_CreateDefaultTitleWin(wk, heapId);
     if (wk->preloadedSeqs == 0) {
-        wk->preloadedSeqs = func_02005af4(sPreloadedSeqs, NELEMS(sPreloadedSeqs));
+        wk->preloadedSeqs = GFL_SndBGMStack_Preload(sPreloadedSeqs, NELEMS(sPreloadedSeqs));
         GFL_SndBGMPlay(SEQ_BGM_DATA_CONV, 0xffff);
     }
 }
 
 void KeySystem_Teardown(KeySystemWork *wk, BOOL keepSounds) {
     if (!keepSounds) {
-        func_02005d8c();
-        func_02005b60(wk->preloadedSeqs);
+        GFL_SndBGMStopImmediate();
+        GFL_SndBGMStack_Unload(wk->preloadedSeqs);
         wk->preloadedSeqs = 0;
     }
     CygnusFlow_Exit(wk);
@@ -801,7 +801,7 @@ void KeySystem_Teardown(KeySystemWork *wk, BOOL keepSounds) {
     wk->wordSet = NULL;
     GFL_MsgDataFree(wk->msgData);
     wk->msgData = NULL;
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     wk->printQueue = NULL;
     GFL_FontFree(wk->font);
     wk->font = NULL;

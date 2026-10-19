@@ -532,7 +532,7 @@ static void func_ov036_0218d7a8(IrcMenuWork *wk) {
 }
 
 static void func_ov036_0218d824(IrcMenuWork *wk) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     func_ov036_0218d50c(wk);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, CHAR_POS(wk->frameChars), CHAR_SIZE(wk->frameChars));
@@ -547,7 +547,7 @@ static void func_ov036_0218d824(IrcMenuWork *wk) {
 static void func_ov036_0218d878(IrcMenuWork *wk) {
     if (GFL_WipeIsFinished()) {
         if (wk->mode != 12) {
-            if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(func_ov012_02150cf0(wk->param)))) {
+            if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
                 func_ov036_0218d0ec(wk, NULL, 866);
             }
         } else {
@@ -560,12 +560,12 @@ static void func_ov036_0218d8c0(IrcMenuWork *wk) {
     wk->ending = TRUE;
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     if (wk->mode != 12) {
-        if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(func_ov012_02150cf0(wk->param)))) {
-            GameCommSys_ExitReq(GSYS_GetGameCommSystem(func_ov012_02150cf0(wk->param)));
+        if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
+            GameCommSys_ExitReq(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)));
         }
     }
     if (wk->mode >= 1 && wk->mode <= 8) {
-        func_02038bc8(30);
+        JoinAvenue_RecordActivity(30);
     }
     func_ov036_0218d0ec(wk, func_ov036_0218d878, 901);
 }
@@ -578,7 +578,7 @@ static void func_ov036_0218d938(u32 param, fx32 frame) {
         func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 917);
         return;
     }
-    if (func_02008ac8((const Config *)getTrainerDataBlkAddress(func_ov012_02150cf4(wk->param))) == 1) {
+    if (Config_GetSaveBeforeIR((const Config *)getTrainerDataBlkAddress(EventIRC_GetSaveControl(wk->param))) == 1) {
         func_ov036_0218d0ec(wk, func_ov036_0218e7cc, 920);
         return;
     }
@@ -607,13 +607,13 @@ static void func_ov036_0218d9a8(IrcMenuWork *wk) {
         index = 3;
     }
     func_0204c520(wk->actors[index], TRUE);
-    func_0204c5b0(wk->actors[index], &callback);
-    func_0204c56c(wk->actors[index]);
+    ClActor_SetAnimCallback(wk->actors[index], &callback);
+    ClActor_RestartAnim(wk->actors[index]);
     func_ov036_0218d0ec(wk, func_ov036_0218d9a4, 968);
 }
 
 static void func_ov036_0218da0c(IrcMenuWork *wk) {
-    if (func_ov036_0218e69c(wk) && func_0203da48()) {
+    if (func_ov036_0218e69c(wk) && GFL_HIDIsTouchPressed()) {
         func_ov036_0218d3ac(wk);
         func_ov036_0218d0ec(wk, func_ov036_0218db14, 980);
     }
@@ -717,8 +717,8 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
     callback.param = (u32)wk;
     callback.func = func_ov036_0218db94;
     func_0204c520(wk->actors[index], TRUE);
-    func_0204c5b0(wk->actors[index], &callback);
-    func_0204c56c(wk->actors[index]);
+    ClActor_SetAnimCallback(wk->actors[index], &callback);
+    ClActor_RestartAnim(wk->actors[index]);
     func_ov036_0218d0ec(wk, func_ov036_0218dbec, 1146);
 }
 
@@ -738,8 +738,8 @@ static void func_ov036_0218dc5c(IrcMenuWork *wk) {
     callback.param = (u32)wk;
     callback.func = func_ov036_0218dc44;
     func_0204c520(wk->actors[wk->selected], TRUE);
-    func_0204c5b0(wk->actors[wk->selected], &callback);
-    func_0204c56c(wk->actors[wk->selected]);
+    ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
+    ClActor_RestartAnim(wk->actors[wk->selected]);
     func_ov036_0218d0ec(wk, func_ov036_0218dc58, 1179);
 }
 
@@ -808,8 +808,8 @@ static void func_ov036_0218ddec(IrcMenuWork *wk) {
     callback.param = (u32)wk;
     callback.func = func_ov036_0218dda0;
     func_0204c520(wk->actors[index], TRUE);
-    func_0204c5b0(wk->actors[index], &callback);
-    func_0204c56c(wk->actors[index]);
+    ClActor_SetAnimCallback(wk->actors[index], &callback);
+    ClActor_RestartAnim(wk->actors[index]);
     func_ov036_0218d0ec(wk, func_ov036_0218dde8, 1293);
 }
 
@@ -900,8 +900,8 @@ static void func_ov036_0218df98(IrcMenuWork *wk) {
     callback.param = (u32)wk;
     callback.func = func_ov036_0218df3c;
     func_0204c520(wk->actors[index], TRUE);
-    func_0204c5b0(wk->actors[index], &callback);
-    func_0204c56c(wk->actors[index]);
+    ClActor_SetAnimCallback(wk->actors[index], &callback);
+    ClActor_RestartAnim(wk->actors[index]);
     func_ov036_0218d0ec(wk, func_ov036_0218df94, 1432);
 }
 
@@ -950,9 +950,9 @@ static void func_ov036_0218e0bc(IrcMenuWork *wk) {
 static void func_ov036_0218e0c8(IrcMenuWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC_MENU, wk->heapId);
 
-    wk->clRes[3] = func_0204b81c(arc, 5, FALSE, 1, wk->heapId);
-    wk->clRes[1] = func_0204bbb8(arc, 3, 1, 0, 0, 10, wk->heapId);
-    wk->clRes[5] = func_0204bde0(arc, 7, 16, wk->heapId);
+    wk->clRes[3] = ClActSys_LoadChars(arc, 5, FALSE, 1, wk->heapId);
+    wk->clRes[1] = ClActSys_LoadPlttRange(arc, 3, 1, 0, 0, 10, wk->heapId);
+    wk->clRes[5] = ClActSys_LoadCellAnims(arc, 7, 16, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -961,7 +961,7 @@ static void func_ov036_0218e124(IrcMenuWork *wk) {
 
     for (i = 0; i < 5; i++) {
         if (wk->actors[i] != NULL) {
-            func_0204c108(wk->actors[i]);
+            ClActor_Delete(wk->actors[i]);
             wk->actors[i] = NULL;
         }
     }
@@ -981,10 +981,10 @@ static void func_ov036_0218e148(IrcMenuWork *wk) {
         setup.sequence = sequences[i];
         setup.priority = 0;
         setup.bgPriority = 1;
-        wk->actors[i] = func_0204c040(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
+        wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
         func_0204c520(wk->actors[i], FALSE);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], 1);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
 }
 
@@ -1002,10 +1002,10 @@ static void func_ov036_0218e25c(IrcMenuWork *wk) {
         setup.sequence = sequences[i];
         setup.priority = 0;
         setup.bgPriority = 1;
-        wk->actors[i] = func_0204c040(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
+        wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
         func_0204c520(wk->actors[i], FALSE);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], 1);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
 }
 
@@ -1023,10 +1023,10 @@ static void func_ov036_0218e358(IrcMenuWork *wk) {
         setup.sequence = sequences[i];
         setup.priority = 0;
         setup.bgPriority = 1;
-        wk->actors[i] = func_0204c040(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
+        wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
         func_0204c520(wk->actors[i], FALSE);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], 1);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
 }
 
@@ -1044,10 +1044,10 @@ static void func_ov036_0218e46c(IrcMenuWork *wk) {
         setup.sequence = sequences[i];
         setup.priority = 0;
         setup.bgPriority = 1;
-        wk->actors[i] = func_0204c040(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
+        wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
         func_0204c520(wk->actors[i], FALSE);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], 1);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
 }
 
@@ -1059,29 +1059,29 @@ static void func_ov036_0218e56c(IrcMenuWork *wk) {
 
     for (i = 0; i < 5; i++) {
         if (wk->actors[i] != NULL) {
-            func_0204c108(wk->actors[i]);
+            ClActor_Delete(wk->actors[i]);
             wk->actors[i] = NULL;
         }
     }
     for (i = 0; i < 2; i++) {
         if (wk->actors2[i] != NULL) {
-            func_0204c108(wk->actors2[i]);
+            ClActor_Delete(wk->actors2[i]);
             wk->actors2[i] = NULL;
         }
     }
     for (i = 0; i < 2; i++) {
         if (wk->clRes[i] != 0) {
-            func_0204bcd0(wk->clRes[i]);
+            ClActSys_FreePltt(wk->clRes[i]);
         }
     }
     for (; i < 4; i++) {
         if (wk->clRes[i] != 0) {
-            func_0204b98c(wk->clRes[i]);
+            ClActSys_FreeChars(wk->clRes[i]);
         }
     }
     for (; i < 6; i++) {
         if (wk->clRes[i] != 0) {
-            func_0204be64(wk->clRes[i]);
+            ClActSys_FreeCellAnims(wk->clRes[i]);
         }
     }
 }
@@ -1116,20 +1116,20 @@ static BOOL func_ov036_0218e69c(IrcMenuWork *wk) {
         if (wk->msgWin != NULL) {
             KeyCursor_Update(wk->keyCursor, wk->printStream, wk->msgWin);
         }
-        switch (func_020223b4(wk->printStream)) {
+        switch (PrintStream_GetState(wk->printStream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(wk->printStream);
+            PrintStream_Delete(wk->printStream);
             wk->printStream = NULL;
             break;
         case PRINT_STREAM_PAUSED:
-            if (func_0203da48()) {
+            if (GFL_HIDIsTouchPressed()) {
                 GFL_SndSEPlay(1351);
-                func_020223bc(wk->printStream);
+                PrintStream_Continue(wk->printStream);
             }
             break;
         case PRINT_STREAM_RUNNING:
-            if (func_0203da2c()) {
-                func_020223e0(wk->printStream, 0);
+            if (GFL_HIDIsTouchHeld()) {
+                PrintStream_SkipWait(wk->printStream, 0);
             }
             break;
         }
@@ -1149,8 +1149,8 @@ static void func_ov036_0218e710(IrcMenuWork *wk, BOOL instant) {
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     if (!instant) {
-        wk->printStream =
-            func_02022268(win, 0, 0, wk->strBuf, wk->font, func_02017bcc(), wk->tcbMgr, 2, wk->heapId, 15);
+        wk->printStream = PrintStream_Create(win, 0, 0, wk->strBuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2,
+                                             wk->heapId, 15);
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(win), 0, 0, wk->strBuf, wk->font);
         wk->printStream = NULL;
@@ -1170,7 +1170,7 @@ static void func_ov036_0218e7cc(IrcMenuWork *wk) {
 }
 
 static void func_ov036_0218e804(IrcMenuWork *wk) {
-    if (func_02017850(wk->gameData) == 2) {
+    if (GameData_UpdateSave(wk->gameData) == 2) {
         func_ov036_0218d2e0(wk, FALSE);
         BmpWin_ClearFrame(wk->msgWin, 2);
         BmpWin_ClearScreen(wk->msgWin);
@@ -1186,13 +1186,13 @@ static void func_ov036_0218e804(IrcMenuWork *wk) {
 
 static void func_ov036_0218e864(IrcMenuWork *wk) {
     if (func_ov036_0218e69c(wk)) {
-        func_0201782c(wk->gameData);
+        GameData_StartSave(wk->gameData);
         func_ov036_0218d0ec(wk, func_ov036_0218e804, 0x797);
     }
 }
 
 static void func_ov036_0218e88c(IrcMenuWork *wk) {
-    if (func_ov036_0218e69c(wk) && func_0203da48()) {
+    if (func_ov036_0218e69c(wk) && GFL_HIDIsTouchPressed()) {
         func_ov036_0218d2e0(wk, FALSE);
         GFL_BGSysClearScr(3);
         func_ov036_0218d3ac(wk);
@@ -1234,7 +1234,7 @@ static void func_ov036_0218e978(IrcMenuWork *wk) {
 }
 
 static void func_ov036_0218e9a0(TCB *task, void *work) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *work) {
@@ -1246,7 +1246,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     wk->heapId = HEAPID_IRC_BATTLE_MENU;
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sIrcMenuVRAMConfig);
     {
         BGSysLCDConfig lcd = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -1255,7 +1255,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     ClActSys_Create(&data_02093f08, &sIrcMenuVRAMConfig, wk->heapId);
-    wk->clUnit = func_0204bf1c(40, 0, wk->heapId);
+    wk->clUnit = ClActUnit_Create(40, 0, wk->heapId);
     wk->vblankTask = GFL_VBlankTCBAdd(func_ov036_0218e9a0, wk, 0);
     func_ov036_0218d0f4(wk);
     func_ov036_0218d5f0(wk);
@@ -1263,7 +1263,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     wk->bgPalettes = GFL_HeapAllocate(wk->heapId, 0x200, FALSE, "ircbattlemenu.c", 0x833);
     wk->tcbMgr = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 2, 0);
     wk->keyCursor = KeyCursor_Create(15, FALSE, TRUE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
     func_ov036_0218e0c8(wk);
     func_ov036_0218e568(wk, 0x39, 0x9a, 0, 10);
@@ -1271,9 +1271,9 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     func_ov036_0218d0ec(wk, func_ov036_0218d7a8, 0x844);
     wk->param = param;
-    wk->gameData = GSYS_GetGameData(func_ov012_02150cf0(wk->param));
+    wk->gameData = GSYS_GetGameData(EventIRC_GetGameSystem(wk->param));
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     GFL_BGSysSetEnabledBGsA(0x13);
     GFL_BGSysSetEnabledBGsB(0x17);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_OBJ, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 9, 14);
@@ -1285,7 +1285,7 @@ static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *w
     IrcMenuStateFunc func = wk->state;
     BOOL done = TRUE;
 
-    func_02012be4(GameData_GetWifiList(wk->gameData));
+    WihDwc_GetStatus(GameData_GetWifiList(wk->gameData));
     if (func != NULL) {
         func(wk);
         done = FALSE;
@@ -1299,12 +1299,12 @@ static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->bgScroll);
     wk->bgScroll--;
     GFL_TCBExMgrUpdate(wk->tcbMgr);
-    func_02021a3c(wk->printQueue);
-    func_0204b794();
+    PrintQueue_Main(wk->printQueue);
+    ClActSys_Draw();
     if (!wk->ending) {
-        GSYS_TryBootGameComm(func_ov012_02150cf0(wk->param));
+        GSYS_TryBootGameComm(EventIRC_GetGameSystem(wk->param));
     }
-    if (GFL_WipeIsFinished() && func_02016bec(func_ov012_02150cf0(wk->param))) {
+    if (GFL_WipeIsFinished() && func_02016bec(EventIRC_GetGameSystem(wk->param))) {
         wk->mode = 12;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
@@ -1321,7 +1321,7 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
         return FALSE;
     }
     func_ov036_0218d824(wk);
-    func_ov012_02150cec(event, wk->mode);
+    EventIRC_SetMode(event, wk->mode);
     event->useBattleBox = wk->choice;
     if (wk->waitIcon != NULL) {
         WaitIcon_Free(wk->waitIcon);
@@ -1331,13 +1331,13 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
     GFL_HeapFree(wk->bgPalettes);
     func_ov036_0218e56c(wk);
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     KeyCursor_Free(wk->keyCursor);
     GFL_TCBExMgrFree(wk->tcbMgr);
     GFL_BGSysReleaseBG(7);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     if (wk->msgWin != NULL) {
         BmpWin_Free(wk->msgWin);
     }
@@ -1350,8 +1350,8 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
     }
     AppTaskMenuRes_Free(wk->menuRes);
     GFL_TCBRemove(wk->vblankTask);
-    func_0204bf98(wk->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(wk->clUnit);
+    ClActSys_Delete();
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
     GFL_ProcReleaseSubsystem(proc);

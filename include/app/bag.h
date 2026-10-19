@@ -17,7 +17,7 @@ struct BagProcessData {
     GameData *gameData;
     TrainerDataSave *trainerData;
     PlayerInfo *playerInfo;
-    // The bag's cursor in each pocket, which func_0200887c and the functions after it read and set
+    // The bag's cursor in each pocket, which BagCursor_GetPocketPosition and the functions after it read and set
     void *cursor;
     // The Free Space's filter
     u32 freeSpaceFilter;

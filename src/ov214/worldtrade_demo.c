@@ -47,7 +47,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
 
     switch (wk->subProcessMode) {
     case DEMO_MODE_UPLOAD:
-        param->recvPkm = param->sendPkm = func_0200b4d0(wk->param->worldtrade_data);
+        param->recvPkm = param->sendPkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
         procs = &data_ov194_021c6400;
         break;
@@ -55,7 +55,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         if (wk->uploadPokemonData.isTrade) {
             param->recvPkm = (PartyPkm *)wk->uploadPokemonData.postData;
         } else {
-            param->recvPkm = func_0200b4d0(wk->param->worldtrade_data);
+            param->recvPkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         }
         param->sendPkm = param->recvPkm;
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
@@ -63,7 +63,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
         break;
     case DEMO_MODE_DOWNLOAD_EX:
         param->recvPkm = wk->uploadPokemonData.isTrade ? (PartyPkm *)wk->uploadPokemonData.postData
-                                                       : func_0200b4d0(wk->param->worldtrade_data);
+                                                       : WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         WorldTradeData_GetPkm(wk->param->worldtrade_data, wk->sentPokemon);
         param->sendPkm = wk->sentPokemon;
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
@@ -227,15 +227,15 @@ int WorldTrade_Demo_End(WorldTradeWork *wk, int seq) {
 }
 
 PlayerInfo *WorldTrade_MakePartnerStatus(Dpw_Tr_Data *dtd) {
-    PlayerInfo *info = func_02008b0c(HEAPID_WORLDTRADE);
+    PlayerInfo *info = PlayerInfo_Create(HEAPID_WORLDTRADE);
 
-    func_02008b40(info);
+    PlayerInfo_Init(info);
     copyTrainerName(info, dtd->name);
-    func_02008c00(info, dtd->versionCode);
-    func_02008c08(info, dtd->langCode);
+    PlayerInfo_SetVersion(info, dtd->versionCode);
+    PlayerInfo_SetRegion(info, dtd->langCode);
     setTrainerGender(info, dtd->gender);
     func_02008bf8(info, dtd->trainerType);
-    func_02008c14(info, dtd->countryCode, dtd->localCode);
+    PlayerInfo_SetCountryAndProvince(info, dtd->countryCode, dtd->localCode);
     info->id = dtd->trainerID;
     info->profileId = dtd->id;
     return info;

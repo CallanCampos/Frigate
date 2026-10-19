@@ -12,17 +12,17 @@ BOOL s01E6_TrialHouseWorkInit(VM *vm, FieldScriptEnv *env);
 BOOL s01E7_TrialHouseWorkDelete(VM *vm, FieldScriptEnv *env);
 BOOL s01E8_TrialHousePrepareParty(VM *vm, FieldScriptEnv *env);
 BOOL s01E9_TrialHouseCallTeamSelect(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02164564(VM *vm, FieldScriptEnv *env);
+BOOL s01EA_TrialHouseSetTrainer(VM *vm, FieldScriptEnv *env);
 BOOL s01EB_TrialHouseMsgDisp(VM *vm, FieldScriptEnv *env);
 BOOL s01EC_TrialHouseStartBattle(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216462c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216465c(VM *vm, FieldScriptEnv *env);
+BOOL s01ED_TrialHouseSetDownloadMode(VM *vm, FieldScriptEnv *env);
+BOOL s01EE_TrialHouseSetBattleTestRank(VM *vm, FieldScriptEnv *env);
 BOOL s01EF_TrialHouseGetBattleTestRank(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_021646cc(VM *vm, FieldScriptEnv *env);
+BOOL s01F0_TrialHouseDownloadExamination(VM *vm, FieldScriptEnv *env);
 BOOL s01F1_TrialHouseCalcPointsStars(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216474c(VM *vm, FieldScriptEnv *env);
+BOOL s01F2_TrialHouseGetExaminationType(VM *vm, FieldScriptEnv *env);
 BOOL s01F3_TrialHouseSaveData(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_021647c4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216480c(VM *vm, FieldScriptEnv *env);
+BOOL s01F4_TrialHouseCallResults(VM *vm, FieldScriptEnv *env);
+BOOL s01F5_TrialHouseGetRecordMask(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_TRIAL_HOUSE_H

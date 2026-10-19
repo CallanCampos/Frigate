@@ -77,9 +77,9 @@ PdwAccMessage *PdwAccMessage_Create(HeapID heapId, u32 msgFile) {
 
     msg->heapId = heapId;
     BmpWin_InitAllocator(msg->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     msg->tcbMgr = GFL_TCBExMgrCreate(msg->heapId, msg->heapId, 2, 0);
-    msg->printQueue = func_02021998(msg->heapId);
+    msg->printQueue = PrintQueue_CreateDefault(msg->heapId);
     msg->strBuf = GFL_StrBufCreate(400, msg->heapId);
     msg->tmpBuf = GFL_StrBufCreate(400, msg->heapId);
     msg->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, msg->heapId);
@@ -96,7 +96,7 @@ PdwAccMessage *PdwAccMessage_Create(HeapID heapId, u32 msgFile) {
 
 void PdwAccMessage_Main(PdwAccMessage *msg) {
     GFL_TCBExMgrUpdate(msg->tcbMgr);
-    func_02021a3c(msg->printQueue);
+    PrintQueue_Main(msg->printQueue);
 }
 
 void PdwAccMessage_Free(PdwAccMessage *msg) {
@@ -106,17 +106,17 @@ void PdwAccMessage_Free(PdwAccMessage *msg) {
     GFL_BGSysFreeCharMemory(5, CHAR_POS(msg->frameChars), CHAR_SIZE(msg->frameChars));
     GFL_BGSysFreeCharMemory(6, CHAR_POS(msg->infoFrameChars), CHAR_SIZE(msg->infoFrameChars));
     PdwAccMessage_DeleteButtons(msg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_MsgDataFree(msg->msgData);
     GFL_FontFree(msg->font);
     GFL_StrBufFree(msg->strBuf);
     GFL_StrBufFree(msg->tmpBuf);
     GFL_WordSetSystemFree(msg->wordSet);
     AppTaskMenuRes_Free(msg->menuRes);
-    func_02021c44(msg->printQueue);
-    func_02021a18(msg->printQueue);
+    PrintQueue_Clear(msg->printQueue);
+    PrintQueue_Free(msg->printQueue);
     if (msg->printStream != NULL) {
-        func_020223cc(msg->printStream);
+        PrintStream_Delete(msg->printStream);
     }
     if (msg->waitIcon != NULL) {
         WaitIcon_Free(msg->waitIcon);
@@ -154,8 +154,8 @@ void PdwAccMessage_PrintStream(PdwAccMessage *msg, u32 msgId) {
     win = msg->msgWin;
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
-    msg->printStream =
-        func_02022268(win, 0, 0, msg->strBuf, msg->font, func_02017bcc(), msg->tcbMgr, 2, msg->heapId, 15);
+    msg->printStream = PrintStream_Create(win, 0, 0, msg->strBuf, msg->font, TextSpeed_GetCurrentWait(), msg->tcbMgr, 2,
+                                          msg->heapId, 15);
     BmpWin_DrawFrame(win, TRUE, msg->frameChars, 12);
     BmpWin_FlushChar(win);
     BmpWin_FlushMap(win);
@@ -173,14 +173,14 @@ void PdwAccMessage_StartWaitIcon(PdwAccMessage *msg) {
 // The message goes on only with A
 BOOL PdwAccMessage_IsPrintFinished(PdwAccMessage *msg) {
     if (msg->printStream != NULL) {
-        switch (func_020223b4(msg->printStream)) {
+        switch (PrintStream_GetState(msg->printStream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(msg->printStream);
+            PrintStream_Delete(msg->printStream);
             msg->printStream = NULL;
             break;
         case PRINT_STREAM_PAUSED:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A) {
-                func_020223bc(msg->printStream);
+                PrintStream_Continue(msg->printStream);
             }
             break;
         }

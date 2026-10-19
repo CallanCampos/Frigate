@@ -363,7 +363,7 @@ static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, Fiel
     npc.modelId = FldAct_GetObjCode(passerby->actor);
     npc.direction = dir;
     npc.uid = passerby->id;
-    func_ov012_021682c0(&npc, x, z, 0);
+    ZoneNPC_SetGridPos(&npc, x, z, 0);
     FldAct_Transplant(passerby->actor, &npc);
     passerby->type = type;
     passerby->dir = dir;
@@ -551,16 +551,16 @@ static u16 CasteliaRushConfig_GetWalkAcmd(const CasteliaRushConfig *config) {
 }
 
 static void Passerby_StartWalker(CasteliaRushPasserby *passerby) {
-    func_ov012_0216763c(passerby->actor, TRUE);
-    func_ov012_02167788(passerby->actor, TRUE);
-    func_ov012_02167580(passerby->actor, FALSE);
+    FldAct_SetHeightCalcDisabled(passerby->actor, TRUE);
+    FldAct_SetMapAttrDisabled(passerby->actor, TRUE);
+    SetActorCollisionEnabled(passerby->actor, FALSE);
     SetActorSCRID(passerby->actor, SCRID_PASSERBY_NONE);
 }
 
 static void Passerby_StartTalker(CasteliaRushPasserby *passerby) {
-    func_ov012_0216763c(passerby->actor, TRUE);
-    func_ov012_02167788(passerby->actor, TRUE);
-    func_ov012_02167580(passerby->actor, TRUE);
+    FldAct_SetHeightCalcDisabled(passerby->actor, TRUE);
+    FldAct_SetMapAttrDisabled(passerby->actor, TRUE);
+    SetActorCollisionEnabled(passerby->actor, TRUE);
     SetActorSCRID(passerby->actor, SCRID_PASSERBY_NONE);
 }
 
@@ -569,7 +569,7 @@ static void Passerby_UpdateWalker(CasteliaRushPasserby *passerby, MMSys *actorSy
 
     switch (passerby->state) {
     case PASSERBY_STATE_WAIT:
-        if (!func_ov012_02166ecc(passerby->actor)) {
+        if (!FldAct_CheckAcmdEnd(passerby->actor)) {
             break;
         }
         passerby->state++;
@@ -597,7 +597,7 @@ static void Passerby_UpdateTalker(CasteliaRushPasserby *passerby, MMSys *actorSy
 
     switch (passerby->state) {
     case PASSERBY_STATE_WAIT:
-        if (!func_ov012_02166ecc(passerby->actor)) {
+        if (!FldAct_CheckAcmdEnd(passerby->actor)) {
             break;
         }
         passerby->state++;
@@ -634,7 +634,7 @@ static BOOL Passerby_FindActorAhead(CasteliaRushPasserby *passerby, MMSys *actor
     FieldActor *actor;
 
     while (NextActor(actorSys, &actor, &index) == TRUE) {
-        if (passerby->actor != actor && !CheckActorFlag(actor, 0x80) && !func_ov012_02167520(actor) &&
+        if (passerby->actor != actor && !CheckActorFlag(actor, 0x80) && !IsActorHidden(actor) &&
             Passerby_IsActorAhead(passerby, actor, maxDist, minDist)) {
             *found = actor;
             return TRUE;

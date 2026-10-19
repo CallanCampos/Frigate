@@ -26,7 +26,9 @@ static BOOL IsExcludedWord(u16 word);
 static const u8 sSentenceCounts[PMS_SENTENCE_TYPE_COUNT] = { 20, 20, 20, 20, 20, 21, 2 };
 
 static const u16 sSentenceMsgFiles[PMS_SENTENCE_TYPE_COUNT] = {
-    TEXT_BANK_PMS_SENTENCE_TYPE_0, TEXT_BANK_PMS_SENTENCE_TYPE_1, TEXT_BANK_PMS_SENTENCE_TYPE_2, TEXT_BANK_PMS_SENTENCE_TYPE_3, TEXT_BANK_PMS_SENTENCE_TYPE_4, TEXT_BANK_PMS_SENTENCE_TYPE_5, TEXT_BANK_PMS_SENTENCE_TYPE_6,
+    TEXT_BANK_PMS_SENTENCE_TYPE_0, TEXT_BANK_PMS_SENTENCE_TYPE_1, TEXT_BANK_PMS_SENTENCE_TYPE_2,
+    TEXT_BANK_PMS_SENTENCE_TYPE_3, TEXT_BANK_PMS_SENTENCE_TYPE_4, TEXT_BANK_PMS_SENTENCE_TYPE_5,
+    TEXT_BANK_PMS_SENTENCE_TYPE_6,
 };
 
 void PMSData_Clear(PMSData *data) {
@@ -53,7 +55,7 @@ void PMSData_InitWithSentence(PMSData *data, u16 type, u16 id) {
     PMSData_SetSentence(data, type, id);
 }
 
-void func_02029bfc(PMSData *data, u32 preset) {
+void PMSData_InitPreset(PMSData *data, u32 preset) {
     switch (preset) {
     case 0:
         PMSData_Init(data, 1);
@@ -151,7 +153,7 @@ static u32 GetSentenceWordCount(u16 type, u16 id, HeapID heapId) {
     return count;
 }
 
-u16 func_02029df8(const PMSData *data, u32 index) {
+u16 PMSData_GetWordIndex(const PMSData *data, u32 index) {
     u16 word = data->words[index];
 
     if (word == PMS_WORD_NULL) {
@@ -164,7 +166,7 @@ u16 PMSData_GetWord(const PMSData *data, u32 index) {
     return data->words[index];
 }
 
-BOOL func_02029e1c(const PMSData *data, u32 index) {
+BOOL PMSData_IsWordNumber(const PMSData *data, u32 index) {
     return PMSWord_IsNumber(data->words[index]);
 }
 

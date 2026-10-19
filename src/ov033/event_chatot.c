@@ -109,8 +109,8 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         }
         break;
     case 5:
-        func_02006e0c(2);
-        if (func_02006e3c() == TRUE) {
+        SndMic_AddCount(2);
+        if (SndMic_IsOverLimit() == TRUE) {
             WaitIcon_Free(work->waitIcon);
             func_ov036_02188474(work->talkWindow);
             func_ov036_0218836c(work->talkWindow, 0, 0, 1);
@@ -120,7 +120,7 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         break;
     case 6:
         if (func_ov036_021883e8(work->talkWindow) == TRUE) {
-            if (func_02006e80(func_ov033_02178fcc, &work->recorded) == 0) {
+            if (SndMic_StartRecording(func_ov033_02178fcc, &work->recorded) == 0) {
                 *state = 7;
             } else {
                 message = GFL_MsgDataLoadStrbufNew(work->msgData, 3);
@@ -138,7 +138,7 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         break;
     case 7:
         if (work->recorded == TRUE) {
-            func_02006ec0(work->chatter);
+            SndMic_EncodeChatter(work->chatter);
             ampOffFreeBlocks();
             GCTX_HIDUnblockSleep(8);
             GameEvent_ChainNext(event, EventPushBGMFinish_Create(work->gsys, 0, 30));
@@ -209,7 +209,7 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     BOOL encrypted;
     ClActorSetup setup;
 
-    work->unit = func_0204bf1c(1, 0, 21);
+    work->unit = ClActUnit_Create(1, 0, 21);
     pkm = func_0201d620(work->pkm);
     arc = MakePokeGraArcHandle(21);
     encrypted = PML_PkmDecrypt(pkm);
@@ -219,15 +219,15 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     PML_PkmReEncrypt(pkm, encrypted);
     GFL_ArcToolFree(arc);
     setup = sSpriteSetup;
-    work->sprite = func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, 21);
+    work->sprite = ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, 21);
 }
 
 void func_ov033_021790a0(ChatotEventWork *work) {
-    func_0204c108(work->sprite);
-    func_0204b98c(work->chars);
-    func_0204bcd0(work->palette);
-    func_0204be64(work->cellAnims);
-    func_0204bf98(work->unit);
+    ClActor_Delete(work->sprite);
+    ClActSys_FreeChars(work->chars);
+    ClActSys_FreePltt(work->palette);
+    ClActSys_FreeCellAnims(work->cellAnims);
+    ClActUnit_Delete(work->unit);
 }
 
 u32 func_ov033_021790c4(ChatotEventWork *work) {
@@ -243,9 +243,9 @@ u32 func_ov033_021790c4(ChatotEventWork *work) {
             return 0;
         }
     }
-    func_0204c178(work->sprite, &position, 0);
+    ClActor_GetSurfacePos(work->sprite, &position, 0);
     position.y -= work->animOffset;
-    func_0204c140(work->sprite, &position, 0);
+    ClActor_SetSurfacePos(work->sprite, &position, 0);
     work->animOffset--;
     return 1;
 }

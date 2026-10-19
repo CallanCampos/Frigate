@@ -1,9 +1,9 @@
-func_ov128_021eec80 kind:function(thumb,size=0x54) addr:0x021eec80
-func_ov128_021eecd4 kind:function(thumb,size=0x26) addr:0x021eecd4
-func_ov128_021eecfc kind:function(thumb,size=0x4c) addr:0x021eecfc
-func_ov128_021eed48 kind:function(thumb,size=0x158) addr:0x021eed48
-func_ov128_021eeea0 kind:function(thumb,size=0x28) addr:0x021eeea0
-func_ov128_021eeec8 kind:function(thumb,size=0x120) addr:0x021eeec8
+PassingVehicles_Init kind:function(thumb,size=0x54) addr:0x021eec80
+PassingVehicles_End kind:function(thumb,size=0x26) addr:0x021eecd4
+PassingVehicles_PlayPassSound kind:function(thumb,size=0x4c) addr:0x021eecfc
+PassingVehicles_Update kind:function(thumb,size=0x158) addr:0x021eed48
+PassingVehicles_PlaceAll kind:function(thumb,size=0x28) addr:0x021eeea0
+PassingVehicles_PlaceVehicle kind:function(thumb,size=0x120) addr:0x021eeec8
 data_ov128_021eefe8 kind:data(any) addr:0x021eefe8
 data_ov128_021ef011 kind:data(any) addr:0x021ef011 ambiguous
 data_ov128_021ef030 kind:data(any) addr:0x021ef030

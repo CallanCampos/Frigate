@@ -187,7 +187,7 @@ KeySystemMsgWin *KeySystemMsgWin_Create(u16 bg, u16 x, u16 y, u16 width, u16 hei
 
     MI_CpuFill8(win, 0, sizeof(KeySystemMsgWin));
     win->font = font;
-    win->printQueue = func_02021998(heapId);
+    win->printQueue = PrintQueue_CreateDefault(heapId);
     win->mode = KEY_SYSTEM_MSG_IDLE;
     win->heapId = heapId;
     win->str = GFL_StrBufCreate(0x300, heapId);
@@ -203,7 +203,7 @@ KeySystemMsgWin *KeySystemMsgWin_Create(u16 bg, u16 x, u16 y, u16 width, u16 hei
 
 void KeySystemMsgWin_Free(KeySystemMsgWin *win) {
     if (win->stream != NULL) {
-        func_020223cc(win->stream);
+        PrintStream_Delete(win->stream);
         win->stream = NULL;
     }
     if (win->waitIcon != NULL) {
@@ -217,14 +217,14 @@ void KeySystemMsgWin_Free(KeySystemMsgWin *win) {
     KeySystemMsgWin_ClearFrame(win);
     BmpWin_Free(win->window);
     GFL_StrBufFree(win->str);
-    func_02021a18(win->printQueue);
+    PrintQueue_Free(win->printQueue);
     GFL_HeapFree(win);
 }
 
 void KeySystemMsgWin_Update(KeySystemMsgWin *win) {
     BOOL done;
 
-    func_02021a3c(win->printQueue);
+    PrintQueue_Main(win->printQueue);
     switch (win->mode) {
     case KEY_SYSTEM_MSG_PRINT_WAIT_ICON:
         PrintWindow_Flush(&win->printWindow, win->printQueue);
@@ -286,10 +286,10 @@ static void KeySystemMsgWin_Print(KeySystemMsgWin *p_wk, u32 mode) {
     KeySystemPos pos;
     s32 wait;
 
-    func_02021c44(p_wk->printQueue);
+    PrintQueue_Clear(p_wk->printQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(p_wk->window), COLOR_BACKGROUND(p_wk->color));
     if (p_wk->stream != NULL) {
-        func_020223cc(p_wk->stream);
+        PrintStream_Delete(p_wk->stream);
         p_wk->stream = NULL;
     }
     if (p_wk->p_keycursor != NULL) {
@@ -313,26 +313,26 @@ static void KeySystemMsgWin_Print(KeySystemMsgWin *p_wk, u32 mode) {
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printCommon, 0x402);
         p_wk->p_keycursor = KeyCursor_Create(COLOR_BACKGROUND(p_wk->color), 1, 0, p_wk->heapId);
-        wait = func_02017c50(1);
-        p_wk->stream = func_02022268(p_wk->window, pos.x, pos.y, p_wk->str, p_wk->font, wait, p_wk->tcbManager, 0,
-                                     p_wk->heapId, COLOR_BACKGROUND(p_wk->color));
+        wait = TextSpeed_GetWait(1);
+        p_wk->stream = PrintStream_Create(p_wk->window, pos.x, pos.y, p_wk->str, p_wk->font, wait, p_wk->tcbManager, 0,
+                                          p_wk->heapId, COLOR_BACKGROUND(p_wk->color));
         p_wk->mode = KEY_SYSTEM_MSG_STREAM;
         break;
     case KEY_SYSTEM_MSG_STREAM:
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printCommon, 2);
         p_wk->p_keycursor = KeyCursor_Create(COLOR_BACKGROUND(p_wk->color), 1, 0, p_wk->heapId);
-        wait = func_02017bcc();
-        p_wk->stream = func_02022268(p_wk->window, pos.x, pos.y, p_wk->str, p_wk->font, wait, p_wk->tcbManager, 0,
-                                     p_wk->heapId, COLOR_BACKGROUND(p_wk->color));
+        wait = TextSpeed_GetCurrentWait();
+        p_wk->stream = PrintStream_Create(p_wk->window, pos.x, pos.y, p_wk->str, p_wk->font, wait, p_wk->tcbManager, 0,
+                                          p_wk->heapId, COLOR_BACKGROUND(p_wk->color));
         p_wk->mode = KEY_SYSTEM_MSG_STREAM;
         break;
     case KEY_SYSTEM_MSG_STREAM_NO_CURSOR:
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printCommon, 2);
-        wait = func_02017bcc();
-        p_wk->stream = func_02022268(p_wk->window, pos.x, pos.y, p_wk->str, p_wk->font, wait, p_wk->tcbManager, 0,
-                                     p_wk->heapId, COLOR_BACKGROUND(p_wk->color));
+        wait = TextSpeed_GetCurrentWait();
+        p_wk->stream = PrintStream_Create(p_wk->window, pos.x, pos.y, p_wk->str, p_wk->font, wait, p_wk->tcbManager, 0,
+                                          p_wk->heapId, COLOR_BACKGROUND(p_wk->color));
         p_wk->mode = KEY_SYSTEM_MSG_STREAM_NO_CURSOR;
         break;
     }
@@ -884,7 +884,7 @@ KeySystemOamText *KeySystemOamText_Create(const ClActorSetup *setup, u16 width, 
     BmpOamActorSetup actorSetup;
 
     MI_CpuFill8(text, 0, sizeof(KeySystemOamText));
-    text->printQueue = func_02021998(heapId);
+    text->printQueue = PrintQueue_CreateDefault(heapId);
     text->str = GFL_StrBufCreate(128, heapId);
     text->bitmap = GFL_BitmapCreate(width, height, 32, heapId);
     MI_CpuFill8(&actorSetup, 0, sizeof(BmpOamActorSetup));
@@ -905,7 +905,7 @@ void KeySystemOamText_Free(KeySystemOamText *text) {
     BmpOam_ActorDel(text->actor);
     GFL_BitmapFree(text->bitmap);
     GFL_StrBufFree(text->str);
-    func_02021a18(text->printQueue);
+    PrintQueue_Free(text->printQueue);
     GFL_HeapFree(text);
 }
 
@@ -915,7 +915,7 @@ void KeySystemOamText_Print(KeySystemOamText *text, MsgData *msgData, u32 msgId,
     GFL_BitmapFill(text->bitmap, COLOR_BACKGROUND(text->color));
     GFL_MsgDataLoadStrbuf(msgData, msgId, text->str);
     KeySystem_CalcTextPos(text->align, &text->pos, text->bitmap, text->str, font, &pos);
-    func_02021c7c(text->printQueue, text->bitmap, pos.x, pos.y, text->str, font, text->color);
+    PrintQueue_PrintColor(text->printQueue, text->bitmap, pos.x, pos.y, text->str, font, text->color);
     text->printing = TRUE;
 }
 
@@ -924,8 +924,8 @@ void KeySystemOamText_SetColor(KeySystemOamText *text, u16 color) {
 }
 
 void KeySystemOamText_Update(KeySystemOamText *text) {
-    func_02021a3c(text->printQueue);
-    if (text->printing && !func_02021c1c(text->printQueue, text->bitmap)) {
+    PrintQueue_Main(text->printQueue);
+    if (text->printing && !PrintQueue_IsBitmapPending(text->printQueue, text->bitmap)) {
         BmpOam_ActorBmpTrans(text->actor);
         text->printing = FALSE;
     }
@@ -1095,21 +1095,21 @@ static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *pr
     if (list->setup.icons[index] != NULL) {
         pos.x = 224;
         pos.y = y + 16;
-        func_0204c210(list->setup.icons[index], &pos);
-        func_0204c124(list->setup.icons[index], TRUE);
+        ClActor_SetPos(list->setup.icons[index], &pos);
+        ClActor_SetVisible(list->setup.icons[index], TRUE);
     }
     if (list->setup.arrowUp != NULL) {
         if (FrameList_GetScroll(list->list) != 0) {
-            func_0204c124(list->setup.arrowUp, TRUE);
+            ClActor_SetVisible(list->setup.arrowUp, TRUE);
         } else {
-            func_0204c124(list->setup.arrowUp, FALSE);
+            ClActor_SetVisible(list->setup.arrowUp, FALSE);
         }
     }
     if (list->setup.arrowDown != NULL) {
         if (FrameList_CanScrollDown(list->list)) {
-            func_0204c124(list->setup.arrowDown, TRUE);
+            ClActor_SetVisible(list->setup.arrowDown, TRUE);
         } else {
-            func_0204c124(list->setup.arrowDown, FALSE);
+            ClActor_SetVisible(list->setup.arrowDown, FALSE);
         }
     }
 }
@@ -1125,12 +1125,12 @@ static void KeySystemScrollList_Scroll(void *work, s16 delta) {
     int y;
 
     for (i = 0; i < list->setup.count; i++) {
-        if (list->setup.icons[i] != NULL && func_0204c138(list->setup.icons[i])) {
-            func_0204c21c(list->setup.icons[i], &pos);
+        if (list->setup.icons[i] != NULL && ClActor_IsVisible(list->setup.icons[i])) {
+            ClActor_GetPos(list->setup.icons[i], &pos);
             pos.y = pos.y - delta;
-            func_0204c210(list->setup.icons[i], &pos);
+            ClActor_SetPos(list->setup.icons[i], &pos);
             if (pos.y <= -12 || pos.y >= 268) {
-                func_0204c124(list->setup.icons[i], FALSE);
+                ClActor_SetVisible(list->setup.icons[i], FALSE);
             }
         }
     }
@@ -1157,14 +1157,14 @@ void KeySystemParticle_Free(KeySystemParticle *particle) {
 
 void KeySystemParticle_Load(KeySystemParticle *particle, u32 arcId, u32 fileId, HeapID heapId) {
     if (particle->system != NULL) {
-        func_0204fa84(particle->system);
+        Particle_DeleteSystem(particle->system);
     }
-    particle->system = func_0204f968(particle->work, PARTICLE_WORK_SIZE, TRUE, heapId);
-    func_0204fe04(particle->system, func_0204fdf8(arcId, fileId, heapId), TRUE, NULL);
+    particle->system = Particle_CreateSystem(particle->work, PARTICLE_WORK_SIZE, TRUE, heapId);
+    Particle_SetResource(particle->system, Particle_ReadResource(arcId, fileId, heapId), TRUE, NULL);
 }
 
 void KeySystemParticle_Emit(KeySystemParticle *particle, int resourceId) {
-    func_0205007c(particle->system, resourceId, NULL, particle);
+    Particle_CreateEmitterWithCallback(particle->system, resourceId, NULL, particle);
 }
 
 static void KeySystem_BlendColor(u32 type, u16 *dest, u16 angle, u8 palette, u8 index, u16 from, u16 to) {

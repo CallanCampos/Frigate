@@ -28,21 +28,21 @@ StaActLightSys *StaActLight_InitSystem(HeapID heapId, StaActing *stage) {
         sys->lights[i].type = 0;
     }
     sys->followActive = FALSE;
-    sys->clactUnit = func_0204bf1c(5, 0, sys->heapId);
-    func_0204c028(sys->clactUnit);
+    sys->clactUnit = ClActUnit_Create(5, 0, sys->heapId);
+    ClActUnit_UseSystemRenderer(sys->clactUnit);
     arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL, sys->heapId);
-    sys->palette = func_0204bba0(arc, 4, CLACT_VRAM_MAIN, 0, sys->heapId);
-    sys->chars = func_0204b81c(arc, 10, FALSE, CLACT_VRAM_MAIN, sys->heapId);
-    sys->cellAnims = func_0204bde0(arc, 20, 23, sys->heapId);
+    sys->palette = ClActSys_LoadPltt(arc, 4, CLACT_VRAM_MAIN, 0, sys->heapId);
+    sys->chars = ClActSys_LoadChars(arc, 10, FALSE, CLACT_VRAM_MAIN, sys->heapId);
+    sys->cellAnims = ClActSys_LoadCellAnims(arc, 20, 23, sys->heapId);
     GFL_ArcToolFree(arc);
     return sys;
 }
 
 void StaActLight_TermSystem(StaActLightSys *sys) {
-    func_0204bcd0(sys->palette);
-    func_0204b98c(sys->chars);
-    func_0204be64(sys->cellAnims);
-    func_0204bf98(sys->clactUnit);
+    ClActSys_FreePltt(sys->palette);
+    ClActSys_FreeChars(sys->chars);
+    ClActSys_FreeCellAnims(sys->cellAnims);
+    ClActUnit_Delete(sys->clactUnit);
     GFL_HeapFree(sys);
 }
 
@@ -67,11 +67,11 @@ static void StaActLight_UpdateLight(StaActLightSys *sys, StaActLight *light) {
 
         pos.x = FX_FX32_TO_F32(light->pos.x) - scroll;
         pos.y = FX_FX32_TO_F32(light->pos.y);
-        func_0204c140(light->actor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(light->actor, &pos, CLACT_SURFACE_MAIN);
         if (sys->stage != NULL && StaActing_GetLightUpPoke(sys->stage) != STA_ACT_LIGHT_NO_POKE) {
-            func_0204c124(light->actor, FALSE);
+            ClActor_SetVisible(light->actor, FALSE);
         } else {
-            func_0204c124(light->actor, TRUE);
+            ClActor_SetVisible(light->actor, TRUE);
         }
     }
 }
@@ -86,9 +86,9 @@ static void StaActLight_UpdateFollowLight(StaActLightSys *sys) {
         setup.sequence = 0;
         setup.priority = 0;
         setup.bgPriority = 2;
-        sys->followActor = func_0204c040(sys->clactUnit, sys->chars, sys->palette, sys->cellAnims, &setup,
-                                         CLACT_SURFACE_MAIN, sys->heapId);
-        func_0204c124(sys->followActor, TRUE);
+        sys->followActor = ClActor_Create(sys->clactUnit, sys->chars, sys->palette, sys->cellAnims, &setup,
+                                          CLACT_SURFACE_MAIN, sys->heapId);
+        ClActor_SetVisible(sys->followActor, TRUE);
     }
     if (sys->followActive == TRUE) {
         StaActPokeSys *pokeSys;
@@ -98,7 +98,7 @@ static void StaActLight_UpdateFollowLight(StaActLightSys *sys) {
         ClActorPos pos;
 
         if (StaActing_GetLightUpPoke(sys->stage) == STA_ACT_LIGHT_NO_POKE) {
-            func_0204c108(sys->followActor);
+            ClActor_Delete(sys->followActor);
             sys->followActive = FALSE;
             return;
         }
@@ -108,7 +108,7 @@ static void StaActLight_UpdateFollowLight(StaActLightSys *sys) {
         StaActPoke_GetPosition(pokeSys, poke, &pokePos);
         pos.x = FX_FX32_TO_F32(pokePos.x) - scroll;
         pos.y = FX_FX32_TO_F32(pokePos.y) - 32.0f;
-        func_0204c140(sys->followActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(sys->followActor, &pos, CLACT_SURFACE_MAIN);
     }
 }
 
@@ -132,14 +132,14 @@ StaActLight *StaActLight_AddLight(StaActLightSys *sys, u32 type) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 2;
-    light->actor = func_0204c040(sys->clactUnit, sys->chars, sys->palette, sys->cellAnims, &setup, CLACT_SURFACE_MAIN,
-                                 sys->heapId);
-    func_0204c124(light->actor, TRUE);
+    light->actor = ClActor_Create(sys->clactUnit, sys->chars, sys->palette, sys->cellAnims, &setup, CLACT_SURFACE_MAIN,
+                                  sys->heapId);
+    ClActor_SetVisible(light->actor, TRUE);
     return light;
 }
 
 void StaActLight_DelLight(StaActLightSys *sys, StaActLight *light) {
-    func_0204c108(light->actor);
+    ClActor_Delete(light->actor);
     light->type = 0;
 }
 

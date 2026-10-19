@@ -55,8 +55,8 @@
 #include "text/script/scrcmd_shop.h"
 
 // The command's shop IDs past the Poké Marts', whose items are in file ID + 6 of ARCID_SHOP_ITEMS. The special marts'
-// stock grows with a level that func_02010274 keeps in the key system's data, its value 0 for 0xf7 to 0xfa and 1 for
-// 0xef to 0xf2
+// stock grows with a level that KeyDataSave_GetProgress keeps in the key system's data, its value 0 for 0xf7 to 0xfa
+// and 1 for 0xef to 0xf2
 #define SHOP_ID_SPECIAL_MART_1_FIRST 0xef
 #define SHOP_ID_SPECIAL_MART_1_LAST 0xf2
 #define SHOP_ID_MOVE_TUTOR_NACRENE 0xf3
@@ -125,7 +125,7 @@ typedef struct {
     u32 height;
 } ShopRect;
 
-// Cell actor resources, as the func_0204b81c family returns them
+// Cell actor resources, as the ClActSys_LoadChars family returns them
 typedef struct {
     u32 palette;
     u32 chars;
@@ -302,7 +302,7 @@ static const ShopWindowSetup sWindowMessage = { 1, 1, 19, 30, 4, 11, 631 };
 
 static const ShopWindowSetup sWindowBP = { 1, 2, 2, 8, 2, 11, 38 };
 
-// The level of a special mart for each value of func_02010274
+// The level of a special mart for each value of KeyDataSave_GetProgress
 static const int sSpecialMartLevels[] = { 0, 2, 4, 6, 8, 10 };
 
 // The areas of BG 1 that the list's windows cover: all of them, and those of the amount
@@ -600,7 +600,7 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     if (shopId != SHOP_ID_BP_ITEMS && shopId != SHOP_ID_BP_TMS && shopId != SHOP_ID_MOVE_TUTOR_DRIFTVEIL &&
         shopId != SHOP_ID_MOVE_TUTOR_LENTIMAS && shopId != SHOP_ID_MOVE_TUTOR_HUMILAU &&
         shopId != SHOP_ID_MOVE_TUTOR_NACRENE) {
-        func_ov012_02160124();
+        GameBeacon_BroadcastShopping();
     }
     return TRUE;
 }
@@ -864,7 +864,7 @@ static void func_ov036_021ac1d0(ShopUIWork *wk) {
 static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
     s32 index;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     if (wk->listShown == 0) {
@@ -891,18 +891,18 @@ static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
 }
 
 static u8 ShopUI_WaitAB(ShopUIWork *wk) {
-    u32 state = func_020223b4(wk->printStream);
+    u32 state = PrintStream_GetState(wk->printStream);
 
     if (state == PRINT_STREAM_DONE) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         return wk->nextState;
     } else if (state == PRINT_STREAM_RUNNING) {
         if ((GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) || (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B)) {
-            func_020223e0(wk->printStream, 0);
+            PrintStream_SkipWait(wk->printStream, 0);
         }
     } else if (state == PRINT_STREAM_PAUSED) {
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B)) {
-            func_020223bc(wk->printStream);
+            PrintStream_Continue(wk->printStream);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
         }
     }
@@ -934,7 +934,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
     case 2:
         func_ov036_021ad168(wk, wk->item);
         ShopUI_UpdateItemAmountDisp(wk, wk->amount, wk->price);
-        func_0204c124(wk->actors[3], TRUE);
+        ClActor_SetVisible(wk->actors[3], TRUE);
         wk->state = 3;
         break;
     case 3:
@@ -945,14 +945,14 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         BmpWin_FlushMap(wk->windows[2]);
         BmpWin_FlushMap(wk->windows[5]);
         GFL_BGSysQueueScrLoad(1);
-        func_0204c124(wk->actors[3], FALSE);
+        ClActor_SetVisible(wk->actors[3], FALSE);
         BmpMenuList_Redraw(wk->list);
         wk->state = 1;
         break;
     case 5:
         func_ov036_021adbd4(1);
         BmpWin_FlushMap(wk->windows[2]);
-        func_0204c124(wk->actors[3], FALSE);
+        ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
         if (wk->listMode != SHOP_LIST_TMS) {
             func_ov036_021ad168(wk, wk->item);
@@ -962,7 +962,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
     case 6:
         func_ov036_021adbd4(1);
         BmpWin_FlushMap(wk->windows[2]);
-        func_0204c124(wk->actors[3], FALSE);
+        ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
         wk->state = 7;
         break;
@@ -1028,7 +1028,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         ShopUI_FreeText(wk);
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PrintWindow_Flush(&wk->printWindow, wk->printQueue);
     GFL_TCBExMgrUpdate(wk->tcbManager);
     GFL_TCBExMgrUpdate(wk->tcbManager);
@@ -1122,9 +1122,9 @@ static void ShopUI_LoadSpecialPokeMartItems(ShopUIWork *wk, int shopId) {
     u32 i;
 
     if (shopId >= SHOP_ID_SPECIAL_MART_0_FIRST && shopId <= SHOP_ID_SPECIAL_MART_0_LAST) {
-        value = func_02010274(wk->keyData, 0);
+        value = KeyDataSave_GetProgress(wk->keyData, 0);
     } else {
-        value = func_02010274(wk->keyData, 1);
+        value = KeyDataSave_GetProgress(wk->keyData, 1);
     }
     for (i = 0; i < NELEMS(sSpecialMartLevels); i++) {
         if (value >= sSpecialMartLevels[i]) {
@@ -1216,18 +1216,19 @@ static void ShopUI_FreeBG(ShopUIWork *wk) {
 static void ShopUI_CreateCellActors(ShopUIWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SCRCMD_SHOP, wk->heapId);
 
-    wk->res[0].palette = func_0204bbb8(arc, 11, 0, 0, 0, 1, wk->heapId);
-    wk->res[0].chars = func_0204b81c(arc, 8, 0, 0, wk->heapId);
-    wk->res[1].chars = func_0204b81c(arc, 5, 0, 0, wk->heapId);
-    wk->res[0].cellAnims = func_0204bde0(arc, 9, 10, wk->heapId);
-    wk->res[1].cellAnims = func_0204bde0(arc, 6, 7, wk->heapId);
+    wk->res[0].palette = ClActSys_LoadPlttRange(arc, 11, 0, 0, 0, 1, wk->heapId);
+    wk->res[0].chars = ClActSys_LoadChars(arc, 8, 0, 0, wk->heapId);
+    wk->res[1].chars = ClActSys_LoadChars(arc, 5, 0, 0, wk->heapId);
+    wk->res[0].cellAnims = ClActSys_LoadCellAnims(arc, 9, 10, wk->heapId);
+    wk->res[1].cellAnims = ClActSys_LoadCellAnims(arc, 6, 7, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void func_ov036_021acc38(ShopUIWork *wk) {
-    wk->res[2].palette = func_0204bbb8(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 32, 0, 1, wk->heapId);
-    wk->res[2].chars = func_0204b81c(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
-    wk->res[2].cellAnims = func_0204bde0(wk->iconArc, 1, 0, wk->heapId);
+    wk->res[2].palette =
+        ClActSys_LoadPlttRange(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 32, 0, 1, wk->heapId);
+    wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
+    wk->res[2].cellAnims = ClActSys_LoadCellAnims(wk->iconArc, 1, 0, wk->heapId);
 }
 
 // Shows an item's icon, or hides it for anything past the last item. The move tutors show their shard's
@@ -1240,44 +1241,44 @@ static void ShopUI_LoadItemSprite(ShopUIWork *wk, u16 item) {
     if (item <= ITEM_LAST) {
         nclr = GFL_G2DIOReadNCLRArc(wk->iconArc, GetItemGraphicsDatID(item, 2), &palette, wk->heapId);
         ncgr = GFL_G2DIOReadOBJNCGRArc(wk->iconArc, GetItemGraphicsDatID(item, 1), FALSE, &character, wk->heapId);
-        func_0204bd10(wk->res[2].palette, palette, 1);
-        func_0204ba40(wk->res[2].chars, character);
+        ClActSys_ReplacePlttData(wk->res[2].palette, palette, 1);
+        ClActSys_ReplaceCharData(wk->res[2].chars, character);
         GFL_HeapFree(nclr);
         GFL_HeapFree(ncgr);
-        func_0204c124(wk->actors[4], TRUE);
+        ClActor_SetVisible(wk->actors[4], TRUE);
     } else {
-        func_0204c124(wk->actors[4], FALSE);
+        ClActor_SetVisible(wk->actors[4], FALSE);
     }
     if (wk->listMode == SHOP_LIST_MOVES) {
         ClActorPos pos;
 
         pos.x = 22;
         pos.y = 28;
-        func_0204c124(wk->actors[4], TRUE);
-        func_0204c140(wk->actors[4], &pos, 0);
+        ClActor_SetVisible(wk->actors[4], TRUE);
+        ClActor_SetSurfacePos(wk->actors[4], &pos, 0);
     }
 }
 
 static void func_ov036_021acd50(ShopUIWork *wk) {
-    wk->actors[0] = func_0204c040(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims,
-                                  &sActorSetups[0], 0, wk->heapId);
-    wk->actors[1] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
-                                  &sActorSetups[1], 0, wk->heapId);
-    wk->actors[2] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
-                                  &sActorSetups[2], 0, wk->heapId);
-    wk->actors[3] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
-                                  &sActorSetups[3], 0, wk->heapId);
+    wk->actors[0] = ClActor_Create(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims,
+                                   &sActorSetups[0], 0, wk->heapId);
+    wk->actors[1] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
+                                   &sActorSetups[1], 0, wk->heapId);
+    wk->actors[2] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
+                                   &sActorSetups[2], 0, wk->heapId);
+    wk->actors[3] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
+                                   &sActorSetups[3], 0, wk->heapId);
     func_0204c520(wk->actors[3], TRUE);
-    wk->actors[4] = func_0204c040(wk->clactUnit, wk->res[2].chars, wk->res[2].palette, wk->res[2].cellAnims,
-                                  &sActorSetups[4], 0, wk->heapId);
-    func_0204c124(wk->actors[1], FALSE);
-    func_0204c124(wk->actors[2], FALSE);
-    func_0204c124(wk->actors[3], FALSE);
+    wk->actors[4] = ClActor_Create(wk->clactUnit, wk->res[2].chars, wk->res[2].palette, wk->res[2].cellAnims,
+                                   &sActorSetups[4], 0, wk->heapId);
+    ClActor_SetVisible(wk->actors[1], FALSE);
+    ClActor_SetVisible(wk->actors[2], FALSE);
+    ClActor_SetVisible(wk->actors[3], FALSE);
 }
 
 static void ShopUI_SetupSprites(ShopUIWork *wk) {
-    wk->clactUnit = func_0204bf1c(5, 1, wk->heapId);
-    func_0204bfd4(wk->clactUnit, TRUE);
+    wk->clactUnit = ClActUnit_Create(5, 1, wk->heapId);
+    ClActUnit_SetActive(wk->clactUnit, TRUE);
     ShopUI_CreateCellActors(wk);
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, wk->heapId);
     func_ov036_021acc38(wk);
@@ -1285,16 +1286,16 @@ static void ShopUI_SetupSprites(ShopUIWork *wk) {
 }
 
 static void func_ov036_021acea0(ShopUIWork *wk) {
-    func_0204be64(wk->res[2].cellAnims);
-    func_0204be64(wk->res[1].cellAnims);
-    func_0204be64(wk->res[0].cellAnims);
-    func_0204b98c(wk->res[2].chars);
-    func_0204b98c(wk->res[1].chars);
-    func_0204b98c(wk->res[0].chars);
-    func_0204bcd0(wk->res[2].palette);
-    func_0204bcd0(wk->res[0].palette);
+    ClActSys_FreeCellAnims(wk->res[2].cellAnims);
+    ClActSys_FreeCellAnims(wk->res[1].cellAnims);
+    ClActSys_FreeCellAnims(wk->res[0].cellAnims);
+    ClActSys_FreeChars(wk->res[2].chars);
+    ClActSys_FreeChars(wk->res[1].chars);
+    ClActSys_FreeChars(wk->res[0].chars);
+    ClActSys_FreePltt(wk->res[2].palette);
+    ClActSys_FreePltt(wk->res[0].palette);
     GFL_ArcToolFree(wk->iconArc);
-    func_0204bf98(wk->clactUnit);
+    ClActUnit_Delete(wk->clactUnit);
 }
 
 static void ShopUI_SetupBmpWin(ShopUIWork *wk) {
@@ -1319,7 +1320,7 @@ static void ShopUI_SetupBmpWin(ShopUIWork *wk) {
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->windows[0]), 0, 0, strbuf, wk->font, PRINT_COLOR(15, 2, 15));
     GFL_StrBufFree(strbuf);
     PrintWindow_Init(&wk->printWindow, wk->windows[2]);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     if (wk->currency == SHOP_CURRENCY_BP || wk->currency == SHOP_CURRENCY_SHARDS) {
         BmpWin_TransferNow(wk->windows[1]);
     } else {
@@ -1331,8 +1332,8 @@ static void ShopUI_SetupBmpWin(ShopUIWork *wk) {
 static void ShopUI_FreeSprites(ShopUIWork *wk) {
     int i;
 
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     for (i = 0; i < 7; i++) {
         BmpWin_Free(wk->windows[i]);
     }
@@ -1468,7 +1469,7 @@ static void func_ov036_021ad48c(PrintQueue *queue, GFLBitmap *bitmap, int x, int
     if (y <= 8) {
         GFL_TextRendererDrawToBitmapEx(bitmap, x, y, strbuf, font, color);
     } else {
-        func_02021c7c(queue, bitmap, x, y, strbuf, font, color);
+        PrintQueue_PrintColor(queue, bitmap, x, y, strbuf, font, color);
     }
 }
 
@@ -1523,7 +1524,7 @@ static void func_ov036_021ad64c(BmpMenuList *list, s32 value, u8 init) {
     BmpMenuList_GetPos(list, &listTop, &cursorRow);
     pos.x = 172;
     pos.y = cursorRow * 16 + 22;
-    func_0204c140(wk->actors[0], &pos, 0);
+    ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
     if (value < NELEMS(wk->entries)) {
         func_ov036_021ad21c(wk, wk->entries[value].item);
         if (wk->listMode != SHOP_LIST_MOVES) {
@@ -1560,8 +1561,9 @@ static void ShopUI_SetStatusDialogue(ShopUIWork *wk, u32 msgId, u16 item, BOOL p
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, func_ov036_021ad6e0);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov036_021ad6e0);
     BmpWin_TransferNow(wk->windows[6]);
 }
 
@@ -1595,8 +1597,9 @@ static void func_ov036_021ad864(ShopUIWork *wk, u32 msgId) {
 
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, NULL);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, NULL);
     BmpWin_TransferNow(wk->windows[6]);
 }
 

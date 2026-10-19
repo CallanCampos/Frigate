@@ -14,9 +14,9 @@ struct EventResearchRadar {
 
 static char sFile[] = "event_research_radar.c";
 
-GameEventReturnCode func_ov018_0216e660(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventResearchRadar_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEventReturnCode func_ov018_0216e660(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventResearchRadar_Callback(GameEvent *event, u32 *state, void *data) {
     EventResearchRadar *work = data;
     GameSystem *gsys = work->gsys;
     Field *field = work->field;
@@ -49,8 +49,8 @@ GameEventReturnCode func_ov018_0216e660(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov018_0216e708(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov018_0216e660, sizeof(EventResearchRadar));
+GameEvent *EventResearchRadar_Create(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventResearchRadar_Callback, sizeof(EventResearchRadar));
     EventResearchRadar *work = GameEvent_GetData(event);
 
     work->gsys = gsys;

@@ -271,7 +271,7 @@ static u32 FieldSubscreen_GetOverrideScreen(FieldSubscreen *subscreen, GameSyste
         GetZoneIsEntreeForest(zoneId)) {
         return FLD_SUBSCREEN_ID_BLANK_STANDBY_2;
     }
-    if (func_020098c0(func_02009918(GameData_GetSaveControl(gameData))) == 0) {
+    if (CGearSettings_IsOn(CGearSettings_GetFromSave(GameData_GetSaveControl(gameData))) == 0) {
         return FLD_SUBSCREEN_ID_BLANK_STANDBY_2;
     }
     if (getStatusOfFesMission(GSYS_GetLinkFestival(gsys)) != 0) {
@@ -286,15 +286,15 @@ u32 FieldSubscreen_GetIDForChange(FieldSubscreen *subscreen, u32 param) {
     u32 screenId = FieldSubscreen_GetOverrideScreen(subscreen, gsys, gameData);
 
     if (param == FLD_SUBSCREEN_ID_DEFAULT) {
-        u8 powerRequest = func_02017404(gameData);
+        u8 powerRequest = GameData_GetCGearPowerRequest(gameData);
         if (screenId != FLD_SUBSCREEN_ID_MAX) {
             return screenId;
         }
         if (powerRequest == 1) {
-            if (func_02016b34(gsys) != 0) {
+            if (GSYS_IsCGearOn(gsys) != 0) {
                 return FLD_SUBSCREEN_ID_ENTRALINK;
             }
-            func_0201740c(gameData, 0);
+            GameData_SetCGearPowerRequest(gameData, 0);
         }
     } else if (param == FLD_SUBSCREEN_ID_ENTRALINK && screenId != FLD_SUBSCREEN_ID_MAX) {
         return screenId;
@@ -354,7 +354,7 @@ void func_ov036_021984f0(FieldSubscreen *subscreen, HeapID heapId) {
 
 static void FieldSubscreen_CGear_Init(FieldSubscreen *subscreen, u32 previousScreenId) {
     GameSystem *gsys = Field_GetGameSystem(subscreen->field);
-    CGearSettings *settings = func_02009918(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
+    CGearSettings *settings = CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     u8 wasOn;
     u32 isOn;
 
@@ -362,7 +362,7 @@ static void FieldSubscreen_CGear_Init(FieldSubscreen *subscreen, u32 previousScr
     // The settings keep whether the C-Gear was on when it last showed, so that it plays its startup when it has been
     // turned on since
     wasOn = func_02009914(settings);
-    isOn = func_02016b34(gsys);
+    isOn = GSYS_IsCGearOn(gsys);
     subscreen->work = CGearSw_Create(settings, subscreen, gsys, isOn == TRUE && wasOn == FALSE);
     func_02009910(settings, isOn);
     if (func_02016bec(gsys)) {
@@ -377,8 +377,8 @@ static void FieldSubscreen_CGear_InitPowerOn(FieldSubscreen *subscreen, u32 prev
     CGearSettings *settings;
 
     GFL_OvlLoad(OVERLAY_C_GEAR_SW);
-    isOn = func_02016b34(gsys);
-    settings = func_02009918(save);
+    isOn = GSYS_IsCGearOn(gsys);
+    settings = CGearSettings_GetFromSave(save);
     subscreen->work = CGearSw_CreateWithCallback(settings, subscreen, Field_GetGameSystem(subscreen->field),
                                                  subscreen->callback, subscreen->callbackWork, isOn);
     func_02009910(settings, isOn);
@@ -401,9 +401,9 @@ static void FieldSubscreen_CGear_Draw(FieldSubscreen *subscreen) {
 static void FieldSubscreen_CGear_Update(FieldSubscreen *subscreen, BOOL active) {
     if (active) {
         GameSystem *gsys = Field_GetGameSystem(subscreen->field);
-        CGearSettings *settings = func_02009918(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
+        CGearSettings *settings = CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
         if (func_02016bec(gsys)) {
-            if (func_02016b34(gsys) != 0) {
+            if (GSYS_IsCGearOn(gsys) != 0) {
                 func_02016bf8(gsys);
             } else if (CGearSw_Reload(subscreen->work)) {
                 func_02009910(settings, FALSE);
@@ -422,28 +422,28 @@ static void FieldSubscreen_NoGear_Init(FieldSubscreen *subscreen, u32 previousSc
     CGearSettings *settings;
 
     GFL_OvlLoad(OVERLAY_NO_GEAR);
-    settings = func_02009918(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
-    subscreen->work = func_ov080_021eaa68(settings, subscreen, Field_GetGameSystem(subscreen->field));
+    settings = CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
+    subscreen->work = NoGear_Create(settings, subscreen, Field_GetGameSystem(subscreen->field));
 }
 
 static void FieldSubscreen_NoGear_Terminate(FieldSubscreen *subscreen) {
-    func_ov080_021eaab8(subscreen->work);
+    NoGear_Free(subscreen->work);
     GFL_OvlUnload(OVERLAY_NO_GEAR);
 }
 
 static void FieldSubscreen_NoGear_Draw(FieldSubscreen *subscreen) {
-    func_ov080_021eaab4(subscreen->work);
+    NoGear_Draw(subscreen->work);
 }
 
 static void FieldSubscreen_NoGear_Update(FieldSubscreen *subscreen, BOOL active) {
-    func_ov080_021eaa98(subscreen->work);
+    NoGear_Update(subscreen->work);
 }
 
 static void FieldSubscreen_Wbt_Init(FieldSubscreen *subscreen, u32 previousScreenId) {
     CGearSettings *settings;
 
     GFL_OvlLoad(OVERLAY_WBT_SUBSCREEN);
-    settings = func_02009918(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
+    settings = CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
     subscreen->work = WbtSubscreen_Create(settings, subscreen, Field_GetGameSystem(subscreen->field));
 }
 
@@ -453,7 +453,7 @@ static void FieldSubscreen_Wbt_Terminate(FieldSubscreen *subscreen) {
 }
 
 static void FieldSubscreen_Wbt_Draw(FieldSubscreen *subscreen) {
-    func_ov081_021ea934(subscreen->work);
+    WbtSubscreen_Draw(subscreen->work);
 }
 
 static void FieldSubscreen_Wbt_Update(FieldSubscreen *subscreen, BOOL active) {

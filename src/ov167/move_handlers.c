@@ -49,8 +49,8 @@ static const BattleEventHandlerEntry *EventAddBrickBreak(u32 *priority);
 static void HandlerBrickBreakStart(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerBrickBreakEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerBrickBreakCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static BOOL func_ov167_021c6130(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId,
-                                u8 monId);
+static BOOL HandlerBrickBreakSkipCheck(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId,
+                                       u8 monId);
 static const BattleEventHandlerEntry *EventJumpKickAdd(u32 *priority);
 static void HandlerJumpKickMiss(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void CommonJumpKickEffect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -172,7 +172,7 @@ static void HandlerRageStart(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 static void HandlerRageBuild(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerRageEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddAquaRing(u32 *priority);
-static void func_ov167_021c79c0(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerAquaRing(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddThrash(u32 *priority);
 static void HandlerThrash(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerThrashEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -182,7 +182,7 @@ static void HandlerUproar(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
 static void HandlerUproarEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerUproarUnlock(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerUproarPreventSleep(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static void func_ov167_021c7e14(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerUproarYawnCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddRollout(u32 *priority);
 static void HandlerRolloutStart(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerRolloutMiss(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -314,7 +314,7 @@ static void HandlerRecycle(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
 static const BattleEventHandlerEntry *EventAddPsychoShift(u32 *priority);
 static void HandlerPsychoShift(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddPainSplit(u32 *priority);
-static void func_ov167_021c98b8(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerPainSplit(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventBellyDrum(u32 *priority);
 static void HandlerBellyDrum(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddFeint(u32 *priority);
@@ -442,20 +442,20 @@ static const BattleEventHandlerEntry *EventAddMorningSun(u32 *priority);
 static void HandlerMorningSun(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddFly(u32 *priority);
 static void HandlerFly(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static void func_ov167_021cba48(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerFlyRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddShadowForce(u32 *priority);
 static void HandlerShadowForce(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static void func_ov167_021cbaac(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerShadowForceRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerShadowForceEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddBounce(u32 *priority);
 static void HandlerBounce(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static void func_ov167_021cbb80(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerBounceRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddDive(u32 *priority);
 static void HandlerDive(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static void func_ov167_021cbbe4(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerDiveRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddDig(u32 *priority);
 static void HandlerDig(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static void func_ov167_021cbc48(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+static void HandlerDigRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddSolarBeam(u32 *priority);
 static void HandlerSolarBeamSunCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerSolarBeamCharge(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -594,7 +594,7 @@ static const BattleEventHandlerEntry *EventAddFreezeShock(u32 *priority);
 static void HandlerFreezeShock(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static const BattleEventHandlerEntry *EventAddFusionFlare(u32 *priority);
 static void HandlerFusionFlare(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-static u32 func_ov167_021cdbc4(u16 move, u16 partnerMove);
+static u32 GetPledgeComboEffect(u16 move, u16 partnerMove);
 static const BattleEventHandlerEntry *EventAddWaterPledge(u32 *priority);
 static void HandlerWaterPledgeCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerWaterPledgeDecide(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -913,7 +913,7 @@ static BOOL DoesMoveEventExist(u8 monId, u16 move, u8 *found) {
 }
 
 // Removes the move's handlers that don't persist
-void func_ov167_021c5bbc(BattleMon *mon, u16 move) {
+void MoveEvent_RemoveItem(BattleMon *mon, u16 move) {
     BattleEventItem *item;
     BattleEventItem *next;
 
@@ -931,7 +931,7 @@ void RemoveForce(BattleMon *mon, u16 move) {
     RemoveHandlerForce(GetMonID(mon), move);
 }
 
-BOOL func_ov167_021c5c10(BattleEventItem *item, s32 *work) {
+BOOL MoveEventItem_IsPersistent(BattleEventItem *item, s32 *work) {
     if (work[6] != 0) {
         return TRUE;
     }
@@ -997,7 +997,7 @@ static void HandlerConversion(BattleEventItem *item, BtlServerFlow *flow, u8 mon
         }
         if (count != 0) {
             param = BattleHandler_PushWork(flow, 0x14, monId);
-            param->type = func_ov167_021ce530(types[(u16)BattleRandom(count)]);
+            param->type = PokeTypePair_MakeMonotype(types[(u16)BattleRandom(count)]);
             param->monIndex = monId;
             BattleHandler_PopWork(flow, param);
         }
@@ -1050,7 +1050,7 @@ static void HandlerCamouflage(BattleEventItem *item, BtlServerFlow *flow, u8 mon
             type = 0xe;
             break;
         }
-        pair = func_ov167_021ce530(type);
+        pair = PokeTypePair_MakeMonotype(type);
         if (pair != GetPokeType(GetBattleMon(flow, monId))) {
             param = BattleHandler_PushWork(flow, 0x14, monId);
             param->type = pair;
@@ -1127,7 +1127,7 @@ static void HandlerWaterSport(BattleEventItem *item, BtlServerFlow *flow, u8 mon
     if (BattleEventVar_GetValue(3) == monId) {
         param = BattleHandler_PushWork(flow, 0x1b, monId);
         param->effect = 4;
-        param->value = func_ov167_021ce1dc(monId);
+        param->value = MakeConditionDependPoke(monId);
         BattleHandler_StrSetup(&param->string, 1, 0x72);
         BattleHandler_PopWork(flow, param);
     }
@@ -1148,7 +1148,7 @@ static void HandlerMudSport(BattleEventItem *item, BtlServerFlow *flow, u8 monId
     if (BattleEventVar_GetValue(3) == monId) {
         param = BattleHandler_PushWork(flow, 0x1b, monId);
         param->effect = 5;
-        param->value = func_ov167_021ce1dc(monId);
+        param->value = MakeConditionDependPoke(monId);
         BattleHandler_StrSetup(&param->string, 1, 0x73);
         BattleHandler_PopWork(flow, param);
     }
@@ -1207,7 +1207,7 @@ static const BattleEventHandlerEntry *EventAddBrickBreak(u32 *priority) {
 
 static void HandlerBrickBreakStart(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (BattleEventVar_GetValue(3) == monId) {
-        BattleEventItem_AttachSkipCheckHandler(item, func_ov167_021c6130);
+        BattleEventItem_AttachSkipCheckHandler(item, HandlerBrickBreakSkipCheck);
     }
 }
 
@@ -1239,8 +1239,8 @@ static void HandlerBrickBreakCheck(BattleEventItem *item, BtlServerFlow *flow, u
 }
 
 // Skips the side effects' handlers, Reflect's and Light Screen's, while Brick Break hits
-static BOOL func_ov167_021c6130(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId,
-                                u8 monId) {
+static BOOL HandlerBrickBreakSkipCheck(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId,
+                                       u8 monId) {
     if (factorType == 2 && subId <= 1) {
         return TRUE;
     }
@@ -1302,8 +1302,8 @@ static void HandlerMimic(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
             if (used != move) {
                 move = used;
             }
-            if (move != 0 && !IsMimicExcludedMove(move) && func_ov167_021baf78(mon, move) == 4) {
-                slot = func_ov167_021baf78(mon, BattleEventItem_GetSubID(item));
+            if (move != 0 && !IsMimicExcludedMove(move) && BattleMon_FindMoveSlot(mon, move) == 4) {
+                slot = BattleMon_FindMoveSlot(mon, BattleEventItem_GetSubID(item));
                 if (slot != 4) {
                     update = BattleHandler_PushWork(flow, 0x25, monId);
                     update->monIndex = monId;
@@ -1351,7 +1351,7 @@ static void HandlerSketch(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         }
         if (move != 0 && move != 0xa6 && move != 0xa5 && move != 0x1c0 && !MoveIsUsable(mon, move) &&
             !TransformCheck(mon)) {
-            slot = func_ov167_021baf78(mon, BattleEventItem_GetSubID(item));
+            slot = BattleMon_FindMoveSlot(mon, BattleEventItem_GetSubID(item));
             if (slot != 4) {
                 update = BattleHandler_PushWork(flow, 0x25, monId);
                 update->monIndex = monId;
@@ -1383,8 +1383,8 @@ static const BattleEventHandlerEntry *EventAddFollowMe(u32 *priority) {
 }
 
 static void HandlerFollowMeCheckFail(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    if ((func_ov167_021abc9c(flow) == 0 || func_ov167_021abc9c(flow) == 3) && BattleEventVar_GetValue(2) == monId &&
-        BattleEventVar_GetValue(0x22) == 0) {
+    if ((BtlServerFlow_GetBattleStyle(flow) == 0 || BtlServerFlow_GetBattleStyle(flow) == 3) &&
+        BattleEventVar_GetValue(2) == monId && BattleEventVar_GetValue(0x22) == 0) {
         BattleEventVar_RewriteValue(0x22, 0x1a);
     }
 }
@@ -1406,13 +1406,13 @@ static void HandlerFollowMeBaitTarget(BattleEventItem *item, BtlServerFlow *flow
     BattleMon *mon;
     u16 move;
 
-    if (func_ov167_021abc9c(flow) != 0 && func_ov167_021abc9c(flow) != 3) {
+    if (BtlServerFlow_GetBattleStyle(flow) != 0 && BtlServerFlow_GetBattleStyle(flow) != 3) {
         attackerId = BattleEventVar_GetValue(3);
         mon = GetBattleMon(flow, monId);
         if (!IsAllyMonID(monId, attackerId) && BattleEventVar_GetValue(0x12) != 0x1fb && !CheckCondition(mon, 0x21) &&
             !IsMonSwitchingOut(flow)) {
             move = BattleEventVar_GetValue(0x12);
-            if (!func_ov167_021abdd0(flow, attackerId, monId, move)) {
+            if (!BtlServerFlow_IsTargetOutOfRange(flow, attackerId, monId, move)) {
                 BattleEventVar_RewriteValue(4, monId);
             }
         }
@@ -1467,7 +1467,7 @@ static void HandlerSpiderWeb(BattleEventItem *item, BtlServerFlow *flow, u8 monI
             param = BattleHandler_PushWork(flow, 0xc, monId);
             param->targetIndex = targetId;
             param->condition = 0x16;
-            param->value = func_ov167_021bd5b0(monId);
+            param->value = BtlCalc_MakePokeCondition(monId);
             BattleHandler_StrSetup(&param->string, 2, 0x368);
             BattleHandler_AddArg(&param->string, targetId);
             BattleHandler_PopWork(flow, param);
@@ -1490,7 +1490,8 @@ static void HandlerHaze(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
 
     if (BattleEventVar_GetValue(3) == monId) {
         reset = BattleHandler_PushWork(flow, 0x10, monId);
-        reset->count = HandlerGetAlivePartyCount(flow, 0x800 | func_ov167_021ab840(flow, monId), reset->monIndices);
+        reset->count =
+            HandlerGetAlivePartyCount(flow, 0x800 | BtlServerFlow_GetMonBattlePos(flow, monId), reset->monIndices);
         BattleHandler_PopWork(flow, reset);
         message = BattleHandler_PushWork(flow, 4, monId);
         BattleHandler_StrSetup(&message->string, 1, 0x65);
@@ -1529,7 +1530,7 @@ static const BattleEventHandlerEntry *EventAddCurse(u32 *priority) {
 
 static void HandlerCurseMoveParam(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (BattleEventVar_GetValue(2) == monId) {
-        BattleEventVar_RewriteValue(0x1b, func_ov167_021bd8d0(GetBattleMon(flow, monId)));
+        BattleEventVar_RewriteValue(0x1b, BtlCalc_GetCurseTarget(GetBattleMon(flow, monId)));
     }
 }
 
@@ -1713,7 +1714,7 @@ static void HandlerTriAttack(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(3) == monId) {
         status = sTriAttackStatuses[(u8)BattleRandom(3)];
-        condition = func_ov167_021bd52c(status);
+        condition = BtlCalc_MakeStatusCondition(status);
         BattleEventVar_RewriteValue(0x1d, status);
         BattleEventVar_RewriteValue(0x1e, condition.raw);
         BattleEventVar_RewriteValue(0x26, 20);
@@ -1819,7 +1820,7 @@ static void HandlerSecretPower(BattleEventItem *item, BtlServerFlow *flow, u8 mo
             condition = BattleHandler_PushWork(flow, 0xc, monId);
             condition->targetIndex = targetId;
             condition->condition = arg;
-            func_ov167_021bd5d4(arg, mon, &condition->value);
+            BtlCalc_MakeDefaultCondition(arg, mon, &condition->value);
             BattleHandler_PopWork(flow, condition);
             break;
         case 1:
@@ -1859,7 +1860,7 @@ static void HandlerChatter(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
         if (GetBattleMonSpecies(mon) == 0x1b9) {
-            volume = func_ov167_021aba18(flow, monId);
+            volume = BtlServerFlow_GetChatterEffect(flow, monId);
             if (volume != 0) {
                 status = CONDITION_CONFUSION;
                 GetSrcData(mon);
@@ -1868,7 +1869,7 @@ static void HandlerChatter(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
                 } else {
                     chance = 10;
                 }
-                func_ov167_021bd5d4(status, mon, &condition);
+                BtlCalc_MakeDefaultCondition(status, mon, &condition);
                 BattleEventVar_RewriteValue(0x1d, status);
                 BattleEventVar_RewriteValue(0x1e, condition.raw);
                 BattleEventVar_RewriteValue(0x26, chance);
@@ -1894,7 +1895,7 @@ static void HandlerBind(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
     if (BattleEventVar_GetValue(3) == monId) {
         move = BattleEventItem_GetSubID(item);
         condition.raw = BattleEventVar_GetValue(0x1e);
-        func_ov167_021ce368(&condition, move);
+        Condition_SetParam(&condition, move);
         BattleEventVar_RewriteValue(0x1e, condition.raw);
     }
 }
@@ -2370,15 +2371,15 @@ static void CommonCounterSetTarget(BtlServerFlow *flow, u8 monId, s32 *work, u32
     if (BattleEventVar_GetValue(3) == monId &&
         CommonCounterCheckDamageRecieved(GetBattleMon(flow, monId), category, &record)) {
         targetId = record.attackerId;
-        if (func_ov167_021ab840(flow, targetId) == 6) {
+        if (BtlServerFlow_GetMonBattlePos(flow, targetId) == 6) {
             targetId = 0x1f;
             if (record.attackerPos != 6) {
-                targetId = func_ov167_021ab884(flow, record.attackerPos);
+                targetId = BtlServerFlow_GetMonIDAtPos(flow, record.attackerPos);
             }
             if (targetId == 0x1f) {
-                pos = func_ov167_021abb70(flow, monId, 1);
+                pos = BtlServerFlow_GetMoveTargetPos(flow, monId, 1);
                 if (pos != 6) {
-                    targetId = func_ov167_021ab884(flow, pos);
+                    targetId = BtlServerFlow_GetMonIDAtPos(flow, pos);
                 }
                 if (targetId == 0x1f) {
                     targetId = record.attackerId;
@@ -2517,14 +2518,14 @@ static void HandlerSuckerPunch(BattleEventItem *item, BtlServerFlow *flow, u8 mo
         targetId = BattleEventVar_GetValue(4);
         target = GetBattleMon(flow, targetId);
         attacking = FALSE;
-        if (!GetTurnFlag(target, 3) && func_ov167_021abb8c(flow, targetId, &action)) {
-            move = func_ov167_021bdb68(&action);
+        if (!GetTurnFlag(target, 3) && BtlServerFlow_GetPendingAction(flow, targetId, &action)) {
+            move = BattleAction_GetFightMove(&action);
             if (move != 0 && PML_MoveIsDamaging(move)) {
                 attacking = TRUE;
             }
         }
         if (!attacking) {
-            move = func_ov167_021bdb68(&action);
+            move = BattleAction_GetFightMove(&action);
             if (move == 0 || !PML_MoveIsDamaging(move)) {
                 if (BattleEventVar_RewriteValue(0x40, 1)) {
                     BattleHandler_StrSetup((BattleHandlerString *)BattleEventVar_GetValue(0x3f), 1, 0x47);
@@ -2549,12 +2550,12 @@ static void HandlerPursuitStart(BattleEventItem *item, BtlServerFlow *flow, u8 m
     BattleAction action;
     u8 targetId;
 
-    if (func_ov167_021abb8c(flow, monId, &action)) {
+    if (BtlServerFlow_GetPendingAction(flow, monId, &action)) {
         targetId = BattleEventVar_GetValue(6);
         if (!IsAllyMonID(targetId, monId)) {
-            func_ov167_021abb50(flow, targetId);
-            func_ov167_021abb50(flow, monId);
-            if (!func_ov167_021abdd0(flow, monId, targetId, 0)) {
+            BtlServerFlow_MonIDToPos(flow, targetId);
+            BtlServerFlow_MonIDToPos(flow, monId);
+            if (!BtlServerFlow_IsTargetOutOfRange(flow, monId, targetId, 0)) {
                 AddSwitchOutInterrupt(flow, monId);
             }
         }
@@ -2716,7 +2717,7 @@ static const BattleEventHandlerEntry *EventAddLeechSeed(u32 *priority) {
 
 static void HandlerLeechSeed(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (BattleEventVar_GetValue(3) == monId) {
-        BattleEventVar_RewriteValue(0x1e, MakeConditionParamPermanent(func_ov167_021ab840(flow, monId)).raw);
+        BattleEventVar_RewriteValue(0x1e, MakeConditionParamPermanent(BtlServerFlow_GetMonBattlePos(flow, monId)).raw);
     }
 }
 
@@ -2733,7 +2734,7 @@ static void HandlerPayDay(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
     BattleHandlerMessageParam *message;
 
     if (BattleEventVar_GetValue(3) == monId &&
-        func_ov167_021abf28(flow, GetBattleMonStat(GetBattleMon(flow, monId), 0xf) * 5, monId)) {
+        BtlServerFlow_AddPayDayMoney(flow, GetBattleMonStat(GetBattleMon(flow, monId), 0xf) * 5, monId)) {
         message = BattleHandler_PushWork(flow, 4, monId);
         BattleHandler_StrSetup(&message->string, 1, 0x7a);
         BattleHandler_PopWork(flow, message);
@@ -2786,7 +2787,7 @@ static void HandlerRageEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
 }
 
 static const BattleEventHandlerEntry sHandlersAquaRing[] = {
-    { 0xa0, func_ov167_021c79c0 },
+    { 0xa0, HandlerAquaRing },
 };
 
 static const BattleEventHandlerEntry *EventAddAquaRing(u32 *priority) {
@@ -2794,7 +2795,7 @@ static const BattleEventHandlerEntry *EventAddAquaRing(u32 *priority) {
     return sHandlersAquaRing;
 }
 
-static void func_ov167_021c79c0(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerAquaRing(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     BattleHandlerAddConditionParam *param;
 
     if (BattleEventVar_GetValue(3) == monId && !CheckCondition(GetBattleMon(flow, monId), 0x23)) {
@@ -2860,7 +2861,7 @@ static void HandlerThrashEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monI
             if (work[0] == 0) {
                 confuse = BattleHandler_PushWork(flow, 0xc, monId);
                 confuse->condition = 6;
-                func_ov167_021bd5d4(6, mon, &confuse->value);
+                BtlCalc_MakeDefaultCondition(6, mon, &confuse->value);
                 confuse->noMessage = TRUE;
                 confuse->targetIndex = monId;
                 BattleHandler_StrSetup(&confuse->string, 2, 0x168);
@@ -2895,9 +2896,9 @@ static void HandlerThrashTurnCheck(BattleEventItem *item, BtlServerFlow *flow, u
 // This part
 
 static const BattleEventHandlerEntry sHandlersUproar[] = {
-    { 0x45, HandlerUproar },       { 0x04, HandlerUproarEnd },
-    { 0x77, HandlerUproarUnlock }, { 0x65, HandlerUproarPreventSleep },
-    { 0x0e, func_ov167_021c7e14 },
+    { 0x45, HandlerUproar },          { 0x04, HandlerUproarEnd },
+    { 0x77, HandlerUproarUnlock },    { 0x65, HandlerUproarPreventSleep },
+    { 0x0e, HandlerUproarYawnCheck },
 };
 
 static const BattleEventHandlerEntry *EventAddUproar(u32 *priority) {
@@ -2927,8 +2928,8 @@ static void HandlerUproar(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
             BattleHandler_AddArg(&msgParam->string, monId);
             BattleHandler_PopWork(flow, msgParam);
 
-            side = func_ov167_021ab840(flow, monId);
-            mons = func_ov167_021abc60(flow, 7);
+            side = BtlServerFlow_GetMonBattlePos(flow, monId);
+            mons = BtlServerFlow_GetHandlerWork(flow, 7);
             mons[0] = HandlerGetAlivePartyCount(flow, side | 0x800, &mons[1]);
             for (i = 0; i < mons[0]; i++) {
                 if (CheckCondition(GetBattleMon(flow, mons[1 + i]), 2)) {
@@ -2994,7 +2995,7 @@ static void HandlerUproarPreventSleep(BattleEventItem *item, BtlServerFlow *flow
     }
 }
 
-static void func_ov167_021c7e14(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerUproarYawnCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (work[6] != 0) {
         BattleEventVar_RewriteValue(0x41, 1);
     }
@@ -3117,8 +3118,8 @@ static void HandlerGyroBall(BattleEventItem *item, BtlServerFlow *flow, u8 monId
     if (BattleEventVar_GetValue(3) == monId) {
         attacker = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        attackerSpeed = func_ov167_021abd08(flow, attacker, FALSE);
-        power = 25 * func_ov167_021abd08(flow, target, FALSE) / attackerSpeed + 1;
+        attackerSpeed = BtlServerFlow_CalcSpeed(flow, attacker, FALSE);
+        power = 25 * BtlServerFlow_CalcSpeed(flow, target, FALSE) / attackerSpeed + 1;
         if (power > 150) {
             power = 150;
         }
@@ -3495,7 +3496,7 @@ static void HandlerTrumpCard(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
-        slot = func_ov167_021baf78(mon, BattleEventItem_GetSubID(item));
+        slot = BattleMon_FindMoveSlot(mon, BattleEventItem_GetSubID(item));
         if (slot != 4) {
             pp = GetMovePP(mon, slot);
             if (pp >= NELEMS(sTrumpCardPower)) {
@@ -3607,7 +3608,7 @@ static void HandlerLowKick(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
     u32 power;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        weight = func_ov167_021abee0(flow, GetMonID(GetBattleMon(flow, BattleEventVar_GetValue(4))));
+        weight = BtlServerFlow_GetMonWeight(flow, GetMonID(GetBattleMon(flow, BattleEventVar_GetValue(4))));
         if (weight >= 2000) {
             power = 120;
         } else if (weight >= 1000) {
@@ -3795,7 +3796,7 @@ static void HandlerJudgement(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     u16 heldItem;
     u8 type;
 
-    if (BattleEventVar_GetValue(2) == monId && func_ov167_021abd8c(flow, monId)) {
+    if (BattleEventVar_GetValue(2) == monId && BtlServerFlow_CanUseHeldItem(flow, monId)) {
         heldItem = GetBattleMonHeldItem(GetBattleMon(flow, monId));
         type = 0;
         switch (heldItem) {
@@ -3866,7 +3867,7 @@ static void HandlerTechnoBlast(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     u8 type;
     u8 effect;
 
-    if (BattleEventVar_GetValue(2) == monId && func_ov167_021abd8c(flow, monId)) {
+    if (BattleEventVar_GetValue(2) == monId && BtlServerFlow_CanUseHeldItem(flow, monId)) {
         heldItem = GetBattleMonHeldItem(GetBattleMon(flow, monId));
         type = 0;
         effect = 0;
@@ -3931,7 +3932,7 @@ static void HandlerNaturalGiftCheckFail(BattleEventItem *item, BtlServerFlow *fl
     u16 heldItem;
 
     if (BattleEventVar_GetValue(2) == monId) {
-        if (!func_ov167_021abd8c(flow, monId)) {
+        if (!BtlServerFlow_CanUseHeldItem(flow, monId)) {
             BattleEventVar_RewriteValue(0x22, 0x1a);
             return;
         }
@@ -3982,7 +3983,7 @@ static void HandlerKnockOff(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
-        if (!func_ov167_021cdf28(flow, monId, targetId)) {
+        if (!IsItemSwapBlocked(flow, monId, targetId)) {
             heldItem = GetBattleMonHeldItem(GetBattleMon(flow, targetId));
             if (heldItem != 0) {
                 param = BattleHandler_PushWork(flow, 0x20, monId);
@@ -4039,7 +4040,7 @@ static void HandlerMagicCoatWait(BattleEventItem *item, BtlServerFlow *flow, u8 
 
 static void HandlerMagicCoatReflect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     if (BattleEventVar_GetValue(2) == monId && BattleEventVar_RewriteValue(0x51, 1)) {
-        func_ov167_021ce044(item, flow, monId, work);
+        CommonMoveProtectedMessage(item, flow, monId, work);
     }
 }
 
@@ -4129,7 +4130,7 @@ static void HandlerThief(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
         targetId = BattleEventVar_GetValue(6);
         if (targetId != 0x1f) {
             target = GetBattleMon(flow, targetId);
-            if (GetBattleMonHeldItem(target) != 0 && !func_ov167_021cdf28(flow, monId, targetId)) {
+            if (GetBattleMonHeldItem(target) != 0 && !IsItemSwapBlocked(flow, monId, targetId)) {
                 swapParam = BattleHandler_PushWork(flow, 0x24, monId);
                 swapParam->otherIndex = targetId;
                 BattleHandler_StrSetup(&swapParam->firstString, 2, 0x421);
@@ -4168,7 +4169,7 @@ static void HandlerTrick(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
-        if (!func_ov167_021cdf08(flow, monId)) {
+        if (!IsWildOpponent(flow, monId)) {
             user = GetBattleMon(flow, monId);
             target = GetBattleMon(flow, targetId);
             userItem = GetBattleMonHeldItem(user);
@@ -4560,11 +4561,11 @@ static u8 GetBideTargetID(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
 
     mon = GetBattleMon(flow, monId);
     for (i = 0; i < 3; i++) {
-        if (func_ov167_021bc120(mon, i) != 0) {
+        if (BattleMon_GetDamageRecordCount(mon, i) != 0) {
             GetDamageReceived(mon, i, 0, &record);
             targetId = record.attackerId;
-            if (func_ov167_021ab840(flow, targetId) == 6) {
-                count = HandlerGetAlivePartyCount(flow, func_ov167_021abb50(flow, monId) | 0x100, mons);
+            if (BtlServerFlow_GetMonBattlePos(flow, targetId) == 6) {
+                count = HandlerGetAlivePartyCount(flow, BtlServerFlow_MonIDToPos(flow, monId) | 0x100, mons);
                 if (count != 0) {
                     targetId = mons[(u8)BattleRandom(count)];
                 } else {
@@ -4651,9 +4652,9 @@ static void HandlerPsychoShift(BattleEventItem *item, BtlServerFlow *flow, u8 mo
                 addParam = BattleHandler_PushWork(flow, 0xc, monId);
                 addParam->condition = status;
                 if (status == 5 && Condition_IsBadlyPoisoned(cont)) {
-                    value = func_ov167_021ce298();
+                    value = MakeConditionBadlyPoisoned();
                 } else {
-                    value = func_ov167_021bd52c(status);
+                    value = BtlCalc_MakeStatusCondition(status);
                 }
                 addParam->value = value;
                 addParam->targetIndex = targetId;
@@ -4673,7 +4674,7 @@ static void HandlerPsychoShift(BattleEventItem *item, BtlServerFlow *flow, u8 mo
 }
 
 static const BattleEventHandlerEntry sHandlersPainSplit[] = {
-    { 0xa0, func_ov167_021c98b8 },
+    { 0xa0, HandlerPainSplit },
 };
 
 static const BattleEventHandlerEntry *EventAddPainSplit(u32 *priority) {
@@ -4681,7 +4682,7 @@ static const BattleEventHandlerEntry *EventAddPainSplit(u32 *priority) {
     return sHandlersPainSplit;
 }
 
-static void func_ov167_021c98b8(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerPainSplit(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     u8 targetId;
     BattleMon *user;
     BattleMon *target;
@@ -4746,7 +4747,7 @@ static void HandlerBellyDrum(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     if (BattleEventVar_GetValue(3) == monId) {
         mon = GetBattleMon(flow, monId);
         hpCost = DivideMaxHPZeroCheck(mon, 2);
-        stages = func_ov167_021bb550(mon, 1);
+        stages = BattleMon_GetStatRaiseRoom(mon, 1);
         if (GetBattleMonStat(mon, 0xd) > hpCost && stages != 0) {
             hpParam = BattleHandler_PushWork(flow, 8, monId);
             hpParam->count = 1;
@@ -4820,8 +4821,8 @@ static void HandlerFeintResetProtectCounter(BattleEventItem *item, BtlServerFlow
     BattleHandlerRemoveSideEffectParam *param;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        side = func_ov167_0219d338(GetSideFromMonID(monId));
-        if (func_ov167_021abe04(flow, side, 9) || func_ov167_021abe04(flow, side, 10)) {
+        side = GetOpposingSide(GetSideFromMonID(monId));
+        if (BtlServerFlow_IsSideEffectSet(flow, side, 9) || BtlServerFlow_IsSideEffectSet(flow, side, 10)) {
             param = BattleHandler_PushWork(flow, 0x1a, monId);
             param->side = side;
             BattleHandler_InitFlags(param->effects, 3);
@@ -4932,7 +4933,7 @@ static void HandlerRest(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
             condition = BattleHandler_PushWork(flow, 0xc, monId);
             condition->targetIndex = monId;
             condition->condition = 2;
-            condition->value = func_ov167_021bd58c(3);
+            condition->value = BtlCalc_MakeTurnCondition(3);
             condition->showFail = 1;
             condition->overwrite = 1;
             condition->skipItemReaction = 1;
@@ -5002,9 +5003,9 @@ static void HandlerConversion2(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     BattleHandlerChangeTypeParam *param;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        type = func_ov167_021bbfb0(GetBattleMon(flow, BattleEventVar_GetValue(6)));
+        type = BattleMon_GetPrevMoveType(GetBattleMon(flow, BattleEventVar_GetValue(6)));
         if (type != 0x11) {
-            types = func_ov167_021abc60(flow, 0x11);
+            types = BtlServerFlow_GetHandlerWork(flow, 0x11);
             count = GetTypeWeaknesses(type, types);
             if (count != 0) {
                 mon = GetBattleMon(flow, monId);
@@ -5023,7 +5024,7 @@ static void HandlerConversion2(BattleEventItem *item, BtlServerFlow *flow, u8 mo
                 if (count != 0) {
                     type = types[BattleRandom(count)];
                     param = BattleHandler_PushWork(flow, 0x14, monId);
-                    param->type = func_ov167_021ce530(type);
+                    param->type = PokeTypePair_MakeMonotype(type);
                     param->monIndex = monId;
                     BattleHandler_PopWork(flow, param);
                 }
@@ -5052,7 +5053,7 @@ static void HandlerEncore(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         move = GetPreviousMoveUsed(target);
-        if (!CheckCondition(target, 0x17) && !IsEncoreExcludedMove(move) && func_ov167_021bada0(target, move)) {
+        if (!CheckCondition(target, 0x17) && !IsEncoreExcludedMove(move) && BattleMon_GetPPOfMove(target, move)) {
             if (GetTurnFlag(target, 1)) {
                 turns++;
             }
@@ -5092,7 +5093,7 @@ static void HandlerTaunt(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
             }
             param = BattleHandler_PushWork(flow, 0xc, monId);
             param->condition = 0xb;
-            param->value = func_ov167_021bd58c(turns);
+            param->value = BtlCalc_MakeTurnCondition(turns);
             param->targetIndex = targetId;
             BattleHandler_PopWork(flow, param);
         }
@@ -5176,7 +5177,7 @@ static void HandlerImprison(BattleEventItem *item, BtlServerFlow *flow, u8 monId
     if (BattleEventVar_GetValue(3) == monId) {
         param = BattleHandler_PushWork(flow, 0x1b, monId);
         param->effect = 3;
-        param->value = func_ov167_021ce1dc(monId);
+        param->value = MakeConditionDependPoke(monId);
         param->duration = 1;
         param->string.enabled = 2;
         param->string.message = 0x24a;
@@ -5226,9 +5227,9 @@ static void CommonCureAllyMonStatus(BattleEventItem *item, BtlServerFlow *flow, 
     u8 i;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        party = func_ov167_021abb0c(flow, monId);
-        allyParty = func_ov167_021abb20(flow, monId);
-        monIds = func_ov167_021abc60(flow, 0xc);
+        party = BtlServerFlow_GetMonParty(flow, monId);
+        allyParty = BtlServerFlow_GetAllyParty(flow, monId);
+        monIds = BtlServerFlow_GetHandlerWork(flow, 0xc);
         msg = BattleHandler_PushWork(flow, 4, monId);
         BattleHandler_StrSetup(&msg->string, 1, message);
         BattleHandler_PopWork(flow, msg);
@@ -5291,7 +5292,7 @@ static void HandlerMemento(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
-        value = func_ov167_021abf0c(flow);
+        value = BtlServerFlow_GetNextSerial(flow);
 
         param = BattleHandler_PushWork(flow, 0xe, monId);
         param->count = 1;
@@ -5338,7 +5339,7 @@ static void HandlerSpite(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         move = GetPreviousMoveUsed(target);
-        slot = func_ov167_021baf78(target, move);
+        slot = BattleMon_FindMoveSlot(target, move);
         if (slot != 4) {
             pp = GetMovePP(target, slot);
             if (pp > 4) {
@@ -5418,7 +5419,7 @@ static void HandlerHeartSwap(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         mon = GetBattleMon(flow, monId);
-        stages = (u32 *)func_ov167_021abc60(flow, 0x1c);
+        stages = (u32 *)BtlServerFlow_GetHandlerWork(flow, 0x1c);
         for (i = 1; i <= 7; i++) {
             stages[i - 1] = GetBattleMonStat(mon, i);
         }
@@ -5699,7 +5700,7 @@ static void HandlerLockOn(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         param = BattleHandler_PushWork(flow, 0xc, monId);
         param->targetIndex = monId;
         param->condition = 0x1d;
-        param->value = func_ov167_021ce268(targetId, 2);
+        param->value = MakeConditionDependPokeTurns(targetId, 2);
         BattleHandler_StrSetup(&param->string, 2, 0x28b);
         BattleHandler_AddArg(&param->string, monId);
         BattleHandler_AddArg(&param->string, targetId);
@@ -5912,10 +5913,10 @@ static void HandlerLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 mon
     BattleHandlerPosEffectParam *param;
     BattleHandlerFaintParam *faint;
 
-    if (BattleEventVar_GetValue(3) == monId && func_ov167_021aba64(flow, monId)) {
+    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId)) {
         param = BattleHandler_PushWork(flow, 0x1e, monId);
         param->effect = 1;
-        param->pos = func_ov167_021abb50(flow, monId);
+        param->pos = BtlServerFlow_MonIDToPos(flow, monId);
         BattleHandler_PopWork(flow, param);
 
         faint = BattleHandler_PushWork(flow, 0x13, monId);
@@ -5937,10 +5938,10 @@ static void HandlerHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     BattleHandlerPosEffectParam *param;
     BattleHandlerFaintParam *faint;
 
-    if (BattleEventVar_GetValue(3) == monId && func_ov167_021aba64(flow, monId)) {
+    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId)) {
         param = BattleHandler_PushWork(flow, 0x1e, monId);
         param->effect = 2;
-        param->pos = func_ov167_021abb50(flow, monId);
+        param->pos = BtlServerFlow_MonIDToPos(flow, monId);
         BattleHandler_PopWork(flow, param);
 
         faint = BattleHandler_PushWork(flow, 0x13, monId);
@@ -5964,7 +5965,7 @@ static void HandlerWish(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
     if (BattleEventVar_GetValue(3) == monId) {
         param = BattleHandler_PushWork(flow, 0x1e, monId);
         param->effect = 0;
-        param->pos = func_ov167_021abb50(flow, monId);
+        param->pos = BtlServerFlow_MonIDToPos(flow, monId);
         BattleHandler_PopWork(flow, param);
     }
 }
@@ -6005,8 +6006,8 @@ static void CommonDelayAttack(BattleEventItem *item, BtlServerFlow *flow, u8 mon
 
     if (BattleEventVar_GetValue(3) == monId && BattleEventVar_RewriteValue(0x51, 1)) {
         if (targetPos == 6) {
-            pos = func_ov167_021abb50(flow, monId);
-            targetPos = func_ov167_0219c48c(func_ov167_021abc9c(flow), pos, 0);
+            pos = BtlServerFlow_MonIDToPos(flow, monId);
+            targetPos = GetOpposingPosForStyle(BtlServerFlow_GetBattleStyle(flow), pos, 0);
         }
         param = BattleHandler_PushWork(flow, 0x1e, monId);
         param->effect = 3;
@@ -6117,8 +6118,8 @@ static void HandlerUturn(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
     BattleHandlerSwitchParam *param;
     BattleHandlerEffectAtPosParam *effect;
 
-    if (BattleEventVar_GetValue(3) == monId && func_ov167_021aba64(flow, monId) && func_ov167_021aba8c(flow)) {
-        trainerId = func_ov167_0219c648(monId);
+    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId) && func_ov167_021aba8c(flow)) {
+        trainerId = GetClientIDFromMonID(monId);
         param = BattleHandler_PushWork(flow, 0x29, monId);
         param->monIndex = monId;
         BattleHandler_StrSetup(&param->firstString, 2, 0x302);
@@ -6128,7 +6129,7 @@ static void HandlerUturn(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
 
         effect = BattleHandler_PushWork(flow, 0x37, monId);
         effect->effect = BattleEventItem_GetSubID(item) == 0x171 ? 0x283 : 0x284;
-        effect->pos1 = func_ov167_021abb50(flow, monId);
+        effect->pos1 = BtlServerFlow_MonIDToPos(flow, monId);
         effect->pos2 = 6;
         effect->header.checkPrevResult = 1;
         BattleHandler_PopWork(flow, effect);
@@ -6205,10 +6206,10 @@ static void HandlerBatonPass(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     BattleHandlerFlagParam *flag;
     BattleHandlerSwitchParam *sw;
 
-    if (BattleEventVar_GetValue(3) == monId && func_ov167_021aba64(flow, monId) && func_ov167_021aba8c(flow)) {
+    if (BattleEventVar_GetValue(3) == monId && BtlServerFlow_HasReserveMon(flow, monId) && func_ov167_021aba8c(flow)) {
         param = BattleHandler_PushWork(flow, 0x1e, monId);
         param->effect = 4;
-        param->pos = func_ov167_021abb50(flow, monId);
+        param->pos = BtlServerFlow_MonIDToPos(flow, monId);
         param->args[0] = monId;
         param->argCount = 1;
         BattleHandler_PopWork(flow, param);
@@ -6241,7 +6242,7 @@ static const BattleEventHandlerEntry *EventAddTeleport(u32 *priority) {
 static void HandlerTeleportCheckFail(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     BattleMon *mon;
 
-    if (func_ov167_021abca8(flow) != 0 || func_ov167_021abc9c(flow) != 0) {
+    if (BtlServerFlow_GetBattleType(flow) != 0 || BtlServerFlow_GetBattleStyle(flow) != 0) {
         BattleEventVar_RewriteValue(0x22, 0x1a);
     }
     mon = GetBattleMon(flow, monId);
@@ -6283,8 +6284,8 @@ static void HandlerFlingCheckFail(BattleEventItem *item, BtlServerFlow *flow, u8
 
     if (BattleEventVar_GetValue(2) == monId) {
         heldItem = GetBattleMonHeldItem(GetBattleMon(flow, monId));
-        if (heldItem == 0 || ItemGetParam(heldItem, 0xa) == 0 || !func_ov167_021abd8c(flow, monId) ||
-            func_ov167_021cdedc(flow, monId)) {
+        if (heldItem == 0 || ItemGetParam(heldItem, 0xa) == 0 || !BtlServerFlow_CanUseHeldItem(flow, monId) ||
+            IsItemUnremovable(flow, monId)) {
             BattleEventVar_RewriteValue(0x22, 0x1a);
         }
     }
@@ -6411,7 +6412,7 @@ static void HandlerHelpingHandReady(BattleEventItem *item, BtlServerFlow *flow, 
     BattleMon *target;
     BattleHandlerMessageParam *msg;
 
-    if (func_ov167_021abcc0(flow) > 1 && BattleEventVar_GetValue(3) == monId) {
+    if (BtlServerFlow_GetFrontPosCount(flow) > 1 && BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         if (!IsFainted(target) && !GetTurnFlag(target, 1)) {
@@ -6491,7 +6492,7 @@ static BattleMon *CommonBeatUpGetParam(BtlServerFlow *flow, u8 monId, u8 index) 
     BattleMon *mon;
     BOOL valid;
 
-    party = func_ov167_021abb0c(flow, monId);
+    party = BtlServerFlow_GetMonParty(flow, monId);
     count = GetNumMonsInParty(party);
     if (index >= count) {
         return NULL;
@@ -6561,7 +6562,7 @@ static void HandlerMorningSun(BattleEventItem *item, BtlServerFlow *flow, u8 mon
 
 static const BattleEventHandlerEntry sHandlersFly[] = {
     { 0x95, HandlerFly },
-    { 0x98, func_ov167_021cba48 },
+    { 0x98, HandlerFlyRelease },
 };
 
 static const BattleEventHandlerEntry *EventAddFly(u32 *priority) {
@@ -6586,11 +6587,11 @@ static void HandlerFly(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32
     }
 }
 
-static void func_ov167_021cba48(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerFlyRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
 }
 
 static const BattleEventHandlerEntry sHandlersShadowForce[] = {
-    { 0x95, HandlerShadowForce },       { 0x98, func_ov167_021cbaac },
+    { 0x95, HandlerShadowForce },       { 0x98, HandlerShadowForceRelease },
     { 0x2e, HandlerFeintBreakProtect }, { 0x81, HandlerFeintResetProtectCounter },
     { 0x84, HandlerShadowForceEnd },
 };
@@ -6617,7 +6618,7 @@ static void HandlerShadowForce(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     }
 }
 
-static void func_ov167_021cbaac(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerShadowForceRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
 }
 
 static void HandlerShadowForceEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
@@ -6643,7 +6644,7 @@ static void HandlerShadowForceEnd(BattleEventItem *item, BtlServerFlow *flow, u8
 
 static const BattleEventHandlerEntry sHandlersBounce[] = {
     { 0x95, HandlerBounce },
-    { 0x98, func_ov167_021cbb80 },
+    { 0x98, HandlerBounceRelease },
 };
 
 static const BattleEventHandlerEntry *EventAddBounce(u32 *priority) {
@@ -6668,12 +6669,12 @@ static void HandlerBounce(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
     }
 }
 
-static void func_ov167_021cbb80(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerBounceRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
 }
 
 static const BattleEventHandlerEntry sHandlersDive[] = {
     { 0x95, HandlerDive },
-    { 0x98, func_ov167_021cbbe4 },
+    { 0x98, HandlerDiveRelease },
 };
 
 static const BattleEventHandlerEntry *EventAddDive(u32 *priority) {
@@ -6698,12 +6699,12 @@ static void HandlerDive(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
     }
 }
 
-static void func_ov167_021cbbe4(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerDiveRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
 }
 
 static const BattleEventHandlerEntry sHandlersDig[] = {
     { 0x95, HandlerDig },
-    { 0x98, func_ov167_021cbc48 },
+    { 0x98, HandlerDigRelease },
 };
 
 static const BattleEventHandlerEntry *EventAddDig(u32 *priority) {
@@ -6728,7 +6729,7 @@ static void HandlerDig(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32
     }
 }
 
-static void func_ov167_021cbc48(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+static void HandlerDigRelease(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
 }
 
 static const BattleEventHandlerEntry sHandlersSolarBeam[] = {
@@ -7001,7 +7002,7 @@ static void HandlerGrudgeReducePP(BattleEventItem *item, BtlServerFlow *flow, u8
         attackerId = BattleEventVar_GetValue(3);
         attacker = GetBattleMon(flow, attackerId);
         move = BattleEventVar_GetValue(0x14);
-        slot = func_ov167_021baf78(attacker, move);
+        slot = BattleMon_FindMoveSlot(attacker, move);
         if (slot != 4) {
             param = BattleHandler_PushWork(flow, 0xa, monId);
             param->monIndex = attackerId;
@@ -7103,7 +7104,7 @@ static void HandlerFocuspunch(BattleEventItem *item, BtlServerFlow *flow, u8 mon
         if (!IsSemiInvulnMove(GetBattleMon(flow, monId))) {
             effect = BattleHandler_PushWork(flow, 0x37, monId);
             effect->effect = 0x272;
-            effect->pos1 = func_ov167_021abb50(flow, monId);
+            effect->pos1 = BtlServerFlow_MonIDToPos(flow, monId);
             effect->pos2 = 6;
             effect->hideMessageWindow = 1;
             BattleHandler_PopWork(flow, effect);
@@ -7134,8 +7135,8 @@ static void HandlerMetronome(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(2) == monId) {
         excluded = GetMetronomeExcludedMoves(&count);
-        move = func_ov167_021bd658(excluded, count);
-        targetPos = func_ov167_021abb70(flow, monId, move);
+        move = BtlCalc_PickRandomMove(excluded, count);
+        targetPos = BtlServerFlow_GetMoveTargetPos(flow, monId, move);
         BattleEventVar_RewriteValue(0x12, move);
         BattleEventVar_RewriteValue(0xd, targetPos);
     }
@@ -7208,7 +7209,7 @@ static void HandlerNaturePower(BattleEventItem *item, BtlServerFlow *flow, u8 mo
             move = MOVE_ICE_BEAM;
             break;
         }
-        targetPos = func_ov167_021abb70(flow, monId, move);
+        targetPos = BtlServerFlow_GetMoveTargetPos(flow, monId, move);
         BattleEventVar_RewriteValue(0x12, move);
         BattleEventVar_RewriteValue(0xd, targetPos);
     }
@@ -7250,8 +7251,8 @@ static void HandlerAssist(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
     u8 targetPos;
 
     if (BattleEventVar_GetValue(2) == monId) {
-        party = func_ov167_021abb0c(flow, monId);
-        moves = (u16 *)func_ov167_021abc60(flow, 0x30);
+        party = BtlServerFlow_GetMonParty(flow, monId);
+        moves = (u16 *)BtlServerFlow_GetHandlerWork(flow, 0x30);
         count = 0;
         numMons = GetNumMonsInParty(party);
         for (i = 0; i < numMons; i++) {
@@ -7268,7 +7269,7 @@ static void HandlerAssist(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         }
         if (count != 0) {
             index = BattleRandom(count);
-            targetPos = func_ov167_021abb70(flow, monId, moves[index]);
+            targetPos = BtlServerFlow_GetMoveTargetPos(flow, monId, moves[index]);
             BattleEventVar_RewriteValue(0x12, moves[index]);
             BattleEventVar_RewriteValue(0xd, targetPos);
         }
@@ -7306,7 +7307,7 @@ static void HandlerSleepTalk(BattleEventItem *item, BtlServerFlow *flow, u8 monI
             }
             if (count != 0) {
                 move = work[(u8)BattleRandom(count)];
-                targetPos = func_ov167_021abb70(flow, monId, move);
+                targetPos = BtlServerFlow_GetMoveTargetPos(flow, monId, move);
                 BattleEventVar_RewriteValue(0x12, move);
                 BattleEventVar_RewriteValue(0xd, targetPos);
             } else {
@@ -7333,8 +7334,8 @@ static void HandlerMirrorMove(BattleEventItem *item, BtlServerFlow *flow, u8 mon
     if (BattleEventVar_GetValue(2) == monId) {
         pos = BattleEventVar_GetValue(0xe);
         if (pos == 6) {
-            side = func_ov167_021ab840(flow, monId);
-            pos = func_ov167_0219c48c(func_ov167_021abc9c(flow), side, 0);
+            side = BtlServerFlow_GetMonBattlePos(flow, monId);
+            pos = GetOpposingPosForStyle(BtlServerFlow_GetBattleStyle(flow), side, 0);
         }
         if (HandlerGetAlivePartyCount(flow, pos, (u8 *)work)) {
             move = GetPreviousMoveID(GetBattleMon(flow, ((u8 *)work)[0]));
@@ -7370,16 +7371,16 @@ static void HandlerMeFirst(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
     if (BattleEventVar_GetValue(2) == monId) {
         pos = BattleEventVar_GetValue(0xe);
         if (pos == 6) {
-            side = func_ov167_021ab840(flow, monId);
-            pos = func_ov167_0219c48c(func_ov167_021abc9c(flow), side, 0);
+            side = BtlServerFlow_GetMonBattlePos(flow, monId);
+            pos = GetOpposingPosForStyle(BtlServerFlow_GetBattleStyle(flow), side, 0);
         }
         if (HandlerGetAlivePartyCount(flow, pos, (u8 *)work)) {
             target = GetBattleMon(flow, ((u8 *)work)[0]);
             targetId = ((u8 *)work)[0];
             success = FALSE;
-            if (!GetTurnFlag(target, 3) && func_ov167_021abb8c(flow, targetId, &action) &&
-                func_ov167_021abc8c(flow, targetId) && !func_ov167_021abeb4(flow, targetId)) {
-                move = func_ov167_021bdb68(&action);
+            if (!GetTurnFlag(target, 3) && BtlServerFlow_GetPendingAction(flow, targetId, &action) &&
+                BtlServerFlow_IsMonInBattle(flow, targetId) && !BtlServerFlow_IsInSkyDrop(flow, targetId)) {
+                move = BattleAction_GetFightMove(&action);
                 if (move != 0 && PML_MoveIsDamaging(move) && !IsMeFirstExcludedMove(move)) {
                     success = TRUE;
                 }
@@ -7414,9 +7415,9 @@ static void HandlerCopycat(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
     u8 targetPos;
 
     if (BattleEventVar_GetValue(2) == monId) {
-        move = func_ov167_021abc54(flow);
+        move = BtlServerFlow_GetLastUsedMove(flow);
         if (move != 0 && !IsCopycatExcludedMove(move)) {
-            targetPos = func_ov167_021abb70(flow, monId, move);
+            targetPos = BtlServerFlow_GetMoveTargetPos(flow, monId, move);
             BattleEventVar_RewriteValue(0x12, move);
             BattleEventVar_RewriteValue(0xd, targetPos);
         }
@@ -7536,7 +7537,7 @@ static void HandlerHeavySlam(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     if (BattleEventVar_GetValue(3) == monId) {
         attacker = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        ratio = func_ov167_021abee0(flow, monId) / func_ov167_021abee0(flow, GetMonID(target));
+        ratio = BtlServerFlow_GetMonWeight(flow, monId) / BtlServerFlow_GetMonWeight(flow, GetMonID(target));
         if (ratio >= 5) {
             power = 120;
         } else if (ratio == 4) {
@@ -7570,7 +7571,7 @@ static void HandlerElectroBall(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     if (BattleEventVar_GetValue(3) == monId) {
         attacker = GetBattleMon(flow, monId);
         target = GetBattleMon(flow, BattleEventVar_GetValue(4));
-        ratio = func_ov167_021abd08(flow, attacker, FALSE) / func_ov167_021abd08(flow, target, FALSE);
+        ratio = BtlServerFlow_CalcSpeed(flow, attacker, FALSE) / BtlServerFlow_CalcSpeed(flow, target, FALSE);
         if (ratio >= 4) {
             power = 150;
         } else if (ratio >= 3) {
@@ -7696,7 +7697,7 @@ static void HandlerSoak(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s3
         count = BattleEventVar_GetValue(5);
         for (i = 0; i < count; i++) {
             param = BattleHandler_PushWork(flow, 0x14, monId);
-            param->type = func_ov167_021ce530(10);
+            param->type = PokeTypePair_MakeMonotype(10);
             param->monIndex = BattleEventVar_GetValue(6 + i);
             BattleHandler_PopWork(flow, param);
         }
@@ -7869,8 +7870,8 @@ static void HandlerSmackDown(BattleEventItem *item, BtlServerFlow *flow, u8 monI
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         grounded = FALSE;
-        if (!func_ov167_021abeb4(flow, targetId)) {
-            if (func_ov167_021abd74(flow, targetId) && !CheckCondition(target, 0x21)) {
+        if (!BtlServerFlow_IsInSkyDrop(flow, targetId)) {
+            if (BtlServerFlow_IsFloating(flow, targetId) && !CheckCondition(target, 0x21)) {
                 param = BattleHandler_PushWork(flow, 0xc, monId);
                 param->targetIndex = targetId;
                 param->condition = 0x1f;
@@ -8144,7 +8145,7 @@ static void HandlerFlameBurst(BattleEventItem *item, BtlServerFlow *flow, u8 mon
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(4);
-        pos = func_ov167_021ab874(flow, targetId);
+        pos = BtlServerFlow_GetPosOfMon(flow, targetId);
         if (pos != 6) {
             count = HandlerGetAlivePartyCount(flow, 0x900 | pos, targets);
             for (i = 0; i < count; i++) {
@@ -8179,7 +8180,7 @@ static void HandlerSynchronoise(BattleEventItem *item, BtlServerFlow *flow, u8 m
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(4);
         target = GetBattleMon(flow, targetId);
-        if (!func_ov167_021ce588(GetPokeType(GetBattleMon(flow, monId)), GetPokeType(target))) {
+        if (!PokeTypePair_IsMatchEither(GetPokeType(GetBattleMon(flow, monId)), GetPokeType(target))) {
             BattleEventVar_RewriteValue(0x40, 1);
         }
     }
@@ -8205,7 +8206,7 @@ static void HandlerBestow(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         target = GetBattleMon(flow, targetId);
         heldItem = GetBattleMonHeldItem(GetBattleMon(flow, monId));
         if (heldItem != 0 && !PML_ItemIsMail(heldItem) && GetBattleMonHeldItem(target) == 0 &&
-            !func_ov167_021cdedc(flow, monId) && !func_ov167_021cdedc(flow, targetId) &&
+            !IsItemUnremovable(flow, monId) && !IsItemUnremovable(flow, targetId) &&
             !GiratinaArceusGenesectItemCheck(GetBattleMonSpecies(target), heldItem)) {
             param = BattleHandler_PushWork(flow, 0x20, monId);
             param->targetIndex = monId;
@@ -8356,25 +8357,25 @@ static void HandlerAllySwitch(BattleEventItem *item, BtlServerFlow *flow, u8 mon
     u8 allyPos;
     BattleHandlerSwapPokeParam *param;
 
-    pos = func_ov167_021abb50(flow, monId);
+    pos = BtlServerFlow_MonIDToPos(flow, monId);
     allyId = monId;
-    switch (func_ov167_021abc9c(flow)) {
+    switch (BtlServerFlow_GetBattleStyle(flow)) {
     case 1:
-        if (func_ov167_021abe40(flow, func_ov167_0219c648(monId)) == 4) {
+        if (BtlServerFlow_GetAllyClientID(flow, GetClientIDFromMonID(monId)) == 4) {
             allyPos = GetPosOnSameSide(pos, 0);
             if (allyPos == pos) {
                 allyPos = GetPosOnSameSide(pos, 1);
             }
-            allyId = func_ov167_021abb60(flow, allyPos);
+            allyId = BtlServerFlow_PosToMonID(flow, allyPos);
         }
         break;
     case 2:
-        if (!func_ov167_0219d2cc(pos)) {
+        if (!IsTripleCenterPos(pos)) {
             allyPos = GetPosOnSameSide(pos, 0);
             if (allyPos == pos) {
                 allyPos = GetPosOnSameSide(pos, 2);
             }
-            allyId = func_ov167_021abb60(flow, allyPos);
+            allyId = BtlServerFlow_PosToMonID(flow, allyPos);
         }
         break;
     }
@@ -8455,7 +8456,7 @@ static void HandlerSkyDropGrab(BattleEventItem *item, BtlServerFlow *flow, u8 mo
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
         failed = FALSE;
-        if (targetId == 0x1f || !func_ov167_021abfac(flow, monId, targetId, &failed)) {
+        if (targetId == 0x1f || !BtlServerFlow_StartSkyDrop(flow, monId, targetId, &failed)) {
             BattleEventVar_RewriteValue(0x41, 1);
             if (failed) {
                 BattleEventVar_RewriteValue(0x4f, 1);
@@ -8475,17 +8476,17 @@ static void HandlerSkyDropRelease(BattleEventItem *item, BtlServerFlow *flow, u8
 
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BtlFlow_GetSkyDropTarget(GetBattleMon(flow, monId));
-        if (targetId == 0x1f || func_ov167_021ab840(flow, targetId) == 6) {
+        if (targetId == 0x1f || BtlServerFlow_GetMonBattlePos(flow, targetId) == 6) {
             BattleEventVar_RewriteValue(0x41, 1);
         }
-        func_ov167_021abfd4(flow, monId);
+        BtlServerFlow_SkyDropRelease(flow, monId);
     }
 }
 
 static void HandlerSkyDropTarget(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     u8 targetId;
 
-    if (func_ov167_021abc9c(flow) != 0 && func_ov167_021abc9c(flow) != 3) {
+    if (BtlServerFlow_GetBattleStyle(flow) != 0 && BtlServerFlow_GetBattleStyle(flow) != 3) {
         targetId = BtlFlow_GetSkyDropTarget(GetBattleMon(flow, monId));
         if (targetId != 0x1f) {
             BattleEventVar_RewriteValue(4, targetId);
@@ -8498,7 +8499,7 @@ static void HandlerSkyDropCheckFail(BattleEventItem *item, BtlServerFlow *flow, 
 
     if (BattleEventVar_GetValue(2) == monId) {
         targetId = BtlFlow_GetSkyDropTarget(GetBattleMon(flow, monId));
-        if (targetId != 0x1f && !func_ov167_021abc8c(flow, targetId)) {
+        if (targetId != 0x1f && !BtlServerFlow_IsMonInBattle(flow, targetId)) {
             BattleEventVar_RewriteValue(0x22, 0x1a);
         }
     }
@@ -8551,7 +8552,7 @@ static void HandlerForesight(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 
     if (BattleEventVar_GetValue(3) == monId) {
         cont.raw = BattleEventVar_GetValue(0x1e);
-        func_ov167_021ce368(&cont, 7);
+        Condition_SetParam(&cont, 7);
         BattleEventVar_RewriteValue(0x1e, cont.raw);
     }
 }
@@ -8571,7 +8572,7 @@ static void HandlerMiracleEye(BattleEventItem *item, BtlServerFlow *flow, u8 mon
 
     if (BattleEventVar_GetValue(3) == monId) {
         cont.raw = BattleEventVar_GetValue(0x1e);
-        func_ov167_021ce368(&cont, 16);
+        Condition_SetParam(&cont, 16);
         BattleEventVar_RewriteValue(0x1e, cont.raw);
     }
 }
@@ -8659,7 +8660,7 @@ typedef struct PledgeCombo {
     u32 effect;
 } PledgeCombo;
 
-static u32 func_ov167_021cdbc4(u16 move, u16 partnerMove) {
+static u32 GetPledgeComboEffect(u16 move, u16 partnerMove) {
     static const PledgeCombo sPledgeCombos[] = {
         { MOVE_WATER_PLEDGE, MOVE_FIRE_PLEDGE, 1 },
         { MOVE_GRASS_PLEDGE, MOVE_FIRE_PLEDGE, 2 },
@@ -8694,8 +8695,8 @@ static void HandlerWaterPledgeCheck(BattleEventItem *item, BtlServerFlow *flow, 
     u8 type;
 
     if (BattleEventVar_GetValue(3) == monId &&
-        func_ov167_021bc650(GetBattleMon(flow, monId), &partnerId, &partnerMove)) {
-        combo = func_ov167_021cdbc4(BattleEventItem_GetSubID(item), partnerMove);
+        BattleMon_GetComboMove(GetBattleMon(flow, monId), &partnerId, &partnerMove)) {
+        combo = GetPledgeComboEffect(BattleEventItem_GetSubID(item), partnerMove);
         type = BattleEventVar_GetValue(0x16);
         if (combo != 0) {
             work[1] = combo;
@@ -8811,7 +8812,7 @@ static void HandlerWaterPledgeFieldEffect(BattleEventItem *item, BtlServerFlow *
             BattleHandler_PopWork(flow, param);
 
             if (posMonId != 0x1f) {
-                pos = func_ov167_021ab874(flow, posMonId);
+                pos = BtlServerFlow_GetPosOfMon(flow, posMonId);
                 if (pos != 6) {
                     posParam = BattleHandler_PushWork(flow, 0x37, monId);
                     posParam->pos1 = pos;

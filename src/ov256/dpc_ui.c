@@ -17,7 +17,7 @@ static const TouchRect sDpcUiTouchRects[] = {
 };
 
 u32 DpcUi_PageMain(DendouPCWork *wk) {
-    u32 ret = func_0203da0c(sDpcUiTouchRects);
+    u32 ret = GFL_HIDGetTouchPressedRect(sDpcUiTouchRects);
 
     if (ret == TOUCH_RECT_NONE) {
         ret = DpcUi_HitPokemon(wk);
@@ -44,7 +44,7 @@ u32 DpcUi_PageMain(DendouPCWork *wk) {
 }
 
 u32 DpcUi_PokeMain(DendouPCWork *wk) {
-    u32 ret = func_0203da0c(sDpcUiTouchRects);
+    u32 ret = GFL_HIDGetTouchPressedRect(sDpcUiTouchRects);
 
     if (ret != DPCUI_RETURN) {
         ret = DpcUi_HitPokemon(wk);
@@ -74,7 +74,7 @@ static u32 DpcUi_HitPokemon(DendouPCWork *wk) {
     s16 x, y;
     s16 left, right, top, bottom;
 
-    if (func_0203dac8(&tpX, &tpY) == FALSE) {
+    if (GFL_HIDGetTouchPressedPoint(&tpX, &tpY) == FALSE) {
         return DPCUI_NONE;
     }
 

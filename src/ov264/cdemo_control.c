@@ -66,7 +66,7 @@ static u32 CDemo_StateExit(CDemoWork *work) {
         return 1;
     if (GFL_SndBGMIsFading() == TRUE)
         return 1;
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     if (work->initialized == TRUE) {
         CDemo_StopVBlank(work);
         GFL_ArcToolFree(work->arc);

@@ -13,46 +13,50 @@
 #include "system/game_system.h"
 #include "system/wordset.h"
 
-BOOL func_ov012_0216a950(VM *vm, FieldScriptEnv *env) {
+BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data = func_020074d8(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
+    void *data =
+        SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_02010b90(data, index);
+    *result = MemoryLinkSave_IsMemoryFlagSet(data, index);
     return FALSE;
 }
 
-BOOL func_ov012_0216a994(VM *vm, FieldScriptEnv *env) {
+BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data = func_020074d8(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
+    void *data =
+        SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_02010bc0(data, index);
+    *result = MemoryLinkSave_GetVar(data, index);
     return FALSE;
 }
 
-BOOL func_ov012_0216a9d8(VM *vm, FieldScriptEnv *env) {
+BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data = func_020074d8(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
+    void *data =
+        SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_02010bcc(data, index);
+    *result = MemoryLinkSave_IsPlayerLinked(data, index);
     return FALSE;
 }
 
 // Puts the name of the entry in the buffer
-BOOL func_ov012_0216aa1c(VM *vm, FieldScriptEnv *env) {
+BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data = func_020074d8(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
+    void *data =
+        SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u16 index = ScriptReadAny(vm, env);
     u16 bufIndex = ScriptReadAny(vm, env);
-    u8 value = func_02010bd8(data, index);
-    const u16 *name = func_02010be4(data, index);
+    u8 value = MemoryLinkSave_GetPlayerGender(data, index);
+    const u16 *name = MemoryLinkSave_GetPlayerName(data, index);
     StrBuf *strbuf = GFL_StrBufCreate(64, HEAPID_TAIL(heapId));
 
     GFL_StrBufLoadFixedString(strbuf, name, 8);
@@ -62,17 +66,17 @@ BOOL func_ov012_0216aa1c(VM *vm, FieldScriptEnv *env) {
 }
 
 // Mode 0: whether the downloaded props were added. Mode 1: whether the musical's program is at least the downloaded one
-BOOL func_ov012_0216aabc(VM *vm, FieldScriptEnv *env) {
+BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
-    void *data = func_020074d8(save);
+    void *data = SaveControl_GetMemoryLink(save);
     u16 mode = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
     switch (mode) {
     case 0:
-        *result = func_0200af5c(musical);
+        *result = MusicalSave_GetDownloadedProps(musical);
         break;
     case 1: {
         u16 current = FALSE;
@@ -88,10 +92,10 @@ BOOL func_ov012_0216aabc(VM *vm, FieldScriptEnv *env) {
 }
 
 // Adds the downloaded props the musical doesn't have, and sets the result when it added any
-BOOL func_ov012_0216ab30(VM *vm, FieldScriptEnv *env) {
+BOOL s02B7_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
-    void *data = func_020074d8(save);
+    void *data = SaveControl_GetMemoryLink(save);
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
     u16 *result = ScriptReadVar(vm, env);
     const u8 *props = (const u8 *)func_02010b0c(data, 0xb, NULL);
@@ -100,12 +104,12 @@ BOOL func_ov012_0216ab30(VM *vm, FieldScriptEnv *env) {
     *result = FALSE;
     for (i = 0; i < 100; i++) {
         if (props[i / 8] & (1 << (i % 8))) {
-            if (!func_0200ad60(musical, i)) {
-                func_0200add8(musical, i);
+            if (!MusicalSave_HasProp(musical, i)) {
+                MusicalSave_AddProp(musical, i);
                 *result = TRUE;
             }
         }
     }
-    func_0200af64(musical, TRUE);
+    MusicalSave_SetDownloadedProps(musical, TRUE);
     return FALSE;
 }

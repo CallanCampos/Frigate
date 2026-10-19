@@ -10,8 +10,8 @@
 #define RESORT_ZONE_COUNT 3
 
 // The zone of an index, and the index of a zone (0 if it is none of them)
-u16 func_0203950c(u32 index);
-u32 func_02039518(u16 zoneId);
+u16 ResortLayout_GetZoneId(u32 index);
+u32 ResortLayout_GetZoneIndex(u16 zoneId);
 // Positions on the grid and directions, from two tables of {u16 x, u16 z, u32 dir}: one of 48, one of 4
 void func_02039538(u16 index, u16 *x, u16 *z, u16 *dir);
 // The offset of a shop's entity

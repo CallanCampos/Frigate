@@ -7,12 +7,12 @@
 #include "types.h"
 #include "struct_decls.h"
 
-void *func_ov012_0215f55c(u32 *seq, void *param);
-BOOL func_ov012_0215f5b4(u32 *seq, void *param, void *work);
-BOOL func_ov012_0215f610(u32 *seq, void *param, void *work);
-BOOL func_ov012_0215f628(u32 *seq, void *param, void *work);
-void func_ov012_0215f654(u32 *seq, void *param, void *work);
+void *GameBeaconSearch_Init(u32 *seq, void *param);
+BOOL GameBeaconSearch_InitWait(u32 *seq, void *param, void *work);
+BOOL GameBeaconSearch_Exit(u32 *seq, void *param, void *work);
+BOOL GameBeaconSearch_ExitWait(u32 *seq, void *param, void *work);
+void GameBeaconSearch_Main(u32 *seq, void *param, void *work);
 // Waits a while before taking the beacons of type 0x35 again
-void func_ov012_0215f94c(void *work);
+void GameBeaconSearch_StartType35Wait(void *work);
 
 #endif // POKEBW2_FIELD_GAME_BEACON_SEARCH_H

@@ -13,19 +13,19 @@ enum {
 };
 
 // Shows the icon, or shows it again with new graphics when it is already shown
-void func_0203e76c(u32 x, u32 y, u32 type, HeapID heapId);
-void func_0203e7dc(void);
+void WmIcon_Create(u32 x, u32 y, u32 type, HeapID heapId);
+void WmIcon_Delete(void);
 // The signal strength, 0 to 3
-void func_0203e7f8(int level);
-void func_0203e810(BOOL top, HeapID heapId);
+void WmIcon_SetStrength(int level);
+void WmIcon_SetScreen(BOOL top, HeapID heapId);
 // Writes the icon to OAM, each frame
-void func_0203e838(void);
-void func_0203e84c(void);
-void func_0203e860(void);
-// Puts the icon at x and y in place of where func_0203e76c says, unless x is 0
-void func_0203e874(u16 x, u16 y);
+void WmIcon_Update(void);
+void WmIcon_Show(void);
+void WmIcon_Hide(void);
+// Puts the icon at x and y in place of where WmIcon_Create says, unless x is 0
+void WmIcon_SetPos(u16 x, u16 y);
 // The 2D engine that draws the icon, 1 for the main engine and 2 for the sub engine
-u32 func_0203e8b0(void);
+u32 WmIcon_GetEngine(void);
 
 // The game's archive of the icon's graphics, and its files: two sets of characters and the palette
 typedef struct {
@@ -34,6 +34,6 @@ typedef struct {
 } WmIconFiles;
 
 u32 getWifiIconNarcIdxNum(void);
-void func_020116b0(WmIconFiles *files);
+void WmIconFiles_Init(WmIconFiles *files);
 
 #endif // POKEBW2_GFL_WM_ICON_H

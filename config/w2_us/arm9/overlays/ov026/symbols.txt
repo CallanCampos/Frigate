@@ -1,6 +1,6 @@
 FesMissionHollow_Setup kind:function(thumb,size=0xa2) addr:0x0216f940
-func_ov026_0216f9a4 kind:function(thumb,size=0x1c) addr:0x0216f9e4
-func_ov026_0216f9c0 kind:function(thumb,size=0x1c) addr:0x0216fa00
+FesMissionHollow_GetPersonObjCode kind:function(thumb,size=0x1c) addr:0x0216f9e4
+FesMissionHollow_GetPersonUnk2 kind:function(thumb,size=0x1c) addr:0x0216fa00
 FesMissionHollow_Shuffle kind:function(thumb,size=0x54) addr:0x0216fa1c
 FesMissionHollow_IsActive kind:function(thumb,size=0x20) addr:0x0216fa70
 data_ov026_0216fa50 kind:data(any) addr:0x0216fa90

@@ -203,19 +203,19 @@ void func_ov036_021948ec(FieldActor *actor, u16 objIdx) {
 }
 
 void func_ov036_02194924(FieldActor *actor) {
-    func_ov012_02167174(actor);
+    FldAct_CallMoveInitProc(actor);
     SetActorFlag(actor, 2);
 }
 
 void func_ov036_02194938(FieldActor *actor) {
-    if (func_ov012_0216748c(actor, 2) == 0) {
+    if (CheckActorMMSysFlag(actor, 2) == 0) {
         func_ov036_02194a18(actor);
         func_ov036_02194a3c(actor);
         if (CheckActorMovementFlag(actor, 0x200)) {
             func_ov036_0218eff4(actor);
-        } else if (func_ov012_02167600(actor) == FALSE) {
+        } else if (IsActorMovementDisabled(actor) == FALSE) {
             if (func_ov036_021949ec(actor) == TRUE) {
-                func_ov012_02167188(actor);
+                FldAct_CallMoveProc(actor);
             }
         }
         func_ov036_02194a5c(actor);
@@ -255,7 +255,7 @@ static BOOL func_ov036_021949ec(FieldActor *actor) {
 static void func_ov036_02194a18(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x800)) {
         if (func_ov036_02194ac8(actor) == TRUE) {
-            func_ov012_021674dc(actor);
+            FldAct_SetMoveStart(actor);
         }
     }
 }
@@ -289,7 +289,7 @@ static BOOL func_ov036_02194ac8(FieldActor *actor) {
     u32 origYTile = -1;
     u32 tile = -1;
 
-    if (!func_ov012_021677a4(actor)) {
+    if (!FldAct_IsMapAttrDisabled(actor)) {
         NoGridMapper *mapper = FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
         RailPosition origYPos;
         RailPosition pos;
@@ -310,7 +310,7 @@ static BOOL func_ov036_02194ac8(FieldActor *actor) {
 }
 
 static void func_ov036_02194b48(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (func_ov036_02194ac8(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
@@ -323,7 +323,7 @@ static void func_ov036_02194b48(FieldActor *actor) {
 }
 
 static void func_ov036_02194ba8(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (func_ov036_02194ac8(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
@@ -337,7 +337,7 @@ static void func_ov036_02194ba8(FieldActor *actor) {
 }
 
 static void func_ov036_02194c14(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (func_ov036_02194ac8(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
@@ -349,7 +349,7 @@ static void func_ov036_02194c14(FieldActor *actor) {
 }
 
 static void func_ov036_02194c68(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (func_ov036_02194ac8(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
@@ -361,7 +361,7 @@ static void func_ov036_02194c68(FieldActor *actor) {
 }
 
 static void func_ov036_02194cbc(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (func_ov036_02194ac8(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
@@ -403,7 +403,7 @@ static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, cons
 }
 
 static void func_ov036_02194db4(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    if (func_ov012_021673f8(GetActorMModelSystem(actor))) {
+    if (FldActSys_AreShadowsEnabled(GetActorMModelSystem(actor))) {
         if (!CheckActorMovementFlag(actor, 0x4000)) {
             func_ov036_021a3bf0(actor, FldAct_GetFieldEffects(actor));
             SetActorMovementFlag(actor, 0x4000);
@@ -426,7 +426,7 @@ static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, cons
             if (GetTileFlags(tile) & 0x40) {
                 reflectTile = tile;
             } else {
-                tile = func_ov012_0215e9b0(actor, 1);
+                tile = FldAct_GetTileTypeInDir(actor, 1);
                 if (GetTileFlags(tile) & 0x40) {
                     reflectTile = tile;
                 }
@@ -444,7 +444,7 @@ static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, cons
 
 static void func_ov036_02194e70(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (info->enableReflections != 0 && FldAct_CheckReflectingFlag(actor)) {
-        u32 reflectTile = func_ov012_0215e9b0(actor, 1);
+        u32 reflectTile = FldAct_GetTileTypeInDir(actor, 1);
 
         if (reflectTile == -1) {
             FldAct_SetReflectingFlag(actor, FALSE);
@@ -480,7 +480,7 @@ BOOL func_ov036_02194ef8(FieldActor *actor) {
 
 static void func_ov036_02194f04(FieldActor *actor, u32 dir) {
     CheckSetActorFaceDir(actor, dir);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -509,7 +509,7 @@ static void func_ov036_02194f58(FieldActor *actor, u32 dir, u32 speed, u32 frame
     func_ov036_02195640(actor, dir, speed);
     func_ov036_021959bc(actor, dir);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, frames);
+    FldAct_SetDrawStatus(actor, frames);
     SetActorMovementFlag(actor, 0x20);
     FieldActor_NextAcmdState(actor);
 }
@@ -525,13 +525,13 @@ BOOL func_ov036_02194f94(FieldActor *actor) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x440);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 BOOL func_ov036_02194fe8(FieldActor *actor) {
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     return FALSE;
 }
 
@@ -621,7 +621,7 @@ static void func_ov036_02195134(FieldActor *actor, u32 dir, u32 speed, u32 frame
     work->unk0 = frames;
     work->wait = speed;
     CheckSetActorFaceDir(actor, dir);
-    func_ov012_021670f4(actor, frames);
+    FldAct_SetDrawStatus(actor, frames);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -633,7 +633,7 @@ BOOL func_ov036_02195168(FieldActor *actor) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x400);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -735,7 +735,7 @@ static void func_ov036_021952dc(FieldActor *actor, u32 dir, u32 speed, u32 timer
     }
     SetActorMovementFlag(actor, 0xa0);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, frame);
+    FldAct_SetDrawStatus(actor, frame);
     FieldActor_NextAcmdState(actor);
     if (se != 0) {
         GFL_SndSEPlay(se);

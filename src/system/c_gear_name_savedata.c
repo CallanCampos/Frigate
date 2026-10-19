@@ -22,7 +22,7 @@ static u32 getNameSize(void) {
     return CGEAR_NAME_LENGTH * sizeof(u16);
 }
 
-void func_020114a8(u16 *name) {
+void CGearName_Init(u16 *name) {
     MsgData *msgData;
     StrBuf *str;
 
@@ -35,16 +35,16 @@ void func_020114a8(u16 *name) {
     GFL_MsgDataFree(msgData);
 }
 
-void *func_020114f0(SaveControl *save) {
+void *CGearName_GetFromSave(SaveControl *save) {
     CGearSave *cgear = SaveControl_GetBlockPtr(save, SAVE_BLOCK_CGEAR);
 
     return cgear->name;
 }
 
-void func_020114fc(void *saveBlock, StrBuf *name) {
+void CGearName_Set(void *saveBlock, StrBuf *name) {
     GFL_StrBufStoreString(name, saveBlock, CGEAR_NAME_LENGTH);
 }
 
-const u16 *func_0201150c(void *saveBlock) {
+const u16 *CGearName_Get(void *saveBlock) {
     return saveBlock;
 }

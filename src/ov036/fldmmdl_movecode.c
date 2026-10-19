@@ -293,8 +293,8 @@ static void func_ov036_02191228(FieldActor *actor, u32 mask) {
     RailWanderWork *work = ClearActorPositionBlock(actor, sizeof(RailWanderWork));
     work->timer = func_ov036_02192280(data_ov036_021cbb1c, -1);
     work->mask = mask;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
 }
 
 void func_ov036_0219125c(FieldActor *actor) {
@@ -344,7 +344,7 @@ void func_ov036_021912d4(FieldActor *actor) {
 void func_ov036_021912e0(FieldActor *actor) {
     RailWanderWork *work = GetNPCRailPosPtrAddr(actor);
     if (GetActorEvType(actor) == 0xb) {
-        if (func_ov012_0215ebd8(actor) == TRUE && func_ov036_02192254() == TRUE) {
+        if (FldAct_IsNearPlayer(actor) == TRUE && func_ov036_02192254() == TRUE) {
             u16 faceDir = GetActorFaceDir(actor);
             u16 dir = func_ov036_02191378(GetActorMoveCode(actor), faceDir);
             if (dir != DIR_NONE) {
@@ -421,8 +421,8 @@ static void func_ov036_02191420(FieldActor *actor, u32 acmdBase, u32 dirMask, u3
     work->mode = mode;
     work->acmdBase = acmdBase;
     work->mask = dirMask;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
 }
 
 void func_ov036_02191448(FieldActor *actor) {
@@ -432,11 +432,11 @@ void func_ov036_02191448(FieldActor *actor) {
     u32 acmd;
     switch (work->state) {
     case 0:
-        func_ov012_021674bc(actor);
-        func_ov012_021674e8(actor);
+        FldAct_ClearMoving(actor);
+        FldAct_ClearMoveEnd(actor);
         dir = GetActorFaceDir(actor);
         acmd = GetAcmdForDir(dir, 0);
-        func_ov012_02166eb0(actor, acmd);
+        FldAct_SetLocalAcmd(actor, acmd);
         work->state++;
         break;
     case 1:
@@ -471,12 +471,12 @@ void func_ov036_02191448(FieldActor *actor) {
             }
         }
         acmd = GetAcmdForDir(dir, work->acmdBase);
-        func_ov012_02166eb0(actor, acmd);
-        func_ov012_021674b0(actor);
+        FldAct_SetLocalAcmd(actor, acmd);
+        FldAct_SetMoving(actor);
         work->state++;
     case 4:
         if (func_ov036_0218f01c(actor)) {
-            func_ov012_021674bc(actor);
+            FldAct_ClearMoving(actor);
             work->state = 0;
         }
         break;
@@ -564,8 +564,8 @@ static BOOL func_ov036_0219165c(FieldActor *actor, u32 dir) {
 static void func_ov036_021916b8(FieldActor *actor, u32 dir) {
     RailFaceWork *work = ClearActorPositionBlock(actor, sizeof(RailFaceWork));
     work->dir = dir;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
     SetActorInitialGPosToNowGPos(actor);
 }
 
@@ -600,8 +600,8 @@ void func_ov036_02191728(FieldActor *actor) {
 static void func_ov036_02191734(FieldActor *actor, u32 turn) {
     RailTurnWork *work = ClearActorPositionBlock(actor, sizeof(RailTurnWork));
     work->turn = turn;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
     SetActorInitialGPosToNowGPos(actor);
 }
 
@@ -626,7 +626,7 @@ static BOOL func_ov036_02191794(FieldActor *actor, RailTurnWork *work) {
         dir = GetActorFaceDir(actor);
     }
     acmd = GetAcmdForDir(dir, 0);
-    func_ov012_02166eb0(actor, acmd);
+    FldAct_SetLocalAcmd(actor, acmd);
     work->state = 1;
     return TRUE;
 }
@@ -648,7 +648,7 @@ static BOOL func_ov036_021917f0(FieldActor *actor, RailTurnWork *work) {
             work->count = 0;
             return FALSE;
         }
-        if (!func_ov012_0215ebd8(actor)) {
+        if (!FldAct_IsNearPlayer(actor)) {
             return FALSE;
         }
         if (!func_ov036_02192254()) {
@@ -706,7 +706,7 @@ void func_ov036_021918ec(FieldActor *actor) {
 static BOOL func_ov036_02191910(FieldActor *actor, RailTurnWork *work) {
     u32 dir = GetActorFaceDir(actor);
     u32 acmd = GetAcmdForDir(dir, 0);
-    func_ov012_02166eb0(actor, acmd);
+    FldAct_SetLocalAcmd(actor, acmd);
     work->state = 1;
     return TRUE;
 }
@@ -835,7 +835,7 @@ static BOOL func_ov036_02191a90(FieldActor *actor, RailPaceWork *work) {
     }
     acmdBase = 12;
     if (func_ov036_021924c4(actor) != 0) {
-        if (func_ov036_021921f0() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+        if (func_ov036_021921f0() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             acmdBase = 16;
         }
     }
@@ -843,18 +843,18 @@ static BOOL func_ov036_02191a90(FieldActor *actor, RailPaceWork *work) {
         acmdBase = 32;
     }
     u32 acmd = GetAcmdForDir(dir, acmdBase);
-    func_ov012_02166eb0(actor, acmd);
+    FldAct_SetLocalAcmd(actor, acmd);
     if (func_ov036_021924e8(actor) == TRUE) {
         func_ov036_02192520(actor, &work->face);
     }
-    func_ov012_021674b0(actor);
+    FldAct_SetMoving(actor);
     work->state = 2;
     return TRUE;
 }
 
 static BOOL func_ov036_02191b98(FieldActor *actor, RailPaceWork *work) {
     if (func_ov036_0218f01c(actor) == TRUE) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         if (func_ov036_021924e8(actor) == TRUE) {
             func_ov036_02192594(actor, &work->face);
         }
@@ -990,7 +990,7 @@ static BOOL func_ov036_02191d1c(FieldActor *actor, ActorRoundWork *work) {
     u32 speed = 12;
 
     if (func_ov036_021924c4(actor)) {
-        if (func_ov036_021921f0() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+        if (func_ov036_021921f0() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             speed = 16;
         }
     }
@@ -1001,14 +1001,14 @@ static BOOL func_ov036_02191d1c(FieldActor *actor, ActorRoundWork *work) {
     if (func_ov036_021924e8(actor) == TRUE) {
         func_ov036_02192520(actor, &work->face);
     }
-    func_ov012_021674b0(actor);
+    FldAct_SetMoving(actor);
     work->state = 1;
     return TRUE;
 }
 
 static BOOL func_ov036_02191e78(FieldActor *actor, ActorRoundWork *work) {
     if (func_ov036_0218f01c(actor) == TRUE) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         if (func_ov036_021924e8(actor) == TRUE) {
             func_ov036_02192594(actor, &work->face);
         }
@@ -1083,8 +1083,8 @@ static BOOL func_ov036_02191fa0(FieldActor *actor, ActorPatrolWork *work) {
         u16 dir = GetActorFaceDir(actor);
 
         if (func_ov036_021a5e30(actor, dir, GetActorUserParam(actor, 0), NULL) != -1) {
-            func_ov012_02166eb0(actor, GetAcmdForDir(dir, 0x30));
-            func_ov012_021674b0(actor);
+            FldAct_SetLocalAcmd(actor, GetAcmdForDir(dir, 0x30));
+            FldAct_SetMoving(actor);
             work->state = 1;
             return TRUE;
         }
@@ -1113,7 +1113,7 @@ static BOOL func_ov036_02191ff8(FieldActor *actor, ActorPatrolWork *work) {
                 break;
             }
         }
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         work->state = 2;
     }
     return FALSE;
@@ -1165,7 +1165,7 @@ static BOOL func_ov036_02192058(FieldActor *actor, ActorPatrolWork *work) {
     u32 speed = 12;
 
     if (func_ov036_021924c4(actor)) {
-        if (func_ov036_021921f0() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+        if (func_ov036_021921f0() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             speed = 16;
         }
     }
@@ -1176,14 +1176,14 @@ static BOOL func_ov036_02192058(FieldActor *actor, ActorPatrolWork *work) {
     if (func_ov036_021924e8(actor) == TRUE) {
         func_ov036_02192520(actor, &work->face);
     }
-    func_ov012_021674b0(actor);
+    FldAct_SetMoving(actor);
     work->state = 3;
     return TRUE;
 }
 
 static BOOL func_ov036_021921c0(FieldActor *actor, ActorPatrolWork *work) {
     if (func_ov036_0218f01c(actor) == TRUE) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         if (func_ov036_021924e8(actor) == TRUE) {
             func_ov036_02192594(actor, &work->face);
         }
@@ -1386,7 +1386,7 @@ static BOOL func_ov036_02192478(FieldActor *actor, u8 *wait) {
         return TRUE;
     }
     if (*wait == 0) {
-        if (!func_ov012_0215ebd8(actor)) {
+        if (!FldAct_IsNearPlayer(actor)) {
             return FALSE;
         }
         if (!func_ov036_02192254()) {

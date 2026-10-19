@@ -41,7 +41,7 @@ void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
     gimmick->gameData = GSYS_GetGameData(gsys);
     gimmick->festival = GSYS_GetLinkFestival(gsys);
     gimmick->mission = GetFestMissionCfg(gimmick->festival);
-    gimmick->work = (FesMissionWork *)func_02014864(gimmick->festival);
+    gimmick->work = (FesMissionWork *)LinkFestival_GetEntries(gimmick->festival);
     gimmick->field = field;
     gimmick->eventData = GameData_GetEventData(gimmick->gameData);
     gimmick->eventWork = GameData_GetEventWork(gimmick->gameData);
@@ -93,7 +93,7 @@ void FesGimmick_BindActorSystem(void *gimmick, MMSys *actorSystem) {
     fes->actors = actorSystem;
     if (getStatusOfFesMission(fes->festival)) {
         if (fes->mission->header.kind == MISSION_PEOPLE) {
-            func_ov072_021e8be0(fes, fes->work);
+            FesMissionGimmick_LoadActorResource(fes, fes->work);
         }
     }
 }
@@ -120,7 +120,7 @@ void func_ov036_021b65e8(void *gimmick) {
     FesGimmick *fes = gimmick;
 
     if (getStatusOfFesMission(fes->festival)) {
-        MI_CpuFill8(func_02014864(fes->festival), 0, sizeof(FesMissionWork));
+        MI_CpuFill8(LinkFestival_GetEntries(fes->festival), 0, sizeof(FesMissionWork));
         switch (fes->mission->header.kind) {
         case MISSION_FLAGS:
             ClearFesEventFlags(fes);
@@ -151,10 +151,10 @@ void func_ov036_021b6660(void *gimmick) {
     if (getStatusOfFesMission(fes->festival)) {
         switch (fes->mission->header.kind) {
         case MISSION_SPARKLE:
-            func_ov072_021e8be0(fes, fes->work);
+            FesMissionGimmick_LoadActorResource(fes, fes->work);
             break;
         case MISSION_PEOPLE:
-            func_ov072_021e8bf8(fes, fes->work);
+            FesMissionGimmick_RemoveBlockedPeople(fes, fes->work);
             break;
         }
     }
@@ -162,7 +162,7 @@ void func_ov036_021b6660(void *gimmick) {
 
 BOOL func_ov036_021b6690(void *gimmick) {
     FesGimmick *fes = gimmick;
-    RivalEntry *work = func_02014864(fes->festival);
+    RivalEntry *work = LinkFestival_GetEntries(fes->festival);
 
     if (!getStatusOfFesMission(fes->festival)) {
         return FALSE;
@@ -171,9 +171,9 @@ BOOL func_ov036_021b6690(void *gimmick) {
     case MISSION_SPARKLE:
         return FestSparkle_End(gimmick, (FestSparkleWork *)work);
     case MISSION_PEOPLE:
-        return func_ov072_021e8c3c(gimmick, (FesMissionWork *)work);
+        return FesMissionGimmick_End(gimmick, (FesMissionWork *)work);
     case MISSION_HOLLOW:
-        return func_ov073_021e8c4c(gimmick);
+        return RivalSelect_RemoveHollowActorIfMission(gimmick);
     default:
         return FALSE;
     }
@@ -229,11 +229,11 @@ BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height) {
 
 void DeleteFunfestActor(void *gimmick, u16 zoneId, u8 actorIndex) {
     FesGimmick *fes = gimmick;
-    RivalEntry *work = func_02014864(fes->festival);
+    RivalEntry *work = LinkFestival_GetEntries(fes->festival);
 
     if (getStatusOfFesMission(fes->festival)) {
         if (fes->mission->header.kind == MISSION_PEOPLE) {
-            func_ov072_021e8c08(fes, (FesMissionWork *)work, zoneId, actorIndex);
+            FesMissionGimmick_RemovePerson(fes, (FesMissionWork *)work, zoneId, actorIndex);
         }
     }
 }
@@ -249,13 +249,13 @@ u32 func_ov036_021b67bc(void *gimmick) {
 
 void func_ov036_021b67d8(void *gimmick, PokeParty *party) {
     if (FesGimmick_IsCurrent(gimmick, MISSION_PEOPLE)) {
-        func_ov072_021e8c74(gimmick, party);
+        FesMissionGimmick_BoostPartyLevels(gimmick, party);
     }
 }
 
 BOOL hollowFesMissions(void *gimmick, u32 id) {
     if (FesGimmick_IsCurrent(gimmick, MISSION_HOLLOW) && FesMissionHollow_IsActive(gimmick) &&
-        func_ov073_021e8d00(gimmick, id) != 10) {
+        RivalSelect_FindEntryIndex(gimmick, id) != 10) {
         return TRUE;
     }
     return FALSE;

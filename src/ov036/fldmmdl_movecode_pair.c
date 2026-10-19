@@ -130,8 +130,8 @@ void func_ov036_02192a4c(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 8);
 
     func_ov036_02192b18(actor, work);
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
     SetActorFlag8000(actor, 0);
 }
 
@@ -148,15 +148,15 @@ void func_ov036_02192aa8(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02192aac(FieldActor *actor, ActorFollowWork *work) {
-    func_ov012_021674bc(actor);
-    func_ov012_021674e8(actor);
-    if (func_ov012_02167520(actor)) {
+    FldAct_ClearMoving(actor);
+    FldAct_ClearMoveEnd(actor);
+    if (IsActorHidden(actor)) {
         return FALSE;
     }
     if (func_ov036_02192b6c(actor, work) == TRUE) {
         func_ov036_02192ba0(actor, work);
         if (func_ov036_02192c28(actor) == TRUE) {
-            func_ov012_021674b0(actor);
+            FldAct_SetMoving(actor);
             work->state++;
             return TRUE;
         }
@@ -166,7 +166,7 @@ static BOOL func_ov036_02192aac(FieldActor *actor, ActorFollowWork *work) {
 
 static BOOL func_ov036_02192afc(FieldActor *actor, ActorFollowWork *work) {
     if (func_ov036_0218f01c(actor) == TRUE) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         work->state = 0;
     }
     return FALSE;
@@ -260,8 +260,8 @@ void func_ov036_02192ca8(FieldActor *actor) {
     ActorFollowWork *work = ClearActorPositionBlock(actor, 12);
 
     func_ov036_02192e10(actor, work);
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
     work->active = 0;
 }
 
@@ -284,11 +284,11 @@ void func_ov036_02192d04(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02192d10(FieldActor *actor, ActorFollowWork *work) {
-    func_ov012_021674bc(actor);
-    func_ov012_021674e8(actor);
+    FldAct_ClearMoving(actor);
+    FldAct_ClearMoveEnd(actor);
     if (func_ov036_02192eac(actor, work) == TRUE) {
         if (func_ov036_02192ef8(actor, work) == TRUE) {
-            func_ov012_021674b0(actor);
+            FldAct_SetMoving(actor);
             work->state++;
             return TRUE;
         }
@@ -300,7 +300,7 @@ static BOOL func_ov036_02192d4c(FieldActor *actor, ActorFollowWork *work) {
     if (!func_ov036_0218f01c(actor)) {
         return FALSE;
     }
-    func_ov012_021674bc(actor);
+    FldAct_ClearMoving(actor);
     work->state = 0;
     return FALSE;
 }
@@ -405,8 +405,8 @@ static void func_ov036_02192f8c(FieldActor *actor, u32 variant) {
     ActorBobWork *work = ClearActorPositionBlock(actor, 8);
 
     work->variant = variant;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
     SetActorMovementFlag(actor, 0x8000);
     VecFx32 offset = { 0, -32 * FX32_ONE, 0 };
 
@@ -469,8 +469,8 @@ static BOOL func_ov036_021930a4(FieldActor *actor, ActorEffectWork *work) {
     if (work->hasEffect == 0) {
         func_ov036_02193110(actor, func_ov036_02193088(actor, work->kind));
     }
-    func_ov012_021674bc(actor);
-    func_ov012_021674e8(actor);
+    FldAct_ClearMoving(actor);
+    FldAct_ClearMoveEnd(actor);
     work->state++;
     return FALSE;
 }
@@ -478,7 +478,7 @@ static BOOL func_ov036_021930a4(FieldActor *actor, ActorEffectWork *work) {
 static BOOL func_ov036_021930d4(FieldActor *actor, ActorEffectWork *work) {
     if (work->hasEffect == 0) {
         if (func_ov036_0219311c(actor) == NULL) {
-            if (func_ov012_02167614(actor) == TRUE) {
+            if (FldAct_IsDrawReady(actor) == TRUE) {
                 func_ov036_02193110(actor, func_ov036_02193088(actor, work->kind));
             }
         }
@@ -556,8 +556,8 @@ static BOOL func_ov036_021931d4(FieldActor *actor, ActorTurnWork *work) {
     u32 dir = GetActorFaceDir(actor);
 
     StartDirAcmd(actor, dir, 0);
-    func_ov012_021674bc(actor);
-    func_ov012_021674e8(actor);
+    FldAct_ClearMoving(actor);
+    FldAct_ClearMoveEnd(actor);
     work->state = 1;
     return TRUE;
 }
@@ -578,8 +578,8 @@ static BOOL func_ov036_02193220(FieldActor *actor, ActorTurnWork *work) {
             work->dir = GetActorMotionDir(player);
         }
     }
-    func_ov012_021674bc(actor);
-    func_ov012_021674e8(actor);
+    FldAct_ClearMoving(actor);
+    FldAct_ClearMoveEnd(actor);
     work->state = 3;
     return TRUE;
 }
@@ -587,7 +587,7 @@ static BOOL func_ov036_02193220(FieldActor *actor, ActorTurnWork *work) {
 static BOOL func_ov036_02193254(FieldActor *actor, ActorTurnWork *work) {
     u32 acmd = GetAcmdForDir(GetActorMotionDir(FindPlayerFieldActor(GetActorMModelSystem(actor))), 0);
 
-    func_ov012_02166eb0(actor, acmd);
+    FldAct_SetLocalAcmd(actor, acmd);
     work->state = 4;
     return TRUE;
 }
@@ -596,8 +596,8 @@ static BOOL func_ov036_02193280(FieldActor *actor, ActorTurnWork *work) {
     if (!func_ov036_0218f01c(actor)) {
         return FALSE;
     }
-    func_ov012_021674bc(actor);
-    func_ov012_021674e8(actor);
+    FldAct_ClearMoving(actor);
+    FldAct_ClearMoveEnd(actor);
     work->state = 2;
     return FALSE;
 }
@@ -633,7 +633,7 @@ void func_ov036_021932ec(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02193310(FieldActor *actor, ActorHopWork *work) {
-    func_ov012_021674bc(actor);
+    FldAct_ClearMoving(actor);
     work->state++;
     return TRUE;
 }
@@ -646,7 +646,7 @@ static BOOL func_ov036_02193324(FieldActor *actor, ActorHopWork *work) {
 
 static BOOL func_ov036_02193338(FieldActor *actor, ActorHopWork *work) {
     if (func_ov036_0218f01c(actor) == TRUE) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         work->state = 0;
     }
     return FALSE;
@@ -731,13 +731,13 @@ static BOOL func_ov036_0219350c(FieldActor *actor, ActorHopWork *work, u32 speed
     if (dir == DIR_NONE) {
         dir = GetActorMotionDir(actor);
         acmd = GetAcmdForDir(dir, 0x1c);
-        func_ov012_02166eb0(actor, acmd);
+        FldAct_SetLocalAcmd(actor, acmd);
         return FALSE;
     }
     if (result == 0) {
         acmd = GetAcmdForDir(dir, speed);
-        func_ov012_021674b0(actor);
-        func_ov012_02166eb0(actor, acmd);
+        FldAct_SetMoving(actor);
+        FldAct_SetLocalAcmd(actor, acmd);
         return TRUE;
     }
     if ((result & 1) && work->mode == 2) {
@@ -748,13 +748,13 @@ static BOOL func_ov036_0219350c(FieldActor *actor, ActorHopWork *work, u32 speed
         if (dir == DIR_NONE) {
             dir = GetActorMotionDir(actor);
             acmd = GetAcmdForDir(dir, 0x1c);
-            func_ov012_02166eb0(actor, acmd);
+            FldAct_SetLocalAcmd(actor, acmd);
             return FALSE;
         }
         if (result == 0) {
             acmd = GetAcmdForDir(dir, speed);
-            func_ov012_021674b0(actor);
-            func_ov012_02166eb0(actor, acmd);
+            FldAct_SetMoving(actor);
+            FldAct_SetLocalAcmd(actor, acmd);
             return TRUE;
         }
     }
@@ -764,18 +764,18 @@ static BOOL func_ov036_0219350c(FieldActor *actor, ActorHopWork *work, u32 speed
         if (dir == DIR_NONE) {
             dir = GetActorMotionDir(actor);
             acmd = GetAcmdForDir(dir, 0x1c);
-            func_ov012_02166eb0(actor, acmd);
+            FldAct_SetLocalAcmd(actor, acmd);
             return FALSE;
         }
         if (result == 0) {
             acmd = GetAcmdForDir(dir, speed);
-            func_ov012_021674b0(actor);
-            func_ov012_02166eb0(actor, acmd);
+            FldAct_SetMoving(actor);
+            FldAct_SetLocalAcmd(actor, acmd);
             return TRUE;
         }
     }
     dir = GetActorMotionDir(actor);
     acmd = GetAcmdForDir(dir, 0x1c);
-    func_ov012_02166eb0(actor, acmd);
+    FldAct_SetLocalAcmd(actor, acmd);
     return FALSE;
 }

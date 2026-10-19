@@ -163,7 +163,7 @@ typedef struct {
     u8 unk353;
 } GFLNetSys;
 
-// The network error, which func_020424ac records
+// The network error, which NetState_RecordError records
 typedef struct {
     int code;
     u32 unk4;
@@ -172,117 +172,120 @@ typedef struct {
     int type;
 } GFLNetErrorInfo;
 
-void func_020410dc(void);
+void NetCommand_UpdateHugeSend(void);
 // Command handlers of the other parts of the library
-void func_02040d78(int netId, int sender, int command, int size, void *data, NetHandle *handle);
-BOOL func_02040dc0(int command);
-BOOL func_02040dd4(int command);
-void *func_02040de8(int command, int netId, int size);
-BOOL func_02040c94(int netId);
+void NetCommand_Dispatch(int netId, int sender, int command, int size, void *data, NetHandle *handle);
+BOOL NetCommand_HasCallback(int command);
+BOOL NetCommand_HasBufferFunc(int command);
+void *NetCommand_GetRecvBuffer(int command, int netId, int size);
+BOOL NetCommand_IsForThisMachine(int netId);
 
 // net_err.c: the network error screen. The error's code is its message in TEXT_BANK_WIFI_ERROR
 // Creates the network's heap, and the buffers the error screen saves the display in
 void GFL_NetHeapInit(void);
 void GFL_NetErrInit(u32 heapId);
 // Finds the network's error, each frame
-void func_02011c78(void);
+void GFL_NetErrUpdate(void);
 // What the game is to do about the network's error, if there is one: 1 to go on, 2 to end the connection
 BOOL GFL_NetErrCheck(void);
 void GFL_NetErrMarkShown(void);
 BOOL GFL_NetErrShow(u32 a0);
 // Shows the fatal error screen for a Wi-Fi error with the message given
-void func_02011d04(u32 message);
+void GFL_NetErrShowWifi(u32 message);
 // GFL_NetErrShow(1)
 void func_02011d20(void);
 // Records a Wi-Fi error with the message given, to show it
-void func_020120f0(u32 message);
+void GFL_NetErrRecordWifi(u32 message);
 // The message for a server's result
-u32 func_02011d2c(int result);
-// Whether func_02011de0 leaves the screens dark, for the caller to set the brightness with func_02011da4
-void func_02011d8c(BOOL keepDark);
-void func_02011d98(void);
-void func_02011da4(void);
+u32 GFL_NetErrGetServerMessage(int result);
+// Whether GFL_NetErrShowScreen leaves the screens dark, for the caller to set the brightness with
+// GFL_NetErrApplyBrightness
+void GFL_NetErrSetKeepDark(BOOL keepDark);
+void GFL_NetErrClearKeepDark(void);
+void GFL_NetErrApplyBrightness(void);
 // Shows the error screen until A or B is pressed, with the wireless icon
-void func_02011de0(void);
+void GFL_NetErrShowScreen(void);
 // Whether the error was handled, after shutting the connection down
-BOOL func_02012154(void);
-void func_02012144(void);
+BOOL GFL_NetErrShutdown(void);
+void GFL_NetErrClear(void);
 // The state of the wireless connections, as bits: 0x2 a local wireless one, 0x3c the signal, 0x3c0 Wi-Fi
-u32 func_02012be4(WifiList *wifiList);
-void *func_02012908(int num, HeapID heapId);
-void func_02012994(void *work);
-void func_02012a4c(void);
+u32 WihDwc_GetStatus(WifiList *wifiList);
+void *WihDwc_Create(int num, HeapID heapId);
+void WihDwc_Destroy(void *work);
+void WihDwc_TickTimers(void);
 void GFL_NetErrAbort(void);
-void func_02012050(void);
+void GFL_NetErrRecord(void);
 // Shows the error screen for an assertion that failed
 void AssertFailErrorDisp(void);
 // The wireless signal level of the DS Download Play, and the record of the best level a scan saw, which it sets and
 // clears
-u16 func_02012ea0(void);
-void func_02012ebc(u8 linkLevel);
+u16 WihDwc_GetLinkLevel(void);
+void WihDwc_SetBestLinkLevel(u8 linkLevel);
 void func_02012edc(void);
 
 // The device table for a GFL_NET_TYPE_*, from outside the library
-const GFLNetDevTable *func_020116c0(int type);
-void func_02011778(int type);
+const GFLNetDevTable *NetDefine_LoadDevice(int type);
+void NetDefine_UnloadDevice(int type);
 // GFL_SndBGMSetVolume, unless a connection is up and overlay 11's func_ov011_02151dec returns TRUE
-void func_02011bdc(u16 trackMask, s32 volume);
+void NetBgmVolume_Set(u16 trackMask, s32 volume);
 
 // net.c: starts and ends the network, and passes calls to the device and the other parts of the library
 void func_020425a0(int a0, int a1, HeapID parentHeapId, HeapID heapId);
-void func_020425ec(const GFLNetInitData *pNetInit, void (*callback)(void *work), void *work);
-BOOL func_02042788(void);
+void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), void *work);
+BOOL GFL_NetIsInitialized(void);
 // Whether the network has ended
-BOOL func_020427a4(void);
+BOOL GFL_NetIsEnded(void);
 // Ends the network, calling back with the game's work once it has
-BOOL func_02042860(void (*callback)(void *work));
-void func_020428a0(void);
-void *func_020428a8(int index);
-u8 *func_020428c8(int index);
+BOOL GFL_NetExit(void (*callback)(void *work));
+void GFL_NetCancelEnd(void);
+void *GFL_NetGetBeaconData(int index);
+u8 *GFL_NetGetBeaconMac(int index);
 // Steps the network while the game waits for it, as before a soft reset
-BOOL func_020428e0(void);
-void func_02042918(void);
-void func_02042950(const u8 *mac);
-void func_0204295c(const u8 *mac);
+BOOL GFL_NetMainWhileWaiting(void);
+void GFL_NetUpdateDevice(void);
+void GFL_NetStartAsParent(const u8 *mac);
+void GFL_NetStartAsChild(const u8 *mac);
 void func_02042968(void);
 void func_02042970(void);
 void func_020429a8(void (*callback)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work));
-void func_020429d8(int a0);
-void func_020429e0(u8 *mac, int index);
+void GFL_NetIwSetGameCommandBase(int a0);
+void GFL_NetIwGetCollectedMac(u8 *mac, int index);
 void func_020429e8(void *a0);
-void func_020429f0(void);
+void GFL_NetIwFree(void);
 void func_020429f8(void (*callback)(void *work));
 // The argument is unused
 void func_02042a10(int unused);
 void func_02042a1c(int a0);
 void func_02042a30(int mode, int a1, const u8 *mac);
 BOOL func_02042a38(void);
-void func_02042a40(int a0);
+void GFL_NetIwOverrideNetId(int a0);
 u8 func_02042a48(void);
 void func_02042a50(int a0);
-u8 func_02042a6c(NetHandle *handle);
-int func_02042a78(void);
-BOOL func_02042a80(u8 netId);
+u8 GFL_NetGetHandleNetId(NetHandle *handle);
+int GFL_NetGetNegotiatedCount(void);
+BOOL GFL_NetIsNegotiated(u8 netId);
 void func_02042a9c(NetHandle *handle, int a1);
-BOOL func_02042ab8(void);
+BOOL GFL_NetIsNotInitialized(void);
 // Whether the network is infrared, or Wi-Fi
-BOOL func_02042b00(void);
-BOOL func_02042b20(void);
+BOOL GFL_NetIsInfrared(void);
+BOOL GFL_NetIsWifi(void);
 // Calls into the functions that show the wireless strength icons
-void func_02042ba8(BOOL top, HeapID heapId);
-BOOL func_02042bc4(void);
+void GFL_NetSetIconScreen(BOOL top, HeapID heapId);
+BOOL GFL_NetIsParent(void);
 // Whether a machine's negotiation has been accepted
-BOOL func_02042bd8(NetHandle *handle);
+BOOL GFL_NetIsHandleNegotiated(NetHandle *handle);
 // Send a command to every machine, or to one; the game's commands wait for the negotiation
-BOOL func_02042be8(NetHandle *handle, int command, u16 size, const void *data);
-BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
-BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
-BOOL func_02042cfc(NetHandle *handle);
-void func_02042d04(NetHandle *handle, u16 timing);
-BOOL func_02042d0c(NetHandle *handle, u16 timing);
+BOOL GFL_NetSendCommand(NetHandle *handle, int command, u16 size, const void *data);
+BOOL GFL_NetSendCommandToMachine(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
+                                 BOOL noCopy);
+BOOL GFL_NetSendCommandToBits(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6,
+                              BOOL noCopy);
+BOOL GFL_NetIsSendQueueEmpty(NetHandle *handle);
+void GFL_NetSendTiming(NetHandle *handle, u16 timing);
+BOOL GFL_NetIsTimingRecv(NetHandle *handle, u16 timing);
 // The second argument is unused
-void func_02042d14(u8 gameCommandBase, u8 unused);
-u8 func_02042d34(void);
+void GFL_NetSetGameCommandBase(u8 gameCommandBase, u8 unused);
+u8 GFL_NetGetGameCommandBase(void);
 // Whether the net game command base is one of the battle kinds
 BOOL func_02011844(void);
 int func_02042d48(void);
@@ -290,29 +293,29 @@ int func_02042d64(void);
 u8 func_02042d80(void);
 void func_02042d8c(BOOL a0);
 // The game's work, which the callbacks get
-void *func_02042d94(void);
-void func_02042dac(void *work);
+void *GFL_NetGetWork(void);
+void GFL_NetSetWork(void *work);
 // The number of machines, and the size of each machine's data in a packet
-int func_02042dc0(void);
-int func_02042de8(void);
+int GFL_NetGetMaxConnectNum(void);
+int GFL_NetGetMaxSendSize(void);
 u16 func_02042df4(void);
 void func_02042e18(void);
 void func_02042e30(int a0);
 void func_02042e54(int a0);
-GFLNetSys *func_02042e78(void);
-GFLNetInitData *func_02042e84(void);
+GFLNetSys *GFL_NetGetSys(void);
+GFLNetInitData *GFL_NetGetInitData(void);
 void func_02042e94(u8 a0);
 void func_02042e9c(BOOL a0);
 void *allocConfigDSSoftwareFeature(HeapID heapId, u32 size, const char *file, u16 line);
-void func_02042ed0(void *ptr);
+void GFL_NetFreeAligned32(void *ptr);
 // Record and read back the offset of BG 1 of the main engine, which bg_sys.c sets whenever it changes
-void func_02042ee0(int x, int y);
-void func_02042eec(int *x, int *y);
-void func_02042efc(const GFLNetInitData *pNetInit);
+void GFL_NetSetBG1Offset(int x, int y);
+void GFL_NetGetBG1Offset(int *x, int *y);
+void GFL_NetSetInitData(const GFLNetInitData *pNetInit);
 void func_02042f10(void);
-BOOL func_02042f24(void);
-void func_02042f2c(int x, int y);
-void func_02042f40(void);
+BOOL GFL_NetHasError(void);
+void GFL_NetMoveIcon(int x, int y);
+void GFL_NetResetIconPos(void);
 void func_02042f50(BOOL a0);
 
 #endif // POKEBW2_GFL_NET_H

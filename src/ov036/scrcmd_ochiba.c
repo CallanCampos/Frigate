@@ -195,9 +195,9 @@ BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u16 *result = ScriptReadVar(vm, env);
-    u16 key = func_02017220(gameData);
+    u16 key = GameData_GetMyCity(gameData);
 
-    *result = func_02010274(getKeyDataBlkAddress(save), key);
+    *result = KeyDataSave_GetProgress(getKeyDataBlkAddress(save), key);
     return FALSE;
 }
 
@@ -206,7 +206,7 @@ BOOL func_ov036_021c9a7c(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_0200fec8(block, index);
+    *result = WbtSave_IsTrainerBeaten(block, index);
     return FALSE;
 }
 
@@ -223,7 +223,7 @@ BOOL func_ov036_021c9ab0(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     gameData = GSYS_GetGameData(gsys);
     survey = getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData));
-    *result = func_02009cac(survey, GetGameDataPlayerInfo(gameData), index);
+    *result = UnityTower_GetCountryCountForPlayer(survey, GetGameDataPlayerInfo(gameData), index);
     return FALSE;
 }
 
@@ -234,7 +234,8 @@ BOOL s02DD_UnityTowerGetVisitorCount(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     result = ScriptReadVar(vm, env);
-    *result = func_02009ce4(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    *result =
+        UnityTower_CountVisitors(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     return FALSE;
 }
 
@@ -250,7 +251,7 @@ BOOL func_ov036_021c9b38(VM *vm, FieldScriptEnv *env) {
     visitor = ScriptReadAny(vm, env);
     index = func_ov033_0217aac4(unityTower, visitor);
     if (index != 0xff) {
-        func_02009db4(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5, 1);
+        UnityTower_SetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5, 1);
     }
     return FALSE;
 }

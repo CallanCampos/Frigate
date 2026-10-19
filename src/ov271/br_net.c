@@ -83,7 +83,7 @@ BrNet *BrNet_Init(GameData *gameData, u32 a1, HeapID heapId) {
 
     MI_CpuFill8(&init, 0, sizeof(GdsRapInit));
     init.gameData = gameData;
-    init.profileId = func_02008bdc(GetGameDataPlayerInfo(gameData));
+    init.profileId = PlayerInfo_GetProfileId(GetGameDataPlayerInfo(gameData));
     init.loginBuffer = (void *)a1;
     init.callbacks.work = net;
     init.callbacks.onUploadMusicalShotEnd = BrNet_OnUploadMusicalShotEnd;
@@ -267,22 +267,22 @@ BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID) {
                     switch (result->detail) {
                     case 0x96:
                         GFL_SndStop();
-                        func_020120f0(0x41);
+                        GFL_NetErrRecordWifi(0x41);
                         ret = 3;
                         break;
                     case 0x97:
                         GFL_SndStop();
-                        func_020120f0(0x42);
+                        GFL_NetErrRecordWifi(0x42);
                         ret = 3;
                         break;
                     case 0x98:
                         GFL_SndStop();
-                        func_020120f0(0x44);
+                        GFL_NetErrRecordWifi(0x44);
                         ret = 3;
                         break;
                     case 0x99:
                         GFL_SndStop();
-                        func_020120f0(0x43);
+                        GFL_NetErrRecordWifi(0x43);
                         ret = 3;
                         break;
                     default:

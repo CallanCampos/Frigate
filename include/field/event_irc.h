@@ -42,17 +42,17 @@ extern const GameProcFunctions IRC_MENU_PROC;
 void setPartyLv50(PokeParty *party);
 void battleBoxToLv50Party(BOOL useBattleBox, EventIRCWork *work);
 void TrimPartyTo3Members(PokeParty *party);
-void func_ov012_02150484(EventIRCWork *work);
-void func_ov012_021504a4(EventIRCWork *work, GameData *gameData);
-void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys);
+void TrimPartiesTo3Members(EventIRCWork *work);
+void EventIRC_RecordFriendBattles(EventIRCWork *work, GameData *gameData);
+void EventIRC_SetBattlePlayers(EventIRCWork *work, GameSystem *gsys);
 GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data);
 // Starts the event, as a new event or in place of event's callback
 GameEvent *CallIRC(GameSystem *gsys, Field *field, GameEvent *event, BOOL create);
-void func_ov012_02150cac(EventIRCWork *work);
-void func_ov012_02150ccc(EventIRCWork *work);
+void EventIRC_FreeParties(EventIRCWork *work);
+void EventIRC_RestoreBgm(EventIRCWork *work);
 // Accessors for the infrared menu of overlay 36
-void func_ov012_02150cec(EventIRCWork *work, u32 mode);
-GameSystem *func_ov012_02150cf0(EventIRCWork *work);
-SaveControl *func_ov012_02150cf4(EventIRCWork *work);
+void EventIRC_SetMode(EventIRCWork *work, u32 mode);
+GameSystem *EventIRC_GetGameSystem(EventIRCWork *work);
+SaveControl *EventIRC_GetSaveControl(EventIRCWork *work);
 
 #endif // POKEBW2_FIELD_EVENT_IRC_H

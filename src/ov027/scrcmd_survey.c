@@ -23,7 +23,7 @@
 #include "system/game_system.h"
 #include "system/wordset.h"
 
-static GameEventReturnCode func_ov027_021707e8(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode SurveyTextEvent_Run(GameEvent *event, u32 *state, void *data);
 
 // The options a survey can pick, with the score each needs and its probability in percent
 // clang-format off
@@ -111,28 +111,28 @@ void insideProbabilityLoop(SurveyProbabilityState *state, u32 selection) {
     }
 }
 
-BOOL func_ov027_021703a8(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_GetRank(VM *vm, FieldScriptEnv *env) {
     TrainerGameInfoSave *info;
     u16 *out;
 
     FieldScriptEnv_GetScriptWork(env);
     info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     out = ScriptReadVar(vm, env);
-    *out = func_0200c96c(info);
+    *out = TrainerGameInfo_GetSurveyRank(info);
     return FALSE;
 }
 
-BOOL func_ov027_021703dc(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_RaiseRank(VM *vm, FieldScriptEnv *env) {
     TrainerGameInfoSave *info;
     int count;
 
     FieldScriptEnv_GetScriptWork(env);
     info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
-    count = func_0200c96c(info);
+    count = TrainerGameInfo_GetSurveyRank(info);
     if (count >= 5) {
         return FALSE;
     }
-    func_0200c974(info, count + 1);
+    TrainerGameInfo_SetSurveyRank(info, count + 1);
     GameBeaconSys_SetSurveyRank((u8)(count + 1));
     return FALSE;
 }
@@ -144,7 +144,7 @@ BOOL s01FF_SurveyGetCurrentQuestionID(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     info = getTrainerGameInfoAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     out = ScriptReadVar(vm, env);
-    *out = func_0200ca7c(info);
+    *out = TrainerGameInfo_GetSurveyQuestion(info);
     return FALSE;
 }
 
@@ -159,9 +159,9 @@ BOOL s0200_SurveyGetCurrentAnswerIDs(VM *vm, FieldScriptEnv *env) {
     first = ScriptReadVar(vm, env);
     second = ScriptReadVar(vm, env);
     third = ScriptReadVar(vm, env);
-    *first = func_0200ca8c(info, 0);
-    *second = func_0200ca8c(info, 1);
-    *third = func_0200ca8c(info, 2);
+    *first = TrainerGameInfo_GetSurveyAnswer(info, 0);
+    *second = TrainerGameInfo_GetSurveyAnswer(info, 1);
+    *third = TrainerGameInfo_GetSurveyAnswer(info, 2);
     return FALSE;
 }
 
@@ -176,7 +176,7 @@ BOOL s0204_SurveyGetTime(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov027_021704e0(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_Start(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerGameInfoSave *info;
     u16 values[3];
@@ -186,22 +186,22 @@ BOOL func_ov027_021704e0(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     save = GameData_GetSaveControl(FieldScriptEnv_GetGameData(env));
     info = getTrainerGameInfoAddress(save);
-    func_0200ec2c(save);
+    SurveySave_Get(save);
     first = ScriptReadAny(vm, env);
     values[0] = ScriptReadAny(vm, env);
     values[1] = ScriptReadAny(vm, env);
     values[2] = ScriptReadAny(vm, env);
-    func_0200ca84(info, first);
+    TrainerGameInfo_SetSurveyQuestion(info, first);
     for (i = 0; i < 3; i++) {
-        func_0200ca94(info, i, values[i]);
-        func_0200caa8(info, i, 0);
+        TrainerGameInfo_SetSurveyAnswer(info, i, values[i]);
+        TrainerGameInfo_SetSurveyCount(info, i, 0);
     }
     // The original call passes the value already in r0 without setting up a new argument.
     setSecondsCurrentTimeInTrainerCard(info, RTC_ConvertSecondsCached());
     return FALSE;
 }
 
-BOOL func_ov027_02170580(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_Clear(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerGameInfoSave *info;
     int i;
@@ -209,10 +209,10 @@ BOOL func_ov027_02170580(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     save = GameData_GetSaveControl(FieldScriptEnv_GetGameData(env));
     info = getTrainerGameInfoAddress(save);
-    func_0200ec2c(save);
-    func_0200ca84(info, 0);
+    SurveySave_Get(save);
+    TrainerGameInfo_SetSurveyQuestion(info, 0);
     for (i = 0; i < 3; i++) {
-        func_0200ca94(info, i, 0xff);
+        TrainerGameInfo_SetSurveyAnswer(info, i, 0xff);
     }
     GameBeaconSys_ClearNotice(0);
     return FALSE;
@@ -231,14 +231,14 @@ BOOL s0201_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     save = GameData_GetSaveControl(FieldScriptEnv_GetGameData(env));
-    survey = func_0200ec2c(save);
+    survey = SurveySave_Get(save);
     question = ScriptReadAny(vm, env);
     out = ScriptReadVar(vm, env);
     count = GetSurveyAnswerMsgIDCount(question);
     best = -1;
     for (i = 0; i < count; i++) {
-        total = func_0200ed90(survey, question, i + 1);
-        total += func_0200ed48(survey, question, i + 1);
+        total = SurveySave_GetTotalAnswerCount(survey, question, i + 1);
+        total += SurveySave_GetTodayAnswerCount(survey, question, i + 1);
         if (best < total) {
             best = total;
             msgId = GetSurveyAnswerMsgID(question, i);
@@ -248,31 +248,31 @@ BOOL s0201_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov027_02170650(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_WriteOwnAnswer(VM *vm, FieldScriptEnv *env) {
     void *survey;
     u32 question;
     u32 answer;
 
     FieldScriptEnv_GetScriptWork(env);
-    survey = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))));
+    survey = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))));
     question = ScriptReadAny(vm, env);
     answer = ScriptReadAny(vm, env);
-    func_0200ec80(survey, question, answer);
+    SurveySave_WriteAnswer(survey, question, answer);
     GameBeaconSys_SetSurveyAnswers(survey);
     return FALSE;
 }
 
-BOOL func_ov027_02170698(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_ShowRankMessage(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameEvent *event;
 
     work = FieldScriptEnv_GetScriptWork(env);
-    event = func_ov027_02170860(FieldScriptEnv_GetGameSystem(env));
+    event = SurveyTextEvent_Create(FieldScriptEnv_GetGameSystem(env));
     ScriptWork_CallEvent(work, event);
     return TRUE;
 }
 
-BOOL func_ov027_021706bc(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_GetQuestionState(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerCardSave *card;
     u8 index;
@@ -282,15 +282,15 @@ BOOL func_ov027_021706bc(VM *vm, FieldScriptEnv *env) {
     card = getTrainerCardData_wrapper(save);
     index = ScriptReadAny(vm, env);
     out = ScriptReadVar(vm, env);
-    if (index == func_0200ca7c(card)) {
-        *out = func_ov012_02165330(save);
+    if (index == TrainerGameInfo_GetSurveyQuestion(card)) {
+        *out = Survey_GetCurrentState(save);
     } else {
-        *out = func_ov012_021653d8(save, index);
+        *out = Survey_GetQuestionState(save, index);
     }
     return FALSE;
 }
 
-BOOL func_ov027_0217070c(VM *vm, FieldScriptEnv *env) {
+BOOL SurveyCmd_GetCurrentRemaining(VM *vm, FieldScriptEnv *env) {
     SaveControl *save;
     TrainerCardSave *card;
     u16 *out;
@@ -300,20 +300,20 @@ BOOL func_ov027_0217070c(VM *vm, FieldScriptEnv *env) {
     save = GameData_GetSaveControl(FieldScriptEnv_GetGameData(env));
     card = getTrainerCardData_wrapper(save);
     out = ScriptReadVar(vm, env);
-    kind = func_ov012_021652cc(func_0200ca7c(card));
+    kind = Survey_GetQuestionType(TrainerGameInfo_GetSurveyQuestion(card));
     switch (kind) {
     case 1:
-        result = func_ov027_021707b8(save);
+        result = Survey_GetCurrentHoursLeft(save);
         break;
     case 0:
-        result = func_ov027_02170758(save);
+        result = Survey_GetCurrentAnswersLeft(save);
         break;
     }
     *out = result;
     return FALSE;
 }
 
-u16 func_ov027_02170758(SaveControl *save) {
+u16 Survey_GetCurrentAnswersLeft(SaveControl *save) {
     void *survey;
     u16 index;
     u32 maximum;
@@ -323,42 +323,42 @@ u16 func_ov027_02170758(SaveControl *save) {
     u32 minimum;
     u32 value;
 
-    survey = func_0200ec2c(save);
-    index = func_0200ca7c(getTrainerCardData_wrapper(save));
-    maximum = func_ov012_02165310(index);
-    count = (u8)func_ov012_021652dc(index);
-    func_ov012_021652ec(index, answers);
+    survey = SurveySave_Get(save);
+    index = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
+    maximum = Survey_GetQuestionThreshold(index);
+    count = (u8)Survey_GetQuestionAnswerCount(index);
+    Survey_GetQuestionAnswers(index, answers);
     minimum = 0xf694e;
     for (i = 0; i < count; i++) {
-        value = func_ov012_02165480(survey, answers[i]);
+        value = Survey_GetAnswerCount(survey, answers[i]);
         if (value < minimum)
             minimum = value;
     }
     return maximum - minimum;
 }
 
-u16 func_ov027_021707b8(SaveControl *save) {
+u16 Survey_GetCurrentHoursLeft(SaveControl *save) {
     u16 index;
     u16 length;
     s32 result;
 
-    func_0200ec2c(save);
-    index = func_0200ca7c(getTrainerCardData_wrapper(save));
+    SurveySave_Get(save);
+    index = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     length = detectLengthSinceLastSession(save);
-    result = func_ov012_02165320((u8)index) - length;
+    result = Survey_GetQuestionHours((u8)index) - length;
     if (result < 0)
         result = 0;
     return result;
 }
 
-static GameEventReturnCode func_ov027_021707e8(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode SurveyTextEvent_Run(GameEvent *event, u32 *state, void *data) {
     SurveyTextWork *work = data;
     switch (*state) {
     case 0:
         getSurveyText(work);
-        func_ov027_021708e0(work);
-        func_ov027_02170944(work);
-        func_ov027_02170964(work);
+        SurveyTextWork_CreateWindow(work);
+        SurveyTextWork_CreateWordSet(work);
+        SurveyTextWork_PrintRankMessage(work);
         (*state)++;
         break;
     case 1:
@@ -370,25 +370,25 @@ static GameEventReturnCode func_ov027_021707e8(GameEvent *event, u32 *state, voi
             (*state)++;
         break;
     case 3:
-        func_ov027_02170a1c(work);
-        func_ov027_02170954(work);
-        func_ov027_02170934(work);
-        func_ov027_021708d0(work);
+        SurveyTextWork_ClearWindow(work);
+        SurveyTextWork_FreeWordSet(work);
+        SurveyTextWork_DeleteWindow(work);
+        SurveyTextWork_FreeText(work);
         return TRUE;
     }
     return FALSE;
 }
 
-GameEvent *func_ov027_02170860(GameSystem *gsys) {
+GameEvent *SurveyTextEvent_Create(GameSystem *gsys) {
     GameEvent *event;
     SurveyTextWork *work;
-    event = GameEvent_Create(gsys, NULL, func_ov027_021707e8, 0x20);
+    event = GameEvent_Create(gsys, NULL, SurveyTextEvent_Run, 0x20);
     work = GameEvent_GetData(event);
-    func_ov027_02170884(work, gsys);
+    SurveyTextWork_Init(work, gsys);
     return event;
 }
 
-void func_ov027_02170884(SurveyTextWork *work, GameSystem *gsys) {
+void SurveyTextWork_Init(SurveyTextWork *work, GameSystem *gsys) {
     Field *field;
     field = GSYS_GetField(gsys);
     MI_CpuFill8(work, 0, 0x20);
@@ -403,16 +403,16 @@ void getSurveyText(SurveyTextWork *work) {
     work->message = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_CASTELIA_CITY_13, work->heapId);
 }
 
-void func_ov027_021708d0(SurveyTextWork *work) {
+void SurveyTextWork_FreeText(SurveyTextWork *work) {
     GFL_MsgDataFree(work->message);
     work->message = NULL;
 }
 
-void func_ov027_021708e0(SurveyTextWork *work) {
+void SurveyTextWork_CreateWindow(SurveyTextWork *work) {
     u32 first;
     u32 second;
     u32 third;
-    u32 mode = func_ov027_02170a38(work);
+    u32 mode = SurveyTextWork_GetRank(work);
 
     switch (mode) {
     case 0:
@@ -433,21 +433,21 @@ void func_ov027_021708e0(SurveyTextWork *work) {
     work->window = FieldMsgBG_CreateMoneyWin(work->msgBGSys, work->message, first, first, second, third);
 }
 
-void func_ov027_02170934(SurveyTextWork *work) {
+void SurveyTextWork_DeleteWindow(SurveyTextWork *work) {
     func_ov036_02187c1c(work->window);
     work->window = NULL;
 }
 
-void func_ov027_02170944(SurveyTextWork *work) {
+void SurveyTextWork_CreateWordSet(SurveyTextWork *work) {
     work->wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
 }
 
-void func_ov027_02170954(SurveyTextWork *work) {
+void SurveyTextWork_FreeWordSet(SurveyTextWork *work) {
     GFL_WordSetSystemFree(work->wordSet);
     work->wordSet = NULL;
 }
 
-void func_ov027_02170964(SurveyTextWork *work) {
+void SurveyTextWork_PrintRankMessage(SurveyTextWork *work) {
     StrBuf *source;
     StrBuf *formatted;
     u32 kind;
@@ -459,7 +459,7 @@ void func_ov027_02170964(SurveyTextWork *work) {
 
     source = GFL_StrBufCreate(256, work->heapId);
     formatted = GFL_StrBufCreate(256, work->heapId);
-    kind = func_ov027_02170a38(work);
+    kind = SurveyTextWork_GetRank(work);
     num1 = func_ov027_02170a4c(work);
     num2 = func_ov027_02170a60(work);
     msgId = GetTrainerCardTextMSGID(kind);
@@ -477,13 +477,13 @@ void func_ov027_02170964(SurveyTextWork *work) {
     GFL_StrBufFree(formatted);
 }
 
-void func_ov027_02170a1c(SurveyTextWork *work) {
+void SurveyTextWork_ClearWindow(SurveyTextWork *work) {
     func_ov036_02187c7c(work->window);
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(func_ov036_02187c9c(work->window)));
 }
 
-u32 func_ov027_02170a38(SurveyTextWork *work) {
-    return func_0200c96c(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
+u32 SurveyTextWork_GetRank(SurveyTextWork *work) {
+    return TrainerGameInfo_GetSurveyRank(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
 }
 
 u32 func_ov027_02170a4c(SurveyTextWork *work) {

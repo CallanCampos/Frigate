@@ -101,7 +101,7 @@ void InfoWin_Init(u8 bg, u8 palette, GameData *gameData, HeapID heapId) {
     sInfoWin->batteryLevel = GCTX_HIDGetBatteryLevel();
     if (gameData != NULL) {
         sInfoWin->wifiList = GameData_GetWifiList(gameData);
-        sInfoWin->showBeacons = func_02017614(gameData);
+        sInfoWin->showBeacons = GameData_IsCGearOn(gameData);
     } else {
         sInfoWin->wifiList = NULL;
         sInfoWin->showBeacons = FALSE;
@@ -132,16 +132,16 @@ void InfoWin_Update(void) {
         }
         sInfoWin->batteryTimer = 0;
     }
-    if (func_02042788() == TRUE) {
-        netInit = func_02042e84();
-        connectNum = func_02042a78();
-        if (func_02042b20() == TRUE) {
+    if (GFL_NetIsInitialized() == TRUE) {
+        netInit = GFL_NetGetInitData();
+        connectNum = GFL_NetGetNegotiatedCount();
+        if (GFL_NetIsWifi() == TRUE) {
             connected = TRUE;
         }
     }
 
     if (connectNum < 2 && connected == FALSE) {
-        status = func_02012be4(sInfoWin->wifiList);
+        status = WihDwc_GetStatus(sInfoWin->wifiList);
         beacon = 0;
         if (sInfoWin->showBeacons == TRUE && GameBeaconSys_GetNextNew(&beacon) != 30) {
             sInfoWin->flags = sInfoWin->flags | INFOWIN_DRAW_SIGNAL;

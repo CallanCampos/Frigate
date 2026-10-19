@@ -40,14 +40,14 @@ void func_ov036_021afa2c(FieldScriptEnv *env, u32 partyIdx) {
 
         MI_CpuCopy8(PokeParty_GetPkm(party, partyIdx), pkm, size);
         if (PML_ItemIsMail(PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL)) == TRUE) {
-            void *mails = func_02009790(gameData);
+            void *mails = MailBox_GetFromGameData(gameData);
             MailData *mail = CreateMailData(FieldScriptEnv_GetHeapID(env));
-            s32 index = func_020097c4(mails, 0);
+            s32 index = MailBox_GetFreeSlot(mails, 0);
 
             PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
             GetGameDataPlayerInfo(gameData);
             if (index >= 0) {
-                func_020097e0(mails, 0, index, mail);
+                MailBox_SetMail(mails, 0, index, mail);
             }
             ResetMailData(mail);
             PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);

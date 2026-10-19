@@ -103,7 +103,7 @@ static void NoGear_LoadGraphics(NoGearWork *work) {
     work->chars = GFL_BGSysLoadArcNCGRDynamic(arc, 2, 6, 0, FALSE, work->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 3, 6, 0, (u16)work->chars, 0, FALSE, work->heapId);
     GFL_ArcToolFree(arc);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
@@ -163,7 +163,7 @@ static void NoGear_Release(NoGearWork *work) {
 static void NoGear_Idle(NoGearWork *work) {
 }
 
-NoGearWork *func_ov080_021eaa68(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys) {
+NoGearWork *NoGear_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys) {
     NoGearWork *work = GFL_HeapAllocate(HEAPID_FIELDMAP, sizeof(NoGearWork), TRUE, "no_gear.c", 376);
 
     work->heapId = HEAPID_FIELDMAP;
@@ -172,18 +172,18 @@ NoGearWork *func_ov080_021eaa68(void *saveData, FieldSubscreen *subscreen, GameS
     return work;
 }
 
-void func_ov080_021eaa98(NoGearWork *work) {
+void NoGear_Update(NoGearWork *work) {
     if (work->func != NULL) {
         work->func(work);
     }
     // The connection state is fetched but not used
-    func_02012be4(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
+    WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
 }
 
-void func_ov080_021eaab4(NoGearWork *work) {
+void NoGear_Draw(NoGearWork *work) {
 }
 
-void func_ov080_021eaab8(NoGearWork *work) {
+void NoGear_Free(NoGearWork *work) {
     NoGear_Release(work);
     G2S_BlendNone();
     GFL_HeapFree(work);

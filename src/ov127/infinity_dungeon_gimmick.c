@@ -170,7 +170,7 @@ void InfinityDungeonGimmick_Setup(Field *field) {
     InfinityDungeonGimmick *gimmick = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(InfinityDungeonGimmick));
     MI_CpuFill8(gimmick, 0, sizeof(InfinityDungeonGimmick));
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
-    InfinityDungeonGimmick_Init(gimmick, field, keyData, func_02017220(gameData));
+    InfinityDungeonGimmick_Init(gimmick, field, keyData, GameData_GetMyCity(gameData));
     gimmick->dungeon =
         GFL_HeapAllocate(heapId, InfinityDungeonGimmick_GetDungeonSize(), FALSE, "infinity_dungeon_gimmick.c", 510);
     InfinityDungeonGimmick_SetupDungeon(gimmick->dungeon, gameData, heapId);
@@ -199,7 +199,7 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
     u32 anm;
     InfinityDungeonObject *object;
 
-    if (func_ov127_021f0dd8(dungeon) == VERSION_BLACK2) {
+    if (InfinityDungeon_GetVersion(dungeon) == VERSION_BLACK2) {
         LoadFieldExpandObjData(gimmick->expObjSystem, &sBlackScene, 0);
     } else {
         LoadFieldExpandObjData(gimmick->expObjSystem, &sWhiteScene, 0);
@@ -231,7 +231,7 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
     }
 
     if (gimmick->zoneId - ZONE_WHITE_TREEHOLLOW <= 1) {
-        u32 level = func_02010274(gimmick->keyData, gimmick->unk50);
+        u32 level = KeyDataSave_GetProgress(gimmick->keyData, gimmick->unk50);
         InfinityDungeonObject *machineA = &gimmick->objects[OBJECT_MACHINE_A];
         InfinityDungeonObject *machineB = &gimmick->objects[OBJECT_MACHINE_B];
 
@@ -243,14 +243,14 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
             FieldExpObj_SetActorHidden(machineB->expObj, 0, machineB->actor, TRUE);
         }
     } else {
-        u8 floor = func_020102d4(gimmick->keyData);
-        u8 room = func_020102ec(gimmick->keyData);
+        u8 floor = KeyDataSave_GetFloorInArea(gimmick->keyData);
+        u8 room = KeyDataSave_GetRoom(gimmick->keyData);
 
-        if (func_ov127_021f093c(dungeon, floor, room)) {
+        if (InfinityDungeon_IsBelowGoal(dungeon, floor, room)) {
             u8 anm;
             u8 count;
             InfinityDungeonObject *lift = &gimmick->objects[OBJECT_LIFT];
-            BOOL done = func_ov127_021f096c(dungeon, gimmick->keyData);
+            BOOL done = InfinityDungeon_IsTargetDefeated(dungeon, gimmick->keyData);
 
             FieldExpObj_SetActorHidden(lift->expObj, 0, lift->actor, FALSE);
             count = InfinityDungeonGimmick_GetLiftAnimationCount(dungeon);
@@ -320,7 +320,7 @@ static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u3
     if (door->kind == DOOR_OPEN) {
         startFrame = 0;
         endFrame = FX32_CONST(14);
-        if (func_ov127_021f0dd8(dungeon) == VERSION_BLACK2) {
+        if (InfinityDungeon_GetVersion(dungeon) == VERSION_BLACK2) {
             se = SEQ_SE_SW_MDUN_BL_01;
         } else {
             se = SEQ_SE_SW_MDUN_WH_01;
@@ -328,7 +328,7 @@ static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u3
     } else {
         startFrame = FX32_CONST(15);
         endFrame = FX32_CONST(29);
-        if (func_ov127_021f0dd8(dungeon) == VERSION_BLACK2) {
+        if (InfinityDungeon_GetVersion(dungeon) == VERSION_BLACK2) {
             se = SEQ_SE_SW_MDUN_BL_02;
         } else {
             se = SEQ_SE_SW_MDUN_WH_02;
@@ -452,7 +452,7 @@ static GameEventReturnCode InfinityDungeonGimmick_LiftEvent(GameEvent *event, u3
             break;
         }
         InfinityDungeonGimmick_StartLiftAnimations(lift);
-        if (func_ov127_021f0dd8(lift->gimmick->dungeon) == VERSION_BLACK2) {
+        if (InfinityDungeon_GetVersion(lift->gimmick->dungeon) == VERSION_BLACK2) {
             GFL_SndSEPlay(SEQ_SE_SW_MDUN_BL_07);
         } else {
             GFL_SndSEPlay(SEQ_SE_SW_MDUN_WH_07);
@@ -472,7 +472,7 @@ static GameEventReturnCode InfinityDungeonGimmick_LiftEvent(GameEvent *event, u3
         }
         InfinityDungeonGimmick_HideAllActors(lift, FALSE);
         InfinityDungeonGimmick_HideLift(lift);
-        func_ov127_021efd60(Field_GetGameSystem(lift->field), lift->gimmick->dungeon);
+        InfinityDungeon_CreateCurrentWalls(Field_GetGameSystem(lift->field), lift->gimmick->dungeon);
         camera = Field_GetCameraSystem(lift->field);
         FieldCameraAnm_SetLoadDefaultsAnimation(camera, 1);
         FieldCameraAnm_EVCameraEnd(camera);
@@ -555,7 +555,7 @@ static InfinityDungeonObject *InfinityDungeonGimmick_GetLiftObject(InfinityDunge
 
 // The black lift has one animation, the white one two
 static u8 InfinityDungeonGimmick_GetLiftAnimationCount(InfinityDungeon *dungeon) {
-    if (func_ov127_021f0dd8(dungeon) == VERSION_BLACK2) {
+    if (InfinityDungeon_GetVersion(dungeon) == VERSION_BLACK2) {
         return 1;
     }
     return 2;
@@ -588,7 +588,7 @@ void InfinityDungeonGimmick_SetWall(InfinityDungeonGimmick *gimmick, FieldPropHa
 // Fills in a dungeon from the save: its version, then everything its seed gives
 static void InfinityDungeonGimmick_SetupDungeon(InfinityDungeon *dungeon, GameData *gameData, HeapID heapId) {
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
-    u16 version = func_02017220(gameData);
+    u16 version = GameData_GetMyCity(gameData);
 
     MI_CpuFill8(dungeon, 0, sizeof(InfinityDungeon));
     if (version == 0) {
@@ -596,13 +596,13 @@ static void InfinityDungeonGimmick_SetupDungeon(InfinityDungeon *dungeon, GameDa
     } else {
         dungeon->version = VERSION_WHITE2;
     }
-    InfinityDungeon_Seed(dungeon, func_02010284(keyData));
-    func_ov127_021f0040(keyData, dungeon);
+    InfinityDungeon_Seed(dungeon, KeyDataSave_GetSeed(keyData));
+    InfinityDungeon_Setup(keyData, dungeon);
 }
 
 static void InfinityDungeonGimmick_SeedDungeon(InfinityDungeon *dungeon, KeyDataSave *keyData) {
-    InfinityDungeon_Seed(dungeon, func_02010284(keyData));
-    func_ov127_021f0040(keyData, dungeon);
+    InfinityDungeon_Seed(dungeon, KeyDataSave_GetSeed(keyData));
+    InfinityDungeon_Setup(keyData, dungeon);
 }
 
 static u32 InfinityDungeonGimmick_GetDungeonSize(void) {
@@ -630,8 +630,8 @@ void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, 
     InfinityDungeonRoomChange *roomChange;
     u8 level;
 
-    func_02010338(keyData, a3);
-    level = func_02010378(keyData);
+    KeyDataSave_SetFloor(keyData, a3);
+    level = KeyDataSave_GetArea(keyData);
     event = GameEvent_Create(gsys, NULL, InfinityDungeonRoomChange_Event, sizeof(InfinityDungeonRoomChange));
     ScriptWork_CallEvent(work, event);
     roomChange = GameEvent_GetData(event);
@@ -646,24 +646,24 @@ void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, 
 
 // How many floors of the level the player is on
 static u8 InfinityDungeonGimmick_GetFloorInLevel(u8 floor, u8 level) {
-    return floor - func_020103a0(level);
+    return floor - KeyDataSave_GetAreaFirstFloor(level);
 }
 
 void InfinityDungeonRoomChange_Init(InfinityDungeonRoomChange *roomChange, GameSystem *gsys) {
-    u8 version = func_ov127_021f0dd8(roomChange->dungeon);
+    u8 version = InfinityDungeon_GetVersion(roomChange->dungeon);
 
     roomChange->heapId = HEAPID_FIELDMAP;
     roomChange->gsys = gsys;
     roomChange->field = GSYS_GetField(gsys);
     roomChange->gameData = GSYS_GetGameData(roomChange->gsys);
     roomChange->keyData = getKeyDataBlkAddress(GameData_GetSaveControl(roomChange->gameData));
-    roomChange->roomZones = func_ov127_021f0acc(version);
-    roomChange->room = func_020102ec(roomChange->keyData);
-    roomChange->floor = func_020102d4(roomChange->keyData);
+    roomChange->roomZones = InfinityDungeon_GetRoomZones(version);
+    roomChange->room = KeyDataSave_GetRoom(roomChange->keyData);
+    roomChange->floor = KeyDataSave_GetFloorInArea(roomChange->keyData);
     roomChange->g3dMapper = Field_GetG3DMapper(roomChange->field);
     roomChange->propSystem = FieldG3DMapper_GetBMSystem(roomChange->g3dMapper);
     roomChange->actorSystem = Field_GetActorSystem(roomChange->field);
-    roomChange->level = func_02010378(roomChange->keyData);
+    roomChange->level = KeyDataSave_GetArea(roomChange->keyData);
 }
 
 // Moves the player to another room: the fade out, the new room's zone, then the fade in with the room's walls and
@@ -676,7 +676,7 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
         InfinityDungeonRoomChange_Init(roomChange, GameEvent_GetGameSystem(event));
         DisableAllActorsMovement(Field_GetActorSystem(roomChange->field));
         if (roomChange->outTransition == 8) {
-            if (func_ov127_021f08d0(roomChange)) {
+            if (InfinityDungeonRoomChange_UsesFade(roomChange)) {
                 GFL_FadeSet(3, 0, 16, 4);
             } else {
                 GameEvent_ChainNext(
@@ -693,14 +693,14 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
         }
         destination = &roomChange->destination;
         InfinityDungeonRoomChange_SetNextPosition(roomChange);
-        func_ov012_0215ef2c(Field_GetActorSystem(roomChange->field));
+        ZoneChange_ResetStrengthRocks(Field_GetActorSystem(roomChange->field));
         if (roomChange->direction == DIR_ARRIVAL) {
             SetPlayerSpecialState(GameData_GetPlayerState(roomChange->gameData), 0);
-            func_ov012_021591b4(roomChange->gameData);
+            GameData_ResetPhenomenonSteps(roomChange->gameData);
         }
-        GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(roomChange->gsys, roomChange->field,
-                                                                    destination->zoneId, &destination->pos,
-                                                                    func_ov127_021efdac(roomChange->direction)));
+        GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(
+                                       roomChange->gsys, roomChange->field, destination->zoneId, &destination->pos,
+                                       InfinityDungeon_GetEntryFacing(roomChange->direction)));
         (*state)++;
         break;
     }
@@ -715,11 +715,11 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
             if (room->kind != ROOM_KIND_GOAL) {
                 InfinityDungeonRoomChange_CreateWalls(roomChange, room, roomChange->nextFloor, roomChange->nextRoom);
                 InfinityDungeonRoomChange_CreateTrainers(roomChange, room);
-                func_ov127_021efde0(roomChange, room);
+                InfinityDungeonRoomChange_CreateNpcs(roomChange, room);
             }
         }
         if (roomChange->inTransition == 8) {
-            if (func_ov127_021f08d0(roomChange)) {
+            if (InfinityDungeonRoomChange_UsesFade(roomChange)) {
                 FieldG3D_RestoreSurface(roomChange->field);
                 GFL_FadeSet(3, 16, 0, 4);
             } else {
@@ -790,7 +790,7 @@ static void InfinityDungeonRoomChange_SetNextRoom(InfinityDungeonRoomChange *roo
     }
     room = InfinityDungeonRoomChange_GetNextRoom(roomChange);
     destination->zoneId = roomChange->roomZones[room->kind];
-    func_0201033c(roomChange->keyData, roomChange->nextRoom);
+    KeyDataSave_SetRoom(roomChange->keyData, roomChange->nextRoom);
 }
 
 // The first room of the floor that has no template yet
@@ -806,14 +806,14 @@ static void InfinityDungeonRoomChange_SetStartRoom(InfinityDungeonRoomChange *ro
         roomChange->nextRoom++;
     }
     destination->zoneId = roomChange->roomZones[InfinityDungeonRoomChange_GetNextRoom(roomChange)->kind];
-    func_0201033c(roomChange->keyData, roomChange->nextRoom);
+    KeyDataSave_SetRoom(roomChange->keyData, roomChange->nextRoom);
     roomChange->floor = roomChange->nextFloor;
 }
 
 static void InfinityDungeonRoomChange_SetRoomPosition(InfinityDungeonRoomChange *roomChange) {
-    u8 version = func_ov127_021f0dd8(roomChange->dungeon);
+    u8 version = InfinityDungeon_GetVersion(roomChange->dungeon);
     InfinityDungeonRoom *room = InfinityDungeonRoomChange_GetNextRoom(roomChange);
-    const InfinityDungeonPos *pos = func_ov127_021f0b04(version, room->kind, roomChange->direction);
+    const InfinityDungeonPos *pos = InfinityDungeon_GetRoomEntryPos(version, room->kind, roomChange->direction);
 
     InfinityDungeonGimmick_SetTilePosition(&roomChange->destination.pos, pos->x, pos->y, pos->z);
 }
@@ -824,8 +824,8 @@ static void InfinityDungeonRoomChange_SetArrivalZone(InfinityDungeonRoomChange *
 }
 
 static void InfinityDungeonRoomChange_SetFloorPosition(InfinityDungeonRoomChange *roomChange) {
-    u8 version = func_ov127_021f0dd8(roomChange->dungeon);
-    const InfinityDungeonPos *pos = func_ov127_021f0ae0(version);
+    u8 version = InfinityDungeon_GetVersion(roomChange->dungeon);
+    const InfinityDungeonPos *pos = InfinityDungeon_GetFloorPos(version);
 
     InfinityDungeonGimmick_SetTilePosition(&roomChange->destination.pos, pos->x, pos->y, pos->z);
 }
@@ -835,9 +835,9 @@ static void InfinityDungeonRoomChange_SetArrivalPosition(InfinityDungeonRoomChan
     const InfinityDungeonPos *pos;
 
     if (roomChange->level <= 4) {
-        pos = func_ov127_021f0af4(0);
+        pos = InfinityDungeon_GetArrivalPos(0);
     } else {
-        pos = func_ov127_021f0af4(1);
+        pos = InfinityDungeon_GetArrivalPos(1);
     }
     InfinityDungeonGimmick_SetTilePosition(&destination->pos, pos->x, pos->y, pos->z);
 }

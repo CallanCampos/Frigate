@@ -104,7 +104,7 @@ static const BGSetup sFaceBGSetup = {
     FALSE,
 };
 
-GameEvent *func_ov155_021f59e0(u8 type, u8 unused, u16 endBlack, GameSystem *gsys, FieldScriptEnv *env) {
+GameEvent *EventFaceUpStart_Create(u8 type, u8 unused, u16 endBlack, GameSystem *gsys, FieldScriptEnv *env) {
     FaceUpWork *work;
     Field *field = GSYS_GetField(gsys);
     u32 textSpeed;
@@ -125,7 +125,8 @@ GameEvent *func_ov155_021f59e0(u8 type, u8 unused, u16 endBlack, GameSystem *gsy
     FaceUpAnim_Init(&work->eyes);
     FaceUpAnim_Init(&work->mouth);
 
-    textSpeed = func_02008a14((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    textSpeed =
+        Config_GetTextSpeed((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     if (textSpeed == 0) {
         work->mouth.interval = 3;
     } else if (textSpeed == 1) {
@@ -253,20 +254,20 @@ static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
     GFL_BGSysSetBGEnabled(FACEUP_BG_PARTS, TRUE);
 }
 
-GameEvent *func_ov155_021f5cd0(GameSystem *gsys) {
+GameEvent *EventFaceUpEnd_Create(GameSystem *gsys) {
     if (*(FaceUpWork **)Field_GetNDemoDataHandle(GSYS_GetField(gsys)) == NULL) {
         return NULL;
     }
     return GameEvent_Create(gsys, NULL, EventFaceUpEnd_Callback, 0);
 }
 
-void func_ov155_021f5cf8(Field *field) {
+void FaceUp_FreeNow(Field *field) {
     FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
 
     FaceUp_Free(field, work);
 }
 
-void func_ov155_021f5d0c(Field *field) {
+void FaceUp_StartTalk(Field *field) {
     FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
 
     work->talkEnded = FALSE;

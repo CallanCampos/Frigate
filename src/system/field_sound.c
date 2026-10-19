@@ -149,7 +149,7 @@ static u32 GetZoneBGMOverrideID(GameData *gameData, s32 zoneId) {
         return NO_BGM_OVERRIDE;
     }
 
-    if (func_02017b34(gameData)) {
+    if (GameData_IsFunfestMission(gameData)) {
         return SEQ_BGM_FES;
     }
     return NO_BGM_OVERRIDE;

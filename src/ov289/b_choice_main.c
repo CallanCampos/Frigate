@@ -347,9 +347,9 @@ static void BChoiceMain_Task(TCB *tcb, void *data) {
 }
 
 static BOOL BChoiceMain_Finish(TCB *tcb, BChoiceWork *work) {
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         if (work->param->skip == 1) {
-            func_02021c44(work->printQueue);
+            PrintQueue_Clear(work->printQueue);
         } else {
             return FALSE;
         }
@@ -366,9 +366,9 @@ static BOOL BChoiceMain_Finish(TCB *tcb, BChoiceWork *work) {
     GFL_TCBExMgrFree(work->tcbManager);
     GFL_HeapFree(work->positions);
     BChoiceMain_FreeWindows(work);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     work->param->done = TRUE;
-    func_0203d564(!(work->flags & FLAG_KEY_CHOICE));
+    GCTX_HIDSetUsingTouch(!(work->flags & FLAG_KEY_CHOICE));
     if (work->param->result != NULL) {
         *work->param->result = work->choice;
     }
@@ -417,7 +417,7 @@ static void BChoiceMain_Init(BChoiceWork *work) {
     G2S_BlendNone();
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
-    work->printQueue = func_02021998(work->param->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->param->heapId);
     work->positions = GFL_ArcSysReadHeapNew(ARCID_B_CHOICE, FILE_POSITIONS, work->param->heapId);
     BChoiceMain_InitBG(work);
     BChoiceMain_LoadGraphics(work, work->layout);
@@ -427,7 +427,7 @@ static void BChoiceMain_Init(BChoiceWork *work) {
     BChoiceMain_StartWipe(work);
     BChoiceMain_InitPalettes(work);
     work->unk80 = 1;
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         work->flags |= FLAG_KEYS;
         work->flags |= FLAG_REFRESH;
     }
@@ -539,7 +539,7 @@ static void BChoiceMain_FreeBG(BChoiceWork *work) {
 static void BChoiceMain_InitPalettes(BChoiceWork *work) {
     PaletteFade_LoadFromVRAM(work->paletteFade, 1, 0, 0xe0);
     PaletteFade_LoadNCLR(work->paletteFade, ARCID_FONT, 6, work->param->heapId, 1, 0x20, 0x80);
-    func_02042ba8(FALSE, work->param->heapId);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, 0, 0x20);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, 0xe0, 0x20);
     PaletteFade_StartFade(work->paletteFade, 10, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
@@ -687,8 +687,8 @@ static void BChoiceMain_PrintText(BChoiceWork *work, u32 window, int x, int y, S
     u16 offset = BChoiceMain_GetAlignOffset(str, work->param->font, align);
     PrintQueue *printQueue = work->printQueue;
 
-    func_02021c7c(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str, work->param->font,
-                  color);
+    PrintQueue_PrintColor(printQueue, BmpWin_GetBitmap(work->windows[window].window), x - offset, y, str,
+                          work->param->font, color);
     work->windows[window].dirty = TRUE;
 }
 
@@ -705,12 +705,12 @@ static u16 BChoiceMain_GetAlignOffset(StrBuf *str, Font *font, u32 align) {
 static void BChoiceMain_UpdatePrint(BChoiceWork *work) {
     int i;
 
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < WINDOW_MAX; i++) {
         PrintQueue *printQueue = work->printQueue;
 
         if (work->windows[i].dirty) {
-            if (!func_02021c1c(printQueue, BmpWin_GetBitmap(work->windows[i].window))) {
+            if (!PrintQueue_IsBitmapPending(printQueue, BmpWin_GetBitmap(work->windows[i].window))) {
                 BmpWin_FlushChar(work->windows[i].window);
                 work->windows[i].dirty = FALSE;
             }
@@ -719,7 +719,7 @@ static void BChoiceMain_UpdatePrint(BChoiceWork *work) {
 }
 
 static s32 BChoiceMain_GetTouched(BChoiceWork *work, int layout) {
-    return func_0203da0c(sBChoiceTouchRectTables[layout]);
+    return GFL_HIDGetTouchPressedRect(sBChoiceTouchRectTables[layout]);
 }
 
 static void BChoiceMain_PrintChoices(BChoiceWork *work) {
@@ -735,11 +735,11 @@ static void BChoiceMain_PrintChoices(BChoiceWork *work) {
 static void BChoiceMain_InitActors(BChoiceWork *work) {
     int i;
 
-    work->unit = func_0204bf1c(ACTOR_COUNT, 0, HEAPID_TAIL(work->param->heapId));
+    work->unit = ClActUnit_Create(ACTOR_COUNT, 0, HEAPID_TAIL(work->param->heapId));
     BChoiceMain_LoadActorResources(work);
     BChoiceMain_CreateActors(work, CLACT_SURFACE_SUB, sBChoiceActorSetups, sBChoiceActorResources);
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c378(work->actors[i], 0, TRUE);
+        ClActor_SetPalette(work->actors[i], 0, TRUE);
     }
 }
 
@@ -747,20 +747,20 @@ static void BChoiceMain_FreeActors(BChoiceWork *work) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(work->actors[i]);
+        ClActor_Delete(work->actors[i]);
     }
-    func_0204bcd0(work->resources[0]);
-    func_0204b98c(work->resources[1]);
-    func_0204be64(work->resources[2]);
-    func_0204bf98(work->unit);
+    ClActSys_FreePltt(work->resources[0]);
+    ClActSys_FreeChars(work->resources[1]);
+    ClActSys_FreeCellAnims(work->resources[2]);
+    ClActUnit_Delete(work->unit);
 }
 
 static void BChoiceMain_LoadActorResources(BChoiceWork *work) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(work->param->heapId));
 
-    work->resources[0] = func_0204bbb8(arc, FILE_CURSOR_PALETTE, 1, 0, 4, 1, work->param->heapId);
-    work->resources[2] = func_0204bde0(arc, FILE_CURSOR_CELLS, FILE_CURSOR_ANIMS, work->param->heapId);
-    work->resources[1] = func_0204b81c(arc, FILE_CURSOR_CHARS, FALSE, 1, work->param->heapId);
+    work->resources[0] = ClActSys_LoadPlttRange(arc, FILE_CURSOR_PALETTE, 1, 0, 4, 1, work->param->heapId);
+    work->resources[2] = ClActSys_LoadCellAnims(arc, FILE_CURSOR_CELLS, FILE_CURSOR_ANIMS, work->param->heapId);
+    work->resources[1] = ClActSys_LoadChars(arc, FILE_CURSOR_CHARS, FALSE, 1, work->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -791,23 +791,23 @@ static void BChoiceMain_CreateActors(BChoiceWork *work, u32 surface, const BChoi
         setup.sequence = setups->sequence;
         setup.priority = setups->priority;
         setup.bgPriority = setups->bgPriority;
-        actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells],
-                                  &setup, surface, work->param->heapId);
+        actors[i] = ClActor_Create(unit, work->resources[chars], work->resources[palette], work->resources[cells],
+                                   &setup, surface, work->param->heapId);
         visible = FALSE;
         if (setups->visible == 1) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         animated = FALSE;
         if (setups->flags & 1) {
             animated = TRUE;
         }
         func_0204c520(actors[i], animated);
         if (setups->flags & 2) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (setups->flags & 4) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
         setups++;
     }
@@ -822,7 +822,7 @@ static s16 BChoiceMain_GetPosition(BChoiceWork *work, u32 index) {
 
 static void BChoiceMain_SetCursorVisible(BChoiceWork *work, u32 unused, int index, BOOL visible) {
     if (index < ACTOR_COUNT) {
-        func_0204c124(work->actors[index], visible);
+        ClActor_SetVisible(work->actors[index], visible);
     }
 }
 
@@ -842,7 +842,7 @@ static void BChoiceMain_UpdateCursor(BChoiceWork *work, BOOL show, int layout, i
 
             pos.x = BChoiceMain_GetPosition(work, (u32)index * 2);
             pos.y = BChoiceMain_GetPosition(work, index * 2 + 1);
-            func_0204c140(work->actors[i], &pos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(work->actors[i], &pos, CLACT_SURFACE_SUB);
         }
     }
 }

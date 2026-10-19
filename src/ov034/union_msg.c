@@ -290,151 +290,151 @@ static const struct {
     { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 4 }, { 4 }, { 4 }, { 4 }, { 2 }, { 5 }, { 5 },
 };
 
-u16 func_ov034_0217aa7c(UnionSystem *unisys) {
+u16 UnionMsg_GetNoReplyMessage(UnionSystem *unisys) {
     return sMsgPair_0204[getTrainerGender(unisys->param->playerInfo)];
 }
 
-u16 func_ov034_0217aa94(u8 gender) {
+u16 UnionMsg_GetContactGreetingMessage(u8 gender) {
     return sMsgPair_0234[gender];
 }
 
-u16 func_ov034_0217aaa0(u8 gender) {
+u16 UnionMsg_GetJustAskMessage(u8 gender) {
     return sMsgPair_0218[gender];
 }
 
-u16 func_ov034_0217aaac(u8 gender) {
+u16 UnionMsg_GetBusyMessage(u8 gender) {
     return sMsgPair_0230[gender];
 }
 
-u16 func_ov034_0217aab8(u32 row, u8 gender) {
+u16 UnionMsg_GetShowCardMessage(u32 row, u8 gender) {
     return sMsgPairs_04cc[row - 2][gender];
 }
 
-u16 func_ov034_0217aacc(u32 row, u8 gender) {
+u16 UnionMsg_GetCardMissingMessage(u32 row, u8 gender) {
     return sMsgPairs_0530[row - 2][gender];
 }
 
-u16 func_ov034_0217aae0(u32 row) {
+u16 UnionMsg_GetOfferMessage(u32 row) {
     return sTable_0424[row - 2];
 }
 
-u16 func_ov034_0217aaf0(u32 row) {
+u16 UnionMsg_GetDeclinedMessage(u32 row) {
     return sTable_0458[row - 2];
 }
 
-u16 func_ov034_0217ab00(u8 gender) {
+u16 UnionMsg_GetWhatToDoMessage(u8 gender) {
     return sMsgPair_01e8[gender];
 }
 
-u16 func_ov034_0217ab0c(u8 gender) {
+u16 UnionMsg_GetBattleStartMessage(u8 gender) {
     return sMsgPair_0214[gender];
 }
 
-u16 func_ov034_0217ab18(u8 gender) {
+u16 UnionMsg_GetOnePokemonCannotTradeMessage(u8 gender) {
     return sMsgPair_0208[gender];
 }
 
-u16 func_ov034_0217ab24(u8 gender) {
+u16 UnionMsg_GetNeedEggMessage(u8 gender) {
     return sMsgPair_0200[gender];
 }
 
-u16 func_ov034_0217ab30(UnionSystem *unisys) {
+u16 UnionMsg_GetEggCannotTradeMessage(UnionSystem *unisys) {
     return sMsgPair_0210[getTrainerGender(unisys->param->playerInfo)];
 }
 
-u16 func_ov034_0217ab48(UnionSystem *unisys) {
+u16 UnionMsg_GetEggCannotTradeResultMessage(UnionSystem *unisys) {
     return sMsgPair_020c[getTrainerGender(unisys->param->playerInfo)];
 }
 
-u16 func_ov034_0217ab60(u8 gender) {
+u16 UnionMsg_GetBattleChatMessage(u8 gender) {
     return sMsgPairs_0268[GFL_RandomLC(4)][gender];
 }
 
-u16 func_ov034_0217ab7c(u8 gender) {
+u16 UnionMsg_GetBusyTrainerMessage(u8 gender) {
     return sMsgPair_0224[gender];
 }
 
-u16 func_ov034_0217ab88(u8 gender) {
+u16 UnionMsg_GetCardChatMessage(u8 gender) {
     return sMsgPairs_0250[GFL_RandomLC(2)][gender];
 }
 
-u16 func_ov034_0217aba4(u8 gender) {
+u16 UnionMsg_GetDrawChatMessage(u8 gender) {
     return sMsgPairs_0258[GFL_RandomLC(4)][gender];
 }
 
-u16 func_ov034_0217abc0(u8 gender) {
+u16 UnionMsg_GetTradeChatMessage(u8 gender) {
     return sMsgPairs_0248[GFL_RandomLC(2)][gender];
 }
 
-u16 func_ov034_0217abdc(u8 gender) {
+u16 UnionMsg_GetSpinTradeChatMessage(u8 gender) {
     return sMsgPairs_0278[GFL_RandomLC(4)][gender];
 }
 
-u16 func_ov034_0217abf8(u8 gender) {
+u16 UnionMsg_GetJoinMultiBattleMessage(u8 gender) {
     return sMsgPair_01fc[gender];
 }
 
-u16 func_ov034_0217ac04(u8 gender) {
+u16 UnionMsg_GetJoinSpinTradeMessage(u8 gender) {
     return sMsgPair_01f8[gender];
 }
 
-u16 func_ov034_0217ac10(u8 gender) {
+u16 UnionMsg_GetJoinDrawMessage(u8 gender) {
     return sMsgPair_0228[gender];
 }
 
-u16 func_ov034_0217ac1c(u8 gender) {
+u16 UnionMsg_GetBattleDeclineMessage(u8 gender) {
     return sMsgPair_01ec[gender];
 }
 
-u16 func_ov034_0217ac28(u8 gender) {
+u16 UnionMsg_GetEggTradeDeclineMessage(u8 gender) {
     return sMsgPair_01f0[gender];
 }
 
-u16 func_ov034_0217ac34(u8 gender) {
+u16 UnionMsg_GetDrawDeclineMessage(u8 gender) {
     return sMsgPair_022c[gender];
 }
 
-u16 func_ov034_0217ac40(u8 gender) {
+u16 UnionMsg_GetNoEggMessage(u8 gender) {
     return sMsgPair_0238[gender];
 }
 
-u16 func_ov034_0217ac4c(u8 gender) {
+u16 UnionMsg_GetTargetEggCannotTradeMessage(u8 gender) {
     return sMsgPair_0220[gender];
 }
 
-u16 func_ov034_0217ac58(u8 gender) {
+u16 UnionMsg_GetEggTradeAcceptMessage(u8 gender) {
     return sMsgPair_0244[gender];
 }
 
-u16 func_ov034_0217ac64(u8 gender) {
+u16 UnionMsg_GetSpinTradeStartMessage(u8 gender) {
     return sMsgPair_0240[gender];
 }
 
-u16 func_ov034_0217ac70(u8 gender) {
+u16 UnionMsg_GetEggTradeBusyMessage(u8 gender) {
     return sMsgPair_023c[gender];
 }
 
-u16 func_ov034_0217ac7c(u8 gender) {
+u16 UnionMsg_GetDrawAcceptMessage(u8 gender) {
     return sMsgPair_01e0[gender];
 }
 
-u16 func_ov034_0217ac88(u8 gender) {
+u16 UnionMsg_GetDrawStartMessage(u8 gender) {
     return sMsgPair_01d8[gender];
 }
 
-u16 func_ov034_0217ac94(u8 gender) {
+u16 UnionMsg_GetDrawBusyMessage(u8 gender) {
     return sMsgPair_01dc[gender];
 }
 
-u16 func_ov034_0217aca0(u8 gender) {
+u16 UnionMsg_GetBattleAcceptMessage(u8 gender) {
     return sMsgPair_021c[gender];
 }
 
-u16 func_ov034_0217acac(u8 gender) {
+u16 UnionMsg_GetMultiBattleStartMessage(u8 gender) {
     return sMsgPair_01f4[gender];
 }
 
-u16 func_ov034_0217acb8(u8 gender) {
+u16 UnionMsg_GetBattleBusyMessage(u8 gender) {
     return sMsgPair_01e4[gender];
 }
 
@@ -894,7 +894,7 @@ BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field) {
     if (unisys->alloc.rpm == NULL) {
         return TRUE;
     }
-    return func_02021c0c(queue);
+    return PrintQueue_IsEmpty(queue);
 }
 
 void UnionMsg_FreeRulesWindow(UnionSystem *unisys) {

@@ -97,7 +97,7 @@ FieldParticle *func_ov036_021bb590(HeapID heapId) {
     FieldParticle *particle = GFL_HeapAllocate(heapId, sizeof(FieldParticle), TRUE, "fld_particle.c", 46);
 
     particle->heapId = heapId;
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     particle->work = GFL_HeapAllocate(heapId, 0x4800, TRUE, "fld_particle.c", 52);
     return particle;
 }
@@ -107,8 +107,8 @@ ParticleSystem *func_ov036_021bb5d0(FieldParticle *particle) {
     fx32 zNear;
     fx32 zFar;
 
-    particle->system = func_0204f968(particle->work, 0x4800, TRUE, particle->heapId);
-    camera = func_02050194(particle->system);
+    particle->system = Particle_CreateSystem(particle->work, 0x4800, TRUE, particle->heapId);
+    camera = Particle_GetCamera(particle->system);
     zNear = FX32_ONE;
     zFar = FX32_CONST(900);
     GFL_G3DCameraSetProjectionZNear(camera, &zNear);
@@ -118,24 +118,24 @@ ParticleSystem *func_ov036_021bb5d0(FieldParticle *particle) {
 
 void func_ov036_021bb60c(FieldParticle *particle) {
     if (particle->system != NULL) {
-        func_0204fa84(particle->system);
+        Particle_DeleteSystem(particle->system);
         particle->system = NULL;
     }
 }
 
 void *FieldParticle_LoadResource(FieldParticle *particle, u32 arcId, u32 fileId) {
-    return func_0204fdf8(arcId, fileId, particle->heapId);
+    return Particle_ReadResource(arcId, fileId, particle->heapId);
 }
 
 void func_ov036_021bb630(FieldParticle *particle, void *resource, BOOL immediate, TCBManager *tcbMgr) {
-    func_0204fe04(particle->system, resource, immediate, tcbMgr);
+    Particle_SetResource(particle->system, resource, immediate, tcbMgr);
 }
 
 BOOL func_ov036_021bb63c(FieldParticle *particle) {
     if (particle->system == NULL) {
         return TRUE;
     }
-    if (func_020500a8(particle->system) == FALSE) {
+    if (Particle_GetEmitterCount(particle->system) == FALSE) {
         return TRUE;
     }
     return FALSE;
@@ -143,11 +143,11 @@ BOOL func_ov036_021bb63c(FieldParticle *particle) {
 
 void func_ov036_021bb658(FieldParticle *particle) {
     func_ov036_021bb60c(particle);
-    func_0204fb4c();
+    Particle_Free();
     GFL_HeapFree(particle->work);
     GFL_HeapFree(particle);
 }
 
 void func_ov036_021bb674(void) {
-    func_0204f954();
+    Particle_DrawAndUpdateAll();
 }

@@ -482,7 +482,7 @@ BOOL s0106_CallEggHatch(VM *vm, FieldScriptEnv *env) {
 
         if (isEgg != 0 && isBadEgg == 0 && happiness == 0) {
             ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(16),
-                                                                       (GameEventProvider)func_ov016_0216e754, pkm));
+                                                                       (GameEventProvider)EventEggDemo_Create, pkm));
             *result = i;
             return TRUE;
         }

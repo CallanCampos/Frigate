@@ -129,7 +129,7 @@ static BOOL TDownload_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->wordSet = GFL_WordSetSystemCreate(8, 40, wk->heapId);
     wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_DOWNLOAD, wk->heapId);
     wk->msgData[1] = NULL;
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->tcbEx = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
     wk->stream = NULL;
     wk->streamStr = NULL;
@@ -155,7 +155,7 @@ static BOOL TDownload_Exit(GameProc *proc, u32 *state, void *param, void *work) 
         }
     }
     TDownloadSave_FreeWaitIcon(wk);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->font);
     GFL_TCBExMgrFree(wk->tcbEx);
@@ -177,7 +177,7 @@ static BOOL TDownload_Main(GameProc *proc, u32 *state, void *param, void *work) 
         }
         break;
     case 1:
-        if (wk->seq == T_DOWNLOAD_SEQ_END && func_02021c0c(wk->printQueue) == TRUE) {
+        if (wk->seq == T_DOWNLOAD_SEQ_END && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -312,7 +312,7 @@ static void TDownload_RunMode(TDownloadWork *wk) {
 static void TDownload_FlushWindows(TDownloadWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < T_DOWNLOAD_WINDOW_COUNT; i++) {
         if (wk->windows[i].window != NULL) {
             PrintWindow_Flush(&wk->windows[i], wk->printQueue);
@@ -373,7 +373,7 @@ static void TDownload_InitSelect(TDownloadWork *wk) {
 }
 
 static void TDownload_SelectMain(TDownloadWork *wk) {
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (TDownload_SelectTouch(wk) == FALSE) {
             TDownload_SelectKeys(wk);
         }
@@ -401,21 +401,21 @@ static BOOL TDownload_SelectTouch(TDownloadWork *wk) {
         if (wk->saveFlags & (1 << (slot + 4))) {
             wk->slotPos = slot;
             moved = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         break;
     }
     if (moved == FALSE && touched == 0) {
         TDownloadUtil_PressButton(wk, 3, 0);
         input = T_DOWNLOAD_INPUT_TOUCH;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (moved == TRUE) {
         wk->flags |= T_DOWNLOAD_FLAG_SELECT_MOVED;
         TDownloadUtil_SetCursorKeys(wk, TRUE);
         wk->seq = 130;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (input != 0) {
         TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
@@ -433,7 +433,7 @@ static BOOL TDownload_SelectKeys(TDownloadWork *wk) {
     BOOL result = FALSE;
     int pos;
 
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         if (GCTX_HIDGetPressedKeys()) {
             TDownloadUtil_UpdateCursorMode(wk, TRUE, input, input);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -459,7 +459,7 @@ static BOOL TDownload_SelectKeys(TDownloadWork *wk) {
             TDownloadUtil_SetCursorKeys(wk, TRUE);
             wk->seq = 130;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             TDownloadUtil_PressButton(wk, 3, 0);
             input = T_DOWNLOAD_INPUT_KEY;
@@ -484,7 +484,7 @@ static BOOL TDownload_WaitInput(TDownloadWork *wk) {
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         result = TRUE;
         TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
-    } else if (func_0203da48() == TRUE) {
+    } else if (GFL_HIDIsTouchPressed() == TRUE) {
         result = TRUE;
         TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
     }
@@ -523,7 +523,7 @@ static void TDownload_Select(TDownloadWork *wk) {
         }
         break;
     case 130:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
@@ -624,7 +624,7 @@ static void TDownload_InitDetail(TDownloadWork *wk) {
 }
 
 static void TDownload_DetailMain(TDownloadWork *wk) {
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (TDownload_DetailTouch(wk) == FALSE) {
             TDownload_DetailKeys(wk);
         }
@@ -667,7 +667,7 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
         TDownloadUtil_PressButton(wk, 3, 0);
         button = 1;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (touched == 3) {
         if (!(wk->flags & T_DOWNLOAD_FLAG_ONE_PAGE) && wk->page[wk->tab] != 0) {
             wk->page[wk->tab]--;
@@ -678,7 +678,7 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
             button = 2;
             input = 1;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     } else if (touched == 2) {
         if (!(wk->flags & T_DOWNLOAD_FLAG_ONE_PAGE) && wk->page[wk->tab] != wk->pageCount[wk->tab] - 1) {
@@ -690,30 +690,30 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
             button = 3;
             input = 1;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     } else if (touched == 4) {
         wk->tab = 0;
         input = 1;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         wk->flags |= T_DOWNLOAD_FLAG_TAB;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (touched == 5) {
         wk->tab = 1;
         input = 1;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         wk->flags |= T_DOWNLOAD_FLAG_TAB;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (touched == 6) {
         input = 1;
         wk->tab = 2;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         wk->flags |= T_DOWNLOAD_FLAG_TAB;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (held == 7) {
         if (wk->pageCount[wk->tab] > 1) {
             input = 2;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     }
     if (input == 1) {
@@ -735,7 +735,7 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
         result = TRUE;
         if (button == 1) {
             wk->seq = 110;
-            func_0203d564(result);
+            GCTX_HIDSetUsingTouch(result);
         } else if (button == 2) {
             wk->seq = 120;
         } else if (button == 3) {
@@ -817,7 +817,7 @@ static BOOL TDownload_DetailKeys(TDownloadWork *wk) {
         result = TRUE;
         if (button == 1) {
             wk->seq = 110;
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else if (button == 2) {
             wk->seq = 120;
         } else if (button == 3) {
@@ -932,7 +932,7 @@ static void TDownload_InitReceived(TDownloadWork *wk) {
     if (wk->flags & T_DOWNLOAD_FLAG_LIST_PRINTED) {
         wk->seq = wk->seqAfterList;
         GFL_BGSysSetBGEnabled(2, TRUE);
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
             TDownloadUtil_MoveCursor(wk, 0, wk->listCursor[0]);
         }
@@ -943,8 +943,8 @@ static void TDownload_ReceivedMain(TDownloadWork *wk) {
     BOOL handled = FALSE;
     int result;
 
-    if (func_02021c0c(wk->printQueue)) {
-        if (func_0203d554() == TRUE && GCTX_HIDGetPressedKeys()) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
+        if (GCTX_HIDIsUsingTouch() == TRUE && GCTX_HIDGetPressedKeys()) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
@@ -985,7 +985,7 @@ static BOOL TDownload_ReceivedTouch(TDownloadWork *wk) {
     if (TDownloadUtil_GetTouch(wk, FALSE, wk->mode) == 1) {
         TDownloadUtil_PressButton(wk, 3, 0);
         pressed = TRUE;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (pressed) {
         wk->seq = 110;
@@ -1030,7 +1030,7 @@ static void TDownload_Received(TDownloadWork *wk) {
                 wk->flags |= T_DOWNLOAD_FLAG_LIST_PRINTED;
                 wk->seq = wk->seqAfterList;
                 GFL_BGSysSetBGEnabled(2, TRUE);
-                if (func_0203d554() == FALSE) {
+                if (GCTX_HIDIsUsingTouch() == FALSE) {
                     TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
                     TDownloadUtil_MoveCursor(wk, 0, wk->listCursor[0]);
                 }
@@ -1086,7 +1086,7 @@ static void TDownload_Received(TDownloadWork *wk) {
         }
         break;
     case 130:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
@@ -1234,7 +1234,7 @@ static void TDownload_InitSaved(TDownloadWork *wk) {
 }
 
 static void TDownload_SavedMain(TDownloadWork *wk) {
-    if (func_02021c0c(wk->printQueue)) {
+    if (PrintQueue_IsEmpty(wk->printQueue)) {
         if (TDownload_SavedTouch(wk) == FALSE) {
             TDownload_SavedKeys(wk);
         }
@@ -1262,21 +1262,21 @@ static BOOL TDownload_SavedTouch(TDownloadWork *wk) {
         if (wk->saveFlags & (1 << (slot + 4))) {
             wk->slotCursor = slot;
             moved = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         break;
     }
     if (moved == FALSE && touched == 0) {
         TDownloadUtil_PressButton(wk, 3, 0);
         input = T_DOWNLOAD_INPUT_TOUCH;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (moved == TRUE) {
         wk->flags |= T_DOWNLOAD_FLAG_SAVED_MOVED;
         TDownloadUtil_SetCursorKeys(wk, TRUE);
         wk->seq = 130;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (input != 0) {
         result = TRUE;
@@ -1294,7 +1294,7 @@ static BOOL TDownload_SavedKeys(TDownloadWork *wk) {
     BOOL result = FALSE;
     int pos;
 
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         if (GCTX_HIDGetPressedKeys()) {
             TDownloadUtil_UpdateCursorMode(wk, TRUE, input, input);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1320,7 +1320,7 @@ static BOOL TDownload_SavedKeys(TDownloadWork *wk) {
             TDownloadUtil_SetCursorKeys(wk, TRUE);
             wk->seq = 130;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             TDownloadUtil_PressButton(wk, 3, 0);
             input = T_DOWNLOAD_INPUT_KEY;
@@ -1411,7 +1411,7 @@ static void TDownload_Saved(TDownloadWork *wk) {
         }
         break;
     case 130:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
@@ -1527,14 +1527,14 @@ static void TDownload_Saved(TDownloadWork *wk) {
         }
         break;
     case 405:
-        if (func_02021c0c(wk->printQueue)) {
+        if (PrintQueue_IsEmpty(wk->printQueue)) {
             TDownloadSave_StartSave(wk, wk->listPos[2], TDownloadSave_FindFreeSlot(wk));
             TDownloadSave_CreateWaitIcon(wk);
             wk->seq = 500;
         }
         break;
     case 410:
-        if (func_02021c0c(wk->printQueue)) {
+        if (PrintQueue_IsEmpty(wk->printQueue)) {
             TDownloadSave_StartSave(wk, wk->listPos[2], wk->slotCursor);
             TDownloadSave_CreateWaitIcon(wk);
             wk->seq = 500;

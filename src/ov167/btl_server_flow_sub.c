@@ -27,66 +27,66 @@
 #include "save/player_info.h"
 #include "system/rtc.h"
 
-static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                              void *targets);
-static u8 func_ov167_021ae55c(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, u8 pos, u8 targetPos);
-static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                              void *targets);
-static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                              void *targets);
-static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, BtlFlowMoveParam *param, u8 target,
-                                void *targets);
-static BattleMon *func_ov167_021aecac(BtlServerFlow *flow, u8 pos, u8 index);
-static BattleMon *func_ov167_021aecdc(BtlServerFlow *flow, u8 pos);
-static u8 func_ov167_021aed0c(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId);
-static u8 func_ov167_021aed4c(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param);
-static u8 func_ov167_021aedac(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId);
+static u8 CollectTargetsSingle(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
+                               void *targets);
+static u8 GetCurseTargetPos(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, u8 pos, u8 targetPos);
+static u8 CollectTargetsDouble(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
+                               void *targets);
+static u8 CollectTargetsTriple(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
+                               void *targets);
+static BOOL RetargetFromFaintedFoe(BtlServerFlow *flow, u32 style, BattleMon *mon, BtlFlowMoveParam *param, u8 target,
+                                   void *targets);
+static BattleMon *GetOpposingMonAt(BtlServerFlow *flow, u8 pos, u8 index);
+static BattleMon *GetAllyMonAt(BtlServerFlow *flow, u8 pos);
+static u8 RedirectMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId);
+static u8 ServerEvent_DecideMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param);
+static u8 ServerEvent_BaitMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId);
 static u32 ScaleExpGainedByLevel(BattleMon *mon, u32 exp, u16 level, u16 defeatedLevel);
 static void AddEVs(BattleMon *mon, BattleMon *defeated, BtlFlowExpEntry *entry);
-static BOOL func_ov167_021af5bc(BtlServerFlow *flow, BattleMon *mon, u16 item);
-static BOOL func_ov167_021af6b0(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item, u8 *shakes,
-                                u8 *critical);
-static fx32 func_ov167_021af870(BtlServerFlow *flow);
-static fx32 func_ov167_021af8c4(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item);
-static BOOL func_ov167_021afa24(BtlServerFlow *flow, fx32 value);
-static BOOL func_ov167_021afaac(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afabc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afacc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afadc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afaec(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afafc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afb0c(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afb1c(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afb84(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc14(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc24(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc34(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc44(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc54(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc64(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afc74(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afcf4(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 slot);
-static BOOL func_ov167_021afd90(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afe3c(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021afecc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 condition);
-static BOOL func_ov167_021aff14(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021affb4(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 stat);
-static BOOL func_ov167_021b0028(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021b0084(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021b00d4(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021b0170(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
-static BOOL func_ov167_021b01e4(BattleParty *party, s16 species);
-static BOOL func_ov167_021b0228(BattleParty *party, s16 species);
-static s32 func_ov167_021b026c(BattleParty *party);
-static BOOL func_ov167_021b02a0(BattleParty *party);
-static s16 func_ov167_021b02bc(BtlMainModule *mainModule, const BtlScriptedRules *rules);
-static s32 func_ov167_021b02d4(const s32 *outcomes);
-static s32 func_ov167_021b02ec(BtlMainModule *mainModule, BOOL won);
-static u32 func_ov167_021b06dc(BtlServerFlow *flow, const u8 *alive, const u8 *total, u8 side);
-static void func_ov167_021b0774(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 side);
+static BOOL ThrowBall(BtlServerFlow *flow, BattleMon *mon, u16 item);
+static BOOL CheckBallCapture(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item, u8 *shakes,
+                             u8 *critical);
+static fx32 GetDarkGrassCaptureMod(BtlServerFlow *flow);
+static fx32 GetBallCaptureMod(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item);
+static BOOL CheckCriticalCapture(BtlServerFlow *flow, fx32 value);
+static BOOL BagItemCureSleep(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCurePoison(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCureBurn(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCureFreeze(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCureParalysis(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCureConfusion(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCureInfatuation(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemGuardSpec(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRevive(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseAttack(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseDefense(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseSpAttack(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseSpDefense(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseSpeed(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseAccuracy(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemDireHit(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRestorePP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 slot);
+static BOOL BagItemRestoreAllPP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRestoreHP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemCureCondition(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 condition);
+static BOOL BagItemCureMentalConditions(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemRaiseStat(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 stat);
+static BOOL BagItemItemUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemAbilityUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemItemDrop(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL BagItemResetUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param);
+static BOOL HasFaintedMonOfSpecies(BattleParty *party, s16 species);
+static BOOL HasFaintedMonOfOtherSpecies(BattleParty *party, s16 species);
+static s32 CountFaintedMons(BattleParty *party);
+static BOOL IsPartyAllFainted(BattleParty *party);
+static s16 GetRulesTargetSpecies(BtlMainModule *mainModule, const BtlScriptedRules *rules);
+static s32 GetLastRuleOutcome(const s32 *outcomes);
+static s32 CheckRulesTurnLimit(BtlMainModule *mainModule, BOOL won);
+static u32 JudgeByRemainingMons(BtlServerFlow *flow, const u8 *alive, const u8 *total, u8 side);
+static void GetSideHP(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 side);
 
 // Fills targets with the mons a move hits, from its target type and the battle style
-u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, void *targets) {
+u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, void *targets) {
     u32 style;
     u8 redirect;
     u8 count;
@@ -95,23 +95,23 @@ u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMo
     style = BtlSetup_GetBattleStyle(flow->mainModule);
     redirect = 0x1f;
     if (!param->flags.unk0) {
-        redirect = func_ov167_021aed4c(flow, mon, param);
+        redirect = ServerEvent_DecideMoveTarget(flow, mon, param);
     }
     BtlMonSet_Clear(targets);
     flow->unk77F = 6;
     switch (style) {
     case BTL_STYLE_SINGLE:
     default:
-        count = func_ov167_021ae430(flow, mon, target, param, redirect, targets);
+        count = CollectTargetsSingle(flow, mon, target, param, redirect, targets);
         break;
     case BTL_STYLE_DOUBLE:
-        count = func_ov167_021ae590(flow, mon, target, param, redirect, targets);
+        count = CollectTargetsDouble(flow, mon, target, param, redirect, targets);
         break;
     case BTL_STYLE_TRIPLE:
-        count = func_ov167_021ae82c(flow, mon, target, param, redirect, targets);
+        count = CollectTargetsTriple(flow, mon, target, param, redirect, targets);
         break;
     case BTL_STYLE_ROTATION:
-        count = func_ov167_021ae430(flow, mon, target, param, redirect, targets);
+        count = CollectTargetsSingle(flow, mon, target, param, redirect, targets);
         break;
     }
     if (count == 1) {
@@ -119,7 +119,7 @@ u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMo
         if (first != NULL) {
             flow->unk77F = BtlPosPoke_GetPosOfMon(&flow->posPoke, GetMonID(first));
         }
-        if (!func_ov167_021aeb10(flow, style, mon, param, target, targets)) {
+        if (!RetargetFromFaintedFoe(flow, style, mon, param, target, targets)) {
             count = 0;
         }
     }
@@ -127,8 +127,8 @@ u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMo
 }
 
 // The targets in a single or rotation battle
-static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                              void *targets) {
+static u8 CollectTargetsSingle(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
+                               void *targets) {
     u8 pos;
 
     pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
@@ -139,7 +139,7 @@ static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
     case 5:
     case 9:
         BtlMonSet_Add(targets,
-                      redirect == 0x1f ? func_ov167_021aecac(flow, pos, 0) : GetPokeParam(flow->pokeCon, redirect));
+                      redirect == 0x1f ? GetOpposingMonAt(flow, pos, 0) : GetPokeParam(flow->pokeCon, redirect));
         return 1;
     case 1:
     case 7:
@@ -151,7 +151,7 @@ static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         return 1;
     case 8:
         BtlMonSet_Add(targets, mon);
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 0));
         return 2;
     case 13:
         if (redirect != 0x1f) {
@@ -164,13 +164,13 @@ static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
 }
 
 // Curse picks its own target: the user itself, or a foe for a Ghost type
-static u8 func_ov167_021ae55c(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, u8 pos, u8 targetPos) {
+static u8 GetCurseTargetPos(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, u8 pos, u8 targetPos) {
     u16 move = param->move;
 
     if (move == MOVE_CURSE) {
         if (param->targetType == 0) {
             if (pos == targetPos || targetPos == 6) {
-                return func_ov167_021bd8e4(flow->mainModule, flow->pokeCon, mon, MOVE_CURSE);
+                return DecideMoveTargetAuto(flow->mainModule, flow->pokeCon, mon, MOVE_CURSE);
             }
         } else if (param->targetType == 7 && pos != targetPos) {
             return pos;
@@ -180,39 +180,39 @@ static u8 func_ov167_021ae55c(BtlServerFlow *flow, BtlFlowMoveParam *param, Batt
 }
 
 // The targets in a double battle
-static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                              void *targets) {
+static u8 CollectTargetsDouble(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
+                               void *targets) {
     u8 pos;
     u8 targetPos;
     BattleMon *single;
     u8 newTarget;
 
     pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
-    targetPos = func_ov167_021ae55c(flow, param, mon, pos, target);
+    targetPos = GetCurseTargetPos(flow, param, mon, pos, target);
     switch (param->targetType) {
     case 0:
-        single = func_ov167_0219d180(flow->pokeCon, targetPos);
+        single = PokeCon_GetPosMon(flow->pokeCon, targetPos);
         break;
     case 3:
-        single = func_ov167_0219d180(flow->pokeCon, targetPos);
+        single = PokeCon_GetPosMon(flow->pokeCon, targetPos);
         break;
     case 9:
-        single = func_ov167_021aecac(flow, pos, BattleRandom(2));
+        single = GetOpposingMonAt(flow, pos, BattleRandom(2));
         break;
     case 5:
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 0));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 1));
         return 2;
     case 4:
-        BtlMonSet_Add(targets, func_ov167_021aecdc(flow, pos));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, GetAllyMonAt(flow, pos));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 0));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 1));
         return 3;
     case 8:
         BtlMonSet_Add(targets, mon);
-        BtlMonSet_Add(targets, func_ov167_021aecdc(flow, pos));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, GetAllyMonAt(flow, pos));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 0));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 1));
         return 3;
     case 7:
         if (redirect == 0x1f) {
@@ -222,10 +222,10 @@ static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         }
         return 1;
     case 1:
-        BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
+        BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, targetPos));
         return 1;
     case 2:
-        BtlMonSet_Add(targets, func_ov167_021aecdc(flow, pos));
+        BtlMonSet_Add(targets, GetAllyMonAt(flow, pos));
         return 1;
     case 13:
         if (redirect != 0x1f) {
@@ -237,7 +237,7 @@ static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         return 0;
     }
     if (single != NULL) {
-        newTarget = func_ov167_021aed0c(flow, mon, param, GetMonID(single));
+        newTarget = RedirectMoveTarget(flow, mon, param, GetMonID(single));
         if (newTarget != 0x1f) {
             single = GetPokeParam(flow->pokeCon, newTarget);
         }
@@ -248,8 +248,8 @@ static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
 }
 
 // The targets in a triple battle, where only the mons next to each other reach each other
-static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                              void *targets) {
+static u8 CollectTargetsTriple(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
+                               void *targets) {
     u8 pos;
     const AdjacentOpponentData *adjacent;
     u8 targetPos;
@@ -261,33 +261,33 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
     u8 index;
 
     pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
-    adjacent = func_ov167_0219d2bc(pos);
-    targetPos = func_ov167_021ae55c(flow, param, mon, pos, target);
+    adjacent = GetAdjacentOpponentData(pos);
+    targetPos = GetCurseTargetPos(flow, param, mon, pos, target);
     switch (param->targetType) {
     case 0:
-        single = func_ov167_0219d180(flow->pokeCon, targetPos);
+        single = PokeCon_GetPosMon(flow->pokeCon, targetPos);
         break;
     case 3:
-        single = func_ov167_0219d180(flow->pokeCon, targetPos);
+        single = PokeCon_GetPosMon(flow->pokeCon, targetPos);
         break;
     case 9:
         index = BattleRandom(adjacent->count1);
-        single = func_ov167_0219d180(flow->pokeCon, adjacent->list1[index]);
+        single = PokeCon_GetPosMon(flow->pokeCon, adjacent->list1[index]);
         break;
     case 5:
         for (i = 0; i < adjacent->count1; i++) {
-            BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list1[i]));
+            BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, adjacent->list1[i]));
         }
         return adjacent->count1;
     case 4:
         count = 0;
         for (i = 0; i < adjacent->count1; i++) {
-            BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list1[i]));
+            BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, adjacent->list1[i]));
             count++;
         }
         for (j = 0; j < adjacent->count2; j++) {
             if (pos != adjacent->list2[j]) {
-                BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list2[j]));
+                BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, adjacent->list2[j]));
                 count++;
             }
         }
@@ -298,12 +298,12 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
             u8 allyPos = GetPosOnSameSide(pos, i);
 
             if (allyPos != pos) {
-                BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, allyPos));
+                BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, allyPos));
             }
         }
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
-        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 2));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 0));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 1));
+        BtlMonSet_Add(targets, GetOpposingMonAt(flow, pos, 2));
         return 6;
     case 7:
         if (redirect == 0x1f) {
@@ -313,10 +313,10 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         }
         return 1;
     case 1:
-        BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
+        BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, targetPos));
         return 1;
     case 2:
-        BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
+        BtlMonSet_Add(targets, PokeCon_GetPosMon(flow->pokeCon, targetPos));
         return 1;
     case 13:
         if (redirect != 0x1f) {
@@ -328,7 +328,7 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         return 0;
     }
     if (single != NULL) {
-        newTarget = func_ov167_021aed0c(flow, mon, param, GetMonID(single));
+        newTarget = RedirectMoveTarget(flow, mon, param, GetMonID(single));
         if (newTarget != 0x1f) {
             single = GetPokeParam(flow->pokeCon, newTarget);
         }
@@ -340,8 +340,8 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
 
 // When a single target has fainted before the move, the move goes to the nearest foe still standing instead, or the
 // one with more HP, or a random one of two
-static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, BtlFlowMoveParam *param, u8 target,
-                                void *targets) {
+static BOOL RetargetFromFaintedFoe(BtlServerFlow *flow, u32 style, BattleMon *mon, BtlFlowMoveParam *param, u8 target,
+                                   void *targets) {
     BattleMon *fainted;
     u8 pos;
     u8 numPositions;
@@ -354,7 +354,7 @@ static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, 
     u8 index;
     u16 code;
 
-    if (func_ov167_021bd728(style) > 1 && BtlMonSet_GetCount(targets) == 1) {
+    if (BtlCalc_GetFrontPosCount(style) > 1 && BtlMonSet_GetCount(targets) == 1) {
         fainted = BtlMonSet_Get(targets, 0);
         if (IsFainted(fainted) && !IsAllyMonID(GetMonID(mon), GetMonID(fainted))) {
             pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
@@ -364,12 +364,12 @@ static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, 
             } else {
                 code = 0x100 | pos;
             }
-            numPositions = func_ov167_0219bfe4(flow->mainModule, code, positions);
+            numPositions = ExpandPosFlags(flow->mainModule, code, positions);
             for (i = 0; i < 3; i++) {
                 mons[i] = NULL;
             }
             for (count = 0, i = 0; i < numPositions; i++) {
-                mons[count] = func_ov167_0219d180(flow->pokeCon, positions[i]);
+                mons[count] = PokeCon_GetPosMon(flow->pokeCon, positions[i]);
                 if (!IsFainted(mons[count])) {
                     positions[count] = positions[i];
                     count++;
@@ -411,35 +411,35 @@ static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, 
 }
 
 // The mon on the other side at an index from a position
-static BattleMon *func_ov167_021aecac(BtlServerFlow *flow, u8 pos, u8 index) {
+static BattleMon *GetOpposingMonAt(BtlServerFlow *flow, u8 pos, u8 index) {
     u8 clientId;
     u8 slot;
 
-    func_ov167_0219c694(flow->mainModule, func_ov167_0219c4bc(flow->mainModule, pos, index), &clientId, &slot);
-    return func_ov167_0219d4e4(func_ov167_0219f260(flow->server, clientId)->party, slot);
+    GetPosClientAndIndex(flow->mainModule, GetOpposingPos(flow->mainModule, pos, index), &clientId, &slot);
+    return BattleParty_GetMon(BattleServer_GetClient(flow->server, clientId)->party, slot);
 }
 
 // The mon beside a position
-static BattleMon *func_ov167_021aecdc(BtlServerFlow *flow, u8 pos) {
+static BattleMon *GetAllyMonAt(BtlServerFlow *flow, u8 pos) {
     u8 clientId;
     u8 slot;
 
-    func_ov167_0219c694(flow->mainModule, func_ov167_0219c51c(flow->mainModule, pos), &clientId, &slot);
-    return func_ov167_0219d4e4(func_ov167_0219f260(flow->server, clientId)->party, slot);
+    GetPosClientAndIndex(flow->mainModule, GetPartnerPos(flow->mainModule, pos), &clientId, &slot);
+    return BattleParty_GetMon(BattleServer_GetClient(flow->server, clientId)->party, slot);
 }
 
-static u8 func_ov167_021aed0c(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId) {
+static u8 RedirectMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId) {
     u32 state;
     u8 result;
 
     state = PushState(&flow->actionState, 0x26b);
-    result = func_ov167_021aedac(flow, mon, param, targetId);
+    result = ServerEvent_BaitMoveTarget(flow, mon, param, targetId);
     PopState(&flow->actionState, state, 0x26d);
     return result;
 }
 
 // The mon that draws a move to itself, as Follow Me and Lightning Rod do, or 0x1f for none
-static u8 func_ov167_021aed4c(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param) {
+static u8 ServerEvent_DecideMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param) {
     u8 monId;
 
     BattleEventVar_Push(0x27f);
@@ -455,7 +455,7 @@ static u8 func_ov167_021aed4c(BtlServerFlow *flow, BattleMon *mon, BtlFlowMovePa
 }
 
 // The mon that takes a move over from its target, as with Lightning Rod, or 0x1f for none
-static u8 func_ov167_021aedac(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId) {
+static u8 ServerEvent_BaitMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId) {
     u8 newTarget;
 
     BattleEventVar_Push(0x298);
@@ -493,7 +493,7 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
     u8 monId;
     u8 k;
 
-    setup = func_ov167_0219e310(flow->mainModule);
+    setup = GetBattleSetupParam(flow->mainModule);
     baseExp = CalcBaseExpGain(defeated, setup->levelDiff);
     numMons = GetNumMonsInParty(party);
     numExpShare = 0;
@@ -525,10 +525,10 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
         }
     }
     // The rest is split among the mons that faced the defeated one and are still standing
-    numFaced = func_ov167_021bc604(defeated);
+    numFaced = BattleMon_GetConfrontedMonCount(defeated);
     numStanding = 0;
     for (i = 0; i < numFaced; i++) {
-        if (!IsFainted(GetPokeParam(flow->pokeCon, func_ov167_021bc60c(defeated, i)))) {
+        if (!IsFainted(GetPokeParam(flow->pokeCon, BattleMon_GetConfrontedMonID(defeated, i)))) {
             numStanding++;
         }
     }
@@ -541,7 +541,7 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
         if (!IsFainted(mon)) {
             monId = GetMonID(mon);
             for (k = 0; k < numFaced; k++) {
-                if (monId == func_ov167_021bc60c(defeated, k)) {
+                if (monId == BattleMon_GetConfrontedMonID(defeated, k)) {
                     entries[j].exp += exp;
                 }
             }
@@ -550,7 +550,7 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
     for (i = 0; i < numMons; i++) {
         entry = &entries[i];
         if (entries[i].exp != 0) {
-            player = func_ov167_0219bf68(flow->mainModule);
+            player = GetPlayerInfo(flow->mainModule);
             mon = GetBattleMonFromParty(party, i);
             pkm = GetSrcData(mon);
             level = GetBattleMonStat(mon, 0xf);
@@ -577,7 +577,7 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
     }
     for (i = 0; i < numMons; i++) {
         if (entries[i].exp != 0) {
-            AddEVs(func_ov167_0219d4e4(party, i), defeated, &entries[i]);
+            AddEVs(BattleParty_GetMon(party, i), defeated, &entries[i]);
         }
     }
 }
@@ -700,33 +700,33 @@ typedef struct {
 } BtlFlowItemEffect;
 
 static const BtlFlowItemEffect data_ov167_021d6d20[23] = {
-    { 0x12, 0, FALSE, func_ov167_021afaac },
-    { 0x13, 0, FALSE, func_ov167_021afabc },
-    { 0x14, 0, FALSE, func_ov167_021afacc },
-    { 0x15, 0, FALSE, func_ov167_021afadc },
-    { 0x16, 0, FALSE, func_ov167_021afaec },
-    { 0x17, 0, FALSE, func_ov167_021afafc },
-    { 0x18, 0, FALSE, func_ov167_021afb0c },
-    { 0x19, 1, FALSE, func_ov167_021afb1c },
-    { 0x1a, 0, FALSE, func_ov167_021afb84 },
-    { 0x1e, 1, FALSE, func_ov167_021afc14 },
-    { 0x1f, 1, FALSE, func_ov167_021afc24 },
-    { 0x20, 1, FALSE, func_ov167_021afc34 },
-    { 0x21, 1, FALSE, func_ov167_021afc44 },
-    { 0x22, 1, FALSE, func_ov167_021afc54 },
-    { 0x23, 1, FALSE, func_ov167_021afc64 },
-    { 0x24, 1, FALSE, func_ov167_021afc74 },
-    { 0x27, 0, FALSE, func_ov167_021afcf4 },
-    { 0x28, 0, FALSE, func_ov167_021afd90 },
-    { 0x29, 0, FALSE, func_ov167_021afe3c },
-    { ITEM_ITEM_URGE, 2, TRUE, func_ov167_021b0028 },
-    { ITEM_ABILITY_URGE, 2, TRUE, func_ov167_021b0084 },
-    { ITEM_ITEM_DROP, 2, TRUE, func_ov167_021b00d4 },
-    { ITEM_RESET_URGE, 2, TRUE, func_ov167_021b0170 },
+    { 0x12, 0, FALSE, BagItemCureSleep },
+    { 0x13, 0, FALSE, BagItemCurePoison },
+    { 0x14, 0, FALSE, BagItemCureBurn },
+    { 0x15, 0, FALSE, BagItemCureFreeze },
+    { 0x16, 0, FALSE, BagItemCureParalysis },
+    { 0x17, 0, FALSE, BagItemCureConfusion },
+    { 0x18, 0, FALSE, BagItemCureInfatuation },
+    { 0x19, 1, FALSE, BagItemGuardSpec },
+    { 0x1a, 0, FALSE, BagItemRevive },
+    { 0x1e, 1, FALSE, BagItemRaiseAttack },
+    { 0x1f, 1, FALSE, BagItemRaiseDefense },
+    { 0x20, 1, FALSE, BagItemRaiseSpAttack },
+    { 0x21, 1, FALSE, BagItemRaiseSpDefense },
+    { 0x22, 1, FALSE, BagItemRaiseSpeed },
+    { 0x23, 1, FALSE, BagItemRaiseAccuracy },
+    { 0x24, 1, FALSE, BagItemDireHit },
+    { 0x27, 0, FALSE, BagItemRestorePP },
+    { 0x28, 0, FALSE, BagItemRestoreAllPP },
+    { 0x29, 0, FALSE, BagItemRestoreHP },
+    { ITEM_ITEM_URGE, 2, TRUE, BagItemItemUrge },
+    { ITEM_ABILITY_URGE, 2, TRUE, BagItemAbilityUrge },
+    { ITEM_ITEM_DROP, 2, TRUE, BagItemItemDrop },
+    { ITEM_RESET_URGE, 2, TRUE, BagItemResetUrge },
 };
 
 // A trainer uses an item from the bag on a party mon
-u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot) {
+u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot) {
     u8 numOut;
     BattleParty *party;
     u8 clientId;
@@ -745,13 +745,13 @@ u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, 
     s32 value;
     u16 effectId;
 
-    clientId = func_ov167_0219c648(GetMonID(mon));
+    clientId = GetClientIDFromMonID(GetMonID(mon));
     target = NULL;
     placed = 0;
     if (slot != 6) {
         party = GetPartyData(flow->pokeCon, clientId);
         numOut = GetClientBattlerCount(flow->mainModule, clientId);
-        target = func_ov167_0219d4e4(party, slot);
+        target = BattleParty_GetMon(party, slot);
         targetId = GetMonID(target);
         targetPos = GetBattlePos(&flow->posPoke, targetId);
         // 0 for a mon in battle, 1 for one in a rotation battle's back slots, 2 for one in the party
@@ -764,9 +764,9 @@ u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, 
         }
     }
     if (flow->unk18 != 1) {
-        func_ov167_021b15d0(flow->queue, 0x5a, 0x21, clientId, item, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x21, clientId, item, 0xffff0000);
         if (ItemGetParam(item, 0xf) == 4) {
-            if (func_ov167_021af5bc(flow, mon, item)) {
+            if (ThrowBall(flow, mon, item)) {
                 BattleClient_SubItem(flow->mainModule, clientId, item);
             }
             return FALSE;
@@ -776,9 +776,9 @@ u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, 
             return TRUE;
         }
     } else {
-        func_ov167_021b15d0(flow->queue, 0x5a, 0x24, clientId, targetId, item, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x24, clientId, targetId, item, 0xffff0000);
         if (clientId == GetPlayerClientID(flow->mainModule)) {
-            func_ov167_0219dad0(flow->mainModule, 0x6f);
+            IncRecord(flow->mainModule, 0x6f);
         }
     }
     usable = place == 0 && targetPos != 6 ? TRUE : FALSE;
@@ -798,30 +798,30 @@ u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, 
         }
     }
     if (!usable) {
-        func_ov167_021b15d0(flow->queue, 0x5a, 0xc4, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xc4, 0xffff0000);
         return FALSE;
     }
     if (flow->unk18 == 1) {
         if (targetPos != 6) {
-            func_ov167_021b1434(flow->queue, 0x4d, targetPos, 0x282);
+            BtlServerCmdQueue_Put(flow->queue, 0x4d, targetPos, 0x282);
         }
         for (i = 0; i < 23; i++) {
             if (data_ov167_021d6d20[i].exact && item == data_ov167_021d6d20[i].param) {
                 result = FALSE;
-                if (!func_ov167_021abe78(flow, targetId)) {
+                if (!BtlServerFlow_IsSemiInvuln(flow, targetId)) {
                     u32 reservePos = SCQUE_RESERVE_Pos(flow->queue, 0x4d);
 
                     result = data_ov167_021d6d20[i].func(flow, target, item, 0, param);
                     if (result == TRUE) {
-                        func_ov167_021b14ec(flow->queue, reservePos, 0x4d, targetPos, 0x25e);
-                        func_ov167_021b1434(flow->queue, 0x4c, 0x236);
+                        BtlServerCmdQueue_PutReserved(flow->queue, reservePos, 0x4d, targetPos, 0x25e);
+                        BtlServerCmdQueue_Put(flow->queue, 0x4c, 0x236);
                         return FALSE;
                     }
                 }
                 if (result == FALSE) {
-                    func_ov167_021b15d0(flow->queue, 0x5a, 0x44, 0xffff0000);
+                    BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x44, 0xffff0000);
                 }
-                func_ov167_021b1434(flow->queue, 0x4c, 0x236);
+                BtlServerCmdQueue_Put(flow->queue, 0x4c, 0x236);
                 return FALSE;
             }
         }
@@ -838,21 +838,21 @@ u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, 
     }
     if (used) {
         effectId = targetPos != 6 ? 0x25e : 0x292;
-        func_ov167_021b14ec(flow->queue, reserve, 0x4d, targetPos, effectId);
+        BtlServerCmdQueue_PutReserved(flow->queue, reserve, 0x4d, targetPos, effectId);
         if (flow->unk18 != 1) {
             BattleClient_SubItem(flow->mainModule, clientId, item);
-            func_ov167_0219db7c(flow->mainModule, target, item);
+            ChangeFriendshipByItem(flow->mainModule, target, item);
         }
     } else {
-        func_ov167_021b15d0(flow->queue, 0x5a, 0x44, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x44, 0xffff0000);
     }
     PopState(&flow->actionState, state, 0x4f4);
-    func_ov167_021b1434(flow->queue, 0x4c, 0x236);
+    BtlServerCmdQueue_Put(flow->queue, 0x4c, 0x236);
     return FALSE;
 }
 
 // Throws a ball at the first foe standing; only a wild one can be caught
-static BOOL func_ov167_021af5bc(BtlServerFlow *flow, BattleMon *mon, u16 item) {
+static BOOL ThrowBall(BtlServerFlow *flow, BattleMon *mon, u16 item) {
     u8 positions[6];
     u8 shakes;
     u8 critical;
@@ -865,10 +865,10 @@ static BOOL func_ov167_021af5bc(BtlServerFlow *flow, BattleMon *mon, u16 item) {
 
     target = NULL;
     targetPos = 6;
-    numPositions = func_ov167_0219bfe4(
-        flow->mainModule, 0x600 | MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon)), positions);
+    numPositions = ExpandPosFlags(flow->mainModule,
+                                  0x600 | MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon)), positions);
     for (i = 0; i < numPositions; i++) {
-        target = func_ov167_0219d180(flow->pokeCon, positions[i]);
+        target = PokeCon_GetPosMon(flow->pokeCon, positions[i]);
         if (!IsFainted(target)) {
             targetPos = positions[i];
             break;
@@ -876,28 +876,28 @@ static BOOL func_ov167_021af5bc(BtlServerFlow *flow, BattleMon *mon, u16 item) {
     }
     if (BtlSetup_GetBattleType(flow->mainModule) == 0) {
         if (targetPos != 6) {
-            caught = func_ov167_021af6b0(flow, mon, target, item, &shakes, &critical);
+            caught = CheckBallCapture(flow, mon, target, item, &shakes, &critical);
             if (caught) {
                 flow->unk14 = 6;
                 flow->unk784 = targetPos;
-                isNew = !func_ov167_0219bf70(flow->mainModule, target) ? TRUE : FALSE;
-                func_ov167_021bc624(target, item);
+                isNew = !IsMonCaught(flow->mainModule, target) ? TRUE : FALSE;
+                BattleMon_SetCaughtBall(target, item);
             } else {
                 isNew = FALSE;
             }
-            func_ov167_021b1434(flow->queue, 0x46, targetPos, shakes, caught, isNew, critical, item);
+            BtlServerCmdQueue_Put(flow->queue, 0x46, targetPos, shakes, caught, isNew, critical, item);
         }
         return TRUE;
     }
     if (targetPos != 6) {
-        func_ov167_021b1434(flow->queue, 0x47, targetPos, item);
+        BtlServerCmdQueue_Put(flow->queue, 0x47, targetPos, item);
     }
     return FALSE;
 }
 
 // Whether a ball catches its target, with how many times it shakes and whether it was a critical capture
-static BOOL func_ov167_021af6b0(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item, u8 *shakes,
-                                u8 *critical) {
+static BOOL CheckBallCapture(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item, u8 *shakes,
+                             u8 *critical) {
     u32 maxHP;
     u32 base;
     fx32 rate;
@@ -916,12 +916,12 @@ static BOOL func_ov167_021af6b0(BtlServerFlow *flow, BattleMon *mon, BattleMon *
     base = maxHP - GetBattleMonStat(target, 0xd) * 2;
     rate = FX32_CONST(base);
     if (BtlSetup_IsBattleType(flow->mainModule, 0x20)) {
-        rate = FX_MUL(rate, func_ov167_021af870(flow));
+        rate = FX_MUL(rate, GetDarkGrassCaptureMod(flow));
     }
     species = GetBattleMonSpecies(target);
     form = GetBattleMonStat(target, 0x13);
     rate *= (u16)PML_PersonalGetParamSingle(species, form, 8);
-    rate = (u32)FX_MUL(rate, func_ov167_021af8c4(flow, mon, target, item)) / maxHP;
+    rate = (u32)FX_MUL(rate, GetBallCaptureMod(flow, mon, target, item)) / maxHP;
     switch (GetBattleMonStatus(target)) {
     case 2:
     case 3:
@@ -934,7 +934,7 @@ static BOOL func_ov167_021af6b0(BtlServerFlow *flow, BattleMon *mon, BattleMon *
         break;
     }
     value = PassPower_ApplyCapture(rate);
-    *critical = func_ov167_021afa24(flow, value);
+    *critical = CheckCriticalCapture(flow, value);
     if (value >= FX32_CONST(255)) {
         *shakes = *critical ? 1 : 3;
         return TRUE;
@@ -953,8 +953,8 @@ static BOOL func_ov167_021af6b0(BtlServerFlow *flow, BattleMon *mon, BattleMon *
 }
 
 // In dark grass, catching gets harder the fewer species the player has caught
-static fx32 func_ov167_021af870(BtlServerFlow *flow) {
-    u32 count = func_ov167_0219bf88(flow->mainModule);
+static fx32 GetDarkGrassCaptureMod(BtlServerFlow *flow) {
+    u32 count = GetDexCaughtCount(flow->mainModule);
 
     if (count > 600) {
         return FX32_ONE;
@@ -975,7 +975,7 @@ static fx32 func_ov167_021af870(BtlServerFlow *flow) {
 }
 
 // The catch rate multiplier of a ball
-static fx32 func_ov167_021af8c4(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item) {
+static fx32 GetBallCaptureMod(BtlServerFlow *flow, BattleMon *mon, BattleMon *target, u16 item) {
     switch (item) {
     case ITEM_GREAT_BALL:
         return FX32_CONST(1.5);
@@ -1008,7 +1008,7 @@ static fx32 func_ov167_021af8c4(BtlServerFlow *flow, BattleMon *mon, BattleMon *
         break;
     }
     case ITEM_REPEAT_BALL:
-        if (func_ov167_0219bf70(flow->mainModule, target)) {
+        if (IsMonCaught(flow->mainModule, target)) {
             return FX32_CONST(3);
         }
         break;
@@ -1042,8 +1042,8 @@ static fx32 func_ov167_021af8c4(BtlServerFlow *flow, BattleMon *mon, BattleMon *
 }
 
 // A critical capture, likelier the more species the player has caught
-static BOOL func_ov167_021afa24(BtlServerFlow *flow, fx32 value) {
-    u32 count = func_ov167_0219bf88(flow->mainModule);
+static BOOL CheckCriticalCapture(BtlServerFlow *flow, fx32 value) {
+    u32 count = GetDexCaughtCount(flow->mainModule);
     fx32 ratio;
 
     if (count > 600) {
@@ -1069,36 +1069,36 @@ static BOOL func_ov167_021afa24(BtlServerFlow *flow, fx32 value) {
     return FALSE;
 }
 
-static BOOL func_ov167_021afaac(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021afecc(flow, mon, item, value, CONDITION_SLEEP);
+static BOOL BagItemCureSleep(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureCondition(flow, mon, item, value, CONDITION_SLEEP);
 }
 
-static BOOL func_ov167_021afabc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021afecc(flow, mon, item, value, CONDITION_POISON);
+static BOOL BagItemCurePoison(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureCondition(flow, mon, item, value, CONDITION_POISON);
 }
 
-static BOOL func_ov167_021afacc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021afecc(flow, mon, item, value, CONDITION_BURN);
+static BOOL BagItemCureBurn(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureCondition(flow, mon, item, value, CONDITION_BURN);
 }
 
-static BOOL func_ov167_021afadc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021afecc(flow, mon, item, value, CONDITION_FREEZE);
+static BOOL BagItemCureFreeze(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureCondition(flow, mon, item, value, CONDITION_FREEZE);
 }
 
-static BOOL func_ov167_021afaec(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021afecc(flow, mon, item, value, CONDITION_PARALYSIS);
+static BOOL BagItemCureParalysis(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureCondition(flow, mon, item, value, CONDITION_PARALYSIS);
 }
 
-static BOOL func_ov167_021afafc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021afecc(flow, mon, item, value, CONDITION_CONFUSION);
+static BOOL BagItemCureConfusion(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureCondition(flow, mon, item, value, CONDITION_CONFUSION);
 }
 
-static BOOL func_ov167_021afb0c(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021aff14(flow, mon, item, value, 7);
+static BOOL BagItemCureInfatuation(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemCureMentalConditions(flow, mon, item, value, 7);
 }
 
 // Guard Spec. sets up Mist on the user's side
-static BOOL func_ov167_021afb1c(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemGuardSpec(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u8 side;
     BattleCondition cont;
     BattleHandlerMessageParam *message;
@@ -1116,7 +1116,7 @@ static BOOL func_ov167_021afb1c(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Revives a fainted mon with the HP the item gives
-static BOOL func_ov167_021afb84(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemRevive(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u8 monId;
     BattleHandlerReviveParam *revive;
 
@@ -1141,66 +1141,66 @@ static BOOL func_ov167_021afb84(BtlServerFlow *flow, BattleMon *mon, u16 item, s
         BattleHandler_StrSetup(&revive->string, 2, 3);
         BattleHandler_AddArg(&revive->string, monId);
         BattleHandler_PopWork(flow, revive);
-        func_ov167_021ac020(flow, monId);
+        BtlServerFlow_NotifyRevive(flow, monId);
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov167_021afc14(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021affb4(flow, mon, item, value, 1);
+static BOOL BagItemRaiseAttack(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemRaiseStat(flow, mon, item, value, 1);
 }
 
-static BOOL func_ov167_021afc24(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021affb4(flow, mon, item, value, 2);
+static BOOL BagItemRaiseDefense(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemRaiseStat(flow, mon, item, value, 2);
 }
 
-static BOOL func_ov167_021afc34(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021affb4(flow, mon, item, value, 3);
+static BOOL BagItemRaiseSpAttack(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemRaiseStat(flow, mon, item, value, 3);
 }
 
-static BOOL func_ov167_021afc44(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021affb4(flow, mon, item, value, 4);
+static BOOL BagItemRaiseSpDefense(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemRaiseStat(flow, mon, item, value, 4);
 }
 
-static BOOL func_ov167_021afc54(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021affb4(flow, mon, item, value, 5);
+static BOOL BagItemRaiseSpeed(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemRaiseStat(flow, mon, item, value, 5);
 }
 
-static BOOL func_ov167_021afc64(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
-    return func_ov167_021affb4(flow, mon, item, value, 6);
+static BOOL BagItemRaiseAccuracy(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+    return BagItemRaiseStat(flow, mon, item, value, 6);
 }
 
 // Dire Hit raises the critical hit stage
-static BOOL func_ov167_021afc74(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemDireHit(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     BOOL used = FALSE;
 
     if (!GetAdditionalConditionFlag(mon, 9)) {
-        func_ov167_021bb7e4(mon, 9);
-        func_ov167_021b1434(flow->queue, 0x19, GetMonID(mon), 9);
+        BattleMon_SetConditionFlag(mon, 9);
+        BtlServerCmdQueue_Put(flow->queue, 0x19, GetMonID(mon), 9);
         used = TRUE;
     }
-    if (value > 1 && func_ov167_021bb738(mon, value - 1)) {
-        func_ov167_021b1434(flow->queue, 0xe, GetMonID(mon), value - 1);
+    if (value > 1 && BattleMon_AddCritStage(mon, value - 1)) {
+        BtlServerCmdQueue_Put(flow->queue, 0xe, GetMonID(mon), value - 1);
         used = TRUE;
     }
     if (used) {
-        func_ov167_021b15d0(flow->queue, 0x5b, 0x411, GetMonID(mon), 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x411, GetMonID(mon), 0xffff0000);
         return TRUE;
     }
     return FALSE;
 }
 
 // An Ether restores the PP of one move
-static BOOL func_ov167_021afcf4(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 slot) {
+static BOOL BagItemRestorePP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 slot) {
     u8 monId;
     u8 amount;
     u8 maxAmount;
     BattleHandlerPPParam *pp;
 
-    if (func_ov167_021bac50(mon) > slot) {
+    if (BattleMon_GetOrgMoveCount(mon) > slot) {
         monId = GetMonID(mon);
-        amount = func_ov167_021bad68(mon, slot);
+        amount = BattleMon_GetOrgMovePPUsed(mon, slot);
         maxAmount = ItemGetParam(item, 0x3b);
         if (maxAmount != 0x7f && amount > maxAmount) {
             amount = maxAmount;
@@ -1213,7 +1213,7 @@ static BOOL func_ov167_021afcf4(BtlServerFlow *flow, BattleMon *mon, u16 item, s
             pp->allowFainted = 1;
             BattleHandler_StrSetup(&pp->string, 2, 0x186);
             BattleHandler_AddArg(&pp->string, monId);
-            BattleHandler_AddArg(&pp->string, func_ov167_021bacd0(mon, slot));
+            BattleHandler_AddArg(&pp->string, BattleMon_GetOrgMoveID(mon, slot));
             BattleHandler_PopWork(flow, pp);
             return TRUE;
         }
@@ -1222,7 +1222,7 @@ static BOOL func_ov167_021afcf4(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // An Elixir restores the PP of every move
-static BOOL func_ov167_021afd90(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemRestoreAllPP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u8 monId;
     u32 numMoves;
     BOOL used;
@@ -1235,9 +1235,9 @@ static BOOL func_ov167_021afd90(BtlServerFlow *flow, BattleMon *mon, u16 item, s
     monId = GetMonID(mon);
     maxAmount = ItemGetParam(item, 0x3b);
     used = FALSE;
-    numMoves = func_ov167_021bac50(mon);
+    numMoves = BattleMon_GetOrgMoveCount(mon);
     for (i = 0; i < numMoves; i++) {
-        amount = func_ov167_021bad68(mon, i);
+        amount = BattleMon_GetOrgMovePPUsed(mon, i);
         if (amount > maxAmount) {
             amount = maxAmount;
         }
@@ -1261,7 +1261,7 @@ static BOOL func_ov167_021afd90(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // A Potion restores HP
-static BOOL func_ov167_021afe3c(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemRestoreHP(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u8 monId;
     BattleHandlerRecoverHPParam *recover;
     u32 amount;
@@ -1295,7 +1295,7 @@ static BOOL func_ov167_021afe3c(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Cures a condition of a mon
-static BOOL func_ov167_021afecc(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 condition) {
+static BOOL BagItemCureCondition(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 condition) {
     u8 monId;
     BattleHandlerCureConditionParam *param;
 
@@ -1312,7 +1312,7 @@ static BOOL func_ov167_021afecc(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Cures every major condition of a mon that isn't in battle
-static BOOL func_ov167_021aff14(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemCureMentalConditions(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     BOOL cured;
     u32 i;
     u32 condition;
@@ -1343,7 +1343,7 @@ static BOOL func_ov167_021aff14(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Raises a stat of a mon in battle
-static BOOL func_ov167_021affb4(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 stat) {
+static BOOL BagItemRaiseStat(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u32 stat) {
     u8 monId;
     BattleHandlerStatChangeParam *param;
 
@@ -1362,14 +1362,14 @@ static BOOL func_ov167_021affb4(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Uses a mon's held item: 1 when it was used, 2 when it only set the flag, 0 when it can't be used
-static BOOL func_ov167_021b0028(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemItemUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u8 flag;
     u8 monId;
     u8 result;
 
     if (!IsReactiveHeldItem(GetBattleMonHeldItem(mon))) {
         monId = GetMonID(mon);
-        result = func_ov167_021abfec(flow, mon, &flag);
+        result = BtlServerFlow_UseHeldItem(flow, mon, &flag);
         if (!result) {
             result = flag ? 2 : 0;
             return result;
@@ -1379,14 +1379,14 @@ static BOOL func_ov167_021b0028(BtlServerFlow *flow, BattleMon *mon, u16 item, s
     return 0;
 }
 
-static BOOL func_ov167_021b0084(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemAbilityUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u32 state;
     u32 result;
 
     if (GetBattleMonStat(mon, 0x10) != ABILITY_IMPOSTER) {
         state = PushState(&flow->actionState, 0x797);
-        func_ov167_021ac010(flow, mon);
-        result = func_ov167_021ac450(flow);
+        BtlServerFlow_TriggerAbility(flow, mon);
+        result = BtlServerFlow_GetHandlerResult(flow);
         PopState(&flow->actionState, state, 0x79c);
         if (result == 2) {
             return TRUE;
@@ -1396,13 +1396,13 @@ static BOOL func_ov167_021b0084(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Takes away a mon's held item
-static BOOL func_ov167_021b00d4(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemItemDrop(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u16 heldItem;
     u32 state;
     u8 monId;
     BattleHandlerSetItemParam *setItem;
 
-    if (!func_ov167_021cdedc(flow, GetMonID(mon)) && (heldItem = GetBattleMonHeldItem(mon)) != 0) {
+    if (!IsItemUnremovable(flow, GetMonID(mon)) && (heldItem = GetBattleMonHeldItem(mon)) != 0) {
         state = PushState(&flow->actionState, 0x7ae);
         monId = GetMonID(mon);
         setItem = BattleHandler_PushWork(flow, 0x20, monId);
@@ -1419,7 +1419,7 @@ static BOOL func_ov167_021b00d4(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Resets a mon's stat stages
-static BOOL func_ov167_021b0170(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
+static BOOL BagItemResetUrge(BtlServerFlow *flow, BattleMon *mon, u16 item, s32 value, u8 param) {
     u32 state;
     u8 monId;
     BattleHandlerResetStatStageParam *reset;
@@ -1440,7 +1440,7 @@ static BOOL func_ov167_021b0170(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 }
 
 // Whether a party has a fainted mon of a species
-static BOOL func_ov167_021b01e4(BattleParty *party, s16 species) {
+static BOOL HasFaintedMonOfSpecies(BattleParty *party, s16 species) {
     s32 i;
     BattleMon *mon;
 
@@ -1454,7 +1454,7 @@ static BOOL func_ov167_021b01e4(BattleParty *party, s16 species) {
 }
 
 // Whether a party has a fainted mon of another species
-static BOOL func_ov167_021b0228(BattleParty *party, s16 species) {
+static BOOL HasFaintedMonOfOtherSpecies(BattleParty *party, s16 species) {
     s32 i;
     BattleMon *mon;
 
@@ -1468,7 +1468,7 @@ static BOOL func_ov167_021b0228(BattleParty *party, s16 species) {
 }
 
 // How many of a party's mons have fainted
-static s32 func_ov167_021b026c(BattleParty *party) {
+static s32 CountFaintedMons(BattleParty *party) {
     s32 count = 0;
     s32 i;
 
@@ -1481,22 +1481,22 @@ static s32 func_ov167_021b026c(BattleParty *party) {
 }
 
 // Whether all of a party's mons have fainted
-static BOOL func_ov167_021b02a0(BattleParty *party) {
-    if (GetNumMonsInParty(party) == func_ov167_021b026c(party)) {
+static BOOL IsPartyAllFainted(BattleParty *party) {
+    if (GetNumMonsInParty(party) == CountFaintedMons(party)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static s16 func_ov167_021b02bc(BtlMainModule *mainModule, const BtlScriptedRules *rules) {
-    if (func_ov167_0219c988(mainModule) == 1) {
+static s16 GetRulesTargetSpecies(BtlMainModule *mainModule, const BtlScriptedRules *rules) {
+    if (GetStudioMode(mainModule) == 1) {
         return rules->species1;
     }
     return rules->species2;
 }
 
 // The last outcome that was set
-static s32 func_ov167_021b02d4(const s32 *outcomes) {
+static s32 GetLastRuleOutcome(const s32 *outcomes) {
     s32 i;
     s32 outcome = 0;
 
@@ -1509,9 +1509,9 @@ static s32 func_ov167_021b02d4(const s32 *outcomes) {
 }
 
 // -2 when the turn limit is up without a win
-static s32 func_ov167_021b02ec(BtlMainModule *mainModule, BOOL won) {
-    BtlServerFlow *flow = func_ov167_0219e158(mainModule);
-    const BtlScriptedRules *rules = func_ov167_0219e39c(mainModule);
+static s32 CheckRulesTurnLimit(BtlMainModule *mainModule, BOOL won) {
+    BtlServerFlow *flow = GetServerFlow(mainModule);
+    const BtlScriptedRules *rules = GetStudioRules(mainModule);
 
     if (flow->unk10 >= rules->turnLimit && !won) {
         return -2;
@@ -1520,22 +1520,22 @@ static s32 func_ov167_021b02ec(BtlMainModule *mainModule, BOOL won) {
 }
 
 // Checks a scripted battle's rules at the end of a turn: 1 for a win, the outcome of a broken rule, or 0 to go on
-s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
-    u8 unkDF = func_ov167_0219c9b0(mainModule);
+s32 CheckScriptedBattleRules(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
+    u8 unkDF = GetStudioMovieId(mainModule);
     BOOL won = FALSE;
     s32 outcomes[5] = { 0 };
     const BtlScriptedRules *rules;
     BOOL playerDown;
     s32 outcome;
 
-    rules = func_ov167_0219e39c(mainModule);
-    playerDown = func_ov167_021b02a0(GetPartyData(pokeCon, 0));
+    rules = GetStudioRules(mainModule);
+    playerDown = IsPartyAllFainted(GetPartyData(pokeCon, 0));
     switch (rules->rule) {
     case 2: {
         BattleParty *party = GetPartyData(pokeCon, 1);
-        s16 species = func_ov167_021b02bc(mainModule, rules);
-        BOOL otherDown = func_ov167_021b0228(party, species);
-        BOOL targetDown = func_ov167_021b01e4(party, species);
+        s16 species = GetRulesTargetSpecies(mainModule, rules);
+        BOOL otherDown = HasFaintedMonOfOtherSpecies(party, species);
+        BOOL targetDown = HasFaintedMonOfSpecies(party, species);
 
         u32 value = func_ov167_0219e300(mainModule);
 
@@ -1550,14 +1550,14 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         } else if (playerDown) {
             outcomes[2] = -3;
         }
-        outcomes[3] = func_ov167_021b02ec(mainModule, won);
+        outcomes[3] = CheckRulesTurnLimit(mainModule, won);
         break;
     }
     case 4: {
-        s16 species = func_ov167_021b02bc(mainModule, rules);
+        s16 species = GetRulesTargetSpecies(mainModule, rules);
         BattleParty *party = GetPartyData(pokeCon, 1);
-        BOOL targetDown = func_ov167_021b01e4(party, species);
-        BOOL otherDown = func_ov167_021b0228(party, species);
+        BOOL targetDown = HasFaintedMonOfSpecies(party, species);
+        BOOL otherDown = HasFaintedMonOfOtherSpecies(party, species);
 
         if (targetDown) {
             won = TRUE;
@@ -1568,14 +1568,14 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (playerDown) {
             outcomes[1] = -3;
         }
-        outcomes[2] = func_ov167_021b02ec(mainModule, won);
+        outcomes[2] = CheckRulesTurnLimit(mainModule, won);
         break;
     }
     case 0: {
         BattleParty *party = GetPartyData(pokeCon, 1);
-        s32 turn = func_ov167_0219d3e0(mainModule);
-        s32 numDown = func_ov167_021b026c(party);
-        BOOL allDown = func_ov167_021b02a0(party);
+        s32 turn = GetServerTurnCount(mainModule);
+        s32 numDown = CountFaintedMons(party);
+        BOOL allDown = IsPartyAllFainted(party);
 
         if (turn > numDown || playerDown) {
             outcomes[0] = -8;
@@ -1590,11 +1590,11 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (playerDown) {
             outcomes[2] = -3;
         }
-        outcomes[3] = func_ov167_021b02ec(mainModule, won);
+        outcomes[3] = CheckRulesTurnLimit(mainModule, won);
         break;
     }
     case 1: {
-        BOOL allDown = func_ov167_021b02a0(GetPartyData(pokeCon, 1));
+        BOOL allDown = IsPartyAllFainted(GetPartyData(pokeCon, 1));
 
         if (playerDown) {
             outcomes[0] = -3;
@@ -1602,26 +1602,26 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (allDown) {
             won = TRUE;
         }
-        outcomes[1] = func_ov167_021b02ec(mainModule, won);
+        outcomes[1] = CheckRulesTurnLimit(mainModule, won);
         break;
     }
     case 3: {
-        s16 species = func_ov167_021b02bc(mainModule, rules);
+        s16 species = GetRulesTargetSpecies(mainModule, rules);
 
-        if (func_ov167_021b01e4(GetPartyData(pokeCon, 1), species)) {
+        if (HasFaintedMonOfSpecies(GetPartyData(pokeCon, 1), species)) {
             won = TRUE;
         }
         if (playerDown) {
             outcomes[0] = -3;
         }
-        outcomes[1] = func_ov167_021b02ec(mainModule, won);
+        outcomes[1] = CheckRulesTurnLimit(mainModule, won);
         break;
     }
     case 5: {
-        s16 species = func_ov167_021b02bc(mainModule, rules);
+        s16 species = GetRulesTargetSpecies(mainModule, rules);
         BattleParty *party = GetPartyData(pokeCon, 1);
-        BOOL targetDown = func_ov167_021b01e4(party, species);
-        s32 numDown = func_ov167_021b026c(party);
+        BOOL targetDown = HasFaintedMonOfSpecies(party, species);
+        s32 numDown = CountFaintedMons(party);
         u8 numMons = GetNumMonsInParty(party);
 
         if (!targetDown && numDown == numMons - 1) {
@@ -1633,11 +1633,11 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (playerDown) {
             outcomes[1] = -3;
         }
-        outcomes[2] = func_ov167_021b02ec(mainModule, won);
+        outcomes[2] = CheckRulesTurnLimit(mainModule, won);
         break;
     }
     case 6: {
-        BOOL allDown = func_ov167_021b02a0(GetPartyData(pokeCon, 1));
+        BOOL allDown = IsPartyAllFainted(GetPartyData(pokeCon, 1));
 
         if (playerDown) {
             outcomes[0] = -3;
@@ -1645,11 +1645,11 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (allDown) {
             outcomes[1] = -5;
         }
-        won = func_ov167_021b02ec(mainModule, FALSE);
+        won = CheckRulesTurnLimit(mainModule, FALSE);
         break;
     }
     case 7: {
-        s32 numDown = func_ov167_021b026c(GetPartyData(pokeCon, 1));
+        s32 numDown = CountFaintedMons(GetPartyData(pokeCon, 1));
 
         if (playerDown) {
             outcomes[0] = -3;
@@ -1657,11 +1657,11 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (numDown) {
             outcomes[1] = -4;
         }
-        won = func_ov167_021b02ec(mainModule, FALSE);
+        won = CheckRulesTurnLimit(mainModule, FALSE);
         break;
     }
     case 8: {
-        BOOL allDown = func_ov167_021b02a0(GetPartyData(pokeCon, 1));
+        BOOL allDown = IsPartyAllFainted(GetPartyData(pokeCon, 1));
 
         if (playerDown) {
             won = TRUE;
@@ -1669,13 +1669,13 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
         if (allDown) {
             outcomes[0] = -5;
         }
-        if (func_ov167_021b02ec(mainModule, won)) {
+        if (CheckRulesTurnLimit(mainModule, won)) {
             outcomes[1] = -2;
         }
         break;
     }
     }
-    outcome = func_ov167_021b02d4(outcomes);
+    outcome = GetLastRuleOutcome(outcomes);
     if (won && outcome == 0) {
         return 1;
     }
@@ -1686,7 +1686,7 @@ s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
 }
 
 // The battle's result for the player: 0 for a loss, 1 for a win, 2 for a draw
-u32 func_ov167_021b05b4(BtlServerFlow *flow) {
+u32 CalcBattleResult(BtlServerFlow *flow) {
     u8 alive[2];
     u8 total[2];
     u32 i;
@@ -1709,7 +1709,7 @@ u32 func_ov167_021b05b4(BtlServerFlow *flow) {
             }
         }
     }
-    if (func_ov167_0219c988(flow->mainModule) == 0) {
+    if (GetStudioMode(flow->mainModule) == 0) {
         side = GetClientSide(flow->mainModule, GetPlayerClientID(flow->mainModule));
         otherSide = side ^ 1;
         if (alive[side] == 0 && alive[otherSide] != 0) {
@@ -1732,9 +1732,9 @@ u32 func_ov167_021b05b4(BtlServerFlow *flow) {
             }
             return 2;
         }
-        return func_ov167_021b06dc(flow, alive, total, side);
+        return JudgeByRemainingMons(flow, alive, total, side);
     }
-    outcome = func_ov167_021b0318(flow->mainModule, flow->pokeCon);
+    outcome = CheckScriptedBattleRules(flow->mainModule, flow->pokeCon);
     flow->unk2130 = -outcome;
     if (outcome > 0) {
         return 1;
@@ -1743,7 +1743,7 @@ u32 func_ov167_021b05b4(BtlServerFlow *flow) {
 }
 
 // When both sides are still standing: the side with more mons left wins, then the one with more HP left
-static u32 func_ov167_021b06dc(BtlServerFlow *flow, const u8 *alive, const u8 *total, u8 side) {
+static u32 JudgeByRemainingMons(BtlServerFlow *flow, const u8 *alive, const u8 *total, u8 side) {
     s32 down0;
     s32 down1;
     s32 hp[2];
@@ -1759,8 +1759,8 @@ static u32 func_ov167_021b06dc(BtlServerFlow *flow, const u8 *alive, const u8 *t
         }
         return 0;
     }
-    func_ov167_021b0774(flow, &hp[0], &percent[0], 0);
-    func_ov167_021b0774(flow, &hp[1], &percent[1], 1);
+    GetSideHP(flow, &hp[0], &percent[0], 0);
+    GetSideHP(flow, &hp[1], &percent[1], 1);
     if (percent[0] != percent[1]) {
         winner = percent[0] > percent[1] ? 0 : 1;
         if (winner == side) {
@@ -1779,7 +1779,7 @@ static u32 func_ov167_021b06dc(BtlServerFlow *flow, const u8 *alive, const u8 *t
 }
 
 // The HP a side has left, in total and in percent of its max
-static void func_ov167_021b0774(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 side) {
+static void GetSideHP(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 side) {
     u32 maxHP;
     u32 i;
     BattleParty *party;
@@ -1804,7 +1804,7 @@ static void func_ov167_021b0774(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 s
     *percent = *hp * 100 / maxHP;
 }
 
-void func_ov167_021b0814(u32 *table) {
+void EffectivenessTable_Init(u32 *table) {
     u32 i;
 
     for (i = 0; i < 24; i++) {
@@ -1812,14 +1812,14 @@ void func_ov167_021b0814(u32 *table) {
     }
 }
 
-void func_ov167_021b0824(u32 *table, u8 monId, u32 value) {
+void EffectivenessTable_Set(u32 *table, u8 monId, u32 value) {
     table[monId] = value;
 }
 
-u32 func_ov167_021b082c(u32 *table, u8 monId) {
+u32 EffectivenessTable_Get(u32 *table, u8 monId) {
     return table[monId];
 }
 
-u32 func_ov167_021b0834(u32 *table, u8 monId) {
+u32 EffectivenessTable_GetValue(u32 *table, u8 monId) {
     return table[monId];
 }

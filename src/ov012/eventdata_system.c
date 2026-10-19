@@ -203,8 +203,8 @@ u16 ZoneWarp_CalcPosWeightBitsGrid(ZoneWarp *warp, const VecFx32 *position) {
     return ZoneWarp_CalcPosWeightBitsGrid_(warp, position);
 }
 
-u16 func_ov012_0215d104(ZoneWarp *warp, const RailPosition *position) {
-    return func_ov012_0215d654(warp, position);
+u16 ZoneWarp_CalcPosWeightBitsRail(ZoneWarp *warp, const RailPosition *position) {
+    return ZoneWarp_CalcPosWeightBitsRail_(warp, position);
 }
 
 BOOL CheckWarpDirectionMatch(const ZoneWarp *warp, u16 direction) {
@@ -515,14 +515,14 @@ u16 CheckProxyEntityEventRail(EventData *data, EventWork *eventWork, const RailP
     return CheckProxyEntityEvent(data, eventWork, position, direction);
 }
 
-void func_ov012_0215d4d0(const ZoneBGEntity *entity, VecFx32 *position) {
-    func_ov012_0215d88c(entity, position);
+void GetBGEntityCenterPosGrid(const ZoneBGEntity *entity, VecFx32 *position) {
+    GetBGEntityPosGrid_(entity, position);
     position->x += 0x8000;
     position->z += 0x8000;
 }
 
-void func_ov012_0215d4ec(const ZoneBGEntity *entity, RailPosition *position) {
-    func_ov012_0215d8fc(entity, position);
+void GetBGEntityPosRail(const ZoneBGEntity *entity, RailPosition *position) {
+    GetBGEntityPosRail_(entity, position);
 }
 
 void GetTriggerCenterPos(const ZoneTrigger *trigger, VecFx32 *position) {
@@ -625,7 +625,7 @@ u16 ZoneWarp_CalcPosWeightBitsGrid_(ZoneWarp *warp, const VecFx32 *position) {
     return (direction << 8) | 0x10;
 }
 
-u16 func_ov012_0215d654(ZoneWarp *warp, const RailPosition *position) {
+u16 ZoneWarp_CalcPosWeightBitsRail_(ZoneWarp *warp, const RailPosition *position) {
     const ZoneWarpRailPosition *rail;
     u32 direction;
     BOOL frontFlip;
@@ -763,7 +763,7 @@ BOOL CheckWarpPositionMatchRail(const ZoneWarp *warp, const RailPosition *positi
     return FALSE;
 }
 
-void func_ov012_0215d88c(const ZoneBGEntity *entity, VecFx32 *position) {
+void GetBGEntityPosGrid_(const ZoneBGEntity *entity, VecFx32 *position) {
     const s32 *coords;
     s32 x;
     s32 y;
@@ -799,7 +799,7 @@ BOOL CheckBGPositionMatchGrid(const ZoneBGEntity *entity, const VecFx32 *positio
     return FALSE;
 }
 
-void func_ov012_0215d8fc(const ZoneBGEntity *entity, RailPosition *position) {
+void GetBGEntityPosRail_(const ZoneBGEntity *entity, RailPosition *position) {
     u32 direction;
     const u16 *values;
 

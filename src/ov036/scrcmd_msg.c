@@ -117,7 +117,7 @@ static void func_ov036_021a86b8(FieldScriptEnv *env) {
 
     if (FieldScriptSubEvent_IsRegistered(1)) {
         func_ov036_02188504(getMapDisplayInfoPtr(env));
-        icon = func_ov012_021551c0(env);
+        icon = GetSpecialMessageIconPtr(env);
         if (icon != NULL) {
             WaitIcon_Free(icon);
             SetSpecialMessageIconPtr(env, NULL);
@@ -168,7 +168,7 @@ BOOL s0037_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env) {
     if (!FieldScriptSubEvent_IsRegistered(1)) {
         return FALSE;
     }
-    icon = func_ov012_021551c0(env);
+    icon = GetSpecialMessageIconPtr(env);
     if (icon != NULL) {
         WaitIcon_Free(icon);
         SetSpecialMessageIconPtr(env, NULL);
@@ -758,8 +758,8 @@ static void func_ov036_021a94ac(FieldScriptEnv *env) {
 
     if (FieldScriptSubEvent_IsRegistered(4)) {
         func_ov036_0218903c(getMapDisplayInfoPtr(env));
-        font = func_ov012_02153ed4(work);
-        func_ov012_02153ed0(work, NULL);
+        font = ScriptWork_GetSignFont(work);
+        ScriptWork_SetSignFont(work, NULL);
         if (font != NULL) {
             GFL_FontFree(font);
         }
@@ -793,7 +793,7 @@ BOOL func_ov036_021a9554(VM *vm, FieldScriptEnv *env) {
     MsgData *msgData = GetFieldScriptMsgData(env);
     Font *font = GFL_FontCreate(0x17, 4, 0, FALSE, heapId);
 
-    func_ov012_02153ed0(work, font);
+    ScriptWork_SetSignFont(work, font);
     setMapDisplayInfoPtr(env, func_ov036_02188f34(fieldWork2->msgBGSys, type, font));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
     VM_SetNativeCallback(vm, func_ov036_021a9484);

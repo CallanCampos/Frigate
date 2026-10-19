@@ -394,7 +394,7 @@ static void RollerCoaster_Task(TCB *task, void *data) {
                     GFL_SndSEPlay(SEQ_SE_FLD_76);
                     player = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_76);
                     FieldSnd_SetAmbienceVolume(fieldSound, SEQ_SE_FLD_25, 127);
-                    NNS_SndPlayerSetVolume(func_020061a8(player), 0);
+                    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), 0);
                 }
                 work->stations[i] = NO_SPOT;
             }
@@ -687,7 +687,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
             work->waitCar = NO_CAR;
             FieldSnd_PlayAmbience(fieldSound, SEQ_SE_FLD_25);
             GFL_SndSEPlay(SEQ_SE_FLD_76);
-            NNS_SndPlayerSetVolume(func_020061a8(player), 0);
+            NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), 0);
             FieldSnd_SetAmbienceVolume(fieldSound, SEQ_SE_FLD_25, 127);
             work->riding = TRUE;
             (*state)++;
@@ -835,7 +835,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     } else if (speed >= SPEED_SLOW) {
         volume = 30;
     }
-    NNS_SndPlayerSetVolume(func_020061a8(player), volume);
+    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), volume);
     return GAMEEVENT_CONTINUE;
 }
 

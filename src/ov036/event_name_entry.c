@@ -115,7 +115,7 @@ static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, 
             RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gsys)), 0x1e);
         }
         GFL_StrBufFree(work->name);
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;
@@ -141,7 +141,7 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     occupants = getAddressOfBeginningOfOccupants(save);
     info = JoinAvenue_GetInfo(save);
-    person = func_02038a18(occupants);
+    person = JoinAvenueOccupants_GetPlayerPerson(occupants);
     name = GFL_StrBufCreate(64, 0x8004);
 
     switch (target) {
@@ -202,15 +202,15 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
             JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(save);
             JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
-            JoinAvenuePerson *person = func_02038a18(occupants);
+            JoinAvenuePerson *person = JoinAvenueOccupants_GetPlayerPerson(occupants);
             const u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
 
             switch (work->target) {
             case 0:
-                func_02039064(info, 0, (u32)str);
+                JoinAvenueInfo_SetParam(info, 0, (u32)str);
                 break;
             case 1:
-                func_02039064(info, 1, (u32)str);
+                JoinAvenueInfo_SetParam(info, 1, (u32)str);
                 break;
             case 2:
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
@@ -229,12 +229,12 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             msgData = GFL_MsgSysLoadData(FALSE, 2, 0x6d, HEAPID_GAMEEVENT);
             GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
             GFL_MsgDataFree(msgData);
-            func_02039064(info, 0, (u32)name);
+            JoinAvenueInfo_SetParam(info, 0, (u32)name);
         }
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);
         }
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;
@@ -271,7 +271,7 @@ static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state,
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);
         }
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;
@@ -318,7 +318,7 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
             *work->result = 0;
         }
         GFL_StrBufFree(speciesName);
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;

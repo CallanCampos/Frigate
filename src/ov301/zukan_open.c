@@ -312,11 +312,11 @@ static void ZukanOpen_LoadSkin(ZukanOpenWork *work) {
     void *characters;
     void *palette;
 
-    if (func_020074ec(save, SKIN_BLOCK, HEAPID_TAIL(HEAPID_ZUKAN_OPEN)) == TRUE) {
+    if (SaveControl_OpenExtraBlock(save, SKIN_BLOCK, HEAPID_TAIL(HEAPID_ZUKAN_OPEN)) == TRUE) {
         block = getAddressOfExtraSaveBlk(save, SKIN_BLOCK, 0);
-        if (block != NULL && func_0200f18c(block) == TRUE) {
-            characters = func_0200f180(block);
-            palette = func_0200f184(block);
+        if (block != NULL && PokedexSkinSave_IsValid(block) == TRUE) {
+            characters = PokedexSkinSave_GetChars(block);
+            palette = PokedexSkinSave_GetPalette(block);
             GFL_BGSysLoadChar(BG_COVER_BACK, characters, SKIN_CHAR_SIZE, 0);
             GFL_BGSysUploadStdPalette(BG_COVER_BACK, palette, SKIN_PALETTE_SIZE, 0);
             GFL_BGSysUploadStdPalette(BG_COVER_SUB, palette, SKIN_PALETTE_SIZE, 0);
@@ -344,7 +344,7 @@ static u32 ZukanOpen_StepSetup(ZukanOpenWork *work) {
     ZukanOpen_InitBG();
     ZukanOpen_LoadGraphics(work);
     ZukanOpen_LoadSkin(work);
-    func_02042ba8(TRUE, HEAPID_ZUKAN_OPEN);
+    GFL_NetSetIconScreen(TRUE, HEAPID_ZUKAN_OPEN);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     ZukanOpen_AddVBlank(work);
     ZukanCommon_WipeIn(HEAPID_ZUKAN_OPEN);
@@ -381,22 +381,22 @@ static u32 ZukanOpen_StepWaitInput(ZukanOpenWork *work) {
         return STEP_OPEN;
     }
     work->timer++;
-    if (func_0203da2c() == TRUE) {
-        func_0203d564(TRUE);
+    if (GFL_HIDIsTouchHeld() == TRUE) {
+        GCTX_HIDSetUsingTouch(TRUE);
         return STEP_OPEN;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return STEP_OPEN;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         work->param->result = ZUKAN_OPEN_RESULT_BACK;
         ZukanCommon_WipeOut(HEAPID_ZUKAN_OPEN);
         return STEP_WAIT_WIPE_OUT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         work->param->result = ZUKAN_OPEN_RESULT_CLOSE;
         ZukanCommon_WipeOut(HEAPID_ZUKAN_OPEN);
         return STEP_WAIT_WIPE_OUT;

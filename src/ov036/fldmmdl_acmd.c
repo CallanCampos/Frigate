@@ -830,17 +830,17 @@ void func_ov036_0218ed18(MMSys *system) {
     if (FldActSys_GetActorG3DSystem(system) != NULL) {
         func_ov036_021946f4(system);
     }
-    func_ov012_021673c8(system, FALSE);
+    FldActSys_SetDrawInited(system, FALSE);
 }
 
 void func_ov036_0218ed44(FieldActor *actor) {
-    if (!CheckMMSysFlag(GetActorMModelSystem(actor), 4) && func_ov012_0216750c(actor)) {
+    if (!CheckMMSysFlag(GetActorMModelSystem(actor), 4) && FldAct_IsDrawCreated(actor)) {
         FldAct_InvokeUpdateCallback(actor);
     }
 }
 
 BOOL func_ov036_0218ed68(FieldActor *actor) {
-    if (func_ov012_02167600(actor) && !func_ov012_0216773c(actor)) {
+    if (IsActorMovementDisabled(actor) && !FldAct_CheckAcmdSet(actor)) {
         return TRUE;
     }
     if (CheckActorFlag(actor, 0x10)) {
@@ -857,9 +857,9 @@ void CopyActorPosAllAdd(FieldActor *actor, VecFx32 *dest) {
     VecFx32 offset;
 
     CopyActorWPos(actor, &wPos);
-    func_ov012_0216731c(actor, &pos1);
-    func_ov012_0216733c(actor, &pos2);
-    func_ov012_0216735c(actor, &pos3);
+    CopyActorWPosOffset(actor, &pos1);
+    FldAct_GetOuterDrawOffset(actor, &pos2);
+    FldAct_GetAttrDrawOffset(actor, &pos3);
     CopyActorPosOffset(actor, &offset);
     dest->x = wPos.x + pos1.x + pos2.x + pos3.x + offset.x;
     dest->y = wPos.y + pos1.y + pos2.y + pos3.y + offset.y;
@@ -883,7 +883,7 @@ FieldAcmdTCB *FieldAcmdTCB_Create(FieldActor *actor, const u32 *action) {
     MMSys *system = GetActorMModelSystem(actor);
     FieldAcmdWork *work = GFL_HeapAllocate(HEAPID_TAIL(FldActSys_GetFieldHeapID(system)), sizeof(FieldAcmdWork), TRUE,
                                            "fldmmdl_acmd.c", 278);
-    u32 priority = func_ov012_02166f6c(GetActorMModelSystem(actor)) - 2;
+    u32 priority = FldActSys_GetTaskPriority(GetActorMModelSystem(actor)) - 2;
     TCB *tcb = GFL_TCBMgrAddTask(GetMMSysTCBMgr(system), FieldAcmdTCB_Callback, work, priority);
 
     work->actor = actor;
@@ -901,7 +901,7 @@ BOOL FieldAcmdTCB_CheckEnded(FieldAcmdTCB *task) {
 void FieldAcmdTCB_Remove(FieldAcmdTCB *task) {
     FieldAcmdWork *work = GFL_TCBGetData((TCB *)task);
 
-    func_ov012_02166ef8(work->actor);
+    FldAct_EndAcmd(work->actor);
     if (work->queue != NULL) {
         GFL_HeapFree((void *)work->queue);
     }
@@ -937,7 +937,7 @@ static BOOL FieldAcmdTCB_CommitAcmd(FieldAcmdWork *work) {
 }
 
 static BOOL FieldAcmdTCB_CheckSeqPerms(FieldAcmdWork *work) {
-    if (!func_ov012_02166ecc(work->actor)) {
+    if (!FldAct_CheckAcmdEnd(work->actor)) {
         return FALSE;
     }
     work->state = ACMD_TCB_STATE_ADVANCE_QUEUE;
@@ -1009,7 +1009,7 @@ BOOL func_ov036_0218f01c(FieldActor *actor) {
     }
     ClearActorMovementFlag(actor, 0x400);
     SetNextActorAcmd(actor, 0xff);
-    func_ov012_02167220(actor, 0);
+    FldAct_SetAcmdState(actor, 0);
     return TRUE;
 }
 
@@ -1027,7 +1027,7 @@ static BOOL func_ov036_0218f09c(FieldActor *actor) {
 
 static void func_ov036_0218f0ac(FieldActor *actor, u32 dir) {
     CheckSetActorFaceDir(actor, dir);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -1059,9 +1059,9 @@ static void func_ov036_0218f100(FieldActor *actor, u32 dir, fx32 speed, s16 fram
     work->frames = frames;
     work->dir = dir;
     work->speed = speed;
-    func_ov012_0215e8ec(actor, dir);
+    FldAct_StepGPosInDir(actor, dir);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, state);
+    FldAct_SetDrawStatus(actor, state);
     SetActorMovementFlag(actor, 0x20);
     FieldActor_NextAcmdState(actor);
 }
@@ -1069,7 +1069,7 @@ static void func_ov036_0218f100(FieldActor *actor, u32 dir, fx32 speed, s16 fram
 static BOOL func_ov036_0218f14c(FieldActor *actor) {
     FieldAcmdWalkWork *work = func_ov012_02167154(actor);
 
-    func_ov012_0215ea30(actor, work->dir, work->speed);
+    FldAct_MoveWPosInDir(actor, work->dir, work->speed);
     CheckRecalcActorY(actor);
     work->frames--;
     if (work->frames > 0) {
@@ -1077,7 +1077,7 @@ static BOOL func_ov036_0218f14c(FieldActor *actor) {
     }
     SetActorMovementFlag(actor, 0x440);
     SetActorInitialGPosToNowGPos(actor);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -1248,7 +1248,7 @@ static void func_ov036_0218f458(FieldActor *actor, u32 dir, s16 frames, u16 stat
     work->state = state;
     work->frames = frames;
     CheckSetActorFaceDir(actor, dir);
-    func_ov012_021670f4(actor, state);
+    FldAct_SetDrawStatus(actor, state);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -1261,7 +1261,7 @@ static BOOL func_ov036_0218f48c(FieldActor *actor) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x400);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -1379,11 +1379,11 @@ static void func_ov036_0218f600(FieldActor *actor, u32 dir, fx32 speed, u32 fram
     if (speed == 0) {
         SetActorInitialGPosToNowGPos(actor);
     } else {
-        func_ov012_0215e8ec(actor, dir);
+        FldAct_StepGPosInDir(actor, dir);
     }
     SetActorMovementFlag(actor, 0xa0);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, state);
+    FldAct_SetDrawStatus(actor, state);
     FieldActor_NextAcmdState(actor);
     if (se != 0) {
         GFL_SndSEPlay(se);
@@ -1402,11 +1402,11 @@ static BOOL func_ov036_0218f690(FieldActor *actor) {
     u16 index;
 
     if (work->speed != 0) {
-        func_ov012_0215ea30(actor, work->dir, work->speed);
+        FldAct_MoveWPosInDir(actor, work->dir, work->speed);
         CheckRecalcActorY(actor);
         if (work->progress >= 0x10000) {
             work->progress = 0;
-            func_ov012_0215e8ec(actor, work->dir);
+            FldAct_StepGPosInDir(actor, work->dir);
             SetActorMovementFlag(actor, 0x20);
         }
         speed = work->speed;
@@ -1432,7 +1432,7 @@ static BOOL func_ov036_0218f690(FieldActor *actor) {
     SetActorWPosOffset(actor, &zero);
     SetActorMovementFlag(actor, 0x540);
     SetActorInitialGPosToNowGPos(actor);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     GFL_SndSEPlay(SEQ_SE_FLD_10);
     return TRUE;
@@ -1615,7 +1615,7 @@ static BOOL func_ov036_0218fb2c(FieldActor *actor) {
     AcmdPosSpeedWork *work = func_ov012_0216713c(actor, 8);
 
     work->speed = 8 << 13;
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1641,7 +1641,7 @@ static BOOL func_ov036_0218fb98(FieldActor *actor) {
     work->pos = 5 << 18;
     work->speed = -0x10000;
     GFL_SndSEPlay(SEQ_SE_FLD_05);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1766,9 +1766,9 @@ static void func_ov036_0218fd68(FieldActor *actor, u32 dir, u32 steps, u32 state
     work->dir = dir;
     work->state = state;
     work->steps = steps;
-    func_ov012_0215e8ec(actor, dir);
+    FldAct_StepGPosInDir(actor, dir);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, state);
+    FldAct_SetDrawStatus(actor, state);
     SetActorMovementFlag(actor, 0x20);
     FieldActor_NextAcmdState(actor);
 }
@@ -1776,7 +1776,7 @@ static void func_ov036_0218fd68(FieldActor *actor, u32 dir, u32 steps, u32 state
 static BOOL func_ov036_0218fdac(FieldActor *actor, const s32 *distances) {
     AcmdDirStepsWork *work = func_ov012_02167154(actor);
 
-    func_ov012_0215ea30(actor, work->dir, distances[work->index]);
+    FldAct_MoveWPosInDir(actor, work->dir, distances[work->index]);
     CheckRecalcActorY(actor);
     work->index++;
     if (work->index < work->steps) {
@@ -1784,7 +1784,7 @@ static BOOL func_ov036_0218fdac(FieldActor *actor, const s32 *distances) {
     }
     SetActorMovementFlag(actor, 0x440);
     SetActorInitialGPosToNowGPos(actor);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -1919,21 +1919,21 @@ static BOOL func_ov036_0218ff8c(FieldActor *actor) {
 
 static BOOL func_ov036_0218ffa4(FieldActor *actor) {
     func_ov012_0216713c(actor, 4);
-    func_ov012_021670f4(actor, 10);
+    FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_0218ffc0(FieldActor *actor) {
     func_ov012_0216713c(actor, 4);
-    func_ov012_021670f4(actor, 11);
+    FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_0218ffdc(FieldActor *actor) {
     func_ov012_0216713c(actor, 4);
-    func_ov012_021670f4(actor, 12);
+    FldAct_SetDrawStatus(actor, 12);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -1955,9 +1955,9 @@ static BOOL func_ov036_02190028(FieldActor *actor) {
     func_ov012_02167154(actor);
     index = FldAct_GetBlActIdx(actor, 0);
     if (index != 0xffff) {
-        if (func_0204f768(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))), (u16)index,
+        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))), (u16)index,
                           &cmd) == TRUE) {
-            func_ov012_021670f4(actor, 0);
+            FldAct_SetDrawStatus(actor, 0);
             FieldActor_NextAcmdState(actor);
             return TRUE;
         }
@@ -1972,7 +1972,7 @@ static BOOL func_ov036_02190080(FieldActor *actor) {
     func_ov012_02167154(actor);
     index = FldAct_GetBlActIdx(actor, 0);
     if (index != 0xffff) {
-        if (func_0204f768(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))), (u16)index,
+        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))), (u16)index,
                           &cmd) == TRUE) {
             FieldActor_NextAcmdState(actor);
             return TRUE;
@@ -2028,7 +2028,7 @@ static void func_ov036_02190194(FieldActor *actor, u32 value, u16 limit) {
     AcmdWaitWork *work = func_ov012_0216713c(actor, 4);
 
     work->limit = limit;
-    func_ov012_021670f4(actor, value);
+    FldAct_SetDrawStatus(actor, value);
 }
 
 static BOOL func_ov036_021901b0(FieldActor *actor) {
@@ -2061,7 +2061,7 @@ static BOOL func_ov036_02190200(FieldActor *actor) {
 
 static BOOL func_ov036_02190218(FieldActor *actor) {
     func_ov012_0216713c(actor, 4);
-    func_ov012_021670f4(actor, 1);
+    FldAct_SetDrawStatus(actor, 1);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2094,8 +2094,8 @@ static void func_ov036_0219028c(FieldActor *actor, const VecFx32 *delta, u32 fac
     work->delta = *delta;
     CheckSetActorFaceDir(actor, faceDir);
     SetActorMotionDir(actor, motionDir);
-    func_ov012_021670f4(actor, param);
-    func_ov012_021674dc(actor);
+    FldAct_SetDrawStatus(actor, param);
+    FldAct_SetMoveStart(actor);
     SetActorInitialGPosX(actor, GetGPosX(actor));
     SetActorInitialGPosY(actor, FldAct_GetGPosY(actor));
     SetActorInitialGPosZ(actor, GetGPosZ(actor));
@@ -2120,14 +2120,14 @@ static void func_ov036_0219028c(FieldActor *actor, const VecFx32 *delta, u32 fac
 static BOOL func_ov036_02190350(FieldActor *actor) {
     AcmdShiftWork *work = func_ov012_02167154(actor);
 
-    func_ov012_0215e9fc(actor, &work->delta);
+    FldAct_AddWPos(actor, &work->delta);
     work->frames--;
     if (work->frames > 0) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x440);
     SetActorInitialGPosToNowGPos(actor);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2354,8 +2354,8 @@ static void func_ov036_021909e8(FieldActor *actor, s32 step, u32 faceDir, u32 mo
     work->angleStep = 0x1000 / work->frames;
     CheckSetActorFaceDir(actor, faceDir);
     SetActorMotionDir(actor, motionDir);
-    func_ov012_021670f4(actor, anim);
-    func_ov012_021674dc(actor);
+    FldAct_SetDrawStatus(actor, anim);
+    FldAct_SetMoveStart(actor);
     SetActorInitialGPosX(actor, GetGPosX(actor));
     SetActorInitialGPosY(actor, FldAct_GetGPosY(actor));
     SetActorInitialGPosZ(actor, GetGPosZ(actor));
@@ -2462,7 +2462,7 @@ static BOOL func_ov036_02190ad0(FieldActor *actor) {
     SetActorWPosOffset(actor, &zero);
     SetActorMovementFlag(actor, 0x540);
     SetActorInitialGPosToNowGPos(actor);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2529,7 +2529,7 @@ static BOOL func_ov036_02190e04(FieldActor *actor) {
 
 static BOOL func_ov036_02190e28(FieldActor *actor) {
     func_ov012_0216713c(actor, 4);
-    func_ov012_021670f4(actor, 1);
+    FldAct_SetDrawStatus(actor, 1);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -2544,7 +2544,7 @@ static BOOL func_ov036_02190e44(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02190e60(FieldActor *actor) {
-    func_ov012_021670f4(actor, 10);
+    FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2555,15 +2555,15 @@ static BOOL func_ov036_02190e74(FieldActor *actor) {
     work->frames = 2;
     work->dir = 2;
     work->distance = 0x8000;
-    func_ov012_0215e8ec(actor, work->dir);
-    func_ov012_021670f4(actor, work->anim);
+    FldAct_StepGPosInDir(actor, work->dir);
+    FldAct_SetDrawStatus(actor, work->anim);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL func_ov036_02190eac(FieldActor *actor) {
     WalkFramesWork *work = func_ov012_02167154(actor);
-    func_ov012_0215ea30(actor, work->dir, work->distance);
+    FldAct_MoveWPosInDir(actor, work->dir, work->distance);
     CheckRecalcActorY(actor);
     work->frames--;
     if (work->frames > 0) {
@@ -2579,7 +2579,7 @@ static BOOL func_ov036_02190eec(FieldActor *actor) {
     work->speed = 0x2000;
     work->time = 0;
     work->lastFrame = 0;
-    func_ov012_021670f4(actor, 11);
+    FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2622,19 +2622,19 @@ static BOOL func_ov036_02190f14(FieldActor *actor) {
     if (work->height / 0x8000 < 16) {
         return FALSE;
     }
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL func_ov036_0219100c(FieldActor *actor) {
-    func_ov012_021670f4(actor, 10);
+    FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL func_ov036_02191020(FieldActor *actor) {
-    func_ov012_021670f4(actor, 11);
+    FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
@@ -2644,11 +2644,11 @@ static BOOL func_ov036_02191034(FieldActor *actor) {
     u32 blActIdx;
     u16 cmd;
     blActIdx = FldAct_GetBlActIdx(actor, 0);
-    if (blActIdx != 0xffff && !func_0204f768(blAct, (u16)blActIdx, &cmd)) {
+    if (blActIdx != 0xffff && !BlActSys_GetActorLastCmd(blAct, (u16)blActIdx, &cmd)) {
         return FALSE;
     }
     CheckSetActorFaceDir(actor, DIR_DOWN);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2666,7 +2666,7 @@ static BOOL func_ov036_021910b0(FieldActor *actor) {
     work->time = 0;
     work->lastFrame = 0;
     SetActorWPosOffset(actor, &offset);
-    func_ov012_021670f4(actor, 10);
+    FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -2699,32 +2699,32 @@ static BOOL func_ov036_021910f4(FieldActor *actor) {
 }
 
 static BOOL func_ov036_02191174(FieldActor *actor) {
-    func_ov012_021670f4(actor, 10);
+    FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
 static BOOL func_ov036_02191188(FieldActor *actor) {
-    func_ov012_021670f4(actor, 10);
+    FldAct_SetDrawStatus(actor, 10);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_0219119c(FieldActor *actor) {
-    func_ov012_021670f4(actor, 11);
+    FldAct_SetDrawStatus(actor, 11);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_021911b0(FieldActor *actor) {
-    func_ov012_021670f4(actor, 12);
+    FldAct_SetDrawStatus(actor, 12);
     func_ov036_02197288(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 static BOOL func_ov036_021911cc(FieldActor *actor) {
-    func_ov012_021670f4(actor, 13);
+    FldAct_SetDrawStatus(actor, 13);
     func_ov036_02197288(actor);
     FieldActor_NextAcmdState(actor);
     return FALSE;
@@ -2732,7 +2732,7 @@ static BOOL func_ov036_021911cc(FieldActor *actor) {
 
 static BOOL func_ov036_021911e8(FieldActor *actor) {
     if (func_ov036_02197238(actor) == TRUE) {
-        func_ov012_021670f4(actor, 0);
+        FldAct_SetDrawStatus(actor, 0);
         FieldActor_NextAcmdState(actor);
         return TRUE;
     }

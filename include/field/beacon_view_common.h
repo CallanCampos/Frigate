@@ -79,7 +79,7 @@ void BeaconViewMenu_Close(BeaconViewMenu *menu);
 // Counts *timer down, and returns TRUE once it runs out or a drawn pixel of the BG is touched
 BOOL BeaconView_WaitTimerOrTouch(u8 *timer, u8 bg);
 // 22 for a beacon of a type of 60 or more (the Funfest missions'), otherwise its type plus 21
-u32 func_ov083_021eab38(const GameBeacon *beacon);
+u32 BeaconView_GetTypeMsgId(const GameBeacon *beacon);
 
 void BeaconViewOam_Init(BeaconViewOam *oam, BmpOamActorSetup *setup, BmpOamSys *sys, PrintQueue *queue, Font *font,
                         TCBExManager *tcbManager);

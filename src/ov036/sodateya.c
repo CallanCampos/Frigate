@@ -214,7 +214,7 @@ void DayCare_Breed(DayCare *dayCare, PokeParty *party) {
     if (DayCareSave_CheckSpawnFlag(dayCare->save) == TRUE) {
         GameData *gameData;
 
-        func_ov012_02160080();
+        GameBeacon_BroadcastEggReceived();
         setPartyFullToConst(dayCare->field);
         DayCare_CreateChildPkm(dayCare, egg);
         PokeParty_AddPkm(party, egg);

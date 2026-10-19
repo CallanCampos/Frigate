@@ -170,7 +170,7 @@ static BOOL func_ov036_0219272c(FieldActor *actor) {
         work->phase++;
     case 3:
         wait = 8;
-        if (GetActorEvType(actor) == 14 && func_ov036_02192a38() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+        if (GetActorEvType(actor) == 14 && func_ov036_02192a38() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
             wait = 4;
         }
         work->wait++;
@@ -268,7 +268,7 @@ static BOOL func_ov036_021928ec(FieldActor *actor) {
         {
             u16 evType = GetActorEvType(actor);
 
-            if ((evType == 15 || evType == 16) && func_ov036_02192a38() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+            if ((evType == 15 || evType == 16) && func_ov036_02192a38() == TRUE && FldAct_IsNearPlayer(actor) == TRUE) {
                 wait = 4;
             }
         }

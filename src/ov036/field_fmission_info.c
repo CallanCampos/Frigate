@@ -201,28 +201,28 @@ void func_ov036_021b5c78(void *work) {
 }
 
 static void func_ov036_021b5cbc(FieldFMissionInfo *info, ArcTool *arc) {
-    info->unit = func_0204bf1c(FMISSION_ACTOR_COUNT, 0, info->heapId);
+    info->unit = ClActUnit_Create(FMISSION_ACTOR_COUNT, 0, info->heapId);
     {
         ClActSurfaceSetup surface = { 0, 0, 256, 192, 0, 2 };
 
-        info->renderer = func_0204be9c(&surface, 1, info->heapId);
+        info->renderer = ClActRenderer_Create(&surface, 1, info->heapId);
     }
-    func_0204c018(info->unit, info->renderer);
+    ClActUnit_SetRenderer(info->unit, info->renderer);
     func_0204bff0(info->unit, TRUE);
     func_0204c004(info->unit, TRUE);
-    info->palette = func_0204bbb8(arc, FMISSION_FILE_PALETTE, CLACT_VRAM_MAIN, 160, 0, 1, info->heapId);
-    info->chars = func_0204b81c(arc, FMISSION_FILE_CHARS, TRUE, CLACT_VRAM_MAIN, info->heapId);
-    info->cellAnims = func_0204bde0(arc, FMISSION_FILE_CELLS, FMISSION_FILE_ANIMS, info->heapId);
+    info->palette = ClActSys_LoadPlttRange(arc, FMISSION_FILE_PALETTE, CLACT_VRAM_MAIN, 160, 0, 1, info->heapId);
+    info->chars = ClActSys_LoadChars(arc, FMISSION_FILE_CHARS, TRUE, CLACT_VRAM_MAIN, info->heapId);
+    info->cellAnims = ClActSys_LoadCellAnims(arc, FMISSION_FILE_CELLS, FMISSION_FILE_ANIMS, info->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void func_ov036_021b5d4c(FieldFMissionInfo *info) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, FALSE);
-    func_0204be64(info->cellAnims);
-    func_0204b98c(info->chars);
-    func_0204bcd0(info->palette);
-    func_0204becc(info->renderer);
-    func_0204bf98(info->unit);
+    ClActSys_FreeCellAnims(info->cellAnims);
+    ClActSys_FreeChars(info->chars);
+    ClActSys_FreePltt(info->palette);
+    ClActRenderer_Delete(info->renderer);
+    ClActUnit_Delete(info->unit);
 }
 
 static ClActor *func_ov036_021b5d78(FieldFMissionInfo *info, s16 x, s16 y, u16 sequence, u8 priority) {
@@ -234,11 +234,11 @@ static ClActor *func_ov036_021b5d78(FieldFMissionInfo *info, s16 x, s16 y, u16 s
     setup.sequence = sequence;
     setup.bgPriority = 1;
     setup.priority = priority;
-    actor = func_0204c040(info->unit, info->chars, info->palette, info->cellAnims, &setup, CLACT_SURFACE_MAIN,
+    actor = ClActor_Create(info->unit, info->chars, info->palette, info->cellAnims, &setup, CLACT_SURFACE_MAIN,
                           info->heapId);
     func_0204c520(actor, FALSE);
     func_0204c5c8(actor, FALSE);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     return actor;
 }
 
@@ -270,7 +270,7 @@ static void func_ov036_021b5dc8(FieldFMissionInfo *info) {
     info->actors[FMISSION_ACTOR_SCORE_GAIN] = func_ov036_021b5d78(info, 104, 180, FMISSION_SEQ_SCORE_GAIN, 2);
     info->actors[FMISSION_ACTOR_TIME_GAIN] = func_ov036_021b5d78(info, 104, 4, FMISSION_SEQ_TIME_GAIN, 2);
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {
-        func_0204c178(info->actors[i], &info->positions[i], CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(info->actors[i], &info->positions[i], CLACT_SURFACE_MAIN);
     }
 }
 
@@ -278,8 +278,8 @@ static void func_ov036_021b5f24(FieldFMissionInfo *info) {
     int i;
 
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {
-        func_0204c124(info->actors[i], FALSE);
-        func_0204c108(info->actors[i]);
+        ClActor_SetVisible(info->actors[i], FALSE);
+        ClActor_Delete(info->actors[i]);
     }
 }
 
@@ -287,19 +287,19 @@ static void func_ov036_021b5f48(FieldFMissionInfo *info, BOOL visible) {
     int i;
 
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {
-        func_0204c124(info->actors[i], visible);
+        ClActor_SetVisible(info->actors[i], visible);
     }
 }
 
 static void func_ov036_021b5f64(FieldFMissionInfo *info) {
     func_ov036_021b5f48(info, FALSE);
     info->shown = FALSE;
-    func_0204bfd4(info->unit, FALSE);
+    ClActUnit_SetActive(info->unit, FALSE);
     info->scoreTimer = 0;
 }
 
 static BOOL func_ov036_021b5f84(FieldFMissionInfo *info) {
-    return func_0201494c(info->festival) > 1;
+    return LinkFestival_GetMemberCount(info->festival) > 1;
 }
 
 static u32 func_ov036_021b5f98(u32 value, u8 digit) {
@@ -322,17 +322,17 @@ static void func_ov036_021b5fd4(FieldFMissionInfo *info, u32 value, int digits, 
                 visible = TRUE;
                 started = TRUE;
             }
-            func_0204c124(info->actors[firstActor], visible);
+            ClActor_SetVisible(info->actors[firstActor], visible);
         } else {
-            func_0204c124(info->actors[firstActor], TRUE);
+            ClActor_SetVisible(info->actors[firstActor], TRUE);
         }
-        func_0204c504(info->actors[firstActor], digit);
+        ClActor_SetAnimFrame(info->actors[firstActor], digit);
         firstActor++;
     }
 }
 
 static void func_ov036_021b6040(FieldFMissionInfo *info, BOOL force) {
-    int time = func_020145dc(info->festival);
+    int time = LinkFestival_GetSecondsLeft(info->festival);
     int minutes = time / 60;
 
     if (time != info->seconds || force) {
@@ -347,7 +347,7 @@ static void func_ov036_021b6040(FieldFMissionInfo *info, BOOL force) {
 
 static void func_ov036_021b60a0(FieldFMissionInfo *info) {
     if (info->groupVisible) {
-        func_0204c124(info->actors[FMISSION_ACTOR_GROUP_LABEL], TRUE);
+        ClActor_SetVisible(info->actors[FMISSION_ACTOR_GROUP_LABEL], TRUE);
         func_ov036_021b5fd4(info, func_0201482c(info->festival), FMISSION_COUNT_DIGITS, FMISSION_ACTOR_GROUP_DIGITS,
                             FALSE);
     }
@@ -355,7 +355,7 @@ static void func_ov036_021b60a0(FieldFMissionInfo *info) {
 
 static void func_ov036_021b60d0(FieldFMissionInfo *info, u8 actor, u16 x) {
     info->positions[actor].x = x;
-    func_0204c140(info->actors[actor], &info->positions[actor], CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(info->actors[actor], &info->positions[actor], CLACT_SURFACE_MAIN);
 }
 
 // Where the mission's icon and the player's score go, the same whatever the mission and the score
@@ -372,8 +372,8 @@ static void func_ov036_021b60f8(FieldFMissionInfo *info) {
     u16 scoreX;
 
     func_ov036_021b5fd4(info, score, FMISSION_COUNT_DIGITS, FMISSION_ACTOR_SCORE_DIGITS, FALSE);
-    func_0204c488(info->actors[FMISSION_ACTOR_ICON], mode + FMISSION_SEQ_ICONS);
-    func_0204c56c(info->actors[FMISSION_ACTOR_ICON]);
+    ClActor_SetSequence(info->actors[FMISSION_ACTOR_ICON], mode + FMISSION_SEQ_ICONS);
+    ClActor_RestartAnim(info->actors[FMISSION_ACTOR_ICON]);
     func_ov036_021b60ec(mode, score, &iconX, &scoreX);
     func_ov036_021b60d0(info, FMISSION_ACTOR_ICON, iconX);
     for (i = 0; i < FMISSION_COUNT_DIGITS; i++) {
@@ -398,7 +398,7 @@ static void func_ov036_021b616c(FieldFMissionInfo *info) {
     func_ov036_021b60a0(info);
     func_ov036_021b60f8(info);
     info->shown = TRUE;
-    func_0204bfd4(info->unit, TRUE);
+    ClActUnit_SetActive(info->unit, TRUE);
 }
 
 static void func_ov036_021b61e8(FieldFMissionInfo *info, u8 first, u8 count, int yOffset) {
@@ -418,10 +418,10 @@ static void func_ov036_021b61e8(FieldFMissionInfo *info, u8 first, u8 count, int
 
         pos.x = info->positions[actor].x;
         pos.y = yOffset + info->positions[actor].y;
-        func_0204c140(info->actors[actor], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(info->actors[actor], &pos, CLACT_SURFACE_MAIN);
         // The last two, a highlight, stay hidden
         if (i < count - 2) {
-            func_0204c124(info->actors[actor], TRUE);
+            ClActor_SetVisible(info->actors[actor], TRUE);
         }
     }
     slide->step = FX_Div(FX32_CONST(yOffset), FX32_CONST(slide->timer));
@@ -441,11 +441,11 @@ static void func_ov036_021b62d4(TCBEx *task, void *data) {
         for (i = slide->first; i < slide->first + slide->count; i++) {
             pos.x = info->positions[i].x;
             pos.y = info->positions[i].y + FX_Whole(slide->step * slide->timer);
-            func_0204c140(info->actors[i], &pos, CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(info->actors[i], &pos, CLACT_SURFACE_MAIN);
         }
     } else {
         for (i = slide->first; i < slide->first + slide->count; i++) {
-            func_0204c140(info->actors[i], &info->positions[i], CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(info->actors[i], &info->positions[i], CLACT_SURFACE_MAIN);
         }
         GFL_TCBExRequestEnd(task);
     }
@@ -467,8 +467,8 @@ static void func_ov036_021b6368(FieldFMissionInfo *info) {
             blink = GFL_TCBExGetData(task);
             MI_CpuFill8(blink, 0, sizeof(FieldFMissionBlink));
             blink->info = info;
-            func_0204c124(info->actors[FMISSION_ACTOR_SCORE_GAIN], TRUE);
-            func_0204c124(info->actors[FMISSION_ACTOR_SCORE_FLASH], TRUE);
+            ClActor_SetVisible(info->actors[FMISSION_ACTOR_SCORE_GAIN], TRUE);
+            ClActor_SetVisible(info->actors[FMISSION_ACTOR_SCORE_FLASH], TRUE);
         }
     }
 }
@@ -481,8 +481,8 @@ static void func_ov036_021b63dc(TCBEx *task, void *data) {
         info->scoreTimer--;
         return;
     }
-    func_0204c124(info->actors[FMISSION_ACTOR_SCORE_GAIN], FALSE);
-    func_0204c124(info->actors[FMISSION_ACTOR_SCORE_FLASH], FALSE);
+    ClActor_SetVisible(info->actors[FMISSION_ACTOR_SCORE_GAIN], FALSE);
+    ClActor_SetVisible(info->actors[FMISSION_ACTOR_SCORE_FLASH], FALSE);
     info->scoreAnim = FALSE;
     GFL_TCBExRequestEnd(task);
 }
@@ -500,8 +500,8 @@ static void func_ov036_021b6410(FieldFMissionInfo *info) {
             blink = GFL_TCBExGetData(task);
             MI_CpuFill8(blink, 0, sizeof(FieldFMissionBlink));
             blink->info = info;
-            func_0204c124(info->actors[FMISSION_ACTOR_TIME_GAIN], TRUE);
-            func_0204c124(info->actors[FMISSION_ACTOR_TIME_FLASH], TRUE);
+            ClActor_SetVisible(info->actors[FMISSION_ACTOR_TIME_GAIN], TRUE);
+            ClActor_SetVisible(info->actors[FMISSION_ACTOR_TIME_FLASH], TRUE);
         }
     }
 }
@@ -514,8 +514,8 @@ static void func_ov036_021b6474(TCBEx *task, void *data) {
         info->timeTimer--;
         return;
     }
-    func_0204c124(info->actors[FMISSION_ACTOR_TIME_GAIN], FALSE);
-    func_0204c124(info->actors[FMISSION_ACTOR_TIME_FLASH], FALSE);
+    ClActor_SetVisible(info->actors[FMISSION_ACTOR_TIME_GAIN], FALSE);
+    ClActor_SetVisible(info->actors[FMISSION_ACTOR_TIME_FLASH], FALSE);
     info->timeAnim = FALSE;
     GFL_TCBExRequestEnd(task);
 }

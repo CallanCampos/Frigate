@@ -28,7 +28,7 @@ void loadPokemonSpeciesTextNameToStrbuf(WordSet *wordSet, u32 index, PartyPkm *p
 void loadMoveNameToStrbuf(WordSet *wordSet, u32 index, u32 move);
 void loadItemNameToStrbuf(WordSet *wordSet, u32 index, u32 item);
 void loadPassPowerToStrbuf(WordSet *wordSet, u32 index, u32 passPower);
-void func_02024868(WordSet *wordSet, u32 index, u8 value, s32 arg3);
+void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 value, s32 arg3);
 // An item's name: the plural when plural is set, else the one in message file 481 when a4 is set
 void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL a4);
 void loadBagPocketNameToStrbuf(WordSet *wordSet, u32 index, u32 pocket);
@@ -63,6 +63,6 @@ void loadMedalNameToStrbuf(WordSet *wordSet, u32 index, u8 medal);
 void loadMedalRankToStrbuf(WordSet *wordSet, u32 index, u8 rank, u32 medalType);
 void loadFromEmptyFile(WordSet *wordSet, u32 index, u8 messageId);
 void loadPokewoodLineToStrbuf(WordSet *wordSet, u32 index, u32 line);
-void func_0202483c(WordSet *wordSet, u32 index, u32 tournament);
+void WordSet_LoadPWTTournamentType(WordSet *wordSet, u32 index, u32 tournament);
 
 #endif // POKEBW2_SYSTEM_WORDSET_H

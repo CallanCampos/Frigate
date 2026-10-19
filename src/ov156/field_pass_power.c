@@ -102,9 +102,9 @@ GameEvent *EventPassPowerActivate_Create(GameSystem *gsys, void *args) {
     if (params[1]) {
         u16 price = PassPowerData_GetPrice(data, passPower);
         BagSave_SubItem(GameData_GetBag(gameData), ITEM_PASS_ORB, price, HEAPID_TAIL(HEAPID_FIELDMAP));
-        func_ov012_0215fcd0(passPower);
+        GameBeacon_BroadcastPassPower(passPower);
     } else {
-        func_ov012_02160340(passPower);
+        GameBeacon_BroadcastReceivedPassPower(passPower);
     }
     PassPowerData_Free(data);
     return event;

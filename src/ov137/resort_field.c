@@ -187,104 +187,104 @@ typedef struct {
     u32 slot;
 } ResortWalkerPlace;
 
-static ResortWatch *func_ov137_021eef7c(HeapID heapId, const ResortWatchSetup *setup);
-static void func_ov137_021eefc4(ResortWatch *watch);
-static void func_ov137_021eefd8(ResortWatch *watch);
-static void func_ov137_021eeff8(ResortWatch *watch, ResortWatchCallback callback);
-static void func_ov137_021eeffc(ResortWatch *watch);
-static void func_ov137_021ef004(ResortWatch *watch);
-static void func_ov137_021ef0dc(ResortWatch *watch);
-static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
-                                          JoinAvenueOccupants *occupants);
-static void func_ov137_021ef1b4(ResortWalkers *walkers);
-static void func_ov137_021ef1e8(ResortWalkers *walkers, Field *field);
-static void func_ov137_021ef234(ResortWalkers *walkers, u32 mode);
-static void func_ov137_021ef250(ResortWalkers *walkers, ResortPerson *person);
-static void func_ov137_021ef2bc(ResortWalkers *walkers, ResortPerson *person);
-static void func_ov137_021ef2f4(ResortWalkers *walkers, ResortPerson *person);
-static void func_ov137_021ef304(FieldActor *actor, u16 x, u16 z);
-static ResortWalker *func_ov137_021ef340(ResortWalkers *walkers, ResortPerson *person);
-static void func_ov137_021ef388(ResortWalker *walker, HeapID heapId);
-static void func_ov137_021ef390(ResortWalker *walker);
-static void func_ov137_021ef3b0(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static void func_ov137_021ef418(ResortWalker *walker, ResortPerson *person, void *shops, void *unkb1c,
+static ResortWatch *ResortWatch_Create(HeapID heapId, const ResortWatchSetup *setup);
+static void ResortWatch_Free(ResortWatch *watch);
+static void ResortWatch_Update(ResortWatch *watch);
+static void ResortWatch_SetCallback(ResortWatch *watch, ResortWatchCallback callback);
+static void ResortWatch_MarkChanged(ResortWatch *watch);
+static void ResortWatch_CheckLists(ResortWatch *watch);
+static void ResortWatch_CheckEntries(ResortWatch *watch);
+static ResortWalkers *ResortWalkers_Create(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
+                                           JoinAvenueOccupants *occupants);
+static void ResortWalkers_Free(ResortWalkers *walkers);
+static void ResortWalkers_Update(ResortWalkers *walkers, Field *field);
+static void ResortWalkers_Place(ResortWalkers *walkers, u32 mode);
+static void ResortWalkers_Add(ResortWalkers *walkers, ResortPerson *person);
+static void ResortWalkers_Remove(ResortWalkers *walkers, ResortPerson *person);
+static void ResortWalkers_MarkObjCodeChanged(ResortWalkers *walkers, ResortPerson *person);
+static void ResortField_SetActorPos(FieldActor *actor, u16 x, u16 z);
+static ResortWalker *ResortWalkers_Find(ResortWalkers *walkers, ResortPerson *person);
+static void ResortWalker_Init(ResortWalker *walker, HeapID heapId);
+static void ResortWalker_Release(ResortWalker *walker);
+static void ResortWalker_Update(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static void ResortWalker_Assign(ResortWalker *walker, ResortPerson *person, void *shops, void *unkb1c,
                                 JoinAvenueOccupants *occupants);
-static void func_ov137_021ef470(ResortWalker *walker);
-static BOOL func_ov137_021ef488(const ResortWalker *walker, ResortPerson *person);
-static BOOL func_ov137_021ef498(const ResortWalker *walker);
-static void func_ov137_021ef4a8(ResortWalker *walker, u16 acmd, u16 dir, u16 x);
-static void func_ov137_021ef4b8(ResortWalker *walker, u16 acmd, u16 dir, u16 x, u16 z);
-static BOOL func_ov137_021ef5b8(ResortWalker *walker);
-static BOOL func_ov137_021ef5c8(ResortWalker *walker);
-static void func_ov137_021ef5f0(ResortWalker *walker);
-static BOOL func_ov137_021ef5f8(ResortWalker *walker);
-static BOOL func_ov137_021ef624(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player, u32 a3, u32 a4);
-static void func_ov137_021ef644(ResortWalker *walker);
-static BOOL func_ov137_021ef6d4(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static BOOL func_ov137_021ef710(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static BOOL func_ov137_021ef798(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static BOOL func_ov137_021ef7bc(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static BOOL func_ov137_021ef8e4(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static void func_ov137_021ef984(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static void func_ov137_021ef9a8(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants);
-static BOOL func_ov137_021efa68(ResortWalker *walker, FieldPlayer *player);
-static void func_ov137_021efaf0(FieldActor *actor);
-static void func_ov137_021efaf4(FieldActor *actor);
-static void func_ov137_021efb48(FieldActor *actor);
-static void func_ov137_021efb4c(FieldActor *actor);
-static void func_ov137_021efb50(ResortWalkerGroup *group, u16 x, u16 dir, HeapID heapId);
-static void func_ov137_021efb78(ResortWalkerGroup *group);
-static void func_ov137_021efb84(ResortWalkerGroup *group, FieldPlayer *player);
-static void func_ov137_021efc78(ResortWalkerGroup *group, u32 mode);
-static void func_ov137_021efd2c(ResortWalkerGroup *group, u16 slot, ResortWalker *walker);
-static void func_ov137_021efd38(ResortWalkerGroup *group, u16 slot);
-static BOOL func_ov137_021efd48(ResortPerson *person, u16 *group, u16 *slot);
-static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortPersonData **datas, JoinAvenueInfo *info,
-                                          JoinAvenueOccupants *occupants, BOOL enabled);
-static void func_ov137_021efe1c(ResortBubbles *bubbles);
-static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field);
-static void func_ov137_021f007c(ResortBubbles *bubbles);
-static void func_ov137_021f009c(ResortBubbles *bubbles);
-static void func_ov137_021f00a4(ResortBubbles *bubbles);
-static void func_ov137_021f00ac(ResortBubbles *bubbles, BOOL start);
-static void func_ov137_021f00d8(ResortBubbles *bubbles);
-static ResortPersonData *func_ov137_021f0164(ResortBubbles *bubbles);
-static void func_ov137_021f022c(ResortBubble *bubble, u16 index, HeapID heapId);
-static void func_ov137_021f024c(ResortBubble *bubble);
-static void func_ov137_021f0264(ResortBubble *bubble, void *msgBGSys);
-static BOOL func_ov137_021f0280(u16 a, u16 b, BOOL mode);
-static void func_ov137_021f02f0(ResortBubble *bubble, void *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
-                                JoinAvenueOccupants *occupants, MsgData *msgData, u32 kind, BOOL mode);
-static void func_ov137_021f03f8(ResortBubble *bubble, void *msgBGSys);
-static void func_ov137_021f0414(ResortBubble *bubble);
-static BOOL func_ov137_021f041c(ResortBubble *bubble);
-static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMSys *mmSys, FieldPlayer *player,
-                                              BOOL flag, u32 a5);
-static void func_ov137_021f0508(ResortFieldPeople *people, BOOL flag, u32 a2);
-static void func_ov137_021f0540(ResortFieldPeople *people);
-static void func_ov137_021f0560(ResortFieldPeople *people, Field *field);
-static void func_ov137_021f0584(ResortFieldPeople *people);
-static ResortPeople *func_ov137_021f059c(ResortFieldPeople *people);
-static void func_ov137_021f05a0(ResortFieldPeople *people, ResortPerson *person);
-static ResortWalkers *func_ov137_021f05ac(ResortFieldPeople *people);
-static void func_ov137_021f05b0(ResortFieldPeople *people, ResortSys *sys, ResortNPC *npc);
-static void func_ov137_021f0670(ResortFieldPeople *people);
-static BOOL func_ov137_021f067c(void *context, void *person, u32 a2, u32 event);
-static BOOL func_ov137_021f0720(void *context, void *person, u32 a2, u32 event);
-static ResortFieldScene *func_ov137_021f0758(HeapID heapId, FieldExpObjSystem *expObj, FieldCamera *camera);
-static void func_ov137_021f0790(ResortFieldScene *scene);
-static void func_ov137_021f07a4(ResortFieldScene *scene);
-static void func_ov137_021f07d0(ResortFieldScene *scene, u32 index);
-static BOOL func_ov137_021f07ec(ResortFieldScene *scene, u32 index);
-static void func_ov137_021f0800(ResortFieldScene *scene, u32 index);
-static void func_ov137_021f0818(ResortFieldScene *scene);
-static BOOL func_ov137_021f08dc(ResortFieldScene *scene);
-static void func_ov137_021f09b4(ResortFieldScene *scene);
-static void func_ov137_021f0a38(ResortFieldScene *scene);
-static BOOL func_ov137_021f0a80(ResortFieldScene *scene);
-static void func_ov137_021f0ad8(ResortFieldScene *scene);
-static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapId);
-static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapId);
+static void ResortWalker_Clear(ResortWalker *walker);
+static BOOL ResortWalker_IsPerson(const ResortWalker *walker, ResortPerson *person);
+static BOOL ResortWalker_IsAssigned(const ResortWalker *walker);
+static void ResortWalker_Start(ResortWalker *walker, u16 acmd, u16 dir, u16 x);
+static void ResortWalker_StartAt(ResortWalker *walker, u16 acmd, u16 dir, u16 x, u16 z);
+static BOOL ResortWalker_IsIdle(ResortWalker *walker);
+static BOOL ResortWalker_IsAtOrigin(ResortWalker *walker);
+static void ResortWalker_MarkObjCodeChanged(ResortWalker *walker);
+static BOOL ResortWalker_IsFast(ResortWalker *walker);
+static BOOL ResortWalker_IsBlocked(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player, u32 a3, u32 a4);
+static void ResortWalker_SetupWalk(ResortWalker *walker);
+static BOOL ResortWalker_StateCheckSteps(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static BOOL ResortWalker_StateStep(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static BOOL ResortWalker_StateWaitStep(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static BOOL ResortWalker_StateLookAround(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static BOOL ResortWalker_StateStopAtShop(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static void ResortWalker_RunStates(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
+static void ResortWalker_FindStops(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants);
+static BOOL ResortWalker_CheckStop(ResortWalker *walker, FieldPlayer *player);
+static void ResortWalkerMove_Unk4(FieldActor *actor);
+static void ResortWalkerMove_Update(FieldActor *actor);
+static void ResortWalkerMove_Unk0C(FieldActor *actor);
+static void ResortWalkerMove_Unk10(FieldActor *actor);
+static void ResortWalkerGroup_Init(ResortWalkerGroup *group, u16 x, u16 dir, HeapID heapId);
+static void ResortWalkerGroup_Clear(ResortWalkerGroup *group);
+static void ResortWalkerGroup_Update(ResortWalkerGroup *group, FieldPlayer *player);
+static void ResortWalkerGroup_Place(ResortWalkerGroup *group, u32 mode);
+static void ResortWalkerGroup_Add(ResortWalkerGroup *group, u16 slot, ResortWalker *walker);
+static void ResortWalkerGroup_Remove(ResortWalkerGroup *group, u16 slot);
+static BOOL ResortField_GetWalkerPlace(ResortPerson *person, u16 *group, u16 *slot);
+static ResortBubbles *ResortBubbles_Create(HeapID heapId, void *msgBGSys, ResortPersonData **datas,
+                                           JoinAvenueInfo *info, JoinAvenueOccupants *occupants, BOOL enabled);
+static void ResortBubbles_Free(ResortBubbles *bubbles);
+static void ResortBubbles_Update(ResortBubbles *bubbles, Field *field);
+static void ResortBubbles_HideAll(ResortBubbles *bubbles);
+static void ResortBubbles_Enable(ResortBubbles *bubbles);
+static void ResortBubbles_SetEventMode(ResortBubbles *bubbles);
+static void ResortBubbles_SetActive(ResortBubbles *bubbles, BOOL start);
+static void ResortBubbles_UpdateInterval(ResortBubbles *bubbles);
+static ResortPersonData *ResortBubbles_PickData(ResortBubbles *bubbles);
+static void ResortBubble_Init(ResortBubble *bubble, u16 index, HeapID heapId);
+static void ResortBubble_Free(ResortBubble *bubble);
+static void ResortBubble_Update(ResortBubble *bubble, void *msgBGSys);
+static BOOL ResortBubble_Overlaps(u16 a, u16 b, BOOL mode);
+static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
+                              JoinAvenueOccupants *occupants, MsgData *msgData, u32 kind, BOOL mode);
+static void ResortBubble_Hide(ResortBubble *bubble, void *msgBGSys);
+static void ResortBubble_Reset(ResortBubble *bubble);
+static BOOL ResortBubble_IsDone(ResortBubble *bubble);
+static ResortFieldPeople *ResortFieldPeople_Create(HeapID heapId, ResortSys *sys, MMSys *mmSys, FieldPlayer *player,
+                                                   BOOL flag, u32 a5);
+static void ResortFieldPeople_CreatePeople(ResortFieldPeople *people, BOOL flag, u32 a2);
+static void ResortFieldPeople_Free(ResortFieldPeople *people);
+static void ResortFieldPeople_Update(ResortFieldPeople *people, Field *field);
+static void ResortFieldPeople_UseNormalWatch(ResortFieldPeople *people);
+static ResortPeople *ResortFieldPeople_GetPeople(ResortFieldPeople *people);
+static void ResortFieldPeople_RemoveWalker(ResortFieldPeople *people, ResortPerson *person);
+static ResortWalkers *ResortFieldPeople_GetWalkers(ResortFieldPeople *people);
+static void ResortFieldPeople_PlaceAtShops(ResortFieldPeople *people, ResortSys *sys, ResortNPC *npc);
+static void ResortFieldPeople_MarkChanged(ResortFieldPeople *people);
+static BOOL ResortFieldPeople_WatchCallback(void *context, void *person, u32 a2, u32 event);
+static BOOL ResortFieldPeople_WatchCallbackFiltered(void *context, void *person, u32 a2, u32 event);
+static ResortFieldScene *ResortFieldScene_Create(HeapID heapId, FieldExpObjSystem *expObj, FieldCamera *camera);
+static void ResortFieldScene_Free(ResortFieldScene *scene);
+static void ResortFieldScene_Update(ResortFieldScene *scene);
+static void ResortFieldScene_StartAnim(ResortFieldScene *scene, u32 index);
+static BOOL ResortFieldScene_IsAnimDone(ResortFieldScene *scene, u32 index);
+static void ResortFieldScene_EndAnim(ResortFieldScene *scene, u32 index);
+static void ResortSceneAnim0_Start(ResortFieldScene *scene);
+static BOOL ResortSceneAnim0_Update(ResortFieldScene *scene);
+static void ResortSceneAnim0_End(ResortFieldScene *scene);
+static void ResortSceneAnim1_Start(ResortFieldScene *scene);
+static BOOL ResortSceneAnim1_Update(ResortFieldScene *scene);
+static void ResortSceneAnim1_End(ResortFieldScene *scene);
+static void ResortField_AddInitialEntries(ResortSys *sys, GameData *gameData, HeapID heapId);
+static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, HeapID heapId);
 
 // Not referenced, as reading it is folded: the angle of the scene's second animation
 const u32 RESORT_FIELD_SCENE_ANGLE = 0xdd00;
@@ -311,14 +311,15 @@ static const u8 sBubbleXs0[RESORT_BUBBLES] = { 1, 18, 2, 16, 4, 18, 3, 15, 1, 15
 static const u32 sBubbleIntervalKinds[] = { 0, 2, 3, 4 };
 static const u32 sBubbleKinds[] = { 0, 2, 3, 4 };
 static BOOL (*const sWalkerStates[])(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) = {
-    func_ov137_021ef6d4, func_ov137_021ef710, func_ov137_021ef798, func_ov137_021ef7bc, func_ov137_021ef8e4,
+    ResortWalker_StateCheckSteps, ResortWalker_StateStep,       ResortWalker_StateWaitStep,
+    ResortWalker_StateLookAround, ResortWalker_StateStopAtShop,
 };
 static const FieldActorMoveCode sWalkerMoveCode = {
-    0, func_ov137_021efaf0, func_ov137_021efaf4, func_ov137_021efb48, func_ov137_021efb4c,
+    0, ResortWalkerMove_Unk4, ResortWalkerMove_Update, ResortWalkerMove_Unk0C, ResortWalkerMove_Unk10,
 };
 static const ResortSceneAnim sSceneAnims[] = {
-    { func_ov137_021f0818, func_ov137_021f08dc, func_ov137_021f09b4 },
-    { func_ov137_021f0a38, func_ov137_021f0a80, func_ov137_021f0ad8 },
+    { ResortSceneAnim0_Start, ResortSceneAnim0_Update, ResortSceneAnim0_End },
+    { ResortSceneAnim1_Start, ResortSceneAnim1_Update, ResortSceneAnim1_End },
 };
 static const G3DSceneActorSetup sSceneActors[] = {
     { 0, 0, 0, 0, sSceneAnimations0, 2 },
@@ -329,7 +330,7 @@ static const G3DSceneResourceSetup sSceneResources[] = {
 };
 static const G3DSceneSetup sScene = { sSceneResources, 6, sSceneActors, 2 };
 
-void func_ov137_021eec80(Field *field) {
+void ResortField_Setup(Field *field) {
     void *block;
     GameData *gameData;
     ResortWork *unk;
@@ -353,7 +354,7 @@ void func_ov137_021eec80(Field *field) {
 
     heapId = Field_GetHeapID(field);
     gameData = GSYS_GetGameData(Field_GetGameSystem(field));
-    unk = func_02017b84(gameData);
+    unk = GameData_GetResortWork(gameData);
     work = Field_AllocGimmickWorkBlock(field, 1, heapId, sizeof(ResortFieldWork));
     bubblesEnabled = TRUE;
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
@@ -362,24 +363,24 @@ void func_ov137_021eec80(Field *field) {
     sysSetup.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     sysSetup.list = JoinAvenue_GetPersonList(joinAvenue);
     sysSetup.list2 = *list2;
-    sysSetup.entries = func_02010054(joinAvenue);
+    sysSetup.entries = JoinAvenue_GetEntryList(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
     work->sys = ResortSys_Create(&sysSetup, unk, heapId);
     flag = JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL);
-    func_ov137_021f0be4(work->sys, gameData, heapId);
-    func_ov137_021f0ae0(work->sys, gameData, heapId);
+    ResortField_AddSpecialEntry(work->sys, gameData, heapId);
+    ResortField_AddInitialEntries(work->sys, gameData, heapId);
     unk2 = ResortWork_Get(unk, 8);
     mmSys = GameData_GetMMSys(gameData);
-    work->people = func_ov137_021f042c(heapId, work->sys, mmSys, Field_GetPlayer(field), flag, unk2);
-    func_ov137_021f0508(work->people, flag, unk2);
+    work->people = ResortFieldPeople_Create(heapId, work->sys, mmSys, Field_GetPlayer(field), flag, unk2);
+    ResortFieldPeople_CreatePeople(work->people, flag, unk2);
 
     MI_CpuFill8(&npcSetup, 0, sizeof(ResortNPCSetup));
     npcSetup.mmSys = GameData_GetMMSys(gameData);
     npcSetup.unk4 = 16;
     npcSetup.info = ResortSys_GetInfo(work->sys);
-    npcSetup.zone = func_02039518(Field_GetPlayerStateZoneID(field));
+    npcSetup.zone = ResortLayout_GetZoneIndex(Field_GetPlayerStateZoneID(field));
     npcSetup.table = ResortSys_GetShopOpenings(work->sys);
-    work->npc = func_ov137_021f1c24(&npcSetup, heapId);
+    work->npc = ResortNPC_Create(&npcSetup, heapId);
 
     msgBGSys = Field_GetMsgBGSys(field);
     datas = ResortSys_GetDatas(work->sys);
@@ -388,129 +389,129 @@ void func_ov137_021eec80(Field *field) {
     if (flag) {
         bubblesEnabled = FALSE;
     }
-    work->bubbles = func_ov137_021efdac(heapId, msgBGSys, datas, info, occupants, bubblesEnabled);
+    work->bubbles = ResortBubbles_Create(heapId, msgBGSys, datas, info, occupants, bubblesEnabled);
     expObj = Field_GetExpObjSystem(field);
-    work->scene = func_ov137_021f0758(heapId, expObj, Field_GetCameraSystem(field));
+    work->scene = ResortFieldScene_Create(heapId, expObj, Field_GetCameraSystem(field));
 
     block = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
     entries = ResortSys_GetEntries(work->sys);
-    for (i = 0; i < func_02037ed4(entries); i++) {
-        void *entry = func_02037f04(entries, i);
-        if (!func_02037a90(entry) && (u16)func_02037b38(entry, 3, NULL) == 223) {
-            func_0200ff50(block, 2, 15);
+    for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
+        void *entry = JoinAvenueEntryList_Get(entries, i);
+        if (!JoinAvenueEntry_IsEmpty(entry) && (u16)JoinAvenueEntry_GetParam(entry, 3, NULL) == 223) {
+            HollowRivalSave_SetValue(block, 2, 15);
             return;
         }
     }
 }
 
-void func_ov137_021eee4c(Field *field) {
+void ResortField_Delete(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f0790(work->scene);
-    func_ov137_021efe1c(work->bubbles);
-    func_ov137_021f1c74(work->npc);
-    func_ov137_021f0540(work->people);
+    ResortFieldScene_Free(work->scene);
+    ResortBubbles_Free(work->bubbles);
+    ResortNPC_Free(work->npc);
+    ResortFieldPeople_Free(work->people);
     ResortSys_Free(work->sys);
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
-void func_ov137_021eee80(Field *field) {
+void ResortField_Update(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f0560(work->people, field);
-    func_ov137_021f1c88(work->npc, field);
-    func_ov137_021efe54(work->bubbles, field);
-    func_ov137_021f07a4(work->scene);
+    ResortFieldPeople_Update(work->people, field);
+    ResortNPC_Update(work->npc, field);
+    ResortBubbles_Update(work->bubbles, field);
+    ResortFieldScene_Update(work->scene);
 }
 
-ResortPeople *func_ov137_021eeeac(Field *field) {
+ResortPeople *ResortField_GetPeople(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    return func_ov137_021f059c(work->people);
+    return ResortFieldPeople_GetPeople(work->people);
 }
 
-ResortNPC *func_ov137_021eeebc(Field *field) {
+ResortNPC *ResortField_GetNPC(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
     return work->npc;
 }
 
-ResortSys *func_ov137_021eeec8(Field *field) {
+ResortSys *ResortField_GetSys(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
     return work->sys;
 }
 
-void func_ov137_021eeed4(Field *field, ResortPerson *person) {
+void ResortField_RemoveWalker(Field *field, ResortPerson *person) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f05a0(work->people, person);
+    ResortFieldPeople_RemoveWalker(work->people, person);
 }
 
-void func_ov137_021eeee8(Field *field, u32 index) {
+void ResortField_StartSceneAnim(Field *field, u32 index) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f07d0(work->scene, index);
+    ResortFieldScene_StartAnim(work->scene, index);
 }
 
-BOOL func_ov137_021eeefc(Field *field, u32 index) {
+BOOL ResortField_IsSceneAnimDone(Field *field, u32 index) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    return func_ov137_021f07ec(work->scene, index);
+    return ResortFieldScene_IsAnimDone(work->scene, index);
 }
 
-void func_ov137_021eef10(Field *field, u32 index) {
+void ResortField_EndSceneAnim(Field *field, u32 index) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f0800(work->scene, index);
+    ResortFieldScene_EndAnim(work->scene, index);
 }
 
-void func_ov137_021eef24(Field *field) {
+void ResortField_RefreshPeople(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f0584(work->people);
-    func_ov137_021f009c(work->bubbles);
+    ResortFieldPeople_UseNormalWatch(work->people);
+    ResortBubbles_Enable(work->bubbles);
 }
 
-void func_ov137_021eef3c(Field *field) {
+void ResortField_MarkPeopleChanged(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f0670(work->people);
+    ResortFieldPeople_MarkChanged(work->people);
 }
 
-void func_ov137_021eef4c(Field *field) {
+void ResortField_EnterEventMode(Field *field) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f00a4(work->bubbles);
-    func_ov137_021f05b0(work->people, work->sys, work->npc);
+    ResortBubbles_SetEventMode(work->bubbles);
+    ResortFieldPeople_PlaceAtShops(work->people, work->sys, work->npc);
 }
 
-void func_ov137_021eef68(Field *field, BOOL start) {
+void ResortField_SetBubblesActive(Field *field, BOOL start) {
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov137_021f00ac(work->bubbles, start);
+    ResortBubbles_SetActive(work->bubbles, start);
 }
 
-static ResortWatch *func_ov137_021eef7c(HeapID heapId, const ResortWatchSetup *setup) {
+static ResortWatch *ResortWatch_Create(HeapID heapId, const ResortWatchSetup *setup) {
     ResortWatch *watch = GFL_HeapAllocate(heapId, sizeof(ResortWatch), TRUE, "resort_field.c", 659);
     watch->setup = *setup;
     watch->list = setup->list;
     watch->entries = setup->entries;
     watch->list2 = setup->list2;
     GameBeaconSys_SetAvenuePeople(watch->list2);
-    func_ov137_021eeffc(watch);
+    ResortWatch_MarkChanged(watch);
     return watch;
 }
 
-static void func_ov137_021eefc4(ResortWatch *watch) {
+static void ResortWatch_Free(ResortWatch *watch) {
     GameBeaconSys_SetAvenuePeople(NULL);
     GFL_HeapFree(watch);
 }
 
-static void func_ov137_021eefd8(ResortWatch *watch) {
+static void ResortWatch_Update(ResortWatch *watch) {
     if (watch->timer++ > watch->setup.interval) {
-        func_ov137_021ef004(watch);
-        func_ov137_021ef0dc(watch);
+        ResortWatch_CheckLists(watch);
+        ResortWatch_CheckEntries(watch);
         watch->timer = 0;
     }
 }
 
-static void func_ov137_021eeff8(ResortWatch *watch, ResortWatchCallback callback) {
+static void ResortWatch_SetCallback(ResortWatch *watch, ResortWatchCallback callback) {
     watch->setup.callback = callback;
 }
 
-static void func_ov137_021eeffc(ResortWatch *watch) {
+static void ResortWatch_MarkChanged(ResortWatch *watch) {
     watch->changed = TRUE;
 }
 
-static void func_ov137_021ef004(ResortWatch *watch) {
+static void ResortWatch_CheckLists(ResortWatch *watch) {
     u32 i;
     u32 j;
 
@@ -536,12 +537,12 @@ static void func_ov137_021ef004(ResortWatch *watch) {
     }
 }
 
-static void func_ov137_021ef0dc(ResortWatch *watch) {
+static void ResortWatch_CheckEntries(ResortWatch *watch) {
     if (watch->changed) {
         u32 i;
-        for (i = 0; i < func_02037ed4(watch->entries); i++) {
-            void *entry = func_02037f04(watch->entries, i);
-            if (!func_02037a90(entry)) {
+        for (i = 0; i < JoinAvenueEntryList_GetCount(watch->entries); i++) {
+            void *entry = JoinAvenueEntryList_Get(watch->entries, i);
+            if (!JoinAvenueEntry_IsEmpty(entry)) {
                 watch->setup.callback(watch->setup.context, entry, 1, 2);
             }
         }
@@ -549,8 +550,8 @@ static void func_ov137_021ef0dc(ResortWatch *watch) {
     }
 }
 
-static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
-                                          JoinAvenueOccupants *occupants) {
+static ResortWalkers *ResortWalkers_Create(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
+                                           JoinAvenueOccupants *occupants) {
     int i;
     ResortWalkers *walkers = GFL_HeapAllocate(heapId, sizeof(ResortWalkers), TRUE, "resort_field.c", 950);
 
@@ -560,81 +561,81 @@ static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlay
     walkers->unkb1c = unkb1c;
     walkers->occupants = occupants;
     for (i = 0; i < RESORT_WALKERS; i++) {
-        func_ov137_021ef388(&walkers->walkers[i], heapId);
+        ResortWalker_Init(&walkers->walkers[i], heapId);
     }
     for (i = 0; i < RESORT_WALKER_GROUPS; i++) {
-        func_ov137_021efb50(&walkers->groups[i], sGroupXs[i], sGroupDirs[i], heapId);
+        ResortWalkerGroup_Init(&walkers->groups[i], sGroupXs[i], sGroupDirs[i], heapId);
     }
     return walkers;
 }
 
-static void func_ov137_021ef1b4(ResortWalkers *walkers) {
+static void ResortWalkers_Free(ResortWalkers *walkers) {
     int i;
     for (i = 0; i < RESORT_WALKER_GROUPS; i++) {
-        func_ov137_021efb78(&walkers->groups[i]);
+        ResortWalkerGroup_Clear(&walkers->groups[i]);
     }
     for (i = 0; i < RESORT_WALKERS; i++) {
-        func_ov137_021ef390(&walkers->walkers[i]);
+        ResortWalker_Release(&walkers->walkers[i]);
     }
     GFL_HeapFree(walkers);
 }
 
-static void func_ov137_021ef1e8(ResortWalkers *walkers, Field *field) {
+static void ResortWalkers_Update(ResortWalkers *walkers, Field *field) {
     int i;
     if (!Field_IsEventRunning(field)) {
         for (i = 0; i < RESORT_WALKER_GROUPS; i++) {
-            func_ov137_021efb84(&walkers->groups[i], walkers->player);
+            ResortWalkerGroup_Update(&walkers->groups[i], walkers->player);
         }
     }
     for (i = 0; i < RESORT_WALKERS; i++) {
-        func_ov137_021ef3b0(&walkers->walkers[i], walkers->mmSys, walkers->player);
+        ResortWalker_Update(&walkers->walkers[i], walkers->mmSys, walkers->player);
     }
 }
 
-static void func_ov137_021ef234(ResortWalkers *walkers, u32 mode) {
+static void ResortWalkers_Place(ResortWalkers *walkers, u32 mode) {
     int i;
     for (i = 0; i < RESORT_WALKER_GROUPS; i++) {
-        func_ov137_021efc78(&walkers->groups[i], mode);
+        ResortWalkerGroup_Place(&walkers->groups[i], mode);
     }
 }
 
-static void func_ov137_021ef250(ResortWalkers *walkers, ResortPerson *person) {
+static void ResortWalkers_Add(ResortWalkers *walkers, ResortPerson *person) {
     u16 group;
     u16 slot;
     int i;
 
-    if (func_ov137_021efd48(person, &group, &slot)) {
+    if (ResortField_GetWalkerPlace(person, &group, &slot)) {
         for (i = 0; i < RESORT_WALKERS; i++) {
-            if (!func_ov137_021ef498(&walkers->walkers[i])) {
-                func_ov137_021ef418(&walkers->walkers[i], person, walkers->shops, walkers->unkb1c, walkers->occupants);
-                func_ov137_021efd2c(&walkers->groups[group], slot, &walkers->walkers[i]);
+            if (!ResortWalker_IsAssigned(&walkers->walkers[i])) {
+                ResortWalker_Assign(&walkers->walkers[i], person, walkers->shops, walkers->unkb1c, walkers->occupants);
+                ResortWalkerGroup_Add(&walkers->groups[group], slot, &walkers->walkers[i]);
                 return;
             }
         }
     }
 }
 
-static void func_ov137_021ef2bc(ResortWalkers *walkers, ResortPerson *person) {
+static void ResortWalkers_Remove(ResortWalkers *walkers, ResortPerson *person) {
     u16 group;
     u16 slot;
 
-    if (func_ov137_021efd48(person, &group, &slot)) {
-        ResortWalker *walker = func_ov137_021ef340(walkers, person);
+    if (ResortField_GetWalkerPlace(person, &group, &slot)) {
+        ResortWalker *walker = ResortWalkers_Find(walkers, person);
         if (walker != NULL) {
-            func_ov137_021efd38(&walkers->groups[group], slot);
-            func_ov137_021ef390(walker);
+            ResortWalkerGroup_Remove(&walkers->groups[group], slot);
+            ResortWalker_Release(walker);
         }
     }
 }
 
-static void func_ov137_021ef2f4(ResortWalkers *walkers, ResortPerson *person) {
-    ResortWalker *walker = func_ov137_021ef340(walkers, person);
+static void ResortWalkers_MarkObjCodeChanged(ResortWalkers *walkers, ResortPerson *person) {
+    ResortWalker *walker = ResortWalkers_Find(walkers, person);
     if (walker != NULL) {
-        func_ov137_021ef5f0(walker);
+        ResortWalker_MarkObjCodeChanged(walker);
     }
 }
 
-static void func_ov137_021ef304(FieldActor *actor, u16 x, u16 z) {
+static void ResortField_SetActorPos(FieldActor *actor, u16 x, u16 z) {
     VecFx32 pos;
     pos.x = (x << 16) + 0x8000;
     pos.y = 0;
@@ -644,14 +645,14 @@ static void func_ov137_021ef304(FieldActor *actor, u16 x, u16 z) {
     SetActorGPosZ(actor, z);
 }
 
-static ResortWalker *func_ov137_021ef340(ResortWalkers *walkers, ResortPerson *person) {
+static ResortWalker *ResortWalkers_Find(ResortWalkers *walkers, ResortPerson *person) {
     u16 group;
     u16 slot;
     int i;
 
-    if (func_ov137_021efd48(person, &group, &slot)) {
+    if (ResortField_GetWalkerPlace(person, &group, &slot)) {
         for (i = 0; i < RESORT_WALKERS; i++) {
-            if (func_ov137_021ef488(&walkers->walkers[i], person)) {
+            if (ResortWalker_IsPerson(&walkers->walkers[i], person)) {
                 return &walkers->walkers[i];
             }
         }
@@ -659,24 +660,24 @@ static ResortWalker *func_ov137_021ef340(ResortWalkers *walkers, ResortPerson *p
     return NULL;
 }
 
-static void func_ov137_021ef388(ResortWalker *walker, HeapID heapId) {
-    func_ov137_021ef470(walker);
+static void ResortWalker_Init(ResortWalker *walker, HeapID heapId) {
+    ResortWalker_Clear(walker);
 }
 
-static void func_ov137_021ef390(ResortWalker *walker) {
-    if (func_ov137_021ef498(walker)) {
-        ChangeActorMoveCodeSeq(func_ov137_021f110c(walker->person), 0);
+static void ResortWalker_Release(ResortWalker *walker) {
+    if (ResortWalker_IsAssigned(walker)) {
+        ChangeActorMoveCodeSeq(ResortPerson_GetActor(walker->person), 0);
     }
-    func_ov137_021ef470(walker);
+    ResortWalker_Clear(walker);
 }
 
-static void func_ov137_021ef3b0(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
-    if (func_ov137_021ef498(walker)) {
-        FieldActor *actor = func_ov137_021f110c(walker->person);
+static void ResortWalker_Update(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+    if (ResortWalker_IsAssigned(walker)) {
+        FieldActor *actor = ResortPerson_GetActor(walker->person);
         if (walker->unk14 && !walker->unk15) {
             switch (walker->unk54) {
             case 0:
-                func_ov012_02166eb0(actor, 0xbe);
+                FldAct_SetLocalAcmd(actor, 0xbe);
                 walker->unk54++;
             case 1:
                 if (func_ov036_0218f01c(actor)) {
@@ -687,61 +688,61 @@ static void func_ov137_021ef3b0(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
                 break;
             }
         }
-        if (walker->objCodeChanged && func_ov137_021ef5b8(walker)) {
-            func_ov137_021f0f64(walker->person);
+        if (walker->objCodeChanged && ResortWalker_IsIdle(walker)) {
+            ResortPerson_UpdateObjCode(walker->person);
             walker->objCodeChanged = FALSE;
         }
     }
 }
 
-static void func_ov137_021ef418(ResortWalker *walker, ResortPerson *person, void *shops, void *unkb1c,
+static void ResortWalker_Assign(ResortWalker *walker, ResortPerson *person, void *shops, void *unkb1c,
                                 JoinAvenueOccupants *occupants) {
-    func_ov137_021ef470(walker);
+    ResortWalker_Clear(walker);
     walker->person = person;
-    func_ov012_021682e8(func_ov137_021f110c(person), &sWalkerMoveCode);
-    func_ov137_021f1070(walker->person, FALSE);
-    func_ov137_021ef9a8(walker, shops, unkb1c, occupants);
-    switch (func_ov137_021f10f4(walker->person, 0)) {
+    FldAct_SetMoveCodeFuncs(ResortPerson_GetActor(person), &sWalkerMoveCode);
+    ResortPerson_SetVisible(walker->person, FALSE);
+    ResortWalker_FindStops(walker, shops, unkb1c, occupants);
+    switch (ResortPerson_GetAttr(walker->person, 0)) {
     case 1:
     case 2:
-        walker->start = func_ov137_021ef644;
-        walker->update = func_ov137_021ef984;
+        walker->start = ResortWalker_SetupWalk;
+        walker->update = ResortWalker_RunStates;
         break;
     }
 }
 
-static void func_ov137_021ef470(ResortWalker *walker) {
+static void ResortWalker_Clear(ResortWalker *walker) {
     MI_CpuFill8(walker, 0, sizeof(ResortWalker));
     walker->magic = 0x765f573;
 }
 
-static BOOL func_ov137_021ef488(const ResortWalker *walker, ResortPerson *person) {
+static BOOL ResortWalker_IsPerson(const ResortWalker *walker, ResortPerson *person) {
     if (person == walker->person) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov137_021ef498(const ResortWalker *walker) {
+static BOOL ResortWalker_IsAssigned(const ResortWalker *walker) {
     if (walker->person != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov137_021ef4a8(ResortWalker *walker, u16 acmd, u16 dir, u16 x) {
-    func_ov137_021ef4b8(walker, acmd, dir, x, 0);
+static void ResortWalker_Start(ResortWalker *walker, u16 acmd, u16 dir, u16 x) {
+    ResortWalker_StartAt(walker, acmd, dir, x, 0);
 }
 
-static void func_ov137_021ef4b8(ResortWalker *walker, u16 acmd, u16 dir, u16 x, u16 z) {
+static void ResortWalker_StartAt(ResortWalker *walker, u16 acmd, u16 dir, u16 x, u16 z) {
     FieldActor *actor;
 
     walker->state = 0;
     walker->active = TRUE;
     walker->acmd = acmd;
     walker->dir = dir;
-    actor = func_ov137_021f110c(walker->person);
-    if (func_ov137_021ef5c8(walker)) {
+    actor = ResortPerson_GetActor(walker->person);
+    if (ResortWalker_IsAtOrigin(walker)) {
         if (walker->dir == DIR_UP) {
             if (z == 0) {
                 z = 77;
@@ -759,12 +760,12 @@ static void func_ov137_021ef4b8(ResortWalker *walker, u16 acmd, u16 dir, u16 x, 
                 walker->steps = 1;
             }
         }
-        func_ov137_021ef304(actor, x, z);
+        ResortField_SetActorPos(actor, x, z);
     } else {
         s16 actorZ = GetGPosZ(actor);
         if (walker->dir == DIR_UP) {
             if (actorZ < 9) {
-                func_ov137_021ef304(actor, x, 77);
+                ResortField_SetActorPos(actor, x, 77);
                 walker->steps = 69;
                 if (walker->steps <= 0) {
                     walker->steps = 1;
@@ -774,11 +775,11 @@ static void func_ov137_021ef4b8(ResortWalker *walker, u16 acmd, u16 dir, u16 x, 
                 if (walker->steps <= 0) {
                     walker->steps = 1;
                 }
-                func_ov137_021ef304(actor, x, actorZ);
+                ResortField_SetActorPos(actor, x, actorZ);
             }
         } else if (walker->dir == DIR_DOWN) {
             if (actorZ > 77) {
-                func_ov137_021ef304(actor, x, 9);
+                ResortField_SetActorPos(actor, x, 9);
                 walker->steps = 69;
                 if (walker->steps <= 0) {
                     walker->steps = 1;
@@ -788,26 +789,26 @@ static void func_ov137_021ef4b8(ResortWalker *walker, u16 acmd, u16 dir, u16 x, 
                 if (walker->steps <= 0) {
                     walker->steps = 1;
                 }
-                func_ov137_021ef304(actor, x, actorZ);
+                ResortField_SetActorPos(actor, x, actorZ);
             }
         }
     }
-    func_ov137_021f1070(walker->person, TRUE);
-    func_ov137_021f10dc(walker->person, 38, 1);
+    ResortPerson_SetVisible(walker->person, TRUE);
+    ResortPerson_SetParam(walker->person, 38, 1);
     if (walker->start != NULL) {
         walker->start(walker);
     }
 }
 
-static BOOL func_ov137_021ef5b8(ResortWalker *walker) {
+static BOOL ResortWalker_IsIdle(ResortWalker *walker) {
     if (walker->active == FALSE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov137_021ef5c8(ResortWalker *walker) {
-    FieldActor *actor = func_ov137_021f110c(walker->person);
+static BOOL ResortWalker_IsAtOrigin(ResortWalker *walker) {
+    FieldActor *actor = ResortPerson_GetActor(walker->person);
     s16 x = GetGPosX(actor);
     s16 z = GetGPosZ(actor);
     if (x == 0 && z == 0) {
@@ -816,32 +817,32 @@ static BOOL func_ov137_021ef5c8(ResortWalker *walker) {
     return FALSE;
 }
 
-static void func_ov137_021ef5f0(ResortWalker *walker) {
+static void ResortWalker_MarkObjCodeChanged(ResortWalker *walker) {
     walker->objCodeChanged = TRUE;
 }
 
-static BOOL func_ov137_021ef5f8(ResortWalker *walker) {
-    u32 type = func_ov137_021f10f4(walker->person, 0);
-    u32 value = func_ov137_021f10e8(walker->person, 31, NULL);
+static BOOL ResortWalker_IsFast(ResortWalker *walker) {
+    u32 type = ResortPerson_GetAttr(walker->person, 0);
+    u32 value = ResortPerson_GetParam(walker->person, 31, NULL);
     if (type == 1 && (value == 2 || value == 3)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov137_021ef624(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player, u32 a3, u32 a4) {
-    if (ActorRouteCollCheckOneTileInDir(func_ov137_021f110c(walker->person), walker->dir) & 4) {
+static BOOL ResortWalker_IsBlocked(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player, u32 a3, u32 a4) {
+    if (ActorRouteCollCheckOneTileInDir(ResortPerson_GetActor(walker->person), walker->dir) & 4) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov137_021ef644(ResortWalker *walker) {
+static void ResortWalker_SetupWalk(ResortWalker *walker) {
     s16 stepSpeed;
-    u16 speed = func_ov137_021f10e8(walker->person, 34, NULL);
+    u16 speed = ResortPerson_GetParam(walker->person, 34, NULL);
 
-    if (func_ov137_021f10f4(walker->person, 0) == 1) {
-        u32 value = func_ov137_021f10e8(walker->person, 31, NULL);
+    if (ResortPerson_GetAttr(walker->person, 0) == 1) {
+        u32 value = ResortPerson_GetParam(walker->person, 31, NULL);
         if (value == 2 || value == 3) {
             speed = 7;
         }
@@ -858,57 +859,57 @@ static void func_ov137_021ef644(ResortWalker *walker) {
     walker->unk26 = walker->steps - walker->unk28;
 }
 
-static BOOL func_ov137_021ef6d4(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+static BOOL ResortWalker_StateCheckSteps(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
     if (walker->steps <= 0) {
         walker->active = FALSE;
         walker->state = 0;
-        func_ov137_021f1070(walker->person, FALSE);
-        func_ov137_021ef304(func_ov137_021f110c(walker->person), 0, 0);
-        func_ov137_021f10dc(walker->person, 38, 0);
+        ResortPerson_SetVisible(walker->person, FALSE);
+        ResortField_SetActorPos(ResortPerson_GetActor(walker->person), 0, 0);
+        ResortPerson_SetParam(walker->person, 38, 0);
         return FALSE;
     }
     walker->state = 1;
     return TRUE;
 }
 
-static BOOL func_ov137_021ef710(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
-    FieldActor *actor = func_ov137_021f110c(walker->person);
+static BOOL ResortWalker_StateStep(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+    FieldActor *actor = ResortPerson_GetActor(walker->person);
 
-    if (func_ov137_021ef624(walker, mmSys, player, 1, 0)) {
-        func_ov012_02166eb0(actor, 0x3f);
-        func_ov012_021674b0(actor);
+    if (ResortWalker_IsBlocked(walker, mmSys, player, 1, 0)) {
+        FldAct_SetLocalAcmd(actor, 0x3f);
+        FldAct_SetMoving(actor);
         walker->state = 2;
-    } else if (func_ov137_021efa68(walker, player)) {
+    } else if (ResortWalker_CheckStop(walker, player)) {
         walker->state = 4;
     } else if (walker->unk26 == walker->steps) {
         walker->lookState = 0;
         walker->state = 3;
     } else {
-        func_ov012_02166eb0(actor, GetAcmdForDir(walker->dir, walker->acmd));
+        FldAct_SetLocalAcmd(actor, GetAcmdForDir(walker->dir, walker->acmd));
         SetActorMotionDir(actor, walker->dir);
-        func_ov012_021674b0(actor);
+        FldAct_SetMoving(actor);
         walker->steps--;
         walker->state = 2;
     }
     return TRUE;
 }
 
-static BOOL func_ov137_021ef798(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
-    FieldActor *actor = func_ov137_021f110c(walker->person);
+static BOOL ResortWalker_StateWaitStep(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+    FieldActor *actor = ResortPerson_GetActor(walker->person);
     if (func_ov036_0218f01c(actor)) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         walker->state = 0;
     }
     return FALSE;
 }
 
-static BOOL func_ov137_021ef7bc(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
-    FieldActor *actor = func_ov137_021f110c(walker->person);
+static BOOL ResortWalker_StateLookAround(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+    FieldActor *actor = ResortPerson_GetActor(walker->person);
 
     switch (walker->lookState) {
     case 0:
         walker->lookDir = GFL_RandomMTRange(2) ? DIR_LEFT : DIR_RIGHT;
-        func_ov012_02166eb0(actor, walker->lookDir);
+        FldAct_SetLocalAcmd(actor, walker->lookDir);
         walker->lookState++;
     case 1:
         if (func_ov036_0218f01c(actor)) {
@@ -925,7 +926,7 @@ static BOOL func_ov137_021ef7bc(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
         }
     case 3:
         walker->lookDir = walker->lookDir == DIR_RIGHT ? DIR_LEFT : DIR_RIGHT;
-        func_ov012_02166eb0(actor, walker->lookDir);
+        FldAct_SetLocalAcmd(actor, walker->lookDir);
         walker->lookState++;
     case 4:
         if (func_ov036_0218f01c(actor)) {
@@ -947,14 +948,14 @@ static BOOL func_ov137_021ef7bc(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
     return TRUE;
 }
 
-static BOOL func_ov137_021ef8e4(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
-    FieldActor *actor = func_ov137_021f110c(walker->person);
+static BOOL ResortWalker_StateStopAtShop(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+    FieldActor *actor = ResortPerson_GetActor(walker->person);
 
     switch (walker->stopState) {
     case 0:
-        func_ov012_021674bc(actor);
-        func_ov012_021674e8(actor);
-        func_ov012_02166eb0(actor, walker->stopAcmd[walker->stop]);
+        FldAct_ClearMoving(actor);
+        FldAct_ClearMoveEnd(actor);
+        FldAct_SetLocalAcmd(actor, walker->stopAcmd[walker->stop]);
         walker->stopState++;
     case 1:
         if (func_ov036_0218f01c(actor)) {
@@ -978,19 +979,19 @@ static BOOL func_ov137_021ef8e4(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
     return TRUE;
 }
 
-static void func_ov137_021ef984(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
+static void ResortWalker_RunStates(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
     while (sWalkerStates[walker->state](walker, mmSys, player) == TRUE) {
     }
 }
 
-static void func_ov137_021ef9a8(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants) {
+static void ResortWalker_FindStops(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants) {
     int i;
-    u16 id = func_ov137_021f10e8(walker->person, 19, NULL);
+    u16 id = ResortPerson_GetParam(walker->person, 19, NULL);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetShop(shops, id), 0);
 
-    GetGPosZ(func_ov137_021f110c(walker->person));
+    GetGPosZ(ResortPerson_GetActor(walker->person));
     for (i = 0; i < RESORT_WALKER_STOPS; i++) {
-        JoinAvenuePerson *occupant = func_02038860(occupants, i);
+        JoinAvenuePerson *occupant = JoinAvenueOccupants_GetPerson(occupants, i);
         if (!JoinAvenuePerson_IsEmpty(occupant) &&
             shop == ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shops, occupant), 0)) {
             u16 z = ResortBinary_Get(unkb1c, i, 2);
@@ -1002,12 +1003,12 @@ static void func_ov137_021ef9a8(ResortWalker *walker, void *shops, void *unkb1c,
     walker->stop = walker->stopCount;
 }
 
-static BOOL func_ov137_021efa68(ResortWalker *walker, FieldPlayer *player) {
+static BOOL ResortWalker_CheckStop(ResortWalker *walker, FieldPlayer *player) {
     s16 x;
     s16 y;
     s16 z;
     int i;
-    FieldActor *actor = func_ov137_021f110c(walker->person);
+    FieldActor *actor = ResortPerson_GetActor(walker->person);
     s16 actorZ;
 
     FieldPlayer_GetGPos(player, &x, &y, &z);
@@ -1025,39 +1026,40 @@ static BOOL func_ov137_021efa68(ResortWalker *walker, FieldPlayer *player) {
     return FALSE;
 }
 
-static void func_ov137_021efaf0(FieldActor *actor) {
+static void ResortWalkerMove_Unk4(FieldActor *actor) {
 }
 
-static void func_ov137_021efaf4(FieldActor *actor) {
+static void ResortWalkerMove_Update(FieldActor *actor) {
     MMSys *mmSys = GetActorMModelSystem(actor);
     Field *field = GetMMSysField(mmSys);
     ResortFieldWork *work = Field_GetGimmickWorkBlock(field, 1);
-    ResortWalkers *walkers = func_ov137_021f05ac(work->people);
-    ResortWalker *walker = func_ov137_021ef340(walkers, func_ov137_021f15cc(func_ov137_021f059c(work->people), actor));
+    ResortWalkers *walkers = ResortFieldPeople_GetWalkers(work->people);
+    ResortWalker *walker =
+        ResortWalkers_Find(walkers, ResortPeople_FindByActor(ResortFieldPeople_GetPeople(work->people), actor));
 
     if (walker->update != NULL && walker->active) {
         walker->update(walker, mmSys, Field_GetPlayer(field));
     }
 }
 
-static void func_ov137_021efb48(FieldActor *actor) {
+static void ResortWalkerMove_Unk0C(FieldActor *actor) {
 }
 
-static void func_ov137_021efb4c(FieldActor *actor) {
+static void ResortWalkerMove_Unk10(FieldActor *actor) {
 }
 
-static void func_ov137_021efb50(ResortWalkerGroup *group, u16 x, u16 dir, HeapID heapId) {
+static void ResortWalkerGroup_Init(ResortWalkerGroup *group, u16 x, u16 dir, HeapID heapId) {
     MI_CpuFill8(group, 0, sizeof(ResortWalkerGroup));
     group->x = x;
     group->dir = dir;
     group->timer = GFL_RandomMTRange(239) + 1;
 }
 
-static void func_ov137_021efb78(ResortWalkerGroup *group) {
+static void ResortWalkerGroup_Clear(ResortWalkerGroup *group) {
     MI_CpuFill8(group, 0, sizeof(ResortWalkerGroup));
 }
 
-static void func_ov137_021efb84(ResortWalkerGroup *group, FieldPlayer *player) {
+static void ResortWalkerGroup_Update(ResortWalkerGroup *group, FieldPlayer *player) {
     int i;
     u32 active = 0;
     FieldActor *actor = FieldPlayer_GetActor(player);
@@ -1076,7 +1078,7 @@ static void func_ov137_021efb84(ResortWalkerGroup *group, FieldPlayer *player) {
         }
     }
     for (i = 0; i < RESORT_WALKER_GROUP_SIZE; i++) {
-        if (group->walkers[i] != NULL && !func_ov137_021ef5b8(group->walkers[i])) {
+        if (group->walkers[i] != NULL && !ResortWalker_IsIdle(group->walkers[i])) {
             active++;
         }
     }
@@ -1087,12 +1089,12 @@ static void func_ov137_021efb84(ResortWalkerGroup *group, FieldPlayer *player) {
         group->next++;
         group->next %= RESORT_WALKER_GROUP_SIZE;
     }
-    if (func_ov137_021ef5f8(group->walkers[group->next])) {
+    if (ResortWalker_IsFast(group->walkers[group->next])) {
         group->timer = 0;
     }
     if (group->timer-- <= 0) {
-        if (func_ov137_021ef5b8(group->walkers[group->next])) {
-            func_ov137_021ef4a8(group->walkers[group->next], 12, group->dir, group->x);
+        if (ResortWalker_IsIdle(group->walkers[group->next])) {
+            ResortWalker_Start(group->walkers[group->next], 12, group->dir, group->x);
             group->timer = GFL_RandomMTRange(239) + 1;
         }
         group->next++;
@@ -1100,25 +1102,25 @@ static void func_ov137_021efb84(ResortWalkerGroup *group, FieldPlayer *player) {
     }
 }
 
-static void func_ov137_021efc78(ResortWalkerGroup *group, u32 mode) {
+static void ResortWalkerGroup_Place(ResortWalkerGroup *group, u32 mode) {
     int i;
     for (i = 0; i < RESORT_WALKER_GROUP_SIZE; i++) {
-        if (group->walkers[i] != NULL && func_ov137_021ef498(group->walkers[i])) {
+        if (group->walkers[i] != NULL && ResortWalker_IsAssigned(group->walkers[i])) {
             if (mode == 0) {
-                if (func_ov137_021ef5c8(group->walkers[i])) {
+                if (ResortWalker_IsAtOrigin(group->walkers[i])) {
                     u16 z;
                     if (group->dir == DIR_UP) {
                         z = (GFL_RandomMTRange(8) + 8) * i;
                     } else {
                         z = (GFL_RandomMTRange(8) + 8) * (4 - i);
                     }
-                    func_ov137_021ef4b8(group->walkers[i], 12, group->dir, group->x, z);
+                    ResortWalker_StartAt(group->walkers[i], 12, group->dir, group->x, z);
                     group->next = i + 1;
                     group->next %= RESORT_WALKER_GROUP_SIZE;
                 }
             } else if (mode == 1) {
-                if (!func_ov137_021ef5c8(group->walkers[i])) {
-                    func_ov137_021ef4a8(group->walkers[i], 12, group->dir, group->x);
+                if (!ResortWalker_IsAtOrigin(group->walkers[i])) {
+                    ResortWalker_Start(group->walkers[i], 12, group->dir, group->x);
                     group->timer = GFL_RandomMTRange(239) + 1;
                     group->next = i + 1;
                     group->next %= RESORT_WALKER_GROUP_SIZE;
@@ -1128,21 +1130,21 @@ static void func_ov137_021efc78(ResortWalkerGroup *group, u32 mode) {
     }
 }
 
-static void func_ov137_021efd2c(ResortWalkerGroup *group, u16 slot, ResortWalker *walker) {
+static void ResortWalkerGroup_Add(ResortWalkerGroup *group, u16 slot, ResortWalker *walker) {
     group->walkers[slot] = walker;
     group->count++;
 }
 
-static void func_ov137_021efd38(ResortWalkerGroup *group, u16 slot) {
+static void ResortWalkerGroup_Remove(ResortWalkerGroup *group, u16 slot) {
     group->count--;
     group->walkers[slot] = NULL;
 }
 
-static BOOL func_ov137_021efd48(ResortPerson *person, u16 *group, u16 *slot) {
+static BOOL ResortField_GetWalkerPlace(ResortPerson *person, u16 *group, u16 *slot) {
     u32 i;
-    ResortPersonData *data = func_ov137_021f1110(person);
-    u32 kind = func_ov137_021f1988(data);
-    u16 index = func_ov137_021f198c(data);
+    ResortPersonData *data = ResortPerson_GetData(person);
+    u32 kind = ResortData_GetKind(data);
+    u16 index = ResortData_GetIndex(data);
 
     for (i = 0; i < NELEMS(sWalkerPlaces); i++) {
         if (kind == sWalkerPlaces[i].kind && index == sWalkerPlaces[i].index) {
@@ -1154,8 +1156,8 @@ static BOOL func_ov137_021efd48(ResortPerson *person, u16 *group, u16 *slot) {
     return FALSE;
 }
 
-static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortPersonData **datas, JoinAvenueInfo *info,
-                                          JoinAvenueOccupants *occupants, BOOL enabled) {
+static ResortBubbles *ResortBubbles_Create(HeapID heapId, void *msgBGSys, ResortPersonData **datas,
+                                           JoinAvenueInfo *info, JoinAvenueOccupants *occupants, BOOL enabled) {
     int i;
     ResortBubbles *bubbles = GFL_HeapAllocate(heapId, sizeof(ResortBubbles), TRUE, "resort_field.c", 2612);
 
@@ -1166,23 +1168,23 @@ static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortP
     bubbles->enabled = enabled;
     bubbles->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_JOIN_AVENUE, heapId);
     for (i = 0; i < RESORT_BUBBLES; i++) {
-        func_ov137_021f022c(&bubbles->bubbles[i], i, heapId);
+        ResortBubble_Init(&bubbles->bubbles[i], i, heapId);
     }
-    func_ov137_021f00d8(bubbles);
+    ResortBubbles_UpdateInterval(bubbles);
     return bubbles;
 }
 
-static void func_ov137_021efe1c(ResortBubbles *bubbles) {
+static void ResortBubbles_Free(ResortBubbles *bubbles) {
     int i;
     for (i = 0; i < RESORT_BUBBLES; i++) {
-        func_ov137_021f03f8(&bubbles->bubbles[i], bubbles->msgBGSys);
-        func_ov137_021f024c(&bubbles->bubbles[i]);
+        ResortBubble_Hide(&bubbles->bubbles[i], bubbles->msgBGSys);
+        ResortBubble_Free(&bubbles->bubbles[i]);
     }
     GFL_MsgDataFree(bubbles->msgData);
     GFL_HeapFree(bubbles);
 }
 
-static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
+static void ResortBubbles_Update(ResortBubbles *bubbles, Field *field) {
     BOOL run = FALSE;
     BOOL clear = FALSE;
     int i;
@@ -1205,7 +1207,7 @@ static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
             if (bubbles->timer++ < bubbles->interval) {
                 break;
             }
-            func_ov137_021f00d8(bubbles);
+            ResortBubbles_UpdateInterval(bubbles);
             bubbles->shown = 0;
             bubbles->count = GFL_RandomMTRange(2) + 1;
             bubbles->delay = 0;
@@ -1226,7 +1228,7 @@ static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
             if (bubbles->delay++ < bubbles->delayTime) {
                 break;
             }
-            data = func_ov137_021f0164(bubbles);
+            data = ResortBubbles_PickData(bubbles);
             tries = 0;
             bubbles->delay = 0;
             if (data == NULL) {
@@ -1245,7 +1247,7 @@ static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
                         bubbles->state = 2;
                         return;
                     }
-                } while (func_ov137_021f0280(bubble, bubbles->bubbleIndexes[0], bubbles->mode));
+                } while (ResortBubble_Overlaps(bubble, bubbles->bubbleIndexes[0], bubbles->mode));
                 break;
             case 2:
                 do {
@@ -1255,16 +1257,16 @@ static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
                         bubbles->state = 2;
                         return;
                     }
-                } while (func_ov137_021f0280(bubble, bubbles->bubbleIndexes[0], bubbles->mode) ||
-                         func_ov137_021f0280(bubble, bubbles->bubbleIndexes[1], bubbles->mode));
+                } while (ResortBubble_Overlaps(bubble, bubbles->bubbleIndexes[0], bubbles->mode) ||
+                         ResortBubble_Overlaps(bubble, bubbles->bubbleIndexes[1], bubbles->mode));
                 break;
             }
             bubbles->bubbleIndexes[bubbles->shown] = bubble;
             if (bubbles->mode == TRUE) {
                 bubbles->unk10 = GFL_RandomMTRange(4) + 4;
             }
-            func_ov137_021f02f0(&bubbles->bubbles[bubble], bubbles->msgBGSys, data, bubbles->info, bubbles->occupants,
-                                bubbles->msgData, bubbles->unk10, bubbles->mode);
+            ResortBubble_Show(&bubbles->bubbles[bubble], bubbles->msgBGSys, data, bubbles->info, bubbles->occupants,
+                              bubbles->msgData, bubbles->unk10, bubbles->mode);
             if (bubbles->shown++ >= bubbles->count) {
                 bubbles->state = 2;
             }
@@ -1273,7 +1275,7 @@ static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
         case 2: {
             BOOL done = TRUE;
             for (i = 0; i < bubbles->count; i++) {
-                done &= func_ov137_021f041c(&bubbles->bubbles[bubbles->bubbleIndexes[i]]);
+                done &= ResortBubble_IsDone(&bubbles->bubbles[bubbles->bubbleIndexes[i]]);
             }
             if (done) {
                 bubbles->state = 0;
@@ -1283,53 +1285,53 @@ static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field) {
         }
         }
         for (i = 0; i < RESORT_BUBBLES; i++) {
-            func_ov137_021f0264(&bubbles->bubbles[i], bubbles->msgBGSys);
+            ResortBubble_Update(&bubbles->bubbles[i], bubbles->msgBGSys);
         }
     } else if (clear) {
-        func_ov137_021f007c(bubbles);
+        ResortBubbles_HideAll(bubbles);
     }
 }
 
-static void func_ov137_021f007c(ResortBubbles *bubbles) {
+static void ResortBubbles_HideAll(ResortBubbles *bubbles) {
     int i;
     for (i = 0; i < RESORT_BUBBLES; i++) {
-        func_ov137_021f03f8(&bubbles->bubbles[i], bubbles->msgBGSys);
+        ResortBubble_Hide(&bubbles->bubbles[i], bubbles->msgBGSys);
     }
 }
 
-static void func_ov137_021f009c(ResortBubbles *bubbles) {
+static void ResortBubbles_Enable(ResortBubbles *bubbles) {
     bubbles->enabled = TRUE;
 }
 
-static void func_ov137_021f00a4(ResortBubbles *bubbles) {
+static void ResortBubbles_SetEventMode(ResortBubbles *bubbles) {
     bubbles->mode = TRUE;
 }
 
-static void func_ov137_021f00ac(ResortBubbles *bubbles, BOOL start) {
+static void ResortBubbles_SetActive(ResortBubbles *bubbles, BOOL start) {
     if (bubbles->mode == TRUE) {
         if (start) {
             bubbles->state = 0;
             bubbles->timer = bubbles->interval;
             bubbles->active = TRUE;
         } else {
-            func_ov137_021f007c(bubbles);
+            ResortBubbles_HideAll(bubbles);
             bubbles->active = FALSE;
         }
     }
 }
 
 // The more people there are, the more often the bubbles show
-static void func_ov137_021f00d8(ResortBubbles *bubbles) {
+static void ResortBubbles_UpdateInterval(ResortBubbles *bubbles) {
     u32 count = 0;
-    ResortDataIter iter = func_ov137_021f1ae0(bubbles->datas, sBubbleIntervalKinds, 4);
+    ResortDataIter iter = ResortDatas_StartIter(bubbles->datas, sBubbleIntervalKinds, 4);
     ResortPersonData *data;
 
     while (TRUE) {
-        data = func_ov137_021f1b0c(bubbles->datas, &iter, sBubbleIntervalKinds, 4);
+        data = ResortDatas_NextIter(bubbles->datas, &iter, sBubbleIntervalKinds, 4);
         if (data == NULL) {
             break;
         }
-        if (!func_ov137_021f195c(data)) {
+        if (!ResortData_IsEmpty(data)) {
             count++;
         }
     }
@@ -1352,28 +1354,28 @@ static u16 sDataIndexes[36];
 static u32 sDataKinds[36];
 
 // A random data of the people who are not empty
-static ResortPersonData *func_ov137_021f0164(ResortBubbles *bubbles) {
+static ResortPersonData *ResortBubbles_PickData(ResortBubbles *bubbles) {
     int count = 0;
-    ResortDataIter iter = func_ov137_021f1ae0(bubbles->datas, sBubbleKinds, 4);
+    ResortDataIter iter = ResortDatas_StartIter(bubbles->datas, sBubbleKinds, 4);
     ResortPersonData *data;
 
     while (TRUE) {
-        data = func_ov137_021f1b0c(bubbles->datas, &iter, sBubbleKinds, 4);
+        data = ResortDatas_NextIter(bubbles->datas, &iter, sBubbleKinds, 4);
         if (data == NULL) {
             break;
         }
-        if (func_ov137_021f195c(data)) {
+        if (ResortData_IsEmpty(data)) {
             continue;
         }
-        sDataKinds[count] = func_ov137_021f1988(data);
-        sDataIndexes[count] = func_ov137_021f198c(data);
+        sDataKinds[count] = ResortData_GetKind(data);
+        sDataIndexes[count] = ResortData_GetIndex(data);
         count++;
     }
     if (count == 0) {
         return NULL;
     }
     if (count == 1) {
-        return func_ov137_021f1b94(bubbles->datas, sDataKinds[0], sDataIndexes[0]);
+        return ResortDatas_Get(bubbles->datas, sDataKinds[0], sDataIndexes[0]);
     }
     {
         int n = 0;
@@ -1382,35 +1384,35 @@ static ResortPersonData *func_ov137_021f0164(ResortBubbles *bubbles) {
 
         for (i = 0; i < count; i++) {
             if (n++ == chosen) {
-                return func_ov137_021f1b94(bubbles->datas, sDataKinds[i], sDataIndexes[i]);
+                return ResortDatas_Get(bubbles->datas, sDataKinds[i], sDataIndexes[i]);
             }
         }
     }
     return NULL;
 }
 
-static void func_ov137_021f022c(ResortBubble *bubble, u16 index, HeapID heapId) {
+static void ResortBubble_Init(ResortBubble *bubble, u16 index, HeapID heapId) {
     MI_CpuFill8(bubble, 0, sizeof(ResortBubble));
     bubble->strbuf = GFL_StrBufCreate(33, heapId);
     bubble->index = index;
 }
 
-static void func_ov137_021f024c(ResortBubble *bubble) {
+static void ResortBubble_Free(ResortBubble *bubble) {
     GFL_StrBufFree(bubble->strbuf);
     MI_CpuFill8(bubble, 0, sizeof(ResortBubble));
 }
 
-static void func_ov137_021f0264(ResortBubble *bubble, void *msgBGSys) {
+static void ResortBubble_Update(ResortBubble *bubble, void *msgBGSys) {
     if (bubble->active) {
         bubble->timer++;
         if (bubble->timer >= 60) {
-            func_ov137_021f03f8(bubble, msgBGSys);
+            ResortBubble_Hide(bubble, msgBGSys);
         }
     }
 }
 
 // Whether the bubbles at two places overlap
-static BOOL func_ov137_021f0280(u16 a, u16 b, BOOL mode) {
+static BOOL ResortBubble_Overlaps(u16 a, u16 b, BOOL mode) {
     const u8 *xs = sBubbleXs0;
     int width = 14;
     s16 bx;
@@ -1437,8 +1439,8 @@ static BOOL func_ov137_021f0280(u16 a, u16 b, BOOL mode) {
     return (aBottom >= by) & ((ay <= bBottom) & ((ax <= bRight) & (aRight >= bx)));
 }
 
-static void func_ov137_021f02f0(ResortBubble *bubble, void *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
-                                JoinAvenueOccupants *occupants, MsgData *msgData, u32 kind, BOOL mode) {
+static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
+                              JoinAvenueOccupants *occupants, MsgData *msgData, u32 kind, BOOL mode) {
     u32 style;
     u8 width;
     u8 height;
@@ -1450,7 +1452,7 @@ static void func_ov137_021f02f0(ResortBubble *bubble, void *msgBGSys, ResortPers
     switch (kind) {
     case 0: {
         u16 name[10];
-        func_ov137_021f1968(data, 5, name);
+        ResortData_GetParam(data, 5, name);
         GFL_StrBufLoadString(bubble->strbuf, name);
         break;
     }
@@ -1458,28 +1460,28 @@ static void func_ov137_021f02f0(ResortBubble *bubble, void *msgBGSys, ResortPers
     case 3:
     default: {
         u16 text[9];
-        func_ov137_021f1968(data, 88, text);
+        ResortData_GetParam(data, 88, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
     }
     case 2: {
         u16 text[9];
-        func_ov137_021f1968(data, 89, text);
+        ResortData_GetParam(data, 89, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 2;
         break;
     }
     case 4: {
         u16 text[9];
-        joinAveTextHandler(func_02038a18(occupants), 88, text);
+        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), 88, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
     }
     case 5: {
         u16 text[9];
-        joinAveTextHandler(func_02038a18(occupants), 89, text);
+        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), 89, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
@@ -1505,27 +1507,27 @@ static void func_ov137_021f02f0(ResortBubble *bubble, void *msgBGSys, ResortPers
                         style);
 }
 
-static void func_ov137_021f03f8(ResortBubble *bubble, void *msgBGSys) {
+static void ResortBubble_Hide(ResortBubble *bubble, void *msgBGSys) {
     if (bubble->active) {
         func_ov036_02188e90(msgBGSys, bubble->index);
-        func_ov137_021f0414(bubble);
+        ResortBubble_Reset(bubble);
     }
 }
 
-static void func_ov137_021f0414(ResortBubble *bubble) {
+static void ResortBubble_Reset(ResortBubble *bubble) {
     bubble->timer = 0;
     bubble->active = FALSE;
 }
 
-static BOOL func_ov137_021f041c(ResortBubble *bubble) {
+static BOOL ResortBubble_IsDone(ResortBubble *bubble) {
     if (bubble->active == FALSE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMSys *mmSys, FieldPlayer *player,
-                                              BOOL flag, u32 a5) {
+static ResortFieldPeople *ResortFieldPeople_Create(HeapID heapId, ResortSys *sys, MMSys *mmSys, FieldPlayer *player,
+                                                   BOOL flag, u32 a5) {
     ResortWatchSetup watchSetup;
     ResortPeopleSetup peopleSetup;
     ResortFieldPeople *people = GFL_HeapAllocate(heapId, sizeof(ResortFieldPeople), TRUE, "resort_field.c", 3601);
@@ -1536,9 +1538,9 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
     watchSetup.list2 = ResortSys_GetList2(sys);
     watchSetup.entries = ResortSys_GetEntries(sys);
     watchSetup.context = people;
-    watchSetup.callback = flag ? func_ov137_021f0720 : func_ov137_021f067c;
+    watchSetup.callback = flag ? ResortFieldPeople_WatchCallbackFiltered : ResortFieldPeople_WatchCallback;
     watchSetup.interval = 0;
-    people->watch = func_ov137_021eef7c(heapId, &watchSetup);
+    people->watch = ResortWatch_Create(heapId, &watchSetup);
 
     MI_CpuFill8(&peopleSetup, 0, sizeof(ResortPeopleSetup));
     peopleSetup.mmSys = mmSys;
@@ -1547,65 +1549,65 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
     peopleSetup.count = 64;
     peopleSetup.zone = 1;
     peopleSetup.shops = ResortSys_GetShopData(sys);
-    peopleSetup.unk18 = ResortSys_GetUnk20Table(sys);
-    people->people = func_ov137_021f12b4(&peopleSetup, heapId);
-    people->walkers = func_ov137_021ef124(heapId, mmSys, player, ResortSys_GetShopData(sys),
-                                          ResortSys_GetUnk20Table(sys), ResortSys_GetOccupants(sys));
+    peopleSetup.unk18 = ResortSys_GetPosOffsets(sys);
+    people->people = ResortPeople_Create(&peopleSetup, heapId);
+    people->walkers = ResortWalkers_Create(heapId, mmSys, player, ResortSys_GetShopData(sys),
+                                           ResortSys_GetPosOffsets(sys), ResortSys_GetOccupants(sys));
     return people;
 }
 
-static void func_ov137_021f0508(ResortFieldPeople *people, BOOL flag, u32 a2) {
+static void ResortFieldPeople_CreatePeople(ResortFieldPeople *people, BOOL flag, u32 a2) {
     int i;
 
     if (flag) {
-        func_ov137_021f13a4(people->people);
+        ResortPeople_CreateFromDatas(people->people);
     } else {
-        func_ov137_021f1350(people->people);
+        ResortPeople_CreateFromSlots(people->people);
     }
     for (i = 0; i < 64; i++) {
-        ResortPerson *person = func_ov137_021f1634(people->people, i);
+        ResortPerson *person = ResortPeople_GetByIndex(people->people, i);
         if (person != NULL) {
-            func_ov137_021ef250(people->walkers, person);
+            ResortWalkers_Add(people->walkers, person);
         }
     }
-    func_ov137_021ef234(people->walkers, 1);
+    ResortWalkers_Place(people->walkers, 1);
 }
 
-static void func_ov137_021f0540(ResortFieldPeople *people) {
-    func_ov137_021ef1b4(people->walkers);
-    func_ov137_021f1300(people->people);
-    func_ov137_021eefc4(people->watch);
+static void ResortFieldPeople_Free(ResortFieldPeople *people) {
+    ResortWalkers_Free(people->walkers);
+    ResortPeople_Free(people->people);
+    ResortWatch_Free(people->watch);
     GFL_HeapFree(people);
 }
 
-static void func_ov137_021f0560(ResortFieldPeople *people, Field *field) {
-    func_ov137_021eefd8(people->watch);
-    func_ov137_021f1348(people->people, Field_GetPlayer(field));
-    func_ov137_021ef1e8(people->walkers, field);
+static void ResortFieldPeople_Update(ResortFieldPeople *people, Field *field) {
+    ResortWatch_Update(people->watch);
+    ResortPeople_Update(people->people, Field_GetPlayer(field));
+    ResortWalkers_Update(people->walkers, field);
 }
 
-static void func_ov137_021f0584(ResortFieldPeople *people) {
-    func_ov137_021eeffc(people->watch);
-    func_ov137_021eeff8(people->watch, func_ov137_021f067c);
+static void ResortFieldPeople_UseNormalWatch(ResortFieldPeople *people) {
+    ResortWatch_MarkChanged(people->watch);
+    ResortWatch_SetCallback(people->watch, ResortFieldPeople_WatchCallback);
 }
 
-static ResortPeople *func_ov137_021f059c(ResortFieldPeople *people) {
+static ResortPeople *ResortFieldPeople_GetPeople(ResortFieldPeople *people) {
     return people->people;
 }
 
-static void func_ov137_021f05a0(ResortFieldPeople *people, ResortPerson *person) {
-    func_ov137_021ef2bc(people->walkers, person);
+static void ResortFieldPeople_RemoveWalker(ResortFieldPeople *people, ResortPerson *person) {
+    ResortWalkers_Remove(people->walkers, person);
 }
 
-static ResortWalkers *func_ov137_021f05ac(ResortFieldPeople *people) {
+static ResortWalkers *ResortFieldPeople_GetWalkers(ResortFieldPeople *people) {
     return people->walkers;
 }
 
 // Moves the occupants' actors to the shops' doors at x 11 or 19, and turns the NPCs to them
-static void func_ov137_021f05b0(ResortFieldPeople *people, ResortSys *sys, ResortNPC *npc) {
+static void ResortFieldPeople_PlaceAtShops(ResortFieldPeople *people, ResortSys *sys, ResortNPC *npc) {
     u32 i;
     ResortPersonData **datas = ResortSys_GetDatas(people->sys);
-    ResortDataIter iter = func_ov137_021f1ae0(datas, sWalkerOccupantKinds, 1);
+    ResortDataIter iter = ResortDatas_StartIter(datas, sWalkerOccupantKinds, 1);
     ResortPersonData *data;
 
     while (TRUE) {
@@ -1613,14 +1615,14 @@ static void func_ov137_021f05b0(ResortFieldPeople *people, ResortSys *sys, Resor
         s16 x;
         u16 dir;
 
-        data = func_ov137_021f1b0c(datas, &iter, sWalkerOccupantKinds, 1);
+        data = ResortDatas_NextIter(datas, &iter, sWalkerOccupantKinds, 1);
         if (data == NULL) {
             break;
         }
-        if (func_ov137_021f195c(data)) {
+        if (ResortData_IsEmpty(data)) {
             continue;
         }
-        actor = func_ov137_021f110c(func_ov137_021f163c(people->people, data));
+        actor = ResortPerson_GetActor(ResortPeople_FindByData(people->people, data));
         if (GetGPosX(actor) < 15) {
             x = 11;
             dir = DIR_RIGHT;
@@ -1630,19 +1632,19 @@ static void func_ov137_021f05b0(ResortFieldPeople *people, ResortSys *sys, Resor
         }
         SetActorGPos(actor, x, 0, GetGPosZ(actor), dir);
     }
-    for (i = 0; i < func_ov137_021f1d00(npc); i++) {
-        FieldActor *actor = func_ov137_021f1cc8(npc, i);
+    for (i = 0; i < ResortNPC_GetCount(npc); i++) {
+        FieldActor *actor = ResortNPC_GetActor(npc, i);
         if (actor != NULL) {
             ChangeActorMoveCodeSeq(actor, (GetGPosX(actor) < 15 ? DIR_RIGHT : DIR_LEFT) + 14);
         }
     }
 }
 
-static void func_ov137_021f0670(ResortFieldPeople *people) {
-    func_ov137_021eeffc(people->watch);
+static void ResortFieldPeople_MarkChanged(ResortFieldPeople *people) {
+    ResortWatch_MarkChanged(people->watch);
 }
 
-static BOOL func_ov137_021f067c(void *context, void *person, u32 a2, u32 event) {
+static BOOL ResortFieldPeople_WatchCallback(void *context, void *person, u32 a2, u32 event) {
     ResortFieldPeople *people = context;
 
     switch (event) {
@@ -1651,46 +1653,46 @@ static BOOL func_ov137_021f067c(void *context, void *person, u32 a2, u32 event) 
     case 0:
         return TRUE;
     case 3:
-        func_ov137_021ef2f4(people->walkers, func_ov137_021f1600(people->people, person));
+        ResortWalkers_MarkObjCodeChanged(people->walkers, ResortPeople_FindByJoinAvenuePerson(people->people, person));
         return TRUE;
     case 4:
         return TRUE;
     case 1: {
-        ResortPerson *resortPerson = func_ov137_021f1600(people->people, person);
+        ResortPerson *resortPerson = ResortPeople_FindByJoinAvenuePerson(people->people, person);
         if (resortPerson != NULL) {
-            func_ov137_021f05a0(people, resortPerson);
-            func_ov137_021f15ac(people->people, resortPerson);
+            ResortFieldPeople_RemoveWalker(people, resortPerson);
+            ResortPeople_Delete(people->people, resortPerson);
         }
     }
     case 2:
-        if (func_ov137_021f1600(people->people, person) == NULL) {
+        if (ResortPeople_FindByJoinAvenuePerson(people->people, person) == NULL) {
             ResortPersonSource source;
             MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
-            source.data = func_ov137_021f1b6c(ResortSys_GetDatas(people->sys), person);
+            source.data = ResortDatas_FindByPerson(ResortSys_GetDatas(people->sys), person);
             source.zone = 1;
-            func_ov137_021ef250(people->walkers, func_ov137_021f14a8(people->people, &source));
+            ResortWalkers_Add(people->walkers, ResortPeople_AddAtEmptySlot(people->people, &source));
         }
         return TRUE;
     }
     return TRUE;
 }
 
-static BOOL func_ov137_021f0720(void *context, void *person, u32 a2, u32 event) {
+static BOOL ResortFieldPeople_WatchCallbackFiltered(void *context, void *person, u32 a2, u32 event) {
     BOOL handle = FALSE;
 
     if (a2 == 1) {
-        u32 value = func_02037b38(person, 31, NULL);
+        u32 value = JoinAvenueEntry_GetParam(person, 31, NULL);
         if (value == 2 || value == 3) {
             handle = TRUE;
         }
     }
     if (handle) {
-        return func_ov137_021f067c(context, person, a2, event);
+        return ResortFieldPeople_WatchCallback(context, person, a2, event);
     }
     return FALSE;
 }
 
-static ResortFieldScene *func_ov137_021f0758(HeapID heapId, FieldExpObjSystem *expObj, FieldCamera *camera) {
+static ResortFieldScene *ResortFieldScene_Create(HeapID heapId, FieldExpObjSystem *expObj, FieldCamera *camera) {
     ResortFieldScene *scene = GFL_HeapAllocate(heapId, sizeof(ResortFieldScene), TRUE, "resort_field.c", 4098);
     scene->expObj = expObj;
     scene->camera = camera;
@@ -1698,12 +1700,12 @@ static ResortFieldScene *func_ov137_021f0758(HeapID heapId, FieldExpObjSystem *e
     return scene;
 }
 
-static void func_ov137_021f0790(ResortFieldScene *scene) {
+static void ResortFieldScene_Free(ResortFieldScene *scene) {
     FieldExpObj_FreeScene(scene->expObj, 0);
     GFL_HeapFree(scene);
 }
 
-static void func_ov137_021f07a4(ResortFieldScene *scene) {
+static void ResortFieldScene_Update(ResortFieldScene *scene) {
     int i;
 
     FieldExpObj_StepAllAnimations(scene->expObj);
@@ -1714,26 +1716,26 @@ static void func_ov137_021f07a4(ResortFieldScene *scene) {
     }
 }
 
-static void func_ov137_021f07d0(ResortFieldScene *scene, u32 index) {
+static void ResortFieldScene_StartAnim(ResortFieldScene *scene, u32 index) {
     scene->anims[index] = &sSceneAnims[index];
     scene->anims[index]->start(scene);
 }
 
-static BOOL func_ov137_021f07ec(ResortFieldScene *scene, u32 index) {
+static BOOL ResortFieldScene_IsAnimDone(ResortFieldScene *scene, u32 index) {
     if (scene->anims[index] == NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov137_021f0800(ResortFieldScene *scene, u32 index) {
+static void ResortFieldScene_EndAnim(ResortFieldScene *scene, u32 index) {
     if (scene->anims[index] != NULL) {
         scene->anims[index]->end(scene);
         scene->anims[index] = NULL;
     }
 }
 
-static void func_ov137_021f0818(ResortFieldScene *scene) {
+static void ResortSceneAnim0_Start(ResortFieldScene *scene) {
     u32 i = 0;
     SRTMatrix *matrix0 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 0);
     SRTMatrix *matrix1 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 1);
@@ -1756,7 +1758,7 @@ static void func_ov137_021f0818(ResortFieldScene *scene) {
     }
 }
 
-static BOOL func_ov137_021f08dc(ResortFieldScene *scene) {
+static BOOL ResortSceneAnim0_Update(ResortFieldScene *scene) {
     u32 i = 0;
     VecFx32 target;
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(scene->expObj, 0, 0, 0);
@@ -1783,7 +1785,7 @@ static BOOL func_ov137_021f08dc(ResortFieldScene *scene) {
     return FALSE;
 }
 
-static void func_ov137_021f09b4(ResortFieldScene *scene) {
+static void ResortSceneAnim0_End(ResortFieldScene *scene) {
     u32 i;
 
     FieldExpObj_SetActorHidden(scene->expObj, 0, 0, TRUE);
@@ -1800,13 +1802,13 @@ static void func_ov137_021f09b4(ResortFieldScene *scene) {
     }
 }
 
-static void func_ov137_021f0a38(ResortFieldScene *scene) {
+static void ResortSceneAnim1_Start(ResortFieldScene *scene) {
     SRTMatrix *matrix0;
     SRTMatrix *matrix1;
     fx32 cos;
     fx32 sin;
 
-    func_ov137_021f0818(scene);
+    ResortSceneAnim0_Start(scene);
     matrix0 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 0);
     matrix1 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 1);
     cos = FX_CosIdx(RESORT_FIELD_SCENE_ANGLE);
@@ -1815,9 +1817,9 @@ static void func_ov137_021f0a38(ResortFieldScene *scene) {
     MTX_RotX33_(&matrix1->rotation, sin, cos);
 }
 
-static BOOL func_ov137_021f0a80(ResortFieldScene *scene) {
+static BOOL ResortSceneAnim1_Update(ResortFieldScene *scene) {
     VecFx32 target;
-    BOOL done = func_ov137_021f08dc(scene);
+    BOOL done = ResortSceneAnim0_Update(scene);
     SRTMatrix *matrix0 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 0);
     SRTMatrix *matrix1 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 1);
 
@@ -1829,12 +1831,12 @@ static BOOL func_ov137_021f0a80(ResortFieldScene *scene) {
     return done;
 }
 
-static void func_ov137_021f0ad8(ResortFieldScene *scene) {
-    func_ov137_021f09b4(scene);
+static void ResortSceneAnim1_End(ResortFieldScene *scene) {
+    ResortSceneAnim0_End(scene);
 }
 
 // Adds people to the avenue from entries, by the player's progress, the first time
-static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapId) {
+static void ResortField_AddInitialEntries(ResortSys *sys, GameData *gameData, HeapID heapId) {
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
 
     if (JoinAvenue_GetParam(info, 7, NULL) == 0 && JoinAvenue_GetParam(info, 6, NULL) == 0) {
@@ -1849,8 +1851,8 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
         int tries;
 
         ResortSys_GetEntries(sys);
-        entry = func_02037a40(HEAPID_TAIL(heapId));
-        unk = func_ov012_02169b78(gameData);
+        entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
+        unk = TrainerCard_CountStars(gameData);
         badges = getBadgeCount(getTrainerGameInfoAddress(save));
         rank = MedalBox_GetRank(SaveControl_GetMedalBox(save));
         count = 0;
@@ -1874,7 +1876,7 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
         while (added < count) {
             u32 result;
             ResortSys_MakeShopEntry(sys, gameData, entry, 4, tries, heapId);
-            result = func_02010078(joinAvenue, gameData, entry, 2);
+            result = JoinAvenue_Add(joinAvenue, gameData, entry, 2);
             if (result == 2) {
                 added++;
             }
@@ -1882,12 +1884,12 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
                 break;
             }
         }
-        func_02037a68(entry);
-        func_02039064(info, 6, 1);
+        JoinAvenueEntry_Free(entry);
+        JoinAvenueInfo_SetParam(info, 6, 1);
     }
 }
 
-static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapId) {
+static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     void *table = ResortSys_GetRanks(sys);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
@@ -1900,29 +1902,29 @@ static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapI
         u32 i;
 
         add = TRUE;
-        for (i = 0; i < func_02037ed4(entries); i++) {
-            void *entry = func_02037f04(entries, i);
-            if (!func_02037a90(entry) && func_02037b38(entry, 31, NULL) == 5) {
+        for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
+            void *entry = JoinAvenueEntryList_Get(entries, i);
+            if (!JoinAvenueEntry_IsEmpty(entry) && JoinAvenueEntry_GetParam(entry, 31, NULL) == 5) {
                 add = FALSE;
                 break;
             }
         }
-        func_02039064(info, 24, 1);
+        JoinAvenueInfo_SetParam(info, 24, 1);
     }
     if (add) {
         u16 chance = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, NULL)), 10);
-        if (func_020393e4(info, 21, 100) < chance) {
-            void *entry = func_02037a40(HEAPID_TAIL(heapId));
+        if (JoinAvenueInfo_Random(info, 21, 100) < chance) {
+            void *entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
             ResortSys_MakeShopEntry(sys, gameData, entry, 5, 0, heapId);
-            if (func_02010078(joinAvenue, gameData, entry, 2) == 2) {
-                func_02039064(info, 25, 0);
+            if (JoinAvenue_Add(joinAvenue, gameData, entry, 2) == 2) {
+                JoinAvenueInfo_SetParam(info, 25, 0);
             }
-            func_02037a68(entry);
+            JoinAvenueEntry_Free(entry);
         }
     }
 }
 
-void func_ov137_021f0d10(Field *field) {
+void ResortField0_Setup(Field *field) {
     GameData *gameData;
     HeapID heapId;
     ResortFieldWork0 *work;
@@ -1936,7 +1938,7 @@ void func_ov137_021f0d10(Field *field) {
     heapId = Field_GetHeapID(field);
     gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
-    unk = func_02017b84(gameData);
+    unk = GameData_GetResortWork(gameData);
     fill = FALSE;
     work = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(ResortFieldWork0));
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
@@ -1944,7 +1946,7 @@ void func_ov137_021f0d10(Field *field) {
     sysSetup.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     sysSetup.list = JoinAvenue_GetPersonList(joinAvenue);
     sysSetup.list2 = NULL;
-    sysSetup.entries = func_02010054(joinAvenue);
+    sysSetup.entries = JoinAvenue_GetEntryList(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
     work->sys = ResortSys_Create(&sysSetup, unk, heapId);
     if (JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL) == 0) {
@@ -1958,10 +1960,10 @@ void func_ov137_021f0d10(Field *field) {
     peopleSetup.count = 16;
     peopleSetup.zone = 2;
     peopleSetup.shops = ResortSys_GetShopData(work->sys);
-    peopleSetup.unk18 = ResortSys_GetUnk20Table(work->sys);
-    work->people = func_ov137_021f12b4(&peopleSetup, heapId);
+    peopleSetup.unk18 = ResortSys_GetPosOffsets(work->sys);
+    work->people = ResortPeople_Create(&peopleSetup, heapId);
     if (fill) {
-        func_ov137_021f1350(work->people);
+        ResortPeople_CreateFromSlots(work->people);
     }
 
     MI_CpuFill8(&npcSetup, 0, sizeof(ResortNPCSetup));
@@ -1970,34 +1972,34 @@ void func_ov137_021f0d10(Field *field) {
     npcSetup.info = ResortSys_GetInfo(work->sys);
     npcSetup.zone = 2;
     npcSetup.table = ResortSys_GetShopOpenings(work->sys);
-    work->npc = func_ov137_021f1c24(&npcSetup, heapId);
+    work->npc = ResortNPC_Create(&npcSetup, heapId);
 }
 
-void func_ov137_021f0e28(Field *field) {
+void ResortField0_Delete(Field *field) {
     ResortFieldWork0 *work = Field_GetGimmickWorkBlock(field, 0);
-    func_ov137_021f1c74(work->npc);
-    func_ov137_021f1300(work->people);
+    ResortNPC_Free(work->npc);
+    ResortPeople_Free(work->people);
     ResortSys_Free(work->sys);
     Field_DeleteGimmickWorkBlock(field, 0);
 }
 
-void func_ov137_021f0e50(Field *field) {
+void ResortField0_Update(Field *field) {
     ResortFieldWork0 *work = Field_GetGimmickWorkBlock(field, 0);
-    func_ov137_021f1c88(work->npc, field);
-    func_ov137_021f1348(work->people, Field_GetPlayer(field));
+    ResortNPC_Update(work->npc, field);
+    ResortPeople_Update(work->people, Field_GetPlayer(field));
 }
 
-ResortPeople *func_ov137_021f0e74(Field *field) {
+ResortPeople *ResortField0_GetPeople(Field *field) {
     ResortFieldWork0 *work = Field_GetGimmickWorkBlock(field, 0);
     return work->people;
 }
 
-ResortSys *func_ov137_021f0e80(Field *field) {
+ResortSys *ResortField0_GetSys(Field *field) {
     ResortFieldWork0 *work = Field_GetGimmickWorkBlock(field, 0);
     return work->sys;
 }
 
-ResortNPC *func_ov137_021f0e8c(Field *field) {
+ResortNPC *ResortField0_GetNPC(Field *field) {
     ResortFieldWork0 *work = Field_GetGimmickWorkBlock(field, 0);
     return work->npc;
 }

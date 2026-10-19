@@ -186,49 +186,49 @@ BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env) {
 
     switch (command) {
     case 0:
-        func_ov012_0215fd50(value);
+        GameBeacon_BroadcastFoundItem(value);
         break;
     case 1:
-        func_ov012_0216002c(value);
+        GameBeacon_BroadcastFieldMove(value);
         break;
     case 2:
-        func_ov012_0215fe3c();
+        GameBeacon_BroadcastUnionRoomReception();
         break;
     case 3:
-        func_ov012_02160210();
+        GameBeacon_BroadcastBattleInstituteChallenge();
         break;
     case 4:
-        func_ov012_02160240(value);
+        GameBeacon_BroadcastBattleInstituteRank(value);
         break;
     case 5:
-        func_ov012_021602cc();
+        GameBeacon_BroadcastPokeTransfer();
         break;
     case 6:
-        func_ov012_02160174();
+        GameBeacon_BroadcastBattleSubwayChallenge();
         break;
     case 7:
-        func_ov012_021601a4(value);
+        GameBeacon_BroadcastBattleSubwayWinStreak(value);
         break;
     case 8:
-        func_ov012_021601dc();
+        GameBeacon_BroadcastBattleSubwayTrophy();
         break;
     case 9:
-        func_ov012_021604c4(value);
+        GameBeacon_BroadcastTournamentChallenge(value);
         break;
     case 10:
-        func_ov012_021604f4(value, extra);
+        GameBeacon_BroadcastTournamentWin(value, extra);
         break;
     case 11:
-        func_ov012_0216052c(value, extra);
+        GameBeacon_BroadcastTournamentLoss(value, extra);
         break;
     case 12:
-        func_ov012_021605a4(value, zoneId);
+        GameBeacon_BroadcastAreaChallenge(value, zoneId);
         break;
     case 13:
-        func_ov012_021605d4(value, zoneId);
+        GameBeacon_BroadcastAreaCleared(value, zoneId);
         break;
     case 14:
-        func_ov012_0216045c(value);
+        GameBeacon_BroadcastPokestarShooting(value);
         break;
     }
     return FALSE;

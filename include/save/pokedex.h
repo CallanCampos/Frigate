@@ -31,7 +31,7 @@ struct PokeDexSave {
     u32 habitatListEnabled : 1;
     // Set to 1 with the Pokédex (func_0200d1dc)
     u32 unk4_2 : 8;
-    // Which Pokédex the detail screen counts (func_0200d1f8)
+    // Which Pokédex the detail screen counts (PokeDex_GetMode)
     u32 mode : 2;
     // The species that the Pokédex's list was last on
     u32 lastSpecies : 10;
@@ -59,26 +59,26 @@ BOOL PokeDex_IsHabitatListEnabled(PokeDexSave *pokedex);
 void givePlayerPokedex(PokeDexSave *pokedex);
 u32 func_0200d1dc(PokeDexSave *pokedex);
 // Which Pokédex the detail screen counts: 0 the regional one, 1 the national one, 2 the national one once obtained
-u32 func_0200d1f8(PokeDexSave *pokedex);
-// Sets which Pokédex the detail screen counts, with func_0200d1f8's values
-void func_0200d1e4(PokeDexSave *pokedex, u32 mode);
+u32 PokeDex_GetMode(PokeDexSave *pokedex);
+// Sets which Pokédex the detail screen counts, with PokeDex_GetMode's values
+void PokeDex_SetMode(PokeDexSave *pokedex, u32 mode);
 BOOL PokeDex_IsCaught(PokeDexSave *pokedex, u16 species);
 BOOL PokeDex_IsSeen(PokeDexSave *pokedex, u16 species);
 // The species that the Pokédex's list was last on, and sets it
-void func_0200d200(PokeDexSave *pokedex, u16 species);
-u16 func_0200d214(PokeDexSave *pokedex);
+void PokeDex_SetLastSpecies(PokeDexSave *pokedex, u16 species);
+u16 PokeDex_GetLastSpecies(PokeDexSave *pokedex);
 // Sets the sex, shininess and form that the Pokédex shows of a species
 void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form);
 // The forms of a species, 1 for one without any
 u16 getNumberOfForms(u16 species);
 // The sex, shininess and form that the Pokédex shows of a species
-void func_0200d3c8(PokeDexSave *pokedex, u16 species, u32 *sex, u32 *rare, u32 *form, HeapID heapId);
+void PokeDex_GetShownSexRareForm(PokeDexSave *pokedex, u16 species, u32 *sex, u32 *rare, u32 *form, HeapID heapId);
 // Whether the Pokédex has seen the species in that sex, shininess and form
-BOOL func_0200d8d4(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form);
+BOOL PokeDex_HasSeenVariant(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form);
 // The personality of the Spinda the Pokédex shows, for index 0
 u32 func_0200da18(PokeDexSave *pokedex, u32 index);
 // Whether the Pokédex has the species' entry in a language
-BOOL func_0200db5c(PokeDexSave *pokedex, u16 species, u32 language);
+BOOL PokeDex_HasLanguage(PokeDexSave *pokedex, u16 species, u32 language);
 u16 PokeDex_GetSeenNoNational(PokeDexSave *pokedex);
 u16 PokeDex_GetCaughtNoNational(PokeDexSave *pokedex);
 // The same of the regional Pokédex, whose table they load on the heap

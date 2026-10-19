@@ -63,7 +63,7 @@ static BOOL TDownloadSave_LoadSlot(TDownloadWork *wk, int slot) {
     MIi_CpuClear32(0, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
     save = GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys));
     block = sTDownloadSaveBlocks[slot].block;
-    if (func_020074ec(save, block, wk->heapId) == TRUE) {
+    if (SaveControl_OpenExtraBlock(save, block, wk->heapId) == TRUE) {
         src = getAddressOfExtraSaveBlk(save, block, sTDownloadSaveBlocks[slot].offset);
         MIi_CpuCopy32(src, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
         loaded = TRUE;
@@ -193,10 +193,10 @@ void TDownloadSave_StartSave(TDownloadWork *wk, int src, int dest) {
         gameData = GSYS_GetGameData(wk->param->gsys);
         save = GameData_GetSaveControl(gameData);
         block = sTDownloadSaveBlocks[dest].block;
-        func_020074ec(save, block, wk->heapId);
+        SaveControl_OpenExtraBlock(save, block, wk->heapId);
         MIi_CpuCopy32(data, getAddressOfExtraSaveBlk(save, block, sTDownloadSaveBlocks[dest].offset),
                       T_DOWNLOAD_TOURNAMENT_SIZE);
-        func_020178c4(gameData, block);
+        GameData_StartSaveBlock(gameData, block);
         wk->saveFlags |= T_DOWNLOAD_SAVE_FLAG_SAVING;
     }
 }
@@ -216,7 +216,7 @@ BOOL TDownloadSave_UpdateSave(TDownloadWork *wk) {
     gameData = GSYS_GetGameData(wk->param->gsys);
     save = GameData_GetSaveControl(gameData);
     block = sTDownloadSaveBlocks[dest].block;
-    state = func_020178f4(gameData, block);
+    state = GameData_UpdateSaveBlock(gameData, block);
     if (state == 2 || state == 3) {
         freeIntermediateSaveExtraBlksAfterLoad(save, block);
         wk->saveFlags &= ~T_DOWNLOAD_SAVE_FLAG_SAVING;

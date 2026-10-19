@@ -281,47 +281,47 @@ DupFittingWork *DupFitting_Create(MusicalDressUpParam *param, HeapID heapId) {
     work->autoScroll = TRUE;
     work->scrolled = 0;
     work->scrollTarget = work->angle % DUP_FITTING_RING_STEP + 0x10000;
-    if (func_0200af44(work->param->save) == FALSE) {
-        func_0200af50(work->param->save, TRUE);
+    if (MusicalSave_GetDressingRoomVisited(work->param->save) == FALSE) {
+        MusicalSave_SetDressingRoomVisited(work->param->save, TRUE);
         work->showDemo = TRUE;
     } else {
         work->showDemo = FALSE;
     }
     GFL_SndBGMPlay(SEQ_BGM_MSL_DRESSUP, 0xffff);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     return work;
 }
 
 void DupFitting_Free(DupFittingWork *work) {
     u8 i;
 
-    func_0203d564(TRUE);
-    func_0200ae14(work->param->save);
-    func_02005d8c();
+    GCTX_HIDSetUsingTouch(TRUE);
+    MusicalSave_ClearNewProps(work->param->save);
+    GFL_SndBGMStopImmediate();
     DupFitting_FreeMessages(work);
     DupFitting_FreeSparkles(work);
-    func_0204c108(work->buttons[0]);
-    func_0204c108(work->buttons[1]);
-    func_0204c108(work->hand);
+    ClActor_Delete(work->buttons[0]);
+    ClActor_Delete(work->buttons[1]);
+    ClActor_Delete(work->hand);
     for (i = 0; i <= 2; i++) {
-        func_0204bcd0(work->clactRes[i]);
+        ClActSys_FreePltt(work->clactRes[i]);
     }
     for (i = 3; i <= 5; i++) {
-        func_0204b98c(work->clactRes[i]);
+        ClActSys_FreeChars(work->clactRes[i]);
     }
     for (i = 6; i <= 8; i++) {
-        func_0204be64(work->clactRes[i]);
+        ClActSys_FreeCellAnims(work->clactRes[i]);
     }
     if (work->bmpWin != NULL) {
         BmpWin_Free(work->bmpWin);
     }
-    func_0204bf98(work->clactUnit);
-    func_0204b758();
+    ClActUnit_Delete(work->clactUnit);
+    ClActSys_Delete();
     DupFitting_FreeItems(work);
     MusPokeDraw_DelPoke(work->pokeSys, work->poke);
     MusPokeDraw_TermSystem(work->pokeSys);
     GFL_TCBRemove(work->vblankTcb);
-    func_0204e450(work->blact);
+    BlActScene_Delete(work->blact);
     GFL_G3DCameraFree(work->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -395,7 +395,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
         if (DupFitting_UpdateConfirm(work) == 2) {
             work->state = DUP_FITTING_STATE_DONE_WAIT;
             work->confirmTimer = 0;
-            func_0204c124(work->okMark, TRUE);
+            ClActor_SetVisible(work->okMark, TRUE);
         }
         break;
     case DUP_FITTING_STATE_DONE_WAIT:
@@ -410,18 +410,18 @@ u32 DupFitting_Main(DupFittingWork *work) {
                 work->msgClosed = TRUE;
             } else {
                 DupFitting_PrintMessage(work, Title3_Text_WaitingOtherParticipantsDress, NULL);
-                func_ov211_021ef988(work->param->comm, 0x45);
+                MusComm_SendTiming(work->param->comm, 0x45);
                 work->state = DUP_FITTING_STATE_WAIT_TIMING;
             }
         }
         break;
     case DUP_FITTING_STATE_WAIT_TIMING:
-        if (func_ov211_021ef99c(work->param->comm, 0x45) == TRUE) {
+        if (MusComm_IsTimingReached(work->param->comm, 0x45) == TRUE) {
             work->state = DUP_FITTING_STATE_WAIT_SOUND;
         }
         break;
     case DUP_FITTING_STATE_WAIT_SOUND:
-        if (func_ov211_021f0240(work->param->comm) == TRUE) {
+        if (MusComm_IsSoundReceived(work->param->comm) == TRUE) {
             GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_WHITE, 18, 1, work->heapId);
             GFL_SndBGMFadeOut(60);
             work->state = DUP_FITTING_STATE_FADE_OUT;
@@ -433,7 +433,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
     DupFitting_UpdateReturning(work);
     MusPokeDraw_UpdateSystem(work->pokeSys);
     MusItemDraw_UpdateSystem(work->itemSys);
-    func_0204b794();
+    ClActSys_Draw();
     GFL_G3DSysReset();
     GFL_G3DSysMtxViewFlush();
     MusPokeDraw_DrawSystem(work->pokeSys);
@@ -471,7 +471,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
         loadBGScrToVramByNarcNoReserveNegAlign(ARCID_MUSICAL_SHOT, 13, 7, 0, 0, FALSE, work->heapId);
         GFL_BGSysQueueScrLoad(7);
         work->printing = FALSE;
-        func_02021c44(work->printQueue);
+        PrintQueue_Clear(work->printQueue);
         BmpWin_Free(work->bmpWin);
         work->bmpWin = NULL;
         DupFitting_Trace(work, 6);
@@ -491,7 +491,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
         }
     }
     DupFitting_Trace(work, 10);
-    if (work->printing == TRUE && func_02021c0c(work->printQueue) == TRUE) {
+    if (work->printing == TRUE && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
         work->printing = FALSE;
         BmpWin_Transfer(work->bmpWin);
         GFL_BGSysSetBGPriority(4, 1);
@@ -501,7 +501,7 @@ u32 DupFitting_Main(DupFittingWork *work) {
     }
     DupFitting_Trace(work, 12);
     if (work->printQueue != NULL) {
-        func_02021a3c(work->printQueue);
+        PrintQueue_Main(work->printQueue);
     }
     DupFitting_Trace(work, 14);
     if (work->sndCooldown != 0) {
@@ -558,18 +558,18 @@ static void DupFitting_VBlank(TCB *tcb, void *data) {
             u16 material;
 
             work->shadowItemId = entry->itemId;
-            func_0204e820(work->blact, work->shadowMaterial, &plttKey);
-            func_0204e7f8(work->blact, entry->material, &texKey);
-            func_0204e808(work->blact, work->shadowMaterial, texKey);
+            BlActScene_GetMaterialPlttKey(work->blact, work->shadowMaterial, &plttKey);
+            BlActScene_GetMaterialTexKey(work->blact, entry->material, &texKey);
+            BlActScene_SetMaterialTexKey(work->blact, work->shadowMaterial, texKey);
             size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->shadowItemId));
-            func_0204e4d0(size, &width, &height);
+            BlAct_GetTexDimensions(size, &width, &height);
             material = BlActScene_AddMaterialExistTex(work->blact, texKey, plttKey, 0, size, width, height);
             MusItemDraw_ChangeItem(work->itemSys, work->shadowDraw, work->shadowItemId, material);
-            func_0204e73c(work->blact, work->shadowMaterial);
+            BlActScene_FreeMaterialVramIfTex(work->blact, work->shadowMaterial);
             work->shadowMaterial = material;
         }
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     MusItemDraw_DrawSystem(work->itemSys);
 }
 
@@ -750,8 +750,8 @@ static void DupFitting_InitGraphics(DupFittingWork *work) {
     ClActSys_Create(&clactSetup, &DUP_FITTING_VRAM_CONFIG, work->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    work->clactUnit = func_0204bf1c(24, 0, work->heapId);
-    func_0204c028(work->clactUnit);
+    work->clactUnit = ClActUnit_Create(24, 0, work->heapId);
+    ClActUnit_UseSystemRenderer(work->clactUnit);
     {
         BlActSceneSetup blactSetup = { 0x200, 0xa0, { FX32_ONE, FX32_ONE, 0 }, 0, 0, 0, 0, 0x3f, BLACT_ORIGIN_CENTER };
 
@@ -776,37 +776,37 @@ static void DupFitting_LoadResources(DupFittingWork *work) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, 13, 7, 0, 0, FALSE, work->heapId);
     GFL_BGSysMoveBGReq(6, BG_MOVE_SET_X, 128);
     GFL_BGSysMoveBGReq(5, BG_MOVE_SET_X, -128);
-    work->clactRes[0] = func_0204bba0(arc, 2, CLACT_VRAM_MAIN, 0, work->heapId);
-    work->clactRes[3] = func_0204b81c(arc, 8, FALSE, CLACT_VRAM_MAIN, work->heapId);
-    work->clactRes[6] = func_0204bde0(arc, 20, 24, work->heapId);
-    work->clactRes[2] = func_0204bba0(arc, 1, CLACT_VRAM_SUB, 0, work->heapId);
-    work->clactRes[5] = func_0204b81c(arc, 6, FALSE, CLACT_VRAM_SUB, work->heapId);
-    work->clactRes[8] = func_0204bde0(arc, 19, 23, work->heapId);
-    work->clactRes[1] = func_0204bba0(arc, 0, CLACT_VRAM_MAIN, 0x40, work->heapId);
-    work->clactRes[4] = func_0204b81c(arc, 5, FALSE, CLACT_VRAM_MAIN, work->heapId);
-    work->clactRes[7] = func_0204bde0(arc, 17, 21, work->heapId);
+    work->clactRes[0] = ClActSys_LoadPltt(arc, 2, CLACT_VRAM_MAIN, 0, work->heapId);
+    work->clactRes[3] = ClActSys_LoadChars(arc, 8, FALSE, CLACT_VRAM_MAIN, work->heapId);
+    work->clactRes[6] = ClActSys_LoadCellAnims(arc, 20, 24, work->heapId);
+    work->clactRes[2] = ClActSys_LoadPltt(arc, 1, CLACT_VRAM_SUB, 0, work->heapId);
+    work->clactRes[5] = ClActSys_LoadChars(arc, 6, FALSE, CLACT_VRAM_SUB, work->heapId);
+    work->clactRes[8] = ClActSys_LoadCellAnims(arc, 19, 23, work->heapId);
+    work->clactRes[1] = ClActSys_LoadPltt(arc, 0, CLACT_VRAM_MAIN, 0x40, work->heapId);
+    work->clactRes[4] = ClActSys_LoadChars(arc, 5, FALSE, CLACT_VRAM_MAIN, work->heapId);
+    work->clactRes[7] = ClActSys_LoadCellAnims(arc, 17, 21, work->heapId);
     setup.x = 32;
     setup.y = 224;
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 2;
-    work->buttons[0] = func_0204c040(work->clactUnit, work->clactRes[3], work->clactRes[0], work->clactRes[6], &setup,
-                                     CLACT_SURFACE_MAIN, work->heapId);
+    work->buttons[0] = ClActor_Create(work->clactUnit, work->clactRes[3], work->clactRes[0], work->clactRes[6], &setup,
+                                      CLACT_SURFACE_MAIN, work->heapId);
     setup.x = 224;
     setup.y = 224;
     setup.sequence = 1;
-    work->buttons[1] = func_0204c040(work->clactUnit, work->clactRes[3], work->clactRes[0], work->clactRes[6], &setup,
-                                     CLACT_SURFACE_MAIN, work->heapId);
+    work->buttons[1] = ClActor_Create(work->clactUnit, work->clactRes[3], work->clactRes[0], work->clactRes[6], &setup,
+                                      CLACT_SURFACE_MAIN, work->heapId);
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 2;
     setup.priority = 0;
     setup.bgPriority = 0;
-    work->hand = func_0204c040(work->clactUnit, work->clactRes[3], work->clactRes[0], work->clactRes[6], &setup,
-                               CLACT_SURFACE_MAIN, work->heapId);
-    func_0204c124(work->buttons[0], TRUE);
-    func_0204c124(work->buttons[1], TRUE);
-    func_0204c124(work->hand, FALSE);
+    work->hand = ClActor_Create(work->clactUnit, work->clactRes[3], work->clactRes[0], work->clactRes[6], &setup,
+                                CLACT_SURFACE_MAIN, work->heapId);
+    ClActor_SetVisible(work->buttons[0], TRUE);
+    ClActor_SetVisible(work->buttons[1], TRUE);
+    ClActor_SetVisible(work->hand, FALSE);
     GFL_ArcToolFree(arc);
     GFL_BGSysLoadScr(3);
     GFL_BGSysLoadScr(2);
@@ -846,10 +846,10 @@ static void DupFitting_InitItems(DupFittingWork *work) {
 
     work->entryCount = 0;
     for (n = 0; n < DUP_FITTING_ENTRY_MAX; n++) {
-        if (func_0200ad60(work->param->save, n) == TRUE) {
+        if (MusicalSave_HasProp(work->param->save, n) == TRUE) {
             work->entries[work->entryCount].itemId = n;
             work->entries[work->entryCount].used = FALSE;
-            if (func_0200ad9c(work->param->save, n) == TRUE) {
+            if (MusicalSave_IsPropNew(work->param->save, n) == TRUE) {
                 work->entries[work->entryCount].isNew = TRUE;
             } else {
                 work->entries[work->entryCount].isNew = FALSE;
@@ -890,7 +890,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         plttSize = NNS_GfdGetPlttKeySize(plttKey);
         dimPlttKey = NNS_GfdAllocPlttVram(plttSize, FALSE, 0);
         size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->entries[n].itemId));
-        func_0204e4d0(size, &width, &height);
+        BlAct_GetTexDimensions(size, &width, &height);
         work->entries[n].material =
             BlActScene_AddMaterialExistTex(work->blact, texKey, plttKey, 0, size, width, height);
         palette = GFL_G3DResGetTexPaletteData(res);
@@ -935,7 +935,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
 
         work->shadowItemId = 0;
         size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->shadowItemId));
-        func_0204e4d0(size, &width, &height);
+        BlAct_GetTexDimensions(size, &width, &height);
         res = MusItemDraw_LoadTexResource(work->shadowItemId);
         GFL_G3DResUploadTexData(res);
         work->shadowMaterial = BlActScene_AddMaterialExistTex(work->blact, GFL_G3DResGetTexVRAMHandle(res),
@@ -947,7 +947,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         MusItemDraw_SetShadowPalette(work->itemSys, work->shadowDraw, res);
         MusItemDraw_FreeTexResource(res);
     }
-    work->badgeMaterial = func_0204e614(work->blact, ARCID_MUSICAL_SHOT, 25, 2, 0x22, 32, 32);
+    work->badgeMaterial = BlActScene_AddMaterialArcTex(work->blact, ARCID_MUSICAL_SHOT, 25, 2, 0x22, 32, 32);
     for (i = 0; i < DUP_FITTING_RING_PROPS; i++) {
         VecFx32 pos = { 0, 0, 0 };
         u32 actor = BlActScene_AddNewActor(work->blact, work->badgeMaterial, FX32_ONE, FX32_ONE, &pos, 31, 0, 0);
@@ -1169,7 +1169,7 @@ static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 a
             badgePos.y = (192 * FX32_ONE - (vec.y + 0x8000)) / 16;
             badgePos.z = vec.z + 192 * FX32_ONE / 512;
             BlActScene_SetActorPos(work->blact, work->badgeActors[i], &badgePos);
-            func_0204ea5c(work->blact, work->badgeActors[i], &scale, &scale);
+            BlActScene_SetActorScale(work->blact, work->badgeActors[i], &scale, &scale);
             BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &shown);
         } else {
             BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &hidden);
@@ -1201,8 +1201,8 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
     BOOL picked = FALSE;
 
     if (work->demo == FALSE) {
-        work->touchStart = func_0203da48();
-        work->touching = func_0203da84(&work->touchX, &work->touchY);
+        work->touchStart = GFL_HIDIsTouchPressed();
+        work->touching = GFL_HIDGetTouchHeldPoint(&work->touchX, &work->touchY);
     }
     if (work->touchStart != FALSE || work->touching != FALSE) {
         if (work->touchY > 176) {
@@ -1300,8 +1300,8 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
     static const u16 tiltSteps[2] = { 0x100, 0 };
     // The smallest turn of a drag that moves the ring
     static const u16 dragMinTurn = 227;
-    s32 delta =
-        func_020443d8(work->prevTouchX, work->prevTouchY * 72 / 48, work->touchX, work->touchY * 72 / 48, 128, 80, 72);
+    s32 delta = GFL_MathArcAngle(work->prevTouchX, work->prevTouchY * 72 / 48, work->touchX, work->touchY * 72 / 48,
+                                 128, 80, 72);
 
     work->dragAccum += MATH_ABS(delta);
     if (work->touchStart == TRUE || work->dragAccum >= 0x71c) {
@@ -1560,12 +1560,12 @@ static void DupFitting_WearItem(DupFittingWork *work) {
     DupFittingItemNode_GetDraw(work->heldNode);
     heldDraw = DupFittingItemNode_GetDraw(work->heldNode);
     if (DupFitting_HasWornInCategory(work, work->hoverPos) == TRUE) {
-        s32 category = func_ov210_021ef118(work->hoverPos);
+        s32 category = MusItemData_GetPosGroup(work->hoverPos);
         DupFittingItemNode *other;
 
         for (other = DupFittingItemList_GetHead(work->wornList); other != NULL;
              other = DupFittingItemNode_GetNext(other)) {
-            if (category == func_ov210_021ef118(DupFittingItemNode_GetEquipPos(other))) {
+            if (category == MusItemData_GetPosGroup(DupFittingItemNode_GetEquipPos(other))) {
                 break;
             }
         }
@@ -1708,7 +1708,7 @@ static BOOL DupFitting_SelectCategory(DupFittingWork *work) {
     touch[1] = work->touchY - 112;
     pos = DupFitting_FindNearestEquipPos(work, NULL, touch, &distance);
     if (pos != DUP_FITTING_EQUIP_NONE) {
-        category = func_ov210_021ef118(pos);
+        category = MusItemData_GetPosGroup(pos);
         if (category == 7) {
             category = 6;
         }
@@ -1785,11 +1785,11 @@ static void DupFitting_UpdateTilt(DupFittingWork *work) {
 }
 
 static BOOL DupFitting_HasWornInCategory(DupFittingWork *work, s32 pos) {
-    s32 category = func_ov210_021ef118(pos);
+    s32 category = MusItemData_GetPosGroup(pos);
     DupFittingItemNode *node;
 
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
-        if (category == func_ov210_021ef118(DupFittingItemNode_GetEquipPos(node))) {
+        if (category == MusItemData_GetPosGroup(DupFittingItemNode_GetEquipPos(node))) {
             return TRUE;
         }
     }
@@ -2031,14 +2031,14 @@ static void DupFitting_UpdateTransition(DupFittingWork *work) {
         y = 64;
     }
     pos.y = y + 160;
-    func_0204c140(work->buttons[0], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(work->buttons[0], &pos, CLACT_SURFACE_MAIN);
     pos.x = 224;
     y = 192 - work->transition;
     if (y >= 64) {
         y = 64;
     }
     pos.y = y + 160;
-    func_0204c140(work->buttons[1], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(work->buttons[1], &pos, CLACT_SURFACE_MAIN);
 }
 
 static u32 DupFitting_UpdateConfirm(DupFittingWork *work) {
@@ -2049,8 +2049,8 @@ static u32 DupFitting_UpdateConfirm(DupFittingWork *work) {
     };
     s32 hit;
 
-    func_0203da84(&work->touchX, &work->touchY);
-    hit = func_0203da0c(rects);
+    GFL_HIDGetTouchHeldPoint(&work->touchX, &work->touchY);
+    hit = GFL_HIDGetTouchPressedRect(rects);
     switch (hit) {
     case 0:
         DupFitting_SaveWornItems(work);
@@ -2097,8 +2097,8 @@ static void DupFitting_ResetRotations(DupFittingWork *work) {
 static void DupFitting_UpdateConfirmTouch(DupFittingWork *work) {
     work->prevTouchX = work->touchX;
     work->prevTouchY = work->touchY;
-    work->touchStart = func_0203da48();
-    work->touching = func_0203da84(&work->touchX, &work->touchY);
+    work->touchStart = GFL_HIDIsTouchPressed();
+    work->touching = GFL_HIDGetTouchHeldPoint(&work->touchX, &work->touchY);
     if (work->touchStart == TRUE) {
         DupFittingItemNode *best = NULL;
         u32 bestDistance = 256;
@@ -2193,13 +2193,13 @@ static void DupFitting_UpdateButtons(DupFittingWork *work) {
     if (pos.y >= 224) {
         pos.y = 224;
     }
-    func_0204c140(work->buttons[0], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(work->buttons[0], &pos, CLACT_SURFACE_MAIN);
     pos.x = 224;
     pos.y = work->confirmTimer * 2 + 160;
     if (pos.y >= 224) {
         pos.y = 224;
     }
-    func_0204c140(work->buttons[1], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(work->buttons[1], &pos, CLACT_SURFACE_MAIN);
     palette = 24 * work->confirmTimer / 60 + 4;
     if (palette >= 11) {
         palette = 3;
@@ -2235,7 +2235,7 @@ static void DupFitting_StartDemo(DupFittingWork *work) {
 static void DupFitting_EndDemo(DupFittingWork *work) {
     work->demo = FALSE;
     work->state = DUP_FITTING_STATE_DRESS;
-    func_0204c124(work->hand, FALSE);
+    ClActor_SetVisible(work->hand, FALSE);
     DupFitting_PrintPokeName(work);
 }
 
@@ -2289,7 +2289,7 @@ static void DupFitting_UpdateDemo(DupFittingWork *work) {
 
         pos.x = work->touchX;
         pos.y = work->touchY;
-        func_0204c140(work->hand, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(work->hand, &pos, CLACT_SURFACE_MAIN);
     }
     DupFitting_UpdateDress(work);
 }
@@ -2300,7 +2300,7 @@ static void DupFitting_DemoRotate(DupFittingWork *work, u16 target, s32 total, u
 
     work->touching = FALSE;
     work->touchStart = FALSE;
-    func_0204c124(work->hand, TRUE);
+    ClActor_SetVisible(work->hand, TRUE);
     step = total / frames;
     angle = (target - step * work->demoFrame + 0x10000) % 0x10000;
     work->touchX = FX_FX32_TO_F32(72 * FX_SinIdx(angle) + 128 * FX32_ONE);
@@ -2318,7 +2318,7 @@ static void DupFitting_DemoWait(DupFittingWork *work, u16 frames) {
     work->touching = FALSE;
     work->touchStart = FALSE;
     work->demoFrame++;
-    func_0204c124(work->hand, FALSE);
+    ClActor_SetVisible(work->hand, FALSE);
     if (work->demoFrame > frames) {
         work->demoFrame = 0;
         work->demoStage++;
@@ -2338,7 +2338,7 @@ static void DupFitting_DemoMoveHand(DupFittingWork *work, const DupFittingPoint 
     y = from->y + (to->y - from->y) * work->demoFrame / frames;
     work->touchX = from->x + (to->x - from->x) * work->demoFrame / frames;
     work->touchY = y;
-    func_0204c124(work->hand, TRUE);
+    ClActor_SetVisible(work->hand, TRUE);
     work->demoFrame++;
     if (work->demoFrame > frames) {
         work->demoFrame = 0;
@@ -2353,12 +2353,12 @@ static void DupFitting_InitMessages(DupFittingWork *work) {
     work->categoryMsg =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, work->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 0x1c0, 0x20, work->heapId);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     LoadSysMsgBox(7, 0x80, 12, 0, work->heapId);
 }
 
 static void DupFitting_FreeMessages(DupFittingWork *work) {
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_MsgDataFree(work->itemMsg);
     GFL_MsgDataFree(work->categoryMsg);
     GFL_MsgDataFree(work->dressMsg);
@@ -2368,7 +2368,7 @@ static void DupFitting_FreeMessages(DupFittingWork *work) {
 static void DupFitting_PrintMessage(DupFittingWork *work, u32 messageId, WordSet *wordSet) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(work->dressMsg, messageId);
 
-    func_02021c44(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(work->bmpWin), 15);
     if (wordSet != NULL) {
         StrBuf *formatted = GFL_StrBufCreate(128, work->heapId);
@@ -2377,7 +2377,8 @@ static void DupFitting_PrintMessage(DupFittingWork *work, u32 messageId, WordSet
         GFL_StrBufFree(str);
         str = formatted;
     }
-    func_02021c7c(work->printQueue, BmpWin_GetBitmap(work->bmpWin), 2, 2, str, work->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(work->printQueue, BmpWin_GetBitmap(work->bmpWin), 2, 2, str, work->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     work->printing = TRUE;
 }
@@ -2459,11 +2460,11 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
         sparkle.sequence = 0;
         sparkle.priority = 0;
         sparkle.bgPriority = 0;
-        work->sparkles[i] = func_0204c040(work->clactUnit, work->clactRes[2], work->clactRes[5], work->clactRes[8],
-                                          &sparkle, CLACT_SURFACE_SUB, work->heapId);
-        func_0204c124(work->sparkles[i], TRUE);
+        work->sparkles[i] = ClActor_Create(work->clactUnit, work->clactRes[2], work->clactRes[5], work->clactRes[8],
+                                           &sparkle, CLACT_SURFACE_SUB, work->heapId);
+        ClActor_SetVisible(work->sparkles[i], TRUE);
         func_0204c520(work->sparkles[i], TRUE);
-        func_0204c318(work->sparkles[i], 0);
+        ClActor_SetObjMode(work->sparkles[i], 0);
         work->sparkleTimer[i] = 0;
     }
     setup.x = 128;
@@ -2471,14 +2472,14 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 0;
-    work->okMark = func_0204c040(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
-                                 CLACT_SURFACE_MAIN, work->heapId);
-    func_0204c124(work->okMark, FALSE);
+    work->okMark = ClActor_Create(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
+                                  CLACT_SURFACE_MAIN, work->heapId);
+    ClActor_SetVisible(work->okMark, FALSE);
     func_0204c520(work->okMark, TRUE);
     setup.sequence = 2;
-    work->touchEffect = func_0204c040(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
-                                      CLACT_SURFACE_MAIN, work->heapId);
-    func_0204c124(work->touchEffect, FALSE);
+    work->touchEffect = ClActor_Create(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
+                                       CLACT_SURFACE_MAIN, work->heapId);
+    ClActor_SetVisible(work->touchEffect, FALSE);
     func_0204c520(work->touchEffect, TRUE);
 }
 
@@ -2486,10 +2487,10 @@ static void DupFitting_FreeSparkles(DupFittingWork *work) {
     u8 i;
 
     for (i = 0; i < 8; i++) {
-        func_0204c108(work->sparkles[i]);
+        ClActor_Delete(work->sparkles[i]);
     }
-    func_0204c108(work->touchEffect);
-    func_0204c108(work->okMark);
+    ClActor_Delete(work->touchEffect);
+    ClActor_Delete(work->okMark);
 }
 
 static void DupFitting_UpdateSparkles(DupFittingWork *work) {
@@ -2497,27 +2498,27 @@ static void DupFitting_UpdateSparkles(DupFittingWork *work) {
     u8 i;
 
     for (i = 0; i < 8; i++) {
-        func_0204c468(work->sparkles[i], GFL_BGSysGetBGPriority(4));
-        func_0204c318(work->sparkles[i], 0);
+        ClActor_SetBgPriority(work->sparkles[i], GFL_BGSysGetBGPriority(4));
+        ClActor_SetObjMode(work->sparkles[i], 0);
         if (work->sparkleTimer[i] == 0) {
             pos.x = GFL_RandomMTRange(56);
             if (GFL_RandomMTRange(2) == 1) {
                 pos.x = 256 - pos.x;
             }
             pos.y = GFL_RandomMTRange(192);
-            func_0204c140(work->sparkles[i], &pos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(work->sparkles[i], &pos, CLACT_SURFACE_SUB);
             if (pos.y > 90) {
-                func_0204c488(work->sparkles[i], GFL_RandomMTRange(2));
+                ClActor_SetSequence(work->sparkles[i], GFL_RandomMTRange(2));
             } else {
-                func_0204c488(work->sparkles[i], GFL_RandomMTRange(2) + 2);
+                ClActor_SetSequence(work->sparkles[i], GFL_RandomMTRange(2) + 2);
             }
             work->sparkleTimer[i] = GFL_RandomMTRange(200) + 400;
         } else {
             work->sparkleTimer[i]--;
         }
     }
-    if (func_0204c138(work->touchEffect) == TRUE && func_0204c560(work->touchEffect) == FALSE) {
-        func_0204c124(work->touchEffect, FALSE);
+    if (ClActor_IsVisible(work->touchEffect) == TRUE && ClActor_IsAnimActive(work->touchEffect) == FALSE) {
+        ClActor_SetVisible(work->touchEffect, FALSE);
     }
 }
 
@@ -2526,9 +2527,9 @@ static void DupFitting_ShowTouchEffect(DupFittingWork *work) {
 
     pos.x = work->touchX;
     pos.y = work->touchY;
-    func_0204c56c(work->touchEffect);
-    func_0204c124(work->touchEffect, TRUE);
-    func_0204c140(work->touchEffect, &pos, CLACT_SURFACE_MAIN);
+    ClActor_RestartAnim(work->touchEffect);
+    ClActor_SetVisible(work->touchEffect, TRUE);
+    ClActor_SetSurfacePos(work->touchEffect, &pos, CLACT_SURFACE_MAIN);
 }
 
 static void DupFitting_Trace(DupFittingWork *work, u8 id) {

@@ -85,15 +85,15 @@ GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param
 void EncEffGrid_ClearAndDraw(EncEff *effect);
 void EncEffGrid_Draw(EncEffGrid *grid);
 
-GameEvent *func_ov152_021f6200(GameSystem *gsys, Field *field);
-GameEvent *func_ov152_021f623c(GameSystem *gsys);
-void func_ov152_021f6264(EncEffGrid *grid);
-BOOL func_ov152_021f62a4(EncEffCell *cell);
+GameEvent *EncEffCells_Create(GameSystem *gsys, Field *field);
+GameEvent *EncEffCells_CreateGridEvent(GameSystem *gsys);
+void EncEffCells_Update(EncEffGrid *grid);
+BOOL EncEffCells_UpdateCell(EncEffCell *cell);
 
-GameEvent *func_ov153_021f6200(GameSystem *gsys, Field *field);
-GameEvent *func_ov153_021f623c(GameSystem *gsys);
-void func_ov153_021f6268(EncEffGrid *grid);
-BOOL func_ov153_021f62c4(EncEffCell *cell);
+GameEvent *EncEffColumns_Create(GameSystem *gsys, Field *field);
+GameEvent *EncEffColumns_CreateGridEvent(GameSystem *gsys);
+void EncEffColumns_Update(EncEffGrid *grid);
+BOOL EncEffColumns_UpdateCell(EncEffCell *cell);
 EncEff *EncEff_Create(HeapID heapId, Field *field);
 void EncEff_Free(EncEff *encEff);
 

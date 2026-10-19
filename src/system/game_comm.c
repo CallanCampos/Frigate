@@ -86,11 +86,11 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
 static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
     [GAME_COMM_NO_NULL] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
     [GAME_COMM_NO_BEACON_SEARCH] = {
-        func_ov012_0215f55c,
-        func_ov012_0215f5b4,
-        func_ov012_0215f654,
-        func_ov012_0215f610,
-        func_ov012_0215f628,
+        GameBeaconSearch_Init,
+        GameBeaconSearch_InitWait,
+        GameBeaconSearch_Main,
+        GameBeaconSearch_Exit,
+        GameBeaconSearch_ExitWait,
         NULL,
         NULL,
     },
@@ -105,20 +105,20 @@ static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
         UnionMain_OnFieldOut,
     },
     [GAME_COMM_NO_MUSICAL] = {
-        func_ov211_021ef230,
+        MusComm_Init,
         NULL,
-        func_ov211_021ef394,
-        func_ov211_021ef288,
-        func_ov211_021ef378,
+        MusComm_Update,
+        MusComm_Exit,
+        MusComm_ExitWait,
         NULL,
         NULL,
     },
     [GAME_COMM_NO_UNK5] = {
-        func_ov012_0215f55c,
-        func_ov012_0215f5b4,
-        func_ov012_0215f654,
-        func_ov012_0215f610,
-        func_ov012_0215f628,
+        GameBeaconSearch_Init,
+        GameBeaconSearch_InitWait,
+        GameBeaconSearch_Main,
+        GameBeaconSearch_Exit,
+        GameBeaconSearch_ExitWait,
         NULL,
         NULL,
     },
@@ -345,17 +345,17 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
     PlayerInfo *info2;
     GameCommLogEntry *entry;
 
-    if (netId1 == func_020175cc(comm->gameData)) {
+    if (netId1 == GameData_GetNetID(comm->gameData)) {
         info1 = GetGameDataPlayerInfo(comm->gameData);
     } else {
-        info1 = func_02017378(comm->gameData, netId1);
+        info1 = GameData_GetPlayerInfoByNetID(comm->gameData, netId1);
     }
-    if (netId2 == func_020175cc(comm->gameData)) {
+    if (netId2 == GameData_GetNetID(comm->gameData)) {
         info2 = GetGameDataPlayerInfo(comm->gameData);
     } else {
-        info2 = func_02017378(comm->gameData, netId2);
+        info2 = GameData_GetPlayerInfoByNetID(comm->gameData, netId2);
     }
-    if (func_02008b5c(info1) == TRUE || func_02008b5c(info2) == TRUE) {
+    if (PlayerInfo_IsNameEmpty(info1) == TRUE || PlayerInfo_IsNameEmpty(info2) == TRUE) {
         return;
     }
 
@@ -387,7 +387,7 @@ void func_0202bf68(GameCommSys *comm, u32 netId1, u32 netId2) {
 }
 
 void func_0202bf7c(GameCommSys *comm) {
-    u32 netId = func_020175cc(comm->gameData);
+    u32 netId = GameData_GetNetID(comm->gameData);
 
     GameCommSys_LogPlayers(comm, netId, netId, 0x37);
 }

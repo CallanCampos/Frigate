@@ -414,8 +414,8 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
         u32 date;
 
         GSYS_GetGameData(wk->param->gsys);
-        log = func_0200afbc(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
-        if (!func_0200b0f0(log, getIDAsUInt(trainer))) {
+        log = TrainerLogSave_Get(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
+        if (!TrainerLogSave_HasId(log, getIDAsUInt(trainer))) {
             isNew = TRUE;
         }
         isNewTrainer = FALSE;
@@ -423,7 +423,7 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
             isNewTrainer = TRUE;
         }
         CompatibleIrcSys_BuildProfile(wk->param->gsys, &mine);
-        if (func_02042bc4()) {
+        if (GFL_NetIsParent()) {
             date = mine.date;
         } else {
             date = wk->profile->date;
@@ -553,5 +553,5 @@ static u8 IrcCompatible_BirthdayScore(const CompatibleIrcProfile *profile, u32 d
     rtcDate.month = (u8)(date >> 16);
     rtcDate.day = (u8)(date >> 8);
     rtcDate.week = (u8)date;
-    return func_0200b11c(profile->birthMonth, profile->birthDay, &rtcDate);
+    return TrainerLog_GetBirthdayValue(profile->birthMonth, profile->birthDay, &rtcDate);
 }

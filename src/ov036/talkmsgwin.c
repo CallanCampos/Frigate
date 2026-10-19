@@ -331,13 +331,13 @@ void func_ov036_0218b524(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u32 wait
     TalkMsgWin *win = &sys->windows[index];
 
     if (win->stream != NULL) {
-        func_020223cc(win->stream);
+        PrintStream_Delete(win->stream);
         win->stream = NULL;
     }
     if (strbuf != NULL) {
         win->wait = wait;
         win->strbuf = strbuf;
-        win->stream = func_02022268(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
+        win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
                                     sys->tcbMgr, 0, sys->setup.heapId, 15);
         win->state = TALKMSG_WIN_STATE_SHOWN;
     }
@@ -426,7 +426,7 @@ static void ActorMsgWin_CreateCore(TalkMsgWinSys *sys, TalkMsgWin *win, const Ve
 static void func_ov036_0218b6c4(TalkMsgWinSys *sys, TalkMsgWin *win) {
     if (func_ov036_0218b5fc(win) == FALSE) {
         if (win->stream != NULL) {
-            func_020223cc(win->stream);
+            PrintStream_Delete(win->stream);
             win->stream = NULL;
         }
         func_ov036_0218cf48(sys, win->bmpWin);
@@ -462,7 +462,7 @@ static void func_ov036_0218b70c(TalkMsgWinSys *sys, TalkMsgWin *win) {
             win->state = TALKMSG_WIN_STATE_SHOWN;
             wait = win->wait;
             func_ov036_0218cf38(sys, win);
-            win->stream = func_02022268(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
+            win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
                                         sys->tcbMgr, 0, sys->setup.heapId, 15);
         }
         break;
@@ -495,7 +495,7 @@ static void func_ov036_0218b7e8(TalkMsgWinSys *sys, TalkMsgWin *win) {
         win->state = TALKMSG_WIN_STATE_SHOWN;
         wait = win->wait;
         func_ov036_0218cf28(sys, win);
-        win->stream = func_02022268(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
+        win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
                                     sys->tcbMgr, 0, sys->setup.heapId, 15);
         break;
     }

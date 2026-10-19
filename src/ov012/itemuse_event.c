@@ -46,9 +46,10 @@ typedef struct {
 static FieldActionResult CheckFieldActionBlocked(u32 action, GameSystem *gsys, Field *field);
 static FieldActionResult FieldActionBlockCheck_Cycling(GameData *gameData, Field *field, PlayerState *state);
 static FieldActionResult FieldActionBlockCheck_EscapeRope(GameData *gameData, Field *field, PlayerState *state);
-static FieldActionResult func_ov012_0215f0ac(GameData *gameData, Field *field, PlayerState *state);
+static FieldActionResult FieldActionBlockCheck_NormalZone(GameData *gameData, Field *field, PlayerState *state);
 static FieldActionResult FieldActionBlockCheck_Surf(GameData *gameData, Field *field, PlayerState *state);
-static FieldActionResult func_ov012_0215f108(GameData *gameData, Field *field, PlayerState *state);
+static FieldActionResult FieldActionBlockCheck_NormalZoneNotRoyalUnova(GameData *gameData, Field *field,
+                                                                       PlayerState *state);
 static GameEventReturnCode EventFieldToggleCycling_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFieldToggleDowsing_Callback(GameEvent *event, u32 *state, void *data);
 
@@ -63,14 +64,14 @@ static const FieldActionBlockCheck FIELD_ACTION_BLOCK_CHECKS[12] = {
     NULL,
     NULL,
     FieldActionBlockCheck_EscapeRope,
-    func_ov012_0215f0ac,
+    FieldActionBlockCheck_NormalZone,
     FieldActionBlockCheck_Surf,
-    func_ov012_0215f108,
+    FieldActionBlockCheck_NormalZoneNotRoyalUnova,
     NULL,
     NULL,
-    func_ov012_0215f108,
-    func_ov012_0215f108,
-    func_ov012_0215f108,
+    FieldActionBlockCheck_NormalZoneNotRoyalUnova,
+    FieldActionBlockCheck_NormalZoneNotRoyalUnova,
+    FieldActionBlockCheck_NormalZoneNotRoyalUnova,
 };
 
 void PlayerActionPerms_Create(PlayerActionPerms *perms, GameSystem *gsys, Field *field) {
@@ -141,7 +142,7 @@ static FieldActionResult FieldActionBlockCheck_EscapeRope(GameData *gameData, Fi
     return FIELD_ACTION_ALLOWED;
 }
 
-static FieldActionResult func_ov012_0215f0ac(GameData *gameData, Field *field, PlayerState *state) {
+static FieldActionResult FieldActionBlockCheck_NormalZone(GameData *gameData, Field *field, PlayerState *state) {
     if (func_02018c38(PlayerState_GetZoneID(state))) {
         return FIELD_ACTION_ALLOWED;
     }
@@ -161,7 +162,8 @@ static FieldActionResult FieldActionBlockCheck_Surf(GameData *gameData, Field *f
     return FIELD_ACTION_ALLOWED;
 }
 
-static FieldActionResult func_ov012_0215f108(GameData *gameData, Field *field, PlayerState *state) {
+static FieldActionResult FieldActionBlockCheck_NormalZoneNotRoyalUnova(GameData *gameData, Field *field,
+                                                                       PlayerState *state) {
     u16 zoneId = PlayerState_GetZoneID(state);
 
     if (IsZoneRoyalUnova(zoneId)) {

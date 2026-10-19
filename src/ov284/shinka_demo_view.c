@@ -343,12 +343,12 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         break;
     case VIEW_WHITEN:
         view->state = VIEW_WAIT_WHITE;
-        func_0201ae2c(view->mcss[view->current], 0, 16, 0, GX_RGB(31, 31, 31));
-        func_0201ae2c(view->mcss[ShinkaDemoView_OtherMcss(view->current)], 16, 16, 0, GX_RGB(31, 31, 31));
+        MCSS_StartFade(view->mcss[view->current], 0, 16, 0, GX_RGB(31, 31, 31));
+        MCSS_StartFade(view->mcss[ShinkaDemoView_OtherMcss(view->current)], 16, 16, 0, GX_RGB(31, 31, 31));
         MCSS_PauseAnimation(view->mcss[view->current]);
         break;
     case VIEW_WAIT_WHITE:
-        if (func_0201aee8(view->mcss[view->current]) == FALSE) {
+        if (MCSS_IsFading(view->mcss[view->current]) == FALSE) {
             view->state = VIEW_WAIT_PIECES;
         }
         break;
@@ -365,7 +365,7 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         ShinkaDemoView_SetMcssX(view, FX32_CONST(256));
         ShinkaDemoView_SetPiecesPosition(view, 0, FX32_CONST(-0.5), 0);
         view->mcssVisible = FALSE;
-        NNS_G2dRestartMCAnimation(func_0201adc4(view->mcss[view->current]));
+        NNS_G2dRestartMCAnimation(MCSS_GetMultiCellAnimation(view->mcss[view->current]));
         break;
     case VIEW_UNUSED_7:
         if (view->frame >= 1) {
@@ -434,10 +434,10 @@ void ShinkaDemoView_Update(ShinkaDemoView *view) {
         break;
     case VIEW_FADE_IN:
         view->state = VIEW_WAIT_FADE;
-        func_0201ae2c(view->mcss[view->current], 16, 0, 1, GX_RGB(31, 31, 31));
+        MCSS_StartFade(view->mcss[view->current], 16, 0, 1, GX_RGB(31, 31, 31));
         break;
     case VIEW_WAIT_FADE:
-        if (func_0201aee8(view->mcss[view->current]) == FALSE) {
+        if (MCSS_IsFading(view->mcss[view->current]) == FALSE) {
             view->state = VIEW_WAIT_CRY_START;
             MCSS_ResumeAnimation(view->mcss[view->current]);
         }
@@ -533,8 +533,8 @@ BOOL ShinkaDemoView_Cancel(ShinkaDemoView *view) {
 
 static void ShinkaDemoView_InitMcss(ShinkaDemoView *view) {
     view->mcssSystem = MCSSSys_Create(2, view->heapId);
-    func_0201aefc(view->mcssSystem, 0x30000);
-    func_0201aacc(view->mcssSystem);
+    MCSSSys_SetTexBase(view->mcssSystem, 0x30000);
+    MCSSSys_EnableOrtho(view->mcssSystem);
 }
 
 static void ShinkaDemoView_FreeMcss(ShinkaDemoView *view) {
@@ -573,13 +573,13 @@ static void ShinkaDemoView_AddMcss(ShinkaDemoView *view) {
         for (i = 0; i < NELEMS(view->mcss); i++) {
             if (i == 0) {
                 view->mcss[i] =
-                    func_0201c14c(view->mcssSystem, view->pkm, 0, 0, ShinkaDemoView_GetSpriteY(view->pkm), 0);
+                    MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, ShinkaDemoView_GetSpriteY(view->pkm), 0);
             } else {
-                view->mcss[i] =
-                    func_0201c14c(view->mcssSystem, view->evolved, 0, 0, ShinkaDemoView_GetSpriteY(view->evolved), 0);
+                view->mcss[i] = MCSSSys_AddPartyPkm(view->mcssSystem, view->evolved, 0, 0,
+                                                    ShinkaDemoView_GetSpriteY(view->evolved), 0);
             }
-            func_0201aecc(view->mcss[i], 1);
-            func_0201c290(view->mcss[i]);
+            MCSS_SetNoShadow(view->mcss[i], 1);
+            MCSS_SetLoopAnimation(view->mcss[i]);
             MCSS_SetScale(view->mcss[i], &scale);
             if (i != 0) {
                 MCSS_Hide(view->mcss[i]);
@@ -587,9 +587,9 @@ static void ShinkaDemoView_AddMcss(ShinkaDemoView *view) {
             }
         }
     } else {
-        view->mcss[1] = func_0201c14c(view->mcssSystem, view->pkm, 0, 0, ShinkaDemoView_GetSpriteY(view->pkm), 0);
-        func_0201aecc(view->mcss[1], 1);
-        func_0201c290(view->mcss[1]);
+        view->mcss[1] = MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, ShinkaDemoView_GetSpriteY(view->pkm), 0);
+        MCSS_SetNoShadow(view->mcss[1], 1);
+        MCSS_SetLoopAnimation(view->mcss[1]);
         MCSS_SetScale(view->mcss[1], &scale);
     }
     ShinkaDemoView_SetMcssOffsets(view);
@@ -633,7 +633,7 @@ static void ShinkaDemoView_SetMcssOffsets(ShinkaDemoView *view) {
             offset.x = FX32_CONST(left);
             offset.y = FX32_CONST(height);
             offset.z = 0;
-            func_0201ab54(view->mcss[i], &offset);
+            MCSS_SetPositionOffset(view->mcss[i], &offset);
         }
     }
 }

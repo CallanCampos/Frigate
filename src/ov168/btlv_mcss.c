@@ -72,13 +72,13 @@ struct BtlvMcss {
     u32 rotating : 1;                         //        BtlvMcss_StartRotation's task runs
     u32 shadows : 1;                          //
     u32 moveTasks;                            // 0x514  the position, a circle or a shake
-    u32 unk518Tasks;                          // 0x518  func_0201abb8's vector
-    u32 unk51cTasks;                          // 0x51c  func_0201abf0's vector
+    u32 unk518Tasks;                          // 0x518  MCSS_SetScaleOffset's vector
+    u32 unk51cTasks;                          // 0x51c  MCSS_SetRotation's vector
     u32 scaleTasks;                           // 0x520
     u32 unk524Tasks;                          // 0x524  func_0201ac40's vector
     u32 blinkTasks;                           // 0x528
     u32 alphaTasks;                           // 0x52c
-    u32 levelTasks;                           // 0x530  func_0201af54's level
+    u32 levelTasks;                           // 0x530  MCSS_SetMosaic's level
     u32 flat;                                 // 0x534
     fx32 scaleNear;                           // 0x538  the even positions' scale
     fx32 scaleFar;                            // 0x53c  the odd positions'
@@ -244,8 +244,8 @@ BtlvMcss *BtlvMcss_Create(u32 battleStyle, TCBManager *tcbMgr, HeapID heapId) {
     work->mcssSys = MCSSSys_Create(BTLV_MCSS_POS_MAX, heapId);
     work->tcbMgr = tcbMgr;
     work->heapId = heapId;
-    func_0201b28c(work->mcssSys, 0x100);
-    func_0201b290(work->mcssSys, TRUE);
+    MCSSSys_SetCellDepth(work->mcssSys, 0x100);
+    MCSSSys_SetOrthoNear(work->mcssSys, TRUE);
     work->flat = TRUE;
     work->scaleNear = FX32_ONE;
     work->scaleFar = FX32_ONE;
@@ -448,10 +448,10 @@ void BtlvMcss_AddPokemon(BtlvMcss *work, PartyPkm *pkm, int pos) {
         shadow = TRUE;
     }
     if (!shadow) {
-        func_0201aeb0(work->entries[index].mcss, 0);
+        MCSS_SetShadowAlpha(work->entries[index].mcss, 0);
     } else {
-        func_0201ac70(work->entries[index].mcss, &offset);
-        func_0201ac64(work->entries[index].mcss, unk6);
+        MCSS_SetShadowOffset(work->entries[index].mcss, &offset);
+        MCSS_SetShadowRotZ(work->entries[index].mcss, unk6);
     }
     work->entries[index].idleCount = 3;
     BtlvMcss_UpdateScale(work, pos);
@@ -511,7 +511,7 @@ void BtlvMcss_SetFlatAll(BtlvMcss *work) {
     int pos;
     int index;
 
-    func_0201aacc(work->mcssSys);
+    MCSSSys_EnableOrtho(work->mcssSys);
     work->flat = TRUE;
     for (pos = 0; pos < BTLV_MCSS_POS_MAX; pos++) {
         index = BtlvMcss_GetIndex(work, pos);
@@ -526,7 +526,7 @@ void BtlvMcss_ClearFlatAll(BtlvMcss *work) {
     int pos;
     int index;
 
-    func_0201aadc(work->mcssSys);
+    MCSSSys_DisableOrtho(work->mcssSys);
     work->flat = FALSE;
     for (pos = 0; pos < BTLV_MCSS_POS_MAX; pos++) {
         index = BtlvMcss_GetIndex(work, pos);
@@ -542,7 +542,7 @@ void BtlvMcss_SetFlat(BtlvMcss *work, int pos) {
 
     if (index != -1) {
         work->entries[index].flat = TRUE;
-        func_0201aae8(work->entries[index].mcss);
+        MCSS_EnableOrtho(work->entries[index].mcss);
         BtlvMcss_UpdateScale(work, pos);
     }
 }
@@ -552,7 +552,7 @@ void BtlvMcss_ClearFlat(BtlvMcss *work, int pos) {
 
     if (index != -1) {
         work->entries[index].flat = FALSE;
-        func_0201aaf8(work->entries[index].mcss);
+        MCSS_DisableOrtho(work->entries[index].mcss);
         BtlvMcss_UpdateScale(work, pos);
     }
 }
@@ -564,21 +564,21 @@ static void BtlvMcss_SetAnimStop(BtlvMcss *work, int pos, int mode) {
         return;
     }
     if (mode == 4) {
-        func_0201ac9c(work->entries[index].mcss);
+        MCSS_DisableFlipV(work->entries[index].mcss);
         work->entries[index].frozen = FALSE;
     }
     if (work->entries[index].frozen) {
         return;
     }
     if (mode == 2) {
-        func_0201acb0(work->entries[index].mcss);
+        MCSS_ToggleFlipV(work->entries[index].mcss);
     } else if (mode == 1) {
-        func_0201ac8c(work->entries[index].mcss);
+        MCSS_EnableFlipV(work->entries[index].mcss);
     } else if (mode == 3) {
-        func_0201ac8c(work->entries[index].mcss);
+        MCSS_EnableFlipV(work->entries[index].mcss);
         work->entries[index].frozen = TRUE;
     } else {
-        func_0201ac9c(work->entries[index].mcss);
+        MCSS_DisableFlipV(work->entries[index].mcss);
     }
 }
 
@@ -591,7 +591,7 @@ static BOOL BtlvMcss_IsAnimStopped(BtlvMcss *work, int pos) {
     if (work->entries[index].mcss == NULL) {
         return FALSE;
     }
-    return func_0201acd4(work->entries[index].mcss);
+    return MCSS_IsPaused(work->entries[index].mcss);
 }
 
 void BtlvMcss_SetAnimPause(BtlvMcss *work, int pos, int mode) {
@@ -620,7 +620,7 @@ BOOL BtlvMcss_GetVanish(BtlvMcss *work, int pos) {
     if (work->entries[index].mcss == NULL) {
         return FALSE;
     }
-    return func_0201ad70(work->entries[index].mcss);
+    return MCSS_IsHidden(work->entries[index].mcss);
 }
 
 void BtlvMcss_SetVanish(BtlvMcss *work, int pos, int mode) {
@@ -631,7 +631,7 @@ void BtlvMcss_SetVanish(BtlvMcss *work, int pos, int mode) {
     }
     switch (mode) {
     case 2:
-        func_0201ada0(work->entries[index].mcss);
+        MCSS_ToggleHidden(work->entries[index].mcss);
         break;
     case 1:
         MCSS_Hide(work->entries[index].mcss);
@@ -640,7 +640,7 @@ void BtlvMcss_SetVanish(BtlvMcss *work, int pos, int mode) {
         MCSS_Show(work->entries[index].mcss);
         break;
     case 3:
-        if (func_0201ad70(work->entries[index].mcss)) {
+        if (MCSS_IsHidden(work->entries[index].mcss)) {
             work->entries[index].hidden = TRUE;
         }
         MCSS_Hide(work->entries[index].mcss);
@@ -712,7 +712,7 @@ void BtlvMcss_SetShadowVanish(BtlvMcss *work, int pos, u8 value) {
     if (!work->shadows) {
         value = 1;
     }
-    func_0201aecc(work->entries[index].mcss, value);
+    MCSS_SetNoShadow(work->entries[index].mcss, value);
 }
 
 void BtlvMcss_SetAnimSpeed(BtlvMcss *work, int pos, fx32 speed) {
@@ -721,7 +721,7 @@ void BtlvMcss_SetAnimSpeed(BtlvMcss *work, int pos, fx32 speed) {
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201afa0(work->entries[index].mcss, speed);
+    MCSS_SetAnimSpeed(work->entries[index].mcss, speed);
 }
 
 void BtlvMcss_MovePosition(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
@@ -766,7 +766,7 @@ void BtlvMcss_MoveVec518(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201aba0(work->entries[index].mcss, &start);
+    MCSS_GetScaleOffset(work->entries[index].mcss, &start);
     work->unk518Seq[pos]++;
     BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec518,
                            BtlvMcss_MoveTaskEnd_Vec518, FALSE, work->unk518Seq[pos]);
@@ -780,7 +780,7 @@ void BtlvMcss_MoveScale(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 fr
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201ab70(work->entries[index].mcss, &start);
+    MCSS_GetScale(work->entries[index].mcss, &start);
     work->scaleSeq[pos]++;
     BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Scale,
                            BtlvMcss_MoveTaskEnd_Scale, FALSE, work->scaleSeq[pos]);
@@ -794,11 +794,11 @@ void BtlvMcss_MoveVec524(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    // BUG: the start is func_0201aba0's vector, where the task steps func_0201ac28's
+    // BUG: the start is MCSS_GetScaleOffset's vector, where the task steps func_0201ac28's
 #ifdef BUGFIX
     func_0201ac28(work->entries[index].mcss, &start);
 #else
-    func_0201aba0(work->entries[index].mcss, &start);
+    MCSS_GetScaleOffset(work->entries[index].mcss, &start);
 #endif
     work->unk524Seq[pos]++;
     BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec524,
@@ -813,7 +813,7 @@ void BtlvMcss_MoveVec51c(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201abd4(work->entries[index].mcss, &start);
+    MCSS_GetRotation(work->entries[index].mcss, &start);
     work->unk51cSeq[pos]++;
     BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec51c,
                            BtlvMcss_MoveTaskEnd_Vec51c, TRUE, work->unk51cSeq[pos]);
@@ -882,7 +882,7 @@ void BtlvMcss_MoveAlpha(BtlvMcss *work, int pos, int type, int alpha, s32 frames
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    start.x = FX32_CONST(func_0201ae88(work->entries[index].mcss));
+    start.x = FX32_CONST(MCSS_GetAlpha(work->entries[index].mcss));
     start.y = 0;
     start.z = 0;
     end.x = FX32_CONST(alpha);
@@ -952,7 +952,7 @@ void BtlvMcss_MoveLevel(BtlvMcss *work, int pos, int type, int level, s32 frames
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    start.x = FX32_CONST(func_0201af44(work->entries[index].mcss));
+    start.x = FX32_CONST(MCSS_GetMosaic(work->entries[index].mcss));
     start.y = 0;
     start.z = 0;
     end.x = FX32_CONST(level);
@@ -968,7 +968,7 @@ BOOL BtlvMcss_IsBusy(BtlvMcss *work, int pos) {
     BOOL fading = FALSE;
 
     if (BtlvMcss_Exists(work, pos)) {
-        fading = func_0201aee8(work->entries[BtlvMcss_GetIndex(work, pos)].mcss);
+        fading = MCSS_IsFading(work->entries[BtlvMcss_GetIndex(work, pos)].mcss);
     }
     if ((BtlvEffect_PosBit(pos) & work->moveTasks) || (BtlvEffect_PosBit(pos) & work->unk518Tasks) ||
         (BtlvEffect_PosBit(pos) & work->unk524Tasks) || (BtlvEffect_PosBit(pos) & work->scaleTasks) ||
@@ -1004,8 +1004,8 @@ void BtlvMcss_StartPaletteFade(BtlvMcss *work, int pos, u8 startEvy, u8 endEvy, 
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    // The callers pass the wait as a u8, and func_0201ae2c takes it signed
-    func_0201ae2c(work->entries[index].mcss, startEvy, endEvy, (s8)wait, color);
+    // The callers pass the wait as a u8, and MCSS_StartFade takes it signed
+    MCSS_StartFade(work->entries[index].mcss, startEvy, endEvy, (s8)wait, color);
     work->entries[index].fading = TRUE;
 }
 
@@ -1015,7 +1015,7 @@ static void BtlvMcss_SetPaletteBlend(BtlvMcss *work, int pos, u8 evy, GXRgb colo
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201afb0(work->mcssSys, work->entries[index].mcss, evy, color);
+    MCSS_BlendPalette(work->mcssSys, work->entries[index].mcss, evy, color);
 }
 
 static void BtlvMcss_ResetPaletteBlend(BtlvMcss *work, int pos) {
@@ -1024,7 +1024,7 @@ static void BtlvMcss_ResetPaletteBlend(BtlvMcss *work, int pos) {
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201b128(work->mcssSys, work->entries[index].mcss);
+    MCSS_ResetPalette(work->mcssSys, work->entries[index].mcss);
 }
 
 void BtlvMcss_ChangePokemon(BtlvMcss *work, int pos, PartyPkm *pkm) {
@@ -1115,8 +1115,8 @@ void BtlvMcss_SetSubstitute(BtlvMcss *work, int pos, BOOL substitute, BOOL flag)
         return;
     }
     if (!substitute) {
-        func_0201c188(work->mcssSys, work->entries[index].mon.personality);
-        func_02019bd8(work->mcssSys, work->entries[index].mcss, &work->entries[index].info);
+        MCSSSys_SetSpindaLoadCallback(work->mcssSys, work->entries[index].mon.personality);
+        MCSS_Reload(work->mcssSys, work->entries[index].mcss, &work->entries[index].info);
         MCSS_SetAnimationEndCallback(work->entries[index].mcss, index, BtlvMcss_OnAnimationEnd, 1);
         if (flag) {
             work->entries[index].flags &= ~BTLV_MCSS_FLAG_UNK0;
@@ -1132,7 +1132,7 @@ void BtlvMcss_SetSubstitute(BtlvMcss *work, int pos, BOOL substitute, BOOL flag)
         info.multiCellAnime = (pos & 1) ? 0x3ab0 : 0x3ab6;
         info.bin = (pos & 1) ? 0x3ab1 : 0x3ab7;
         info.unk20 = 0;
-        func_02019bd8(work->mcssSys, work->entries[index].mcss, &info);
+        MCSS_Reload(work->mcssSys, work->entries[index].mcss, &info);
         BtlvMcss_ResetPaletteBlend(work, pos);
         if (flag) {
             work->entries[index].flags |= BTLV_MCSS_FLAG_UNK0;
@@ -1147,8 +1147,8 @@ static void BtlvMcss_SetLevel(BtlvMcss *work, int pos, int level) {
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    func_0201c188(work->mcssSys, work->entries[index].mon.personality);
-    func_0201af54(work->mcssSys, work->entries[index].mcss, level);
+    MCSSSys_SetSpindaLoadCallback(work->mcssSys, work->entries[index].mon.personality);
+    MCSS_SetMosaic(work->mcssSys, work->entries[index].mcss, level);
 }
 
 void BtlvMcss_Transform(BtlvMcss *work, int targetPos, int pos) {
@@ -1176,7 +1176,7 @@ void BtlvMcss_Transform(BtlvMcss *work, int targetPos, int pos) {
     }
     work->entries[index].mon = work->entries[target].mon;
     dst = &work->entries[index].info;
-    func_02019bd8(work->mcssSys, work->entries[index].mcss, dst);
+    MCSS_Reload(work->mcssSys, work->entries[index].mcss, dst);
 }
 
 void BtlvMcss_ReloadSprite(BtlvMcss *work, int pos, const MCSSLoadInfo *info) {
@@ -1184,8 +1184,8 @@ void BtlvMcss_ReloadSprite(BtlvMcss *work, int pos, const MCSSLoadInfo *info) {
     MCSSLoadInfo *dst = &work->entries[index].info;
 
     *dst = *info;
-    func_0201c188(work->mcssSys, work->entries[index].mon.personality);
-    func_02019bd8(work->mcssSys, work->entries[index].mcss, dst);
+    MCSSSys_SetSpindaLoadCallback(work->mcssSys, work->entries[index].mon.personality);
+    MCSS_Reload(work->mcssSys, work->entries[index].mcss, dst);
 }
 
 u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, s32 speed, int volume, int arg4, int arg5, int arg6) {
@@ -1233,7 +1233,7 @@ u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, s32 speed, int volume, int arg4, i
     chatterInfo = &chatter;
     flag = FALSE;
     if (mainModule != NULL) {
-        if (!func_ov167_0219d228(mainModule, pos, &chatterInfo->chatter)) {
+        if (!GetViewPosChatter(mainModule, pos, &chatterInfo->chatter)) {
             chatterInfo = NULL;
         }
     } else {
@@ -1284,8 +1284,8 @@ void BtlvMcss_SetupPokemonLoadInfo(BtlvMcss *work, PartyPkm *pkm, MCSSLoadInfo *
     if (pos & 1) {
         back = FALSE;
     }
-    func_0201bfdc(pkm, info, back);
-    func_0201c188(work->mcssSys, PokeParty_GetParam(pkm, PKM_PARAM_PID, NULL));
+    SetupPokemonLoaderByPartyPkm(pkm, info, back);
+    MCSSSys_SetSpindaLoadCallback(work->mcssSys, PokeParty_GetParam(pkm, PKM_PARAM_PID, NULL));
 }
 
 BOOL BtlvMcss_SetAnimation(BtlvMcss *work, int pos, int anim) {
@@ -1338,7 +1338,7 @@ void BtlvMcss_ResetPosition(BtlvMcss *work, int pos) {
     }
     BtlvMcss_GetDefaultPosImpl(work, &home, pos);
     MCSS_GetPosition(work->entries[index].mcss, &cur);
-    func_0201ab3c(work->entries[index].mcss, &offset);
+    MCSS_GetPositionOffset(work->entries[index].mcss, &offset);
     work->entries[index].moved = FALSE;
     if (home.x != cur.x || home.y != cur.y || home.z != cur.z || offset.x != 0 || offset.y != 0 || offset.z != 0) {
         work->entries[index].moved = TRUE;
@@ -1346,7 +1346,7 @@ void BtlvMcss_ResetPosition(BtlvMcss *work, int pos) {
         offset.y = 0;
         offset.z = 0;
         MCSS_SetPosition(work->entries[index].mcss, &home);
-        func_0201ab54(work->entries[index].mcss, &offset);
+        MCSS_SetPositionOffset(work->entries[index].mcss, &offset);
         MCSS_Hide(work->entries[index].mcss);
     }
 }
@@ -1386,7 +1386,7 @@ void BtlvMcss_SetUnkB270(BtlvMcss *work, int pos, BOOL check) {
             break;
         }
     }
-    func_0201b270(work->entries[index].mcss, flag);
+    MCSS_SetReverse(work->entries[index].mcss, flag);
 }
 
 BOOL BtlvMcss_CheckChanged(BtlvMcss *work, int pos) {
@@ -1460,7 +1460,7 @@ static void BtlvMcss_UpdateScale(BtlvMcss *work, int pos) {
     scale.x = value;
     scale.y = value;
     scale.z = FX32_ONE;
-    func_0201ac0c(work->entries[index].mcss, &scale);
+    MCSS_SetShadowScale(work->entries[index].mcss, &scale);
 }
 
 static void BtlvMcss_StartMoveTask(BtlvMcss *work, int pos, int type, VecFx32 *start, VecFx32 *end, s32 frames,
@@ -1560,9 +1560,9 @@ static void BtlvMcss_MoveTask_Vec518(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    func_0201aba0(work->entries[index].mcss, &value);
+    MCSS_GetScaleOffset(work->entries[index].mcss, &value);
     done = BtlvEffTool_Move(&task->move, &value);
-    func_0201abb8(work->entries[index].mcss, &value);
+    MCSS_SetScaleOffset(work->entries[index].mcss, &value);
     if (done == TRUE) {
         BtlvEffect_EndTask(tcb);
     }
@@ -1595,7 +1595,7 @@ static void BtlvMcss_MoveTask_Scale(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    func_0201ab70(work->entries[index].mcss, &value);
+    MCSS_GetScale(work->entries[index].mcss, &value);
     done = BtlvEffTool_Move(&task->move, &value);
     MCSS_SetScale(work->entries[index].mcss, &value);
     if (done == TRUE) {
@@ -1665,9 +1665,9 @@ static void BtlvMcss_MoveTask_Vec51c(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    func_0201abd4(work->entries[index].mcss, &value);
+    MCSS_GetRotation(work->entries[index].mcss, &value);
     done = BtlvEffTool_Move(&task->move, &value);
-    func_0201abf0(work->entries[index].mcss, &value);
+    MCSS_SetRotation(work->entries[index].mcss, &value);
     if (done == TRUE) {
         BtlvEffect_EndTask(tcb);
     }
@@ -1817,7 +1817,7 @@ static void BtlvMcss_MoveTask_Circle(TCB *tcb, void *data) {
                     break;
                 }
             }
-            func_0201ab54(work->entries[index].mcss, &offset);
+            MCSS_SetPositionOffset(work->entries[index].mcss, &offset);
         } else {
             task->waitCount++;
         }
@@ -1866,12 +1866,12 @@ static void BtlvMcss_MoveTask_Shake(TCB *tcb, void *data) {
     } else {
         offset.x = value;
     }
-    func_0201ab54(work->entries[index].mcss, &offset);
+    MCSS_SetPositionOffset(work->entries[index].mcss, &offset);
     if (--task->frames == 0) {
         offset.x = 0;
         offset.y = 0;
         offset.z = 0;
-        func_0201ab54(work->entries[index].mcss, &offset);
+        MCSS_SetPositionOffset(work->entries[index].mcss, &offset);
         BtlvEffect_EndTask(tcb);
     }
 }
@@ -1935,16 +1935,16 @@ static void BtlvMcss_IdleTask(TCB *tcb, void *data) {
     }
     switch (idle->seq) {
     case 0:
-        func_0201adc4(work->entries[index].mcss)->animCtrl.bActive = FALSE;
-        func_0201ae1c(work->entries[index].mcss, index | 0x80000000, BtlvMcss_IdleNodeCallback);
+        MCSS_GetMultiCellAnimation(work->entries[index].mcss)->animCtrl.bActive = FALSE;
+        MCSS_TraverseNodes(work->entries[index].mcss, index | 0x80000000, BtlvMcss_IdleNodeCallback);
         idle->seq++;
         idle->wait = data_ov168_021f4184[GFL_RandomMTRange(3)];
         break;
     case 1:
         if (--idle->wait == 0 || work->unk51cTasks != 0 || !BtlvEffvm_GetScriptKind(BtlvEffect_GetEffvm())) {
             MCSS_SetAnimation(work->entries[index].mcss, 0);
-            func_0201adc4(work->entries[index].mcss)->animCtrl.bActive = TRUE;
-            func_0201ae1c(work->entries[index].mcss, index, BtlvMcss_IdleNodeCallback);
+            MCSS_GetMultiCellAnimation(work->entries[index].mcss)->animCtrl.bActive = TRUE;
+            MCSS_TraverseNodes(work->entries[index].mcss, index, BtlvMcss_IdleNodeCallback);
             idle->seq++;
         }
         break;
@@ -2083,7 +2083,7 @@ static void BtlvMcss_OnAnimationEnd(u32 index, fx32 frame) {
         work->entries[index].idleCount = 3;
         idle = GFL_HeapAllocate(HEAPID_TAIL(work->heapId), sizeof(BtlvMcssIdle), TRUE, "btlv_mcss.c", 0xdb6);
         idle->index = index;
-        if (func_0201adc8(work->entries[index].mcss) > 1) {
+        if (MCSS_GetAnimationCount(work->entries[index].mcss) > 1) {
             MCSS_SetAnimation(work->entries[index].mcss, 1);
         }
         work->entries[index].idleTask = GFL_TCBMgrAddTask(work->tcbMgr, BtlvMcss_IdleTask, idle, 0);

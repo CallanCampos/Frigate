@@ -14,7 +14,7 @@ typedef struct WbtSubscreen WbtSubscreen;
 // The first two arguments are unused
 WbtSubscreen *WbtSubscreen_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
 void WbtSubscreen_Update(WbtSubscreen *work);
-void func_ov081_021ea934(WbtSubscreen *work);
+void WbtSubscreen_Draw(WbtSubscreen *work);
 void WbtSubscreen_Free(WbtSubscreen *work);
 
 #endif // POKEBW2_FIELD_WBT_SUBSCREEN_H

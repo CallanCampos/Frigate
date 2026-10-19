@@ -65,7 +65,7 @@ void PokeListMenu_Open(PokeListWork *wk, PokeListMenu *menu, const u32 *items) {
     setup.y = 24;
     setup.width = 13;
     setup.height = 3;
-    func_0203d564(wk->touch);
+    GCTX_HIDSetUsingTouch(wk->touch);
     menu->taskMenu = AppTaskMenu_Create(&setup, wk->taskMenuRes);
 }
 
@@ -82,7 +82,7 @@ void PokeListMenu_OpenYesNo(PokeListWork *wk, PokeListMenu *menu) {
     setup.y = 18;
     setup.width = 8;
     setup.height = 3;
-    func_0203d564(wk->touch);
+    GCTX_HIDSetUsingTouch(wk->touch);
     menu->taskMenu = AppTaskMenu_Create(&setup, wk->taskMenuRes);
 }
 
@@ -93,7 +93,7 @@ void PokeListMenu_Close(PokeListWork *wk, PokeListMenu *menu) {
     for (i = 0; i < menu->count; i++) {
         GFL_StrBufFree(menu->entries[i].str);
     }
-    wk->touch = func_0203d554();
+    wk->touch = GCTX_HIDIsUsingTouch();
 }
 
 void PokeListMenu_Update(PokeListWork *wk, PokeListMenu *menu) {

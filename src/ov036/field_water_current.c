@@ -108,7 +108,7 @@ GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data
         break;
     case 1:
         func_ov036_021c2750(work);
-        if (func_ov012_02166ecc(work->actor)) {
+        if (FldAct_CheckAcmdEnd(work->actor)) {
             func_ov036_021c268c(work);
             func_ov036_021c26dc(work);
             func_ov036_021c26ec(work);

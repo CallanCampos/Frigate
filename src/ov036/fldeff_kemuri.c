@@ -88,7 +88,7 @@ void func_ov036_021a3e74(FieldActor *actor, FieldEffects *effects) {
 void func_ov036_021a3ec4(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     SmokeTaskParams params;
-    u16 angle = func_ov012_02166fb0(GetActorMModelSystem(actor));
+    u16 angle = FldActSys_GetCameraAngle(GetActorMModelSystem(actor));
 
     CopyActorWPos(actor, &pos);
     pos.y += FX32_ONE;

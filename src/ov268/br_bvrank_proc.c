@@ -128,7 +128,7 @@ static BOOL BrBvRank_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
     }
@@ -178,7 +178,7 @@ static BOOL BrBvRank_ProcExit(GameProc *proc, u32 *state, void *param, void *wor
         BrBallEff_Exit(p_wk->ballEff[i]);
     }
     BmpOam_Exit(p_wk->bmpoam);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }
@@ -200,7 +200,7 @@ static BOOL BrBvRank_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->captionWin != NULL) {
         BrMsgWin_Main(p_wk->captionWin);
     }
@@ -334,7 +334,7 @@ static void BrBvRank_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
 
     BrBvRankList_Main(&p_wk->list, p_wk->heapId);
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (BrBtn_GetTrg(p_wk->btn, x, y)) {
             BrPoint pos;
 
@@ -438,7 +438,7 @@ static void BrBvRank_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             if (ret) {
                 for (i = 0; i < p_wk->p_param->p_outline->data_num; i++) {
                     p_wk->p_param->p_outline->isSecure[i] =
-                        func_0200c124(&p_wk->p_param->p_outline->data[i].header, BATTLE_REC_HEADER_UNK2A, 0);
+                        BattleRec_GetHeaderValue(&p_wk->p_param->p_outline->data[i].header, BATTLE_REC_HEADER_UNK2A, 0);
                 }
                 BrSeq_SetNext(p_seqwk, BrBvRank_SeqDownloadEnd);
             } else {
@@ -457,12 +457,12 @@ static void BrBvRank_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         break;
     }
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -662,8 +662,8 @@ static void BrBvRankList_CreateIcons(BrBvRankList *p_wk, ClActUnit *unit, HeapID
     }
 
     handle = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(heapId));
-    p_wk->plt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, heapId);
-    p_wk->cel = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
+    p_wk->plt = ClActSys_LoadPlttEx(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, heapId);
+    p_wk->cel = ClActSys_LoadCellAnims(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
 
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.sequence = 1;
@@ -682,19 +682,19 @@ static void BrBvRankList_CreateIcons(BrBvRankList *p_wk, ClActUnit *unit, HeapID
                 species = 1;
             }
             p_wk->chr[i][j] =
-                func_0204b81c(handle, PokeParty_GetIconIndex(species, poke.form[j], poke.gender[j], FALSE), FALSE,
-                              CLACT_VRAM_MAIN, heapId);
+                ClActSys_LoadChars(handle, PokeParty_GetIconIndex(species, poke.form[j], poke.gender[j], FALSE), FALSE,
+                                   CLACT_VRAM_MAIN, heapId);
             setup.x = j * 24 + 110;
             setup.y = i * 24 + 72;
             setup.priority = BR_BVRANK_ICON_COL_MAX - j;
             p_wk->icon[i][j] =
-                func_0204c040(unit, p_wk->chr[i][j], p_wk->plt, p_wk->cel, &setup, CLACT_SURFACE_MAIN, heapId);
-            func_0204c378(p_wk->icon[i][j], PokeIcon_GetPalette(species, poke.form[j], poke.gender[j], FALSE), 0);
-            func_0204c318(p_wk->icon[i][j], 1);
+                ClActor_Create(unit, p_wk->chr[i][j], p_wk->plt, p_wk->cel, &setup, CLACT_SURFACE_MAIN, heapId);
+            ClActor_SetPalette(p_wk->icon[i][j], PokeIcon_GetPalette(species, poke.form[j], poke.gender[j], FALSE), 0);
+            ClActor_SetObjMode(p_wk->icon[i][j], 1);
             if (poke.species[j] == 0) {
-                func_0204c124(p_wk->icon[i][j], FALSE);
+                ClActor_SetVisible(p_wk->icon[i][j], FALSE);
             } else {
-                func_0204c124(p_wk->icon[i][j], TRUE);
+                ClActor_SetVisible(p_wk->icon[i][j], TRUE);
             }
         }
     }
@@ -706,13 +706,13 @@ static void BrBvRankList_DeleteIcons(BrBvRankList *p_wk) {
     int i;
     int j;
 
-    func_0204be64(p_wk->cel);
-    func_0204bcd0(p_wk->plt);
+    ClActSys_FreeCellAnims(p_wk->cel);
+    ClActSys_FreePltt(p_wk->plt);
     for (i = 0; i < BR_BVRANK_ICON_ROW_MAX; i++) {
         for (j = 0; j < BR_BVRANK_ICON_COL_MAX; j++) {
             if (p_wk->icon[i][j] != NULL) {
-                func_0204b98c(p_wk->chr[i][j]);
-                func_0204c108(p_wk->icon[i][j]);
+                ClActSys_FreeChars(p_wk->chr[i][j]);
+                ClActor_Delete(p_wk->icon[i][j]);
                 p_wk->icon[i][j] = NULL;
             }
         }
@@ -732,33 +732,33 @@ static void BrBvRankList_ScrollIcons(BrBvRankList *p_wk, u32 list, s8 slide, Hea
                 ClActor *src = p_wk->icon[row + 1][col];
                 ClActor *dst = p_wk->icon[row][col];
 
-                if (func_0204c138(src)) {
+                if (ClActor_IsVisible(src)) {
                     NNSG2dImageProxy proxy;
                     u8 plt;
 
-                    func_0204c40c(src, &proxy);
-                    plt = func_0204c39c(src);
-                    func_0204c3e4(dst, &proxy);
-                    func_0204c378(dst, plt, 0);
-                    func_0204c124(dst, TRUE);
+                    ClActor_GetImageProxy(src, &proxy);
+                    plt = ClActor_GetPalette(src);
+                    ClActor_SetImageProxy(dst, &proxy);
+                    ClActor_SetPalette(dst, plt, 0);
+                    ClActor_SetVisible(dst, TRUE);
                 } else {
-                    func_0204c124(dst, FALSE);
+                    ClActor_SetVisible(dst, FALSE);
                 }
             } else if (slide == -1 && row != BR_BVRANK_ICON_ROW_MAX - 1) {
                 ClActor *src = p_wk->icon[BR_BVRANK_ICON_ROW_MAX - 2 - row][col];
                 ClActor *dst = p_wk->icon[BR_BVRANK_ICON_ROW_MAX - 1 - row][col];
 
-                if (func_0204c138(src)) {
+                if (ClActor_IsVisible(src)) {
                     NNSG2dImageProxy proxy;
                     u8 plt;
 
-                    func_0204c40c(src, &proxy);
-                    plt = func_0204c39c(src);
-                    func_0204c3e4(dst, &proxy);
-                    func_0204c378(dst, plt, 0);
-                    func_0204c124(dst, TRUE);
+                    ClActor_GetImageProxy(src, &proxy);
+                    plt = ClActor_GetPalette(src);
+                    ClActor_SetImageProxy(dst, &proxy);
+                    ClActor_SetPalette(dst, plt, 0);
+                    ClActor_SetVisible(dst, TRUE);
                 } else {
-                    func_0204c124(dst, FALSE);
+                    ClActor_SetVisible(dst, FALSE);
                 }
             }
         }
@@ -790,15 +790,15 @@ static void BrBvRankList_ScrollIcons(BrBvRankList *p_wk, u32 list, s8 slide, Hea
             buf = GFL_G2DIOReadOBJNCGRArc(
                 handle, PokeParty_GetIconIndex(poke.species[col], poke.form[col], poke.gender[col], FALSE), FALSE, &chr,
                 HEAPID_TAIL(heapId));
-            func_0204ba40(p_wk->chr[p_wk->chrTop][col], chr);
-            func_0204bb58(p_wk->chr[p_wk->chrTop][col], &proxy);
-            func_0204c3e4(p_wk->icon[row][col], &proxy);
-            func_0204c378(p_wk->icon[row][col],
-                          PokeIcon_GetPalette(poke.species[col], poke.form[col], poke.gender[col], FALSE), 0);
+            ClActSys_ReplaceCharData(p_wk->chr[p_wk->chrTop][col], chr);
+            ClActSys_GetCharProxy(p_wk->chr[p_wk->chrTop][col], &proxy);
+            ClActor_SetImageProxy(p_wk->icon[row][col], &proxy);
+            ClActor_SetPalette(p_wk->icon[row][col],
+                               PokeIcon_GetPalette(poke.species[col], poke.form[col], poke.gender[col], FALSE), 0);
             GFL_HeapFree(buf);
-            func_0204c124(p_wk->icon[row][col], TRUE);
+            ClActor_SetVisible(p_wk->icon[row][col], TRUE);
         } else {
-            func_0204c124(p_wk->icon[row][col], FALSE);
+            ClActor_SetVisible(p_wk->icon[row][col], FALSE);
         }
     }
 
@@ -824,7 +824,7 @@ static void BrBvRank_GetPokeData(BrOutline *outline, BrBvRankPokeData *poke) {
 
     MI_CpuFill8(poke, 0, sizeof(BrBvRankPokeData));
     header = &outline->header;
-    mode = func_0200c124(header, BATTLE_REC_HEADER_MODE, 0);
+    mode = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_MODE, 0);
     switch (mode) {
     case 0x10:
     case 0x11:
@@ -847,9 +847,9 @@ static void BrBvRank_GetPokeData(BrOutline *outline, BrBvRankPokeData *poke) {
         if (isSmallTeam && 3 <= i && i <= 5) {
             continue;
         }
-        species = func_0200c124(header, BATTLE_REC_HEADER_SPECIES, i);
-        form = func_0200c124(header, BATTLE_REC_HEADER_FORM, i);
-        gender = func_0200c124(header, BATTLE_REC_HEADER_GENDER, i);
+        species = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_SPECIES, i);
+        form = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_FORM, i);
+        gender = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_GENDER, i);
         if (species >= BR_BVRANK_SPECIES_END) {
             species = 0;
         }

@@ -80,10 +80,10 @@ void WF2DMAP_SCRDrawSysMain(WF2DMAP_SCRDRAW *sys, const WF2DMAP_SCROLL *scroll) 
     pos.x = left;
     pos.y = top;
     if (sys->surface == 0) {
-        func_0204bedc(sys->renderer, 0, &pos);
+        ClActRenderer_SetSurfacePos(sys->renderer, 0, &pos);
     } else {
         pos.y += 192;
-        func_0204bedc(sys->renderer, 1, &pos);
+        ClActRenderer_SetSurfacePos(sys->renderer, 1, &pos);
     }
 
     WF2DMAP_SCRDrawSysBGScroll(sys, left, top);

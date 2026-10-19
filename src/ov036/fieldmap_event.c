@@ -492,8 +492,8 @@ GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data) {
         }
         return EventMapChangeUnionRoomExit_Create(gsys, field);
     }
-    if (func_ov028_021710a4(unisys) == TRUE) {
-        if (func_ov028_021710b0(unisys) == 0) {
+    if (UnionMain_GetAtCounter(unisys) == TRUE) {
+        if (UnionMain_GetExiting(unisys) == 0) {
             GameCommSys_ExitReq(commSys);
         }
         return NULL;
@@ -1120,10 +1120,10 @@ static GameEvent *CheckFunfestMissionEvent(GameSystem *gsys, Field *field) {
     if (!isFesMissionAvailable(GetFestMissionCfg(festival))) {
         return NULL;
     }
-    if (func_02016b34(gsys) == 0) {
-        return GameEvent_CreateOverlayDelegate(gsys, OVERLAY_FUNFEST_MISSION, func_ov157_021f5b18, field);
+    if (GSYS_IsCGearOn(gsys) == 0) {
+        return GameEvent_CreateOverlayDelegate(gsys, OVERLAY_FUNFEST_MISSION, EventFestMissionDisconnect_Create, field);
     }
-    if (func_020148cc(festival)) {
+    if (LinkFestival_IsMissionOver(festival)) {
         return GameEvent_CreateOverlayDelegate(gsys, OVERLAY_FUNFEST_MISSION, EventFestMissionMenu_Create, field);
     }
     return NULL;
@@ -1376,7 +1376,7 @@ static void RememberOutboundWarpRail(FieldInteractWk *wk, u32 warpId, RailPositi
 static GameEvent *CreateWarpMapChangeEventRail(FieldInteractWk *wk, Field *field, u32 warpId, RailPosition *pos) {
     ZoneWarp *warp = GetZoneWarpByID(wk->eventData, warpId);
 
-    return EventMapChangeWarp_CreateFromEntity(wk->gsys, field, warp, func_ov012_0215d104(warp, pos));
+    return EventMapChangeWarp_CreateFromEntity(wk->gsys, field, warp, ZoneWarp_CalcPosWeightBitsRail(warp, pos));
 }
 
 // Whether the rail lets the player move on in the direction faced
@@ -1416,7 +1416,7 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
         break;
     }
     case 2:
-        if (func_ov012_02166ecc(actor) == TRUE) {
+        if (FldAct_CheckAcmdEnd(actor) == TRUE) {
             func_ov036_0219a5fc(player);
             (*state)++;
         }

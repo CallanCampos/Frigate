@@ -381,7 +381,7 @@ static BOOL WinRecord_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIN_RECORD, wk->heapId);
     wk->msgData[1] = NULL;
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     WinRecord_InitWork(wk);
     GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
@@ -394,9 +394,9 @@ static BOOL WinRecord_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     int i;
 
     if (wk->flags & WIN_RECORD_FLAG_KEYS) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
     } else {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     WinRecord_ExitWork(wk);
     for (i = 0; i < 2; i++) {
@@ -412,7 +412,7 @@ static BOOL WinRecord_Exit(GameProc *proc, u32 *state, void *param, void *work) 
         }
     }
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     WinRecordGraphic_Delete(wk->graphic);
     heapId = wk->heapId;
@@ -432,7 +432,7 @@ static BOOL WinRecord_Main(GameProc *proc, u32 *state, void *param, void *work) 
         }
         break;
     case 1:
-        if (wk->seq == WIN_RECORD_SEQ_END && func_02021c0c(wk->printQueue) == TRUE) {
+        if (wk->seq == WIN_RECORD_SEQ_END && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -549,7 +549,7 @@ static void WinRecord_Seq(WinRecordWork *wk) {
 static void WinRecord_FlushWindows(WinRecordWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WIN_RECORD_WINDOW_COUNT; i++) {
         PrintWindow_Flush(&wk->windows[i], wk->printQueue);
     }
@@ -628,22 +628,22 @@ static void WinRecord_CreateActors(WinRecordWork *wk, u32 surface, const WinReco
         setup.sequence = data->anim;
         setup.priority = data->priority;
         setup.bgPriority = data->bgPriority;
-        actors[i] = func_0204c040(unit, wk->res[chars], wk->res[pltt], wk->res[cells], &setup, surface, wk->heapId);
+        actors[i] = ClActor_Create(unit, wk->res[chars], wk->res[pltt], wk->res[cells], &setup, surface, wk->heapId);
         visible = FALSE;
         if (data->visible == TRUE) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         autoAnim = FALSE;
         if (data->flags & 1) {
             autoAnim = TRUE;
         }
         func_0204c520(actors[i], autoAnim);
         if (data->flags & 2) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (data->flags & 4) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
         data++;
     }
@@ -654,23 +654,23 @@ static void WinRecord_LoadObjRes(WinRecordWork *wk, u32 vramType, const WinRecor
     ClActUnit *unit = WinRecordGraphic_GetClActUnit(wk->graphic);
 
     wk->res[res->pltt.index] =
-        func_0204bbb8(arc, res->pltt.file, vramType, res->pltt.offset, 0, res->pltt.count, wk->heapId);
-    wk->res[res->chars.index] = func_0204b81c(arc, res->chars.file, FALSE, vramType, wk->heapId);
-    wk->res[res->cells.index] = func_0204bde0(arc, res->cells.file, res->anims.file, wk->heapId);
+        ClActSys_LoadPlttRange(arc, res->pltt.file, vramType, res->pltt.offset, 0, res->pltt.count, wk->heapId);
+    wk->res[res->chars.index] = ClActSys_LoadChars(arc, res->chars.file, FALSE, vramType, wk->heapId);
+    wk->res[res->cells.index] = ClActSys_LoadCellAnims(arc, res->cells.file, res->anims.file, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void WinRecord_LoadUIRes(WinRecordWork *wk, u32 vramType) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
     ClActUnit *unit = WinRecordGraphic_GetClActUnit(wk->graphic);
-    u32 pltt = func_0202d810();
-    u32 chars = func_0202d814();
-    u32 cells = func_0202d818(2);
-    u32 anims = func_0202d81c(2);
+    u32 pltt = AppMenuCommon_GetTouchBarPaletteFile();
+    u32 chars = AppMenuCommon_GetTouchBarCharFile();
+    u32 cells = AppMenuCommon_GetTouchBarCellFile(2);
+    u32 anims = AppMenuCommon_GetTouchBarAnimFile(2);
 
-    wk->res[WIN_RECORD_RES_UI_PLTT] = func_0204bbb8(arc, pltt, vramType, 0x160, 0, 4, wk->heapId);
-    wk->res[WIN_RECORD_RES_UI_CHARS] = func_0204b81c(arc, chars, FALSE, vramType, wk->heapId);
-    wk->res[WIN_RECORD_RES_UI_CELLS] = func_0204bde0(arc, cells, anims, wk->heapId);
+    wk->res[WIN_RECORD_RES_UI_PLTT] = ClActSys_LoadPlttRange(arc, pltt, vramType, 0x160, 0, 4, wk->heapId);
+    wk->res[WIN_RECORD_RES_UI_CHARS] = ClActSys_LoadChars(arc, chars, FALSE, vramType, wk->heapId);
+    wk->res[WIN_RECORD_RES_UI_CELLS] = ClActSys_LoadCellAnims(arc, cells, anims, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -692,44 +692,44 @@ static void WinRecord_InitObj(WinRecordWork *wk) {
     WinRecord_CreateActors(wk, 0, sWinRecordScrollActors, &sWinRecordScrollActorRes);
     WinRecord_CreateActors(wk, 0, sWinRecordButtonActors, &sWinRecordButtonActorRes);
     WinRecord_CreateActors(wk, 1, sWinRecordTrainerActors, &sWinRecordTrainerActorRes);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }
 
 static void WinRecord_ExitObj(WinRecordWork *wk) {
     int i;
 
     for (i = 0; i < WIN_RECORD_SCROLL_ACTOR_COUNT; i++) {
-        func_0204c108(wk->scrollActors[i]);
+        ClActor_Delete(wk->scrollActors[i]);
     }
     for (i = 0; i < WIN_RECORD_BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i]);
+        ClActor_Delete(wk->buttons[i]);
     }
-    func_0204c108(wk->trainer[0]);
-    func_0204bcd0(wk->res[WIN_RECORD_RES_OBJ_PLTT]);
-    func_0204b98c(wk->res[WIN_RECORD_RES_OBJ_CHARS]);
-    func_0204be64(wk->res[WIN_RECORD_RES_OBJ_CELLS]);
-    func_0204bcd0(wk->res[WIN_RECORD_RES_UI_PLTT]);
-    func_0204b98c(wk->res[WIN_RECORD_RES_UI_CHARS]);
-    func_0204be64(wk->res[WIN_RECORD_RES_UI_CELLS]);
-    func_0204bcd0(wk->res[WIN_RECORD_RES_TRAINER_PLTT]);
-    func_0204b98c(wk->res[WIN_RECORD_RES_TRAINER_CHARS]);
-    func_0204be64(wk->res[WIN_RECORD_RES_TRAINER_CELLS]);
+    ClActor_Delete(wk->trainer[0]);
+    ClActSys_FreePltt(wk->res[WIN_RECORD_RES_OBJ_PLTT]);
+    ClActSys_FreeChars(wk->res[WIN_RECORD_RES_OBJ_CHARS]);
+    ClActSys_FreeCellAnims(wk->res[WIN_RECORD_RES_OBJ_CELLS]);
+    ClActSys_FreePltt(wk->res[WIN_RECORD_RES_UI_PLTT]);
+    ClActSys_FreeChars(wk->res[WIN_RECORD_RES_UI_CHARS]);
+    ClActSys_FreeCellAnims(wk->res[WIN_RECORD_RES_UI_CELLS]);
+    ClActSys_FreePltt(wk->res[WIN_RECORD_RES_TRAINER_PLTT]);
+    ClActSys_FreeChars(wk->res[WIN_RECORD_RES_TRAINER_CHARS]);
+    ClActSys_FreeCellAnims(wk->res[WIN_RECORD_RES_TRAINER_CELLS]);
 }
 
 static void WinRecord_SetActorAnim(WinRecordWork *wk, int kind, int index, int anim) {
     if (kind == WIN_RECORD_ACTOR_SCROLL) {
         if (index < WIN_RECORD_SCROLL_ACTOR_COUNT) {
-            func_0204c488(wk->scrollActors[index], anim);
+            ClActor_SetSequence(wk->scrollActors[index], anim);
             func_0204c520(wk->scrollActors[index], TRUE);
         }
     } else if (kind == WIN_RECORD_ACTOR_BUTTON) {
         if (index < WIN_RECORD_BUTTON_COUNT) {
-            func_0204c488(wk->buttons[index], anim);
+            ClActor_SetSequence(wk->buttons[index], anim);
             func_0204c520(wk->buttons[index], TRUE);
         }
     } else if (kind == WIN_RECORD_ACTOR_TRAINER) {
         if (index < WIN_RECORD_TRAINER_ACTOR_COUNT) {
-            func_0204c488(wk->trainer[index], anim);
+            ClActor_SetSequence(wk->trainer[index], anim);
             func_0204c520(wk->trainer[index], TRUE);
         }
     }
@@ -738,15 +738,15 @@ static void WinRecord_SetActorAnim(WinRecordWork *wk, int kind, int index, int a
 static void WinRecord_SetActorVisible(WinRecordWork *wk, int kind, int index, BOOL visible) {
     if (kind == WIN_RECORD_ACTOR_SCROLL) {
         if (index < WIN_RECORD_SCROLL_ACTOR_COUNT) {
-            func_0204c124(wk->scrollActors[index], visible);
+            ClActor_SetVisible(wk->scrollActors[index], visible);
         }
     } else if (kind == WIN_RECORD_ACTOR_BUTTON) {
         if (index < WIN_RECORD_BUTTON_COUNT) {
-            func_0204c124(wk->buttons[index], visible);
+            ClActor_SetVisible(wk->buttons[index], visible);
         }
     } else if (kind == WIN_RECORD_ACTOR_TRAINER) {
         if (index < WIN_RECORD_TRAINER_ACTOR_COUNT) {
-            func_0204c124(wk->trainer[index], visible);
+            ClActor_SetVisible(wk->trainer[index], visible);
         }
     }
 }
@@ -758,21 +758,21 @@ static BOOL WinRecord_IsActorAnimating(WinRecordWork *wk, int kind, int index) {
         if (index >= WIN_RECORD_SCROLL_ACTOR_COUNT) {
             return FALSE;
         }
-        if (func_0204c560(wk->scrollActors[index]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->scrollActors[index]) == FALSE) {
             animating = FALSE;
         }
     } else if (kind == WIN_RECORD_ACTOR_BUTTON) {
         if (index >= WIN_RECORD_BUTTON_COUNT) {
             return FALSE;
         }
-        if (func_0204c560(wk->buttons[index]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->buttons[index]) == FALSE) {
             animating = FALSE;
         }
     } else if (kind == WIN_RECORD_ACTOR_TRAINER) {
         if (index >= WIN_RECORD_TRAINER_ACTOR_COUNT) {
             return FALSE;
         }
-        if (func_0204c560(wk->trainer[index]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->trainer[index]) == FALSE) {
             animating = FALSE;
         }
     }
@@ -892,7 +892,7 @@ static void WinRecord_InitWins(WinRecordWork *wk) {
         wk->trainerClass = 1;
     }
     for (i = 0; i < WIN_RECORD_TOURNAMENT_COUNT; i++) {
-        wins = func_0200feac(wk->param->save, sWinRecordTournaments[i]);
+        wins = WbtSave_GetCount(wk->param->save, sWinRecordTournaments[i]);
         if (wins >= WIN_RECORD_MAX_WINS) {
             wins = WIN_RECORD_MAX_WINS;
         }
@@ -989,7 +989,7 @@ static void WinRecord_GetTouchRect(WinRecordWork *wk, int index, TouchRect *rect
 
 static BOOL WinRecord_TouchInput(WinRecordWork *wk) {
     int pressed = 0;
-    int touched = func_0203da0c(wk->touchRects);
+    int touched = GFL_HIDGetTouchPressedRect(wk->touchRects);
     BOOL result = FALSE;
 
     if (wk->flags & WIN_RECORD_FLAG_END) {
@@ -1195,14 +1195,14 @@ static void WinRecord_UpdateScrollBar(WinRecordWork *wk) {
     ClActorPos pos;
 
     if (!(wk->flags & WIN_RECORD_FLAG_NO_SCROLL)) {
-        func_0204c178(wk->scrollActors[0], &pos, 0);
+        ClActor_GetSurfacePos(wk->scrollActors[0], &pos, 0);
         pos.y = FrameList_ClampBarPos(wk->list, pos.y);
         if (pos.y < 40) {
             pos.y = 40;
         } else if (pos.y > 152) {
             pos.y = 152;
         }
-        func_0204c140(wk->scrollActors[0], &pos, 0);
+        ClActor_SetSurfacePos(wk->scrollActors[0], &pos, 0);
     }
 }
 
@@ -1221,7 +1221,7 @@ static void WinRecord_ScrollBG(WinRecordWork *wk) {
 }
 
 static void WinRecord_ListInput(WinRecordWork *wk, BOOL updated) {
-    BOOL touch = func_0203d554();
+    BOOL touch = GCTX_HIDIsUsingTouch();
     int pos;
 
     if (wk->flags & WIN_RECORD_FLAG_NO_SCROLL) {
@@ -1240,7 +1240,7 @@ static void WinRecord_ListInput(WinRecordWork *wk, BOOL updated) {
         }
     } else {
         if (touch == TRUE) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
         if (updated == FALSE) {
             if (GCTX_HIDGetHeldKeys() & (PAD_KEY_LEFT | PAD_KEY_UP)) {

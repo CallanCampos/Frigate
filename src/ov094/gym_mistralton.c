@@ -575,7 +575,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
     work = Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
     case 0:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             FldAct_SetAcmd(data->actor, ACMD_JUMP);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
@@ -588,7 +588,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
         }
         break;
     case 2:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = (s32)FieldPlayer_GetFaceDir(data->player) % 4;
             FldAct_SetAcmd(data->actor, ACMD_FACE_DIR_BASE + dir);
             data->turns++;
@@ -598,7 +598,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
         }
         break;
     case 3:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             FieldPlayer_GetGPos(data->player, &x, &y, &z);
             distance = Mistralton_CountFreeCells(data->field, &data->stopReason, x, z);
             FieldPlayer_GetWPos(data->player, &pos);
@@ -625,7 +625,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
         }
         break;
     case 6:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = FieldPlayer_GetFaceDir(data->player) + 1;
             dir = dir % 4;
             FldAct_SetAcmd(data->actor, ACMD_FACE_DIR + dir);
@@ -650,7 +650,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
     case 4: {
         BOOL ready = FALSE;
 
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             dir = FieldPlayer_GetFaceDir(data->player) + 1;
             dir = dir % 4;
             FldAct_SetAcmd(data->actor, ACMD_FACE_DIR + dir);
@@ -706,7 +706,7 @@ static GameEventReturnCode MistraltonBumpEvent_Run(GameEvent *event, u32 *state,
     Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
     case 0:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             FldAct_SetAcmd(data->actor, ACMD_JUMP);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
@@ -719,7 +719,7 @@ static GameEventReturnCode MistraltonBumpEvent_Run(GameEvent *event, u32 *state,
         }
         break;
     case 2:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             code = FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(data->player), FORME_RIDING);
             if (code != FldAct_GetObjCode(data->actor)) {
                 FieldPlayer_ForceObjCode(data->player, code);
@@ -786,7 +786,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         *state = 1;
         break;
     case 1:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             FldAct_SetAcmd(data->actor, ACMD_JUMP);
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 2;
@@ -818,7 +818,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         }
         break;
     case 5:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             u16 dir = (s32)FieldPlayer_GetFaceDir(data->player) % 4;
 
             FldAct_SetAcmd(data->actor, ACMD_FACE_DIR_BASE + dir);
@@ -829,7 +829,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         }
         break;
     case 6:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             VecFx32 pos;
             FieldTask *moveTask;
             FieldTask *spinTask;
@@ -932,7 +932,7 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
     work = Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);
     switch (*state) {
     case 0:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             GFL_SndSEPlay(SEQ_SE_GYM_H07);
             *state = 1;
         }
@@ -953,7 +953,7 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
         }
         break;
     case 4:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             FieldTask *task;
             VecFx32 pos;
             FieldCameraShakeSetup shake;
@@ -978,7 +978,7 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
         }
         break;
     case 5:
-        if (func_ov012_02166ecc(data->actor)) {
+        if (FldAct_CheckAcmdEnd(data->actor)) {
             u16 dir = GetActorFaceDir(data->actor) + 1;
 
             dir = dir % 4;

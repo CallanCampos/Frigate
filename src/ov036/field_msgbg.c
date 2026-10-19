@@ -332,7 +332,7 @@ FieldMsgBG *CreateFieldMsgBGSystem(HeapID heapId, G3DCamera *camera) {
     sys->camera = camera;
     sys->alphaBlend = TRUE;
     sys->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, sys->heapId);
-    sys->queue = func_02021998(sys->heapId);
+    sys->queue = PrintQueue_CreateDefault(sys->heapId);
     sys->tcbMgr = GFL_TCBExMgrCreate(sys->heapId, sys->heapId, 1, 4);
     func_ov036_0218a72c(&sys->input);
     sys->bgCharFile = GFL_ArcSysReadHeapNewLZ(ARCID_WINFRAME, 11, FALSE, heapId);
@@ -385,7 +385,7 @@ void func_ov036_021877ac(FieldMsgBG *sys) {
         }
     }
     if (sys->queue != NULL) {
-        func_02021a18(sys->queue);
+        PrintQueue_Free(sys->queue);
     }
     if (sys->font != NULL) {
         GFL_FontFree(sys->font);
@@ -436,7 +436,7 @@ void func_ov036_021878d0(FieldMsgBG *sys) {
     int i;
     NumberedMsgWin **numberedWin;
 
-    func_02021a3c(sys->queue);
+    PrintQueue_Main(sys->queue);
     numberedWin = sys->numberedWins;
     for (i = 0; i < MSGBG_NUMBERED_WIN_COUNT; i++, numberedWin++) {
         if (*numberedWin != NULL) {
@@ -464,11 +464,11 @@ void func_ov036_0218796c(FieldMsgBG *sys) {
 }
 
 void func_ov036_02187980(FieldMsgBG *sys) {
-    func_02021c44(sys->queue);
+    PrintQueue_Clear(sys->queue);
 }
 
 BOOL func_ov036_0218798c(FieldMsgBG *sys) {
-    return func_02021c0c(sys->queue);
+    return PrintQueue_IsEmpty(sys->queue);
 }
 
 PrintQueue *func_ov036_02187998(FieldMsgBG *sys) {
@@ -888,7 +888,7 @@ static MsgStream *func_ov036_02188188(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *w
     stream->sys = sys;
     stream->wait = wait;
     stream->stream =
-        func_02022294(window, x, y, strbuf, sys->font, wait, sys->tcbMgr, 0, sys->heapId, a6, func_ov036_021881fc);
+        PrintStream_CreateWithCallback(window, x, y, strbuf, sys->font, wait, sys->tcbMgr, 0, sys->heapId, a6, func_ov036_021881fc);
     func_ov036_0218a738(&stream->sys->input);
     return stream;
 }
@@ -909,12 +909,12 @@ static MsgStream *func_ov036_02188220(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *w
 }
 
 static void func_ov036_0218823c(MsgStream *stream) {
-    func_020223cc(stream->stream);
+    PrintStream_Delete(stream->stream);
     GFL_HeapFree(stream);
 }
 
 static u32 func_ov036_02188250(MsgStream *stream) {
-    u32 state = func_020223b4(stream->stream);
+    u32 state = PrintStream_GetState(stream->stream);
 
     switch (state) {
     case PRINT_STREAM_RUNNING:
@@ -925,11 +925,11 @@ static u32 func_ov036_02188250(MsgStream *stream) {
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if (func_ov036_0218a798(&stream->sys->input, func_020223b8(stream->stream))) {
+        if (func_ov036_0218a798(&stream->sys->input, PrintStream_GetPageMode(stream->stream))) {
             if (!func_ov036_0218a744(&stream->sys->input)) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
-            func_020223bc(stream->stream);
+            PrintStream_Continue(stream->stream);
             state = PRINT_STREAM_RUNNING;
             func_ov036_0218a7d8(stream->stream, 0);
         }
@@ -1203,7 +1203,7 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
         return FALSE;
     }
     stream = func_ov036_0218b50c(actorWin->talk, actorWin->type);
-    state = func_020223b4(stream);
+    state = PrintStream_GetState(stream);
     GFL_BGSysMoveBG(MSGBG_BG, BG_MOVE_SET_Y, actorWin->shake);
     if (actorWin->shake < 0) {
         actorWin->shake += 2;
@@ -1231,11 +1231,11 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
         if (func_ov036_0218a744(&actorWin->sys->input) == FALSE) {
             func_ov036_02189de8(&actorWin->cursor, bitmap, MSGBG_COLOR_BG);
         }
-        if (func_ov036_0218a798(&actorWin->sys->input, func_020223b8(stream))) {
+        if (func_ov036_0218a798(&actorWin->sys->input, PrintStream_GetPageMode(stream))) {
             if (func_ov036_0218a744(&actorWin->sys->input) == FALSE) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
-            func_020223bc(stream);
+            PrintStream_Continue(stream);
             func_ov036_02189d24(&actorWin->cursor, bitmap, MSGBG_COLOR_BG);
             func_ov036_0218a7d8(stream, 0);
         }
@@ -1344,7 +1344,7 @@ BOOL func_ov036_02188bdc(InfoMsgWin *win) {
     GCTX_HIDGetPressedKeys();
     GCTX_HIDGetHeldKeys();
     result = func_ov036_02188250(win->stream);
-    win->state = func_020223b4(win->stream->stream);
+    win->state = PrintStream_GetState(win->stream->stream);
     GFL_BGSysMoveBG(MSGBG_BG, BG_MOVE_SET_Y, win->shake);
     if (win->shake < 0) {
         win->shake += 2;
@@ -1493,7 +1493,7 @@ static BOOL func_ov036_02188eec(NumberedMsgWin *win) {
     }
     GCTX_HIDGetPressedKeys();
     GCTX_HIDGetHeldKeys();
-    switch (func_020223b4(func_ov036_0218b50c(win->talk, win->index))) {
+    switch (PrintStream_GetState(func_ov036_0218b50c(win->talk, win->index))) {
     case PRINT_STREAM_RUNNING:
     case PRINT_STREAM_PAUSED:
         break;
@@ -1667,7 +1667,7 @@ static void func_ov036_021894c8(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal)
 }
 
 static BOOL func_ov036_02189660(const StrBuf *src, StrBuf *dest, u32 line) {
-    if (func_02022900(src, dest, line) == FALSE) {
+    if (GFL_FontCopyLine(src, dest, line) == FALSE) {
         return TRUE;
     }
     return FALSE;
@@ -1677,12 +1677,12 @@ static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src
     s32 y = 1;
 
     GFL_BitmapFill(bitmap, color);
-    if (func_02022900(src, dest, *line) == FALSE) {
+    if (GFL_FontCopyLine(src, dest, *line) == FALSE) {
         return TRUE;
     }
     GFL_TextRendererDrawToBitmap(bitmap, 1, y, dest, font);
     y += GFL_FontGetBlockHeight(dest, font) + 1;
-    if (func_02022900(src, dest, ++*line) == FALSE) {
+    if (GFL_FontCopyLine(src, dest, ++*line) == FALSE) {
         return TRUE;
     }
     GFL_TextRendererDrawToBitmap(bitmap, 1, y, dest, font);
@@ -1779,12 +1779,12 @@ static void func_ov036_02189a18(u16 x, u16 y, GFLBitmap *bitmap, Font *font, con
     StrBuf *line = GFL_StrBufCreate(GFL_StrBufGetCharCount(text) + 1, heapId);
     u32 i = 0;
 
-    if (func_02022900(text, line, 0) == TRUE) {
+    if (GFL_FontCopyLine(text, line, 0) == TRUE) {
         do {
             GFL_TextRendererDrawToBitmap(bitmap, x, y, line, font);
             y += lineHeight;
             i++;
-        } while (func_02022900(text, line, i) == TRUE);
+        } while (GFL_FontCopyLine(text, line, i) == TRUE);
     }
     GFL_StrBufFree(line);
 }
@@ -1854,8 +1854,8 @@ u32 func_ov036_02189c54(FieldMsgBG *sys, StrBuf *str, u32 margin) {
     StrBuf *clone = GFL_StrBufClone(str, sys->heapId);
     u32 i = 0;
 
-    if (func_02022900(str, clone, 0) == TRUE) {
-        while (++i < 0x18 && func_02022900(str, clone, i) == TRUE) {
+    if (GFL_FontCopyLine(str, clone, 0) == TRUE) {
+        while (++i < 0x18 && GFL_FontCopyLine(str, clone, i) == TRUE) {
         }
     }
     GFL_StrBufFree(clone);
@@ -2315,9 +2315,9 @@ static BOOL func_ov036_0218a744(MsgBGInput *input) {
 
 static s32 func_ov036_0218a748(MsgBGInput *input) {
     if (input->autoAdvance != 0) {
-        return func_02017c50(1);
+        return TextSpeed_GetWait(1);
     }
-    return func_02017bcc();
+    return TextSpeed_GetCurrentWait();
 }
 
 static BOOL func_ov036_0218a760(MsgBGInput *input) {
@@ -2358,8 +2358,8 @@ static BOOL func_ov036_0218a798(MsgBGInput *input, BOOL fast) {
 
 static void func_ov036_0218a7d8(PrintStream *stream, u32 mode) {
     if (mode == 1) {
-        func_02022410(stream, func_02017c50(2));
+        PrintStream_SetFastWait(stream, TextSpeed_GetWait(2));
     } else {
-        func_0202243c(stream);
+        PrintStream_ClearFast(stream);
     }
 }

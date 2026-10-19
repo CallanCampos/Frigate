@@ -227,7 +227,7 @@ static void MusShotPhoto_ExitGraphics(MusShotPhoto *photo) {
     GFL_BGSysReleaseBG(3);
     GFL_BGSysReleaseBG(1);
     GFL_BGSysReleaseBG(2);
-    func_0204e450(photo->blact);
+    BlActScene_Delete(photo->blact);
     GFL_G3DCameraFree(photo->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);

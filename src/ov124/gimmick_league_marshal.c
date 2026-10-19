@@ -81,27 +81,27 @@ typedef struct {
     void *refBind;
 } CameraShakeTaskWork;
 
-static void func_ov124_021eed94(MarshalRoomWork *work);
-static void func_ov124_021eee2c(MarshalRoomWork *work);
-static void func_ov124_021eee68(MarshalRoomWork *work);
-static void func_ov124_021eee74(MarshalRoomWork *work);
-static void func_ov124_021eee80(FieldExpObjSystem *expObj, u16 model, int anmCount);
-static void func_ov124_021eeef8(FieldExpObjSystem *expObj, u16 model, u16 anm, BOOL looped);
-static void func_ov124_021eef44(FieldExpObjSystem *expObj, u16 model, u16 anm);
-static void func_ov124_021eef7c(MarshalRoomWork *work);
-static void func_ov124_021eefd0(MarshalRoomWork *work);
-static void func_ov124_021ef024(MarshalRoomWork *work);
-static void func_ov124_021ef040(MarshalRoomWork *work);
-static void func_ov124_021ef05c(MarshalRoomWork *work);
-static GameEvent *func_ov124_021ef0a4(GameSystem *gsys);
-static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, void *data);
-static void func_ov124_021ef288(PlatformEventWork *work, fx32 y);
-static void func_ov124_021ef2d0(MarshalRoomState *state, BOOL done);
-static BOOL func_ov124_021ef2d4(MarshalRoomState *state);
-static void func_ov124_021ef2d8(MarshalRoomState *state, BOOL down);
-static BOOL func_ov124_021ef2dc(MarshalRoomState *state);
-static FieldTask *func_ov124_021ef2e0(Field *field, const CameraShake *shake);
-static BOOL func_ov124_021ef31c(void *data);
+static void MarshalRoom_ShowSavedState(MarshalRoomWork *work);
+static void MarshalRoom_LoadScene(MarshalRoomWork *work);
+static void MarshalRoom_FreeScene(MarshalRoomWork *work);
+static void MarshalRoom_StepAnims(MarshalRoomWork *work);
+static void MarshalRoom_InitModel(FieldExpObjSystem *expObj, u16 model, int anmCount);
+static void MarshalRoom_PlayAnm(FieldExpObjSystem *expObj, u16 model, u16 anm, BOOL looped);
+static void MarshalRoom_StopAnm(FieldExpObjSystem *expObj, u16 model, u16 anm);
+static void MarshalRoom_ShowModel0End(MarshalRoomWork *work);
+static void MarshalRoom_ShowModel1End(MarshalRoomWork *work);
+static void MarshalRoom_PlayModel3FirstAnm(MarshalRoomWork *work);
+static void MarshalRoom_PlayModel3SecondAnm(MarshalRoomWork *work);
+static void MarshalRoom_ShowModel3End(MarshalRoomWork *work);
+static GameEvent *MarshalRoom_CreatePlatformEvent(GameSystem *gsys);
+static GameEventReturnCode MarshalRoom_PlatformEvent(GameEvent *event, u32 *state, void *data);
+static void MarshalRoom_SetPlatformY(PlatformEventWork *work, fx32 y);
+static void MarshalRoomState_SetModel0Done(MarshalRoomState *state, BOOL done);
+static BOOL MarshalRoomState_IsModel0Done(MarshalRoomState *state);
+static void MarshalRoomState_SetPlatformDown(MarshalRoomState *state, BOOL down);
+static BOOL MarshalRoomState_IsPlatformDown(MarshalRoomState *state);
+static FieldTask *MarshalRoom_CreateCameraShakeTask(Field *field, const CameraShake *shake);
+static BOOL MarshalRoom_CameraShakeTask(void *data);
 
 static const G3DSceneAnimationSetup sModel3Animations[] = { { 9, 0 }, { 10, 0 } };
 static const G3DSceneAnimationSetup sModel0Animations[] = { { 1, 0 }, { 2, 0 } };
@@ -125,7 +125,7 @@ static const G3DSceneActorSetup sActors[4] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov124_021eec80(Field *field) {
+void MarshalRoom_Init(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     MarshalRoomWork *work =
         Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(MarshalRoomWork));
@@ -133,60 +133,60 @@ void func_ov124_021eec80(Field *field) {
     work->expObj = Field_GetExpObjSystem(field);
     work->field = field;
     work->state = GimmickState_GetUserData(GameData_GetGimmickState(gameData), GIMMICK_STATE_ID);
-    func_ov124_021eee2c(work);
-    func_ov124_021eed94(work);
+    MarshalRoom_LoadScene(work);
+    MarshalRoom_ShowSavedState(work);
 }
 
-void func_ov124_021eecc8(Field *field) {
-    func_ov124_021eee68(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
+void MarshalRoom_End(Field *field) {
+    MarshalRoom_FreeScene(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
-void func_ov124_021eece0(Field *field) {
-    func_ov124_021eee74(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
+void MarshalRoom_Update(Field *field) {
+    MarshalRoom_StepAnims(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
 }
 
-void func_ov124_021eecf0(GameSystem *gsys) {
+void MarshalRoom_PlayModel0Anims(GameSystem *gsys) {
     MarshalRoomWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
 
-    func_ov124_021eeef8(work->expObj, MODEL_0, 0, FALSE);
-    func_ov124_021eeef8(work->expObj, MODEL_0, 1, FALSE);
-    func_ov124_021ef2d0(work->state, TRUE);
+    MarshalRoom_PlayAnm(work->expObj, MODEL_0, 0, FALSE);
+    MarshalRoom_PlayAnm(work->expObj, MODEL_0, 1, FALSE);
+    MarshalRoomState_SetModel0Done(work->state, TRUE);
 }
 
-void func_ov124_021eed20(GameSystem *gsys, u16 which) {
+void MarshalRoom_PlayModel3Anim(GameSystem *gsys, u16 which) {
     MarshalRoomWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
 
     if (which == 0) {
-        func_ov124_021ef024(work);
+        MarshalRoom_PlayModel3FirstAnm(work);
     } else {
-        func_ov124_021ef040(work);
+        MarshalRoom_PlayModel3SecondAnm(work);
     }
 }
 
-void func_ov124_021eed40(GameSystem *gsys) {
+void MarshalRoom_PlayModel1Anims(GameSystem *gsys) {
     MarshalRoomWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
     u32 i;
 
     for (i = 0; i < 3; i++) {
-        func_ov124_021eeef8(work->expObj, MODEL_1, i, FALSE);
+        MarshalRoom_PlayAnm(work->expObj, MODEL_1, i, FALSE);
     }
 }
 
-GameEvent *func_ov124_021eed6c(GameSystem *gsys) {
+GameEvent *MarshalRoom_LowerPlatform(GameSystem *gsys) {
     MarshalRoomWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
-    GameEvent *event = func_ov124_021ef0a4(gsys);
+    GameEvent *event = MarshalRoom_CreatePlatformEvent(gsys);
 
     if (event != NULL) {
-        func_ov124_021ef2d8(work->state, TRUE);
+        MarshalRoomState_SetPlatformDown(work->state, TRUE);
     }
     return event;
 }
 
 // Shows the models as the saved state left them
-static void func_ov124_021eed94(MarshalRoomWork *work) {
-    BOOL model0Done = func_ov124_021ef2d4(work->state);
-    BOOL platformDown = func_ov124_021ef2dc(work->state);
+static void MarshalRoom_ShowSavedState(MarshalRoomWork *work) {
+    BOOL model0Done = MarshalRoomState_IsModel0Done(work->state);
+    BOOL platformDown = MarshalRoomState_IsPlatformDown(work->state);
     fx32 y = PLATFORM_TOP_Y;
     SRTMatrix *matrix;
 
@@ -195,13 +195,13 @@ static void func_ov124_021eed94(MarshalRoomWork *work) {
     if (model0Done == FALSE && platformDown == FALSE) {
         FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_3, FALSE);
     } else if (model0Done == TRUE && platformDown == FALSE) {
-        func_ov124_021ef05c(work);
-        func_ov124_021eef7c(work);
+        MarshalRoom_ShowModel3End(work);
+        MarshalRoom_ShowModel0End(work);
     } else if (platformDown == TRUE) {
-        func_ov124_021eef7c(work);
+        MarshalRoom_ShowModel0End(work);
         y = PLATFORM_BOTTOM_Y;
         FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_PLATFORM, FALSE);
-        func_ov124_021eefd0(work);
+        MarshalRoom_ShowModel1End(work);
     }
     matrix = FieldExpObj_GetActorMatrixPtr(work->expObj, 0, MODEL_PLATFORM);
     matrix->translation.x = FX32_CONST(248);
@@ -209,24 +209,24 @@ static void func_ov124_021eed94(MarshalRoomWork *work) {
     matrix->translation.z = FX32_CONST(120);
 }
 
-static void func_ov124_021eee2c(MarshalRoomWork *work) {
+static void MarshalRoom_LoadScene(MarshalRoomWork *work) {
     LoadFieldExpandObjData(work->expObj, &sSceneSetup, 0);
-    func_ov124_021eee80(work->expObj, MODEL_0, NELEMS(sModel0Animations));
-    func_ov124_021eee80(work->expObj, MODEL_1, NELEMS(sModel1Animations));
-    func_ov124_021eee80(work->expObj, MODEL_PLATFORM, 0);
-    func_ov124_021eee80(work->expObj, MODEL_3, NELEMS(sModel3Animations));
+    MarshalRoom_InitModel(work->expObj, MODEL_0, NELEMS(sModel0Animations));
+    MarshalRoom_InitModel(work->expObj, MODEL_1, NELEMS(sModel1Animations));
+    MarshalRoom_InitModel(work->expObj, MODEL_PLATFORM, 0);
+    MarshalRoom_InitModel(work->expObj, MODEL_3, NELEMS(sModel3Animations));
 }
 
-static void func_ov124_021eee68(MarshalRoomWork *work) {
+static void MarshalRoom_FreeScene(MarshalRoomWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov124_021eee74(MarshalRoomWork *work) {
+static void MarshalRoom_StepAnims(MarshalRoomWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
 // Places the model, hidden, with its animations set and paused
-static void func_ov124_021eee80(FieldExpObjSystem *expObj, u16 model, int anmCount) {
+static void MarshalRoom_InitModel(FieldExpObjSystem *expObj, u16 model, int anmCount) {
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
     int i;
@@ -246,7 +246,7 @@ static void func_ov124_021eee80(FieldExpObjSystem *expObj, u16 model, int anmCou
 }
 
 // Plays the animation from its first frame
-static void func_ov124_021eeef8(FieldExpObjSystem *expObj, u16 model, u16 anm, BOOL looped) {
+static void MarshalRoom_PlayAnm(FieldExpObjSystem *expObj, u16 model, u16 anm, BOOL looped) {
     FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, model, anm);
 
     FieldExpObjAnm_SetPaused(anmInfo, FALSE);
@@ -256,7 +256,7 @@ static void func_ov124_021eeef8(FieldExpObjSystem *expObj, u16 model, u16 anm, B
 }
 
 // Stops the animation at its first frame
-static void func_ov124_021eef44(FieldExpObjSystem *expObj, u16 model, u16 anm) {
+static void MarshalRoom_StopAnm(FieldExpObjSystem *expObj, u16 model, u16 anm) {
     FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, model, anm);
 
     FieldExpObjAnm_SetPaused(anmInfo, TRUE);
@@ -265,7 +265,7 @@ static void func_ov124_021eef44(FieldExpObjSystem *expObj, u16 model, u16 anm) {
 }
 
 // Shows model 0 at the end of its animations
-static void func_ov124_021eef7c(MarshalRoomWork *work) {
+static void MarshalRoom_ShowModel0End(MarshalRoomWork *work) {
     FieldExpObjAnm *anm;
     u32 i;
 
@@ -278,7 +278,7 @@ static void func_ov124_021eef7c(MarshalRoomWork *work) {
 }
 
 // Shows model 1 at the end of its animations
-static void func_ov124_021eefd0(MarshalRoomWork *work) {
+static void MarshalRoom_ShowModel1End(MarshalRoomWork *work) {
     FieldExpObjAnm *anm;
     u32 i;
 
@@ -290,18 +290,18 @@ static void func_ov124_021eefd0(MarshalRoomWork *work) {
     }
 }
 
-static void func_ov124_021ef024(MarshalRoomWork *work) {
-    func_ov124_021eeef8(work->expObj, MODEL_3, 0, FALSE);
-    func_ov124_021eef44(work->expObj, MODEL_3, 1);
+static void MarshalRoom_PlayModel3FirstAnm(MarshalRoomWork *work) {
+    MarshalRoom_PlayAnm(work->expObj, MODEL_3, 0, FALSE);
+    MarshalRoom_StopAnm(work->expObj, MODEL_3, 1);
 }
 
-static void func_ov124_021ef040(MarshalRoomWork *work) {
-    func_ov124_021eeef8(work->expObj, MODEL_3, 1, FALSE);
-    func_ov124_021eef44(work->expObj, MODEL_3, 0);
+static void MarshalRoom_PlayModel3SecondAnm(MarshalRoomWork *work) {
+    MarshalRoom_PlayAnm(work->expObj, MODEL_3, 1, FALSE);
+    MarshalRoom_StopAnm(work->expObj, MODEL_3, 0);
 }
 
 // Shows model 3 at the end of its first animation
-static void func_ov124_021ef05c(MarshalRoomWork *work) {
+static void MarshalRoom_ShowModel3End(MarshalRoomWork *work) {
     FieldExpObjAnm *anm;
     fx32 frame;
 
@@ -312,9 +312,9 @@ static void func_ov124_021ef05c(MarshalRoomWork *work) {
     FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_3, 0, frame);
 }
 
-static GameEvent *func_ov124_021ef0a4(GameSystem *gsys) {
+static GameEvent *MarshalRoom_CreatePlatformEvent(GameSystem *gsys) {
     Field *field = GSYS_GetField(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov124_021ef10c, sizeof(PlatformEventWork));
+    GameEvent *event = GameEvent_Create(gsys, NULL, MarshalRoom_PlatformEvent, sizeof(PlatformEventWork));
     PlatformEventWork *work = GameEvent_GetData(event);
 
     work->expObj = Field_GetExpObjSystem(field);
@@ -331,7 +331,7 @@ static GameEvent *func_ov124_021ef0a4(GameSystem *gsys) {
     return event;
 }
 
-static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode MarshalRoom_PlatformEvent(GameEvent *event, u32 *state, void *data) {
     PlatformEventWork *work = data;
     GameSystem *gsys = GameEvent_GetGameSystem(event);
     MarshalRoomWork *gimmick = Field_GetGimmickWorkBlock(work->field, GIMMICK_WORK_ID);
@@ -363,7 +363,7 @@ static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, voi
             frames++;
         }
         shake.delay = frames - 5;
-        task = func_ov124_021ef2e0(work->field, &shake);
+        task = MarshalRoom_CreateCameraShakeTask(work->field, &shake);
         FieldTaskManager_AddTask(Field_GetTaskManager(work->field), task, 0);
         *state = 1;
         break;
@@ -375,7 +375,7 @@ static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, voi
             GFL_SndSEPlay(SEQ_SE_SW_RENBU_04);
             *state = 2;
         }
-        func_ov124_021ef288(work, work->y);
+        MarshalRoom_SetPlatformY(work, work->y);
         break;
     case 2:
         work->bounceFrame++;
@@ -389,11 +389,11 @@ static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, voi
             offset = 0;
             *state = 3;
         }
-        func_ov124_021ef288(work, PLATFORM_BOTTOM_Y + offset);
+        MarshalRoom_SetPlatformY(work, PLATFORM_BOTTOM_Y + offset);
         break;
     case 3:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(work->field))) {
-            func_ov012_02166f2c(work->player);
+            FldAct_FreeAcmd(work->player);
             ClearActorFlag(work->player, 0x10);
             return GAMEEVENT_DONE;
         }
@@ -403,7 +403,7 @@ static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, voi
 }
 
 // Moves the platform and the player on it to the height
-static void func_ov124_021ef288(PlatformEventWork *work, fx32 y) {
+static void MarshalRoom_SetPlatformY(PlatformEventWork *work, fx32 y) {
     VecFx32 pos;
 
     FieldExpObj_GetActorMatrixPtr(work->expObj, 0, MODEL_PLATFORM)->translation.y = y;
@@ -413,24 +413,25 @@ static void func_ov124_021ef288(PlatformEventWork *work, fx32 y) {
     SetActorWPosValue(work->player, &pos);
 }
 
-static void func_ov124_021ef2d0(MarshalRoomState *state, BOOL done) {
+static void MarshalRoomState_SetModel0Done(MarshalRoomState *state, BOOL done) {
     state->model0Done = done;
 }
 
-static BOOL func_ov124_021ef2d4(MarshalRoomState *state) {
+static BOOL MarshalRoomState_IsModel0Done(MarshalRoomState *state) {
     return state->model0Done;
 }
 
-static void func_ov124_021ef2d8(MarshalRoomState *state, BOOL down) {
+static void MarshalRoomState_SetPlatformDown(MarshalRoomState *state, BOOL down) {
     state->platformDown = down;
 }
 
-static BOOL func_ov124_021ef2dc(MarshalRoomState *state) {
+static BOOL MarshalRoomState_IsPlatformDown(MarshalRoomState *state) {
     return state->platformDown;
 }
 
-static FieldTask *func_ov124_021ef2e0(Field *field, const CameraShake *shake) {
-    FieldTask *task = FieldTask_Create(Field_GetHeapID(field), sizeof(CameraShakeTaskWork), func_ov124_021ef31c);
+static FieldTask *MarshalRoom_CreateCameraShakeTask(Field *field, const CameraShake *shake) {
+    FieldTask *task =
+        FieldTask_Create(Field_GetHeapID(field), sizeof(CameraShakeTaskWork), MarshalRoom_CameraShakeTask);
     CameraShakeTaskWork *work = FieldTask_GetData(task);
 
     work->field = field;
@@ -440,7 +441,7 @@ static FieldTask *func_ov124_021ef2e0(Field *field, const CameraShake *shake) {
     return task;
 }
 
-static BOOL func_ov124_021ef31c(void *data) {
+static BOOL MarshalRoom_CameraShakeTask(void *data) {
     CameraShakeTaskWork *work = data;
     BOOL done = FALSE;
     CameraShake *shake = &work->shake;

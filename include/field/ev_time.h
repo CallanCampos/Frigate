@@ -1,7 +1,7 @@
 #ifndef POKEBW2_FIELD_EV_TIME_H
 #define POKEBW2_FIELD_EV_TIME_H
 
-// Overlay 12's ev_time.c, the game's clock. func_ov012_02162f44 is in field/field.h, and the getters of the date and
+// Overlay 12's ev_time.c, the game's clock. EvTime_Update is in field/field.h, and the getters of the date and
 // time in system/game_data.h. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"

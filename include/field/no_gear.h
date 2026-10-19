@@ -13,9 +13,9 @@
 typedef struct NoGearWork NoGearWork;
 
 // The first two arguments are unused
-NoGearWork *func_ov080_021eaa68(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
-void func_ov080_021eaa98(NoGearWork *work);
-void func_ov080_021eaab4(NoGearWork *work);
-void func_ov080_021eaab8(NoGearWork *work);
+NoGearWork *NoGear_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys);
+void NoGear_Update(NoGearWork *work);
+void NoGear_Draw(NoGearWork *work);
+void NoGear_Free(NoGearWork *work);
 
 #endif // POKEBW2_FIELD_NO_GEAR_H

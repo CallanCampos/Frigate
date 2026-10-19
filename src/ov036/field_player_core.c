@@ -181,7 +181,7 @@ void FieldPlayerCore_UpdateActionStatusObserver(FieldPlayerCore *core) {
             return;
         }
     }
-    if (func_ov012_02166ecc(actor) == TRUE) {
+    if (FldAct_CheckAcmdEnd(actor) == TRUE) {
         switch (moveStatus) {
         case 0:
             return;
@@ -336,7 +336,7 @@ BOOL func_ov036_0219b0a4(FieldPlayerCore *core) {
         return TRUE;
     }
     idx = FldAct_GetBlActIdx(core->actor, 0);
-    if (idx != BLACT_IDX_NONE && func_0204f768(blActSys, (u16)idx, &cmd) && cmd == 0x3fff) {
+    if (idx != BLACT_IDX_NONE && BlActSys_GetActorLastCmd(blActSys, (u16)idx, &cmd) && cmd == 0x3fff) {
         return TRUE;
     }
     return FALSE;
@@ -573,7 +573,7 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_NONE(FieldPlayerCore *core) {
         func_ov036_021a3a70((FieldEffectTask *)tcb);
         func_ov036_0219b138(core, NULL);
     }
-    func_ov012_0216734c(actor, &offset);
+    FldAct_SetOuterDrawOffset(actor, &offset);
     core->seqDone = 1;
     return FALSE;
 }

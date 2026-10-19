@@ -8,23 +8,23 @@
 #include "struct_decls.h"
 
 // Sets up the adapters, sharing one per client unless commMode is set
-void func_ov167_021d4a1c(u8 commMode);
-void func_ov167_021d4a40(void);
-BtlAdapter *func_ov167_021d4a44(void *netHandle, u8 clientId, BOOL flag, HeapID heapId);
-void func_ov167_021d4abc(BtlAdapter *adapter);
-void func_ov167_021d4acc(BtlAdapter *adapter);
-void func_ov167_021d4ad4(void);
+void BtlAdapter_InitSystem(u8 commMode);
+void BtlAdapter_QuitSystem(void);
+BtlAdapter *BtlAdapter_Create(void *netHandle, u8 clientId, BOOL flag, HeapID heapId);
+void BtlAdapter_ResetState(BtlAdapter *adapter);
+void BtlAdapter_Delete(BtlAdapter *adapter);
+void BtlAdapter_ClearNetReplies(void);
 void func_ov167_021d4ae8(void);
-void func_ov167_021d4aec(BtlAdapter *adapter, u32 cmd, const void *data, u32 size);
-BOOL func_ov167_021d4b18(BtlAdapter *adapter);
+void BtlAdapter_SetCmd(BtlAdapter *adapter, u32 cmd, const void *data, u32 size);
+BOOL BtlAdapter_WaitCmd(BtlAdapter *adapter);
 // The client's reply to the last command, and its size if size isn't NULL
-void *func_ov167_021d4b50(BtlAdapter *adapter, u32 *size);
-void func_ov167_021d4b5c(BtlAdapter *adapter);
+void *BtlAdapter_GetReturnData(BtlAdapter *adapter, u32 *size);
+void BtlAdapter_SetIdle(BtlAdapter *adapter);
 
-void func_ov167_021d4bc8(BtlAdapter *adapter);
-u8 func_ov167_021d4bd4(BtlAdapter *adapter);
+void BtlAdapter_ClearSendCmd(BtlAdapter *adapter);
+u8 BtlAdapter_GetRecvCmd(BtlAdapter *adapter);
 // The data the adapter received, and its size
-u16 func_ov167_021d4c0c(BtlAdapter *adapter, const void **data);
-BOOL func_ov167_021d4c38(BtlAdapter *adapter, const void *data, u32 size);
+u16 BtlAdapter_GetRecvData(BtlAdapter *adapter, const void **data);
+BOOL BtlAdapter_SetReturnData(BtlAdapter *adapter, const void *data, u32 size);
 
 #endif // POKEBW2_BATTLE_BTL_ADAPTER_H

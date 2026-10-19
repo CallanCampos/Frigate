@@ -30,9 +30,9 @@ struct KeyDataSave {
 }; // size: 0x60
 
 // The block's size and its initial state
-u32 func_02010230(void);
-void func_02010234(KeyDataSave *keyData);
+u32 KeyDataSave_GetSize(void);
+void KeyDataSave_Init(KeyDataSave *keyData);
 // The key information in the block
-KeyInfoSave *func_020103f0(KeyDataSave *keyData);
+KeyInfoSave *KeyDataSave_GetKeyInfo(KeyDataSave *keyData);
 
 #endif // POKEBW2_SAVE_KEY_DATA_SAVEDATA_H

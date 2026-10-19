@@ -1,9 +1,9 @@
-func_ov097_021eec80 kind:function(thumb,size=0x134) addr:0x021eec80
-func_ov097_021eedb4 kind:function(thumb,size=0x24) addr:0x021eedb4
-func_ov097_021eedd8 kind:function(thumb,size=0xc) addr:0x021eedd8
-func_ov097_021eede4 kind:function(thumb,size=0x9c) addr:0x021eede4
+DriftveilLift_Init kind:function(thumb,size=0x134) addr:0x021eec80
+DriftveilLift_End kind:function(thumb,size=0x24) addr:0x021eedb4
+DriftveilLift_Update kind:function(thumb,size=0xc) addr:0x021eedd8
+DriftveilLift_CreateMoveEvent kind:function(thumb,size=0x9c) addr:0x021eede4
 DriftveilLift_MoveEvent kind:function(thumb,size=0x164) addr:0x021eee80
-func_ov097_021eefe4 kind:function(thumb,size=0xc8) addr:0x021eefe4
+DriftveilLift_PlaceAtBottom kind:function(thumb,size=0xc8) addr:0x021eefe4
 DriftveilLift_HasArrived kind:function(thumb,size=0x20) addr:0x021ef0ac
 DriftveilLift_ResetAnm kind:function(thumb,size=0x42) addr:0x021ef0cc
 data_ov097_021ef110 kind:data(any) addr:0x021ef110

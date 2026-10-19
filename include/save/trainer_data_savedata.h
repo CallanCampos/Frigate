@@ -23,20 +23,20 @@ struct TrainerDataSave {
 };
 
 u32 getSizeofTrainerData(void);
-void func_02008da4(TrainerDataSave *data);
+void TrainerDataSave_Init(TrainerDataSave *data);
 PlayerInfo *SaveControl_GetPlayerInfo(SaveControl *save);
 TrainerDataSave *getTrainerDataBlkAddress(SaveControl *save);
 // The play time: hours and minutes
-PlayTime *func_02008de8(SaveControl *save);
+PlayTime *SaveControl_GetPlayTime(SaveControl *save);
 u8 func_02008df4(SaveControl *save);
 void func_02008e04(SaveControl *save);
 void func_02008e14(SaveControl *save);
-BOOL func_02008e24(SaveControl *save, u32 index);
-void func_02008e48(SaveControl *save, u32 index);
-void func_02008e60(SaveControl *save, u32 index);
+BOOL TrainerDataSave_IsMarkerSet(SaveControl *save, u32 index);
+void TrainerDataSave_SetMarker(SaveControl *save, u32 index);
+void TrainerDataSave_ClearMarker(SaveControl *save, u32 index);
 u32 *func_02008e74(SaveControl *save, u32 index);
 // Copy the player's info from the player state, and back
-void func_02008e88(SaveControl *save, PlayerState *state);
-void func_02008ea8(SaveControl *save, PlayerState *state);
+void TrainerDataSave_StorePlayerInfo(SaveControl *save, PlayerState *state);
+void TrainerDataSave_LoadPlayerInfo(SaveControl *save, PlayerState *state);
 
 #endif // POKEBW2_SAVE_TRAINER_DATA_SAVEDATA_H

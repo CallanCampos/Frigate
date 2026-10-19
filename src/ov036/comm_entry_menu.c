@@ -378,7 +378,7 @@ static inline u8 *CommEntryMenu_GetShownMac(CommEntryMenu *menu, int row) {
 
 // This machine's beacon, which the activity's network setup gives
 static inline CommEntryBeacon *CommEntryMenu_GetBeacon(void) {
-    return func_02042e84()->unk18(func_02042d94());
+    return GFL_NetGetInitData()->unk18(GFL_NetGetWork());
 }
 
 // Whether the member of a network ID is one the leader checks on before the activity starts
@@ -423,7 +423,7 @@ CommEntryMenu *CommEntryMenu_Create(const PlayerInfo *info, Field *field, u32 mi
     menu->heapId = heapId;
     menu->shownCount = -1;
     menu->nextMsg = COMM_ENTRY_NO_MESSAGE;
-    func_02008b34(info, &menu->self);
+    PlayerInfo_Copy(info, &menu->self);
     if (mac != NULL) {
         MI_CpuCopy8(mac, menu->mac, sizeof(menu->mac));
     }
@@ -452,7 +452,7 @@ u32 CommEntryMenu_Free(CommEntryMenu *menu) {
     func_ov036_02188338(menu->msgWin);
     func_ov036_021879b8(menu->msgData);
     GFL_WordSetSystemFree(menu->wordSet);
-    if (func_02042788() == TRUE) {
+    if (GFL_NetIsInitialized() == TRUE) {
         CommEntryMenu_RemoveCommands();
     }
     GFL_HeapFree(menu);
@@ -469,7 +469,7 @@ void CommEntryMenu_SetCallbacks(CommEntryMenu *menu, void *work, CommEntryMenuCa
 void CommEntryMenu_AddEntry(CommEntryMenu *menu, u32 netId, const PlayerInfo *info, u8 autoAccept, const u8 *mac) {
     CommEntryMember *member = &menu->members[netId];
 
-    func_02008b34(info, &member->info);
+    PlayerInfo_Copy(info, &member->info);
     member->state = COMM_ENTRY_MEMBER_NEW;
     member->autoAccept = autoAccept;
     MI_CpuCopy8(mac, member->mac, sizeof(member->mac));
@@ -528,8 +528,8 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         }
         break;
     case 2:
-        if (func_0203ff6c() > 1) {
-            if (func_02040504() == TRUE) {
+        if (NetSystem_CountConnected() > 1) {
+            if (NetHandle_SendNegotiation() == TRUE) {
                 menu->seq++;
             }
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
@@ -540,7 +540,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         }
         break;
     case 3:
-        if (func_0204044c(func_02040440()) == TRUE) {
+        if (NetHandle_IsNegotiated(NetHandle_GetOwn()) == TRUE) {
             menu->seq = 4;
         }
         break;
@@ -566,7 +566,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
             menu->seq = 6;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             menu->seq = 7;
-        } else if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_02042a78() <= 1) {
+        } else if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && GFL_NetGetNegotiatedCount() <= 1) {
             menu->seq = 17;
         } else if (msg != COMM_ENTRY_NO_MESSAGE) {
             CommEntryMenu_PrintMessage(menu, msg);
@@ -577,7 +577,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         u32 answer = CommEntryMenu_AskGroupOk(menu);
 
         if (answer == COMM_ENTRY_ASK_YES) {
-            func_02042a9c(func_02040440(), 0);
+            func_02042a9c(NetHandle_GetOwn(), 0);
             menu->seq = 9;
         } else if (answer == COMM_ENTRY_ASK_NO) {
             if (CommEntryMenu_CountAccepted(menu) >= menu->maxCount) {
@@ -597,7 +597,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         u32 answer = CommEntryMenu_AskCancel(menu);
 
         if (answer == COMM_ENTRY_ASK_YES) {
-            func_02042a9c(func_02040440(), 0);
+            func_02042a9c(NetHandle_GetOwn(), 0);
             menu->seq = 13;
         } else if (answer == COMM_ENTRY_ASK_NO) {
             menu->seq = 5;
@@ -606,18 +606,18 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
     }
     case 9:
         if (CommEntryMenu_SendCheck(menu->sendToAll) == TRUE) {
-            CommEntryMenu_SetReady(menu, func_02042a6c(func_02040440()));
+            CommEntryMenu_SetReady(menu, GFL_NetGetHandleNetId(NetHandle_GetOwn()));
             menu->checkMask = menu->memberList.mask;
             func_02042e9c(TRUE);
             menu->seq = 10;
         }
         break;
     case 10:
-        mask = 1 << func_02042a6c(func_02040440());
+        mask = 1 << GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
         for (i = 0; i < COMM_ENTRY_MEMBER_MAX ? TRUE : FALSE; i++) {
-            if (i != func_02042a6c(func_02040440()) && CommEntryMenu_IsChecked(menu, i)) {
-                if (func_02042a80(i) == TRUE) {
+            if (i != GFL_NetGetHandleNetId(NetHandle_GetOwn()) && CommEntryMenu_IsChecked(menu, i)) {
+                if (GFL_NetIsNegotiated(i) == TRUE) {
                     if (menu->readyMask & 1 << i) {
                         mask |= 1U << i;
                     }
@@ -647,17 +647,17 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
             menu->result = COMM_ENTRY_MENU_DONE;
             menu->seq = 8;
             menu->readyCount = MATH_CountPopulation(menu->readyMask);
-            func_02040624(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         }
         break;
     case 8:
-        if (menu->readyCount != func_0203ff6c() || menu->minCount > func_0203ff6c()) {
+        if (menu->readyCount != NetSystem_CountConnected() || menu->minCount > NetSystem_CountConnected()) {
             if (CommEntryMenu_SendCancel(menu->sendToAll) == TRUE) {
                 menu->checkMask = menu->memberList.mask;
                 menu->result = COMM_ENTRY_MENU_CANCELLED;
                 menu->seq = 14;
             }
-        } else if (func_02040664(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
             menu->seq = 19;
             // Stop the players who look for a leader from finding this one
@@ -784,13 +784,13 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_MembersHaveGatheredPlease);
         }
         menu->seq = 7;
-        func_02040624(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
     case 7:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
-        if (func_02040664(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
             menu->seq = 15;
         } else if (menu->cancelled == TRUE) {
@@ -808,25 +808,25 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         break;
     case 10:
         // The leader refused: start the network again, to pick another
-        menu->netWork = func_02042d94();
-        MI_CpuCopy8(func_02042e84(), &menu->netInit, sizeof(GFLNetInitData));
+        menu->netWork = GFL_NetGetWork();
+        MI_CpuCopy8(GFL_NetGetInitData(), &menu->netInit, sizeof(GFLNetInitData));
         CommEntryMenu_RemoveCommands();
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
         copyVarForText(menu->wordSet, 0, &menu->replyInfo);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_Refused);
         menu->seq = 11;
         break;
     case 11:
-        if (func_020427a4() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->seq = 12;
         }
         break;
     case 12:
-        func_020425ec(&menu->netInit, NULL, menu->netWork);
+        GFL_NetInit(&menu->netInit, NULL, menu->netWork);
         menu->seq = 13;
         break;
     case 13:
-        if (func_02042788() == TRUE) {
+        if (GFL_NetIsInitialized() == TRUE) {
             CommEntryMenu_AddCommands(menu);
             menu->seq = 0;
         }
@@ -891,13 +891,13 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_MembersHaveGatheredPlease);
         }
         menu->seq = 5;
-        func_02040624(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
     case 5:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
-        if (func_02040664(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
             menu->seq = 11;
         } else if (menu->cancelled == TRUE) {
@@ -917,13 +917,13 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
     case 8:
         // Nothing sets steps 8 and 9, the leader's refusal as CommEntryMenu_UpdateAskToJoin has it. The leader
         // list's selected leader they print is NULL in this menu, which never creates the list
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
         copyVarForText(menu->wordSet, 0, &menu->list.selected->info);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_Refused);
         menu->seq = 9;
         break;
     case 9:
-        if (func_020427a4() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_REFUSED;
             menu->seq = 11;
         }
@@ -1009,13 +1009,13 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_MembersHaveGatheredPlease);
         }
         menu->seq = 6;
-        func_02040624(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
     case 6:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
-        if (func_02040664(func_02040440(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
             menu->seq = 12;
         } else if (menu->cancelled == TRUE) {
@@ -1033,13 +1033,13 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
         }
         break;
     case 9:
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
         copyVarForText(menu->wordSet, 0, &menu->replyInfo);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_Refused);
         menu->seq = 10;
         break;
     case 10:
-        if (func_020427a4() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
+        if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_REFUSED;
             menu->seq = 12;
         }
@@ -1094,7 +1094,7 @@ static u8 CommEntryMenu_UpdateMemberList(CommEntryMenu *menu) {
 
     for (i = 0; i < COMM_ENTRY_MEMBER_MAX; i++) {
         if (menu->members[i].state != COMM_ENTRY_MEMBER_NONE) {
-            func_02008b34(&menu->members[i].info, &menu->memberList.players[i]);
+            PlayerInfo_Copy(&menu->members[i].info, &menu->memberList.players[i]);
             mask |= 1 << i;
         }
     }
@@ -1107,7 +1107,7 @@ static void CommEntryMenu_CheckLeft(CommEntryMenu *menu) {
     u8 i;
 
     for (i = 0; i < COMM_ENTRY_MEMBER_MAX; i++) {
-        if (menu->members[i].state != COMM_ENTRY_MEMBER_NONE && func_02042a80(i) == FALSE) {
+        if (menu->members[i].state != COMM_ENTRY_MEMBER_NONE && GFL_NetIsNegotiated(i) == FALSE) {
             if (menu->onLeave != NULL) {
                 menu->onLeave(menu->callbackWork, &menu->members[i].info, menu->members[i].mac);
             }
@@ -1597,8 +1597,8 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
                 func_ov036_02187ef8(menu->list.menu);
                 menu->list.changed = FALSE;
             }
-        } else if (func_0203ff6c() > 1) {
-            if (func_02040504() == TRUE) {
+        } else if (NetSystem_CountConnected() > 1) {
+            if (NetHandle_SendNegotiation() == TRUE) {
                 list->seq++;
             }
         } else {
@@ -1615,7 +1615,7 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
         }
         break;
     case 1:
-        if (func_0204044c(func_02040440()) == TRUE) {
+        if (NetHandle_IsNegotiated(NetHandle_GetOwn()) == TRUE) {
             menu->reply = COMM_ENTRY_REPLY_NONE;
             if (CommEntryMenu_SendEntry(&menu->self, FALSE, menu->sendToAll) == TRUE) {
                 list->seq = 2;
@@ -1709,7 +1709,7 @@ static BOOL CommEntryMenu_UpdateLeaderListInput(CommEntryMenu *menu) {
     default:
         if (list->leaders[index].valid == TRUE) {
             list->selected = &list->leaders[index];
-            func_0204295c(list->selected->mac);
+            GFL_NetStartAsChild(list->selected->mac);
             copyVarForText(menu->wordSet, 0, &list->selected->info);
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_AwaitingSResponseB);
             list->timer = 0;
@@ -1737,7 +1737,7 @@ static void CommEntryMenu_ScanBeacons(CommEntryMenu *menu) {
     int i;
 
     for (i = 0; i < COMM_ENTRY_LEADER_MAX; i++) {
-        CommEntryBeacon *beacon = func_020428a8(i);
+        CommEntryBeacon *beacon = GFL_NetGetBeaconData(i);
 
         if (beacon != NULL && beacon->gameId == COMM_ENTRY_BEACON_GAME_ID) {
             CommEntryMenu_AddLeader(menu, beacon->mac, &beacon->info);
@@ -1759,7 +1759,7 @@ static void CommEntryMenu_AddLeader(CommEntryMenu *menu, const u8 *mac, const Pl
     for (i = 0; i < COMM_ENTRY_LEADER_MAX; i++) {
         if (list->leaders[i].valid == FALSE) {
             MI_CpuCopy8(mac, list->leaders[i].mac, sizeof(list->leaders[i].mac));
-            func_02008b34(info, &list->leaders[i].info);
+            PlayerInfo_Copy(info, &list->leaders[i].info);
             list->leaders[i].timer = COMM_ENTRY_LEADER_TIMEOUT;
             list->leaders[i].valid = TRUE;
             list->changed = TRUE;
@@ -1857,7 +1857,7 @@ static void CommEntryMenu_CloseYesNo(CommEntryMenu *menu) {
 
 static void CommEntryMenu_SetReply(CommEntryMenu *menu, u32 reply, const PlayerInfo *info) {
     menu->reply = reply;
-    func_02008b34(info, &menu->replyInfo);
+    PlayerInfo_Copy(info, &menu->replyInfo);
 }
 
 static int CommEntryMenu_GetMemberListSize(void) {
@@ -1869,7 +1869,7 @@ static BOOL CommEntryMenu_AnyConnected(u32 mask) {
     u8 i;
 
     for (i = 0; i < COMM_ENTRY_MEMBER_MAX; i++) {
-        if (i != func_02042a6c(func_02040440()) && (1 << i & mask) && func_02042a80(i) == TRUE) {
+        if (i != GFL_NetGetHandleNetId(NetHandle_GetOwn()) && (1 << i & mask) && GFL_NetIsNegotiated(i) == TRUE) {
             return TRUE;
         }
     }
@@ -1877,11 +1877,11 @@ static BOOL CommEntryMenu_AnyConnected(u32 mask) {
 }
 
 static void CommEntryMenu_AddCommands(CommEntryMenu *menu) {
-    func_02040c20(COMM_ENTRY_CMD_ENTRY, sCommEntryNetCommands, NELEMS(sCommEntryNetCommands), menu);
+    NetCommand_AddTable(COMM_ENTRY_CMD_ENTRY, sCommEntryNetCommands, NELEMS(sCommEntryNetCommands), menu);
 }
 
 static void CommEntryMenu_RemoveCommands(void) {
-    func_02040c64(COMM_ENTRY_CMD_ENTRY);
+    NetCommand_RemoveTable(COMM_ENTRY_CMD_ENTRY);
 }
 
 static void *CommEntryMenu_GetMemberListRecvBuffer(int netId, void *work, int size) {
@@ -1898,14 +1898,14 @@ static BOOL CommEntryMenu_SendEntry(const PlayerInfo *info, u8 autoAccept, BOOL 
     CommEntryPacket packet;
 
     MI_CpuFill8(&packet, 0, sizeof(packet));
-    func_02008b34(info, &packet.info);
+    PlayerInfo_Copy(info, &packet.info);
     OS_GetMacAddress(packet.mac);
     packet.autoAccept = autoAccept;
     if (toAll == TRUE) {
-        return func_02042c18(func_02040440(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0,
+        return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0,
                              FALSE, FALSE);
     }
-    return func_02042c18(func_02040440(), 0, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0, FALSE, FALSE);
 }
 
 static void CommEntryMenu_RecvAccept(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1914,10 +1914,10 @@ static void CommEntryMenu_RecvAccept(int netId, int size, const void *data, void
 
 static BOOL CommEntryMenu_SendAccept(u8 netId, BOOL toAll, PlayerInfo *info) {
     if (toAll == TRUE) {
-        return func_02042c18(func_02040414(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(),
+        return GFL_NetSendCommandToMachine(NetHandle_Get(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(),
                              info, 0, FALSE, FALSE);
     }
-    return func_02042c18(func_02040440(), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
 }
 
 static void CommEntryMenu_RecvRefuse(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1926,10 +1926,10 @@ static void CommEntryMenu_RecvRefuse(int netId, int size, const void *data, void
 
 static BOOL CommEntryMenu_SendRefuse(u8 netId, BOOL toAll, PlayerInfo *info) {
     if (toAll == TRUE) {
-        return func_02042c18(func_02040414(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(),
+        return GFL_NetSendCommandToMachine(NetHandle_Get(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(),
                              info, 0, FALSE, FALSE);
     }
-    return func_02042c18(func_02040440(), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
 }
 
 static void CommEntryMenu_RecvCheck(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1938,9 +1938,9 @@ static void CommEntryMenu_RecvCheck(int netId, int size, const void *data, void 
 
 static BOOL CommEntryMenu_SendCheck(BOOL toAll) {
     if (toAll == TRUE) {
-        return func_02042be8(func_02040414(GFL_NET_NETID_SERVER), COMM_ENTRY_CMD_CHECK, 0, NULL);
+        return GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), COMM_ENTRY_CMD_CHECK, 0, NULL);
     }
-    return func_02042be8(func_02040440(), COMM_ENTRY_CMD_CHECK, 0, NULL);
+    return GFL_NetSendCommand(NetHandle_GetOwn(), COMM_ENTRY_CMD_CHECK, 0, NULL);
 }
 
 static void CommEntryMenu_RecvCheckReply(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1949,10 +1949,10 @@ static void CommEntryMenu_RecvCheckReply(int netId, int size, const void *data, 
 
 static BOOL CommEntryMenu_SendCheckReply(BOOL toAll) {
     if (toAll == TRUE) {
-        return func_02042c18(func_02040440(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_CHECK_REPLY, 0, NULL, 0, FALSE,
+        return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_CHECK_REPLY, 0, NULL, 0, FALSE,
                              FALSE);
     }
-    return func_02042c18(func_02040440(), 0, COMM_ENTRY_CMD_CHECK_REPLY, 0, NULL, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COMM_ENTRY_CMD_CHECK_REPLY, 0, NULL, 0, FALSE, FALSE);
 }
 
 static void CommEntryMenu_RecvStart(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1961,9 +1961,9 @@ static void CommEntryMenu_RecvStart(int netId, int size, const void *data, void 
 
 static BOOL CommEntryMenu_SendStart(BOOL toAll) {
     if (toAll == TRUE) {
-        return func_02042be8(func_02040414(GFL_NET_NETID_SERVER), COMM_ENTRY_CMD_START, 0, NULL);
+        return GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), COMM_ENTRY_CMD_START, 0, NULL);
     }
-    return func_02042be8(func_02040440(), COMM_ENTRY_CMD_START, 0, NULL);
+    return GFL_NetSendCommand(NetHandle_GetOwn(), COMM_ENTRY_CMD_START, 0, NULL);
 }
 
 static void CommEntryMenu_RecvCancel(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1972,14 +1972,14 @@ static void CommEntryMenu_RecvCancel(int netId, int size, const void *data, void
 
 static BOOL CommEntryMenu_SendCancel(BOOL toAll) {
     if (toAll == TRUE) {
-        return func_02042be8(func_02040414(GFL_NET_NETID_SERVER), COMM_ENTRY_CMD_CANCEL, 0, NULL);
+        return GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), COMM_ENTRY_CMD_CANCEL, 0, NULL);
     }
-    return func_02042be8(func_02040440(), COMM_ENTRY_CMD_CANCEL, 0, NULL);
+    return GFL_NetSendCommand(NetHandle_GetOwn(), COMM_ENTRY_CMD_CANCEL, 0, NULL);
 }
 
 static void CommEntryMenu_RecvMemberList(int netId, int size, const void *data, void *work, NetHandle *handle) {
     // The leader's own copy tells it that the list was sent
-    if (func_02042bc4() == TRUE) {
+    if (GFL_NetIsParent() == TRUE) {
         CommEntryMenu_OnMemberListSent(work);
     } else {
         CommEntryMenu_SetMemberList(work, data);
@@ -1988,9 +1988,9 @@ static void CommEntryMenu_RecvMemberList(int netId, int size, const void *data, 
 
 static BOOL CommEntryMenu_SendMemberList(CommEntryMemberList *list, u32 netIds, BOOL toAll) {
     if (toAll == TRUE) {
-        return func_02042c9c(func_02040414(GFL_NET_NETID_SERVER), netIds, COMM_ENTRY_CMD_MEMBER_LIST,
+        return GFL_NetSendCommandToBits(NetHandle_Get(GFL_NET_NETID_SERVER), netIds, COMM_ENTRY_CMD_MEMBER_LIST,
                              CommEntryMenu_GetMemberListSize(), list, 0, FALSE, TRUE);
     }
-    return func_02042c9c(func_02040440(), netIds, COMM_ENTRY_CMD_MEMBER_LIST, CommEntryMenu_GetMemberListSize(), list,
+    return GFL_NetSendCommandToBits(NetHandle_GetOwn(), netIds, COMM_ENTRY_CMD_MEMBER_LIST, CommEntryMenu_GetMemberListSize(), list,
                          0, FALSE, TRUE);
 }

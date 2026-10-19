@@ -56,7 +56,7 @@ static const G3DSceneResourceSetup sResources[] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov097_021eec80(Field *field) {
+void DriftveilLift_Init(Field *field) {
     // Where each lift is
     VecFx32 lift0Position = { FX32_CONST(120), 0, FX32_CONST(72) };
     VecFx32 lift1Position = { FX32_CONST(120), 0, FX32_CONST(72) };
@@ -91,7 +91,7 @@ void func_ov097_021eec80(Field *field) {
     }
 }
 
-void func_ov097_021eedb4(Field *field) {
+void DriftveilLift_End(Field *field) {
     FieldExpObjSystem *system;
 
     system = Field_GetExpObjSystem(field);
@@ -100,11 +100,11 @@ void func_ov097_021eedb4(Field *field) {
     FieldExpObj_FreeScene(system, 0);
 }
 
-void func_ov097_021eedd8(Field *field) {
+void DriftveilLift_Update(Field *field) {
     FieldExpObj_StepAllAnimations(Field_GetExpObjSystem(field));
 }
 
-GameEvent *func_ov097_021eede4(GameSystem *gsys, BOOL down, BOOL withRider) {
+GameEvent *DriftveilLift_CreateMoveEvent(GameSystem *gsys, BOOL down, BOOL withRider) {
     Field *field;
     LiftWork *work;
 
@@ -196,7 +196,7 @@ static GameEventReturnCode DriftveilLift_MoveEvent(GameEvent *event, u32 *state,
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov097_021eefe4(GameSystem *gsys, u16 withRider) {
+void DriftveilLift_PlaceAtBottom(GameSystem *gsys, u16 withRider) {
     Field *field;
     FieldExpObjSystem *system;
     LiftWork *work;

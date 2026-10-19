@@ -101,7 +101,7 @@ void WorldTrade_PrintInit(WorldTradePrint *print, TrainerDataSave *config) {
     print->tcbManager = GFL_TCBExMgrCreate(HEAPID_WORLDTRADE, HEAPID_WORLDTRADE, 32, 32);
     print->config = config;
     print->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_WORLDTRADE);
-    print->printQueue = func_02021998(HEAPID_WORLDTRADE);
+    print->printQueue = PrintQueue_CreateDefault(HEAPID_WORLDTRADE);
     print->keyCursor = KeyCursor_Create(15, 1, 1, HEAPID_WORLDTRADE);
     for (i = 0; i < PRINT_ENTRY_COUNT; i++) {
         WorldTradePrintEntry *entry = &print->entries[i];
@@ -113,7 +113,7 @@ void WorldTrade_PrintInit(WorldTradePrint *print, TrainerDataSave *config) {
 
 void WorldTrade_PrintExit(WorldTradePrint *print) {
     KeyCursor_Free(print->keyCursor);
-    func_02021a18(print->printQueue);
+    PrintQueue_Free(print->printQueue);
     GFL_FontFree(print->font);
     GFL_TCBExMgrFree(print->tcbManager);
     MI_CpuFill8(print, 0, sizeof(WorldTradePrint));
@@ -135,34 +135,34 @@ void WorldTrade_PrintMain(WorldTradePrint *print) {
 
     if (print->stream != NULL) {
         KeyCursor_Update(print->keyCursor, print->stream, print->streamWin);
-        switch (func_020223b4(print->stream)) {
+        switch (PrintStream_GetState(print->stream)) {
         case PRINT_STREAM_RUNNING:
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-                func_020223e0(print->stream, 0);
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
+                PrintStream_SkipWait(print->stream, 0);
             }
             break;
         case PRINT_STREAM_PAUSED:
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(print->stream);
+                PrintStream_Continue(print->stream);
             }
             break;
         case PRINT_STREAM_DONE:
-            func_020223cc(print->stream);
+            PrintStream_Delete(print->stream);
             print->stream = NULL;
             print->streamWin = NULL;
             break;
         }
     }
 
-    func_02021a3c(print->printQueue);
+    PrintQueue_Main(print->printQueue);
     GFL_TCBExMgrUpdate(print->tcbManager);
 }
 
 BOOL WorldTrade_PrintIsBusy(WorldTradePrint *print) {
     BOOL busy = FALSE;
 
-    if (print->stream != NULL && func_020223b4(print->stream) != PRINT_STREAM_DONE) {
+    if (print->stream != NULL && PrintStream_GetState(print->stream) != PRINT_STREAM_DONE) {
         busy = TRUE;
     }
     return busy;
@@ -174,11 +174,11 @@ void WorldTrade_Print(BmpWin *win, u8 font, StrBuf *str, int x, int y, WorldTrad
 
 void WorldTrade_StreamPrint(BmpWin *win, u8 font, StrBuf *str, int x, int y, WorldTradePrint *print) {
     if (print->stream != NULL) {
-        func_020223cc(print->stream);
+        PrintStream_Delete(print->stream);
         print->stream = NULL;
     }
-    print->stream =
-        func_02022268(win, x, y, str, print->font, func_02017bcc(), print->tcbManager, 0, HEAPID_WORLDTRADE, 15);
+    print->stream = PrintStream_Create(win, x, y, str, print->font, TextSpeed_GetCurrentWait(), print->tcbManager, 0,
+                                       HEAPID_WORLDTRADE, 15);
     print->streamWin = win;
 }
 
@@ -212,7 +212,7 @@ void WorldTrade_PrintClear(WorldTradePrint *print) {
         }
     }
     if (print->stream != NULL) {
-        func_020223cc(print->stream);
+        PrintStream_Delete(print->stream);
         print->stream = NULL;
         print->streamWin = NULL;
     }
@@ -225,7 +225,7 @@ WorldTradeNumFont *WorldTrade_NumFontCreate(u32 unused0, u32 unused1, u32 unused
     MI_CpuFill8(numFont, 0, sizeof(WorldTradeNumFont));
     numFont->heapId = heapId;
     numFont->font = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, heapId);
-    numFont->printQueue = func_02021998(heapId);
+    numFont->printQueue = PrintQueue_CreateDefault(heapId);
     numFont->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WORLDTRADE, heapId);
     numFont->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     return numFont;
@@ -234,7 +234,7 @@ WorldTradeNumFont *WorldTrade_NumFontCreate(u32 unused0, u32 unused1, u32 unused
 void WorldTrade_NumFontDelete(WorldTradeNumFont *numFont) {
     GFL_WordSetSystemFree(numFont->wordSet);
     GFL_MsgDataFree(numFont->msgData);
-    func_02021a18(numFont->printQueue);
+    PrintQueue_Free(numFont->printQueue);
     GFL_FontFree(numFont->font);
     GFL_HeapFree(numFont);
 }
@@ -250,7 +250,7 @@ void WorldTrade_NumFontMain(WorldTradeNumFont *numFont) {
             }
         }
     }
-    func_02021a3c(numFont->printQueue);
+    PrintQueue_Main(numFont->printQueue);
 }
 
 void WorldTrade_NumFontPrintNumber(WorldTradeNumFont *numFont, int num, int digits, int dispType, BmpWin *win, int x,

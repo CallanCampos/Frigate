@@ -190,7 +190,7 @@ BtlvGauge *BtlvGauge_Create(Font *font, u32 mode, HeapID heapId) {
 
     gauge->heapId = heapId;
     gauge->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, gauge->heapId);
-    gauge->unit = func_0204bf1c(40, 0, gauge->heapId);
+    gauge->unit = ClActUnit_Create(40, 0, gauge->heapId);
     gauge->font = font;
     gauge->bgm = GFL_SndBGMGetID();
     flash = GFL_HeapAllocate(heapId, sizeof(BtlvGaugeFlashTask), TRUE, "btlv_gauge.c", 355);
@@ -211,7 +211,7 @@ void BtlvGauge_Delete(BtlvGauge *gauge) {
         GFL_SndBGMPop();
         BtlvGauge_PauseBgm(FALSE);
     }
-    func_0204bf98(gauge->unit);
+    ClActUnit_Delete(gauge->unit);
     GFL_ArcToolFree(gauge->arc);
     GFL_HeapFree(GFL_TCBGetData(gauge->flashTask));
     GFL_TCBRemove(gauge->flashTask);
@@ -277,14 +277,14 @@ void BtlvGauge_Update(BtlvGauge *gauge) {
         if (gauge->entries[i].damageActor != NULL && gauge->entries[i].mon.blinking) {
             if (gauge->entries[i].mon.blinkCount == 0 || !gauge->entries[i].mon.shown ||
                 !gauge->entries[i].mon.visible) {
-                func_0204c124(gauge->entries[i].damageActor, FALSE);
+                ClActor_SetVisible(gauge->entries[i].damageActor, FALSE);
                 gauge->entries[i].mon.blinking = FALSE;
             } else {
-                func_0204c124(gauge->entries[i].damageActor, gauge->entries[i].mon.blinkCount & 1);
+                ClActor_SetVisible(gauge->entries[i].damageActor, gauge->entries[i].mon.blinkCount & 1);
                 gauge->entries[i].mon.blinkCount--;
             }
             if (gauge->showNumbers && !(i & 1)) {
-                func_0204c124(gauge->entries[i].damageActor, FALSE);
+                ClActor_SetVisible(gauge->entries[i].damageActor, FALSE);
             }
         }
     }
@@ -321,11 +321,11 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
     gauge->entries[index].mon.expAnim = GAUGE_ANIM_START;
     gauge->entries[index].mon.expDelta = 0;
     gauge->entries[index].mon.unk2e = 0;
-    gauge->entries[index].mon.caught = func_ov167_0219bf70(mainModule, mon);
-    if (PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_SHOW_SEX, NULL) == 0) {
+    gauge->entries[index].mon.caught = IsMonCaught(mainModule, mon);
+    if (PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_SHOW_SEX, NULL) == 0) {
         gauge->entries[index].mon.sex = 2;
     } else {
-        gauge->entries[index].mon.sex = PokeParty_GetSex(func_ov167_021bb064(mon));
+        gauge->entries[index].mon.sex = PokeParty_GetSex(BattleMon_GetViewSrcData(mon));
     }
     if (Condition_IsBadlyPoisoned(GetConditionContinuationParam(mon, CONDITION_POISON)) == TRUE &&
         GetBattleMonStatus(mon) == CONDITION_POISON) {
@@ -337,7 +337,7 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
     BtlvGauge_SetPos(gauge, index, NULL);
     BtlvGauge_ShowHpParts(gauge, index, TRUE);
     BtlvGauge_CalcHpDots(&gauge->entries[index]);
-    BtlvGauge_Show(gauge, type, index, func_ov167_021bb064(mon));
+    BtlvGauge_Show(gauge, type, index, BattleMon_GetViewSrcData(mon));
 }
 
 void BtlvGauge_SetPartyPkm(BtlvGauge *gauge, PokeDexSave *pokedex, PartyPkm *pkm, u32 type, int index) {
@@ -396,19 +396,23 @@ static void BtlvGauge_LoadResources(BtlvGauge *gauge) {
     gauge->loaded = TRUE;
     for (i = 0; i < 6; i++) {
         gauge->palettes[i] =
-            func_0204bba0(gauge->arc, BtlvGauge_PaletteFile(), CLACT_VRAM_MAIN, i * 0x20, gauge->heapId);
+            ClActSys_LoadPltt(gauge->arc, BtlvGauge_PaletteFile(), CLACT_VRAM_MAIN, i * 0x20, gauge->heapId);
         PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,
-                                 func_0204bdc0(gauge->palettes[i], FALSE) / 2, 0x20);
+                                 ClActSys_GetPlttVramAddr(gauge->palettes[i], FALSE) / 2, 0x20);
     }
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(gauge->heapId));
-    gauge->statusChars = func_0204b81c(arc, func_0202d8b4(), FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-    gauge->statusCellAnims = func_0204bde0(arc, func_0202d8b8(1), func_0202d8bc(1), gauge->heapId);
-    gauge->statusPalette = func_0204bba0(arc, func_0202d8b0(), CLACT_VRAM_MAIN, 0x100, gauge->heapId);
-    gauge->statusPaletteDark = func_0204bba0(arc, func_0202d8b0(), CLACT_VRAM_MAIN, 0x120, gauge->heapId);
+    gauge->statusChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetStatusIconCharFile(), FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+    gauge->statusCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetStatusIconCellFile(1),
+                                                    AppMenuCommon_GetStatusIconAnimFile(1), gauge->heapId);
+    gauge->statusPalette =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetStatusIconPaletteFile(), CLACT_VRAM_MAIN, 0x100, gauge->heapId);
+    gauge->statusPaletteDark =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetStatusIconPaletteFile(), CLACT_VRAM_MAIN, 0x120, gauge->heapId);
     PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,
-                             func_0204bdc0(gauge->statusPalette, FALSE) / 2, 0x20);
+                             ClActSys_GetPlttVramAddr(gauge->statusPalette, FALSE) / 2, 0x20);
     PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,
-                             func_0204bdc0(gauge->statusPaletteDark, FALSE) / 2, 0x20);
+                             ClActSys_GetPlttVramAddr(gauge->statusPaletteDark, FALSE) / 2, 0x20);
     PaletteFade_BlendPalettes(BtlvEffect_GetPaletteFade(), PALFADE_BUFFER_MAIN_OBJ, 1 << 9, 8, 0);
     GFL_ArcToolFree(arc);
     gauge->charFile = GFL_G2DIOReadOBJNCGRArc(gauge->arc, 0x1b2, FALSE, &character, gauge->heapId);
@@ -457,12 +461,12 @@ static void BtlvGauge_FreeResources(BtlvGauge *gauge) {
             BtlvGauge_DeleteActors(gauge, pos);
         }
         for (i = 0; i < 6; i++) {
-            func_0204bcd0(gauge->palettes[i]);
+            ClActSys_FreePltt(gauge->palettes[i]);
         }
-        func_0204b98c(gauge->statusChars);
-        func_0204be64(gauge->statusCellAnims);
-        func_0204bcd0(gauge->statusPalette);
-        func_0204bcd0(gauge->statusPaletteDark);
+        ClActSys_FreeChars(gauge->statusChars);
+        ClActSys_FreeCellAnims(gauge->statusCellAnims);
+        ClActSys_FreePltt(gauge->statusPalette);
+        ClActSys_FreePltt(gauge->statusPaletteDark);
         GFL_HeapFree(gauge->charFile);
         gauge->loaded = FALSE;
     }
@@ -507,23 +511,23 @@ static void BtlvGauge_CreateActors(BtlvGauge *gauge, u32 type, int index) {
             slot = index - 2;
         }
         paletteFile = index < 4 ? BtlvGauge_PaletteFile() : BtlvGauge_BackPaletteFile();
-        func_0204bcd0(gauge->palettes[slot]);
+        ClActSys_FreePltt(gauge->palettes[slot]);
         gauge->palettes[slot] =
-            func_0204bbb8(gauge->arc, paletteFile, CLACT_VRAM_MAIN, slot * 0x20, 0, 1, gauge->heapId);
+            ClActSys_LoadPlttRange(gauge->arc, paletteFile, CLACT_VRAM_MAIN, slot * 0x20, 0, 1, gauge->heapId);
         PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,
-                                 func_0204bdc0(gauge->palettes[slot], FALSE) / 2, 0x20);
+                                 ClActSys_GetPlttVramAddr(gauge->palettes[slot], FALSE) / 2, 0x20);
     }
-    gauge->entries[index].nameChars = func_0204b81c(gauge->arc, charsFile, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-    gauge->entries[index].nameCellAnims = func_0204bde0(gauge->arc, cellFile, animFile, gauge->heapId);
-    gauge->entries[index].hpNumChars = func_0204b81c(gauge->arc, 0x1c8, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-    gauge->entries[index].hpNumCellAnims = func_0204bde0(gauge->arc, 0x1c9, 0x1ca, gauge->heapId);
-    gauge->entries[index].hpBarChars = func_0204b81c(gauge->arc, 0x1bf, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-    gauge->entries[index].hpBarCellAnims = func_0204bde0(gauge->arc, 0x1c0, 0x1c1, gauge->heapId);
-    gauge->entries[index].damageChars = func_0204b81c(gauge->arc, 0x1c2, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-    gauge->entries[index].damageCellAnims = func_0204bde0(gauge->arc, 0x1c3, 0x1c1, gauge->heapId);
+    gauge->entries[index].nameChars = ClActSys_LoadChars(gauge->arc, charsFile, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+    gauge->entries[index].nameCellAnims = ClActSys_LoadCellAnims(gauge->arc, cellFile, animFile, gauge->heapId);
+    gauge->entries[index].hpNumChars = ClActSys_LoadChars(gauge->arc, 0x1c8, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+    gauge->entries[index].hpNumCellAnims = ClActSys_LoadCellAnims(gauge->arc, 0x1c9, 0x1ca, gauge->heapId);
+    gauge->entries[index].hpBarChars = ClActSys_LoadChars(gauge->arc, 0x1bf, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+    gauge->entries[index].hpBarCellAnims = ClActSys_LoadCellAnims(gauge->arc, 0x1c0, 0x1c1, gauge->heapId);
+    gauge->entries[index].damageChars = ClActSys_LoadChars(gauge->arc, 0x1c2, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+    gauge->entries[index].damageCellAnims = ClActSys_LoadCellAnims(gauge->arc, 0x1c3, 0x1c1, gauge->heapId);
     if (!(index & 1)) {
-        gauge->entries[index].expChars = func_0204b81c(gauge->arc, 0x1c5, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-        gauge->entries[index].expCellAnims = func_0204bde0(gauge->arc, 0x1c6, 0x1c7, gauge->heapId);
+        gauge->entries[index].expChars = ClActSys_LoadChars(gauge->arc, 0x1c5, FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+        gauge->entries[index].expCellAnims = ClActSys_LoadCellAnims(gauge->arc, 0x1c6, 0x1c7, gauge->heapId);
     }
     {
         ClActorSetup setup = { 0, 0, 0, 0, 1 };
@@ -542,64 +546,64 @@ static void BtlvGauge_CreateActors(BtlvGauge *gauge, u32 type, int index) {
         }
         setup.priority = priority + 2;
         gauge->entries[index].nameActor =
-            func_0204c040(gauge->unit, gauge->entries[index].nameChars, gauge->palettes[slot],
-                          gauge->entries[index].nameCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
+            ClActor_Create(gauge->unit, gauge->entries[index].nameChars, gauge->palettes[slot],
+                           gauge->entries[index].nameCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
         setup.priority = priority + 1;
         gauge->entries[index].hpNumActor =
-            func_0204c040(gauge->unit, gauge->entries[index].hpNumChars, gauge->palettes[slot],
-                          gauge->entries[index].hpNumCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
+            ClActor_Create(gauge->unit, gauge->entries[index].hpNumChars, gauge->palettes[slot],
+                           gauge->entries[index].hpNumCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
         gauge->entries[index].hpBarActor =
-            func_0204c040(gauge->unit, gauge->entries[index].hpBarChars, gauge->palettes[slot],
-                          gauge->entries[index].hpBarCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
+            ClActor_Create(gauge->unit, gauge->entries[index].hpBarChars, gauge->palettes[slot],
+                           gauge->entries[index].hpBarCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
         if (BtlvEffect_GetBattleStyle() == BTL_STYLE_ROTATION && index >= 4) {
             gauge->entries[index].statusActor =
-                func_0204c040(gauge->unit, gauge->statusChars, gauge->statusPaletteDark, gauge->statusCellAnims, &setup,
-                              CLACT_SURFACE_MAIN, gauge->heapId);
+                ClActor_Create(gauge->unit, gauge->statusChars, gauge->statusPaletteDark, gauge->statusCellAnims,
+                               &setup, CLACT_SURFACE_MAIN, gauge->heapId);
         } else {
             gauge->entries[index].statusActor =
-                func_0204c040(gauge->unit, gauge->statusChars, gauge->statusPalette, gauge->statusCellAnims, &setup,
-                              CLACT_SURFACE_MAIN, gauge->heapId);
+                ClActor_Create(gauge->unit, gauge->statusChars, gauge->statusPalette, gauge->statusCellAnims, &setup,
+                               CLACT_SURFACE_MAIN, gauge->heapId);
         }
         func_0204c520(gauge->entries[index].statusActor, TRUE);
         setup.priority = priority;
         gauge->entries[index].damageActor =
-            func_0204c040(gauge->unit, gauge->entries[index].damageChars, gauge->palettes[slot],
-                          gauge->entries[index].damageCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
-        func_0204c124(gauge->entries[index].damageActor, FALSE);
+            ClActor_Create(gauge->unit, gauge->entries[index].damageChars, gauge->palettes[slot],
+                           gauge->entries[index].damageCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
+        ClActor_SetVisible(gauge->entries[index].damageActor, FALSE);
         if (!(index & 1) && type != BTL_STYLE_TRIPLE && type != BTL_STYLE_ROTATION) {
             gauge->entries[index].expActor =
-                func_0204c040(gauge->unit, gauge->entries[index].expChars, gauge->palettes[slot],
-                              gauge->entries[index].expCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
+                ClActor_Create(gauge->unit, gauge->entries[index].expChars, gauge->palettes[slot],
+                               gauge->entries[index].expCellAnims, &setup, CLACT_SURFACE_MAIN, gauge->heapId);
         }
     }
 }
 
 static void BtlvGauge_DeleteActors(BtlvGauge *gauge, int index) {
     if (gauge->entries[index].nameActor != NULL) {
-        func_0204b98c(gauge->entries[index].nameChars);
-        func_0204b98c(gauge->entries[index].hpNumChars);
-        func_0204b98c(gauge->entries[index].hpBarChars);
-        func_0204b98c(gauge->entries[index].damageChars);
-        func_0204be64(gauge->entries[index].nameCellAnims);
-        func_0204be64(gauge->entries[index].hpNumCellAnims);
-        func_0204be64(gauge->entries[index].hpBarCellAnims);
-        func_0204be64(gauge->entries[index].damageCellAnims);
-        func_0204c108(gauge->entries[index].nameActor);
-        func_0204c108(gauge->entries[index].hpNumActor);
-        func_0204c108(gauge->entries[index].hpBarActor);
-        func_0204c108(gauge->entries[index].damageActor);
-        func_0204c108(gauge->entries[index].statusActor);
+        ClActSys_FreeChars(gauge->entries[index].nameChars);
+        ClActSys_FreeChars(gauge->entries[index].hpNumChars);
+        ClActSys_FreeChars(gauge->entries[index].hpBarChars);
+        ClActSys_FreeChars(gauge->entries[index].damageChars);
+        ClActSys_FreeCellAnims(gauge->entries[index].nameCellAnims);
+        ClActSys_FreeCellAnims(gauge->entries[index].hpNumCellAnims);
+        ClActSys_FreeCellAnims(gauge->entries[index].hpBarCellAnims);
+        ClActSys_FreeCellAnims(gauge->entries[index].damageCellAnims);
+        ClActor_Delete(gauge->entries[index].nameActor);
+        ClActor_Delete(gauge->entries[index].hpNumActor);
+        ClActor_Delete(gauge->entries[index].hpBarActor);
+        ClActor_Delete(gauge->entries[index].damageActor);
+        ClActor_Delete(gauge->entries[index].statusActor);
         gauge->entries[index].nameActor = NULL;
         gauge->entries[index].hpNumActor = NULL;
         gauge->entries[index].hpBarActor = NULL;
         gauge->entries[index].damageActor = NULL;
         gauge->entries[index].statusActor = NULL;
         if (!(index & 1)) {
-            func_0204b98c(gauge->entries[index].expChars);
-            func_0204be64(gauge->entries[index].expCellAnims);
+            ClActSys_FreeChars(gauge->entries[index].expChars);
+            ClActSys_FreeCellAnims(gauge->entries[index].expCellAnims);
         }
         if (gauge->entries[index].expActor != NULL) {
-            func_0204c108(gauge->entries[index].expActor);
+            ClActor_Delete(gauge->entries[index].expActor);
             gauge->entries[index].expActor = NULL;
         }
     }
@@ -683,33 +687,33 @@ void BtlvGauge_SetPos(BtlvGauge *gauge, int index, const ClActorPos *offset) {
     pos.x = x;
     pos.y = y;
     if (gauge->entries[index].nameActor != NULL) {
-        func_0204c140(gauge->entries[index].nameActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(gauge->entries[index].nameActor, &pos, CLACT_SURFACE_MAIN);
     }
     side = index & 1;
     if (!side && gauge->entries[index].mon.type == BTL_STYLE_SINGLE && gauge->entries[index].hpNumActor != NULL) {
         pos.x = x + 16;
         pos.y = y + 13;
-        func_0204c140(gauge->entries[index].hpNumActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(gauge->entries[index].hpNumActor, &pos, CLACT_SURFACE_MAIN);
     } else if (!side && gauge->entries[index].mon.type != BTL_STYLE_DOUBLE &&
                gauge->entries[index].hpNumActor != NULL) {
         pos.x = x + 16;
         pos.y = y + 7;
-        func_0204c140(gauge->entries[index].hpNumActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(gauge->entries[index].hpNumActor, &pos, CLACT_SURFACE_MAIN);
     }
     if (gauge->entries[index].hpBarActor != NULL) {
         pos.x = x + hpBarOffsets[side].x;
         pos.y = y + hpBarOffsets[side].y;
-        func_0204c140(gauge->entries[index].hpBarActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(gauge->entries[index].hpBarActor, &pos, CLACT_SURFACE_MAIN);
     }
     if (gauge->entries[index].statusActor != NULL) {
         pos.x = x + statusOffsets[side].x;
         pos.y = y + statusOffsets[side].y;
-        func_0204c140(gauge->entries[index].statusActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(gauge->entries[index].statusActor, &pos, CLACT_SURFACE_MAIN);
     }
     if (gauge->entries[index].expActor != NULL) {
         pos.x = x + 8;
         pos.y = y + 21;
-        func_0204c140(gauge->entries[index].expActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(gauge->entries[index].expActor, &pos, CLACT_SURFACE_MAIN);
     }
 }
 
@@ -789,14 +793,14 @@ void BtlvGauge_SetSideVisible(BtlvGauge *gauge, BOOL visible, u32 side) {
 void BtlvGauge_SetVisible(BtlvGauge *gauge, BOOL visible, int index) {
     gauge->entries[index].mon.visible = visible;
     if (gauge->entries[index].nameActor != NULL) {
-        func_0204c124(gauge->entries[index].nameActor, visible);
+        ClActor_SetVisible(gauge->entries[index].nameActor, visible);
         BtlvGauge_ShowHpParts(gauge, index, visible);
     }
     if (gauge->entries[index].expActor != NULL) {
-        func_0204c124(gauge->entries[index].expActor, visible);
+        ClActor_SetVisible(gauge->entries[index].expActor, visible);
     }
-    if (gauge->entries[index].statusActor != NULL && func_0204c4a0(gauge->entries[index].statusActor) != 0) {
-        func_0204c124(gauge->entries[index].statusActor, visible);
+    if (gauge->entries[index].statusActor != NULL && ClActor_GetSequence(gauge->entries[index].statusActor) != 0) {
+        ClActor_SetVisible(gauge->entries[index].statusActor, visible);
     }
 }
 
@@ -834,14 +838,14 @@ static void BtlvGauge_SetHpTarget(BtlvGauge *gauge, BtlvGaugeEntry *entry, s32 h
     if (entry->mon.hpDelta > 0) {
         BtlvGauge_CalcHpDots(entry);
         if (entry->hpBarActor != NULL) {
-            func_0204c178(entry->hpBarActor, &pos, CLACT_SURFACE_MAIN);
+            ClActor_GetSurfacePos(entry->hpBarActor, &pos, CLACT_SURFACE_MAIN);
         }
         pos.x -= 48 - entry->mon.hpDots;
         if (entry->damageActor != NULL) {
-            func_0204c140(entry->damageActor, &pos, CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(entry->damageActor, &pos, CLACT_SURFACE_MAIN);
         }
         if (entry->damageActor != NULL) {
-            func_0204c124(entry->damageActor, TRUE);
+            ClActor_SetVisible(entry->damageActor, TRUE);
         }
         BtlvGauge_DrawDamage(gauge, entry, entry->mon.hpDots);
     }
@@ -1059,7 +1063,7 @@ static void BtlvGauge_DrawName(BtlvGauge *gauge, BtlvGaugeEntry *entry, PartyPkm
     GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
     if (entry->nameActor != NULL) {
         pixels = GFL_BitmapGetPixelData(bitmap);
-        func_0204c40c(entry->nameActor, &proxy);
+        ClActor_GetImageProxy(entry->nameActor, &proxy);
         if (entry->mon.side) {
             MI_CpuCopy16(
                 pixels, (void *)((u32)vram + 0x40 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]), 0xc0);
@@ -1101,7 +1105,7 @@ static void BtlvGauge_DrawSex(BtlvGauge *gauge, BtlvGaugeEntry *entry) {
         bottom = GAUGE_TILE_BLANK;
     }
     if (entry->nameActor != NULL) {
-        func_0204c40c(entry->nameActor, &proxy);
+        ClActor_GetImageProxy(entry->nameActor, &proxy);
         if (entry->mon.side) {
             MI_CpuCopy16(gauge->chars + top,
                          (void *)((u32)vram + 0x440 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
@@ -1139,7 +1143,7 @@ static void BtlvGauge_DrawBar(BtlvGauge *gauge, int index, int bar) {
         if (gauge->showNumbers && !(index & 1)) {
             return;
         }
-        func_0204c40c(entry->hpBarActor, &proxy);
+        ClActor_GetImageProxy(entry->hpBarActor, &proxy);
         dots =
             BtlvGauge_CalcBarTiles(entry->mon.maxHp, entry->mon.hp, entry->mon.hpDelta, &entry->mon.hpAnim, tiles, 6);
         hp = entry->mon.hpAnim;
@@ -1172,7 +1176,7 @@ static void BtlvGauge_DrawBar(BtlvGauge *gauge, int index, int bar) {
         if (entry->expActor == NULL) {
             return;
         }
-        func_0204c40c(entry->expActor, &proxy);
+        ClActor_GetImageProxy(entry->expActor, &proxy);
         BtlvGauge_CalcBarTiles(entry->mon.expMax, entry->mon.exp, entry->mon.expDelta, &entry->mon.expAnim, tiles, 10);
         for (i = 0; i < 10; i++) {
             MI_CpuCopy16(
@@ -1196,7 +1200,7 @@ static void BtlvGauge_DrawHpNumbers(BtlvGauge *gauge, BtlvGaugeEntry *entry, s32
     if (entry->hpNumActor == NULL) {
         return;
     }
-    func_0204c40c(entry->hpNumActor, &proxy);
+    ClActor_GetImageProxy(entry->hpNumActor, &proxy);
     for (i = 0; i < 3; i++) {
         hpTiles[i] = GAUGE_TILE_BLANK;
         maxTiles[i] = GAUGE_TILE_BLANK;
@@ -1251,7 +1255,7 @@ static void BtlvGauge_DrawLevel(BtlvGauge *gauge, BtlvGaugeEntry *entry) {
         GFL_TextRendererDrawToBitmap(bitmap, 0, 5, str, gauge->font);
         GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
         pixels = GFL_BitmapGetPixelData(bitmap);
-        func_0204c40c(entry->nameActor, &proxy);
+        ClActor_GetImageProxy(entry->nameActor, &proxy);
         if (entry->mon.side) {
             MI_CpuCopy16(pixels,
                          (void *)((u32)vram + 0x480 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
@@ -1281,7 +1285,7 @@ static void BtlvGauge_DrawCaughtMark(BtlvGauge *gauge, BtlvGaugeEntry *entry) {
         if (!entry->mon.caught) {
             tile = GAUGE_TILE_BLANK;
         }
-        func_0204c40c(entry->nameActor, &proxy);
+        ClActor_GetImageProxy(entry->nameActor, &proxy);
         MI_CpuCopy16(gauge->chars + tile,
                      (void *)((u32)vram + 0x120 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]), 0x20);
     }
@@ -1308,7 +1312,7 @@ static void BtlvGauge_DrawDamage(BtlvGauge *gauge, BtlvGaugeEntry *entry, s32 do
                 break;
             }
         }
-        func_0204c40c(entry->damageActor, &proxy);
+        ClActor_GetImageProxy(entry->damageActor, &proxy);
         for (i = 0; i < 6; i++) {
             MI_CpuCopy16(gauge->chars + (tiles[i] * 0x20 + 0x6a0),
                          (void *)((u32)vram + i * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
@@ -1364,11 +1368,11 @@ void BtlvGauge_SetStatus(BtlvGauge *gauge, u32 status, int index) {
     }
     if (gauge->entries[index].statusActor != NULL) {
         if (status == 0) {
-            func_0204c124(gauge->entries[index].statusActor, FALSE);
-            func_0204c488(gauge->entries[index].statusActor, 0);
+            ClActor_SetVisible(gauge->entries[index].statusActor, FALSE);
+            ClActor_SetSequence(gauge->entries[index].statusActor, 0);
         } else {
-            func_0204c124(gauge->entries[index].statusActor, TRUE);
-            func_0204c488(gauge->entries[index].statusActor, sequences[status]);
+            ClActor_SetVisible(gauge->entries[index].statusActor, TRUE);
+            ClActor_SetSequence(gauge->entries[index].statusActor, sequences[status]);
         }
     }
 }
@@ -1429,7 +1433,7 @@ static void BtlvGauge_ReadStatus(BtlvGauge *gauge, int index, u32 *color, u32 *s
     if (fromActor == FALSE) {
         *status = gauge->entries[index].mon.status;
     } else {
-        *status = func_0204c4a0(gauge->entries[index].statusActor);
+        *status = ClActor_GetSequence(gauge->entries[index].statusActor);
     }
     *color = HPGauge_GetColor(gauge->entries[index].mon.hp, gauge->entries[index].mon.maxHp);
     if (*status == 0) {
@@ -1507,25 +1511,25 @@ static void BtlvGauge_SlideInTask(TCB *tcb, void *data) {
         dx = -8;
     }
     if (entry->nameActor != NULL) {
-        func_0204c178(entry->nameActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(entry->nameActor, &pos, CLACT_SURFACE_MAIN);
         pos.x += dx;
-        func_0204c140(entry->nameActor, &pos, CLACT_SURFACE_MAIN);
-        func_0204c178(entry->hpBarActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(entry->nameActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(entry->hpBarActor, &pos, CLACT_SURFACE_MAIN);
         pos.x += dx;
-        func_0204c140(entry->hpBarActor, &pos, CLACT_SURFACE_MAIN);
-        func_0204c178(entry->statusActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(entry->hpBarActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(entry->statusActor, &pos, CLACT_SURFACE_MAIN);
         pos.x += dx;
-        func_0204c140(entry->statusActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(entry->statusActor, &pos, CLACT_SURFACE_MAIN);
         if (!entry->mon.side) {
-            func_0204c178(entry->hpNumActor, &pos, CLACT_SURFACE_MAIN);
+            ClActor_GetSurfacePos(entry->hpNumActor, &pos, CLACT_SURFACE_MAIN);
             pos.x += dx;
-            func_0204c140(entry->hpNumActor, &pos, CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(entry->hpNumActor, &pos, CLACT_SURFACE_MAIN);
         }
     }
     if (entry->expActor != NULL) {
-        func_0204c178(entry->expActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(entry->expActor, &pos, CLACT_SURFACE_MAIN);
         pos.x += dx;
-        func_0204c140(entry->expActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(entry->expActor, &pos, CLACT_SURFACE_MAIN);
     }
     entry->mon.slideFrames--;
     if (entry->mon.slideFrames == 0) {
@@ -1602,11 +1606,11 @@ static void BtlvGauge_ShowHpParts(BtlvGauge *gauge, int index, BOOL visible) {
     if ((gauge->entries[index].mon.type == BTL_STYLE_TRIPLE || gauge->entries[index].mon.type == BTL_STYLE_ROTATION) &&
         visible == TRUE && !(index & 1)) {
         if (gauge->entries[index].hpNumActor != NULL) {
-            func_0204c124(gauge->entries[index].hpNumActor, gauge->showNumbers);
-            func_0204c124(gauge->entries[index].hpBarActor, !gauge->showNumbers);
+            ClActor_SetVisible(gauge->entries[index].hpNumActor, gauge->showNumbers);
+            ClActor_SetVisible(gauge->entries[index].hpBarActor, !gauge->showNumbers);
         }
     } else if (gauge->entries[index].hpNumActor != NULL) {
-        func_0204c124(gauge->entries[index].hpNumActor, visible);
-        func_0204c124(gauge->entries[index].hpBarActor, visible);
+        ClActor_SetVisible(gauge->entries[index].hpNumActor, visible);
+        ClActor_SetVisible(gauge->entries[index].hpBarActor, visible);
     }
 }

@@ -82,7 +82,7 @@ static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL succ
     if (sNetDevWifiWork != NULL) {
         return FALSE;
     }
-    pNetInit = func_02042e84();
+    pNetInit = GFL_NetGetInitData();
     DWCRapCommon_Create(pNetInit->wifiHeapId, pNetInit->wifiHeapSize);
     sNetDevWifiWork = GFL_HeapAllocate(heapId, sizeof(NetDevWifiWork), TRUE, "net_devwifi.c", 186);
     sNetDevWifiWork->pNetInit = sys;
@@ -198,7 +198,7 @@ static BOOL NetDevWifi_IsError(void) {
     int result = DWC_GetLastErrorEx(&code, &type);
 
     if (result != 0) {
-        func_020424ac(code, type, result, 0);
+        NetState_RecordError(code, type, result, 0);
     }
     if (result == 0) {
         return 0;
@@ -206,7 +206,7 @@ static BOOL NetDevWifi_IsError(void) {
     if (code == 0) {
         return -10000;
     }
-    info = func_02042540();
+    info = NetState_GetErrorInfo();
     return info->type != 0 ? info->type : code;
 }
 

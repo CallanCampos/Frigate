@@ -26,9 +26,9 @@ enum {
 
 // Runs the current sequence; FALSE once the box is done
 BOOL Box2Seq_Main(Box2SysWork *syswk, u32 *seq);
-int func_ov255_021cbe68(Box2SysWork *syswk, int nextSeq);
-int func_ov255_021cbec8(Box2SysWork *syswk, Box2VFunc func, int nextSeq);
-void func_ov255_021cdb90(Box2SysWork *syswk);
-void func_ov255_021cdc74(Box2SysWork *syswk, s16 item);
+int Box2Seq_WipeOut(Box2SysWork *syswk, int nextSeq);
+int Box2Seq_RunVFunc(Box2SysWork *syswk, Box2VFunc func, int nextSeq);
+void Box2Seq_PutPartyLeft(Box2SysWork *syswk);
+void Box2Seq_OpenItemMenu(Box2SysWork *syswk, s16 item);
 
 #endif // POKEBW2_APP_BOX2_SEQ_H

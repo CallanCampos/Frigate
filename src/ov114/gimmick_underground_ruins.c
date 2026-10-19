@@ -14,9 +14,9 @@ typedef struct {
     Field *field;
 } GimmickWork;
 
-static void func_ov114_021eee0c(GimmickWork *work);
-static void func_ov114_021eeedc(GimmickWork *work);
-static void func_ov114_021eeee8(GimmickWork *work);
+static void UndergroundRuins_LoadScene(GimmickWork *work);
+static void UndergroundRuins_FreeScene(GimmickWork *work);
+static void UndergroundRuins_StepAnimations(GimmickWork *work);
 
 static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 } };
 
@@ -34,26 +34,26 @@ static const G3DSceneActorSetup sActors[] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov114_021eec80(Field *field) {
+void UndergroundRuins_Init(Field *field) {
     GimmickWork *work;
 
     Field_AllocGimmickWorkBlock(field, 1, Field_GetHeapID(field), sizeof(GimmickWork));
     work = Field_GetGimmickWorkBlock(field, 1);
     work->field = field;
     work->expObj = Field_GetExpObjSystem(field);
-    func_ov114_021eee0c(work);
+    UndergroundRuins_LoadScene(work);
 }
 
-void func_ov114_021eecb0(Field *field) {
-    func_ov114_021eeedc(Field_GetGimmickWorkBlock(field, 1));
+void UndergroundRuins_End(Field *field) {
+    UndergroundRuins_FreeScene(Field_GetGimmickWorkBlock(field, 1));
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
-void func_ov114_021eecc8(Field *field) {
-    func_ov114_021eeee8(Field_GetGimmickWorkBlock(field, 1));
+void UndergroundRuins_Update(Field *field) {
+    UndergroundRuins_StepAnimations(Field_GetGimmickWorkBlock(field, 1));
 }
 
-void func_ov114_021eecd8(GameSystem *gsys, u8 a1) {
+void UndergroundRuins_ShowModel(GameSystem *gsys, u8 a1) {
     GameData *gameData;
     GimmickWork *work;
 
@@ -66,7 +66,7 @@ void func_ov114_021eecd8(GameSystem *gsys, u8 a1) {
     FieldExpObj_SetActorHidden(work->expObj, 0, a1 + 1, FALSE);
 }
 
-void func_ov114_021eed34(GameSystem *gsys, u16 a1) {
+void UndergroundRuins_SetAnmEnd(GameSystem *gsys, u16 a1) {
     GameData *gameData;
     GimmickWork *work;
     FieldExpObjAnm *anm;
@@ -87,7 +87,7 @@ void func_ov114_021eed34(GameSystem *gsys, u16 a1) {
     }
 }
 
-void func_ov114_021eeda0(GameSystem *gsys, u16 a1) {
+void UndergroundRuins_PlayAnm(GameSystem *gsys, u16 a1) {
     GameData *gameData;
     GimmickWork *work;
     int i;
@@ -108,7 +108,7 @@ void func_ov114_021eeda0(GameSystem *gsys, u16 a1) {
     }
 }
 
-static void func_ov114_021eee0c(GimmickWork *work) {
+static void UndergroundRuins_LoadScene(GimmickWork *work) {
     SRTMatrix *matrix;
     int i;
 
@@ -142,10 +142,10 @@ static void func_ov114_021eee0c(GimmickWork *work) {
     }
 }
 
-static void func_ov114_021eeedc(GimmickWork *work) {
+static void UndergroundRuins_FreeScene(GimmickWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov114_021eeee8(GimmickWork *work) {
+static void UndergroundRuins_StepAnimations(GimmickWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
