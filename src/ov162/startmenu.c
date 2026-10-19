@@ -354,7 +354,7 @@ static BOOL StartMenu_Main(GameProc *proc, u32 *state, void *param, void *work) 
         return TRUE;
     }
     GFL_TCBExMgrUpdate(wk->tcbManager);
-    func_0204b794();
+    ClActSys_Draw();
     return FALSE;
 }
 
@@ -447,7 +447,7 @@ static u32 StartMenu_Free(StartMenuWork *wk) {
     case 0:
         wk->seq++;
     case 1:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             StartMenu_RemoveVBlankTask(wk);
             StartMenu_FreeUnk16C(wk);
             StartMenu_FreeTextScreens(wk);
@@ -844,7 +844,7 @@ static u32 StartMenu_Leave(StartMenuWork *wk) {
 
 static void StartMenu_VBlank(TCB *tcb, void *data) {
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
@@ -1261,44 +1261,44 @@ static void StartMenu_InitObj(StartMenuWork *wk) {
     // Archive 30 has the player's icon for each gender
     arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_TAIL(HEAPID_STARTMENU));
     if (getTrainerGender(wk->playerInfo) == 0) {
-        wk->chars[OBJ_RES_PLAYER] = func_0204b81c(arc, 5, 0, 1, HEAPID_STARTMENU);
-        wk->palettes[OBJ_RES_PLAYER] = func_0204bba0(arc, 4, 1, 0, HEAPID_STARTMENU);
-        wk->cellAnims[OBJ_RES_PLAYER] = func_0204bde0(arc, 0, 1, HEAPID_STARTMENU);
+        wk->chars[OBJ_RES_PLAYER] = ClActSys_LoadChars(arc, 5, 0, 1, HEAPID_STARTMENU);
+        wk->palettes[OBJ_RES_PLAYER] = ClActSys_LoadPltt(arc, 4, 1, 0, HEAPID_STARTMENU);
+        wk->cellAnims[OBJ_RES_PLAYER] = ClActSys_LoadCellAnims(arc, 0, 1, HEAPID_STARTMENU);
     } else {
-        wk->chars[OBJ_RES_PLAYER] = func_0204b81c(arc, 7, 0, 1, HEAPID_STARTMENU);
-        wk->palettes[OBJ_RES_PLAYER] = func_0204bba0(arc, 6, 1, 0, HEAPID_STARTMENU);
-        wk->cellAnims[OBJ_RES_PLAYER] = func_0204bde0(arc, 2, 3, HEAPID_STARTMENU);
+        wk->chars[OBJ_RES_PLAYER] = ClActSys_LoadChars(arc, 7, 0, 1, HEAPID_STARTMENU);
+        wk->palettes[OBJ_RES_PLAYER] = ClActSys_LoadPltt(arc, 6, 1, 0, HEAPID_STARTMENU);
+        wk->cellAnims[OBJ_RES_PLAYER] = ClActSys_LoadCellAnims(arc, 2, 3, HEAPID_STARTMENU);
     }
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(ARCID_STARTMENU, HEAPID_TAIL(HEAPID_STARTMENU));
-    wk->chars[OBJ_RES_NEW] = func_0204b81c(arc, 10, 1, 0, HEAPID_STARTMENU);
-    wk->palettes[OBJ_RES_NEW] = func_0204bba0(arc, 11, 0, 0x20, HEAPID_STARTMENU);
-    wk->cellAnims[OBJ_RES_NEW] = func_0204bde0(arc, 12, 13, HEAPID_STARTMENU);
-    wk->chars[OBJ_RES_WFC_SETTINGS] = func_0204b81c(arc, 18, 1, 0, HEAPID_STARTMENU);
-    wk->palettes[OBJ_RES_WFC_SETTINGS] = func_0204bba0(arc, 19, 0, 0x40, HEAPID_STARTMENU);
-    wk->cellAnims[OBJ_RES_WFC_SETTINGS] = func_0204bde0(arc, 20, 21, HEAPID_STARTMENU);
-    wk->chars[OBJ_RES_KEYS] = func_0204b81c(arc, 14, 1, 1, HEAPID_STARTMENU);
-    wk->palettes[OBJ_RES_KEYS] = func_0204bba0(arc, 15, 1, 0x20, HEAPID_STARTMENU);
-    wk->cellAnims[OBJ_RES_KEYS] = func_0204bde0(arc, 16, 17, HEAPID_STARTMENU);
+    wk->chars[OBJ_RES_NEW] = ClActSys_LoadChars(arc, 10, 1, 0, HEAPID_STARTMENU);
+    wk->palettes[OBJ_RES_NEW] = ClActSys_LoadPltt(arc, 11, 0, 0x20, HEAPID_STARTMENU);
+    wk->cellAnims[OBJ_RES_NEW] = ClActSys_LoadCellAnims(arc, 12, 13, HEAPID_STARTMENU);
+    wk->chars[OBJ_RES_WFC_SETTINGS] = ClActSys_LoadChars(arc, 18, 1, 0, HEAPID_STARTMENU);
+    wk->palettes[OBJ_RES_WFC_SETTINGS] = ClActSys_LoadPltt(arc, 19, 0, 0x40, HEAPID_STARTMENU);
+    wk->cellAnims[OBJ_RES_WFC_SETTINGS] = ClActSys_LoadCellAnims(arc, 20, 21, HEAPID_STARTMENU);
+    wk->chars[OBJ_RES_KEYS] = ClActSys_LoadChars(arc, 14, 1, 1, HEAPID_STARTMENU);
+    wk->palettes[OBJ_RES_KEYS] = ClActSys_LoadPltt(arc, 15, 1, 0x20, HEAPID_STARTMENU);
+    wk->cellAnims[OBJ_RES_KEYS] = ClActSys_LoadCellAnims(arc, 16, 17, HEAPID_STARTMENU);
     GFL_ArcToolFree(arc);
-    wk->clactUnit = func_0204bf1c(ACTOR_COUNT, 0, HEAPID_STARTMENU);
-    wk->actors[ACTOR_PLAYER] = func_0204c040(wk->clactUnit, wk->chars[OBJ_RES_PLAYER], wk->palettes[OBJ_RES_PLAYER],
-                                             wk->cellAnims[OBJ_RES_PLAYER], &sPlayerActorSetup, 1, HEAPID_STARTMENU);
-    func_0204c124(wk->actors[ACTOR_PLAYER], FALSE);
+    wk->clactUnit = ClActUnit_Create(ACTOR_COUNT, 0, HEAPID_STARTMENU);
+    wk->actors[ACTOR_PLAYER] = ClActor_Create(wk->clactUnit, wk->chars[OBJ_RES_PLAYER], wk->palettes[OBJ_RES_PLAYER],
+                                              wk->cellAnims[OBJ_RES_PLAYER], &sPlayerActorSetup, 1, HEAPID_STARTMENU);
+    ClActor_SetVisible(wk->actors[ACTOR_PLAYER], FALSE);
     for (i = 0; i <= 3; i++) {
-        wk->actors[i] = func_0204c040(wk->clactUnit, wk->chars[OBJ_RES_NEW], wk->palettes[OBJ_RES_NEW],
-                                      wk->cellAnims[OBJ_RES_NEW], &sNewActorSetup, 0, HEAPID_STARTMENU);
+        wk->actors[i] = ClActor_Create(wk->clactUnit, wk->chars[OBJ_RES_NEW], wk->palettes[OBJ_RES_NEW],
+                                       wk->cellAnims[OBJ_RES_NEW], &sNewActorSetup, 0, HEAPID_STARTMENU);
         func_0204c520(wk->actors[i], TRUE);
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     wk->actors[ACTOR_WFC_SETTINGS] =
-        func_0204c040(wk->clactUnit, wk->chars[OBJ_RES_WFC_SETTINGS], wk->palettes[OBJ_RES_WFC_SETTINGS],
-                      wk->cellAnims[OBJ_RES_WFC_SETTINGS], &sWFCSettingsActorSetup, 0, HEAPID_STARTMENU);
+        ClActor_Create(wk->clactUnit, wk->chars[OBJ_RES_WFC_SETTINGS], wk->palettes[OBJ_RES_WFC_SETTINGS],
+                       wk->cellAnims[OBJ_RES_WFC_SETTINGS], &sWFCSettingsActorSetup, 0, HEAPID_STARTMENU);
     for (i = ACTOR_KEYS; i <= ACTOR_KEYS + 2; i++) {
         wk->actors[i] =
-            func_0204c040(wk->clactUnit, wk->chars[OBJ_RES_KEYS], wk->palettes[OBJ_RES_KEYS],
-                          wk->cellAnims[OBJ_RES_KEYS], &sKeyActorSetups[i - ACTOR_KEYS], 1, HEAPID_STARTMENU);
-        func_0204c124(wk->actors[i], FALSE);
+            ClActor_Create(wk->clactUnit, wk->chars[OBJ_RES_KEYS], wk->palettes[OBJ_RES_KEYS],
+                           wk->cellAnims[OBJ_RES_KEYS], &sKeyActorSetups[i - ACTOR_KEYS], 1, HEAPID_STARTMENU);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
@@ -1308,19 +1308,19 @@ static void StartMenu_FreeObj(StartMenuWork *wk) {
     u32 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204bf98(wk->clactUnit);
+    ClActUnit_Delete(wk->clactUnit);
     for (i = 0; i < OBJ_RES_COUNT; i++) {
-        func_0204b98c(wk->chars[i]);
-    }
-    for (i = 0; i < OBJ_RES_COUNT; i++) {
-        func_0204bcd0(wk->palettes[i]);
+        ClActSys_FreeChars(wk->chars[i]);
     }
     for (i = 0; i < OBJ_RES_COUNT; i++) {
-        func_0204be64(wk->cellAnims[i]);
+        ClActSys_FreePltt(wk->palettes[i]);
     }
-    func_0204b758();
+    for (i = 0; i < OBJ_RES_COUNT; i++) {
+        ClActSys_FreeCellAnims(wk->cellAnims[i]);
+    }
+    ClActSys_Delete();
 }
 
 static void StartMenu_InitTextScreens(StartMenuWork *wk) {
@@ -1407,9 +1407,9 @@ static void StartMenu_FreeItemScreens(StartMenuWork *wk) {
 static void StartMenu_SetActorY(StartMenuWork *wk, u32 actor, s16 y) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[actor], &pos, 0);
+    ClActor_GetSurfacePos(wk->actors[actor], &pos, 0);
     pos.y = y;
-    func_0204c140(wk->actors[actor], &pos, 0);
+    ClActor_SetSurfacePos(wk->actors[actor], &pos, 0);
 }
 
 static void StartMenu_DrawItems(StartMenuWork *wk) {
@@ -1427,21 +1427,21 @@ static void StartMenu_DrawItems(StartMenuWork *wk) {
         if (wk->items[i] != ITEM_CONTINUE) {
             if (wk->items[i] == ITEM_WFC_SETTINGS) {
                 StartMenu_SetActorY(wk, ACTOR_WFC_SETTINGS, row * 8 + sItemLayouts[wk->items[i]].rows * 8 / 2);
-                func_0204c124(wk->actors[ACTOR_WFC_SETTINGS], TRUE);
+                ClActor_SetVisible(wk->actors[ACTOR_WFC_SETTINGS], TRUE);
             } else if (wk->items[i] == ITEM_BATTLE_COMPETITION) {
                 if (TrainerGameInfo_GetStartMenuItemFlags(wk->gameInfo, 1) == TRUE) {
                     StartMenu_SetActorY(wk, 1, row * 8 + sItemLayouts[wk->items[i]].rows * 8 / 2);
-                    func_0204c124(wk->actors[1], TRUE);
+                    ClActor_SetVisible(wk->actors[1], TRUE);
                 }
             } else if (wk->items[i] == ITEM_GAME_SYNC_SETTINGS) {
                 if (TrainerGameInfo_GetStartMenuItemFlags(wk->gameInfo, 2) == TRUE) {
                     StartMenu_SetActorY(wk, 2, row * 8 + sItemLayouts[wk->items[i]].rows * 8 / 2);
-                    func_0204c124(wk->actors[2], TRUE);
+                    ClActor_SetVisible(wk->actors[2], TRUE);
                 }
             } else if (wk->items[i] == ITEM_MB_PARENT) {
                 if (TrainerGameInfo_GetStartMenuItemFlags(wk->gameInfo, 3) == TRUE) {
                     StartMenu_SetActorY(wk, 3, row * 8 + sItemLayouts[wk->items[i]].rows * 8 / 2);
-                    func_0204c124(wk->actors[3], TRUE);
+                    ClActor_SetVisible(wk->actors[3], TRUE);
                 }
             }
         }
@@ -1479,7 +1479,7 @@ static void StartMenu_ShowSavedGame(StartMenuWork *wk) {
     u32 window;
     s32 i;
 
-    func_0204c124(wk->actors[ACTOR_PLAYER], TRUE);
+    ClActor_SetVisible(wk->actors[ACTOR_PLAYER], TRUE);
     anyKey = FALSE;
     actor = ACTOR_KEYS;
     window = WINDOW_KEYS;
@@ -1488,21 +1488,21 @@ static void StartMenu_ShowSavedGame(StartMenuWork *wk) {
     }
     if (GetGameDifficulty(wk->keyInfo) != GAME_DIFFICULTY_NORMAL) {
         BmpWin_FlushMap(wk->windows[WINDOW_KEYS].window);
-        func_0204c124(wk->actors[ACTOR_KEYS], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_KEYS], TRUE);
         anyKey = TRUE;
         actor++;
         window++;
     }
     if (KeyInfo_GetCityKey(wk->keyInfo) == TRUE) {
         BmpWin_FlushMap(wk->windows[window].window);
-        func_0204c124(wk->actors[actor], TRUE);
+        ClActor_SetVisible(wk->actors[actor], TRUE);
         anyKey = TRUE;
         actor++;
         window++;
     }
     if (KeyInfo_GetChamberKey(wk->keyInfo) != 0) {
         BmpWin_FlushMap(wk->windows[window].window);
-        func_0204c124(wk->actors[actor], TRUE);
+        ClActor_SetVisible(wk->actors[actor], TRUE);
         anyKey = TRUE;
     }
     if (anyKey) {
@@ -1521,10 +1521,10 @@ static void StartMenu_HideSavedGame(StartMenuWork *wk) {
     for (i = WINDOW_SAVED_GAME; i <= WINDOW_KEYS + 2; i++) {
         BmpWin_ClearScreen(wk->windows[i].window);
     }
-    func_0204c124(wk->actors[ACTOR_KEYS], FALSE);
-    func_0204c124(wk->actors[ACTOR_KEYS + 1], FALSE);
-    func_0204c124(wk->actors[ACTOR_KEYS + 2], FALSE);
-    func_0204c124(wk->actors[ACTOR_PLAYER], FALSE);
+    ClActor_SetVisible(wk->actors[ACTOR_KEYS], FALSE);
+    ClActor_SetVisible(wk->actors[ACTOR_KEYS + 1], FALSE);
+    ClActor_SetVisible(wk->actors[ACTOR_KEYS + 2], FALSE);
+    ClActor_SetVisible(wk->actors[ACTOR_PLAYER], FALSE);
     GFL_BGSysQueueScrLoad(4);
     GFL_BGSysFillScrAsync(5, 0);
 }
@@ -1535,9 +1535,9 @@ static void StartMenu_MoveItemActors(StartMenuWork *wk, s32 dy) {
     ClActorPos pos;
 
     for (i = 0; i < ACTOR_WFC_SETTINGS + 1; i++) {
-        func_0204c178(wk->actors[i], &pos, 0);
+        ClActor_GetSurfacePos(wk->actors[i], &pos, 0);
         pos.y += (s16)dy;
-        func_0204c140(wk->actors[i], &pos, 0);
+        ClActor_SetSurfacePos(wk->actors[i], &pos, 0);
     }
 }
 
@@ -1603,7 +1603,7 @@ static void StartMenu_SetItemActorsVisible(StartMenuWork *wk, BOOL visible) {
 
     if (visible == FALSE) {
         for (i = 0; i <= ACTOR_WFC_SETTINGS; i++) {
-            func_0204c124(wk->actors[i], visible);
+            ClActor_SetVisible(wk->actors[i], visible);
         }
         return;
     }
@@ -1613,18 +1613,18 @@ static void StartMenu_SetItemActorsVisible(StartMenuWork *wk, BOOL visible) {
         }
         if (wk->items[i] == ITEM_BATTLE_COMPETITION) {
             if (TrainerGameInfo_GetStartMenuItemFlags(wk->gameInfo, 1) == TRUE) {
-                func_0204c124(wk->actors[1], TRUE);
+                ClActor_SetVisible(wk->actors[1], TRUE);
             }
         } else if (wk->items[i] == ITEM_GAME_SYNC_SETTINGS) {
             if (TrainerGameInfo_GetStartMenuItemFlags(wk->gameInfo, 2) == TRUE) {
-                func_0204c124(wk->actors[2], TRUE);
+                ClActor_SetVisible(wk->actors[2], TRUE);
             }
         } else if (wk->items[i] == ITEM_MB_PARENT) {
             if (TrainerGameInfo_GetStartMenuItemFlags(wk->gameInfo, 3) == TRUE) {
-                func_0204c124(wk->actors[3], TRUE);
+                ClActor_SetVisible(wk->actors[3], TRUE);
             }
         } else if (wk->items[i] == ITEM_WFC_SETTINGS) {
-            func_0204c124(wk->actors[ACTOR_WFC_SETTINGS], TRUE);
+            ClActor_SetVisible(wk->actors[ACTOR_WFC_SETTINGS], TRUE);
         }
     }
 }

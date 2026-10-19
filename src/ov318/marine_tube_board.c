@@ -91,7 +91,7 @@ static BOOL MarineTubeBoard_Init(GameProc *proc, u32 *state, void *param, void *
     MarineTubeBoardMsgWin_Init(&wk->msgWin, wk->font, wk->msgData, wk->printQueue, wk->wordSet, wk->heapId);
     MarineTubeBoardPrinter_Init(&wk->printer, wk->heapId);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 16, 0);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     return TRUE;
 }
 
@@ -122,11 +122,11 @@ static BOOL MarineTubeBoard_Main(GameProc *proc, u32 *state, void *param, void *
     u32 y;
 
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         input = TRUE;
-    } else if (func_0203dac8(&x, &y)) {
+    } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         input = TRUE;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     switch (*state) {
     case STEP_START:

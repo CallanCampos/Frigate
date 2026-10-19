@@ -185,7 +185,7 @@ static BOOL EggDemo_Init(GameProc *proc, u32 *state, void *param, void *work) {
     EggDemo_InitBGM(param, wk);
     GFL_FadeSet(3, 16, 16, 0);
     wk->procManager = CreateGameProcManager(wk->heapId);
-    func_02042ba8(0, wk->heapId);
+    GFL_NetSetIconScreen(0, wk->heapId);
     return TRUE;
 }
 
@@ -307,11 +307,11 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
             wk->state = EGG_DEMO_WAIT_BGM_END;
             GFL_FadeSet(3, 0, 16, 2);
             EggDemo_FadeOutBGM(param, wk);
-            func_0203d564(0);
+            GCTX_HIDSetUsingTouch(0);
         } else if (answer == ANSWER_YES) {
             wk->state = EGG_DEMO_WAIT_FADE_NAME;
             GFL_FadeSet(3, 0, 16, 0);
-            func_0203d564(0);
+            GCTX_HIDSetUsingTouch(0);
         }
         break;
     case EGG_DEMO_WAIT_FADE_NAME:
@@ -449,13 +449,13 @@ static void EggDemo_InitActors(EggDemoParam *param, EggDemoWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_EGG_DEMO, wk->heapId);
     u8 i;
 
-    wk->palette = func_0204bbb8(arc, 3, 0, 0, 0, 1, wk->heapId);
-    wk->chars = func_0204b81c(arc, 2, 0, 0, wk->heapId);
-    wk->cellAnims = func_0204bde0(arc, 1, 0, wk->heapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 3, 0, 0, 0, 1, wk->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 2, 0, 0, wk->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 1, 0, wk->heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ACTOR_COUNT; i++) {
-        wk->actors[i] = func_0204c040(EggDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette, wk->cellAnims,
-                                      &sActorSetups[i], 0, wk->heapId);
+        wk->actors[i] = ClActor_Create(EggDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette, wk->cellAnims,
+                                       &sActorSetups[i], 0, wk->heapId);
         func_0204c520(wk->actors[i], FALSE);
     }
 }
@@ -464,18 +464,18 @@ static void EggDemo_FreeActors(EggDemoParam *param, EggDemoWork *wk) {
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204be64(wk->cellAnims);
-    func_0204b98c(wk->chars);
-    func_0204bcd0(wk->palette);
+    ClActSys_FreeCellAnims(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreePltt(wk->palette);
 }
 
 static void EggDemo_StartActors(EggDemoParam *param, EggDemoWork *wk) {
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c504(wk->actors[i], 0);
+        ClActor_SetAnimFrame(wk->actors[i], 0);
         func_0204c520(wk->actors[i], TRUE);
     }
 }
@@ -485,7 +485,7 @@ static BOOL EggDemo_AreActorsDone(EggDemoParam *param, EggDemoWork *wk) {
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        if (func_0204c560(wk->actors[i])) {
+        if (ClActor_IsAnimActive(wk->actors[i])) {
             done = FALSE;
             break;
         }
@@ -676,12 +676,12 @@ static BOOL EggDemo_IsPrintDone(EggDemoParam *param, EggDemoWork *wk) {
 
     switch (PrintStream_GetState(wk->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
             PrintStream_SkipWait(wk->printStream, 0);
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
             PrintStream_Continue(wk->printStream);
         }
         break;

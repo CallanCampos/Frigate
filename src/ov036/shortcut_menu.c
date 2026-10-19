@@ -132,13 +132,13 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     GFL_BGSysCreateBG(BG, &sBgSetup, 0);
     GFL_BGSysClearBG(BG);
     GFL_BGSysFillChar(BG, 0, 1, 0);
-    work->unit = func_0204bf1c(8, 0, heapId);
+    work->unit = ClActUnit_Create(8, 0, heapId);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_SHORTCUT_MENU, heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0x160, 0x40, heapId);
-    work->palette = func_0204bbb8(arc, 4, 0, 0x40, 0, 1, heapId);
-    work->chars = func_0204b81c(arc, 3, FALSE, 0, heapId);
-    work->cellAnims = func_0204bde0(arc, 2, 1, heapId);
+    work->palette = ClActSys_LoadPlttRange(arc, 4, 0, 0x40, 0, 1, heapId);
+    work->chars = ClActSys_LoadChars(arc, 3, FALSE, 0, heapId);
+    work->cellAnims = ClActSys_LoadCellAnims(arc, 2, 1, heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 6, 0, 0x140, 0x20, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 5, BG, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, BG, 0, 0, FALSE, heapId);
@@ -151,8 +151,8 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
         setup.sequence = i;
         setup.x = sActorX[i];
         work->clactActors[i] =
-            func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, heapId);
-        func_0204c124(work->clactActors[i], FALSE);
+            ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, heapId);
+        ClActor_SetVisible(work->clactActors[i], FALSE);
         func_0204c520(work->clactActors[i], TRUE);
     }
 
@@ -185,16 +185,16 @@ void func_ov036_021bf004(void *app) {
     GFL_BGSysSetBGEnabled(BG, FALSE);
     FreeMenu(work, work->listPos);
     for (i = 0; i < ACTORS; i++) {
-        func_0204c108(work->clactActors[i]);
+        ClActor_Delete(work->clactActors[i]);
     }
     PrintQueue_Clear(work->menuQueue);
     PrintQueue_Free(work->menuQueue);
     GFL_FontFree(work->menuFont);
     GFL_MsgDataFree(work->menuMsgData);
-    func_0204bcd0(work->palette);
-    func_0204b98c(work->chars);
-    func_0204be64(work->cellAnims);
-    func_0204bf98(work->unit);
+    ClActSys_FreePltt(work->palette);
+    ClActSys_FreeChars(work->chars);
+    ClActSys_FreeCellAnims(work->cellAnims);
+    ClActUnit_Delete(work->unit);
     GFL_BGSysFreeFilledChar(BG, 1, 0);
     GFL_BGSysReleaseBG(BG);
     GFL_HeapFree(work);
@@ -242,7 +242,7 @@ void func_ov036_021bf088(void *app) {
     }
     case STATE_CLOSING:
         for (i = 0; i < ACTORS; i++) {
-            func_0204c124(work->clactActors[i], FALSE);
+            ClActor_SetVisible(work->clactActors[i], FALSE);
         }
         work->scroll = 4;
         work->state = STATE_SCROLL_OUT;
@@ -390,7 +390,7 @@ static void ReadInput(ShortcutMenuApp *work) {
     u16 listTop;
     s32 count;
 
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     BmpMenuList_GetCursorIndex(work->list, &cursorIndex);
     count = BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT);
 
@@ -449,7 +449,7 @@ static void ReadInput(ShortcutMenuApp *work) {
 
             work->scrollDir = 0;
             for (i = 0; i < ACTORS; i++) {
-                func_0204c124(work->actors[i], FALSE);
+                ClActor_SetVisible(work->actors[i], FALSE);
             }
             RedrawHighlight(work->list, FALSE, FALSE);
         } else if (work->mode == 1) {
@@ -478,7 +478,7 @@ static BOOL PrintDone(ShortcutMenuApp *work) {
         }
         if (work->showActors) {
             for (i = 0; i < ACTORS; i++) {
-                func_0204c124(work->actors[i], TRUE);
+                ClActor_SetVisible(work->actors[i], TRUE);
             }
             work->showActors = 0;
         }
@@ -610,9 +610,9 @@ static void SetActorsY(ShortcutMenuApp *work, u32 y) {
     int i;
 
     for (i = 0; i < ACTORS; i++) {
-        func_0204c178(work->actors[i], &pos, 0);
+        ClActor_GetSurfacePos(work->actors[i], &pos, 0);
         pos.y = y;
-        func_0204c140(work->actors[i], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[i], &pos, 0);
     }
 }
 

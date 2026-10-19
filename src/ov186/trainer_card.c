@@ -191,7 +191,7 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->param = cardParam;
     wk->data = cardParam->shownData;
     wk->ownData = cardParam->data;
-    wk->touchMode = func_0203d554();
+    wk->touchMode = GCTX_HIDIsUsingTouch();
     wk->msgSpeed = TextSpeed_GetCurrentWait();
     wk->frameType = 0;
     if (wk->data->clearMonth != 0) {
@@ -208,7 +208,7 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
         }
         bit <<= 1;
     }
-    if (func_02042a78() > 0) {
+    if (GFL_NetGetNegotiatedCount() > 0) {
         wk->isOnline = TRUE;
     }
     GFL_BGSysCreate(wk->heapId);
@@ -251,7 +251,7 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     TrainerCard_SetSideActors(wk, wk->side, wk->param->canEdit);
     wk->vblankTask = GFL_VBlankTCBAdd(TrainerCard_VBlank, wk, 1);
     wk->tcbl = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 3, 0);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     GFL_WipeSet(1, 3, 3, 0, 6, 1, wk->heapId);
     return TRUE;
 }
@@ -298,13 +298,13 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
         }
         break;
     case TRCARD_SEQ_RETURN:
-        if (!func_0204c560(wk->obj.actors[TRCARD_ACTOR_RETURN])) {
+        if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_RETURN])) {
             GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
     case TRCARD_SEQ_EXIT:
-        if (!func_0204c560(wk->obj.actors[TRCARD_ACTOR_EXIT])) {
+        if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_EXIT])) {
             GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
             *state = TRCARD_SEQ_FADE_OUT;
         }
@@ -330,14 +330,14 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
         *state = TRCARD_SEQ_FADE_OUT;
         break;
     case TRCARD_SEQ_BADGES:
-        if (!func_0204c560(wk->obj.actors[TRCARD_ACTOR_BADGES])) {
+        if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_BADGES])) {
             GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
             wk->param->next = 2;
             *state = TRCARD_SEQ_FADE_OUT;
         }
         break;
     case TRCARD_SEQ_MEDALS:
-        if (!func_0204c560(wk->obj.actors[TRCARD_ACTOR_RANK])) {
+        if (!ClActor_IsAnimActive(wk->obj.actors[TRCARD_ACTOR_RANK])) {
             GFL_WipeSet(2, 4, 4, 0, 6, 1, wk->heapId);
             wk->param->next = 4;
             *state = TRCARD_SEQ_FADE_OUT;
@@ -350,7 +350,7 @@ BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work) {
     if (wk->frame >= 0x100) {
         wk->frame = 0;
     }
-    func_0204b794();
+    ClActSys_Draw();
     PMSDraw_Main(wk->pmsDraw);
     PrintQueue_Main(wk->printQueue);
     if (wk->tcbl != NULL) {
@@ -387,7 +387,7 @@ BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     TrainerCard_ReleaseBG();
     GFL_TCBRemove(wk->vblankTask);
     GFL_TCBExMgrFree(wk->tcbl);
-    func_0203d564(wk->touchMode);
+    GCTX_HIDSetUsingTouch(wk->touchMode);
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_TRAINER_CARD_SCREEN);
     return TRUE;
@@ -975,7 +975,7 @@ static void TrainerCard_UpdateAffine(TrainerCardWork *wk) {
 // Switches between the keys and the touch screen when the other is used
 static BOOL TrainerCard_CheckInputMode(TrainerCardWork *wk) {
     if (wk->touchMode == TRUE) {
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             return FALSE;
         }
         if (GCTX_HIDGetHeldKeys()) {
@@ -986,7 +986,7 @@ static BOOL TrainerCard_CheckInputMode(TrainerCardWork *wk) {
         if (GCTX_HIDGetHeldKeys()) {
             return FALSE;
         }
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             wk->touchMode = TRUE;
             return FALSE;
         }
@@ -1001,7 +1001,7 @@ static int TrainerCard_KeyInput(TrainerCardWork *wk) {
         if (wk->zoomed == 0) {
             TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_RETURN, 9, TRUE);
             GFL_SndSEPlay(SEQ_SE_SW_CARD_04);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return TRCARD_INPUT_RETURN;
         }
     } else if (keys & PAD_BUTTON_X) {
@@ -1069,12 +1069,12 @@ static void TrainerCard_SetPenButton(TrainerCardWork *wk, int eraser, int visibl
 static void TrainerCard_PressPenButton(TrainerCardWork *wk, int eraser) {
     if (eraser == 0) {
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BADGES, 11, TRUE);
-        func_0204c124(wk->obj.actors[TRCARD_ACTOR_ZOOM], FALSE);
-        func_0204c124(wk->obj.actors[TRCARD_ACTOR_BRUSH], FALSE);
+        ClActor_SetVisible(wk->obj.actors[TRCARD_ACTOR_ZOOM], FALSE);
+        ClActor_SetVisible(wk->obj.actors[TRCARD_ACTOR_BRUSH], FALSE);
     } else {
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_BADGES, 13, TRUE);
-        func_0204c124(wk->obj.actors[TRCARD_ACTOR_ZOOM], TRUE);
-        func_0204c124(wk->obj.actors[TRCARD_ACTOR_BRUSH], TRUE);
+        ClActor_SetVisible(wk->obj.actors[TRCARD_ACTOR_ZOOM], TRUE);
+        ClActor_SetVisible(wk->obj.actors[TRCARD_ACTOR_BRUSH], TRUE);
     }
 }
 
@@ -1103,14 +1103,14 @@ static int TrainerCard_TouchCard(TrainerCardWork *wk, int button) {
     case 0:
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_RETURN, 9, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_CARD_04);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return TRCARD_INPUT_RETURN;
     case 1:
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_EXIT, 8, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_CARD_05);
         return TRCARD_INPUT_EXIT;
     case 2:
-        func_0203da84(&wk->touchX, &wk->touchY);
+        GFL_HIDGetTouchHeldPoint(&wk->touchX, &wk->touchY);
         TrCardObj_SetAnime(&wk->obj, TRCARD_ACTOR_FLIP, 23, TRUE);
         return TRCARD_INPUT_FLIP;
     case 3:
@@ -1234,10 +1234,10 @@ static int TrainerCard_CheckScrollTouch(TrainerCardWork *wk, BOOL held) {
     int hit;
 
     if (!held) {
-        if (func_0203da0c(sTrainerCardListRect) == 0) {
+        if (GFL_HIDGetTouchPressedRect(sTrainerCardListRect) == 0) {
             result = 0;
         } else {
-            hit = func_0203da0c(sTrainerCardArrowRects);
+            hit = GFL_HIDGetTouchPressedRect(sTrainerCardArrowRects);
             if (hit == 0) {
                 result = 1;
             } else if (hit == 1) {
@@ -1245,10 +1245,10 @@ static int TrainerCard_CheckScrollTouch(TrainerCardWork *wk, BOOL held) {
             }
         }
     } else {
-        if (func_0203d9c8(sTrainerCardListRect) == 0) {
+        if (GFL_HIDGetTouchHeldRect(sTrainerCardListRect) == 0) {
             result = 0;
         } else {
-            hit = func_0203d9c8(sTrainerCardArrowRects);
+            hit = GFL_HIDGetTouchHeldRect(sTrainerCardArrowRects);
             if (hit == 0) {
                 result = 1;
             } else if (hit == 1) {
@@ -1286,8 +1286,8 @@ static void TrainerCard_ScrollTouch(TrainerCardWork *wk) {
         return;
     }
     if (trg == 0) {
-        if (func_0203da48()) {
-            func_0203dac8(&x, &y);
+        if (GFL_HIDIsTouchPressed()) {
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             wk->dragY = y;
             wk->dragScroll = wk->scroll;
         }
@@ -1299,8 +1299,8 @@ static void TrainerCard_ScrollTouch(TrainerCardWork *wk) {
         wk->dragScroll = wk->scroll;
     }
     if (cont == 0) {
-        if (func_0203da2c()) {
-            func_0203da84(&x, &y);
+        if (GFL_HIDIsTouchHeld()) {
+            GFL_HIDGetTouchHeldPoint(&x, &y);
             wk->scroll = wk->dragScroll - (wk->dragY - y);
         }
     } else {
@@ -1311,7 +1311,7 @@ static void TrainerCard_ScrollTouch(TrainerCardWork *wk) {
             wk->scroll -= 8;
             TrainerCard_SetScrollArrows(wk, 0);
         }
-        func_0203da84(&x, &y);
+        GFL_HIDGetTouchHeldPoint(&x, &y);
         wk->dragY = y;
         wk->dragScroll = wk->scroll;
     }
@@ -1351,12 +1351,12 @@ static int TrainerCard_TouchInput(TrainerCardWork *wk) {
 
     if (!wk->data->unk04_7) {
         if (wk->zoomed == 0) {
-            hit = func_0203da0c(sTrainerCardRects);
+            hit = GFL_HIDGetTouchPressedRect(sTrainerCardRects);
         } else {
-            hit = func_0203da0c(sTrainerCardZoomedRects);
+            hit = GFL_HIDGetTouchPressedRect(sTrainerCardZoomedRects);
         }
     } else {
-        hit = func_0203da0c(sTrainerCardOtherRects);
+        hit = GFL_HIDGetTouchPressedRect(sTrainerCardOtherRects);
         if (hit == 3) {
             hit = 12;
         }
@@ -1461,7 +1461,7 @@ static void TrainerCard_VBlank(TCB *tcb, void *data) {
         TrainerCard_UpdateAffine(wk);
     }
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void TrainerCard_ResetAffine(void) {
@@ -1598,8 +1598,8 @@ static void TrainerCard_AnimatePalette(TrainerCardWork *wk) {
 
 // Ends a stroke when the pen leaves the signature's surroundings
 static void TrainerCard_CheckPenRelease(TrainerCardWork *wk) {
-    if ((wk->side != 0 && wk->zoomed == 0 && func_0203d9c8(sTrainerCardSignRelease) != 0) ||
-        (wk->zoomed == 1 && func_0203d9c8(sTrainerCardZoomedSignRelease) != 0)) {
+    if ((wk->side != 0 && wk->zoomed == 0 && GFL_HIDGetTouchHeldRect(sTrainerCardSignRelease) != 0) ||
+        (wk->zoomed == 1 && GFL_HIDGetTouchHeldRect(sTrainerCardZoomedSignRelease) != 0)) {
         wk->penTouch = 0;
     }
 }
@@ -1611,12 +1611,12 @@ static void TrainerCard_ReadPen(TrainerCardWork *wk, int zoomed) {
     if (wk->data->unk04_5 || wk->data->unk04_4 == TRUE) {
         return;
     }
-    if (func_0203da84(&x, &y)) {
+    if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
         if (zoomed == 0) {
-            if (func_0203da0c(sTrainerCardSignRect) == 0) {
+            if (GFL_HIDGetTouchPressedRect(sTrainerCardSignRect) == 0) {
                 wk->penTouch = 1;
             }
-            if (wk->penTouch != 0 && func_0203dadc(sTrainerCardSignRect, x, y) == 0) {
+            if (wk->penTouch != 0 && GFL_HIDGetTouchRectAt(sTrainerCardSignRect, x, y) == 0) {
                 wk->pen.x = x;
                 wk->pen.y = y;
                 wk->pen.brush = wk->brush;
@@ -1630,10 +1630,10 @@ static void TrainerCard_ReadPen(TrainerCardWork *wk, int zoomed) {
                 wk->pen.on = 0;
             }
         } else {
-            if (func_0203da0c(sTrainerCardZoomedSignRect) == 0) {
+            if (GFL_HIDGetTouchPressedRect(sTrainerCardZoomedSignRect) == 0) {
                 wk->penTouch = 1;
             }
-            if (wk->penTouch != 0 && func_0203dadc(sTrainerCardZoomedSignRect, x, y) == 0) {
+            if (wk->penTouch != 0 && GFL_HIDGetTouchRectAt(sTrainerCardZoomedSignRect, x, y) == 0) {
                 wk->pen.x = (x - 32 + wk->zoomSide * 192) / 2 + 32;
                 wk->pen.y = (y - 24) / 2 + 88;
                 wk->pen.brush = wk->brush;

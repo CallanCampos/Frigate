@@ -701,7 +701,7 @@ void ResearchList_Main(ResearchList *wk) {
     if (!ResearchList_IsEnd(wk)) {
         ResearchList_UpdateCommonPaletteAnime(wk);
         ResearchList_UpdatePaletteAnimes(wk);
-        func_0204b794();
+        ClActSys_Draw();
     }
     ResearchList_CountFrame(wk);
     ResearchList_UpdateSeq(wk);
@@ -783,11 +783,11 @@ static void ResearchList_SeqSetup(ResearchList *wk) {
 
 static void ResearchList_SeqTouch(ResearchList *wk) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 item = func_0203da0c(wk->listRects);
-    s32 commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    s32 item = GFL_HIDGetTouchPressedRect(wk->listRects);
+    s32 commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
     u32 x, y;
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
 
     if (ResearchList_IsForceExit(wk) || commonButton == RESEARCH_COMMON_BUTTON_RETURN) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -818,7 +818,7 @@ static void ResearchList_SeqTouch(ResearchList *wk) {
             ResearchList_EndSeq(wk);
             ResearchList_PushSeq(wk, SEQ_CONFIRM_OPEN_TOUCH);
         }
-    } else if ((func_0203d9c8(wk->scrollRects) == 0 || func_0203da0c(wk->scrollRects) == 0) &&
+    } else if ((GFL_HIDGetTouchHeldRect(wk->scrollRects) == 0 || GFL_HIDGetTouchPressedRect(wk->scrollRects) == 0) &&
                ResearchList_CanScroll(wk) == TRUE) {
         ResearchList_EndSeq(wk);
         ResearchList_PushSeq(wk, SEQ_DRAG);
@@ -829,11 +829,11 @@ static void ResearchList_SeqTouch(ResearchList *wk) {
 static void ResearchList_SeqCursor(ResearchList *wk) {
     u32 held = GCTX_HIDGetHeldKeys();
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 item = func_0203da0c(wk->listRects);
-    s32 commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    s32 item = GFL_HIDGetTouchPressedRect(wk->listRects);
+    s32 commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
     u32 x, y;
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
 
     if (held & (PAD_KEY_UP | PAD_KEY_DOWN)) {
         ResearchList_CountKeyRepeat(wk);
@@ -883,7 +883,7 @@ static void ResearchList_SeqCursor(ResearchList *wk) {
         ResearchList_SetTouchMode(wk, FALSE);
         ResearchList_EndSeq(wk);
         ResearchList_PushSeq(wk, SEQ_RETURN_CURSOR);
-    } else if ((func_0203d9c8(wk->scrollRects) == 0 || func_0203da0c(wk->scrollRects) == 0) &&
+    } else if ((GFL_HIDGetTouchHeldRect(wk->scrollRects) == 0 || GFL_HIDGetTouchPressedRect(wk->scrollRects) == 0) &&
                ResearchList_CanScroll(wk) == TRUE) {
         ResearchList_HideCursor(wk);
         ResearchList_HideSurvey(wk);
@@ -918,7 +918,7 @@ static void ResearchList_SeqCursorScroll(ResearchList *wk) {
 
 static void ResearchList_SeqDrag(ResearchList *wk) {
     u32 x, y;
-    BOOL touching = func_0203da84(&x, &y);
+    BOOL touching = GFL_HIDGetTouchHeldPoint(&x, &y);
 
     switch (ResearchList_GetSeqState(wk)) {
     case 0:
@@ -954,7 +954,7 @@ static void ResearchList_SeqDrag(ResearchList *wk) {
 
 static void ResearchList_SeqConfirmTouch(ResearchList *wk) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 button = func_0203da0c(wk->buttonRects);
+    s32 button = GFL_HIDGetTouchPressedRect(wk->buttonRects);
 
     if ((keys & PAD_KEY_UP) || (keys & PAD_KEY_DOWN) || (keys & PAD_KEY_LEFT) || (keys & PAD_KEY_RIGHT) ||
         (keys & PAD_BUTTON_A)) {
@@ -980,7 +980,7 @@ static void ResearchList_SeqConfirmTouch(ResearchList *wk) {
 
 static void ResearchList_SeqConfirmCursor(ResearchList *wk) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 button = func_0203da0c(wk->buttonRects);
+    s32 button = GFL_HIDGetTouchPressedRect(wk->buttonRects);
 
     if (keys & PAD_KEY_UP) {
         ResearchList_ButtonCursorUp(wk);
@@ -1642,15 +1642,15 @@ static void ResearchList_UpdateCurrentIcon(ResearchList *wk) {
     ClActorPos pos;
 
     if (current == SURVEY_NONE) {
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
         return;
     }
 
     pos.x = ResearchList_GetItemScreenX(wk, current);
     pos.y = ResearchList_GetItemScreenTop(wk, current) + 10;
-    func_0204c140(actor, &pos, 0);
+    ClActor_SetSurfacePos(actor, &pos, 0);
     func_0204c520(actor, TRUE);
-    func_0204c124(actor, TRUE);
+    ClActor_SetVisible(actor, TRUE);
 }
 
 static void ResearchList_PrintCursorSurvey(ResearchList *wk) {
@@ -1686,14 +1686,14 @@ static void ResearchList_UpdateScrollBar(ResearchList *wk) {
     ClActorPos pos;
 
     if (!ResearchList_CanScroll(wk)) {
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
         return;
     }
 
     pos.x = 248;
     pos.y = ResearchList_GetBarY(wk);
-    func_0204c140(actor, &pos, 0);
-    func_0204c124(actor, TRUE);
+    ClActor_SetSurfacePos(actor, &pos, 0);
+    ClActor_SetVisible(actor, TRUE);
 }
 
 static int ResearchList_GetBarY(ResearchList *wk) {
@@ -2014,7 +2014,7 @@ static void ResearchList_VBlank(TCB *tcb, void *data) {
     ResearchList *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
 }
 
@@ -2453,9 +2453,9 @@ static void ResearchList_ClearObjRes(ResearchList *wk) {
 static void ResearchList_LoadSubObjRes(ResearchList *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, HEAPID_TAIL(heapId));
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
-    u32 palette = func_0204bba0(handle, 16, CLACT_VRAM_SUB, 0, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
+    u32 palette = ClActSys_LoadPltt(handle, 16, CLACT_VRAM_SUB, 0, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
 
     wk->objRes[OBJ_RES_SUB_CHARS] = chars;
     wk->objRes[OBJ_RES_SUB_PALETTE] = palette;
@@ -2464,24 +2464,24 @@ static void ResearchList_LoadSubObjRes(ResearchList *wk) {
 }
 
 static void ResearchList_FreeSubObjRes(ResearchList *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_SUB_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_SUB_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_SUB_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_SUB_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
 }
 
 static void ResearchList_LoadMainObjRes(ResearchList *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, HEAPID_TAIL(heapId));
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
-    u32 palette = func_0204bbb8(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 5, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
+    u32 palette = ClActSys_LoadPlttRange(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 5, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
     ArcTool *commonHandle;
     u32 buttonPalette;
 
     GFL_ArcToolFree(handle);
 
     commonHandle = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
-    buttonPalette = func_0204bbb8(commonHandle, 31, CLACT_VRAM_MAIN, 0x80, 0, 2, heapId);
+    buttonPalette = ClActSys_LoadPlttRange(commonHandle, 31, CLACT_VRAM_MAIN, 0x80, 0, 2, heapId);
     GFL_ArcToolFree(commonHandle);
 
     wk->objRes[OBJ_RES_MAIN_CHARS] = chars;
@@ -2491,10 +2491,10 @@ static void ResearchList_LoadMainObjRes(ResearchList *wk) {
 }
 
 static void ResearchList_FreeMainObjRes(ResearchList *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_MAIN_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_MAIN_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_BUTTON_PALETTE]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_MAIN_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_MAIN_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_BUTTON_PALETTE]);
 }
 
 static void ResearchList_ClearUnits(ResearchList *wk) {
@@ -2509,7 +2509,7 @@ static void ResearchList_CreateUnits(ResearchList *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        wk->units[i] = func_0204bf1c(sListUnitCounts[i], sListUnitPriorities[i], wk->heapId);
+        wk->units[i] = ClActUnit_Create(sListUnitCounts[i], sListUnitPriorities[i], wk->heapId);
     }
 }
 
@@ -2517,7 +2517,7 @@ static void ResearchList_DeleteUnits(ResearchList *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        func_0204bf98(wk->units[i]);
+        ClActUnit_Delete(wk->units[i]);
     }
 }
 
@@ -2549,8 +2549,8 @@ static void ResearchList_CreateActors(ResearchList *wk) {
         chars = ResearchList_GetObjRes(wk, entry->chars);
         palette = ResearchList_GetObjRes(wk, entry->palette);
         cellAnims = ResearchList_GetObjRes(wk, entry->cellAnims);
-        wk->actors[i] = func_0204c040(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
-        func_0204c124(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
 }
 
@@ -2558,7 +2558,7 @@ static void ResearchList_DeleteActors(ResearchList *wk) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
 }
 
@@ -2765,12 +2765,12 @@ static void ResearchList_ShowCenterActor(ResearchList *wk) {
 
     pos.x = 128;
     pos.y = 96;
-    func_0204c140(actor, &pos, 0);
-    func_0204c124(actor, TRUE);
+    ClActor_SetSurfacePos(actor, &pos, 0);
+    ClActor_SetVisible(actor, TRUE);
 }
 
 static void ResearchList_ShowCommIcon(ResearchList *wk) {
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }
 
 static void ResearchList_SetVBlank(ResearchList *wk) {

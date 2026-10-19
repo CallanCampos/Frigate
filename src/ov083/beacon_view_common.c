@@ -73,12 +73,12 @@ void BeaconView_SetActorPos(ClActor *actor, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(actor, &pos, 0);
+    ClActor_SetSurfacePos(actor, &pos, 0);
 }
 
 void BeaconView_SetActorAnim(ClActor *actor, u16 sequence) {
-    func_0204c488(actor, sequence);
-    func_0204c56c(actor);
+    ClActor_SetSequence(actor, sequence);
+    ClActor_RestartAnim(actor);
 }
 
 void BeaconView_SetPrintTimeLimit(PrintQueue *queue, BOOL longer) {
@@ -203,7 +203,7 @@ BOOL BeaconView_WaitTimerOrTouch(u8 *timer, u8 bg) {
         *timer = 0;
         return TRUE;
     }
-    if (func_0203dac8(&x, &y) && GFL_BGSysIsPixelOfColor(bg, x, y + 64, &colors)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && GFL_BGSysIsPixelOfColor(bg, x, y + 64, &colors)) {
         *timer = 0;
         return TRUE;
     }

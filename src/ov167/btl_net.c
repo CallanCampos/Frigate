@@ -132,7 +132,7 @@ void func_ov167_021b9950(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
         sWork->netHandle = netHandle;
         sWork->clientMask = clientMask;
         sWork->heapId = heapId;
-        sWork->myNetId = func_02042a6c(netHandle);
+        sWork->myNetId = GFL_NetGetHandleNetId(netHandle);
         sWork->serverNetId = 40;
         sWork->serverCmdReceived = FALSE;
         sWork->unkE = 0;
@@ -141,7 +141,7 @@ void func_ov167_021b9950(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
                 count++;
             }
         }
-        max = func_02042a78();
+        max = GFL_NetGetNegotiatedCount();
         if (count > max) {
             count = max;
         }
@@ -186,7 +186,7 @@ BOOL func_ov167_021b9a94(u8 clientId) {
 
     packet->version = 100;
     packet->clientId = clientId;
-    return func_02042be8(sWork->netHandle, 0x100, sizeof(BtlNetVersionPacket), packet);
+    return GFL_NetSendCommand(sWork->netHandle, 0x100, sizeof(BtlNetVersionPacket), packet);
 }
 
 // Command 0x100: records a machine's version, and once every machine's is in, makes the highest the server
@@ -259,7 +259,7 @@ static u8 func_ov167_021b9b94(u8 clientId) {
 
 // Sends the server's sync data to everyone
 BOOL func_ov167_021b9bb8(BtlMainSyncData *data) {
-    return func_02042c18(sWork->netHandle, 0xff, 0x101, sizeof(BtlMainSyncData), data, 0, 0, 0);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x101, sizeof(BtlMainSyncData), data, 0, 0, 0);
 }
 
 // Command 0x101: keeps the first sync data that arrives
@@ -281,7 +281,7 @@ BOOL func_ov167_021b9c0c(BtlMainSyncData *data) {
 
 // Sends this machine's party to everyone
 u8 func_ov167_021b9c38(PokeParty *party) {
-    return func_02042c18(sWork->netHandle, 0xff, 0x102, PokeParty_GetSaveDataSize(), party, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x102, PokeParty_GetSaveDataSize(), party, 0, 1, 1);
 }
 
 // Command 0x102's buffer
@@ -323,7 +323,7 @@ BOOL func_ov167_021b9d0c(void *chatter) {
         chatter = &sWork->sendBuf.noChatter;
         sWork->sendBuf.noChatter = 0;
     }
-    return func_02042c18(sWork->netHandle, 0xff, 0x103, size, chatter, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x103, size, chatter, 0, 1, 1);
 }
 
 // Command 0x103's buffer: a word for no cry, which goes in the machine's reply buffer
@@ -378,7 +378,8 @@ void func_ov167_021b9e74(void) {
 BOOL func_ov167_021b9e80(void *data) {
     BtlNetPartyPacket *packet = data;
 
-    return func_02042c18(sWork->netHandle, 0xff, 0x104, packet->size + sizeof(BtlNetPartyPacket), packet, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x104, packet->size + sizeof(BtlNetPartyPacket), packet,
+                                       0, 1, 1);
 }
 
 // Command 0x104's buffer
@@ -437,7 +438,7 @@ void func_ov167_021ba000(void) {
 
 // Sends this machine's player info to everyone
 BOOL func_ov167_021ba008(PlayerInfo *info) {
-    return func_02042c18(sWork->netHandle, 0xff, 0x105, PlayerInfo_GetSize(), info, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x105, PlayerInfo_GetSize(), info, 0, 1, 1);
 }
 
 // Command 0x105's buffer
@@ -479,7 +480,7 @@ PlayerInfo *func_ov167_021ba0cc(u8 clientId) {
 // Sends this machine's trainer to everyone
 BOOL func_ov167_021ba108(BtlSetupTrainer *trainer) {
     BtlCommTrainerData *data = func_ov167_021ba20c(trainer, HEAPID_TAIL(sWork->heapId));
-    BOOL result = func_02042c18(sWork->netHandle, 0xff, 0x106, sizeof(BtlCommTrainerData), data, 0, 1, 0);
+    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x106, sizeof(BtlCommTrainerData), data, 0, 1, 0);
 
     func_ov167_021ba264(data);
     return result;
@@ -572,7 +573,7 @@ void func_ov167_021ba2f4(u8 id) {
 BOOL func_ov167_021ba318(u8 id) {
     if (sWork != NULL) {
         if (sWork->timingPending) {
-            BOOL done = func_02040664(sWork->netHandle, sWork->timingNo, 1);
+            BOOL done = NetHandle_IsTimingPairRecv(sWork->netHandle, sWork->timingNo, 1);
 
             if (done) {
                 sWork->timingNo = 0;
@@ -592,7 +593,7 @@ BOOL func_ov167_021ba358(u8 clientId, void *data, u32 size) {
     u8 netId = func_ov167_021b9b94(clientId);
 
     if (netId != 40) {
-        return func_02042c18(sWork->netHandle, netId, 0x107, size, data, 0, 0, 1);
+        return GFL_NetSendCommandToMachine(sWork->netHandle, netId, 0x107, size, data, 0, 0, 1);
     }
     return TRUE;
 }
@@ -652,7 +653,7 @@ u16 func_ov167_021ba46c(void **data) {
 
 // Sends this machine's reply to the server
 BOOL func_ov167_021ba484(void *data, u32 size) {
-    BOOL result = func_02042c18(sWork->netHandle, sWork->serverNetId, 0x108, size, data, 0, 1, 1);
+    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, sWork->serverNetId, 0x108, size, data, 0, 1, 1);
 
     if (result) {
         sWork->serverCmdReceived = FALSE;

@@ -73,7 +73,7 @@ static void ZknSearchMain_VBlankTask(TCB *tcb, void *data) {
     ZknSearchWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
     if (wk->bgRequest == ZKNSEARCH_BG_REQUEST_ON) {
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG3, TRUE);

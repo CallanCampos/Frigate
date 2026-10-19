@@ -410,9 +410,9 @@ static void MysteryActors_Init(MysteryActors *actors, ClActUnit *unit, HeapID he
     int i;
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_MYSTERY, heapId);
-    actors->palette = func_0204bba0(arc, 8, CLACT_VRAM_BOTH, 0, heapId);
-    actors->cellAnims = func_0204bde0(arc, 34, 37, heapId);
-    actors->chars = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_BOTH, heapId);
+    actors->palette = ClActSys_LoadPltt(arc, 8, CLACT_VRAM_BOTH, 0, heapId);
+    actors->cellAnims = ClActSys_LoadCellAnims(arc, 34, 37, heapId);
+    actors->chars = ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_BOTH, heapId);
     buffer = GFL_G2DIOReadNCLRArc(arc, 8, &palette, heapId);
     colors = palette->rawData;
     MI_CpuCopy8(colors, actors->fromColors, sizeof(actors->fromColors));
@@ -422,16 +422,16 @@ static void MysteryActors_Init(MysteryActors *actors, ClActUnit *unit, HeapID he
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     actors->actors[ACTOR_CURSOR] =
-        func_0204c040(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
-    func_0204c124(actors->actors[ACTOR_CURSOR], FALSE);
+        ClActor_Create(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(actors->actors[ACTOR_CURSOR], FALSE);
     for (i = 0; i < STAR_COUNT; i++) {
         setup.x = GFL_RandomLCAlt(256);
         setup.y = GFL_RandomLCAlt(256) - 272;
         setup.bgPriority = 3;
         setup.sequence = GFL_RandomLCAlt(6) + 3;
         actors->actors[ACTOR_STARS + i] =
-            func_0204c040(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
-        func_0204c124(actors->actors[ACTOR_STARS + i], FALSE);
+            ClActor_Create(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
+        ClActor_SetVisible(actors->actors[ACTOR_STARS + i], FALSE);
     }
     setup.x = 128;
     setup.y = 177;
@@ -439,8 +439,8 @@ static void MysteryActors_Init(MysteryActors *actors, ClActUnit *unit, HeapID he
     setup.priority = 1;
     setup.sequence = 9;
     actors->actors[ACTOR_HINT] =
-        func_0204c040(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
-    func_0204c124(actors->actors[ACTOR_HINT], FALSE);
+        ClActor_Create(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(actors->actors[ACTOR_HINT], FALSE);
 }
 
 static void MysteryActors_Exit(MysteryActors *actors) {
@@ -448,12 +448,12 @@ static void MysteryActors_Exit(MysteryActors *actors) {
 
     for (i = 0; i < 35; i++) {
         if (actors->actors[i] != NULL) {
-            func_0204c108(actors->actors[i]);
+            ClActor_Delete(actors->actors[i]);
         }
     }
-    func_0204bcd0(actors->palette);
-    func_0204b98c(actors->chars);
-    func_0204be64(actors->cellAnims);
+    ClActSys_FreePltt(actors->palette);
+    ClActSys_FreeChars(actors->chars);
+    ClActSys_FreeCellAnims(actors->cellAnims);
 }
 
 static ClActor *MysteryActors_GetActor(const MysteryActors *actors, u32 index) {
@@ -464,7 +464,7 @@ static void MysteryActors_LoadPalette(MysteryActors *actors, HeapID heapId) {
     NNSG2dPaletteData *palette;
     void *buffer = GFL_G2DIOReadNCLR(ARCID_MYSTERY, 8, &palette, heapId);
 
-    func_0204bd10(actors->palette, palette, 7);
+    ClActSys_ReplacePlttData(actors->palette, palette, 7);
     GFL_HeapFree(buffer);
 }
 
@@ -489,7 +489,7 @@ static void MysteryParticle_Init(MysteryParticle *particle, HeapID heapId) {
     MI_CpuFill8(particle, 0, sizeof(MysteryParticle));
     particle->active = TRUE;
     particle->work = GFL_HeapAllocate(heapId, 0x4800, FALSE, "mystery.c", 1154);
-    particle->sys = func_0204f968(particle->work, 0x4800, TRUE, heapId);
+    particle->sys = Particle_CreateSystem(particle->work, 0x4800, TRUE, heapId);
 }
 
 static void MysteryParticle_Exit(MysteryParticle *particle) {
@@ -498,11 +498,11 @@ static void MysteryParticle_Exit(MysteryParticle *particle) {
 }
 
 static void MysteryParticle_Load(MysteryParticle *particle, u32 arcId, u32 fileId, HeapID heapId) {
-    func_0204fe04(particle->sys, func_0204fdf8(arcId, fileId, heapId), TRUE, NULL);
+    Particle_SetResource(particle->sys, Particle_ReadResource(arcId, fileId, heapId), TRUE, NULL);
 }
 
 static void MysteryParticle_Emit(MysteryParticle *particle, int emitter) {
-    func_0205007c(particle->sys, emitter, NULL, particle);
+    Particle_CreateEmitterWithCallback(particle->sys, emitter, NULL, particle);
 }
 
 static BOOL MysteryParticle_IsActive(MysteryParticle *particle) {
@@ -1329,7 +1329,7 @@ static void MysterySeq_WifiLogin(MysterySeq *seq, u32 *state, void *work) {
         wk->msgWin = MysteryMsgWin_Create(1, 15, wk->queue, wk->font, HEAPID_MYSTERY);
         MysteryMsgWin_DrawFrame(wk->msgWin, 10, 14);
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
-        func_02042ba8(TRUE, HEAPID_MYSTERY);
+        GFL_NetSetIconScreen(TRUE, HEAPID_MYSTERY);
         GFL_SndBGMPlay(SEQ_BGM_WIFI_PRESENT, 0xffff);
         MysteryBgScroll_SetEnabled(&wk->scroll, TRUE);
         *state = 4;
@@ -1578,7 +1578,7 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     MI_CpuCopy8(colors + palNo * 16, effect->kindColors, sizeof(effect->kindColors));
     GFL_HeapFree(buffer);
     for (i = 0; i < STAR_COUNT; i++) {
-        func_0204c378(MysteryActors_GetActor(actors, ACTOR_STARS + i), (u8)palNo, 0);
+        ClActor_SetPalette(MysteryActors_GetActor(actors, ACTOR_STARS + i), (u8)palNo, 0);
     }
     switch (recv->gift.kind) {
     case 0:
@@ -1596,9 +1596,11 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
         break;
     case 2:
         arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, heapId);
-        effect->palette = func_0204bba0(arc, GetItemGraphicsDatID(recv->gift.value, 2), CLACT_VRAM_MAIN, 0x1c0, heapId);
-        effect->cellAnims = func_0204bde0(arc, 1, 0, heapId);
-        effect->chars = func_0204b81c(arc, GetItemGraphicsDatID(recv->gift.value, 1), FALSE, CLACT_VRAM_MAIN, heapId);
+        effect->palette =
+            ClActSys_LoadPltt(arc, GetItemGraphicsDatID(recv->gift.value, 2), CLACT_VRAM_MAIN, 0x1c0, heapId);
+        effect->cellAnims = ClActSys_LoadCellAnims(arc, 1, 0, heapId);
+        effect->chars =
+            ClActSys_LoadChars(arc, GetItemGraphicsDatID(recv->gift.value, 1), FALSE, CLACT_VRAM_MAIN, heapId);
         GFL_ArcToolFree(arc);
         effect->offsetX = 4;
         effect->height = 8;
@@ -1606,9 +1608,9 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     case 3:
     case 4:
         arc = GFL_ArcSysCreateFileHandle(ARCID_MYSTERY, heapId);
-        effect->palette = func_0204bba0(arc, 3, CLACT_VRAM_MAIN, 0x1c0, heapId);
-        effect->cellAnims = func_0204bde0(arc, 33, 36, heapId);
-        effect->chars = func_0204b81c(arc, 12, FALSE, CLACT_VRAM_MAIN, heapId);
+        effect->palette = ClActSys_LoadPltt(arc, 3, CLACT_VRAM_MAIN, 0x1c0, heapId);
+        effect->cellAnims = ClActSys_LoadCellAnims(arc, 33, 36, heapId);
+        effect->chars = ClActSys_LoadChars(arc, 12, FALSE, CLACT_VRAM_MAIN, heapId);
         GFL_ArcToolFree(arc);
         effect->height = 8;
         break;
@@ -1622,10 +1624,10 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     setup.x = effect->offsetX + 128;
     setup.y = -96;
     setup.bgPriority = 2;
-    effect->actor = func_0204c040(unit, effect->chars, effect->palette, effect->cellAnims, &setup, 0, heapId);
-    func_0204c124(effect->actor, FALSE);
+    effect->actor = ClActor_Create(unit, effect->chars, effect->palette, effect->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(effect->actor, FALSE);
     if (recv->special) {
-        func_0204c318(effect->actor, 1);
+        ClActor_SetObjMode(effect->actor, 1);
     }
 }
 
@@ -1657,10 +1659,10 @@ static void MysteryEffect_Exit(MysteryEffect *effect) {
         MysteryParticle_Exit(&effect->particle);
     }
     GFL_BGSysSetBGEnabled(2, FALSE);
-    func_0204c108(effect->actor);
-    func_0204bcd0(effect->palette);
-    func_0204b98c(effect->chars);
-    func_0204be64(effect->cellAnims);
+    ClActor_Delete(effect->actor);
+    ClActSys_FreePltt(effect->palette);
+    ClActSys_FreeChars(effect->chars);
+    ClActSys_FreeCellAnims(effect->cellAnims);
     MI_CpuFill8(effect, 0, sizeof(MysteryEffect));
 }
 
@@ -1718,9 +1720,9 @@ static void MysteryEffect_Fall(MysteryEffect *effect) {
         break;
     case 4:
         y = (214 - effect->height) * effect->frame / 60 - 96;
-        func_0204c1a8(effect->actor, y, 0, 1);
+        ClActor_SetSurfacePosAxis(effect->actor, y, 0, 1);
         if (y >= -48 && y <= 192) {
-            func_0204c124(effect->actor, TRUE);
+            ClActor_SetVisible(effect->actor, TRUE);
         }
         if (effect->frame++ >= 60) {
             GFL_SndSEPlay(SEQ_SE_SYS_50);
@@ -1793,8 +1795,8 @@ static void MysteryEffect_FallSpecial(MysteryEffect *effect) {
     case 4:
         pos.x = 128;
         pos.y = 118 - effect->height;
-        func_0204c140(effect->actor, &pos, 0);
-        func_0204c124(effect->actor, TRUE);
+        ClActor_SetSurfacePos(effect->actor, &pos, 0);
+        ClActor_SetVisible(effect->actor, TRUE);
         effect->subFrame = 0;
         effect->state = 5;
         break;
@@ -1873,7 +1875,7 @@ static void MysteryBgScroll_Init(MysteryBgScroll *scroll, MysteryActors *actors,
     scroll->startSpeed = -FX32_CONST(0.2);
     scroll->heapId = heapId;
     for (i = 0; i < STAR_COUNT; i++) {
-        func_0204c21c(MysteryActors_GetActor(scroll->actors, ACTOR_STARS + i), &pos);
+        ClActor_GetPos(MysteryActors_GetActor(scroll->actors, ACTOR_STARS + i), &pos);
         scroll->starY[i] = pos.y << FX32_SHIFT;
         scroll->starSpeed[i] = GFL_RandomLCAlt(FX32_ONE) + FX32_CONST(1.6);
     }
@@ -1920,15 +1922,15 @@ static void MysteryBgScroll_Slow(MysteryBgScroll *scroll) {
     }
     for (i = 0; i < STAR_COUNT; i++) {
         actor = MysteryActors_GetActor(scroll->actors, ACTOR_STARS + i);
-        if (func_0204c138(actor)) {
+        if (ClActor_IsVisible(actor)) {
             scroll->starY[i] += scroll->starSpeed[i];
-            func_0204c21c(actor, &pos);
+            ClActor_GetPos(actor, &pos);
             pos.y = scroll->starY[i] >> FX32_SHIFT;
-            func_0204c210(actor, &pos);
+            ClActor_SetPos(actor, &pos);
             if (pos.y >= 0 && pos.y <= 208) {
-                func_0204c124(actor, TRUE);
+                ClActor_SetVisible(actor, TRUE);
             } else {
-                func_0204c124(actor, FALSE);
+                ClActor_SetVisible(actor, FALSE);
             }
         }
     }
@@ -1954,13 +1956,13 @@ static void MysteryBgScroll_Fast(MysteryBgScroll *scroll) {
             scroll->starY[i] = -FX32_CONST(16);
         }
         actor = MysteryActors_GetActor(scroll->actors, ACTOR_STARS + i);
-        func_0204c21c(actor, &pos);
+        ClActor_GetPos(actor, &pos);
         pos.y = scroll->starY[i] >> FX32_SHIFT;
-        func_0204c210(actor, &pos);
+        ClActor_SetPos(actor, &pos);
         if (pos.y >= 0 && pos.y <= 208) {
-            func_0204c124(actor, TRUE);
+            ClActor_SetVisible(actor, TRUE);
         } else {
-            func_0204c124(actor, FALSE);
+            ClActor_SetVisible(actor, FALSE);
         }
     }
     scroll->pos += scroll->speed;
@@ -1984,12 +1986,12 @@ static void MysteryOamMsg_Init(MysteryOamMsg *msg, const MysteryActors *actors, 
     MysteryOamText_SetColor(msg->text, PRINT_COLOR(1, 3, 0));
     MysteryOamText_SetAlign(msg->text, 0, 0, 1);
     MysteryOamText_Print(msg->text, msgData, msgId, font);
-    func_0204c124(MysteryActors_GetActor(actors, ACTOR_HINT), TRUE);
+    ClActor_SetVisible(MysteryActors_GetActor(actors, ACTOR_HINT), TRUE);
 }
 
 static void MysteryOamMsg_Exit(MysteryOamMsg *msg) {
     MysteryOamText_Clear(msg->text);
-    func_0204c124(MysteryActors_GetActor(msg->actors, ACTOR_HINT), FALSE);
+    ClActor_SetVisible(MysteryActors_GetActor(msg->actors, ACTOR_HINT), FALSE);
     MysteryOamText_Delete(msg->text);
     BmpOam_Exit(msg->bmpOam);
     MI_CpuFill8(msg, 0, sizeof(MysteryOamMsg));

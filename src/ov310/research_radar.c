@@ -183,7 +183,7 @@ static BOOL ResearchRadar_Main(GameProc *proc, u32 *state, void *param, void *wo
 static void ResearchRadar_UpdateComm(ResearchRadarWork *wk) {
     WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(wk->gsys)));
     if (GSYS_TryBootGameComm(wk->gsys)) {
-        func_02042ba8(TRUE, wk->heapId);
+        GFL_NetSetIconScreen(TRUE, wk->heapId);
     }
 }
 

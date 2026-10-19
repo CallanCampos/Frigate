@@ -125,7 +125,7 @@ static void func_ov036_021a3c20(FieldEffectTask *task, void *work) {
         return;
     }
     polygonId = 2;
-    func_0204ea98(shadowTask->shadow->scene, shadowTask->actorIndex, &polygonId);
+    BlActScene_SetActorPolygonId(shadowTask->shadow->scene, shadowTask->actorIndex, &polygonId);
     func_ov036_021a3a94(task);
 }
 

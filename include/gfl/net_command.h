@@ -19,24 +19,24 @@ typedef struct {
 #define GFL_NET_CMD_BASE_COUNT 0x11
 
 // The tables are NetCommand arrays
-void func_02040b94(int base, const void *list, int listNum, void *work, HeapID unused);
-void func_02040bfc(void);
-void func_02040c20(int base, const void *list, int listNum, void *work);
-void func_02040c64(int base);
+void NetCommand_Init(int base, const void *list, int listNum, void *work, HeapID unused);
+void NetCommand_Exit(void);
+void NetCommand_AddTable(int base, const void *list, int listNum, void *work);
+void NetCommand_RemoveTable(int base);
 // Whether data from these machines (bits, or GFL_NET_NETID_SERVER for all) is for this machine
-BOOL func_02040c94(int netIds);
+BOOL NetCommand_IsForThisMachine(int netIds);
 // Calls a command's handler
-void func_02040d78(int netId, int netIds, int command, int size, void *data, NetHandle *handle);
-BOOL func_02040dc0(int command);
-BOOL func_02040dd4(int command);
-void *func_02040de8(int command, int netId, int size);
+void NetCommand_Dispatch(int netId, int netIds, int command, int size, void *data, NetHandle *handle);
+BOOL NetCommand_HasCallback(int command);
+BOOL NetCommand_HasBufferFunc(int command);
+void *NetCommand_GetRecvBuffer(int command, int netId, int size);
 void func_02040e0c(void);
 // Handlers for data in chunks: a chunk, and the header before the chunks
-void func_02040e10(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_02040ebc(int netId, int size, const void *data, void *work, NetHandle *handle);
+void NetCommand_RecvHugeChunk(int netId, int size, const void *data, void *work, NetHandle *handle);
+void NetCommand_RecvHugeHeader(int netId, int size, const void *data, void *work, NetHandle *handle);
 // Sends data in chunks, returning whether it could start
-int func_02040f84(NetHandle *handle, u8 netIds, u16 command, u32 size, void *data);
+int NetCommand_SendHuge(NetHandle *handle, u8 netIds, u16 command, u32 size, void *data);
 // Sends the next chunk, each frame
-void func_020410dc(void);
+void NetCommand_UpdateHugeSend(void);
 
 #endif // POKEBW2_GFL_NET_COMMAND_H

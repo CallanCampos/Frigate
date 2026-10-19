@@ -1532,7 +1532,7 @@ static BOOL WifiBSubway_PrintError(WifiBSubwayWork *wk) {
         return FALSE;
     }
     if (GFL_NetErrCheck()) {
-        func_02042540();
+        NetState_GetErrorInfo();
         return FALSE;
     }
     if (WifiBSubwayError_Check(&wk->error)) {
@@ -1572,7 +1572,7 @@ static void WifiBSubwayView_Init(WifiBSubwayView *view, HeapID heapId) {
     view->initialized = TRUE;
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    func_02042ba8(TRUE, heapId);
+    GFL_NetSetIconScreen(TRUE, heapId);
 }
 
 static void WifiBSubwayView_Free(WifiBSubwayView *view) {
@@ -1734,7 +1734,7 @@ static BOOL WifiBSubwayView_WaitPrint(WifiBSubwayView *view) {
         return TRUE;
     }
     if (state == PRINT_STREAM_PAUSED) {
-        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || func_0203da48()) {
+        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GFL_HIDIsTouchPressed()) {
             PrintStream_Continue(view->stream);
         }
     }

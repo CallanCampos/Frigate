@@ -208,7 +208,7 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     BOOL encrypted;
     ClActorSetup setup;
 
-    work->unit = func_0204bf1c(1, 0, 21);
+    work->unit = ClActUnit_Create(1, 0, 21);
     pkm = func_0201d620(work->pkm);
     arc = MakePokeGraArcHandle(21);
     encrypted = PML_PkmDecrypt(pkm);
@@ -218,15 +218,15 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     PML_PkmReEncrypt(pkm, encrypted);
     GFL_ArcToolFree(arc);
     setup = sSpriteSetup;
-    work->sprite = func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, 21);
+    work->sprite = ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, 21);
 }
 
 void func_ov033_021790a0(ChatotEventWork *work) {
-    func_0204c108(work->sprite);
-    func_0204b98c(work->chars);
-    func_0204bcd0(work->palette);
-    func_0204be64(work->cellAnims);
-    func_0204bf98(work->unit);
+    ClActor_Delete(work->sprite);
+    ClActSys_FreeChars(work->chars);
+    ClActSys_FreePltt(work->palette);
+    ClActSys_FreeCellAnims(work->cellAnims);
+    ClActUnit_Delete(work->unit);
 }
 
 u32 func_ov033_021790c4(ChatotEventWork *work) {
@@ -242,9 +242,9 @@ u32 func_ov033_021790c4(ChatotEventWork *work) {
             return 0;
         }
     }
-    func_0204c178(work->sprite, &position, 0);
+    ClActor_GetSurfacePos(work->sprite, &position, 0);
     position.y -= work->animOffset;
-    func_0204c140(work->sprite, &position, 0);
+    ClActor_SetSurfacePos(work->sprite, &position, 0);
     work->animOffset--;
     return 1;
 }

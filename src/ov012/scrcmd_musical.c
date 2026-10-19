@@ -729,7 +729,7 @@ GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *arg)
         (*state)++;
         break;
     case 3:
-        if (func_020427a4() == TRUE || !data->online) {
+        if (GFL_NetIsEnded() == TRUE || !data->online) {
             if (data->online == TRUE) {
                 GSYS_TryBootGameComm(GameEvent_GetGameSystem(event));
             }

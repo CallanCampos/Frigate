@@ -137,12 +137,12 @@ void WorldTrade_PrintMain(WorldTradePrint *print) {
         KeyCursor_Update(print->keyCursor, print->stream, print->streamWin);
         switch (PrintStream_GetState(print->stream)) {
         case PRINT_STREAM_RUNNING:
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                 PrintStream_SkipWait(print->stream, 0);
             }
             break;
         case PRINT_STREAM_PAUSED:
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
                 PrintStream_Continue(print->stream);
             }

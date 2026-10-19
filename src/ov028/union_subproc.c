@@ -294,11 +294,11 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         }
         break;
     case 3:
-        func_02040624(func_02040440(), 9, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 9, 0x14);
         (*step)++;
         break;
     case 4:
-        if (func_02040664(func_02040440(), 9, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 9, 0x14) == TRUE) {
             *step = 7;
         }
         break;
@@ -342,13 +342,13 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
             }
         } else {
             UnionComm_SetCommandBase(self->activity);
-            func_02040624(func_02040440(), 10, 0x14);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 0x14);
             *step = 12;
         }
         break;
     case 12:
-        if (func_02040664(func_02040440(), 10, 0x14) == TRUE) {
-            func_02042a9c(func_02040440(), TRUE);
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 0x14) == TRUE) {
+            func_02042a9c(NetHandle_GetOwn(), TRUE);
             *step = 13;
         }
         break;
@@ -419,7 +419,7 @@ static BOOL UnionCommand_WarpA(GameSystem *gsys, UnionSystem *unisys, Field *fie
     VecFx32 pos;
 
     if (*step == 0) {
-        pos.x = (func_02042a6c(func_02040440()) * 16 + 88) << FX32_SHIFT;
+        pos.x = (GFL_NetGetHandleNetId(NetHandle_GetOwn()) * 16 + 88) << FX32_SHIFT;
         pos.y = 0;
         pos.z = FX32_CONST(152);
         *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_UNION_ROOM_COLOSSEUM, &pos, 0, FALSE);
@@ -435,7 +435,7 @@ static BOOL UnionCommand_WarpB(GameSystem *gsys, UnionSystem *unisys, Field *fie
     VecFx32 pos;
 
     if (*step == 0) {
-        pos.x = (func_02042a6c(func_02040440()) * 16 + 88) << FX32_SHIFT;
+        pos.x = (GFL_NetGetHandleNetId(NetHandle_GetOwn()) * 16 + 88) << FX32_SHIFT;
         pos.y = 0;
         pos.z = FX32_CONST(152);
         *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_UNION_ROOM_COLOSSEUM_2, &pos, 0, FALSE);
@@ -469,7 +469,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     UnionSelf *self = &unisys->situ;
     PStatusParam *status = &param->status;
     ColosseumBattleParam *battle = param->battle;
-    u32 selfId = func_02042a6c(func_02040440());
+    u32 selfId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     PokeParty *tmpParty;
     PokeParty *party;
     GameEvent *chain;
@@ -556,7 +556,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         }
         GFL_HeapFree(tmpParty);
         func_ov028_02172b4c(colosseum, TRUE);
-        func_02040624(func_02040440(), 22, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 22, 0x14);
         (*step)++;
         break;
     case 9:
@@ -564,7 +564,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             *step = 17;
             break;
         }
-        if (func_02040664(func_02040440(), 22, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 22, 0x14) == TRUE) {
             (*step)++;
         }
         break;
@@ -602,7 +602,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     case 13:
         if (!GFL_NetErrCheck()) {
             wifiList = GameData_GetWifiList(GSYS_GetGameData(gsys));
-            count = func_02042a78();
+            count = GFL_NetGetNegotiatedCount();
             isRedTeam = colosseum->unk16C[selfId] & 1;
             for (i = 0; i < count; i++) {
                 if (i == selfId) {

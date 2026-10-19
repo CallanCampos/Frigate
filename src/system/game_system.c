@@ -393,7 +393,7 @@ static BOOL GSYS_CanBootGameComm(GameSystem *gsys) {
 BOOL GSYS_TryBootGameComm(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
-    if (!func_02042788() && !GameCommSys_BootCheck(comm) && GSYS_CanBootGameComm(gsys) == TRUE) {
+    if (!GFL_NetIsInitialized() && !GameCommSys_BootCheck(comm) && GSYS_CanBootGameComm(gsys) == TRUE) {
         GameCommSys_Boot(comm, 1, gsys);
         return TRUE;
     }
@@ -434,7 +434,7 @@ static BOOL GSYS_SleepCheckCallback(void *work) {
     if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(gsys))) {
         return TRUE;
     }
-    if (func_02043068()) {
+    if (NetIw_IsRunning()) {
         return TRUE;
     }
     if (GetIsShouldUICallback()) {

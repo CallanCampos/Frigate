@@ -35,9 +35,9 @@ int ZknListUI_Main(ZknListWork *wk) {
     int ret;
 
     if (PokeDex_IsHabitatListEnabled(wk->param->pokedex) == TRUE) {
-        ret = func_0203da0c(sZknListTouchHabitat);
+        ret = GFL_HIDGetTouchPressedRect(sZknListTouchHabitat);
     } else {
-        ret = func_0203da0c(sZknListTouchNoHabitat);
+        ret = GFL_HIDGetTouchPressedRect(sZknListTouchNoHabitat);
     }
     if (ret != -1) {
         if (ret == ZKNLIST_UI_START) {
@@ -57,8 +57,8 @@ int ZknListUI_Main(ZknListWork *wk) {
             if (wk->param->searched == TRUE) {
                 return -1;
             }
-            if (func_0203d554() == FALSE) {
-                func_0203d564(TRUE);
+            if (GCTX_HIDIsUsingTouch() == FALSE) {
+                GCTX_HIDSetUsingTouch(TRUE);
                 FrameList_RedrawCursor(wk->frameList);
             }
         }
@@ -73,7 +73,7 @@ int ZknListUI_Main(ZknListWork *wk) {
             if (PokeDex_GetMode(wk->param->pokedex) != 1) {
                 return -1;
             }
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (ret == ZKNLIST_UI_NATIONAL) {
             if (PokeDex_IsNationalObtained(wk->param->pokedex) != TRUE ||
@@ -93,7 +93,7 @@ int ZknListUI_Main(ZknListWork *wk) {
                     return -1;
                 }
             }
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (ret == ZKNLIST_UI_HABITAT) {
             if (PokeDex_IsHabitatListEnabled(wk->param->pokedex) == FALSE) {
@@ -102,22 +102,22 @@ int ZknListUI_Main(ZknListWork *wk) {
             if (wk->param->searched == TRUE) {
                 return -1;
             }
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return ret;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNLIST_UI_RETURN;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNLIST_UI_EXIT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
         if (func_0200d1dc(wk->param->pokedex) == 1) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return ZKNLIST_UI_START;
         }
     }
@@ -128,18 +128,18 @@ int ZknListUI_Main(ZknListWork *wk) {
         if (wk->param->searched == TRUE) {
             return -1;
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNLIST_UI_SELECT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_Y) {
         if (wk->param->searched == TRUE) {
             return -1;
         }
-        if (func_0203d554() == TRUE) {
-            func_0203d564(FALSE);
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
+            GCTX_HIDSetUsingTouch(FALSE);
             FrameList_ShowCursor(wk->frameList);
         } else {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
         return ZKNLIST_UI_SHORTCUT;
     }

@@ -545,15 +545,15 @@ static void WifiMcr_BgLoad(void *unk, u32 heapId, ArcTool *arc, u32 arcId) {
 }
 
 static void WifiMcr_ClactResLoadCore(MCR_CLACT *clact, u32 heapId, ArcTool *arc) {
-    clact->chars = func_0204b81c(arc, 17, FALSE, 0, heapId);
-    clact->palette = func_0204bbb8(arc, 8, 0, 11 * 32, 0, 2, heapId);
-    clact->cellAnims = func_0204bde0(arc, 20, 32, heapId);
+    clact->chars = ClActSys_LoadChars(arc, 17, FALSE, 0, heapId);
+    clact->palette = ClActSys_LoadPlttRange(arc, 8, 0, 11 * 32, 0, 2, heapId);
+    clact->cellAnims = ClActSys_LoadCellAnims(arc, 20, 32, heapId);
 }
 
 static void WifiMcr_ClactResFreeCore(MCR_CLACT *clact) {
-    func_0204b98c(clact->chars);
-    func_0204bcd0(clact->palette);
-    func_0204be64(clact->cellAnims);
+    ClActSys_FreeChars(clact->chars);
+    ClActSys_FreePltt(clact->palette);
+    ClActSys_FreeCellAnims(clact->cellAnims);
 }
 
 static void WifiMcr_ClactActorAddCore(MCR_CLACT *clact, u32 heapId) {
@@ -564,22 +564,22 @@ static void WifiMcr_ClactActorAddCore(MCR_CLACT *clact, u32 heapId) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 0;
-    clact->exitCursor = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0, heapId);
+    clact->exitCursor = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0, heapId);
 
     setup.sequence = 2;
     setup.priority = 254;
     setup.bgPriority = 3;
-    clact->cursor = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0, heapId);
+    clact->cursor = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0, heapId);
 
-    func_0204c124(clact->exitCursor, FALSE);
-    func_0204c124(clact->cursor, FALSE);
+    ClActor_SetVisible(clact->exitCursor, FALSE);
+    ClActor_SetVisible(clact->cursor, FALSE);
     func_0204c520(clact->exitCursor, TRUE);
     func_0204c520(clact->cursor, TRUE);
 }
 
 static void WifiMcr_ClactActorDelCore(MCR_CLACT *clact) {
-    func_0204c108(clact->exitCursor);
-    func_0204c108(clact->cursor);
+    ClActor_Delete(clact->exitCursor);
+    ClActor_Delete(clact->cursor);
 }
 
 static void WifiMcr_ExitCursorOn(WIFI_MATCHROOM *wk) {
@@ -592,12 +592,12 @@ static void WifiMcr_ExitCursorOn(WIFI_MATCHROOM *wk) {
 
     actorPos.x = pos.x;
     actorPos.y = pos.y;
-    func_0204c210(wk->clact.exitCursor, &actorPos);
-    func_0204c124(wk->clact.exitCursor, TRUE);
+    ClActor_SetPos(wk->clact.exitCursor, &actorPos);
+    ClActor_SetVisible(wk->clact.exitCursor, TRUE);
 }
 
 static void WifiMcr_ExitCursorOff(WIFI_MATCHROOM *wk) {
-    func_0204c124(wk->clact.exitCursor, FALSE);
+    ClActor_SetVisible(wk->clact.exitCursor, FALSE);
 }
 
 static void WifiMcr_CursorSet(WIFI_MATCHROOM *wk, WF2DMAP_POS pos, u32 priority) {
@@ -605,13 +605,13 @@ static void WifiMcr_CursorSet(WIFI_MATCHROOM *wk, WF2DMAP_POS pos, u32 priority)
 
     actorPos.x = pos.x + 8;
     actorPos.y = pos.y;
-    func_0204c210(wk->clact.cursor, &actorPos);
-    func_0204c438(wk->clact.cursor, priority);
-    func_0204c124(wk->clact.cursor, TRUE);
+    ClActor_SetPos(wk->clact.cursor, &actorPos);
+    ClActor_SetPriority(wk->clact.cursor, priority);
+    ClActor_SetVisible(wk->clact.cursor, TRUE);
 }
 
 static void WifiMcr_CursorHide(WIFI_MATCHROOM *wk) {
-    func_0204c124(wk->clact.cursor, FALSE);
+    ClActor_SetVisible(wk->clact.cursor, FALSE);
 }
 
 static BOOL WifiMcr_PlayerOnExitCheck(const WIFI_MATCHROOM *wk) {
@@ -779,7 +779,7 @@ static void WifiMcr_DrawKuru(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
     pos.y = WF2DMAP_OBJWkDataGet(obj->obj, WF2DMAP_OBJPM_Y);
     shadowPos = pos;
 
-    pos.y += FX_Mul(func_02044304(obj->moveCount), -192 * FX32_ONE) >> FX32_SHIFT;
+    pos.y += FX_Mul(GFL_MathSinDeg(obj->moveCount), -192 * FX32_ONE) >> FX32_SHIFT;
 
     WF2DMAP_OBJDrawWkMatrixSet(obj->draw, pos);
     WF2DMAP_OBJDrawWkShadowMatrixSet(obj->draw, shadowPos);
@@ -800,7 +800,7 @@ static void WifiMcr_DrawJump(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
 
         count %= WIFI_MCR_NPC_JUMP_ONE;
         degrees = (count * 180) / WIFI_MCR_NPC_JUMP_ONE;
-        pos.y -= FX_Mul(func_02044304(degrees), 4 * FX32_ONE) >> FX32_SHIFT;
+        pos.y -= FX_Mul(GFL_MathSinDeg(degrees), 4 * FX32_ONE) >> FX32_SHIFT;
     }
 
     WF2DMAP_OBJDrawWkMatrixSet(obj->draw, pos);

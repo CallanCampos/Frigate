@@ -86,14 +86,14 @@ static BOOL CodeIn_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, 15, 7);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, 7, 8);
     wk->vblankTask = GFL_VBlankTCBAdd(CodeIn_VBlank, wk, 16);
-    func_02042ba8(TRUE, HEAPID_CODEIN);
+    GFL_NetSetIconScreen(TRUE, HEAPID_CODEIN);
     return TRUE;
 }
 
 static BOOL CodeIn_ProcMain(GameProc *proc, u32 *state, void *param, void *work) {
     BOOL done = CodeIn_Main(work);
 
-    func_0204b794();
+    ClActSys_Draw();
     if (done) {
         return TRUE;
     }
@@ -196,5 +196,5 @@ static void CodeIn_VBlank(TCB *tcb, void *data) {
     CodeInWork *wk = data;
 
     PaletteFade_Transfer(wk->fade);
-    func_0204b7c8();
+    ClActSys_VBlank();
 }

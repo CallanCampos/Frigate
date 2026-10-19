@@ -60,7 +60,7 @@ tools that show the differences.
   `mask = 0xffffffff; mask ^= 1 << bit; keyData->flags &= mask;`, and set with
   `mask = 1; mask <<= bit; keyData->flags |= mask;`, where `|= 1 << bit` adds a register copy.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
-  `clact.c`'s `func_0204ca1c`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
+  `clact.c`'s `ClAct_IsCellInViewTransformed`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which
   also passes a call's result to a setter through a `u8 pp` local rather than a `(u8)` cast.
 - A blend's clamps written into their own narrow locals, `u8 r = MATH_CLAMP(glowR + dr, 0, 31);`, and through one
@@ -134,9 +134,9 @@ tools that show the differences.
   `report_event.c`'s `EventSave_Update` writes `FieldSubscreen *subscreen = Field_GetSubscreen(work->field);` before
   passing `work->screenId`.
 - Saved registers swapped around an indirect call, with `r0` still holding a value just stored, mean the call passes
-  an argument: `net_state.c`'s `func_020411fc` calls the network's end callback as `callback(NULL)`, so the callback
+  an argument: `net_state.c`'s `NetState_FinishEnd` calls the network's end callback as `callback(NULL)`, so the callback
   type takes a `void *`. Parameters spilled at entry in the wrong order can be narrower than written:
-  `net_command.c`'s `func_02040f84` takes a `u8` and a `u16`, which its caller in overlay 70 narrows.
+  `net_command.c`'s `NetCommand_SendHuge` takes a `u8` and a `u16`, which its caller in overlay 70 narrows.
 - A pointer that follows another (`cr = cb + n`) adds its operands the other way round when written from the base,
   `cr = y + n + n`, which reuses `y + n` and adds the scaled count first: `ssp_jpegenc.c`'s
   `JpegEnc_ConvertYUV422`. A product the original computes by doubling one factor in place (`lsls rW, rW, #1`
@@ -503,7 +503,7 @@ Same instructions, registers swapped.
   `GFLNetInitData *init = &sNetInit;` local swaps `r4` and `r5`.
 - Constants hoisted into saved registers across a run of `f(g(x, N), FALSE)` calls (`movs r1, #0; movs r4, #0` at the
   first call, `adds r1, r4, #0` at the last ones) come from the inner call's result passing through one local that
-  every statement reassigns: `actor = GetActor(...); func_0204c124(actor, FALSE);`, as the habitat list's
+  every statement reassigns: `actor = GetActor(...); ClActor_SetVisible(actor, FALSE);`, as the habitat list's
   `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
   constant locals, inline helpers and loops did not reproduce it.
 - A register argument or a loop counter that takes its 0 from another variable's stack slot
@@ -516,7 +516,7 @@ Same instructions, registers swapped.
   `count` is declared or set, its type, and the shape of the inline changed nothing.
 - A store written in each branch of an `if` is the extra use that wins a register for a member-pointer local. The
   battle party list's `BPlistObj_LoadPokeIconRes` has `u32 *res = wk->charRes;` before its loop and writes
-  `res[i] = func_0204b81c(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
+  `res[i] = ClActSys_LoadChars(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
   the branches the code has the right size but the file handle and `res` are swapped in `r6`/`r7`, through every
   declaration order.
 - A bit field argument extracted completely before the first argument is set up (`ldrh r0; lsls r0, #0x11; lsrs r1,
@@ -630,7 +630,7 @@ Same instructions, registers swapped.
   show from the starting source flips the immediates there.
   A function with calls and joins after the constant's first use doesn't follow a node count. `ctvt_talk.c`'s
   `CtvtTalk_Enter` sets its `1` in `r7` after the zoom button's `if`/`else`, and the original copies it from the
-  talk button's `func_0204c124` on. There padding before that join never moved the edge, 40 field stores after it
+  talk button's `ClActor_SetVisible` on. There padding before that join never moved the edge, 40 field stores after it
   (about 200 nodes) never produced a copy, and added calls moved the first copy in jumps: a seventh actor creation
   put it one use late, 19 to 23 calls put it at later uses, and 24 to 39 removed every copy. The badge gate's edge,
   in a function without such joins, moves by one padding call as described. Matched code switches in the middle of
@@ -733,7 +733,7 @@ Same code, other `sp` offsets or frame size.
   of the frame in declaration order, and the function matches with every local at function scope and `trainerId`
   declared after `count`. Give each local the type the loop uses it at, and run `tools/decomp/locals.py` again after
   each type change to see which pair is still swapped. The wider type can be the callee's prototype:
-  `ctvt_game_cam.c`'s `CtvtGameCamExchange_Start` passes its `u8 netId` counter to `func_02042a80` on every pass and
+  `ctvt_game_cam.c`'s `CtvtGameCamExchange_Start` passes its `u8 netId` counter to `GFL_NetIsNegotiated` on every pass and
   keeps it in `r4`, ahead of `slot`, only with that function taking `u8 netId`; with the old `int netId` the counter
   was the converted copy in `r5`, after `slot`. A `u16` or `u32` parameter matched too, but the function's other
   callers pass their `int` counters as `(u8)i`, which a `u8` parameter explains.
@@ -782,7 +782,7 @@ Same code, other `sp` offsets or frame size.
   others.
 - A common subexpression's spilled temporary takes its slot by where its first use is written. A local holding it
   doesn't count, since MWCC propagates `end = offset + size;` into its uses whatever its type or declaration.
-  `backup_system.c`'s `func_0203b170` puts `offset + size` at the top of its spilled values (`sp+0x20`) only with
+  `backup_system.c`'s `SaveData_LoadWithBackup` puts `offset + size` at the top of its spilled values (`sp+0x20`) only with
   `dataFooter = (BlockFooter *)(data + end);` written first of its three footer pointers, before a call and a `break`
   test; written after them, the value took the lowest slot (`sp+4`). Every named slot then moved down by 4, and `data`
   declared after the loop counter took the freed lowest one.
@@ -901,7 +901,7 @@ Same code, other `sp` offsets or frame size.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
-  Spilled parameters follow the same rule at both ends of the call: `wm_icon.c`'s `func_0203e76c` reloads its
+  Spilled parameters follow the same rule at both ends of the call: `wm_icon.c`'s `WmIcon_Create` reloads its
   `u32 x` and `y`, passed on as `u32`, ahead of the stack argument stores, and its `HeapID heapId`, passed to a
   `u32 heapId`, after them. Widening the callee alone, or narrowing `heapId` alone, did not match: sweep the caller's
   and the callee's widths together.
@@ -1753,8 +1753,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its
   step to two scroll fields the second way.
 - An argument narrowed by a `u16` parameter is narrowed again at each call, and only hoisted out of a loop, while a
-  `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `func_0204c1a8` and
-  `func_0204c1dc` took their surface as `u16`.
+  `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `ClActor_SetSurfacePosAxis` and
+  `ClActor_GetSurfacePosAxis` took their surface as `u16`.
 - A signed halving kept apart from its narrowing ahead of a loop (`asrs r0, r0, #1; lsls r0, r0, #0x10; asrs r2, r0,
   #0x10`), where MWCC gives `lsls r0, r0, #0xf; asrs r4, r0, #0x10`, is a value the loop body computes through a narrow
   local and the loop-invariant pass hoists. The fold is a tree rewrite before code generation, and it carries a
@@ -2032,7 +2032,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `pos = x + 0xc` and reading through `pos` keeps the `add` (`ssp_exifdec.c`'s IFD loop).
 - A ternary argument `f(c ? 1 : 0)` compiles to the select form (`movs r0, #1; cmp; beq; movs r0, #0`). A branchy
   original (`bne`; `movs #1`; `b`; `movs #0`) is an `if`/`else` with a call in each branch, as `CtvtTalk_UpdateMain`
-  calls `func_0203d564(TRUE)` or `func_0203d564(FALSE)`.
+  calls `GCTX_HIDSetUsingTouch(TRUE)` or `GCTX_HIDSetUsingTouch(FALSE)`.
 - MWCC doesn't push a constant multiply into the arms of a select: `&frames[c ? 0 : 2]` with 0x460-byte elements gives
   `movne r2, #0; moveq r2, #2; mov r0, #0x460; mla`. A select of 0 and an element's size added to a base (`movne r0, #0;
   moveq r0, #0x460; add r8, r6, r0`) is therefore a ternary of byte offsets in the source, which no index spelling, type
@@ -2148,7 +2148,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `mystery.c`'s effects match with `static inline void Mystery_SetBlendAlpha(s16 ev1, s16 ev2)` storing
   `ev1 | (ev2 << 8)`, called as `Mystery_SetBlendAlpha(alpha, 16 - alpha)` with a `u32` alpha; `s16` locals or casts
   narrow in the other order. Called twice on one bit field, such an inline narrows it at the second call only, so the
-  original sign-extends the field twice, once plain and once after `lsl`/`asr #16`: `clact.c`'s `func_0204cb8c` wraps
+  original sign-extends the field twice, once plain and once after `lsl`/`asr #16`: `clact.c`'s `ClAct_CullOam` wraps
   `oam->x` with `ClAct_WrapOamX(oam->x)` for both its left and its right edge (and `oam->y` likewise), where one local
   wrapped once was 56 bytes short.
 - `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
@@ -2302,7 +2302,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   comparison, and `if (isLeague) { return FALSE; } return TRUE;`.
 - A range check that adds the 16-bit negated constant (`adds r0, #0xc004`, narrowing, `cmp r0, #3`, `bhi`) is an
   `||` chain of `==` tests of consecutive constants; a written `(u16)(x - C) <= n` subtracts instead.
-  `billboard_act.c`'s `func_0204f768` tests the last animation command this way, and `pml_item.c`'s
+  `billboard_act.c`'s `BlActSys_GetActorLastCmd` tests the last animation command this way, and `pml_item.c`'s
   `PML_ItemIsNotSpecialMonsball` its nine balls, with `0xfe14` from the literal pool and `cmp #8; bls`, where
   `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice.
 - An inline that returns a condition, `return a && b;`, builds the flag ahead of the tests (`movs r1, #0`, the
@@ -2576,7 +2576,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag built as `bne; movs #0; b; movs #1; str [sp]` is an enum-typed local set with a ternary; every plain 0/1
   spelling folds to the mirrored `beq` layout. Which of a function's two flags is the enum can differ between
   siblings: in the Pokédex entry's `ZukanInfo_InitTypeIcons` the enum (`ClActDrawType`, our name) feeds the resource
-  loaders and a `u32` zero-plus-`if` flag feeds `func_0204c040`, and in `ZukanInfo_ShowTypesInGameLanguage`,
+  loaders and a `u32` zero-plus-`if` flag feeds `ClActor_Create`, and in `ZukanInfo_ShowTypesInGameLanguage`,
   `ZukanInfo_ShowTypesInLanguage` and `ZukanInfo_LoadFootprint` it is the other way round. All four were 4 bytes
   long or 29 bytes off before.
 - A dead second conditional branch on the same flags is a redundant test in the source: the live competition's
@@ -3445,7 +3445,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Japanese text in a string is written as is: sources are UTF-8, and the build hands them to MWCC in Shift JIS, the
   encoding of the game's strings, through sjiswrap, with `-enc SJIS` so that a second byte of 0x5c (`表`, `ソ`) isn't
   read as a backslash. An escape such as `\x94` can't stand in for it in an assert, whose expression is stringized as
-  written: `wm_icon.c`'s `func_0203e5ec` has `GFL_ASSERT(0 && "非対応のOBJマッピングモード")`. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
+  written: `wm_icon.c`'s `WmIcon_GetCharNo` has `GFL_ASSERT(0 && "非対応のOBJマッピングモード")`. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
   bytes would be wrong.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
   a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.

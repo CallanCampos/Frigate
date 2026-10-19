@@ -476,10 +476,10 @@ static void CommTvtField_InitActors(CommTvtFieldWork *wk) {
         setup.priority = 1;
         setup.bgPriority = 2;
         wk->actors[i] =
-            func_0204c040(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
+            ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
         func_0204c520(wk->actors[i], FALSE);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], TRUE);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], TRUE);
     }
     setup.x = 128;
     setup.y = 96;
@@ -487,30 +487,30 @@ static void CommTvtField_InitActors(CommTvtFieldWork *wk) {
     setup.priority = 0;
     setup.bgPriority = 2;
     wk->actors[3] =
-        func_0204c040(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
+        ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
     func_0204c520(wk->actors[3], TRUE);
-    func_0204c124(wk->actors[3], TRUE);
-    func_0204c318(wk->actors[3], TRUE);
+    ClActor_SetVisible(wk->actors[3], TRUE);
+    ClActor_SetObjMode(wk->actors[3], TRUE);
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 18;
     setup.priority = 0;
     setup.bgPriority = 2;
     wk->actors[4] =
-        func_0204c040(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
+        ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
     func_0204c520(wk->actors[4], TRUE);
-    func_0204c124(wk->actors[4], FALSE);
-    func_0204c318(wk->actors[4], TRUE);
+    ClActor_SetVisible(wk->actors[4], FALSE);
+    ClActor_SetObjMode(wk->actors[4], TRUE);
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 25;
     setup.priority = 0;
     setup.bgPriority = 2;
     wk->actors[5] =
-        func_0204c040(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
+        ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
     func_0204c520(wk->actors[5], TRUE);
-    func_0204c124(wk->actors[5], FALSE);
-    func_0204c318(wk->actors[5], TRUE);
+    ClActor_SetVisible(wk->actors[5], FALSE);
+    ClActor_SetObjMode(wk->actors[5], TRUE);
 }
 
 static void CommTvtField_InitGraphics(CommTvtFieldWork *wk) {
@@ -535,9 +535,9 @@ static void CommTvtField_InitGraphics(CommTvtFieldWork *wk) {
     wk->backgroundChars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 9, 4, 0, (u16)wk->backgroundChars, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 15, 6, 0, (u16)wk->backgroundChars, 0, FALSE, wk->heapId);
-    wk->chars = func_0204b81c(arc, 5, FALSE, CLACT_VRAM_SUB, wk->heapId);
-    wk->palette = func_0204bbb8(arc, 3, CLACT_VRAM_SUB, 0, 0, 10, wk->heapId);
-    wk->cellAnims = func_0204bde0(arc, 7, 16, wk->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 5, FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_SUB, 0, 0, 10, wk->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 7, 16, wk->heapId);
     GFL_ArcToolFree(arc);
     wk->frameChars = LoadCursorImageEndOfHeap(5, 11, 0, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 0x180, 0x20, wk->heapId);
@@ -620,8 +620,8 @@ static void CommTvtField_StartPress(CommTvtFieldWork *wk) {
         index = 1;
     }
     func_0204c520(wk->actors[index], TRUE);
-    func_0204c5b0(wk->actors[index], &callback);
-    func_0204c56c(wk->actors[index]);
+    ClActor_SetAnimCallback(wk->actors[index], &callback);
+    ClActor_RestartAnim(wk->actors[index]);
     CommTvtField_SetFuncLine(wk, CommTvtField_Idle, 912);
 }
 
@@ -719,13 +719,13 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
     if (wk->shownState != state) {
         switch (state) {
         case 0:
-            func_0204c124(wk->actors[5], FALSE);
+            ClActor_SetVisible(wk->actors[5], FALSE);
             CommTvtField_FreeWindow7(10, wk);
             GFL_MsgDataLoadStrbuf(wk->msgData, 0, wk->strbuf54);
             CommTvtField_CreateWindow(0, wk, &sMessageWindow, sTitleCenterX, sTitleCenterY);
             break;
         case 1:
-            func_0204c124(wk->actors[5], FALSE);
+            ClActor_SetVisible(wk->actors[5], FALSE);
             CommTvtField_FreeWindow7(10, wk);
             GFL_MsgDataLoadStrbuf(wk->msgData, 15, wk->strbuf54);
             CommTvtField_CreateWindow(0, wk, &sCallWindow, sTitleCenterX, sTitleCenterY);
@@ -734,7 +734,7 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
             u32 caller = func_ov012_0215365c(comm);
 
             wk->shownCaller = caller;
-            func_0204c124(wk->actors[5], FALSE);
+            ClActor_SetVisible(wk->actors[5], FALSE);
             CommTvtField_FreeWindow7(10, wk);
             WordSetNumber(wk->wordSet, 0, caller, 1, 0, TRUE);
             GFL_MsgDataLoadStrbuf(wk->msgData, 16, wk->strbuf50);
@@ -747,7 +747,7 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
             CommTvtField_CreateWindow(0, wk, &sCallWindow, sTitleCenterX, sTitleCenterY);
             if (func_ov012_02153660(comm, wk->strbuf54)) {
                 CommTvtField_CreateWindow(10, wk, &sNoticeWindow, NULL, NULL);
-                func_0204c124(wk->actors[5], TRUE);
+                ClActor_SetVisible(wk->actors[5], TRUE);
             }
             break;
         }
@@ -776,16 +776,16 @@ static void CommTvtField_AnimateIcon(CommTvtFieldWork *wk) {
     switch (func_ov012_02153658(GSYS_GetGameCommSystem(wk->gsys))) {
     case 0:
     case 1:
-        if (func_0204c4a0(wk->actors[0]) == 20) {
+        if (ClActor_GetSequence(wk->actors[0]) == 20) {
             func_0204c520(wk->actors[0], FALSE);
-            func_0204c488(wk->actors[0], 12);
+            ClActor_SetSequence(wk->actors[0], 12);
         }
         break;
     case 2:
     case 3:
-        if (func_0204c4a0(wk->actors[0]) == 12) {
+        if (ClActor_GetSequence(wk->actors[0]) == 12) {
             func_0204c520(wk->actors[0], TRUE);
-            func_0204c488(wk->actors[0], 20);
+            ClActor_SetSequence(wk->actors[0], 20);
         }
         break;
     }
@@ -794,8 +794,8 @@ static void CommTvtField_AnimateIcon(CommTvtFieldWork *wk) {
 static void CommTvtField_SetAnswerMode(CommTvtFieldWork *wk, int index) {
     u8 *mac;
 
-    func_02042e84();
-    mac = func_020428c8(index);
+    GFL_NetGetInitData();
+    mac = GFL_NetGetBeaconMac(index);
     wk->param->commParam.unk4 = 2;
     MI_CpuCopy8(mac, wk->param->commParam.parentMac, 6);
 }
@@ -803,7 +803,7 @@ static void CommTvtField_SetAnswerMode(CommTvtFieldWork *wk, int index) {
 static void CommTvtField_SetCallMode(CommTvtFieldWork *wk) {
     u8 mac[6] = { 0, 0, 0, 0, 0, 0 };
 
-    func_02042e84();
+    GFL_NetGetInitData();
     wk->param->commParam.unk4 = 1;
     MI_CpuCopy8(mac, wk->param->commParam.parentMac, 6);
 }
@@ -812,41 +812,41 @@ static void CommTvtField_UpdateCalls(CommTvtFieldWork *wk) {
     int found = WihDwc_FindFriendInvite(GameData_GetWifiList(wk->gameData));
 
     if (found != -1) {
-        void *beacon = func_020428a8(found);
+        void *beacon = GFL_NetGetBeaconData(found);
         StrBuf *name = GFL_StrBufCreate(200, wk->heapId);
 
         GFL_StrBufLoadFixedString(name, CtvtBeacon_GetPlayerName(beacon), 8);
-        if (!func_0204c138(wk->actors[4])) {
+        if (!ClActor_IsVisible(wk->actors[4])) {
             GFL_StrBufLoadFixedString(wk->strbuf58, CtvtBeacon_GetPlayerName(beacon), 8);
             GFL_BitmapFill(BmpWin_GetBitmap(wk->nameWindow), 0);
             GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->nameWindow), 0, 0, wk->strbuf58, wk->font, TEXT_COLOR);
             BmpWin_FlushChar(wk->nameWindow);
             BmpWin_FlushMap(wk->nameWindow);
-            func_0204c124(wk->actors[4], TRUE);
+            ClActor_SetVisible(wk->actors[4], TRUE);
             GFL_BGSysQueueScrLoad(5);
             CommTvtField_SetAnswerMode(wk, found);
         }
         GFL_StrBufFree(name);
         FieldSnd_RingRingtone(GameData_GetFieldSoundSystem(wk->gameData));
-        if (func_0204c4a0(wk->actors[3]) == 15) {
-            func_0204c488(wk->actors[3], 16);
+        if (ClActor_GetSequence(wk->actors[3]) == 15) {
+            ClActor_SetSequence(wk->actors[3], 16);
         }
-        if (func_0204c4a0(wk->actors[1]) == 11) {
+        if (ClActor_GetSequence(wk->actors[1]) == 11) {
             func_0204c520(wk->actors[1], TRUE);
-            func_0204c488(wk->actors[1], 19);
+            ClActor_SetSequence(wk->actors[1], 19);
         }
     } else {
         FieldSnd_StopRingtone(GameData_GetFieldSoundSystem(wk->gameData));
-        func_0204c124(wk->actors[4], FALSE);
+        ClActor_SetVisible(wk->actors[4], FALSE);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->nameWindow), 0);
         BmpWin_FlushChar(wk->nameWindow);
         CommTvtField_SetCallMode(wk);
-        if (func_0204c4a0(wk->actors[1]) == 19) {
+        if (ClActor_GetSequence(wk->actors[1]) == 19) {
             func_0204c520(wk->actors[1], FALSE);
-            func_0204c488(wk->actors[1], 11);
+            ClActor_SetSequence(wk->actors[1], 11);
         }
-        if (func_0204c4a0(wk->actors[3]) == 16) {
-            func_0204c488(wk->actors[3], 15);
+        if (ClActor_GetSequence(wk->actors[3]) == 16) {
+            ClActor_SetSequence(wk->actors[3], 15);
         }
     }
 }
@@ -898,7 +898,7 @@ static u32 CommTvtField_CountCalls(CommTvtFieldWork *wk) {
 }
 
 static void CommTvtField_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static const ClActSysSetup sCommTvtFieldClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 100, 100, 100, 100, 16, 16 };
@@ -934,7 +934,7 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     ClActSys_Create(&sCommTvtFieldClActSetup, &sCommTvtFieldVRAMConfig, wk->heapId);
-    wk->unit = func_0204bf1c(40, 0, wk->heapId);
+    wk->unit = ClActUnit_Create(40, 0, wk->heapId);
     wk->vblankTask = GFL_VBlankTCBAdd(CommTvtField_VBlank, wk, 0);
     CommTvtField_InitBG(wk);
     CommTvtField_InitGraphics(wk);
@@ -947,15 +947,15 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_ALL);
     CommTvtField_SetFuncLine(wk, CommTvtField_InitUI, 1739);
     wk->param = fieldParam;
-    func_02042e84();
+    GFL_NetGetInitData();
     wk->param->commParam.unk4 = 1;
     wk->param->commParam.gameData = wk->gameData;
-    func_02042ba8(FALSE, wk->heapId);
-    if (func_02042788()) {
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
+    if (GFL_NetIsInitialized()) {
         // The callback takes the command as an int; net_whpipe.h says u8
         func_ov030_02174120((void (*)(void *, const void *, u8, u8))CommTvtField_OnBeacon, wk);
     }
-    func_0203d564(TRUE);
+    GCTX_HIDSetUsingTouch(TRUE);
     return TRUE;
 }
 
@@ -974,8 +974,8 @@ static BOOL CommTvtFieldApp_Main(GameProc *proc, u32 *state, void *param, void *
         CommTvtField_UpdateCalls(wk);
     }
     CommTvtField_TickCallers(wk);
-    func_0204b794();
-    if (func_02042788()) {
+    ClActSys_Draw();
+    if (GFL_NetIsInitialized()) {
         wk->prevWifiState = wk->wifiState;
         wk->wifiState = WihDwc_GetStatus(GameData_GetWifiList(wk->gameData));
         wk->prevCallCount = wk->callCount;
@@ -1005,7 +1005,7 @@ static BOOL CommTvtFieldApp_Exit(GameProc *proc, u32 *state, void *param, void *
     if (!GFL_WipeIsFinished()) {
         return FALSE;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         func_ov030_02174120(NULL, NULL);
     }
     CommTvtField_FreeGraphics(wk);
@@ -1015,17 +1015,17 @@ static BOOL CommTvtFieldApp_Exit(GameProc *proc, u32 *state, void *param, void *
     PrintQueue_Clear(wk->queue);
     PrintQueue_Free(wk->queue);
     for (i = 0; i < 3; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204c108(wk->actors[3]);
-    func_0204c108(wk->actors[4]);
-    func_0204c108(wk->actors[5]);
-    func_0204bcd0(wk->palette);
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActor_Delete(wk->actors[3]);
+    ClActor_Delete(wk->actors[4]);
+    ClActor_Delete(wk->actors[5]);
+    ClActSys_FreePltt(wk->palette);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
     GFL_TCBRemove(wk->vblankTask);
-    func_0204bf98(wk->unit);
-    func_0204b758();
+    ClActUnit_Delete(wk->unit);
+    ClActSys_Delete();
     if (wk->stream != NULL) {
         PrintStream_Delete(wk->stream);
     }

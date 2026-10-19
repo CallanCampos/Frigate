@@ -93,7 +93,7 @@ static BOOL BattleLoseMessage_Main(GameProc *proc, u32 *state, void *param, void
         BmpWin_FlushChar(window);
         BmpWin_FlushMap(window);
         GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
-        func_02042ba8(TRUE, msg->heapId);
+        GFL_NetSetIconScreen(TRUE, msg->heapId);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
         (*state)++;
         break;

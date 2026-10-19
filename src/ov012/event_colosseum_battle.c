@@ -92,7 +92,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     case 6:
         func_ov012_02152910(&rule, 3);
         gameData = GSYS_GetGameData(gsys);
-        BtlSetup_SetNet1v1Single(setup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNet1v1Single(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 9:
         func_ov012_02152910(&rule, 4);
@@ -103,7 +103,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     case 10:
         func_ov012_02152910(&rule, 7);
         gameData = GSYS_GetGameData(gsys);
-        BtlSetup_SetNet1v1Double(setup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNet1v1Double(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 13:
         func_ov012_02152910(&rule, 8);
@@ -114,7 +114,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     case 14:
         func_ov012_02152910(&rule, 11);
         gameData = GSYS_GetGameData(gsys);
-        BtlSetup_SetNetTriple(setup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNetTriple(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 17:
         func_ov012_02152910(&rule, 12);
@@ -125,7 +125,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     case 18:
         func_ov012_02152910(&rule, 15);
         gameData = GSYS_GetGameData(gsys);
-        BtlSetup_SetNetRotation(setup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNetRotation(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 21:
         func_ov012_02152910(&rule, 16);
@@ -136,7 +136,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     case 22:
         func_ov012_02152910(&rule, 19);
         gameData = GSYS_GetGameData(gsys);
-        BtlSetup_SetNetMultiVsNet(setup, gameData, func_02040440(), 1, param->unk12, HEAPID_GAMEEVENT);
+        BtlSetup_SetNetMultiVsNet(setup, gameData, NetHandle_GetOwn(), 1, param->unk12, HEAPID_GAMEEVENT);
         break;
     default:
         GFL_ASSERT_MSG(FALSE, "play_category = %d\n", category);

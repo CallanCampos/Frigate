@@ -263,11 +263,11 @@ static void BeaconView_DrawAll(BeaconViewWork *work) {
     BeaconView_UpdateArrows(work);
     BeaconView_UpdateThanksButton(work);
     BeaconView_UpdateBar(work);
-    func_0204c124(work->actors[BEACON_VIEW_ACTOR_BAR], work->logCount >= BEACON_VIEW_LINE_MAX + 1 ? TRUE : FALSE);
+    ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_BAR], work->logCount >= BEACON_VIEW_LINE_MAX + 1 ? TRUE : FALSE);
     if (work->passPower == PASS_POWER_NONE) {
         BeaconView_SetActorAnim(work->actors[BEACON_VIEW_ACTOR_PASS_POWER], 3);
     }
-    func_02042ba8(FALSE, work->tmpHeapId);
+    GFL_NetSetIconScreen(FALSE, work->tmpHeapId);
 }
 
 // What a touch does, and the sequence it gives
@@ -275,7 +275,7 @@ static int BeaconView_CheckTouch(BeaconViewWork *work) {
     BeaconViewTouch touch;
     int hit;
 
-    if (!func_0203dac8((u32 *)&touch.x, (u32 *)&touch.y)) {
+    if (!GFL_HIDGetTouchPressedPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
         return SEQ_MAIN;
     }
     hit = BeaconView_HitTestButton(work, &touch);
@@ -340,7 +340,7 @@ static int BeaconView_CheckTouch(BeaconViewWork *work) {
 static int BeaconView_GetHeldArrow(BeaconViewWork *work) {
     BeaconViewTouch touch;
 
-    if (func_0203da84((u32 *)&touch.x, (u32 *)&touch.y)) {
+    if (GFL_HIDGetTouchHeldPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
         return BeaconView_HitTestArrow(work, &touch);
     }
     return TOUCH_RECT_NONE;
@@ -350,7 +350,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
     BeaconViewTouch touch;
 
     if (work->barDragging) {
-        if (!func_0203da84((u32 *)&touch.x, (u32 *)&touch.y)) {
+        if (!GFL_HIDGetTouchHeldPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
             work->barDragging = FALSE;
             return SEQ_BAR;
         }
@@ -476,7 +476,7 @@ static BOOL BeaconView_TakeNewBeacon(BeaconViewWork *work) {
     if (work->logCount < GAME_BEACON_LOG_MAX) {
         work->logCount += (u8)work->isNew;
         if (work->isNew && work->logCount >= BEACON_VIEW_LINE_MAX + 1) {
-            func_0204c124(work->actors[BEACON_VIEW_ACTOR_BAR], TRUE);
+            ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_BAR], TRUE);
         }
         if (work->logCount <= BEACON_VIEW_LINE_MAX) {
             work->viewCount = work->logCount;
@@ -513,7 +513,7 @@ void BeaconView_SetButtonAnim(BeaconViewWork *work, int button, int state) {
 }
 
 BOOL BeaconView_IsButtonAnimating(BeaconViewWork *work, int button) {
-    return func_0204c560(work->actors[button]);
+    return ClActor_IsAnimActive(work->actors[button]);
 }
 
 // Shows a beacon just taken: its message, then its line, which pushes the others down when the player is new
@@ -637,7 +637,7 @@ static int BeaconView_CheckThanksTouch(BeaconViewWork *work) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return THANKS_END;
     }
-    if (!func_0203dac8((u32 *)&touch.x, (u32 *)&touch.y)) {
+    if (!GFL_HIDGetTouchPressedPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
         return THANKS_INPUT;
     }
     if (BeaconView_HitTestButton(work, &touch) == BEACON_VIEW_ACTOR_THANKS) {

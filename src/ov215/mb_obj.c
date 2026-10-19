@@ -86,14 +86,14 @@ void MailBox_FreeOBJs(MailBoxWork *work) {
 
 void MailBox_UpdateClActUnit(MailBoxView *view) {
     if (view->clActUnit != NULL) {
-        func_0204b794();
+        ClActSys_Draw();
     }
 }
 
 static void MailBox_InitClAct(MailBoxView *view) {
     ClActSys_Create(&sClActSetup, &MailBox_VRAMConfig, HEAPID_MAILBOX_VIEW);
-    view->clActUnit = func_0204bf1c(8, 0, HEAPID_MAILBOX_VIEW);
-    func_0204c028(view->clActUnit);
+    view->clActUnit = ClActUnit_Create(8, 0, HEAPID_MAILBOX_VIEW);
+    ClActUnit_UseSystemRenderer(view->clActUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
@@ -102,14 +102,14 @@ static void MailBox_FreeClAct(MailBoxView *view) {
     // BUG: the palette and the cell animations are freed with each other's function. Both are resource 0, so it
     // works
 #ifdef BUGFIX
-    func_0204be64(view->cellAnims[0]);
-    func_0204bcd0(view->palettes[0]);
+    ClActSys_FreeCellAnims(view->cellAnims[0]);
+    ClActSys_FreePltt(view->palettes[0]);
 #else
-    func_0204be64(view->palettes[0]);
-    func_0204bcd0(view->cellAnims[0]);
+    ClActSys_FreeCellAnims(view->palettes[0]);
+    ClActSys_FreePltt(view->cellAnims[0]);
 #endif
-    func_0204bf98(view->clActUnit);
-    func_0204b758();
+    ClActUnit_Delete(view->clActUnit);
+    ClActSys_Delete();
 }
 
 static ClActor *MailBox_CreateActor(MailBoxView *view, const MailBoxActorTemplate *template) {
@@ -120,13 +120,13 @@ static ClActor *MailBox_CreateActor(MailBoxView *view, const MailBoxActorTemplat
     setup.sequence = template->sequence;
     setup.priority = 0;
     setup.bgPriority = template->bgPriority;
-    return func_0204c040(view->clActUnit, view->chars[template->charIndex], view->palettes[template->paletteIndex],
-                         view->cellAnims[template->cellAnimIndex], &setup, template->surface, HEAPID_MAILBOX_VIEW);
+    return ClActor_Create(view->clActUnit, view->chars[template->charIndex], view->palettes[template->paletteIndex],
+                          view->cellAnims[template->cellAnimIndex], &setup, template->surface, HEAPID_MAILBOX_VIEW);
 }
 
 static void MailBox_FreeActor(MailBoxView *view, u32 index) {
     if (view->actors[index] != NULL) {
-        func_0204c108(view->actors[index]);
+        ClActor_Delete(view->actors[index]);
         view->actors[index] = NULL;
     }
 }
@@ -140,11 +140,11 @@ static void MailBox_FreeActors(MailBoxView *view) {
 }
 
 void MailBox_SetActorAnim(MailBoxView *view, u32 index, u32 sequence) {
-    func_0204c488(view->actors[index], sequence);
+    ClActor_SetSequence(view->actors[index], sequence);
 }
 
 void MailBox_SetActorVisible(MailBoxView *view, u32 index, BOOL visible) {
-    func_0204c124(view->actors[index], visible);
+    ClActor_SetVisible(view->actors[index], visible);
 }
 
 void MailBox_SetActorPos(MailBoxView *view, u32 index, int x, int y) {
@@ -153,18 +153,18 @@ void MailBox_SetActorPos(MailBoxView *view, u32 index, int x, int y) {
     pos.x = x;
     pos.y = y;
     if (y < 256) {
-        func_0204c140(view->actors[index], &pos, 0);
+        ClActor_SetSurfacePos(view->actors[index], &pos, 0);
     } else {
-        func_0204c140(view->actors[index], &pos, 1);
+        ClActor_SetSurfacePos(view->actors[index], &pos, 1);
     }
-    func_0204c4d4(view->actors[index], 0);
+    ClActor_SetAnimTime(view->actors[index], 0);
 }
 
 void MailBox_SetActorBlend(MailBoxView *view, u32 index, BOOL blend) {
     if (blend == TRUE) {
-        func_0204c318(view->actors[index], GX_OAM_MODE_XLU);
+        ClActor_SetObjMode(view->actors[index], GX_OAM_MODE_XLU);
     } else {
-        func_0204c318(view->actors[index], GX_OAM_MODE_NORMAL);
+        ClActor_SetObjMode(view->actors[index], GX_OAM_MODE_NORMAL);
     }
 }
 
@@ -181,25 +181,25 @@ static void MailBox_LoadActorResources(MailBoxView *view) {
     u32 i;
 
     for (i = 0; i <= 2; i++) {
-        view->chars[i] = func_0204b81c(arc, func_0202d894(), FALSE, TRUE, HEAPID_MAILBOX_VIEW);
+        view->chars[i] = ClActSys_LoadChars(arc, func_0202d894(), FALSE, TRUE, HEAPID_MAILBOX_VIEW);
     }
-    view->palettes[0] = func_0204bba0(arc, PokeIcon_GetPaletteFile(), 1, 0, HEAPID_MAILBOX_VIEW);
-    view->cellAnims[0] = func_0204bde0(arc, func_0202d898(0), func_0202d89c(0), HEAPID_MAILBOX_VIEW);
+    view->palettes[0] = ClActSys_LoadPltt(arc, PokeIcon_GetPaletteFile(), 1, 0, HEAPID_MAILBOX_VIEW);
+    view->cellAnims[0] = ClActSys_LoadCellAnims(arc, func_0202d898(0), func_0202d89c(0), HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
 }
 
 static void MailBox_LoadButtonResources(MailBoxView *view) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAILBOX, HEAPID_MAILBOX_VIEW);
 
-    view->chars[3] = func_0204b81c(arc, 44, TRUE, 0, HEAPID_MAILBOX_VIEW);
-    view->palettes[1] = func_0204bba0(arc, 47, 0, 0, HEAPID_MAILBOX_VIEW);
-    view->cellAnims[1] = func_0204bde0(arc, 45, 46, HEAPID_MAILBOX_VIEW);
+    view->chars[3] = ClActSys_LoadChars(arc, 44, TRUE, 0, HEAPID_MAILBOX_VIEW);
+    view->palettes[1] = ClActSys_LoadPltt(arc, 47, 0, 0, HEAPID_MAILBOX_VIEW);
+    view->cellAnims[1] = ClActSys_LoadCellAnims(arc, 45, 46, HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_MAILBOX_VIEW);
-    view->chars[4] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, HEAPID_MAILBOX_VIEW);
-    view->palettes[2] = func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x80, HEAPID_MAILBOX_VIEW);
-    view->cellAnims[2] = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0),
-                                       HEAPID_MAILBOX_VIEW);
+    view->chars[4] = ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, HEAPID_MAILBOX_VIEW);
+    view->palettes[2] = ClActSys_LoadPltt(arc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x80, HEAPID_MAILBOX_VIEW);
+    view->cellAnims[2] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(0),
+                                                AppMenuCommon_GetTouchBarAnimFile(0), HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
 }
 

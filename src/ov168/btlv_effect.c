@@ -311,7 +311,7 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
         BtlvClact_SetGauge(sBtlvEffect->clact, func_ov167_0219e39c(sBtlvEffect->setup.mainModule)->turnLimit, 0);
     }
     BtlvMcss_SetFlatAll(sBtlvEffect->mcss);
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     for (i = 0; i < 8; i++) {
         sBtlvEffect->trainers[i] = -1;
     }
@@ -343,7 +343,7 @@ void BtlvEffect_Exit(void) {
         BtlvGauge_Delete(sBtlvEffect->gauge);
         BtlvTimer_Delete(sBtlvEffect->timer);
         BtlvBg_Delete(sBtlvEffect->bg);
-        func_0204fb4c();
+        Particle_Free();
         BtlvEffvm_Delete(sBtlvEffect->effvm);
         GFL_TCBRemove(sBtlvEffect->vblankTask);
         func_0203a610(sBtlvEffect->tcbManager);
@@ -372,7 +372,7 @@ void BtlvEffect_Main(void) {
         // The game reads the polygon list RAM count before each of these and drops it, likely what is left of a debug
         // print of the counts
         reg_G3X_RAM_COUNT;
-        func_0204f954();
+        Particle_DrawAndUpdateAll();
         reg_G3X_RAM_COUNT;
         GFL_G3DSysReqSwapBuffers();
     }
@@ -1154,7 +1154,7 @@ static void BtlvEffect_EndAllTasks(void) {
 }
 
 static void BtlvEffect_VBlankTask(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(sBtlvEffect->palFade);
 }
 
@@ -1321,7 +1321,7 @@ static void BtlvEffect_DelayedMoveTaskEnd(TCB *tcb) {
 
 static void BtlvEffect_UpdateIdleEffect(void) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    BOOL touched = func_0203da48();
+    BOOL touched = GFL_HIDIsTouchPressed();
     s32 pick;
     u32 effect;
 

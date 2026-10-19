@@ -325,10 +325,10 @@ WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void
     p_wk->record =
         GFL_HeapAllocate(heapId, sizeof(GdbField) * WBM_GDB_FIELD_TABLE_MAX, FALSE, "wifibattlematch_net.c", 716);
     MI_CpuFill8(p_wk->record, 0, sizeof(GdbField) * WBM_GDB_FIELD_TABLE_MAX);
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         GFL_ASSERT(0);
     }
-    func_02040c20(0x2400, sNetCommands, 7, p_wk);
+    NetCommand_AddTable(0x2400, sNetCommands, 7, p_wk);
     func_02042d8c(0);
     DWCRap_SetErrorFunc(WifiBattleMatchNet_OnDwcError, p_wk);
     DWCRap_SetEventFunc(WifiBattleMatchNet_OnDwcEvent, p_wk);
@@ -338,7 +338,7 @@ WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void
 void WifiBattleMatchNet_Delete(WifiBattleMatchNet *p_wk) {
     DWCRap_SetEventFunc(NULL, NULL);
     DWCRap_SetErrorFunc(NULL, NULL);
-    func_02040c64(0x2400);
+    NetCommand_RemoveTable(0x2400);
     GFL_HeapFree(p_wk->record);
     GFL_HeapFree(p_wk);
 }
@@ -348,18 +348,18 @@ void WifiBattleMatchNet_Nop(WifiBattleMatchNet *p_wk) {
 
 void WifiBattleMatchNet_StartSync(WifiBattleMatchNet *p_wk, u32 syncId) {
     p_wk->syncId = syncId;
-    func_02040624(func_02040440(), (u8)p_wk->syncId, 0x24);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), (u8)p_wk->syncId, 0x24);
 }
 
 BOOL WifiBattleMatchNet_CheckSync(WifiBattleMatchNet *p_wk) {
-    return func_02040664(func_02040440(), (u8)p_wk->syncId, 0x24);
+    return NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), (u8)p_wk->syncId, 0x24);
 }
 
 u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
     WifiBattleMatchNetError *error = &p_wk->error;
     WifiBattleMatchNetResult result = WBM_RESULT_OK;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (GFL_NetErrCheck()) {
             func_02042e94(0);
             func_02042e9c(0);
@@ -421,14 +421,14 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
         }
         switch (result) {
         case WBM_RESULT_DISCONNECTED:
-            func_02042478();
-            func_020424e4();
+            NetState_ClearError();
+            NetState_ClearWifiError();
             GFL_NetErrShowScreen();
             GFL_NetErrClear();
             break;
         case WBM_RESULT_FAILED:
             if (!GFL_NetErrCheck()) {
-                func_020424ac(0, 0, 0, 0x3f7);
+                NetState_RecordError(0, 0, 0, 0x3f7);
                 GFL_NetErrRecord();
             }
             GFL_NetErrMarkShown();
@@ -496,7 +496,7 @@ void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u
     if (mode == 1) {
         modValue += a2;
     }
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         GFL_NetErrAbort();
     }
     func_ov011_02160170();
@@ -548,9 +548,9 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         p_wk->matchState = 2;
         break;
     case 2:
-        switch (func_020420b4()) {
+        switch (NetState_GetWifiStatus()) {
         case 0: {
-            GFLNetErrorInfo *info = func_02042540();
+            GFLNetErrorInfo *info = NetState_GetErrorInfo();
 
             if ((u32)(info->type - 0x3f0) <= 1) {
                 WifiBattleMatchNet_ResetEnd(p_wk);
@@ -571,8 +571,8 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 3:
-        if (func_0203ffc4()) {
-            if (func_02040504()) {
+        if (NetSystem_GetNetId()) {
+            if (NetHandle_SendNegotiation()) {
                 p_wk->matchState = 4;
             }
             if (p_wk->matchTimer++ > 3600) {
@@ -585,7 +585,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 4:
-        func_02040624(func_02040440(), 0xf, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xf, 0x24);
         p_wk->matchTimer = 0;
         p_wk->matchState = 6;
         break;
@@ -593,8 +593,8 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         if (p_wk->matchTimer++ > 3600) {
             WifiBattleMatchNet_ResetEnd(p_wk);
             p_wk->matchState = 7;
-        } else if (func_02040474() && func_02040504()) {
-            func_02040624(func_02040440(), 0xf, 0x24);
+        } else if (NetHandle_CountNegotiated() && NetHandle_SendNegotiation()) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xf, 0x24);
             p_wk->matchTimer = 0;
             p_wk->matchState = 6;
         }
@@ -603,17 +603,17 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         if (p_wk->matchTimer++ > 3600) {
             WifiBattleMatchNet_ResetEnd(p_wk);
             p_wk->matchState = 7;
-        } else if (func_02040664(func_02040440(), 0xf, 0x24)) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xf, 0x24)) {
             p_wk->matchState = 8;
         }
         break;
     case 7:
         if (WifiBattleMatchNet_EndMain(p_wk)) {
-            GFLNetErrorInfo *info = func_02042540();
+            GFLNetErrorInfo *info = NetState_GetErrorInfo();
 
             if ((u32)(info->type - 0x3f0) <= 1) {
-                func_020424e4();
-                func_02042478();
+                NetState_ClearWifiError();
+                NetState_ClearError();
                 GFL_NetErrClear();
                 func_020421ac(TRUE);
             }
@@ -621,7 +621,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 8:
-        func_02042bc4();
+        GFL_NetIsParent();
         return 1;
     }
     return 0;
@@ -674,7 +674,7 @@ BOOL WifiBattleMatchNet_EndMain(WifiBattleMatchNet *p_wk) {
 
 BOOL WifiBattleMatchNet_SendCmd2402(WifiBattleMatchNet *p_wk) {
     if (DWCRap_IsConnected()) {
-        return func_02042be8(func_02040440(), 0x2402, 4, &sCmd2402Data);
+        return GFL_NetSendCommand(NetHandle_GetOwn(), 0x2402, 4, &sCmd2402Data);
     }
     return TRUE;
 }
@@ -689,10 +689,10 @@ BOOL WifiBattleMatchNet_TakeCmd2402(WifiBattleMatchNet *p_wk) {
 }
 
 BOOL WifiBattleMatchNet_SendPerson(WifiBattleMatchNet *p_wk) {
-    BOOL toServer = func_02042a6c(func_02040440()) == 0;
+    BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
 
     JoinAvenuePerson_InitPlayer(&p_wk->person, p_wk->gameData);
-    return func_02042c18(func_02040440(), toServer, 0x2406, 0xc4, &p_wk->person, TRUE, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), toServer, 0x2406, 0xc4, &p_wk->person, TRUE, FALSE, TRUE);
 }
 
 BOOL WifiBattleMatchNet_TakePerson(WifiBattleMatchNet *p_wk) {
@@ -712,7 +712,7 @@ static void WifiBattleMatchNet_GetLoginDate(u8 *dest) {
     RTCDate date;
     RTCTime time;
 
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         GFL_NetErrAbort();
     }
     if (!func_ov011_0215dda8(&date, &time)) {
@@ -816,7 +816,7 @@ void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind
                 break;
             }
         } else {
-            func_02042bc4();
+            GFL_NetIsParent();
             p_wk->param.format = a3;
             p_wk->param.outcome = a4[0];
             p_wk->param.mine = a4[4];
@@ -854,7 +854,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
     if (out != NULL) {
         *out = p_wk->flag170;
     }
-    netError = func_02042540();
+    netError = NetState_GetErrorInfo();
     if ((u32)(netError->type - 0x3f0) <= 1) {
         p_wk->flag164 = TRUE;
     }
@@ -876,14 +876,14 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         if (p_wk->flag164 != 0) {
             p_wk->state = 4;
         } else {
-            func_02040624(func_02040440(), 4, 0x24);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 4, 0x24);
             p_wk->state = 1;
         }
         break;
     case 1:
         if (p_wk->flag164 != 0) {
             p_wk->state = 4;
-        } else if (func_02040664(func_02040440(), 4, 0x24) || p_wk->flag164 != 0) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 4, 0x24) || p_wk->flag164 != 0) {
             p_wk->state = 2;
         }
         break;
@@ -922,7 +922,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         p_wk->state = 6;
         break;
     case 6:
-        if (func_02042bc4() || p_wk->flag164 != 0) {
+        if (GFL_NetIsParent() || p_wk->flag164 != 0) {
             p_wk->counter++;
             err = Sc_CreateSession(WifiBattleMatchNet_OnRequestDone, 100, p_wk);
             p_wk->requestSent = TRUE;
@@ -960,18 +960,18 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
             p_wk->state = 11;
         } else {
             WifiBattleMatchNet_CopyConnectionId(p_wk->p_data->mine.unk30);
-            func_02040624(func_02040440(), 1, 0x24);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 1, 0x24);
             p_wk->state = 9;
         }
         break;
     case 9:
-        if (func_02040664(func_02040440(), 1, 0x24) || p_wk->flag164 != 0) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 1, 0x24) || p_wk->flag164 != 0) {
             p_wk->state = 10;
         }
         break;
     case 10:
-        if (func_02042bc4() || p_wk->flag164 != 0) {
-            if (func_02042be8(func_02040440(), 0x2400, 0x68, &p_wk->p_data->mine) || p_wk->flag164 != 0) {
+        if (GFL_NetIsParent() || p_wk->flag164 != 0) {
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), 0x2400, 0x68, &p_wk->p_data->mine) || p_wk->flag164 != 0) {
                 p_wk->state = 11;
             }
         } else if (p_wk->flagInfoReceived != 0 || p_wk->flag164 != 0) {
@@ -1018,18 +1018,18 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         if (p_wk->flag164 != 0) {
             p_wk->state = 19;
         } else {
-            func_02040624(func_02040440(), 2, 0x24);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, 0x24);
             p_wk->state = 14;
         }
         break;
     case 14:
-        if (func_02040664(func_02040440(), 2, 0x24) || p_wk->flag164 != 0) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 2, 0x24) || p_wk->flag164 != 0) {
             p_wk->state = 15;
         }
         break;
     case 15:
-        if (func_02042bc4()) {
-            if (func_02042be8(func_02040440(), 0x2400, 0x68, &p_wk->p_data->mine) || p_wk->flag164 != 0) {
+        if (GFL_NetIsParent()) {
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), 0x2400, 0x68, &p_wk->p_data->mine) || p_wk->flag164 != 0) {
                 p_wk->state = 16;
             }
         } else if (p_wk->flagInfoReceived != 0 || p_wk->flag164 != 0) {
@@ -1041,8 +1041,8 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         }
         break;
     case 16:
-        if (!func_02042bc4()) {
-            if (func_02042be8(func_02040440(), 0x2400, 0x68, &p_wk->p_data->mine) || p_wk->flag164 != 0) {
+        if (!GFL_NetIsParent()) {
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), 0x2400, 0x68, &p_wk->p_data->mine) || p_wk->flag164 != 0) {
                 p_wk->state = 17;
             }
         } else if (p_wk->flagInfoReceived != 0 || p_wk->flag164 != 0) {
@@ -1054,11 +1054,11 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         }
         break;
     case 17:
-        func_02040624(func_02040440(), 3, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0x24);
         p_wk->state = 18;
         break;
     case 18:
-        if (func_02040664(func_02040440(), 3, 0x24) || p_wk->flag164 != 0) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 3, 0x24) || p_wk->flag164 != 0) {
             p_wk->state = 19;
         }
         break;
@@ -1108,11 +1108,11 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         p_wk->state = 23;
         break;
     case 23:
-        func_02040624(func_02040440(), 5, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 5, 0x24);
         p_wk->state = 24;
         break;
     case 24:
-        if (func_02040664(func_02040440(), 5, 0x24) || p_wk->flag164 != 0) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 5, 0x24) || p_wk->flag164 != 0) {
             p_wk->state = 25;
         }
         break;
@@ -1492,7 +1492,7 @@ static int WifiBattleMatchNet_SetNoRating1C(WifiBattleMatchNetInfo *info, WifiBa
 static void WifiBattleMatchNet_OnInfoReceived(int netId, int size, const void *data, void *work, NetHandle *handle) {
     WifiBattleMatchNet *p_wk = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         MI_CpuCopy8(data, &p_wk->p_data->theirs, 0x68);
         p_wk->flagInfoReceived = 1;
     }
@@ -1504,7 +1504,7 @@ static void WifiBattleMatchNet_OnPlayerInfoReceived(int netId, int size, const v
     PlayerInfo *info = GameData_GetPlayerInfoByNetID(p_wk->gameData, netId);
 
     MI_CpuCopy8(data, info, PlayerInfo_GetSize());
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         p_wk->flagPlayerInfoReceived = 1;
     }
 }
@@ -1512,7 +1512,7 @@ static void WifiBattleMatchNet_OnPlayerInfoReceived(int netId, int size, const v
 static void *WifiBattleMatchNet_GetRecvBuffer(int netId, void *work, int size) {
     WifiBattleMatchNet *p_wk = work;
 
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         GFL_ASSERT(0);
         return NULL;
     }
@@ -1522,7 +1522,7 @@ static void *WifiBattleMatchNet_GetRecvBuffer(int netId, void *work, int size) {
 static void WifiBattleMatchNet_OnCmd2402(int netId, int size, const void *data, void *work, NetHandle *handle) {
     WifiBattleMatchNet *p_wk = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         p_wk->flag140 = 1;
     }
 }
@@ -1530,7 +1530,7 @@ static void WifiBattleMatchNet_OnCmd2402(int netId, int size, const void *data, 
 static void WifiBattleMatchNet_OnPartyReceived(int netId, int size, const void *data, void *work, NetHandle *handle) {
     WifiBattleMatchNet *p_wk = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         p_wk->flagPartyReceived = 1;
     }
 }
@@ -1538,7 +1538,7 @@ static void WifiBattleMatchNet_OnPartyReceived(int netId, int size, const void *
 static void WifiBattleMatchNet_OnCmd2404(int netId, int size, const void *data, void *work, NetHandle *handle) {
     WifiBattleMatchNet *p_wk = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         p_wk->flag148 = 1;
     }
 }
@@ -1547,7 +1547,7 @@ static void WifiBattleMatchNet_OnValueReceived(int netId, int size, const void *
     WifiBattleMatchNet *p_wk = work;
     u32 value = *(const u32 *)data;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         p_wk->receivedValue = value;
         p_wk->flagValueReceived = 1;
     }
@@ -1557,7 +1557,7 @@ static void WifiBattleMatchNet_OnPersonReceived(int netId, int size, const void 
     WifiBattleMatchNet *p_wk = work;
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(p_wk->gameData));
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         JoinAvenuePerson *person = (JoinAvenuePerson *)data;
 
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_26, 1);
@@ -2129,10 +2129,11 @@ u32 WifiBattleMatchNet_GetRecordId(WifiBattleMatchNet *p_wk) {
 }
 
 BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const void *data) {
-    BOOL toServer = func_02042a6c(func_02040440()) == 0;
-    NetHandle *handle = func_02040440();
+    BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
+    NetHandle *handle = NetHandle_GetOwn();
 
-    return func_02042c18(handle, toServer, 0x2401, PokeParty_GetSaveDataSize() + 0xd4, data, TRUE, TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(handle, toServer, 0x2401, PokeParty_GetSaveDataSize() + 0xd4, data, TRUE, TRUE,
+                                       TRUE);
 }
 
 BOOL WifiBattleMatchNet_TakePlayerInfo(WifiBattleMatchNet *p_wk, void **out) {
@@ -2146,10 +2147,10 @@ BOOL WifiBattleMatchNet_TakePlayerInfo(WifiBattleMatchNet *p_wk, void **out) {
 }
 
 BOOL WifiBattleMatchNet_SendParty(WifiBattleMatchNet *p_wk, PokeParty *party) {
-    BOOL toServer = func_02042a6c(func_02040440()) == 0;
-    NetHandle *handle = func_02040440();
+    BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
+    NetHandle *handle = NetHandle_GetOwn();
 
-    return func_02042c18(handle, toServer, 0x2403, PokeParty_GetSaveDataSize(), party, TRUE, TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(handle, toServer, 0x2403, PokeParty_GetSaveDataSize(), party, TRUE, TRUE, TRUE);
 }
 
 BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party) {
@@ -2163,9 +2164,9 @@ BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party) {
 }
 
 BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const void *data) {
-    BOOL toServer = func_02042a6c(func_02040440()) == 0;
+    BOOL toServer = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
 
-    return func_02042c18(func_02040440(), toServer, 0x2404, 4, data, TRUE, TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), toServer, 0x2404, 4, data, TRUE, TRUE, TRUE);
 }
 
 BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out) {
@@ -2179,7 +2180,7 @@ BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out) {
 }
 
 BOOL WifiBattleMatchNet_SendReportValue(WifiBattleMatchNet *p_wk, const void *data) {
-    return func_02042be8(func_02040440(), 0x2405, 4, data);
+    return GFL_NetSendCommand(NetHandle_GetOwn(), 0x2405, 4, data);
 }
 
 BOOL WifiBattleMatchNet_TakeReportValue(WifiBattleMatchNet *p_wk, u32 *out) {
@@ -2242,7 +2243,7 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
     case 4:
         NdReportResults();
         if (p_wk->timer++ > 7200) {
-            func_020424ac(0, 0, 0, 0x3f7);
+            NetState_RecordError(0, 0, 0, 0x3f7);
             WifiBattleMatchNet_StartDownloadCancel(p_wk, 8);
         }
         if (sDownload.done == 0) {
@@ -2286,7 +2287,7 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
     case 100:
         NdReportResults();
         if (p_wk->timer++ > 7200) {
-            func_020424ac(0, 0, 0, 0x3f7);
+            NetState_RecordError(0, 0, 0, 0x3f7);
             WifiBattleMatchNet_StartDownloadCancel(p_wk, 8);
         }
         if (sDownload.code != 0) {
@@ -2783,13 +2784,13 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
 static void WifiBattleMatchNet_SetTimeoutError(WifiBattleMatchNetError *error, int code, int line) {
     error->timeoutCode = code;
     error->kind = WBM_ERROR_TIMEOUT;
-    func_020424ac(0, 0, 0, 0x3f5);
+    NetState_RecordError(0, 0, 0, 0x3f5);
 }
 
 static void WifiBattleMatchNet_SetDwcError(WifiBattleMatchNetError *error, int code, int line) {
     error->dwcCode = code;
     error->kind = WBM_ERROR_DWC;
-    func_020424ac(0, 0, 0, 0x3f7);
+    NetState_RecordError(0, 0, 0, 0x3f7);
 }
 
 static void WifiBattleMatchNet_SetGdbError(WifiBattleMatchNetError *error, int code, int line) {
@@ -2955,7 +2956,7 @@ static void WifiBattleMatchNet_ClearError(WifiBattleMatchNetError *error) {
 
 void WifiBattleMatchNet_ShowIcon(WifiBattleMatchNet *p_wk, int a1) {
     if (a1 != 0) {
-        func_02042ba8(TRUE, p_wk->msgHeapId);
+        GFL_NetSetIconScreen(TRUE, p_wk->msgHeapId);
     }
 }
 

@@ -249,7 +249,7 @@ static void LocalTvtCallMode_SeqFadeInSelect(LocalTvtSeq *seq, int *step, void *
 
         LocalTvtCallMode_GetSelectSetup(mode, &setup);
         mode->select = LocalTvtCallSelect_Create(&setup, mode->heapId);
-        func_02042ba8(FALSE, mode->heapId);
+        GFL_NetSetIconScreen(FALSE, mode->heapId);
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
         (*step)++;
         break;
@@ -314,7 +314,7 @@ static void LocalTvtCallMode_SeqSelect(LocalTvtSeq *seq, int *step, void *work) 
 
             LocalTvtCallMode_GetSelectSetup(mode, &setup);
             mode->select = LocalTvtCallSelect_Create(&setup, mode->heapId);
-            func_02042ba8(FALSE, mode->heapId);
+            GFL_NetSetIconScreen(FALSE, mode->heapId);
         }
         (*step)++;
         break;

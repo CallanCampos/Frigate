@@ -663,7 +663,7 @@ static u32 DebugGameStart_UpdateMenu(DebugGameStartWork *wk) {
     {
         TouchRectTable table = sDebugTouchRects;
 
-        touched = func_0203da0c(table.rects);
+        touched = GFL_HIDGetTouchPressedRect(table.rects);
     }
     if (touched != TOUCH_RECT_NONE) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);

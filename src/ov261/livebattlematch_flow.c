@@ -932,11 +932,11 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
         }
         break;
     case 16:
-        func_02040624(func_02040440(), 0x48, 0x1f);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x48, 0x1f);
         *seq = 17;
         break;
     case 17:
-        if (func_02040664(func_02040440(), 0x48, 0x1f)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x48, 0x1f)) {
             *seq = 18;
         }
         break;
@@ -1019,11 +1019,11 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 35, 2, 40, 34);
         break;
     case 34:
-        func_02040624(func_02040440(), 0x47, 0x1f);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x47, 0x1f);
         *seq = 35;
         break;
     case 35:
-        if (func_02040664(func_02040440(), 0x47, 0x1f)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x47, 0x1f)) {
             *seq = 36;
         }
         break;

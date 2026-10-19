@@ -171,7 +171,7 @@ static int BBagMain_StateInit(BBagWork *work) {
     } else {
         BBagUi_CreateCursor(work, work->page, 0);
     }
-    func_02042ba8(FALSE, work->param->heapId);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, PALFADE_VRAM_SUB_OBJ, 0xe0, 0x20);
     PaletteFade_StartFade(work->paletteFade, 0xa, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
     if (work->param->mode == 3) {
@@ -205,7 +205,7 @@ static int BBagMain_StateInitLauncher(BBagWork *work) {
     }
     BAppCursor_SetVisible(work->cursor, work->cursorVisible);
     BBagUi_CreateCursor(work, work->page, 0);
-    func_02042ba8(FALSE, work->param->heapId);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, PALFADE_VRAM_SUB_OBJ, 0xe0, 0x20);
     PaletteFade_StartFade(work->paletteFade, 0xa, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
     work->initialized = TRUE;
@@ -542,14 +542,14 @@ static int BBagMain_StateCloseMessage(BBagWork *work) {
 static int BBagMain_StatePrintMessage(BBagWork *work) {
     switch (PrintStream_GetState(work->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             PrintStream_SkipWait(work->printStream, 0);
         }
         work->streamAdvanced = FALSE;
         break;
     case PRINT_STREAM_PAUSED:
         if (work->streamAdvanced == FALSE &&
-            (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             BBagMain_PlayMessageSE(work, SEQ_SE_MESSAGE);
             PrintStream_Continue(work->printStream);
             work->streamAdvanced = TRUE;
@@ -568,7 +568,7 @@ static int BBagMain_StateWaitMessageKey(BBagWork *work) {
     if (BBagMain_CheckQuit(work) == TRUE) {
         return 0x12;
     }
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
         return work->nextSeq;
     }
     return 0xf;

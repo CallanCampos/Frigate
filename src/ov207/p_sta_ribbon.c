@@ -164,9 +164,9 @@ void PStaRibbon_CreateActors(PStatusWork *wk, PStaRibbonWork *ribbon) {
     setup.bgPriority = 0;
     setup.sequence = 0;
     ribbon->cursor =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(12)], wk->clResources[PSTA_RES_PLTT(11)],
-                      wk->clResources[PSTA_RES_CELL(12)], &setup, 0, wk->heapId);
-    func_0204c124(ribbon->cursor, FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(12)], wk->clResources[PSTA_RES_PLTT(11)],
+                       wk->clResources[PSTA_RES_CELL(12)], &setup, 0, wk->heapId);
+    ClActor_SetVisible(ribbon->cursor, FALSE);
     oamSetup.x = ROW_X;
     oamSetup.palette = wk->clResources[PSTA_RES_PLTT(8)];
     oamSetup.paletteOffset = 0;
@@ -187,7 +187,7 @@ void PStaRibbon_CreateActors(PStatusWork *wk, PStaRibbonWork *ribbon) {
 void PStaRibbon_FreeActors(PStatusWork *wk, PStaRibbonWork *ribbon) {
     u8 i;
 
-    func_0204c108(ribbon->cursor);
+    ClActor_Delete(ribbon->cursor);
     for (i = 0; i < ROW_COUNT; i++) {
         PStaOam_FreeActor(ribbon->rows[i].oam);
         GFL_BitmapFree(ribbon->rows[i].bitmap);
@@ -232,8 +232,8 @@ static BOOL PStaRibbon_HandleDetailKeys(PStatusWork *wk, PStaRibbonWork *ribbon)
 
     if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
         PStatus_EnableInput(wk, TRUE);
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
-        func_0204c124(ribbon->cursor, FALSE);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetVisible(ribbon->cursor, FALSE);
         ribbon->cursorRow = ROW_NONE;
         ribbon->cursorEntry = CURSOR_NONE;
         ribbon->cursorMoved = TRUE;
@@ -314,8 +314,8 @@ static void PStaRibbon_HandleDetailTouch(PStatusWork *wk, PStaRibbonWork *ribbon
 
     if (wk->touchHit == PSTA_BUTTON_BACK) {
         PStatus_EnableInput(wk, TRUE);
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
-        func_0204c124(ribbon->cursor, FALSE);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetVisible(ribbon->cursor, FALSE);
         ribbon->cursorRow = ROW_NONE;
         ribbon->cursorEntry = CURSOR_NONE;
         ribbon->cursorMoved = TRUE;
@@ -325,7 +325,7 @@ static void PStaRibbon_HandleDetailTouch(PStatusWork *wk, PStaRibbonWork *ribbon
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         return;
     }
-    if (func_0203da48() == TRUE && wk->touchX > ROW_X && wk->touchX < LIST_RIGHT) {
+    if (GFL_HIDIsTouchPressed() == TRUE && wk->touchX > ROW_X && wk->touchX < LIST_RIGHT) {
         hit = PStaRibbon_GetTouchedRow(wk, ribbon);
         if (hit != TOUCH_RECT_NONE) {
             ribbon->cursorRow = hit;
@@ -333,12 +333,13 @@ static void PStaRibbon_HandleDetailTouch(PStatusWork *wk, PStaRibbonWork *ribbon
             ribbon->cursorEntry = PStaRibbon_GetRowEntry(ribbon, hit);
             ribbon->isDragging = TRUE;
             ribbon->scrollSpeed = 0;
-            func_0204c124(ribbon->cursor, FALSE);
+            ClActor_SetVisible(ribbon->cursor, FALSE);
             PStaRibbon_FreeDetailWindows(wk, ribbon);
             PStaRibbon_PrintDetail(wk, ribbon);
         }
         wk->isTouch = TRUE;
-    } else if (func_0203da2c() == TRUE && ribbon->isDragging == TRUE && wk->touchX > ROW_X && wk->touchX < LIST_RIGHT) {
+    } else if (GFL_HIDIsTouchHeld() == TRUE && ribbon->isDragging == TRUE && wk->touchX > ROW_X &&
+               wk->touchX < LIST_RIGHT) {
         dy = wk->prevTouchY - wk->touchY;
         speed = dy * 2;
         PStaRibbon_Scroll(wk, ribbon, dy);
@@ -396,7 +397,7 @@ static s32 PStaRibbon_GetTouchedRow(PStatusWork *wk, PStaRibbonWork *ribbon) {
         }
     }
     rects[ROW_COUNT].top = TOUCH_RECT_END;
-    return func_0203da0c(rects);
+    return GFL_HIDGetTouchPressedRect(rects);
 }
 
 static void PStaRibbon_SelectVisibleRow(PStatusWork *wk, PStaRibbonWork *ribbon) {
@@ -408,7 +409,7 @@ static void PStaRibbon_MoveCursor(PStatusWork *wk, PStaRibbonWork *ribbon, u8 ro
 
     pos.x = ROW_X;
     pos.y = PStaRibbon_GetRowY(ribbon, row);
-    func_0204c140(ribbon->cursor, &pos, 0);
+    ClActor_SetSurfacePos(ribbon->cursor, &pos, 0);
     ribbon->cursorRow = row;
     ribbon->cursorMoved = TRUE;
     ribbon->cursorEntry = PStaRibbon_GetRowEntry(ribbon, row);
@@ -483,7 +484,7 @@ void PStaRibbon_Draw(PStatusWork *wk, PStaRibbonWork *ribbon) {
     ribbon->prevCursorRow = ROW_NONE;
     ribbon->isShown = TRUE;
     ribbon->needsRedraw = TRUE;
-    func_0204c488(wk->buttons[PSTA_BUTTON_RIBBON], 5);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_RIBBON], 5);
 }
 
 void PStaRibbon_Unload(PStatusWork *wk, PStaRibbonWork *ribbon) {
@@ -507,7 +508,7 @@ void PStaRibbon_Clear(PStatusWork *wk, PStaRibbonWork *ribbon) {
     GFL_BGSysFillScrArea(1, 0, 0, 0, 19, 21, 16);
     GFL_BGSysLoadScr(1);
     ribbon->isShown = FALSE;
-    func_0204c488(wk->buttons[PSTA_BUTTON_RIBBON], 2);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_RIBBON], 2);
 }
 
 void PStaRibbon_LoadPokemon(PStatusWork *wk, PStaRibbonWork *ribbon) {
@@ -684,17 +685,17 @@ static void PStaRibbon_ShowDetail(PStatusWork *wk, PStaRibbonWork *ribbon) {
     BmpWin_FlushMap(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     arc = GFL_ArcSysCreateFileHandle(ARCID_P_STATUS, wk->heapId);
-    ribbon->iconChars = func_0204b81c(arc, Ribbon_GetData(id, RIBBON_DATA_ICON), FALSE, 1, wk->heapId);
+    ribbon->iconChars = ClActSys_LoadChars(arc, Ribbon_GetData(id, RIBBON_DATA_ICON), FALSE, 1, wk->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 128;
     setup.y = 100;
     setup.priority = 10;
     setup.bgPriority = 0;
     setup.sequence = 0;
-    ribbon->icon = func_0204c040(wk->actorUnit, ribbon->iconChars, wk->clResources[PSTA_RES_PLTT(7)],
-                                 wk->clResources[PSTA_RES_CELL(11)], &setup, 1, wk->heapId);
-    func_0204c378(ribbon->icon, (u8)Ribbon_GetData(id, RIBBON_DATA_PALETTE), 1);
-    func_0204c124(ribbon->icon, TRUE);
+    ribbon->icon = ClActor_Create(wk->actorUnit, ribbon->iconChars, wk->clResources[PSTA_RES_PLTT(7)],
+                                  wk->clResources[PSTA_RES_CELL(11)], &setup, 1, wk->heapId);
+    ClActor_SetPalette(ribbon->icon, (u8)Ribbon_GetData(id, RIBBON_DATA_PALETTE), 1);
+    ClActor_SetVisible(ribbon->icon, TRUE);
     GFL_BGSysBufferScrDefault(6, ribbon->screens[2].screen->rawData, ribbon->screens[2].screen->size);
     GFL_BGSysQueueScrLoad(6);
     ribbon->isDetailShown = TRUE;
@@ -713,8 +714,8 @@ static void PStaRibbon_FreeDetailWindows(PStatusWork *wk, PStaRibbonWork *ribbon
 
 static void PStaRibbon_HideDetail(PStatusWork *wk, PStaRibbonWork *ribbon) {
     if (ribbon->isDetailShown == TRUE) {
-        func_0204b98c(ribbon->iconChars);
-        func_0204c108(ribbon->icon);
+        ClActSys_FreeChars(ribbon->iconChars);
+        ClActor_Delete(ribbon->icon);
         GFL_BGSysFillScrAsync(4, 0);
         GFL_BGSysQueueScrLoad(4);
         ribbon->isDetailShown = FALSE;

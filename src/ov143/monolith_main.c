@@ -169,7 +169,7 @@ static BOOL Monolith_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->bottomProcMgr = CreateGameProcManager(HEAPID_MONOLITH);
     AppPrintsysCommon_Init(&wk->printsys, APP_PRINTSYS_COMMON_KEYS | APP_PRINTSYS_COMMON_TOUCH);
     wk->vblankTask = GFL_VBlankTCBAdd(Monolith_VBlank, wk, 10);
-    func_02042ba8(FALSE, HEAPID_MONOLITH);
+    GFL_NetSetIconScreen(FALSE, HEAPID_MONOLITH);
     wk->screen.param = param;
     wk->screen.work = wk;
     wk->screen.state = &wk->state;
@@ -253,7 +253,7 @@ static BOOL Monolith_Main(GameProc *proc, u32 *state, void *param, void *work) {
     }
     GFL_TCBExMgrUpdate(wk->tcbMgr);
     PrintQueue_Main(wk->printQueue);
-    func_0204b794();
+    ClActSys_Draw();
     return FALSE;
 }
 
@@ -402,8 +402,8 @@ static void Monolith_CreateActors(MonolithWork *wk) {
     setup.charCount = 96;
     setup.cellAnimCount = 64;
     ClActSys_Create(&setup, &sMonolithVRAMConfig, HEAPID_MONOLITH);
-    wk->clactUnit = func_0204bf1c(96, 0, HEAPID_MONOLITH);
-    func_0204c028(wk->clactUnit);
+    wk->clactUnit = ClActUnit_Create(96, 0, HEAPID_MONOLITH);
+    ClActUnit_UseSystemRenderer(wk->clactUnit);
     wk->palSlots = ActorTool_CreatePalSlots(HEAPID_MONOLITH, 16, 16);
     wk->bmpOam = BmpOam_Init(HEAPID_MONOLITH, wk->clactUnit);
 }
@@ -412,8 +412,8 @@ static void Monolith_FreeActors(MonolithWork *wk) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, FALSE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);
     BmpOam_Exit(wk->bmpOam);
-    func_0204bf98(wk->clactUnit);
-    func_0204b758();
+    ClActUnit_Delete(wk->clactUnit);
+    ClActSys_Delete();
     ActorTool_DeletePalSlots(wk->palSlots);
 }
 
@@ -429,8 +429,8 @@ static void Monolith_LoadActorResources(MonolithWork *wk) {
         }
         wk->actorRes[i].palette =
             ActorTool_LoadPalettesFade(wk->fade, wk->palSlots, wk->arc, 3, sub, 5, HEAPID_MONOLITH);
-        wk->actorRes[i].chars = func_0204b81c(wk->arc, 0, TRUE, sub, HEAPID_MONOLITH);
-        wk->actorRes[i].cellAnims = func_0204bde0(wk->arc, 1, 2, HEAPID_MONOLITH);
+        wk->actorRes[i].chars = ClActSys_LoadChars(wk->arc, 0, TRUE, sub, HEAPID_MONOLITH);
+        wk->actorRes[i].cellAnims = ClActSys_LoadCellAnims(wk->arc, 1, 2, HEAPID_MONOLITH);
         wk->actorRes[i].fontPalette =
             ActorTool_LoadPaletteFade(wk->fade, wk->palSlots, fontArc, 5, sub, 1, HEAPID_MONOLITH);
     }
@@ -447,8 +447,8 @@ static void Monolith_FreeActorResources(MonolithWork *wk) {
             sub = TRUE;
         }
         ActorTool_FreePalette(wk->palSlots, wk->actorRes[i].palette, sub);
-        func_0204b98c(wk->actorRes[i].chars);
-        func_0204be64(wk->actorRes[i].cellAnims);
+        ClActSys_FreeChars(wk->actorRes[i].chars);
+        ClActSys_FreeCellAnims(wk->actorRes[i].cellAnims);
         ActorTool_FreePalette(wk->palSlots, wk->actorRes[i].fontPalette, sub);
     }
 }
@@ -456,7 +456,7 @@ static void Monolith_FreeActorResources(MonolithWork *wk) {
 static void Monolith_VBlank(TCB *tcb, void *data) {
     MonolithWork *wk = data;
 
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->fade);
 }
 

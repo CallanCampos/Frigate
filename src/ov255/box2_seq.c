@@ -373,7 +373,7 @@ static int Box2Seq_Init(Box2SysWork *syswk) {
     func_ov255_021d23d8(syswk);
     Box2Main_InitYesNo(syswk);
     Box2Main_SetBlendAlpha(TRUE);
-    func_02042ba8(TRUE, HEAPID_BOX2_APP);
+    GFL_NetSetIconScreen(TRUE, HEAPID_BOX2_APP);
     Box2Main_InitVBlank(syswk);
     return syswk->nextSeq;
 }
@@ -433,14 +433,14 @@ static int Box2Seq_VFunc(Box2SysWork *syswk) {
 }
 
 static int Box2Seq_TrgWait(Box2SysWork *syswk) {
-    if (func_0203da48() == TRUE) {
+    if (GFL_HIDIsTouchPressed() == TRUE) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return syswk->nextSeq;
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return syswk->nextSeq;
     }
     return BOX2SEQ_TRGWAIT;
@@ -732,7 +732,7 @@ static int func_ov255_021c30f8(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
                 func_ov255_021ceed0(syswk, sMenu71f0, 6);
             }
@@ -1011,7 +1011,7 @@ static int func_ov255_021c385c(Box2SysWork *syswk) {
             func_ov255_021d1ac8(syswk, 0, 0);
             if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 GFL_SndSEPlay(SEQ_SE_SYS_39);
-                func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+                GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                 Box2Main_PokeInfoPut(syswk, res);
                 CursorMove_SetPos(syswk->app->cursorMove, res);
                 return func_ov255_021cd32c(syswk, res, 21);
@@ -1505,7 +1505,7 @@ static int func_ov255_021c445c(Box2SysWork *syswk) {
             return 36;
         }
     } else if (syswk->unk18 == 3) {
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             res = func_ov255_021d34e0();
             if (res != 0xffffffff) {
                 func_ov255_021d208c(syswk, syswk->app->rangeSelect.startPos, res, 0);
@@ -1541,7 +1541,7 @@ static int func_ov255_021c445c(Box2SysWork *syswk) {
             for (y = 0; y < syswk->app->rangeHeight; y++) {
                 if (res >= syswk->pos + y * 6 && res < syswk->app->rangeWidth + (syswk->pos + y * 6)) {
                     GFL_SndSEPlay(SEQ_SE_SYS_39);
-                    func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+                    GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                     CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
                     Box2Main_PokeInfoPut(syswk, syswk->pos);
                     syswk->app->unkA5B4 = TRUE;
@@ -2170,7 +2170,7 @@ static int func_ov255_021c53f4(Box2SysWork *syswk) {
             return 42;
         }
     } else if (syswk->unk18 == 3) {
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             res = func_ov255_021d34e0();
             if (res != 0xffffffff) {
                 func_ov255_021d208c(syswk, syswk->app->rangeSelect.startPos, res, 0);
@@ -2200,7 +2200,7 @@ static int func_ov255_021c53f4(Box2SysWork *syswk) {
         }
         return 42;
     } else if (syswk->unk18 == 4) {
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             if (func_ov255_021d3604() == TRUE) {
                 res = func_ov255_021d3524();
                 if (res != 0xffffffff) {
@@ -2238,7 +2238,7 @@ static int func_ov255_021c53f4(Box2SysWork *syswk) {
                 for (i = 0; i < syswk->app->rangeHeight; i++) {
                     if (res >= syswk->pos + i * 6 && res < syswk->app->rangeWidth + (syswk->pos + i * 6)) {
                         GFL_SndSEPlay(SEQ_SE_SYS_39);
-                        func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+                        GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                         CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
                         Box2Main_PokeInfoPut(syswk, syswk->pos);
                         syswk->app->unkA5B4 = TRUE;
@@ -2256,7 +2256,7 @@ static int func_ov255_021c53f4(Box2SysWork *syswk) {
                     if (res >= top + i * 2 && res < syswk->app->rangeWidth + (top + i * 2)) {
                         GFL_SndSEPlay(SEQ_SE_SYS_39);
                         func_ov255_021d208c(syswk, syswk->app->rangeSelect.startPos, syswk->app->rangeSelect.endPos, 1);
-                        func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+                        GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                         CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
                         Box2Main_PokeInfoPut(syswk, syswk->pos);
                         syswk->app->unkA5B4 = TRUE;
@@ -2643,7 +2643,7 @@ static int func_ov255_021c6058(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
                 func_ov255_021ceed0(syswk, sMenu71f0, 6);
             }
@@ -2944,7 +2944,7 @@ static int func_ov255_021c686c(Box2SysWork *syswk) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 GFL_SndSEPlay(SEQ_SE_SYS_39);
-                func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+                GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                 Box2Main_PokeInfoPut(syswk, res);
                 return func_ov255_021cd32c(syswk, res, 32);
             }
@@ -2960,7 +2960,7 @@ static int func_ov255_021c686c(Box2SysWork *syswk) {
             CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
             if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 GFL_SndSEPlay(SEQ_SE_SYS_39);
-                func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+                GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
                 Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
                 return func_ov255_021cd32c(syswk, res + BOX2_PARTY_POS, 32);
             }
@@ -3224,7 +3224,7 @@ static int func_ov255_021c6fd4(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
                 func_ov255_021ceed0(syswk, sMenu70f8, 4);
             }
@@ -3448,7 +3448,7 @@ static int func_ov255_021c762c(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
                 func_ov255_021ceed0(syswk, sMenu70f8, 4);
             }
@@ -3616,7 +3616,7 @@ static int func_ov255_021c7b98(Box2SysWork *syswk) {
     func_ov255_021cefa4(syswk->app, 27);
     func_ov255_021d11a4(syswk, 0);
     func_ov255_021bc018(syswk);
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
     }
     if (func_ov255_021d3858(syswk->app->bgWinFrame) == TRUE) {
@@ -3640,7 +3640,7 @@ static int func_ov255_021c7c10(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
                 func_ov255_021ceed0(syswk, sMenu7194, 5);
             }
@@ -3860,7 +3860,7 @@ static int func_ov255_021c8238(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
                 func_ov255_021ceed0(syswk, sMenu7130, 5);
             }
@@ -4207,7 +4207,7 @@ static int func_ov255_021c8b38(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             Box2Main_PokeInfoPut(syswk, res);
             return func_ov255_021cd5e4(syswk, res);
         }
@@ -4870,7 +4870,7 @@ static int func_ov255_021c9c34(Box2SysWork *syswk) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
         if (Box2Main_GetPokeParam(syswk, res + BOX2_PARTY_POS, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_39);
-            func_0203dac8(&syswk->app->tpx, &syswk->app->tpy);
+            GFL_HIDGetTouchPressedPoint(&syswk->app->tpx, &syswk->app->tpy);
             Box2Main_PokeInfoPut(syswk, res + BOX2_PARTY_POS);
             return func_ov255_021cd994(syswk, res + BOX2_PARTY_POS);
         }
@@ -6251,7 +6251,7 @@ static int func_ov255_021cbf18(Box2SysWork *syswk) {
         GFL_SndSEPlay(SEQ_SE_BEEP);
         func_ov255_021cf0a4(syswk, 24);
     }
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6268,7 +6268,7 @@ static int func_ov255_021cbfe8(Box2SysWork *syswk) {
     func_ov255_021bc018(syswk);
     Box2Main_PokeFreeCreate(syswk);
     func_ov255_021d013c(syswk->app->subWork);
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6288,7 +6288,7 @@ static int func_ov255_021cc040(Box2SysWork *syswk) {
     } else {
         func_ov255_021d0310(syswk, 2, 0);
     }
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6299,7 +6299,7 @@ static int func_ov255_021cc040(Box2SysWork *syswk) {
 
 // The item arrangement: puts the held item in the bag
 static int func_ov255_021cc0b4(Box2SysWork *syswk) {
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6340,7 +6340,7 @@ static int func_ov255_021cc198(Box2SysWork *syswk) {
 static int func_ov255_021cc1bc(Box2SysWork *syswk) {
     func_ov255_021cefa4(syswk->app, 24);
     func_ov255_021bc018(syswk);
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6408,7 +6408,7 @@ static int func_ov255_021cc330(Box2SysWork *syswk) {
     CursorMove_SetPos(syswk->app->cursorMove, syswk->pos);
     func_ov255_021d0310(syswk, 0x81, 1);
     func_ov255_021d11a4(syswk, 0);
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6417,7 +6417,7 @@ static int func_ov255_021cc330(Box2SysWork *syswk) {
 }
 
 static int func_ov255_021cc380(Box2SysWork *syswk) {
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, FALSE);
     } else {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
@@ -6472,9 +6472,9 @@ static int func_ov255_021cc460(Box2SysWork *syswk, u32 id, u32 pal, int seq) {
 // Wipes out to call a sub process
 static int func_ov255_021cc4e0(Box2SysWork *syswk, u32 type) {
     if (CursorMove_IsCursorVisible(syswk->app->cursorMove) == TRUE) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
     } else {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     syswk->nextSeq = BOX2SEQ_SUBPROC_CALL;
     syswk->subProcType = type;

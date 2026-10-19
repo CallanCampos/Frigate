@@ -94,8 +94,8 @@ void WihDwc_Destroy(void *work) {
 
     GFL_ASSERT(_localWork);
     WH_SetScanInfoCallback(NULL);
-    func_02042ed0(wk->parseWork);
-    func_02042ed0(wk);
+    GFL_NetFreeAligned32(wk->parseWork);
+    GFL_NetFreeAligned32(wk);
     _localWork = NULL;
     GFL_OvlUnload(OVERLAY_ID(31));
 }
@@ -194,7 +194,7 @@ static BOOL isLocked(WMBssDesc *bss) {
 
 u32 WihDwc_GetStatus(WifiList *wifiList) {
     u32 status = 0;
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
     int i;
     DWCApInfo apInfo;
 
@@ -204,11 +204,11 @@ u32 WihDwc_GetStatus(WifiList *wifiList) {
     if (WihDwc_FindFriendInvite(wifiList) != -1) {
         status |= 0x8;
     }
-    if (init->gameCommandBase == 0x35 && func_02042a78() > 1) {
+    if (init->gameCommandBase == 0x35 && GFL_NetGetNegotiatedCount() > 1) {
         status |= 0x4;
     }
     for (i = 0; i < init->unk62; i++) {
-        if (func_020428a8(i) != NULL) {
+        if (GFL_NetGetBeaconData(i) != NULL) {
             u8 service = func_ov030_021740a4(i);
 
             if (service >= 0x14 && service <= 0x1b) {
@@ -293,11 +293,11 @@ int WihDwc_FindFriendInvite(WifiList *wifiList) {
     int i;
     u8 mac[6];
 
-    if (func_02042788()) {
-        func_02042e84();
+    if (GFL_NetIsInitialized()) {
+        GFL_NetGetInitData();
         OS_GetMacAddress(mac);
         for (i = 0; i < 16; i++) {
-            if (func_ov030_02173b78(i) == 0x20 && CtvtBeacon_IsFriendInvite(func_020428a8(i), wifiList, mac)) {
+            if (func_ov030_02173b78(i) == 0x20 && CtvtBeacon_IsFriendInvite(GFL_NetGetBeaconData(i), wifiList, mac)) {
                 return i;
             }
         }

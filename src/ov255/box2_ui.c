@@ -711,7 +711,7 @@ void func_ov255_021d23d8(Box2SysWork *syswk) {
     BOOL visible;
     u32 id;
 
-    visible = func_0203d554() == TRUE ? FALSE : TRUE;
+    visible = GCTX_HIDIsUsingTouch() == TRUE ? FALSE : TRUE;
     switch (syswk->param->mode) {
     case 0:
         id = 0;
@@ -812,11 +812,11 @@ u32 func_ov255_021d2588(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 6;
         }
         if (res == 6) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 6;
         }
         if (res == 7) {
@@ -866,11 +866,11 @@ u32 func_ov255_021d2690(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 33;
         }
         if (res == 33) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 33;
         }
         if (res == 34) {
@@ -912,11 +912,11 @@ u32 func_ov255_021d2770(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 34;
         }
         if (res == 34) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 34;
         }
         if (res == 35) {
@@ -1023,7 +1023,7 @@ u32 func_ov255_021d29e8(Box2SysWork *syswk) {
     u32 y;
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
     if (res == CURSORMOVE_NONE) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_Y) {
             Box2Main_ShowCursor(syswk);
@@ -1054,11 +1054,11 @@ u32 func_ov255_021d2a64(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 7;
         }
         if (res == 7) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 7;
         }
         if (res == 8) {
@@ -1155,11 +1155,11 @@ u32 func_ov255_021d2c7c(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 34;
         }
         if (res == 34) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 34;
         }
         if (res == 35) {
@@ -1215,11 +1215,11 @@ u32 func_ov255_021d2dac(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 7;
         }
         if (res == 7) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 7;
         }
         if (res == 8) {
@@ -1318,11 +1318,11 @@ u32 func_ov255_021d2f88(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 34;
         }
         if (res == 34) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 34;
         }
         if (res == 35) {
@@ -1381,11 +1381,11 @@ u32 func_ov255_021d30e0(Box2SysWork *syswk) {
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 7;
         }
         if (res == 7) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 7;
         }
         if (res == 8) {
@@ -1507,7 +1507,7 @@ static u32 func_ov255_021d33a8(const CursorMoveData *data, u32 count) {
     rects[1] = sTouchRectEnd;
     for (i = 0; i < count; i++) {
         rects[0] = data[i].rect;
-        if (func_0203da0c(rects) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchPressedRect(rects) != TOUCH_RECT_NONE) {
             return i;
         }
     }
@@ -1521,7 +1521,7 @@ static u32 func_ov255_021d3408(const CursorMoveData *data, u32 count) {
     rects[1] = sTouchRectEnd;
     for (i = 0; i < count; i++) {
         rects[0] = data[i].rect;
-        if (func_0203d9c8(rects) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchHeldRect(rects) != TOUCH_RECT_NONE) {
             return i;
         }
     }
@@ -1535,7 +1535,7 @@ static u32 func_ov255_021d3468(const CursorMoveData *data, u32 count, u32 x, u32
     rects[1] = sTouchRectEnd;
     for (i = 0; i < count; i++) {
         rects[0] = data[i].rect;
-        if (func_0203dadc(rects, x, y) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchRectAt(rects, x, y) != TOUCH_RECT_NONE) {
             return i;
         }
     }
@@ -1571,27 +1571,27 @@ u32 func_ov255_021d3534(void) {
 }
 
 u32 func_ov255_021d3544(void) {
-    return func_0203d9c8(sTouchRects_78e4);
+    return GFL_HIDGetTouchHeldRect(sTouchRects_78e4);
 }
 
 BOOL func_ov255_021d3554(u32 *x, u32 *y) {
-    if (func_0203d9c8(sTouchRects_78f0) != TOUCH_RECT_NONE) {
-        func_0203da84(x, y);
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78f0) != TOUCH_RECT_NONE) {
+        GFL_HIDGetTouchHeldPoint(x, y);
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL func_ov255_021d357c(u32 *x, u32 *y) {
-    if (func_0203d9c8(sTouchRects_78cc) != TOUCH_RECT_NONE) {
-        func_0203da84(x, y);
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78cc) != TOUCH_RECT_NONE) {
+        GFL_HIDGetTouchHeldPoint(x, y);
         return TRUE;
     }
     return FALSE;
 }
 
 int func_ov255_021d35a4(u32 x, u32 y) {
-    int res = func_0203dadc(sTouchRects_79fc, x, y);
+    int res = GFL_HIDGetTouchRectAt(sTouchRects_79fc, x, y);
 
     if (res == TOUCH_RECT_NONE) {
         return TOUCH_RECT_NONE;
@@ -1609,14 +1609,14 @@ u32 func_ov255_021d35c4(u32 x, u32 y) {
 }
 
 BOOL func_ov255_021d35e8(void) {
-    if (func_0203d9c8(sTouchRects_78d4) != TOUCH_RECT_NONE) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78d4) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL func_ov255_021d3604(void) {
-    if (func_0203d9c8(sTouchRects_78dc) != TOUCH_RECT_NONE) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78dc) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -1627,7 +1627,7 @@ u32 func_ov255_021d3620(void) {
 }
 
 BOOL func_ov255_021d3630(void) {
-    if (func_0203d9c8(sTouchRects_78c4) != TOUCH_RECT_NONE) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78c4) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;

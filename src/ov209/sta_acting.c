@@ -383,7 +383,7 @@ StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
     stage->button = StaActButton_InitSystem(stage->heapId, stage, stage->param->pokes[stage->playerPos]);
     stage->scriptSys = StaActScript_InitSystem(stage->heapId, stage);
     StaActing_InitAppealEffect(stage);
-    func_02042ba8(FALSE, stage->heapId);
+    GFL_NetSetIconScreen(FALSE, stage->heapId);
     StaActing_LoadBg(stage, 0);
     stage->sound[0] = stage->param->ov210->sound[0];
     stage->sound[1] = stage->param->ov210->sound[1];
@@ -426,8 +426,8 @@ void StaActing_Term(StaActing *stage) {
     StaActPoke_TermSystem(stage->pokeSys);
     MusPokeDraw_TermSystem(stage->pokeDraw);
     MusItemDraw_TermSystem(stage->itemDraw);
-    func_0204b758();
-    func_0204e450(stage->blact);
+    ClActSys_Delete();
+    BlActScene_Delete(stage->blact);
     GFL_G3DCameraFree(stage->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -530,7 +530,7 @@ BOOL StaActing_Main(StaActing *stage) {
     StaActEffect_DrawSystem(stage->effectSys);
     StaActing_DrawDebug(stage);
     GFL_G3DSysReqSwapBuffers();
-    func_0204b794();
+    ClActSys_Draw();
     if (stage->param->comm != NULL && stage->seq != STA_ACTING_SEQ_FADE_IN &&
         stage->seq != STA_ACTING_SEQ_WAIT_FADE_IN && stage->seq != STA_ACTING_SEQ_FADE_OUT &&
         stage->seq != STA_ACTING_SEQ_WAIT_FADE_OUT && GFL_NetErrCheck() != FALSE) {
@@ -540,7 +540,7 @@ BOOL StaActing_Main(StaActing *stage) {
 }
 
 static void StaActing_VBlank(TCB *tcb, void *work) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void StaActing_InitGraphics(StaActing *stage) {
@@ -1099,7 +1099,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 
                     stage->param->pokes[stage->lightUpPos]->unk54[stage->lightUpEquip] = TRUE;
                     GFL_SndSEPlay(se);
-                } else if (func_02042bc4() == TRUE) {
+                } else if (GFL_NetIsParent() == TRUE) {
                     if (StaActing_ScoreItem(stage, stage->lightUpPos, stage->lightUpEquip) == SEQ_SE_MSCL_11) {
                         func_ov211_021f05c0(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 1);
                     } else {
@@ -1130,7 +1130,7 @@ static u32 StaActing_ScoreItem(StaActing *stage, u8 pos, u8 equip) {
 static void StaActing_UpdateNpcItemUse(StaActing *stage) {
     u8 i;
 
-    if (stage->param->comm == NULL || func_02042bc4() == TRUE) {
+    if (stage->param->comm == NULL || GFL_NetIsParent() == TRUE) {
         for (i = 0; i < 4; i++) {
             if (stage->npcUseWait[i] != 0) {
                 stage->npcUseWait[i]--;
@@ -1156,7 +1156,7 @@ static inline u8 StaActing_RandomHand(void) {
 void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
     u8 i;
 
-    if (stage->param->comm == NULL || func_02042bc4() == TRUE) {
+    if (stage->param->comm == NULL || GFL_NetIsParent() == TRUE) {
         for (i = 0; i < 4; i++) {
             BOOL hand[2] = { FALSE, FALSE };
             MusicalPoke *poke = stage->param->pokes[i];

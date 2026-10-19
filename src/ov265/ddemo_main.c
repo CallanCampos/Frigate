@@ -102,14 +102,14 @@ void DDemoMain_ExitVBlank(DDemoWork *wk) {
 }
 
 static void DDemoMain_VBlank1st(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_G3DDual3DExecVBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
 static void DDemoMain_VBlank2nd(TCB *tcb, void *data) {
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
@@ -325,7 +325,7 @@ void DDemoMain_MainDouble3D(DDemoWork *wk) {
         DDemoMain_SetParticleCamera(wk, wk->ptc[DDEMO_PTC_TYPE], FALSE);
         DDemoMain_SetParticleCamera(wk, wk->ptc[DDEMO_PTC_NAME], FALSE);
     }
-    func_0204f954();
+    Particle_DrawAndUpdateAll();
     GFL_G3DSysReqSwapBuffers();
     GFL_G3DDual3DRaiseNeedRenderFlag();
 }
@@ -339,45 +339,48 @@ void DDemoMain_ExitDouble3D(void) {
 }
 
 void DDemoMain_InitParticle(void) {
-    func_0204f918(HEAPID_DENDOU_DEMO);
+    Particle_Init(HEAPID_DENDOU_DEMO);
 }
 
 void DDemoMain_ExitParticle(void) {
-    func_0204fb4c();
+    Particle_Free();
 }
 
 void DDemoMain_CreateTypeParticle(DDemoWork *wk) {
-    wk->ptc[DDEMO_PTC_TYPE] = func_0204f968(wk->ptcWork[DDEMO_PTC_TYPE], DDEMO_PTC_WORK_SIZE, TRUE, HEAPID_DENDOU_DEMO);
-    func_0204fe04(wk->ptc[DDEMO_PTC_TYPE],
-                  func_0204fdf8(ARCID_DENDOU_DEMO, sDDemoTypeParticles[wk->type], HEAPID_DENDOU_DEMO), TRUE, NULL);
+    wk->ptc[DDEMO_PTC_TYPE] =
+        Particle_CreateSystem(wk->ptcWork[DDEMO_PTC_TYPE], DDEMO_PTC_WORK_SIZE, TRUE, HEAPID_DENDOU_DEMO);
+    Particle_SetResource(wk->ptc[DDEMO_PTC_TYPE],
+                         Particle_ReadResource(ARCID_DENDOU_DEMO, sDDemoTypeParticles[wk->type], HEAPID_DENDOU_DEMO),
+                         TRUE, NULL);
 }
 
 void DDemoMain_DeleteTypeParticle(DDemoWork *wk) {
-    func_0204fa84(wk->ptc[DDEMO_PTC_TYPE]);
+    Particle_DeleteSystem(wk->ptc[DDEMO_PTC_TYPE]);
     wk->ptc[DDEMO_PTC_TYPE] = NULL;
 }
 
 void DDemoMain_SetTypeParticle(DDemoWork *wk, u32 id) {
     VecFx32 pos = { 0, 0, 0x19a };
 
-    func_0205006c(wk->ptc[DDEMO_PTC_TYPE], id, &pos);
+    Particle_CreateEmitter(wk->ptc[DDEMO_PTC_TYPE], id, &pos);
 }
 
 void DDemoMain_CreateNameParticle(DDemoWork *wk) {
-    wk->ptc[DDEMO_PTC_NAME] = func_0204f968(wk->ptcWork[DDEMO_PTC_NAME], DDEMO_PTC_WORK_SIZE, TRUE, HEAPID_DENDOU_DEMO);
-    func_0204fe04(wk->ptc[DDEMO_PTC_NAME], func_0204fdf8(ARCID_DENDOU_DEMO, NARC_DDEMO_NAME_SPA, HEAPID_DENDOU_DEMO),
-                  TRUE, NULL);
+    wk->ptc[DDEMO_PTC_NAME] =
+        Particle_CreateSystem(wk->ptcWork[DDEMO_PTC_NAME], DDEMO_PTC_WORK_SIZE, TRUE, HEAPID_DENDOU_DEMO);
+    Particle_SetResource(wk->ptc[DDEMO_PTC_NAME],
+                         Particle_ReadResource(ARCID_DENDOU_DEMO, NARC_DDEMO_NAME_SPA, HEAPID_DENDOU_DEMO), TRUE, NULL);
 }
 
 void DDemoMain_DeleteNameParticle(DDemoWork *wk) {
-    func_0204fa84(wk->ptc[DDEMO_PTC_NAME]);
+    Particle_DeleteSystem(wk->ptc[DDEMO_PTC_NAME]);
     wk->ptc[DDEMO_PTC_NAME] = NULL;
 }
 
 void DDemoMain_SetNameParticle(DDemoWork *wk, u32 id) {
     VecFx32 pos = { 0, 0, 0 };
 
-    func_0205006c(wk->ptc[DDEMO_PTC_NAME], id, &pos);
+    Particle_CreateEmitter(wk->ptc[DDEMO_PTC_NAME], id, &pos);
 }
 
 // Gives a particle system the half of the view that a screen shows: the particles are laid out over both screens
@@ -400,8 +403,8 @@ static void DDemoMain_SetParticleCamera(DDemoWork *wk, ParticleSystem *ptc, BOOL
     projection.far = FX32_CONST(1024);
     projection.near = 0;
     projection.ndcRangeOverride = 0;
-    func_02050178(ptc);
-    func_020500cc(ptc, &projection, 0x2000, NULL, NULL, NULL, HEAPID_DENDOU_DEMO);
+    Particle_FreeCamera(ptc);
+    Particle_SetCamera(ptc, &projection, 0x2000, NULL, NULL, NULL, HEAPID_DENDOU_DEMO);
 }
 
 void DDemoMain_InitMcss(DDemoWork *wk) {

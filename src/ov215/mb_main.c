@@ -53,7 +53,7 @@ const BGSysVRAMConfig MailBox_VRAMConfig = {
 
 void MailBox_VBlank(TCB *tcb, void *data) {
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 void MailBox_SetVRAMBanks(void) {
@@ -427,7 +427,7 @@ BOOL MailBox_UpdatePaletteFx(MailBoxWork *work) {
     switch (fx->phase) {
     case 0:
         if (!fx->onScreen) {
-            func_0204c378(work->view->actors[fx->target], fx->firstPalette, TRUE);
+            ClActor_SetPalette(work->view->actors[fx->target], fx->firstPalette, TRUE);
         } else {
             GFL_BGSysSetScrPaletteNo(fx->target, fx->x, fx->y, fx->width, fx->height, fx->firstPalette);
             GFL_BGSysQueueScrLoad(fx->target);
@@ -438,7 +438,7 @@ BOOL MailBox_UpdatePaletteFx(MailBoxWork *work) {
         fx->timer++;
         if (fx->timer == 4) {
             if (!fx->onScreen) {
-                func_0204c378(work->view->actors[fx->target], fx->secondPalette, TRUE);
+                ClActor_SetPalette(work->view->actors[fx->target], fx->secondPalette, TRUE);
             } else {
                 GFL_BGSysSetScrPaletteNo(fx->target, fx->x, fx->y, fx->width, fx->height, fx->secondPalette);
                 GFL_BGSysQueueScrLoad(fx->target);
@@ -469,7 +469,7 @@ void MailBox_LoadMailGraphics(MailBoxWork *work) {
 
 void MailBox_CreatePMSDraw(MailBoxWork *work) {
     work->view->pmsPrintQueue = PrintQueue_CreateDefault(HEAPID_MAILBOX_VIEW);
-    work->view->pmsClActUnit = func_0204bf1c(8, 2, HEAPID_MAILBOX_VIEW);
+    work->view->pmsClActUnit = ClActUnit_Create(8, 2, HEAPID_MAILBOX_VIEW);
     work->view->pmsDraw = PMSDraw_Create(work->view->pmsClActUnit, CLACT_VRAM_SUB, work->view->pmsPrintQueue,
                                          work->font, 4, 4, HEAPID_MAILBOX_VIEW);
     PMSDraw_SetBackColor(work->view->pmsDraw, 0);
@@ -478,5 +478,5 @@ void MailBox_CreatePMSDraw(MailBoxWork *work) {
 void MailBox_FreePMSDraw(MailBoxWork *work) {
     PMSDraw_Delete(work->view->pmsDraw);
     PrintQueue_Free(work->view->pmsPrintQueue);
-    func_0204bf98(work->view->pmsClActUnit);
+    ClActUnit_Delete(work->view->pmsClActUnit);
 }

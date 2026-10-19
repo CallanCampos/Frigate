@@ -223,9 +223,9 @@ static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFi
         break;
     case 3:
     case 8:
-        handle = func_02040440();
+        handle = NetHandle_GetOwn();
         netId = 0;
-        if (func_0203ffc4()) {
+        if (NetSystem_GetNetId()) {
             netId = 2;
         }
         BtlSetup_SetNetMultiVsAI(setup, gameData, handle, 1, netId, 0, 0, heapId);

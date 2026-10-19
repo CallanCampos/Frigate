@@ -23,7 +23,7 @@ BOOL UnionEff_AllColosseumMembersHere(UnionColosseum *colosseum) {
             count++;
         }
     }
-    if (count >= func_02042a78()) {
+    if (count >= GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
@@ -38,7 +38,7 @@ BOOL UnionEff_AllColosseumCardsIn(UnionColosseum *colosseum) {
             count++;
         }
     }
-    if (count >= func_02042a78()) {
+    if (count >= GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
@@ -96,7 +96,7 @@ BOOL UnionEff_AllColosseumReady(UnionColosseum *colosseum) {
             count++;
         }
     }
-    if (count >= func_02042a78() || count >= MATH_CountPopulation(mask)) {
+    if (count >= GFL_NetGetNegotiatedCount() || count >= MATH_CountPopulation(mask)) {
         return TRUE;
     }
     return FALSE;
@@ -152,7 +152,7 @@ BOOL UnionEff_IsOnSeatSpot(Field *field) {
 
 void UnionEff_UpdateColosseumCommPlayers(UnionColosseum *colosseum) {
     ColosseumChoice choice;
-    u8 self = func_02042a6c(func_02040440());
+    u8 self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     int i;
 
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {

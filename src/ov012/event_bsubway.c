@@ -358,14 +358,14 @@ static BOOL func_ov012_02166300(GameProc *proc, u32 *state, void *param, void *w
     switch (*state) {
     case 0:
         GFL_OvlLoad(OVERLAY_ID(167));
-        func_02040c20(0x100, data_ov167_021d7448, 9, NULL);
-        func_02042d04(func_02040440(), BSUBWAY_COMM_TIMING_BATTLE);
+        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        GFL_NetSendTiming(NetHandle_GetOwn(), BSUBWAY_COMM_TIMING_BATTLE);
         *state = 1;
         break;
     case 1:
         if (GFL_NetErrCheck()) {
             *state = 4;
-        } else if (func_02042d0c(func_02040440(), BSUBWAY_COMM_TIMING_BATTLE)) {
+        } else if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), BSUBWAY_COMM_TIMING_BATTLE)) {
             *state = 2;
         }
         break;
@@ -379,7 +379,7 @@ static BOOL func_ov012_02166300(GameProc *proc, u32 *state, void *param, void *w
         }
         break;
     case 4:
-        func_02040c64(0x100);
+        NetCommand_RemoveTable(0x100);
         GFL_OvlUnload(OVERLAY_ID(167));
         *state = 5;
         break;

@@ -1095,21 +1095,21 @@ static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *pr
     if (list->setup.icons[index] != NULL) {
         pos.x = 224;
         pos.y = y + 16;
-        func_0204c210(list->setup.icons[index], &pos);
-        func_0204c124(list->setup.icons[index], TRUE);
+        ClActor_SetPos(list->setup.icons[index], &pos);
+        ClActor_SetVisible(list->setup.icons[index], TRUE);
     }
     if (list->setup.arrowUp != NULL) {
         if (FrameList_GetScroll(list->list) != 0) {
-            func_0204c124(list->setup.arrowUp, TRUE);
+            ClActor_SetVisible(list->setup.arrowUp, TRUE);
         } else {
-            func_0204c124(list->setup.arrowUp, FALSE);
+            ClActor_SetVisible(list->setup.arrowUp, FALSE);
         }
     }
     if (list->setup.arrowDown != NULL) {
         if (FrameList_CanScrollDown(list->list)) {
-            func_0204c124(list->setup.arrowDown, TRUE);
+            ClActor_SetVisible(list->setup.arrowDown, TRUE);
         } else {
-            func_0204c124(list->setup.arrowDown, FALSE);
+            ClActor_SetVisible(list->setup.arrowDown, FALSE);
         }
     }
 }
@@ -1125,12 +1125,12 @@ static void KeySystemScrollList_Scroll(void *work, s16 delta) {
     int y;
 
     for (i = 0; i < list->setup.count; i++) {
-        if (list->setup.icons[i] != NULL && func_0204c138(list->setup.icons[i])) {
-            func_0204c21c(list->setup.icons[i], &pos);
+        if (list->setup.icons[i] != NULL && ClActor_IsVisible(list->setup.icons[i])) {
+            ClActor_GetPos(list->setup.icons[i], &pos);
             pos.y = pos.y - delta;
-            func_0204c210(list->setup.icons[i], &pos);
+            ClActor_SetPos(list->setup.icons[i], &pos);
             if (pos.y <= -12 || pos.y >= 268) {
-                func_0204c124(list->setup.icons[i], FALSE);
+                ClActor_SetVisible(list->setup.icons[i], FALSE);
             }
         }
     }
@@ -1157,14 +1157,14 @@ void KeySystemParticle_Free(KeySystemParticle *particle) {
 
 void KeySystemParticle_Load(KeySystemParticle *particle, u32 arcId, u32 fileId, HeapID heapId) {
     if (particle->system != NULL) {
-        func_0204fa84(particle->system);
+        Particle_DeleteSystem(particle->system);
     }
-    particle->system = func_0204f968(particle->work, PARTICLE_WORK_SIZE, TRUE, heapId);
-    func_0204fe04(particle->system, func_0204fdf8(arcId, fileId, heapId), TRUE, NULL);
+    particle->system = Particle_CreateSystem(particle->work, PARTICLE_WORK_SIZE, TRUE, heapId);
+    Particle_SetResource(particle->system, Particle_ReadResource(arcId, fileId, heapId), TRUE, NULL);
 }
 
 void KeySystemParticle_Emit(KeySystemParticle *particle, int resourceId) {
-    func_0205007c(particle->system, resourceId, NULL, particle);
+    Particle_CreateEmitterWithCallback(particle->system, resourceId, NULL, particle);
 }
 
 static void KeySystem_BlendColor(u32 type, u16 *dest, u16 angle, u8 palette, u8 index, u16 from, u16 to) {

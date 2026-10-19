@@ -106,15 +106,15 @@ BmpOamActor *BmpOam_ActorAdd(BmpOamSys *sys, const BmpOamActorSetup *setup) {
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {
             mapping = BmpOam_LoadCellAnim(sys, setup->vramType, arc);
-            actor->chars[y * width + x] = func_0204b8bc(sCellRes[mapping].charSize, setup->vramType, sys->heapId);
+            actor->chars[y * width + x] = ClActSys_AllocChars(sCellRes[mapping].charSize, setup->vramType, sys->heapId);
             clSetup.x = setup->x + x * 32;
             clSetup.y = setup->y + y * 16;
             clSetup.priority = setup->priority;
             clSetup.bgPriority = setup->bgPriority;
             actor->actors[y * width + x] =
-                func_0204c040(sys->unit, actor->chars[y * width + x], setup->palette, sys->cellAnims[mapping], &clSetup,
-                              setup->surface, sys->heapId);
-            func_0204c378(actor->actors[y * width + x], (u8)setup->paletteOffset, 0);
+                ClActor_Create(sys->unit, actor->chars[y * width + x], setup->palette, sys->cellAnims[mapping],
+                               &clSetup, setup->surface, sys->heapId);
+            ClActor_SetPalette(actor->actors[y * width + x], (u8)setup->paletteOffset, 0);
             func_0204c5c8(actor->actors[y * width + x], FALSE);
         }
     }
@@ -126,8 +126,8 @@ void BmpOam_ActorDel(BmpOamActor *actor) {
 
     for (y = 0; y < actor->height; y++) {
         for (x = 0; x < actor->width; x++) {
-            func_0204b98c(actor->chars[y * actor->width + x]);
-            func_0204c108(actor->actors[y * actor->width + x]);
+            ClActSys_FreeChars(actor->chars[y * actor->width + x]);
+            ClActor_Delete(actor->actors[y * actor->width + x]);
         }
     }
     GFL_HeapFree(actor);
@@ -138,13 +138,13 @@ void BmpOam_ActorSetDrawEnable(BmpOamActor *actor, BOOL enable) {
 
     for (y = 0; y < actor->height; y++) {
         for (x = 0; x < actor->width; x++) {
-            func_0204c124(actor->actors[y * actor->width + x], enable);
+            ClActor_SetVisible(actor->actors[y * actor->width + x], enable);
         }
     }
 }
 
 BOOL BmpOam_ActorGetDrawEnable(BmpOamActor *actor) {
-    return func_0204c138(actor->actors[0]);
+    return ClActor_IsVisible(actor->actors[0]);
 }
 
 void BmpOam_ActorBmpTrans(BmpOamActor *actor) {
@@ -180,7 +180,7 @@ void BmpOam_ActorBmpTrans(BmpOamActor *actor) {
             } else {
                 size = CELL_ROW_SIZE;
             }
-            vramOffset = func_0204bb80(actor->chars[y * actor->width + x], actor->vramType);
+            vramOffset = ClActSys_GetCharVramAddr(actor->chars[y * actor->width + x], actor->vramType);
             upload(pixels + offset, vramOffset, size);
             // Not when the bitmap ends halfway through the last row of cells
             if (y != actor->height - 1 || (tilesHigh & 1) == 0) {
@@ -199,7 +199,7 @@ void BmpOam_ActorBmpTrans(BmpOamActor *actor) {
 void BmpOam_ActorGetPos(BmpOamActor *actor, s16 *x, s16 *y) {
     ClActorPos pos;
 
-    func_0204c178(actor->actors[0], &pos, actor->surface);
+    ClActor_GetSurfacePos(actor->actors[0], &pos, actor->surface);
     *x = pos.x;
     *y = pos.y;
 }
@@ -212,7 +212,7 @@ void BmpOam_ActorSetPos(BmpOamActor *actor, s16 x, s16 y) {
         for (j = 0; j < actor->width; j++) {
             pos.x = x + j * 32;
             pos.y = y + i * 16;
-            func_0204c140(actor->actors[i * actor->width + j], &pos, actor->surface);
+            ClActor_SetSurfacePos(actor->actors[i * actor->width + j], &pos, actor->surface);
         }
     }
 }
@@ -222,7 +222,7 @@ void BmpOam_ActorSetObjMode(BmpOamActor *actor, u32 mode) {
 
     for (i = 0; i < actor->height; i++) {
         for (j = 0; j < actor->width; j++) {
-            func_0204c318(actor->actors[i * actor->width + j], mode);
+            ClActor_SetObjMode(actor->actors[i * actor->width + j], mode);
         }
     }
 }
@@ -232,7 +232,7 @@ void BmpOam_ActorSetPriority(BmpOamActor *actor, u8 priority) {
 
     for (i = 0; i < actor->height; i++) {
         for (j = 0; j < actor->width; j++) {
-            func_0204c438(actor->actors[i * actor->width + j], priority);
+            ClActor_SetPriority(actor->actors[i * actor->width + j], priority);
         }
     }
 }
@@ -242,7 +242,7 @@ void BmpOam_ActorSetBgPriority(BmpOamActor *actor, u32 bgPriority) {
 
     for (i = 0; i < actor->height; i++) {
         for (j = 0; j < actor->width; j++) {
-            func_0204c468(actor->actors[i * actor->width + j], bgPriority);
+            ClActor_SetBgPriority(actor->actors[i * actor->width + j], bgPriority);
         }
     }
 }
@@ -252,7 +252,7 @@ void BmpOam_ActorSetPaletteOffset(BmpOamActor *actor, u32 offset) {
 
     for (i = 0; i < actor->height; i++) {
         for (j = 0; j < actor->width; j++) {
-            func_0204c378(actor->actors[i * actor->width + j], offset, 0);
+            ClActor_SetPalette(actor->actors[i * actor->width + j], offset, 0);
         }
     }
 }
@@ -285,7 +285,7 @@ static u32 BmpOam_LoadCellAnim(BmpOamSys *sys, u32 vramType, ArcTool *arc) {
         return mapping;
     }
     sys->cellAnims[mapping] =
-        func_0204bde0(arc, sCellRes[mapping].cellFileId, sCellRes[mapping].animFileId, sys->heapId);
+        ClActSys_LoadCellAnims(arc, sCellRes[mapping].cellFileId, sCellRes[mapping].animFileId, sys->heapId);
     return mapping;
 }
 
@@ -294,7 +294,7 @@ static void BmpOam_FreeCellAnims(BmpOamSys *sys) {
 
     for (i = 0; i < CELL_MAPPING_COUNT; i++) {
         if (sys->cellAnims[i] != CELL_ANIM_NONE) {
-            func_0204be64(sys->cellAnims[i]);
+            ClActSys_FreeCellAnims(sys->cellAnims[i]);
             sys->cellAnims[i] = CELL_ANIM_NONE;
         }
     }

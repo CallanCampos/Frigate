@@ -696,7 +696,7 @@ void GtsNegoMessage_CreateCancelButton(GtsNegoMessage *msg, ButtonManCallback ca
     msg->items[0].color = GTSNEGO_BUTTON_COLOR;
     msg->items[0].type = 0;
     msg->cancelButton = AppTaskMenuWin_CreateEx(msg->menuRes, &msg->items[0], 10, 21, 12, 3, FALSE, TRUE, msg->heapId);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         AppTaskMenuWin_SetActive(msg->cancelButton, TRUE);
     }
     GFL_StrBufFree(msg->items[0].str);

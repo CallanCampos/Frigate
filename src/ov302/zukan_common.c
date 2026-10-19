@@ -203,8 +203,8 @@ void ZukanCommon_ScrollBGs(u8 bg1, u8 bg2, int *timer) {
 }
 
 ClActor *ZukanCommon_CreateActor(ClActUnit *unit, const ZukanActorTemplate *template, HeapID heapId) {
-    return func_0204c040(unit, template->chars, template->palette, template->cells, &template->setup, template->surface,
-                         heapId);
+    return ClActor_Create(unit, template->chars, template->palette, template->cells, &template->setup,
+                          template->surface, heapId);
 }
 
 u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **outList, HeapID heapId) {

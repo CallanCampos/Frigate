@@ -245,13 +245,13 @@ static void func_ov012_02152b50(void *work) {
 BOOL func_ov012_02152b64(void *work) {
     DeliveryBeaconWork *pWork = work;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         return FALSE;
     }
     data_ov012_0216e034.gameCommandBase = pWork->aInit.code;
     pWork->unk5E = 0xff;
     func_ov012_021529c0(pWork);
-    func_020425ec(&data_ov012_0216e034, func_ov012_02152b50, pWork);
+    GFL_NetInit(&data_ov012_0216e034, func_ov012_02152b50, pWork);
     func_ov012_02152984(pWork, func_ov012_0215298c, 498);
     return TRUE;
 }
@@ -285,5 +285,5 @@ void func_ov012_02152bec(void *work) {
 
 void func_ov012_02152bfc(void *work) {
     GFL_HeapFree(work);
-    func_02042860(NULL);
+    GFL_NetExit(NULL);
 }

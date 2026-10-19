@@ -185,12 +185,12 @@ static void func_ov036_021b4b44(u16 blActIdx, void *data) {
         return;
     }
     zoneId = Field_GetPlayerStateZoneID(FieldEffects_GetField(work->params.effect->effects));
-    visible = func_0204f684(sys, (u16)actorIdx);
+    visible = BlActSys_IsActorVisible(sys, (u16)actorIdx);
     if (visible && func_ov012_0216754c(work->params.actor)) {
         visible = 0;
     }
-    func_0204f664(sys, blActIdx, visible);
-    func_0204f6c8(sys, blActIdx, 0);
+    BlActSys_SetActorVisible(sys, blActIdx, visible);
+    BlActSys_SetActorAnimating(sys, blActIdx, 0);
     actor = work->params.actor;
     config = GetActorMdlInfo(actor);
     CopyActorWPos(actor, &pos);
@@ -227,21 +227,21 @@ static void func_ov036_021b4b44(u16 blActIdx, void *data) {
     func_ov036_021b4e3c(camera, zoneId, &target, &pos);
     BlActScene_SetActorPos(scene, blActIdx, &pos);
     flip = TRUE;
-    self = func_0204f750(sys, (u16)actorIdx);
-    other = func_0204f750(sys, blActIdx);
+    self = BlActSys_GetSceneActor(sys, (u16)actorIdx);
+    other = BlActSys_GetSceneActor(sys, blActIdx);
     rot[3] = work->swing;
     rot[2] = work->scaleY;
     rot[2] += (s16)func_ov036_021b4d98(zoneId);
     rot[1] = 0;
     rot[0] = 0;
-    func_0204e9f8(scene, self, (u16 *)&rot[1]);
-    func_0204ea08(scene, other, (u16 *)&rot[1]);
-    func_0204ea3c(scene, self, (u16 *)&rot[0]);
-    func_0204ea4c(scene, other, (u16 *)&rot[0]);
-    func_0204ea5c(scene, other, &rot[3], &rot[2]);
-    func_0204eb7c(scene, other, &flip);
-    flip = func_0204eb48(scene, self);
-    func_0204eb58(scene, other, &flip);
+    BlActScene_GetActorMaterial(scene, self, (u16 *)&rot[1]);
+    BlActScene_SetActorMaterial(scene, other, (u16 *)&rot[1]);
+    BlActScene_GetActorFace(scene, self, (u16 *)&rot[0]);
+    BlActScene_SetActorFace(scene, other, (u16 *)&rot[0]);
+    BlActScene_SetActorScale(scene, other, &rot[3], &rot[2]);
+    BlActScene_SetActorFlipT(scene, other, &flip);
+    flip = BlActScene_GetActorFlipS(scene, self);
+    BlActScene_SetActorFlipS(scene, other, &flip);
 }
 
 static s32 func_ov036_021b4d98(u32 zoneId) {

@@ -171,7 +171,7 @@ static void BrStart_SeqOpen(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         }
         break;
     case SEQ_TOUCH_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             GFL_SndSEPlay(SEQ_SE_BREC_02);
             BrMsgWin_Exit(wk->msgWin);
             wk->msgWin = NULL;

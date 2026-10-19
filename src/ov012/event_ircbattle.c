@@ -88,7 +88,7 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
         partner = -1;
         count = 2;
     } else {
-        place = work->ircMatch.order[func_02042a6c(func_02040440())];
+        place = work->ircMatch.order[GFL_NetGetHandleNetId(NetHandle_GetOwn())];
         if (place < 2) {
             partnerPlace = 1 - place;
         } else {
@@ -104,7 +104,7 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
     }
     for (i = 0; i < count; i++) {
         info = GameData_GetPlayerInfoByNetID(gameData, i);
-        if (i != func_02042a6c(func_02040440()) && info != NULL &&
+        if (i != GFL_NetGetHandleNetId(NetHandle_GetOwn()) && info != NULL &&
             WifiList_FindFriendByPlayerInfo(GameData_GetWifiList(gameData), info, &friendIndex)) {
             if (i == partner) {
                 WifiList_SetFriendLastDateToNow(GameData_GetWifiList(gameData), friendIndex);
@@ -122,7 +122,7 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
 // Puts each player's party and info in their place in the battle
 void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
     if (work->btlSetup->fieldSituation.unk1a) {
-        if (work->ircMatch.order[func_02042a6c(func_02040440())] < 2) {
+        if (work->ircMatch.order[GFL_NetGetHandleNetId(NetHandle_GetOwn())] < 2) {
             s32 i = 0;
 
             for (; i < 4; i++) {
@@ -140,7 +140,7 @@ void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
                     GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
             }
         }
-    } else if (func_02042a6c(func_02040440()) == 0) {
+    } else if (GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0) {
         s32 i = 0;
 
         for (; i < 2; i++) {
@@ -232,12 +232,12 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         break;
     case 7:
         GFL_OvlLoad(OVERLAY_BATTLE_MAIN);
-        func_02040c20(0x100, data_ov167_021d7448, 9, NULL);
-        func_02040624(func_02040440(), 0x6e, 12);
+        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x6e, 12);
         (*state)++;
         break;
     case 8:
-        if (func_02040664(func_02040440(), 0x6e, 12)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x6e, 12)) {
             (*state)++;
         }
         if (GFL_NetErrCheck()) {
@@ -258,30 +258,30 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         case 1:
             work->players.unk44 = 1;
             work->players.rule = 2;
-            BtlSetup_SetNet1v1Single(work->btlSetup, work->gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+            BtlSetup_SetNet1v1Single(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
         case 2:
             work->players.unk44 = 1;
             work->players.rule = 6;
-            BtlSetup_SetNet1v1Double(work->btlSetup, work->gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+            BtlSetup_SetNet1v1Double(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
         case 3:
             work->players.unk44 = 1;
             work->players.rule = 10;
-            BtlSetup_SetNetTriple(work->btlSetup, work->gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+            BtlSetup_SetNetTriple(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
         case 4:
             work->players.unk44 = 1;
             work->players.rule = 14;
-            BtlSetup_SetNetRotation(work->btlSetup, work->gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+            BtlSetup_SetNetRotation(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
             break;
         case 5: {
             u32 positions[4] = { 0, 2, 1, 3 };
 
             work->players.unk44 = 3;
             work->players.rule = 18;
-            BtlSetup_SetNetMultiVsNet(work->btlSetup, work->gameData, func_02040440(), 1,
-                                      positions[work->ircMatch.order[func_02042a6c(func_02040440())]],
+            BtlSetup_SetNetMultiVsNet(work->btlSetup, work->gameData, NetHandle_GetOwn(), 1,
+                                      positions[work->ircMatch.order[GFL_NetGetHandleNetId(NetHandle_GetOwn())]],
                                       HEAPID_GAMEEVENT);
             work->btlSetup->fieldSituation.unk1a = 1;
             work->btlSetup->battleStyle = 1;
@@ -293,7 +293,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         BtlSetup_AllocRecBuffer(work->btlSetup, 1);
         work->bgm = GFL_SndBGMGetID();
         GFL_SndBGMStopImmediate();
-        func_02040624(func_02040440(), 10, 12);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 12);
         (*state)++;
         break;
     case 10:
@@ -307,8 +307,8 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             }
             GFL_OvlUnload(OVERLAY_BATTLE_MAIN);
             *state = 20;
-        } else if (func_02040664(func_02040440(), 10, 12)) {
-            if (func_02042bc4()) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 12)) {
+            if (GFL_NetIsParent()) {
                 GFL_SndBGMPlay(SEQ_BGM_VS_TRAINER_M, SND_CHANNEL_MASK_ALL);
             } else {
                 GFL_SndBGMPlay(SEQ_BGM_VS_TRAINER_S, SND_CHANNEL_MASK_ALL);
@@ -377,14 +377,14 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         *state = 13;
         break;
     case 17:
-        if (func_02042788() && !GFL_NetErrCheck()) {
-            func_02040624(func_02040440(), 0xdc, 12);
+        if (GFL_NetIsInitialized() && !GFL_NetErrCheck()) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xdc, 12);
         }
         (*state)++;
         break;
     case 18:
-        if (func_02042788() && !GFL_NetErrCheck()) {
-            if (func_02040664(func_02040440(), 0xdc, 12)) {
+        if (GFL_NetIsInitialized() && !GFL_NetErrCheck()) {
+            if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xdc, 12)) {
                 work->counter = 0;
                 (*state)++;
             }
@@ -394,9 +394,9 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         }
         break;
     case 19:
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             if (++work->counter >= 60) {
-                func_02042860(0);
+                GFL_NetExit(0);
                 (*state)++;
             }
         } else {
@@ -404,7 +404,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         }
         break;
     case 20:
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             GFL_NetErrClear();
             *state = 21;
         }
@@ -419,7 +419,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         (*state)++;
         break;
     case 23:
-        func_020429f0();
+        GFL_NetIwFree();
         func_ov012_02150cac(work);
         return GAMEEVENT_DONE;
     case 24:

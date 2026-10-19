@@ -190,24 +190,24 @@ static void WbtListBG_VBlank(WbtListBG *bg) {
 static void WbtListClAct_Init(WbtListClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(WbtListClAct));
     ClActSys_Create(&sWbtListClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void WbtListClAct_Free(WbtListClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(WbtListClAct));
 }
 
 static void WbtListClAct_Update(WbtListClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void WbtListClAct_VBlank(WbtListClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *WbtListClAct_GetUnit(WbtListClAct *clact) {

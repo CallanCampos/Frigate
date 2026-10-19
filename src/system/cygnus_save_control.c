@@ -51,18 +51,18 @@ void DreamRadar_FreeBuffer(void *buffer) {
 }
 
 void ReadDreamRadarSaveData(void *buffer) {
-    func_0203bf30(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
+    BackupSystem_Read(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
 }
 
 void DreamRadar_WriteSaveData(void) {
-    func_0203bee8(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
+    BackupSystem_WriteWait(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
 }
 
 // Erases the card's data
 void DreamRadar_EraseSaveData(HeapID heapId) {
     CygnusSaveData *data = GFL_HeapAllocate(heapId, sizeof(CygnusSaveData), TRUE, "cygnus_save_control.c", 117);
 
-    func_0203bee8(CYGNUS_DATA_CARD_OFFSET, data, sizeof(CygnusSaveData));
+    BackupSystem_WriteWait(CYGNUS_DATA_CARD_OFFSET, data, sizeof(CygnusSaveData));
     GFL_HeapFree(data);
 }
 

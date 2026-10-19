@@ -245,7 +245,7 @@ static void PdwAcc_StateStart(PdwAccWork *wk) {
 }
 
 static void PdwAcc_StateWaitCreate(PdwAccWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!PdwAcc_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             u32 *response = NHttpRap_GetAnswer(wk->http);
 
@@ -265,7 +265,7 @@ static void PdwAcc_StateWaitCreate(PdwAccWork *wk) {
 static void PdwAcc_StateCreate(PdwAccWork *wk) {
     u32 size;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(PDWACC_REQUEST_CREATE, wk->http)) {
             void *data = SaveControl_GetUploadData(wk->save, &size);
 
@@ -313,7 +313,7 @@ static BOOL PdwAcc_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     wk->save = GameData_GetSaveControl(pdwParam->gameData);
     wk->gameData = pdwParam->gameData;
     wk->profileId = PlayerInfo_GetProfileId(GetGameDataPlayerInfo(pdwParam->gameData));
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         wk->http = NHttpRap_Create(pdwParam->heapId, wk->profileId, pdwParam->loginBuffer);
         DWCRap_SetErrorFunc(PdwAcc_OnDisconnect, wk);
     }
@@ -387,7 +387,7 @@ static BOOL PdwAcc_ProcExit(GameProc *proc, u32 *state, void *param, void *work)
         NHttpRap_Destroy(wk->http);
         wk->http = NULL;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         DWCRap_SetErrorFunc(NULL, NULL);
     }
     GFL_ProcReleaseSubsystem(proc);

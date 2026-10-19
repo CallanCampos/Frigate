@@ -110,21 +110,21 @@ void UIObjRes_Load(UIObjRes *res, UIObjResSetup *setup, ClActUnit *unit, HeapID 
     ArcTool *arc = GFL_ArcSysCreateFileHandle(setup->arcId, heapId);
 
     if (setup->flags & 1) {
-        res->palette = func_0204bc48(arc, setup->paletteFile, setup->vramType, setup->paletteOffset << 5, heapId);
+        res->palette = ClActSys_LoadPlttEx(arc, setup->paletteFile, setup->vramType, setup->paletteOffset << 5, heapId);
     } else {
-        res->palette = func_0204bbb8(arc, setup->paletteFile, setup->vramType, setup->paletteOffset << 5,
-                                     setup->paletteStart, setup->paletteCount, heapId);
+        res->palette = ClActSys_LoadPlttRange(arc, setup->paletteFile, setup->vramType, setup->paletteOffset << 5,
+                                              setup->paletteStart, setup->paletteCount, heapId);
     }
-    res->chars = func_0204b81c(arc, setup->charFile, compressed, setup->vramType, heapId);
-    res->cellAnims = func_0204bde0(arc, setup->cellFile, setup->animFile, heapId);
+    res->chars = ClActSys_LoadChars(arc, setup->charFile, compressed, setup->vramType, heapId);
+    res->cellAnims = ClActSys_LoadCellAnims(arc, setup->cellFile, setup->animFile, heapId);
     res->vramType = setup->vramType;
     GFL_ArcToolFree(arc);
 }
 
 void UIObjRes_Free(UIObjRes *res) {
-    func_0204bcd0(res->palette);
-    func_0204b98c(res->chars);
-    func_0204be64(res->cellAnims);
+    ClActSys_FreePltt(res->palette);
+    ClActSys_FreeChars(res->chars);
+    ClActSys_FreeCellAnims(res->cellAnims);
 }
 
 ClActor *UIObjRes_CreateActor(UIObjRes *res, ClActUnit *unit, u8 x, u8 y, u8 anim, HeapID heapId) {
@@ -133,7 +133,7 @@ ClActor *UIObjRes_CreateActor(UIObjRes *res, ClActUnit *unit, u8 x, u8 y, u8 ani
 
     setup.x = x;
     setup.y = y;
-    actor = func_0204c040(unit, res->chars, res->palette, res->cellAnims, &setup, res->vramType, heapId);
-    func_0204c488(actor, anim);
+    actor = ClActor_Create(unit, res->chars, res->palette, res->cellAnims, &setup, res->vramType, heapId);
+    ClActor_SetSequence(actor, anim);
     return actor;
 }

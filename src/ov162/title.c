@@ -488,7 +488,7 @@ static void Title_Update(TitleWork *wk) {
 static void TitleSys_VBlank(TCB *tcb, void *data) {
     TitleSys *sys = data;
 
-    func_0204b7c8();
+    ClActSys_VBlank();
     GX_SetCapture(GX_CAPTURE_SIZE_256x192, GX_CAPTURE_MODE_AB, GX_CAPTURE_SRCA_2D3D, GX_CAPTURE_SRCB_VRAM_0x00000,
                   GX_CAPTURE_DEST_VRAM_D_0x00000, sys->captureEva, sys->captureEvb);
 }
@@ -690,30 +690,30 @@ static void TitleObj_Init(TitleObj *obj, HeapID heapId) {
     ClActorSetup setup;
 
     ClActSys_Create(&data_02093f08, &sVRAMConfig, heapId);
-    obj->unit = func_0204bf1c(64, 0, heapId);
-    func_0204c028(obj->unit);
-    obj->chars = func_0204b81c(arc, 5, 1, 1, heapId);
-    obj->palette = func_0204bba0(arc, 4, 1, 0, heapId);
-    obj->cellAnims = func_0204bde0(arc, 6, 7, heapId);
+    obj->unit = ClActUnit_Create(64, 0, heapId);
+    ClActUnit_UseSystemRenderer(obj->unit);
+    obj->chars = ClActSys_LoadChars(arc, 5, 1, 1, heapId);
+    obj->palette = ClActSys_LoadPltt(arc, 4, 1, 0, heapId);
+    obj->cellAnims = ClActSys_LoadCellAnims(arc, 6, 7, heapId);
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 0;
     setup.bgPriority = 0;
     setup.priority = 0;
-    obj->actor = func_0204c040(obj->unit, obj->chars, obj->palette, obj->cellAnims, &setup, 1, heapId);
+    obj->actor = ClActor_Create(obj->unit, obj->chars, obj->palette, obj->cellAnims, &setup, 1, heapId);
     func_0204c520(obj->actor, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     GFL_ArcToolFree(arc);
 }
 
 static void TitleObj_Update(TitleObj *obj, HeapID heapId) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void TitleObj_Free(TitleObj *obj) {
-    func_0204b98c(obj->chars);
-    func_0204bcd0(obj->palette);
-    func_0204be64(obj->cellAnims);
-    func_0204bf98(obj->unit);
-    func_0204b758();
+    ClActSys_FreeChars(obj->chars);
+    ClActSys_FreePltt(obj->palette);
+    ClActSys_FreeCellAnims(obj->cellAnims);
+    ClActUnit_Delete(obj->unit);
+    ClActSys_Delete();
 }

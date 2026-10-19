@@ -152,7 +152,7 @@ static int ZknSearchSeq_Init(ZknSearchWork *wk) {
     ZknSearchBmp_Init(wk);
     ZknSearchObj_Init(wk);
     ZknSearchMain_InitBlinkAnm(wk);
-    func_02042ba8(TRUE, HEAPID_ZUKAN_SEARCH);
+    GFL_NetSetIconScreen(TRUE, HEAPID_ZUKAN_SEARCH);
     ZknSearchMain_InitBGWinFrame(wk);
     ZknSearchMain_InitFramePos(wk);
     ZknSearchMain_InitPaletteFade(wk);
@@ -348,7 +348,7 @@ static int ZknSearchSeq_SearchResult(ZknSearchWork *wk) {
         }
         ZknSearchMain_HideLoading(wk);
         ZknSearchBmp_PutInfo(wk);
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             CursorMove_SetCursorVisible(wk->cursorMove, FALSE);
         } else {
             CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
@@ -391,7 +391,7 @@ static int ZknSearchSeq_Order(ZknSearchWork *wk) {
     case 3:
     case 4:
     case 5:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             ZknSearchSeq_SetOrder(wk, ret);
         }
@@ -468,7 +468,7 @@ static int ZknSearchSeq_Initial(ZknSearchWork *wk) {
     case 4:
     case 5:
     case 6:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             ZknSearchSeq_SetInitial(wk, ret);
         }
@@ -585,7 +585,7 @@ static int ZknSearchSeq_Type(ZknSearchWork *wk) {
     case 4:
     case 5:
     case 6:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             ZknSearchSeq_SetType(wk, ret);
         }
@@ -703,7 +703,7 @@ static int ZknSearchSeq_Color(ZknSearchWork *wk) {
     case 4:
     case 5:
     case 6:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             ZknSearchSeq_SetColor(wk, ret);
         }
@@ -817,7 +817,7 @@ static int ZknSearchSeq_Shape(ZknSearchWork *wk) {
     case 1:
     case 2:
     case 3:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             ZknSearchSeq_SetShape(wk, ret);
         }
@@ -941,7 +941,7 @@ static int ZknSearchSeq_ButtonAnm(ZknSearchWork *wk) {
             }
             break;
         case 4:
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 ZknSearchUI_SetCursorPalette(wk, wk->buttonId, ZKNSEARCH_UI_PALETTE_OFF);
             } else {
                 ZknSearchUI_SetCursorPalette(wk, wk->buttonId, ZKNSEARCH_UI_PALETTE_ON);

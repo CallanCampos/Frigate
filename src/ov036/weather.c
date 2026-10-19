@@ -82,10 +82,10 @@ void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void 
     weather->next = 0xffff;
     weather->pending = 0xffff;
     weather->overlayId = -1;
-    weather->actUnit = func_0204bf1c(0x40, 8, heapId);
-    renderer = func_0204be9c(&WEATHER_SURFACE_SETUP, 1, heapId);
+    weather->actUnit = ClActUnit_Create(0x40, 8, heapId);
+    renderer = ClActRenderer_Create(&WEATHER_SURFACE_SETUP, 1, heapId);
     weather->renderer = renderer;
-    func_0204c018(weather->actUnit, renderer);
+    ClActUnit_SetRenderer(weather->actUnit, renderer);
     func_0204bff0(weather->actUnit, TRUE);
     func_0204c004(weather->actUnit, TRUE);
     for (i = 0; i < 2; i++) {
@@ -105,8 +105,8 @@ void func_ov036_021990d8(void *weatherPtr) {
         func_ov036_02199424(weather->tasks[i]);
     }
     func_ov036_02199230(weather);
-    func_0204becc(weather->renderer);
-    func_0204bf98(weather->actUnit);
+    ClActRenderer_Delete(weather->renderer);
+    ClActUnit_Delete(weather->actUnit);
     for (i = 0; i < 2; i++) {
         func_ov036_02198bf0(weather->layers[i]);
     }

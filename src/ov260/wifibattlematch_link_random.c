@@ -2345,7 +2345,7 @@ static u32 WifiBattleMatchLink_UpdateCancel(WifiBattleMatchLinkRandom *link, BOO
             link->cancelSeq++;
             WifiBattleMatchLinkIcon_SetShown(link->linkIcon, FALSE);
             WifiBattleMatchNet_CancelMatch(link->net);
-            if (!GFL_NetErrCheck() && func_02042788()) {
+            if (!GFL_NetErrCheck() && GFL_NetIsInitialized()) {
                 func_ov011_02160170();
             }
         }

@@ -116,7 +116,7 @@ BOOL MailView_Unload(MailSysWork *work) {
 
 static void MailView_CreatePMSDraw(MailSysWork *work) {
     work->pmsQueue = PrintQueue_CreateDefault(work->heapId);
-    work->pmsClUnit = func_0204bf1c(8, 1, work->heapId);
+    work->pmsClUnit = ClActUnit_Create(8, 1, work->heapId);
     work->pmsDraw = PMSDraw_Create(work->pmsClUnit, 0, work->pmsQueue, work->font, 0, 4, work->heapId);
     PMSDraw_SetBackColor(work->pmsDraw, 0);
 }
@@ -125,7 +125,7 @@ static void MailView_DeletePMSDraw(MailSysWork *work) {
     PMSDraw_Delete(work->pmsDraw);
     PrintQueue_Free(work->pmsQueue);
     work->pmsQueue = NULL;
-    func_0204bf98(work->pmsClUnit);
+    ClActUnit_Delete(work->pmsClUnit);
 }
 
 static void MailView_SetVRAMBanks(MailSysWork *work) {
@@ -306,16 +306,16 @@ static void MailView_PrintMail(MailSysWork *work) {
 
 static void MailView_CreateClAct(MailSysWork *work) {
     ClActSys_Create(&data_02093f08, &MailSys_VRAMConfig, work->heapId);
-    work->clUnit = func_0204bf1c(4, 0, work->heapId);
-    func_0204c028(work->clUnit);
+    work->clUnit = ClActUnit_Create(4, 0, work->heapId);
+    ClActUnit_UseSystemRenderer(work->clUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
 }
 
 // The counterpart of MailView_CreateClAct, which the ROM places after it (0x021a8d58). Whether it belongs to this file
 // or starts mb_seq.c is a guess: it frees what MailView_CreateClAct made
 static void MailView_DeleteClAct(MailSysWork *work) {
-    func_0204bf98(work->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(work->clUnit);
+    ClActSys_Delete();
 }

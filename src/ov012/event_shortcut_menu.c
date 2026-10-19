@@ -59,7 +59,7 @@ GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code) {
         work->input->arg = work;
     }
     DisableAllActorsMovement(Field_GetActorSystem(work->field));
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     return event;
 }
 

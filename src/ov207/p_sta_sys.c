@@ -104,7 +104,7 @@ BOOL PStatus_Init(PStatusWork *wk) {
     wk->pressedButton = NULL;
     wk->playCry = FALSE;
     wk->canForgetHm = FALSE;
-    wk->isTouch = func_0203d554();
+    wk->isTouch = GCTX_HIDIsUsingTouch();
     if (wk->param->mode == PSTATUS_MODE_FORGET_HM) {
         wk->param->mode = PSTATUS_MODE_FORGET_MOVE;
         wk->canForgetHm = TRUE;
@@ -160,7 +160,7 @@ BOOL PStatus_Init(PStatusWork *wk) {
             break;
         }
     }
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return TRUE;
 }
 
@@ -187,7 +187,7 @@ BOOL PStatus_Exit(PStatusWork *wk) {
         wk->param->mode = PSTATUS_MODE_FORGET_HM;
         wk->canForgetHm = FALSE;
     }
-    func_0203d564(wk->isTouch);
+    GCTX_HIDSetUsingTouch(wk->isTouch);
     if (wk->boxPartyPkm != NULL) {
         GFL_HeapFree(wk->boxPartyPkm);
     }
@@ -199,7 +199,7 @@ int PStatus_Main(PStatusWork *wk) {
 
     wk->prevTouchX = wk->touchX;
     wk->prevTouchY = wk->touchY;
-    func_0203da84(&wk->touchX, &wk->touchY);
+    GFL_HIDGetTouchHeldPoint(&wk->touchX, &wk->touchY);
     switch (wk->seq) {
     case PSTA_SEQ_FADE_IN:
         if (wk->isRedrawing == TRUE) {
@@ -215,7 +215,8 @@ int PStatus_Main(PStatusWork *wk) {
         }
         break;
     case PSTA_SEQ_EXIT:
-        if (wk->pressedButton == NULL || func_0204c560(wk->pressedButton) == FALSE || wk->param->forceExit == TRUE) {
+        if (wk->pressedButton == NULL || ClActor_IsAnimActive(wk->pressedButton) == FALSE ||
+            wk->param->forceExit == TRUE) {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
             wk->seq = PSTA_SEQ_WAIT_FADE_OUT;
         }
@@ -254,7 +255,7 @@ int PStatus_Main(PStatusWork *wk) {
         break;
     }
     PrintQueue_Main(wk->printQueue);
-    func_0204b794();
+    ClActSys_Draw();
     MCSSSys_Update(wk->mcssSys);
     GFL_G3DSysReset();
     GFL_G3DSysMtxViewFlush();
@@ -270,19 +271,19 @@ int PStatus_Main(PStatusWork *wk) {
         GFL_BGSysMoveBGReq(7, BG_MOVE_DOWN, 1);
         wk->bgScrollFrames -= 4;
     }
-    if (wk->upPressed == TRUE && func_0204c560(wk->buttons[PSTA_BUTTON_UP]) == FALSE) {
+    if (wk->upPressed == TRUE && ClActor_IsAnimActive(wk->buttons[PSTA_BUTTON_UP]) == FALSE) {
         if (PStatus_FindPokemon(wk, PSTA_DIR_UP, NULL) == TRUE) {
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 3);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 3);
         } else {
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 17);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 17);
         }
         wk->upPressed = FALSE;
     }
-    if (wk->downPressed == TRUE && func_0204c560(wk->buttons[PSTA_BUTTON_DOWN]) == FALSE) {
+    if (wk->downPressed == TRUE && ClActor_IsAnimActive(wk->buttons[PSTA_BUTTON_DOWN]) == FALSE) {
         if (PStatus_FindPokemon(wk, PSTA_DIR_DOWN, NULL) == TRUE) {
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 2);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 2);
         } else {
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 16);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 16);
         }
         wk->downPressed = FALSE;
     }
@@ -291,7 +292,7 @@ int PStatus_Main(PStatusWork *wk) {
 }
 
 static void PStatus_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void PStatus_InitGraphics(PStatusWork *wk) {
@@ -326,8 +327,8 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
     clactSetup = data_02093f08;
     clactSetup.charCount = 110;
     ClActSys_Create(&clactSetup, &sPStatusVRAMConfig, wk->heapId);
-    wk->actorUnit = func_0204bf1c(96, 0, wk->heapId);
-    func_0204c028(wk->actorUnit);
+    wk->actorUnit = ClActUnit_Create(96, 0, wk->heapId);
+    ClActUnit_UseSystemRenderer(wk->actorUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     GFL_G3DSysCreate(FALSE, 2, FALSE, 1, 0, wk->heapId, NULL);
@@ -349,8 +350,8 @@ static void PStatus_ExitGraphics(PStatusWork *wk) {
     MCSSSys_Free(wk->mcssSys);
     GFL_G3DCameraFree(wk->camera);
     GFL_G3DSysFree();
-    func_0204bf98(wk->actorUnit);
-    func_0204b758();
+    ClActUnit_Delete(wk->actorUnit);
+    ClActSys_Delete();
     GFL_BGSysReleaseBG(5);
     GFL_BGSysReleaseBG(6);
     GFL_BGSysReleaseBG(7);
@@ -382,20 +383,20 @@ static void PStatus_LoadResources(PStatusWork *wk) {
     GFL_BGSysLoadArcNCGRStatic(arc, 11, 5, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 73, 7, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 67, 5, 0, 0, FALSE, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(0)] = func_0204bbb8(arc, 5, 0, 0, 0, 4, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(6)] = func_0204bbb8(arc, 7, 0, 0x160, 0, 2, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(7)] = func_0204bbb8(arc, 8, 1, 0, 0, 5, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(8)] = func_0204bbb8(arc, 6, 0, 0x1a0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(11)] = func_0204bbb8(arc, 4, 0, 0x1c0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(0)] = func_0204b81c(arc, 13, FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(8)] = func_0204b81c(arc, 17, FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(9)] = func_0204b81c(arc, 16, FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(12)] = func_0204b81c(arc, 15, FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(0)] = func_0204bde0(arc, 80, 131, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(7)] = func_0204bde0(arc, 83, 134, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(8)] = func_0204bde0(arc, 82, 133, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(11)] = func_0204bde0(arc, 84, 135, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(12)] = func_0204bde0(arc, 81, 132, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(0)] = ClActSys_LoadPlttRange(arc, 5, 0, 0, 0, 4, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(6)] = ClActSys_LoadPlttRange(arc, 7, 0, 0x160, 0, 2, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(7)] = ClActSys_LoadPlttRange(arc, 8, 1, 0, 0, 5, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(8)] = ClActSys_LoadPlttRange(arc, 6, 0, 0x1a0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(11)] = ClActSys_LoadPlttRange(arc, 4, 0, 0x1c0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(0)] = ClActSys_LoadChars(arc, 13, FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(8)] = ClActSys_LoadChars(arc, 17, FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(9)] = ClActSys_LoadChars(arc, 16, FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(12)] = ClActSys_LoadChars(arc, 15, FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(0)] = ClActSys_LoadCellAnims(arc, 80, 131, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(7)] = ClActSys_LoadCellAnims(arc, 83, 134, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(8)] = ClActSys_LoadCellAnims(arc, 82, 133, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(11)] = ClActSys_LoadCellAnims(arc, 84, 135, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(12)] = ClActSys_LoadCellAnims(arc, 81, 132, wk->heapId);
 
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(uiArc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0x120, 0x20, wk->heapId);
@@ -403,43 +404,45 @@ static void PStatus_LoadResources(PStatusWork *wk) {
     loadBGScrToVramByFileNoReserveNegAlign(uiArc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE, wk->heapId);
     GFL_BGSysSetScrPaletteNo(1, 0, 21, 32, 3, 9);
     GFL_G2DIOLoadArcNCLRDefault(uiArc, 0, 4, 0x1a0, 0x20, wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(5)] = func_0204bbb8(uiArc, 1, 1, 0x100, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(7)] = func_0204b81c(uiArc, 2, FALSE, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(6)] = func_0204bde0(uiArc, 5, 8, wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(5)] = ClActSys_LoadPlttRange(uiArc, 1, 1, 0x100, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(7)] = ClActSys_LoadChars(uiArc, 2, FALSE, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(6)] = ClActSys_LoadCellAnims(uiArc, 5, 8, wk->heapId);
     wk->clResources[PSTA_RES_PLTT(3)] =
-        func_0204bbb8(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 0, 0x100, 0, 3, wk->heapId);
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 0, 0x100, 0, 3, wk->heapId);
     wk->clResources[PSTA_RES_PLTT(4)] =
-        func_0204bbb8(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0xa0, 0, 3, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(4)] =
-        func_0204bde0(uiArc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), wk->heapId);
-    wk->clResources[PSTA_RES_CELL(5)] =
-        func_0204bde0(uiArc, AppMenuCommon_GetTypeIconCellFile(0), AppMenuCommon_GetTypeIconAnimFile(0), wk->heapId);
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0xa0, 0, 3, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(4)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetTypeIconCellFile(2),
+                                                               AppMenuCommon_GetTypeIconAnimFile(2), wk->heapId);
+    wk->clResources[PSTA_RES_CELL(5)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetTypeIconCellFile(0),
+                                                               AppMenuCommon_GetTypeIconAnimFile(0), wk->heapId);
     for (i = 0; i < PSTA_TYPE_COUNT; i++) {
-        wk->typeIconChars[i] = func_0204b81c(uiArc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, 0, wk->heapId);
+        wk->typeIconChars[i] = ClActSys_LoadChars(uiArc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, 0, wk->heapId);
     }
-    wk->clResources[PSTA_RES_CHAR(4)] = func_0204b81c(uiArc, 56, FALSE, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(5)] = func_0204b81c(uiArc, 57, FALSE, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(6)] = func_0204b81c(uiArc, 58, FALSE, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(1)] = func_0204b81c(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(1)] =
-        func_0204bde0(uiArc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(9)] = func_0204bbb8(uiArc, func_0202d964(), 0, 0xa0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(10)] = func_0204b81c(uiArc, func_0202d968(2), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(9)] = func_0204bde0(uiArc, func_0202d96c(2), func_0202d970(2), wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(2)] = func_0204bbb8(uiArc, func_0202d944(), 0, 0xc0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(3)] = func_0204b81c(uiArc, func_0202d948(2), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(3)] = func_0204bde0(uiArc, func_0202d94c(2), func_0202d950(2), wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(4)] = ClActSys_LoadChars(uiArc, 56, FALSE, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(5)] = ClActSys_LoadChars(uiArc, 57, FALSE, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(6)] = ClActSys_LoadChars(uiArc, 58, FALSE, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(1)] =
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(1)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                               AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(9)] = ClActSys_LoadPlttRange(uiArc, func_0202d964(), 0, 0xa0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(10)] = ClActSys_LoadChars(uiArc, func_0202d968(2), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(9)] = ClActSys_LoadCellAnims(uiArc, func_0202d96c(2), func_0202d970(2), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(2)] = ClActSys_LoadPlttRange(uiArc, func_0202d944(), 0, 0xc0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(3)] = ClActSys_LoadChars(uiArc, func_0202d948(2), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(3)] = ClActSys_LoadCellAnims(uiArc, func_0202d94c(2), func_0202d950(2), wk->heapId);
     wk->clResources[PSTA_RES_PLTT(10)] =
-        func_0204bbb8(uiArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(11)] =
-        func_0204b81c(uiArc, AppMenuCommon_GetStatusIconCharFile(), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(10)] = func_0204bde0(uiArc, AppMenuCommon_GetStatusIconCellFile(2),
-                                                       AppMenuCommon_GetStatusIconAnimFile(2), wk->heapId);
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetStatusIconCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(10)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetStatusIconCellFile(2),
+                                                                AppMenuCommon_GetStatusIconAnimFile(2), wk->heapId);
     wk->clResources[PSTA_RES_PLTT(1)] =
-        func_0204bbb8(uiArc, AppMenuCommon_GetBallPaletteFile(1), 0, 0xe0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(2)] = func_0204b81c(uiArc, AppMenuCommon_GetBallCharFile(1), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(2)] =
-        func_0204bde0(uiArc, AppMenuCommon_GetBallCellFile(1, 2), AppMenuCommon_GetBallAnimFile(1, 2), wk->heapId);
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetBallPaletteFile(1), 0, 0xe0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(2)] =
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetBallCharFile(1), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(2)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetBallCellFile(1, 2),
+                                                               AppMenuCommon_GetBallAnimFile(1, 2), wk->heapId);
     GFL_ArcToolFree(uiArc);
 
     PStaSub_LoadResources(wk, wk->sub, arc);
@@ -457,16 +460,16 @@ static void PStatus_FreeResources(PStatusWork *wk) {
     PStaInfo_FreeResources(wk, wk->info);
     PStaSub_FreeResources(wk, wk->sub);
     for (i = PSTA_RES_PLTT(0); i <= PSTA_RES_PLTT(11); i++) {
-        func_0204bcd0(wk->clResources[i]);
+        ClActSys_FreePltt(wk->clResources[i]);
     }
     for (i = PSTA_RES_CHAR(0); i <= PSTA_RES_CHAR(12); i++) {
-        func_0204b98c(wk->clResources[i]);
+        ClActSys_FreeChars(wk->clResources[i]);
     }
     for (i = PSTA_RES_CELL(0); i <= PSTA_RES_CELL(12); i++) {
-        func_0204be64(wk->clResources[i]);
+        ClActSys_FreeCellAnims(wk->clResources[i]);
     }
     for (i = 0; i < PSTA_TYPE_COUNT; i++) {
-        func_0204b98c(wk->typeIconChars[i]);
+        ClActSys_FreeChars(wk->typeIconChars[i]);
     }
 }
 
@@ -492,30 +495,30 @@ static void PStatus_CreateActors(PStatusWork *wk) {
         setup.y = i == PSTA_BUTTON_SHORTCUT ? 172 : 168;
         setup.sequence = sequences[i];
         wk->buttons[i] =
-            func_0204c040(wk->actorUnit, chars, wk->clResources[PSTA_RES_PLTT(0)], cellAnims, &setup, 0, wk->heapId);
+            ClActor_Create(wk->actorUnit, chars, wk->clResources[PSTA_RES_PLTT(0)], cellAnims, &setup, 0, wk->heapId);
         func_0204c520(wk->buttons[i], TRUE);
-        func_0204c124(wk->buttons[i], TRUE);
+        ClActor_SetVisible(wk->buttons[i], TRUE);
     }
     setup.x = 0;
     setup.y = 0;
     setup.sequence = 0;
-    wk->typeIcons[0] = func_0204c040(wk->actorUnit, wk->typeIconChars[0], wk->clResources[PSTA_RES_PLTT(3)],
-                                     wk->clResources[PSTA_RES_CELL(4)], &setup, 0, wk->heapId);
-    wk->typeIcons[1] = func_0204c040(wk->actorUnit, wk->typeIconChars[0], wk->clResources[PSTA_RES_PLTT(3)],
-                                     wk->clResources[PSTA_RES_CELL(4)], &setup, 0, wk->heapId);
+    wk->typeIcons[0] = ClActor_Create(wk->actorUnit, wk->typeIconChars[0], wk->clResources[PSTA_RES_PLTT(3)],
+                                      wk->clResources[PSTA_RES_CELL(4)], &setup, 0, wk->heapId);
+    wk->typeIcons[1] = ClActor_Create(wk->actorUnit, wk->typeIconChars[0], wk->clResources[PSTA_RES_PLTT(3)],
+                                      wk->clResources[PSTA_RES_CELL(4)], &setup, 0, wk->heapId);
     for (i = 0; i < 2; i++) {
-        func_0204c124(wk->typeIcons[i], FALSE);
+        ClActor_SetVisible(wk->typeIcons[i], FALSE);
     }
     if (wk->param->mode == PSTATUS_MODE_FORGET_MOVE) {
         for (i = 0; i < PSTA_BUTTON_COUNT; i++) {
             if (i != PSTA_BUTTON_BACK) {
-                func_0204c124(wk->buttons[i], FALSE);
+                ClActor_SetVisible(wk->buttons[i], FALSE);
             }
         }
     }
     if (PStatus_IsFromFieldMenu(wk) == FALSE) {
-        func_0204c124(wk->buttons[PSTA_BUTTON_CLOSE], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_SHORTCUT], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_CLOSE], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SHORTCUT], FALSE);
     }
     PStaSub_CreateActors(wk, wk->sub);
     PStaRibbon_CreateActors(wk, wk->ribbon);
@@ -529,10 +532,10 @@ static void PStatus_FreeActors(PStatusWork *wk) {
     PStaSkill_FreeActors(wk, wk->skill);
     PStaSub_FreeActors(wk, wk->sub);
     for (i = 0; i < PSTA_BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i]);
+        ClActor_Delete(wk->buttons[i]);
     }
     for (i = 0; i < 2; i++) {
-        func_0204c108(wk->typeIcons[i]);
+        ClActor_Delete(wk->typeIcons[i]);
     }
 }
 
@@ -570,7 +573,7 @@ static void PStatus_CheckTouch(PStatusWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    wk->touchHit = func_0203da0c(rects);
+    wk->touchHit = GFL_HIDGetTouchPressedRect(rects);
 }
 
 static void PStatus_HandleInput(PStatusWork *wk) {
@@ -585,8 +588,8 @@ static BOOL PStatus_HandleKeys(PStatusWork *wk) {
     if (GCTX_HIDGetTypedKeys() & PAD_KEY_DOWN) {
         if (PStatus_ChangePokemon(wk, PSTA_DIR_DOWN) == TRUE) {
             PStatus_StartRedraw(wk);
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 3);
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 10);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 3);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 10);
             wk->upPressed = FALSE;
             wk->downPressed = TRUE;
             GFL_SndSEPlay(SEQ_SE_SYS_37);
@@ -596,8 +599,8 @@ static BOOL PStatus_HandleKeys(PStatusWork *wk) {
     } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_UP) {
         if (PStatus_ChangePokemon(wk, PSTA_DIR_UP) == TRUE) {
             PStatus_StartRedraw(wk);
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 11);
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 2);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 11);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 2);
             wk->upPressed = TRUE;
             wk->downPressed = FALSE;
             GFL_SndSEPlay(SEQ_SE_SYS_37);
@@ -628,7 +631,7 @@ static BOOL PStatus_HandleKeys(PStatusWork *wk) {
         wk->exitResult = PSTATUS_RESULT_BACK;
         wk->param->result = PSTATUS_RESULT_BACK;
         wk->seq = PSTA_SEQ_EXIT;
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
         wk->pressedButton = wk->buttons[PSTA_BUTTON_BACK];
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         wk->isTouch = FALSE;
@@ -637,7 +640,7 @@ static BOOL PStatus_HandleKeys(PStatusWork *wk) {
         wk->exitResult = PSTATUS_RESULT_CLOSE;
         wk->param->result = PSTATUS_RESULT_CLOSE;
         wk->seq = PSTA_SEQ_EXIT;
-        func_0204c488(wk->buttons[PSTA_BUTTON_CLOSE], 8);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_CLOSE], 8);
         wk->pressedButton = wk->buttons[PSTA_BUTTON_CLOSE];
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
         wk->isTouch = FALSE;
@@ -646,10 +649,10 @@ static BOOL PStatus_HandleKeys(PStatusWork *wk) {
         if (wk->page < PSTATUS_PAGE_FORGET) {
             if (wk->shortcutRegistered[wk->page] == TRUE) {
                 wk->shortcutRegistered[wk->page] = FALSE;
-                func_0204c488(wk->buttons[PSTA_BUTTON_SHORTCUT], 6);
+                ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SHORTCUT], 6);
             } else {
                 wk->shortcutRegistered[wk->page] = TRUE;
-                func_0204c488(wk->buttons[PSTA_BUTTON_SHORTCUT], 7);
+                ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SHORTCUT], 7);
             }
             GFL_SndSEPlay(SEQ_SE_SYS_07);
             wk->isTouch = FALSE;
@@ -689,10 +692,10 @@ static void PStatus_HandleTouch(PStatusWork *wk) {
         if (wk->page < PSTATUS_PAGE_FORGET && PStatus_IsFromFieldMenu(wk) == TRUE) {
             if (wk->shortcutRegistered[wk->page] == TRUE) {
                 wk->shortcutRegistered[wk->page] = FALSE;
-                func_0204c488(wk->buttons[PSTA_BUTTON_SHORTCUT], 6);
+                ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SHORTCUT], 6);
             } else {
                 wk->shortcutRegistered[wk->page] = TRUE;
-                func_0204c488(wk->buttons[PSTA_BUTTON_SHORTCUT], 7);
+                ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SHORTCUT], 7);
             }
             GFL_SndSEPlay(SEQ_SE_SYS_07);
             wk->isTouch = TRUE;
@@ -701,8 +704,8 @@ static void PStatus_HandleTouch(PStatusWork *wk) {
     case PSTA_BUTTON_UP:
         if (PStatus_ChangePokemon(wk, PSTA_DIR_UP) == TRUE) {
             PStatus_StartRedraw(wk);
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 11);
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 2);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 11);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 2);
             wk->upPressed = TRUE;
             wk->downPressed = FALSE;
             GFL_SndSEPlay(SEQ_SE_SYS_37);
@@ -712,8 +715,8 @@ static void PStatus_HandleTouch(PStatusWork *wk) {
     case PSTA_BUTTON_DOWN:
         if (PStatus_ChangePokemon(wk, PSTA_DIR_DOWN) == TRUE) {
             PStatus_StartRedraw(wk);
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 3);
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 10);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 3);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 10);
             wk->upPressed = FALSE;
             wk->downPressed = TRUE;
             GFL_SndSEPlay(SEQ_SE_SYS_37);
@@ -725,7 +728,7 @@ static void PStatus_HandleTouch(PStatusWork *wk) {
             wk->exitResult = PSTATUS_RESULT_CLOSE;
             wk->param->result = PSTATUS_RESULT_CLOSE;
             wk->seq = PSTA_SEQ_EXIT;
-            func_0204c488(wk->buttons[PSTA_BUTTON_CLOSE], 8);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_CLOSE], 8);
             wk->pressedButton = wk->buttons[PSTA_BUTTON_CLOSE];
             GFL_SndSEPlay(SEQ_SE_CLOSE1);
             wk->isTouch = TRUE;
@@ -735,7 +738,7 @@ static void PStatus_HandleTouch(PStatusWork *wk) {
         wk->exitResult = PSTATUS_RESULT_BACK;
         wk->param->result = PSTATUS_RESULT_BACK;
         wk->seq = PSTA_SEQ_EXIT;
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
         wk->pressedButton = wk->buttons[PSTA_BUTTON_BACK];
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         wk->isTouch = TRUE;
@@ -876,24 +879,24 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
 void PStatus_EnableInput(PStatusWork *wk, BOOL enable) {
     wk->isInputEnabled = enable;
     if (enable == FALSE) {
-        func_0204c124(wk->buttons[PSTA_BUTTON_INFO], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_SKILL], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_RIBBON], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_SHORTCUT], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_UP], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_DOWN], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_CLOSE], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_INFO], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SKILL], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_RIBBON], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SHORTCUT], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_UP], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_DOWN], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_CLOSE], FALSE);
     } else {
-        func_0204c124(wk->buttons[PSTA_BUTTON_INFO], TRUE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_SKILL], TRUE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_INFO], TRUE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SKILL], TRUE);
         if (wk->hasRibbon == TRUE) {
-            func_0204c124(wk->buttons[PSTA_BUTTON_RIBBON], TRUE);
+            ClActor_SetVisible(wk->buttons[PSTA_BUTTON_RIBBON], TRUE);
         }
-        func_0204c124(wk->buttons[PSTA_BUTTON_UP], TRUE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_DOWN], TRUE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_UP], TRUE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_DOWN], TRUE);
         if (PStatus_IsFromFieldMenu(wk) == TRUE) {
-            func_0204c124(wk->buttons[PSTA_BUTTON_SHORTCUT], TRUE);
-            func_0204c124(wk->buttons[PSTA_BUTTON_CLOSE], TRUE);
+            ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SHORTCUT], TRUE);
+            ClActor_SetVisible(wk->buttons[PSTA_BUTTON_CLOSE], TRUE);
         }
     }
 }
@@ -1076,35 +1079,35 @@ static void PStatus_UpdateRedraw(PStatusWork *wk) {
         break;
     }
     if (wk->isEgg == FALSE && wk->param->mode != PSTATUS_MODE_FORGET_MOVE) {
-        func_0204c124(wk->buttons[PSTA_BUTTON_SKILL], TRUE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SKILL], TRUE);
         if (wk->hasRibbon == FALSE) {
-            func_0204c124(wk->buttons[PSTA_BUTTON_RIBBON], FALSE);
+            ClActor_SetVisible(wk->buttons[PSTA_BUTTON_RIBBON], FALSE);
         } else {
-            func_0204c124(wk->buttons[PSTA_BUTTON_RIBBON], TRUE);
+            ClActor_SetVisible(wk->buttons[PSTA_BUTTON_RIBBON], TRUE);
         }
     } else {
-        func_0204c124(wk->buttons[PSTA_BUTTON_SKILL], FALSE);
-        func_0204c124(wk->buttons[PSTA_BUTTON_RIBBON], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_SKILL], FALSE);
+        ClActor_SetVisible(wk->buttons[PSTA_BUTTON_RIBBON], FALSE);
     }
     if (wk->upPressed == FALSE) {
         if (PStatus_FindPokemon(wk, PSTA_DIR_UP, NULL) == TRUE) {
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 3);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 3);
         } else {
-            func_0204c488(wk->buttons[PSTA_BUTTON_UP], 17);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_UP], 17);
         }
     }
     if (wk->downPressed == FALSE) {
         if (PStatus_FindPokemon(wk, PSTA_DIR_DOWN, NULL) == TRUE) {
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 2);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 2);
         } else {
-            func_0204c488(wk->buttons[PSTA_BUTTON_DOWN], 16);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_DOWN], 16);
         }
     }
     if (wk->page < PSTATUS_PAGE_FORGET && PStatus_IsFromFieldMenu(wk) == TRUE) {
         if (wk->shortcutRegistered[wk->page] == TRUE) {
-            func_0204c488(wk->buttons[PSTA_BUTTON_SHORTCUT], 7);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SHORTCUT], 7);
         } else {
-            func_0204c488(wk->buttons[PSTA_BUTTON_SHORTCUT], 6);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SHORTCUT], 6);
         }
     }
     if (wk->playCry == TRUE) {

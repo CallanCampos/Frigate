@@ -281,6 +281,6 @@ static void WbtSubscreen_PrintTournament(WbtSubscreen *work) {
 }
 
 static void WbtSubscreen_InitWirelessIcons(WbtSubscreen *work) {
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }

@@ -190,7 +190,7 @@ static void PdcMain_InitGraphics(HeapID heapId) {
 static void PdcMain_ExitGraphics(void) {
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    func_0204b758();
+    ClActSys_Delete();
     GFL_G3DSysFree();
 }
 
@@ -351,7 +351,7 @@ static u32 PdcMain_ProcBag(PdcMain *work) {
         }
         break;
     case PDC_BAG_WAIT_EFFECT_END:
-        if ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48() || --work->timer == 0) {
+        if ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed() || --work->timer == 0) {
             GFL_FadeSet(3, 0, 16, 2);
             work->seq++;
         }

@@ -430,11 +430,11 @@ static LocalTvtFace *LocalTvtFace_Create(LocalTvtChara *chara, const LocalTvtFac
 
 static void LocalTvtFace_Free(LocalTvtChara *chara, LocalTvtFace *face) {
     LocalTvtFace_FreeObject(face);
-    func_0204c108(face->eyes);
-    func_0204c108(face->mouth);
-    func_0204bcd0(face->palette);
-    func_0204b98c(face->chars);
-    func_0204be64(face->cellAnims);
+    ClActor_Delete(face->eyes);
+    ClActor_Delete(face->mouth);
+    ClActSys_FreePltt(face->palette);
+    ClActSys_FreeChars(face->chars);
+    ClActSys_FreeCellAnims(face->cellAnims);
     BmpWin_ClearScreen(face->nameWindow);
     BmpWin_Free(face->nameWindow);
     if (face->charFile != NULL) {
@@ -507,19 +507,19 @@ static void LocalTvtFace_Update(LocalTvtFace *face) {
     }
     face->blinkTimer += (u16)(GFL_RandomLC(2) + 1);
     if (face->blinkTimer >= 150) {
-        func_0204c540(face->eyes);
-        func_0204c56c(face->eyes);
+        ClActor_StartAnim(face->eyes);
+        ClActor_RestartAnim(face->eyes);
         face->blinkTimer = 0;
     }
     // The mouth keeps moving for a while after the characters stop
     if (face->talking == TRUE || face->talkTimer != 0) {
-        if (!func_0204c560(face->mouth)) {
-            func_0204c540(face->mouth);
+        if (!ClActor_IsAnimActive(face->mouth)) {
+            ClActor_StartAnim(face->mouth);
         }
     } else {
-        if (func_0204c560(face->mouth) == TRUE) {
-            if (func_0204c510(face->mouth) == 0) {
-                func_0204c550(face->mouth);
+        if (ClActor_IsAnimActive(face->mouth) == TRUE) {
+            if (ClActor_GetAnimFrame(face->mouth) == 0) {
+                ClActor_StopAnim(face->mouth);
             }
         }
     }
@@ -575,11 +575,11 @@ static void LocalTvtFace_LoadGraphics(LocalTvtFace *face, LocalTvtChara *chara, 
                            heapId);
     LocalTvtFace_CopyChars(face, srcOffset, size * face->index + BACKGROUND_CHAR_OFFSET, size);
     GFL_HeapFree(face->charFile);
-    face->palette =
-        func_0204bc48(chara->arc, sLocalTvtPersonFiles[face->person].obj, 0, (face->index * 2 + 3) * 0x20, heapId);
-    face->chars = func_0204b81c(chara->arc, sLocalTvtPersonFiles[face->person].obj + 1, FALSE, 0, heapId);
-    face->cellAnims = func_0204bde0(chara->arc, sLocalTvtPersonFiles[face->person].obj + 2,
-                                    sLocalTvtPersonFiles[face->person].obj + 3, heapId);
+    face->palette = ClActSys_LoadPlttEx(chara->arc, sLocalTvtPersonFiles[face->person].obj, 0,
+                                        (face->index * 2 + 3) * 0x20, heapId);
+    face->chars = ClActSys_LoadChars(chara->arc, sLocalTvtPersonFiles[face->person].obj + 1, FALSE, 0, heapId);
+    face->cellAnims = ClActSys_LoadCellAnims(chara->arc, sLocalTvtPersonFiles[face->person].obj + 2,
+                                             sLocalTvtPersonFiles[face->person].obj + 3, heapId);
     setup.priority = 10;
     setup.bgPriority = 1;
     setup.x = (face->index % 2) * 128 + 64;
@@ -588,15 +588,15 @@ static void LocalTvtFace_LoadGraphics(LocalTvtFace *face, LocalTvtChara *chara, 
         setup.y += 56;
     }
     setup.sequence = 0;
-    face->eyes = func_0204c040(chara->setup.unit, face->chars, face->palette, face->cellAnims, &setup, 0, heapId);
-    func_0204c124(face->eyes, FALSE);
+    face->eyes = ClActor_Create(chara->setup.unit, face->chars, face->palette, face->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(face->eyes, FALSE);
     func_0204c520(face->eyes, TRUE);
-    func_0204c550(face->eyes);
+    ClActor_StopAnim(face->eyes);
     setup.sequence = 1;
-    face->mouth = func_0204c040(chara->setup.unit, face->chars, face->palette, face->cellAnims, &setup, 0, heapId);
-    func_0204c124(face->mouth, FALSE);
+    face->mouth = ClActor_Create(chara->setup.unit, face->chars, face->palette, face->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(face->mouth, FALSE);
     func_0204c520(face->mouth, TRUE);
-    func_0204c550(face->mouth);
+    ClActor_StopAnim(face->mouth);
 }
 
 static void LocalTvtFace_ReadChars(LocalTvtFace *face, ArcTool *arc, u32 fileId, HeapID heapId) {
@@ -694,9 +694,9 @@ static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, 
         cellFile = sLocalTvtObjectFiles[object][1].cells;
         animFile = sLocalTvtObjectFiles[object][1].anims;
     }
-    face->objectPalette = func_0204bc48(chara->arc, paletteFile, 0, (face->index + 12) * 0x20, heapId);
-    face->objectChars = func_0204b81c(chara->arc, charFile, FALSE, 0, heapId);
-    face->objectCellAnims = func_0204bde0(chara->arc, cellFile, animFile, heapId);
+    face->objectPalette = ClActSys_LoadPlttEx(chara->arc, paletteFile, 0, (face->index + 12) * 0x20, heapId);
+    face->objectChars = ClActSys_LoadChars(chara->arc, charFile, FALSE, 0, heapId);
+    face->objectCellAnims = ClActSys_LoadCellAnims(chara->arc, cellFile, animFile, heapId);
     setup.priority = 10;
     setup.bgPriority = 2;
     setup.x = 0;
@@ -704,38 +704,38 @@ static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, 
     setup.sequence = 0;
     setup.x = sLocalTvtObjectPositions[face->index].x;
     setup.y = sLocalTvtObjectPositions[face->index].y;
-    face->objectActor = func_0204c040(chara->setup.unit, face->objectChars, face->objectPalette, face->objectCellAnims,
-                                      &setup, 0, heapId);
-    func_0204c124(face->objectActor, FALSE);
+    face->objectActor = ClActor_Create(chara->setup.unit, face->objectChars, face->objectPalette, face->objectCellAnims,
+                                       &setup, 0, heapId);
+    ClActor_SetVisible(face->objectActor, FALSE);
     func_0204c520(face->objectActor, TRUE);
-    func_0204c4d4(face->objectActor, GFL_RandomLCAlt(0x4000));
+    ClActor_SetAnimTime(face->objectActor, GFL_RandomLCAlt(0x4000));
 }
 
 static void LocalTvtFace_FreeObject(LocalTvtFace *face) {
     if (face->objectActor != NULL) {
-        func_0204c108(face->objectActor);
+        ClActor_Delete(face->objectActor);
         face->objectActor = NULL;
     }
     if (face->objectPalette != 0xff) {
-        func_0204bcd0(face->objectPalette);
+        ClActSys_FreePltt(face->objectPalette);
         face->objectPalette = 0xff;
     }
     if (face->objectChars != 0xff) {
-        func_0204b98c(face->objectChars);
+        ClActSys_FreeChars(face->objectChars);
         face->objectChars = 0xff;
     }
     if (face->objectCellAnims != 0xff) {
-        func_0204be64(face->objectCellAnims);
+        ClActSys_FreeCellAnims(face->objectCellAnims);
         face->objectCellAnims = 0xff;
     }
 }
 
 static void LocalTvtFace_SetVisible(LocalTvtFace *face, BOOL visible) {
     if (face->objectActor != NULL) {
-        func_0204c124(face->objectActor, visible);
+        ClActor_SetVisible(face->objectActor, visible);
     }
-    func_0204c124(face->eyes, visible);
-    func_0204c124(face->mouth, visible);
+    ClActor_SetVisible(face->eyes, visible);
+    ClActor_SetVisible(face->mouth, visible);
 }
 
 // The cursor that points at the name of the face that talks
@@ -743,26 +743,26 @@ static void LocalTvtChara_CreateCursor(LocalTvtChara *chara) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, chara->heapId);
     ClActorSetup setup;
 
-    chara->cursorPalette = func_0204bc48(arc, 3, 0, 0, chara->heapId);
-    chara->cursorChars = func_0204b81c(arc, 27, FALSE, 0, chara->heapId);
-    chara->cursorCellAnims = func_0204bde0(arc, 21, 24, chara->heapId);
+    chara->cursorPalette = ClActSys_LoadPlttEx(arc, 3, 0, 0, chara->heapId);
+    chara->cursorChars = ClActSys_LoadChars(arc, 27, FALSE, 0, chara->heapId);
+    chara->cursorCellAnims = ClActSys_LoadCellAnims(arc, 21, 24, chara->heapId);
     GFL_ArcToolFree(arc);
     setup.priority = 10;
     setup.bgPriority = 1;
     setup.x = 0;
     setup.y = 0;
     setup.sequence = 0;
-    chara->cursor = func_0204c040(chara->setup.unit, chara->cursorChars, chara->cursorPalette, chara->cursorCellAnims,
-                                  &setup, 0, chara->heapId);
-    func_0204c124(chara->cursor, FALSE);
+    chara->cursor = ClActor_Create(chara->setup.unit, chara->cursorChars, chara->cursorPalette, chara->cursorCellAnims,
+                                   &setup, 0, chara->heapId);
+    ClActor_SetVisible(chara->cursor, FALSE);
     func_0204c520(chara->cursor, TRUE);
 }
 
 static void LocalTvtChara_FreeCursor(LocalTvtChara *chara) {
-    func_0204c108(chara->cursor);
-    func_0204bcd0(chara->cursorPalette);
-    func_0204b98c(chara->cursorChars);
-    func_0204be64(chara->cursorCellAnims);
+    ClActor_Delete(chara->cursor);
+    ClActSys_FreePltt(chara->cursorPalette);
+    ClActSys_FreeChars(chara->cursorChars);
+    ClActSys_FreeCellAnims(chara->cursorCellAnims);
 }
 
 static void LocalTvtChara_ShowCursor(LocalTvtChara *chara, u32 index) {
@@ -771,13 +771,13 @@ static void LocalTvtChara_ShowCursor(LocalTvtChara *chara, u32 index) {
 
     pos.x = nameWidth / 2 + (sLocalTvtNamePositions[index].x * 8 + 80);
     pos.y = sLocalTvtNamePositions[index].y * 8 + 16;
-    func_0204c140(chara->cursor, &pos, 0);
-    func_0204c124(chara->cursor, TRUE);
-    func_0204c56c(chara->cursor);
+    ClActor_SetSurfacePos(chara->cursor, &pos, 0);
+    ClActor_SetVisible(chara->cursor, TRUE);
+    ClActor_RestartAnim(chara->cursor);
 }
 
 static void LocalTvtChara_HideCursor(LocalTvtChara *chara) {
-    func_0204c124(chara->cursor, FALSE);
+    ClActor_SetVisible(chara->cursor, FALSE);
 }
 
 static void LocalTvtChara_VBlank(TCB *tcb, void *data) {

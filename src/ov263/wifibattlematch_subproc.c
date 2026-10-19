@@ -128,8 +128,8 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
     }
 
     // A failed connection ends the screens
-    if (func_02042788()) {
-        if (func_02042e84()->bNetType == NET_TYPE_IRC) {
+    if (GFL_NetIsInitialized()) {
+        if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 list->result = 2;
@@ -346,7 +346,7 @@ static void WifiBattleMatchExchange_InitWifi(WifiBattleMatchExchangeWork *wk, Wi
 
 static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, WifiBattleMatchExchangeParam *param,
                                              u32 *state) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         switch (DWCRapCommon_CheckError(1, 1)) {
         case 0:
             break;
@@ -364,11 +364,11 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
 
     switch (*state) {
     case 0:
-        func_02040624(func_02040440(), 0x10, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x10, 0x24);
         (*state)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 0x10, 0x24)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x10, 0x24)) {
             (*state)++;
         }
         break;
@@ -380,11 +380,11 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         (*state)++;
         break;
     case 3:
-        func_02040624(func_02040440(), 0x11, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 0x24);
         (*state)++;
         break;
     case 4:
-        if (func_02040664(func_02040440(), 0x11, 0x24)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x11, 0x24)) {
             (*state)++;
         }
         break;
@@ -399,11 +399,11 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         }
         break;
     case 7:
-        func_02040624(func_02040440(), 0x12, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x12, 0x24);
         (*state)++;
         break;
     case 8:
-        if (func_02040664(func_02040440(), 0x12, 0x24)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x12, 0x24)) {
             (*state)++;
         }
         break;
@@ -416,11 +416,11 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         (*state)++;
         break;
     case 10:
-        func_02040624(func_02040440(), 0x13, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x13, 0x24);
         (*state)++;
         break;
     case 11:
-        if (func_02040664(func_02040440(), 0x13, 0x24)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x13, 0x24)) {
             return TRUE;
         }
         break;
@@ -456,11 +456,11 @@ static BOOL WifiBattleMatchExchange_MainIrc(WifiBattleMatchExchangeWork *wk, Wif
         (*state)++;
         break;
     case 1:
-        func_02040624(func_02040440(), 0x11, 0x1f);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 0x1f);
         (*state)++;
         break;
     case 2:
-        if (func_02040664(func_02040440(), 0x11, 0x1f)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x11, 0x1f)) {
             (*state)++;
         }
         break;

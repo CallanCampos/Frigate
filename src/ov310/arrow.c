@@ -176,18 +176,18 @@ static void Arrow_ShowPiece(Arrow *arrow, u8 index) {
         sequence = arrow->resources.sequences[PIECE_HEAD];
         break;
     }
-    func_0204c140(actor, &pos, arrow->resources.surface);
-    func_0204c488(actor, sequence);
-    func_0204c4d4(actor, 0);
-    func_0204c584(actor, 1);
+    ClActor_SetSurfacePos(actor, &pos, arrow->resources.surface);
+    ClActor_SetSequence(actor, sequence);
+    ClActor_SetAnimTime(actor, 0);
+    ClActor_SetPlayMode(actor, 1);
     func_0204c520(actor, TRUE);
     func_0204c53c(actor, FX32_CONST(18));
-    func_0204c540(actor);
-    func_0204c124(actor, TRUE);
+    ClActor_StartAnim(actor);
+    ClActor_SetVisible(actor, TRUE);
 }
 
 static void Arrow_StopPiece(Arrow *arrow, u8 index) {
-    func_0204c550(arrow->pieces[index].actor);
+    ClActor_StopAnim(arrow->pieces[index].actor);
 }
 
 static void Arrow_HideAll(Arrow *arrow) {
@@ -195,7 +195,7 @@ static void Arrow_HideAll(Arrow *arrow) {
     int count = arrow->pieceCount;
 
     for (i = 0; i < count; i++) {
-        func_0204c124(arrow->pieces[i].actor, FALSE);
+        ClActor_SetVisible(arrow->pieces[i].actor, FALSE);
     }
 }
 
@@ -305,11 +305,11 @@ static void Arrow_Free(Arrow *arrow) {
 }
 
 static void Arrow_CreateUnit(Arrow *arrow) {
-    arrow->unit = func_0204bf1c(PIECE_MAX, 0, arrow->heapId);
+    arrow->unit = ClActUnit_Create(PIECE_MAX, 0, arrow->heapId);
 }
 
 static void Arrow_DeleteUnit(Arrow *arrow) {
-    func_0204bf98(arrow->unit);
+    ClActUnit_Delete(arrow->unit);
 }
 
 static void Arrow_CreateActors(Arrow *arrow) {
@@ -323,8 +323,8 @@ static void Arrow_CreateActors(Arrow *arrow) {
     setup.priority = 0;
     setup.bgPriority = 0;
     for (i = 0; i < PIECE_MAX; i++) {
-        arrow->pieces[i].actor = func_0204c040(arrow->unit, resources->chars, resources->palette, resources->cellAnims,
-                                               &setup, resources->surface, arrow->heapId);
+        arrow->pieces[i].actor = ClActor_Create(arrow->unit, resources->chars, resources->palette, resources->cellAnims,
+                                                &setup, resources->surface, arrow->heapId);
     }
 }
 
@@ -332,7 +332,7 @@ static void Arrow_DeleteActors(Arrow *arrow) {
     int i;
 
     for (i = 0; i < PIECE_MAX; i++) {
-        func_0204c108(arrow->pieces[i].actor);
+        ClActor_Delete(arrow->pieces[i].actor);
     }
 }
 

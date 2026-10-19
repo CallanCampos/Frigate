@@ -411,7 +411,7 @@ static void BrRecord_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (BrRecord_GetTrgChange(p_wk, x, y)) {
             p_wk->isProfile ^= 1;
             BrSeq_SetNext(p_seqwk, BrRecord_SeqChangePage);
@@ -571,12 +571,12 @@ static void BrRecord_SeqDownloadOutline(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_a
         break;
     }
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -718,12 +718,12 @@ static void BrRecord_SeqDownloadPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs
         break;
     }
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -885,7 +885,7 @@ static void BrRecord_SeqConfirmPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs)
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (BrRecord_GetTrgYes(p_wk, x, y)) {
                 *p_seq = SEQ_YES_FADEOUT_START;
             } else if (BrRecord_GetTrgNo(p_wk, x, y)) {
@@ -1101,8 +1101,8 @@ static void BrRecord_CreateIcons(BrRecordWork *p_wk, ClActUnit *unit, BattleRecH
     int idx;
 
     handle = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(heapId));
-    p_wk->iconPlt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_SURFACE_MAIN, 0x80, heapId);
-    p_wk->iconCell = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
+    p_wk->iconPlt = ClActSys_LoadPlttEx(handle, PokeIcon_GetPaletteFile(), CLACT_SURFACE_MAIN, 0x80, heapId);
+    p_wk->iconCell = ClActSys_LoadCellAnims(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
 
     idx = 0;
     step = 6;
@@ -1147,16 +1147,16 @@ static void BrRecord_CreateIcons(BrRecordWork *p_wk, ClActUnit *unit, BattleRecH
         if (species[i] != 0) {
             ClActorSetup setup;
 
-            p_wk->iconChr[i] = func_0204b81c(handle, PokeParty_GetIconIndex(species[i], form[i], gender[i], FALSE),
-                                             FALSE, CLACT_SURFACE_MAIN, heapId);
+            p_wk->iconChr[i] = ClActSys_LoadChars(handle, PokeParty_GetIconIndex(species[i], form[i], gender[i], FALSE),
+                                                  FALSE, CLACT_SURFACE_MAIN, heapId);
             MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
             setup.x = sBrRecordIconPos[layout][i].x + 8;
             setup.y = sBrRecordIconPos[layout][i].y - 12;
             setup.sequence = 1;
             setup.priority = BATTLE_REC_HEADER_PKM_MAX - cnt;
-            p_wk->icon[cnt] = func_0204c040(unit, p_wk->iconChr[i], p_wk->iconPlt, p_wk->iconCell, &setup, 0, heapId);
-            func_0204c318(p_wk->icon[cnt], 1);
-            func_0204c378(p_wk->icon[cnt], PokeIcon_GetPalette(species[i], form[i], gender[i], FALSE), 0);
+            p_wk->icon[cnt] = ClActor_Create(unit, p_wk->iconChr[i], p_wk->iconPlt, p_wk->iconCell, &setup, 0, heapId);
+            ClActor_SetObjMode(p_wk->icon[cnt], 1);
+            ClActor_SetPalette(p_wk->icon[cnt], PokeIcon_GetPalette(species[i], form[i], gender[i], FALSE), 0);
             cnt++;
         }
     }
@@ -1192,21 +1192,21 @@ static void BrRecord_DeleteInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
     if (p_wk->isInfoCreated) {
         for (i = 0; i < BATTLE_REC_HEADER_PKM_MAX; i++) {
             if (p_wk->icon[i] != NULL) {
-                func_0204c124(p_wk->icon[i], FALSE);
-                func_0204c108(p_wk->icon[i]);
+                ClActor_SetVisible(p_wk->icon[i], FALSE);
+                ClActor_Delete(p_wk->icon[i]);
                 p_wk->icon[i] = NULL;
             }
             if (p_wk->iconChr[i] != -1) {
-                func_0204b98c(p_wk->iconChr[i]);
+                ClActSys_FreeChars(p_wk->iconChr[i]);
                 p_wk->iconChr[i] = -1;
             }
         }
         if (p_wk->iconPlt != -1) {
-            func_0204bcd0(p_wk->iconPlt);
+            ClActSys_FreePltt(p_wk->iconPlt);
             p_wk->iconPlt = -1;
         }
         if (p_wk->iconCell != -1) {
-            func_0204be64(p_wk->iconCell);
+            ClActSys_FreeCellAnims(p_wk->iconCell);
             p_wk->iconCell = -1;
         }
         for (i = 0; i < MSGWIN_MAX; i++) {

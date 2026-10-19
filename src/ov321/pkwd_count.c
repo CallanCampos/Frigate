@@ -648,23 +648,23 @@ static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCou
         setup.sequence = entries->sequence;
         setup.priority = entries->priority;
         setup.bgPriority = entries->bgPriority;
-        actors[i] = func_0204c040(unit, wk->resources[charsSlot], wk->resources[paletteSlot], wk->resources[cellSlot],
-                                  &setup, surface, wk->heapId);
+        actors[i] = ClActor_Create(unit, wk->resources[charsSlot], wk->resources[paletteSlot], wk->resources[cellSlot],
+                                   &setup, surface, wk->heapId);
         visible = FALSE;
         if (entries->visible == 1) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         animated = FALSE;
         if (entries->flags & 1) {
             animated = TRUE;
         }
         func_0204c520(actors[i], animated);
         if (entries->flags & 2) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (entries->flags & 4) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
     }
 }
@@ -673,10 +673,10 @@ static void PkwdCount_LoadActorResources(PkwdCountWork *wk, u32 surface, const P
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_COUNT, wk->heapId);
 
     PkwdCountGraphic_GetClActUnit(wk->graphic);
-    wk->resources[res->paletteSlot] =
-        func_0204bbb8(arc, res->paletteFile, surface, res->paletteOffset << 5, 0, res->paletteCount, wk->heapId);
-    wk->resources[res->charsSlot] = func_0204b81c(arc, res->charsFile, FALSE, surface, wk->heapId);
-    wk->resources[res->cellSlot] = func_0204bde0(arc, res->cellFile, res->animFile, wk->heapId);
+    wk->resources[res->paletteSlot] = ClActSys_LoadPlttRange(arc, res->paletteFile, surface, res->paletteOffset << 5, 0,
+                                                             res->paletteCount, wk->heapId);
+    wk->resources[res->charsSlot] = ClActSys_LoadChars(arc, res->charsFile, FALSE, surface, wk->heapId);
+    wk->resources[res->cellSlot] = ClActSys_LoadCellAnims(arc, res->cellFile, res->animFile, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -686,34 +686,34 @@ static void PkwdCount_InitActors(PkwdCountWork *wk) {
     PkwdCount_LoadActorResources(wk, 0, &sPkwdCountActorRes1);
     PkwdCount_CreateActors(wk, 0, sPkwdCountMainActors, &sPkwdCountMainActorGroup);
     PkwdCount_CreateActors(wk, 0, sPkwdCountSubActors, &sPkwdCountSubActorGroup);
-    func_0204c318(wk->mainActors[0], 1);
-    func_02042ba8(FALSE, wk->heapId);
+    ClActor_SetObjMode(wk->mainActors[0], 1);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void PkwdCount_FreeActors(PkwdCountWork *wk) {
     int i;
 
-    func_0204c108(wk->mainActors[0]);
+    ClActor_Delete(wk->mainActors[0]);
     for (i = 0; i < SUB_ACTOR_COUNT; i++) {
-        func_0204c108(wk->subActors[i]);
+        ClActor_Delete(wk->subActors[i]);
     }
-    func_0204bcd0(wk->resources[0]);
-    func_0204b98c(wk->resources[1]);
-    func_0204be64(wk->resources[2]);
-    func_0204bcd0(wk->resources[3]);
-    func_0204b98c(wk->resources[4]);
-    func_0204be64(wk->resources[5]);
+    ClActSys_FreePltt(wk->resources[0]);
+    ClActSys_FreeChars(wk->resources[1]);
+    ClActSys_FreeCellAnims(wk->resources[2]);
+    ClActSys_FreePltt(wk->resources[3]);
+    ClActSys_FreeChars(wk->resources[4]);
+    ClActSys_FreeCellAnims(wk->resources[5]);
 }
 
 static void PkwdCount_PlayAnim(PkwdCountWork *wk, int isSub, int index, u32 sequence) {
     if (isSub == 0) {
         if (index < MAIN_ACTOR_COUNT) {
-            func_0204c488(wk->mainActors[index], (u16)sequence);
+            ClActor_SetSequence(wk->mainActors[index], (u16)sequence);
             func_0204c520(wk->mainActors[index], TRUE);
         }
     } else if (index < SUB_ACTOR_COUNT) {
-        func_0204c488(wk->subActors[index], (u16)sequence);
+        ClActor_SetSequence(wk->subActors[index], (u16)sequence);
         func_0204c520(wk->subActors[index], TRUE);
     }
 }
@@ -721,10 +721,10 @@ static void PkwdCount_PlayAnim(PkwdCountWork *wk, int isSub, int index, u32 sequ
 static void PkwdCount_SetActorVisible(PkwdCountWork *wk, int isSub, int index, BOOL visible) {
     if (isSub == 0) {
         if (index < MAIN_ACTOR_COUNT) {
-            func_0204c124(wk->mainActors[index], visible);
+            ClActor_SetVisible(wk->mainActors[index], visible);
         }
     } else if (index < SUB_ACTOR_COUNT) {
-        func_0204c124(wk->subActors[index], visible);
+        ClActor_SetVisible(wk->subActors[index], visible);
     }
 }
 
@@ -735,14 +735,14 @@ static BOOL PkwdCount_IsActorAnimating(PkwdCountWork *wk, int isSub, int index) 
         if (index >= MAIN_ACTOR_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->mainActors[index])) {
+        if (!ClActor_IsAnimActive(wk->mainActors[index])) {
             result = FALSE;
         }
     } else {
         if (index >= SUB_ACTOR_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->subActors[index])) {
+        if (!ClActor_IsAnimActive(wk->subActors[index])) {
             result = FALSE;
         }
     }
@@ -776,9 +776,9 @@ static void PkwdCount_SetScene(PkwdCountWork *wk, u32 scene) {
         ClActorPos pos;
 
         PkwdCount_SetActorVisible(wk, FALSE, 0, FALSE);
-        func_0204c178(wk->mainActors[0], &pos, 0);
+        ClActor_GetSurfacePos(wk->mainActors[0], &pos, 0);
         pos.y = 256;
-        func_0204c140(wk->mainActors[0], &pos, 0);
+        ClActor_SetSurfacePos(wk->mainActors[0], &pos, 0);
     } else if (scene == SCENE_COUNT) {
         GFL_BGSysSetBGEnabled(3, FALSE);
         GFL_BGSysSetBGEnabled(2, FALSE);

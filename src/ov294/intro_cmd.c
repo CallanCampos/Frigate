@@ -398,7 +398,7 @@ static BOOL IntroCmd_SEStop(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
 }
 
 static BOOL IntroCmd_WaitInput(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
-    if (func_0203da48() || GCTX_HIDGetPressedKeys()) {
+    if (GFL_HIDIsTouchPressed() || GCTX_HIDGetPressedKeys()) {
         return TRUE;
     }
     return FALSE;
@@ -800,22 +800,22 @@ static BOOL IntroCmd_CreateObj(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_INTRO, cmd->heapId);
     ClActorSetup setup;
 
-    cmd->objChars = func_0204b81c(arc, 10, 0, 0, cmd->heapId);
-    cmd->objPalette = func_0204bba0(arc, 11, 0, 0x20, cmd->heapId);
-    cmd->objCellAnims = func_0204bde0(arc, 9, 8, cmd->heapId);
+    cmd->objChars = ClActSys_LoadChars(arc, 10, 0, 0, cmd->heapId);
+    cmd->objPalette = ClActSys_LoadPltt(arc, 11, 0, 0x20, cmd->heapId);
+    cmd->objCellAnims = ClActSys_LoadCellAnims(arc, 9, 8, cmd->heapId);
     GFL_ArcToolFree(arc);
     setup = sObjSetup;
-    cmd->obj = func_0204c040(IntroGraphic_GetClActUnit(cmd->graphic), cmd->objChars, cmd->objPalette, cmd->objCellAnims,
-                             &setup, 0, cmd->heapId);
-    func_0204c124(cmd->obj, FALSE);
+    cmd->obj = ClActor_Create(IntroGraphic_GetClActUnit(cmd->graphic), cmd->objChars, cmd->objPalette,
+                              cmd->objCellAnims, &setup, 0, cmd->heapId);
+    ClActor_SetVisible(cmd->obj, FALSE);
     return TRUE;
 }
 
 static BOOL IntroCmd_FreeObj(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
-    func_0204b98c(cmd->objChars);
-    func_0204bcd0(cmd->objPalette);
-    func_0204be64(cmd->objCellAnims);
-    func_0204c108(cmd->obj);
+    ClActSys_FreeChars(cmd->objChars);
+    ClActSys_FreePltt(cmd->objPalette);
+    ClActSys_FreeCellAnims(cmd->objCellAnims);
+    ClActor_Delete(cmd->obj);
     return TRUE;
 }
 
@@ -826,14 +826,14 @@ static BOOL IntroCmd_ObjFadeIn(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     switch (work->state) {
     case 0:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 12, 0, 16);
-        func_0204c318(cmd->obj, GX_OAM_MODE_XLU);
-        func_0204c124(cmd->obj, TRUE);
+        ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_XLU);
+        ClActor_SetVisible(cmd->obj, TRUE);
         work->state++;
         break;
     case 16:
         for (i = 0; i < 3; i++) {
-            if (func_0204c370(cmd->obj) == GX_OAM_MODE_XLU) {
-                func_0204c318(cmd->obj, GX_OAM_MODE_NORMAL);
+            if (ClActor_GetObjMode(cmd->obj) == GX_OAM_MODE_XLU) {
+                ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_NORMAL);
             }
         }
         work->state = 0;
@@ -853,14 +853,14 @@ static BOOL IntroCmd_ObjFadeOut(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     case 0:
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 12, 16, 0);
         for (i = 0; i < 3; i++) {
-            func_0204c318(cmd->obj, GX_OAM_MODE_XLU);
+            ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_XLU);
         }
         work->state++;
         break;
     case 16:
         for (i = 0; i < 3; i++) {
-            func_0204c318(cmd->obj, GX_OAM_MODE_NORMAL);
-            func_0204c124(cmd->obj, FALSE);
+            ClActor_SetObjMode(cmd->obj, GX_OAM_MODE_NORMAL);
+            ClActor_SetVisible(cmd->obj, FALSE);
         }
         work->state = 0;
         return TRUE;

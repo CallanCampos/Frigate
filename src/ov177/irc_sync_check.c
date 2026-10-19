@@ -588,23 +588,23 @@ static void IrcSyncCheckClAct_Init(IrcSyncCheckClAct *clact, const BGSysVRAMConf
 
     MI_CpuFill8(clact, 0, sizeof(IrcSyncCheckClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     arc = GFL_ArcSysCreateFileHandle(ARCID_IRC_COMPAT, heapId);
-    clact->palette = func_0204bba0(arc, 12, CLACT_VRAM_SUB, 0, heapId);
-    clact->chars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
-    clact->cellAnims = func_0204bde0(arc, 10, 9, heapId);
+    clact->palette = ClActSys_LoadPltt(arc, 12, CLACT_VRAM_SUB, 0, heapId);
+    clact->chars = ClActSys_LoadChars(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
+    clact->cellAnims = ClActSys_LoadCellAnims(arc, 10, 9, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < CLACT_COUNT; i++) {
-        clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
-                                         CLACT_SURFACE_SUB, heapId);
-        func_0204c124(clact->actors[i], FALSE);
-        func_0204c468(clact->actors[i], 3);
+        clact->actors[i] = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
+                                          CLACT_SURFACE_SUB, heapId);
+        ClActor_SetVisible(clact->actors[i], FALSE);
+        ClActor_SetBgPriority(clact->actors[i], 3);
         func_0204c520(clact->actors[i], TRUE);
-        func_0204c488(clact->actors[i], 0);
+        ClActor_SetSequence(clact->actors[i], 0);
     }
 }
 
@@ -613,23 +613,23 @@ static void IrcSyncCheckClAct_Free(IrcSyncCheckClAct *clact) {
 
     for (i = 0; i < CLACT_COUNT + 1; i++) {
         if (clact->actors[i] != NULL) {
-            func_0204c108(clact->actors[i]);
+            ClActor_Delete(clact->actors[i]);
         }
     }
-    func_0204bcd0(clact->palette);
-    func_0204b98c(clact->chars);
-    func_0204be64(clact->cellAnims);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActSys_FreePltt(clact->palette);
+    ClActSys_FreeChars(clact->chars);
+    ClActSys_FreeCellAnims(clact->cellAnims);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(IrcSyncCheckClAct));
 }
 
 static void IrcSyncCheckClAct_Update(IrcSyncCheckClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void IrcSyncCheckClAct_VBlank(IrcSyncCheckClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActor *IrcSyncCheckClAct_GetActor(IrcSyncCheckClAct *clact, int index) {
@@ -1256,7 +1256,7 @@ static BOOL IrcSyncNet_Send(IrcSyncNet *net, const IrcSyncData *data) {
         break;
     case 1:
         if (CompatibleIrcSys_SendEx(net->sys, NET_COMMAND_BASE, sizeof(IrcSyncData), &net->send,
-                                    !func_02042a6c(func_02040440()), 0, FALSE, TRUE)) {
+                                    !GFL_NetGetHandleNetId(NetHandle_GetOwn()), 0, FALSE, TRUE)) {
             net->state = 2;
         }
         break;
@@ -1278,8 +1278,8 @@ static void IrcSyncNet_GetReceived(IrcSyncNet *net, IrcSyncData *dest) {
 static void IrcSyncNet_OnReceive(int netId, int size, const void *data, void *work, NetHandle *handle) {
     IrcSyncNet *net = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             net->received = TRUE;
         }
     }
@@ -1288,7 +1288,7 @@ static void IrcSyncNet_OnReceive(int netId, int size, const void *data, void *wo
 static void *IrcSyncNet_GetBuffer(int netId, void *work, int size) {
     IrcSyncNet *net = work;
 
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return &net->own;
     }
     return &net->peer;
@@ -1363,7 +1363,7 @@ static BOOL IrcSyncRect_IsPressed(const IrcSyncRect *rect, IrcSyncPoint *point) 
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y) && x - rect->left < rect->right - rect->left &&
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && x - rect->left < rect->right - rect->left &&
         y - rect->top < rect->bottom - rect->top) {
         if (point != NULL) {
             point->x = x;
@@ -1379,7 +1379,7 @@ static BOOL IrcSyncRect_IsHeld(const IrcSyncRect *rect, IrcSyncPoint *point) {
     u32 x;
     u32 y;
 
-    if (func_0203da84(&x, &y) && x - rect->left < rect->right - rect->left &&
+    if (GFL_HIDGetTouchHeldPoint(&x, &y) && x - rect->left < rect->right - rect->left &&
         y - rect->top < rect->bottom - rect->top) {
         if (point != NULL) {
             point->x = x;
@@ -1533,7 +1533,7 @@ static void IrcSyncCheckSparkle_Init(IrcSyncCheckSparkle *sparkle, ClActor *acto
     MI_CpuFill8(sparkle, 0, sizeof(IrcSyncCheckSparkle));
     sparkle->actor = actor;
     sparkle->value = value;
-    func_0204c378(actor, (u8)palette, TRUE);
+    ClActor_SetPalette(actor, (u8)palette, TRUE);
 }
 
 static void IrcSyncTrace_Clear(IrcSyncTrace *trace) {

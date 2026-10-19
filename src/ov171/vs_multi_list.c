@@ -180,7 +180,7 @@ static BOOL VsMultiList_Main(GameProc *proc, u32 *state, void *param, void *work
     }
     BGWinFrame_UpdateMoves(wk->frames);
     VsMultiList_FlushText(wk);
-    func_0204b794();
+    ClActSys_Draw();
     return FALSE;
 }
 
@@ -204,7 +204,7 @@ static int VsMultiList_StateSetup(VsMultiListWork *wk) {
     VsMultiList_CreateWindows(wk);
     VsMultiList_CreateObjs(wk);
     VsMultiList_CreateFrames(wk);
-    func_02042ba8(TRUE, HEAPID_VS_MULTI_LIST);
+    GFL_NetSetIconScreen(TRUE, HEAPID_VS_MULTI_LIST);
     GFL_BGSysSetBGEnabledA(0x17, TRUE);
     VsMultiList_AddVBlankTask(wk);
     return VsMultiList_StartWipeIn(wk, VsMultiList_StartWait(wk, 128, STATE_SLIDE));
@@ -421,7 +421,7 @@ static void VsMultiList_RemoveVBlankTask(VsMultiListWork *wk) {
 
 static void VsMultiList_VBlank(TCB *tcb, void *data) {
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
@@ -584,7 +584,7 @@ static void VsMultiList_InitClActSys(VsMultiListWork *wk) {
 }
 
 static void VsMultiList_FreeClActSys(void) {
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
@@ -601,21 +601,22 @@ static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
         } else {
             icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
         }
-        charRes[i] = func_0204b81c(arc, icon, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
+        charRes[i] = ClActSys_LoadChars(arc, icon, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
     }
-    wk->palRes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), HEAPID_VS_MULTI_LIST);
+    wk->palRes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[0] =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), HEAPID_VS_MULTI_LIST);
     GFL_ArcToolFree(arc);
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), BG_HEAP);
-    wk->charRes[7] = func_0204b81c(uiArc, 12, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
-    wk->palRes[2] = func_0204bba0(uiArc, 11, CLACT_VRAM_MAIN, 96, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[2] = func_0204bde0(uiArc, 15, 18, HEAPID_VS_MULTI_LIST);
-    wk->charRes[6] = func_0204b81c(uiArc, 65, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
-    wk->palRes[1] = func_0204bba0(uiArc, 66, CLACT_VRAM_MAIN, 128, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[1] = func_0204bde0(uiArc, 69, 72, HEAPID_VS_MULTI_LIST);
-    wk->charRes[8] = func_0204b81c(uiArc, func_0202d958(2), FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
-    wk->palRes[3] = func_0204bba0(uiArc, func_0202d954(), CLACT_VRAM_MAIN, 160, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[3] = func_0204bde0(uiArc, func_0202d95c(2), func_0202d960(2), HEAPID_VS_MULTI_LIST);
+    wk->charRes[7] = ClActSys_LoadChars(uiArc, 12, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
+    wk->palRes[2] = ClActSys_LoadPltt(uiArc, 11, CLACT_VRAM_MAIN, 96, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[2] = ClActSys_LoadCellAnims(uiArc, 15, 18, HEAPID_VS_MULTI_LIST);
+    wk->charRes[6] = ClActSys_LoadChars(uiArc, 65, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
+    wk->palRes[1] = ClActSys_LoadPltt(uiArc, 66, CLACT_VRAM_MAIN, 128, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[1] = ClActSys_LoadCellAnims(uiArc, 69, 72, HEAPID_VS_MULTI_LIST);
+    wk->charRes[8] = ClActSys_LoadChars(uiArc, func_0202d958(2), FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
+    wk->palRes[3] = ClActSys_LoadPltt(uiArc, func_0202d954(), CLACT_VRAM_MAIN, 160, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[3] = ClActSys_LoadCellAnims(uiArc, func_0202d95c(2), func_0202d960(2), HEAPID_VS_MULTI_LIST);
     GFL_ArcToolFree(uiArc);
 }
 
@@ -623,48 +624,48 @@ static void VsMultiList_FreeObjRes(VsMultiListWork *wk) {
     u32 i;
 
     for (i = 0; i < CHAR_RES_COUNT; i++) {
-        func_0204b98c(wk->charRes[i]);
+        ClActSys_FreeChars(wk->charRes[i]);
     }
     for (i = 0; i < PLTT_RES_COUNT; i++) {
-        func_0204bcd0(wk->palRes[i]);
+        ClActSys_FreePltt(wk->palRes[i]);
     }
     for (i = 0; i < CELL_RES_COUNT; i++) {
-        func_0204be64(wk->cellRes[i]);
+        ClActSys_FreeCellAnims(wk->cellRes[i]);
     }
 }
 
 static void VsMultiList_CreateActors(VsMultiListWork *wk) {
     u32 i;
 
-    wk->clUnit = func_0204bf1c(ACTOR_COUNT, 0, HEAPID_VS_MULTI_LIST);
+    wk->clUnit = ClActUnit_Create(ACTOR_COUNT, 0, HEAPID_VS_MULTI_LIST);
     for (i = 0; i < ACTOR_COUNT; i++) {
         const VsMultiListActor *def = &sVsMultiListActors[i];
 
-        wk->actors[i] = func_0204c040(wk->clUnit, wk->charRes[def->charIndex], wk->palRes[def->palIndex],
-                                      wk->cellRes[def->cellIndex], &def->setup, 0, HEAPID_VS_MULTI_LIST);
+        wk->actors[i] = ClActor_Create(wk->clUnit, wk->charRes[def->charIndex], wk->palRes[def->palIndex],
+                                       wk->cellRes[def->cellIndex], &def->setup, 0, HEAPID_VS_MULTI_LIST);
     }
     for (i = 0; i < POKEMON_COUNT; i++) {
         if (wk->pkm[i] == NULL) {
-            func_0204c124(wk->actors[i], FALSE);
-            func_0204c124(wk->actors[i + 6], FALSE);
-            func_0204c124(wk->actors[i + 18], FALSE);
+            ClActor_SetVisible(wk->actors[i], FALSE);
+            ClActor_SetVisible(wk->actors[i + 6], FALSE);
+            ClActor_SetVisible(wk->actors[i + 18], FALSE);
         } else {
             u16 item;
 
             func_0204c520(wk->actors[i], TRUE);
-            func_0204c378(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(wk->pkm[i])), TRUE);
+            ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(wk->pkm[i])), TRUE);
             item = PokeParty_GetParam(wk->pkm[i], PKM_PARAM_ITEM, NULL);
             if (item == 0) {
-                func_0204c124(wk->actors[i + 6], FALSE);
+                ClActor_SetVisible(wk->actors[i + 6], FALSE);
             } else if (PML_ItemIsMail(item) == TRUE) {
-                func_0204c4d4(wk->actors[i + 6], 0);
-                func_0204c488(wk->actors[i + 6], 1);
+                ClActor_SetAnimTime(wk->actors[i + 6], 0);
+                ClActor_SetSequence(wk->actors[i + 6], 1);
             } else {
-                func_0204c4d4(wk->actors[i + 6], 0);
-                func_0204c488(wk->actors[i + 6], 0);
+                ClActor_SetAnimTime(wk->actors[i + 6], 0);
+                ClActor_SetSequence(wk->actors[i + 6], 0);
             }
         }
-        func_0204c124(wk->actors[i + 12], FALSE);
+        ClActor_SetVisible(wk->actors[i + 12], FALSE);
     }
     if (wk->param->flipped == 0) {
         for (i = 0; i < BOARD_POKEMON_COUNT; i++) {
@@ -687,17 +688,17 @@ static void VsMultiList_FreeActors(VsMultiListWork *wk) {
     u32 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204bf98(wk->clUnit);
+    ClActUnit_Delete(wk->clUnit);
 }
 
 static void VsMultiList_MoveActor(VsMultiListWork *wk, u32 index, s16 dx) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[index], &pos, 0);
+    ClActor_GetSurfacePos(wk->actors[index], &pos, 0);
     pos.x += dx;
-    func_0204c140(wk->actors[index], &pos, 0);
+    ClActor_SetSurfacePos(wk->actors[index], &pos, 0);
 }
 
 // Moves the three Pokémon's four actors each, starting at the one given

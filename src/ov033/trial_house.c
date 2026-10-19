@@ -265,7 +265,7 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
         *state = 5;
         break;
     case 5:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             *state = 6;
         }
         break;

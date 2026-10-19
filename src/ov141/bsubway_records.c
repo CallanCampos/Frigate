@@ -280,7 +280,7 @@ static BOOL BSubwayRecords_Init(GameProc *proc, u32 *state, void *param, void *w
     BSubwayRecords_UpdateArrows(wk, wk->page, wk->pageCount);
     BSubwayRecords_ShowPage(wk, wk->page);
     GFL_WipeSet(0, 1, 1, 0, 16, TRUE, HEAPID_BSUBWAY_RECORDS);
-    func_02042ba8(TRUE, HEAPID_BSUBWAY_RECORDS);
+    GFL_NetSetIconScreen(TRUE, HEAPID_BSUBWAY_RECORDS);
     return TRUE;
 }
 
@@ -292,7 +292,7 @@ static BOOL BSubwayRecords_Main(GameProc *proc, u32 *state, void *param, void *w
     }
     BSubwayRecords_FlushText(wk);
     BGWinFrame_UpdateMoves(wk->frames);
-    func_0204b794();
+    ClActSys_Draw();
     return FALSE;
 }
 
@@ -313,7 +313,7 @@ static BOOL BSubwayRecords_Exit(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void BSubwayRecords_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -443,19 +443,19 @@ static void BSubwayRecords_InitObjRes(BSubwayRecordsWork *wk) {
     ArcTool *uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_BSUBWAY_RECORDS);
 
     ClActSys_Create(&data_02093f08, &sBSubwayRecordsVRAMConfig, HEAPID_BSUBWAY_RECORDS);
-    wk->clUnits[0] = func_0204bf1c(4, 1, HEAPID_BSUBWAY_RECORDS);
-    wk->clUnits[1] = func_0204bf1c(2, 1, HEAPID_BSUBWAY_RECORDS);
+    wk->clUnits[0] = ClActUnit_Create(4, 1, HEAPID_BSUBWAY_RECORDS);
+    wk->clUnits[1] = ClActUnit_Create(2, 1, HEAPID_BSUBWAY_RECORDS);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    wk->objRes[1] = func_0204b81c(wk->arc, 7, TRUE, CLACT_VRAM_BOTH, HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[0] = func_0204bba0(wk->arc, 10, CLACT_VRAM_BOTH, 0, HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[2] = func_0204bde0(wk->arc, 8, 9, HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[1] = ClActSys_LoadChars(wk->arc, 7, TRUE, CLACT_VRAM_BOTH, HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[0] = ClActSys_LoadPltt(wk->arc, 10, CLACT_VRAM_BOTH, 0, HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[2] = ClActSys_LoadCellAnims(wk->arc, 8, 9, HEAPID_BSUBWAY_RECORDS);
     wk->objRes[4] =
-        func_0204b81c(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[3] = func_0204bbb8(uiArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x160, 0, 3,
-                                  HEAPID_BSUBWAY_RECORDS);
-    wk->objRes[5] = func_0204bde0(uiArc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0),
-                                  HEAPID_BSUBWAY_RECORDS);
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[3] = ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x160, 0, 3,
+                                           HEAPID_BSUBWAY_RECORDS);
+    wk->objRes[5] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetTouchBarCellFile(0),
+                                           AppMenuCommon_GetTouchBarAnimFile(0), HEAPID_BSUBWAY_RECORDS);
     GFL_ArcToolFree(uiArc);
 }
 
@@ -471,22 +471,22 @@ static void BSubwayRecords_CreateActors(BSubwayRecordsWork *wk) {
         setup.sequence = def->sequence;
         setup.bgPriority = 0;
         setup.priority = 0;
-        wk->actors[i] = func_0204c040(wk->clUnits[0], wk->objRes[def->charIndex], wk->objRes[def->palIndex],
-                                      wk->objRes[def->cellIndex], &setup, 0, HEAPID_BSUBWAY_RECORDS);
+        wk->actors[i] = ClActor_Create(wk->clUnits[0], wk->objRes[def->charIndex], wk->objRes[def->palIndex],
+                                       wk->objRes[def->cellIndex], &setup, 0, HEAPID_BSUBWAY_RECORDS);
         func_0204c520(wk->actors[i], TRUE);
     }
 }
 
 static void BSubwayRecords_FreeObjRes(BSubwayRecordsWork *wk) {
-    func_0204b98c(wk->objRes[4]);
-    func_0204bcd0(wk->objRes[3]);
-    func_0204be64(wk->objRes[5]);
-    func_0204b98c(wk->objRes[1]);
-    func_0204bcd0(wk->objRes[0]);
-    func_0204be64(wk->objRes[2]);
-    func_0204bf98(wk->clUnits[1]);
-    func_0204bf98(wk->clUnits[0]);
-    func_0204b758();
+    ClActSys_FreeChars(wk->objRes[4]);
+    ClActSys_FreePltt(wk->objRes[3]);
+    ClActSys_FreeCellAnims(wk->objRes[5]);
+    ClActSys_FreeChars(wk->objRes[1]);
+    ClActSys_FreePltt(wk->objRes[0]);
+    ClActSys_FreeCellAnims(wk->objRes[2]);
+    ClActUnit_Delete(wk->clUnits[1]);
+    ClActUnit_Delete(wk->clUnits[0]);
+    ClActSys_Delete();
 }
 
 static void BSubwayRecords_CreateWindows(BSubwayRecordsWork *wk) {
@@ -579,7 +579,7 @@ static BOOL BSubwayRecords_StateInput(BSubwayRecordsWork *wk) {
 }
 
 static BOOL BSubwayRecords_StateWaitBack(BSubwayRecordsWork *wk) {
-    if (!func_0204c560(wk->actors[ACTOR_BACK])) {
+    if (!ClActor_IsAnimActive(wk->actors[ACTOR_BACK])) {
         wk->state = STATE_FADE_OUT;
     }
     return TRUE;
@@ -637,7 +637,7 @@ static void BSubwayRecords_MoveCursorActor(BSubwayRecordsWork *wk, int pos) {
 
     actorPos.x = data->x;
     actorPos.y = data->y;
-    func_0204c140(wk->actors[ACTOR_CURSOR], &actorPos, 0);
+    ClActor_SetSurfacePos(wk->actors[ACTOR_CURSOR], &actorPos, 0);
 }
 
 // Shows a record's name, place, message and numbers in the windows under the list, or clears them for a position past
@@ -684,7 +684,7 @@ static void BSubwayRecords_ShowRecord(BSubwayRecordsWork *wk, BSubwayRecord *rec
 }
 
 static int BSubwayRecords_GetInput(BSubwayRecordsWork *wk) {
-    int input = func_0203da0c(sBSubwayRecordsTouchRects);
+    int input = GFL_HIDGetTouchPressedRect(sBSubwayRecordsTouchRects);
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         input = INPUT_BACK;
@@ -698,21 +698,21 @@ static void BSubwayRecords_HandleInput(BSubwayRecordsWork *wk, int input) {
     case INPUT_PREV_PAGE:
         if (BSubwayRecords_StepPage(wk, input)) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0204c488(wk->actors[ACTOR_ARROW_LEFT], 12);
+            ClActor_SetSequence(wk->actors[ACTOR_ARROW_LEFT], 12);
             BSubwayRecords_ShowPage(wk, wk->page);
         }
         break;
     case INPUT_NEXT_PAGE:
         if (BSubwayRecords_StepPage(wk, input)) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0204c488(wk->actors[ACTOR_ARROW_RIGHT], 13);
+            ClActor_SetSequence(wk->actors[ACTOR_ARROW_RIGHT], 13);
             BSubwayRecords_ShowPage(wk, wk->page);
         }
         break;
     case INPUT_BACK:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         wk->state = STATE_WAIT_BACK;
-        func_0204c488(wk->actors[ACTOR_BACK], 9);
+        ClActor_SetSequence(wk->actors[ACTOR_BACK], 9);
         break;
     }
 }
@@ -728,19 +728,19 @@ static void BSubwayRecords_InitPages(BSubwayRecordsWork *wk) {
 // Shows the page's arrows when there is a page to go to
 static void BSubwayRecords_UpdateArrows(BSubwayRecordsWork *wk, int page, int pageCount) {
     if (pageCount == 1) {
-        func_0204c124(wk->actors[ACTOR_ARROW_LEFT], FALSE);
-        func_0204c124(wk->actors[ACTOR_ARROW_RIGHT], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_LEFT], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_RIGHT], FALSE);
         return;
     }
     if (page == 0) {
-        func_0204c124(wk->actors[ACTOR_ARROW_LEFT], FALSE);
-        func_0204c124(wk->actors[ACTOR_ARROW_RIGHT], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_LEFT], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_RIGHT], TRUE);
     } else if (page != 0 && page < pageCount - 1) {
-        func_0204c124(wk->actors[ACTOR_ARROW_LEFT], TRUE);
-        func_0204c124(wk->actors[ACTOR_ARROW_RIGHT], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_LEFT], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_RIGHT], TRUE);
     } else if (page == pageCount - 1) {
-        func_0204c124(wk->actors[ACTOR_ARROW_LEFT], TRUE);
-        func_0204c124(wk->actors[ACTOR_ARROW_RIGHT], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_LEFT], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_ARROW_RIGHT], FALSE);
     }
 }
 

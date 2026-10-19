@@ -94,7 +94,7 @@ static BOOL GameSyncSettings_Main(GameProc *proc, u32 *state, void *param, void 
         break;
     case GAME_SYNC_SETTINGS_LOGOUT:
         // Without a connection left, it logs in again
-        if (!func_02042788() || wk->account.disconnected == TRUE) {
+        if (!GFL_NetIsInitialized() || wk->account.disconnected == TRUE) {
             wk->login.unk14 = 1;
             wk->state = GAME_SYNC_SETTINGS_LOGIN;
         } else {

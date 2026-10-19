@@ -852,9 +852,9 @@ static void PkwdRecordMonitor_LoadCommonRes(PkwdRecordMonitorWork *wk, u32 vramT
     charsFile = AppMenuCommon_GetTouchBarCharFile();
     cellFile = AppMenuCommon_GetTouchBarCellFile(2);
     animFile = AppMenuCommon_GetTouchBarAnimFile(2);
-    wk->res.of.commonPalette = func_0204bbb8(arc, paletteFile, vramType, 4 * 0x20, 0, 4, wk->heapId);
-    wk->res.of.commonChars = func_0204b81c(arc, charsFile, FALSE, vramType, wk->heapId);
-    wk->res.of.commonCell = func_0204bde0(arc, cellFile, animFile, wk->heapId);
+    wk->res.of.commonPalette = ClActSys_LoadPlttRange(arc, paletteFile, vramType, 4 * 0x20, 0, 4, wk->heapId);
+    wk->res.of.commonChars = ClActSys_LoadChars(arc, charsFile, FALSE, vramType, wk->heapId);
+    wk->res.of.commonCell = ClActSys_LoadCellAnims(arc, cellFile, animFile, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -863,11 +863,12 @@ static void PkwdRecordMonitor_LoadIconRes(PkwdRecordMonitorWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(wk->heapId));
     u32 i;
 
-    wk->res.of.iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 5 * 0x20, wk->heapId);
-    wk->res.of.iconCell = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->heapId);
+    wk->res.of.iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 5 * 0x20, wk->heapId);
+    wk->res.of.iconCell =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->heapId);
     for (i = 0; i < CAST_COUNT; i++) {
         wk->res.of.iconChars[i] =
-            func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_MAIN, wk->heapId);
+            ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_MAIN, wk->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -880,20 +881,20 @@ static void PkwdRecordMonitor_SetIcon(PkwdRecordMonitorWork *wk, u32 index, u32 
     void *buffer = GFL_G2DIOReadOBJNCGRArc(arc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE, &character,
                                            HEAPID_TAIL(wk->heapId));
 
-    func_0204ba40(wk->res.of.iconChars[index], character);
+    ClActSys_ReplaceCharData(wk->res.of.iconChars[index], character);
     GFL_HeapFree(buffer);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->icons[index], palette, 1);
+    ClActor_SetPalette(wk->icons[index], palette, 1);
 }
 
 static void PkwdRecordMonitor_LoadRes(PkwdRecordMonitorWork *wk, u32 vramType, const PkwdRecordMonitorResSetup *setup) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     PkwdRecordMonitorGraphic_GetClActUnit(wk->graphic);
-    wk->res.all[setup->palette.res] =
-        func_0204bbb8(arc, setup->palette.fileId, vramType, setup->palette.offset, 0, setup->palette.count, wk->heapId);
-    wk->res.all[setup->chars.res] = func_0204b81c(arc, setup->chars.fileId, FALSE, vramType, wk->heapId);
-    wk->res.all[setup->cell.res] = func_0204bde0(arc, setup->cell.fileId, setup->anim.fileId, wk->heapId);
+    wk->res.all[setup->palette.res] = ClActSys_LoadPlttRange(
+        arc, setup->palette.fileId, vramType, setup->palette.offset, 0, setup->palette.count, wk->heapId);
+    wk->res.all[setup->chars.res] = ClActSys_LoadChars(arc, setup->chars.fileId, FALSE, vramType, wk->heapId);
+    wk->res.all[setup->cell.res] = ClActSys_LoadCellAnims(arc, setup->cell.fileId, setup->anim.fileId, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -940,23 +941,23 @@ static void PkwdRecordMonitor_CreateActors(PkwdRecordMonitorWork *wk, u32 surfac
         actorSetup.sequence = setup->sequence;
         actorSetup.priority = setup->priority;
         actorSetup.bgPriority = setup->bgPriority;
-        actors[i] = func_0204c040(unit, wk->res.all[setup->charsRes], wk->res.all[paletteRes], wk->res.all[cellRes],
-                                  &actorSetup, surface, wk->heapId);
+        actors[i] = ClActor_Create(unit, wk->res.all[setup->charsRes], wk->res.all[paletteRes], wk->res.all[cellRes],
+                                   &actorSetup, surface, wk->heapId);
         flag = FALSE;
         if (setup->visible == TRUE) {
             flag = TRUE;
         }
-        func_0204c124(actors[i], flag);
+        ClActor_SetVisible(actors[i], flag);
         flag = FALSE;
         if (setup->flags & ACTOR_ANIMATE) {
             flag = TRUE;
         }
         func_0204c520(actors[i], flag);
         if (setup->flags & ACTOR_FLIP_V) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (setup->flags & ACTOR_FLIP_H) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
         setup++;
     }
@@ -971,10 +972,10 @@ static void PkwdRecordMonitor_InitActors(PkwdRecordMonitorWork *wk) {
     PkwdRecordMonitor_CreateActors(wk, 0, sPkwdRecordMonitorIconActors, &sPkwdRecordMonitorIconGroup);
     PkwdRecordMonitor_CreateActors(wk, 1, sPkwdRecordMonitorListActors, &sPkwdRecordMonitorListGroup);
     PkwdRecordMonitor_CreateActors(wk, 0, sPkwdRecordMonitorMarkActors, &sPkwdRecordMonitorMarkGroup);
-    func_02042ba8(TRUE, wk->heapId);
-    func_0204c318(wk->marks[MARK_COVER + 0], 1);
-    func_0204c318(wk->marks[MARK_COVER + 1], 1);
-    func_0204c318(wk->marks[MARK_COVER + 2], 1);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
+    ClActor_SetObjMode(wk->marks[MARK_COVER + 0], 1);
+    ClActor_SetObjMode(wk->marks[MARK_COVER + 1], 1);
+    ClActor_SetObjMode(wk->marks[MARK_COVER + 2], 1);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
@@ -985,28 +986,28 @@ static void PkwdRecordMonitor_FreeActors(PkwdRecordMonitorWork *wk) {
     s32 i;
 
     for (i = 0; i < BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i]);
+        ClActor_Delete(wk->buttons[i]);
     }
     for (i = 0; i < CAST_COUNT; i++) {
-        func_0204c108(wk->icons[i]);
+        ClActor_Delete(wk->icons[i]);
     }
     for (i = 0; i < LIST_ACTOR_COUNT; i++) {
-        func_0204c108(wk->listActors[i]);
+        ClActor_Delete(wk->listActors[i]);
     }
     for (i = 0; i < MARK_COUNT; i++) {
-        func_0204c108(wk->marks[i]);
+        ClActor_Delete(wk->marks[i]);
     }
-    func_0204bcd0(wk->res.of.commonPalette);
-    func_0204b98c(wk->res.of.commonChars);
-    func_0204be64(wk->res.of.commonCell);
-    func_0204bcd0(wk->res.of.iconPalette);
+    ClActSys_FreePltt(wk->res.of.commonPalette);
+    ClActSys_FreeChars(wk->res.of.commonChars);
+    ClActSys_FreeCellAnims(wk->res.of.commonCell);
+    ClActSys_FreePltt(wk->res.of.iconPalette);
     for (i = 0; i < CAST_COUNT; i++) {
-        func_0204b98c(wk->res.of.iconChars[i]);
+        ClActSys_FreeChars(wk->res.of.iconChars[i]);
     }
-    func_0204be64(wk->res.of.iconCell);
-    func_0204bcd0(wk->res.of.markPalette);
-    func_0204b98c(wk->res.of.markChars);
-    func_0204be64(wk->res.of.markCell);
+    ClActSys_FreeCellAnims(wk->res.of.iconCell);
+    ClActSys_FreePltt(wk->res.of.markPalette);
+    ClActSys_FreeChars(wk->res.of.markChars);
+    ClActSys_FreeCellAnims(wk->res.of.markCell);
 }
 
 // Plays an animation of an actor
@@ -1016,27 +1017,27 @@ static void PkwdRecordMonitor_SetActorSequence(PkwdRecordMonitorWork *wk, u32 gr
     if (group == ACTOR_GROUP_BUTTON) {
         if (index < BUTTON_COUNT) {
             actors = wk->buttons;
-            func_0204c488(actors[index], sequence);
+            ClActor_SetSequence(actors[index], sequence);
             func_0204c520(actors[index], TRUE);
         }
     } else if (group == ACTOR_GROUP_ICON) {
         if (index < CAST_COUNT) {
             actors = wk->icons;
-            func_0204c488(actors[index], sequence);
+            ClActor_SetSequence(actors[index], sequence);
             func_0204c520(actors[index], TRUE);
         }
     } else if (group == ACTOR_GROUP_LIST) {
         if (index < LIST_ACTOR_COUNT) {
             actors = wk->listActors;
-            func_0204c488(actors[index], sequence);
+            ClActor_SetSequence(actors[index], sequence);
             func_0204c520(actors[index], TRUE);
         }
     } else if (group == ACTOR_GROUP_MARK) {
         if (index < MARK_COUNT) {
             actors = wk->marks;
-            func_0204c488(actors[index], sequence);
+            ClActor_SetSequence(actors[index], sequence);
             func_0204c520(actors[index], TRUE);
-            func_0204c56c(actors[index]);
+            ClActor_RestartAnim(actors[index]);
         }
     }
 }
@@ -1044,19 +1045,19 @@ static void PkwdRecordMonitor_SetActorSequence(PkwdRecordMonitorWork *wk, u32 gr
 static void PkwdRecordMonitor_SetActorVisible(PkwdRecordMonitorWork *wk, u32 group, s32 index, BOOL visible) {
     if (group == ACTOR_GROUP_BUTTON) {
         if (index < BUTTON_COUNT) {
-            func_0204c124(wk->buttons[index], visible);
+            ClActor_SetVisible(wk->buttons[index], visible);
         }
     } else if (group == ACTOR_GROUP_ICON) {
         if (index < CAST_COUNT) {
-            func_0204c124(wk->icons[index], visible);
+            ClActor_SetVisible(wk->icons[index], visible);
         }
     } else if (group == ACTOR_GROUP_LIST) {
         if (index < LIST_ACTOR_COUNT) {
-            func_0204c124(wk->listActors[index], visible);
+            ClActor_SetVisible(wk->listActors[index], visible);
         }
     } else if (group == ACTOR_GROUP_MARK) {
         if (index < MARK_COUNT) {
-            func_0204c124(wk->marks[index], visible);
+            ClActor_SetVisible(wk->marks[index], visible);
         }
     }
 }
@@ -1068,28 +1069,28 @@ static BOOL PkwdRecordMonitor_IsActorAnimating(PkwdRecordMonitorWork *wk, u32 gr
         if (index >= BUTTON_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->buttons[index])) {
+        if (!ClActor_IsAnimActive(wk->buttons[index])) {
             animating = FALSE;
         }
     } else if (group == ACTOR_GROUP_ICON) {
         if (index >= CAST_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->icons[index])) {
+        if (!ClActor_IsAnimActive(wk->icons[index])) {
             animating = FALSE;
         }
     } else if (group == ACTOR_GROUP_LIST) {
         if (index >= LIST_ACTOR_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->listActors[index])) {
+        if (!ClActor_IsAnimActive(wk->listActors[index])) {
             animating = FALSE;
         }
     } else if (group == ACTOR_GROUP_MARK) {
         if (index >= MARK_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->marks[index])) {
+        if (!ClActor_IsAnimActive(wk->marks[index])) {
             animating = FALSE;
         }
     }
@@ -1424,9 +1425,9 @@ static void PkwdRecordMonitor_Input(PkwdRecordMonitorWork *wk) {
             wk->listState = LIST_STATE_WAIT_RETURN;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             if (touch == 0) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             } else {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
         }
     }
@@ -1443,7 +1444,7 @@ static void PkwdRecordMonitor_Input(PkwdRecordMonitorWork *wk) {
         if (wk->flags & FLAG_DETAILS_OPEN) {
             BOOL show = FALSE;
 
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 show = TRUE;
             }
             if (wk->flags & FLAG_DECIDED) {
@@ -1622,7 +1623,7 @@ static void PkwdRecordMonitor_ChangeMode(PkwdRecordMonitorWork *wk) {
 }
 
 static s32 PkwdRecordMonitor_ReadTouch(PkwdRecordMonitorWork *wk, u32 page) {
-    return func_0203da0c(sPkwdRecordMonitorTouchRectPages[page]);
+    return GFL_HIDGetTouchPressedRect(sPkwdRecordMonitorTouchRectPages[page]);
 }
 
 // Lists the movies that have been filmed, and finds the highest grossing ones
@@ -1698,7 +1699,7 @@ static void PkwdRecordMonitor_ShowDetails(PkwdRecordMonitorWork *wk, BOOL show) 
     u8 enabled = TRUE;
 
     if (!show) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             enabled = FALSE;
         }
         GFL_BGSysSetBGEnabled(0, enabled);
@@ -1717,7 +1718,7 @@ static BOOL PkwdRecordMonitor_CheckKeyMode(PkwdRecordMonitorWork *wk) {
     if (wk->keyMode == TRUE) {
         return FALSE;
     }
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         keyMode = TRUE;
         wk->keyMode = TRUE;
     }
@@ -1820,12 +1821,12 @@ static u32 PkwdRecordMonitor_HandleListResult(PkwdRecordMonitorWork *wk, u32 res
         }
     } else if (action == ACTION_DECIDE || action == ACTION_DECIDE_TOUCH) {
         PkwdRecordMonitor_StoreListPos(wk);
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         FrameList_SetRowPalette(wk->list, (u16)wk->cursor, 1);
         if (action == ACTION_DECIDE) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
         if (wk->keyMode == TRUE) {
             wk->flags |= FLAG_DECIDED;
@@ -1913,14 +1914,14 @@ static void PkwdRecordMonitor_UpdateScrollBar(PkwdRecordMonitorWork *wk) {
     ClActorPos pos;
 
     if (wk->count > LIST_ROWS) {
-        func_0204c178(wk->listActors[LIST_ACTOR_BAR], &pos, 1);
+        ClActor_GetSurfacePos(wk->listActors[LIST_ACTOR_BAR], &pos, 1);
         pos.y = FrameList_ClampBarPos(wk->list, pos.y);
         if (pos.y < 8) {
             pos.y = 8;
         } else if (pos.y > 160) {
             pos.y = 160;
         }
-        func_0204c140(wk->listActors[LIST_ACTOR_BAR], &pos, 1);
+        ClActor_SetSurfacePos(wk->listActors[LIST_ACTOR_BAR], &pos, 1);
     }
 }
 
@@ -1993,12 +1994,12 @@ static void PkwdRecordMonitor_UpdateListMarks(PkwdRecordMonitorWork *wk, BOOL re
     for (i = 0; i < LIST_MARK_COUNT; i++) {
         ClActorPos pos;
 
-        func_0204c178(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
+        ClActor_GetSurfacePos(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
         pos.x = PkwdRecordMonitor_GetPosition(wk, (POSITION_LIST_MARK + i) * 2);
         // The two indexes differ in signedness: the original computes the product twice
         pos.y = PkwdRecordMonitor_GetPosition(wk, (u32)(POSITION_LIST_MARK + i) * 2 + 1);
         pos.y += (s16)(direction * LIST_ROW_HEIGHT);
-        func_0204c140(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
+        ClActor_SetSurfacePos(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
     }
     wk->markScroll = scroll;
 }
@@ -2009,9 +2010,9 @@ static void PkwdRecordMonitor_MoveListMarks(PkwdRecordMonitorWork *wk, s16 delta
     for (i = 0; i < LIST_MARK_COUNT; i++) {
         ClActorPos pos;
 
-        func_0204c178(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
+        ClActor_GetSurfacePos(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
         pos.y -= delta;
-        func_0204c140(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
+        ClActor_SetSurfacePos(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
     }
 }
 

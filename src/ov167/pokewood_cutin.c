@@ -219,10 +219,10 @@ static const CutinEntry sCutins[] = {
 PokewoodCutin *func_ov167_021d5e1c(HeapID heapId) {
     PokewoodCutin *cutin = GFL_HeapAllocate(heapId, sizeof(PokewoodCutin), TRUE, "pokewood_cutin.c", 292);
 
-    cutin->unit = func_0204bf1c(CUTIN_ACTOR_COUNT, 0, heapId);
-    cutin->renderer = func_0204be9c(&sSurfaceSetup, 1, heapId);
-    func_0204bf14(cutin->renderer, TRUE);
-    func_0204c018(cutin->unit, cutin->renderer);
+    cutin->unit = ClActUnit_Create(CUTIN_ACTOR_COUNT, 0, heapId);
+    cutin->renderer = ClActRenderer_Create(&sSurfaceSetup, 1, heapId);
+    ClActRenderer_SetCulling(cutin->renderer, TRUE);
+    ClActUnit_SetRenderer(cutin->unit, cutin->renderer);
     cutin->heapId = heapId;
     return cutin;
 }
@@ -232,8 +232,8 @@ void func_ov167_021d5e68(PokewoodCutin *cutin) {
         CutinScript_Free(cutin->script);
         cutin->script = NULL;
     }
-    func_0204becc(cutin->renderer);
-    func_0204bf98(cutin->unit);
+    ClActRenderer_Delete(cutin->renderer);
+    ClActUnit_Delete(cutin->unit);
     GFL_HeapFree(cutin);
 }
 
@@ -352,17 +352,17 @@ static void Cutin_LoadResources(PokewoodCutin *cutin, u32 paletteFile, u32 charF
     ClActorSetup setup;
     int i;
 
-    cutin->chars = func_0204b81c(arc, charFile, TRUE, CLACT_VRAM_MAIN, cutin->heapId);
-    cutin->palette = func_0204bba0(arc, paletteFile, CLACT_VRAM_MAIN, 0, cutin->heapId);
+    cutin->chars = ClActSys_LoadChars(arc, charFile, TRUE, CLACT_VRAM_MAIN, cutin->heapId);
+    cutin->palette = ClActSys_LoadPltt(arc, paletteFile, CLACT_VRAM_MAIN, 0, cutin->heapId);
     PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ, 0, 0x1e0);
-    cutin->cellAnims = func_0204bde0(arc, cellFile, animFile, cutin->heapId);
+    cutin->cellAnims = ClActSys_LoadCellAnims(arc, cellFile, animFile, cutin->heapId);
     cutin->cellData = GFL_G2DIOReadNCERArc(arc, cellFile, FALSE, &cutin->cells, cutin->heapId);
     GFL_ArcToolFree(arc);
     setup = sActorSetup;
     for (i = 0; i < CUTIN_ACTOR_COUNT; i++) {
         cutin->actors[i] =
-            func_0204c040(cutin->unit, cutin->chars, cutin->palette, cutin->cellAnims, &setup, 0, cutin->heapId);
-        func_0204c124(cutin->actors[i], FALSE);
+            ClActor_Create(cutin->unit, cutin->chars, cutin->palette, cutin->cellAnims, &setup, 0, cutin->heapId);
+        ClActor_SetVisible(cutin->actors[i], FALSE);
     }
     cutin->loaded = TRUE;
 }
@@ -372,12 +372,12 @@ static void Cutin_UnloadResources(PokewoodCutin *cutin) {
 
     if (cutin->loaded) {
         for (i = 0; i < CUTIN_ACTOR_COUNT; i++) {
-            func_0204c108(cutin->actors[i]);
+            ClActor_Delete(cutin->actors[i]);
         }
         GFL_HeapFree(cutin->cellData);
-        func_0204be64(cutin->cellAnims);
-        func_0204b98c(cutin->chars);
-        func_0204bcd0(cutin->palette);
+        ClActSys_FreeCellAnims(cutin->cellAnims);
+        ClActSys_FreeChars(cutin->chars);
+        ClActSys_FreePltt(cutin->palette);
         cutin->loaded = FALSE;
     }
 }
@@ -403,9 +403,9 @@ static BOOL Cutin_CmdMove(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
         sMoveFuncs[args[1]].init(cutin, actor, args);
         sMoveFuncs[args[1]].update(cutin);
         sMoveFuncs[args[1]].getPos(cutin, &pos);
-        func_0204c140(actor, &pos, 0);
-        func_0204c488(actor, args[0]);
-        func_0204c124(actor, TRUE);
+        ClActor_SetSurfacePos(actor, &pos, 0);
+        ClActor_SetSequence(actor, args[0]);
+        ClActor_SetVisible(actor, TRUE);
         (*seq)++;
         break;
     case 1:
@@ -413,7 +413,7 @@ static BOOL Cutin_CmdMove(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
             (*seq)++;
         }
         sMoveFuncs[args[1]].getPos(cutin, &pos);
-        func_0204c140(actor, &pos, 0);
+        ClActor_SetSurfacePos(actor, &pos, 0);
         break;
     case 2:
         return TRUE;
@@ -431,9 +431,9 @@ static BOOL Cutin_CmdMoveDist(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
         sMoveFuncs[args[1]].initDist(cutin, actor, args);
         sMoveFuncs[args[1]].update(cutin);
         sMoveFuncs[args[1]].getPos(cutin, &pos);
-        func_0204c140(actor, &pos, 0);
-        func_0204c488(actor, args[0]);
-        func_0204c124(actor, TRUE);
+        ClActor_SetSurfacePos(actor, &pos, 0);
+        ClActor_SetSequence(actor, args[0]);
+        ClActor_SetVisible(actor, TRUE);
         (*seq)++;
         break;
     case 1:
@@ -441,7 +441,7 @@ static BOOL Cutin_CmdMoveDist(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
             (*seq)++;
         }
         sMoveFuncs[args[1]].getPos(cutin, &pos);
-        func_0204c140(actor, &pos, 0);
+        ClActor_SetSurfacePos(actor, &pos, 0);
         break;
     case 2:
         return TRUE;
@@ -450,7 +450,7 @@ static BOOL Cutin_CmdMoveDist(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
 }
 
 static BOOL Cutin_CmdSetVisible(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
-    func_0204c124(cutin->actors[args[0]], args[1]);
+    ClActor_SetVisible(cutin->actors[args[0]], args[1]);
     return TRUE;
 }
 
@@ -464,9 +464,9 @@ static BOOL Cutin_CmdNudge(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
         sNudgeFuncs[args[1]].init(cutin, &cutin->nudge, actor);
         sNudgeFuncs[args[1]].update(cutin, &cutin->nudge);
         sNudgeFuncs[args[1]].getPos(cutin, &cutin->nudge, &pos);
-        func_0204c140(actor, &pos, 0);
-        func_0204c488(actor, args[0]);
-        func_0204c124(actor, TRUE);
+        ClActor_SetSurfacePos(actor, &pos, 0);
+        ClActor_SetSequence(actor, args[0]);
+        ClActor_SetVisible(actor, TRUE);
         (*seq)++;
         break;
     case 1:
@@ -474,7 +474,7 @@ static BOOL Cutin_CmdNudge(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
             (*seq)++;
         }
         sNudgeFuncs[args[1]].getPos(cutin, &cutin->nudge, &pos);
-        func_0204c140(actor, &pos, 0);
+        ClActor_SetSurfacePos(actor, &pos, 0);
         break;
     case 2:
         return TRUE;
@@ -625,7 +625,7 @@ static void Cutin_GetCenterMove(u16 dir, ClActor *actor, CutinPoint *start, Cuti
     ClActorPos pos;
     CutinPoint offset = { 0, 0 };
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     switch (dir) {
     case 0:
         offset.y = 256;
@@ -681,7 +681,7 @@ static void Cutin_GetDistMove(u16 dir, u16 dist, ClActor *actor, CutinPoint *sta
     s32 diagonal = FX_Div(dist * FX32_ONE, FX32_CONST(1.1414)) >> FX32_SHIFT;
 #endif
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     switch (dir) {
     case 0:
         offset.y = dist;
@@ -721,7 +721,7 @@ static void Cutin_GetDistMove(u16 dir, u16 dist, ClActor *actor, CutinPoint *sta
 static void Cutin_NudgeUpInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor *actor) {
     ClActorPos pos;
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     nudge->start.x = pos.x;
     nudge->start.y = pos.y;
     nudge->end.x = pos.x;
@@ -731,7 +731,7 @@ static void Cutin_NudgeUpInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor *
 static void Cutin_NudgeDownInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor *actor) {
     ClActorPos pos;
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     nudge->start.x = pos.x;
     nudge->start.y = pos.y;
     nudge->end.x = pos.x;
@@ -741,7 +741,7 @@ static void Cutin_NudgeDownInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor
 static void Cutin_NudgeLeftInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor *actor) {
     ClActorPos pos;
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     nudge->start.x = pos.x;
     nudge->start.y = pos.y;
     nudge->end.x = pos.x - 10;
@@ -751,7 +751,7 @@ static void Cutin_NudgeLeftInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor
 static void Cutin_NudgeRightInit(PokewoodCutin *cutin, CutinNudge *nudge, ClActor *actor) {
     ClActorPos pos;
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     nudge->start.x = pos.x;
     nudge->start.y = pos.y;
     nudge->end.x = pos.x + 10;

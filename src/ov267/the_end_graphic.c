@@ -188,24 +188,24 @@ static void TheEndBG_VBlank(TheEndBG *bg) {
 static void TheEndClAct_Init(TheEndClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(TheEndClAct));
     ClActSys_Create(&sTheEndClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void TheEndClAct_Free(TheEndClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(TheEndClAct));
 }
 
 static void TheEndClAct_Update(TheEndClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void TheEndClAct_VBlank(TheEndClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void TheEndG3dSys_Init(TheEndG3dSys *g3d, HeapID heapId) {

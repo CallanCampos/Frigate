@@ -213,7 +213,7 @@ static void CGearPowerOnOff_Init(CGearPowerOnOff *work, HeapID heapId) {
     CGearPowerOnOff_InitBG(work, heapId);
     CGearPowerOnOff_CreateMenuRes(work, heapId);
     CGearPowerOnOff_CreateWindows(work, heapId);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     func_ov036_02198884(work->subscreen, heapId);
 }
 
@@ -485,7 +485,7 @@ static BOOL CGearPowerOnOff_SeqNoWireless(CGearPowerOnOff *work) {
         }
         break;
     case 2:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             work->seq++;
         }
         break;

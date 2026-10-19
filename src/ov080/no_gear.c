@@ -103,7 +103,7 @@ static void NoGear_LoadGraphics(NoGearWork *work) {
     work->chars = GFL_BGSysLoadArcNCGRDynamic(arc, 2, 6, 0, FALSE, work->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 3, 6, 0, (u16)work->chars, 0, FALSE, work->heapId);
     GFL_ArcToolFree(arc);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 

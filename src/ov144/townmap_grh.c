@@ -217,14 +217,14 @@ static void TownMapClAct_Init(TownMapClAct *clact, const BGSysVRAMConfig *vramCo
 
         ClActSys_Create(&setup, vramConfig, heapId);
     }
-    clact->units[TOWNMAP_UNIT_MAIN] = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->units[TOWNMAP_UNIT_MAIN]);
+    clact->units[TOWNMAP_UNIT_MAIN] = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->units[TOWNMAP_UNIT_MAIN]);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     arc = GFL_ArcSysCreateFileHandle(ARCID_TOWNMAP_GRA, heapId);
-    clact->res[TOWNMAP_RES_PLTT] = func_0204bba0(arc, 2, CLACT_VRAM_MAIN, 0, heapId);
-    clact->res[TOWNMAP_RES_CHARS] = func_0204b81c(arc, 8, FALSE, CLACT_VRAM_MAIN, heapId);
-    clact->res[TOWNMAP_RES_CELL_ANIMS] = func_0204bde0(arc, 12, 19, heapId);
+    clact->res[TOWNMAP_RES_PLTT] = ClActSys_LoadPltt(arc, 2, CLACT_VRAM_MAIN, 0, heapId);
+    clact->res[TOWNMAP_RES_CHARS] = ClActSys_LoadChars(arc, 8, FALSE, CLACT_VRAM_MAIN, heapId);
+    clact->res[TOWNMAP_RES_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, 12, 19, heapId);
     GFL_ArcToolFree(arc);
     {
         ClActorSetup setup;
@@ -232,16 +232,16 @@ static void TownMapClAct_Init(TownMapClAct *clact, const BGSysVRAMConfig *vramCo
         MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         for (i = 0; i < TOWNMAP_ACTOR_COUNT; i++) {
             clact->actors[i] =
-                func_0204c040(clact->units[TOWNMAP_UNIT_MAIN], clact->res[TOWNMAP_RES_CHARS],
-                              clact->res[TOWNMAP_RES_PLTT], clact->res[TOWNMAP_RES_CELL_ANIMS], &setup, 1, heapId);
+                ClActor_Create(clact->units[TOWNMAP_UNIT_MAIN], clact->res[TOWNMAP_RES_CHARS],
+                               clact->res[TOWNMAP_RES_PLTT], clact->res[TOWNMAP_RES_CELL_ANIMS], &setup, 1, heapId);
         }
     }
-    func_0204c488(clact->actors[TOWNMAP_ACTOR_NAME_PLATE], 0);
-    func_0204c488(clact->actors[TOWNMAP_ACTOR_CURSOR], 4);
-    func_0204c488(clact->actors[TOWNMAP_ACTOR_RING], 5);
-    func_0204c488(clact->actors[TOWNMAP_ACTOR_PLAYER], 6);
+    ClActor_SetSequence(clact->actors[TOWNMAP_ACTOR_NAME_PLATE], 0);
+    ClActor_SetSequence(clact->actors[TOWNMAP_ACTOR_CURSOR], 4);
+    ClActor_SetSequence(clact->actors[TOWNMAP_ACTOR_RING], 5);
+    ClActor_SetSequence(clact->actors[TOWNMAP_ACTOR_PLAYER], 6);
     for (i = 0; i < TOWNMAP_ACTOR_COUNT; i++) {
-        func_0204c124(clact->actors[i], FALSE);
+        ClActor_SetVisible(clact->actors[i], FALSE);
     }
 }
 
@@ -250,25 +250,25 @@ static void TownMapClAct_Free(TownMapClAct *clact) {
 
     for (i = 0; i < TOWNMAP_ACTOR_COUNT; i++) {
         if (clact->actors[i] != NULL) {
-            func_0204c108(clact->actors[i]);
+            ClActor_Delete(clact->actors[i]);
         }
     }
-    func_0204be64(clact->res[TOWNMAP_RES_CELL_ANIMS]);
-    func_0204b98c(clact->res[TOWNMAP_RES_CHARS]);
-    func_0204bcd0(clact->res[TOWNMAP_RES_PLTT]);
+    ClActSys_FreeCellAnims(clact->res[TOWNMAP_RES_CELL_ANIMS]);
+    ClActSys_FreeChars(clact->res[TOWNMAP_RES_CHARS]);
+    ClActSys_FreePltt(clact->res[TOWNMAP_RES_PLTT]);
     if (clact->units[TOWNMAP_UNIT_MAIN] != NULL) {
-        func_0204bf98(clact->units[TOWNMAP_UNIT_MAIN]);
+        ClActUnit_Delete(clact->units[TOWNMAP_UNIT_MAIN]);
     }
-    func_0204b758();
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(TownMapClAct));
 }
 
 static void TownMapClAct_Update(TownMapClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void TownMapClAct_VBlank(TownMapClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActor *TownMapClAct_GetActor(TownMapClAct *clact, u32 index) {

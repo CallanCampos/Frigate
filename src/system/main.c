@@ -90,13 +90,13 @@ void SetMainMemoryPriorityBlocked(BOOL blocked) {
 
 // FALSE while the network, a sound stream or SetMainMemoryPriorityBlocked needs the ARM7 to keep its priority
 static BOOL IsMainMemoryPriorityFree(void) {
-    if (func_0203ff6c() > 1) {
+    if (NetSystem_CountConnected() > 1) {
         return FALSE;
     }
-    if (func_02042b00()) {
+    if (GFL_NetIsInfrared()) {
         return FALSE;
     }
-    if (func_02042b20()) {
+    if (GFL_NetIsWifi()) {
         return FALSE;
     }
     if (GFL_SndStreamCheckInit()) {

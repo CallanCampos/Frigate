@@ -187,34 +187,34 @@ static void BeaconDetailBG_VBlank(BeaconDetailBG *bg) {
 static void BeaconDetailClAct_Init(BeaconDetailClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(BeaconDetailClAct));
     ClActSys_Create(&sBeaconDetailClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
     {
         ClActSurfaceSetup surfaces[] = {
             { 0, 0, 256, 192, 0, 0 },
             { 0, 512, 256, 192, 1, 0 },
         };
 
-        clact->renderer = func_0204be9c(surfaces, NELEMS(surfaces), heapId);
+        clact->renderer = ClActRenderer_Create(surfaces, NELEMS(surfaces), heapId);
     }
-    func_0204bf14(clact->renderer, TRUE);
-    func_0204c018(clact->unit, clact->renderer);
+    ClActRenderer_SetCulling(clact->renderer, TRUE);
+    ClActUnit_SetRenderer(clact->unit, clact->renderer);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void BeaconDetailClAct_Free(BeaconDetailClAct *clact) {
-    func_0204becc(clact->renderer);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActRenderer_Delete(clact->renderer);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(BeaconDetailClAct));
 }
 
 static void BeaconDetailClAct_Update(BeaconDetailClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void BeaconDetailClAct_VBlank(BeaconDetailClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *BeaconDetailClAct_GetUnit(BeaconDetailClAct *clact) {

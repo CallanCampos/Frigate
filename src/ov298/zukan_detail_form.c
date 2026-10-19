@@ -741,7 +741,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         ZukanDetailForm_LoadEntries(param, wk, common);
         ZukanDetailForm_LoadIconResources(param, wk, common);
         ZukanDetailForm_ChangePokemon(param, wk, common);
-        func_0204c318(wk->iconActors[wk->icon], 1);
+        ClActor_SetObjMode(wk->iconActors[wk->icon], 1);
         MCSS_Hide(wk->sprites[SPRITE_CUR_FRONT].mcss);
         MCSS_StartFade(wk->sprites[SPRITE_CUR_FRONT].mcss, 16, 16, 0, 0);
         if (wk->sprites[SPRITE_NEXT_FRONT].mcss != NULL) {
@@ -1621,15 +1621,15 @@ static void ZukanDetailForm_Turn(ZukanDetailFormParam *param, ZukanDetailFormWor
 static void ZukanDetailForm_LoadIconResources(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
                                               ZukanDetailCommon *common) {
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, param->heapId);
-    wk->iconPalette = func_0204bc48(wk->iconArc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
+    wk->iconPalette = ClActSys_LoadPlttEx(wk->iconArc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
     wk->iconCellAnims =
-        func_0204bde0(wk->iconArc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
+        ClActSys_LoadCellAnims(wk->iconArc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
 }
 
 static void ZukanDetailForm_FreeIconResources(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
                                               ZukanDetailCommon *common) {
-    func_0204be64(wk->iconCellAnims);
-    func_0204bcd0(wk->iconPalette);
+    ClActSys_FreeCellAnims(wk->iconCellAnims);
+    ClActSys_FreePltt(wk->iconPalette);
     GFL_ArcToolFree(wk->iconArc);
 }
 
@@ -1643,17 +1643,17 @@ static ClActor *ZukanDetailForm_CreateIcon(ArcTool *arc, u32 *chars, u32 palette
     setup.sequence = 1;
     setup.priority = 1;
     setup.bgPriority = 0;
-    *chars = func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
-    actor = func_0204c040(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
+    *chars = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
+    actor = ClActor_Create(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
     func_0204c520(actor, FALSE);
-    func_0204c378(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
-    func_0204c318(actor, 0);
+    ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
+    ClActor_SetObjMode(actor, 0);
     return actor;
 }
 
 static void ZukanDetailForm_FreeIcon(u32 chars, ClActor *actor) {
-    func_0204c108(actor);
-    func_0204b98c(chars);
+    ClActor_Delete(actor);
+    ClActSys_FreeChars(chars);
 }
 
 // Lists every sex, color and form of the species that the Pokédex has seen. The one that it shows comes first, with
@@ -2022,7 +2022,7 @@ static void ZukanDetailForm_ChangeNext(ZukanDetailFormParam *param, ZukanDetailF
 static void ZukanDetailForm_ChangeIcon(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
                                        ZukanDetailCommon *common) {
     if (wk->iconActors[wk->icon] != NULL) {
-        func_0204c124(wk->iconActors[wk->icon], FALSE);
+        ClActor_SetVisible(wk->iconActors[wk->icon], FALSE);
     }
     wk->icon = (wk->icon + 1) % 2;
     // Frees the other icon as the screen's exit does, testing it again
@@ -2080,7 +2080,7 @@ static void ZukanDetailForm_CheckInput(ZukanDetailFormParam *param, ZukanDetailF
                     u32 x;
                     u32 y;
 
-                    if (func_0203dac8(&x, &y) && y < 168) {
+                    if (GFL_HIDGetTouchPressedPoint(&x, &y) && y < 168) {
                         open = TRUE;
                         touch = TRUE;
                     }
@@ -2094,7 +2094,7 @@ static void ZukanDetailForm_CheckInput(ZukanDetailFormParam *param, ZukanDetailF
                     }
                     ZukanDetailForm_SetMode(param, wk, common, FORM_MODE_OPEN);
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
-                    func_0203d564(touch);
+                    GCTX_HIDSetUsingTouch(touch);
                     ZukanDetailTouchbar_SetActive(touchbar, FALSE);
                 }
             }
@@ -2276,17 +2276,21 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
     u8 i;
 
-    wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_PALETTE] = func_0204bbb8(arc, 3, CLACT_VRAM_MAIN, 0, 0, 3, param->heapId);
-    wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CHARS] = func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CELL_ANIMS] = func_0204bde0(arc, 28, 45, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_PALETTE] =
+        ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_MAIN, 0, 0, 3, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CHARS] =
+        ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, 28, 45, param->heapId);
     wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_PALETTE] =
-        func_0204bbb8(arc, 0, CLACT_VRAM_MAIN, 0x60, 0, 1, param->heapId);
-    wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CHARS] = func_0204b81c(arc, 10, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CELL_ANIMS] = func_0204bde0(arc, 27, 44, param->heapId);
+        ClActSys_LoadPlttRange(arc, 0, CLACT_VRAM_MAIN, 0x60, 0, 1, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CHARS] =
+        ClActSys_LoadChars(arc, 10, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, 27, 44, param->heapId);
     wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_PALETTE] =
-        func_0204bbb8(arc, 6, CLACT_VRAM_MAIN, 0x80, 0, 2, param->heapId);
-    wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CHARS] = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CELL_ANIMS] = func_0204bde0(arc, 30, 47, param->heapId);
+        ClActSys_LoadPlttRange(arc, 6, CLACT_VRAM_MAIN, 0x80, 0, 2, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CHARS] =
+        ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, 30, 47, param->heapId);
     GFL_ArcToolFree(arc);
 
     for (i = 0; i < ACTOR_COUNT; i++) {
@@ -2298,13 +2302,13 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
         setup.sequence = ZUKAN_DETAIL_FORM_ACTORS[i].sequence;
         setup.priority = ZUKAN_DETAIL_FORM_ACTORS[i].priority;
         setup.bgPriority = ZUKAN_DETAIL_FORM_ACTORS[i].bgPriority;
-        wk->actors[i] = func_0204c040(wk->unit, wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].chars],
-                                      wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].palette],
-                                      wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].cellAnims], &setup, CLACT_SURFACE_MAIN,
-                                      param->heapId);
+        wk->actors[i] = ClActor_Create(wk->unit, wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].chars],
+                                       wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].palette],
+                                       wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].cellAnims], &setup, CLACT_SURFACE_MAIN,
+                                       param->heapId);
         func_0204c520(wk->actors[i], TRUE);
-        func_0204c124(wk->actors[i], FALSE);
-        func_0204c318(wk->actors[i], 1);
+        ClActor_SetVisible(wk->actors[i], FALSE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
 
     wk->buttons[BUTTON_TURN].x = 64;
@@ -2381,10 +2385,10 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
         setup.priority = 0;
         setup.bgPriority = 3;
         wk->buttons[i].actor =
-            func_0204c040(wk->unit, wk->resources[wk->buttons[i].chars], wk->resources[wk->buttons[i].palette],
-                          wk->resources[wk->buttons[i].cellAnims], &setup, CLACT_SURFACE_MAIN, param->heapId);
+            ClActor_Create(wk->unit, wk->resources[wk->buttons[i].chars], wk->resources[wk->buttons[i].palette],
+                           wk->resources[wk->buttons[i].cellAnims], &setup, CLACT_SURFACE_MAIN, param->heapId);
         func_0204c520(wk->buttons[i].actor, TRUE);
-        func_0204c318(wk->buttons[i].actor, 1);
+        ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
     wk->pushed = BUTTON_NONE;
 }
@@ -2394,20 +2398,20 @@ static void ZukanDetailForm_FreeActors(ZukanDetailFormParam *param, ZukanDetailF
     u8 i;
 
     for (i = 0; i < BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i].actor);
+        ClActor_Delete(wk->buttons[i].actor);
     }
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204bcd0(wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_PALETTE]);
-    func_0204b98c(wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CHARS]);
-    func_0204be64(wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CELL_ANIMS]);
-    func_0204bcd0(wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_PALETTE]);
-    func_0204b98c(wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CHARS]);
-    func_0204be64(wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CELL_ANIMS]);
-    func_0204bcd0(wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_PALETTE]);
-    func_0204b98c(wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CHARS]);
-    func_0204be64(wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CELL_ANIMS]);
+    ClActSys_FreePltt(wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_PALETTE]);
+    ClActSys_FreeChars(wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CHARS]);
+    ClActSys_FreeCellAnims(wk->resources[ZUKAN_DETAIL_FORM_RES_MAIN_CELL_ANIMS]);
+    ClActSys_FreePltt(wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_PALETTE]);
+    ClActSys_FreeChars(wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CHARS]);
+    ClActSys_FreeCellAnims(wk->resources[ZUKAN_DETAIL_FORM_RES_COLOR_CELL_ANIMS]);
+    ClActSys_FreePltt(wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_PALETTE]);
+    ClActSys_FreeChars(wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CHARS]);
+    ClActSys_FreeCellAnims(wk->resources[ZUKAN_DETAIL_FORM_RES_ARROW_CELL_ANIMS]);
 }
 
 // The button pushed with its key or touched, which starts its animation
@@ -2420,7 +2424,7 @@ static FormButton ZukanDetailForm_GetButtonInput(ZukanDetailFormParam *param, Zu
 
     if (button == BUTTON_NONE) {
         for (i = 0; i < BUTTON_COUNT; i++) {
-            if (func_0204c138(wk->buttons[i].actor)) {
+            if (ClActor_IsVisible(wk->buttons[i].actor)) {
                 if (GCTX_HIDGetPressedKeys() & wk->buttons[i].key) {
                     touch = FALSE;
                     button = i;
@@ -2439,9 +2443,9 @@ static FormButton ZukanDetailForm_GetButtonInput(ZukanDetailFormParam *param, Zu
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             for (i = 0; i < BUTTON_COUNT; i++) {
-                if (func_0204c138(wk->buttons[i].actor) && wk->buttons[i].rectX <= x &&
+                if (ClActor_IsVisible(wk->buttons[i].actor) && wk->buttons[i].rectX <= x &&
                     x < wk->buttons[i].rectX + wk->buttons[i].rectWidth && wk->buttons[i].rectY <= y &&
                     y < wk->buttons[i].rectY + wk->buttons[i].rectHeight) {
                     touch = TRUE;
@@ -2457,10 +2461,10 @@ static FormButton ZukanDetailForm_GetButtonInput(ZukanDetailFormParam *param, Zu
         } else {
             int other;
 
-            func_0203d564(touch);
+            GCTX_HIDSetUsingTouch(touch);
             ZukanDetailTouchbar_SetActive(touchbar, FALSE);
             wk->buttons[button].state = BUTTON_STATE_PUSHED;
-            func_0204c488(wk->buttons[button].actor, wk->buttons[button].pushedAnim);
+            ClActor_SetSequence(wk->buttons[button].actor, wk->buttons[button].pushedAnim);
             GFL_SndSEPlay(wk->buttons[button].se);
             // Pushing one arrow greys out the other
             other = BUTTON_NONE;
@@ -2471,7 +2475,7 @@ static FormButton ZukanDetailForm_GetButtonInput(ZukanDetailFormParam *param, Zu
             }
             if (other != BUTTON_NONE) {
                 func_0204c520(wk->buttons[other].actor, FALSE);
-                func_0204c4d4(wk->buttons[other].actor, 0);
+                ClActor_SetAnimTime(wk->buttons[other].actor, 0);
             }
             wk->pushed = button;
         }
@@ -2493,11 +2497,11 @@ static void ZukanDetailForm_UpdateArrows(ZukanDetailFormParam *param, ZukanDetai
         break;
     }
     if (visible) {
-        func_0204c124(wk->buttons[BUTTON_ARROW_L].actor, TRUE);
-        func_0204c124(wk->buttons[BUTTON_ARROW_R].actor, TRUE);
+        ClActor_SetVisible(wk->buttons[BUTTON_ARROW_L].actor, TRUE);
+        ClActor_SetVisible(wk->buttons[BUTTON_ARROW_R].actor, TRUE);
     } else {
-        func_0204c124(wk->buttons[BUTTON_ARROW_L].actor, FALSE);
-        func_0204c124(wk->buttons[BUTTON_ARROW_R].actor, FALSE);
+        ClActor_SetVisible(wk->buttons[BUTTON_ARROW_L].actor, FALSE);
+        ClActor_SetVisible(wk->buttons[BUTTON_ARROW_R].actor, FALSE);
     }
 }
 
@@ -2513,14 +2517,14 @@ static void ZukanDetailForm_UpdateButtons(ZukanDetailFormParam *param, ZukanDeta
             wk->buttons[wk->pushed].state = BUTTON_STATE_ANIMATING;
             break;
         case BUTTON_STATE_ANIMATING:
-            if (!func_0204c560(wk->buttons[wk->pushed].actor)) {
+            if (!ClActor_IsAnimActive(wk->buttons[wk->pushed].actor)) {
                 wk->buttons[wk->pushed].state = BUTTON_STATE_DONE;
             }
             break;
         case BUTTON_STATE_DONE: {
             int other;
 
-            func_0204c488(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].activeAnim);
+            ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].activeAnim);
             wk->buttons[wk->pushed].state = BUTTON_STATE_NONE;
             other = BUTTON_NONE;
             if (wk->pushed == BUTTON_ARROW_L) {
@@ -2530,7 +2534,7 @@ static void ZukanDetailForm_UpdateButtons(ZukanDetailFormParam *param, ZukanDeta
             }
             if (other != BUTTON_NONE && wk->buttons[other].state == BUTTON_STATE_NONE) {
                 func_0204c520(wk->buttons[other].actor, TRUE);
-                func_0204c488(wk->buttons[other].actor, wk->buttons[other].activeAnim);
+                ClActor_SetSequence(wk->buttons[other].actor, wk->buttons[other].activeAnim);
             }
             wk->pushed = BUTTON_NONE;
             if (wk->mode == FORM_MODE_SINGLE || wk->mode == FORM_MODE_COMPARE) {
@@ -2561,28 +2565,28 @@ static void ZukanDetailForm_UpdateColorMarks(ZukanDetailFormParam *param, ZukanD
     if (showCur && showNext) {
         pos.x = 0;
         pos.y = 0;
-        func_0204c140(wk->actors[ACTOR_COLOR_CUR], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_COLOR_CUR], &pos, CLACT_SURFACE_MAIN);
         pos.x = 128;
         pos.y = 0;
-        func_0204c140(wk->actors[ACTOR_COLOR_NEXT], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_COLOR_NEXT], &pos, CLACT_SURFACE_MAIN);
     } else if (showCur) {
         pos.x = 64;
         pos.y = 0;
-        func_0204c140(wk->actors[ACTOR_COLOR_CUR], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_COLOR_CUR], &pos, CLACT_SURFACE_MAIN);
     }
     {
         u8 anim = wk->entries[wk->cur].color == ENTRY_COLOR_RARE ? 1 : 0;
 
-        func_0204c124(wk->actors[ACTOR_COLOR_CUR], TRUE);
-        func_0204c488(wk->actors[ACTOR_COLOR_CUR], anim);
+        ClActor_SetVisible(wk->actors[ACTOR_COLOR_CUR], TRUE);
+        ClActor_SetSequence(wk->actors[ACTOR_COLOR_CUR], anim);
     }
     if (showNext) {
         u8 anim = wk->entries[wk->next].color == ENTRY_COLOR_RARE ? 1 : 0;
 
-        func_0204c124(wk->actors[ACTOR_COLOR_NEXT], TRUE);
-        func_0204c488(wk->actors[ACTOR_COLOR_NEXT], anim);
+        ClActor_SetVisible(wk->actors[ACTOR_COLOR_NEXT], TRUE);
+        ClActor_SetSequence(wk->actors[ACTOR_COLOR_NEXT], anim);
     } else {
-        func_0204c124(wk->actors[ACTOR_COLOR_NEXT], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_COLOR_NEXT], FALSE);
     }
 }
 
@@ -2607,15 +2611,15 @@ static void ZukanDetailForm_UpdateSlider(ZukanDetailFormParam *param, ZukanDetai
                                       NULL, &x, NULL);
         pos.x = x;
         pos.y = SLIDER_KNOB_Y;
-        func_0204c140(wk->actors[ACTOR_SLIDER_KNOB], &pos, CLACT_SURFACE_MAIN);
-        func_0204c124(wk->actors[ACTOR_SLIDER_BAR], TRUE);
-        func_0204c124(wk->actors[ACTOR_SLIDER_KNOB], TRUE);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_SLIDER_KNOB], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetVisible(wk->actors[ACTOR_SLIDER_BAR], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_SLIDER_KNOB], TRUE);
         wk->sliderSnap = FALSE;
         wk->sliderActive = FALSE;
         wk->dragging = FALSE;
     } else {
-        func_0204c124(wk->actors[ACTOR_SLIDER_BAR], FALSE);
-        func_0204c124(wk->actors[ACTOR_SLIDER_KNOB], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_SLIDER_BAR], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_SLIDER_KNOB], FALSE);
     }
 }
 
@@ -2638,12 +2642,12 @@ static BOOL ZukanDetailForm_DragSlider(ZukanDetailFormParam *param, ZukanDetailF
     u32 y;
 
     if (wk->dragging) {
-        if (!func_0203da84(&x, &y)) {
+        if (!GFL_HIDGetTouchHeldPoint(&x, &y)) {
             wk->dragging = FALSE;
             ZukanDetailTouchbar_SetActive(touchbar, TRUE);
         }
     } else if (wk->count >= 3) {
-        if (func_0203dac8(&x, &y) && x >= 144 && x <= 231 && y >= 40 && y <= 63) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y) && x >= 144 && x <= 231 && y >= 40 && y <= 63) {
             wk->dragging = TRUE;
             ZukanDetailTouchbar_SetActive(touchbar, FALSE);
             moved = TRUE;
@@ -2656,7 +2660,7 @@ static BOOL ZukanDetailForm_DragSlider(ZukanDetailFormParam *param, ZukanDetailF
         x = MATH_CLAMP(x, SLIDER_X, SLIDER_X + SLIDER_WIDTH - 1);
         pos.x = x;
         pos.y = SLIDER_KNOB_Y;
-        func_0204c140(wk->actors[ACTOR_SLIDER_KNOB], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_SLIDER_KNOB], &pos, CLACT_SURFACE_MAIN);
         wk->next = ZukanDetailForm_GetSliderEntry(param, wk, common, wk->cur,
                                                   ZukanDetailForm_GetSliderIndex(wk->count - 1, x));
         if (next != wk->next) {
@@ -2668,7 +2672,7 @@ static BOOL ZukanDetailForm_DragSlider(ZukanDetailFormParam *param, ZukanDetailF
         GFL_SndSEPlay(SEQ_SE_SYS_06);
     }
     if (wk->dragging) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     return wk->dragging;
 }
@@ -2685,7 +2689,7 @@ static BOOL ZukanDetailForm_SnapSlider(ZukanDetailFormParam *param, ZukanDetailF
                                       NULL, &x, NULL);
         pos.x = x;
         pos.y = SLIDER_KNOB_Y;
-        func_0204c140(wk->actors[ACTOR_SLIDER_KNOB], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_SLIDER_KNOB], &pos, CLACT_SURFACE_MAIN);
         snapped = TRUE;
     }
     return snapped;
@@ -3288,13 +3292,13 @@ static void ZukanDetailForm_SetActorsOpaque(ZukanDetailFormParam *param, ZukanDe
 
     for (i = 0; i < 2; i++) {
         if (wk->iconActors[i] != NULL) {
-            func_0204c318(wk->iconActors[i], 0);
+            ClActor_SetObjMode(wk->iconActors[i], 0);
         }
     }
-    func_0204c318(wk->actors[ACTOR_SLIDER_BAR], 0);
-    func_0204c318(wk->actors[ACTOR_SLIDER_KNOB], 0);
+    ClActor_SetObjMode(wk->actors[ACTOR_SLIDER_BAR], 0);
+    ClActor_SetObjMode(wk->actors[ACTOR_SLIDER_KNOB], 0);
     for (i = 0; i < BUTTON_COUNT; i++) {
-        func_0204c318(wk->buttons[i].actor, 0);
+        ClActor_SetObjMode(wk->buttons[i].actor, 0);
     }
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0,
                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
@@ -3312,13 +3316,13 @@ static void ZukanDetailForm_SetActorsBlended(ZukanDetailFormParam *param, ZukanD
 
     for (i = 0; i < 2; i++) {
         if (wk->iconActors[i] != NULL) {
-            func_0204c318(wk->iconActors[i], 1);
+            ClActor_SetObjMode(wk->iconActors[i], 1);
         }
     }
-    func_0204c318(wk->actors[ACTOR_SLIDER_BAR], 1);
-    func_0204c318(wk->actors[ACTOR_SLIDER_KNOB], 1);
+    ClActor_SetObjMode(wk->actors[ACTOR_SLIDER_BAR], 1);
+    ClActor_SetObjMode(wk->actors[ACTOR_SLIDER_KNOB], 1);
     for (i = 0; i < BUTTON_COUNT; i++) {
-        func_0204c318(wk->buttons[i].actor, 1);
+        ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
     ZukanDetailBlend_InitPlanes(wk->blendMain);
     ZukanDetailBlend_InitPlanes(wk->blendSub);

@@ -550,7 +550,7 @@ static BOOL ZukanDetailMap_Main(ZukanDetailProcSys *sys, int *seq, void *param_,
         ZukanDetailMap_LoadPanelBG(param, wk, common);
         ZukanDetailMap_LoadIconResources(param, wk, common);
         ZukanDetailMap_LoadPokemon(param, wk, common);
-        func_0204c318(wk->icons[wk->icon], 1);
+        ClActor_SetObjMode(wk->icons[wk->icon], 1);
         ZukanDetailMap_InitPlayerMarker(param, wk, common);
         if (wk->found == TRUE) {
             ZukanDetailMap_SetPlayerMarkerVisible(param, wk, common, TRUE);
@@ -871,26 +871,26 @@ static void ZukanDetailMap_CreateActors(ZukanDetailMapParam *param, ZukanDetailM
     ArcTool *arc;
     u8 i;
 
-    wk->renderer = func_0204be9c(&surface, 1, param->heapId);
-    wk->unit2 = func_0204bf1c(16, 0, param->heapId);
-    func_0204c018(wk->unit2, wk->renderer);
+    wk->renderer = ClActRenderer_Create(&surface, 1, param->heapId);
+    wk->unit2 = ClActUnit_Create(16, 0, param->heapId);
+    ClActUnit_SetRenderer(wk->unit2, wk->renderer);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_TOWNMAP_GRA, param->heapId);
-    wk->mapPalette = func_0204bbb8(arc, 2, CLACT_VRAM_MAIN, 0, 0, 5, param->heapId);
-    wk->mapChars = func_0204b81c(arc, 8, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->mapCellAnims = func_0204bde0(arc, 12, 19, param->heapId);
+    wk->mapPalette = ClActSys_LoadPlttRange(arc, 2, CLACT_VRAM_MAIN, 0, 0, 5, param->heapId);
+    wk->mapChars = ClActSys_LoadChars(arc, 8, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->mapCellAnims = ClActSys_LoadCellAnims(arc, 12, 19, param->heapId);
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
-    wk->seasonPalette = func_0204bbb8(arc, 6, CLACT_VRAM_MAIN, 0xa0, 0, 2, param->heapId);
-    wk->seasonChars = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->seasonCellAnims = func_0204bde0(arc, 30, 47, param->heapId);
+    wk->seasonPalette = ClActSys_LoadPlttRange(arc, 6, CLACT_VRAM_MAIN, 0xa0, 0, 2, param->heapId);
+    wk->seasonChars = ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->seasonCellAnims = ClActSys_LoadCellAnims(arc, 30, 47, param->heapId);
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, param->heapId);
-    wk->areaPalette = func_0204bbb8(arc, 5, CLACT_VRAM_MAIN, 0xe0, 0, 1, param->heapId);
-    wk->areaChars = func_0204b81c(arc, 15, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->areaCellAnims = func_0204bde0(arc, 29, 46, param->heapId);
+    wk->areaPalette = ClActSys_LoadPlttRange(arc, 5, CLACT_VRAM_MAIN, 0xe0, 0, 1, param->heapId);
+    wk->areaChars = ClActSys_LoadChars(arc, 15, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->areaCellAnims = ClActSys_LoadCellAnims(arc, 29, 46, param->heapId);
     GFL_ArcToolFree(arc);
 
     {
@@ -903,29 +903,29 @@ static void ZukanDetailMap_CreateActors(ZukanDetailMapParam *param, ZukanDetailM
 
         MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         for (i = ACTOR_CURSOR; i < ACTOR_COUNT; i++) {
-            wk->actors[i] = func_0204c040(wk->unit2, wk->mapChars, wk->mapPalette, wk->mapCellAnims, &setup,
-                                          CLACT_SURFACE_MAIN, param->heapId);
+            wk->actors[i] = ClActor_Create(wk->unit2, wk->mapChars, wk->mapPalette, wk->mapCellAnims, &setup,
+                                           CLACT_SURFACE_MAIN, param->heapId);
         }
         for (i = 0; i < ACTOR_CURSOR; i++) {
-            wk->actors[i] = func_0204c040(wk->unit2, wk->seasonChars, wk->seasonPalette, wk->seasonCellAnims, &setup,
-                                          CLACT_SURFACE_MAIN, param->heapId);
+            wk->actors[i] = ClActor_Create(wk->unit2, wk->seasonChars, wk->seasonPalette, wk->seasonCellAnims, &setup,
+                                           CLACT_SURFACE_MAIN, param->heapId);
         }
         for (i = 0; i < ACTOR_COUNT; i++) {
-            func_0204c488(wk->actors[i], anims[i]);
+            ClActor_SetSequence(wk->actors[i], anims[i]);
             func_0204c520(wk->actors[i], TRUE);
-            func_0204c468(wk->actors[i], bgPriorities[i]);
-            func_0204c438(wk->actors[i], priorities[i]);
-            func_0204c124(wk->actors[i], FALSE);
-            func_0204c318(wk->actors[i], 1);
+            ClActor_SetBgPriority(wk->actors[i], bgPriorities[i]);
+            ClActor_SetPriority(wk->actors[i], priorities[i]);
+            ClActor_SetVisible(wk->actors[i], FALSE);
+            ClActor_SetObjMode(wk->actors[i], 1);
         }
         pos.x = 128;
         pos.y = 96;
         for (i = 0; i < ACTOR_CURSOR; i++) {
-            func_0204c140(wk->actors[i], &pos, CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(wk->actors[i], &pos, CLACT_SURFACE_MAIN);
         }
         buttonPos.x = 132;
         buttonPos.y = 176;
-        func_0204c140(wk->actors[ACTOR_BUTTON], &buttonPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_BUTTON], &buttonPos, CLACT_SURFACE_MAIN);
     }
     wk->arrow = ACTOR_NONE;
 }
@@ -934,19 +934,19 @@ static void ZukanDetailMap_FreeActors(ZukanDetailMapParam *param, ZukanDetailMap
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204be64(wk->areaCellAnims);
-    func_0204b98c(wk->areaChars);
-    func_0204bcd0(wk->areaPalette);
-    func_0204be64(wk->seasonCellAnims);
-    func_0204b98c(wk->seasonChars);
-    func_0204bcd0(wk->seasonPalette);
-    func_0204be64(wk->mapCellAnims);
-    func_0204b98c(wk->mapChars);
-    func_0204bcd0(wk->mapPalette);
-    func_0204bf98(wk->unit2);
-    func_0204becc(wk->renderer);
+    ClActSys_FreeCellAnims(wk->areaCellAnims);
+    ClActSys_FreeChars(wk->areaChars);
+    ClActSys_FreePltt(wk->areaPalette);
+    ClActSys_FreeCellAnims(wk->seasonCellAnims);
+    ClActSys_FreeChars(wk->seasonChars);
+    ClActSys_FreePltt(wk->seasonPalette);
+    ClActSys_FreeCellAnims(wk->mapCellAnims);
+    ClActSys_FreeChars(wk->mapChars);
+    ClActSys_FreePltt(wk->mapPalette);
+    ClActUnit_Delete(wk->unit2);
+    ClActRenderer_Delete(wk->renderer);
 }
 
 static void ZukanDetailMap_CreateAreas(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
@@ -957,14 +957,14 @@ static void ZukanDetailMap_CreateAreas(ZukanDetailMapParam *param, ZukanDetailMa
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
         setup.x = TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_X);
         setup.y = TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_Y);
-        wk->areas[i] = func_0204c040(wk->unit, wk->areaChars, wk->areaPalette, wk->areaCellAnims, &setup,
-                                     CLACT_SURFACE_MAIN, param->heapId);
-        func_0204c488(wk->areas[i], TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_ANIM));
+        wk->areas[i] = ClActor_Create(wk->unit, wk->areaChars, wk->areaPalette, wk->areaCellAnims, &setup,
+                                      CLACT_SURFACE_MAIN, param->heapId);
+        ClActor_SetSequence(wk->areas[i], TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_ANIM));
         func_0204c520(wk->areas[i], TRUE);
-        func_0204c468(wk->areas[i], 2);
-        func_0204c438(wk->areas[i], 4);
-        func_0204c124(wk->areas[i], FALSE);
-        func_0204c318(wk->areas[i], 1);
+        ClActor_SetBgPriority(wk->areas[i], 2);
+        ClActor_SetPriority(wk->areas[i], 4);
+        ClActor_SetVisible(wk->areas[i], FALSE);
+        ClActor_SetObjMode(wk->areas[i], 1);
     }
 }
 
@@ -972,7 +972,7 @@ static void ZukanDetailMap_FreeAreas(ZukanDetailMapParam *param, ZukanDetailMapW
     u8 i;
 
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
-        func_0204c108(wk->areas[i]);
+        ClActor_Delete(wk->areas[i]);
     }
 }
 
@@ -1004,11 +1004,11 @@ static void ZukanDetailMap_CreatePlaces(ZukanDetailMapParam *param, ZukanDetailM
                 setup.priority = 5;
                 setup.bgPriority = 2;
                 wk->places[i].state = PLACE_SHOWN;
-                wk->places[i].actor = func_0204c040(wk->unit2, wk->mapChars, wk->mapPalette, wk->mapCellAnims, &setup,
-                                                    CLACT_SURFACE_MAIN, param->heapId);
+                wk->places[i].actor = ClActor_Create(wk->unit2, wk->mapChars, wk->mapPalette, wk->mapCellAnims, &setup,
+                                                     CLACT_SURFACE_MAIN, param->heapId);
                 func_0204c520(wk->places[i].actor, TRUE);
-                func_0204c124(wk->places[i].actor, TRUE);
-                func_0204c318(wk->places[i].actor, 1);
+                ClActor_SetVisible(wk->places[i].actor, TRUE);
+                ClActor_SetObjMode(wk->places[i].actor, 1);
             }
         } else {
             wk->places[i].state = PLACE_NONE;
@@ -1022,7 +1022,7 @@ static void ZukanDetailMap_FreePlaces(ZukanDetailMapParam *param, ZukanDetailMap
 
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
         if (wk->places[i].state == PLACE_SHOWN) {
-            func_0204c108(wk->places[i].actor);
+            ClActor_Delete(wk->places[i].actor);
         }
     }
 }
@@ -1170,26 +1170,26 @@ static void ZukanDetailMap_UpdateMainSlide(ZukanDetailMapParam *param, ZukanDeta
         case SLIDE_NONE:
             break;
         case SLIDE_IN:
-            func_0204c178(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
+            ClActor_GetSurfacePos(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
             if (pos.y <= 112) {
                 pos.y = 112;
                 wk->iconSlide = SLIDE_DONE;
             } else {
                 pos.y -= 8;
             }
-            func_0204c140(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
             break;
         case SLIDE_DONE:
             break;
         case SLIDE_OUT:
-            func_0204c178(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
+            ClActor_GetSurfacePos(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
             if (pos.y >= 176) {
                 pos.y = 176;
                 wk->iconSlide = SLIDE_NONE;
             } else {
                 pos.y += 8;
             }
-            func_0204c140(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(wk->icons[wk->icon], &pos, CLACT_SURFACE_SUB);
             break;
         }
     }
@@ -1215,10 +1215,10 @@ static void ZukanDetailMap_UpdateArrow(ZukanDetailMapParam *param, ZukanDetailMa
         other = ACTOR_SEASON_NEXT;
         otherAnim = 2;
     }
-    if (wk->arrow != ACTOR_NONE && !func_0204c560(wk->actors[wk->arrow])) {
-        func_0204c488(wk->actors[wk->arrow], anim);
+    if (wk->arrow != ACTOR_NONE && !ClActor_IsAnimActive(wk->actors[wk->arrow])) {
+        ClActor_SetSequence(wk->actors[wk->arrow], anim);
         func_0204c520(wk->actors[other], TRUE);
-        func_0204c488(wk->actors[other], otherAnim);
+        ClActor_SetSequence(wk->actors[other], otherAnim);
         wk->arrow = ACTOR_NONE;
         if (wk->state == MAP_STATE_MAP || wk->state == MAP_STATE_PLACE) {
             ZukanDetailTouchbar_SetActive(touchbar, TRUE);
@@ -1230,15 +1230,16 @@ static void ZukanDetailMap_LoadIconResources(ZukanDetailMapParam *param, ZukanDe
                                              ZukanDetailCommon *common) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, param->heapId);
 
-    wk->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
-    wk->iconCellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
+    wk->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
+    wk->iconCellAnims =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void ZukanDetailMap_FreeIconResources(ZukanDetailMapParam *param, ZukanDetailMapWork *wk,
                                              ZukanDetailCommon *common) {
-    func_0204be64(wk->iconCellAnims);
-    func_0204bcd0(wk->iconPalette);
+    ClActSys_FreeCellAnims(wk->iconCellAnims);
+    ClActSys_FreePltt(wk->iconPalette);
 }
 
 static ClActor *ZukanDetailMap_CreateIcon(u32 *chars, u32 palette, u32 cellAnims, ClActUnit *unit, HeapID heapId,
@@ -1252,18 +1253,18 @@ static ClActor *ZukanDetailMap_CreateIcon(u32 *chars, u32 palette, u32 cellAnims
     setup.sequence = 1;
     setup.priority = 1;
     setup.bgPriority = 0;
-    *chars = func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
-    actor = func_0204c040(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
+    *chars = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
+    actor = ClActor_Create(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
     func_0204c520(actor, FALSE);
-    func_0204c378(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
-    func_0204c318(actor, 0);
+    ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
+    ClActor_SetObjMode(actor, 0);
     GFL_ArcToolFree(arc);
     return actor;
 }
 
 static void ZukanDetailMap_FreeIcon(u32 chars, ClActor *actor) {
-    func_0204c108(actor);
-    func_0204b98c(chars);
+    ClActor_Delete(actor);
+    ClActSys_FreeChars(chars);
 }
 
 static u8 ZukanDetailMap_GetPlayerPlace(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
@@ -1287,7 +1288,7 @@ static void ZukanDetailMap_InitPlayerMarker(ZukanDetailMapParam *param, ZukanDet
 
         pos.x = TownMapData_GetParam(wk->townmap, place, TOWNMAP_PARAM_X);
         pos.y = TownMapData_GetParam(wk->townmap, place, TOWNMAP_PARAM_Y);
-        func_0204c140(wk->actors[ACTOR_PLAYER], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_PLAYER], &pos, CLACT_SURFACE_MAIN);
     }
 }
 
@@ -1295,17 +1296,17 @@ static void ZukanDetailMap_SetPlayerMarkerVisible(ZukanDetailMapParam *param, Zu
                                                   ZukanDetailCommon *common, BOOL visible) {
     if (visible) {
         if (ZukanDetailMap_GetPlayerPlace(param, wk, common) != NO_PLACE) {
-            func_0204c488(wk->actors[ACTOR_PLAYER], 6);
-            func_0204c124(wk->actors[ACTOR_PLAYER], TRUE);
+            ClActor_SetSequence(wk->actors[ACTOR_PLAYER], 6);
+            ClActor_SetVisible(wk->actors[ACTOR_PLAYER], TRUE);
         }
     } else {
-        func_0204c124(wk->actors[ACTOR_PLAYER], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_PLAYER], FALSE);
     }
 }
 
 static BOOL ZukanDetailMap_IsPlayerMarkerVisible(ZukanDetailMapParam *param, ZukanDetailMapWork *wk,
                                                  ZukanDetailCommon *common) {
-    return func_0204c138(wk->actors[ACTOR_PLAYER]);
+    return ClActor_IsVisible(wk->actors[ACTOR_PLAYER]);
 }
 
 // Shows the cursor at the picked place, or at the player's, or else at the middle of the map
@@ -1319,8 +1320,8 @@ static void ZukanDetailMap_ResetCursor(ZukanDetailMapParam *param, ZukanDetailMa
         pos.x = TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_X);
         pos.y = TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_Y);
     }
-    func_0204c140(wk->actors[ACTOR_CURSOR], &pos, CLACT_SURFACE_MAIN);
-    func_0204c124(wk->actors[ACTOR_CURSOR], TRUE);
+    ClActor_SetSurfacePos(wk->actors[ACTOR_CURSOR], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetVisible(wk->actors[ACTOR_CURSOR], TRUE);
 }
 
 static void ZukanDetailMap_SelectPlayerPlace(ZukanDetailMapParam *param, ZukanDetailMapWork *wk,
@@ -1457,7 +1458,7 @@ static void ZukanDetailMap_HandleInput(ZukanDetailMapParam *param, ZukanDetailMa
             }
         }
         if (handled) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (open) {
                 wk->touched = FALSE;
             }
@@ -1466,7 +1467,7 @@ static void ZukanDetailMap_HandleInput(ZukanDetailMapParam *param, ZukanDetailMa
             u32 x;
             u32 y;
 
-            if (func_0203dac8(&x, &y)) {
+            if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
                 if (!wk->bySeason) {
                     if (y < 168) {
                         open = TRUE;
@@ -1495,7 +1496,7 @@ static void ZukanDetailMap_HandleInput(ZukanDetailMapParam *param, ZukanDetailMa
                 }
             }
             if (handled) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 if (open) {
                     wk->touched = TRUE;
                     wk->touchX = x;
@@ -1541,13 +1542,13 @@ static void ZukanDetailMap_HandleInput(ZukanDetailMapParam *param, ZukanDetailMa
             }
         }
         if (handled) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
         if (!handled) {
             u32 x;
             u32 y;
 
-            if (func_0203dac8(&x, &y)) {
+            if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
                 if (wk->bySeason == FALSE) {
                     if (y >= 168) {
                         move = FALSE;
@@ -1580,7 +1581,7 @@ static void ZukanDetailMap_HandleInput(ZukanDetailMapParam *param, ZukanDetailMa
                 }
             }
             if (handled) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         if (move) {
@@ -1600,20 +1601,20 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
     if (!wk->found) {
         return;
     }
-    if (!func_0203d554()) {
-        if (func_0203dac8(&x, &y)) {
-            func_0203d564(TRUE);
-            func_0204c124(wk->actors[ACTOR_CURSOR], FALSE);
+    if (!GCTX_HIDIsUsingTouch()) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
+            GCTX_HIDSetUsingTouch(TRUE);
+            ClActor_SetVisible(wk->actors[ACTOR_CURSOR], FALSE);
         }
     } else if (GCTX_HIDGetPressedKeys()) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ZukanDetailMap_ResetCursor(param, wk, common);
         ZukanDetailMap_PrintPlace(param, wk, common);
         ZukanDetailMap_UpdateKinds(param, wk, common);
         return;
     }
 
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         u8 prevPlace = wk->place;
         BOOL moved = FALSE;
         BOOL nearFound = FALSE;
@@ -1627,7 +1628,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
         u8 nearPlace;
         u32 held;
 
-        func_0204c178(wk->actors[ACTOR_CURSOR], &cursorPos, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(wk->actors[ACTOR_CURSOR], &cursorPos, CLACT_SURFACE_MAIN);
         held = GCTX_HIDGetHeldKeys();
         if ((held & PAD_KEY_RIGHT) || (held & PAD_KEY_LEFT) || (held & PAD_KEY_UP) || (held & PAD_KEY_DOWN)) {
             moved = TRUE;
@@ -1691,7 +1692,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
         }
         cursorPos.x = MATH_CLAMP(cursorPos.x, 0, 248);
         cursorPos.y = MATH_CLAMP(cursorPos.y, 8, 168);
-        func_0204c140(wk->actors[ACTOR_CURSOR], &cursorPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_CURSOR], &cursorPos, CLACT_SURFACE_MAIN);
         wk->place = ZukanDetailMap_FindTouchedPlace(param, wk, common, cursorPos.x, cursorPos.y);
         if (wk->place != prevPlace) {
             ZukanDetailMap_PrintPlace(param, wk, common);
@@ -1700,7 +1701,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
         }
-    } else if (func_0203dac8(&x, &y)) {
+    } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         u8 prevPlace = wk->place;
 
         wk->place = ZukanDetailMap_FindTouchedPlace(param, wk, common, x, y);
@@ -1851,7 +1852,7 @@ static void ZukanDetailMap_SetState(ZukanDetailMapParam *param, ZukanDetailMapWo
                 } else {
                     wk->place = ZukanDetailMap_FindTouchedPlace(param, wk, common, wk->touchX, wk->touchY);
                     if (wk->place != NO_PLACE) {
-                        func_0204c124(wk->actors[ACTOR_PLACE], TRUE);
+                        ClActor_SetVisible(wk->actors[ACTOR_PLACE], TRUE);
                     }
                 }
                 ZukanDetailMap_PrintPlace(param, wk, common);
@@ -1898,8 +1899,8 @@ static void ZukanDetailMap_SetState(ZukanDetailMapParam *param, ZukanDetailMapWo
 
             wk->iconSlide = SLIDE_OUT;
             wk->panelSlide = SLIDE_OUT;
-            func_0204c124(wk->actors[ACTOR_CURSOR], FALSE);
-            func_0204c124(wk->actors[ACTOR_PLACE], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_CURSOR], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_PLACE], FALSE);
             showArrows = FALSE;
             if (ZukanDetailCommon_GetCount(common) > 1) {
                 showArrows = TRUE;
@@ -1942,7 +1943,7 @@ static void ZukanDetailMap_LoadPokemon(ZukanDetailMapParam *param, ZukanDetailMa
     }
 
     if (wk->icons[wk->icon] != NULL) {
-        func_0204c124(wk->icons[wk->icon], FALSE);
+        ClActor_SetVisible(wk->icons[wk->icon], FALSE);
     }
     wk->icon = (wk->icon + 1) % 2;
     if (wk->icons[wk->icon] != NULL) {
@@ -1979,17 +1980,17 @@ static void ZukanDetailMap_LoadPokemon(ZukanDetailMapParam *param, ZukanDetailMa
             PrintQueue_Clear(wk->printQueues[WINDOW_SEASON]);
             GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]), 0);
             BmpWin_FlushChar(wk->windows[WINDOW_SEASON]);
-            func_0204c124(wk->actors[ACTOR_SEASON], FALSE);
-            func_0204c124(wk->actors[ACTOR_SEASON_NEXT], FALSE);
-            func_0204c124(wk->actors[ACTOR_SEASON_PREV], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_SEASON], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_SEASON_NEXT], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_SEASON_PREV], FALSE);
         }
     } else if (wasBySeason == FALSE) {
         ZukanDetailMap_PrintSeason(param, wk, common);
-        func_0204c124(wk->actors[ACTOR_SEASON], TRUE);
-        func_0204c488(wk->actors[ACTOR_SEASON_NEXT], 2);
-        func_0204c124(wk->actors[ACTOR_SEASON_NEXT], TRUE);
-        func_0204c488(wk->actors[ACTOR_SEASON_PREV], 4);
-        func_0204c124(wk->actors[ACTOR_SEASON_PREV], TRUE);
+        ClActor_SetVisible(wk->actors[ACTOR_SEASON], TRUE);
+        ClActor_SetSequence(wk->actors[ACTOR_SEASON_NEXT], 2);
+        ClActor_SetVisible(wk->actors[ACTOR_SEASON_NEXT], TRUE);
+        ClActor_SetSequence(wk->actors[ACTOR_SEASON_PREV], 4);
+        ClActor_SetVisible(wk->actors[ACTOR_SEASON_PREV], TRUE);
     }
 }
 
@@ -2019,12 +2020,12 @@ static void ZukanDetailMap_PrintPlace(ZukanDetailMapParam *param, ZukanDetailMap
         ZukanDetailMap_TransferWindow(param, wk, common, WINDOW_PLACE);
         pos.x = TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_X);
         pos.y = TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_Y);
-        func_0204c488(wk->actors[ACTOR_PLACE], 5);
-        func_0204c140(wk->actors[ACTOR_PLACE], &pos, CLACT_SURFACE_MAIN);
-        func_0204c124(wk->actors[ACTOR_PLACE], TRUE);
+        ClActor_SetSequence(wk->actors[ACTOR_PLACE], 5);
+        ClActor_SetSurfacePos(wk->actors[ACTOR_PLACE], &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetVisible(wk->actors[ACTOR_PLACE], TRUE);
     } else {
         BmpWin_FlushChar(wk->windows[WINDOW_PLACE]);
-        func_0204c124(wk->actors[ACTOR_PLACE], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_PLACE], FALSE);
     }
 }
 
@@ -2052,12 +2053,12 @@ static void ZukanDetailMap_ChangeSeason(ZukanDetailMapParam *param, ZukanDetailM
         anim = 5;
         other = ACTOR_SEASON_NEXT;
     }
-    func_0204c488(wk->actors[wk->arrow], anim);
+    ClActor_SetSequence(wk->actors[wk->arrow], anim);
     func_0204c520(wk->actors[other], FALSE);
-    func_0204c4d4(wk->actors[other], 0);
+    ClActor_SetAnimTime(wk->actors[other], 0);
     ZukanDetailTouchbar_SetActive(touchbar, FALSE);
     if (touch == TRUE) {
-        func_0204c124(wk->actors[ACTOR_CURSOR], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_CURSOR], FALSE);
     } else if (wk->state == MAP_STATE_PLACE && wk->found == TRUE) {
         ZukanDetailMap_ResetCursor(param, wk, common);
         ZukanDetailMap_PrintPlace(param, wk, common);
@@ -2102,23 +2103,23 @@ static void ZukanDetailMap_StartChange(ZukanDetailMapParam *param, ZukanDetailMa
 static void ZukanDetailMap_HideHabitat(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
     u8 i;
 
-    if (func_0204c138(wk->actors[ACTOR_UNKNOWN])) {
+    if (ClActor_IsVisible(wk->actors[ACTOR_UNKNOWN])) {
         if (wk->found == TRUE) {
             wk->transferPending[WINDOW_UNKNOWN] = FALSE;
             PrintQueue_Clear(wk->printQueues[WINDOW_UNKNOWN]);
             GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]), 0);
             BmpWin_FlushChar(wk->windows[WINDOW_UNKNOWN]);
-            func_0204c124(wk->actors[ACTOR_UNKNOWN], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_UNKNOWN], FALSE);
         }
     } else {
         for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
-            func_0204c124(wk->areas[i], FALSE);
+            ClActor_SetVisible(wk->areas[i], FALSE);
         }
         if (wk->found == FALSE) {
             ZukanDetailMap_SetPlayerMarkerVisible(param, wk, common, FALSE);
             wk->place = NO_PLACE;
-            func_0204c124(wk->actors[ACTOR_CURSOR], FALSE);
-            func_0204c124(wk->actors[ACTOR_PLACE], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_CURSOR], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_PLACE], FALSE);
             ZukanDetailMap_PrintPlace(param, wk, common);
             ZukanDetailMap_UpdateKinds(param, wk, common);
         }
@@ -2127,7 +2128,7 @@ static void ZukanDetailMap_HideHabitat(ZukanDetailMapParam *param, ZukanDetailMa
 
 static void ZukanDetailMap_RequestHabitatBlend(ZukanDetailMapParam *param, ZukanDetailMapWork *wk,
                                                ZukanDetailCommon *common) {
-    if (!func_0204c138(wk->actors[ACTOR_UNKNOWN])) {
+    if (!ClActor_IsVisible(wk->actors[ACTOR_UNKNOWN])) {
         if (wk->found == FALSE) {
             wk->vblankRequest = VBLANK_DIM;
         } else {
@@ -2137,7 +2138,7 @@ static void ZukanDetailMap_RequestHabitatBlend(ZukanDetailMapParam *param, Zukan
 }
 
 static void ZukanDetailMap_ShowAreas(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
-    BOOL unknownShown = func_0204c138(wk->actors[ACTOR_UNKNOWN]);
+    BOOL unknownShown = ClActor_IsVisible(wk->actors[ACTOR_UNKNOWN]);
 
     if (wk->found == FALSE) {
         if (!unknownShown) {
@@ -2151,7 +2152,7 @@ static void ZukanDetailMap_ShowAreas(ZukanDetailMapParam *param, ZukanDetailMapW
             GFL_StrBufFree(strbuf);
             wk->transferPending[WINDOW_UNKNOWN] = TRUE;
             ZukanDetailMap_TransferWindow(param, wk, common, WINDOW_UNKNOWN);
-            func_0204c124(wk->actors[ACTOR_UNKNOWN], TRUE);
+            ClActor_SetVisible(wk->actors[ACTOR_UNKNOWN], TRUE);
         }
     } else {
         u8 season = wk->bySeason == FALSE ? 0 : wk->season;
@@ -2159,7 +2160,7 @@ static void ZukanDetailMap_ShowAreas(ZukanDetailMapParam *param, ZukanDetailMapW
 
         for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
             if (wk->habitat->seasons[season].places[wk->placeOrder[i]] != 0 && wk->places[i].state != PLACE_HIDDEN) {
-                func_0204c124(wk->areas[i], TRUE);
+                ClActor_SetVisible(wk->areas[i], TRUE);
             }
         }
         if (!ZukanDetailMap_IsPlayerMarkerVisible(param, wk, common)) {
@@ -2194,15 +2195,15 @@ static void ZukanDetailMap_ClearButton(ZukanDetailMapWork *wk) {
 static void ZukanDetailMap_HideAreas(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
     u8 i;
 
-    if (func_0204c138(wk->actors[ACTOR_UNKNOWN])) {
+    if (ClActor_IsVisible(wk->actors[ACTOR_UNKNOWN])) {
         wk->transferPending[WINDOW_UNKNOWN] = FALSE;
         PrintQueue_Clear(wk->printQueues[WINDOW_UNKNOWN]);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]), 0);
         BmpWin_FlushChar(wk->windows[WINDOW_UNKNOWN]);
-        func_0204c124(wk->actors[ACTOR_UNKNOWN], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_UNKNOWN], FALSE);
     } else {
         for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
-            func_0204c124(wk->areas[i], FALSE);
+            ClActor_SetVisible(wk->areas[i], FALSE);
         }
     }
 }
@@ -2288,12 +2289,12 @@ static void ZukanDetailMap_SetActorsOpaque(ZukanDetailMapParam *param, ZukanDeta
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (i != ACTOR_UNKNOWN) {
-            func_0204c318(wk->actors[i], 0);
+            ClActor_SetObjMode(wk->actors[i], 0);
         }
     }
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
         if (wk->places[i].state == PLACE_SHOWN) {
-            func_0204c318(wk->places[i].actor, 0);
+            ClActor_SetObjMode(wk->places[i].actor, 0);
         }
     }
 }
@@ -2304,12 +2305,12 @@ static void ZukanDetailMap_SetActorsBlended(ZukanDetailMapParam *param, ZukanDet
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (i != ACTOR_UNKNOWN) {
-            func_0204c318(wk->actors[i], 1);
+            ClActor_SetObjMode(wk->actors[i], 1);
         }
     }
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
         if (wk->places[i].state == PLACE_SHOWN) {
-            func_0204c318(wk->places[i].actor, 1);
+            ClActor_SetObjMode(wk->places[i].actor, 1);
         }
     }
 }
@@ -2320,7 +2321,7 @@ static void ZukanDetailMap_SetIconsOpaque(ZukanDetailMapParam *param, ZukanDetai
 
     for (i = 0; i < 2; i++) {
         if (wk->icons[i] != NULL) {
-            func_0204c318(wk->icons[i], 0);
+            ClActor_SetObjMode(wk->icons[i], 0);
         }
     }
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, ALL_PLANES, 12, 4);
@@ -2332,7 +2333,7 @@ static void ZukanDetailMap_SetIconsBlended(ZukanDetailMapParam *param, ZukanDeta
 
     for (i = 0; i < 2; i++) {
         if (wk->icons[i] != NULL) {
-            func_0204c318(wk->icons[i], 1);
+            ClActor_SetObjMode(wk->icons[i], 1);
         }
     }
     ZukanDetailBlend_InitPlanes(wk->blendSub);
@@ -2377,7 +2378,7 @@ static void ZukanDetailMap_UpdateButton(ZukanDetailMapParam *param, ZukanDetailM
     param->place = ZUKAN_DETAIL_MAP_NO_PLACE;
     if (show == TRUE) {
         if (PokeDex_IsHabitatListEnabled(pokedex) == TRUE) {
-            func_0204c124(wk->actors[ACTOR_BUTTON], FALSE);
+            ClActor_SetVisible(wk->actors[ACTOR_BUTTON], FALSE);
             ZukanDetailTouchbar_SetMapPlaceVisible(touchbar, TRUE);
             if (ZukanDetailMap_SetHabitatKind(wk, common) == TRUE) {
                 param->place = TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE);

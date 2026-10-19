@@ -275,24 +275,24 @@ static void Demo3DBG_VBlank(Demo3DBG *bg) {
 static void Demo3DClAct_Init(Demo3DClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(Demo3DClAct));
     ClActSys_Create(&sDemo3DClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(32, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(32, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void Demo3DClAct_Free(Demo3DClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(Demo3DClAct));
 }
 
 static void Demo3DClAct_Update(Demo3DClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void Demo3DClAct_VBlank(Demo3DClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *Demo3DClAct_GetUnit(Demo3DClAct *clact) {

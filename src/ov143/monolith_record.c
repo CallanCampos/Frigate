@@ -149,12 +149,12 @@ static BOOL MonolithRecord_Main(GameProc *proc, u32 *state, void *param, void *w
     switch (*state) {
     case MONOLITH_RECORD_SEQ_INPUT:
         pressed = GCTX_HIDGetPressedKeys();
-        if (func_0203da0c(sMonolithRecordTouchRects) != TOUCH_RECT_NONE || (pressed & PAD_BUTTON_B)) {
+        if (GFL_HIDGetTouchPressedRect(sMonolithRecordTouchRects) != TOUCH_RECT_NONE || (pressed & PAD_BUTTON_B)) {
             MonolithTool_PressReturnButton(&rw->returnButton);
             if (pressed & PAD_BUTTON_B) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             (*state)++;

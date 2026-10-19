@@ -485,7 +485,7 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
         break;
     case 2:
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) ||
-            func_0203da48() == TRUE) {
+            GFL_HIDIsTouchPressed() == TRUE) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             wk->subState = 3;
         }
@@ -521,7 +521,7 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
         break;
     case 5:
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) ||
-            func_0203da48() == TRUE) {
+            GFL_HIDIsTouchPressed() == TRUE) {
             wk->subState = 6;
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             BmpWin_ClearScreen(wk->statsWindow);

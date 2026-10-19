@@ -235,7 +235,7 @@ static void MBParent_Exit(MBParentWork *wk) {
     GCTX_HIDUnblockSleep(0x10);
     GFL_TCBRemove(wk->vblankTask);
     GFL_VBlankResetCallback();
-    func_0203e7dc();
+    WmIcon_Delete();
     if (wk->startMenu == TRUE) {
         GFL_SndBGMStopImmediate();
     } else {
@@ -336,9 +336,9 @@ static BOOL MBParent_Main(MBParentWork *wk) {
             wk->waitConnectFrames = 0;
             MBComm_StartNet(wk->comm);
             if (wk->startMenu == FALSE) {
-                func_02042ba8(FALSE, wk->heapId);
+                GFL_NetSetIconScreen(FALSE, wk->heapId);
             } else {
-                func_02042ba8(TRUE, wk->heapId);
+                GFL_NetSetIconScreen(TRUE, wk->heapId);
             }
         } else {
             wk->state = MB_PARENT_STATE_WIPE_OUT;
@@ -555,12 +555,12 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         break;
     }
     MBUtilMsg_Update(wk->msg);
-    func_0204b794();
+    ClActSys_Draw();
     return FALSE;
 }
 
 static void MBParent_VBlankTask(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void MBParent_ScrollBGs(void *data) {
@@ -627,16 +627,16 @@ static void MBParent_InitGraphics(MBParentWork *wk) {
     clactSetup = data_02093f08;
     clactSetup.charCount = 64;
     ClActSys_Create(&clactSetup, &sVRAMConfig, wk->heapId);
-    wk->actorUnit = func_0204bf1c(8, 0, wk->heapId);
-    func_0204c028(wk->actorUnit);
+    wk->actorUnit = ClActUnit_Create(8, 0, wk->heapId);
+    ClActUnit_UseSystemRenderer(wk->actorUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void MBParent_FreeGraphics(MBParentWork *wk) {
-    func_0204c108(wk->cancelButton);
-    func_0204bf98(wk->actorUnit);
-    func_0204b758();
+    ClActor_Delete(wk->cancelButton);
+    ClActUnit_Delete(wk->actorUnit);
+    ClActSys_Delete();
     GFL_BGSysReleaseBG(0);
     GFL_BGSysReleaseBG(1);
     GFL_BGSysReleaseBG(2);
@@ -706,24 +706,24 @@ static void MBParent_LoadGraphics(MBParentWork *wk) {
         GFL_BGSysSetScrPaletteNo(6, 0, 21, 32, 3, 8);
         GFL_BGSysLoadScr(6);
         wk->cancelButtonPalette =
-            func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, wk->heapId);
+            ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, wk->heapId);
         wk->cancelButtonChars =
-            func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, wk->heapId);
-        wk->cancelButtonCellAnims =
-            func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        wk->cancelButtonCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                           AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
         GFL_ArcToolFree(arc);
         setup.x = 232;
         setup.y = 168;
         setup.sequence = 1;
         setup.bgPriority = 0;
         setup.priority = 0;
-        wk->cancelButton = func_0204c040(wk->actorUnit, wk->cancelButtonChars, wk->cancelButtonPalette,
-                                         wk->cancelButtonCellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
+        wk->cancelButton = ClActor_Create(wk->actorUnit, wk->cancelButtonChars, wk->cancelButtonPalette,
+                                          wk->cancelButtonCellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
     }
     if (wk->startMenu == FALSE) {
-        func_0204c124(wk->cancelButton, TRUE);
+        ClActor_SetVisible(wk->cancelButton, TRUE);
     } else {
-        func_0204c124(wk->cancelButton, FALSE);
+        ClActor_SetVisible(wk->cancelButton, FALSE);
     }
 }
 
@@ -869,11 +869,11 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         sWirelessDone = FALSE;
         wk->wirelessStarted = TRUE;
         WH_Initialize(wk->heapId, MBParent_OnWirelessDone, 0);
-        func_0203e76c(240, 0, 0, wk->heapId);
+        WmIcon_Create(240, 0, 0, wk->heapId);
         if (wk->startMenu == FALSE) {
-            func_0203e810(FALSE, wk->heapId);
+            WmIcon_SetScreen(FALSE, wk->heapId);
         } else {
-            func_0203e810(TRUE, wk->heapId);
+            WmIcon_SetScreen(TRUE, wk->heapId);
         }
         wk->distributionSeq = 1;
         GCTX_HIDSetSoftResetCallback(MBParent_SoftResetCallback, wk);
@@ -917,7 +917,7 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
             MBUtilMsg_PrintAtOnce(wk->msg, 0x15);
         }
         MBUtilMsg_SetShowWaitIcon(wk->msg, 1);
-        func_0204c488(wk->cancelButton, 15);
+        ClActor_SetSequence(wk->cancelButton, 15);
         wk->distributionSeq = 5;
         break;
     case 5:
@@ -941,8 +941,8 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         }
         break;
     }
-    func_0203e7f8(WM_LINK_LEVEL_3 - WM_GetLinkLevel());
-    func_0203e838();
+    WmIcon_SetStrength(WM_LINK_LEVEL_3 - WM_GetLinkLevel());
+    WmIcon_Update();
     return FALSE;
 }
 
@@ -976,11 +976,11 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
     switch (MBP_GetState()) {
     case MBP_STATE_ENTRY:
         if (wk->cancelSeq == 0) {
-            int hit = func_0203da0c(sCancelButtonRect);
+            int hit = GFL_HIDGetTouchPressedRect(sCancelButtonRect);
 
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B || (hit == 0 && wk->startMenu == FALSE)) {
                 wk->cancelSeq = 1;
-                func_0204c488(wk->cancelButton, 9);
+                ClActor_SetSequence(wk->cancelButton, 9);
                 func_0204c520(wk->cancelButton, TRUE);
                 GFL_SndSEPlay(SEQ_SE_CANCEL1);
             } else if (MBP_IsBootableAll()) {
@@ -1001,7 +1001,7 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
     switch (wk->cancelSeq) {
     case 1:
         MBUtilMsg_ClearWindow(wk->msg);
-        func_0204c488(wk->cancelButton, 15);
+        ClActor_SetSequence(wk->cancelButton, 15);
         if (wk->startMenu == FALSE) {
             MBUtilMsg_SetWindow(wk->msg, 7);
             MBUtilMsg_Print(wk->msg, 9, TextSpeed_GetCurrentWait());
@@ -1050,7 +1050,7 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
             }
             MBUtilMsg_CreateWordSet(wk->msg);
             MBUtilMsg_SetNumberZeroPadded(wk->msg, 0, getTrainerID(playerInfo), 5);
-            func_0204c488(wk->cancelButton, 1);
+            ClActor_SetSequence(wk->cancelButton, 1);
             if (wk->startMenu == FALSE) {
                 MBUtilMsg_Print(wk->msg, 0, TextSpeed_GetCurrentWait());
             } else {
@@ -1576,7 +1576,7 @@ static BOOL MBParentProc_Init(GameProc *proc, u32 *state, void *param, void *wor
     MBParentParam *mbParam = param;
     MBParentWork *wk;
 
-    if (func_020427a4() == FALSE) {
+    if (GFL_NetIsEnded() == FALSE) {
         return FALSE;
     }
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MB_PARENT, 0x130000);

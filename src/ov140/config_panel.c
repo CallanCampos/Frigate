@@ -778,17 +778,17 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
 
     MI_CpuFill8(obj, 0, sizeof(ConfigPanelObj));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
-    obj->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(obj->unit);
+    obj->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(obj->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_CONFIG_PANEL, heapId);
-    obj->palette = func_0204bba0(arc, 6, CLACT_VRAM_MAIN, 0, heapId);
-    obj->chars = func_0204b81c(arc, 5, FALSE, CLACT_VRAM_MAIN, heapId);
-    obj->cellAnims = func_0204bde0(arc, 4, 3, heapId);
-    obj->knobChars = func_0204b81c(arc, 12, FALSE, CLACT_VRAM_MAIN, heapId);
-    obj->knobCellAnims = func_0204bde0(arc, 11, 10, heapId);
+    obj->palette = ClActSys_LoadPltt(arc, 6, CLACT_VRAM_MAIN, 0, heapId);
+    obj->chars = ClActSys_LoadChars(arc, 5, FALSE, CLACT_VRAM_MAIN, heapId);
+    obj->cellAnims = ClActSys_LoadCellAnims(arc, 4, 3, heapId);
+    obj->knobChars = ClActSys_LoadChars(arc, 12, FALSE, CLACT_VRAM_MAIN, heapId);
+    obj->knobCellAnims = ClActSys_LoadCellAnims(arc, 11, 10, heapId);
     GFL_ArcToolFree(arc);
 
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
@@ -797,7 +797,7 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
     for (i = ACTOR_ITEM; i < ACTOR_ITEM + ITEM_COUNT; i++) {
         setup.x = sConfigPanelItems[i - ACTOR_ITEM].x;
         setup.y = sConfigPanelItems[i - ACTOR_ITEM].y;
-        obj->actors[i] = func_0204c040(obj->unit, obj->chars, obj->palette, obj->cellAnims, &setup, 0, heapId);
+        obj->actors[i] = ClActor_Create(obj->unit, obj->chars, obj->palette, obj->cellAnims, &setup, 0, heapId);
         func_0204c520(obj->actors[i], FALSE);
     }
 
@@ -806,11 +806,11 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
     setup.y = 96;
     setup.bgPriority = 2;
     setup.priority = 1;
-    obj->actors[1] = func_0204c040(obj->unit, obj->knobChars, obj->palette, obj->knobCellAnims, &setup, 0, heapId);
-    func_0204c378(obj->actors[1], 6, 1);
+    obj->actors[1] = ClActor_Create(obj->unit, obj->knobChars, obj->palette, obj->knobCellAnims, &setup, 0, heapId);
+    ClActor_SetPalette(obj->actors[1], 6, 1);
 
-    if (func_02042788()) {
-        func_02042ba8(TRUE, heapId);
+    if (GFL_NetIsInitialized()) {
+        GFL_NetSetIconScreen(TRUE, heapId);
     }
 }
 
@@ -819,16 +819,16 @@ static void ConfigPanelObj_Exit(ConfigPanelObj *obj) {
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (obj->actors[i] != NULL) {
-            func_0204c108(obj->actors[i]);
+            ClActor_Delete(obj->actors[i]);
         }
     }
-    func_0204bcd0(obj->palette);
-    func_0204b98c(obj->chars);
-    func_0204be64(obj->cellAnims);
-    func_0204b98c(obj->knobChars);
-    func_0204be64(obj->knobCellAnims);
-    func_0204bf98(obj->unit);
-    func_0204b758();
+    ClActSys_FreePltt(obj->palette);
+    ClActSys_FreeChars(obj->chars);
+    ClActSys_FreeCellAnims(obj->cellAnims);
+    ClActSys_FreeChars(obj->knobChars);
+    ClActSys_FreeCellAnims(obj->knobCellAnims);
+    ClActUnit_Delete(obj->unit);
+    ClActSys_Delete();
     MI_CpuFill8(obj, 0, sizeof(ConfigPanelObj));
 }
 
@@ -840,13 +840,13 @@ static void ConfigPanelObj_Main(ConfigPanelObj *obj) {
         obj->frame = 0;
     }
     for (i = ACTOR_ITEM; i < ACTOR_ITEM + ITEM_COUNT; i++) {
-        func_0204c504(obj->actors[i], obj->frame / 12);
+        ClActor_SetAnimFrame(obj->actors[i], obj->frame / 12);
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void ConfigPanelObj_VBlank(ConfigPanelObj *obj) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActor *ConfigPanelObj_GetActor(ConfigPanelObj *obj, u32 index) {
@@ -872,14 +872,14 @@ static void ConfigPanelUi_Main(ConfigPanelUi *ui) {
     u32 held;
 
     ui->input = INPUT_NONE;
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         ui->input = INPUT_TOUCH;
         ui->start.x = x;
         ui->start.y = y;
         ui->now.x = x;
         ui->now.y = y;
         ui->touching = TRUE;
-    } else if (func_0203da84(&x, &y) && ui->touching) {
+    } else if (GFL_HIDGetTouchHeldPoint(&x, &y) && ui->touching) {
         if (MATH_ABS((s32)y - ui->start.y) >= 1) {
             ui->input = INPUT_SLIDE;
             ui->slide.x = x - ui->now.x;
@@ -893,8 +893,8 @@ static void ConfigPanelUi_Main(ConfigPanelUi *ui) {
 
     pressed = GCTX_HIDGetPressedKeys();
     held = GCTX_HIDGetHeldKeys();
-    if (pressed != 0 && func_0203d554() == TRUE && !(pressed & (PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_Y))) {
-        func_0203d564(FALSE);
+    if (pressed != 0 && GCTX_HIDIsUsingTouch() == TRUE && !(pressed & (PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_Y))) {
+        GCTX_HIDSetUsingTouch(FALSE);
         ui->input = INPUT_KEY_MODE;
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         return;
@@ -902,13 +902,13 @@ static void ConfigPanelUi_Main(ConfigPanelUi *ui) {
     if (pressed & PAD_BUTTON_A) {
         ui->input = INPUT_DECIDE;
     } else if (pressed & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ui->input = INPUT_CANCEL;
     } else if (pressed & PAD_BUTTON_Y) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ui->input = INPUT_Y;
     } else if (pressed & PAD_BUTTON_X) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ui->input = INPUT_X;
     } else if (pressed & PAD_KEY_UP) {
         ui->input = INPUT_UP;
@@ -1081,8 +1081,8 @@ static void ConfigPanelAppBar_Main(ConfigPanelAppBar *appBar, ConfigPanelUi *ui,
             appBar->button = BUTTON_CONFIRM;
             appBar->decided = TRUE;
             appBar->touched = TRUE;
-            if (!func_0203d554()) {
-                func_0203d564(TRUE);
+            if (!GCTX_HIDIsUsingTouch()) {
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         } else if (ConfigPanel_IsInRect(&sConfigPanelQuitRect, &point) && appBar->button != BUTTON_QUIT) {
             GFL_BGSysSetBGEnabled(BG_MESSAGE, FALSE);
@@ -1090,8 +1090,8 @@ static void ConfigPanelAppBar_Main(ConfigPanelAppBar *appBar, ConfigPanelUi *ui,
             appBar->button = BUTTON_QUIT;
             appBar->decided = TRUE;
             appBar->touched = TRUE;
-            if (!func_0203d554()) {
-                func_0203d564(TRUE);
+            if (!GCTX_HIDIsUsingTouch()) {
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         } else if (appBar->button != BUTTON_NONE) {
             appBar->button = BUTTON_NONE;
@@ -1161,12 +1161,12 @@ static void ConfigPanelAppBar_Main(ConfigPanelAppBar *appBar, ConfigPanelUi *ui,
         TouchBar_Main(appBar->touchBar);
         switch (TouchBar_GetTouched(appBar->touchBar)) {
         case TOUCHBAR_ICON_CHECK:
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 appBar->touched = TRUE;
             }
             break;
         case TOUCHBAR_ICON_CLOSE:
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 appBar->touched = TRUE;
             }
             break;
@@ -1259,7 +1259,7 @@ static void ConfigPanelScroll_Init(ConfigPanelScroll *scroll, u16 textBg, u16 ro
         scroll->actors[i] = ConfigPanelGraphic_GetActor(graphic, ACTOR_ITEM + i);
     }
     ConfigPanelScroll_Move(scroll, -8, -192, 192);
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         scroll->cursor = -1;
         ConfigPanelScroll_Draw(scroll, FALSE);
         scroll->update = FALSE;
@@ -1328,8 +1328,8 @@ static void ConfigPanelScroll_Main(ConfigPanelScroll *scroll, ConfigPanelUi *ui,
             ConfigPanelScroll_Draw(scroll, FALSE);
             ConfigPanelGraphic_ResetPulse(graphic);
             scroll->update = TRUE;
-            if (!func_0203d554()) {
-                func_0203d564(TRUE);
+            if (!GCTX_HIDIsUsingTouch()) {
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
@@ -1479,15 +1479,15 @@ static void ConfigPanelScroll_Draw(ConfigPanelScroll *scroll, BOOL cursorVisible
     for (i = 0; i < ITEM_COUNT; i++) {
         if (scroll->cursor == sConfigPanelItems[i].option && cursorVisible) {
             if (ConfigPanelOptions_IsSet(&scroll->options, i)) {
-                func_0204c4b8(scroll->actors[i], 3);
+                ClActor_ChangeSequence(scroll->actors[i], 3);
             } else {
-                func_0204c4b8(scroll->actors[i], 2);
+                ClActor_ChangeSequence(scroll->actors[i], 2);
             }
         } else {
             if (ConfigPanelOptions_IsSet(&scroll->options, i)) {
-                func_0204c4b8(scroll->actors[i], 0);
+                ClActor_ChangeSequence(scroll->actors[i], 0);
             } else {
-                func_0204c4b8(scroll->actors[i], 1);
+                ClActor_ChangeSequence(scroll->actors[i], 1);
             }
         }
     }
@@ -1509,7 +1509,7 @@ static void ConfigPanelScroll_Move(ConfigPanelScroll *scroll, int dy, int min, i
     for (i = 0; i < ITEM_COUNT; i++) {
         pos.x = sConfigPanelItems[i].x;
         pos.y = scroll->y + sConfigPanelItems[i].y;
-        func_0204c140(scroll->actors[i], &pos, 0);
+        ClActor_SetSurfacePos(scroll->actors[i], &pos, 0);
     }
 }
 

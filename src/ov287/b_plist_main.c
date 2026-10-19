@@ -852,14 +852,14 @@ static int BPlistMain_StateCloseMessage(BPlistWork *work) {
 static int BPlistMain_StatePrintMessage(BPlistWork *work) {
     switch (PrintStream_GetState(work->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             PrintStream_SkipWait(work->printStream, 0);
         }
         work->streamAdvanced = FALSE;
         break;
     case PRINT_STREAM_PAUSED:
         if (work->streamAdvanced == FALSE &&
-            (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             BPlistMain_PlayMessageSE(work, SEQ_SE_MESSAGE);
             PrintStream_Continue(work->printStream);
             work->streamAdvanced = TRUE;
@@ -878,7 +878,7 @@ static int BPlistMain_StateWaitMessageKey(BPlistWork *work) {
     if (BPlistMain_CheckQuit(work) == TRUE) {
         return 0x1f;
     }
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
         if (work->msgWinOpen == TRUE) {
             BmpWin_ClearFrame(work->msgWins[1].window, 0);
             work->msgWinOpen = FALSE;

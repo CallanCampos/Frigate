@@ -434,7 +434,7 @@ static BOOL GeonetProc_Init(GameProc *proc, u32 *state, void *param, void *procW
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 32, 32);
     work->keyCursor = KeyCursor_Create(15, TRUE, FALSE, work->heapId);
     work->queue = PrintQueue_CreateDefault(work->heapId);
-    func_02042ba8(TRUE, work->heapId);
+    GFL_NetSetIconScreen(TRUE, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     Geonet_LoadPlaces(work);
     return TRUE;
@@ -479,15 +479,15 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
 
     work->keysPressed = GCTX_HIDGetPressedKeys();
     work->keysHeld = GCTX_HIDGetHeldKeys();
-    if (func_0203d9c8(sGeonetTouchRects) != TOUCH_RECT_NONE) {
-        work->touchHeld = func_0203da84(&work->touchX, &work->touchY);
+    if (GFL_HIDGetTouchHeldRect(sGeonetTouchRects) != TOUCH_RECT_NONE) {
+        work->touchHeld = GFL_HIDGetTouchHeldPoint(&work->touchX, &work->touchY);
     } else {
         work->touchHeld = FALSE;
     }
     if (work->touchHeld == TRUE) {
-        work->touchPressed = func_0203da48();
+        work->touchPressed = GFL_HIDIsTouchPressed();
     } else {
-        work->touchPressed = func_0203dac8(&work->touchX, &work->touchY);
+        work->touchPressed = GFL_HIDGetTouchPressedPoint(&work->touchX, &work->touchY);
     }
 
     switch (*state) {
@@ -930,7 +930,7 @@ static void Geonet_ReadTouch(GeonetWork *work) {
     int moveY;
 
     work->touchKeys = 0;
-    button = func_0203da0c(sGeonetButtonRects);
+    button = GFL_HIDGetTouchPressedRect(sGeonetButtonRects);
     if (button == BUTTON_VIEW) {
         keys = PAD_BUTTON_X;
     } else if (button == BUTTON_QUIT) {
@@ -1709,10 +1709,10 @@ static u32 Geonet_GetDistance(const GeonetAngles *a, const GeonetAngles *b) {
     int x = MATH_ABS(a->x - b->x);
     int y = MATH_ABS(a->y - b->y);
 
-    if (x > func_020443b4(180)) {
+    if (x > GFL_MathDegToAngleIdx(180)) {
         x = 0xffff - x;
     }
-    if (y > func_020443b4(180)) {
+    if (y > GFL_MathDegToAngleIdx(180)) {
         y = 0xffff - y;
     }
     return FX_Sqrt((x * x + y * y) << FX32_SHIFT) >> FX32_SHIFT;

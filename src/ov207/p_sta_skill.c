@@ -212,7 +212,7 @@ void PStaSkill_Main(PStatusWork *wk, PStaSkillWork *skill) {
         PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
         skill->swapSrc = SLOT_NONE;
         PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
-        func_0204c124(skill->actors[3], FALSE);
+        ClActor_SetVisible(skill->actors[3], FALSE);
         skill->isSwapPending = FALSE;
     }
     for (i = 0; i < PLATE_COUNT; i++) {
@@ -222,12 +222,12 @@ void PStaSkill_Main(PStatusWork *wk, PStaSkillWork *skill) {
         skill->exitTimer++;
         if (skill->exitTimer % 8 < 4) {
             if (skill->forgetConfirmed == TRUE) {
-                func_0204c488(skill->plates[skill->cursor].plate, 15);
+                ClActor_SetSequence(skill->plates[skill->cursor].plate, 15);
             } else {
                 PStaSkill_SetPlateAnim(&skill->plates[skill->cursor], PLATE_ANIM_NORMAL);
             }
         } else if (skill->forgetConfirmed == TRUE) {
-            func_0204c488(skill->plates[skill->cursor].plate, 16);
+            ClActor_SetSequence(skill->plates[skill->cursor].plate, 16);
         } else {
             PStaSkill_SetPlateAnim(&skill->plates[skill->cursor], PLATE_ANIM_SELECTED);
         }
@@ -272,34 +272,34 @@ void PStaSkill_CreateActors(PStatusWork *wk, PStaSkillWork *skill) {
     setup.bgPriority = 1;
     setup.sequence = 0;
     skill->actors[0] =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(7)], wk->clResources[PSTA_RES_PLTT(5)],
-                      wk->clResources[PSTA_RES_CELL(6)], &setup, 1, wk->heapId);
-    func_0204c124(skill->actors[0], FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(7)], wk->clResources[PSTA_RES_PLTT(5)],
+                       wk->clResources[PSTA_RES_CELL(6)], &setup, 1, wk->heapId);
+    ClActor_SetVisible(skill->actors[0], FALSE);
     setup.x = 172;
     setup.y = 56;
     skill->actors[1] =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(4)], wk->clResources[PSTA_RES_PLTT(4)],
-                      wk->clResources[PSTA_RES_CELL(4)], &setup, 1, wk->heapId);
-    func_0204c124(skill->actors[1], FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(4)], wk->clResources[PSTA_RES_PLTT(4)],
+                       wk->clResources[PSTA_RES_CELL(4)], &setup, 1, wk->heapId);
+    ClActor_SetVisible(skill->actors[1], FALSE);
     setup.bgPriority = 0;
     skill->actors[2] =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
-                      wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
-    func_0204c124(skill->actors[2], FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
+                       wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
+    ClActor_SetVisible(skill->actors[2], FALSE);
     setup.sequence = 5;
     setup.priority = 8;
     skill->actors[3] =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
-                      wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
-    func_0204c124(skill->actors[3], FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
+                       wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
+    ClActor_SetVisible(skill->actors[3], FALSE);
     func_0204c520(skill->actors[3], TRUE);
     setup.sequence = 2;
     setup.priority = 4;
     setup.bgPriority = 0;
     skill->actors[4] =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
-                      wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
-    func_0204c124(skill->actors[4], FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
+                       wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
+    ClActor_SetVisible(skill->actors[4], FALSE);
     func_0204c520(skill->actors[4], TRUE);
     for (i = 0; i < skill->moveCount; i++) {
         PStaSkill_CreatePlate(wk, skill, &skill->plates[i], i);
@@ -312,11 +312,11 @@ void PStaSkill_FreeActors(PStatusWork *wk, PStaSkillWork *skill) {
     for (i = 0; i < skill->moveCount; i++) {
         PStaSkill_FreePlate(wk, skill, &skill->plates[i]);
     }
-    func_0204c108(skill->actors[0]);
-    func_0204c108(skill->actors[1]);
-    func_0204c108(skill->actors[2]);
-    func_0204c108(skill->actors[3]);
-    func_0204c108(skill->actors[4]);
+    ClActor_Delete(skill->actors[0]);
+    ClActor_Delete(skill->actors[1]);
+    ClActor_Delete(skill->actors[2]);
+    ClActor_Delete(skill->actors[3]);
+    ClActor_Delete(skill->actors[4]);
 }
 
 void PStaSkill_Load(PStatusWork *wk, PStaSkillWork *skill) {
@@ -346,7 +346,7 @@ void PStaSkill_Draw(PStatusWork *wk, PStaSkillWork *skill) {
     for (i = 0; i < skill->moveCount; i++) {
         PStaSkill_DrawPlate(wk, skill, &skill->plates[i]);
     }
-    func_0204c488(wk->buttons[PSTA_BUTTON_SKILL], 4);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SKILL], 4);
 }
 
 void PStaSkill_Unload(PStatusWork *wk, PStaSkillWork *skill) {
@@ -371,11 +371,11 @@ void PStaSkill_Clear(PStatusWork *wk, PStaSkillWork *skill) {
     GFL_BGSysLoadScr(1);
     GFL_BGSysFillScrAsync(4, 0);
     GFL_BGSysQueueScrLoad(4);
-    func_0204c124(skill->actors[0], FALSE);
-    func_0204c124(skill->actors[1], FALSE);
-    func_0204c124(wk->typeIcons[0], FALSE);
-    func_0204c124(wk->typeIcons[1], FALSE);
-    func_0204c488(wk->buttons[PSTA_BUTTON_SKILL], 1);
+    ClActor_SetVisible(skill->actors[0], FALSE);
+    ClActor_SetVisible(skill->actors[1], FALSE);
+    ClActor_SetVisible(wk->typeIcons[0], FALSE);
+    ClActor_SetVisible(wk->typeIcons[1], FALSE);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SKILL], 1);
 }
 
 static void PStaSkill_PrintStats(PStatusWork *wk, PStaSkillWork *skill) {
@@ -398,10 +398,10 @@ static void PStaSkill_DrawStats(PStatusWork *wk, PStaSkillWork *skill) {
     GFL_BGSysQueueScrLoad(6);
     GFL_BGSysLoadScrArea(5, 0, 0, 32, 3, skill->screens[3].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(5);
-    func_0204c124(skill->actors[0], TRUE);
-    func_0204c124(skill->actors[1], FALSE);
-    func_0204c124(wk->typeIcons[0], FALSE);
-    func_0204c124(wk->typeIcons[1], FALSE);
+    ClActor_SetVisible(skill->actors[0], TRUE);
+    ClActor_SetVisible(skill->actors[1], FALSE);
+    ClActor_SetVisible(wk->typeIcons[0], FALSE);
+    ClActor_SetVisible(wk->typeIcons[1], FALSE);
 }
 
 static void PStaSkill_PrintDetail(PStatusWork *wk, PStaSkillWork *skill) {
@@ -430,33 +430,33 @@ static void PStaSkill_DrawDetail(PStatusWork *wk, PStaSkillWork *skill) {
     GFL_BGSysQueueScrLoad(6);
     GFL_BGSysLoadScrArea(5, 0, 0, 32, 3, skill->screens[4].screen->rawData, 0, 0, 32, 32);
     GFL_BGSysQueueScrLoad(5);
-    func_0204c124(skill->actors[0], FALSE);
-    func_0204c124(skill->actors[1], TRUE);
+    ClActor_SetVisible(skill->actors[0], FALSE);
+    ClActor_SetVisible(skill->actors[1], TRUE);
     for (i = 0; i < skill->moveCount; i++) {
         PStaSkill_DrawPlate(wk, skill, &skill->plates[i]);
     }
     pkm = PStatus_GetBoxPkm(wk);
     type1 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE1, NULL);
     type2 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE2, NULL);
-    func_0204bb58(wk->typeIconChars[type1], &proxy1);
-    func_0204c3e4(wk->typeIcons[0], &proxy1);
-    func_0204c378(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
+    ClActSys_GetCharProxy(wk->typeIconChars[type1], &proxy1);
+    ClActor_SetImageProxy(wk->typeIcons[0], &proxy1);
+    ClActor_SetPalette(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
     pos.x = 208;
     pos.y = 120;
-    func_0204c140(wk->typeIcons[0], &pos, 0);
-    func_0204c124(wk->typeIcons[0], TRUE);
-    func_0204c468(wk->typeIcons[0], 0);
+    ClActor_SetSurfacePos(wk->typeIcons[0], &pos, 0);
+    ClActor_SetVisible(wk->typeIcons[0], TRUE);
+    ClActor_SetBgPriority(wk->typeIcons[0], 0);
     if (type1 != type2) {
-        func_0204bb58(wk->typeIconChars[type2], &proxy2);
-        func_0204c3e4(wk->typeIcons[1], &proxy2);
-        func_0204c378(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
+        ClActSys_GetCharProxy(wk->typeIconChars[type2], &proxy2);
+        ClActor_SetImageProxy(wk->typeIcons[1], &proxy2);
+        ClActor_SetPalette(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
         pos.x = 240;
         pos.y = 120;
-        func_0204c140(wk->typeIcons[1], &pos, 0);
-        func_0204c124(wk->typeIcons[1], TRUE);
-        func_0204c468(wk->typeIcons[1], 0);
+        ClActor_SetSurfacePos(wk->typeIcons[1], &pos, 0);
+        ClActor_SetVisible(wk->typeIcons[1], TRUE);
+        ClActor_SetBgPriority(wk->typeIcons[1], 0);
     } else {
-        func_0204c124(wk->typeIcons[1], FALSE);
+        ClActor_SetVisible(wk->typeIcons[1], FALSE);
     }
 }
 
@@ -574,9 +574,9 @@ static void PStaSkill_PrintMoveDetail(PStatusWork *wk, PStaSkillWork *skill) {
     }
     PStatus_PrintToWindow(wk, skill->windows[8], 0x95, 1, 1, PRINT_COLOR(15, 2, 0));
     category = PML_MoveGetCategory(move);
-    func_0204bb58(wk->clResources[PSTA_RES_CHAR(4) + category], &proxy);
-    func_0204c3e4(skill->actors[1], &proxy);
-    func_0204c378(skill->actors[1], AppMenuCommon_GetCategoryIconPaletteIndex(category), 1);
+    ClActSys_GetCharProxy(wk->clResources[PSTA_RES_CHAR(4) + category], &proxy);
+    ClActor_SetImageProxy(skill->actors[1], &proxy);
+    ClActor_SetPalette(skill->actors[1], AppMenuCommon_GetCategoryIconPaletteIndex(category), 1);
     PStatus_PrintToWindow(wk, skill->windows[9], 0x93, 1, 1, PRINT_COLOR(15, 2, 0));
     power = PML_MoveGetBasePower(move);
     if (power <= 1) {
@@ -650,7 +650,7 @@ void PStaSkill_DrawForget(PStatusWork *wk, PStaSkillWork *skill) {
     for (i = 0; i < skill->moveCount; i++) {
         PStaSkill_DrawPlate(wk, skill, &skill->plates[i]);
     }
-    func_0204c488(wk->buttons[PSTA_BUTTON_SKILL], 4);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SKILL], 4);
     if (skill->moveCount == PLATE_COUNT) {
         skill->cursor = PLATE_NEW;
     } else {
@@ -686,11 +686,11 @@ void PStaSkill_ClearForget(PStatusWork *wk, PStaSkillWork *skill) {
     GFL_BGSysLoadScr(1);
     GFL_BGSysFillScrAsync(4, 0);
     GFL_BGSysQueueScrLoad(4);
-    func_0204c124(skill->actors[0], FALSE);
-    func_0204c124(skill->actors[1], FALSE);
-    func_0204c124(wk->typeIcons[0], FALSE);
-    func_0204c124(wk->typeIcons[1], FALSE);
-    func_0204c488(wk->buttons[PSTA_BUTTON_SKILL], 1);
+    ClActor_SetVisible(skill->actors[0], FALSE);
+    ClActor_SetVisible(skill->actors[1], FALSE);
+    ClActor_SetVisible(wk->typeIcons[0], FALSE);
+    ClActor_SetVisible(wk->typeIcons[1], FALSE);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_SKILL], 1);
 }
 
 static void PStaSkill_HandleInput(PStatusWork *wk, PStaSkillWork *skill) {
@@ -701,7 +701,7 @@ static void PStaSkill_HandleInput(PStatusWork *wk, PStaSkillWork *skill) {
     } else if (PStaSkill_HandleForgetKeys(wk, skill) == FALSE) {
         PStaSkill_HandleForgetTouch(wk, skill);
     }
-    if (func_0203da2c() == FALSE) {
+    if (GFL_HIDIsTouchHeld() == FALSE) {
         skill->isDragging = FALSE;
     }
 }
@@ -724,9 +724,9 @@ static BOOL PStaSkill_HandleKeys(PStatusWork *wk, PStaSkillWork *skill) {
         }
     } else if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B && skill->isSwapping == FALSE) {
         PStatus_EnableInput(wk, TRUE);
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
         PStaSkill_SetPlateAnim(&skill->plates[skill->cursor], PLATE_ANIM_NORMAL);
-        func_0204c124(skill->actors[2], FALSE);
+        ClActor_SetVisible(skill->actors[2], FALSE);
         PStaSkill_PrintStats(wk, skill);
         wk->isTouch = FALSE;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -746,9 +746,9 @@ static BOOL PStaSkill_HandleKeys(PStatusWork *wk, PStaSkillWork *skill) {
                 skill->swapSrc = skill->cursor;
                 PStaSkill_SetPlateAnim(&skill->plates[skill->cursor], PLATE_ANIM_HELD);
                 PStaSkill_GetPlatePos(&skill->plates[skill->swapSrc], &pos);
-                func_0204c140(skill->actors[3], &pos, 0);
-                func_0204c124(skill->actors[3], TRUE);
-                func_0204c56c(skill->actors[3]);
+                ClActor_SetSurfacePos(skill->actors[3], &pos, 0);
+                ClActor_SetVisible(skill->actors[3], TRUE);
+                ClActor_RestartAnim(skill->actors[3]);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             } else if (skill->swapSrc != skill->cursor) {
                 PStaSkill_SwapMoves(wk, skill, skill->swapSrc, skill->cursor);
@@ -756,7 +756,7 @@ static BOOL PStaSkill_HandleKeys(PStatusWork *wk, PStaSkillWork *skill) {
             } else {
                 skill->isSwapping = FALSE;
                 PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
-                func_0204c124(skill->actors[3], FALSE);
+                ClActor_SetVisible(skill->actors[3], FALSE);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }
             return TRUE;
@@ -764,8 +764,8 @@ static BOOL PStaSkill_HandleKeys(PStatusWork *wk, PStaSkillWork *skill) {
     } else if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B && skill->isSwapping == TRUE) {
         PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
         PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
-        func_0204c124(skill->actors[3], FALSE);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetVisible(skill->actors[3], FALSE);
         skill->isSwapping = FALSE;
         skill->swapSrc = SLOT_NONE;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -786,13 +786,13 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
 
     if (wk->touchHit == PSTA_BUTTON_BACK && wk->isInputEnabled == FALSE) {
         PStatus_EnableInput(wk, TRUE);
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
         PStaSkill_SetPlateAnim(&skill->plates[skill->cursor], PLATE_ANIM_NORMAL);
-        func_0204c124(skill->actors[2], FALSE);
+        ClActor_SetVisible(skill->actors[2], FALSE);
         PStaSkill_PrintStats(wk, skill);
         if (skill->isSwapping == TRUE) {
             PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
-            func_0204c124(skill->actors[3], FALSE);
+            ClActor_SetVisible(skill->actors[3], FALSE);
             skill->isSwapping = FALSE;
             skill->swapSrc = SLOT_NONE;
         }
@@ -804,8 +804,8 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
         PStaSkill_GetPlateRect(&skill->plates[i], &rects[i]);
     }
     rects[PLATE_COUNT].top = TOUCH_RECT_END;
-    if (func_0203da48() == TRUE) {
-        hit = func_0203da0c(rects);
+    if (GFL_HIDIsTouchPressed() == TRUE) {
+        hit = GFL_HIDGetTouchPressedRect(rects);
         if (hit == TOUCH_RECT_NONE) {
             return;
         }
@@ -820,40 +820,40 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
             if (skill->isSwapping != TRUE) {
                 skill->swapSrc = hit;
                 PStaSkill_GetPlatePos(&skill->plates[hit], &heldPos);
-                func_0204c140(skill->actors[4], &heldPos, 0);
-                func_0204c124(skill->actors[4], TRUE);
+                ClActor_SetSurfacePos(skill->actors[4], &heldPos, 0);
+                ClActor_SetVisible(skill->actors[4], TRUE);
                 if (hit == 0) {
-                    func_0204c488(skill->actors[4], 3);
+                    ClActor_SetSequence(skill->actors[4], 3);
                 } else if (hit == 3) {
-                    func_0204c488(skill->actors[4], 4);
+                    ClActor_SetSequence(skill->actors[4], 4);
                 } else {
-                    func_0204c488(skill->actors[4], 2);
+                    ClActor_SetSequence(skill->actors[4], 2);
                 }
             }
             skill->dragStartX = wk->touchX;
             skill->dragStartY = wk->touchY;
             PStaSkill_GetPlatePos(&skill->plates[hit], &touchPos);
-            func_0204c140(skill->actors[3], &touchPos, 0);
-            func_0204c124(skill->actors[3], TRUE);
-            func_0204c56c(skill->actors[3]);
+            ClActor_SetSurfacePos(skill->actors[3], &touchPos, 0);
+            ClActor_SetVisible(skill->actors[3], TRUE);
+            ClActor_RestartAnim(skill->actors[3]);
         }
         wk->isTouch = TRUE;
         PStaSkill_SelectMove(wk, skill, hit, TRUE);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-    } else if (func_0203da2c() == TRUE) {
+    } else if (GFL_HIDIsTouchHeld() == TRUE) {
         if (skill->isDragging != TRUE) {
             return;
         }
-        hit = func_0203d9c8(rects);
+        hit = GFL_HIDGetTouchHeldRect(rects);
         if (skill->isSwapping == FALSE) {
             if (hit == TOUCH_RECT_NONE) {
                 skill->isDragging = FALSE;
-                func_0204c124(skill->actors[4], FALSE);
-                func_0204c124(skill->actors[3], FALSE);
+                ClActor_SetVisible(skill->actors[4], FALSE);
+                ClActor_SetVisible(skill->actors[3], FALSE);
             } else if (MATH_ABS((int)(skill->dragStartY - wk->touchY)) > 8) {
                 PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_HELD);
                 skill->isSwapping = TRUE;
-                func_0204c124(skill->actors[4], FALSE);
+                ClActor_SetVisible(skill->actors[4], FALSE);
             }
         }
         if (skill->isSwapping == TRUE) {
@@ -865,16 +865,16 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
                 return;
             }
             PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
-            func_0204c124(skill->actors[4], FALSE);
-            func_0204c124(skill->actors[3], FALSE);
+            ClActor_SetVisible(skill->actors[4], FALSE);
+            ClActor_SetVisible(skill->actors[3], FALSE);
             skill->isSwapping = FALSE;
             skill->isDragging = FALSE;
             PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
             skill->swapSrc = SLOT_NONE;
         }
     } else if (skill->isDragging == TRUE) {
-        func_0204c124(skill->actors[4], FALSE);
-        func_0204c124(skill->actors[3], FALSE);
+        ClActor_SetVisible(skill->actors[4], FALSE);
+        ClActor_SetVisible(skill->actors[3], FALSE);
         if (skill->isSwapping == TRUE) {
             if (skill->swapSrc != skill->cursor) {
                 PStaSkill_SwapMoves(wk, skill, skill->swapSrc, skill->cursor);
@@ -904,7 +904,7 @@ static BOOL PStaSkill_HandleForgetKeys(PStatusWork *wk, PStaSkillWork *skill) {
             wk->exitResult = PSTATUS_RESULT_BACK;
             wk->param->result = PSTATUS_RESULT_BACK;
             wk->seq = PSTA_SEQ_EXIT;
-            func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
             wk->pressedButton = wk->buttons[PSTA_BUTTON_BACK];
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             return TRUE;
@@ -912,12 +912,12 @@ static BOOL PStaSkill_HandleForgetKeys(PStatusWork *wk, PStaSkillWork *skill) {
         wk->isTouch = FALSE;
         PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
         PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
-        func_0204c124(skill->actors[3], FALSE);
+        ClActor_SetVisible(skill->actors[3], FALSE);
         skill->cursor = skill->swapSrc;
         skill->swapSrc = SLOT_NONE;
         skill->isConfirming = FALSE;
         PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
-        func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+        ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
         PStaSkill_ShowForgetPrompt(wk, skill, FALSE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     } else if (skill->isConfirming) {
@@ -953,9 +953,9 @@ static BOOL PStaSkill_HandleForgetKeys(PStatusWork *wk, PStaSkillWork *skill) {
                     skill->cursor = PLATE_NEW;
                     PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
                     PStaSkill_GetPlatePos(&skill->plates[skill->swapSrc], &pos);
-                    func_0204c140(skill->actors[3], &pos, 0);
-                    func_0204c124(skill->actors[3], TRUE);
-                    func_0204c56c(skill->actors[3]);
+                    ClActor_SetSurfacePos(skill->actors[3], &pos, 0);
+                    ClActor_SetVisible(skill->actors[3], TRUE);
+                    ClActor_RestartAnim(skill->actors[3]);
                     PStaSkill_ShowForgetPrompt(wk, skill, TRUE);
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 }
@@ -989,7 +989,7 @@ static void PStaSkill_HandleForgetTouch(PStatusWork *wk, PStaSkillWork *skill) {
             wk->exitResult = PSTATUS_RESULT_BACK;
             wk->param->result = PSTATUS_RESULT_BACK;
             wk->seq = PSTA_SEQ_EXIT;
-            func_0204c488(wk->buttons[PSTA_BUTTON_BACK], 9);
+            ClActor_SetSequence(wk->buttons[PSTA_BUTTON_BACK], 9);
             wk->pressedButton = wk->buttons[PSTA_BUTTON_BACK];
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             return;
@@ -997,7 +997,7 @@ static void PStaSkill_HandleForgetTouch(PStatusWork *wk, PStaSkillWork *skill) {
         wk->isTouch = TRUE;
         PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
         PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
-        func_0204c124(skill->actors[3], FALSE);
+        ClActor_SetVisible(skill->actors[3], FALSE);
         skill->swapSrc = SLOT_NONE;
         skill->isConfirming = FALSE;
         if (skill->moveCount == PLATE_COUNT) {
@@ -1015,7 +1015,7 @@ static void PStaSkill_HandleForgetTouch(PStatusWork *wk, PStaSkillWork *skill) {
         PStaSkill_GetPlateRect(&skill->plates[i], &rects[i]);
     }
     rects[PLATE_COUNT].top = TOUCH_RECT_END;
-    hit = func_0203da0c(rects);
+    hit = GFL_HIDGetTouchPressedRect(rects);
     if (hit == TOUCH_RECT_NONE) {
         return;
     }
@@ -1046,9 +1046,9 @@ static void PStaSkill_HandleForgetTouch(PStatusWork *wk, PStaSkillWork *skill) {
                 skill->cursor = PLATE_NEW;
                 PStaSkill_SelectMove(wk, skill, skill->cursor, FALSE);
                 PStaSkill_GetPlatePos(&skill->plates[skill->swapSrc], &pos);
-                func_0204c140(skill->actors[3], &pos, 0);
-                func_0204c124(skill->actors[3], TRUE);
-                func_0204c56c(skill->actors[3]);
+                ClActor_SetSurfacePos(skill->actors[3], &pos, 0);
+                ClActor_SetVisible(skill->actors[3], TRUE);
+                ClActor_RestartAnim(skill->actors[3]);
                 PStaSkill_ShowForgetPrompt(wk, skill, TRUE);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 return;
@@ -1111,10 +1111,10 @@ static void PStaSkill_SelectMove(PStatusWork *wk, PStaSkillWork *skill, u8 slot,
 
     if (wk->isTouch == FALSE) {
         PStaSkill_GetPlatePos(&skill->plates[slot], &pos);
-        func_0204c140(skill->actors[2], &pos, 0);
-        func_0204c124(skill->actors[2], FALSE);
+        ClActor_SetSurfacePos(skill->actors[2], &pos, 0);
+        ClActor_SetVisible(skill->actors[2], FALSE);
     } else {
-        func_0204c124(skill->actors[2], FALSE);
+        ClActor_SetVisible(skill->actors[2], FALSE);
     }
     if (skill->cursor != skill->swapSrc || skill->isSwapping == FALSE) {
         if (skill->cursor != CURSOR_NONE) {
@@ -1164,14 +1164,14 @@ static void PStaSkill_ShowForgetPrompt(PStatusWork *wk, PStaSkillWork *skill, BO
     SkillPlate *plate = &skill->plates[PLATE_NEW];
 
     if (show == TRUE) {
-        func_0204c488(plate->plate, 16);
+        ClActor_SetSequence(plate->plate, 16);
         PStaOam_SetVisible(plate->oam, FALSE);
-        func_0204c124(plate->typeIcon, FALSE);
+        ClActor_SetVisible(plate->typeIcon, FALSE);
         PStaOam_Upload(skill->forgetOam);
         PStaOam_SetVisible(skill->forgetOam, TRUE);
     } else {
         PStaOam_SetVisible(skill->forgetOam, FALSE);
-        func_0204c124(plate->typeIcon, TRUE);
+        ClActor_SetVisible(plate->typeIcon, TRUE);
         if (skill->cursor == PLATE_NEW) {
             PStaSkill_SetPlateAnim(plate, PLATE_ANIM_SELECTED);
         } else {
@@ -1212,22 +1212,22 @@ static void PStaSkill_CreatePlate(PStatusWork *wk, PStaSkillWork *skill, SkillPl
     setup.priority = 10;
     setup.bgPriority = 0;
     setup.sequence = plate->slot;
-    plate->plate = func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(8)], wk->clResources[PSTA_RES_PLTT(6)],
-                                 wk->clResources[PSTA_RES_CELL(7)], &setup, 0, wk->heapId);
-    func_0204c124(plate->plate, FALSE);
+    plate->plate = ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(8)], wk->clResources[PSTA_RES_PLTT(6)],
+                                  wk->clResources[PSTA_RES_CELL(7)], &setup, 0, wk->heapId);
+    ClActor_SetVisible(plate->plate, FALSE);
     setup.x = sPlatePos[plate->slot].x * 8 + 26;
     setup.y = sPlatePos[plate->slot].y * 8 + 9;
     setup.priority = 8;
     setup.bgPriority = 0;
     setup.sequence = 0;
-    plate->typeIcon = func_0204c040(wk->actorUnit, wk->typeIconChars[0], wk->clResources[PSTA_RES_PLTT(3)],
-                                    wk->clResources[PSTA_RES_CELL(4)], &setup, 0, wk->heapId);
-    func_0204c124(plate->typeIcon, FALSE);
+    plate->typeIcon = ClActor_Create(wk->actorUnit, wk->typeIconChars[0], wk->clResources[PSTA_RES_PLTT(3)],
+                                     wk->clResources[PSTA_RES_CELL(4)], &setup, 0, wk->heapId);
+    ClActor_SetVisible(plate->typeIcon, FALSE);
 }
 
 static void PStaSkill_FreePlate(PStatusWork *wk, PStaSkillWork *skill, SkillPlate *plate) {
-    func_0204c108(plate->plate);
-    func_0204c108(plate->typeIcon);
+    ClActor_Delete(plate->plate);
+    ClActor_Delete(plate->typeIcon);
     plate->slot = CURSOR_NONE;
 }
 
@@ -1300,15 +1300,15 @@ static void PStaSkill_DrawPlate(PStatusWork *wk, PStaSkillWork *skill, SkillPlat
     if (plate->isDirty == TRUE) {
         if (move != MOVE_NONE) {
             type = PML_MoveGetType(move);
-            func_0204bb58(wk->typeIconChars[type], &proxy);
-            func_0204c3e4(plate->typeIcon, &proxy);
-            func_0204c378(plate->typeIcon, AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
-            func_0204c124(plate->typeIcon, TRUE);
+            ClActSys_GetCharProxy(wk->typeIconChars[type], &proxy);
+            ClActor_SetImageProxy(plate->typeIcon, &proxy);
+            ClActor_SetPalette(plate->typeIcon, AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
+            ClActor_SetVisible(plate->typeIcon, TRUE);
         } else {
-            func_0204c124(plate->typeIcon, FALSE);
+            ClActor_SetVisible(plate->typeIcon, FALSE);
         }
         PStaOam_Upload(plate->oam);
-        func_0204c124(plate->plate, TRUE);
+        ClActor_SetVisible(plate->plate, TRUE);
         plate->isDirty = FALSE;
     }
 }
@@ -1319,8 +1319,8 @@ static void PStaSkill_UnloadPlate(PStatusWork *wk, PStaSkillWork *skill, SkillPl
 }
 
 static void PStaSkill_HidePlate(PStatusWork *wk, PStaSkillWork *skill, SkillPlate *plate) {
-    func_0204c124(plate->plate, FALSE);
-    func_0204c124(plate->typeIcon, FALSE);
+    ClActor_SetVisible(plate->plate, FALSE);
+    ClActor_SetVisible(plate->typeIcon, FALSE);
 }
 
 static void PStaSkill_GetPlateRect(SkillPlate *plate, TouchRect *rect) {
@@ -1343,5 +1343,5 @@ static void PStaSkill_GetPlatePos(SkillPlate *plate, ClActorPos *pos) {
 }
 
 static void PStaSkill_SetPlateAnim(SkillPlate *plate, u32 anim) {
-    func_0204c488(plate->plate, plate->slot + anim * PLATE_COUNT);
+    ClActor_SetSequence(plate->plate, plate->slot + anim * PLATE_COUNT);
 }

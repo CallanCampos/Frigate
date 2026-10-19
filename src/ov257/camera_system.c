@@ -255,7 +255,7 @@ static void CameraSystem_LoadSound(CameraSystem *sys, BOOL start) {
 
 static void CameraSystem_FreeSound(CameraSystem *sys) {
     if (sys->soundData != NULL) {
-        func_02042ed0(sys->soundData);
+        GFL_NetFreeAligned32(sys->soundData);
         sys->soundData = NULL;
     }
 }
@@ -356,7 +356,7 @@ static void CameraSystem_FreeBuffers(CameraSystem *sys) {
     if (sys->capturing == FALSE && CAMERA_IsBusy() == FALSE) {
         if (sys->buffersAllocated == TRUE) {
             for (i = 0; i < sys->numBuffers; i++) {
-                func_02042ed0(sys->buffers[i]);
+                GFL_NetFreeAligned32(sys->buffers[i]);
             }
         }
         GFL_HeapFree(sys->buffers);

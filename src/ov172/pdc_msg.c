@@ -212,7 +212,7 @@ BOOL PdcMsg_Step(PdcMsg *msg) {
         }
         return TRUE;
     case PDC_MSG_STEP_WAIT_KEY:
-        if ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed()) {
             msg->timer = 0;
         }
         if (msg->timer != 0) {

@@ -202,7 +202,7 @@ void func_ov167_021ce604(HeapID heapId) {
     GFL_OvlLoad(OVERLAY_ID(168));
     GX_SetBankForLCDC(0x80);
     GFL_OvlLoad(OVERLAY_ID(169));
-    if (!func_02042b20()) {
+    if (!GFL_NetIsWifi()) {
         GFL_OvlLoad(OVERLAY_TR_AI);
     }
 }
@@ -211,7 +211,7 @@ void func_ov167_021ce638(void) {
     func_ov167_021ce748();
     GFL_OvlUnload(OVERLAY_ID(168));
     GFL_OvlUnload(OVERLAY_ID(169));
-    if (!func_02042b20()) {
+    if (!GFL_NetIsWifi()) {
         GFL_OvlUnload(OVERLAY_TR_AI);
     }
 }
@@ -246,7 +246,7 @@ void func_ov167_021ce678(HeapID heapId) {
 
 void func_ov167_021ce748(void) {
     BtlvEffect_Exit();
-    func_0204b758();
+    ClActSys_Delete();
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
     GFL_G3DSysFree();

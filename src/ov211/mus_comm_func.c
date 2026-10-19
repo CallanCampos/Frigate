@@ -309,7 +309,7 @@ void *func_ov211_021ef230(u32 *seq, void *param) {
         sMusCommInitData.bNetType = 4;
     } else {
         sMusCommInitData.bNetType = 0;
-        func_020425ec(&sMusCommInitData, MusComm_OnNetEnd, work);
+        GFL_NetInit(&sMusCommInitData, MusComm_OnNetEnd, work);
     }
     PlayerInfo_Copy(work->playerInfo, &work->beacon.playerInfo);
     OS_GetMacAddress(work->beacon.mac);
@@ -322,12 +322,12 @@ BOOL func_ov211_021ef288(u32 *seq, void *param, void *work_) {
 
     switch ((int)*seq) {
     case 0:
-        if (func_02042a78() <= 1) {
-            func_02042860(NULL);
+        if (GFL_NetGetNegotiatedCount() <= 1) {
+            GFL_NetExit(NULL);
             return TRUE;
         }
         if (work->netMode == 1) {
-            func_02040c64(MUS_COMM_CMD_MSG);
+            NetCommand_RemoveTable(MUS_COMM_CMD_MSG);
         }
         if (work->ready == 1) {
             func_02042e9c(FALSE);
@@ -341,21 +341,21 @@ BOOL func_ov211_021ef288(u32 *seq, void *param, void *work_) {
         if (func_ov211_021ef99c(work, MUS_COMM_TIMING_START) == TRUE) {
             *seq = 2;
         }
-        if (func_02042a78() <= 1 || GFL_NetErrCheck()) {
+        if (GFL_NetGetNegotiatedCount() <= 1 || GFL_NetErrCheck()) {
             *seq = 10;
         }
         break;
     case 2:
         if (work->ready == 0) {
-            func_02042860(NULL);
+            GFL_NetExit(NULL);
             return TRUE;
         }
-        if (func_02042bc4() == 0) {
-            if (func_02042be8(func_02040440(), 1, 0, NULL) == 1) {
+        if (GFL_NetIsParent() == 0) {
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), 1, 0, NULL) == 1) {
                 return TRUE;
             }
-        } else if (func_02042a78() <= 1) {
-            func_02042860(NULL);
+        } else if (GFL_NetGetNegotiatedCount() <= 1) {
+            GFL_NetExit(NULL);
             return TRUE;
         }
         if (GFL_NetErrCheck()) {
@@ -366,14 +366,14 @@ BOOL func_ov211_021ef288(u32 *seq, void *param, void *work_) {
         if (GFL_NetErrCheck()) {
             func_02016b0c(work->gsys, 1);
         }
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL func_ov211_021ef378(u32 *seq, void *param, void *work) {
-    if (func_020427a4() == 1) {
+    if (GFL_NetIsEnded() == 1) {
         GFL_HeapFree(work);
         return TRUE;
     }
@@ -385,7 +385,7 @@ void func_ov211_021ef394(u32 *seq, void *param, void *work) {
 }
 
 void func_ov211_021ef3a0(MusCommWork *comm) {
-    if (func_02042bc4() == 1) {
+    if (GFL_NetIsParent() == 1) {
         comm->role = 1;
     } else {
         comm->role = 2;
@@ -393,8 +393,8 @@ void func_ov211_021ef3a0(MusCommWork *comm) {
 }
 
 void func_ov211_021ef3b8(MusCommWork *comm) {
-    func_02040c20(MUS_COMM_CMD_MSG, sMusCommCommands, NELEMS(sMusCommCommands), comm);
-    if (func_02042bc4() == 1) {
+    NetCommand_AddTable(MUS_COMM_CMD_MSG, sMusCommCommands, NELEMS(sMusCommCommands), comm);
+    if (GFL_NetIsParent() == 1) {
         comm->role = 1;
     } else {
         comm->role = 2;
@@ -511,8 +511,8 @@ static void MusComm_Main(MusCommWork *work) {
 
     if (GFL_NetErrCheck()) {
         work->error = TRUE;
-        if (!func_020427a4()) {
-            func_02042860(NULL);
+        if (!GFL_NetIsEnded()) {
+            GFL_NetExit(NULL);
         }
     }
     if (work->error == 1) {
@@ -548,7 +548,7 @@ static void MusComm_Main(MusCommWork *work) {
                 count++;
             }
         }
-        if (count == func_02042a78() && MusComm_SendAllPlayerData(work) == 1) {
+        if (count == GFL_NetGetNegotiatedCount() && MusComm_SendAllPlayerData(work) == 1) {
             work->state = MUS_COMM_STATE_WAIT_REQUEST;
         }
         break;
@@ -635,7 +635,7 @@ static void MusComm_Main(MusCommWork *work) {
                 count++;
             }
         }
-        if (count == func_02042a78() && MusComm_SendAllPokes(work) == 1) {
+        if (count == GFL_NetGetNegotiatedCount() && MusComm_SendAllPokes(work) == 1) {
             work->state = MUS_COMM_STATE_POKES_SENT;
         }
         break;
@@ -701,11 +701,11 @@ static void MusComm_Main(MusCommWork *work) {
 }
 
 void func_ov211_021ef988(MusCommWork *comm, u8 timing) {
-    func_02040624(func_02040440(), timing, 0x11);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), timing, 0x11);
 }
 
 BOOL func_ov211_021ef99c(MusCommWork *comm, u8 timing) {
-    if (func_02040664(func_02040440(), timing, 0x11) == 1) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), timing, 0x11) == 1) {
         return TRUE;
     }
     if (comm->error == 1) {
@@ -747,20 +747,20 @@ static BOOL MusComm_IsSameGame(int a, int b) {
 
 static BOOL MusComm_SendMsgSelf(MusCommWork *work, u8 cmd, u32 value, u8 sendId) {
     MusCommMsg msg;
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
 
     msg.cmd = cmd;
     msg.value = value;
-    return func_02042c18(handle, sendId, MUS_COMM_CMD_MSG, sizeof(MusCommMsg), &msg, 1, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(handle, sendId, MUS_COMM_CMD_MSG, sizeof(MusCommMsg), &msg, 1, FALSE, FALSE);
 }
 
 static BOOL MusComm_SendMsg(MusCommWork *work, u8 cmd, u32 value, u8 sendId) {
     MusCommMsg msg;
-    NetHandle *handle = func_02040414(0xff);
+    NetHandle *handle = NetHandle_Get(0xff);
 
     msg.cmd = cmd;
     msg.value = value;
-    return func_02042c18(handle, sendId, MUS_COMM_CMD_MSG, sizeof(MusCommMsg), &msg, 1, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(handle, sendId, MUS_COMM_CMD_MSG, sizeof(MusCommMsg), &msg, 1, FALSE, FALSE);
 }
 
 static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, NetHandle *handle) {
@@ -889,8 +889,9 @@ static BOOL MusComm_SendPlayerData(MusCommWork *work) {
     MI_CpuCopy8(&work->musicalId, data, 4);
     MI_CpuCopy8(work->info, info, PlayerInfo_GetSize());
     MI_CpuCopy8(work->pkm, pkm, PML_GetPkmRawSize());
-    return func_02042c18(func_02040440(), 0xff, MUS_COMM_CMD_PLAYER_DATA,
-                         PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), work->playerData, 1, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, MUS_COMM_CMD_PLAYER_DATA,
+                                       PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), work->playerData, 1, FALSE,
+                                       TRUE);
 }
 
 static void MusComm_RecvPlayerData(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -915,8 +916,9 @@ static BOOL MusComm_SendAllPlayerData(MusCommWork *work) {
 
         MI_CpuCopy8(work->players[i].data, dest, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
     }
-    return func_02042c18(func_02040414(0xff), 0xff, MUS_COMM_CMD_ALL_PLAYER_DATA,
-                         (PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize()) * 4, work->allPlayerData, 1, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_Get(0xff), 0xff, MUS_COMM_CMD_ALL_PLAYER_DATA,
+                                       (PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize()) * 4, work->allPlayerData, 1,
+                                       FALSE, TRUE);
 }
 
 static void MusComm_RecvAllPlayerData(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -958,8 +960,8 @@ static BOOL MusComm_SendPoke(MusCommWork *work, MusicalPoke *poke) {
     work->pokeData = data;
     MI_CpuCopy8(poke, data, sizeof(MusicalPoke));
     MI_CpuCopy8(poke->pkm, data + sizeof(MusicalPoke), PokeParty_GetPkmRawSize());
-    return func_02042c18(func_02040440(), 0xff, MUS_COMM_CMD_POKE, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke),
-                         work->pokeData, 1, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, MUS_COMM_CMD_POKE,
+                                       PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), work->pokeData, 1, FALSE, TRUE);
 }
 
 static void MusComm_RecvPoke(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -985,8 +987,9 @@ static BOOL MusComm_SendAllPokes(MusCommWork *work) {
 
         MI_CpuCopy8(work->players[i].poke, dest, size);
     }
-    return func_02042c18(func_02040414(0xff), 0xff, MUS_COMM_CMD_ALL_POKES,
-                         (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke)) * 4, work->allPokeData, 1, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_Get(0xff), 0xff, MUS_COMM_CMD_ALL_POKES,
+                                       (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke)) * 4, work->allPokeData, 1,
+                                       FALSE, TRUE);
 }
 
 static void MusComm_RecvAllPokes(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1079,7 +1082,7 @@ static BOOL MusComm_SendSoundChunk(MusCommWork *work, u8 chunk) {
     if ((chunk + 1) * MUS_COMM_SOUND_CHUNK_SIZE > work->ov210->soundDataSize) {
         size = work->ov210->soundDataSize % MUS_COMM_SOUND_CHUNK_SIZE;
     }
-    return func_02042c18(func_02040414(0xff), 0xff, MUS_COMM_CMD_SOUND_DATA, size, data, 0, TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_Get(0xff), 0xff, MUS_COMM_CMD_SOUND_DATA, size, data, 0, TRUE, TRUE);
 }
 
 static void MusComm_RecvSoundChunk(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1126,9 +1129,9 @@ static BOOL MusComm_SendProgram(MusCommWork *work) {
     NetHandle *handle;
 
     MusComm_CheckData(work->ov210->unk4, work->ov210->size[0], 2);
-    handle = func_02040414(0xff);
-    return func_02042c18(handle, 0xff, MUS_COMM_CMD_PROGRAM_DATA, work->ov210->size[0], work->ov210->unk4, 1, FALSE,
-                         TRUE);
+    handle = NetHandle_Get(0xff);
+    return GFL_NetSendCommandToMachine(handle, 0xff, MUS_COMM_CMD_PROGRAM_DATA, work->ov210->size[0], work->ov210->unk4,
+                                       1, FALSE, TRUE);
 }
 
 static void MusComm_RecvProgram(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1148,9 +1151,9 @@ static BOOL MusComm_SendMsgArc(MusCommWork *work) {
     NetHandle *handle;
 
     MusComm_CheckData(work->ov210->msgArc, work->ov210->size[1], 1);
-    handle = func_02040414(0xff);
-    return func_02042c18(handle, 0xff, MUS_COMM_CMD_MSG_ARC_DATA, work->ov210->size[1], work->ov210->msgArc, 1, FALSE,
-                         TRUE);
+    handle = NetHandle_Get(0xff);
+    return GFL_NetSendCommandToMachine(handle, 0xff, MUS_COMM_CMD_MSG_ARC_DATA, work->ov210->size[1],
+                                       work->ov210->msgArc, 1, FALSE, TRUE);
 }
 
 static void MusComm_RecvMsgArc(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1170,9 +1173,9 @@ static BOOL MusComm_SendScript(MusCommWork *work) {
     NetHandle *handle;
 
     MusComm_CheckData(work->ov210->script, work->ov210->size[2], 0);
-    handle = func_02040414(0xff);
-    return func_02042c18(handle, 0xff, MUS_COMM_CMD_SCRIPT_DATA, work->ov210->size[2], work->ov210->script, 1, FALSE,
-                         TRUE);
+    handle = NetHandle_Get(0xff);
+    return GFL_NetSendCommandToMachine(handle, 0xff, MUS_COMM_CMD_SCRIPT_DATA, work->ov210->size[2],
+                                       work->ov210->script, 1, FALSE, TRUE);
 }
 
 static void MusComm_RecvScript(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1225,7 +1228,7 @@ BOOL func_ov211_021f0460(MusCommWork *comm, u8 equip) {
 }
 
 u8 func_ov211_021f0470(MusCommWork *comm) {
-    return comm->players[func_02042a6c(func_02040440())].pos;
+    return comm->players[GFL_NetGetHandleNetId(NetHandle_GetOwn())].pos;
 }
 
 u8 func_ov211_021f0488(MusCommWork *comm, u8 index) {

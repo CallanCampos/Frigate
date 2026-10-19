@@ -103,7 +103,7 @@ static int ZknListSeq_Init(ZknListWork *wk) {
     } else {
         ZknListBmp_PutSearchCount(wk);
     }
-    func_02042ba8(TRUE, HEAPID_ZUKAN_LIST);
+    GFL_NetSetIconScreen(TRUE, HEAPID_ZUKAN_LIST);
     ZknListMain_SetBlend();
     ZknListMain_InitWindow();
     ZknListMain_InitFramePos(wk);
@@ -211,7 +211,7 @@ static int ZknListSeq_List(ZknListWork *wk) {
         seq = SEQ_LIST_SCROLL;
         break;
     case FRAMELIST_NONE: {
-        BOOL touch = func_0203d554();
+        BOOL touch = GCTX_HIDIsUsingTouch();
         int ui = ZknListUI_Main(wk);
 
         switch (ui) {
@@ -222,7 +222,7 @@ static int ZknListSeq_List(ZknListWork *wk) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 return ZknListSeq_SetDecide(wk, index);
             }
-            func_0203d564(touch);
+            GCTX_HIDSetUsingTouch(touch);
             break;
         }
         case ZKNLIST_UI_ROW:

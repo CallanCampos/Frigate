@@ -438,7 +438,7 @@ static BOOL UnionOneself_StepIdleRun(UnionSystem *unisys, UnionSelf *situ, Field
     if (situ->nextStep != 0) {
         return TRUE;
     }
-    if (func_02042a78() > 1) {
+    if (GFL_NetGetNegotiatedCount() > 1) {
         UnionComm_RequestLink0(unisys);
         return FALSE;
     }
@@ -597,20 +597,20 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
         break;
     case 1:
         if (UnionMsg_IsPrintDone(unisys)) {
-            if (func_02042a78() > 1) {
+            if (GFL_NetGetNegotiatedCount() > 1) {
                 for (i = 2; i < 5; i++) {
-                    if (func_02042a80((u8)i) == TRUE) {
+                    if (GFL_NetIsNegotiated((u8)i) == TRUE) {
                         break;
                     }
                 }
-                if (i < 5 || func_0203ff6c() > 2) {
+                if (i < 5 || NetSystem_CountConnected() > 2) {
                     UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217aa7c(unisys));
                     UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
                     UnionComm_RequestLink0(unisys);
                     *seq = 4;
                 } else {
                     func_02042e9c(TRUE);
-                    func_02042a9c(func_02040440(), 0);
+                    func_02042a9c(NetHandle_GetOwn(), 0);
                     *seq = 2;
                 }
             } else {
@@ -666,7 +666,7 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
         }
         break;
     case 6:
-        if (func_0203ff6c() <= 1) {
+        if (NetSystem_CountConnected() <= 1) {
             UnionComm_RequestLink0(unisys);
             (*seq)++;
         }
@@ -715,7 +715,7 @@ static BOOL UnionOneself_StepAskedRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         *seq = 1;
         break;
     case 1:
-        if (func_02042a78() > 1) {
+        if (GFL_NetGetNegotiatedCount() > 1) {
             func_02042e9c(TRUE);
             *seq = 3;
         } else {
@@ -804,11 +804,11 @@ static BOOL UnionOneself_StepParentBegin(UnionSystem *unisys, UnionSelf *situ, F
         UnionGroup_ResetTargets(&situ->mycomm);
         UnionComm_SetSelf(unisys, 4, 1);
         UnionGroup_AddBeaconMember(&situ->mycomm, situ->mycomm.parent);
-        func_02040624(func_02040440(), 2, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, 0x14);
         (*seq)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 2, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 2, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -953,11 +953,11 @@ static BOOL UnionOneself_StepOfferBegin(UnionSystem *unisys, UnionSelf *situ, Fi
         UnionGroup_ResetTargets(&situ->mycomm);
         UnionComm_SetSelf(unisys, 4, 1);
         UnionGroup_AddBeaconMember(&situ->mycomm, situ->mycomm.parent);
-        func_02040624(func_02040440(), 2, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, 0x14);
         (*seq)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 2, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 2, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -1508,7 +1508,7 @@ static u32 UnionOneself_GetCardVersion(UnionSystem *unisys, BOOL remote) {
     GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
     int i;
 
-    for (i = 0; i < func_02042a78(); i++) {
+    for (i = 0; i < GFL_NetGetNegotiatedCount(); i++) {
         PlayerInfo *info;
 
         if (remote) {
@@ -1542,14 +1542,14 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         func_ov012_02169770(unisys->alloc.my_card, unisys->param->gameData, TRUE, FALSE, HEAPID_UNION);
         func_ov012_02169508(unisys->alloc.my_card, unisys->param->gameData, HEAPID_UNION);
         MI_CpuCopy8(unisys->alloc.my_card, unisys->alloc.target_card, 0x678);
-        func_02040624(func_02040440(), 3, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0x14);
         UnionMsg_CreateAndPrint(unisys, field,
                                 UnionMsg_GetOriginMessage(unisys, situ->mycomm.target->beacon.country,
                                                           situ->mycomm.target->beacon.province));
         (*seq)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 3, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 3, 0x14) == TRUE) {
             if (UnionOneself_GetCardVersion(unisys, FALSE) == 0x16) {
                 *seq = 2;
             } else {
@@ -1576,11 +1576,11 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         }
         break;
     case 5:
-        func_02040624(func_02040440(), 4, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 4, 0x14);
         (*seq)++;
         break;
     case 6:
-        if (func_02040664(func_02040440(), 4, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 4, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -1595,17 +1595,17 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         break;
     case 9:
         UnionMsg_CreateAndPrint(unisys, field, 0x10);
-        func_02040624(func_02040440(), 5, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 5, 0x14);
         (*seq)++;
         break;
     case 10:
-        if (UnionMsg_IsPrintDone(unisys) && func_02040664(func_02040440(), 5, 0x14) == TRUE) {
+        if (UnionMsg_IsPrintDone(unisys) && NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 5, 0x14) == TRUE) {
             GFL_HeapFree(unisys->alloc.my_card);
             GFL_HeapFree(unisys->alloc.target_card);
             unisys->alloc.cardParam = NULL;
             unisys->alloc.my_card = NULL;
             unisys->alloc.target_card = NULL;
-            if (func_02042bc4() == TRUE) {
+            if (GFL_NetIsParent() == TRUE) {
                 UnionOneself_SetNextStep(unisys, UNION_STEP_PARENT);
             } else {
                 UnionOneself_SetNextStep(unisys, UNION_STEP_OFFER_PARTY);
@@ -1628,17 +1628,17 @@ static BOOL UnionOneself_StepTradeRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         break;
     case 1:
         if (UnionMsg_IsPrintDone(unisys) == TRUE) {
-            func_02040624(func_02040440(), 6, 0x14);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 6, 0x14);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_02040664(func_02040440(), 6, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 6, 0x14) == TRUE) {
             GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
             RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
 
-            Misc_AddMetTrainer(
-                rival, getIDAsUInt(GameData_GetPlayerInfoByNetID(gameData, func_02042a6c(func_02040440()) ^ 1)));
+            Misc_AddMetTrainer(rival, getIDAsUInt(GameData_GetPlayerInfoByNetID(
+                                          gameData, GFL_NetGetHandleNetId(NetHandle_GetOwn()) ^ 1)));
             (*seq)++;
         }
         break;
@@ -1677,12 +1677,12 @@ static BOOL UnionOneself_StepTradeRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         break;
     case 5:
         UnionMsg_CreateAndPrint(unisys, field, 0x10);
-        func_02040624(func_02040440(), 7, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 7, 0x14);
         (*seq)++;
         break;
     case 6:
-        if (UnionMsg_IsPrintDone(unisys) && func_02040664(func_02040440(), 7, 0x14) == TRUE) {
-            if (func_02042bc4() == TRUE) {
+        if (UnionMsg_IsPrintDone(unisys) && NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 7, 0x14) == TRUE) {
+            if (GFL_NetIsParent() == TRUE) {
                 UnionOneself_SetNextStep(unisys, UNION_STEP_PARENT);
             } else {
                 UnionOneself_SetNextStep(unisys, UNION_STEP_OFFER_PARTY);
@@ -1711,10 +1711,10 @@ static BOOL UnionOneself_StepRecruitRun(UnionSystem *unisys, UnionSelf *situ, Fi
         break;
     case 1:
         if (UnionMsg_IsPrintDone(unisys)) {
-            if (func_02042a78() > 1) {
+            if (GFL_NetGetNegotiatedCount() > 1) {
                 func_02042e9c(TRUE);
                 needed = UnionMsg_GetTableByte(situ->mycomm.unk19);
-                if (needed <= func_02042a6c(func_02040440())) {
+                if (needed <= GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
                     *seq = 4;
                 } else {
                     UnionComm_SetSelf(unisys, 3, (u32)&unisys->found[entryIndex]);
@@ -1799,7 +1799,7 @@ static BOOL UnionOneself_StepLeaveRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         (*seq)++;
         break;
     case 1:
-        if (!UnionComm_IsLinkRequested(unisys) && func_020427a4() == TRUE) {
+        if (!UnionComm_IsLinkRequested(unisys) && GFL_NetIsEnded() == TRUE) {
             if (situ->mycomm.parent != NULL) {
                 UnionGroup_RemoveBeaconMember(&situ->mycomm, situ->mycomm.parent);
                 UnionComm_SetSelf(unisys, 3, 0);
@@ -1835,11 +1835,11 @@ static BOOL UnionOneself_StepJoinRun(UnionSystem *unisys, UnionSelf *situ, Field
         (*seq)++;
         break;
     case 1:
-        func_02040624(func_02040440(), 8, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 8, 0x14);
         (*seq)++;
         break;
     case 2:
-        if (func_02040664(func_02040440(), 8, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 8, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -1937,11 +1937,11 @@ static BOOL UnionOneself_StepColosseumChildRun(UnionSystem *unisys, UnionSelf *s
         }
         break;
     case 2:
-        func_02040624(func_02040440(), 0xb, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xb, 0x14);
         (*seq)++;
         break;
     case 3:
-        if (func_02040664(func_02040440(), 0xb, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xb, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -1980,13 +1980,13 @@ static BOOL UnionOneself_StepColosseumParentRun(UnionSystem *unisys, UnionSelf *
         break;
     case 2:
         if (situ->mycomm.unk46_1 == 0) {
-            func_02040624(func_02040440(), 0xb, 0x14);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xb, 0x14);
         }
         (*seq)++;
         break;
     case 3:
         if (situ->mycomm.unk46_1 == 0) {
-            if (func_02040664(func_02040440(), 0xb, 0x14) == TRUE) {
+            if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xb, 0x14) == TRUE) {
                 (*seq)++;
             }
         } else {
@@ -2015,7 +2015,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
     UnionColosseum *clsys = unisys->colosseum_sys;
     PlayerInfo *info;
 
-    func_02042a6c(func_02040440());
+    GFL_NetGetHandleNetId(NetHandle_GetOwn());
     GFL_ASSERT(clsys != NULL);
     if (UnionOneself_CheckNetErrorEnd(unisys) == TRUE) {
         if (clsys->unk178 != NULL) {
@@ -2028,7 +2028,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
     case 0:
         if (UnionMsg_GetTableByte(situ->mycomm.unk19) == 2) {
             clsys->unkDE = 1;
-            if (func_02042bc4() == TRUE) {
+            if (GFL_NetIsParent() == TRUE) {
                 if (func_ov028_021714a4() == TRUE) {
                     *seq = 0x64;
                 }
@@ -2038,7 +2038,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
             break;
         }
         func_02042e9c(FALSE);
-        if (func_02042bc4() == TRUE) {
+        if (GFL_NetIsParent() == TRUE) {
             info = GetGameDataPlayerInfo(unisys->param->gameData);
             clsys->unk178 = func_ov036_021c3d9c(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
                                                 UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION, 0, 0, 0);
@@ -2055,14 +2055,14 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
         }
         if (situ->mycomm.unk46_1 == 0) {
             UnionComm_SetCommandBase(situ->activity);
-            func_02040624(func_02040440(), 0xc, 0x14);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xc, 0x14);
         }
         (*seq)++;
         break;
     case 1:
         if (situ->mycomm.unk46_1 == 0) {
-            if (func_02040664(func_02040440(), 0xc, 0x14) == TRUE) {
-                func_02042a9c(func_02040440(), 1);
+            if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xc, 0x14) == TRUE) {
+                func_02042a9c(NetHandle_GetOwn(), 1);
                 (*seq)++;
             }
         } else {
@@ -2136,7 +2136,7 @@ static void UnionOneself_RemoveColosseumMember(UnionSystem *unisys, int netId, c
 
 static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq) {
     UnionColosseum *clsys = unisys->colosseum_sys;
-    u8 netId = func_02042a6c(func_02040440());
+    u8 netId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     GFL_ASSERT(clsys != NULL);
     if (UnionOneself_CheckNetErrorEnd(unisys) == TRUE) {
@@ -2145,21 +2145,21 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
     }
     switch (*seq) {
     case 0:
-        func_02040624(func_02040440(), 0xd, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xd, 0x14);
         (*seq)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 0xd, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xd, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
     case 2:
         Colosseum_RegisterCommands(unisys);
-        func_02040624(func_02040440(), 0xe, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xe, 0x14);
         (*seq)++;
         break;
     case 3:
-        if (func_02040664(func_02040440(), 0xe, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xe, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -2170,7 +2170,7 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
         break;
     case 5:
         if (UnionEff_AllColosseumMembersHere(clsys) == TRUE) {
-            int count = func_02042a78();
+            int count = GFL_NetGetNegotiatedCount();
             int i;
 
             for (i = 0; i < count; i++) {
@@ -2183,11 +2183,11 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
         }
         break;
     case 6:
-        func_02040624(func_02040440(), 0xf, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xf, 0x14);
         (*seq)++;
         break;
     case 7:
-        if (func_02040664(func_02040440(), 0xf, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xf, 0x14) == TRUE) {
             if (UnionOneself_GetCardVersion(unisys, TRUE) == 0x16) {
                 *seq = 8;
             } else {
@@ -2212,11 +2212,11 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
         break;
     case 10: {
         RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(GSYS_GetGameData(unisys->param->gsys)));
-        int count = func_02042a78();
+        int count = GFL_NetGetNegotiatedCount();
         int i;
 
         for (i = 0; i < count; i++) {
-            if (clsys->members[i].unk26 == 1 && i != func_02042a6c(func_02040440())) {
+            if (clsys->members[i].unk26 == 1 && i != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
                 Misc_AddMetTrainer(rival, getIDAsUInt(&clsys->members[i].info));
             }
         }
@@ -2529,7 +2529,7 @@ static BOOL UnionOneself_StepPartyWaitRun(UnionSystem *unisys, UnionSelf *situ, 
 
 static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq) {
     UnionColosseum *clsys = unisys->colosseum_sys;
-    u8 netId = func_02042a6c(func_02040440());
+    u8 netId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     if (UnionOneself_CheckNetErrorEnd(unisys) == TRUE) {
         UnionMsg_FreeAll(unisys);
@@ -2557,11 +2557,11 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
         func_ov028_02172b4c(clsys, TRUE);
         UnionEff_ClearColosseumUnk170(clsys);
         func_ov028_02172b14(clsys);
-        func_02040624(func_02040440(), 0x14, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x14, 0x14);
         (*seq)++;
         break;
     case 2:
-        if (func_02040664(func_02040440(), 0x14, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x14, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
@@ -2576,16 +2576,16 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
         }
         break;
     case 5:
-        func_02040624(func_02040440(), 0x10, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x10, 0x14);
         (*seq)++;
         break;
     case 6:
-        if (func_02040664(func_02040440(), 0x10, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x10, 0x14) == TRUE) {
             (*seq)++;
         }
         break;
     case 7:
-        if (func_02042bc4() == TRUE) {
+        if (GFL_NetIsParent() == TRUE) {
             if (Colosseum_SendResult(clsys->unkCC) == TRUE) {
                 (*seq)++;
             }
@@ -2606,7 +2606,7 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
 static BOOL UnionOneself_StepBattleListRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq) {
     UnionColosseum *clsys = unisys->colosseum_sys;
     UnionColosseumParam *param;
-    int netId = func_02042a6c(func_02040440());
+    int netId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     if (*seq < 3 && UnionOneself_CheckNetErrorEnd(unisys) == TRUE) {
         UnionMsg_FreeAll(unisys);
@@ -2648,12 +2648,12 @@ static BOOL UnionOneself_StepBattleListRun(UnionSystem *unisys, UnionSelf *situ,
         break;
     case 1:
         if (UnionMsg_IsPrintDone(unisys) == TRUE) {
-            func_02040624(func_02040440(), 0x11, 0x14);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x11, 0x14);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_02040664(func_02040440(), 0x11, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x11, 0x14) == TRUE) {
             UnionMsg_FreeAll(unisys);
             (*seq)++;
         }
@@ -2668,7 +2668,7 @@ static BOOL UnionOneself_StepBattleListRun(UnionSystem *unisys, UnionSelf *situ,
         param->list.regulation = unisys->alloc.regulation;
         param->battle = GFL_HeapAllocate(HEAPID_UNION, sizeof(ColosseumBattleParam), TRUE, "union_oneself.c", 4433);
         count = 0;
-        for (i = 0; i < func_02042a78(); i++) {
+        for (i = 0; i < GFL_NetGetNegotiatedCount(); i++) {
             if (i != netId) {
                 int slot;
 
@@ -2798,24 +2798,24 @@ static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *sit
         }
         break;
     case 4:
-        func_02040624(func_02040440(), 0x13, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x13, 0x14);
         (*seq)++;
         break;
     case 5:
-        if (func_02040664(func_02040440(), 0x13, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x13, 0x14) == TRUE) {
             func_02042e9c(FALSE);
             (*seq)++;
         }
         break;
     case 6:
-        if (func_02042bc4() == TRUE) {
+        if (GFL_NetIsParent() == TRUE) {
             u8 mask = clsys->unk17C[2];
 
-            if (func_0203ff6c() <= 1) {
+            if (NetSystem_CountConnected() <= 1) {
                 (*seq)++;
             } else {
                 for (i = 0; i < 5; i++) {
-                    if (i != func_0203ffc4() && (mask & (1 << i)) && func_02042a80((u8)i) == TRUE) {
+                    if (i != NetSystem_GetNetId() && (mask & (1 << i)) && GFL_NetIsNegotiated((u8)i) == TRUE) {
                         break;
                     }
                 }

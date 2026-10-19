@@ -124,7 +124,7 @@ static BOOL ZukanToroku_Init(GameProc *proc, u32 *state, void *param, void *work
     wk->nickname =
         ZukanNickname_Create(wk->heapId, prm->pkm, prm->boxMessage, prm->boxes, prm->box,
                              ZukanTorokuGraphic_GetClActUnit(wk->graphic), wk->font, wk->printQueue, prm->gameData);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     if (wk->phase == PHASE_NICKNAME) {
         ZukanToroku_LoadCover(wk);
     }
@@ -172,14 +172,14 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
             break;
         case ENTRY_WAIT_KEY:
             pressed = FALSE;
-            touched = func_0203da48();
+            touched = GFL_HIDIsTouchPressed();
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 pressed = TRUE;
             }
             if (touched) {
                 pressed = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             if (pressed) {
                 func_ov296_0219de14(wk->info);

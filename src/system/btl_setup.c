@@ -391,11 +391,11 @@ void BtlSetup_SetTrainer2v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus 
 }
 
 void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 0, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 0, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 void BtlSetup_SetNet1v1Double(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 1, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 1, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 void BtlSetup_SetNetMultiVsNet(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, u8 a4, HeapID heapId) {
@@ -411,11 +411,11 @@ void BtlSetup_SetNetMultiVsAI(BtlSetup *setup, GameData *gameData, NetHandle *ha
 }
 
 void BtlSetup_SetNetTriple(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 2, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 2, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 void BtlSetup_SetNetRotation(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 3, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 3, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 // A setup with a party, a player's info and a trainer for every client, and its own copy of the options

@@ -123,10 +123,10 @@ static void func_ov036_021be8b0(FieldEffectTask *task, void *work) {
         func_ov036_021a3a70(task);
         return;
     }
-    func_0204f6d4(blact, rippleTask->actorIndex, RIPPLE_ANIMS, 1);
+    BlActSys_SetActorAnims(blact, rippleTask->actorIndex, RIPPLE_ANIMS, 1);
     actorIndex = rippleTask->actorIndex;
-    func_0204f6ec(blact, actorIndex, 0);
-    func_0204f6c8(blact, actorIndex, TRUE);
+    BlActSys_SetActorAnim(blact, actorIndex, 0);
+    BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
 }
 
 static void func_ov036_021be948(FieldEffectTask *task, void *work) {
@@ -143,7 +143,7 @@ static void func_ov036_021be964(FieldEffectTask *task, void *work) {
     RippleTask *rippleTask = work;
     u16 cmd;
 
-    if (func_0204f768(rippleTask->ripple->blact, rippleTask->actorIndex, &cmd)) {
+    if (BlActSys_GetActorLastCmd(rippleTask->ripple->blact, rippleTask->actorIndex, &cmd)) {
         func_ov036_021a3a70(task);
     }
 }

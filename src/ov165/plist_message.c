@@ -81,7 +81,7 @@ void PokeListMessage_Update(PokeListWork *wk, PokeListMessage *msg) {
         KeyCursor_Update(msg->keyCursor, msg->stream, msg->window);
         if (AppPrintsysCommon_Update(&msg->printWait, msg->stream) == TRUE) {
             if (msg->waitInput == FALSE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) ||
-                func_0203da48() == TRUE) {
+                GFL_HIDIsTouchPressed() == TRUE) {
                 if (msg->waitInput == TRUE) {
                     GFL_SndSEPlay(SEQ_SE_MESSAGE);
                 }

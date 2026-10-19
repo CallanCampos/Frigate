@@ -493,16 +493,16 @@ static void KeySystemClAct_Init(KeySystemClAct *clact, KeySystemGraphic *graphic
 static void KeySystemClAct_LoadResources(KeySystemClAct *clact, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_KEY_SYSTEM, heapId);
 
-    clact->resources[1] = func_0204b81c(arc, 5, FALSE, 0, heapId);
-    clact->resources[0] = func_0204bbb8(arc, 2, 0, 0, 0, 4, heapId);
-    clact->resources[2] = func_0204bde0(arc, 13, 14, heapId);
+    clact->resources[1] = ClActSys_LoadChars(arc, 5, FALSE, 0, heapId);
+    clact->resources[0] = ClActSys_LoadPlttRange(arc, 2, 0, 0, 0, 4, heapId);
+    clact->resources[2] = ClActSys_LoadCellAnims(arc, 13, 14, heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void KeySystemClAct_FreeResources(KeySystemClAct *clact) {
-    func_0204bcd0(clact->resources[0]);
-    func_0204b98c(clact->resources[1]);
-    func_0204be64(clact->resources[2]);
+    ClActSys_FreePltt(clact->resources[0]);
+    ClActSys_FreeChars(clact->resources[1]);
+    ClActSys_FreeCellAnims(clact->resources[2]);
 }
 
 ClActor *KeySystemClAct_Create(KeySystemClAct *clact, u32 id, HeapID heapId) {
@@ -644,17 +644,17 @@ ClActor *KeySystemClAct_Create(KeySystemClAct *clact, u32 id, HeapID heapId) {
     default:
         return NULL;
     }
-    clact->actors[id] = func_0204c040(clact->unit, clact->resources[1], clact->resources[0], clact->resources[2],
-                                      &setup, surface, heapId);
+    clact->actors[id] = ClActor_Create(clact->unit, clact->resources[1], clact->resources[0], clact->resources[2],
+                                       &setup, surface, heapId);
     func_0204c520(clact->actors[id], autoAnim);
-    func_0204c124(clact->actors[id], visible);
-    func_0204c244(clact->actors[id], affineMode);
+    ClActor_SetVisible(clact->actors[id], visible);
+    ClActor_SetAffineMode(clact->actors[id], affineMode);
     return clact->actors[id];
 }
 
 void KeySystemClAct_Delete(KeySystemClAct *clact, u32 id) {
     if (clact->actors[id] != NULL) {
-        func_0204c108(clact->actors[id]);
+        ClActor_Delete(clact->actors[id]);
         clact->actors[id] = NULL;
     }
 }

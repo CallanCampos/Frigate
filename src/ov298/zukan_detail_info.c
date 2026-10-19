@@ -428,11 +428,11 @@ static BOOL ZukanDetailInfo_CheckTouch(ZukanDetailInfoParam *param, ZukanDetailI
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             u8 i;
 
             for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-                if (func_0204c138(wk->buttons[i].actor) && wk->buttons[i].rect[0] <= x &&
+                if (ClActor_IsVisible(wk->buttons[i].actor) && wk->buttons[i].rect[0] <= x &&
                     x < wk->buttons[i].rect[0] + wk->buttons[i].rect[2] && wk->buttons[i].rect[1] <= y &&
                     y < wk->buttons[i].rect[1] + wk->buttons[i].rect[3]) {
                     if (wk->language != i) {
@@ -448,9 +448,9 @@ static BOOL ZukanDetailInfo_CheckTouch(ZukanDetailInfoParam *param, ZukanDetailI
     if (pushed) {
         ZukanDetailInfo_SetLanguage(param, wk, common, wk->pushed);
         wk->buttons[wk->pushed].state = BUTTON_PUSHED;
-        func_0204c488(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
+        ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
         GFL_SndSEPlay(SEQ_SE_SELECT3);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         ZukanDetailTouchbar_SetActive(touchbar, FALSE);
     }
     return pushed;
@@ -469,7 +469,7 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
         if (wk->language == LANGUAGE_NONE) {
             if ((typed & (PAD_BUTTON_L | PAD_BUTTON_R)) || (pressed & PAD_BUTTON_A)) {
                 for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-                    if (func_0204c138(wk->buttons[i].actor)) {
+                    if (ClActor_IsVisible(wk->buttons[i].actor)) {
                         wk->pushed = i;
                         pushed = TRUE;
                         break;
@@ -480,7 +480,7 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
             for (i = 1; i < LANGUAGE_BUTTON_COUNT; i++) {
                 u8 button = (wk->language + i) % LANGUAGE_BUTTON_COUNT;
 
-                if (func_0204c138(wk->buttons[button].actor)) {
+                if (ClActor_IsVisible(wk->buttons[button].actor)) {
                     wk->pushed = button;
                     pushed = TRUE;
                     break;
@@ -490,7 +490,7 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
             for (i = 1; i < LANGUAGE_BUTTON_COUNT; i++) {
                 u8 button = (wk->language + LANGUAGE_BUTTON_COUNT - i) % LANGUAGE_BUTTON_COUNT;
 
-                if (func_0204c138(wk->buttons[button].actor)) {
+                if (ClActor_IsVisible(wk->buttons[button].actor)) {
                     wk->pushed = button;
                     pushed = TRUE;
                     break;
@@ -502,9 +502,9 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
     if (pushed) {
         ZukanDetailInfo_SetLanguage(param, wk, common, wk->pushed);
         wk->buttons[wk->pushed].state = BUTTON_PUSHED;
-        func_0204c488(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
+        ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
         GFL_SndSEPlay(SEQ_SE_SELECT3);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ZukanDetailTouchbar_SetActive(touchbar, FALSE);
     }
     return pushed;
@@ -576,8 +576,8 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
     u8 i;
 
     wk->palette = ZukanDetailTouchbar_GetIconPalette(touchbar);
-    wk->chars = func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->cellAnims = func_0204bde0(arc, 28, 45, param->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 28, 45, param->heapId);
     GFL_ArcToolFree(arc);
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
@@ -594,9 +594,9 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
         setup.y = sZukanDetailInfoLanguageButtons[i].y;
         setup.sequence = wk->buttons[i].anim;
         wk->buttons[i].actor =
-            func_0204c040(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
+            ClActor_Create(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
         func_0204c520(wk->buttons[i].actor, TRUE);
-        func_0204c318(wk->buttons[i].actor, 1);
+        ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
 }
 
@@ -605,10 +605,10 @@ static void ZukanDetailInfo_FreeButtons(ZukanDetailInfoParam *param, ZukanDetail
     u8 i;
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i].actor);
+        ClActor_Delete(wk->buttons[i].actor);
     }
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
 }
 
 static void ZukanDetailInfo_UpdateButton(ZukanDetailInfoParam *param, ZukanDetailInfoWork *wk,
@@ -625,12 +625,12 @@ static void ZukanDetailInfo_UpdateButton(ZukanDetailInfoParam *param, ZukanDetai
             wk->buttons[i].state = BUTTON_WAIT_ANIM;
             break;
         case BUTTON_WAIT_ANIM:
-            if (!func_0204c560(wk->buttons[i].actor)) {
+            if (!ClActor_IsAnimActive(wk->buttons[i].actor)) {
                 wk->buttons[i].state = BUTTON_DONE;
             }
             break;
         case BUTTON_DONE:
-            func_0204c488(wk->buttons[i].actor, wk->buttons[i].anim);
+            ClActor_SetSequence(wk->buttons[i].actor, wk->buttons[i].anim);
             wk->buttons[i].state = BUTTON_IDLE;
             wk->pushed = LANGUAGE_NONE;
             ZukanDetailTouchbar_SetActive(touchbar, TRUE);
@@ -645,9 +645,9 @@ static void ZukanDetailInfo_ResetButtons(ZukanDetailInfoParam *param, ZukanDetai
     u8 i;
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        func_0204c124(wk->buttons[i].actor, visible[i]);
+        ClActor_SetVisible(wk->buttons[i].actor, visible[i]);
         wk->buttons[i].state = BUTTON_IDLE;
-        func_0204c488(wk->buttons[i].actor, wk->buttons[i].anim);
+        ClActor_SetSequence(wk->buttons[i].actor, wk->buttons[i].anim);
     }
     wk->pushed = LANGUAGE_NONE;
 }
@@ -711,7 +711,7 @@ static void ZukanDetailInfo_StartGlow(ZukanDetailInfoParam *param, ZukanDetailIn
 
 static void ZukanDetailInfo_StopGlow(ZukanDetailInfoParam *param, ZukanDetailInfoWork *wk, ZukanDetailCommon *common) {
     if (wk->language != LANGUAGE_NONE) {
-        func_0204c378(wk->buttons[wk->language].actor, 0, 0);
+        ClActor_SetPalette(wk->buttons[wk->language].actor, 0, 0);
         wk->glowStart = FALSE;
     }
 }
@@ -724,7 +724,7 @@ static void ZukanDetailInfo_UpdateGlow(ZukanDetailInfoParam *param, ZukanDetailI
 
     if (wk->glowStart) {
         if (wk->language != LANGUAGE_NONE) {
-            func_0204c378(wk->buttons[wk->language].actor, 2, 0);
+            ClActor_SetPalette(wk->buttons[wk->language].actor, 2, 0);
         }
         wk->glowStart = FALSE;
     }

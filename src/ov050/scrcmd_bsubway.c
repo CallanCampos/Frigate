@@ -876,7 +876,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         result = TRUE;
         break;
     case 407:
-        *retWk = func_0203ffc4();
+        *retWk = NetSystem_GetNetId();
         break;
     case 408:
         MI_CpuFill8(&bsw->ircMatchParam, 0, sizeof(bsw->ircMatchParam));
@@ -907,11 +907,12 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         Misc_AddMetTrainer(getHollow_RivalData(save), bsw->partner.id);
         break;
     case 411:
-        *retWk = func_0203ffc4() == FALSE ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)
-                                          : func_ov050_021e6fd4(&bsw->partner);
+        *retWk = NetSystem_GetNetId() == FALSE
+                     ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)
+                     : func_ov050_021e6fd4(&bsw->partner);
         break;
     case 412:
-        *retWk = func_0203ffc4() == FALSE
+        *retWk = NetSystem_GetNetId() == FALSE
                      ? func_ov050_021e6fd4(&bsw->partner)
                      : FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0);
         break;
@@ -1042,7 +1043,7 @@ static GameEventReturnCode func_ov050_021e6b78(GameEvent *event, u32 *state, voi
 
     switch (*state) {
     case 0:
-        if (func_02042bc4() == TRUE) {
+        if (GFL_NetIsParent() == TRUE) {
             func_02042e9c(FALSE);
         }
         if ((*bsw)->unkC_9 == TRUE) {
@@ -1051,18 +1052,18 @@ static GameEventReturnCode func_ov050_021e6b78(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 1:
-        if (func_02042bc4() == TRUE) {
-            if (func_02042a78() <= 1) {
-                func_02042860(0);
+        if (GFL_NetIsParent() == TRUE) {
+            if (GFL_NetGetNegotiatedCount() <= 1) {
+                GFL_NetExit(0);
                 (*state)++;
             }
         } else {
-            func_02042860(0);
+            GFL_NetExit(0);
             (*state)++;
         }
         break;
     case 2:
-        if (func_020427a4() == TRUE) {
+        if (GFL_NetIsEnded() == TRUE) {
             return GAMEEVENT_DONE;
         }
         break;

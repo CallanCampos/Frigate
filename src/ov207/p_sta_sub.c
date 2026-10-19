@@ -228,9 +228,9 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     ballSetup.priority = 10;
     ballSetup.bgPriority = 1;
     ballSetup.sequence = defaultSequence;
-    sub->ballIcon = func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(2)], wk->clResources[PSTA_RES_PLTT(1)],
-                                  wk->clResources[PSTA_RES_CELL(2)], &ballSetup, 0, wk->heapId);
-    func_0204c124(sub->ballIcon, FALSE);
+    sub->ballIcon = ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(2)], wk->clResources[PSTA_RES_PLTT(1)],
+                                   wk->clResources[PSTA_RES_CELL(2)], &ballSetup, 0, wk->heapId);
+    ClActor_SetVisible(sub->ballIcon, FALSE);
     iconSetup.y = iconY;
     iconSetup.priority = 10;
     iconSetup.bgPriority = 1;
@@ -238,9 +238,9 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
         iconSetup.x = sIconXs[i];
         iconSetup.sequence = sIconSequences[i];
         sub->icons[i] =
-            func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(3)], wk->clResources[PSTA_RES_PLTT(2)],
-                          wk->clResources[PSTA_RES_CELL(3)], &iconSetup, 0, wk->heapId);
-        func_0204c124(sub->icons[i], TRUE);
+            ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(3)], wk->clResources[PSTA_RES_PLTT(2)],
+                           wk->clResources[PSTA_RES_CELL(3)], &iconSetup, 0, wk->heapId);
+        ClActor_SetVisible(sub->icons[i], TRUE);
     }
     pokerusSetup.x = 236;
     pokerusSetup.y = 26;
@@ -248,29 +248,29 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     pokerusSetup.bgPriority = 1;
     pokerusSetup.sequence = defaultSequence;
     sub->pokerusIcon =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(10)], wk->clResources[PSTA_RES_PLTT(9)],
-                      wk->clResources[PSTA_RES_CELL(9)], &pokerusSetup, 0, wk->heapId);
-    func_0204c124(sub->pokerusIcon, FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(10)], wk->clResources[PSTA_RES_PLTT(9)],
+                       wk->clResources[PSTA_RES_CELL(9)], &pokerusSetup, 0, wk->heapId);
+    ClActor_SetVisible(sub->pokerusIcon, FALSE);
     statusSetup.x = 241;
     statusSetup.y = 31;
     statusSetup.priority = 10;
     statusSetup.bgPriority = 1;
     statusSetup.sequence = defaultSequence;
     sub->statusIcon =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(11)], wk->clResources[PSTA_RES_PLTT(10)],
-                      wk->clResources[PSTA_RES_CELL(10)], &statusSetup, 0, wk->heapId);
-    func_0204c124(sub->statusIcon, FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(11)], wk->clResources[PSTA_RES_PLTT(10)],
+                       wk->clResources[PSTA_RES_CELL(10)], &statusSetup, 0, wk->heapId);
+    ClActor_SetVisible(sub->statusIcon, FALSE);
 }
 
 void PStaSub_FreeActors(PStatusWork *wk, PStaSubWork *sub) {
     u8 i;
 
-    func_0204c108(sub->statusIcon);
-    func_0204c108(sub->pokerusIcon);
+    ClActor_Delete(sub->statusIcon);
+    ClActor_Delete(sub->pokerusIcon);
     for (i = 0; i < PSTA_SUB_ICON_COUNT; i++) {
-        func_0204c108(sub->icons[i]);
+        ClActor_Delete(sub->icons[i]);
     }
-    func_0204c108(sub->ballIcon);
+    ClActor_Delete(sub->ballIcon);
 }
 
 void PStaSub_Load(PStatusWork *wk, PStaSubWork *sub) {
@@ -326,30 +326,30 @@ void PStaSub_Draw(PStatusWork *wk, PStaSubWork *sub) {
 
     ball = PML_PkmGetParam(boxPkm, PKM_PARAM_POKEBALL, NULL);
     file = GFL_G2DIOReadNCLR(getUINarcIdx(), AppMenuCommon_GetBallPaletteFile(ball), &palette, wk->heapId);
-    func_0204bd10(wk->clResources[PSTA_RES_PLTT(1)], palette, 1);
+    ClActSys_ReplacePlttData(wk->clResources[PSTA_RES_PLTT(1)], palette, 1);
     GFL_HeapFree(file);
     file = GFL_G2DIOReadBGNCGR(getUINarcIdx(), AppMenuCommon_GetBallCharFile(ball), FALSE, &chars, wk->heapId);
-    func_0204ba40(wk->clResources[PSTA_RES_CHAR(2)], chars);
+    ClActSys_ReplaceCharData(wk->clResources[PSTA_RES_CHAR(2)], chars);
     GFL_HeapFree(file);
-    func_0204c124(sub->ballIcon, TRUE);
+    ClActor_SetVisible(sub->ballIcon, TRUE);
 
     markings = PML_PkmGetParam(boxPkm, PKM_PARAM_MARKINGS, NULL);
     for (i = 0, bit = 1; i < MARKING_COUNT; bit <<= 1, i++) {
         if (markings & bit) {
-            func_0204c488(sub->icons[i], i * 2 + 1);
+            ClActor_SetSequence(sub->icons[i], i * 2 + 1);
         } else {
-            func_0204c488(sub->icons[i], i * 2);
+            ClActor_SetSequence(sub->icons[i], i * 2);
         }
     }
     if (doesPokeHavePokerus(boxPkm) == TRUE) {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_POKERUS], TRUE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_POKERUS], TRUE);
     } else {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_POKERUS], FALSE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_POKERUS], FALSE);
     }
     if (PML_PkmIsRare(boxPkm) == TRUE && wk->isEgg == FALSE) {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_SHINY], TRUE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_SHINY], TRUE);
     } else {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_SHINY], FALSE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_SHINY], FALSE);
     }
 
     if (sub->frontShown == TRUE) {
@@ -379,15 +379,15 @@ void PStaSub_Draw(PStatusWork *wk, PStaSubWork *sub) {
     }
 
     if ((u8)GetStatusCond(pkm) != 0) {
-        func_0204c488(sub->statusIcon, AppMenuCommon_GetStatusIcon(pkm));
-        func_0204c124(sub->statusIcon, TRUE);
-        func_0204c124(sub->pokerusIcon, FALSE);
+        ClActor_SetSequence(sub->statusIcon, AppMenuCommon_GetStatusIcon(pkm));
+        ClActor_SetVisible(sub->statusIcon, TRUE);
+        ClActor_SetVisible(sub->pokerusIcon, FALSE);
     } else {
-        func_0204c124(sub->statusIcon, FALSE);
+        ClActor_SetVisible(sub->statusIcon, FALSE);
         if (doesPokerusHaveDuration(boxPkm) == TRUE) {
-            func_0204c124(sub->pokerusIcon, TRUE);
+            ClActor_SetVisible(sub->pokerusIcon, TRUE);
         } else {
-            func_0204c124(sub->pokerusIcon, FALSE);
+            ClActor_SetVisible(sub->pokerusIcon, FALSE);
         }
     }
 
@@ -417,7 +417,7 @@ void PStaSub_Unload(PStatusWork *wk, PStaSubWork *sub) {
 
 void PStaSub_Clear(PStatusWork *wk, PStaSubWork *sub) {
     PStaSub_RemoveSprites(wk, sub);
-    func_0204c124(sub->ballIcon, FALSE);
+    ClActor_SetVisible(sub->ballIcon, FALSE);
 }
 
 static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
@@ -687,13 +687,13 @@ static void PStaSub_HandleTouch(PStatusWork *wk, PStaSubWork *sub) {
     s32 hit;
     u8 i;
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
     if (wk->isEgg) {
         return;
     }
-    pressed = func_0203da48();
-    held = func_0203da2c();
-    hit = func_0203d9c8(rects);
+    pressed = GFL_HIDIsTouchPressed();
+    held = GFL_HIDIsTouchHeld();
+    hit = GFL_HIDGetTouchHeldRect(rects);
     if (sub->state == PSTA_SUB_FRONT) {
         if (hit == 0 || (hit == 1 && pressed == FALSE)) {
             if (pressed == TRUE) {
@@ -750,7 +750,7 @@ static void PStaSub_HandleMarkings(PStatusWork *wk, PStaSubWork *sub) {
     if (wk->param->mode == PSTATUS_MODE_LOCK_MARKINGS) {
         return;
     }
-    hit = func_0203da0c(rects);
+    hit = GFL_HIDGetTouchPressedRect(rects);
     if (hit == TOUCH_RECT_NONE) {
         return;
     }
@@ -761,9 +761,9 @@ static void PStaSub_HandleMarkings(PStatusWork *wk, PStaSubWork *sub) {
     PML_PkmSetParam(pkm, PKM_PARAM_MARKINGS, markings);
     for (i = 0; i < MARKING_COUNT; i++) {
         if (markings & bit) {
-            func_0204c488(sub->icons[i], i * 2 + 1);
+            ClActor_SetSequence(sub->icons[i], i * 2 + 1);
         } else {
-            func_0204c488(sub->icons[i], i * 2);
+            ClActor_SetSequence(sub->icons[i], i * 2);
         }
         bit <<= 1;
     }
@@ -777,7 +777,7 @@ static void PStaSub_TrackGestures(PStatusWork *wk, PStaSubWork *sub) {
     u32 dir;
     BOOL lap;
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
 
     dx = x - sub->swipeX.startX;
     dy = y - sub->swipeX.startY;

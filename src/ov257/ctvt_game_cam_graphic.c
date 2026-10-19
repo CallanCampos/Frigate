@@ -156,15 +156,15 @@ static void CtvtGameCamBG_Free(CtvtGameCamBG *bg) {
 static void CtvtGameCamClAct_Init(CtvtGameCamClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(CtvtGameCamClAct));
     ClActSys_Create(&sCtvtGameCamClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(16, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(16, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void CtvtGameCamClAct_Free(CtvtGameCamClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(CtvtGameCamClAct));
 }
 

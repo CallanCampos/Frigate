@@ -129,7 +129,7 @@ BOOL func_ov012_0215f5b4(u32 *seq, void *param, void *work) {
     switch (*seq) {
     case 0:
         GFL_HeapDumpOnFailure(HEAPID_DLP);
-        func_020425ec(&data_ov012_0216d6a8, func_ov012_0215f5f4, search);
+        GFL_NetInit(&data_ov012_0216d6a8, func_ov012_0215f5f4, search);
         (*seq)++;
         break;
     case 1:
@@ -153,7 +153,7 @@ BOOL func_ov012_0215f610(u32 *seq, void *param, void *work) {
     BeaconSearchWork *search = work;
 
     WihDwc_Destroy(search->unk88);
-    func_02042860(func_ov012_0215f64c);
+    GFL_NetExit(func_ov012_0215f64c);
     return TRUE;
 }
 
@@ -231,7 +231,7 @@ static BeaconSearchFound *func_ov012_0215f6c8(BeaconSearchWork *work, int *index
                 found->type = beacon->type;
                 found->connectNum = beacon->connectNum;
                 found->connectMax = beacon->connectMax;
-                mac = func_020428c8(*index);
+                mac = GFL_NetGetBeaconMac(*index);
                 for (i = 0; i < 6; i++) {
                     found->mac[i] = mac[i];
                 }
@@ -262,14 +262,14 @@ static BeaconSearchBeacon *func_ov012_0215f760(BeaconSearchWork *work, int *inde
         if (type == 0x35 && work->timer != 0) {
             continue;
         }
-        beacon = func_020428a8(i);
+        beacon = GFL_NetGetBeaconData(i);
         if (beacon == NULL) {
             continue;
         }
         if (beacon->connectNum < beacon->connectMax) {
             if (best == -1) {
                 best = i;
-            } else if (func_ov012_0215f924(beacon, func_020428a8(best)) == beacon) {
+            } else if (func_ov012_0215f924(beacon, GFL_NetGetBeaconData(best)) == beacon) {
                 best = i;
             }
         } else {
@@ -278,7 +278,7 @@ static BeaconSearchBeacon *func_ov012_0215f760(BeaconSearchWork *work, int *inde
     }
     if (best != -1) {
         *index = best;
-        return func_020428a8(best);
+        return GFL_NetGetBeaconData(best);
     }
     return NULL;
 }
@@ -298,9 +298,9 @@ static void func_ov012_0215f810(BeaconSearchBeacon *beacon, GameData *gameData, 
 
     MI_CpuFill8(beacon, 0, sizeof(BeaconSearchBeacon));
     beacon->type = 3;
-    beacon->connectNum = func_02042a78();
+    beacon->connectNum = GFL_NetGetNegotiatedCount();
     beacon->connectMax = 3;
-    beacon->unk2_0 = func_02040078();
+    beacon->unk2_0 = NetSystem_HasErrorChecked();
     beacon->unk2_1 = 0;
     beacon->unk3_0 = func_0202be3c(commSys);
     beacon->trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));

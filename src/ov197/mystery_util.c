@@ -686,9 +686,9 @@ MysteryList *MysteryList_Create(const MysteryListSetup *setup, HeapID heapId) {
     }
     pos.x = sListCursorPositions[list->pos].x;
     pos.y = sListCursorPositions[list->pos].y + setup->offsetY * 8;
-    func_0204c140(list->cursor, &pos, 0);
-    func_0204c124(list->cursor, TRUE);
-    func_0204c488(list->cursor, list->cursorSequence);
+    ClActor_SetSurfacePos(list->cursor, &pos, 0);
+    ClActor_SetVisible(list->cursor, TRUE);
+    ClActor_SetSequence(list->cursor, list->cursorSequence);
     func_0204c520(list->cursor, TRUE);
     return list;
 }
@@ -697,7 +697,7 @@ void MysteryList_Delete(MysteryList *list) {
     if (list->cursorPos != NULL && list->pos != 3) {
         *list->cursorPos = list->pos;
     }
-    func_0204c124(list->cursor, FALSE);
+    ClActor_SetVisible(list->cursor, FALSE);
     MysteryTextWin_Clear(list->textWin);
     MysteryTextWin_Delete(list->textWin);
     GFL_BGSysLoadScr(list->bg);
@@ -745,11 +745,11 @@ u32 MysteryList_Update(MysteryList *list) {
     if (moved) {
         pos.x = sListCursorPositions[list->pos].x;
         pos.y = sListCursorPositions[list->pos].y + list->offsetY * 8;
-        func_0204c140(list->cursor, &pos, 0);
+        ClActor_SetSurfacePos(list->cursor, &pos, 0);
         if (list->pos == 3) {
-            func_0204c488(list->cursor, 2);
+            ClActor_SetSequence(list->cursor, 2);
         } else {
-            func_0204c488(list->cursor, list->cursorSequence);
+            ClActor_SetSequence(list->cursor, list->cursorSequence);
         }
         if (list->onMove != NULL) {
             list->onMove(list->work);

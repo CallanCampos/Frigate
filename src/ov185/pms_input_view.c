@@ -135,7 +135,7 @@ PMSInputView *PMSIView_Create(const PMSInputWork *mwk, const PMSInputData *dwk) 
         vwk->dwk = dwk;
         vwk->keyMode = PMSInput_GetKeyModePtr(mwk);
         ClActSys_Create(&data_02093f08, &sPMSIViewVRAMConfig, HEAPID_PMS_INPUT);
-        vwk->actUnit = func_0204bf1c(128, 0, HEAPID_PMS_INPUT);
+        vwk->actUnit = ClActUnit_Create(128, 0, HEAPID_PMS_INPUT);
         GFL_BGSysCreate(HEAPID_PMS_INPUT);
         BmpWin_InitAllocator(HEAPID_PMS_INPUT);
         GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
@@ -167,16 +167,16 @@ void PMSIView_Delete(PMSInputView *vwk) {
         GFL_TCBRemove(vwk->mainTask);
         GFL_TCBRemove(vwk->vintrTask);
         PMSIVMenu_Delete(vwk->menu);
-        func_0204bf98(vwk->actUnit);
+        ClActUnit_Delete(vwk->actUnit);
         for (i = 0; i < 2; i++) {
-            func_0204bcd0(vwk->objRes[i].palette);
-            func_0204b98c(vwk->objRes[i].chars);
-            func_0204be64(vwk->objRes[i].cellAnims);
-            func_0204bcd0(vwk->objRes2[i].palette);
-            func_0204b98c(vwk->objRes2[i].chars);
-            func_0204be64(vwk->objRes2[i].cellAnims);
+            ClActSys_FreePltt(vwk->objRes[i].palette);
+            ClActSys_FreeChars(vwk->objRes[i].chars);
+            ClActSys_FreeCellAnims(vwk->objRes[i].cellAnims);
+            ClActSys_FreePltt(vwk->objRes2[i].palette);
+            ClActSys_FreeChars(vwk->objRes2[i].chars);
+            ClActSys_FreeCellAnims(vwk->objRes2[i].cellAnims);
         }
-        func_0204b758();
+        ClActSys_Delete();
         BmpWin_FreeAllocator();
         GFL_BGSysFree();
         GFL_HeapFree(vwk);
@@ -190,7 +190,7 @@ TCB *PMSIView_AddVTask(TCBFunc func, void *wk, u32 priority) {
 static void PMSIView_MainTask(TCB *tcb, void *data) {
     PMSInputView *vwk = data;
 
-    func_0204b794();
+    ClActSys_Draw();
     if (vwk->menu != NULL) {
         PMSIVMenu_Main(vwk->menu);
     }
@@ -207,7 +207,7 @@ static void PMSIView_VintrTask(TCB *tcb, void *data) {
         vwk->lowerScreenChanged = FALSE;
     }
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 void PMSIView_SetCommand(PMSInputView *vwk, int cmd) {
@@ -370,12 +370,12 @@ static void PMSIView_SetupObjGraphic(PMSIVCommandWork *cwk, ArcTool *arc) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        vwk->objRes[i].palette = func_0204bba0(arc, 7, i, 0, HEAPID_PMS_INPUT);
-        vwk->objRes[i].chars = func_0204b81c(arc, 19, FALSE, i, HEAPID_PMS_INPUT);
-        vwk->objRes[i].cellAnims = func_0204bde0(arc, 36, 42, HEAPID_PMS_INPUT);
-        vwk->objRes2[i].palette = func_0204bba0(arc, 1, i, 0xe0, HEAPID_PMS_INPUT);
-        vwk->objRes2[i].chars = func_0204b81c(arc, 46, FALSE, i, HEAPID_PMS_INPUT);
-        vwk->objRes2[i].cellAnims = func_0204bde0(arc, 34, 40, HEAPID_PMS_INPUT);
+        vwk->objRes[i].palette = ClActSys_LoadPltt(arc, 7, i, 0, HEAPID_PMS_INPUT);
+        vwk->objRes[i].chars = ClActSys_LoadChars(arc, 19, FALSE, i, HEAPID_PMS_INPUT);
+        vwk->objRes[i].cellAnims = ClActSys_LoadCellAnims(arc, 36, 42, HEAPID_PMS_INPUT);
+        vwk->objRes2[i].palette = ClActSys_LoadPltt(arc, 1, i, 0xe0, HEAPID_PMS_INPUT);
+        vwk->objRes2[i].chars = ClActSys_LoadChars(arc, 46, FALSE, i, HEAPID_PMS_INPUT);
+        vwk->objRes2[i].cellAnims = ClActSys_LoadCellAnims(arc, 34, 40, HEAPID_PMS_INPUT);
     }
 }
 
@@ -1245,7 +1245,7 @@ ClActor *PMSIView_AddActor(PMSInputView *vwk, const PMSIVObjRes *res, u32 x, u32
         surface = CLACT_SURFACE_MAIN;
     }
     irq = OS_DisableInterrupts();
-    actor = func_0204c040(vwk->actUnit, res->chars, res->palette, res->cellAnims, &setup, surface, HEAPID_PMS_INPUT);
+    actor = ClActor_Create(vwk->actUnit, res->chars, res->palette, res->cellAnims, &setup, surface, HEAPID_PMS_INPUT);
     OS_RestoreInterrupts(irq);
     if (actor) {
         func_0204c520(actor, TRUE);

@@ -169,7 +169,7 @@ static void func_ov012_02152c70(void *work) {
 static void func_ov012_02152c74(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         return;
     }
     if (pWork->isSender == FALSE) {
@@ -193,21 +193,21 @@ static void func_ov012_02152c74(void *work) {
 
 static void func_ov012_02152cf4(void *work) {
     if (NetDevIrc_IsConnected()) {
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
     }
     func_ov012_02152c24(work, func_ov012_02152c74, 258);
 }
 
 static void func_ov012_02152d1c(void *work) {
-    func_02042860(NULL);
+    GFL_NetExit(NULL);
     func_ov012_02152c24(work, func_ov012_02152c74, 266);
 }
 
 static void func_ov012_02152d3c(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    if (func_02040664(func_02040440(), 35, (u8)pWork->aInit.code)) {
-        if (func_02042bc4()) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 35, (u8)pWork->aInit.code)) {
+        if (GFL_NetIsParent()) {
             NetDevIrc_SetTimeout(300);
             func_ov012_02152c24(pWork, func_ov012_02152cf4, 275);
         } else {
@@ -219,7 +219,7 @@ static void func_ov012_02152d3c(void *work) {
 static void func_ov012_02152d8c(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    func_02040624(func_02040440(), 35, (u8)pWork->aInit.code);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), 35, (u8)pWork->aInit.code);
     func_ov012_02152c24(pWork, func_ov012_02152d3c, 287);
 }
 
@@ -228,12 +228,12 @@ static void func_ov012_02152db4(void *work) {
     DeliveryIrcWork *pWork = work;
     DeliveryData *data;
 
-    if (func_02040664(func_02040440(), 24, (u8)pWork->aInit.code)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code)) {
         if (pWork->isSender) {
             if (pWork->found == TRUE) {
                 data = &pWork->aInit.data[pWork->index];
-                if (func_02042c18(func_02040440(), 0xff, pWork->aInit.code << 8, data->datasize, data->pData, 0, FALSE,
-                                  TRUE)) {
+                if (GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, pWork->aInit.code << 8, data->datasize,
+                                                data->pData, 0, FALSE, TRUE)) {
                     func_ov012_02152c24(pWork, func_ov012_02152d8c, 302);
                 }
             } else {
@@ -253,16 +253,17 @@ static void func_ov012_02152e4c(void *work) {
     if (pWork->found == TRUE) {
         header.crc = getCRC16(pWork->sendData->pData, pWork->sendData->datasize);
         header.seed = pWork->seed;
-        if (func_02042be8(func_02040440(), (u16)((pWork->aInit.code << 8) + 1), sizeof(DeliveryIrcHeader), &header)) {
-            func_02040624(func_02040440(), 24, (u8)pWork->aInit.code);
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), (u16)((pWork->aInit.code << 8) + 1), sizeof(DeliveryIrcHeader),
+                               &header)) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code);
             pWork->negotiated = FALSE;
             func_ov012_02152c24(pWork, func_ov012_02152db4, 338);
         }
     } else {
         pWork->noData = TRUE;
-        if (func_02042be8(func_02040440(), (u16)((pWork->aInit.code << 8) + 3), sizeof(pWork->noData),
-                          &pWork->noData)) {
-            func_02040624(func_02040440(), 24, (u8)pWork->aInit.code);
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), (u16)((pWork->aInit.code << 8) + 3), sizeof(pWork->noData),
+                               &pWork->noData)) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code);
             pWork->negotiated = FALSE;
             func_ov012_02152c24(pWork, func_ov012_02152db4, 354);
         }
@@ -275,7 +276,7 @@ static void func_ov012_02152f0c(void *work) {
     DeliveryData *data;
     u32 i;
 
-    if (func_02040664(func_02040440(), 23, (u8)pWork->aInit.code)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 23, (u8)pWork->aInit.code)) {
         if (pWork->isSender) {
             data = NULL;
             pWork->found = FALSE;
@@ -294,7 +295,7 @@ static void func_ov012_02152f0c(void *work) {
                 pWork->sendData = data;
             }
         } else {
-            func_02040624(func_02040440(), 24, (u8)pWork->aInit.code);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code);
             func_ov012_02152c24(pWork, func_ov012_02152db4, 403);
         }
     }
@@ -307,8 +308,8 @@ static void func_ov012_02152fd0(void *work) {
     if (pWork->isSender == FALSE) {
         pWork->wanted.region = pWork->aInit.data[0].region;
         pWork->wanted.mask = pWork->aInit.data[0].mask;
-        if (func_02042be8(func_02040440(), (u16)((pWork->aInit.code << 8) + 2), sizeof(DeliveryIrcWanted),
-                          &pWork->wanted)) {
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), (u16)((pWork->aInit.code << 8) + 2), sizeof(DeliveryIrcWanted),
+                               &pWork->wanted)) {
             func_ov012_02152c24(pWork, func_ov012_02152f0c, 418);
         }
     } else {
@@ -319,8 +320,8 @@ static void func_ov012_02152fd0(void *work) {
 static void func_ov012_0215302c(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    if (func_02042a78() > 1) {
-        func_02040624(func_02040440(), 23, (u8)pWork->aInit.code);
+    if (GFL_NetGetNegotiatedCount() > 1) {
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 23, (u8)pWork->aInit.code);
         func_ov012_02152c24(pWork, func_ov012_02152fd0, 431);
     }
 }
@@ -331,7 +332,7 @@ static void func_ov012_0215305c(void *work) {
 }
 
 static void func_ov012_0215307c(void *work) {
-    if (func_02042788() == TRUE) {
+    if (GFL_NetIsInitialized() == TRUE) {
         func_ov012_02152c24(work, func_ov012_0215305c, 446);
     }
 }
@@ -344,11 +345,11 @@ void *func_ov012_0215309c(const DeliveryIrcInit *init) {
 }
 
 static BOOL func_ov012_021530cc(DeliveryIrcWork *pWork) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         return FALSE;
     }
     data_ov012_0216e110.gameCommandBase = pWork->aInit.code;
-    func_020425ec(&data_ov012_0216e110, NULL, pWork);
+    GFL_NetInit(&data_ov012_0216e110, NULL, pWork);
     return TRUE;
 }
 
@@ -380,5 +381,5 @@ void func_ov012_0215313c(void *work) {
 
 void func_ov012_02153150(void *work) {
     GFL_HeapFree(work);
-    func_02042860(NULL);
+    GFL_NetExit(NULL);
 }

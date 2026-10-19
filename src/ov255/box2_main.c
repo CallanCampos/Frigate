@@ -150,7 +150,7 @@ static void Box2Main_VBlank(TCB *tcb, void *data) {
 
     func_ov255_021cdf9c(syswk->app);
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(syswk->app->palFade);
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
@@ -466,9 +466,9 @@ void Box2Main_OpenYesNo(Box2SysWork *syswk, u32 pos) {
     param.width = 8;
     param.height = 3;
     if (CursorMove_IsCursorVisible(syswk->app->cursorMove) == TRUE) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
     } else {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     syswk->app->yesNoMenu = AppTaskMenu_Create(&param, syswk->app->yesNoRes);
     AppTaskMenu_SetCursorPos(syswk->app->yesNoMenu, pos);
@@ -597,7 +597,7 @@ BOOL Box2Main_IsTrayScrollRight(Box2SysWork *syswk, u32 from, u32 to) {
 }
 
 void Box2Main_ShowCursor(Box2SysWork *syswk) {
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     if (CursorMove_IsCursorVisible(syswk->app->cursorMove) == FALSE) {
         CursorMove_SetCursorVisible(syswk->app->cursorMove, TRUE);
     }
@@ -2786,13 +2786,13 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
 
     switch (vf->seq) {
     case 0:
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             func_ov255_021d3954(syswk->app->bgWinFrame);
         }
         vf->seq = 1;
         break;
     case 1:
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             syswk->app->unkA551 = 0;
             vf->cnt = 0;
             pos = BOX2_GET_NONE;
@@ -2930,7 +2930,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2939,7 +2939,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2947,7 +2947,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
         if (Box2Main_VFuncBoxListScrollRight(syswk) == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2955,7 +2955,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
         if (Box2Main_VFuncBoxListScrollLeft(syswk) == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2963,7 +2963,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
         if (func_ov255_021c05e8(syswk) == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2978,7 +2978,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
             GFL_SndSEPlay(SEQ_SE_SYS_42);
             vf->seq = 12;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2986,7 +2986,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
         if (frameMove == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -2999,7 +2999,7 @@ BOOL Box2Main_VFuncPokeMoveTouchParty(Box2SysWork *syswk) {
             GFL_SndSEPlay(SEQ_SE_SYS_42);
             vf->seq = 10;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3053,13 +3053,13 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
 
     switch (vf->seq) {
     case 0:
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             func_ov255_021d3954(syswk->app->bgWinFrame);
         }
         vf->seq = 1;
         break;
     case 1:
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             syswk->app->unkA551 = 0;
             pos = BOX2_GET_NONE;
             if (syswk->moveMode == 2) {
@@ -3247,7 +3247,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3256,7 +3256,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3264,7 +3264,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
         if (Box2Main_VFuncBoxListScrollRight(syswk) == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3272,7 +3272,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
         if (Box2Main_VFuncBoxListScrollLeft(syswk) == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3280,7 +3280,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
         if (func_ov255_021c05e8(syswk) == FALSE) {
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3295,7 +3295,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
             GFL_SndSEPlay(SEQ_SE_SYS_42);
             vf->seq = 12;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3304,7 +3304,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
             syswk->unk1A = 2;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3317,7 +3317,7 @@ BOOL Box2Main_VFuncPokeMoveTouch(Box2SysWork *syswk) {
             GFL_SndSEPlay(SEQ_SE_SYS_42);
             vf->seq = 10;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3474,7 +3474,7 @@ BOOL Box2Main_VFuncPartyOutTouch(Box2SysWork *syswk) {
 
     switch (vf->seq) {
     case 0:
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             func_ov255_021d3954(syswk->app->bgWinFrame);
         }
         vf->seq = 1;
@@ -3483,7 +3483,7 @@ BOOL Box2Main_VFuncPartyOutTouch(Box2SysWork *syswk) {
         if (func_ov255_021d3858(syswk->app->bgWinFrame) == FALSE) {
             func_ov255_021d1348(syswk->app, 1);
         }
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             pos = BOX2_GET_NONE;
             if (func_ov255_021d3858(syswk->app->bgWinFrame) == FALSE && frameMove == FALSE) {
                 pos = TrayPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy);
@@ -3537,7 +3537,7 @@ BOOL Box2Main_VFuncPartyOutTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3546,7 +3546,7 @@ BOOL Box2Main_VFuncPartyOutTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -3600,13 +3600,13 @@ BOOL Box2Main_VFuncPartyInTouch(Box2SysWork *syswk) {
 
     switch (vf->seq) {
     case 0:
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             func_ov255_021d3954(syswk->app->bgWinFrame);
         }
         vf->seq = 1;
         break;
     case 1:
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             pos = BOX2_GET_NONE;
             if (func_ov255_021d3834(syswk->app->bgWinFrame) == TRUE) {
                 pos = PartyPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy, sPartyPokeAreaLeft);
@@ -3948,7 +3948,7 @@ BOOL Box2Main_VFuncItemArrangeGetTouch(Box2SysWork *syswk) {
         func_ov255_021d0cf4(syswk->app);
         vf->seq = 2;
     case 2:
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             if (frameMove == TRUE || func_ov255_021d3834(syswk->app->bgWinFrame) == TRUE) {
                 party = TRUE;
             } else {
@@ -4028,7 +4028,7 @@ BOOL Box2Main_VFuncItemArrangeGetTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 2;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             Box2Main_ItemIconTouchMove(syswk->app, x, y);
         }
         break;
@@ -4037,7 +4037,7 @@ BOOL Box2Main_VFuncItemArrangeGetTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 2;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             Box2Main_ItemIconTouchMove(syswk->app, x, y);
         }
         break;
@@ -4203,7 +4203,7 @@ BOOL Box2Main_VFuncItemArrangePartyGetTouch(Box2SysWork *syswk) {
         vf->seq = 2;
         break;
     case 2:
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             pos = TrayPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy);
             if (pos == BOX2_GET_NONE) {
                 pos = PartyPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy, sPartyPokeAreaLeft);
@@ -4256,7 +4256,7 @@ BOOL Box2Main_VFuncItemArrangePartyGetTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 2;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             Box2Main_ItemIconTouchMove(syswk->app, x, y);
         }
         break;
@@ -4265,7 +4265,7 @@ BOOL Box2Main_VFuncItemArrangePartyGetTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 2;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             Box2Main_ItemIconTouchMove(syswk->app, x, y);
         }
         break;
@@ -4550,7 +4550,7 @@ BOOL Box2Main_VFuncItemArrangeBoxPartyGetTouch(Box2SysWork *syswk) {
         if (func_ov255_021d3834(syswk->app->bgWinFrame) == TRUE) {
             func_ov255_021d1348(syswk->app, 1);
         }
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             if (frameMove == TRUE || func_ov255_021d3834(syswk->app->bgWinFrame) == TRUE) {
                 party = TRUE;
             } else {
@@ -4619,7 +4619,7 @@ BOOL Box2Main_VFuncItemArrangeBoxPartyGetTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 2;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             Box2Main_ItemIconTouchMove(syswk->app, x, y);
         }
         break;
@@ -4628,7 +4628,7 @@ BOOL Box2Main_VFuncItemArrangeBoxPartyGetTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 2;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             Box2Main_ItemIconTouchMove(syswk->app, x, y);
         }
         break;
@@ -4795,13 +4795,13 @@ BOOL Box2Main_VFuncRangeMoveTouch(Box2SysWork *syswk) {
 
     switch (vf->seq) {
     case 0:
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             func_ov255_021d3954(syswk->app->bgWinFrame);
         }
         vf->seq = 1;
         break;
     case 1:
-        if (func_0203da84(&x, &y) == FALSE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == FALSE) {
             pos = BOX2_GET_NONE;
             if (func_ov255_021d3834(syswk->app->bgWinFrame) == TRUE) {
                 pos = PartyPokePutAreaCheck(syswk->app->tpx, syswk->app->tpy, sPartyPokeAreaLeft);
@@ -4896,7 +4896,7 @@ BOOL Box2Main_VFuncRangeMoveTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
@@ -4905,7 +4905,7 @@ BOOL Box2Main_VFuncRangeMoveTouch(Box2SysWork *syswk) {
             vf->cnt = 16;
             vf->seq = 1;
         }
-        if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
             PokeIconRangeTouchMove(syswk, x, y);
         }
         break;
