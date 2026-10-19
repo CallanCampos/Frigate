@@ -539,10 +539,11 @@ measured:
   from the stairs on are Black 2's, 124 frames sooner. Its screens show the same story: Hugh's comment on the stairs,
   Bianca's talks, Tepig chosen, the Pokédex, and "Would you like to save the game?" with Aspertia City, badges 0,
   Pokédex 1, time 0:04. Decoded the same way: Tepig, level 5, 135 experience, 22/22 HP (another personality value than
-  Black 2's), its checksum valid; event flags 0x961 and 0x962; the same event variables as Black 2's save and no other
-  (0x4030 at 1, 0x4043 at 255, 0x40a0 at 1, 0x40a1 at 4, 0x40a4 at 1). The game's passes take two frames or more while
-  it saves, from frame 15,802 to 16,067, and the menu closes at 16,695 (count 14,394); the two copies are the same, and
-  2,080 bytes differ from White 2's `first_save`.
+  Black 2's), its checksum valid; event flags 0x961 and 0x962; all 431 event variables and all 3,064 saved flags as in
+  Black 2's save (the route sets 0x4030 at 1, 0x4043 at 255, 0x40a0 at 1, 0x40a1 at 4 and 0x40a4 at 1; 0x4165 is at 1
+  from `first_save` on, in both versions). The game's passes take two frames or more while it saves, from frame 15,802
+  to 16,067, and the menu closes at 16,695 (count 14,394); the two copies are the same, and 2,080 bytes differ from
+  White 2's `first_save`.
 - **The Route 19 save** (`route19_save`, from `starter_save`, 28,600 frames, SHA-1 `826bc561a328`): Hugh's trainer
   battle (FIGHT, Tackle: Tepig grows to level 6, 229 experience), the Pokémon Center's scene, Mom's, the gate's gift
   and Bianca's catching lesson, B through each, then SAVE beside the grass at (56, 696). It is for the battles, which

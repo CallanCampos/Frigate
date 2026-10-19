@@ -54,7 +54,8 @@ level that doesn't exist yet says "not yet"; no field is left out.
     task changes no code the other tests build.
   - The starter save on White 2's oracle: SHA-1 `3b9dac231d1f` in three runs (one with traces and pictures, two of
     `oracle.py save starter_save --version w2_us`, from the cached `first_save`). Every run passed `--save-dir` or
-    `--save`; `~/Library/Application Support/Frigate` doesn't exist. T5's nightly runs and T7 not yet.
+    `--save`, and none wrote under `~/Library`: the files in its `Application Support/Frigate` and `Logs/Frigate` are
+    from 16:33 at the latest, before this branch. T5's nightly runs and T7 not yet.
 - **Tiers:** not measured: no decomp C changed.
 - **Trap stubs:** 474 function stubs and 46 data placeholders in each version (`gen_stubs`, each build above), from 512
   and 46 at the last entry: upstream's code merged by `334077ba7`. A continued game without `--launch` still stops on
@@ -72,8 +73,9 @@ level that doesn't exist yet says "not yet"; no field is left out.
     Black 2's, its presses from the stairs on 124 frames sooner. The oracle's screens show the story as Black 2's:
     Hugh's comment, Bianca's talks, Tepig, the Pokédex, and the save's question with Aspertia City, badges 0, Pokédex
     1, time 0:04. The save, decoded: Tepig, level 5, 135 experience, 22/22 HP, its checksum valid; event flags 0x961
-    and 0x962; the same nonzero event variables as Black 2's save (0x4030 = 1, 0x4043 = 255, 0x40a0 = 1, 0x40a1 = 4,
-    0x40a4 = 1); both copies the same; 2,080 bytes from White 2's `first_save`. `SAVES` keeps its SHA-1.
+    and 0x962; all 431 event variables and 3,064 saved flags as in Black 2's save (the route sets 0x4030 = 1,
+    0x4043 = 255, 0x40a0 = 1, 0x40a1 = 4 and 0x40a4 = 1; 0x4165 = 1 is in `first_save` already); both copies the same;
+    2,080 bytes from White 2's `first_save`. `SAVES` keeps its SHA-1.
   - **White 2's `party_menus`**: Black 2's input file and counts, measured again on White 2's oracle from the new save
     (`launch_party_menus_w2_us.*`): each app's first frame and the black after it come at Black 2's counts, and the
     White 2 port takes Black 2's passes to each app's first frame (`--launch APP@4044`: 4046 for the party list and
