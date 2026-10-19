@@ -11963,6 +11963,15 @@ overlays/ov153 0x021f6200 EncEffColumns_Create
 overlays/ov153 0x021f623c EncEffColumns_CreateGridEvent
 overlays/ov153 0x021f6268 EncEffColumns_Update
 overlays/ov153 0x021f62c4 EncEffColumns_UpdateCell
+overlays/ov154 0x021f6200 EncEffSpread_Create
+overlays/ov154 0x021f623c EncEffSpread_CreateGridEvent
+overlays/ov154 0x021f626c EncEffSpread_Init
+overlays/ov154 0x021f62b0 EncEffSpread_Update
+overlays/ov154 0x021f6314 EncEffSpread_UpdateCell
+overlays/ov154 0x021f634c EncEffSpread_IsCellNext
+overlays/ov154 0x021f637c EncEffSpread_AddCell
+overlays/ov154 0x021f63bc EncEffSpread_AddNeighbors
+overlays/ov154 0x021f6420 EncEffSpread_ShowNextWave
 overlays/ov155 0x021f5ab8 EventFaceUpStart_Callback
 overlays/ov155 0x021f5b34 FaceUp_LoadGraphics
 overlays/ov155 0x021f5d20 EventFaceUpEnd_Callback
