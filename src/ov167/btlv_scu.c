@@ -4,6 +4,7 @@
 #include "battle/btl_string.h"
 #include "battle/btlv.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "constants/battle.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
@@ -409,8 +410,8 @@ void func_ov167_021d0cd4(BtlvScu *scu) {
     GFL_BGSysFillChar(1, 0, 1, 0);
     frameChar = func_ov167_021d0f28(scu, 11, 0x164, 1);
     scu->abilityCharOffset = func_ov167_021d0f28(scu, 11, 0x1e3, 3);
-    loadBGScrToVramByNarcNoReserveNegAlign(11, 0x1e5, 2, 0, 0, FALSE, scu->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(11, 0x1e6, 3, 0, 0, FALSE, scu->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_BTLV, 0x1e5, 2, 0, 0, FALSE, scu->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_BTLV, 0x1e6, 3, 0, 0, FALSE, scu->heapId);
     scu->msgWin = BmpWin_CreateDynamic(1, 1, 19, 30, 4, 0, 0);
     scu->msgBitmap = BmpWin_GetBitmap(scu->msgWin);
     BmpWin_FlushMap(scu->msgWin);
@@ -486,13 +487,13 @@ void func_ov167_021d0f84(BtlvScu *scu) {
 }
 
 void func_ov167_021d0ff8(const BtlvScu *scu) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(scu->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(scu->heapId));
 
     GFL_BGSysLoadArcNCGRStatic(arc, 0x1e3, 3, scu->abilityCharOffset, 0, FALSE, scu->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 0x1eb, 3, scu->statFrameCharOffset, 0, FALSE, scu->heapId);
     GFL_ArcToolFree(arc);
     GFL_BGSysClearScr(3);
-    loadBGScrToVramByNarcNoReserveNegAlign(11, 0x1e6, 3, 0, 0, FALSE, scu->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_BTLV, 0x1e6, 3, 0, 0, FALSE, scu->heapId);
 }
 
 static BOOL func_ov167_021d1070(BtlvScu *scu) {
@@ -2500,7 +2501,7 @@ BOOL func_ov167_021d3aa8(BtlvScu *scu, u8 pos) {
 static void func_ov167_021d3ac4(BtlvScu *scu, u32 charOffset) {
     u32 i;
 
-    scu->abilityCharFile = GFL_G2DIOReadBGNCGR(11, 0x1E3, FALSE, &scu->abilityChars, scu->heapId);
+    scu->abilityCharFile = GFL_G2DIOReadBGNCGR(ARCID_BTLV, 0x1E3, FALSE, &scu->abilityChars, scu->heapId);
     for (i = 0; i < 2; i++) {
         scu->abilityWins[i].scu = scu;
         scu->abilityWins[i].side = i;

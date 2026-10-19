@@ -1,0 +1,175 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Meganium",
+    "pokedex": {
+        "category": "Herb Pokémon",
+        "entry": "Its breath has the fantastic\nability to revive dead plants and\nflowers.",
+        "height": "5'11\"",
+        "weight": "221.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Meganium",
+                "category": "Herb Pokémon",
+                "entry": "Its breath has the fantastic\nability to revive dead plants and\nflowers.",
+                "height": "5'11\"",
+                "weight": "221.6 lbs."
+            },
+            "fr": {
+                "name": "Méganium",
+                "category": "Pokémon Herbe",
+                "entry": "Son souffle a l'incroyable capacité\nde ranimer les plantes et les fleurs\nflétries.",
+                "height": "1,8 m",
+                "weight": "100,5 kg"
+            },
+            "de": {
+                "name": "Meganie",
+                "category": "Kräuter",
+                "entry": "Mit seinem Atem kann es tote\nPflanzen und Blumen zu neuem\nLeben erwecken.",
+                "height": "1,8 m",
+                "weight": "100,5 kg"
+            },
+            "it": {
+                "name": "Meganium",
+                "category": "Pokémon Erbe",
+                "entry": "Il suo respiro ha lo straordinario\npotere di far tornare rigogliosi piante\nsecche e fiori avvizziti.",
+                "height": "1,8 m",
+                "weight": "100,5 kg"
+            },
+            "ko": {
+                "name": "메가니움",
+                "category": "허브포켓몬",
+                "entry": "메가니움이 뿜어내는 호흡에는\n시든 화초를 되살리는\n이상한 힘이 숨어 있다.",
+                "height": "1.8 m",
+                "weight": "100.5 kg"
+            },
+            "es": {
+                "name": "Meganium",
+                "category": "Pokémon Hierba",
+                "entry": "Su aliento tiene la maravillosa capacidad\nde revivir plantas y flores muertas.",
+                "height": "1,8 m",
+                "weight": "100,5 kg"
+            },
+            "ja": {
+                "name": "メガニウム",
+                "category": "ハーブポケモン",
+                "entry": "メガニウムが\\x{3000}はきだす\\x{3000}いきには\nかれた\\x{3000}くさばなを\\x{3000}よみがえらせる\nふしぎな\\x{3000}ちからが\\x{3000}ひめられている。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 82,
+        "defense": 100,
+        "speed": 80,
+        "special_attack": 83,
+        "special_defense": 100
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_OVERGROW", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_LEAF_GUARD",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 236,
+    "height": 18,
+    "weight": 1005,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_RAZOR_LEAF" ],
+            [ 1, "MOVE_POISON_POWDER" ],
+            [ 6, "MOVE_RAZOR_LEAF" ],
+            [ 9, "MOVE_POISON_POWDER" ],
+            [ 12, "MOVE_SYNTHESIS" ],
+            [ 18, "MOVE_REFLECT" ],
+            [ 22, "MOVE_MAGICAL_LEAF" ],
+            [ 26, "MOVE_NATURAL_GIFT" ],
+            [ 32, "MOVE_PETAL_DANCE" ],
+            [ 34, "MOVE_SWEET_SCENT" ],
+            [ 40, "MOVE_LIGHT_SCREEN" ],
+            [ 46, "MOVE_BODY_SLAM" ],
+            [ 54, "MOVE_SAFEGUARD" ],
+            [ 60, "MOVE_AROMATHERAPY" ],
+            [ 66, "MOVE_SOLAR_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM33",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM53",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM78",
+            "TM82",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_GRASS_PLEDGE",
+            "MOVE_FRENZY_PLANT",
+            "MOVE_SEED_BOMB",
+            "MOVE_MAGIC_COAT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CHIKORITA",
+    "cry_volume": 110
+}

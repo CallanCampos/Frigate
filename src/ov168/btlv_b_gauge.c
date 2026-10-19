@@ -5,6 +5,7 @@
 #include "types.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
@@ -100,7 +101,7 @@ static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
     s32 x;
     BtlvBGaugeParam *param;
 
-    arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(work->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(work->heapId));
     work->loaded = TRUE;
     work->chars = func_0204b81c(arc, 0x1cb, FALSE, 0, work->heapId);
     work->cellAnims = func_0204bde0(arc, 0x1cd, 0x1ce, work->heapId);

@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lamarcus",
+    "class": "TRAINER_CLASS_HOOPSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_POTION",
+    "party": [
+        {
+            "species": "SPECIES_SWADLOON",
+            "form": 0,
+            "level": 25,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "level": 25,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey there!{be01}\nThink you can overcome\nmy tricky dribbling style?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hey! Come on, watch me!\nI was dribbling this whole time!"
+        },
+        {
+            "type": 15,
+            "text": "I'm gonna pass this item to you\nwhile dribbling at the same time!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I love Pokémon battles,\nand I love basketball!{be01}\nI'm so lucky to be able to do both!"
+        }
+    ]
+}

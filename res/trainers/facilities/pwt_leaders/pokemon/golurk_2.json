@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GOLURK",
+    "moves": [ "MOVE_HAMMER_ARM", "MOVE_ROCK_SLIDE", "MOVE_CURSE", "MOVE_GYRO_BALL" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_WIDE_LENS",
+    "form": 0
+}

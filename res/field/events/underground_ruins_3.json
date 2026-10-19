@@ -1,0 +1,64 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 3,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 10,
+                "y": 50,
+                "z": 0
+            }
+        },
+        {
+            "script": 4,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 18,
+                "y": 18,
+                "z": 0
+            }
+        },
+        {
+            "script": 5,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 26,
+                "y": 17,
+                "z": 0
+            }
+        },
+        {
+            "script": 6,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 4,
+                "y": 17,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [],
+    "triggers": [
+        {
+            "script": 1,
+            "var": 0,
+            "value": 0,
+            "type": 0,
+            "grid": {
+                "x": 14,
+                "z": 60,
+                "width": 3,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": []
+}

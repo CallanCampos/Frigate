@@ -67,8 +67,8 @@
 #include "system/union_view.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
-#include "text/system/0416.h"
 #include "text/system/wifi_error.h"
+#include "text/system/wifi_p2pmatch.h"
 
 // The Wi-Fi Club's match board: the room where the player meets the friends who are online, the friend list of the
 // lower screen, and the states of calling a friend, of choosing what to play and of leaving for the game. The ROM has
@@ -848,8 +848,8 @@ static BOOL WifiP2PMatch_ProcExit(GameProc *proc, u32 *state, void *param, void 
 // definitions, and the places of the ones further down (each before its first user), are what gives the ROM's layout
 
 static const WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchFriendMenuOptions[] = {
-    { Bank0416_Text_Connect, 1 },
-    { Bank0416_Text_Cancel, BMPMENULIST_CANCEL },
+    { WifiP2pmatch_Text_Connect, 1 },
+    { WifiP2pmatch_Text_Cancel, BMPMENULIST_CANCEL },
 };
 
 static const BmpMenuListHeader sWifiP2PMatchFriendMenuHeader = {
@@ -860,48 +860,48 @@ static const BmpMenuListHeader sWifiP2PMatchFriendMenuHeader = {
 // The values are the states the options lead to; WifiP2PMatch_OpenBattleRulesMenu sets the first three messages
 // to the mode, the rule and the Wonder Launcher setting chosen so far
 static WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchBattleRulesOptions[] = {
-    { Bank0416_Text_SingleBattle, WIFIP2PMATCH_SEQ_BATTLE_MODE_MENU_START },
-    { Bank0416_Text_NoRestrictions, WIFIP2PMATCH_SEQ_BATTLE_RULE_MENU_START },
-    { Bank0416_Text_WonderLauncher, WIFIP2PMATCH_SEQ_SHOOTER_MENU_START },
-    { Bank0416_Text_Confirm, WIFIP2PMATCH_SEQ_BATTLE_SETUP_DECIDE },
-    { Bank0416_Text_Rules, WIFIP2PMATCH_SEQ_RULES_SHOW },
-    { Bank0416_Text_Cancel, BMPMENULIST_CANCEL },
+    { WifiP2pmatch_Text_SingleBattle, WIFIP2PMATCH_SEQ_BATTLE_MODE_MENU_START },
+    { WifiP2pmatch_Text_NoRestrictions, WIFIP2PMATCH_SEQ_BATTLE_RULE_MENU_START },
+    { WifiP2pmatch_Text_WonderLauncher, WIFIP2PMATCH_SEQ_SHOOTER_MENU_START },
+    { WifiP2pmatch_Text_Confirm, WIFIP2PMATCH_SEQ_BATTLE_SETUP_DECIDE },
+    { WifiP2pmatch_Text_Rules, WIFIP2PMATCH_SEQ_RULES_SHOW },
+    { WifiP2pmatch_Text_Cancel, BMPMENULIST_CANCEL },
 };
 
 static WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchBattleRuleOptions[] = {
-    { Bank0416_Text_NoRestrictions, 0 },
-    { Bank0416_Text_FlatRule, 1 },
-    { Bank0416_Text_Cancel, BMPMENULIST_CANCEL },
+    { WifiP2pmatch_Text_NoRestrictions, 0 },
+    { WifiP2pmatch_Text_FlatRule, 1 },
+    { WifiP2pmatch_Text_Cancel, BMPMENULIST_CANCEL },
 };
 
 // The values are game modes
 static WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchGameModeOptions[] = {
-    { Bank0416_Text_VoiceChat, WIFIP2PMATCH_GAMEMODE_VCHAT },
-    { Bank0416_Text_Xtransceiver, WIFIP2PMATCH_GAMEMODE_TVT },
-    { Bank0416_Text_Battle, WIFIP2PMATCH_GAMEMODE_BATTLE },
-    { Bank0416_Text_Trade, WIFIP2PMATCH_GAMEMODE_TRADE },
-    { Bank0416_Text_Cancel, BMPMENULIST_CANCEL },
+    { WifiP2pmatch_Text_VoiceChat, WIFIP2PMATCH_GAMEMODE_VCHAT },
+    { WifiP2pmatch_Text_Xtransceiver, WIFIP2PMATCH_GAMEMODE_TVT },
+    { WifiP2pmatch_Text_Battle, WIFIP2PMATCH_GAMEMODE_BATTLE },
+    { WifiP2pmatch_Text_Trade, WIFIP2PMATCH_GAMEMODE_TRADE },
+    { WifiP2pmatch_Text_Cancel, BMPMENULIST_CANCEL },
 };
 
 static const ConfirmDialogSetup sWifiP2PMatchYesNoSetup = { 2, 24, 13, 15, 0x115 };
 
 static WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchPartyMenuOptions[] = {
-    { Bank0416_Text_Party, 0 },
-    { Bank0416_Text_BattleBox, 1 },
+    { WifiP2pmatch_Text_Party, 0 },
+    { WifiP2pmatch_Text_BattleBox, 1 },
 };
 
 static WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchBattleModeOptions[] = {
-    { Bank0416_Text_SingleBattle, 0 },
-    { Bank0416_Text_DoubleBattle, 1 },
-    { Bank0416_Text_TripleBattle, 2 },
-    { Bank0416_Text_RotationBattle, 3 },
-    { Bank0416_Text_Cancel, BMPMENULIST_CANCEL },
+    { WifiP2pmatch_Text_SingleBattle, 0 },
+    { WifiP2pmatch_Text_DoubleBattle, 1 },
+    { WifiP2pmatch_Text_TripleBattle, 2 },
+    { WifiP2pmatch_Text_RotationBattle, 3 },
+    { WifiP2pmatch_Text_Cancel, BMPMENULIST_CANCEL },
 };
 
 static WIFIP2PMATCH_MENU_OPTION sWifiP2PMatchShooterOptions[] = {
-    { Bank0416_Text_WonderLauncher, 0 },
-    { Bank0416_Text_WonderLauncherOff, 1 },
-    { Bank0416_Text_Cancel, BMPMENULIST_CANCEL },
+    { WifiP2pmatch_Text_WonderLauncher, 0 },
+    { WifiP2pmatch_Text_WonderLauncherOff, 1 },
+    { WifiP2pmatch_Text_Cancel, BMPMENULIST_CANCEL },
 };
 
 static BmpMenuListHeader sWifiP2PMatchGameModeMenuHeader = {
@@ -1244,7 +1244,7 @@ static void WifiP2PMatch_DrawTitle(WIFIP2PMATCH_WORK *wk) {
     WifiP2PMatch_FreeWindow(wk->titleWin);
     wk->titleWin = BmpWin_CreateDynamic(3, 5, 1, 22, 2, 15, 1);
     BmpWin_FlushMap(wk->titleWin);
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_6, wk->titleString);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_6, wk->titleString);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->titleWin), 0, 0, wk->titleString, wk->font);
     BmpWin_FlushChar(wk->titleWin);
 }
@@ -1440,7 +1440,7 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
     func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
     WifiP2PMatch_ViewSetFriendNameWord(wk, friendIndex);
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_17, wk->expStrBuf);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_17, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->view.detailWin[0]), 25, 0, wk->titleString, wk->font);
 
@@ -1449,37 +1449,37 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
     gameMode = WifiP2PMatch_GetGameMode(wk, friendStatus);
     msgId = WifiP2PMatch_GetStatusMessage(status, gameMode, &color);
     // The battles' statuses have short names for this page
-    if (msgId >= Bank0416_Text_Single && msgId <= Bank0416_Text_Rotation) {
-        msgId -= Bank0416_Text_Single - Bank0416_Text_SingleBattle;
+    if (msgId >= WifiP2pmatch_Text_Single && msgId <= WifiP2pmatch_Text_Rotation) {
+        msgId -= WifiP2pmatch_Text_Single - WifiP2pmatch_Text_SingleBattle;
     }
     GFL_MsgDataLoadStrbuf(wk->msgData, msgId, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[0]), 96, 0, wk->expStrBuf, wk->font,
                                    PRINT_COLOR(15, 2, 0));
 
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_BattleRecord, wk->titleString);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_BattleRecord, wk->titleString);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 104, 0, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
     WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_WINS), 4, 1, TRUE);
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_W, wk->expStrBuf);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_W, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 176, 24, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
     WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LOSSES), 4, 1, TRUE);
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_L, wk->expStrBuf);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_L, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 176, 40, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
 
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_PokemonTrades, wk->titleString);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_PokemonTrades, wk->titleString);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 104, 64, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
     WordSetNumber(wk->view.wordSet, 0, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_DRAWS), 4, 1, TRUE);
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_19, wk->expStrBuf);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_19, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 188, 64, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
 
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_DateLastPlayed, wk->titleString);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_DateLastPlayed, wk->titleString);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 8, 96, wk->titleString, wk->font,
                                    PRINT_COLOR(15, 2, 0));
     day = func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_DAY);
@@ -1489,7 +1489,7 @@ static void WifiP2PMatch_DrawFriendDetail(WIFIP2PMATCH_WORK *wk, u32 heapId) {
                       TRUE);
         WordSetNumber(wk->view.wordSet, 1, func_02009f80(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_LAST_MONTH), 2, 0,
                       TRUE);
-        GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_23, wk->expStrBuf);
+        GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_23, wk->expStrBuf);
         GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
         GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->view.detailWin[1]), 152, 96, wk->titleString, wk->font,
                                        PRINT_COLOR(15, 2, 0));
@@ -1518,10 +1518,12 @@ static int WifiP2PMatch_GetStatusMessage(u32 status, u32 gameMode, u32 *color) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     {
         int msgs[] = {
-            Bank0416_Text_StandingBy, Bank0416_Text_StandingBy,   Bank0416_Text_StandingBy, Bank0416_Text_Talking,
-            Bank0416_Text_VoiceChat,  Bank0416_Text_Xtransceiver, Bank0416_Text_Trade,      Bank0416_Text_Single,
-            Bank0416_Text_Single,     Bank0416_Text_Double,       Bank0416_Text_Double,     Bank0416_Text_Triple,
-            Bank0416_Text_Triple,     Bank0416_Text_Rotation,     Bank0416_Text_Rotation,   Bank0416_Text_Empty_30,
+            WifiP2pmatch_Text_StandingBy, WifiP2pmatch_Text_StandingBy, WifiP2pmatch_Text_StandingBy,
+            WifiP2pmatch_Text_Talking,    WifiP2pmatch_Text_VoiceChat,  WifiP2pmatch_Text_Xtransceiver,
+            WifiP2pmatch_Text_Trade,      WifiP2pmatch_Text_Single,     WifiP2pmatch_Text_Single,
+            WifiP2pmatch_Text_Double,     WifiP2pmatch_Text_Double,     WifiP2pmatch_Text_Triple,
+            WifiP2pmatch_Text_Triple,     WifiP2pmatch_Text_Rotation,   WifiP2pmatch_Text_Rotation,
+            WifiP2pmatch_Text_Empty_30,
         };
 
         if (gameMode > WIFIP2PMATCH_GAMEMODE_MAX) {
@@ -1540,13 +1542,13 @@ static BmpMenuListHeader sWifiP2PMatchBattleRulesMenuHeader = {
 // or those the friend sent
 static void WifiP2PMatch_OpenBattleRulesMenu(WIFIP2PMATCH_WORK *wk, BOOL fromParent) {
     if (fromParent) {
-        sWifiP2PMatchBattleRulesOptions[0].msg = Bank0416_Text_BattleFormatSingleBattle + wk->parent->battleMode;
-        sWifiP2PMatchBattleRulesOptions[1].msg = Bank0416_Text_BattleRuleNoRestrictions + wk->parent->battleRule;
-        sWifiP2PMatchBattleRulesOptions[2].msg = Bank0416_Text_WonderLauncherOff_2 - wk->parent->unk20;
+        sWifiP2PMatchBattleRulesOptions[0].msg = WifiP2pmatch_Text_BattleFormatSingleBattle + wk->parent->battleMode;
+        sWifiP2PMatchBattleRulesOptions[1].msg = WifiP2pmatch_Text_BattleRuleNoRestrictions + wk->parent->battleRule;
+        sWifiP2PMatchBattleRulesOptions[2].msg = WifiP2pmatch_Text_WonderLauncherOff_2 - wk->parent->unk20;
     } else {
-        sWifiP2PMatchBattleRulesOptions[0].msg = Bank0416_Text_BattleFormatSingleBattle + wk->battleMode;
-        sWifiP2PMatchBattleRulesOptions[1].msg = Bank0416_Text_BattleRuleNoRestrictions + wk->battleRule;
-        sWifiP2PMatchBattleRulesOptions[2].msg = Bank0416_Text_WonderLauncherOff_2 - wk->parent->unk48;
+        sWifiP2PMatchBattleRulesOptions[0].msg = WifiP2pmatch_Text_BattleFormatSingleBattle + wk->battleMode;
+        sWifiP2PMatchBattleRulesOptions[1].msg = WifiP2pmatch_Text_BattleRuleNoRestrictions + wk->battleRule;
+        sWifiP2PMatchBattleRulesOptions[2].msg = WifiP2pmatch_Text_WonderLauncherOff_2 - wk->parent->unk48;
     }
     WifiP2PMatch_OpenListMenu(wk, &sWifiP2PMatchBattleRulesMenuHeader, sWifiP2PMatchBattleRulesOptions, 6,
                               WIFIP2PMATCH_MENU_BATTLE_RULES, 30);
@@ -1609,7 +1611,7 @@ static void WifiP2PMatch_DrawPartyWindow(WIFIP2PMATCH_WORK *wk, PokeParty *party
         nidoranNickname = PokeParty_GetParam(pkm, PKM_PARAM_NIDORAN_NICKNAME, NULL);
         level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
         sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
-        GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_L_2, string);
+        GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_L_2, string);
         WordSetNumber(wk->wordSet, 0, level, 3, 0, TRUE);
         GFL_WordSetFormatStrbuf(wk->wordSet, levelString, string);
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->subWin), i * 40 + 1, 32, levelString, wk->smallFont);
@@ -1620,10 +1622,10 @@ static void WifiP2PMatch_DrawPartyWindow(WIFIP2PMATCH_WORK *wk, PokeParty *party
             continue;
         }
         if (sex == GENDER_MALE) {
-            GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_44, string);
+            GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_44, string);
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->subWin), i * 40 + 30, 16, string, wk->font);
         } else {
-            GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_45, string);
+            GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_45, string);
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->subWin), i * 40 + 30, 16, string, wk->font);
         }
     }
@@ -1770,10 +1772,10 @@ static void WifiP2PMatch_DrawRulesWindow(WIFIP2PMATCH_WORK *wk, u32 failBits, BO
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->sysMsgWin), 0, 0, title, wk->font);
         GFL_StrBufFree(title);
     } else if (kind != WIFIP2PMATCH_RULES_SHORT) {
-        u32 msgId = Bank0416_Text_Party;
+        u32 msgId = WifiP2pmatch_Text_Party;
 
         if (kind != WIFIP2PMATCH_RULES_PARTY) {
-            msgId = Bank0416_Text_BattleBox;
+            msgId = WifiP2pmatch_Text_BattleBox;
         }
         GFL_MsgDataLoadStrbuf(wk->msgData, msgId, wk->expStrBuf);
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->sysMsgWin), 0, 0, wk->expStrBuf, wk->font);
@@ -1843,12 +1845,12 @@ static int WifiP2PMatch_StateConnected(WIFIP2PMATCH_WORK *wk, int seq) {
     if (!func_02042bc4()) {
         wk->result = 3;
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WantPlay, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WantPlay, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_PLAY_YES_NO_START;
     } else {
         wk->result = 4;
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingSResponse, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingSResponse, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         func_02040624(func_02040440(), WIFIP2PMATCH_TIMING_SEQ, 10);
         wk->seq = WIFIP2PMATCH_SEQ_SYNC_SEQ_TIMING_WAIT;
@@ -1891,11 +1893,11 @@ static int WifiP2PMatch_StateGameModeMessage(WIFIP2PMATCH_WORK *wk, int seq) {
     if (func_02042bc4()) {
         wk->result = 3;
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WhatWouldLike, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WhatWouldLike, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_GAME_MODE_MENU_OPEN;
     } else {
         wk->result = 4;
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         func_02040624(func_02040440(), WIFIP2PMATCH_TIMING_SEQ, 10);
         wk->seq = WIFIP2PMATCH_SEQ_SYNC_SEQ_TIMING_WAIT;
@@ -1940,7 +1942,7 @@ static int WifiP2PMatch_StateGameModeMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         break;
     case WIFIP2PMATCH_GAMEMODE_VCHAT:
         if (!wk->parent->vchat[1]) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_LooksLikeCantTalk, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_LooksLikeCantTalk, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_GAME_MODE_KEY_WAIT;
         } else {
             wk->sendSeq = WIFIP2PMATCH_SEQ_ASK_VCHAT;
@@ -1949,10 +1951,10 @@ static int WifiP2PMatch_StateGameModeMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         break;
     case WIFIP2PMATCH_GAMEMODE_TVT:
         if (!wk->parent->vchat[1]) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_LooksLikeCantTalk, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_LooksLikeCantTalk, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_GAME_MODE_KEY_WAIT;
         } else if (!canPlayerExchangePhotos() && isRunningOnDSi()) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_UsesCameraFunctionSend, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_UsesCameraFunctionSend, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_NO_CAMERA_YES_NO_START;
         } else {
             wk->sendSeq = WIFIP2PMATCH_SEQ_ASK_TVT;
@@ -1961,7 +1963,7 @@ static int WifiP2PMatch_StateGameModeMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         break;
     case WIFIP2PMATCH_GAMEMODE_TRADE:
         if (!WifiP2PMatch_HasTwoPokemon(wk)) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NeedLeastTwoPokemon, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NeedLeastTwoPokemon, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_GAME_MODE_KEY_WAIT;
         } else if (wk->parent->vchat[0] != wk->parent->vchat[1]) {
             wk->unk1352 = 6;
@@ -2050,14 +2052,15 @@ static int WifiP2PMatch_StateGameModeKeyWait(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // States 0x4b to 0x4d: the child is asked whether to play what the parent chose; the parent waits
 static int WifiP2PMatch_AskGameMode(WIFIP2PMATCH_WORK *wk, int seq) {
-    u32 msgs[] = { Bank0416_Text_WouldLikeTalkUsing, Bank0416_Text_WouldLikeTalkUsing_2, Bank0416_Text_Trade_2 };
+    u32 msgs[] = { WifiP2pmatch_Text_WouldLikeTalkUsing, WifiP2pmatch_Text_WouldLikeTalkUsing_2,
+                   WifiP2pmatch_Text_Trade_2 };
 
     if (!func_02042bc4()) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
         WifiP2PMatch_PrintMessage(wk, msgs[wk->modeSeq - WIFIP2PMATCH_SEQ_ASK_VCHAT], FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_ANSWER_YES_NO_START;
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         func_02040624(func_02040440(), WIFIP2PMATCH_TIMING_SEQ, 10);
         wk->seq = WIFIP2PMATCH_SEQ_SYNC_SEQ_TIMING_WAIT;
@@ -2105,10 +2108,10 @@ static int WifiP2PMatch_StateAnswerYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (ret == 0) {
         if (!WifiP2PMatch_HasTwoPokemon(wk) && wk->modeSeq == WIFIP2PMATCH_SEQ_ASK_TRADE) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NeedLeastTwoPokemon, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NeedLeastTwoPokemon, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_TRADE_REFUSED_KEY_WAIT;
         } else if (!canPlayerExchangePhotos() && isRunningOnDSi() && wk->modeSeq == WIFIP2PMATCH_SEQ_ASK_TVT) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_UsesCameraFunctionSend, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_UsesCameraFunctionSend, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_ANSWER_NO_CAMERA_YES_NO_START;
         } else {
             wk->seq = WIFIP2PMATCH_SEQ_SEND_START_GAME;
@@ -2141,11 +2144,11 @@ static int WifiP2PMatch_StateTradeRefusedKeyWait(WIFIP2PMATCH_WORK *wk, int seq)
 // State 0x90: the offer was declined
 static int WifiP2PMatch_StateDeclined(WIFIP2PMATCH_WORK *wk, int seq) {
     if (func_02042bc4()) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendApparentlyUnableParticipate, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendApparentlyUnableParticipate, FALSE);
         func_02040624(func_02040440(), WIFIP2PMATCH_TIMING_SEQ, 10);
         wk->seq = WIFIP2PMATCH_SEQ_SYNC_SEQ_TIMING_WAIT;
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_DeclinedOffer, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_DeclinedOffer, FALSE);
         wk->timer = 120;
         wk->seq = WIFIP2PMATCH_SEQ_DECLINED_WAIT;
     }
@@ -2205,7 +2208,7 @@ static int WifiP2PMatch_StateStartGame(WIFIP2PMATCH_WORK *wk, int seq) {
     switch (wk->modeSeq) {
     case WIFIP2PMATCH_SEQ_ASK_VCHAT:
         WifiP2PMatch_StartVChat(wk);
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_PressBButtonEnd, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_PressBButtonEnd, FALSE);
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_PLAYING, WIFIP2PMATCH_GAMEMODE_VCHAT);
         WifiP2PMatch_BgmVolumeFadeStart(wk, 0);
         wk->unk1355 = 0;
@@ -2250,7 +2253,7 @@ static int WifiP2PMatch_StateBattleSetupMenu(WIFIP2PMATCH_WORK *wk, int seq) {
     if (ret == BMPMENULIST_CANCEL) {
         if (wk->result == 3 || wk->result == 4) {
             WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WhatWouldLike, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WhatWouldLike, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_GAME_MODE_MENU_OPEN;
         } else {
             wk->seq = WIFIP2PMATCH_SEQ_RECRUIT_MENU_START;
@@ -2452,7 +2455,7 @@ static int WifiP2PMatch_StateBattleSetupDecide(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_LoadRegulation(wk, 0);
     }
     if (!WifiP2PMatch_PassesRegulation(wk)) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_REGULATION_FAIL_PARTY;
         return seq;
     }
@@ -2464,9 +2467,9 @@ static int WifiP2PMatch_StateBattleSetupDecide(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
     if (wk->result == 3 || wk->result == 4) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_Communicating, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_Communicating, FALSE);
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
     }
     WifiP2PMatch_StartWaitIcon(wk);
     return seq;
@@ -2576,11 +2579,11 @@ static int WifiP2PMatch_StateBattleOfferShow(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_LoadMyRegulation(wk);
         WifiP2PMatch_DrawRulesWindow(wk, 0, wk->parent->unk48, 1);
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessageCore(wk, Bank0416_Text_WillHaveSingleBattle + wk->battleMode + wk->battleRule * 4,
+        WifiP2PMatch_PrintMessageCore(wk, WifiP2pmatch_Text_WillHaveSingleBattle + wk->battleMode + wk->battleRule * 4,
                                       FALSE, TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_BATTLE_OFFER_MSG_WAIT;
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         func_02040624(func_02040440(), 0x1b, 10);
         wk->seq = WIFIP2PMATCH_SEQ_SYNC_SEQ_TIMING_WAIT;
@@ -2639,7 +2642,7 @@ static int WifiP2PMatch_StateBattleOfferYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     } else {
         if (wk->result == 1 || wk->result == 2) {
             wk->sendSeq = WIFIP2PMATCH_SEQ_CANCEL_RESET;
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_RequestHasBeenSuspended, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_RequestHasBeenSuspended, FALSE);
         } else {
             wk->sendSeq = WIFIP2PMATCH_SEQ_DECLINED;
         }
@@ -2664,16 +2667,16 @@ static int WifiP2PMatch_StateBattleOfferCheckParty(WIFIP2PMATCH_WORK *wk, int se
         switch (wk->result) {
         case 3:
             wk->seq = WIFIP2PMATCH_SEQ_REGULATION_FAIL_KEY_WAIT;
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
             return seq;
         case 2:
         case 4:
             wk->seq = WIFIP2PMATCH_SEQ_REGULATION_FAIL_PARTY;
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
             return seq;
         default:
             wk->seq = WIFIP2PMATCH_SEQ_TRADE_REFUSED_KEY_WAIT;
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
             return seq;
         }
     }
@@ -2708,7 +2711,7 @@ static int WifiP2PMatch_StatePartySelectStart(WIFIP2PMATCH_WORK *wk, int seq) {
         PokeParty_Copy(GameData_GetParty(wk->gameData), wk->parent->parties[id]);
         wk->seq = WIFIP2PMATCH_SEQ_PARTY_SEND;
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_PleaseSelectWhetherUse, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_PleaseSelectWhetherUse, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_PARTY_MENU_START;
     }
     return seq;
@@ -2757,7 +2760,7 @@ static int WifiP2PMatch_StatePartyMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     case 0:
         if (WifiP2PMatch_CheckParty(wk->regulation, wk->gameData, &flags) != 0) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_PARTY_MENU_FAIL_PARTY;
             WifiP2PMatch_ClosePartyMenu(wk);
             return seq;
@@ -2767,7 +2770,7 @@ static int WifiP2PMatch_StatePartyMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         break;
     case 1:
         if (WifiP2PMatch_CheckBattleBoxParty(wk->regulation, wk->battleBoxParty, &flags) != 0) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_PARTY_MENU_FAIL_BATTLE_BOX;
             WifiP2PMatch_ClosePartyMenu(wk);
             return seq;
@@ -2790,7 +2793,7 @@ static int WifiP2PMatch_StatePartySend(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (func_02042c18(func_02040440(), 0xff, 0xa07, PokeParty_GetSaveDataSize(), wk->parent->parties[id], 0, FALSE,
                       TRUE)) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         wk->seq = WIFIP2PMATCH_SEQ_PARTY_SEND_TIMING;
     }
@@ -2815,13 +2818,13 @@ static int WifiP2PMatch_StatePartySendWait(WIFIP2PMATCH_WORK *wk, int seq) {
         u32 msgId;
 
         if (min == 3 && max == 3) {
-            msgId = Bank0416_Text_PleaseSelectThreePokemon;
+            msgId = WifiP2pmatch_Text_PleaseSelectThreePokemon;
         } else if (min == 4 && max == 4) {
-            msgId = Bank0416_Text_PleaseSelectFourPokemon;
+            msgId = WifiP2pmatch_Text_PleaseSelectFourPokemon;
         } else if (min == 6 && max == 6) {
-            msgId = Bank0416_Text_PleaseSelectSixPokemon;
+            msgId = WifiP2pmatch_Text_PleaseSelectSixPokemon;
         } else {
-            msgId = Bank0416_Text_PleaseChoosePokemonWill;
+            msgId = WifiP2pmatch_Text_PleaseChoosePokemonWill;
         }
         WifiP2PMatch_PrintMessage(wk, msgId, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
@@ -2895,7 +2898,7 @@ static int WifiP2PMatch_StatePartyMenuFailBattleBox(WIFIP2PMATCH_WORK *wk, int s
 static int WifiP2PMatch_StatePartyMenuFailEnd(WIFIP2PMATCH_WORK *wk, int seq) {
     if (GCTX_HIDGetPressedKeys()) {
         WifiP2PMatch_FreeRulesWindow(wk);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_PleaseSelectWhetherUse, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_PleaseSelectWhetherUse, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_PARTY_MENU_START;
     }
     return seq;
@@ -2908,7 +2911,7 @@ static int WifiP2PMatch_StatePlayAgainAsk(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (!func_02042bc4()) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WouldLikePlayAgain, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WouldLikePlayAgain, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_PLAY_AGAIN_YES_NO_START;
     } else {
         func_02040624(func_02040440(), 0x1b, 10);
@@ -2986,9 +2989,9 @@ static int WifiP2PMatch_StateTalkEndTimingWait(WIFIP2PMATCH_WORK *wk, int seq) {
     func_02042e94(0);
     func_02042e9c(FALSE);
     if (func_02042bc4()) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedConversation, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedConversation, FALSE);
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendBusyEndingCommunication, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendBusyEndingCommunication, FALSE);
     }
     wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_START;
     return seq;
@@ -3006,9 +3009,9 @@ static int WifiP2PMatch_StateDeclineReset(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0xa9
 static int WifiP2PMatch_StateDeclineMsg(WIFIP2PMATCH_WORK *wk, int seq) {
     if (wk->result == 2 || wk->result == 3) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendBusyEndingCommunication, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendBusyEndingCommunication, FALSE);
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedConversation, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedConversation, FALSE);
     }
     wk->result = 0;
     wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_START;
@@ -3027,9 +3030,9 @@ static int WifiP2PMatch_StateCancelReset(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0x99
 static int WifiP2PMatch_StateCancelMsg(WIFIP2PMATCH_WORK *wk, int seq) {
     if (wk->result == 2 || wk->result == 3) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedConversation, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedConversation, FALSE);
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendBusyEndingCommunication, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendBusyEndingCommunication, FALSE);
     }
     wk->result = 0;
     wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_START;
@@ -3046,9 +3049,9 @@ static int WifiP2PMatch_StateGoDisconnect(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateRefusedMsg(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     if (func_02042bc4()) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendApparentlyUnableParticipate, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendApparentlyUnableParticipate, FALSE);
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_DeclinedOffer, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_DeclinedOffer, FALSE);
     }
     wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_START;
     return seq;
@@ -3065,10 +3068,10 @@ static int WifiP2PMatch_StateDisconnectStart(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // State 0x7d: the two sides' voice chat settings differ
 static int WifiP2PMatch_StateVChatDiffMsg(WIFIP2PMATCH_WORK *wk, int seq) {
-    u32 msgId = Bank0416_Text_VoiceChatWillTurned;
+    u32 msgId = WifiP2pmatch_Text_VoiceChatWillTurned;
 
     if (wk->parent->vchat[1] == 0) {
-        msgId = Bank0416_Text_VoiceChatWillTurned_2;
+        msgId = WifiP2pmatch_Text_VoiceChatWillTurned_2;
     }
     WifiP2PMatch_PrintMessage(wk, msgId, FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_VCHAT_DIFF_YES_NO_START;
@@ -3174,9 +3177,9 @@ static int WifiP2PMatch_StateUnableMsg(WIFIP2PMATCH_WORK *wk, int seq) {
     func_02042e94(0);
     func_02042e9c(FALSE);
     if (func_02042bc4()) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendApparentlyUnableParticipate, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendApparentlyUnableParticipate, FALSE);
     } else {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedConversation, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedConversation, FALSE);
     }
     wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_START;
     return seq;
@@ -3187,11 +3190,11 @@ static int WifiP2PMatch_StateReturnFromGame(WIFIP2PMATCH_WORK *wk, int seq) {
     func_02042a9c(func_02040440(), 0);
     if (!func_02042bc4()) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WouldLikePlayAgain, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WouldLikePlayAgain, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_RETURN_YES_NO_START;
     } else {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         func_02040624(func_02040440(), 0x1b, 10);
         wk->seq = WIFIP2PMATCH_SEQ_SYNC_SEQ_TIMING_WAIT;
@@ -3248,7 +3251,7 @@ static int WifiP2PMatch_StateGameStart(WIFIP2PMATCH_WORK *wk, int seq) {
         func_02042e84();
         WifiP2PMatch_StartVChat(wk);
         WifiP2PMatch_BgmVolumeFadeStart(wk, 0);
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_PressBButtonEnd, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_PressBButtonEnd, FALSE);
         wk->unk1355 = 0;
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_START;
         return seq;
@@ -3264,7 +3267,7 @@ static int WifiP2PMatch_StateGameStart(WIFIP2PMATCH_WORK *wk, int seq) {
         if (func_02042bc4()) {
             if (WifiP2PMatch_CheckParty(wk->regulation, wk->gameData, &flags) != 0 &&
                 WifiP2PMatch_CheckBattleBoxParty(wk->regulation, wk->battleBoxParty, &flags) != 0) {
-                WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+                WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
                 wk->seq = WIFIP2PMATCH_SEQ_GAME_START_FAIL_KEY_WAIT;
                 return seq;
             }
@@ -3294,7 +3297,7 @@ static int WifiP2PMatch_StateGameStartFailKeyWait(WIFIP2PMATCH_WORK *wk, int seq
 static int WifiP2PMatch_StateBattleRecruitStart(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_LoadRegulation(wk, 1);
     if (!WifiP2PMatch_PassesRegulation(wk)) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_REGULATION_FAIL_PARTY;
         return seq;
     }
@@ -3488,9 +3491,9 @@ static void WifiP2PMatch_GraphicInit(WIFIP2PMATCH_WORK *wk) {
     GFL_BGSysSetEnabledBGsB(0);
     GX_SetVisiblePlane(0);
     GXS_SetVisiblePlane(0);
-    arc = GFL_ArcSysCreateFileHandle(0x20, WIFIP2PMATCH_HEAP);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFIP2PMATCH, WIFIP2PMATCH_HEAP);
     wk->wordSet = GFL_WordSetSystemCreateDefault(WIFIP2PMATCH_HEAP);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0416, WIFIP2PMATCH_HEAP);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_P2PMATCH, WIFIP2PMATCH_HEAP);
     wk->sysMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, WIFIP2PMATCH_HEAP);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, WIFIP2PMATCH_HEAP);
     wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, WIFIP2PMATCH_HEAP);
@@ -4061,7 +4064,7 @@ static int WifiP2PMatch_StateReconnectKeyWait(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         wk->sysMsgWin = WifiP2PMatch_FreeWindow(wk->sysMsgWin);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_ReconnectNintendoWfc, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_ReconnectNintendoWfc, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_RECONNECT_YES_NO_START;
     }
     return seq;
@@ -4520,7 +4523,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (func_020420b4() == 4) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
         func_020421ac(TRUE);
@@ -4535,9 +4538,9 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
 
         if (DWCRap_GetLastNetId() == -1 && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X)) {
             if (WifiP2PMatch_ToggleVChat(wk)) {
-                WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_VoiceChatTurned, FALSE);
+                WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_VoiceChatTurned, FALSE);
             } else {
-                WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_VoiceChatTurnedOff, FALSE);
+                WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_VoiceChatTurnedOff, FALSE);
             }
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             WifiP2PMatch_DrawMyInfo(wk);
@@ -4589,21 +4592,21 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->preConnect = DWCRap_GetLastNetId();
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
         if (wk->unk1351 == 0) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WantsJoin, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WantsJoin, FALSE);
         }
         wk->unk1C8 = 0;
     } else if (wk->preConnect != -1 && DWCRap_GetLastNetId() == -1) {
         func_ov011_02151e40(0);
         WIFI_STATUS_SetUseVChat(wk->myStatus, WIFI_STATUS_GetVChatStatus(wk->myStatus));
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         func_020421ac(TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
     if (WifiP2PMatch_IsConnectFailed(wk) && wk->preConnect != -1) {
         WifiP2PMatch_SetFriendNameWord(wk, func_ov011_02151e24());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
@@ -4690,7 +4693,7 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (WifiP2PMatch_IsConnectFailed(wk) && wk->preConnect != -1) {
         WifiP2PMatch_SetFriendNameWord(wk, func_ov011_02151e24());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
@@ -4698,12 +4701,12 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->preConnect = DWCRap_GetLastNetId();
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
         if (wk->unk1351 == 0) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WantsJoin, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WantsJoin, FALSE);
         }
         wk->unk1C8 = 0;
     } else if (func_ov011_02151e24() != -1) {
         WifiP2PMatch_SetFriendNameWord(wk, func_ov011_02151e24());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
@@ -4774,7 +4777,7 @@ static int WifiP2PMatch_StateVChatCallStart(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_ViewCloseDetail(wk, WIFIP2PMATCH_HEAP);
         WifiP2PMatch_SetFriendNameWord(wk, friendIndex);
         wk->callTimer = 60 * 60;
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_HasContacted, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_HasContacted, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         wk->seq = WIFIP2PMATCH_SEQ_JOIN_WAIT;
         wk->unk1350 = wk->friendNo;
@@ -4804,7 +4807,7 @@ static int WifiP2PMatch_StateVChatCallWait(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->seq = WIFIP2PMATCH_SEQ_JOIN_TIMEOUT;
     } else if (wifiStatus != WIFIP2PMATCH_STATUS_WAIT && wifiStatus != WIFIP2PMATCH_STATUS_RECRUIT) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
     } else if (func_020420b4() == 1) {
         WifiP2PMatch_EndMessage(wk);
@@ -4814,14 +4817,14 @@ static int WifiP2PMatch_StateVChatCallWait(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->unk1355 = 0;
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_START;
         WifiP2PMatch_BgmVolumeFadeStart(wk, 0);
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_PressBButtonEnd, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_PressBButtonEnd, FALSE);
     }
     return seq;
 }
 
 static int WifiP2PMatch_StateVChatInvited(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-    WifiP2PMatch_PrintMessage(wk, Bank0416_Text_InvitesVoiceChat, FALSE);
+    WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_InvitesVoiceChat, FALSE);
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_PLAYING, 4);
     wk->seq = WIFIP2PMATCH_SEQ_VCHAT_INVITED_WAIT;
     return seq;
@@ -4833,14 +4836,14 @@ static int WifiP2PMatch_StateVChatInvitedWait(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (DWCRap_GetFriendIndex() < 0) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedVoiceChat, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedVoiceChat, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
     if (WifiP2PMatch_IsMessageEnd(wk)) {
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             WifiP2PMatch_EndMessage(wk);
-            WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_PressBButtonEnd, FALSE);
+            WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_PressBButtonEnd, FALSE);
             WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_PLAYING, 4);
             WifiP2PMatch_BgmVolumeFadeStart(wk, 0);
             wk->unk1355 = 0;
@@ -4878,12 +4881,12 @@ static int WifiP2PMatch_StateVChat(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_UpdateFriendList(wk, WIFIP2PMATCH_HEAP);
     WifiP2PMatch_ViewRedrawButtons(wk);
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WouldLikeEndVoice, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WouldLikeEndVoice, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_END_YES_NO_START;
     } else if (wk->unk1355 != 0) {
         WifiP2PMatch_EndMessage(wk);
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedVoiceChat, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedVoiceChat, FALSE);
         wk->timer = 60;
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_ENDED_MESSAGE;
     } else {
@@ -4898,7 +4901,7 @@ static int WifiP2PMatch_StateVChatEndYesNoStart(WIFIP2PMATCH_WORK *wk, int seq) 
         if (wk->unk1355 != 0) {
             WifiP2PMatch_EndMessage(wk);
             WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedVoiceChat, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedVoiceChat, FALSE);
             wk->timer = 60;
             wk->seq = WIFIP2PMATCH_SEQ_VCHAT_ENDED_MESSAGE;
         } else {
@@ -4920,14 +4923,14 @@ static int WifiP2PMatch_StateVChatEndYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
             ConfirmDialog_Free(wk->yesNoMenu);
             wk->yesNoMenu = NULL;
             WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_EndedVoiceChat, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedVoiceChat, FALSE);
             wk->timer = 60;
             wk->seq = WIFIP2PMATCH_SEQ_VCHAT_ENDED_MESSAGE;
         }
     } else if (ret == 0) {
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_END_SEND;
     } else {
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_PressBButtonEnd, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_PressBButtonEnd, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_START;
     }
     return seq;
@@ -5124,7 +5127,7 @@ static int WifiP2PMatch_StateNoFriendKeyWait(WIFIP2PMATCH_WORK *wk, int seq) {
 // B in the room while seeking: asks whether to stop
 static int WifiP2PMatch_StateRecruitStopAsk(WIFIP2PMATCH_WORK *wk, int seq) {
     WIFI_MCR_PCAnmMain(&wk->room);
-    WifiP2PMatch_PrintMessage(wk, Bank0416_Text_SuspendInvitation, FALSE);
+    WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_SuspendInvitation, FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_RECRUIT_STOP_YES_NO_START;
     return seq;
 }
@@ -5160,7 +5163,7 @@ static int WifiP2PMatch_StateRecruitStopYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_RoomResume(wk);
         wk->seq = WIFIP2PMATCH_SEQ_ROOM;
     } else {
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_SeekingParticipants, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_SeekingParticipants, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_ROOM_MESSAGE;
     }
     return seq;
@@ -5175,7 +5178,7 @@ static int WifiP2PMatch_StateRecruitMenuStart(WIFIP2PMATCH_WORK *wk, int seq) {
 }
 
 static int WifiP2PMatch_StateRecruitMenuMessage(WIFIP2PMATCH_WORK *wk, int seq) {
-    WifiP2PMatch_PrintMessage(wk, Bank0416_Text_WhatWouldLikeSeek, FALSE);
+    WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WhatWouldLikeSeek, FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_RECRUIT_MENU;
     return seq;
 }
@@ -5229,7 +5232,7 @@ static int WifiP2PMatch_StateRecruitMenu(WIFIP2PMATCH_WORK *wk, int seq) {
             BmpMenuList_Free(wk->list, NULL, &wk->menuCursor[4]);
             ListMenuCore_FreeOptionList(wk->menuOptions);
             WifiP2PMatch_EndMessage(wk);
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NeedLeastTwoPokemon, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NeedLeastTwoPokemon, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_MESSAGE_KEY_WAIT_TO_ROOM;
             return seq;
         }
@@ -5243,7 +5246,7 @@ static int WifiP2PMatch_StateRecruitMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         }
         if (!canPlayerExchangePhotos() && isRunningOnDSi()) {
             WifiP2PMatch_FreeRecruitMenu(wk);
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_UsesCameraFunctionSend, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_UsesCameraFunctionSend, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_CAMERA_NOTICE_YES_NO_START;
             return seq;
         }
@@ -5322,9 +5325,9 @@ static int WifiP2PMatch_StateConnectFriendYesNo(WIFIP2PMATCH_WORK *wk, int seq) 
             wk->seq = WIFIP2PMATCH_SEQ_JOIN_FRIEND;
         } else {
             if (WIFI_STATUS_GetVChatStatus(wk->myStatus)) {
-                WifiP2PMatch_PrintMessage(wk, Bank0416_Text_VoiceChatWillTurned_2, FALSE);
+                WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_VoiceChatWillTurned_2, FALSE);
             } else {
-                WifiP2PMatch_PrintMessage(wk, Bank0416_Text_VoiceChatWillTurned, FALSE);
+                WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_VoiceChatWillTurned, FALSE);
             }
             wk->seq = WIFIP2PMATCH_SEQ_VCHAT_CHANGE_YES_NO_INIT;
         }
@@ -5425,7 +5428,7 @@ static int WifiP2PMatch_StateFriendSelect(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     switch (status) {
     case WIFIP2PMATCH_STATUS_NONE:
-        msgId = Bank0416_Text_SeemsBusy;
+        msgId = WifiP2pmatch_Text_SeemsBusy;
         break;
     case WIFIP2PMATCH_STATUS_WAIT:
         wk->seq = WIFIP2PMATCH_SEQ_ROOM;
@@ -5433,11 +5436,11 @@ static int WifiP2PMatch_StateFriendSelect(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     case WIFIP2PMATCH_STATUS_RECRUIT: {
         u32 msgIds[] = {
-            Bank0416_Text_SeemsBusy,
-            Bank0416_Text_SeekingSomeoneTrade,
-            Bank0416_Text_LookingSomeoneChatXtransceiver,
-            Bank0416_Text_WantsHaveVoiceChat,
-            Bank0416_Text_SeekingSomeoneBattle,
+            WifiP2pmatch_Text_SeemsBusy,
+            WifiP2pmatch_Text_SeekingSomeoneTrade,
+            WifiP2pmatch_Text_LookingSomeoneChatXtransceiver,
+            WifiP2pmatch_Text_WantsHaveVoiceChat,
+            WifiP2pmatch_Text_SeekingSomeoneBattle,
         };
 
         msgId = msgIds[game];
@@ -5445,18 +5448,18 @@ static int WifiP2PMatch_StateFriendSelect(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     case WIFIP2PMATCH_STATUS_PLAYING: {
         u32 msgIds[] = {
-            Bank0416_Text_SeemsBusy,   Bank0416_Text_Trading,  Bank0416_Text_UsingXtransceiver,
-            Bank0416_Text_VoiceChat_2, Bank0416_Text_Battle_2,
+            WifiP2pmatch_Text_SeemsBusy,   WifiP2pmatch_Text_Trading,  WifiP2pmatch_Text_UsingXtransceiver,
+            WifiP2pmatch_Text_VoiceChat_2, WifiP2pmatch_Text_Battle_2,
         };
 
         msgId = msgIds[game];
         break;
     }
     case 5:
-        msgId = Bank0416_Text_SeemsBusy;
+        msgId = WifiP2pmatch_Text_SeemsBusy;
         break;
     default:
-        msgId = Bank0416_Text_SeemsBusy;
+        msgId = WifiP2pmatch_Text_SeemsBusy;
         break;
     }
     WifiP2PMatch_PrintMessage(wk, msgId, FALSE);
@@ -5529,12 +5532,12 @@ static BOOL WifiP2PMatch_CallFriend(WIFIP2PMATCH_WORK *wk) {
             WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_CALL, 3);
             WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
             wk->unk1351 = friendNo;
-            WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_Communicating, FALSE);
+            WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_Communicating, FALSE);
             WifiP2PMatch_StartWaitIcon(wk);
             wk->seq = WIFIP2PMATCH_SEQ_CALL_WAIT;
         } else {
             WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
         }
     }
@@ -5549,7 +5552,7 @@ static int WifiP2PMatch_StateCallWait(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (WifiP2PMatch_GetFriendStatus(wk->friendNo - 1) == 0) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
@@ -5560,12 +5563,12 @@ static int WifiP2PMatch_StateCallWait(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (wk->timer > 3600) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
     if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_SuspendRequest, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_SuspendRequest, FALSE);
         WifiP2PMatch_YesNoStart(wk);
         wk->seq = WIFIP2PMATCH_SEQ_CALL_CANCEL_YES_NO;
     }
@@ -5584,11 +5587,11 @@ static int WifiP2PMatch_StateCallCancelYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (ret == 0) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_RequestHasBeenSuspended, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_RequestHasBeenSuspended, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
     } else {
         WifiP2PMatch_EndMessage(wk);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_Communicating, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_Communicating, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         wk->seq = WIFIP2PMATCH_SEQ_CALL_WAIT;
     }
@@ -5621,7 +5624,7 @@ static int WifiP2PMatch_StateWaitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq) {
         if (obj == NULL) {
             BmpMenuList_Free(wk->list, NULL, NULL);
             WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
             keepMessage = TRUE;
         } else {
@@ -5632,7 +5635,7 @@ static int WifiP2PMatch_StateWaitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq) {
             if (gameMode != WifiP2PMatch_GetGameMode(wk, &wk->targetStatus) ||
                 vchat != WIFI_STATUS_GetVChatStatus(&wk->targetStatus)) {
                 WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
-                WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+                WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
                 wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
                 keepMessage = TRUE;
             } else {
@@ -5711,12 +5714,12 @@ static int WifiP2PMatch_StateRecruitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         gameMode = WifiP2PMatch_GetGameMode(wk, targetStatus);
         if (gameMode == 5 && !canPlayerExchangePhotos() && isRunningOnDSi()) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_UsesCameraFunctionSend, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_UsesCameraFunctionSend, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FRIEND_YES_NO_START;
             return seq;
         }
         if (gameMode == 6 && !WifiP2PMatch_HasTwoPokemon(wk)) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NeedLeastTwoPokemon, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NeedLeastTwoPokemon, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_MESSAGE_KEY_WAIT_TO_ROOM;
             break;
         }
@@ -5725,7 +5728,7 @@ static int WifiP2PMatch_StateRecruitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq
             wk->battleRule = (gameMode - 7) % 2;
             WifiP2PMatch_LoadMyRegulation(wk);
             if (!WifiP2PMatch_PassesRegulation(wk)) {
-                WifiP2PMatch_PrintMessage(wk, Bank0416_Text_NotMeetConditionsCannot, FALSE);
+                WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_NotMeetConditionsCannot, FALSE);
                 wk->seq = WIFIP2PMATCH_SEQ_MESSAGE_KEY_WAIT_TO_ROOM;
             }
         }
@@ -5735,9 +5738,9 @@ static int WifiP2PMatch_StateRecruitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq
             break;
         }
         if (WIFI_STATUS_GetVChatStatus(wk->myStatus)) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_VoiceChatWillTurned_2, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_VoiceChatWillTurned_2, FALSE);
         } else {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_VoiceChatWillTurned, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_VoiceChatWillTurned, FALSE);
         }
         wk->seq = WIFIP2PMATCH_SEQ_VCHAT_CHANGE_YES_NO_INIT;
         break;
@@ -5758,7 +5761,7 @@ static int WifiP2PMatch_StateJoinFriend(WIFIP2PMATCH_WORK *wk, int seq) {
 
     countActivePkms(wk->party);
     if (wk->friendNo == 0) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_RequestHasBeenSuspended, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_RequestHasBeenSuspended, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
     }
     status = WifiP2PMatch_GetFriendStatusData(friendNo - 1);
@@ -5769,7 +5772,7 @@ static int WifiP2PMatch_StateJoinFriend(WIFIP2PMATCH_WORK *wk, int seq) {
         gameMode != WifiP2PMatch_GetGameMode(wk, &wk->targetStatus) ||
         vchat != WIFI_STATUS_GetVChatStatus(&wk->targetStatus) || wifiStatus == 6) {
         WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
         return seq;
     }
@@ -5779,13 +5782,13 @@ static int WifiP2PMatch_StateJoinFriend(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_ChangeNetStatus(wk, WIFIP2PMATCH_STATUS_CALL, gameMode);
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_CALL, gameMode);
         WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
-        WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_Communicating, FALSE);
+        WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_Communicating, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         wk->friendNo = friendNo;
         wk->seq = WIFIP2PMATCH_SEQ_JOIN_WAIT;
     } else {
         WifiP2PMatch_SetFriendNameWord(wk, friendNo - 1);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
     }
     return seq;
@@ -5805,15 +5808,15 @@ static int WifiP2PMatch_StateJoinWait(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->seq = WIFIP2PMATCH_SEQ_JOIN_TIMEOUT;
     } else if (func_020420b4() == 5) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
     } else if (DWCRap_GetStatus() == 5) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AppearsBusy, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AppearsBusy, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
     } else if (DWCRap_GetStatus() == 4 || func_02042210()) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
     } else if (func_020420b4() == 1) {
         WIFI_STATUS_ResetVChatMac(wk->myStatus);
@@ -5871,7 +5874,7 @@ static int WifiP2PMatch_StateFriendConnected(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (WifiP2PMatch_GetFriendStatus(DWCRap_GetFriendIndex()) == 0) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
@@ -5882,7 +5885,7 @@ static int WifiP2PMatch_StateFriendConnected(WIFIP2PMATCH_WORK *wk, int seq) {
     wk->friendNo = DWCRap_GetFriendIndex() + 1;
     if (!wk->unk1351) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CommunicatingPleaseStandBy, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CommunicatingPleaseStandBy, FALSE);
     }
     WifiP2PMatchNet_CommandInit(wk);
     wk->seq = WIFIP2PMATCH_SEQ_NEGOTIATION_WAIT;
@@ -5894,7 +5897,7 @@ static int WifiP2PMatch_StateFriendConnected(WIFIP2PMATCH_WORK *wk, int seq) {
 static BOOL WifiP2PMatch_CheckDisconnect(WIFIP2PMATCH_WORK *wk) {
     if (func_020420b4() >= 3) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
     } else if (func_02042580()) {
         WifiP2PMatch_OnNetError(wk);
@@ -5910,10 +5913,10 @@ static int WifiP2PMatch_StateNegotiationWait(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_IsMessageEnd(wk);
     if (func_020420b4() >= 4 || func_02042210()) {
         if (wk->unk244) {
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FriendEndedCommunicationBattle, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendEndedCommunicationBattle, FALSE);
         } else {
             WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_FailedRespond, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         }
         wk->unk244 = 0;
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
@@ -5926,7 +5929,7 @@ static int WifiP2PMatch_StateNegotiationWait(WIFIP2PMATCH_WORK *wk, int seq) {
                 MI_CpuFill8(wk->connectGameMode, 0, sizeof(wk->connectGameMode));
                 func_02040624(func_02040440(), 0xe, 10);
                 wk->unk244 = 0;
-                WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CommunicatingPleaseStandBy_2, FALSE);
+                WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CommunicatingPleaseStandBy_2, FALSE);
                 WifiP2PMatch_StartWaitIcon(wk);
                 wk->seq = WIFIP2PMATCH_SEQ_SEND_PLAYER_INFO;
             }
@@ -6056,7 +6059,7 @@ static int WifiP2PMatch_StateConnectDataWait(WIFIP2PMATCH_WORK *wk, int seq) {
             wk->seq = WIFIP2PMATCH_SEQ_CONNECT_TIMING;
         } else {
             WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
-            WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CantConnect, FALSE);
+            WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_CantConnect, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         }
     }
@@ -6234,7 +6237,7 @@ static int WifiP2PMatch_StateRetryYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (ret == 0) {
-        WifiP2PMatch_PrintMessage(wk, Bank0416_Text_AwaitingFriendsDecisionPlease, FALSE);
+        WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AwaitingFriendsDecisionPlease, FALSE);
         WifiP2PMatch_StartWaitIcon(wk);
         wk->unk244 = 1;
         wk->seq = WIFIP2PMATCH_SEQ_NEGOTIATION_WAIT;
@@ -6710,7 +6713,7 @@ static void WifiP2PMatch_ViewDrawFriendName(WIFIP2PMATCH_WORK *wk, BmpWin *windo
     GFL_BitmapFill(BmpWin_GetBitmap(window), 0);
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
     WifiP2PMatch_ViewSetFriendNameWord(wk, friendNo - 1);
-    GFL_MsgDataLoadStrbuf(wk->msgData, Bank0416_Text_Empty_17, wk->expStrBuf);
+    GFL_MsgDataLoadStrbuf(wk->msgData, WifiP2pmatch_Text_Empty_17, wk->expStrBuf);
     GFL_WordSetFormatStrbuf(wk->view.wordSet, wk->titleString, wk->expStrBuf);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 2, 8, wk->titleString, wk->font);
     BmpWin_FlushChar(window);
@@ -6771,7 +6774,7 @@ static void WifiP2PMatch_RoomPause(WIFIP2PMATCH_WORK *wk, BOOL message) {
         wk->roomPaused = TRUE;
         WIFI_MCR_PlayerMovePause(&wk->room, TRUE);
         if (message == TRUE) {
-            WifiP2PMatch_PrintMessageNow(wk, Bank0416_Text_SeekingParticipants, FALSE);
+            WifiP2PMatch_PrintMessageNow(wk, WifiP2pmatch_Text_SeekingParticipants, FALSE);
         }
     }
 }

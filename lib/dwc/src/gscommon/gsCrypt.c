@@ -4,8 +4,8 @@
 // GameSpy's RSA (gsCrypt.c). The ROM names neither the file nor its function; both are GameSpy's, as pret's pokerevo
 // Wii build has the file (gsCrypt.s) and the later SDK the function
 
-int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, int hashSize, const u8 *signature,
-                               int signatureSize) {
+int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, u32 hashSize, const u8 *signature,
+                               u32 signatureSize) {
     BigNum value;
     // The signature as bytes, once it is decrypted: 00 01, FF up to a 00, the DER prefix of the hash, the hash
     u8 *bytes = (u8 *)value.data;
@@ -21,13 +21,13 @@ int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, int hash
     if (hash == NULL || signature == NULL) {
         return -1;
     }
-    if (signatureSize != key->modulus.length * 4) {
+    if (signatureSize != key->modulus.length * sizeof(u32)) {
         return -1;
     }
     if (hashSize != 16 && hashSize != 20) {
         return -1;
     }
-    value.length = (u32)signatureSize / 4;
+    value.length = signatureSize / sizeof(u32);
     memcpy(value.data, signature, signatureSize);
     gsLargeIntReverseBytes(&value);
     gsLargeIntPowerMod(&value, &key->exponent, &key->modulus, &value);
@@ -44,7 +44,7 @@ int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, int hash
         }
     }
     start = i + 1;
-    size = value.length * 4;
+    size = value.length * sizeof(u32);
     if (start + 0x22 == size) {
         if (memcmp(md5Prefix, &bytes[start], 18) != 0) {
             return -4;

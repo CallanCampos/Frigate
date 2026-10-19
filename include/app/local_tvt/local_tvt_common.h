@@ -7,11 +7,6 @@
 
 #define HEAPID_LOCAL_TVT 85
 
-// The archive of the faces, backgrounds and objects of the calls
-#define ARC_LOCAL_TVT 132
-// The communication Xtransceiver's archive, which has the frame, the cursors and the lower screen
-#define ARC_LOCAL_TVT_COMMON 170
-
 // At most this many faces are on the upper screen
 #define LOCAL_TVT_FACES 4
 

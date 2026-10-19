@@ -1,3 +1,0 @@
-VillageBridge2_Text_GreatGreatGreatGrandfather = My great-great-great-grandfather and\nhis Gurdurr worked together and built{be00}\nthis Village Bridge.
-VillageBridge2_Text_IllStonecutterLikeGrandpa = I'll be a stonecutter like my grandpa!\nI can get help from powerful Pokémon!
-VillageBridge2_Text_IfTeamPlasmaHad = If Team Plasma had tricked everyone\ninto releasing all their Pokémon,{be00}\nit would have been impossible{be00}\nto build a bridge like this.{be01}\nPeople and Pokémon are inseparable...{be01}\nThe relationship is not more or less\nthan that. That's what I believe.

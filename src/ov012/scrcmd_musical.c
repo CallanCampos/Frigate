@@ -420,7 +420,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         if (kind == 1) {
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_13, heapId);
         } else {
-            msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0484, heapId);
+            msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_MUSICAL, heapId);
         }
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 3);
         func_0202437c(wordSet, wordIndex, str, 0, 1, 2);

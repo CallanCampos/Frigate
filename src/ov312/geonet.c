@@ -50,8 +50,6 @@
 // Generation 4 globe's code (pokeplatinum's wifi_earth) moved to this game's libraries
 
 #define HEAPID_GEONET 0x7c
-// The globe's models and the screens' graphics
-#define ARCID_GEONET 194
 // The places of the globe: member 18 has those of the countries, and each country with regions has a member of its
 // own
 #define ARCID_GEONET_PLACE 52

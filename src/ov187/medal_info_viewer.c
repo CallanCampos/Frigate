@@ -31,15 +31,13 @@
 #include "system/printsys.h"
 #include "system/version.h"
 #include "system/wordset.h"
-#include "text/system/0082.h"
+#include "text/system/medal_info_viewer.h"
 
 // The viewer of the medal screens, named after the ROM's "medal_info_viewer.c". The names are ours
 
 // The archives of the medal screens. Our names; the archives hold, in order, each medal's picture data, the screen's BG
 // graphics and its cell actors' graphics
 #define ARCID_MEDAL_INFO_MEDAL_DATA 235
-#define ARCID_MEDAL_INFO_BG 237
-#define ARCID_MEDAL_INFO_OBJ 238
 
 // The BGs, in the order of sMedalInfoBGSetups
 enum {
@@ -459,7 +457,7 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
         } else {
             MedalInfoViewer_PrintNoMedal(viewer);
         }
-        arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_BG, viewer->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_VIEWER, viewer->heapId);
         if (viewer->hasMedal == TRUE) {
             loadBGScrToVramByFileNoReserveNegAlign(arc, 5, MedalInfoViewer_GetBG(MEDAL_INFO_BG_PANEL), 0, 0, FALSE,
                                                    viewer->heapId);
@@ -513,7 +511,7 @@ static void MedalInfoViewer_Init(MedalInfoViewer *viewer, MedalInfoViewerParam *
     }
     viewer->fontText = GFL_FontCreate(ARCID_FONT, 0, 0, 0, heapId);
     viewer->fontLabel = GFL_FontCreate(ARCID_FONT, 2, 0, 0, heapId);
-    viewer->msgMain = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0082, heapId);
+    viewer->msgMain = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MEDAL_INFO_VIEWER, heapId);
     viewer->msgMedalNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MEDAL_NAMES, heapId);
     viewer->msgDescriptions = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_11, heapId);
     viewer->printing = TRUE;
@@ -557,7 +555,7 @@ static void MedalInfoViewer_BGInit(MedalInfoViewer *viewer) {
         GFL_BGSysCreateBG(sMedalInfoBGSetups[i].bg, &sMedalInfoBGSetups[i].setup, sMedalInfoBGSetups[i].mode);
         GFL_BGSysSetBGEnabled(sMedalInfoBGSetups[i].bg, TRUE);
     }
-    bgArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_BG, heapId);
+    bgArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_VIEWER, heapId);
     commonArc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
     if (viewer->param->mode != MEDAL_INFO_VIEWER_MODE_LIST) {
         rank = viewer->entry->rank;
@@ -643,7 +641,7 @@ static void MedalInfoViewer_PrintQueueExit(MedalInfoViewer *viewer) {
 static void MedalInfoViewer_PrintMedal(MedalInfoViewer *viewer) {
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(viewer->heapId);
     StrBuf *buf = GFL_StrBufCreate(49, viewer->heapId);
-    StrBuf *fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_SMedalRally);
+    StrBuf *fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_SMedalRally);
 
     func_0202437c(wordSet, 0, viewer->entry->name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
@@ -651,25 +649,25 @@ static void MedalInfoViewer_PrintMedal(MedalInfoViewer *viewer) {
     GFL_StrBufFree(buf);
     GFL_StrBufFree(fmt);
 
-    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_MedalsReceived);
+    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_MedalsReceived);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 128, 29, buf, viewer->fontLabel,
                       MEDAL_INFO_COLOR_LABEL);
     GFL_StrBufFree(buf);
 
     buf = GFL_StrBufCreate(49, viewer->heapId);
-    fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_Empty_2);
+    fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_Empty_2);
     WordSetNumber(wordSet, 0, viewer->entry->count, 3, NUM_PAD_SPACE, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 216, 28, buf, viewer->fontText, MEDAL_INFO_COLOR_TEXT);
     GFL_StrBufFree(buf);
     GFL_StrBufFree(fmt);
 
-    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_FavoriteMedal);
+    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_FavoriteMedal);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 48, 49, buf, viewer->fontLabel, MEDAL_INFO_COLOR_LABEL);
     GFL_StrBufFree(buf);
 
     buf = GFL_StrBufCreate(49, viewer->heapId);
-    fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_Empty);
+    fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_Empty);
     loadMedalNameToStrbuf(wordSet, 0, viewer->entry->medal);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 48, 64, buf, viewer->fontText, MEDAL_INFO_COLOR_TEXT);
@@ -677,13 +675,13 @@ static void MedalInfoViewer_PrintMedal(MedalInfoViewer *viewer) {
     GFL_StrBufFree(fmt);
 
     if (viewer->param->mode != MEDAL_INFO_VIEWER_MODE_LIST) {
-        buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_Received);
+        buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_Received);
         PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 48, 85, buf, viewer->fontLabel,
                           MEDAL_INFO_COLOR_LABEL);
         GFL_StrBufFree(buf);
 
         buf = GFL_StrBufCreate(49, viewer->heapId);
-        fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_20);
+        fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_20);
         WordSetNumber(wordSet, 0, viewer->entry->year, 2, NUM_PAD_ZERO, TRUE);
         WordSetNumber(wordSet, 1, viewer->entry->month, 2, NUM_PAD_NONE, TRUE);
         WordSetNumber(wordSet, 2, viewer->entry->day, 2, NUM_PAD_NONE, TRUE);
@@ -703,7 +701,7 @@ static void MedalInfoViewer_PrintMedal(MedalInfoViewer *viewer) {
 static void MedalInfoViewer_PrintNoMedal(MedalInfoViewer *viewer) {
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(viewer->heapId);
     StrBuf *buf = GFL_StrBufCreate(49, viewer->heapId);
-    StrBuf *fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_SMedalRally);
+    StrBuf *fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_SMedalRally);
 
     func_0202437c(wordSet, 0, viewer->entry->name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
@@ -711,24 +709,24 @@ static void MedalInfoViewer_PrintNoMedal(MedalInfoViewer *viewer) {
     GFL_StrBufFree(buf);
     GFL_StrBufFree(fmt);
 
-    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_MedalsReceived);
+    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_MedalsReceived);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 128, 57, buf, viewer->fontLabel,
                       MEDAL_INFO_COLOR_LABEL);
     GFL_StrBufFree(buf);
 
     buf = GFL_StrBufCreate(49, viewer->heapId);
-    fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_Empty_2);
+    fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_Empty_2);
     WordSetNumber(wordSet, 0, viewer->entry->count, 3, NUM_PAD_SPACE, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 216, 56, buf, viewer->fontText, MEDAL_INFO_COLOR_TEXT);
     GFL_StrBufFree(buf);
     GFL_StrBufFree(fmt);
 
-    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_FavoriteMedal);
+    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_FavoriteMedal);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 8, 77, buf, viewer->fontLabel, MEDAL_INFO_COLOR_LABEL);
     GFL_StrBufFree(buf);
 
-    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, Bank0082_Text_None);
+    buf = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_None);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 8, 92, buf, viewer->fontText, MEDAL_INFO_COLOR_TEXT);
     GFL_StrBufFree(buf);
     GFL_WordSetSystemFree(wordSet);
@@ -752,7 +750,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
 
     res = viewer->res;
     arcs[1] = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
-    arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_OBJ, heapId);
+    arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL, heapId);
     res[0].cellAnims = func_0204bde0(arcs[0], 2, 3, heapId);
     res[0].palette = func_0204bbb8(arcs[0], 0, CLACT_VRAM_BOTH, 0, 0, 6, heapId);
     res[0].chars = func_0204b81c(arcs[0], 1, FALSE, CLACT_VRAM_BOTH, heapId);

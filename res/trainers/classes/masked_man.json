@@ -1,0 +1,6 @@
+{
+    "$schema": "trainer_class.schema.json",
+    "name": "Masked Man",
+    "compress_name": true,
+    "name_with_article": "the Masked Man"
+}

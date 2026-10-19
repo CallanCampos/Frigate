@@ -14,8 +14,11 @@ every section.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
-- `src/` holds the code built with the game's compiler and flags. An overlay's files go in `src/ovNNN/`, and the main
+- `src/` holds the code built with the game's compiler. An overlay's files go in `src/ovNNN/`, and the main
   module's in `src/gfl/` (Game Freak's library) and `src/system/` (the game's own code), mirroring `include/`.
+  The default flags are in `configure.py`; a file whose original code and data require another setting goes in
+  `config/compiler_flags.toml`, as `ctvt_draw.c` needs `-ipa function`. Different flags alone do not make a game
+  source a library. See `docs/configs.md` for the shared compiler settings.
 - `lib/` holds the libraries built apart from the game, as in pret's projects: `lib/<name>/include/` for the public
   headers, `lib/<name>/src/` for the sources and private headers (`lib/spl/src/spl_internal.h`), and
   `lib/<name>/library.toml` for the library's compiler and flags, which `configure.py` and the probe read: `lib/spl/`
@@ -34,8 +37,9 @@ every section.
   compiler), `lib/dpw/` (the Global Trade Station's and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
   Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's screens and
-  selectable objects, built with the game's compiler and flags; the name is ours) and `lib/irc/` (the infrared link,
-  overlay 31's last two files, built with the game's compiler and flags but `-O2,p`; the name is ours).
+  selectable objects, and the resource, heap, OAM, cell and display helpers under them, built with the game's compiler
+  and flags; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files, built with the game's
+  compiler and flags; the name is ours).
   NitroSDK, TwlSDK and DWC are built with the game's compiler, `dsi/1.1p1`: NitroSDK as ARM code by default, with most
   of its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the
   LTD autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
@@ -54,6 +58,12 @@ every section.
   refer to them, and how well each boundary between two functions keeps every section's data references in file
   order and the calls inside one file.
   `docs/source-files.md` lists every overlay's files with the evidence for their names (`source_files.py --markdown`).
+- A binary that the game embeds as it is, and that no compiler of ours can build, is a `const u8` array whose
+  initializer includes the bytes from the base ROM. That covers the DSi DSP's TeakLite programs in the LTD autoload,
+  `lib/twl/src/dsp/dsp_g711_image.c` and `dsp_graphics_image.c`. `ROM_BLOBS` in `configure.py` names each include file
+  under `rom/` of the generated headers with its module and symbol, and `tools/build/rom_blob.py` writes it from the
+  extracted module, with the symbol's address and size from `symbols.txt`. The bytes are never committed. Without a
+  ROM, `compile_all.py` writes zeros of the same size.
 - `struct_decls.h` declares every struct type once, as `typedef struct Name Name;`. The header of the module that
   owns a struct defines its layout when that is known (`struct Name { ... };`, without another typedef), and other
   code only uses pointers to it. A struct that only one file uses, such as an event's work, is defined in that file.
@@ -61,7 +71,7 @@ every section.
   layout with padding is still the one definition.
 - Headers are grouped like the game's code: `system/` (game system, game data, events), `field/`, `save/`, `gfl/`
   (Game Freak's library), `pml/` (Pokémon data), `battle/`, `demo/` and `constants/`, whose ID lists, such as species
-  and items, are generated from `data/constants/` (see [Constant lists](data.md#constant-lists)). The libraries'
+  and items, are generated from `generated/` (see [Constant lists](data.md#constant-lists)). The libraries'
   headers are in `lib/`, as `lib/nitro/include/nitro/`, `lib/nnsys/include/nnsys/`, `lib/spl/include/spl/`,
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),

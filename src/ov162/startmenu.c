@@ -1258,7 +1258,7 @@ static void StartMenu_InitObj(StartMenuWork *wk) {
 
     ClActSys_Create(&setup, &sVRAMConfig, HEAPID_STARTMENU);
     // Archive 30 has the player's icon for each gender
-    arc = GFL_ArcSysCreateFileHandle(30, HEAPID_TAIL(HEAPID_STARTMENU));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_TAIL(HEAPID_STARTMENU));
     if (getTrainerGender(wk->playerInfo) == 0) {
         wk->chars[OBJ_RES_PLAYER] = func_0204b81c(arc, 5, 0, 1, HEAPID_STARTMENU);
         wk->palettes[OBJ_RES_PLAYER] = func_0204bba0(arc, 4, 1, 0, HEAPID_STARTMENU);

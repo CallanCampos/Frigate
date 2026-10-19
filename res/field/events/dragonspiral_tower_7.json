@@ -1,0 +1,95 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_110",
+            "movement": 69,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0536",
+            "script": 7234,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 1,
+                "front": 4,
+                "side": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_110",
+            "movement": 69,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0533",
+            "script": 7231,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 9,
+                "front": 15,
+                "side": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_110",
+            "movement": 69,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0532",
+            "script": 7230,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 45,
+                "front": 1,
+                "side": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_DRAGONSPIRAL_TOWER_6",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 4,
+            "rail": {
+                "component": 26,
+                "front": 1,
+                "side": 0,
+                "front_span": 1,
+                "side_span": 1,
+                "param": 0
+            }
+        },
+        {
+            "zone": "ZONE_DRAGONSPIRAL_TOWER_8",
+            "warp": 0,
+            "unk4": 4,
+            "transition": 4,
+            "rail": {
+                "component": 4,
+                "front": 4,
+                "side": 0,
+                "front_span": 1,
+                "side_span": 1,
+                "param": 3
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

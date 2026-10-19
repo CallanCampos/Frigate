@@ -2310,7 +2310,7 @@ static void ItemMenu_CreatePaletteAnim(ItemMenuWork *work) {
     ArcTool *arc;
 
     work->paletteAnim = BlinkPalAnm_Create(16, 16, 0xfffe, work->heapId);
-    arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     BlinkPalAnm_SetPalBufferArcTool(work->paletteAnim, arc, 21, 16, 32);
     GFL_ArcToolFree(arc);
 }

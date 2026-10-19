@@ -1,0 +1,5 @@
+VirbankCity2_Text_AhWantGoPokestar = Ah! I want to go to Pokéstar Studios\nas soon as possible!{be01}\nI want my dear Audino\nto be in a movie!
+VirbankCity2_Text_DearAudinoWillMake = My dear Audino will make its movie debut\nin Pokéstar Studios!
+VirbankCity2_Text_WhenPokemonEvolvesIts = When a Pokémon evolves, its appearance\nwill change, and it'll get more powerful!{be01}\nIf you keep a Pokémon from evolving,\nit will learn moves more quickly!
+VirbankCity2_Text_BrrrmBrrrm = Brrrm...brrrm.
+\pad{a0}

@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Rock Head",
-    "description": "Protects the Pokémon\nfrom recoil damage."
-}

@@ -1,0 +1,22 @@
+PkwdBriefingMovie37_Text_GhostErasersRequestsCome = {bd02}Ghost Erasers...\n\n\n{bd02}Requests come from all over\n{bd02}due to their tremendous skill...
+PkwdBriefingMovie37_Text_ButThemBusinessEverything = {bd02}But for them,\n{bd02}business is everything...
+PkwdBriefingMovie37_Text_IfCantPayTheir = {bd02}If you can't pay their substantial fee,\n{bd02}they won't help you...
+PkwdBriefingMovie37_Text_GhostEraserCaseFiles = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 003\n\n{bd02}Code Name: {0102:0}
+PkwdBriefingMovie37_Text_RequestFromArcheologistConcerns = {bd02}This request is from an archeologist,\n\n{bd02}and it concerns a cursed treasure.
+PkwdBriefingMovie37_Text_ExcavatedStatueApparentlyTakes = {bd02}The excavated statue apparently\n\n{bd02}takes on a life of its own at midnight\n\n{bd02}and attacks people.
+PkwdBriefingMovie37_Text_MoreoverThoughtStatueMade = {bd02}Moreover, it is thought this statue\n\n{bd02}was made by a group of people\n\n{bd02}who followed the Majin of Mayhem!
+PkwdBriefingMovie37_Text_InvestigationWeWillHandle = {bd02}For this investigation,\n\n{bd02}we will handle it directly.
+PkwdBriefingMovie37_Text_Empty = なし
+PkwdBriefingMovie37_Text_Empty_2 = なし
+PkwdBriefingMovie37_Text_GhostErasersRequestsCome_2 = {bd02}Ghost Erasers...\n\n\n{bd02}Requests come from all over\n{bd02}due to their tremendous skill...
+PkwdBriefingMovie37_Text_ButThemBusinessEverything_2 = {bd02}But for them,\n{bd02}business is everything...
+PkwdBriefingMovie37_Text_IfCantPayTheir_2 = {bd02}If you can't pay their substantial fee,\n{bd02}they won't help you...
+PkwdBriefingMovie37_Text_GhostEraserCaseFiles_2 = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 003\n\n{bd02}Code Name: {0102:0}
+PkwdBriefingMovie37_Text_RequestFromArcheologistConcerns_2 = {bd02}This request is from an archeologist,\n\n{bd02}and it concerns a cursed treasure.
+PkwdBriefingMovie37_Text_ExcavatedStatueApparentlyTakes_2 = {bd02}The excavated statue apparently\n\n{bd02}takes on a life of its own at midnight\n\n{bd02}and attacks people.
+PkwdBriefingMovie37_Text_MoreoverThoughtStatueMade_2 = {bd02}Moreover, it is thought this statue\n\n{bd02}was made by a group of people\n\n{bd02}who followed the Majin of Mayhem!
+PkwdBriefingMovie37_Text_InvestigationWeWillHandle_2 = {bd02}For this investigation,\n\n{bd02}we will handle it directly.
+PkwdBriefingMovie37_Text_Empty_3 = なし
+PkwdBriefingMovie37_Text_Empty_4 = なし
+PkwdBriefingMovie37_Text_Empty_5 = なし
+\pad{74}

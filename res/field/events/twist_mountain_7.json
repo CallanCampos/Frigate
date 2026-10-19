@@ -1,0 +1,23 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 16,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 56,
+                "y": 0,
+                "z": 168,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

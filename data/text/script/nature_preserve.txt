@@ -1,6 +1,0 @@
-NaturePreserve_Text_Gwaooooogh = Gwaooooogh!
-NaturePreserve_Text_DarkHaxorusVanishedInto = The dark Haxorus vanished\ninto the preserve...
-NaturePreserve_Text_ItsHopSkipJump = It's a hop, skip, and a jump by my plane!\nWant to go back to Mistralton City?
-NaturePreserve_Text_OkLetsHitRunway = OK! Let's hit the runway!{be01}
-NaturePreserve_Text_RogerTalkWhenYoure = Roger!\nTalk to me when you're ready!
-\pad{78}

@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jay",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HERACROSS",
+            "form": 0,
+            "level": 52,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GIGALITH",
+            "form": 0,
+            "level": 52,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CONKELDURR",
+            "form": 0,
+            "level": 52,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hoo!\nHa!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Gah!"
+        },
+        {
+            "type": 2,
+            "text": "...I lost! I'm sorry,\nmy precious Pokémon!"
+        }
+    ]
+}

@@ -28,12 +28,12 @@
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/wipe.h"
-#include "text/system/0024.h"
+#include "text/system/cg_help.h"
 
 #define PAGE_COUNT 15
 // The titles of the pages are the first messages of the bank and their texts the ones after
-#define TITLE_MESSAGE(page) (Bank0024_Text_AboutInfrared + (page))
-#define TEXT_MESSAGE(page) (Bank0024_Text_UsingInfraredCanBattle + (page))
+#define TITLE_MESSAGE(page) (CgHelp_Text_AboutInfrared + (page))
+#define TEXT_MESSAGE(page) (CgHelp_Text_UsingInfraredCanBattle + (page))
 
 // The sub screen's BGs, which show the help
 enum {
@@ -384,7 +384,7 @@ static void CGHelp_InitText(CGHelp *help) {
 
     help->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, help->heapId);
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
-    help->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0024, help->heapId);
+    help->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_CG_HELP, help->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 15 * 32, 0x20, help->heapId);
     LoadSysMsgBox(BG_MESSAGE, 1, 13, 0, help->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(0), 4, 13 * 32, 0x40, help->heapId);
@@ -403,15 +403,15 @@ static void CGHelp_InitText(CGHelp *help) {
     GFL_BGSysLoadScr(BG_MESSAGE);
     GFL_BGSysLoadScr(BG_TEXT);
     help->printing = FALSE;
-    item.str = GFL_MsgDataLoadStrbufNew(help->msgData, Bank0024_Text_Next);
+    item.str = GFL_MsgDataLoadStrbufNew(help->msgData, CgHelp_Text_Next);
     item.color = 0x39e3;
     item.type = 0;
     help->nextButton = AppTaskMenuWin_Create(help->taskMenuRes, &item, 11, 21, 11, help->heapId);
     GFL_StrBufFree(item.str);
-    item.str = GFL_MsgDataLoadStrbufNew(help->msgData, Bank0024_Text_Previous);
+    item.str = GFL_MsgDataLoadStrbufNew(help->msgData, CgHelp_Text_Previous);
     help->previousButton = AppTaskMenuWin_Create(help->taskMenuRes, &item, 0, 21, 11, help->heapId);
     GFL_StrBufFree(item.str);
-    item.str = GFL_MsgDataLoadStrbufNew(help->msgData, Bank0024_Text_Quit);
+    item.str = GFL_MsgDataLoadStrbufNew(help->msgData, CgHelp_Text_Quit);
     item.type = APP_TASKMENU_ITEM_RETURN;
     help->quitButton = AppTaskMenuWin_Create(help->taskMenuRes, &item, 22, 21, 10, help->heapId);
     GFL_StrBufFree(item.str);

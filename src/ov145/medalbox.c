@@ -53,10 +53,6 @@
 // file's, "medalbox_data_sys.c"
 
 #define HEAPID_MEDALBOX 0x97
-// The screen's graphics
-#define ARCID_MEDALBOX 236
-// The medals' cells
-#define ARCID_MEDAL_OBJ 238
 
 #define BG_COUNT 8
 // Indexes into sMedalBoxBGs
@@ -96,9 +92,6 @@
 // The medal under the cursor, on the top screen
 #define ACTOR_INFO_MEDAL 70
 #define ACTOR_COUNT 71
-
-// NitroSDK's GX_OAM_MODE_OBJWND, which nitro/gx.h lacks
-#define OAM_MODE_OBJWND 2
 
 #define MEDAL_ACTOR_COUNT 25
 #define SPARKLE_COUNT 10
@@ -661,7 +654,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
     resources = work->resources;
     arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDALBOX, heapId);
     arcs[1] = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
-    arcs[2] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_OBJ, heapId);
+    arcs[2] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL, heapId);
     work->resources[RES_MEDAL_CELLS] = func_0204bde0(arcs[2], 2, 3, heapId);
     resources[RES_MEDAL_PALETTE] = func_0204bbb8(arcs[2], 0, 2, 0, 0, 6, heapId);
     resources[RES_MEDAL_CHARS] = func_0204b81c(arcs[2], 1, FALSE, 2, heapId);
@@ -734,7 +727,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
                           work->resources[RES_MEDAL_CELLS], &windowSetup, 0, heapId);
         func_0204c488(work->actors[j], 0);
         func_0204c124(work->actors[j], TRUE);
-        func_0204c318(work->actors[j], OAM_MODE_OBJWND);
+        func_0204c318(work->actors[j], GX_OAM_MODE_OBJWND);
     }
 
     actorSetup.x = 0x2c;

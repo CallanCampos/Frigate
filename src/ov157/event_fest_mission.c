@@ -29,7 +29,7 @@
 #include "system/game_system.h"
 #include "system/str_tool.h"
 #include "system/wordset.h"
-#include "text/script/0412.h"
+#include "text/script/event_fest_mission.h"
 
 // Overlay 21's event_festival.c
 #define OVERLAY_EVENT_FESTIVAL OVERLAY_ID(21)
@@ -170,7 +170,7 @@ static void FestMissionEvent_Init(FestMissionEventWork *work, GameSystem *gsys, 
     work->festival = GSYS_GetLinkFestival(gsys);
     work->festText = getTextFileForFestMissions(work->heapId);
     work->passPowerData = PassPowerData_Create(work->heapId);
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_0412, work->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_EVENT_FEST_MISSION, work->heapId);
     work->wordSet = GFL_WordSetSystemCreate(6, 48, work->heapId);
     work->strbuf = GFL_StrBufCreate(161, work->heapId);
     work->formatted = GFL_StrBufCreate(161, work->heapId);
@@ -452,7 +452,7 @@ static void FestMission_Print(FestMissionEventWork *work) {
     s32 seconds = FestMissionConfig_GetSecondsLeft((FestMissionConfig *)&work->mission);
     s32 minutes;
 
-    GFL_MsgDataLoadStrbuf(work->msgData, ScriptBank0412_Text_Empty, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
     func_ov027_02170d04(work->festText, work->formatted, &work->mission, work->tailHeapId);
     func_0202437c(work->wordSet, 0, work->formatted, 0, 1, 2);
     FestMission_PrintLine(work, work->strbuf, 0, 0);
@@ -463,9 +463,9 @@ static void FestMission_Print(FestMissionEventWork *work) {
     WordSetNumber(work->wordSet, 3, seconds % 60, 2, NUM_PAD_NONE, TRUE);
     WordSetNumber(work->wordSet, 4, work->mission.count, 4, NUM_PAD_NONE, TRUE);
     if (minutes == 0) {
-        GFL_MsgDataLoadStrbuf(work->msgData, ScriptBank0412_Text_TimeRemainingSec, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingSec, work->strbuf);
     } else {
-        GFL_MsgDataLoadStrbuf(work->msgData, ScriptBank0412_Text_TimeRemainingMinSec, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_TimeRemainingMinSec, work->strbuf);
     }
     FestMission_PrintLine(work, work->strbuf, 8, 7);
     GFL_MsgDataLoadStrbuf(work->msgData, work->mission.unk10_6 + 13, work->strbuf);

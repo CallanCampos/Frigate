@@ -154,8 +154,10 @@ void func_ov036_0219634c(FieldActor *actor, u16 *a1, u16 *a2);
 void func_ov036_021963a4(FieldActor *actor, u16 a1, u16 a2);
 // Sets the frame of the model's animation for a time. FALSE if the actor has no model
 BOOL func_ov036_02196b10(FieldActor *actor, u16 time);
-// Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command
+// Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command, and the setting of
+// the field effect it hides in
 BOOL func_ov036_0218ed68(FieldActor *actor);
+void func_ov036_02193110(FieldActor *actor, FieldEffectTask *task);
 // Overlay 36's fldmmdl_blact.c: the freeing of the billboard actors' work, the flag that their load callback sets,
 // their billboard system, and the change of an actor's model to another object code
 void func_ov036_021937a4(MMSys *system);

@@ -1,0 +1,17 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_KON", null, null, null ],
+    "instruments": [
+        {
+            "program": 50,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 70,
+            "sustain": 0,
+            "release": 110,
+            "pan": 64
+        }
+    ]
+}

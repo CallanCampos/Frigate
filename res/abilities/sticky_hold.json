@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sticky Hold",
+    "description": "Protects the Pokémon\nfrom item theft."
+}

@@ -1,0 +1,66 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_ROUTE_8_GATE",
+            "warp": 0,
+            "unk4": 1,
+            "transition": 6,
+            "grid": {
+                "x": 248,
+                "y": 0,
+                "z": 2536,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_9_GATE",
+            "warp": 0,
+            "unk4": 0,
+            "transition": 6,
+            "grid": {
+                "x": 248,
+                "y": 0,
+                "z": 536,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 2000,
+            "var": 6,
+            "value": 0,
+            "type": 6,
+            "grid": {
+                "x": 7,
+                "z": 159,
+                "width": 18,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        },
+        {
+            "script": 2000,
+            "var": 6,
+            "value": 0,
+            "type": 6,
+            "grid": {
+                "x": 7,
+                "z": 32,
+                "width": 18,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": []
+}

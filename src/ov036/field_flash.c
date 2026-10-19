@@ -29,6 +29,8 @@ struct FieldFlash {
 
 void FieldFlashAnimation_Init(FieldFlashAnimation *animation);
 void FieldFlashAnimation_Reset(FieldFlashAnimation *animation);
+void FieldFlashAnimation_Set(FieldFlashAnimation *animation, fx32 scaleStart, fx32 scaleEnd, s16 alphaStart,
+                             u8 alphaEnd, u32 frameCount);
 BOOL FieldFlashAnimation_Update(FieldFlashAnimation *animation);
 fx32 FieldFlashAnimation_GetScale(FieldFlashAnimation *animation);
 void FieldFlashAnimation_SetScale(FieldFlashAnimation *animation, fx32 scale);

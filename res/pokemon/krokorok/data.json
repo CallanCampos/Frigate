@@ -1,0 +1,147 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Krokorok",
+    "pokedex": {
+        "category": "Desert Croc Pokémon",
+        "entry": "Protected by thin membranes, their eyes\ncan see even in the dead of night.\nThey live in groups of a few individuals.",
+        "height": "3'03\"",
+        "weight": "73.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "さばくワニポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 82,
+        "defense": 45,
+        "speed": 74,
+        "special_attack": 45,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_GROUND", "TYPE_DARK" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_INTIMIDATE", "ABILITY_MOXIE" ],
+    "hidden_ability": "ABILITY_ANGER_POINT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 123,
+    "height": 10,
+    "weight": 334,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_RAGE" ],
+            [ 1, "MOVE_BITE" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 4, "MOVE_BITE" ],
+            [ 7, "MOVE_SAND_ATTACK" ],
+            [ 10, "MOVE_TORMENT" ],
+            [ 13, "MOVE_SAND_TOMB" ],
+            [ 16, "MOVE_ASSURANCE" ],
+            [ 19, "MOVE_MUD_SLAP" ],
+            [ 22, "MOVE_EMBARGO" ],
+            [ 25, "MOVE_SWAGGER" ],
+            [ 28, "MOVE_CRUNCH" ],
+            [ 32, "MOVE_DIG" ],
+            [ 36, "MOVE_SCARY_FACE" ],
+            [ 40, "MOVE_FOUL_PLAY" ],
+            [ 44, "MOVE_SANDSTORM" ],
+            [ 48, "MOVE_EARTHQUAKE" ],
+            [ 52, "MOVE_THRASH" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM12",
+            "TM17",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM56",
+            "TM59",
+            "TM63",
+            "TM65",
+            "TM66",
+            "TM67",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "TM95",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_LOW_KICK",
+            "MOVE_UPROAR",
+            "MOVE_EARTH_POWER",
+            "MOVE_FOUL_PLAY",
+            "MOVE_AQUA_TAIL",
+            "MOVE_DARK_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SPITE",
+            "MOVE_SNATCH",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 40,
+            "species": "SPECIES_KROOKODILE"
+        }
+    ],
+    "regional_dex_number": 100,
+    "baby_species": "SPECIES_SANDILE",
+    "cry_volume": 127
+}

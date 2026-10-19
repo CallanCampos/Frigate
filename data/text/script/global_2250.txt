@@ -1,4 +1,0 @@
-Global2250_Text_Oh = Oh?{be01}
-Global2250_Text_HatchedFromEgg = {0101:0} hatched from the Egg!
-Global2250_Text_WouldLikeGiveNickname = Would you like to give a nickname to the\nnewly hatched {0101:0}?
-\pad{60}

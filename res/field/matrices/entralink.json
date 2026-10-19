@@ -1,0 +1,7 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ "MAP_MODEL_ENTRALINK_PALACE01_00_00", "MAP_MODEL_ENTRALINK_PALACE01_01_00" ],
+        [ "MAP_MODEL_ENTRALINK_PALACE01_00_01", "MAP_MODEL_ENTRALINK_PALACE01_01_01" ]
+    ]
+}

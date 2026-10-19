@@ -17,9 +17,6 @@
 #include "gfl/clact.h"
 #include "nnsys/g2d.h"
 
-// The match board's graphics archive, which arc.h has no name for yet
-#define ARCID_WIFIP2PMATCH 32
-
 // How many characters the room holds: the player and the friends
 #define WIFI_MCR_OBJ_MAX 48
 // How many friends a block of the room seats, and so how many each of the room's maps adds

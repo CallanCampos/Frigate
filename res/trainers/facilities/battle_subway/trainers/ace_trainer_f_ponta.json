@@ -1,0 +1,30 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ponta",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "pokemon": [
+        "claydol_1",
+        "mandibuzz_1",
+        "gastrodon_2",
+        "ferrothorn_2",
+        "salamence_2",
+        "granbull_3",
+        "spiritomb_3",
+        "krookodile_3",
+        "lickilicky_3",
+        "blissey_3",
+        "quagsire_4",
+        "staraptor_4",
+        "weezing_4",
+        "tauros_4",
+        "scrafty_4",
+        "gyarados_4",
+        "arcanine_4",
+        "regice_4"
+    ],
+    "messages": [
+        "I can see despair in your eyes.\nBring it on!",
+        "It was a waste of time, much as I suspected.\nYou should start training all over again.",
+        "Did I underestimate you as just a little kid?\nOr was this your true ability?"
+    ]
+}

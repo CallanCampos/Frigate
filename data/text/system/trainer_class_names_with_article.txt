@@ -1,1 +1,0 @@
-\from{trainer_classes.name_with_article}

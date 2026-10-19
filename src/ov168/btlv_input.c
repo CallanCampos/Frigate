@@ -46,7 +46,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/0021.h"
+#include "text/system/btlv_input.h"
 
 // An actor slot; the second word is never touched
 typedef struct {
@@ -455,7 +455,7 @@ static void BtlvInput_SetTypeBit(u32 *mask, int bit);
 static void BtlvInput_ApplyTypeMask(BtlvInput *work);
 static void BtlvInput_ShowTypeScreen(BtlvInput *work);
 static void BtlvInput_LoadTypePalettes(BtlvInput *work);
-static void BtlvInput_LoadTypePalette(const BtlvInput *work, int palette);
+static void BtlvInput_LoadTypePalette(BtlvInput *work, int palette);
 static void BtlvInput_UpdateTypePaletteAnim(BtlvInput *work);
 static void BtlvInput_SetTypeAnimIndex(BtlvInput *work, int index);
 static int BtlvInput_PickTypeAnimIndex(BtlvInput *work, int current);
@@ -591,7 +591,7 @@ static BtlvInput *BtlvInput_Create(GameData *gameData, u32 rule, u32 unk54, Pale
     for (i = 0; i < 4; i++) {
         work->moveChars[i] = -1;
     }
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0021, work->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTLV_INPUT, work->heapId);
     work->pressedButton = -1;
     work->typeLoaded = FALSE;
     work->typePalBuf = NULL;
@@ -639,7 +639,7 @@ static void BtlvInput_CoreTask(TCB *tcb, void *data) {
 
 static void BtlvInput_InitGraphics(BtlvInput *work) {
     GFL_BGSysSetLCDConfigForEngine(&data_ov168_021f3648, BGSYS_ENGINE_SUB);
-    work->arc = GFL_ArcSysCreateFileHandle(11, work->heapId);
+    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, work->heapId);
     work->moveUnit = func_0204bf1c(4, 2, work->heapId);
     work->pokeUnit = func_0204bf1c(12, 2, work->heapId);
     work->cursorUnit = func_0204bf1c(6, 0, work->heapId);
@@ -1932,9 +1932,15 @@ static void BtlvInput_LoadTypePalettes(BtlvInput *work) {
 }
 
 // Loads one of the copied palettes into the fade buffers
-static void BtlvInput_LoadTypePalette(const BtlvInput *work, int palette) {
-    PaletteFade_LoadData(work->paletteFade, work->typePalBuf + palette * 0x80, 3, 0, 0x80);
-    PaletteFade_LoadData(work->paletteFade, work->typePalBuf2 + palette * 0xa0, 1, 0, 0xa0);
+static void BtlvInput_LoadTypePalette(BtlvInput *work, int palette) {
+    const u8 *src;
+
+    src = work->typePalBuf;
+    src += palette * 0x80;
+    PaletteFade_LoadData(work->paletteFade, src, 3, 0, 0x80);
+    src = work->typePalBuf2;
+    src += palette * 0xa0;
+    PaletteFade_LoadData(work->paletteFade, src, 1, 0, 0xa0);
 }
 
 // Animates the type icons' palettes: every 5 frames the next palette of the current step, a new random step when
@@ -2486,14 +2492,14 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
     int i;
 
     nameBuf = GFL_StrBufCreate(16, work->heapId);
-    nameFmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty);
-    ppLabel = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Pp);
+    nameFmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty);
+    ppLabel = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Pp);
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     ppBuf = GFL_StrBufCreate(16, work->heapId);
-    ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_2);
+    ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_2);
     func_0204bfd4(work->moveUnit, FALSE);
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4 ? TRUE : FALSE; i++) {
         if (param->moves[i] != MOVE_NONE) {
             HeapID heapId = HEAPID_TAIL(work->heapId);
             type = PML_MoveGetParam(param->moves[i], MOVE_PARAM_TYPE);
@@ -2531,7 +2537,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
         } else {
             palette = 463;
         }
-        palBuf = GFL_G2DIOReadNCLR(11, palette, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, palette, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x90, 0x20);
         GFL_HeapFree(palBuf);
     }
@@ -2594,12 +2600,12 @@ static void BtlvInput_DrawTargetPanels(BtlvInput *work, BtlvInputScreenTask *tas
 
     count = (work->rule == 2) ? 3 : 2;
     for (i = 0; i < count; i++) {
-        palBuf = GFL_G2DIOReadNCLR(11, 481, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 481, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
     for (; i < count * 2; i++) {
-        palBuf = GFL_G2DIOReadNCLR(11, 482, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 482, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
@@ -2673,7 +2679,7 @@ static void BtlvInput_DrawRecorderCount(BtlvInput *work, const BtlvInputRecorder
 
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     buf = GFL_StrBufCreate(8, work->heapId);
-    fmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_6);
+    fmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_6);
     GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
     GFL_TextRndUpdateColorIndexLUT(9, 10, 0);
     WordSetNumber(wordSet, 0, param->unk8, 3, 2, TRUE);
@@ -2686,7 +2692,7 @@ static void BtlvInput_DrawRecorderCount(BtlvInput *work, const BtlvInputRecorder
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     GFL_TextRendererDrawToBitmap(work->msgBitmap, 96, 8, buf, work->font);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
-    label = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_7);
+    label = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_7);
     GFL_TextRendererDrawToBitmap(work->msgBitmap, 124, 8, label, work->font);
     GFL_StrBufFree(label);
     GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
@@ -2984,6 +2990,7 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     GFLBitmap *bitmap;
     u8 *pixels;
     int i;
+    void *vram = G2S_GetOBJCharPtr();
 
     work->actor21c = func_0204c040(work->unit218, work->chars, work->palette, work->cellAnims, &data_ov168_021f35f2, 1,
                                    work->heapId);
@@ -2994,7 +3001,7 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     func_0204c488(work->actor21c, 20);
 
     strbuf = GFL_StrBufCreate(16, work->heapId);
-    src = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty);
+    src = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty);
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     bitmap = GFL_BitmapCreate(14, 4, 0x20, work->heapId);
     GFL_BitmapFill(bitmap, 0);
@@ -3009,18 +3016,18 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     pixels = GFL_BitmapGetPixelData(bitmap);
     func_0204c40c(work->actor21c, &proxy);
     for (i = 0; i < 4; i++) {
-        MI_CpuCopy16(&pixels[i * 0x1c0],
-                     (void *)(HW_DB_OBJ_VRAM + (0xde + i * 8) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x100);
-        MI_CpuCopy16(&pixels[i * 0x1c0 + 0x100],
-                     (void *)(HW_DB_OBJ_VRAM + (0xfe + i * 4) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x80);
-        MI_CpuCopy16(&pixels[i * 0x1c0 + 0x180],
-                     (void *)(HW_DB_OBJ_VRAM + (0x10e + i * 2) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x40);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0],
+            (void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x100);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0 + 0x100],
+            (void *)((u32)vram + (0xfe + i * 4) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x80);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0 + 0x180],
+            (void *)((u32)vram + (0x10e + i * 2) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x40);
     }
 
     GFL_StrBufFree(strbuf);
@@ -3326,7 +3333,7 @@ static void BtlvInput_PrintLauncherPoints(BtlvInput *work, BtlvInputCommandParam
     }
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     strbuf = GFL_StrBufCreate(6, work->heapId);
-    src = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_8);
+    src = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_8);
     GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     WordSetNumber(wordSet, 0, param->launcherPoints, 2, 0, TRUE);

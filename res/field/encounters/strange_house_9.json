@@ -1,0 +1,51 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_LITWICK", 31, 31 ],
+                [ "SPECIES_GOTHITA", 31, 31 ],
+                [ "SPECIES_RATICATE", 32, 32 ],
+                [ "SPECIES_GOLBAT", 32, 32 ],
+                [ "SPECIES_GOTHORITA", 33, 33 ],
+                [ "SPECIES_BANETTE", 32, 32 ],
+                [ "SPECIES_RATICATE", 33, 33 ],
+                [ "SPECIES_GOLBAT", 33, 33 ],
+                [ "SPECIES_BANETTE", 34, 34 ],
+                [ "SPECIES_GOTHORITA", 34, 34 ],
+                [ "SPECIES_BANETTE", 34, 34 ],
+                [ "SPECIES_GOTHORITA", 34, 34 ]
+            ],
+            "white2": [
+                [ "SPECIES_LITWICK", 31, 31 ],
+                [ "SPECIES_SOLOSIS", 31, 31 ],
+                [ "SPECIES_RATICATE", 32, 32 ],
+                [ "SPECIES_GOLBAT", 32, 32 ],
+                [ "SPECIES_DUOSION", 33, 33 ],
+                [ "SPECIES_BANETTE", 32, 32 ],
+                [ "SPECIES_RATICATE", 33, 33 ],
+                [ "SPECIES_GOLBAT", 33, 33 ],
+                [ "SPECIES_BANETTE", 34, 34 ],
+                [ "SPECIES_DUOSION", 34, 34 ],
+                [ "SPECIES_BANETTE", 34, 34 ],
+                [ "SPECIES_DUOSION", 34, 34 ]
+            ]
+        },
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

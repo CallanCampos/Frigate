@@ -430,7 +430,7 @@ static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *set
     if (gender != 0) {
         isMale = FALSE;
     }
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0181 + movie * 2 + (u8)isMale, heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PKWD_BOOK_MOVIE_00_GIRL + movie * 2 + (u8)isMale, heapId);
     if (kind == POKEWOOD_KIND_FILM) {
         param->introText = GFL_MsgDataLoadStrbufNew(msgData, 0);
     } else if (kind == POKEWOOD_KIND_WATCH) {

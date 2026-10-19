@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SPIRITOMB",
+    "moves": [ "MOVE_SUCKER_PUNCH", "MOVE_PAIN_SPLIT", "MOVE_TOXIC", "MOVE_GRUDGE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

@@ -40,15 +40,13 @@
 #include "system/str_tool.h"
 #include "system/text_speed.h"
 #include "system/wordset.h"
-#include "text/system/0313.h"
 #include "text/system/event_pass_power_startmenu.h"
+#include "text/system/pkwd_briefing_common.h"
 
 // Pokéstar Studios' theater: the movie's set in 3D on the upper screen and the audience in its seats on the lower
 // one. Before the battle it shows the briefing of the scene a line at a time; after it, the movie's credits scroll
 // by while the audience reacts to how the movie went. Named after the ROM's "pkwd_briefing.c"
 
-// The archive of the sets and of the audience's graphics
-#define ARCID_PKWD_BRIEFING 11
 // The archive of the movies' data, as in event_pokewood.c
 #define ARCID_PKWD_MOVIE 269
 
@@ -76,7 +74,7 @@ enum {
     FILE_CAMERA = 35,
 };
 
-// The files of the audience in ARCID_PKWD_BRIEFING
+// The files of the audience in ARCID_BTLV
 enum {
     FILE_AUDIENCE_BG_PALETTE = 560,
     FILE_AUDIENCE_BG_CHARS = 561,
@@ -639,120 +637,120 @@ static const BGSysVRAMConfig sPkwdBriefingVRAMConfig = {
 
 // The sets: the model and the animation of each, the animation of its actor, and the actor
 static const G3DSceneResourceSetup sPkwdBriefingSet00Resources[] = {
-    { ARCID_PKWD_BRIEFING, 141, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 146, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 141, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 146, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet01Resources[] = {
-    { ARCID_PKWD_BRIEFING, 205, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 209, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 205, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 209, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet02Resources[] = {
-    { ARCID_PKWD_BRIEFING, 313, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 316, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 313, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 316, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet03Resources[] = {
-    { ARCID_PKWD_BRIEFING, 273, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 278, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 273, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 278, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet04Resources[] = {
-    { ARCID_PKWD_BRIEFING, 189, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 193, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 189, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 193, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet05Resources[] = {
-    { ARCID_PKWD_BRIEFING, 293, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 298, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 293, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 298, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet06Resources[] = {
-    { ARCID_PKWD_BRIEFING, 314, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 317, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 314, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 317, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet07Resources[] = {
-    { ARCID_PKWD_BRIEFING, 161, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 166, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 161, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 166, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet08Resources[] = {
-    { ARCID_PKWD_BRIEFING, 189, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 193, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 189, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 193, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet09Resources[] = {
-    { ARCID_PKWD_BRIEFING, 122, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 127, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 122, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 127, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet10Resources[] = {
-    { ARCID_PKWD_BRIEFING, 207, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 211, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 207, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 211, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet11Resources[] = {
-    { ARCID_PKWD_BRIEFING, 181, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 183, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 181, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 183, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet12Resources[] = {
-    { ARCID_PKWD_BRIEFING, 191, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 195, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 191, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 195, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet13Resources[] = {
-    { ARCID_PKWD_BRIEFING, 163, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 168, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 163, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 168, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet14Resources[] = {
-    { ARCID_PKWD_BRIEFING, 142, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 147, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 142, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 147, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet15Resources[] = {
-    { ARCID_PKWD_BRIEFING, 141, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 146, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 141, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 146, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet16Resources[] = {
-    { ARCID_PKWD_BRIEFING, 253, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 258, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 253, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 258, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet17Resources[] = {
-    { ARCID_PKWD_BRIEFING, 237, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 241, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 237, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 241, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet18Resources[] = {
-    { ARCID_PKWD_BRIEFING, 239, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 243, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 239, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 243, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet19Resources[] = {
-    { ARCID_PKWD_BRIEFING, 294, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 299, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 294, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 299, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet20Resources[] = {
-    { ARCID_PKWD_BRIEFING, 295, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 300, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 295, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 300, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet21Resources[] = {
-    { ARCID_PKWD_BRIEFING, 223, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 227, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 223, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 227, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet22Resources[] = {
-    { ARCID_PKWD_BRIEFING, 257, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 262, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 257, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 262, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet23Resources[] = {
-    { ARCID_PKWD_BRIEFING, 276, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 281, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 276, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 281, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet24Resources[] = {
-    { ARCID_PKWD_BRIEFING, 273, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 278, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 273, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 278, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet25Resources[] = {
-    { ARCID_PKWD_BRIEFING, 274, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 279, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 274, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 279, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet26Resources[] = {
-    { ARCID_PKWD_BRIEFING, 255, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 260, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 255, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 260, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet27Resources[] = {
-    { ARCID_PKWD_BRIEFING, 296, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 301, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 296, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 301, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet28Resources[] = {
-    { ARCID_PKWD_BRIEFING, 125, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 130, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 125, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 130, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneAnimationSetup sPkwdBriefingSet00Anims[] = { { 1, 0 } };
@@ -1359,7 +1357,7 @@ static void PkwdBriefingText_FreeBG(PkwdBriefingText *text) {
 }
 
 static void PkwdBriefingText_LoadBriefing(PkwdBriefingText *text, s32 movie, PlayerInfo *playerInfo, HeapID heapId) {
-    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0267 + movie, heapId);
+    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PKWD_BRIEFING_MOVIE_00 + movie, heapId);
     text->lines[0] = GFL_StrBufCreate(304, heapId);
     text->lines[1] = GFL_StrBufCreate(304, heapId);
     text->empty = GFL_StrBufCreate(304, heapId);
@@ -1434,18 +1432,19 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
     StrBuf *strbuf;
     PkwdBriefingMovieFile *file;
 
-    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0313, heapId);
+    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PKWD_BRIEFING_COMMON, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
-    text->empty = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Empty_327);
-    text->unk1D4 = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Empty_328);
+    text->empty = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Empty_327);
+    text->unk1D4 = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Empty_328);
     for (i = 0; i < 15; i++) {
         text->credits[CREDIT_MOVIE + i] = GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + i);
     }
-    text->credits[CREDIT_SCREENPLAY] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Screenplay);
-    text->credits[CREDIT_VFX] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Vfx);
-    text->credits[CREDIT_ART] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_PokestarStudiosArt);
-    text->credits[CREDIT_DIRECTOR] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Director);
-    text->credits[CREDIT_PLAYER_ROLE] = GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + Bank0313_Text_Kid + sex);
+    text->credits[CREDIT_SCREENPLAY] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Screenplay);
+    text->credits[CREDIT_VFX] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Vfx);
+    text->credits[CREDIT_ART] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_PokestarStudiosArt);
+    text->credits[CREDIT_DIRECTOR] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Director);
+    text->credits[CREDIT_PLAYER_ROLE] =
+        GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + PkwdBriefingCommon_Text_Kid + sex);
     text->credits[CREDIT_PLAYER_NAME] = PkwdBriefing_CreatePlayerName(param, heapId);
 
     msgData =
@@ -1469,7 +1468,7 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
 
     file = GFL_ArcSysReadHeapNew(ARCID_PKWD_MOVIE, movie, HEAPID_TAIL(heapId));
     text->credits[CREDIT_DIRECTOR_NAME] =
-        GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_DavidPokench + file->director);
+        GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_DavidPokench + file->director);
     starLevel = file->starLevel;
     GFL_HeapFree(file);
 
@@ -1859,7 +1858,7 @@ static BOOL PkwdBriefing_IsLastLine(PkwdBriefingWork *wk) {
 static void PkwdBriefingAudience_Init(PkwdBriefingAudience *audience, HeapID heapId) {
     s32 i;
 
-    audience->arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BRIEFING, heapId);
+    audience->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, heapId);
     audience->unit = func_0204bf1c(SEAT_COUNT, 1, heapId);
     audience->chars = func_0204b81c(audience->arc, FILE_AUDIENCE_CHARS, FALSE, 1, heapId);
     audience->cellAnims = func_0204bde0(audience->arc, FILE_AUDIENCE_CELLS, FILE_AUDIENCE_ANIMS, heapId);

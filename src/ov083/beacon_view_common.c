@@ -95,7 +95,7 @@ BeaconViewMenu *BeaconViewMenu_Create(u8 bg, u8 palette, Font *font, PrintQueue 
 
     menu->heapId = heapId;
     menu->res = AppTaskMenuRes_Create(bg, palette, font, queue, heapId);
-    menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0012, heapId);
+    menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BEACON_VIEW_COMMON, heapId);
     for (i = 0; i < BEACON_VIEW_MENU_STR_MAX; i++) {
         menu->strs[i] = GFL_MsgDataLoadStrbufNew(menu->msgData, i);
     }

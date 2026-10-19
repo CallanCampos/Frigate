@@ -1,0 +1,93 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_COMBEE", 35, 35 ],
+                [ "SPECIES_ROSELIA", 35, 35 ],
+                [ "SPECIES_SEWADDLE", 36, 36 ],
+                [ "SPECIES_TRANQUILL", 37, 37 ],
+                [ "SPECIES_HERACROSS", 36, 36 ],
+                [ "SPECIES_TRANQUILL", 36, 36 ],
+                [ "SPECIES_HERACROSS", 38, 38 ],
+                [ "SPECIES_SEWADDLE", 38, 38 ],
+                [ "SPECIES_ROSELIA", 37, 37 ],
+                [ "SPECIES_TRANQUILL", 38, 38 ],
+                [ "SPECIES_ROSELIA", 37, 37 ],
+                [ "SPECIES_TRANQUILL", 38, 38 ]
+            ],
+            "white2": [
+                [ "SPECIES_COMBEE", 35, 35 ],
+                [ "SPECIES_ROSELIA", 35, 35 ],
+                [ "SPECIES_SEWADDLE", 36, 36 ],
+                [ "SPECIES_TRANQUILL", 37, 37 ],
+                [ "SPECIES_PINSIR", 36, 36 ],
+                [ "SPECIES_TRANQUILL", 36, 36 ],
+                [ "SPECIES_PINSIR", 38, 38 ],
+                [ "SPECIES_SEWADDLE", 38, 38 ],
+                [ "SPECIES_ROSELIA", 37, 37 ],
+                [ "SPECIES_TRANQUILL", 38, 38 ],
+                [ "SPECIES_ROSELIA", 37, 37 ],
+                [ "SPECIES_TRANQUILL", 38, 38 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_COMBEE", 39, 39 ],
+                [ "SPECIES_ROSELIA", 39, 39 ],
+                [ "SPECIES_SEWADDLE", 40, 40 ],
+                [ "SPECIES_TRANQUILL", 41, 41 ],
+                [ "SPECIES_HERACROSS", 40, 40 ],
+                [ "SPECIES_TRANQUILL", 40, 40 ],
+                [ "SPECIES_HERACROSS", 42, 42 ],
+                [ "SPECIES_SEWADDLE", 42, 42 ],
+                [ "SPECIES_ROSELIA", 41, 41 ],
+                [ "SPECIES_TRANQUILL", 42, 42 ],
+                [ "SPECIES_ROSELIA", 41, 41 ],
+                [ "SPECIES_TRANQUILL", 42, 42 ]
+            ],
+            "white2": [
+                [ "SPECIES_COMBEE", 39, 39 ],
+                [ "SPECIES_ROSELIA", 39, 39 ],
+                [ "SPECIES_SEWADDLE", 40, 40 ],
+                [ "SPECIES_TRANQUILL", 41, 41 ],
+                [ "SPECIES_PINSIR", 40, 40 ],
+                [ "SPECIES_TRANQUILL", 40, 40 ],
+                [ "SPECIES_PINSIR", 42, 42 ],
+                [ "SPECIES_SEWADDLE", 42, 42 ],
+                [ "SPECIES_ROSELIA", 41, 41 ],
+                [ "SPECIES_TRANQUILL", 42, 42 ],
+                [ "SPECIES_ROSELIA", 41, 41 ],
+                [ "SPECIES_TRANQUILL", 42, 42 ]
+            ]
+        },
+        "shaking_grass": [
+            [ "SPECIES_AUDINO", 35, 35 ],
+            [ "SPECIES_AUDINO", 35, 35 ],
+            [ "SPECIES_EMOLGA", 36, 36 ],
+            [ "SPECIES_DUNSPARCE", 36, 36 ],
+            [ "SPECIES_AUDINO", 37, 37 ],
+            [ "SPECIES_AUDINO", 37, 37 ],
+            [ "SPECIES_UNFEZANT", 38, 38 ],
+            [ "SPECIES_LEAVANNY", 38, 38 ],
+            [ "SPECIES_VESPIQUEN", 38, 38 ],
+            [ "SPECIES_ROSERADE", 38, 38 ],
+            [ "SPECIES_VESPIQUEN", 38, 38 ],
+            [ "SPECIES_ROSERADE", 38, 38 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

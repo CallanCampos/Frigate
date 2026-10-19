@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "White Smoke",
+    "description": "Prevents other Pokémon\nfrom lowering its stats."
+}

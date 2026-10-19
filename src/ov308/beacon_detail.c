@@ -40,11 +40,6 @@
 // sender was doing, and the touch bar turns to the log's other beacons. The ROM has no name for this file;
 // "beacon_detail.c" is a guess from its graphic file's, "beacon_detail_gra.c"
 
-// The screen's graphics, the town map's and the trainers that the Union Room shows players as
-#define ARCID_BEACON_DETAIL 171
-#define ARCID_TOWNMAP_GRA 84
-#define ARCID_UNION_VIEW 31
-
 // How many beacons the log's list shows at once
 #define LOG_LIST_ROWS 4
 
@@ -297,7 +292,7 @@ static void BeaconDetail_FreeData(BeaconDetailWork *work) {
 
 static void BeaconDetail_InitSystems(BeaconDetailWork *work) {
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 64, 128);
-    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON_DETAIL, work->heapId);
+    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON, work->heapId);
     GFL_TextRndUpdateColorIndexLUT(7, 8, 15);
     work->printQueue = func_020219a8(0x800, work->heapId);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, work->heapId);
@@ -413,7 +408,7 @@ static void BeaconDetail_LoadObjs(BeaconDetailWork *work, ArcTool *arc) {
     {
         BeaconDetailObjResFiles files = { CLACT_VRAM_MAIN, 10, 1, 0, 49, 65 };
 
-        unionArc = GFL_ArcSysCreateFileHandle(ARCID_UNION_VIEW, work->tailHeapId);
+        unionArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, work->tailHeapId);
         BeaconDetail_LoadObjRes(work, &work->unionRes, &files, unionArc);
     }
     work->unionPalette.file = GFL_ArcToolReadHeapNew(unionArc, 0, work->heapId);

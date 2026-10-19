@@ -1,5 +1,0 @@
-BridgeGateGate9_Text_HowPokemonUnderOcean = How was it?\nFor Pokémon under the ocean,{be00}\nthe world looks like that, doesn't it?
-BridgeGateGate9_Text_PathSeeRatherThan = The path is to see rather than to move.
-BridgeGateGate9_Text_ParasolFullTmsWould = My parasol is full of TMs.\nWould you like one?{be01}
-BridgeGateGate9_Text_FacadeFacadeWhenUsers = Facade! Facade!\nWhen the user's poisoned, paralyzed,{be00}\nor burned, its attack power doubles!
-BridgeGateGate9_Text_ItsSignExplainsMarine = It's a sign that explains\nthe Marine Tube.{be01}

@@ -34,7 +34,7 @@
 #include "system/time_icon.h"
 #include "system/version.h"
 #include "system/wordset.h"
-#include "text/system/0041.h"
+#include "text/system/game_clear_save.h"
 
 // The records that the first clear sets
 #define RECORD_CLEAR_PLAY_TIME 2
@@ -116,7 +116,7 @@ static BOOL GameClearSave_Init(GameProc *proc, u32 *state, void *param, void *wo
     save = GFL_ProcInitSubsystem(proc, sizeof(GameClearSave), HEAPID_GAME_CLEAR_SAVE);
     MIi_CpuClear32(0, save, sizeof(GameClearSave));
     save->heapId = HEAPID_GAME_CLEAR_SAVE;
-    save->msgBank = TEXT_BANK_0041;
+    save->msgBank = TEXT_BANK_GAME_CLEAR_SAVE;
     save->gameData = GSYS_GetGameData(gsys);
     save->playerInfo = GetGameDataPlayerInfo(save->gameData);
     if (func_0200746c(GameData_GetSaveControl(save->gameData))) {
@@ -163,7 +163,7 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
             break;
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        GameClearSave_PrintMessage(save, Bank0041_Text_SavingDontTurnOff, 0, 0);
+        GameClearSave_PrintMessage(save, GameClearSave_Text_SavingDontTurnOff, 0, 0);
         window = save->window;
         BmpWin_FlushChar(window);
         BmpWin_FlushMap(window);
@@ -217,7 +217,7 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
     case STATE_RESULT_MESSAGE:
         WaitIcon_Free(save->waitIcon);
         if (!save->cannotSave && save->saved) {
-            GameClearSave_PrintMessage(save, Bank0041_Text_SavedGame, 0, 0);
+            GameClearSave_PrintMessage(save, GameClearSave_Text_SavedGame, 0, 0);
             window = save->window;
             BmpWin_FlushChar(window);
             BmpWin_FlushMap(window);
@@ -226,7 +226,7 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
             *state = STATE_WAIT_MESSAGE;
             GFL_SndSEPlay(SEQ_SE_SAVE);
         } else {
-            GameClearSave_PrintMessage(save, Bank0041_Text_ThereAlreadySavedGame, 0, 0);
+            GameClearSave_PrintMessage(save, GameClearSave_Text_ThereAlreadySavedGame, 0, 0);
             window = save->window;
             BmpWin_FlushChar(window);
             BmpWin_FlushMap(window);

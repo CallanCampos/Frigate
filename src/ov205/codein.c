@@ -24,8 +24,6 @@
 // The code input screen's process. The ROM has no name for this file; "codein.c" is a guess from pokeplatinum, whose
 // code input screen has the same three files. Our names
 
-// The archive of the screen's graphics
-#define ARCID_CODEIN 58
 #define FRIEND_CODE_LENGTH 12
 
 static BOOL CodeIn_ProcInit(GameProc *proc, u32 *state, void *param, void *work);

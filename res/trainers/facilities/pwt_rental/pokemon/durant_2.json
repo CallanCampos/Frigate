@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DURANT",
+    "moves": [ "MOVE_DIG", "MOVE_IRON_DEFENSE", "MOVE_AGILITY", "MOVE_BATON_PASS" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_POWER_HERB",
+    "form": 0
+}

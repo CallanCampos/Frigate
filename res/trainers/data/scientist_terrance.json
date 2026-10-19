@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Terrance",
+    "class": "TRAINER_CLASS_SCIENTIST_M_52",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_SP_DEF" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GRIMER",
+            "form": 0,
+            "level": 18,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The fact that you are here means...\nthat you are also part of the sewer?!{be00}\nAll right! Then I will survey you, too!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Huh...? Where am I?\nWho are you?"
+        },
+        {
+            "type": 2,
+            "text": "What?! You mean that I got so\ncaught up in my survey of the sewer{be00}\nthat I ended up in the Relic Passage?!"
+        }
+    ]
+}

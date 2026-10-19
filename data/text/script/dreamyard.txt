@@ -1,6 +1,0 @@
-Dreamyard_Text_Shuaaan = Shuaaan!
-Dreamyard_Text_Shuaaaann = Shuaaaann!
-Dreamyard_Text_LatiosFlewOffInto = Latios flew off into\nthe distant sky...
-Dreamyard_Text_Huaaaan = Huaaaan!
-Dreamyard_Text_Huaaaaann = Huaaaaann!
-Dreamyard_Text_LatiasFlewOffInto = Latias flew off into\nthe distant sky...

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sid",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_STARYU",
+            "form": 0,
+            "level": 38,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BUIZEL",
+            "form": 0,
+            "level": 38,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Check out my lively Pokémon, which\nI've gathered from all around the{be00}\nUnova region!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Mmm hmm! Looks like you are\neven more lively and fresh!"
+        },
+        {
+            "type": 2,
+            "text": "As long as you've got momentum,\nyou don't need experience or knowledge!"
+        }
+    ]
+}

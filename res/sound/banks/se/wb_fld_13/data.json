@@ -1,0 +1,18 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_FLD_FOOT_WATER", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_FLD_FOOT_WATER",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 125,
+            "pan": 64
+        }
+    ]
+}

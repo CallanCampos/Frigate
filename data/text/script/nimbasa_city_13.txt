@@ -1,5 +1,0 @@
-NimbasaCity13_Text_SportsGameLikeBaseball = A sports game, like baseball or football,\nstarts at a certain time every day.{be01}\nThat's in Big Stadium!
-NimbasaCity13_Text_SmallCourtCanFind = In the Small Court, you can find games of\nbasketball and tennis.
-NimbasaCity13_Text_OhOhSeemsLike = Oh...?{be01}\nOh, my!{be01}\nYour {0101:0} seems to like you!{be01}\nThat's so nice to see. Makes me want\nto give you this!{be01}
-NimbasaCity13_Text_IfPokemonHoldsSoothe = If a Pokémon holds a Soothe Bell, it will\nbecome more friendly to you.
-NimbasaCity13_Text_OhOhSFeelings = Oh...?{be01}\nOh, my!{be01}\nYour {0101:0}'s feelings\ntoward you seem to be neutral.{be01}\nIf you can win its friendship,\nI will give you something nice!

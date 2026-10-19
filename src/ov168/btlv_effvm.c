@@ -13,6 +13,7 @@
 #include "battle/btlv_effect.h"
 #include "battle/btlv_gauge.h"
 #include "battle/btlv_mcss.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -1869,8 +1870,8 @@ static BOOL BtlvEffvm_CmdLoadBg(VM *vm, void *env) {
     u32 fileId = VM_Read32(vm);
 
     GFL_BGSysSetBGPriority(3, 1);
-    GFL_BGSysLoadNCGRStatic(94, fileId + 1, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
-    loadBGScrToVramByNarcNoReserveNegAlign(94, fileId, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
+    GFL_BGSysLoadNCGRStatic(ARCID_BTLV_EFFVM_BG, fileId + 1, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_BTLV_EFFVM_BG, fileId, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
     PaletteFade_LoadNCLREx(BtlvEffect_GetPaletteFade(), 94, fileId + 2, HEAPID_TAIL(wk->heapId), 0, 0, 0x80, 0);
     wk->bgX = GFL_BGSysGetBGOffsetX(3);
     wk->bgY = GFL_BGSysGetBGOffsetY(3);
@@ -1919,7 +1920,7 @@ static BOOL BtlvEffvm_CmdBgPalAnim(VM *vm, void *env) {
 
     work->wk = wk;
     work->loops = loops;
-    data = GFL_ArcSysReadHeapNewLZ(231, fileId, FALSE, HEAPID_TAIL(wk->heapId));
+    data = GFL_ArcSysReadHeapNewLZ(ARCID_BTLV_EFFVM_PAL_ANIM, fileId, FALSE, HEAPID_TAIL(wk->heapId));
     work->fileId = fileId + 1;
     palettes = data;
     for (i = 0; *palettes != 0xff; i++) {
@@ -2097,8 +2098,6 @@ static BOOL BtlvEffvm_CmdClactDelete(VM *vm, void *env) {
     return wk->ret;
 }
 
-// NONMATCHING: the original keeps &positions in r6 from the prologue on and recomputes &offset at each use; this
-// keeps &offset in r6 and recomputes &positions, 2 bytes longer
 static BOOL BtlvEffvm_CmdGauge(VM *vm, void *env) {
     BtlvEffvm *wk = env;
     u32 mode = VM_Read32(vm);
@@ -2136,21 +2135,24 @@ static BOOL BtlvEffvm_CmdGauge(VM *vm, void *env) {
         case 0:
             for (i = 0; i < 8; i += 2) {
                 if (BtlvEffect_CheckExist(i)) {
-                    positions[count++] = i;
+                    positions[count] = i;
+                    count++;
                 }
             }
             break;
         case 1:
             for (i = 1; i < 8; i += 2) {
                 if (BtlvEffect_CheckExist(i)) {
-                    positions[count++] = i;
+                    positions[count] = i;
+                    count++;
                 }
             }
             break;
         case 2:
             for (i = 0; i < 8; i++) {
                 if (BtlvEffect_CheckExist(i)) {
-                    positions[count++] = i;
+                    positions[count] = i;
+                    count++;
                 }
             }
             break;
@@ -2165,16 +2167,14 @@ static BOOL BtlvEffvm_CmdGauge(VM *vm, void *env) {
         if (count != 0) {
             for (i = 0; i < count; i++) {
                 ClActorPos offset = { 0, 0 };
+                int *pos;
 
-                if (mode == 2) {
-                    offset.x = 128;
-                } else {
-                    offset.x = -16;
-                }
-                if (positions[i] & 1) {
+                offset.x = mode == 2 ? 128 : -16;
+                pos = &positions[i];
+                if (*pos & 1) {
                     offset.x *= -1;
                 }
-                BtlvGauge_SetPos(BtlvEffect_GetGauge(), positions[i], &offset);
+                BtlvGauge_SetPos(BtlvEffect_GetGauge(), *pos, &offset);
             }
         }
     }
@@ -3114,7 +3114,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
             case 9:
             case 13:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    positions[0] = (wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4024[wk->attacker];
@@ -3126,7 +3126,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
                 break;
             case 11:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    positions[0] = (wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4044[wk->attacker];
@@ -3346,7 +3346,6 @@ static u32 BtlvEffvm_GetEmitterCount(BtlvEffvm *wk, int index) {
     return wk->emitterCounts[index];
 }
 
-// NONMATCHING: the swap of motion type 4 is scheduled differently (from.z spilled, stores interleaved)
 static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
     BtlvEffvmEmitParam *param = func_02050188();
     BOOL flip = param->flip;
@@ -3533,16 +3532,19 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
             work->height = param->motionHeight;
         }
         if (param->motionType == 4) {
-            fx32 x = from.x;
-            fx32 y = from.y;
-            fx32 z = from.z;
+            fx32 x;
+            fx32 y;
+            fx32 z;
 
+            x = from.x;
             from.x = to.x;
+            y = from.y;
             from.y = to.y;
+            z = from.z;
             from.z = to.z;
-            to.x += x;
-            to.y += y;
-            to.z += z;
+            to.x = x + from.x;
+            to.y = y + from.y;
+            to.z = z + from.z;
         }
         dir.x = to.x - from.x;
         dir.y = to.y - from.y;
@@ -3591,7 +3593,7 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         emitterAxis.x = vec.x;
         emitterAxis.y = vec.y;
         emitterAxis.z = vec.z;
-        if (!((angle >= 0x2000 && angle <= 0x6000) || (angle >= 0xa000 && angle <= 0xe000))) {
+        if (angle < 0x2000 || (angle > 0x6000 && angle < 0xa000) || angle > 0xe000) {
             spinAxis = 0;
         }
         func_02050328(emitter, &spinAxis);
@@ -4283,8 +4285,6 @@ static void BtlvEffvm_BgmFadeTask(TCB *tcb, void *data) {
     }
 }
 
-// NONMATCHING: the original masks the vertical bounds with 0xffff (an `ands` against a mask built as 0xff << 8 | 0xff,
-// shared by both stores) where MWCC drops the mask under the 16-bit store, and loads winV before winH, 12 bytes
 static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
     BtlvEffvmWindowWork *work = data;
 
@@ -4294,8 +4294,7 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
         G2_SetWnd1InsidePlane(work->winInOut & 0xff, FALSE);
         G2_SetWndOutsidePlane((work->winInOut & 0xff00) >> 8, FALSE);
         GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
-        reg_G2_WIN1H = 0;
-        reg_G2_WIN1V = 0;
+        G2_SetWnd1Position(0, 0, 0, 0);
         work->state++;
     case 1:
         if (work->wait == 0) {
@@ -4318,14 +4317,11 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
                 work->winH--;
                 break;
             }
-            reg_G2_WIN0H = work->winH;
-            reg_G2_WIN0V = work->winV & 0xffff;
+            G2_SetWnd0Position(work->winH >> 8, work->winV >> 8, work->winH & 0xff, work->winV & 0xff);
             if ((u8)work->winH == 0xff) {
-                reg_G2_WIN1H = 0x100;
-                reg_G2_WIN1V = work->winV & 0xffff;
+                G2_SetWnd1Position(1, work->winV >> 8, 256, work->winV & 0xff);
             } else {
-                reg_G2_WIN1H = 0;
-                reg_G2_WIN1V = 0;
+                G2_SetWnd1Position(0, 0, 0, 0);
             }
             if (--work->count == 0) {
                 BtlvEffect_EndTask(tcb);
@@ -4415,7 +4411,7 @@ static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data) {
             return;
         }
         offset = (work->palettes[work->index] - 8) * 16;
-        file = GFL_G2DIOReadNCLR(231, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
+        file = GFL_G2DIOReadNCLR(ARCID_BTLV_EFFVM_PAL_ANIM, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
         MIi_CpuCopy16((u16 *)palette->rawData + offset,
                       PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 0) + 0x80, 0x20);
         PaletteFade_ApplyPalette(BtlvEffect_GetPaletteFade(), 8, 0);

@@ -1,0 +1,54 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rosaline",
+    "class": "TRAINER_CLASS_VETERAN_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CROBAT",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_CROSS_POISON", "MOVE_U_TURN", "MOVE_RAIN_DANCE", "MOVE_SUNNY_DAY" ]
+        },
+        {
+            "species": "SPECIES_MAGMORTAR",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FLARE_BLITZ", "MOVE_PSYCHIC", "MOVE_THUNDERBOLT", "MOVE_WILL_O_WISP" ]
+        },
+        {
+            "species": "SPECIES_LEAFEON",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_LEAF_BLADE", "MOVE_X_SCISSOR", "MOVE_QUICK_ATTACK", "MOVE_SWORDS_DANCE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Let me show you the Pokémon that I\nmet by fate!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The Pokémon that you've met are quite\nformidable, aren't they?"
+        },
+        {
+            "type": 2,
+            "text": "Young kids sure have it good.\nThey get to meet all kinds of Pokémon!"
+        }
+    ]
+}

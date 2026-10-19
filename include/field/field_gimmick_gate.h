@@ -36,4 +36,7 @@ void func_ov104_021eed00(Field *field);
 void func_ov104_021eed20(Field *field);
 u32 func_ov104_021eed44(Field *field);
 
+// Script command 0x17a: plays a sound and runs the news board's event for as long as the script says
+BOOL func_ov104_021efb90(VM *vm, FieldScriptEnv *env);
+
 #endif // POKEBW2_FIELD_FIELD_GIMMICK_GATE_H

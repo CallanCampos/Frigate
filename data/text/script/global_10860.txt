@@ -1,3 +1,0 @@
-Global10860_Text_XtransceiverRinging = The Xtransceiver is ringing!
-Global10860_Text_PickedUpXtransceiver = {0100:0} picked up\nthe Xtransceiver.{be01}
-\pad{4e}

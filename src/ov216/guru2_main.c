@@ -57,10 +57,6 @@
 // disc, which the parent spins while every player's touches of the button make the Eggs jump; when the time is up
 // each player takes the Egg in front of them, and those whose Egg stopped on a bonus area get a Berry. Names are ours
 
-// The Spin Trade's archives, which constants/arc.h doesn't have yet: its models and BGs, and the countdown's actor
-#define ARCID_GURU2 180
-#define ARCID_GURU2_OBJ 181
-
 // The class of the timing syncs
 #define GURU2_SYNC_CLASS 0x28
 enum {

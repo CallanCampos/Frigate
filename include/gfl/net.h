@@ -262,7 +262,7 @@ u8 func_02042a48(void);
 void func_02042a50(int a0);
 u8 func_02042a6c(NetHandle *handle);
 int func_02042a78(void);
-BOOL func_02042a80(int netId);
+BOOL func_02042a80(u8 netId);
 void func_02042a9c(NetHandle *handle, int a1);
 BOOL func_02042ab8(void);
 // Whether the network is infrared, or Wi-Fi

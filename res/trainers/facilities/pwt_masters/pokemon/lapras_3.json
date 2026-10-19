@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LAPRAS",
+    "moves": [ "MOVE_ICE_BEAM", "MOVE_HYDRO_PUMP", "MOVE_ICE_SHARD", "MOVE_THUNDERBOLT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

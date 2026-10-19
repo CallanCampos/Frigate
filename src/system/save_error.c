@@ -29,8 +29,7 @@
 #define SAVE_ERROR_NO_RESPONSE 1
 #define SAVE_ERROR_WRITE 2
 
-// The archive of the window's graphics, and its files
-#define ARCID_SAVE_ERROR_GRA 22
+// The files of the window's graphics in ARCID_ERROR_WINDOW_GRA
 #define SAVE_ERROR_GRA_PLTT 0
 #define SAVE_ERROR_GRA_CHAR 1
 #define SAVE_ERROR_GRA_SCRN 2
@@ -112,21 +111,21 @@ static void displayLightBlueErrorWindow(void) {
 
     MIi_CpuClear32(0, G2_GetBG1CharPtr(), 0x4000);
 
-    file = GFL_ArcSysReadHeapNewLZ(ARCID_SAVE_ERROR_GRA, SAVE_ERROR_GRA_CHAR, FALSE, HEAPID_SAVEDATA);
+    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_CHAR, FALSE, HEAPID_SAVEDATA);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
         DC_FlushRange(chars->rawData, chars->size);
         MI_CpuCopy16(chars->rawData, G2_GetBG1CharPtr(), chars->size);
     }
     GFL_HeapFree(file);
 
-    file = GFL_ArcSysReadHeapNewLZ(ARCID_SAVE_ERROR_GRA, SAVE_ERROR_GRA_SCRN, FALSE, HEAPID_SAVEDATA);
+    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_SCRN, FALSE, HEAPID_SAVEDATA);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
         DC_FlushRange(screen->rawData, screen->size);
         MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->size);
     }
     GFL_HeapFree(file);
 
-    file = GFL_ArcSysReadHeapNewLZ(ARCID_SAVE_ERROR_GRA, SAVE_ERROR_GRA_PLTT, FALSE, HEAPID_SAVEDATA);
+    file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, SAVE_ERROR_GRA_PLTT, FALSE, HEAPID_SAVEDATA);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
         DC_FlushRange(palette->rawData, 0x20);

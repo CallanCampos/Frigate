@@ -1,7 +1,0 @@
-NimbasaCity10_Text_PokemonTennisWonderfulPlayers = Pokémon tennis is wonderful!{be01}\nPlayers are never alone.\nTheir Pokémon are always with them!
-NimbasaCity10_Text_TennisAllAboutRackets = Tennis is all about rackets and balls.\nThere's nothing profound about it.
-NimbasaCity10_Text_AmBallBoyWho = I am a ball boy who collects\ntennis balls.{be01}\nYou are a Pokémon Trainer who\ncollects Pokémon.
-NimbasaCity10_Text_BecomeBallBoysWe = To become ball boys,\nwe gotta practice.
-NimbasaCity10_Text_Woowoof = Woowoof!
-NimbasaCity10_Text_Yap = Yap!
-\pad{a0}

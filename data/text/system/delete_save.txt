@@ -1,3 +1,0 @@
-DeleteSave_Text_DeleteAllSavedData = Delete all saved data?
-DeleteSave_Text_OnceSavedDataHas = Once the saved data has been deleted,\nthere is no way to recover it.{be01}\nIs it really OK to delete\nall saved data?
-DeleteSave_Text_DeletingAllSavedData = Deleting all saved data...\nDon't turn off the power.

@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Braven",
+    "class": "TRAINER_CLASS_POLICEMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GROWLITHE",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_EMBER", "MOVE_BITE", "MOVE_ODOR_SLEUTH", "MOVE_LEER" ]
+        },
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_TACKLE", "MOVE_BITE", "MOVE_ODOR_SLEUTH", "MOVE_WORK_UP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Ah, that smell?{be01}\nMy Herdier here seems to say that\nyou've got a dangerous smell about you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I see... Your strength is\ncertainly quite dangerous..."
+        },
+        {
+            "type": 2,
+            "text": "Just because you're strong doesn't mean\nyou can look down on those who aren't!"
+        }
+    ]
+}

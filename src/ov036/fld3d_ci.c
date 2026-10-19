@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "field/battle_cutin.h"
 #include "field/encounter_effect.h"
@@ -1262,8 +1263,8 @@ static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *p
     palAddr = NNS_G3DResTexGetPltRAMAddress(tex, palName);
     ci->character = NULL;
     ci->palette = NULL;
-    ci->charData = GFL_G2DIOReadBGNCGR(0x10b, charFile, TRUE, &ci->character, heapId);
-    ci->paletteData = GFL_G2DIOReadNCLR(0x10b, palFile, &ci->palette, heapId);
+    ci->charData = GFL_G2DIOReadBGNCGR(ARCID_FLD3D_CI, charFile, TRUE, &ci->character, heapId);
+    ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FLD3D_CI, palFile, &ci->palette, heapId);
     charRaw = ci->character->rawData;
     pixels = GFL_BitmapGetPixelData(ci->bitmap);
     size = height * width * 32;

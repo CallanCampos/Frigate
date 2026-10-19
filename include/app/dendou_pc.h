@@ -12,8 +12,6 @@
 
 // The screen's heap, a child of HEAPID_USER
 #define HEAPID_DENDOU_PC 0x8c
-// The screen's graphics
-#define ARCID_DENDOU_PC 210
 
 // What the screen shows
 enum {

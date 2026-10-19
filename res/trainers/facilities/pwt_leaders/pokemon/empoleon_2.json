@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_EMPOLEON",
+    "moves": [ "MOVE_DRILL_PECK", "MOVE_AQUA_JET", "MOVE_METAL_CLAW", "MOVE_FEATHER_DANCE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_MUSCLE_BAND",
+    "form": 0
+}

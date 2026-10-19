@@ -1,0 +1,6 @@
+AspertiaCity8_Text_FlakyFortuneTellingSays = My flaky fortune-telling says that\nyou'll meet a Pokémon!
+AspertiaCity8_Text_GoingNextTownBig = Going to the next town was a big\nadventure when I was a kid!{be01}\nOh yeah! Here, I'll give you something\nI always used to take with me back then!{be01}\nUm... Now, where is it?\nI'll look for it! Sorry!
+AspertiaCity8_Text_OhAlreadyHaveGym = Oh! You already have a Gym Badge!{be01}\nThis is a present from me!\nI hope it helps you out!{be01}
+AspertiaCity8_Text_UltraBallReallyGood = The Ultra Ball is really good.\nIt performs much better{be00}\nthan a regular Poké Ball!
+AspertiaCity8_Text_WonderIfTheresPokemon = I wonder if there's a Pokémon that was\ndropped on the ground somewhere...
+AspertiaCity8_Text_ItsWorstWhenFind = It's the worst when you find the Pokémon\nyou were looking for and you don't{be00}\nhave any Poké Balls.

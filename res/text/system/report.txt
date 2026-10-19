@@ -1,0 +1,11 @@
+Report_Text_SData = {0100:0}'s Data
+Report_Text_20 = {0201:1}/{0201:2}/20{0201:0}
+Report_Text_Empty = {0201:0}:{0201:1}
+Report_Text_Empty_2 = {0105:0}
+Report_Text_GymBadges = Gym Badges: {0201:0}
+Report_Text_Pokedex = Pokédex: {0202:0}
+Report_Text_Time = Time: {0202:0}:{0201:1}
+Report_Text_LastSaved20 = {bd02}Last saved on {0201:1}/{0201:2}/20{0201:0} at {0201:3}:{0201:4}
+Report_Text_Yes = YES
+Report_Text_No = NO
+\pad{70}

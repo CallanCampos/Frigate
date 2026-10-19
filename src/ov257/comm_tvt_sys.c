@@ -56,8 +56,6 @@
 #define COMM_TVT_PALETTE_FRAMES 10
 #define COMM_TVT_OBJ_RESOURCES 11
 
-#define ARC_COMM_TVT 170
-
 enum {
     COMM_TVT_START_WAIT,
     COMM_TVT_START_CALL,
@@ -136,54 +134,16 @@ static BOOL CommTvt_ProcExit(GameProc *proc, u32 *state, void *param, void *work
 static const u8 sTalkerCursorX[COMM_TVT_MEMBERS] = { 88, 88, 184, 184 };
 static const u8 sTalkerCursorY[COMM_TVT_MEMBERS] = { 72, 200, 72, 200 };
 
+// Declared in an order that gives the original layout of the data (tools/decomp/rodata_order.py)
+static const BGSysVRAMConfig sCommTvtVRAMConfig = {
+    GX_VRAM_BG_256_AB, GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
+    GX_VRAM_OBJ_16_F,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
+};
+
 static const BGSysLCDConfig sCommTvtLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BGMODE_0, GX_BG0_AS_2D };
 
 // The video's bitmaps (BG 2 and BG 3) are made in CommTvt_InitGraphics
-static const BGSetup sCommTvtBG7Setup = {
-    0,
-    0,
-    0x800,
-    0,
-    BGRES_256x256,
-    GX_BG_COLORMODE_16,
-    GX_BG_SCRBASE(0x7800),
-    GX_BG_CHARBASE(0x08000),
-    0x8000,
-    GX_BG_EXTPLTT_23,
-    3,
-    GX_BG_AREAOVER_XLU,
-    FALSE,
-};
-static const BGSetup sCommTvtBG6Setup = {
-    0,
-    0,
-    0x1000,
-    0,
-    BGRES_256x512,
-    GX_BG_COLORMODE_16,
-    GX_BG_SCRBASE(0x6800),
-    GX_BG_CHARBASE(0x10000),
-    0x8000,
-    GX_BG_EXTPLTT_23,
-    2,
-    GX_BG_AREAOVER_XLU,
-    FALSE,
-};
-static const BGSetup sCommTvtBG0Setup = {
-    0,
-    0,
-    0x800,
-    0,
-    BGRES_256x256,
-    GX_BG_COLORMODE_16,
-    GX_BG_SCRBASE(0x7000),
-    GX_BG_CHARBASE(0x00000),
-    0x7000,
-    GX_BG_EXTPLTT_23,
-    0,
-    GX_BG_AREAOVER_XLU,
-    FALSE,
-};
 static const BGSetup sCommTvtBG4Setup = {
     0,
     0,
@@ -214,7 +174,22 @@ static const BGSetup sCommTvtBG5Setup = {
     GX_BG_AREAOVER_XLU,
     FALSE,
 };
-static const BGSetup sCommTvtBG1Setup = {
+static const BGSetup sCommTvtBG6Setup = {
+    0,
+    0,
+    0x1000,
+    0,
+    BGRES_256x512,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x6800),
+    GX_BG_CHARBASE(0x10000),
+    0x8000,
+    GX_BG_EXTPLTT_23,
+    2,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
+};
+static const BGSetup sCommTvtBG7Setup = {
     0,
     0,
     0x800,
@@ -229,11 +204,35 @@ static const BGSetup sCommTvtBG1Setup = {
     GX_BG_AREAOVER_XLU,
     FALSE,
 };
-
-static const BGSysVRAMConfig sCommTvtVRAMConfig = {
-    GX_VRAM_BG_256_AB, GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
-    GX_VRAM_OBJ_16_F,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
+static const BGSetup sCommTvtBG0Setup = {
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7000),
+    GX_BG_CHARBASE(0x00000),
+    0x7000,
+    GX_BG_EXTPLTT_23,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
+};
+static const BGSetup sCommTvtBG1Setup = {
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7800),
+    GX_BG_CHARBASE(0x08000),
+    0x8000,
+    GX_BG_EXTPLTT_23,
+    3,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static inline void CommTvt_CreateNameWindows(CommTvtWork *sys) {
@@ -550,11 +549,11 @@ static void CommTvt_CreateBG(const BGSetup *setup, u8 bg, u8 mode) {
 static void CommTvt_LoadResources(CommTvtWork *sys) {
     PlayerInfo *player = GetGameDataPlayerInfo(sys->param->gameData);
     ArcTool *arc;
-    NNSG2dPaletteData *palette;
     ClActorSetup setup;
+    NNSG2dPaletteData *palette;
     void *file;
 
-    sys->arc = GFL_ArcSysCreateFileHandle(ARC_COMM_TVT, sys->heapId);
+    sys->arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, sys->heapId);
     if (getTrainerGender(player) == GENDER_MALE) {
         GFL_G2DIOLoadArcNCLRDefault(sys->arc, 7, 4, 0, 0xc0, sys->heapId);
     } else {
@@ -600,7 +599,11 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
     func_0204c124(sys->talkerCursor, FALSE);
     func_0204c520(sys->talkerCursor, TRUE);
 
-    file = GFL_G2DIOReadNCLRArc(sys->arc, getTrainerGender(player) == GENDER_MALE ? 7 : 6, &palette, sys->heapId);
+    if (getTrainerGender(player) == GENDER_MALE) {
+        file = GFL_G2DIOReadNCLRArc(sys->arc, 7, &palette, sys->heapId);
+    } else {
+        file = GFL_G2DIOReadNCLRArc(sys->arc, 6, &palette, sys->heapId);
+    }
     MIi_CpuCopy32((u8 *)palette->rawData + 0xc0, sys->palettes, sizeof(sys->palettes));
     GFL_HeapFree(file);
 }
@@ -1168,7 +1171,7 @@ static BOOL CommTvt_ProcMain(GameProc *proc, u32 *state, void *param, void *work
     return FALSE;
 }
 
-const GameProcFunctions COMM_TVT_PROC_FUNCTIONS = {
+GameProcFunctions COMM_TVT_PROC_FUNCTIONS = {
     CommTvt_ProcInit,
     CommTvt_ProcMain,
     CommTvt_ProcExit,

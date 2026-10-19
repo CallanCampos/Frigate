@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Radolf",
+    "class": "TRAINER_CLASS_HIKER",
+    "pokemon": [
+        "metapod_1",
+        "kakuna_1",
+        "silcoon_1",
+        "cascoon_1",
+        "seedot_1",
+        "venipede_1",
+        "nincada_1",
+        "roggenrola_1",
+        "pineco_1",
+        "bonsly_1",
+        "geodude_1",
+        "beldum_1",
+        "yamask_1",
+        "shellder_1",
+        "sewaddle_1",
+        "aron_1",
+        "hippopotas_1",
+        "koffing_1",
+        "rhyhorn_1",
+        "clamperl_1"
+    ]
+}

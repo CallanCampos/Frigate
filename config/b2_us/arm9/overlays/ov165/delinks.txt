@@ -11,6 +11,7 @@ src/ov165/pokelist.c:
     .bss        start:0x021a4d40 end:0x021a4d44
 
 src/ov165/plist_sys.c:
+    complete
     .text       start:0x02199b88 end:0x0219e678
     .rodata     start:0x021a49dc end:0x021a4be0
 
@@ -74,6 +75,7 @@ lib/dsprot/src/dsprot_detect.c:
     .ctor       start:0x021a4cd4 end:0x021a4cd8
 
 lib/dsprot/src/dsprot_cipher_entry.c:
+    complete
     .rodata     start:0x021a4cac end:0x021a4cb4
 
 lib/dsprot/src/dsprot_cipher.c:

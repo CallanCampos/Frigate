@@ -1,0 +1,3 @@
+BridgeGate2_Text_HelloIfCrossSkyarrow = Hello! If you cross the Skyarrow Bridge\nfrom here, you'll reach Castelia City.
+BridgeGate2_Text_TheySaySkyarrowBridge = They say the Skyarrow Bridge was built\nas a result of the tireless pursuit{be00}\nof a safe and sturdy structure.{be01}\nI wonder what kind of Pokémon built it\nand how they felt while building it.
+BridgeGate2_Text_UseFlyYoullThere = Use Fly, and you'll be there in no time!{be01}\nBut some people prefer to cross\nthat bridge to go to Castelia City.

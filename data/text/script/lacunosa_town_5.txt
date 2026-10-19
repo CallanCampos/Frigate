@@ -1,3 +1,0 @@
-LacunosaTown5_Text_ThereLotPeopleWorld = There are a lot of people in the world,\nand there are just as many different{be00}\ncharacteristics and ideas.{be01}\nI think I'd be really happy if I could\nmeet a lot of people and see the{be00}\ndifferences for myself!
-LacunosaTown5_Text_WorkAlwaysKeepsVery = My work always keeps me very busy, so\nI'm thrilled if I can go home at night.{be01}\nI'm sorry to leave my wife lonely, but\nthat's the life of a powerful executive.{be01}\nOh, this is a souvenir from a business\ntrip. She does not seem to need it,{be00}\nso I will give it to you.{be01}
-LacunosaTown5_Text_TomorrowItsWorkAlways = Tomorrow it's work as always!{be01}\nI'm a super businessman, aren't I?

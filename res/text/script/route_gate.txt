@@ -1,0 +1,3 @@
+RouteGate_Text_RelicCastleDesertResort = The Relic Castle in the Desert Resort.{be01}\nYou can tell just by looking at it\nthat time has been cruel.
+RouteGate_Text_ImSchoolKidIll = I'm a School Kid, and I'll tell you this.{be01}\nJust like in caves, you can run into\nPokémon almost anywhere in the desert.{be01}\nBut they don't like hiding in the pale\nsand. So if you walk there, you won't{be00}\nhave to worry about battling.
+\pad{e2}

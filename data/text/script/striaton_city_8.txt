@@ -1,6 +1,0 @@
-StriatonCity8_Text_IveTrainedOnlyFire = I've trained only Fire-type Pokémon,\n'cause they're my favorites!{be01}\nThey don't do well against Water-, Rock-,\nor Ground-type Pokémon and moves.{be01}\nBut thinking about how to compensate\nfor that is one of the fun things{be00}\nabout being a Trainer.
-StriatonCity8_Text_SometimesLookThroughPc = Sometimes I look through my PC Box and\npick out an interesting Pokémon to raise!{be01}\nThere are so many things you never\nknow until you raise a certain Pokémon.
-StriatonCity8_Text_Skreee = Skreee!
-StriatonCity8_Text_FweeOosh = Fwee-oosh!
-StriatonCity8_Text_FweeLeeLee = Fwee lee lee... ♪
-\pad{7a}

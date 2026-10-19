@@ -23,9 +23,6 @@
 // this file's data is laid out apart from that one's): the BG's files, the windows and their printing, the touch
 // rectangles, the actors, and the flash of the choice made.
 
-// The battle's graphics archive, and the one of the actors of the cursor
-#define ARCID_BATTLE_SCENARIO 100
-#define ARCID_BATTLE_CURSOR 11
 // The files of the type icons' palette, cells and animations in the menus' archive
 #define FILE_TYPE_PALETTE 0x21
 #define FILE_TYPE_CELLS 0x3b
@@ -270,7 +267,7 @@ void BScenarioGraphic_LoadBG(BScenarioWork *work) {
     ArcTool *arc;
     const BScenarioPaletteLoad *paletteLoad;
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_SCENARIO, HEAPID_TAIL(heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, HEAPID_TAIL(heapId));
     paletteLoad = &sBScenarioPaletteLoads[(u32)sBScenarioGraphicSeries[work->param->scenario] % 4];
     GFL_G2DIOLoadArcNCLRDefault(arc, paletteLoad->fileId, paletteLoad->type, paletteLoad->offset, 0, heapId);
     for (i = 0; i < 8; i++) {
@@ -444,7 +441,7 @@ static void BScenarioGraphic_LoadIconResources(BScenarioWork *work) {
 }
 
 static void BScenarioGraphic_LoadCursorResources(BScenarioWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_CURSOR, HEAPID_TAIL(work->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(work->param->heapId));
 
     work->palettes[BSCENARIO_RES_CURSOR] = func_0204bbb8(arc, FILE_CURSOR_PALETTE, 1, 0xe0, 4, 1, work->param->heapId);
     work->cells[BSCENARIO_RES_CURSOR] = func_0204bde0(arc, FILE_CURSOR_CELLS, FILE_CURSOR_ANIMS, work->param->heapId);
@@ -453,7 +450,7 @@ static void BScenarioGraphic_LoadCursorResources(BScenarioWork *work) {
 }
 
 static void BScenarioGraphic_LoadButtonResources(BScenarioWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_SCENARIO, HEAPID_TAIL(work->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, HEAPID_TAIL(work->param->heapId));
 
     work->palettes[BSCENARIO_RES_BUTTON] = func_0204bbb8(arc, FILE_BUTTON_PALETTE, 1, 0x100, 0, 5, work->param->heapId);
     work->cells[BSCENARIO_RES_BUTTON] = func_0204bde0(arc, FILE_BUTTON_CELLS, FILE_BUTTON_ANIMS, work->param->heapId);

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VESPIQUEN",
+    "moves": [ "MOVE_DEFEND_ORDER", "MOVE_TOXIC", "MOVE_PROTECT", "MOVE_HEAL_ORDER" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_SASSY",
+    "item": "ITEM_QUICK_CLAW",
+    "form": 0
+}

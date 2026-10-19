@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Anger Point",
-    "description": "Maxes Attack after\ntaking a critical hit."
-}

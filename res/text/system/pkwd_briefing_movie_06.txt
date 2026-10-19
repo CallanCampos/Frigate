@@ -1,0 +1,22 @@
+PkwdBriefingMovie06_Text_UnableTolerateNinjasConstant = {bd02}Unable to tolerate\n{bd02}the {0102:0} Ninja's\n{bd02}constant escapes any longer,\n{bd02}the World Police finally\n{bd02}put a plan to capture him into motion.
+PkwdBriefingMovie06_Text_ThenMechaCopsExploits = {bd02}Then, Mecha Cop's exploits\n{bd02}drove the {0102:0} Ninja\n{bd02}into the heart of Castelia City!
+PkwdBriefingMovie06_Text_Empty = なし
+PkwdBriefingMovie06_Text_Empty_2 = なし
+PkwdBriefingMovie06_Text_Empty_3 = なし
+PkwdBriefingMovie06_Text_Empty_4 = なし
+PkwdBriefingMovie06_Text_Empty_5 = なし
+PkwdBriefingMovie06_Text_Empty_6 = なし
+PkwdBriefingMovie06_Text_Empty_7 = なし
+PkwdBriefingMovie06_Text_Empty_8 = なし
+PkwdBriefingMovie06_Text_UnableTolerateNinjasConstant_2 = {bd02}Unable to tolerate\n{bd02}the {0102:0} Ninja's\n{bd02}constant escapes any longer,\n{bd02}the World Police finally\n{bd02}put a plan to capture her into motion.
+PkwdBriefingMovie06_Text_ThenMechaCopsExploits_2 = {bd02}Then, Mecha Cop's exploits\n{bd02}drove the {0102:0} Ninja\n{bd02}into the heart of Castelia City!
+PkwdBriefingMovie06_Text_Empty_9 = なし
+PkwdBriefingMovie06_Text_Empty_10 = なし
+PkwdBriefingMovie06_Text_Empty_11 = なし
+PkwdBriefingMovie06_Text_Empty_12 = なし
+PkwdBriefingMovie06_Text_Empty_13 = なし
+PkwdBriefingMovie06_Text_Empty_14 = なし
+PkwdBriefingMovie06_Text_Empty_15 = なし
+PkwdBriefingMovie06_Text_Empty_16 = なし
+PkwdBriefingMovie06_Text_Empty_17 = なし
+\pad{b4}
