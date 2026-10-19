@@ -6862,6 +6862,9 @@ overlays/ov012 0x0216ca74 HIDEN_EVENT_UNUSED
 overlays/ov012 0x0216cb74 sFieldMenuAppIds
 overlays/ov013 0x0216e660 EventBeaconDetail_Callback
 overlays/ov013 0x0216e770 EventBeaconDetail_Create
+overlays/ov014 0x0216e660 EventPassPower_SetupParam
+overlays/ov014 0x0216e73c EventPassPower_Callback
+overlays/ov014 0x0216e8ac EventPassPower_Create
 overlays/ov020 0x0216e660 EventPokeSelect_Create
 overlays/ov020 0x0216e6b4 EventMoveTutorPokeSelect_Create
 overlays/ov020 0x0216e714 EventMusicalPokeSelect_Create

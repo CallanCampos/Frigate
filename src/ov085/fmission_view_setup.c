@@ -221,7 +221,7 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         event = FMissionViewSetup_CreateCallEvent(
             view,
             GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_PASS_POWER,
-                                            (GameEventProvider)func_ov014_0216e8ac, &args),
+                                            (GameEventProvider)EventPassPower_Create, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_PASS_POWER);
         break;
     }

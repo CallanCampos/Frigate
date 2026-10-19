@@ -210,8 +210,8 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
     case BEACON_VIEW_EVENT_PASS_POWER: {
         u32 args = 0;
 
-        event =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(14), (GameEventProvider)func_ov014_0216e8ac, &args);
+        event = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(14), (GameEventProvider)EventPassPower_Create,
+                                                &args);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_PASS_POWER);
         break;
     }
