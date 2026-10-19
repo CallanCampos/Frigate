@@ -87,14 +87,14 @@ static void HandlerPosWish(BattleEventItem *item, BtlServerFlow *flow, u8 pos, s
     u8 wisherId;
     u8 targetId;
 
-    if (BattleEventVar_GetValue(2) == 0x1f && !func_ov167_021abf14(flow)) {
+    if (BattleEventVar_GetValue(2) == 0x1f && !BtlServerFlow_CheckMatchup(flow)) {
         if (work[0] == 0) {
             work[1] = GetTurnCounter(flow);
             work[0] = 1;
             return;
         }
         if (GetTurnCounter(flow) > (u32)work[1]) {
-            targetId = func_ov167_021abb60(flow, pos);
+            targetId = BtlServerFlow_PosToMonID(flow, pos);
             if (targetId != 0x1f && !IsMonFullHP(GetBattleMon(flow, targetId))) {
                 wisherId = work[6];
                 wisher = GetBattleMon(flow, wisherId);
@@ -134,7 +134,7 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
     BattleHandlerPPParam *pp;
 
     monId = BattleEventVar_GetValue(2);
-    if (pos != func_ov167_021abb50(flow, monId)) {
+    if (pos != BtlServerFlow_MonIDToPos(flow, monId)) {
         return;
     }
     mon = GetBattleMon(flow, monId);
@@ -208,7 +208,7 @@ static void HandlerPosHealingWish(BattleEventItem *item, BtlServerFlow *flow, u8
     BattleHandlerCureConditionParam *cure;
 
     monId = BattleEventVar_GetValue(2);
-    if (pos != func_ov167_021abb50(flow, monId)) {
+    if (pos != BtlServerFlow_MonIDToPos(flow, monId)) {
         return;
     }
     mon = GetBattleMon(flow, monId);
@@ -261,10 +261,10 @@ static void HandlerPosFutureSight(BattleEventItem *item, BtlServerFlow *flow, u8
     BattleHandlerMessageParam *msg;
     BattleHandlerDelayMoveDamageParam *damage;
 
-    if (BattleEventVar_GetValue(2) == 0x1f && !func_ov167_021abf14(flow)) {
+    if (BattleEventVar_GetValue(2) == 0x1f && !BtlServerFlow_CheckMatchup(flow)) {
         turn = GetTurnCounter(flow);
         if (turn >= work[0]) {
-            targetId = func_ov167_021abb60(flow, pos);
+            targetId = BtlServerFlow_PosToMonID(flow, pos);
             attackerId = work[6];
             if (targetId != 0x1f && targetId != attackerId && !IsFainted(GetBattleMon(flow, targetId))) {
                 msg = BattleHandler_PushWork(flow, 4, attackerId);
@@ -298,7 +298,7 @@ static void HandlerPosBatonPass(BattleEventItem *item, BtlServerFlow *flow, u8 p
     BattleHandlerBatonPassParam *param;
 
     monId = BattleEventVar_GetValue(2);
-    if (monId == func_ov167_021abb60(flow, pos)) {
+    if (monId == BtlServerFlow_PosToMonID(flow, pos)) {
         param = BattleHandler_PushWork(flow, 0x2a, 0x1f);
         param->sourceMonIndex = work[0];
         param->targetMonIndex = monId;

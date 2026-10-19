@@ -50,9 +50,9 @@ static void ConditionEndTurnActive(BtlServerFlow *flow, BattleMon *mon, u8 monId
     if (IsFainted(mon)) {
         return;
     }
-    damage = func_ov167_021bbb24(mon, condition);
+    damage = BattleMon_GetResidualDamage(mon, condition);
     if (damage != 0) {
-        func_ov167_021a8524(flow, mon, condition, damage);
+        ServerControl_ConditionDamage(flow, mon, condition, damage);
     }
     switch (condition) {
     case CONDITION_PERISH_SONG:
@@ -107,7 +107,7 @@ static void ConditionEndTurnPerishSong(BtlServerFlow *flow, BattleMon *mon, u8 m
 
     if (!IsFainted(mon)) {
         cont = GetConditionContinuationParam(mon, CONDITION_PERISH_SONG);
-        turns = func_ov167_021ce33c(cont) - func_ov167_021bbb1c(mon, CONDITION_PERISH_SONG);
+        turns = Condition_GetTurns(cont) - BattleMon_GetConditionTurnCount(mon, CONDITION_PERISH_SONG);
         if (turns > 0) {
             PerishSongMessage(flow, mon, turns);
         }
@@ -126,7 +126,7 @@ static void ConditionEndTurnLeechSeed(BtlServerFlow *flow, BattleMon *mon, u8 mo
 
     cont = GetConditionContinuationParam(mon, CONDITION_LEECH_SEED);
     pos = Condition_GetParam(cont);
-    sourceId = func_ov167_021ab884(flow, pos);
+    sourceId = BtlServerFlow_GetMonIDAtPos(flow, pos);
     if (sourceId != 0x1f) {
         amount = DivideMaxHPZeroCheck(mon, 8);
         hp = GetBattleMonStat(mon, 0xd);
@@ -143,7 +143,7 @@ static void ConditionEndTurnLeechSeed(BtlServerFlow *flow, BattleMon *mon, u8 mo
         message += 0x13;
         damage->effect = message;
         damage->effectArg1 = pos;
-        damage->effectArg2 = func_ov167_021abb50(flow, monId);
+        damage->effectArg2 = BtlServerFlow_MonIDToPos(flow, monId);
         BattleHandler_PopWork(flow, damage);
         if (sourceId != 0x1f) {
             drain = BattleHandler_PushWork(flow, 6, monId);
@@ -207,7 +207,7 @@ static void ConditionEndTurnBind(BtlServerFlow *flow, BattleMon *mon, u8 monId) 
         }
         damage = BattleHandler_PushWork(flow, 7, monId);
         damage->targetIndex = monId;
-        if (func_ov167_021ce464(cont) != 0) {
+        if (GetConditionFlag(cont) != 0) {
             damage->amount = DivideMaxHPZeroCheck(mon, 8);
         } else {
             damage->amount = DivideMaxHPZeroCheck(mon, 16);
@@ -215,7 +215,7 @@ static void ConditionEndTurnBind(BtlServerFlow *flow, BattleMon *mon, u8 monId) 
         if (effect != -1) {
             damage->showViewEffect = TRUE;
             damage->effect = effect;
-            damage->effectArg1 = func_ov167_021abb50(flow, monId);
+            damage->effectArg1 = BtlServerFlow_MonIDToPos(flow, monId);
             damage->effectArg2 = 6;
         }
         BattleHandler_StrSetup(&damage->string, 2, 0x174);
@@ -245,7 +245,7 @@ static void ConditionEndTurnEncore(BtlServerFlow *flow, BattleMon *mon, u8 monId
     BattleHandlerCureConditionParam *cure;
     u32 condition = 0x17;
 
-    if (!func_ov167_021bada0(mon, Condition_GetParam(GetConditionContinuationParam(mon, condition)))) {
+    if (!BattleMon_GetPPOfMove(mon, Condition_GetParam(GetConditionContinuationParam(mon, condition)))) {
         cure = BattleHandler_PushWork(flow, 0xb, monId);
         cure->condition = condition;
         cure->monIds[0] = monId;
@@ -285,7 +285,7 @@ static void ConditionCuredYawn(BtlServerFlow *flow, BattleMon *mon) {
     u8 monId;
     s32 turns;
 
-    turns = func_ov167_021bd3a0(2, 4);
+    turns = BtlCalc_RandomRange(2, 4);
     if (turns > 0) {
         if (GetBattleMonStatus(mon) == 0) {
             monId = GetMonID(mon);
@@ -494,7 +494,7 @@ void Condition_CheckTypeImmunity(BtlServerFlow *flow, BattleMon *target) {
         cont = GetConditionContinuationParam(target, CONDITION_FORESIGHT);
         pos = Condition_GetParam(cont);
         if (pos == (u8)BattleEventVar_GetValue(0x15)) {
-            if (func_ov167_021ce464(cont) == 0) {
+            if (GetConditionFlag(cont) == 0) {
                 BattleEventVar_RewriteValue(0x4b, TRUE);
             } else {
                 BattleEventVar_RewriteValue(0x4c, TRUE);

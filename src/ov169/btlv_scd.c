@@ -457,22 +457,22 @@ BtlvScd *BtlvScd_Create(BtlvCore *core, BtlMainModule *mainModule, BtlPokeCon *p
     scd->shooterEnergy = 0;
     scd->step = 0;
     scd->forceQuit = FALSE;
-    scd->typeCount = func_ov167_021b9194(client);
-    scd->typeMask = func_ov167_021b919c(client);
+    scd->typeCount = BattleClient_GetAudienceSize(client);
+    scd->typeMask = BattleClient_GetAudienceMask(client);
     scd->noCancel = func_ov167_0219c9c0(mainModule);
-    scd->keyCursorFlag = func_020174c8(func_ov167_0219bf98(scd->mainModule));
+    scd->keyCursorFlag = func_020174c8(GetGameData(scd->mainModule));
     scd->printQueue = PrintQueue_CreateDefault(scd->heapId);
     BtlvScd_ClearProcs(scd);
     return scd;
 }
 
 void BtlvScd_CreateInput(BtlvScd *scd) {
-    GameData *gameData = func_ov167_0219bf98(scd->mainModule);
+    GameData *gameData = GetGameData(scd->mainModule);
     u32 rule = BtlSetup_GetBattleStyle(scd->mainModule);
     u32 battleType = BtlSetup_GetBattleType(scd->mainModule);
     PaletteFade *paletteFade = BtlvEffect_GetPaletteFade();
-    u8 unk328 = func_ov167_0219bedc(scd->mainModule);
-    u32 fileSet = func_ov167_0219c988(scd->mainModule);
+    u8 unk328 = GetMultiMode(scd->mainModule);
+    u32 fileSet = GetStudioMode(scd->mainModule);
 
     scd->input = BtlvInput_CreateForBattle(gameData, rule, battleType, paletteFade, scd->font, &scd->keyCursorFlag,
                                            scd->scdState, unk328, fileSet, scd->typeCount, scd->typeMask, scd->noCancel,
@@ -532,7 +532,7 @@ BOOL BtlvScd_IsIdle(BtlvScd *scd) {
 }
 
 void BtlvScd_Delete(BtlvScd *scd) {
-    func_020174bc(func_ov167_0219bf98(scd->mainModule), scd->keyCursorFlag);
+    func_020174bc(GetGameData(scd->mainModule), scd->keyCursorFlag);
     PrintQueue_Free(scd->printQueue);
     GFL_StrBufFree(scd->strbuf);
     BtlvInput_Delete(scd->input);
@@ -682,7 +682,7 @@ static BOOL BtlvScd_CommandInit(s32 *seq, void *arg) {
     param.scdState = scd->scdState;
     param.launcherPoints = scd->shooterEnergy;
     param.pokePos =
-        func_ov167_0219c6dc(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
+        BattlePosToViewPos(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
     BtlvEffect_GaugeAction(param.pokePos);
     style = BtlSetup_GetBattleStyle(scd->mainModule);
     for (; side < 2; side++) {
@@ -694,7 +694,7 @@ static BOOL BtlvScd_CommandInit(s32 *seq, void *arg) {
         parties[1] = NULL;
         if (side == 0) {
             playerClient = GetPlayerClientID(scd->mainModule);
-            otherClient = func_ov167_0219c86c(scd->mainModule);
+            otherClient = GetPlayerAllyClientID(scd->mainModule);
             if (style == BTL_STYLE_DOUBLE && otherClient != 4) {
                 if (playerClient < otherClient) {
                     parties[0] = GetClientParty(scd->pokeCon, playerClient);
@@ -713,33 +713,33 @@ static BOOL BtlvScd_CommandInit(s32 *seq, void *arg) {
             }
             switch (style) {
             case BTL_STYLE_SINGLE:
-                mon = func_ov167_0219d188(scd->pokeCon, func_ov167_0219c744(scd->mainModule, 0));
+                mon = PokeCon_GetPosMonInner(scd->pokeCon, ViewPosToBattlePos(scd->mainModule, 0));
                 if (!IsFainted(mon)) {
                     param.species[0] = GetBattleMonSpecies(mon);
-                    param.forms[0] = PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_FORM, NULL);
+                    param.forms[0] = PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_FORM, NULL);
                     param.sexes[0] = GetBattleMonStat(mon, BATTLEMON_GENDER);
                 }
                 break;
             case BTL_STYLE_TRIPLE:
-                mon = func_ov167_0219d188(scd->pokeCon, func_ov167_0219c744(scd->mainModule, 6));
+                mon = PokeCon_GetPosMonInner(scd->pokeCon, ViewPosToBattlePos(scd->mainModule, 6));
                 if (!IsFainted(mon)) {
                     param.species[2] = GetBattleMonSpecies(mon);
-                    param.forms[2] = PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_FORM, NULL);
+                    param.forms[2] = PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_FORM, NULL);
                     param.sexes[2] = GetBattleMonStat(mon, BATTLEMON_GENDER);
                 }
                 // fall through
             case BTL_STYLE_DOUBLE:
             case BTL_STYLE_ROTATION:
-                mon = func_ov167_0219d188(scd->pokeCon, func_ov167_0219c744(scd->mainModule, 2));
+                mon = PokeCon_GetPosMonInner(scd->pokeCon, ViewPosToBattlePos(scd->mainModule, 2));
                 if (!IsFainted(mon)) {
                     param.species[0] = GetBattleMonSpecies(mon);
-                    param.forms[0] = PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_FORM, NULL);
+                    param.forms[0] = PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_FORM, NULL);
                     param.sexes[0] = GetBattleMonStat(mon, BATTLEMON_GENDER);
                 }
-                mon = func_ov167_0219d188(scd->pokeCon, func_ov167_0219c744(scd->mainModule, 4));
+                mon = PokeCon_GetPosMonInner(scd->pokeCon, ViewPosToBattlePos(scd->mainModule, 4));
                 if (!IsFainted(mon)) {
                     param.species[1] = GetBattleMonSpecies(mon);
-                    param.forms[1] = PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_FORM, NULL);
+                    param.forms[1] = PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_FORM, NULL);
                     param.sexes[1] = GetBattleMonStat(mon, BATTLEMON_GENDER);
                 }
                 break;
@@ -751,8 +751,8 @@ static BOOL BtlvScd_CommandInit(s32 *seq, void *arg) {
             if (BtlSetup_GetBattleType(scd->mainModule) == 0 || BtlSetup_GetBattleType(scd->mainModule) == 4) {
                 break;
             }
-            firstClient = func_ov167_0219c8b8(scd->mainModule, 0);
-            secondClient = func_ov167_0219c8b8(scd->mainModule, 1);
+            firstClient = GetPlayerOpponentClientID(scd->mainModule, 0);
+            secondClient = GetPlayerOpponentClientID(scd->mainModule, 1);
             param.secondRow = TRUE;
             parties[0] = GetClientParty(scd->pokeCon, firstClient);
             counts[0] = GetNumMonsInParty(parties[0]);
@@ -798,7 +798,7 @@ static BOOL BtlvScd_CommandInit(s32 *seq, void *arg) {
         }
     }
     param.laterPoke = scd->slot;
-    param.ballSlide = func_ov167_021b9188(scd->client);
+    param.ballSlide = BattleClient_GetWeather(scd->client);
     BtlvInput_SetScreen(scd->input, 1, &param);
     return TRUE;
 }
@@ -813,7 +813,7 @@ static BOOL BtlvScd_CommandMain(s32 *seq, void *arg) {
         if (input != TOUCH_RECT_NONE) {
             scd->result = data_ov169_0689d9b0[input];
             if (scd->result == 4) {
-                func_ov167_021bdc3c(scd->action);
+                BattleAction_SetEscape(scd->action);
                 BtlvInput_SetScreen(scd->input, 0, NULL);
                 BtlvEffect_GaugeAction(8);
                 BtlvEffect_StopIdleEffect();
@@ -853,7 +853,7 @@ static BOOL BtlvScd_MoveInit(s32 *seq, void *arg) {
     count = GetBattleMonMoveCount(scd->mon);
     param.noMoveInfo = TransformCheck(scd->mon);
     for (i = 0; i < count; i++) {
-        param.moves[i] = func_ov167_021bad28(scd->mon, i, &pp, &maxPP);
+        param.moves[i] = BattleMon_GetMoveInfo(scd->mon, i, &pp, &maxPP);
         param.pp[i] = pp;
         param.maxPP[i] = maxPP;
     }
@@ -863,7 +863,7 @@ static BOOL BtlvScd_MoveInit(s32 *seq, void *arg) {
         param.maxPP[i] = 0;
     }
     param.pos =
-        func_ov167_0219c6dc(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
+        BattlePosToViewPos(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
     BtlvInput_SetScreen(scd->input, 2, &param);
     return TRUE;
 }
@@ -876,7 +876,7 @@ static BOOL BtlvScd_MoveMain(s32 *seq, void *arg) {
     u8 pos;
     BOOL flagged;
 
-    pos = func_ov167_0219c6dc(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
+    pos = BattlePosToViewPos(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
     if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE && pos != 4) {
         set = &data_ov169_0689da08;
     } else {
@@ -898,12 +898,12 @@ static BOOL BtlvScd_MoveMain(s32 *seq, void *arg) {
         if (input < GetBattleMonMoveCount(scd->mon)) {
             BattleAction_SetFightParam(scd->action, MoveGetID(scd->mon, input), 6);
             if (flagged) {
-                func_ov167_021bdb40(scd->action);
+                BattleAction_SetMoveInfoFlag(scd->action);
             }
             return TRUE;
         }
         if (BtlSetup_GetBattleStyle(scd->mainModule) == BTL_STYLE_TRIPLE && input == 5) {
-            func_ov167_021bdc4c(scd->action);
+            BattleAction_SetShift(scd->action);
             return TRUE;
         }
     }
@@ -942,16 +942,16 @@ static BOOL BtlvScd_RotationMain(s32 *seq, void *arg) {
                 slot = 1;
             }
             if (button != 7) {
-                mon = scd->targetParam->mons[func_ov167_0219d38c(slot)].mon;
+                mon = scd->targetParam->mons[GetRotationInSlot(slot)].mon;
                 move = MoveGetID(mon, button);
             } else {
                 move = MOVE_STRUGGLE;
             }
-            func_ov167_021bdc24(&scd->targetParam->rotateAction, slot);
+            BattleAction_SetRotationParam(&scd->targetParam->rotateAction, slot);
             BattleAction_SetFightParam(&scd->targetParam->action, move, 6);
             BattleAction_SetFightParam(scd->action, move, 6);
             if (flagged) {
-                func_ov167_021bdb40(scd->action);
+                BattleAction_SetMoveInfoFlag(scd->action);
             }
         } else if (button == 4) { // tested again, as the original does
             BattleAction_SetNull(scd->action);
@@ -966,16 +966,16 @@ static void BtlvScd_ClearTargetList(BtlvScdTargetList *list) {
 }
 
 static void BtlvScd_FillSelectTargets(BtlvScdTargetList *list, BtlMainModule *mainModule, u16 posFlags) {
-    list->selectCount = func_ov167_0219bfe4(mainModule, posFlags, list->pos);
+    list->selectCount = ExpandPosFlags(mainModule, posFlags, list->pos);
 }
 
 static void BtlvScd_FillGroupTargets(BtlvScdTargetList *list, BtlMainModule *mainModule, u16 posFlags) {
-    list->count = func_ov167_0219bfe4(mainModule, posFlags, list->pos);
+    list->count = ExpandPosFlags(mainModule, posFlags, list->pos);
     list->kind = TARGETS_GROUP;
 }
 
 static void BtlvScd_FillSideTargets(BtlvScdTargetList *list, BtlMainModule *mainModule, u16 posFlags) {
-    list->count = func_ov167_0219bfe4(mainModule, posFlags, list->pos);
+    list->count = ExpandPosFlags(mainModule, posFlags, list->pos);
     list->kind = TARGETS_SIDE;
 }
 
@@ -984,9 +984,9 @@ static void BtlvScd_AddFarTargets(BtlvScdTargetList *list, BtlMainModule *mainMo
     u8 far;
 
     if (BtlSetup_GetBattleStyle(mainModule) == BTL_STYLE_TRIPLE && getMoveFlag(move, 0xb) &&
-        func_ov167_0219d2dc(pos, &far)) {
+        GetNonAdjacentOpponentPos(pos, &far)) {
         list->pos[list->selectCount++] = far;
-        list->pos[list->selectCount++] = func_ov167_0219c4c8(BTL_STYLE_TRIPLE, far);
+        list->pos[list->selectCount++] = GetFacingPos(BTL_STYLE_TRIPLE, far);
     }
 }
 
@@ -995,7 +995,7 @@ static BOOL BtlvScd_GetTargetPos(BtlvScdTargetList *list, u32 button, BtlMainMod
     u8 i;
 
     if (list->selectCount != 0) {
-        *outPos = func_ov167_0219c744(mainModule, data_ov169_0689d9b4[button]);
+        *outPos = ViewPosToBattlePos(mainModule, data_ov169_0689d9b4[button]);
         for (i = 0; i < list->selectCount; i++) {
             if (*outPos == list->pos[i]) {
                 return TRUE;
@@ -1014,18 +1014,18 @@ static void BtlvScd_SetTargetScreen(const u8 *positions, u8 count, u32 kind, Btl
 
     MI_CpuClear16(&param, sizeof(param));
     param.attackerPos =
-        func_ov167_0219c6dc(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
+        BattlePosToViewPos(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
     param.range = PML_MoveGetParam(move, MOVE_PARAM_TARGET);
     if (move == MOVE_CURSE) {
-        param.range = func_ov167_021bd8d0(scd->mon);
+        param.range = BtlCalc_GetCurseTarget(scd->mon);
     }
     if (param.range == 0 && getMoveFlag(move, 0xb)) {
         param.range = 14;
     }
     while (count-- != 0) {
-        BattleMon *mon = func_ov167_0219d188(scd->pokeCon, *positions);
-        PartyPkm *pkm = func_ov167_021bb064(mon);
-        u8 index = func_ov167_0219c6dc(scd->mainModule, *positions) - 2;
+        BattleMon *mon = PokeCon_GetPosMonInner(scd->pokeCon, *positions);
+        PartyPkm *pkm = BattleMon_GetViewSrcData(mon);
+        u8 index = BattlePosToViewPos(scd->mainModule, *positions) - 2;
         BtlvInputTargetEntry *entry = &param.mons[index];
 
         entry->hp = GetBattleMonStat(mon, BATTLEMON_HP);
@@ -1034,10 +1034,10 @@ static void BtlvScd_SetTargetScreen(const u8 *positions, u8 count, u32 kind, Btl
             GetBattleMonSpecies(mon); // the original reads the species and drops it
             entry->pkm = pkm;
             entry->maxHp = GetBattleMonStat(mon, BATTLEMON_HP + 1);
-            if (PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_SHOW_SEX, NULL) == 0) {
+            if (PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_SHOW_SEX, NULL) == 0) {
                 entry->msgForm = 2;
             } else {
-                entry->msgForm = PokeParty_GetSex(func_ov167_021bb064(mon));
+                entry->msgForm = PokeParty_GetSex(BattleMon_GetViewSrcData(mon));
             }
             if (GetBattleMonStatus(mon) != 0) {
                 entry->unk1 = 3;
@@ -1074,7 +1074,8 @@ static BOOL BtlvScd_TargetInit(s32 *seq, void *arg) {
         u8 target = 6;
 
         if (scd->targets.selectCount != 0) {
-            target = func_ov167_0219d2bc(MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)))->list1[0];
+            target =
+                GetAdjacentOpponentData(MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)))->list1[0];
         }
         BattleAction_SetFightParam(scd->action, scd->action->bits.move, target);
         scd->targetChosen = TRUE;
@@ -1083,7 +1084,7 @@ static BOOL BtlvScd_TargetInit(s32 *seq, void *arg) {
     scd->targetChosen = FALSE;
     scd->moveRange = PML_MoveGetParam(scd->action->bits.move, MOVE_PARAM_TARGET);
     if (scd->action->bits.move == MOVE_CURSE) {
-        scd->moveRange = func_ov167_021bd8d0(scd->mon);
+        scd->moveRange = BtlCalc_GetCurseTarget(scd->mon);
     }
     return TRUE;
 }
@@ -1100,7 +1101,7 @@ static BOOL BtlvScd_TargetMain(s32 *seq, void *arg) {
     s32 input;
 
     if (*seq == 0) {
-        pos = func_ov167_0219c6dc(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
+        pos = BattlePosToViewPos(scd->mainModule, MonIDToBattlePos(scd->mainModule, scd->pokeCon, GetMonID(scd->mon)));
         range = scd->moveRange;
         index = (pos - 2) / 2;
         if (BtlSetup_GetBattleStyle(scd->mainModule) != BTL_STYLE_TRIPLE) {
@@ -1139,7 +1140,7 @@ static void BtlvScd_BuildTargetList(BtlvScdTargetList *list, BtlvScd *scd) {
 
     BtlvScd_ClearTargetList(list);
     if (move == MOVE_CURSE) {
-        range = func_ov167_021bd8d0(scd->mon);
+        range = BtlCalc_GetCurseTarget(scd->mon);
     }
     switch (range) {
     case 0:

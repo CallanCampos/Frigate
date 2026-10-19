@@ -1233,7 +1233,7 @@ u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, s32 speed, int volume, int arg4, i
     chatterInfo = &chatter;
     flag = FALSE;
     if (mainModule != NULL) {
-        if (!func_ov167_0219d228(mainModule, pos, &chatterInfo->chatter)) {
+        if (!GetViewPosChatter(mainModule, pos, &chatterInfo->chatter)) {
             chatterInfo = NULL;
         }
     } else {

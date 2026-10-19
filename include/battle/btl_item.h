@@ -5,7 +5,7 @@
 #include "struct_decls.h"
 
 BattleEventItem *ItemEvent_TempAdd(BattleMon *mon, u16 item);
-void func_ov167_021c27c4(void *temp);
+void ItemEvent_TempRemove(void *temp);
 void ItemEvent_ItemRotationWake(BattleMon *mon);
 BattleEventItem *ItemEvent_AddItem(BattleMon *mon);
 void ItemEvent_RemoveItem(BattleMon *mon);

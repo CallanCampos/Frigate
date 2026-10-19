@@ -23,22 +23,22 @@ BattleEventVarStack data_ov167_021db3b0;
 BattleEventItem data_ov167_021db954[BATTLE_EVENT_ITEM_MAX];
 
 // Function names from swan.
-void func_ov167_021bc6bc(void) {
+void BattleEvent_Init(void) {
     u32 i;
     BattleEventItem *item;
 
     for (i = 0; i < BATTLE_EVENT_ITEM_MAX; i++) {
         item = &data_ov167_021db954[i];
-        func_ov167_021bcccc(item);
+        BattleEvent_ClearItem(item);
         data_ov167_021db1a0[i] = item;
     }
     data_ov167_021db194.first = NULL;
     data_ov167_021db194.poolCount = 0;
     data_ov167_021db194.depth = 0;
-    func_ov167_021bccd8();
+    BattleEventVar_Init();
 }
 
-void func_ov167_021bc6f8(void) {
+void BattleEvent_ClearTurnPause(void) {
     BattleEventItem *item;
 
     for (item = data_ov167_021db194.first; item != NULL; item = item->next) {
@@ -51,7 +51,7 @@ void func_ov167_021bc718(void) {
 
 BattleEventItem *BattleEvent_AddItem(u32 factorType, u16 subId, u32 priority, u32 subPriority, u8 monId,
                                      const BattleEventHandlerEntry *handlers, u16 numHandlers) {
-    BattleEventItem *item = func_ov167_021bcc84();
+    BattleEventItem *item = BattleEvent_AllocItem();
     BOOL usesMon;
     BattleEventItem *prev;
     BattleEventItem *cur;
@@ -143,7 +143,7 @@ void BattleEventItem_Remove(BattleEventItem *item) {
             item->next->prev = item->prev;
         }
         func_ov167_021bc718();
-        func_ov167_021bcca4(item);
+        BattleEvent_FreeItem(item);
     }
 }
 
@@ -185,22 +185,22 @@ void BattleEventItem_SetWorkValue(BattleEventItem *item, u8 index, u32 value) {
 }
 
 void BattleEvent_ForceCallHandlers(BtlServerFlow *flow, u32 event) {
-    func_ov167_021bc918(flow, event, 7, FALSE);
+    BattleEvent_CallHandlersCore(flow, event, 7, FALSE);
 }
 
 void BattleEvent_CallHandlers(BtlServerFlow *flow, u32 event) {
-    func_ov167_021bc918(flow, event, 7, TRUE);
+    BattleEvent_CallHandlersCore(flow, event, 7, TRUE);
 }
 
-void func_ov167_021bc90c(BtlServerFlow *flow, u32 event, u32 factorType) {
-    func_ov167_021bc918(flow, event, factorType, TRUE);
+void BattleEvent_CallFactorHandlers(BtlServerFlow *flow, u32 event, u32 factorType) {
+    BattleEvent_CallHandlersCore(flow, event, factorType, TRUE);
 }
 
-void func_ov167_021bc918(BtlServerFlow *flow, u32 event, u32 factorType, BOOL checkSkip) {
+void BattleEvent_CallHandlersCore(BtlServerFlow *flow, u32 event, u32 factorType, BOOL checkSkip) {
     BattleEventItem *item;
 
     data_ov167_021db194.depth++;
-    func_ov167_021bc94c(flow, event, factorType, checkSkip);
+    BattleEvent_CallHandlersSub(flow, event, factorType, checkSkip);
     if (--data_ov167_021db194.depth == 0) {
         item = data_ov167_021db194.first;
         if (item != NULL) {
@@ -213,7 +213,7 @@ void func_ov167_021bc918(BtlServerFlow *flow, u32 event, u32 factorType, BOOL ch
 }
 
 // Calls the handlers of the event of every item of the factor type, or every item for 7
-void func_ov167_021bc94c(BtlServerFlow *flow, u32 event, u32 factorType, BOOL checkSkip) {
+void BattleEvent_CallHandlersSub(BtlServerFlow *flow, u32 event, u32 factorType, BOOL checkSkip) {
     BattleEventItem *item = data_ov167_021db194.first;
     const BattleEventHandlerEntry *handlers;
     u32 i;
@@ -229,7 +229,7 @@ void func_ov167_021bc94c(BtlServerFlow *flow, u32 event, u32 factorType, BOOL ch
             for (i = 0; i < item->numHandlers; i++) {
                 const BattleEventHandlerEntry *entry = &handlers[i];
                 if (event == entry->event) {
-                    if (!checkSkip || !func_ov167_021bca50(flow, item, event)) {
+                    if (!checkSkip || !BattleEvent_CheckSkip(flow, item, event)) {
                         item->running = TRUE;
                         entry->handler(item, flow, item->monId, item->work);
                         if (item->recallEnable) {
@@ -261,7 +261,7 @@ void func_ov167_021bc94c(BtlServerFlow *flow, u32 event, u32 factorType, BOOL ch
 
 // Whether an item's handlers are skipped: its mon's ability is suppressed, its held item can't be used, or another
 // item's skip check skips it
-BOOL func_ov167_021bca50(BtlServerFlow *flow, BattleEventItem *item, u32 event) {
+BOOL BattleEvent_CheckSkip(BtlServerFlow *flow, BattleEventItem *item, u32 event) {
     BattleMon *mon = NULL;
     BattleEventItem *other;
     BattleMon *otherMon;
@@ -338,17 +338,17 @@ BattleEventItem *BattleEvent_GetNextItem(BattleEventItem *item) {
     return NULL;
 }
 
-void func_ov167_021bcba4(u8 monId) {
+void BattleEvent_PausePersistentMoveItems(u8 monId) {
     BattleEventItem *item;
 
     for (item = data_ov167_021db194.first; item != NULL; item = item->next) {
-        if (item->factorType == 0 && item->dependMonId == monId && func_ov167_021c5c10(item, item->work)) {
+        if (item->factorType == 0 && item->dependMonId == monId && MoveEventItem_IsPersistent(item, item->work)) {
             item->unk25 = TRUE;
         }
     }
 }
 
-void func_ov167_021bcbe4(u8 monId) {
+void BattleEvent_ResumeMoveItems(u8 monId) {
     BattleEventItem *item;
 
     for (item = data_ov167_021db194.first; item != NULL; item = item->next) {
@@ -381,25 +381,25 @@ BOOL BattleEvent_ItemRotationWake(u8 monId, u32 factorType) {
     return woken;
 }
 
-BattleEventItem *func_ov167_021bcc84(void) {
+BattleEventItem *BattleEvent_AllocItem(void) {
     if (data_ov167_021db194.poolCount == BATTLE_EVENT_ITEM_MAX) {
         return NULL;
     }
     return data_ov167_021db1a0[data_ov167_021db194.poolCount++];
 }
 
-void func_ov167_021bcca4(BattleEventItem *item) {
+void BattleEvent_FreeItem(BattleEventItem *item) {
     if (data_ov167_021db194.poolCount != 0) {
-        func_ov167_021bcccc(item);
+        BattleEvent_ClearItem(item);
         data_ov167_021db1a0[--data_ov167_021db194.poolCount] = item;
     }
 }
 
-void func_ov167_021bcccc(BattleEventItem *item) {
+void BattleEvent_ClearItem(BattleEventItem *item) {
     MI_CpuFill8(item, 0, sizeof(BattleEventItem));
 }
 
-void func_ov167_021bccd8(void) {
+void BattleEventVar_Init(void) {
     BattleEventVarStack *vars = &data_ov167_021db3b0;
     u32 i;
 
@@ -409,9 +409,9 @@ void func_ov167_021bccd8(void) {
     }
 }
 
-void func_ov167_021bccf4(void) {
+void BattleEventVar_CheckReset(void) {
     if (data_ov167_021db3b0.sp != 0) {
-        func_ov167_021bccd8();
+        BattleEventVar_Init();
     }
 }
 
@@ -452,7 +452,7 @@ void BattleEventVar_Pop(u32 line) {
 }
 
 void BattleEventVar_SetValue(u32 key, s32 value) {
-    u32 index = func_ov167_021bcfd8(&data_ov167_021db3b0, key);
+    u32 index = BattleEventVar_FindSetIndex(&data_ov167_021db3b0, key);
 
     data_ov167_021db3b0.keys[index] = key;
     data_ov167_021db3b0.values[index] = value;
@@ -462,7 +462,7 @@ void BattleEventVar_SetValue(u32 key, s32 value) {
 }
 
 void BattleEventVar_SetConstValue(u32 key, s32 value) {
-    u32 index = func_ov167_021bcfd8(&data_ov167_021db3b0, key);
+    u32 index = BattleEventVar_FindSetIndex(&data_ov167_021db3b0, key);
 
     data_ov167_021db3b0.keys[index] = key;
     data_ov167_021db3b0.values[index] = value;
@@ -472,7 +472,7 @@ void BattleEventVar_SetConstValue(u32 key, s32 value) {
 }
 
 void BattleEventVar_SetRewriteOnceValue(u32 key, s32 value) {
-    u32 index = func_ov167_021bcfd8(&data_ov167_021db3b0, key);
+    u32 index = BattleEventVar_FindSetIndex(&data_ov167_021db3b0, key);
 
     data_ov167_021db3b0.keys[index] = key;
     data_ov167_021db3b0.values[index] = value;
@@ -482,7 +482,7 @@ void BattleEventVar_SetRewriteOnceValue(u32 key, s32 value) {
 }
 
 void BattleEventVar_SetMulValue(u32 key, s32 value, s32 minValue, s32 maxValue) {
-    u32 index = func_ov167_021bcfd8(&data_ov167_021db3b0, key);
+    u32 index = BattleEventVar_FindSetIndex(&data_ov167_021db3b0, key);
 
     data_ov167_021db3b0.keys[index] = key;
     data_ov167_021db3b0.values[index] = value;
@@ -493,7 +493,7 @@ void BattleEventVar_SetMulValue(u32 key, s32 value, s32 minValue, s32 maxValue) 
 
 BOOL BattleEventVar_RewriteValue(u16 key, s32 value) {
     BattleEventVarStack *vars = &data_ov167_021db3b0;
-    s32 index = func_ov167_021bcffc(vars, key);
+    s32 index = BattleEventVar_FindIndex(vars, key);
 
     if (index >= 0 && vars->kinds[index] <= 1) {
         vars->keys[index] = key;
@@ -508,10 +508,10 @@ BOOL BattleEventVar_RewriteValue(u16 key, s32 value) {
 
 void BattleEventVar_MulValue(u16 key, s32 value) {
     BattleEventVarStack *vars = &data_ov167_021db3b0;
-    s32 index = func_ov167_021bcffc(vars, key);
+    s32 index = BattleEventVar_FindIndex(vars, key);
 
     if (index >= 0 && vars->kinds[index] == 3) {
-        vars->values[index] = func_ov167_021bd020(vars, index, FX_Mul(vars->values[index], value));
+        vars->values[index] = BattleEventVar_ClampValue(vars, index, FX_Mul(vars->values[index], value));
     }
 }
 
@@ -530,7 +530,7 @@ u32 BattleEventVar_GetValue(u32 key) {
     return 0;
 }
 
-BOOL func_ov167_021bcfa0(u16 key, s32 *value) {
+BOOL BattleEventVar_GetValueIfExist(u16 key, s32 *value) {
     BattleEventVarStack *vars = &data_ov167_021db3b0;
     u32 i;
 
@@ -547,7 +547,7 @@ BOOL func_ov167_021bcfa0(u16 key, s32 *value) {
 }
 
 // The slot of the frame to set the variable in: its own, or the first free one
-u32 func_ov167_021bcfd8(BattleEventVarStack *vars, u32 key) {
+u32 BattleEventVar_FindSetIndex(BattleEventVarStack *vars, u32 key) {
     u32 i;
 
     for (i = vars->sp; i < BATTLE_EVENT_VAR_MAX; i++) {
@@ -561,7 +561,7 @@ u32 func_ov167_021bcfd8(BattleEventVarStack *vars, u32 key) {
     return i;
 }
 
-s32 func_ov167_021bcffc(BattleEventVarStack *vars, u16 key) {
+s32 BattleEventVar_FindIndex(BattleEventVarStack *vars, u16 key) {
     u32 i;
 
     for (i = vars->sp; i < BATTLE_EVENT_VAR_MAX && vars->keys[i] != 0; i++) {
@@ -573,7 +573,7 @@ s32 func_ov167_021bcffc(BattleEventVarStack *vars, u16 key) {
 }
 
 // Clamps the value to the variable's range, if it has one
-s32 func_ov167_021bd020(BattleEventVarStack *vars, u32 index, s32 value) {
+s32 BattleEventVar_ClampValue(BattleEventVarStack *vars, u32 index, s32 value) {
     if (vars->maxValues[index] != 0 || vars->minValues[index] != 0) {
         if (vars->minValues[index] > value) {
             value = vars->minValues[index];

@@ -49,25 +49,25 @@ static void clearEffect(BtlField *field, u32 effect) {
     }
 }
 
-void func_ov167_021d59a0(u32 weather) {
+void FieldStatusInit(u32 weather) {
     initField(&sField, weather);
 }
 
 // Function name from swan.
 u8 GetFieldWeather(void) {
-    return func_ov167_021d5ad4(&sField);
+    return BtlField_GetWeather(&sField);
 }
 
-u32 func_ov167_021d59c0(void) {
+u32 FieldStatusGetWeatherTurns(void) {
     return getWeatherTurns(&sField);
 }
 
 // Function name from swan.
 void FieldStatusSetWeather(u8 weather, u8 duration) {
-    func_ov167_021d5aec(&sField, weather, duration);
+    BtlField_SetWeather(&sField, weather, duration);
 }
 
-u8 func_ov167_021d59e4(void) {
+u8 FieldStatusDecWeatherTurns(void) {
     return decWeatherTurns(&sField);
 }
 
@@ -78,24 +78,24 @@ BOOL FieldStatusAddEffect(u32 effect, BattleCondition value) {
 
 // Function name from swan.
 BOOL FieldStatusRemoveEffect(u32 effect) {
-    return func_ov167_021d5bc0(&sField, effect);
+    return BtlField_RemoveEffect(&sField, effect);
 }
 
 // Function name from swan.
 BOOL FieldStatusAddDependPoke(u32 effect, u8 monId) {
-    return func_ov167_021d5c04(&sField, effect, monId);
+    return BtlField_AddDependPoke(&sField, effect, monId);
 }
 
-void func_ov167_021d5a38(u8 monId) {
-    func_ov167_021d5c60(&sField, monId);
+void FieldStatusRemoveDependPoke(u8 monId) {
+    BtlField_RemoveDependPoke(&sField, monId);
 }
 
-BOOL func_ov167_021d5a48(BtlPokeCon *pokeCon, BattleMon *mon, u16 move) {
+BOOL FieldStatusCheckImprison(BtlPokeCon *pokeCon, BattleMon *mon, u16 move) {
     return CheckImprison(&sField, pokeCon, mon, move);
 }
 
-void func_ov167_021d5a60(void (*callback)(u32 effect, BtlServerFlow *flow), BtlServerFlow *flow) {
-    func_ov167_021d5da4(&sField, callback, flow);
+void FieldStatusTurnCheck(void (*callback)(u32 effect, BtlServerFlow *flow), BtlServerFlow *flow) {
+    BtlField_TurnCheck(&sField, callback, flow);
 }
 
 // Function name from swan.
@@ -103,14 +103,14 @@ u32 IsFieldEffectActive(u32 fieldEffect) {
     return CheckFieldEffect(&sField, fieldEffect);
 }
 
-BtlField *func_ov167_021d5a84(HeapID heapId) {
+BtlField *BtlField_Create(HeapID heapId) {
     BtlField *field = GFL_HeapAllocate(heapId, sizeof(BtlField), TRUE, "btl_field.c", 0x10c);
 
     initField(field, 0);
     return field;
 }
 
-void func_ov167_021d5aac(BtlField *field) {
+void BtlField_Delete(BtlField *field) {
     GFL_HeapFree(field);
 }
 
@@ -124,7 +124,7 @@ static void initField(BtlField *field, u32 weather) {
     field->weatherTurns = WEATHER_TURNS_PERMANENT;
 }
 
-u8 func_ov167_021d5ad4(BtlField *field) {
+u8 BtlField_GetWeather(BtlField *field) {
     return field->weather;
 }
 
@@ -135,12 +135,12 @@ static u32 getWeatherTurns(BtlField *field) {
     return 0;
 }
 
-void func_ov167_021d5aec(BtlField *field, u8 weather, u16 turns) {
+void BtlField_SetWeather(BtlField *field, u8 weather, u16 turns) {
     field->weather = weather;
     field->weatherTurns = turns;
 }
 
-void func_ov167_021d5af4(BtlField *field) {
+void BtlField_ClearWeather(BtlField *field) {
     field->weather = 0;
     field->weatherTurns = 0;
 }
@@ -179,14 +179,14 @@ BOOL FieldStatusaddEffectCore(BtlField *field, u32 effect, BattleCondition value
         }
         monId = Condition_GetMonID(value);
         if (monId != NO_MON) {
-            func_ov167_021d5c04(field, effect, monId);
+            BtlField_AddDependPoke(field, effect, monId);
         }
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov167_021d5bc0(BtlField *field, u32 effect) {
+BOOL BtlField_RemoveEffect(BtlField *field, u32 effect) {
     if (CheckFieldEffect(field, effect)) {
         if (field->events[effect] != NULL) {
             FieldEffectEventRemove(field->events[effect]);
@@ -198,7 +198,7 @@ BOOL func_ov167_021d5bc0(BtlField *field, u32 effect) {
     return FALSE;
 }
 
-BOOL func_ov167_021d5c04(BtlField *field, u32 effect, u8 monId) {
+BOOL BtlField_AddDependPoke(BtlField *field, u32 effect, u8 monId) {
     u32 count;
     u32 i;
 
@@ -219,7 +219,7 @@ BOOL func_ov167_021d5c04(BtlField *field, u32 effect, u8 monId) {
 }
 
 // Removes a Pokemon from every effect that depends on it, ending the effects that no other Pokemon keeps up
-void func_ov167_021d5c60(BtlField *field, u8 monId) {
+void BtlField_RemoveDependPoke(BtlField *field, u8 monId) {
     // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
     unsigned long effect;
     u32 i;
@@ -246,7 +246,7 @@ void func_ov167_021d5c60(BtlField *field, u8 monId) {
                     }
                     clearEffect(field, effect);
                 } else if (monId == Condition_GetMonID(field->conditions[effect])) {
-                    func_ov167_021ce308(&field->conditions[effect], (u8)field->dependPokes[effect][0]);
+                    Condition_SetMonID(&field->conditions[effect], (u8)field->dependPokes[effect][0]);
                 }
             }
         }
@@ -270,13 +270,13 @@ BOOL CheckImprison(BtlField *field, BtlPokeCon *pokeCon, BattleMon *mon, u16 mov
 }
 
 // Counts the turns of the timed effects, ending those whose turns ran out
-void func_ov167_021d5da4(BtlField *field, void (*callback)(u32 effect, BtlServerFlow *flow), BtlServerFlow *flow) {
+void BtlField_TurnCheck(BtlField *field, void (*callback)(u32 effect, BtlServerFlow *flow), BtlServerFlow *flow) {
     u32 effect;
     u8 turns;
 
     for (effect = 1; effect < FIELD_EFFECT_COUNT; effect++) {
         if (CheckFieldEffect(field, effect)) {
-            turns = func_ov167_021ce33c(field->conditions[effect]);
+            turns = Condition_GetTurns(field->conditions[effect]);
             if (turns != 0 && ++field->turnCounts[effect] >= turns) {
                 if (field->events[effect] != NULL) {
                     FieldEffectEventRemove(field->events[effect]);

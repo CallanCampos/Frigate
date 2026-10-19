@@ -216,7 +216,7 @@ static const CutinEntry sCutins[] = {
     { 24, 3, 0 },
 };
 
-PokewoodCutin *func_ov167_021d5e1c(HeapID heapId) {
+PokewoodCutin *PokewoodCutin_Create(HeapID heapId) {
     PokewoodCutin *cutin = GFL_HeapAllocate(heapId, sizeof(PokewoodCutin), TRUE, "pokewood_cutin.c", 292);
 
     cutin->unit = ClActUnit_Create(CUTIN_ACTOR_COUNT, 0, heapId);
@@ -227,7 +227,7 @@ PokewoodCutin *func_ov167_021d5e1c(HeapID heapId) {
     return cutin;
 }
 
-void func_ov167_021d5e68(PokewoodCutin *cutin) {
+void PokewoodCutin_Delete(PokewoodCutin *cutin) {
     if (cutin->script != NULL) {
         CutinScript_Free(cutin->script);
         cutin->script = NULL;
@@ -237,8 +237,8 @@ void func_ov167_021d5e68(PokewoodCutin *cutin) {
     GFL_HeapFree(cutin);
 }
 
-// Runs the cut-in that func_ov167_021d5fc4 started, a step of its script at a time
-void func_ov167_021d5e90(PokewoodCutin *cutin) {
+// Runs the cut-in that PokewoodCutin_Start started, a step of its script at a time
+void PokewoodCutin_Main(PokewoodCutin *cutin) {
     u16 paletteFile;
     u16 charFile;
     u16 cellFile;
@@ -297,11 +297,11 @@ void func_ov167_021d5e90(PokewoodCutin *cutin) {
     }
 }
 
-BOOL func_ov167_021d5fc0(PokewoodCutin *cutin) {
+BOOL PokewoodCutin_IsDone(PokewoodCutin *cutin) {
     return cutin->done;
 }
 
-void func_ov167_021d5fc4(PokewoodCutin *cutin, const BtlScriptedRules *rules, s8 scene, u16 choice, u32 gender) {
+void PokewoodCutin_Start(PokewoodCutin *cutin, const BtlScriptedRules *rules, s8 scene, u16 choice, u32 gender) {
     cutin->seq = 1;
     cutin->done = FALSE;
     cutin->step = 0;
@@ -311,12 +311,12 @@ void func_ov167_021d5fc4(PokewoodCutin *cutin, const BtlScriptedRules *rules, s8
     cutin->choice = choice;
 }
 
-void func_ov167_021d5fe4(PokewoodCutin *cutin, BtlvCore *viewCore) {
+void PokewoodCutin_SetViewCore(PokewoodCutin *cutin, BtlvCore *viewCore) {
     cutin->viewCore = viewCore;
 }
 
 // Whether the movie has a cut-in after the scene for its result
-BOOL func_ov167_021d5fe8(const BtlScriptedRules *rules, s8 scene, u8 result, u32 unused) {
+BOOL PokewoodCutin_HasCutin(const BtlScriptedRules *rules, s8 scene, u8 result, u32 unused) {
     u32 i;
     u32 movie = rules->movie;
     BOOL play;
@@ -526,11 +526,11 @@ static BOOL Cutin_CmdPrintMessage(PokewoodCutin *cutin, u16 *seq, const u16 *arg
             msgId = scene->messages[args[1]][args[0]];
         }
         Btlv_StringParam_Setup(&cutin->strParam, 8, msgId);
-        func_ov167_021d01ec(cutin->viewCore, &cutin->strParam);
+        BtlvCore_StartMsg(cutin->viewCore, &cutin->strParam);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(cutin->viewCore)) {
+        if (BtlvCore_WaitMsg(cutin->viewCore)) {
             return TRUE;
         }
         break;
@@ -541,11 +541,11 @@ static BOOL Cutin_CmdPrintMessage(PokewoodCutin *cutin, u16 *seq, const u16 *arg
 static BOOL Cutin_CmdViewEffect(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021d04bc(cutin->viewCore);
+        BtlvCore_StartHideMsgWin(cutin->viewCore);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d04cc(cutin->viewCore)) {
+        if (BtlvCore_WaitHideMsgWin(cutin->viewCore)) {
             return TRUE;
         }
         break;
