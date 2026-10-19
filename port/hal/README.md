@@ -126,7 +126,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | --- | --- |
 | [rom/port_rom.h](rom/port_rom.h), [rom/rom.c](rom/rom.c) | Finding the player's ROM (`--rom`, `FRIGATE_ROM`, `orig/`), mapping it, checking it, and what the DS's boot leaves in memory |
 | [rom/rom_manifest.h](rom/rom_manifest.h) | What the build knows of the ROM it was built for: the game code, the name, the hashes of the dump and of every file |
-| [rom/sha1.h](rom/sha1.h), [rom/sha1.c](rom/sha1.c) | SHA-1 for those checks |
+| [rom/sha1.h](rom/sha1.h), [rom/sha1.c](rom/sha1.c) | SHA-1 for those checks and the run directory's screen hashes: the ARMv8 SHA instructions where the compiler targets them (every Apple Silicon Mac), the C rounds elsewhere |
 | [card/port_card.h](card/port_card.h), [card/backup.c](card/backup.c) | The ARM7's side of the save chip: the 512 KiB flash kept as `IREO.sav` or `IRDO.sav`, written a frame after the game's last write |
 | [card/card_rom.c](card/card_rom.c) | `CARDi_ReadRom` and the card's ROM reads, as copies from the mapped dump |
 | [card/card_backup_host.c](card/card_backup_host.c), [card/card_backup_calls.h](card/card_backup_calls.h) | The decomp's backup commands compiled through, with the game's buffers kept as whole pointers |
