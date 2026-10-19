@@ -13,9 +13,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned (16 KiB, Apple Silicon's pages, where the VRAM banks
-// can be mapped into region 0x06's window by pages, port/hal/gx/vram.c; 4 KiB on Windows, which copies the banks
-// instead). They are zero-filled memory the system commits only when touched
+// The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned, so that the VRAM banks can be mapped into region
+// 0x06's window by pages (port/hal/gx/vram.c). They are zero-filled memory the system commits only when touched. The
+// alignment is PORT_HOST_PAGE_ALIGNMENT (port/hal/host/host.h): 16 KiB, Apple Silicon's page and the largest of the
+// hosts, but 4 KiB on Windows, which copies the banks instead, and in an x86_64 Mach-O program (the macOS app's Intel
+// slice, ADR 0015), whose linker holds a section's alignment to its 4 KiB page
 #define REGION_SIZE (1u << 24)
 #define REGION_STORAGE __attribute__((aligned(PORT_HOST_PAGE_ALIGNMENT)))
 REGION_STORAGE unsigned char port_hw_mem_01[REGION_SIZE]; // ITCM

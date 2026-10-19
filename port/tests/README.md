@@ -11,7 +11,8 @@ Most tests need nothing but the build. The ones that need the player's ROM (`ori
 `rom_*` ones, `nnsys_g2d_rom_equivalence`, `snd_rom_*`, the `replay_*` tests, `integrate_launch_never_asked` and the
 `oracle_*` and `launch_*` tests that run the game. `asm_oracle` also needs the extracted ROM, its own Python
 environment and a host build directory configured with `-G Ninja`, whose `build.ninja` it reads the game's flags from
-(it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup)), and the
+(it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup), and on macOS
+in one with no slice for its Python's architecture, such as an x86_64 build on Apple Silicon), and the
 `oracle_*` tests that run melonDS need the oracle, built with `-DPORT_BUILD_ORACLE=ON`
 ([../tools/oracle/README.md](../tools/oracle/README.md)), as do the test launcher's `launch_*` tests, which start from
 saves the oracle makes (`oracle_saves`). The oracle counts game frames with the ROM build's link map
@@ -20,7 +21,7 @@ at once ("counts game frames, which need --counter") rather than skip. A skipped
 
 | Directory | What it tests | Game functionality covered | Tests |
 | --- | --- | --- | --- |
-| [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read and the options it describes, the test launcher's option and the kinds of field menu (`test_launcher_spec.c`); the macOS app's scripts, bundle identifier and log, with stand-in programs and projects; and `check_exit.py`, which runs the program and checks its exit status, or that it crashed, since ctest's `PASS_REGULAR_EXPRESSION` ignores the status and fails a crash | The controls; the oracle's comparisons; the field menu's items; the app | `app_*`, and the `integrate_launch_*` and launcher tests that run through `check_exit.py` |
+| [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read and the options it describes, the test launcher's option and the kinds of field menu (`test_launcher_spec.c`); the macOS app's scripts, bundle identifier and log, with stand-in programs and projects, and a universal program's two slices running the opening the same (`test_universal_slices.sh`); and `check_exit.py`, which runs the program and checks its exit status, or that it crashed, since ctest's `PASS_REGULAR_EXPRESSION` ignores the status and fails a crash | The controls; the oracle's comparisons; the field menu's items; the app | `app_*`, and the `integrate_launch_*` and launcher tests that run through `check_exit.py` |
 | [asm_oracle/](asm_oracle/README.md) | The C that replaces the SDK's assembly, against the ROM's own machine code run in Unicorn (a test tool only) on seeded random inputs | Copies, fills, decompression, matrices, sorting, SHA-1, RC4 | `asm_oracle` |
 | [assets/](assets) | Frigate's artwork as committed: each SVG is what its generator writes, the PNG masters' sizes, and the small images' ships pixel for pixel | None: the program's look | `assets_branding` |
 | [fx/](fx) | The decomp's libfx C as the host compiles it | 3D maths | `fx_libfx` |

@@ -14,6 +14,12 @@
 # The app must hold all four and load them from itself alone: it is moved and the originals taken away before it runs
 # again. Its icon must be the .icns given, with the ten images of a macOS icon set (the 16 and 32 pixel ones the small
 # images drawn for their size), and its Info.plist must hold the names, the identifier and the About text as given.
+#
+# A universal program, arm64 and x86_64 for macOS 11.0 as the distribution build makes it (ADR 0015), with a universal
+# library: the app of both slices, its LSMinimumSystemVersion --minimum's, the program started as each slice this Mac
+# runs; check_app.sh on that app, which reads each slice's signature and compares versions part by part (11 is 11.0);
+# and the refusals of --archs and --minimum: a program or a library without a slice the app is for, and a library
+# built for a newer macOS than the app's.
 set -u
 
 cc=$1
@@ -23,6 +29,7 @@ master=$4
 small16=$5
 small32=$6
 script="$repo/port/app/macos/make_app.sh"
+check_app="$repo/port/app/macos/check_app.sh"
 make_icns="$repo/port/app/macos/make_icns.sh"
 plist="$repo/port/app/macos/Info.plist.in"
 checks=0
@@ -37,13 +44,21 @@ expect() {
 }
 
 # Builds an app from the program $1 into $2 with the icon $3 (the version's by default) and the bundle identifier $4
-# (a test one by default), and prints the script's exit status, its messages in $work/messages. The About text has the
-# characters that XML and sed's replacements give a meaning to
+# (a test one by default), and the options that follow (--archs, --minimum), and prints the script's exit status, its
+# output in $work/output and its messages in $work/messages. The About text has the characters that XML and sed's
+# replacements give a meaning to
 about='Test & <About> | text \ with é; and more'
 make_app() {
-    "$script" --program "$1" --app "$2" --plist "$plist" --icon "${3:-$icns}" \
-        --bundle-id "${4:-io.github.callancampos.frigate.test}" --name "Test Name" --display-name "Prog App" \
-        --about "$about" --repo "$repo" >/dev/null 2>"$work/messages"
+    program=$1
+    bundle=$2
+    icon=${3:-$icns}
+    id=${4:-io.github.callancampos.frigate.test}
+    shift 2
+    [ $# -gt 0 ] && shift
+    [ $# -gt 0 ] && shift
+    "$script" --program "$program" --app "$bundle" --plist "$plist" --icon "$icon" --bundle-id "$id" \
+        --name "Test Name" --display-name "Prog App" --about "$about" --repo "$repo" "$@" >"$work/output" \
+        2>"$work/messages"
     echo $?
 }
 
@@ -204,6 +219,94 @@ expect "a program that doesn't start: status" "$(make_app "$work/bin x/bad" "$wo
 expect "a program that doesn't start: message" \
     "$(grep -c "the program doesn't start from the app" "$work/messages")" 1
 expect "a program that doesn't start: nothing made" "$(ls "$work/out dir")" ""
+
+# A universal program and library, both slices for macOS 11.0: the app of both, for macOS 11.0, started as each slice
+# this Mac runs (x86_64 needs Rosetta on Apple Silicon)
+mkdir -p "$work/uni"
+universal="-arch arm64 -arch x86_64 -mmacosx-version-min=11.0"
+printf 'int uni(void) { return 11; }\n' >uni.c
+printf '#include <stdio.h>\nint uni(void);\nint main(void) { printf("%%d\\n", uni()); return 0; }\n' >uniprog.c
+# shellcheck disable=SC2086 # the flags are words
+"$cc" $universal -dynamiclib -install_name @rpath/libuni.dylib -o "$work/uni/libuni.dylib" uni.c
+# shellcheck disable=SC2086
+"$cc" $universal -o "$work/uni/uniprog" uniprog.c -L"$work/uni" -luni "-Wl,-rpath,$work/uni"
+app="$work/out dir/Uni.app"
+expect "a universal program: status" \
+    "$(make_app "$work/uni/uniprog" "$app" "" "" --archs "arm64 x86_64" --minimum 11.0)" 0
+expect "a universal program: the program's slices" "$(lipo -archs "$app/Contents/MacOS/uniprog")" "x86_64 arm64"
+expect "a universal program: the library's slices" "$(lipo -archs "$app/Contents/Frameworks/libuni.dylib")" \
+    "x86_64 arm64"
+expect "a universal program: LSMinimumSystemVersion" \
+    "$(plutil -extract LSMinimumSystemVersion raw -o - "$app/Contents/Info.plist")" 11.0
+started=$(sed -n 's/.*; started as \(.*\)$/\1/p' "$work/output")
+for slice in arm64 x86_64; do
+    if arch "-$slice" /usr/bin/true 2>/dev/null; then
+        expect "a universal program: started as $slice" "$(printf '%s\n' "$started" | grep -c "$slice")" 1
+        expect "a universal program: runs as $slice" "$(arch "-$slice" "$app/Contents/MacOS/uniprog")" 11
+    fi
+done
+# check_app.sh on it: both slices, each signed ad hoc on its own, for macOS 11.0 however it is written, and not 12.0
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 11.0 >"$work/check" 2>&1
+expect "check_app.sh on the universal app: status" $? 0
+for slice in arm64 x86_64; do
+    expect "check_app.sh: the $slice slice's own signature" \
+        "$(grep -c "Uni.app ($slice): .*CodeDirectory .*flags=0x2(adhoc).* Signature=adhoc" "$work/check")" 1
+done
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 11 >"$work/check" 2>&1
+expect "check_app.sh with --minimum 11: status" $? 0
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 12.0 >"$work/check" 2>&1
+expect "check_app.sh with --minimum 12.0: status" $? 1
+expect "check_app.sh with --minimum 12.0: the slices and the Info.plist" "$(grep -c '^FAIL' "$work/check")" 3
+rm -rf "$app"
+
+# --minimum written 11, as CMake takes it: LSMinimumSystemVersion 11, which check_app.sh takes for 11.0
+expect "--minimum 11: status" \
+    "$(make_app "$work/uni/uniprog" "$app" "" "" --archs "arm64 x86_64" --minimum 11)" 0
+expect "--minimum 11: LSMinimumSystemVersion" \
+    "$(plutil -extract LSMinimumSystemVersion raw -o - "$app/Contents/Info.plist")" 11
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 11.0 >"$work/check" 2>&1
+expect "--minimum 11: check_app.sh with --minimum 11.0" $? 0
+rm -rf "$app"
+
+# The same app with --archs in CMake's own spelling, a list with a semicolon
+expect "--archs as a CMake list: status" \
+    "$(make_app "$work/uni/uniprog" "$app" "" "" --archs "arm64;x86_64" --minimum 11.0)" 0
+rm -rf "$app"
+
+# Without --minimum, LSMinimumSystemVersion is the newest macOS a slice was built for: here a library's 13.0
+# shellcheck disable=SC2086
+"$cc" -arch arm64 -arch x86_64 -mmacosx-version-min=13.0 -dynamiclib -install_name @rpath/libuni.dylib \
+    -o "$work/uni/libuni.dylib" uni.c
+expect "a library for macOS 13: status without --minimum" "$(make_app "$work/uni/uniprog" "$app")" 0
+expect "a library for macOS 13: LSMinimumSystemVersion without --minimum" \
+    "$(plutil -extract LSMinimumSystemVersion raw -o - "$app/Contents/Info.plist")" 13.0
+rm -rf "$app"
+# and with --minimum 11.0, no app
+expect "a library for macOS 13: status" \
+    "$(make_app "$work/uni/uniprog" "$app" "" "" --archs "arm64 x86_64" --minimum 11.0)" 1
+expect "a library for macOS 13: message" \
+    "$(grep -c "libuni.dylib's [a-z0-9_]* slice is built for macOS 13.0, newer than the app's 11.0" "$work/messages")" 1
+expect "a library for macOS 13: nothing made" "$(ls "$work/out dir")" ""
+
+# A library with one slice where the app is for two: no app
+"$cc" -arch arm64 -mmacosx-version-min=11.0 -dynamiclib -install_name @rpath/libuni.dylib -o "$work/uni/libuni.dylib" \
+    uni.c
+expect "a library without its x86_64 slice: status" \
+    "$(make_app "$work/uni/uniprog" "$app" "" "" --archs "arm64 x86_64" --minimum 11.0)" 1
+expect "a library without its x86_64 slice: message" \
+    "$(grep -c "libuni.dylib has no x86_64 slice (it has arm64); the app is for arm64 x86_64" "$work/messages")" 1
+expect "a library without its x86_64 slice: nothing made" "$(ls "$work/out dir")" ""
+
+# A program with one slice, this Mac's, where the app is for two: no app
+expect "a program with one slice: status" \
+    "$(make_app "$work/bin x/prog" "$work/out dir/One.app" "" "" --archs "arm64 x86_64")" 1
+expect "a program with one slice: message" "$(grep -c "prog has no [a-z0-9_]* slice" "$work/messages")" 1
+expect "a program with one slice: nothing made" "$(ls "$work/out dir")" ""
+
+# A --minimum that isn't a version: no app
+expect "a --minimum that isn't a version: status" \
+    "$(make_app "$work/bin x/prog" "$work/out dir/Bad.app" "" "" --minimum eleven)" 2
+expect "a --minimum that isn't a version: message" "$(grep -c "takes a macOS version" "$work/messages")" 1
 
 # A master that isn't 1024 x 1024, or a small image that isn't its size: no .icns
 sips -z 512 512 "$master" --out "$work/small.png" >/dev/null

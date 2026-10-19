@@ -7,10 +7,11 @@
 # Layouts (-DPORT_OVSEC_LAYOUT): split, the default, gives an overlay a data section and a zerofill bss section;
 # combined gives it one section, with its zeroed statics in the file (-fno-zero-initialized-in-bss), for when the
 # split layout's sections no longer fit Mach-O's 255. On macOS a step before the link of every program that links the
-# game's objects (the game and the tests that link it, whichever fragment adds them) counts the sections and stops a
-# link that would pass 255, or the budget of 150 overlay sections, with a message that names the cause; it also stops
-# one whose objects put a writable static of an overlay file outside its overlay's sections, where no reset would find
-# it (a leak).
+# game's objects (the game and the tests that link it, whichever fragment adds them) counts the sections, of each slice
+# of a universal program (the distribution build's, ADR 0015), and stops a link that would pass 255, or the budget of
+# 150 overlay sections, with a message that names the cause; it also stops one whose objects put a writable static of
+# an overlay file outside its overlay's sections, where no reset would find it (a leak). After the link, a test per
+# program compares each slice's sections with the prediction, by name.
 
 set(PORT_OVSEC_LAYOUT "split" CACHE STRING "Overlay sections: split (data and bss apart) or combined (one per overlay)")
 set_property(CACHE PORT_OVSEC_LAYOUT PROPERTY STRINGS split combined)
@@ -125,14 +126,14 @@ if(APPLE)
         file(GENERATE OUTPUT "${port_ovsec_gen}/link_inputs_${target}.txt" CONTENT "$<JOIN:${inputs},\n>\n")
         add_custom_command(TARGET ${target} PRE_LINK
             COMMAND "${PORT_PYTHON}" "${port_ovsec_tool}" check --inputs "${port_ovsec_gen}/link_inputs_${target}.txt"
-                --out "${port_ovsec_gen}/link_sections_${target}.txt" --overlay-budget "${PORT_OVSEC_BUDGET}"
+                --out "${port_ovsec_gen}/link_sections_${target}.json" --overlay-budget "${PORT_OVSEC_BUDGET}"
                 --overlay-objects "${port_ovsec_gen}/checked_objects.txt"
             VERBATIM)
         set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS
             "${port_ovsec_tool}" "${port_ovsec_gen}/checked_objects.txt")
         add_test(NAME overlay_sections_image_${target}
             COMMAND "${PORT_PYTHON}" "${port_ovsec_tool}" image $<TARGET_FILE:${target}>
-                --predicted "${port_ovsec_gen}/link_sections_${target}.txt")
+                --predicted "${port_ovsec_gen}/link_sections_${target}.json")
     endfunction()
 
     # Every program of this directory whose sources name the game's objects, once every fragment has added its own
@@ -155,7 +156,7 @@ if(APPLE)
     add_test(NAME overlay_sections_budget
         COMMAND "${PORT_PYTHON}" "${port_ovsec_tool}" check
             --inputs "${port_ovsec_gen}/link_inputs_${PORT_PROGRAM}.txt"
-            --out "${port_ovsec_gen}/budget_test.txt" --overlay-budget 1)
+            --out "${port_ovsec_gen}/budget_test.json" --overlay-budget 1)
     set_tests_properties(overlay_sections_budget PROPERTIES
         PASS_REGULAR_EXPRESSION "overlay sections, over the budget of 1")
     file(WRITE "${port_ovsec_gen}/leak_test_objects.txt.new"
@@ -164,7 +165,7 @@ if(APPLE)
     add_test(NAME overlay_sections_leaks
         COMMAND "${PORT_PYTHON}" "${port_ovsec_tool}" check
             --inputs "${port_ovsec_gen}/link_inputs_${PORT_PROGRAM}.txt"
-            --out "${port_ovsec_gen}/leak_test.txt" --overlay-budget 0
+            --out "${port_ovsec_gen}/leak_test.json" --overlay-budget 0
             --overlay-objects "${port_ovsec_gen}/leak_test_objects.txt")
     set_tests_properties(overlay_sections_leaks PROPERTIES
         PASS_REGULAR_EXPRESSION "_sLocked of overlay 0's src/gfl/backup_card.c in __DATA,__(bss|data|common)")

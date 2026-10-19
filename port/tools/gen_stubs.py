@@ -39,7 +39,8 @@ IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Placeholders get room beyond the DS size, since host layouts of structs with pointers are larger
 PLACEHOLDER_SCALE = 2
 PLACEHOLDER_MAX = 0x10000
-# nm prints Mach-O's symbols with a leading underscore; the objects are this machine's, which builds for itself
+# nm prints Mach-O's symbols with a leading underscore; the objects are this machine's, every slice of a universal macOS
+# build (ADR 0015) a Mach-O one
 MACHO = sys.platform == "darwin"
 # A quoted argument of the compiler driver's -### output, with its backslashes and quotes escaped
 DRIVER_ARGUMENT = re.compile(r'"((?:[^"\\]|\\.)*)"')

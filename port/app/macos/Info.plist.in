@@ -16,8 +16,10 @@
   - The versions come from git: CFBundleVersion is the number of commits up to the one built, which only grows along
     main, CFBundleShortVersionString is 0.0 and that number, and PortSourceRevision is the commit itself (git describe,
     with -dirty for a build of uncommitted changes).
-  - LSMinimumSystemVersion is the newest macOS that the program and the libraries in the bundle were built for
-    (their LC_BUILD_VERSION), so that an older macOS says so instead of failing to load them.
+  - LSMinimumSystemVersion is the oldest macOS the app runs on, so that an older one says so instead of failing to load
+    it: the build's deployment target when it sets one (make_app.sh's --minimum, CMAKE_OSX_DEPLOYMENT_TARGET: 11.0 for
+    the distribution build, ADR 0015), which no binary of the app may be built for a newer macOS than; else the newest
+    macOS that the program and the libraries in the bundle were built for (their LC_BUILD_VERSION).
   - NSHighResolutionCapable gives the window a Retina backing store; the window asks SDL for its full pixel density
     (port/app/present.c).
   - LSApplicationCategoryType is a game category, and GCSupportsGameMode (macOS 14 and later) and LSSupportsGameMode

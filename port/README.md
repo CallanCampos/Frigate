@@ -25,8 +25,9 @@ match melonDS pass for pass in both versions, and the party list and the Pokéde
 ## Quick start
 
 Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux and Windows too
-([Building on Windows](#building-on-windows)). It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or later and
-SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+([Building on Windows](#building-on-windows)); CI's job for the macOS app for other Macs, on Apple Silicon and Intel,
+is set up and hasn't run yet ([The macOS app](#the-macos-app)). It needs CMake 3.28 or later, Ninja, clang, Python 3.11
+or later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake downloads the pinned SDL3 release and builds it).
 Running the game needs your own dump of the ROM. A clone needs the decomp's untracked inputs first:
 [Preparing a checkout](#preparing-a-checkout) has the steps, and places your dumps as `orig/baserom_b2_us.nds` and
 `orig/baserom_w2_us.nds`.
@@ -147,8 +148,8 @@ asm oracle, each spike, the artwork) lists its files there.
 [PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
-(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests); any other change outside
-`port/` is a game change listed in [docs/game-changes.md](docs/game-changes.md).
+(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests, and the macOS distribution
+build); any other change outside `port/` is a game change listed in [docs/game-changes.md](docs/game-changes.md).
 
 ## Where to go next
 
@@ -227,6 +228,29 @@ cmake --build build/port --target frigate-black2_app   # build/port/Frigate Blac
 port/tools/package_macos.sh                             # build/port/Frigate Black 2 0.0.N.dmg, with the app
 ```
 
+That app is for the Mac that built it: the program is built for its processor and its SDK's macOS (26 with Xcode 26),
+and loads Homebrew's SDL3, which is built for the same. **The distribution build** makes the app for other Macs than
+the one that builds it (yours, to copy it to: nothing in this repository uploads it): one universal program, for
+Apple Silicon (arm64) and Intel (x86_64) Macs, built for **macOS 11 Big Sur and later** (so far run only on macOS
+26), with SDL3's pinned release built along for the same target and linked into the program, so that the app holds no
+library ([ADR 0015](docs/adr/0015-universal-macos-app-for-macos-11.md)). One command configures it in a build
+directory of its own, builds it, makes the app and puts it in a checked disk image:
+
+```sh
+port/tools/package_macos.sh --distribution                 # build/port-dist/Frigate Black 2 0.0.N.dmg
+port/tools/package_macos.sh --distribution --version w2_us # build/port-dist-w2/Frigate White 2 0.0.N.dmg
+```
+
+By hand, that is `cmake -S port -B build/port-dist -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+-DPORT_MACOS_DISTRIBUTION=ON`, then the build and the app's target as above; a directory configured with the option
+stays the distribution build's. The first configure downloads SDL3's pinned release from GitHub (it needs the network)
+and configures it, and the build compiles it and everything else for both processors, so it takes about twice a
+development build's time. It has been tested on macOS 26 on Apple Silicon, its x86_64 slice under Rosetta. CI's
+distribution job is set up to build and test it on macOS 15 and 26, Apple Silicon and Intel, and hasn't run yet: no
+macOS older than 26 has run it. `ctest --test-dir build/port-dist` runs the tests as this Mac's slice,
+`port/tools/ctest_one_slice.sh --build-dir build/port-dist --arch x86_64` runs them as the x86_64 slice under Rosetta,
+and `app_universal_slices` runs both slices through the opening and requires the same frames.
+
 - `-DPORT_VERSION=w2_us` makes `Frigate White 2.app` (target `frigate-white2_app`), and `-DPORT_MACOS_APP=ON` makes the
   app with every build. The menu bar and the About window call it Frigate; the Finder and the Dock, Frigate Black 2 or
   Frigate White 2.
@@ -249,10 +273,14 @@ port/tools/package_macos.sh                             # build/port/Frigate Bla
   Frigate's prefix ([app/macos/bundle_id.cmake](app/macos/bundle_id.cmake)), and `make_app.sh` refuses any
   `com.example` identifier.
 - The version comes from git: `0.0.N`, N being the number of commits built, and the commit in `PortSourceRevision`.
-  The minimum macOS is the one the program and the libraries in the app were built for; with Homebrew's SDL3 that is
-  the macOS Homebrew built SDL3 for.
+  The minimum macOS (`LSMinimumSystemVersion`) is the build's deployment target when it sets one, 11.0 for the
+  distribution build, and `make_app.sh` refuses a binary without a slice for each of the build's architectures or
+  built for a newer macOS; otherwise it is the newest macOS any binary in the app was built for, the SDK's for a
+  development build. [app/macos/check_app.sh](app/macos/check_app.sh) prints what an app's or a program's load
+  commands say, slice by slice, and checks them, as CI does on the distribution app.
 - `package_macos.sh` puts the app and a link to `/Applications` in a compressed disk image, then checks the image, the
-  app's signature in it, and that it holds no ROM or other game file. `--out PATH` puts it elsewhere, but never where
+  app's signature in it, its slices and minimum macOS against the build's, and that it holds no ROM or other game
+  file. `--out PATH` puts it elsewhere, but never where
   git would take it into a repository, this one or another (only under an ignored directory such as `build/`, or
   outside every work tree). Its header lists its options.
 
@@ -279,16 +307,28 @@ alert, and the log says why: a save file it can't use (one that isn't the 512 Ki
 reaching code that has no C yet (a trap stub, the commonest today), the game stopping or resetting itself, or a crash.
 Run from a terminal, or with `open --stderr PATH`, the messages go there instead.
 
-**Gatekeeper.** An app built on your own Mac opens normally. One that came from elsewhere (a download, or a disk image
-copied from another Mac) is quarantined, and macOS 15 and later block it until you allow it once:
+**Installing on another Mac.** Open the disk image, drag the app onto Applications and open it from there. On another
+Mac the app doesn't find the ROM of the checkout it was built in: give it yours with
+`open -n -a "Frigate Black 2" --args --rom PATH` or `--env FRIGATE_ROM=PATH`, as above. The program keeps the path of
+that checkout, and its debug map those of the build's objects, so the app names your home folder: it is for your own
+Macs. A build for other people would be made from a neutral path and stripped first
+([ADR 0010](docs/adr/0010-macos-app-as-a-signed-copy-of-the-program.md),
+[ADR 0015](docs/adr/0015-universal-macos-app-for-macos-11.md)).
 
-1. Open the app. macOS says it can't verify it; click **Done**.
+**Gatekeeper.** An app built on your own Mac opens normally. One that came from elsewhere (a download, AirDrop, or a
+disk image copied from another Mac) is quarantined, and since it is signed ad hoc and not notarized, macOS blocks it
+until you allow it once. On **macOS 15 Sequoia and later**:
+
+1. Open the app. macOS says it couldn't verify that the app is free of malware; click **Done** (not **Move to
+   Trash**).
 2. Open **System Settings → Privacy & Security** and scroll to **Security**, where it says the app "was blocked to
    protect your Mac". Click **Open Anyway** (it shows for about an hour after the blocked launch).
 3. Confirm with **Open Anyway** and your password or Touch ID.
 
-From then on the app opens normally. On macOS 14 and earlier, Control-clicking the app and choosing **Open** does the
-same. Do this only for an app whose source you trust.
+On **macOS 11 Big Sur to 14 Sonoma**, Control-click (or right-click) the app in the Finder, choose **Open**, and click
+**Open** in the dialog; or, after a blocked launch, click **Open Anyway** under **System Preferences → Security &
+Privacy → General** (macOS 11 and 12) or **System Settings → Privacy & Security** (13 and 14). From then on the app
+opens normally. Do this only for an app whose source you trust.
 
 ## Preparing a checkout
 

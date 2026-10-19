@@ -70,8 +70,10 @@ ROMs byte for byte (or sit behind a host-only switch).
 The decomp builds here exactly as upstream: see the [README](../README.md) and [build details](../docs/building.md).
 `python3 configure.py && ninja` rebuilds both ROMs from your own dumps and checks both SHA1s. Frigate builds with
 CMake, as [port/README.md](../port/README.md#quick-start) says: `frigate-black2` and `frigate-white2`, and on macOS
-`Frigate Black 2.app` and `Frigate White 2.app`, which you build yourself from your own checkout. On Windows it builds
-in MSYS2's CLANG64 environment ([Building on Windows](../port/README.md#building-on-windows)).
+`Frigate Black 2.app` and `Frigate White 2.app`, which you build yourself from your own checkout, for your Mac or, with
+the distribution build, as one universal app for Apple Silicon and Intel Macs, built for macOS 11 or later and so far
+run only on macOS 26 ([port/README.md](../port/README.md#the-macos-app)). On Windows it builds in MSYS2's CLANG64
+environment ([Building on Windows](../port/README.md#building-on-windows)).
 
 ## For decomp contributors
 

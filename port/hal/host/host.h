@@ -26,8 +26,10 @@
 
 // The alignment of a static array that must start a page (port/hal/hw's memory windows, and the paddings around the
 // trap stubs' placeholders that port/tools/gen_stubs.py writes): the largest page of the hosts, Apple Silicon's 16 KiB,
-// but Windows' 4 KiB there, since COFF aligns no static object beyond 8 KiB
-#ifdef _WIN32
+// but 4 KiB, the host's page, on Windows, since COFF aligns no static object beyond 8 KiB, and in an x86_64 Mach-O
+// program (the macOS app's Intel slice, port/docs/adr/0015), whose linker holds a section's alignment to its 4 KiB page
+// and warns at more. The preprocessor chooses, so each slice of a universal macOS program gets its own
+#if defined(_WIN32) || (defined(__APPLE__) && defined(__x86_64__))
 #define PORT_HOST_PAGE_ALIGNMENT 4096
 #else
 #define PORT_HOST_PAGE_ALIGNMENT 16384

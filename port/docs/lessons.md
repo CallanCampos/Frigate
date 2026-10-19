@@ -3,6 +3,39 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the universal macOS app, after review
+
+- **`-Werror=` doesn't survive `-w` or `-Wno-everything`, in either order, nor a system header.** With Apple clang 21,
+  a call to a macOS 26 API at a target of 11.0 compiles, and is weakly imported, under
+  `-Werror=unguarded-availability -Wno-everything -Werror=unguarded-availability`, and inside a header found through
+  `-isystem` (CMake's `SYSTEM` include directories). To hold a header-only library to the check, compile its
+  implementation with `--no-system-header-prefix=NAME.h` and no `-w`, as `port/cmake/os.cmake` does for minicoro. Test
+  such a probe with the build's compiler (`/usr/bin/cc`): Homebrew's clang, first on this Mac's `PATH`, uses the
+  Command Line Tools' older SDK, where a macOS 26 function isn't declared at all.
+- **`codesign -d` reads one slice too**, the Mac's own: give `--arch` for each slice of a universal program.
+- **Write down where a claim about CI came from, and look again before relying on it**: "the oldest runner is macOS 14,
+  deprecated" was true and still led to testing nothing older than 26, while macOS 15's runners, not deprecated, have
+  Xcode 26 beside their default.
+
+## 2026-10-18: the universal macOS app
+
+- **`otool`, `nm` and the like read one slice of a universal file**, the Mac's own, unless told otherwise: make_app.sh
+  took its libraries, search paths and minimum macOS from the arm64 slice alone, and gen_overlay_sections.py counted
+  one slice. Read every slice (`otool -arch all`, `llvm-dwarfdump --arch`, a parser that walks the fat header), and
+  check each against the build's architectures.
+- **The deployment target changes what the linker makes**, not only the minos it writes: below macOS 12 on arm64 and
+  13 on x86_64 a program binds lazily, with sections of its own, and a static library with Objective-C brings more on
+  arm64. A tool that predicts a link must take its rules from the target and the architecture, and a test that compares
+  by name, not count, says which rule is missing. Measure each rule with a small program at several targets.
+- **An x86_64 Mach-O program can't align a section past 4 KiB**: ld64 lowers it and only warns, so a 16 KiB-aligned
+  window in a universal build is 16 KiB-aligned on arm64 and by luck on x86_64. Check what the code needs (the host's
+  page), not a constant.
+- **A library fetched and built along takes what the builder's Mac has**: SDL3's configure found Homebrew's libusb and
+  built in a dlopen of it. A build for other Macs turns such options off, so that it doesn't depend on the machine it
+  was made on.
+- **bash 3.2, macOS's `sh`, can't parse a `case` inside `$(...)`** whose patterns lack their opening parenthesis: write
+  `(pattern)` there.
+
 ## 2026-10-18: the Windows track's merge, after review
 
 - **Trace a warning count that moved against the base's own CI run, file and line.** The last STATUS entry's count

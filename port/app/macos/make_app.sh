@@ -9,7 +9,7 @@
 # them (port/hal/card).
 #
 #   make_app.sh --program PATH --app PATH --plist TEMPLATE --icon ICNS --bundle-id ID --name NAME --display-name NAME
-#               --about TEXT --repo DIR
+#               --about TEXT --repo DIR [--archs "ARCH ..."] [--minimum VERSION]
 #
 #   --icon ICNS          the app's icon (CFBundleIconFile), an .icns file
 #   --bundle-id ID       the bundle identifier (CFBundleIdentifier), io.github.callancampos.frigate.black2; a
@@ -18,10 +18,18 @@
 #   --display-name NAME  the app's own name (CFBundleDisplayName), Frigate Black 2 or Frigate White 2
 #   --about TEXT         what the About window says under the name (NSHumanReadableCopyright): what Frigate is and that
 #                        it is not affiliated with the game's owners (port/hal/os/port_app.h)
+#   --archs "ARCH ..."   the architectures the app is for (CMAKE_OSX_ARCHITECTURES; arm64 x86_64 for the distribution
+#                        build, ADR 0015), separated by blanks, commas or semicolons: every binary of the app must have
+#                        a slice for each. Without it, any slices do
+#   --minimum VERSION    the oldest macOS the app is for (CMAKE_OSX_DEPLOYMENT_TARGET; 11.0 for the distribution build),
+#                        its LSMinimumSystemVersion: no slice of any binary of the app may be built for a newer one.
+#                        Without it, LSMinimumSystemVersion is the newest macOS any slice is built for
 #
-# Before it signs, it checks that every binary of the app loads nothing from outside macOS and the app, and after, that
-# the program starts from the app (--help). The app is built next to its final path and moved there once it is signed
-# and verified, so that a failed build leaves no half-made app behind. port/tests/app/test_make_app.sh tests it.
+# Before it signs, it checks that every binary of the app, every slice of it, loads nothing from outside macOS and the
+# app, and has the slices and the macOS that --archs and --minimum ask for; after, that the program starts from the app
+# (--help) as each of its slices that this Mac can run (an x86_64 slice on Apple Silicon needs Rosetta). The app is
+# built next to its final path and moved there once it is signed and verified, so that a failed build leaves no
+# half-made app behind. port/tests/app/test_make_app.sh tests it, and port/app/macos/check_app.sh checks the app made.
 set -eu
 
 program=
@@ -33,6 +41,8 @@ bundle_name=
 display_name=
 about=
 repo=
+archs=
+minimum_wanted=
 while [ $# -gt 0 ]; do
     case "$1" in
     --program) program=$2 ;;
@@ -44,6 +54,8 @@ while [ $# -gt 0 ]; do
     --display-name) display_name=$2 ;;
     --about) about=$2 ;;
     --repo) repo=$2 ;;
+    --archs) archs=$(printf '%s' "$2" | tr ',;' '  ') ;;
+    --minimum) minimum_wanted=$2 ;;
     *)
         echo "make_app.sh: unknown argument $1" >&2
         exit 2
@@ -66,6 +78,13 @@ com.example.*)
     exit 2
     ;;
 esac
+case "$minimum_wanted" in
+'' | [0-9]* ) ;;
+*)
+    echo "make_app.sh: --minimum takes a macOS version, such as 11.0, not $minimum_wanted" >&2
+    exit 2
+    ;;
+esac
 # An .icns file starts with its type, "icns"
 if [ ! -f "$icon" ] || [ "$(head -c 4 "$icon")" != icns ]; then
     echo "make_app.sh: $icon isn't an .icns file" >&2
@@ -78,7 +97,7 @@ contents="$staging/Contents"
 frameworks="$contents/Frameworks"
 queue="$staging.queue"
 # A build that fails leaves nothing behind it; one that succeeds has moved the staging app into place by then
-trap 'rm -rf "$staging" "$queue" "$queue.names"' EXIT
+trap 'rm -rf "$staging" "$queue" "$queue.names" "$queue.slices"' EXIT
 rm -rf "$staging" "$queue"
 mkdir -p "$contents/MacOS" "$contents/Resources" "$frameworks"
 cp "$program" "$contents/MacOS/$name"
@@ -86,22 +105,42 @@ cp "$program" "$contents/MacOS/$name"
 cp "$icon" "$contents/Resources/AppIcon.icns"
 program_dir=$(cd "$(dirname "$program")" && pwd -P)
 
-# The install names a binary loads, one per line (of every slice of a universal binary), without a library's own id
+# The install names a binary loads, one per line, of every slice of a universal binary (otool alone reads only the
+# slice of the Mac it runs on), without a library's own id. otool -arch all heads each slice's list with a line that
+# ends with a colon, which no install name does
 dependencies() {
-    id=$(otool -D "$1" | tail -n +2 | head -1)
-    otool -L "$1" | sed -n 's/^[[:space:]]\{1,\}\(.*\) (compatibility version.*$/\1/p' | sort -u |
+    ids=$(otool -arch all -D "$1" | grep -v ':$' || true)
+    otool -arch all -L "$1" | sed -n 's/^[[:space:]]\{1,\}\(.*\) (compatibility version.*$/\1/p' | sort -u |
         while IFS= read -r dependency; do
-            if [ "$dependency" != "$id" ]; then
+            if ! printf '%s\n' "$ids" | grep -qxF -e "$dependency"; then
                 printf '%s\n' "$dependency"
             fi
         done
 }
 
-# A binary's search paths (LC_RPATH), one per line
+# A binary's search paths (LC_RPATH), one per line, in order, those of every slice once
 search_paths() {
-    otool -l "$1" | awk '
+    otool -arch all -l "$1" | awk '
         $1 == "cmd" { rpath = ($2 == "LC_RPATH") }
-        rpath && $1 == "path" { sub(/^ *path /, ""); sub(/ \(offset [0-9]+\)$/, ""); print }'
+        rpath && $1 == "path" { sub(/^ *path /, ""); sub(/ \(offset [0-9]+\)$/, ""); if (!seen[$0]++) print }'
+}
+
+# The macOS a slice of a binary is built for: LC_BUILD_VERSION's minos, or LC_VERSION_MIN_MACOSX's version for
+# binaries built before it
+slice_minimum() {
+    otool -arch "$2" -l "$1" | awk '
+        $1 == "cmd" { build = ($2 == "LC_BUILD_VERSION"); old = ($2 == "LC_VERSION_MIN_MACOSX") }
+        build && $1 == "minos" { print $2; exit }
+        old && $1 == "version" { print $2; exit }'
+}
+
+# Whether version $1 is newer than $2, part by part
+newer() {
+    printf '%s %s\n' "$1" "$2" | awk '{
+        n = split($1, a, "."); m = split($2, b, ".")
+        for (i = 1; i <= 3; i++) { x = (i <= n) ? a[i] + 0 : 0; y = (i <= m) ? b[i] + 0 : 0
+            if (x != y) exit !(x > y) }
+        exit 1 }'
 }
 
 # Whether a path is macOS's own: its libraries are in /usr/lib and /System, some only in dyld's shared cache
@@ -267,26 +306,46 @@ for binary in "$contents/MacOS/$name" "$frameworks"/*; do
     done
 done
 
-# The newest macOS any binary of the app was built for (LC_BUILD_VERSION's minos, or LC_VERSION_MIN_MACOSX's version
-# for binaries built before it), compared part by part
-minimum=$(
-    for binary in "$contents/MacOS/$name" "$contents"/Frameworks/*; do
-        [ -f "$binary" ] || continue
-        otool -l "$binary" | awk '
-            $1 == "cmd" { build = ($2 == "LC_BUILD_VERSION"); old = ($2 == "LC_VERSION_MIN_MACOSX") }
-            build && $1 == "minos" { print $2 }
-            old && $1 == "version" { print $2 }'
-    done | awk -F. '
+# Every slice of every binary of the app: the architectures --archs asks for are there, and none is built for a newer
+# macOS than --minimum. "binary<TAB>architecture<TAB>macOS" for each slice, for what follows
+for binary in "$contents/MacOS/$name" "$contents"/Frameworks/*; do
+    [ -f "$binary" ] || continue
+    present=$(lipo -archs "$binary")
+    for wanted in $archs; do
+        if ! printf '%s\n' $present | grep -qxF -e "$wanted"; then
+            echo "make_app.sh: $binary has no $wanted slice (it has $present); the app is for $archs" >&2
+            exit 1
+        fi
+    done
+    for slice in $present; do
+        built_for=$(slice_minimum "$binary" "$slice")
+        if [ -z "$built_for" ]; then
+            echo "make_app.sh: $binary's $slice slice doesn't say which macOS it was built for" >&2
+            exit 1
+        fi
+        if [ -n "$minimum_wanted" ] && newer "$built_for" "$minimum_wanted"; then
+            echo "make_app.sh: $binary's $slice slice is built for macOS $built_for, newer than the app's" \
+                "$minimum_wanted" >&2
+            exit 1
+        fi
+        printf '%s\t%s\t%s\n' "$binary" "$slice" "$built_for"
+    done
+done >"$queue.slices"
+
+# LSMinimumSystemVersion: --minimum's, else the newest macOS any slice was built for, compared part by part
+if [ -n "$minimum_wanted" ]; then
+    minimum=$minimum_wanted
+else
+    minimum=$(cut -f3 "$queue.slices" | awk -F. '
         { major = $1 + 0; minor = $2 + 0; patch = $3 + 0
           if (!seen || major > bm || (major == bm && (minor > bn || (minor == bn && patch > bp)))) {
               bm = major; bn = minor; bp = patch; seen = 1
           } }
-        END { if (seen) { printf "%d.%d", bm, bn; if (bp) printf ".%d", bp; print "" } }'
-)
-if [ -z "$minimum" ]; then
-    echo "make_app.sh: no binary of the app says which macOS it was built for" >&2
-    exit 1
+        END { if (seen) { printf "%d.%d", bm, bn; if (bp) printf ".%d", bp; print "" } }')
 fi
+program_archs=$(awk -F '\t' -v program="$contents/MacOS/$name" '$1 == program { printf "%s%s", sep, $2; sep = " " }' \
+    "$queue.slices")
+rm -f "$queue.slices"
 
 # The versions from git (Info.plist.in says what each is)
 count=$(git -C "$repo" rev-list --count HEAD)
@@ -312,18 +371,27 @@ printf 'APPL????' >"$contents/PkgInfo"
 codesign --force --deep --sign - "$staging"
 codesign --verify --deep --strict "$staging"
 
-# The program starts from the app: dyld loads every library from where the app says, or stops it at once. --help
-# returns before anything opens, and its output is kept (the program writes its messages to a log file when it runs
-# from an app with nowhere to write them, port/app/main.c). A program for another architecture isn't run
-if lipo -archs "$contents/MacOS/$name" | tr ' ' '\n' | grep -qx "$(uname -m)"; then
+# The program starts from the app, as each of its slices that this Mac runs (arch -ARCH; an x86_64 slice on Apple
+# Silicon runs under Rosetta, which may not be installed, and an arm64 one never runs on an Intel Mac): dyld loads every
+# library from where the app says, or stops it at once. --help returns before anything opens, and its output is kept
+# (the program writes its messages to a log file when it runs from an app with nowhere to write them, port/app/main.c)
+started=
+for slice in $program_archs; do
+    if ! arch "-$slice" /usr/bin/true 2>/dev/null; then
+        echo "make_app.sh: the program's $slice slice can't run on this Mac, so its start from the app isn't checked"
+        continue
+    fi
     if ! output=$(env -u DYLD_LIBRARY_PATH -u DYLD_FALLBACK_LIBRARY_PATH -u DYLD_FRAMEWORK_PATH \
-        -u DYLD_FALLBACK_FRAMEWORK_PATH -u DYLD_INSERT_LIBRARIES "$contents/MacOS/$name" --help 2>&1); then
+        -u DYLD_FALLBACK_FRAMEWORK_PATH -u DYLD_INSERT_LIBRARIES \
+        arch "-$slice" "$contents/MacOS/$name" --help 2>&1); then
         printf '%s\n' "$output" >&2
-        echo "make_app.sh: the program doesn't start from the app" >&2
+        echo "make_app.sh: the program doesn't start from the app (its $slice slice)" >&2
         exit 1
     fi
-fi
+    started="$started${started:+ and }$slice"
+done
 
 rm -rf "$app"
 mv "$staging" "$app"
-echo "make_app.sh: $app (bundle $bundle_id, version 0.0.$count, $revision, macOS $minimum or later), signed ad hoc"
+echo "make_app.sh: $app (bundle $bundle_id, version 0.0.$count, $revision, $program_archs, macOS $minimum or later)," \
+    "signed ad hoc; started as ${started:-no slice}"
