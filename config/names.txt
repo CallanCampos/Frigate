@@ -9518,6 +9518,9 @@ overlays/ov092 0x021efe74 GymElec_CreateProgressEvent
 overlays/ov092 0x021efeb8 GymElec_ProgressEvent
 overlays/ov092 0x021eff6c GymElecSave_SetProgress
 overlays/ov092 0x021eff70 GymElecSave_GetProgress
+overlays/ov093 0x021eec80 GymNacrene_Init
+overlays/ov093 0x021eecb4 GymNacrene_End
+overlays/ov093 0x021eecc0 GymNacrene_Update
 overlays/ov094 0x021eec80 GymMistralton_Init
 overlays/ov094 0x021eecfc GymMistralton_End
 overlays/ov094 0x021eed34 GymMistralton_Update
