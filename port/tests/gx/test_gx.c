@@ -259,11 +259,16 @@ static void test_views(void) {
     CHECK(port_vram_view(PORT_VRAM_VIEW_LCDC) == port_hw_pointer(0x06800000));
     // Each view starts a slot of region 0x06's window, as the aliasing backends map them, and a page of the host's: the
     // window is aligned to PORT_HOST_PAGE_ALIGNMENT (port/hal/host/host.h), 16 KiB on Apple Silicon and Linux, 4 KiB
-    // on Windows, which copies the banks, and in an x86_64 Mach-O program (port/hal/hw/hw.c)
+    // on Windows, which copies the banks, and in an x86_64 Mach-O program (port/hal/hw/hw.c). The page the system
+    // reports at run time must divide it too, or the aliasing backends would skip and the game copy the banks with no
+    // test failing; a page larger than a slot (64 KiB on some arm64 Linux kernels) can't alias whatever the window's
+    // alignment, so there the banks are copied by design (port/hal/gx/vram_os.c)
     uintptr_t window = (uintptr_t)port_hw_pointer(0x06000000);
+    size_t page = port_host_page_size();
     for (int view = 0; view < PORT_VRAM_CPU_VIEW_COUNT; view++) {
         CHECK(((uintptr_t)port_vram_view(view) - window) % PORT_VRAM_SLOT_SIZE == 0);
         CHECK((uintptr_t)port_vram_view(view) % PORT_HOST_PAGE_ALIGNMENT == 0);
+        CHECK(page > PORT_VRAM_SLOT_SIZE || (uintptr_t)port_vram_view(view) % page == 0);
     }
 }
 

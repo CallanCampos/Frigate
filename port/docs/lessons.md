@@ -3,6 +3,15 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the macOS and White 2 merge, after review
+
+- **A build-time alignment and the page the system reports are two checks.** The merge folded the mac track's
+  `% port_vram_os_page_size()` in `test_gx.c` into the Windows seam's `% PORT_HOST_PAGE_ALIGNMENT`, which proves only
+  that the linker kept `hw.c`'s alignment. A host whose page is larger than the macro but still fits in a slot would
+  then have its aliasing backends skip (77) and the game copy the banks, with every test passing. Where a merge
+  replaces a run-time measure with a constant, keep the run-time check beside it, bounded to the hosts where it can
+  hold (here a page no larger than a slot, `port/hal/gx/vram_os.c`). Rosetta reports 4096, as an Intel Mac does.
+
 ## 2026-10-18: the macOS and White 2 tracks merged
 
 - **A C library's `memset` touches the bytes in its own order.** `host_trap_placeholder_fiber` clears a trap

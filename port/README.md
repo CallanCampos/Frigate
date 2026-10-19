@@ -247,9 +247,10 @@ stays the distribution build's. The first configure downloads SDL3's pinned rele
 and configures it, and the build compiles it and everything else for both processors, so it takes about twice a
 development build's time. It has been tested with the ROM on macOS 26 on Apple Silicon, its x86_64 slice under
 Rosetta. CI's distribution job builds it on macOS 15 and 26, Apple Silicon and Intel, runs there the tests that need no
-ROM (as the x86_64 slice on Intel) and starts every slice of the app it makes: no macOS older than 15 has run it, and
-none older than 26 has played the game. `package_macos.sh` builds only the program and its app, so build the tests
-first, `cmake --build build/port-dist`; then `ctest --test-dir build/port-dist` runs them as this Mac's slice,
+ROM (as the x86_64 slice on Intel) and starts the app it makes, both slices on Apple Silicon (the x86_64 one under
+Rosetta) and the x86_64 one on Intel, which can't run arm64: no macOS older than 15 has run it, and none older than 26
+has played the game. `package_macos.sh` builds only the program and its app, so build the tests first,
+`cmake --build build/port-dist`; then `ctest --test-dir build/port-dist` runs them as this Mac's slice,
 `port/tools/ctest_one_slice.sh --build-dir build/port-dist --arch x86_64` runs them as the x86_64 slice under Rosetta,
 and `app_universal_slices` runs both slices through the opening and requires the same frames.
 
