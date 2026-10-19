@@ -9,7 +9,7 @@ void ghiCallCompletedCallback(GHIConnection *connection) {
     char *buffer;
 
     if (connection->result != 0) {
-        func_ov011_0216cca8(8, 0, 2, "Socket Error: %d\n", connection->socketError);
+        gsDebugFormat(8, 0, 2, "Socket Error: %d\n", connection->socketError);
     }
     completed = connection->completedCallback;
     if (completed != NULL) {

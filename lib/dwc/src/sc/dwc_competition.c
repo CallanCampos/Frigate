@@ -74,16 +74,16 @@ void ScClient_SetServers(int server) {
 }
 
 static int ScClient_Alloc(ScClient **client) {
-    if (data_ov011_02190698 == 1) {
+    if (__GSIACResult == 1) {
         if (gCompetitionUrl[0] == '\0') {
             OS_SNPrintf(gCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                        data_ov011_0219069c);
+                        __GSIACGamename);
         }
     } else {
         return 1;
     }
-    *client = func_ov011_0216dddc(sizeof(ScClient));
+    *client = gsimalloc(sizeof(ScClient));
     if (*client == NULL) {
         return 5;
     }
@@ -132,15 +132,15 @@ void ScClient_CopyCcid(ScClient *client, const char *ccid) {
 }
 
 static char *ScClient_BuildUrl(void) {
-    if (data_ov011_02190698 == 1) {
+    if (__GSIACResult == 1) {
         if (gCompetitionUrl[0] == '\0') {
             OS_SNPrintf(gCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                        data_ov011_0219069c);
+                        __GSIACGamename);
         }
         return gCompetitionUrl;
     }
-    func_ov011_0216cca8(0, 3, 1, "No availability\r\n");
+    gsDebugFormat(0, 3, 1, "No availability\r\n");
     return NULL;
 }
 
@@ -171,7 +171,7 @@ int ScClient_Destroy(ScClient *client) {
     }
     if (client->valid != 0) {
         ScClient_Reset(client);
-        func_ov011_0216ddfc(client);
+        gsifree(client);
     }
     return 0;
 }
@@ -349,14 +349,14 @@ static int ScReport_Create(const char *csid, int version, int playerNum, int tea
     teamSize = playerNum * 0x10;
     playerSize = teamSize + playerNum * 4;
 
-    created = func_ov011_0216dddc(sizeof(ScReport));
+    created = gsimalloc(sizeof(ScReport));
     if (created == NULL) {
         return 5;
     }
     memset(created, 0, sizeof(ScReport));
-    header = func_ov011_0216dddc(0x10000);
+    header = gsimalloc(0x10000);
     if (header == NULL) {
-        func_ov011_0216ddfc(created);
+        gsifree(created);
         return 5;
     }
     memset(header, 0, 0x10000);
@@ -384,12 +384,12 @@ static int ScReport_Destroy(ScReport *report) {
     report->groupOffset = 0;
     report->keyNum = 0;
     report->unk_0c = 0;
-    func_ov011_0216ddfc(report->buffer);
+    gsifree(report->buffer);
     report->buffer = NULL;
     report->bufferSize = 0;
     report->unk_118 = 0;
     report->used = 0;
-    func_ov011_0216ddfc(report);
+    gsifree(report);
     return 0;
 }
 

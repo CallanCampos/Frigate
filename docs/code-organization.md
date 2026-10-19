@@ -36,11 +36,11 @@ every section.
   `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under DWC in overlay 11, Thumb with the game's
   compiler), `lib/dpw/` (the Global Trade Station's and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
-  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's screens and
-  selectable objects, and the helpers under them: resources, heap, OAM, cells, fades, text, input, interrupts, lists,
-  OBJ characters, strings, VRAM banks, tasks and display, built with the game's compiler and flags; the name is ours)
-  and `lib/irc/` (the infrared link, overlay 31's last two files, built with the game's compiler and flags; the name
-  is ours).
+  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's main loop, screens,
+  keyboards and selectable objects, and the helpers under them: resources, messages, heap, OAM, cells, fades, text,
+  input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display, built with the game's compiler and
+  flags but unsigned `char`; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files, built
+  with the game's compiler and flags; the name is ours).
   NitroSDK and TwlSDK are built with the game's compiler, `dsi/1.1p1`, and DWC with `dsi/1.2` (only
   `DWCi_Acc_CreateLoginId` tells them apart, and it matches from 1.2 on): NitroSDK as ARM code by default, with most of
   its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the LTD
@@ -78,7 +78,8 @@ every section.
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),
   `lib/dpw/include/dpw/` (the Global Trade Station's server library), `lib/poke_net/include/poke_net/` (the Global
-  Data Server client) and `lib/irc/include/irc/` (the infrared link).
+  Data Server client), `lib/dwcutil/include/dwcutil/` (the DWC utility's AOSS client and connection test, which its
+  screens call) and `lib/irc/include/irc/` (the infrared link).
   A header is named after the original file that owns its declarations, or after swan's header for it, such as
   `field/field_3dci.h`.
 - Put functions, data and callback tables used across source files or overlays in the owning file's header. Declare

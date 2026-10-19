@@ -33,7 +33,7 @@ int Sc_Startup(int gameId, int server) {
     const char *challenge;
     int error;
 
-    func_ov011_0216c77c();
+    gsCoreInitialize();
     ScClient_SetServers(server);
     func_ov011_0215f9b4(&authToken, &challenge);
     sScState.loginDone = 0;
@@ -45,7 +45,7 @@ int Sc_Startup(int gameId, int server) {
     }
     while (sScState.loginDone == 0) {
         OS_Sleep(10);
-        func_ov011_0216c910(0);
+        gsCoreThink(0);
     }
     if (DWC_GetLastError(0) != 0) {
         return 7;
@@ -64,10 +64,10 @@ int Sc_Shutdown(void) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(3, error));
     }
     Sc_ReleaseUrls();
-    func_ov011_0216c998();
-    func_ov011_0216c910(0);
-    if (func_ov011_0216c9f4() != 2) {
-        func_ov011_0216c910(0);
+    gsCoreShutdown();
+    gsCoreThink(0);
+    if (gsCoreIsShutdown() != 2) {
+        gsCoreThink(0);
     }
     return error;
 }

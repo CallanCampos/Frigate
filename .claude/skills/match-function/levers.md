@@ -1025,7 +1025,12 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row.
+arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row. The lever never applies to a function
+whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
+`addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
+placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the
+literal (`&G.field` as one pool word) and keeps two reads of a field apart, so an original with such a pool word or
+a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `SetAffinedOamPosition_` show.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").
@@ -1033,6 +1038,9 @@ whose value is 0/1").
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
 subexpression, loaded into a").
+They match with `ATTRIBUTE_ALIGN(4)` on their task structs' `work` member, written before the type, with
+no evidence in the ROM that the original aligned it: after the name, the functions that store `work` lose
+other optimizations (matching.md: "Where a member's alignment is written").
 `#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3` around one function alone matched
 overlay 139's `UpdateScroll`, a field's offset added before the index for two merged reads, where
 `opt_common_subs off` made it 4 bytes longer and `opt_lifetimes`, `opt_loop_invariants` and `opt_strength_reduction`

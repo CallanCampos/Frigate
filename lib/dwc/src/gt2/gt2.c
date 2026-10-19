@@ -121,7 +121,7 @@ static void Gt2_OnSocketCreateError(GTI2Socket *unused) {
     GT2Engine *engine = Gt2_GetEngine();
     int count;
 
-    func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Socket error, passing to app and message handlers\n");
+    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Socket error, passing to app and message handlers\n");
     if (engine->onSocketError != NULL) {
         engine->onSocketError(3, engine->userData);
     }
@@ -150,20 +150,20 @@ static void Gt2_OnClosed(GTI2Connection *addr, int reason) {
         reason = 3;
     }
 
-    func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connection closed to %s\n",
-                        func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
+    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection closed to %s\n",
+                  func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     count = func_ov011_02171588(engine->pending);
     for (i = 0; i < count; i++) {
         GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
         if (pending->onClosed != NULL) {
-            func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connection closed: passed to message handler\n");
+            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection closed: passed to message handler\n");
             pending->onClosed(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, pending->userData);
         }
     }
 
     if (engine->onClosed != NULL) {
-        func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connection closed: passed to app\n");
+        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection closed: passed to app\n");
         engine->onClosed(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, engine->userData);
     }
 
@@ -211,8 +211,8 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
         connKey.port = (u16)func_ov011_0217d384(addr);
         index = func_ov011_021716ac(engine->connections, &connKey, Gt2_CompareConnectionAddr, 0, FALSE);
         if (index != -1) {
-            func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connect rejected by %s\n",
-                                func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
+            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connect rejected by %s\n",
+                          func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
             func_ov011_02171668(engine->connections, index);
         }
     }
@@ -226,7 +226,7 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
         index = func_ov011_021716ac(pending->attempts, &attemptKey, Gt2_CompareConnectionAddr, 0, FALSE);
         if (index != -1) {
             if (pending->onAttemptResult != NULL) {
-                func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passing connect result to message handler\n");
+                gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing connect result to message handler\n");
                 pending->onAttemptResult(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, rawResult == 2,
                                          pending->userData);
             }
@@ -237,7 +237,7 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 
     if (engine->pendingCount > 0) {
         if (engine->onAttemptResult != NULL) {
-            func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passing connect result to app\n");
+            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing connect result to app\n");
             engine->onAttemptResult(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, rawResult == 2,
                                     engine->userData);
         }
@@ -252,21 +252,21 @@ static void Gt2_OnPing(GTI2Connection *addr, u32 latencyMs) {
     int i;
     int count;
 
-    func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Received ping from %s\n",
-                        func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
+    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Received ping from %s\n",
+                  func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     count = func_ov011_02171588(engine->pending);
     for (i = 0; i < count; i++) {
         GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
         if (pending->onPing != NULL) {
-            func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passing to message handler\n");
+            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing to message handler\n");
             pending->onPing(func_ov011_0217d380(addr), func_ov011_0217d384(addr), latencyMs, pending->userData);
             return;
         }
     }
 
     if (engine->onPing != NULL) {
-        func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passing to app\n");
+        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing to app\n");
         engine->onPing(func_ov011_0217d380(addr), func_ov011_0217d384(addr), latencyMs, engine->userData);
     }
 }
@@ -282,8 +282,8 @@ static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, 
     u8 *dest;
     u32 n;
 
-    func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Received data from %s\n",
-                        func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
+    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Received data from %s\n",
+                  func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     if (len >= 0x10) {
         src = (const u8 *)data;
@@ -296,7 +296,7 @@ static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, 
         if (index != -1) {
             GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, index);
             if (pending->onReceived != NULL) {
-                func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passed to message handler\n");
+                gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passed to message handler\n");
                 pending->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), (const u8 *)data + 0x10,
                                     len - 0x10, reliable, pending->userData);
                 return;
@@ -305,7 +305,7 @@ static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, 
     }
 
     if (engine->onReceived != NULL) {
-        func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passed to app\n");
+        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passed to app\n");
         engine->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), data, len, reliable, engine->userData);
     }
 }
@@ -322,8 +322,8 @@ static BOOL Gt2_OnUnknownMessage(GTI2Socket *unused, u32 ip, u16 port, const voi
     }
 
     handled = FALSE;
-    func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Unknown message from %s, passing to app\n",
-                        func_ov011_0217ed14(ip, port, buf));
+    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Unknown message from %s, passing to app\n",
+                  func_ov011_0217ed14(ip, port, buf));
     if (engine->onUnknownMessage(ip, port, len, data, engine->userData) != 0) {
         handled = TRUE;
     }
@@ -345,7 +345,7 @@ static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u3
     u32 n;
 
     (void)unused;
-    func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s\n", func_ov011_0217ed14(ip, port, buf));
+    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s\n", func_ov011_0217ed14(ip, port, buf));
 
     if (len >= 0x10) {
         src = (const u8 *)data;
@@ -367,14 +367,14 @@ static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u3
             table.onConnected = Gt2_OnConnectAttemptDone;
             func_ov011_0217d190(handle, &table);
 
-            func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connection attempt auto-accepted for message handler\n");
+            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt auto-accepted for message handler\n");
             return;
         }
     }
 
     if (engine->onUnhandledAttempt != NULL) {
-        func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s, asking app to accept/reject\n",
-                            func_ov011_0217ed14(ip, port, buf));
+        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s, asking app to accept/reject\n",
+                      func_ov011_0217ed14(ip, port, buf));
         engine->onUnhandledAttempt(ip, port, elapsedMilliseconds, data, len, engine->userData);
         return;
     }
@@ -416,19 +416,19 @@ int Gt2_CreateSocket(u16 localPort, int incomingBufferSize, int outgoingBufferSi
     error =
         func_ov011_0217d144(&engine->socket, addrBuf, outgoingBufferSize, incomingBufferSize, Gt2_OnSocketCreateError);
     if (error != 0) {
-        func_ov011_0216cca8(0xc, 0, 2, "[Udp Engine] error creating gt2 socket, error code: %d\n", error);
+        gsDebugFormat(0xc, 0, 2, "[Udp Engine] error creating gt2 socket, error code: %d\n", error);
         return 3;
     }
 
     engine->connections = func_ov011_02171514(0xc, 1, NULL);
     if (engine->connections == NULL) {
-        func_ov011_0216cca8(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
+        gsDebugFormat(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
         return 1;
     }
 
     engine->pending = func_ov011_02171514(0x3c, 1, Gt2_FreePendingConnect);
     if (engine->pending == NULL) {
-        func_ov011_0216cca8(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
+        gsDebugFormat(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
         return 1;
     }
 
@@ -454,7 +454,7 @@ int Gt2_GetConnectionState(u32 ip, u16 port, int *state) {
     int index;
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 3, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 3, 0xf, "[Udp Engine] Engine not initialized\n");
         *state = 3;
         return 0xb;
     }
@@ -486,11 +486,11 @@ int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs)
     int state;
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     if (ip == 0 || port == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Invalid parameter(s), check ip, port");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid parameter(s), check ip, port");
         return 0xa;
     }
 
@@ -501,7 +501,7 @@ int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs)
         conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
         state = func_ov011_0217d364(conn->handle);
         if (state == 1) {
-            func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine is already talking to remote address\n");
+            gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine is already talking to remote address\n");
             return 5;
         }
         if (state != 0) {
@@ -561,7 +561,7 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
     int n;
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 3;
     }
 
@@ -573,11 +573,11 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
     if (index == -1) {
         // BUG: The formatted address is computed but the format string has no %s to print it
 #ifdef BUGFIX
-        func_ov011_0216cca8(0xc, 0, 2, "[Udp Engine] address not found for sending message: %s\n",
-                            func_ov011_0217ed14(ip, port, buf));
+        gsDebugFormat(0xc, 0, 2, "[Udp Engine] address not found for sending message: %s\n",
+                      func_ov011_0217ed14(ip, port, buf));
 #else
-        func_ov011_0216cca8(0xc, 0, 2, "[Udp Engine] address not found for sending message\n",
-                            func_ov011_0217ed14(ip, port, buf));
+        gsDebugFormat(0xc, 0, 2, "[Udp Engine] address not found for sending message\n",
+                      func_ov011_0217ed14(ip, port, buf));
 #endif
         return 4;
     }
@@ -585,16 +585,16 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
     conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
     maxSize = func_ov011_0217d390(conn->handle);
     if (total > maxSize && reliable != 0) {
-        func_ov011_0216cca8(0xc, 0, 2, "[Udp Engine] Message Size too large, dropping message\n");
+        gsDebugFormat(0xc, 0, 2, "[Udp Engine] Message Size too large, dropping message\n");
         return 0xc;
     }
 
     // BUG: An empty header allocates only size bytes, but the copies always write size + 0x10 bytes.
 #ifdef BUGFIX
     // Reserve capacity for both copies while preserving the original transmitted length.
-    packet = func_ov011_0216dddc(size + 0x10);
+    packet = gsimalloc(size + 0x10);
 #else
-    packet = func_ov011_0216dddc(total);
+    packet = gsimalloc(total);
 #endif
     src = (const u8 *)header;
     dest = (u8 *)packet;
@@ -604,7 +604,7 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
     } while (--n != 0);
     memcpy((u8 *)packet + 0x10, message, size);
     index = func_ov011_0217d290(conn->handle, packet, total, reliable);
-    func_ov011_0216ddfc(packet);
+    gsifree(packet);
     return (index != 0) ? 8 : 0;
 }
 
@@ -613,7 +613,7 @@ int Gt2_StopSocket(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     func_ov011_0217d168(engine->socket);
@@ -625,7 +625,7 @@ int Gt2_CloseSocket(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     func_ov011_0217d158(engine->socket);
@@ -640,7 +640,7 @@ u16 Gt2_GetLocalPort(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 1, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 1, "[Udp Engine] Engine not initialized\n");
         return 0;
     }
     return engine->localPort;
@@ -658,15 +658,15 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
     int n;
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     if (initMessage[0] == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Invalid init message\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid init message\n");
         return 0xa;
     }
     if (header[0] == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Invalid header\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid header\n");
         return 0xa;
     }
 
@@ -685,7 +685,7 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
 
     attempts = func_ov011_02171514(4, 1, NULL);
     if (attempts == NULL) {
-        func_ov011_0216cca8(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
+        gsDebugFormat(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
         return 1;
     }
 
@@ -710,11 +710,11 @@ int Gt2_CancelConnect(const char *header) {
     int index;
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     if (header == NULL || header[0] == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Invalid or empty header\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid or empty header\n");
         return 0xa;
     }
 
@@ -737,7 +737,7 @@ BOOL Gt2_IsIdle(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return TRUE;
     }
     return func_ov011_02171588(engine->pending) == 0;
@@ -748,7 +748,7 @@ BOOL Gt2_HasNoAppCallbacks(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return TRUE;
     }
     if (engine->onClosed != NULL || engine->onUnhandledAttempt != NULL || engine->onAttemptResult != NULL ||
@@ -767,7 +767,7 @@ int Gt2_Close(u32 ip, u16 port) {
     int index;
 
     if (engine->initialized == 0) {
-        func_ov011_0216cca8(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
         return 0;
     }
 

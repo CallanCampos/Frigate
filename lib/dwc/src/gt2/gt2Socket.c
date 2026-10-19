@@ -63,7 +63,7 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     u32 ip;
     int addressSize;
 
-    func_ov011_0216e31c();
+    SocketStartUp();
     if (incomingBufferSize == 0) {
         incomingBufferSize = 0x10000;
     }
@@ -73,7 +73,7 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     if (!func_ov011_0217ed7c(localAddress, &ip, &port)) {
         return 4;
     }
-    socket = func_ov011_0216dddc(sizeof(GTI2Socket));
+    socket = gsimalloc(sizeof(GTI2Socket));
     if (socket == NULL) {
         return 1;
     }
@@ -85,16 +85,16 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     socket->connections =
         func_ov011_02171830(sizeof(GTI2Connection *), 0x20, 2, func_ov011_0217e768, func_ov011_0217e77c, NULL);
     if (socket->connections == NULL) {
-        func_ov011_0216ddfc(socket);
+        gsifree(socket);
         return 1;
     }
     socket->closedConnections = func_ov011_02171514(sizeof(GTI2Connection *), 4, func_ov011_0217e798);
     if (socket->closedConnections == NULL) {
         func_ov011_0217187c(socket->connections);
-        func_ov011_0216ddfc(socket);
+        gsifree(socket);
         return 1;
     }
-    socket->handle = func_ov011_0216de20(2, 2, 0);
+    socket->handle = gsiSocket(2, 2, 0);
     socket->protocol = protocol;
     if (protocol == 3) {
         socket->protocolOffset = 0;
@@ -104,7 +104,7 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     if (socket->handle == -1) {
         func_ov011_0217187c(socket->connections);
         func_ov011_02171558(socket->closedConnections);
-        func_ov011_0216ddfc(socket);
+        gsifree(socket);
         return 3;
     }
     memset(&address, 0, sizeof(address));
@@ -112,16 +112,16 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     address.addr = ip;
     address.port = GTI2_SWAP16(port);
     if (protocol != 3) {
-        if (func_ov011_0216de8c(socket->handle, &address, sizeof(address)) == -1) {
-            func_ov011_0216de30(socket->handle);
+        if (bind(socket->handle, &address, sizeof(address)) == -1) {
+            closesocket(socket->handle);
             func_ov011_0217187c(socket->connections);
             func_ov011_02171558(socket->closedConnections);
-            func_ov011_0216ddfc(socket);
+            gsifree(socket);
             return 3;
         }
     }
     addressSize = sizeof(address);
-    func_ov011_0216df74(socket->handle, &address, &addressSize);
+    getsockname(socket->handle, &address, &addressSize);
     socket->ip = address.addr;
     socket->port = GTI2_SWAP16(address.port);
     *socketOut = socket;
@@ -133,11 +133,11 @@ void func_ov011_0217e944(GTI2Socket *socket) {
         socket->close = TRUE;
         return;
     }
-    func_ov011_0216de30(socket->handle);
+    closesocket(socket->handle);
     func_ov011_0217187c(socket->connections);
     func_ov011_02171558(socket->closedConnections);
-    func_ov011_0216ddfc(socket);
-    func_ov011_0216e320();
+    gsifree(socket);
+    SocketShutDown();
 }
 
 void func_ov011_0217e974(GTI2Socket *socket, GTI2ConnectAttemptCallback callback) {
@@ -146,7 +146,7 @@ void func_ov011_0217e974(GTI2Socket *socket, GTI2ConnectAttemptCallback callback
 
 // Allocates a connection
 static GTI2Connection *func_ov011_0217e978(void) {
-    return func_ov011_0216dddc(sizeof(GTI2Connection));
+    return gsimalloc(sizeof(GTI2Connection));
 }
 
 int func_ov011_0217e984(GTI2Socket *socket, GTI2Connection **connectionOut, u32 ip, u16 port) {
@@ -161,7 +161,7 @@ int func_ov011_0217e984(GTI2Socket *socket, GTI2Connection **connectionOut, u32 
         connection->ip = ip;
         connection->port = port;
         connection->socket = socket;
-        connection->startTime = func_ov011_0216e324();
+        connection->startTime = current_time();
         connection->lastSendTime = connection->startTime;
         connection->serialNumber = 0;
         connection->expectedSerialNumber = 0;
@@ -195,8 +195,8 @@ int func_ov011_0217e984(GTI2Socket *socket, GTI2Connection **connectionOut, u32 
     }
 fail:
     if (connection != NULL) {
-        func_ov011_0216ddfc(connection->incoming.data);
-        func_ov011_0216ddfc(connection->outgoing.data);
+        gsifree(connection->incoming.data);
+        gsifree(connection->outgoing.data);
         if (connection->incomingMessages != NULL) {
             func_ov011_02171558(connection->incomingMessages);
         }
@@ -209,7 +209,7 @@ fail:
         if (connection->receiveFilters != NULL) {
             func_ov011_02171558(connection->receiveFilters);
         }
-        func_ov011_0216ddfc(connection);
+        gsifree(connection);
     }
     return 1;
 }
@@ -239,7 +239,7 @@ BOOL func_ov011_0217eb34(GTI2Socket *socket, u32 ip, u16 port, const void *messa
     int error;
 
     func_ov011_0217ee60(&message, &length);
-    if (socket->protocol != 3 && !func_ov011_0216e12c(socket->handle)) {
+    if (socket->protocol != 3 && !CanSendOnSocket(socket->handle)) {
         return TRUE;
     }
     SocAddrIn address = { 0 };
@@ -247,9 +247,9 @@ BOOL func_ov011_0217eb34(GTI2Socket *socket, u32 ip, u16 port, const void *messa
     address.family = 2;
     address.addr = ip;
     address.port = GTI2_SWAP16(port);
-    result = func_ov011_0216df34(socket->handle, message, length, 0, &address, sizeof(address));
+    result = sendto(socket->handle, message, length, 0, &address, sizeof(address));
     if (result == -1) {
-        error = func_ov011_0216dfa8(socket->handle);
+        error = GOAGetLastError(socket->handle);
         if (error == -15) {
             if (!func_ov011_0217df34(socket, ip, port)) {
                 return FALSE;
@@ -289,7 +289,7 @@ static int func_ov011_0217ec68(void *element, void *clientData) {
 }
 
 BOOL func_ov011_0217eca0(GTI2Socket *socket) {
-    u32 now = func_ov011_0216e324();
+    u32 now = current_time();
 
     if (func_ov011_021719cc(socket->connections, func_ov011_0217ec68, &now)) {
         return FALSE;
