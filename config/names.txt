@@ -26374,6 +26374,7 @@ overlays/ov294 0x021a3710 IntroMcss_SetAnimation
 overlays/ov294 0x021a3748 IntroMcss_IsAnimationEnded
 overlays/ov294 0x021a3754 IntroMcss_ClearAnimationEnded
 overlays/ov294 0x021a3760 IntroMcss_SetAlpha
+overlays/ov294 0x021a3798 IntroMcss_SetFlipV
 overlays/ov294 0x021a37bc IntroMcss_OnAnimationEnd
 overlays/ov294 0x021a37d0 IntroMcss_MoveX
 overlays/ov294 0x021a3830 IntroMcss_DecreaseY

@@ -119,7 +119,7 @@ void IntroMcss_SetAlpha(IntroMcss *mcss, u8 index, u32 alpha) {
     MCSS_SetAlpha(mcss->sprites[index].mcss, alpha);
 }
 
-void func_ov294_021a3798(IntroMcss *mcss, u8 index, BOOL a2) {
+void IntroMcss_SetFlipV(IntroMcss *mcss, u8 index, BOOL a2) {
     if (a2) {
         MCSS_EnableFlipV(mcss->sprites[index].mcss);
     } else {
