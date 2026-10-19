@@ -99,7 +99,7 @@ static BOOL Plugin14Cmd_StartAspertiaSeasonAnimations(VM *vm, FieldScriptEnv *en
 }
 
 static BOOL Plugin14Cmd_StartLeagueCenterAnimations(VM *vm, FieldScriptEnv *env) {
-    func_ov115_021eed08(FieldScriptEnv_GetGameSystem(env));
+    LeagueCenter_PlayModel(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 

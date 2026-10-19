@@ -9983,6 +9983,16 @@ overlays/ov114 0x021eeda0 UndergroundRuins_PlayAnm
 overlays/ov114 0x021eee0c UndergroundRuins_LoadScene
 overlays/ov114 0x021eeedc UndergroundRuins_FreeScene
 overlays/ov114 0x021eeee8 UndergroundRuins_StepAnimations
+overlays/ov115 0x021eec80 LeagueCenter_Init
+overlays/ov115 0x021eecc8 LeagueCenter_End
+overlays/ov115 0x021eece8 LeagueCenter_Update
+overlays/ov115 0x021eed08 LeagueCenter_PlayModel
+overlays/ov115 0x021eed28 LeagueCenter_LoadBG
+overlays/ov115 0x021eedc8 LeagueCenter_FreeBG
+overlays/ov115 0x021eedd4 LeagueCenter_LoadModel
+overlays/ov115 0x021eee58 LeagueCenter_FreeScene
+overlays/ov115 0x021eee64 LeagueCenter_StepAnimations
+overlays/ov115 0x021eee70 LeagueCenter_PlayActor
 overlays/ov116 0x021eec80 GimmickGC6_Setup
 overlays/ov116 0x021eecb0 GimmickGC6_End
 overlays/ov116 0x021eecc8 GimmickGC6_Update
