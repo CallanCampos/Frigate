@@ -9565,6 +9565,9 @@ overlays/ov094 0x021f0254 sMistraltonScene
 overlays/ov094 0x021f02cc sMistraltonResources
 overlays/ov094 0x021f0434 sMistraltonActors
 overlays/ov094 0x021f05a4 sMistraltonGrid
+overlays/ov095 0x021eec80 GymStriaton_Init
+overlays/ov095 0x021eecac GymStriaton_End
+overlays/ov095 0x021eecb8 GymStriaton_Update
 overlays/ov096 0x021eec80 DriftveilGym_Init
 overlays/ov096 0x021eecd4 DriftveilGym_End
 overlays/ov096 0x021eed0c DriftveilGym_Update
