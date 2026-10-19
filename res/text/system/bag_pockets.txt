@@ -1,0 +1,6 @@
+BagPockets_Text_Items = ITEMS
+BagPockets_Text_Medicine = MEDICINE
+BagPockets_Text_TmsHms = TMs & HMs
+BagPockets_Text_Berries = BERRIES
+BagPockets_Text_KeyItems = KEY ITEMS
+BagPockets_Text_FreeSpace = FREE SPACE

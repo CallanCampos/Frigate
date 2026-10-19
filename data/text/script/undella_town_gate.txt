@@ -1,5 +1,0 @@
-UndellaTownGate_Text_Empty =                                                                                                     \x{ffff}
-UndellaTownGate_Text_Empty_2 =                                               \x{ffff}
-UndellaTownGate_Text_Empty_3 =        \x{ffff}
-UndellaTownGate_Text_Empty_4 =       \x{ffff}
-\pad{62}

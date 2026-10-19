@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
 #include "field/player_action.h"
@@ -17,13 +18,9 @@
 // The grid coordinate of a world coordinate
 #define POS_TO_GRID(pos) ((s16)(((pos) >> 4) / FX32_ONE))
 
-// The object code of a boulder, which sits lower on the ground than the others
-#define OBJCODE_STRENGTH_ROCK 0x6d
 // An object code of no actor
 #define OBJCODE_NONE 0xffff
-// The object codes that stand for the object code in a work value, from WKOBJCODE00
-#define OBJCODE_WKOBJCODE_FIRST 0xa2
-#define OBJCODE_WKOBJCODE_LAST 0xb1
+// The work value of OBJ_CODE_WORK_00, the first of the object codes that stand for the object code in a work value
 #define WORK_OBJCODE_FIRST 0x4020
 
 // The configs that the cache can hold
@@ -400,7 +397,7 @@ static void LoadActorParamsByZoneNPC(FieldActor *actor, const ZoneNPC *npc, Even
     FldAct_SetObjCode(actor, objCode);
     LoadInfoForNewActorModelID(system, objCode, actor);
     config = &actor->config;
-    if (objCode == 0xb9) {
+    if (objCode == OBJ_CODE_185) {
         actor->collisionWidth = npc->param0;
         actor->collisionHeight = npc->param1;
         if (actor->collisionWidth == 0) {
@@ -1882,11 +1879,11 @@ u16 ResolvePossibleWKOBJCODE(EventWork *eventWork, u16 objCode) {
 }
 
 static u16 GetWKOBJCODENPCOBJCODE(EventWork *eventWork, u16 objCode) {
-    if (objCode >= OBJCODE_WKOBJCODE_FIRST && objCode <= OBJCODE_WKOBJCODE_LAST) {
+    if (objCode >= OBJ_CODE_WORK_00 && objCode <= OBJ_CODE_WORK_0F) {
         if (eventWork == NULL) {
             objCode = 10;
         } else {
-            objCode = *EventWork_GetWkPtr(eventWork, objCode - OBJCODE_WKOBJCODE_FIRST + WORK_OBJCODE_FIRST);
+            objCode = *EventWork_GetWkPtr(eventWork, objCode - OBJ_CODE_WORK_00 + WORK_OBJCODE_FIRST);
         }
     }
     return objCode;
@@ -1999,7 +1996,7 @@ static BOOL LoadSaveDataStrengthRockPosition(FieldActor *actor, VecFx32 *pos) {
             pos->x = save->x[slot] << 16;
             pos->y = y = save->y[slot] << 16;
             pos->z = save->z[slot] << 16;
-            pos->y = y -= (FldAct_GetObjCode(actor) == OBJCODE_STRENGTH_ROCK ? 14 : 26) * FX32_ONE;
+            pos->y = y -= (FldAct_GetObjCode(actor) == OBJ_CODE_STRENGTH_ROCK ? 14 : 26) * FX32_ONE;
             pos->y = y + ((save->y[slot] <= 0 ? 1 : 2) << 16);
             return TRUE;
         }
@@ -2044,7 +2041,8 @@ void func_ov012_02168258(MMSys *system, u16 zoneId, u16 uid) {
 }
 
 BOOL IsNPCStrengthRock(u16 objCode) {
-    if (objCode == OBJCODE_STRENGTH_ROCK || objCode == 0x2003 || objCode == 0x2004 || objCode == 0x2005) {
+    if (objCode == OBJ_CODE_STRENGTH_ROCK || objCode == OBJ_CODE_MODEL_3 || objCode == OBJ_CODE_MODEL_4 ||
+        objCode == OBJ_CODE_MODEL_BIGROCK2) {
         return TRUE;
     }
     return FALSE;

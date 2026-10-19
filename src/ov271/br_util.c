@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include "app/battle_recorder/br_util.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -815,7 +816,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             cel = 21;
             anm = 22;
         }
-        handle = GFL_ArcSysCreateFileHandle(30, HEAPID_TAIL(heapId));
+        handle = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_TAIL(heapId));
         p_wk->trainerPlt = func_0204bbb8(handle, plt, CLACT_VRAM_MAIN, 0x1a0, 0, 1, heapId);
         p_wk->trainerCel = func_0204bde0(handle, cel, anm, heapId);
         p_wk->trainerChr = func_0204b81c(handle, chr, FALSE, CLACT_VRAM_MAIN, heapId);
@@ -824,7 +825,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
     }
     case BR_PROFILE_TYPE_UNION: {
         u32 view = GdsProfile_GetUnionView(cp_profile);
-        ArcTool *handle = GFL_ArcSysCreateFileHandle(31, HEAPID_TAIL(heapId));
+        ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, HEAPID_TAIL(heapId));
 
         p_wk->trainerPlt = func_0204bbb8(handle, 0, CLACT_VRAM_MAIN, 0x1a0, sc_union_plt[view], 1, heapId);
         p_wk->trainerCel = func_0204bde0(handle, 65, 66, heapId);

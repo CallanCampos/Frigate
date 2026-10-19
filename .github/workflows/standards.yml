@@ -2,8 +2,9 @@ name: Standards
 
 # Checks a pull request, or a push to main, against docs/code-standards.md: clang-format on the C files it changes (the
 # pinned 23.1.1, since releases format differently), check_style.py on the lines it adds, check_style.py's own fixture
-# tests, the skills' Codex copies against the Claude ones, and names that apply_names.py would still rewrite. It needs
-# no ROM, so pull requests from forks run it too.
+# tests, the skills' Codex copies against the Claude ones, names that apply_names.py would still rewrite, and the
+# functions and addresses of docs/nonmatching-functions.md's rows against the configs. It needs no ROM, so pull requests
+# from forks run it too.
 on:
   push:
     branches: [main]
@@ -82,5 +83,12 @@ jobs:
           if [ -n "$stale" ]; then
             echo "$stale"
             echo "::error::These identifiers have names in symbols.txt: run tools/decomp/apply_names.py."
+            exit 1
+          fi
+
+      - name: Rows of the nonmatching functions
+        run: |
+          if ! python tools/decomp/check_nonmatching_rows.py; then
+            echo "::error::Fix these rows of docs/nonmatching-functions.md (check_nonmatching_rows.py --fix corrects White 2 addresses)."
             exit 1
           fi

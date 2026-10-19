@@ -41,9 +41,18 @@
 // The zone of no zone, for a position outside the map
 #define ZONE_NONE 0xffff
 
+// The other version's Route 4, whose hidden items are left out of the search
+#ifdef BLACK2
+#define ZONE_OTHER_ROUTE_4 ZONE_ROUTE_4_16
+#else
+#define ZONE_OTHER_ROUTE_4 ZONE_ROUTE_4
+#endif
+
 // What the search found: nothing or a hidden item
-#define HIT_NONE 0
-#define HIT_HIDDEN_ITEM 1
+typedef enum {
+    HIT_NONE,
+    HIT_HIDDEN_ITEM,
+} DowsingHitType;
 
 // The area that is searched around the player, in tiles: the signal map is 32 wide, the player at its (15, 11)
 #define MAP_WIDTH 32
@@ -94,7 +103,7 @@ typedef struct {
 
 // A hidden item that the search found
 typedef struct {
-    u32 type;
+    DowsingHitType type;
     const HiddenItem *item;
 } DowsingHit;
 
@@ -439,7 +448,8 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     minZ = playerZ - SEARCH_TOP;
     maxZ = playerZ + SEARCH_BOTTOM;
     DowsingHit hit = { HIT_NONE, NULL };
-    DowsingHit best = hit;
+    DowsingHit best;
+    best.type = HIT_NONE;
     bestDistance = -1;
 
     if (work->searchRestart) {
@@ -478,7 +488,7 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
                 const HiddenItem *item = hit.item;
                 if (zoneId != item->zoneId) {
                     if (!item->outdoors || !zoneIsMatrix0 || GetZoneIsEntralinkAny(item->zoneId) ||
-                        item->zoneId == ZONE_ROUTE_4_16) {
+                        item->zoneId == ZONE_OTHER_ROUTE_4) {
                         continue;
                     }
                 }

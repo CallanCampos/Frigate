@@ -1,0 +1,96 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A move: res/moves/<move>/data.json",
+    "description": "One record of the move data (archive a/0/2/1, the 0x24 bytes that PML_MoveGetParamCore reads). tools/data/move_data.py packs them in the order of generated/moves.txt. A string value is the name of a constant from generated/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "name", "description", "type", "quality", "category", "power", "accuracy", "pp", "priority", "hits", "inflicts", "crit_stage",
+        "flinch_chance", "effect", "drain", "heal", "target", "stat_changes", "flags"
+    ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "name": {
+            "type": "string",
+            "description": "The move's name, which the text files take with \\from{moves.name}, also in capitals"
+        },
+        "description": { "type": "string", "description": "The move's description, with its line breaks" },
+        "type": { "type": "string", "x-constant": "TYPE_" },
+        "quality": {
+            "type": "string", "x-constant": "MOVE_QUALITY_",
+            "description": "The class of the move's effect, a MOVE_QUALITY_* constant"
+        },
+        "category": { "type": "string", "x-constant": "MOVE_CATEGORY_", "description": "Physical, special or status" },
+        "power": { "$ref": "#/$defs/u8" },
+        "accuracy": {
+            "$ref": "#/$defs/u8", "description": "In percent, or 101 for a move that never misses"
+        },
+        "pp": { "$ref": "#/$defs/u8" },
+        "priority": { "$ref": "#/$defs/s8" },
+        "hits": {
+            "type": "object", "additionalProperties": false, "required": [ "min", "max" ],
+            "description": "The number of hits of a multi-hit move, 0 and 0 for one hit",
+            "properties": {
+                "min": { "type": "integer", "minimum": 0, "maximum": 15 },
+                "max": { "type": "integer", "minimum": 0, "maximum": 15 }
+            }
+        },
+        "inflicts": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "condition", "chance", "duration", "min_turns", "max_turns" ],
+            "description": "The condition the move inflicts, its chance, and the turns it lasts",
+            "properties": {
+                "condition": {
+                    "type": [ "string", "integer" ], "x-constant": "CONDITION_", "minimum": 0, "maximum": 65535,
+                    "description": "A CONDITION_* constant"
+                },
+                "chance": { "$ref": "#/$defs/u8", "description": "In percent" },
+                "duration": { "$ref": "#/$defs/u8", "description": "The kind of duration" },
+                "min_turns": { "$ref": "#/$defs/u8" },
+                "max_turns": { "$ref": "#/$defs/u8" }
+            }
+        },
+        "crit_stage": { "$ref": "#/$defs/u8", "description": "The critical hit stage, 6 for a move that always lands one" },
+        "flinch_chance": { "$ref": "#/$defs/u8", "description": "In percent" },
+        "effect": {
+            "type": [ "string", "integer" ], "x-constant": "BATTLE_EFFECT_", "minimum": 0, "maximum": 65535,
+            "description": "A BATTLE_EFFECT_* constant"
+        },
+        "drain": {
+            "$ref": "#/$defs/s8",
+            "description": "The share of the damage the user drains (positive) or takes as recoil (negative), in percent"
+        },
+        "heal": { "$ref": "#/$defs/s8", "description": "The share of the user's HP it heals, in percent" },
+        "target": {
+            "type": "string", "x-constant": "MOVE_TARGET_",
+            "description": "Which Pokémon the move targets, a MOVE_TARGET_* constant"
+        },
+        "stat_changes": {
+            "type": "array", "maxItems": 3,
+            "description": "Up to three stat changes, in their slots: an empty slot before a used one is { \"stat\": 0, \"stages\": 0, \"chance\": 0 }",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "stat", "stages", "chance" ],
+                "properties": {
+                    "stat": {
+                        "type": [ "string", "integer" ], "x-constant": "BATTLEMON_", "minimum": 0, "maximum": 255,
+                        "description": "A BATTLEMON_*_STAGE constant"
+                    },
+                    "stages": { "$ref": "#/$defs/s8", "description": "The stages the stat changes by" },
+                    "chance": { "$ref": "#/$defs/u8", "description": "In percent" }
+                }
+            }
+        },
+        "flags": {
+            "type": "array",
+            "items": {
+                "type": [ "string", "integer" ], "x-constant": "MOVE_FLAG_", "minimum": 0,
+                "description": "A MOVE_FLAG_* constant, or the value of a flag that has none"
+            },
+            "description": "The move's flags"
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "s8": { "type": "integer", "minimum": -128, "maximum": 127 }
+    }
+}

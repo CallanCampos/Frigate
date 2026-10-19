@@ -59,24 +59,6 @@ struct PlaceName {
     NNSG2dCharacterData *charData;
 };
 
-typedef struct {
-    BmpOamSys *bmpOam;
-    u16 palette;
-    PrintQueue *printQueue;
-} PlaceNameTextSetup;
-
-typedef struct {
-    u16 palette;
-    u16 chars;
-    u16 cellAnims;
-} PlaceNameFrameSetup;
-
-typedef struct {
-    Font *font;
-    u16 zoneId;
-    StrBuf *name;
-} PlaceNameTextParam;
-
 BOOL isGameVerWhite2(void);
 void endColorBlending(PlaceName *wk);
 void func_ov036_021b5194(PlaceName *wk);
@@ -452,7 +434,7 @@ void func_ov036_021b53f4(PlaceName *wk, u32 index) {
 }
 
 void func_ov036_021b540c(PlaceName *wk) {
-    wk->arc = GFL_ArcSysCreateFileHandle(0x53, FieldPlaceName_GetHeapID(wk));
+    wk->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_PLACE_NAME, FieldPlaceName_GetHeapID(wk));
 }
 
 void func_ov036_021b5420(PlaceName *wk) {

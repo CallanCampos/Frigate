@@ -1,4 +1,0 @@
-VillageBridge7_Text_BothPokemonHealthyEnergetic = Both you and your Pokémon are healthy\nand energetic!{be01}\nIf you get tired, please talk to me.\nI'll let you take a nice long rest.
-VillageBridge7_Text_OhPokemonLookPretty = Oh, your Pokémon look pretty tired.\nDon't be shy. Take a nice long rest!{be01}
-VillageBridge7_Text_Gothoo = Gothoo. ♪
-\pad{b6}

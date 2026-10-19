@@ -1,0 +1,22 @@
+PkwdBriefingMovie30_Text_ManagedFleeMonstersSave = {bd02}{0100:1} managed to flee the monsters\n{bd02}and save a girl who was asking for help\n{bd02}at the amusement park.
+PkwdBriefingMovie30_Text_LookingCauseRedFog = {bd02}Looking for the cause\n{bd02}of the red fog,\n{bd02}{0100:1} arrived in a graveyard,\n{bd02}and there he saw...
+PkwdBriefingMovie30_Text_Empty = なし
+PkwdBriefingMovie30_Text_Empty_2 = なし
+PkwdBriefingMovie30_Text_Empty_3 = なし
+PkwdBriefingMovie30_Text_Empty_4 = なし
+PkwdBriefingMovie30_Text_Empty_5 = なし
+PkwdBriefingMovie30_Text_Empty_6 = なし
+PkwdBriefingMovie30_Text_Empty_7 = なし
+PkwdBriefingMovie30_Text_Empty_8 = なし
+PkwdBriefingMovie30_Text_ManagedFleeMonstersSave_2 = {bd02}{0100:1} managed to flee the monsters\n{bd02}and save a boy who was asking for help\n{bd02}at the amusement park.
+PkwdBriefingMovie30_Text_LookingCauseRedFog_2 = {bd02}Looking for the cause\n{bd02}of the red fog,\n{bd02}{0100:1} arrived in a graveyard,\n{bd02}and there she saw...
+PkwdBriefingMovie30_Text_Empty_9 = なし
+PkwdBriefingMovie30_Text_Empty_10 = なし
+PkwdBriefingMovie30_Text_Empty_11 = なし
+PkwdBriefingMovie30_Text_Empty_12 = なし
+PkwdBriefingMovie30_Text_Empty_13 = なし
+PkwdBriefingMovie30_Text_Empty_14 = なし
+PkwdBriefingMovie30_Text_Empty_15 = なし
+PkwdBriefingMovie30_Text_Empty_16 = なし
+PkwdBriefingMovie30_Text_Empty_17 = なし
+\pad{40}

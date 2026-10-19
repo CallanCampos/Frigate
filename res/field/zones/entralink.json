@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 3,
+    "npc_cache": 24,
+    "area": "AREA_ENTRALINK",
+    "matrix": "MAP_MATRIX_ENTRALINK",
+    "scripts": "SCRIPTS_ENTRALINK",
+    "text": "SCRIPT_TEXT_ENTRALINK",
+    "bgm": "SEQ_BGM_PALACE",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_ENTRALINK",
+    "place": "PLACE_ENTRALINK",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 0,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 16,
+        "y": 0,
+        "z": 16
+    }
+}

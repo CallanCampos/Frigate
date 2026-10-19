@@ -51,13 +51,13 @@ struct EncEffGridParam {
 void func_ov036_021c5ea0(EncEff *effect);
 // Loads overlay 148 alone, for the effects that draw the captured screen themselves
 void func_ov036_021c5ebc(EncEff *effect);
-void *EncEff_AllocWorkArea(EncEff *effect, u32 id, u32 size);
+void *EncEff_AllocWorkArea(EncEff *effect, u32 size, HeapID heapId);
 void *EncEff_GetWorkArea(EncEff *effect);
 void *EncEff_GetEventData(EncEff *effect);
 void *Field_Get3DCi(Field *field);
 void EncEff_CallRenderFunc(EncEff *effect);
-GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, void *g3DCi, u8 partySlot);
-GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, void *g3DCi, u32 param);
+GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, Fld3DCi *ci, u8 partySlot);
+GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 actorId);
 // The event of an effect: init makes the effect's event, and render draws it
 GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
                                           void (*render)(EncEffGrid *grid));

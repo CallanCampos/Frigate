@@ -16,6 +16,8 @@
 // side, and from 8 on the trainers. An enum, so MWCC keeps the first test of the loops over the positions
 typedef enum {
     BTLV_MCSS_POS_FIRST = 0,
+    BTLV_MCSS_POS_SINGLE_PLAYER = 0, // the player's Pokémon of a single battle
+    BTLV_MCSS_POS_SINGLE_ENEMY = 1,  // the opponent's
     BTLV_MCSS_POS_TRAINER = 8,
     BTLV_MCSS_POS_MAX = 14,
 } BtlvMcssPos;

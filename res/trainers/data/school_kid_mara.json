@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Mara",
+    "class": "TRAINER_CLASS_SCHOOL_KID_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 5,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DEERLING",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SHELMET",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I need to research the Exp. Points of\nPokémon for my homework assignment!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It's not fair to use moves\nI wasn't expecting!"
+        },
+        {
+            "type": 2,
+            "text": "Hmm! I see! If a high-level Pokémon\ndefeats a lower-level Pokémon, they{be00}\ndon't receive very many Exp. Points!"
+        }
+    ]
+}

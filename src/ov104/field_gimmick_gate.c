@@ -107,7 +107,6 @@ void func_ov104_021ef9f8(GimmickGateZoneList *list);
 void func_ov104_021efa18(GimmickGateWork *work, GimmickGateZoneList *list);
 void func_ov104_021efad0(GimmickGateWork *work, GimmickGateZoneList *list);
 void func_ov104_021efb30(GimmickGateWork *work, GimmickGateZoneList *list);
-BOOL func_ov104_021efb90(VM *vm, FieldScriptEnv *env);
 void func_ov104_021eeea0(GimmickGateWork *work);
 void func_ov104_021eeee0(GimmickGateWork *work);
 GimmickGateSave *func_ov104_021eed58(Field *field);

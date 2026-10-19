@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kumiko",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GOLBAT",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I may be a Backpacker, but I'm also\na Treasure Hunter!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I missed my chance for that elusive\ntreasure called “victory\"!"
+        },
+        {
+            "type": 2,
+            "text": "Have you heard of the Magma Stone?{be01}\nThey say it lies in a volcano somewhere\nand has something to do with Pokémon.{be01}\nYou put it somewhere...or remove it from\nsomewhere...and it'll summon{be00}\nsome Pokémon.{be00}\nNo one's that clear on the details."
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sap Sipper",
+    "description": "Boosts Attack when hit by\na Grass-type move."
+}

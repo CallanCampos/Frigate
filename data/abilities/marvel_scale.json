@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Marvel Scale",
-    "description": "Ups Defense if there is\na status problem."
-}

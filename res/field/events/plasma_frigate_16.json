@@ -1,0 +1,118 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
+            "movement": 4,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x03d0",
+            "script": 3429,
+            "direction": "DIR_DOWN",
+            "params": [ 2, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 25,
+                "z": 7,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
+            "movement": 4,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x03d0",
+            "script": 3428,
+            "direction": "DIR_DOWN",
+            "params": [ 1, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 21,
+                "z": 4,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_7",
+            "warp": 6,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 312,
+                "y": 0,
+                "z": 88,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_9",
+            "warp": 4,
+            "unk4": 0,
+            "transition": 5,
+            "grid": {
+                "x": 344,
+                "y": 0,
+                "z": 136,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_2",
+            "warp": 5,
+            "unk4": 0,
+            "transition": 5,
+            "grid": {
+                "x": 344,
+                "y": 0,
+                "z": 40,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_9",
+            "warp": 3,
+            "unk4": 0,
+            "transition": 5,
+            "grid": {
+                "x": 472,
+                "y": 0,
+                "z": 40,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_15",
+            "warp": 1,
+            "unk4": 0,
+            "transition": 5,
+            "grid": {
+                "x": 472,
+                "y": 0,
+                "z": 136,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

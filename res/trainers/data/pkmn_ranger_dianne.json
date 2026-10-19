@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dianne",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_TRIPLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_SITRUS_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_LARVESTA",
+            "form": 0,
+            "level": 39,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FLAREON",
+            "form": 0,
+            "level": 39,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_VIBRAVA",
+            "form": 0,
+            "level": 39,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "If you've got three or more Pokémon\nready for battle, let's have a{be00}\nTriple Battle!"
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "The power of three come together as one!\nLet's have a Triple Battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Everyone coming together as one...\nWhat great teamwork that was!"
+        },
+        {
+            "type": 15,
+            "text": "Your great display of teamwork impressed\nme, so I'd like to give you this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "In a Triple Battle, your Pokémon have\nmore than triple the power!{be00}\nIt's a true test of a Trainer's skill!"
+        }
+    ]
+}

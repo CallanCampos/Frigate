@@ -7,9 +7,9 @@ build runs them with the system's `python3`.
 
 | Directory | What it holds |
 | --- | --- |
-| `build/` | Steps of the build and checks of its output: the ROM's file system (`files_tree.py`), mwccarm's depfiles, the linker script for a shifted build, objdiff's config and progress, comparing two ROMs (`romdiff.py`) and verifying a DSi ROM |
+| `build/` | Steps of the build and checks of its output: the ROM's file system (`files_tree.py`), mwccarm's depfiles, NitroSDK's symbols in the linker script (`lcf_symbols.py`) and its padding for a shifted build, objdiff's config and progress, comparing two ROMs (`romdiff.py`) and verifying a DSi ROM |
 | `decomp/` | Decompiling: probing a file against the ROM (`compiler_probe.py`), showing a function's asm (`show_func.py`), its locals, respellings, the permuter, finding source files, finding functions the build compiled more than once (`find_duplicates.py`), and changing the dsd configs of both versions (`add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`) |
-| `data/` | The game data in JSON: the shared reader and validator (`datajson.py`), NARC archives, the constant lists (`gen_constants.py`, `make_constants.py`, `rename_constant.py`) and a packer per kind of data (`species_data.py` and the rest), see [docs/data.md](../docs/data.md) |
+| `res/` | The game data in JSON: the shared reader and validator (`datajson.py`), NARC archives, the constant lists (`gen_constants.py`, `make_constants.py`, `rename_constant.py`) and a packer per kind of data (`species_data.py` and the rest), see [docs/data.md](../docs/data.md) |
 | `text/` | The game's text: its message files (`text_data.py`), the messages taken from the JSON (`text_sources.py`), the message ID headers and the easy chat words, see [docs/data.md](../docs/data.md) |
 | `script/` | The field and trainer AI scripts' disassemblers and command table, see [docs/scripts.md](../docs/scripts.md) |
 | `compiler_tests/` | Small C files that pin down how the compiler behaves |

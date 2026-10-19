@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LAPRAS",
+    "moves": [ "MOVE_HYDRO_PUMP", "MOVE_BLIZZARD", "MOVE_ICE_SHARD", "MOVE_SHEER_COLD" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_SASSY",
+    "item": "ITEM_ZOOM_LENS",
+    "form": 0
+}

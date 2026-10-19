@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Felix",
+    "class": "TRAINER_CLASS_JANITOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LILLIPUP",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TRUBBISH",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Cleaning actually takes a lot\nof strength...{be01}\nIn other words, I've been training real\nhard by doing all this cleaning!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oops! Who cares about winning or losing!\nThat spot over there is what's on my mind!"
+        },
+        {
+            "type": 2,
+            "text": "When you clean, do you ever feel like\nit's never going to end?{be01}\nWorks for me! That means I can clean\nforever, and I sure love cleaning."
+        }
+    ]
+}

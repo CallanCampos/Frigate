@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Marco",
+    "class": "TRAINER_CLASS_STRIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_HYPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 47,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 47,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey, check this!\nTrap and...shoot!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hmm... My Pokémon don't come out any\nstronger even if I give the ball momentum?"
+        },
+        {
+            "type": 15,
+            "text": "Items are important, both in sports\nand in Pokémon battles!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I'm going to come up with a separate\ntraining regimen for when I practice{be00}\nPokémon battles."
+        }
+    ]
+}

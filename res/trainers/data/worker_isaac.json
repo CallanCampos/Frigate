@@ -1,0 +1,37 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Isaac",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MAGBY",
+            "form": 0,
+            "level": 12,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_SMOG", "MOVE_EMBER", "MOVE_LEER" ]
+        },
+        {
+            "species": "SPECIES_KOFFING",
+            "form": 0,
+            "level": 12,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ASSURANCE", "MOVE_TACKLE", "MOVE_POISON_GAS" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Is this what it means to face reality?"
+        }
+    ]
+}

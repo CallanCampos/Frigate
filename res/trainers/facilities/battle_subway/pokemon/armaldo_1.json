@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ARMALDO",
+    "moves": [ "MOVE_X_SCISSOR", "MOVE_ROCK_BLAST", "MOVE_REST", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

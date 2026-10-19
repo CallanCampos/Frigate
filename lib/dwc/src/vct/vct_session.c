@@ -8,20 +8,6 @@
 // what each packet does to a machine's state decides whether to carry on, to refuse, or to give the application an
 // event.
 
-// A control packet: a machine asking another to start or stop hearing it
-struct VCTControlPacket {
-    u32 magic;
-    u8 type;
-    u8 length;
-    u8 command;
-    u8 pad7;
-    u8 from;
-    u8 to;
-    u8 flag;
-    u8 origin;
-    u32 argument;
-};
-
 // The sessions that are free and in use, the clock and the random number generator's constants
 struct VCTSessionPool {
     VCTSession *freeList;
@@ -38,8 +24,6 @@ struct VCTSessionState {
     // How many machines are in the voice chat, and which
     int count;
     u32 mask;
-    // When the last request was sent, or 0
-    u64 requestTime;
 };
 
 static VCTSession *AllocFromPool(u8 aid);
@@ -51,7 +35,7 @@ static void BroadcastCommand(int flag);
 static void InitSession(VCTSession *session, u8 aid);
 static BOOL SendControl(VCTSession *session, VCTControlPacket *packet);
 static int GetEvent(VCTControlPacket *packet, VCTSession *session);
-static void InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command);
+static int InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command);
 static int ReplyTransition(VCTSession *session, VCTControlPacket *packet);
 static BOOL CanStart(VCTSession *session);
 static int CheckTransition(VCTSession *session, VCTControlPacket *packet);
@@ -70,6 +54,11 @@ static const u8 sDirectEvents[7] = { 7, 12, 2, 3, 9, 2, 0 };
 // What a control packet does to a machine in each state (a row each), by the command (a column each: those of a
 // broadcast packet, then those of a direct one): the next state, -1 to take no notice, or -2 to refuse. The first two
 // tables are for when the packet is a reply, the others for when it is a request, one of each for the first mode.
+static const s8 sReplyTableMode1[6][11] = {
+    { 4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0 },
+    { -2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1 },  { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1 },
+    { -2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1 },
+};
 static const s8 sReplyTableOther[6][11] = {
     { -2, -2, -2, 3, -1, -1, 0, -1, -1, -1, -1 },   { -2, -2, -2, -3, -1, 2, 0, 0, 0, -1, 0 },
     { -2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1 }, { -2, 0, -2, -3, -1, -1, -1, -1, -1, -1, -1 },
@@ -85,16 +74,13 @@ static const s8 sCheckTableOther[6][11] = {
     { -2, 5, -2, -2, -1, -2, 0, -2, -2, -2, -2 }, { -2, -2, -2, -2, -1, -2, 0, -2, -2, -2, -2 },
     { -2, -2, -2, -2, -1, 3, 0, 0, 0, -2, 0 },    { -2, -2, -2, -2, -1, 0, 0, -2, -2, 0, -2 },
 };
-static const s8 sReplyTableMode1[6][11] = {
-    { 4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0 },
-    { -2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1 },  { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1 },
-    { -2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1 },
-};
 
 // How long to wait for an answer, in clock ticks
 static u64 sRequestTimeout = 15709687;
 
 static VCTSessionPool sSessionPool;
+// When the last request was sent, or 0
+static u64 sRequestTime;
 static VCTSessionState sSessionState;
 
 VCTSession *VCT_AllocSession(u8 aid) {
@@ -287,13 +273,13 @@ void VCT_CheckTimeout(void) {
     if (gVCTSettings.unkC == 0) {
         return;
     }
-    if (sSessionState.requestTime == 0) {
+    if (sRequestTime == 0) {
         return;
     }
-    if (now - sSessionState.requestTime <= sRequestTimeout) {
+    if (now - sRequestTime <= sRequestTimeout) {
         return;
     }
-    sSessionState.requestTime = 0;
+    sRequestTime = 0;
     sSessionPool.host.active = 0;
     sSessionPool.host.state = 0;
     BroadcastCommand(0);
@@ -440,7 +426,8 @@ static int GetEvent(VCTControlPacket *packet, VCTSession *session) {
     return 12;
 }
 
-static void InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command) {
+// Fills in a control packet from this machine to the session's. It returns 0, which no caller reads
+static int InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command) {
     packet->magic = VCT_PACKET_MAGIC;
     packet->length = sizeof(VCTControlPacket);
     packet->command = command;
@@ -449,12 +436,12 @@ static void InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 
     packet->flag = 0;
     packet->origin = gVCTSettings.aid;
     packet->argument = 0;
+    return 0;
 }
 
 // Moves a session on by a reply, returning what the table says
 static int ReplyTransition(VCTSession *session, VCTControlPacket *packet) {
     int column = packet->command;
-    const s8(*table)[11];
     int next;
 
     if (packet->type == VCT_TYPE_CONTROL) {
@@ -466,11 +453,11 @@ static int ReplyTransition(VCTSession *session, VCTControlPacket *packet) {
     if (column < 0) {
         return -1;
     }
-    table = sReplyTableMode1;
-    if (gVCTSettings.mode != 1) {
-        table = sReplyTableOther;
+    if (gVCTSettings.mode == 1) {
+        next = sReplyTableMode1[session->state][column];
+    } else {
+        next = sReplyTableOther[session->state][column];
     }
-    next = table[session->state][column];
     switch (next) {
     case -1:
         return next;
@@ -503,7 +490,6 @@ static BOOL CanStart(VCTSession *session) {
 // Moves a session on by a request, returning 0 if it is refused
 static int CheckTransition(VCTSession *session, VCTControlPacket *packet) {
     int column = packet->command;
-    const s8(*table)[11];
     int next;
 
     if (packet->type == VCT_TYPE_CONTROL) {
@@ -515,8 +501,11 @@ static int CheckTransition(VCTSession *session, VCTControlPacket *packet) {
     if (column < 0) {
         return -1;
     }
-    table = gVCTSettings.mode == 1 ? sCheckTableMode1 : sCheckTableOther;
-    next = table[session->state][column];
+    if (gVCTSettings.mode == 1) {
+        next = sCheckTableMode1[session->state][column];
+    } else {
+        next = sCheckTableOther[session->state][column];
+    }
     if (next == -1) {
         return TRUE;
     }
@@ -591,11 +580,12 @@ static BOOL HandlePeerPacket(VCTControlPacket *packet, VCTEventResult *result) {
 }
 
 static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
-    VCTSession *host = &sSessionPool.host;
+    VCTSession *host;
     int next;
 
     if (sSessionPool.host.active == 2) {
         if (sSessionPool.host.aid == packet->from) {
+            host = &sSessionPool.host;
             next = ReplyTransition(host, packet);
             switch (next) {
             case -2:
@@ -606,6 +596,9 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
             case -1:
                 return FALSE;
             }
+            result->event = GetEvent(packet, host);
+            result->session = host;
+            host->state = next;
         } else {
             BroadcastCommand(1);
             return FALSE;
@@ -617,6 +610,7 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
         sSessionPool.host.aid = packet->from;
         sSessionPool.host.active = 2;
         sSessionPool.host.state = 0;
+        host = &sSessionPool.host;
         next = ReplyTransition(host, packet);
         switch (next) {
         case -3:
@@ -625,16 +619,16 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
             sSessionPool.host.active = 0;
             return FALSE;
         }
+        result->event = GetEvent(packet, host);
+        result->session = host;
+        host->state = next;
     }
-    result->event = GetEvent(packet, host);
-    result->session = host;
-    host->state = next;
     if (result->event == 10) {
         BroadcastCommand(1);
-        sSessionState.requestTime = OS_GetTick();
+        sRequestTime = OS_GetTick();
     } else {
         BroadcastCommand(0);
-        sSessionState.requestTime = 0;
+        sRequestTime = 0;
     }
     return TRUE;
 }

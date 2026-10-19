@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BLAZIKEN",
+    "moves": [ "MOVE_BLAZE_KICK", "MOVE_FLAME_CHARGE", "MOVE_ENDURE", "MOVE_REVERSAL" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_SALAC_BERRY",
+    "form": 0
+}

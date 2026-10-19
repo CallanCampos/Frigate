@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SKUNTANK",
+    "moves": [ "MOVE_FLAMETHROWER", "MOVE_NIGHT_SLASH", "MOVE_INCINERATE", "MOVE_MEMENTO" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAUGHTY",
+    "item": "ITEM_SHUCA_BERRY",
+    "form": 0
+}

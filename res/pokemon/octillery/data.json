@@ -1,0 +1,179 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Octillery",
+    "pokedex": {
+        "category": "Jet Pokémon",
+        "entry": "It has a tendency to want to be in holes.\nIt prefers rock crags or pots and\nsprays ink from them before attacking.",
+        "height": "2'11\"",
+        "weight": "62.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Octillery",
+                "category": "Jet Pokémon",
+                "entry": "It loves to lurk inside holes in\nrocks. It sometimes sprays ink on\nprey by sticking out only its mouth.",
+                "height": "2'11\"",
+                "weight": "62.8 lbs."
+            },
+            "fr": {
+                "name": "Octillery",
+                "category": "Pokémon Jet",
+                "entry": "Il adore se cacher dans les\nfissures de la roche. Il crache\nparfois de l'encre sur ses proies.",
+                "height": "0,9 m",
+                "weight": "28,5 kg"
+            },
+            "de": {
+                "name": "Octillery",
+                "category": "Hochdruck",
+                "entry": "Es lauert gern in den Löchern von\nFelsen, um vorbeischwimmende\nBeute mit Tinte zu bespritzen.",
+                "height": "0,9 m",
+                "weight": "28,5 kg"
+            },
+            "it": {
+                "name": "Octillery",
+                "category": "Pokémon Jet",
+                "entry": "Adora nascondersi nelle spaccature\ndelle rocce. A volte allunga la bocca\ne sputa inchiostro sulle prede.",
+                "height": "0,9 m",
+                "weight": "28,5 kg"
+            },
+            "ko": {
+                "name": "대포무노",
+                "category": "분사포켓몬",
+                "entry": "바위굴에 파고드는 것을 좋아한다.\n그대로 입만 내놓고 먹이에\n먹물을 뿜는 일도 있다.",
+                "height": "0.9 m",
+                "weight": "28.5 kg"
+            },
+            "es": {
+                "name": "Octillery",
+                "category": "Pokémon Reactor",
+                "entry": "Le gusta acechar desde agujeros\nen las rocas. Escupe tinta a sus\npresas asomando solo la boca.",
+                "height": "0,9 m",
+                "weight": "28,5 kg"
+            },
+            "ja": {
+                "name": "オクタン",
+                "category": "ふんしゃポケモン",
+                "entry": "いわあなに\\x{3000}もぐりこむのが\\x{3000}すき。\nそのまま\\x{3000}くちだけだして\\x{3000}えものに\nスミを\\x{3000}ふきかけることも\\x{3000}ある。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff18}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 105,
+        "defense": 75,
+        "speed": 45,
+        "special_attack": 105,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_2" ],
+    "abilities": [ "ABILITY_SUCTION_CUPS", "ABILITY_SNIPER" ],
+    "hidden_ability": "ABILITY_MOODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 168,
+    "height": 9,
+    "weight": 285,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GUNK_SHOT" ],
+            [ 1, "MOVE_ROCK_BLAST" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 1, "MOVE_CONSTRICT" ],
+            [ 1, "MOVE_PSYBEAM" ],
+            [ 1, "MOVE_AURORA_BEAM" ],
+            [ 6, "MOVE_CONSTRICT" ],
+            [ 10, "MOVE_PSYBEAM" ],
+            [ 14, "MOVE_AURORA_BEAM" ],
+            [ 18, "MOVE_BUBBLE_BEAM" ],
+            [ 22, "MOVE_FOCUS_ENERGY" ],
+            [ 25, "MOVE_OCTAZOOKA" ],
+            [ 28, "MOVE_WRING_OUT" ],
+            [ 34, "MOVE_SIGNAL_BEAM" ],
+            [ 40, "MOVE_ICE_BEAM" ],
+            [ 46, "MOVE_BULLET_SEED" ],
+            [ 52, "MOVE_HYDRO_PUMP" ],
+            [ 58, "MOVE_HYPER_BEAM" ],
+            [ 64, "MOVE_SOAK" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM34",
+            "TM35",
+            "TM36",
+            "TM38",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM55",
+            "TM57",
+            "TM59",
+            "TM66",
+            "TM68",
+            "TM73",
+            "TM87",
+            "TM90",
+            "TM91",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_SEED_BOMB",
+            "MOVE_BOUNCE",
+            "MOVE_GUNK_SHOT",
+            "MOVE_ICY_WIND",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 236,
+    "baby_species": "SPECIES_REMORAID",
+    "cry_volume": 110
+}

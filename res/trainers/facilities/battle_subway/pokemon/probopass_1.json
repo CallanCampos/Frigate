@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_PROBOPASS",
+    "moves": [ "MOVE_SMACK_DOWN", "MOVE_VOLT_SWITCH", "MOVE_THUNDER_WAVE", "MOVE_MAGNET_RISE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_CHERI_BERRY",
+    "form": 0
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SLOWKING",
+    "moves": [ "MOVE_ZEN_HEADBUTT", "MOVE_EARTHQUAKE", "MOVE_SWAGGER", "MOVE_PSYCH_UP" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_GENTLE",
+    "item": "ITEM_KINGS_ROCK",
+    "form": 0
+}

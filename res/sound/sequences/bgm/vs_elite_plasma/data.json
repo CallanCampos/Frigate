@@ -1,0 +1,9 @@
+{
+    "$schema": "../../../sequence.schema.json",
+    "file": "SEQ_BGM_VS_NEO_PLASMA",
+    "bank": "BANK_MUS_SW_VS_NEO_PLASMA",
+    "volume": 80,
+    "channel_priority": 30,
+    "player_priority": 64,
+    "player": "PLAYER_BGM"
+}

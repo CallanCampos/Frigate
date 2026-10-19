@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TROPIUS",
+    "moves": [ "MOVE_SOLAR_BEAM", "MOVE_AIR_SLASH", "MOVE_SYNTHESIS", "MOVE_SUNNY_DAY" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_HEAT_ROCK",
+    "form": 0
+}

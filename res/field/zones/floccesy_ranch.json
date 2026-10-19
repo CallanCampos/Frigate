@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 18,
+    "area": "AREA_ROUTE_19",
+    "matrix": "MAP_MATRIX_OVERWORLD",
+    "scripts": "SCRIPTS_FLOCCESY_RANCH",
+    "text": "SCRIPT_TEXT_FLOCCESY_RANCH",
+    "bgm": {
+        "spring": "SEQ_BGM_SW_R_19_SP",
+        "summer": "SEQ_BGM_SW_R_19_SU",
+        "autumn": "SEQ_BGM_SW_R_19_AU",
+        "winter": "SEQ_BGM_SW_R_19_WI"
+    },
+    "encounters": "ENCOUNTERS_FLOCCESY_RANCH",
+    "enc_slot": 6,
+    "parent": "ZONE_FLOCCESY_RANCH",
+    "place": "PLACE_FLOCCESY_RANCH",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 1,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 0,
+    "name_icon": 15,
+    "easy_level": 1,
+    "fly": {
+        "x": 135,
+        "y": 0,
+        "z": 630
+    }
+}

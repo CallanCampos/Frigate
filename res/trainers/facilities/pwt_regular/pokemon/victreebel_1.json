@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VICTREEBEL",
+    "moves": [ "MOVE_LEAF_TORNADO", "MOVE_STOCKPILE", "MOVE_SWALLOW", "MOVE_GASTRO_ACID" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_QUIET",
+    "item": "ITEM_PAYAPA_BERRY",
+    "form": 0
+}

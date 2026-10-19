@@ -109,21 +109,23 @@ static void EncEffRipple_Draw(EncEffRipple *ripple) {
         G3_Scale(scale.x, scale.y, scale.z);
     }
     for (y = 0; y < ENCEFF_RIPPLE_ROWS - 1; y++) {
-        VecFx16 *row = &ripple->vertices[y * ENCEFF_RIPPLE_COLUMNS];
+        // The row's t texture coordinate
+        fx32 t;
 
         G3_Begin(GX_BEGIN_QUAD_STRIP);
+        t = y * 8 * FX32_ONE;
         for (x = 0; x < ENCEFF_RIPPLE_COLUMNS; x++) {
-            fx16 x0 = row[x].x;
-            fx16 x1 = row[x + ENCEFF_RIPPLE_COLUMNS].x;
-            fx16 y0 = row[x].y;
-            fx16 y1 = row[x + ENCEFF_RIPPLE_COLUMNS].y;
-            fx16 z0 = row[x].z;
-            fx16 z1 = row[x + ENCEFF_RIPPLE_COLUMNS].z;
+            fx16 x0 = ripple->vertices[y * ENCEFF_RIPPLE_COLUMNS + x].x;
+            fx16 x1 = ripple->vertices[(y + 1) * ENCEFF_RIPPLE_COLUMNS + x].x;
+            fx16 y0 = ripple->vertices[y * ENCEFF_RIPPLE_COLUMNS + x].y;
+            fx16 y1 = ripple->vertices[(y + 1) * ENCEFF_RIPPLE_COLUMNS + x].y;
+            fx16 z0 = ripple->vertices[y * ENCEFF_RIPPLE_COLUMNS + x].z;
+            fx16 z1 = ripple->vertices[(y + 1) * ENCEFF_RIPPLE_COLUMNS + x].z;
 
             G3_Normal(0, 0, -FX16_ONE);
-            G3_TexCoord(x * 8 * FX32_ONE, y * 8 * FX32_ONE);
+            G3_TexCoord(x * 8 * FX32_ONE, t);
             G3_Vtx(x0, -y0, z0);
-            G3_TexCoord(x * 8 * FX32_ONE, y * 8 * FX32_ONE + 8 * FX32_ONE);
+            G3_TexCoord(x * 8 * FX32_ONE, t + 8 * FX32_ONE);
             G3_Vtx(x1, -y1, z1);
         }
         G3_End();

@@ -940,7 +940,7 @@ u16 GetDirFromPosToPos(s32 x1, s32 z1, s32 x2, s32 z2) {
     return direction;
 }
 
-u32 func_ov012_0215ed38(u32 direction, u16 angle) {
+u8 func_ov012_0215ed38(u32 direction, u16 angle) {
     u16 rotated = data_ov012_0216cd60[direction] + angle;
 
     return data_ov012_0216cdc8[data_ov012_0216cd68[rotated / 0x1000]][DIR_DOWN];

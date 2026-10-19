@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Janie",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_ENERGY_ROOT",
+    "party": [
+        {
+            "species": "SPECIES_HITMONCHAN",
+            "form": 0,
+            "level": 63,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A place where you can warm up!\nThat's what I heard and why I came here!{be00}\nLet's turn up the heat on this thing!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The heat here is too much.\nI'm just burning up!"
+        },
+        {
+            "type": 15,
+            "text": "Accept this symbol of my excitement!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "My warrior's heart is burning!\nThank you for the hot battle!{be01}\nNext, I will stay on this hot streak\nand watch the game!"
+        }
+    ]
+}

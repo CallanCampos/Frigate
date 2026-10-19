@@ -1,5 +1,0 @@
-Empty_Text_Empty =     \x{ffff}
-Empty_Text_Empty_2 =     \x{ffff}
-Empty_Text_Empty_3 =      \x{ffff}
-Empty_Text_Empty_4 =      \x{ffff}
-Empty_Text_Empty_5 =     \x{ffff}

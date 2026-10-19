@@ -124,33 +124,6 @@ static void CtvtDraw_UpdateCancel(CommTvtWork *sys, CtvtDraw *draw);
 
 static const u16 sUnusedColors[] = { 0x1c13, 0x1313, 0x1c1c, 0x4e73, 0x739c };
 
-// The animations of each tool's button, when not chosen and when chosen
-static const u8 sPenButtonAnims[] = { 1, 2 };
-static const u8 sPickButtonAnims[] = { 3, 4 };
-static const u8 sEraserButtonAnims[] = { 5, 6 };
-static const u8 sStampButtonAnims[] = { 7, 8 };
-
-static const int sPens[] = { DRAW_PEN_ROUND, DRAW_PEN_SMALL, DRAW_PEN_DOT };
-
-static const int sStamps[] = { DRAW_PEN_HEART, DRAW_PEN_POKE_BALL, DRAW_PEN_FACE, DRAW_PEN_STAR, DRAW_PEN_DROP };
-
-static const TouchRect sStampButtons[CTVT_DRAW_TOUCH_MAX] = {
-    { 0x98, 0xa8, 0x60, 0x70 }, { 0x98, 0xa8, 0x70, 0x80 }, { 0x98, 0xa8, 0x80, 0x90 },
-    { 0x98, 0xa8, 0x90, 0xa0 }, { 0x98, 0xa8, 0xa0, 0xb0 }, { TOUCH_RECT_END },
-};
-
-static const TouchRect sToolButtons[CTVT_DRAW_TOUCH_MAX] = {
-    { 0xa8, 0xc0, 0x04, 0x1c }, { 0xa8, 0xc0, 0x2c, 0x44 }, { 0xa8, 0xc0, 0x54, 0x6c }, { 0xa8, 0xc0, 0x7c, 0x94 },
-    { 0xa8, 0xc0, 0xbc, 0xd4 }, { 0xa8, 0xc0, 0xe0, 0xf8 }, { TOUCH_RECT_END },
-};
-
-static const TouchRect sPenButtons[CTVT_DRAW_TOUCH_MAX] = {
-    { 0x98, 0xa8, 0x08, 0x18 },
-    { 0x98, 0xa8, 0x18, 0x28 },
-    { 0x98, 0xa8, 0x28, 0x38 },
-    { TOUCH_RECT_END },
-};
-
 CtvtDraw *CtvtDraw_Create(CommTvtWork *sys, HeapID heapId) {
     CtvtDraw *draw = GFL_HeapAllocate(heapId, sizeof(CtvtDraw), TRUE, "ctvt_draw.c", 219);
 
@@ -523,13 +496,13 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DSI_VGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NONE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DS_LCD);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_SEPIA01);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_DOWN) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_QVGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_MONO);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_CIF);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NEGATIVE);
         }
     }
     if (CommTvt_GetSelfIndex(sys) == 0 && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_L) &&
@@ -549,7 +522,8 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
 
         draw->cursorColor = GX_RGB(level, level, level);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0xde, &draw->cursorColor, sizeof(draw->cursorColor));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0xde, &draw->cursorColor,
+                                       sizeof(draw->cursorColor));
     return COMM_TVT_MODE_DRAW;
 }
 
@@ -572,6 +546,33 @@ static void CtvtDraw_UpdateMenu(CommTvtWork *sys, CtvtDraw *draw) {
         GFL_SndSEPlay(SEQ_SE_SYS_48);
     }
 }
+
+// The animations of each tool's button, when not chosen and when chosen
+static const u8 sPenButtonAnims[] = { 1, 2 };
+static const u8 sPickButtonAnims[] = { 3, 4 };
+static const u8 sEraserButtonAnims[] = { 5, 6 };
+static const u8 sStampButtonAnims[] = { 7, 8 };
+
+static const int sPens[] = { DRAW_PEN_ROUND, DRAW_PEN_SMALL, DRAW_PEN_DOT };
+
+static const int sStamps[] = { DRAW_PEN_HEART, DRAW_PEN_POKE_BALL, DRAW_PEN_FACE, DRAW_PEN_STAR, DRAW_PEN_DROP };
+
+static const TouchRect sStampButtons[CTVT_DRAW_TOUCH_MAX] = {
+    { 0x98, 0xa8, 0x60, 0x70 }, { 0x98, 0xa8, 0x70, 0x80 }, { 0x98, 0xa8, 0x80, 0x90 },
+    { 0x98, 0xa8, 0x90, 0xa0 }, { 0x98, 0xa8, 0xa0, 0xb0 }, { TOUCH_RECT_END },
+};
+
+static const TouchRect sToolButtons[CTVT_DRAW_TOUCH_MAX] = {
+    { 0xa8, 0xc0, 0x04, 0x1c }, { 0xa8, 0xc0, 0x2c, 0x44 }, { 0xa8, 0xc0, 0x54, 0x6c }, { 0xa8, 0xc0, 0x7c, 0x94 },
+    { 0xa8, 0xc0, 0xbc, 0xd4 }, { 0xa8, 0xc0, 0xe0, 0xf8 }, { TOUCH_RECT_END },
+};
+
+static const TouchRect sPenButtons[CTVT_DRAW_TOUCH_MAX] = {
+    { 0x98, 0xa8, 0x08, 0x18 },
+    { 0x98, 0xa8, 0x18, 0x28 },
+    { 0x98, 0xa8, 0x28, 0x38 },
+    { TOUCH_RECT_END },
+};
 
 static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
     s32 hit = func_0203da0c(sToolButtons);
@@ -768,14 +769,14 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     }
     if (func_0203da48() == TRUE && draw->inputHandled == FALSE) {
         if (draw->tool == DRAW_TOOL_PICK) {
-            u16 *screen = (u16 *)G2_GetBG2ScrPtr() + y * 256 + x;
+            u16 *screen = (u16 *)((u32)G2_GetBG2ScrPtr() + x * 2 + y * 512);
             u16 *camera;
 
             G2_GetBG3ScrPtr();
             if (CommTvt_IsZoomed(sys) == TRUE) {
-                camera = (u16 *)G2_GetBG3ScrPtr() + (y / 2) * 256 + x / 2;
+                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + (x / 2) * 2 + (y / 2) * 512);
             } else {
-                camera = (u16 *)G2_GetBG3ScrPtr() + y * 256 + x;
+                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + x * 2 + y * 512);
             }
             if (*screen & CTVT_DRAW_OPAQUE) {
                 draw->color = *screen;

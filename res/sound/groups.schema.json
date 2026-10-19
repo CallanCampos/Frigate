@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The sound groups: res/sound/groups.json",
+    "description": "The sound archive's groups, the sequences that the game loads together, by their constants in generated/sound_groups.txt.",
+    "type": "object",
+    "properties": { "$schema": { "type": "string", "description": "This schema, for editors" } },
+    "additionalProperties": {
+        "type": "array",
+        "items": {
+            "type": "object", "additionalProperties": false, "required": [ "sequence", "load" ],
+            "properties": {
+                "sequence": { "type": "string", "x-constant": "SEQ_" },
+                "load": { "type": "integer", "minimum": 0, "maximum": 255, "description": "What of it to load: 1 the sequence, 2 its bank, 4 its wave archives" }
+            }
+        }
+    }
+}

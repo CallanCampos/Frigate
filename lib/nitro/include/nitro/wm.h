@@ -275,7 +275,7 @@ typedef struct {
     u16 childSize;
 } WMStartConnectCallback;
 
-// The callback of the measure of a channel: how busy it was, and the caller's own callback for that result
+// The callback of the measure of a channel: how busy it was
 typedef struct {
     u16 apiid;
     u16 errcode;
@@ -283,8 +283,6 @@ typedef struct {
     u16 wlResult;
     u16 channel;
     u16 ccaBusyRatio;
-    // Called with the channel and with how busy it was; the SDK's own name for this field is not known
-    void (*unk_0c)(u16 channel, u16 busy);
 } WMMeasureChannelCallback;
 
 // What a callback of a port gets: a packet that came in, or (state WM_STATECODE_CONNECTED and its like, and

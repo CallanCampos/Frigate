@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ALAKAZAM",
+    "moves": [ "MOVE_PSYCH_UP", "MOVE_ENCORE", "MOVE_PROTECT", "MOVE_PSYCHIC" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_FOCUS_SASH",
+    "form": 0
+}

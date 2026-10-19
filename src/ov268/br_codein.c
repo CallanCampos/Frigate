@@ -7,6 +7,7 @@
 #include "app/battle_recorder/br_codein_pv.h"
 #include "app/battle_recorder/br_res.h"
 #include "app/battle_recorder/br_util.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/button_man.h"
 #include "gfl/clact.h"
@@ -14,9 +15,6 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "gfl/tcb.h"
-
-// The archive of the code input screen's graphics, which nothing is loaded from here
-#define ARCID_CODEIN 58
 
 static void BrCodeIn_VBlank(TCB *tcb, void *data);
 

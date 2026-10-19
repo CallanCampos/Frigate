@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Bobyosi",
+    "class": "TRAINER_CLASS_POLICEMAN",
+    "pokemon": [
+        "blaziken_2",
+        "infernape_2",
+        "empoleon_2",
+        "emboar_2",
+        "medicham_2",
+        "breloom_2",
+        "forretress_2",
+        "skarmory_2",
+        "hariyama_2",
+        "sawk_2",
+        "throh_2",
+        "durant_2",
+        "scrafty_2",
+        "ferrothorn_2",
+        "toxicroak_2",
+        "bisharp_2",
+        "bastiodon_2",
+        "escavalier_2",
+        "poliwrath_2"
+    ],
+    "messages": [ "I'll protect my peace by myself.", "My peace remains protected.", "Please don't disturb my peace and quiet." ]
+}

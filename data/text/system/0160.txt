@@ -1,3 +1,0 @@
-Bank0160_Text_Confirm = CONFIRM
-Bank0160_Text_Cancel = CANCEL
-Bank0160_Text_Exit = EXIT

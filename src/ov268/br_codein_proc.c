@@ -13,7 +13,7 @@
 #include "gfl/clact.h"
 #include "gfl/std.h"
 #include "system/printsys.h"
-#include "text/system/0008.h"
+#include "text/system/br_res.h"
 
 // The digits of a battle video's number
 #define BR_CODEIN_VIDEO_NUMBER_LENGTH 12
@@ -63,7 +63,7 @@ static BOOL BrCodeInProc_Init(GameProc *proc, u32 *state, void *param, void *wor
 
     wk->que = func_02021998(wk->heapId);
     wk->text = BrText_Init(p->res, wk->que, wk->heapId);
-    BrText_Print(wk->text, p->res, Bank0008_Text_PleaseEnterVideoNumber);
+    BrText_Print(wk->text, p->res, BrRes_Text_PleaseEnterVideoNumber);
     return TRUE;
 }
 

@@ -3,6 +3,7 @@
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_util.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -234,7 +235,7 @@ int LocalTvtCallSelect_GetSelected(LocalTvtCallSelect *select) {
 }
 
 static void LocalTvtCallSelect_LoadResources(LocalTvtCallSelect *select, HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT_COMMON, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, heapId);
 
     LoadSysMsgBox(4, 0x140, 9, 0, heapId);
     select->palette = func_0204bc48(arc, 3, 1, 0, heapId);

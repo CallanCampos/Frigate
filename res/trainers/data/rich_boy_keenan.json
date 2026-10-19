@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Keenan",
+    "class": "TRAINER_CLASS_RICH_BOY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 40,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My gorgeous Pokémon and I have come\nto frolic about Relic Castle! Here, take{be00}\na look at my Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your strength is quite high class, indeed!"
+        },
+        {
+            "type": 2,
+            "text": "Visiting famous landmarks with\nmy most favorite Pokémon is a{be00}\ntruly exceptional experience!"
+        }
+    ]
+}

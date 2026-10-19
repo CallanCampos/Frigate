@@ -64,8 +64,8 @@ static LocalTvtChelen *LocalTvtChelen_Create(GameData *gameData, HeapID heapId) 
 
     chelen->heapId = heapId;
     chelen->gameData = gameData;
-    chelen->typeMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0397, heapId);
-    chelen->abilityMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0396, heapId);
+    chelen->typeMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_PERSON_CHELEN_TYPE, heapId);
+    chelen->abilityMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_PERSON_CHELEN_ABILITY, heapId);
     return chelen;
 }
 

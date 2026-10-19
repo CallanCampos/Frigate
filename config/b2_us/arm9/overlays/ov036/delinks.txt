@@ -196,6 +196,7 @@ src/ov036/scrcmd_gym.c:
     .text       start:0x021aad44 end:0x021ab218
 
 src/ov036/scrcmd_fade.c:
+    complete
     .text       start:0x021ab218 end:0x021ab73c
 
 src/ov036/scrcmd_msg.c:
@@ -360,6 +361,7 @@ src/ov036/ircbattlemenu.c:
     .data       start:0x021d4c34 end:0x021d4d34
 
 src/ov036/field_menu_event.c:
+    complete
     .text       start:0x0218b12c end:0x0218b1f8
 
 src/ov036/fldmmdl_acmd.c:
@@ -369,23 +371,23 @@ src/ov036/fldmmdl_acmd.c:
 
 src/ov036/fldmmdl_blact.c:
     .text       start:0x02193680 end:0x021946b4
-    .rodata     start:0x021ce3a0 end:0x021cf2e4
+    .rodata     start:0x021ce3a0 end:0x021cf364
     .data       start:0x021d4d50 end:0x021d4d60
 
 src/ov036/fldmmdl_g3dobj.c:
     .text       start:0x021946b4 end:0x02195378
-    .rodata     start:0x021cf2e4 end:0x021cf3a8
+    .rodata     start:0x021cf364 end:0x021cf3a8
     .data       start:0x021d4d60 end:0x021d4d74
 
 src/ov036/fld_act_rail.c:
     .text       start:0x02195378 end:0x02196238
-    .rodata     start:0x021cf3a8 end:0x021cf768
-    .data       start:0x021d4d74 end:0x021d4d98
+    .rodata     start:0x021cf3a8 end:0x021cf7c8
+    .data       start:0x021d4d74 end:0x021d4de8
 
 src/ov036/field_rail_loader.c:
     .text       start:0x02196238 end:0x02197534
-    .rodata     start:0x021cf768 end:0x021cf9dc
-    .data       start:0x021d4d98 end:0x021d4dfc
+    .rodata     start:0x021cf7c8 end:0x021cf9dc
+    .data       start:0x021d4de8 end:0x021d4dfc
 
 src/ov036/field_fog.c:
     complete
@@ -393,6 +395,7 @@ src/ov036/field_fog.c:
     .data       start:0x021d4dfc end:0x021d4e08
 
 src/ov036/field_zonefog.c:
+    complete
     .text       start:0x02197710 end:0x02197820
     .data       start:0x021d4e08 end:0x021d4e18
 
@@ -402,7 +405,7 @@ src/ov036/field_light.c:
 
 src/ov036/field_subscreen.c:
     .text       start:0x02198198 end:0x02198bc0
-    .rodata     start:0x021cf9dc end:0x021cf9ec
+    .rodata     start:0x021cf9dc end:0x021cfb44
     .data       start:0x021d4e28 end:0x021d4e3c
 
 src/ov036/field_3dbg.c:
@@ -411,7 +414,7 @@ src/ov036/field_3dbg.c:
 
 src/ov036/weather.c:
     .text       start:0x02199004 end:0x021993e0
-    .rodata     start:0x021cf9ec end:0x021cfbe4
+    .rodata     start:0x021cfb44 end:0x021cfbe4
     .data       start:0x021d4e4c end:0x021d4e60
 
 src/ov036/weather_task.c:
@@ -420,6 +423,7 @@ src/ov036/weather_task.c:
     .data       start:0x021d4e60 end:0x021d4e70
 
 src/ov036/fieldmap_ctrl_grid.c:
+    complete
     .text       start:0x0219a3b4 end:0x0219a47c
     .rodata     start:0x021cfbfc end:0x021cfc10
     .data       start:0x021d4e70 end:0x021d4e88
@@ -435,6 +439,7 @@ src/ov036/field_player_nogrid.c:
     .data       start:0x021d4ec0 end:0x021d4efc
 
 src/ov036/fieldmap_ctrl_nogrid_work.c:
+    complete
     .text       start:0x0219e328 end:0x0219e430
     .rodata     start:0x021cfdf4 end:0x021cfe1c
     .data       start:0x021d4efc end:0x021d4f18
@@ -519,6 +524,7 @@ src/ov036/field_player_grid_event.c:
     .data       start:0x021d5404 end:0x021d5420
 
 src/ov036/fld_particle.c:
+    complete
     .text       start:0x021bb590 end:0x021bb67c
     .rodata     start:0x021d1784 end:0x021d1c80
     .data       start:0x021d5420 end:0x021d5430
@@ -534,11 +540,13 @@ src/ov036/sodateya.c:
     .data       start:0x021d54a4 end:0x021d54b0
 
 src/ov036/fldeff_ripple.c:
+    complete
     .text       start:0x021be790 end:0x021be988
     .rodata     start:0x021d220c end:0x021d2234
     .data       start:0x021d54b0 end:0x021d54c4
 
 src/ov036/fldeff_splash.c:
+    complete
     .text       start:0x021be988 end:0x021beb70
     .rodata     start:0x021d2234 end:0x021d2248
     .data       start:0x021d54c4 end:0x021d54d4
@@ -599,6 +607,7 @@ src/ov036/fldeff_d06denki.c:
     .data       start:0x021d558c end:0x021d55a0
 
 src/ov036/land_data_patch.c:
+    complete
     .text       start:0x021c2cbc end:0x021c2ddc
     .data       start:0x021d55a0 end:0x021d55b4
 
@@ -613,6 +622,7 @@ src/ov036/party_select_list.c:
     .data       start:0x021d55d4 end:0x021d5620
 
 src/ov036/field_bbd_color.c:
+    complete
     .text       start:0x021c3c34 end:0x021c3d9c
     .rodata     start:0x021d2540 end:0x021d2560
     .data       start:0x021d5620 end:0x021d5634
@@ -628,11 +638,13 @@ src/ov036/enceff.c:
     .data       start:0x021d5648 end:0x021d5654
 
 src/ov036/fldeff_btrain.c:
+    complete
     .text       start:0x021c649c end:0x021c66e8
     .rodata     start:0x021d2920 end:0x021d2988
     .data       start:0x021d5654 end:0x021d5664
 
 src/ov036/fldeff_hide.c:
+    complete
     .text       start:0x021c66e8 end:0x021c6934
     .rodata     start:0x021d2988 end:0x021d29b4
     .data       start:0x021d5664 end:0x021d5674
@@ -658,6 +670,7 @@ src/ov036/scrcmd_hidden_hollow.c:
     .rodata     start:0x021d4818 end:0x021d48f4
 
 src/ov036/fldeff_ochiba.c:
+    complete
     .text       start:0x021c944c end:0x021c97b8
     .rodata     start:0x021d48f4 end:0x021d4920
     .data       start:0x021d5758 end:0x021d5768

@@ -1,0 +1,454 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 6,
+            "grid": {
+                "x": 796,
+                "y": 664,
+                "z": 16
+            }
+        },
+        {
+            "script": 8200,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 776,
+                "y": 660,
+                "z": 16
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 775,
+                "y": 662,
+                "z": -80
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 770,
+                "y": 668,
+                "z": -80
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 770,
+                "y": 661,
+                "z": -80
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 777,
+                "y": 661,
+                "z": 16
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 776,
+                "y": 655,
+                "z": 16
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 779,
+                "y": 658,
+                "z": 16
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 773,
+                "y": 650,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 794,
+                "y": 643,
+                "z": 80
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 793,
+                "y": 650,
+                "z": 80
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 796,
+                "y": 649,
+                "z": 80
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 783,
+                "y": 646,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 789,
+                "y": 647,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 774,
+                "y": 668,
+                "z": -80
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_YOUNGSTER",
+            "movement": 15,
+            "type": 0,
+            "flag": 0,
+            "script": 8,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 776,
+                "z": 664,
+                "y": -327680
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_21",
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 1
+            },
+            "grid": {
+                "x": 786,
+                "z": 659,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_ARTIST",
+            "movement": 17,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 779,
+                "z": 654,
+                "y": 65536
+            }
+        },
+        {
+            "id": 3,
+            "model": "OBJ_CODE_14",
+            "movement": 15,
+            "type": 0,
+            "flag": 0,
+            "script": 6,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 781,
+                "z": 647,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": "OBJ_CODE_312",
+            "movement": 15,
+            "type": 0,
+            "flag": 0,
+            "script": 7,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 782,
+                "z": 647,
+                "y": 0
+            }
+        },
+        {
+            "id": 5,
+            "model": "OBJ_CODE_29",
+            "movement": 17,
+            "type": 0,
+            "flag": 0,
+            "script": 5,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 779,
+                "z": 655,
+                "y": 65536
+            }
+        },
+        {
+            "id": 6,
+            "model": "OBJ_CODE_LASS",
+            "movement": 15,
+            "type": 0,
+            "flag": 0,
+            "script": 9,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 790,
+                "z": 642,
+                "y": 327680
+            }
+        },
+        {
+            "id": 7,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0578",
+            "script": 7300,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 794,
+                "z": 632,
+                "y": 131072
+            }
+        },
+        {
+            "id": 8,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x057d",
+            "script": 7305,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 796,
+                "z": 633,
+                "y": 131072
+            }
+        },
+        {
+            "id": 9,
+            "model": "OBJ_CODE_29",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 10,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 770,
+                "z": 666,
+                "y": -327680
+            }
+        },
+        {
+            "id": 10,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 11,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 770,
+                "z": 667,
+                "y": -327680
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_ACCUMULA_TOWN_POKEMON_CENTER",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 12744,
+                "y": 0,
+                "z": 10520,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN_2",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 12344,
+                "y": 65455,
+                "z": 10568,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN_4",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 12568,
+                "y": 0,
+                "z": 10344,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN_6",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 12440,
+                "y": 0,
+                "z": 10344,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN_8",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 12712,
+                "y": 80,
+                "z": 10376,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_GATE",
+            "warp": 0,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 12296,
+                "y": 0,
+                "z": 10360,
+                "width": 1,
+                "height": 3,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

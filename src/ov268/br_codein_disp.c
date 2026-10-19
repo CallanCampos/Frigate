@@ -17,7 +17,7 @@
 #include "system/bmp_oam.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
-#include "text/system/0008.h"
+#include "text/system/br_res.h"
 
 // The digits' animations: the ten large digits after an empty place, then the same small. The bar follows
 #define SEQ_SMALL 11
@@ -34,7 +34,7 @@ static void BrCodeInDisp_LoadButtonTextPltt(BrCodeInWork *wk);
 static void BrCodeInDisp_AddButtonText(BrCodeInWork *wk, int button, int x, int y, int unused);
 
 // The names of Back and OK
-static const u32 sBrCodeInButtonMessages[BR_CODEIN_BUTTON_COUNT] = { Bank0008_Text_Quit, Bank0008_Text_Ok };
+static const u32 sBrCodeInButtonMessages[BR_CODEIN_BUTTON_COUNT] = { BrRes_Text_Quit, BrRes_Text_Ok };
 
 // Takes the resources of the digits, the cursors and the buttons from the ones the screen loaded
 void BrCodeInDisp_GetResources(BrCodeInWork *wk) {

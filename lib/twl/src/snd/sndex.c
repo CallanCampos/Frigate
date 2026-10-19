@@ -60,30 +60,40 @@ typedef enum SndexState {
 // The notification that the ARM7 sends of its own: the code of its word, and the argument that was set with it
 typedef void (*SndexNotifyCallback)(u32 code, void *arg);
 
-// The library's state, in the bss. The state is volatile because the PXI callback, which runs in the FIFO's interrupt,
-// changes it while a thread looks at it. The fields up to filterEndSent also belong to the code that sets the volume
-// before the console sleeps or exits (func_02704e04), which nothing in the game starts: it sends the command 0x84
-// with the volume field, and again, up to five times, from the callback of its answer
-typedef struct SndexWork {
-    u8 volume;                     // 0x00
-    BOOL filterBusy;               // 0x04: the filter request is in progress
-    int volumeRetries;             // 0x08
-    volatile SndexState state;     // 0x0c
-    u32 volumeCallbackRetries;     // 0x10
-    BOOL volumePending;            // 0x14: the volume is being set
-    BOOL filterEndSent;            // 0x18: the last word of the filter request is on its way
-    PMExitCallbackInfo exitInfo;   // 0x1c
-    SndexNotifyCallback notify;    // 0x2c
-    void *notifyArg;               // 0x30
-    u32 unk_34[2];                 // 0x34
-    PMSleepCallbackInfo sleepInfo; // 0x3c
-    SNDEXCallback callback;        // 0x4c: of the request in progress
-    void *callbackArg;             // 0x50
-    void *result;                  // 0x54: where the answer's value goes, if the request has one
-    u8 command;                    // 0x58: of the request in progress
-} SndexWork;
+// The request in progress
+typedef struct SndexRequest {
+    SNDEXCallback callback; // 0x0
+    void *arg;              // 0x4
+    void *result;           // 0x8: where the answer's value goes, if the request has one
+    u8 command;             // 0xc
+} SndexRequest;
 
-static SndexWork sSndex;
+// The callback of the notification, which nothing in the game sets
+typedef struct SndexNotify {
+    SndexNotifyCallback callback; // 0x0
+    void *arg;                    // 0x4
+    u32 unk_8[2];                 // 0x8: never read or written in the ROM, but the object is 0x10 bytes
+} SndexNotify;
+
+// The library's state, in the bss. It is separate statics, not one struct: SNDEX_SetIirFilter clears its two flags
+// before it reloads its result only when they are two objects. -ipa file reads and writes them from one base, and
+// lays them out by its sort by size, so they are defined in the order that gives the ROM's layout, not in address
+// order (sVolume, sFilterBusy, sVolumeRetries, sState, sVolumeCallbackRetries, sVolumePending, sFilterEndSent,
+// sExitInfo, sNotify, sSleepInfo, sRequest). The statics of the volume belong to the code that sets it before the
+// console sleeps or exits (func_02704e04) while sVolumePending is set, which nothing in the game does: it sends the
+// command 0x84 with sVolume, and again, up to five times, from the callback of its answer
+static u8 sVolume;
+static BOOL sFilterEndSent; // the last word of the filter request is on its way
+static BOOL sFilterBusy;    // the filter request is in progress
+static int sVolumeRetries;  // of func_02704e04
+// Volatile because the PXI callback, which runs in the FIFO's interrupt, changes it while a thread looks at it
+static volatile SndexState sState;
+static u32 sVolumeCallbackRetries; // of the callback of the volume request
+static BOOL sVolumePending;        // the volume is waiting to be set
+static SndexRequest sRequest;
+static SndexNotify sNotify;
+static PMExitCallbackInfo sExitInfo;
+static PMSleepCallbackInfo sSleepInfo;
 
 static SNDEXResult func_02704448(int volume, SNDEXCallback callback, void *arg, BOOL byLevel);
 static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg);
@@ -104,11 +114,11 @@ static void func_02704e04(void);
 void SNDEX_Init(void) {
     u32 irq = OS_DisableInterrupts();
 
-    if (sSndex.state != SNDEX_STATE_UNINITIALIZED) {
+    if (sState != SNDEX_STATE_UNINITIALIZED) {
         OS_RestoreInterrupts(irq);
         return;
     }
-    sSndex.state = SNDEX_STATE_INITIALIZING;
+    sState = SNDEX_STATE_INITIALIZING;
     OS_RestoreInterrupts(irq);
 
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_NONE);
@@ -118,11 +128,11 @@ void SNDEX_Init(void) {
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SNDEX, func_027049b0);
 
-    PM_SetExitCallbackInfo(&sSndex.exitInfo, func_02704d64, NULL);
-    PM_InsertPreExitCallback(&sSndex.exitInfo, SNDEX_PM_PRIORITY);
-    PM_SetSleepCallbackInfo(&sSndex.sleepInfo, func_02704d64, NULL);
-    PM_InsertPreSleepCallback(&sSndex.sleepInfo, SNDEX_PM_PRIORITY);
-    sSndex.state = SNDEX_STATE_IDLE;
+    PM_SetExitCallbackInfo(&sExitInfo, func_02704d64, NULL);
+    PM_InsertPreExitCallback(&sExitInfo, SNDEX_PM_PRIORITY);
+    PM_SetSleepCallbackInfo(&sSleepInfo, func_02704d64, NULL);
+    PM_InsertPreSleepCallback(&sSleepInfo, SNDEX_PM_PRIORITY);
+    sState = SNDEX_STATE_IDLE;
 }
 
 // Sends the command 0x84, with a value of at most 31, or at most 7 when byLevel is set
@@ -137,7 +147,7 @@ static SNDEXResult func_02704448(int volume, SNDEXCallback callback, void *arg, 
         return result;
     }
     func_02704d48(callback, arg, NULL, SNDEX_COMMAND_84);
-    if (!func_02704b74(sSndex.command, (u8)((volume & 0x1f) | (byLevel << 6)))) {
+    if (!func_02704b74(sRequest.command, (u8)((volume & 0x1f) | (byLevel << 6)))) {
         return SNDEX_RESULT_SEND_ERROR;
     }
     return SNDEX_RESULT_SUCCESS;
@@ -154,23 +164,23 @@ static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg) 
 static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallback callback, void *arg) {
     SNDEXResult result;
 
-    if (sSndex.filterBusy) {
+    if (sFilterBusy) {
         return SNDEX_RESULT_BUSY;
     }
-    sSndex.filterBusy = TRUE;
+    sFilterBusy = TRUE;
     if (!OSi_IsCodecTwlMode()) {
-        sSndex.filterBusy = FALSE;
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
     result = func_02704c5c();
     if (result != SNDEX_RESULT_SUCCESS) {
-        sSndex.filterBusy = FALSE;
+        sFilterBusy = FALSE;
         return result;
     }
 
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_TARGET);
-    if (!func_02704be0(sSndex.command, (u16)target)) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, (u16)target)) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     // Each word waits until the answer to the last one is in and the library is idle again
@@ -179,8 +189,8 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
     }
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_0);
-    if (!func_02704be0(sSndex.command, coefficients[0])) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, coefficients[0])) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
@@ -188,8 +198,8 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
     }
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_1);
-    if (!func_02704be0(sSndex.command, coefficients[1])) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, coefficients[1])) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
@@ -197,8 +207,8 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
     }
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_2);
-    if (!func_02704be0(sSndex.command, coefficients[2])) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, coefficients[2])) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
@@ -206,8 +216,8 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
     }
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_3);
-    if (!func_02704be0(sSndex.command, coefficients[3])) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, coefficients[3])) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
@@ -215,8 +225,8 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
     }
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_4);
-    if (!func_02704be0(sSndex.command, coefficients[4])) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, coefficients[4])) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
@@ -224,8 +234,8 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
     }
     func_02704d48(callback, arg, NULL, SNDEX_COMMAND_FILTER_END);
-    if (!func_02704be0(sSndex.command, 0)) {
-        sSndex.filterBusy = FALSE;
+    if (!func_02704be0(sRequest.command, 0)) {
+        sFilterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
     return SNDEX_RESULT_SUCCESS;
@@ -245,8 +255,8 @@ SNDEXResult SNDEX_SetIirFilter(int target, const u16 *coefficients) {
     if (result == SNDEX_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
     }
-    sSndex.filterEndSent = FALSE;
-    sSndex.filterBusy = FALSE;
+    sFilterEndSent = FALSE;
+    sFilterBusy = FALSE;
     return result;
 }
 
@@ -264,18 +274,18 @@ SNDEXResult func_02704858(void) {
     }
     // In the exclusive state the request goes on without starting; the second test of the state needs it to change
     // between the two reads
-    if (sSndex.state != SNDEX_STATE_EXCLUSIVE) {
+    if (sState != SNDEX_STATE_EXCLUSIVE) {
         result = func_02704c5c();
         if (result != SNDEX_RESULT_SUCCESS) {
             return result;
         }
-    } else if (sSndex.state == SNDEX_STATE_EXCLUSIVE_ENDING) {
+    } else if (sState == SNDEX_STATE_EXCLUSIVE_ENDING) {
         return SNDEX_RESULT_BUSY;
     }
 
     OS_InitMessageQueue(&queue, messages, 1);
     func_02704d48(func_02704b58, &queue, NULL, SNDEX_COMMAND_EXCLUSIVE_BEGIN);
-    if (!func_02704b74(sSndex.command, 0)) {
+    if (!func_02704b74(sRequest.command, 0)) {
         return SNDEX_RESULT_SEND_ERROR;
     }
     OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
@@ -286,13 +296,13 @@ SNDEXResult func_02704858(void) {
 SNDEXResult func_02704940(SNDEXCallback callback, void *arg) {
     SNDEXResult result;
 
-    if (!OSi_IsCodecTwlMode() || sSndex.state != SNDEX_STATE_EXCLUSIVE) {
+    if (!OSi_IsCodecTwlMode() || sState != SNDEX_STATE_EXCLUSIVE) {
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
     result = SNDEX_RESULT_SEND_ERROR;
-    sSndex.state = SNDEX_STATE_EXCLUSIVE_ENDING;
+    sState = SNDEX_STATE_EXCLUSIVE_ENDING;
     func_02704d48(callback, arg, NULL, SNDEX_COMMAND_EXCLUSIVE_END);
-    if (func_02704b74(sSndex.command, 0)) {
+    if (func_02704b74(sRequest.command, 0)) {
         result = SNDEX_RESULT_SUCCESS;
     }
     return result;
@@ -312,9 +322,8 @@ static void func_027049b0(u32 tag, u32 data, BOOL err) {
         func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_NOTIFY);
     }
     if (tag != PXI_FIFO_TAG_SNDEX || err == TRUE ||
-        (sSndex.state != SNDEX_STATE_REQUEST && sSndex.state != SNDEX_STATE_EXCLUSIVE &&
-         sSndex.state != SNDEX_STATE_EXCLUSIVE_ENDING) ||
-        sSndex.command != command) {
+        (sState != SNDEX_STATE_REQUEST && sState != SNDEX_STATE_EXCLUSIVE && sState != SNDEX_STATE_EXCLUSIVE_ENDING) ||
+        sRequest.command != command) {
         func_02704cc4(SNDEX_RESULT_FATAL_ERROR);
         return;
     }
@@ -323,34 +332,34 @@ static void func_027049b0(u32 tag, u32 data, BOOL err) {
     case SNDEX_ANSWER_OK:
         switch (command) {
         case 1:
-            if (sSndex.result != NULL) {
-                *(u32 *)sSndex.result = value;
+            if (sRequest.result != NULL) {
+                *(u32 *)sRequest.result = value;
             }
             break;
         case 2:
-            if (sSndex.result != NULL) {
-                *(u32 *)sSndex.result = value;
+            if (sRequest.result != NULL) {
+                *(u32 *)sRequest.result = value;
             }
             break;
         case 3:
         case 4:
-            if (sSndex.result != NULL) {
-                *(u8 *)sSndex.result = value;
+            if (sRequest.result != NULL) {
+                *(u8 *)sRequest.result = value;
             }
             break;
         case 5:
-            if (sSndex.result != NULL) {
-                *(u32 *)sSndex.result = value;
+            if (sRequest.result != NULL) {
+                *(u32 *)sRequest.result = value;
             }
             break;
         case SNDEX_COMMAND_NOTIFY:
-            if (sSndex.notify != NULL) {
-                sSndex.notify(answer, sSndex.notifyArg);
+            if (sNotify.callback != NULL) {
+                sNotify.callback(answer, sNotify.arg);
             }
             break;
         case 0xfe:
-            if (sSndex.result != NULL) {
-                *(u32 *)sSndex.result = value;
+            if (sRequest.result != NULL) {
+                *(u32 *)sRequest.result = value;
             }
             break;
         }
@@ -367,8 +376,8 @@ static void func_027049b0(u32 tag, u32 data, BOOL err) {
         break;
     case SNDEX_ANSWER_ERROR_5:
         if (command == 4) {
-            if (sSndex.result != NULL) {
-                *(u8 *)sSndex.result = 0;
+            if (sRequest.result != NULL) {
+                *(u8 *)sRequest.result = 0;
             }
         }
         func_02704cc4(SNDEX_RESULT_ARM7_ERROR);
@@ -389,7 +398,7 @@ static BOOL func_02704b74(u32 command, u8 value) {
     u32 irq = OS_DisableInterrupts();
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SNDEX, ((command << 16) & 0xff0000) | (value & 0xff), FALSE) < 0) {
-        sSndex.state = SNDEX_STATE_IDLE;
+        sState = SNDEX_STATE_IDLE;
         OS_RestoreInterrupts(irq);
         return FALSE;
     }
@@ -402,12 +411,12 @@ static BOOL func_02704be0(u32 command, u16 value) {
     u32 irq = OS_DisableInterrupts();
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SNDEX, ((command << 16) & 0xff0000) | (value & 0xffff), FALSE) < 0) {
-        sSndex.state = SNDEX_STATE_IDLE;
+        sState = SNDEX_STATE_IDLE;
         OS_RestoreInterrupts(irq);
         return FALSE;
     }
     if (command == SNDEX_COMMAND_FILTER_END) {
-        sSndex.filterEndSent = TRUE;
+        sFilterEndSent = TRUE;
     }
     OS_RestoreInterrupts(irq);
     return TRUE;
@@ -418,7 +427,7 @@ static BOOL func_02704be0(u32 command, u16 value) {
 static SNDEXResult func_02704c5c(void) {
     u32 irq = OS_DisableInterrupts();
 
-    switch (sSndex.state) {
+    switch (sState) {
     case SNDEX_STATE_UNINITIALIZED:
     case SNDEX_STATE_INITIALIZING:
         OS_RestoreInterrupts(irq);
@@ -429,7 +438,7 @@ static SNDEXResult func_02704c5c(void) {
         OS_RestoreInterrupts(irq);
         return SNDEX_RESULT_BUSY;
     default:
-        sSndex.state = SNDEX_STATE_REQUEST;
+        sState = SNDEX_STATE_REQUEST;
         OS_RestoreInterrupts(irq);
         return SNDEX_RESULT_SUCCESS;
     }
@@ -439,19 +448,19 @@ static SNDEXResult func_02704c5c(void) {
 // calls its callback with the result
 static void func_02704cc4(SNDEXResult result) {
     u32 irq = OS_DisableInterrupts();
-    u8 command = sSndex.command;
-    SNDEXCallback callback = sSndex.callback;
-    void *arg = sSndex.callbackArg;
+    u8 command = sRequest.command;
+    SNDEXCallback callback = sRequest.callback;
+    void *arg = sRequest.arg;
 
     if (command == SNDEX_COMMAND_FILTER_END) {
-        sSndex.filterEndSent = FALSE;
-        sSndex.filterBusy = FALSE;
+        sFilterEndSent = FALSE;
+        sFilterBusy = FALSE;
     }
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_NONE);
     if (command == SNDEX_COMMAND_EXCLUSIVE_BEGIN) {
-        sSndex.state = SNDEX_STATE_EXCLUSIVE;
+        sState = SNDEX_STATE_EXCLUSIVE;
     } else {
-        sSndex.state = SNDEX_STATE_IDLE;
+        sState = SNDEX_STATE_IDLE;
     }
     OS_RestoreInterrupts(irq);
     if (callback != NULL) {
@@ -461,10 +470,10 @@ static void func_02704cc4(SNDEXResult result) {
 
 // Sets up the request in progress
 static void func_02704d48(SNDEXCallback callback, void *arg, void *result, u8 command) {
-    sSndex.callback = callback;
-    sSndex.callbackArg = arg;
-    sSndex.result = result;
-    sSndex.command = command;
+    sRequest.callback = callback;
+    sRequest.arg = arg;
+    sRequest.result = result;
+    sRequest.command = command;
 }
 
 // The callback that runs before the console sleeps or exits
@@ -475,7 +484,7 @@ static void func_02704d64(void *arg) {
 
 // Waits until the last word of the filter request has been answered
 static void func_02704d74(void) {
-    while (sSndex.filterEndSent) {
+    while (sFilterEndSent) {
         OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
         PXIi_HandlerRecvFifoNotEmpty();
     }
@@ -483,21 +492,21 @@ static void func_02704d74(void) {
 
 // The callback of the volume request: sends it again if it failed, up to five times, and ends the wait otherwise
 static void func_02704db0(SNDEXResult result, void *arg) {
-    if (result != SNDEX_RESULT_SUCCESS && sSndex.volumeCallbackRetries < 5) {
-        func_027044c0(sSndex.volume, func_02704db0, NULL);
-        sSndex.volumeCallbackRetries++;
+    if (result != SNDEX_RESULT_SUCCESS && sVolumeCallbackRetries < 5) {
+        func_027044c0(sVolume, func_02704db0, NULL);
+        sVolumeCallbackRetries++;
     } else {
-        sSndex.volumePending = FALSE;
+        sVolumePending = FALSE;
     }
 }
 
 // Sends the volume request, if one is pending, and waits until its callback is done with it
 static void func_02704e04(void) {
-    if (sSndex.volumePending) {
-        while (func_027044c0(sSndex.volume, func_02704db0, NULL) != SNDEX_RESULT_SUCCESS && sSndex.volumeRetries < 5) {
-            sSndex.volumeRetries++;
+    if (sVolumePending) {
+        while (func_027044c0(sVolume, func_02704db0, NULL) != SNDEX_RESULT_SUCCESS && sVolumeRetries < 5) {
+            sVolumeRetries++;
         }
-        while (sSndex.volumePending) {
+        while (sVolumePending) {
             OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
             PXIi_HandlerRecvFifoNotEmpty();
         }

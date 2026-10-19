@@ -33,7 +33,7 @@
 #include "system/time_icon.h"
 #include "system/wordset.h"
 #include "text/script/global_10520.h"
-#include "text/system/0359.h"
+#include "text/system/report.h"
 
 #define SEQ_SE_SAVE 0x558
 #define SEQ_SE_MESSAGE 0x547
@@ -370,12 +370,12 @@ static BOOL func_ov012_02164110(EventSaveWork *work) {
 }
 
 static void func_ov012_02164150(EventSaveWork *work) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0359, work->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_REPORT, work->heapId);
 
-    work->report->items[0].str = GFL_MsgDataLoadStrbufNew(msgData, Bank0359_Text_Yes);
+    work->report->items[0].str = GFL_MsgDataLoadStrbufNew(msgData, Report_Text_Yes);
     work->report->items[0].color = 0x39e3;
     work->report->items[0].type = 0;
-    work->report->items[1].str = GFL_MsgDataLoadStrbufNew(msgData, Bank0359_Text_No);
+    work->report->items[1].str = GFL_MsgDataLoadStrbufNew(msgData, Report_Text_No);
     work->report->items[1].color = 0x39e3;
     work->report->items[1].type = 0;
     GFL_MsgDataFree(msgData);

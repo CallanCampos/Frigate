@@ -1,3 +1,6 @@
+#include <string.h>
+// First: MWCC builds ghiEncryptorSslInitFunc's 8-byte memset of the state in place, as the ROM does, only when
+// <string.h> declares it before dwc/ext.h does
 #include "ghttp_internal.h"
 
 // ghttpEncryption: the secure connections of the requests, through the SSL of the Wi-Fi library's sockets (TWL's), and
@@ -276,10 +279,10 @@ int ghiEncryptorSslInitFunc(GHIConnection *connection, GHIEncryptor *encryptor) 
                             __FUNCTION__, 1073);
         return 3;
     }
+    encryptor->open = TRUE;
     encryptor->unk_0C = 0;
     encryptor->active = FALSE;
     encryptor->mode = 0;
-    encryptor->open = TRUE;
     encryptor->established = TRUE;
     encryptor->unk_1C = 1;
     func_ov011_0216cca8(8, 4, 15, "%s(@%s:%d):GameSpy SSL (TWL engine) initialized\r\n", GHI_FILE, __FUNCTION__, 1085);

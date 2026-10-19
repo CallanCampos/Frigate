@@ -1,5 +1,6 @@
 #include "system/time_icon.h"
 #include "types.h"
+#include "constants/arc.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
@@ -14,7 +15,6 @@
 #define TIME_ICON_FRAMES 8
 #define TIME_ICON_SIZE 16
 // The bitmap's file
-#define TIME_ICON_ARC 0xc3
 #define TIME_ICON_FILE 0
 
 struct WaitIcon {
@@ -67,7 +67,7 @@ static void WaitIcon_Init(WaitIcon *icon, BmpWin *window, u8 clearColor, u8 inte
     icon->clearColor = clearColor;
     icon->interval = interval;
     icon->frame = GFL_RandomLC(TIME_ICON_FRAMES);
-    icon->bitmap = GFL_G2DIOLoadBitmap(TIME_ICON_ARC, TIME_ICON_FILE, TRUE, icon->heapId);
+    icon->bitmap = GFL_G2DIOLoadBitmap(ARCID_TIME_ICON, TIME_ICON_FILE, TRUE, icon->heapId);
     icon->window = BmpWin_CreateDynamic(BmpWin_GetBGIndex(window), BmpWin_GetPosX(window) + BmpWin_GetSizeX(window) - 2,
                                         BmpWin_GetPosY(window) + BmpWin_GetSizeY(window) - 2, 2, 2,
                                         BmpWin_GetPalette(window), TRUE);
@@ -79,7 +79,7 @@ WaitIcon *WaitIcon_Alloc(HeapID heapId) {
     WaitIcon *icon = GFL_HeapAllocate(heapId, sizeof(WaitIcon), FALSE, "time_icon.c", 166);
 
     icon->heapId = heapId;
-    icon->bitmap = GFL_G2DIOLoadBitmap(TIME_ICON_ARC, TIME_ICON_FILE, TRUE, icon->heapId);
+    icon->bitmap = GFL_G2DIOLoadBitmap(ARCID_TIME_ICON, TIME_ICON_FILE, TRUE, icon->heapId);
     icon->window = NULL;
     icon->tcb = NULL;
     icon->tcbEx = NULL;

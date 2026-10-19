@@ -1,3 +1,0 @@
-UndellaTown2_Text_WonderWhyOnlyFather = I wonder why only the father\nfrom The Riches stayed here...
-UndellaTown2_Text_HearShopsRunBy = I hear that the shops in\n{0139:0} are run by amazing{be00}\nPokémon Trainers.{be01}\nOK! I can't lose to them!\nI'm getting excited about this!
-\pad{8c}

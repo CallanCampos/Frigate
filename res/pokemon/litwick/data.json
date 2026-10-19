@@ -1,0 +1,143 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Litwick",
+    "pokedex": {
+        "category": "Candle Pokémon",
+        "entry": "Its flame is usually out, but it starts\nshining when it absorbs life force\nfrom people or Pokémon.",
+        "height": "1'00\"",
+        "weight": "6.8 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ろうそくポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 30,
+        "defense": 55,
+        "speed": 20,
+        "special_attack": 65,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_GHOST", "TYPE_FIRE" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_FLASH_FIRE", "ABILITY_FLAME_BODY" ],
+    "hidden_ability": "ABILITY_SHADOW_TAG",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 55,
+    "height": 3,
+    "weight": 31,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_EMBER" ],
+            [ 1, "MOVE_ASTONISH" ],
+            [ 3, "MOVE_MINIMIZE" ],
+            [ 5, "MOVE_SMOG" ],
+            [ 7, "MOVE_FIRE_SPIN" ],
+            [ 10, "MOVE_CONFUSE_RAY" ],
+            [ 13, "MOVE_NIGHT_SHADE" ],
+            [ 16, "MOVE_WILL_O_WISP" ],
+            [ 20, "MOVE_FLAME_BURST" ],
+            [ 24, "MOVE_IMPRISON" ],
+            [ 28, "MOVE_HEX" ],
+            [ 33, "MOVE_MEMENTO" ],
+            [ 38, "MOVE_INFERNO" ],
+            [ 43, "MOVE_CURSE" ],
+            [ 49, "MOVE_SHADOW_BALL" ],
+            [ 55, "MOVE_PAIN_SPLIT" ],
+            [ 61, "MOVE_OVERHEAT" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM53",
+            "TM59",
+            "TM61",
+            "TM63",
+            "TM66",
+            "TM70",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_DARK_PULSE",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_ACID_ARMOR",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HAZE",
+            "MOVE_ENDURE",
+            "MOVE_CAPTIVATE",
+            "MOVE_ACID",
+            "MOVE_CLEAR_SMOG"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 41,
+            "species": "SPECIES_LAMPENT"
+        }
+    ],
+    "regional_dex_number": 190,
+    "baby_species": "SPECIES_LITWICK",
+    "cry_volume": 120
+}

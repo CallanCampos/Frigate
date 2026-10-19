@@ -1,4 +1,0 @@
-OpelucidCityGate_Text_Empty =                                                                                              \x{ffff}
-OpelucidCityGate_Text_Empty_2 =                                                     \x{ffff}
-OpelucidCityGate_Text_Empty_3 =        \x{ffff}
-OpelucidCityGate_Text_Empty_4 =       \x{ffff}

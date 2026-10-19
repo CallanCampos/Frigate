@@ -1712,11 +1712,12 @@ data_ov012_0216c9c0 kind:data(any) addr:0x0216c9c0
 data_ov012_0216c9e0 kind:data(any) addr:0x0216c9e0
 data_ov012_0216c9e4 kind:data(any) addr:0x0216c9e4
 data_ov012_0216c9f4 kind:data(any) addr:0x0216c9f4
-data_ov012_0216ca04 kind:data(any) addr:0x0216ca04
-data_ov012_0216ca06 kind:data(any) addr:0x0216ca06
-data_ov012_0216ca1a kind:data(any) addr:0x0216ca1a
-data_ov012_0216ca1c kind:data(any) addr:0x0216ca1c
+wf_location kind:data(any) addr:0x0216ca04
+stats_list kind:data(any) addr:0x0216ca06
+iv_set kind:data(any) addr:0x0216ca1a
+sRoamingZoneGroups kind:data(any) addr:0x0216ca34
 ROAMING_POKEMON_ZONES kind:data(any) addr:0x0216ca52
+HIDEN_EVENT_UNUSED kind:data(any) addr:0x0216ca74
 ABYSSAL_RUINS_FLASH_ROCK_RADIUS kind:data(any) addr:0x0216ca78
 ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS kind:data(any) addr:0x0216ca80
 HIDEN_EVENTS_NORMAL kind:data(any) addr:0x0216ca88
@@ -1726,7 +1727,7 @@ data_ov012_0216cae4 kind:data(any) addr:0x0216cae4
 data_ov012_0216cb38 kind:data(any) addr:0x0216cb38
 data_ov012_0216cb44 kind:data(any) addr:0x0216cb44
 TYPE_CHAMP_MEDAL_IDS kind:data(any) addr:0x0216cb50
-data_ov012_0216cb74 kind:data(any) addr:0x0216cb74
+sFieldMenuAppIds kind:data(any) addr:0x0216cb74
 FIELD_PROC_LINK_LIST kind:data(any) addr:0x0216cb98
 ACMD_QUEUE_WALK_E_8F kind:data(any) addr:0x0216cd00
 ACMD_QUEUE_WALK_W_8F kind:data(any) addr:0x0216cd08

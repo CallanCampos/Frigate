@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SHIFTRY",
+    "moves": [ "MOVE_FLING", "MOVE_POWER_WHIP", "MOVE_BRICK_BREAK", "MOVE_SWORDS_DANCE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_IRON_BALL",
+    "form": 0
+}

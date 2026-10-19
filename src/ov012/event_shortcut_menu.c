@@ -2,7 +2,6 @@
 #include "constants/pokemon.h"
 #include "field/field.h"
 #include "field/field_actor.h"
-#include "field/field_menu.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"
 #include "field/hidden_event.h"
@@ -11,7 +10,6 @@
 #include "field/player_action.h"
 #include "field/player_state.h"
 #include "field/shortcut_menu.h"
-#include "field/subscreen.h"
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -23,47 +21,6 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
-
-u32 func_ov012_0215aa68(u32 index) {
-    return data_ov012_0216cb74[index];
-}
-
-BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg) {
-    FieldMenuWork *menu = arg;
-    FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
-
-    if (input->eventType == 0) {
-        func_ov036_0219886c(subscreen, menu->unk10);
-    }
-    return TRUE;
-}
-
-BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg) {
-    return TRUE;
-}
-
-BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg) {
-    FieldMenuWork *menu = arg;
-    GameData *gameData = GSYS_GetGameData(menu->gameSystem);
-
-    switch (input->eventType) {
-    case 4:
-        GameData_SetLastSubscreen(gameData, 6);
-        break;
-    case 0:
-        GameData_SetLastSubscreen(gameData, 1);
-        break;
-    case 5:
-        GameData_SetLastSubscreen(gameData, 0);
-        break;
-    case 1:
-    case 2:
-    case 3:
-        GameData_SetLastSubscreen(gameData, menu->screenId);
-        break;
-    }
-    return TRUE;
-}
 
 BOOL IsExistAnyYShortcut(GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);

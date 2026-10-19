@@ -1,0 +1,17 @@
+PmsWordsInitialU_Text_Ugh = UGH
+PmsWordsInitialU_Text_Umbreon = UMBREON
+PmsWordsInitialU_Text_Unaware = UNAWARE
+PmsWordsInitialU_Text_Unbelievable = UNBELIEVABLE
+PmsWordsInitialU_Text_Unburden = UNBURDEN
+PmsWordsInitialU_Text_Uncle = UNCLE
+PmsWordsInitialU_Text_Unfezant = UNFEZANT
+PmsWordsInitialU_Text_Union = UNION
+PmsWordsInitialU_Text_Unique = UNIQUE
+PmsWordsInitialU_Text_Unnerve = UNNERVE
+PmsWordsInitialU_Text_Unown = UNOWN
+PmsWordsInitialU_Text_Uproar = UPROAR
+PmsWordsInitialU_Text_Urgh = URGH
+PmsWordsInitialU_Text_Ursaring = URSARING
+PmsWordsInitialU_Text_Useless = USELESS
+PmsWordsInitialU_Text_Uturn = UTURN
+PmsWordsInitialU_Text_Uxie = UXIE

@@ -3,6 +3,8 @@
 // nothing here; the file's name and its functions' are those of the Generation 4 library, or guesses after them. The
 // two halves may be two files (poke_net.c and a platform file), which nothing in the ROM tells apart.
 
+#include <string.h>
+// The standard header comes first so memset uses the compiler's in-place fixed-size clear
 #include "types.h"
 #include "dwc/ext.h"
 #include "nitro/mi.h"

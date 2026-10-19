@@ -1,0 +1,5 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "file": "BANK_SE_WB_SYS_ASTART",
+    "wave_archives": [ "WAVE_SE_WB_SYS_53", null, null, null ]
+}

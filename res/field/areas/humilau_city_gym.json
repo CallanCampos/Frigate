@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_HUMILAU_CITY_GYM",
+    "texture_set": "MAP_TEXTURE_SET_HUMILAU_CITY_GYM",
+    "srt_animation": 30,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 100,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}

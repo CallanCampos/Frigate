@@ -977,7 +977,7 @@ void func_ov012_02151d6c(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 w
     }
     if (!done) {
         msgId = func_ov012_02152634(work->program, func_ov012_02151b14(work, index));
-        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0098, HEAPID_GAMEEVENT);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MUSICAL_EVENT, HEAPID_GAMEEVENT);
         name = GFL_MsgDataLoadStrbufNew(msgData, msgId);
         func_0202437c(wordSet, wordIndex, name, 0, 1, 2);
         GFL_StrBufFree(name);

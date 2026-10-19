@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Shadow Tag",
-    "description": "Prevents the foe from\nescaping."
-}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Joey",
+    "class": "TRAINER_CLASS_ROUGHNECK",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_VENIPEDE",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SANDILE",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "This ain't no place for\nkids like you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Just who are you?\nYou looked pretty timid..."
+        },
+        {
+            "type": 2,
+            "text": "All I know is that if you're a Trainer,\nyou're gonna get challenged!"
+        }
+    ]
+}

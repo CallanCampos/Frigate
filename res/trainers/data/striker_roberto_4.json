@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Roberto",
+    "class": "TRAINER_CLASS_STRIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_SUPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 34,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I gathered a bunch of cool Pokémon\nto make my team. I'll teach you a{be00}\nthing or two about their strength{be00}\nin this lecture!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Bam! You lectured me!\nYou are so cool!"
+        },
+        {
+            "type": 15,
+            "text": "This is my thanks for the lecture!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "No matter how cool the Pokémon is, it's\nup to the Trainer to lead it to victory!"
+        }
+    ]
+}

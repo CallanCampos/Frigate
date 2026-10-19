@@ -1,0 +1,40 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_LBDEMO_06", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_LBDEMO_06",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 110,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 1,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_LBDEMO_06",
+            "wave": 1,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 2,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        }
+    ]
+}

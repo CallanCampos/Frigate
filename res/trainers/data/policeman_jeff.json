@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jeff",
+    "class": "TRAINER_CLASS_POLICEMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_ULTRA_BALL",
+    "party": [
+        {
+            "species": "SPECIES_ARCANINE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MIENSHAO",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Are you a criminal?!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh, you are not a criminal...\nSorry! Lo siento!"
+        },
+        {
+            "type": 15,
+            "text": "Hey! Come on!\nI'll give you this, so cheer up!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I'm here because I heard someone\naround here was faking points."
+        }
+    ]
+}

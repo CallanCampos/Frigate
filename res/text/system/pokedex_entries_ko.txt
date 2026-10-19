@@ -1,0 +1,2 @@
+\from{species.pokedex.ko.entry}
+\pad{ae}

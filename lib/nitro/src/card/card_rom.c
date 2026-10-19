@@ -33,8 +33,6 @@
 
 // What reads the ROM, as CARDi_ReadRomWithCPU does: len bytes from the offset src into dst. The first parameter is for
 // the argument of a callback, which a reader by DMA gives the read
-typedef u32 (*CARDiRomReader)(void *arg, void *dst, u32 src, u32 len);
-
 static void CARDi_SetRomOp(u32 cmd, u32 offset);
 static BOOL CARDi_IsTwlRomMode(void);
 static void CARDi_StartReadRomPage(u32 offset);
@@ -57,7 +55,7 @@ u32 cardi_rom_base;
 static CARDiRomDmaRead *sRomDmaActive;
 // How the thread's tasks read the ROM. A read uses DMA only while this is the CPU's reader; the DSi's setup in the LTD
 // autoload swaps it for its own
-static CARDiRomReader sRomReader;
+CARDiRomReader sRomReader;
 // Whether a read discards the instruction cache of what it read, which nothing turns on
 static BOOL sInvalidateIC;
 // The 0x88 bytes that follow the ROM's program, which CARD_Init reads on a ROM boot. The multiboot library sends them
@@ -362,7 +360,7 @@ void CARDi_InitRom(void) {
     }
     // The call into the LTD autoload goes through a veneer, which the linker adds after this function
     if (OS_IsRunOnTwl()) {
-        func_02767520();
+        CARDi_InitTwlRom();
     }
 }
 

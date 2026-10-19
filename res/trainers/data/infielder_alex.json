@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Alex",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_POTION",
+    "party": [
+        {
+            "species": "SPECIES_PANSEAR",
+            "form": 0,
+            "level": 24,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PANPOUR",
+            "form": 0,
+            "level": 24,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PANSAGE",
+            "form": 0,
+            "level": 24,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'm a little bit strong.\nI will work out!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I got worked over..."
+        },
+        {
+            "type": 15,
+            "text": "Thanks for coming to Big Stadium!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "You're quite strong.\nYou have left the Little League!"
+        }
+    ]
+}

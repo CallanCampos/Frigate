@@ -1,0 +1,585 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_DEMO_FLIGHT", null, null, null ],
+    "instruments": [
+        {
+            "program": 39,
+            "type": "drums",
+            "first_key": "Fs1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 13,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 0,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 13,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 0,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 13,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 0,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 13,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 0,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 13,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 0,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 1,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 6,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 6,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 6,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 6,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 7,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 22,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 58
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 22,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 58
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 22,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 58
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 2,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 36
+                }
+            ]
+        },
+        {
+            "program": 19,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 0,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 11,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 3,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 4,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 5,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 8,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 9,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 10,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 11,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 12,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 15,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 16,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 17,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 15,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 14,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 23,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 19,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 18,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "B5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 21,
+                    "base_key": "F5",
+                    "attack": 122,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 20,
+                    "base_key": "C6",
+                    "attack": 122,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 5,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 23,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_FLIGHT",
+                    "wave": 24,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,49 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Morimoto",
+    "class": "TRAINER_CLASS_GAME_FREAK_MORIMOTO",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_SUPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PANSAGE",
+            "form": 0,
+            "level": 14,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_ORAN_BERRY",
+            "moves": [ "MOVE_VINE_WHIP", "MOVE_FURY_SWIPES", "MOVE_LICK" ]
+        },
+        {
+            "species": "SPECIES_PANSEAR",
+            "form": 0,
+            "level": 14,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_ORAN_BERRY",
+            "moves": [ "MOVE_INCINERATE", "MOVE_FURY_SWIPES", "MOVE_LICK" ]
+        },
+        {
+            "species": "SPECIES_PANPOUR",
+            "form": 0,
+            "level": 14,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_ORAN_BERRY",
+            "moves": [ "MOVE_WATER_GUN", "MOVE_FURY_SWIPES", "MOVE_LICK" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "After all, I am the strongest and greatest.\nJust kidding!"
+        }
+    ]
+}

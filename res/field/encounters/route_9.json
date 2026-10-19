@@ -1,0 +1,109 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_GOTHORITA", 37, 37 ],
+                [ "SPECIES_MINCCINO", 37, 37 ],
+                [ "SPECIES_GARBODOR", 38, 38 ],
+                [ "SPECIES_MINCCINO", 39, 39 ],
+                [ "SPECIES_PAWNIARD", 38, 38 ],
+                [ "SPECIES_LIEPARD", 40, 40 ],
+                [ "SPECIES_PAWNIARD", 40, 40 ],
+                [ "SPECIES_MUK", 40, 40 ],
+                [ "SPECIES_GOTHORITA", 39, 39 ],
+                [ "SPECIES_GARBODOR", 40, 40 ],
+                [ "SPECIES_GOTHORITA", 39, 39 ],
+                [ "SPECIES_GARBODOR", 40, 40 ]
+            ],
+            "white2": [
+                [ "SPECIES_DUOSION", 37, 37 ],
+                [ "SPECIES_MINCCINO", 37, 37 ],
+                [ "SPECIES_GARBODOR", 38, 38 ],
+                [ "SPECIES_MINCCINO", 39, 39 ],
+                [ "SPECIES_PAWNIARD", 38, 38 ],
+                [ "SPECIES_LIEPARD", 40, 40 ],
+                [ "SPECIES_PAWNIARD", 40, 40 ],
+                [ "SPECIES_MUK", 40, 40 ],
+                [ "SPECIES_DUOSION", 39, 39 ],
+                [ "SPECIES_GARBODOR", 40, 40 ],
+                [ "SPECIES_DUOSION", 39, 39 ],
+                [ "SPECIES_GARBODOR", 40, 40 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_GOTHORITA", 41, 41 ],
+                [ "SPECIES_MINCCINO", 41, 41 ],
+                [ "SPECIES_GARBODOR", 42, 42 ],
+                [ "SPECIES_MINCCINO", 43, 43 ],
+                [ "SPECIES_PAWNIARD", 42, 42 ],
+                [ "SPECIES_LIEPARD", 44, 44 ],
+                [ "SPECIES_PAWNIARD", 44, 44 ],
+                [ "SPECIES_MUK", 44, 44 ],
+                [ "SPECIES_GOTHORITA", 43, 43 ],
+                [ "SPECIES_GARBODOR", 44, 44 ],
+                [ "SPECIES_GOTHORITA", 43, 43 ],
+                [ "SPECIES_GARBODOR", 44, 44 ]
+            ],
+            "white2": [
+                [ "SPECIES_DUOSION", 41, 41 ],
+                [ "SPECIES_MINCCINO", 41, 41 ],
+                [ "SPECIES_GARBODOR", 42, 42 ],
+                [ "SPECIES_MINCCINO", 43, 43 ],
+                [ "SPECIES_PAWNIARD", 42, 42 ],
+                [ "SPECIES_LIEPARD", 44, 44 ],
+                [ "SPECIES_PAWNIARD", 44, 44 ],
+                [ "SPECIES_MUK", 44, 44 ],
+                [ "SPECIES_DUOSION", 43, 43 ],
+                [ "SPECIES_GARBODOR", 44, 44 ],
+                [ "SPECIES_DUOSION", 43, 43 ],
+                [ "SPECIES_GARBODOR", 44, 44 ]
+            ]
+        },
+        "shaking_grass": {
+            "black2": [
+                [ "SPECIES_AUDINO", 37, 37 ],
+                [ "SPECIES_AUDINO", 37, 37 ],
+                [ "SPECIES_EMOLGA", 38, 38 ],
+                [ "SPECIES_AUDINO", 38, 38 ],
+                [ "SPECIES_AUDINO", 39, 39 ],
+                [ "SPECIES_AUDINO", 39, 39 ],
+                [ "SPECIES_AUDINO", 40, 40 ],
+                [ "SPECIES_AUDINO", 40, 40 ],
+                [ "SPECIES_CINCCINO", 40, 40 ],
+                [ "SPECIES_GOTHITELLE", 40, 40 ],
+                [ "SPECIES_CINCCINO", 40, 40 ],
+                [ "SPECIES_GOTHITELLE", 40, 40 ]
+            ],
+            "white2": [
+                [ "SPECIES_AUDINO", 37, 37 ],
+                [ "SPECIES_AUDINO", 37, 37 ],
+                [ "SPECIES_EMOLGA", 38, 38 ],
+                [ "SPECIES_AUDINO", 38, 38 ],
+                [ "SPECIES_AUDINO", 39, 39 ],
+                [ "SPECIES_AUDINO", 39, 39 ],
+                [ "SPECIES_AUDINO", 40, 40 ],
+                [ "SPECIES_AUDINO", 40, 40 ],
+                [ "SPECIES_CINCCINO", 40, 40 ],
+                [ "SPECIES_REUNICLUS", 40, 40 ],
+                [ "SPECIES_CINCCINO", 40, 40 ],
+                [ "SPECIES_REUNICLUS", 40, 40 ]
+            ]
+        },
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

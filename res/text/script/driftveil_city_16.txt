@@ -1,0 +1,3 @@
+DriftveilCity16_Text_TrainerIfPokemonWouldve = Trainer...{be01}\nIf my Pokémon was with me,\nI would've challenged you for a battle.{be01}\nInstead, please accept this.{be01}
+DriftveilCity16_Text_BigRootHavePokemon = It is...a Big Root!{be01}\nHave a Pokémon hold this,\nand it absorbs more HP from the target!{be01}\nThis was a perfect item for my Pokémon's\nsignature move...
+\pad{fc}

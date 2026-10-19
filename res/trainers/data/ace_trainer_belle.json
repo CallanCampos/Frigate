@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Belle",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ARCHEN",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_AXEW",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Wait a sec!{be01}\nLet me grip my Poké Ball a little\nbit tighter.{be01}\n...Yeah, like that! Now I'm good!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Squeeze!"
+        },
+        {
+            "type": 2,
+            "text": "If you hold your Poké Ball tight when\nyou're feeling unsure, your Pokémon will{be00}\ncheer you on!{be00}\nThat's why I'm OK!"
+        }
+    ]
+}

@@ -1,6 +1,0 @@
-Route7_Text_XtransceiverRinging = The Xtransceiver is ringing.
-Route7_Text_PickedUpXtransceiver = {0100:0} picked up the Xtransceiver.{be01}
-Route7_Text_IfStandStillRaised = If you stand still on the raised walkway,\nyou'll fall off!
-Route7_Text_Route7 = Route 7
-Route7_Text_CelestialTowerPlaceRest = Celestial Tower\nA place of rest for innocent spirits
-Route7_Text_TrainerTipsNumberExp = Trainer Tips!{be01}\n\nThe number of Exp. Points you get\nafter a battle is based on levels.{be01}\nWhen your Pokémon is weaker than\nits opponent, it will get more.{be01}\nBut if your Pokémon is stronger,\nit won't get as many.

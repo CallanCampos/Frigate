@@ -36,8 +36,6 @@ typedef struct {
 u32 func_ov036_021b88cc(u32 type);
 u32 func_ov036_021b88fc(u32 from, u32 to);
 u32 func_ov036_021b892c(u32 from, u32 to);
-GameEvent *func_ov036_021b8800(GameSystem *gsys, Field *field, u8 startSeason, u8 endSeason,
-                               EventSeasonBannerCallback callback, void *callbackArg);
 GameEvent *func_ov036_021b895c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
 GameEvent *func_ov036_021b899c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
 GameEvent *func_ov036_021b89dc(GameSystem *gsys, Field *field);

@@ -1,3 +1,0 @@
-Route10_Text_Empty =        \x{ffff}
-Route10_Text_Empty_2 =                           \x{ffff}
-\pad{26}

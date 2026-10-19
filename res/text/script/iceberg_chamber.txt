@@ -1,0 +1,6 @@
+IcebergChamber_Text_PokemonStatueExudesPower = The Pokémon statue that exudes the\npower of ice started moving!{be01}
+IcebergChamber_Text_Jakiih = Jakiih!
+IcebergChamber_Text_RegiceDisappearedDeepInto = Regice disappeared deep\ninto the ruins...
+IcebergChamber_Text_IcebergChamber = Iceberg Chamber
+IcebergChamber_Text_ProtectsPlacePowerIce = It protects this place\nwith the power of ice.
+\pad{36}

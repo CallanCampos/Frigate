@@ -1,0 +1,124 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Palpitoad",
+    "pokedex": {
+        "category": "Vibration Pokémon",
+        "entry": "It lives in the water and on land.\nIt uses its long, sticky tongue\nto immobilize its opponents.",
+        "height": "2'07\"",
+        "weight": "37.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "しんどうポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 65,
+        "defense": 55,
+        "speed": 69,
+        "special_attack": 65,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_WATER", "TYPE_GROUND" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_PECHA_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_HYDRATION" ],
+    "hidden_ability": "ABILITY_WATER_ABSORB",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 134,
+    "height": 8,
+    "weight": 170,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BUBBLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_SUPERSONIC" ],
+            [ 1, "MOVE_ROUND" ],
+            [ 5, "MOVE_SUPERSONIC" ],
+            [ 9, "MOVE_ROUND" ],
+            [ 12, "MOVE_BUBBLE_BEAM" ],
+            [ 16, "MOVE_MUD_SHOT" ],
+            [ 20, "MOVE_AQUA_RING" ],
+            [ 23, "MOVE_UPROAR" ],
+            [ 28, "MOVE_MUDDY_WATER" ],
+            [ 33, "MOVE_RAIN_DANCE" ],
+            [ 37, "MOVE_FLAIL" ],
+            [ 42, "MOVE_ECHOED_VOICE" ],
+            [ 47, "MOVE_HYDRO_PUMP" ],
+            [ 51, "MOVE_HYPER_VOICE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM55",
+            "TM78",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03"
+        ],
+        "by_tutor": [
+            "MOVE_BOUNCE",
+            "MOVE_UPROAR",
+            "MOVE_EARTH_POWER",
+            "MOVE_ICY_WIND",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_GASTRO_ACID",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 36,
+            "species": "SPECIES_SEISMITOAD"
+        }
+    ],
+    "regional_dex_number": 229,
+    "baby_species": "SPECIES_TYMPOLE",
+    "cry_volume": 110
+}

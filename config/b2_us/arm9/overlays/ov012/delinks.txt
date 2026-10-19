@@ -59,6 +59,7 @@ src/ov012/intrude_work.c:
 src/ov012/script_sys.c:
     complete
     .text       start:0x0215366c end:0x02153da4
+    .rodata     start:0x0216af98 end:0x0216b4e4
     .data       start:0x0216e190 end:0x0216e1b4
 
 src/ov012/script_work.c:
@@ -69,10 +70,12 @@ src/ov012/script_work.c:
 src/ov012/script_sub_event.c:
     complete
     .text       start:0x02154070 end:0x02154180
+    .bss        start:0x0216e640 end:0x0216e644
 
 src/ov012/scrcmd_vm.c:
     complete
     .text       start:0x02154180 end:0x02154948
+    .rodata     start:0x0216b4e4 end:0x0216c104
 
 src/ov012/script_plugin.c:
     complete
@@ -114,6 +117,7 @@ src/ov012/scrcmd_game_state.c:
 src/ov012/scrcmd_pokemon.c:
     complete
     .text       start:0x02156174 end:0x021574a4
+    .rodata     start:0x0216ca04 end:0x0216ca34
     .data       start:0x0216e1f4 end:0x0216e208
 
 src/ov012/scrcmd_proc.c:
@@ -133,13 +137,14 @@ src/ov012/scrcmd_musical.c:
 
 src/ov012/field_encount_st.c:
     complete
-    .text       start:0x021590ec end:0x021593fc
+    .text       start:0x021590ec end:0x02159230
+    .rodata     start:0x0216ca34 end:0x0216ca74
     .data       start:0x0216e240 end:0x0216e254
 
 src/ov012/hiden_event.c:
     complete
-    .text       start:0x021593fc end:0x02159bc0
-    .rodata     start:0x0216ca88 end:0x0216cb38
+    .text       start:0x02159230 end:0x02159bc0
+    .rodata     start:0x0216ca74 end:0x0216cb38
 
 src/ov012/scrcmd_network.c:
     complete
@@ -161,11 +166,12 @@ src/ov012/event_game_clear.c:
 
 src/ov012/event_field_menu.c:
     complete
-    .text       start:0x0215a7a4 end:0x0215aa68
+    .text       start:0x0215a7a4 end:0x0215aad8
+    .rodata     start:0x0216cb74 end:0x0216cb98
 
 src/ov012/event_shortcut_menu.c:
     complete
-    .text       start:0x0215aa68 end:0x0215b488
+    .text       start:0x0215aad8 end:0x0215b488
     .data       start:0x0216e268 end:0x0216e280
 
 src/ov012/event_field_proclink.c:
@@ -192,6 +198,7 @@ src/ov012/city_state.c:
     .text       start:0x0215cd58 end:0x0215cda4
 
 src/ov012/eventdata_system.c:
+    complete
     .text       start:0x0215cda4 end:0x0215dabc
     .data       start:0x0216e298 end:0x0216e2ac
 
@@ -250,6 +257,7 @@ src/ov012/scrcmd_unity_tower.c:
     .text       start:0x02160b80 end:0x02160dc8
 
 src/ov012/building_enter_effect.c:
+    complete
     .text       start:0x02160dc8 end:0x02160eb4
     .data       start:0x0216e2e0 end:0x0216e2e4
     .bss        start:0x0216e644 end:0x0216e660

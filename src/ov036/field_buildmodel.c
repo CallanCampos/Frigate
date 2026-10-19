@@ -23,15 +23,6 @@ struct FieldPropDoorResInfo {
     s16 z;
 };
 
-struct FieldPropSourceInfo {
-    s32 x;
-    s32 y;
-    s32 z;
-    u16 unkC;
-    u8 highResId;
-    u8 lowResId;
-};
-
 FieldPropSystem *FieldPropSystem_Create(HeapID heapId, FieldG3DMapper *mapper, u16 season) {
     FieldPropSystem *system = GFL_HeapAllocate(heapId, sizeof(FieldPropSystem), FALSE, "field_buildmodel.c", 404);
     s32 i;

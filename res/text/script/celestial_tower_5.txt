@@ -1,0 +1,2 @@
+CelestialTower5_Text_CantBelieveThoseThree = I can't believe those\nthree down there lost...{be01}\nEven so, you're not getting past me!{be01}\nYou're fighting for that couple,\nand I'm fighting for myself!{be00}\nYou know which is stronger, right?!{be01}
+CelestialTower5_Text_SeeWeWereThinking = I see...{be01}\nWe were thinking only about ourselves.\nWe sure weren't thinking about the{be00}\nPokémon at our sides, were we?

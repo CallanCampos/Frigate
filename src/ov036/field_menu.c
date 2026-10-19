@@ -209,7 +209,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
     menu->printQueue = func_02021998(menu->heapId);
     menu->scrollDirty = FALSE;
     menu->scrollY = 0;
-    arc = GFL_ArcSysCreateFileHandle(0x46, menu->tmpHeapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_MENU, menu->tmpHeapId);
     menuType = FieldMenu_GetMenuType(gameData, menu->eventWork, menu->zoneId);
     menu->menuType = menuType;
     func_ov036_0219ff20(menu, arc, menuType, menu->msgBGSys);
@@ -612,7 +612,6 @@ u32 FieldMenu_GetSelectedItem(FieldMenu *menu) {
 }
 
 void FieldMenu_SetCursorItem(FieldMenu *menu, u32 itemId) {
-    FieldMenuItem *items = menu->items;
     u8 i;
 
     for (i = 0; i < 7; i++) {
@@ -622,7 +621,7 @@ void FieldMenu_SetCursorItem(FieldMenu *menu, u32 itemId) {
             menu->cursorX = i % 2;
             menu->cursorY = i / 2;
             menu->cursorDirty = TRUE;
-            item = &items[menu->cursorX + menu->cursorY * 2];
+            item = &menu->items[menu->cursorX + menu->cursorY * 2];
             func_ov036_021a074c(menu, item->cursorX, item->cursorY);
         }
     }
@@ -665,8 +664,8 @@ static void func_ov036_021a05b8(FieldMenu *menu) {
             return;
         }
         GFL_SndSEPlay(0x548);
-        menu->curItem = NULL;
         menu->keyMode = TRUE;
+        menu->curItem = NULL;
         menu->cursorDirty = TRUE;
         func_0204c124(menu->cursor, TRUE);
         return;

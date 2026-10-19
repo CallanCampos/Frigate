@@ -1,0 +1,18 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_W103_NOISE", null, null, null ],
+    "instruments": [
+        {
+            "program": 81,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_W103_NOISE",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 90,
+            "decay": 99,
+            "sustain": 99,
+            "release": 115,
+            "pan": 64
+        }
+    ]
+}

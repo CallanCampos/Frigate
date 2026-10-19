@@ -25,6 +25,7 @@ int MI_FreeWram(MIWram wram, MIWramProc proc);
 int MI_CancelWram(MIWram wram, MIWramProc proc);
 BOOL MI_IsNDmaBusy(u32 ndmaNo);
 void MI_StopNDma(u32 ndmaNo);
+void func_02768370(u32 ndmaNo, const void *src, void *dst, u32 size);
 // Receives a camera frame by NDMA, CAMERA_DmaRecvAsync's body
 void func_02768378(u32 ndmaNo, void *dest, u32 unitWords, u32 length, u32 unk, MINDmaCallback callback, void *arg);
 

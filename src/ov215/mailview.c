@@ -29,9 +29,8 @@
 // The mail screen's graphics (overlay 215's mailview.c): its BGs, palettes, windows, buttons and the mail's text,
 // loaded a step at a time by MailView_Load. The names are ours
 
-// The mail graphics' archive, which no header names yet. A design's files are its palette, its characters
+// The files of a design in ARCID_MAILBOX, the mail graphics' archive: its palette, its characters
 // MAIL_FILE_CHAR_BASE files on, and its screen MAIL_FILE_SCREEN_BASE files on
-#define ARCID_MAIL 0x99
 #define MAIL_FILE_CHAR_BASE 12
 #define MAIL_FILE_SCREEN_BASE 24
 // The screen of the buttons, with the write phase's frame
@@ -179,7 +178,7 @@ static void MailView_ReleaseBGs(MailSysWork *work) {
 
 static void MailView_LoadGraphics(MailSysWork *work) {
     u32 design = work->edit->design;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAIL, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAILBOX, work->heapId);
 
     LoadSysMsgBox(0, 1, 4, 0, work->heapId);
     LoadSysMsgBox(0, 13, 6, 0, work->heapId);
@@ -207,7 +206,7 @@ static void MailView_LoadGraphics(MailSysWork *work) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
     if (work->phase != MAIL_PHASE_VIEW) {
-        arc = GFL_ArcSysCreateFileHandle(ARCID_MAIL, work->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_MAILBOX, work->heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, MAIL_FILE_WRITE_SCREEN, 2, 0, screenSize, TRUE, work->heapId);
         GFL_ArcToolFree(arc);
         work->onKeyMode = MailSys_OnKeyMode;

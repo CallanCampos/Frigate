@@ -1,0 +1,200 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Misdreavus",
+    "pokedex": {
+        "category": "Screech Pokémon",
+        "entry": "A Pokémon that startles people in\nthe middle of the night. It gathers\nfear as its energy.",
+        "height": "2'04\"",
+        "weight": "2.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Misdreavus",
+                "category": "Screech Pokémon",
+                "entry": "A Pokémon that startles people in\nthe middle of the night. It gathers\nfear as its energy.",
+                "height": "2'04\"",
+                "weight": "2.2 lbs."
+            },
+            "fr": {
+                "name": "Feuforêve",
+                "category": "Pokémon Strident",
+                "entry": "Il fait peur aux aventuriers en\npleine nuit et se nourrit de leur\nfrayeur.",
+                "height": "0,7 m",
+                "weight": "1,0 kg"
+            },
+            "de": {
+                "name": "Traunfugil",
+                "category": "Kreischer",
+                "entry": "Ein Pokémon, das Menschen mitten in\nder Nacht erschreckt. Es sammelt die\nAngst als seine Energie.",
+                "height": "0,7 m",
+                "weight": "1,0 kg"
+            },
+            "it": {
+                "name": "Misdreavus",
+                "category": "Pokémon Strido",
+                "entry": "Un Pokémon che terrorizza la gente nel\ncuore della notte. Assorbe la paura per\nusarla come energia.",
+                "height": "0,7 m",
+                "weight": "1,0 kg"
+            },
+            "ko": {
+                "name": "무우마",
+                "category": "야명포켓몬",
+                "entry": "한밤중에 사람을 놀라게 하고\n무서워하는 마음을 모아 자신의\n에너지로 만드는 포켓몬이다.",
+                "height": "0.7 m",
+                "weight": "1.0 kg"
+            },
+            "es": {
+                "name": "Misdreavus",
+                "category": "Pokémon Chirrido",
+                "entry": "Sorprende a la gente en mitad\nde la noche y acumula su miedo\ncomo energía.",
+                "height": "0,7 m",
+                "weight": "1,0 kg"
+            },
+            "ja": {
+                "name": "ムウマ",
+                "category": "よなきポケモン",
+                "entry": "まよなか\\x{3000}ひとを\\x{3000}おどろかせては\nこわがるこころを\\x{3000}あつめて\\x{3000}じぶんの\nエネルギーに\\x{3000}している\\x{3000}ポケモン。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 60,
+        "defense": 60,
+        "speed": 85,
+        "special_attack": 85,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 87,
+    "height": 7,
+    "weight": 10,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_PSYWAVE" ],
+            [ 5, "MOVE_SPITE" ],
+            [ 10, "MOVE_ASTONISH" ],
+            [ 14, "MOVE_CONFUSE_RAY" ],
+            [ 19, "MOVE_MEAN_LOOK" ],
+            [ 23, "MOVE_HEX" ],
+            [ 28, "MOVE_PSYBEAM" ],
+            [ 32, "MOVE_PAIN_SPLIT" ],
+            [ 37, "MOVE_PAYBACK" ],
+            [ 41, "MOVE_SHADOW_BALL" ],
+            [ 46, "MOVE_PERISH_SONG" ],
+            [ 50, "MOVE_GRUDGE" ],
+            [ 55, "MOVE_POWER_GEM" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM57",
+            "TM61",
+            "TM63",
+            "TM66",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": [
+            "MOVE_SCREECH",
+            "MOVE_DESTINY_BOND",
+            "MOVE_IMPRISON",
+            "MOVE_MEMENTO",
+            "MOVE_SUCKER_PUNCH",
+            "MOVE_SHADOW_SNEAK",
+            "MOVE_CURSE",
+            "MOVE_SPITE",
+            "MOVE_OMINOUS_WIND",
+            "MOVE_NASTY_PLOT",
+            "MOVE_SKILL_SWAP",
+            "MOVE_WONDER_ROOM"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_DUSK_STONE",
+            "species": "SPECIES_MISMAGIUS"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MISDREAVUS",
+    "cry_volume": 110
+}

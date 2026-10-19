@@ -24,6 +24,16 @@ typedef struct {
     u16 isOut;
 } WipeLinePattern;
 
+enum {
+    LINE_PATTERN_DOWN_OUT,
+    LINE_PATTERN_SPLIT_OUT,
+    LINE_PATTERN_DOWN_IN,
+    LINE_PATTERN_THREE_WAY_IN,
+    LINE_PATTERN_UP_OUT,
+    LINE_PATTERN_UP_IN,
+    LINE_PATTERN_THREE_WAY_OUT,
+};
+
 // A window rectangle moving from start to end (x1, y1, x2, y2), with the planes inside and outside it
 typedef struct {
     u8 start[4];
@@ -175,6 +185,12 @@ static void WipeLineWork_Exit(WipeLineWork *work);
 static void WipeLineWork_Compute(WipeLineWork *work);
 static void WipeLineRange_Apply(const WipeLineRange *range, WipeLineWnd *lines, s32 step, s32 division);
 
+// The split patterns remain in the game's data even though this wipe table only uses the single-edge patterns.
+static WipeLinePattern sLinePatterns[] = {
+    { NULL, 1, TRUE }, { NULL, 2, TRUE },  { NULL, 1, FALSE }, { NULL, 3, FALSE },
+    { NULL, 1, TRUE }, { NULL, 1, FALSE }, { NULL, 3, TRUE },
+};
+
 BOOL WipeFunc_BrightnessOut(WipeScreen *screen) {
     if (screen->seq == 0) {
         screen->endCovered = TRUE;
@@ -198,11 +214,10 @@ BOOL WipeFunc_BrightnessIn(WipeScreen *screen) {
 BOOL WipeFunc_LinesDownOut(WipeScreen *screen) {
     if (screen->seq == 0) {
         static const WipeLineRange range = { 0x00, 0xc0, TRUE };
-        static WipeLinePattern pattern = { NULL, 1, TRUE };
 
-        pattern.ranges = &range;
+        sLinePatterns[LINE_PATTERN_DOWN_OUT].ranges = &range;
         Wipe_SetBackdropColor(screen->color);
-        WipeLine_Init(screen, &pattern);
+        WipeLine_Init(screen, &sLinePatterns[LINE_PATTERN_DOWN_OUT]);
         screen->endCovered = TRUE;
         screen->useBrightness = FALSE;
         return FALSE;
@@ -213,11 +228,10 @@ BOOL WipeFunc_LinesDownOut(WipeScreen *screen) {
 BOOL WipeFunc_LinesDownIn(WipeScreen *screen) {
     if (screen->seq == 0) {
         static const WipeLineRange range = { 0x00, 0xc0, FALSE };
-        static WipeLinePattern pattern = { NULL, 1, FALSE };
 
-        pattern.ranges = &range;
+        sLinePatterns[LINE_PATTERN_DOWN_IN].ranges = &range;
         Wipe_SetBackdropColor(screen->color);
-        WipeLine_Init(screen, &pattern);
+        WipeLine_Init(screen, &sLinePatterns[LINE_PATTERN_DOWN_IN]);
         screen->endCovered = FALSE;
         screen->useBrightness = FALSE;
         return FALSE;
@@ -228,11 +242,10 @@ BOOL WipeFunc_LinesDownIn(WipeScreen *screen) {
 BOOL WipeFunc_LinesUpOut(WipeScreen *screen) {
     if (screen->seq == 0) {
         static const WipeLineRange range = { 0xc0, 0x00, TRUE };
-        static WipeLinePattern pattern = { NULL, 1, TRUE };
 
-        pattern.ranges = &range;
+        sLinePatterns[LINE_PATTERN_UP_OUT].ranges = &range;
         Wipe_SetBackdropColor(screen->color);
-        WipeLine_Init(screen, &pattern);
+        WipeLine_Init(screen, &sLinePatterns[LINE_PATTERN_UP_OUT]);
         screen->endCovered = TRUE;
         screen->useBrightness = FALSE;
         return FALSE;
@@ -243,11 +256,10 @@ BOOL WipeFunc_LinesUpOut(WipeScreen *screen) {
 BOOL WipeFunc_LinesUpIn(WipeScreen *screen) {
     if (screen->seq == 0) {
         static const WipeLineRange range = { 0xc0, 0x00, FALSE };
-        static WipeLinePattern pattern = { NULL, 1, FALSE };
 
-        pattern.ranges = &range;
+        sLinePatterns[LINE_PATTERN_UP_IN].ranges = &range;
         Wipe_SetBackdropColor(screen->color);
-        WipeLine_Init(screen, &pattern);
+        WipeLine_Init(screen, &sLinePatterns[LINE_PATTERN_UP_IN]);
         screen->endCovered = FALSE;
         screen->useBrightness = FALSE;
         return FALSE;

@@ -13,7 +13,7 @@ Read `CLAUDE.md`, `docs/code-standards.md` and `docs/code-organization.md` first
 `.venv/bin/python tools/decomp/check_style.py --diff HEAD FILE` (or `--diff` against what the changes are measured
 from) and read each finding it gives. For a whole area rather than one file, the specialized reviewers in
 `.claude/agents/review/` go deeper: pbw-game-reviewer (src/, include/), pbw-library-reviewer (lib/),
-pbw-config-reviewer (config/ and the decomp docs), pbw-data-reviewer (data/, tools/data), pbw-tools-reviewer (tools,
+pbw-config-reviewer (config/ and the decomp docs), pbw-data-reviewer (res/, tools/data), pbw-tools-reviewer (tools,
 CI, agent config); their "Known bad shapes" lists apply here too. Then read the diff (`git diff` or
 `git diff --cached`, limited to the file, its header and the configs) and the whole source file.
 
@@ -32,7 +32,7 @@ Check:
 5. **Names:** swan's names kept; our names recorded in `config/names.txt` via `rename_symbol.py`, not hand-edited
    into `symbols.txt`. Guessed file or function names are said to be guessed. There are no `unk` names where swan or
    the code gives one. The file is named from the ROM's string, or descriptively, never with an overlay number.
-6. **Natural C** (docs/code-standards.md): no gotos to a return or to the compiler's shared tails, no dummy locals or
+6. **Natural C** (docs/code-standards.md): no gotos to a return or to the compiler's shared tails (a labelled tail block that does real work for several paths is fine), no dummy locals or
    statements split to steer registers, no hand-expanded macros, no byte-offset casts (a pointer sum of the
    element's own type is fine), no inline asm, no `volatile` without a commented reason, no narrating comments, no
    copied pret code. A function that matches only through one of these keeps the natural C and gets a row, and a
