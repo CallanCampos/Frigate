@@ -91,11 +91,12 @@ while it waits is the platform layer's:
    its word reaches the ARM9 when it goes off, as on the DS. Nothing reads the host's time, so a run is the same every
    time.
 3. **Each visible line is drawn** by the scanline hook ([../gfx/screens.c](../gfx/screens.c)): before line 0 the 3D
-   frame swapped at the last VBlank is rasterized ([../gfx/ref/ds3d.c](../gfx/ref/ds3d.c)); then for each 2D engine
-   the registers, palettes, OAM and VRAM are gathered (`port_vram_fill_source`, [../hal/gx/vram.c](../hal/gx/vram.c)),
-   the line is drawn ([../gfx/ref/ds2d.c](../gfx/ref/ds2d.c)), engine A's line feeds display capture
-   ([../gfx/capture.c](../gfx/capture.c)), and each line goes to the screen POWCNT1 gives its engine. The game's HBlank
-   tasks run between lines, so raster effects change registers as on the DS.
+   frame swapped at the last VBlank is rasterized ([../gfx/ref/ds3d.c](../gfx/ref/ds3d.c)), unless everything it is
+   drawn from is what the last picture was drawn from ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)); then for each 2D
+   engine the registers, palettes, OAM and VRAM are gathered (`port_vram_fill_source`,
+   [../hal/gx/vram.c](../hal/gx/vram.c)), the line is drawn ([../gfx/ref/ds2d.c](../gfx/ref/ds2d.c)), engine A's line
+   feeds display capture ([../gfx/capture.c](../gfx/capture.c)), and each line goes to the screen POWCNT1 gives its
+   engine. The game's HBlank tasks run between lines, so raster effects change registers as on the DS.
 4. **At line 192 the frame hooks run**, on the dispatcher's stack, in the order they were added:
    - the 3D swap (`port_g3d_vblank`, [../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)): the polygon list closed by
      SWAP_BUFFERS becomes next frame's;
@@ -128,14 +129,14 @@ medians in ms; the last row is the frame without the pacing wait, median and 95t
 
 | Part | Where its time goes | Title's 3D | Start menu | New Game's 3D flight | Juniper's intro | Bag and card |
 | --- | --- | --- | --- | --- | --- | --- |
-| 3D frame | [../gfx/ref/ds3d.c](../gfx/ref/ds3d.c), before line 0: `DrawPixel`, `DrawSpan` and `PerspValue` for every pixel of every polygon (the title's Kyurem is about 1,160 polygons and 170,000 pixels a frame, 3.5 screens), `Texel` and `PaletteRead` for its textures; then edge marking, fog and anti-aliasing over the picture. A list stays drawn every frame until the next swap ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)) | 2.99 | 1.89 | 2.69 | 0.21 | 1.88 |
+| 3D frame | [../gfx/ref/ds3d.c](../gfx/ref/ds3d.c), before line 0: `DrawPixel`, `DrawSpan` and `PerspValue` for every pixel of every polygon (the title's Kyurem is about 1,160 polygons and 170,000 pixels a frame, 3.5 screens), `Texel` and `PaletteRead` for its textures; then edge marking, fog and anti-aliasing over the picture. The DS draws the last list every frame until the next swap; a frame whose list, latched registers and texture memory are all the last picture's keeps that picture instead ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)), so a still 3D scene costs a comparison of its texture memory | 2.98 | 0 | 2.70 | 0.21 | 0 |
 | Geometry engine | [../gfx/ge/ge.c](../gfx/ge/ge.c): the logged writes decoded and queued (`Decode`, `Enqueue`, `Execute`), the matrices, lighting and the clipper (`RunCommand`, `Vertex`, `Submit`) | 0.50 | 0 | 0.63 | 0.01 | 0 |
-| 2D lines | [../gfx/ref/ds2d.c](../gfx/ref/ds2d.c) (`Compose`, `DrawTextBg`, `DrawObjs`) and each line's sources, [../hal/gx/vram.c](../hal/gx/vram.c)'s `port_vram_fill_source` | 0.45 | 0.56 | 0.22 | 0.44 | 0.49 |
+| 2D lines | [../gfx/ref/ds2d.c](../gfx/ref/ds2d.c) (`Compose`, `DrawTextBg`, `DrawObjs`) and each line's sources, [../hal/gx/vram.c](../hal/gx/vram.c)'s `port_vram_fill_source` | 0.45 | 0.56 | 0.23 | 0.45 | 0.50 |
 | Capture | [../gfx/capture.c](../gfx/capture.c), every line while the game captures (the title's picture into VRAM D) | 0.18 | 0 | 0 | 0 | 0 |
-| ARM7 | [../hal/snd7](../hal/snd7/snd7_internal.h): the sound driver catching up and the mixer, at each VBlank and at its alarms | 0.02 | 0.02 | 0.13 | 0.09 | 0.11 |
+| ARM7 | [../hal/snd7](../hal/snd7/snd7_internal.h): the sound driver catching up and the mixer, at each VBlank and at its alarms | 0.02 | 0.02 | 0.13 | 0.09 | 0.10 |
 | Window | [../app/present.c](../app/present.c): SDL's texture upload and present, about 0.2 ms with a window (none headless) | 0 | 0 | 0 | 0 | 0 |
 | The rest | The game's C on its fibers, the dispatcher, the interrupt handlers, the other frame hooks | 0.08 | 0.04 | 0.09 | 0.05 | 0.04 |
-| The frame | | 4.24, 4.45 | 2.53, 3.95 | 3.78, 4.68 | 0.82, 1.23 | 2.54, 2.69 |
+| The frame | | 4.25, 4.45 | 0.62, 3.97 | 3.79, 4.68 | 0.82, 1.23 | 0.66, 0.79 |
 
 Windowed, paced, the same frames cost about 1.4 times as much: the core slows down while the program sleeps through
 the rest of each frame. The x86_64 slice under Rosetta takes about 1.7 times the arm64 time.

@@ -257,6 +257,86 @@ static void TestFrame(void) {
     Io32(0x350, 0);
 }
 
+// A frame drawn from what the last one was drawn from keeps the last picture: the same list (no swap or reset since),
+// latched registers, slots' pages and texture memory. The memory is copied whenever a frame is drawn from the same
+// list, registers and pages as the one before, and compared at the next, so a still scene is drawn twice, then kept
+// until something it is drawn from changes; a change of the memory alone is drawn once
+static void TestKeep(void) {
+    uint32_t draws;
+
+    port_g3d_reset();
+    Io32(0x350, 0x1fu << 10 | 31u << 16); // clear: blue, opaque
+    Io16(0x354, 0x7fff);
+    Io16(0x60, 1); // textures on
+    for (int i = 0; i < 16; i++) {
+        sTex[0][i * 2] = 0x1f; // red
+        sTex[0][i * 2 + 1] = 0x80;
+    }
+    LogBasic(0x001f00c0);
+    Log(0x20, 0x7fff);
+    Log(0x2a, 7u << 26 | 0u);
+    LogQuad(10, 10, 14, 14);
+    Log(0x50, 0);
+    port_g3d_vblank();
+    draws = port_g3d_draws();
+    port_g3d_render_frame();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 2);
+    for (int i = 0; i < 3; i++) {
+        port_g3d_render_frame();
+    }
+    CHECK_HEX(port_g3d_draws() - draws, 2);
+    CHECK_HEX(port_g3d_line(12)[12], 0xffff0000);
+    // A texel changed (the quad has no texture coordinates, so every pixel shows texel 0): drawn again, with it
+    sTex[0][0] = 0x00;
+    sTex[0][1] = 0xfc; // blue
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 3);
+    CHECK_HEX(port_g3d_line(12)[12], 0xff0000ff);
+    port_g3d_render_frame();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 3);
+    // A palette slot's memory counts too, though this texture reads none
+    sPltt[5][0x3fff] = 1;
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 4);
+    sPltt[5][0x3fff] = 0;
+    port_g3d_render_frame();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 5);
+    // A register changes the picture only once a VBlank latches it
+    Io32(0x350, 0x1fu << 5 | 31u << 16); // green
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 5);
+    port_g3d_vblank();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 6);
+    CHECK_HEX(port_g3d_line(12)[9], 0xff00ff00);
+    port_g3d_render_frame();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 7);
+    // A VBlank without a swap or a change keeps the picture; a swap of the same commands is another list, drawn
+    port_g3d_vblank();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 7);
+    LogBasic(0x001f00c0);
+    Log(0x20, 0x7fff);
+    Log(0x2a, 7u << 26 | 0u);
+    LogQuad(10, 10, 14, 14);
+    Log(0x50, 0);
+    port_g3d_vblank();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 8);
+    // A reset empties the lists and the picture: drawn again, the rear plane alone
+    port_g3d_reset();
+    port_g3d_render_frame();
+    CHECK_HEX(port_g3d_draws() - draws, 9);
+    CHECK_HEX(port_g3d_line(12)[12], 0);
+    memset(sTex[0], 0, 32);
+    Io16(0x60, 0);
+    Io32(0x350, 0);
+}
+
 // DISP3DCNT through its accessor, if the generator ever routes it: bit 13 shows polygon RAM's overflow, and a store
 // with bit 13 set acknowledges it
 static void TestDisp3dcnt(void) {
@@ -285,6 +365,7 @@ int main(void) {
     TestGxstatWrites();
     TestOneDotDepth();
     TestFrame();
+    TestKeep();
     TestDisp3dcnt();
     printf("%d checks, %d failures\n", sChecks, sFailures);
     return sFailures != 0;
