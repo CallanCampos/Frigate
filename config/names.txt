@@ -9676,6 +9676,17 @@ overlays/ov099 0x021efd80 sGymOpelucidResources
 overlays/ov099 0x021efe7c sCurves
 overlays/ov099 0x021efffc sGymOpelucidSteps
 overlays/ov099 0x021f0480 sTierChecks
+overlays/ov100 0x021eec80 GymVirbank_Init
+overlays/ov100 0x021eecd0 GymVirbank_End
+overlays/ov100 0x021eecf8 GymVirbank_Update
+overlays/ov100 0x021eed10 GymVirbank_StopModelAnimations
+overlays/ov100 0x021eed64 GymVirbank_SetActorFlag
+overlays/ov100 0x021eed80 GymVirbank_PlaceModels
+overlays/ov100 0x021eee34 GymVirbank_FreeModels
+overlays/ov100 0x021eee40 GymVirbank_StepAnimations
+overlays/ov100 0x021eee4c GymVirbank_InitMusic
+overlays/ov100 0x021eefac GymVirbank_UpdateMusicVolume
+overlays/ov100 0x021ef004 GymVirbank_GetVolumeIndex
 overlays/ov101 0x021eec80 GymHumilau_Init
 overlays/ov101 0x021eece0 GymHumilau_End
 overlays/ov101 0x021eed00 GymHumilau_Update

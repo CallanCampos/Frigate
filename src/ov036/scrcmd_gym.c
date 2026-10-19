@@ -264,14 +264,14 @@ BOOL func_ov036_021ab134(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    func_ov100_021eed10(gsys, VM_Read16(vm));
+    GymVirbank_StopModelAnimations(gsys, VM_Read16(vm));
     return TRUE;
 }
 
 BOOL func_ov036_021ab158(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov100_021eed64(gsys, VM_Read16(vm));
+    GymVirbank_SetActorFlag(gsys, VM_Read16(vm));
     return TRUE;
 }
 
