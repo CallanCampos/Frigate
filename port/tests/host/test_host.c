@@ -3,9 +3,10 @@
 // would; a crash is reported with a backtrace before the fault ends the program; the same on a fiber, as the game's
 // threads run (port/hal/os/fiber.c), with the C library's code making the access, and with a fiber's guard touched; the
 // watchdog ends a program that spins, with its message and status, and leaves one alone that kicks it or that started
-// it with 0 seconds, which turns it off; and the program's static data, directories (one whose name isn't ASCII among
-// them), arguments, environment and private file mappings that the PXI bus (port/hal/pxi/pointer.c), the saves and the
-// tests stand on. The scenarios that end the process run one a process. None needs a ROM.
+// it with 0 seconds, which turns it off; and the program's static data, pages and their protection, directories (one
+// whose name isn't ASCII among them), arguments, environment and private file mappings that the PXI bus
+// (port/hal/pxi/pointer.c), the saves and the tests stand on. The scenarios that end the process run one a process.
+// None needs a ROM.
 //
 //   port_host_tests NAME [ARGUMENT]
 #include "hal/host/host.h"
@@ -200,9 +201,10 @@ static int TestStaticData(void) {
     return sFailed;
 }
 
-// Pages, a directory, the environment and a private mapping of a file, in the temporary directory; and a folder whose
-// name isn't ASCII, made and written by the C library, which SDL, whose paths are UTF-8, finds by the same name: on
-// Windows, only a program whose code page is UTF-8 (its manifest, port/app/windows) has the C library take UTF-8
+// Pages (one made inaccessible, then readable again), a directory, the environment and a private mapping of a file, in
+// the temporary directory; and a folder whose name isn't ASCII, made and written by the C library, which SDL, whose
+// paths are UTF-8, finds by the same name: on Windows, only a program whose code page is UTF-8 (its manifest,
+// port/app/windows) has the C library take UTF-8
 static int TestFiles(void) {
     char dir[600];
     char path[700];
@@ -220,6 +222,10 @@ static int TestFiles(void) {
     Check(pages != NULL && ((uintptr_t)pages & (page - 1)) == 0 && pages[page] == 0, "zeroed pages, page aligned");
     if (pages != NULL) {
         pages[3 * page] = 1;
+        // As the trap's placeholders are at exit in the sanitized build (port/hal/trap.c)
+        Check(port_host_protect_none(pages + page, page, "host test: no access") == 0 &&
+                  port_host_protect_read(pages + page, page, "host test: readable") == 0 && pages[page] == 0,
+              "a page made inaccessible reads again once made readable");
         port_host_unmap(pages, 4 * page);
     }
 

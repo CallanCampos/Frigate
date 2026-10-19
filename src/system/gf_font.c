@@ -178,7 +178,22 @@ static void GFL_FontLoad(Font *font, u32 fileId, BOOL fixedWidth, HeapID heapId)
         font->lastBits = 8;
     }
     font->glyphsOffset = font->info.glyphOffset + sizeof(FontGlyphInfo);
+#ifdef PLATFORM_PC
+    // The bitmap copies read whole tiles' rows of the glyph after the cell's 3 bytes, and the bit reader the byte after
+    // the last bits it takes: past the end of a cell whose font is shorter than its tiles, as the main font is (15
+    // rows, so its copy's 16th row was read from the heap after the cell, and never drawn). The host's cell has room
+    // for every row of its tiles at 2 bits a pixel and the byte after, zeroed (port/docs/sanitizers.md)
+    {
+        u32 cellBytes = 3 + font->tilesWide * font->tilesHigh * 16 + 1;
+
+        if (cellBytes < font->glyphInfo.cellSize) {
+            cellBytes = font->glyphInfo.cellSize;
+        }
+        font->cell = GFL_HeapAllocate(heapId, cellBytes, TRUE, "gf_font.c", 275);
+    }
+#else
     font->cell = GFL_HeapAllocate(heapId, font->glyphInfo.cellSize, FALSE, "gf_font.c", 275);
+#endif
     size = GFL_ArcToolGetDataLength(font->handle, fileId) - font->info.mapOffset;
     font->maps = GFL_HeapAllocate(heapId, size, FALSE, "gf_font.c", 280);
     GFL_ArcToolReadRange(font->handle, fileId, font->info.mapOffset, size, font->maps);

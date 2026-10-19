@@ -207,6 +207,15 @@ int port_host_protect_none(void *start, size_t size, const char *what) {
     return 0;
 }
 
+// The pages are no longer the seam's to report: a fault there is any other's
+int port_host_protect_read(void *start, size_t size, const char *what) {
+    if (Protect(start, size, PAGE_READONLY, what) != 0) {
+        return -1;
+    }
+    ForgetRegions(start, size);
+    return 0;
+}
+
 int port_host_protect_stack_guard(void *start, size_t size, const char *what) {
     unsigned char *end = (unsigned char *)start + size;
     size_t tripwire = size < STACK_GUARD_TRIPWIRE ? size : STACK_GUARD_TRIPWIRE;

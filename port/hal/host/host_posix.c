@@ -92,6 +92,14 @@ int port_host_protect_none(void *start, size_t size, const char *what) {
     return 0;
 }
 
+int port_host_protect_read(void *start, size_t size, const char *what) {
+    if (mprotect(start, size, PROT_READ) != 0) {
+        perror(what);
+        return -1;
+    }
+    return 0;
+}
+
 // The signal handler runs on a stack of its own, so a guard of no access is enough: the fault is delivered there
 int port_host_protect_stack_guard(void *start, size_t size, const char *what) {
     return port_host_protect_none(start, size, what);

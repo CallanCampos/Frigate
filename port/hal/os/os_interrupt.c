@@ -11,13 +11,34 @@
 // The callbacks of the timers, which come after those of the DMA channels
 #define OSi_TIMER_CALLBACK_INFO (OSi_IrqCallbackInfo + OSi_IRQCALLBACK_NO_TIMER0)
 
+// The handlers that OS_SetIrqFunction gives the DMA channels and timers, kept with their own type. The SDK casts such
+// a handler (void of void) to a callback (void of a pointer), which OSi_IrqCallback (os_irqTable.c) then calls with
+// the callback's argument: calling a function through a pointer of another type is undefined in C, and UBSan's
+// function check stops there (port/docs/sanitizers.md). On the host the callback is CallIrqFunction instead, and its
+// argument the slot here that holds the handler
+static OSIrqFunction sIrqFunctions[OSi_IRQCALLBACK_NUM];
+
+static void CallIrqFunction(void *slot) {
+    (*(OSIrqFunction *)slot)();
+}
+
+// The handler of a DMA channel's or timer's interrupt, as the SDK's OS_GetIrqFunction gives it: a callback that
+// OSi_EnterDmaCallback or OSi_EnterTimerCallback set is returned as a handler, as the SDK returns it
+static OSIrqFunction CallbackFunction(const OSIrqCallbackInfo *info) {
+    if (info->func == CallIrqFunction) {
+        return *(const OSIrqFunction *)info->arg;
+    }
+    return (OSIrqFunction)info->func;
+}
+
 // NitroSDK's OS_InitIrqTable: nobody waits for an interrupt yet
 void OS_InitIrqTable(void) {
     OS_InitThreadQueue(&OSi_IrqThreadQueue);
 }
 
 // NitroSDK's OS_SetIrqFunction. The interrupts of DMA channels and timers get a callback in
-// OSi_IrqCallbackInfo, which their handlers call; the others go in the table of handlers
+// OSi_IrqCallbackInfo, which their handlers call (CallIrqFunction, with the handler); the others go in the table of
+// handlers
 void OS_SetIrqFunction(u32 interrupts, OSIrqFunction function) {
     int n;
     OSIrqCallbackInfo *info;
@@ -35,8 +56,11 @@ void OS_SetIrqFunction(u32 interrupts, OSIrqFunction function) {
                 OS_IRQTable[n] = function;
             }
             if (info != NULL) {
-                info->func = (OSIrqCallback)function;
-                info->arg = NULL;
+                OSIrqFunction *slot = &sIrqFunctions[info - OSi_IrqCallbackInfo];
+
+                *slot = function;
+                info->func = function != NULL ? CallIrqFunction : NULL;
+                info->arg = function != NULL ? slot : NULL;
                 info->enable = TRUE;
             }
         }
@@ -52,10 +76,10 @@ OSIrqFunction OS_GetIrqFunction(u32 interrupts) {
     for (n = 0; n < 32; n++) {
         if (interrupts & 1) {
             if (n >= OS_IE_DMA0_SHIFT && n <= OS_IE_DMA0_SHIFT + 3) {
-                return (OSIrqFunction)OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + n - OS_IE_DMA0_SHIFT].func;
+                return CallbackFunction(&OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + n - OS_IE_DMA0_SHIFT]);
             }
             if (n >= OS_IE_TIMER0_SHIFT && n <= OS_IE_TIMER0_SHIFT + 3) {
-                return (OSIrqFunction)OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_TIMER0 + n - OS_IE_TIMER0_SHIFT].func;
+                return CallbackFunction(&OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_TIMER0 + n - OS_IE_TIMER0_SHIFT]);
             }
             return *table;
         }

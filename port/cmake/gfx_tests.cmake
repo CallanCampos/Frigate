@@ -42,5 +42,5 @@ target_include_directories(port_bench_gfx_ds2d PRIVATE "${CMAKE_CURRENT_SOURCE_D
 target_compile_options(port_bench_gfx_ds2d PRIVATE -std=c11 -Wall -Wextra -Werror -O2)
 if(PORT_GFX_TIMING_GATE)
     add_test(NAME gfx_ds2d_timing COMMAND port_bench_gfx_ds2d ${PORT_GFX_TIMING_LIMIT_US})
-    set_tests_properties(gfx_ds2d_timing PROPERTIES LABELS timing)
+    port_test_labels(gfx_ds2d_timing timing)
 endif()

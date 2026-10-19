@@ -106,9 +106,11 @@ class Sequence:
     pair on the game's count. lags: by version, the count lags declared (compare.py --lag). known: by version, the port
     frames whose screens differ from the oracle's by construction, left out of the comparison and the reference, and
     known_oracle the oracle frames that no port frame can show; each with why (README.md, "Known differences").
-    state_frames: the port frames whose game state (STATE) is compared with the oracle's at the frames they pair with,
-    which state_oracle, the oracle frames dumped, covers; known_state, by version, the port frames whose state differs
-    by construction, with why"""
+    close: by version, the port frames whose screens with 3D must also have few pixels that differ at all
+    (compare.py --close), with why: where a 2D layer the 3D's tolerance would forgive shows. state_frames: the port
+    frames whose game state (STATE) is compared with the oracle's at the frames they pair with, which state_oracle, the
+    oracle frames dumped, covers; known_state, by version, the port frames whose state differs by construction, with
+    why"""
     port_frames: int
     oracle_frames: int
     sample: str
@@ -116,6 +118,7 @@ class Sequence:
     lags: dict[str, str] = field(default_factory=dict)
     known: dict[str, dict[str, str]] = field(default_factory=dict)
     known_oracle: dict[str, dict[str, str]] = field(default_factory=dict)
+    close: dict[str, dict[str, str]] = field(default_factory=dict)
     state_frames: str = ""
     state_oracle: str = ""
     known_state: dict[str, dict[str, str]] = field(default_factory=dict)
@@ -149,6 +152,10 @@ CURSOR = ("the start menu's cursor pulses a step ahead on the port since the tit
           "CONTINUE's press, which both read on the same pass, ends the pulse on the same count: on the press's frame "
           "the port shows the step after the DS's last one, a step the DS shows elsewhere in the pulse (at counts "
           "3274, 3296, 3338 and 3360 from the first save) but not on that count")
+# The frames held close, by kind
+TITLE_FADE = ("the title's bottom screen fading in over its 3D, where the copyright screen's tiles read past their "
+              "file show as a band (port/docs/sanitizers.md, H1), a step or two from black: within the 3D's tolerance; "
+              "from a blank save the port's heap holds the DS's bytes there")
 SEQUENCES = {
     # Power-on, the boot screens, the Game Freak logo and the whole opening to the title and its first 274 frames of
     # 3D, nothing pressed: the movies run from port frame 313 (count 312) to the title, at port frame 3527 in both
@@ -159,6 +166,7 @@ SEQUENCES = {
         sample="1-3800/12,3520-3540",
         clock="313-3526",
         known_oracle={"w2_us": {"1283": TORN_OPENING}},
+        close={"b2_us": {"3527-3560": TITLE_FADE}, "w2_us": {"3527-3560": TITLE_FADE}},
         state_frames="3527-3800",
         state_oracle="3700-4300",
     ),
@@ -177,6 +185,7 @@ SEQUENCES = {
                       "3219-3240/3": CRY},
         },
         known_oracle={"b2_us": {"4943": TORN_START}, "w2_us": {"1283": TORN_OPENING, "4875": TORN_START}},
+        close={"b2_us": {"1116-1149": TITLE_FADE}, "w2_us": {"1116-1149": TITLE_FADE}},
         state_frames="1116-3600",
         state_oracle="2800-5700",
         known_state={"b2_us": {"3110-3124": CAMERA}, "w2_us": {"3110-3124": CAMERA}},
@@ -187,7 +196,9 @@ SEQUENCES = {
     # stops there on overlay 36's field code and data, which have no C yet (stop_from). The title's known differences
     # are the title sequence's; on the oracle they come 23 frames sooner, since its start-up, which reads the save,
     # starts the main loop at frame 219 with this save and at 242 with a blank one. In White 2 the press of CONTINUE
-    # brings the counts together again
+    # brings the counts together again. The title's first frames of 3D aren't held close as the title sequence's are:
+    # from a save, the heap after the copyright screen's file holds other bytes on the port than on the DS, so the band
+    # they show differs (README.md, "Known differences")
     "continue": Sequence(
         port_frames=3600,
         oracle_frames=6000,
@@ -1019,11 +1030,16 @@ def command_sequence(args) -> int:
     known_oracle = sequence.known_oracle.get(args.version, {})
     if known_oracle:
         command += ["--known-oracle", ",".join(known_oracle)]
+    close = sequence.close.get(args.version, {})
+    if close:
+        command += ["--close", ",".join(close)]
     result = compare.main(command)
     for frames, why in sequence.known.get(args.version, {}).items():
         print(f"left out, port frames {frames}: {why}")
     for frames, why in known_oracle.items():
         print(f"no counterpart, oracle frames {frames}: {why}")
+    for frames, why in close.items():
+        print(f"held close, port frames {frames}: {why}")
     if sequence.state_frames:
         known_state = by_frame(sequence.known_state.get(args.version, {}))
         state = [f for f in compare.parse_frames(sequence.state_frames) if f not in known_state]

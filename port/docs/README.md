@@ -22,6 +22,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [game-changes.md](game-changes.md) | Every change Frigate makes outside `port/`, with its kind, its guard and its proof that the ROMs stay byte for byte |
 | [decomp-findings.md](decomp-findings.md) | Where the decomp's C that the ROM doesn't link behaves differently from the ROM, or is unresolved |
 | [lessons.md](lessons.md) | What port work taught that the code doesn't show, newest first |
+| [sanitizers.md](sanitizers.md) | The sanitized build (T5): how to run it and read its reports, what Frigate tells the sanitizers, the checks it leaves out and why, what it can't see, and what it found |
 
 ## Records
 
@@ -42,6 +43,7 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md) | The cartridge's infrared chip as a register model |
 | [adr/0012](adr/0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed |
 | [adr/0013](adr/0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind `port/hal/host` |
+| [adr/0014](adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted |
 | [adr/0015](adr/0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |

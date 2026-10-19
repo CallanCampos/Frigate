@@ -3,12 +3,22 @@
 // fault handler names the placeholder that was touched. Either way the program stops with status 70, its message naming
 // the symbol, its address and its caller. It also tells Frigate's test launcher whether a symbol is still a placeholder
 // (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012). The
-// host's pages, faults, backtraces and names come from port/hal/host, the same code on every host here.
+// host's pages, faults, backtraces and names come from port/hal/host, the same code on every host here. In the
+// sanitized build the placeholders become readable again at exit, for LeakSanitizer (port/docs/sanitizers.md).
 #include "hal/trap.h"
 #include "hal/host/host.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define PORT_ASAN 1
+#endif
+#endif
+#if defined(__SANITIZE_ADDRESS__) && !defined(PORT_ASAN)
+#define PORT_ASAN 1
+#endif
 
 static void print_caller(void *caller) {
     const char *name;
@@ -95,14 +105,39 @@ static void on_fault(const void *fault_address, const char *fault) {
     fflush(stderr);
 }
 
-void port_trap_protect_data(void) {
+// The whole pages of the placeholders' range, which are the ones protected
+static void protected_pages(uintptr_t *begin, uintptr_t *end) {
     uintptr_t page = (uintptr_t)port_host_page_size();
+    *begin = ((uintptr_t)sDataBegin + page - 1) & ~(page - 1);
+    *end = (uintptr_t)sDataEnd & ~(page - 1);
+}
+
+#ifdef PORT_ASAN
+// LeakSanitizer's check at exit scans the program's writable data for pointers, by the protection its segments had
+// when they were loaded, so it reads the placeholders' pages too: on macOS the check then never ended. The
+// placeholders hold zeros and nothing else, so at exit they become readable again. atexit runs this before the check,
+// which the runtime registered at its start; a trap's _Exit runs neither
+static void unprotect_data_at_exit(void) {
+    uintptr_t begin;
+    uintptr_t end;
+    protected_pages(&begin, &end);
+    if (end > begin) {
+        port_host_protect_read((void *)begin, end - begin, "port: the data placeholders' protection at exit");
+    }
+}
+#endif
+
+void port_trap_protect_data(void) {
     find_data_range();
-    uintptr_t begin = ((uintptr_t)sDataBegin + page - 1) & ~(page - 1);
-    uintptr_t end = (uintptr_t)sDataEnd & ~(page - 1);
+    uintptr_t begin;
+    uintptr_t end;
+    protected_pages(&begin, &end);
     if (end > begin) {
         port_host_protect_none((void *)begin, end - begin, "port: the data placeholders' protection");
     }
+#ifdef PORT_ASAN
+    atexit(unprotect_data_at_exit);
+#endif
     // The handler runs on a stack of its own, so that a thread's stack overflowing (the game's threads run on fibers
     // with guard pages) is still reported
     port_host_set_fault_handler(on_fault);

@@ -12,11 +12,8 @@
 // The prescaler that the SDK sets for the system timer: one count every 64 cycles
 #define TICK_PRESCALER 64
 
-// The SDK registers it with OS_SetIrqFunction, as a handler of the interrupt table (void of void), and its interrupt's
-// callback (OSi_IrqCallback, os_irqTable.c) then calls it as a callback (void of a pointer). Calling a function through
-// a pointer of another type is undefined in C (UBSan's function check stops there), so on the host it has the
-// callback's type, which is how it is called
-static void OSi_CountUpTick(void *arg); // swan's clock_irq
+// The handler of timer 0's interrupt, which OS_SetIrqFunction registers (os_interrupt.c keeps it with its type)
+static void OSi_CountUpTick(void); // swan's clock_irq
 
 static u16 OSi_UseTick; // swan's g_ClockIsInitialized
 static BOOL OSi_NeedResetTimer;
@@ -39,7 +36,7 @@ void OS_InitTick(void) {
     OSi_TickCounter = 0;
     port_osi_stop_timer(0);
     port_osi_start_timer(0, 0, TICK_PRESCALER, TRUE);
-    OS_SetIrqFunction(OS_IE_TIMER0, (OSIrqFunction)OSi_CountUpTick);
+    OS_SetIrqFunction(OS_IE_TIMER0, OSi_CountUpTick);
     OS_EnableIrqMask(OS_IE_TIMER0);
     OSi_NeedResetTimer = FALSE;
 }
@@ -49,16 +46,19 @@ BOOL OS_IsTickAvailable(void) {
     return OSi_UseTick;
 }
 
-// NitroSDK's OSi_CountUpTick, the handler of timer 0's interrupt
-static void OSi_CountUpTick(void *arg) {
-    (void)arg;
+// NitroSDK's OSi_CountUpTick, the handler of timer 0's interrupt. The SDK sets itself again with
+// OSi_EnterTimerCallback, casting itself to a callback (void of a pointer); here OS_SetIrqFunction keeps its type, and
+// OS_EnableIrqMask does the rest of what OSi_EnterTimerCallback does (in the interrupt's handler, where nothing else
+// can be taken, it only sets timer 0's bit of IE, which is already set)
+static void OSi_CountUpTick(void) {
     OSi_TickCounter++;
     if (OSi_NeedResetTimer) {
         port_osi_stop_timer(0);
         port_osi_start_timer(0, 0, TICK_PRESCALER, TRUE);
         OSi_NeedResetTimer = FALSE;
     }
-    OSi_EnterTimerCallback(0, OSi_CountUpTick, NULL);
+    OS_SetIrqFunction(OS_IE_TIMER0, OSi_CountUpTick);
+    OS_EnableIrqMask(OS_IE_TIMER0);
 }
 
 // NitroSDK's OS_GetTick. The wrap's interrupt may be pending with the timer already past 0, in which case the counter

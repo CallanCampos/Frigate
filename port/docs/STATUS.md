@@ -26,10 +26,151 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the sanitized build after review: the copyright screen's read kept, every report fatal on Linux
+
+- **Upstream:** `993e6c49b`, as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `9c5b9bfce`, on the branch `port-sanitizers` after `7773fd59c`: the two reviews' fixes and this entry; not
+  pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) with
+  `src/gfl/arc_util.c`'s new block. `check_mwcc_neutral.py` finds 3,176 of 3,180 file and version pairs identical to
+  `993e6c49b`, the three game files among them; the other four are `vm.c`'s and `event_field_proclink.c`'s Neutral
+  rows, as before.
+- **Host build:** arm64 macOS, RelWithDebInfo, Ninja, Apple clang 21.0.0, in `build/`: `port` and `port-w2` plain,
+  `port-san` and `port-san-w2` with `-DPORT_SANITIZE=ON`. Each gives the decomp's 263 warnings and none in `port/`.
+  Not pushed, so no CI run; Linux not built.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle and its saves in each build: Black 2, all 267 pass (2,134 s);
+    White 2, 261 of 263 pass and the two that need its starter save skip (632 s). The tests left `~/Library` alone
+    (`HOME` a scratch directory).
+  - T5, the strict sanitized build, Apple clang: Black 2, all 268 pass (3,062 s), its 24 routes among them; White 2,
+    262 of 264 pass and `oracle_continue_starter` and `oracle_launch_party_menus` skip (2,480 s), 18 of its 20 routes
+    run. No test's output has a sanitizer's report. Three suites ran at once on a machine loaded to 150: `asm_oracle`
+    timed out at its 900 s in each and passed run again (Black 2's in 261 and 382 s; sanitized White 2's, run without
+    ctest's limit, in 692 s, 181 s of CPU), and `oracle_continue` and `oracle_continue_starter` failed only on the
+    frames this change first held close in them too (below), and passed once those were dropped.
+    Upstream clang and LeakSanitizer were not run again: what changed in what runs is `fnd_hooks.c` and its hooks'
+    calls in `arc_util.c`, which Apple clang's ASan covers, and the runtime's defaults, which are already macOS's.
+  - The oracle's sequences with the copyright screen's read restored: the title's first frame of 3D differs from
+    melonDS's in 8 pixels on the bottom screen in both versions (opening, port frame 3527), as at `2da26e048`; with
+    `c8eaf91c9`'s change it differed in 14,330 (a band over lines 38 to 95 drawn as background). Over the 34 frames now
+    held close in the opening and the title, the most that differ is 235 (Black 2) and 104 (White 2) of the 491
+    allowed; the old change fails the first four in both. From a save (continue, continue_starter) the band's noise
+    differs from the DS's, 10,764 pixels at port frame 1116 in Black 2 and 10,974 in White 2, since the heap holds
+    other bytes there on the port: within the 3D's tolerance, as before, and those sequences don't hold the frames
+    close. A probe of the hooks on 2,000 random heaps found the shadow given back exactly after each read.
+    `compare.py`'s and `oracle.py`'s unit tests pass (51).
+  - CI's `sanitize` job: not run (not pushed). T7 not yet.
+- **Tiers:** not measured: no new C.
+- **Trap stubs:** as in the last entry: 512 function stubs and 46 data placeholders in each version (`gen_stubs`, the
+  plain builds), 511 in the sanitized builds.
+- **64-bit warnings:** not measured by kind; each build gives the decomp's 263 warnings of every kind, as the last
+  entry, and none in `port/`.
+- **Work done:** the two reviews of `3271b7d43` to `7773fd59c`, each finding checked; all were real.
+  - **H1 is not a bug to fix.** The copyright screen's tiles read past its file's block show on the title screen's
+    bottom screen as it fades in, as melonDS shows them, and the host read the DS's bytes; `c8eaf91c9`'s change drew
+    the background there, which the oracle comparison's 3D tolerance let through. The game reads them again, around
+    `port_heap_ds_read_begin` and `port_heap_ds_read_end` (`port/include/port_host.h`), which in the sanitized build
+    let that one read reach past the block and then poison again exactly what was poisoned (`fnd_hooks.c`). Its rows
+    in game-changes.md and decomp-findings.md, sanitizers.md, ADR 0014, lessons.md and the feature map say so. The
+    opening and the title now hold the title's first 34 frames of 3D close (`compare.py --close`, a sequence's
+    `close`): there a screen with 3D may differ in at most 1% of its pixels at all. The continue sequences can't, since
+    from a save the bytes after the file aren't the DS's on the port (the oracle README's "Known differences").
+  - **Every report fatal on every host.** Off Apple, ASan's runtime ends a report (UBSan's and LeakSanitizer's too)
+    with status 1, which the tests that pass on their output or on a failure accepted. `sanitizers.c` makes
+    `abort_on_error=1` the default of every sanitized program, and every test of the sanitized build fails on a
+    sanitizer's report in its output (`FAIL_REGULAR_EXPRESSION`, set at the end of the directory).
+  - **A resized block** has the DS's size of what the game asked for addressable after every successful resize, not
+    only when the host's size changed (`fnd_hooks.c`).
+  - **Labels** are given where each test is defined (`port_test_labels`), the same tests as before; `timing` is listed.
+    `PORT_SANITIZE_RECOVER` without `PORT_SANITIZE`, and a timing gate with it, are refused at configure time.
+  - **Documents:** sanitizers.md (exit statuses per host, LeakSanitizer's reports and the policy for a third party's
+    leak, the other options, what CI runs without a ROM, the survey's real coverage, the reports apart from the gaps),
+    the CI job's comments, the `cmake/` and `tests/` guides, PLAN.md §4.4, `nnsys.cmake`'s header, and
+    `port_mco_saved_stack_pointer` declared once, in `hal/os/mco_impl.h`. The last entry's coverage is corrected:
+    White 2 ran 18 of its 20 routes, and the runs that end on a trap stub get no leak check.
+- **Next:** as in the last entry: White 2's starter route, so that `party_menus` and `continue_starter` run in White 2;
+  the apps no route reaches yet; a save with an adventure made by the port, once overlay 36 lets it into the field. For
+  T5: the sanitize job's first CI run, Linux's LeakSanitizer and function check included; the `OS_Alloc` heaps under
+  ASan as FND's are; a nightly run of the sanitized routes.
+- **Blockers:** as in the last entry.
+
+## 2026-10-18: the sanitized build, clean on every route of both versions, with the game's heaps under ASan
+
+- **Upstream:** `993e6c49b`, as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `7773fd59c`, on the branch `port-sanitizers` from `main` at `2da26e048`: `3271b7d43` (the OS core's DMA and
+  timer handlers called with their type), `c8eaf91c9` (three memory bugs of the game, fixed under `PLATFORM_PC`),
+  `521d483b2` (the fibers and the trap under the sanitizers), then this commit (the sanitized build, its CI job, the
+  documents and this entry); not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) with the three game
+  changes, two of them in complete files (`arc_util.c`, `gf_font.c`). `check_mwcc_neutral.py` finds 3,176 of 3,180 file
+  and version pairs identical to `993e6c49b`, the three changed files among them (`printsys.c` is incomplete, so this is
+  its proof); the other four are `vm.c`'s and `event_field_proclink.c`'s Neutral rows, as before.
+- **Host build:** arm64 macOS, RelWithDebInfo, Ninja, in `build/`: `port` (Black 2) and `port-w2` (White 2), plain;
+  `port-san` (Black 2) and `port-san-w2` (White 2) with `-DPORT_SANITIZE=ON` under Apple clang 21.0.0; `port-san-llvm`
+  (Black 2) under Homebrew clang 23.1.3; and a survey build with `-DPORT_SANITIZE_RECOVER=ON`, deleted after. The
+  Apple builds give the decomp's 263 warnings and none in `port/` (White 2's plain build compiled every file); the
+  Homebrew build 265, the decomp's and two of clang 23's `-Wunused-but-set-global` in older port code, which Apple
+  clang 21 doesn't give (`hal/dwc/ov011_pending.c`'s `sGameSpyServer`, `tests/rom/test_backup.c`'s `sReplyData`),
+  left as they are. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4`, with the oracle and its saves in each build: Black 2, all 267 pass (1,399 s);
+    White 2, 261 of 263 pass and the two that need its starter save skip (1,744 s). The tests left `~/Library` alone
+    (`HOME` a scratch directory).
+  - T5, the sanitized build (ASan and UBSan, every report fatal, the game's heaps poisoned): Black 2 under Apple clang,
+    all 268 pass (the plain build's 267 and `os_all_fake_stacks`; 2,463 s), its 24 routes among them, the oracle's
+    comparisons included; White 2, 262 of 264 pass and `oracle_continue_starter` and `oracle_launch_party_menus` skip,
+    as in the plain build (2,771 s), 18 of its 20 routes among them (the two that skip are routes); Black 2 under
+    upstream clang 23 with LeakSanitizer (`ASAN_OPTIONS=detect_leaks=1`), which adds the function check: the 244 tests
+    that aren't routes pass (514 s), and so do its 24 routes, with no leak at the exit of any run that ended normally
+    (1,938 s); the runs that end on a trap stub (`oracle_continue`, `oracle_continue_starter`, and `oracle_port_save`'s
+    when it stops on one) leave through `_Exit`, which has no leak check. The start menu's route with LeakSanitizer
+    ends in 67 s (it hung for 36 minutes in the survey). A survey build ran Black 2's 18 routes twice: the first round found
+    the game's three memory bugs below, the second, after their fixes, no report.
+  - The asm oracle passes in the sanitized build too (it left the sanitizers' options out of its libraries).
+  - CI's new `sanitize` job: written, not run (not pushed). T7 not yet.
+- **Tiers:** not measured: no new C.
+- **Trap stubs:** 512 function stubs and 46 data placeholders in each version (`gen_stubs`, the plain builds); the
+  sanitized builds have 511, their `lib/twl/src/nwm/nwm.c` no longer referencing `func_02769520`.
+- **64-bit warnings:** not measured by kind; White 2's plain build compiled every file with 263 warnings of every kind,
+  as the last entries, and the three changed game files compile with none.
+- **Work done:** Frigate is sanitizer-clean on every route the tests run, in both versions, from the sanitizer survey
+  of this day (four UBSan reports, R1 to R4, and seven gaps, G1 to G7; [sanitizers.md](sanitizers.md) has each with
+  what was done), and the sanitized build is repeatable
+  ([ADR 0014](adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md)).
+  - **`PORT_SANITIZE`** builds every target but SDL3 under `-fsanitize=address,undefined -fno-sanitize-recover=all`
+    with an ignorelist, and `PORT_SANITIZE_RECOVER` lets a survey run go on. The tests carry labels by what they need,
+    `route` and `oracle`, so `ctest -L route -LE oracle` runs the routes that need no oracle. CI's `sanitize` job builds
+    the sanitized Black 2 on macOS and Linux and runs every test that isn't a route, then the routes that need no
+    oracle, which skip without the ROM. `os.cmake`'s header no longer gives a recipe that left alignment fatal.
+  - **R1, R2** (NitroSystem's 2-aligned reads of an animation's cell index through a 4-aligned type) and **R3** (the
+    save data's calls to 56 typed initializers through `void (*)(void *)`): right on every host, left out by
+    `port/cmake/sanitizer_ignorelist.txt`, by check and function, each with its reason. **R4** (`OS_SetIrqFunction`'s
+    cast of a DMA or timer handler to a callback, in Frigate's own OS core): fixed in `os_interrupt.c` and `os_tick.c`.
+  - **G1:** UBSan's reports print ASan's stack, which follows the fibers (`port/hal/os/sanitizers.c`). **G2:** Apple
+    clang emits no function check for C and has no LeakSanitizer: upstream clang locally and CI's Linux job. **G3:** the
+    trap's placeholders become readable at exit, so LeakSanitizer's check ends. **G4:** a suspended fiber's root region
+    is its live frames only. **G5:** a fiber destroyed while suspended has its fake stack freed. **G6:** the game's
+    expanded and frame heaps are poisoned block by block (`fnd_hooks.c`, FND built without ASan). **G7** (UBSan reports
+    a place once) can't be changed and doesn't matter once a report is fatal.
+  - **What G6 found**, three memory bugs of the game that the DS's heap tolerates, fixed under `PLATFORM_PC` with rows
+    in game-changes.md and decomp-findings.md: the copyright screen's load of 0x8000 bytes from a smaller file (H1),
+    the main font's cell a row and a byte too short for its glyph copy (H2), and a write after free when a print
+    stream's task ends (H3).
+  - The documents: [sanitizers.md](sanitizers.md) (running it, reading a report, what Frigate tells the sanitizers,
+    what is left out and why, what it can't see, what it found), the guides (the README, `cmake/`, `tests/`, `hal/`),
+    the feature map's row for the sanitized build, GLOSSARY.md, MODDING.md, PLAN.md §4.5 and §6, and lessons.md.
+- **Next:** as in the last entry: White 2's starter route, so that `party_menus` and `continue_starter` run in White 2;
+  the apps no route reaches yet; a save with an adventure made by the port, once overlay 36 lets it into the field. For
+  T5: the sanitize job's first CI run, Linux's LeakSanitizer and function check included; the `OS_Alloc` heaps under
+  ASan as FND's are; a nightly run of the sanitized routes.
+- **Blockers:** as in the last entry: overlay 36 (issue #83, another contributor's active claim) gates phase 3, the
+  overworld, and the launcher's retirement (ADR 0012); `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, no C yet)
+  stops the Pokédex; overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the macOS and White 2 merge after review: each VRAM view checked against the host's page again
 
 - **Upstream:** `81eea95ee` (merge of PR #387), as merged into the port's `main` by `4d0ce54b7`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` after `84b7d7f96` (the last entry): `6ce5ab330` (the review's
+- **Port:** `c4c273e33`, on the branch `port-integrate` after `84b7d7f96` (the last entry): `6ce5ab330` (the review's
   fixes), then this entry; pushed to `port-macos-dist` on origin for CI, not to `main`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `6ce5ab330`. No
   file outside `port/` changed.

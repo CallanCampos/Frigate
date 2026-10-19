@@ -48,6 +48,10 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
   `--input FILE` plays a replay, and `--launch APPS` opens the field menu's apps for the tests
   ([the test launcher](#the-test-launcher)).
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
+- **The sanitized build**, `cmake -S port -B build/port-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  -DPORT_SANITIZE=ON`, runs the game and every test under AddressSanitizer and UndefinedBehaviorSanitizer, the game's
+  own heaps included, and stops at the first report; `ctest -L route` runs its routes. How to read a report, and the
+  few checks it leaves out and why, are in [docs/sanitizers.md](docs/sanitizers.md).
 - **The ROM build stays as upstream's:** `python3 configure.py && ninja` rebuilds both ROMs from your dumps and checks
   both SHA1s. Every change to this repository ends with it, since Frigate's changes must leave the ROMs byte for byte
   ([CLAUDE.md](CLAUDE.md#how-the-root-rules-apply-here)).
@@ -148,8 +152,9 @@ asm oracle, each spike, the artwork) lists its files there.
 [PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
-(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests, and the macOS distribution
-build); any other change outside `port/` is a game change listed in [docs/game-changes.md](docs/game-changes.md).
+(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized, and the
+macOS distribution build); any other change outside `port/` is a game change listed in
+[docs/game-changes.md](docs/game-changes.md).
 
 ## Where to go next
 

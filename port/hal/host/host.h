@@ -62,6 +62,11 @@ void port_host_unmap_file_copy(void *view, size_t size);
 // what
 int port_host_protect_none(void *start, size_t size, const char *what);
 
+// Makes whole pages readable, and only readable, again: the trap placeholders' pages at exit in the sanitized build,
+// so that LeakSanitizer's scan of the program's data can read them (port/hal/trap.c). A fault there afterwards is
+// reported as any other is. 0 when done, -1 with the system's reason printed after what
+int port_host_protect_read(void *start, size_t size, const char *what);
+
 // Makes the guard under a fiber's stack fault on any access (port/hal/os/fiber.c). On Windows the top of the guard,
 // next to the stack, is a guard page, whose first touch raises a fault, over pages left writable for the exception
 // frame that the system writes on the overflowing stack: a fault in pages with no access at all, below the stack

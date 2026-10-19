@@ -47,6 +47,7 @@ add_test(NAME integrate_launch_never_asked
             --expect "--launch: the game never asked for the field, so no app was opened"
             -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 300 --watchdog 30 --launch bag)
 set_tests_properties(integrate_launch_never_asked PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 300)
+port_test_labels(integrate_launch_never_asked route)
 
 # The boot to the logos: 120 frames, where the Nintendo and The Pokémon Company screen shows, and a screenshot of it.
 # Off by default, since the replay tests (port/cmake/app.cmake) and the oracle's opening sequence
@@ -59,4 +60,5 @@ if(PORT_TEST_BOOT_LOGOS)
                 --screenshot "${CMAKE_CURRENT_BINARY_DIR}/boot_logos_120.png")
     set_tests_properties(integrate_boot_logos PROPERTIES TIMEOUT 120 SKIP_RETURN_CODE 66
         PASS_REGULAR_EXPRESSION "wrote the screens after frame 120" FAIL_REGULAR_EXPRESSION "has no C yet|watchdog")
+    port_test_labels(integrate_boot_logos route)
 endif()

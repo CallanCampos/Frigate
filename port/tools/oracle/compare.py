@@ -13,7 +13,8 @@ shows the same pictures at the palettes' depth, whatever the timing).
 
     compare.py screens ORACLE PORT [--offset N | --align counter|first-change|image|sequence] [--clock LIST]
                        [--lag FRAME=N,...] [--frames LIST] [--known-oracle LIST] [--report DIR] [--depth 6|5]
-                       [--tolerance FRACTION] [--pixel-tolerance STEPS] [--brief]
+                       [--tolerance FRACTION] [--pixel-tolerance STEPS] [--close LIST [--close-tolerance FRACTION]]
+                       [--brief]
     compare.py memory ORACLE PORT [--offset N | --align ...] [--clock LIST] [--lag FRAME=N,...] [--frames LIST]
                       [--labels A,B,...]
     compare.py align ORACLE PORT
@@ -22,12 +23,14 @@ shows the same pictures at the palettes' depth, whatever the timing).
 Each screen compares on its own, at the DS's colour depth (6 bits a channel, value >> 2), or with --depth 5 at its
 palettes' (value >> 3), which leaves out differences in the output's low bit. A screen that shows 3D in the oracle's
 frame (frames.tsv's top_3d and bottom_3d) passes when few of its pixels differ by more than a few steps after allowing
-each pixel a one-pixel shift (rasterizers differ at polygon edges); a screen without 3D must be exact. Without a
-picture on one side, frames.tsv's hashes decide a screen without 3D at 6 bits; any other screen is not compared.
-With counter or sequence, every oracle frame between the frames that two consecutive port frames pair with must show
-the screens of one of the two, or be one --known-oracle lists: a picture the port never shows fails.
---report writes, for each frame that isn't exact, an image of the oracle's screens, the port's and the differences
-side by side; --brief lists, and draws, only the frames that don't match.
+each pixel a one-pixel shift (rasterizers differ at polygon edges); a screen without 3D must be exact. On the port
+frames --close lists, a screen with 3D must also have few pixels that differ at all (--close-tolerance), so that a 2D
+layer that differs by a step or two everywhere, as in a fade from black, can't pass as 3D. Without a picture on one
+side, frames.tsv's hashes decide a screen without 3D at 6 bits; any other screen is not compared. With counter or
+sequence, every oracle frame between the frames that two consecutive port frames pair with must show the screens of
+one of the two, or be one --known-oracle lists: a picture the port never shows fails. --report writes, for each frame
+that isn't exact, an image of the oracle's screens, the port's and the differences side by side; --brief lists, and
+draws, only the frames that don't match.
 
 Exit statuses: 0 when every pair matches, 1 when something differs or couldn't be compared, 2 for bad arguments or
 runs it can't read. Standard library only.
@@ -54,6 +57,8 @@ FRAME_FILE = "frame_{:06d}.png"
 # from every pixel around the same place in the other picture
 DEFAULT_TOLERANCE = 0.005
 DEFAULT_PIXEL_TOLERANCE = 2
+# On a frame held close (--close), a screen with 3D passes only when at most this fraction of its pixels differ at all
+DEFAULT_CLOSE_TOLERANCE = 0.01
 
 
 class RunError(Exception):
@@ -802,6 +807,8 @@ def command_screens(args) -> int:
         unshown = unshown_frames(oracle, pairing.mapping, (compared[0], compared[-1]), pairing.breaks, known)
     if args.report:
         os.makedirs(args.report, exist_ok=True)
+    close = set(parse_frames(args.close)) if args.close else set()
+    close_limit = int(args.close_tolerance * SCREEN_PIXELS)
     screen_bytes = SCREEN_PIXELS * 3
     results = []
     for port_frame, oracle_frame in pairs:
@@ -837,7 +844,13 @@ def command_screens(args) -> int:
             differing, beyond = compare_screen(oracle_screen, port_screen, args.pixel_tolerance, args.depth)
             # The tolerance is a fraction of this screen's pixels, and only a screen with 3D has one
             passed = three_d[screen] and len(beyond) <= args.tolerance * SCREEN_PIXELS
-            checks.append(ScreenCheck(three_d[screen], "pass" if passed else "fail", len(differing), len(beyond)))
+            reason = ""
+            if passed and port_frame in close and len(differing) > close_limit:
+                passed = False
+                reason = (f"{len(differing)} pixels differ, {len(beyond)} beyond tolerance: more than the "
+                          f"{close_limit} a frame held close may")
+            checks.append(ScreenCheck(three_d[screen], "pass" if passed else "fail", len(differing), len(beyond),
+                                      reason))
             all_differing += [index + screen * SCREEN_PIXELS for index in differing]
             all_beyond += [index + screen * SCREEN_PIXELS for index in beyond]
         results.append(ScreenResult(port_frame, oracle_frame, three_d, checks, note))
@@ -997,6 +1010,10 @@ def main(argv: list[str] | None = None) -> int:
                          help="screens with 3D: the steps a pixel may differ by")
     screens.add_argument("--depth", type=int, choices=[5, 6], default=6,
                          help="bits a channel to compare: 6, the DS's output (default), or 5, its palettes' colours")
+    screens.add_argument("--close", help="port frames whose screens with 3D must also have few pixels that differ at "
+                         "all (a frame list): where a 2D layer that the 3D's tolerance would forgive shows")
+    screens.add_argument("--close-tolerance", type=float, default=DEFAULT_CLOSE_TOLERANCE,
+                         help="--close: the fraction of a screen's pixels that may differ at all")
     screens.add_argument("--known-oracle", help="oracle frames known to have no counterpart on the port (a frame "
                          "the DS tore), which the check for pictures no port frame shows leaves out")
     memory = commands.add_parser("memory", help="compare the memory dumps by label")

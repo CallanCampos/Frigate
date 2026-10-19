@@ -19,8 +19,32 @@
 // for a negative alignment), and an expanded heap's blocks are a multiple of 8 long, which keeps the block heads FND
 // writes between them aligned as well. GFL's own head before each allocation is 32 bytes on a host for the same reason
 // (include/gfl/heapsys.h).
+//
+// In the sanitized build (PORT_SANITIZE, port/docs/sanitizers.md), the wrappers also tell AddressSanitizer what is
+// allocated in the expanded and frame heaps, which hold nearly all of the game's memory: the GFL heaps and everything
+// in them, and the sound heap. A heap's memory is poisoned when it is created, a block is made addressable when it is
+// allocated, for the bytes the DS would give it (the size asked for, rounded up to 4), and poisoned again when it is
+// freed, and a destroyed heap's memory goes back to its owner. So an access past a block's end, into FND's block heads
+// or free memory, or to a block after it was freed, is an ASan report naming the game's code. FND itself
+// (lib/nnsys/src/fnd's heaps) is compiled without ASan, as a C library's malloc is, so that it can write its own heads
+// and free lists (port/cmake/nnsys.cmake defines PORT_POISON_HEAPS here then). Unit heaps, which the game doesn't
+// create, are left alone. Where the game reads past a block as the DS does, and uses what it read (the copyright
+// screen's characters, src/gfl/arc_util.c), port_heap_ds_read_begin and port_heap_ds_read_end, at the end of this file
+// (declared in port/include/port_host.h), let that one read reach what follows the block, then poison again what was
+// poisoned there.
 #include "hal/nnsys/reloc.h"
 #include "nnsys/fnd.h"
+
+#ifdef PORT_POISON_HEAPS
+#include <sanitizer/asan_interface.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define POISON(start, size) ASAN_POISON_MEMORY_REGION(start, size)
+#define UNPOISON(start, size) ASAN_UNPOISON_MEMORY_REGION(start, size)
+#else
+#define POISON(start, size) ((void)(start), (void)(size))
+#define UNPOISON(start, size) ((void)(start), (void)(size))
+#endif
 
 #define HOST_HEAP_ALIGN 8
 
@@ -52,6 +76,40 @@ static void ReleaseBetween(const void *from, const void *to) {
     }
 }
 
+// [from, to) given back to its heap: its trees are released, and ASan sees it freed
+static void FreeBetween(const void *from, const void *to) {
+    ReleaseBetween(from, to);
+    if ((const u8 *)from < (const u8 *)to) {
+        POISON(from, (size_t)((const u8 *)to - (const u8 *)from));
+    }
+}
+
+// What the DS gives a block of size bytes: FND rounds every size up to 4, and 0 to 4
+static u32 DsBlockSize(u32 size) {
+    return ((size == 0 ? 1 : size) + 3) & ~3u;
+}
+
+// A new heap's memory, from the end of its heads, is free until something is allocated from it
+static NNSFndHeapHandle PoisonNewHeap(NNSFndHeapHandle heap) {
+    if (heap != NULL) {
+        POISON(heap->heapStart, (size_t)((u8 *)heap->heapEnd - (u8 *)heap->heapStart));
+    }
+    return heap;
+}
+
+// A block allocated from a heap: the DS's size of it is addressable, and the host's rounding after it is not
+static void *UnpoisonBlock(void *block, u32 size) {
+    if (block != NULL) {
+        UNPOISON(block, DsBlockSize(size));
+    }
+    return block;
+}
+
+// A destroyed heap's memory, heads included, is its owner's again: a block of another heap or the arena it came from
+static void UnpoisonDestroyedHeap(void *heap, void *end) {
+    UNPOISON(heap, (size_t)((u8 *)end - (u8 *)heap));
+}
+
 static int HostAlignment(int alignment) {
     if (alignment < 0) {
         return alignment > -HOST_HEAP_ALIGN ? -HOST_HEAP_ALIGN : alignment;
@@ -75,37 +133,45 @@ static void *HostHeapStart(void *startAddress, u32 *size) {
 
 NNSFndHeapHandle NNS_FndCreateExpHeapEx(void *startAddress, u32 size, u16 optFlag) {
     startAddress = HostHeapStart(startAddress, &size);
-    return port_sdk_NNS_FndCreateExpHeapEx(startAddress, size, optFlag);
+    return PoisonNewHeap(port_sdk_NNS_FndCreateExpHeapEx(startAddress, size, optFlag));
 }
 
 void *NNS_FndAllocFromExpHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
-    return port_sdk_NNS_FndAllocFromExpHeapEx(heap, HostBlockSize(size), HostAlignment(alignment));
+    return UnpoisonBlock(port_sdk_NNS_FndAllocFromExpHeapEx(heap, HostBlockSize(size), HostAlignment(alignment)), size);
 }
 
 NNSFndHeapHandle NNS_FndCreateFrmHeapEx(void *startAddress, u32 size, u16 optFlag) {
     startAddress = HostHeapStart(startAddress, &size);
-    return port_sdk_NNS_FndCreateFrmHeapEx(startAddress, size, optFlag);
+    return PoisonNewHeap(port_sdk_NNS_FndCreateFrmHeapEx(startAddress, size, optFlag));
 }
 
 void *NNS_FndAllocFromFrmHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
-    return port_sdk_NNS_FndAllocFromFrmHeapEx(heap, size, HostAlignment(alignment));
+    return UnpoisonBlock(port_sdk_NNS_FndAllocFromFrmHeapEx(heap, size, HostAlignment(alignment)), size);
 }
 
-// Destroying a heap frees all of it: from its common head, where its memory starts, to its end
+// Destroying a heap frees all of it: from its common head, where its memory starts, to its end. Its trees are
+// released, and the memory is its owner's again
 void NNS_FndDestroyExpHeap(NNSFndHeapHandle heap) {
     void *end = heap->heapEnd;
 
     port_sdk_NNS_FndDestroyExpHeap(heap);
     ReleaseBetween(heap, end);
+    UnpoisonDestroyedHeap(heap, end);
 }
 
 u32 NNS_FndResizeForMBlockExpHeap(NNSFndHeapHandle heap, void *memBlock, u32 size) {
     u32 oldSize = NNS_FndGetSizeForMBlockExpHeap(memBlock);
     u32 newSize = port_sdk_NNS_FndResizeForMBlockExpHeap(heap, memBlock, HostBlockSize(size));
 
-    // 0 when it couldn't grow; a block that grows frees nothing
+    // 0 when it couldn't grow; a block that grows frees nothing. Both sizes are the host's, a multiple of 8, and FND
+    // keeps the old one when it refuses a shrink too small to leave a free block, so they say nothing of the DS's: a
+    // resized block always has the DS's size of the new one addressable, and nothing after it
     if (newSize != 0 && newSize < oldSize) {
-        ReleaseBetween((u8 *)memBlock + newSize, (u8 *)memBlock + oldSize);
+        FreeBetween((u8 *)memBlock + newSize, (u8 *)memBlock + oldSize);
+    }
+    if (newSize != 0) {
+        POISON(memBlock, newSize > oldSize ? newSize : oldSize);
+        UnpoisonBlock(memBlock, size);
     }
     return newSize;
 }
@@ -114,7 +180,7 @@ void NNS_FndFreeToExpHeap(NNSFndHeapHandle heap, void *memBlock) {
     u32 size = NNS_FndGetSizeForMBlockExpHeap(memBlock);
 
     port_sdk_NNS_FndFreeToExpHeap(heap, memBlock);
-    ReleaseBetween(memBlock, (u8 *)memBlock + size);
+    FreeBetween(memBlock, (u8 *)memBlock + size);
 }
 
 void NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap) {
@@ -122,13 +188,14 @@ void NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap) {
 
     port_sdk_NNS_FndDestroyFrmHeap(heap);
     ReleaseBetween(heap, end);
+    UnpoisonDestroyedHeap(heap, end);
 }
 
 // What a frame heap frees is what it held before and no longer holds: the bottom shrinks to a lower low, the top to a
 // higher high
 static void ReleaseFrameHeapChange(void *lowBefore, void *highBefore, NNSiFndFrameHeap *frmHeap) {
-    ReleaseBetween(frmHeap->low, lowBefore);
-    ReleaseBetween(highBefore, frmHeap->high);
+    FreeBetween(frmHeap->low, lowBefore);
+    FreeBetween(highBefore, frmHeap->high);
 }
 
 void NNS_FndFreeToFrmHeap(NNSFndHeapHandle heap, int mode) {
@@ -155,4 +222,75 @@ void NNS_FndUnitHeapFree(NNSFndHeapHandle heap, void *memBlock) {
 
     port_sdk_NNS_FndUnitHeapFree(heap, memBlock);
     ReleaseBetween(memBlock, (u8 *)memBlock + unitSize);
+}
+
+#ifdef PORT_POISON_HEAPS
+// ASan's shadow granule: one shadow byte says how many of these 8 bytes are addressable, from the first
+#define ASAN_GRANULE 8
+
+// The read the DS makes past a block that is under way: the span it may reach, widened to whole granules, and which of
+// the span's bytes were poisoned when it began
+static struct {
+    u8 *start;
+    size_t size;
+    u8 *poisoned;
+} sDsRead;
+#endif
+
+void port_heap_ds_read_begin(const void *start, unsigned int size) {
+#ifdef PORT_POISON_HEAPS
+    uptr from = (uptr)start & ~(uptr)(ASAN_GRANULE - 1);
+    uptr to = ((uptr)start + size + ASAN_GRANULE - 1) & ~(uptr)(ASAN_GRANULE - 1);
+    size_t i;
+
+    if (sDsRead.poisoned != NULL) {
+        fprintf(stderr, "port: fnd_hooks: a read past a heap block began while another was under way\n");
+        abort();
+    }
+    if (size == 0) {
+        return;
+    }
+    sDsRead.start = (u8 *)from;
+    sDsRead.size = (size_t)(to - from);
+    sDsRead.poisoned = malloc(sDsRead.size);
+    if (sDsRead.poisoned == NULL) {
+        fprintf(stderr, "port: fnd_hooks: out of memory for a read past a heap block\n");
+        abort();
+    }
+    for (i = 0; i < sDsRead.size; i++) {
+        sDsRead.poisoned[i] = (u8)__asan_address_is_poisoned(sDsRead.start + i);
+    }
+    UNPOISON(sDsRead.start, sDsRead.size);
+#else
+    (void)start;
+    (void)size;
+#endif
+}
+
+// A granule's poisoned bytes are always its last ones (its shadow byte counts the addressable ones from the first), so
+// each run of bytes that were poisoned starts within a granule and ends on a granule's end: poisoning the runs again,
+// in address order, gives the shadow back as it was before the read
+void port_heap_ds_read_end(void) {
+#ifdef PORT_POISON_HEAPS
+    size_t i = 0;
+
+    if (sDsRead.poisoned == NULL) {
+        return;
+    }
+    while (i < sDsRead.size) {
+        size_t first = i;
+
+        if (!sDsRead.poisoned[i]) {
+            i++;
+            continue;
+        }
+        while (i < sDsRead.size && sDsRead.poisoned[i]) {
+            i++;
+        }
+        POISON(sDsRead.start + first, i - first);
+    }
+    free(sDsRead.poisoned);
+    sDsRead.poisoned = NULL;
+    sDsRead.size = 0;
+#endif
 }

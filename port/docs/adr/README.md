@@ -20,8 +20,8 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
 - Files are `NNNN-short-title.md`: four digits, then the title in lowercase words joined by hyphens.
 - Numbers are given in the order ADRs are written, starting at 0001, and never reused. The decisions below that are
   waiting for an ADR take the next free number when someone writes them.
-- 0014 is kept for the sanitized build's ADR, written on the branch `port-sanitizers` as 0013 before the Windows build's
-  took that number; it becomes 0014 when the branch merges, so the next free number is 0016.
+- 0014, the sanitized build's ADR, was written on the branch `port-sanitizers` as 0013 before the Windows build's took
+  that number, and became 0014 when the branch merged; the next free number is 0016.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, or to "accepted; amended by NNNN" when a later ADR changes part of it. Typos and broken links may be fixed.
 - Each ADR gets a row in the index below in the same commit.
@@ -71,7 +71,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0011](0011-cartridge-infrared-chip-as-a-register-model.md) | The cartridge's infrared chip as a register model | §4.5, D3 | accepted |
 | [0012](0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed | §7 phase 4, §6 | accepted |
 | [0013](0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind port/hal/host | D4, §4.4, §7 phase 5 | accepted |
-| 0014 | Kept for the sanitized build's ADR, 0013 on the branch `port-sanitizers` until it merges | §4.5, §6, §7 phase 5 | reserved |
+| [0014](0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted | §4.5, §6, §7 phase 5 | accepted |
 | [0015](0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically | D11, §7 | accepted |
 
 ## Decisions waiting for an ADR

@@ -32,7 +32,8 @@ _Noreturn void port_trap_function(const PortTrapSymbol *symbol, void *caller);
 int port_trap_is_placeholder(const void *address);
 
 // Makes the data placeholders inaccessible, so that the first access to DS data with no C yet is reported by name
-// instead of reading zeros. Called once at startup, before the game runs
+// instead of reading zeros. Called once at startup, before the game runs. Under AddressSanitizer they become readable
+// again at exit, before LeakSanitizer scans the program's data (trap.c)
 void port_trap_protect_data(void);
 
 // The tables gen_stubs.py writes: every data placeholder, in the DS's address order, and the paddings defined around

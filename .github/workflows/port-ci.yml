@@ -4,13 +4,14 @@ name: Frigate CI
 # skipping. The ROM build needs the base ROMs, which CI doesn't have; upstream's compile.yml compiles every C file with
 # MWCC instead, and every port session's sync builds both ROMs locally (port/docs/SYNC.md).
 #
-# Three jobs: the development build on macOS and Linux (host), as port/README.md's quick start makes it; the same on
+# Four jobs: the development build on macOS and Linux (host), as port/README.md's quick start makes it; the same on
 # Windows (host-windows), with MSYS2's CLANG64 toolchain (clang, lld and the UCRT;
-# port/docs/adr/0013-windows-build-with-msys2-clang64.md); and the macOS distribution build (macos-distribution,
+# port/docs/adr/0013-windows-build-with-msys2-clang64.md); the macOS distribution build (macos-distribution,
 # port/docs/adr/0015-universal-macos-app-for-macos-11.md), one universal app, arm64 and x86_64, for macOS 11.0 and later,
 # made and tested on Apple Silicon and on Intel, with macOS 26 and with macOS 15, the oldest runners that aren't
-# deprecated. Each job builds its own copy and uploads nothing: the port's compiled game code is never uploaded
-# (port/CLAUDE.md).
+# deprecated; and the sanitized build on macOS and Linux (sanitize, port/docs/sanitizers.md,
+# port/docs/adr/0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md). Each job builds its own copy and
+# uploads nothing: the port's compiled game code is never uploaded (port/CLAUDE.md).
 on:
   push:
     branches: [main]
@@ -216,3 +217,56 @@ jobs:
           every=
           if [ "${{ runner.arch }}" = ARM64 ]; then every=--run-every-slice; fi
           port/app/macos/check_app.sh "build/port-dist/Frigate Black 2.app" --archs "arm64 x86_64" --minimum 11.0 $every
+
+  # Frigate's sanitized build (port/docs/sanitizers.md): Black 2 under AddressSanitizer and UndefinedBehaviorSanitizer,
+  # every report fatal (the program aborts on every host, and a report in a test's output fails the test), with its
+  # tests run under them: the OS core's scenarios on the fibers, the host seam's and the platform layer's scenarios on
+  # the whole program's objects, the units. CI has no ROM, so of the routes that need no oracle (ctest -L route -LE oracle) only the smoke
+  # test runs, as far as the program's look for the ROM, with the replays' fixtures; the replays and the port's checks
+  # of the oracle's hashes skip, as in the host job, and the routes themselves run only where the ROM is. Linux adds
+  # what Apple clang lacks: UndefinedBehaviorSanitizer's function check for C, and LeakSanitizer at every program's
+  # exit, the smoke test's included, which is CI's one run of the program into the game's main()
+  sanitize:
+    name: Sanitized build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-26.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja sdl3
+
+      - name: Install build tools (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+            libxi-dev libxss-dev libxtst-dev libxkbcommon-dev libwayland-dev wayland-protocols libegl-dev libgl-dev \
+            libdrm-dev libgbm-dev libasound2-dev libpulse-dev libudev-dev libdbus-1-dev
+
+      - name: Configure
+        env:
+          CC: clang
+        run: cmake -S port -B build/port-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_SANITIZE=ON
+
+      - name: Build
+        run: cmake --build build/port-san
+
+      - name: Test, but the routes
+        run: ctest --test-dir build/port-san -LE route --output-on-failure
+
+      # The routes that need no oracle (those that need it are left out, since CI doesn't build it). Without the ROM
+      # only the smoke test runs, and the replays' fixtures, which empty their save directories; the rest skip
+      - name: The smoke test, the one route that runs without the ROM
+        run: ctest --test-dir build/port-san -L route -LE oracle --output-on-failure

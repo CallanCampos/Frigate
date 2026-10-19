@@ -8,14 +8,16 @@
 // context, is what it would then overwrite; so the guard is large, and the build adds stack probes where the compiler
 // doesn't by default (port/cmake/os.cmake). The PortFiber itself lives in the C heap, out of the stack's way. This
 // file also tells AddressSanitizer about every switch, since minicoro's own annotations miss the switches back to the
-// host stack (mco_impl.c, which is built without ASan), and tells LeakSanitizer to scan the stacks of suspended fibers
-// for pointers. The pages and their protection are the host's (port/hal/host): on Windows the top of the guard is a
-// guard page over pages left writable for the system's exception frame, so that an overflow is still reported there.
-// A fiber's first frame is the last a backtrace walks, so that the report of a trap or crash on a fiber has one.
+// host stack (mco_impl.c, which is built without ASan), frees the fake stack of a fiber destroyed while suspended,
+// and tells LeakSanitizer to scan the live frames and saved registers of suspended fibers for pointers. The pages and
+// their protection are the host's (port/hal/host): on Windows the top of the guard is a guard page over pages left
+// writable for the system's exception frame, so that an overflow is still reported there. A fiber's first frame is
+// the last a backtrace walks, so that the report of a trap or crash on a fiber has one.
 #include "hal/os/fiber.h"
 #include "hal/host/host.h"
 
 #define MCO_NO_MULTITHREAD
+#include "hal/os/mco_impl.h"
 #include "minicoro.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -61,7 +63,8 @@ struct PortFiber {
     PortFiberFunc func;
     void *arg;
     int painted;
-    void *asanFakeStack; // ASan's fake stack of the fiber while it is switched out
+    void *asanFakeStack;      // ASan's fake stack of the fiber while it is switched out
+    unsigned char *lsanStack; // the start of the stack's root region while the fiber is suspended, or NULL
 };
 
 static int sPaint;
@@ -105,6 +108,60 @@ static void ProtectGuard(unsigned char *p, size_t size) {
         abort();
     }
 }
+
+#ifdef PORT_LSAN
+// The bytes under the stack pointer that a function may still use without moving it, the red zone of the arm64 and
+// x86-64 System V ABIs
+#define RED_ZONE_BYTES 128
+
+// LeakSanitizer scans the stack and registers of each thread, not of fibers: an allocation that only a suspended
+// fiber holds (any SDK thread's, at exit) would be reported as leaked. So a suspended fiber's live frames, from where
+// its stack pointer stopped to the top, are a root region, from its suspension to its next resume. The dead frames
+// under them are left out, so that a pointer they still hold doesn't hide a leak; without the saved stack pointer the
+// whole stack is the region. Its callee-saved registers are in minicoro's context, in the header's pages, which are a
+// root region for the fiber's life (port_fiber_create)
+static void ScanStackForLeaks(PortFiber *fiber) {
+    unsigned char *top = fiber->stackLow + fiber->stackSize;
+    unsigned char *sp = port_mco_saved_stack_pointer(fiber->co);
+    unsigned char *low = fiber->stackLow;
+
+    if (sp != NULL && sp > fiber->stackLow + RED_ZONE_BYTES && sp <= top) {
+        low = sp - RED_ZONE_BYTES;
+    }
+    fiber->lsanStack = low;
+    __lsan_register_root_region(low, (size_t)(top - low));
+}
+
+static void StopScanningStack(PortFiber *fiber) {
+    if (fiber->lsanStack != NULL) {
+        __lsan_unregister_root_region(fiber->lsanStack,
+                                      (size_t)(fiber->stackLow + fiber->stackSize - fiber->lsanStack));
+        fiber->lsanStack = NULL;
+    }
+}
+#endif
+
+#ifdef PORT_ASAN
+// A fiber destroyed while suspended still has the fake stack that ASan gave it (with detect_stack_use_after_return),
+// which only the fiber's last departure frees (FiberMain). The interface frees the fake stack that is current when a
+// switch starts with nowhere to save it, so the fiber's becomes current for a moment, through a switch from this
+// stack to this stack, which is then finished with this stack's own fake stack back. Nothing instrumented runs in
+// between, and this function's own locals are on the real stack
+#if defined(__clang__) || defined(__GNUC__)
+__attribute__((no_sanitize("address")))
+#endif
+static void FreeFakeStack(void *fakeStack) {
+    PortFiber *self = port_fiber_current();
+    const void *bottom = self != NULL ? (const void *)self->stackLow : sHostBottom;
+    size_t size = self != NULL ? self->stackSize : sHostSize;
+    void *own = NULL;
+
+    __sanitizer_start_switch_fiber(&own, bottom, size);
+    __sanitizer_finish_switch_fiber(fakeStack, NULL, NULL);
+    __sanitizer_start_switch_fiber(NULL, bottom, size);
+    __sanitizer_finish_switch_fiber(own, NULL, NULL);
+}
+#endif
 
 // ASan's protocol for each switch: __sanitizer_start_switch_fiber on the old stack, naming the new one, and
 // __sanitizer_finish_switch_fiber on the new stack as soon as it runs. A fiber's first arrival has no fake stack to
@@ -175,24 +232,33 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
         *dummyReturn = 0;
     }
 #ifdef PORT_LSAN
-    // LeakSanitizer scans the stacks and registers of threads, not of fibers: an allocation that only a suspended
-    // fiber holds (any SDK thread's, at exit) would be reported as leaked without this. A suspended fiber keeps its
-    // locals in its stack and its callee-saved registers in minicoro's context, in the header's pages; LSan skips the
-    // inaccessible guard between them
-    __lsan_register_root_region(fiber->mapping, fiber->mappingSize);
+    // minicoro's coroutine and context, where a suspended fiber's callee-saved registers are (ScanStackForLeaks)
+    __lsan_register_root_region(fiber->mapping, headerSize);
 #endif
     return fiber;
 }
 
 void port_fiber_destroy(PortFiber *fiber) {
+    int suspended;
+
     if (fiber == NULL) {
         return;
     }
+    suspended = mco_status(fiber->co) == MCO_SUSPENDED;
     if (mco_uninit(fiber->co) != MCO_SUCCESS) {
         Fatal("destroying a running fiber");
     }
 #ifdef PORT_LSAN
-    __lsan_unregister_root_region(fiber->mapping, fiber->mappingSize);
+    StopScanningStack(fiber);
+    __lsan_unregister_root_region(fiber->mapping, (size_t)(fiber->guard - fiber->mapping));
+#endif
+#ifdef PORT_ASAN
+    // A fiber that never ran, or that ran without fake stacks, has none
+    if (suspended && fiber->asanFakeStack != NULL) {
+        FreeFakeStack(fiber->asanFakeStack);
+    }
+#else
+    (void)suspended;
 #endif
 #ifdef PORT_ASAN
     // A fiber that never returned leaves its frames' redzones poisoned in the shadow memory; a later mapping at the
@@ -209,12 +275,20 @@ void port_fiber_resume(PortFiber *fiber) {
     if (mco_running() != NULL) {
         Fatal("a fiber can only be resumed from the host stack");
     }
+#ifdef PORT_LSAN
+    StopScanningStack(fiber);
+#endif
 #ifdef PORT_ASAN
     __sanitizer_start_switch_fiber(&sHostFakeStack, fiber->stackLow, fiber->stackSize);
 #endif
     result = mco_resume(fiber->co);
 #ifdef PORT_ASAN
     __sanitizer_finish_switch_fiber(sHostFakeStack, NULL, NULL);
+#endif
+#ifdef PORT_LSAN
+    if (result == MCO_SUCCESS && mco_status(fiber->co) == MCO_SUSPENDED) {
+        ScanStackForLeaks(fiber);
+    }
 #endif
     if (result != MCO_SUCCESS) {
         fprintf(stderr, "port: fiber: resume: %s\n", mco_result_description(result));

@@ -263,6 +263,35 @@ class ScreenTests(unittest.TestCase):
         runs.frame(runs.port, 4, scattered)
         self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "4"]), 1)
 
+    def test_frames_held_close(self):
+        runs = Runs(self)
+        black = solid(b"\x00\x00\x00")
+        # A band of the 3D screen, 56 of its lines, a step lighter in the port, as a 2D layer can be while the screen
+        # fades in from black: within the pixel tolerance everywhere, so a screen with 3D passes
+        band = bytearray(black)
+        for y in range(192 + 40, 192 + 96):
+            for x in range(W):
+                put(band, x, y, b"\x04\x04\x04")
+        runs.frame(runs.oracle, 1, black, three_d=(False, True))
+        runs.frame(runs.port, 1, band)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port]), 0)
+        # Held close, the frame fails: 14,336 pixels differ, beyond the 1% of the screen a frame held close may
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--close", "1"])
+        self.assertEqual(status, 1, out)
+        self.assertIn("bottom 14336 pixels differ, 0 beyond tolerance: more than the 491 a frame held close may", out)
+        # A frame not on the list keeps the 3D's tolerance
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--close", "2"]), 0)
+        # A few pixels a rasterizer draws differently are within a frame held close
+        edge = bytearray(black)
+        for y in range(192 + 50, 192 + 58):
+            put(edge, 100, y, b"\xc0\xc0\xc0")
+        runs.frame(runs.oracle, 2, black, three_d=(False, True))
+        runs.frame(runs.port, 2, edge)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "2", "--close", "2"]), 0)
+        # And --close-tolerance sets how many
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--frames", "2", "--close", "2",
+                                              "--close-tolerance", "0.0001"]), 1)
+
     def test_hashes_only(self):
         runs = Runs(self)
         picture = solid(b"\x80\x80\x80")
@@ -1414,6 +1443,12 @@ class OracleScriptTests(unittest.TestCase):
                 self.assertTrue(set(oracle.by_frame(table)) <= set(range(1, sequence.port_frames + 1)), name)
             for version, table in sequence.known_oracle.items():
                 self.assertTrue(set(oracle.by_frame(table)) <= set(range(1, sequence.oracle_frames + 1)), name)
+            # The frames held close are port frames that it compares, not ones it leaves out
+            for version, table in sequence.close.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
+                held = set(oracle.by_frame(table))
+                self.assertTrue(held <= set(range(1, sequence.port_frames + 1)), name)
+                self.assertFalse(held & set(oracle.by_frame(sequence.known.get(version, {}))), name)
             if sequence.state_frames:
                 state = set(compare.parse_frames(sequence.state_frames))
                 self.assertTrue(state <= set(range(1, sequence.port_frames + 1)), name)

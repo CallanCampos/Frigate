@@ -19,6 +19,20 @@ saves the oracle makes (`oracle_saves`). The oracle counts game frames with the 
 (`build/<version>/arm9.o.xMAP`), so those tests need `python3 configure.py && ninja` to have run: without it they fail
 at once ("counts game frames, which need --counter") rather than skip. A skipped test says so in ctest's summary.
 
+Three labels pick tests by what they need: `route`, the tests whose program runs the game from power-on on the
+player's ROM (the replays, the oracle's sequences and the port's checks of their hashes, the test launcher's routes,
+`integrate_launch_never_asked`, and the smoke test, which passes without a ROM too, stopping where the program looks
+for one); `oracle`, the tests that need the melonDS oracle or the saves it makes; and `timing`, the renderers' timing
+gates, which exist only with `PORT_G3D_TIMING_GATE` or `PORT_GFX_TIMING_GATE`. So `ctest -L route -LE oracle` runs the
+routes that need no oracle, and `ctest -LE route` the rest; ctest adds the fixtures they need (`oracle_saves`, the
+replays' `*_clean`). A test gets its labels where it is defined, with `port_test_labels(TEST LABEL...)`
+([../CMakeLists.txt](../CMakeLists.txt)): a new test that runs the game from power-on gets `route` in the fragment that
+adds it, and `oracle` too when it needs the oracle or its saves.
+In the sanitized build (`-DPORT_SANITIZE=ON`, [../docs/sanitizers.md](../docs/sanitizers.md)) every test runs under
+AddressSanitizer and UndefinedBehaviorSanitizer, and a report fails it on every host: the program aborts, where the
+runtime's own default off macOS is status 1, which a test that passes on its output or expects a failure would
+accept, and a sanitizer's report in a test's output fails the test too. The routes are that build's T5 runs.
+
 | Directory | What it tests | Game functionality covered | Tests |
 | --- | --- | --- | --- |
 | [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read and the options it describes, the test launcher's option and the kinds of field menu (`test_launcher_spec.c`); the macOS app's scripts, bundle identifier and log, with stand-in programs and projects, and a universal program's two slices running the opening the same (`test_universal_slices.sh`); and `check_exit.py`, which runs the program and checks its exit status, or that it crashed, since ctest's `PASS_REGULAR_EXPRESSION` ignores the status and fails a crash | The controls; the oracle's comparisons; the field menu's items; the app | `app_*`, and the `integrate_launch_*` and launcher tests that run through `check_exit.py` |
