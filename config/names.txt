@@ -11959,6 +11959,10 @@ overlays/ov152 0x021f6200 EncEffCells_Create
 overlays/ov152 0x021f623c EncEffCells_CreateGridEvent
 overlays/ov152 0x021f6264 EncEffCells_Update
 overlays/ov152 0x021f62a4 EncEffCells_UpdateCell
+overlays/ov153 0x021f6200 EncEffColumns_Create
+overlays/ov153 0x021f623c EncEffColumns_CreateGridEvent
+overlays/ov153 0x021f6268 EncEffColumns_Update
+overlays/ov153 0x021f62c4 EncEffColumns_UpdateCell
 overlays/ov155 0x021f5ab8 EventFaceUpStart_Callback
 overlays/ov155 0x021f5b34 FaceUp_LoadGraphics
 overlays/ov155 0x021f5d20 EventFaceUpEnd_Callback
