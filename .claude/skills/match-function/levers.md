@@ -967,6 +967,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
   gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
   32-aligned")
+- A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
+  the bias in the addend, byte arithmetic adds it at run time, and the subtraction survives folding only through a
+  `static inline` whose result indexes an array. (matching.md: "A bias on a data symbol lands in the literal's addend")
 
 ## Function order and presence
 
