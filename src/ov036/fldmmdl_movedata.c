@@ -214,11 +214,11 @@ static const FieldActorMoveCode data_ov036_021cc574 = { 0x3, func_ov036_02191f18
 static const FieldActorMoveCode data_ov036_021cc588 = { 0x3, func_ov036_02191f28, func_ov036_02191f58,
                                                         MoveCodeNone_Delete, MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc59c = { 0, MoveCodeNone_Init, MoveCodeNone_Move,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
+static const FieldActorMoveCode data_ov036_021cc59c = { 0, MoveCodeNone_Init, MoveCodeNone_Move, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
 
-static const FieldActorMoveCode data_ov036_021cc5b0 = { 0x1, MoveCodeNone_Init, MoveCodeNone_Move,
-                                                        MoveCodeNone_Delete, MoveCodeNone_Return };
+static const FieldActorMoveCode data_ov036_021cc5b0 = { 0x1, MoveCodeNone_Init, MoveCodeNone_Move, MoveCodeNone_Delete,
+                                                        MoveCodeNone_Return };
 
 static const FieldActorMoveCode data_ov036_021cc5c4 = { 0x3, func_ov036_02191ef8, func_ov036_02191f58,
                                                         MoveCodeNone_Delete, MoveCodeNone_Return };

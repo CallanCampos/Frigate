@@ -235,7 +235,7 @@ static ClActor *func_ov036_021b5d78(FieldFMissionInfo *info, s16 x, s16 y, u16 s
     setup.bgPriority = 1;
     setup.priority = priority;
     actor = ClActor_Create(info->unit, info->chars, info->palette, info->cellAnims, &setup, CLACT_SURFACE_MAIN,
-                          info->heapId);
+                           info->heapId);
     func_0204c520(actor, FALSE);
     func_0204c5c8(actor, FALSE);
     ClActor_SetVisible(actor, FALSE);

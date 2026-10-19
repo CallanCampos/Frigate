@@ -657,7 +657,8 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
                 menu->result = COMM_ENTRY_MENU_CANCELLED;
                 menu->seq = 14;
             }
-        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) ==
+                   TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
             menu->seq = 19;
             // Stop the players who look for a leader from finding this one
@@ -1902,10 +1903,11 @@ static BOOL CommEntryMenu_SendEntry(const PlayerInfo *info, u8 autoAccept, BOOL 
     OS_GetMacAddress(packet.mac);
     packet.autoAccept = autoAccept;
     if (toAll == TRUE) {
-        return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0,
-                             FALSE, FALSE);
+        return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_ENTRY,
+                                           sizeof(packet), &packet, 0, FALSE, FALSE);
     }
-    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COMM_ENTRY_CMD_ENTRY, sizeof(packet), &packet, 0, FALSE,
+                                       FALSE);
 }
 
 static void CommEntryMenu_RecvAccept(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1914,10 +1916,11 @@ static void CommEntryMenu_RecvAccept(int netId, int size, const void *data, void
 
 static BOOL CommEntryMenu_SendAccept(u8 netId, BOOL toAll, PlayerInfo *info) {
     if (toAll == TRUE) {
-        return GFL_NetSendCommandToMachine(NetHandle_Get(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(),
-                             info, 0, FALSE, FALSE);
+        return GFL_NetSendCommandToMachine(NetHandle_Get(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_ACCEPT,
+                                           PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
     }
-    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, COMM_ENTRY_CMD_ACCEPT, PlayerInfo_GetSize(), info, 0,
+                                       FALSE, FALSE);
 }
 
 static void CommEntryMenu_RecvRefuse(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1926,10 +1929,11 @@ static void CommEntryMenu_RecvRefuse(int netId, int size, const void *data, void
 
 static BOOL CommEntryMenu_SendRefuse(u8 netId, BOOL toAll, PlayerInfo *info) {
     if (toAll == TRUE) {
-        return GFL_NetSendCommandToMachine(NetHandle_Get(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(),
-                             info, 0, FALSE, FALSE);
+        return GFL_NetSendCommandToMachine(NetHandle_Get(GFL_NET_NETID_SERVER), netId, COMM_ENTRY_CMD_REFUSE,
+                                           PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
     }
-    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(), info, 0, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, COMM_ENTRY_CMD_REFUSE, PlayerInfo_GetSize(), info, 0,
+                                       FALSE, FALSE);
 }
 
 static void CommEntryMenu_RecvCheck(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1949,8 +1953,8 @@ static void CommEntryMenu_RecvCheckReply(int netId, int size, const void *data, 
 
 static BOOL CommEntryMenu_SendCheckReply(BOOL toAll) {
     if (toAll == TRUE) {
-        return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_CHECK_REPLY, 0, NULL, 0, FALSE,
-                             FALSE);
+        return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), GFL_NET_NETID_SERVER, COMM_ENTRY_CMD_CHECK_REPLY, 0,
+                                           NULL, 0, FALSE, FALSE);
     }
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COMM_ENTRY_CMD_CHECK_REPLY, 0, NULL, 0, FALSE, FALSE);
 }
@@ -1989,8 +1993,8 @@ static void CommEntryMenu_RecvMemberList(int netId, int size, const void *data, 
 static BOOL CommEntryMenu_SendMemberList(CommEntryMemberList *list, u32 netIds, BOOL toAll) {
     if (toAll == TRUE) {
         return GFL_NetSendCommandToBits(NetHandle_Get(GFL_NET_NETID_SERVER), netIds, COMM_ENTRY_CMD_MEMBER_LIST,
-                             CommEntryMenu_GetMemberListSize(), list, 0, FALSE, TRUE);
+                                        CommEntryMenu_GetMemberListSize(), list, 0, FALSE, TRUE);
     }
-    return GFL_NetSendCommandToBits(NetHandle_GetOwn(), netIds, COMM_ENTRY_CMD_MEMBER_LIST, CommEntryMenu_GetMemberListSize(), list,
-                         0, FALSE, TRUE);
+    return GFL_NetSendCommandToBits(NetHandle_GetOwn(), netIds, COMM_ENTRY_CMD_MEMBER_LIST,
+                                    CommEntryMenu_GetMemberListSize(), list, 0, FALSE, TRUE);
 }

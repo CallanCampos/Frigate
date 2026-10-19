@@ -338,7 +338,7 @@ void func_ov036_0218b524(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u32 wait
         win->wait = wait;
         win->strbuf = strbuf;
         win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
-                                    sys->tcbMgr, 0, sys->setup.heapId, 15);
+                                         sys->tcbMgr, 0, sys->setup.heapId, 15);
         win->state = TALKMSG_WIN_STATE_SHOWN;
     }
 }
@@ -463,7 +463,7 @@ static void func_ov036_0218b70c(TalkMsgWinSys *sys, TalkMsgWin *win) {
             wait = win->wait;
             func_ov036_0218cf38(sys, win);
             win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
-                                        sys->tcbMgr, 0, sys->setup.heapId, 15);
+                                             sys->tcbMgr, 0, sys->setup.heapId, 15);
         }
         break;
     case TALKMSG_WIN_STATE_SHOWN:
@@ -496,7 +496,7 @@ static void func_ov036_0218b7e8(TalkMsgWinSys *sys, TalkMsgWin *win) {
         wait = win->wait;
         func_ov036_0218cf28(sys, win);
         win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
-                                    sys->tcbMgr, 0, sys->setup.heapId, 15);
+                                         sys->tcbMgr, 0, sys->setup.heapId, 15);
         break;
     }
     case TALKMSG_WIN_STATE_CLOSING:

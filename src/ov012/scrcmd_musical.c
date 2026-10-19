@@ -583,7 +583,8 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
         if (commWork->comm != NULL && arg == 0x8e) {
             for (i = 0; i < 4; i++) {
                 info = MusComm_GetPlayerInfo(commWork->comm, i);
-                if (info != NULL && (u32)(PlayerInfo_GetVersion(info) - VERSION_WHITE) <= VERSION_BLACK - VERSION_WHITE) {
+                if (info != NULL &&
+                    (u32)(PlayerInfo_GetVersion(info) - VERSION_WHITE) <= VERSION_BLACK - VERSION_WHITE) {
                     allowed = FALSE;
                 }
             }

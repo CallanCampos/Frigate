@@ -887,8 +887,8 @@ static MsgStream *func_ov036_02188188(FieldMsgBG *sys, StrBuf *strbuf, BmpWin *w
 
     stream->sys = sys;
     stream->wait = wait;
-    stream->stream =
-        PrintStream_CreateWithCallback(window, x, y, strbuf, sys->font, wait, sys->tcbMgr, 0, sys->heapId, a6, func_ov036_021881fc);
+    stream->stream = PrintStream_CreateWithCallback(window, x, y, strbuf, sys->font, wait, sys->tcbMgr, 0, sys->heapId,
+                                                    a6, func_ov036_021881fc);
     func_ov036_0218a738(&stream->sys->input);
     return stream;
 }

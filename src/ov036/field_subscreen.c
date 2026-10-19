@@ -422,7 +422,8 @@ static void FieldSubscreen_NoGear_Init(FieldSubscreen *subscreen, u32 previousSc
     CGearSettings *settings;
 
     GFL_OvlLoad(OVERLAY_NO_GEAR);
-    settings = CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
+    settings =
+        CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
     subscreen->work = NoGear_Create(settings, subscreen, Field_GetGameSystem(subscreen->field));
 }
 
@@ -443,7 +444,8 @@ static void FieldSubscreen_Wbt_Init(FieldSubscreen *subscreen, u32 previousScree
     CGearSettings *settings;
 
     GFL_OvlLoad(OVERLAY_WBT_SUBSCREEN);
-    settings = CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
+    settings =
+        CGearSettings_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(subscreen->field))));
     subscreen->work = WbtSubscreen_Create(settings, subscreen, Field_GetGameSystem(subscreen->field));
 }
 

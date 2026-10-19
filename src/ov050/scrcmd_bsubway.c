@@ -911,8 +911,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         Misc_AddMetTrainer(getHollow_RivalData(save), bsw->partner.id);
         break;
     case 411:
-        *retWk = NetSystem_GetNetId() == FALSE ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)
-                                          : BSubway_GetPlayerObjCode(&bsw->partner);
+        *retWk = NetSystem_GetNetId() == FALSE
+                     ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)
+                     : BSubway_GetPlayerObjCode(&bsw->partner);
         break;
     case 412:
         *retWk = NetSystem_GetNetId() == FALSE
@@ -947,7 +948,8 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL ScriptNative_BSubwaySendWait(VM *vm, void *env) {
-    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env))));
+    BSubwayScrWork *bsw =
+        GameData_GetBSubwayScrWork(GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env))));
 
     if (BSubwayComm_Send(bsw) == TRUE) {
         return TRUE;

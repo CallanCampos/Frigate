@@ -1955,8 +1955,8 @@ static BOOL func_ov036_02190028(FieldActor *actor) {
     func_ov012_02167154(actor);
     index = FldAct_GetBlActIdx(actor, 0);
     if (index != 0xffff) {
-        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))), (u16)index,
-                          &cmd) == TRUE) {
+        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))),
+                                     (u16)index, &cmd) == TRUE) {
             FldAct_SetDrawStatus(actor, 0);
             FieldActor_NextAcmdState(actor);
             return TRUE;
@@ -1972,8 +1972,8 @@ static BOOL func_ov036_02190080(FieldActor *actor) {
     func_ov012_02167154(actor);
     index = FldAct_GetBlActIdx(actor, 0);
     if (index != 0xffff) {
-        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))), (u16)index,
-                          &cmd) == TRUE) {
+        if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldActSys_GetFieldBlAct(GetActorMModelSystem(actor))),
+                                     (u16)index, &cmd) == TRUE) {
             FieldActor_NextAcmdState(actor);
             return TRUE;
         }

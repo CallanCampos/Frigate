@@ -86,7 +86,8 @@ void GimmickGate_FreeBoardEntries(GimmickGateWork *work);
 GimmickGateBoardEntry *GimmickGate_FindBoardEntry(GimmickGateWork *work);
 GimmickGateBoardEntry *GimmickGate_FindListEntry(GimmickGateWork *work);
 u32 GimmickGate_HasBoardEntry(GimmickGateWork *work);
-void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *message, u32 kind, GimmickGateBoardEntry *entry);
+void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *message, u32 kind,
+                                 GimmickGateBoardEntry *entry);
 void GimmickGate_SetupMessages(GimmickGateWork *work);
 void GimmickGate_SetupDefaultMessages(GimmickGateWork *work);
 void GimmickGate_SetupHallOfFameMessages(GimmickGateWork *work);
@@ -560,7 +561,8 @@ u32 GimmickGate_HasBoardEntry(GimmickGateWork *work) {
     return 0;
 }
 
-void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *message, u32 kind, GimmickGateBoardEntry *entry) {
+void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *message, u32 kind,
+                                 GimmickGateBoardEntry *entry) {
     Elboard_AddMessage(work->board, message);
     if (kind == 8) {
         GimmickGate_AddMessage(work, kind, entry->flagId);
