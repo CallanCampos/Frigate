@@ -10438,6 +10438,12 @@ overlays/ov127 0x021f233c sWhiteWallProps
 overlays/ov127 0x021f2344 sBlackWallProps
 overlays/ov127 0x021f4f34 sMenuInit
 overlays/ov127 0x021f4f48 sMenuItems
+overlays/ov128 0x021eec80 PassingVehicles_Init
+overlays/ov128 0x021eecd4 PassingVehicles_End
+overlays/ov128 0x021eecfc PassingVehicles_PlayPassSound
+overlays/ov128 0x021eed48 PassingVehicles_Update
+overlays/ov128 0x021eeea0 PassingVehicles_PlaceAll
+overlays/ov128 0x021eeec8 PassingVehicles_PlaceVehicle
 overlays/ov129 0x021eec80 SpPokeGimmickA_Init
 overlays/ov129 0x021eed40 SpPokeGimmickA_End
 overlays/ov129 0x021eed5c SpPokeGimmickA_Update
