@@ -1,7 +1,10 @@
 // The DS's geometry engine (ge.h). Commands pass the two stages the hardware has: the FIFO decoder turns port writes
 // and packed GXFIFO words into entries of one command code and one parameter each, and the executor takes each
-// command's parameters from consecutive entries and runs it. Matrices are 4x4, row by row, in 20.12 fixed point, with
-// vectors as rows on the left (v' = v * M), as GBATEK writes them.
+// command's parameters from consecutive entries and runs it. Entries go straight to the executor, which runs each
+// command once its last parameter comes; only a SWAP_BUFFERS that must wait for the VBlank holds itself and every
+// entry after it in a queue, as the hardware's FIFO holds them. In the 3D scenes this is about a quarter of the frame's
+// work on the game's thread (port/docs/ARCHITECTURE.md, "Where a frame's time goes"). Matrices are 4x4, row by row,
+// in 20.12 fixed point, with vectors as rows on the left (v' = v * M), as GBATEK writes them.
 //
 // Facts are GBATEK's unless a comment says they are melonDS's measured behaviour or the port's choice.
 #include "gfx/ge/ge.h"
@@ -107,7 +110,14 @@ struct PortGe {
     uint32_t packed;
     int packedLeft;
     int packedParams;
-    // The entries that wait to run, [head, tail)
+    // The executor's command whose parameters are coming, straight from the decoder: its code, the entries it takes
+    // (its parameters, or 1 for a command without any) and those taken so far (0: none is coming)
+    uint32_t current;
+    int currentNeed;
+    int currentHave;
+    uint32_t currentParams[32];
+    // The entries that wait to run, [head, tail): those from a SWAP_BUFFERS that waits for the VBlank on, which run
+    // there; while any waits, every new entry waits behind it
     Entry *queue;
     size_t head;
     size_t tail;
@@ -207,10 +217,15 @@ static uint64_t Product(int32_t a, int32_t b) {
     return (uint64_t)((int64_t)a * b);
 }
 
-// a * b / c, rounded toward zero, for clipping; a * b can need 66 bits
+// a * b / c, rounded toward zero, for clipping; a * b can need 66 bits, but rarely does, and when it fits in 64 the
+// division in 64 is the same
 static int64_t MulDiv(int64_t a, int64_t b, int64_t c) {
 #if defined(__SIZEOF_INT128__)
     __extension__ typedef __int128 Wide;
+    int64_t product;
+    if (!__builtin_mul_overflow(a, b, &product) && !(product == INT64_MIN && c == -1)) {
+        return product / c;
+    }
     return (int64_t)((Wide)a * b / c);
 #else
     long double q = (long double)a * (long double)b / (long double)c;
@@ -933,57 +948,24 @@ static void VecTest(PortGe *ge, uint32_t param) {
 
 // --- The executor
 
-// Parameters per command (GBATEK's table), or -1 for a code that is no command (NOP among them)
+// Parameters per command (GBATEK's table), plus 1: 0 for a code that is no command (NOP among them). A table, since
+// every entry looks its command up
+static const uint8_t kParamsPlusOne[256] = {
+    [CMD_MTX_PUSH] = 1,       [CMD_MTX_IDENTITY] = 1,  [CMD_END_VTXS] = 1,      [CMD_MTX_MODE] = 2,
+    [CMD_MTX_POP] = 2,        [CMD_MTX_STORE] = 2,     [CMD_MTX_RESTORE] = 2,   [CMD_COLOR] = 2,
+    [CMD_NORMAL] = 2,         [CMD_TEXCOORD] = 2,      [CMD_VTX_10] = 2,        [CMD_VTX_XY] = 2,
+    [CMD_VTX_XZ] = 2,         [CMD_VTX_YZ] = 2,        [CMD_VTX_DIFF] = 2,      [CMD_POLYGON_ATTR] = 2,
+    [CMD_TEXIMAGE_PARAM] = 2, [CMD_PLTT_BASE] = 2,     [CMD_DIF_AMB] = 2,       [CMD_SPE_EMI] = 2,
+    [CMD_LIGHT_VECTOR] = 2,   [CMD_LIGHT_COLOR] = 2,   [CMD_BEGIN_VTXS] = 2,    [CMD_SWAP_BUFFERS] = 2,
+    [CMD_VIEWPORT] = 2,       [CMD_VEC_TEST] = 2,      [CMD_VTX_16] = 3,        [CMD_POS_TEST] = 3,
+    [CMD_MTX_SCALE] = 4,      [CMD_MTX_TRANS] = 4,     [CMD_BOX_TEST] = 4,      [CMD_MTX_MULT_3x3] = 10,
+    [CMD_MTX_LOAD_4x3] = 13,  [CMD_MTX_MULT_4x3] = 13, [CMD_MTX_LOAD_4x4] = 17, [CMD_MTX_MULT_4x4] = 17,
+    [CMD_SHININESS] = 33,
+};
+
+// Parameters per command, or -1 for a code that is no command
 static int ParamCount(uint32_t cmd) {
-    switch (cmd) {
-    case CMD_MTX_PUSH:
-    case CMD_MTX_IDENTITY:
-    case CMD_END_VTXS:
-        return 0;
-    case CMD_MTX_MODE:
-    case CMD_MTX_POP:
-    case CMD_MTX_STORE:
-    case CMD_MTX_RESTORE:
-    case CMD_COLOR:
-    case CMD_NORMAL:
-    case CMD_TEXCOORD:
-    case CMD_VTX_10:
-    case CMD_VTX_XY:
-    case CMD_VTX_XZ:
-    case CMD_VTX_YZ:
-    case CMD_VTX_DIFF:
-    case CMD_POLYGON_ATTR:
-    case CMD_TEXIMAGE_PARAM:
-    case CMD_PLTT_BASE:
-    case CMD_DIF_AMB:
-    case CMD_SPE_EMI:
-    case CMD_LIGHT_VECTOR:
-    case CMD_LIGHT_COLOR:
-    case CMD_BEGIN_VTXS:
-    case CMD_SWAP_BUFFERS:
-    case CMD_VIEWPORT:
-    case CMD_VEC_TEST:
-        return 1;
-    case CMD_VTX_16:
-    case CMD_POS_TEST:
-        return 2;
-    case CMD_MTX_SCALE:
-    case CMD_MTX_TRANS:
-    case CMD_BOX_TEST:
-        return 3;
-    case CMD_MTX_MULT_3x3:
-        return 9;
-    case CMD_MTX_LOAD_4x3:
-    case CMD_MTX_MULT_4x3:
-        return 12;
-    case CMD_MTX_LOAD_4x4:
-    case CMD_MTX_MULT_4x4:
-        return 16;
-    case CMD_SHININESS:
-        return 32;
-    default:
-        return -1;
-    }
+    return (int)kParamsPlusOne[cmd & 0xff] - 1;
 }
 
 static void ClearList(PortGeList *list) {
@@ -1179,8 +1161,8 @@ static void RunCommand(PortGe *ge, uint32_t cmd, const uint32_t *p) {
     }
 }
 
-// Runs every command whose parameters have all come, in order, until one waits: a SWAP_BUFFERS while the last one
-// still waits for the VBlank
+// Runs the queue's commands whose parameters have all come, in order, until one waits: a SWAP_BUFFERS while the last
+// one still waits for the VBlank. Once the queue is empty, entries go straight to the executor again (Feed)
 static void Execute(PortGe *ge) {
     uint32_t params[32];
     while (ge->head < ge->tail) {
@@ -1230,6 +1212,32 @@ static void Enqueue(PortGe *ge, uint32_t cmd, uint32_t param) {
     ge->tail++;
 }
 
+// One entry from the decoder to the executor, as Execute would take it from the queue: the first entry of a command
+// starts it, and the entries after it, whatever their codes, are its parameters until it has them all; then it runs,
+// unless it is a SWAP_BUFFERS while the last one waits for the VBlank, which waits in the queue with every entry after
+// it, as on the DS. While entries wait there, each new one joins them
+static void Feed(PortGe *ge, uint32_t cmd, uint32_t param) {
+    if (ge->tail != ge->head) {
+        Enqueue(ge, cmd, param);
+        return;
+    }
+    if (ge->currentNeed == 0) {
+        int count = ParamCount(cmd);
+        if (cmd == CMD_SWAP_BUFFERS && ge->swapped != NULL) {
+            Enqueue(ge, cmd, param);
+            return;
+        }
+        ge->current = cmd;
+        ge->currentNeed = count > 0 ? count : 1;
+        ge->currentHave = 0;
+    }
+    ge->currentParams[ge->currentHave++] = param;
+    if (ge->currentHave == ge->currentNeed) {
+        ge->currentNeed = 0;
+        RunCommand(ge, ge->current, ge->currentParams);
+    }
+}
+
 // Steps through a packed word's commands: those without parameters are queued at once, and the first that has some
 // waits for them. NOPs and undefined codes take no parameters and are dropped, so a word of four NOPs is a word
 // without commands, and the word after the last parameter is the next packed word (GBATEK "Packed commands")
@@ -1242,7 +1250,7 @@ static void NextPacked(PortGe *ge) {
             return;
         }
         if (count == 0) {
-            Enqueue(ge, cmd, 0);
+            Feed(ge, cmd, 0);
         }
         ge->packed >>= 8;
         ge->packedLeft--;
@@ -1260,7 +1268,7 @@ static void Decode(PortGe *ge, uint32_t port, uint32_t value) {
             NextPacked(ge);
             return;
         }
-        Enqueue(ge, ge->packed & 0xff, value);
+        Feed(ge, ge->packed & 0xff, value);
         if (--ge->packedParams == 0) {
             ge->packed >>= 8;
             ge->packedLeft--;
@@ -1269,7 +1277,7 @@ static void Decode(PortGe *ge, uint32_t port, uint32_t value) {
     } else if (port >= GXFIFO_END && port < PORTS_END) {
         uint32_t cmd = (port - GXFIFO) >> 2;
         if (ParamCount(cmd) >= 0) {
-            Enqueue(ge, cmd, value);
+            Feed(ge, cmd, value);
         }
     }
 }
