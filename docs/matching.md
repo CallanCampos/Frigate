@@ -3277,6 +3277,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   with those in the list a top-of-file permutation matches. `rodata_order.py --from-object FILE.o` lists every data
   object a compile produced so none is dropped, and `rodata_order.py ... --check FILE.o` fails loudly when the model
   and the compiler disagree; run the check against a real compile before trusting any verdict.
+- Function-local initializers of one size tie in the sort too, and `--check` doesn't compare their order. Their own
+  declaration order also sets their function's stack slots, so the tie is fixed by moving other declarations:
+  `btlv_input.c`'s `BtlvInput_CreateBallSlideActors` declares `palettes`, `xs` and `ys` (20 bytes each) in the order
+  its code needs, and they come out `xs`, `ys`, `palettes`, as in the ROM, only with the top-of-file
+  `data_ov168_021f3700` declared after `data_ov168_021f3780` and `data_ov168_021f3610` after
+  `data_ov168_021f3864`. The model predicted it: all 87 two-move orders it gave compiled to the ROM's layout.
 - A run of fields that every function reaches from one literal, at fixed offsets, can be several small statics of the
   shared section rather than a struct. The size sort tells them apart: `snd_sys.c`'s `.bss` has a 2-byte mask, six
   4-byte statics and a 24-byte struct (0x34 bytes) before a 40-byte array, which a 0x34-byte struct would follow.
