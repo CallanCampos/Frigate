@@ -75,7 +75,8 @@ consider every name at the destination, including labels, and use the first over
 An alias therefore cannot hide a reference to a static function.
 
 `section-start` and `section-end` move one end of a registered source file's section, as an object at a boundary
-that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files:
+that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files. Recording a boundary
+again replaces its earlier record, since fixes replay in address order:
 
 ```sh
 .venv/bin/python tools/decomp/config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028
