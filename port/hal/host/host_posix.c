@@ -4,9 +4,10 @@
 // symbols and symbol table), the monotonic clock, and the renderer's threads (pthreads, at macOS's user-interactive
 // QoS) with their signals (a mutex and a condition variable). It touches no part of the game: the trap placeholders
 // (port/hal/trap.c), the fibers' guards (port/hal/os/fiber.c), the PXI pointers into static data
-// (port/hal/pxi/pointer.c), --run-dump's globals (port/app/main.c) and the watchdog (port/app/main.c) stand on it.
-// Windows has host_windows.c instead. glibc hides dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs
-// from strict C11, so port/CMakeLists.txt defines _GNU_SOURCE for this file on the command line, ahead of any header
+// (port/hal/pxi/pointer.c), --run-dump's globals (port/app/main.c), the watchdog (port/app/main.c), --frame-times'
+// clock (port/hal/os/frame_time.c) and the 3D renderer's workers (port/gfx/workers.c) stand on it. Windows has
+// host_windows.c instead. glibc hides dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs from strict
+// C11, so port/CMakeLists.txt defines _GNU_SOURCE for this file on the command line, ahead of any header
 // (port_host.h, which some targets force-include)
 #ifndef _WIN32
 

@@ -2,15 +2,14 @@
 // vectored exception handler that moves the report to a stack of its own, crashes nobody handles through the
 // unhandled-exception filter, backtraces by unwinding the x64 stack with the image's unwind tables, the names of the
 // program's functions and globals from the COFF symbol table that lld keeps in an unstripped MinGW program, the
-// watchdog as a thread, the program's static data from the PE image's writable sections, the performance counter as
-// the monotonic clock, and the renderer's threads with their signals (a slim reader/writer lock and a condition
-// variable). It also sets up every
-// program that links it before main(): stdout and stderr in binary mode, so that "\n" stays "\n" as on macOS and
-// Linux; no error dialog on a crash or abort(), which would hold a test or a CI run forever; and both exception
-// handlers. It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers' guards
+// watchdog as a thread, the program's static data from the PE image's writable sections, the performance counter as the
+// monotonic clock, and the renderer's threads with their signals (a slim reader/writer lock and a condition variable).
+// It also sets up every program that links it before main(): stdout and stderr in binary mode, so that "\n" stays "\n"
+// as on macOS and Linux; no error dialog on a crash or abort(), which would hold a test or a CI run forever; and both
+// exception handlers. It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers' guards
 // (port/hal/os/fiber.c), the PXI pointers into static data (port/hal/pxi/pointer.c), --run-dump's globals
-// (port/app/main.c) and the watchdog (port/app/main.c) stand on it. macOS and Linux have host_posix.c instead
-// (port/docs/adr/0013).
+// (port/app/main.c), the watchdog (port/app/main.c), --frame-times' clock (port/hal/os/frame_time.c) and the 3D
+// renderer's workers (port/gfx/workers.c) stand on it. macOS and Linux have host_posix.c instead (port/docs/adr/0013).
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN

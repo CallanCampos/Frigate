@@ -1,18 +1,18 @@
-// The host operating system's services that the platform layer, the program and the tests share, where macOS, Linux
-// and Windows differ: memory pages and their protection, faults (a trap placeholder touched, a fiber's stack
-// overflowing into its guard, a crash), backtraces and the names of the program's functions and globals, the watchdog
-// that stops a frame which never ends, the monotonic clock that times the frames, writes to stderr that take no lock,
-// directories, the environment and the program's static data. It touches no part of the game itself: it is what the
-// code above it stands on, so that trap.c, fiber.c and the tests are the same on every host (port/docs/adr/0013). A
-// module whose own feature is a host's keeps its branches instead (the saves' folder and files in
-// port/hal/card/backup.c, the VRAM's aliasing in port/hal/gx/vram_os.c, the mapped ROM in port/hal/rom/rom.c, the
-// overlays' sections by object format in port/hal/fs/ovsec.c, the RTC's local time, the macOS app's log, the window's
-// icon); port/hal/README.md lists them. Each host's half is one file, chosen by the compiler: host_posix.c for macOS
-// and Linux, host_windows.c for Windows; the other compiles to nothing. Its users: port/hal/trap.c (traps and crashes),
-// port/hal/os/fiber.c (the fibers' stacks and guards), port/hal/pxi/pointer.c (the static data),
-// port/hal/os/os_terminate.c (backtraces), port/hal/gx (the page size), port/hal/os/frame_time.c (the clock),
-// port/app/main.c (the watchdog, --run-dump's globals), port/app/run_dir.c, and the tests' harnesses. Plain C types
-// only.
+// The host operating system's services that the platform layer, the program and the tests share, where macOS, Linux and
+// Windows differ: memory pages and their protection, faults (a trap placeholder touched, a fiber's stack overflowing
+// into its guard, a crash), backtraces and the names of the program's functions and globals, the watchdog that stops a
+// frame which never ends, the monotonic clock that times the frames, the 3D renderer's threads and the signals they
+// wait on, writes to stderr that take no lock, directories, the environment and the program's static data. It touches
+// no part of the game itself: it is what the code above it stands on, so that trap.c, fiber.c and the tests are the
+// same on every host (port/docs/adr/0013). A module whose own feature is a host's keeps its branches instead (the
+// saves' folder and files in port/hal/card/backup.c, the VRAM's aliasing in port/hal/gx/vram_os.c, the mapped ROM in
+// port/hal/rom/rom.c, the overlays' sections by object format in port/hal/fs/ovsec.c, the RTC's local time, the macOS
+// app's log, the window's icon); port/hal/README.md lists them. Each host's half is one file, chosen by the compiler:
+// host_posix.c for macOS and Linux, host_windows.c for Windows; the other compiles to nothing. Its users:
+// port/hal/trap.c (traps and crashes), port/hal/os/fiber.c (the fibers' stacks and guards), port/hal/pxi/pointer.c (the
+// static data), port/hal/os/os_terminate.c (backtraces), port/hal/gx (the page size), port/hal/os/frame_time.c (the
+// clock), port/gfx/workers.c (the 3D renderer's threads and signals), port/app/main.c (the watchdog, --run-dump's
+// globals, the game's thread's class), port/app/run_dir.c, and the tests' harnesses. Plain C types only.
 //
 // On Windows, every program that links host_windows.c also gets, before main(): stdout and stderr in binary mode, no
 // error dialog on a crash or abort(), and both exception handlers, which report the crashes nobody handles (see
