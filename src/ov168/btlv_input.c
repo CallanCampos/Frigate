@@ -1,6 +1,5 @@
 // The battle's lower screen. The name is the ROM's string, from GFL_HeapAllocate's asserts. The names are ours; swan
-// has none for this file. Another session's notes, ~/Projects/White2Decomp/docs/battle-ui-spec.md (White 2 addresses,
-// +0x40), were the source of our understanding of the screens and their transitions, not of names or code
+// has none for this file
 
 #include "battle/btlv_input.h"
 #include "types.h"
@@ -296,7 +295,7 @@ static const BtlvInputTypeAnim data_ov168_021f361c[3] = { { 4, 4 }, { 4, 4 }, { 
 static const int data_ov168_021f3628[2][2] = { { 136, 136 }, { 24, 48 } };
 // Where each move tile's type icon goes
 static const ClActorPos data_ov168_021f3638[4] = { { 34, 65 }, { 162, 65 }, { 34, 113 }, { 162, 113 } };
-static const BGSysLCDConfig data_ov168_021f3648 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_2D };
+static const BGSysLCDConfig data_ov168_021f3648 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
 static const u32 data_ov168_021f3658[3][2] = { { 0x247, 0x246 }, { 0x245, 0 }, { 0, 0x245 } };
 static const s32 data_ov168_021f368c[7] = { 0x200, 0x400, 0x800, 0x1000, 0x10, 0x4, 0x8 };
 static const s32 data_ov168_021f36a8[7] = { 0, 0, 0, 0, 1, 0, 0 };
@@ -309,11 +308,6 @@ static const TouchRect data_ov168_021f3760[8] = {
 static const BtlvInputButtonSet data_ov168_021f3604 = { data_ov168_021f3760, data_ov168_021f36a8, data_ov168_021f36c4 };
 static const s32 data_ov168_021f3670[7] = { 0, 0, 0, 0, 1, 0, 0 };
 static const BtlvInputScroll data_ov168_021f36e0[2][2] = { { { 256, 0 }, { 0, 192 } }, { { 256, 0 }, { 0, 0 } } };
-static const TouchRect data_ov168_021f3700[8] = {
-    { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 }, { 0x50, 0x80, 0x80, 0xff },
-    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
-};
-static const BtlvInputButtonSet data_ov168_021f3610 = { data_ov168_021f3700, data_ov168_021f3670, data_ov168_021f368c };
 // Where each party icon goes, by rule
 static const ClActorPos data_ov168_021f3780[4][3] = {
     { { 128, 112 }, { -1, -1 }, { -1, -1 } },
@@ -321,12 +315,20 @@ static const ClActorPos data_ov168_021f3780[4][3] = {
     { { 88, 112 }, { 128, 112 }, { 168, 112 } },
     { { 104, 112 }, { 152, 112 }, { -1, -1 } },
 };
+static const TouchRect data_ov168_021f3700[8] = {
+    { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 }, { 0x50, 0x80, 0x80, 0xff },
+    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
+};
 // Where each move tile's name is centered
 static const s32 data_ov168_021f3720[4][2] = { { 64, 10 }, { 192, 10 }, { 64, 58 }, { 192, 58 } };
-// The tile palette of each move type
-static const u32 data_ov168_021f3864[17] = {
+// The tile palette of each move type. The explicit alignment is a guess, from the code of BtlvInput_DrawMoveTiles,
+// the only function that reads the table: MWCC keeps the loop of a function that reads an aligned object entered at
+// its test (docs/matching.md). An alignment of 1, 2 or 4 gives the same code and layout, and the table's address
+// allows nothing above 4.
+static const u32 data_ov168_021f3864[17] ATTRIBUTE_ALIGN(4) = {
     464, 470, 473, 471, 472, 476, 475, 477, 479, 465, 466, 468, 467, 469, 478, 474, 480,
 };
+static const BtlvInputButtonSet data_ov168_021f3610 = { data_ov168_021f3700, data_ov168_021f3670, data_ov168_021f368c };
 // The scroll of BG 4 for the button rise of each slot
 static const BtlvInputScroll data_ov168_021f3740[4] = { { 256, 448 }, { 256, 192 }, { 0, 192 }, { 0, 448 } };
 // The key cursor's stops of the move screen, without a usable move and with one, per slot
@@ -402,7 +404,7 @@ static const BtlvInputBGSetup data_ov168_021f3b88[4] = {
     { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_16, 0, 4, 0x8000, 0, 1, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_16, 4, 4, 0x8000, 0, 1, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, 8, 6, 0x8000, 0, 0, 0, 0 }, BGMODE_TEXT },
-    { { 0, 0, 0x2000, 0, BGRES_128x128, GX_BG_COLORMODE_16, 0, 0, 0x8000, 0, 1, 0, 0 }, BGMODE_EXTENDED },
+    { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_256, 12, 2, 0x8000, 0, 1, 0, 0 }, BGMODE_EXTENDED },
 };
 // The target screen's BG 4 map, by rule, attacker and move range
 static const u32 data_ov168_021f3c18[2][3][15] = {
@@ -2466,6 +2468,28 @@ static void BtlvInput_GetStringWidth(const StrBuf *strbuf, Font *font, int *widt
     *blocks = b;
 }
 
+// The letter, shadow and background colors of a PP color, 5 bits each, as printsys.c's TEXT_COLOR_* macros read a
+// PRINT_COLOR. Getters rather than the shifts in the arguments: in BtlvInput_DrawMoveTiles the original computes the
+// three from the background back to the letter, each narrowed to u8, as these give
+static inline u8 BtlvInput_ColorLetter(s32 color) {
+    return (color >> 10) & 0x1f;
+}
+
+static inline u8 BtlvInput_ColorShadow(s32 color) {
+    return (color >> 5) & 0x1f;
+}
+
+static inline u8 BtlvInput_ColorBackground(s32 color) {
+    return color & 0x1f;
+}
+
+// The heap ID that allocates from the tail of the heap, for temporary buffers. A getter rather than HEAPID_TAIL in the
+// arguments: in BtlvInput_DrawMoveTiles the original computes it and spills it before the getUINarcIdx call of an
+// earlier argument, as an inline argument is
+static inline HeapID BtlvInput_TempHeapId(const BtlvInput *work) {
+    return HEAPID_TAIL(work->heapId);
+}
+
 // Draws the four move tiles' text and type icons
 static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *param) {
     const s32 ppLabelPos[4][2] = { { 53, 26 }, { 181, 26 }, { 53, 74 }, { 181, 74 } };
@@ -2479,14 +2503,14 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
     u8 shadow;
     u8 background;
     WordSet *wordSet;
+    u32 palette;
     StrBuf *nameBuf;
     StrBuf *nameFmt;
-    StrBuf *ppLabel;
     StrBuf *ppBuf;
     StrBuf *ppFmt;
+    StrBuf *ppLabel;
     void *charBuf;
     void *palBuf;
-    u32 palette;
     s32 type;
     s32 color;
     int i;
@@ -2499,19 +2523,19 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
     ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_2);
     func_0204bfd4(work->moveUnit, FALSE);
 
-    for (i = 0; i < 4 ? TRUE : FALSE; i++) {
+    for (i = 0; i < 4; i++) {
         if (param->moves[i] != MOVE_NONE) {
-            HeapID heapId = HEAPID_TAIL(work->heapId);
             type = PML_MoveGetParam(param->moves[i], MOVE_PARAM_TYPE);
             palette = data_ov168_021f3864[type];
             work->moveActors[i] = func_0204c040(work->moveUnit, work->moveChars[i], work->movePalette,
                                                 work->moveCellAnims, &data_ov168_021f35f2, 1, work->heapId);
             func_0204c140(work->moveActors[i], &data_ov168_021f3638[i], 1);
-            charBuf = GFL_G2DIOReadOBJNCGR(getUINarcIdx(), func_0202d7f4(type), FALSE, &character, heapId);
+            charBuf = GFL_G2DIOReadOBJNCGR(getUINarcIdx(), func_0202d7f4(type), FALSE, &character,
+                                           BtlvInput_TempHeapId(work));
             func_0204c378(work->moveActors[i], func_0202d7e8(type), 1);
             func_0204c40c(work->moveActors[i], &proxy);
             MI_CpuCopy16(character->rawData,
-                         (void *)(HW_DB_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]), 0x100);
+                         (u8 *)G2S_GetOBJCharPtr() + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB], 0x100);
             GFL_HeapFree(charBuf);
 
             GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
@@ -2526,7 +2550,8 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
             WordSetNumber(wordSet, 1, param->maxPP[i], 2, 1, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, ppBuf, ppFmt);
             color = BtlvInput_GetPPColor(param->pp[i], param->maxPP[i]);
-            GFL_TextRndUpdateColorIndexLUT((color >> 10) & 0x1f, (color >> 5) & 0x1f, color & 0x1f);
+            GFL_TextRndUpdateColorIndexLUT(BtlvInput_ColorLetter(color), BtlvInput_ColorShadow(color),
+                                           BtlvInput_ColorBackground(color));
             GFL_TextRendererDrawToBitmap(work->msgBitmap, ppLabelPos[i][0], ppLabelPos[i][1], ppLabel, work->font);
             BtlvInput_GetStringWidth(ppBuf, work->font, &width, &blocks);
             GFL_TextRendererDrawToBitmap(work->msgBitmap, ppPos[i][0] - width / 2, ppPos[i][1], ppBuf, work->font);
@@ -2537,7 +2562,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
         } else {
             palette = 463;
         }
-        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, palette, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, palette, &paletteData, BtlvInput_TempHeapId(work));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x90, 0x20);
         GFL_HeapFree(palBuf);
     }

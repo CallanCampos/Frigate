@@ -43,7 +43,9 @@ void NNS_G2dUnpackNAN(NNSG2dAnimBankData *bank) {
     for (i = 0; i < bank->numSequences; i++) {
         NNSi_G2dUnpackOffset(seqArray[i].pAnmFrameArray, frameArray);
         for (j = 0; j < seqArray[i].numFrames; j++) {
-            NNSi_G2dUnpackOffset(seqArray[i].pAnmFrameArray[j].pContent, animData);
+            // The SDK assigns the macro's result again here
+            seqArray[i].pAnmFrameArray[j].pContent =
+                NNSi_G2dUnpackOffset(seqArray[i].pAnmFrameArray[j].pContent, animData);
         }
     }
 

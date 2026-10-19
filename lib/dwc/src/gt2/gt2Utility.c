@@ -69,7 +69,7 @@ BOOL func_ov011_0217ed7c(const char *string, u32 *ipOut, u16 *portOut) {
             port = number;
         }
         if (string != NULL) {
-            ip = func_ov011_0216df90(string);
+            ip = inet_addr(string);
             if (ip == -1) {
                 hostEnt = SOC_GetHostByName(string);
                 if (hostEnt == NULL) {

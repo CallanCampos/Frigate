@@ -47,9 +47,9 @@ BOOL ghiDecryptReceivedData(GHIConnection *connection) {
         } while (result == 2 && outSize == 0);
 
         if (inSize > connection->decodeBuffer.length) {
-            func_ov011_0216cca8(
-                8, 4, 1, "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
-                inSize, connection->decodeBuffer.length);
+            gsDebugFormat(8, 4, 1,
+                          "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
+                          inSize, connection->decodeBuffer.length);
             return FALSE;
         }
         connection->decodeBuffer.pos += inSize;
@@ -79,7 +79,7 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
     int error;
 
     if (connection->throttle != 0) {
-        u32 now = func_ov011_0216e324();
+        u32 now = current_time();
 
         if (now < connection->lastThrottleTime + ghiThrottleInterval) {
             return 1;
@@ -107,9 +107,9 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
             return 3;
         }
     } else {
-        received = func_ov011_0216def0(connection->socket, buffer, max, 0);
+        received = recv(connection->socket, buffer, max, 0);
         if (received == -1) {
-            error = func_ov011_0216dfa8(connection->socket);
+            error = GOAGetLastError(connection->socket);
             if (error == -56) {
                 connection->closing = TRUE;
                 return 2;
@@ -131,7 +131,7 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
     }
     buffer[received] = '\0';
     *size = received;
-    func_ov011_0216cca8(8, 0, 0x20, "Received %d bytes\n", received);
+    gsDebugFormat(8, 0, 0x20, "Received %d bytes\n", received);
     return 0;
 }
 
@@ -160,9 +160,9 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
             return -1;
         }
     } else {
-        sent = func_ov011_0216df24(connection->socket, data, size, 0);
+        sent = send(connection->socket, data, size, 0);
         if (sent == -1) {
-            int error = func_ov011_0216dfa8(connection->socket);
+            int error = GOAGetLastError(connection->socket);
 
             if (error == -6 || error == -26 || error == -76) {
                 return 0;

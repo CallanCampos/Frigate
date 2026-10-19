@@ -985,79 +985,85 @@ static void RollerCoaster_GetJointTrans(const NNSG3dResJntAnm *anm, u32 node, fx
 }
 
 // A translation component at a frame, from values stored every 1, 2 or 4 frames and interpolated between, as
-// NitroSystem's joint animation reads them.
+// NitroSystem's joint animation reads them. The cases end in two blocks that several of them jump to: `average` makes a
+// frame between two stored values, and `read` reads a stored one.
 static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data, const NNSG3dResJntAnm *anm) {
-    u32 index = frame >> FX32_SHIFT;
+    u32 frameIndex = frame >> FX32_SHIFT;
     const void *values = (const u8 *)anm + data[1];
-    BOOL interp = FALSE;
-    u32 pairIndex;
+    u32 lastInterp;
+    u32 index;
 
-    if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-        u32 lastInterp = (data[0] & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-
-        if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_2) {
-            if (index & 1) {
-                if (index > lastInterp) {
-                    index = (lastInterp >> 1) + 1;
-                } else {
-                    pairIndex = index >> 1;
-                    interp = TRUE;
-                }
-            } else {
-                index >>= 1;
-            }
-        } else {
-            if (index & 3) {
-                if (index > lastInterp) {
-                    index = (lastInterp >> 2) + (index & 3);
-                } else if (index & 1) {
-                    u32 first;
-                    u32 second;
-                    fx32 v;
-                    fx32 subV;
-
-                    if (index & 2) {
-                        second = index >> 2;
-                        first = second + 1;
-                    } else {
-                        first = index >> 2;
-                        second = first + 1;
-                    }
-                    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-                        const fx16 *array = values;
-
-                        v = array[first];
-                        subV = array[second];
-                        *value = (v + v + v + subV) >> 2;
-                    } else {
-                        const fx32 *array = values;
-                        fx64 tripled = (fx64)array[first] * 3;
-                        fx64 sub = array[second];
-
-                        *value = (fx32)((tripled + sub) >> 2);
-                    }
-                    return;
-                } else {
-                    pairIndex = index >> 2;
-                    interp = TRUE;
-                }
-            } else {
-                index >>= 2;
-            }
-        }
+    if (!(data[0] & NNS_G3D_JNTANM_TINFO_STEP_MASK)) {
+        index = frameIndex;
+        goto read;
     }
 
-    if (interp) {
-        if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-            const fx16 *pair = &((const fx16 *)values)[pairIndex];
-
-            *value = (pair[0] + pair[1]) >> 1;
-        } else {
-            const fx32 *pair = &((const fx32 *)values)[pairIndex];
-
-            *value = (pair[0] >> 1) + (pair[1] >> 1);
+    lastInterp = (data[0] & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+    if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_2) {
+        if (frameIndex & 1) {
+            if (frameIndex > lastInterp) {
+                index = (lastInterp >> 1) + 1;
+                goto read;
+            }
+            index = frameIndex >> 1;
+            goto average;
         }
-    } else if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        index = frameIndex >> 1;
+        goto read;
+    }
+    if (frameIndex & 3) {
+        if (frameIndex > lastInterp) {
+            index = (lastInterp >> 2) + (frameIndex & 3);
+            goto read;
+        }
+        if (frameIndex & 1) {
+            u32 second;
+            fx32 v;
+            fx32 subV;
+
+            if (frameIndex & 2) {
+                second = frameIndex >> 2;
+                index = second + 1;
+            } else {
+                index = frameIndex >> 2;
+                second = index + 1;
+            }
+            if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+                const fx16 *array = values;
+
+                v = array[index];
+                subV = array[second];
+                *value = (v + v + v + subV) >> 2;
+            } else {
+                const fx32 *array = values;
+
+                v = array[index];
+                subV = array[second];
+                *value = ((fx64)v + v + v + subV) >> 2;
+            }
+            return;
+        }
+        index = frameIndex >> 2;
+        goto average;
+    }
+    index = frameIndex >> 2;
+    goto read;
+
+average:
+    // The frame between two stored values is their average
+    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        const fx16 *array = values;
+
+        *value = (*(array + index) + *(array + index + 1)) >> 1;
+    } else {
+        const fx32 *array = values;
+
+        *value = (*(array + index) >> 1) + (*(array + index + 1) >> 1);
+    }
+    return;
+
+read:
+    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
         *value = ((const fx16 *)values)[index];
     } else {
         *value = ((const fx32 *)values)[index];

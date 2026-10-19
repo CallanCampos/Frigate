@@ -1,7 +1,10 @@
-#include "dwc/gt2Message.h"
+#include <string.h>
+// Before dwc/ext.h: MWCC builds the packets' 2-byte memcpys in place, as the ROM does, only when
+// <string.h> declares them first
 #include "dwc/ext.h"
 #include "dwc/gt2Callback.h"
 #include "dwc/gt2Connection.h"
+#include "dwc/gt2Message.h"
 #include "dwc/gt2Socket.h"
 
 // GameSpy GT2's messages (gt2Message.c). The functions' names, from pret/pokerevo's Wii build, are in
@@ -222,7 +225,7 @@ static BOOL func_ov011_0217d61c(GTI2Connection *connection, const u8 *data, int 
         return FALSE;
     }
     if (connection->initialMessage != NULL) {
-        func_ov011_0216ddfc(connection->initialMessage);
+        gsifree(connection->initialMessage);
         connection->initialMessage = NULL;
     }
     connection->state = 1;
@@ -258,7 +261,7 @@ static BOOL func_ov011_0217d6b4(GTI2Connection *connection, const u8 *data, int 
     }
     connection->state = 4;
     if (func_ov011_0217ca30(connection->socket, connection, connection->ip, connection->port,
-                            func_ov011_0216e324() - connection->challengeTime, data + 32, length - 32)) {
+                            current_time() - connection->challengeTime, data + 32, length - 32)) {
         return TRUE;
     }
     return FALSE;
@@ -455,7 +458,7 @@ restart:
 static void func_ov011_0217da7c(GTI2Connection *connection) {
     if (!connection->pendingAck) {
         connection->pendingAck = TRUE;
-        connection->pendingAckTime = func_ov011_0216e324();
+        connection->pendingAckTime = current_time();
     }
 }
 
@@ -576,7 +579,7 @@ static BOOL func_ov011_0217dc74(GTI2Connection *connection, const u8 *data, int 
     dest[1] = src[1];
     dest[2] = src[2];
     dest[3] = src[3];
-    if (func_ov011_0217cbbc(connection, func_ov011_0216e324() - sendTime)) {
+    if (func_ov011_0217cbbc(connection, current_time() - sendTime)) {
         return TRUE;
     }
     return FALSE;
@@ -731,7 +734,7 @@ BOOL func_ov011_0217df34(GTI2Socket *socket, u32 ip, u16 port) {
         return TRUE;
     }
     if (connection->state == 0) {
-        if (connection->timeout == 0 || func_ov011_0216e324() - connection->startTime < connection->timeout) {
+        if (connection->timeout == 0 || current_time() - connection->startTime < connection->timeout) {
             return TRUE;
         }
         if (!func_ov011_0217d3d8(connection, 6, 1)) {
@@ -766,12 +769,12 @@ BOOL func_ov011_0217e020(GTI2Socket *socket) {
     int length;
     int error;
 
-    if (func_ov011_0216e10c(socket->handle) != 0) {
+    if (CanReceiveOnSocket(socket->handle) != 0) {
         do {
             addressSize = sizeof(address);
-            length = func_ov011_0216df00(socket->handle, buffer, sizeof(buffer), 0, &address, &addressSize);
+            length = recvfrom(socket->handle, buffer, sizeof(buffer), 0, &address, &addressSize);
             if (length == -1) {
-                error = func_ov011_0216dfa8(socket->handle);
+                error = GOAGetLastError(socket->handle);
                 if (error == -15) {
                     if (!func_ov011_0217df34(socket, address.addr, GTI2_SWAP16(address.port))) {
                         return FALSE;
@@ -789,7 +792,7 @@ BOOL func_ov011_0217e020(GTI2Socket *socket) {
                     return FALSE;
                 }
             }
-        } while (func_ov011_0216e10c(socket->handle));
+        } while (CanReceiveOnSocket(socket->handle));
     }
     return TRUE;
 }
@@ -802,7 +805,7 @@ static BOOL func_ov011_0217e140(GTI2Connection *connection, u16 sequence, int le
     message.offset = connection->outgoing.length;
     message.length = length;
     message.serialNumber = sequence;
-    message.sendTime = func_ov011_0216e324();
+    message.sendTime = current_time();
     count = func_ov011_02171588(connection->outgoingMessages);
     func_ov011_021715a4(connection->outgoingMessages, &message);
     return count + 1 == func_ov011_02171588(connection->outgoingMessages);
@@ -1006,25 +1009,16 @@ static BOOL func_ov011_0217e4e0(GTI2Connection *connection, const u8 *data, int 
 }
 
 BOOL func_ov011_0217e598(GTI2Connection *connection) {
-    const u8 *magic;
     u16 prefix;
-    const u8 *src;
-    u8 *dest;
     u8 packet[10];
     int length = 0;
 
     if (connection->socket->protocol == 2) {
         prefix = 5;
-        src = (const u8 *)&prefix;
-        dest = packet;
-        dest[0] = src[0];
-        dest[1] = src[1];
+        memcpy(packet, &prefix, 2);
         length += 2;
     }
-    magic = (const u8 *)"\xfe\xfe";
-    dest = packet + length;
-    dest[0] = magic[0];
-    dest[1] = magic[1];
+    memcpy(packet + length, "\xfe\xfe", 2);
     packet[length + 2] = 0x64;
     func_ov011_0217d3c4(packet, length + 3, connection->expectedSerialNumber);
     if (!func_ov011_0217cf18(connection, packet, length + 5)) {
@@ -1039,22 +1033,13 @@ static BOOL func_ov011_0217e608(GTI2Connection *connection, u16 first, u16 last)
     u16 prefix;
     u8 packet[10];
     int length = 0;
-    const u8 *magic;
-    const u8 *src;
-    u8 *dest;
 
     if (connection->socket->protocol == 2) {
         prefix = 7;
-        src = (const u8 *)&prefix;
-        dest = packet;
-        dest[0] = src[0];
-        dest[1] = src[1];
+        memcpy(packet, &prefix, 2);
         length += 2;
     }
-    magic = (const u8 *)"\xfe\xfe";
-    dest = packet + length;
-    dest[0] = magic[0];
-    dest[1] = magic[1];
+    memcpy(packet + length, "\xfe\xfe", 2);
     packet[length + 2] = 0x65;
     func_ov011_0217d3c4(packet, length + 3, first);
     length += 5;
@@ -1081,24 +1066,15 @@ BOOL func_ov011_0217e694(GTI2Connection *connection) {
 // Sends an address the note that its connection is closed
 static BOOL func_ov011_0217e6a4(GTI2Socket *socket, u32 ip, u16 port) {
     u16 prefix;
-    u8 packet[10];
+    u8 packet[5];
     int length = 0;
-    const u8 *magic;
-    const u8 *src;
-    u8 *dest;
 
     if (socket->protocol == 2) {
         prefix = 3;
-        src = (const u8 *)&prefix;
-        dest = packet;
-        dest[0] = src[0];
-        dest[1] = src[1];
+        memcpy(packet, &prefix, 2);
         length += 2;
     }
-    magic = (const u8 *)"\xfe\xfe";
-    dest = packet + length;
-    dest[0] = magic[0];
-    dest[1] = magic[1];
+    memcpy(packet + length, "\xfe\xfe", 2);
     packet[length + 2] = 0x68;
     if (!func_ov011_0217eb34(socket, ip, port, packet, length + 3)) {
         return FALSE;

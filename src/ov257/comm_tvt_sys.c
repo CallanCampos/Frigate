@@ -457,7 +457,8 @@ static BOOL CommTvt_Main(CommTvtWork *sys) {
         }
         if (frame != sys->paletteFrame) {
             sys->paletteFrame = frame;
-            NNS_GfdRegisterNewVramTransferTask(0x1f, 0x40, sys->palettes[frame], sizeof(sys->palettes[0]));
+            NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0x40, sys->palettes[frame],
+                                               sizeof(sys->palettes[0]));
         }
     }
     GFL_TCBExMgrUpdate(sys->tcbEx);

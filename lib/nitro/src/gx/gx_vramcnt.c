@@ -521,60 +521,60 @@ static u32 disableBankForX_(u16 *banks) {
     return disabled;
 }
 
-void GX_DisableBankForBG(void) {
-    disableBankForX_(&gGXState.bg);
+u32 GX_DisableBankForBG(void) {
+    return disableBankForX_(&gGXState.bg);
 }
 
-void GX_DisableBankForOBJ(void) {
-    disableBankForX_(&gGXState.obj);
+u32 GX_DisableBankForOBJ(void) {
+    return disableBankForX_(&gGXState.obj);
 }
 
-void GX_DisableBankForBGExtPltt(void) {
+u32 GX_DisableBankForBGExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
-    disableBankForX_(&gGXState.bgExtPltt);
+    return disableBankForX_(&gGXState.bgExtPltt);
 }
 
-void GX_DisableBankForOBJExtPltt(void) {
+u32 GX_DisableBankForOBJExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
-    disableBankForX_(&gGXState.objExtPltt);
+    return disableBankForX_(&gGXState.objExtPltt);
 }
 
-void GX_DisableBankForTex(void) {
-    disableBankForX_(&gGXState.tex);
+u32 GX_DisableBankForTex(void) {
+    return disableBankForX_(&gGXState.tex);
 }
 
-void GX_DisableBankForTexPltt(void) {
-    disableBankForX_(&gGXState.texPltt);
+u32 GX_DisableBankForTexPltt(void) {
+    return disableBankForX_(&gGXState.texPltt);
 }
 
-void GX_DisableBankForClearImage(void) {
-    disableBankForX_(&gGXState.clrImg);
+u32 GX_DisableBankForClearImage(void) {
+    return disableBankForX_(&gGXState.clrImg);
 }
 
-void GX_DisableBankForARM7(void) {
-    disableBankForX_(&gGXState.arm7);
+u32 GX_DisableBankForARM7(void) {
+    return disableBankForX_(&gGXState.arm7);
 }
 
-void GX_DisableBankForLCDC(void) {
-    disableBankForX_(&gGXState.lcdc);
+u32 GX_DisableBankForLCDC(void) {
+    return disableBankForX_(&gGXState.lcdc);
 }
 
-void GX_DisableBankForSubBG(void) {
-    disableBankForX_(&gGXState.subBg);
+u32 GX_DisableBankForSubBG(void) {
+    return disableBankForX_(&gGXState.subBg);
 }
 
-void GX_DisableBankForSubOBJ(void) {
-    disableBankForX_(&gGXState.subObj);
+u32 GX_DisableBankForSubOBJ(void) {
+    return disableBankForX_(&gGXState.subObj);
 }
 
-void GX_DisableBankForSubBGExtPltt(void) {
+u32 GX_DisableBankForSubBGExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
-    disableBankForX_(&gGXState.subBgExtPltt);
+    return disableBankForX_(&gGXState.subBgExtPltt);
 }
 
-void GX_DisableBankForSubOBJExtPltt(void) {
+u32 GX_DisableBankForSubOBJExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
-    disableBankForX_(&gGXState.subObjExtPltt);
+    return disableBankForX_(&gGXState.subObjExtPltt);
 }
 
 u16 GX_GetBankForOBJ(void) {

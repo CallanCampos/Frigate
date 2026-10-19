@@ -22,7 +22,7 @@ static void func_ov011_021714e0(DArray *array) {
     int capacity = array->capacity + array->growBy;
 
     array->capacity = capacity;
-    array->list = func_ov011_0216ddec(array->list, capacity * array->elementSize);
+    array->list = gsirealloc(array->list, capacity * array->elementSize);
 }
 
 // Copies the element to the index
@@ -31,7 +31,7 @@ static void func_ov011_021714fc(DArray *array, const void *element, int index) {
 }
 
 DArray *func_ov011_02171514(int elementSize, int growBy, DArrayFreeFunc freeFunc) {
-    DArray *array = func_ov011_0216dddc(sizeof(DArray));
+    DArray *array = gsimalloc(sizeof(DArray));
 
     if (growBy == 0) {
         growBy = 8;
@@ -42,7 +42,7 @@ DArray *func_ov011_02171514(int elementSize, int growBy, DArrayFreeFunc freeFunc
     array->growBy = growBy;
     array->freeFunc = freeFunc;
     if (growBy != 0) {
-        array->list = func_ov011_0216dddc(growBy * array->elementSize);
+        array->list = gsimalloc(growBy * array->elementSize);
         memset(array->list, 0, array->capacity * array->elementSize);
     } else {
         array->list = NULL;
@@ -57,9 +57,9 @@ void func_ov011_02171558(DArray *array) {
         func_ov011_021714cc(array, i);
     }
     if (array->list != NULL) {
-        func_ov011_0216ddfc(array->list);
+        gsifree(array->list);
     }
-    func_ov011_0216ddfc(array);
+    gsifree(array);
 }
 
 int func_ov011_02171588(DArray *array) {

@@ -28,10 +28,31 @@
 #define H(b, c, d) ((b) ^ (c) ^ (d))
 #define I(b, c, d) ((c) ^ ((b) | ~(d)))
 
-#define FF(a, b, c, d, x, t, s) ((a) = (b) + ROTL((a) + F(b, c, d) + (x) + (t), s))
-#define GG(a, b, c, d, x, t, s) ((a) = (b) + ROTL((a) + G(b, c, d) + (x) + (t), s))
-#define HH(a, b, c, d, x, t, s) ((a) = (b) + ROTL((a) + H(b, c, d) + (x) + (t), s))
-#define II(a, b, c, d, x, t, s) ((a) = (b) + ROTL((a) + I(b, c, d) + (x) + (t), s))
+#define FF(a, b, c, d, x, t, s)                                                                                        \
+    {                                                                                                                  \
+        (a) += F(b, c, d) + (x) + (t);                                                                                 \
+        (a) = (b) + ROTL(a, s);                                                                                        \
+    }
+#define GG(a, b, c, d, x, t, s)                                                                                        \
+    {                                                                                                                  \
+        (a) += G(b, c, d) + (x) + (t);                                                                                 \
+        (a) = (b) + ROTL(a, s);                                                                                        \
+    }
+#define HH(a, b, c, d, x, t, s)                                                                                        \
+    {                                                                                                                  \
+        (a) += H(b, c, d) + (x) + (t);                                                                                 \
+        (a) = (b) + ROTL(a, s);                                                                                        \
+    }
+#define II(a, b, c, d, x, t, s)                                                                                        \
+    {                                                                                                                  \
+        (a) += I(b, c, d) + (x) + (t);                                                                                 \
+        (a) = (b) + ROTL(a, s);                                                                                        \
+    }
+
+// The 64-byte padding MD5Final appends to a message before its length
+static u8 sMD5Padding[64] = {
+    0x80,
+};
 
 // Which of the 16 message words each of the 64 steps mixes in: i for round 1, (5i + 1) % 16 for round 2,
 // (3i + 5) % 16 for round 3 and (7i) % 16 for round 4
@@ -64,11 +85,6 @@ static u32 sMD5Constants[64] = {
     0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
 };
 
-// The 64-byte padding MD5Final appends to a message before its length
-static u8 sMD5Padding[64] = {
-    0x80,
-};
-
 // RFC 1321's Encode, which packs an array of 32-bit words into bytes, low byte first: on this little-endian target
 // that is a plain copy, through MI_CpuCopy8 (whose argument order is the opposite of this one's)
 static void MD5Encode(u8 *output, const u32 *input, u32 len) {
@@ -87,7 +103,7 @@ static void MD5Transform(u32 state[4], const u8 block[64]) {
     u32 d = state[3];
     u32 x[16];
     u32 i;
-    u32 j;
+    int j;
 
     MD5Decode(x, block, 64);
     i = 0;

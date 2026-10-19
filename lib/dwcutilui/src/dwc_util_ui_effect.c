@@ -4,7 +4,7 @@
 #include "nitro/gx.h"
 
 typedef struct DWCUtilUiEffect {
-    void *task;
+    DWCUtilTask *task;
     GXOamAttr *oam;
     u8 variant;
     u8 frame;
@@ -16,7 +16,7 @@ typedef struct DWCUtilUiEffect {
 static const u8 sEffectData[12] = { 0x0e, 0x04, 0x05, 0x00, 0xe6, 0x00, 0x8b, 0x00, 0x00, 0x00, 0xa8, 0x00 };
 static DWCUtilUiEffect *sEffect;
 
-static void DWCUtilUiEffect_Update(void *task);
+static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg);
 
 void DWCUtilUiEffect_Init(u8 variant) {
     int mode = 4;
@@ -28,7 +28,7 @@ void DWCUtilUiEffect_Init(u8 variant) {
     sEffect->oam->attr01 &= 0xfffff3ff;
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0x0fff) | (sEffectData[variant] << 12);
     sEffect->oam->attr01 = (sEffect->oam->attr01 & 0xfe00ff00) | 0x00e6008b;
-    sEffect->task = func_ov182_021bd200(1, DWCUtilUiEffect_Update, 0, 0x78);
+    sEffect->task = func_ov182_021bd200(1, DWCUtilUiEffect_Update, NULL, 0x78);
 }
 
 void DWCUtilUiEffect_Destroy(void) {
@@ -37,7 +37,7 @@ void DWCUtilUiEffect_Destroy(void) {
     func_ov182_021bc4f0(&sEffect);
 }
 
-static void DWCUtilUiEffect_Update(void *task) {
+static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg) {
     u8 palette;
 
     sEffect->frame = FX_ModS32(sEffect->frame + 1, 40);
