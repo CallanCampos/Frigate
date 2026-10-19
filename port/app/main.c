@@ -581,6 +581,9 @@ int main(int argc, char **argv) {
 
     port_hw_init();
     port_trap_protect_data();
+    // The game's thread runs at the class an app's main thread gets on macOS (user-interactive), however the program
+    // was started, so that a run from a shell or a test isn't put on the efficiency cores; the workers start in it too
+    port_host_thread_set_interactive();
     // The 3D renderer's workers, which draw nothing but its bands of lines (port/gfx/workers.h); 0 is the default
     port_workers_start((int)renderThreads);
     if (!sHeadless) {

@@ -145,7 +145,10 @@ the rest of each frame. The x86_64 slice under Rosetta takes about 1.7 times the
 ### Threads and stacks
 
 Frigate runs the game on one host thread. Only the 3D renderer's workers run beside it, drawing their bands of the 3D
-frame's lines while the game's thread draws its own ([ADR 0016](adr/0016-3d-frame-in-bands-on-worker-threads.md)).
+frame's lines while the game's thread draws its own ([ADR 0016](adr/0016-3d-frame-in-bands-on-worker-threads.md)). On
+macOS every one of them runs at the user-interactive QoS that an app's main thread gets, however the program was
+started (`port_host_thread_set_interactive`, [../hal/host](../hal/host/host.h)), so that a run from a shell or a test is
+scheduled as the app is.
 
 | What | Where it runs | Code |
 | --- | --- | --- |
