@@ -49,33 +49,33 @@ static void gpiProfilesTableFree(void *element) {
     GPIProfile *profile = element;
 
     if (profile->buddyStatus != NULL) {
-        func_ov011_0216ddfc(profile->buddyStatus->statusString);
+        gsifree(profile->buddyStatus->statusString);
         profile->buddyStatus->statusString = NULL;
-        func_ov011_0216ddfc(profile->buddyStatus->locationString);
+        gsifree(profile->buddyStatus->locationString);
         profile->buddyStatus->locationString = NULL;
-        func_ov011_0216ddfc(profile->buddyStatus);
+        gsifree(profile->buddyStatus);
         profile->buddyStatus = NULL;
     }
     if (profile->buddyStatusInfo != NULL) {
-        func_ov011_0216ddfc(profile->buddyStatusInfo->richStatus);
+        gsifree(profile->buddyStatusInfo->richStatus);
         profile->buddyStatusInfo->richStatus = NULL;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->gameType);
+        gsifree(profile->buddyStatusInfo->gameType);
         profile->buddyStatusInfo->gameType = NULL;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->gameVariant);
+        gsifree(profile->buddyStatusInfo->gameVariant);
         profile->buddyStatusInfo->gameVariant = NULL;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->gameMapName);
+        gsifree(profile->buddyStatusInfo->gameMapName);
         profile->buddyStatusInfo->gameMapName = NULL;
         if (profile->buddyStatusInfo->extendedInfoKeys != NULL) {
             func_ov011_02171558(profile->buddyStatusInfo->extendedInfoKeys);
             profile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
-        func_ov011_0216ddfc(profile->buddyStatusInfo);
+        gsifree(profile->buddyStatusInfo);
         profile->buddyStatusInfo = NULL;
     }
     gpiFreeInfoCache(profile);
-    func_ov011_0216ddfc(profile->authSig);
+    gsifree(profile->authSig);
     profile->authSig = NULL;
-    func_ov011_0216ddfc(profile->peerSig);
+    gsifree(profile->peerSig);
     profile->peerSig = NULL;
 }
 
@@ -114,7 +114,7 @@ int gpiProcessNewProfile(GPConnection *connection, GPIOperation *operation, cons
     pid = atol(buffer);
     callback = operation->callback;
     if (callback.callback != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPNewProfileResponseArg));
+        arg = gsimalloc(sizeof(GPNewProfileResponseArg));
         if (arg == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -193,7 +193,7 @@ int gpiProcessDeleteProfle(GPConnection *connection, GPIOperation *operation, co
     }
     callback = operation->callback;
     if (callback.callback != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPDeleteProfileResponseArg));
+        arg = gsimalloc(sizeof(GPDeleteProfileResponseArg));
         if (arg == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -293,25 +293,25 @@ GPIProfile *gpiFindBuddy(GPConnection *connection, int buddyIndex) {
 }
 
 void gpiRemoveBuddyStatus(GPIBuddyStatus *buddyStatus) {
-    func_ov011_0216ddfc(buddyStatus->locationString);
+    gsifree(buddyStatus->locationString);
     buddyStatus->locationString = NULL;
-    func_ov011_0216ddfc(buddyStatus->statusString);
+    gsifree(buddyStatus->statusString);
     buddyStatus->statusString = NULL;
-    func_ov011_0216ddfc(buddyStatus);
+    gsifree(buddyStatus);
 }
 
 void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo *buddyStatusInfo) {
-    func_ov011_0216ddfc(buddyStatusInfo->richStatus);
+    gsifree(buddyStatusInfo->richStatus);
     buddyStatusInfo->richStatus = NULL;
-    func_ov011_0216ddfc(buddyStatusInfo->gameType);
+    gsifree(buddyStatusInfo->gameType);
     buddyStatusInfo->gameType = NULL;
-    func_ov011_0216ddfc(buddyStatusInfo->gameVariant);
+    gsifree(buddyStatusInfo->gameVariant);
     buddyStatusInfo->gameVariant = NULL;
-    func_ov011_0216ddfc(buddyStatusInfo->gameMapName);
+    gsifree(buddyStatusInfo->gameMapName);
     buddyStatusInfo->gameMapName = NULL;
     func_ov011_02171558(buddyStatusInfo->extendedInfoKeys);
     buddyStatusInfo->extendedInfoKeys = NULL;
-    func_ov011_0216ddfc(buddyStatusInfo);
+    gsifree(buddyStatusInfo);
 }
 
 // Whether nothing keeps a profile in the table any more

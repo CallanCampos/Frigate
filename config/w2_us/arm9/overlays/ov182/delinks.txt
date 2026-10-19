@@ -137,3 +137,65 @@ lib/dwcutilui/src/dwc_util_task.c:
     .text       start:0x021bd114 end:0x021bd30c
     .rodata     start:0x021c05e4 end:0x021c05e8
     .bss        start:0x021c4244 end:0x021c4260
+
+lib/dwcutilui/src/dwc_util_gfx_resource.c:
+    complete
+    .text       start:0x021ab67c end:0x021ab808
+    .rodata     start:0x021bfb94 end:0x021bfbe4
+    .bss        start:0x021c4070 end:0x021c40b0
+
+lib/dwcutilui/src/dwc_util_button_sprites.c:
+    complete
+    .text       start:0x021ab808 end:0x021ab94c
+    .rodata     start:0x021bfbe4 end:0x021bfbf0
+    .bss        start:0x021c40b0 end:0x021c40b4
+
+lib/dwcutilui/src/dwc_util_bg_overlay.c:
+    complete
+    .text       start:0x021ab94c end:0x021aba3c
+    .data       start:0x021c0794 end:0x021c09c8
+    .bss        start:0x021c40b4 end:0x021c40b8
+
+lib/dwcutilui/src/dwc_util_link_icon.c:
+    complete
+    .text       start:0x021aba3c end:0x021abb50
+    .rodata     start:0x021bfbf0 end:0x021bfbf8
+    .bss        start:0x021c40b8 end:0x021c40bc
+
+lib/dwcutilui/src/dwc_util_keyboard.c:
+    .text       start:0x021abb50 end:0x021acdc0
+    .rodata     start:0x021bfbf8 end:0x021bfebc
+    .data       start:0x021c09c8 end:0x021c0bac
+    .bss        start:0x021c40bc end:0x021c40c0
+
+lib/dwcutilui/src/dwc_util_menu.c:
+    .text       start:0x021acdc0 end:0x021adad4
+    .rodata     start:0x021bfebc end:0x021bffc8
+    .bss        start:0x021c40c0 end:0x021c40c4
+
+lib/dwcutilui/src/dwc_util_aoss_session.c:
+    complete
+    .text       start:0x021adad4 end:0x021adc00
+    .rodata     start:0x021bffc8 end:0x021bffd4
+    .bss        start:0x021c40c4 end:0x021c40cc
+
+lib/dwcutilui/src/dwc_util_main.c:
+    complete
+    .text       start:0x021adc00 end:0x021ae0c4
+    .data       start:0x021c0bac end:0x021c0bcc
+    .bss        start:0x021c40cc end:0x021c40ec
+
+lib/dwcutilui/src/dwc_util_msg_resource.c:
+    complete
+    .text       start:0x021ae0c4 end:0x021ae174
+    .bss        start:0x021c40ec end:0x021c40f0
+
+lib/dwcutilui/src/dwc_util_move.c:
+    .text       start:0x021ae174 end:0x021ae418
+    .data       start:0x021c0bcc end:0x021c0c2c
+    .bss        start:0x021c40f0 end:0x021c40f4
+
+lib/dwcutilui/src/dwc_util_connection.c:
+    complete
+    .text       start:0x021ae418 end:0x021ae534
+    .bss        start:0x021c40f4 end:0x021c40f8

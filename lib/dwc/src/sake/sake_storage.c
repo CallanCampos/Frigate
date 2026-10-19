@@ -88,57 +88,57 @@ static int Sake_CheckFields(const SakeField *fields, int fieldNum) {
 static void Sake_WriteFields(SakeRequest *request, SakeField *fields, int fieldNum) {
     int i;
 
-    func_ov011_02170614(request->writer, "ns1", "values");
+    gsXmlWriteOpenTag(request->writer, "ns1", "values");
     for (i = 0; i < fieldNum; i++) {
-        func_ov011_02170614(request->writer, "ns1", "RecordField");
-        func_ov011_021706b8(request->writer, "ns1", "name", fields[i].name);
-        func_ov011_02170614(request->writer, "ns1", "value");
+        gsXmlWriteOpenTag(request->writer, "ns1", "RecordField");
+        gsXmlWriteStringElement(request->writer, "ns1", "name", fields[i].name);
+        gsXmlWriteOpenTag(request->writer, "ns1", "value");
         if (fields[i].type == SAKE_FIELD_BYTE) {
-            func_ov011_02170614(request->writer, "ns1", "byteValue");
-            func_ov011_02170818(request->writer, "ns1", "value", fields[i].value.byteValue);
-            func_ov011_02170660(request->writer, "ns1", "byteValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "byteValue");
+            gsXmlWriteIntElement(request->writer, "ns1", "value", fields[i].value.byteValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "byteValue");
         } else if (fields[i].type == SAKE_FIELD_SHORT) {
-            func_ov011_02170614(request->writer, "ns1", "shortValue");
-            func_ov011_02170818(request->writer, "ns1", "value", fields[i].value.shortValue);
-            func_ov011_02170660(request->writer, "ns1", "shortValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "shortValue");
+            gsXmlWriteIntElement(request->writer, "ns1", "value", fields[i].value.shortValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "shortValue");
         } else if (fields[i].type == SAKE_FIELD_INT) {
-            func_ov011_02170614(request->writer, "ns1", "intValue");
-            func_ov011_02170818(request->writer, "ns1", "value", fields[i].value.intValue);
-            func_ov011_02170660(request->writer, "ns1", "intValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "intValue");
+            gsXmlWriteIntElement(request->writer, "ns1", "value", fields[i].value.intValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "intValue");
         } else if (fields[i].type == SAKE_FIELD_INT64) {
-            func_ov011_02170614(request->writer, "ns1", "int64Value");
-            func_ov011_02170868(request->writer, "ns1", "value", fields[i].value.int64Value);
-            func_ov011_02170660(request->writer, "ns1", "int64Value");
+            gsXmlWriteOpenTag(request->writer, "ns1", "int64Value");
+            gsXmlWriteInt64Element(request->writer, "ns1", "value", fields[i].value.int64Value);
+            gsXmlWriteCloseTag(request->writer, "ns1", "int64Value");
         } else if (fields[i].type == SAKE_FIELD_FLOAT) {
-            func_ov011_02170614(request->writer, "ns1", "floatValue");
-            func_ov011_021708b4(request->writer, "ns1", "value", fields[i].value.floatValue);
-            func_ov011_02170660(request->writer, "ns1", "floatValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "floatValue");
+            gsXmlWriteFloatElement(request->writer, "ns1", "value", fields[i].value.floatValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "floatValue");
         } else if (fields[i].type == SAKE_FIELD_ASCII_STRING) {
-            func_ov011_02170614(request->writer, "ns1", "asciiStringValue");
-            func_ov011_021706b8(request->writer, "ns1", "value", fields[i].value.asciiStringValue);
-            func_ov011_02170660(request->writer, "ns1", "asciiStringValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "asciiStringValue");
+            gsXmlWriteStringElement(request->writer, "ns1", "value", fields[i].value.asciiStringValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "asciiStringValue");
         } else if (fields[i].type == SAKE_FIELD_UNICODE_STRING) {
-            func_ov011_02170614(request->writer, "ns1", "unicodeStringValue");
-            func_ov011_02170780(request->writer, "ns1", "value", fields[i].value.unicodeStringValue);
-            func_ov011_02170660(request->writer, "ns1", "unicodeStringValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "unicodeStringValue");
+            gsXmlWriteUnicodeStringElement(request->writer, "ns1", "value", fields[i].value.unicodeStringValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "unicodeStringValue");
         } else if (fields[i].type == SAKE_FIELD_BOOLEAN) {
-            func_ov011_02170614(request->writer, "ns1", "booleanValue");
-            func_ov011_02170818(request->writer, "ns1", "value", fields[i].value.booleanValue != FALSE);
-            func_ov011_02170660(request->writer, "ns1", "booleanValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "booleanValue");
+            gsXmlWriteIntElement(request->writer, "ns1", "value", fields[i].value.booleanValue != FALSE);
+            gsXmlWriteCloseTag(request->writer, "ns1", "booleanValue");
         } else if (fields[i].type == SAKE_FIELD_DATE_AND_TIME) {
-            func_ov011_02170614(request->writer, "ns1", "dateAndTimeValue");
-            func_ov011_02170a00(request->writer, "ns1", "value", fields[i].value.dateAndTimeValue);
-            func_ov011_02170660(request->writer, "ns1", "dateAndTimeValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "dateAndTimeValue");
+            gsXmlWriteDateTimeElement(request->writer, "ns1", "value", fields[i].value.dateAndTimeValue);
+            gsXmlWriteCloseTag(request->writer, "ns1", "dateAndTimeValue");
         } else if (fields[i].type == SAKE_FIELD_BINARY_DATA) {
-            func_ov011_02170614(request->writer, "ns1", "binaryDataValue");
-            func_ov011_0217098c(request->writer, "ns1", "value", fields[i].value.binaryDataValue.data,
-                                fields[i].value.binaryDataValue.length);
-            func_ov011_02170660(request->writer, "ns1", "binaryDataValue");
+            gsXmlWriteOpenTag(request->writer, "ns1", "binaryDataValue");
+            gsXmlWriteBase64BinaryElement(request->writer, "ns1", "value", fields[i].value.binaryDataValue.data,
+                                          fields[i].value.binaryDataValue.length);
+            gsXmlWriteCloseTag(request->writer, "ns1", "binaryDataValue");
         }
-        func_ov011_02170660(request->writer, "ns1", "value");
-        func_ov011_02170660(request->writer, "ns1", "RecordField");
+        gsXmlWriteCloseTag(request->writer, "ns1", "value");
+        gsXmlWriteCloseTag(request->writer, "ns1", "RecordField");
     }
-    func_ov011_02170660(request->writer, "ns1", "values");
+    gsXmlWriteCloseTag(request->writer, "ns1", "values");
 }
 
 static int Sake_ValidateCreateRecord(SakeRequest *request) {
@@ -159,13 +159,13 @@ static int Sake_ValidateCreateRecord(SakeRequest *request) {
 static int Sake_BuildCreateRecord(SakeRequest *request) {
     SakeCreateRecordInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     Sake_WriteFields(request, input->fields, input->fieldNum);
     return 0;
 }
 
 static int Sake_ParseCreateRecord(SakeRequest *request) {
-    if (func_ov011_02171090(request->response, "recordid", request->output) == FALSE) {
+    if (gsXmlReadChildAsInt(request->response, "recordid", request->output) == FALSE) {
         return SAKE_RESULT_MALFORMED_RESPONSE;
     }
     return 0;
@@ -193,8 +193,8 @@ static int Sake_ValidateUpdateRecord(SakeRequest *request) {
 static int Sake_BuildUpdateRecord(SakeRequest *request) {
     SakeUpdateRecordInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
-    func_ov011_02170818(request->writer, "ns1", "recordid", input->recordId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteIntElement(request->writer, "ns1", "recordid", input->recordId);
     Sake_WriteFields(request, input->fields, input->fieldNum);
     return 0;
 }
@@ -215,7 +215,7 @@ static int Sake_ValidateDeleteRecord(SakeRequest *request) {
 static int Sake_BuildDeleteRecord(SakeRequest *request) {
     SakeDeleteRecordInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
-    func_ov011_02170818(request->writer, "ns1", "recordid", input->recordId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteIntElement(request->writer, "ns1", "recordid", input->recordId);
     return 0;
 }

@@ -5,7 +5,7 @@
 // dwc/gt2Buffer.h
 
 BOOL func_ov011_0217c944(GTI2Buffer *buffer, int capacity) {
-    buffer->data = func_ov011_0216dddc(capacity);
+    buffer->data = gsimalloc(capacity);
     if (buffer->data == NULL) {
         return FALSE;
     }

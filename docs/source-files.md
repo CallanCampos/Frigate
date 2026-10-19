@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-874 of 1688 functions are in source files.
+1044 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -119,7 +119,20 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `gsAvailable.c` | `0x0216c520`–`0x0216c764` | 5 | complete | descriptive |
+| `gsCore.c` | `0x0216c764`–`0x0216cac0` | 11 | complete | descriptive |
+| `gsCrypt.c` | `0x0216cac0`–`0x0216cc2c` | 1 | complete | descriptive |
+| `gsDebug.c` | `0x0216cc2c`–`0x0216cd94` | 5 | complete | descriptive |
+| `gsLargeInt.c` | `0x0216cd94`–`0x0216dd9c` | 18 | partial | descriptive |
+| `gsMemory.c` | `0x0216dd9c`–`0x0216de10` | 8 | complete | descriptive |
+| `gsPlatformSocket.c` | `0x0216de10`–`0x0216e204` | 22 | partial | descriptive |
+| `gsPlatformThread.c` | `0x0216e204`–`0x0216e250` | 6 | complete | descriptive |
+| `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
+| `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
+| `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
 | `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
+| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | partial | descriptive |
+| `gs_screen_print.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
@@ -1593,7 +1606,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `btlv_camera.c` | `0x021de6b4`–`0x021dec68` | 13 | complete | string at `0x021f3f40` |
 | `btlv_effect.c` | `0x021dec68`–`0x021e0de4` | 119 | partial | string at `0x021f3f9c` |
 | `btlv_effvm.c` | `0x021e0de4`–`0x021e67b8` | 138 | complete | string at `0x021f4174` |
-| `btlv_mcss.c` | `0x021e67b8`–`0x021e982c` | 95 | partial | string at `0x021f4188` |
+| `btlv_mcss.c` | `0x021e67b8`–`0x021e982c` | 95 | complete | string at `0x021f4188` |
 | `btlv_clact.c` | `0x021e982c`–`0x021ea2a8` | 23 | complete | string at `0x021f4194` |
 | `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | complete | string at `0x021f41c8` |
 | `btlv_gauge.c` | `0x021ef794`–`0x021f1c84` | 58 | complete | string at `0x021f41d8` |
@@ -1737,7 +1750,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-252 of 1113 functions are in source files.
+372 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1748,6 +1761,17 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
+| `dwc_util_gfx_resource.c` | `0x021ab63c`–`0x021ab7c8` | 7 | complete | descriptive |
+| `dwc_util_button_sprites.c` | `0x021ab7c8`–`0x021ab90c` | 5 | complete | descriptive |
+| `dwc_util_bg_overlay.c` | `0x021ab90c`–`0x021ab9fc` | 6 | complete | descriptive |
+| `dwc_util_link_icon.c` | `0x021ab9fc`–`0x021abb10` | 3 | complete | descriptive |
+| `dwc_util_keyboard.c` | `0x021abb10`–`0x021acd80` | 30 | partial | descriptive |
+| `dwc_util_menu.c` | `0x021acd80`–`0x021ada94` | 28 | partial | descriptive |
+| `dwc_util_aoss_session.c` | `0x021ada94`–`0x021adbc0` | 5 | complete | descriptive |
+| `dwc_util_main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
+| `dwc_util_msg_resource.c` | `0x021ae084`–`0x021ae134` | 6 | complete | descriptive |
+| `dwc_util_move.c` | `0x021ae134`–`0x021ae3d8` | 8 | partial | descriptive |
+| `dwc_util_connection.c` | `0x021ae3d8`–`0x021ae4f4` | 7 | complete | descriptive |
 | `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |

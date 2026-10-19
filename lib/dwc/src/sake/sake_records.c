@@ -95,31 +95,31 @@ static int Sake_CheckNames(const char **names, int nameNum) {
 static void Sake_WriteNames(SakeRequest *request, const char **names, int nameNum) {
     int i;
 
-    func_ov011_02170614(request->writer, "ns1", "fields");
+    gsXmlWriteOpenTag(request->writer, "ns1", "fields");
     for (i = 0; i < nameNum; i++) {
-        func_ov011_021706b8(request->writer, "ns1", "string", names[i]);
+        gsXmlWriteStringElement(request->writer, "ns1", "string", names[i]);
     }
-    func_ov011_02170660(request->writer, "ns1", "fields");
+    gsXmlWriteCloseTag(request->writer, "ns1", "fields");
 }
 
 static void Sake_WriteRecordIds(SakeRequest *request, const int *recordIds, int recordNum) {
     int i;
 
-    func_ov011_02170614(request->writer, "ns1", "recordids");
+    gsXmlWriteOpenTag(request->writer, "ns1", "recordids");
     for (i = 0; i < recordNum; i++) {
-        func_ov011_02170818(request->writer, "ns1", "int", recordIds[i]);
+        gsXmlWriteIntElement(request->writer, "ns1", "int", recordIds[i]);
     }
-    func_ov011_02170660(request->writer, "ns1", "recordids");
+    gsXmlWriteCloseTag(request->writer, "ns1", "recordids");
 }
 
 static void Sake_WriteOwnerIds(SakeRequest *request, const int *ownerIds, int ownerNum) {
     int i;
 
-    func_ov011_02170614(request->writer, "ns1", "ownerids");
+    gsXmlWriteOpenTag(request->writer, "ns1", "ownerids");
     for (i = 0; i < ownerNum; i++) {
-        func_ov011_02170818(request->writer, "ns1", "int", ownerIds[i]);
+        gsXmlWriteIntElement(request->writer, "ns1", "int", ownerIds[i]);
     }
-    func_ov011_02170660(request->writer, "ns1", "ownerids");
+    gsXmlWriteCloseTag(request->writer, "ns1", "ownerids");
 }
 
 static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *recordNum, int fieldNum,
@@ -131,87 +131,87 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
     int count;
     int listSize;
 
-    if (func_ov011_02170db8(request->response, "values") == FALSE) {
+    if (gsXmlMoveToChild(request->response, "values") == FALSE) {
         return SAKE_RESULT_MALFORMED_RESPONSE;
     }
-    count = func_ov011_02171390(request->response, "ArrayOfRecordValue");
+    count = gsXmlCountChildren(request->response, "ArrayOfRecordValue");
     *recordNum = count;
     if (count == 0) {
         *records = NULL;
         return 0;
     }
     listSize = count * sizeof(SakeField *);
-    list = func_ov011_0216dddc(listSize);
+    list = gsimalloc(listSize);
     if (list == NULL) {
         return SAKE_RESULT_OUT_OF_MEMORY;
     }
     memset(list, 0, listSize);
     *records = list;
     for (i = 0; i < *recordNum; i++) {
-        if (func_ov011_02170d28(request->response, "ArrayOfRecordValue") == FALSE) {
+        if (gsXmlMoveToNext(request->response, "ArrayOfRecordValue") == FALSE) {
             return SAKE_RESULT_MALFORMED_RESPONSE;
         }
-        record = func_ov011_0216dddc(fieldNum * sizeof(SakeField));
+        record = gsimalloc(fieldNum * sizeof(SakeField));
         if (record == NULL) {
             return SAKE_RESULT_OUT_OF_MEMORY;
         }
         memset(record, 0, fieldNum * sizeof(SakeField));
         list[i] = record;
-        if (fieldNum != func_ov011_02171390(request->response, "RecordValue")) {
+        if (fieldNum != gsXmlCountChildren(request->response, "RecordValue")) {
             return SAKE_RESULT_MALFORMED_RESPONSE;
         }
         for (j = 0; j < fieldNum; j++) {
             SakeField *field = &record[j];
 
             field->name = fieldNames[j];
-            if (func_ov011_02170d28(request->response, "RecordValue") == FALSE) {
+            if (gsXmlMoveToNext(request->response, "RecordValue") == FALSE) {
                 return SAKE_RESULT_MALFORMED_RESPONSE;
             }
-            if (func_ov011_02170db8(request->response, "byteValue")) {
+            if (gsXmlMoveToChild(request->response, "byteValue")) {
                 int value;
 
-                if (func_ov011_02171090(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt(request->response, "value", &value) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_BYTE;
                 field->value.byteValue = value;
-            } else if (func_ov011_02170db8(request->response, "shortValue")) {
+            } else if (gsXmlMoveToChild(request->response, "shortValue")) {
                 int value;
 
-                if (func_ov011_02171090(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt(request->response, "value", &value) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_SHORT;
                 field->value.shortValue = value;
-            } else if (func_ov011_02170db8(request->response, "intValue")) {
+            } else if (gsXmlMoveToChild(request->response, "intValue")) {
                 int value;
 
-                if (func_ov011_02171090(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt(request->response, "value", &value) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_INT;
                 field->value.intValue = value;
-            } else if (func_ov011_02170db8(request->response, "int64Value")) {
+            } else if (gsXmlMoveToChild(request->response, "int64Value")) {
                 s64 value;
 
-                if (func_ov011_02171108(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt64(request->response, "value", &value) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_INT64;
                 field->value.int64Value = value;
-            } else if (func_ov011_02170db8(request->response, "floatValue")) {
+            } else if (gsXmlMoveToChild(request->response, "floatValue")) {
                 float value;
 
-                if (func_ov011_0217123c(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsFloat(request->response, "value", &value) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_FLOAT;
                 field->value.floatValue = value;
-            } else if (func_ov011_02170db8(request->response, "asciiStringValue")) {
+            } else if (gsXmlMoveToChild(request->response, "asciiStringValue")) {
                 char *text;
                 int length;
 
-                if (func_ov011_02170e14(request->response, "value", &text, &length) == FALSE) {
+                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
@@ -221,12 +221,12 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 }
                 field->type = SAKE_FIELD_ASCII_STRING;
                 field->value.asciiStringValue = text;
-            } else if (func_ov011_02170db8(request->response, "unicodeStringValue")) {
+            } else if (gsXmlMoveToChild(request->response, "unicodeStringValue")) {
                 char *text;
                 int length;
                 u16 *wide;
 
-                if (func_ov011_02170e14(request->response, "value", &text, &length) == FALSE) {
+                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
@@ -234,18 +234,18 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 } else {
                     text = "";
                 }
-                wide = func_ov011_0216edd0(text);
+                wide = UTF8ToUCS2StringAlloc(text);
                 if (wide == NULL) {
                     return SAKE_RESULT_OUT_OF_MEMORY;
                 }
                 field->type = SAKE_FIELD_UNICODE_STRING;
                 field->value.unicodeStringValue = wide;
-            } else if (func_ov011_02170db8(request->response, "booleanValue")) {
+            } else if (gsXmlMoveToChild(request->response, "booleanValue")) {
                 char *text;
                 int length;
                 BOOL value;
 
-                if (func_ov011_02170e14(request->response, "value", &text, &length) == FALSE) {
+                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
@@ -256,28 +256,28 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 }
                 field->type = SAKE_FIELD_BOOLEAN;
                 field->value.booleanValue = value;
-            } else if (func_ov011_02170db8(request->response, "dateAndTimeValue")) {
+            } else if (gsXmlMoveToChild(request->response, "dateAndTimeValue")) {
                 int value;
 
-                if (func_ov011_02171184(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsDateTimeElement(request->response, "value", &value) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_DATE_AND_TIME;
                 field->value.dateAndTimeValue = value;
-            } else if (func_ov011_02170db8(request->response, "binaryDataValue")) {
+            } else if (gsXmlMoveToChild(request->response, "binaryDataValue")) {
                 void *data;
                 int length;
 
-                if (func_ov011_02170fec(request->response, "value", NULL, &length) == FALSE) {
+                if (gsXmlReadChildAsBase64Binary(request->response, "value", NULL, &length) == FALSE) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (length > 0) {
-                    data = func_ov011_0216dddc(length);
+                    data = gsimalloc(length);
                     if (data == NULL) {
                         return SAKE_RESULT_OUT_OF_MEMORY;
                     }
-                    if (func_ov011_02170fec(request->response, "value", data, &length) == FALSE) {
-                        func_ov011_0216ddfc(data);
+                    if (gsXmlReadChildAsBase64Binary(request->response, "value", data, &length) == FALSE) {
+                        gsifree(data);
                         return SAKE_RESULT_MALFORMED_RESPONSE;
                     }
                 } else {
@@ -305,13 +305,13 @@ static void Sake_FreeFields(int fieldNum, SakeField *fields) {
         SakeField *field = &fields[i];
 
         if (field->type == SAKE_FIELD_BINARY_DATA && field->value.binaryDataValue.data != NULL) {
-            func_ov011_0216ddfc(field->value.binaryDataValue.data);
+            gsifree(field->value.binaryDataValue.data);
         }
         if (field->type == SAKE_FIELD_UNICODE_STRING) {
-            func_ov011_0216ddfc(field->value.unicodeStringValue);
+            gsifree(field->value.unicodeStringValue);
         }
     }
-    func_ov011_0216ddfc(fields);
+    gsifree(fields);
 }
 
 static void Sake_FreeRecords(int fieldNum, int recordNum, SakeField **records) {
@@ -325,17 +325,17 @@ static void Sake_FreeRecords(int fieldNum, int recordNum, SakeField **records) {
         if (records[i] != NULL) {
             for (j = 0; j < fieldNum; j++) {
                 if (records[i][j].type == SAKE_FIELD_BINARY_DATA && records[i][j].value.binaryDataValue.data != NULL) {
-                    func_ov011_0216ddfc(records[i][j].value.binaryDataValue.data);
+                    gsifree(records[i][j].value.binaryDataValue.data);
                 }
                 if (records[i][j].type == SAKE_FIELD_UNICODE_STRING) {
-                    func_ov011_0216ddfc(records[i][j].value.unicodeStringValue);
+                    gsifree(records[i][j].value.unicodeStringValue);
                 }
             }
-            func_ov011_0216ddfc(records[i]);
+            gsifree(records[i]);
             records[i] = NULL;
         }
     }
-    func_ov011_0216ddfc(records);
+    gsifree(records);
 }
 
 static int Sake_ValidateSearchRecords(SakeRequest *request) {
@@ -362,21 +362,21 @@ static int Sake_ValidateSearchRecords(SakeRequest *request) {
 static int Sake_BuildSearchRecords(SakeRequest *request) {
     SakeSearchRecordsInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     if (input->filter != NULL) {
-        func_ov011_021706b8(request->writer, "ns1", "filter", input->filter);
+        gsXmlWriteStringElement(request->writer, "ns1", "filter", input->filter);
     }
     if (input->sort != NULL) {
-        func_ov011_021706b8(request->writer, "ns1", "sort", input->sort);
+        gsXmlWriteStringElement(request->writer, "ns1", "sort", input->sort);
     }
-    func_ov011_02170818(request->writer, "ns1", "offset", input->offset);
-    func_ov011_02170818(request->writer, "ns1", "max", input->max);
+    gsXmlWriteIntElement(request->writer, "ns1", "offset", input->offset);
+    gsXmlWriteIntElement(request->writer, "ns1", "max", input->max);
     if (input->targetFilter != NULL) {
-        func_ov011_021706b8(request->writer, "ns1", "targetfilter", input->targetFilter);
+        gsXmlWriteStringElement(request->writer, "ns1", "targetfilter", input->targetFilter);
     }
-    func_ov011_02170818(request->writer, "ns1", "surrounding", input->surrounding);
+    gsXmlWriteIntElement(request->writer, "ns1", "surrounding", input->surrounding);
     Sake_WriteOwnerIds(request, input->ownerIds, input->ownerNum);
-    func_ov011_02170818(request->writer, "ns1", "cacheFlag", input->cacheFlag);
+    gsXmlWriteIntElement(request->writer, "ns1", "cacheFlag", input->cacheFlag);
     Sake_WriteNames(request, input->fieldNames, input->fieldNum);
     return 0;
 }
@@ -415,7 +415,7 @@ static int Sake_ValidateGetMyRecords(SakeRequest *request) {
 static int Sake_BuildGetMyRecords(SakeRequest *request) {
     SakeGetMyRecordsInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     Sake_WriteNames(request, input->fieldNames, input->fieldNum);
     return 0;
 }
@@ -464,7 +464,7 @@ static int Sake_ValidateGetSpecificRecords(SakeRequest *request) {
 static int Sake_BuildGetSpecificRecords(SakeRequest *request) {
     SakeGetSpecificRecordsInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     Sake_WriteRecordIds(request, input->recordIds, input->recordNum);
     Sake_WriteNames(request, input->fieldNames, input->fieldNum);
     return 0;
@@ -508,11 +508,11 @@ static int Sake_ValidateGetRandomRecords(SakeRequest *request) {
 static int Sake_BuildGetRandomRecords(SakeRequest *request) {
     SakeGetRandomRecordsInput *input = request->input;
 
-    func_ov011_021706b8(request->writer, "ns1", "tableid", input->tableId);
+    gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     if (input->filter != NULL) {
-        func_ov011_021706b8(request->writer, "ns1", "filter", input->filter);
+        gsXmlWriteStringElement(request->writer, "ns1", "filter", input->filter);
     }
-    func_ov011_02170818(request->writer, "ns1", "max", 1);
+    gsXmlWriteIntElement(request->writer, "ns1", "max", 1);
     Sake_WriteNames(request, input->fieldNames, input->fieldNum);
     return 0;
 }
@@ -532,7 +532,7 @@ static int Sake_ParseGetRandomRecords(SakeRequest *request) {
             *output = NULL;
         }
     }
-    func_ov011_0216ddfc(records);
+    gsifree(records);
     return error;
 }
 

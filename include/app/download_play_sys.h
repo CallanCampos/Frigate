@@ -123,8 +123,21 @@ typedef struct {
     DownloadPlayWork play;
 } DownloadPlaySysContext;
 
+// The game that the overlay's screens file hands the flow to offer: an MBGameRegistry up to its player count, without
+// the user parameters
+typedef struct {
+    const char *romFilePathp;
+    u16 *gameNamep;
+    u16 *gameIntroductionp;
+    const char *iconCharPathp;
+    const char *iconPalettePathp;
+    u32 ggid;
+    u8 maxPlayerNum;
+    u8 pad[3];
+} DownloadPlaySysGame;
+
 // What the overlay's screens file calls
-void func_ov182_021ba768(DownloadPlaySysContext *context, const MBGameRegistry *registry);
+void func_ov182_021ba768(DownloadPlaySysContext *context, const DownloadPlaySysGame *registry);
 BOOL func_ov182_021ba81c(void);
 BOOL func_ov182_021ba918(void);
 BOOL func_ov182_021ba950(void);
