@@ -2,10 +2,10 @@
 # whole program's objects as the program links them (port/hal/trap.c and the trap stubs' placeholders), each scenario in
 # a process of its own: a trap placeholder touched (the game reaching data with no C yet), a crash reported, both again
 # on a fiber with the C library's code making the access (as the game's threads run), a fiber's guard touched there, the
-# crashes that aren't memory faults (a division by zero, an illegal instruction, a breakpoint, __builtin_trap) on the
-# host's stack and on a fiber, the watchdog going off, kicked and off, the program's static data (the PXI bus's
-# pointers), files, a folder and an argument whose names aren't ASCII, the environment and private file mappings. None
-# needs a ROM, so every CI job runs them.
+# crashes that aren't memory faults (a division by zero, an illegal instruction, a breakpoint) on the host's stack and
+# on a fiber, and __builtin_trap on the host's stack, the watchdog going off, kicked and off, the program's static data
+# (the PXI bus's pointers), files, a folder and an argument whose names aren't ASCII, the environment and private file
+# mappings. None needs a ROM, so every CI job runs them.
 enable_testing()
 add_executable(port_host_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/host/test_host.c"
@@ -50,12 +50,17 @@ foreach(scenario IN ITEMS crash_report_fiber guard_fiber)
     set_tests_properties(host_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()
 
-# The crashes that aren't memory faults, on the host's stack and on a fiber, reported the same way on every host
-# (port/hal/host/host.h), and each ending the program by what its report names, which check_exit.py checks: on macOS and
-# Linux, a division by zero is SIGFPE (8), an illegal instruction SIGILL (4) and a breakpoint SIGTRAP (5), and
-# __builtin_trap is SIGILL on x86-64 and SIGTRAP on arm64 (a universal program runs either slice); on Windows they are
-# exceptions 0xc0000094, 0xc000001d and 0x80000003, and __builtin_trap is an illegal instruction. arm64 divides by zero
-# without a fault, so there the scenario raises SIGFPE itself (port/tests/host/test_host.c)
+# The crashes that aren't memory faults, a division by zero, an illegal instruction and a breakpoint on the host's stack
+# and on a fiber, and __builtin_trap on the host's stack, reported the same way on every host (port/hal/host/host.h),
+# and each ending the program by what its report names, which check_exit.py checks: on macOS and Linux, a division by
+# zero is SIGFPE (8), an illegal instruction SIGILL (4) and a breakpoint SIGTRAP (5), and __builtin_trap is SIGILL on
+# x86-64 and SIGTRAP on arm64 (a universal program runs either slice); on Windows they are exceptions 0xc0000094,
+# 0xc000001d and 0x80000003, and __builtin_trap is an illegal instruction. arm64 divides by zero without a fault, so
+# there the scenario raises SIGFPE itself (port/tests/host/test_host.c). On macOS the report also names the function
+# that holds the instruction, "  in NAME+0x...", from the program's symbols: the scenario's own, or for arm64's division
+# the system's __pthread_kill, where raise() stops the thread. Linux's dladdr reads only the symbols a program exports,
+# and an ELF program exports none of its functions unless it links with --export-dynamic, which Frigate's don't;
+# Windows' backtrace starts at the faulting instruction instead of naming it apart
 if(WIN32)
     set(port_host_divide "exception 0xc0000094")
     set(port_host_illegal "exception 0xc000001d")
@@ -67,20 +72,24 @@ else()
     set(port_host_breakpoint "signal 5")
     set(port_host_trap "signal (4|5)")
 endif()
-function(port_host_crash_test scenario report)
+function(port_host_crash_test scenario report function)
+    set(where)
+    if(APPLE)
+        set(where --expect "port: crash: ${report} at address 0x[0-9a-f]+\\n  in (${function})\\+0x[0-9a-f]+\\n")
+    endif()
     add_test(NAME host_${scenario}
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}" "${port_host_check_exit}"
-            --crash --expect "port: crash: ${report} at address" --expect "Backtrace:"
+            --crash --expect "port: crash: ${report} at address" ${where} --expect "Backtrace:"
             -- $<TARGET_FILE:port_host_tests> ${scenario})
     set_tests_properties(host_${scenario} PROPERTIES TIMEOUT 60)
 endfunction()
-port_host_crash_test(divide_by_zero "${port_host_divide}")
-port_host_crash_test(divide_by_zero_fiber "${port_host_divide}")
-port_host_crash_test(illegal_instruction "${port_host_illegal}")
-port_host_crash_test(illegal_instruction_fiber "${port_host_illegal}")
-port_host_crash_test(breakpoint "${port_host_breakpoint}")
-port_host_crash_test(breakpoint_fiber "${port_host_breakpoint}")
-port_host_crash_test(trap "${port_host_trap}")
+port_host_crash_test(divide_by_zero "${port_host_divide}" "DivideByZero|__pthread_kill")
+port_host_crash_test(divide_by_zero_fiber "${port_host_divide}" "DivideByZero|__pthread_kill")
+port_host_crash_test(illegal_instruction "${port_host_illegal}" IllegalInstruction)
+port_host_crash_test(illegal_instruction_fiber "${port_host_illegal}" IllegalInstruction)
+port_host_crash_test(breakpoint "${port_host_breakpoint}" Breakpoint)
+port_host_crash_test(breakpoint_fiber "${port_host_breakpoint}" Breakpoint)
+port_host_crash_test(trap "${port_host_trap}" Trap)
 
 # The watchdog: its message and its status after a second of spinning; and no report while it is kicked
 add_test(NAME host_watchdog

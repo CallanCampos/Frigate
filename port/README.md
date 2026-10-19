@@ -288,11 +288,11 @@ and `app_universal_slices` runs both slices through the opening and requires the
   commands say, slice by slice, and checks them, as CI does on the distribution app.
 - `package_macos.sh` puts the app and a link to `/Applications` in a compressed disk image, then checks the image, the
   app's signature in it, its slices and minimum macOS against the build's, and that it holds no ROM or other game
-  file and no sanitizer's runtime. It refuses a sanitized build (`-DPORT_SANITIZE=ON`,
-  [docs/sanitizers.md](docs/sanitizers.md)), whose app carries the toolchain's sanitizer runtime and is for testing on
-  the Mac that built it, before it builds anything. `--out PATH` puts the image elsewhere, but never where git would
-  take it into a repository, this one or another (only under an ignored directory such as `build/`, or outside every
-  work tree). Its header lists its options.
+  file and no sanitizer's runtime, and removes an image that fails a check. It refuses a sanitized build
+  (`-DPORT_SANITIZE=ON`, or `-fsanitize=` in any of CMake's flags, [docs/sanitizers.md](docs/sanitizers.md)), whose app
+  carries the toolchain's sanitizer runtime and is for testing on the Mac that built it, before it builds anything.
+  `--out PATH` puts the image elsewhere, but never where git would take it into a repository, this one or another
+  (only under an ignored directory such as `build/`, or outside every work tree). Its header lists its options.
 
 **The ROM.** The app holds no ROM and no game data. It finds yours as the program does
 ([hal/rom](hal/rom/port_rom.h)): `--rom PATH`, then the `FRIGATE_ROM` environment variable, then the `orig/` of the

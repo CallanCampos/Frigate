@@ -3,10 +3,9 @@
 crash reports and the heap hooks' aborts run (port/cmake/integrate.cmake, host.cmake, nnsys.cmake): each ending it can
 want, met and missed, a skip, a crash that its report names and one that it doesn't, and a sanitizer's report, which
 fails a run whatever ending it wants, so that a sanitized program that aborted on a report (port/docs/sanitizers.md)
-never passes as the crash or abort a test wanted. The
-program it checks is a stand-in, this Python run with -c. What the checker prints is kept, not printed: the stand-ins'
-reports would otherwise reach ctest's output, which the sanitized build fails a test on (a failing case prints it).
-No ROM, no game; standard library only.
+never passes as the crash or abort a test wanted. The program it checks is a stand-in, this Python run with -c. What the
+checker prints is kept, not printed: the stand-ins' reports would otherwise reach ctest's output, which the sanitized
+build fails a test on (a failing case prints it). No ROM, no game; standard library only.
 
     test_check_exit.py
 """

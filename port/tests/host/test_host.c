@@ -2,13 +2,13 @@
 // Windows: a trap placeholder touched stops the program with its name and status 70 (port/hal/trap.c), as the game
 // would; a crash is reported with a backtrace before the fault ends the program; the same on a fiber, as the game's
 // threads run (port/hal/os/fiber.c), with the C library's code making the access, and with a fiber's guard touched; the
-// crashes that aren't memory faults, a division by zero, an illegal instruction, __builtin_trap and a breakpoint, on
-// the host's stack and on a fiber, each reported the same way before it ends the program (SIGFPE, SIGILL and SIGTRAP on
-// macOS and Linux, exceptions on Windows); the watchdog ends a program that spins, with its message and status, and
-// leaves one alone that kicks it or that started it with 0 seconds, which turns it off; and the program's static data,
-// pages and their protection, directories (one whose name isn't ASCII among them), arguments, environment and private
-// file mappings that the PXI bus (port/hal/pxi/pointer.c), the saves and the tests stand on. The scenarios that end the
-// process run one a process. None needs a ROM.
+// crashes that aren't memory faults, a division by zero, an illegal instruction and a breakpoint, on the host's stack
+// and on a fiber, and __builtin_trap on the host's stack, each reported the same way before it ends the program
+// (SIGFPE, SIGILL and SIGTRAP on macOS and Linux, exceptions on Windows); the watchdog ends a program that spins, with
+// its message and status, and leaves one alone that kicks it or that started it with 0 seconds, which turns it off; and
+// the program's static data, pages and their protection, directories (one whose name isn't ASCII among them),
+// arguments, environment and private file mappings that the PXI bus (port/hal/pxi/pointer.c), the saves and the tests
+// stand on. The scenarios that end the process run one a process. None needs a ROM.
 //
 //   port_host_tests NAME [ARGUMENT]
 #include "hal/host/host.h"
@@ -136,10 +136,12 @@ static int TestGuardFiber(void) {
     return OnFiber(ClearGuard);
 }
 
-// The crashes that aren't memory faults, each reported with the instruction's address and a backtrace, then ended by
-// the signal (macOS, Linux) or with the exception's status (Windows) that port/cmake/host.cmake names. The operands of
-// the division are volatile, so that the compiler divides at run time: with a constant dividend of 1, LLVM turns
-// 1 / x into a comparison, which never faults
+// The crashes that aren't memory faults, each reported with the instruction's address, on macOS the function holding it
+// too ("  in NAME+0x..."), and a backtrace, then ended by the signal (macOS, Linux) or with the exception's status
+// (Windows) that port/cmake/host.cmake names. The functions that crash are not inlined, so that the function the
+// report names is the scenario's own, whichever stack it runs on. The operands of the division are volatile, so that
+// the compiler divides at run time: with a constant dividend of 1, LLVM turns 1 / x into a comparison, which never
+// faults
 static volatile int sDividend = 10;
 static volatile int sDivisor;
 static volatile int sQuotient;
@@ -148,7 +150,7 @@ static volatile int sQuotient;
 // as the Pokédex's scroll bar did there (port/docs/sanitizers.md, R5), so there the test raises SIGFPE itself, which
 // the seam reports at the instruction where the signal stopped the thread. Without UBSan's check of it, which reports
 // the division before it runs in the sanitized build
-__attribute__((no_sanitize("integer-divide-by-zero"))) static void DivideByZero(void) {
+__attribute__((noinline, no_sanitize("integer-divide-by-zero"))) static void DivideByZero(void) {
     printf("dividing %d by %d\n", sDividend, sDivisor);
     sQuotient = sDividend / sDivisor;
 #if defined(__aarch64__)
@@ -160,7 +162,7 @@ __attribute__((no_sanitize("integer-divide-by-zero"))) static void DivideByZero(
 
 // An illegal instruction (SIGILL, exception 0xc000001d): UDF #0 on arm64, UD2 elsewhere, which is x86-64's
 // __builtin_trap
-static void IllegalInstruction(void) {
+__attribute__((noinline)) static void IllegalInstruction(void) {
     printf("an illegal instruction\n");
 #if defined(__aarch64__)
     __asm__ volatile("udf #0");
@@ -171,14 +173,14 @@ static void IllegalInstruction(void) {
 }
 
 // A breakpoint (SIGTRAP, exception 0x80000003): INT3 on x86-64, BRK on arm64
-static void Breakpoint(void) {
+__attribute__((noinline)) static void Breakpoint(void) {
     printf("a breakpoint\n");
     __builtin_debugtrap();
     printf("never: the breakpoint went on\n");
 }
 
 // What the compiler emits for a trap: UD2 on x86-64, an illegal instruction, and BRK on arm64, a breakpoint
-static void Trap(void) {
+__attribute__((noinline)) static void Trap(void) {
     printf("__builtin_trap\n");
     __builtin_trap();
 }

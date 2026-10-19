@@ -10,15 +10,15 @@ instead.
 
 --fresh-save-dir gives the program a save directory of its own, a new temporary one, removed after. --crash wants the
 program to end by a crash, as each host ends a crashed program: killed by a signal on macOS and Linux, with an
-exception's status on Windows (port/hal/host): an error's, 0xc0000000 and up, or a warning's, 0x80000000 and up, such
-as a guard page's 0x80000001 or a breakpoint's 0x80000003; and when its messages have the host's crash report,
+exception's status on Windows (port/hal/host): an error's, 0xc0000000 and up, or a warning's, 0x80000000 and up, such as
+a guard page's 0x80000001 or a breakpoint's 0x80000003; and when its messages have the host's crash report,
 "port: crash: signal N" or "port: crash: exception 0xCODE", the crash the report names: killed by signal N, or status
 0xCODE. --abort wants it to end by abort(), a check of the platform layer's that failed: killed by SIGABRT on macOS and
 Linux, status 3 on Windows. Exits 0 when the program ended as wanted, its messages (stderr, then stdout) match every
 --expect and no --reject, and hold no sanitizer's report; 77 (skipped) when it ended with a --skip-status (66: no ROM);
-1 otherwise. A sanitizer's report fails the run whatever ending it wants, since none of the
-runs this checks expects one: in the sanitized build a report aborts the program (port/docs/sanitizers.md), which
---crash or --abort would otherwise take for the ending it wants. Standard library only.
+1 otherwise. A sanitizer's report fails the run whatever ending it wants, since none of the runs this checks expects
+one: in the sanitized build a report aborts the program (port/docs/sanitizers.md), which --crash or --abort would
+otherwise take for the ending it wants. Standard library only.
 """
 
 from __future__ import annotations

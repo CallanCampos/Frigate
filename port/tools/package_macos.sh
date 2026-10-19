@@ -4,10 +4,12 @@
 # signed ad hoc, and hdiutil makes a compressed disk image named after it, with the app and a link to /Applications to
 # drag it onto. The image is checked before the script ends: it verifies, the app in it passes codesign's strict check,
 # its program has the slices and its Info.plist the minimum macOS the build was configured for, and it holds no ROM,
-# save or other file of the game's, and no sanitizer's runtime. A sanitized build (-DPORT_SANITIZE=ON, or -fsanitize= in
-# its C or linker flags) is refused before anything is built: its app carries the toolchain's sanitizer runtime, which
-# make_app.sh copies into it, and is for testing on this Mac only (port/docs/sanitizers.md). It is only ever made
-# locally: the port's compiled game code is never uploaded or distributed (port/CLAUDE.md).
+# save or other file of the game's, and no sanitizer's runtime; an image that fails a check, or that the script stops
+# before checking, is removed. A sanitized build (-DPORT_SANITIZE=ON, or -fsanitize= in any of the compiler's or the
+# linker's flags its cache holds, a configuration's such as CMAKE_C_FLAGS_RELWITHDEBINFO among them) is refused before
+# anything is built: its app carries the toolchain's sanitizer runtime, which make_app.sh copies into it, and is for
+# testing on this Mac only (port/docs/sanitizers.md). It is only ever made locally: the port's compiled game code is
+# never uploaded or distributed (port/CLAUDE.md).
 #
 #   port/tools/package_macos.sh [--build-dir DIR] [--out PATH]
 #   port/tools/package_macos.sh --distribution [--version b2_us|w2_us] [--build-dir DIR] [--out PATH]
@@ -145,17 +147,18 @@ fi
 
 # A sanitized build's app links the toolchain's AddressSanitizer runtime, which make_app.sh copies into it with the
 # other libraries the program loads: an app for testing on this Mac, never one to give out (port/docs/sanitizers.md).
-# So no disk image is made of it, whether the build was configured with PORT_SANITIZE or with -fsanitize= in its flags
+# So no disk image is made of it, whether the build was configured with PORT_SANITIZE or with -fsanitize= in any of
+# CMake's flags in its cache: every CMAKE_*FLAGS* entry, the compilers' and the linkers' (an executable's, a shared
+# library's), for every configuration (CMAKE_C_FLAGS_RELWITHDEBINFO and its kin), whichever the build uses
 sanitized=
 if cache_on PORT_SANITIZE; then
     sanitized="-DPORT_SANITIZE=ON"
 else
-    for flags in CMAKE_C_FLAGS CMAKE_EXE_LINKER_FLAGS; do
-        if cache_value "$flags" | grep -q -e '-fsanitize='; then
-            sanitized="-fsanitize= in $flags"
-            break
-        fi
-    done
+    flags=$(sed -n 's/^\(CMAKE_[A-Z_]*FLAGS[A-Z_]*\):[A-Z]*=.*-fsanitize=.*/\1/p' "$build_dir/CMakeCache.txt" |
+        head -n 1)
+    if [ -n "$flags" ]; then
+        sanitized="-fsanitize= in $flags"
+    fi
 fi
 if [ -n "$sanitized" ]; then
     echo "package_macos.sh: $build_dir is a sanitized build ($sanitized): its app carries the sanitizer runtime and" \
@@ -189,9 +192,16 @@ mkdir -p "$(dirname "$out")"
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/package_macos.XXXXXX")
 mount_point="$work/mount"
+# Set from the image's making until it has passed every check: an image that fails one (a sanitizer's runtime in it,
+# say), or that the script stops before checking, is removed on the way out, so that none is left to give out
+unchecked=
 cleanup() {
     if [ -d "$mount_point" ]; then
         hdiutil detach -quiet "$mount_point" 2>/dev/null || true
+    fi
+    if [ -n "$unchecked" ] && [ -e "$out" ]; then
+        rm -f "$out"
+        echo "package_macos.sh: removed $out, which didn't pass its checks" >&2
     fi
     rm -rf "$work"
 }
@@ -204,6 +214,7 @@ ditto "$app" "$work/image/$app_name.app"
 ln -s /Applications "$work/image/Applications"
 # hdiutil create fails now and then for no reason of the image's ("Resource busy", on GitHub's macOS runners above all),
 # so it gets three tries, a few seconds apart, before its last message stops the script
+unchecked=yes
 attempt=1
 while :; do
     rm -f "$out"
@@ -265,6 +276,7 @@ if [ -n "$found" ]; then
 fi
 hdiutil detach -quiet "$mount_point"
 rmdir "$mount_point"
+unchecked=
 
 size=$(du -h "$out" | cut -f1)
 echo "package_macos.sh: $out ($size): $app_name.app $app_version, $slices, macOS $app_minimum or later, signed ad hoc"

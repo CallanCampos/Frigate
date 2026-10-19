@@ -162,9 +162,13 @@ static const void *InstructionAddress(const void *context) {
 }
 
 // A crash: a memory fault goes to the handler, with the address accessed; any other is reported here, with the address
-// of the instruction that raised it and a backtrace. Then, unless the handler ended the program, the signal's default
-// action ends it, as it would have without a handler: the signal stays blocked until this returns, and is delivered
-// then, before the faulting instruction could run again
+// of the instruction that raised it, the function that holds it when the program's symbols name one, and a backtrace.
+// The function is named apart because the backtrace may not show it: backtrace() walks the frames up from this
+// handler's, through the system's signal trampoline, and what follows _sigtramp depends on the system. On arm64 macOS
+// it is the faulting function's frame, at the faulting instruction; on x86_64 under Rosetta it is a frame at 0, then
+// that function's callers without the function itself, or on a fiber nothing more. Then, unless the handler ended the
+// program, the signal's default action ends it, as it would have without a handler: the signal stays blocked until
+// this returns, and is delivered then, before the faulting instruction could run again
 static void OnFault(int signal, siginfo_t *info, void *context) {
     char fault[32];
     struct sigaction action;
@@ -176,10 +180,18 @@ static void OnFault(int signal, siginfo_t *info, void *context) {
         }
     } else {
         const void *instruction = InstructionAddress(context);
+        const char *name;
+        uintptr_t offset;
 
+        if (instruction == NULL) {
+            instruction = info->si_addr;
+        }
         // Not async-signal-safe, as the handler's report isn't, but the process is about to end, and this is the
         // report it exists for
-        fprintf(stderr, "\nport: crash: %s at address %p\n", fault, instruction != NULL ? instruction : info->si_addr);
+        fprintf(stderr, "\nport: crash: %s at address %p\n", fault, instruction);
+        if (port_host_function_at(instruction, &name, &offset)) {
+            fprintf(stderr, "  in %s+0x%lx\n", name, (unsigned long)offset);
+        }
         port_host_print_backtrace();
         fflush(stderr);
     }

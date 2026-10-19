@@ -69,8 +69,10 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   - The macOS app built here links the toolchain's ASan runtime, which
     [../app/macos/make_app.sh](../app/macos/make_app.sh) copies into it: it is for testing on this Mac, never for
     giving out. So [../tools/package_macos.sh](../tools/package_macos.sh) refuses to put a sanitized build's app in a
-    disk image (a build configured with `PORT_SANITIZE`, or with `-fsanitize=` in its flags), before it builds
-    anything, and checks that no image it makes holds a sanitizer's runtime (the test `app_package_macos_out`).
+    disk image (a build configured with `PORT_SANITIZE`, or with `-fsanitize=` in any of CMake's flags in its cache,
+    `CMAKE_C_FLAGS_RELWITHDEBINFO` and the linkers' among them), before it builds anything; and it checks that no image
+    it makes holds a sanitizer's runtime, and removes one that does. The test `app_package_macos_out` checks both, the
+    image's check on a stand-in app with a library of the runtime's name, which it builds and packages.
   - With `-DPORT_MACOS_DISTRIBUTION=ON`, in a directory of its own (`build/port-san-dist`), both slices are built
     sanitized for macOS 11.0, with SDL3 linked statically and left as it is: ctest runs the Mac's slice, and
     [../tools/ctest_one_slice.sh](../tools/ctest_one_slice.sh) the other, the x86_64 one under Rosetta on Apple

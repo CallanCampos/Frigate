@@ -3,6 +3,23 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: the crash reports and the sanitized build's packaging, after review
+
+- **A check of a CMake cache by a variable's name misses its kin.** CMake keeps each configuration's flags
+  (`CMAKE_C_FLAGS_RELWITHDEBINFO`, `CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO`) and a shared library's linker flags
+  (`CMAKE_SHARED_LINKER_FLAGS`) apart from `CMAKE_C_FLAGS` and `CMAKE_EXE_LINKER_FLAGS`, so a refusal that read those
+  two let a build configured with `-DCMAKE_C_FLAGS_RELWITHDEBINFO="... -fsanitize=address"` through, to build everything
+  and fail only at the image. Match the family (`CMAKE_*FLAGS*`), and give the test one case of each member.
+- **A check after a script writes its output removes the output when it fails.** `package_macos.sh` checked the image
+  it had written, failed with status 1, and left the image where it would have been given out. Whatever a later check
+  can fail is removed on the way out (the `EXIT` trap) until every check has passed.
+- **A backtrace taken in a signal handler may not show the function that faulted.** What `backtrace()` finds after
+  `_sigtramp` is the system's doing: on arm64 macOS the faulting function's frame, at the faulting instruction; on
+  x86_64 under Rosetta a frame at 0 and then only that function's callers, and on a fiber nothing more. The report
+  names the function from the saved program counter instead, as the trap stubs name their caller.
+- **A document that says a test covers something is checked against the test.** sanitizers.md named the test of the
+  image's check before any test reached that check; the test that existed only fed caches to the refusals before it.
+
 ## 2026-10-19: the crash reports of SIGFPE, SIGILL and SIGTRAP, and no disk image of a sanitized build
 
 - **On arm64, `__builtin_trap` is a breakpoint.** It is BRK, SIGTRAP on macOS and Linux, where x86-64's UD2 is SIGILL:
