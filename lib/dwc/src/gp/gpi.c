@@ -23,7 +23,7 @@ int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int 
     int result;
 
     *connection = NULL;
-    iconnection = func_ov011_0216dddc(sizeof(GPIConnection));
+    iconnection = gsimalloc(sizeof(GPIConnection));
     if (iconnection == NULL) {
         return 1;
     }
@@ -38,7 +38,7 @@ int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int 
     iconnection->namespaceID = namespaceID;
     iconnection->partnerID = partnerID;
     if (!gpiInitProfiles((GPConnection *)&iconnection)) {
-        func_ov011_0216ddfc(iconnection);
+        gsifree(iconnection);
         return 1;
     }
     iconnection->diskCache = NULL;
@@ -51,8 +51,8 @@ int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int 
         gpiDestroy((GPConnection *)&iconnection);
         return result;
     }
-    func_ov011_0216e31c();
-    srand(func_ov011_0216e324());
+    SocketStartUp();
+    srand(current_time());
     *connection = iconnection;
     return 0;
 }
@@ -63,7 +63,7 @@ void gpiDestroy(GPConnection *connection) {
     gpiDisconnect(connection, TRUE);
     gpiStatusInfoKeysDestroy(connection);
     func_ov011_0217187c(iconnection->profileList.profileTable);
-    func_ov011_0216ddfc(iconnection);
+    gsifree(iconnection);
     *connection = NULL;
 }
 
@@ -92,29 +92,29 @@ int gpiReset(GPConnection *connection) {
     iconnection->socketBuffer.len = 0;
     iconnection->socketBuffer.pos = 0;
     iconnection->socketBuffer.size = 0;
-    func_ov011_0216ddfc(iconnection->socketBuffer.buffer);
+    gsifree(iconnection->socketBuffer.buffer);
     iconnection->socketBuffer.buffer = NULL;
     iconnection->socketBuffer.buffer = NULL;
     iconnection->inputBufferSize = 0;
-    func_ov011_0216ddfc(iconnection->inputBuffer);
+    gsifree(iconnection->inputBuffer);
     iconnection->inputBuffer = NULL;
     iconnection->inputBuffer = NULL;
     iconnection->outputBuffer.len = 0;
     iconnection->outputBuffer.pos = 0;
     iconnection->outputBuffer.size = 0;
-    func_ov011_0216ddfc(iconnection->outputBuffer.buffer);
+    gsifree(iconnection->outputBuffer.buffer);
     iconnection->outputBuffer.buffer = NULL;
     iconnection->outputBuffer.buffer = NULL;
     iconnection->updateproBuffer.len = 0;
     iconnection->updateproBuffer.pos = 0;
     iconnection->updateproBuffer.size = 0;
-    func_ov011_0216ddfc(iconnection->updateproBuffer.buffer);
+    gsifree(iconnection->updateproBuffer.buffer);
     iconnection->updateproBuffer.buffer = NULL;
     iconnection->updateproBuffer.buffer = NULL;
     iconnection->updateuiBuffer.len = 0;
     iconnection->updateuiBuffer.pos = 0;
     iconnection->updateuiBuffer.size = 0;
-    func_ov011_0216ddfc(iconnection->updateuiBuffer.buffer);
+    gsifree(iconnection->updateuiBuffer.buffer);
     iconnection->updateuiBuffer.buffer = NULL;
     iconnection->updateuiBuffer.buffer = NULL;
     gpiStatusInfoKeysDestroy(connection);
@@ -158,7 +158,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
 
     connClosed = FALSE;
     iconnection = *connection;
-    now = func_ov011_0216e324();
+    now = current_time();
     do {
         gpiAddLocalInfo(connection, &iconnection->outputBuffer);
         if (iconnection->outputBuffer.len > 0) {
@@ -183,7 +183,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
         while ((next = strstr(iconnection->socketBuffer.buffer, "\\final\\")) != NULL) {
             iconnection->kaTransmit = now;
             *next = '\0';
-            func_ov011_0216cca8(1, 0, 0x20, "CMD: %s\n", iconnection->socketBuffer.buffer);
+            gsDebugFormat(1, 0, 0x20, "CMD: %s\n", iconnection->socketBuffer.buffer);
             len = next - iconnection->socketBuffer.buffer;
             if (len > iconnection->inputBufferSize) {
                 int increase = len;
@@ -193,7 +193,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                     increase = 0x4000;
                 }
                 iconnection->inputBufferSize += increase;
-                tempPtr = func_ov011_0216ddec(iconnection->inputBuffer, iconnection->inputBufferSize + 1);
+                tempPtr = gsirealloc(iconnection->inputBuffer, iconnection->inputBufferSize + 1);
                 if (tempPtr == NULL) {
                     gpiSetErrorString(connection, "Out of memory.");
                     return 1;
@@ -210,7 +210,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                 int id = atol(str + 4);
 
                 if (!gpiFindOperationByID(connection, &operation, id)) {
-                    func_ov011_0216cca8(1, 0, 1, "No matching operation found for id %d\n", id);
+                    gsDebugFormat(1, 0, 1, "No matching operation found for id %d\n", id);
                 } else {
                     result = gpiProcessOperation(connection, operation, iconnection->inputBuffer);
                     if (result != 0) {
@@ -251,7 +251,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                             return result;
                         }
                     } else {
-                        func_ov011_0216cca8(1, 0, 1, "Received an unrecognized message.\n");
+                        gsDebugFormat(1, 0, 1, "Received an unrecognized message.\n");
                     }
                 }
             }
@@ -263,7 +263,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
         }
         loop = gpiOperationsAreBlocking(connection);
         if (loop) {
-            func_ov011_0216e360(10);
+            msleep(10);
         }
     } while (loop);
     // A keep-alive after two minutes without a message
@@ -287,7 +287,7 @@ int gpiProcess(GPConnection *connection, int blockingOperationID) {
             result = gpiCheckConnect(connection);
             loop = result == 0 && blockingOperationID != 0 && iconnection->connectState == GPI_CONNECTING;
             if (loop) {
-                func_ov011_0216e360(10);
+                msleep(10);
             }
         } while (loop);
         // A connect that failed ends its operation with a server error

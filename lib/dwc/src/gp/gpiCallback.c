@@ -18,7 +18,7 @@ void gpiCallErrorCallback(GPConnection *connection, int result, int fatal) {
     }
     callback = iconnection->callbacks[0];
     if (callback.callback != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPErrorArg));
+        arg = gsimalloc(sizeof(GPErrorArg));
         if (arg != NULL) {
             arg->result = result;
             arg->fatal = fatal;
@@ -31,7 +31,7 @@ void gpiCallErrorCallback(GPConnection *connection, int result, int fatal) {
 
 int gpiAddCallback(GPConnection *connection, GPICallback callback, void *arg, const GPIOperation *operation, int type) {
     GPIConnection *iconnection = *connection;
-    GPICallbackData *data = func_ov011_0216dddc(sizeof(GPICallbackData));
+    GPICallbackData *data = gsimalloc(sizeof(GPICallbackData));
 
     if (data == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
@@ -59,42 +59,42 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
     data->callback.callback(connection, data->arg, data->callback.param);
     type = data->type;
     if (type == GPI_ADD_MESSAGE) {
-        func_ov011_0216ddfc(((GPRecvBuddyMessageArg *)data->arg)->message);
+        gsifree(((GPRecvBuddyMessageArg *)data->arg)->message);
         ((GPRecvBuddyMessageArg *)data->arg)->message = NULL;
     } else if (type == GPI_ADD_BUDDYUTM) {
-        func_ov011_0216ddfc(((GPRecvBuddyUTMArg *)data->arg)->message);
+        gsifree(((GPRecvBuddyUTMArg *)data->arg)->message);
         ((GPRecvBuddyUTMArg *)data->arg)->message = NULL;
     } else if (type == GPI_ADD_NICKS) {
         GPGetUserNicksResponseArg *arg = data->arg;
         int i;
 
         for (i = 0; i < arg->numNicks; i++) {
-            func_ov011_0216ddfc(arg->nicks[i]);
+            gsifree(arg->nicks[i]);
             arg->nicks[i] = NULL;
-            func_ov011_0216ddfc(arg->uniquenicks[i]);
+            gsifree(arg->uniquenicks[i]);
             arg->uniquenicks[i] = NULL;
         }
-        func_ov011_0216ddfc(arg->nicks);
+        gsifree(arg->nicks);
         arg->nicks = NULL;
-        func_ov011_0216ddfc(arg->uniquenicks);
+        gsifree(arg->uniquenicks);
         arg->uniquenicks = NULL;
     } else if (type == GPI_ADD_PMATCH) {
         GPFindPlayersResponseArg *arg = data->arg;
 
-        func_ov011_0216ddfc(arg->matches);
+        gsifree(arg->matches);
         arg->matches = NULL;
     } else if (type == GPI_ADD_TRANSFER_CALLBACK) {
         GPTransferCallbackArg *arg = data->arg;
 
         if (arg->message != NULL) {
-            func_ov011_0216ddfc(arg->message);
+            gsifree(arg->message);
             arg->message = NULL;
         }
     } else if (type == GPI_ADD_REVERSE_BUDDIES) {
         GPGetReverseBuddiesResponseArg *arg = data->arg;
 
         if (arg->profiles != NULL) {
-            func_ov011_0216ddfc(arg->profiles);
+            gsifree(arg->profiles);
             arg->profiles = NULL;
         }
     } else if (type == GPI_ADD_SUGGESTED_UNIQUE) {
@@ -102,10 +102,10 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
         GPSuggestUniqueNickResponseArg *arg = data->arg;
 
         for (i = 0; i < arg->numSuggestedNicks; i++) {
-            func_ov011_0216ddfc(arg->suggestedNicks[i]);
+            gsifree(arg->suggestedNicks[i]);
             arg->suggestedNicks[i] = NULL;
         }
-        func_ov011_0216ddfc(arg->suggestedNicks);
+        gsifree(arg->suggestedNicks);
         arg->suggestedNicks = NULL;
     } else if (type == GPI_ADD_BUDDYREVOKE) {
         // The buddy that revoked is deleted once the app knows, without telling the server
@@ -114,7 +114,7 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
         GPGetReverseBuddiesListResponseArg *arg = data->arg;
 
         if (arg->matches != NULL) {
-            func_ov011_0216ddfc(arg->matches);
+            gsifree(arg->matches);
             arg->matches = NULL;
         }
     } else if (type == GPI_ADD_BUDDYKEYS) {
@@ -123,27 +123,27 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
 
         if (arg->numKeys != 0) {
             for (i = 0; i < arg->numKeys; i++) {
-                func_ov011_0216ddfc(arg->keys[i]);
+                gsifree(arg->keys[i]);
                 arg->keys[i] = NULL;
-                func_ov011_0216ddfc(arg->values[i]);
+                gsifree(arg->values[i]);
                 arg->values[i] = NULL;
             }
-            func_ov011_0216ddfc(arg->keys);
+            gsifree(arg->keys);
             arg->keys = NULL;
-            func_ov011_0216ddfc(arg->values);
+            gsifree(arg->values);
             arg->values = NULL;
         }
     } else if (type == GPI_ADD_PROFILE_LIST) {
         GPGetProfileListResponseArg *arg = data->arg;
 
         if (arg->profiles != NULL) {
-            func_ov011_0216ddfc(arg->profiles);
+            gsifree(arg->profiles);
             arg->profiles = NULL;
         }
     }
-    func_ov011_0216ddfc(data->arg);
+    gsifree(data->arg);
     data->arg = NULL;
-    func_ov011_0216ddfc(data);
+    gsifree(data);
 }
 
 int gpiProcessCallbacks(GPConnection *connection, int blockingOperationID) {

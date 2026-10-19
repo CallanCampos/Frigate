@@ -149,7 +149,7 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
         DWCi_SetError(8, Gdb_GetErrorCode(1, 4));
         return 4;
     }
-    func_ov011_0216c77c();
+    gsCoreInitialize();
     error = sakeStartup(&sGdb.sake);
     if (error != 0) {
         Gdb_Printf(295, "sakeStartup failed.[%d]\n", error);
@@ -249,8 +249,8 @@ static void Gdb_ReleaseUrls(void) {
 }
 
 void Gdb_Update(void) {
-    if (func_ov011_0216c9f4() != 2) {
-        func_ov011_0216c910(0);
+    if (gsCoreIsShutdown() != 2) {
+        gsCoreThink(0);
     }
     DWC_ProcessGHTTP();
 }
@@ -418,10 +418,10 @@ static BOOL Gdb_CheckReady(int *error) {
 }
 
 static void Gdb_RunLibrary(void) {
-    func_ov011_0216c998();
-    func_ov011_0216c910(0);
-    if (func_ov011_0216c9f4() != 2) {
-        func_ov011_0216c910(0);
+    gsCoreShutdown();
+    gsCoreThink(0);
+    if (gsCoreIsShutdown() != 2) {
+        gsCoreThink(0);
     }
 }
 

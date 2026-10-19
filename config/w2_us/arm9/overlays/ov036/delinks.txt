@@ -316,6 +316,7 @@ src/ov036/sound_obj.c:
     .data       start:0x021d5514 end:0x021d5520
 
 src/ov036/event_name_entry.c:
+    complete
     .text       start:0x021bf94c end:0x021bfec0
 
 src/ov036/shortcut_menu.c:
@@ -343,6 +344,7 @@ src/ov036/field_msgbg.c:
     .data       start:0x021d4bf0 end:0x021d4c00
 
 src/ov036/field_wfbc.c:
+    complete
     .text       start:0x0218adec end:0x0218ae78
     .data       start:0x021d4c00 end:0x021d4c10
 
@@ -352,12 +354,12 @@ src/ov036/field_comm_actor.c:
     .data       start:0x021d4c10 end:0x021d4c24
 
 src/ov036/ctalkmsgwin.c:
-    .text       start:0x0218b238 end:0x0218d134
+    .text       start:0x0218b238 end:0x0218d128
     .data       start:0x021d4c24 end:0x021d4c74
 
 src/ov036/ircbattlemenu.c:
-    .text       start:0x0218d134 end:0x0218ed58
-    .rodata     start:0x021cab0c end:0x021cad28
+    .text       start:0x0218d128 end:0x0218ed58
+    .rodata     start:0x021cab0c end:0x021cace0
     .data       start:0x021d4c74 end:0x021d4d74
 
 src/ov036/field_menu_event.c:
@@ -366,7 +368,7 @@ src/ov036/field_menu_event.c:
 
 src/ov036/fldmmdl_acmd.c:
     .text       start:0x0218ed58 end:0x021936c0
-    .rodata     start:0x021cad28 end:0x021ce3d4
+    .rodata     start:0x021cace0 end:0x021ce3d4
     .data       start:0x021d4d74 end:0x021d4d90
 
 src/ov036/fldmmdl_blact.c:
@@ -457,6 +459,7 @@ src/ov036/field_rail.c:
     .data       start:0x021d5270 end:0x021d529c
 
 src/ov036/union_mine_pms.c:
+    complete
     .text       start:0x021b4494 end:0x021b46e8
     .rodata     start:0x021d10ac end:0x021d10b4
     .data       start:0x021d52e0 end:0x021d5364
@@ -478,6 +481,7 @@ src/ov036/field_fmission_info.c:
     .data       start:0x021d53a0 end:0x021d53b8
 
 src/ov036/fes_gimmick.c:
+    complete
     .text       start:0x021b64e8 end:0x021b685c
     .data       start:0x021d53b8 end:0x021d53c8
 
@@ -493,6 +497,7 @@ src/ov036/entrance_camera.c:
     .data       start:0x021d5404 end:0x021d5418
 
 src/ov036/field_gimmick.c:
+    complete
     .text       start:0x021b7fb4 end:0x021b8084
     .rodata     start:0x021d12a8 end:0x021d1658
 
@@ -561,6 +566,7 @@ src/ov036/fieldmap_tcb_camera_zoom.c:
     .data       start:0x021d5540 end:0x021d555c
 
 src/ov036/field_task.c:
+    complete
     .text       start:0x021c08a8 end:0x021c094c
     .data       start:0x021d555c end:0x021d556c
 
@@ -587,6 +593,7 @@ src/ov036/fld_wipe_3dobj.c:
     .data       start:0x021d55a8 end:0x021d55bc
 
 src/ov036/pleasure_boat.c:
+    complete
     .text       start:0x021c20b8 end:0x021c22d4
     .data       start:0x021d55bc end:0x021d55cc
 
