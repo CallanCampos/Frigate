@@ -208,6 +208,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
+- An RC4 swap or any three-way exchange with the wrong registers: write it through one temporary, and group a
+  masked sum as `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that steals the counter's
+  register: index `src[i + k]` directly, with an `unsigned long i`. (matching.md: "An RC4 key schedule's swap")
 
 ## Stack slots or frame size
 
@@ -288,6 +291,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   the parameter is narrower than `int` (for a static helper, the type its public caller passes); loop with a
   separate `int` counter. (matching.md: "A register parameter stored at entry and read back from its slot")
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
+- A byte-sized running value kept on the stack and reloaded across calls where ours holds it in a register: declare
+  it `u8`. (matching.md: "A running sum that only ever holds a byte")
 
 ## Instructions in another order (scheduling)
 

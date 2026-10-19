@@ -650,6 +650,15 @@ Same instructions, registers swapped.
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode).
+- An RC4 key schedule's swap written through one temporary, `temp = table[j]; table[j] = table[i]; table[i] =
+  temp;`, lets the two reads of `table[i]` share a register, and the sum grouped `(table[i] + (j + key[k])) & 0xff`
+  gives `add r4, r5, r4` where the flat `j + key[k] + table[i]` swaps the operands: DS Protect's
+  `DSProt_Rc4InitMulti` went from 28 differing lines to a match with those two spellings. In the same library's
+  `DSProt_EncryptCodeMulti` and `DSProt_DecryptCodeMulti`, a named `u8 *in = src + i` took the saved register ahead
+  of the counter; indexing `src[i + k]` and `*(u32 *)(src + i)` directly, with an `unsigned long i`, gives the
+  original's registers, and the running `u8 sum` is `dest[i + 3] = sum + src[i + 3]; sum = dest[i + 3];`. A byte
+  decrypted through a `static inline` that returns the xor and stores the plain byte into the state splits the
+  bytes' live ranges, so the first lands in `r7` and the next two in `fp`.
 
 ## Stack slots
 
@@ -1045,6 +1054,10 @@ Same code, other `sp` offsets or frame size.
   without being hoisted itself: the grid transition's `EncEffGrid_Draw` (22 bytes of stack slots) matched with
   `s1 = s + width * FX32_ONE; t1 = t + height * FX32_ONE;` assigned right after `s` and `t`, the far corner's texture
   coordinates. The invariant itself as a local (`w = width * FX32_ONE`) is hoisted under a guard and costs 4 bytes.
+- A running sum that only ever holds a byte, kept on the stack and reloaded from its slot across calls (`ldrne r0,
+  [sp, #0xc]` for a `-1` and the counter started from a reload of it), is a `u8` local: `DSProt_DecryptCodeMulti`'s
+  `u8 sum` gave the original's `push {r3}` frame of 0x10 and its 4 missing bytes, where a `u32 sum` lived in a
+  register.
 
 ## Instruction order
 
