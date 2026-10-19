@@ -5257,14 +5257,14 @@
     .2byte \a1
     .endm
 
-    // func_ov065_021e6508
+    // PokemonCenterCmd_GetMatchState
     .macro Plugin13_Cmd1005 a0, a1
     FieldCommand 1005
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov065_021e658c
+    // PokemonCenterCmd_SetMatchInProgress
     .macro Plugin13_Cmd1006
     FieldCommand 1006
     .endm
@@ -5280,7 +5280,7 @@
     .2byte \a1
     .endm
 
-    // func_ov065_021e6634
+    // PokemonCenterCmd_AddBattlePoints
     .macro Plugin13_Cmd1009 a0
     FieldCommand 1009
     .2byte \a0
