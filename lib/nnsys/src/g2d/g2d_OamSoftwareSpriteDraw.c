@@ -36,70 +36,91 @@ static const GXTexSizeT texSizeTTbl_[3][4] = {
     { GX_TEXSIZE_T16, GX_TEXSIZE_T32, GX_TEXSIZE_T32, GX_TEXSIZE_T64 },
 };
 
+static inline u32 GetNumTexChar(GXTexSizeS texSize) {
+    return numCharsInRowTbl_[texSize];
+}
+
+static inline void DoFlip(BOOL flipH, BOOL flipV, fx32 *u0, fx32 *u1, fx32 *v0, fx32 *v1) {
+    fx32 temp;
+
+    if (flipH) {
+        temp = *u0;
+        *u0 = *u1;
+        *u1 = temp;
+    }
+    if (flipV) {
+        temp = *v0;
+        *v0 = *v1;
+        *v1 = temp;
+    }
+    if (s_pUVFlipCorrectFunc != NULL) {
+        s_pUVFlipCorrectFunc(u0, v0, u1, v1, flipH, flipV);
+    }
+}
+
+static inline u32 GetPlttOffset(GXTexFmt fmt, BOOL extendedPltt, u16 plttNo) {
+    if (extendedPltt) {
+        return (u32)(plttNo << 9);
+    } else if (fmt == GX_TEXFMT_PLTT256) {
+        return 0;
+    } else {
+        return (u32)(plttNo << 5);
+    }
+}
+
 // Sets the texture and palette of an OAM's characters, and gives its texture coordinates, flipped as it is
 static void SetTexParamsAndGetTexCoord_(const GXOamAttr *oam, const NNSG2dImageAttr *texImageAttr, u32 texBaseAddr,
                                         u32 pltBaseAddr, OamTexCoord *coord) {
-    GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
-    int shapeIdx = (shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT;
-    int sizeIdx = (shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT;
+    const GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
+    const int shapeIdx = (shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT;
+    const int sizeIdx = (shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT;
+    const u16 shapeBit = (u16)shapeIdx;
+    const u16 sizeBit = (u16)sizeIdx;
     u16 charName;
-    BOOL flipV;
-    BOOL flipH;
-    GXTexFmt fmt;
-    u16 cParam;
-    u32 pltOffset;
 
+    charName = oam->charNo;
     coord->w = NNSi_objSizeWTbl[shapeIdx][sizeIdx];
     coord->h = NNSi_objSizeHTbl[shapeIdx][sizeIdx];
 
-    charName = oam->charNo;
     if (texImageAttr->mappingType == GX_OBJVRAMMODE_CHAR_2D) {
-        G3_TexImageParam(texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texImageAttr->sizeS, texImageAttr->sizeT,
-                         GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr);
+        reg_G3_TEXIMAGE_PARAM =
+            GX_PACK_TEXIMAGE_PARAM(texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texImageAttr->sizeS, texImageAttr->sizeT,
+                                   GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr);
         if (texImageAttr->fmt == GX_TEXFMT_PLTT256) {
             charName >>= 1;
         }
-        coord->u0 = ((numCharsInRowTbl_[texImageAttr->sizeS] - 1) & charName) << (3 + FX32_SHIFT);
-        coord->v0 = (charName >> texImageAttr->sizeS) << (3 + FX32_SHIFT);
+        {
+            const u32 numCharPerLine = GetNumTexChar(texImageAttr->sizeS);
+
+            coord->u0 = ((charName & (numCharPerLine - 1)) << 3) << FX32_SHIFT;
+            coord->v0 = ((charName >> texImageAttr->sizeS) << 3) << FX32_SHIFT;
+        }
     } else {
-        G3_TexImageParam(
-            texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texSizeSTbl_[(u16)shapeIdx][(u16)sizeIdx],
-            texSizeTTbl_[(u16)shapeIdx][(u16)sizeIdx], GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse,
-            texBaseAddr +
-                (charName << (((texImageAttr->mappingType & REG_GX_DISPCNT_EXOBJ_MASK) >> REG_GX_DISPCNT_EXOBJ_SHIFT) +
-                              5)));
+        const int shiftBit =
+            5 + ((texImageAttr->mappingType & REG_GX_DISPCNT_EXOBJ_MASK) >> REG_GX_DISPCNT_EXOBJ_SHIFT);
+
+        reg_G3_TEXIMAGE_PARAM = GX_PACK_TEXIMAGE_PARAM(
+            texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texSizeSTbl_[shapeBit][sizeBit], texSizeTTbl_[shapeBit][sizeBit],
+            GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr + (charName << shiftBit));
         coord->u0 = 0;
         coord->v0 = 0;
     }
     coord->u1 = coord->u0 + (coord->w << FX32_SHIFT);
     coord->v1 = coord->v0 + (coord->h << FX32_SHIFT);
 
-    flipV = oam->flipV;
-    flipH = oam->flipH;
-    if (flipH) {
-        fx32 tmp = coord->u0;
-        coord->u0 = coord->u1;
-        coord->u1 = tmp;
-    }
-    if (flipV) {
-        fx32 tmp = coord->v0;
-        coord->v0 = coord->v1;
-        coord->v1 = tmp;
-    }
-    if (s_pUVFlipCorrectFunc != NULL) {
-        s_pUVFlipCorrectFunc(&coord->u0, &coord->v0, &coord->u1, &coord->v1, flipH, flipV);
+    {
+        const BOOL flipH = oam->flipH;
+        const BOOL flipV = oam->flipV;
+
+        DoFlip(flipH, flipV, &coord->u0, &coord->u1, &coord->v0, &coord->v1);
     }
 
-    fmt = texFmtTbl_[oam->colorMode];
-    cParam = oam->cParam;
-    if (texImageAttr->bExtendedPlt) {
-        pltOffset = cParam * 0x200;
-    } else if (fmt == GX_TEXFMT_PLTT256) {
-        pltOffset = 0;
-    } else {
-        pltOffset = cParam * 0x20;
+    {
+        const GXTexFmt fmt = texFmtTbl_[oam->colorMode];
+        const u32 pltOffset = GetPlttOffset(fmt, texImageAttr->bExtendedPlt, (u16)oam->cParam);
+
+        G3_TexPlttBase(pltBaseAddr + pltOffset, fmt);
     }
-    G3_TexPlttBase(pltBaseAddr + pltOffset, fmt);
 }
 
 void NNSi_G2dSetOamSoftEmuAutoZOffsetFlag(BOOL flag) {

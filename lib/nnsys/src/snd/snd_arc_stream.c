@@ -778,16 +778,15 @@ static void ProcessCommand(StrmCommand *command) {
     BOOL loop;
     u32 bufOffset;
     u32 len;
+    u32 block;
     u32 blockSize;
+    u32 blockSamples;
     u32 blockOffset;
+    u32 readOffset;
     u32 fileOffset;
     u32 samples;
     u32 dataSize;
     u32 readSize;
-    u8 *dest;
-    u32 block;
-    u32 blockSamples;
-    u32 readOffset;
     int ch;
 
     if (player->flags.dataEnd && player->endWait > 0) {
@@ -865,16 +864,20 @@ static void ProcessCommand(StrmCommand *command) {
         fileOffset += player->header.head.dataOffset;
 
         for (ch = 0; ch < command->numChannels; ch++) {
-            dest = (u8 *)command->buffer[ch] + bufOffset;
+            void *dest;
+            void *readDest;
+
+            dest = readDest = (u8 *)command->buffer[ch] + bufOffset;
 
             if (ch < player->header.head.numChannels) {
-                void *readBuffer = dest;
+                s32 result;
 
                 if (player->header.head.format == STRM_FORMAT_ADPCM) {
                     OS_LockMutex(&sDecodeMutex);
-                    readBuffer = sArcStrm.decodeBuffer;
+                    readDest = sArcStrm.decodeBuffer;
                 }
-                if (player->read(player, readBuffer, readSize, fileOffset + ch * blockSize) != readSize) {
+                result = player->read(player, readDest, readSize, fileOffset + ch * blockSize);
+                if (result != readSize) {
                     dataSize = 0;
                     samples = 0;
                     loop = FALSE;
@@ -888,28 +891,31 @@ static void ProcessCommand(StrmCommand *command) {
                 if (player->header.head.format == STRM_FORMAT_ADPCM) {
                     AdpcmState *state = &player->adpcm[ch];
                     const u8 *src = sArcStrm.decodeBuffer;
+                    s16 *out = dest;
                     u32 pos;
+                    u32 end;
 
                     if (blockOffset == 0) {
                         *state = *(const AdpcmState *)src;
                         src += STRM_ADPCM_HEADER_SIZE;
                     }
+                    end = blockOffset + samples;
                     pos = blockOffset;
-                    if (blockOffset & 1) {
-                        *(s16 *)dest = DecodeAdpcm(state, (*src >> 4) & 0xf);
-                        dest += sizeof(s16);
+                    if (pos & 1) {
+                        *out++ = DecodeAdpcm(state, (*src >> 4) & 0xf);
                         pos++;
                         src++;
                     }
-                    while (pos < ((blockOffset + samples) & ~1)) {
-                        *(s16 *)dest = DecodeAdpcm(state, *src & 0xf);
-                        *(s16 *)(dest + sizeof(s16)) = DecodeAdpcm(state, (*src >> 4) & 0xf);
-                        pos += 2;
-                        dest += 2 * sizeof(s16);
+                    while (pos < (end & ~1)) {
+                        *out++ = DecodeAdpcm(state, *src & 0xf);
+                        pos++;
+                        *out++ = DecodeAdpcm(state, (*src >> 4) & 0xf);
+                        pos++;
                         src++;
                     }
-                    if (pos < blockOffset + samples) {
-                        *(s16 *)dest = DecodeAdpcm(state, *src & 0xf);
+                    if (pos < end) {
+                        *out++ = DecodeAdpcm(state, *src & 0xf);
+                        pos++;
                     }
                     OS_UnlockMutex(&sDecodeMutex);
                 }
