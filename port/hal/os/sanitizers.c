@@ -13,10 +13,11 @@
 // but elsewhere the runtime ends with _exit(1) instead, the same status as a program's own failures. A test that
 // passes on its output (ctest's PASS_REGULAR_EXPRESSION), or on a failure (WILL_FAIL, or a wrapper that expects
 // status 1), would pass with a report, and so would every test with LeakSanitizer's, which comes at exit, after the
-// output; ctest fails a test that aborts whatever it expects. ASan's runtime also ends UBSan's fatal reports and
-// LeakSanitizer's check, so this covers all three. A build with PORT_SANITIZE_RECOVER, whose checks can go on after a
-// report, also makes going on ASan's default (halt_on_error=0), so that one run surveys every report of a route; ASan
-// still reports each place once (suppress_equal_pcs), as UBSan always does.
+// output; ctest fails a test that aborts whatever it expects, WILL_FAIL or not (port/docs/sanitizers.md). ASan's
+// runtime also ends UBSan's fatal reports and LeakSanitizer's check, so this covers all three. A build with
+// PORT_SANITIZE_RECOVER, whose checks can go on after a report, also makes going on ASan's default (halt_on_error=0),
+// so that one run surveys every report of a route; ASan still reports each place once (suppress_equal_pcs), as UBSan
+// always does.
 #if defined(__has_feature)
 #if __has_feature(undefined_behavior_sanitizer) && __has_feature(address_sanitizer)
 #include <sanitizer/common_interface_defs.h>

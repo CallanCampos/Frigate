@@ -14,7 +14,8 @@
 //   - the shared memory: the DS's is 0x02fff000 to 0x02fff680; the host's is 4 times that;
 //   - the shared WRAM: empty, as on the DS (both ends 0x03040000).
 // The table of the arenas' limits is kept here, not in the DS's shared memory (HW_ARENA_INFO_BUF), where 64-bit
-// pointers would not fit; nothing but this file reads it.
+// pointers would not fit; nothing but this file reads it. port_os_main_arena_holds (port_os.h) tells
+// port/hal/nnsys/fnd_hooks.c whether a read the game makes past a heap block stays in the main arena's block.
 #include "hal/hw/hw.h"
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
@@ -73,6 +74,14 @@ static void *OS_GetInitArenaLo(int arena); // swan's GetUserMemRegionDefaultStar
 
 void port_os_set_main_arena_size(size_t bytes) {
     sMainArenaSize = bytes;
+}
+
+int port_os_main_arena_holds(const void *start, size_t size) {
+    uintptr_t from = (uintptr_t)start;
+    uintptr_t low = (uintptr_t)sMainArena.start;
+
+    return sMainArena.block != NULL && from >= low && from - low <= sMainArena.size &&
+           size <= sMainArena.size - (from - low);
 }
 
 // The arena's block, made once per process and zeroed for each run (the DS's memory has no defined contents there; a

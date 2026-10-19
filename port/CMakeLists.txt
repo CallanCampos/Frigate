@@ -408,15 +408,24 @@ port_test_labels(smoke_reaches_game_main route)
 # In the sanitized build a sanitizer's report in a test's output fails the test, whatever else the test expects. A
 # report aborts the programs that link the platform layer (port/hal/os/sanitizers.c), which ctest fails, but a test
 # program without it ends a report with status 1 off macOS, which a test that passes on its output or on a failure
-# accepts. Deferred to the end of this directory, after the tests port/cmake/overlay_sections.cmake adds there
-function(port_fail_on_sanitizer_reports)
+# accepts. That holds for every test because none inverts its result with WILL_FAIL, which would make the failure a
+# pass: a test of a failure checks how its program ends through tests/app/check_exit.py, which fails a run with a
+# report whatever ending it wants, and configuring stops on a test with WILL_FAIL, in every build. A wrapper that runs
+# the program shows ctest only what it prints, so each fails on the program's abort itself (port/docs/sanitizers.md).
+# Deferred to the end of this directory, after the tests port/cmake/overlay_sections.cmake adds there
+function(port_check_tests)
     get_property(tests DIRECTORY PROPERTY TESTS)
     foreach(test IN LISTS tests)
-        set_property(TEST ${test} APPEND PROPERTY FAIL_REGULAR_EXPRESSION
-            "ERROR: (Address|Leak)Sanitizer" "SUMMARY: [A-Za-z]+Sanitizer" "runtime error: "
-            "LeakSanitizer has encountered a fatal error")
+        get_property(will_fail TEST ${test} PROPERTY WILL_FAIL)
+        if(will_fail)
+            message(FATAL_ERROR "The test ${test} has WILL_FAIL, which would turn the sanitized build's failure on a "
+                "sanitizer's report into a pass: check how its program ends with tests/app/check_exit.py instead")
+        endif()
+        if(PORT_SANITIZE)
+            set_property(TEST ${test} APPEND PROPERTY FAIL_REGULAR_EXPRESSION
+                "ERROR: (Address|Leak)Sanitizer" "SUMMARY: [A-Za-z]+Sanitizer" "runtime error: "
+                "LeakSanitizer has encountered a fatal error")
+        endif()
     endforeach()
 endfunction()
-if(PORT_SANITIZE)
-    cmake_language(DEFER CALL port_fail_on_sanitizer_reports)
-endif()
+cmake_language(DEFER CALL port_check_tests)

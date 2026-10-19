@@ -72,7 +72,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [os_tick.c](os/os_tick.c) | The tick counter, on the virtual clock's timer 0 |
 | [os_alarm.c](os/os_alarm.c) | Alarms, on the virtual clock's timer 1 |
 | [os_valarm_host.c](os/os_valarm_host.c) | The decomp's V-count alarms compiled through, so that each run starts them afresh |
-| [os_arena.c](os/os_arena.c) | The memory arenas over host memory (the 16 MiB main arena, `--main-arena-size`) |
+| [os_arena.c](os/os_arena.c) | The memory arenas over host memory (the 16 MiB main arena, `--main-arena-size`), and whether a span lies in the main arena's block (`port_os_main_arena_holds`) |
 | [os_alloc_host.c](os/os_alloc_host.c) | The decomp's heap allocator (`os_alloc.c`) compiled through, with its 64-bit edges fixed |
 | [memory_map.c](os/memory_map.c) | The linker symbols of the DS memory map that the SDK's C names, and the host's DTCM |
 | [os_cpu.c](os/os_cpu.c) | What only drives the ARM9's coprocessor or memory map: the caches, the protection unit, the TCM address, the exception vector; nothing to do on a host |
@@ -167,7 +167,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [input/port_input.h](input/port_input.h), [input/input.c](input/input.c) | The buttons and the lid, written where the game's `PAD_Read` reads them |
 | [nnsys/reloc.h](nnsys/reloc.h), [nnsys/reloc.c](nnsys/reloc.c) | The registry of host-layout trees built for NitroSystem files the DS relocates in place |
 | [nnsys/g2d_load.h](nnsys/g2d_load.h), [nnsys/g2d_load.c](nnsys/g2d_load.c), [nnsys/g2d_file.h](nnsys/g2d_file.h) | The G2D file loaders (characters, palettes, cells, multi-cells, animations, fonts) building those trees from the files' DS layouts |
-| [nnsys/fnd_hooks.c](nnsys/fnd_hooks.c) | NitroSystem's heap frees, wrapped so that a file's trees go with its memory; the heaps aligned for 64-bit structs; in the sanitized build, the expanded and frame heaps' blocks shown to AddressSanitizer, so that an access outside one is a report, and the one read the game makes past a block as the DS does, whose bytes it shows, let through (`port_heap_ds_read_begin`, `port_heap_ds_read_end`) ([../docs/sanitizers.md](../docs/sanitizers.md)) |
+| [nnsys/fnd_hooks.c](nnsys/fnd_hooks.c) | NitroSystem's heap frees, wrapped so that a file's trees go with its memory; the heaps aligned for 64-bit structs; in the sanitized build, the expanded and frame heaps' blocks shown to AddressSanitizer, so that an access outside one is a report, and the one read the game makes past a block as the DS does, whose bytes it shows, let through (`port_heap_ds_read_begin`, `port_heap_ds_read_end`), in every build checked to stay in the game's heaps alive or the main arena ([../docs/sanitizers.md](../docs/sanitizers.md)) |
 | [gfl/heap_policy.c](gfl/heap_policy.c) | The host's heap sizes (`port_heap_size`, `--heap-scale-root`, `--heap-scale-child`) |
 | [gfl/particle_work.c](gfl/particle_work.c) | The particle systems' work, sized for 64-bit structs |
 | [gfl/gfl_frame.h](gfl/gfl_frame.h), [gfl/gfl_use_host.c](gfl/gfl_use_host.c) | GFL's frame count for replays; the decomp's `gfl_use.c` compiled through to read it |
@@ -230,7 +230,7 @@ Some headers are named for the interface rather than the file that implements it
 | Header | Implemented in |
 | --- | --- |
 | [os/port_app.h](os/port_app.h) (the program's options and hooks) | `os/app_options.c` |
-| [os/port_os.h](os/port_os.h) (the OS core) | `os/core.c`, and `os/os_arena.c` (`port_os_set_main_arena_size`), `os/memory_map.c` (the IRQ check word) |
+| [os/port_os.h](os/port_os.h) (the OS core) | `os/core.c`, and `os/os_arena.c` (`port_os_set_main_arena_size`, `port_os_main_arena_holds`), `os/memory_map.c` (the IRQ check word) |
 | [card/port_card.h](card/port_card.h) (the save chip) | `card/backup.c` |
 | [../include/port_host.h](../include/port_host.h)'s `port_hw_auxspicnt` and `port_hw_auxspidata` (the card slot's SPI registers) | `card/card_spi.c` |
 | [input/port_input.h](input/port_input.h) | `input/input.c` |

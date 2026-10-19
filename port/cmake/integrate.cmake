@@ -25,12 +25,17 @@ foreach(scenario IN ITEMS dma_copies dma_async dma_gx_command os_alloc main_aren
     set_tests_properties(integrate_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()
 
-# The program refuses an option it doesn't know, with status 2, instead of running the game
-add_test(NAME integrate_unknown_option COMMAND ${PORT_PROGRAM} --headless --no-such-option)
-set_tests_properties(integrate_unknown_option PROPERTIES WILL_FAIL TRUE TIMEOUT 30)
-
-# And a --launch that names no app Frigate's test launcher opens (port/app/launcher_spec.c): status 2 before the game
-# starts. check_exit.py checks the status, which a PASS_REGULAR_EXPRESSION would ignore
+# The program refuses an option it doesn't know, with status 2, instead of running the game; and a --launch that names
+# no app Frigate's test launcher opens (port/app/launcher_spec.c), with status 2 before the game starts. check_exit.py
+# checks the status, which a PASS_REGULAR_EXPRESSION would ignore and WILL_FAIL would take any failure for, a
+# sanitizer's report in the sanitized build included (WILL_FAIL turns ctest's failure on a report into a pass, so
+# port/CMakeLists.txt refuses it)
+add_test(NAME integrate_unknown_option
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 2 --fresh-save-dir
+            --expect "port: unknown option --no-such-option" --reject "entering the game's main"
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --no-such-option)
+set_tests_properties(integrate_unknown_option PROPERTIES TIMEOUT 30)
 add_test(NAME integrate_launch_bad_option
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 2 --fresh-save-dir

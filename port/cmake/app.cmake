@@ -3,7 +3,7 @@
 # driver's trace, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The
 # screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds. Their tests are here too, with
 # those of Frigate's test launcher's option and gate (port/app/launcher_spec.c, the field menu's apps), whose library,
-# port_launcher, port/CMakeLists.txt builds.
+# port_launcher, port/CMakeLists.txt builds, and of check_exit.py, the checker of the tests of the program's endings.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/sound_trace.c"
@@ -50,6 +50,13 @@ foreach(variant IN ITEMS plain sanitized)
     add_test(NAME app_window_icon_${variant} COMMAND ${target})
     set_tests_properties(app_window_icon_${variant} PROPERTIES TIMEOUT 60)
 endforeach()
+
+# check_exit.py, the checker of the tests of the program's endings (port/tests/app/test_check_exit.py): each ending,
+# met and missed, a skip, and a sanitizer's report, which fails a run whatever ending it wants
+add_test(NAME app_check_exit
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_check_exit.py")
+set_tests_properties(app_check_exit PROPERTIES TIMEOUT 120)
 
 # --help's first lines against the product's names that the build read from port/hal/os/port_app.h, which the macOS
 # app's names and About window use too; then each option of its usage described, and --launch's apps as the test

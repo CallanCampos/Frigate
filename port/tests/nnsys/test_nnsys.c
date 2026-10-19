@@ -2,21 +2,36 @@
 // format, through the decomp's own functions that use what they return and through the Unpack functions that take a
 // struct; the shapes no file of the ROM has (animation sequences outside the bank's frames, font structs inside another
 // block); the registry's lifetime through NNS FND's heaps; rebuilding a tree when a buffer is reused, with another file
-// or the same one; and, with the player's ROM, every G2D file of it against a simulation of the DS's own relocation
-// (test_g2d_rom.c).
+// or the same one; a read the DS makes past a heap block (port_heap_ds_read_begin, which the copyright screen's load in
+// src/gfl/arc_util.c calls), let through in the game's heaps and the main arena and stopped outside them; and, with the
+// player's ROM, every G2D file of it against a simulation of the DS's own relocation (test_g2d_rom.c).
 //
 //   port_nnsys_tests <scenario>        one of the scenarios below, or all of them with "all"
+//   port_nnsys_tests ds_read_outside   a read past a block that leaves the game's memory: the program stops (abort)
 //   port_nnsys_tests rom <rom.nds>     the ROM-wide equivalence test; exits 77 (skipped) without the ROM
 //
 // Each scenario ends with every tree released, so that a sanitizer build's leak checker sees what a tree leaves.
 #include "hal/nnsys/g2d_file.h"
 #include "hal/nnsys/g2d_load.h"
 #include "hal/nnsys/reloc.h"
+#include "nitro/os.h"
 #include "nnsys/fnd.h"
 #include "nnsys/g2d.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define TEST_ASAN 1
+#endif
+#endif
+#if defined(__SANITIZE_ADDRESS__) && !defined(TEST_ASAN)
+#define TEST_ASAN 1
+#endif
+#ifdef TEST_ASAN
+#include <sanitizer/asan_interface.h>
+#endif
 
 int port_nnsys_rom_test(const char *romPath);
 
@@ -1071,6 +1086,86 @@ static void ScenarioRegistry(void) {
     CHECK(port_reloc_count() == 0 && sDestroyed == 1005);
 }
 
+// Reads every byte of [start, start + size), as the game's load of the copyright screen's characters does
+static unsigned ReadSpan(const u8 *start, size_t size) {
+    const volatile u8 *p = start;
+    unsigned sum = 0;
+
+    for (size_t i = 0; i < size; i++) {
+        sum += p[i];
+    }
+    return sum;
+}
+
+// A read the DS makes past a heap block, let through where it stays in the game's memory: past a block into the next
+// within its heap; out of a child heap, created in a block of its parent, into the parent; and out of a heap into the
+// main arena around it. In the sanitized build the span is readable between the two calls, and what was poisoned is
+// poisoned again after them (port/hal/nnsys/fnd_hooks.c)
+static void ScenarioDsReads(void) {
+    size_t heapSize = 0x4000;
+    u8 *memory = malloc(heapSize);
+    NNSFndHeapHandle heap = NNS_FndCreateExpHeapEx(memory, (u32)heapSize, 0);
+    u8 *block = NNS_FndAllocFromExpHeapEx(heap, 0x40, 8);
+    u8 *next = NNS_FndAllocFromExpHeapEx(heap, 0x40, 8);
+    u8 *parentBlock;
+    NNSFndHeapHandle child;
+    u8 *childBlock;
+    NNSFndHeapHandle arenaHeap;
+    u8 *arenaBlock;
+
+    CHECK(block != NULL && next != NULL && next > block);
+    memset(next, 0x5a, 0x40);
+    port_heap_ds_read_begin(block, 0x100);
+#ifdef TEST_ASAN
+    CHECK(!__asan_region_is_poisoned(block, 0x100));
+#endif
+    CHECK(ReadSpan(block, 0x100) >= 0x40 * 0x5a);
+    port_heap_ds_read_end();
+#ifdef TEST_ASAN
+    // The block's own bytes stay addressable, the head of the next block and the free memory after it are poisoned
+    CHECK(!__asan_region_is_poisoned(block, 0x40) && __asan_address_is_poisoned(block + 0x40));
+    CHECK(!__asan_region_is_poisoned(next, 0x40) && __asan_address_is_poisoned(next + 0x40));
+#endif
+
+    // A child heap in a block of the heap, and a read out of its last block into the parent's memory after it
+    parentBlock = NNS_FndAllocFromExpHeapEx(heap, 0x400, 8);
+    child = NNS_FndCreateExpHeapEx(parentBlock, 0x400, 0);
+    childBlock = NNS_FndAllocFromExpHeapEx(child, 0x40, -8);
+    CHECK(child != NULL && childBlock != NULL && childBlock + 0x40 <= parentBlock + 0x400);
+    port_heap_ds_read_begin(childBlock, 0x100);
+    ReadSpan(childBlock, 0x100);
+    port_heap_ds_read_end();
+    NNS_FndDestroyExpHeap(child);
+    NNS_FndDestroyExpHeap(heap);
+    free(memory);
+
+    // A heap carved from the main arena, as the game's are, and a read out of it into the arena after it
+    OS_InitArena();
+    arenaHeap = NNS_FndCreateExpHeapEx(OS_GetArenaLo(OS_ARENA_MAIN), 0x1000, 0);
+    arenaBlock = NNS_FndAllocFromExpHeapEx(arenaHeap, 0x40, -8);
+    CHECK(arenaHeap != NULL && arenaBlock != NULL);
+    port_heap_ds_read_begin(arenaBlock, 0x400);
+    ReadSpan(arenaBlock, 0x400);
+    port_heap_ds_read_end();
+    NNS_FndDestroyExpHeap(arenaHeap);
+}
+
+// A read past a block that leaves the game's memory, past the end of a heap in memory of the host's own: the check
+// stops the program (abort), with its message, before anything is read. Run alone, never by "all"
+static int ScenarioDsReadOutside(void) {
+    size_t heapSize = 0x1000;
+    u8 *memory = malloc(heapSize);
+    NNSFndHeapHandle heap = NNS_FndCreateExpHeapEx(memory, (u32)heapSize, 0);
+    u8 *block = NNS_FndAllocFromExpHeapEx(heap, 0x40, -8);
+
+    port_heap_ds_read_begin(block, 0x2000);
+    printf("ds_read_outside: the read went on outside the game's memory\n");
+    port_heap_ds_read_end();
+    NNS_FndDestroyExpHeap(heap);
+    free(memory);
+    return 1;
+}
+
 static const struct {
     const char *name;
     void (*run)(void);
@@ -1081,7 +1176,7 @@ static const struct {
     { "font", ScenarioFont },           { "font_nodes", ScenarioFontNodes },
     { "heaps", ScenarioHeaps },         { "reuse", ScenarioReuse },
     { "refill", ScenarioRefill },       { "malformed", ScenarioMalformed },
-    { "registry", ScenarioRegistry },
+    { "registry", ScenarioRegistry },   { "ds_reads", ScenarioDsReads },
 };
 
 int main(int argc, char **argv) {
@@ -1096,6 +1191,9 @@ int main(int argc, char **argv) {
             return 2;
         }
         return port_nnsys_rom_test(argv[2]);
+    }
+    if (strcmp(name, "ds_read_outside") == 0) {
+        return ScenarioDsReadOutside();
     }
     for (size_t i = 0; i < sizeof(sScenarios) / sizeof(sScenarios[0]); i++) {
         if (strcmp(name, "all") == 0 || strcmp(name, sScenarios[i].name) == 0) {

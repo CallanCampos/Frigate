@@ -4,7 +4,8 @@
 #   - lib/nnsys/src/fnd: every function that gives heap memory back (freeing a block, shrinking one, freeing a frame
 #     heap's ends or back to a state, freeing a unit, destroying a heap). port/hal/nnsys/fnd_hooks.c gives the original
 #     names wrappers that call the SDK's and then release the relocated trees in what it freed (port/hal/nnsys/reloc.h).
-#     Also the expanded and frame heaps' creation and allocation, which the wrappers align for 64-bit structs
+#     Also the expanded and frame heaps' creation and allocation, which the wrappers align for 64-bit structs, and
+#     whose live heaps they list, for the check of a read the DS makes past a block (port_heap_ds_read_begin)
 #   - lib/nnsys/src/g2d: every function that relocates a loaded file in place, and the public ones around them.
 #     port/hal/nnsys/g2d_load.c replaces them with loaders that build host structs; the renamed originals stay unused.
 #     The files' other functions (NNS_G2dFindBinaryBlock, NNS_G2dGetCellDataByIdx and the like) stay the decomp's
@@ -66,8 +67,9 @@ if(PORT_SANITIZE)
         PORT_POISON_HEAPS)
 endif()
 
-# The tests: the loaders on files made by the tests, the registry through FND's heaps, and every G2D file of the
-# player's ROM against a simulation of the DS's unpack (skipped without the ROM), run on the whole program's objects
+# The tests: the loaders on files made by the tests, the registry through FND's heaps, a read the DS makes past a heap
+# block, and every G2D file of the player's ROM against a simulation of the DS's unpack (skipped without the ROM), run
+# on the whole program's objects
 enable_testing()
 add_executable(port_nnsys_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/nnsys/test_nnsys.c" "${CMAKE_CURRENT_SOURCE_DIR}/tests/nnsys/test_g2d_rom.c"
@@ -78,10 +80,22 @@ target_include_directories(port_nnsys_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}
 target_compile_options(port_nnsys_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
 
 foreach(scenario IN ITEMS character palette cell_bank multicell_bank anim_bank anim_frames font font_nodes heaps reuse
-                         refill malformed registry)
+                         refill malformed registry ds_reads)
     add_test(NAME nnsys_${scenario} COMMAND port_nnsys_tests ${scenario})
     set_tests_properties(nnsys_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()
+
+# A read the DS makes past a heap block (port_heap_ds_read_begin) that would leave the game's heaps and the main arena
+# stops the program with its message (abort), in every build, rather than read, and in the sanitized build unpoison,
+# memory that isn't the game's. check_exit.py checks how it ends
+add_test(NAME nnsys_ds_read_outside
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --abort
+            --expect "port: fnd_hooks: a read past a heap block, 0x2000 bytes from 0x[0-9a-fA-F]+,"
+            --expect "reaches outside the game's heaps and the main arena"
+            --reject "the read went on"
+            -- $<TARGET_FILE:port_nnsys_tests> ds_read_outside)
+set_tests_properties(nnsys_ds_read_outside PROPERTIES TIMEOUT 60)
 
 add_test(NAME nnsys_g2d_rom_equivalence
     COMMAND port_nnsys_tests rom "${REPO_ROOT}/orig/baserom_${PORT_VERSION}.nds")

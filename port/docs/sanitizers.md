@@ -28,9 +28,18 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   on every host: [../hal/os/sanitizers.c](../hal/os/sanitizers.c) makes `abort_on_error=1` the runtime's default.
   That is macOS's own default; elsewhere the runtime ends a report with status 1, the status of the program's own
   failures, which a test that passes on its output (`PASS_REGULAR_EXPRESSION`) or on a failure (`WILL_FAIL`, a wrapper
-  that expects 1) would accept. ctest fails a test whose program aborts, whatever the test expects, and in this build
-  also any test whose output has a sanitizer's report in it (`FAIL_REGULAR_EXPRESSION`, set at the end of
-  [../CMakeLists.txt](../CMakeLists.txt)), for the test programs that don't link the platform layer.
+  that expects 1) would accept.
+- **A report fails the test that reaches it**, by three checks, each with its condition:
+  - ctest fails a test whose program aborts, whatever the test expects.
+  - In this build ctest also fails a test whose output has a sanitizer's report in it (`FAIL_REGULAR_EXPRESSION`, set
+    at the end of [../CMakeLists.txt](../CMakeLists.txt)), for the test programs that don't link the platform layer.
+    That holds only for a test that doesn't invert its result with `WILL_FAIL`, which turns that failure into a pass;
+    so no test has `WILL_FAIL`, and configuring stops on one, in every build. A test of a failure checks how its
+    program ends with [../tests/app/check_exit.py](../tests/app/check_exit.py) (`--status`, `--crash`, `--abort`).
+  - A wrapper that runs the program (`check_exit.py`, `check_launch_smoke.py`, `oracle.py`, the replays' scripts)
+    shows ctest only what it prints, so it fails on the program's abort itself: each wants a status, or a stop at a
+    trap, that an abort isn't. `check_exit.py`, whose `--crash` and `--abort` would take an abort for the ending they
+    want, fails a run with a report in its output whatever ending it wants.
 - **The compiler** is the one CMake finds, Apple clang on macOS. Apple clang emits no function check for C
   (`-fsanitize=function`, in `undefined` since upstream clang 17) and its runtime has no LeakSanitizer; upstream clang
   has both: `-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang` on macOS, with `ASAN_OPTIONS=detect_leaks=1` for
@@ -93,7 +102,7 @@ ctest --test-dir build/port-san -L route                       # every route, wi
 | The live frames and saved registers of suspended fibers | `fiber.c` (`ScanStackForLeaks`), with the saved stack pointer from `mco_impl.c` | LeakSanitizer scans threads' stacks, not fibers': an allocation only a suspended fiber holds would be a leak. Only the live frames, from the saved stack pointer up, so that the dead frames under them don't hide one |
 | UBSan's reports, with ASan's stack | [../hal/os/sanitizers.c](../hal/os/sanitizers.c) (`__ubsan_on_report`) | UBSan unwinds only within the host thread's own stack, so its trace stopped at the report's frame on a fiber |
 | The game's expanded and frame heaps, block by block | [../hal/nnsys/fnd_hooks.c](../hal/nnsys/fnd_hooks.c), with FND's heaps built without ASan ([../cmake/nnsys.cmake](../cmake/nnsys.cmake)) | Every GFL heap and the sound heap live inside one 16 MiB arena, which ASan sees as one block: an overrun from one of the game's allocations into the next was invisible. A new heap's memory is poisoned, a block made addressable for the bytes the DS gives it (the size asked for, rounded up to 4) when it is allocated, and poisoned when it is freed; a destroyed heap's memory is its owner's again |
-| A read the DS makes past one of the game's heap blocks, whose bytes it uses | `fnd_hooks.c` (`port_heap_ds_read_begin`, `port_heap_ds_read_end`), from `src/gfl/arc_util.c` under `PLATFORM_PC` | The copyright screen loads 0x8000 bytes of a smaller file's characters, past the file's block into what follows it in the heap, as the DS does, and the title screen's bottom screen shows those tiles as it fades in (H1, below): the read stays the DS's, and ASan lets it reach the span it names and poisons again after it what was poisoned |
+| A read the DS makes past one of the game's heap blocks, whose bytes it uses | `fnd_hooks.c` (`port_heap_ds_read_begin`, `port_heap_ds_read_end`), from `src/gfl/arc_util.c` under `PLATFORM_PC` | The copyright screen loads 0x8000 bytes of a smaller file's characters, past the file's block into what follows it in the heap, as the DS does, and the title screen's bottom screen shows those tiles as it fades in (H1, below): the read stays the DS's, and ASan lets it reach the span it names and poisons again after it what was poisoned. The span must lie in one of the game's expanded or frame heaps alive, heads included, or else in the main arena they are carved from (`port_os_main_arena_holds`): a span that reaches outside both stops the program with a message, in every build, rather than read, and unpoison, memory that isn't the game's (`nnsys_ds_read_outside`) |
 | The trap's data placeholders at exit | [../hal/trap.c](../hal/trap.c) | LeakSanitizer scans the program's writable data by the protection it was loaded with, so it read the placeholders' inaccessible pages at exit, and its check never ended. They become readable at exit, before the check |
 | The overlays' sections | [../hal/fs/ovsec.c](../hal/fs/ovsec.c) | Its snapshot and reset copy whole sections, ASan's redzones between the statics included, in loops without ASan |
 | Another fiber's stack | `fiber.c` (`port_fiber_stack_used`) | Read without ASan, since dead frames there may still be poisoned |

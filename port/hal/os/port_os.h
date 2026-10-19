@@ -55,6 +55,11 @@ void port_os_set_stack_sizes(uint32_t launcher, uint32_t thread);
 void port_os_set_main_arena_size(size_t bytes);
 void port_os_set_tick_step(uint32_t cycles);
 
+// Whether the main memory arena's host block, from its start to its end whatever the game has taken from it, holds all
+// of [start, start + size): the game carves its heaps from it, so the game's reads stay in it. 0 before OS_InitArena
+// made the block. port/hal/nnsys/fnd_hooks.c checks a read the DS makes past a heap block against it
+int port_os_main_arena_holds(const void *start, size_t size);
+
 // Interrupts, for the HAL modules that model the hardware raising one (PXI, DMA, the card). port_os_request_irq sets
 // bits of IF; they are taken at the next defined point, never in the middle of the caller.
 // port_os_interrupts_enabled is TRUE when an interrupt requested now could be taken at once: code runs on a thread's

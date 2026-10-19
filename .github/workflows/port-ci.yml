@@ -219,13 +219,14 @@ jobs:
           port/app/macos/check_app.sh "build/port-dist/Frigate Black 2.app" --archs "arm64 x86_64" --minimum 11.0 $every
 
   # Frigate's sanitized build (port/docs/sanitizers.md): Black 2 under AddressSanitizer and UndefinedBehaviorSanitizer,
-  # every report fatal (the program aborts on every host, and a report in a test's output fails the test), with its
-  # tests run under them: the OS core's scenarios on the fibers, the host seam's and the platform layer's scenarios on
-  # the whole program's objects, the units. CI has no ROM, so of the routes that need no oracle (ctest -L route -LE oracle) only the smoke
-  # test runs, as far as the program's look for the ROM, with the replays' fixtures; the replays and the port's checks
-  # of the oracle's hashes skip, as in the host job, and the routes themselves run only where the ROM is. Linux adds
-  # what Apple clang lacks: UndefinedBehaviorSanitizer's function check for C, and LeakSanitizer at every program's
-  # exit, the smoke test's included, which is CI's one run of the program into the game's main()
+  # every report fatal (the program aborts on every host, and a report in a test's output fails the test, since no
+  # test has WILL_FAIL), with its tests run under them: the OS core's scenarios on the fibers, the host seam's and the
+  # platform layer's scenarios on the whole program's objects, the units. CI has no ROM, so of the routes that need no
+  # oracle (ctest -L route -LE oracle) only the smoke test runs, as far as the program's look for the ROM, with the
+  # replays' fixtures; the replays and the port's checks of the oracle's hashes skip, as in the host job, and the routes
+  # themselves run only where the ROM is. Linux adds what Apple clang lacks: UndefinedBehaviorSanitizer's function
+  # check for C, and LeakSanitizer at every program's exit, the smoke test's included, which is CI's one run of the
+  # program into the game's main()
   sanitize:
     name: Sanitized build (${{ matrix.os }})
     strategy:

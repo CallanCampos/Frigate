@@ -31,14 +31,18 @@
 // create, are left alone. Where the game reads past a block as the DS does, and uses what it read (the copyright
 // screen's characters, src/gfl/arc_util.c), port_heap_ds_read_begin and port_heap_ds_read_end, at the end of this file
 // (declared in port/include/port_host.h), let that one read reach what follows the block, then poison again what was
-// poisoned there.
+// poisoned there. In every build, port_heap_ds_read_begin first checks that the read stays in the game's memory: in
+// one of the expanded and frame heaps alive (which the wrappers of their creation and destruction keep a list of), or
+// else in the main arena they are carved from (port/hal/os/os_arena.c); a read that reaches outside both stops the
+// program with a message, rather than read, and unpoison, memory that isn't the game's.
 #include "hal/nnsys/reloc.h"
+#include "hal/os/port_os.h"
 #include "nnsys/fnd.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef PORT_POISON_HEAPS
 #include <sanitizer/asan_interface.h>
-#include <stdio.h>
-#include <stdlib.h>
 #define POISON(start, size) ASAN_POISON_MEMORY_REGION(start, size)
 #define UNPOISON(start, size) ASAN_UNPOISON_MEMORY_REGION(start, size)
 #else
@@ -110,6 +114,57 @@ static void UnpoisonDestroyedHeap(void *heap, void *end) {
     UNPOISON(heap, (size_t)((u8 *)end - (u8 *)heap));
 }
 
+// The expanded and frame heaps alive, each from its common head, where its memory starts, to its end
+typedef struct LiveHeap {
+    NNSFndHeapHandle heap;
+    const u8 *end;
+} LiveHeap;
+
+static LiveHeap *sLiveHeaps;
+static size_t sLiveHeapCount;
+static size_t sLiveHeapCapacity;
+
+static NNSFndHeapHandle AddLiveHeap(NNSFndHeapHandle heap) {
+    if (heap == NULL) {
+        return NULL;
+    }
+    if (sLiveHeapCount == sLiveHeapCapacity) {
+        size_t capacity = sLiveHeapCapacity == 0 ? 64 : sLiveHeapCapacity * 2;
+        LiveHeap *heaps = realloc(sLiveHeaps, capacity * sizeof(*heaps));
+
+        if (heaps == NULL) {
+            fprintf(stderr, "port: fnd_hooks: out of memory for the list of the game's heaps\n");
+            abort();
+        }
+        sLiveHeaps = heaps;
+        sLiveHeapCapacity = capacity;
+    }
+    sLiveHeaps[sLiveHeapCount].heap = heap;
+    sLiveHeaps[sLiveHeapCount].end = heap->heapEnd;
+    sLiveHeapCount++;
+    return heap;
+}
+
+static void RemoveLiveHeap(NNSFndHeapHandle heap) {
+    for (size_t i = 0; i < sLiveHeapCount; i++) {
+        if (sLiveHeaps[i].heap == heap) {
+            sLiveHeaps[i] = sLiveHeaps[--sLiveHeapCount];
+            return;
+        }
+    }
+}
+
+// Whether [start, end) lies in the memory of one heap alive, its heads included, or else in the main arena: the game's
+// memory, which a read the DS makes past a block may reach
+static int InGameMemory(const u8 *start, const u8 *end) {
+    for (size_t i = 0; i < sLiveHeapCount; i++) {
+        if (start >= (const u8 *)sLiveHeaps[i].heap && end <= sLiveHeaps[i].end) {
+            return 1;
+        }
+    }
+    return port_os_main_arena_holds(start, (size_t)(end - start));
+}
+
 static int HostAlignment(int alignment) {
     if (alignment < 0) {
         return alignment > -HOST_HEAP_ALIGN ? -HOST_HEAP_ALIGN : alignment;
@@ -133,7 +188,7 @@ static void *HostHeapStart(void *startAddress, u32 *size) {
 
 NNSFndHeapHandle NNS_FndCreateExpHeapEx(void *startAddress, u32 size, u16 optFlag) {
     startAddress = HostHeapStart(startAddress, &size);
-    return PoisonNewHeap(port_sdk_NNS_FndCreateExpHeapEx(startAddress, size, optFlag));
+    return PoisonNewHeap(AddLiveHeap(port_sdk_NNS_FndCreateExpHeapEx(startAddress, size, optFlag)));
 }
 
 void *NNS_FndAllocFromExpHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
@@ -142,7 +197,7 @@ void *NNS_FndAllocFromExpHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) 
 
 NNSFndHeapHandle NNS_FndCreateFrmHeapEx(void *startAddress, u32 size, u16 optFlag) {
     startAddress = HostHeapStart(startAddress, &size);
-    return PoisonNewHeap(port_sdk_NNS_FndCreateFrmHeapEx(startAddress, size, optFlag));
+    return PoisonNewHeap(AddLiveHeap(port_sdk_NNS_FndCreateFrmHeapEx(startAddress, size, optFlag)));
 }
 
 void *NNS_FndAllocFromFrmHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
@@ -154,6 +209,7 @@ void *NNS_FndAllocFromFrmHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) 
 void NNS_FndDestroyExpHeap(NNSFndHeapHandle heap) {
     void *end = heap->heapEnd;
 
+    RemoveLiveHeap(heap);
     port_sdk_NNS_FndDestroyExpHeap(heap);
     ReleaseBetween(heap, end);
     UnpoisonDestroyedHeap(heap, end);
@@ -186,6 +242,7 @@ void NNS_FndFreeToExpHeap(NNSFndHeapHandle heap, void *memBlock) {
 void NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap) {
     void *end = heap->heapEnd;
 
+    RemoveLiveHeap(heap);
     port_sdk_NNS_FndDestroyFrmHeap(heap);
     ReleaseBetween(heap, end);
     UnpoisonDestroyedHeap(heap, end);
@@ -237,12 +294,26 @@ static struct {
 } sDsRead;
 #endif
 
+// In the sanitized build the span is widened to whole granules, which is what it unpoisons, so that is what must lie in
+// the game's memory
 void port_heap_ds_read_begin(const void *start, unsigned int size) {
 #ifdef PORT_POISON_HEAPS
     uptr from = (uptr)start & ~(uptr)(ASAN_GRANULE - 1);
     uptr to = ((uptr)start + size + ASAN_GRANULE - 1) & ~(uptr)(ASAN_GRANULE - 1);
     size_t i;
+#else
+    uptr from = (uptr)start;
+    uptr to = (uptr)start + size;
+#endif
 
+    if (size != 0 && !InGameMemory((const u8 *)from, (const u8 *)to)) {
+        fprintf(stderr,
+                "port: fnd_hooks: a read past a heap block, 0x%x bytes from %p, reaches outside the game's heaps and "
+                "the main arena\n",
+                size, start);
+        abort();
+    }
+#ifdef PORT_POISON_HEAPS
     if (sDsRead.poisoned != NULL) {
         fprintf(stderr, "port: fnd_hooks: a read past a heap block began while another was under way\n");
         abort();
@@ -261,9 +332,6 @@ void port_heap_ds_read_begin(const void *start, unsigned int size) {
         sDsRead.poisoned[i] = (u8)__asan_address_is_poisoned(sDsRead.start + i);
     }
     UNPOISON(sDsRead.start, sDsRead.size);
-#else
-    (void)start;
-    (void)size;
 #endif
 }
 
