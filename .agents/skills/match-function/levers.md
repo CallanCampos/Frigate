@@ -707,6 +707,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Failures that set a saved register to 0 and jump to one `mov r0, rN` exit, where a `result` variable gets a stack
   slot: the body is a `static inline` called by a one-line wrapper. (matching.md: "Every `return` gets its own
   epilogue")
+- A search loop's hit sets the result and branches straight to the caller's shared tail, with no count test after
+  the loop (`break` + `if (j == 6)` is 8 bytes long): the loop is in a `static inline` that `return`s the result
+  from inside it. (matching.md: "A search loop whose hit sets the result")
 - A redundant outer `if` gives a doubled `beq`.
 - `v = f(); if (v == x)` and `if (f() == x)` put `cmp`'s operands in opposite orders. (matching.md: "operands of `cmp`")
 - A last test that branches the wrong way (`bne` to the false return for `beq` to the true one): negate the condition

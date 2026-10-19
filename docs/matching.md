@@ -2342,6 +2342,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is
   `return Mystery_CreateGiftPokemon(gift, heapId, gameData);`, the maker overlay 197 also inlines: written out with
   a result variable and `goto`, the result got a stack slot of its own and the frame grew.
+- A search loop whose hit sets the result and branches straight to the function's shared tail, with no test of the
+  loop's count after it (`movne r1, #0xf1; bne <shared multiply>`, then the exhaustion falls into the failure block):
+  the loop is in a `static inline` that `return`s the result from inside it, and the caller assigns the call. A
+  `break` followed by `if (j == 6)` adds `cmp; movne; bne`, 8 bytes, and the `goto` that gives the same bytes is the
+  form `docs/code-standards.md` forbids. DS Protect's `DSProt_CheckEmulatorA`/`B` match through
+  `DSProt_CheckMacZero(args, mac, setCode, flag, zeroCode)`, which returns `setCode` at the first nonzero MAC byte
+  and otherwise tampers and returns `zeroCode`.
 - A conditional branch to the epilogue beyond Thumb's `b<cond>` range goes through a `b` within range that jumps to
   the same label. `return;` statements share the return label, while the end of an `if` body and a `break` out of a
   `switch` jump to the label after that statement, even when both labels end at the same epilogue. An early
