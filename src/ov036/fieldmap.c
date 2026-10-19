@@ -881,7 +881,7 @@ void Field_SetMoneyWin(Field *field, void *moneyWin) {
     field->moneyWin = moneyWin;
 }
 
-DayCareSave *Field_GetDayCare(Field *field) {
+DayCare *Field_GetDayCare(Field *field) {
     return field->dayCare;
 }
 

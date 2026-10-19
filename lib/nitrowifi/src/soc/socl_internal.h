@@ -259,9 +259,6 @@ int SOCL_Shutdown(SOCLSocket *socket);
 // socl_close.c
 // Tests nonnegative handle absence from live/trash lists, not historical allocation ownership or generation.
 BOOL SOCL_IsClosed(int socket);
-// TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
-// (SOC_Close's caller in DWC asks it after a failed close; no counterpart in pokediamond's NitroWiFi)
-BOOL SOCL_IsNotClosing(int socket);
 // Returns without awaiting callback/reclamation; zero also covers an already absent positive handle.
 int SOCL_Close(int socket);
 
@@ -269,7 +266,6 @@ int SOCL_Close(int socket);
 int SOCL_Cleanup(void);
 CPSInAddr SOCL_Resolve(const char *name);
 CPSInAddr SOCL_InetAtoH(const char *name);
-CPSInAddr SOCL_GetHostID(void);
 
 // The socket's local port, or 0 for no socket
 static inline u16 SOCL_GetHostPort(int sock) {

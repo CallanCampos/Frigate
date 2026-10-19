@@ -64,7 +64,7 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
 
     func_ov011_02169df8(server);
     sGameCode = gameCode;
-    func_ov011_0216ddc8(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
+    gsiMemoryCallbacksSet(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
     if (gameName != NULL) {
         strcpy(data_ov011_021917bc, gameName);
     }

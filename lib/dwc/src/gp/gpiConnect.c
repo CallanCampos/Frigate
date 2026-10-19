@@ -47,16 +47,16 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
     strncpy(iconnection->mHeader, "gamespygp", 0x10);
     if (!Gt2_IsInitialized()) {
         port = GPI_PEER_PORT;
-        func_ov011_0216cca8(1, 0, 8, "Initializing UDP Layer\n");
+        gsDebugFormat(1, 0, 8, "Initializing UDP Layer\n");
         result = Gt2_CreateSocket(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         if (result != 0) {
             while (result != 0 && port < GPI_PEER_PORT + 100) {
-                func_ov011_0216cca8(1, 0, 16, "Port %d failed, trying next port\n", port);
+                gsDebugFormat(1, 0, 16, "Port %d failed, trying next port\n", port);
                 port++;
                 result = Gt2_CreateSocket(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
             }
             if (result != 0) {
-                func_ov011_0216cca8(1, 0, 1, "Tryed all 100 ports after default port, giving up.\n");
+                gsDebugFormat(1, 0, 1, "Tryed all 100 ports after default port, giving up.\n");
                 gpiSetError(connection, 8, "There was error starting the UDP layer.");
                 gpiCallErrorCallback(connection, 3, 1);
                 return 3;
@@ -66,7 +66,7 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
             iconnection->peerPort = port;
         }
     } else {
-        func_ov011_0216cca8(1, 0, 8, "UDP Layer already initialized, using existing port.\n");
+        gsDebugFormat(1, 0, 8, "UDP Layer already initialized, using existing port.\n");
         iconnection->peerPort = Gt2_GetLocalPort();
     }
     if (Gt2_Connect(iconnection->mHeader, iconnection->mHeader, NULL, gpiPeerAcceptedCallback, gpiPeerLeftCallback,
@@ -78,20 +78,20 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
     if (iconnection->firewall) {
         iconnection->peerPort = 0;
     }
-    iconnection->cmSocket = func_ov011_0216de20(2, 1, 0);
+    iconnection->cmSocket = gsiSocket(2, 1, 0);
     if (iconnection->cmSocket == -1) {
         gpiSetError(connection, 5, "There was an error creating a socket.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
-    if (!func_ov011_0216e054(iconnection->cmSocket, 0)) {
+    if (!SetSockBlocking(iconnection->cmSocket, 0)) {
         gpiSetError(connection, 5, "There was an error making a socket non-blocking.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
     SocAddrIn address = { 0 };
     address.family = 2;
-    if (func_ov011_0216df90(sConnectionManagerHostname) == -1) {
+    if (inet_addr(sConnectionManagerHostname) == -1) {
         SocHostEnt *host = SOC_GetHostByName(sConnectionManagerHostname);
         if (host == NULL) {
             gpiSetError(connection, 5, "Could not resolve connection mananger host name.");
@@ -100,11 +100,11 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
         }
         address.addr = *(u32 *)host->addrList[0];
     } else {
-        address.addr = func_ov011_0216df90(sConnectionManagerHostname);
+        address.addr = inet_addr(sConnectionManagerHostname);
     }
     address.port = GPI_CONNECTION_MANAGER_PORT;
-    if (func_ov011_0216dec4(iconnection->cmSocket, &address, sizeof(address)) == -1) {
-        error = func_ov011_0216dfa8(iconnection->cmSocket);
+    if (connect(iconnection->cmSocket, &address, sizeof(address)) == -1) {
+        error = GOAGetLastError(iconnection->cmSocket);
         if (error != -6 && error != -26 && error != -76) {
             gpiSetError(connection, 5, "There was an error connecting a socket.");
             gpiCallErrorCallback(connection, 3, 1);
@@ -139,8 +139,8 @@ int gpiConnect(GPConnection *connection, const char *nick, const char *uniquenic
     strzcpy(iconnection->uniquenick, uniquenick, 0x15);
     strzcpy(iconnection->email, email, 0x33);
     strzcpy(iconnection->password, password, 0x1f);
-    func_ov011_0216e2f0(iconnection->email);
-    data = func_ov011_0216dddc(sizeof(GPIConnectData));
+    _strlwr(iconnection->email);
+    data = gsimalloc(sizeof(GPIConnectData));
     if (data == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
@@ -250,7 +250,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\productid\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->productID);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\gamename\\");
-    gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, data_ov011_0219069c);
+    gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, __GSIACGamename);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\namespaceid\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->namespaceID);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\sdkrevision\\");
@@ -281,7 +281,7 @@ static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data) {
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\productid\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->productID);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\gamename\\");
-    gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, data_ov011_0219069c);
+    gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, __GSIACGamename);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\namespaceid\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->namespaceID);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\uniquenick\\");
@@ -289,12 +289,12 @@ static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data) {
     if (data->cdkey[0] != '\0') {
         // The CD key is scrambled as gpiEncodeString scrambles a password
         cdkeylen = strlen(data->cdkey);
-        func_ov011_0216e654(0x79707367);
+        Util_RandSeed(0x79707367);
         for (i = 0; i < cdkeylen; i++) {
-            cdkeyxor[i] = data->cdkey[i] ^ (char)func_ov011_0216e670(0, 0xff);
+            cdkeyxor[i] = data->cdkey[i] ^ (char)Util_RandInt(0, 0xff);
         }
         cdkeyxor[i] = '\0';
-        func_ov011_0216e878(cdkeyxor, cdkeyenc, cdkeylen, 1);
+        B64Encode(cdkeyxor, cdkeyenc, cdkeylen, 1);
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\cdkeyenc\\");
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, cdkeyenc);
     }
@@ -440,7 +440,7 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
         iconnection->connectState = GPI_CONNECTED;
         callback = operation->callback;
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPConnectResponseArg));
+            arg = gsimalloc(sizeof(GPConnectResponseArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -486,36 +486,36 @@ static BOOL gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *pr
 
     if (profile->buddyStatus != NULL) {
         profile->buddyOrBlockCache = TRUE;
-        func_ov011_0216ddfc(profile->buddyStatus->statusString);
+        gsifree(profile->buddyStatus->statusString);
         profile->buddyStatus->statusString = NULL;
-        func_ov011_0216ddfc(profile->buddyStatus->locationString);
+        gsifree(profile->buddyStatus->locationString);
         profile->buddyStatus->locationString = NULL;
-        func_ov011_0216ddfc(profile->buddyStatus);
+        gsifree(profile->buddyStatus);
         profile->buddyStatus = NULL;
     }
     if (profile->buddyStatusInfo != NULL) {
         profile->buddyOrBlockCache = TRUE;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->richStatus);
+        gsifree(profile->buddyStatusInfo->richStatus);
         profile->buddyStatusInfo->richStatus = NULL;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->gameType);
+        gsifree(profile->buddyStatusInfo->gameType);
         profile->buddyStatusInfo->gameType = NULL;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->gameVariant);
+        gsifree(profile->buddyStatusInfo->gameVariant);
         profile->buddyStatusInfo->gameVariant = NULL;
-        func_ov011_0216ddfc(profile->buddyStatusInfo->gameMapName);
+        gsifree(profile->buddyStatusInfo->gameMapName);
         profile->buddyStatusInfo->gameMapName = NULL;
         if (profile->buddyStatusInfo->extendedInfoKeys != NULL) {
             func_ov011_02171558(profile->buddyStatusInfo->extendedInfoKeys);
             profile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
-        func_ov011_0216ddfc(profile->buddyStatusInfo);
+        gsifree(profile->buddyStatusInfo);
         profile->buddyStatusInfo = NULL;
     }
     if (profile->blocked) {
         profile->buddyOrBlockCache = TRUE;
     }
-    func_ov011_0216ddfc(profile->authSig);
+    gsifree(profile->authSig);
     profile->authSig = NULL;
-    func_ov011_0216ddfc(profile->peerSig);
+    gsifree(profile->peerSig);
     profile->peerSig = NULL;
     profile->requestCount = 0;
     if (profile->cache == NULL || (iconnection->infoCachingBuddyAndBlockOnly == TRUE && !profile->buddyOrBlockCache)) {
@@ -540,8 +540,8 @@ void gpiDisconnect(GPConnection *connection, BOOL tellServer) {
         }
         gpiSendFromBuffer(connection, iconnection->cmSocket, &iconnection->outputBuffer, &connClosed, TRUE, "CM");
         if (iconnection->cmSocket != -1) {
-            func_ov011_0216de7c(iconnection->cmSocket, 2);
-            func_ov011_0216de30(iconnection->cmSocket);
+            shutdown(iconnection->cmSocket, 2);
+            closesocket(iconnection->cmSocket);
             iconnection->cmSocket = -1;
         }
         iconnection->connectState = GPI_DISCONNECTED;
@@ -554,15 +554,15 @@ void gpiDisconnect(GPConnection *connection, BOOL tellServer) {
             Gt2_CloseSocket();
         }
     }
-    func_ov011_0216ddfc(iconnection->socketBuffer.buffer);
+    gsifree(iconnection->socketBuffer.buffer);
     iconnection->socketBuffer.buffer = NULL;
-    func_ov011_0216ddfc(iconnection->inputBuffer);
+    gsifree(iconnection->inputBuffer);
     iconnection->inputBuffer = NULL;
-    func_ov011_0216ddfc(iconnection->outputBuffer.buffer);
+    gsifree(iconnection->outputBuffer.buffer);
     iconnection->outputBuffer.buffer = NULL;
-    func_ov011_0216ddfc(iconnection->updateproBuffer.buffer);
+    gsifree(iconnection->updateproBuffer.buffer);
     iconnection->updateproBuffer.buffer = NULL;
-    func_ov011_0216ddfc(iconnection->updateuiBuffer.buffer);
+    gsifree(iconnection->updateuiBuffer.buffer);
     iconnection->updateuiBuffer.buffer = NULL;
     while (iconnection->operationList != NULL) {
         gpiRemoveOperation(connection, iconnection->operationList);

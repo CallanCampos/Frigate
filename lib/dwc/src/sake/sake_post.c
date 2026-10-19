@@ -14,7 +14,7 @@ static void Sake_PostMessage(SakeRequest *request) {
         OS_SNPrintf(gSakeStorageUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
                     request->sake->gameName);
     }
-    http = func_ov011_0216ea4c(gSakeStorageUrl, request->type->soapAction, request->writer, Sake_OnResponse, request);
+    http = gsiExecuteSoap(gSakeStorageUrl, request->type->soapAction, request->writer, Sake_OnResponse, request);
     if (http != NULL) {
         request->type->http = http->handle;
     } else {
