@@ -113,6 +113,7 @@ int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 siz
             break;
         }
         }
+        // The running sum is the byte written
         dest[i + 3] = sum + src[i + 3];
         sum = dest[i + 3];
         state->offset -= sum;
@@ -120,6 +121,7 @@ int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 siz
     return 0;
 }
 
+// Decrypts one byte with the next value of the cipher, and keeps the encrypted byte as the state's offset
 static inline u32 DSProt_DecryptByteMulti(DSProtCipherState *state, u32 byte) {
     u32 out = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
 

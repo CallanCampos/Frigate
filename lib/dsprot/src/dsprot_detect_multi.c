@@ -26,8 +26,8 @@ static inline void DSProt_Tamper(DSProtCheckArgs *args, u32 flag) {
     args->failed = flag;
 }
 
-// Returns `setCode` if the first MAC address has a nonzero byte, and otherwise has the second function run with `flag`
-// and returns `zeroCode`
+// Returns `setCode` if the MAC address has a nonzero byte, and otherwise has the second function run with `flag` and
+// returns `zeroCode`
 static inline u32 DSProt_CheckMacZero(DSProtCheckArgs *args, const u8 *mac, u32 setCode, u32 flag, u32 zeroCode) {
     int i;
 
