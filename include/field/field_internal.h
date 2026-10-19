@@ -73,7 +73,7 @@ struct Field {
     FieldGimmickWorkBlock gimmickWork;
     void *particleSystem;
     void *g3dCi;
-    DayCareSave *dayCare;
+    DayCare *dayCare;
     u32 renderMode;
     void *g3DObjSystem;
     FieldTaskManager *taskManager;

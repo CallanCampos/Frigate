@@ -85,24 +85,24 @@ static void ghiFreePostItem(void *element) {
     GHIPostItem *item = element;
 
     if (item->type != GHI_POST_XML) {
-        func_ov011_0216ddfc(item->name);
+        gsifree(item->name);
     }
     if (item->type == GHI_POST_STRING) {
-        func_ov011_0216ddfc(item->u.string.value);
+        gsifree(item->u.string.value);
     } else if (item->type == GHI_POST_DISK_FILE) {
-        func_ov011_0216ddfc(item->u.disk.path);
-        func_ov011_0216ddfc(item->u.disk.fileName);
-        func_ov011_0216ddfc(item->u.disk.contentType);
+        gsifree(item->u.disk.path);
+        gsifree(item->u.disk.fileName);
+        gsifree(item->u.disk.contentType);
     } else if (item->type == GHI_POST_MEMORY_FILE) {
-        func_ov011_0216ddfc(item->u.memory.fileName);
-        func_ov011_0216ddfc(item->u.memory.contentType);
+        gsifree(item->u.memory.fileName);
+        gsifree(item->u.memory.contentType);
     } else if (item->type == GHI_POST_XML) {
-        func_ov011_0216fe64(item->u.xml.message);
+        gsXmlFreeWriter(item->u.xml.message);
     }
 }
 
 GHIPost *ghiNewPost(void) {
-    GHIPost *post = func_ov011_0216dddc(sizeof(GHIPost));
+    GHIPost *post = gsimalloc(sizeof(GHIPost));
     char *p;
     u32 size;
 
@@ -117,7 +117,7 @@ GHIPost *ghiNewPost(void) {
     post->autoFree = TRUE;
     post->items = func_ov011_02171514(sizeof(GHIPostItem), 0, ghiFreePostItem);
     if (post->items == NULL) {
-        func_ov011_0216ddfc(post);
+        gsifree(post);
         return NULL;
     }
     return post;
@@ -132,7 +132,7 @@ void ghiFreePost(GHIPost *post) {
         func_ov011_02171558(post->items);
     }
     post->items = NULL;
-    func_ov011_0216ddfc(post);
+    gsifree(post);
 }
 
 // Frees a post of a request, and what the request keeps of it
@@ -148,14 +148,14 @@ void ghiFreePostOfRequest(int request, GHIPost *post) {
 // Adds a file that is in memory: the post copies the texts but not the bytes. Returns FALSE if it can't
 int ghttpPostAddFileFromMemory(GHIPost *post, const char *field, const void *bytes, int size, const char *fileName,
                                const char *contentType) {
-    char *fieldCopy = func_ov011_0216e2c8(field);
-    char *fileNameCopy = func_ov011_0216e2c8(fileName);
-    char *contentTypeCopy = func_ov011_0216e2c8(contentType);
+    char *fieldCopy = goastrdup(field);
+    char *fileNameCopy = goastrdup(fileName);
+    char *contentTypeCopy = goastrdup(contentType);
 
     if (fieldCopy == NULL || fileNameCopy == NULL || contentTypeCopy == NULL) {
-        func_ov011_0216ddfc(fieldCopy);
-        func_ov011_0216ddfc(fileNameCopy);
-        func_ov011_0216ddfc(contentTypeCopy);
+        gsifree(fieldCopy);
+        gsifree(fileNameCopy);
+        gsifree(contentTypeCopy);
         return FALSE;
     } else {
         GHIPostItem item = { 0 };
@@ -227,7 +227,7 @@ static int ghiPostGetUrlEncodedLength(GHIConnection *connection) {
             length += item->u.string.escapeCount * 2;
             length += 1;
         } else if (item->type == GHI_POST_XML) {
-            length += func_ov011_0216fed0(item->u.xml.message);
+            length += gsXmlWriterGetDataLength(item->u.xml.message);
         }
     }
     return length + (count - 1);
@@ -330,8 +330,8 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
             }
         } else if (item->type == GHI_POST_XML) {
             length += xmlExtra;
-            length += func_ov011_0216fed0(item->u.xml.message);
-            padding = GHI_DIME_PAD(func_ov011_0216fed0(item->u.xml.message));
+            length += gsXmlWriterGetDataLength(item->u.xml.message);
+            padding = GHI_DIME_PAD(gsXmlWriterGetDataLength(item->u.xml.message));
             if (padding != 4) {
                 length += padding;
             }
@@ -530,14 +530,14 @@ static BOOL ghiPostXmlStateDoPosting(GHIPostItemState *state, GHIConnection *con
     padding[1] = 0;
     padding[2] = 0;
     if (connection->post->mixed) {
-        padLength = 4 - func_ov011_0216fed0(message) % 4;
+        padLength = 4 - gsXmlWriterGetDataLength(message) % 4;
         if (padLength == 4) {
             padLength = 0;
         }
     }
     if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
-        if (!ghiAppendDataToBuffer(&connection->encodeBuffer, func_ov011_0216fecc(message),
-                                   func_ov011_0216fed0(message)) ||
+        if (!ghiAppendDataToBuffer(&connection->encodeBuffer, gsXmlWriterGetData(message),
+                                   gsXmlWriterGetDataLength(message)) ||
             !ghiAppendDataToBuffer(&connection->encodeBuffer, padding, padLength) ||
             !ghiEncryptDataToBuffer(&connection->sendBuffer, connection->encodeBuffer.data,
                                     connection->encodeBuffer.length)) {
@@ -552,7 +552,7 @@ static BOOL ghiPostXmlStateDoPosting(GHIPostItemState *state, GHIConnection *con
         }
         return TRUE;
     }
-    if (!ghiTrySendThenBuffer(connection, func_ov011_0216fecc(message), func_ov011_0216fed0(message))) {
+    if (!ghiTrySendThenBuffer(connection, gsXmlWriterGetData(message), gsXmlWriterGetDataLength(message))) {
         return FALSE;
     }
     switch (ghiTrySendThenBuffer(connection, padding, padLength)) {
@@ -708,10 +708,10 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
                     headers[1].optionsLength = 0;
                     headers[1].idLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_ID));
                     headers[1].typeLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_TYPE));
-                    headers[1].dataLength = GHI_SWAP32(func_ov011_0216fed0(state->item->u.xml.message));
+                    headers[1].dataLength = GHI_SWAP32(gsXmlWriterGetDataLength(state->item->u.xml.message));
                     ghiCopy(buffer, &headers[1], sizeof(GHIDimeHeader));
                     length += sizeof(GHIDimeHeader);
-                    count = func_ov011_0216ee7c(buffer + length, GHI_MESSAGE_ID, sizeof(buffer) - length);
+                    count = gsiSafeStrcpyA(buffer + length, GHI_MESSAGE_ID, sizeof(buffer) - length);
                     length += count;
                     padding = 4 - (count & 3);
                     if (padding != 4) {
@@ -719,7 +719,7 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
                             buffer[length++] = 0;
                         }
                     }
-                    count = func_ov011_0216ee7c(buffer + length, GHI_MESSAGE_TYPE, sizeof(buffer) - length);
+                    count = gsiSafeStrcpyA(buffer + length, GHI_MESSAGE_TYPE, sizeof(buffer) - length);
                     length += count;
                     padding = 4 - (count & 3);
                     if (padding != 4) {
@@ -764,7 +764,7 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
                     headers[0].dataLength = GHI_SWAP32(dataLength);
                     ghiCopy(buffer, &headers[0], sizeof(GHIDimeHeader));
                     length += sizeof(GHIDimeHeader);
-                    count = func_ov011_0216ee7c(buffer + length, state->item->name, sizeof(buffer) - length);
+                    count = gsiSafeStrcpyA(buffer + length, state->item->name, sizeof(buffer) - length);
                     length += count;
                     padding = 4 - (count & 3);
                     if (padding != 4) {
@@ -772,7 +772,7 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
                             buffer[length++] = 0;
                         }
                     }
-                    count = func_ov011_0216ee7c(buffer + length, contentType, sizeof(buffer) - length);
+                    count = gsiSafeStrcpyA(buffer + length, contentType, sizeof(buffer) - length);
                     length += count;
                     padding = 4 - (count & 3);
                     if (padding != 4) {

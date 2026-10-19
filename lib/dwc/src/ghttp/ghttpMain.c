@@ -84,7 +84,7 @@ BOOL ghiProcessConnection(GHIConnection *connection) {
         ghiDoReceivingFile(connection);
     }
     if (connection->state == 11) {
-        func_ov011_0216cca8(8, 3, 0x10, "Connection Closing\n");
+        gsDebugFormat(8, 3, 0x10, "Connection Closing\n");
     }
 
     if (connection->redirectUrl != NULL) {
@@ -93,7 +93,7 @@ BOOL ghiProcessConnection(GHIConnection *connection) {
 
     completed = connection->completed;
     if (connection->result == 0x12 && !completed) {
-        if (!func_ov011_0216e10c(connection->socket)) {
+        if (!CanReceiveOnSocket(connection->socket)) {
             connection->completed = TRUE;
         }
     }
@@ -147,7 +147,7 @@ void ghttpCleanup(void) {
     if (sStartCount == 0) {
         ghiCleanupConnections();
         if (ghiProxyAddress != NULL) {
-            func_ov011_0216ddfc(ghiProxyAddress);
+            gsifree(ghiProxyAddress);
             ghiProxyAddress = NULL;
         }
         ghiUnlock();
@@ -182,13 +182,13 @@ int ghttpGetExA(const char *url, const char *headers, char *buffer, int bufferSi
         return -1;
     }
     connection->type = 0;
-    connection->url = func_ov011_0216e2c8(url);
+    connection->url = goastrdup(url);
     if (connection->url == NULL) {
         ghiFreeConnection(connection);
         return -1;
     }
     if (headers != NULL && headers[0] != '\0') {
-        connection->headers = func_ov011_0216e2c8(headers);
+        connection->headers = goastrdup(headers);
         if (connection->headers == NULL) {
             ghiFreeConnection(connection);
             return -1;
@@ -220,7 +220,7 @@ int ghttpGetExA(const char *url, const char *headers, char *buffer, int bufferSi
     if (blocking) {
         if (!ghiProcessConnection(connection)) {
             do {
-                func_ov011_0216e360(10);
+                msleep(10);
             } while (!ghiProcessConnection(connection));
         }
         return 0;
