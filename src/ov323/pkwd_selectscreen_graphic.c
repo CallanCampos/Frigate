@@ -189,24 +189,24 @@ static void PkwdSelectScreenBG_VBlank(PkwdSelectScreenBG *bg) {
 static void PkwdSelectScreenClAct_Init(PkwdSelectScreenClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(PkwdSelectScreenClAct));
     ClActSys_Create(&sPkwdSelectScreenClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void PkwdSelectScreenClAct_Free(PkwdSelectScreenClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(PkwdSelectScreenClAct));
 }
 
 static void PkwdSelectScreenClAct_Update(PkwdSelectScreenClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void PkwdSelectScreenClAct_VBlank(PkwdSelectScreenClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *PkwdSelectScreenClAct_GetUnit(PkwdSelectScreenClAct *clact) {

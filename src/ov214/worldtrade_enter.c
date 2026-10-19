@@ -626,5 +626,5 @@ void WorldTrade_ExplainPrint(BmpWin *win, MsgData *msgManager, int no, WorldTrad
 }
 
 void WorldTrade_WifiIconAdd(WorldTradeWork *wk) {
-    func_02042ba8(FALSE, HEAPID_WORLDTRADE);
+    GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);
 }

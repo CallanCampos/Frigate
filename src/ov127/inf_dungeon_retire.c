@@ -180,7 +180,7 @@ static void InfDungeonRetire_Init(InfDungeonRetire *work, HeapID heapId) {
     InfDungeonRetire_InitBGs(work, heapId);
     InfDungeonRetire_InitMenuRes(work, heapId);
     InfDungeonRetire_InitWindow(work, heapId);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     func_ov036_02198884(work->subscreen, heapId);
 }
 

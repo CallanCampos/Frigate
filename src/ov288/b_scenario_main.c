@@ -346,7 +346,7 @@ static BOOL BScenarioMain_Finish(TCB *tcb, BScenarioWork *work) {
     PrintQueue_Free(work->printQueue);
     GFL_FontFree(work->smallFont);
     work->param->done = TRUE;
-    func_0203d564(!(work->flags & BSCENARIO_FLAG_KEY_CLOSE));
+    GCTX_HIDSetUsingTouch(!(work->flags & BSCENARIO_FLAG_KEY_CLOSE));
     GFL_TCBRemove(tcb);
     GFL_HeapFree(work);
     return TRUE;
@@ -402,7 +402,7 @@ static void BScenarioMain_Init(BScenarioWork *work) {
     BScenarioMain_StartWipe(work);
     BScenarioMain_InitPalettes(work);
     work->flags |= BSCENARIO_FLAG_REFRESH;
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         work->flags |= BSCENARIO_FLAG_KEYS;
     }
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, 8, 3);
@@ -520,7 +520,7 @@ static void BScenarioMain_InitPalettes(BScenarioWork *work) {
     PaletteFade_LoadNCLR(work->paletteFade, ARCID_PKWD, FILE_LABEL_PALETTE, work->param->heapId, 1, 0x20, 0x90);
     PaletteFade_LoadNCLR(work->paletteFade, ARCID_PKWD, sBScenarioSeriesPalettes[series % 4], work->param->heapId, 1,
                          0x60, 0xa0);
-    func_02042ba8(FALSE, work->param->heapId);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, 0, 0x1e0);
     PaletteFade_StartFade(work->paletteFade, 10, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
 }

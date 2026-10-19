@@ -8,7 +8,7 @@
 // name is a guess.
 
 void NetBgmVolume_Set(u16 trackMask, s32 volume) {
-    if (!func_02042b20() || func_ov011_02151dec() == 0) {
+    if (!GFL_NetIsWifi() || func_ov011_02151dec() == 0) {
         GFL_SndBGMSetVolume(trackMask, volume);
     }
 }

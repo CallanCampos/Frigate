@@ -63,7 +63,7 @@ void DWCRapCommon_EndSubHeap(void) {
 
     if (pDwcRapWork->subCount != 0) {
         // Blocks of the second heap are still allocated
-        func_020424ac(0, 0, 0, 0x3ee);
+        NetState_RecordError(0, 0, 0, 0x3ee);
         pDwcRapWork->destroySub = TRUE;
     } else {
         DWCRapCommon_DestroySubHeap();
@@ -104,7 +104,7 @@ void *DWCRapCommon_Alloc(u32 name, u32 size, int align) {
 
     if (ptr == NULL) {
         AssertFailErrorDisp();
-        func_020424ac(0, 0, 0, 0x3ee);
+        NetState_RecordError(0, 0, 0, 0x3ee);
         return NULL;
     }
     return ptr;
@@ -121,7 +121,7 @@ void DWCRapCommon_Free(u32 name, void *ptr, u32 size) {
                 OS_RestoreInterrupts(mask);
                 pDwcRapWork->subCount--;
             } else {
-                func_020424ac(0, 0, 0, 0x3ee);
+                NetState_RecordError(0, 0, 0, 0x3ee);
             }
         } else {
             mask = OS_DisableInterrupts();
@@ -172,8 +172,8 @@ void DWCRapCommon_ResetUserData(void *userData) {
 }
 
 static void DWCRapCommon_ShutdownLibrary(void) {
-    func_020424e4();
-    func_02042478();
+    NetState_ClearWifiError();
+    NetState_ClearError();
     DWC_ClearError();
 }
 
@@ -181,8 +181,8 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
     GFLNetErrorInfo *error;
     int type;
 
-    if (func_02042788()) {
-        error = func_02042540();
+    if (GFL_NetIsInitialized()) {
+        error = NetState_GetErrorInfo();
         if (GFL_NetErrCheck()) {
             switch (error->unk4) {
             case 1:
@@ -220,9 +220,9 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
                 GFL_NetErrClear();
                 return 4;
             }
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             func_020421ac(TRUE);
             return 0;
         }

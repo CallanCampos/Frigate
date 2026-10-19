@@ -17,9 +17,9 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk);
 
 void PokemonTradeIrcDemo_Init(PokemonTradeWork *wk) {
     func_ov194_021bb4b4(wk);
-    func_0204b758();
+    ClActSys_Delete();
     func_ov194_021c2c44(wk);
-    wk->clactUnit = func_0204bf1c(3, 0, wk->heapId);
+    wk->clactUnit = ClActUnit_Create(3, 0, wk->heapId);
     wk->work3D = GFL_HeapAllocate(wk->heapId, sizeof(PokemonTrade3DWork), TRUE, "pokemontrade_ircdemo.c", 101);
     wk->work3D->heapId = wk->heapId;
     func_ov194_021c4088(wk, TRUE);
@@ -64,22 +64,22 @@ static void PokemonTradeIrcDemo_Run(PokemonTradeWork *wk) {
         MCSS_Hide(wk->mcss[0]);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(-1)) {
-        func_0205007c(wk->work3D->systems[0], 0, NULL, wk);
+        Particle_CreateEmitterWithCallback(wk->work3D->systems[0], 0, NULL, wk);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x15e)) {
-        func_0205007c(wk->work3D->systems[1], 0, NULL, wk);
+        Particle_CreateEmitterWithCallback(wk->work3D->systems[1], 0, NULL, wk);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0xc8)) {
-        func_0205007c(wk->work3D->systems[2], 1, NULL, wk);
+        Particle_CreateEmitterWithCallback(wk->work3D->systems[2], 1, NULL, wk);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x14)) {
-        func_0205007c(wk->work3D->systems[3], 2, NULL, wk);
+        Particle_CreateEmitterWithCallback(wk->work3D->systems[3], 2, NULL, wk);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x258)) {
-        func_0205007c(wk->work3D->systems[4], 2, NULL, wk);
+        Particle_CreateEmitterWithCallback(wk->work3D->systems[4], 2, NULL, wk);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(-1)) {
-        func_0205007c(wk->work3D->systems[5], 3, NULL, wk);
+        Particle_CreateEmitterWithCallback(wk->work3D->systems[5], 3, NULL, wk);
     }
     if (wk->timer == PokemonTradeIrcDemo_Frames(0x256)) {
         PokemonTradeIrcDemo_ShowActor(wk);

@@ -188,24 +188,24 @@ static void SubwayMapBG_VBlank(SubwayMapBG *bg) {
 static void SubwayMapClAct_Init(SubwayMapClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(SubwayMapClAct));
     ClActSys_Create(&sSubwayMapClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void SubwayMapClAct_Free(SubwayMapClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(SubwayMapClAct));
 }
 
 static void SubwayMapClAct_Update(SubwayMapClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void SubwayMapClAct_VBlank(SubwayMapClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void SubwayMapG3dSys_Init(SubwayMapG3dSys *g3d, HeapID heapId) {

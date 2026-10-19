@@ -5540,7 +5540,7 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         break;
     case 8:
         sExpSeq++;
-        if ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48() || sExpSeq > 80) {
+        if ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed() || sExpSeq > 80) {
             sExpSeq = 0;
             func_ov167_0219db64(client->mainModule, mon);
             func_ov167_021d0978(client->viewCore, mon, &sLevelUp);
@@ -5548,13 +5548,13 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         }
         break;
     case 9:
-        if (func_ov167_021d0988(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48())) {
+        if (func_ov167_021d0988(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed())) {
             func_ov167_021d0998(client->viewCore);
             *seq = 10;
         }
         break;
     case 10:
-        if (func_ov167_021d09a8(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48())) {
+        if (func_ov167_021d09a8(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed())) {
             func_ov167_021d09b8(client->viewCore);
             *seq = 11;
         }

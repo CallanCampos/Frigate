@@ -111,8 +111,8 @@ BOOL func_ov030_02173340(HeapID heapId, WHCallback callback, void *gameWork, BOO
     NetWhpipeWork *work;
     GFLNetInitData *init;
 
-    func_02042e84();
-    init = func_02042e84();
+    GFL_NetGetInitData();
+    init = GFL_NetGetInitData();
     if (sWork != NULL) {
         return FALSE;
     }
@@ -142,7 +142,7 @@ static BOOL CheckBeacon(const NetWhpipeBeacon *beacon) {
     u16 gameId;
 
     work = sWork;
-    init = func_02042e84();
+    init = GFL_NetGetInitData();
     gameCommandBase = init->gameCommandBase;
     gameId = init->unk4C.id.gameId;
     info = &beacon->info;
@@ -180,7 +180,7 @@ static BOOL OnBeaconFound(const void *found) {
     int i;
     NetWhpipeWork *work = sWork;
 
-    func_02042e84();
+    GFL_NetGetInitData();
     if (!CheckBeacon(beacon)) {
         return FALSE;
     }
@@ -329,10 +329,10 @@ static void TickBeaconTimers(void) {
 }
 
 void func_ov030_02173780(void) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         NetWhpipeBeaconInfo *info;
         NetWhpipeWork *work = sWork;
-        GFLNetInitData *init = func_02042e84();
+        GFLNetInitData *init = GFL_NetGetInitData();
         int size;
 
         if (init->unk1C == NULL) {
@@ -356,7 +356,7 @@ void func_ov030_02173780(void) {
 static void UpdateBeacon(void) {
     NetWhpipeWork *work = sWork;
     NetWhpipeBeaconInfo *info = &work->info;
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
 
     if (init->unk1C != NULL) {
         int size = init->unk1C(work->gameWork);
@@ -613,7 +613,7 @@ static void StateStartParent(void *arg) {
     u16 modes[2] = { 4, 0 };
 
     if (state == WH_SYSSTATE_MEASURECHANNEL) {
-        GFLNetInitData *init = func_02042e84();
+        GFLNetInitData *init = GFL_NetGetInitData();
         u16 channel;
 
         work->entryClosed = FALSE;
@@ -658,7 +658,7 @@ BOOL func_ov030_02173cf8(BOOL anyChannel) {
 
 static void SetBeaconInfo(NetWhpipeBeaconInfo *info, int size) {
     NetWhpipeWork *work = sWork;
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
 
     if (work != NULL && init != NULL) {
         info->crc = getCRC16(&info->gameId, size - 2);
@@ -672,7 +672,7 @@ static void SetBeaconInfo(NetWhpipeBeaconInfo *info, int size) {
 }
 
 static void StateStartChild(void *arg) {
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
     u16 modes[2] = { 5, 1 };
 
     if (WH_GetSystemState() == WH_SYSSTATE_IDLE || WH_GetSystemState() == WH_SYSSTATE_SCANNING) {
@@ -685,7 +685,7 @@ static void StateStartChild(void *arg) {
 }
 
 BOOL func_ov030_02173e0c(BOOL unused, const u8 *mac, int index, void (*callback)(void)) {
-    func_02042e84();
+    GFL_NetGetInitData();
     if (sWork->base.state != NULL) {
         return FALSE;
     }

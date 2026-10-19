@@ -170,22 +170,22 @@ static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, void *resource, u32 
         size = &MMDL_BILLBOARD_SIZES_INT[sizeIdx];
         texKey = GFL_G3DResGetTexVRAMHandle(resource);
         plttKey = GFL_G3DResGetPltVRAMHandle(resource);
-        material = func_0204f31c(sys,
-                                 BlActScene_AddMaterialExistTex(scene, texKey, plttKey, 0,
-                                                                MMDL_TEXTURE_ATLAS_SIZE_BITS[atlasIdx],
-                                                                MMDL_BILLBOARD_SIZES_INT[sizeIdx].width, size->height),
-                                 NULL);
+        material = BlActSys_AddTexMat(
+            sys,
+            BlActScene_AddMaterialExistTex(scene, texKey, plttKey, 0, MMDL_TEXTURE_ATLAS_SIZE_BITS[atlasIdx],
+                                           MMDL_BILLBOARD_SIZES_INT[sizeIdx].width, size->height),
+            NULL);
         GFL_G3DResFree(resource);
     }
     return material;
 }
 
 static void func_ov036_02193700(BlActSys *sys, u32 texMat) {
-    u16 material = func_0204f3bc(sys, texMat);
+    u16 material = BlActSys_GetTexMatMaterial(sys, texMat);
     BlActScene *scene = BlActSys_GetScene(sys);
 
-    func_0204f3a0(sys, texMat);
-    func_0204e77c(scene, material);
+    BlActSys_FreeTexMat(sys, texMat);
+    BlActScene_FreeMaterialVram(scene, material);
 }
 
 void FldActSys_InitBlAct(MMSys *system, BlActSys *sys, u32 count) {
@@ -293,10 +293,10 @@ static u16 FldActSys_AddBlAct(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrl
     actor = BlActSys_ExecActorRequests(blact->sys, blact->firstMat, &request, 1, 0);
     anims = func_ov036_02194650(ctrlType);
     if (anims->unk0 != NULL) {
-        func_0204f6d4(blact->sys, actor, anims->unk0, anims->unk4);
+        BlActSys_SetActorAnims(blact->sys, actor, anims->unk0, anims->unk4);
         sys = blact->sys;
-        func_0204f6ec(sys, actor, 0);
-        func_0204f6c8(sys, actor, TRUE);
+        BlActSys_SetActorAnim(sys, actor, 0);
+        BlActSys_SetActorAnimating(sys, actor, TRUE);
     }
     return actor;
 }
@@ -314,7 +314,7 @@ static u16 func_ov036_0219396c(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctr
     u16 actor = FldActSys_AddBlActDefault(system, pos, sizeIdx, ctrlType, mat);
 
     if (palMat != BLACT_NONE) {
-        func_0204f730(((FieldBlAct *)FldActSys_GetFieldBlAct(system))->sys, actor, palMat);
+        BlActSys_ShareActorPltt(((FieldBlAct *)FldActSys_GetFieldBlAct(system))->sys, actor, palMat);
     }
     return actor;
 }

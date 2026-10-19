@@ -523,8 +523,8 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
     } else {
         NameEntryMessage_Print(&work->message, param->mode);
     }
-    if (func_02042788()) {
-        func_02042ba8(TRUE, HEAPID_NAMEIN);
+    if (GFL_NetIsInitialized()) {
+        GFL_NetSetIconScreen(TRUE, HEAPID_NAMEIN);
     }
     if (work->param->saveTask != NULL) {
         SaveControlIntr_Resume(work->param->saveTask);
@@ -605,27 +605,27 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
     int i;
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_NAMEIN_GRAPHIC, heapId);
-    objs->palette = func_0204bba0(arc, 9, 0, 0, heapId);
-    objs->cellAnims = func_0204bde0(arc, 7, 6, heapId);
-    objs->chars = func_0204b81c(arc, 8, FALSE, 0, heapId);
+    objs->palette = ClActSys_LoadPltt(arc, 9, 0, 0, heapId);
+    objs->cellAnims = ClActSys_LoadCellAnims(arc, 7, 6, heapId);
+    objs->chars = ClActSys_LoadChars(arc, 8, FALSE, 0, heapId);
     GFL_ArcToolFree(arc);
 
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.sequence = 0;
     for (i = 0; i < NAME_SLOT_COUNT; i++) {
-        objs->actors[i] = func_0204c040(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
+        objs->actors[i] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
     }
     setup.sequence = 1;
-    objs->actors[17] = func_0204c040(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
-    func_0204c124(objs->actors[17], FALSE);
+    objs->actors[17] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
+    ClActor_SetVisible(objs->actors[17], FALSE);
 
     for (i = 18; i < 20; i++) {
         setup.x = -32;
         setup.y = -32;
         setup.sequence = i - 15;
-        objs->actors[i] = func_0204c040(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
+        objs->actors[i] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
         func_0204c520(objs->actors[i], TRUE);
-        func_0204c124(objs->actors[i], FALSE);
+        ClActor_SetVisible(objs->actors[i], FALSE);
     }
 
     for (i = 21; i <= 23; i++) {
@@ -633,8 +633,8 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
         setup.x += i - 21;
         setup.y = 20;
         setup.sequence = i - 15;
-        objs->actors[i] = func_0204c040(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
-        func_0204c124(objs->actors[i], FALSE);
+        objs->actors[i] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
+        ClActor_SetVisible(objs->actors[i], FALSE);
     }
 }
 
@@ -643,12 +643,12 @@ static void NameEntryObjs_Free(NameEntryObjs *objs) {
 
     for (i = 0; i < OBJ_COUNT; i++) {
         if (objs->actors[i] != NULL) {
-            func_0204c108(objs->actors[i]);
+            ClActor_Delete(objs->actors[i]);
         }
     }
-    func_0204bcd0(objs->palette);
-    func_0204b98c(objs->chars);
-    func_0204be64(objs->cellAnims);
+    ClActSys_FreePltt(objs->palette);
+    ClActSys_FreeChars(objs->chars);
+    ClActSys_FreeCellAnims(objs->cellAnims);
 }
 
 static ClActor *NameEntryObjs_Get(NameEntryObjs *objs, u32 index) {
@@ -707,21 +707,21 @@ static void KeyHighlight_Set(KeyHighlight *highlight, u32 mode, const KeyRect *r
             GFL_BGSysSetScrPaletteNo(1, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top,
                                      mode + 1);
         }
-        if (!func_0203d554()) {
+        if (!GCTX_HIDIsUsingTouch()) {
             highlight->pos[0].x = rect->left * 8 + 7;
             y = rect->top * 8 + (rect->bottom - rect->top) * 4 - 3;
             highlight->pos[0].y = y;
             highlight->pos[1].x = rect->right * 8 - 7;
             highlight->pos[1].y = y;
-            func_0204c56c(highlight->actors[0]);
-            func_0204c56c(highlight->actors[1]);
-            func_0204c124(highlight->actors[0], TRUE);
-            func_0204c124(highlight->actors[1], TRUE);
+            ClActor_RestartAnim(highlight->actors[0]);
+            ClActor_RestartAnim(highlight->actors[1]);
+            ClActor_SetVisible(highlight->actors[0], TRUE);
+            ClActor_SetVisible(highlight->actors[1], TRUE);
         }
     }
-    if (mode == 0 || func_0203d554() == TRUE) {
-        func_0204c124(highlight->actors[0], FALSE);
-        func_0204c124(highlight->actors[1], FALSE);
+    if (mode == 0 || GCTX_HIDIsUsingTouch() == TRUE) {
+        ClActor_SetVisible(highlight->actors[0], FALSE);
+        ClActor_SetVisible(highlight->actors[1], FALSE);
     }
     GFL_BGSysLoadScr(2);
     GFL_BGSysLoadScr(1);
@@ -750,7 +750,7 @@ static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect
             palette = 3;
             step = 0x1999;
             if (highlight->timer++ > 10) {
-                if (!func_0203d554()) {
+                if (!GCTX_HIDIsUsingTouch()) {
                     KeyHighlight_Set(highlight, 1, rect, highlight->kanaPage, type);
                 } else {
                     KeyHighlight_Set(highlight, 0, rect, highlight->kanaPage, type);
@@ -766,12 +766,12 @@ static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect
 
     pos = highlight->pos[0];
     pos.y -= GFL_BGSysGetBGOffsetY(2) * 8;
-    func_0204c140(highlight->actors[0], &pos, 0);
+    ClActor_SetSurfacePos(highlight->actors[0], &pos, 0);
     pos = highlight->pos[1];
     pos.y -= GFL_BGSysGetBGOffsetY(2) * 8;
-    func_0204c140(highlight->actors[1], &pos, 0);
+    ClActor_SetSurfacePos(highlight->actors[1], &pos, 0);
     if (highlight->type != type) {
-        if (!func_0203d554()) {
+        if (!GCTX_HIDIsUsingTouch()) {
             KeyHighlight_Set(highlight, 1, &highlight->rect, highlight->kanaPage, type);
         } else {
             KeyHighlight_Set(highlight, 0, &highlight->rect, highlight->kanaPage, type);
@@ -868,15 +868,15 @@ static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, P
     offset += 64;
     for (i = 0; i < NAME_SLOT_COUNT; i++) {
         pos.x = offset + i * 14;
-        func_0204c488(box->slots[i], 1);
+        ClActor_SetSequence(box->slots[i], 1);
         func_0204c520(box->slots[i], TRUE);
-        func_0204c140(box->slots[i], &pos, 0);
-        func_0204c124(box->slots[i], TRUE);
+        ClActor_SetSurfacePos(box->slots[i], &pos, 0);
+        ClActor_SetVisible(box->slots[i], TRUE);
     }
     for (i = box->maxLength; i < NAME_SLOT_COUNT; i++) {
-        func_0204c124(box->slots[i], FALSE);
+        ClActor_SetVisible(box->slots[i], FALSE);
     }
-    func_0204c540(box->slots[box->length]);
+    ClActor_StartAnim(box->slots[box->length]);
     box->dirty = TRUE;
     NameBox_Update(box);
 }
@@ -940,19 +940,19 @@ static BOOL NameBox_Update(NameBox *box) {
         }
 
         for (i = 0; i < box->maxLength; i++) {
-            func_0204c4d4(box->slots[i], 0);
-            func_0204c488(box->slots[i], 1);
-            func_0204c124(box->slots[i], TRUE);
+            ClActor_SetAnimTime(box->slots[i], 0);
+            ClActor_SetSequence(box->slots[i], 1);
+            ClActor_SetVisible(box->slots[i], TRUE);
         }
         for (; i < NAME_SLOT_COUNT; i++) {
-            func_0204c4d4(box->slots[i], 0);
-            func_0204c488(box->slots[i], 1);
-            func_0204c124(box->slots[i], FALSE);
+            ClActor_SetAnimTime(box->slots[i], 0);
+            ClActor_SetSequence(box->slots[i], 1);
+            ClActor_SetVisible(box->slots[i], FALSE);
         }
         for (i = 0; i <= box->length && i < box->maxLength; i++) {
-            func_0204c124(box->slots[i], TRUE);
+            ClActor_SetVisible(box->slots[i], TRUE);
         }
-        func_0204c488(box->slots[box->length], 0);
+        ClActor_SetSequence(box->slots[box->length], 0);
         box->dirty = FALSE;
     }
     return NameBox_IsPrintDone(box);
@@ -2017,7 +2017,7 @@ static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue,
     kb->print.window = kb->window;
     kb->print.printing = FALSE;
     KeyLayout_PrintKeys(&kb->layout, &kb->print, queue, font, heapId);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
             KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
         }
@@ -2309,9 +2309,9 @@ static BOOL Keyboard_HandleKeys(Keyboard *kb, KeyInput *input) {
         KeyLayout_Move(&kb->layout, &kb->pos, &delta);
     }
     if (moved) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
@@ -2353,10 +2353,10 @@ static BOOL Keyboard_HandleButtons(Keyboard *kb, KeyInput *input) {
         kb->result = KEY_RESULT_CYCLE;
         acted = FALSE;
     }
-    if (acted && func_0203d554() == TRUE) {
+    if (acted && GCTX_HIDIsUsingTouch() == TRUE) {
         if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
             return FALSE;
         }
@@ -2371,7 +2371,7 @@ static BOOL Keyboard_HandleTouch(Keyboard *kb, KeyInput *input) {
     int x;
     int y;
 
-    if (func_0203dac8(&touchX, &touchY)) {
+    if (GFL_HIDGetTouchPressedPoint(&touchX, &touchY)) {
         touch.x = touchX;
         touch.y = touchY;
         if (KeyLayout_FindAtTouch(&kb->layout, &touch, &kb->pos)) {
@@ -2380,7 +2380,7 @@ static BOOL Keyboard_HandleTouch(Keyboard *kb, KeyInput *input) {
             input->pos.y = y;
             input->moved = TRUE;
             input->pos.x = x;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return TRUE;
         }
     }
@@ -2473,10 +2473,10 @@ static BOOL Keyboard_HandleKeysSlide(Keyboard *kb, KeyInput *input) {
         KeyLayout_Move(&kb->layout, &pos, &delta);
         kind = KeyLayout_GetChar(&kb->layout, &pos, NULL);
         if (kind == KEY_KIND_TYPE_0 || kind == KEY_KIND_TYPE_1 || kind == KEY_KIND_TYPE_2 || kind == KEY_KIND_TYPE_3) {
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
-                    func_0203d564(FALSE);
+                    GCTX_HIDSetUsingTouch(FALSE);
                     KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
                 }
             } else {
@@ -2510,10 +2510,10 @@ static BOOL Keyboard_HandleButtonsSlide(Keyboard *kb, KeyInput *input) {
             input->pos = kb->pos;
             acted = TRUE;
         }
-        if (acted && func_0203d554() == TRUE) {
+        if (acted && GCTX_HIDIsUsingTouch() == TRUE) {
             if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 KeyHighlight_Set(&kb->highlight, 1, &rect, kb->kanaPage, kb->type);
                 return FALSE;
             }
@@ -2531,7 +2531,7 @@ static BOOL Keyboard_HandleTouchSlide(Keyboard *kb, KeyInput *input) {
     int kind;
 
     if (!kb->hasUpperLayer) {
-        if (func_0203dac8(&touchX, &touchY)) {
+        if (GFL_HIDGetTouchPressedPoint(&touchX, &touchY)) {
             touch.x = touchX;
             touch.y = touchY;
             if (KeyLayout_FindAtTouch(&kb->layout, &touch, &kb->pos)) {
@@ -2543,7 +2543,7 @@ static BOOL Keyboard_HandleTouchSlide(Keyboard *kb, KeyInput *input) {
                     input->pos.y = y;
                     input->moved = TRUE;
                     input->pos.x = x;
-                    func_0203d564(TRUE);
+                    GCTX_HIDSetUsingTouch(TRUE);
                     return TRUE;
                 }
             }
@@ -2778,19 +2778,19 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
 
     arc = GFL_ArcSysCreateFileHandle(arcId, heapId);
     if (ownPalette) {
-        icon->palette = func_0204bc48(arc, paletteFile, 0, 128, heapId);
+        icon->palette = ClActSys_LoadPlttEx(arc, paletteFile, 0, 128, heapId);
     } else {
-        icon->palette = func_0204bbb8(arc, paletteFile, 0, 128, paletteStart, 1, heapId);
+        icon->palette = ClActSys_LoadPlttRange(arc, paletteFile, 0, 128, paletteStart, 1, heapId);
     }
-    icon->cellAnims = func_0204bde0(arc, cellFile, animFile, heapId);
-    icon->chars = func_0204b81c(arc, charsFile, FALSE, 0, heapId);
+    icon->cellAnims = ClActSys_LoadCellAnims(arc, cellFile, animFile, heapId);
+    icon->chars = ClActSys_LoadChars(arc, charsFile, FALSE, 0, heapId);
     GFL_ArcToolFree(arc);
 
     icon->baseY = y;
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = x;
     setup.y = y;
-    icon->actor = func_0204c040(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 0, heapId);
+    icon->actor = ClActor_Create(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 0, heapId);
     func_0204c520(icon->actor, TRUE);
     switch (type) {
     case ICON_TYPE_PLAYER:
@@ -2804,30 +2804,30 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
         NsbtxToClwk_LoadTexture(icon->actor, 48, 48 + 221, 3, 4, 4, 0, 0, heapId);
         break;
     case ICON_TYPE_FRIEND:
-        func_0204c378(icon->actor, 0, TRUE);
+        ClActor_SetPalette(icon->actor, 0, TRUE);
         break;
     case ICON_TYPE_POKEMON:
     case ICON_TYPE_POKEMON_NO_LABEL:
-        func_0204c488(icon->actor, 1);
-        func_0204c378(icon->actor, PokeIcon_GetPalette(species, (u8)form, (form & 0xff00) >> 8, FALSE), FALSE);
+        ClActor_SetSequence(icon->actor, 1);
+        ClActor_SetPalette(icon->actor, PokeIcon_GetPalette(species, (u8)form, (form & 0xff00) >> 8, FALSE), FALSE);
         break;
     case ICON_TYPE_KEY:
-        func_0204c488(icon->actor, 5);
-        func_0204c378(icon->actor, 0, TRUE);
+        ClActor_SetSequence(icon->actor, 5);
+        ClActor_SetPalette(icon->actor, 0, TRUE);
         break;
     case ICON_TYPE_BOX:
-        func_0204c488(icon->actor, 2);
-        func_0204c378(icon->actor, 0, TRUE);
+        ClActor_SetSequence(icon->actor, 2);
+        ClActor_SetPalette(icon->actor, 0, TRUE);
         break;
     case ICON_TYPE_AVENUE:
-        func_0204c378(icon->actor, 0, TRUE);
+        ClActor_SetPalette(icon->actor, 0, TRUE);
         break;
     }
 
     if (hasLabel) {
         arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, heapId);
         icon->labelBitmap = GFL_BitmapCreate(2, 2, 32, heapId);
-        icon->labelPalette = func_0204bc48(arc, 5, 0, 224, heapId);
+        icon->labelPalette = ClActSys_LoadPlttEx(arc, 5, 0, 224, heapId);
         GFL_ArcToolFree(arc);
         MI_CpuFill8(&labelSetup, 0, sizeof(BmpOamActorSetup));
         labelSetup.bitmap = icon->labelBitmap;
@@ -2857,15 +2857,15 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
 
 static void NameEntryIcon_Free(NameEntryIcon *icon) {
     if (icon->labelActor != NULL) {
-        func_0204bcd0(icon->labelPalette);
+        ClActSys_FreePltt(icon->labelPalette);
         GFL_StrBufFree(icon->label);
         BmpOam_ActorDel(icon->labelActor);
         GFL_BitmapFree(icon->labelBitmap);
     }
-    func_0204bcd0(icon->palette);
-    func_0204b98c(icon->chars);
-    func_0204be64(icon->cellAnims);
-    func_0204c108(icon->actor);
+    ClActSys_FreePltt(icon->palette);
+    ClActSys_FreeChars(icon->chars);
+    ClActSys_FreeCellAnims(icon->cellAnims);
+    ClActor_Delete(icon->actor);
     MI_CpuFill8(icon, 0, sizeof(NameEntryIcon));
 }
 
@@ -2878,9 +2878,9 @@ static void NameEntryIcon_Update(NameEntryIcon *icon) {
 
     switch (icon->state) {
     case 0:
-        func_0204c178(icon->actor, &pos, 0);
+        ClActor_GetSurfacePos(icon->actor, &pos, 0);
         icon->touched = FALSE;
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             rect.left = pos.x - 16;
             rect.top = pos.y - 16;
             rect.right = pos.x + 16;
@@ -2928,10 +2928,10 @@ static BOOL NameEntryIcon_Bounce(NameEntryIcon *icon) {
 
     if (icon->bouncing) {
         frame = icon->frame++;
-        func_0204c178(icon->actor, &pos, 0);
+        ClActor_GetSurfacePos(icon->actor, &pos, 0);
         angle = frame * 0x7fff / 8;
         pos.y = icon->baseY - (12 * FX_SinIdx(angle) >> 12);
-        func_0204c140(icon->actor, &pos, 0);
+        ClActor_SetSurfacePos(icon->actor, &pos, 0);
         if (icon->frame > 8) {
             icon->bouncing = FALSE;
         }
@@ -2981,7 +2981,7 @@ static void NameEntryObjs_ShowSelectors(NameEntryObjs *objs, BOOL show) {
 
     if (show == TRUE) {
         for (i = 21; i <= 23; i++) {
-            func_0204c124(NameEntryObjs_Get(objs, i), TRUE);
+            ClActor_SetVisible(NameEntryObjs_Get(objs, i), TRUE);
         }
     }
 }
@@ -2996,8 +2996,8 @@ static int NameEntryObjs_UpdateSelectors(NameEntryObjs *objs) {
     int i;
 
     for (i = 21; i <= 23; i++) {
-        func_0204c178(NameEntryObjs_Get(objs, i), &pos, 0);
-        if (func_0203dac8(&x, &y)) {
+        ClActor_GetSurfacePos(NameEntryObjs_Get(objs, i), &pos, 0);
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             rect.left = pos.x - 8;
             rect.top = pos.y - 12;
             rect.right = pos.x + 8;
@@ -3006,8 +3006,8 @@ static int NameEntryObjs_UpdateSelectors(NameEntryObjs *objs) {
             touch.y = y;
             if (NameEntry_PointInRect(&rect, &touch)) {
                 func_0204c520(NameEntryObjs_Get(objs, i), TRUE);
-                func_0204c4d4(NameEntryObjs_Get(objs, i), 0);
-                func_0204c56c(NameEntryObjs_Get(objs, i));
+                ClActor_SetAnimTime(NameEntryObjs_Get(objs, i), 0);
+                ClActor_RestartAnim(NameEntryObjs_Get(objs, i));
                 return i - 21;
             }
         }
@@ -3245,12 +3245,12 @@ static void NameEntryTask_Talk(NameEntryTask *task, u32 *state, NameEntryWork *w
         GFL_TCBExMgrUpdate(talk->tcbManager);
         switch (PrintStream_GetState(talk->stream)) {
         case PRINT_STREAM_RUNNING:
-            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
                 PrintStream_SkipWait(talk->stream, 0);
                 if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                    func_0203d564(FALSE);
+                    GCTX_HIDSetUsingTouch(FALSE);
                 } else {
-                    func_0203d564(TRUE);
+                    GCTX_HIDSetUsingTouch(TRUE);
                 }
             }
             break;
@@ -3258,12 +3258,12 @@ static void NameEntryTask_Talk(NameEntryTask *task, u32 *state, NameEntryWork *w
             *state = 1;
             break;
         case PRINT_STREAM_PAUSED:
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                 PrintStream_Continue(talk->stream);
                 if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                    func_0203d564(FALSE);
+                    GCTX_HIDSetUsingTouch(FALSE);
                 } else {
-                    func_0203d564(TRUE);
+                    GCTX_HIDSetUsingTouch(TRUE);
                 }
             }
             break;

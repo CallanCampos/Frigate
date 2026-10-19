@@ -202,7 +202,7 @@ static u32 MailBox_StateInit(MailBoxWork *work) {
     MailBox_UpdateMailList(work);
     MailBox_CreateMenuResources(work);
     work->vblankTask = GFL_VBlankTCBAdd(MailBox_VBlank, work, 1);
-    func_02042ba8(FALSE, HEAPID_MAILBOX_VIEW);
+    GFL_NetSetIconScreen(FALSE, HEAPID_MAILBOX_VIEW);
     return work->nextState;
 }
 
@@ -243,7 +243,7 @@ static u32 MailBox_StateWaitMessage(MailBoxWork *work) {
             PrintStream_Delete(work->view->stream);
             return work->nextState;
         }
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             PrintStream_Delete(work->view->stream);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             return work->nextState;
@@ -517,7 +517,7 @@ static u32 MailBox_StateMailWritten(MailBoxWork *work) {
 }
 
 static u32 MailBox_StatePressReturn(MailBoxWork *work) {
-    if (!func_0204c560(work->view->actors[MAILBOX_ACTOR_RETURN_BUTTON])) {
+    if (!ClActor_IsAnimActive(work->view->actors[MAILBOX_ACTOR_RETURN_BUTTON])) {
         work->param->result = 0;
         MailBox_SetActorAnim(work->view, MAILBOX_ACTOR_CLOSE_BUTTON, 0);
         return work->nextState;
@@ -526,7 +526,7 @@ static u32 MailBox_StatePressReturn(MailBoxWork *work) {
 }
 
 static u32 MailBox_StatePressClose(MailBoxWork *work) {
-    if (!func_0204c560(work->view->actors[MAILBOX_ACTOR_CLOSE_BUTTON])) {
+    if (!ClActor_IsAnimActive(work->view->actors[MAILBOX_ACTOR_CLOSE_BUTTON])) {
         work->param->result = 1;
         return work->nextState;
     }

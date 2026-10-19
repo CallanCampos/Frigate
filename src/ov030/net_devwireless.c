@@ -106,7 +106,7 @@ static BOOL NetDevWireless_Init(HeapID heapId, void *sys, WHCallback callback, v
     sDevWireless = GFL_HeapAllocate(heapId, sizeof(NetDevWireless), TRUE, "net_devwireless.c", 180);
     sDevWireless->sys = sys;
     flag = TRUE;
-    if (func_02042e84()->bNetType != 5) {
+    if (GFL_NetGetInitData()->bNetType != 5) {
         flag = FALSE;
     }
     return func_ov030_02173340(heapId, callback, work, flag);
@@ -272,7 +272,7 @@ static int NetDevWireless_GetNetId(void) {
 }
 
 static int NetDevWireless_GetSignalLevel(void) {
-    if (func_02042d34() == 3) {
+    if (GFL_NetGetGameCommandBase() == 3) {
         return 3 - WihDwc_GetLinkLevel();
     }
     return 3 - WM_GetLinkLevel();

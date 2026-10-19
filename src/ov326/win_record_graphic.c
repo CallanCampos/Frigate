@@ -190,24 +190,24 @@ static void WinRecordGraphic_BGVBlank(WinRecordBG *bg) {
 static void WinRecordGraphic_ClActInit(WinRecordClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(WinRecordClAct));
     ClActSys_Create(&sWinRecordClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void WinRecordGraphic_ClActExit(WinRecordClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(WinRecordClAct));
 }
 
 static void WinRecordGraphic_ClActMain(WinRecordClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void WinRecordGraphic_ClActVBlank(WinRecordClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *WinRecordGraphic_ClActGetUnit(WinRecordClAct *clact) {

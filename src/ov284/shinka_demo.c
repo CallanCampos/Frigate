@@ -280,7 +280,7 @@ static BOOL ShinkaDemo_Init(GameProc *proc, u32 *state, void *param, void *work)
     wk->unk118 = FALSE;
     wk->procManager = CreateGameProcManager(wk->heapId);
     ShinkaDemo_InitGraphics(param, wk);
-    func_02042ba8(0, wk->heapId);
+    GFL_NetSetIconScreen(0, wk->heapId);
     return TRUE;
 }
 
@@ -423,7 +423,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
         if (demoParam->canCancel && ShinkaDemo_IsKoukanPlaying(param, wk) && wk->cancelled == FALSE &&
             (keys & PAD_BUTTON_B) && ShinkaDemoView_Cancel(wk->view)) {
             wk->cancelled = TRUE;
-            func_0203d564(0);
+            GCTX_HIDSetUsingTouch(0);
             ShinkaDemoEffect_Cancel(wk->effect);
         }
         break;
@@ -580,7 +580,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
         GFL_OvlUnload(OVERLAY_PSTATUS);
         wk->state = SHINKA_DEMO_WAIT_FADE_OV207_END;
         ShinkaDemo_InitGraphics(param, wk);
-        func_02042ba8(0, wk->heapId);
+        GFL_NetSetIconScreen(0, wk->heapId);
         GFL_FadeSet(3, 16, 0, 0);
         break;
     case SHINKA_DEMO_WAIT_FADE_OV207_END:
@@ -605,7 +605,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             TwoChoiceMenu_Free(wk->menu);
             wk->menu = NULL;
             ShinkaDemoGraphic_FreeSubBG(wk->graphic);
-            wk->usingKeys = func_0203d554() == FALSE;
+            wk->usingKeys = GCTX_HIDIsUsingTouch() == FALSE;
             wk->tcbBuffer = GFL_HeapAllocate(wk->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "shinka_demo.c", 1360);
             MI_CpuFill8(wk->tcbBuffer, 0, GFL_TCBMgrCalcAllocSize(8));
             wk->tcbManager = GFL_TCBMgrCreate(8, wk->tcbBuffer);
@@ -655,7 +655,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             ShinkaDemoGraphic_InitSubBG(wk->graphic);
             wk->menu = TwoChoiceMenu_Create(wk->heapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
                                             wk->font, wk->printQueue, 0);
-            func_02042ba8(0, wk->heapId);
+            GFL_NetSetIconScreen(0, wk->heapId);
             GFL_FadeSet(2, 16, 0, 0);
         }
         break;
@@ -668,7 +668,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
                 wk->forgetMove = PokeParty_GetParam(wk->pkm, PKM_PARAM_MOVE1 + wk->slot, NULL);
                 wk->state = SHINKA_DEMO_FORGET;
             }
-            func_0203d564(wk->usingKeys ? FALSE : TRUE);
+            GCTX_HIDSetUsingTouch(wk->usingKeys ? FALSE : TRUE);
         }
         break;
     case SHINKA_DEMO_FORGET:
@@ -1020,13 +1020,13 @@ static void ShinkaDemo_InitActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SHINKA_DEMO, wk->graphicHeapId);
     u8 i;
 
-    wk->palette = func_0204bbb8(arc, 3, 0, 0, 0, 1, wk->graphicHeapId);
-    wk->chars = func_0204b81c(arc, 2, 0, 0, wk->graphicHeapId);
-    wk->cellAnims = func_0204bde0(arc, 1, 0, wk->graphicHeapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 3, 0, 0, 0, 1, wk->graphicHeapId);
+    wk->chars = ClActSys_LoadChars(arc, 2, 0, 0, wk->graphicHeapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 1, 0, wk->graphicHeapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ACTOR_COUNT; i++) {
-        wk->actors[i] = func_0204c040(ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
-                                      wk->cellAnims, &sActorSetups[i], 0, wk->graphicHeapId);
+        wk->actors[i] = ClActor_Create(ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
+                                       wk->cellAnims, &sActorSetups[i], 0, wk->graphicHeapId);
         func_0204c520(wk->actors[i], FALSE);
     }
     wk->actorsCreated = TRUE;
@@ -1037,11 +1037,11 @@ static void ShinkaDemo_FreeActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
 
     if (wk->actorsCreated) {
         for (i = 0; i < ACTOR_COUNT; i++) {
-            func_0204c108(wk->actors[i]);
+            ClActor_Delete(wk->actors[i]);
         }
-        func_0204be64(wk->cellAnims);
-        func_0204b98c(wk->chars);
-        func_0204bcd0(wk->palette);
+        ClActSys_FreeCellAnims(wk->cellAnims);
+        ClActSys_FreeChars(wk->chars);
+        ClActSys_FreePltt(wk->palette);
         wk->actorsCreated = FALSE;
     }
 }
@@ -1051,7 +1051,7 @@ static void ShinkaDemo_StartActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
 
     if (wk->actorsCreated) {
         for (i = 0; i < ACTOR_COUNT; i++) {
-            func_0204c504(wk->actors[i], 0);
+            ClActor_SetAnimFrame(wk->actors[i], 0);
             func_0204c520(wk->actors[i], TRUE);
         }
     }
@@ -1065,7 +1065,7 @@ static BOOL ShinkaDemo_AreActorsDone(ShinkaDemoParam *param, ShinkaDemoWork *wk)
     if (wk->actorsCreated) {
         done = TRUE;
         for (i = 0; i < ACTOR_COUNT; i++) {
-            if (func_0204c560(wk->actors[i])) {
+            if (ClActor_IsAnimActive(wk->actors[i])) {
                 done = FALSE;
                 break;
             }
@@ -1172,23 +1172,23 @@ static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk) {
 
     switch (PrintStream_GetState(wk->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
             PrintStream_SkipWait(wk->printStream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             PrintStream_Continue(wk->printStream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
@@ -1201,11 +1201,11 @@ static BOOL ShinkaDemo_IsPrintDone(ShinkaDemoWork *wk) {
 
 // Whether A or B was pressed or the touch screen touched
 static BOOL ShinkaDemo_WaitButton(ShinkaDemoWork *wk) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         return TRUE;
     }

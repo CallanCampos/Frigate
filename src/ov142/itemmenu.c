@@ -205,7 +205,7 @@ static void ItemMenu_RedrawList(ItemMenuWork *work) {
 }
 
 static void ItemMenu_UpdateList(ItemMenuWork *work) {
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         ItemMenuDisp_DrawItemInfo(work);
     } else {
         ItemMenuDisp_HideItemInfo(work);
@@ -349,12 +349,12 @@ static BOOL ItemMenu_TouchScrollBar(ItemMenuWork *work) {
     s32 scroll;
 
     count = ItemMenu_GetItemCount(work);
-    if (count >= ITEMMENU_LIST_ROWS + 1 && func_0203da84(&x, &y) == TRUE) {
+    if (count >= ITEMMENU_LIST_ROWS + 1 && GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
         if (x >= 256 || x < 224) {
             return FALSE;
         }
         if (work->touchHeld == FALSE) {
-            if (func_0203da48() == TRUE) {
+            if (GFL_HIDIsTouchPressed() == TRUE) {
                 if (y < 16 || y >= 152) {
                     return FALSE;
                 }
@@ -459,7 +459,7 @@ static BOOL ItemMenu_MoveItemByTouch(ItemMenuWork *work) {
     u32 steps;
     u32 i;
 
-    if (func_0203da84(&x, &y) == TRUE) {
+    if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
         if (x < 144 || x > 231 || y < 12 || y > 155) {
             return FALSE;
         }
@@ -498,7 +498,7 @@ static BOOL ItemMenu_IsMoveDoneTouched(void) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y) == TRUE && x >= 224 && x <= 247 && y >= 168 && y <= 191) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) == TRUE && x >= 224 && x <= 247 && y >= 168 && y <= 191) {
         return TRUE;
     }
     return FALSE;
@@ -524,13 +524,13 @@ static void ItemMenu_StateMoveItem(ItemMenuWork *work) {
         ItemMenu_UpdateList(work);
         return;
     }
-    if (func_0203da2c() == FALSE) {
+    if (GFL_HIDIsTouchHeld() == FALSE) {
         work->touchHeld = FALSE;
         if (work->touchMoved == TRUE) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             work->touchMoved = FALSE;
             BagSave_CopyPocket(work->bag, work->items, work->pocket, FALSE);
-            func_0204c488(work->listCursor, 1);
+            ClActor_SetSequence(work->listCursor, 1);
             ItemMenuDisp_SetMoveButtons(work, TRUE);
             work->movingItem = FALSE;
             ItemMenu_SetKeyMode(work, FALSE);
@@ -544,7 +544,7 @@ static void ItemMenu_StateMoveItem(ItemMenuWork *work) {
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_SELECT)) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         BagSave_CopyPocket(work->bag, work->items, work->pocket, FALSE);
-        func_0204c488(work->listCursor, 1);
+        ClActor_SetSequence(work->listCursor, 1);
         ItemMenuDisp_SetMoveButtons(work, TRUE);
         work->movingItem = FALSE;
         ItemMenu_SetKeyMode(work, TRUE);
@@ -553,7 +553,7 @@ static void ItemMenu_StateMoveItem(ItemMenuWork *work) {
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_0204c488(work->listCursor, 1);
+        ClActor_SetSequence(work->listCursor, 1);
         work->movingItem = FALSE;
         ItemMenu_SetKeyMode(work, TRUE);
         work->drawnScroll = 0xffff;
@@ -563,7 +563,7 @@ static void ItemMenu_StateMoveItem(ItemMenuWork *work) {
     }
     if (ItemMenu_IsMoveDoneTouched() == TRUE) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_0204c488(work->listCursor, 1);
+        ClActor_SetSequence(work->listCursor, 1);
         work->movingItem = FALSE;
         ItemMenu_SetKeyMode(work, FALSE);
         work->drawnScroll = 0xffff;
@@ -630,7 +630,7 @@ static void ItemMenu_StateUseRepel(ItemMenuWork *work) {
 // Waits for a message to be read
 static void ItemMenu_StateWaitMessage(ItemMenuWork *work) {
     if (ItemMenuDisp_IsMessageDone(work) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GFL_BGSysClearScr(3);
         work->drawnScroll = 0xffff;
         ItemMenu_UpdateList(work);
@@ -854,12 +854,12 @@ static void ItemMenu_StateItemMenu(ItemMenuWork *work) {
             }
             break;
         case 10:
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 ItemMenuDisp_HideItemInfo(work);
             } else {
                 ItemMenuDisp_DrawItemInfo(work);
             }
-            ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+            ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
             ItemMenuDisp_SetButtonsActive(work, TRUE);
             func_0204c520(work->scrollBar, TRUE);
             ItemMenu_ReturnToList(work);
@@ -933,7 +933,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
     if (PrintQueue_IsEmpty(work->printQueue) == FALSE) {
         return;
     }
-    if (func_0203da2c() == FALSE) {
+    if (GFL_HIDIsTouchHeld() == FALSE) {
         work->touchHeld = FALSE;
     }
     GFL_BMN_Main(work->buttonMan);
@@ -949,7 +949,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
     if (work->touchHeld == TRUE) {
         return;
     }
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         keys = GCTX_HIDGetPressedKeys();
         if (keys == 0) {
             return;
@@ -971,7 +971,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         work->result = 1;
         work->item = ITEM_NONE;
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ItemMenu_PressButton(work, 4, NULL);
         return;
     }
@@ -981,7 +981,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
         }
         work->result = 0;
         work->item = ITEM_NONE;
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ItemMenu_PressButton(work, 3, NULL);
         return;
     }
@@ -992,7 +992,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
             } else {
                 ItemMenu_TogglePocketRegistration(work);
             }
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 ItemMenuDisp_DrawItemInfo(work);
                 ItemMenu_SetKeyMode(work, TRUE);
             }
@@ -1034,7 +1034,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
         }
         MI_CpuFill8(work->items, 0, sizeof(work->items));
         BagSave_CopyPocket(work->bag, work->items, work->pocket, TRUE);
-        func_0204c488(work->listCursor, 2);
+        ClActor_SetSequence(work->listCursor, 2);
         ItemMenuDisp_SetMoveButtons(work, FALSE);
         work->movingItem = TRUE;
         ItemMenu_StartMoveItem(work);
@@ -1050,14 +1050,14 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
         if (++work->pocket >= 6) {
             work->pocket = 0;
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ItemMenu_PressPocketArrow(work, pocket, TRUE, ItemMenu_StatePocketArrowDone);
     } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_LEFT) {
         pocket = work->pocket;
         if (--work->pocket < 0) {
             work->pocket = 5;
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ItemMenu_PressPocketArrow(work, pocket, FALSE, ItemMenu_StatePocketArrowDone);
     }
 }
@@ -1074,7 +1074,7 @@ static void ItemMenu_StateTMBootUp(ItemMenuWork *work) {
             GFL_BGSysClearScr(3);
             func_0204c520(work->scrollBar, TRUE);
             ItemMenuDisp_SetButtonsActive(work, TRUE);
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 ItemMenuDisp_HideItemInfo(work);
                 ItemMenu_SetKeyMode(work, FALSE);
             } else {
@@ -1096,7 +1096,7 @@ static void ItemMenu_StateTMAskBootUp(ItemMenuWork *work) {
 // Asks whether to teach the TM's move
 static void ItemMenu_StateTMShowMove(ItemMenuWork *work) {
     if (GFL_SndPlayerIsActiveAny() != TRUE &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_ContainedTeachPokemon, work->strbuf);
         loadMoveNameToStrbuf(work->wordSet, 0, PML_ItemGetTMWazaID(work->item));
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
@@ -1125,7 +1125,7 @@ static void ItemMenu_StateUseTM(ItemMenuWork *work) {
 
 // Waits for a message to be read, then goes back to the list
 static void ItemMenu_StateReturnToList(ItemMenuWork *work) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GFL_BGSysClearScr(3);
         work->drawnScroll = 0xffff;
         ItemMenu_UpdateList(work);
@@ -1163,7 +1163,7 @@ static void ItemMenu_StateTossConfirm(ItemMenuWork *work) {
         } else {
             func_0204c520(work->scrollBar, TRUE);
             ItemMenuDisp_SetButtonsActive(work, TRUE);
-            ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+            ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
             ItemMenu_ReturnToList(work);
         }
     }
@@ -1196,9 +1196,9 @@ static void ItemMenu_StateTossQuantity(ItemMenuWork *work) {
         if (result == -1) {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
                 result = 0;
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 result = 1;
             }
         }
@@ -1260,9 +1260,9 @@ static void ItemMenu_StateSellQuantity(ItemMenuWork *work) {
         if (result == -1) {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
                 result = 0;
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 result = 1;
             }
         }
@@ -1313,7 +1313,7 @@ static void ItemMenu_StateSellConfirm(ItemMenuWork *work) {
             ItemMenu_SetState(work, ItemMenu_StateSellWaitMessage);
             break;
         case 1:
-            ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+            ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
             ItemMenu_SetState(work, ItemMenu_StateSellEnd);
             break;
         }
@@ -1325,7 +1325,7 @@ static void ItemMenu_StateSellWaitMessage(ItemMenuWork *work) {
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
             ItemMenu_SetKeyMode(work, TRUE);
             ItemMenu_SetState(work, ItemMenu_StateSellEnd);
-        } else if (func_0203da48()) {
+        } else if (GFL_HIDIsTouchPressed()) {
             ItemMenu_SetKeyMode(work, FALSE);
             ItemMenu_SetState(work, ItemMenu_StateSellEnd);
         }
@@ -1407,14 +1407,14 @@ static void ItemMenu_ShowQuantity(ItemMenuWork *work, u32 mode) {
     work->quantityMode = mode;
     ItemMenuDisp_DrawQuantityFrame(work);
     ItemMenuDisp_DrawQuantity(work, work->quantity);
-    func_0204c124(work->buttons[5], TRUE);
-    func_0204c124(work->buttons[6], TRUE);
+    ClActor_SetVisible(work->buttons[5], TRUE);
+    ClActor_SetVisible(work->buttons[6], TRUE);
 }
 
 static void ItemMenu_HideQuantity(ItemMenuWork *work) {
     GFL_BGSysClearScr(3);
-    func_0204c124(work->buttons[5], FALSE);
-    func_0204c124(work->buttons[6], FALSE);
+    ClActor_SetVisible(work->buttons[5], FALSE);
+    ClActor_SetVisible(work->buttons[6], FALSE);
 }
 
 // Changes the quantity with the keys or the arrows. Returns whether it was changed
@@ -1428,7 +1428,7 @@ static BOOL ItemMenu_UpdateQuantity(ItemMenuWork *work) {
         { 116, 140, 234, 0 },
         { TOUCH_RECT_END, 0, 0, 0 },
     };
-    s32 hit = func_0203d9c8(rects);
+    s32 hit = GFL_HIDGetTouchHeldRect(rects);
     u32 down;
 
     if (hit != TOUCH_RECT_NONE) {
@@ -1484,9 +1484,9 @@ static BOOL ItemMenu_UpdateQuantity(ItemMenuWork *work) {
     if (work->quantity != old) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         if (down == FALSE) {
-            func_0204c488(work->buttons[5], 11);
+            ClActor_SetSequence(work->buttons[5], 11);
         } else {
-            func_0204c488(work->buttons[6], 10);
+            ClActor_SetSequence(work->buttons[6], 10);
         }
         ItemMenuDisp_DrawQuantity(work, work->quantity);
     }
@@ -1521,7 +1521,7 @@ static void ItemMenu_StateMoveFreeSpace(ItemMenuWork *work) {
 static void ItemMenu_StateFreeSpaceWaitMessage(ItemMenuWork *work) {
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         ItemMenu_SetKeyMode(work, TRUE);
-    } else if (func_0203da48()) {
+    } else if (GFL_HIDIsTouchPressed()) {
         ItemMenu_SetKeyMode(work, FALSE);
     } else {
         return;
@@ -1732,9 +1732,9 @@ static void ItemMenu_SortByUses(ItemMenuWork *work, BOOL mostUsedFirst) {
 static void ItemMenu_PressSortButton(ItemMenuWork *work) {
     GFL_SndSEPlay(SEQ_SE_DECIDE1);
     if (work->pocket != BAG_POCKET_FREE_SPACE) {
-        func_0204c488(work->sortButton, 2);
+        ClActor_SetSequence(work->sortButton, 2);
     } else {
-        func_0204c488(work->filterButton, 1);
+        ClActor_SetSequence(work->filterButton, 1);
     }
 }
 
@@ -1791,9 +1791,9 @@ static void ItemMenu_SetKeyMode(ItemMenuWork *work, BOOL keys) {
         keys = TRUE;
     }
     if (keys) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
     } else {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (ItemMenu_GetItemCount(work) == 0) {
         keys = FALSE;
@@ -1856,8 +1856,9 @@ static void ItemMenu_TogglePocketRegistration(ItemMenuWork *work) {
 // Shows whether the pocket is registered
 static void ItemMenu_UpdatePocketRegistration(ItemMenuWork *work) {
     if (work->movingItem != TRUE) {
-        func_0204c488(work->buttons[2],
-                      GameData_IsShortcutRegistered(work->gameData, ItemMenu_GetPocketShortcut(work->pocket)) + 6);
+        ClActor_SetSequence(work->buttons[2],
+                            GameData_IsShortcutRegistered(work->gameData, ItemMenu_GetPocketShortcut(work->pocket)) +
+                                6);
     }
 }
 
@@ -2032,13 +2033,13 @@ static void ItemMenu_ButtonCallback(u32 button, u32 event, void *data) {
             work->result = 0;
             work->item = ITEM_NONE;
             ItemMenu_PressButton(work, 3, NULL);
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     } else if (button == 11) {
         work->result = 1;
         work->item = ITEM_NONE;
         ItemMenu_PressButton(work, 4, NULL);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (button >= 12 && button < 18) {
         if (work->state != ItemMenu_StateList) {
             return;
@@ -2091,7 +2092,7 @@ static void ItemMenu_VBlank(TCB *tcb, void *data) {
         work->tmInfoRequest = 0;
     }
     PaletteFade_Transfer(work->paletteFade);
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 // Fades the bag in
@@ -2219,8 +2220,8 @@ static BOOL ItemMenuProc_Init(GameProc *proc, u32 *state, void *param, void *dat
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 1, 0);
     ItemMenuDisp_CreatePocketWindows(work);
     work->taskMenuRes = AppTaskMenuRes_Create(3, 9, work->font, work->printQueue, work->heapId);
-    func_02042ba8(TRUE, work->heapId);
-    ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+    GFL_NetSetIconScreen(TRUE, work->heapId);
+    ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
     ItemMenuDisp_ShowBGs();
     ItemMenu_SetState(work, ItemMenu_StateFadeIn);
     return TRUE;
@@ -2371,15 +2372,15 @@ static void ItemMenu_PressButton(ItemMenuWork *work, u32 button, ItemMenuState n
         anim = 12;
     }
     work->buttonAnim = button;
-    func_0204c4d4(work->buttons[work->buttonAnim], 0);
-    func_0204c488(work->buttons[work->buttonAnim], anim);
+    ClActor_SetAnimTime(work->buttons[work->buttonAnim], 0);
+    ClActor_SetSequence(work->buttons[work->buttonAnim], anim);
     func_0204c520(work->buttons[work->buttonAnim], TRUE);
     work->buttonAnimNext = next;
     ItemMenu_SetState(work, ItemMenu_StateWaitButton);
 }
 
 static void ItemMenu_StateWaitButton(ItemMenuWork *work) {
-    if (func_0204c560(work->buttons[work->buttonAnim]) == FALSE) {
+    if (ClActor_IsAnimActive(work->buttons[work->buttonAnim]) == FALSE) {
         work->buttonAnim = 0;
         ItemMenu_SetState(work, work->buttonAnimNext);
     }
@@ -2403,8 +2404,8 @@ static void ItemMenu_PressPocketArrow(ItemMenuWork *work, s32 oldPocket, BOOL ri
     }
     work->buttonAnim = right;
     work->buttonAnimTimer = 6;
-    func_0204c4d4(work->buttons[work->buttonAnim], 0);
-    func_0204c488(work->buttons[work->buttonAnim], anim);
+    ClActor_SetAnimTime(work->buttons[work->buttonAnim], 0);
+    ClActor_SetSequence(work->buttons[work->buttonAnim], anim);
     func_0204c520(work->buttons[work->buttonAnim], TRUE);
     work->buttonAnimNext = next;
     ItemMenu_SetState(work, ItemMenu_StateWaitPocketArrow);
@@ -2428,10 +2429,10 @@ static const TouchRect sQuantityButtonRects[] = {
 
 // The quantity's buttons: confirm and cancel
 static s32 ItemMenu_GetQuantityButton(void) {
-    s32 hit = func_0203da0c(sQuantityButtonRects);
+    s32 hit = GFL_HIDGetTouchPressedRect(sQuantityButtonRects);
 
     if (hit != TOUCH_RECT_NONE) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     return hit;
 }
@@ -2440,7 +2441,7 @@ static void ItemMenu_StateTossCancel(ItemMenuWork *work) {
     ItemMenu_HideQuantity(work);
     func_0204c520(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
-    ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+    ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
     ItemMenu_ReturnToList(work);
 }
 
@@ -2448,7 +2449,7 @@ static void ItemMenu_StateSellCancel(ItemMenuWork *work) {
     ItemMenu_HideQuantity(work);
     func_0204c520(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
-    ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+    ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
     ItemMenu_SetState(work, ItemMenu_StateSellEnd);
 }
 
@@ -2467,8 +2468,8 @@ static void ItemMenu_FreePaletteFade(ItemMenuWork *work) {
 
 // Opens the sort menu once its button is up
 static void ItemMenu_StateOpenSortMenu(ItemMenuWork *work) {
-    if (func_0204c560(work->sortButton) == FALSE) {
-        func_0204c488(work->sortButton, 0);
+    if (ClActor_IsAnimActive(work->sortButton) == FALSE) {
+        ClActor_SetSequence(work->sortButton, 0);
         func_0204c520(work->scrollBar, FALSE);
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_HowWantSortItems, work->expandBuf);
         ItemMenuDisp_ShowMessage(work, FALSE);
@@ -2551,12 +2552,12 @@ static void ItemMenu_StateSortMenu(ItemMenuWork *work) {
                 done = TRUE;
                 break;
             case 5:
-                if (func_0203d554() == TRUE) {
+                if (GCTX_HIDIsUsingTouch() == TRUE) {
                     ItemMenuDisp_HideItemInfo(work);
                 } else {
                     ItemMenuDisp_DrawItemInfo(work);
                 }
-                ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+                ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
                 ItemMenuDisp_SetButtonsActive(work, TRUE);
                 done = TRUE;
                 func_0204c520(work->scrollBar, TRUE);
@@ -2646,8 +2647,8 @@ static void ItemMenu_StateFilterDone(ItemMenuWork *work) {
 
 // Opens the Free Space's filter menu once its button is up
 static void ItemMenu_StateOpenFilterMenu(ItemMenuWork *work) {
-    if (func_0204c560(work->filterButton) == FALSE) {
-        func_0204c488(work->filterButton, 2);
+    if (ClActor_IsAnimActive(work->filterButton) == FALSE) {
+        ClActor_SetSequence(work->filterButton, 2);
         func_0204c520(work->scrollBar, FALSE);
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SelectTypeItemWant, work->expandBuf);
         ItemMenuDisp_ShowMessage(work, FALSE);
@@ -2779,12 +2780,12 @@ static void ItemMenu_StateFilterMenu(ItemMenuWork *work) {
                 done = TRUE;
                 break;
             case 6:
-                if (func_0203d554() == TRUE) {
+                if (GCTX_HIDIsUsingTouch() == TRUE) {
                     ItemMenuDisp_HideItemInfo(work);
                 } else {
                     ItemMenuDisp_DrawItemInfo(work);
                 }
-                ItemMenu_SetKeyMode(work, func_0203d554() ? FALSE : TRUE);
+                ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
                 ItemMenuDisp_SetButtonsActive(work, TRUE);
                 done = TRUE;
                 func_0204c520(work->scrollBar, TRUE);
@@ -2804,7 +2805,7 @@ static void ItemMenu_StateFilterMenu(ItemMenuWork *work) {
 static void ItemMenu_StateSortWaitMessage(ItemMenuWork *work) {
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         ItemMenu_SetKeyMode(work, TRUE);
-    } else if (func_0203da48()) {
+    } else if (GFL_HIDIsTouchPressed()) {
         ItemMenu_SetKeyMode(work, FALSE);
     } else {
         return;

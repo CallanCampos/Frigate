@@ -45,7 +45,7 @@ static void DpcMain_VBlank(TCB *tcb, void *data) {
     DendouPCWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->palFade);
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }

@@ -448,7 +448,7 @@ static int Upload_SubSeqStart(WorldTradeWork *wk) {
         Enter_MessagePrintNoStream(wk, wk->msgManager, 0x9a, 1, 0xf0f);
         wk->subprocessSeq = UPLOAD_SEQ_NOW_SAVE_MESSAGE;
         wk->subNextProcess = WORLDTRADE_TITLE;
-        func_02042ba8(TRUE, HEAPID_WORLDTRADE);
+        GFL_NetSetIconScreen(TRUE, HEAPID_WORLDTRADE);
         break;
     default:
         GFL_ASSERT(0);
@@ -554,9 +554,9 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
         NHttpRap_FreePostData(wk->evilCheck);
         NHttpRap_Destroy(wk->evilCheck);
         GFL_NetErrShutdown();
-        func_020424e4();
+        NetState_ClearWifiError();
         GFL_NetErrClear();
-        func_02042478();
+        NetState_ClearError();
     }
     return WT_SEQ_MAIN;
 }
@@ -618,9 +618,9 @@ static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
         wk->connectErrorNo = -5;
         wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
         GFL_NetErrShutdown();
-        func_020424e4();
+        NetState_ClearWifiError();
         GFL_NetErrClear();
-        func_02042478();
+        NetState_ClearError();
     }
     return WT_SEQ_MAIN;
 }
@@ -648,9 +648,9 @@ static int Upload_SubSeqUploadResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -5:
         case -6:
@@ -673,9 +673,9 @@ static int Upload_SubSeqUploadResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -13:
             WorldTrade_ShowFatalError(wk);
@@ -755,16 +755,16 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
         case -3:
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -4:
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -12:
             wk->connectErrorNo = result;
@@ -776,9 +776,9 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -13:
             WorldTrade_ShowFatalError(wk);
@@ -874,9 +874,9 @@ static int Upload_SubSeqExchangeResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -13:
             WorldTrade_ShowFatalError(wk);
@@ -998,9 +998,9 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -13:
             WorldTrade_ShowFatalError(wk);
@@ -1050,9 +1050,9 @@ static int Upload_SubSeqServerDownloadResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             return WT_SEQ_MAIN;
         case -13:
             WorldTrade_ShowFatalError(wk);
@@ -1205,9 +1205,9 @@ static int Upload_SubSeqDownloadExFinishResult(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -4:
         case -12:
@@ -1285,9 +1285,9 @@ static int Upload_SubSeqServerPokeDeleteWait(WorldTradeWork *wk) {
             wk->connectErrorNo = result;
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
             GFL_NetErrShutdown();
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrClear();
-            func_02042478();
+            NetState_ClearError();
             break;
         case -2:
         case -12:
@@ -1477,7 +1477,7 @@ static int Upload_SubSeqMessageWait(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqMessageWaitButton(WorldTradeWork *wk) {
-    if ((!WorldTrade_PrintIsBusy(&wk->print) && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A)) || func_0203da48()) {
+    if ((!WorldTrade_PrintIsBusy(&wk->print) && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A)) || GFL_HIDIsTouchPressed()) {
         GFL_SndSEPlay(SEQ_SE_MESSAGE);
         wk->subprocessSeq = wk->subprocessNextSeq;
     }

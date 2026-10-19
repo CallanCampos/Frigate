@@ -415,7 +415,7 @@ static BOOL CommBtlDemoProc_Init(GameProc *proc, u32 *state, void *param, void *
     CommBtlDemoG3D_Init(&wk->g3d, wk->graphic, wk->heapId);
     CommBtlDemoObj_Init(&wk->obj, wk->graphic, wk->heapId);
     GX_SetDispSelect(GX_DISP_SELECT_MAIN_SUB);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 1);
     *state = 1;
     return FALSE;
@@ -635,11 +635,11 @@ static BOOL CommBtlDemoResult_Main(UIScene *scene, void *param) {
             GFL_SndSEPlay(CommBtlDemo_GetSE(SE_RESULT, wk->param->competition));
             CommBtlDemoResult_ShowLabel(&wk->result, side, 0);
         } else if (wk->timer == 24) {
-            func_0204c124(wk->result.countActors[wk->battleResult != COMM_BTL_DEMO_RESULT_WIN ? 1 : 0], FALSE);
+            ClActor_SetVisible(wk->result.countActors[wk->battleResult != COMM_BTL_DEMO_RESULT_WIN ? 1 : 0], FALSE);
         } else if (wk->timer == 45) {
             CommBtlDemoResult_ShowLabel(&wk->result, wk->battleResult == COMM_BTL_DEMO_RESULT_LOSE ? 0 : 1, 1);
         } else if (wk->timer == 54) {
-            func_0204c124(wk->result.countActors[wk->battleResult != COMM_BTL_DEMO_RESULT_LOSE ? 1 : 0], FALSE);
+            ClActor_SetVisible(wk->result.countActors[wk->battleResult != COMM_BTL_DEMO_RESULT_LOSE ? 1 : 0], FALSE);
         } else if (wk->timer == 120) {
             GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, -3);
         } else if (wk->timer == 128) {
@@ -873,9 +873,9 @@ static void CommBtlDemoBalls_Init(CommBtlDemoBalls *balls, PokeParty *party, u8 
         }
         balls->actors[i] = CommBtlDemoObj_CreateActor(obj, x, y, anim);
         if (CommBtlDemo_IsStart(type)) {
-            func_0204c124(balls->actors[i], FALSE);
+            ClActor_SetVisible(balls->actors[i], FALSE);
         } else {
-            func_0204c124(balls->actors[i], TRUE);
+            ClActor_SetVisible(balls->actors[i], TRUE);
         }
     }
 }
@@ -884,7 +884,7 @@ static void CommBtlDemoBalls_Free(CommBtlDemoBalls *balls) {
     int i;
 
     for (i = 0; i < balls->ballCount; i++) {
-        func_0204c108(balls->actors[i]);
+        ClActor_Delete(balls->actors[i]);
     }
 }
 
@@ -932,13 +932,13 @@ static void CommBtlDemoBalls_Step(CommBtlDemoBalls *balls, u32 start) {
             CommBtlDemoG3D_AddEmitters(balls->g3d, &pos);
         }
         if (CommBtlDemo_IsStart(balls->type)) {
-            func_0204c124(balls->actors[frame], TRUE);
+            ClActor_SetVisible(balls->actors[frame], TRUE);
         } else {
             CommBtlDemoBalls_SetState(balls, balls->party, balls->states, balls->ballCount - 1 - frame);
         }
     } else {
         for (i = 0; i < balls->ballCount; i++) {
-            func_0204c468(balls->actors[i], 1);
+            ClActor_SetBgPriority(balls->actors[i], 1);
         }
         balls->started = FALSE;
     }
@@ -1010,7 +1010,7 @@ static void CommBtlDemoBalls_SetState(CommBtlDemoBalls *balls, PokeParty *party,
     if (index < PokeParty_GetPkmCount(party)) {
         pkm = PokeParty_GetPkm(balls->party, index);
     }
-    func_0204c4b8(balls->actors[index], CommBtlDemo_GetBallAnim(pkm, states[index]));
+    ClActor_ChangeSequence(balls->actors[index], CommBtlDemo_GetBallAnim(pkm, states[index]));
 }
 
 static BmpWin *CommBtlDemo_CreateNameWindow(u8 type, u8 index) {
@@ -1171,7 +1171,7 @@ static void CommBtlDemo_AddRecords(CommBtlDemoWork *wk) {
     if (wk->param->records == NULL) {
         return;
     }
-    switch (func_02042d34()) {
+    switch (GFL_NetGetGameCommandBase()) {
     case 12:
     case 31:
     case 37:
@@ -1221,7 +1221,7 @@ static void CommBtlDemoResult_Init(CommBtlDemoResult *result, CommBtlDemoObj *ob
             break;
         }
         result->labels[i] = CommBtlDemoObj_CreateActor(obj, x, y, ANIM_WIN);
-        func_0204c124(result->labels[i], FALSE);
+        ClActor_SetVisible(result->labels[i], FALSE);
     }
 }
 
@@ -1229,19 +1229,19 @@ static void CommBtlDemoResult_Free(CommBtlDemoResult *result) {
     int i;
 
     for (i = 0; i < LABEL_COUNT; i++) {
-        func_0204c108(result->labels[i]);
+        ClActor_Delete(result->labels[i]);
     }
     for (i = 0; i < SIDE_COUNT; i++) {
-        func_0204c108(result->countActors[i]);
+        ClActor_Delete(result->countActors[i]);
     }
 }
 
 static void CommBtlDemoResult_Update(CommBtlDemoResult *result) {
     CommBtlDemo_IsSingle(result->type);
     if (result->timer == 30) {
-        func_0204c124(result->countActors[0], TRUE);
+        ClActor_SetVisible(result->countActors[0], TRUE);
         func_0204c520(result->countActors[0], TRUE);
-        func_0204c124(result->countActors[1], TRUE);
+        ClActor_SetVisible(result->countActors[1], TRUE);
         func_0204c520(result->countActors[1], TRUE);
     }
     result->timer++;
@@ -1262,9 +1262,9 @@ static void CommBtlDemoResult_ShowLabel(CommBtlDemoResult *result, u32 label, u3
         anim = ANIM_DRAW;
         break;
     }
-    func_0204c124(result->labels[label], TRUE);
+    ClActor_SetVisible(result->labels[label], TRUE);
     func_0204c520(result->labels[label], TRUE);
-    func_0204c4b8(result->labels[label], anim);
+    ClActor_ChangeSequence(result->labels[label], anim);
 }
 
 static void CommBtlDemoObj_Init(CommBtlDemoObj *obj, CommBtlDemoGraphic *graphic, HeapID heapId) {
@@ -1307,8 +1307,8 @@ static ClActor *CommBtlDemoObj_CreateCount(CommBtlDemoObj *obj, u32 side, u8 cou
         y = 40;
     }
     actor = CommBtlDemoObj_CreateActor(obj, x, y, ANIM_COUNT_0 + count);
-    func_0204c124(actor, FALSE);
-    func_0204c438(actor, 1);
+    ClActor_SetVisible(actor, FALSE);
+    ClActor_SetPriority(actor, 1);
     return actor;
 }
 
@@ -1317,7 +1317,7 @@ static void CommBtlDemoG3D_Init(CommBtlDemoG3D *g3d, CommBtlDemoGraphic *graphic
     g3d->graphic = graphic;
     g3d->heapId = heapId;
     g3d->manager = GFL_G3DMgrCreate(16, 20, heapId);
-    func_0204f918(heapId);
+    Particle_Init(heapId);
 }
 
 static void CommBtlDemoG3D_Free(CommBtlDemoG3D *g3d) {
@@ -1329,7 +1329,7 @@ static void CommBtlDemoG3D_Free(CommBtlDemoG3D *g3d) {
 static void CommBtlDemoG3D_Draw(CommBtlDemoG3D *g3d) {
     CommBtlDemoGraphic_Begin3D(g3d->graphic);
     if (g3d->particles != NULL) {
-        func_0204f954();
+        Particle_DrawAndUpdateAll();
     }
     if (g3d->sceneLoaded) {
         SRTMatrix matrix;
@@ -1354,7 +1354,7 @@ static void CommBtlDemoG3D_LoadParticles(CommBtlDemoG3D *g3d, u32 file) {
     if (g3d->particles != NULL) {
         CommBtlDemoG3D_ClearParticles(g3d);
     }
-    g3d->particles = func_0204f968(g3d->particleWork, PARTICLE_WORK_SIZE, TRUE, g3d->heapId);
+    g3d->particles = Particle_CreateSystem(g3d->particleWork, PARTICLE_WORK_SIZE, TRUE, g3d->heapId);
     projection.type = G3DCAM_PROJECTION_ORTHO;
     projection.param1 = FX32_CONST(3);
     projection.param2 = -FX32_CONST(3);
@@ -1363,29 +1363,29 @@ static void CommBtlDemoG3D_LoadParticles(CommBtlDemoG3D *g3d, u32 file) {
     projection.near = FX32_ONE;
     projection.far = FX32_CONST(1024);
     projection.ndcRangeOverride = 0;
-    func_02050178(g3d->particles);
-    func_020500cc(g3d->particles, &projection, FX32_CONST(2), &sCommBtlDemoParticleCameraPosition,
-                  &sCommBtlDemoParticleCameraUp, &sCommBtlDemoParticleCameraTarget, g3d->heapId);
-    resource = func_0204fdf8(ARCID_COMM_BTL_DEMO, file, g3d->heapId);
-    g3d->emitterCount = func_020503f0(resource);
-    func_0204fe04(g3d->particles, resource, FALSE, GFL_VBlankGetTCBMgr());
+    Particle_FreeCamera(g3d->particles);
+    Particle_SetCamera(g3d->particles, &projection, FX32_CONST(2), &sCommBtlDemoParticleCameraPosition,
+                       &sCommBtlDemoParticleCameraUp, &sCommBtlDemoParticleCameraTarget, g3d->heapId);
+    resource = Particle_ReadResource(ARCID_COMM_BTL_DEMO, file, g3d->heapId);
+    g3d->emitterCount = Particle_GetResourceEmitterCount(resource);
+    Particle_SetResource(g3d->particles, resource, FALSE, GFL_VBlankGetTCBMgr());
 }
 
 static void CommBtlDemoG3D_ClearParticles(CommBtlDemoG3D *g3d) {
-    func_020500b0(g3d->particles);
-    func_0204fa84(g3d->particles);
+    Particle_DeleteAllEmitters(g3d->particles);
+    Particle_DeleteSystem(g3d->particles);
     g3d->particles = NULL;
 }
 
 static void CommBtlDemoG3D_FreeParticles(CommBtlDemoG3D *g3d) {
     if (g3d->particles != NULL) {
-        func_0204fa84(g3d->particles);
+        Particle_DeleteSystem(g3d->particles);
     }
-    func_0204fb4c();
+    Particle_Free();
 }
 
 static void CommBtlDemoG3D_AddEmitter(CommBtlDemoG3D *g3d, u16 emitter, const VecFx32 *pos) {
-    func_0205006c(g3d->particles, emitter, pos);
+    Particle_CreateEmitter(g3d->particles, emitter, pos);
 }
 
 // Adds every emitter of the particle file

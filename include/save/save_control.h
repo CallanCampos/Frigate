@@ -152,7 +152,7 @@ void *getAddressOfExtraSaveBlk(SaveControl *save, u32 block, u32 arg2);
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *save, u32 block);
 u32 SaveControl_GetStatus(SaveControl *save);
 void func_020074b8(SaveControl *save, u32 *a1, u32 *a2);
-// The bytes written so far of the save in progress, func_0203b080 of the save's SaveData
+// The bytes written so far of the save in progress, SaveData_GetBytesWritten of the save's SaveData
 u32 SaveControl_GetBytesWritten(SaveControl *save);
 u32 SaveControl_GetErrors(SaveControl *save);
 void SaveControl_InitNewGame(SaveControl *save);

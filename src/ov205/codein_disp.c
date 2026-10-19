@@ -54,8 +54,8 @@ void CodeInDisp_InitActors(CodeInWork *wk, const BGSysVRAMConfig *vramConfig) {
     setup.oamCountMain = 112;
     ClActSys_Create(&setup, vramConfig, HEAPID_CODEIN);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
-    wk->unit = func_0204bf1c(64, 0, HEAPID_CODEIN);
-    func_0204c028(wk->unit);
+    wk->unit = ClActUnit_Create(64, 0, HEAPID_CODEIN);
+    ClActUnit_UseSystemRenderer(wk->unit);
 }
 
 void CodeInDisp_LoadResources(CodeInWork *wk) {
@@ -68,15 +68,15 @@ void CodeInDisp_LoadResources(CodeInWork *wk) {
     GFL_BGSysLoadArcNCGRStatic(arc, 7, 5, 0, 0, FALSE, HEAPID_CODEIN);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 11, 5, 0, 0, FALSE, HEAPID_CODEIN);
     GFL_G2DIOLoadArcNCLRDefault(arc, 2, 4, 0, 0, HEAPID_CODEIN);
-    wk->plttRes[CODEIN_RES_CODE] = func_0204bba0(arc, 0, CLACT_VRAM_MAIN, 0, HEAPID_CODEIN);
-    wk->charRes[CODEIN_RES_CODE] = func_0204b81c(arc, 5, FALSE, CLACT_VRAM_MAIN, HEAPID_CODEIN);
-    wk->cellAnimRes[CODEIN_RES_CODE] = func_0204bde0(arc, 12, 15, HEAPID_CODEIN);
-    wk->plttRes[CODEIN_RES_CURSOR] = func_0204bba0(arc, 4, CLACT_VRAM_MAIN, 0x20, HEAPID_CODEIN);
-    wk->charRes[CODEIN_RES_CURSOR] = func_0204b81c(arc, 9, FALSE, CLACT_VRAM_MAIN, HEAPID_CODEIN);
-    wk->cellAnimRes[CODEIN_RES_CURSOR] = func_0204bde0(arc, 14, 17, HEAPID_CODEIN);
-    wk->plttRes[CODEIN_RES_BUTTON] = func_0204bba0(arc, 3, CLACT_VRAM_MAIN, 0x40, HEAPID_CODEIN);
-    wk->charRes[CODEIN_RES_BUTTON] = func_0204b81c(arc, 8, FALSE, CLACT_VRAM_MAIN, HEAPID_CODEIN);
-    wk->cellAnimRes[CODEIN_RES_BUTTON] = func_0204bde0(arc, 13, 16, HEAPID_CODEIN);
+    wk->plttRes[CODEIN_RES_CODE] = ClActSys_LoadPltt(arc, 0, CLACT_VRAM_MAIN, 0, HEAPID_CODEIN);
+    wk->charRes[CODEIN_RES_CODE] = ClActSys_LoadChars(arc, 5, FALSE, CLACT_VRAM_MAIN, HEAPID_CODEIN);
+    wk->cellAnimRes[CODEIN_RES_CODE] = ClActSys_LoadCellAnims(arc, 12, 15, HEAPID_CODEIN);
+    wk->plttRes[CODEIN_RES_CURSOR] = ClActSys_LoadPltt(arc, 4, CLACT_VRAM_MAIN, 0x20, HEAPID_CODEIN);
+    wk->charRes[CODEIN_RES_CURSOR] = ClActSys_LoadChars(arc, 9, FALSE, CLACT_VRAM_MAIN, HEAPID_CODEIN);
+    wk->cellAnimRes[CODEIN_RES_CURSOR] = ClActSys_LoadCellAnims(arc, 14, 17, HEAPID_CODEIN);
+    wk->plttRes[CODEIN_RES_BUTTON] = ClActSys_LoadPltt(arc, 3, CLACT_VRAM_MAIN, 0x40, HEAPID_CODEIN);
+    wk->charRes[CODEIN_RES_BUTTON] = ClActSys_LoadChars(arc, 8, FALSE, CLACT_VRAM_MAIN, HEAPID_CODEIN);
+    wk->cellAnimRes[CODEIN_RES_BUTTON] = ClActSys_LoadCellAnims(arc, 13, 16, HEAPID_CODEIN);
     LoadSysMsgBox(MESSAGE_BG, FRAME_CHAR, FRAME_PALETTE, 0, HEAPID_CODEIN);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, MESSAGE_PALETTE * 0x20, 0x20, HEAPID_CODEIN);
 }
@@ -85,24 +85,24 @@ void CodeInDisp_Free(CodeInWork *wk) {
     int i;
 
     for (i = 0; i < wk->codeMax; i++) {
-        func_0204c108(wk->code[i].actor);
+        ClActor_Delete(wk->code[i].actor);
     }
     for (i = 0; i < CODEIN_BAR_COUNT; i++) {
-        func_0204c108(wk->bar[i].actor);
-        func_0204c108(wk->btn[i].actor);
+        ClActor_Delete(wk->bar[i].actor);
+        ClActor_Delete(wk->btn[i].actor);
     }
     for (i = 0; i < CODEIN_CURSOR_COUNT; i++) {
-        func_0204c108(wk->cur[i].actor);
+        ClActor_Delete(wk->cur[i].actor);
     }
     CodeInDisp_FreeBmpOam(wk);
     BmpWin_Free(wk->window);
     for (i = 0; i < CODEIN_RES_COUNT; i++) {
-        func_0204bcd0(wk->plttRes[i]);
-        func_0204b98c(wk->charRes[i]);
-        func_0204be64(wk->cellAnimRes[i]);
+        ClActSys_FreePltt(wk->plttRes[i]);
+        ClActSys_FreeChars(wk->charRes[i]);
+        ClActSys_FreeCellAnims(wk->cellAnimRes[i]);
     }
-    func_0204bf98(wk->unit);
-    func_0204b758();
+    ClActUnit_Delete(wk->unit);
+    ClActSys_Delete();
 }
 
 // Adds the digits' actors, with a bar after each of the first two groups
@@ -124,22 +124,22 @@ void CodeInDisp_AddCodeActors(CodeInWork *wk) {
             setup.x = CODE_X + i * 8;
             setup.y = CODE_Y;
             setup.sequence = SEQ_BAR;
-            wk->bar[bar].actor = func_0204c040(unit, wk->charRes[CODEIN_RES_CODE], wk->plttRes[CODEIN_RES_CODE],
-                                               wk->cellAnimRes[CODEIN_RES_CODE], &setup, 0, HEAPID_CODEIN);
+            wk->bar[bar].actor = ClActor_Create(unit, wk->charRes[CODEIN_RES_CODE], wk->plttRes[CODEIN_RES_CODE],
+                                                wk->cellAnimRes[CODEIN_RES_CODE], &setup, 0, HEAPID_CODEIN);
             bar++;
         } else {
             setup.x = CODE_X + i * 8;
             setup.y = CODE_Y;
             setup.sequence = CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size);
-            wk->code[digit].actor = func_0204c040(unit, wk->charRes[CODEIN_RES_CODE], wk->plttRes[CODEIN_RES_CODE],
-                                                  wk->cellAnimRes[CODEIN_RES_CODE], &setup, 0, HEAPID_CODEIN);
+            wk->code[digit].actor = ClActor_Create(unit, wk->charRes[CODEIN_RES_CODE], wk->plttRes[CODEIN_RES_CODE],
+                                                   wk->cellAnimRes[CODEIN_RES_CODE], &setup, 0, HEAPID_CODEIN);
             digit++;
         }
     }
     // A single number has no bars
     if (wk->param.blocks[1] == 0 && wk->param.blocks[2] == 0) {
-        func_0204c124(wk->bar[0].actor, FALSE);
-        func_0204c124(wk->bar[1].actor, FALSE);
+        ClActor_SetVisible(wk->bar[0].actor, FALSE);
+        ClActor_SetVisible(wk->bar[1].actor, FALSE);
     }
 }
 
@@ -153,30 +153,30 @@ void CodeInDisp_AddCursorActors(CodeInWork *wk) {
     setup.priority = 0;
     setup.bgPriority = 0;
     wk->cur[CODEIN_CURSOR_CODE].actor =
-        func_0204c040(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
-                      wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
+        ClActor_Create(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
+                       wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
     wk->cur[CODEIN_CURSOR_KEY].actor =
-        func_0204c040(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
-                      wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
+        ClActor_Create(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
+                       wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
     wk->cur[CODEIN_CURSOR_PRESS].actor =
-        func_0204c040(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
-                      wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
+        ClActor_Create(unit, wk->charRes[CODEIN_RES_CURSOR], wk->plttRes[CODEIN_RES_CURSOR],
+                       wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
     CodeInDisp_SetCodeCursor(wk, 0);
-    func_0204c488(wk->cur[CODEIN_CURSOR_CODE].actor, 0);
+    ClActor_SetSequence(wk->cur[CODEIN_CURSOR_CODE].actor, 0);
     func_0204c520(wk->cur[CODEIN_CURSOR_CODE].actor, TRUE);
     wk->cur[CODEIN_CURSOR_KEY].move.x = 0;
     wk->cur[CODEIN_CURSOR_KEY].move.y = 0;
     wk->cur[CODEIN_CURSOR_KEY].state = 1;
     CodeInDisp_SetKeyCursor(wk, 0);
-    func_0204c488(wk->cur[CODEIN_CURSOR_KEY].actor, wk->cur[CODEIN_CURSOR_KEY].state);
+    ClActor_SetSequence(wk->cur[CODEIN_CURSOR_KEY].actor, wk->cur[CODEIN_CURSOR_KEY].state);
     func_0204c520(wk->cur[CODEIN_CURSOR_KEY].actor, TRUE);
-    func_0204c318(wk->cur[CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
+    ClActor_SetObjMode(wk->cur[CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
     wk->cur[CODEIN_CURSOR_PRESS].move.x = 0;
     wk->cur[CODEIN_CURSOR_PRESS].move.y = 0;
     wk->cur[CODEIN_CURSOR_PRESS].state = 1;
     CodeInDisp_SetKeyCursor(wk, 0);
-    func_0204c488(wk->cur[CODEIN_CURSOR_PRESS].actor, wk->cur[CODEIN_CURSOR_PRESS].state);
-    func_0204c318(wk->cur[CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
+    ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, wk->cur[CODEIN_CURSOR_PRESS].state);
+    ClActor_SetObjMode(wk->cur[CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
     func_0204c520(wk->cur[CODEIN_CURSOR_PRESS].actor, TRUE);
     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_PRESS, FALSE);
@@ -192,22 +192,22 @@ void CodeInDisp_AddButtonActors(CodeInWork *wk) {
     setup.sequence = 0;
     setup.priority = CODE_PRIORITY;
     setup.bgPriority = 0;
-    wk->btn[0].actor = func_0204c040(unit, wk->charRes[CODEIN_RES_BUTTON], wk->plttRes[CODEIN_RES_BUTTON],
-                                     wk->cellAnimRes[CODEIN_RES_BUTTON], &setup, 0, HEAPID_CODEIN);
-    wk->btn[1].actor = func_0204c040(unit, wk->charRes[CODEIN_RES_BUTTON], wk->plttRes[CODEIN_RES_BUTTON],
-                                     wk->cellAnimRes[CODEIN_RES_BUTTON], &setup, 0, HEAPID_CODEIN);
+    wk->btn[0].actor = ClActor_Create(unit, wk->charRes[CODEIN_RES_BUTTON], wk->plttRes[CODEIN_RES_BUTTON],
+                                      wk->cellAnimRes[CODEIN_RES_BUTTON], &setup, 0, HEAPID_CODEIN);
+    wk->btn[1].actor = ClActor_Create(unit, wk->charRes[CODEIN_RES_BUTTON], wk->plttRes[CODEIN_RES_BUTTON],
+                                      wk->cellAnimRes[CODEIN_RES_BUTTON], &setup, 0, HEAPID_CODEIN);
     pos.x = (wk->rects[CODEIN_RECT_BACK].left + wk->rects[CODEIN_RECT_BACK].right) / 2;
     pos.y = (wk->rects[CODEIN_RECT_BACK].top + wk->rects[CODEIN_RECT_BACK].bottom) / 2;
-    func_0204c140(wk->btn[0].actor, &pos, 0);
-    func_0204c488(wk->btn[0].actor, 0);
+    ClActor_SetSurfacePos(wk->btn[0].actor, &pos, 0);
+    ClActor_SetSequence(wk->btn[0].actor, 0);
     pos.x = (wk->rects[CODEIN_RECT_OK].left + wk->rects[CODEIN_RECT_OK].right) / 2;
     pos.y = (wk->rects[CODEIN_RECT_OK].top + wk->rects[CODEIN_RECT_OK].bottom) / 2;
-    func_0204c140(wk->btn[1].actor, &pos, 0);
-    func_0204c488(wk->btn[1].actor, 0);
+    ClActor_SetSurfacePos(wk->btn[1].actor, &pos, 0);
+    ClActor_SetSequence(wk->btn[1].actor, 0);
 }
 
 void CodeInDisp_SetCursorVisible(CodeInWork *wk, int cursor, BOOL visible) {
-    func_0204c124(wk->cur[cursor].actor, visible);
+    ClActor_SetVisible(wk->cur[cursor].actor, visible);
 }
 
 // Puts the code's cursor under a digit
@@ -216,9 +216,9 @@ void CodeInDisp_SetCodeCursor(CodeInWork *wk, int digit) {
     ClActor *actor = wk->code[digit].actor;
 
     wk->cur[CODEIN_CURSOR_CODE].state = digit;
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     pos.y += 16;
-    func_0204c140(wk->cur[CODEIN_CURSOR_CODE].actor, &pos, 0);
+    ClActor_SetSurfacePos(wk->cur[CODEIN_CURSOR_CODE].actor, &pos, 0);
 }
 
 // Puts the keys' cursor on a key and restarts its animation
@@ -227,8 +227,8 @@ void CodeInDisp_SetKeyCursor(CodeInWork *wk, int key) {
 
     pos.x = (wk->rects[CODEIN_RECT_KEYS + key].left + wk->rects[CODEIN_RECT_KEYS + key].right) / 2;
     pos.y = (wk->rects[CODEIN_RECT_KEYS + key].top + wk->rects[CODEIN_RECT_KEYS + key].bottom) / 2;
-    func_0204c140(wk->cur[CODEIN_CURSOR_KEY].actor, &pos, 0);
-    func_0204c4d4(wk->cur[CODEIN_CURSOR_KEY].actor, 0);
+    ClActor_SetSurfacePos(wk->cur[CODEIN_CURSOR_KEY].actor, &pos, 0);
+    ClActor_SetAnimTime(wk->cur[CODEIN_CURSOR_KEY].actor, 0);
 }
 
 void CodeInDisp_SetCursorOnKey(CodeInWork *wk, int key, int cursor) {
@@ -236,8 +236,8 @@ void CodeInDisp_SetCursorOnKey(CodeInWork *wk, int key, int cursor) {
 
     pos.x = (wk->rects[CODEIN_RECT_KEYS + key].left + wk->rects[CODEIN_RECT_KEYS + key].right) / 2;
     pos.y = (wk->rects[CODEIN_RECT_KEYS + key].top + wk->rects[CODEIN_RECT_KEYS + key].bottom) / 2;
-    func_0204c140(wk->cur[cursor].actor, &pos, 0);
-    func_0204c4d4(wk->cur[cursor].actor, 0);
+    ClActor_SetSurfacePos(wk->cur[cursor].actor, &pos, 0);
+    ClActor_SetAnimTime(wk->cur[cursor].actor, 0);
 }
 
 // Gives the keys' cursors their animations, and hides the keys' cursor while a press flashes or the touch screen is
@@ -246,11 +246,11 @@ void CodeInDisp_UpdateCursors(CodeInWork *wk) {
     int i;
 
     for (i = CODEIN_CURSOR_KEY; i < CODEIN_CURSOR_COUNT; i++) {
-        int sequence = func_0204c4a0(wk->cur[i].actor);
+        int sequence = ClActor_GetSequence(wk->cur[i].actor);
 
         if (sequence == SEQ_CURSOR_PRESS) {
-            if (!func_0204c560(wk->cur[i].actor)) {
-                func_0204c488(wk->cur[i].actor, wk->cur[i].state);
+            if (!ClActor_IsAnimActive(wk->cur[i].actor)) {
+                ClActor_SetSequence(wk->cur[i].actor, wk->cur[i].state);
                 if (wk->touchMode == TRUE) {
                     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
                 } else {
@@ -260,9 +260,9 @@ void CodeInDisp_UpdateCursors(CodeInWork *wk) {
             }
         } else {
             if (sequence != wk->cur[i].state) {
-                func_0204c488(wk->cur[i].actor, wk->cur[i].state);
+                ClActor_SetSequence(wk->cur[i].actor, wk->cur[i].state);
             }
-            if (func_0204c4a0(wk->cur[i].actor) != SEQ_CURSOR_PRESS) {
+            if (ClActor_GetSequence(wk->cur[i].actor) != SEQ_CURSOR_PRESS) {
                 if (wk->touchMode == TRUE) {
                     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
                 } else {
@@ -296,19 +296,19 @@ void CodeInDisp_UpdateButtons(CodeInWork *wk) {
         case 1:
             wk->btn[i].move.wait++;
             if (wk->btn[i].move.wait == 1) {
-                func_0204c488(wk->btn[i].actor, 1);
+                ClActor_SetSequence(wk->btn[i].actor, 1);
                 CodeInDisp_SetButtonTextPos(wk->btnText[i], x, y);
             } else if (wk->btn[i].move.wait == 2) {
-                func_0204c488(wk->btn[i].actor, 2);
+                ClActor_SetSequence(wk->btn[i].actor, 2);
                 CodeInDisp_SetButtonTextPos(wk->btnText[i], x, y);
             } else if (wk->btn[i].move.wait == BUTTON_FRAMES) {
-                func_0204c488(wk->btn[i].actor, 0);
+                ClActor_SetSequence(wk->btn[i].actor, 0);
                 CodeInDisp_SetButtonTextPos(wk->btnText[i], x, y);
                 wk->btn[i].state++;
             }
             break;
         default:
-            func_0204c488(wk->btn[i].actor, 0);
+            ClActor_SetSequence(wk->btn[i].actor, 0);
             CodeInDisp_SetButtonTextPos(wk->btnText[i], x, y);
             wk->btn[i].state = 0;
             break;
@@ -358,10 +358,10 @@ void CodeInDisp_SetCodePositions(CodeInWork *wk, BOOL move) {
                 x += 8;
             }
         }
-        func_0204c178(wk->code[i].actor, &pos, 0);
+        ClActor_GetSurfacePos(wk->code[i].actor, &pos, 0);
         if (!move) {
             pos.x = x;
-            func_0204c140(wk->code[i].actor, &pos, 0);
+            ClActor_SetSurfacePos(wk->code[i].actor, &pos, 0);
         } else {
             wk->code[i].move.x = (x - pos.x) / 4;
             wk->code[i].move.y = 0;
@@ -369,7 +369,7 @@ void CodeInDisp_SetCodePositions(CodeInWork *wk, BOOL move) {
             wk->code[i].move.scale = 0;
         }
         if (i == wk->bar[bar].state && bar != CODEIN_BAR_COUNT) {
-            func_0204c178(wk->bar[bar].actor, &barPos, 0);
+            ClActor_GetSurfacePos(wk->bar[bar].actor, &barPos, 0);
             if (wk->largeStart == wk->largeEnd) {
                 x += 8;
             } else if (i > wk->largeStart && i < wk->largeEnd) {
@@ -379,7 +379,7 @@ void CodeInDisp_SetCodePositions(CodeInWork *wk, BOOL move) {
             }
             if (!move) {
                 barPos.x = x;
-                func_0204c140(wk->bar[bar].actor, &barPos, 0);
+                ClActor_SetSurfacePos(wk->bar[bar].actor, &barPos, 0);
             } else {
                 wk->bar[bar].move.x = (x - barPos.x) / 4;
                 wk->bar[bar].move.y = 0;
@@ -405,7 +405,7 @@ void CodeInDisp_UpdateCodeRects(CodeInWork *wk) {
             halfWidth = 4;
             halfHeight = 8;
         }
-        func_0204c178(wk->code[i].actor, &pos, 0);
+        ClActor_GetSurfacePos(wk->code[i].actor, &pos, 0);
         wk->code[i].rect->top = pos.y - halfHeight;
         wk->code[i].rect->left = pos.x - halfWidth;
         wk->code[i].rect->bottom = pos.y + halfHeight;
@@ -418,7 +418,7 @@ void CodeInDisp_InitBmpOam(CodeInWork *wk) {
 }
 
 static void CodeInDisp_FreeBmpOam(CodeInWork *wk) {
-    func_0204bcd0(wk->btnTextPltt);
+    ClActSys_FreePltt(wk->btnTextPltt);
     BmpOam_ActorDel(wk->btnText[0]);
     BmpOam_ActorDel(wk->btnText[1]);
     BmpOam_Exit(wk->bmpOam);
@@ -427,7 +427,7 @@ static void CodeInDisp_FreeBmpOam(CodeInWork *wk) {
 static void CodeInDisp_LoadButtonTextPltt(CodeInWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, HEAPID_CODEIN);
 
-    wk->btnTextPltt = func_0204bc48(arc, 5, CLACT_VRAM_MAIN, 0x80, HEAPID_CODEIN);
+    wk->btnTextPltt = ClActSys_LoadPlttEx(arc, 5, CLACT_VRAM_MAIN, 0x80, HEAPID_CODEIN);
     GFL_ArcToolFree(arc);
 }
 

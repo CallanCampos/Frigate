@@ -22,7 +22,7 @@ static void Colosseum_SetPlayer(UnionColosseum *colosseum, BattlePlayer *player,
 
 UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const PlayerInfo *info, u32 flag) {
     UnionColosseum *colosseum;
-    int self = func_02042a6c(func_02040440());
+    int self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     int i;
     u8 value;
     ColosseumMember *member;
@@ -115,7 +115,7 @@ BOOL Colosseum_Vote(UnionColosseum *colosseum, u32 netId, u8 value) {
 void func_ov028_02172a1c(UnionColosseum *colosseum) {
     int i;
 
-    if (func_02042bc4()) {
+    if (GFL_NetIsParent()) {
         for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
             u8 value = colosseum->unkD0[i];
 
@@ -130,14 +130,14 @@ void func_ov028_02172a50(UnionColosseum *colosseum) {
     int count;
     int i;
 
-    if (func_02042bc4()) {
+    if (GFL_NetIsParent()) {
         count = 0;
         for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
             if (colosseum->unkD4[i] == 1) {
                 count++;
             }
         }
-        if (count == func_02042a78()) {
+        if (count == GFL_NetGetNegotiatedCount()) {
             if (Colosseum_SendUnkB() == TRUE) {
                 for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
                     colosseum->unkD4[i] = 0;
@@ -181,14 +181,14 @@ BOOL func_ov028_02172b20(const UnionColosseum *colosseum) {
             count++;
         }
     }
-    if (count >= func_02042a78()) {
+    if (count >= GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
 }
 
 void func_ov028_02172b4c(UnionColosseum *colosseum, BOOL keepOwn) {
-    int self = func_02042a6c(func_02040440());
+    int self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     int i;
 
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
@@ -217,7 +217,7 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
         member_max++;
     }
     GFL_ASSERT(member_max == 2 || member_max == 4);
-    self = func_02042a6c(func_02040440());
+    self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     selfTeam = colosseum->unk16C[self];
     for (i = 0; i < member_max; i++) {
         u8 team = colosseum->unk16C[i];

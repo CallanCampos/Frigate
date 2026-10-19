@@ -407,7 +407,7 @@ static BOOL BtlRecSelProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     BtlRecSel_CreateDummyIcon(prm, wk);
     BtlRecSel_InitPaletteFade(prm, wk);
     BtlRecSel_FreeDummyIcon(prm, wk);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return TRUE;
 }
 
@@ -498,7 +498,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         u32 choice = ConfirmDialog_Update(wk->yesNo);
 
         if (choice != BMPMENU_NULL) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (choice == 0) {
                 // With a video saved already, show it and ask whether to overwrite it
                 if (BattleRec_IsSlotValid(save, wk->heapId, &saved, 0)) {
@@ -521,7 +521,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         u32 choice = ConfirmDialog_Update(wk->yesNo);
 
         if (choice != BMPMENU_NULL) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (choice == 0) {
                 BtlRecSel_StopTimer(prm, wk);
                 *state = SEQ_END_MESSAGE;
@@ -538,7 +538,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         u32 choice = ConfirmDialog_Update(wk->yesNo);
 
         if (choice != BMPMENU_NULL) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (choice == 0) {
                 wk->hideNextSeq = SEQ_SAVE_MESSAGE;
             } else {
@@ -722,7 +722,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         if (done) {
             if (prm->comm) {
-                func_02040624(func_02040440(), 150, 43);
+                NetHandle_SendTimingPair(NetHandle_GetOwn(), 150, 43);
                 wk->waitIcon = WaitIcon_Create(GFL_VBlankGetTCBMgr(), wk->messageWindow, 15, 16, wk->heapId);
             }
             *state = SEQ_END_SYNC;
@@ -733,7 +733,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         done = TRUE;
         if (prm->comm) {
             if (!GFL_NetErrCheck()) {
-                done = func_02040664(func_02040440(), 150, 43);
+                done = NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 150, 43);
             }
             if (done) {
                 WaitIcon_Free(wk->waitIcon);
@@ -894,23 +894,23 @@ static BOOL BtlRecSel_UpdateStream(BtlRecSelParam *param, BtlRecSelWork *work) {
 
     switch (PrintStream_GetState(work->stream)) {
     case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
             PrintStream_SkipWait(work->stream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             PrintStream_Continue(work->stream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
@@ -919,11 +919,11 @@ static BOOL BtlRecSel_UpdateStream(BtlRecSelParam *param, BtlRecSelWork *work) {
             work->waitTimer--;
         } else {
             if (work->waitKey) {
-                if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+                if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                        func_0203d564(FALSE);
+                        GCTX_HIDSetUsingTouch(FALSE);
                     } else {
-                        func_0203d564(TRUE);
+                        GCTX_HIDSetUsingTouch(TRUE);
                     }
                     work->waitKey = FALSE;
                     done = TRUE;
@@ -1276,15 +1276,15 @@ static ClActor *BtlRecSel_CreateIcon(ClActUnit *unit, HeapID heapId, u32 vramTyp
     setup.paletteCount = 3;
     UIObjRes_Load(res, &setup, unit, heapId);
     actor = UIObjRes_CreateActor(res, unit, x, y, anim, heapId);
-    func_0204c468(actor, bgPriority);
-    func_0204c438(actor, priority);
+    ClActor_SetBgPriority(actor, bgPriority);
+    ClActor_SetPriority(actor, priority);
     func_0204c520(actor, TRUE);
-    func_0204c378(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
+    ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     return actor;
 }
 
 static void BtlRecSel_FreeIcon(UIObjRes *res, ClActor *actor) {
-    func_0204c108(actor);
+    ClActor_Delete(actor);
     UIObjRes_Free(res);
 }
 

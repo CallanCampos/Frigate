@@ -55,7 +55,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
 
     if (running != TRUE && GFL_NetErrCheck() && (s32)*state >= 0 && (s32)*state < 13) {
         if (procWork->commandsSet == TRUE) {
-            func_02040c64(0x100);
+            NetCommand_RemoveTable(0x100);
         }
         if (procWork->ov167Loaded == TRUE) {
             GFL_OvlUnload(OVERLAY_ID(167));
@@ -86,11 +86,11 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         }
         break;
     case 2:
-        func_02042d04(func_02040440(), 0xc9);
+        GFL_NetSendTiming(NetHandle_GetOwn(), 0xc9);
         *state = 3;
         break;
     case 3:
-        if (func_02042d0c(func_02040440(), 0xc9)) {
+        if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xc9)) {
             *state = 4;
         }
         break;
@@ -117,12 +117,12 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         procWork->ov167Loaded = TRUE;
         GFL_OvlLoad(OVERLAY_ID(167));
         procWork->commandsSet = TRUE;
-        func_02040c20(0x100, data_ov167_021d7448, 9, NULL);
-        func_02042d04(func_02040440(), 0xc8);
+        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        GFL_NetSendTiming(NetHandle_GetOwn(), 0xc8);
         *state = 7;
         break;
     case 7:
-        if (func_02042d0c(func_02040440(), 0xc8)) {
+        if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xc8)) {
             *state = 8;
         }
         break;
@@ -142,14 +142,14 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         *state = 11;
         break;
     case 11:
-        func_02042d04(func_02040440(), 0xca);
+        GFL_NetSendTiming(NetHandle_GetOwn(), 0xca);
         *state = 12;
         break;
     case 12:
-        if (!func_02042d0c(func_02040440(), 0xca)) {
+        if (!GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xca)) {
             break;
         }
-        func_02040c64(0x100);
+        NetCommand_RemoveTable(0x100);
         procWork->commandsSet = FALSE;
         GFL_OvlUnload(OVERLAY_ID(167));
         procWork->ov167Loaded = FALSE;

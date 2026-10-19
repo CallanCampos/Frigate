@@ -161,17 +161,17 @@ PlaceNameLetter *func_ov036_021b6824(HeapID heapId, u32 type, void *arg, ClActUn
     letter->work = letter + 1;
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
-        letter->actor = func_0204c040(unit, chars, palette, cellAnims, &setup, 0, heapId);
+        letter->actor = ClActor_Create(unit, chars, palette, cellAnims, &setup, 0, heapId);
     }
-    func_0204c318(letter->actor, 2);
-    func_0204c124(letter->actor, FALSE);
+    ClActor_SetObjMode(letter->actor, 2);
+    ClActor_SetVisible(letter->actor, FALSE);
     letter->ops->init(letter, letter->work, arg);
     return letter;
 }
 
 void func_ov036_021b68bc(PlaceNameLetter *letter) {
     letter->ops->exit(letter, letter->work);
-    func_0204c108(letter->actor);
+    ClActor_Delete(letter->actor);
     GFL_HeapFree(letter);
 }
 
@@ -222,7 +222,7 @@ static void func_ov036_021b6950(PlaceNameLetter *letter, void *work, void *arg) 
     BmpOamActorSetup oamSetup;
 
     wk->queue = setup->printQueue;
-    func_0204c488(letter->actor, 0);
+    ClActor_SetSequence(letter->actor, 0);
     wk->bitmap = GFL_BitmapCreate(25, 2, 32, letter->heapId);
     oamSetup.bitmap = wk->bitmap;
     oamSetup.x = 0;
@@ -235,28 +235,28 @@ static void func_ov036_021b6950(PlaceNameLetter *letter, void *work, void *arg) 
     oamSetup.vramType = 0;
     wk->oamActor = BmpOam_ActorAdd(setup->bmpOam, &oamSetup);
     BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
-    wk->palette = func_0204bbb8(letter->arc, 26, 0, 96, 0, 1, letter->heapId);
-    wk->chars = func_0204b81c(letter->arc, 25, 0, 0, letter->heapId);
-    wk->cellAnims = func_0204bde0(letter->arc, 24, 23, letter->heapId);
+    wk->palette = ClActSys_LoadPlttRange(letter->arc, 26, 0, 96, 0, 1, letter->heapId);
+    wk->chars = ClActSys_LoadChars(letter->arc, 25, 0, 0, letter->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(letter->arc, 24, 23, letter->heapId);
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
-        wk->actor = func_0204c040(letter->unit, wk->chars, wk->palette, wk->cellAnims, &setup, 0, letter->heapId);
+        wk->actor = ClActor_Create(letter->unit, wk->chars, wk->palette, wk->cellAnims, &setup, 0, letter->heapId);
     }
-    func_0204c124(wk->actor, FALSE);
-    func_0204c468(wk->actor, 1);
-    func_0204c438(wk->actor, 3);
+    ClActor_SetVisible(wk->actor, FALSE);
+    ClActor_SetBgPriority(wk->actor, 1);
+    ClActor_SetPriority(wk->actor, 3);
 }
 
 static void func_ov036_021b6a3c(PlaceNameLetter *letter, void *work) {
     LetterA *wk = work;
 
     if (wk->actor != NULL) {
-        func_0204c108(wk->actor);
+        ClActor_Delete(wk->actor);
         wk->actor = NULL;
     }
-    func_0204bcd0(wk->palette);
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActSys_FreePltt(wk->palette);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
     if (wk->oamActor != NULL) {
         BmpOam_ActorDel(wk->oamActor);
         wk->oamActor = NULL;
@@ -316,7 +316,7 @@ static u32 func_ov036_021b6adc(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
     case 4: {
         NNSG2dCharacterData *character;
         void *file = GFL_G2DIOReadOBJNCGRArc(letter->arc, wk->iconId + 2, FALSE, &character, letter->heapId);
-        func_0204ba40(wk->chars, character);
+        ClActSys_ReplaceCharData(wk->chars, character);
         GFL_HeapFree(file);
         (*step)++;
         break;
@@ -349,8 +349,8 @@ static u32 func_ov036_021b6b9c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
         spec.swingFrames = (s16)(letter->param1 * 0.4f);
         func_ov036_021b7224(&wk->anim, &spec);
         BmpOam_ActorSetDrawEnable(wk->oamActor, TRUE);
-        func_0204c124(letter->actor, TRUE);
-        func_0204c124(wk->actor, TRUE);
+        ClActor_SetVisible(letter->actor, TRUE);
+        ClActor_SetVisible(wk->actor, TRUE);
         (*step)++;
         break;
     }
@@ -384,8 +384,8 @@ static u32 func_ov036_021b6c7c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
     case 1:
         func_ov036_021b70e8(&wk->mover);
         if (func_ov036_021b712c(&wk->mover)) {
-            func_0204c124(letter->actor, FALSE);
-            func_0204c124(wk->actor, FALSE);
+            ClActor_SetVisible(letter->actor, FALSE);
+            ClActor_SetVisible(wk->actor, FALSE);
             BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
             (*step)++;
         }
@@ -399,8 +399,8 @@ static u32 func_ov036_021b6c7c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
 }
 
 static u32 func_ov036_021b6d2c(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
-    func_0204c124(letter->actor, FALSE);
-    func_0204c124(wk->actor, FALSE);
+    ClActor_SetVisible(letter->actor, FALSE);
+    ClActor_SetVisible(wk->actor, FALSE);
     BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
     return FALSE;
 }
@@ -414,10 +414,10 @@ static void func_ov036_021b6d50(PlaceNameLetter *letter, LetterA *wk, ClActorPos
     actorPos = PLACE_NAME_LETTER_POSITIONS[0];
     letterPos.x += pos->x;
     letterPos.y += pos->y;
-    func_0204c140(letter->actor, &letterPos, letter->bgPriority);
+    ClActor_SetSurfacePos(letter->actor, &letterPos, letter->bgPriority);
     actorPos.x += pos->x;
     actorPos.y += pos->y;
-    func_0204c140(wk->actor, &actorPos, letter->bgPriority);
+    ClActor_SetSurfacePos(wk->actor, &actorPos, letter->bgPriority);
     oamPos.x += pos->x;
     oamPos.y += pos->y;
     BmpOam_ActorSetPos(wk->oamActor, oamPos.x, oamPos.y);
@@ -427,22 +427,22 @@ static void func_ov036_021b6dec(PlaceNameLetter *letter, void *work, void *arg) 
     LetterB *wk = work;
     PlaceNameFrameSetup *frame = arg;
 
-    func_0204c488(letter->actor, 1);
+    ClActor_SetSequence(letter->actor, 1);
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
         wk->actor =
-            func_0204c040(letter->unit, frame->chars, frame->palette, frame->cellAnims, &setup, 0, letter->heapId);
+            ClActor_Create(letter->unit, frame->chars, frame->palette, frame->cellAnims, &setup, 0, letter->heapId);
     }
-    func_0204c124(wk->actor, FALSE);
-    func_0204c468(wk->actor, 1);
-    func_0204c438(wk->actor, 3);
+    ClActor_SetVisible(wk->actor, FALSE);
+    ClActor_SetBgPriority(wk->actor, 1);
+    ClActor_SetPriority(wk->actor, 3);
 }
 
 static void func_ov036_021b6e44(PlaceNameLetter *letter, void *work) {
     LetterB *wk = work;
 
     if (wk->actor != NULL) {
-        func_0204c108(wk->actor);
+        ClActor_Delete(wk->actor);
         wk->actor = NULL;
     }
 }
@@ -469,7 +469,7 @@ static u32 func_ov036_021b6e70(PlaceNameLetter *letter, void *work) {
 }
 
 static u32 func_ov036_021b6ea0(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
-    func_0204c488(wk->actor, (u16)(wk->iconId + 2));
+    ClActor_SetSequence(wk->actor, (u16)(wk->iconId + 2));
     return FALSE;
 }
 
@@ -483,8 +483,8 @@ static u32 func_ov036_021b6eb8(PlaceNameLetter *letter, LetterB *wk, s32 *step) 
         spec.swingStart = letter->param0 >= spec.moveFrames ? letter->param0 - spec.moveFrames : letter->param0;
         spec.swingFrames = (s16)(letter->param1 * 0.4f);
         func_ov036_021b7224(&wk->anim, &spec);
-        func_0204c124(letter->actor, TRUE);
-        func_0204c124(wk->actor, TRUE);
+        ClActor_SetVisible(letter->actor, TRUE);
+        ClActor_SetVisible(wk->actor, TRUE);
         (*step)++;
         break;
     }
@@ -518,8 +518,8 @@ static u32 func_ov036_021b6f88(PlaceNameLetter *letter, LetterB *wk, s32 *step) 
     case 1:
         func_ov036_021b70e8(&wk->mover);
         if (func_ov036_021b712c(&wk->mover)) {
-            func_0204c124(letter->actor, FALSE);
-            func_0204c124(wk->actor, FALSE);
+            ClActor_SetVisible(letter->actor, FALSE);
+            ClActor_SetVisible(wk->actor, FALSE);
             (*step)++;
         }
         break;
@@ -532,8 +532,8 @@ static u32 func_ov036_021b6f88(PlaceNameLetter *letter, LetterB *wk, s32 *step) 
 }
 
 static u32 func_ov036_021b7030(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
-    func_0204c124(letter->actor, FALSE);
-    func_0204c124(wk->actor, FALSE);
+    ClActor_SetVisible(letter->actor, FALSE);
+    ClActor_SetVisible(wk->actor, FALSE);
     return FALSE;
 }
 
@@ -545,10 +545,10 @@ static void func_ov036_021b704c(PlaceNameLetter *letter, LetterB *wk, ClActorPos
     actorPos = PLACE_NAME_LETTER_POSITIONS[3];
     letterPos.x += pos->x;
     letterPos.y += pos->y;
-    func_0204c140(letter->actor, &letterPos, letter->bgPriority);
+    ClActor_SetSurfacePos(letter->actor, &letterPos, letter->bgPriority);
     actorPos.x += pos->x;
     actorPos.y += pos->y;
-    func_0204c140(wk->actor, &actorPos, letter->bgPriority);
+    ClActor_SetSurfacePos(wk->actor, &actorPos, letter->bgPriority);
 }
 
 static void func_ov036_021b70bc(Mover *mover, const MoveSpec *spec) {

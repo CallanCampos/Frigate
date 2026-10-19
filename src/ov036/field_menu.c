@@ -203,7 +203,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
     menu->msgBGSys = Field_GetMsgBGSys(field);
     menu->cursorX = 0;
     menu->cursorY = 0;
-    menu->cursorDirty = menu->keyMode = func_0203d554() ^ TRUE;
+    menu->cursorDirty = menu->keyMode = GCTX_HIDIsUsingTouch() ^ TRUE;
     menu->curItem = NULL;
     menu->vblankTcb = GFL_VBlankTCBAdd(func_ov036_021a040c, menu, 0);
     menu->printQueue = PrintQueue_CreateDefault(menu->heapId);
@@ -226,12 +226,12 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
         FieldMenu_SetCursorItem(menu, func_020173ec(gameData));
         menu->cursorDirty = TRUE;
         if (menu->keyMode) {
-            func_0204c124(menu->cursor, TRUE);
+            ClActor_SetVisible(menu->cursor, TRUE);
         } else {
-            func_0204c124(menu->cursor, FALSE);
+            ClActor_SetVisible(menu->cursor, FALSE);
         }
     }
-    func_02042ba8(FALSE, menu->tmpHeapId);
+    GFL_NetSetIconScreen(FALSE, menu->tmpHeapId);
     return menu;
 }
 
@@ -249,16 +249,16 @@ void FieldMenu_Free(FieldMenu *menu) {
     }
     func_ov036_0219fb54(menu);
     GFL_TCBRemove(menu->vblankTcb);
-    func_0204c108(menu->returnButton);
-    func_0204c108(menu->cursor);
-    func_0204becc(menu->renderer);
-    func_0204bf98(menu->actUnit);
-    func_0204be64(menu->menuCellAnims);
-    func_0204b98c(menu->menuChars);
-    func_0204bcd0(menu->menuPalette);
-    func_0204be64(menu->commonCellAnims);
-    func_0204b98c(menu->commonChars);
-    func_0204bcd0(menu->commonPalette);
+    ClActor_Delete(menu->returnButton);
+    ClActor_Delete(menu->cursor);
+    ClActRenderer_Delete(menu->renderer);
+    ClActUnit_Delete(menu->actUnit);
+    ClActSys_FreeCellAnims(menu->menuCellAnims);
+    ClActSys_FreeChars(menu->menuChars);
+    ClActSys_FreePltt(menu->menuPalette);
+    ClActSys_FreeCellAnims(menu->commonCellAnims);
+    ClActSys_FreeChars(menu->commonChars);
+    ClActSys_FreePltt(menu->commonPalette);
     GFL_BGSysMoveBG(6, BG_MOVE_SET_Y, 0);
     GFL_BGSysReleaseBG(7);
     GFL_BGSysReleaseBG(5);
@@ -318,7 +318,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         func_ov036_021a07ac(menu);
         break;
     case 4:
-        if (!func_0204c560(menu->returnButton)) {
+        if (!ClActor_IsAnimActive(menu->returnButton)) {
             menu->state = 5;
             GFL_BGSysSetBGEnabled(5, TRUE);
             GFL_BGSysSetBGEnabled(6, TRUE);
@@ -334,12 +334,12 @@ void FieldMenu_Update(FieldMenu *menu) {
             GFL_BGSysSetBGEnabled(5, TRUE);
             GFL_BGSysSetBGEnabled(6, TRUE);
             GFL_BGSysSetBGEnabled(7, TRUE);
-            func_0204c124(menu->returnButton, FALSE);
+            ClActor_SetVisible(menu->returnButton, FALSE);
         } else if (menu->curItem->icon != NULL) {
             menu->decideFrames = 0;
             func_ov036_021a074c(menu, menu->curItem->cursorX, menu->curItem->cursorY);
-            func_0204c488(menu->cursor, 1);
-            func_0204c124(menu->cursor, TRUE);
+            ClActor_SetSequence(menu->cursor, 1);
+            ClActor_SetVisible(menu->cursor, TRUE);
             menu->state = 6;
             GFL_SndSEPlay(0x54c);
         } else {
@@ -348,7 +348,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         break;
     case 6:
         menu->decideFrames++;
-        if (!func_0204c560(menu->cursor)) {
+        if (!ClActor_IsAnimActive(menu->cursor)) {
             menu->state = 8;
         }
         break;
@@ -383,22 +383,22 @@ static void func_ov036_0219fe54(FieldMenu *menu) {
 
     scroll.x = 0;
     scroll.y = -menu->scrollY;
-    func_0204bedc(menu->renderer, 0, &scroll);
+    ClActRenderer_SetSurfacePos(menu->renderer, 0, &scroll);
     for (i = 0; i < 7; i++) {
         if (menu->items[i].icon != NULL && menu->items[i].itemId != FIELD_MENU_ITEM_NONE) {
-            func_0204c178(menu->items[i].icon, &iconPos, 0);
+            ClActor_GetSurfacePos(menu->items[i].icon, &iconPos, 0);
             if (iconPos.y < 0xd0) {
-                func_0204c124(menu->items[i].icon, TRUE);
+                ClActor_SetVisible(menu->items[i].icon, TRUE);
             } else {
-                func_0204c124(menu->items[i].icon, FALSE);
+                ClActor_SetVisible(menu->items[i].icon, FALSE);
             }
         }
     }
-    func_0204c178(menu->cursor, &cursorPos, 0);
+    ClActor_GetSurfacePos(menu->cursor, &cursorPos, 0);
     if (menu->keyMode && cursorPos.y < 0xd6) {
-        func_0204c124(menu->cursor, TRUE);
+        ClActor_SetVisible(menu->cursor, TRUE);
     } else {
-        func_0204c124(menu->cursor, FALSE);
+        ClActor_SetVisible(menu->cursor, FALSE);
     }
 }
 
@@ -434,41 +434,42 @@ static void func_ov036_0219ff20(FieldMenu *menu, ArcTool *arc, u8 menuType, void
     GFL_BGSysLoadArcNCGRStatic(arc, 3, 5, 0, 0, FALSE, menu->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, data_ov036_021cfe64[menuType], 5, 0, 0, FALSE, menu->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 0x10, 7, 0, 0, FALSE, menu->tmpHeapId);
-    menu->menuPalette = func_0204bbb8(arc, 2, CLACT_VRAM_SUB, 0, 0, 11, menu->heapId);
-    menu->menuChars = func_0204b81c(arc, 0xf, FALSE, CLACT_VRAM_SUB, menu->heapId);
-    menu->menuCellAnims = func_0204bde0(arc, 0x1f, 0x2a, menu->heapId);
+    menu->menuPalette = ClActSys_LoadPlttRange(arc, 2, CLACT_VRAM_SUB, 0, 0, 11, menu->heapId);
+    menu->menuChars = ClActSys_LoadChars(arc, 0xf, FALSE, CLACT_VRAM_SUB, menu->heapId);
+    menu->menuCellAnims = ClActSys_LoadCellAnims(arc, 0x1f, 0x2a, menu->heapId);
     common = GFL_ArcSysCreateFileHandle(getUINarcIdx(), menu->tmpHeapId);
-    menu->commonPalette =
-        func_0204bbb8(common, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0x160, 0, 2, menu->heapId);
-    menu->commonChars = func_0204b81c(common, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, menu->heapId);
-    menu->commonCellAnims =
-        func_0204bde0(common, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0), menu->heapId);
+    menu->commonPalette = ClActSys_LoadPlttRange(common, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0x160,
+                                                 0, 2, menu->heapId);
+    menu->commonChars =
+        ClActSys_LoadChars(common, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, menu->heapId);
+    menu->commonCellAnims = ClActSys_LoadCellAnims(common, AppMenuCommon_GetTouchBarCellFile(0),
+                                                   AppMenuCommon_GetTouchBarAnimFile(0), menu->heapId);
     GFL_ArcToolFree(common);
     GFL_BGSysLoadScr(5);
-    menu->actUnit = func_0204bf1c(8, 0, menu->heapId);
+    menu->actUnit = ClActUnit_Create(8, 0, menu->heapId);
     {
         ClActSurfaceSetup surface = { 0, 0, 0x100, 0xbf, 1, 0 };
 
-        menu->renderer = func_0204be9c(&surface, 1, menu->heapId);
+        menu->renderer = ClActRenderer_Create(&surface, 1, menu->heapId);
     }
-    func_0204c018(menu->actUnit, menu->renderer);
+    ClActUnit_SetRenderer(menu->actUnit, menu->renderer);
     setup.x = 0x40;
     setup.y = 0x2c;
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 0;
     menu->cursor =
-        func_0204c040(menu->actUnit, menu->menuChars, menu->menuPalette, menu->menuCellAnims, &setup, 0, menu->heapId);
+        ClActor_Create(menu->actUnit, menu->menuChars, menu->menuPalette, menu->menuCellAnims, &setup, 0, menu->heapId);
     func_0204c53c(menu->cursor, FX32_ONE);
     func_0204c520(menu->cursor, TRUE);
-    func_0204c468(menu->cursor, 2);
+    ClActor_SetBgPriority(menu->cursor, 2);
     setup.x = 0xe0;
     setup.y = 0xa8;
-    menu->returnButton = func_0204c040(menu->actUnit, menu->commonChars, menu->commonPalette, menu->commonCellAnims,
-                                       &setup, 0, menu->heapId);
+    menu->returnButton = ClActor_Create(menu->actUnit, menu->commonChars, menu->commonPalette, menu->commonCellAnims,
+                                        &setup, 0, menu->heapId);
     func_0204c53c(menu->returnButton, FX32_ONE);
     func_0204c520(menu->returnButton, TRUE);
-    func_0204c124(menu->returnButton, TRUE);
+    ClActor_SetVisible(menu->returnButton, TRUE);
     func_0204c53c(menu->returnButton, FX32_CONST(2));
 }
 
@@ -584,7 +585,7 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
 // Pulses the cursor's colors
 static void func_ov036_021a040c(TCB *tcb, void *data) {
     FieldMenu *menu = data;
-    fx32 t = func_02044360((u16)menu->cursorFadeFrame) + FX32_ONE;
+    fx32 t = GFL_MathSinDegWrap((u16)menu->cursorFadeFrame) + FX32_ONE;
     GXRgb colors[2];
 
     colors[1] = (t * 8 / 0x2000 + 9) | ((31 << 10) | ((t * 5 / 0x2000 + 18) << 5));
@@ -603,7 +604,7 @@ static void func_ov036_021a04a4(FieldMenu *menu) {
     GFL_BGSysMoveBG(6, BG_MOVE_SET_Y, -5 - 0xc0);
     pos.x = 0;
     pos.y = 0xc0;
-    func_0204bedc(menu->renderer, 0, &pos);
+    ClActRenderer_SetSurfacePos(menu->renderer, 0, &pos);
 }
 
 u32 FieldMenu_GetSelectedItem(FieldMenu *menu) {
@@ -669,7 +670,7 @@ static void func_ov036_021a05b8(FieldMenu *menu) {
         menu->keyMode = TRUE;
         menu->curItem = NULL;
         menu->cursorDirty = TRUE;
-        func_0204c124(menu->cursor, TRUE);
+        ClActor_SetVisible(menu->cursor, TRUE);
         return;
     }
     if (repeat & PAD_KEY_UP) {
@@ -707,7 +708,7 @@ static void func_ov036_021a05b8(FieldMenu *menu) {
     if (trg & PAD_BUTTON_A) {
         if (menu->items[func_ov036_021a0544(menu->cursorX, menu->cursorY)].itemId != FIELD_MENU_ITEM_NONE) {
             func_ov036_021a0770(menu, FALSE);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
     }
 }
@@ -717,20 +718,20 @@ static void func_ov036_021a06c8(FieldMenu *menu) {
         { 0x18, 0x40, 0x08, 0x78 }, { 0x18, 0x40, 0x88, 0xf8 }, { 0x48, 0x70, 0x08, 0x78 }, { 0x48, 0x70, 0x88, 0xf8 },
         { 0x78, 0xa0, 0x08, 0x78 }, { 0x78, 0xa0, 0x88, 0xf8 }, { 0xa8, 0xbf, 0xe0, 0xf8 }, { TOUCH_RECT_END, 0, 0, 0 },
     };
-    int slot = func_0203da0c(rects);
+    int slot = GFL_HIDGetTouchPressedRect(rects);
 
     if (slot != TOUCH_RECT_NONE && menu->items[slot].itemId != FIELD_MENU_ITEM_NONE) {
         menu->cursorX = slot % 2;
         menu->cursorY = slot / 2;
         menu->keyMode = FALSE;
-        func_0204c124(menu->cursor, FALSE);
+        ClActor_SetVisible(menu->cursor, FALSE);
         if (slot == FIELD_MENU_SLOT_BOTTOM) {
             func_ov036_021a0770(menu, TRUE);
             return;
         }
         menu->cursorDirty = TRUE;
         func_ov036_021a0770(menu, FALSE);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
 }
 
@@ -739,7 +740,7 @@ static void func_ov036_021a074c(FieldMenu *menu, u8 x, u8 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(menu->cursor, &pos, 0);
+    ClActor_SetSurfacePos(menu->cursor, &pos, 0);
     menu->cursorFadeFrame = 0;
 }
 
@@ -748,7 +749,7 @@ static void func_ov036_021a0770(FieldMenu *menu, BOOL cancel) {
     if (cancel == TRUE) {
         menu->cancel = TRUE;
         menu->state = 4;
-        func_0204c488(menu->returnButton, 8);
+        ClActor_SetSequence(menu->returnButton, 8);
     } else {
         menu->cancel = FALSE;
         menu->state = 5;
@@ -762,13 +763,13 @@ static void func_ov036_021a07ac(FieldMenu *menu) {
     if (menu->cursorDirty == TRUE) {
         prev = menu->curItem;
         menu->curItem = &menu->items[menu->cursorX + menu->cursorY * 2];
-        func_0204c488(menu->cursor, 0);
+        ClActor_SetSequence(menu->cursor, 0);
         func_ov036_021a074c(menu, menu->curItem->cursorX, menu->curItem->cursorY);
         if (menu->curItem->icon != NULL && menu->keyMode == TRUE) {
-            func_0204c488(menu->curItem->icon, 1);
+            ClActor_SetSequence(menu->curItem->icon, 1);
         }
         if (prev != NULL && prev->icon != NULL) {
-            func_0204c488(prev->icon, 0);
+            ClActor_SetSequence(prev->icon, 0);
         }
         menu->cursorDirty = FALSE;
     }
@@ -787,8 +788,8 @@ static void func_ov036_021a0820(FieldMenu *menu, FieldMenuItem *item, const Fiel
     GFL_BitmapFill(BmpWin_GetBitmap(item->win), 0);
     PrintQueue_PrintColor(menu->printQueue, BmpWin_GetBitmap(item->win), 2, 1, setup->name, font, 0x440);
     if (setup->arc != NULL) {
-        item->chars = func_0204b81c(setup->arc, setup->charFile, FALSE, CLACT_VRAM_SUB, menu->heapId);
-        item->cellAnims = func_0204bde0(setup->arc, setup->cellFile, setup->animFile, menu->heapId);
+        item->chars = ClActSys_LoadChars(setup->arc, setup->charFile, FALSE, CLACT_VRAM_SUB, menu->heapId);
+        item->cellAnims = ClActSys_LoadCellAnims(setup->arc, setup->cellFile, setup->animFile, menu->heapId);
         actorSetup.base.x = setup->iconX;
         actorSetup.base.y = setup->iconY;
         actorSetup.base.sequence = 0;
@@ -800,15 +801,15 @@ static void func_ov036_021a0820(FieldMenu *menu, FieldMenuItem *item, const Fiel
         actorSetup.scaleY = FX32_ONE;
         actorSetup.rotation = 0;
         actorSetup.affineMode = 2;
-        item->icon =
-            func_0204c0a4(menu->actUnit, item->chars, menu->menuPalette, item->cellAnims, &actorSetup, 0, menu->heapId);
+        item->icon = ClActor_CreateEx(menu->actUnit, item->chars, menu->menuPalette, item->cellAnims, &actorSetup, 0,
+                                      menu->heapId);
         func_0204c53c(item->icon, FX32_ONE);
         func_0204c520(item->icon, TRUE);
-        func_0204c488(item->icon, 0);
+        ClActor_SetSequence(item->icon, 0);
         if (item->itemId == FIELD_MENU_ITEM_NONE) {
-            func_0204c124(item->icon, FALSE);
+            ClActor_SetVisible(item->icon, FALSE);
         } else {
-            func_0204c124(item->icon, TRUE);
+            ClActor_SetVisible(item->icon, TRUE);
         }
     } else {
         item->icon = NULL;
@@ -819,9 +820,9 @@ static void func_ov036_021a0938(FieldMenu *menu, FieldMenuItem *item) {
     if (item->active == TRUE) {
         BmpWin_Free(item->win);
         if (item->icon != NULL) {
-            func_0204c108(item->icon);
-            func_0204be64(item->cellAnims);
-            func_0204b98c(item->chars);
+            ClActor_Delete(item->icon);
+            ClActSys_FreeCellAnims(item->cellAnims);
+            ClActSys_FreeChars(item->chars);
         }
     }
 }

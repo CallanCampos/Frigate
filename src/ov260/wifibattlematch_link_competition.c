@@ -1965,7 +1965,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         }
         if (timedOut) {
             WifiBattleMatchNet_CancelMatch(link->net);
-            if (!GFL_NetErrCheck() && func_02042788()) {
+            if (!GFL_NetErrCheck() && GFL_NetIsInitialized()) {
                 func_ov011_02160170();
             }
             *seq = 10;
@@ -2429,7 +2429,7 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         break;
     case 1:
         entry = link->entry;
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             GFL_NetErrAbort();
         }
         valid = func_ov011_0215dda8(&date, &time);
@@ -3060,7 +3060,7 @@ static u32 WifiBattleMatchLink_CompetitionUpdateCancel(WifiBattleMatchLinkCompet
             link->cancelSeq++;
             WifiBattleMatchLinkIcon_SetShown(link->linkIcon, FALSE);
             WifiBattleMatchNet_CancelMatch(link->net);
-            if (!GFL_NetErrCheck() && func_02042788()) {
+            if (!GFL_NetErrCheck() && GFL_NetIsInitialized()) {
                 func_ov011_02160170();
             }
         }

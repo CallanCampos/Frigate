@@ -160,7 +160,7 @@ ZukanNickname *ZukanNickname_Create(HeapID heapId, PartyPkm *pkm, StrBuf *boxMes
                            nickname->tcbManager, 2, nickname->heapId, COLOR_BACKGROUND);
     nickname->frameChars = LoadCursorImageEndOfHeap(BG_TEXT, PALETTE_FRAME, 0, nickname->heapId);
     keyCursor = TRUE;
-    if (func_0203d554()) {
+    if (GCTX_HIDIsUsingTouch()) {
         keyCursor = FALSE;
     }
     nickname->keyCursorFlag = keyCursor;
@@ -206,11 +206,11 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
         case PRINT_STREAM_RUNNING:
             pressed = FALSE;
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 pressed = TRUE;
-            } else if (func_0203da2c()) {
+            } else if (GFL_HIDIsTouchHeld()) {
                 pressed = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             if (pressed) {
                 PrintStream_SkipWait(nickname->stream, 0);
@@ -219,11 +219,11 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
         case PRINT_STREAM_PAUSED:
             pressed = FALSE;
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 pressed = TRUE;
-            } else if (func_0203da48()) {
+            } else if (GFL_HIDIsTouchPressed()) {
                 pressed = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             if (pressed) {
                 PrintStream_Continue(nickname->stream);
@@ -269,11 +269,11 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
         case PRINT_STREAM_RUNNING:
             pressed = FALSE;
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 pressed = TRUE;
-            } else if (func_0203da2c()) {
+            } else if (GFL_HIDIsTouchHeld()) {
                 pressed = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             if (pressed) {
                 PrintStream_SkipWait(nickname->stream, 0);
@@ -282,11 +282,11 @@ BOOL ZukanNickname_Update(ZukanNickname *nickname) {
         case PRINT_STREAM_PAUSED:
             pressed = FALSE;
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 pressed = TRUE;
-            } else if (func_0203da48()) {
+            } else if (GFL_HIDIsTouchPressed()) {
                 pressed = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             if (pressed) {
                 PrintStream_Continue(nickname->stream);
@@ -362,11 +362,11 @@ static void ZukanNickname_UpdateInput(ZukanNickname *nickname) {
         BOOL pressed = FALSE;
 
         if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             pressed = TRUE;
-        } else if (func_0203da2c()) {
+        } else if (GFL_HIDIsTouchHeld()) {
             pressed = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (pressed) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
@@ -378,7 +378,7 @@ static void ZukanNickname_UpdateInput(ZukanNickname *nickname) {
     case INPUT_SHOW: {
         MsgData *msgData;
         BtlvInputYesNoParam param;
-        nickname->keyCursorFlag = func_0203d554() ? FALSE : TRUE;
+        nickname->keyCursorFlag = GCTX_HIDIsUsingTouch() ? FALSE : TRUE;
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_YES_NO, nickname->heapId);
         param.strs[0] = GFL_MsgDataLoadStrbufNew(msgData, YesNo_Text_Yes);
         param.strs[1] = GFL_MsgDataLoadStrbufNew(msgData, YesNo_Text_No);
@@ -401,7 +401,7 @@ static void ZukanNickname_UpdateInput(ZukanNickname *nickname) {
             } else {
                 nickname->answer = ZUKAN_NICKNAME_NO;
             }
-            func_0203d564(nickname->keyCursorFlag == FALSE);
+            GCTX_HIDSetUsingTouch(nickname->keyCursorFlag == FALSE);
         }
         break;
     }

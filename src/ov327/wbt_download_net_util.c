@@ -525,7 +525,7 @@ static BOOL WbtDownloadNet_Init(GameProc *proc, u32 *state, void *param, void *w
     downloadParam.dataSize = WBT_DOWNLOAD_BUFFER_SIZE;
     downloadParam.heapId = HEAPID_WBT_DOWNLOAD_NET;
     wk->download = NetCommonDownload_Create(&downloadParam);
-    func_02042ba8(TRUE, HEAPID_WBT_DOWNLOAD_NET);
+    GFL_NetSetIconScreen(TRUE, HEAPID_WBT_DOWNLOAD_NET);
     wk->message = WbtDownloadMessage_Create(1, 1, 0x13, 0x1e, 4, 0xc, wk->font, HEAPID_WBT_DOWNLOAD_NET);
     WbtDownloadMessage_SetColor(wk->message, PRINT_COLOR(1, 2, 15));
     WbtDownloadMessage_DrawFrame(wk->message, WbtDownloadNetBG_GetFrameChars(&wk->bg, 0), 0xd);

@@ -379,7 +379,7 @@ static void BrBtnSys_Seq_Main(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     p_wk->input = BR_BTN_INPUT_NONE;
     p_wk->isBusy = FALSE;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         for (i = 0; i < p_wk->btn_max; i++) {
             if (BrBtnWork_GetTrg(&p_wk->btn[i], x, y)) {
                 if (BrBtnWork_GetParam(&p_wk->btn[i], BR_BTN_PARAM_VALID)) {
@@ -1242,8 +1242,8 @@ BrBtn *BrBtn_Init(const ClActorSetup *setup, const StrBuf *str, u16 width, u32 d
     MI_CpuFill8(p_wk, 0, sizeof(BrBtn));
     p_wk->width = width;
     p_wk->display = display;
-    p_wk->clwk = func_0204c040(unit, obj->chr, obj->plt, obj->cell, setup, display, heapId);
-    func_0204c318(p_wk->clwk, TRUE);
+    p_wk->clwk = ClActor_Create(unit, obj->chr, obj->plt, obj->cell, setup, display, heapId);
+    ClActor_SetObjMode(p_wk->clwk, TRUE);
     p_wk->bmp = GFL_BitmapCreate(p_wk->width / 8, 2, 0x20, heapId);
     GFL_TextRendererDrawToBitmapEx(p_wk->bmp, 1, 0, str, font, 0x3da0);
 
@@ -1266,7 +1266,7 @@ BrBtn *BrBtn_Init(const ClActorSetup *setup, const StrBuf *str, u16 width, u32 d
 void BrBtn_Exit(BrBtn *p_wk) {
     BmpOam_ActorDel(p_wk->oam);
     GFL_BitmapFree(p_wk->bmp);
-    func_0204c108(p_wk->clwk);
+    ClActor_Delete(p_wk->clwk);
     GFL_HeapFree(p_wk);
 }
 
@@ -1284,7 +1284,7 @@ BOOL BrBtn_GetHit(const BrBtn *cp_wk, u32 x, u32 y) {
     ClActorPos pos;
     s32 left, right, top, bottom;
 
-    func_0204c178(cp_wk->clwk, &pos, cp_wk->display);
+    ClActor_GetSurfacePos(cp_wk->clwk, &pos, cp_wk->display);
     left = pos.x;
     right = pos.x + cp_wk->width;
     top = pos.y - 16;
@@ -1297,14 +1297,14 @@ static void BrBtn_SetPos(BrBtn *p_wk, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(p_wk->clwk, &pos, p_wk->display);
+    ClActor_SetSurfacePos(p_wk->clwk, &pos, p_wk->display);
     BmpOam_ActorSetPos(p_wk->oam, pos.x + 32, pos.y - 8);
 }
 
 static void BrBtn_GetPos(const BrBtn *cp_wk, s16 *p_x, s16 *p_y) {
     ClActorPos pos;
 
-    func_0204c178(cp_wk->clwk, &pos, cp_wk->display);
+    ClActor_GetSurfacePos(cp_wk->clwk, &pos, cp_wk->display);
     if (p_x != NULL) {
         *p_x = pos.x;
     }
@@ -1314,24 +1314,24 @@ static void BrBtn_GetPos(const BrBtn *cp_wk, s16 *p_x, s16 *p_y) {
 }
 
 static void BrBtn_SetSoftPriority(BrBtn *p_wk, u8 priority) {
-    func_0204c438(p_wk->clwk, priority);
+    ClActor_SetPriority(p_wk->clwk, priority);
     BmpOam_ActorSetPriority(p_wk->oam, priority - 1);
 }
 
 static u8 BrBtn_GetSoftPriority(const BrBtn *cp_wk) {
-    return func_0204c45c(cp_wk->clwk);
+    return ClActor_GetPriority(cp_wk->clwk);
 }
 
 static void BrBtn_SetBgPriority(BrBtn *p_wk, u8 priority) {
-    func_0204c468(p_wk->clwk, priority);
+    ClActor_SetBgPriority(p_wk->clwk, priority);
     BmpOam_ActorSetBgPriority(p_wk->oam, priority);
 }
 
 static u8 BrBtn_GetBgPriority(const BrBtn *cp_wk) {
-    return func_0204c47c(cp_wk->clwk);
+    return ClActor_GetBgPriority(cp_wk->clwk);
 }
 
 static void BrBtn_SetPalette(BrBtn *p_wk, u32 plt) {
-    func_0204c378(p_wk->clwk, (u8)plt, 0);
+    ClActor_SetPalette(p_wk->clwk, (u8)plt, 0);
     BmpOam_ActorSetPaletteOffset(p_wk->oam, (u8)(plt + 1));
 }

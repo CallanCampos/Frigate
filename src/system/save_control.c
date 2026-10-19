@@ -52,7 +52,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     ctrl->memoryLink = GFL_HeapAllocate(heapId, sizeof(MemoryLinkSave), TRUE, "save_control.c", 87);
     zero476Bytes(ctrl->memoryLink);
 
-    result = func_0203ae4c(ctrl->sv, HEAPID_USER);
+    result = SaveData_Load(ctrl->sv, HEAPID_USER);
     if ((result == SAVE_LOAD_RESULT_OK || result == SAVE_LOAD_RESULT_OK_PARTIAL) && func_02008df4(ctrl) == TRUE) {
         result = SAVE_LOAD_RESULT_NONE;
     }
@@ -151,7 +151,7 @@ u32 SaveControl_Reload(SaveControl *save) {
     MusicalSave *musical;
     SaveExtraID i;
 
-    result = func_0203ae4c(save->sv, HEAPID_USER);
+    result = SaveData_Load(save->sv, HEAPID_USER);
     switch (result) {
     case SAVE_LOAD_RESULT_OK:
     case SAVE_LOAD_RESULT_OK_PARTIAL:
@@ -183,7 +183,7 @@ u32 SaveControl_Reload(SaveControl *save) {
 void SaveControl_StartSave(SaveControl *save) {
     save->unk3 = func_02008df4(save);
     func_02008e14(save);
-    func_0203aeb4(save->sv);
+    SaveData_SaveStart(save->sv);
 }
 
 u32 SaveControl_ContinueSave(SaveControl *save) {
@@ -201,7 +201,7 @@ u32 SaveControl_ContinueSave(SaveControl *save) {
         save->keysBroken = FALSE;
         return SAVE_RESULT_CONTINUE;
     }
-    result = func_0203aecc(save->sv);
+    result = SaveData_SaveStep(save->sv);
     if (result == SAVE_RESULT_OK && func_02008df4(save) == FALSE) {
         if (save->unk8) {
             DreamRadar_MarkRead(save);
@@ -214,14 +214,14 @@ u32 SaveControl_ContinueSave(SaveControl *save) {
 }
 
 void SaveControl_CancelSave(SaveControl *save) {
-    func_0203af00(save->sv);
+    SaveData_SaveCancel(save->sv);
     if (save->unk3 == TRUE) {
         func_02008e04(save);
     }
 }
 
 u32 SaveControl_GetBytesWritten(SaveControl *save) {
-    return func_0203b080(save->sv);
+    return SaveData_GetBytesWritten(save->sv);
 }
 
 void *SaveControl_GetBlockPtr(SaveControl *save, u32 block) {
@@ -229,7 +229,7 @@ void *SaveControl_GetBlockPtr(SaveControl *save, u32 block) {
 }
 
 void *SaveControl_GetUploadData(SaveControl *save, u32 *size) {
-    return func_0203ad7c(save->sv, size);
+    return SaveData_GetData(save->sv, size);
 }
 
 u32 SaveControl_GetStatus(SaveControl *save) {
@@ -274,15 +274,15 @@ void SaveControl_InitNewGame(SaveControl *save) {
 }
 
 void func_020074ac(SaveControl *save) {
-    func_0203adb4(save->sv, HEAPID_USER);
+    SaveData_Erase(save->sv, HEAPID_USER);
 }
 
 void func_020074b8(SaveControl *save, u32 *a1, u32 *a2) {
-    func_0203adac(save->sv, a1, a2);
+    SaveData_GetChangedSize(save->sv, a1, a2);
 }
 
 BOOL SaveControl_ReadBlockCopy(SaveControl *save, u32 block, u32 copy, void *dest, u32 size) {
-    return func_0203bf48(save->sv, block, copy, dest, size);
+    return SaveData_ReadBlockFromCard(save->sv, block, copy, dest, size);
 }
 
 void *SaveControl_GetMemoryLink(SaveControl *save) {
@@ -310,7 +310,7 @@ u32 SaveControl_OpenExtraBlock(SaveControl *save, u32 block, HeapID heapId) {
     if (TrainerDataSave_IsMarkerSet(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
     }
-    return func_0203b018(save->sv_extra[block], heapId, *func_02008e74(save, block));
+    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *func_02008e74(save, block));
 }
 
 void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *ctrl, u32 extra_id) {
@@ -320,15 +320,15 @@ void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *ctrl, u32 extra_id) {
 }
 
 u32 SaveControl_LoadExtraBlock(SaveControl *save, u32 block, HeapID heapId, void *buffer, u32 size) {
-    save->sv_extra[block] = func_0203ad44(&sv_extra_blk_data[block], heapId, buffer, size, TRUE);
+    save->sv_extra[block] = SaveData_InitWithBuffer(&sv_extra_blk_data[block], heapId, buffer, size, TRUE);
     if (TrainerDataSave_IsMarkerSet(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
     }
-    return func_0203b018(save->sv_extra[block], heapId, *func_02008e74(save, block));
+    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *func_02008e74(save, block));
 }
 
 void SaveControl_InitExtraBlock(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size) {
-    save->sv_extra[block] = func_0203ad44(&sv_extra_blk_data[block], heapId, buffer, size, FALSE);
+    save->sv_extra[block] = SaveData_InitWithBuffer(&sv_extra_blk_data[block], heapId, buffer, size, FALSE);
 }
 
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *ctrl, u32 extra_id) {
@@ -340,12 +340,12 @@ void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *ctrl, u32 extra_id) {
 void SaveControl_StartExtraSave(SaveControl *ctrl, u32 extra_id) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
     TrainerDataSave_SetMarker(ctrl, extra_id);
-    func_0203af08(ctrl->sv, ctrl->sv_extra[extra_id], func_02008e74(ctrl, extra_id));
+    SaveData_DualSaveStart(ctrl->sv, ctrl->sv_extra[extra_id], func_02008e74(ctrl, extra_id));
 }
 
 u32 SaveControl_ContinueExtraSave(SaveControl *ctrl, u32 extra_id) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
-    return func_0203af18(ctrl->sv, ctrl->sv_extra[extra_id]);
+    return SaveData_DualSaveStep(ctrl->sv, ctrl->sv_extra[extra_id]);
 }
 
 void *getAddressOfExtraSaveBlk(SaveControl *ctrl, u32 extra_id, u32 arg2) {
@@ -355,20 +355,20 @@ void *getAddressOfExtraSaveBlk(SaveControl *ctrl, u32 extra_id, u32 arg2) {
 
 void SaveControl_ClearExtraBlock(SaveControl *ctrl, u32 extra_id, HeapID heapId) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
-    func_0203adb4(ctrl->sv_extra[extra_id], heapId);
+    SaveData_Erase(ctrl->sv_extra[extra_id], heapId);
 }
 
 // Erases the gifts outside the save, by clearing the start of both copies' headers
 static void SaveControl_ClearOutsideGifts(void) {
     u32 zero = 0;
 
-    func_0203bee8(SAVE_OUTSIDE_GIFTS_ADDR, &zero, sizeof(zero));
-    func_0203bee8(SAVE_OUTSIDE_GIFTS_BACKUP_ADDR, &zero, sizeof(zero));
+    BackupSystem_WriteWait(SAVE_OUTSIDE_GIFTS_ADDR, &zero, sizeof(zero));
+    BackupSystem_WriteWait(SAVE_OUTSIDE_GIFTS_BACKUP_ADDR, &zero, sizeof(zero));
 }
 
 // Erases the keys outside the save
 static void SaveControl_ClearOutsideKeys(void) {
     u32 zero = 0;
 
-    func_0203bee8(SAVE_OUTSIDE_KEYS_ADDR, &zero, sizeof(zero));
+    BackupSystem_WriteWait(SAVE_OUTSIDE_KEYS_ADDR, &zero, sizeof(zero));
 }

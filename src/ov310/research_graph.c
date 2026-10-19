@@ -764,7 +764,7 @@ void ResearchGraph_Main(ResearchGraph *wk) {
     ResearchGraph_CheckNewResults(wk);
     ResearchGraph_CountUpdateFrames(wk);
     if (wk->active) {
-        func_0204b794();
+        ClActSys_Draw();
         ResearchGraph_UpdateGraphs(wk);
         Arrow_Update(wk->arrow);
         ResearchGraph_UpdateCommonPaletteAnime(wk);
@@ -867,8 +867,8 @@ static void ResearchGraph_SeqTouch(ResearchGraph *wk) {
 
     GCTX_HIDGetHeldKeys();
     keys = GCTX_HIDGetPressedKeys();
-    rect = func_0203da0c(wk->touchRects);
-    commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    rect = GFL_HIDGetTouchPressedRect(wk->touchRects);
+    commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
 
     if (wk->resultsShown && wk->newResults && wk->updateReady) {
         ResearchGraph_EndSeq(wk);
@@ -997,8 +997,8 @@ static void ResearchGraph_SeqCursor(ResearchGraph *wk) {
 
     GCTX_HIDGetHeldKeys();
     keys = GCTX_HIDGetPressedKeys();
-    rect = func_0203da0c(wk->touchRects);
-    commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    rect = GFL_HIDGetTouchPressedRect(wk->touchRects);
+    commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
 
     if (wk->resultsShown && wk->newResults && wk->updateReady) {
         ResearchGraph_EndSeq(wk);
@@ -2134,19 +2134,19 @@ static void ResearchGraph_UpdateArrows(ResearchGraph *wk) {
     ClActorPos pos;
 
     if (wk->updating == TRUE || wk->cursor == CURSOR_PLAYER_ANSWER || wk->cursor == CURSOR_BUTTON) {
-        func_0204c124(left, FALSE);
-        func_0204c124(right, FALSE);
+        ClActor_SetVisible(left, FALSE);
+        ClActor_SetVisible(right, FALSE);
         return;
     }
 
     pos.x = entry->x + entry->leftX;
     pos.y = entry->y + entry->leftY;
-    func_0204c140(left, &pos, 0);
+    ClActor_SetSurfacePos(left, &pos, 0);
     pos.x = entry->x + entry->rightX;
     pos.y = entry->y + entry->rightY;
-    func_0204c140(right, &pos, 0);
-    func_0204c124(left, TRUE);
-    func_0204c124(right, TRUE);
+    ClActor_SetSurfacePos(right, &pos, 0);
+    ClActor_SetVisible(left, TRUE);
+    ClActor_SetVisible(right, TRUE);
     func_0204c520(left, TRUE);
     func_0204c520(right, TRUE);
 }
@@ -2155,16 +2155,16 @@ static void ResearchGraph_SetArrowsVisible(ResearchGraph *wk, BOOL visible) {
     ClActor *left = ResearchGraph_GetActor(wk, ACTOR_LEFT);
     ClActor *right = ResearchGraph_GetActor(wk, ACTOR_RIGHT);
 
-    func_0204c124(left, visible);
-    func_0204c124(right, visible);
+    ClActor_SetVisible(left, visible);
+    ClActor_SetVisible(right, visible);
 }
 
 static void ResearchGraph_UpdateLegend(ResearchGraph *wk) {
     if (!wk->resultsShown || !ResearchGraph_GetQuestionTotal(wk)) {
-        func_0204c124(wk->actors[ACTOR_LEGEND], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_LEGEND], FALSE);
         return;
     }
-    func_0204c124(wk->actors[ACTOR_LEGEND], TRUE);
+    ClActor_SetVisible(wk->actors[ACTOR_LEGEND], TRUE);
 }
 
 // Marks the player's answer in the graph while the cursor is on it
@@ -2176,31 +2176,31 @@ static void ResearchGraph_UpdateMarker(ResearchGraph *wk) {
     ClActorPos pos;
 
     if (!wk->resultsShown) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
     if (wk->cursor != CURSOR_PLAYER_ANSWER) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
 
     answerId = ResearchGraph_GetPlayerAnswer(wk);
     if (!CircleGraph_GetPercentById(ResearchGraph_GetGraph(wk), answerId)) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
     if (answerId == 0) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
 
     CircleGraph_GetLabelScreenPosById(ResearchGraph_GetGraph(wk), answerId, &x, &y);
     pos.x = x;
     pos.y = y;
-    func_0204c140(marker, &pos, entry->surface);
-    func_0204c124(marker, TRUE);
+    ClActor_SetSurfacePos(marker, &pos, entry->surface);
+    ClActor_SetVisible(marker, TRUE);
     func_0204c520(marker, TRUE);
-    func_0204c584(marker, 2);
+    ClActor_SetPlayMode(marker, 2);
 }
 
 static void ResearchGraph_ShowButton(ResearchGraph *wk) {
@@ -2264,7 +2264,7 @@ static void ResearchGraph_VBlank(TCB *tcb, void *data) {
     ResearchGraph *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
 }
 
@@ -2882,9 +2882,9 @@ static void ResearchGraph_DeleteBGFonts(ResearchGraph *wk) {
 static void ResearchGraph_LoadSubObjRes(ResearchGraph *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, heapId);
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
-    u32 palette = func_0204bba0(handle, 16, CLACT_VRAM_SUB, 0, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
+    u32 palette = ClActSys_LoadPltt(handle, 16, CLACT_VRAM_SUB, 0, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
 
     wk->objRes[OBJ_RES_SUB_CHARS] = chars;
     wk->objRes[OBJ_RES_SUB_PALETTE] = palette;
@@ -2893,24 +2893,24 @@ static void ResearchGraph_LoadSubObjRes(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_FreeSubObjRes(ResearchGraph *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_SUB_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_SUB_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_SUB_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_SUB_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
 }
 
 static void ResearchGraph_LoadMainObjRes(ResearchGraph *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, heapId);
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
-    u32 palette = func_0204bbb8(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 3, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
+    u32 palette = ClActSys_LoadPlttRange(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 3, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
     ArcTool *commonHandle;
     u32 buttonPalette;
 
     GFL_ArcToolFree(handle);
 
     commonHandle = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
-    buttonPalette = func_0204bbb8(commonHandle, 31, CLACT_VRAM_MAIN, 0x80, 0, 2, heapId);
+    buttonPalette = ClActSys_LoadPlttRange(commonHandle, 31, CLACT_VRAM_MAIN, 0x80, 0, 2, heapId);
     GFL_ArcToolFree(commonHandle);
 
     wk->objRes[OBJ_RES_MAIN_CHARS] = chars;
@@ -2920,10 +2920,10 @@ static void ResearchGraph_LoadMainObjRes(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_FreeMainObjRes(ResearchGraph *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_MAIN_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_MAIN_PALETTE]);
-    func_0204bcd0(wk->objRes[OBJ_RES_BUTTON_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_MAIN_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_MAIN_PALETTE]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_BUTTON_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
 }
 
 static void ResearchGraph_ClearUnits(ResearchGraph *wk) {
@@ -2938,7 +2938,7 @@ static void ResearchGraph_CreateUnits(ResearchGraph *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        wk->units[i] = func_0204bf1c(sGraphUnitCounts[i], sGraphUnitPriorities[i], wk->heapId);
+        wk->units[i] = ClActUnit_Create(sGraphUnitCounts[i], sGraphUnitPriorities[i], wk->heapId);
     }
 }
 
@@ -2946,7 +2946,7 @@ static void ResearchGraph_DeleteUnits(ResearchGraph *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        func_0204bf98(wk->units[i]);
+        ClActUnit_Delete(wk->units[i]);
     }
 }
 
@@ -2978,8 +2978,8 @@ static void ResearchGraph_CreateActors(ResearchGraph *wk) {
         chars = ResearchGraph_GetObjRes(wk, entry->chars);
         palette = ResearchGraph_GetObjRes(wk, entry->palette);
         cellAnims = ResearchGraph_GetObjRes(wk, entry->cellAnims);
-        wk->actors[i] = func_0204c040(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
-        func_0204c124(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
 }
 
@@ -2987,7 +2987,7 @@ static void ResearchGraph_DeleteActors(ResearchGraph *wk) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
 }
 
@@ -3162,7 +3162,7 @@ static void ResearchGraph_RestorePalettes(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_ShowCommIcon(ResearchGraph *wk) {
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }
 
 static void ResearchGraph_SetVBlank(ResearchGraph *wk) {

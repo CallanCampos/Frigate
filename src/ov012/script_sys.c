@@ -650,13 +650,13 @@ u32 FieldScript_IsVMFeatureSetReduced(u32 featureLevel) {
 }
 
 void FieldScript_ThrowOpcodeAccessError(void) {
-    if (func_02042788()) {
-        func_020428a0();
-        func_02042860(0);
-        func_020429f0();
+    if (GFL_NetIsInitialized()) {
+        GFL_NetCancelEnd();
+        GFL_NetExit(0);
+        GFL_NetIwFree();
         do {
-            func_020428e0();
-        } while (!func_020427a4());
+            GFL_NetMainWhileWaiting();
+        } while (!GFL_NetIsEnded());
     }
     while (TRUE) {
         Machine_ProcessExitRequest();

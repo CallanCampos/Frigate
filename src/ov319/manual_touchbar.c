@@ -212,8 +212,8 @@ void ManualTouchBar_SetMode(ManualTouchBar *bar, u32 mode) {
         case MANUAL_TOUCHBAR_MODE_TITLE:
             break;
         case MANUAL_TOUCHBAR_MODE_EXPLAIN:
-            func_0204c124(bar->arrows[0], FALSE);
-            func_0204c124(bar->arrows[1], FALSE);
+            ClActor_SetVisible(bar->arrows[0], FALSE);
+            ClActor_SetVisible(bar->arrows[1], FALSE);
             break;
         case MANUAL_TOUCHBAR_MODE_NONE:
             break;
@@ -244,19 +244,19 @@ void ManualTouchBar_SetPage(ManualTouchBar *bar, u8 pageCount, u8 page) {
     bar->page = page;
     if (bar->mode == MANUAL_TOUCHBAR_MODE_EXPLAIN) {
         if (bar->pageCount <= 1) {
-            func_0204c124(bar->arrows[0], FALSE);
-            func_0204c124(bar->arrows[1], FALSE);
+            ClActor_SetVisible(bar->arrows[0], FALSE);
+            ClActor_SetVisible(bar->arrows[1], FALSE);
             ManualTouchBar_ClearText(bar);
         } else {
             if (bar->page == 0) {
-                func_0204c124(bar->arrows[0], FALSE);
-                func_0204c124(bar->arrows[1], TRUE);
+                ClActor_SetVisible(bar->arrows[0], FALSE);
+                ClActor_SetVisible(bar->arrows[1], TRUE);
             } else if (bar->page == pageCount - 1) {
-                func_0204c124(bar->arrows[0], TRUE);
-                func_0204c124(bar->arrows[1], FALSE);
+                ClActor_SetVisible(bar->arrows[0], TRUE);
+                ClActor_SetVisible(bar->arrows[1], FALSE);
             } else {
-                func_0204c124(bar->arrows[0], TRUE);
-                func_0204c124(bar->arrows[1], TRUE);
+                ClActor_SetVisible(bar->arrows[0], TRUE);
+                ClActor_SetVisible(bar->arrows[1], TRUE);
             }
             ManualTouchBar_PrintPage(bar);
         }
@@ -397,16 +397,17 @@ static void ManualTouchBar_CreateArrows(ManualTouchBar *bar) {
     u8 i;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), bar->common->heapId);
 
-    bar->palette =
-        func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 4 * 0x20, 0, 3, bar->common->heapId);
-    bar->chars = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, bar->common->heapId);
-    bar->cellAnims = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0),
-                                   bar->common->heapId);
+    bar->palette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 4 * 0x20, 0, 3,
+                                          bar->common->heapId);
+    bar->chars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, bar->common->heapId);
+    bar->cellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(0),
+                                            AppMenuCommon_GetTouchBarAnimFile(0), bar->common->heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ARROW_COUNT; i++) {
-        bar->arrows[i] = func_0204c040(ManualGraphic_GetClActUnit(bar->common->graphic), bar->chars, bar->palette,
-                                       bar->cellAnims, &sManualTouchBarArrows[i].setup, 1, bar->common->heapId);
-        func_0204c124(bar->arrows[i], FALSE);
+        bar->arrows[i] = ClActor_Create(ManualGraphic_GetClActUnit(bar->common->graphic), bar->chars, bar->palette,
+                                        bar->cellAnims, &sManualTouchBarArrows[i].setup, 1, bar->common->heapId);
+        ClActor_SetVisible(bar->arrows[i], FALSE);
         func_0204c520(bar->arrows[i], TRUE);
     }
 }
@@ -415,11 +416,11 @@ static void ManualTouchBar_FreeArrows(ManualTouchBar *bar) {
     u8 i;
 
     for (i = 0; i < ARROW_COUNT; i++) {
-        func_0204c108(bar->arrows[i]);
+        ClActor_Delete(bar->arrows[i]);
     }
-    func_0204be64(bar->cellAnims);
-    func_0204b98c(bar->chars);
-    func_0204bcd0(bar->palette);
+    ClActSys_FreeCellAnims(bar->cellAnims);
+    ClActSys_FreeChars(bar->chars);
+    ClActSys_FreePltt(bar->palette);
 }
 
 // Reads the arrows: a press by key or touch plays the arrow's animation, and the arrow is decided once it ends
@@ -430,29 +431,29 @@ static void ManualTouchBar_UpdateArrows(ManualTouchBar *bar) {
         u8 i;
 
         for (i = 0; i < ARROW_COUNT; i++) {
-            if (func_0204c138(bar->arrows[i])) {
+            if (ClActor_IsVisible(bar->arrows[i])) {
                 const ManualTouchBarArrow *arrow = &sManualTouchBarArrows[i];
                 u32 x;
                 u32 y;
 
                 if (GCTX_HIDGetTypedKeys() & arrow->key) {
                     bar->arrow = i;
-                    func_0203d564(FALSE);
+                    GCTX_HIDSetUsingTouch(FALSE);
                     pressed = TRUE;
                     break;
                 }
-                if (func_0203dac8(&x, &y)) {
+                if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
                     if (arrow->left <= x && x <= arrow->right && arrow->top <= y && y <= arrow->bottom) {
                         bar->arrow = i;
                         pressed = TRUE;
-                        func_0203d564(TRUE);
+                        GCTX_HIDSetUsingTouch(TRUE);
                         break;
                     }
                 }
             }
         }
         if (pressed) {
-            func_0204c488(bar->arrows[bar->arrow], sManualTouchBarArrows[bar->arrow].pressedAnim);
+            ClActor_SetSequence(bar->arrows[bar->arrow], sManualTouchBarArrows[bar->arrow].pressedAnim);
             if (sManualTouchBarArrows[bar->arrow].se != 0) {
                 GFL_SndSEPlay(sManualTouchBarArrows[bar->arrow].se);
             }
@@ -464,8 +465,8 @@ static void ManualTouchBar_UpdateArrows(ManualTouchBar *bar) {
         bar->arrowState = ARROW_STATE_ANIM;
         break;
     case ARROW_STATE_ANIM:
-        if (!func_0204c560(bar->arrows[bar->arrow])) {
-            func_0204c488(bar->arrows[bar->arrow], sManualTouchBarArrows[bar->arrow].setup.sequence);
+        if (!ClActor_IsAnimActive(bar->arrows[bar->arrow])) {
+            ClActor_SetSequence(bar->arrows[bar->arrow], sManualTouchBarArrows[bar->arrow].setup.sequence);
             bar->arrowState = ARROW_STATE_DECIDED;
         }
         break;

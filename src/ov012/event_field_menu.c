@@ -54,7 +54,7 @@ GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
         break;
     }
     work->appCall.screenId = work->screenId;
-    func_0203d564(TRUE);
+    GCTX_HIDSetUsingTouch(TRUE);
     return event;
 }
 

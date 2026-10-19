@@ -216,8 +216,8 @@ static void func_ov036_021b4904(FieldEffectTask *task, void *work) {
         alpha = fmTask->alpha;
         blact = fmTask->params.footmark->blact;
         scene = BlActSys_GetScene(blact);
-        sceneActor = func_0204f750(blact, fmTask->actor);
-        func_0204ea78(scene, sceneActor, &alpha);
+        sceneActor = BlActSys_GetSceneActor(blact, fmTask->actor);
+        BlActScene_SetActorAlpha(scene, sceneActor, &alpha);
         break;
     }
 }

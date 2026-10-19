@@ -1050,7 +1050,7 @@ static BOOL PkwdBriefing_Main(GameProc *proc, u32 *state, void *param, void *wor
         PkwdBriefingText_CountLines(&wk->text, wk->sex);
         PkwdBriefingText_PrintLine(&wk->text, 0, wk->sex);
         InfoWin_Init(6, 15, wk->param->gameData, wk->heapId);
-        func_02042ba8(FALSE, wk->heapId);
+        GFL_NetSetIconScreen(FALSE, wk->heapId);
         GFL_FadeSet(3, 16, 0, 2);
         wk->state = STATE_WAIT_FADE_IN;
         wk->lastVBlank = OS_GetVBlankCount();
@@ -1134,7 +1134,7 @@ static BOOL PkwdBriefing_CreditsMain(GameProc *proc, u32 *state, void *param, vo
         PkwdBriefing_LoadCredits(wk->param, &wk->text, wk->param->movie, wk->heapId);
         PkwdBriefingText_CreateCreditsWindows(&wk->text, wk->heapId, wk->layout);
         InfoWin_Init(6, 15, wk->param->gameData, wk->heapId);
-        func_02042ba8(FALSE, wk->heapId);
+        GFL_NetSetIconScreen(FALSE, wk->heapId);
         wk->state = STATE_WAIT_PRINT;
         wk->lastVBlank = OS_GetVBlankCount();
         wk->text.scroll = -192;
@@ -1256,7 +1256,7 @@ static void PkwdBriefing_VBlank(TCB *tcb, void *data) {
     PrintQueue_Main(wk->text.printQueue);
     PrintWindow_Flush(&wk->text.printWindows[0], wk->text.printQueue);
     PrintWindow_Flush(&wk->text.printWindows[1], wk->text.printQueue);
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -1268,7 +1268,7 @@ static void PkwdBriefing_CreditsVBlank(TCB *tcb, void *data) {
     }
     G2_SetBG1Offset(0, wk->text.scroll);
     G2_SetBG2Offset(0, wk->text.scroll + 16);
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -1698,18 +1698,18 @@ static void PkwdBriefingSet_Free(PkwdBriefingSet *set) {
 
 static void PkwdBriefingClAct_Init(PkwdBriefingClAct *clact, HeapID heapId) {
     ClActSys_Create(&data_02093f08, &sPkwdBriefingVRAMConfig, heapId);
-    clact->unit = func_0204bf1c(64, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(64, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);
 }
 
 static void PkwdBriefingClAct_Update(PkwdBriefingClAct *clact, HeapID heapId) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void PkwdBriefingClAct_Free(PkwdBriefingClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
 }
 
 // Shows the lines of the briefing one after the other. A line slides in as it fades in and waits for the A Button
@@ -1859,10 +1859,10 @@ static void PkwdBriefingAudience_Init(PkwdBriefingAudience *audience, HeapID hea
     s32 i;
 
     audience->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, heapId);
-    audience->unit = func_0204bf1c(SEAT_COUNT, 1, heapId);
-    audience->chars = func_0204b81c(audience->arc, FILE_AUDIENCE_CHARS, FALSE, 1, heapId);
-    audience->cellAnims = func_0204bde0(audience->arc, FILE_AUDIENCE_CELLS, FILE_AUDIENCE_ANIMS, heapId);
-    audience->palette = func_0204bbb8(audience->arc, FILE_AUDIENCE_PALETTE, 1, 0, 0, 4, heapId);
+    audience->unit = ClActUnit_Create(SEAT_COUNT, 1, heapId);
+    audience->chars = ClActSys_LoadChars(audience->arc, FILE_AUDIENCE_CHARS, FALSE, 1, heapId);
+    audience->cellAnims = ClActSys_LoadCellAnims(audience->arc, FILE_AUDIENCE_CELLS, FILE_AUDIENCE_ANIMS, heapId);
+    audience->palette = ClActSys_LoadPlttRange(audience->arc, FILE_AUDIENCE_PALETTE, 1, 0, 0, 4, heapId);
     for (i = 0; i < SEAT_COUNT; i++) {
         ClActorSetup base = sPkwdBriefingAudienceSetup;
         ClActorSetup setup = base;
@@ -1870,11 +1870,11 @@ static void PkwdBriefingAudience_Init(PkwdBriefingAudience *audience, HeapID hea
         setup.x = sPkwdBriefingSeats[i].x;
         setup.y = sPkwdBriefingSeats[i].y;
         setup.priority = 128 - i;
-        audience->actors[i] = func_0204c040(audience->unit, audience->chars, audience->palette, audience->cellAnims,
-                                            &setup, CLACT_SURFACE_SUB, heapId);
+        audience->actors[i] = ClActor_Create(audience->unit, audience->chars, audience->palette, audience->cellAnims,
+                                             &setup, CLACT_SURFACE_SUB, heapId);
         func_0204c520(audience->actors[i], FALSE);
-        func_0204c124(audience->actors[i], TRUE);
-        func_0204c378(audience->actors[i], sPkwdBriefingSeats[i].palette, 1);
+        ClActor_SetVisible(audience->actors[i], TRUE);
+        ClActor_SetPalette(audience->actors[i], sPkwdBriefingSeats[i].palette, 1);
     }
     PkwdBriefingAudience_LoadPalettes(audience, heapId);
 }
@@ -1886,14 +1886,14 @@ static void PkwdBriefingAudience_Free(PkwdBriefingAudience *audience) {
     PkwdBriefingAudience_FreePalettes(audience);
     for (i = 0; i < SEAT_COUNT; i++) {
         if (audience->actors[i] != NULL) {
-            func_0204c108(audience->actors[i]);
+            ClActor_Delete(audience->actors[i]);
             audience->actors[i] = NULL;
         }
     }
-    func_0204be64(audience->cellAnims);
-    func_0204bcd0(audience->palette);
+    ClActSys_FreeCellAnims(audience->cellAnims);
+    ClActSys_FreePltt(audience->palette);
     if (audience->unit != NULL) {
-        func_0204bf98(audience->unit);
+        ClActUnit_Delete(audience->unit);
     }
     GFL_ArcToolFree(audience->arc);
 }
@@ -1965,12 +1965,12 @@ static void PkwdBriefing_InitAudience(PkwdBriefingWork *wk, BOOL pickSeats, Heap
 }
 
 static void PkwdBriefingAudience_SetVisible(PkwdBriefingAudience *audience, s32 seat, BOOL visible) {
-    func_0204c124(audience->actors[seat], visible);
+    ClActor_SetVisible(audience->actors[seat], visible);
 }
 
 static void PkwdBriefingAudience_SetSequence(PkwdBriefingAudience *audience, s32 seat, u32 sequence) {
-    func_0204c488(audience->actors[seat], sequence);
-    func_0204c378(audience->actors[seat], sPkwdBriefingSeats[seat].palette, 1);
+    ClActor_SetSequence(audience->actors[seat], sequence);
+    ClActor_SetPalette(audience->actors[seat], sPkwdBriefingSeats[seat].palette, 1);
 }
 
 static void PkwdBriefingAudience_SetAllSequences(PkwdBriefingAudience *audience, u32 sequence, u32 seats) {

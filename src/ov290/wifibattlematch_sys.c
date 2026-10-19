@@ -634,22 +634,22 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         default:
         case 0:
             fileId = 0xf;
-            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 1:
-            BtlSetup_SetNet1v1Double(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Double(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 2:
             fileId = 0x11;
-            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 3:
             fileId = 0x12;
-            BtlSetup_SetNetRotation(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetRotation(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 4:
             fileId = 0x13;
-            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         }
         regulation = PokeRegulation_LoadNew(fileId, heapId);
@@ -658,38 +658,38 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         regulation = func_0200b530(TournamentBlock_GetEntry(tournament, 0));
         switch (Regulation_GetParam(regulation, 0x15)) {
         case 0:
-            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 1:
-            BtlSetup_SetNet1v1Double(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Double(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 2:
-            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 3:
-            BtlSetup_SetNetRotation(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetRotation(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         default:
-            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         }
     } else if (sys->mode == 1) {
         regulation = func_0200b530(TournamentBlock_GetEntry(tournament, 1));
         switch (Regulation_GetParam(regulation, 0x15)) {
         case 0:
-            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 1:
-            BtlSetup_SetNet1v1Double(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Double(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 2:
-            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetTriple(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         case 3:
-            BtlSetup_SetNetRotation(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNetRotation(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         default:
-            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
+            BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
         }
     } else {

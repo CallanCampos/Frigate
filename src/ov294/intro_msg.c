@@ -161,13 +161,13 @@ BOOL IntroMsg_UpdatePrint(IntroMsg *msg) {
             return TRUE;
         case PRINT_STREAM_PAUSED:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
-                func_0203da48()) {
+                GFL_HIDIsTouchPressed()) {
                 PrintStream_Continue(msg->printStream);
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             break;
         case PRINT_STREAM_RUNNING:
-            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
                 PrintStream_SkipWait(msg->printStream, 0);
             }
             break;

@@ -52,7 +52,7 @@ struct CtvtGameCamSeq {
 
 // The cell actors: the camera's frame, the shutter's countdown and the four characters of the roulette
 typedef struct {
-    // As func_0204bc48, func_0204b81c and func_0204bde0 load them
+    // As ClActSys_LoadPlttEx, ClActSys_LoadChars and ClActSys_LoadCellAnims load them
     u32 resources[3];
     ClActor *actors[8];
 } CtvtGameCamActors;
@@ -241,8 +241,8 @@ CtvtGameCamTask *CtvtGameCam_StartTask(CtvtGameCam *cam, HeapID heapId) {
         CtvtGameCamRoulette_Init(&task->roulette, task->heapId);
     }
     task->vblankTask = GFL_VBlankTCBAdd(CtvtGameCam_VBlank, task, 1);
-    if (func_02042788()) {
-        func_02042ba8(TRUE, heapId);
+    if (GFL_NetIsInitialized()) {
+        GFL_NetSetIconScreen(TRUE, heapId);
     }
     return task;
 }
@@ -319,7 +319,7 @@ void CtvtGameCam_Delete(CtvtGameCam *cam) {
 
     if (cam->cameraEnabled == TRUE) {
         for (i = 0; i < 3; i++) {
-            func_02042ed0(cam->pictures[i]);
+            GFL_NetFreeAligned32(cam->pictures[i]);
         }
     } else {
         for (i = 0; i < 3; i++) {
@@ -355,9 +355,9 @@ static void CtvtGameCamActors_Init(CtvtGameCamActors *clact, ClActUnit *unit, He
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME_CAM, heapId);
     ClActorSetup setup;
 
-    clact->resources[0] = func_0204bc48(arc, 1, 2, 0, heapId);
-    clact->resources[1] = func_0204b81c(arc, 4, FALSE, 2, heapId);
-    clact->resources[2] = func_0204bde0(arc, 7, 8, heapId);
+    clact->resources[0] = ClActSys_LoadPlttEx(arc, 1, 2, 0, heapId);
+    clact->resources[1] = ClActSys_LoadChars(arc, 4, FALSE, 2, heapId);
+    clact->resources[2] = ClActSys_LoadCellAnims(arc, 7, 8, heapId);
     GFL_ArcToolFree(arc);
 
     MI_CpuFill8(&setup, 0, sizeof(setup));
@@ -366,24 +366,24 @@ static void CtvtGameCamActors_Init(CtvtGameCamActors *clact, ClActUnit *unit, He
     setup.y = 96;
     setup.bgPriority = 0;
     clact->actors[1] =
-        func_0204c040(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 1, heapId);
-    func_0204c124(clact->actors[1], FALSE);
+        ClActor_Create(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 1, heapId);
+    ClActor_SetVisible(clact->actors[1], FALSE);
 
     setup.sequence = 1;
     setup.x = 128;
     setup.y = 52;
     setup.bgPriority = 1;
     clact->actors[0] =
-        func_0204c040(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 0, heapId);
-    func_0204c124(clact->actors[0], TRUE);
+        ClActor_Create(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 0, heapId);
+    ClActor_SetVisible(clact->actors[0], TRUE);
 
     setup.sequence = 2;
     setup.x = 128;
     setup.y = 96;
     setup.bgPriority = 0;
     clact->actors[2] =
-        func_0204c040(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 0, heapId);
-    func_0204c124(clact->actors[2], FALSE);
+        ClActor_Create(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 0, heapId);
+    ClActor_SetVisible(clact->actors[2], FALSE);
     func_0204c520(clact->actors[2], TRUE);
 
     setup.sequence = 3;
@@ -402,8 +402,8 @@ static void CtvtGameCamActors_Init(CtvtGameCamActors *clact, ClActUnit *unit, He
             setup.x = positions[i - 3][0];
             setup.y = positions[i - 3][1];
             clact->actors[i] =
-                func_0204c040(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 1, heapId);
-            func_0204c124(clact->actors[i], FALSE);
+                ClActor_Create(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 1, heapId);
+            ClActor_SetVisible(clact->actors[i], FALSE);
         }
     }
 }
@@ -413,12 +413,12 @@ static void CtvtGameCamActors_Free(CtvtGameCamActors *clact) {
 
     for (i = 0; i < 8; i++) {
         if (clact->actors[i] != NULL) {
-            func_0204c108(clact->actors[i]);
+            ClActor_Delete(clact->actors[i]);
         }
     }
-    func_0204bcd0(clact->resources[0]);
-    func_0204b98c(clact->resources[1]);
-    func_0204be64(clact->resources[2]);
+    ClActSys_FreePltt(clact->resources[0]);
+    ClActSys_FreeChars(clact->resources[1]);
+    ClActSys_FreeCellAnims(clact->resources[2]);
 }
 
 static ClActor *CtvtGameCamActors_GetActor(CtvtGameCamActors *clact, u8 index) {
@@ -537,7 +537,7 @@ static void CtvtGameCamCamera_Init(CtvtGameCamCamera *camera, CameraSystem *came
 }
 
 static void CtvtGameCamCamera_Free(CtvtGameCamCamera *camera) {
-    func_02042ed0(camera->frame);
+    GFL_NetFreeAligned32(camera->frame);
 }
 
 // Crops the middle 128 by 128 of the frame and halves it with the DSP into a 64 by 64 picture. The crop's constants
@@ -564,7 +564,7 @@ static void CtvtGameCamCamera_TakePicture(CtvtGameCamCamera *camera, void *dest,
     DSP_Scaling(crop, dest, width, height, scale, scale, 2);
     DSP_UnloadGraphics();
     CameraSystem_InitDsp(camera->cameraSystem);
-    func_02042ed0(crop);
+    GFL_NetFreeAligned32(crop);
 }
 
 static void CtvtGameCamCamera_Start(CtvtGameCamCamera *camera) {
@@ -611,10 +611,10 @@ static void CtvtGameCamRoulette_Update(CtvtGameCamRoulette *roulette, CtvtGameCa
             roulette->wait--;
         }
         if (roulette->wait == 0) {
-            func_0204c378(CtvtGameCamActors_GetActor(clact, roulette->cursor + 3), 0, TRUE);
+            ClActor_SetPalette(CtvtGameCamActors_GetActor(clact, roulette->cursor + 3), 0, TRUE);
             roulette->cursor++;
             roulette->cursor %= 4;
-            func_0204c378(CtvtGameCamActors_GetActor(clact, roulette->cursor + 3), 1, TRUE);
+            ClActor_SetPalette(CtvtGameCamActors_GetActor(clact, roulette->cursor + 3), 1, TRUE);
             roulette->moving = FALSE;
         }
     }
@@ -651,7 +651,7 @@ static void CtvtGameCamExchange_Init(CtvtGameCamExchange *exchange, BOOL cameraE
     for (i = 0; i < 3; i++) {
         exchange->received[i] = 0;
     }
-    exchange->connections = func_02042a78();
+    exchange->connections = GFL_NetGetNegotiatedCount();
     exchange->timer = 0;
     exchange->waiting = TRUE;
     exchange->started = FALSE;
@@ -662,19 +662,19 @@ static void CtvtGameCamExchange_Start(CtvtGameCamExchange *exchange, CtvtGameMem
     u8 slot = 0;
     u8 selfNetId;
 
-    func_02043868(exchange->heapId, FALSE);
-    selfNetId = func_02042a6c(func_02040440());
+    NetLdata_Init(exchange->heapId, FALSE);
+    selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     for (netId = 0; netId < 4; netId++) {
         if (selfNetId == netId) {
             continue;
         }
-        if (func_02042a80(netId) == FALSE) {
+        if (GFL_NetIsNegotiated(netId) == FALSE) {
             slot++;
         } else {
             CtvtGameMember *member = &members[slot];
 
             if (member->hasCamera == TRUE && !canPlayerExchangePhotos()) {
-                func_020439a4(0x2000, netId, exchange->heapId, member->pictures[0]);
+                NetLdata_SetRecvBuffer(0x2000, netId, exchange->heapId, member->pictures[0]);
                 exchange->receiving |= (u8)(1 << netId);
             }
             if (member->canExchangePhotos == FALSE) {
@@ -689,7 +689,7 @@ static void CtvtGameCamExchange_Free(CtvtGameCamExchange *exchange, BOOL cameraE
     if (cameraEnabled == TRUE) {
         GFL_HeapFree(exchange->buffer);
     }
-    func_020438dc();
+    NetLdata_Exit();
 }
 
 static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMember *members) {
@@ -704,19 +704,19 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
         u8 netId;
 
         finished = 0;
-        selfNetId = func_02042a6c(func_02040440());
+        selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
         if (!canPlayerExchangePhotos()) {
             for (netId = 0; netId < 4; netId++) {
                 if (exchange->receiving & (1 << netId)) {
                     if (exchange->picture != exchange->received[slot]) {
                         finished |= (u8)(1 << netId);
-                    } else if (func_02043b24(netId) == TRUE) {
-                        func_02043a1c(netId);
+                    } else if (NetLdata_IsRecvDone(netId) == TRUE) {
+                        NetLdata_FreeRecvBuffer(netId);
                         exchange->received[slot]++;
                         if (exchange->received[slot] < 3) {
-                            func_020439a4(0x2000, netId, exchange->heapId,
-                                          members[slot].pictures[exchange->received[slot]]);
+                            NetLdata_SetRecvBuffer(0x2000, netId, exchange->heapId,
+                                                   members[slot].pictures[exchange->received[slot]]);
                         }
                     }
                 }
@@ -727,20 +727,20 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
         }
         if (finished == exchange->receiving) {
             exchange->state = 1;
-            func_02043b10();
+            NetLdata_IsSendDone();
             return;
         }
         break;
     }
     case 1:
         if (exchange->waiting == FALSE) {
-            func_02040624(func_02040440(), (u8)(exchange->picture + 32), 32);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), (u8)(exchange->picture + 32), 32);
             exchange->state = 2;
             return;
         }
         break;
     case 2:
-        if (func_02040664(func_02040440(), (u8)(exchange->picture + 32), 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), (u8)(exchange->picture + 32), 32) == TRUE) {
             exchange->state = 0;
             exchange->waiting = TRUE;
             exchange->picture++;
@@ -756,12 +756,12 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
 }
 
 static void CtvtGameCamExchange_Send(CtvtGameCamExchange *exchange) {
-    func_0204393c(exchange->buffer, 0x2000, exchange->noExchange, FALSE);
+    NetLdata_StartSend(exchange->buffer, 0x2000, exchange->noExchange, FALSE);
     exchange->waiting = FALSE;
 }
 
 static BOOL CtvtGameCamExchange_CanSend(CtvtGameCamExchange *exchange) {
-    if (!func_02043b10()) {
+    if (!NetLdata_IsSendDone()) {
         return FALSE;
     }
     if (exchange->timer < 80) {
@@ -785,7 +785,7 @@ static void CtvtGameCamExchange_CopyBuffer(CtvtGameCamExchange *exchange, void *
 
 // Whether someone left the call
 static BOOL CtvtGameCamExchange_IsSomeoneGone(CtvtGameCamExchange *exchange) {
-    if (exchange->connections != func_02042a78()) {
+    if (exchange->connections != GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
@@ -829,14 +829,14 @@ static void CtvtGameCam_SeqStart(CtvtGameCamSeq *seq, int *state, CtvtGameCamTas
     switch (*state) {
     case 0: {
         u8 netId;
-        u8 selfNetId = func_02042a6c(func_02040440());
+        u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
         BOOL ready = TRUE;
 
-        if (!func_02043b10()) {
+        if (!NetLdata_IsSendDone()) {
             ready = FALSE;
         }
         for (netId = 0; netId < 4; netId++) {
-            if (selfNetId != netId && func_02042a80(netId) && !func_02043b24(netId)) {
+            if (selfNetId != netId && GFL_NetIsNegotiated(netId) && !NetLdata_IsRecvDone(netId)) {
                 ready = FALSE;
                 break;
             }
@@ -847,16 +847,16 @@ static void CtvtGameCam_SeqStart(CtvtGameCamSeq *seq, int *state, CtvtGameCamTas
         break;
     }
     case 1:
-        func_02040624(func_02040440(), 30, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 30, 32);
         *state = 2;
         break;
     case 2:
-        if (func_02040664(func_02040440(), 30, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 30, 32) == TRUE) {
             *state = 3;
         }
         break;
     case 3:
-        func_020438dc();
+        NetLdata_Exit();
         CtvtGameCamExchange_Start(&task->exchange, task->cam->members, task->cam->cameraEnabled);
         *state = 4;
         break;
@@ -882,11 +882,11 @@ static void CtvtGameCam_SeqWaitExchange(CtvtGameCamSeq *seq, int *state, CtvtGam
     }
     switch (*state) {
     case 0:
-        func_02040624(func_02040440(), 31, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 31, 32);
         *state = 1;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 31, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 31, 32) == TRUE) {
             *state = 2;
         }
         break;
@@ -934,7 +934,7 @@ static void CtvtGameCam_SeqWaitMessage(CtvtGameCamSeq *seq, int *state, CtvtGame
 }
 
 static void CtvtGameCam_SeqCameraIntro(CtvtGameCamSeq *seq, int *state, CtvtGameCamTask *task) {
-    func_0204c124(CtvtGameCamActors_GetActor(&task->clact, 1), TRUE);
+    ClActor_SetVisible(CtvtGameCamActors_GetActor(&task->clact, 1), TRUE);
     CtvtGameCamMsg_Print(&task->msg, &task->msgWin, CtvtGameCam_SeqPictureNumber, 49, task->heapId);
     CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqWaitMessage);
 }
@@ -955,8 +955,8 @@ static void CtvtGameCam_SeqPicturePrompt(CtvtGameCamSeq *seq, int *state, CtvtGa
 static void CtvtGameCam_SeqTakePicture(CtvtGameCamSeq *seq, int *state, CtvtGameCamTask *task) {
     switch (*state) {
     case 0:
-        func_0204c124(CtvtGameCamActors_GetActor(&task->clact, 2), TRUE);
-        func_0204c56c(CtvtGameCamActors_GetActor(&task->clact, 2));
+        ClActor_SetVisible(CtvtGameCamActors_GetActor(&task->clact, 2), TRUE);
+        ClActor_RestartAnim(CtvtGameCamActors_GetActor(&task->clact, 2));
         *state = 1;
         GFL_SndSEPlay(1355);
         break;
@@ -968,12 +968,12 @@ static void CtvtGameCam_SeqTakePicture(CtvtGameCamSeq *seq, int *state, CtvtGame
         if (timer % 60 == 0 && timer <= 180) {
             GFL_SndSEPlay(1355);
         }
-        if (func_0204c560(CtvtGameCamActors_GetActor(&task->clact, 2))) {
+        if (ClActor_IsAnimActive(CtvtGameCamActors_GetActor(&task->clact, 2))) {
             break;
         }
         task->camera.timer = 0;
         CtvtGameCamCamera_Stop(&task->camera);
-        func_0204c124(CtvtGameCamActors_GetActor(&task->clact, 2), FALSE);
+        ClActor_SetVisible(CtvtGameCamActors_GetActor(&task->clact, 2), FALSE);
         GFL_WipeSet(4, 0, 0, 0x7fff, 6, 2, task->heapId);
         CtvtGameCamCamera_PlayShutterSound(&task->camera);
         *state = 2;
@@ -1037,7 +1037,7 @@ static void CtvtGameCam_SeqRouletteIntro(CtvtGameCamSeq *seq, int *state, CtvtGa
     u8 i;
 
     for (i = 3; i < 7; i++) {
-        func_0204c124(CtvtGameCamActors_GetActor(&task->clact, i), TRUE);
+        ClActor_SetVisible(CtvtGameCamActors_GetActor(&task->clact, i), TRUE);
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME_CAM, task->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 4, 0, 0, task->heapId);
@@ -1127,7 +1127,7 @@ static void CtvtGameCam_SeqRoulette(CtvtGameCamSeq *seq, int *state, CtvtGameCam
             u8 actorIndex = task->roulette.cursor + 3;
 
             task->roulette.blink ^= 1;
-            func_0204c378(CtvtGameCamActors_GetActor(&task->clact, actorIndex), task->roulette.blink, TRUE);
+            ClActor_SetPalette(CtvtGameCamActors_GetActor(&task->clact, actorIndex), task->roulette.blink, TRUE);
         }
         task->roulette.timer++;
         if (task->roulette.timer > 80) {
@@ -1170,5 +1170,5 @@ static void CtvtGameCam_VBlank(TCB *tcb, void *work) {
         GXS_LoadBG3Scr(task->camera.frame, 0, 256 * 192 * 2);
         task->camera.frameReady = FALSE;
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
 }

@@ -81,10 +81,10 @@ PMSIVWordWin *PMSIVWordWin_Create(PMSInputView *vwk, const PMSInputWork *mwk, co
 
 void PMSIVWordWin_Delete(PMSIVWordWin *wk) {
     if (wk->cursor) {
-        func_0204c108(wk->cursor);
+        ClActor_Delete(wk->cursor);
     }
     if (wk->scrollBar) {
-        func_0204c108(wk->scrollBar);
+        ClActor_Delete(wk->scrollBar);
     }
     if (wk->str) {
         GFL_StrBufFree(wk->str);
@@ -112,17 +112,17 @@ static void PMSIVWordWin_SetupActors(PMSIVWordWin *wk) {
 
     PMSIView_GetObjRes(wk->vwk, &res, 0, 0);
     wk->cursor = PMSIView_AddActor(wk->vwk, &res, 62, 24, 4, NNS_G2D_VRAM_TYPE_2DMAIN);
-    func_0204c488(wk->cursor, CURSOR_ANIM);
-    func_0204c124(wk->cursor, FALSE);
+    ClActor_SetSequence(wk->cursor, CURSOR_ANIM);
+    ClActor_SetVisible(wk->cursor, FALSE);
     wk->scrollBar = PMSIView_AddActor(wk->vwk, &res, 244, SCROLL_BAR_TOP, 5, NNS_G2D_VRAM_TYPE_2DMAIN);
-    func_0204c488(wk->scrollBar, 18);
-    func_0204c124(wk->scrollBar, FALSE);
+    ClActor_SetSequence(wk->scrollBar, 18);
+    ClActor_SetVisible(wk->scrollBar, FALSE);
     for (i = 0; i < WORDWIN_NUMBER_COUNT; i++) {
         PMSIView_GetObjRes2(wk->vwk, &numberRes, 0);
         wk->numberAct[i] = PMSIView_AddActor(wk->vwk, &numberRes, 0, 0, 0, NNS_G2D_VRAM_TYPE_2DMAIN);
-        func_0204c488(wk->numberAct[i], i);
-        func_0204c124(wk->numberAct[i], FALSE);
-        func_0204c468(wk->numberAct[i], 1);
+        ClActor_SetSequence(wk->numberAct[i], i);
+        ClActor_SetVisible(wk->numberAct[i], FALSE);
+        ClActor_SetBgPriority(wk->numberAct[i], 1);
     }
 }
 
@@ -200,7 +200,7 @@ BOOL PMSIVWordWin_WaitFadeOut(PMSIVWordWin *wk) {
     if (wk->seq == 0) {
         if (PMSIVTool_WaitBlend(&wk->blend)) {
             for (i = 0; i < WORDWIN_NUMBER_COUNT; i++) {
-                func_0204c124(wk->numberAct[i], FALSE);
+                ClActor_SetVisible(wk->numberAct[i], FALSE);
             }
             GFL_BGSysSetBGEnabled(2, FALSE);
             G2_SetWndOutsidePlane(wk->savedOutside.planeMask, wk->savedOutside.effect);
@@ -216,14 +216,14 @@ BOOL PMSIVWordWin_WaitFadeOut(PMSIVWordWin *wk) {
 void PMSIVWordWin_VisibleCursor(PMSIVWordWin *wk, BOOL visible) {
     if (visible) {
         if (*wk->keyMode == 0) {
-            func_0204c124(wk->cursor, TRUE);
+            ClActor_SetVisible(wk->cursor, TRUE);
         } else {
-            func_0204c124(wk->cursor, FALSE);
+            ClActor_SetVisible(wk->cursor, FALSE);
         }
-        func_0204c124(wk->scrollBar, PMSInput_GetCategoryWordMax(wk->mwk) > 14 ? TRUE : FALSE);
+        ClActor_SetVisible(wk->scrollBar, PMSInput_GetCategoryWordMax(wk->mwk) > 14 ? TRUE : FALSE);
     } else {
-        func_0204c124(wk->cursor, visible);
-        func_0204c124(wk->scrollBar, FALSE);
+        ClActor_SetVisible(wk->cursor, visible);
+        ClActor_SetVisible(wk->scrollBar, FALSE);
     }
 }
 
@@ -233,8 +233,8 @@ void PMSIVWordWin_MoveCursor(PMSIVWordWin *wk, u32 pos) {
     if (pos != -1) {
         actPos.x = (pos & 1) * 112 + 62;
         actPos.y = (pos / 2 + 1) * WORDWIN_LINE_HEIGHT;
-        func_0204c140(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
-        func_0204c488(wk->cursor, CURSOR_ANIM);
+        ClActor_SetSurfacePos(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSequence(wk->cursor, CURSOR_ANIM);
     }
 }
 
@@ -289,9 +289,9 @@ BOOL PMSIVWordWin_WaitScroll(PMSIVWordWin *wk) {
 }
 
 BOOL PMSIVWordWin_GetScrollBarPos(PMSIVWordWin *wk, ClActorPos *pos) {
-    BOOL visible = func_0204c138(wk->scrollBar);
+    BOOL visible = ClActor_IsVisible(wk->scrollBar);
 
-    func_0204c178(wk->scrollBar, pos, CLACT_SURFACE_MAIN);
+    ClActor_GetSurfacePos(wk->scrollBar, pos, CLACT_SURFACE_MAIN);
     return visible;
 }
 
@@ -316,13 +316,13 @@ void PMSIVWordWin_SetScrollBar(PMSIVWordWin *wk, u32 top, u32 scrollMax) {
     } else {
         pos.y = SCROLL_BAR_TOP;
     }
-    func_0204c140(wk->scrollBar, &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->scrollBar, &pos, CLACT_SURFACE_MAIN);
 }
 
 void PMSIVWordWin_SetScrollBarY(PMSIVWordWin *wk, u32 y) {
     ClActorPos pos;
 
-    func_0204c178(wk->scrollBar, &pos, CLACT_SURFACE_MAIN);
+    ClActor_GetSurfacePos(wk->scrollBar, &pos, CLACT_SURFACE_MAIN);
     pos.y = y;
     if (pos.y < SCROLL_BAR_TOP) {
         pos.y = SCROLL_BAR_TOP;
@@ -330,7 +330,7 @@ void PMSIVWordWin_SetScrollBarY(PMSIVWordWin *wk, u32 y) {
     if (pos.y > SCROLL_BAR_BOTTOM) {
         pos.y = SCROLL_BAR_BOTTOM;
     }
-    func_0204c140(wk->scrollBar, &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->scrollBar, &pos, CLACT_SURFACE_MAIN);
 }
 
 u32 PMSIVWordWin_GetScrollBarLine(PMSIVWordWin *wk, u32 scrollMax) {
@@ -402,8 +402,8 @@ static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, u32 index, u32 y) {
 
         pos.x = ((index - 2) & 1) * 112 + 24;
         pos.y = y - 8;
-        func_0204c210(wk->numberAct[index - 2], &pos);
-        func_0204c124(wk->numberAct[index - 2], TRUE);
+        ClActor_SetPos(wk->numberAct[index - 2], &pos);
+        ClActor_SetVisible(wk->numberAct[index - 2], TRUE);
         return;
     }
     PMSInput_GetCategoryWord(wk->mwk, index - 2, wk->str);
@@ -424,23 +424,23 @@ static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, u32 index, u32 y) {
 void PMSIVWordWin_StartCursorDecide(PMSIVWordWin *wk, u32 pos) {
     ClActorPos actPos;
 
-    wk->cursorVisible = func_0204c138(wk->cursor);
-    func_0204c124(wk->cursor, TRUE);
+    wk->cursorVisible = ClActor_IsVisible(wk->cursor);
+    ClActor_SetVisible(wk->cursor, TRUE);
     if (pos != -1) {
         actPos.x = (pos & 1) * 112 + 62;
         actPos.y = (pos / 2 + 1) * WORDWIN_LINE_HEIGHT;
-        func_0204c140(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
-        func_0204c488(wk->cursor, CURSOR_ANIM_DECIDE);
+        ClActor_SetSurfacePos(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSequence(wk->cursor, CURSOR_ANIM_DECIDE);
     }
 }
 
 BOOL PMSIVWordWin_WaitCursorDecide(PMSIVWordWin *wk) {
-    if (func_0204c4a0(wk->cursor) != CURSOR_ANIM_DECIDE) {
+    if (ClActor_GetSequence(wk->cursor) != CURSOR_ANIM_DECIDE) {
         return TRUE;
     }
-    if (!func_0204c560(wk->cursor)) {
-        func_0204c124(wk->cursor, wk->cursorVisible);
-        func_0204c488(wk->cursor, CURSOR_ANIM);
+    if (!ClActor_IsAnimActive(wk->cursor)) {
+        ClActor_SetVisible(wk->cursor, wk->cursorVisible);
+        ClActor_SetSequence(wk->cursor, CURSOR_ANIM);
         wk->cursorVisible = FALSE;
         return TRUE;
     }

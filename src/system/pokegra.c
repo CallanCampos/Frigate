@@ -391,13 +391,14 @@ ArcTool *MakePokeGraArcHandle(HeapID heapId) {
 
 u32 PokeGra_LoadClActPalette(ArcTool *arc, u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg, u32 vramType,
                              u16 offset, HeapID heapId) {
-    return func_0204bbb8(arc, GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), species, form, sex, rare, dir, egg),
-                         vramType, offset, 0, 1, heapId);
+    return ClActSys_LoadPlttRange(
+        arc, GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), species, form, sex, rare, dir, egg), vramType, offset,
+        0, 1, heapId);
 }
 
 u32 PokeGra_LoadClActChars(ArcTool *arc, u32 species, u32 form, u32 sex, BOOL rare, u32 dir, BOOL egg, u32 personality,
                            u32 vramType, HeapID heapId) {
-    u32 chars = func_0204b81c(
+    u32 chars = ClActSys_LoadChars(
         arc, GetPokemonSingleCellCharacterDataNo(GetPokemonGraphicsARCID(), species, form, sex, rare, dir, egg), TRUE,
         vramType, heapId);
 
@@ -405,7 +406,7 @@ u32 PokeGra_LoadClActChars(ArcTool *arc, u32 species, u32 form, u32 sex, BOOL ra
         NNSG2dCharacterData *charData;
         void *file = LoadSingleCellSpindaGraphics(&charData, species, form, sex, rare, dir, egg, personality, heapId);
 
-        func_0204ba40(chars, charData);
+        ClActSys_ReplaceCharData(chars, charData);
         GFL_HeapFree(file);
     }
     return chars;
@@ -416,7 +417,7 @@ u32 PokeGra_LoadClActCellAnims(u32 species, u32 form, u32 sex, BOOL rare, u32 di
     u32 cellFile = AppMenuCommon_GetPokemonSpriteCellFile(mapping);
     u32 animFile = AppMenuCommon_GetPokemonSpriteAnimFile(mapping);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    u32 cellAnims = func_0204bde0(arc, cellFile, animFile, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(arc, cellFile, animFile, heapId);
 
     GFL_ArcToolFree(arc);
     return cellAnims;
@@ -458,18 +459,18 @@ ArcTool *MakeTrGraArcHandle(HeapID heapId) {
 }
 
 u32 TrGra_LoadClActPalette(ArcTool *arc, u32 trainerClass, u32 vramType, u16 offset, HeapID heapId) {
-    return func_0204bbb8(arc, GetTrSpritePaletteDatID(trainerClass, 0), vramType, offset, 0, 1, heapId);
+    return ClActSys_LoadPlttRange(arc, GetTrSpritePaletteDatID(trainerClass, 0), vramType, offset, 0, 1, heapId);
 }
 
 u32 TrGra_LoadClActChars(ArcTool *arc, u32 trainerClass, u32 vramType, HeapID heapId) {
-    return func_0204b81c(arc, GetTrSpriteCharacter1DatID(trainerClass, 0), TRUE, vramType, heapId);
+    return ClActSys_LoadChars(arc, GetTrSpriteCharacter1DatID(trainerClass, 0), TRUE, vramType, heapId);
 }
 
 u32 TrGra_LoadClActCellAnims(u32 trainerClass, u32 mapping, u32 vramType, HeapID heapId) {
     u32 cellFile = AppMenuCommon_GetTrainerSpriteCellFile(mapping);
     u32 animFile = AppMenuCommon_GetTrainerSpriteAnimFile(mapping);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    u32 cellAnims = func_0204bde0(arc, cellFile, animFile, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(arc, cellFile, animFile, heapId);
 
     GFL_ArcToolFree(arc);
     return cellAnims;
@@ -482,10 +483,10 @@ void TrGra_ReplaceClActCharsAndPalette(ArcTool *arc, u32 trainerClass, u32 chars
 
     file = GFL_ArcToolReadHeapNew(arc, GetTrSpritePaletteDatID(trainerClass, 0), heapId);
     NNS_G2dGetUnpackedPaletteData(file, &paletteData);
-    func_0204bd10(palette, paletteData, 1);
+    ClActSys_ReplacePlttData(palette, paletteData, 1);
     GFL_HeapFree(file);
 
     file = GFL_G2DIOReadOBJNCGRArc(arc, GetTrSpriteCharacter1DatID(trainerClass, 0), TRUE, &charData, heapId);
-    func_0204ba40(chars, charData);
+    ClActSys_ReplaceCharData(chars, charData);
     GFL_HeapFree(file);
 }

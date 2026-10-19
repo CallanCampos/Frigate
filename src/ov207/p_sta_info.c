@@ -159,31 +159,31 @@ void PStaInfo_Draw(PStatusWork *wk, PStaInfoWork *info) {
     if (wk->isEgg == FALSE) {
         type1 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE1, NULL);
         type2 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE2, NULL);
-        func_0204bb58(wk->typeIconChars[type1], &proxy1);
-        func_0204c3e4(wk->typeIcons[0], &proxy1);
-        func_0204c378(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
+        ClActSys_GetCharProxy(wk->typeIconChars[type1], &proxy1);
+        ClActor_SetImageProxy(wk->typeIcons[0], &proxy1);
+        ClActor_SetPalette(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
         pos.x = 96;
         pos.y = 48;
-        func_0204c140(wk->typeIcons[0], &pos, 0);
-        func_0204c124(wk->typeIcons[0], TRUE);
-        func_0204c468(wk->typeIcons[0], 1);
+        ClActor_SetSurfacePos(wk->typeIcons[0], &pos, 0);
+        ClActor_SetVisible(wk->typeIcons[0], TRUE);
+        ClActor_SetBgPriority(wk->typeIcons[0], 1);
         if (type1 != type2) {
-            func_0204bb58(wk->typeIconChars[type2], &proxy2);
-            func_0204c3e4(wk->typeIcons[1], &proxy2);
-            func_0204c378(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
+            ClActSys_GetCharProxy(wk->typeIconChars[type2], &proxy2);
+            ClActor_SetImageProxy(wk->typeIcons[1], &proxy2);
+            ClActor_SetPalette(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
             pos.x = 130;
             pos.y = 48;
-            func_0204c140(wk->typeIcons[1], &pos, 0);
-            func_0204c124(wk->typeIcons[1], TRUE);
-            func_0204c468(wk->typeIcons[1], 1);
+            ClActor_SetSurfacePos(wk->typeIcons[1], &pos, 0);
+            ClActor_SetVisible(wk->typeIcons[1], TRUE);
+            ClActor_SetBgPriority(wk->typeIcons[1], 1);
         } else {
-            func_0204c124(wk->typeIcons[1], FALSE);
+            ClActor_SetVisible(wk->typeIcons[1], FALSE);
         }
     } else {
-        func_0204c124(wk->typeIcons[0], FALSE);
-        func_0204c124(wk->typeIcons[1], FALSE);
+        ClActor_SetVisible(wk->typeIcons[0], FALSE);
+        ClActor_SetVisible(wk->typeIcons[1], FALSE);
     }
-    func_0204c488(wk->buttons[PSTA_BUTTON_INFO], 3);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_INFO], 3);
 }
 
 void PStaInfo_Unload(PStatusWork *wk, PStaInfoWork *info) {
@@ -201,9 +201,9 @@ void PStaInfo_Clear(PStatusWork *wk, PStaInfoWork *info) {
     GFL_BGSysQueueScrLoad(1);
     GFL_BGSysFillScrAsync(4, 0);
     GFL_BGSysQueueScrLoad(4);
-    func_0204c124(wk->typeIcons[0], FALSE);
-    func_0204c124(wk->typeIcons[1], FALSE);
-    func_0204c488(wk->buttons[PSTA_BUTTON_INFO], 0);
+    ClActor_SetVisible(wk->typeIcons[0], FALSE);
+    ClActor_SetVisible(wk->typeIcons[1], FALSE);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_INFO], 0);
 }
 
 // A new string of a species' name

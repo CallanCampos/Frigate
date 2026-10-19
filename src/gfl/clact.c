@@ -95,127 +95,129 @@ typedef struct {
 
 ClActSys *g_ClActSys;
 
-void func_0204c5e4(ClActRenderer *renderer, const ClActSysSetup *setup, HeapID heapId);
-static void func_0204c614(BOOL updating);
-static BOOL func_0204c628(void);
-static void func_0204c640(BOOL ready);
-static BOOL func_0204c654(void);
-static void func_0204c66c(void);
-static void func_0204c690(void);
-static void func_0204c6d8(ClActUnit *unit);
-static void func_0204c724(ClActUnit *unit);
-static void func_0204c758(ClActOamMan *mans, u8 fromMain, u8 numMain, u8 fromSub, u8 numSub);
-static void func_0204c784(ClActOamMan *mans);
-static void func_0204c798(ClActOamMan *mans);
-static void func_0204c7b0(ClActOamMan *mans);
-static void func_0204c7c8(ClActOamMan *man, u8 from, u8 num, u32 type);
-static void func_0204c7e0(ClActOamMan *man);
-static void func_0204c7f0(ClActOamMan *man);
-static void func_0204c800(ClActRenderer *renderer, const ClActSurfaceSetup *setups, u16 count, HeapID heapId);
-static void func_0204c884(ClActRenderer *renderer);
-static void func_0204c890(ClActRenderer *renderer, BOOL cull);
-static void func_0204c8d0(NNSG2dRenderSurface *surface, const ClActSurfaceSetup *setup);
-static void func_0204c93c(NNSG2dRenderSurface *surface, u32 screen);
-static BOOL func_0204c94c(ClActOamMan *man, const GXOamAttr *oam, u16 affineIdx, u16 palette, u32 mode);
-static BOOL func_0204c9a4(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine);
-static BOOL func_0204c9c8(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine);
-static u16 func_0204c9f4(const MtxFx22 *mtx);
-static u16 func_0204ca08(const MtxFx22 *mtx);
-static BOOL func_0204ca1c(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view);
-static BOOL func_0204cb14(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view);
-static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx);
-static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top, fx32 bottom, const MtxFx32 *mtx,
-                          const NNSG2dViewRect *view);
-static void func_0204cda4(ClActTransfer *transfer, u8 count, HeapID heapId);
-static void func_0204cdf8(ClActTransfer *transfer);
-static void func_0204ce18(ClActTransfer *transfer, u32 count, HeapID heapId);
-static void func_0204ce5c(ClActTransfer *transfer);
-static void func_0204ce6c(ClActTransfer *transfer);
-static ClActTransferTask *func_0204cea0(ClActTransfer *transfer);
-static BOOL func_0204cec8(u32 type, u32 dstAddr, void *src, u32 size);
-static void func_0204cf08(ClActTransferTask *task, u32 screen, u32 dst, void *src, u32 size);
-static void func_0204cf14(ClActTransferTask *task);
-static ClActor *func_0204cf38(ClActUnit *unit);
-static void func_0204cf70(ClActUnit *unit, ClActor *actor);
-static void func_0204cfd8(ClActUnit *unit, ClActor *actor);
-static ClActor *func_0204d000(ClActor *head, u8 priority);
-static ClActor *func_0204d020(ClActor *tail, u8 priority);
-static void func_0204d040(ClActor *actor);
-static void func_0204d094(ClActor *actor, const ClActorSetup *setup, u16 surface);
-static void func_0204d0d8(ClActor *actor, const ClActResSetup *res);
-static void func_0204d0fc(ClActor *actor, u32 surface, ClActorPos *offset);
-static void func_0204d11c(ClActResSetup *res, u16 charIdx, u16 plttIdx, ClActCharRes *chars, ClActPlttRes *pltt,
-                          NNSG2dCellDataBank *cells, NNSG2dAnimBankData *anims);
-static ClActor *func_0204d138(ClActUnit *unit, const ClActorSetup *setup, const ClActResSetup *res, u16 surface,
-                              HeapID heapId);
-static ClActor *func_0204d17c(ClActUnit *unit, const ClActorSetupEx *setup, const ClActResSetup *res, u16 surface,
-                              HeapID heapId);
-static void func_0204d1cc(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
-static void func_0204d1f4(ClActAnim *anim);
-static u32 func_0204d214(const ClActResSetup *res);
-static void func_0204d22c(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
-static void func_0204d24c(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
-static void func_0204d2a8(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
-static void func_0204d30c(ClActAnim *anim);
-static void func_0204d318(ClActAnim *anim);
-static void func_0204d330(ClActAnim *anim);
-static void func_0204d348(ClActAnim *anim, u16 sequence);
-static void func_0204d35c(ClActAnim *anim, u16 sequence);
-static void func_0204d374(ClActAnim *anim, u16 sequence);
+void ClActRenderer_InitForSystem(ClActRenderer *renderer, const ClActSysSetup *setup, HeapID heapId);
+static void ClActSys_SetUpdating(BOOL updating);
+static BOOL ClActSys_IsUpdating(void);
+static void ClActSys_SetOamReady(BOOL ready);
+static BOOL ClActSys_IsOamReady(void);
+static void ClActSys_ResetOamBuffersIfReady(void);
+static void ClActSys_DrawUnits(void);
+static void ClActUnit_Link(ClActUnit *unit);
+static void ClActUnit_Unlink(ClActUnit *unit);
+static void ClActOamMan_InitAll(ClActOamMan *mans, u8 fromMain, u8 numMain, u8 fromSub, u8 numSub);
+static void ClActOamMan_ShutdownAll(ClActOamMan *mans);
+static void ClActOamMan_ApplyAll(ClActOamMan *mans);
+static void ClActOamMan_ResetAll(ClActOamMan *mans);
+static void ClActOamMan_Init(ClActOamMan *man, u8 from, u8 num, u32 type);
+static void ClActOamMan_Apply(ClActOamMan *man);
+static void ClActOamMan_Reset(ClActOamMan *man);
+static void ClActRenderer_Init(ClActRenderer *renderer, const ClActSurfaceSetup *setups, u16 count, HeapID heapId);
+static void ClActRenderer_Free(ClActRenderer *renderer);
+static void ClActRenderer_SetCullCallback(ClActRenderer *renderer, BOOL cull);
+static void ClActSurface_Init(NNSG2dRenderSurface *surface, const ClActSurfaceSetup *setup);
+static void ClActSurface_SetType(NNSG2dRenderSurface *surface, u32 screen);
+static BOOL ClActOamMan_EntryOam(ClActOamMan *man, const GXOamAttr *oam, u16 affineIdx, u16 palette, u32 mode);
+static BOOL ClActOam_EntryMain(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine);
+static BOOL ClActOam_EntrySub(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine);
+static u16 ClActAffine_EntryMain(const MtxFx22 *mtx);
+static u16 ClActAffine_EntrySub(const MtxFx22 *mtx);
+static BOOL ClAct_IsCellInViewTransformed(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view);
+static BOOL ClAct_IsCellInView(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view);
+static void ClAct_CullOam(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx);
+static BOOL ClAct_IsRectInView(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top, fx32 bottom, const MtxFx32 *mtx,
+                               const NNSG2dViewRect *view);
+static void ClActTransfer_Init(ClActTransfer *transfer, u8 count, HeapID heapId);
+static void ClActTransfer_Free(ClActTransfer *transfer);
+static void ClActTransfer_AllocTasks(ClActTransfer *transfer, u32 count, HeapID heapId);
+static void ClActTransfer_FreeTasks(ClActTransfer *transfer);
+static void ClActTransfer_RunTasks(ClActTransfer *transfer);
+static ClActTransferTask *ClActTransfer_FindFreeTask(ClActTransfer *transfer);
+static BOOL ClActTransfer_Request(u32 type, u32 dstAddr, void *src, u32 size);
+static void ClActTransferTask_Set(ClActTransferTask *task, u32 screen, u32 dst, void *src, u32 size);
+static void ClActTransferTask_Run(ClActTransferTask *task);
+static ClActor *ClActUnit_FindFreeActor(ClActUnit *unit);
+static void ClActUnit_InsertActor(ClActUnit *unit, ClActor *actor);
+static void ClActUnit_RemoveActor(ClActUnit *unit, ClActor *actor);
+static ClActor *ClActUnit_FindInsertPosFromHead(ClActor *head, u8 priority);
+static ClActor *ClActUnit_FindInsertPosFromTail(ClActor *tail, u8 priority);
+static void ClActor_Reset(ClActor *actor);
+static void ClActor_ApplySetup(ClActor *actor, const ClActorSetup *setup, u16 surface);
+static void ClActor_ApplyRes(ClActor *actor, const ClActResSetup *res);
+static void ClActor_GetSurfaceOffset(ClActor *actor, u32 surface, ClActorPos *offset);
+static void ClActResSetup_Init(ClActResSetup *res, u16 charIdx, u16 plttIdx, ClActCharRes *chars, ClActPlttRes *pltt,
+                               NNSG2dCellDataBank *cells, NNSG2dAnimBankData *anims);
+static ClActor *ClActor_CreateFromRes(ClActUnit *unit, const ClActorSetup *setup, const ClActResSetup *res, u16 surface,
+                                      HeapID heapId);
+static ClActor *ClActor_CreateExFromRes(ClActUnit *unit, const ClActorSetupEx *setup, const ClActResSetup *res,
+                                        u16 surface, HeapID heapId);
+static void ClActAnim_Init(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
+static void ClActAnim_Free(ClActAnim *anim);
+static u32 ClActAnim_GetType(const ClActResSetup *res);
+static void ClActAnim_InitCell(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
+static void ClActAnim_InitVramTransfer(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
+static void ClActAnim_InitMultiCell(ClActAnim *anim, const ClActResSetup *res, HeapID heapId);
+static void ClActAnim_FreeCell(ClActAnim *anim);
+static void ClActAnim_FreeVramTransfer(ClActAnim *anim);
+static void ClActAnim_FreeMultiCell(ClActAnim *anim);
+static void ClActAnim_SetSequence(ClActAnim *anim, u16 sequence);
+static void ClActAnim_SetSequenceCell(ClActAnim *anim, u16 sequence);
+static void ClActAnim_SetSequenceVramTransfer(ClActAnim *anim, u16 sequence);
 static void setSeqToMultiCellAnim(ClActAnim *anim, u16 sequence);
-static void func_0204d3a4(ClActAnim *anim, fx32 time);
-static void func_0204d3d0(ClActAnim *anim, fx32 frames);
-static void func_0204d3dc(ClActAnim *anim, fx32 frames);
-static void func_0204d3e8(ClActAnim *anim, fx32 frames);
-static NNSG2dAnimController *func_0204d3f4(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d408(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d40c(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d410(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d414(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d428(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d42c(ClActAnim *anim);
-static NNSG2dAnimController *func_0204d430(ClActAnim *anim);
-static void func_0204d434(ClActAnim *anim, u16 frame);
-static void func_0204d448(ClActAnim *anim, u16 frame);
-static void func_0204d454(ClActAnim *anim, u16 frame);
-static void func_0204d460(ClActAnim *anim, u16 frame);
-static void func_0204d480(ClActAnim *anim, fx32 speed);
-static void func_0204d48c(ClActAnim *anim, fx32 speed);
-static void func_0204d498(ClActAnim *anim, fx32 speed);
-static void func_0204d4a4(ClActAnim *anim);
-static void func_0204d4b8(ClActAnim *anim);
-static void func_0204d4c4(ClActAnim *anim);
-static void func_0204d4d0(ClActAnim *anim);
-static const NNSG2dUserExAnimSequenceAttr *func_0204d4e4(ClActAnim *anim, u32 sequence);
-static const NNSG2dUserExAnimSequenceAttr *func_0204d524(ClActAnim *anim, u32 sequence);
-static const NNSG2dUserExAnimSequenceAttr *func_0204d564(ClActAnim *anim, u32 sequence);
-static const NNSG2dUserExCellAttrBank *func_0204d5a4(ClActAnim *anim);
-static const NNSG2dUserExCellAttrBank *func_0204d5c8(ClActAnim *anim);
-static const NNSG2dUserExCellAttrBank *func_0204d5ec(ClActAnim *anim);
-static u32 func_0204d610(ClActAnim *anim);
-static u32 func_0204d624(ClActAnim *anim);
-static u32 func_0204d62c(ClActAnim *anim);
-static u32 func_0204d634(ClActAnim *anim);
-static void func_0204d63c(ClActAnim *anim, const ClActorCallback *callback);
-static void func_0204d678(ClActAnim *anim);
+static void ClActAnim_SetTime(ClActAnim *anim, fx32 time);
+static void ClActAnim_TickCell(ClActAnim *anim, fx32 frames);
+static void ClActAnim_TickVramTransfer(ClActAnim *anim, fx32 frames);
+static void ClActAnim_TickMultiCell(ClActAnim *anim, fx32 frames);
+static NNSG2dAnimController *ClActAnim_GetCtrl(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrlCell(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrlVramTransfer(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrlMultiCell(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrl2(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrl2Cell(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrl2VramTransfer(ClActAnim *anim);
+static NNSG2dAnimController *ClActAnim_GetCtrl2MultiCell(ClActAnim *anim);
+static void ClActAnim_SetFrame(ClActAnim *anim, u16 frame);
+static void ClActAnim_SetFrameCell(ClActAnim *anim, u16 frame);
+static void ClActAnim_SetFrameVramTransfer(ClActAnim *anim, u16 frame);
+static void ClActAnim_SetFrameMultiCell(ClActAnim *anim, u16 frame);
+static void ClActAnim_SetSpeedCell(ClActAnim *anim, fx32 speed);
+static void ClActAnim_SetSpeedVramTransfer(ClActAnim *anim, fx32 speed);
+static void ClActAnim_SetSpeedMultiCell(ClActAnim *anim, fx32 speed);
+static void ClActAnim_Restart(ClActAnim *anim);
+static void ClActAnim_RestartCell(ClActAnim *anim);
+static void ClActAnim_RestartVramTransfer(ClActAnim *anim);
+static void ClActAnim_RestartMultiCell(ClActAnim *anim);
+static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrCell(ClActAnim *anim, u32 sequence);
+static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrVramTransfer(ClActAnim *anim, u32 sequence);
+static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrMultiCell(ClActAnim *anim, u32 sequence);
+static const NNSG2dUserExCellAttrBank *ClActAnim_GetUserExCellAttrBankCell(ClActAnim *anim);
+static const NNSG2dUserExCellAttrBank *ClActAnim_GetUserExCellAttrBankVramTransfer(ClActAnim *anim);
+static const NNSG2dUserExCellAttrBank *ClActAnim_GetUserExCellAttrBankMultiCell(ClActAnim *anim);
+static u32 ClActAnim_GetSequenceCount(ClActAnim *anim);
+static u32 ClActAnim_GetSequenceCountCell(ClActAnim *anim);
+static u32 ClActAnim_GetSequenceCountVramTransfer(ClActAnim *anim);
+static u32 ClActAnim_GetSequenceCountMultiCell(ClActAnim *anim);
+static void ClActAnim_SetCallback(ClActAnim *anim, const ClActorCallback *callback);
+static void ClActAnim_ClearCallback(ClActAnim *anim);
 static void ClActVRAMManager_Init(ClActResMan *man, HeapID heapId, const BGSysVRAMConfig *vramConfig,
                                   const ClActResManSetup *setup);
-static void func_0204d6f8(ClActResMan *man);
-static BOOL func_0204d798(u32 vramType, u32 which);
-static void *func_0204d7b0(ArcTool *arc, u32 fileId, BOOL compressed, HeapID heapId);
-static ClActCharRes *func_0204d810(HeapID heapId, u32 count);
-static void func_0204d868(ClActResMan *man, u32 idx, NNSG2dCharacterData *charData, NNSG2dCellDataBank *transferCells,
-                          u32 vramType);
-static void func_0204d984(ClActCharRes *chars);
-static void func_0204d98c(NNSG2dCharacterData *charData, NNSG2dVRamType type);
-static ClActPlttRes *func_0204d9b0(HeapID heapId, u32 count);
-static void func_0204d9f4(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset, u16 start, u16 count);
-static void func_0204db2c(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset);
-static void func_0204dbec(ClActPlttRes *pltts);
-static ClActCellAnimRes *func_0204dbf4(HeapID heapId, u32 count);
-static BOOL func_0204dc2c(ClActResMan *man, u32 idx, void *cellFile, void *animFile);
-static void func_0204dc60(ClActCellAnimRes *cellAnims);
-static void func_0204dc68(ClActResMan *man, u32 idx, void *file, u32 vramType, NNSG2dCellDataBank *transferCells);
+static void ClActResMan_Free(ClActResMan *man);
+static BOOL ClAct_VramTypeIncludes(u32 vramType, u32 which);
+static void *ClAct_ReadCharFile(ArcTool *arc, u32 fileId, BOOL compressed, HeapID heapId);
+static ClActCharRes *ClActCharRes_AllocArray(HeapID heapId, u32 count);
+static void ClActResMan_SetupChars(ClActResMan *man, u32 idx, NNSG2dCharacterData *charData,
+                                   NNSG2dCellDataBank *transferCells, u32 vramType);
+static void ClActCharRes_FreeArray(ClActCharRes *chars);
+static void ClAct_SetCharMapping(NNSG2dCharacterData *charData, NNSG2dVRamType type);
+static ClActPlttRes *ClActPlttRes_AllocArray(HeapID heapId, u32 count);
+static void ClActResMan_SetupPlttRange(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset, u16 start,
+                                       u16 count);
+static void ClActResMan_SetupPlttEx(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset);
+static void ClActPlttRes_FreeArray(ClActPlttRes *pltts);
+static ClActCellAnimRes *ClActCellAnimRes_AllocArray(HeapID heapId, u32 count);
+static BOOL ClActResMan_SetupCellAnims(ClActResMan *man, u32 idx, void *cellFile, void *animFile);
+static void ClActCellAnimRes_FreeArray(ClActCellAnimRes *cellAnims);
+static void ClActResMan_SetupCharsFromFile(ClActResMan *man, u32 idx, void *file, u32 vramType,
+                                           NNSG2dCellDataBank *transferCells);
 
 // MWCC sorts a file's data by size, in an order that depends on where each object is declared; these are declared in
 // the order that lays them out as in the ROM
@@ -228,75 +230,75 @@ static void (*const sTransferFuncs[2])(const void *src, u32 offset, u32 size) = 
 };
 // Global, as only functions that are never compiled read them
 const NNSG2dUserExAnimSequenceAttr *(*const gClActAnimGetSeqAttrFuncs[3])(ClActAnim *anim, u32 sequence) = {
-    func_0204d4e4,
-    func_0204d524,
-    func_0204d564,
+    ClActAnim_GetUserExSeqAttrCell,
+    ClActAnim_GetUserExSeqAttrVramTransfer,
+    ClActAnim_GetUserExSeqAttrMultiCell,
 };
 static NNSG2dAnimController *(*const sAnimGetCtrlFuncs[3])(ClActAnim *anim) = {
-    func_0204d428,
-    func_0204d42c,
-    func_0204d430,
+    ClActAnim_GetCtrl2Cell,
+    ClActAnim_GetCtrl2VramTransfer,
+    ClActAnim_GetCtrl2MultiCell,
 };
 static void (*const sAnimFreeFuncs[3])(ClActAnim *anim) = {
-    func_0204d30c,
-    func_0204d318,
-    func_0204d330,
+    ClActAnim_FreeCell,
+    ClActAnim_FreeVramTransfer,
+    ClActAnim_FreeMultiCell,
 };
 static const NNSG2dRndCellCullingFunction sCullingFuncs[3] = {
-    func_0204ca1c,
-    func_0204cb14,
+    ClAct_IsCellInViewTransformed,
+    ClAct_IsCellInView,
     NULL,
 };
 static NNSG2dAnimController *(*const sAnimGetCtrlFuncs2[3])(ClActAnim *anim) = {
-    func_0204d408,
-    func_0204d40c,
-    func_0204d410,
+    ClActAnim_GetCtrlCell,
+    ClActAnim_GetCtrlVramTransfer,
+    ClActAnim_GetCtrlMultiCell,
 };
 const NNSG2dUserExCellAttrBank *(*const gClActAnimGetCellAttrFuncs[3])(ClActAnim *anim) = {
-    func_0204d5a4,
-    func_0204d5c8,
-    func_0204d5ec,
+    ClActAnim_GetUserExCellAttrBankCell,
+    ClActAnim_GetUserExCellAttrBankVramTransfer,
+    ClActAnim_GetUserExCellAttrBankMultiCell,
 };
 static void (*const sAnimSetFrameFuncs[3])(ClActAnim *anim, u16 frame) = {
-    func_0204d448,
-    func_0204d454,
-    func_0204d460,
+    ClActAnim_SetFrameCell,
+    ClActAnim_SetFrameVramTransfer,
+    ClActAnim_SetFrameMultiCell,
 };
 static void (*const sAnimInitFuncs[3])(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) = {
-    func_0204d22c,
-    func_0204d24c,
-    func_0204d2a8,
+    ClActAnim_InitCell,
+    ClActAnim_InitVramTransfer,
+    ClActAnim_InitMultiCell,
 };
 static u32 (*const sAnimGetSequenceCountFuncs[3])(ClActAnim *anim) = {
-    func_0204d624,
-    func_0204d62c,
-    func_0204d634,
+    ClActAnim_GetSequenceCountCell,
+    ClActAnim_GetSequenceCountVramTransfer,
+    ClActAnim_GetSequenceCountMultiCell,
 };
 static void (*const sAnimSetSequenceFuncs[3])(ClActAnim *anim, u16 sequence) = {
-    func_0204d35c,
-    func_0204d374,
+    ClActAnim_SetSequenceCell,
+    ClActAnim_SetSequenceVramTransfer,
     setSeqToMultiCellAnim,
 };
 static const ClActSurfaceFuncs sSurfaceFuncs[2] = {
-    { func_0204c9a4, func_0204c9f4, NULL },
-    { func_0204c9c8, func_0204ca08, NULL },
+    { ClActOam_EntryMain, ClActAffine_EntryMain, NULL },
+    { ClActOam_EntrySub, ClActAffine_EntrySub, NULL },
 };
 static const NNSG2dCharacterData sCharDataTemplate = { 0xffff, 0xffff, GX_TEXFMT_PLTT16, 0, 0, 0, NULL };
 static void (*const sAnimTickFuncs[3])(ClActAnim *anim, fx32 frames) = {
-    func_0204d3d0,
-    func_0204d3dc,
-    func_0204d3e8,
+    ClActAnim_TickCell,
+    ClActAnim_TickVramTransfer,
+    ClActAnim_TickMultiCell,
 };
 const ClActSysSetup data_02093f08 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 static void (*sAnimSetSpeedFuncs[3])(ClActAnim *anim, fx32 speed) = {
-    func_0204d480,
-    func_0204d48c,
-    func_0204d498,
+    ClActAnim_SetSpeedCell,
+    ClActAnim_SetSpeedVramTransfer,
+    ClActAnim_SetSpeedMultiCell,
 };
 static void (*sAnimRestartFuncs[3])(ClActAnim *anim) = {
-    func_0204d4b8,
-    func_0204d4c4,
-    func_0204d4d0,
+    ClActAnim_RestartCell,
+    ClActAnim_RestartVramTransfer,
+    ClActAnim_RestartMultiCell,
 };
 const ClActSysSetup data_02093f24 = { 0, 0, 0, 192, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 static void (*renderers[4])(ClActUnit *unit) = {
@@ -318,7 +320,7 @@ static inline void ClAct_SetVec(NNSG2dFVec2 *vec, s16 x, s16 y) {
 
 static inline void ClAct_RunTransfers(ClActTransfer *transfer) {
     if (transfer->active) {
-        func_0204ce6c(transfer);
+        ClActTransfer_RunTasks(transfer);
     }
 }
 
@@ -379,63 +381,63 @@ void ClActSys_Create(const ClActSysSetup *setup, const BGSysVRAMConfig *vramConf
     resSetup.offsetMain = setup->charOffsetMain;
     resSetup.offsetSub = setup->charOffsetSub;
     ClActVRAMManager_Init(&g_ClActSys->res, heapId, vramConfig, &resSetup);
-    func_0204c758(g_ClActSys->oamMans, setup->oamStartMain, setup->oamCountMain, setup->oamStartSub,
-                  setup->oamCountSub);
-    func_0204c5e4(&g_ClActSys->renderer, setup, heapId);
-    func_0204cda4(&g_ClActSys->transfer, setup->transferCount, heapId);
+    ClActOamMan_InitAll(g_ClActSys->oamMans, setup->oamStartMain, setup->oamCountMain, setup->oamStartSub,
+                        setup->oamCountSub);
+    ClActRenderer_InitForSystem(&g_ClActSys->renderer, setup, heapId);
+    ClActTransfer_Init(&g_ClActSys->transfer, setup->transferCount, heapId);
     for (; i < 2; i++) {
         g_ClActSys->palettes[i] = 0;
     }
-    func_0204c614(TRUE);
-    func_0204c640(TRUE);
+    ClActSys_SetUpdating(TRUE);
+    ClActSys_SetOamReady(TRUE);
 }
 
-void func_0204b758(void) {
-    func_0204c614(FALSE);
-    func_0204c784(g_ClActSys->oamMans);
-    func_0204c884(&g_ClActSys->renderer);
-    func_0204cdf8(&g_ClActSys->transfer);
-    func_0204d6f8(&g_ClActSys->res);
+void ClActSys_Delete(void) {
+    ClActSys_SetUpdating(FALSE);
+    ClActOamMan_ShutdownAll(g_ClActSys->oamMans);
+    ClActRenderer_Free(&g_ClActSys->renderer);
+    ClActTransfer_Free(&g_ClActSys->transfer);
+    ClActResMan_Free(&g_ClActSys->res);
     GFL_HeapFree(g_ClActSys);
     g_ClActSys = NULL;
 }
 
-void func_0204b794(void) {
+void ClActSys_Draw(void) {
     if (g_ClActSys != NULL) {
-        func_0204c614(FALSE);
-        func_0204c66c();
-        func_0204c690();
+        ClActSys_SetUpdating(FALSE);
+        ClActSys_ResetOamBuffersIfReady();
+        ClActSys_DrawUnits();
         if (g_ClActSys->transfer.active) {
             NNS_G2dUpdateCellTransferStateManager();
         }
-        func_0204c614(TRUE);
+        ClActSys_SetUpdating(TRUE);
     }
 }
 
-void func_0204b7c8(void) {
-    if (g_ClActSys != NULL && func_0204c628()) {
-        func_0204c798(g_ClActSys->oamMans);
+void ClActSys_VBlank(void) {
+    if (g_ClActSys != NULL && ClActSys_IsUpdating()) {
+        ClActOamMan_ApplyAll(g_ClActSys->oamMans);
         ClAct_RunTransfers(&g_ClActSys->transfer);
-        func_0204c640(TRUE);
+        ClActSys_SetOamReady(TRUE);
     }
 }
 
-void func_0204b7fc(void) {
+void ClActSys_ResetOamBuffers(void) {
     if (g_ClActSys != NULL) {
-        func_0204c614(FALSE);
-        func_0204c66c();
-        func_0204c614(TRUE);
+        ClActSys_SetUpdating(FALSE);
+        ClActSys_ResetOamBuffersIfReady();
+        ClActSys_SetUpdating(TRUE);
     }
 }
 
-u32 func_0204b81c(ArcTool *arc, u32 fileId, BOOL compressed, u32 vramType, HeapID heapId) {
+u32 ClActSys_LoadChars(ArcTool *arc, u32 fileId, BOOL compressed, u32 vramType, HeapID heapId) {
     u32 idx = ClAct_FindFreeChar(&g_ClActSys->res);
 
     if (idx != CLACT_RES_NONE) {
         ClActCharRes *res = &g_ClActSys->res.chars[idx];
-        void *data = func_0204d7b0(arc, fileId, compressed, HEAPID_TAIL(heapId));
+        void *data = ClAct_ReadCharFile(arc, fileId, compressed, HEAPID_TAIL(heapId));
 
-        func_0204dc68(&g_ClActSys->res, idx, data, vramType, NULL);
+        ClActResMan_SetupCharsFromFile(&g_ClActSys->res, idx, data, vramType, NULL);
         GFL_HeapFree(data);
         res->data = NULL;
         res->extData = FALSE;
@@ -444,7 +446,7 @@ u32 func_0204b81c(ArcTool *arc, u32 fileId, BOOL compressed, u32 vramType, HeapI
     return CLACT_RES_NONE;
 }
 
-u32 func_0204b8bc(u32 size, u32 vramType, HeapID heapId) {
+u32 ClActSys_AllocChars(u32 size, u32 vramType, HeapID heapId) {
     u32 idx = ClAct_FindFreeChar(&g_ClActSys->res);
     ClActCharRes *res;
     NNSG2dCharacterData charData;
@@ -457,7 +459,7 @@ u32 func_0204b8bc(u32 size, u32 vramType, HeapID heapId) {
     charData.mappingType = GX_GetOBJVRamModeChar();
     charData.size = size;
     charData.rawData = GFL_HeapAllocate(HEAPID_TAIL(heapId), size, TRUE, "clact.c", 992);
-    func_0204d868(&g_ClActSys->res, idx, &charData, NULL, vramType);
+    ClActResMan_SetupChars(&g_ClActSys->res, idx, &charData, NULL, vramType);
     res->free = FALSE;
     res->data = NULL;
     res->extData = FALSE;
@@ -465,7 +467,7 @@ u32 func_0204b8bc(u32 size, u32 vramType, HeapID heapId) {
     return idx;
 }
 
-void func_0204b98c(u32 chars) {
+void ClActSys_FreeChars(u32 chars) {
     if (!GFL_VRAMManagerAllocIsInvalid(&g_ClActSys->res.chars[chars].allocMain)) {
         GFL_VRAMManagerDeAlloc(g_ClActSys->res.vmanMain, &g_ClActSys->res.chars[chars].allocMain);
     }
@@ -484,7 +486,7 @@ void func_0204b98c(u32 chars) {
     g_ClActSys->res.chars[chars].size = 0;
 }
 
-void func_0204ba40(u32 chars, NNSG2dCharacterData *character) {
+void ClActSys_ReplaceCharData(u32 chars, NNSG2dCharacterData *character) {
     if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
         u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
 
@@ -499,7 +501,7 @@ void func_0204ba40(u32 chars, NNSG2dCharacterData *character) {
     }
 }
 
-void func_0204bab8(u32 chars, void *src, u32 size, u32 offset, u32 vramType) {
+void ClActSys_WriteCharData(u32 chars, void *src, u32 size, u32 offset, u32 vramType) {
     if (vramType == CLACT_VRAM_MAIN || vramType == CLACT_VRAM_BOTH) {
         if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
             u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
@@ -518,57 +520,57 @@ void func_0204bab8(u32 chars, void *src, u32 size, u32 offset, u32 vramType) {
     }
 }
 
-void func_0204bb58(u32 chars, NNSG2dImageProxy *proxy) {
+void ClActSys_GetCharProxy(u32 chars, NNSG2dImageProxy *proxy) {
     *proxy = g_ClActSys->res.chars[chars].proxy;
 }
 
-u32 func_0204bb80(u32 chars, BOOL sub) {
+u32 ClActSys_GetCharVramAddr(u32 chars, BOOL sub) {
     NNSG2dImageProxy proxy;
     NNSG2dVRamType type = NNS_G2D_VRAM_TYPE_2DMAIN;
 
     if (sub) {
         type = NNS_G2D_VRAM_TYPE_2DSUB;
     }
-    func_0204bb58(chars, &proxy);
+    ClActSys_GetCharProxy(chars, &proxy);
     return NNS_G2dGetImageLocation(&proxy, type);
 }
 
-u32 func_0204bba0(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId) {
-    return func_0204bbb8(arc, fileId, vramType, offset, 0, 0, heapId);
+u32 ClActSys_LoadPltt(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId) {
+    return ClActSys_LoadPlttRange(arc, fileId, vramType, offset, 0, 0, heapId);
 }
 
-u32 func_0204bbb8(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, u16 start, u16 count, HeapID heapId) {
+u32 ClActSys_LoadPlttRange(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, u16 start, u16 count, HeapID heapId) {
     u32 idx = ClAct_FindFreePltt(&g_ClActSys->res);
 
     if (idx != CLACT_RES_NONE) {
         void *data = GFL_ArcToolReadHeapNew(arc, fileId, HEAPID_TAIL(heapId));
 
-        func_0204d9f4(&g_ClActSys->res, idx, data, vramType, offset, start, count);
+        ClActResMan_SetupPlttRange(&g_ClActSys->res, idx, data, vramType, offset, start, count);
         GFL_HeapFree(data);
         return idx;
     }
     return idx;
 }
 
-u32 func_0204bc48(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId) {
+u32 ClActSys_LoadPlttEx(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId) {
     u32 idx = ClAct_FindFreePltt(&g_ClActSys->res);
 
     if (idx != CLACT_RES_NONE) {
         void *data = GFL_ArcToolReadHeapNew(arc, fileId, HEAPID_TAIL(heapId));
 
-        func_0204db2c(&g_ClActSys->res, idx, data, vramType, offset);
+        ClActResMan_SetupPlttEx(&g_ClActSys->res, idx, data, vramType, offset);
         GFL_HeapFree(data);
         return idx;
     }
     return idx;
 }
 
-void func_0204bcd0(u32 palette) {
+void ClActSys_FreePltt(u32 palette) {
     g_ClActSys->res.pltts[palette].free = TRUE;
     g_ClActSys->res.pltts[palette].size = 0;
 }
 
-void func_0204bd10(u32 palette, NNSG2dPaletteData *data, u32 count) {
+void ClActSys_ReplacePlttData(u32 palette, NNSG2dPaletteData *data, u32 count) {
     u32 size = count * 32;
 
     if (count == 0) {
@@ -588,22 +590,22 @@ void func_0204bd10(u32 palette, NNSG2dPaletteData *data, u32 count) {
     }
 }
 
-void func_0204bd9c(u32 palette, NNSG2dImagePaletteProxy *proxy) {
+void ClActSys_GetPlttProxy(u32 palette, NNSG2dImagePaletteProxy *proxy) {
     *proxy = g_ClActSys->res.pltts[palette].proxy;
 }
 
-u32 func_0204bdc0(u32 palette, BOOL sub) {
+u32 ClActSys_GetPlttVramAddr(u32 palette, BOOL sub) {
     NNSG2dImagePaletteProxy proxy;
     NNSG2dVRamType type = NNS_G2D_VRAM_TYPE_2DMAIN;
 
     if (sub) {
         type = NNS_G2D_VRAM_TYPE_2DSUB;
     }
-    func_0204bd9c(palette, &proxy);
+    ClActSys_GetPlttProxy(palette, &proxy);
     return NNS_G2dGetImagePaletteLocation(&proxy, type);
 }
 
-u32 func_0204bde0(ArcTool *arc, u32 cellFileId, u32 animFileId, HeapID heapId) {
+u32 ClActSys_LoadCellAnims(ArcTool *arc, u32 cellFileId, u32 animFileId, HeapID heapId) {
     u32 idx = ClAct_FindFreeCellAnim(&g_ClActSys->res);
     ClActCellAnimRes *cellAnims = g_ClActSys->res.cellAnims;
     ClActCellAnimRes *res = &cellAnims[idx];
@@ -616,11 +618,11 @@ u32 func_0204bde0(ArcTool *arc, u32 cellFileId, u32 animFileId, HeapID heapId) {
 #endif
     cellAnims[idx].cellFile = GFL_ArcToolReadHeapNew(arc, cellFileId, heapId);
     res->animFile = GFL_ArcToolReadHeapNew(arc, animFileId, heapId);
-    func_0204dc2c(&g_ClActSys->res, idx, cellAnims[idx].cellFile, res->animFile);
+    ClActResMan_SetupCellAnims(&g_ClActSys->res, idx, cellAnims[idx].cellFile, res->animFile);
     return idx;
 }
 
-void func_0204be64(u32 cellAnims) {
+void ClActSys_FreeCellAnims(u32 cellAnims) {
     ClActCellAnimRes *res = &g_ClActSys->res.cellAnims[cellAnims];
 
     if (res->cellFile != NULL) {
@@ -634,34 +636,34 @@ void func_0204be64(u32 cellAnims) {
     res->free = TRUE;
 }
 
-ClActRenderer *func_0204be9c(const ClActSurfaceSetup *setups, u16 count, HeapID heapId) {
+ClActRenderer *ClActRenderer_Create(const ClActSurfaceSetup *setups, u16 count, HeapID heapId) {
     ClActRenderer *renderer = GFL_HeapAllocate(heapId, sizeof(ClActRenderer), TRUE, "clact.c", 1611);
 
-    func_0204c800(renderer, setups, count, heapId);
+    ClActRenderer_Init(renderer, setups, count, heapId);
     return renderer;
 }
 
-void func_0204becc(ClActRenderer *renderer) {
-    func_0204c884(renderer);
+void ClActRenderer_Delete(ClActRenderer *renderer) {
+    ClActRenderer_Free(renderer);
     GFL_HeapFree(renderer);
 }
 
-void func_0204bedc(ClActRenderer *renderer, u32 surface, const ClActorPos *pos) {
+void ClActRenderer_SetSurfacePos(ClActRenderer *renderer, u32 surface, const ClActorPos *pos) {
     ClAct_SetVec(&renderer->surfaces[surface].viewRect.posTopLeft, pos->x, pos->y);
 }
 
-void func_0204befc(ClActRenderer *renderer, u32 surface, ClActorPos *pos) {
+void ClActRenderer_GetSurfacePos(ClActRenderer *renderer, u32 surface, ClActorPos *pos) {
     const NNSG2dFVec2 *vec = &renderer->surfaces[surface].viewRect.posTopLeft;
 
     pos->x = vec->x >> FX32_SHIFT;
     pos->y = vec->y >> FX32_SHIFT;
 }
 
-void func_0204bf14(ClActRenderer *renderer, BOOL cull) {
-    func_0204c890(renderer, cull);
+void ClActRenderer_SetCulling(ClActRenderer *renderer, BOOL cull) {
+    ClActRenderer_SetCullCallback(renderer, cull);
 }
 
-ClActUnit *func_0204bf1c(u16 count, u8 priority, HeapID heapId) {
+ClActUnit *ClActUnit_Create(u16 count, u8 priority, HeapID heapId) {
     ClActUnit *unit;
     int i = 0;
 
@@ -671,32 +673,32 @@ ClActUnit *func_0204bf1c(u16 count, u8 priority, HeapID heapId) {
     unit->count = count;
     unit->priority = priority;
     for (; i < count; i++) {
-        func_0204d040(&unit->actors[i]);
+        ClActor_Reset(&unit->actors[i]);
     }
-    func_0204c028(unit);
-    func_0204bfd4(unit, TRUE);
-    func_0204c6d8(unit);
+    ClActUnit_UseSystemRenderer(unit);
+    ClActUnit_SetActive(unit, TRUE);
+    ClActUnit_Link(unit);
     return unit;
 }
 
-void func_0204bf98(ClActUnit *unit) {
+void ClActUnit_Delete(ClActUnit *unit) {
     int i;
 
-    func_0204c724(unit);
+    ClActUnit_Unlink(unit);
     for (i = 0; i < unit->count; i++) {
         if (unit->actors[i].next != NULL) {
-            func_0204c108(&unit->actors[i]);
+            ClActor_Delete(&unit->actors[i]);
         }
     }
     GFL_HeapFree(unit->actors);
     GFL_HeapFree(unit);
 }
 
-void func_0204bfd4(ClActUnit *unit, BOOL active) {
+void ClActUnit_SetActive(ClActUnit *unit, BOOL active) {
     unit->active = active;
 }
 
-BOOL func_0204bfe8(ClActUnit *unit) {
+BOOL ClActUnit_IsActive(ClActUnit *unit) {
     return unit->active;
 }
 
@@ -708,100 +710,100 @@ void func_0204c004(ClActUnit *unit, BOOL a1) {
     unit->sharedParams = a1;
 }
 
-void func_0204c018(ClActUnit *unit, ClActRenderer *renderer) {
+void ClActUnit_SetRenderer(ClActUnit *unit, ClActRenderer *renderer) {
     unit->renderer = renderer;
     unit->rendererType = 1;
 }
 
-void func_0204c028(ClActUnit *unit) {
+void ClActUnit_UseSystemRenderer(ClActUnit *unit) {
     unit->renderer = &g_ClActSys->renderer;
     unit->rendererType = 0;
 }
 
-ClActor *func_0204c040(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetup *setup, u16 surface,
-                       HeapID heapId) {
+ClActor *ClActor_Create(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetup *setup, u16 surface,
+                        HeapID heapId) {
     ClActResSetup res;
 
-    func_0204d11c(&res, chars, palette, &g_ClActSys->res.chars[chars], &g_ClActSys->res.pltts[palette],
-                  g_ClActSys->res.cellAnims[cellAnims].cells, g_ClActSys->res.cellAnims[cellAnims].anims);
-    return func_0204d138(unit, setup, &res, surface, heapId);
+    ClActResSetup_Init(&res, chars, palette, &g_ClActSys->res.chars[chars], &g_ClActSys->res.pltts[palette],
+                       g_ClActSys->res.cellAnims[cellAnims].cells, g_ClActSys->res.cellAnims[cellAnims].anims);
+    return ClActor_CreateFromRes(unit, setup, &res, surface, heapId);
 }
 
-ClActor *func_0204c0a4(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetupEx *setup, u16 surface,
-                       HeapID heapId) {
+ClActor *ClActor_CreateEx(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetupEx *setup,
+                          u16 surface, HeapID heapId) {
     ClActResSetup res;
 
-    func_0204d11c(&res, chars, palette, &g_ClActSys->res.chars[chars], &g_ClActSys->res.pltts[palette],
-                  g_ClActSys->res.cellAnims[cellAnims].cells, g_ClActSys->res.cellAnims[cellAnims].anims);
-    return func_0204d17c(unit, setup, &res, surface, heapId);
+    ClActResSetup_Init(&res, chars, palette, &g_ClActSys->res.chars[chars], &g_ClActSys->res.pltts[palette],
+                       g_ClActSys->res.cellAnims[cellAnims].cells, g_ClActSys->res.cellAnims[cellAnims].anims);
+    return ClActor_CreateExFromRes(unit, setup, &res, surface, heapId);
 }
 
-void func_0204c108(ClActor *actor) {
-    func_0204cfd8(actor->unit, actor);
-    func_0204d1f4(&actor->anim);
-    func_0204d040(actor);
+void ClActor_Delete(ClActor *actor) {
+    ClActUnit_RemoveActor(actor->unit, actor);
+    ClActAnim_Free(&actor->anim);
+    ClActor_Reset(actor);
 }
 
-void func_0204c124(ClActor *actor, BOOL visible) {
+void ClActor_SetVisible(ClActor *actor, BOOL visible) {
     actor->visible = visible;
 }
 
-BOOL func_0204c138(ClActor *actor) {
+BOOL ClActor_IsVisible(ClActor *actor) {
     return actor->visible;
 }
 
-void func_0204c140(ClActor *actor, const ClActorPos *pos, u16 surface) {
+void ClActor_SetSurfacePos(ClActor *actor, const ClActorPos *pos, u16 surface) {
     ClActorPos offset;
     ClActorPos actorPos;
 
-    func_0204d0fc(actor, surface, &offset);
+    ClActor_GetSurfaceOffset(actor, surface, &offset);
     actorPos.x = pos->x + offset.x;
     actorPos.y = pos->y + offset.y;
-    func_0204c210(actor, &actorPos);
+    ClActor_SetPos(actor, &actorPos);
 }
 
-void func_0204c178(ClActor *actor, ClActorPos *pos, u16 surface) {
+void ClActor_GetSurfacePos(ClActor *actor, ClActorPos *pos, u16 surface) {
     ClActorPos offset;
 
-    func_0204d0fc(actor, surface, &offset);
-    func_0204c21c(actor, pos);
+    ClActor_GetSurfaceOffset(actor, surface, &offset);
+    ClActor_GetPos(actor, pos);
     pos->x -= offset.x;
     pos->y -= offset.y;
 }
 
-void func_0204c1a8(ClActor *actor, s16 value, u16 surface, u32 axis) {
+void ClActor_SetSurfacePosAxis(ClActor *actor, s16 value, u16 surface, u32 axis) {
     ClActorPos offset;
 
-    func_0204d0fc(actor, surface, &offset);
+    ClActor_GetSurfaceOffset(actor, surface, &offset);
     if (axis == 0) {
         value += offset.x;
     } else {
         value += offset.y;
     }
-    func_0204c228(actor, value, axis);
+    ClActor_SetPosAxis(actor, value, axis);
 }
 
-s16 func_0204c1dc(ClActor *actor, u16 surface, u32 axis) {
+s16 ClActor_GetSurfacePosAxis(ClActor *actor, u16 surface, u32 axis) {
     ClActorPos offset;
     s16 value;
 
-    func_0204d0fc(actor, surface, &offset);
-    value = func_0204c234(actor, axis);
+    ClActor_GetSurfaceOffset(actor, surface, &offset);
+    value = ClActor_GetPosAxis(actor, axis);
     if (axis == 0) {
         return value - offset.x;
     }
     return value - offset.y;
 }
 
-void func_0204c210(ClActor *actor, const ClActorPos *pos) {
+void ClActor_SetPos(ClActor *actor, const ClActorPos *pos) {
     actor->pos = *pos;
 }
 
-void func_0204c21c(const ClActor *actor, ClActorPos *pos) {
+void ClActor_GetPos(const ClActor *actor, ClActorPos *pos) {
     *pos = actor->pos;
 }
 
-void func_0204c228(ClActor *actor, s16 value, u32 axis) {
+void ClActor_SetPosAxis(ClActor *actor, s16 value, u32 axis) {
     if (axis == 0) {
         actor->pos.x = value;
     } else {
@@ -809,22 +811,22 @@ void func_0204c228(ClActor *actor, s16 value, u32 axis) {
     }
 }
 
-s16 func_0204c234(ClActor *actor, u32 axis) {
+s16 ClActor_GetPosAxis(ClActor *actor, u32 axis) {
     if (axis == 0) {
         return actor->pos.x;
     }
     return actor->pos.y;
 }
 
-void func_0204c244(ClActor *actor, u32 affineMode) {
+void ClActor_SetAffineMode(ClActor *actor, u32 affineMode) {
     actor->affineMode = affineMode;
 }
 
-void func_0204c258(ClActor *actor, const ClActorPos *center) {
+void ClActor_SetAffineCenter(ClActor *actor, const ClActorPos *center) {
     actor->affineCenter = *center;
 }
 
-void func_0204c264(ClActor *actor, s16 value, u32 axis) {
+void ClActor_SetAffineCenterAxis(ClActor *actor, s16 value, u32 axis) {
     if (axis == 0) {
         actor->affineCenter.x = value;
     } else {
@@ -832,15 +834,15 @@ void func_0204c264(ClActor *actor, s16 value, u32 axis) {
     }
 }
 
-void func_0204c270(ClActor *actor, const ClActorScale *scale) {
+void ClActor_SetScale(ClActor *actor, const ClActorScale *scale) {
     actor->scale = *scale;
 }
 
-void func_0204c27c(ClActor *actor, ClActorScale *scale) {
+void ClActor_GetScale(ClActor *actor, ClActorScale *scale) {
     *scale = actor->scale;
 }
 
-void func_0204c288(ClActor *actor, fx32 value, u32 axis) {
+void ClActor_SetScaleAxis(ClActor *actor, fx32 value, u32 axis) {
     if (axis == 0) {
         actor->scale.x = value;
     } else {
@@ -848,22 +850,22 @@ void func_0204c288(ClActor *actor, fx32 value, u32 axis) {
     }
 }
 
-fx32 func_0204c294(ClActor *actor, u32 axis) {
+fx32 ClActor_GetScaleAxis(ClActor *actor, u32 axis) {
     if (axis == 0) {
         return actor->scale.x;
     }
     return actor->scale.y;
 }
 
-void func_0204c2a0(ClActor *actor, u16 rotation) {
+void ClActor_SetRotation(ClActor *actor, u16 rotation) {
     actor->rotation = rotation;
 }
 
-u16 func_0204c2a8(ClActor *actor) {
+u16 ClActor_GetRotation(ClActor *actor) {
     return actor->rotation;
 }
 
-void func_0204c2b0(ClActor *actor, u32 axis, BOOL flip) {
+void ClActor_SetFlip(ClActor *actor, u32 axis, BOOL flip) {
     u32 bit = 1;
 
     if (axis) {
@@ -889,7 +891,7 @@ BOOL ClActor_GetFlip(ClActor *actor, u32 axis) {
     return flip;
 }
 
-void func_0204c318(ClActor *actor, u32 mode) {
+void ClActor_SetObjMode(ClActor *actor, u32 mode) {
     actor->objMode = mode;
     if (mode == GX_OAM_MODE_NORMAL) {
         if (actor->overwrite & NNS_G2D_RND_OVERWRITE_OBJMODE) {
@@ -900,105 +902,105 @@ void func_0204c318(ClActor *actor, u32 mode) {
     }
 }
 
-u32 func_0204c370(ClActor *actor) {
+u32 ClActor_GetObjMode(ClActor *actor) {
     return actor->objMode;
 }
 
-void func_0204c378(ClActor *actor, u32 palette, u32 a2) {
+void ClActor_SetPalette(ClActor *actor, u32 palette, u32 a2) {
     actor->palette = palette;
     actor->paletteMode = a2;
 }
 
-u8 func_0204c39c(ClActor *actor) {
+u8 ClActor_GetPalette(ClActor *actor) {
     return actor->palette;
 }
 
-void func_0204c3a8(ClActor *actor, const NNSG2dImagePaletteProxy *proxy) {
+void ClActor_SetPlttProxy(ClActor *actor, const NNSG2dImagePaletteProxy *proxy) {
     NNS_G2dIsImagePaletteReadyToUse(proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
     NNS_G2dIsImagePaletteReadyToUse(proxy, NNS_G2D_VRAM_TYPE_2DSUB);
     actor->pltProxy = *proxy;
 }
 
-void func_0204c3d0(ClActor *actor, NNSG2dImagePaletteProxy *proxy) {
+void ClActor_GetPlttProxy(ClActor *actor, NNSG2dImagePaletteProxy *proxy) {
     *proxy = actor->pltProxy;
 }
 
-void func_0204c3e4(ClActor *actor, const NNSG2dImageProxy *proxy) {
+void ClActor_SetImageProxy(ClActor *actor, const NNSG2dImageProxy *proxy) {
     NNS_G2dIsImageReadyToUse(proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
     NNS_G2dIsImageReadyToUse(proxy, NNS_G2D_VRAM_TYPE_2DSUB);
     actor->imgProxy = *proxy;
 }
 
-void func_0204c40c(ClActor *actor, NNSG2dImageProxy *proxy) {
+void ClActor_GetImageProxy(ClActor *actor, NNSG2dImageProxy *proxy) {
     *proxy = actor->imgProxy;
 }
 
-u16 func_0204c428(ClActor *actor) {
+u16 ClActor_GetCharIdx(ClActor *actor) {
     return actor->charIdx;
 }
 
-u16 func_0204c430(ClActor *actor) {
+u16 ClActor_GetPlttIdx(ClActor *actor) {
     return actor->plttIdx;
 }
 
-void func_0204c438(ClActor *actor, u8 priority) {
+void ClActor_SetPriority(ClActor *actor, u8 priority) {
     actor->priority = priority;
-    func_0204cfd8(actor->unit, actor);
-    func_0204cf70(actor->unit, actor);
+    ClActUnit_RemoveActor(actor->unit, actor);
+    ClActUnit_InsertActor(actor->unit, actor);
 }
 
-u8 func_0204c45c(ClActor *actor) {
+u8 ClActor_GetPriority(ClActor *actor) {
     return actor->priority;
 }
 
-void func_0204c468(ClActor *actor, u32 bgPriority) {
+void ClActor_SetBgPriority(ClActor *actor, u32 bgPriority) {
     actor->bgPriority = bgPriority;
 }
 
-u8 func_0204c47c(ClActor *actor) {
+u8 ClActor_GetBgPriority(ClActor *actor) {
     return actor->bgPriority;
 }
 
-void func_0204c488(ClActor *actor, u16 sequence) {
+void ClActor_SetSequence(ClActor *actor, u16 sequence) {
     actor->sequence = sequence;
-    func_0204d348(&actor->anim, sequence);
-    func_0204c540(actor);
+    ClActAnim_SetSequence(&actor->anim, sequence);
+    ClActor_StartAnim(actor);
 }
 
-u16 func_0204c4a0(ClActor *actor) {
+u16 ClActor_GetSequence(ClActor *actor) {
     return actor->sequence;
 }
 
-u16 func_0204c4a8(ClActor *actor) {
-    return func_0204d610(&actor->anim);
+u16 ClActor_GetSequenceCount(ClActor *actor) {
+    return ClActAnim_GetSequenceCount(&actor->anim);
 }
 
-void func_0204c4b8(ClActor *actor, u16 sequence) {
+void ClActor_ChangeSequence(ClActor *actor, u16 sequence) {
     if (sequence != actor->sequence) {
-        func_0204c488(actor, sequence);
-        func_0204c540(actor);
+        ClActor_SetSequence(actor, sequence);
+        ClActor_StartAnim(actor);
     }
 }
 
-void func_0204c4d4(ClActor *actor, fx32 time) {
-    func_0204d3a4(&actor->anim, time);
+void ClActor_SetAnimTime(ClActor *actor, fx32 time) {
+    ClActAnim_SetTime(&actor->anim, time);
 }
 
-void func_0204c4e0(ClActor *actor, fx32 speed) {
+void ClActor_SetAnimSpeed(ClActor *actor, fx32 speed) {
     ClActAnim_SetSpeed(&actor->anim, speed);
     ClActAnim_Tick(&actor->anim, FX32_ONE);
 }
 
-fx32 func_0204c4f8(ClActor *actor) {
-    return func_0204d414(&actor->anim)->currentTime;
+fx32 ClActor_GetAnimTime(ClActor *actor) {
+    return ClActAnim_GetCtrl2(&actor->anim)->currentTime;
 }
 
-void func_0204c504(ClActor *actor, u16 frame) {
-    func_0204d434(&actor->anim, frame);
+void ClActor_SetAnimFrame(ClActor *actor, u16 frame) {
+    ClActAnim_SetFrame(&actor->anim, frame);
 }
 
-u16 func_0204c510(ClActor *actor) {
-    return NNS_G2dGetAnimCtrlCurrentFrame(func_0204d414(&actor->anim));
+u16 ClActor_GetAnimFrame(ClActor *actor) {
+    return NNS_G2dGetAnimCtrlCurrentFrame(ClActAnim_GetCtrl2(&actor->anim));
 }
 
 void func_0204c520(ClActor *actor, BOOL a1) {
@@ -1013,28 +1015,28 @@ void func_0204c53c(ClActor *actor, fx32 a1) {
     actor->autoAnimSpeed = a1;
 }
 
-void func_0204c540(ClActor *actor) {
-    func_0204d3f4(&actor->anim)->bActive = TRUE;
+void ClActor_StartAnim(ClActor *actor) {
+    ClActAnim_GetCtrl(&actor->anim)->bActive = TRUE;
 }
 
-void func_0204c550(ClActor *actor) {
-    func_0204d3f4(&actor->anim)->bActive = FALSE;
+void ClActor_StopAnim(ClActor *actor) {
+    ClActAnim_GetCtrl(&actor->anim)->bActive = FALSE;
 }
 
-BOOL func_0204c560(ClActor *actor) {
-    return func_0204d414(&actor->anim)->bActive;
+BOOL ClActor_IsAnimActive(ClActor *actor) {
+    return ClActAnim_GetCtrl2(&actor->anim)->bActive;
 }
 
-void func_0204c56c(ClActor *actor) {
-    func_0204d3f4(&actor->anim)->bActive = TRUE;
-    func_0204d4a4(&actor->anim);
+void ClActor_RestartAnim(ClActor *actor) {
+    ClActAnim_GetCtrl(&actor->anim)->bActive = TRUE;
+    ClActAnim_Restart(&actor->anim);
 }
 
-void func_0204c584(ClActor *actor, u32 playMode) {
+void ClActor_SetPlayMode(ClActor *actor, u32 playMode) {
     NNSG2dAnimController *animCtrl;
 
     actor->playMode = playMode;
-    animCtrl = func_0204d3f4(&actor->anim);
+    animCtrl = ClActAnim_GetCtrl(&actor->anim);
     if (playMode == 0) {
         animCtrl->bReverse = FALSE;
         animCtrl->overriddenPlayMode = 0;
@@ -1043,12 +1045,12 @@ void func_0204c584(ClActor *actor, u32 playMode) {
     }
 }
 
-void func_0204c5b0(ClActor *actor, const ClActorCallback *callback) {
-    func_0204d63c(&actor->anim, callback);
+void ClActor_SetAnimCallback(ClActor *actor, const ClActorCallback *callback) {
+    ClActAnim_SetCallback(&actor->anim, callback);
 }
 
-void func_0204c5bc(ClActor *actor) {
-    func_0204d678(&actor->anim);
+void ClActor_ClearAnimCallback(ClActor *actor) {
+    ClActAnim_ClearCallback(&actor->anim);
 }
 
 void func_0204c5c8(ClActor *actor, BOOL a1) {
@@ -1068,48 +1070,48 @@ static const NNSG2dUserExCellAttrBank *ClActor_GetUserExCellAttrBank(ClActor *ac
     return gClActAnimGetCellAttrFuncs[actor->anim.type](&actor->anim);
 }
 
-void func_0204c5e4(ClActRenderer *renderer, const ClActSysSetup *setup, HeapID heapId) {
+void ClActRenderer_InitForSystem(ClActRenderer *renderer, const ClActSysSetup *setup, HeapID heapId) {
     sSurfaceSetups[0].x = setup->mainX;
     sSurfaceSetups[0].y = setup->mainY;
     sSurfaceSetups[1].x = setup->subX;
     sSurfaceSetups[1].y = setup->subY;
-    func_0204c800(renderer, sSurfaceSetups, 2, heapId);
+    ClActRenderer_Init(renderer, sSurfaceSetups, 2, heapId);
 }
 
-static void func_0204c614(BOOL updating) {
+static void ClActSys_SetUpdating(BOOL updating) {
     if (g_ClActSys != NULL) {
         g_ClActSys->updating = updating;
     }
 }
 
-static BOOL func_0204c628(void) {
+static BOOL ClActSys_IsUpdating(void) {
     if (g_ClActSys != NULL) {
         return g_ClActSys->updating;
     }
     return FALSE;
 }
 
-static void func_0204c640(BOOL ready) {
+static void ClActSys_SetOamReady(BOOL ready) {
     if (g_ClActSys != NULL) {
         g_ClActSys->oamReady = ready;
     }
 }
 
-static BOOL func_0204c654(void) {
+static BOOL ClActSys_IsOamReady(void) {
     if (g_ClActSys != NULL) {
         return g_ClActSys->oamReady;
     }
     return FALSE;
 }
 
-static void func_0204c66c(void) {
-    if (g_ClActSys != NULL && func_0204c654()) {
-        func_0204c7b0(g_ClActSys->oamMans);
-        func_0204c640(FALSE);
+static void ClActSys_ResetOamBuffersIfReady(void) {
+    if (g_ClActSys != NULL && ClActSys_IsOamReady()) {
+        ClActOamMan_ResetAll(g_ClActSys->oamMans);
+        ClActSys_SetOamReady(FALSE);
     }
 }
 
-static void func_0204c690(void) {
+static void ClActSys_DrawUnits(void) {
     ClActUnit *unit = g_ClActSys->units;
 
     if (unit != NULL) {
@@ -1122,7 +1124,7 @@ static void func_0204c690(void) {
     }
 }
 
-static void func_0204c6d8(ClActUnit *unit) {
+static void ClActUnit_Link(ClActUnit *unit) {
     ClActUnit *cur;
 
     if (g_ClActSys->units == NULL) {
@@ -1145,7 +1147,7 @@ static void func_0204c6d8(ClActUnit *unit) {
     cur->next = unit;
 }
 
-static void func_0204c724(ClActUnit *unit) {
+static void ClActUnit_Unlink(ClActUnit *unit) {
     if (g_ClActSys->units == unit) {
         if (unit->next == unit) {
             g_ClActSys->units = NULL;
@@ -1159,35 +1161,35 @@ static void func_0204c724(ClActUnit *unit) {
     unit->prev = NULL;
 }
 
-static void func_0204c758(ClActOamMan *mans, u8 fromMain, u8 numMain, u8 fromSub, u8 numSub) {
+static void ClActOamMan_InitAll(ClActOamMan *mans, u8 fromMain, u8 numMain, u8 fromSub, u8 numSub) {
     NNS_G2dInitOamManagerModule();
-    func_0204c7c8(&mans[0], fromMain, numMain, NNS_G2D_OAMTYPE_MAIN);
-    func_0204c7c8(&mans[1], fromSub, numSub, NNS_G2D_OAMTYPE_SUB);
+    ClActOamMan_Init(&mans[0], fromMain, numMain, NNS_G2D_OAMTYPE_MAIN);
+    ClActOamMan_Init(&mans[1], fromSub, numSub, NNS_G2D_OAMTYPE_SUB);
 }
 
-static void func_0204c784(ClActOamMan *mans) {
-    func_0204c7b0(mans);
-    func_0204c798(mans);
+static void ClActOamMan_ShutdownAll(ClActOamMan *mans) {
+    ClActOamMan_ResetAll(mans);
+    ClActOamMan_ApplyAll(mans);
     NNS_G2dInitOamManagerModule();
 }
 
-static void func_0204c798(ClActOamMan *mans) {
+static void ClActOamMan_ApplyAll(ClActOamMan *mans) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_0204c7e0(&mans[i]);
+        ClActOamMan_Apply(&mans[i]);
     }
 }
 
-static void func_0204c7b0(ClActOamMan *mans) {
+static void ClActOamMan_ResetAll(ClActOamMan *mans) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_0204c7f0(&mans[i]);
+        ClActOamMan_Reset(&mans[i]);
     }
 }
 
-static void func_0204c7c8(ClActOamMan *man, u8 from, u8 num, u32 type) {
+static void ClActOamMan_Init(ClActOamMan *man, u8 from, u8 num, u32 type) {
     if (num == 0) {
         man->active = FALSE;
     } else {
@@ -1196,19 +1198,19 @@ static void func_0204c7c8(ClActOamMan *man, u8 from, u8 num, u32 type) {
     }
 }
 
-static void func_0204c7e0(ClActOamMan *man) {
+static void ClActOamMan_Apply(ClActOamMan *man) {
     if (man->active) {
         NNS_G2dApplyOamManagerToHW(&man->man);
     }
 }
 
-static void func_0204c7f0(ClActOamMan *man) {
+static void ClActOamMan_Reset(ClActOamMan *man) {
     if (man->active) {
         NNS_G2dResetOamManagerBuffer(&man->man);
     }
 }
 
-static void func_0204c800(ClActRenderer *renderer, const ClActSurfaceSetup *setups, u16 count, HeapID heapId) {
+static void ClActRenderer_Init(ClActRenderer *renderer, const ClActSurfaceSetup *setups, u16 count, HeapID heapId) {
     u32 i;
 
     NNS_G2dInitRenderer(&renderer->renderer);
@@ -1216,7 +1218,7 @@ static void func_0204c800(ClActRenderer *renderer, const ClActSurfaceSetup *setu
     renderer->surfaces = GFL_HeapAllocate(heapId, count * sizeof(NNSG2dRenderSurface), FALSE, "clact.c", 4124);
     renderer->surfaceCount = count;
     for (i = 0; i < count; i++) {
-        func_0204c8d0(&renderer->surfaces[i], &setups[i]);
+        ClActSurface_Init(&renderer->surfaces[i], &setups[i]);
         NNS_G2dAddRendererTargetSurface(&renderer->renderer, &renderer->surfaces[i]);
     }
     if (renderer->surfaceCount == 1) {
@@ -1224,16 +1226,16 @@ static void func_0204c800(ClActRenderer *renderer, const ClActSurfaceSetup *setu
     }
 }
 
-static void func_0204c884(ClActRenderer *renderer) {
+static void ClActRenderer_Free(ClActRenderer *renderer) {
     GFL_HeapFree(renderer->surfaces);
 }
 
-static void func_0204c890(ClActRenderer *renderer, BOOL cull) {
+static void ClActRenderer_SetCullCallback(ClActRenderer *renderer, BOOL cull) {
     int i;
     void *callback;
 
     if (cull) {
-        callback = func_0204cb8c;
+        callback = ClAct_CullOam;
     } else {
         callback = NULL;
         renderer->renderer.rendererCore.bDrawEnable = TRUE;
@@ -1243,13 +1245,13 @@ static void func_0204c890(ClActRenderer *renderer, BOOL cull) {
     }
 }
 
-static void func_0204c8d0(NNSG2dRenderSurface *surface, const ClActSurfaceSetup *setup) {
+static void ClActSurface_Init(NNSG2dRenderSurface *surface, const ClActSurfaceSetup *setup) {
     ClActSurfaceFuncs funcs;
 
     NNS_G2dInitRenderSurface(surface);
     ClAct_SetVec(&surface->viewRect.posTopLeft, setup->x, setup->y);
     ClAct_SetVec(&surface->viewRect.sizeView, setup->w, setup->h);
-    func_0204c93c(surface, setup->screen);
+    ClActSurface_SetType(surface, setup->screen);
     funcs = sSurfaceFuncs[setup->screen];
     funcs.culling = sCullingFuncs[setup->culling];
     surface->pFuncOamRegister = funcs.oamRegister;
@@ -1257,11 +1259,11 @@ static void func_0204c8d0(NNSG2dRenderSurface *surface, const ClActSurfaceSetup 
     surface->pFuncVisibilityCulling = funcs.culling;
 }
 
-static void func_0204c93c(NNSG2dRenderSurface *surface, u32 screen) {
+static void ClActSurface_SetType(NNSG2dRenderSurface *surface, u32 screen) {
     surface->type = sSurfaceTypes[screen];
 }
 
-static BOOL func_0204c94c(ClActOamMan *man, const GXOamAttr *oam, u16 affineIdx, u16 palette, u32 mode) {
+static BOOL ClActOamMan_EntryOam(ClActOamMan *man, const GXOamAttr *oam, u16 affineIdx, u16 palette, u32 mode) {
     GXOamAttr attr;
 
     MI_CpuCopy8(oam, &attr, sizeof(GXOamAttr));
@@ -1273,24 +1275,26 @@ static BOOL func_0204c94c(ClActOamMan *man, const GXOamAttr *oam, u16 affineIdx,
     return NNS_G2dEntryOamManagerOamWithAffineIdx(&man->man, &attr, affineIdx);
 }
 
-static BOOL func_0204c9a4(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine) {
-    return func_0204c94c(&g_ClActSys->oamMans[0], oam, affineIdx, g_ClActSys->palettes[0], g_ClActSys->paletteMode);
+static BOOL ClActOam_EntryMain(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine) {
+    return ClActOamMan_EntryOam(&g_ClActSys->oamMans[0], oam, affineIdx, g_ClActSys->palettes[0],
+                                g_ClActSys->paletteMode);
 }
 
-static BOOL func_0204c9c8(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine) {
-    return func_0204c94c(&g_ClActSys->oamMans[1], oam, affineIdx, g_ClActSys->palettes[1], g_ClActSys->paletteMode);
+static BOOL ClActOam_EntrySub(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine) {
+    return ClActOamMan_EntryOam(&g_ClActSys->oamMans[1], oam, affineIdx, g_ClActSys->palettes[1],
+                                g_ClActSys->paletteMode);
 }
 
-static u16 func_0204c9f4(const MtxFx22 *mtx) {
+static u16 ClActAffine_EntryMain(const MtxFx22 *mtx) {
     return NNS_G2dEntryOamManagerAffine(&g_ClActSys->oamMans[0].man, mtx);
 }
 
-static u16 func_0204ca08(const MtxFx22 *mtx) {
+static u16 ClActAffine_EntrySub(const MtxFx22 *mtx) {
     return NNS_G2dEntryOamManagerAffine(&g_ClActSys->oamMans[1].man, mtx);
 }
 
 // Whether a cell's bounding rect, or circle, is in view, its corners transformed by the matrix
-static BOOL func_0204ca1c(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view) {
+static BOOL ClAct_IsCellInViewTransformed(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view) {
     fx32 tmp;
     const NNSG2dCellBoundingRectS16 *rect = &((const NNSG2dCellDataWithBR *)cell)->boundingRect;
     u32 r = NNSi_G2dGetCellBoundingSphereR(cell);
@@ -1337,7 +1341,7 @@ static BOOL func_0204ca1c(const NNSG2dCellData *cell, const MtxFx32 *mtx, const 
 }
 
 // The same, untransformed
-static BOOL func_0204cb14(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view) {
+static BOOL ClAct_IsCellInView(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view) {
     const NNSG2dCellBoundingRectS16 *rect = &((const NNSG2dCellDataWithBR *)cell)->boundingRect;
     u32 r = NNSi_G2dGetCellBoundingSphereR(cell);
     fx32 posX = mtx->_20 - view->posTopLeft.x;
@@ -1385,7 +1389,7 @@ static inline s16 ClAct_WrapOamY(s16 y) {
 }
 
 // Called by the renderers before each OAM: skips one that is out of view
-static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx) {
+static void ClAct_CullOam(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx) {
     GXOamAttr *oam = &state->oam;
     GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
     fx32 left = ClAct_WrapOamX(oam->x) << FX32_SHIFT;
@@ -1393,8 +1397,8 @@ static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32
     fx32 top = ClAct_WrapOamY(oam->y) << FX32_SHIFT;
     fx32 bottom = (ClAct_WrapOamY(oam->y) + NNS_G2dGetOamSizeY(&shape)) << FX32_SHIFT;
 
-    if (func_0204cc54(mtx->_20 - view->posTopLeft.x, mtx->_21 - view->posTopLeft.y, left, right, top, bottom, mtx,
-                      view)) {
+    if (ClAct_IsRectInView(mtx->_20 - view->posTopLeft.x, mtx->_21 - view->posTopLeft.y, left, right, top, bottom, mtx,
+                           view)) {
         state->skip = TRUE;
     } else {
         state->skip = FALSE;
@@ -1410,8 +1414,8 @@ static inline void ClAct_UpdateMinMax(fx32 value, fx32 *min, fx32 *max) {
 }
 
 // Whether a rect is in view, its corners transformed by the matrix
-static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top, fx32 bottom, const MtxFx32 *mtx,
-                          const NNSG2dViewRect *view) {
+static BOOL ClAct_IsRectInView(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top, fx32 bottom, const MtxFx32 *mtx,
+                               const NNSG2dViewRect *view) {
     fx32 minX;
     fx32 maxX;
     fx32 minY;
@@ -1437,28 +1441,28 @@ static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top,
     return FALSE;
 }
 
-static void func_0204cda4(ClActTransfer *transfer, u8 count, HeapID heapId) {
+static void ClActTransfer_Init(ClActTransfer *transfer, u8 count, HeapID heapId) {
     if (count == 0) {
         transfer->active = FALSE;
         return;
     }
     transfer->count = count;
     transfer->states = GFL_HeapAllocate(heapId, count * sizeof(NNSG2dCellTransferState), FALSE, "clact.c", 4976);
-    NNS_G2dInitCellTransferStateManager(transfer->states, count, func_0204cec8);
-    func_0204ce18(transfer, count, heapId);
+    NNS_G2dInitCellTransferStateManager(transfer->states, count, ClActTransfer_Request);
+    ClActTransfer_AllocTasks(transfer, count, heapId);
     transfer->active = TRUE;
 }
 
-static void func_0204cdf8(ClActTransfer *transfer) {
+static void ClActTransfer_Free(ClActTransfer *transfer) {
     if (transfer->active) {
         GFL_HeapFree(transfer->states);
         transfer->states = NULL;
-        func_0204ce5c(transfer);
+        ClActTransfer_FreeTasks(transfer);
         transfer->active = FALSE;
     }
 }
 
-static void func_0204ce18(ClActTransfer *transfer, u32 count, HeapID heapId) {
+static void ClActTransfer_AllocTasks(ClActTransfer *transfer, u32 count, HeapID heapId) {
     u32 i = 0;
 
     transfer->tasks = GFL_HeapAllocate(heapId, count * sizeof(ClActTransferTask), FALSE, "clact.c", 5044);
@@ -1467,23 +1471,23 @@ static void func_0204ce18(ClActTransfer *transfer, u32 count, HeapID heapId) {
     }
 }
 
-static void func_0204ce5c(ClActTransfer *transfer) {
+static void ClActTransfer_FreeTasks(ClActTransfer *transfer) {
     GFL_HeapFree(transfer->tasks);
     transfer->tasks = NULL;
 }
 
-static void func_0204ce6c(ClActTransfer *transfer) {
+static void ClActTransfer_RunTasks(ClActTransfer *transfer) {
     u32 i;
 
     for (i = 0; i < transfer->count; i++) {
         if (transfer->tasks[i].src != NULL) {
-            func_0204cf14(&transfer->tasks[i]);
+            ClActTransferTask_Run(&transfer->tasks[i]);
             MI_CpuFill8(&transfer->tasks[i], 0, sizeof(ClActTransferTask));
         }
     }
 }
 
-static ClActTransferTask *func_0204cea0(ClActTransfer *transfer) {
+static ClActTransferTask *ClActTransfer_FindFreeTask(ClActTransfer *transfer) {
     u32 i;
 
     for (i = 0; i < transfer->count; i++) {
@@ -1494,8 +1498,8 @@ static ClActTransferTask *func_0204cea0(ClActTransfer *transfer) {
     return NULL;
 }
 
-static BOOL func_0204cec8(u32 type, u32 dstAddr, void *src, u32 size) {
-    ClActTransferTask *task = func_0204cea0(&g_ClActSys->transfer);
+static BOOL ClActTransfer_Request(u32 type, u32 dstAddr, void *src, u32 size) {
+    ClActTransferTask *task = ClActTransfer_FindFreeTask(&g_ClActSys->transfer);
     u32 screen;
 
     if (type == NNS_GFD_DST_2D_OBJ_CHAR_MAIN) {
@@ -1504,24 +1508,24 @@ static BOOL func_0204cec8(u32 type, u32 dstAddr, void *src, u32 size) {
         screen = 1;
     }
     if (size != 0) {
-        func_0204cf08(task, screen, dstAddr, src, size);
+        ClActTransferTask_Set(task, screen, dstAddr, src, size);
     }
     return TRUE;
 }
 
-static void func_0204cf08(ClActTransferTask *task, u32 screen, u32 dst, void *src, u32 size) {
+static void ClActTransferTask_Set(ClActTransferTask *task, u32 screen, u32 dst, void *src, u32 size) {
     task->screen = screen;
     task->dst = dst;
     task->src = src;
     task->size = size;
 }
 
-static void func_0204cf14(ClActTransferTask *task) {
+static void ClActTransferTask_Run(ClActTransferTask *task) {
     DC_FlushRange(task->src, task->size);
     sTransferFuncs[task->screen](task->src, task->dst, task->size);
 }
 
-static ClActor *func_0204cf38(ClActUnit *unit) {
+static ClActor *ClActUnit_FindFreeActor(ClActUnit *unit) {
     int i;
 
     for (i = 0; i < unit->count; i++) {
@@ -1533,7 +1537,7 @@ static ClActor *func_0204cf38(ClActUnit *unit) {
     return NULL;
 }
 
-static void func_0204cf70(ClActUnit *unit, ClActor *actor) {
+static void ClActUnit_InsertActor(ClActUnit *unit, ClActor *actor) {
     ClActor *pos;
     u8 priority;
     u8 headPriority;
@@ -1544,15 +1548,15 @@ static void func_0204cf70(ClActUnit *unit, ClActor *actor) {
         unit->actorList->prev = actor;
         return;
     }
-    priority = func_0204c45c(actor);
-    headPriority = func_0204c45c(unit->actorList);
+    priority = ClActor_GetPriority(actor);
+    headPriority = ClActor_GetPriority(unit->actorList);
     if (priority < headPriority) {
         pos = unit->actorList->prev;
         unit->actorList = actor;
-    } else if ((u8)((headPriority + func_0204c45c(unit->actorList->prev)) / 2) >= priority) {
-        pos = func_0204d000(unit->actorList, priority);
+    } else if ((u8)((headPriority + ClActor_GetPriority(unit->actorList->prev)) / 2) >= priority) {
+        pos = ClActUnit_FindInsertPosFromHead(unit->actorList, priority);
     } else {
-        pos = func_0204d020(unit->actorList->prev, priority);
+        pos = ClActUnit_FindInsertPosFromTail(unit->actorList->prev, priority);
     }
     actor->prev = pos;
     actor->next = pos->next;
@@ -1560,7 +1564,7 @@ static void func_0204cf70(ClActUnit *unit, ClActor *actor) {
     pos->next = actor;
 }
 
-static void func_0204cfd8(ClActUnit *unit, ClActor *actor) {
+static void ClActUnit_RemoveActor(ClActUnit *unit, ClActor *actor) {
     if (unit->actorList == actor) {
         if (actor->next == actor) {
             unit->actorList = NULL;
@@ -1574,11 +1578,11 @@ static void func_0204cfd8(ClActUnit *unit, ClActor *actor) {
     actor->prev = NULL;
 }
 
-static ClActor *func_0204d000(ClActor *head, u8 priority) {
+static ClActor *ClActUnit_FindInsertPosFromHead(ClActor *head, u8 priority) {
     ClActor *cur = head;
 
     do {
-        if (func_0204c45c(cur) > priority) {
+        if (ClActor_GetPriority(cur) > priority) {
             return cur->prev;
         }
         cur = cur->next;
@@ -1586,11 +1590,11 @@ static ClActor *func_0204d000(ClActor *head, u8 priority) {
     return head->prev;
 }
 
-static ClActor *func_0204d020(ClActor *tail, u8 priority) {
+static ClActor *ClActUnit_FindInsertPosFromTail(ClActor *tail, u8 priority) {
     ClActor *cur = tail;
 
     do {
-        if (func_0204c45c(cur) <= priority) {
+        if (ClActor_GetPriority(cur) <= priority) {
             return cur;
         }
         cur = cur->prev;
@@ -1598,7 +1602,7 @@ static ClActor *func_0204d020(ClActor *tail, u8 priority) {
     return tail->next;
 }
 
-static void func_0204d040(ClActor *actor) {
+static void ClActor_Reset(ClActor *actor) {
     MI_CpuFill8(actor, 0, sizeof(ClActor));
     actor->autoAnimSpeed = FX32_ONE;
     NNS_G2dInitImageProxy(&actor->imgProxy);
@@ -1610,33 +1614,33 @@ static void func_0204d040(ClActor *actor) {
     actor->affineMode = 0;
 }
 
-static void func_0204d094(ClActor *actor, const ClActorSetup *setup, u16 surface) {
-    func_0204c1a8(actor, setup->x, surface, 0);
-    func_0204c1a8(actor, setup->y, surface, 1);
+static void ClActor_ApplySetup(ClActor *actor, const ClActorSetup *setup, u16 surface) {
+    ClActor_SetSurfacePosAxis(actor, setup->x, surface, 0);
+    ClActor_SetSurfacePosAxis(actor, setup->y, surface, 1);
     actor->priority = setup->priority;
-    func_0204c468(actor, setup->bgPriority);
-    func_0204c488(actor, setup->sequence);
-    func_0204c540(actor);
+    ClActor_SetBgPriority(actor, setup->bgPriority);
+    ClActor_SetSequence(actor, setup->sequence);
+    ClActor_StartAnim(actor);
 }
 
-static void func_0204d0d8(ClActor *actor, const ClActResSetup *res) {
-    func_0204c3e4(actor, &res->chars->proxy);
-    func_0204c3a8(actor, &res->pltt->proxy);
+static void ClActor_ApplyRes(ClActor *actor, const ClActResSetup *res) {
+    ClActor_SetImageProxy(actor, &res->chars->proxy);
+    ClActor_SetPlttProxy(actor, &res->pltt->proxy);
     actor->charIdx = res->charIdx;
     actor->plttIdx = res->plttIdx;
 }
 
-static void func_0204d0fc(ClActor *actor, u32 surface, ClActorPos *offset) {
+static void ClActor_GetSurfaceOffset(ClActor *actor, u32 surface, ClActorPos *offset) {
     if (surface != CLACT_SURFACE_NONE) {
-        func_0204befc(actor->unit->renderer, surface, offset);
+        ClActRenderer_GetSurfacePos(actor->unit->renderer, surface, offset);
     } else {
         offset->x = 0;
         offset->y = 0;
     }
 }
 
-static void func_0204d11c(ClActResSetup *res, u16 charIdx, u16 plttIdx, ClActCharRes *chars, ClActPlttRes *pltt,
-                          NNSG2dCellDataBank *cells, NNSG2dAnimBankData *anims) {
+static void ClActResSetup_Init(ClActResSetup *res, u16 charIdx, u16 plttIdx, ClActCharRes *chars, ClActPlttRes *pltt,
+                               NNSG2dCellDataBank *cells, NNSG2dAnimBankData *anims) {
     res->charIdx = charIdx;
     res->plttIdx = plttIdx;
     res->pltt = pltt;
@@ -1648,48 +1652,48 @@ static void func_0204d11c(ClActResSetup *res, u16 charIdx, u16 plttIdx, ClActCha
     res->transferChar = NULL;
 }
 
-static ClActor *func_0204d138(ClActUnit *unit, const ClActorSetup *setup, const ClActResSetup *res, u16 surface,
-                              HeapID heapId) {
-    ClActor *actor = func_0204cf38(unit);
+static ClActor *ClActor_CreateFromRes(ClActUnit *unit, const ClActorSetup *setup, const ClActResSetup *res, u16 surface,
+                                      HeapID heapId) {
+    ClActor *actor = ClActUnit_FindFreeActor(unit);
 
     actor->unit = unit;
-    func_0204d1cc(&actor->anim, res, heapId);
-    func_0204d094(actor, setup, surface);
-    func_0204d0d8(actor, res);
-    func_0204cf70(unit, actor);
-    func_0204c124(actor, TRUE);
+    ClActAnim_Init(&actor->anim, res, heapId);
+    ClActor_ApplySetup(actor, setup, surface);
+    ClActor_ApplyRes(actor, res);
+    ClActUnit_InsertActor(unit, actor);
+    ClActor_SetVisible(actor, TRUE);
     return actor;
 }
 
-static ClActor *func_0204d17c(ClActUnit *unit, const ClActorSetupEx *setup, const ClActResSetup *res, u16 surface,
-                              HeapID heapId) {
-    ClActor *actor = func_0204d138(unit, &setup->base, res, surface, heapId);
+static ClActor *ClActor_CreateExFromRes(ClActUnit *unit, const ClActorSetupEx *setup, const ClActResSetup *res,
+                                        u16 surface, HeapID heapId) {
+    ClActor *actor = ClActor_CreateFromRes(unit, &setup->base, res, surface, heapId);
 
-    func_0204c264(actor, setup->affineCenter.x, 0);
+    ClActor_SetAffineCenterAxis(actor, setup->affineCenter.x, 0);
     // BUG: the y of the affine center is set to its x
 #ifdef BUGFIX
-    func_0204c264(actor, setup->affineCenter.y, 1);
+    ClActor_SetAffineCenterAxis(actor, setup->affineCenter.y, 1);
 #else
-    func_0204c264(actor, setup->affineCenter.x, 1);
+    ClActor_SetAffineCenterAxis(actor, setup->affineCenter.x, 1);
 #endif
-    func_0204c288(actor, setup->scaleX, 0);
-    func_0204c288(actor, setup->scaleY, 1);
-    func_0204c2a0(actor, setup->rotation);
-    func_0204c244(actor, setup->affineMode);
+    ClActor_SetScaleAxis(actor, setup->scaleX, 0);
+    ClActor_SetScaleAxis(actor, setup->scaleY, 1);
+    ClActor_SetRotation(actor, setup->rotation);
+    ClActor_SetAffineMode(actor, setup->affineMode);
     return actor;
 }
 
-static void func_0204d1cc(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
-    anim->type = func_0204d214(res);
+static void ClActAnim_Init(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
+    anim->type = ClActAnim_GetType(res);
     sAnimInitFuncs[anim->type](anim, res, heapId);
 }
 
-static void func_0204d1f4(ClActAnim *anim) {
+static void ClActAnim_Free(ClActAnim *anim) {
     sAnimFreeFuncs[anim->type](anim);
     MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
-static u32 func_0204d214(const ClActResSetup *res) {
+static u32 ClActAnim_GetType(const ClActResSetup *res) {
     if (res->transferChar != NULL) {
         return CLACT_ANIM_VRAM_TRANSFER;
     }
@@ -1699,13 +1703,13 @@ static u32 func_0204d214(const ClActResSetup *res) {
     return CLACT_ANIM_CELL;
 }
 
-static void func_0204d22c(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
+static void ClActAnim_InitCell(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
     anim->cells = res->cells;
     anim->anims = res->anims;
     NNS_G2dInitCellAnimation(&anim->cellAnim, NNS_G2dGetAnimSequenceByIdx(anim->anims, 0), anim->cells);
 }
 
-static void func_0204d24c(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
+static void ClActAnim_InitVramTransfer(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
     NNSG2dCharacterData *transferChar;
     const NNSG2dAnimSequence *seq;
 
@@ -1721,7 +1725,7 @@ static void func_0204d24c(ClActAnim *anim, const ClActResSetup *res, HeapID heap
                                            transferChar->rawData, NULL, transferChar->size);
 }
 
-static void func_0204d2a8(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
+static void ClActAnim_InitMultiCell(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
     anim->cells = res->cells;
     anim->anims = res->anims;
     anim->mcBank = res->mcBank;
@@ -1733,29 +1737,29 @@ static void func_0204d2a8(ClActAnim *anim, const ClActResSetup *res, HeapID heap
     NNS_G2dSetAnimSequenceToMCAnimation(&anim->mcAnim, NNS_G2dGetAnimSequenceByIdx(anim->mcAnims, 0));
 }
 
-static void func_0204d30c(ClActAnim *anim) {
+static void ClActAnim_FreeCell(ClActAnim *anim) {
     MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
-static void func_0204d318(ClActAnim *anim) {
+static void ClActAnim_FreeVramTransfer(ClActAnim *anim) {
     NNS_G2dFreeCellTransferStateHandle(anim->transferHandle);
     MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
-static void func_0204d330(ClActAnim *anim) {
+static void ClActAnim_FreeMultiCell(ClActAnim *anim) {
     GFL_HeapFree(anim->mcWork);
     MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
-static void func_0204d348(ClActAnim *anim, u16 sequence) {
+static void ClActAnim_SetSequence(ClActAnim *anim, u16 sequence) {
     sAnimSetSequenceFuncs[anim->type](anim, sequence);
 }
 
-static void func_0204d35c(ClActAnim *anim, u16 sequence) {
+static void ClActAnim_SetSequenceCell(ClActAnim *anim, u16 sequence) {
     NNS_G2dSetCellAnimationSequence(&anim->cellAnim, NNS_G2dGetAnimSequenceByIdx(anim->anims, sequence));
 }
 
-static void func_0204d374(ClActAnim *anim, u16 sequence) {
+static void ClActAnim_SetSequenceVramTransfer(ClActAnim *anim, u16 sequence) {
     NNS_G2dSetCellAnimationSequence(&anim->cellAnim, NNS_G2dGetAnimSequenceByIdx(anim->anims, sequence));
 }
 
@@ -1763,8 +1767,8 @@ static void setSeqToMultiCellAnim(ClActAnim *anim, u16 sequence) {
     NNS_G2dSetAnimSequenceToMCAnimation(&anim->mcAnim, NNS_G2dGetAnimSequenceByIdx(anim->mcAnims, sequence));
 }
 
-static void func_0204d3a4(ClActAnim *anim, fx32 time) {
-    func_0204d3f4(anim)->currentTime = time;
+static void ClActAnim_SetTime(ClActAnim *anim, fx32 time) {
+    ClActAnim_GetCtrl(anim)->currentTime = time;
     ClActAnim_Tick(anim, 0);
 }
 
@@ -1772,63 +1776,63 @@ void ClActAnim_Tick(ClActAnim *anim, fx32 frames) {
     sAnimTickFuncs[anim->type](anim, frames);
 }
 
-static void func_0204d3d0(ClActAnim *anim, fx32 frames) {
+static void ClActAnim_TickCell(ClActAnim *anim, fx32 frames) {
     NNS_G2dTickCellAnimation(&anim->cellAnim, frames);
 }
 
-static void func_0204d3dc(ClActAnim *anim, fx32 frames) {
+static void ClActAnim_TickVramTransfer(ClActAnim *anim, fx32 frames) {
     NNS_G2dTickCellAnimation(&anim->cellAnim, frames);
 }
 
-static void func_0204d3e8(ClActAnim *anim, fx32 frames) {
+static void ClActAnim_TickMultiCell(ClActAnim *anim, fx32 frames) {
     NNS_G2dTickMCAnimation(&anim->mcAnim, frames);
 }
 
-static NNSG2dAnimController *func_0204d3f4(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrl(ClActAnim *anim) {
     return sAnimGetCtrlFuncs2[anim->type](anim);
 }
 
-static NNSG2dAnimController *func_0204d408(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrlCell(ClActAnim *anim) {
     return &anim->cellAnim.animCtrl;
 }
 
-static NNSG2dAnimController *func_0204d40c(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrlVramTransfer(ClActAnim *anim) {
     return &anim->cellAnim.animCtrl;
 }
 
-static NNSG2dAnimController *func_0204d410(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrlMultiCell(ClActAnim *anim) {
     return &anim->mcAnim.animCtrl;
 }
 
-static NNSG2dAnimController *func_0204d414(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrl2(ClActAnim *anim) {
     return sAnimGetCtrlFuncs[anim->type](anim);
 }
 
-static NNSG2dAnimController *func_0204d428(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrl2Cell(ClActAnim *anim) {
     return &anim->cellAnim.animCtrl;
 }
 
-static NNSG2dAnimController *func_0204d42c(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrl2VramTransfer(ClActAnim *anim) {
     return &anim->cellAnim.animCtrl;
 }
 
-static NNSG2dAnimController *func_0204d430(ClActAnim *anim) {
+static NNSG2dAnimController *ClActAnim_GetCtrl2MultiCell(ClActAnim *anim) {
     return &anim->mcAnim.animCtrl;
 }
 
-static void func_0204d434(ClActAnim *anim, u16 frame) {
+static void ClActAnim_SetFrame(ClActAnim *anim, u16 frame) {
     sAnimSetFrameFuncs[anim->type](anim, frame);
 }
 
-static void func_0204d448(ClActAnim *anim, u16 frame) {
+static void ClActAnim_SetFrameCell(ClActAnim *anim, u16 frame) {
     NNS_G2dSetCellAnimationCurrentFrame(&anim->cellAnim, frame);
 }
 
-static void func_0204d454(ClActAnim *anim, u16 frame) {
+static void ClActAnim_SetFrameVramTransfer(ClActAnim *anim, u16 frame) {
     NNS_G2dSetCellAnimationCurrentFrame(&anim->cellAnim, frame);
 }
 
-static void func_0204d460(ClActAnim *anim, u16 frame) {
+static void ClActAnim_SetFrameMultiCell(ClActAnim *anim, u16 frame) {
     NNS_G2dSetMCAnimationCurrentFrame(&anim->mcAnim, frame);
 }
 
@@ -1836,36 +1840,36 @@ void ClActAnim_SetSpeed(ClActAnim *anim, fx32 speed) {
     sAnimSetSpeedFuncs[anim->type](anim, speed);
 }
 
-static void func_0204d480(ClActAnim *anim, fx32 speed) {
+static void ClActAnim_SetSpeedCell(ClActAnim *anim, fx32 speed) {
     NNS_G2dSetCellAnimationSpeed(&anim->cellAnim, speed);
 }
 
-static void func_0204d48c(ClActAnim *anim, fx32 speed) {
+static void ClActAnim_SetSpeedVramTransfer(ClActAnim *anim, fx32 speed) {
     NNS_G2dSetCellAnimationSpeed(&anim->cellAnim, speed);
 }
 
-static void func_0204d498(ClActAnim *anim, fx32 speed) {
+static void ClActAnim_SetSpeedMultiCell(ClActAnim *anim, fx32 speed) {
     NNS_G2dSetMCAnimationSpeed(&anim->mcAnim, speed);
 }
 
-static void func_0204d4a4(ClActAnim *anim) {
+static void ClActAnim_Restart(ClActAnim *anim) {
     sAnimRestartFuncs[anim->type](anim);
 }
 
-static void func_0204d4b8(ClActAnim *anim) {
+static void ClActAnim_RestartCell(ClActAnim *anim) {
     NNS_G2dRestartCellAnimation(&anim->cellAnim);
 }
 
-static void func_0204d4c4(ClActAnim *anim) {
+static void ClActAnim_RestartVramTransfer(ClActAnim *anim) {
     NNS_G2dRestartCellAnimation(&anim->cellAnim);
 }
 
-static void func_0204d4d0(ClActAnim *anim) {
-    func_0204d4b8(anim);
+static void ClActAnim_RestartMultiCell(ClActAnim *anim) {
+    ClActAnim_RestartCell(anim);
     NNS_G2dRestartMCCellAnimations(&anim->mcAnim.multiCellInstance);
 }
 
-static const NNSG2dUserExAnimSequenceAttr *func_0204d4e4(ClActAnim *anim, u32 sequence) {
+static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrCell(ClActAnim *anim, u32 sequence) {
     const NNSG2dUserExAnimAttrBank *bank = NNS_G2dGetUserExAnimAttrBank(anim->anims);
 
     if (bank != NULL) {
@@ -1874,7 +1878,7 @@ static const NNSG2dUserExAnimSequenceAttr *func_0204d4e4(ClActAnim *anim, u32 se
     return NULL;
 }
 
-static const NNSG2dUserExAnimSequenceAttr *func_0204d524(ClActAnim *anim, u32 sequence) {
+static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrVramTransfer(ClActAnim *anim, u32 sequence) {
     const NNSG2dUserExAnimAttrBank *bank = NNS_G2dGetUserExAnimAttrBank(anim->anims);
 
     if (bank != NULL) {
@@ -1883,7 +1887,7 @@ static const NNSG2dUserExAnimSequenceAttr *func_0204d524(ClActAnim *anim, u32 se
     return NULL;
 }
 
-static const NNSG2dUserExAnimSequenceAttr *func_0204d564(ClActAnim *anim, u32 sequence) {
+static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrMultiCell(ClActAnim *anim, u32 sequence) {
     const NNSG2dUserExAnimAttrBank *bank = NNS_G2dGetUserExAnimAttrBank(anim->mcAnims);
 
     if (bank != NULL) {
@@ -1892,36 +1896,36 @@ static const NNSG2dUserExAnimSequenceAttr *func_0204d564(ClActAnim *anim, u32 se
     return NULL;
 }
 
-static const NNSG2dUserExCellAttrBank *func_0204d5a4(ClActAnim *anim) {
+static const NNSG2dUserExCellAttrBank *ClActAnim_GetUserExCellAttrBankCell(ClActAnim *anim) {
     return NNS_G2dGetUserExCellAttrBankFromCellBank(anim->cells);
 }
 
-static const NNSG2dUserExCellAttrBank *func_0204d5c8(ClActAnim *anim) {
+static const NNSG2dUserExCellAttrBank *ClActAnim_GetUserExCellAttrBankVramTransfer(ClActAnim *anim) {
     return NNS_G2dGetUserExCellAttrBankFromCellBank(anim->cells);
 }
 
-static const NNSG2dUserExCellAttrBank *func_0204d5ec(ClActAnim *anim) {
+static const NNSG2dUserExCellAttrBank *ClActAnim_GetUserExCellAttrBankMultiCell(ClActAnim *anim) {
     return NNS_G2dGetUserExCellAttrBankFromMCBank(anim->mcBank);
 }
 
-static u32 func_0204d610(ClActAnim *anim) {
+static u32 ClActAnim_GetSequenceCount(ClActAnim *anim) {
     return sAnimGetSequenceCountFuncs[anim->type](anim);
 }
 
-static u32 func_0204d624(ClActAnim *anim) {
+static u32 ClActAnim_GetSequenceCountCell(ClActAnim *anim) {
     return anim->anims->numSequences;
 }
 
-static u32 func_0204d62c(ClActAnim *anim) {
+static u32 ClActAnim_GetSequenceCountVramTransfer(ClActAnim *anim) {
     return anim->anims->numSequences;
 }
 
-static u32 func_0204d634(ClActAnim *anim) {
+static u32 ClActAnim_GetSequenceCountMultiCell(ClActAnim *anim) {
     return anim->mcAnims->numSequences;
 }
 
-static void func_0204d63c(ClActAnim *anim, const ClActorCallback *callback) {
-    NNSG2dAnimController *animCtrl = func_0204d3f4(anim);
+static void ClActAnim_SetCallback(ClActAnim *anim, const ClActorCallback *callback) {
+    NNSG2dAnimController *animCtrl = ClActAnim_GetCtrl(anim);
 
     switch (callback->type) {
     case CLACT_CALLBACK_LAST_FRAME:
@@ -1936,8 +1940,8 @@ static void func_0204d63c(ClActAnim *anim, const ClActorCallback *callback) {
     }
 }
 
-static void func_0204d678(ClActAnim *anim) {
-    NNS_G2dSetAnimCtrlCallBackFunctor(func_0204d3f4(anim), NNS_G2D_ANMCALLBACKTYPE_NONE, 0, NULL);
+static void ClActAnim_ClearCallback(ClActAnim *anim) {
+    NNS_G2dSetAnimCtrlCallBackFunctor(ClActAnim_GetCtrl(anim), NNS_G2D_ANMCALLBACKTYPE_NONE, 0, NULL);
 }
 
 static void ClActVRAMManager_Init(ClActResMan *man, HeapID heapId, const BGSysVRAMConfig *vramConfig,
@@ -1946,9 +1950,9 @@ static void ClActVRAMManager_Init(ClActResMan *man, HeapID heapId, const BGSysVR
                                           vramConfig->objMappingMain);
     man->vmanSub = GFL_VRAMManagerCreate(heapId, VMAN_TYPE_OBJ, vramConfig->objSub, setup->offsetSub << 5,
                                          vramConfig->objMappingSub);
-    man->chars = func_0204d810(heapId, setup->charCount);
-    man->pltts = func_0204d9b0(heapId, setup->plttCount);
-    man->cellAnims = func_0204dbf4(heapId, setup->cellAnimCount);
+    man->chars = ClActCharRes_AllocArray(heapId, setup->charCount);
+    man->pltts = ClActPlttRes_AllocArray(heapId, setup->plttCount);
+    man->cellAnims = ClActCellAnimRes_AllocArray(heapId, setup->cellAnimCount);
     man->charCount = setup->charCount;
     man->plttCount = setup->plttCount;
     man->cellAnimCount = setup->cellAnimCount;
@@ -1957,27 +1961,27 @@ static void ClActVRAMManager_Init(ClActResMan *man, HeapID heapId, const BGSysVR
     man->offsetSub = setup->offsetSub;
 }
 
-static void func_0204d6f8(ClActResMan *man) {
+static void ClActResMan_Free(ClActResMan *man) {
     u32 i;
 
     for (i = 0; i < man->charCount; i++) {
         if (!man->chars[i].free) {
-            func_0204b98c(i);
+            ClActSys_FreeChars(i);
         }
     }
     for (i = 0; i < man->cellAnimCount; i++) {
         if (man->cellAnims[i].free == FALSE) {
-            func_0204be64(i);
+            ClActSys_FreeCellAnims(i);
         }
     }
     for (i = 0; i < man->plttCount; i++) {
         if (!man->pltts[i].free) {
-            func_0204bcd0(i);
+            ClActSys_FreePltt(i);
         }
     }
-    func_0204d984(man->chars);
-    func_0204dbec(man->pltts);
-    func_0204dc60(man->cellAnims);
+    ClActCharRes_FreeArray(man->chars);
+    ClActPlttRes_FreeArray(man->pltts);
+    ClActCellAnimRes_FreeArray(man->cellAnims);
     GFL_VRAMManagerFree(man->vmanSub);
     GFL_VRAMManagerFree(man->vmanMain);
     man->vmanMain = NULL;
@@ -1987,7 +1991,7 @@ static void func_0204d6f8(ClActResMan *man) {
     man->cellAnims = NULL;
 }
 
-static BOOL func_0204d798(u32 vramType, u32 which) {
+static BOOL ClAct_VramTypeIncludes(u32 vramType, u32 which) {
     if (vramType == CLACT_VRAM_BOTH || which == CLACT_VRAM_BOTH) {
         return TRUE;
     }
@@ -1997,7 +2001,7 @@ static BOOL func_0204d798(u32 vramType, u32 which) {
     return FALSE;
 }
 
-static void *func_0204d7b0(ArcTool *arc, u32 fileId, BOOL compressed, HeapID heapId) {
+static void *ClAct_ReadCharFile(ArcTool *arc, u32 fileId, BOOL compressed, HeapID heapId) {
     void *data;
 
     if (compressed) {
@@ -2012,7 +2016,7 @@ static void *func_0204d7b0(ArcTool *arc, u32 fileId, BOOL compressed, HeapID hea
     return data;
 }
 
-static ClActCharRes *func_0204d810(HeapID heapId, u32 count) {
+static ClActCharRes *ClActCharRes_AllocArray(HeapID heapId, u32 count) {
     ClActCharRes *chars = GFL_HeapAllocate(heapId, count * sizeof(ClActCharRes), FALSE, "clact.c", 7360);
     u32 i = 0;
 
@@ -2024,8 +2028,8 @@ static ClActCharRes *func_0204d810(HeapID heapId, u32 count) {
     return chars;
 }
 
-static void func_0204d868(ClActResMan *man, u32 idx, NNSG2dCharacterData *charData, NNSG2dCellDataBank *transferCells,
-                          u32 vramType) {
+static void ClActResMan_SetupChars(ClActResMan *man, u32 idx, NNSG2dCharacterData *charData,
+                                   NNSG2dCellDataBank *transferCells, u32 vramType) {
     ClActCharRes *res = &man->chars[idx];
     u32 size;
     BOOL vramTransfer;
@@ -2038,10 +2042,11 @@ static void func_0204d868(ClActResMan *man, u32 idx, NNSG2dCharacterData *charDa
         vramTransfer = TRUE;
     }
     NNS_G2dInitImageProxy(&res->proxy);
-    if (func_0204d798(vramType, CLACT_VRAM_MAIN) && GFL_VRAMManagerAlloc(man->vmanMain, size, &res->allocMain)) {
+    if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_MAIN) &&
+        GFL_VRAMManagerAlloc(man->vmanMain, size, &res->allocMain)) {
         u32 addr = GFL_VRAMManagerGetAllocAddress(man->vmanMain, &res->allocMain);
 
-        func_0204d98c(charData, NNS_G2D_VRAM_TYPE_2DMAIN);
+        ClAct_SetCharMapping(charData, NNS_G2D_VRAM_TYPE_2DMAIN);
         if (vramTransfer) {
             NNS_G2dLoadImageVramTransfer(charData, addr, NNS_G2D_VRAM_TYPE_2DMAIN, &res->proxy);
         } else if (charData->mappingType != GX_OBJVRAMMODE_CHAR_2D) {
@@ -2050,10 +2055,10 @@ static void func_0204d868(ClActResMan *man, u32 idx, NNSG2dCharacterData *charDa
             NNS_G2dLoadImage2DMapping(charData, addr, NNS_G2D_VRAM_TYPE_2DMAIN, &res->proxy);
         }
     }
-    if (func_0204d798(vramType, CLACT_VRAM_SUB) && GFL_VRAMManagerAlloc(man->vmanSub, size, &res->allocSub)) {
+    if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_SUB) && GFL_VRAMManagerAlloc(man->vmanSub, size, &res->allocSub)) {
         u32 addr = GFL_VRAMManagerGetAllocAddress(man->vmanSub, &res->allocSub);
 
-        func_0204d98c(charData, NNS_G2D_VRAM_TYPE_2DSUB);
+        ClAct_SetCharMapping(charData, NNS_G2D_VRAM_TYPE_2DSUB);
         if (vramTransfer) {
             NNS_G2dLoadImageVramTransfer(charData, addr, NNS_G2D_VRAM_TYPE_2DSUB, &res->proxy);
         } else if (charData->mappingType != GX_OBJVRAMMODE_CHAR_2D) {
@@ -2069,12 +2074,12 @@ static void func_0204d868(ClActResMan *man, u32 idx, NNSG2dCharacterData *charDa
     res->size = size;
 }
 
-static void func_0204d984(ClActCharRes *chars) {
+static void ClActCharRes_FreeArray(ClActCharRes *chars) {
     GFL_HeapFree(chars);
 }
 
 // Makes the characters' mapping the engine's, which loading them follows
-static void func_0204d98c(NNSG2dCharacterData *charData, NNSG2dVRamType type) {
+static void ClAct_SetCharMapping(NNSG2dCharacterData *charData, NNSG2dVRamType type) {
     u32 mapping = type == NNS_G2D_VRAM_TYPE_2DMAIN ? GX_GetOBJVRamModeChar() : GXS_GetOBJVRamModeChar();
 
     if (charData->mappingType != mapping) {
@@ -2082,7 +2087,7 @@ static void func_0204d98c(NNSG2dCharacterData *charData, NNSG2dVRamType type) {
     }
 }
 
-static ClActPlttRes *func_0204d9b0(HeapID heapId, u32 count) {
+static ClActPlttRes *ClActPlttRes_AllocArray(HeapID heapId, u32 count) {
     ClActPlttRes *pltts = GFL_HeapAllocate(heapId, count * sizeof(ClActPlttRes), FALSE, "clact.c", 7514);
     u32 i = 0;
 
@@ -2092,7 +2097,8 @@ static ClActPlttRes *func_0204d9b0(HeapID heapId, u32 count) {
     return pltts;
 }
 
-static void func_0204d9f4(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset, u16 start, u16 count) {
+static void ClActResMan_SetupPlttRange(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset, u16 start,
+                                       u16 count) {
     ClActPlttRes *res = &man->pltts[idx];
     u32 limit = 0x200;
     BOOL extended;
@@ -2124,7 +2130,7 @@ static void func_0204d9f4(ClActResMan *man, u32 idx, void *file, u32 vramType, u
         if (offset != 0 && pltt->size + offset > limit) {
             pltt->size = limit - offset;
         }
-        if (func_0204d798(vramType, CLACT_VRAM_MAIN)) {
+        if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_MAIN)) {
             banks = GX_GetBankForOBJExtPltt();
             if (extended) {
                 GX_SetBankForLCDC(banks);
@@ -2134,7 +2140,7 @@ static void func_0204d9f4(ClActResMan *man, u32 idx, void *file, u32 vramType, u
                 GX_SetBankForOBJExtPltt(banks);
             }
         }
-        if (func_0204d798(vramType, CLACT_VRAM_SUB)) {
+        if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_SUB)) {
             banks = GX_GetBankForSubOBJExtPltt();
             if (extended) {
                 GX_SetBankForLCDC(banks);
@@ -2149,7 +2155,7 @@ static void func_0204d9f4(ClActResMan *man, u32 idx, void *file, u32 vramType, u
     }
 }
 
-static void func_0204db2c(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset) {
+static void ClActResMan_SetupPlttEx(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset) {
     ClActPlttRes *res = &man->pltts[idx];
     BOOL extended;
     NNSG2dPaletteData *pltt;
@@ -2164,7 +2170,7 @@ static void func_0204db2c(ClActResMan *man, u32 idx, void *file, u32 vramType, u
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &cmpInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &pltt)) {
         NNS_G2dInitImagePaletteProxy(&res->proxy);
-        if (func_0204d798(vramType, CLACT_VRAM_MAIN)) {
+        if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_MAIN)) {
             u32 banks = GX_GetBankForOBJExtPltt();
 
             if (extended) {
@@ -2175,7 +2181,7 @@ static void func_0204db2c(ClActResMan *man, u32 idx, void *file, u32 vramType, u
                 GX_SetBankForOBJExtPltt(banks);
             }
         }
-        if (func_0204d798(vramType, CLACT_VRAM_SUB)) {
+        if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_SUB)) {
             u32 banks = GX_GetBankForSubOBJExtPltt();
 
             if (extended) {
@@ -2190,11 +2196,11 @@ static void func_0204db2c(ClActResMan *man, u32 idx, void *file, u32 vramType, u
     }
 }
 
-static void func_0204dbec(ClActPlttRes *pltts) {
+static void ClActPlttRes_FreeArray(ClActPlttRes *pltts) {
     GFL_HeapFree(pltts);
 }
 
-static ClActCellAnimRes *func_0204dbf4(HeapID heapId, u32 count) {
+static ClActCellAnimRes *ClActCellAnimRes_AllocArray(HeapID heapId, u32 count) {
     ClActCellAnimRes *cellAnims = GFL_HeapAllocate(heapId, count * sizeof(ClActCellAnimRes), FALSE, "clact.c", 7752);
     u32 i = 0;
 
@@ -2204,7 +2210,7 @@ static ClActCellAnimRes *func_0204dbf4(HeapID heapId, u32 count) {
     return cellAnims;
 }
 
-static BOOL func_0204dc2c(ClActResMan *man, u32 idx, void *cellFile, void *animFile) {
+static BOOL ClActResMan_SetupCellAnims(ClActResMan *man, u32 idx, void *cellFile, void *animFile) {
     ClActCellAnimRes *res = &man->cellAnims[idx];
 
     if (NNS_G2dGetUnpackedCellBank(cellFile, &res->cells) && NNS_G2dGetUnpackedAnimBank(animFile, &res->anims)) {
@@ -2214,15 +2220,16 @@ static BOOL func_0204dc2c(ClActResMan *man, u32 idx, void *cellFile, void *animF
     return FALSE;
 }
 
-static void func_0204dc60(ClActCellAnimRes *cellAnims) {
+static void ClActCellAnimRes_FreeArray(ClActCellAnimRes *cellAnims) {
     GFL_HeapFree(cellAnims);
 }
 
-static void func_0204dc68(ClActResMan *man, u32 idx, void *file, u32 vramType, NNSG2dCellDataBank *transferCells) {
+static void ClActResMan_SetupCharsFromFile(ClActResMan *man, u32 idx, void *file, u32 vramType,
+                                           NNSG2dCellDataBank *transferCells) {
     NNSG2dCharacterData *charData;
 
     if (NNS_G2dGetUnpackedCharacterData(file, &charData)) {
-        func_0204d868(man, idx, charData, transferCells, vramType);
+        ClActResMan_SetupChars(man, idx, charData, transferCells, vramType);
         man->chars[idx].free = FALSE;
     }
 }

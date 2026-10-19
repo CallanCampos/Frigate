@@ -109,10 +109,10 @@ u8 TrainerLog_GetBirthdayValue(u8 month, u8 day, const RTCDate *date) {
     u32 today;
     u32 birthdayDay;
 
-    today = func_02044298(&birthday);
+    today = RTC_GetDayOfYear(&birthday);
     birthday.month = month;
     birthday.day = day;
-    birthdayDay = func_02044298(&birthday);
+    birthdayDay = RTC_GetDayOfYear(&birthday);
     if (today >= birthdayDay) {
         birthdayDay += 365;
     }

@@ -220,7 +220,7 @@ void GameBeaconSys_Update(void) {
     u16 hours;
     int i;
 
-    if (sys == NULL || func_02042788() == FALSE) {
+    if (sys == NULL || GFL_NetIsInitialized() == FALSE) {
         return;
     }
     if (sys->gameData != NULL) {
@@ -240,11 +240,12 @@ void GameBeaconSys_Update(void) {
     if (GameBeaconSendSlot_UpdateTimer(&sys->mine)) {
         sys->avenueAdRequest = TRUE;
     }
-    if (func_02042d34() == 3 && !func_ov030_02173c08() && GameBeaconSys_UpdateAvenueAdTimer(sys) &&
+    if (GFL_NetGetGameCommandBase() == 3 && !func_ov030_02173c08() && GameBeaconSys_UpdateAvenueAdTimer(sys) &&
         sys->mine.beacon.type <= 1) {
         sys->avenueAdRequest = TRUE;
     }
-    if (sys->gameData != NULL && !GameData_CheckEventsPaused(sys->gameData) && sys->enabled && func_02042d34() == 3) {
+    if (sys->gameData != NULL && !GameData_CheckEventsPaused(sys->gameData) && sys->enabled &&
+        GFL_NetGetGameCommandBase() == 3) {
         if (!func_ov030_02173c08()) {
             if (sys->mine.beacon.type <= 1 && sys->avenueAdRequest == TRUE) {
                 GameBeaconSys_SendAvenueAd(sys);
@@ -289,7 +290,7 @@ void GameBeaconSys_ToggleB2W2Only(void) {
 }
 
 void GameBeaconSys_SendIfUpdated(void) {
-    if (GameBeaconSys->mine.updated == TRUE && func_02042788() == TRUE) {
+    if (GameBeaconSys->mine.updated == TRUE && GFL_NetIsInitialized() == TRUE) {
         func_ov030_02173780();
         GameBeaconSys->mine.updated = FALSE;
     }

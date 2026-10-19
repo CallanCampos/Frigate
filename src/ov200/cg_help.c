@@ -206,7 +206,7 @@ static void CGHelp_Setup(CGHelp *help) {
     help->page = 0;
     help->redraw = TRUE;
     CGHelp_DrawPage(help, help->page);
-    func_02042ba8(FALSE, help->heapId);
+    GFL_NetSetIconScreen(FALSE, help->heapId);
 }
 
 static void CGHelp_Cleanup(CGHelp *help) {
@@ -245,7 +245,7 @@ static BOOL CGHelp_Update(CGHelp *help) {
         break;
     }
     PrintQueue_Main(help->printQueue);
-    func_0204b794();
+    ClActSys_Draw();
     if (help->nextButton != NULL) {
         AppTaskMenuWin_Update(help->nextButton);
     }
@@ -282,7 +282,7 @@ static BOOL CGHelp_Update(CGHelp *help) {
 }
 
 static void CGHelp_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void CGHelp_InitBGs(CGHelp *help) {
@@ -310,14 +310,14 @@ static void CGHelp_InitBGs(CGHelp *help) {
     clActSetup = data_02093f08;
     clActSetup.charCount = 0x40;
     ClActSys_Create(&clActSetup, &sVRAMConfig, help->heapId);
-    help->clActUnit = func_0204bf1c(0x30, 0, help->heapId);
-    func_0204c028(help->clActUnit);
+    help->clActUnit = ClActUnit_Create(0x30, 0, help->heapId);
+    ClActUnit_UseSystemRenderer(help->clActUnit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void CGHelp_FreeBGs(CGHelp *help) {
-    func_0204bf98(help->clActUnit);
-    func_0204b758();
+    ClActUnit_Delete(help->clActUnit);
+    ClActSys_Delete();
     GFL_BGSysReleaseBG(BG_TEXT);
     GFL_BGSysReleaseBG(BG_MESSAGE);
     GFL_BGSysReleaseBG(BG_FRAME);
@@ -347,11 +347,11 @@ static void CGHelp_LoadGraphics(CGHelp *help) {
     GFL_ArcToolFree(arc);
     gender = getTrainerGender(help->param->playerInfo) & 1;
     arc = GFL_ArcSysCreateFileHandle(ARCID_C_GEAR, help->heapId);
-    help->palette = func_0204bbb8(arc, 14 + gender, CLACT_VRAM_SUB, 0, 0, 15, help->heapId);
-    help->chars[0] = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_SUB, help->heapId);
-    help->cellAnims[0] = func_0204bde0(arc, 17, 18, help->heapId);
-    help->chars[1] = func_0204b81c(arc, 19, FALSE, CLACT_VRAM_SUB, help->heapId);
-    help->cellAnims[1] = func_0204bde0(arc, 29, 30, help->heapId);
+    help->palette = ClActSys_LoadPlttRange(arc, 14 + gender, CLACT_VRAM_SUB, 0, 0, 15, help->heapId);
+    help->chars[0] = ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_SUB, help->heapId);
+    help->cellAnims[0] = ClActSys_LoadCellAnims(arc, 17, 18, help->heapId);
+    help->chars[1] = ClActSys_LoadChars(arc, 19, FALSE, CLACT_VRAM_SUB, help->heapId);
+    help->cellAnims[1] = ClActSys_LoadCellAnims(arc, 29, 30, help->heapId);
     GFL_ArcToolFree(arc);
     actorSetup.x = 32;
     actorSetup.y = 48;
@@ -359,9 +359,9 @@ static void CGHelp_LoadGraphics(CGHelp *help) {
     actorSetup.bgPriority = 0;
     for (i = 0; i < ACTOR_COUNT; i++) {
         actorSetup.priority = i;
-        help->actors[i] = func_0204c040(help->clActUnit, help->chars[i], help->palette, help->cellAnims[i], &actorSetup,
-                                        CLACT_SURFACE_SUB, help->heapId);
-        func_0204c124(help->actors[i], FALSE);
+        help->actors[i] = ClActor_Create(help->clActUnit, help->chars[i], help->palette, help->cellAnims[i],
+                                         &actorSetup, CLACT_SURFACE_SUB, help->heapId);
+        ClActor_SetVisible(help->actors[i], FALSE);
         func_0204c520(help->actors[i], FALSE);
     }
 }
@@ -370,13 +370,13 @@ static void CGHelp_FreeGraphics(CGHelp *help) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(help->actors[i]);
+        ClActor_Delete(help->actors[i]);
     }
-    func_0204be64(help->cellAnims[1]);
-    func_0204b98c(help->chars[1]);
-    func_0204be64(help->cellAnims[0]);
-    func_0204b98c(help->chars[0]);
-    func_0204bcd0(help->palette);
+    ClActSys_FreeCellAnims(help->cellAnims[1]);
+    ClActSys_FreeChars(help->chars[1]);
+    ClActSys_FreeCellAnims(help->cellAnims[0]);
+    ClActSys_FreeChars(help->chars[0]);
+    ClActSys_FreePltt(help->palette);
 }
 
 static void CGHelp_InitText(CGHelp *help) {
@@ -444,7 +444,7 @@ static void CGHelp_HandleInput(CGHelp *help) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    switch (func_0203da0c(rects)) {
+    switch (GFL_HIDGetTouchPressedRect(rects)) {
     case BUTTON_PREVIOUS:
         if (help->page != 0) {
             help->page--;
@@ -493,9 +493,9 @@ static void CGHelp_DrawPage(CGHelp *help, u8 page) {
 static void CGHelp_ShowAnimation(CGHelp *help, u8 page) {
     const PageAnimation *animation = &sPageAnimations[sPageAnimationIndex[page]];
 
-    func_0204c488(help->actors[animation->actor], animation->sequence);
-    func_0204c124(help->actors[animation->actor], TRUE);
-    func_0204c124(help->actors[animation->actor ^ 1], FALSE);
+    ClActor_SetSequence(help->actors[animation->actor], animation->sequence);
+    ClActor_SetVisible(help->actors[animation->actor], TRUE);
+    ClActor_SetVisible(help->actors[animation->actor ^ 1], FALSE);
 }
 
 static BOOL CGHelp_Init(GameProc *proc, u32 *state, void *param, void *work) {

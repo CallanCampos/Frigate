@@ -126,11 +126,11 @@ void PokeListBattle_Update(PokeListWork *wk) {
 }
 
 static void PokeListBattle_CreateUnit(PokeListWork *wk) {
-    wk->partnerUnit = func_0204bf1c(36, 8, wk->heapId);
+    wk->partnerUnit = ClActUnit_Create(36, 8, wk->heapId);
 }
 
 static void PokeListBattle_FreeUnit(PokeListWork *wk) {
-    func_0204bf98(wk->partnerUnit);
+    ClActUnit_Delete(wk->partnerUnit);
 }
 
 static void PokeListBattle_LoadResources(PokeListWork *wk) {
@@ -157,13 +157,13 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
     // BUG: The common archive's graphics are loaded from the closed handle of the first archive, as in
     // PokeList_LoadResources
 #ifdef BUGFIX
-    wk->clResources[CL_RES_PLTT(3)] = func_0204bba0(commonArc, func_0202d890(), 1, 0x60, wk->heapId);
-    wk->clResources[CL_RES_CHAR(4)] = func_0204b81c(commonArc, func_0202d894(), FALSE, 1, wk->heapId);
-    wk->clResources[CL_RES_CELL(4)] = func_0204bde0(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(3)] = ClActSys_LoadPltt(commonArc, func_0202d890(), 1, 0x60, wk->heapId);
+    wk->clResources[CL_RES_CHAR(4)] = ClActSys_LoadChars(commonArc, func_0202d894(), FALSE, 1, wk->heapId);
+    wk->clResources[CL_RES_CELL(4)] = ClActSys_LoadCellAnims(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
 #else
-    wk->clResources[CL_RES_PLTT(3)] = func_0204bba0(arc, func_0202d890(), 1, 0x60, wk->heapId);
-    wk->clResources[CL_RES_CHAR(4)] = func_0204b81c(arc, func_0202d894(), FALSE, 1, wk->heapId);
-    wk->clResources[CL_RES_CELL(4)] = func_0204bde0(arc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(3)] = ClActSys_LoadPltt(arc, func_0202d890(), 1, 0x60, wk->heapId);
+    wk->clResources[CL_RES_CHAR(4)] = ClActSys_LoadChars(arc, func_0202d894(), FALSE, 1, wk->heapId);
+    wk->clResources[CL_RES_CELL(4)] = ClActSys_LoadCellAnims(arc, func_0202d898(2), func_0202d89c(2), wk->heapId);
 #endif
     if (wk->param->timerEnabled == TRUE) {
 #ifdef BUGFIX
@@ -181,7 +181,7 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
     GFL_ArcToolFree(commonArc);
 
     iconArc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
-    wk->clResources[CL_RES_PLTT(7)] = func_0204bc48(iconArc, PokeIcon_GetPaletteFile(), 1, 0xc0, wk->heapId);
+    wk->clResources[CL_RES_PLTT(7)] = ClActSys_LoadPlttEx(iconArc, PokeIcon_GetPaletteFile(), 1, 0xc0, wk->heapId);
     GFL_ArcToolFree(iconArc);
     MIi_CpuCopy16((void *)(HW_DB_BG_PLTT + 0x40), wk->timerBaseColors, sizeof(wk->timerBaseColors));
 }
@@ -297,7 +297,7 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     ClActorSetup iconSetup;
     ClActorSetup itemSetup;
 
-    partnerPkm->iconChars = func_0204b81c(arc, PokeIcon_GetFileOfPkm(boxPkm), FALSE, 1, wk->heapId);
+    partnerPkm->iconChars = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(boxPkm), FALSE, 1, wk->heapId);
     GFL_ArcToolFree(arc);
     palette = PokeIcon_GetPaletteOfPkm(boxPkm);
     iconSetup.x = x + 16;
@@ -305,9 +305,9 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     iconSetup.sequence = 1;
     iconSetup.priority = 16;
     iconSetup.bgPriority = 2;
-    partnerPkm->icon = func_0204c040(wk->partnerUnit, partnerPkm->iconChars, wk->clResources[CL_RES_PLTT(7)],
-                                     wk->clResources[CL_RES_CELL(7)], &iconSetup, 1, wk->heapId);
-    func_0204c378(partnerPkm->icon, palette, 1);
+    partnerPkm->icon = ClActor_Create(wk->partnerUnit, partnerPkm->iconChars, wk->clResources[CL_RES_PLTT(7)],
+                                      wk->clResources[CL_RES_CELL(7)], &iconSetup, 1, wk->heapId);
+    ClActor_SetPalette(partnerPkm->icon, palette, 1);
     func_0204c520(partnerPkm->icon, TRUE);
     item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
     itemSetup.x = x + 32;
@@ -316,17 +316,17 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     itemSetup.priority = 8;
     itemSetup.bgPriority = 2;
     partnerPkm->itemIcon =
-        func_0204c040(wk->partnerUnit, wk->clResources[CL_RES_CHAR(4)], wk->clResources[CL_RES_PLTT(3)],
-                      wk->clResources[CL_RES_CELL(4)], &itemSetup, 1, wk->heapId);
+        ClActor_Create(wk->partnerUnit, wk->clResources[CL_RES_CHAR(4)], wk->clResources[CL_RES_PLTT(3)],
+                       wk->clResources[CL_RES_CELL(4)], &itemSetup, 1, wk->heapId);
     if (item != 0) {
-        func_0204c124(partnerPkm->itemIcon, TRUE);
+        ClActor_SetVisible(partnerPkm->itemIcon, TRUE);
         if (PML_ItemIsMail(item) == TRUE) {
-            func_0204c488(partnerPkm->itemIcon, 1);
+            ClActor_SetSequence(partnerPkm->itemIcon, 1);
         } else {
-            func_0204c488(partnerPkm->itemIcon, 0);
+            ClActor_SetSequence(partnerPkm->itemIcon, 0);
         }
     } else {
-        func_0204c124(partnerPkm->itemIcon, FALSE);
+        ClActor_SetVisible(partnerPkm->itemIcon, FALSE);
     }
     sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
     PokeListBattle_CreateSexWindow(wk, partnerPkm, isEgg, sex, x, y);
@@ -339,9 +339,9 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
 static void PokeListBattle_FreePartnerPkm(PokeListWork *wk, PokeListPartnerPkm *partnerPkm) {
     BmpWin_Free(partnerPkm->sexWindow);
     BmpWin_Free(partnerPkm->levelWindow);
-    func_0204c108(partnerPkm->itemIcon);
-    func_0204c108(partnerPkm->icon);
-    func_0204b98c(partnerPkm->iconChars);
+    ClActor_Delete(partnerPkm->itemIcon);
+    ClActor_Delete(partnerPkm->icon);
+    ClActSys_FreeChars(partnerPkm->iconChars);
     GFL_HeapFree(partnerPkm);
 }
 

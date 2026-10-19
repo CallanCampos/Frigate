@@ -302,14 +302,14 @@ static void func_ov012_02163f50(EventSaveWork *work) {
 static BOOL func_ov012_02163fc8(EventSaveWork *work) {
     switch (PrintStream_GetState(work->report->stream)) {
     case PRINT_STREAM_RUNNING:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             PrintStream_SkipWait(work->report->stream, 0);
         }
         work->report->continued = FALSE;
         break;
     case PRINT_STREAM_PAUSED:
         if (work->report->continued == FALSE &&
-            (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             PrintStream_Continue(work->report->stream);
             work->report->continued = TRUE;

@@ -206,7 +206,7 @@ void func_ov255_021cf414(Box2AppWork *app) {
     func_ov255_021d1d44(app);
     func_ov255_021cf58c(app);
     func_ov255_021cf488(app);
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void func_ov255_021cf430(Box2AppWork *app) {
@@ -228,23 +228,23 @@ static void func_ov255_021cf488(Box2AppWork *app) {
 
     for (i = 0; i < NELEMS(app->chrRes); i++) {
         if (app->chrRes[i] != BOX2_RES_NONE) {
-            func_0204b98c(app->chrRes[i]);
+            ClActSys_FreeChars(app->chrRes[i]);
         }
     }
     for (i = 0; i < NELEMS(app->palRes); i++) {
         if (app->palRes[i] != BOX2_RES_NONE) {
-            func_0204bcd0(app->palRes[i]);
+            ClActSys_FreePltt(app->palRes[i]);
         }
     }
     for (i = 0; i < NELEMS(app->cellRes); i++) {
         if (app->cellRes[i] != BOX2_RES_NONE) {
-            func_0204be64(app->cellRes[i]);
+            ClActSys_FreeCellAnims(app->cellRes[i]);
         }
     }
 }
 
 static void func_ov255_021cf4e8(Box2SysWork *syswk) {
-    syswk->app->clunit = func_0204bf1c(233, 0, HEAPID_BOX2_APP);
+    syswk->app->clunit = ClActUnit_Create(233, 0, HEAPID_BOX2_APP);
     func_ov255_021d12e4(syswk->app);
     func_ov255_021cf904(syswk->app);
     func_ov255_021d0d70(syswk);
@@ -252,15 +252,15 @@ static void func_ov255_021cf4e8(Box2SysWork *syswk) {
 }
 
 static ClActor *func_ov255_021cf51c(Box2AppWork *app, const Box2ActorData *data) {
-    ClActor *actor = func_0204c040(app->clunit, app->chrRes[data->chr], app->palRes[data->pal],
-                                   app->cellRes[data->cell], &data->setup, data->surface, HEAPID_BOX2_APP);
+    ClActor *actor = ClActor_Create(app->clunit, app->chrRes[data->chr], app->palRes[data->pal],
+                                    app->cellRes[data->cell], &data->setup, data->surface, HEAPID_BOX2_APP);
     func_0204c5c8(actor, FALSE);
     return actor;
 }
 
 static void func_ov255_021cf570(Box2AppWork *app, u32 id) {
     if (app->actors[id] != NULL) {
-        func_0204c108(app->actors[id]);
+        ClActor_Delete(app->actors[id]);
         app->actors[id] = NULL;
     }
 }
@@ -271,7 +271,7 @@ static void func_ov255_021cf58c(Box2AppWork *app) {
     for (i = 0; i < NELEMS(app->actors); i++) {
         func_ov255_021cf570(app, i);
     }
-    func_0204bf98(app->clunit);
+    ClActUnit_Delete(app->clunit);
 }
 
 void func_ov255_021cf5b0(Box2AppWork *app) {
@@ -279,15 +279,15 @@ void func_ov255_021cf5b0(Box2AppWork *app) {
 
     for (i = 0; i < 49; i++) {
         if (app->actors[i] != NULL && func_0204c534(app->actors[i]) != TRUE) {
-            func_0204c4e0(app->actors[i], FX32_ONE);
+            ClActor_SetAnimSpeed(app->actors[i], FX32_ONE);
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 void func_ov255_021cf5e4(Box2AppWork *app, u32 id, u32 anim) {
-    func_0204c4d4(app->actors[id], 0);
-    func_0204c488(app->actors[id], anim);
+    ClActor_SetAnimTime(app->actors[id], 0);
+    ClActor_SetSequence(app->actors[id], anim);
 }
 
 void func_ov255_021cf608(Box2AppWork *app, u32 id, u32 anim) {
@@ -296,32 +296,32 @@ void func_ov255_021cf608(Box2AppWork *app, u32 id, u32 anim) {
 }
 
 BOOL func_ov255_021cf628(Box2AppWork *app, u32 id) {
-    return func_0204c560(app->actors[id]);
+    return ClActor_IsAnimActive(app->actors[id]);
 }
 
 void func_ov255_021cf63c(Box2AppWork *app, u32 id, BOOL visible) {
     if (app->actors[id] != NULL) {
-        func_0204c124(app->actors[id], visible);
+        ClActor_SetVisible(app->actors[id], visible);
     }
 }
 
 BOOL func_ov255_021cf658(Box2AppWork *app, u32 id) {
-    return func_0204c138(app->actors[id]);
+    return ClActor_IsVisible(app->actors[id]);
 }
 
 static void func_ov255_021cf66c(Box2AppWork *app, u32 id, u32 priority) {
-    func_0204c468(app->actors[id], (u8)priority);
+    ClActor_SetBgPriority(app->actors[id], (u8)priority);
 }
 
 static void func_ov255_021cf684(Box2AppWork *app, u32 id, u32 priority) {
-    func_0204c438(app->actors[id], priority);
+    ClActor_SetPriority(app->actors[id], priority);
 }
 
 static void func_ov255_021cf69c(Box2AppWork *app, u32 id, BOOL blend) {
     if (blend == TRUE) {
-        func_0204c318(app->actors[id], GX_OAM_MODE_XLU);
+        ClActor_SetObjMode(app->actors[id], GX_OAM_MODE_XLU);
     } else {
-        func_0204c318(app->actors[id], GX_OAM_MODE_NORMAL);
+        ClActor_SetObjMode(app->actors[id], GX_OAM_MODE_NORMAL);
     }
 }
 
@@ -330,19 +330,19 @@ void func_ov255_021cf6c8(Box2AppWork *app, u32 id, s16 x, s16 y, u16 surface) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(app->actors[id], &pos, surface);
+    ClActor_SetSurfacePos(app->actors[id], &pos, surface);
 }
 
 void func_ov255_021cf6ec(Box2AppWork *app, u32 id, s16 *x, s16 *y, u16 surface) {
     ClActorPos pos;
 
-    func_0204c178(app->actors[id], &pos, surface);
+    ClActor_GetSurfacePos(app->actors[id], &pos, surface);
     *x = pos.x;
     *y = pos.y;
 }
 
 static void func_ov255_021cf718(Box2AppWork *app, u32 id, u32 palette) {
-    func_0204c378(app->actors[id], (u8)palette, 1);
+    ClActor_SetPalette(app->actors[id], (u8)palette, 1);
 }
 
 static void func_ov255_021cf734(Box2AppWork *app) {
@@ -352,39 +352,41 @@ static void func_ov255_021cf734(Box2AppWork *app) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_BOX2, HEAPID_BOX2_APP);
     for (i = 0; i < 6; i++) {
-        app->chrRes[116 + i] = func_0204b81c(arc, 71, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+        app->chrRes[116 + i] = ClActSys_LoadChars(arc, 71, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
     }
-    app->palRes[5] = func_0204bba0(arc, 72, CLACT_VRAM_MAIN, 0, HEAPID_BOX2_APP);
-    app->cellRes[5] = func_0204bde0(arc, 73, 74, HEAPID_BOX2_APP);
+    app->palRes[5] = ClActSys_LoadPltt(arc, 72, CLACT_VRAM_MAIN, 0, HEAPID_BOX2_APP);
+    app->cellRes[5] = ClActSys_LoadCellAnims(arc, 73, 74, HEAPID_BOX2_APP);
     for (j = 0; j < 96; j++) {
-        app->chrRes[j] = func_0204b81c(arc, 75, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+        app->chrRes[j] = ClActSys_LoadChars(arc, 75, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
     }
-    app->chrRes[122] = func_0204b81c(arc, 67, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->palRes[6] = func_0204bba0(arc, 70, CLACT_VRAM_MAIN, 0xe0, HEAPID_BOX2_APP);
-    app->cellRes[6] = func_0204bde0(arc, 68, 69, HEAPID_BOX2_APP);
-    app->chrRes[123] = func_0204b81c(arc, 64, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->cellRes[7] = func_0204bde0(arc, 65, 66, HEAPID_BOX2_APP);
-    app->chrRes[98] = func_0204b81c(arc, 76, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->cellRes[3] = func_0204bde0(arc, 77, 78, HEAPID_BOX2_APP);
+    app->chrRes[122] = ClActSys_LoadChars(arc, 67, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->palRes[6] = ClActSys_LoadPltt(arc, 70, CLACT_VRAM_MAIN, 0xe0, HEAPID_BOX2_APP);
+    app->cellRes[6] = ClActSys_LoadCellAnims(arc, 68, 69, HEAPID_BOX2_APP);
+    app->chrRes[123] = ClActSys_LoadChars(arc, 64, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->cellRes[7] = ClActSys_LoadCellAnims(arc, 65, 66, HEAPID_BOX2_APP);
+    app->chrRes[98] = ClActSys_LoadChars(arc, 76, TRUE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->cellRes[3] = ClActSys_LoadCellAnims(arc, 77, 78, HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
 static void func_ov255_021cf84c(Box2AppWork *app) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_BOX2_APP);
 
-    app->chrRes[124] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->chrRes[124] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
     app->palRes[7] =
-        func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x120, HEAPID_BOX2_APP);
-    app->cellRes[8] =
-        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_BOX2_APP);
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x120, HEAPID_BOX2_APP);
+    app->cellRes[8] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                             AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
 static void func_ov255_021cf8b8(Box2AppWork *app) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_BOX2_APP);
 
-    app->palRes[0] = func_0204bc48(arc, PokeIcon_GetAltPaletteFile(), CLACT_VRAM_MAIN, 0x60, HEAPID_BOX2_APP);
-    app->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_BOX2_APP);
+    app->palRes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetAltPaletteFile(), CLACT_VRAM_MAIN, 0x60, HEAPID_BOX2_APP);
+    app->cellRes[0] =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
@@ -489,8 +491,8 @@ static u32 func_ov255_021cfba0(Box2SysWork *syswk, BoxPkm *pkm) {
 }
 
 static void func_ov255_021cfbbc(Box2AppWork *app, void *chr, u32 id, u32 palette) {
-    func_0204bab8(func_0204c428(app->actors[id]), chr, 0x200, 0, CLACT_VRAM_MAIN);
-    func_0204c378(app->actors[id], (u8)palette, 1);
+    ClActSys_WriteCharData(ClActor_GetCharIdx(app->actors[id]), chr, 0x200, 0, CLACT_VRAM_MAIN);
+    ClActor_SetPalette(app->actors[id], (u8)palette, 1);
 }
 
 static void func_ov255_021cfbf0(Box2SysWork *syswk, BoxPkm *pkm, u32 id) {
@@ -714,13 +716,13 @@ void func_ov255_021d013c(Box2PokeFreeWork *wk) {
 
     wk->scale = 4096.0f;
     wk->scaleCnt = 0;
-    func_0204c244(wk->cap, 1);
+    ClActor_SetAffineMode(wk->cap, 1);
     scale.x = wk->scale;
     scale.y = wk->scale;
-    func_0204c270(wk->cap, &scale);
+    ClActor_SetScale(wk->cap, &scale);
     center.x = 0;
     center.y = 8;
-    func_0204c258(wk->cap, &center);
+    ClActor_SetAffineCenter(wk->cap, &center);
 }
 
 BOOL func_ov255_021d0184(Box2PokeFreeWork *wk) {
@@ -733,7 +735,7 @@ BOOL func_ov255_021d0184(Box2PokeFreeWork *wk) {
     }
     scale.x = wk->scale;
     scale.y = wk->scale;
-    func_0204c270(wk->cap, &scale);
+    ClActor_SetScale(wk->cap, &scale);
     return TRUE;
 }
 
@@ -748,12 +750,12 @@ BOOL func_ov255_021d01c8(Box2PokeFreeWork *wk) {
     }
     scale.x = wk->scale;
     scale.y = wk->scale;
-    func_0204c270(wk->cap, &scale);
+    ClActor_SetScale(wk->cap, &scale);
     return TRUE;
 }
 
 void func_ov255_021d0214(Box2PokeFreeWork *wk) {
-    func_0204c124(wk->cap, FALSE);
+    ClActor_SetVisible(wk->cap, FALSE);
     func_ov255_021d0228(wk);
 }
 
@@ -763,11 +765,11 @@ void func_ov255_021d0228(Box2PokeFreeWork *wk) {
 
     center.x = 0;
     center.y = 0;
-    func_0204c258(wk->cap, &center);
+    ClActor_SetAffineCenter(wk->cap, &center);
     scale.x = FX32_ONE;
     scale.y = FX32_ONE;
-    func_0204c270(wk->cap, &scale);
-    func_0204c244(wk->cap, 0);
+    ClActor_SetScale(wk->cap, &scale);
+    ClActor_SetAffineMode(wk->cap, 0);
 }
 
 static void func_ov255_021d025c(Box2SysWork *syswk, BOOL blend, u32 start, u32 end, BOOL check) {
@@ -955,10 +957,10 @@ void func_ov255_021d06a4(Box2SysWork *syswk, Box2PokeInfo *info, u32 id) {
         id++;
     }
     if (syswk->app->actors[id] != NULL) {
-        func_0204c108(syswk->app->actors[id]);
-        func_0204b98c(*chr);
-        func_0204bcd0(*pal);
-        func_0204be64(*cell);
+        ClActor_Delete(syswk->app->actors[id]);
+        ClActSys_FreeChars(*chr);
+        ClActSys_FreePltt(*pal);
+        ClActSys_FreeCellAnims(*cell);
     }
     arc = MakePokeGraArcHandle(HEAPID_BOX2_APP);
     encrypted = PML_PkmDecrypt(info->pkm);
@@ -982,22 +984,22 @@ static void func_ov255_021d07d0(Box2AppWork *app) {
 
     for (i = 0; i < 17; i++) {
         app->chrRes[99 + i] =
-            func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
     }
-    app->cellRes[4] =
-        func_0204bde0(arc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), HEAPID_BOX2_APP);
-    app->palRes[4] = func_0204bba0(arc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB, 0, HEAPID_BOX2_APP);
-    app->chrRes[126] = func_0204b81c(arc, func_0202d948(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
-    app->cellRes[10] = func_0204bde0(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
-    app->palRes[9] = func_0204bba0(arc, func_0202d944(), CLACT_VRAM_SUB, 0xa0, HEAPID_BOX2_APP);
-    app->chrRes[127] = func_0204b81c(arc, func_0202d968(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
-    app->cellRes[11] = func_0204bde0(arc, func_0202d96c(2), func_0202d970(2), HEAPID_BOX2_APP);
-    app->palRes[10] = func_0204bba0(arc, func_0202d964(), CLACT_VRAM_SUB, 0xc0, HEAPID_BOX2_APP);
-    app->chrRes[125] = func_0204b81c(arc, func_0202d948(2), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->cellRes[9] = func_0204bde0(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
-    app->palRes[8] = func_0204bba0(arc, func_0202d944(), CLACT_VRAM_MAIN, 0x1c0, HEAPID_BOX2_APP);
-    app->chrRes[128] = func_0204b81c(arc, 175, FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->cellRes[12] = func_0204bde0(arc, 174, 173, HEAPID_BOX2_APP);
+    app->cellRes[4] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTypeIconCellFile(2),
+                                             AppMenuCommon_GetTypeIconAnimFile(2), HEAPID_BOX2_APP);
+    app->palRes[4] = ClActSys_LoadPltt(arc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB, 0, HEAPID_BOX2_APP);
+    app->chrRes[126] = ClActSys_LoadChars(arc, func_0202d948(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
+    app->cellRes[10] = ClActSys_LoadCellAnims(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
+    app->palRes[9] = ClActSys_LoadPltt(arc, func_0202d944(), CLACT_VRAM_SUB, 0xa0, HEAPID_BOX2_APP);
+    app->chrRes[127] = ClActSys_LoadChars(arc, func_0202d968(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
+    app->cellRes[11] = ClActSys_LoadCellAnims(arc, func_0202d96c(2), func_0202d970(2), HEAPID_BOX2_APP);
+    app->palRes[10] = ClActSys_LoadPltt(arc, func_0202d964(), CLACT_VRAM_SUB, 0xc0, HEAPID_BOX2_APP);
+    app->chrRes[125] = ClActSys_LoadChars(arc, func_0202d948(2), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->cellRes[9] = ClActSys_LoadCellAnims(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
+    app->palRes[8] = ClActSys_LoadPltt(arc, func_0202d944(), CLACT_VRAM_MAIN, 0x1c0, HEAPID_BOX2_APP);
+    app->chrRes[128] = ClActSys_LoadChars(arc, 175, FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->cellRes[12] = ClActSys_LoadCellAnims(arc, 174, 173, HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
@@ -1008,7 +1010,7 @@ static void func_ov255_021d0978(Box2AppWork *app) {
     for (i = 0; i < 17; i++) {
         data.chr = 99 + i;
         app->actors[32 + i] = func_ov255_021cf51c(app, &data);
-        func_0204c378(app->actors[32 + i], AppMenuCommon_GetTypeIconPaletteIndex(i), 1);
+        ClActor_SetPalette(app->actors[32 + i], AppMenuCommon_GetTypeIconPaletteIndex(i), 1);
         func_ov255_021cf63c(app, 32 + i, FALSE);
     }
 }
@@ -1039,7 +1041,7 @@ void func_ov255_021d0a28(Box2AppWork *app, Box2PokeInfo *info) {
 static void func_ov255_021d0a58(Box2AppWork *app) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, HEAPID_BOX2_APP);
 
-    app->palRes[3] = func_0204bba0(arc, GetItemGraphicsDatID(0, 2), CLACT_VRAM_MAIN, 0x1a0, HEAPID_BOX2_APP);
+    app->palRes[3] = ClActSys_LoadPltt(arc, GetItemGraphicsDatID(0, 2), CLACT_VRAM_MAIN, 0x1a0, HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
@@ -1049,10 +1051,10 @@ void func_ov255_021d0a94(Box2AppWork *app, u16 item) {
     void *buf;
 
     buf = GFL_G2DIOReadOBJNCGR(PML_ItemGetIconArcID(), GetItemGraphicsDatID(item, 1), FALSE, &chr, HEAPID_BOX2_APP);
-    func_0204ba40(func_0204c428(app->actors[BOX2_ACTOR_ITEM_ICON]), chr);
+    ClActSys_ReplaceCharData(ClActor_GetCharIdx(app->actors[BOX2_ACTOR_ITEM_ICON]), chr);
     GFL_HeapFree(buf);
     buf = GFL_G2DIOReadNCLR(PML_ItemGetIconArcID(), GetItemGraphicsDatID(item, 2), &pal, HEAPID_BOX2_APP);
-    func_0204bd10(func_0204c430(app->actors[BOX2_ACTOR_ITEM_ICON]), pal, 1);
+    ClActSys_ReplacePlttData(ClActor_GetPlttIdx(app->actors[BOX2_ACTOR_ITEM_ICON]), pal, 1);
     GFL_HeapFree(buf);
 }
 
@@ -1060,15 +1062,15 @@ void func_ov255_021d0b08(Box2AppWork *app, BOOL affine) {
     ClActorPos center;
 
     if (affine == TRUE) {
-        func_0204c244(app->actors[BOX2_ACTOR_ITEM_ICON], 1);
+        ClActor_SetAffineMode(app->actors[BOX2_ACTOR_ITEM_ICON], 1);
         center.x = 12;
         center.y = 12;
-        func_0204c258(app->actors[BOX2_ACTOR_ITEM_ICON], &center);
+        ClActor_SetAffineCenter(app->actors[BOX2_ACTOR_ITEM_ICON], &center);
     } else {
         center.x = 0;
         center.y = 0;
-        func_0204c258(app->actors[BOX2_ACTOR_ITEM_ICON], &center);
-        func_0204c244(app->actors[BOX2_ACTOR_ITEM_ICON], 0);
+        ClActor_SetAffineCenter(app->actors[BOX2_ACTOR_ITEM_ICON], &center);
+        ClActor_SetAffineMode(app->actors[BOX2_ACTOR_ITEM_ICON], 0);
     }
 }
 
@@ -1102,8 +1104,8 @@ void func_ov255_021d0bc8(Box2AppWork *app) {
         func_ov255_021cf6ec(app, BOX2_ACTOR_ITEM_ICON, &x, &y, 0);
         if (app->actors[BOX2_ACTOR_ITEM_OUTLINE] == NULL) {
             data = sActorData[BOX2_ACTOR_ITEM_ICON];
-            data.setup.priority = func_0204c45c(app->actors[BOX2_ACTOR_ITEM_ICON]) + 1;
-            data.setup.bgPriority = func_0204c47c(app->actors[BOX2_ACTOR_ITEM_ICON]);
+            data.setup.priority = ClActor_GetPriority(app->actors[BOX2_ACTOR_ITEM_ICON]) + 1;
+            data.setup.bgPriority = ClActor_GetBgPriority(app->actors[BOX2_ACTOR_ITEM_ICON]);
             data.chr = 98;
             data.pal = 6;
             data.palette = 1;
@@ -1111,12 +1113,12 @@ void func_ov255_021d0bc8(Box2AppWork *app) {
                 data.setup.x = x + sItemOutlineX[i];
                 data.setup.y = y + sItemOutlineY[i];
                 app->actors[BOX2_ACTOR_ITEM_OUTLINE + i] = func_ov255_021cf51c(app, &data);
-                func_0204c378(app->actors[BOX2_ACTOR_ITEM_OUTLINE + i], (u8)data.palette, 1);
+                ClActor_SetPalette(app->actors[BOX2_ACTOR_ITEM_OUTLINE + i], (u8)data.palette, 1);
                 func_ov255_021cf63c(app, BOX2_ACTOR_ITEM_OUTLINE + i, FALSE);
             }
         } else {
-            u32 priority = func_0204c45c(app->actors[BOX2_ACTOR_ITEM_ICON]);
-            u32 bgPriority = func_0204c47c(app->actors[BOX2_ACTOR_ITEM_ICON]);
+            u32 priority = ClActor_GetPriority(app->actors[BOX2_ACTOR_ITEM_ICON]);
+            u32 bgPriority = ClActor_GetBgPriority(app->actors[BOX2_ACTOR_ITEM_ICON]);
 
             for (i = 0; i < 8; i++) {
                 func_ov255_021cf6c8(app, BOX2_ACTOR_ITEM_OUTLINE + i, x + sItemOutlineX[i], y + sItemOutlineY[i], 0);
@@ -1245,8 +1247,8 @@ void func_ov255_021d1054(Box2SysWork *syswk, u32 pos) {
         func_ov255_021cf6ec(app, id, &x, &y, 0);
         if (app->actors[BOX2_ACTOR_ITEM_OUTLINE] == NULL) {
             data = sPokeIconData;
-            data.setup.priority = func_0204c45c(app->actors[id]) + 1;
-            data.setup.bgPriority = func_0204c47c(app->actors[id]);
+            data.setup.priority = ClActor_GetPriority(app->actors[id]) + 1;
+            data.setup.bgPriority = ClActor_GetBgPriority(app->actors[id]);
             data.chr = id - BOX2_ACTOR_POKEICON;
             data.pal = 6;
             data.palette = 1;
@@ -1254,17 +1256,17 @@ void func_ov255_021d1054(Box2SysWork *syswk, u32 pos) {
                 data.setup.x = x + sItemOutlineX[i];
                 data.setup.y = y + sItemOutlineY[i];
                 app->actors[BOX2_ACTOR_ITEM_OUTLINE + i] = func_ov255_021cf51c(app, &data);
-                func_0204c378(app->actors[BOX2_ACTOR_ITEM_OUTLINE + i], (u8)data.palette, 1);
+                ClActor_SetPalette(app->actors[BOX2_ACTOR_ITEM_OUTLINE + i], (u8)data.palette, 1);
             }
         } else {
             u32 priority;
             u32 bgPriority;
 
-            func_0204c40c(app->actors[id], &proxy);
-            priority = func_0204c45c(app->actors[id]);
-            bgPriority = func_0204c47c(app->actors[id]);
+            ClActor_GetImageProxy(app->actors[id], &proxy);
+            priority = ClActor_GetPriority(app->actors[id]);
+            bgPriority = ClActor_GetBgPriority(app->actors[id]);
             for (i = 0; i < 8; i++) {
-                func_0204c3e4(app->actors[BOX2_ACTOR_ITEM_OUTLINE + i], &proxy);
+                ClActor_SetImageProxy(app->actors[BOX2_ACTOR_ITEM_OUTLINE + i], &proxy);
                 func_ov255_021cf6c8(app, BOX2_ACTOR_ITEM_OUTLINE + i, x + sItemOutlineX[i], y + sItemOutlineY[i], 0);
                 func_ov255_021cf684(app, BOX2_ACTOR_ITEM_OUTLINE + i, priority + 1);
                 func_ov255_021cf66c(app, BOX2_ACTOR_ITEM_OUTLINE + i, bgPriority);
@@ -1283,8 +1285,10 @@ void func_ov255_021d11a4(Box2SysWork *syswk, BOOL visible) {
             func_ov255_021cf63c(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i, visible);
             if (visible == TRUE && syswk->pos != BOX2_GET_NONE) {
                 id = syswk->app->pokeIconId[syswk->pos];
-                func_ov255_021cf684(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i, func_0204c45c(syswk->app->actors[id]) + 1);
-                func_ov255_021cf66c(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i, func_0204c47c(syswk->app->actors[id]));
+                func_ov255_021cf684(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i,
+                                    ClActor_GetPriority(syswk->app->actors[id]) + 1);
+                func_ov255_021cf66c(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i,
+                                    ClActor_GetBgPriority(syswk->app->actors[id]));
             }
         }
     }
@@ -1292,8 +1296,8 @@ void func_ov255_021d11a4(Box2SysWork *syswk, BOOL visible) {
 
 void func_ov255_021d121c(Box2SysWork *syswk, u32 pos) {
     u32 id = syswk->app->pokeIconId[pos];
-    u32 priority = func_0204c45c(syswk->app->actors[id]);
-    u32 bgPriority = func_0204c47c(syswk->app->actors[id]);
+    u32 priority = ClActor_GetPriority(syswk->app->actors[id]);
+    u32 bgPriority = ClActor_GetBgPriority(syswk->app->actors[id]);
     u32 i;
 
     for (i = 0; i < 8; i++) {
@@ -1439,7 +1443,7 @@ void func_ov255_021d15f4(Box2SysWork *syswk, u32 tray) {
 static void func_ov255_021d1624(Box2SysWork *syswk, u32 tray, u32 id) {
     Box2AppWork *app = syswk->app;
 
-    func_0204bab8(func_0204c428(app->actors[id]), app->trayIconChar[tray], 0x400, 0, CLACT_VRAM_MAIN);
+    ClActSys_WriteCharData(ClActor_GetCharIdx(app->actors[id]), app->trayIconChar[tray], 0x400, 0, CLACT_VRAM_MAIN);
 }
 
 static void func_ov255_021d1654(Box2SysWork *syswk, u32 tray, u32 row) {

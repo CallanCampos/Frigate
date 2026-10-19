@@ -66,7 +66,7 @@ static BOOL ZukanDetail_Init(GameProc *proc, u32 *state, void *param_, void *wor
     wk->nextPage = ZUKAN_DETAIL_PAGE_NONE;
 
     GFL_FadeSet(3, 0, 0, 0);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return TRUE;
 }
 

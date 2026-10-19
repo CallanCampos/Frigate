@@ -98,7 +98,7 @@ static u32 DpcSeq_Init(DendouPCWork *wk) {
     DpcObj_Init(wk);
     DpcSeq_PageChange(wk);
     DpcMain_SetBlend();
-    func_02042ba8(TRUE, HEAPID_DENDOU_PC);
+    GFL_NetSetIconScreen(TRUE, HEAPID_DENDOU_PC);
     DpcMain_InitVBlank(wk);
 
     return DpcSeq_SetFadeIn(wk, DPCSEQ_PAGE_MAIN);

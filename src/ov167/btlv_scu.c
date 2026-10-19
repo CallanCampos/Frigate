@@ -1853,7 +1853,7 @@ BOOL func_ov167_021d2edc(BtlvScu *scu) {
     case 2:
         if (scu->printStream != NULL) {
             if (!func_ov167_0219bee4(scu->mainModule)) {
-                if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+                if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
                     if (!PrintStream_IsFast(scu->printStream)) {
                         PrintStream_SetFastWait(scu->printStream, TextSpeed_GetWait(2));
                     }
@@ -1878,7 +1878,7 @@ BOOL func_ov167_021d2edc(BtlvScu *scu) {
         }
         break;
     case 3:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
             scu->waitTimer = 0;
         }
         if (scu->waitTimer != 0) {

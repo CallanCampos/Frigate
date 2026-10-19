@@ -537,7 +537,7 @@ void func_ov296_0219dc74(ZukanInfo *info) {
     case ZUKAN_INFO_STATE_SLIDE_IN:
         xDone = FALSE;
         yDone = FALSE;
-        func_0204c21c(info->sprites[info->spriteSlot], &pos);
+        ClActor_GetPos(info->sprites[info->spriteSlot], &pos);
         pos.x++;
         pos.y++;
         if (pos.x > 0x80) {
@@ -548,7 +548,7 @@ void func_ov296_0219dc74(ZukanInfo *info) {
             pos.y = 0x48;
             yDone = TRUE;
         }
-        func_0204c210(info->sprites[info->spriteSlot], &pos);
+        ClActor_SetPos(info->sprites[info->spriteSlot], &pos);
         if (xDone && yDone) {
             info->state = ZUKAN_INFO_STATE_DONE;
         }
@@ -1139,9 +1139,9 @@ static void ZukanInfo_LoadSpriteResources(ZukanInfo *info, u32 slot) {
 }
 
 static void ZukanInfo_FreeSpriteResources(ZukanInfo *info, u32 slot) {
-    func_0204bcd0(info->palettes[slot]);
-    func_0204b98c(info->chars[slot]);
-    func_0204be64(info->cellAnims[slot]);
+    ClActSys_FreePltt(info->palettes[slot]);
+    ClActSys_FreeChars(info->chars[slot]);
+    ClActSys_FreeCellAnims(info->cellAnims[slot]);
 }
 
 static void ZukanInfo_CreateSpriteActor(ZukanInfo *info, int x, u16 y, u32 slot) {
@@ -1155,19 +1155,19 @@ static void ZukanInfo_CreateSpriteActor(ZukanInfo *info, int x, u16 y, u32 slot)
     MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = x;
     setup.y = y;
-    info->sprites[slot] = func_0204c040(info->unit, info->chars[slot], info->palettes[slot], info->cellAnims[slot],
-                                        &setup, sub, info->heapId);
-    func_0204c438(info->sprites[slot], 0);
+    info->sprites[slot] = ClActor_Create(info->unit, info->chars[slot], info->palettes[slot], info->cellAnims[slot],
+                                         &setup, sub, info->heapId);
+    ClActor_SetPriority(info->sprites[slot], 0);
     if (info->mode == ZUKAN_INFO_MODE_DETAIL) {
-        func_0204c318(info->sprites[slot], 1);
+        ClActor_SetObjMode(info->sprites[slot], 1);
     }
     if (PML_PersonalGetParam(info->personal, PERSONAL_SPRITE_FLIP) == 0) {
-        func_0204c2b0(info->sprites[slot], 1, TRUE);
+        ClActor_SetFlip(info->sprites[slot], 1, TRUE);
     }
 }
 
 static void ZukanInfo_DeleteSpriteActor(ZukanInfo *info, u32 slot) {
-    func_0204c108(info->sprites[slot]);
+    ClActor_Delete(info->sprites[slot]);
 }
 
 static void ZukanInfo_HideOtherSprites(ZukanInfo *info) {
@@ -1175,7 +1175,7 @@ static void ZukanInfo_HideOtherSprites(ZukanInfo *info) {
 
     for (i = 0; i < 2; i++) {
         if (i != info->spriteSlot && info->sprites[i] != NULL) {
-            func_0204c124(info->sprites[i], FALSE);
+            ClActor_SetVisible(info->sprites[i], FALSE);
         }
     }
 }
@@ -1198,9 +1198,10 @@ static void ZukanInfo_InitTypeIcons(ZukanInfo *info) {
         }
     }
     info->typeSlot = 0;
-    info->typePalette = func_0204bbb8(arc, AppMenuCommon_GetTypeIconPaletteFile(), draw, 0x40, 0, 3, info->heapId);
-    info->typeCellAnims =
-        func_0204bde0(arc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), info->heapId);
+    info->typePalette =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTypeIconPaletteFile(), draw, 0x40, 0, 3, info->heapId);
+    info->typeCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTypeIconCellFile(2),
+                                                 AppMenuCommon_GetTypeIconAnimFile(2), info->heapId);
 
     if (info->mode == ZUKAN_INFO_MODE_DETAIL && info->engine == 0) {
         setup.x = 0;
@@ -1212,13 +1213,14 @@ static void ZukanInfo_InitTypeIcons(ZukanInfo *info) {
         info->shownTypes[0] = TYPE_NULL;
         info->shownTypes[1] = TYPE_NULL;
         for (i = 0; i < TYPE_NULL; i++) {
-            info->allTypeChars[i] = func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, draw, info->heapId);
-            info->allTypeActors[i] = func_0204c040(info->unit, info->allTypeChars[i], info->typePalette,
-                                                   info->typeCellAnims, &setup, surface, info->heapId);
-            func_0204c378(info->allTypeActors[i], AppMenuCommon_GetTypeIconPaletteIndex(i), TRUE);
-            func_0204c438(info->allTypeActors[i], 2);
-            func_0204c318(info->allTypeActors[i], 1);
-            func_0204c124(info->allTypeActors[i], FALSE);
+            info->allTypeChars[i] =
+                ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, draw, info->heapId);
+            info->allTypeActors[i] = ClActor_Create(info->unit, info->allTypeChars[i], info->typePalette,
+                                                    info->typeCellAnims, &setup, surface, info->heapId);
+            ClActor_SetPalette(info->allTypeActors[i], AppMenuCommon_GetTypeIconPaletteIndex(i), TRUE);
+            ClActor_SetPriority(info->allTypeActors[i], 2);
+            ClActor_SetObjMode(info->allTypeActors[i], 1);
+            ClActor_SetVisible(info->allTypeActors[i], FALSE);
         }
     } else {
         info->allTypesLoaded = FALSE;
@@ -1233,13 +1235,13 @@ static void ZukanInfo_FreeTypeIcons(ZukanInfo *info) {
     }
     if (info->allTypesLoaded) {
         for (i = 0; i < TYPE_NULL; i++) {
-            func_0204c108(info->allTypeActors[i]);
-            func_0204b98c(info->allTypeChars[i]);
+            ClActor_Delete(info->allTypeActors[i]);
+            ClActSys_FreeChars(info->allTypeChars[i]);
         }
         info->allTypesLoaded = FALSE;
     }
-    func_0204be64(info->typeCellAnims);
-    func_0204bcd0(info->typePalette);
+    ClActSys_FreeCellAnims(info->typeCellAnims);
+    ClActSys_FreePltt(info->typePalette);
 }
 
 // Shows the Pokémon's types in the slot, in the game's language or in another one
@@ -1274,35 +1276,35 @@ static void ZukanInfo_ShowTypesInGameLanguage(ZukanInfo *info, u32 type1, u32 ty
 
         if (info->shownTypes[0] != TYPE_NULL) {
             if (info->shownTypes[0] != type1 && info->shownTypes[0] != type2) {
-                func_0204c124(info->allTypeActors[info->shownTypes[0]], FALSE);
+                ClActor_SetVisible(info->allTypeActors[info->shownTypes[0]], FALSE);
                 info->shownTypes[0] = TYPE_NULL;
             } else {
                 if (info->shownTypes[0] == type2) {
-                    func_0204c140(info->allTypeActors[info->shownTypes[0]], &pos[1], sub);
+                    ClActor_SetSurfacePos(info->allTypeActors[info->shownTypes[0]], &pos[1], sub);
                 }
-                func_0204c124(info->allTypeActors[info->shownTypes[0]], TRUE);
+                ClActor_SetVisible(info->allTypeActors[info->shownTypes[0]], TRUE);
             }
         }
         if (info->shownTypes[1] != TYPE_NULL) {
             if (info->shownTypes[1] != type1 && info->shownTypes[1] != type2) {
-                func_0204c124(info->allTypeActors[info->shownTypes[1]], FALSE);
+                ClActor_SetVisible(info->allTypeActors[info->shownTypes[1]], FALSE);
                 info->shownTypes[1] = TYPE_NULL;
             } else {
                 if (info->shownTypes[1] == type1) {
-                    func_0204c140(info->allTypeActors[info->shownTypes[1]], &pos[0], sub);
+                    ClActor_SetSurfacePos(info->allTypeActors[info->shownTypes[1]], &pos[0], sub);
                 }
-                func_0204c124(info->allTypeActors[info->shownTypes[1]], TRUE);
+                ClActor_SetVisible(info->allTypeActors[info->shownTypes[1]], TRUE);
             }
         }
         if (type1 != TYPE_NULL) {
             info->shownTypes[0] = type1;
-            func_0204c124(info->allTypeActors[info->shownTypes[0]], TRUE);
-            func_0204c140(info->allTypeActors[info->shownTypes[0]], &pos[0], sub);
+            ClActor_SetVisible(info->allTypeActors[info->shownTypes[0]], TRUE);
+            ClActor_SetSurfacePos(info->allTypeActors[info->shownTypes[0]], &pos[0], sub);
         }
         if (type2 != TYPE_NULL) {
             info->shownTypes[1] = type2;
-            func_0204c124(info->allTypeActors[info->shownTypes[1]], TRUE);
-            func_0204c140(info->allTypeActors[info->shownTypes[1]], &pos[1], sub);
+            ClActor_SetVisible(info->allTypeActors[info->shownTypes[1]], TRUE);
+            ClActor_SetSurfacePos(info->allTypeActors[info->shownTypes[1]], &pos[1], sub);
         }
     } else {
         ArcTool *arc;
@@ -1328,16 +1330,16 @@ static void ZukanInfo_ShowTypesInGameLanguage(ZukanInfo *info, u32 type1, u32 ty
             info->typeChars[slot][i] = -1;
             if (types[i] != TYPE_NULL) {
                 info->typeChars[slot][i] =
-                    func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(types[i]), FALSE, draw, info->heapId);
+                    ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(types[i]), FALSE, draw, info->heapId);
             }
         }
         for (i = 0; i < 2; i++) {
             if (info->typeChars[slot][i] != -1) {
-                info->typeActors[slot][i] = func_0204c040(info->unit, info->typeChars[slot][i], info->typePalette,
-                                                          info->typeCellAnims, &setups[i], surface, info->heapId);
-                func_0204c378(info->typeActors[slot][i], AppMenuCommon_GetTypeIconPaletteIndex(types[i]), TRUE);
-                func_0204c438(info->typeActors[slot][i], 2);
-                func_0204c318(info->typeActors[slot][i], 1);
+                info->typeActors[slot][i] = ClActor_Create(info->unit, info->typeChars[slot][i], info->typePalette,
+                                                           info->typeCellAnims, &setups[i], surface, info->heapId);
+                ClActor_SetPalette(info->typeActors[slot][i], AppMenuCommon_GetTypeIconPaletteIndex(types[i]), TRUE);
+                ClActor_SetPriority(info->typeActors[slot][i], 2);
+                ClActor_SetObjMode(info->typeActors[slot][i], 1);
             }
         }
     }
@@ -1377,22 +1379,22 @@ static void ZukanInfo_ShowTypesInLanguage(ZukanInfo *info, u32 type1, u32 type2,
         type = types[i];
         if (type != TYPE_NULL) {
             info->typeChars[slot][i] =
-                func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, draw, info->heapId);
+                ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, draw, info->heapId);
             column = sTypeIconTiles[type][1] << 7;
             row = sTypeIconTiles[type][0] << 11;
-            func_0204bab8(info->typeChars[slot][i], &tiles[row + column], 0x80, 0, draw);
-            func_0204bab8(info->typeChars[slot][i], &tiles[row + 0x400 + column], 0x80, 0x80, draw);
+            ClActSys_WriteCharData(info->typeChars[slot][i], &tiles[row + column], 0x80, 0, draw);
+            ClActSys_WriteCharData(info->typeChars[slot][i], &tiles[row + 0x400 + column], 0x80, 0x80, draw);
         }
     }
     GFL_HeapFree(file);
 
     for (i = 0; i < 2; i++) {
         if (info->typeChars[slot][i] != -1) {
-            info->typeActors[slot][i] = func_0204c040(info->unit, info->typeChars[slot][i], info->typePalette,
-                                                      info->typeCellAnims, &setups[i], surface, info->heapId);
-            func_0204c378(info->typeActors[slot][i], AppMenuCommon_GetTypeIconPaletteIndex(types[i]), TRUE);
-            func_0204c438(info->typeActors[slot][i], 2);
-            func_0204c318(info->typeActors[slot][i], 1);
+            info->typeActors[slot][i] = ClActor_Create(info->unit, info->typeChars[slot][i], info->typePalette,
+                                                       info->typeCellAnims, &setups[i], surface, info->heapId);
+            ClActor_SetPalette(info->typeActors[slot][i], AppMenuCommon_GetTypeIconPaletteIndex(types[i]), TRUE);
+            ClActor_SetPriority(info->typeActors[slot][i], 2);
+            ClActor_SetObjMode(info->typeActors[slot][i], 1);
         }
     }
 }
@@ -1403,12 +1405,12 @@ static void ZukanInfo_FreeTypeActors(ZukanInfo *info, u32 slot) {
     if (!info->allTypesLoaded) {
         for (i = 0; i < 2; i++) {
             if (info->typeChars[slot][i] != -1) {
-                func_0204c108(info->typeActors[slot][i]);
+                ClActor_Delete(info->typeActors[slot][i]);
             }
         }
         for (i = 0; i < 2; i++) {
             if (info->typeChars[slot][i] != -1) {
-                func_0204b98c(info->typeChars[slot][i]);
+                ClActSys_FreeChars(info->typeChars[slot][i]);
                 info->typeChars[slot][i] = -1;
             }
         }
@@ -1424,7 +1426,7 @@ static void ZukanInfo_HideOtherTypes(ZukanInfo *info) {
             if (slot != info->typeSlot) {
                 for (i = 0; i < 2; i++) {
                     if (info->typeChars[slot][i] != -1) {
-                        func_0204c124(info->typeActors[slot][i], FALSE);
+                        ClActor_SetVisible(info->typeActors[slot][i], FALSE);
                     }
                 }
             }
@@ -1446,11 +1448,12 @@ static void ZukanInfo_InitFootprints(ZukanInfo *info) {
         sub = TRUE;
     }
     arc = info->arcs[ZUKAN_INFO_ARC_FOOTPRINT];
-    info->footprintPalette = func_0204bbb8(arc, ZukanInfo_GetFootprintPaletteFile(), sub, 0xa0, 0, 1, info->heapId);
+    info->footprintPalette =
+        ClActSys_LoadPlttRange(arc, ZukanInfo_GetFootprintPaletteFile(), sub, 0xa0, 0, 1, info->heapId);
     info->footprintCellAnimsOld =
-        func_0204bde0(arc, ZukanInfo_GetFootprintCellFile(0), ZukanInfo_GetFootprintAnimFile(0), info->heapId);
-    info->footprintCellAnims = func_0204bde0(arc, ZukanInfo_GetFootprintCellFile(SPECIES_ARCEUS + 1),
-                                             ZukanInfo_GetFootprintAnimFile(SPECIES_ARCEUS + 1), info->heapId);
+        ClActSys_LoadCellAnims(arc, ZukanInfo_GetFootprintCellFile(0), ZukanInfo_GetFootprintAnimFile(0), info->heapId);
+    info->footprintCellAnims = ClActSys_LoadCellAnims(arc, ZukanInfo_GetFootprintCellFile(SPECIES_ARCEUS + 1),
+                                                      ZukanInfo_GetFootprintAnimFile(SPECIES_ARCEUS + 1), info->heapId);
 }
 
 static void ZukanInfo_FreeFootprints(ZukanInfo *info) {
@@ -1459,9 +1462,9 @@ static void ZukanInfo_FreeFootprints(ZukanInfo *info) {
     for (i = 0; i < 2; i++) {
         ZukanInfo_UnloadFootprint(info, i);
     }
-    func_0204be64(info->footprintCellAnims);
-    func_0204be64(info->footprintCellAnimsOld);
-    func_0204bcd0(info->footprintPalette);
+    ClActSys_FreeCellAnims(info->footprintCellAnims);
+    ClActSys_FreeCellAnims(info->footprintCellAnimsOld);
+    ClActSys_FreePltt(info->footprintPalette);
 }
 
 static void ZukanInfo_LoadFootprint(ZukanInfo *info, u32 species, u32 form, u32 slot) {
@@ -1478,10 +1481,11 @@ static void ZukanInfo_LoadFootprint(ZukanInfo *info, u32 species, u32 form, u32 
     formFile = ZukanInfo_GetFootprintFormFile(species, form);
     if (formFile == 0xffff) {
         arc = info->arcs[ZUKAN_INFO_ARC_FOOTPRINT];
-        info->footprintChars[slot] = func_0204b81c(arc, ZukanInfo_GetFootprintFile(species), TRUE, draw, info->heapId);
+        info->footprintChars[slot] =
+            ClActSys_LoadChars(arc, ZukanInfo_GetFootprintFile(species), TRUE, draw, info->heapId);
     } else {
         info->footprintChars[slot] =
-            func_0204b81c(info->arcs[ZUKAN_INFO_ARC_FOOTPRINT_FORM], formFile, TRUE, draw, info->heapId);
+            ClActSys_LoadChars(info->arcs[ZUKAN_INFO_ARC_FOOTPRINT_FORM], formFile, TRUE, draw, info->heapId);
     }
 
     setup.x = 120;
@@ -1490,21 +1494,21 @@ static void ZukanInfo_LoadFootprint(ZukanInfo *info, u32 species, u32 form, u32 
     setup.priority = 1;
     setup.bgPriority = 0;
     if (species <= SPECIES_ARCEUS && formFile != 0xffff) {
-        info->footprints[slot] = func_0204c040(info->unit, info->footprintChars[slot], info->footprintPalette,
-                                               info->footprintCellAnimsOld, &setup, surface, info->heapId);
+        info->footprints[slot] = ClActor_Create(info->unit, info->footprintChars[slot], info->footprintPalette,
+                                                info->footprintCellAnimsOld, &setup, surface, info->heapId);
     } else {
-        info->footprints[slot] = func_0204c040(info->unit, info->footprintChars[slot], info->footprintPalette,
-                                               info->footprintCellAnims, &setup, surface, info->heapId);
+        info->footprints[slot] = ClActor_Create(info->unit, info->footprintChars[slot], info->footprintPalette,
+                                                info->footprintCellAnims, &setup, surface, info->heapId);
     }
-    func_0204c438(info->footprints[slot], 1);
-    func_0204c318(info->footprints[slot], 1);
+    ClActor_SetPriority(info->footprints[slot], 1);
+    ClActor_SetObjMode(info->footprints[slot], 1);
     ZukanInfo_HideOtherFootprints(info);
 }
 
 static void ZukanInfo_UnloadFootprint(ZukanInfo *info, u32 slot) {
     if (info->footprints[slot] != NULL) {
-        func_0204c108(info->footprints[slot]);
-        func_0204b98c(info->footprintChars[slot]);
+        ClActor_Delete(info->footprints[slot]);
+        ClActSys_FreeChars(info->footprintChars[slot]);
         info->footprints[slot] = NULL;
     }
 }
@@ -1514,7 +1518,7 @@ static void ZukanInfo_HideOtherFootprints(ZukanInfo *info) {
 
     for (i = 0; i < 2; i++) {
         if (i != info->footprintSlot && info->footprints[i] != NULL) {
-            func_0204c124(info->footprints[i], FALSE);
+            ClActor_SetVisible(info->footprints[i], FALSE);
         }
     }
 }
@@ -1567,25 +1571,25 @@ static void ZukanInfo_UpdateFootprintGlow(ZukanInfo *info) {
 static void ZukanInfo_SetFootprintsVisible(ZukanInfo *info, BOOL visible) {
     u8 i;
 
-    func_0204c124(info->footprints[info->footprintSlot], visible);
+    ClActor_SetVisible(info->footprints[info->footprintSlot], visible);
     if (info->allTypesLoaded) {
         if (info->shownTypes[0] != TYPE_NULL) {
-            func_0204c124(info->allTypeActors[info->shownTypes[0]], visible);
+            ClActor_SetVisible(info->allTypeActors[info->shownTypes[0]], visible);
         }
         if (info->shownTypes[1] != TYPE_NULL) {
-            func_0204c124(info->allTypeActors[info->shownTypes[1]], visible);
+            ClActor_SetVisible(info->allTypeActors[info->shownTypes[1]], visible);
         }
     } else {
         for (i = 0; i < 2; i++) {
             if (info->typeChars[info->typeSlot][i] != -1) {
-                func_0204c124(info->typeActors[info->typeSlot][i], visible);
+                ClActor_SetVisible(info->typeActors[info->typeSlot][i], visible);
             }
         }
     }
 }
 
 static void ZukanInfo_SetVisible(ZukanInfo *info, BOOL visible) {
-    func_0204c124(info->sprites[info->spriteSlot], visible);
+    ClActor_SetVisible(info->sprites[info->spriteSlot], visible);
     if (!info->caught) {
         visible = FALSE;
     }

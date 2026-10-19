@@ -76,13 +76,13 @@ static void ActorPalSlots_Free(ActorPalSlots *slots, int first, BOOL sub) {
 static u32 ActorTool_LoadPalettes(ActorPalSlots *slots, ArcTool *arc, u32 fileId, BOOL sub, u32 count, u32 heapId) {
     int first = ActorPalSlots_Alloc(slots, count, sub);
 
-    return func_0204bbb8(arc, fileId, sub, first * 32, 0, count, heapId);
+    return ClActSys_LoadPlttRange(arc, fileId, sub, first * 32, 0, count, heapId);
 }
 
 static u32 ActorTool_LoadPalette(ActorPalSlots *slots, ArcTool *arc, u32 fileId, BOOL sub, u32 count, u32 heapId) {
     int first = ActorPalSlots_Alloc(slots, count, sub);
 
-    return func_0204bc48(arc, fileId, sub, first * 32, heapId);
+    return ClActSys_LoadPlttEx(arc, fileId, sub, first * 32, heapId);
 }
 
 u32 ActorTool_LoadPalettesFade(PaletteFade *fade, ActorPalSlots *slots, ArcTool *arc, u32 fileId, BOOL sub, u32 count,
@@ -116,10 +116,10 @@ u32 ActorTool_LoadPaletteFade(PaletteFade *fade, ActorPalSlots *slots, ArcTool *
 }
 
 static u32 ActorTool_GetPalSlot(ActorPalSlots *slots, u32 palette, BOOL sub) {
-    return func_0204bdc0(palette, sub) / 32;
+    return ClActSys_GetPlttVramAddr(palette, sub) / 32;
 }
 
 void ActorTool_FreePalette(ActorPalSlots *slots, u32 palette, BOOL sub) {
     ActorPalSlots_Free(slots, ActorTool_GetPalSlot(slots, palette, sub), sub);
-    func_0204bcd0(palette);
+    ClActSys_FreePltt(palette);
 }

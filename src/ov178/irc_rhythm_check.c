@@ -584,38 +584,38 @@ static void IrcRhythmClAct_Init(IrcRhythmClAct *clact, const BGSysVRAMConfig *vr
 
     MI_CpuFill8(clact, 0, sizeof(IrcRhythmClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     arc = GFL_ArcSysCreateFileHandle(ARCID_IRC_COMPAT, heapId);
-    clact->palette = func_0204bba0(arc, 35, CLACT_VRAM_MAIN, 0, heapId);
-    clact->chars = func_0204b81c(arc, 34, FALSE, CLACT_VRAM_MAIN, heapId);
-    clact->cellAnims = func_0204bde0(arc, 33, 32, heapId);
-    clact->countdownPalette = func_0204bbb8(arc, 12, CLACT_VRAM_MAIN, 0xe0, 12, 1, heapId);
-    clact->countdownChars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_MAIN, heapId);
-    clact->countdownCellAnims = func_0204bde0(arc, 10, 9, heapId);
-    clact->subPalette = func_0204bba0(arc, 35, CLACT_VRAM_SUB, 0, heapId);
-    clact->subChars = func_0204b81c(arc, 34, FALSE, CLACT_VRAM_SUB, heapId);
-    clact->subCellAnims = func_0204bde0(arc, 33, 32, heapId);
+    clact->palette = ClActSys_LoadPltt(arc, 35, CLACT_VRAM_MAIN, 0, heapId);
+    clact->chars = ClActSys_LoadChars(arc, 34, FALSE, CLACT_VRAM_MAIN, heapId);
+    clact->cellAnims = ClActSys_LoadCellAnims(arc, 33, 32, heapId);
+    clact->countdownPalette = ClActSys_LoadPlttRange(arc, 12, CLACT_VRAM_MAIN, 0xe0, 12, 1, heapId);
+    clact->countdownChars = ClActSys_LoadChars(arc, 11, FALSE, CLACT_VRAM_MAIN, heapId);
+    clact->countdownCellAnims = ClActSys_LoadCellAnims(arc, 10, 9, heapId);
+    clact->subPalette = ClActSys_LoadPltt(arc, 35, CLACT_VRAM_SUB, 0, heapId);
+    clact->subChars = ClActSys_LoadChars(arc, 34, FALSE, CLACT_VRAM_SUB, heapId);
+    clact->subCellAnims = ClActSys_LoadCellAnims(arc, 33, 32, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < PARTICLE_COUNT; i++) {
-        clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
-                                         CLACT_SURFACE_MAIN, heapId);
-        func_0204c124(clact->actors[i], FALSE);
-        func_0204c468(clact->actors[i], 3);
+        clact->actors[i] = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
+                                          CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetVisible(clact->actors[i], FALSE);
+        ClActor_SetBgPriority(clact->actors[i], 3);
         func_0204c520(clact->actors[i], TRUE);
-        func_0204c488(clact->actors[i], 0);
+        ClActor_SetSequence(clact->actors[i], 0);
     }
     setup.x = 128;
     setup.y = 96;
     for (i = COUNTDOWN_ACTOR; i < COUNTDOWN_ACTOR + 3; i++) {
         setup.sequence = i - 30;
-        clact->actors[i] = func_0204c040(clact->unit, clact->countdownChars, clact->countdownPalette,
-                                         clact->countdownCellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c124(clact->actors[i], FALSE);
-        func_0204c378(clact->actors[i], 0, TRUE);
+        clact->actors[i] = ClActor_Create(clact->unit, clact->countdownChars, clact->countdownPalette,
+                                          clact->countdownCellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetVisible(clact->actors[i], FALSE);
+        ClActor_SetPalette(clact->actors[i], 0, TRUE);
     }
 }
 
@@ -624,29 +624,29 @@ static void IrcRhythmClAct_Free(IrcRhythmClAct *clact) {
 
     for (i = 0; i < CLACT_COUNT; i++) {
         if (clact->actors[i] != NULL) {
-            func_0204c108(clact->actors[i]);
+            ClActor_Delete(clact->actors[i]);
         }
     }
-    func_0204bcd0(clact->palette);
-    func_0204b98c(clact->chars);
-    func_0204be64(clact->cellAnims);
-    func_0204bcd0(clact->subPalette);
-    func_0204b98c(clact->subChars);
-    func_0204be64(clact->subCellAnims);
-    func_0204bcd0(clact->countdownPalette);
-    func_0204b98c(clact->countdownChars);
-    func_0204be64(clact->countdownCellAnims);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActSys_FreePltt(clact->palette);
+    ClActSys_FreeChars(clact->chars);
+    ClActSys_FreeCellAnims(clact->cellAnims);
+    ClActSys_FreePltt(clact->subPalette);
+    ClActSys_FreeChars(clact->subChars);
+    ClActSys_FreeCellAnims(clact->subCellAnims);
+    ClActSys_FreePltt(clact->countdownPalette);
+    ClActSys_FreeChars(clact->countdownChars);
+    ClActSys_FreeCellAnims(clact->countdownCellAnims);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(IrcRhythmClAct));
 }
 
 static void IrcRhythmClAct_Update(IrcRhythmClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void IrcRhythmClAct_VBlank(IrcRhythmClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActor *IrcRhythmClAct_GetActor(IrcRhythmClAct *clact, int index) {
@@ -808,8 +808,8 @@ static void IrcRhythmCountdown_Update(IrcRhythmCountdown *countdown) {
     if (countdown->active) {
         if (countdown->frame == 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_43);
-            func_0204c124(countdown->actor, TRUE);
-            func_0204c488(countdown->actor, 4 - countdown->count);
+            ClActor_SetVisible(countdown->actor, TRUE);
+            ClActor_SetSequence(countdown->actor, 4 - countdown->count);
         }
         if (countdown->frame++ >= COUNTDOWN_FRAME_COUNT) {
             countdown->frame = 0;
@@ -819,7 +819,7 @@ static void IrcRhythmCountdown_Update(IrcRhythmCountdown *countdown) {
             GFL_SndSEPlay(SEQ_SE_SYS_44);
             countdown->done = TRUE;
             countdown->active = FALSE;
-            func_0204c124(countdown->actor, FALSE);
+            ClActor_SetVisible(countdown->actor, FALSE);
         }
     }
 }
@@ -1128,7 +1128,7 @@ static BOOL IrcRhythmNet_Send(IrcRhythmNet *net, const IrcRhythmData *data) {
         break;
     case 1:
         if (CompatibleIrcSys_SendEx(net->sys, NET_COMMAND_BASE, sizeof(IrcRhythmData), &net->send,
-                                    !func_02042a6c(func_02040440()), 0, FALSE, TRUE)) {
+                                    !GFL_NetGetHandleNetId(NetHandle_GetOwn()), 0, FALSE, TRUE)) {
             net->state = 2;
         }
         break;
@@ -1150,8 +1150,8 @@ static void IrcRhythmNet_GetReceived(IrcRhythmNet *net, IrcRhythmData *dest) {
 static void IrcRhythmNet_OnReceive(int netId, int size, const void *data, void *work, NetHandle *handle) {
     IrcRhythmNet *net = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             net->received = TRUE;
         }
     }
@@ -1160,7 +1160,7 @@ static void IrcRhythmNet_OnReceive(int netId, int size, const void *data, void *
 static void *IrcRhythmNet_GetBuffer(int netId, void *work, int size) {
     IrcRhythmNet *net = work;
 
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return &net->own;
     }
     return &net->peer;
@@ -1171,7 +1171,7 @@ static BOOL IrcRhythm_GetTouch(IrcRhythmPoint *point) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y) && x <= TOUCH_MAX_X && y <= TOUCH_MAX_Y) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && x <= TOUCH_MAX_X && y <= TOUCH_MAX_Y) {
         point->x = x;
         point->y = y;
         return TRUE;
@@ -1409,10 +1409,10 @@ static void IrcRhythmParticle_Update(IrcRhythmParticle *particle) {
             pos.x = particle->end.x;
             pos.y = particle->end.y;
 #endif
-            func_0204c124(particle->actor, FALSE);
+            ClActor_SetVisible(particle->actor, FALSE);
             particle->active = FALSE;
         }
-        func_0204c140(particle->actor, &pos, particle->surface);
+        ClActor_SetSurfacePos(particle->actor, &pos, particle->surface);
     }
 }
 
@@ -1423,8 +1423,8 @@ static void IrcRhythmParticle_Start(IrcRhythmParticle *particle, const IrcRhythm
     VEC_Set(&particle->end, FX32_CONST(to->x), FX32_CONST(to->y), 0);
     particle->frame = 0;
     particle->duration = duration;
-    func_0204c124(particle->actor, TRUE);
-    func_0204c378(particle->actor, (u8)palette, TRUE);
+    ClActor_SetVisible(particle->actor, TRUE);
+    ClActor_SetPalette(particle->actor, (u8)palette, TRUE);
 }
 
 static BOOL IrcRhythmParticle_IsActive(IrcRhythmParticle *particle) {

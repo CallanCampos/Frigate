@@ -335,7 +335,7 @@ static void ZukanAreaList_StateFadeOut(ZukanAreaListWork *wk) {
 static void ZukanAreaList_StateInit(ZukanAreaListWork *wk) {
     ZukanAreaListView_FillWindow(ZUKAN_AREA_LIST_WIN_MAIN, 0, &wk->view);
     ZukanAreaListView_FillWindow(ZUKAN_AREA_LIST_WIN_SUB, 0, &wk->view);
-    func_02042ba8(TRUE, HEAPID_ZUKAN_AREA_LIST);
+    GFL_NetSetIconScreen(TRUE, HEAPID_ZUKAN_AREA_LIST);
     ZukanAreaList_LoadNationalObtained(wk);
     ZukanAreaList_PrintHeading(wk);
     ZukanAreaList_InitModes(wk);
@@ -401,7 +401,7 @@ static void ZukanAreaList_StateButton(ZukanAreaListWork *wk) {
         ZukanAreaListView_SetActorAnim(&wk->view, wk->buttonActor, wk->buttonAnim);
         wk->step++;
     case 1:
-        if (!func_0204c560(ZukanAreaListView_GetActor(&wk->view, wk->buttonActor)) ||
+        if (!ClActor_IsAnimActive(ZukanAreaListView_GetActor(&wk->view, wk->buttonActor)) ||
             wk->stateParam == STATE_PARAM_NO_WAIT) {
             ZukanAreaList_SetState(wk, wk->nextState, wk->nextStateParam);
         }
@@ -412,7 +412,7 @@ static void ZukanAreaList_StateButton(ZukanAreaListWork *wk) {
 // The touches and keys that the list leaves
 static BOOL ZukanAreaList_Input(ZukanAreaListWork *wk) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 touch = func_0203da0c(sZukanAreaListTouchRects);
+    s32 touch = GFL_HIDGetTouchPressedRect(sZukanAreaListTouchRects);
     int scroll;
     int row;
 
@@ -574,7 +574,7 @@ static void ZukanAreaList_StateDecide(ZukanAreaListWork *wk) {
     case 0: {
         ClActor *frame = ZukanAreaListView_GetActor(&wk->view, ZUKAN_AREA_LIST_OBJ_MARK_FRAME);
 
-        func_0204c488(frame, func_0204c4a0(frame) + 1);
+        ClActor_SetSequence(frame, ClActor_GetSequence(frame) + 1);
         func_0204c520(frame, TRUE);
         ZukanAreaListView_SetActorAnim(&wk->view, ZUKAN_AREA_LIST_OBJ_DECIDE, 40);
     }
@@ -639,7 +639,7 @@ static void ZukanAreaList_PrintModes(ZukanAreaListWork *wk) {
         strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_Unova);
         ZukanAreaListView_Print(ZUKAN_AREA_LIST_WIN_MAIN, strbuf, &wk->view, 2, 126, 40, 16, PRINT_COLOR(15, 2, 1));
         GFL_StrBufFree(strbuf);
-        func_0204c124(ZukanAreaListView_GetActor(&wk->view, ZUKAN_AREA_LIST_OBJ_MODE_UPPER), FALSE);
+        ClActor_SetVisible(ZukanAreaListView_GetActor(&wk->view, ZUKAN_AREA_LIST_OBJ_MODE_UPPER), FALSE);
     }
 }
 

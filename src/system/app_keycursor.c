@@ -100,7 +100,7 @@ void KeyCursor_Update(KeyCursor *cursor, PrintStream *stream, BmpWin *window) {
             pressed = GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B);
         }
         if (pressed == FALSE && cursor->touch) {
-            pressed = func_0203da48();
+            pressed = GFL_HIDIsTouchPressed();
         }
 
         if (pressed) {
@@ -126,7 +126,7 @@ BOOL KeyCursor_UpdateWait(KeyCursor *cursor, BmpWin *window) {
         pressed = GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B);
     }
     if (pressed == FALSE && cursor->touch) {
-        pressed = func_0203da48();
+        pressed = GFL_HIDIsTouchPressed();
     }
 
     if (pressed) {

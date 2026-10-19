@@ -111,7 +111,7 @@ static BOOL SubwayMap_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_ArcToolFree(arc);
     GFL_BGSysLoadScr(BG_SUB_MAP);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     return TRUE;
 }
 
@@ -153,11 +153,11 @@ static BOOL SubwayMap_Main(GameProc *proc, u32 *state, void *param, void *work) 
     case STEP_WAIT_INPUT:
         done = FALSE;
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             done = TRUE;
-        } else if (func_0203dac8(&x, &y)) {
+        } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             done = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (done) {
             *state = STEP_WAIT_FADE_OUT;

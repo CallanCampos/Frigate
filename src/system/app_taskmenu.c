@@ -122,7 +122,7 @@ AppTaskMenu *AppTaskMenu_Create(AppTaskMenuInit *init, AppTaskMenuRes *res) {
     menu->init.height = init->height == 0 ? DEFAULT_HEIGHT : init->height;
 
     AppTaskMenu_CreateWindows(menu, res);
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         AppTaskMenu_SetWindowActive(menu->windows[menu->cursorPos], menu->res, TRUE);
     }
     menu->isUpdatingText = TRUE;
@@ -306,7 +306,7 @@ static void AppTaskMenuWin_PulseColor(u16 *angle, GXRgb *color, u8 bg, u8 palett
 void AppTaskMenu_SetLocked(AppTaskMenu *menu, BOOL locked) {
     menu->isLocked = locked;
     if (locked == TRUE) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         AppTaskMenu_SetWindowActive(menu->windows[menu->cursorPos], menu->res, FALSE);
     }
 }
@@ -315,7 +315,7 @@ void AppTaskMenu_SetCursorPos(AppTaskMenu *menu, u32 pos) {
     int i;
 
     menu->cursorPos = pos;
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         for (i = 0; i < menu->init.itemCount; i++) {
             if (i == pos) {
                 AppTaskMenu_SetWindowActive(menu->windows[i], menu->res, TRUE);
@@ -336,10 +336,10 @@ static void AppTaskMenu_UpdateKeys(AppTaskMenu *menu) {
     }
 
     // In touch mode the first key, other than B, only brings the cursor back
-    if (func_0203d554() == TRUE && (pressed & PAD_BUTTON_B) == 0) {
+    if (GCTX_HIDIsUsingTouch() == TRUE && (pressed & PAD_BUTTON_B) == 0) {
         if (pressed & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_KEY_UP | PAD_KEY_DOWN)) {
             AppTaskMenu_SetWindowActive(menu->windows[menu->cursorPos], menu->res, TRUE);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         return;
@@ -370,7 +370,7 @@ static void AppTaskMenu_UpdateKeys(AppTaskMenu *menu) {
         menu->cursorPos = menu->init.itemCount - 1;
         menu->isDecided = TRUE;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
     }
 
     if (oldPos != menu->cursorPos) {
@@ -402,9 +402,9 @@ static void AppTaskMenu_UpdateTouch(AppTaskMenu *menu) {
     }
     rects[i].top = TOUCH_RECT_END;
 
-    hit = func_0203da0c(rects);
+    hit = GFL_HIDGetTouchPressedRect(rects);
     if (hit != TOUCH_RECT_NONE) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         AppTaskMenu_SetWindowActive(menu->windows[menu->cursorPos], menu->res, FALSE);
         menu->cursorPos = hit;
         menu->isDecided = TRUE;
@@ -538,7 +538,7 @@ BOOL AppTaskMenuWin_IsTouched(AppTaskMenuWin *win) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         u32 left = BmpWin_GetPosX(win->window) * 8;
         u32 top = BmpWin_GetPosY(win->window) * 8;
         u32 right = left + BmpWin_GetSizeX(win->window) * 8;

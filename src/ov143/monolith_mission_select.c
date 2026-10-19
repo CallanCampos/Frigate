@@ -424,7 +424,7 @@ static BOOL MonolithMission_Init(GameProc *proc, u32 *state, void *param, void *
         if (MonolithMission_DrawList(mfw, screen->work, mfw->count) == TRUE) {
             MonolithMission_UpdateRows(mfw);
             mfw->rowsChanged = TRUE;
-            if (func_0203d554() == FALSE) {
+            if (GCTX_HIDIsUsingTouch() == FALSE) {
                 MonolithMission_SetCursor(mfw, 1, MONOLITH_MISSION_CURSOR_DRAG);
             } else {
                 MonolithMission_SetCursor(mfw, MONOLITH_MISSION_NONE, MONOLITH_MISSION_CURSOR_DRAG);
@@ -480,10 +480,10 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         break;
     case MONOLITH_MISSION_SEQ_WAIT_HELP:
         if (MonolithMission_UpdateMessage(screen->work, mfw) == TRUE &&
-            (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             MonolithMission_ClearMessage(mfw);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            if (func_0203da48() == FALSE) {
+            if (GFL_HIDIsTouchPressed() == FALSE) {
                 MonolithMission_SetCursor(mfw, 1, MONOLITH_MISSION_CURSOR_DRAG);
             } else {
                 MonolithMission_SetCursor(mfw, MONOLITH_MISSION_NONE, MONOLITH_MISSION_CURSOR_DRAG);
@@ -492,19 +492,19 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         }
         break;
     case MONOLITH_MISSION_SEQ_WAIT_RELEASE:
-        if (!func_0203da2c() && !(MonolithMission_GetHeldKeys(mfw) & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (!GFL_HIDIsTouchHeld() && !(MonolithMission_GetHeldKeys(mfw) & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             *state = MONOLITH_MISSION_SEQ_INPUT;
         }
         break;
     case MONOLITH_MISSION_SEQ_INPUT:
         pressed = GCTX_HIDGetPressedKeys();
-        hit = func_0203da0c(sMonolithMissionTouchRects);
+        hit = GFL_HIDGetTouchPressedRect(sMonolithMissionTouchRects);
         if (hit == 0 || (pressed & PAD_BUTTON_B)) {
             MonolithTool_PressReturnButton(&mfw->returnButton);
             if (hit == 0) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             } else {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             *state = MONOLITH_MISSION_SEQ_RETURN;
@@ -585,13 +585,13 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         if (mfw->timer != 0) {
             mfw->timer--;
         }
-        if (mfw->timer == 0 || func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (mfw->timer == 0 || GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             MonolithMission_ClearMessage(mfw);
             func_0202bf7c(GSYS_GetGameCommSystem(screen->param->gsys));
             MonolithTool_SetPanelPulse(screen, TRUE, 1);
             MonolithTool_SetTextCursor(screen, &mfw->startButton, 1, 0xff, 3);
-            if (func_0203da48()) {
+            if (GFL_HIDIsTouchPressed()) {
                 *state = MONOLITH_MISSION_SEQ_WAIT_TOUCH_RELEASE;
             } else {
                 *state = MONOLITH_MISSION_SEQ_RETURN;
@@ -599,7 +599,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         }
         break;
     case MONOLITH_MISSION_SEQ_WAIT_TOUCH_RELEASE:
-        if (!func_0203da2c()) {
+        if (!GFL_HIDIsTouchHeld()) {
             *state = MONOLITH_MISSION_SEQ_RETURN;
         }
         break;
@@ -914,7 +914,7 @@ static void MonolithMission_DeleteRowActors(MonolithMissionWork *mfw) {
 
 static void MonolithMission_CreateStartButton(MonolithScreenParam *screen, MonolithMissionWork *mfw) {
     MonolithTool_CreateText(screen->work, &mfw->startButton, 1, MONOLITH_TEXT_NARROW, 64, 180, 46, NULL);
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         MonolithTool_SetTextVisible(&mfw->startButton, FALSE);
     }
 }
@@ -942,8 +942,8 @@ static void MonolithMission_UpdateReturnButton(MonolithMissionWork *mfw) {
 static void MonolithMission_CreateArrows(MonolithScreenParam *screen, MonolithMissionWork *mfw) {
     mfw->arrowUp = MonolithTool_CreateActor(screen->work, 128, 28, 9);
     mfw->arrowDown = MonolithTool_CreateActor(screen->work, 128, 164, 10);
-    func_0204c124(mfw->arrowUp, FALSE);
-    func_0204c124(mfw->arrowDown, FALSE);
+    ClActor_SetVisible(mfw->arrowUp, FALSE);
+    ClActor_SetVisible(mfw->arrowDown, FALSE);
 }
 
 static void MonolithMission_DeleteArrows(MonolithMissionWork *mfw) {
@@ -954,14 +954,14 @@ static void MonolithMission_DeleteArrows(MonolithMissionWork *mfw) {
 // Shows the arrows where the list goes on
 static void MonolithMission_UpdateArrows(MonolithMissionWork *mfw) {
     if (mfw->scroll <= (8 << 8)) {
-        func_0204c124(mfw->arrowUp, FALSE);
+        ClActor_SetVisible(mfw->arrowUp, FALSE);
     } else {
-        func_0204c124(mfw->arrowUp, TRUE);
+        ClActor_SetVisible(mfw->arrowUp, TRUE);
     }
     if ((mfw->scroll >> 8) >= mfw->count * MONOLITH_MISSION_ROW_HEIGHT - 200) {
-        func_0204c124(mfw->arrowDown, FALSE);
+        ClActor_SetVisible(mfw->arrowDown, FALSE);
     } else {
-        func_0204c124(mfw->arrowDown, TRUE);
+        ClActor_SetVisible(mfw->arrowDown, TRUE);
     }
     MonolithTool_UpdateActor(mfw->arrowUp);
     MonolithTool_UpdateActor(mfw->arrowDown);
@@ -980,7 +980,7 @@ static BOOL MonolithMission_Input(MonolithScreenParam *screen, MonolithMissionWo
     int diff;
 
     mfw->keyScroll = 0;
-    touching = func_0203da84(&x, &y);
+    touching = GFL_HIDGetTouchHeldPoint(&x, &y);
     if (mfw->dragFrames == 0 && (x < 24 || x > 224)) {
         touching = FALSE;
     }
@@ -1007,7 +1007,7 @@ static BOOL MonolithMission_Input(MonolithScreenParam *screen, MonolithMissionWo
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             MonolithMission_SetCursor(mfw, mfw->cursor, MONOLITH_MISSION_CURSOR_KEYS);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return TRUE;
         }
@@ -1050,11 +1050,11 @@ static BOOL MonolithMission_Input(MonolithScreenParam *screen, MonolithMissionWo
                     mfw->tapY = y;
                     MonolithMission_SetCursor(mfw, MONOLITH_MISSION_NONE, MONOLITH_MISSION_CURSOR_DRAG);
                 }
-            } else if (func_0203da48() == TRUE && mfw->cursor != MONOLITH_MISSION_NONE && x >= 16 && x <= 112 &&
+            } else if (GFL_HIDIsTouchPressed() == TRUE && mfw->cursor != MONOLITH_MISSION_NONE && x >= 16 && x <= 112 &&
                        y >= 172 && y <= 188) {
                 picked = TRUE;
                 index = mfw->cursor;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             } else {
                 MonolithMission_MoveLevelCursor(screen, mfw, MONOLITH_MISSION_LEVEL_TOUCH);
             }
@@ -1296,11 +1296,11 @@ static void MonolithMission_CreateIcons(MonolithScreenParam *screen, MonolithMis
         setup.priority = icon->priority;
         setup.bgPriority = icon->bgPriority;
         mfw->icons[i] =
-            func_0204c040(screen->work->clactUnit, screen->work->actorRes[1].chars, screen->work->actorRes[1].palette,
-                          screen->work->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
+            ClActor_Create(screen->work->clactUnit, screen->work->actorRes[1].chars, screen->work->actorRes[1].palette,
+                           screen->work->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
         func_0204c520(mfw->icons[i], TRUE);
         if (icon->palette != 0) {
-            func_0204c378(mfw->icons[i], (u8)icon->palette, TRUE);
+            ClActor_SetPalette(mfw->icons[i], (u8)icon->palette, TRUE);
         }
     }
 }
@@ -1309,25 +1309,25 @@ static void MonolithMission_DeleteIcons(MonolithMissionWork *mfw) {
     int i;
 
     for (i = 0; i < MONOLITH_MISSION_ICON_COUNT; i++) {
-        func_0204c108(mfw->icons[i]);
+        ClActor_Delete(mfw->icons[i]);
     }
 }
 
 static void MonolithMission_SetIconY(MonolithMissionWork *mfw, int index, int y) {
     ClActorPos pos;
 
-    func_0204c178(mfw->icons[index], &pos, CLACT_VRAM_SUB);
+    ClActor_GetSurfacePos(mfw->icons[index], &pos, CLACT_VRAM_SUB);
     pos.y = y;
     pos.y += 8;
-    func_0204c140(mfw->icons[index], &pos, CLACT_VRAM_SUB);
+    ClActor_SetSurfacePos(mfw->icons[index], &pos, CLACT_VRAM_SUB);
 }
 
 static void MonolithMission_SetIconVisible(MonolithMissionWork *mfw, int index, BOOL visible) {
-    func_0204c124(mfw->icons[index], visible);
+    ClActor_SetVisible(mfw->icons[index], visible);
 }
 
 static void MonolithMission_SetIconSequence(MonolithMissionWork *mfw, int index, int sequence) {
-    func_0204c488(mfw->icons[index], sequence);
+    ClActor_SetSequence(mfw->icons[index], sequence);
     func_0204c520(mfw->icons[index], TRUE);
 }
 
@@ -1530,7 +1530,7 @@ static void MonolithMission_MoveLevelCursor(MonolithScreenParam *screen, Monolit
             changed = TRUE;
         }
     } else if (by == MONOLITH_MISSION_LEVEL_TOUCH) {
-        hit = func_0203da0c(sMonolithMissionLevelRects);
+        hit = GFL_HIDGetTouchPressedRect(sMonolithMissionLevelRects);
         if (hit >= 0 && hit <= maxLevel) {
             mfw->level = hit;
             changed = TRUE;
@@ -1558,8 +1558,8 @@ static void MonolithMission_MoveLevelCursor(MonolithScreenParam *screen, Monolit
         }
     }
     if (changed == TRUE) {
-        func_0204c378(mfw->icons[prevLevel], 0, TRUE);
-        func_0204c378(mfw->icons[mfw->level], 4, TRUE);
+        ClActor_SetPalette(mfw->icons[prevLevel], 0, TRUE);
+        ClActor_SetPalette(mfw->icons[mfw->level], 4, TRUE);
     }
     MonolithMission_RedrawRow(mfw, screen->work, mfw->level);
 }
@@ -1575,7 +1575,7 @@ static void MonolithMission_UpdateCheatCode(MonolithScreenParam *screen, Monolit
     u32 key;
 
     if (!(mfw->flags & MONOLITH_MISSION_FLAG_FIRST_VISIT) && !(mfw->flags & MONOLITH_MISSION_FLAG_CHEAT)) {
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             mfw->codeProgress = 0;
             return;
         }

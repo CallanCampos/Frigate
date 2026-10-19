@@ -148,7 +148,7 @@ void GFLAppInit(void) {
     GFL_FadeCreate(0);
     mainBackupSystemInit(7, showSavegameMainError, showSavegameAltError);
     GFL_TextPrintInit(NULL);
-    func_02044170();
+    RTCCache_Init();
     GFL_RandomInit();
     sVBlankCount = 0;
     GFL_VBlankResetCallback();
@@ -160,7 +160,7 @@ void GFLAppUpdate(void) {
     GCTX_HIDUpdate();
     func_02011818();
     GCTX_ProcMgrUpdate();
-    func_02044198();
+    RTCCache_Update();
 }
 
 void func_02005668(void) {
@@ -197,7 +197,7 @@ void GFL_VBlankResetCallback(void) {
 void GFL_VBlankUpdate(void) {
     GFL_TCBMgrUpdate(sWork->vblankTCBMgr);
     GFL_BGSysUpdate();
-    func_0204f864();
+    DMAVBlank_Update();
     GFL_FadeUpdate();
     sVBlankCount++;
 }

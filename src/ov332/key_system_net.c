@@ -297,7 +297,7 @@ u32 KeySystemNet_CheckError(KeySystemNet *net) {
             return KEY_SYSTEM_NET_ERROR;
         }
         if (GFL_NetErrCheck()) {
-            switch (func_02042540()->unk4) {
+            switch (NetState_GetErrorInfo()->unk4) {
             case 1:
             case 2:
             case 3:
@@ -322,7 +322,7 @@ void KeySystemNet_Reset(KeySystemNet *net) {
     switch (net->mode) {
     case KEY_SYSTEM_NET_MODE_WIRELESS:
     case KEY_SYSTEM_NET_MODE_OV181:
-        func_020429f0();
+        GFL_NetIwFree();
         GFL_NetErrShutdown();
         GFL_NetErrClear();
         KeySystemSeq_Set(net->seq, KeySystemNet_SeqIdle);
@@ -330,7 +330,7 @@ void KeySystemNet_Reset(KeySystemNet *net) {
     case KEY_SYSTEM_NET_MODE_WIFI:
         GFL_NetErrShutdown();
         GFL_NetErrClear();
-        func_020424e4();
+        NetState_ClearWifiError();
         DWC_ClearError();
         KeySystemSeq_Set(net->seq, KeySystemNet_SeqIdle);
         break;
@@ -364,7 +364,7 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
     case 0:
         net->count = 0;
         net->cancel = FALSE;
-        func_020425ec(&sNetInitData, NULL, net);
+        GFL_NetInit(&sNetInitData, NULL, net);
         net->timer = 0;
         (*state)++;
         break;
@@ -373,8 +373,8 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
             KeySystemSeq_Set(seq, KeySystemNet_SeqCancel);
             return;
         }
-        if (func_02042788()) {
-            func_02042ba8(TRUE, HEAPID_KEY_SYSTEM);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetSetIconScreen(TRUE, HEAPID_KEY_SYSTEM);
             func_020429a8(KeySystemNet_OnConnect, KeySystemNet_OnStart, KeySystemNet_OnDisconnect);
             (*state)++;
         }
@@ -386,15 +386,15 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
         }
         if (net->timer++ >= NET_TIMEOUT) {
             net->timer = 0;
-            func_020429f0();
-            func_02042860(NULL);
+            GFL_NetIwFree();
+            GFL_NetExit(NULL);
             *state = 6;
         }
         break;
     case 3:
         net->timer = 0;
-        func_02040c20(NET_COMMAND_BASE, sKeySystemNetCommands, 1, net);
-        func_02040624(func_02040440(), 10, NET_COMMAND_BASE >> 8);
+        NetCommand_AddTable(NET_COMMAND_BASE, sKeySystemNetCommands, 1, net);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, NET_COMMAND_BASE >> 8);
         func_02042e94(TRUE);
         func_02042e9c(TRUE);
         (*state)++;
@@ -402,11 +402,11 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
     case 4:
         if (net->timer++ >= NET_TIMEOUT) {
             net->timer = 0;
-            func_02040c64(NET_COMMAND_BASE);
-            func_020429f0();
-            func_02042860(NULL);
+            NetCommand_RemoveTable(NET_COMMAND_BASE);
+            GFL_NetIwFree();
+            GFL_NetExit(NULL);
             *state = 6;
-        } else if (func_02040664(func_02040440(), 10, NET_COMMAND_BASE >> 8)) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, NET_COMMAND_BASE >> 8)) {
             (*state)++;
         }
         break;
@@ -414,7 +414,7 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
         KeySystemSeq_Set(seq, KeySystemNet_SeqConnected);
         break;
     case 6:
-        if (func_020427a4()) {
+        if (GFL_NetIsEnded()) {
             KeySystemSeq_Set(seq, KeySystemNet_SeqIdle);
         }
         break;
@@ -424,28 +424,28 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
 static void KeySystemNet_SeqDisconnect(KeySystemSeq *seq, int *state, void *work) {
     switch (*state) {
     case 0:
-        if (func_02042a78() > 0) {
-            func_02040624(func_02040440(), 13, NET_COMMAND_BASE >> 8);
+        if (GFL_NetGetNegotiatedCount() > 0) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 13, NET_COMMAND_BASE >> 8);
             (*state)++;
         } else {
             *state = 2;
         }
         break;
     case 1:
-        if (func_02040664(func_02040440(), 13, NET_COMMAND_BASE >> 8)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 13, NET_COMMAND_BASE >> 8)) {
             func_02042e94(FALSE);
             func_02042e9c(FALSE);
             (*state)++;
         }
         break;
     case 2:
-        func_02040c64(NET_COMMAND_BASE);
-        func_020429f0();
-        func_02042860(NULL);
+        NetCommand_RemoveTable(NET_COMMAND_BASE);
+        GFL_NetIwFree();
+        GFL_NetExit(NULL);
         (*state)++;
         break;
     case 3:
-        if (func_020427a4()) {
+        if (GFL_NetIsEnded()) {
             (*state)++;
         }
         break;
@@ -465,16 +465,16 @@ static void KeySystemNet_SeqSend(KeySystemSeq *seq, int *state, void *work) {
     switch (*state) {
     case 0:
         net->hasReceived = FALSE;
-        func_02040624(func_02040440(), 11, NET_COMMAND_BASE >> 8);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 11, NET_COMMAND_BASE >> 8);
         (*state)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 11, NET_COMMAND_BASE >> 8)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 11, NET_COMMAND_BASE >> 8)) {
             (*state)++;
         }
         break;
     case 2:
-        if (func_02042be8(func_02040440(), NET_COMMAND_BASE, request->send.size, request->send.data)) {
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), NET_COMMAND_BASE, request->send.size, request->send.data)) {
             (*state)++;
         }
         break;
@@ -484,11 +484,11 @@ static void KeySystemNet_SeqSend(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 4:
-        func_02040624(func_02040440(), 12, NET_COMMAND_BASE >> 8);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 12, NET_COMMAND_BASE >> 8);
         (*state)++;
         break;
     case 5:
-        if (func_02040664(func_02040440(), 12, NET_COMMAND_BASE >> 8)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 12, NET_COMMAND_BASE >> 8)) {
             (*state)++;
         }
         break;
@@ -501,15 +501,15 @@ static void KeySystemNet_SeqSend(KeySystemSeq *seq, int *state, void *work) {
 static void KeySystemNet_SeqCancel(KeySystemSeq *seq, int *state, void *work) {
     switch (*state) {
     case 0:
-        if (func_02042788()) {
-            func_02042860(NULL);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetExit(NULL);
             *state = 1;
         } else {
             *state = 2;
         }
         break;
     case 1:
-        if (func_020427a4()) {
+        if (GFL_NetIsEnded()) {
             *state = 2;
         }
         break;
@@ -524,11 +524,11 @@ static void KeySystemNet_SeqSync(KeySystemSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        func_02040624(func_02040440(), (u8)(net->count + 20), NET_COMMAND_BASE >> 8);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), (u8)(net->count + 20), NET_COMMAND_BASE >> 8);
         (*state)++;
         break;
     case 1:
-        if (func_02040664(func_02040440(), (u8)(net->count + 20), NET_COMMAND_BASE >> 8)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), (u8)(net->count + 20), NET_COMMAND_BASE >> 8)) {
             (*state)++;
         }
         break;
@@ -811,7 +811,7 @@ static void KeySystemNet_OnDisconnect(void *work) {
 static void KeySystemNet_Receive(int netId, int size, const void *data, void *work, NetHandle *handle) {
     KeySystemNet *net = work;
 
-    if (handle == func_02040440() && netId != func_0203ffc4() && size < NET_BUFFER_SIZE) {
+    if (handle == NetHandle_GetOwn() && netId != NetSystem_GetNetId() && size < NET_BUFFER_SIZE) {
         net->hasReceived = TRUE;
         MI_CpuCopy8(data, net->received, size);
     }

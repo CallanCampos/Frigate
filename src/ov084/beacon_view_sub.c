@@ -314,7 +314,7 @@ int BeaconView_HitTestPanel(BeaconViewWork *work, BeaconViewTouch *touch) {
         rects[i + 1].right = 209;
     }
     rects[work->viewCount + 1].top = TOUCH_RECT_END;
-    hit = func_0203dadc(rects, touch->x, touch->y);
+    hit = GFL_HIDGetTouchRectAt(rects, touch->x, touch->y);
     if (hit == TOUCH_RECT_NONE || hit == 0) {
         return TOUCH_RECT_NONE;
     }
@@ -334,12 +334,12 @@ int BeaconView_HitTestMedal(BeaconViewWork *work, BeaconViewTouch *touch) {
         rects[i].right = 16;
     }
     rects[work->viewCount].top = TOUCH_RECT_END;
-    return func_0203dadc(rects, touch->x, touch->y);
+    return GFL_HIDGetTouchRectAt(rects, touch->x, touch->y);
 }
 
 // 1 for the up arrow and 0 for the down arrow when the log can scroll that way, or TOUCH_RECT_NONE
 int BeaconView_HitTestArrow(BeaconViewWork *work, BeaconViewTouch *touch) {
-    int hit = func_0203dadc(sBeaconViewArrowRects, touch->x, touch->y);
+    int hit = GFL_HIDGetTouchRectAt(sBeaconViewArrowRects, touch->x, touch->y);
 
     if (hit == 0 && work->top != 0) {
         return 1;
@@ -374,14 +374,14 @@ int BeaconView_HitTestButton(BeaconViewWork *work, BeaconViewTouch *touch) {
 
     rects[1].top = TOUCH_RECT_END;
     for (i = 0; i < BEACON_VIEW_ACTOR_UP; i++) {
-        u8 state = func_0204c4a0(work->actors[i]) - (i * 3 + 1);
+        u8 state = ClActor_GetSequence(work->actors[i]) - (i * 3 + 1);
 
         if (state % 3 < 2) {
             rects[0].top = 172;
             rects[0].bottom = rects[0].top + 24;
             rects[0].left = i * 32 + 132;
             rects[0].right = rects[0].left + 24;
-            if (func_0203dadc(rects, touch->x, touch->y) != TOUCH_RECT_NONE) {
+            if (GFL_HIDGetTouchRectAt(rects, touch->x, touch->y) != TOUCH_RECT_NONE) {
                 BeaconView_PlaySE(sBeaconViewButtonSounds[i]);
                 return i;
             }
@@ -418,22 +418,22 @@ static void BeaconView_ClearTotal(BeaconViewWork *work) {
 }
 
 static void BeaconView_SetButtonsVisible(BeaconViewWork *work, BOOL visible) {
-    func_0204c124(work->actors[BEACON_VIEW_ACTOR_PASS_POWER], visible);
-    func_0204c124(work->actors[BEACON_VIEW_ACTOR_GREETING], visible);
-    func_0204c124(work->actors[BEACON_VIEW_ACTOR_RETURN], visible);
-    func_0204c124(work->actors[BEACON_VIEW_ACTOR_THANKS], visible);
+    ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_PASS_POWER], visible);
+    ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_GREETING], visible);
+    ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_RETURN], visible);
+    ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_THANKS], visible);
 }
 
 void BeaconView_UpdateArrows(BeaconViewWork *work) {
     if (work->top == 0) {
-        func_0204c488(work->actors[BEACON_VIEW_ACTOR_UP], 16);
+        ClActor_SetSequence(work->actors[BEACON_VIEW_ACTOR_UP], 16);
     } else {
-        func_0204c488(work->actors[BEACON_VIEW_ACTOR_UP], 13);
+        ClActor_SetSequence(work->actors[BEACON_VIEW_ACTOR_UP], 13);
     }
     if (work->top + work->viewCount < work->logCount) {
-        func_0204c488(work->actors[BEACON_VIEW_ACTOR_DOWN], 17);
+        ClActor_SetSequence(work->actors[BEACON_VIEW_ACTOR_DOWN], 17);
     } else {
-        func_0204c488(work->actors[BEACON_VIEW_ACTOR_DOWN], 20);
+        ClActor_SetSequence(work->actors[BEACON_VIEW_ACTOR_DOWN], 20);
     }
 }
 
@@ -453,16 +453,16 @@ void BeaconView_UpdateBar(BeaconViewWork *work) {
 
 void BeaconView_UpdateThanksButton(BeaconViewWork *work) {
     if (work->logCount == 0) {
-        func_0204c488(work->actors[BEACON_VIEW_ACTOR_THANKS], 9);
+        ClActor_SetSequence(work->actors[BEACON_VIEW_ACTOR_THANKS], 9);
     } else {
-        func_0204c488(work->actors[BEACON_VIEW_ACTOR_THANKS], 7);
+        ClActor_SetSequence(work->actors[BEACON_VIEW_ACTOR_THANKS], 7);
     }
 }
 
 void BeaconViewPanel_SetVisible(BeaconViewPanel *panel, BOOL visible) {
     BmpOam_ActorSetDrawEnable(panel->oam.actor, visible);
-    func_0204c124(panel->trainer, visible);
-    func_0204c124(panel->base, visible);
+    ClActor_SetVisible(panel->trainer, visible);
+    ClActor_SetVisible(panel->base, visible);
     if (!visible || panel->unkA != 0xffff) {
         BeaconViewPanel_SetMedalVisible(panel, visible);
     }
@@ -472,15 +472,15 @@ void BeaconViewPanel_SetVisible(BeaconViewPanel *panel, BOOL visible) {
 }
 
 static void BeaconViewPanel_SetIconVisible(BeaconViewPanel *panel, BOOL visible) {
-    func_0204c124(panel->icon, visible);
+    ClActor_SetVisible(panel->icon, visible);
 }
 
 static void BeaconViewPanel_SetMedalVisible(BeaconViewPanel *panel, BOOL visible) {
     int i;
 
-    func_0204c124(panel->medal, visible);
+    ClActor_SetVisible(panel->medal, visible);
     for (i = 0; i < BEACON_VIEW_PANEL_DIGITS; i++) {
-        func_0204c124(panel->digits[i], visible);
+        ClActor_SetVisible(panel->digits[i], visible);
     }
 }
 
@@ -539,15 +539,15 @@ BeaconViewPanel *BeaconView_FindPanel(BeaconViewWork *work, u8 dataIndex) {
 static void BeaconViewPanel_SetTrainer(BeaconViewWork *work, BeaconViewPanel *panel, const GameBeacon *beacon) {
     u8 view = GameBeacon_GetTrainerViewWithGender(beacon);
 
-    func_0204ba40(work->res[BEACON_VIEW_RES_TRAINER].lists[BEACON_VIEW_RES_CHARS].ids[panel->id],
-                  work->trainerChars[view].data);
+    ClActSys_ReplaceCharData(work->res[BEACON_VIEW_RES_TRAINER].lists[BEACON_VIEW_RES_CHARS].ids[panel->id],
+                             work->trainerChars[view].data);
     PaletteFade_LoadData(work->paletteFade, &work->trainerPalette.colors[(u8)(sBeaconViewTrainerPalettes[view] * 16)],
                          3, (panel->id + 9) * 16, 0x20);
 }
 
 static void BeaconViewPanel_SetIcon(BeaconViewWork *work, BeaconViewPanel *panel, u8 icon) {
-    func_0204ba40(work->res[BEACON_VIEW_RES_ICON].lists[BEACON_VIEW_RES_CHARS].ids[panel->id],
-                  work->iconChars[icon].data);
+    ClActSys_ReplaceCharData(work->res[BEACON_VIEW_RES_ICON].lists[BEACON_VIEW_RES_CHARS].ids[panel->id],
+                             work->iconChars[icon].data);
 }
 
 static u8 BeaconViewPanel_GetColorSet(BeaconViewPanel *panel) {
@@ -643,8 +643,8 @@ static void BeaconViewPanel_SetMedals(BeaconViewWork *work, BeaconViewPanel *pan
         BeaconView_SetActorAnim(panel->medal, 22);
     }
     for (i = 0; i < BEACON_VIEW_PANEL_DIGITS; i++) {
-        func_0204c504(panel->digits[i],
-                      panel->medalCount % sBeaconViewDigitDivisors[i + 1] / sBeaconViewDigitDivisors[i]);
+        ClActor_SetAnimFrame(panel->digits[i],
+                             panel->medalCount % sBeaconViewDigitDivisors[i + 1] / sBeaconViewDigitDivisors[i]);
     }
 }
 

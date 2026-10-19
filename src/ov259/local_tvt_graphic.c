@@ -187,24 +187,24 @@ static void LocalTvtGraphicBG_VBlank(LocalTvtGraphicBG *bg) {
 static void LocalTvtGraphicClAct_Init(LocalTvtGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(LocalTvtGraphicClAct));
     ClActSys_Create(&sLocalTvtClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(32, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(32, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void LocalTvtGraphicClAct_Free(LocalTvtGraphicClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(LocalTvtGraphicClAct));
 }
 
 static void LocalTvtGraphicClAct_Update(LocalTvtGraphicClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void LocalTvtGraphicClAct_VBlank(LocalTvtGraphicClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *LocalTvtGraphicClAct_GetUnit(LocalTvtGraphicClAct *clact) {

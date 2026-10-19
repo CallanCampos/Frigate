@@ -306,7 +306,7 @@ void Field_Free(Field *field) {
     AreaData_Free(field->areaData);
     GFL_HeapFree(field);
     GSYS_SetField(gsys, NULL);
-    func_0203e874(0, 0);
+    WmIcon_SetPos(0, 0);
 }
 
 u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
@@ -478,7 +478,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         FieldG3D_Update(field);
         FieldG3D_RenderPhase1(field);
         FieldG3D_RenderPhase2(field);
-        func_0204b794();
+        ClActSys_Draw();
         if (field->msgBGSys != NULL) {
             func_ov036_021878d0(field->msgBGSys);
         }
@@ -524,7 +524,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     }
     if (field->effectRunningFlag) {
         Field_RenderStart(field);
-        func_0204b794();
+        ClActSys_Draw();
         return 0;
     }
     GCTX_HIDResetFrameCount();
@@ -567,7 +567,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     FieldG3DMapper_SetPlayerPos(field->g3DMapper, &field->playerPos);
     FieldG3D_Update(field);
     func_ov036_021c20e0(*GameData_GetPleasureBoatPtr(field->gameData));
-    func_0204b794();
+    ClActSys_Draw();
     Field_RenderStart(field);
     return 0;
 }
@@ -673,7 +673,7 @@ u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
     GFL_TCBRemove(field->asyncActorMatLoadTCB);
     FieldG3DMapper_Free(field->g3DMapper);
     FieldG3D_Free(field);
-    func_0204b758();
+    ClActSys_Delete();
     BmpWin_FreeAllocator();
     Field_FreeGraphicsSystems(field);
     if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
@@ -1031,7 +1031,7 @@ void FldActSys_AsyncMatLoadTCBFunc(TCB *tcb, void *data) {
             FieldG3DObjSystem_SetupResources(field->g3DObjSystem);
         }
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     if (field->dispControl != NULL) {
         FieldDispControl_Update(field->dispControl);
     }

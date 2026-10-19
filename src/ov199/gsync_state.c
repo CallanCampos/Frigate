@@ -319,7 +319,7 @@ static BOOL GSync_IsOnline(GSyncWork *wk) {
     if (param->hasAccountInfo && param->accountInfo.status == 4) {
         return FALSE;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         return TRUE;
     }
     return FALSE;
@@ -379,7 +379,7 @@ static void GSync_StateWaitCleanup(GSyncWork *wk) {
 }
 
 static void GSync_StateErrorWait(GSyncWork *wk) {
-    if (!wk->receiving && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+    if (!wk->receiving && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         if (wk->saving) {
             GameData_CancelSave(wk->gameData);
             wk->saving = FALSE;
@@ -439,7 +439,7 @@ static void GSync_StateEnd(GSyncWork *wk) {
 
 static void GSync_StateWaitDownloadsShown(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 489);
     }
 }
@@ -467,7 +467,7 @@ static void GSync_StateWaitLevelUp(GSyncWork *wk) {
                 GFL_SndBGMSetPaused(FALSE);
                 GFL_SndBGMFadeIn(6);
             }
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                 GSync_ChangeState(wk, GSync_StateShowDownloads, 539);
             }
         }
@@ -476,7 +476,7 @@ static void GSync_StateWaitLevelUp(GSyncWork *wk) {
 
 static void GSync_StateWaitReceived(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         if (wk->levels == 0) {
             GSync_ChangeState(wk, GSync_StateShowDownloads, 551);
             return;
@@ -579,7 +579,7 @@ static void GSync_StateFinishDownload(GSyncWork *wk) {
         wk->wait--;
         return;
     }
-    if (func_02042788() && NHttpRap_SendRequest(GSYNC_REQUEST_DOWNLOAD_FINISH, wk->http)) {
+    if (GFL_NetIsInitialized() && NHttpRap_SendRequest(GSYNC_REQUEST_DOWNLOAD_FINISH, wk->http)) {
         wk->request[0] = 1;
         wk->request[1] = 0;
         NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), wk->request, sizeof(wk->request));
@@ -1143,7 +1143,7 @@ static void GSync_StateWake(GSyncWork *wk) {
 
 static void GSync_StateWaitTooSoon(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 1536);
     }
 }
@@ -1157,7 +1157,7 @@ static void GSync_StateTooSoon(GSyncWork *wk) {
 
 static void GSync_StateWaitNoRoomMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 1561);
     }
 }
@@ -1224,7 +1224,7 @@ static void GSync_StateWaitAccountMessage(GSyncWork *wk) {
 }
 
 static void GSync_StateShowIdNext(GSyncWork *wk) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSyncMessage_ClearInfo(wk->msg);
         DreamWorldSave_SetIDShown(getDreamWorldStuffAddress(wk->save), TRUE);
         wk->idShown = TRUE;
@@ -1233,7 +1233,7 @@ static void GSync_StateShowIdNext(GSyncWork *wk) {
 }
 
 static void GSync_StateShowIdWait(GSyncWork *wk) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSyncMessage_LoadString(wk->msg, 48);
         GSyncMessage_PrintInfoAt(wk->msg, 7, 14);
         GSync_ChangeState(wk, GSync_StateShowIdNext, 1755);
@@ -1250,7 +1250,7 @@ static void GSync_StateShowId(GSyncWork *wk) {
 }
 
 static void GSync_StateWaitCreate(GSyncWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response;
 
@@ -1276,7 +1276,7 @@ static void GSync_StateCreate(GSyncWork *wk) {
     u32 size;
     void *data;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(GSYNC_REQUEST_CREATE, wk->http)) {
             data = SaveControl_GetUploadData(wk->save, &size);
             NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), data, 0x80000);
@@ -1285,14 +1285,14 @@ static void GSync_StateCreate(GSyncWork *wk) {
                 GSync_ChangeState(wk, GSync_StateWaitCreate, 1841);
             }
         }
-    } else if (GCTX_HIDGetPressedKeys() || func_0203da48()) {
+    } else if (GCTX_HIDGetPressedKeys() || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateWaitCreate, 1847);
     }
 }
 
 static void GSync_StateWaitNotDreamingMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateWaitAccountMessage, 1890);
     }
 }
@@ -1306,7 +1306,7 @@ static void GSync_StateNotDreaming(GSyncWork *wk) {
 
 static void GSync_StateWaitDreamingNowMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 1921);
     }
 }
@@ -1373,7 +1373,7 @@ static void GSync_HandleAccount(GSyncWork *wk, u16 status, GSyncResponse *respon
 }
 
 static void GSync_StateWaitAccount(GSyncWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
 
@@ -1389,18 +1389,18 @@ static void GSync_StateWaitAccount(GSyncWork *wk) {
 static void GSync_StateRequestAccount(GSyncWork *wk) {
     GSyncMessage_Print(wk->msg, 13);
     GSyncMessage_StartWaitIcon(wk->msg);
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(GSYNC_REQUEST_PLAY_STATUS, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitAccount, 2085);
         }
-    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateWaitAccount, 2092);
     }
 }
 
 static void GSync_StateWaitNoPokemonMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         wk->param->gsyncResult = GSYNC_RESULT_ACCOUNT;
         GSyncMessage_ClearMessage(wk->msg);
         GSync_ChangeState(wk, GSync_StateFadeOut, 2115);
@@ -1413,7 +1413,7 @@ static void GSync_StateNoPokemon(GSyncWork *wk) {
 }
 
 static void GSync_StateWaitSpeciesFlags(GSyncWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
             u32 status = response->status;
@@ -1450,15 +1450,15 @@ static void GSync_StateCheckDate(GSyncWork *wk) {
     last.day = (u8)(date >> 8);
     last.week = (u8)date;
     RTC_GetCachedDate(&today);
-    if (func_02044298(&last) == func_02044298(&today)) {
+    if (RTC_GetDayOfYear(&last) == RTC_GetDayOfYear(&today)) {
         GSync_ChangeState(wk, GSync_StateTooSoon, 2212);
         return;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(GSYNC_REQUEST_SPECIES_FLAGS, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitSpeciesFlags, 2220);
         }
-    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateWaitSpeciesFlags, 2227);
     }
 }
@@ -1468,7 +1468,7 @@ static void GSync_StateWaitSentMessage(GSyncWork *wk) {
         GFL_SndSEPlay(SEQ_SE_SYS_26);
     }
     wk->seTimer++;
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateEnd, 2249);
     }
 }
@@ -1510,8 +1510,8 @@ static void GSync_StateWaitSendSave(GSyncWork *wk) {
         }
         break;
     case 3:
-        func_020424ac(0, 0, 0, 1011);
-        func_02042454(0);
+        NetState_RecordError(0, 0, 0, 1011);
+        NetState_SetError(0);
         break;
     case 2:
         wk->saving = FALSE;
@@ -1809,7 +1809,7 @@ static BOOL GSync_ProcInit(GameProc *proc, u32 *state, void *param, void *work) 
     wk->disp = GSyncDisp_Create(wk->heapId);
     wk->msg = GSyncMessage_Create(wk->heapId, 44);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     return TRUE;
 }
 
@@ -1883,7 +1883,7 @@ static BOOL GSync_ProcExit(GameProc *proc, u32 *state, void *param, void *work) 
     if (wk->unk44 != NULL) {
         GFL_HeapFree(wk->unk44);
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         DWCRap_SetEventFunc(NULL, NULL);
     }
     if (wk->http != NULL) {

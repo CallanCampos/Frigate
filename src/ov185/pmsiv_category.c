@@ -93,7 +93,7 @@ void PMSIVCategory_Delete(PMSIVCategory *wk) {
     u8 i;
 
     if (wk->cursor) {
-        func_0204c108(wk->cursor);
+        ClActor_Delete(wk->cursor);
     }
     for (i = 0; i < PMSI_CATEGORY_COUNT; i++) {
         if (wk->groupWin[i]) {
@@ -219,24 +219,24 @@ static void PMSIVCategory_SetupActor(PMSIVCategory *wk) {
 
     PMSIView_GetObjRes(wk->vwk, &res, 0, 0);
     wk->cursor = PMSIView_AddActor(wk->vwk, &res, 48, 64, 3, NNS_G2D_VRAM_TYPE_2DMAIN);
-    func_0204c488(wk->cursor, CURSOR_ANIM_GROUP);
-    func_0204c124(wk->cursor, FALSE);
+    ClActor_SetSequence(wk->cursor, CURSOR_ANIM_GROUP);
+    ClActor_SetVisible(wk->cursor, FALSE);
 }
 
 void PMSIVCategory_VisibleCursor(PMSIVCategory *wk, BOOL visible) {
     if (visible) {
         if (*wk->keyMode == 0) {
-            func_0204c124(wk->cursor, TRUE);
+            ClActor_SetVisible(wk->cursor, TRUE);
             if (PMSInput_GetCategoryMode(wk->mwk) == 0) {
-                func_0204c488(wk->cursor, CURSOR_ANIM_GROUP);
+                ClActor_SetSequence(wk->cursor, CURSOR_ANIM_GROUP);
             } else {
-                func_0204c488(wk->cursor, CURSOR_ANIM_INITIAL);
+                ClActor_SetSequence(wk->cursor, CURSOR_ANIM_INITIAL);
             }
         } else {
-            func_0204c124(wk->cursor, FALSE);
+            ClActor_SetVisible(wk->cursor, FALSE);
         }
     } else {
-        func_0204c124(wk->cursor, FALSE);
+        ClActor_SetVisible(wk->cursor, FALSE);
     }
 }
 
@@ -280,8 +280,8 @@ void PMSIVCategory_MoveCursor(PMSIVCategory *wk, u32 pos) {
             anim = CURSOR_ANIM_INITIAL;
         }
     }
-    func_0204c140(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
-    func_0204c488(wk->cursor, anim);
+    ClActor_SetSurfacePos(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
+    ClActor_SetSequence(wk->cursor, anim);
 }
 
 void PMSIVCategory_StartEnableBG(PMSIVCategory *wk) {
@@ -477,8 +477,8 @@ void PMSIVCategory_StartCursorDecide(PMSIVCategory *wk, u32 pos) {
     ClActorPos actPos;
     u32 anim;
 
-    wk->cursorVisible = func_0204c138(wk->cursor);
-    func_0204c124(wk->cursor, TRUE);
+    wk->cursorVisible = ClActor_IsVisible(wk->cursor);
+    ClActor_SetVisible(wk->cursor, TRUE);
     if (PMSInput_GetCategoryMode(wk->mwk) == 0 && pos != PMSIV_CATEGORY_POS_BACK) {
         actPos.x = (pos % 3) * 80 + 48;
         actPos.y = (pos / 3) * 24 + 64;
@@ -495,19 +495,20 @@ void PMSIVCategory_StartCursorDecide(PMSIVCategory *wk, u32 pos) {
             anim = CURSOR_ANIM_INITIAL_DECIDE;
         }
     }
-    func_0204c140(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
-    func_0204c488(wk->cursor, anim);
+    ClActor_SetSurfacePos(wk->cursor, &actPos, CLACT_SURFACE_MAIN);
+    ClActor_SetSequence(wk->cursor, anim);
 }
 
 BOOL PMSIVCategory_WaitCursorDecide(PMSIVCategory *wk) {
-    u16 anim = func_0204c4a0(wk->cursor);
+    u16 anim = ClActor_GetSequence(wk->cursor);
 
     if (anim != CURSOR_ANIM_GROUP_DECIDE && anim != CURSOR_ANIM_INITIAL_DECIDE) {
         return TRUE;
     }
-    if (!func_0204c560(wk->cursor)) {
-        func_0204c124(wk->cursor, wk->cursorVisible);
-        func_0204c488(wk->cursor, PMSInput_GetCategoryMode(wk->mwk) == 0 ? CURSOR_ANIM_GROUP : CURSOR_ANIM_INITIAL);
+    if (!ClActor_IsAnimActive(wk->cursor)) {
+        ClActor_SetVisible(wk->cursor, wk->cursorVisible);
+        ClActor_SetSequence(wk->cursor,
+                            PMSInput_GetCategoryMode(wk->mwk) == 0 ? CURSOR_ANIM_GROUP : CURSOR_ANIM_INITIAL);
         wk->cursorVisible = FALSE;
         return TRUE;
     }

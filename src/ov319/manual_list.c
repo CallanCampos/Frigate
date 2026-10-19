@@ -104,11 +104,11 @@ ManualList *ManualList_Create(ManualListParam *param, ManualCommon *common) {
     ManualList_LoadGraphics(list);
     ManualList_QueueScreen(list);
     GFL_BGSysMoveBGReq(5, BG_MOVE_SET_Y, 12);
-    func_0204c124(list->scrollBar, list->param->count > VISIBLE_COUNT);
+    ClActor_SetVisible(list->scrollBar, list->param->count > VISIBLE_COUNT);
     y = ManualList_GetScrollBarY(list, ManualList_GetMaxScroll(list) + 1, list->param->scroll);
     pos.x = SCROLL_BAR_X;
     pos.y = y;
-    func_0204c140(list->scrollBar, &pos, 1);
+    ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
     list->vblankTask = GFL_VBlankTCBAdd(ManualList_VBlank, list, 1);
     list->state = STATE_IDLE;
     list->dragging = FALSE;
@@ -204,15 +204,17 @@ static void ManualList_LoadGraphics(ManualList *list) {
     GFL_BGSysLoadArcNCGRStatic(list->common->arc, MANUAL_ARC_BG_NCGR, 4, 0, 0, FALSE, list->common->heapId);
     GFL_G2DIOLoadNSCRAsync(list->common->arc, MANUAL_ARC_LIST_NSCR, 4, 0, 0, 0, FALSE, list->common->heapId);
     list->palette =
-        func_0204bbb8(list->common->arc, MANUAL_ARC_OBJ_NCLR, CLACT_VRAM_SUB, 0, 0, 1, list->common->heapId);
-    list->chars = func_0204b81c(list->common->arc, MANUAL_ARC_OBJ_NCGR, FALSE, CLACT_VRAM_SUB, list->common->heapId);
-    list->cellAnims = func_0204bde0(list->common->arc, MANUAL_ARC_OBJ_NCER, MANUAL_ARC_OBJ_NANR, list->common->heapId);
+        ClActSys_LoadPlttRange(list->common->arc, MANUAL_ARC_OBJ_NCLR, CLACT_VRAM_SUB, 0, 0, 1, list->common->heapId);
+    list->chars =
+        ClActSys_LoadChars(list->common->arc, MANUAL_ARC_OBJ_NCGR, FALSE, CLACT_VRAM_SUB, list->common->heapId);
+    list->cellAnims =
+        ClActSys_LoadCellAnims(list->common->arc, MANUAL_ARC_OBJ_NCER, MANUAL_ARC_OBJ_NANR, list->common->heapId);
     {
         ClActorSetup setup = { SCROLL_BAR_X, SCROLL_BAR_TOP, 0, 0, 3 };
 
-        list->scrollBar = func_0204c040(ManualGraphic_GetClActUnit(list->common->graphic), list->chars, list->palette,
-                                        list->cellAnims, &setup, 1, list->common->heapId);
-        func_0204c124(list->scrollBar, FALSE);
+        list->scrollBar = ClActor_Create(ManualGraphic_GetClActUnit(list->common->graphic), list->chars, list->palette,
+                                         list->cellAnims, &setup, 1, list->common->heapId);
+        ClActor_SetVisible(list->scrollBar, FALSE);
         func_0204c520(list->scrollBar, TRUE);
     }
     {
@@ -220,9 +222,9 @@ static void ManualList_LoadGraphics(ManualList *list) {
 
         for (i = 0; i < WIN_COUNT; i++) {
             setup.y = i * 24 - 8;
-            list->marks[i] = func_0204c040(ManualGraphic_GetClActUnit(list->common->graphic), list->chars,
-                                           list->palette, list->cellAnims, &setup, 1, list->common->heapId);
-            func_0204c124(list->marks[i], FALSE);
+            list->marks[i] = ClActor_Create(ManualGraphic_GetClActUnit(list->common->graphic), list->chars,
+                                            list->palette, list->cellAnims, &setup, 1, list->common->heapId);
+            ClActor_SetVisible(list->marks[i], FALSE);
             func_0204c520(list->marks[i], TRUE);
         }
     }
@@ -236,7 +238,7 @@ static void ManualList_CreateMenu(ManualList *list) {
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, (4 * 16 + 13) * 2, &list->color, 2);
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, (5 * 16 + 13) * 2, &list->color, 2);
     ManualList_Print(list);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], TRUE);
         list->cursorFollows = FALSE;
     }
@@ -251,12 +253,12 @@ static void ManualList_FreeGraphics(ManualList *list) {
 
     ManualList_FreeMenu(list);
     for (i = 0; i < WIN_COUNT; i++) {
-        func_0204c108(list->marks[i]);
+        ClActor_Delete(list->marks[i]);
     }
-    func_0204c108(list->scrollBar);
-    func_0204be64(list->cellAnims);
-    func_0204b98c(list->chars);
-    func_0204bcd0(list->palette);
+    ClActor_Delete(list->scrollBar);
+    ClActSys_FreeCellAnims(list->cellAnims);
+    ClActSys_FreeChars(list->chars);
+    ClActSys_FreePltt(list->palette);
 }
 
 static void ManualList_FreeMenu(ManualList *list) {
@@ -280,24 +282,24 @@ static BOOL ManualList_UpdateCursor(ManualList *list) {
     u16 last;
 
     ManualList_MakeTouchRects(rects);
-    touched = func_0203da0c(rects);
+    touched = GFL_HIDGetTouchPressedRect(rects);
     visible = ManualList_GetVisibleCount(list);
     last = ManualList_GetLastVisible(list);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         if (touched >= 0 && touched < visible) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], FALSE);
         }
     } else if (GCTX_HIDGetPressedKeys() != 0) {
         if (!(GCTX_HIDGetPressedKeys() & PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], TRUE);
             list->cursorFollows = FALSE;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             return FALSE;
         }
     }
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             AppTaskMenuWin_SetFlashing(list->wins[ManualList_GetCursorWin(list)], TRUE);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -325,7 +327,7 @@ static BOOL ManualList_UpdateCursor(ManualList *list) {
                     y = ManualList_GetScrollBarY(list, ManualList_GetMaxScroll(list) + 1, list->param->scroll);
                     pos.x = SCROLL_BAR_X;
                     pos.y = y;
-                    func_0204c140(list->scrollBar, &pos, 1);
+                    ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
                 }
                 AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], TRUE);
                 list->cursorFollows = FALSE;
@@ -351,7 +353,7 @@ static BOOL ManualList_UpdateCursor(ManualList *list) {
                     y = ManualList_GetScrollBarY(list, ManualList_GetMaxScroll(list) + 1, list->param->scroll);
                     pos.x = SCROLL_BAR_X;
                     pos.y = y;
-                    func_0204c140(list->scrollBar, &pos, 1);
+                    ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
                 }
                 AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], TRUE);
                 list->cursorFollows = FALSE;
@@ -380,7 +382,7 @@ static BOOL ManualList_UpdateCursor(ManualList *list) {
                         y = ManualList_GetScrollBarY(list, ManualList_GetMaxScroll(list) + 1, list->param->scroll);
                         pos.x = SCROLL_BAR_X;
                         pos.y = y;
-                        func_0204c140(list->scrollBar, &pos, 1);
+                        ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
                     }
                     AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], TRUE);
                     list->cursorFollows = FALSE;
@@ -407,7 +409,7 @@ static BOOL ManualList_UpdateCursor(ManualList *list) {
                         y = ManualList_GetScrollBarY(list, ManualList_GetMaxScroll(list) + 1, list->param->scroll);
                         pos.x = SCROLL_BAR_X;
                         pos.y = y;
-                        func_0204c140(list->scrollBar, &pos, 1);
+                        ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
                     }
                     AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], TRUE);
                     list->cursorFollows = FALSE;
@@ -430,18 +432,18 @@ static BOOL ManualList_UpdateCursor(ManualList *list) {
 
 // Drags the scroll bar. Returns whether it is being dragged
 static BOOL ManualList_UpdateScrollBar(ManualList *list) {
-    if (!func_0204c138(list->scrollBar)) {
+    if (!ClActor_IsVisible(list->scrollBar)) {
         return FALSE;
     }
     if (list->dragging) {
         u32 x;
         u32 y;
 
-        if (func_0203da84(&x, &y)) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
             ClActorPos pos;
             u16 scroll;
 
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], FALSE);
             pos.x = SCROLL_BAR_X;
             pos.y = y < 8 ? 0 : y - 8;
@@ -450,7 +452,7 @@ static BOOL ManualList_UpdateScrollBar(ManualList *list) {
             } else if (pos.y > SCROLL_BAR_BOTTOM) {
                 pos.y = SCROLL_BAR_BOTTOM;
             }
-            func_0204c140(list->scrollBar, &pos, 1);
+            ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
             scroll = ManualList_GetScrollAt(list, ManualList_GetMaxScroll(list) + 1, y);
             if (scroll != list->param->scroll) {
                 u16 last;
@@ -472,12 +474,12 @@ static BOOL ManualList_UpdateScrollBar(ManualList *list) {
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (x >= SCROLL_BAR_X && x <= SCROLL_BAR_X + 7 && y >= SCROLL_BAR_TOP && y <= 150) {
                 ClActorPos pos;
                 u16 scroll;
 
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 AppTaskMenuWin_SetActive(list->wins[ManualList_GetCursorWin(list)], FALSE);
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
                 list->dragging = TRUE;
@@ -488,7 +490,7 @@ static BOOL ManualList_UpdateScrollBar(ManualList *list) {
                 } else if (pos.y > SCROLL_BAR_BOTTOM) {
                     pos.y = SCROLL_BAR_BOTTOM;
                 }
-                func_0204c140(list->scrollBar, &pos, 1);
+                ClActor_SetSurfacePos(list->scrollBar, &pos, 1);
                 scroll = ManualList_GetScrollAt(list, ManualList_GetMaxScroll(list) + 1, y);
                 if (scroll != list->param->scroll) {
                     u16 last;
@@ -567,7 +569,7 @@ static void ManualList_Print(ManualList *list) {
         }
         i = 1;
         item = list->param->scroll;
-        func_0204c124(list->marks[0], FALSE);
+        ClActor_SetVisible(list->marks[0], FALSE);
     }
     last = ManualList_GetLastVisible(list) + 1;
     if (last >= list->param->count) {
@@ -579,7 +581,7 @@ static void ManualList_Print(ManualList *list) {
             AppTaskMenuWin_ClearScreen(list->wins[j]);
             list->shown[j] = FALSE;
         }
-        func_0204c124(list->marks[j], FALSE);
+        ClActor_SetVisible(list->marks[j], FALSE);
     }
     for (; i <= lastWin; i++) {
         if (list->wins[i] != NULL) {
@@ -602,9 +604,9 @@ static void ManualList_Print(ManualList *list) {
         list->shown[i] = TRUE;
         GFL_StrBufFree(menuItem.str);
         if (list->param->items[item].mark == MANUAL_LIST_MARK_NONE) {
-            func_0204c124(list->marks[i], FALSE);
+            ClActor_SetVisible(list->marks[i], FALSE);
         } else if (list->param->items[item].mark == MANUAL_LIST_MARK_NEW) {
-            func_0204c124(list->marks[i], TRUE);
+            ClActor_SetVisible(list->marks[i], TRUE);
         }
         item++;
     }

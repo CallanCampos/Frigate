@@ -94,19 +94,19 @@ void NetDefine_UnloadDevice(int type) {
 }
 
 void func_02011818(void) {
-    if (func_02042d34() == 0x35) {
+    if (GFL_NetGetGameCommandBase() == 0x35) {
         if (!sSkipFrame) {
-            sSkipFrame = func_020428e0();
+            sSkipFrame = GFL_NetMainWhileWaiting();
         } else {
             sSkipFrame = FALSE;
         }
     } else {
-        func_020428e0();
+        GFL_NetMainWhileWaiting();
     }
 }
 
 BOOL func_02011844(void) {
-    switch (func_02042d34()) {
+    switch (GFL_NetGetGameCommandBase()) {
     case 0xc:
     case 0xd:
     case 0xe:

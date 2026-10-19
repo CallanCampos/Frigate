@@ -420,7 +420,7 @@ static BOOL MailSys_Update(MailSysWork *work) {
         break;
     }
     if (work->clUnit != NULL) {
-        func_0204b794();
+        ClActSys_Draw();
     }
     if (work->tcbMgr != NULL) {
         GFL_TCBMgrUpdate(work->tcbMgr);
@@ -487,7 +487,7 @@ BOOL MailSys_OnKeyMode(MailSysWork *work) {
 // Switches between the keys and the touch screen when the other one is used, and returns whether the keys took over
 static BOOL MailSys_CheckInputModeSwitch(MailSysWork *work) {
     if (work->keyMode == FALSE) {
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             return FALSE;
         }
         if (GCTX_HIDGetHeldKeys() != 0) {
@@ -501,7 +501,7 @@ static BOOL MailSys_CheckInputModeSwitch(MailSysWork *work) {
         if (GCTX_HIDGetHeldKeys() != 0) {
             return FALSE;
         }
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             if (work->onTouchMode != NULL) {
                 work->onTouchMode(work);
             }
@@ -515,7 +515,7 @@ static BOOL MailSys_CheckInputModeSwitch(MailSysWork *work) {
 static BOOL MailSys_PhaseView(MailSysWork *work) {
     if (GCTX_HIDGetPressedKeys() != 0) {
         work->keyMode = TRUE;
-    } else if (func_0203da48()) {
+    } else if (GFL_HIDIsTouchPressed()) {
         work->keyMode = FALSE;
     } else {
         return FALSE;
@@ -589,7 +589,7 @@ static BOOL MailSys_PhaseKeys(MailSysWork *work) {
 }
 
 static BOOL MailSys_PhaseTouch(MailSysWork *work) {
-    s32 touched = func_0203da0c(sMailSysTouchRects);
+    s32 touched = GFL_HIDGetTouchPressedRect(sMailSysTouchRects);
 
     if (touched == TOUCH_RECT_NONE) {
         return FALSE;
@@ -656,7 +656,7 @@ static BOOL MailSys_PhaseNotice(MailSysWork *work) {
         break;
     case 2:
         if (PrintStream_GetState(work->printStream) == PRINT_STREAM_DONE) {
-            if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || GFL_HIDIsTouchPressed()) {
                 PrintStream_Delete(work->printStream);
                 work->subSeq = 3;
             }
@@ -783,7 +783,7 @@ static void MailSys_VBlank(TCB *tcb, void *data) {
     if (work->palFade != NULL) {
         PaletteFade_Transfer(work->palFade);
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }

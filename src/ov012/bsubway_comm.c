@@ -89,7 +89,7 @@ static const GFLNetInitData data_ov012_0216d93c = {
 // clang-format on
 
 void func_ov012_02161844(BSubwayScrWork *bsw) {
-    func_020425ec(&data_ov012_0216d93c, NULL, bsw);
+    GFL_NetInit(&data_ov012_0216d93c, NULL, bsw);
 }
 
 static void *func_ov012_02161858(void *work) {
@@ -115,19 +115,19 @@ static BOOL func_ov012_02161888(int a, int b) {
 
 void func_ov012_02161894(BSubwayScrWork *bsw) {
     // The count passed is the end command, not the table's length
-    func_02040c20(BSUBWAY_COMM_MEMBERS, data_ov012_0216d8fc, BSUBWAY_COMM_MAX, bsw);
+    NetCommand_AddTable(BSUBWAY_COMM_MEMBERS, data_ov012_0216d8fc, BSUBWAY_COMM_MAX, bsw);
 }
 
 void func_ov012_021618ac(BSubwayScrWork *bsw) {
-    func_02040c64(BSUBWAY_COMM_MEMBERS);
+    NetCommand_RemoveTable(BSUBWAY_COMM_MEMBERS);
 }
 
 void func_ov012_021618b8(u8 timing) {
-    func_02042d04(func_02040440(), timing);
+    GFL_NetSendTiming(NetHandle_GetOwn(), timing);
 }
 
 BOOL func_ov012_021618c8(u8 timing) {
-    return func_02042d0c(func_02040440(), timing);
+    return GFL_NetIsTimingRecv(NetHandle_GetOwn(), timing);
 }
 
 static void func_ov012_021618d8(BSubwayScrWork *bsw, GameData *gameData) {
@@ -219,7 +219,7 @@ BOOL func_ov012_02161a48(BSubwayScrWork *bsw) {
     if (command >= BSUBWAY_COMM_MAX) {
         return TRUE;
     }
-    if (func_02042be8(func_02040440(), command, sizeof(bsw->sendBuf), bsw->sendBuf) == TRUE) {
+    if (GFL_NetSendCommand(NetHandle_GetOwn(), command, sizeof(bsw->sendBuf), bsw->sendBuf) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -255,7 +255,7 @@ static void func_ov012_02161ad8(int netId, int size, const void *data, void *wor
     u16 result = 0;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     bsw->partnerGender = recv[0];
@@ -276,7 +276,7 @@ static void func_ov012_02161b4c(int netId, int size, const void *data, void *wor
     BSubwayScrWork *bsw = work;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4() || func_0203ffc4() == 0) {
+    if (netId == NetSystem_GetNetId() || NetSystem_GetNetId() == 0) {
         return;
     }
     MI_CpuCopy8(data, bsw->unk32, 14 * sizeof(u16));
@@ -287,7 +287,7 @@ static void func_ov012_02161b80(int netId, int size, const void *data, void *wor
     const u16 *recv = data;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     bsw->recvResult = 0;
@@ -300,7 +300,7 @@ static void func_ov012_02161bbc(int netId, int size, const void *data, void *wor
     BSubwayScrWork *bsw = work;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     MI_CpuCopy8(data, &bsw->partner, sizeof(PlayerInfo));
@@ -311,7 +311,7 @@ static void func_ov012_02161be8(int netId, int size, const void *data, void *wor
     const u16 *recv = data;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     if (bsw->playMode != recv[0]) {
@@ -326,7 +326,7 @@ static void func_ov012_02161c1c(int netId, int size, const void *data, void *wor
     const u16 *recv = data;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     bsw->recvResult = recv[0];
@@ -337,7 +337,7 @@ static void func_ov012_02161c40(int netId, int size, const void *data, void *wor
     const u16 *recv = data;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     bsw->recvResult = recv[0];
@@ -348,7 +348,7 @@ static void func_ov012_02161c64(int netId, int size, const void *data, void *wor
     const u16 *recv = data;
 
     bsw->recvCount++;
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return;
     }
     bsw->recvResult = recv[0];

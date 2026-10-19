@@ -284,7 +284,7 @@ CtvtComm *CtvtComm_Create(CommTvtWork *sys, HeapID heapId) {
     comm->selfInfo.cameraEnabled = CommTvt_IsCameraEnabled();
     comm->selfInfo.canExchangePhotos = canPlayerExchangePhotos();
     comm->unk0 = 1;
-    func_02043868(heapId, FALSE);
+    NetLdata_Init(heapId, FALSE);
     return comm;
 }
 
@@ -293,12 +293,12 @@ void CtvtComm_Delete(CommTvtWork *sys, CtvtComm *comm) {
 
     GFL_HeapFree(comm->voiceBuffer);
     GFL_HeapFree(comm->voicePacket);
-    func_02042ed0(comm->photoRaw);
-    func_02042ed0(comm->photoJpeg);
-    func_02042ed0(comm->jpegWork);
+    GFL_NetFreeAligned32(comm->photoRaw);
+    GFL_NetFreeAligned32(comm->photoJpeg);
+    GFL_NetFreeAligned32(comm->jpegWork);
     for (i = 0; i < CTVT_COMM_PICTURE_BUFFERS; i++) {
         if (!func_ov257_021aab3c(sys) || i == 0) {
-            func_02042ed0(comm->pictureBuffers[i]);
+            GFL_NetFreeAligned32(comm->pictureBuffers[i]);
         }
     }
     GFL_HeapFree(comm);
@@ -325,7 +325,7 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         comm->netState = CTVT_NET_WAIT_INIT;
         break;
     case CTVT_NET_WAIT_INIT:
-        if (func_02042788() == TRUE) {
+        if (GFL_NetIsInitialized() == TRUE) {
             switch (comm->nextConnectType) {
             case CTVT_CONNECT_PARENT:
                 func_02042968();
@@ -340,7 +340,7 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
                 if (comm->connectType == CTVT_CONNECT_PARENT) {
                     CtvtComm_ClearMember(sys, comm, &comm->members[0]);
                 }
-                func_02042950(comm->parentMac);
+                GFL_NetStartAsParent(comm->parentMac);
                 comm->netState = CTVT_NET_WAIT_CONNECT;
                 break;
             }
@@ -348,7 +348,7 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         }
         break;
     case CTVT_NET_WAIT_CONNECT:
-        if (func_02040504() == TRUE) {
+        if (NetHandle_SendNegotiation() == TRUE) {
             comm->netState = CTVT_NET_WAIT_NEGOTIATION;
         }
         if (comm->connectType != comm->nextConnectType) {
@@ -356,7 +356,7 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         }
         break;
     case CTVT_NET_WAIT_NEGOTIATION:
-        if (func_0204044c(func_02040440()) == TRUE) {
+        if (NetHandle_IsNegotiated(NetHandle_GetOwn()) == TRUE) {
             comm->netState = CTVT_NET_CONNECTED;
         }
         if (comm->connectType != comm->nextConnectType) {
@@ -364,15 +364,15 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         }
         break;
     case CTVT_NET_ADD_COMMANDS: {
-        NetHandle *handle = func_02040440();
+        NetHandle *handle = NetHandle_GetOwn();
 
-        func_02040c20(CTVT_COMM_CMD_BASE, sCtvtCommCommands, NELEMS(sCtvtCommCommands), comm);
-        func_02040624(handle, 8, 32);
+        NetCommand_AddTable(CTVT_COMM_CMD_BASE, sCtvtCommCommands, NELEMS(sCtvtCommCommands), comm);
+        NetHandle_SendTimingPair(handle, 8, 32);
         comm->netState = CTVT_NET_WAIT_SYNC;
         break;
     }
     case CTVT_NET_WAIT_SYNC:
-        if (func_02040664(func_02040440(), 8, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 8, 32) == TRUE) {
             comm->netState = CTVT_NET_CONNECTED;
         }
         break;
@@ -390,11 +390,11 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         }
         break;
     case CTVT_NET_EXIT:
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
         comm->netState = CTVT_NET_WAIT_EXIT;
         break;
     case CTVT_NET_WAIT_EXIT:
-        if (func_020427a4() == TRUE) {
+        if (GFL_NetIsEnded() == TRUE) {
             if (comm->nextConnectType == CTVT_CONNECT_DISCONNECT) {
                 comm->netState = CTVT_NET_DONE;
             } else {
@@ -403,16 +403,16 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         }
         break;
     case CTVT_NET_SEND_END_SYNC:
-        func_02040624(func_02040440(), 9, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 9, 32);
         comm->netState = CTVT_NET_WAIT_END_SYNC;
         break;
     case CTVT_NET_WAIT_END_SYNC:
-        if (func_02040664(func_02040440(), 9, 32) == TRUE) {
-            func_02040c64(CTVT_COMM_CMD_BASE);
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 9, 32) == TRUE) {
+            NetCommand_RemoveTable(CTVT_COMM_CMD_BASE);
             comm->netState = CTVT_NET_DONE;
         }
         if (GFL_NetErrCheck()) {
-            func_02040c64(CTVT_COMM_CMD_BASE);
+            NetCommand_RemoveTable(CTVT_COMM_CMD_BASE);
             comm->netState = CTVT_NET_DONE;
         }
         break;
@@ -435,7 +435,7 @@ static void CtvtComm_InitNet(CommTvtWork *sys, CtvtComm *comm) {
     GFLNetInitData init = sCtvtCommNetInitData;
 
     CommTvt_GetHeapId(sys);
-    func_020425ec(&init, NULL, comm);
+    GFL_NetInit(&init, NULL, comm);
     func_02042e9c(FALSE);
 }
 
@@ -443,9 +443,9 @@ void CtvtComm_Disconnect(CommTvtWork *sys, CtvtComm *comm) {
     if (comm->memberCount <= 1) {
         if (comm->connectType == CTVT_CONNECT_EXISTING) {
             comm->netState = CTVT_NET_DONE;
-            func_02040c64(CTVT_COMM_CMD_BASE);
+            NetCommand_RemoveTable(CTVT_COMM_CMD_BASE);
         } else {
-            func_02042860(NULL);
+            GFL_NetExit(NULL);
             comm->netState = CTVT_NET_WAIT_EXIT;
         }
     } else if (comm->connectType == CTVT_CONNECT_EXISTING) {
@@ -533,7 +533,7 @@ static BOOL CtvtComm_FilterNone(const void *data, void *work) {
 }
 
 static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 i;
     CtvtTalk *talk;
     BOOL alone;
@@ -556,7 +556,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
             CtvtCamera_Redraw(sys, camera, FALSE, FALSE);
         }
     } else {
-        u8 count = func_02042a78();
+        u8 count = GFL_NetGetNegotiatedCount();
 
         if (comm->memberCount != count) {
             CtvtComm_UpdateMembers(sys, comm);
@@ -595,7 +595,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
 
     if (comm->memberCount > 1) {
         if (comm->photoSending == TRUE) {
-            if (func_02043b10() == TRUE) {
+            if (NetLdata_IsSendDone() == TRUE) {
                 comm->photoSending = FALSE;
             }
         } else if (comm->photoTargetMask == (comm->photoTargetMask & comm->photoReadyMask) &&
@@ -614,7 +614,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
                                                 CtvtCamera_GetHeight(sys, camera), CTVT_COMM_JPEG_QUALITY,
                                                 SSP_JPEG_OUTPUT_YUV422, SSP_JPEG_RGB555);
                 if (jpegSize != 0) {
-                    func_0204393c(comm->photoJpeg, jpegSize, comm->photoTargetMask, FALSE);
+                    NetLdata_StartSend(comm->photoJpeg, jpegSize, comm->photoTargetMask, FALSE);
                     comm->photoReadyMask = 0;
                     comm->photoSending = TRUE;
                 }
@@ -679,13 +679,13 @@ static void CtvtComm_SetScanTime(CommTvtWork *sys, CtvtComm *comm) {
 static void CtvtComm_UpdateMembers(CommTvtWork *sys, CtvtComm *comm) {
     u8 count = 0;
     BOOL changed = FALSE;
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     HeapID heapId = CommTvt_GetHeapId(sys);
     u8 netId;
     u8 i;
 
     for (netId = 0; netId < CTVT_COMM_MEMBERS; netId++) {
-        if (func_02042a80(netId) == TRUE) {
+        if (GFL_NetIsNegotiated(netId) == TRUE) {
             if (comm->members[netId].active == FALSE) {
                 CtvtCamera *camera = CommTvt_GetCamera(sys);
 
@@ -697,7 +697,7 @@ static void CtvtComm_UpdateMembers(CommTvtWork *sys, CtvtComm *comm) {
                         u32 bit = 1 << i;
 
                         if (!(comm->pictureBufferMask & bit)) {
-                            func_020439a4(CTVT_COMM_PICTURE_SIZE, netId, heapId, comm->pictureBuffers[i]);
+                            NetLdata_SetRecvBuffer(CTVT_COMM_PICTURE_SIZE, netId, heapId, comm->pictureBuffers[i]);
                             comm->pictureBufferMask |= bit;
                             comm->members[netId].pictureBuffer = i;
                             break;
@@ -714,7 +714,7 @@ static void CtvtComm_UpdateMembers(CommTvtWork *sys, CtvtComm *comm) {
         } else if (comm->members[netId].active == TRUE) {
             comm->members[netId].active = FALSE;
             if (comm->members[netId].isSelf == FALSE) {
-                func_02043a1c(netId);
+                NetLdata_FreeRecvBuffer(netId);
                 comm->pictureBufferMask -= 1 << comm->members[netId].pictureBuffer;
             }
             if (comm->talker == netId) {
@@ -783,19 +783,20 @@ static void CtvtComm_UpdateMember(CommTvtWork *sys, CtvtComm *comm, CtvtCommMemb
         }
         break;
     case CTVT_PICTURE_WAIT_START:
-        if (func_02043b24(netId) == FALSE) {
+        if (NetLdata_IsRecvDone(netId) == FALSE) {
             CtvtCamera_ClearDirty(sys, camera, netId);
             member->pictureState = CTVT_PICTURE_WAIT_END;
         }
         break;
     case CTVT_PICTURE_WAIT_END:
-        if (func_02043b24(netId) == TRUE) {
+        if (NetLdata_IsRecvDone(netId) == TRUE) {
             void *picture = CtvtCamera_GetPicture(sys, camera, netId);
             s16 size[2];
 
             size[1] = CtvtCamera_GetWidth(sys, camera);
             size[0] = CtvtCamera_GetHeight(sys, camera);
-            SSP_StartJpegDecoder(func_02043a80(netId), func_02043ac8(netId), picture, &size[1], &size[0], 0);
+            SSP_StartJpegDecoder(NetLdata_GetRecvBuffer(netId), NetLdata_GetRecvSize(netId), picture, &size[1],
+                                 &size[0], 0);
             CtvtCamera_SetDirty(sys, camera, netId);
             member->pictureState = CTVT_PICTURE_SEND_READY;
         }
@@ -834,39 +835,39 @@ void CtvtComm_SendZoom(CommTvtWork *sys, CtvtComm *comm, BOOL zoomed) {
 }
 
 BOOL CtvtComm_SendPacket(CommTvtWork *sys, CtvtComm *comm, u8 type, u32 value) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     CtvtCommPacket packet;
 
     packet.type = type;
     packet.value = value;
-    return func_02042c18(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket), &packet, TRUE, FALSE,
-                         FALSE);
+    return GFL_NetSendCommandToMachine(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket),
+                                       &packet, TRUE, FALSE, FALSE);
 }
 
 BOOL CtvtComm_SendPacketAll(CommTvtWork *sys, CtvtComm *comm, u8 type, u32 value) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     CtvtCommPacket packet;
 
     packet.type = type;
     packet.value = value;
-    return func_02042c18(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket), &packet, TRUE, TRUE,
-                         FALSE);
+    return GFL_NetSendCommandToMachine(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket),
+                                       &packet, TRUE, TRUE, FALSE);
 }
 
 BOOL CtvtComm_SendPacketData(CommTvtWork *sys, CtvtComm *comm, u8 type, const void *value) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     CtvtCommPacket packet;
 
     packet.type = type;
     MI_CpuCopy8(value, &packet.value, sizeof(packet.value));
-    return func_02042c18(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket), &packet, TRUE, FALSE,
-                         FALSE);
+    return GFL_NetSendCommandToMachine(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket),
+                                       &packet, TRUE, FALSE, FALSE);
 }
 
 static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CtvtComm *comm = work;
     const CtvtCommPacket *packet = data;
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     switch (packet->type) {
     case CTVT_PACKET_READY:
@@ -990,8 +991,8 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
 }
 
 BOOL CtvtComm_SendVoice(CommTvtWork *sys, CtvtComm *comm, CtvtVoicePacket *packet) {
-    BOOL sent = func_02042c18(func_02040440(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_VOICE, packet->size + 8, packet, TRUE,
-                              FALSE, TRUE);
+    BOOL sent = GFL_NetSendCommandToMachine(NetHandle_GetOwn(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_VOICE,
+                                            packet->size + 8, packet, TRUE, FALSE, TRUE);
 
     if (sent) {
         comm->voiceBusy = TRUE;
@@ -1013,7 +1014,7 @@ static void CtvtComm_RecvVoice(int netId, int size, const void *data, void *work
     CtvtVoicePacket *packet = comm->voicePacket;
     s8 *voice = packet->data;
 
-    func_02042a6c(func_02040440());
+    GFL_NetGetHandleNetId(NetHandle_GetOwn());
     if (packet->chunk == 0) {
         Adpcm_ResetDecoder();
         MIi_CpuClear32(0, comm->voiceBuffer, CTVT_COMM_VOICE_BUFFER_SIZE);
@@ -1032,7 +1033,7 @@ static void CtvtComm_RecvVoice(int netId, int size, const void *data, void *work
 }
 
 static BOOL CtvtComm_SendDraw(CommTvtWork *sys, CtvtComm *comm) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     u8 count;
     BOOL sent;
 
@@ -1045,8 +1046,8 @@ static BOOL CtvtComm_SendDraw(CommTvtWork *sys, CtvtComm *comm) {
         count = CTVT_COMM_DRAW_SEND_MAX;
     }
     if (count != 0) {
-        sent = func_02042c18(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_DRAW, count * sizeof(DrawCommand),
-                             &comm->drawQueue[comm->drawReadIndex], TRUE, TRUE, FALSE);
+        sent = GFL_NetSendCommandToMachine(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_DRAW, count * sizeof(DrawCommand),
+                                           &comm->drawQueue[comm->drawReadIndex], TRUE, TRUE, FALSE);
         if (sent) {
             comm->drawReadIndex += count;
             if (comm->drawReadIndex >= CTVT_COMM_DRAW_QUEUE_SIZE) {
@@ -1064,7 +1065,7 @@ static void CtvtComm_RecvDraw(int netId, int size, const void *data, void *work,
     u8 count = size / sizeof(DrawCommand);
     u8 i;
 
-    func_02042a6c(func_02040440());
+    GFL_NetGetHandleNetId(NetHandle_GetOwn());
     for (i = 0; i < count; i++) {
         DrawSystem_AddCommand(drawSystem, (const DrawCommand *)data + i);
     }
@@ -1073,8 +1074,8 @@ static void CtvtComm_RecvDraw(int netId, int size, const void *data, void *work,
 static BOOL CtvtComm_SendInfo(CommTvtWork *sys, CtvtComm *comm) {
     CtvtCommMemberInfo *info = CtvtComm_GetSelfInfo(sys, comm);
 
-    return func_02042c18(func_02040440(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_INFO, sizeof(CtvtCommMemberInfo), info,
-                         TRUE, TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_INFO,
+                                       sizeof(CtvtCommMemberInfo), info, TRUE, TRUE, TRUE);
 }
 
 static void CtvtComm_RecvInfo(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1094,10 +1095,10 @@ static void *CtvtComm_GetInfoBuffer(int netId, void *work, int size) {
 
 static void CtvtComm_UpdateGame(CommTvtWork *sys, CtvtComm *comm) {
     CtvtGame *game = CommTvt_GetGame(sys);
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     BOOL packetSent = FALSE;
 
-    u8 count = func_02042a78();
+    u8 count = GFL_NetGetNegotiatedCount();
 
     if (comm->memberCount != count) {
         CommTvt_SetErrorShown(sys);
@@ -1130,15 +1131,15 @@ void CtvtComm_QueueGameCommand(CommTvtWork *sys, CtvtComm *comm, u16 command) {
 }
 
 static BOOL CtvtComm_SendGameCommand(CommTvtWork *sys, CtvtComm *comm) {
-    return func_02042c18(func_02040440(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_GAME_COMMAND, sizeof(comm->gameCommand),
-                         &comm->gameCommand, TRUE, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_GAME_COMMAND,
+                                       sizeof(comm->gameCommand), &comm->gameCommand, TRUE, FALSE, FALSE);
 }
 
 static void CtvtComm_RecvGameCommand(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CtvtComm *comm = work;
     const u16 *command = data;
     CtvtGame *game = CommTvt_GetGame(comm->sys);
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     switch (*command) {
     case 0:
@@ -1194,8 +1195,8 @@ void CtvtComm_QueueGamePacket(CtvtComm *comm, CtvtGamePacket packet, u8 type) {
 }
 
 static BOOL CtvtComm_SendGamePacket(CommTvtWork *sys, CtvtComm *comm) {
-    BOOL sent = func_02042c18(func_02040440(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_GAME_PACKET, sizeof(CtvtGamePacket),
-                              &comm->gamePacket, TRUE, TRUE, FALSE);
+    BOOL sent = GFL_NetSendCommandToMachine(NetHandle_GetOwn(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_GAME_PACKET,
+                                            sizeof(CtvtGamePacket), &comm->gamePacket, TRUE, TRUE, FALSE);
 
     if (sent) {
         MI_CpuFill8(&comm->gamePacket, 0, sizeof(CtvtGamePacket));
@@ -1207,7 +1208,7 @@ static void CtvtComm_RecvGamePacket(int netId, int size, const void *data, void 
     CtvtComm *comm = work;
     const CtvtGamePacket *packet = data;
     CtvtGame *game = CommTvt_GetGame(comm->sys);
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
     if (CommTvt_IsErrorShown(comm->sys) == TRUE) {
         return;
@@ -1295,30 +1296,30 @@ void CtvtComm_ResetSession(CommTvtWork *sys, CtvtComm *comm) {
 }
 
 static BOOL CtvtComm_SendGameData(CommTvtWork *sys, CtvtComm *comm) {
-    return func_02042c18(func_02040440(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_GAME_DATA, sizeof(CtvtGameData),
-                         &comm->gameData, TRUE, TRUE, FALSE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_GAME_DATA,
+                                       sizeof(CtvtGameData), &comm->gameData, TRUE, TRUE, FALSE);
 }
 
 static void CtvtComm_RecvGameData(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CtvtComm *comm = work;
     CtvtGame *game = CommTvt_GetGame(comm->sys);
 
-    func_02042a6c(func_02040440());
+    GFL_NetGetHandleNetId(NetHandle_GetOwn());
     if (netId == 0) {
         CtvtGame_SetScores(game, data);
     }
 }
 
 void CtvtComm_StartSync(CommTvtWork *sys, CtvtComm *comm, int no) {
-    func_02040624(func_02040440(), no, 32);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), no, 32);
 }
 
 BOOL CtvtComm_IsSynced(CommTvtWork *sys, CtvtComm *comm, int no) {
-    return func_02040664(func_02040440(), no, 32);
+    return NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), no, 32);
 }
 
 u8 CtvtComm_GetSelfNetId(CommTvtWork *sys, CtvtComm *comm) {
-    return func_02042a6c(func_02040440());
+    return GFL_NetGetHandleNetId(NetHandle_GetOwn());
 }
 
 u8 CtvtComm_GetTalker(CommTvtWork *sys, CtvtComm *comm) {

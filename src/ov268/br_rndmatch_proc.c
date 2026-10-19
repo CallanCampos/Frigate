@@ -194,7 +194,7 @@ static BOOL BrRndMatch_ProcMain(GameProc *proc, u32 *state, void *param, void *w
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             wk->select = BrRndMatch_GetTrgMenu(wk, x, y);
             if (wk->select != BR_RNDMATCH_PAGE_TOP) {
                 *state = SEQ_CHANGE_FADEOUT_START;

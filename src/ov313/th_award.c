@@ -234,7 +234,7 @@ static BOOL ThAward_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_ArcToolFree(arc);
     GFL_BGSysLoadScr(BG_SUB_C_GEAR);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 16, 0);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     if (wk->param->playJingle && wk->rankIdx != RANK_NONE) {
         GFL_SndBGMFadeOut(6);
     }
@@ -308,11 +308,11 @@ static BOOL ThAward_Main(GameProc *proc, u32 *state, void *param, void *work) {
     case STEP_WAIT_INPUT:
         done = FALSE;
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             done = TRUE;
-        } else if (func_0203dac8(&x, &y)) {
+        } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             done = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (done) {
             *state = STEP_WAIT_FADE_OUT;
@@ -385,20 +385,20 @@ static void ThAward_InitIcons(ThAwardWork *wk) {
         form = record->pokemon[i].form;
         sex = record->pokemon[i].sex;
         if (i == 0) {
-            wk->icons[i].palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 0, 0x20, wk->heapId);
+            wk->icons[i].palette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 0, 0x20, wk->heapId);
         }
         wk->icons[i].chars =
-            func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE, 0, wk->heapId);
+            ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE, 0, wk->heapId);
         wk->icons[i].cellAnims =
-            func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
+            ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
         MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.x = positions[i].x;
         setup.y = positions[i].y;
-        wk->iconActors[i] = func_0204c040(ThAwardGraphic_GetClActUnit(wk->graphic), wk->icons[i].chars,
-                                          wk->icons[0].palette, wk->icons[i].cellAnims, &setup, 0, wk->heapId);
-        func_0204c488(wk->iconActors[i], 1);
+        wk->iconActors[i] = ClActor_Create(ThAwardGraphic_GetClActUnit(wk->graphic), wk->icons[i].chars,
+                                           wk->icons[0].palette, wk->icons[i].cellAnims, &setup, 0, wk->heapId);
+        ClActor_SetSequence(wk->iconActors[i], 1);
         func_0204c520(wk->iconActors[i], FALSE);
-        func_0204c378(wk->iconActors[i], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
+        ClActor_SetPalette(wk->iconActors[i], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
     }
     GFL_ArcToolFree(arc);
 }
@@ -407,11 +407,11 @@ static void ThAward_FreeIcons(ThAwardWork *wk) {
     u8 i;
 
     for (i = 0; i < wk->iconCount; i++) {
-        func_0204c108(wk->iconActors[i]);
-        func_0204be64(wk->icons[i].cellAnims);
-        func_0204b98c(wk->icons[i].chars);
+        ClActor_Delete(wk->iconActors[i]);
+        ClActSys_FreeCellAnims(wk->icons[i].cellAnims);
+        ClActSys_FreeChars(wk->icons[i].chars);
         if (i == 0) {
-            func_0204bcd0(wk->icons[i].palette);
+            ClActSys_FreePltt(wk->icons[i].palette);
         }
     }
 }
@@ -431,17 +431,17 @@ static void ThAward_InitRankIcons(ThAwardWork *wk) {
         return;
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_TH_AWARD, wk->heapId);
-    wk->rankPalette = func_0204bbb8(arc, 1, 0, 0, 0, 1, wk->heapId);
-    wk->rankChars = func_0204b81c(arc, 3, FALSE, 0, wk->heapId);
-    wk->rankCellAnims = func_0204bde0(arc, 6, 7, wk->heapId);
+    wk->rankPalette = ClActSys_LoadPlttRange(arc, 1, 0, 0, 0, 1, wk->heapId);
+    wk->rankChars = ClActSys_LoadChars(arc, 3, FALSE, 0, wk->heapId);
+    wk->rankCellAnims = ClActSys_LoadCellAnims(arc, 6, 7, wk->heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     for (i = 0; i < wk->rankIconCount; i++) {
         setup.x = sThAwardRankIconPositions[i].x;
         setup.y = sThAwardRankIconPositions[i].y;
-        wk->rankActors[i] = func_0204c040(ThAwardGraphic_GetClActUnit(wk->graphic), wk->rankChars, wk->rankPalette,
-                                          wk->rankCellAnims, &setup, 0, wk->heapId);
-        func_0204c488(wk->rankActors[i], 0);
+        wk->rankActors[i] = ClActor_Create(ThAwardGraphic_GetClActUnit(wk->graphic), wk->rankChars, wk->rankPalette,
+                                           wk->rankCellAnims, &setup, 0, wk->heapId);
+        ClActor_SetSequence(wk->rankActors[i], 0);
         func_0204c520(wk->rankActors[i], TRUE);
     }
 }
@@ -451,11 +451,11 @@ static void ThAward_FreeRankIcons(ThAwardWork *wk) {
 
     if (wk->rankIconCount != 0) {
         for (i = 0; i < wk->rankIconCount; i++) {
-            func_0204c108(wk->rankActors[i]);
+            ClActor_Delete(wk->rankActors[i]);
         }
-        func_0204be64(wk->rankCellAnims);
-        func_0204b98c(wk->rankChars);
-        func_0204bcd0(wk->rankPalette);
+        ClActSys_FreeCellAnims(wk->rankCellAnims);
+        ClActSys_FreeChars(wk->rankChars);
+        ClActSys_FreePltt(wk->rankPalette);
     }
 }
 

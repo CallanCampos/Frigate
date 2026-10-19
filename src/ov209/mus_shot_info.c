@@ -160,7 +160,7 @@ MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSa
     MusShotInfo_InitGraphics(info);
     MusShotInfo_InitMessage(info);
     info->menuRes = AppTaskMenuRes_Create(4, 12, info->font, info->printQueue, info->heapId);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     return info;
 }
@@ -168,12 +168,12 @@ MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSa
 void MusShotInfo_Delete(MusShotInfo *info) {
     AppTaskMenuRes_Free(info->menuRes);
     if (info->askSave == FALSE) {
-        func_0204bcd0(info->returnPalette);
-        func_0204b98c(info->returnChars);
-        func_0204be64(info->returnCellAnims);
-        func_0204c108(info->returnButton);
+        ClActSys_FreePltt(info->returnPalette);
+        ClActSys_FreeChars(info->returnChars);
+        ClActSys_FreeCellAnims(info->returnCellAnims);
+        ClActor_Delete(info->returnButton);
     }
-    func_0204bf98(info->clactUnit);
+    ClActUnit_Delete(info->clactUnit);
     MusShotInfo_ExitMessage(info);
     GFL_BGSysReleaseBG(4);
     GFL_BGSysReleaseBG(6);
@@ -233,15 +233,15 @@ void MusShotInfo_Main(MusShotInfo *info) {
         }
         break;
     case MUS_SHOT_INFO_STATE_WAIT_RETURN:
-        if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || func_0203da0c(MUS_SHOT_INFO_RETURN_RECT) == 0) {
+        if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || GFL_HIDGetTouchPressedRect(MUS_SHOT_INFO_RETURN_RECT) == 0) {
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             info->state = MUS_SHOT_INFO_STATE_RETURN;
-            func_0204c488(info->returnButton, 9);
+            ClActor_SetSequence(info->returnButton, 9);
             func_0204c520(info->returnButton, TRUE);
         }
         break;
     case MUS_SHOT_INFO_STATE_RETURN:
-        if (func_0204c560(info->returnButton) == FALSE) {
+        if (ClActor_IsAnimActive(info->returnButton) == FALSE) {
             info->state = MUS_SHOT_INFO_STATE_END;
         }
         break;
@@ -281,8 +281,8 @@ static void MusShotInfo_InitGraphics(MusShotInfo *info) {
     MusShotInfo_InitBG(&MUS_SHOT_INFO_BG4_SETUP, 4, 0);
     MusShotInfo_InitBG(&MUS_SHOT_INFO_BG6_SETUP, 6, 0);
     MusShotInfo_InitBG(&MUS_SHOT_INFO_BG7_SETUP, 7, 0);
-    info->clactUnit = func_0204bf1c(8, 0, info->heapId);
-    func_0204c028(info->clactUnit);
+    info->clactUnit = ClActUnit_Create(8, 0, info->heapId);
+    ClActUnit_UseSystemRenderer(info->clactUnit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL_SHOT, info->heapId);
@@ -301,11 +301,11 @@ static void MusShotInfo_InitGraphics(MusShotInfo *info) {
         GFL_BGSysSetScrPaletteNo(6, 0, 21, 32, 3, 9);
         GFL_BGSysLoadScr(6);
         info->returnPalette =
-            func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, info->heapId);
+            ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, info->heapId);
         info->returnChars =
-            func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, info->heapId);
-        info->returnCellAnims = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0),
-                                              AppMenuCommon_GetTouchBarAnimFile(0), info->heapId);
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, info->heapId);
+        info->returnCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(0),
+                                                       AppMenuCommon_GetTouchBarAnimFile(0), info->heapId);
         GFL_ArcToolFree(arc);
 
         setup.x = 232;
@@ -313,8 +313,8 @@ static void MusShotInfo_InitGraphics(MusShotInfo *info) {
         setup.sequence = 1;
         setup.bgPriority = 0;
         setup.priority = 0;
-        info->returnButton = func_0204c040(info->clactUnit, info->returnChars, info->returnPalette,
-                                           info->returnCellAnims, &setup, CLACT_SURFACE_SUB, info->heapId);
+        info->returnButton = ClActor_Create(info->clactUnit, info->returnChars, info->returnPalette,
+                                            info->returnCellAnims, &setup, CLACT_SURFACE_SUB, info->heapId);
     }
 }
 

@@ -43,7 +43,8 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
             transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0);
         }
         GameEvent_ChainNext(event, transition);
-        if (func_02042788() == 1 && func_ov036_02180f80(work->comm) == 1 && !GameCommSys_IsTransitioning(work->comm)) {
+        if (GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm) == 1 &&
+            !GameCommSys_IsTransitioning(work->comm)) {
             func_ov030_02174108(1);
             work->communicationFlag = 1;
         }
@@ -97,7 +98,7 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
         break;
     }
     case 7:
-        if (work->communicationFlag && func_02042788() == 1 && func_ov036_02180f80(work->comm)) {
+        if (work->communicationFlag && GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm)) {
             func_ov030_02174108(0);
             work->communicationFlag = 0;
         }

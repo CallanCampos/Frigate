@@ -260,7 +260,7 @@ static void BrMusicalLook_SeqTouch(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (BrBtn_GetTrg(wk->btn, x, y)) {
             BrPoint pos;
 
@@ -336,12 +336,12 @@ static void BrMusicalLook_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adr
         break;
     }
     case SEQ_TOUCH_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);

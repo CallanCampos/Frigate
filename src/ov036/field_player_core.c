@@ -336,7 +336,7 @@ BOOL func_ov036_0219b0a4(FieldPlayerCore *core) {
         return TRUE;
     }
     idx = FldAct_GetBlActIdx(core->actor, 0);
-    if (idx != BLACT_IDX_NONE && func_0204f768(blActSys, (u16)idx, &cmd) && cmd == 0x3fff) {
+    if (idx != BLACT_IDX_NONE && BlActSys_GetActorLastCmd(blActSys, (u16)idx, &cmd) && cmd == 0x3fff) {
         return TRUE;
     }
     return FALSE;

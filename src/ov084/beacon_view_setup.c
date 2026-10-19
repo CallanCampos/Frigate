@@ -373,7 +373,7 @@ static BOOL BeaconView_WaitMedal(BeaconViewWork *work, BeaconViewEvent *event) {
         event->seq++;
         return FALSE;
     case 1:
-        if (func_0204c560(work->panels[event->param].medal)) {
+        if (ClActor_IsAnimActive(work->panels[event->param].medal)) {
             return FALSE;
         }
         break;
@@ -577,13 +577,13 @@ static void BeaconView_FreeResources(BeaconViewWork *work) {
 static void BeaconView_InitActors(BeaconViewWork *work, ArcTool *arc) {
     int i;
 
-    work->clUnit = func_0204bf1c(64, 0, work->resHeapId);
+    work->clUnit = ClActUnit_Create(64, 0, work->resHeapId);
     {
         ClActSurfaceSetup surface = { 0, 0, 256, 192, 1, 2 };
 
-        work->renderer = func_0204be9c(&surface, 1, work->heapId);
+        work->renderer = ClActRenderer_Create(&surface, 1, work->heapId);
     }
-    func_0204c018(work->clUnit, work->renderer);
+    ClActUnit_SetRenderer(work->clUnit, work->renderer);
     work->bmpOam = BmpOam_Init(work->heapId, work->clUnit);
     BeaconView_AddScreenActors(work);
     for (i = 0; i < BEACON_VIEW_PANEL_MAX; i++) {
@@ -601,8 +601,8 @@ static void BeaconView_FreeActors(BeaconViewWork *work) {
     }
     BeaconView_DeleteScreenActors(work);
     BmpOam_Exit(work->bmpOam);
-    func_0204becc(work->renderer);
-    func_0204bf98(work->clUnit);
+    ClActRenderer_Delete(work->renderer);
+    ClActUnit_Delete(work->clUnit);
 }
 
 static void BeaconView_InitWin(BeaconViewWork *work, BeaconViewWinSlot *slot, u8 bg, u8 palette, u8 x, u8 y, u8 width,
@@ -662,17 +662,17 @@ static void BeaconView_LoadRes(BeaconViewWork *work, BeaconViewRes *res, const B
         }
     }
     for (i = 0; i < res->lists[BEACON_VIEW_RES_PALETTE].count; i++) {
-        res->lists[BEACON_VIEW_RES_PALETTE].ids[i] =
-            func_0204bba0(arc, setup->lists[BEACON_VIEW_RES_PALETTE].fileId + i, CLACT_VRAM_SUB, 0, work->resHeapId);
+        res->lists[BEACON_VIEW_RES_PALETTE].ids[i] = ClActSys_LoadPltt(
+            arc, setup->lists[BEACON_VIEW_RES_PALETTE].fileId + i, CLACT_VRAM_SUB, 0, work->resHeapId);
     }
     for (i = 0; i < res->lists[BEACON_VIEW_RES_CHARS].count; i++) {
-        res->lists[BEACON_VIEW_RES_CHARS].ids[i] =
-            func_0204b81c(arc, setup->lists[BEACON_VIEW_RES_CHARS].fileId + i, FALSE, CLACT_VRAM_SUB, work->resHeapId);
+        res->lists[BEACON_VIEW_RES_CHARS].ids[i] = ClActSys_LoadChars(
+            arc, setup->lists[BEACON_VIEW_RES_CHARS].fileId + i, FALSE, CLACT_VRAM_SUB, work->resHeapId);
     }
     for (i = 0; i < res->lists[BEACON_VIEW_RES_CELLS].count; i++) {
         res->lists[BEACON_VIEW_RES_CELLS].ids[i] =
-            func_0204bde0(arc, setup->lists[BEACON_VIEW_RES_CELLS].fileId + i * 2,
-                          setup->lists[BEACON_VIEW_RES_CELLS].fileId + 1 + i * 2, work->resHeapId);
+            ClActSys_LoadCellAnims(arc, setup->lists[BEACON_VIEW_RES_CELLS].fileId + i * 2,
+                                   setup->lists[BEACON_VIEW_RES_CELLS].fileId + 1 + i * 2, work->resHeapId);
     }
 }
 
@@ -680,13 +680,13 @@ static void BeaconView_FreeRes(BeaconViewWork *work, BeaconViewRes *res) {
     int i;
 
     for (i = 0; i < res->lists[BEACON_VIEW_RES_CELLS].count; i++) {
-        func_0204be64(res->lists[BEACON_VIEW_RES_CELLS].ids[i]);
+        ClActSys_FreeCellAnims(res->lists[BEACON_VIEW_RES_CELLS].ids[i]);
     }
     for (i = 0; i < res->lists[BEACON_VIEW_RES_CHARS].count; i++) {
-        func_0204b98c(res->lists[BEACON_VIEW_RES_CHARS].ids[i]);
+        ClActSys_FreeChars(res->lists[BEACON_VIEW_RES_CHARS].ids[i]);
     }
     for (i = 0; i < res->lists[BEACON_VIEW_RES_PALETTE].count; i++) {
-        func_0204bcd0(res->lists[BEACON_VIEW_RES_PALETTE].ids[i]);
+        ClActSys_FreePltt(res->lists[BEACON_VIEW_RES_PALETTE].ids[i]);
     }
     for (i = 0; i < BEACON_VIEW_RES_KINDS; i++) {
         if (res->lists[i].ids != NULL) {
@@ -705,7 +705,7 @@ static ClActor *BeaconView_AddActor(BeaconViewWork *work, u32 chars, u32 palette
     setup.sequence = sequence;
     setup.bgPriority = bgPriority;
     setup.priority = priority;
-    actor = func_0204c040(work->clUnit, chars, palette, cellAnims, &setup, 0, work->resHeapId);
+    actor = ClActor_Create(work->clUnit, chars, palette, cellAnims, &setup, 0, work->resHeapId);
     func_0204c520(actor, FALSE);
     func_0204c5c8(actor, FALSE);
     return actor;
@@ -724,7 +724,7 @@ static void BeaconView_AddScreenActors(BeaconViewWork *work) {
             work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
             work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0], sBeaconViewActorSetups[i].x,
             sBeaconViewActorSetups[i].y, sBeaconViewActorSetups[i].sequence, sBeaconViewActorSetups[i].bgPriority, 2);
-        func_0204c124(work->actors[i], TRUE);
+        ClActor_SetVisible(work->actors[i], TRUE);
         func_0204c520(work->actors[i], i < BEACON_VIEW_ACTOR_UP ? TRUE : FALSE);
     }
 }
@@ -733,8 +733,8 @@ static void BeaconView_DeleteScreenActors(BeaconViewWork *work) {
     int i;
 
     for (i = 0; i < BEACON_VIEW_ACTOR_COUNT; i++) {
-        func_0204c124(work->actors[i], FALSE);
-        func_0204c108(work->actors[i]);
+        ClActor_SetVisible(work->actors[i], FALSE);
+        ClActor_Delete(work->actors[i]);
     }
 }
 
@@ -754,12 +754,12 @@ static void BeaconView_InitPanel(BeaconViewWork *work, u8 id) {
                                       work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
                                       work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0], panel->x,
                                       panel->y, 0, 3, id + 31);
-    func_0204c378(panel->base, id, 0);
+    ClActor_SetPalette(panel->base, id, 0);
     panel->trainer = BeaconView_AddActor(work, work->res[BEACON_VIEW_RES_TRAINER].lists[BEACON_VIEW_RES_CHARS].ids[id],
                                          work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
                                          work->res[BEACON_VIEW_RES_TRAINER].lists[BEACON_VIEW_RES_CELLS].ids[0],
                                          panel->x + 24, panel->y + 24, 0, 3, id + 21);
-    func_0204c378(panel->trainer, (u8)(id + 9), 1);
+    ClActor_SetPalette(panel->trainer, (u8)(id + 9), 1);
     panel->icon = BeaconView_AddActor(work, work->res[BEACON_VIEW_RES_ICON].lists[BEACON_VIEW_RES_CHARS].ids[id],
                                       work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
                                       work->res[BEACON_VIEW_RES_ICON].lists[BEACON_VIEW_RES_CELLS].ids[0],
@@ -775,8 +775,8 @@ static void BeaconView_InitPanel(BeaconViewWork *work, u8 id) {
                                 work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
                                 work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0],
                                 panel->x + 200 - i * 8, panel->y + 28, 25, 3, id + 6);
-        func_0204c378(panel->digits[i], id, 0);
-        func_0204c124(panel->digits[i], FALSE);
+        ClActor_SetPalette(panel->digits[i], id, 0);
+        ClActor_SetVisible(panel->digits[i], FALSE);
     }
     setup.bitmap = GFL_BitmapCreate(12, 2, 0x20, work->heapId);
     setup.x = panel->x + 72;
@@ -793,10 +793,10 @@ static void BeaconView_InitPanel(BeaconViewWork *work, u8 id) {
     GFL_BitmapFill(panel->oam.bitmap, 0);
     BmpOam_ActorBmpTrans(panel->oam.actor);
     BmpOam_ActorSetDrawEnable(panel->oam.actor, FALSE);
-    func_0204c124(panel->base, FALSE);
-    func_0204c124(panel->trainer, FALSE);
-    func_0204c124(panel->icon, FALSE);
-    func_0204c124(panel->medal, FALSE);
+    ClActor_SetVisible(panel->base, FALSE);
+    ClActor_SetVisible(panel->trainer, FALSE);
+    ClActor_SetVisible(panel->icon, FALSE);
+    ClActor_SetVisible(panel->medal, FALSE);
 }
 
 static void BeaconView_FreePanel(BeaconViewWork *work, u8 id) {
@@ -807,16 +807,16 @@ static void BeaconView_FreePanel(BeaconViewWork *work, u8 id) {
     GFL_StrBufFree(panel->greeting);
     BeaconViewOam_Free(&panel->oam);
     for (i = 0; i < BEACON_VIEW_PANEL_DIGITS; i++) {
-        func_0204c124(panel->digits[i], FALSE);
-        func_0204c108(panel->digits[i]);
+        ClActor_SetVisible(panel->digits[i], FALSE);
+        ClActor_Delete(panel->digits[i]);
     }
-    func_0204c124(panel->medal, FALSE);
-    func_0204c108(panel->medal);
-    func_0204c124(panel->icon, FALSE);
-    func_0204c108(panel->icon);
-    func_0204c124(panel->trainer, FALSE);
-    func_0204c108(panel->trainer);
-    func_0204c124(panel->base, FALSE);
-    func_0204c108(panel->base);
+    ClActor_SetVisible(panel->medal, FALSE);
+    ClActor_Delete(panel->medal);
+    ClActor_SetVisible(panel->icon, FALSE);
+    ClActor_Delete(panel->icon);
+    ClActor_SetVisible(panel->trainer, FALSE);
+    ClActor_Delete(panel->trainer);
+    ClActor_SetVisible(panel->base, FALSE);
+    ClActor_Delete(panel->base);
     MI_CpuFill8(panel, 0, sizeof(BeaconViewPanel));
 }

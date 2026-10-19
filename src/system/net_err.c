@@ -254,14 +254,14 @@ void GFL_NetErrInit(u32 heapId) {
 void GFL_NetErrUpdate(void) {
     u8 netType;
 
-    if (g_GflNetErr.state == NET_ERR_STATE_NONE && func_02042788() == TRUE) {
-        if (func_02042f24() || func_0204003c() || func_02042494()) {
+    if (g_GflNetErr.state == NET_ERR_STATE_NONE && GFL_NetIsInitialized() == TRUE) {
+        if (GFL_NetHasError() || NetSystem_HasError() || NetState_GetError()) {
             func_02042f10();
             GFL_NetErrRecord();
-            netType = func_02042e84()->bNetType;
+            netType = GFL_NetGetInitData()->bNetType;
             if (netType == GFL_NET_TYPE_WIFI || netType == GFL_NET_TYPE_WIFI_LOBBY ||
                 netType == GFL_NET_TYPE_WIFI_GTS) {
-                GFLNetErrorInfo *info = func_02042540();
+                GFLNetErrorInfo *info = NetState_GetErrorInfo();
 
                 if (info->type == NET_ERR_INFO_TYPE_FIRST + 2 || info->type == NET_ERR_INFO_TYPE_FIRST + 3) {
                     g_GflNetErr.message = WifiError_Text_ConnectionOtherPersonHas;
@@ -336,8 +336,8 @@ void GFL_NetErrApplyBrightness(void) {
 }
 
 static void func_02011dc8(void) {
-    if (func_02042788() == TRUE) {
-        func_020428e0();
+    if (GFL_NetIsInitialized() == TRUE) {
+        GFL_NetMainWhileWaiting();
         OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     }
 }
@@ -357,8 +357,8 @@ void GFL_NetErrShowScreen(void) {
     GFL_SndStop();
     GFL_NetErrDispInit(FALSE, FALSE);
     GX_VBlankIntr(TRUE);
-    func_0203e84c();
-    if (func_0203e8b0() == 1) {
+    WmIcon_Show();
+    if (WmIcon_GetEngine() == 1) {
         G2_SetWndOutsidePlane(GX_WND_PLANEMASK_BG1, FALSE);
         G2_SetWndOBJInsidePlane(GX_WND_PLANEMASK_OBJ, FALSE);
         GX_SetVisibleWnd(GX_WNDMASK_OW);
@@ -379,8 +379,8 @@ void GFL_NetErrShowScreen(void) {
         func_02011dc8();
     }
     GFL_NetErrRestore(g_GflNetErr.keepDark == TRUE ? TRUE : FALSE);
-    func_0203e860();
-    if (func_0203e8b0() == 2) {
+    WmIcon_Hide();
+    if (WmIcon_GetEngine() == 2) {
         GXS_SetGraphicsMode(subDispCnt.bgMode);
         GXS_SetVisiblePlane(subDispCnt.visiblePlane);
         GXS_SetVisibleWnd(subDispCnt.visibleWnd);
@@ -413,10 +413,10 @@ void GFL_NetErrRecord(void) {
 
     if (GFL_NetErrIsReady() && work->state == NET_ERR_STATE_NONE) {
         work->state = NET_ERR_STATE_FOUND;
-        if (!func_020427a4()) {
-            work->netType = func_02042e84()->bNetType;
-            work->info = *func_02042540();
-            work->stateError = func_02042494();
+        if (!GFL_NetIsEnded()) {
+            work->netType = GFL_NetGetInitData()->bNetType;
+            work->info = *NetState_GetErrorInfo();
+            work->stateError = NetState_GetError();
             if (work->netType == GFL_NET_TYPE_WIFI || work->netType == GFL_NET_TYPE_WIFI_LOBBY ||
                 work->netType == GFL_NET_TYPE_WIFI_GTS) {
                 if (work->info.unk4 == 1 || work->info.unk4 == 2) {
@@ -472,22 +472,22 @@ void GFL_NetErrClear(void) {
 }
 
 BOOL GFL_NetErrShutdown(void) {
-    if (func_02042788()) {
-        GFLNetInitData *init = func_02042e84();
+    if (GFL_NetIsInitialized()) {
+        GFLNetInitData *init = GFL_NetGetInitData();
 
-        func_020428a0();
-        func_02042860(NULL);
-        func_020429f0();
+        GFL_NetCancelEnd();
+        GFL_NetExit(NULL);
+        GFL_NetIwFree();
         do {
             if (init != NULL && (init->bNetType == 0 || init->bNetType == 5)) {
                 if (WH_GetSystemState() == 10) {
                     return FALSE;
                 }
             }
-            func_02042918();
+            GFL_NetUpdateDevice();
             GFL_NetErrGameUpdate();
             OS_WaitIrq(TRUE, OS_IE_V_BLANK);
-        } while (!func_020427a4());
+        } while (!GFL_NetIsEnded());
     }
     return TRUE;
 }
@@ -617,7 +617,7 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     G2_SetBG1Control(work->bg1Control.screenSize, work->bg1Control.colorMode, work->bg1Control.screenBase,
                      work->bg1Control.charBase, work->bg1Control.bgExtPltt);
     G2_BG1Mosaic(work->bg1Control.mosaic);
-    func_02042eec(&x, &y);
+    GFL_NetGetBG1Offset(&x, &y);
     G2_SetBG1Offset(x, y);
     GX_SetGraphicsMode(work->dispCnt.dispMode, work->dispCnt.bgMode, work->dispCnt.bg0_2d3d);
     GX_SetVisiblePlane(work->dispCnt.visiblePlane);

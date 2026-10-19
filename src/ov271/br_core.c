@@ -129,8 +129,8 @@ static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     } else {
         GFL_OvlLoad(OVERLAY_ID(201));
     }
-    if (func_02042788()) {
-        func_02042ba8(FALSE, HEAPID_BATTLE_RECORDER);
+    if (GFL_NetIsInitialized()) {
+        GFL_NetSetIconScreen(FALSE, HEAPID_BATTLE_RECORDER);
     }
 
     if (wk->param->mainParam->mode == BR_MODE_BROWSE) {

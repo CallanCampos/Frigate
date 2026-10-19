@@ -195,10 +195,10 @@ static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
         func_ov036_021a3a70(task);
         return;
     }
-    func_0204f6d4(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
+    BlActSys_SetActorAnims(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
     actorIndex = grassTask->actorIndex;
-    func_0204f6ec(blact, actorIndex, 0);
-    func_0204f6c8(blact, actorIndex, TRUE);
+    BlActSys_SetActorAnim(blact, actorIndex, 0);
+    BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
     if (func_ov036_021a3abc(task) == FALSE) {
         grassTask->state = 1;
     }
@@ -231,7 +231,7 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
                 return;
             }
         }
-        if (func_0204f768(blact, grassTask->actorIndex, &cmd)) {
+        if (BlActSys_GetActorLastCmd(blact, grassTask->actorIndex, &cmd)) {
             grassTask->state++;
         }
         break;
@@ -241,7 +241,7 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
             func_ov036_021a3a70(task);
             return;
         }
-        func_0204f70c(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
+        BlActSys_SetActorStep(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
         grassTask->state++;
         break;
     case 2:

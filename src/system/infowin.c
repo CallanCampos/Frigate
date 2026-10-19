@@ -132,10 +132,10 @@ void InfoWin_Update(void) {
         }
         sInfoWin->batteryTimer = 0;
     }
-    if (func_02042788() == TRUE) {
-        netInit = func_02042e84();
-        connectNum = func_02042a78();
-        if (func_02042b20() == TRUE) {
+    if (GFL_NetIsInitialized() == TRUE) {
+        netInit = GFL_NetGetInitData();
+        connectNum = GFL_NetGetNegotiatedCount();
+        if (GFL_NetIsWifi() == TRUE) {
             connected = TRUE;
         }
     }

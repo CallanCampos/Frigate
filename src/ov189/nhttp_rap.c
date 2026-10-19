@@ -171,7 +171,7 @@ int NHttpRap_StartRequest(NHttpRap *rap) {
     if (rap != NULL) {
         error = NHTTPStartConnection(rap->connection);
         if (error != 0) {
-            func_020424ac(error, 2, error, 0x3f6);
+            NetState_RecordError(error, 2, error, 0x3f6);
             return error;
         }
         return 0;
@@ -208,7 +208,7 @@ int NHttpRap_Poll(NHttpRap *rap) {
         if (error == 0) {
             NHTTPGetHeaderAll(rap->connection, &header);
         } else {
-            func_020424ac(error, 2, error, 0x3f6);
+            NetState_RecordError(error, 2, error, 0x3f6);
         }
         NHttpRap_EndRequest(rap);
         return state;
@@ -308,7 +308,7 @@ BOOL NHttpRap_SendValidate(NHttpRap *rap) {
 void NHttpRap_FreePostData(NHttpRap *rap) {
     if (rap != NULL) {
         if (rap->data != NULL) {
-            func_02042ed0(rap->data);
+            GFL_NetFreeAligned32(rap->data);
         }
         rap->data = NULL;
         rap->size = 0;

@@ -244,113 +244,113 @@ struct ClActor {
 };
 
 void ClActSys_Create(const ClActSysSetup *setup, const BGSysVRAMConfig *vramConfig, HeapID heapId);
-void func_0204b758(void);
-void func_0204b794(void);
-void func_0204b7c8(void);
-void func_0204b7fc(void);
+void ClActSys_Delete(void);
+void ClActSys_Draw(void);
+void ClActSys_VBlank(void);
+void ClActSys_ResetOamBuffers(void);
 
 // Load characters (NCGR), a palette (NCLR), and cells with their animations (NCER and NANR) from an archive, and
 // return their resource indices
-u32 func_0204b81c(ArcTool *arc, u32 fileId, BOOL compressed, u32 vramType, HeapID heapId);
-u32 func_0204b8bc(u32 size, u32 vramType, HeapID heapId);
-void func_0204b98c(u32 chars);
+u32 ClActSys_LoadChars(ArcTool *arc, u32 fileId, BOOL compressed, u32 vramType, HeapID heapId);
+u32 ClActSys_AllocChars(u32 size, u32 vramType, HeapID heapId);
+void ClActSys_FreeChars(u32 chars);
 // Replace the data of loaded characters
-void func_0204ba40(u32 chars, NNSG2dCharacterData *character);
-void func_0204bab8(u32 chars, void *src, u32 size, u32 offset, u32 vramType);
-void func_0204bb58(u32 chars, NNSG2dImageProxy *proxy);
-u32 func_0204bb80(u32 chars, BOOL sub);
-u32 func_0204bba0(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId);
-// func_0204bba0 loading count palettes from start, all when 0
-u32 func_0204bbb8(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, u16 start, u16 count, HeapID heapId);
-u32 func_0204bc48(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId);
-void func_0204bcd0(u32 palette);
+void ClActSys_ReplaceCharData(u32 chars, NNSG2dCharacterData *character);
+void ClActSys_WriteCharData(u32 chars, void *src, u32 size, u32 offset, u32 vramType);
+void ClActSys_GetCharProxy(u32 chars, NNSG2dImageProxy *proxy);
+u32 ClActSys_GetCharVramAddr(u32 chars, BOOL sub);
+u32 ClActSys_LoadPltt(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId);
+// ClActSys_LoadPltt loading count palettes from start, all when 0
+u32 ClActSys_LoadPlttRange(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, u16 start, u16 count, HeapID heapId);
+u32 ClActSys_LoadPlttEx(ArcTool *arc, u32 fileId, u32 vramType, u16 offset, HeapID heapId);
+void ClActSys_FreePltt(u32 palette);
 // Replace the data of a loaded palette, count palettes of it or all when 0
-void func_0204bd10(u32 palette, NNSG2dPaletteData *data, u32 count);
-void func_0204bd9c(u32 palette, NNSG2dImagePaletteProxy *proxy);
-u32 func_0204bdc0(u32 palette, BOOL sub);
-u32 func_0204bde0(ArcTool *arc, u32 cellFileId, u32 animFileId, HeapID heapId);
-void func_0204be64(u32 cellAnims);
+void ClActSys_ReplacePlttData(u32 palette, NNSG2dPaletteData *data, u32 count);
+void ClActSys_GetPlttProxy(u32 palette, NNSG2dImagePaletteProxy *proxy);
+u32 ClActSys_GetPlttVramAddr(u32 palette, BOOL sub);
+u32 ClActSys_LoadCellAnims(ArcTool *arc, u32 cellFileId, u32 animFileId, HeapID heapId);
+void ClActSys_FreeCellAnims(u32 cellAnims);
 
 // A renderer of its own for units, with count surfaces
-ClActRenderer *func_0204be9c(const ClActSurfaceSetup *setups, u16 count, HeapID heapId);
-void func_0204becc(ClActRenderer *renderer);
-void func_0204bedc(ClActRenderer *renderer, u32 surface, const ClActorPos *pos);
-void func_0204befc(ClActRenderer *renderer, u32 surface, ClActorPos *pos);
-void func_0204bf14(ClActRenderer *renderer, BOOL cull);
+ClActRenderer *ClActRenderer_Create(const ClActSurfaceSetup *setups, u16 count, HeapID heapId);
+void ClActRenderer_Delete(ClActRenderer *renderer);
+void ClActRenderer_SetSurfacePos(ClActRenderer *renderer, u32 surface, const ClActorPos *pos);
+void ClActRenderer_GetSurfacePos(ClActRenderer *renderer, u32 surface, ClActorPos *pos);
+void ClActRenderer_SetCulling(ClActRenderer *renderer, BOOL cull);
 
-ClActUnit *func_0204bf1c(u16 count, u8 priority, HeapID heapId);
-void func_0204bf98(ClActUnit *unit);
-void func_0204bfd4(ClActUnit *unit, BOOL active);
-BOOL func_0204bfe8(ClActUnit *unit);
+ClActUnit *ClActUnit_Create(u16 count, u8 priority, HeapID heapId);
+void ClActUnit_Delete(ClActUnit *unit);
+void ClActUnit_SetActive(ClActUnit *unit, BOOL active);
+BOOL ClActUnit_IsActive(ClActUnit *unit);
 void func_0204bff0(ClActUnit *unit, BOOL a1);
 void func_0204c004(ClActUnit *unit, BOOL a1);
-void func_0204c018(ClActUnit *unit, ClActRenderer *renderer);
-void func_0204c028(ClActUnit *unit);
+void ClActUnit_SetRenderer(ClActUnit *unit, ClActRenderer *renderer);
+void ClActUnit_UseSystemRenderer(ClActUnit *unit);
 
 // Positions are relative to a surface of the unit's renderer, or absolute with surface 0xffff
-ClActor *func_0204c040(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetup *setup, u16 surface,
-                       HeapID heapId);
-ClActor *func_0204c0a4(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetupEx *setup, u16 surface,
-                       HeapID heapId);
-void func_0204c108(ClActor *actor);
-void func_0204c124(ClActor *actor, BOOL visible);
-BOOL func_0204c138(ClActor *actor);
-void func_0204c140(ClActor *actor, const ClActorPos *pos, u16 surface);
-void func_0204c178(ClActor *actor, ClActorPos *pos, u16 surface);
-void func_0204c1a8(ClActor *actor, s16 value, u16 surface, u32 axis);
-s16 func_0204c1dc(ClActor *actor, u16 surface, u32 axis);
-void func_0204c210(ClActor *actor, const ClActorPos *pos);
-void func_0204c21c(const ClActor *actor, ClActorPos *pos);
-void func_0204c228(ClActor *actor, s16 value, u32 axis);
-s16 func_0204c234(ClActor *actor, u32 axis);
-void func_0204c244(ClActor *actor, u32 affineMode);
-void func_0204c258(ClActor *actor, const ClActorPos *center);
-void func_0204c264(ClActor *actor, s16 value, u32 axis);
-void func_0204c270(ClActor *actor, const ClActorScale *scale);
-void func_0204c27c(ClActor *actor, ClActorScale *scale);
-void func_0204c288(ClActor *actor, fx32 value, u32 axis);
-fx32 func_0204c294(ClActor *actor, u32 axis);
-void func_0204c2a0(ClActor *actor, u16 rotation);
-u16 func_0204c2a8(ClActor *actor);
-void func_0204c2b0(ClActor *actor, u32 axis, BOOL flip);
+ClActor *ClActor_Create(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetup *setup, u16 surface,
+                        HeapID heapId);
+ClActor *ClActor_CreateEx(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetupEx *setup,
+                          u16 surface, HeapID heapId);
+void ClActor_Delete(ClActor *actor);
+void ClActor_SetVisible(ClActor *actor, BOOL visible);
+BOOL ClActor_IsVisible(ClActor *actor);
+void ClActor_SetSurfacePos(ClActor *actor, const ClActorPos *pos, u16 surface);
+void ClActor_GetSurfacePos(ClActor *actor, ClActorPos *pos, u16 surface);
+void ClActor_SetSurfacePosAxis(ClActor *actor, s16 value, u16 surface, u32 axis);
+s16 ClActor_GetSurfacePosAxis(ClActor *actor, u16 surface, u32 axis);
+void ClActor_SetPos(ClActor *actor, const ClActorPos *pos);
+void ClActor_GetPos(const ClActor *actor, ClActorPos *pos);
+void ClActor_SetPosAxis(ClActor *actor, s16 value, u32 axis);
+s16 ClActor_GetPosAxis(ClActor *actor, u32 axis);
+void ClActor_SetAffineMode(ClActor *actor, u32 affineMode);
+void ClActor_SetAffineCenter(ClActor *actor, const ClActorPos *center);
+void ClActor_SetAffineCenterAxis(ClActor *actor, s16 value, u32 axis);
+void ClActor_SetScale(ClActor *actor, const ClActorScale *scale);
+void ClActor_GetScale(ClActor *actor, ClActorScale *scale);
+void ClActor_SetScaleAxis(ClActor *actor, fx32 value, u32 axis);
+fx32 ClActor_GetScaleAxis(ClActor *actor, u32 axis);
+void ClActor_SetRotation(ClActor *actor, u16 rotation);
+u16 ClActor_GetRotation(ClActor *actor);
+void ClActor_SetFlip(ClActor *actor, u32 axis, BOOL flip);
 BOOL ClActor_GetFlip(ClActor *actor, u32 axis);
 // The actor's OBJ mode, GX_OAM_MODE_*
-void func_0204c318(ClActor *actor, u32 mode);
-u32 func_0204c370(ClActor *actor);
-void func_0204c378(ClActor *actor, u32 palette, u32 a2);
-u8 func_0204c39c(ClActor *actor);
-void func_0204c3a8(ClActor *actor, const NNSG2dImagePaletteProxy *proxy);
-void func_0204c3d0(ClActor *actor, NNSG2dImagePaletteProxy *proxy);
-void func_0204c3e4(ClActor *actor, const NNSG2dImageProxy *proxy);
-void func_0204c40c(ClActor *actor, NNSG2dImageProxy *proxy);
-u16 func_0204c428(ClActor *actor);
-u16 func_0204c430(ClActor *actor);
-void func_0204c438(ClActor *actor, u8 priority);
-u8 func_0204c45c(ClActor *actor);
-void func_0204c468(ClActor *actor, u32 bgPriority);
-u8 func_0204c47c(ClActor *actor);
+void ClActor_SetObjMode(ClActor *actor, u32 mode);
+u32 ClActor_GetObjMode(ClActor *actor);
+void ClActor_SetPalette(ClActor *actor, u32 palette, u32 a2);
+u8 ClActor_GetPalette(ClActor *actor);
+void ClActor_SetPlttProxy(ClActor *actor, const NNSG2dImagePaletteProxy *proxy);
+void ClActor_GetPlttProxy(ClActor *actor, NNSG2dImagePaletteProxy *proxy);
+void ClActor_SetImageProxy(ClActor *actor, const NNSG2dImageProxy *proxy);
+void ClActor_GetImageProxy(ClActor *actor, NNSG2dImageProxy *proxy);
+u16 ClActor_GetCharIdx(ClActor *actor);
+u16 ClActor_GetPlttIdx(ClActor *actor);
+void ClActor_SetPriority(ClActor *actor, u8 priority);
+u8 ClActor_GetPriority(ClActor *actor);
+void ClActor_SetBgPriority(ClActor *actor, u32 bgPriority);
+u8 ClActor_GetBgPriority(ClActor *actor);
 // Sets the actor's animation sequence
-void func_0204c488(ClActor *actor, u16 sequence);
-u16 func_0204c4a0(ClActor *actor);
-u16 func_0204c4a8(ClActor *actor);
+void ClActor_SetSequence(ClActor *actor, u16 sequence);
+u16 ClActor_GetSequence(ClActor *actor);
+u16 ClActor_GetSequenceCount(ClActor *actor);
 // Sets it only when it changes
-void func_0204c4b8(ClActor *actor, u16 sequence);
+void ClActor_ChangeSequence(ClActor *actor, u16 sequence);
 // Act on the actor's animation controller
-void func_0204c4d4(ClActor *actor, fx32 time);
-void func_0204c4e0(ClActor *actor, fx32 speed);
-fx32 func_0204c4f8(ClActor *actor);
-void func_0204c504(ClActor *actor, u16 frame);
-u16 func_0204c510(ClActor *actor);
+void ClActor_SetAnimTime(ClActor *actor, fx32 time);
+void ClActor_SetAnimSpeed(ClActor *actor, fx32 speed);
+fx32 ClActor_GetAnimTime(ClActor *actor);
+void ClActor_SetAnimFrame(ClActor *actor, u16 frame);
+u16 ClActor_GetAnimFrame(ClActor *actor);
 void func_0204c520(ClActor *actor, BOOL a1);
 BOOL func_0204c534(ClActor *actor);
 void func_0204c53c(ClActor *actor, fx32 a1);
-void func_0204c540(ClActor *actor);
-void func_0204c550(ClActor *actor);
-BOOL func_0204c560(ClActor *actor);
-void func_0204c56c(ClActor *actor);
-void func_0204c584(ClActor *actor, u32 playMode);
-void func_0204c5b0(ClActor *actor, const ClActorCallback *callback);
-void func_0204c5bc(ClActor *actor);
+void ClActor_StartAnim(ClActor *actor);
+void ClActor_StopAnim(ClActor *actor);
+BOOL ClActor_IsAnimActive(ClActor *actor);
+void ClActor_RestartAnim(ClActor *actor);
+void ClActor_SetPlayMode(ClActor *actor, u32 playMode);
+void ClActor_SetAnimCallback(ClActor *actor, const ClActorCallback *callback);
+void ClActor_ClearAnimCallback(ClActor *actor);
 void func_0204c5c8(ClActor *actor, BOOL a1);
 // The actor system, which the renderers of clact_itcm.c read
 extern ClActSys *g_ClActSys;

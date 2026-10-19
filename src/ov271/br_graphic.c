@@ -204,24 +204,24 @@ static void BrGraphic_BG_VBlank(BrGraphicBG *p_wk) {
 static void BrGraphic_OBJ_Init(BrGraphicOBJ *p_wk, const BGSysVRAMConfig *cp_vram, HeapID heapId) {
     MI_CpuFill8(p_wk, 0, sizeof(BrGraphicOBJ));
     ClActSys_Create(&sc_clsys_init, cp_vram, heapId);
-    p_wk->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(p_wk->unit);
+    p_wk->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(p_wk->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void BrGraphic_OBJ_Exit(BrGraphicOBJ *p_wk) {
-    func_0204bf98(p_wk->unit);
-    func_0204b758();
+    ClActUnit_Delete(p_wk->unit);
+    ClActSys_Delete();
     MI_CpuFill8(p_wk, 0, sizeof(BrGraphicOBJ));
 }
 
 static void BrGraphic_OBJ_Main(BrGraphicOBJ *p_wk) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void BrGraphic_OBJ_VBlank(BrGraphicOBJ *p_wk) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *BrGraphic_OBJ_GetClunit(const BrGraphicOBJ *p_wk) {

@@ -231,12 +231,12 @@ static void BrBvSend_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         BrSeq_SetNext(p_seqwk, BrBvSend_SeqFadeOut);
         break;
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);

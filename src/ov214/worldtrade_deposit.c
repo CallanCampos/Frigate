@@ -222,7 +222,7 @@ int WorldTrade_Deposit_End(WorldTradeWork *wk, int seq) {
     Deposit_BmpWinDelete(wk);
     Deposit_BgExit();
     WorldTrade_SubLcdBgExit(wk);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     WorldTrade_SubProcessUpdate(wk);
     return WT_SEQ_INIT;
 }
@@ -387,36 +387,37 @@ static void Deposit_SetCellActor(WorldTradeWork *wk) {
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 160;
     setup.y = 32;
-    wk->subCursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
-                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                     wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->subCursorAct, 12);
+    wk->subCursorAct =
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->subCursorAct, 12);
     func_0204c520(wk->subCursorAct, TRUE);
-    func_0204c550(wk->subCursorAct);
-    func_0204c124(wk->subCursorAct, FALSE);
+    ClActor_StopAnim(wk->subCursorAct);
+    ClActor_SetVisible(wk->subCursorAct, FALSE);
 
     setup.x = 228;
     setup.y = 117;
     wk->boxArrowAct[0] =
-        func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->boxArrowAct[0], 38);
-    func_0204c124(wk->boxArrowAct[0], FALSE);
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->boxArrowAct[0], 38);
+    ClActor_SetVisible(wk->boxArrowAct[0], FALSE);
 
     setup.x = 140;
     wk->boxArrowAct[1] =
-        func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->boxArrowAct[1], 39);
-    func_0204c124(wk->boxArrowAct[1], FALSE);
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->boxArrowAct[1], 39);
+    ClActor_SetVisible(wk->boxArrowAct[1], FALSE);
 }
 
 static void Deposit_DelCellActor(WorldTradeWork *wk) {
-    func_0204c108(wk->subCursorAct);
-    func_0204c108(wk->boxArrowAct[0]);
-    func_0204c108(wk->boxArrowAct[1]);
+    ClActor_Delete(wk->subCursorAct);
+    ClActor_Delete(wk->boxArrowAct[0]);
+    ClActor_Delete(wk->boxArrowAct[1]);
 }
 
 static void Deposit_InitWork(WorldTradeWork *wk) {

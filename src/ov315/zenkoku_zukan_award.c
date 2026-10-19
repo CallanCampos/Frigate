@@ -192,7 +192,7 @@ static BOOL ZenkokuZukanAward_Init(GameProc *proc, u32 *state, void *param, void
     GFL_BGSysLoadScr(BG_SUB_C_GEAR);
     ZenkokuZukanAward_StartSlide(wk);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 16, 0);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     if (wk->param->unk04 == 0) {
         GFL_SndBGMFadeOut(6);
     }
@@ -272,11 +272,11 @@ static BOOL ZenkokuZukanAward_Main(GameProc *proc, u32 *state, void *param, void
     case STEP_WAIT_INPUT:
         done = FALSE;
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             done = TRUE;
-        } else if (func_0203dac8(&x, &y)) {
+        } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             done = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (done) {
             *state = STEP_WAIT_FADE_OUT;
@@ -460,21 +460,21 @@ static void ZenkokuZukanAward_InitBackdrop(ZenkokuZukanAwardWork *wk) {
 static void ZenkokuZukanAward_InitRibbon(ZenkokuZukanAwardWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AWARD, wk->heapId);
 
-    wk->palette = func_0204bbb8(arc, 0, 0, 0, 0, 2, wk->heapId);
-    wk->chars = func_0204b81c(arc, 3, FALSE, 0, wk->heapId);
-    wk->cellAnims = func_0204bde0(arc, 8, 9, wk->heapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 0, 0, 0, 0, 2, wk->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 3, FALSE, 0, wk->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 8, 9, wk->heapId);
     GFL_ArcToolFree(arc);
-    wk->ribbon = func_0204c040(ZenkokuZukanAwardGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
-                               wk->cellAnims, sZenkokuZukanAwardRibbonSetup, 0, wk->heapId);
-    func_0204c124(wk->ribbon, TRUE);
+    wk->ribbon = ClActor_Create(ZenkokuZukanAwardGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
+                                wk->cellAnims, sZenkokuZukanAwardRibbonSetup, 0, wk->heapId);
+    ClActor_SetVisible(wk->ribbon, TRUE);
     func_0204c520(wk->ribbon, TRUE);
 }
 
 static void ZenkokuZukanAward_FreeRibbon(ZenkokuZukanAwardWork *wk) {
-    func_0204c108(wk->ribbon);
-    func_0204be64(wk->cellAnims);
-    func_0204b98c(wk->chars);
-    func_0204bcd0(wk->palette);
+    ClActor_Delete(wk->ribbon);
+    ClActSys_FreeCellAnims(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreePltt(wk->palette);
 }
 
 // Puts the diploma's BGs and the ribbon below the screen, to slide up
@@ -488,7 +488,7 @@ static void ZenkokuZukanAward_StartSlide(ZenkokuZukanAwardWork *wk) {
         for (i = 0; i < NELEMS(sZenkokuZukanAwardRibbonSetup); i++) {
             pos.x = sZenkokuZukanAwardRibbonSetup[i].x;
             pos.y = sZenkokuZukanAwardRibbonSetup[i].y - 64;
-            func_0204c140(wk->ribbon, &pos, 0);
+            ClActor_SetSurfacePos(wk->ribbon, &pos, 0);
         }
         wk->slideWait = 0;
     }
@@ -507,9 +507,9 @@ static void ZenkokuZukanAward_UpdateSlide(ZenkokuZukanAwardWork *wk) {
                 }
                 GFL_BGSysMoveBGReq(BG_MAIN_DIPLOMA, BG_MOVE_UP, y);
                 GFL_BGSysMoveBGReq(BG_MAIN_BACKDROP, BG_MOVE_UP, y);
-                func_0204c178(wk->ribbon, &pos, 0);
+                ClActor_GetSurfacePos(wk->ribbon, &pos, 0);
                 pos.y += y;
-                func_0204c140(wk->ribbon, &pos, 0);
+                ClActor_SetSurfacePos(wk->ribbon, &pos, 0);
                 wk->slideWait = 0;
             } else {
                 wk->slideWait--;

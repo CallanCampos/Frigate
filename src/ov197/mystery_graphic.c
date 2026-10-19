@@ -204,12 +204,12 @@ void MysteryGraphic_Start3D(MysteryGraphic *graphic) {
     lcdConfig.bg0Is3D = GX_BG0_AS_3D;
     GFL_BGSysSetLCDConfig(&lcdConfig);
     MysteryG3dSys_Init(&graphic->g3d, graphic->heapId);
-    func_0204f918(graphic->heapId);
+    Particle_Init(graphic->heapId);
 }
 
 void MysteryGraphic_End3D(MysteryGraphic *graphic) {
     GFL_BGSysSetBGEnabled(0, FALSE);
-    func_0204fb4c();
+    Particle_Free();
     MysteryG3dSys_Free(&graphic->g3d);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
 }
@@ -256,26 +256,26 @@ static void MysteryGraphicBG_VBlank(MysteryGraphicBG *bg) {
 static void MysteryGraphicClAct_Init(MysteryGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(MysteryGraphicClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    clact->renderer = func_0204be9c(sSurfaceSetups, NELEMS(sSurfaceSetups), heapId);
-    func_0204c018(clact->unit, clact->renderer);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    clact->renderer = ClActRenderer_Create(sSurfaceSetups, NELEMS(sSurfaceSetups), heapId);
+    ClActUnit_SetRenderer(clact->unit, clact->renderer);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void MysteryGraphicClAct_Free(MysteryGraphicClAct *clact) {
-    func_0204becc(clact->renderer);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActRenderer_Delete(clact->renderer);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(MysteryGraphicClAct));
 }
 
 static void MysteryGraphicClAct_Update(MysteryGraphicClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void MysteryGraphicClAct_VBlank(MysteryGraphicClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *MysteryGraphicClAct_GetUnit(MysteryGraphicClAct *clact) {
@@ -301,7 +301,7 @@ static void MysteryG3dSys_Begin(MysteryG3dSys *g3d) {
         GFL_G3DSysReset();
         GFL_G3DCameraFlush(g3d->camera);
         GFL_G3DSysMtxViewFlush();
-        func_0204f954();
+        Particle_DrawAndUpdateAll();
     }
 }
 

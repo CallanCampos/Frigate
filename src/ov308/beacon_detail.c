@@ -381,16 +381,16 @@ static void BeaconDetail_UpdateTouchBar(TouchBar *touchBar) {
 static void BeaconDetail_LoadObjRes(BeaconDetailWork *work, BeaconDetailObjRes *res,
                                     const BeaconDetailObjResFiles *files, ArcTool *arc) {
     MI_CpuFill8(res, 0, sizeof(BeaconDetailObjRes));
-    res->palette = func_0204bbb8(arc, files->paletteFile, files->vramType, files->paletteOffset * 0x20, 0,
-                                 files->paletteCount, work->heapId);
-    res->chars = func_0204b81c(arc, files->charFile, FALSE, files->vramType, work->heapId);
-    res->cellAnims = func_0204bde0(arc, files->cellFile, files->cellFile + 1, work->heapId);
+    res->palette = ClActSys_LoadPlttRange(arc, files->paletteFile, files->vramType, files->paletteOffset * 0x20, 0,
+                                          files->paletteCount, work->heapId);
+    res->chars = ClActSys_LoadChars(arc, files->charFile, FALSE, files->vramType, work->heapId);
+    res->cellAnims = ClActSys_LoadCellAnims(arc, files->cellFile, files->cellFile + 1, work->heapId);
 }
 
 static void BeaconDetail_FreeObjRes(BeaconDetailWork *work, BeaconDetailObjRes *res) {
-    func_0204be64(res->cellAnims);
-    func_0204b98c(res->chars);
-    func_0204bcd0(res->palette);
+    ClActSys_FreeCellAnims(res->cellAnims);
+    ClActSys_FreeChars(res->chars);
+    ClActSys_FreePltt(res->palette);
 }
 
 // The icons, the map's trainer with every view's characters and the palettes of the views, and a trainer picture
@@ -459,7 +459,7 @@ static ClActor *BeaconDetail_AddActor(BeaconDetailWork *work, ClActUnit *unit, B
     setup.sequence = anim;
     setup.bgPriority = bgPriority;
     setup.priority = priority;
-    return func_0204c040(unit, res->chars, res->palette, res->cellAnims, &setup, surface, work->heapId);
+    return ClActor_Create(unit, res->chars, res->palette, res->cellAnims, &setup, surface, work->heapId);
 }
 
 static void BeaconDetail_CreateMapActors(BeaconDetailWork *work) {
@@ -467,7 +467,7 @@ static void BeaconDetail_CreateMapActors(BeaconDetailWork *work) {
 
     work->actors[BEACON_DETAIL_ACTOR_TRAINER] =
         BeaconDetail_AddActor(work, unit, &work->unionRes, 128, 120, 0, 1, 2, CLACT_SURFACE_MAIN);
-    func_0204c378(work->actors[BEACON_DETAIL_ACTOR_TRAINER], 0, 1);
+    ClActor_SetPalette(work->actors[BEACON_DETAIL_ACTOR_TRAINER], 0, 1);
     work->actors[BEACON_DETAIL_ACTOR_RECENT] =
         BeaconDetail_AddActor(work, unit, &work->iconRes, 96, 120, 0, 2, 2, CLACT_SURFACE_MAIN);
 }
@@ -476,8 +476,8 @@ static void BeaconDetail_FreeMapActors(BeaconDetailWork *work) {
     int i;
 
     for (i = 0; i < BEACON_DETAIL_ACTOR_COUNT; i++) {
-        func_0204c124(work->actors[i], FALSE);
-        func_0204c108(work->actors[i]);
+        ClActor_SetVisible(work->actors[i], FALSE);
+        ClActor_Delete(work->actors[i]);
     }
 }
 
@@ -513,11 +513,11 @@ static void BeaconDetail_CreatePanels(BeaconDetailWork *work) {
         BeaconDetail_InitWindow(&panel->windows[BEACON_DETAIL_WINDOW_COUNTS], bg, i, 4, 19, 27, 4);
         panel->trainerActor =
             BeaconDetail_AddActor(work, unit, &work->trainerRes[i], 220, 44, 0, 1, i, CLACT_SURFACE_SUB);
-        func_0204c318(panel->trainerActor, GX_OAM_MODE_NORMAL);
-        func_0204c124(panel->trainerActor, FALSE);
+        ClActor_SetObjMode(panel->trainerActor, GX_OAM_MODE_NORMAL);
+        ClActor_SetVisible(panel->trainerActor, FALSE);
         panel->rankActor = BeaconDetail_AddActor(work, unit, &work->iconRes, 200, 80, 6, 0, i, CLACT_SURFACE_SUB);
-        func_0204c318(panel->rankActor, GX_OAM_MODE_XLU);
-        func_0204c124(panel->rankActor, FALSE);
+        ClActor_SetObjMode(panel->rankActor, GX_OAM_MODE_XLU);
+        ClActor_SetVisible(panel->rankActor, FALSE);
     }
 }
 
@@ -528,10 +528,10 @@ static void BeaconDetail_FreePanels(BeaconDetailWork *work) {
     for (i = 0; i < BEACON_DETAIL_PANEL_COUNT; i++) {
         BeaconDetailPanel *panel = &work->panels[i];
 
-        func_0204c124(panel->trainerActor, FALSE);
-        func_0204c108(panel->trainerActor);
-        func_0204c124(panel->rankActor, FALSE);
-        func_0204c108(panel->rankActor);
+        ClActor_SetVisible(panel->trainerActor, FALSE);
+        ClActor_Delete(panel->trainerActor);
+        ClActor_SetVisible(panel->rankActor, FALSE);
+        ClActor_Delete(panel->rankActor);
         BmpWin_Free(panel->windows[BEACON_DETAIL_WINDOW_COUNTS].window);
         for (j = 0; j < 2; j++) {
             BmpWin_Free(panel->windows[BEACON_DETAIL_WINDOW_FROM + j].window);

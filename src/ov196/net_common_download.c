@@ -192,7 +192,7 @@ u32 NetCommonDownload_Update(NetCommonDownload *download) {
         if (download->session.initialized) {
             return NET_COMMON_DOWNLOAD_UPDATE_RUNNING;
         }
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             switch (DWCRapCommon_CheckError(TRUE, FALSE)) {
             case 0:
                 download->update = NET_COMMON_DOWNLOAD_UPDATE_RUNNING;
@@ -306,7 +306,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     case 6:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 7, 7);
         }
@@ -349,7 +349,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     case DOWNLOAD_WAIT:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 9, 9);
         }
@@ -370,7 +370,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     case DOWNLOAD_WAIT_CLEANUP:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             *state = session->nextState;
         }
         if (sNdState.done) {
@@ -432,7 +432,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     case 3:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 4, 4);
         }
@@ -475,7 +475,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     case DOWNLOAD_WAIT:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 6, 6);
         }
@@ -496,7 +496,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     case DOWNLOAD_WAIT_CLEANUP:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             *state = session->nextState;
         }
         if (sNdState.done) {
@@ -535,8 +535,8 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         (*state)++;
         break;
     case 1:
-        if (func_02042788()) {
-            func_02042ba8(TRUE, download->param.heapId);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetSetIconScreen(TRUE, download->param.heapId);
             (*state)++;
         }
         break;
@@ -555,7 +555,7 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         (*state)++;
         break;
     case 4:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             (*state)++;
         }
         break;

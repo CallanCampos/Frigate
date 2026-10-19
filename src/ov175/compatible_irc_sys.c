@@ -173,17 +173,17 @@ BOOL CompatibleIrcSys_StartNet(CompatibleIrcSys *sys) {
     switch (sys->state) {
     case 0:
         // The first branch's state is overwritten by the state 1 below, as in the original
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             sys->state = 2;
         } else {
             init = sCompatibleIrcSysNetInit;
             init.unk68.word = sys->unk40;
-            func_020425ec(&init, CompatibleIrcSys_NetInitDone, sys);
+            GFL_NetInit(&init, CompatibleIrcSys_NetInitDone, sys);
         }
         sys->state = 1;
         break;
     case 1:
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             sys->state = 2;
         }
         break;
@@ -213,7 +213,7 @@ BOOL CompatibleIrcSys_EndNet(CompatibleIrcSys *sys) {
         sys->state = 1;
         break;
     case 1:
-        if (func_02042860(CompatibleIrcSys_NetExitDone)) {
+        if (GFL_NetExit(CompatibleIrcSys_NetExitDone)) {
             sys->state = 2;
         } else {
             sys->state = 3;
@@ -262,11 +262,11 @@ BOOL CompatibleIrcSys_Sync(CompatibleIrcSys *sys) {
     }
     switch (sys->state) {
     case 0:
-        func_02040624(func_02040440(), 0xe, 0xd);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xe, 0xd);
         sys->state = 1;
         break;
     case 1:
-        if (func_02040664(func_02040440(), 0xe, 0xd)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xe, 0xd)) {
             sys->state = 2;
         }
         break;
@@ -298,7 +298,7 @@ BOOL CompatibleIrcSys_ExchangeIds(CompatibleIrcSys *sys, u32 value) {
         }
         break;
     case 1:
-        if (func_02042bc4()) {
+        if (GFL_NetIsParent()) {
             for (i = 0; i < 2; i++) {
                 if (value != sys->ids[i]) {
                     break;
@@ -347,7 +347,7 @@ BOOL CompatibleIrcSys_Update(CompatibleIrcSys *sys) {
     }
     if (sys->timer++ > 180) {
         sys->timer = 0;
-        if (!func_020400b8(CMD_COUNT, func_02042a6c(func_02040440()))) {
+        if (!NetSystem_HasQueuedCommand(CMD_COUNT, GFL_NetGetHandleNetId(NetHandle_GetOwn()))) {
             return CompatibleIrcSys_SendCount(sys);
         }
     }
@@ -361,13 +361,13 @@ BOOL CompatibleIrcSys_SendCount(CompatibleIrcSys *sys) {
     if (sys->disabled) {
         return TRUE;
     }
-    dest = func_02042a6c(func_02040440());
+    dest = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     if (dest == 0) {
         sendId = TRUE;
     } else {
         sendId = FALSE;
     }
-    if (!func_020400b8(CMD_COUNT, dest)) {
+    if (!NetSystem_HasQueuedCommand(CMD_COUNT, dest)) {
         return CompatibleIrcSys_SendEx(sys, CMD_COUNT, 4, &sys->sentCount, sendId, 0, 0, TRUE);
     }
     return FALSE;
@@ -384,7 +384,7 @@ static BOOL CompatibleIrcSys_Send(CompatibleIrcSys *sys, int command, u16 size, 
     if (sys->disabled) {
         return TRUE;
     }
-    return func_02042be8(func_02040440(), command, size, data);
+    return GFL_NetSendCommand(NetHandle_GetOwn(), command, size, data);
 }
 
 BOOL CompatibleIrcSys_SendEx(CompatibleIrcSys *sys, u16 command, u32 size, const void *data, u8 sendId, u32 a5, BOOL a6,
@@ -392,18 +392,18 @@ BOOL CompatibleIrcSys_SendEx(CompatibleIrcSys *sys, u16 command, u32 size, const
     if (sys->disabled) {
         return TRUE;
     }
-    return func_02042c18(func_02040440(), sendId, command, size, data, a5, a6, noCopy);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), sendId, command, size, data, a5, a6, noCopy);
 }
 
 void CompatibleIrcSys_AddCommands(CompatibleIrcSys *sys, int base, const void *list, int count, void *work) {
     if (!sys->disabled) {
-        func_02040c20(base, list, count, work);
+        NetCommand_AddTable(base, list, count, work);
     }
 }
 
 void CompatibleIrcSys_RemoveCommands(CompatibleIrcSys *sys, int base) {
     if (!sys->disabled) {
-        func_02040c64(base);
+        NetCommand_RemoveTable(base);
     }
 }
 
@@ -521,7 +521,7 @@ static void CompatibleIrcSys_RecvId(int netId, int size, const void *data, void 
     CompatibleIrcSys *sys = work;
     u32 id;
 
-    if (func_02042bc4()) {
+    if (GFL_NetIsParent()) {
         MI_CpuCopy8(data, &id, 4);
         sys->ids[netId] = id;
     }
@@ -530,7 +530,7 @@ static void CompatibleIrcSys_RecvId(int netId, int size, const void *data, void 
 static void CompatibleIrcSys_RecvIdReply(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CompatibleIrcSys *sys = work;
 
-    if (handle == func_02040440()) {
+    if (handle == NetHandle_GetOwn()) {
         sys->idsReplied = TRUE;
     }
 }
@@ -538,8 +538,8 @@ static void CompatibleIrcSys_RecvIdReply(int netId, int size, const void *data, 
 static void CompatibleIrcSys_RecvCount(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CompatibleIrcSys *sys = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             MI_CpuCopy8(data, &sys->receivedCount, 4);
         }
     }
@@ -631,8 +631,8 @@ static void CompatibleIrcSync_GetPeerProfile(CompatibleIrcSync *sync, Compatible
 static void CompatibleIrcSync_RecvSelection(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CompatibleIrcSync *sync = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             MI_CpuCopy8(data, sync->recvSelection, 8);
             sync->selectionReceived = TRUE;
         }
@@ -642,8 +642,8 @@ static void CompatibleIrcSync_RecvSelection(int netId, int size, const void *dat
 static void CompatibleIrcSync_RecvPing(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CompatibleIrcSync *sync = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             sync->pingReceived = TRUE;
         }
     }
@@ -652,8 +652,8 @@ static void CompatibleIrcSync_RecvPing(int netId, int size, const void *data, vo
 static void CompatibleIrcSync_RecvUnk20(int netId, int size, const void *data, void *work, NetHandle *handle) {
     CompatibleIrcSync *sync = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             sync->unk20 = TRUE;
         }
     }
@@ -668,8 +668,8 @@ static void CompatibleIrcSync_RecvProfile(int netId, int size, const void *data,
 
         MI_CpuCopy8(&profile->trainer, info, PlayerInfo_GetSize());
     }
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             sync->profileReceived = TRUE;
         }
     }
@@ -678,7 +678,7 @@ static void CompatibleIrcSync_RecvProfile(int netId, int size, const void *data,
 static void *CompatibleIrcSync_GetProfileBuffer(int netId, void *work, int size) {
     CompatibleIrcSync *sync = work;
 
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return sync->recvProfileOwn;
     }
     return sync->recvProfilePeer;

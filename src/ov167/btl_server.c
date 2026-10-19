@@ -527,7 +527,7 @@ BOOL func_ov167_0219ed24(BtlServer *server, int *seq) {
         BOOL done = FALSE;
 
         if (!func_ov167_0219c980(server->mainModule)) {
-            if ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed()) {
                 done = TRUE;
             }
         } else {

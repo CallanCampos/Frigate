@@ -540,13 +540,13 @@ static BOOL UnSelectMsg_Wait(UnSelectMsg *msg) {
             return TRUE;
         case 1:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
-                func_0203da48()) {
+                GFL_HIDIsTouchPressed()) {
                 PrintStream_Continue(msg->stream);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }
             break;
         case 0:
-            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
                 PrintStream_SkipWait(msg->stream, 0);
             }
             break;
@@ -697,7 +697,7 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
     UnSelect_PlaceVisitors(wk);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
     wk->hblankTask = GFL_HBlankTCBAdd(UnSelect_HBlank, wk, 0);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return wk;
 }
 
@@ -898,21 +898,21 @@ static void UnSelect_LoadObjRes(UnSelectWork *wk) {
     wk->res[UN_SELECT_RES_PLTT] = UN_SELECT_RES_NONE;
     wk->res[UN_SELECT_RES_CELLS] = UN_SELECT_RES_NONE;
     arc = GFL_ArcSysCreateFileHandle(ARCID_UN_SELECT, heapId);
-    wk->res[UN_SELECT_RES_CHARS] = func_0204b81c(arc, 10, FALSE, CLACT_VRAM_BOTH, heapId);
-    wk->res[UN_SELECT_RES_PLTT] = func_0204bba0(arc, 11, CLACT_VRAM_BOTH, 3 * 0x20, heapId);
-    wk->res[UN_SELECT_RES_CELLS] = func_0204bde0(arc, 9, 8, heapId);
+    wk->res[UN_SELECT_RES_CHARS] = ClActSys_LoadChars(arc, 10, FALSE, CLACT_VRAM_BOTH, heapId);
+    wk->res[UN_SELECT_RES_PLTT] = ClActSys_LoadPltt(arc, 11, CLACT_VRAM_BOTH, 3 * 0x20, heapId);
+    wk->res[UN_SELECT_RES_CELLS] = ClActSys_LoadCellAnims(arc, 9, 8, heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void UnSelect_FreeObjRes(UnSelectWork *wk) {
     if (wk->res[UN_SELECT_RES_CHARS] != UN_SELECT_RES_NONE) {
-        func_0204b98c(wk->res[UN_SELECT_RES_CHARS]);
+        ClActSys_FreeChars(wk->res[UN_SELECT_RES_CHARS]);
     }
     if (wk->res[UN_SELECT_RES_PLTT] != UN_SELECT_RES_NONE) {
-        func_0204bcd0(wk->res[UN_SELECT_RES_PLTT]);
+        ClActSys_FreePltt(wk->res[UN_SELECT_RES_PLTT]);
     }
     if (wk->res[UN_SELECT_RES_CELLS] != UN_SELECT_RES_NONE) {
-        func_0204be64(wk->res[UN_SELECT_RES_CELLS]);
+        ClActSys_FreeCellAnims(wk->res[UN_SELECT_RES_CELLS]);
     }
 }
 
@@ -962,7 +962,7 @@ static void UnSelect_CreateActors(UnSelectWork *wk) {
         for (i = 0; i < UN_SELECT_ROW_MARK_COUNT; i++) {
             ClActor *actor = UnSelect_CreateActor(unit, &template);
 
-            func_0204c124(actor, FALSE);
+            ClActor_SetVisible(actor, FALSE);
             wk->actors[UN_SELECT_ACTOR_ROW_MARK + i] = actor;
         }
     }
@@ -979,8 +979,8 @@ static void UnSelect_CreateActors(UnSelectWork *wk) {
         for (i = 0; i < UN_SELECT_ROW_MARK_COUNT; i++) {
             ClActor *actor = UnSelect_CreateActor(unit, &template);
 
-            func_0204c318(actor, 1);
-            func_0204c124(actor, FALSE);
+            ClActor_SetObjMode(actor, 1);
+            ClActor_SetVisible(actor, FALSE);
             wk->actors[UN_SELECT_ACTOR_ROW_MARK_2 + i] = actor;
         }
     }
@@ -1003,14 +1003,14 @@ static void UnSelect_FreeActors(UnSelectWork *wk) {
 
     for (i = 0; i < UN_SELECT_ACTOR_COUNT; i++) {
         if (wk->actors[i] != NULL) {
-            func_0204c108(wk->actors[i]);
+            ClActor_Delete(wk->actors[i]);
         }
     }
 }
 
 static ClActor *UnSelect_CreateActor(ClActUnit *unit, UnSelectActorTemplate *template) {
-    ClActor *actor = func_0204c040(unit, template->chars, template->palette, template->cells, &template->setup,
-                                   template->surface, HEAPID_UN_SELECT);
+    ClActor *actor = ClActor_Create(unit, template->chars, template->palette, template->cells, &template->setup,
+                                    template->surface, HEAPID_UN_SELECT);
 
     func_0204c520(actor, TRUE);
     return actor;
@@ -1024,14 +1024,14 @@ static void UnSelect_HideRowMarks(UnSelectWork *wk) {
         wk->pageScrolled = FALSE;
         for (i = 0; i < UN_SELECT_ROW_MARK_COUNT; i++) {
             actor = wk->actors[UN_SELECT_ACTOR_ROW_MARK + i];
-            if (func_0204c138(actor)) {
-                func_0204c124(actor, FALSE);
+            if (ClActor_IsVisible(actor)) {
+                ClActor_SetVisible(actor, FALSE);
             }
         }
         for (i = 0; i < UN_SELECT_ROW_MARK_COUNT; i++) {
             actor = wk->actors[UN_SELECT_ACTOR_ROW_MARK_2 + i];
-            if (func_0204c138(actor)) {
-                func_0204c124(actor, FALSE);
+            if (ClActor_IsVisible(actor)) {
+                ClActor_SetVisible(actor, FALSE);
             }
         }
     }
@@ -1046,26 +1046,26 @@ static void UnSelect_ScrollRowMarks(UnSelectWork *wk, int delta) {
     for (i = 0; i < UN_SELECT_ROW_MARK_COUNT; i++) {
         ClActor *actor = wk->actors[UN_SELECT_ACTOR_ROW_MARK + i];
 
-        if (func_0204c138(actor)) {
-            func_0204c178(actor, &pos, 0);
+        if (ClActor_IsVisible(actor)) {
+            ClActor_GetSurfacePos(actor, &pos, 0);
             pos.y += (s16)delta;
             y = pos.y;
-            func_0204c140(actor, &pos, 0);
+            ClActor_SetSurfacePos(actor, &pos, 0);
             if (y <= -20 || y >= 220) {
-                func_0204c124(actor, FALSE);
+                ClActor_SetVisible(actor, FALSE);
             }
         }
     }
     for (i = 0; i < UN_SELECT_ROW_MARK_COUNT; i++) {
         ClActor *actor = wk->actors[UN_SELECT_ACTOR_ROW_MARK_2 + i];
 
-        if (func_0204c138(actor)) {
-            func_0204c178(actor, &pos, 1);
+        if (ClActor_IsVisible(actor)) {
+            ClActor_GetSurfacePos(actor, &pos, 1);
             pos.y += (s16)delta;
             y = pos.y;
-            func_0204c140(actor, &pos, 1);
+            ClActor_SetSurfacePos(actor, &pos, 1);
             if (y <= -28 || y >= 212) {
-                func_0204c124(actor, FALSE);
+                ClActor_SetVisible(actor, FALSE);
             }
         }
     }
@@ -1079,13 +1079,13 @@ static void UnSelect_PlaceVisitors(UnSelectWork *wk) {
         ClActor *actor = wk->actors[UN_SELECT_ACTOR_VISITOR + i];
 
         if (wk->visitorFloors[i] == UN_SELECT_NO_FLOOR) {
-            func_0204c124(actor, FALSE);
+            ClActor_SetVisible(actor, FALSE);
         } else {
             ClActorPos pos;
 
-            func_0204c178(actor, &pos, 0xffff);
+            ClActor_GetSurfacePos(actor, &pos, 0xffff);
             pos.y = wk->visitorFloors[i] * 2 + 92;
-            func_0204c140(actor, &pos, 0xffff);
+            ClActor_SetSurfacePos(actor, &pos, 0xffff);
         }
     }
 }
@@ -1101,18 +1101,18 @@ static void UnSelect_SetBarPos(UnSelectWork *wk, int pos) {
     } else if (y > 152) {
         y = 152;
     }
-    func_0204c178(actor, &actorPos, 0);
+    ClActor_GetSurfacePos(actor, &actorPos, 0);
     actorPos.y = y;
-    func_0204c140(actor, &actorPos, 0);
+    ClActor_SetSurfacePos(actor, &actorPos, 0);
 }
 
 static void UnSelect_SetCursorPos(UnSelectWork *wk, int y) {
     ClActor *actor = wk->actors[UN_SELECT_ACTOR_CURSOR];
     ClActorPos pos;
 
-    func_0204c178(actor, &pos, 0xffff);
+    ClActor_GetSurfacePos(actor, &pos, 0xffff);
     pos.y = y;
-    func_0204c140(actor, &pos, 0xffff);
+    ClActor_SetSurfacePos(actor, &pos, 0xffff);
 }
 
 // Shows a mark that is hidden at y
@@ -1145,12 +1145,12 @@ static BOOL UnSelect_ShowActor(ClActor **actors, int index, u16 surface, int y) 
     ClActor *actor = actors[index];
 
     shown = FALSE;
-    if (!func_0204c138(actor)) {
-        func_0204c124(actor, TRUE);
+    if (!ClActor_IsVisible(actor)) {
+        ClActor_SetVisible(actor, TRUE);
         shown = TRUE;
-        func_0204c178(actor, &pos, surface);
+        ClActor_GetSurfacePos(actor, &pos, surface);
         pos.y = y;
-        func_0204c140(actor, &pos, surface);
+        ClActor_SetSurfacePos(actor, &pos, surface);
     }
     return shown;
 }

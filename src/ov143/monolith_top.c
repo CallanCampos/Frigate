@@ -200,7 +200,7 @@ static BOOL MonolithTop_Main(GameProc *proc, u32 *state, void *param, void *work
         break;
     case MONOLITH_TOP_SEQ_MESSAGE:
         if (MonolithTop_UpdateMessage(screen->work, mtw) == TRUE &&
-            (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             MonolithTop_ClearMessage(mtw);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             *state = MONOLITH_TOP_SEQ_INPUT;
@@ -245,7 +245,7 @@ static void MonolithTop_CreateTexts(MonolithScreenParam *screen, MonolithTopWork
             screen->work, &mtw->texts[i], 1, item->width, item->x, item->y, item->msgId, NULL,
             sMonolithTopTextColors[sMonolithTopEnabled[mtw->mode * MONOLITH_TOP_ENABLED_ROW + i]]);
     }
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         MonolithTool_SetTextCursor(screen, mtw->texts, MONOLITH_TOP_ITEM_COUNT, mtw->cursor, MONOLITH_TOP_PANEL);
         mtw->touching = FALSE;
     } else {
@@ -327,14 +327,14 @@ static void MonolithTop_ClearMessage(MonolithTopWork *mtw) {
 
 static BOOL MonolithTop_Input(MonolithScreenParam *screen, MonolithTopWork *mtw) {
     BOOL picked = FALSE;
-    int hit = func_0203da0c(sMonolithTopTouchRects);
+    int hit = GFL_HIDGetTouchPressedRect(sMonolithTopTouchRects);
     u32 typed;
     int pressed;
 
     if (hit != TOUCH_RECT_NONE) {
         mtw->cursor = hit;
         mtw->picked = hit;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         mtw->touching = FALSE;
         if (sMonolithTopEnabled[mtw->mode * MONOLITH_TOP_ENABLED_ROW + hit] == TRUE) {
             picked = TRUE;
@@ -346,7 +346,7 @@ static BOOL MonolithTop_Input(MonolithScreenParam *screen, MonolithTopWork *mtw)
         typed = GCTX_HIDGetTypedKeys();
         pressed = GCTX_HIDGetPressedKeys();
         if (pressed > 0 && mtw->touching == TRUE) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             mtw->touching = FALSE;
             MonolithTool_SetTextCursor(screen, mtw->texts, MONOLITH_TOP_ITEM_COUNT, mtw->cursor, MONOLITH_TOP_PANEL);
             GFL_SndSEPlay(SEQ_SE_SELECT1);

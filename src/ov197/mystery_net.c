@@ -281,8 +281,8 @@ u32 MysteryNet_GetRecvData(MysteryNet *net, void *buffer, u32 size) {
 u32 MysteryNet_GetError(MysteryNet *net) {
     u32 error = MYSTERY_NET_ERROR_NONE;
 
-    if (func_02042788()) {
-        switch (func_02042e84()->bNetType) {
+    if (GFL_NetIsInitialized()) {
+        switch (GFL_NetGetInitData()->bNetType) {
         case 0:
         case 5:
             error = MysteryNet_CheckErrorWireless(net);
@@ -311,7 +311,7 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
     u32 error = MYSTERY_NET_ERROR_NONE;
 
     if (GFL_NetErrCheck()) {
-        switch (func_02042540()->unk4) {
+        switch (NetState_GetErrorInfo()->unk4) {
         case 1:
         case 2:
         case 3:
@@ -321,7 +321,7 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
             if (net->download.initialized == TRUE) {
                 return error;
             }
-            func_020424e4();
+            NetState_ClearWifiError();
             DWC_ClearError();
             GFL_NetErrShutdown();
             GFL_NetErrShowScreen();
@@ -329,7 +329,7 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
             error = MYSTERY_NET_ERROR_FATAL;
             break;
         case 7:
-            func_020424e4();
+            NetState_ClearWifiError();
             GFL_NetErrAbort();
             error = 3;
             break;
@@ -370,13 +370,13 @@ static void MysteryNet_WirelessStart(MysteryNetSeq *seq, int *state, void *work)
 
     switch (*state) {
     case 0:
-        func_020425ec(&sNetInit, NULL, net);
+        GFL_NetInit(&sNetInit, NULL, net);
         GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);
         *state = 1;
         break;
     case 1:
-        if (func_02042788()) {
-            func_02042ba8(TRUE, net->heapId);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetSetIconScreen(TRUE, net->heapId);
             net->wifiWork = WihDwc_Create(4, net->heapId);
             func_02042968();
             *state = 2;
@@ -399,7 +399,7 @@ static void MysteryNet_WirelessEnd(MysteryNetSeq *seq, int *state, void *work) {
         *state = 1;
         break;
     case 1:
-        if (func_02042860(MysteryNet_OnExit)) {
+        if (GFL_NetExit(MysteryNet_OnExit)) {
             *state = 2;
         } else {
             *state = 3;
@@ -446,8 +446,8 @@ static void MysteryNet_BeaconStart(MysteryNetSeq *seq, int *state, void *work) {
         *state = 1;
         break;
     case 1:
-        if (func_02042788()) {
-            func_02042ba8(TRUE, net->heapId);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetSetIconScreen(TRUE, net->heapId);
             GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
             *state = 2;
         }
@@ -467,7 +467,7 @@ static void MysteryNet_BeaconEnd(MysteryNetSeq *seq, int *state, void *work) {
         *state = 1;
         break;
     case 1:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             *state = 2;
         }
         break;
@@ -508,8 +508,8 @@ static void MysteryNet_IrcStart(MysteryNetSeq *seq, int *state, void *work) {
         *state = 1;
         break;
     case 1:
-        if (func_02042788()) {
-            func_02042ba8(TRUE, net->heapId);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetSetIconScreen(TRUE, net->heapId);
             *state = 2;
         }
         break;
@@ -528,7 +528,7 @@ static void MysteryNet_IrcEnd(MysteryNetSeq *seq, int *state, void *work) {
         *state = 1;
         break;
     case 1:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             *state = 2;
         }
         break;
@@ -665,7 +665,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
     case 6:
         NdReportResults();
         if (download->timeout++ > 7200) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             net->result = MYSTERY_NET_RECV_ERROR;
             MysteryNetDownload_Cleanup(download, 3, state, 7, 7);
         }
@@ -708,7 +708,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
     case DOWNLOAD_WAIT:
         NdReportResults();
         if (download->timeout++ > 7200) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             net->result = MYSTERY_NET_RECV_ERROR;
             MysteryNetDownload_Cleanup(download, 3, state, 9, 9);
         }
@@ -729,7 +729,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
     case DOWNLOAD_WAIT_CLEANUP:
         NdReportResults();
         if (download->timeout++ > 7200) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             *state = download->nextState;
         }
         if (sNdState.done) {
@@ -749,14 +749,14 @@ static void MysteryNet_WifiEnd(MysteryNetSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        if (func_02042860(NULL)) {
+        if (GFL_NetExit(NULL)) {
             *state = 1;
         } else {
             *state = 2;
         }
         break;
     case 1:
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             net->exited = FALSE;
             *state = 2;
         }

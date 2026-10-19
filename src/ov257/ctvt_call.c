@@ -205,8 +205,8 @@ void CtvtCall_Delete(CommTvtWork *sys, CtvtCall *call) {
 // The resources of the actors are the system's: characters, palette and cells
 static inline void CtvtCall_CreateActor(CommTvtWork *sys, ClActor **actor, int chars, int palette, int cells,
                                         const ClActorSetup *setup, HeapID heapId) {
-    *actor = func_0204c040(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
-                           CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
+    *actor = ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
+                            CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
 }
 
 void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
@@ -230,20 +230,20 @@ void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
         setup.sequence = 8;
         setup.priority = 32;
         CtvtCall_CreateActor(sys, &call->rows[i].frame, 5, 1, 9, &setup, heapId);
-        func_0204c124(call->rows[i].frame, FALSE);
+        ClActor_SetVisible(call->rows[i].frame, FALSE);
         func_0204c520(call->rows[i].frame, TRUE);
 
         setup.x = 18;
         setup.sequence = CALL_CHECK_OFF;
         setup.priority = 16;
         CtvtCall_CreateActor(sys, &call->rows[i].check, 5, 1, 9, &setup, heapId);
-        func_0204c124(call->rows[i].check, FALSE);
+        ClActor_SetVisible(call->rows[i].check, FALSE);
 
         setup.x = 200;
         setup.sequence = 18;
         setup.priority = 16;
         CtvtCall_CreateActor(sys, &call->rows[i].camera, 5, 1, 9, &setup, heapId);
-        func_0204c124(call->rows[i].camera, FALSE);
+        ClActor_SetVisible(call->rows[i].camera, FALSE);
     }
 
     setup.x = 224;
@@ -256,14 +256,14 @@ void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
     setup.priority = 0;
     setup.bgPriority = 0;
     CtvtCall_CreateActor(sys, &call->returnButton, 6, 2, 10, &setup, heapId);
-    func_0204c124(call->returnButton, TRUE);
+    ClActor_SetVisible(call->returnButton, TRUE);
     func_0204c520(call->returnButton, TRUE);
 
     setup.x = 248;
     setup.y = 24;
     setup.sequence = 12;
     CtvtCall_CreateActor(sys, &call->scrollBar, 5, 1, 9, &setup, heapId);
-    func_0204c124(call->scrollBar, FALSE);
+    ClActor_SetVisible(call->scrollBar, FALSE);
 
     for (j = 0; j < CTVT_CALL_ENTRIES; j++) {
         call->entries[j].active = FALSE;
@@ -307,7 +307,7 @@ void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
     GFL_BGSysMoveBGReq(6, 3, 0);
 
     if ((param->unk4 == 2 || param->unk4 == 3) && CommTvt_CanExchangePhotos(sys) == FALSE) {
-        func_0204c488(call->returnButton, 15);
+        ClActor_SetSequence(call->returnButton, 15);
         CtvtCall_PrintInfo(sys, call, 24);
         call->showInfo = TRUE;
         call->menuMode = CALL_MENU_WAIT;
@@ -335,13 +335,13 @@ void CtvtCall_Leave(CommTvtWork *sys, CtvtCall *call) {
     BmpWin_Free(call->msgWin);
     CtvtCall_ClearWindow(call->infoWin);
     BmpWin_Free(call->infoWin);
-    func_0204c108(call->scrollBar);
-    func_0204c108(call->returnButton);
+    ClActor_Delete(call->scrollBar);
+    ClActor_Delete(call->returnButton);
     for (i = 0; i < CTVT_CALL_ROWS; i++) {
         BmpWin_Free(call->rows[i].window);
-        func_0204c108(call->rows[i].camera);
-        func_0204c108(call->rows[i].check);
-        func_0204c108(call->rows[i].frame);
+        ClActor_Delete(call->rows[i].camera);
+        ClActor_Delete(call->rows[i].check);
+        ClActor_Delete(call->rows[i].frame);
     }
     for (i = 0; i < CTVT_CALL_ENTRIES; i++) {
         GFL_HeapFree(call->entries[i].beacon);
@@ -406,7 +406,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         break;
     case CALL_STATE_DECIDED:
         if (call->menuMode == CALL_MENU_NONE || call->menuMode == CALL_MENU_BACK) {
-            if (func_0204c560(call->returnButton) == FALSE) {
+            if (ClActor_IsAnimActive(call->returnButton) == FALSE) {
                 CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
                 call->menuMode = CALL_MENU_NONE;
                 call->state = CALL_STATE_LEAVE;
@@ -451,7 +451,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
                 beacon->inviteOnly = TRUE;
                 CtvtComm_StartInviteTimer(sys, comm);
             }
-            func_0204c488(call->returnButton, 15);
+            ClActor_SetSequence(call->returnButton, 15);
         }
         break;
     case CALL_STATE_JOINING:
@@ -493,7 +493,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         break;
     }
     case CALL_STATE_FAILED:
-        if (func_0203da48() == TRUE) {
+        if (GFL_HIDIsTouchPressed() == TRUE) {
             if (CommTvt_GetParam(sys)->unk4 == 2) {
                 CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
                 call->menuMode = CALL_MENU_NONE;
@@ -509,7 +509,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
                 BmpWin_ClearFrame(call->infoWin, 1);
                 CtvtCall_ClearWindow(call->infoWin);
                 func_ov257_021aaeb0(sys);
-                func_0204c488(call->returnButton, 1);
+                ClActor_SetSequence(call->returnButton, 1);
                 call->menuMode = CALL_MENU_RESET;
             }
         }
@@ -530,7 +530,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         if (call->photoTimer > 0) {
             call->photoTimer--;
         }
-        if (func_0203da48() == TRUE || func_ov257_021aab34(sys) == TRUE || call->photoTimer <= 0) {
+        if (GFL_HIDIsTouchPressed() == TRUE || func_ov257_021aab34(sys) == TRUE || call->photoTimer <= 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             BmpWin_ClearFrame(call->msgWin, 1);
             CtvtCall_ClearWindow(call->msgWin);
@@ -538,7 +538,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
             call->msgWin = BmpWin_CreateDynamic(4, 1, 21, 21, 2, 10, TRUE);
             CommTvt_ClearCanExchangePhotos(sys);
             if (param->unk4 == 2 || param->unk4 == 3) {
-                func_0204c488(call->returnButton, 15);
+                ClActor_SetSequence(call->returnButton, 15);
                 if (CommTvt_GetMemberCount(sys) < 2) {
                     CtvtCall_PrintInfo(sys, call, 24);
                 }
@@ -551,7 +551,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
 
                 call->state = CALL_STATE_LIST;
                 call->menuMode = CALL_MENU_RESET;
-                func_0204c488(call->returnButton, 1);
+                ClActor_SetSequence(call->returnButton, 1);
                 heapId = CommTvt_GetHeapId(sys);
                 arc = CommTvt_GetArc(sys);
                 GFL_BGSysLoadArcNCGRStatic(arc, 12, 4, 0, 0x2800, FALSE, heapId);
@@ -591,16 +591,16 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
 
                     if (call->entries[i].selected == TRUE && call->entries[i].memberCount < CTVT_CALL_MEMBERS_MAX &&
                         (call->joinTarget == CTVT_CALL_NONE || call->joinTarget == i)) {
-                        func_0204c488(row->check, CALL_CHECK_ON);
+                        ClActor_SetSequence(row->check, CALL_CHECK_ON);
                     } else if (inviteCount == CTVT_CALL_INVITES || call->joinTarget != CTVT_CALL_NONE ||
                                call->entries[i].memberCount == CTVT_CALL_MEMBERS_MAX) {
-                        func_0204c488(row->check, CALL_CHECK_DISABLED);
+                        ClActor_SetSequence(row->check, CALL_CHECK_DISABLED);
                     } else {
-                        func_0204c488(row->check, CALL_CHECK_OFF);
+                        ClActor_SetSequence(row->check, CALL_CHECK_OFF);
                     }
                     if (call->entries[i].changed == TRUE) {
                         call->entries[i].changed = FALSE;
-                        func_0204c488(row->frame, 34);
+                        ClActor_SetSequence(row->frame, 34);
                     }
                 }
             }
@@ -661,8 +661,8 @@ BOOL CtvtCall_IsBlackWhite(CommTvtWork *sys, CtvtCall *call, const u8 *mac) {
 static void CtvtCall_UpdateTouch(CommTvtWork *sys, CtvtCall *call) {
     u32 tapX, tapY;
     u32 touchX, touchY;
-    BOOL tapped = func_0203dac8(&tapX, &tapY);
-    BOOL touching = func_0203da84(&touchX, &touchY);
+    BOOL tapped = GFL_HIDGetTouchPressedPoint(&tapX, &tapY);
+    BOOL touching = GFL_HIDGetTouchHeldPoint(&touchX, &touchY);
     CtvtComm *comm = CommTvt_GetComm(sys);
 
     if (tapped == TRUE) {
@@ -730,7 +730,7 @@ static void CtvtCall_UpdateTouch(CommTvtWork *sys, CtvtCall *call) {
         } else if (tapX >= 236 && tapX <= 260 && tapY >= call->scrollBarY + 12 && tapY <= call->scrollBarY + 36 &&
                    call->rowCount > CTVT_CALL_VISIBLE_ROWS) {
             call->scrollBarHeld = TRUE;
-            func_0204c488(call->scrollBar, 13);
+            ClActor_SetSequence(call->scrollBar, 13);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
     }
@@ -749,13 +749,13 @@ static void CtvtCall_UpdateTouch(CommTvtWork *sys, CtvtCall *call) {
             call->scrollBarY = y;
             pos.x = 248;
             pos.y = call->scrollBarY + 24;
-            func_0204c140(call->scrollBar, &pos, 1);
+            ClActor_SetSurfacePos(call->scrollBar, &pos, 1);
             call->scrollY = call->scrollBarY * range / CTVT_CALL_SCROLL_BAR_RANGE;
             call->listDirty = TRUE;
         }
     } else {
         call->scrollBarHeld = FALSE;
-        func_0204c488(call->scrollBar, 12);
+        ClActor_SetSequence(call->scrollBar, 12);
     }
 
     if (call->menu != NULL && AppTaskMenuWin_IsTouched(call->menu) == TRUE) {
@@ -766,10 +766,10 @@ static void CtvtCall_UpdateTouch(CommTvtWork *sys, CtvtCall *call) {
             GFL_SEPlayKeepVol(SEQ_SE_SYS_71, 2);
         }
     }
-    if (func_0203da0c(sReturnButton) == 0 || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B)) {
+    if (GFL_HIDGetTouchPressedRect(sReturnButton) == 0 || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B)) {
         call->state = CALL_STATE_DECIDED;
         call->menuMode = CALL_MENU_BACK;
-        func_0204c488(call->returnButton, 9);
+        ClActor_SetSequence(call->returnButton, 9);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     }
 }
@@ -794,11 +794,11 @@ static void CtvtCall_Scan(CommTvtWork *sys, CtvtCall *call) {
         for (i = 0; i < 16; i++) {
             BOOL found = FALSE;
             BOOL replace = FALSE;
-            void *beacon = func_020428a8(i);
+            void *beacon = GFL_NetGetBeaconData(i);
 
             if (beacon != NULL) {
                 int slot = CTVT_CALL_NONE;
-                u8 *mac = func_020428c8(i);
+                u8 *mac = GFL_NetGetBeaconMac(i);
                 u8 service = func_ov030_02173b78(i);
                 BOOL friend;
                 u8 j, k;
@@ -971,7 +971,7 @@ static void CtvtCall_DrawRows(CommTvtWork *sys, CtvtCall *call) {
         if (count > CTVT_CALL_VISIBLE_ROWS) {
             u32 range = (count - CTVT_CALL_VISIBLE_ROWS) * CTVT_CALL_ROW_HEIGHT;
 
-            func_0204c124(call->scrollBar, TRUE);
+            ClActor_SetVisible(call->scrollBar, TRUE);
             if (call->scrollY > range) {
                 call->scrollY = range;
             }
@@ -981,10 +981,10 @@ static void CtvtCall_DrawRows(CommTvtWork *sys, CtvtCall *call) {
 
                 pos.x = 248;
                 pos.y = call->scrollBarY + 24;
-                func_0204c140(call->scrollBar, &pos, 1);
+                ClActor_SetSurfacePos(call->scrollBar, &pos, 1);
             }
         } else {
-            func_0204c124(call->scrollBar, FALSE);
+            ClActor_SetVisible(call->scrollBar, FALSE);
             call->scrollY = 0;
             call->listDirty = TRUE;
         }
@@ -1078,9 +1078,9 @@ static void CtvtCall_DrawRow(CommTvtWork *sys, CtvtCall *call, CtvtCallRow *row,
 }
 
 static inline void CtvtCall_HideRow(CtvtCallRow *row) {
-    func_0204c124(row->frame, FALSE);
-    func_0204c124(row->check, FALSE);
-    func_0204c124(row->camera, FALSE);
+    ClActor_SetVisible(row->frame, FALSE);
+    ClActor_SetVisible(row->check, FALSE);
+    ClActor_SetVisible(row->camera, FALSE);
 }
 
 static void CtvtCall_UpdateRowActors(CommTvtWork *sys, CtvtCall *call, CtvtCallRow *row, u8 index) {
@@ -1096,18 +1096,18 @@ static void CtvtCall_UpdateRowActors(CommTvtWork *sys, CtvtCall *call, CtvtCallR
 
         pos.x = 128;
         pos.y = y + 16;
-        func_0204c140(row->frame, &pos, 1);
-        func_0204c124(row->frame, TRUE);
+        ClActor_SetSurfacePos(row->frame, &pos, 1);
+        ClActor_SetVisible(row->frame, TRUE);
         pos.x = 18;
-        func_0204c140(row->check, &pos, 1);
-        func_0204c124(row->check, TRUE);
+        ClActor_SetSurfacePos(row->check, &pos, 1);
+        ClActor_SetVisible(row->check, TRUE);
         pos.x = 200;
-        func_0204c140(row->camera, &pos, 1);
+        ClActor_SetSurfacePos(row->camera, &pos, 1);
         if (call->entries[row->entry].cameraEnabled == TRUE) {
-            func_0204c488(call->rows[index].camera, 18);
-            func_0204c124(row->camera, TRUE);
+            ClActor_SetSequence(call->rows[index].camera, 18);
+            ClActor_SetVisible(row->camera, TRUE);
         } else {
-            func_0204c124(row->camera, FALSE);
+            ClActor_SetVisible(row->camera, FALSE);
         }
     } else {
         CtvtCall_HideRow(row);

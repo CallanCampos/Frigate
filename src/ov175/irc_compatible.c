@@ -423,7 +423,7 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
             isNewTrainer = TRUE;
         }
         CompatibleIrcSys_BuildProfile(wk->param->gsys, &mine);
-        if (func_02042bc4()) {
+        if (GFL_NetIsParent()) {
             date = mine.date;
         } else {
             date = wk->profile->date;

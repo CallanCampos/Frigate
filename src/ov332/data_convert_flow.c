@@ -1085,7 +1085,7 @@ static void DataConvert_SeqWifiLogin(KeySystemSeq *seq, int *state, void *work) 
         KeySystem_Setup(wk, HEAPID_KEY_SYSTEM);
         KeySystemBG_LoadScreen(wk->bg, 2, 0);
         KeySystemBG_StartFade(wk->bg, KEY_SYSTEM_BG_FADE_2_TO_0, 1);
-        func_02042ba8(TRUE, HEAPID_KEY_SYSTEM);
+        GFL_NetSetIconScreen(TRUE, HEAPID_KEY_SYSTEM);
         (*state)++;
         break;
     case 3:
@@ -1167,7 +1167,7 @@ static void DataConvert_SeqEnterId(KeySystemSeq *seq, int *state, void *work) {
         KeySystem_Setup(wk, HEAPID_KEY_SYSTEM);
         KeySystemBG_LoadScreen(wk->bg, 2, 0);
         KeySystemBG_StartFade(wk->bg, KEY_SYSTEM_BG_FADE_2_TO_0, 1);
-        func_02042ba8(TRUE, HEAPID_KEY_SYSTEM);
+        GFL_NetSetIconScreen(TRUE, HEAPID_KEY_SYSTEM);
         (*state)++;
         break;
     case 3:

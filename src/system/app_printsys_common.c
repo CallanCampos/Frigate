@@ -56,14 +56,14 @@ BOOL AppPrintsysCommon_IsPressed(u32 flags) {
     }
     if (flags & APP_PRINTSYS_COMMON_KEYS) {
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             pressed = TRUE;
         }
     }
     if (flags & APP_PRINTSYS_COMMON_TOUCH) {
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             pressed = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     }
     return pressed;
@@ -81,7 +81,7 @@ static BOOL AppPrintsysCommon_IsHeld(u32 flags) {
         }
     }
     if (flags & APP_PRINTSYS_COMMON_TOUCH) {
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             held = TRUE;
         }
     }
@@ -100,7 +100,7 @@ static BOOL AppPrintsysCommon_IsReleased(u32 flags) {
         }
     }
     if (flags & APP_PRINTSYS_COMMON_TOUCH) {
-        if (func_0203da2c() == FALSE) {
+        if (GFL_HIDIsTouchHeld() == FALSE) {
             released = TRUE;
         }
     }

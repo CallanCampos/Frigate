@@ -240,22 +240,22 @@ static DemoParticle *ShinkaDemoParticle_Create(HeapID heapId, u16 count, const D
     particle->events = events;
     particle->active = FALSE;
     particle->stopTimer = -1;
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     for (i = 0; i < DEMO_PARTICLE_UNIT_COUNT; i++) {
         particle->units[i].system =
-            func_0204f980(particle->units[i].buffer, DEMO_PARTICLE_BUFFER_SIZE, TRUE, 5, 6, 0x3b, heapId);
-        func_02050178(particle->units[i].system);
-        func_020500cc(particle->units[i].system, &projection, FX32_CONST(2), &cameraPosition, &cameraUp, &cameraTarget,
-                      heapId);
-        resource = func_0204fdf8(sParticleResources[i].arcId, sParticleResources[i].fileId, heapId);
-        particle->units[i].resourceCount = func_020503f0(resource);
-        func_0204fe04(particle->units[i].system, resource, TRUE, FALSE);
+            Particle_CreateSystemEx(particle->units[i].buffer, DEMO_PARTICLE_BUFFER_SIZE, TRUE, 5, 6, 0x3b, heapId);
+        Particle_FreeCamera(particle->units[i].system);
+        Particle_SetCamera(particle->units[i].system, &projection, FX32_CONST(2), &cameraPosition, &cameraUp,
+                           &cameraTarget, heapId);
+        resource = Particle_ReadResource(sParticleResources[i].arcId, sParticleResources[i].fileId, heapId);
+        particle->units[i].resourceCount = Particle_GetResourceEmitterCount(resource);
+        Particle_SetResource(particle->units[i].system, resource, TRUE, FALSE);
     }
     return particle;
 }
 
 static void ShinkaDemoParticle_Free(DemoParticle *particle) {
-    func_0204fb4c();
+    Particle_Free();
     GFL_HeapFree(particle);
 }
 
@@ -268,22 +268,22 @@ static void ShinkaDemoParticle_Update(DemoParticle *particle) {
             if (particle->frame != particle->events[particle->index].frame) {
                 break;
             }
-            func_0205006c(particle->units[particle->events[particle->index].unit].system,
-                          particle->events[particle->index].emitter, &pos);
+            Particle_CreateEmitter(particle->units[particle->events[particle->index].unit].system,
+                                   particle->events[particle->index].emitter, &pos);
             particle->index++;
         }
         particle->frame++;
     }
     if (particle->stopTimer >= 0) {
         if (particle->stopTimer == 0) {
-            func_020500b0(particle->units[0].system);
+            Particle_DeleteAllEmitters(particle->units[0].system);
         }
         particle->stopTimer--;
     }
 }
 
 static void ShinkaDemoParticle_Draw(DemoParticle *particle) {
-    func_0204f954();
+    Particle_DrawAndUpdateAll();
 }
 
 static void ShinkaDemoParticle_Start(DemoParticle *particle) {

@@ -415,7 +415,7 @@ static void FMissionView_DrawAll(FMissionView *view) {
         BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_PASS_POWER],
                                 BUTTON_ANIM(FMISSION_VIEW_BUTTON_PASS_POWER, FMISSION_VIEW_BUTTON_STATE_DISABLED));
     }
-    func_02042ba8(FALSE, view->tmpHeapId);
+    GFL_NetSetIconScreen(FALSE, view->tmpHeapId);
     FMissionView_DrawMission(view);
     FMissionView_DrawMemberCount(view, &view->memberPending);
 }
@@ -425,7 +425,7 @@ static int FMissionView_CheckTouch(FMissionView *view) {
     FMissionViewTouch touch;
     int button;
 
-    if (!func_0203dac8(&touch.x, &touch.y)) {
+    if (!GFL_HIDGetTouchPressedPoint(&touch.x, &touch.y)) {
         return SEQ_MAIN;
     }
     button = FMissionView_GetTouchedButton(view, &touch);
@@ -457,7 +457,7 @@ static int FMissionView_GetHeldScroll(FMissionView *view) {
     FMissionViewTouch touch;
     u32 arrow;
 
-    if (!func_0203da84(&touch.x, &touch.y)) {
+    if (!GFL_HIDGetTouchHeldPoint(&touch.x, &touch.y)) {
         return -1;
     }
     arrow = FMissionView_GetTouchedButton(view, &touch) - FMISSION_VIEW_BUTTON_UP;
@@ -557,7 +557,7 @@ void FMissionView_SetButtonState(FMissionView *view, u32 button, u32 state) {
 }
 
 BOOL FMissionView_IsButtonAnimating(FMissionView *view, int button) {
-    return func_0204c560(view->buttons[button]);
+    return ClActor_IsAnimActive(view->buttons[button]);
 }
 
 void FMissionView_TransferPanels(FMissionView *view) {
@@ -663,7 +663,7 @@ static int FMissionView_GetTouchedButton(FMissionView *view, FMissionViewTouch *
         scroll |= 2;
     }
     for (i = 0; i < FMISSION_VIEW_BUTTON_COUNT; i++) {
-        if ((u8)(func_0204c4a0(view->buttons[i]) - (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT) %
+        if ((u8)(ClActor_GetSequence(view->buttons[i]) - (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT) %
                 FMISSION_VIEW_BUTTON_STATE_COUNT >=
             FMISSION_VIEW_BUTTON_STATE_DISABLED) {
             continue;
@@ -675,7 +675,7 @@ static int FMissionView_GetTouchedButton(FMissionView *view, FMissionViewTouch *
         rects[0].bottom = rects[0].top + BUTTON_SIZE;
         rects[0].left = sFMissionViewButtons[i].x;
         rects[0].right = rects[0].left + BUTTON_SIZE;
-        if (func_0203dadc(rects, touch->x, touch->y) == TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchRectAt(rects, touch->x, touch->y) == TOUCH_RECT_NONE) {
             continue;
         }
         if (sFMissionViewButtons[i].scroll == 0) {
@@ -721,26 +721,26 @@ static void FMissionView_DrawMemberCount(FMissionView *view, int *pending) {
 
 // Shows or hides the buttons that a menu covers
 static void FMissionView_SetButtonsVisible(FMissionView *view, BOOL visible) {
-    func_0204c124(view->buttons[FMISSION_VIEW_BUTTON_PASS_POWER], visible);
-    func_0204c124(view->buttons[FMISSION_VIEW_BUTTON_GREETING], visible);
-    func_0204c124(view->buttons[FMISSION_VIEW_BUTTON_QUIT], visible);
-    func_0204c124(view->buttons[FMISSION_VIEW_BUTTON_UP], visible);
-    func_0204c124(view->buttons[FMISSION_VIEW_BUTTON_DOWN], visible);
+    ClActor_SetVisible(view->buttons[FMISSION_VIEW_BUTTON_PASS_POWER], visible);
+    ClActor_SetVisible(view->buttons[FMISSION_VIEW_BUTTON_GREETING], visible);
+    ClActor_SetVisible(view->buttons[FMISSION_VIEW_BUTTON_QUIT], visible);
+    ClActor_SetVisible(view->buttons[FMISSION_VIEW_BUTTON_UP], visible);
+    ClActor_SetVisible(view->buttons[FMISSION_VIEW_BUTTON_DOWN], visible);
 }
 
 // Shows each arrow as usable or not, by whether the list can scroll its way
 static void FMissionView_UpdateArrows(FMissionView *view) {
     if (view->logTop == 0) {
-        func_0204c488(view->buttons[FMISSION_VIEW_BUTTON_UP], ANIM_UP_END);
+        ClActor_SetSequence(view->buttons[FMISSION_VIEW_BUTTON_UP], ANIM_UP_END);
     } else {
-        func_0204c488(view->buttons[FMISSION_VIEW_BUTTON_UP],
-                      BUTTON_ANIM(FMISSION_VIEW_BUTTON_UP, FMISSION_VIEW_BUTTON_STATE_NORMAL));
+        ClActor_SetSequence(view->buttons[FMISSION_VIEW_BUTTON_UP],
+                            BUTTON_ANIM(FMISSION_VIEW_BUTTON_UP, FMISSION_VIEW_BUTTON_STATE_NORMAL));
     }
     if (view->logTop + view->logVisible < view->logCount) {
-        func_0204c488(view->buttons[FMISSION_VIEW_BUTTON_DOWN],
-                      BUTTON_ANIM(FMISSION_VIEW_BUTTON_DOWN, FMISSION_VIEW_BUTTON_STATE_NORMAL));
+        ClActor_SetSequence(view->buttons[FMISSION_VIEW_BUTTON_DOWN],
+                            BUTTON_ANIM(FMISSION_VIEW_BUTTON_DOWN, FMISSION_VIEW_BUTTON_STATE_NORMAL));
     } else {
-        func_0204c488(view->buttons[FMISSION_VIEW_BUTTON_DOWN], ANIM_DOWN_END);
+        ClActor_SetSequence(view->buttons[FMISSION_VIEW_BUTTON_DOWN], ANIM_DOWN_END);
     }
 }
 
@@ -753,12 +753,12 @@ static void FMissionViewPanel_SetVisible(FMissionViewPanel *panel, BOOL visible)
     if (!visible) {
         FMissionViewPanel_SetMarkVisible(panel, visible);
     }
-    func_0204c124(panel->icon, visible);
-    func_0204c124(panel->frame, visible);
+    ClActor_SetVisible(panel->icon, visible);
+    ClActor_SetVisible(panel->frame, visible);
 }
 
 static void FMissionViewPanel_SetMarkVisible(FMissionViewPanel *panel, BOOL visible) {
-    func_0204c124(panel->markActor, visible);
+    ClActor_SetVisible(panel->markActor, visible);
 }
 
 static void FMissionViewPanel_Clear(FMissionViewPanel *panel) {
@@ -814,8 +814,8 @@ static void FMissionView_LoadPanelIcon(FMissionView *view, FMissionViewPanel *pa
     if (!panel->own) {
         u8 color;
 
-        func_0204ba40(view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CHARS].ids[panel->index],
-                      view->iconChars[panel->look].data);
+        ClActSys_ReplaceCharData(view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CHARS].ids[panel->index],
+                                 view->iconChars[panel->look].data);
         color = sFMissionViewLookPalettes[panel->look] * 16;
         PaletteFade_LoadData(view->fade, &view->iconPalettes[color], PALFADE_BUFFER_SUB_OBJ,
                              (panel->index + PANEL_ICON_PALETTE) * 16, 0x20);

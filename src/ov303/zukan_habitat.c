@@ -458,7 +458,7 @@ static void ZukanHabitat_SeqFadeOut(ZukanHabitatWork *wk) {
             wk->slideSub = 0;
             ZukanHabitatGraphic_StartFade(&wk->graphic, 16, 16);
             ZukanHabitat_ClearInfoLabel(wk);
-            func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO), FALSE);
+            ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO), FALSE);
             ZukanHabitatGraphic_SetNewMarksVisible(&wk->graphic, FALSE);
             backdrop = 0;
             GXS_LoadBGPltt(&backdrop, 0, sizeof(backdrop));
@@ -486,7 +486,7 @@ static void ZukanHabitat_SeqFadeOut(ZukanHabitatWork *wk) {
 
 static void ZukanHabitat_SeqList(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
-    int hit = func_0203da0c(sZukanHabitatListTouchRects);
+    int hit = GFL_HIDGetTouchPressedRect(sZukanHabitatListTouchRects);
 
     switch (hit) {
     case LIST_TOUCH_SHORTCUT:
@@ -624,19 +624,19 @@ static void ZukanHabitat_SeqLeaveCursor(ZukanHabitatWork *wk) {
 
     switch (wk->step) {
     case 0:
-        func_0204c4d4(actor, 0);
-        func_0204c488(actor, 9);
+        ClActor_SetAnimTime(actor, 0);
+        ClActor_SetSequence(actor, 9);
         func_0204c520(actor, TRUE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         wk->step++;
         break;
     case 1:
-        if (!GFL_SndPlayerIsActiveAny() && !func_0204c560(actor)) {
+        if (!GFL_SndPlayerIsActiveAny() && !ClActor_IsAnimActive(actor)) {
             ZukanHabitat_SetCursor(wk, wk->cursor, FALSE);
             ZukanHabitat_ShowListButtons(wk);
-            func_0204c488(actor, 1);
+            ClActor_SetSequence(actor, 1);
             func_0204c520(actor, TRUE);
-            func_0204c4d4(actor, 0);
+            ClActor_SetAnimTime(actor, 0);
             ZukanHabitat_SetSequence(wk, SEQ_LIST, ACTION_NONE);
         }
         break;
@@ -646,7 +646,7 @@ static void ZukanHabitat_SeqLeaveCursor(ZukanHabitatWork *wk) {
 // The cursor on the Pokémon, which chooses one to see in the Pokédex
 static void ZukanHabitat_SeqCursor(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
-    int hit = func_0203da0c(sZukanHabitatCursorTouchRects);
+    int hit = GFL_HIDGetTouchPressedRect(sZukanHabitatCursorTouchRects);
 
     switch (wk->step) {
     case 0:
@@ -743,7 +743,7 @@ static void ZukanHabitat_SeqInit(ZukanHabitatWork *wk) {
     switch (wk->step) {
     case 0:
         ZukanHabitatGraphic_FillWindow(ZUKAN_HABITAT_WIN_MAIN, 0, &wk->graphic);
-        func_02042ba8(TRUE, HEAPID_ZUKAN_HABITAT);
+        GFL_NetSetIconScreen(TRUE, HEAPID_ZUKAN_HABITAT);
         ZukanHabitat_LoadSave(wk);
         ZukanHabitat_CheckTypes(wk);
         ZukanHabitat_UpdateList(wk);
@@ -783,10 +783,10 @@ static void ZukanHabitat_SeqButton(ZukanHabitatWork *wk) {
     case 0:
         ZukanHabitatSave_SetZone(wk->habitat, ZukanHabitat_GetArea(wk)->zone);
         if (wk->action == ACTION_EXIT) {
-            func_0204c488(actor, 8);
+            ClActor_SetSequence(actor, 8);
             GFL_SndSEPlay(SEQ_SE_CLOSE1);
         } else if (wk->action == ACTION_RETURN) {
-            func_0204c488(actor, 9);
+            ClActor_SetSequence(actor, 9);
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
         } else if (wk->action == ACTION_INFO) {
             int species = ZukanHabitat_GetSpecies(wk, wk->cursor);
@@ -794,15 +794,15 @@ static void ZukanHabitat_SeqButton(ZukanHabitatWork *wk) {
             if (species >= 0) {
                 PokeDex_SetLastSpecies(wk->pokedex, species);
             }
-            func_0204c488(actor, 29);
+            ClActor_SetSequence(actor, 29);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         }
-        func_0204c4d4(actor, 0);
+        ClActor_SetAnimTime(actor, 0);
         func_0204c520(actor, TRUE);
         wk->step++;
         break;
     case 1:
-        if (!func_0204c560(actor)) {
+        if (!ClActor_IsAnimActive(actor)) {
             ZukanHabitat_SetSequence(wk, SEQ_FADE_OUT, ACTION_NONE);
         }
         break;
@@ -824,22 +824,22 @@ static void ZukanHabitat_SeqChangeSeason(ZukanHabitatWork *wk) {
 
     switch (wk->step) {
     case 0:
-        func_0204c56c(other);
-        func_0204c550(other);
+        ClActor_RestartAnim(other);
+        ClActor_StopAnim(other);
         if (wk->action == ACTION_LEFT) {
-            func_0204c488(pressed, 25);
+            ClActor_SetSequence(pressed, 25);
             wk->season--;
             if (wk->season < 0) {
                 wk->season = SEASON_COUNT - 1;
             }
         } else if (wk->action == ACTION_RIGHT) {
-            func_0204c488(pressed, 23);
+            ClActor_SetSequence(pressed, 23);
             wk->season++;
             if (wk->season >= SEASON_COUNT) {
                 wk->season = 0;
             }
         }
-        func_0204c504(pressed, 0);
+        ClActor_SetAnimFrame(pressed, 0);
         func_0204c520(pressed, TRUE);
         ZukanHabitat_UpdateList(wk);
         ZukanHabitat_UpdateTabs(wk);
@@ -848,21 +848,21 @@ static void ZukanHabitat_SeqChangeSeason(ZukanHabitatWork *wk) {
         // fallthrough
     case 1:
         if (ZukanHabitatGraphic_AreIconsLoaded(&wk->graphic) && !ZukanHabitatGraphic_IsPaletteRequested(&wk->graphic) &&
-            !func_0204c560(pressed)) {
+            !ClActor_IsAnimActive(pressed)) {
             if (wk->action == ACTION_LEFT) {
                 ClActor *right = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT);
 
-                func_0204c488(pressed, 24);
-                func_0204c56c(pressed);
-                func_0204c56c(right);
+                ClActor_SetSequence(pressed, 24);
+                ClActor_RestartAnim(pressed);
+                ClActor_RestartAnim(right);
             } else if (wk->action == ACTION_RIGHT) {
                 ClActor *left = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT);
 
-                func_0204c488(pressed, 22);
-                func_0204c56c(pressed);
-                func_0204c56c(left);
+                ClActor_SetSequence(pressed, 22);
+                ClActor_RestartAnim(pressed);
+                ClActor_RestartAnim(left);
             }
-            func_0204c540(other);
+            ClActor_StartAnim(other);
             ZukanHabitat_SetSequence(wk, SEQ_LIST, ACTION_NONE);
         }
         break;
@@ -896,10 +896,10 @@ static void ZukanHabitat_SeqChangeArea(ZukanHabitatWork *wk) {
                 wk->area = 0;
             }
         }
-        func_0204c4d4(actor, 0);
-        func_0204c488(actor, anim);
+        ClActor_SetAnimTime(actor, 0);
+        ClActor_SetSequence(actor, anim);
         func_0204c520(actor, TRUE);
-        func_0204c540(actor);
+        ClActor_StartAnim(actor);
         wk->step++;
         // fallthrough
     case 1:
@@ -934,15 +934,15 @@ static void ZukanHabitat_UpdateStamp(ZukanHabitatWork *wk) {
 
     switch (ZukanHabitatSave_GetHabitatField(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone), wk->type)) {
     case AWARD_NONE:
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
         break;
     case AWARD_SEEN:
         ZukanHabitatGraphic_StartActorAnim(&wk->graphic, ZUKAN_HABITAT_OBJ_STAMP, 39);
-        func_0204c468(actor, 1);
+        ClActor_SetBgPriority(actor, 1);
         break;
     case AWARD_CAUGHT:
         ZukanHabitatGraphic_StartActorAnim(&wk->graphic, ZUKAN_HABITAT_OBJ_STAMP, 38);
-        func_0204c468(actor, 1);
+        ClActor_SetBgPriority(actor, 1);
         break;
     }
 }
@@ -975,17 +975,17 @@ static void ZukanHabitat_SeqChangeType(ZukanHabitatWork *wk) {
         ZukanHabitat_UpdateStamp(wk);
         GFL_SndSEPlay(SEQ_SE_SELECT3);
         actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + wk->type);
-        func_0204c4d4(actor, 0);
-        func_0204c488(actor, anims[wk->type]);
+        ClActor_SetAnimTime(actor, 0);
+        ClActor_SetSequence(actor, anims[wk->type]);
         func_0204c520(actor, TRUE);
         wk->step++;
         break;
     case 1:
         actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + wk->type);
-        if (!func_0204c560(actor)) {
+        if (!ClActor_IsAnimActive(actor)) {
             func_0204c520(actor, FALSE);
-            func_0204c488(actor, anims[wk->type]);
-            func_0204c4d4(actor, 0);
+            ClActor_SetSequence(actor, anims[wk->type]);
+            ClActor_SetAnimTime(actor, 0);
             wk->step++;
         }
         break;
@@ -1166,7 +1166,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
         }
         break;
     case 2:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
             u32 award;
             int habitat;
             ZukanHabitatType type;
@@ -1195,7 +1195,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
         } else {
             ZukanHabitatGraphic_StartActorAnim(&wk->graphic, ZUKAN_HABITAT_OBJ_STAMP, 27);
         }
-        func_0204c468(actor, 0);
+        ClActor_SetBgPriority(actor, 0);
         wk->timer = 0;
         wk->step++;
         break;
@@ -1205,8 +1205,8 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
             GFL_SndSEPlay(SEQ_SE_SW_ZUKANSTUMP_01);
         }
         wk->timer++;
-        if (!func_0204c560(actor)) {
-            func_0204c468(actor, 1);
+        if (!ClActor_IsAnimActive(actor)) {
+            ClActor_SetBgPriority(actor, 1);
             wk->step++;
         }
         break;
@@ -1430,12 +1430,12 @@ static void ZukanHabitat_UpdateNewMarks(ZukanHabitatWork *wk) {
 static void ZukanHabitat_UpdateNewMark(ZukanHabitatWork *wk, u32 type, ClActor *actor) {
     if (wk->typeShown[type] == TRUE) {
         if (ZukanHabitat_GetTypeAward(wk, type) != AWARD_NONE) {
-            func_0204c124(actor, TRUE);
+            ClActor_SetVisible(actor, TRUE);
         } else {
-            func_0204c124(actor, FALSE);
+            ClActor_SetVisible(actor, FALSE);
         }
     } else {
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
     }
 }
 
@@ -1447,8 +1447,10 @@ static void ZukanHabitat_UpdateList(ZukanHabitatWork *wk) {
     }
     ZukanHabitat_LoadSpecies(wk);
     // The seasons' arrows show only where the seasons differ
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT), area->values[wk->type]);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT), area->values[wk->type]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT),
+                       area->values[wk->type]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT),
+                       area->values[wk->type]);
 }
 
 // Takes the cursor off its cell, and shows or hides it on another
@@ -1500,8 +1502,8 @@ static void ZukanHabitat_CheckTypes(ZukanHabitatWork *wk) {
         }
     }
     if (wk->areaCount <= 1) {
-        func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), FALSE);
-        func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), FALSE);
+        ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), FALSE);
+        ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), FALSE);
     }
 }
 
@@ -1509,49 +1511,51 @@ static void ZukanHabitat_HideListButtons(ZukanHabitatWork *wk) {
     ClActor *actor;
 
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_LAND);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_WATER);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_FISHING);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SHORTCUT);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_EXIT);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     ZukanHabitatGraphic_SetNewMarksVisible(&wk->graphic, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO);
-    func_0204c124(actor, TRUE);
+    ClActor_SetVisible(actor, TRUE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
     actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT);
-    func_0204c124(actor, FALSE);
+    ClActor_SetVisible(actor, FALSE);
 }
 
 static void ZukanHabitat_ShowListButtons(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
 
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_LAND),
-                  wk->typeShown[TYPE_LAND]);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_WATER),
-                  wk->typeShown[TYPE_WATER]);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_FISHING),
-                  wk->typeShown[TYPE_FISHING]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_LAND),
+                       wk->typeShown[TYPE_LAND]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_WATER),
+                       wk->typeShown[TYPE_WATER]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_FISHING),
+                       wk->typeShown[TYPE_FISHING]);
     if (wk->areaCount > 1) {
-        func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), TRUE);
-        func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), TRUE);
+        ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), TRUE);
+        ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), TRUE);
     } else {
-        func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), FALSE);
-        func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), FALSE);
+        ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), FALSE);
+        ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), FALSE);
     }
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SHORTCUT), TRUE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_EXIT), TRUE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT), area->values[wk->type]);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT), area->values[wk->type]);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO), FALSE);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SHORTCUT), TRUE);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_EXIT), TRUE);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT),
+                       area->values[wk->type]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT),
+                       area->values[wk->type]);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO), FALSE);
     ZukanHabitat_UpdateNewMarks(wk);
     ZukanHabitat_ClearInfoLabel(wk);
 }
@@ -1676,9 +1680,9 @@ static void ZukanHabitat_ShowInfoButton(ZukanHabitatWork *wk, BOOL known, BOOL s
 
     if (shown == FALSE) {
         ZukanHabitat_ClearInfoLabel(wk);
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
     } else {
-        func_0204c124(actor, TRUE);
+        ClActor_SetVisible(actor, TRUE);
         if (known == TRUE) {
             ZukanHabitat_PrintInfoLabel(wk, PRINT_COLOR(15, 1, 2));
             ZukanHabitatGraphic_StartActorAnim(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO, 28);

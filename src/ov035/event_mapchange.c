@@ -1704,7 +1704,7 @@ GameEventReturnCode EventEntralinkWarpIn_Callback(GameEvent *event, u32 *state, 
         if (!GameCommSys_BootCheck(comm)) {
             func_0202be00(comm);
             GameData_SetForceSeasonSync(wk->gameData, TRUE);
-            GameData_SetNetID(wk->gameData, func_0203ffc4());
+            GameData_SetNetID(wk->gameData, NetSystem_GetNetId());
             GameEvent_ChainNext(event, EventEntralinkWarp_Create(wk->gsys, wk->field, &wk->spawn));
             *state = 2;
         }

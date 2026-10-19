@@ -521,7 +521,7 @@ static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *w
     func_ov255_021d6150(wk);
     func_ov255_021d41c4(wk);
     func_ov255_021d434c(wk, 0);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
     return TRUE;
 }
@@ -681,10 +681,10 @@ static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapI
 
         wk->actors[i] =
             UIObjRes_CreateActor(&wk->objRes[data->res], unit, data_ov255_021d9394[i].x, data->y, data->anim, heapId);
-        func_0204c468(wk->actors[i], data->bgPriority);
-        func_0204c124(wk->actors[i], data->visible);
+        ClActor_SetBgPriority(wk->actors[i], data->bgPriority);
+        ClActor_SetVisible(wk->actors[i], data->visible);
         func_0204c520(wk->actors[i], TRUE);
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     GFL_BGSysLoadNCLRDefault(ARCID_BOX2, 94, 1, 9 * 0x20, 0x20, heapId);
 }
@@ -781,7 +781,7 @@ static void func_ov255_021d42d4(BoxSearchWork *wk) {
 
     func_ov255_021d4320(wk, FALSE);
     for (i = 6; i <= 10; i++) {
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     for (i = 1; i <= 6; i++) {
         BmpWin *window = wk->windows[i];
@@ -796,14 +796,14 @@ static void func_ov255_021d4320(BoxSearchWork *wk, BOOL visible) {
     u32 i;
 
     for (i = 0; i <= 10; i++) {
-        func_0204c124(wk->actors[i], visible);
+        ClActor_SetVisible(wk->actors[i], visible);
     }
     func_ov255_021d6b5c(wk, 22, visible);
 }
 
 // Starts the main menu
 static int func_ov255_021d434c(BoxSearchWork *wk, int seq) {
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         wk->cursorMove =
             CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, TRUE, wk->menuPos, wk->heapId);
         func_ov255_021d5abc(wk, wk->menuPos, wk->menuPos);
@@ -863,14 +863,14 @@ static int func_ov255_021d4484(BoxSearchWork *wk, int seq) {
         return func_ov255_021d5a70(wk, -1, 0, SEQ_END);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         CursorMove_SetPos(wk->cursorMove, 6);
         CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         return func_ov255_021d5a70(wk, 6, 11, 35);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         CursorMove_SetPos(wk->cursorMove, 7);
         CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         CursorMove_Delete(wk->cursorMove);
@@ -939,7 +939,7 @@ static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
             func_ov255_021d4248(wk, wk->msgData, 199);
             return 5;
         }
-        func_0204c124(wk->actors[11], FALSE);
+        ClActor_SetVisible(wk->actors[11], FALSE);
         if (func_ov255_021d6214(wk, wk->group - 1, 0) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return 5;
@@ -958,7 +958,7 @@ static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
         if (wk->param->syswk->search.species == 0) {
             func_ov255_021d6894(wk, 11, 8, 0);
         } else {
-            func_0204c124(wk->actors[11], FALSE);
+            ClActor_SetVisible(wk->actors[11], FALSE);
         }
         break;
     case -7:
@@ -988,7 +988,7 @@ static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
                     FrameList_SetCursor(wk->list, pos);
                     return 5;
                 }
-                func_0204c124(wk->actors[11], FALSE);
+                ClActor_SetVisible(wk->actors[11], FALSE);
                 if (func_ov255_021d6214(wk, wk->group - 1, 0) != 0) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     FrameList_SetCursor(wk->list, pos);
@@ -1054,7 +1054,7 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
     case 4:
     case 5:
     case 6:
-        if (wk->listCount > 7 || func_0203d554() == FALSE) {
+        if (wk->listCount > 7 || GCTX_HIDIsUsingTouch() == FALSE) {
             func_ov255_021d6a48(wk, CRITERION_SPECIES, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
             func_ov255_021d6828(wk, 11, ret);
             func_ov255_021d4248(wk, wk->speciesNames, wk->param->syswk->search.species);
@@ -1074,7 +1074,7 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
-        func_0204c124(wk->actors[11], FALSE);
+        ClActor_SetVisible(wk->actors[11], FALSE);
         scroll = FrameList_GetScroll(wk->list);
         count = func_ov255_021d6214(wk, wk->group - 1, wk->subGroup);
         if (count > 8) {
@@ -1100,7 +1100,7 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             func_ov255_021d6a48(wk, CRITERION_SPECIES, 0);
-            func_0204c124(wk->actors[11], FALSE);
+            ClActor_SetVisible(wk->actors[11], FALSE);
             func_ov255_021d4248(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         } else if (func_ov255_021d6cd4(wk) == TRUE) {
@@ -1198,7 +1198,7 @@ static int func_ov255_021d4be0(BoxSearchWork *wk, int seq) {
             if (FrameList_GetScroll(wk->list) == 0) {
                 func_ov255_021d6828(wk, 11, 0);
             } else {
-                func_0204c124(wk->actors[11], FALSE);
+                ClActor_SetVisible(wk->actors[11], FALSE);
             }
             func_ov255_021d4248(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1268,7 +1268,7 @@ static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
             func_ov255_021d4248(wk, wk->msgData, 199);
             return 17;
         }
-        func_0204c124(wk->actors[11], FALSE);
+        ClActor_SetVisible(wk->actors[11], FALSE);
         if (func_ov255_021d622c(wk->group - 1, 0) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return 17;
@@ -1287,7 +1287,7 @@ static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
         if (wk->param->syswk->search.ability == 0) {
             func_ov255_021d6894(wk, 11, 8, 0);
         } else {
-            func_0204c124(wk->actors[11], FALSE);
+            ClActor_SetVisible(wk->actors[11], FALSE);
         }
         break;
     case -7:
@@ -1316,7 +1316,7 @@ static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
                     FrameList_SetCursor(wk->list, pos);
                     return 17;
                 }
-                func_0204c124(wk->actors[11], FALSE);
+                ClActor_SetVisible(wk->actors[11], FALSE);
                 if (func_ov255_021d622c(wk->group - 1, 0) != 0) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     FrameList_SetCursor(wk->list, pos);
@@ -1382,7 +1382,7 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
     case 4:
     case 5:
     case 6:
-        if (wk->listCount > 7 || func_0203d554() == FALSE) {
+        if (wk->listCount > 7 || GCTX_HIDIsUsingTouch() == FALSE) {
             func_ov255_021d6a48(wk, CRITERION_ABILITY, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
             func_ov255_021d6828(wk, 11, ret);
             func_ov255_021d4248(wk, wk->abilityNames, wk->param->syswk->search.ability);
@@ -1402,7 +1402,7 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
-        func_0204c124(wk->actors[11], FALSE);
+        ClActor_SetVisible(wk->actors[11], FALSE);
         scroll = FrameList_GetScroll(wk->list);
         count = func_ov255_021d622c(wk->group - 1, wk->subGroup);
         if (count > 8) {
@@ -1428,7 +1428,7 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             func_ov255_021d6a48(wk, CRITERION_ABILITY, 0);
-            func_0204c124(wk->actors[11], FALSE);
+            ClActor_SetVisible(wk->actors[11], FALSE);
             func_ov255_021d4248(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         } else if (func_ov255_021d6cd4(wk) == TRUE) {
@@ -1487,7 +1487,7 @@ static int func_ov255_021d541c(BoxSearchWork *wk, int seq) {
     case 1:
     case 2:
     case 3:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             func_ov255_021d6a48(wk, CRITERION_SEX, ret);
             func_ov255_021d6828(wk, 11, ret);
             func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
@@ -1551,7 +1551,7 @@ static int func_ov255_021d55cc(BoxSearchWork *wk, int seq) {
     case 0:
     case 1:
     case 2:
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             func_ov255_021d6a48(wk, CRITERION_ITEM, ret);
             func_ov255_021d6828(wk, 11, ret);
             func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
@@ -1603,7 +1603,7 @@ static int func_ov255_021d5710(BoxSearchWork *wk, int seq) {
     func_ov255_021d4210(wk, 5);
     for (i = 0; i < 6; i++) {
         func_ov255_021d6828(wk, i + 11, i);
-        func_0204c124(wk->actors[i + 11], func_ov255_021d6aac(wk, i));
+        ClActor_SetVisible(wk->actors[i + 11], func_ov255_021d6aac(wk, i));
     }
     func_ov255_021d6ae8(wk, 22);
     func_ov255_021d6ae8(wk, 28);
@@ -1630,12 +1630,12 @@ static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
     case 3:
     case 4:
     case 5:
-        if (func_0203d554() != FALSE) {
+        if (GCTX_HIDIsUsingTouch() != FALSE) {
             break;
         }
         on = func_ov255_021d6aac(wk, ret) ^ 1;
         func_ov255_021d6a88(wk, ret, on);
-        func_0204c124(wk->actors[ret + 11], on);
+        ClActor_SetVisible(wk->actors[ret + 11], on);
         func_ov255_021d6ae8(wk, 22);
         func_ov255_021d6ae8(wk, 28);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1648,7 +1648,7 @@ static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             for (i = 0; i < 6; i++) {
                 func_ov255_021d6a88(wk, i, FALSE);
-                func_0204c124(wk->actors[i + 11], FALSE);
+                ClActor_SetVisible(wk->actors[i + 11], FALSE);
             }
             func_ov255_021d6ae8(wk, 22);
             func_ov255_021d6ae8(wk, 28);
@@ -1660,7 +1660,7 @@ static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
             if (pos >= 0 && pos <= 5) {
                 on = func_ov255_021d6aac(wk, pos) ^ 1;
                 func_ov255_021d6a88(wk, pos, on);
-                func_0204c124(wk->actors[pos + 11], on);
+                ClActor_SetVisible(wk->actors[pos + 11], on);
                 FrameList_SetCursor(wk->list, pos);
                 func_ov255_021d6ae8(wk, 22);
                 func_ov255_021d6ae8(wk, 28);
@@ -1682,7 +1682,7 @@ static int func_ov255_021d58ec(BoxSearchWork *wk, int seq) {
     func_ov255_021d5b70(wk, 7);
     func_ov255_021d6a48(wk, CRITERION_ACTIVE, TRUE);
     if (CursorMove_IsCursorVisible(wk->cursorMove) == TRUE) {
-        func_0204c488(wk->actors[7], 13);
+        ClActor_SetSequence(wk->actors[7], 13);
     }
     return SEQ_END;
 }
@@ -1692,7 +1692,7 @@ static int func_ov255_021d591c(BoxSearchWork *wk, int seq) {
     func_ov255_021d5b70(wk, 8);
     func_ov255_021d6a48(wk, CRITERION_ACTIVE, FALSE);
     if (CursorMove_IsCursorVisible(wk->cursorMove) == TRUE) {
-        func_0204c488(wk->actors[8], 16);
+        ClActor_SetSequence(wk->actors[8], 16);
     }
     return SEQ_END;
 }
@@ -1703,7 +1703,7 @@ static int func_ov255_021d594c(BoxSearchWork *wk, int seq) {
     func_ov255_021d6940(wk, TRUE);
     func_ov255_021d6ae8(wk, 22);
     if (CursorMove_IsCursorVisible(wk->cursorMove) == TRUE) {
-        func_0204c488(wk->actors[6], 10);
+        ClActor_SetSequence(wk->actors[6], 10);
     }
     return 1;
 }
@@ -1715,7 +1715,7 @@ static int func_ov255_021d5980(BoxSearchWork *wk, int seq) {
 // Waits for a list to be drawn
 static int func_ov255_021d5984(BoxSearchWork *wk, int seq) {
     if (FrameList_Draw(wk->list) == FALSE) {
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             FrameList_ShowCursor(wk->list);
         }
         seq = wk->nextSeq;
@@ -1733,7 +1733,7 @@ static int func_ov255_021d59b0(BoxSearchWork *wk, int seq) {
         func_ov255_021d6bac(wk);
         break;
     case 1:
-        if (func_0204c560(wk->actors[wk->btnActor]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->actors[wk->btnActor]) == FALSE) {
             wk->btnAnmSeq = 0;
             func_ov255_021d6bf0(wk, FALSE);
             return wk->nextSeq;
@@ -1753,7 +1753,7 @@ static int func_ov255_021d5a14(BoxSearchWork *wk, int seq) {
         if (TouchBar_GetDecided(wk->touchBar) == TRUE) {
             return wk->nextSeq;
         }
-    } else if (func_0204c560(wk->actors[wk->btnActor]) == FALSE) {
+    } else if (ClActor_IsAnimActive(wk->actors[wk->btnActor]) == FALSE) {
         return wk->nextSeq;
     }
     return seq;
@@ -1792,9 +1792,9 @@ static void func_ov255_021d5abc(void *work, int pos, int prevPos) {
 
     for (i = 0; i <= 8; i++) {
         if (pos == i) {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][1]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][1]);
         } else {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][0]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][0]);
         }
     }
 }
@@ -1804,7 +1804,7 @@ static void func_ov255_021d5b00(void *work, int pos, int prevPos) {
     int i;
 
     for (i = 0; i <= 8; i++) {
-        func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][0]);
+        ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][0]);
     }
 }
 
@@ -1814,9 +1814,9 @@ static void func_ov255_021d5b28(void *work, int pos, int prevPos) {
 
     for (i = 0; i <= 8; i++) {
         if (pos == i) {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][1]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][1]);
         } else {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][0]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][0]);
         }
     }
 }
@@ -1825,8 +1825,8 @@ static void func_ov255_021d5b6c(void *work, int pos, int prevPos) {
 }
 
 static void func_ov255_021d5b70(BoxSearchWork *wk, u32 type) {
-    func_0204c488(wk->actors[9], data_ov255_021d8f00[type - 7][0]);
-    func_0204c488(wk->actors[10], data_ov255_021d8f00[type - 7][1]);
+    ClActor_SetSequence(wk->actors[9], data_ov255_021d8f00[type - 7][0]);
+    ClActor_SetSequence(wk->actors[10], data_ov255_021d8f00[type - 7][1]);
 }
 
 static void func_ov255_021d5ba4(BoxSearchWork *wk) {
@@ -2289,12 +2289,12 @@ static void func_ov255_021d67b0(BoxSearchWork *wk) {
     GFL_BGSysClearScr(2);
     GFL_BGSysQueueScrLoad(2);
     for (i = 11; i <= 21; i++) {
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     func_ov255_021d6b5c(wk, 22, FALSE);
     func_ov255_021d6b5c(wk, 28, FALSE);
-    func_0204c124(wk->actors[34], FALSE);
-    func_0204c124(wk->actors[35], FALSE);
+    ClActor_SetVisible(wk->actors[34], FALSE);
+    ClActor_SetVisible(wk->actors[35], FALSE);
 }
 
 static void func_ov255_021d6804(BoxSearchWork *wk, u32 actor, s16 y) {
@@ -2302,8 +2302,8 @@ static void func_ov255_021d6804(BoxSearchWork *wk, u32 actor, s16 y) {
 
     pos.x = 127;
     pos.y = y;
-    func_0204c210(wk->actors[actor], &pos);
-    func_0204c124(wk->actors[actor], TRUE);
+    ClActor_SetPos(wk->actors[actor], &pos);
+    ClActor_SetVisible(wk->actors[actor], TRUE);
 }
 
 static void func_ov255_021d6828(BoxSearchWork *wk, u32 actor, int row) {
@@ -2316,12 +2316,12 @@ static void func_ov255_021d683c(BoxSearchWork *wk, s8 delta) {
     u32 i;
 
     for (i = 11; i <= 20; i++) {
-        if (func_0204c138(wk->actors[i])) {
-            func_0204c21c(wk->actors[i], &pos);
+        if (ClActor_IsVisible(wk->actors[i])) {
+            ClActor_GetPos(wk->actors[i], &pos);
             pos.y += delta;
-            func_0204c210(wk->actors[i], &pos);
+            ClActor_SetPos(wk->actors[i], &pos);
             if (pos.y <= -12 || pos.y >= 204) {
-                func_0204c124(wk->actors[i], FALSE);
+                ClActor_SetVisible(wk->actors[i], FALSE);
             }
         }
     }
@@ -2338,7 +2338,7 @@ static void func_ov255_021d6894(BoxSearchWork *wk, u32 actor, int count, int val
             return;
         }
     }
-    func_0204c124(wk->actors[actor], FALSE);
+    ClActor_SetVisible(wk->actors[actor], FALSE);
 }
 
 // Loads the species in the order of their names
@@ -2435,8 +2435,8 @@ static u32 func_ov255_021d6aac(BoxSearchWork *wk, u32 mark) {
 }
 
 static void func_ov255_021d6ac0(BoxSearchWork *wk, u32 actor, u32 anim) {
-    func_0204c4d4(wk->actors[actor], 0);
-    func_0204c488(wk->actors[actor], anim);
+    ClActor_SetAnimTime(wk->actors[actor], 0);
+    ClActor_SetSequence(wk->actors[actor], anim);
     func_0204c520(wk->actors[actor], TRUE);
 }
 
@@ -2447,7 +2447,7 @@ static void func_ov255_021d6ae8(BoxSearchWork *wk, u32 actor) {
     for (i = 0; i < 6; i++) {
         u32 on = func_ov255_021d6aac(wk, i);
 
-        func_0204c488(wk->actors[actor + i], on + i * 2);
+        ClActor_SetSequence(wk->actors[actor + i], on + i * 2);
     }
 }
 
@@ -2463,7 +2463,7 @@ static void func_ov255_021d6b1c(BoxSearchWork *wk, u32 layout) {
         pos.y = 92;
     }
     for (i = 22; i <= 27; i++) {
-        func_0204c140(wk->actors[i], &pos, 0);
+        ClActor_SetSurfacePos(wk->actors[i], &pos, 0);
         pos.x += 16;
     }
 }
@@ -2472,7 +2472,7 @@ static void func_ov255_021d6b5c(BoxSearchWork *wk, u32 actor, BOOL visible) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        func_0204c124(wk->actors[actor + i], visible);
+        ClActor_SetVisible(wk->actors[actor + i], visible);
     }
 }
 
@@ -2480,22 +2480,22 @@ static void func_ov255_021d6b5c(BoxSearchWork *wk, u32 actor, BOOL visible) {
 static void func_ov255_021d6b80(BoxSearchWork *wk) {
     ClActorPos pos = data_ov255_021d8db0;
 
-    func_0204c140(wk->actors[21], &pos, 0);
-    func_0204c124(wk->actors[21], TRUE);
+    ClActor_SetSurfacePos(wk->actors[21], &pos, 0);
+    ClActor_SetVisible(wk->actors[21], TRUE);
 }
 
 // Moves the scroll bar
 static void func_ov255_021d6bac(BoxSearchWork *wk) {
     ClActorPos pos;
 
-    func_0204c21c(wk->actors[21], &pos);
+    ClActor_GetPos(wk->actors[21], &pos);
     pos.y = FrameList_ClampBarPos(wk->list, pos.y);
     if (pos.y < 12) {
         pos.y = 12;
     } else if (pos.y > 156) {
         pos.y = 156;
     }
-    func_0204c210(wk->actors[21], &pos);
+    ClActor_SetPos(wk->actors[21], &pos);
 }
 
 // Shows the list's arrows, grayed out at its ends
@@ -2503,17 +2503,17 @@ static void func_ov255_021d6bf0(BoxSearchWork *wk, BOOL keep) {
     int pos = FrameList_GetCursor(wk->list);
 
     if (keep == FALSE) {
-        func_0204c124(wk->actors[34], TRUE);
-        func_0204c124(wk->actors[35], TRUE);
+        ClActor_SetVisible(wk->actors[34], TRUE);
+        ClActor_SetVisible(wk->actors[35], TRUE);
     }
-    if (func_0204c4a0(wk->actors[34]) != 12 || keep == FALSE) {
+    if (ClActor_GetSequence(wk->actors[34]) != 12 || keep == FALSE) {
         if (FrameList_GetScroll(wk->list) == 0 && pos == 0) {
             func_ov255_021d6ac0(wk, 34, 18);
         } else {
             func_ov255_021d6ac0(wk, 34, 4);
         }
     }
-    if (func_0204c4a0(wk->actors[35]) != 13 || keep == FALSE) {
+    if (ClActor_GetSequence(wk->actors[35]) != 13 || keep == FALSE) {
         if (FrameList_CanScrollDown(wk->list) == FALSE && pos == wk->listRows - 1) {
             func_ov255_021d6ac0(wk, 35, 19);
         } else {
@@ -2544,10 +2544,10 @@ static BOOL func_ov255_021d6cd4(BoxSearchWork *wk) {
 
 // The row of the list touched, or TOUCH_RECT_NONE
 static int func_ov255_021d6cf8(BoxSearchWork *wk) {
-    int pos = func_0203da0c(data_ov255_021d8f65);
+    int pos = GFL_HIDGetTouchPressedRect(data_ov255_021d8f65);
 
-    if (pos >= 0 && pos < wk->listRows && func_0203d554() == FALSE) {
-        func_0203d564(TRUE);
+    if (pos >= 0 && pos < wk->listRows && GCTX_HIDIsUsingTouch() == FALSE) {
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     return pos;
 }

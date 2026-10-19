@@ -232,24 +232,24 @@ static void CommBtlDemoBG_VBlank(CommBtlDemoBG *bg) {
 static void CommBtlDemoClAct_Init(CommBtlDemoClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(CommBtlDemoClAct));
     ClActSys_Create(&sCommBtlDemoClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void CommBtlDemoClAct_Free(CommBtlDemoClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(CommBtlDemoClAct));
 }
 
 static void CommBtlDemoClAct_Update(CommBtlDemoClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void CommBtlDemoClAct_VBlank(CommBtlDemoClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *CommBtlDemoClAct_GetUnit(CommBtlDemoClAct *clact) {

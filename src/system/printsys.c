@@ -323,7 +323,7 @@ void PrintQueue_PrintColor(PrintQueue *queue, GFLBitmap *bitmap, s16 x, s16 y, c
 }
 
 static inline BOOL PrintQueue_IsConnected(void) {
-    if (func_02042a78()) {
+    if (GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
