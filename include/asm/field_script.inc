@@ -3953,7 +3953,7 @@
 
     // Plugin 3
 
-    // func_ov052_021e5800
+    // PokemonLeagueCmd_DisableRailLines
     .macro Plugin3_Cmd1000 a0
     FieldCommand 1000
     .2byte \a0
@@ -3964,13 +3964,13 @@
     .2byte \a0
     .endm
 
-    // func_ov052_021e58ac
+    // PokemonLeagueCmd_PlayGrimsleyGroup
     .macro Plugin3_Cmd1002 a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // func_ov052_021e58cc
+    // PokemonLeagueCmd_PlayGrimsleyModel0Animation
     .macro Plugin3_Cmd1003 a0
     FieldCommand 1003
     .2byte \a0
@@ -3980,95 +3980,95 @@
     FieldCommand 1004
     .endm
 
-    // func_ov052_021e590c
+    // PokemonLeagueCmd_PlayCaitlinModels34Or5
     .macro Plugin3_Cmd1005 a0
     FieldCommand 1005
     .2byte \a0
     .endm
 
-    // func_ov052_021e592c
+    // PokemonLeagueCmd_CallCaitlinModel1Event
     .macro Plugin3_Cmd1006
     FieldCommand 1006
     .endm
 
-    // func_ov052_021e5954
+    // PokemonLeagueCmd_PlayCaitlinModel0
     .macro Plugin3_Cmd1007
     FieldCommand 1007
     .endm
 
-    // func_ov052_021e5964
+    // PokemonLeagueCmd_DropCaitlinActor
     .macro Plugin3_Cmd1008 a0, a1
     FieldCommand 1008
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov052_021e598c
+    // PokemonLeagueCmd_CallShauntalModel8Event
     .macro Plugin3_Cmd1009
     FieldCommand 1009
     .endm
 
-    // func_ov052_021e59b4
+    // PokemonLeagueCmd_PlayShauntalModel
     .macro Plugin3_Cmd1010 a0
     FieldCommand 1010
     .2byte \a0
     .endm
 
-    // func_ov052_021e59dc
+    // PokemonLeagueCmd_CallShauntalRoomChangeEvent
     .macro Plugin3_Cmd1011 a0
     FieldCommand 1011
     .2byte \a0
     .endm
 
-    // func_ov052_021e5a14
+    // PokemonLeagueCmd_CallShauntalModels6And9Event
     .macro Plugin3_Cmd1012
     FieldCommand 1012
     .endm
 
-    // func_ov052_021e5a3c
+    // PokemonLeagueCmd_PlayMarshalModel0
     .macro Plugin3_Cmd1013
     FieldCommand 1013
     .endm
 
-    // func_ov052_021e5a4c
+    // PokemonLeagueCmd_PlayMarshalModel3Animation
     .macro Plugin3_Cmd1014 a0
     FieldCommand 1014
     .2byte \a0
     .endm
 
-    // func_ov052_021e5a6c
+    // PokemonLeagueCmd_PlayMarshalModel1
     .macro Plugin3_Cmd1015
     FieldCommand 1015
     .endm
 
-    // func_ov052_021e5a7c
+    // PokemonLeagueCmd_CallMarshalPlatformEvent
     .macro Plugin3_Cmd1016
     FieldCommand 1016
     .endm
 
-    // func_ov052_021e5aa4
+    // PokemonLeagueCmd_CallChampionChangeEvent
     .macro Plugin3_Cmd1017
     FieldCommand 1017
     .endm
 
-    // func_ov052_021e5acc
+    // PokemonLeagueCmd_CallChampionOpenEvent
     .macro Plugin3_Cmd1018
     FieldCommand 1018
     .endm
 
-    // func_ov052_021e5af4
+    // PokemonLeagueCmd_HideChampionActorShadow
     .macro Plugin3_Cmd1019 a0
     FieldCommand 1019
     .2byte \a0
     .endm
 
-    // func_ov052_021e5b14
+    // PokemonLeagueCmd_ShowChampionActorShadow
     .macro Plugin3_Cmd1020 a0
     FieldCommand 1020
     .2byte \a0
     .endm
 
-    // func_ov052_021e5b34
+    // PokemonLeagueCmd_SetChampionRoomOpen
     .macro Plugin3_Cmd1021
     FieldCommand 1021
     .endm
