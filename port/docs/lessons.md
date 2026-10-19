@@ -5,12 +5,15 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
 
 ## 2026-10-18: the universal macOS app, after review
 
-- **`-Werror=` doesn't survive `-w` or `-Wno-everything`, in either order, nor a system header.** With Apple clang 21,
-  a call to a macOS 26 API at a target of 11.0 compiles, and is weakly imported, under
-  `-Werror=unguarded-availability -Wno-everything -Werror=unguarded-availability`, and inside a header found through
-  `-isystem` (CMake's `SYSTEM` include directories). To hold a header-only library to the check, compile its
-  implementation with `--no-system-header-prefix=NAME.h` and no `-w`, as `port/cmake/os.cmake` does for minicoro. Test
-  such a probe with the build's compiler (`/usr/bin/cc`): Homebrew's clang, first on this Mac's `PATH`, uses the
+- **A header found through `-isystem` hides a `-Werror=` diagnostic whatever the flags; `-w`, or a `-Wno-everything`
+  after the `-Werror=`, cancels it anywhere.** With Apple clang 21, a call to a macOS 26 API at a target of 11.0
+  compiles, weakly imported, inside a header found through `-isystem` (CMake's `SYSTEM` include directories) under any
+  order of `-Wno-everything` and `-Werror=unguarded-availability`. In a file of its own, `-Wno-everything
+  -Werror=unguarded-availability` stops it, while `-w` in any position, or `-Werror=unguarded-availability
+  -Wno-everything`, lets it through (probed again at the merge into `port-integrate`: the lesson first blamed
+  `-Wno-everything` in either order, which was the system header). To hold a header-only library to the check, compile
+  its implementation with `--no-system-header-prefix=NAME.h` and no `-w`, as `port/cmake/os.cmake` does for minicoro.
+  Test such a probe with the build's compiler (`/usr/bin/cc`): Homebrew's clang, first on this Mac's `PATH`, uses the
   Command Line Tools' older SDK, where a macOS 26 function isn't declared at all.
 - **`codesign -d` reads one slice too**, the Mac's own: give `--arch` for each slice of a universal program.
 - **Write down where a claim about CI came from, and look again before relying on it**: "the oldest runner is macOS 14,

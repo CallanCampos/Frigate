@@ -97,13 +97,16 @@ level that doesn't exist yet says "not yet"; no field is left out.
     header calling macOS 26's `posix_spawn_file_actions_addchdir` added fail. This replaces the hand check the entry
     below describes (review B's request for a script for it).
   - **minicoro under the availability check** (A). Its `-w` did cancel the check, but so does more than that:
-    minicoro's code is all in `minicoro.h`, a system header through `port_hal`'s `SYSTEM` include, where clang
-    reports no warning, `-Werror=` ones included. The review's fix, `-Wno-everything -Werror=unguarded-availability`,
-    doesn't hold with Apple clang 21: `-Wno-everything` silences the check in either order (its probe likely ran
-    Homebrew's clang, first on `PATH`, whose Command Line Tools SDK 15.4 doesn't declare the macOS 26 function at all).
-    `mco_impl.c` now drops `-w` and, with a deployment target, takes `--no-system-header-prefix=minicoro.h`: it gives
-    no warning under `-Wall -Wextra`, and a copy of `minicoro.h` with that call appended fails to compile, where both
-    the old options and the system header alone let it through. lessons.md has it.
+    minicoro's code is all in `minicoro.h`, a system header through `port_hal`'s `SYSTEM` include (`-isystem`), where
+    clang reports no warning, `-Werror=` ones included, whatever the flags. So the review's fix,
+    `-Wno-everything -Werror=unguarded-availability`, can't hold for `mco_impl.c`. Corrected at the merge into
+    `port-integrate`, probed again with Apple clang 21.0.0 (`/usr/bin/cc`, SDK 26.5): in a file of its own, that order
+    does stop a macOS 26 call at a target of 11.0, and `-w` anywhere or a `-Wno-everything` after the `-Werror=`
+    cancels it; through `-isystem`, every order lets it through. (This entry first said that `-Wno-everything`
+    silences the check in either order, which only the system header made it look.) `mco_impl.c` now drops `-w` and,
+    with a deployment target, takes `--no-system-header-prefix=minicoro.h`: it gives no warning under
+    `-Wall -Wextra`, and a copy of `minicoro.h` with that call appended fails to compile, where both the old options
+    and the system header alone let it through. That fix stands. lessons.md has it.
   - **`check_app.sh`** (A): it reads each slice's signature (`codesign -dv --arch`) for the ad hoc and hardened runtime
     checks, and compares the program's minos and `LSMinimumSystemVersion` with `--minimum` part by part, as
     `make_app.sh` does, so `--minimum 11` passes a build for 11.0; `package_macos.sh` compares the same way.
