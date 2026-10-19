@@ -22,9 +22,12 @@ add_test(NAME host_trap_placeholder
         --status 70 --skip-status 77 --expect "port: the game accessed [A-Za-z_][A-Za-z0-9_]*\\+0x0 \\("
         --expect "which has no C yet" --expect "Backtrace:" -- $<TARGET_FILE:port_host_tests> trap_placeholder)
 set_tests_properties(host_trap_placeholder PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 60)
+# On a fiber the C library's memset clears the placeholder's first 4 bytes, in its own order: the report names the
+# byte it touched first, the first on Apple Silicon (the x86_64 slice under Rosetta too), Linux and Windows, the last
+# (+0x3) on an Intel Mac
 add_test(NAME host_trap_placeholder_fiber
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}" "${port_host_check_exit}"
-        --status 70 --skip-status 77 --expect "port: the game accessed [A-Za-z_][A-Za-z0-9_]*\\+0x0 \\("
+        --status 70 --skip-status 77 --expect "port: the game accessed [A-Za-z_][A-Za-z0-9_]*\\+0x[0-3] \\("
         --expect "which has no C yet" --expect "Backtrace:" -- $<TARGET_FILE:port_host_tests> trap_placeholder_fiber)
 set_tests_properties(host_trap_placeholder_fiber PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 60)
 

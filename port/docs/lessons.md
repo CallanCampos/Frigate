@@ -3,6 +3,15 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the macOS and White 2 tracks merged
+
+- **A C library's `memset` touches the bytes in its own order.** `host_trap_placeholder_fiber` clears a trap
+  placeholder's first 4 bytes with the library's `memset` and expected the report at `+0x0`: so it was on Apple
+  Silicon, Linux and Windows, and under Rosetta, but an Intel Mac's `memset` stores the last byte first, and the report
+  said `+0x3`. Only CI's Intel runners showed it, the first to run the Windows track's tests on x86_64 macOS; Rosetta
+  doesn't stand in for an Intel Mac where the order of a library's accesses matters. A test of a fault made through
+  the C library accepts any byte it was given.
+
 ## 2026-10-18: White 2's starter save on the oracle
 
 - **A route of timed walks goes astray where a townsperson wanders.** Black 2's starter route held each direction for
