@@ -5406,46 +5406,46 @@
 
     // Plugin 16
 
-    // func_ov068_021e5800
+    // Plugin16Cmd_ShowRuinsModel
     .macro Plugin16_Cmd1000 a0
     FieldCommand 1000
     .2byte \a0
     .endm
 
-    // func_ov068_021e582c
+    // Plugin16Cmd_SetRuinsAnimFrame
     .macro Plugin16_Cmd1001 a0
     FieldCommand 1001
     .2byte \a0
     .endm
 
-    // func_ov068_021e5854
+    // Plugin16Cmd_PlayRuinsAnim
     .macro Plugin16_Cmd1002 a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // func_ov068_021e587c
+    // Plugin16Cmd_CallFormEvent
     .macro Plugin16_Cmd1003
     FieldCommand 1003
     .endm
 
-    // func_ov068_021e58a4
+    // Plugin16Cmd_HideActor2
     .macro Plugin16_Cmd1004
     FieldCommand 1004
     .endm
 
-    // func_ov068_021e58b4
+    // Plugin16Cmd_StartChase
     .macro Plugin16_Cmd1005 a0
     FieldCommand 1005
     .2byte \a0
     .endm
 
-    // func_ov068_021e58f8
+    // Plugin16Cmd_WaitChase
     .macro Plugin16_Cmd1006
     FieldCommand 1006
     .endm
 
-    // func_ov068_021e5940
+    // Plugin16Cmd_DropActor
     .macro Plugin16_Cmd1007
     FieldCommand 1007
     .endm

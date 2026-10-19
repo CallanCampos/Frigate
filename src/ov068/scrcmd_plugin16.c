@@ -14,7 +14,7 @@ typedef struct {
     Field *field;
 } Plugin16WaitData;
 
-static BOOL func_ov068_021e5800(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_ShowRuinsModel(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -22,7 +22,7 @@ static BOOL func_ov068_021e5800(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov068_021e582c(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_SetRuinsAnimFrame(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -30,7 +30,7 @@ static BOOL func_ov068_021e582c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov068_021e5854(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_PlayRuinsAnim(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -38,7 +38,7 @@ static BOOL func_ov068_021e5854(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov068_021e587c(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_CallFormEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = SpPokeGimmick_CallFormEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -49,12 +49,12 @@ static BOOL func_ov068_021e587c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov068_021e58a4(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_HideActor2(VM *vm, FieldScriptEnv *env) {
     SpPokeGimmick_HideActor2(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-static BOOL func_ov068_021e58b4(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_StartChase(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     FieldPlayer *player = Field_GetPlayer(field);
@@ -64,7 +64,7 @@ static BOOL func_ov068_021e58b4(VM *vm, FieldScriptEnv *env) {
 }
 
 // Waits for SpPokeGimmick_IsChaseDone to return TRUE
-static GameEventReturnCode func_ov068_021e58e4(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode Plugin16_WaitChaseEvent(GameEvent *event, u32 *state, void *data) {
     Plugin16WaitData *wait = data;
 
     if (SpPokeGimmick_IsChaseDone(wait->field) == TRUE) {
@@ -73,11 +73,11 @@ static GameEventReturnCode func_ov068_021e58e4(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static BOOL func_ov068_021e58f8(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_WaitChase(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov068_021e58e4, sizeof(Plugin16WaitData));
+    GameEvent *event = GameEvent_Create(gsys, NULL, Plugin16_WaitChaseEvent, sizeof(Plugin16WaitData));
     Plugin16WaitData *wait = GameEvent_GetData(event);
 
     wait->field = field;
@@ -88,7 +88,7 @@ static BOOL func_ov068_021e58f8(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov068_021e5940(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin16Cmd_DropActor(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
     SpPokeGimmick_DropActor(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
@@ -96,7 +96,7 @@ static BOOL func_ov068_021e5940(VM *vm, FieldScriptEnv *env) {
 }
 
 const FieldScriptCommand PLUGIN_16_SCRIPT_COMMANDS[] = {
-    func_ov068_021e5800, func_ov068_021e582c, func_ov068_021e5854,
-    func_ov068_021e587c, func_ov068_021e58a4, func_ov068_021e58b4,
-    func_ov068_021e58f8, func_ov068_021e5940, (FieldScriptCommand)0xFFFFFFFF,
+    Plugin16Cmd_ShowRuinsModel, Plugin16Cmd_SetRuinsAnimFrame, Plugin16Cmd_PlayRuinsAnim,
+    Plugin16Cmd_CallFormEvent,  Plugin16Cmd_HideActor2,        Plugin16Cmd_StartChase,
+    Plugin16Cmd_WaitChase,      Plugin16Cmd_DropActor,         (FieldScriptCommand)0xFFFFFFFF,
 };
