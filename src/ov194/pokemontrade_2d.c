@@ -244,9 +244,12 @@ void func_ov194_021c2e6c(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_PLTT_COMMON] == 0) {
         ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
 
-        wk->objRes[TRADE_OBJRES_CHAR_COMMON] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_SUB, wk->heapId);
-        wk->objRes[TRADE_OBJRES_PLTT_COMMON] = func_0204bbb8(arc, func_0202d810(), CLACT_VRAM_SUB, 0, 0, 3, wk->heapId);
-        wk->objRes[TRADE_OBJRES_CELL_COMMON] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), wk->heapId);
+        wk->objRes[TRADE_OBJRES_CHAR_COMMON] =
+            func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        wk->objRes[TRADE_OBJRES_PLTT_COMMON] =
+            func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, wk->heapId);
+        wk->objRes[TRADE_OBJRES_CELL_COMMON] =
+            func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
         GFL_ArcToolFree(arc);
     }
 }
@@ -1553,10 +1556,10 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
     }
     setup.flags = 0;
     setup.arcId = getUINarcIdx();
-    setup.paletteFile = func_0202d8b0();
-    setup.charFile = func_0202d8b4();
-    setup.cellFile = func_0202d8b8(2);
-    setup.animFile = func_0202d8bc(2);
+    setup.paletteFile = AppMenuCommon_GetStatusIconPaletteFile();
+    setup.charFile = AppMenuCommon_GetStatusIconCharFile();
+    setup.cellFile = AppMenuCommon_GetStatusIconCellFile(2);
+    setup.animFile = AppMenuCommon_GetStatusIconAnimFile(2);
     setup.paletteStart = 0;
     setup.paletteCount = 1;
     UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);

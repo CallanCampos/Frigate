@@ -83,23 +83,23 @@ struct MusicalSave {
 }; // size: 0x2a4
 
 // The size of the block and its init
-u32 func_0200ac58(void);
-void func_0200ac60(MusicalSave *musical);
+u32 MusicalSave_GetSize(void);
+void MusicalSave_Init(MusicalSave *musical);
 MusicalSave *getAddressOfMusicalDataInfo(SaveControl *save);
 void func_0200ad20(MusicalSave *musical);
 MusicalSaveUnk1B0 *func_0200ad44(MusicalSave *musical);
 // Whether a musical photo is saved
-BOOL func_0200ad4c(MusicalSave *musical);
-MusicalShot *func_0200ad5c(MusicalSave *musical);
+BOOL MusicalSave_HasShot(MusicalSave *musical);
+MusicalShot *MusicalSave_GetShot(MusicalSave *musical);
 // Whether a prop is owned, whether it is flagged as new, and giving one
-BOOL func_0200ad60(MusicalSave *musical, u8 prop);
-BOOL func_0200ad9c(MusicalSave *musical, u8 prop);
-void func_0200add8(MusicalSave *musical, u8 prop);
+BOOL MusicalSave_HasProp(MusicalSave *musical, u8 prop);
+BOOL MusicalSave_IsPropNew(MusicalSave *musical, u8 prop);
+void MusicalSave_AddProp(MusicalSave *musical, u8 prop);
 // Forgets which props are new
-void func_0200ae14(MusicalSave *musical);
+void MusicalSave_ClearNewProps(MusicalSave *musical);
 // How many props are owned, and whether all of them are
-u32 func_0200ae30(MusicalSave *musical);
-BOOL func_0200ae58(MusicalSave *musical);
+u32 MusicalSave_CountProps(MusicalSave *musical);
+BOOL MusicalSave_HasAllProps(MusicalSave *musical);
 MusicalSaveUnk1E0 *func_0200ae6c(MusicalSave *musical, u8 index);
 // The counters at 0x252 and 0x254, and adding one to them, up to 0xffff
 u16 func_0200ae78(MusicalSave *musical);
@@ -114,15 +114,15 @@ u8 func_0200aee4(MusicalSave *musical);
 void func_0200aef0(MusicalSave *musical, u8 value);
 u8 func_0200aefc(MusicalSave *musical);
 void func_0200af08(MusicalSave *musical, u8 value);
-const u16 *func_0200af14(MusicalSave *musical);
+const u16 *MusicalSave_GetName(MusicalSave *musical);
 // The counter at 0x256, and adding to it, up to 0xffff
 void func_0200af1c(MusicalSave *musical, u16 value);
 u16 func_0200af38(MusicalSave *musical);
-BOOL func_0200af44(MusicalSave *musical);
-void func_0200af50(MusicalSave *musical, BOOL value);
-// Whether the downloaded props were added, which func_0200af64 sets
-u8 func_0200af5c(MusicalSave *musical);
-void func_0200af64(MusicalSave *musical, u8 value);
-u8 *func_0200af6c(MusicalSave *musical);
+BOOL MusicalSave_GetDressingRoomVisited(MusicalSave *musical);
+void MusicalSave_SetDressingRoomVisited(MusicalSave *musical, BOOL value);
+// Whether the downloaded props were added, which MusicalSave_SetDownloadedProps sets
+u8 MusicalSave_GetDownloadedProps(MusicalSave *musical);
+void MusicalSave_SetDownloadedProps(MusicalSave *musical, u8 value);
+u8 *MusicalSave_GetProps(MusicalSave *musical);
 
 #endif // POKEBW2_SAVE_MUSICAL_SAVEDATA_H

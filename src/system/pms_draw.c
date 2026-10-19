@@ -358,7 +358,7 @@ static BOOL PMSDrawSlot_Main(PMSDrawSlot *slot, PrintQueue *queue, BOOL followSc
     int i;
     BOOL printing;
 
-    if (slot->printing && !func_02021c1c(queue, BmpWin_GetBitmap(slot->window))) {
+    if (slot->printing && !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(slot->window))) {
         BmpWin_FlushChar(slot->window);
         slot->printing = FALSE;
     }
@@ -417,15 +417,15 @@ static void PMSDrawSlot_Print(PMSDrawSlot *slot, PrintQueue *queue, Font *font, 
     format = PMSData_GetSentenceString(sentence, heapId);
     wordCount = (u8)GFL_StrCmdGetWordSetCommandCount(format);
     for (i = 0; i < wordCount; i++) {
-        if (func_02029e1c(sentence, i)) {
+        if (PMSData_IsWordNumber(sentence, i)) {
             slot->isIcon[i] = TRUE;
-        } else if (func_02029df8(sentence, i) == PMS_WORD_NULL) {
+        } else if (PMSData_GetWordIndex(sentence, i) == PMS_WORD_NULL) {
             isEmpty[i] = TRUE;
         }
     }
     str = PMSData_ToStringWithWords(sentence, heapId, wordCount);
     GFL_BitmapFill(BmpWin_GetBitmap(slot->window), backColor);
-    func_02021c7c(queue, BmpWin_GetBitmap(slot->window), offset->x, offset->y, str, font, color);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(slot->window), offset->x, offset->y, str, font, color);
     slot->printing = TRUE;
     GFL_StrBufFree(str);
     for (i = 0; i < wordCount; i++) {
@@ -433,7 +433,7 @@ static void PMSDrawSlot_Print(PMSDrawSlot *slot, PrintQueue *queue, Font *font, 
             u8 width = GFL_StrCmdGetStrWidthUntilWordSetIndex(format, i, font, 0);
             u8 lines = GFL_StrCmdCountLinesUntilWordSetIndex(format, i);
 
-            PMSDraw_SetIcon(slot->icons[i], window, width, lines, func_02029df8(sentence, i), offset);
+            PMSDraw_SetIcon(slot->icons[i], window, width, lines, PMSData_GetWordIndex(sentence, i), offset);
         } else if (isEmpty[i] == TRUE) {
             u8 width = GFL_StrCmdGetStrWidthUntilWordSetIndex(format, i, font, 0);
             u8 lines = GFL_StrCmdCountLinesUntilWordSetIndex(format, i);

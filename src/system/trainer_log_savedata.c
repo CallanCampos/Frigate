@@ -13,11 +13,11 @@
 
 #define SAVE_BLOCK_TRAINER_LOG 0x2c
 
-TrainerLogSave *func_0200afbc(SaveControl *save) {
+TrainerLogSave *TrainerLogSave_Get(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_LOG);
 }
 
-u32 func_0200afc8(TrainerLogSave *log) {
+u32 TrainerLogSave_CountEntries(TrainerLogSave *log) {
     s32 i;
 
     for (i = 0; i < TRAINER_LOG_MAX; i++) {
@@ -28,15 +28,15 @@ u32 func_0200afc8(TrainerLogSave *log) {
     return i;
 }
 
-const u16 *func_0200afe4(TrainerLogSave *log, u32 index) {
+const u16 *TrainerLogSave_GetEntryName(TrainerLogSave *log, u32 index) {
     return log->entries[index].name;
 }
 
-u8 func_0200afec(TrainerLogSave *log, u32 index) {
+u8 TrainerLogSave_GetEntryValue(TrainerLogSave *log, u32 index) {
     return log->entries[index].value;
 }
 
-u16 func_0200b000(TrainerLogSave *log, u32 index) {
+u16 TrainerLogSave_GetEntryCount(TrainerLogSave *log, u32 index) {
     return log->entries[index].count;
 }
 
@@ -53,19 +53,19 @@ void func_0200b024(const TrainerLogSave *log, u32 index, u16 *unk18, u8 *unk1A, 
     *unk1B_6 = entry->unk1B_6;
 }
 
-u8 func_0200b04c(TrainerLogSave *log) {
+u8 TrainerLogSave_GetLastSlot(TrainerLogSave *log) {
     return log->lastSlot;
 }
 
 u32 func_0200b05c(TrainerLogSave *log, u8 month, u8 day, RTCDate *date) {
-    u32 count = func_0200afc8(log);
-    u32 fortune = func_0200b11c(month, day, date);
+    u32 count = TrainerLogSave_CountEntries(log);
+    u32 fortune = TrainerLog_GetBirthdayValue(month, day, date);
     u32 result = 0;
     u32 best = -1;
     u32 i;
 
     for (i = 0; i < count; i++) {
-        s32 diff = func_0200afec(log, i) - fortune;
+        s32 diff = TrainerLogSave_GetEntryValue(log, i) - fortune;
         if (diff < 0) {
             diff = -diff;
         }
@@ -82,7 +82,7 @@ u32 func_0200b05c(TrainerLogSave *log, u8 month, u8 day, RTCDate *date) {
     return result;
 }
 
-BOOL func_0200b0c0(TrainerLogSave *log, u32 id) {
+BOOL TrainerLogSave_WasMetToday(TrainerLogSave *log, u32 id) {
     s32 i;
 
     for (i = 0; i < TRAINER_LOG_MAX; i++) {
@@ -93,7 +93,7 @@ BOOL func_0200b0c0(TrainerLogSave *log, u32 id) {
     return FALSE;
 }
 
-BOOL func_0200b0f0(TrainerLogSave *log, u32 id) {
+BOOL TrainerLogSave_HasId(TrainerLogSave *log, u32 id) {
     s32 i;
 
     for (i = 0; i < TRAINER_LOG_MAX; i++) {
@@ -104,7 +104,7 @@ BOOL func_0200b0f0(TrainerLogSave *log, u32 id) {
     return FALSE;
 }
 
-u8 func_0200b11c(u8 month, u8 day, const RTCDate *date) {
+u8 TrainerLog_GetBirthdayValue(u8 month, u8 day, const RTCDate *date) {
     RTCDate birthday = *date;
     u32 today;
     u32 birthdayDay;
@@ -123,20 +123,20 @@ u8 func_0200b184(TrainerLogSave *log, const u16 *name, u8 value, u8 unk10_17, u8
                  u16 unk18, u8 unk1A, u8 unk1B_0, u8 unk1B_6) {
     u16 count = 0;
     TrainerLogEntry entry;
-    TrainerLogEntry *logged = func_0200b3ec(log, TRAINER_LOG_MAX, id);
+    TrainerLogEntry *logged = TrainerLogSave_FindEntry(log, TRAINER_LOG_MAX, id);
 
     if (logged != NULL) {
         count = logged->count;
     }
     func_0200b330(&entry, name, value, count, unk10_17, unk10_18, unk10_22, id, unk18, unk1A, unk1B_0, unk1B_6);
-    log->lastSlot = func_0200b26c(log, TRAINER_LOG_MAX, &entry);
-    if (func_0200b2fc(log, TRAINER_LOG_MAX, &entry)) {
-        func_0200b41c(log, TRAINER_LOG_MAX, &entry);
+    log->lastSlot = TrainerLogSave_InsertEntry(log, TRAINER_LOG_MAX, &entry);
+    if (TrainerLogSave_ContainsEntry(log, TRAINER_LOG_MAX, &entry)) {
+        TrainerLogSave_IncrementMetCount(log, TRAINER_LOG_MAX, &entry);
     }
     return log->lastSlot;
 }
 
-void func_0200b220(TrainerLogSave *log) {
+void TrainerLogSave_ClearToday(TrainerLogSave *log) {
     s32 i;
 
     for (i = 0; i < TRAINER_LOG_MAX; i++) {
@@ -144,16 +144,16 @@ void func_0200b220(TrainerLogSave *log) {
     }
 }
 
-u32 func_0200b240(void) {
+u32 TrainerLogSave_GetSize(void) {
     return sizeof(TrainerLogSave);
 }
 
-void func_0200b248(TrainerLogSave *log) {
+void TrainerLogSave_Init(TrainerLogSave *log) {
     MI_CpuFill8(log, 0, sizeof(TrainerLogSave));
     log->lastSlot = TRAINER_LOG_NONE;
 }
 
-u8 func_0200b26c(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
+u8 TrainerLogSave_InsertEntry(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
     s32 slot = -1;
     s32 i;
 
@@ -175,7 +175,7 @@ u8 func_0200b26c(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
     return slot;
 }
 
-BOOL func_0200b2fc(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
+BOOL TrainerLogSave_ContainsEntry(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
     s32 i;
 
     for (i = 0; i < count; i++) {
@@ -204,7 +204,7 @@ void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count,
     entry->today = 1;
 }
 
-TrainerLogEntry *func_0200b3ec(TrainerLogSave *log, s32 count, u32 id) {
+TrainerLogEntry *TrainerLogSave_FindEntry(TrainerLogSave *log, s32 count, u32 id) {
     s32 i;
 
     for (i = 0; i < count; i++) {
@@ -215,7 +215,7 @@ TrainerLogEntry *func_0200b3ec(TrainerLogSave *log, s32 count, u32 id) {
     return NULL;
 }
 
-void func_0200b41c(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
+void TrainerLogSave_IncrementMetCount(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
     s32 i;
 
     for (i = 0; i < count; i++) {

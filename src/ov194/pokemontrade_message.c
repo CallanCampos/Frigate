@@ -88,16 +88,16 @@ static void func_ov194_021bfbc0(PokemonTradeSprite *sprite, PartyPkm *pkm, int i
     param.vramType = vramType;
     param.flags = 0;
     param.arcId = getUINarcIdx();
-    param.paletteFile = func_0202d7e4();
-    param.charFile = func_0202d7f4(type);
-    param.cellFile = func_0202d7f8(2);
-    param.animFile = func_0202d7fc(2);
+    param.paletteFile = AppMenuCommon_GetTypeIconPaletteFile();
+    param.charFile = AppMenuCommon_GetTypeIconCharFile(type);
+    param.cellFile = AppMenuCommon_GetTypeIconCellFile(2);
+    param.animFile = AppMenuCommon_GetTypeIconAnimFile(2);
     param.paletteOffset = 8;
     param.paletteStart = 0;
     param.paletteCount = 3;
     UIObjRes_Load(&sprite->res, &param, unit, heapId);
     sprite->actor = UIObjRes_CreateActor(&sprite->res, unit, x, y, 0, heapId);
-    func_0204c378(sprite->actor, func_0202d7e8(type), 1);
+    func_0204c378(sprite->actor, AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void func_ov194_021bfc50(PokemonTradeSprite *sprite) {
@@ -117,10 +117,10 @@ static void func_ov194_021bfc6c(PokemonTradeSprite *sprite, PartyPkm *pkm, ClAct
     param.vramType = vramType;
     param.flags = 0;
     param.arcId = getUINarcIdx();
-    param.paletteFile = func_0202d91c(ball);
-    param.charFile = func_0202d928(ball);
-    param.cellFile = func_0202d934(ball, 2);
-    param.animFile = func_0202d93c(ball, 2);
+    param.paletteFile = AppMenuCommon_GetBallPaletteFile(ball);
+    param.charFile = AppMenuCommon_GetBallCharFile(ball);
+    param.cellFile = AppMenuCommon_GetBallCellFile(ball, 2);
+    param.animFile = AppMenuCommon_GetBallAnimFile(ball, 2);
     param.paletteOffset = plttOffset;
     param.paletteStart = 0;
     param.paletteCount = 1;
@@ -138,8 +138,8 @@ void func_ov194_021bfcf8(PokemonTradeWork *wk, BOOL instant, u32 x, u32 y, u32 w
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     if (!instant) {
-        wk->printStream =
-            func_02022268(window, 0, 0, wk->strbuf, wk->font, func_02017bcc(), wk->tcbEx, 2, wk->heapId, 15);
+        wk->printStream = PrintStream_Create(window, 0, 0, wk->strbuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbEx,
+                                             2, wk->heapId, 15);
         AppPrintsysCommon_Init(&wk->printWait, 2);
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 0, 0, wk->strbuf, wk->font);
@@ -206,7 +206,7 @@ void func_ov194_021bfedc(PokemonTradeWork *wk) {
     wk->drawTemplate = GFL_StrBufCreate(128, wk->heapId);
     wk->strbuf = GFL_StrBufCreate(128, wk->heapId);
     wk->strbufTemplate = GFL_StrBufCreate(128, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     wk->tcbEx = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 2, 0);
     wk->keyCursor = KeyCursor_Create(15, 1, 0, wk->heapId);
@@ -221,7 +221,7 @@ void func_ov194_021bffac(PokemonTradeWork *wk) {
         func_ov194_021bfe70(wk);
         func_ov194_021c00fc(wk);
         if (wk->printStream != NULL) {
-            func_020223cc(wk->printStream);
+            PrintStream_Delete(wk->printStream);
             wk->printStream = NULL;
         }
         if (wk->menuWin != NULL) {
@@ -249,8 +249,8 @@ void func_ov194_021bffac(PokemonTradeWork *wk) {
         GFL_StrBufFree(wk->drawTemplate);
         GFL_StrBufFree(wk->strbuf);
         GFL_StrBufFree(wk->strbufTemplate);
-        func_02021c44(wk->printQueue);
-        func_02021a18(wk->printQueue);
+        PrintQueue_Clear(wk->printQueue);
+        PrintQueue_Free(wk->printQueue);
         GFL_TCBExMgrFree(wk->tcbEx);
         wk->tcbEx = NULL;
     }
@@ -265,7 +265,7 @@ BOOL func_ov194_021c00b0(PokemonTradeWork *wk) {
         }
         done = AppPrintsysCommon_Update(&wk->printWait, wk->printStream);
         if (done && wk->printStream != NULL) {
-            func_020223cc(wk->printStream);
+            PrintStream_Delete(wk->printStream);
             wk->printStream = NULL;
         }
     }
@@ -867,8 +867,8 @@ AppTaskMenuWin *func_ov194_021c1788(PokemonTradeWork *wk, u32 msg) {
 
 // Closes the button, showing the touch bar's again
 void func_ov194_021c1820(PokemonTradeWork *wk, BOOL showActor, BOOL showButton) {
-    if (!func_02021c0c(wk->printQueue)) {
-        func_02021c44(wk->printQueue);
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
+        PrintQueue_Clear(wk->printQueue);
     }
     if (showActor) {
         func_0204c124(wk->actors[2], TRUE);

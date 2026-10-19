@@ -129,7 +129,7 @@ static u32 CDemoCmd_Unused12(CDemoWork *work, const u32 *command) {
     return 1;
 }
 static u32 CDemoCmd_ResetSound(CDemoWork *work, const u32 *command) {
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     return 1;
 }
 static u32 CDemoCmd_StopBGM(CDemoWork *work, const u32 *command) {

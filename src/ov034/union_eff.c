@@ -88,7 +88,7 @@ BOOL UnionEff_IsPlayerOnSpot(Field *field) {
     FieldPlayer_GetWPos(player, &pos);
     pos.x = (pos.x >> 4) / FX32_ONE;
     pos.z = (pos.z >> 4) / FX32_ONE;
-    func_0201754c(state);
+    PlayerState_GetRotation(state);
     for (i = 0; i < 1; i++) {
         if (pos.x == spots[i][0] && pos.z == spots[i][1]) {
             return TRUE;
@@ -118,7 +118,7 @@ int UnionEff_GetKindStep(int kind) {
 BOOL UnionEff_IsFriendBeacon(WifiList *wifiList, const UnionBeacon *beacon) {
     u32 friendIndex;
 
-    if (func_0200a46c(wifiList, beacon->name, beacon->trainerId, beacon->gender, &friendIndex) == TRUE) {
+    if (WifiList_FindFriend(wifiList, beacon->name, beacon->trainerId, beacon->gender, &friendIndex) == TRUE) {
         return TRUE;
     }
     return FALSE;

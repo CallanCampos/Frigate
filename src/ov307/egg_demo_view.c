@@ -369,12 +369,12 @@ void EggDemoView_ShowPokemon(EggDemoView *view, PartyPkm *pkm) {
     EggDemoView_AddMcss(view);
     EggDemoView_SetAnimation(view, 0, FALSE);
     MCSS_Hide(view->mcss);
-    func_0201ae2c(view->mcss, 16, 16, 0, GX_RGB(31, 31, 31));
+    MCSS_StartFade(view->mcss, 16, 16, 0, GX_RGB(31, 31, 31));
     view->state = VIEW_SHOW_POKEMON;
 }
 
 BOOL EggDemoView_IsWhite(EggDemoView *view) {
-    return func_0201aee8(view->mcss) == FALSE;
+    return MCSS_IsFading(view->mcss) == FALSE;
 }
 
 void EggDemoView_Reveal(EggDemoView *view) {
@@ -391,8 +391,8 @@ static void EggDemoView_VBlank(TCB *tcb, void *data) {
 
 static void EggDemoView_InitMcss(EggDemoView *view) {
     view->mcssSystem = MCSSSys_Create(1, view->heapId);
-    func_0201aefc(view->mcssSystem, 0x30000);
-    func_0201aacc(view->mcssSystem);
+    MCSSSys_SetTexBase(view->mcssSystem, 0x30000);
+    MCSSSys_EnableOrtho(view->mcssSystem);
     view->alphaFading = FALSE;
     view->targetAlpha = 0;
 }
@@ -411,8 +411,8 @@ static void EggDemoView_AddMcss(EggDemoView *view) {
     f32 top;
     f32 left;
 
-    view->mcss = func_0201c14c(view->mcssSystem, view->pkm, 0, 0, FX32_CONST(-190), FX32_CONST(-800));
-    func_0201aecc(view->mcss, 1);
+    view->mcss = MCSSSys_AddPartyPkm(view->mcssSystem, view->pkm, 0, 0, FX32_CONST(-190), FX32_CONST(-800));
+    MCSS_SetNoShadow(view->mcss, 1);
     species = PokeParty_GetParam(view->pkm, PKM_PARAM_LEGAL_SPECIES, NULL);
     if (species != SPECIES_EGG) {
         for (i = 0; i < NELEMS(sSpritePositions); i++) {
@@ -440,7 +440,7 @@ static void EggDemoView_AddMcss(EggDemoView *view) {
     offset.x = FX32_CONST(left);
     offset.y = FX32_CONST(height);
     offset.z = 0;
-    func_0201ab54(view->mcss, &offset);
+    MCSS_SetPositionOffset(view->mcss, &offset);
     MCSS_PauseAnimation(view->mcss);
 }
 
@@ -457,7 +457,7 @@ static void EggDemoView_SetAnimation(EggDemoView *view, u32 animation, BOOL stop
     NNSG2dMultiCellAnimation *mcAnim;
 
     MCSS_SetAnimation(view->mcss, animation);
-    mcAnim = func_0201adc4(view->mcss);
+    mcAnim = MCSS_GetMultiCellAnimation(view->mcss);
     NNS_G2dRestartMCAnimation(mcAnim);
     MCSS_ResumeAnimation(view->mcss);
     if (stopAtEnd) {
@@ -465,7 +465,7 @@ static void EggDemoView_SetAnimation(EggDemoView *view, u32 animation, BOOL stop
                                           EggDemoView_OnAnimationEnd);
         view->animationEnded = FALSE;
     } else {
-        func_0201c290(view->mcss);
+        MCSS_SetLoopAnimation(view->mcss);
     }
 }
 
@@ -481,7 +481,7 @@ static void EggDemoView_UpdateAlpha(EggDemoView *view) {
     u8 alpha;
 
     if (view->alphaFading) {
-        alpha = func_0201ae88(view->mcss);
+        alpha = MCSS_GetAlpha(view->mcss);
         if (alpha > view->targetAlpha) {
             alpha--;
         } else {
@@ -496,16 +496,16 @@ static void EggDemoView_UpdateAlpha(EggDemoView *view) {
 
 static void EggDemoView_FadeToWhite(EggDemoView *view) {
     MCSS_PauseAnimation(view->mcss);
-    func_0201ae2c(view->mcss, 0, 16, 0, GX_RGB(31, 31, 31));
+    MCSS_StartFade(view->mcss, 0, 16, 0, GX_RGB(31, 31, 31));
 }
 
 static BOOL EggDemoView_IsFadeDone(EggDemoView *view) {
-    return func_0201aee8(view->mcss) == FALSE;
+    return MCSS_IsFading(view->mcss) == FALSE;
 }
 
 static void EggDemoView_FadeFromWhite(EggDemoView *view) {
     MCSS_Show(view->mcss);
-    func_0201ae2c(view->mcss, 16, 0, 2, GX_RGB(31, 31, 31));
+    MCSS_StartFade(view->mcss, 16, 0, 2, GX_RGB(31, 31, 31));
 }
 
 static DemoParticle *EggDemoParticle_Create(HeapID heapId, u16 count, const DemoParticleEvent *events) {

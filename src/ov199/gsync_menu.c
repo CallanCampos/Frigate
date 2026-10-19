@@ -115,7 +115,7 @@ struct GSyncMenuWork {
     // The button touched
     u32 selected;
     u32 unk274;
-    // The wireless status, from func_02012be4, and the last frame's
+    // The wireless status, from WihDwc_GetStatus, and the last frame's
     u32 wifiStatus;
     u32 prevWifiStatus;
     // The sub screen's palettes kept while they are dimmed
@@ -415,7 +415,7 @@ static void GSyncMenu_CreateButtons(int count, const u32 *msgIds, GSyncMenuWork 
     int i;
 
     wk->buttonCount = count;
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     for (i = 0; i < GSYNC_MENU_BUTTON_WIN_MAX; i++) {
         if (wk->buttonWins[i] != NULL) {
             BmpWin_ClearScreen(wk->buttonWins[i]);
@@ -563,7 +563,7 @@ static void GSyncMenu_StateShowButtons(GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_FreeGraphics(GSyncMenuWork *wk) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GSyncMenu_FreeButtons(wk);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, CHAR_POS(wk->frameChars), CHAR_SIZE(wk->frameChars));
@@ -643,7 +643,7 @@ static void GSyncMenu_SetSignalSequence(GSyncMenuWork *wk, int sequence) {
     }
 }
 
-// Shows the wireless signal's strength on the Game Sync button, from the bits of func_02012be4's status that
+// Shows the wireless signal's strength on the Game Sync button, from the bits of WihDwc_GetStatus's status that
 // are set, strongest first
 static void GSyncMenu_UpdateSignal(GSyncMenuWork *wk) {
     if (wk->wifiStatus != wk->prevWifiStatus) {
@@ -748,20 +748,20 @@ static BOOL GSyncMenu_IsMessageFinished(GSyncMenuWork *wk) {
         if (wk->msgWin != NULL) {
             KeyCursor_Update(wk->keyCursor, wk->printStream, wk->msgWin);
         }
-        switch (func_020223b4(wk->printStream)) {
+        switch (PrintStream_GetState(wk->printStream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(wk->printStream);
+            PrintStream_Delete(wk->printStream);
             wk->printStream = NULL;
             break;
         case PRINT_STREAM_PAUSED:
             if (func_0203da48()) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(wk->printStream);
+                PrintStream_Continue(wk->printStream);
             }
             break;
         case PRINT_STREAM_RUNNING:
             if (func_0203da2c()) {
-                func_020223e0(wk->printStream, 0);
+                PrintStream_SkipWait(wk->printStream, 0);
             }
             break;
         }
@@ -781,8 +781,8 @@ static void GSyncMenu_PrintMessage(GSyncMenuWork *wk, int height, BOOL stream) {
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     if (stream) {
-        wk->printStream =
-            func_02022268(win, 0, 0, wk->strBuf, wk->font, func_02017bcc(), wk->tcbMgr, 2, wk->heapId, 15);
+        wk->printStream = PrintStream_Create(win, 0, 0, wk->strBuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2,
+                                             wk->heapId, 15);
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(win), 0, 0, wk->strBuf, wk->font);
     }
@@ -805,7 +805,7 @@ static void GSyncMenu_StateSaveAsk(GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_StateWaitSave(GSyncMenuWork *wk) {
-    if (func_02017850(wk->gameData) == 2) {
+    if (GameData_UpdateSave(wk->gameData) == 2) {
         GSyncMenu_FreeMessage(wk);
         GSyncMenu_DimSubScreen(wk, FALSE);
         GSyncMenu_ChangeState(wk, GSyncMenu_StateFadeOut, 1258);
@@ -814,7 +814,7 @@ static void GSyncMenu_StateWaitSave(GSyncMenuWork *wk) {
 
 static void GSyncMenu_StateStartSave(GSyncMenuWork *wk) {
     if (GSyncMenu_IsMessageFinished(wk)) {
-        func_0201782c(wk->gameData);
+        GameData_StartSave(wk->gameData);
         GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitSave, 1274);
     }
 }
@@ -878,7 +878,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     GX_DispOn();
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sGSyncMenuVRAMConfig);
     {
         BGSysLCDConfig lcd = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -895,7 +895,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     wk->bgPalettes = GFL_HeapAllocate(wk->heapId, 0x200, FALSE, "gsync_menu.c", 1447);
     wk->tcbMgr = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 3, 0);
     wk->keyCursor = KeyCursor_Create(15, FALSE, TRUE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
     color = WIPE_COLOR_BLACK;
@@ -926,10 +926,10 @@ static BOOL GSyncMenu_ProcMain(GameProc *proc, u32 *state, void *param, void *wo
     }
     if (func_02042788()) {
         wk->prevWifiStatus = wk->wifiStatus;
-        wk->wifiStatus = func_02012be4(NULL);
+        wk->wifiStatus = WihDwc_GetStatus(NULL);
     }
     GFL_TCBExMgrUpdate(wk->tcbMgr);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->bgScroll);
     wk->bgScroll--;
     func_0204b794();
@@ -967,7 +967,7 @@ static BOOL GSyncMenu_ProcExit(GameProc *proc, u32 *state, void *param, void *wo
         wk->waitIcon = NULL;
     }
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     if (wk->yesNoMenu != NULL) {
         AppTaskMenu_Free(wk->yesNoMenu);
@@ -979,8 +979,8 @@ static BOOL GSyncMenu_ProcExit(GameProc *proc, u32 *state, void *param, void *wo
     GFL_HeapFree(wk->bgPalettes);
     KeyCursor_Free(wk->keyCursor);
     GFL_BGSysReleaseBG(5);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     if (wk->msgWin != NULL) {
         BmpWin_Free(wk->msgWin);
     }

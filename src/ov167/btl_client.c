@@ -4134,7 +4134,7 @@ static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq) {
         break;
     case 3:
         if (!GFL_SndBGMIsFading()) {
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             return TRUE;
         }
         break;
@@ -5497,7 +5497,7 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         break;
     case 3:
         func_ov167_021bc6a0(mon);
-        func_02038bc8(9);
+        JoinAvenue_RecordActivity(9);
         func_ov167_021bc3fc(mon);
         func_ov167_021bc6ac(mon);
         if (visible) {

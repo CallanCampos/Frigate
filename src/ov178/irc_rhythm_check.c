@@ -659,7 +659,7 @@ static ClActUnit *IrcRhythmClAct_GetUnit(IrcRhythmClAct *clact) {
 
 static void IrcRhythmText_Init(IrcRhythmText *text, int fontType, HeapID heapId) {
     MI_CpuFill8(text, 0, sizeof(IrcRhythmText));
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     switch (fontType) {
     case 0:
         text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
@@ -668,7 +668,7 @@ static void IrcRhythmText_Init(IrcRhythmText *text, int fontType, HeapID heapId)
         text->font = GFL_FontCreate(ARCID_FONT, 1, 0, FALSE, heapId);
         break;
     }
-    text->queue = func_02021998(heapId);
+    text->queue = PrintQueue_CreateDefault(heapId);
     text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_7, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 0x1c0, 0x20, heapId);
@@ -678,13 +678,13 @@ static void IrcRhythmText_Init(IrcRhythmText *text, int fontType, HeapID heapId)
 static void IrcRhythmText_Free(IrcRhythmText *text) {
     GFL_WordSetSystemFree(text->wordSet);
     GFL_MsgDataFree(text->msgData);
-    func_02021a18(text->queue);
+    PrintQueue_Free(text->queue);
     GFL_FontFree(text->font);
     MI_CpuFill8(text, 0, sizeof(IrcRhythmText));
 }
 
 static BOOL IrcRhythmText_Update(IrcRhythmText *text) {
-    return func_02021a3c(text->queue);
+    return PrintQueue_Main(text->queue);
 }
 
 static Font *IrcRhythmText_GetFont(IrcRhythmText *text) {

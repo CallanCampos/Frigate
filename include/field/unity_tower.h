@@ -78,37 +78,37 @@ struct UnityTowerSurveySave {
 }; // size: 0x1338
 
 // The size of the survey's block and its init
-u32 func_02009b5c(void);
-void func_02009b64(UnityTowerSurveySave *save);
+u32 UnityTower_GetSurveySaveSize(void);
+void UnityTower_InitSurveySave(UnityTowerSurveySave *save);
 // Gives the player the country and region and records them as the player's own
-void func_02009b84(UnityTowerSurveySave *save, PlayerInfo *info, int country, int region);
+void UnityTower_SetOwnRegion(UnityTowerSurveySave *save, PlayerInfo *info, int country, int region);
 // The UNITY_TOWER_REGION_* state of a country's region, and recording one
-u32 func_02009ba4(UnityTowerSurveySave *save, int country, int region);
-void func_02009be0(UnityTowerSurveySave *save, int country, int region, u32 state);
-u8 func_02009c38(UnityTowerSurveySave *save);
+u32 UnityTower_GetRegionState(UnityTowerSurveySave *save, int country, int region);
+void UnityTower_SetRegionState(UnityTowerSurveySave *save, int country, int region, u32 state);
+u8 UnityTower_HasMetForeignRegion(UnityTowerSurveySave *save);
 // A day has passed: every region recorded today becomes one recorded before
-void func_02009c48(UnityTowerSurveySave *save);
+void UnityTower_AgeTodayRegions(UnityTowerSurveySave *save);
 // The countries met, and without the player's own unless withOwnCountry
-u8 func_02009ca0(UnityTowerSurveySave *save);
-u8 func_02009cac(UnityTowerSurveySave *save, PlayerInfo *playerInfo, BOOL withOwnCountry);
+u8 UnityTower_GetCountryCount(UnityTowerSurveySave *save);
+u8 UnityTower_GetCountryCountForPlayer(UnityTowerSurveySave *save, PlayerInfo *playerInfo, BOOL withOwnCountry);
 // How many visitors are listed
-u8 func_02009ce4(UnityTowerSurveySave *save);
+u8 UnityTower_CountVisitors(UnityTowerSurveySave *save);
 // Counts one more country met
-void func_02009d04(UnityTowerSurveySave *save);
+void UnityTower_IncrementCountryCount(UnityTowerSurveySave *save);
 void func_02009d18(UnityTowerSurveySave *save, s32 value);
 u8 func_02009d28(UnityTowerSurveySave *save);
 void setPlayerSurveys(UnityTowerSurveySave *save, s32 hobby);
 u8 getPlayerSurveys(UnityTowerSurveySave *save);
 u32 UnityTower_GetVisitorParam(UnityTowerSurveySave *save, u32 index, u32 param);
 // Sets a visitor's UNITY_TOWER_VISITOR_PARAM_UNK26_0, SCRIPT_FLAG or VALID
-void func_02009db4(UnityTowerSurveySave *save, int index, u32 param, u32 value);
+void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param, u32 value);
 // A visitor, whose PlayerInfo comes first, or NULL out of range
 void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index);
-UnityTowerVisitor *func_02009e68(UnityTowerSurveySave *save);
+UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save);
 // Records the country met, returning whether it is a new one
-BOOL func_02009e6c(UnityTowerSurveySave *save, u32 country);
+BOOL UnityTower_MarkCountryMet(UnityTowerSurveySave *save, u32 country);
 // Whether a visitor from the country has come
-BOOL func_02009eb0(UnityTowerSurveySave *save, u32 country);
+BOOL UnityTower_HasMetCountry(UnityTowerSurveySave *save, u32 country);
 u8 UnityTowerVisitor_GetProvince(PlayerInfo *playerInfo);
 u8 UnityTowerVisitor_GetCountry(PlayerInfo *playerInfo);
 // Records a trade's partner as the latest visitor, unless they have no country: 1 for a visitor met before, who

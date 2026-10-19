@@ -165,7 +165,7 @@ static void func_ov055_021e65c8(GameData *gameData, u16 *counts) {
     int i;
 
     for (i = 0; i < 29; i++) {
-        counts[i] = func_0200feac(save, i);
+        counts[i] = WbtSave_GetCount(save, i);
     }
 }
 

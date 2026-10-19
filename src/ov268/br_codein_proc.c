@@ -61,7 +61,7 @@ static BOOL BrCodeInProc_Init(GameProc *proc, u32 *state, void *param, void *wor
         BrCodeInParam_Create(wk->heapId, BR_CODEIN_VIDEO_NUMBER_LENGTH, p->unit, p->res, wk->ballEff, blocks);
     wk->codeIn = BrCodeIn_Init(wk->codeInParam, wk->heapId);
 
-    wk->que = func_02021998(wk->heapId);
+    wk->que = PrintQueue_CreateDefault(wk->heapId);
     wk->text = BrText_Init(p->res, wk->que, wk->heapId);
     BrText_Print(wk->text, p->res, BrRes_Text_PleaseEnterVideoNumber);
     return TRUE;
@@ -74,7 +74,7 @@ static BOOL BrCodeInProc_Exit(GameProc *proc, u32 *state, void *param, void *wor
     BrText_Exit(wk->text, p->res);
     BrCodeIn_Exit(wk->codeIn);
     BrCodeInParam_Free(wk->codeInParam);
-    func_02021a18(wk->que);
+    PrintQueue_Free(wk->que);
     BrBallEff_Exit(wk->ballEff);
     BrRes_UnloadBG(p->res, 29);
     BrRes_UnloadOBJ(p->res, 6);
@@ -136,7 +136,7 @@ static BOOL BrCodeInProc_Main(GameProc *proc, u32 *state, void *param, void *wor
     if (wk->text != NULL) {
         BrText_Main(wk->text);
     }
-    func_02021a3c(wk->que);
+    PrintQueue_Main(wk->que);
     BrBallEff_Main(wk->ballEff);
     return FALSE;
 }

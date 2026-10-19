@@ -347,7 +347,7 @@ static void DataConvert_SeqWireless(KeySystemSeq *seq, int *state, void *work) {
         break;
     }
     case 12:
-        if (func_0201090c(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData))) {
+        if (MemoryLinkSave_CanMerge(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData))) {
             *state = 16;
         } else {
             *state = 13;
@@ -403,7 +403,8 @@ static void DataConvert_SeqWireless(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 16:
-        wk->transferResult = func_020108dc(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
+        wk->transferResult =
+            MemoryLinkSave_Merge(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
         (*state)++;
         break;
     case 17:
@@ -505,7 +506,7 @@ static void DataConvert_SeqWifi(KeySystemSeq *seq, int *state, void *work) {
             switch (request->wifiGet.result) {
             case 2:
             case 3:
-                func_02011de0();
+                GFL_NetErrShowScreen();
                 *state = 40;
                 break;
             default:
@@ -592,7 +593,7 @@ static void DataConvert_SeqWifi(KeySystemSeq *seq, int *state, void *work) {
                 break;
             case 2:
             case 3:
-                func_02011de0();
+                GFL_NetErrShowScreen();
                 *state = 40;
                 break;
             case 4:
@@ -628,7 +629,7 @@ static void DataConvert_SeqWifi(KeySystemSeq *seq, int *state, void *work) {
         (*state)++;
         break;
     case 21:
-        if (func_0201090c(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData))) {
+        if (MemoryLinkSave_CanMerge(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData))) {
             *state = 25;
         } else {
             *state = 22;
@@ -684,7 +685,8 @@ static void DataConvert_SeqWifi(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 25:
-        wk->transferResult = func_020108dc(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
+        wk->transferResult =
+            MemoryLinkSave_Merge(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
         (*state)++;
         break;
     case 26:
@@ -850,11 +852,11 @@ static void DataConvert_SeqSaveGame(KeySystemSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        func_0201782c(wk->param->gameData);
+        GameData_StartSave(wk->param->gameData);
         (*state)++;
         break;
     case 1:
-        if (func_02017850(wk->param->gameData) == 2) {
+        if (GameData_UpdateSave(wk->param->gameData) == 2) {
             (*state)++;
         }
         break;
@@ -1435,7 +1437,7 @@ static BOOL DataConvert_NeedsGameSave(KeySystemWork *wk) {
 }
 
 static BOOL DataConvert_IsMemoryOpen(KeySystemWork *wk, u32 memory) {
-    if (func_02010c54(wk->memoryLink, memory) || DataConvert_IsMemorySeen(wk, memory)) {
+    if (MemoryLinkSave_CheckMemoryCondition(wk->memoryLink, memory) || DataConvert_IsMemorySeen(wk, memory)) {
         return TRUE;
     }
     return FALSE;
@@ -1455,7 +1457,7 @@ static BOOL DataConvert_HasMemories(KeySystemWork *wk) {
 static BOOL DataConvert_IsMemorySeen(KeySystemWork *wk, u32 memory) {
     EventWork *eventWork = getConstDataBlock(GameData_GetSaveControl(wk->param->gameData));
 
-    if (*EventWork_GetWkPtr(eventWork, func_02010c6c(memory)) == 1) {
+    if (*EventWork_GetWkPtr(eventWork, MemoryLink_GetMemoryEventWork(memory)) == 1) {
         return TRUE;
     }
     return FALSE;

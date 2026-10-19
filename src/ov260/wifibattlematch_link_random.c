@@ -164,7 +164,7 @@ static BOOL WifiBattleMatchLink_RandomInit(GameProc *proc, u32 *state, void *par
         WifiBattleMatchRes_Create(WifiBattleMatchGraphic_GetClActUnit(link->graphic), 2, HEAPID_WIFIBATTLEMATCH_LINK);
     WifiBattleMatchLink_FillOwnPlayer(linkParam->player, link);
     link->font = GFL_FontCreate(0x17, 0, 0, 0, HEAPID_WIFIBATTLEMATCH_LINK);
-    link->printQueue = func_02021998(HEAPID_WIFIBATTLEMATCH_LINK);
+    link->printQueue = PrintQueue_CreateDefault(HEAPID_WIFIBATTLEMATCH_LINK);
     link->msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_FISHING, HEAPID_WIFIBATTLEMATCH_LINK);
     link->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_WIFIBATTLEMATCH_LINK);
@@ -211,7 +211,7 @@ static BOOL WifiBattleMatchLink_RandomExit(GameProc *proc, u32 *state, void *par
     WifiBattleMatchLink_DeleteMenu(link);
     GFL_WordSetSystemFree(link->wordSet);
     GFL_MsgDataFree(link->msgData);
-    func_02021a18(link->printQueue);
+    PrintQueue_Free(link->printQueue);
     GFL_FontFree(link->font);
     WifiBattleMatchRes_Free(link->res);
     WifiBattleMatchGraphic_Free(link->graphic);
@@ -255,7 +255,7 @@ static BOOL WifiBattleMatchLink_RandomMain(GameProc *proc, u32 *state, void *par
         break;
     }
     WifiBattleMatchGraphic_Update(link->graphic);
-    func_02021a3c(link->printQueue);
+    PrintQueue_Main(link->printQueue);
     WifiBattleMatchMsgBox_Update(link->msgBox);
     WifiBattleMatchLinkIcon_Update(link->linkIcon);
     WifiBattleMatchRes_Update(link->res);
@@ -380,7 +380,7 @@ static void WifiBattleMatchLink_TaskRatingStart(WifiBattleMatchTask *task, u32 *
 
     switch (*seq) {
     case 0:
-        if (func_020099f4(getDreamWorldStuffAddress(GameData_GetSaveControl(param->param->gameData)))) {
+        if (DreamWorldSave_GetIDShown(getDreamWorldStuffAddress(GameData_GetSaveControl(param->param->gameData)))) {
             *seq = 1;
         } else {
             *seq = 6;
@@ -1045,8 +1045,8 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         break;
     case 5:
         otherPlayer = param->otherPlayer;
-        if (func_02008bfc(&otherPlayer->info) == VERSION_WHITE2 ||
-            func_02008bfc(&otherPlayer->info) == VERSION_BLACK2) {
+        if (PlayerInfo_GetVersion(&otherPlayer->info) == VERSION_WHITE2 ||
+            PlayerInfo_GetVersion(&otherPlayer->info) == VERSION_BLACK2) {
             if (WifiBattleMatchNet_SendPerson(link->net)) {
                 *seq = 6;
             }
@@ -1141,11 +1141,11 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         WifiBattleMatchTask_SetReturnSeq(task, 14);
         break;
     case 14:
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 15;
         break;
     case 15:
-        switch (func_02017850(param->param->gameData)) {
+        switch (GameData_UpdateSave(param->param->gameData)) {
         case 0:
         case 1:
             break;
@@ -1294,11 +1294,11 @@ static void WifiBattleMatchLink_TaskRatingQuitSave(WifiBattleMatchTask *task, u3
         *seq = 7;
         break;
     case 1:
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 2;
         break;
     case 2:
-        if (func_02017850(param->param->gameData) == 2) {
+        if (GameData_UpdateSave(param->param->gameData) == 2) {
             *seq = 3;
         }
         break;
@@ -1730,8 +1730,8 @@ static void WifiBattleMatchLink_TaskFreeResult(WifiBattleMatchTask *task, u32 *s
         break;
     case 3:
         otherPlayer = param->otherPlayer;
-        if (func_02008bfc(&otherPlayer->info) == VERSION_WHITE2 ||
-            func_02008bfc(&otherPlayer->info) == VERSION_BLACK2) {
+        if (PlayerInfo_GetVersion(&otherPlayer->info) == VERSION_WHITE2 ||
+            PlayerInfo_GetVersion(&otherPlayer->info) == VERSION_BLACK2) {
             if (WifiBattleMatchNet_SendPerson(link->net)) {
                 *seq = 4;
             }
@@ -1796,11 +1796,11 @@ static void WifiBattleMatchLink_TaskFreeResult(WifiBattleMatchTask *task, u32 *s
         WifiBattleMatchTask_SetReturnSeq(task, 11);
         break;
     case 11:
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 12;
         break;
     case 12:
-        switch (func_02017850(param->param->gameData)) {
+        switch (GameData_UpdateSave(param->param->gameData)) {
         case 0:
         case 1:
             break;
@@ -1935,7 +1935,7 @@ static void WifiBattleMatchLink_TaskRelogin(WifiBattleMatchTask *task, u32 *seq,
         WifiBattleMatchNet_Delete(link->net);
         link->net = NULL;
     }
-    func_02012154();
+    GFL_NetErrShutdown();
     WifiBattleMatchTask_End(task);
 }
 

@@ -95,7 +95,7 @@ ManualGraphic *ManualGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     ManualBG_Init(&graphic->bg, heapId);
     ManualClAct_Init(&graphic->clact, &sManualVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(ManualGraphic_VBlank, graphic, 0);
@@ -106,7 +106,7 @@ void ManualGraphic_Free(ManualGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     ManualClAct_Free(&graphic->clact);
     ManualBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

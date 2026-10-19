@@ -53,7 +53,7 @@ static BOOL ZukanDetail_Init(GameProc *proc, u32 *state, void *param_, void *wor
     ZukanDetailGraphic_Free(wk->graphic);
     wk->graphic = ZukanDetailGraphic_Create(0, wk->heapId, FALSE);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->vblankTcb = GFL_VBlankTCBAdd(ZukanDetail_VBlank, wk, 1);
     wk->touchbar =
         ZukanDetailTouchbar_Create(wk->heapId, func_0200d1dc(GameData_GetPokedex(param->gameData)), param->mode);
@@ -84,8 +84,8 @@ static BOOL ZukanDetail_Exit(GameProc *proc, u32 *state, void *param, void *work
     ZukanDetailHeadbar_Free(wk->headbar);
     ZukanDetailTouchbar_Free(wk->touchbar);
     GFL_TCBRemove(wk->vblankTcb);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ZukanDetailGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -149,7 +149,7 @@ static BOOL ZukanDetail_Main(GameProc *proc, u32 *state, void *param_, void *wor
 
     ZukanDetailTouchbar_Update(wk->touchbar);
     ZukanDetailHeadbar_Update(wk->headbar);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     ZukanDetailGraphic_Update(wk->graphic);
     ZukanDetailGraphic_Begin3D(wk->graphic);
     if (!pageChanged) {

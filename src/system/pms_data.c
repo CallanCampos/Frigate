@@ -53,7 +53,7 @@ void PMSData_InitWithSentence(PMSData *data, u16 type, u16 id) {
     PMSData_SetSentence(data, type, id);
 }
 
-void func_02029bfc(PMSData *data, u32 preset) {
+void PMSData_InitPreset(PMSData *data, u32 preset) {
     switch (preset) {
     case 0:
         PMSData_Init(data, 1);
@@ -151,7 +151,7 @@ static u32 GetSentenceWordCount(u16 type, u16 id, HeapID heapId) {
     return count;
 }
 
-u16 func_02029df8(const PMSData *data, u32 index) {
+u16 PMSData_GetWordIndex(const PMSData *data, u32 index) {
     u16 word = data->words[index];
 
     if (word == PMS_WORD_NULL) {
@@ -164,7 +164,7 @@ u16 PMSData_GetWord(const PMSData *data, u32 index) {
     return data->words[index];
 }
 
-BOOL func_02029e1c(const PMSData *data, u32 index) {
+BOOL PMSData_IsWordNumber(const PMSData *data, u32 index) {
     return PMSWord_IsNumber(data->words[index]);
 }
 

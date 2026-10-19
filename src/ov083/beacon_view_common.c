@@ -83,9 +83,9 @@ void BeaconView_SetActorAnim(ClActor *actor, u16 sequence) {
 
 void BeaconView_SetPrintTimeLimit(PrintQueue *queue, BOOL longer) {
     if (longer) {
-        func_02021a34(queue, 2000);
+        PrintQueue_SetTimeLimit(queue, 2000);
     } else {
-        func_02021a34(queue, 500);
+        PrintQueue_SetTimeLimit(queue, 500);
     }
 }
 
@@ -292,7 +292,7 @@ static void BeaconViewOam_PrintEx(BeaconViewOam *oam, const StrBuf *strbuf, u16 
         GFL_TextRendererDrawToBitmapEx(oam->bitmap, 0, 0, strbuf, oam->font, color);
         BmpOam_ActorBmpTrans(oam->actor);
     } else {
-        func_02021c7c(oam->queue, oam->bitmap, 0, 0, strbuf, oam->font, color);
+        PrintQueue_PrintColor(oam->queue, oam->bitmap, 0, 0, strbuf, oam->font, color);
         BeaconViewOam_StartFlushTask(oam, pending);
     }
 }
@@ -316,7 +316,7 @@ static void BeaconViewOam_StartFlushTask(BeaconViewOam *oam, int *pending) {
 static void BeaconViewOam_FlushTask(TCBEx *task, void *data) {
     BeaconViewOamTask *flush = data;
 
-    if (!func_02021c1c(flush->oam->queue, flush->oam->bitmap)) {
+    if (!PrintQueue_IsBitmapPending(flush->oam->queue, flush->oam->bitmap)) {
         BmpOam_ActorBmpTrans(flush->oam->actor);
         if (flush->pending != NULL) {
             (*flush->pending)--;

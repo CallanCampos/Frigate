@@ -364,7 +364,7 @@ static void MicTest_SeqListen(MicTestSeq *seq, u32 *state) {
         break;
     case 1:
         if (MicTest_IsExitPressed()) {
-            if (func_02006e3c()) {
+            if (SndMic_IsOverLimit()) {
                 GFL_SndSEPlay(SEQ_SE_CANCEL1);
                 *state = 2;
             }
@@ -618,7 +618,7 @@ static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, v
     mic->param.size -= 0x20;
     mic->param.fullCallback = callback;
     mic->param.fullArg = arg;
-    mic->wasOpen = func_02006e3c();
+    mic->wasOpen = SndMic_IsOverLimit();
 }
 
 static void MicTestMic_Free(MicTestMic *mic) {
@@ -630,8 +630,8 @@ static void MicTestMic_Free(MicTestMic *mic) {
 static void MicTestMic_Update(MicTestMic *mic) {
     BOOL open;
 
-    func_02006e0c(1);
-    open = func_02006e3c();
+    SndMic_AddCount(1);
+    open = SndMic_IsOverLimit();
     if (!open || !mic->wasOpen) {
         if (!mic->asleep) {
             if (mic->sampling) {

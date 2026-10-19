@@ -278,22 +278,22 @@ u32 KeySystemNet_CheckError(KeySystemNet *net) {
     case KEY_SYSTEM_NET_MODE_WIRELESS:
     case KEY_SYSTEM_NET_MODE_OV181:
         if (net->error) {
-            func_020120f0(14);
+            GFL_NetErrRecordWifi(14);
             KeySystemNet_OnError(net);
-            func_02011de0();
+            GFL_NetErrShowScreen();
             return KEY_SYSTEM_NET_ERROR;
         }
         if (GFL_NetErrCheck()) {
             KeySystemNet_OnError(net);
-            func_02011de0();
+            GFL_NetErrShowScreen();
             return KEY_SYSTEM_NET_ERROR;
         }
         break;
     case KEY_SYSTEM_NET_MODE_WIFI:
         if (net->error) {
-            func_020120f0(net->errorCode);
+            GFL_NetErrRecordWifi(net->errorCode);
             KeySystemNet_OnError(net);
-            func_02011de0();
+            GFL_NetErrShowScreen();
             return KEY_SYSTEM_NET_ERROR;
         }
         if (GFL_NetErrCheck()) {
@@ -305,7 +305,7 @@ u32 KeySystemNet_CheckError(KeySystemNet *net) {
             case 5:
             case 6:
                 KeySystemNet_OnError(net);
-                func_02011de0();
+                GFL_NetErrShowScreen();
                 return KEY_SYSTEM_NET_ERROR;
             case 7:
                 GFL_NetErrAbort();
@@ -323,13 +323,13 @@ void KeySystemNet_Reset(KeySystemNet *net) {
     case KEY_SYSTEM_NET_MODE_WIRELESS:
     case KEY_SYSTEM_NET_MODE_OV181:
         func_020429f0();
-        func_02012154();
-        func_02012144();
+        GFL_NetErrShutdown();
+        GFL_NetErrClear();
         KeySystemSeq_Set(net->seq, KeySystemNet_SeqIdle);
         break;
     case KEY_SYSTEM_NET_MODE_WIFI:
-        func_02012154();
-        func_02012144();
+        GFL_NetErrShutdown();
+        GFL_NetErrClear();
         func_020424e4();
         DWC_ClearError();
         KeySystemSeq_Set(net->seq, KeySystemNet_SeqIdle);
@@ -611,7 +611,8 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
     case 0:
         net->hasReceived = FALSE;
         request->wifi.result = 0;
-        net->http = NHttpRap_Create(net->heapId, func_02008bdc(GetGameDataPlayerInfo(net->gameData)), net->buffer);
+        net->http =
+            NHttpRap_Create(net->heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(net->gameData)), net->buffer);
         NHttpRap_SetAnswerBuffer(net->http, request->wifi.buffer, request->wifi.size);
         if (NHttpRap_SendRequestWithId(10, request->wifi.id, net->http)) {
             *state = 1;
@@ -672,7 +673,7 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
                     break;
                 default:
                     net->error = TRUE;
-                    net->errorCode = func_02011d2c(*(int *)response);
+                    net->errorCode = GFL_NetErrGetServerMessage(*(int *)response);
                     request->wifi.result = 3;
                     *state = 3;
                     break;
@@ -710,7 +711,8 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
     case 0:
         net->hasReceived = FALSE;
         request->wifiGet.result = 0;
-        net->http = NHttpRap_Create(net->heapId, func_02008bdc(GetGameDataPlayerInfo(net->gameData)), net->buffer);
+        net->http =
+            NHttpRap_Create(net->heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(net->gameData)), net->buffer);
         if (NHttpRap_SendRequest(0, net->http)) {
             *state = 1;
         }
@@ -752,7 +754,7 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
                 request->wifiGet.result = 4;
             } else {
                 net->error = TRUE;
-                net->errorCode = func_02011d2c(*response);
+                net->errorCode = GFL_NetErrGetServerMessage(*response);
                 request->wifiGet.result = 3;
                 *state = 3;
             }

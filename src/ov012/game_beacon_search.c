@@ -145,14 +145,14 @@ static void func_ov012_0215f5f4(void *work) {
     BeaconSearchWork *search = work;
 
     search->state = 1;
-    search->unk88 = func_02012908(4, HEAPID_TAIL(HEAPID_TRIAL_HOUSE));
+    search->unk88 = WihDwc_Create(4, HEAPID_TAIL(HEAPID_TRIAL_HOUSE));
 }
 
 BOOL func_ov012_0215f610(u32 *seq, void *param, void *work) {
     GameSystem *gsys = param;
     BeaconSearchWork *search = work;
 
-    func_02012994(search->unk88);
+    WihDwc_Destroy(search->unk88);
     func_02042860(func_ov012_0215f64c);
     return TRUE;
 }
@@ -164,7 +164,7 @@ BOOL func_ov012_0215f628(u32 *seq, void *param, void *work) {
     if (search->state == 0) {
         GFL_HeapFree(search);
         if (GFL_NetErrCheck()) {
-            func_02012144();
+            GFL_NetErrClear();
         }
         return TRUE;
     }
@@ -204,7 +204,7 @@ void func_ov012_0215f654(u32 *seq, void *param, void *work) {
     if (found != NULL) {
         found->type = 0;
     }
-    func_02012a4c();
+    WihDwc_TickTimers();
 }
 
 static BeaconSearchFound *func_ov012_0215f6c8(BeaconSearchWork *work, int *index) {

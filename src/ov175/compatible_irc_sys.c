@@ -462,7 +462,7 @@ void CompatibleIrcSys_BuildProfile(GameSystem *gsys, CompatibleIrcProfile *profi
     trainer = GetGameDataPlayerInfo(gameData);
     profile->birthMonth = owner.birthday.month;
     profile->birthDay = owner.birthday.day;
-    func_02008b34(trainer, &profile->trainer);
+    PlayerInfo_Copy(trainer, &profile->trainer);
     party = GameData_GetParty(gameData);
     isFourteenth = FALSE;
     pkm = PokeParty_GetPkm(party, 0);
@@ -664,7 +664,7 @@ static void CompatibleIrcSync_RecvProfile(int netId, int size, const void *data,
     const CompatibleIrcProfile *profile = data;
 
     if (sync->sys->gameData != NULL) {
-        PlayerInfo *info = func_02017378(sync->sys->gameData, netId);
+        PlayerInfo *info = GameData_GetPlayerInfoByNetID(sync->sys->gameData, netId);
 
         MI_CpuCopy8(&profile->trainer, info, PlayerInfo_GetSize());
     }

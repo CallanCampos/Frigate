@@ -117,7 +117,7 @@ PkwdCountGraphic *PkwdCountGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     PkwdCountBG_Init(&graphic->bg, heapId);
     PkwdCountClAct_Init(&graphic->clact, &sPkwdCountVRAMConfig, heapId);
     graphic->paletteFade = PaletteFade_Create(heapId);
@@ -130,7 +130,7 @@ void PkwdCountGraphic_Free(PkwdCountGraphic *graphic) {
     PkwdCountClAct_Free(&graphic->clact);
     PkwdCountBG_Free(&graphic->bg);
     PaletteFade_Free(graphic->paletteFade);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

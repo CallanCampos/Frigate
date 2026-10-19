@@ -1440,11 +1440,11 @@ static void ResearchList_StartScrollToCursor(ResearchList *wk) {
 static u8 ResearchList_GetCurrentSurvey(ResearchList *wk) {
     u8 questions[QUESTION_COUNT];
     int i;
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchList_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchList_GetGameData(wk)));
     u8 index;
 
     for (i = 0; i < QUESTION_COUNT; i++) {
-        questions[i] = func_0200ece4(survey, i);
+        questions[i] = SurveySave_GetQuestion(survey, i);
     }
 
     for (index = 0; index < SURVEY_COUNT; index++) {
@@ -1461,11 +1461,11 @@ static u8 ResearchList_GetCurrentSurvey(ResearchList *wk) {
 // Makes the chosen survey the one being run
 static void ResearchList_SetCurrentSurvey(ResearchList *wk) {
     u8 index = ResearchList_GetSelected(wk);
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchList_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchList_GetGameData(wk)));
 
-    func_0200ecd8(survey, sListSurveyQuestions1[index], 0);
-    func_0200ecd8(survey, sListSurveyQuestions2[index], 1);
-    func_0200ecd8(survey, sListSurveyQuestions3[index], 2);
+    SurveySave_SetQuestion(survey, sListSurveyQuestions1[index], 0);
+    SurveySave_SetQuestion(survey, sListSurveyQuestions2[index], 1);
+    SurveySave_SetQuestion(survey, sListSurveyQuestions3[index], 2);
 }
 
 static void ResearchList_MoveButtonCursor(ResearchList *wk, int dir) {

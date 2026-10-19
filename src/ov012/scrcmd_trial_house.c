@@ -98,7 +98,7 @@ BOOL func_ov012_0216465c(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     rank = ScriptReadAny(vm, env);
-    func_02009618(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), rank);
+    RecordSetTrialHouseRank(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), rank);
     return FALSE;
 }
 
@@ -109,7 +109,7 @@ BOOL s01EF_TrialHouseGetBattleTestRank(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     result = ScriptReadVar(vm, env);
-    *result = func_02009628(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)));
+    *result = RecordGetTrialHouseRank(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)));
     return FALSE;
 }
 

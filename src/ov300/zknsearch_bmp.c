@@ -65,7 +65,7 @@ void ZknSearchBmp_Exit(ZknSearchWork *wk) {
 void ZknSearchBmp_Update(ZknSearchWork *wk) {
     u32 i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < ZKNSEARCH_WIN_COUNT; i++) {
         PrintWindow_Flush(&wk->windows[i], wk->printQueue);
     }

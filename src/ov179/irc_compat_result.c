@@ -542,11 +542,11 @@ static ClActUnit *IrcCompatClAct_GetUnit(IrcCompatClAct *clact) {
 
 static void IrcCompatText_Init(IrcCompatText *text, BOOL keepFont, HeapID heapId) {
     MI_CpuFill8(text, 0, sizeof(IrcCompatText));
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     if (!keepFont) {
         text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     }
-    text->queue = func_02021998(heapId);
+    text->queue = PrintQueue_CreateDefault(heapId);
     text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_6, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
 }
@@ -554,13 +554,13 @@ static void IrcCompatText_Init(IrcCompatText *text, BOOL keepFont, HeapID heapId
 static void IrcCompatText_Free(IrcCompatText *text) {
     GFL_WordSetSystemFree(text->wordSet);
     GFL_MsgDataFree(text->msgData);
-    func_02021a18(text->queue);
+    PrintQueue_Free(text->queue);
     GFL_FontFree(text->font);
     MI_CpuFill8(text, 0, sizeof(IrcCompatText));
 }
 
 static BOOL IrcCompatText_Update(IrcCompatText *text) {
-    return func_02021a3c(text->queue);
+    return PrintQueue_Main(text->queue);
 }
 
 static Font *IrcCompatText_GetFont(IrcCompatText *text) {
@@ -1087,11 +1087,11 @@ static u32 IrcCompat_GetRewardCount(u32 score, BOOL bothLogs) {
 
 static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk) {
     u32 result = REWARD_NONE;
-    TrainerLogSave *log = func_0200afbc(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
+    TrainerLogSave *log = TrainerLogSave_Get(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
     CompatibleIrcProfile *other = wk->param->profile;
     PlayerInfo *info = &other->trainer;
 
-    if (!func_0200b0c0(log, getIDAsUInt(info)) && wk->param->gsys != NULL) {
+    if (!TrainerLogSave_WasMetToday(log, getIDAsUInt(info)) && wk->param->gsys != NULL) {
         BagSave *bag = GameData_GetBag(GSYS_GetGameData(wk->param->gsys));
         u32 owned = BagSave_GetItemCountByID(bag, ITEM_SWEET_HEART, HEAPID_IRC_COMPAT);
 

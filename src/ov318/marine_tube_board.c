@@ -72,7 +72,7 @@ static BOOL MarineTubeBoard_Init(GameProc *proc, u32 *state, void *param, void *
     MI_CpuFill8(wk, 0, sizeof(MarineTubeBoardWork));
     wk->heapId = HEAPID_MARINE_TUBE_BOARD;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_9, wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     wk->graphic = MarineTubeBoardGraphic_Create(1, wk->heapId);
@@ -103,8 +103,8 @@ static BOOL MarineTubeBoard_Exit(GameProc *proc, u32 *state, void *param, void *
     MarineTubeBoardMsgWin_Free(&wk->msgWin);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_MsgDataFree(wk->msgData);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     GFL_BGSysFreeFilledChar(BG_MESSAGE, 1, 0);
     MarineTubeBoardGraphic_Free(wk->graphic);
@@ -158,7 +158,7 @@ static BOOL MarineTubeBoard_Main(GameProc *proc, u32 *state, void *param, void *
     case STEP_END:
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     MarineTubeBoardGraphic_Update(wk->graphic);
     return FALSE;
 }

@@ -42,7 +42,7 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     colosseum->unkDD = 0xff;
     PokeParty_Copy(GameData_GetParty(gameData), colosseum->party[self]);
     member = &colosseum->members[self];
-    func_02008b34(info, &member->info);
+    PlayerInfo_Copy(info, &member->info);
     OS_GetMacAddress(member->mac);
     member->unk26 = 1;
     value = 1;

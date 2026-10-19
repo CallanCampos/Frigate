@@ -279,7 +279,7 @@ static BOOL MysteryProc_Init(GameProc *proc, u32 *state, void *param, void *work
     MysteryBg_Init(&wk->bg, HEAPID_MYSTERY);
     MysteryActors_Init(&wk->actors, MysteryGraphic_GetClactUnit(wk->graphic), HEAPID_MYSTERY);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_MYSTERY);
-    wk->queue = func_02021998(HEAPID_MYSTERY);
+    wk->queue = PrintQueue_CreateDefault(HEAPID_MYSTERY);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_14, HEAPID_MYSTERY);
     wk->scriptMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, HEAPID_MYSTERY);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_MYSTERY);
@@ -306,18 +306,18 @@ static BOOL MysteryProc_Exit(GameProc *proc, u32 *state, void *param, void *work
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_MsgDataFree(wk->scriptMsgData);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_FontFree(wk->font);
     MysteryActors_Exit(&wk->actors);
     MysteryBg_Exit(&wk->bg);
     MysteryGraphic_Delete(wk->graphic);
-    func_0200aa54(wk->giftSave);
+    MysteryGiftSave_Free(wk->giftSave);
     GameData_Free(wk->gameData);
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_MYSTERY);
     OS_ResetSystem(0);
     GFL_OvlUnload(OVERLAY_ID(189));
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     return TRUE;
 }
 
@@ -332,7 +332,7 @@ static BOOL MysteryProc_Main(GameProc *proc, u32 *state, void *param, void *work
         MysteryGraphic_EndFrame3D(wk->graphic);
     }
     MysteryBgScroll_Main(&wk->scroll);
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     if (wk->msgWin != NULL) {
         MysteryMsgWin_Update(wk->msgWin);
     }
@@ -581,18 +581,18 @@ static void MysterySeq_Top(MysterySeq *seq, u32 *state, void *work) {
             u32 i;
 
             Mystery_DeleteList(wk);
-            full = func_0200a7e4(wk->giftSave) == FALSE ? TRUE : FALSE;
+            full = MysteryGiftSave_HasFreeSlot(wk->giftSave) == FALSE ? TRUE : FALSE;
             if (full) {
-                for (i = 0; i < func_0200aa64(wk->giftSave); i++) {
-                    if (func_0200a820(wk->giftSave, i)) {
+                for (i = 0; i < MysteryGiftSave_GetCardMax(wk->giftSave); i++) {
+                    if (MysteryGiftSave_IsCardDelivered(wk->giftSave, i)) {
                         noneDelivered = FALSE;
                     }
                 }
             }
             if (full) {
                 if (noneDelivered) {
-                    MysteryMsgWin_Print(wk->msgWin, wk->msgData, func_0200aa6c(wk->giftSave) == 0 ? 0x43 : 0x3a,
-                                        MYSTERY_PRINT_STREAM);
+                    MysteryMsgWin_Print(wk->msgWin, wk->msgData,
+                                        MysteryGiftSave_GetKind(wk->giftSave) == 0 ? 0x43 : 0x3a, MYSTERY_PRINT_STREAM);
                     MysterySeq_SetReturn(seq, 0);
                     *state = 19;
                 } else {
@@ -934,14 +934,14 @@ static void MysterySeq_Receive(MysterySeq *seq, u32 *state, void *work) {
         Mystery_DeleteYesNo(wk);
         if (ret == 0) {
             Mystery_DeleteList(wk);
-            if (wk->recv.gift.once && func_0200a8c4(wk->giftSave, wk->recv.gift.id)) {
+            if (wk->recv.gift.once && MysteryGiftSave_IsIdReceived(wk->giftSave, wk->recv.gift.id)) {
                 *state = 11;
                 break;
             }
             RTC_GetCachedDate(&date);
             wk->recv.gift.date = ((date.year + 2000) << 16) | ((date.month & 0xff) << 8) | (date.day & 0xff);
-            func_0200a750(wk->giftSave, &wk->recv.gift);
-            func_0200a900(wk->giftSave, wk->recv.gift.id);
+            MysteryGiftSave_AddCard(wk->giftSave, &wk->recv.gift);
+            MysteryGiftSave_SetIdReceived(wk->giftSave, wk->recv.gift.id);
             MysterySeq_SetNext(seq, MysterySeq_Received);
         } else if (ret == 1) {
             *state = 5;
@@ -1018,11 +1018,11 @@ static void MysterySeq_Received(MysterySeq *seq, u32 *state, void *work) {
         }
         break;
     case 4:
-        func_0200a9d4(wk->giftSave, wk->gameData);
+        MysteryGiftSave_StartSave(wk->giftSave, wk->gameData);
         *state = 5;
         break;
     case 5:
-        if (func_0200a9f4(wk->giftSave, wk->gameData) == 2) {
+        if (MysteryGiftSave_SaveStep(wk->giftSave, wk->gameData) == 2) {
             *state = 6;
         }
         break;
@@ -1259,7 +1259,7 @@ static void MysterySeq_AlbumFull(MysterySeq *seq, u32 *state, void *work) {
         *state = 8;
         break;
     case 7:
-        wk->resumeReceive = func_0200a7e4(wk->giftSave);
+        wk->resumeReceive = MysteryGiftSave_HasFreeSlot(wk->giftSave);
         MysterySeq_SetNext(seq, MysterySeq_Top);
         break;
     case 8:
@@ -1314,7 +1314,7 @@ static void MysterySeq_WifiLogin(MysterySeq *seq, u32 *state, void *work) {
         wk->loginParam->buffer = NULL;
         wk->loginParam->unk18 = 0;
         wk->loginParam->unkC = 9;
-        if (func_0200aa6c(wk->giftSave) == 0) {
+        if (MysteryGiftSave_GetKind(wk->giftSave) == 0) {
             wk->loginParam->unk14 = 2;
         } else {
             wk->loginParam->unk14 = 0;
@@ -2033,7 +2033,8 @@ static u32 Mystery_GetSpriteBottom(BoxPkm *pkm, HeapID heapId) {
 }
 
 static BOOL Mystery_IsRecvDataValid(const MysteryGiftRecvData *recv, u32 errors) {
-    if (func_0200a938(recv) && errors == 0 && (recv->versions == 0 || (recv->versions & (1 << GAME_VERSION)))) {
+    if (MysteryGiftRecvData_CheckCRC(recv) && errors == 0 &&
+        (recv->versions == 0 || (recv->versions & (1 << GAME_VERSION)))) {
         return TRUE;
     }
     return FALSE;

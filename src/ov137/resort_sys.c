@@ -37,8 +37,8 @@
 #define RESORT_SHOP_KIND_COUNT 8
 #define RESORT_PERSON_COUNT 8
 
-// The fields of the info that JoinAvenue_GetParam reads and func_02039064 sets: the avenue's rank, and the popularity
-// points toward the next rank
+// The fields of the info that JoinAvenue_GetParam reads and JoinAvenueInfo_SetParam sets: the avenue's rank, and the
+// popularity points toward the next rank
 #define RESORT_INFO_RANK 2
 #define RESORT_INFO_POPULARITY 3
 
@@ -334,13 +334,13 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         u16 trainerId = func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
         u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
         u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
-        u32 shop = func_020394b0(shopId, trainerId, version, unk18, info, shopData);
+        u32 shop = JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData);
 
         return ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shop), 0) +
                ResortSys_PickByGender(gender, 1120, 1128);
     }
     case 6: {
-        u16 shopId = func_020363e0(func_02038470(func_ov137_021f1980(data)), 0);
+        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 0);
 
         return ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0) +
                ResortSys_PickByGender(gender, 328, 336);
@@ -525,7 +525,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
     case 116:
         return ResortSys_PickByGender(gender, 154, 171);
     case 86: {
-        u16 level = func_020363e0(func_02038470(func_ov137_021f1980(data)), 1);
+        u16 level = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 1);
 
         if (level >= 9) {
             return ResortSys_PickByGender(gender, 80, 85);
@@ -623,7 +623,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         occupant = func_ov137_021f1b94(datas, 0, query);
         shopName =
             ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shopData, func_ov137_021f1980(occupant)), 0);
-        shopId = func_020363e0(func_02038470(func_ov137_021f1980(occupant)), 0);
+        shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(occupant)), 0);
         name = ResortSys_FormatShopText(shopData, occupant, shopId, heapId);
         func_0202437c(wordSet, 0, name, func_ov137_021f1968(occupant, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(name);
@@ -639,9 +639,10 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         u32 pick;
 
         for (i = 0; i < JOIN_AVE_RECORD_COUNT; i++) {
-            JoinAvenueRecord *record = func_0203888c(occupants, i);
+            JoinAvenueRecord *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-            if (!func_020384e0(record) && func_020385a8(record, JOIN_AVE_PARAM_SHOP_KIND, NULL) == 2) {
+            if (!JoinAvenueRecord_IsEmpty(record) &&
+                JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_SHOP_KIND, NULL) == 2) {
                 hasRecord = TRUE;
                 break;
             }
@@ -704,14 +705,14 @@ static BOOL ResortSys_MatchCondition(u32 type, JoinAvenuePerson *person, ResortS
     JoinAvenueOccupants *occupants = ResortSys_GetOccupants(sys);
     ResortBinary *types = ResortSys_GetPersonTypes(sys);
     ResortShopData *shopData = ResortSys_GetShopData(sys);
-    JoinAvenueShop *shop = func_02038470(person);
+    JoinAvenueShop *shop = JoinAvenuePerson_GetShop(person);
     const u16 *shopRow = ResortShopData_GetPersonShop(shopData, person);
     u32 shopKind;
     BOOL found;
     s32 best;
     u32 index;
 
-    func_020363e0(shop, 1);
+    JoinAvenueShop_GetField(shop, 1);
     ResortShopData_GetShopParam(shopRow, 0);
     shopKind = ResortShopData_GetShopParam(shopRow, 0);
     found = FALSE;
@@ -890,13 +891,13 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
     range = ResortBinary_FindRange(ranks, *rank);
     required = ResortBinary_Get(ranks, range, 5);
     if (popularity + points < required) {
-        func_02039064(info, RESORT_INFO_POPULARITY, popularity + points);
+        JoinAvenueInfo_SetParam(info, RESORT_INFO_POPULARITY, popularity + points);
         return 0;
     }
 
     (*rank)++;
-    func_02039064(info, RESORT_INFO_RANK, *rank);
-    func_02039064(info, RESORT_INFO_POPULARITY, 0);
+    JoinAvenueInfo_SetParam(info, RESORT_INFO_RANK, *rank);
+    JoinAvenueInfo_SetParam(info, RESORT_INFO_POPULARITY, 0);
     nextRange = ResortBinary_FindRange(ranks, *rank);
     oldMessage = ResortBinary_Get(ranks, range, 6);
     shop = ResortSys_GetUnlockForRank(sys, gameData, *rank);
@@ -906,9 +907,9 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
 
     if (shop != 0) {
         if (shop == 8) {
-            func_02039064(info, 0x17, 1);
+            JoinAvenueInfo_SetParam(info, 0x17, 1);
         }
-        func_02039064(info, shop + 15, 1);
+        JoinAvenueInfo_SetParam(info, shop + 15, 1);
         newShop = TRUE;
     } else {
         newShop = FALSE;
@@ -928,32 +929,32 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
 u32 ResortSys_AddShopExperience(JoinAvenuePerson *person, ResortSys *sys, u32 points, u16 *level) {
     ResortShopData *shopData = ResortSys_GetShopData(sys);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
-    JoinAvenueShop *shop = func_02038470(person);
-    u32 experience = func_020363e0(shop, 2);
+    JoinAvenueShop *shop = JoinAvenuePerson_GetShop(person);
+    u32 experience = JoinAvenueShop_GetField(shop, 2);
     const u16 *shopRow = ResortShopData_GetPersonShop(shopData, person);
     u32 needed = ResortShopData_GetShopParam(shopRow, 3);
     u32 kind = ResortShopData_GetShopParam(shopRow, 0);
     u32 column1 = ResortShopData_GetShopParam(shopRow, 1);
     const u16 *newRow;
 
-    *level = func_020363e0(shop, 1);
+    *level = JoinAvenueShop_GetField(shop, 1);
     if (*level >= 9) {
         return 3;
     }
     if (experience + points < needed) {
-        func_0203640c(shop, 2, experience + points);
+        JoinAvenueShop_SetField(shop, 2, experience + points);
         return 0;
     }
 
     (*level)++;
-    func_0203640c(shop, 1, *level);
-    func_0203640c(shop, 2, 0);
-    func_0203640c(shop, 3, 0);
-    func_0203640c(shop, 0, ResortShopData_FindShop(shopData, kind, *level, column1));
+    JoinAvenueShop_SetField(shop, 1, *level);
+    JoinAvenueShop_SetField(shop, 2, 0);
+    JoinAvenueShop_SetField(shop, 3, 0);
+    JoinAvenueShop_SetField(shop, 0, ResortShopData_FindShop(shopData, kind, *level, column1));
     newRow = ResortShopData_GetPersonShop(shopData, person);
     if (ResortSys_AreAllShopsMaxLevel(sys)) {
-        func_02039064(info, 0x1b, 1);
-        func_02039064(info, 0x1a, 0);
+        JoinAvenueInfo_SetParam(info, 0x1b, 1);
+        JoinAvenueInfo_SetParam(info, 0x1a, 0);
     }
     if (ResortShopData_GetShopParam(shopRow, 6) != ResortShopData_GetShopParam(newRow, 6)) {
         return 2;
@@ -977,7 +978,7 @@ BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys) {
         if (data == NULL) {
             break;
         }
-        if (func_020363e0(func_02038470(func_ov137_021f1980(data)), 1) != 9) {
+        if (JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 1) != 9) {
             return FALSE;
         }
     }
@@ -991,7 +992,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     ResortShopData *shopData = ResortSys_GetShopData(sys);
     ResortBinary *ranks = ResortSys_GetRanks(sys);
-    JoinAvenuePerson *player = func_02038a18(ResortSys_GetOccupants(sys));
+    JoinAvenuePerson *player = JoinAvenueOccupants_GetPlayerPerson(ResortSys_GetOccupants(sys));
     ResortPersonData *data;
     JoinAvenuePerson *joinPerson;
 
@@ -1022,7 +1023,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 1: {
-        u16 shopId = func_020363e0(func_02038470(joinPerson), 0);
+        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(joinPerson), 0);
         StrBuf *buf = ResortSys_FormatShopText(shopData, data, shopId, heapId);
 
         func_0202437c(wordSet, wordIndex, buf, func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
@@ -1035,7 +1036,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
         u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
         StrBuf *buf = ResortSys_FormatShopText(
-            shopData, data, func_020394b0(shopId, trainerId, version, unk18, info, shopData), heapId);
+            shopData, data, JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData), heapId);
 
         func_0202437c(wordSet, wordIndex, buf, func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(buf);
@@ -1119,7 +1120,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         WordSetNumber(wordSet, wordIndex, func_ov137_021f1968(data, JOIN_AVE_PARAM_DAY, NULL), 2, NUM_PAD_NONE, TRUE);
         break;
     case 7: {
-        u16 shopId = func_020363e0(func_02038470(joinPerson), 0);
+        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(joinPerson), 0);
         u32 shopName = ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0);
         MsgData *msgData =
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
@@ -1136,7 +1137,8 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
         u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
         u32 shopName = ResortShopData_GetShopParam(
-            ResortShopData_GetShop(shopData, func_020394b0(shopId, trainerId, version, unk18, info, shopData)), 0);
+            ResortShopData_GetShop(shopData, JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData)),
+            0);
         MsgData *msgData =
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, shopName + 280);
@@ -1147,9 +1149,11 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 16: {
-        JoinAvenuePerson *occupant = func_02038a18(ResortSys_GetOccupants(sys));
+        JoinAvenuePerson *occupant = JoinAvenueOccupants_GetPlayerPerson(ResortSys_GetOccupants(sys));
         u32 shopName = ResortShopData_GetShopParam(
-            ResortShopData_GetShop(shopData, (u16)func_02038a20(occupant, GetGameDataPlayerInfo(gameData))), 0);
+            ResortShopData_GetShop(shopData,
+                                   (u16)JoinAvenuePerson_GetShopId(occupant, GetGameDataPlayerInfo(gameData))),
+            0);
         MsgData *msgData =
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, shopName + 280);
@@ -1174,8 +1178,8 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     case 9: {
         const u16 *shopRow = ResortShopData_GetPersonShop(shopData, joinPerson);
-        JoinAvenueShop *shop = func_02038470(joinPerson);
-        s32 remaining = ResortShopData_GetShopParam(shopRow, 3) - (u16)func_020363e0(shop, 2);
+        JoinAvenueShop *shop = JoinAvenuePerson_GetShop(joinPerson);
+        s32 remaining = ResortShopData_GetShopParam(shopRow, 3) - (u16)JoinAvenueShop_GetField(shop, 2);
 
         if (remaining < 0) {
             remaining = 0;
@@ -1187,7 +1191,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u16 level;
 
         ResortShopData_GetPersonShop(shopData, joinPerson);
-        level = func_020363e0(func_02038470(joinPerson), 1);
+        level = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(joinPerson), 1);
         WordSetNumber(wordSet, wordIndex, level + 1, 4, NUM_PAD_NONE, TRUE);
         break;
     }
@@ -1338,19 +1342,19 @@ static u32 ResortSys_ChoosePersonType(ResortPersonData *data, ResortSys *sys, Ga
     u32 tier = ResortSys_RollTier(data, sys);
     BOOL hasPlayerShop = FALSE;
     ResortShopData *shopData = ResortSys_GetShopData(sys);
-    JoinAvenuePerson *player = func_02038a18(ResortSys_GetOccupants(sys));
+    JoinAvenuePerson *player = JoinAvenueOccupants_GetPlayerPerson(ResortSys_GetOccupants(sys));
     u32 playerShopKind = ResortShopData_GetShopParam(
-        ResortShopData_GetShop(shopData, (u16)func_02038a20(player, GetGameDataPlayerInfo(gameData))), 0);
+        ResortShopData_GetShop(shopData, (u16)JoinAvenuePerson_GetShopId(player, GetGameDataPlayerInfo(gameData))), 0);
     JoinAvenueOccupants *occupants = ResortSys_GetOccupants(sys);
     s32 i;
 
     for (i = 0; i < RESORT_PERSON_COUNT; i++) {
-        JoinAvenuePerson *person = func_02038860(occupants, i);
+        JoinAvenuePerson *person = JoinAvenueOccupants_GetPerson(occupants, i);
 
         if (!JoinAvenuePerson_IsEmpty(person)) {
             u32 shopKind;
 
-            func_02038470(person);
+            JoinAvenuePerson_GetShop(person);
             shopKind = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(ResortSys_GetShopData(sys), person), 0);
             if (shopKind == playerShopKind) {
                 hasPlayerShop = TRUE;
@@ -1378,7 +1382,7 @@ static u32 ResortSys_ChoosePersonType(ResortPersonData *data, ResortSys *sys, Ga
         occupants2 = ResortSys_GetOccupants(sys);
         unused = TRUE;
         for (i = 0; i < RESORT_PERSON_COUNT; i++) {
-            JoinAvenuePerson *person = func_02038860(occupants2, i);
+            JoinAvenuePerson *person = JoinAvenueOccupants_GetPerson(occupants2, i);
 
             if (!JoinAvenuePerson_IsEmpty(person) && ResortSys_MatchCondition(type, person, sys, &row)) {
                 unused = FALSE;
@@ -1404,7 +1408,7 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
     s32 count = 0;
     u32 rank = 0;
     u32 position = 0;
-    ResortWork *work = func_02017b84(gameData);
+    ResortWork *work = GameData_GetResortWork(gameData);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     StrBuf *nameBuf;
     MsgData *msgData;
@@ -1420,11 +1424,12 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
     }
 
     for (j = RESORT_PERSON_COUNT - 1; j >= 0; j--) {
-        JoinAvenuePerson *person = func_02038860(occupants, j);
+        JoinAvenuePerson *person = JoinAvenueOccupants_GetPerson(occupants, j);
 
         if (!JoinAvenuePerson_IsEmpty(person)) {
-            if ((func_02036e4c(person, 1) && page < 4) || (func_02036e4c(person, 2) && page >= 4) ||
-                (func_02036e4c(person, 0) && page == 8)) {
+            if ((JoinAvenuePerson_HasExtraData(person, 1) && page < 4) ||
+                (JoinAvenuePerson_HasExtraData(person, 2) && page >= 4) ||
+                (JoinAvenuePerson_HasExtraData(person, 0) && page == 8)) {
                 ResortRankEntry *entry = &entries[count];
 
                 entry->index = j;
@@ -1483,9 +1488,9 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
         BOOL shared;
 
         if (index == 8) {
-            person = func_02038a18(occupants);
+            person = JoinAvenueOccupants_GetPlayerPerson(occupants);
         } else {
-            person = func_02038860(occupants, index);
+            person = JoinAvenueOccupants_GetPerson(occupants, index);
         }
 
         GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + 9, templateBuf);
@@ -1617,11 +1622,12 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
     }
 
     for (i = 0; i < RESORT_PERSON_COUNT; i++) {
-        JoinAvenuePerson *other = func_02038860(occupants, i);
+        JoinAvenuePerson *other = JoinAvenueOccupants_GetPerson(occupants, i);
 
         if (!JoinAvenuePerson_IsEmpty(other)) {
-            if ((func_02036e4c(other, 1) && page < 4) || (func_02036e4c(other, 2) && page >= 4 && page < 8) ||
-                (func_02036e4c(other, 0) && page == 8)) {
+            if ((JoinAvenuePerson_HasExtraData(other, 1) && page < 4) ||
+                (JoinAvenuePerson_HasExtraData(other, 2) && page >= 4 && page < 8) ||
+                (JoinAvenuePerson_HasExtraData(other, 0) && page == 8)) {
                 ResortRankSelf *entry = &entries[count];
 
                 entry->index = i;
@@ -1782,7 +1788,7 @@ static BOOL ResortUnlock_FlagSet(ResortSys *sys, GameData *gameData) {
 }
 
 static BOOL ResortUnlock_AllPeople(ResortSys *sys, GameData *gameData) {
-    return func_02038868(ResortSys_GetOccupants(sys)) == 8;
+    return JoinAvenueOccupants_CountPeople(ResortSys_GetOccupants(sys)) == 8;
 }
 
 ResortSys *ResortSys_Get(Field *field) {
@@ -1809,7 +1815,7 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
 
     if (dataKind == kind) {
         JoinAvenuePerson *person = func_ov137_021f1980(data);
-        u16 oldShopId = func_020363e0(func_02038470(person), 0);
+        u16 oldShopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
         const u16 *shop = ResortShopData_GetShop(shopData, oldShopId);
         u16 column2 = ResortShopData_GetShopParam(shop, 2);
         u16 column1 = ResortShopData_GetShopParam(shop, 1);
@@ -1820,14 +1826,14 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
         u16 newShop;
         u32 status;
 
-        newShop = func_020394b0(shopId, trainerId, version, unk18, info, shopData);
+        newShop = JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData);
         newShop = ResortShopData_FindShop(
             shopData, ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, newShop), 0), column2, column1);
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_SHOP_ID, newShop);
         slot = joinAveTextHandler(person, JOIN_AVE_PARAM_SLOT, NULL);
         status = joinAveTextHandler(person, JOIN_AVE_PARAM_UNK_18, NULL);
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_18, 1);
-        func_02038274(person, person, shopData, slot, row);
+        JoinAvenuePerson_InitFromPerson(person, person, shopData, slot, row);
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_18, status);
         return func_ov137_021f198c(data);
     }
@@ -1835,23 +1841,23 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
     if (ResortSys_GetEmptyData(sys, func_ov137_021f17fc(kind), row, &slot, &made)) {
         switch (sMakeKinds[kind][dataKind]) {
         case 1:
-            func_02038274(func_ov137_021f1980(made), func_ov137_021f1980(data), shopData, slot, row);
+            JoinAvenuePerson_InitFromPerson(func_ov137_021f1980(made), func_ov137_021f1980(data), shopData, slot, row);
             break;
         case 2:
-            func_020382d8(func_ov137_021f1980(made), func_ov137_021f1980(data), shopData, slot, row);
+            JoinAvenuePerson_InitFromEntry(func_ov137_021f1980(made), func_ov137_021f1980(data), shopData, slot, row);
             break;
         case 3: {
             JoinAvenueRecord *record = func_ov137_021f1980(made);
             u16 shopKind = func_ov137_021f198c(made);
 
-            func_020386f4(record, func_ov137_021f1980(data), slot, (u16)row, shopKind);
+            JoinAvenueRecord_InitFromPerson(record, func_ov137_021f1980(data), slot, (u16)row, shopKind);
             break;
         }
         case 4: {
             JoinAvenueRecord *record = func_ov137_021f1980(made);
             u16 shopKind = func_ov137_021f198c(made);
 
-            func_02038778(record, func_ov137_021f1980(data), slot, (u16)row, shopKind);
+            JoinAvenueRecord_InitFromEntry(record, func_ov137_021f1980(data), slot, (u16)row, shopKind);
             break;
         }
         default:
@@ -1923,7 +1929,7 @@ static void ResortEntry_Fill(JoinAvenueEntry *entry, u16 shopKind, ResortBinary 
     StrBuf *buf;
     RTCDate date;
 
-    func_02037a70(entry);
+    JoinAvenueEntry_Clear(entry);
     nameMessage = ResortBinary_Get(table, row, 1);
     greetingMessage = ResortBinary_Get(table, row, 7);
     message1 = ResortBinary_Get(table, row, 8);
@@ -1936,32 +1942,32 @@ static void ResortEntry_Fill(JoinAvenueEntry *entry, u16 shopKind, ResortBinary 
 
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
     buf = GFL_MsgDataLoadStrbufNew(msgData, nameMessage);
-    func_02037c70(entry, JOIN_AVE_PARAM_NAME, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_NAME, (u32)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     buf = GFL_MsgDataLoadStrbufNew(msgData, greetingMessage);
-    func_02037c70(entry, JOIN_AVE_PARAM_GREETING, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_GREETING, (u32)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     buf = GFL_MsgDataLoadStrbufNew(msgData, message1);
-    func_02037c70(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     buf = GFL_MsgDataLoadStrbufNew(msgData, message2);
-    func_02037c70(entry, JOIN_AVE_PARAM_MESSAGE2, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE2, (u32)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
-    func_02037c70(entry, JOIN_AVE_PARAM_GENDER, gender);
-    func_02037c70(entry, JOIN_AVE_PARAM_TRAINER_TYPE, trainerType);
-    func_02037c70(entry, JOIN_AVE_PARAM_TRAINER_ID, trainerId);
-    func_02037c70(entry, JOIN_AVE_PARAM_SHOP_ID, shopId);
-    func_02037c70(entry, JOIN_AVE_PARAM_UNK_6, unk6);
-    func_02037c70(entry, JOIN_AVE_PARAM_SHOP_KIND, shopKind);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_GENDER, gender);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_TRAINER_TYPE, trainerType);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_TRAINER_ID, trainerId);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_SHOP_ID, shopId);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_UNK_6, unk6);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_SHOP_KIND, shopKind);
     GFL_MsgDataFree(msgData);
 
     RTC_GetCachedDate(&date);
-    func_02037c70(entry, JOIN_AVE_PARAM_YEAR, date.year);
-    func_02037c70(entry, JOIN_AVE_PARAM_MONTH, date.month);
-    func_02037c70(entry, JOIN_AVE_PARAM_DAY, date.day);
-    func_02037c70(entry, JOIN_AVE_PARAM_SEED, GFL_RandomLC(0));
-    func_02037c70(entry, JOIN_AVE_PARAM_VERSION, GAME_VERSION);
-    func_02037c70(entry, JOIN_AVE_PARAM_LANGUAGE, 2);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_YEAR, date.year);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MONTH, date.month);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_DAY, date.day);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_SEED, GFL_RandomLC(0));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_VERSION, GAME_VERSION);
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_LANGUAGE, 2);
 }
 
 // Makes an entry of a kind of shop, for the kind's row of the texts that the avenue's rank picks
@@ -1975,7 +1981,7 @@ void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, void *entry, u3
     u32 count;
     u32 i;
 
-    func_02038a18(occupants);
+    JoinAvenueOccupants_GetPlayerPerson(occupants);
     selected = 0xff;
     type = 0xff;
     for (i = 0; i < 2; i++) {
@@ -1992,7 +1998,7 @@ void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, void *entry, u3
         }
     }
 
-    pick = func_020393e4(info, salt + 22, count);
+    pick = JoinAvenueInfo_Random(info, salt + 22, count);
     count = 0;
     for (i = 0; i < ResortBinary_GetRowCount(texts); i++) {
         if (type == ResortBinary_Get(texts, i, 0)) {
@@ -2011,17 +2017,18 @@ static void ResortEntry_Setup(ResortSys *sys, GameData *gameData, JoinAvenueEntr
                               HeapID heapId) {
     JoinAvenueOccupants *occupants = ResortSys_GetOccupants(sys);
     ResortBinary *texts = ResortSys_GetTexts(sys);
-    JoinAvenuePerson *player = func_02038a18(occupants);
+    JoinAvenuePerson *player = JoinAvenueOccupants_GetPlayerPerson(occupants);
     u16 message[64];
 
     ResortEntry_Fill(entry, shopKind, texts, row, heapId);
     if (shopKind == 4) {
-        func_02037c70(entry, JOIN_AVE_PARAM_GREETING,
-                      (u32)TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))));
+        JoinAvenueEntry_SetParam(
+            entry, JOIN_AVE_PARAM_GREETING,
+            (u32)TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))));
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE1, message);
-        func_02037c70(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)message);
+        JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)message);
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE2, message);
-        func_02037c70(entry, JOIN_AVE_PARAM_MESSAGE2, (u32)message);
+        JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE2, (u32)message);
     }
 }
 
@@ -2037,10 +2044,10 @@ static void ResortRecord_Setup(ResortSys *sys, JoinAvenueRecord *record, u16 sho
         }
     }
 
-    entry = func_02037a40(HEAPID_TAIL(heapId));
+    entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
     ResortEntry_Fill(entry, 0, texts, row, heapId);
-    func_02038778(record, entry, slot, 2, shopKind);
-    func_02037a68(entry);
+    JoinAvenueRecord_InitFromEntry(record, entry, slot, 2, shopKind);
+    JoinAvenueEntry_Free(entry);
 }
 
 static void ResortEntry_SetupFromType(ResortSys *sys, JoinAvenueEntry *entry, u16 shopKind, u32 type, HeapID heapId) {
@@ -2074,13 +2081,15 @@ void ResortSys_AddEntryOrRecord(ResortSys *sys, PlayerInfo *playerInfo, u32 mode
                 type = sEntryTypes[i].value;
             }
         }
-        entry = func_02037a40(HEAPID_TAIL(heapId));
+        entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
         ResortEntry_SetupFromType(sys, entry, type, shopKind, heapId);
         if (shopKind == 0) {
-            func_02037c70(entry, JOIN_AVE_PARAM_SHOP_ID, func_02038a20(func_02038a18(occupants), playerInfo));
+            JoinAvenueEntry_SetParam(
+                entry, JOIN_AVE_PARAM_SHOP_ID,
+                JoinAvenuePerson_GetShopId(JoinAvenueOccupants_GetPlayerPerson(occupants), playerInfo));
         }
-        func_02037e7c(entries, entry);
-        func_02037a68(entry);
+        JoinAvenueEntryList_Add(entries, entry);
+        JoinAvenueEntry_Free(entry);
         break;
     }
     case 3: {
@@ -2093,11 +2102,11 @@ void ResortSys_AddEntryOrRecord(ResortSys *sys, PlayerInfo *playerInfo, u32 mode
                 type = sRecordTypes[i].value;
             }
         }
-        record = func_020384a4(HEAPID_TAIL(heapId));
+        record = JoinAvenueRecord_Create(HEAPID_TAIL(heapId));
         ResortRecord_Setup(sys, record, type, shopKind, func_ov137_021f184c(slots, 2), heapId);
-        MI_CpuCopy8(record, func_020388c0(occupants), sizeof(JoinAvenueRecord));
+        MI_CpuCopy8(record, JoinAvenueOccupants_GetEmptyRecord(occupants), sizeof(JoinAvenueRecord));
         func_ov137_021f1748(slots);
-        func_020384cc(record);
+        JoinAvenueRecord_Free(record);
         break;
     }
     }
@@ -2232,7 +2241,7 @@ u32 ResortSys_GetVisitPoints(ResortSys *sys, ResortPersonData *data) {
     ResortSys_GetWork(sys);
     base = JoinAvenue_GetParam(info, 5, NULL);
     RTC_GetCachedDate(&date);
-    shopId = func_020363e0(func_02038470(func_ov137_021f1980(data)), 0);
+    shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 0);
     shopKind = ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0);
     trainerType = UnionView_FindTrainerType((u8)func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL));
     if (trainerType >= 8) {
@@ -2301,5 +2310,5 @@ BOOL ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2) {
 
 // Whether all eight of the avenue's people are there
 BOOL ResortSys_IsFull(ResortSys *sys) {
-    return func_02038868(ResortSys_GetOccupants(sys)) == 8;
+    return JoinAvenueOccupants_CountPeople(ResortSys_GetOccupants(sys)) == 8;
 }

@@ -137,13 +137,13 @@ BOOL MailBox_Update(MailBoxWork *work, u32 *state) {
         if (work->view->printQueue != NULL) {
             int i;
 
-            func_02021a3c(work->view->printQueue);
+            PrintQueue_Main(work->view->printQueue);
             for (i = 0; i < MAILBOX_WIN_SENTENCE_1; i++) {
                 PrintQueue *queue = work->view->printQueue;
                 MailBoxPrintState *printState = &work->view->printStates[i];
 
                 if (printState->printing) {
-                    if (func_02021c1c(queue, BmpWin_GetBitmap(printState->window)) == FALSE) {
+                    if (PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(printState->window)) == FALSE) {
                         BmpWin_FlushChar(printState->window);
                         printState->printing = FALSE;
                     }
@@ -157,13 +157,13 @@ BOOL MailBox_Update(MailBoxWork *work, u32 *state) {
             int i;
 
             PMSDraw_Main(work->view->pmsDraw);
-            func_02021a3c(work->view->pmsPrintQueue);
+            PrintQueue_Main(work->view->pmsPrintQueue);
             for (i = MAILBOX_WIN_SENTENCE_1; i < MAILBOX_WINDOW_COUNT; i++) {
                 PrintQueue *queue = work->view->printQueue;
                 MailBoxPrintState *printState = &work->view->printStates[i];
 
                 if (printState->printing) {
-                    if (func_02021c1c(queue, BmpWin_GetBitmap(printState->window)) == FALSE) {
+                    if (PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(printState->window)) == FALSE) {
                         BmpWin_FlushChar(printState->window);
                         printState->printing = FALSE;
                     }
@@ -238,13 +238,13 @@ static u32 MailBox_StateWaitWipe(MailBoxWork *work) {
 }
 
 static u32 MailBox_StateWaitMessage(MailBoxWork *work) {
-    if (func_020223b4(work->view->stream) == PRINT_STREAM_DONE) {
+    if (PrintStream_GetState(work->view->stream) == PRINT_STREAM_DONE) {
         if (!work->view->waitForInput) {
-            func_020223cc(work->view->stream);
+            PrintStream_Delete(work->view->stream);
             return work->nextState;
         }
         if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
-            func_020223cc(work->view->stream);
+            PrintStream_Delete(work->view->stream);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             return work->nextState;
         }
@@ -296,7 +296,7 @@ static u32 MailBox_StateWipeIn(MailBoxWork *work) {
 static u32 MailBox_StateSelectMail(MailBoxWork *work) {
     u32 result;
 
-    if (func_02021c0c(work->view->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(work->view->printQueue) == FALSE) {
         return MAILBOX_STATE_SELECT_MAIL;
     }
     switch (MailBox_GetTouch(work)) {
@@ -435,8 +435,8 @@ static u32 MailBox_StateWaitMenu(MailBoxWork *work) {
         return MailBox_StartMessage(work, FALSE, MAILBOX_STATE_ASK_ERASE);
     case 4:
         MailBox_FreeMenu(work);
-        MailBox_CreatePartyParam(work, 14, PML_ItemGetMailItemID(func_02009750(work->view->mails[work->mailIndex])),
-                                 work->mailIndex);
+        MailBox_CreatePartyParam(
+            work, 14, PML_ItemGetMailItemID(MailData_GetDesign(work->view->mails[work->mailIndex])), work->mailIndex);
         work->childProc = MAILBOX_CHILD_PARTY_GIVE;
         work->nextState = MAILBOX_STATE_START_CHILD;
         return MailBox_StartWipeOut(work, 1);
@@ -636,7 +636,7 @@ static void MailBox_ClearMail(MailBoxWork *work) {
     int i;
 
     for (i = 0; i < 3; i++) {
-        if (PMSData_IsNotEmpty(func_0200976c(work->view->mails[work->mailIndex], i))) {
+        if (PMSData_IsNotEmpty(MailData_GetMessage(work->view->mails[work->mailIndex], i))) {
             PMSDraw_Clear(work->view->pmsDraw, i, FALSE);
         }
     }
@@ -650,7 +650,7 @@ static void MailBox_ClearMail(MailBoxWork *work) {
 static void MailBox_TakeMailItem(MailBoxWork *work) {
     BagSave *bag = GameData_GetBag(work->param->gameData);
 
-    work->item = PML_ItemGetMailItemID(func_02009750(work->view->mails[work->mailIndex]));
+    work->item = PML_ItemGetMailItemID(MailData_GetDesign(work->view->mails[work->mailIndex]));
     if (BagSave_AddItem(bag, work->item, 1, HEAPID_MAILBOX_VIEW) == TRUE) {
         work->bagFull = FALSE;
     } else {

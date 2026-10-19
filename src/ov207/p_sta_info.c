@@ -161,7 +161,7 @@ void PStaInfo_Draw(PStatusWork *wk, PStaInfoWork *info) {
         type2 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE2, NULL);
         func_0204bb58(wk->typeIconChars[type1], &proxy1);
         func_0204c3e4(wk->typeIcons[0], &proxy1);
-        func_0204c378(wk->typeIcons[0], func_0202d7e8(type1), 1);
+        func_0204c378(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
         pos.x = 96;
         pos.y = 48;
         func_0204c140(wk->typeIcons[0], &pos, 0);
@@ -170,7 +170,7 @@ void PStaInfo_Draw(PStatusWork *wk, PStaInfoWork *info) {
         if (type1 != type2) {
             func_0204bb58(wk->typeIconChars[type2], &proxy2);
             func_0204c3e4(wk->typeIcons[1], &proxy2);
-            func_0204c378(wk->typeIcons[1], func_0202d7e8(type2), 1);
+            func_0204c378(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
             pos.x = 130;
             pos.y = 48;
             func_0204c140(wk->typeIcons[1], &pos, 0);
@@ -253,7 +253,8 @@ static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
         } else {
             str = PStaInfo_LoadSpeciesName(SPECIES_EGG);
         }
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->windows[1]), 65, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->windows[1]), 65, 1, str, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(str);
 
         PStatus_PrintToWindow(wk, info->windows[2], 12, 1, 1, PRINT_COLOR(15, 2, 0));
@@ -352,7 +353,8 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
     foreignOT = PML_UtilCheckForeignOT(pkm, playerInfo);
     if (isEgg == FALSE) {
         str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], nature);
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, 1, str, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(str);
         y = 16;
     }
@@ -468,10 +470,10 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
         func_0202437c(wordSet, 8, eggPlace, 0, 1, 2);
         str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], msg);
         GFL_WordSetFormatStrbuf(wordSet, buf, str);
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, buf, wk->font,
-                      PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, buf, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_WordSetSystemFree(wordSet);
-        y += func_0202284c(buf) * 16;
+        y += GFL_FontGetLineCount(buf) * 16;
         GFL_StrBufFree(eggPlace);
         GFL_StrBufFree(metPlace);
         GFL_StrBufFree(str);
@@ -499,8 +501,8 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
                 }
             }
             str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], maxIV % 5 + (0x36 + best * 5));
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
-                          PRINT_COLOR(1, 2, 0));
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
+                                  PRINT_COLOR(1, 2, 0));
             GFL_StrBufFree(str);
         } else {
             u32 hatchMsg;
@@ -515,8 +517,8 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
                 hatchMsg = 0x5b;
             }
             str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], hatchMsg);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
-                          PRINT_COLOR(1, 2, 0));
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
+                                  PRINT_COLOR(1, 2, 0));
             GFL_StrBufFree(str);
         }
     }

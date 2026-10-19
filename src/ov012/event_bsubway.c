@@ -219,7 +219,7 @@ GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental)
 }
 
 GameEvent *func_ov012_02166070(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
-    func_0200bb24(HEAPID_GAMEEVENT);
+    BattleRec_Init(HEAPID_GAMEEVENT);
     bsw->btlSetup = func_ov033_0217c094(bsw, gsys);
     if (bsw->playMode == 3 || bsw->playMode == 8) {
         return func_ov012_02166508(bsw, gsys, field);

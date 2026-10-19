@@ -379,12 +379,12 @@ void Box2Main_LoadBgGraphics(Box2SysWork *syswk) {
 
     // The bar at the bottom of the main screen, which BG 2 copies
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_BOX2_APP);
-    GFL_BGSysLoadArcNCGRDynamic(uiArc, func_0202d824(), 0, 0, FALSE, HEAPID_BOX2_APP);
-    GFL_G2DIOLoadArcNCLRDefault(uiArc, func_0202d820(), 0, 0xe0, 0x20, HEAPID_BOX2_APP);
-    loadBGScrToVramByFileNoReserveNegAlign(uiArc, func_0202d828(), 0, 0, 0, FALSE, HEAPID_BOX2_APP);
+    GFL_BGSysLoadArcNCGRDynamic(uiArc, AppMenuCommon_GetBarBgCharFile(), 0, 0, FALSE, HEAPID_BOX2_APP);
+    GFL_G2DIOLoadArcNCLRDefault(uiArc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0xe0, 0x20, HEAPID_BOX2_APP);
+    loadBGScrToVramByFileNoReserveNegAlign(uiArc, AppMenuCommon_GetBarScreenFile(), 0, 0, 0, FALSE, HEAPID_BOX2_APP);
     GFL_BGSysSetScrPaletteNo(0, 0, 21, 32, 3, 7);
     GFL_BGSysQueueScrLoad(0);
-    charOffset = GFL_BGSysLoadArcNCGRDynamic(uiArc, func_0202d824(), 2, 0, FALSE, HEAPID_BOX2_APP);
+    charOffset = GFL_BGSysLoadArcNCGRDynamic(uiArc, AppMenuCommon_GetBarBgCharFile(), 2, 0, FALSE, HEAPID_BOX2_APP);
     GFL_ArcToolFree(uiArc);
 
     src = GFL_BGSysIsScrHeapExists(0);
@@ -424,13 +424,13 @@ void Box2Main_InitMsg(Box2SysWork *syswk) {
     syswk->app->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_BOX2_APP);
     syswk->app->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, HEAPID_BOX2_APP);
     syswk->app->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_BOX2_APP);
-    syswk->app->printQueue = func_020219a8(0x800, HEAPID_BOX2_APP);
+    syswk->app->printQueue = PrintQueue_Create(0x800, HEAPID_BOX2_APP);
     syswk->app->expandBuf = GFL_StrBufCreate(0x400, HEAPID_BOX2_APP);
 }
 
 void Box2Main_ExitMsg(Box2SysWork *syswk) {
     GFL_StrBufFree(syswk->app->expandBuf);
-    func_02021a18(syswk->app->printQueue);
+    PrintQueue_Free(syswk->app->printQueue);
     GFL_WordSetSystemFree(syswk->app->wordSet);
     GFL_FontFree(syswk->app->smallFont);
     GFL_FontFree(syswk->app->font);
@@ -768,7 +768,7 @@ static void PokeDataSortParty(Box2SysWork *syswk, Box2PokeMoveWork *work) {
             order[i] = i;
         }
     }
-    func_0201fff8(syswk->param->party, order, HEAPID_TAIL(HEAPID_BOX2_APP));
+    PokeParty_Reorder(syswk->param->party, order, HEAPID_TAIL(HEAPID_BOX2_APP));
 }
 
 static u32 PokeDataMoveToTray(Box2SysWork *syswk, u32 tray, u32 pos, u32 dstTray) {
@@ -1089,7 +1089,7 @@ void Box2Main_ExitDexData(Box2SysWork *syswk) {
 BOOL Box2Main_IsSpeciesFlagged(Box2SysWork *syswk, u32 pos) {
     u16 species = Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES, NULL);
 
-    return func_020099b4(syswk->param->unk20, species);
+    return DreamWorldSave_TestSpeciesFlag(syswk->param->unk20, species);
 }
 
 // Puts an icon of a range where it is after cnt steps of its move

@@ -286,7 +286,7 @@ BOOL PokeParty_AddPkm(PokeParty *party, PartyPkm *pkm);
 BOOL PokeParty_RemovePkm(PokeParty *party, u32 index);
 BOOL PokeParty_SwapPkms(PokeParty *party, u32 indexA, u32 indexB, HeapID heapId);
 // Reorders the party: order[i] is the index of the Pokémon that goes to position i
-void func_0201fff8(PokeParty *party, u32 *order, HeapID heapId);
+void PokeParty_Reorder(PokeParty *party, u32 *order, HeapID heapId);
 void PokeParty_RecoverAll(PokeParty *party);
 // A Pokémon's icon in archive 7: its file, and the palette of the file PokeIcon_GetPaletteFile returns that it uses.
 // The cells and animations depend on the sub engine's OBJ VRAM mapping: PokeIcon_GetCellFile_Sub and

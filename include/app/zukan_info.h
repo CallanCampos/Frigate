@@ -23,9 +23,9 @@ typedef struct ZukanInfo ZukanInfo;
 ZukanInfo *func_ov296_0219d6e0(HeapID heapId, PartyPkm *pkm, BOOL national, BOOL caught, u32 mode, u32 engine,
                                u8 bgPriority, ClActUnit *unit, Font *font, PrintQueue *printQueue, MsgData *msgData0,
                                MsgData *msgData1, MsgData *msgData2);
-// sex, rare and form are what the Pokédex shows of the species (func_0200d3c8), personality a Spinda's spots. The
-// print queue is not used, the entry makes its own. The message files are the species categories, the heights and the
-// weights that the caller has loaded already, or NULL to load them
+// sex, rare and form are what the Pokédex shows of the species (PokeDex_GetShownSexRareForm), personality a Spinda's
+// spots. The print queue is not used, the entry makes its own. The message files are the species categories, the
+// heights and the weights that the caller has loaded already, or NULL to load them
 ZukanInfo *func_ov296_0219d768(HeapID heapId, u16 species, u16 form, u16 sex, u16 rare, u32 personality, BOOL national,
                                BOOL caught, u32 mode, u32 engine, u8 bgPriority, ClActUnit *unit, Font *font,
                                PrintQueue *printQueue, MsgData *msgData0, MsgData *msgData1, MsgData *msgData2);

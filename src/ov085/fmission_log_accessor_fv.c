@@ -11,7 +11,7 @@
 // How the Funfest mission's view reads the festival's lists, named after the ROM's "fmission_log_accessor_fv.c". The
 // names are ours
 
-// What func_02015444 says a log entry's value is
+// What FestMission_GetLogCategory says a log entry's value is
 enum {
     LOG_VALUE_NONE,
     LOG_VALUE_ITEM,
@@ -146,7 +146,7 @@ void FMissionLogEntryFV_SetWords(FestMissionLogEntry *entry, WordSet *wordSet, H
     if (name == NULL) {
         return;
     }
-    switch (func_02015444(entry->kind)) {
+    switch (FestMission_GetLogCategory(entry->kind)) {
     case LOG_VALUE_ITEM:
         loadItemTextNameToStrbuf(wordSet, 0, entry->value);
         break;
@@ -161,7 +161,7 @@ void FMissionLogEntryFV_SetWords(FestMissionLogEntry *entry, WordSet *wordSet, H
         func_0202437c(wordSet, 0, name, entry->gender, 1, 2);
         break;
     case LOG_VALUE_PASS_POWER:
-        func_02015018(entry, name);
+        FestMissionLogEntry_GetName(entry, name);
         func_0202437c(wordSet, 0, name, entry->gender, 1, 2);
         loadPassPowerToStrbuf(wordSet, 1, entry->value);
         break;

@@ -106,7 +106,7 @@ CtvtGameCamGraphic *CtvtGameCamGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     CtvtGameCamBG_Init(&graphic->bg, heapId);
     CtvtGameCamClAct_Init(&graphic->clact, &sCtvtGameCamVRAMConfig, heapId);
     return graphic;
@@ -115,7 +115,7 @@ CtvtGameCamGraphic *CtvtGameCamGraphic_Create(u32 layout, HeapID heapId) {
 void CtvtGameCamGraphic_Free(CtvtGameCamGraphic *graphic) {
     CtvtGameCamClAct_Free(&graphic->clact);
     CtvtGameCamBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

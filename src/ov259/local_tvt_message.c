@@ -106,13 +106,13 @@ LocalTvtMessage *LocalTvtMessage_Create(HeapID heapId) {
                       message->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 7, 0, TALK_PALETTE * 0x20, 0x20, message->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 15 * 0x20, 0x20, message->heapId);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     message->tcbManager = GFL_TCBExMgrCreate(message->heapId, message->heapId, 3, 0x100);
     message->stream = NULL;
     message->talkWindow = NULL;
     message->strbuf = GFL_StrBufCreate(0x400, message->heapId);
     message->wordSet = GFL_WordSetSystemCreateDefault(message->heapId);
-    message->queue = func_02021998(message->heapId);
+    message->queue = PrintQueue_CreateDefault(message->heapId);
     message->cursor = KeyCursor_CreateEx(15, TRUE, TRUE, message->heapId, sLocalTvtKeyCursor);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0,
@@ -123,13 +123,13 @@ LocalTvtMessage *LocalTvtMessage_Create(HeapID heapId) {
 void LocalTvtMessage_Free(LocalTvtMessage *message) {
     G2_BlendNone();
     if (message->stream != NULL) {
-        func_020223cc(message->stream);
+        PrintStream_Delete(message->stream);
     }
     if (message->talkWindow != NULL) {
         BmpWin_Free(message->talkWindow);
     }
     KeyCursor_Free(message->cursor);
-    func_02021a18(message->queue);
+    PrintQueue_Free(message->queue);
     GFL_WordSetSystemFree(message->wordSet);
     GFL_StrBufFree(message->strbuf);
     GFL_TCBExMgrFree(message->tcbManager);
@@ -138,7 +138,7 @@ void LocalTvtMessage_Free(LocalTvtMessage *message) {
     GFL_MsgDataFree(message->pokemonMsgData);
     GFL_MsgDataFree(message->talkMsgData);
     GFL_MsgDataFree(message->menuMsgData);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_HeapFree(message);
 }
 
@@ -149,12 +149,12 @@ void LocalTvtMessage_Update(LocalTvtMessage *message) {
     if (message->stream != NULL && message->talkWindow != NULL) {
         message->updateTalk(message);
     }
-    func_02021a3c(message->queue);
+    PrintQueue_Main(message->queue);
     for (i = 0; i < PRINT_COUNT; i++) {
         PrintQueue *queue = message->queue;
 
         if (message->prints[i].pending) {
-            if (!func_02021c1c(queue, BmpWin_GetBitmap(message->prints[i].window))) {
+            if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(message->prints[i].window))) {
                 BmpWin_FlushChar(message->prints[i].window);
                 message->prints[i].pending = FALSE;
             }
@@ -213,7 +213,7 @@ void LocalTvtMessage_Print(LocalTvtMessage *message, BmpWin *window, const StrBu
     GFL_BitmapFill(BmpWin_GetBitmap(window), message->color & 0x1f);
     LocalTvtMessage_GetPrintPosition(message, window, message->strbuf, &x, &y);
     queue = message->queue;
-    func_02021c7c(queue, BmpWin_GetBitmap(print->window), x, y, message->strbuf, message->font, message->color);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(print->window), x, y, message->strbuf, message->font, message->color);
     print->pending = TRUE;
     LocalTvtMessage_SetPosition(message, 0, 0, LOCAL_TVT_ALIGN_LEFT);
     LocalTvtMessage_SetColor(message, PRINT_COLOR(15, 2, 0));
@@ -235,28 +235,28 @@ void LocalTvtMessage_PrintPokemon(LocalTvtMessage *message, BmpWin *window, Part
     strbuf = GFL_MsgDataLoadStrbufNew(message->pokemonMsgData, 3);
     loadPokemonNicknameToStrbuf(message->wordSet, 0, pkm);
     GFL_WordSetFormatStrbuf(message->wordSet, message->strbuf, strbuf);
-    func_02021c7c(message->queue, BmpWin_GetBitmap(window), 32, 8, message->strbuf, message->font,
-                  PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(message->queue, BmpWin_GetBitmap(window), 32, 8, message->strbuf, message->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(strbuf);
     if (!PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL)) {
         strbuf = GFL_MsgDataLoadStrbufNew(message->pokemonMsgData, 2);
         WordSetNumber(message->wordSet, 0, PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL), 3, 0, TRUE);
         GFL_WordSetFormatStrbuf(message->wordSet, message->strbuf, strbuf);
-        func_02021c7c(message->queue, BmpWin_GetBitmap(window), 0, 24, message->strbuf, message->smallFont,
-                      PRINT_COLOR(15, 2, 0));
+        PrintQueue_PrintColor(message->queue, BmpWin_GetBitmap(window), 0, 24, message->strbuf, message->smallFont,
+                              PRINT_COLOR(15, 2, 0));
         GFL_StrBufFree(strbuf);
     }
     if (!PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL)) {
         switch (PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL)) {
         case 0:
             GFL_MsgDataLoadStrbuf(message->pokemonMsgData, 7, message->strbuf);
-            func_02021c7c(message->queue, BmpWin_GetBitmap(window), 96, 8, message->strbuf, message->font,
-                          PRINT_COLOR(5, 6, 0));
+            PrintQueue_PrintColor(message->queue, BmpWin_GetBitmap(window), 96, 8, message->strbuf, message->font,
+                                  PRINT_COLOR(5, 6, 0));
             break;
         case 1:
             GFL_MsgDataLoadStrbuf(message->pokemonMsgData, 8, message->strbuf);
-            func_02021c7c(message->queue, BmpWin_GetBitmap(window), 96, 8, message->strbuf, message->font,
-                          PRINT_COLOR(3, 4, 0));
+            PrintQueue_PrintColor(message->queue, BmpWin_GetBitmap(window), 96, 8, message->strbuf, message->font,
+                                  PRINT_COLOR(3, 4, 0));
             break;
         }
     }
@@ -320,7 +320,7 @@ void LocalTvtMessage_OpenTalkWindow(LocalTvtMessage *message, u32 position) {
 
 void LocalTvtMessage_StartTalk(LocalTvtMessage *message, MsgData *msgData, u32 messageId, u32 keyWait) {
     if (message->stream != NULL) {
-        func_020223cc(message->stream);
+        PrintStream_Delete(message->stream);
         message->stream = NULL;
     }
     GFL_BitmapFill(BmpWin_GetBitmap(message->talkWindow), 15);
@@ -331,8 +331,8 @@ void LocalTvtMessage_StartTalk(LocalTvtMessage *message, MsgData *msgData, u32 m
         GFL_WordSetFormatStrbuf(message->wordSet, message->strbuf, strbuf);
         GFL_StrBufFree(strbuf);
     }
-    message->stream = func_02022268(message->talkWindow, 0, 0, message->strbuf, message->font, func_02017bcc(),
-                                    message->tcbManager, 2, message->heapId, 15);
+    message->stream = PrintStream_Create(message->talkWindow, 0, 0, message->strbuf, message->font,
+                                         TextSpeed_GetCurrentWait(), message->tcbManager, 2, message->heapId, 15);
     switch (keyWait) {
     case FALSE:
     default:
@@ -353,7 +353,7 @@ BOOL LocalTvtMessage_IsTalkFinished(LocalTvtMessage *message) {
 }
 
 BOOL LocalTvtMessage_IsTalkPaused(LocalTvtMessage *message) {
-    if (func_020223b4(message->stream) != PRINT_STREAM_RUNNING) {
+    if (PrintStream_GetState(message->stream) != PRINT_STREAM_RUNNING) {
         return TRUE;
     }
     return FALSE;
@@ -361,7 +361,7 @@ BOOL LocalTvtMessage_IsTalkPaused(LocalTvtMessage *message) {
 
 BOOL LocalTvtMessage_IsTalkDone(LocalTvtMessage *message) {
     if (message->stream != NULL) {
-        if (func_020223b4(message->stream) == PRINT_STREAM_DONE) {
+        if (PrintStream_GetState(message->stream) == PRINT_STREAM_DONE) {
             return TRUE;
         }
         return FALSE;
@@ -392,7 +392,7 @@ static void LocalTvtMessage_GetPrintPosition(LocalTvtMessage *message, BmpWin *w
 static void LocalTvtMessage_UpdateTalk(LocalTvtMessage *message) {
     KeyCursor_Update(message->cursor, message->stream, message->talkWindow);
     if (AppPrintsysCommon_Update(&message->printCommon, message->stream) == TRUE) {
-        func_020223cc(message->stream);
+        PrintStream_Delete(message->stream);
         message->stream = NULL;
     }
 }
@@ -409,7 +409,7 @@ static void LocalTvtMessage_UpdateTalkKeyWait(LocalTvtMessage *message) {
         GFL_SndSEPlay(SEQ_SE_MESSAGE);
     }
     if (AppPrintsysCommon_Update(&message->printCommon, message->stream) == TRUE) {
-        func_020223cc(message->stream);
+        PrintStream_Delete(message->stream);
         message->stream = NULL;
     }
 }

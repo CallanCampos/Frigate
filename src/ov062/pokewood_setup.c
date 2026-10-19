@@ -40,7 +40,7 @@ typedef struct {
 void *func_ov062_021e6680(HeapID heapId, GameSystem *gsys, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     Ov062Param6680 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param6680), TRUE, "pokewood_setup.c", 75);
 
     param->playerInfo = playerInfo;
@@ -56,7 +56,7 @@ void func_ov062_021e66b8(void *param) {
 void *func_ov062_021e66c0(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     SaveControl *saveControl = GameData_GetSaveControl(gameData);
     Ov062Param66c0 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param66c0), TRUE, "pokewood_setup.c", 111);
 
@@ -75,7 +75,7 @@ void func_ov062_021e670c(void *param) {
 void *func_ov062_021e6714(HeapID heapId, GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     Ov062Param6714 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param6714), TRUE, "pokewood_setup.c", 189);
 
     param->playerInfo = playerInfo;
@@ -100,7 +100,7 @@ static void func_ov062_021e6754(PokewoodSystem *sys, GameData *gameData, Pokewoo
 
 static GameEventReturnCode func_ov062_021e67b0(GameEvent *event, u32 *state, void *data) {
     PokewoodSaveEvent *wk = data;
-    PokewoodSave *save = func_02011040(wk->gameData);
+    PokewoodSave *save = PokewoodSave_Get(wk->gameData);
 
     switch (*state) {
     case 0:
@@ -109,7 +109,7 @@ static GameEventReturnCode func_ov062_021e67b0(GameEvent *event, u32 *state, voi
         setPokewoodBlk(PokewoodSystem_GetPokewoodBlk(wk->sys));
         *state = 1;
     case 1:
-        switch (func_020106ec(wk->gameData, HEAPID_FIELDMAP, wk->slot, &wk->state)) {
+        switch (Pokewood_SaveDownloadedMovie(wk->gameData, HEAPID_FIELDMAP, wk->slot, &wk->state)) {
         case 3:
             if (wk->var != NULL) {
                 *wk->var = 0;
@@ -136,7 +136,7 @@ GameEvent *func_ov062_021e682c(GameSystem *gsys, u16 *var) {
     PokewoodSaveEvent *wk = GameEvent_GetData(event);
 
     wk->gameData = GSYS_GetGameData(gsys);
-    wk->sys = *func_02017a04(wk->gameData);
+    wk->sys = *GameData_GetPokewoodSystemPtr(wk->gameData);
     wk->slot = func_ov062_021e62c8(wk->sys);
     wk->state = 0;
     wk->var = var;

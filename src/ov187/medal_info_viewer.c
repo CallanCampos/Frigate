@@ -281,7 +281,7 @@ BOOL MedalInfoViewer_Main(MedalInfoViewer *viewer) {
         break;
     }
     viewer->printing = FALSE;
-    func_02021a3c(viewer->printQueue);
+    PrintQueue_Main(viewer->printQueue);
     PrintWindow_Flush(&viewer->printWindow, viewer->printQueue);
     if (PrintWindow_IsPrinted(&viewer->printWindow) == FALSE) {
         viewer->printing = TRUE;
@@ -534,7 +534,7 @@ static void MedalInfoViewer_GraphicInit(MedalInfoViewer *viewer) {
     GFL_BGSysSetDisplayLayout(0);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MedalInfoViewer_BGInit(viewer);
     MedalInfoViewer_ClActInit(viewer);
     MedalInfoViewer_WindowInit(viewer);
@@ -629,12 +629,12 @@ static void MedalInfoViewer_WindowExit(MedalInfoViewer *viewer) {
 }
 
 static void MedalInfoViewer_PrintQueueInit(MedalInfoViewer *viewer) {
-    viewer->printQueue = func_02021998(viewer->heapId);
+    viewer->printQueue = PrintQueue_CreateDefault(viewer->heapId);
 }
 
 static void MedalInfoViewer_PrintQueueExit(MedalInfoViewer *viewer) {
-    func_02021c44(viewer->printQueue);
-    func_02021a18(viewer->printQueue);
+    PrintQueue_Clear(viewer->printQueue);
+    PrintQueue_Free(viewer->printQueue);
 }
 
 // Prints the title, the medal count, the medal's name and description, and for a Join Avenue visitor the date

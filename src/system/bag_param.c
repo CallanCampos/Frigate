@@ -16,9 +16,9 @@ BagProcessData *BagParam_Create(GameData *gameData, const PlayerActionPerms *per
     param->gameData = gameData;
     param->trainerData = getTrainerDataBlkAddress(save);
     param->playerInfo = GetGameDataPlayerInfo(gameData);
-    param->cursor = func_0201734c(gameData);
+    param->cursor = GameData_GetBagCursor(gameData);
     param->bag = GameData_GetBag(gameData);
-    param->freeSpaceFilter = func_020088e8(param->cursor);
+    param->freeSpaceFilter = BagCursor_GetFreeSpaceFilter(param->cursor);
     if (perms != NULL) {
         MI_CpuCopy8(perms, &param->perms, sizeof(PlayerActionPerms));
     }

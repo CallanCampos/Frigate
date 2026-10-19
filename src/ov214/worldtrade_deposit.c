@@ -961,7 +961,7 @@ void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
 #endif
     dtd->langCode = 2;
     dtd->unk126 = getPlayerSurveys(wk->param->wifihistory);
-    dtd->unk127 = func_02009ca0(wk->param->wifihistory);
+    dtd->unk127 = UnityTower_GetCountryCount(wk->param->wifihistory);
     dtd->unkF7 = func_02009d28(wk->param->wifihistory);
 }
 

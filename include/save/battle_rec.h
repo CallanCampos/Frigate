@@ -170,7 +170,7 @@ typedef struct {
 
 extern BattleRecVideo *data_02140f64;
 
-// The values of a header that func_0200c124 gives
+// The values of a header that BattleRec_GetHeaderValue gives
 enum {
     BATTLE_REC_HEADER_SPECIES,
     BATTLE_REC_HEADER_FORM,
@@ -183,10 +183,10 @@ enum {
 };
 
 // Allocates the loaded video, freeing the one there is, and frees it
-void func_0200bb24(HeapID heapId);
+void BattleRec_Init(HeapID heapId);
 void freeVSPlayerBlkClearPtr(void);
-// Frees a video of func_0200bcd0
-void func_0200bb5c(BattleRecVideo *video);
+// Frees a video of BattleRec_LoadVideo
+void BattleRec_FreeVideo(BattleRecVideo *video);
 u32 getSizeOfVSPlayer(void);
 void clearVSPlayerBlk(BattleRecVideo *video);
 // Whether the loaded video's body has anything in it
@@ -196,30 +196,30 @@ void func_0200bbb4(void);
 void func_0200bbdc(void);
 // Loads the saved video of a slot (0 is the player's own, 1 to 3 the downloaded ones). result is 1 if it loaded,
 // 0 if there is none, 2 if its CRCs are wrong and 3 if the load failed
-void func_0200bc9c(SaveControl *save, HeapID heapId, u32 *result, u32 slot);
-// The same into a video of its own, which func_0200bb5c frees
-BattleRecVideo *func_0200bcd0(SaveControl *save, HeapID heapId, u32 *result, u32 slot);
+void BattleRec_LoadToCurrent(SaveControl *save, HeapID heapId, u32 *result, u32 slot);
+// The same into a video of its own, which BattleRec_FreeVideo frees
+BattleRecVideo *BattleRec_LoadVideo(SaveControl *save, HeapID heapId, u32 *result, u32 slot);
 // Saves the loaded video to a slot as it is, a step each call: 0 while it runs, then the save's result (2 or 3)
-u32 func_0200bdd4(GameData *gameData, BattleRecVideo *video, u32 slot, u16 *seq, HeapID heapId);
+u32 BattleRec_SaveSlot(GameData *gameData, BattleRecVideo *video, u32 slot, u16 *seq, HeapID heapId);
 // The clients of a battle mode and the Pokémon of each
-void func_0200bef4(u16 mode, s32 *clientCount, s32 *pkmCount);
+void BattleRec_GetModeCounts(u16 mode, s32 *clientCount, s32 *pkmCount);
 // decryptData, which encrypts as well
 void decryptVSPlayer(void *data, u32 size, u32 seed);
 // The profile of the player who recorded the loaded video. The name is swan's
 GdsProfile *getVSPlayerAllocation(void);
 // The body and the header of the loaded video
-BattleRecBody *func_0200c0b4(void);
-BattleRecHeader *func_0200c0c0(void);
+BattleRecBody *BattleRec_GetBody(void);
+BattleRecHeader *BattleRec_GetHeader(void);
 // The header of a video
-BattleRecHeader *func_0200c0cc(BattleRecVideo *video);
+BattleRecHeader *BattleRec_GetVideoHeader(BattleRecVideo *video);
 // Makes the loaded video of a received profile, header and body, and decrypts its body
-void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
-                   SaveControl *save);
+void BattleRec_StoreDownloaded(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
+                               SaveControl *save);
 // A value from the header, BATTLE_REC_HEADER_*, such as the video's number
-u64 func_0200c124(BattleRecHeader *header, u32 id, u32 index);
+u64 BattleRec_GetHeaderValue(BattleRecHeader *header, u32 id, u32 index);
 // Sets the CRC of a body
-void func_0200c1dc(BattleRecBody *body);
-// func_0200bcf8, func_0200be50, func_0200c1d0, func_0200c1f0 and func_0200c200 of this file are declared in
-// save/save_control.h
+void BattleRec_UpdateBodyCRC(BattleRecBody *body);
+// BattleRec_IsSlotValid, BattleRec_FinishAndSaveSlot, BattleRec_IsVersionSupported, BattleRec_LoadToolOverlay and
+// BattleRec_UnloadToolOverlay of this file are declared in save/save_control.h
 
 #endif // POKEBW2_SAVE_BATTLE_REC_H

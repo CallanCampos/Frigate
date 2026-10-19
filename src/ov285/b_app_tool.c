@@ -94,7 +94,7 @@ void BAppTool_QueueWindowScreens(PrintWindow *printWindows, const u8 *list) {
 void BAppTool_FlushPrintWindows(PrintWindow *printWindows, PrintQueue *queue, u32 count) {
     u32 i;
 
-    func_02021a3c(queue);
+    PrintQueue_Main(queue);
     for (i = 0; i < count; i++) {
         PrintWindow_Flush(&printWindows[i], queue);
     }

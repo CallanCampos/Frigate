@@ -929,8 +929,8 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
 BOOL Guru2Main_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2MainWork *g2m = work;
 
-    func_02021c44(g2m->msg.queue);
-    func_02021a18(g2m->msg.queue);
+    PrintQueue_Clear(g2m->msg.queue);
+    PrintQueue_Free(g2m->msg.queue);
     if (g2m->waitIcon != NULL) {
         WaitIcon_Free(g2m->waitIcon);
     }
@@ -1624,7 +1624,7 @@ static int Guru2MainSeq_SyncSave(Guru2MainWork *g2m) {
 static int Guru2MainSeq_SyncSaveWait(Guru2MainWork *g2m) {
     if (func_02040664(func_02040440(), GURU2_SYNC_SAVE, GURU2_SYNC_CLASS)) {
         Guru2Main_TradeEgg(g2m, g2m->frontEgg->netId);
-        g2m->netSave = func_02012ee4(HEAPID_GURU2, g2m->g2p->param->gameData);
+        g2m->netSave = NetSave_Create(HEAPID_GURU2, g2m->g2p->param->gameData);
         g2m->waitIcon = WaitIcon_Create(g2m->tcbManager, g2m->msg.msgWindow, 15, 16, HEAPID_GURU2);
         g2m->seq = SEQ_SAVE;
     }
@@ -1632,10 +1632,10 @@ static int Guru2MainSeq_SyncSaveWait(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_Save(Guru2MainWork *g2m) {
-    BOOL done = func_02012f5c(g2m->netSave);
+    BOOL done = NetSave_Update(g2m->netSave);
 
     if (GFL_NetErrCheck()) {
-        func_02012154();
+        GFL_NetErrShutdown();
         GFL_NetErrShow(1);
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
         Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
@@ -1644,7 +1644,7 @@ static int Guru2MainSeq_Save(Guru2MainWork *g2m) {
     if (done) {
         WaitIcon_Free(g2m->waitIcon);
         g2m->waitIcon = NULL;
-        func_02012f8c(g2m->netSave);
+        NetSave_Free(g2m->netSave);
         g2m->seq = SEQ_SYNC_END;
     }
     return SEQ_RESULT_WAIT;
@@ -1776,7 +1776,7 @@ static void Guru2Main_Draw(Guru2MainWork *g2m) {
     GFL_G3DSysReqSwapBuffers();
     func_0204b794();
 
-    func_02021a3c(g2m->msg.queue);
+    PrintQueue_Main(g2m->msg.queue);
     PrintWindow_Flush(&g2m->msg.msgPrint, g2m->msg.queue);
     for (i = 0; i < GURU2_MEMBER_MAX; i++) {
         PrintWindow_Flush(&g2m->msg.namePrints[i], g2m->msg.queue);
@@ -2098,7 +2098,7 @@ static void Guru2Main_InitMsg(Guru2MainWork *g2m) {
         g2m->names[i] = GFL_StrBufCreate(8, HEAPID_GURU2);
     }
     PrintWindow_Init(&msg->msgPrint, msg->msgWindow);
-    msg->queue = func_02021998(HEAPID_GURU2);
+    msg->queue = PrintQueue_CreateDefault(HEAPID_GURU2);
     Guru2Main_CreateNameWindows(g2m, g2m->g2p->memberCount);
 }
 

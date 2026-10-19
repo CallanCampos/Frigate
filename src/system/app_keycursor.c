@@ -87,7 +87,7 @@ void KeyCursor_Draw(KeyCursor *cursor, GFLBitmap *bitmap, u16 bgColor) {
 void KeyCursor_Update(KeyCursor *cursor, PrintStream *stream, BmpWin *window) {
     BOOL pressed;
 
-    switch (func_020223b4(stream)) {
+    switch (PrintStream_GetState(stream)) {
     case PRINT_STREAM_DONE:
         if (cursor->showWhenDone == FALSE) {
             cursor->erased = FALSE;

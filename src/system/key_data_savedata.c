@@ -10,17 +10,17 @@
 
 #define SAVE_BLOCK_KEY_DATA 0x45
 
-u32 func_02010230(void) {
+u32 KeyDataSave_GetSize(void) {
     return sizeof(KeyDataSave);
 }
 
-void func_02010234(KeyDataSave *keyData) {
+void KeyDataSave_Init(KeyDataSave *keyData) {
     MI_CpuFill8(keyData, 0, sizeof(KeyDataSave));
-    func_02010474(func_020103f0(keyData));
+    KeyInfoSave_Init(KeyDataSave_GetKeyInfo(keyData));
 }
 
 // Clears the run, but not its seed, its money or the areas reached
-void func_0201024c(KeyDataSave *keyData) {
+void KeyDataSave_ClearRun(KeyDataSave *keyData) {
     MI_CpuFill8(keyData->trainerFlags, 0, sizeof(keyData->trainerFlags));
     keyData->flags = 0;
     keyData->unk1C = 0;
@@ -32,29 +32,29 @@ KeyDataSave *getKeyDataBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_KEY_DATA);
 }
 
-u8 func_02010274(KeyDataSave *keyData, u32 a1) {
+u8 KeyDataSave_GetProgress(KeyDataSave *keyData, u32 a1) {
     if (a1 == 0) {
         return keyData->progress;
     }
     return keyData->progressOther;
 }
 
-u32 func_02010284(KeyDataSave *keyData) {
+u32 KeyDataSave_GetSeed(KeyDataSave *keyData) {
     return keyData->seed;
 }
 
-BOOL func_02010288(KeyDataSave *keyData, u32 a1, u32 bit) {
+BOOL KeyDataSave_IsTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit) {
     return (keyData->trainerFlags[a1] & (1 << bit)) != 0;
 }
 
 // How many Trainers have been defeated
-u16 func_020102a4(KeyDataSave *keyData) {
+u16 KeyDataSave_CountDefeatedTrainers(KeyDataSave *keyData) {
     u32 i, j;
     u32 count = 0;
 
     for (i = 0; i < KEY_DATA_TRAINER_FLAG_WORDS; i++) {
         for (j = 0; j < 32; j++) {
-            if (func_02010288(keyData, i, j) == TRUE) {
+            if (KeyDataSave_IsTrainerDefeated(keyData, i, j) == TRUE) {
                 count++;
             }
         }
@@ -67,15 +67,15 @@ u8 func_020102d0(KeyDataSave *keyData) {
 }
 
 // The floor within the area reached
-u8 func_020102d4(KeyDataSave *keyData) {
-    return keyData->floor - func_020103a0(func_02010378(keyData));
+u8 KeyDataSave_GetFloorInArea(KeyDataSave *keyData) {
+    return keyData->floor - KeyDataSave_GetAreaFirstFloor(KeyDataSave_GetArea(keyData));
 }
 
-u8 func_020102ec(KeyDataSave *keyData) {
+u8 KeyDataSave_GetRoom(KeyDataSave *keyData) {
     return keyData->room;
 }
 
-void func_020102f0(KeyDataSave *keyData, u8 value, u32 a2) {
+void KeyDataSave_SetProgress(KeyDataSave *keyData, u8 value, u32 a2) {
     if (a2 == 0) {
         keyData->progress = value;
     } else {
@@ -83,11 +83,11 @@ void func_020102f0(KeyDataSave *keyData, u8 value, u32 a2) {
     }
 }
 
-void func_02010300(KeyDataSave *keyData, u32 value) {
+void KeyDataSave_SetSeed(KeyDataSave *keyData, u32 value) {
     keyData->seed = value;
 }
 
-void func_02010304(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set) {
+void KeyDataSave_SetTrainerDefeated(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set) {
     u32 mask;
 
     if (set == FALSE) {
@@ -105,19 +105,19 @@ void func_02010334(KeyDataSave *keyData, u8 value) {
     keyData->unk1C = value;
 }
 
-void func_02010338(KeyDataSave *keyData, u8 value) {
+void KeyDataSave_SetFloor(KeyDataSave *keyData, u8 value) {
     keyData->floor = value;
 }
 
-void func_0201033c(KeyDataSave *keyData, u8 value) {
+void KeyDataSave_SetRoom(KeyDataSave *keyData, u8 value) {
     keyData->room = value;
 }
 
-BOOL func_02010340(KeyDataSave *keyData, u32 bit) {
+BOOL KeyDataSave_IsFlagSet(KeyDataSave *keyData, u32 bit) {
     return ((1 << bit) & keyData->flags) != 0;
 }
 
-void func_02010354(KeyDataSave *keyData, u32 bit, BOOL set) {
+void KeyDataSave_SetFlag(KeyDataSave *keyData, u32 bit, BOOL set) {
     u32 mask;
 
     if (set == FALSE) {
@@ -132,11 +132,11 @@ void func_02010354(KeyDataSave *keyData, u32 bit, BOOL set) {
 }
 
 // The area that the floor reached lies in
-u8 func_02010378(KeyDataSave *keyData) {
+u8 KeyDataSave_GetArea(KeyDataSave *keyData) {
     u8 area;
 
     for (area = 1; area < KEY_DATA_AREA_COUNT; area++) {
-        if ((int)func_020103a0(area) > keyData->floor) {
+        if ((int)KeyDataSave_GetAreaFirstFloor(area) > keyData->floor) {
             return area - 1;
         }
     }
@@ -144,31 +144,31 @@ u8 func_02010378(KeyDataSave *keyData) {
 }
 
 // The floors of the areas before one
-u8 func_020103a0(int a0) {
+u8 KeyDataSave_GetAreaFirstFloor(int a0) {
     int i;
     int floors = 0;
 
     for (i = 0; i < a0; i++) {
-        floors += func_020103c4(i);
+        floors += KeyDataSave_GetAreaFloorCount(i);
     }
     return floors;
 }
 
 // The floors of an area
-u8 func_020103c4(u8 a0) {
+u8 KeyDataSave_GetAreaFloorCount(u8 a0) {
     u8 floors[KEY_DATA_AREA_COUNT] = { 1, 1, 1, 1, 1, 2, 3, 2, 3, 4 };
 
     return floors[a0];
 }
 
-u32 func_020103e8(KeyDataSave *keyData) {
+u32 KeyDataSave_GetMoney(KeyDataSave *keyData) {
     return keyData->money;
 }
 
-void func_020103ec(KeyDataSave *keyData, u32 value) {
+void KeyDataSave_SetMoney(KeyDataSave *keyData, u32 value) {
     keyData->money = value;
 }
 
-KeyInfoSave *func_020103f0(KeyDataSave *keyData) {
+KeyInfoSave *KeyDataSave_GetKeyInfo(KeyDataSave *keyData) {
     return &keyData->keyInfo;
 }

@@ -106,7 +106,7 @@ static BOOL ZukanToroku_Init(GameProc *proc, u32 *state, void *param, void *work
     wk->heapId = HEAPID_ZUKAN_TOROKU;
     wk->graphic = ZukanTorokuGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     if (prm->mode == 0) {
         wk->phase = PHASE_ENTRY;
         wk->step = ENTRY_WAIT_FADE_IN;
@@ -140,8 +140,8 @@ static BOOL ZukanToroku_Exit(GameProc *proc, u32 *state, void *param, void *work
     ZukanToroku_FreeCover(wk);
     ZukanNickname_Free(wk->nickname);
     func_ov296_0219dbcc(wk->info);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ZukanTorokuGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -260,7 +260,7 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
         }
         break;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     ZukanTorokuGraphic_Update(wk->graphic);
     ZukanTorokuGraphic_Begin3D(wk->graphic);
     ZukanTorokuGraphic_End3D(wk->graphic);

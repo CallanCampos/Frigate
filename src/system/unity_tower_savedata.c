@@ -13,11 +13,11 @@
 
 static void setForeignRegionMet(UnityTowerSurveySave *save, u8 met);
 
-u32 func_02009b5c(void) {
+u32 UnityTower_GetSurveySaveSize(void) {
     return sizeof(UnityTowerSurveySave);
 }
 
-void func_02009b64(UnityTowerSurveySave *save) {
+void UnityTower_InitSurveySave(UnityTowerSurveySave *save) {
     MIi_CpuClear32(0, save, sizeof(UnityTowerSurveySave));
 }
 
@@ -26,12 +26,12 @@ UnityTowerSurveySave *getUnityTower_SurveySaveBlkAddrress(SaveControl *save) {
 }
 
 // Makes the player's own country and region, recorded as UNITY_TOWER_REGION_OWN
-void func_02009b84(UnityTowerSurveySave *save, PlayerInfo *info, int country, int region) {
-    func_02008c14(info, country, region);
-    func_02009be0(save, country, region, UNITY_TOWER_REGION_OWN);
+void UnityTower_SetOwnRegion(UnityTowerSurveySave *save, PlayerInfo *info, int country, int region) {
+    PlayerInfo_SetCountryAndProvince(info, country, region);
+    UnityTower_SetRegionState(save, country, region, UNITY_TOWER_REGION_OWN);
 }
 
-u32 func_02009ba4(UnityTowerSurveySave *save, int country, int region) {
+u32 UnityTower_GetRegionState(UnityTowerSurveySave *save, int country, int region) {
     s32 r = region;
     if (country == COUNTRY_NONE) {
         return UNITY_TOWER_REGION_NONE;
@@ -39,7 +39,7 @@ u32 func_02009ba4(UnityTowerSurveySave *save, int country, int region) {
     return (save->regions[r / 4 + (country - 1) * 16] >> ((r % 4) * 2)) & 3;
 }
 
-void func_02009be0(UnityTowerSurveySave *save, int country, int region, u32 state) {
+void UnityTower_SetRegionState(UnityTowerSurveySave *save, int country, int region, u32 state) {
     s32 r = region;
     u8 *byte;
     u32 shift;
@@ -60,7 +60,7 @@ void func_02009be0(UnityTowerSurveySave *save, int country, int region, u32 stat
     }
 }
 
-u8 func_02009c38(UnityTowerSurveySave *save) {
+u8 UnityTower_HasMetForeignRegion(UnityTowerSurveySave *save) {
     return save->foreignRegionMet;
 }
 
@@ -69,7 +69,7 @@ static void setForeignRegionMet(UnityTowerSurveySave *save, u8 met) {
 }
 
 // A day has passed: every region recorded today becomes one recorded before
-void func_02009c48(UnityTowerSurveySave *save) {
+void UnityTower_AgeTodayRegions(UnityTowerSurveySave *save) {
     s32 i;
     s32 shift;
 
@@ -85,25 +85,25 @@ void func_02009c48(UnityTowerSurveySave *save) {
     }
 }
 
-u8 func_02009ca0(UnityTowerSurveySave *save) {
+u8 UnityTower_GetCountryCount(UnityTowerSurveySave *save) {
     return save->countryCount;
 }
 
-u8 func_02009cac(UnityTowerSurveySave *save, PlayerInfo *info, BOOL withOwnCountry) {
-    u8 count = func_02009ca0(save);
+u8 UnityTower_GetCountryCountForPlayer(UnityTowerSurveySave *save, PlayerInfo *info, BOOL withOwnCountry) {
+    u8 count = UnityTower_GetCountryCount(save);
 
     if (!withOwnCountry) {
         u8 country = UnityTowerVisitor_GetCountry(info);
         if (country == COUNTRY_NONE) {
             count = 0;
-        } else if (func_02009eb0(save, country) && count != 0) {
+        } else if (UnityTower_HasMetCountry(save, country) && count != 0) {
             count--;
         }
     }
     return count;
 }
 
-u8 func_02009ce4(UnityTowerSurveySave *save) {
+u8 UnityTower_CountVisitors(UnityTowerSurveySave *save) {
     s32 i;
 
     for (i = 0; i < UNITY_TOWER_VISITOR_MAX; i++) {
@@ -114,7 +114,7 @@ u8 func_02009ce4(UnityTowerSurveySave *save) {
     return i;
 }
 
-void func_02009d04(UnityTowerSurveySave *save) {
+void UnityTower_IncrementCountryCount(UnityTowerSurveySave *save) {
     if (save->countryCount < COUNTRY_CODE_COUNT) {
         save->countryCount++;
     }
@@ -166,7 +166,7 @@ u32 UnityTower_GetVisitorParam(UnityTowerSurveySave *save, u32 index, u32 param)
     return 0;
 }
 
-void func_02009db4(UnityTowerSurveySave *save, int index, u32 param, u32 value) {
+void UnityTower_SetVisitorParam(UnityTowerSurveySave *save, int index, u32 param, u32 value) {
     UnityTowerVisitor *visitor;
 
     if (index >= UNITY_TOWER_VISITOR_MAX) {
@@ -208,18 +208,18 @@ void *UnityTower_GetVisitor(UnityTowerSurveySave *save, int index) {
     return &save->visitors[index];
 }
 
-UnityTowerVisitor *func_02009e68(UnityTowerSurveySave *save) {
+UnityTowerVisitor *UnityTower_GetVisitors(UnityTowerSurveySave *save) {
     return save->visitors;
 }
 
-BOOL func_02009e6c(UnityTowerSurveySave *save, u32 country) {
+BOOL UnityTower_MarkCountryMet(UnityTowerSurveySave *save, u32 country) {
     BOOL isNew = FALSE;
 
     if (country == COUNTRY_NONE) {
         return FALSE;
     }
     if (country < COUNTRY_CODE_COUNT) {
-        if (!func_02009eb0(save, country)) {
+        if (!UnityTower_HasMetCountry(save, country)) {
             isNew = TRUE;
         }
         save->countriesMet[country >> 3] |= (u8)(1 << (u8)(country & 7));
@@ -227,7 +227,7 @@ BOOL func_02009e6c(UnityTowerSurveySave *save, u32 country) {
     return isNew;
 }
 
-BOOL func_02009eb0(UnityTowerSurveySave *save, u32 country) {
+BOOL UnityTower_HasMetCountry(UnityTowerSurveySave *save, u32 country) {
     if (country < COUNTRY_CODE_COUNT) {
         if ((u8)((save->countriesMet[country >> 3] >> (u8)(country & 7)) & 1)) {
             return TRUE;

@@ -723,9 +723,9 @@ static void Dowsing_InitButton(DowsingWork *work) {
     InfoWin_Init(BG_INFOWIN, 3, GSYS_GetGameData(Field_GetGameSystem(work->field)), work->heapId);
     ClActorSetup setup = { 0, 0, 0, 0, 0 };
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_SUB_BG, 0x40, 0x20, heapId);
-    work->barChars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), BG_INFOWIN, 0, FALSE, heapId);
-    screenBuffer = GFL_G2DIOReadNSCRArc(arc, func_0202d828(), FALSE, &screen, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_SUB_BG, 0x40, 0x20, heapId);
+    work->barChars = GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), BG_INFOWIN, 0, FALSE, heapId);
+    screenBuffer = GFL_G2DIOReadNSCRArc(arc, AppMenuCommon_GetBarScreenFile(), FALSE, &screen, heapId);
     chars = work->barChars;
     tiles = (u16 *)screen->rawData;
     for (i = 0; i < 0x300; i++) {
@@ -736,9 +736,10 @@ static void Dowsing_InitButton(DowsingWork *work) {
     GFL_BGSysQueueScrLoad(BG_INFOWIN);
     GFL_HeapFree(screenBuffer);
 
-    work->buttonPalette = func_0204bbb8(arc, func_0202d810(), 1, 0x20, 0, 3, work->heapId);
-    work->buttonChars = func_0204b81c(arc, func_0202d814(), FALSE, 1, work->heapId);
-    work->buttonCellAnims = func_0204bde0(arc, func_0202d818(0), func_0202d81c(0), work->heapId);
+    work->buttonPalette = func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), 1, 0x20, 0, 3, work->heapId);
+    work->buttonChars = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 1, work->heapId);
+    work->buttonCellAnims =
+        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0), work->heapId);
     setup.x = BUTTON_X;
     setup.y = BUTTON_Y;
     work->button = func_0204c040(work->unit, work->buttonChars, work->buttonPalette, work->buttonCellAnims, &setup, 1,

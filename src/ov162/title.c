@@ -497,7 +497,7 @@ static void TitleSys_Init(TitleSys *sys, HeapID heapId) {
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_G3DSysCreate(FALSE, 2, 0, 2, 0x1000, heapId, NULL);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     sys->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 4, 32);
     sys->vblankTask = GFL_VBlankTCBAdd(TitleSys_VBlank, sys, 5);
     GFL_BGSysSetDisplayLayout(0);
@@ -556,12 +556,12 @@ static void TitleBG_Init(TitleBG *bg, HeapID heapId) {
     bg->print.flushPending = FALSE;
     GFL_BGSysLoadScr(5);
     bg->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, heapId);
-    bg->printQueue = func_02021998(heapId);
+    bg->printQueue = PrintQueue_CreateDefault(heapId);
     bg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_16, heapId);
     bg->strbuf = GFL_StrBufCreate(64, heapId);
     GFL_MsgDataLoadStrbuf(bg->msgData, Title16_Text_Empty_2, bg->strbuf);
     width = GFL_FontGetBlockWidth(bg->strbuf, bg->font, 0);
-    func_02021c7c(bg->printQueue, bg->bitmap, 128 - width / 2, 0, bg->strbuf, bg->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(bg->printQueue, bg->bitmap, 128 - width / 2, 0, bg->strbuf, bg->font, PRINT_COLOR(1, 2, 0));
     bg->unk10 = TRUE;
 }
 
@@ -578,7 +578,7 @@ static void TitleBG_Update(TitleBG *bg, HeapID heapId) {
 static void TitleBG_Free(TitleBG *bg) {
     GFL_StrBufFree(bg->strbuf);
     GFL_MsgDataFree(bg->msgData);
-    func_02021a18(bg->printQueue);
+    PrintQueue_Free(bg->printQueue);
     GFL_FontFree(bg->font);
     BmpWin_Free(bg->window);
 }

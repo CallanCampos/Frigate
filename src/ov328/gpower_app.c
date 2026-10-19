@@ -386,7 +386,7 @@ static BOOL GPowerApp_Init(GameProc *proc, u32 *state, void *param, void *data) 
     work->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_TITLE, work->heapId);
     work->msgData[1] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PASS_POWERS, work->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     work->yesNoWins[0] = NULL;
     work->yesNoWins[1] = NULL;
     work->taskMenuRes = AppTaskMenuRes_Create(1, 10, work->font, work->printQueue, work->heapId);
@@ -408,7 +408,7 @@ static BOOL GPowerApp_Exit(GameProc *proc, u32 *state, void *param, void *data) 
         }
     }
     GFL_WordSetSystemFree(work->wordSet);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_FontFree(work->font);
     GPowerApp_FreeYesNo(work);
     AppTaskMenuRes_Free(work->taskMenuRes);
@@ -430,7 +430,7 @@ static BOOL GPowerApp_Main(GameProc *proc, u32 *state, void *param, void *data) 
         }
         break;
     case 1:
-        if (work->seq == SEQ_END && func_02021c0c(work->printQueue) == TRUE) {
+        if (work->seq == SEQ_END && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -657,7 +657,7 @@ static void GPowerApp_UpdateSeq(GPowerApp *work) {
 static void GPowerApp_UpdatePrint(GPowerApp *work) {
     int i;
 
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&work->windows[i], work->printQueue);
     }
@@ -711,9 +711,9 @@ static void GPowerApp_LoadTouchBar(GPowerApp *work, u32 bg, u32 paletteType, u32
     int x;
     int y;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), paletteType, palette * 32, 32, work->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, work->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, work->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), paletteType, palette * 32, 32, work->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, work->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, work->heapId);
     screen = GFL_BGSysIsScrHeapExists(bg);
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 32; x++) {
@@ -808,10 +808,10 @@ static void GPowerApp_LoadCommonObjResources(GPowerApp *work, u32 vramType) {
     u32 anims;
 
     GPowerAppGraphic_GetClActUnit(work->graphic);
-    palette = func_0202d810();
-    chars = func_0202d814();
-    cells = func_0202d818(2);
-    anims = func_0202d81c(2);
+    palette = AppMenuCommon_GetTouchBarPaletteFile();
+    chars = AppMenuCommon_GetTouchBarCharFile();
+    cells = AppMenuCommon_GetTouchBarCellFile(2);
+    anims = AppMenuCommon_GetTouchBarAnimFile(2);
     work->resources[RES_COMMON_PALETTE] = func_0204bbb8(arc, palette, vramType, 8 * 32, 0, 4, work->heapId);
     work->resources[RES_COMMON_CHARS] = func_0204b81c(arc, chars, FALSE, vramType, work->heapId);
     work->resources[RES_COMMON_CELLS] = func_0204bde0(arc, cells, anims, work->heapId);

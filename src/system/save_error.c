@@ -73,7 +73,7 @@ static void playSavegameError(u32 message) {
     }
     GCTX_HIDUnblockSoftReset(2);
     while (TRUE) {
-        func_02005430();
+        Machine_ProcessExitRequest();
     }
 }
 

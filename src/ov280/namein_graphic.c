@@ -114,7 +114,7 @@ NameinGraphic *NameinGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     NameinGraphic_BGInit(&graphic->bg, heapId);
     NameinGraphic_ClActInit(&graphic->clact, &sVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(NameinGraphic_VBlank, graphic, 0);
@@ -125,7 +125,7 @@ void NameinGraphic_Delete(NameinGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     NameinGraphic_ClActExit(&graphic->clact);
     NameinGraphic_BGExit(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

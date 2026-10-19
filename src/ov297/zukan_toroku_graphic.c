@@ -95,7 +95,7 @@ ZukanTorokuGraphic *ZukanTorokuGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     ZukanTorokuBG_Init(&graphic->bg, heapId);
     ZukanTorokuClAct_Init(&graphic->clact, &sZukanTorokuVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(ZukanTorokuGraphic_VBlank, graphic, 0);
@@ -106,7 +106,7 @@ void ZukanTorokuGraphic_Free(ZukanTorokuGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     ZukanTorokuClAct_Free(&graphic->clact);
     ZukanTorokuBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

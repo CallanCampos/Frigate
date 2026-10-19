@@ -323,7 +323,7 @@ BOOL func_ov036_021a7e04(VM *vm, FieldScriptEnv *env) {
     u16 value = ScriptReadAny(vm, env);
     u16 arg = ScriptReadAny(vm, env);
 
-    func_02024868(wordSet, index, value, arg);
+    WordSet_LoadFestivalMission(wordSet, index, value, arg);
     return FALSE;
 }
 

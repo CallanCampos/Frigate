@@ -100,7 +100,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
             work->report->strbuf = GFL_StrBufCreate(0x200, work->heapId);
             work->report->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 1, 4);
             work->report->cursor = KeyCursor_Create(0xf, 1, 1, work->heapId);
-            work->report->printQueue = func_02021998(work->heapId);
+            work->report->printQueue = PrintQueue_CreateDefault(work->heapId);
             work->report->timer = 0;
             func_ov012_02163ee0(work);
             func_ov012_02164150(work);
@@ -160,12 +160,12 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
                 WaitIcon_Create(GFL_VBlankGetTCBMgr(), work->report->window.window, 0xf, 0x10, work->heapId);
             func_ov036_02198b1c(Field_GetSubscreen(work->field));
             func_ov012_021642fc(work);
-            func_0201782c(GSYS_GetGameData(work->gameSystem));
+            GameData_StartSave(GSYS_GetGameData(work->gameSystem));
             *state = 9;
         }
         break;
     case 9:
-        switch (func_02017850(GSYS_GetGameData(work->gameSystem))) {
+        switch (GameData_UpdateSave(GSYS_GetGameData(work->gameSystem))) {
         case 0:
         case 1:
             break;
@@ -261,7 +261,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
 static void func_ov012_02163ea0(EventSaveWork *work) {
     func_ov012_021641c0(work);
     func_ov012_02163f2c(work);
-    func_02021a18(work->report->printQueue);
+    PrintQueue_Free(work->report->printQueue);
     KeyCursor_Free(work->report->cursor);
     GFL_TCBExMgrFree(work->report->tcbManager);
     GFL_StrBufFree(work->report->strbuf);
@@ -292,18 +292,18 @@ static void func_ov012_02163f50(EventSaveWork *work) {
     BmpWin_DrawFrame(work->report->window.window, 2, 1, 13);
     report = work->report;
     work->report->stream =
-        func_02022268(report->window.window, 0, 0, report->strbuf, func_ov036_0218799c(work->msgBgSys), func_02017bcc(),
-                      report->tcbManager, 10, work->heapId, 15);
+        PrintStream_Create(report->window.window, 0, 0, report->strbuf, func_ov036_0218799c(work->msgBgSys),
+                           TextSpeed_GetCurrentWait(), report->tcbManager, 10, work->heapId, 15);
     work->report->continued = FALSE;
     window = work->report->window.window;
     BmpWin_Transfer(window);
 }
 
 static BOOL func_ov012_02163fc8(EventSaveWork *work) {
-    switch (func_020223b4(work->report->stream)) {
+    switch (PrintStream_GetState(work->report->stream)) {
     case PRINT_STREAM_RUNNING:
         if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
-            func_020223e0(work->report->stream, 0);
+            PrintStream_SkipWait(work->report->stream, 0);
         }
         work->report->continued = FALSE;
         break;
@@ -311,12 +311,12 @@ static BOOL func_ov012_02163fc8(EventSaveWork *work) {
         if (work->report->continued == FALSE &&
             (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            func_020223bc(work->report->stream);
+            PrintStream_Continue(work->report->stream);
             work->report->continued = TRUE;
         }
         break;
     case PRINT_STREAM_DONE:
-        func_020223cc(work->report->stream);
+        PrintStream_Delete(work->report->stream);
         work->report->continued = FALSE;
         return FALSE;
     }
@@ -348,7 +348,7 @@ static void func_ov012_02164090(EventSaveWork *work, u32 messageId) {
     font = func_ov036_0218799c(work->msgBgSys);
     reportWindow = &work->report->window;
     queue = work->report->printQueue;
-    func_02021c54(queue, BmpWin_GetBitmap(reportWindow->window), 0, 0, str, font);
+    PrintQueue_Print(queue, BmpWin_GetBitmap(reportWindow->window), 0, 0, str, font);
     reportWindow->printing = TRUE;
     GFL_StrBufFree(str);
     window = work->report->window.window;
@@ -359,14 +359,14 @@ static BOOL func_ov012_02164110(EventSaveWork *work) {
     ReportWindow *reportWindow;
     PrintQueue *queue;
 
-    func_02021a3c(work->report->printQueue);
+    PrintQueue_Main(work->report->printQueue);
     queue = work->report->printQueue;
     reportWindow = &work->report->window;
-    if (reportWindow->printing && !func_02021c1c(queue, BmpWin_GetBitmap(reportWindow->window))) {
+    if (reportWindow->printing && !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(reportWindow->window))) {
         BmpWin_FlushChar(reportWindow->window);
         reportWindow->printing = FALSE;
     }
-    return func_02021c0c(work->report->printQueue);
+    return PrintQueue_IsEmpty(work->report->printQueue);
 }
 
 static void func_ov012_02164150(EventSaveWork *work) {

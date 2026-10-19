@@ -407,7 +407,7 @@ static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, u32 index, u32 y) {
         return;
     }
     PMSInput_GetCategoryWord(wk->mwk, index - 2, wk->str);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     if (y <= 240) {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->win), ((index - 2) & 1) * 112, y, wk->str, font);
         return;

@@ -242,7 +242,7 @@ static int VsMultiList_StateSlide(VsMultiListWork *wk) {
 
     switch (wk->slideStep) {
     case SLIDE_START:
-        if (!func_02021c0c(wk->printQueue)) {
+        if (!PrintQueue_IsEmpty(wk->printQueue)) {
             break;
         }
         if (wk->param->flipped == 0) {
@@ -400,7 +400,7 @@ static void VsMultiList_InitText(VsMultiListWork *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_VS_MULTI_LIST);
     wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, HEAPID_VS_MULTI_LIST);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_VS_MULTI_LIST);
-    wk->printQueue = func_020219a8(0x800, HEAPID_VS_MULTI_LIST);
+    wk->printQueue = PrintQueue_Create(0x800, HEAPID_VS_MULTI_LIST);
 }
 
 static void VsMultiList_FreeText(VsMultiListWork *wk) {
@@ -408,7 +408,7 @@ static void VsMultiList_FreeText(VsMultiListWork *wk) {
     GFL_FontFree(wk->font);
     GFL_FontFree(wk->smallFont);
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
 }
 
 static void VsMultiList_AddVBlankTask(VsMultiListWork *wk) {
@@ -484,7 +484,7 @@ static void VsMultiList_FreeWindows(VsMultiListWork *wk) {
 static void VsMultiList_FlushText(VsMultiListWork *wk) {
     u32 i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < POKEMON_COUNT; i++) {
         PrintWindow_Flush(&wk->printWindows[i], wk->printQueue);
     }

@@ -109,7 +109,7 @@ BOOL func_ov012_02164b94(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FieldScriptEnv_FindActor(env, actorId);
 
     if (actor != NULL) {
-        func_0200ea24(npcData, GetActorUserParam0(actor));
+        SymbolSave_RemoveSlot(npcData, GetActorUserParam0(actor));
     }
     return FALSE;
 }
@@ -158,10 +158,10 @@ BOOL func_ov012_02164c68(VM *vm, FieldScriptEnv *env) {
         *result = TRUE;
         break;
     case 1:
-        *result = func_ov012_02160974(func_02017a24(gameData));
+        *result = func_ov012_02160974(GameData_GetEntreeForestArea(gameData));
         break;
     case 2:
-        *result = func_ov012_02160988(func_02017a24(gameData));
+        *result = func_ov012_02160988(GameData_GetEntreeForestArea(gameData));
         break;
     case 3:
         func_ov012_02164dcc(env, &speciesPokemon);
@@ -180,7 +180,7 @@ BOOL s0217_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 dir = ScriptReadAny(vm, env);
-    u32 area = func_02017a24(gameData);
+    u32 area = GameData_GetEntreeForestArea(gameData);
     GameEvent *event;
     Field *field;
     VecFx32 pos;
@@ -194,7 +194,7 @@ BOOL s0217_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
         event = EventMapChangeWarp_CreateGrid(gsys, field, 0x117, &pos, 1, 0);
     } else {
         if (dir != ENTREE_FOREST_DIR_EXIT) {
-            area = func_ov012_0216094c(gsys, func_02017a24(gameData), dir);
+            area = func_ov012_0216094c(gsys, GameData_GetEntreeForestArea(gameData), dir);
         }
         event = EventEntreeForestWarp_CreateToAnother(gsys, dir, area);
     }
@@ -236,7 +236,7 @@ static GameEvent *EventEntreeForestBattleCall_Create(GameSystem *gsys, Field *fi
     data->pkm = pkm;
     data->pokemon = pokemon;
     data->crc = getCRC16(pkm, PokeParty_GetPkmRawSize());
-    if (func_0200eb54(GameData_GetSaveControl(gameData), &pokemon.raw, heapId, FALSE) == FALSE) {
+    if (SymbolSave_HasPokemon(GameData_GetSaveControl(gameData), &pokemon.raw, heapId, FALSE) == FALSE) {
         data->pokemon.species = 0x2ae;
     }
     SaveBtlFieldStatus(&data->status, gameData, field);
@@ -269,7 +269,7 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
         heapId1 = data->heapId;
         check1.species = PokeParty_GetParam(pkm1, PKM_PARAM_SPECIES, NULL);
         check1.form = PokeParty_GetParam(pkm1, PKM_PARAM_FORM, NULL);
-        if (func_0200eb54(GameData_GetSaveControl(gameData), &check1.raw, heapId1, TRUE) == FALSE) {
+        if (SymbolSave_HasPokemon(GameData_GetSaveControl(gameData), &check1.raw, heapId1, TRUE) == FALSE) {
             data->pokemon.form = 12;
         }
         EncEff_StartEvent(Field_GetEncEff(data->field), event, 0);
@@ -300,8 +300,9 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
         heapId5 = data->heapId;
         check5.species = PokeParty_GetParam(pkm5, PKM_PARAM_SPECIES, NULL);
         check5.form = PokeParty_GetParam(pkm5, PKM_PARAM_FORM, NULL);
-        if (func_0200eb54(GameData_GetSaveControl(gameData), &check5.raw, heapId5, TRUE) == FALSE ||
-            func_0200eb54(GameData_GetSaveControl(gameData), &data->pokemon.raw, data->heapId, FALSE) == FALSE) {
+        if (SymbolSave_HasPokemon(GameData_GetSaveControl(gameData), &check5.raw, heapId5, TRUE) == FALSE ||
+            SymbolSave_HasPokemon(GameData_GetSaveControl(gameData), &data->pokemon.raw, data->heapId, FALSE) ==
+                FALSE) {
             caught = FALSE;
         }
         if (caught == TRUE) {
@@ -405,7 +406,7 @@ static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 
         break;
     case 2:
         data->zoneId = func_ov012_0216092c(gsys, data->area);
-        func_02017a18(gameData, data->area);
+        GameData_SetEntreeForestArea(gameData, data->area);
         GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(gsys, field, data->zoneId, &data->pos, data->dir));
         (*state)++;
         break;

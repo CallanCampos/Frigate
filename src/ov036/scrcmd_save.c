@@ -42,7 +42,7 @@ static GameEventReturnCode func_ov036_021a6b80(GameEvent *event, u32 *state, voi
         }
         RecordAddOne(GameData_GetRecords(gameData), 1);
         if (!save->pokewood) {
-            func_0201782c(gameData);
+            GameData_StartSave(gameData);
             *state = 1;
         } else {
             GameEvent_ChainNext(event, func_ov062_021e682c(save->gsys, save->result));
@@ -50,7 +50,7 @@ static GameEventReturnCode func_ov036_021a6b80(GameEvent *event, u32 *state, voi
         }
         break;
     case 1:
-        switch (func_02017850(gameData)) {
+        switch (GameData_UpdateSave(gameData)) {
         case 0:
         case 1:
             // Still saving
@@ -96,7 +96,7 @@ static GameEvent *func_ov036_021a6c94(GameSystem *gsys, u16 *result) {
     save->saveIcon = NULL;
     save->result = result;
     save->pokewood = FALSE;
-    pokewood = func_02017a04(GSYS_GetGameData(gsys));
+    pokewood = GameData_GetPokewoodSystemPtr(GSYS_GetGameData(gsys));
     if (pokewood != NULL && *pokewood != NULL) {
         save->pokewood = TRUE;
     }

@@ -428,8 +428,8 @@ static void DDemoObj_InitFontOam2nd(DDemoWork *wk) {
     GFL_StrBufFree(str);
 
     str = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlMain2_Text_Empty_4);
-    WordSetNumber(wk->wordSet, 0, func_02008cec(wk->param->playTime), 3, 0, TRUE);
-    WordSetNumber(wk->wordSet, 1, func_02008cf0(wk->param->playTime), 2, 2, TRUE);
+    WordSetNumber(wk->wordSet, 0, PlayTime_GetHours(wk->param->playTime), 3, 0, TRUE);
+    WordSetNumber(wk->wordSet, 1, PlayTime_GetMinutes(wk->param->playTime), 2, 2, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, str);
     DDemoObj_PrintFontOam(wk, DDEMO_FOAM_PLAYER, wk->font, wk->strbuf, 200, 0);
     GFL_StrBufFree(str);

@@ -97,7 +97,7 @@ struct CygnusData {
     GameData *gameData;
     void *radarData;
     DreamRadarSave *save;
-    // What func_02011400 says of the data
+    // What CygnusSaveData_Load says of the data
     u32 status;
     u32 saveState;
     CygnusEntry entries[CYGNUS_ENTRY_MAX];
@@ -931,12 +931,12 @@ static CygnusData *CygnusData_Create(GameData *gameData, HeapID heapId) {
     CygnusData *data = GFL_HeapAllocate(heapId, sizeof(CygnusData), TRUE, "cygnus_flow.c", 1768);
 
     data->gameData = gameData;
-    data->buffer = func_02011510(heapId);
+    data->buffer = DreamRadar_AllocBuffer(heapId);
     return data;
 }
 
 static void CygnusData_Free(CygnusData *data) {
-    func_02011528(data->buffer);
+    DreamRadar_FreeBuffer(data->buffer);
     GFL_HeapFree(data);
 }
 
@@ -944,10 +944,10 @@ static void CygnusData_Load(CygnusData *data, HeapID heapId) {
     u32 words[CYGNUS_WORD_COUNT];
 
     ReadDreamRadarSaveData(data->buffer);
-    data->radarData = func_02011588(data->buffer);
+    data->radarData = DreamRadar_GetSaveData(data->buffer);
     data->save = GetDreamRadarSaveBlock(GameData_GetSaveControl(data->gameData));
     data->received = GetDreamRadarFlag(data->save, 2);
-    data->status = func_02011400(data->radarData, GetDreamRadarFlag(data->save, 1), words);
+    data->status = CygnusSaveData_Load(data->radarData, GetDreamRadarFlag(data->save, 1), words);
     if (data->status == 2 && words[CYGNUS_WORD_COUNT - 1] == 0) {
         CygnusData_ReadEntries(data, words, heapId);
     }
@@ -1005,7 +1005,7 @@ static void CygnusData_Commit(CygnusData *data) {
     seed = GFL_RandomLC(0);
     SetDreamRadarFlag(data->save, 1, seed);
     SetDreamRadarFlag(data->save, 0, TRUE);
-    func_020113c4(data->radarData, seed, data->received);
+    CygnusSaveData_Store(data->radarData, seed, data->received);
     SetDreamRadarFlag(data->save, 2, data->received);
     GCTX_HIDBlockSoftReset(8);
     data->saveState = 0;
@@ -1014,14 +1014,14 @@ static void CygnusData_Commit(CygnusData *data) {
 static BOOL CygnusData_Save(CygnusData *data) {
     switch (data->saveState) {
     case 0:
-        func_0201782c(data->gameData);
+        GameData_StartSave(data->gameData);
         data->saveState++;
         // fallthrough
     case 1:
-        if (func_02017850(data->gameData) != 2) {
+        if (GameData_UpdateSave(data->gameData) != 2) {
             break;
         }
-        func_02011544();
+        DreamRadar_WriteSaveData();
         data->saveState++;
         // fallthrough
     case 2:
@@ -1176,15 +1176,15 @@ static void CygnusData_ReadEntries(CygnusData *data, const u32 *words, HeapID he
     MI_CpuFill8(data->entries, 0, sizeof(data->entries));
     data->count = 0;
     for (i = 0; i <= CYGNUS_WORD_POKEMON_END - 1; i++) {
-        if (func_020115fc(words[i])) {
-            u32 bit = func_0201167c(words[i]);
+        if (DreamRadar_IsPokemonWord(words[i])) {
+            u32 bit = DreamRadar_GetPokemonBit(words[i]);
 
             if (!(data->received & bit)) {
                 u8 radarForm;
                 u8 radarSex;
                 u16 radarSpecies;
 
-                func_02011624(words[i], &radarSpecies, &radarForm, &radarSex);
+                DreamRadar_GetPokemonByWord(words[i], &radarSpecies, &radarForm, &radarSex);
                 data->entries[data->count].type = CYGNUS_ENTRY_POKEMON;
                 data->entries[data->count].id = radarSpecies;
                 data->entries[data->count].form = radarForm;

@@ -33,14 +33,14 @@ static const u32 sMemoryEventWorks[MEMORY_LINK_MEMORY_COUNT] = {
 
 // clang-format off
 static const MemoryLinkCondition sMemoryConditions[MEMORY_LINK_MEMORY_COUNT] = {
-    { 8, func_02010b90 },
-    { 13, func_02010b90 },
-    { 0, func_02010b90 },
-    { 15, func_02010b90 },
-    { 12, func_02010b90 },
-    { 0, func_02010b90 },
-    { 1, func_02010bcc },
-    { 0, func_02010b90 },
+    { 8, MemoryLinkSave_IsMemoryFlagSet },
+    { 13, MemoryLinkSave_IsMemoryFlagSet },
+    { 0, MemoryLinkSave_IsMemoryFlagSet },
+    { 15, MemoryLinkSave_IsMemoryFlagSet },
+    { 12, MemoryLinkSave_IsMemoryFlagSet },
+    { 0, MemoryLinkSave_IsMemoryFlagSet },
+    { 1, MemoryLinkSave_IsPlayerLinked },
+    { 0, MemoryLinkSave_IsMemoryFlagSet },
 };
 
 // clang-format on
@@ -49,7 +49,7 @@ void zero476Bytes(MemoryLinkSave *link) {
     MI_CpuFill8(link, 0, sizeof(MemoryLinkSave));
 }
 
-BOOL func_020108dc(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save) {
+BOOL MemoryLinkSave_Merge(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save) {
     u32 before = getUnlockedMemories(link);
     BOOL unlocked;
     u32 after;
@@ -63,7 +63,7 @@ BOOL func_020108dc(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl
     return unlocked;
 }
 
-BOOL func_0201090c(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save) {
+BOOL MemoryLinkSave_CanMerge(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save) {
     int linked = 0;
     u32 changed = mergeData(link, data, save, FALSE);
     BOOL result = TRUE;
@@ -135,9 +135,9 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
     if (src->unk2A != 0) {
         MusicalSave *musical = getAddressOfMusicalDataInfo(save);
 
-        if (!func_0200af5c(musical)) {
-            BOOL differs = GFL_STD_MemCmp(src->props, func_0200af6c(musical), sizeof(src->props)) != 0;
-            BOOL hasAll = func_0200ae58(musical);
+        if (!MusicalSave_GetDownloadedProps(musical)) {
+            BOOL differs = GFL_STD_MemCmp(src->props, MusicalSave_GetProps(musical), sizeof(src->props)) != 0;
+            BOOL hasAll = MusicalSave_HasAllProps(musical);
 
             if (differs || (!differs && hasAll)) {
                 changed[MEMORY_LINK_PART_MUSICAL] = TRUE;
@@ -201,23 +201,23 @@ u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest) {
     return 0;
 }
 
-BOOL func_02010b90(MemoryLinkSave *link, int index) {
+BOOL MemoryLinkSave_IsMemoryFlagSet(MemoryLinkSave *link, int index) {
     return (link->memories.flags[index / 8] & (1 << (index % 8))) != 0;
 }
 
-u16 func_02010bc0(MemoryLinkSave *link, u32 index) {
+u16 MemoryLinkSave_GetVar(MemoryLinkSave *link, u32 index) {
     return link->memories.vars[index];
 }
 
-BOOL func_02010bcc(MemoryLinkSave *link, int index) {
+BOOL MemoryLinkSave_IsPlayerLinked(MemoryLinkSave *link, int index) {
     return link->players[index].linked;
 }
 
-u8 func_02010bd8(MemoryLinkSave *link, u32 index) {
+u8 MemoryLinkSave_GetPlayerGender(MemoryLinkSave *link, u32 index) {
     return link->players[index].gender;
 }
 
-const u16 *func_02010be4(MemoryLinkSave *link, u32 index) {
+const u16 *MemoryLinkSave_GetPlayerName(MemoryLinkSave *link, u32 index) {
     return link->players[index].name;
 }
 
@@ -233,11 +233,11 @@ static void setVar(MemoryLinkSave *link, u32 index, u16 value) {
     link->memories.vars[index] = value;
 }
 
-BOOL func_02010c54(MemoryLinkSave *link, u32 memory) {
+BOOL MemoryLinkSave_CheckMemoryCondition(MemoryLinkSave *link, u32 memory) {
     return sMemoryConditions[memory].func(link, sMemoryConditions[memory].index);
 }
 
-u32 func_02010c6c(u32 memory) {
+u32 MemoryLink_GetMemoryEventWork(u32 memory) {
     return sMemoryEventWorks[memory];
 }
 
@@ -247,7 +247,7 @@ static u32 getUnlockedMemories(MemoryLinkSave *link) {
     u32 mask = 0;
 
     for (i = 0; i < MEMORY_LINK_MEMORY_COUNT; i++) {
-        if (func_02010c54(link, i)) {
+        if (MemoryLinkSave_CheckMemoryCondition(link, i)) {
             mask |= 1 << i;
         }
     }

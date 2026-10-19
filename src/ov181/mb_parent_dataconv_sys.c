@@ -220,7 +220,7 @@ static BOOL MBDataConv_Connect(MBDataConv *conv, u32 *seq) {
         }
         break;
     case 4:
-        conv->parentInfo.textSpeed = func_02017bcc();
+        conv->parentInfo.textSpeed = TextSpeed_GetCurrentWait();
         conv->parentInfo.language = GFL_MsgDataGetDefaultLangID();
         if (MBComm_SendParentInfo(conv->comm, &conv->parentInfo)) {
             (*seq)++;

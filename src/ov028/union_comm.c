@@ -181,7 +181,7 @@ BOOL UnionComm_ExitWait(u32 *seq, void *param, void *work) {
     if (unisys->commState == 5) {
         UnionComm_Free(param, unisys);
         if (GFL_NetErrCheck()) {
-            func_02012144();
+            GFL_NetErrClear();
         }
         return TRUE;
     }
@@ -499,7 +499,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->country = UnityTowerVisitor_GetCountry(unisys->param->playerInfo);
     beacon->province = UnityTowerVisitor_GetProvince(unisys->param->playerInfo);
     beacon->memberList = self->mycomm.memberList;
-    func_0200a3cc(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->unk50);
+    WifiList_CreateExchangeToken(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->unk50);
     if (unisys->alloc.uniapp != NULL) {
         beacon->entryClosed = UnionApp_IsEntryClosed(unisys->alloc.uniapp);
     } else {

@@ -279,10 +279,10 @@ MysteryCardView *MysteryCardView_Create(const MysteryCardViewSetup *setup, HeapI
     MIi_CpuClear32(-1, view->iconChars, sizeof(view->iconChars));
     MIi_CpuClear32(-1, view->iconPalettes, sizeof(view->iconPalettes));
     MIi_CpuClear32(-1, view->iconCellAnims, sizeof(view->iconCellAnims));
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
-        if (func_0200a800(view->setup.giftSave, i)) {
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
+        if (MysteryGiftSave_IsSlotUsed(view->setup.giftSave, i)) {
             count++;
-            func_0200a71c(view->setup.giftSave, i, &gift);
+            MysteryGiftSave_GetCard(view->setup.giftSave, i, &gift);
             MysteryCard_Init(&view->cards[i], &gift, &view->setup, heapId);
         }
     }
@@ -349,7 +349,7 @@ void MysteryCardView_Delete(MysteryCardView *view) {
     MysteryCardView_ClearPage(view, TRUE);
     MysteryCardView_ClearPage(view, FALSE);
     MysteryCardView_FreeGraphics(view);
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
         MysteryCard_Exit(&view->cards[i]);
     }
     GFL_BGSysClearScr(4);
@@ -752,13 +752,13 @@ static void MysteryCardView_ThrowAway(MysteryCardView *view, int slot) {
     u32 i;
     MysteryAlbum *album;
 
-    func_0200a7b0(view->setup.giftSave, slot);
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
+    MysteryGiftSave_RemoveCard(view->setup.giftSave, slot);
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
         MysteryCard_Exit(&view->cards[i]);
     }
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
-        if (func_0200a800(view->setup.giftSave, i)) {
-            func_0200a71c(view->setup.giftSave, i, &gift);
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
+        if (MysteryGiftSave_IsSlotUsed(view->setup.giftSave, i)) {
+            MysteryGiftSave_GetCard(view->setup.giftSave, i, &gift);
             MysteryCard_Init(&view->cards[i], &gift, &view->setup, view->heapId);
         }
     }
@@ -781,13 +781,13 @@ static void MysteryCardView_Swap(MysteryCardView *view, u32 slot1, u32 slot2) {
     MysteryGift gift;
     u32 i;
 
-    func_0200a970(view->setup.giftSave, slot1, slot2);
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
+    MysteryGiftSave_SwapCards(view->setup.giftSave, slot1, slot2);
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
         MysteryCard_Exit(&view->cards[i]);
     }
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
-        if (func_0200a800(view->setup.giftSave, i)) {
-            func_0200a71c(view->setup.giftSave, i, &gift);
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
+        if (MysteryGiftSave_IsSlotUsed(view->setup.giftSave, i)) {
+            MysteryGiftSave_GetCard(view->setup.giftSave, i, &gift);
             MysteryCard_Init(&view->cards[i], &gift, &view->setup, view->heapId);
         }
     }
@@ -810,7 +810,7 @@ static u32 MysteryCardView_GetCardCount(MysteryCardView *view) {
     u32 i = 0;
     u32 count = 0;
 
-    for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
+    for (i = 0; i < MysteryGiftSave_GetCardMax(view->setup.giftSave); i++) {
         if (MysteryCard_IsUsed(&view->cards[i])) {
             count++;
         }
@@ -1371,7 +1371,7 @@ static void MysteryCardView_SeqThrowAway(MysterySeq *seq, u32 *state, void *work
         }
         break;
     case 7:
-        if (!func_0200a88c(view->setup.giftSave)) {
+        if (!MysteryGiftSave_HasAnyCard(view->setup.giftSave)) {
             MysteryTextWin_ClearLine(view->textWin, 1);
         }
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -1517,7 +1517,7 @@ static void MysteryCardView_SeqExit(MysterySeq *seq, u32 *state, void *work) {
     case 1:
         if (view->setup.mode == 0) {
             *state = 5;
-        } else if (func_0200a7e4(view->setup.giftSave)) {
+        } else if (MysteryGiftSave_HasFreeSlot(view->setup.giftSave)) {
             *state = 5;
         } else {
             *state = 2;
@@ -1592,12 +1592,12 @@ static void MysteryCardView_SeqExit(MysterySeq *seq, u32 *state, void *work) {
             done = FALSE;
         }
         if (done) {
-            func_0200a9d4(view->setup.giftSave, view->setup.gameData);
+            MysteryGiftSave_StartSave(view->setup.giftSave, view->setup.gameData);
             *state = 9;
         }
         break;
     case 9:
-        if (func_0200a9f4(view->setup.giftSave, view->setup.gameData) == 2) {
+        if (MysteryGiftSave_SaveStep(view->setup.giftSave, view->setup.gameData) == 2) {
             *state = 10;
         }
         break;

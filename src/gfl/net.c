@@ -29,12 +29,12 @@ static void func_02042ae4(int x, int y);
 static void func_02042b40(void);
 
 void func_020425a0(int a0, int a1, HeapID parentHeapId, HeapID heapId) {
-    const GFLNetDevTable *pDevTable = func_020116c0(GFL_NET_TYPE_WIFI);
+    const GFLNetDevTable *pDevTable = NetDefine_LoadDevice(GFL_NET_TYPE_WIFI);
 
     if (pDevTable != NULL) {
         pDevTable->unk00(a0, a1);
     }
-    func_02011778(GFL_NET_TYPE_WIFI);
+    NetDefine_UnloadDevice(GFL_NET_TYPE_WIFI);
     if (parentHeapId != heapId) {
         sNet.parentHeapId = heapId;
         GFL_HeapCreateChild(parentHeapId, heapId, 0x9e80);
@@ -54,7 +54,7 @@ void func_020425ec(const GFLNetInitData *pNetInit, void (*callback)(void *work),
     pNet = GFL_HeapAllocate(pNetInit->heapId, sizeof(GFLNetSys), TRUE, "net.c", 106);
     sNet.pNet = pNet;
     pNet->unk352 = TRUE;
-    pNet->pDevTable = func_020116c0(pNetInit->bNetType);
+    pNet->pDevTable = NetDefine_LoadDevice(pNetInit->bNetType);
     GFL_ASSERT(pNet->pDevTable);
     if (pNetInit->bNetType == 4) {
         pNetInit = func_02042f74(pNetInit, work);
@@ -128,7 +128,7 @@ static void func_020427b8(void *work) {
         pNet->aNetInit.unk2C(pNet->devWork);
     }
     func_020403a4(pNet);
-    func_02011778(type);
+    NetDefine_UnloadDevice(type);
     GFL_HeapFree(pNet);
     sNet.pNet = NULL;
     switch (type) {

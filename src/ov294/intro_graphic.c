@@ -158,7 +158,7 @@ IntroGraphic *IntroGraphic_Create(u32 layout, u32 mode, HeapID heapId) {
         IntroClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
         IntroG3dSys_Init(&graphic->g3d, heapId);
     }
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     graphic->vblankTask = GFL_VBlankTCBAdd(IntroGraphic_VBlank, graphic, 0);
     return graphic;
 }
@@ -168,7 +168,7 @@ void IntroGraphic_Free(IntroGraphic *graphic) {
     IntroG3dSys_Free(&graphic->g3d);
     IntroClAct_Free(&graphic->clact);
     IntroBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

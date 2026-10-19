@@ -35,7 +35,7 @@ static void MedalInfo_SetDate(MedalInfo *info, u8 year, u8 month, u8 day) {
 void MedalBox_Init(MedalBox *box) {
     MI_CpuFill8(box, 0, sizeof(MedalBox));
     box->lastMedal = 0xff;
-    func_02010ca0(MedalBox_GetHabitatList(box));
+    ZukanHabitatSave_Init(MedalBox_GetHabitatList(box));
 }
 
 u32 MedalBox_GetBlockSize(void) {

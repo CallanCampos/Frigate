@@ -169,7 +169,7 @@ static const BGSysVRAMConfig sVRAMConfig = {
 static void PdcMain_InitGraphics(HeapID heapId) {
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sVRAMConfig);
     G2_BlendNone();
     G2S_BlendNone();

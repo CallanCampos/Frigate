@@ -28,7 +28,7 @@ u32 UnityTowerSurvey_RegisterTrade(UnityTowerSurveySave *save, UnityTowerVisitor
 }
 
 static u32 UnityTowerSurvey_RegisterVisitor(UnityTowerSurveySave *save, UnityTowerVisitor *visitor) {
-    UnityTowerVisitor *visitors = func_02009e68(save);
+    UnityTowerVisitor *visitors = UnityTower_GetVisitors(save);
     u32 index = UnityTowerVisitors_Find(visitors, visitor);
     u32 country;
 
@@ -140,9 +140,9 @@ static void UnityTowerVisitors_Remove(UnityTowerVisitor *visitors, unsigned long
 }
 
 static void UnityTowerSurvey_AddVisitor(UnityTowerSurveySave *save, UnityTowerVisitor *visitor, BOOL scriptFlag) {
-    UnityTowerVisitors_Add(func_02009e68(save), visitor, scriptFlag);
-    if (func_02009e6c(save, UnityTowerVisitor_GetCountry(&visitor->info))) {
-        func_02009d04(save);
+    UnityTowerVisitors_Add(UnityTower_GetVisitors(save), visitor, scriptFlag);
+    if (UnityTower_MarkCountryMet(save, UnityTowerVisitor_GetCountry(&visitor->info))) {
+        UnityTower_IncrementCountryCount(save);
     }
 }
 

@@ -57,7 +57,7 @@ u32 func_ov012_021683a8(MATHRandContext32 *rand, u32 max, const u32 *list, int c
 
 void func_ov012_021683f4(GameSystem *gsys, u16 zoneId) {
     LinkFestival *festival = GSYS_GetLinkFestival(gsys);
-    RivalEntry *entry = func_02014864(festival);
+    RivalEntry *entry = LinkFestival_GetEntries(festival);
     FestMissionConfig *config;
 
     OS_GetTick();

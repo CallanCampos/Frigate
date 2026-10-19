@@ -30,7 +30,7 @@ BOOL func_ov012_0216a82c(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     result = ScriptReadVar(vm, env);
-    *result = func_02017220(gameData);
+    *result = GameData_GetMyCity(gameData);
     return FALSE;
 }
 
@@ -52,7 +52,7 @@ BOOL func_ov012_0216a894(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     keyInfo = getKeyInfoSaveBlk(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     result = ScriptReadVar(vm, env);
-    *result = func_020105a0(keyInfo);
+    *result = KeyInfo_GetChamberKey(keyInfo);
     return FALSE;
 }
 

@@ -32,9 +32,10 @@ void TrCardObj_Init(TrainerCardObjWork *obj, const BGSysVRAMConfig *vram) {
     obj->res[0].cellAnims = func_0204bde0(arc, 53, 55, obj->heapId);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), obj->heapId);
-    obj->res[1].palette = func_0204bba0(arc, func_0202d810(), CLACT_VRAM_SUB, 0xa0, obj->heapId);
-    obj->res[1].chars = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_SUB, obj->heapId);
-    obj->res[1].cellAnims = func_0204bde0(arc, func_0202d818(0), func_0202d81c(0), obj->heapId);
+    obj->res[1].palette = func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0xa0, obj->heapId);
+    obj->res[1].chars = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, obj->heapId);
+    obj->res[1].cellAnims =
+        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0), obj->heapId);
     GFL_ArcToolFree(arc);
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);

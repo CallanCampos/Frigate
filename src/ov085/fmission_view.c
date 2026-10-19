@@ -288,7 +288,7 @@ void FMissionView_Update(FMissionView *view, BOOL active) {
 }
 
 BOOL FMissionView_IsPrinting(FMissionView *view) {
-    return func_02021a3c(view->printQueue);
+    return PrintQueue_Main(view->printQueue);
 }
 
 GameEvent *FMissionView_CheckEvent(FMissionView *view, BOOL enabled) {
@@ -303,7 +303,7 @@ static int FMissionView_SeqMain(FMissionView *view) {
         view->wait = ENTRY_WAIT;
         return SEQ_WAIT_TASKS;
     }
-    func_02012be4(view->wifiList);
+    WihDwc_GetStatus(view->wifiList);
     next = FMissionView_CheckTouch(view);
     if (next != SEQ_MAIN) {
         return next;
@@ -396,7 +396,7 @@ static void FMissionView_SetDimmed(FMissionView *view, BOOL dimmed) {
 static void FMissionView_DrawAll(FMissionView *view) {
     int i;
 
-    view->memberCount = func_0201494c(view->festival);
+    view->memberCount = LinkFestival_GetMemberCount(view->festival);
     PaletteFade_SetTransferAll(view->fade, TRUE);
     for (i = 0; i < view->logVisible; i++) {
         u8 top = view->logTop;
@@ -509,7 +509,7 @@ static BOOL FMissionView_CheckNewEntry(FMissionView *view) {
 }
 
 static void FMissionView_UpdateMemberCount(FMissionView *view) {
-    u8 count = func_0201494c(view->festival);
+    u8 count = LinkFestival_GetMemberCount(view->festival);
 
     if (count > view->memberCount && view->memberPending == 0) {
         view->memberCount = count;
@@ -859,7 +859,7 @@ static void FMissionView_PrintPanel(FMissionView *view, FMissionViewPanel *panel
     panel->value = FMissionLogEntryFV_GetValue(entry);
     panel->kind = FMissionView_GetEntryFrame(view, kind, panel->value);
     panel->look = FMissionLogEntryFV_GetLook(entry);
-    func_02015018(entry, panel->strs[0]);
+    FestMissionLogEntry_GetName(entry, panel->strs[0]);
     WordSetNumber(view->wordSet, 0, FMissionLogEntryFV_GetScore(entry), 4, 1, TRUE);
     GFL_MsgDataLoadStrbuf(view->msgData, FmissionViewSetup_Text_Score, view->tmpStr);
     GFL_WordSetFormatStrbuf(view->wordSet, panel->strs[2], view->tmpStr);
@@ -882,8 +882,8 @@ static void FMissionView_PrintPanel(FMissionView *view, FMissionViewPanel *panel
             }
         } else {
             for (i = 0; i < FMISSION_VIEW_PANEL_LINE_COUNT; i++) {
-                func_02021c7c(view->printQueue, panel->lines[i].bitmap, (i == 1) ? textX : 0, 0, panel->strs[i],
-                              view->font, colors[i == 2]);
+                PrintQueue_PrintColor(view->printQueue, panel->lines[i].bitmap, (i == 1) ? textX : 0, 0, panel->strs[i],
+                                      view->font, colors[i == 2]);
             }
         }
     }
@@ -900,7 +900,7 @@ static BOOL FMissionView_ShowPanelWhenPrinted(FMissionView *view, FMissionViewPa
     int i;
 
     for (i = 0; i < FMISSION_VIEW_PANEL_LINE_COUNT; i++) {
-        if (func_02021c1c(view->printQueue, panel->lines[i].bitmap)) {
+        if (PrintQueue_IsBitmapPending(view->printQueue, panel->lines[i].bitmap)) {
             return FALSE;
         }
     }
@@ -1114,7 +1114,7 @@ static void FMissionView_MessageTask(TCBEx *task, void *data) {
 
 // Offers the Pass Power that the entry's player used
 static BOOL FMissionView_OfferEntryPassPower(FMissionView *view, FestMissionLogEntry *entry) {
-    u16 passPower = func_02015248(&view->passPowers->own, entry);
+    u16 passPower = FestMissionPassPower_FromLogEntry(&view->passPowers->own, entry);
 
     FMissionLogEntryFV_SetWords(entry, view->wordSet, view->heapId);
     return FMissionView_StartPassPower(view, passPower, FALSE, &view->pending);

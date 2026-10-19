@@ -88,7 +88,7 @@ static BOOL BrBvDelete_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
     p_wk->seq = BrSeq_Init(p_wk, BrBvDelete_SeqFadeIn, p_wk->heapId);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     BrBvDelete_CreateConfirm(p_wk, p_param);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
@@ -110,7 +110,7 @@ static BOOL BrBvDelete_ProcExit(GameProc *proc, u32 *state, void *param, void *w
         BrBvDelete_DeleteText(p_wk, p_param);
         BrBvDelete_DeleteConfirm(p_wk, p_param);
     }
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     BrSeq_Exit(p_wk->seq);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -128,7 +128,7 @@ static BOOL BrBvDelete_ProcMain(GameProc *proc, u32 *state, void *param, void *w
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }

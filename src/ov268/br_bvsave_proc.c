@@ -125,7 +125,7 @@ static BOOL BrBvSave_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
 
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
     p_wk->seq = BrSeq_Init(p_wk, BrBvSave_SeqDownload, p_wk->heapId);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
     }
@@ -144,7 +144,7 @@ static BOOL BrBvSave_ProcExit(GameProc *proc, u32 *state, void *param, void *wor
         BrText_Exit(p_wk->text, p_wk->p_param->res);
         p_wk->text = NULL;
     }
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     BrSeq_Exit(p_wk->seq);
     BmpOam_Exit(p_wk->bmpoam);
     BrProcSys_Pop(p_wk->p_param->procSys);
@@ -169,7 +169,7 @@ static BOOL BrBvSave_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }
@@ -245,10 +245,10 @@ static void BrBvSave_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
                 u64 number;
                 int i;
 
-                func_0200c0d0((GdsProfile *)video->profile, &video->header, &video->body,
-                              GameData_GetSaveControl(p_wk->p_param->gameData));
+                BattleRec_StoreDownloaded((GdsProfile *)video->profile, &video->header, &video->body,
+                                          GameData_GetSaveControl(p_wk->p_param->gameData));
                 isSaved = FALSE;
-                number = func_0200c124(func_0200c0c0(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
+                number = BattleRec_GetHeaderValue(BattleRec_GetHeader(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
                 for (i = BR_RECORD_MODE_OTHER1; i <= BR_RECORD_MODE_OTHER3; i++) {
                     if (p_wk->p_param->recordInfo->videoNumber[i] == number) {
                         isSaved = TRUE;
@@ -556,7 +556,7 @@ static void BrBvSave_SeqSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         BrNetRequestParam req;
 
         MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
-        req.dataNumber = func_0200c124(func_0200c0c0(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
+        req.dataNumber = BattleRec_GetHeaderValue(BattleRec_GetHeader(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_8, &req);
         BrText_Print(p_wk->text, p_wk->p_param->res, 0x13f);
         p_wk->netCnt = 0;

@@ -195,7 +195,7 @@ static void PMSIView_MainTask(TCB *tcb, void *data) {
         PMSIVMenu_Main(vwk->menu);
     }
     if (vwk->printQueue != NULL) {
-        func_02021a3c(vwk->printQueue);
+        PrintQueue_Main(vwk->printQueue);
         PMSIView_FlushMessage(vwk);
     }
 }
@@ -395,8 +395,8 @@ static void PMSIView_CmdQuit(TCB *tcb, void *data) {
             PMSIVCategory_Delete(cwk->vwk->category);
             PMSIVWordWin_Delete(cwk->vwk->wordWin);
             GFL_FontFree(vwk->font);
-            func_02021c44(vwk->printQueue);
-            func_02021a18(vwk->printQueue);
+            PrintQueue_Clear(vwk->printQueue);
+            PrintQueue_Free(vwk->printQueue);
             vwk->printQueue = NULL;
             GFL_BGSysReleaseBG(0);
             GFL_BGSysReleaseBG(1);
@@ -555,7 +555,7 @@ static void PMSIView_SetupBG(PMSIVCommandWork *cwk) {
         GFL_BGSysSetBGEnabled(i, TRUE);
     }
     vwk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_PMS_INPUT);
-    vwk->printQueue = func_020219a8(0x500, HEAPID_PMS_INPUT);
+    vwk->printQueue = PrintQueue_Create(0x500, HEAPID_PMS_INPUT);
 }
 
 static void PMSIView_CmdFadeIn(TCB *tcb, void *data) {
@@ -1303,8 +1303,8 @@ static void PMSIView_PrintMessage(PMSIVCommandWork *cwk, u32 msg) {
     GFL_BitmapFill(BmpWin_GetBitmap(cwk->vwk->msgWin), 7);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, PMSIV_MSG_FILE, HEAPID_PMS_INPUT);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgIds[msg]);
-    func_02021c7c(cwk->vwk->printQueue, BmpWin_GetBitmap(cwk->vwk->msgWin), 2, 4, str, cwk->vwk->font,
-                  PRINT_COLOR(14, 15, 7));
+    PrintQueue_PrintColor(cwk->vwk->printQueue, BmpWin_GetBitmap(cwk->vwk->msgWin), 2, 4, str, cwk->vwk->font,
+                          PRINT_COLOR(14, 15, 7));
     cwk->vwk->msgPrinting = TRUE;
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
@@ -1312,7 +1312,7 @@ static void PMSIView_PrintMessage(PMSIVCommandWork *cwk, u32 msg) {
 
 static void PMSIView_FlushMessage(PMSInputView *vwk) {
     if (vwk->msgPrinting) {
-        if (!func_02021c1c(vwk->printQueue, BmpWin_GetBitmap(vwk->msgWin))) {
+        if (!PrintQueue_IsBitmapPending(vwk->printQueue, BmpWin_GetBitmap(vwk->msgWin))) {
             BmpWin_Transfer(vwk->msgWin);
             vwk->msgPrinting = FALSE;
         }

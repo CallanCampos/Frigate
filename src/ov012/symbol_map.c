@@ -250,7 +250,7 @@ BOOL func_ov012_02160668(AreaNPCSave *npcData, u32 index) {
     u32 kind;
     u32 slot;
 
-    switch (func_0200ea1c(index)) {
+    switch (SymbolSave_GetKindOfSlot(index)) {
     case 0:
         kind = 2;
         break;
@@ -266,17 +266,17 @@ BOOL func_ov012_02160668(AreaNPCSave *npcData, u32 index) {
     default:
         return FALSE;
     }
-    slot = func_0200e9fc(npcData, kind);
+    slot = SymbolSave_FindFreeSlot(npcData, kind);
     if (slot == 0xffff) {
         return FALSE;
     }
-    func_0200e904(npcData);
+    SymbolSave_Decrypt(npcData);
     npcData->pokemon[slot] = npcData->pokemon[index];
     if (kind == 3) {
-        func_0200eb14(npcData, slot);
+        SymbolSave_UpdateDeepestArea(npcData, slot);
     }
     decryptNpcData(npcData);
-    func_0200ea24(npcData, index);
+    SymbolSave_RemoveSlot(npcData, index);
     return TRUE;
 }
 
@@ -390,7 +390,7 @@ SymbolMapList *func_ov012_02160870(HeapID heapId, GameSystem *gsys, u32 *count) 
     u8 found;
 
     GSYS_GetGameCommSystem(gsys);
-    season = func_02017a24(gameData);
+    season = GameData_GetEntreeForestArea(gameData);
     list = GFL_HeapAllocate(heapId, sizeof(SymbolMapList), TRUE, "symbol_map.c", 466);
     *count = func_ov012_02161354(npcData, list->pokemon, 20, season, &found);
     list->count = found;

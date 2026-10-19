@@ -105,7 +105,7 @@ static BOOL WifiLogoutProc_Exit(GameProc *proc, u32 *state, void *param, void *w
     }
     WifiLoginMessage_Free(wk->msg);
     WifiLoginDisp_Free(wk->disp);
-    func_02012144();
+    GFL_NetErrClear();
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_WIFILOGOUT);
     return TRUE;
@@ -174,7 +174,7 @@ static void WifiLogout_StateDisconnect(WifiLogoutWork *work) {
         func_020429f0();
         func_02042478();
         func_020424e4();
-        func_02012144();
+        GFL_NetErrClear();
     }
     if (func_020427a4()) {
         WifiLogout_ChangeState(work, WifiLogout_StatePrintDisconnected, 452);

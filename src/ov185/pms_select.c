@@ -211,7 +211,7 @@ static BOOL PMSSelect_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->param = selectParam;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PMS_INPUT, wk->heapId);
-    wk->queue = func_02021998(wk->heapId);
+    wk->queue = PrintQueue_CreateDefault(wk->heapId);
     wk->procMgr = CreateGameProcManager(wk->heapId);
     wk->prevPos = POS_NONE;
     wk->pos = POS_NONE;
@@ -224,8 +224,8 @@ static BOOL PMSSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) 
 
     PMSSelect_ReleaseScreen(wk);
     FreeGameProcManager(wk->procMgr);
-    func_02021c44(wk->queue);
-    func_02021a18(wk->queue);
+    PrintQueue_Clear(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
     GFL_ProcReleaseSubsystem(proc);
@@ -235,7 +235,7 @@ static BOOL PMSSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) 
 }
 
 static BOOL PMSSelect_IsPrintEnd(PMSSelectWork *wk) {
-    if (func_02021c0c(wk->queue) && PMSDraw_IsPrintEnd(wk->pmsDraw)) {
+    if (PrintQueue_IsEmpty(wk->queue) && PMSDraw_IsPrintEnd(wk->pmsDraw)) {
         return TRUE;
     }
     return FALSE;
@@ -343,8 +343,8 @@ static BOOL PMSSelect_Main(GameProc *proc, u32 *state, void *param, void *work) 
         return TRUE;
     }
 
-    func_02021a3c(wk->queue);
-    if (wk->bg.titleFlushPending && !func_02021c1c(wk->queue, BmpWin_GetBitmap(wk->bg.titleWindow))) {
+    PrintQueue_Main(wk->queue);
+    if (wk->bg.titleFlushPending && !PrintQueue_IsBitmapPending(wk->queue, BmpWin_GetBitmap(wk->bg.titleWindow))) {
         BmpWin_Transfer(wk->bg.titleWindow);
         wk->bg.titleFlushPending = FALSE;
     }
@@ -402,7 +402,7 @@ static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
 static void PMSSelect_ReleaseScreen(PMSSelectWork *wk) {
     u8 i;
 
-    func_02021c44(wk->queue);
+    PrintQueue_Clear(wk->queue);
     for (i = 0; i < PLATE_COUNT; i++) {
         wk->flushPending[i] = FALSE;
     }
@@ -448,7 +448,7 @@ static void PMSSelect_BGLoad(PMSSelectBG *bg, HeapID heapId, Font *font, PrintQu
     bg->titleWindow = BmpWin_CreateDynamic(5, 3, 5, 26, 7, 8, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(bg->titleWindow), 7);
     strbuf = GFL_MsgDataLoadStrbufNew(msgData, 21);
-    func_02021c7c(queue, BmpWin_GetBitmap(bg->titleWindow), 2, 4, strbuf, font, PRINT_COLOR(14, 15, 7));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(bg->titleWindow), 2, 4, strbuf, font, PRINT_COLOR(14, 15, 7));
     bg->titleFlushPending = TRUE;
     GFL_StrBufFree(strbuf);
     GFL_ArcToolFree(arc);
@@ -887,7 +887,7 @@ static void PMSSelect_FlushWindows(PMSSelectWork *wk) {
 static BOOL PMSSelect_FlushWindow(PrintQueue *queue, BmpWin *window, BOOL *flushPending) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(window);
 
-    if (*flushPending == TRUE && !func_02021c1c(queue, bitmap)) {
+    if (*flushPending == TRUE && !PrintQueue_IsBitmapPending(queue, bitmap)) {
         BmpWin_Transfer(window);
         *flushPending = FALSE;
         return TRUE;
@@ -907,7 +907,7 @@ static void PMSSelect_DrawNewPlate(PMSSelectWork *wk, u8 line, u8 index, BOOL ac
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[line]), 13);
         color = PRINT_COLOR(1, 2, 13);
     }
-    func_02021c7c(wk->queue, BmpWin_GetBitmap(wk->windows[line]), 0, 0, strbuf, wk->font, color);
+    PrintQueue_PrintColor(wk->queue, BmpWin_GetBitmap(wk->windows[line]), 0, 0, strbuf, wk->font, color);
     GFL_StrBufFree(strbuf);
     BmpWin_FlushMap(wk->windows[line]);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(wk->windows[line]));

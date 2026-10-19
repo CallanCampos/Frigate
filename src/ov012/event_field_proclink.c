@@ -256,9 +256,9 @@ void EventFieldAppCall_ConvAppResultToEventType(u32 result, u32 *eventType) {
 void func_ov012_0215b754(FieldAppCallWork *work) {
     GameSystem *gsys = work->input->gameSystem;
     GameData *gameData = GSYS_GetGameData(gsys);
-    void *data = func_0201734c(gameData);
+    void *data = GameData_GetBagCursor(gameData);
 
-    func_020088ec(data, 0);
+    BagCursor_SetFreeSpaceFilter(data, 0);
 }
 
 void func_ov012_0215b76c(FieldAppCallParam *param, FieldAppCallInput *input, FieldAppCallPredicate canRetry,
@@ -630,7 +630,7 @@ void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, c
     case FIELD_APP_BAG:
         param = BagParam_Create(gameData, &work->perms, func_ov012_0215bd1c(work->input->gameSystem), HEAPID_GAMEEVENT);
         if (appParam != -1) {
-            func_020088a4(param->cursor, appParam);
+            BagCursor_SetPocket(param->cursor, appParam);
         }
         break;
     case FIELD_APP_POKELIST:

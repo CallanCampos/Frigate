@@ -568,7 +568,7 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         CtvtCall_Scan(sys, call);
         for (i = 0; i < CTVT_CALL_ROWS; i++) {
             if (call->rows[i].printPending == TRUE &&
-                !func_02021c1c(CommTvt_GetPrintQueue(sys), BmpWin_GetBitmap(call->rows[i].window))) {
+                !PrintQueue_IsBitmapPending(CommTvt_GetPrintQueue(sys), BmpWin_GetBitmap(call->rows[i].window))) {
                 BmpWin_Transfer(call->rows[i].window);
                 call->rows[i].printPending = FALSE;
             }
@@ -608,13 +608,15 @@ int CtvtCall_Main(CommTvtWork *sys, CtvtCall *call) {
         }
     }
 
-    if (call->msgWinPending == TRUE && !func_02021c1c(CommTvt_GetPrintQueue(sys), BmpWin_GetBitmap(call->msgWin))) {
+    if (call->msgWinPending == TRUE &&
+        !PrintQueue_IsBitmapPending(CommTvt_GetPrintQueue(sys), BmpWin_GetBitmap(call->msgWin))) {
         BmpWin_FlushChar(call->msgWin);
         BmpWin_FlushMap(call->msgWin);
         GFL_BGSysLoadScr(4);
         call->msgWinPending = FALSE;
     }
-    if (call->infoWinPending == TRUE && !func_02021c1c(CommTvt_GetPrintQueue(sys), BmpWin_GetBitmap(call->infoWin))) {
+    if (call->infoWinPending == TRUE &&
+        !PrintQueue_IsBitmapPending(CommTvt_GetPrintQueue(sys), BmpWin_GetBitmap(call->infoWin))) {
         BmpWin_FlushChar(call->infoWin);
         BmpWin_FlushMap(call->infoWin);
         GFL_BGSysLoadScr(4);
@@ -884,7 +886,7 @@ static void CtvtCall_Scan(CommTvtWork *sys, CtvtCall *call) {
                     if (service == CTVT_CALL_SERVICE_CTVT) {
                         call->entries[slot].gameServiceId = CTVT_CALL_SERVICE_CTVT;
                         MI_CpuCopy8(beacon, call->entries[slot].beacon, sizeof(CtvtCommBeacon));
-                        call->entries[slot].romVersion = func_02008bfc(call->entries[slot].beacon);
+                        call->entries[slot].romVersion = PlayerInfo_GetVersion(call->entries[slot].beacon);
                     } else {
                         call->entries[slot].gameServiceId = CTVT_CALL_SERVICE_FIELD;
                         MI_CpuCopy8(beacon, call->entries[slot].beacon, sizeof(CtvtCallFieldBeacon));
@@ -1020,7 +1022,7 @@ static void CtvtCall_DrawRow(CommTvtWork *sys, CtvtCall *call, CtvtCallRow *row,
         } else {
             GFL_StrBufLoadFixedString(name, ((CtvtCallFieldBeacon *)entry->beacon)->beacon.name, 8);
         }
-        func_02021c7c(queue, BmpWin_GetBitmap(row->window), 6, 0, name, font, 0x3c40);
+        PrintQueue_PrintColor(queue, BmpWin_GetBitmap(row->window), 6, 0, name, font, 0x3c40);
         GFL_StrBufFree(name);
 
         format = GFL_MsgDataLoadStrbufNew(msgData, 14);
@@ -1032,7 +1034,7 @@ static void CtvtCall_DrawRow(CommTvtWork *sys, CtvtCall *call, CtvtCallRow *row,
         }
         GFL_WordSetFormatStrbuf(wordSet, str, format);
         GFL_StrBufFree(format);
-        func_02021c7c(queue, BmpWin_GetBitmap(row->window), 80, 0, str, font, 0x3c40);
+        PrintQueue_PrintColor(queue, BmpWin_GetBitmap(row->window), 80, 0, str, font, 0x3c40);
         GFL_StrBufFree(str);
 
         if (entry->gameServiceId == CTVT_CALL_SERVICE_CTVT) {
@@ -1046,7 +1048,7 @@ static void CtvtCall_DrawRow(CommTvtWork *sys, CtvtCall *call, CtvtCallRow *row,
             WordSetNumber(wordSet, 0, beacon->memberCount, 1, 0, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, members, memberFormat);
             GFL_StrBufFree(memberFormat);
-            func_02021c7c(queue, BmpWin_GetBitmap(row->window), 144, 0, members, font, 0x3c40);
+            PrintQueue_PrintColor(queue, BmpWin_GetBitmap(row->window), 144, 0, members, font, 0x3c40);
             GFL_StrBufFree(members);
         } else {
             entry->memberCount = 0;
@@ -1189,7 +1191,7 @@ static void CtvtCall_UpdateFoundMessage(CommTvtWork *sys, CtvtCall *call) {
 }
 
 static BOOL CtvtCall_IsFriend(CommTvtWork *sys, CtvtCall *call, const u16 *name, u32 id, u32 gender) {
-    return func_0200a46c(GameData_GetWifiList(CommTvt_GetParam(sys)->gameData), name, id, gender, NULL);
+    return WifiList_FindFriend(GameData_GetWifiList(CommTvt_GetParam(sys)->gameData), name, id, gender, NULL);
 }
 
 static void CtvtCall_PrintMessage(CommTvtWork *sys, CtvtCall *call, u32 msgId) {
@@ -1200,7 +1202,7 @@ static void CtvtCall_PrintMessage(CommTvtWork *sys, CtvtCall *call, u32 msgId) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(call->msgWin), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-    func_02021c7c(queue, BmpWin_GetBitmap(call->msgWin), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(call->msgWin), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_DrawFrame(call->msgWin, 2, 0x140, 9);
     call->msgWinPending = TRUE;
@@ -1214,7 +1216,7 @@ static void CtvtCall_PrintInfo(CommTvtWork *sys, CtvtCall *call, u32 msgId) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(call->infoWin), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-    func_02021c7c(queue, BmpWin_GetBitmap(call->infoWin), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(call->infoWin), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_DrawFrame(call->infoWin, 2, 0x140, 9);
     call->infoWinPending = TRUE;

@@ -237,7 +237,7 @@ void FesMissionPeople_LoadSpecies(FesGimmick *gimmick, FesMissionWork *work) {
     default:
         return;
     }
-    arc = func_02014590(gimmick->festival);
+    arc = LinkFestival_GetArchive(gimmick->festival);
     size = GFL_ArcToolGetDataLength(arc, fileId);
     work->speciesCount = size;
     if (size > 0x500) {

@@ -82,7 +82,7 @@ static void func_ov012_0215f9b0(u16 value) {
 static void func_ov012_0215f9d8(GameBeacon *info, u16 value) {
     info->type = 2;
     info->arg.value = value;
-    func_0202d4c8(info, value);
+    GameBeacon_SetRecentKind0(info, value);
 }
 
 static void func_ov012_0215f9e8(u16 value) {
@@ -108,7 +108,7 @@ static void func_ov012_0215fa20(u16 value) {
 static void func_ov012_0215fa48(GameBeacon *info, u16 value) {
     info->type = 4;
     info->arg.value = value;
-    func_0202d4e0(info, value);
+    GameBeacon_SetRecentKind1(info, value);
 }
 
 static void func_ov012_0215fa58(u16 value) {
@@ -138,7 +138,7 @@ void func_ov012_0215fa90(u16 itemId) {
 static void func_ov012_0215fae0(GameBeacon *info, u16 itemId) {
     info->type = 6;
     info->payload.value = itemId;
-    func_0202d4fc(info, itemId);
+    GameBeacon_SetRecentKind2(info, itemId);
 }
 
 void func_ov012_0215faf0(u16 itemId) {
@@ -172,7 +172,7 @@ void func_ov012_0215fb50(u16 itemId) {
 static void func_ov012_0215fba0(GameBeacon *info, u16 itemId) {
     info->type = 8;
     info->payload.value = itemId;
-    func_0202d518(info, itemId);
+    GameBeacon_SetRecentKind3(info, itemId);
 }
 
 void func_ov012_0215fbb0(u16 itemId) {
@@ -206,7 +206,7 @@ void func_ov012_0215fc10(u16 itemId) {
 static void func_ov012_0215fc60(GameBeacon *info, u16 itemId) {
     info->type = 10;
     info->payload.value = itemId;
-    func_0202d534(info, itemId);
+    GameBeacon_SetRecentKind4(info, itemId);
 }
 
 void func_ov012_0215fc70(u16 itemId) {

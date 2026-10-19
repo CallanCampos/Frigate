@@ -491,7 +491,7 @@ static void TDownloadUtil_ExitWindows(TDownloadWork *wk) {
         wk->streamStr = NULL;
     }
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
     }
 }
@@ -606,10 +606,10 @@ static void TDownloadUtil_LoadObjRes(TDownloadWork *wk, u32 vramType, const TDow
 static void TDownloadUtil_LoadUIRes(TDownloadWork *wk, u32 vramType) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
     ClActUnit *unit = TDownloadGraphic_GetClActUnit(wk->graphic);
-    u32 pltt = func_0202d810();
-    u32 chars = func_0202d814();
-    u32 cells = func_0202d818(2);
-    u32 anims = func_0202d81c(2);
+    u32 pltt = AppMenuCommon_GetTouchBarPaletteFile();
+    u32 chars = AppMenuCommon_GetTouchBarCharFile();
+    u32 cells = AppMenuCommon_GetTouchBarCellFile(2);
+    u32 anims = AppMenuCommon_GetTouchBarAnimFile(2);
 
     wk->res[0] = func_0204bbb8(arc, pltt, vramType, 0x160, 0, 4, wk->heapId);
     wk->res[1] = func_0204b81c(arc, chars, FALSE, vramType, wk->heapId);
@@ -757,7 +757,7 @@ int TDownloadUtil_UpdateTaskMenu(TDownloadWork *wk) {
 
 static void TDownloadUtil_PrintStream(TDownloadWork *wk, int window, int message) {
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
     }
     if (wk->streamStr != NULL) {
@@ -765,8 +765,8 @@ static void TDownloadUtil_PrintStream(TDownloadWork *wk, int window, int message
         wk->streamStr = NULL;
     }
     wk->streamStr = GFL_MsgDataLoadStrbufNew(wk->msgData[0], sTDownloadMessages[message]);
-    wk->stream = func_02022268(wk->windows[window].window, 0, 0, wk->streamStr, wk->font, func_02017bcc(), wk->tcbEx, 4,
-                               wk->heapId, 15);
+    wk->stream = PrintStream_Create(wk->windows[window].window, 0, 0, wk->streamStr, wk->font,
+                                    TextSpeed_GetCurrentWait(), wk->tcbEx, 4, wk->heapId, 15);
 }
 
 BOOL TDownloadUtil_UpdateMessage(TDownloadWork *wk) {

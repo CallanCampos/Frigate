@@ -113,13 +113,13 @@ BOOL func_ov012_02159d10(VM *vm, FieldScriptEnv *env) {
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     value = ScriptReadVar(vm, env);
-    *value = func_02016b34(gsys);
+    *value = GSYS_IsCGearOn(gsys);
     return FALSE;
 }
 
 BOOL s024B_FieldSubscreenDisable(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    func_02016b40(gsys, 0);
-    func_0201740c(GSYS_GetGameData(gsys), 0);
+    GSYS_SetCGearOn(gsys, 0);
+    GameData_SetCGearPowerRequest(GSYS_GetGameData(gsys), 0);
     return FALSE;
 }

@@ -191,7 +191,7 @@ static void func_0203e6cc(u32 engine, u32 type, HeapID heapId) {
     u32 pltt;
 
     arc = GFL_ArcSysCreateFileHandle(getWifiIconNarcIdxNum(), HEAPID_TAIL(heapId));
-    func_020116b0(&files);
+    WmIconFiles_Init(&files);
     if (engine == 1) {
         pltt = 1;
         obj = 0;

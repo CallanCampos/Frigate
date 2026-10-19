@@ -426,7 +426,7 @@ static void ZukanAreaListView_InitActorSys(ZukanAreaListView *view) {
 // The windows cover the whole of their screens, the lower and the upper
 static void ZukanAreaListView_InitWindows(ZukanAreaListView *view) {
     BmpWin_InitAllocator(HEAPID_ZUKAN_AREA_LIST);
-    view->printQueue = func_02021998(HEAPID_ZUKAN_AREA_LIST);
+    view->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_AREA_LIST);
 
     view->windows[ZUKAN_AREA_LIST_WIN_MAIN] = BmpWin_CreateDynamic(0, 0, 0, 32, 24, 15, 0);
     BmpWin_FlushMap(view->windows[ZUKAN_AREA_LIST_WIN_MAIN]);
@@ -468,9 +468,11 @@ static void ZukanAreaListView_LoadGraphics(void) {
 
     // The touch bar
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_AREA_LIST);
-    GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), 1, 0, FALSE, HEAPID_ZUKAN_AREA_LIST);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20, HEAPID_ZUKAN_AREA_LIST);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 1, 0, 0, FALSE, HEAPID_ZUKAN_AREA_LIST);
+    GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), 1, 0, FALSE, HEAPID_ZUKAN_AREA_LIST);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20,
+                                HEAPID_ZUKAN_AREA_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE,
+                                           HEAPID_ZUKAN_AREA_LIST);
     GFL_BGSysSetScrPaletteNo(1, 0, 21, 32, 3, 14);
     GFL_BGSysQueueScrLoad(1);
     GFL_ArcToolFree(arc);
@@ -518,10 +520,10 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
         setup.vramType = 0;
         setup.flags = 0;
         setup.arcId = getUINarcIdx();
-        setup.paletteFile = func_0202d810();
-        setup.charFile = func_0202d814();
-        setup.cellFile = func_0202d818(2);
-        setup.animFile = func_0202d81c(2);
+        setup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+        setup.charFile = AppMenuCommon_GetTouchBarCharFile();
+        setup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+        setup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
         setup.paletteOffset = 10;
         setup.paletteStart = 0;
         setup.paletteCount = 3;
@@ -654,8 +656,8 @@ static void ZukanAreaListView_ExitPaletteFade(ZukanAreaListView *view) {
 }
 
 static void ZukanAreaListView_ExitWindows(ZukanAreaListView *view) {
-    func_02021c44(view->printQueue);
-    func_02021a18(view->printQueue);
+    PrintQueue_Clear(view->printQueue);
+    PrintQueue_Free(view->printQueue);
     GFL_FontFree(view->font);
     BmpWin_FreeAllocator();
     BmpWin_Free(view->windows[ZUKAN_AREA_LIST_WIN_MAIN]);
@@ -701,7 +703,7 @@ static void ZukanAreaListView_Update(ZukanAreaListView *view) {
     int window;
 
     view->printed = FALSE;
-    func_02021a3c(view->printQueue);
+    PrintQueue_Main(view->printQueue);
     for (i = 0; i < ZUKAN_AREA_LIST_MARK_COUNT; i++) {
         ClActor *actor = view->actors[ZUKAN_AREA_LIST_OBJ_MARK + i];
         ZukanAreaListMark *mark = &view->marks[0][i];

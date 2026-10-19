@@ -247,7 +247,7 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         ZukanDetailInfo_CreateButtons(param, wk, common);
         pokedex = GameData_GetPokedex(ZukanDetailCommon_GetGameData(common));
         unit = ZukanDetailGraphic_GetClActUnit(ZukanDetailCommon_GetGraphic(common));
-        switch (func_0200d1f8(pokedex)) {
+        switch (PokeDex_GetMode(pokedex)) {
         case 0:
             national = FALSE;
             break;
@@ -665,13 +665,13 @@ static void ZukanDetailInfo_GetPokemon(ZukanDetailInfoParam *param, ZukanDetailI
     BOOL seenLanguages[LANGUAGE_BUTTON_COUNT];
     u8 i;
 
-    func_0200d3c8(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
+    PokeDex_GetShownSexRareForm(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
     if (shown == SPECIES_SPINDA) {
         shownPersonality = func_0200da18(pokedex, shownPersonality);
     }
     shownCaught = PokeDex_IsCaught(pokedex, shown);
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        seenLanguages[i] = func_0200db5c(pokedex, shown, wk->buttons[i].language);
+        seenLanguages[i] = PokeDex_HasLanguage(pokedex, shown, wk->buttons[i].language);
     }
 
     *species = shown;

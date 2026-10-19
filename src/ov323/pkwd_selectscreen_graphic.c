@@ -117,7 +117,7 @@ PkwdSelectScreenGraphic *PkwdSelectScreenGraphic_Create(u32 layout, HeapID heapI
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     PkwdSelectScreenBG_Init(&graphic->bg, heapId);
     PkwdSelectScreenClAct_Init(&graphic->clact, &sPkwdSelectScreenVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(PkwdSelectScreenGraphic_VBlank, graphic, 0);
@@ -128,7 +128,7 @@ void PkwdSelectScreenGraphic_Free(PkwdSelectScreenGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     PkwdSelectScreenClAct_Free(&graphic->clact);
     PkwdSelectScreenBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

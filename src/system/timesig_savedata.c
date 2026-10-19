@@ -10,11 +10,11 @@
 
 #define SAVE_BLOCK_TIMESIG 0x21
 
-u32 func_02009184(void) {
+u32 TimeSigSave_GetSize(void) {
     return sizeof(TimeSigSave);
 }
 
-void func_0200918c(TimeSigSave *timeSig) {
+void TimeSigSave_Init(TimeSigSave *timeSig) {
     MI_CpuFill8(timeSig, 0, sizeof(TimeSigSave));
 }
 
@@ -26,7 +26,7 @@ void *func_020091a8(void *timeSig) {
     return timeSig;
 }
 
-BOOL func_020091ac(TimeSigSave *timeSig) {
+BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig) {
     u32 sum = 0;
     int i;
 
@@ -72,7 +72,7 @@ s64 loadSecondsTime(TimeSigSave *timeSig) {
     return timeSig->seconds;
 }
 
-TimeSigBadgeDate func_02009230(TimeSigSave *timeSig, u32 badgeId) {
+TimeSigBadgeDate TimeSigSave_GetBadgeDate(TimeSigSave *timeSig, u32 badgeId) {
     return timeSig->badgeDates[badgeId];
 }
 
@@ -90,10 +90,10 @@ void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 mon
     saveSecondsTime(timeSig, seconds, seconds >> 32);
 }
 
-u16 func_020092a8(TimeSigSave *timeSig, u32 badgeId) {
+u16 TimeSigSave_GetBadgePolish(TimeSigSave *timeSig, u32 badgeId) {
     return timeSig->badgePolish[badgeId];
 }
 
-void func_020092b8(TimeSigSave *timeSig, u32 badgeId, u32 polish) {
+void TimeSigSave_SetBadgePolish(TimeSigSave *timeSig, u32 badgeId, u32 polish) {
     timeSig->badgePolish[badgeId] = polish;
 }

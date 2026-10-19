@@ -13,7 +13,7 @@ static u16 func_ov012_02161334(AreaNPCSave *npcData, EntreeForestPokemon *dest, 
 u32 func_ov012_02161260(AreaNPCSave *npcData) {
     u8 value;
 
-    func_0200e904(npcData);
+    SymbolSave_Decrypt(npcData);
     value = npcData->unk848;
     decryptNpcData(npcData);
     return value;
@@ -22,7 +22,7 @@ u32 func_ov012_02161260(AreaNPCSave *npcData) {
 u32 func_ov012_0216127c(AreaNPCSave *npcData) {
     u8 value;
 
-    func_0200e904(npcData);
+    SymbolSave_Decrypt(npcData);
     value = npcData->deepestArea;
     decryptNpcData(npcData);
     return value;
@@ -33,7 +33,7 @@ static u8 func_ov012_02161298(AreaNPCSave *npcData, EntreeForestPokemon *dest, i
     int i = 0;
 
     MI_CpuFill8(dest, 0, max * sizeof(EntreeForestPokemon));
-    func_0200e904(npcData);
+    SymbolSave_Decrypt(npcData);
     MI_CpuCopy8(&npcData->pokemon[start], dest, count * sizeof(EntreeForestPokemon));
     decryptNpcData(npcData);
     for (; i < count; i++) {

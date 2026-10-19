@@ -142,7 +142,7 @@ EggDemoGraphic *EggDemoGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     EggDemoBG_Init(&graphic->bg, heapId);
     EggDemoClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
     EggDemoG3dSys_Init(&graphic->g3d, heapId);
@@ -155,7 +155,7 @@ void EggDemoGraphic_Free(EggDemoGraphic *graphic) {
     EggDemoG3dSys_Free(&graphic->g3d);
     EggDemoClAct_Free(&graphic->clact);
     EggDemoBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

@@ -446,7 +446,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     u8 rank;
 
     // The sender's favorite color and a darker shade of it
-    func_02013d38(&colors[0], beacon);
+    GameBeacon_GetFavoriteColorRGB(&colors[0], beacon);
     BlendColors(&colors[0], &colors[1], 1, 3, 0);
     palette = page * 16;
     BeaconDetailSub_LoadPalette(colors, PALETTE_BG_SUB, palette + 1, 2);
@@ -738,7 +738,7 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
     if (!page->decided && TouchBar_GetDecided(page->work->touchBar) != -1) {
         page->decided = TRUE;
     }
-    if (!func_02021c0c(page->work->printQueue)) {
+    if (!PrintQueue_IsEmpty(page->work->printQueue)) {
         return;
     }
     switch (page->seq) {

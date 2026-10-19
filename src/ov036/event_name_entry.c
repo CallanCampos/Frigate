@@ -123,7 +123,7 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     GameData *gameData = GSYS_GetGameData(gsys);
     JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
-    JoinAvenuePerson *person = func_02038a18(getAddressOfBeginningOfOccupants(save));
+    JoinAvenuePerson *person = JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(save));
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(gameData));
     StrBuf *name;
     EventJoinAvenueNameEntry *work;
@@ -183,12 +183,12 @@ GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, v
     if (work->nameEntry->unk1C != 1) {
         JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
         JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
-        JoinAvenuePerson *person = func_02038a18(getAddressOfBeginningOfOccupants(save));
+        JoinAvenuePerson *person = JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(save));
         const u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
 
         switch (work->target) {
         case 1:
-            func_02039064(info, 1, (u32)str);
+            JoinAvenueInfo_SetParam(info, 1, (u32)str);
             break;
         case 2:
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
@@ -197,7 +197,7 @@ GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, v
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE2, (u32)str);
             break;
         default:
-            func_02039064(info, 0, (u32)str);
+            JoinAvenueInfo_SetParam(info, 0, (u32)str);
             break;
         }
     } else if (work->target == 0) {
@@ -206,7 +206,7 @@ GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, v
 
         GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
         GFL_MsgDataFree(msgData);
-        func_02039064(JoinAvenue_GetInfo(save), 0, (u32)name);
+        JoinAvenueInfo_SetParam(JoinAvenue_GetInfo(save), 0, (u32)name);
     }
     if (work->result != NULL) {
         *work->result = (work->nameEntry->unk1C != 1);

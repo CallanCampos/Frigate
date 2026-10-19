@@ -37,10 +37,10 @@ IntroMcss *IntroMcss_Create(HeapID heapId, u32 mode) {
     mcss->system = MCSSSys_Create(SPRITE_COUNT, heapId);
     mcss->heapId = heapId;
     if (mode != INTRO_MODE_PLAYER_NAMED && mode != INTRO_MODE_RIVAL_NAMED) {
-        func_0201aefc(mcss->system, 0x70000);
+        MCSSSys_SetTexBase(mcss->system, 0x70000);
     }
-    func_0201af00(mcss->system, 0x4000);
-    func_0201aacc(mcss->system);
+    MCSSSys_SetPlttBase(mcss->system, 0x4000);
+    MCSSSys_EnableOrtho(mcss->system);
     return mcss;
 }
 
@@ -76,7 +76,7 @@ void IntroMcss_AddPokemon(IntroMcss *mcss, fx32 x, fx32 y, fx32 z, u32 species, 
     VecFx32 scale = sPokemonScale;
     PartyPkm *pkm = PokeParty_NewTempPkm(species, 0, 0, mcss->heapId);
 
-    func_0201bfdc(pkm, &info, 0);
+    SetupPokemonLoaderByPartyPkm(pkm, &info, 0);
     GFL_HeapFree(pkm);
     mcss->sprites[index].mcss = MCSSSys_Add(mcss->system, x, y, z, &info);
     MCSS_SetScale(mcss->sprites[index].mcss, &scale);
@@ -121,9 +121,9 @@ void IntroMcss_SetAlpha(IntroMcss *mcss, u8 index, u32 alpha) {
 
 void func_ov294_021a3798(IntroMcss *mcss, u8 index, BOOL a2) {
     if (a2) {
-        func_0201ac8c(mcss->sprites[index].mcss);
+        MCSS_EnableFlipV(mcss->sprites[index].mcss);
     } else {
-        func_0201ac9c(mcss->sprites[index].mcss);
+        MCSS_DisableFlipV(mcss->sprites[index].mcss);
     }
 }
 

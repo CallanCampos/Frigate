@@ -462,7 +462,7 @@ static UnSelectMsg *UnSelectMsg_Create(HeapID heapId) {
     LoadSysMsgBox(0, 1, 15, 0, heapId);
     msg->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     msg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_UN_SELECT, heapId);
-    msg->printQueue = func_02021998(heapId);
+    msg->printQueue = PrintQueue_CreateDefault(heapId);
     msg->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     msg->strbuf = GFL_StrBufCreate(1600, heapId);
     msg->expanded = GFL_StrBufCreate(1600, heapId);
@@ -479,7 +479,7 @@ static UnSelectMsg *UnSelectMsg_Create(HeapID heapId) {
 
 static void UnSelectMsg_Free(UnSelectMsg *msg) {
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     BmpWin_Free(msg->titleWindow);
@@ -487,7 +487,7 @@ static void UnSelectMsg_Free(UnSelectMsg *msg) {
     GFL_StrBufFree(msg->strbuf);
     GFL_StrBufFree(msg->expanded);
     GFL_MsgDataFree(msg->msgData);
-    func_02021a18(msg->printQueue);
+    PrintQueue_Free(msg->printQueue);
     GFL_FontFree(msg->font);
     GFL_TCBExMgrFree(msg->tcbManager);
     GFL_WordSetSystemFree(msg->wordSet);
@@ -495,7 +495,7 @@ static void UnSelectMsg_Free(UnSelectMsg *msg) {
 }
 
 static void UnSelectMsg_Update(UnSelectMsg *msg) {
-    func_02021a3c(msg->printQueue);
+    PrintQueue_Main(msg->printQueue);
     GFL_TCBExMgrUpdate(msg->tcbManager);
 }
 
@@ -509,7 +509,7 @@ static void UnSelectMsg_PrintItem(UnSelectMsg *msg, PrintWindow *window, PrintQu
     WordSetNumber(msg->wordSet, 2, floor, 3, 0, TRUE);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
     PrintStrAligned(window, queue, 0, 12, msg->expanded, font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
-    if (func_0202284c(msg->names[pos]) > 1) {
+    if (GFL_FontGetLineCount(msg->names[pos]) > 1) {
         y = 4;
     }
     PrintStrAligned(window, queue, 30, y, msg->names[pos], font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
@@ -517,14 +517,15 @@ static void UnSelectMsg_PrintItem(UnSelectMsg *msg, PrintWindow *window, PrintQu
 
 static void UnSelectMsg_Print(UnSelectMsg *msg, u32 msgId) {
     static const u8 backColor = 15;
-    s32 wait = func_02017bcc();
+    s32 wait = TextSpeed_GetCurrentWait();
     BmpWin *window = msg->msgWindow;
 
     GFL_BitmapFill(BmpWin_GetBitmap(window), backColor);
     GFL_TextRndUpdateColorIndexLUT(1, 2, backColor);
     GFL_MsgDataLoadStrbuf(msg->msgData, msgId, msg->strbuf);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
-    msg->stream = func_02022268(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff, msg->heapId, 15);
+    msg->stream =
+        PrintStream_Create(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff, msg->heapId, 15);
     BmpWin_DrawFrame(msg->msgWindow, 2, 1, 15);
     BmpWin_Transfer(window);
 }
@@ -532,21 +533,21 @@ static void UnSelectMsg_Print(UnSelectMsg *msg, u32 msgId) {
 // Whether the message has been printed and the player has gone on
 static BOOL UnSelectMsg_Wait(UnSelectMsg *msg) {
     if (msg->stream != NULL) {
-        switch (func_020223b4(msg->stream)) {
+        switch (PrintStream_GetState(msg->stream)) {
         case 2:
-            func_020223cc(msg->stream);
+            PrintStream_Delete(msg->stream);
             msg->stream = NULL;
             return TRUE;
         case 1:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
                 func_0203da48()) {
-                func_020223bc(msg->stream);
+                PrintStream_Continue(msg->stream);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }
             break;
         case 0:
             if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-                func_020223e0(msg->stream, 0);
+                PrintStream_SkipWait(msg->stream, 0);
             }
             break;
         }

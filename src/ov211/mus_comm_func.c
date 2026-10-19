@@ -311,7 +311,7 @@ void *func_ov211_021ef230(u32 *seq, void *param) {
         sMusCommInitData.bNetType = 0;
         func_020425ec(&sMusCommInitData, MusComm_OnNetEnd, work);
     }
-    func_02008b34(work->playerInfo, &work->beacon.playerInfo);
+    PlayerInfo_Copy(work->playerInfo, &work->beacon.playerInfo);
     OS_GetMacAddress(work->beacon.mac);
     work->beacon.gameId = 0x3a0b;
     return work;
@@ -929,7 +929,7 @@ static void MusComm_RecvAllPlayerData(int netId, int size, const void *data, voi
         BOOL valid;
 
         MI_CpuCopy8(src, comm->players[i].data, dataSize);
-        valid = func_02008b5c(comm->players[i].info) == 0;
+        valid = PlayerInfo_IsNameEmpty(comm->players[i].info) == 0;
         comm->players[i].joined = valid;
         comm->players[i].hasInfo = valid;
     }
@@ -995,7 +995,7 @@ static void MusComm_RecvAllPokes(int netId, int size, const void *data, void *wo
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
 
-        if (func_02008b5c(comm->players[i].info) == 0) {
+        if (PlayerInfo_IsNameEmpty(comm->players[i].info) == 0) {
             u8 *src = comm->allPokeData + i * (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
             u32 pokeSize = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
 

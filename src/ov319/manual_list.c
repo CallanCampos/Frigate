@@ -134,7 +134,7 @@ BOOL ManualList_Main(ManualList *list) {
     BOOL ended = FALSE;
     u8 i;
 
-    if (!func_02021c0c(list->common->queue)) {
+    if (!PrintQueue_IsEmpty(list->common->queue)) {
         return ended;
     }
     if (list->endTimer == 0) {
@@ -262,7 +262,7 @@ static void ManualList_FreeGraphics(ManualList *list) {
 static void ManualList_FreeMenu(ManualList *list) {
     u8 i;
 
-    func_02021c44(list->common->queue);
+    PrintQueue_Clear(list->common->queue);
     for (i = 0; i < WIN_COUNT; i++) {
         if (list->wins[i] != NULL) {
             AppTaskMenuWin_Free(list->wins[i]);

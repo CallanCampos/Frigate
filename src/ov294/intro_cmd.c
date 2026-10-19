@@ -586,9 +586,9 @@ static BOOL IntroCmd_SetMsgLanguage(IntroCmd *cmd, IntroCmdWork *work, s32 *args
     Config *config = cmd->param->config;
 
     if (args[0] == FALSE) {
-        func_02008a8c(config, FALSE);
+        Config_SetKanji(config, FALSE);
     } else {
-        func_02008a8c(config, TRUE);
+        Config_SetKanji(config, TRUE);
     }
     return TRUE;
 }

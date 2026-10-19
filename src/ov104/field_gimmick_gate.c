@@ -193,7 +193,7 @@ void func_ov104_021eec80(Field *field) {
     GimmickGateWork *work;
     GimmickGateScene scene;
 
-    func_02008a84(
+    Config_GetKanji(
         (Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
     scene = GATE_SCENE_1;
     LoadFieldExpandObjData(expObj, &sSceneSetups[scene], scene);
@@ -362,7 +362,7 @@ void func_ov104_021eeee0(GimmickGateWork *work) {
             continue;
         }
         if (zone == 0x177 || zone == 0x17b) {
-            switch (func_02017220(work->gameData)) {
+            switch (GameData_GetMyCity(work->gameData)) {
             case 0:
                 func_ov104_021f0150(&temp, 0xac, i + 1);
                 break;
@@ -463,7 +463,7 @@ void func_ov104_021ef084(const GimmickGateWork *work, u32 *species, s32 *count) 
 
     *count = 0;
     save = GameData_GetSaveControl(gameData);
-    result = func_020074ec(save, 8, work->heapId);
+    result = SaveControl_OpenExtraBlock(save, 8, work->heapId);
     if (result == 1 || result == 2) {
         hallOfFame = getAddressOfExtraSaveBlk(save, 8, 0);
         if (HallOfFameSave_GetTeamCount(hallOfFame) != 0) {

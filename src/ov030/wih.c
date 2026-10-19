@@ -490,7 +490,7 @@ static void WH_StateOutStartScan(void *arg) {
         WMBssDesc *bssDesc = &_pWmInfo->sBssDesc;
 
         MI_CpuCopy8(cb->bssDesc[i], bssDesc, sizeof(WMBssDesc));
-        func_02012ebc(cb->linkLevel[i]);
+        WihDwc_SetBestLinkLevel(cb->linkLevel[i]);
         if (_pWmInfo->sScanInfoCallback != NULL) {
             _pWmInfo->sScanInfoCallback(bssDesc, func_02042d94(), cb->linkLevel[i]);
         }

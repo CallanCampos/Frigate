@@ -157,14 +157,14 @@ void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty 
 }
 
 void func_ov062_021e636c(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result) {
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (result == 1) {
-        func_020110d4(save, 2, movie);
+        PokewoodSave_SetFlag(save, 2, movie);
     } else if (result == 2) {
-        func_020110d4(save, 4, movie);
+        PokewoodSave_SetFlag(save, 4, movie);
     } else if (result == 0) {
-        func_020110d4(save, 6, movie);
+        PokewoodSave_SetFlag(save, 6, movie);
     }
 }
 
@@ -181,7 +181,7 @@ static BOOL func_ov062_021e63a4(PokewoodSave *save, u32 series) {
     u32 i;
 
     for (i = 0; sSeries[series].movies[i] != 0xff; i++) {
-        if (func_020110ac(save, 1, sSeries[series].movies[i]) == FALSE) {
+        if (PokewoodSave_CheckFlag(save, 1, sSeries[series].movies[i]) == FALSE) {
             break;
         }
     }
@@ -193,7 +193,7 @@ static BOOL func_ov062_021e63a4(PokewoodSave *save, u32 series) {
 
 void Pokewood_CheckMedals(GameData *gameData) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(gameData));
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     u32 i;
     u32 count;
 
@@ -202,17 +202,17 @@ void Pokewood_CheckMedals(GameData *gameData) {
             MedalBox_GiveMedal(box, sSeries[i].medal);
         }
     }
-    if (func_020112d8(save, 1) == POKEWOOD_MOVIE_COUNT) {
+    if (PokewoodSave_CountFlags(save, 1) == POKEWOOD_MOVIE_COUNT) {
         MedalBox_GiveMedal(box, 0xd8);
         MedalBox_DiscoverMedal(box, 0xdc);
     }
-    if (func_020112d8(save, 2) == POKEWOOD_MOVIE_COUNT) {
+    if (PokewoodSave_CountFlags(save, 2) == POKEWOOD_MOVIE_COUNT) {
         MedalBox_GiveMedal(box, 0xd9);
     }
     if (func_020111ec(func_020111b0(save)) >= 2) {
         MedalBox_DiscoverMedal(box, 0xd9);
     }
-    count = func_020112d8(save, 4);
+    count = PokewoodSave_CountFlags(save, 4);
     if (count != 0) {
         MedalBox_GiveMedal(box, 0xdb);
     }
@@ -246,10 +246,10 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32
 }
 
 void PokewoodSystem_KeepBestRecord(GameData *gameData, PokewoodSystem *sys) {
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
 
-    if (sys->record.score >= func_02011194(save, sys->movie)->score) {
-        func_02011130(save, sys->movie, &sys->record);
+    if (sys->record.score >= PokewoodSave_GetRecord(save, sys->movie)->score) {
+        PokewoodSave_UpdateRecord(save, sys->movie, &sys->record);
     }
 }
 
@@ -257,7 +257,7 @@ void func_ov062_021e6584(GameData *gameData, PokewoodSystem *sys) {
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
 
     if (sys->record.score > 0) {
-        func_02009508(records, 0x33, sys->record.score);
+        RecordSetIfHigher(records, 0x33, sys->record.score);
     }
     if (sys->record.score > 0) {
         RecordAdd(records, 0x34, sys->record.score);
@@ -265,7 +265,7 @@ void func_ov062_021e6584(GameData *gameData, PokewoodSystem *sys) {
 }
 
 void func_ov062_021e65b4(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot) {
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (func_020111a0(save, slot) == 0) {
         func_020111d0(save, sAmounts[result]);
@@ -302,10 +302,10 @@ void func_ov062_021e663c(GameData *gameData, PokewoodSystem *sys, u32 slot) {
         0, 11, 11, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4,  4,  4,  5,  5,
         5, 6,  6,  6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 12,
     };
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (sys->movie < POKEWOOD_MOVIE_COUNT) {
-        func_0201127c(save, slot, sMovieSeries[sys->movie] + 1, sys->unkF8);
+        PokewoodSave_PushLastSeries(save, slot, sMovieSeries[sys->movie] + 1, sys->unkF8);
     }
 }
 

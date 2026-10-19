@@ -616,7 +616,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
                     level = MONOLITH_MISSION_LEVEL_CHEAT;
                 }
                 func_ov027_02170cf8(mfw->festText, picked, level, &mission);
-                func_0201472c(mfw->festival, &mission, 0);
+                LinkFestival_StartMission(mfw->festival, &mission, 0);
                 if (bootState == 1) {
                     *state = MONOLITH_MISSION_SEQ_END;
                 } else if (bootState == 0) {
@@ -659,13 +659,13 @@ static BOOL MonolithMission_Exit(GameProc *proc, u32 *state, void *param, void *
     MonolithScreenParam *screen = param;
     MonolithMissionWork *mfw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG3);
     GFL_TCBRemove(mfw->vblankTask);
     if (mfw->print_stream != NULL) {
-        func_020223cc(mfw->print_stream);
+        PrintStream_Delete(mfw->print_stream);
     }
     if (mfw->msgStr != NULL) {
         GFL_StrBufFree(mfw->msgStr);
@@ -771,8 +771,8 @@ static void MonolithMission_ShowMessage(MonolithMissionWork *mfw, MonolithWork *
     GFL_ASSERT(mfw->print_stream == NULL);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     mfw->msgStr = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, msgId);
-    mfw->print_stream = func_02022268(mfw->windows[0], 0, 0, mfw->msgStr, wk->font, func_02017bcc(), wk->tcbMgr, 10,
-                                      HEAPID_MONOLITH, 15);
+    mfw->print_stream = PrintStream_Create(mfw->windows[0], 0, 0, mfw->msgStr, wk->font, TextSpeed_GetCurrentWait(),
+                                           wk->tcbMgr, 10, HEAPID_MONOLITH, 15);
     BmpWin_FlushMap(mfw->windows[0]);
     BmpWin_DrawFrame(mfw->windows[0], TRUE, 1, 11);
 }
@@ -786,8 +786,8 @@ static void MonolithMission_ShowMessageExpanded(MonolithMissionWork *mfw, Monoli
     mfw->msgStr = GFL_StrBufCreate(256, HEAPID_MONOLITH);
     GFL_WordSetFormatStrbuf(wk->wordSet, mfw->msgStr, str);
     GFL_StrBufFree(str);
-    mfw->print_stream = func_02022268(mfw->windows[0], 0, 0, mfw->msgStr, wk->font, func_02017bcc(), wk->tcbMgr, 10,
-                                      HEAPID_MONOLITH, 15);
+    mfw->print_stream = PrintStream_Create(mfw->windows[0], 0, 0, mfw->msgStr, wk->font, TextSpeed_GetCurrentWait(),
+                                           wk->tcbMgr, 10, HEAPID_MONOLITH, 15);
     BmpWin_FlushMap(mfw->windows[0]);
     BmpWin_DrawFrame(mfw->windows[0], TRUE, 1, 11);
 }
@@ -800,7 +800,7 @@ static void MonolithMission_ClearMessage(MonolithMissionWork *mfw) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(mfw->windows[0]);
 
     GFL_ASSERT(mfw->print_stream != NULL);
-    func_020223cc(mfw->print_stream);
+    PrintStream_Delete(mfw->print_stream);
     mfw->print_stream = NULL;
     GFL_StrBufFree(mfw->msgStr);
     mfw->msgStr = NULL;
@@ -1491,10 +1491,10 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
 
 // Reads a mission's record from the save into the list
 static void MonolithMission_LoadRecord(MonolithScreenParam *screen, MonolithMissionWork *mfw, int index, int id) {
-    void *records = func_02010dec(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    void *records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
 
-    mfw->records[index].clearedLevel = func_02010f6c(records, id);
-    if (func_02010fb0(records, id) == TRUE) {
+    mfw->records[index].clearedLevel = FestRecords_GetMissionLevel(records, id);
+    if (FestRecords_IsMissionNew(records, id) == TRUE) {
         mfw->records[index].flags |= MONOLITH_MISSION_RECORD_NEW;
     } else {
         mfw->records[index].flags &= ~MONOLITH_MISSION_RECORD_NEW;
@@ -1503,7 +1503,8 @@ static void MonolithMission_LoadRecord(MonolithScreenParam *screen, MonolithMiss
 
 // Takes the mission's new marker from the save
 static void MonolithMission_ClearNew(MonolithScreenParam *screen, MonolithMissionWork *mfw, int id) {
-    func_02010fc0(func_02010dec(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))), id);
+    FestRecords_ClearMissionNew(FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
+                                id);
 }
 
 // Moves the level of the cursor's mission, by the stylus or the keys, or keeps it within the levels that can be picked

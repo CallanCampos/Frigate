@@ -63,9 +63,9 @@ static BOOL func_ov061_021e58c4(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u8 value = ScriptReadAny(vm, env);
-    u16 unk = func_02017220(gameData);
+    u16 unk = GameData_GetMyCity(gameData);
 
-    func_020102f0(getKeyDataBlkAddress(save), value, unk);
+    KeyDataSave_SetProgress(getKeyDataBlkAddress(save), value, unk);
     return FALSE;
 }
 
@@ -75,9 +75,9 @@ static BOOL func_ov061_021e5904(VM *vm, FieldScriptEnv *env) {
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(save);
 
-    func_0201024c(keyData);
-    func_020103ec(keyData, getCash(gameInfo));
-    func_02010300(keyData, random);
+    KeyDataSave_ClearRun(keyData);
+    KeyDataSave_SetMoney(keyData, getCash(gameInfo));
+    KeyDataSave_SetSeed(keyData, random);
     return FALSE;
 }
 
@@ -85,7 +85,7 @@ static BOOL func_ov061_021e594c(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_020102d4(getKeyDataBlkAddress(save));
+    *var = KeyDataSave_GetFloorInArea(getKeyDataBlkAddress(save));
     return FALSE;
 }
 
@@ -93,7 +93,7 @@ static BOOL func_ov061_021e597c(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_02010378(getKeyDataBlkAddress(save));
+    *var = KeyDataSave_GetArea(getKeyDataBlkAddress(save));
     return FALSE;
 }
 
@@ -147,7 +147,7 @@ static BOOL func_ov061_021e5aa8(VM *vm, FieldScriptEnv *env) {
     u16 set = ScriptReadAny(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    func_02010304(keyData, func_020102d4(keyData), actor, set);
+    KeyDataSave_SetTrainerDefeated(keyData, KeyDataSave_GetFloorInArea(keyData), actor, set);
     return FALSE;
 }
 
@@ -157,7 +157,7 @@ static BOOL func_ov061_021e5af4(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    *var = func_02010288(keyData, func_020102d4(keyData), actor);
+    *var = KeyDataSave_IsTrainerDefeated(keyData, KeyDataSave_GetFloorInArea(keyData), actor);
     return FALSE;
 }
 
@@ -206,7 +206,7 @@ static BOOL func_ov061_021e5c04(VM *vm, FieldScriptEnv *env) {
     u16 set = ScriptReadAny(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    func_02010354(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a), set);
+    KeyDataSave_SetFlag(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a), set);
     return FALSE;
 }
 
@@ -219,7 +219,7 @@ static BOOL func_ov061_021e5c5c(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    *var = func_02010340(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a));
+    *var = KeyDataSave_IsFlagSet(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a));
     return FALSE;
 }
 
@@ -228,10 +228,10 @@ static BOOL func_ov061_021e5cb8(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
-    u8 level = func_02010378(getKeyDataBlkAddress(save));
+    u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(save));
     u32 unk = func_ov127_021f02e0(dungeon);
 
-    *var = unk + func_020103a0(level) + 1;
+    *var = unk + KeyDataSave_GetAreaFirstFloor(level) + 1;
     return FALSE;
 }
 
@@ -277,7 +277,7 @@ static BOOL func_ov061_021e5e08(VM *vm, FieldScriptEnv *env) {
     u8 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = InfinityDungeon_GetTrainerId(dungeon, func_020102d4(getKeyDataBlkAddress(save)), actor);
+    *var = InfinityDungeon_GetTrainerId(dungeon, KeyDataSave_GetFloorInArea(getKeyDataBlkAddress(save)), actor);
     return FALSE;
 }
 
@@ -305,26 +305,26 @@ static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
 
     switch (info) {
     case 0:
-        *var = func_020103a0((u8)arg);
+        *var = KeyDataSave_GetAreaFirstFloor((u8)arg);
         break;
     case 1:
-        *var = func_020103c4(arg);
+        *var = KeyDataSave_GetAreaFloorCount(arg);
         break;
     case 2:
-        *var = func_020102ec(keyData);
+        *var = KeyDataSave_GetRoom(keyData);
         break;
     case 6:
-        *var = func_020102d4(keyData);
+        *var = KeyDataSave_GetFloorInArea(keyData);
         break;
     case 3:
         *var = func_ov127_021f08e8(dungeon);
         break;
     case 4:
-        *var = func_020102a4(keyData);
+        *var = KeyDataSave_CountDefeatedTrainers(keyData);
         break;
     case 5:
-        unk = func_020102ec(keyData);
-        *var = func_ov127_021f093c(dungeon, func_020102d4(keyData), unk);
+        unk = KeyDataSave_GetRoom(keyData);
+        *var = func_ov127_021f093c(dungeon, KeyDataSave_GetFloorInArea(keyData), unk);
         break;
     case 9:
         *var = dungeon->rewardItem;
@@ -333,8 +333,8 @@ static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
         *var = dungeon->rewardCount;
         break;
     case 11:
-        unk = func_02010274(keyData, 0);
-        unk2 = func_02010274(keyData, 1);
+        unk = KeyDataSave_GetProgress(keyData, 0);
+        unk2 = KeyDataSave_GetProgress(keyData, 1);
         if (unk == 0 && unk2 == 0) {
             *var = TRUE;
         } else {
@@ -359,7 +359,7 @@ static const BlackTowerUnkPair sUnkPairs[] = {
 static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
-    u8 level = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     u32 area = func_ov127_021f0dd8(dungeon);
     const BlackTowerUnkPair *pairs = area == 0x17 ? sUnkPairs17 : sUnkPairs;
 
@@ -376,7 +376,7 @@ static BOOL func_ov061_021e5fe4(VM *vm, FieldScriptEnv *env) {
     u16 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0db4(dungeon, func_020102d4(keyData), actor);
+    *var = func_ov127_021f0db4(dungeon, KeyDataSave_GetFloorInArea(keyData), actor);
     return FALSE;
 }
 
@@ -401,7 +401,7 @@ static BOOL func_ov061_021e60a8(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     u32 cash = getCash(gameInfo);
 
-    if (cash > func_020103e8(keyData)) {
+    if (cash > KeyDataSave_GetMoney(keyData)) {
         *var = TRUE;
     } else {
         *var = FALSE;
@@ -418,7 +418,7 @@ static BOOL func_ov061_021e60f4(VM *vm, FieldScriptEnv *env) {
     u16 wordIndex = ScriptReadAny(vm, env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u32 cash = getCash(gameInfo);
-    u32 start = func_020103e8(keyData);
+    u32 start = KeyDataSave_GetMoney(keyData);
     u32 amount;
 
     if (cash > start) {

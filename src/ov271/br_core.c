@@ -109,7 +109,7 @@ static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     coreParam->mainParam->result = 0;
 
     wk->graphic = BrGraphic_Init(wk->param->mainParam->mode == BR_MODE_GLOBAL_MUSICAL, 1, HEAPID_BATTLE_RECORDER);
-    color = func_0200cb30(getTrainerCardDataBlkAddress(wk->param->mainParam->gameData));
+    color = TrainerCard_GetBattleRecorderColor(getTrainerCardDataBlkAddress(wk->param->mainParam->gameData));
     wk->res = BrRes_Init(color, wk->param->mainParam->mode == BR_MODE_BROWSE, HEAPID_BATTLE_RECORDER);
     BrRes_LoadBG(wk->res, 0, HEAPID_BATTLE_RECORDER);
     BrRes_LoadBG(wk->res, 1, HEAPID_BATTLE_RECORDER);
@@ -147,7 +147,7 @@ static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
         BrFade_SetAlpha(wk->fade, BR_FADE_DISPLAY_BOTH, 0);
     }
     if (wk->param->mainParam->mode == BR_MODE_GLOBAL_BV && wk->param->mode == BR_CORE_MODE_INIT) {
-        func_02038bc8(0x13);
+        JoinAvenue_RecordActivity(0x13);
     }
     return TRUE;
 }
@@ -174,7 +174,7 @@ static BOOL BrCore_ProcExit(GameProc *proc, u32 *state, void *param, void *work)
     BrProcSys_Exit(wk->procSys);
     if (wk->param->mainParam->mode == BR_MODE_BROWSE) {
         TrainerCardSave *trainerCard = getTrainerCardDataBlkAddress(wk->param->mainParam->gameData);
-        func_0200cb3c(trainerCard, BrRes_GetColor(wk->res));
+        TrainerCard_SetBattleRecorderColor(trainerCard, BrRes_GetColor(wk->res));
     }
     BrRes_UnloadBG(wk->res, 0);
     BrRes_UnloadBG(wk->res, 1);
@@ -368,7 +368,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
         p->outline = NULL;
         wk->param->data->recordMode = menuParam->nextMode;
         gameData = wk->param->mainParam->gameData;
-        func_0200bc9c(GameData_GetSaveControl(gameData), HEAPID_BATTLE_RECORDER_SYS, &result, p->mode);
+        BattleRec_LoadToCurrent(GameData_GetSaveControl(gameData), HEAPID_BATTLE_RECORDER_SYS, &result, p->mode);
         if (result == 1) {
             if (p->mode == BR_RECORD_MODE_MINE) {
                 GdsProfile_SetFromGameData(getVSPlayerAllocation(), gameData);
@@ -581,8 +581,8 @@ static void BrCore_BvSaveAfter(void *param, void *work) {
     if (p->isSave) {
         BrCore_LoadRecordInfo(&wk->param->data->recordInfo, FALSE, wk->param->mainParam->gameData,
                               HEAPID_BATTLE_RECORDER);
-        func_0200bc9c(GameData_GetSaveControl(wk->param->mainParam->gameData), HEAPID_TAIL(HEAPID_BATTLE_RECORDER),
-                      &result, p->saveSlot);
+        BattleRec_LoadToCurrent(GameData_GetSaveControl(wk->param->mainParam->gameData),
+                                HEAPID_TAIL(HEAPID_BATTLE_RECORDER), &result, p->saveSlot);
     }
 }
 
@@ -641,7 +641,7 @@ static void BrCore_LoadRecordInfo(BrRecordInfo *info, BOOL keepLoaded, GameData 
         MI_CpuFill8(info, 0, sizeof(BrRecordInfo));
 
         for (i = 0; i < BR_RECORD_NUM; i++) {
-            func_0200bc9c(save, HEAPID_TAIL(heapId), &result, i);
+            BattleRec_LoadToCurrent(save, HEAPID_TAIL(heapId), &result, i);
             if (result == 1) {
                 GdsProfile *profile = getVSPlayerAllocation();
 
@@ -651,10 +651,10 @@ static void BrCore_LoadRecordInfo(BrRecordInfo *info, BOOL keepLoaded, GameData 
                 info->isValid[i] = TRUE;
                 info->name[i] = GdsProfile_CreateNameStrBuf(profile, HEAPID_BATTLE_RECORDER_SYS);
                 info->sex[i] = GdsProfile_GetSex(profile);
-                info->videoNumber[i] = func_0200c124(func_0200c0c0(), 4, 0);
+                info->videoNumber[i] = BattleRec_GetHeaderValue(BattleRec_GetHeader(), 4, 0);
             }
         }
-        info->hasMusicalShot = func_0200ad4c(getAddressOfMusicalDataInfo(GameData_GetSaveControl(gameData)));
+        info->hasMusicalShot = MusicalSave_HasShot(getAddressOfMusicalDataInfo(GameData_GetSaveControl(gameData)));
         info->isInit = TRUE;
     }
 }

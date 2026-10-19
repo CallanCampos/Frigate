@@ -316,8 +316,8 @@ WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void
     p_wk = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchNet), FALSE, "wifibattlematch_net.c", 700);
     MI_CpuFill8(p_wk, 0, sizeof(WifiBattleMatchNet));
     p_wk->wifiList = GameData_GetWifiList(gameData);
-    p_wk->unk0 = func_02009f7c(p_wk->wifiList);
-    p_wk->profileId = func_02008bdc(GetGameDataPlayerInfo(gameData));
+    p_wk->unk0 = WifiList_GetMyUserData(p_wk->wifiList);
+    p_wk->profileId = PlayerInfo_GetProfileId(GetGameDataPlayerInfo(gameData));
     p_wk->gameData = gameData;
     p_wk->loginBuffer = loginBuffer;
     p_wk->p_data = a0;
@@ -365,8 +365,8 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             func_02042e9c(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
-                func_02017884(p_wk->gameData);
-                func_02011d04(0x29);
+                GameData_CancelSave(p_wk->gameData);
+                GFL_NetErrShowWifi(0x29);
             }
         }
         switch (DWCRapCommon_CheckError(a1, a2)) {
@@ -415,21 +415,21 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             func_02042e9c(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
-                func_02017884(p_wk->gameData);
-                func_02011d04(0x29);
+                GameData_CancelSave(p_wk->gameData);
+                GFL_NetErrShowWifi(0x29);
             }
         }
         switch (result) {
         case WBM_RESULT_DISCONNECTED:
             func_02042478();
             func_020424e4();
-            func_02011de0();
-            func_02012144();
+            GFL_NetErrShowScreen();
+            GFL_NetErrClear();
             break;
         case WBM_RESULT_FAILED:
             if (!GFL_NetErrCheck()) {
                 func_020424ac(0, 0, 0, 0x3f7);
-                func_02012050();
+                GFL_NetErrRecord();
             }
             GFL_NetErrMarkShown();
             break;
@@ -614,7 +614,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
             if ((u32)(info->type - 0x3f0) <= 1) {
                 func_020424e4();
                 func_02042478();
-                func_02012144();
+                GFL_NetErrClear();
                 func_020421ac(TRUE);
             }
             return 2;
@@ -691,7 +691,7 @@ BOOL WifiBattleMatchNet_TakeCmd2402(WifiBattleMatchNet *p_wk) {
 BOOL WifiBattleMatchNet_SendPerson(WifiBattleMatchNet *p_wk) {
     BOOL toServer = func_02042a6c(func_02040440()) == 0;
 
-    func_02036dc0(&p_wk->person, p_wk->gameData);
+    JoinAvenuePerson_InitPlayer(&p_wk->person, p_wk->gameData);
     return func_02042c18(func_02040440(), toServer, 0x2406, 0xc4, &p_wk->person, TRUE, FALSE, TRUE);
 }
 
@@ -1501,7 +1501,7 @@ static void WifiBattleMatchNet_OnInfoReceived(int netId, int size, const void *d
 static void WifiBattleMatchNet_OnPlayerInfoReceived(int netId, int size, const void *data, void *work,
                                                     NetHandle *handle) {
     WifiBattleMatchNet *p_wk = work;
-    PlayerInfo *info = func_02017378(p_wk->gameData, netId);
+    PlayerInfo *info = GameData_GetPlayerInfoByNetID(p_wk->gameData, netId);
 
     MI_CpuCopy8(data, info, PlayerInfo_GetSize());
     if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
@@ -1570,7 +1570,7 @@ static void WifiBattleMatchNet_OnPersonReceived(int netId, int size, const void 
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_NAME, (u32)GFL_StrBufGetStringPtr(name));
             GFL_StrBufFree(name);
         }
-        func_02010078(joinAvenue, p_wk->gameData, person, 1);
+        JoinAvenue_Add(joinAvenue, p_wk->gameData, person, 1);
         p_wk->flagPersonReceived = 1;
     }
 }
@@ -2436,7 +2436,8 @@ static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError
 void WifiBattleMatchNet_StartAccountRequest(WifiBattleMatchNet *p_wk, HeapID heapId) {
     GFL_ASSERT(p_wk->p_nhttp == NULL);
     p_wk->state = 0;
-    p_wk->p_nhttp = NHttpRap_Create(heapId, func_02008bdc(GetGameDataPlayerInfo(p_wk->gameData)), p_wk->loginBuffer);
+    p_wk->p_nhttp =
+        NHttpRap_Create(heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(p_wk->gameData)), p_wk->loginBuffer);
 }
 
 u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk) {
@@ -2472,18 +2473,18 @@ u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk) {
             switch (status) {
             case 503:
                 p_wk->state = 4;
-                func_020120f0(0x3e);
+                GFL_NetErrRecordWifi(0x3e);
                 return 0;
             case 502:
                 p_wk->state = 4;
-                func_020120f0(0x3f);
+                GFL_NetErrRecordWifi(0x3f);
                 return 0;
             }
             p_wk->httpValues = answer->values;
             if (answer->result == 0) {
                 p_wk->state = 3;
             } else {
-                func_020120f0(WifiBattleMatchNet_GetHttpResultMessage(answer->result));
+                GFL_NetErrRecordWifi(WifiBattleMatchNet_GetHttpResultMessage(answer->result));
                 p_wk->state = 4;
             }
         } else if (result != 15) {
@@ -2523,7 +2524,8 @@ void WifiBattleMatchNet_StartPostRequest(WifiBattleMatchNet *p_wk, const void *i
     const WifiBattleMatchNetValues *values = in;
 
     GFL_ASSERT(p_wk->p_nhttp == NULL);
-    p_wk->p_nhttp = NHttpRap_Create(heapId, func_02008bdc(GetGameDataPlayerInfo(p_wk->gameData)), p_wk->loginBuffer);
+    p_wk->p_nhttp =
+        NHttpRap_Create(heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(p_wk->gameData)), p_wk->loginBuffer);
     p_wk->postData = *values;
     p_wk->state = 0;
 }
@@ -2562,17 +2564,17 @@ u32 WifiBattleMatchNet_PostRequestMain(WifiBattleMatchNet *p_wk) {
             switch (status) {
             case 503:
                 p_wk->state = 3;
-                func_020120f0(0x3e);
+                GFL_NetErrRecordWifi(0x3e);
                 return 0;
             case 502:
                 p_wk->state = 3;
-                func_020120f0(0x3f);
+                GFL_NetErrRecordWifi(0x3f);
                 return 0;
             }
             if (answer->result == 0) {
                 p_wk->state = 4;
             } else {
-                func_020120f0(WifiBattleMatchNet_GetHttpResultMessage(answer->result));
+                GFL_NetErrRecordWifi(WifiBattleMatchNet_GetHttpResultMessage(answer->result));
                 p_wk->state = 3;
             }
         } else if (result != 15) {
@@ -2646,8 +2648,8 @@ BOOL WifiBattleMatchNet_NameCheckMain(WifiBattleMatchNet *p_wk, u32 *out) {
 
 void WifiBattleMatchNet_StartPokemonCheck(WifiBattleMatchNet *p_wk, void *data, int kind) {
     p_wk->state = 0;
-    p_wk->p_nhttp =
-        NHttpRap_Create(p_wk->msgHeapId, func_02008bdc(GetGameDataPlayerInfo(p_wk->gameData)), p_wk->loginBuffer);
+    p_wk->p_nhttp = NHttpRap_Create(p_wk->msgHeapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(p_wk->gameData)),
+                                    p_wk->loginBuffer);
     switch (kind) {
     case 0:
         NHttpRap_BeginPost(p_wk->p_nhttp, p_wk->msgHeapId, PokeParty_GetPkmRawSize(), 0);
@@ -2701,7 +2703,7 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
         if (result == 0) {
             switch (status) {
             case 400:
-                func_020120f0(0x41);
+                GFL_NetErrRecordWifi(0x41);
                 if (p_wk->p_nhttp != NULL) {
                     NHttpRap_FreePostData(p_wk->p_nhttp);
                     NHttpRap_Destroy(p_wk->p_nhttp);
@@ -2711,7 +2713,7 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
                 }
                 return 3;
             case 401:
-                func_020120f0(0x42);
+                GFL_NetErrRecordWifi(0x42);
                 if (p_wk->p_nhttp != NULL) {
                     NHttpRap_FreePostData(p_wk->p_nhttp);
                     NHttpRap_Destroy(p_wk->p_nhttp);
@@ -2721,7 +2723,7 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
                 }
                 return 3;
             case 408:
-                func_020120f0(0x44);
+                GFL_NetErrRecordWifi(0x44);
                 if (p_wk->p_nhttp != NULL) {
                     NHttpRap_FreePostData(p_wk->p_nhttp);
                     NHttpRap_Destroy(p_wk->p_nhttp);
@@ -2731,7 +2733,7 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
                 }
                 return 3;
             default:
-                func_020120f0(0x43);
+                GFL_NetErrRecordWifi(0x43);
                 if (p_wk->p_nhttp != NULL) {
                     NHttpRap_FreePostData(p_wk->p_nhttp);
                     NHttpRap_Destroy(p_wk->p_nhttp);

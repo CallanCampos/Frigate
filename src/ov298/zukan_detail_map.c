@@ -791,11 +791,12 @@ static void ZukanDetailMap_Command(ZukanDetailProcSys *sys, int *seq, void *para
             ZukanDetailMap_SetState(param, wk, common, MAP_STATE_CLOSE_START);
             break;
         case ZUKAN_DETAIL_CMD_MAP_PLACE: {
-            void *habitatList = func_02010cb8(GameData_GetSaveControl(ZukanDetailCommon_GetGameData(common)));
+            void *habitatList =
+                SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(ZukanDetailCommon_GetGameData(common)));
 
-            func_02010d70(habitatList, TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE));
+            ZukanHabitatSave_SetZone(habitatList, TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE));
             if (wk->bySeason == TRUE) {
-                func_02010d80(habitatList, wk->season);
+                ZukanHabitatSave_SetSeason(habitatList, wk->season);
             }
             ZukanDetailTouchbar_SetMapPlaceVisible(touchbar, FALSE);
             ZukanDetailMap_ClearButton(wk);
@@ -1031,7 +1032,7 @@ static void ZukanDetailMap_CreatePrintQueues(ZukanDetailMapParam *param, ZukanDe
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        wk->printQueues[i] = func_02021998(param->heapId);
+        wk->printQueues[i] = PrintQueue_CreateDefault(param->heapId);
         wk->transferPending[i] = FALSE;
     }
 }
@@ -1042,8 +1043,8 @@ static void ZukanDetailMap_FreePrintQueues(ZukanDetailMapParam *param, ZukanDeta
 
     for (i = 0; i < WINDOW_COUNT; i++) {
         wk->transferPending[i] = FALSE;
-        func_02021c44(wk->printQueues[i]);
-        func_02021a18(wk->printQueues[i]);
+        PrintQueue_Clear(wk->printQueues[i]);
+        PrintQueue_Free(wk->printQueues[i]);
     }
 }
 
@@ -1051,7 +1052,7 @@ static void ZukanDetailMap_UpdatePrint(ZukanDetailMapParam *param, ZukanDetailMa
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        func_02021a3c(wk->printQueues[i]);
+        PrintQueue_Main(wk->printQueues[i]);
         ZukanDetailMap_TransferWindow(param, wk, common, i);
     }
 }
@@ -1059,7 +1060,8 @@ static void ZukanDetailMap_UpdatePrint(ZukanDetailMapParam *param, ZukanDetailMa
 // Loads a window once its text is printed
 static void ZukanDetailMap_TransferWindow(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common,
                                           u8 window) {
-    if (wk->transferPending[window] && !func_02021c1c(wk->printQueues[window], BmpWin_GetBitmap(wk->windows[window]))) {
+    if (wk->transferPending[window] &&
+        !PrintQueue_IsBitmapPending(wk->printQueues[window], BmpWin_GetBitmap(wk->windows[window]))) {
         BmpWin *bmpWin = wk->windows[window];
 
         BmpWin_FlushChar(bmpWin);
@@ -1107,7 +1109,7 @@ static void ZukanDetailMap_FreeWindows(ZukanDetailMapParam *param, ZukanDetailMa
     }
     for (i = 0; i < WINDOW_COUNT; i++) {
         wk->transferPending[i] = FALSE;
-        func_02021c44(wk->printQueues[i]);
+        PrintQueue_Clear(wk->printQueues[i]);
         BmpWin_Free(wk->windows[i]);
     }
     for (i = 0; i < 2; i++) {
@@ -1730,19 +1732,19 @@ static BOOL ZukanDetailMap_SetHabitatKind(ZukanDetailMapWork *wk, ZukanDetailCom
 
         if (kinds != 0 && ZukanDetailMap_IsPlaceListed(wk, common) == TRUE) {
             GameData *gameData = ZukanDetailCommon_GetGameData(common);
-            void *habitatList = func_02010cb8(GameData_GetSaveControl(gameData));
+            void *habitatList = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
             EventWork *eventWork = GameData_GetEventWork(gameData);
 
             if (kinds & HABITAT_LAND) {
-                func_02010d90(habitatList, 0);
+                ZukanHabitatSave_SetType(habitatList, 0);
                 return TRUE;
             }
             if ((kinds & HABITAT_WATER) && EventWork_FlagGet(eventWork, FLAG_HABITAT_WATER) == TRUE) {
-                func_02010d90(habitatList, 1);
+                ZukanHabitatSave_SetType(habitatList, 1);
                 return TRUE;
             }
             if ((kinds & HABITAT_FISHING) && EventWork_FlagGet(eventWork, FLAG_HABITAT_FISHING) == TRUE) {
-                func_02010d90(habitatList, 2);
+                ZukanHabitatSave_SetType(habitatList, 2);
                 return TRUE;
             }
         }
@@ -1950,13 +1952,13 @@ static void ZukanDetailMap_LoadPokemon(ZukanDetailMapParam *param, ZukanDetailMa
         }
         wk->icons[wk->icon] = NULL;
     }
-    func_0200d3c8(GameData_GetPokedex(ZukanDetailCommon_GetGameData(common)), species, &sex, &rare, &form,
-                  param->heapId);
+    PokeDex_GetShownSexRareForm(GameData_GetPokedex(ZukanDetailCommon_GetGameData(common)), species, &sex, &rare, &form,
+                                param->heapId);
     wk->icons[wk->icon] = ZukanDetailMap_CreateIcon(&wk->iconChars[wk->icon], wk->iconPalette, wk->iconCellAnims,
                                                     wk->unit, param->heapId, species, form, sex, FALSE, 56, 176);
 
     wk->transferPending[WINDOW_NAME] = FALSE;
-    func_02021c44(wk->printQueues[WINDOW_NAME]);
+    PrintQueue_Clear(wk->printQueues[WINDOW_NAME]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_NAME]), 0);
     wordSet = GFL_WordSetSystemCreateDefault(param->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], BtlServerFlowTitle_Text_SArea);
@@ -1965,8 +1967,8 @@ static void ZukanDetailMap_LoadPokemon(ZukanDetailMapParam *param, ZukanDetailMa
     GFL_WordSetFormatStrbuf(wordSet, name, format);
     GFL_StrBufFree(format);
     GFL_WordSetSystemFree(wordSet);
-    func_02021c7c(wk->printQueues[WINDOW_NAME], BmpWin_GetBitmap(wk->windows[WINDOW_NAME]), 0, 5, name, wk->font,
-                  PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueues[WINDOW_NAME], BmpWin_GetBitmap(wk->windows[WINDOW_NAME]), 0, 5, name,
+                          wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(name);
     wk->transferPending[WINDOW_NAME] = TRUE;
     ZukanDetailMap_TransferWindow(param, wk, common, WINDOW_NAME);
@@ -1974,7 +1976,7 @@ static void ZukanDetailMap_LoadPokemon(ZukanDetailMapParam *param, ZukanDetailMa
     if (!wk->bySeason) {
         if (wasBySeason == TRUE) {
             wk->transferPending[WINDOW_SEASON] = FALSE;
-            func_02021c44(wk->printQueues[WINDOW_SEASON]);
+            PrintQueue_Clear(wk->printQueues[WINDOW_SEASON]);
             GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]), 0);
             BmpWin_FlushChar(wk->windows[WINDOW_SEASON]);
             func_0204c124(wk->actors[ACTOR_SEASON], FALSE);
@@ -2003,15 +2005,15 @@ static void ZukanDetailMap_StartExit(ZukanDetailMapParam *param, ZukanDetailMapW
 // Prints the picked place's name, and marks it on the map
 static void ZukanDetailMap_PrintPlace(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
     wk->transferPending[WINDOW_PLACE] = FALSE;
-    func_02021c44(wk->printQueues[WINDOW_PLACE]);
+    PrintQueue_Clear(wk->printQueues[WINDOW_PLACE]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_PLACE]), 0);
     if (wk->place != NO_PLACE) {
         StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(
             wk->msgData[1], ZoneData_GetPlaceNameID(TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE)));
         ClActorPos pos;
 
-        func_02021c7c(wk->printQueues[WINDOW_PLACE], BmpWin_GetBitmap(wk->windows[WINDOW_PLACE]), 0, 1, strbuf,
-                      wk->font, PRINT_COLOR(15, 2, 0));
+        PrintQueue_PrintColor(wk->printQueues[WINDOW_PLACE], BmpWin_GetBitmap(wk->windows[WINDOW_PLACE]), 0, 1, strbuf,
+                              wk->font, PRINT_COLOR(15, 2, 0));
         GFL_StrBufFree(strbuf);
         wk->transferPending[WINDOW_PLACE] = TRUE;
         ZukanDetailMap_TransferWindow(param, wk, common, WINDOW_PLACE);
@@ -2038,7 +2040,7 @@ static void ZukanDetailMap_ChangeSeason(ZukanDetailMapParam *param, ZukanDetailM
         wk->found = wk->habitat->seasons[wk->season].none == FALSE ? TRUE : FALSE;
     }
     wk->transferPending[WINDOW_SEASON] = FALSE;
-    func_02021c44(wk->printQueues[WINDOW_SEASON]);
+    PrintQueue_Clear(wk->printQueues[WINDOW_SEASON]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]), 0);
     ZukanDetailMap_PrintSeason(param, wk, common);
     if (next) {
@@ -2082,8 +2084,8 @@ static void ZukanDetailMap_PrintSeason(ZukanDetailMapParam *param, ZukanDetailMa
     int windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]));
     u16 x = (windowWidth - width) / 2;
 
-    func_02021c7c(wk->printQueues[WINDOW_SEASON], BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]), x, 1, strbuf, wk->font,
-                  PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueues[WINDOW_SEASON], BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]), x, 1, strbuf,
+                          wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(strbuf);
     wk->transferPending[WINDOW_SEASON] = TRUE;
     ZukanDetailMap_TransferWindow(param, wk, common, WINDOW_SEASON);
@@ -2103,7 +2105,7 @@ static void ZukanDetailMap_HideHabitat(ZukanDetailMapParam *param, ZukanDetailMa
     if (func_0204c138(wk->actors[ACTOR_UNKNOWN])) {
         if (wk->found == TRUE) {
             wk->transferPending[WINDOW_UNKNOWN] = FALSE;
-            func_02021c44(wk->printQueues[WINDOW_UNKNOWN]);
+            PrintQueue_Clear(wk->printQueues[WINDOW_UNKNOWN]);
             GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]), 0);
             BmpWin_FlushChar(wk->windows[WINDOW_UNKNOWN]);
             func_0204c124(wk->actors[ACTOR_UNKNOWN], FALSE);
@@ -2144,8 +2146,8 @@ static void ZukanDetailMap_ShowAreas(ZukanDetailMapParam *param, ZukanDetailMapW
             int windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]));
             u16 x = (windowWidth - width) / 2;
 
-            func_02021c7c(wk->printQueues[WINDOW_UNKNOWN], BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]), x, 1, strbuf,
-                          wk->font, PRINT_COLOR(15, 2, 0));
+            PrintQueue_PrintColor(wk->printQueues[WINDOW_UNKNOWN], BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]), x, 1,
+                                  strbuf, wk->font, PRINT_COLOR(15, 2, 0));
             GFL_StrBufFree(strbuf);
             wk->transferPending[WINDOW_UNKNOWN] = TRUE;
             ZukanDetailMap_TransferWindow(param, wk, common, WINDOW_UNKNOWN);
@@ -2171,11 +2173,11 @@ static void ZukanDetailMap_PrintButton(ZukanDetailMapParam *param, ZukanDetailMa
     StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], BtlServerFlowTitle_Text_ViewDetails);
 
     if (active == TRUE) {
-        func_02021c7c(wk->printQueues[WINDOW_BUTTON], BmpWin_GetBitmap(wk->windows[WINDOW_BUTTON]), 0, 5, strbuf,
-                      wk->font, PRINT_COLOR(15, 2, 0));
+        PrintQueue_PrintColor(wk->printQueues[WINDOW_BUTTON], BmpWin_GetBitmap(wk->windows[WINDOW_BUTTON]), 0, 5,
+                              strbuf, wk->font, PRINT_COLOR(15, 2, 0));
     } else {
-        func_02021c7c(wk->printQueues[WINDOW_BUTTON], BmpWin_GetBitmap(wk->windows[WINDOW_BUTTON]), 0, 5, strbuf,
-                      wk->font, PRINT_COLOR(2, 1, 0));
+        PrintQueue_PrintColor(wk->printQueues[WINDOW_BUTTON], BmpWin_GetBitmap(wk->windows[WINDOW_BUTTON]), 0, 5,
+                              strbuf, wk->font, PRINT_COLOR(2, 1, 0));
     }
     GFL_StrBufFree(strbuf);
     wk->transferPending[WINDOW_BUTTON] = TRUE;
@@ -2183,7 +2185,7 @@ static void ZukanDetailMap_PrintButton(ZukanDetailMapParam *param, ZukanDetailMa
 }
 
 static void ZukanDetailMap_ClearButton(ZukanDetailMapWork *wk) {
-    func_02021c44(wk->printQueues[WINDOW_BUTTON]);
+    PrintQueue_Clear(wk->printQueues[WINDOW_BUTTON]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_BUTTON]), 0);
     BmpWin_FlushChar(wk->windows[WINDOW_BUTTON]);
     wk->transferPending[WINDOW_BUTTON] = TRUE;
@@ -2194,7 +2196,7 @@ static void ZukanDetailMap_HideAreas(ZukanDetailMapParam *param, ZukanDetailMapW
 
     if (func_0204c138(wk->actors[ACTOR_UNKNOWN])) {
         wk->transferPending[WINDOW_UNKNOWN] = FALSE;
-        func_02021c44(wk->printQueues[WINDOW_UNKNOWN]);
+        PrintQueue_Clear(wk->printQueues[WINDOW_UNKNOWN]);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]), 0);
         BmpWin_FlushChar(wk->windows[WINDOW_UNKNOWN]);
         func_0204c124(wk->actors[ACTOR_UNKNOWN], FALSE);
@@ -2344,7 +2346,7 @@ static BOOL ZukanDetailMap_IsPlaceListed(ZukanDetailMapWork *wk, ZukanDetailComm
     BOOL listed;
     int flag;
 
-    func_02010cb8(GameData_GetSaveControl(gameData));
+    SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(gameData));
     eventWork = GameData_GetEventWork(gameData);
     zone = TownMapData_GetParam(wk->townmap, wk->place, TOWNMAP_PARAM_ZONE);
     listed = FALSE;

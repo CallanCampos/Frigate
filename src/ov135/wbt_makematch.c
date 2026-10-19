@@ -241,7 +241,7 @@ static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, void *record) {
     for (i = 0; i < m->param->trainerCount; i++) {
         if (WbtMakeMatch_IsEligible(m->param, &m->param->trainers[i]) == TRUE) {
             m->status[i] = WBT_STATUS_CANDIDATE;
-            if (i < 0x40 && !func_0200fec8(record, i)) {
+            if (i < 0x40 && !WbtSave_IsTrainerBeaten(record, i)) {
                 m->encountered[i] = 0;
             }
         }
@@ -545,7 +545,7 @@ static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *
     u8 gender = getTrainerGender(playerInfo);
     u8 rank = 3;
 
-    if (func_0200feac(wbtSave, 0x11)) {
+    if (WbtSave_GetCount(wbtSave, 0x11)) {
         rank = 4;
     }
     if (gender == 1) {
@@ -678,8 +678,8 @@ static BOOL WbtMakeMatch_IsDownloadValid(GameData *gameData, u32 slot) {
     valid = FALSE;
     save = GameData_GetSaveControl(gameData);
 
-    if (func_020074ec(save, block, HEAPID_GAMEEVENT) == TRUE) {
-        valid = func_02010428(getAddressOfExtraSaveBlk(save, block, 0));
+    if (SaveControl_OpenExtraBlock(save, block, HEAPID_GAMEEVENT) == TRUE) {
+        valid = WbtDownloadData_IsCRCValid(getAddressOfExtraSaveBlk(save, block, 0));
     }
     freeIntermediateSaveExtraBlksAfterLoad(save, block);
     return valid;
@@ -719,9 +719,9 @@ void WbtMakeMatch_LoadDownload(WbtSystem *sys, GameData *gameData) {
     }
     block = slot + 0x10;
     save = GameData_GetSaveControl(gameData);
-    if (func_020074ec(save, block, HEAPID_GAMEEVENT) == TRUE) {
+    if (SaveControl_OpenExtraBlock(save, block, HEAPID_GAMEEVENT) == TRUE) {
         data = getAddressOfExtraSaveBlk(save, block, 0);
-        valid = func_02010428(data);
+        valid = WbtDownloadData_IsCRCValid(data);
     }
     if (valid) {
         MIi_CpuCopy32(data, &sys->download, 0x1214);

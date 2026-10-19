@@ -172,9 +172,9 @@ BOOL func_ov056_021e7894(VM *vm, FieldScriptEnv *env) {
     u16 *var1 = ScriptReadVar(vm, env);
     u16 *var2 = ScriptReadVar(vm, env);
     u16 *var3 = ScriptReadVar(vm, env);
-    u16 index1 = func_0200ff34(save, 0);
-    u16 index2 = func_0200ff34(save, 1);
-    u16 index3 = func_0200ff34(save, 2);
+    u16 index1 = WbtSave_GetSlot(save, 0);
+    u16 index2 = WbtSave_GetSlot(save, 1);
+    u16 index3 = WbtSave_GetSlot(save, 2);
     WbtTrainers *trainers = func_ov055_021e63e0(FieldScriptEnv_GetHeapID(env));
 
     *var1 = 0;
@@ -198,7 +198,7 @@ BOOL func_ov056_021e7988(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_0200ff34(save, index);
+    *var = WbtSave_GetSlot(save, index);
     return FALSE;
 }
 

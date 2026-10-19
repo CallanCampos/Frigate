@@ -117,7 +117,7 @@ PkwdBookGraphic *PkwdBookGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     PkwdBookBG_Init(&graphic->bg, heapId);
     PkwdBookClAct_Init(&graphic->clact, &sPkwdBookVRAMConfig, heapId);
     graphic->paletteFade = PaletteFade_Create(heapId);
@@ -130,7 +130,7 @@ void PkwdBookGraphic_Free(PkwdBookGraphic *graphic) {
     PkwdBookClAct_Free(&graphic->clact);
     PkwdBookBG_Free(&graphic->bg);
     PaletteFade_Free(graphic->paletteFade);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

@@ -118,7 +118,7 @@ PkwdRecordMonitorGraphic *PkwdRecordMonitorGraphic_Create(u32 layout, HeapID hea
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     PkwdRecordMonitorBG_Init(&graphic->bg, heapId);
     PkwdRecordMonitorClAct_Init(&graphic->clact, &sPkwdRecordMonitorVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(PkwdRecordMonitorGraphic_VBlank, graphic, 0);
@@ -129,7 +129,7 @@ void PkwdRecordMonitorGraphic_Free(PkwdRecordMonitorGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     PkwdRecordMonitorClAct_Free(&graphic->clact);
     PkwdRecordMonitorBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

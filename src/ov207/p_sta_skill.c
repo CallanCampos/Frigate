@@ -164,7 +164,7 @@ void PStaSkill_Main(PStatusWork *wk, PStaSkillWork *skill) {
     if (skill->redrawStats == TRUE) {
         done = TRUE;
         for (i = 0; i <= 7; i++) {
-            if (func_02021c1c(wk->printQueue, BmpWin_GetBitmap(skill->windows[i])) == TRUE) {
+            if (PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(skill->windows[i])) == TRUE) {
                 done = FALSE;
                 break;
             }
@@ -183,7 +183,7 @@ void PStaSkill_Main(PStatusWork *wk, PStaSkillWork *skill) {
     if (skill->redrawDetail == TRUE) {
         done = TRUE;
         for (i = 8; i <= 11; i++) {
-            if (func_02021c1c(wk->printQueue, BmpWin_GetBitmap(skill->windows[i])) == TRUE) {
+            if (PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(skill->windows[i])) == TRUE) {
                 done = FALSE;
                 break;
             }
@@ -199,14 +199,15 @@ void PStaSkill_Main(PStatusWork *wk, PStaSkillWork *skill) {
             skill->redrawDetail = FALSE;
         }
     }
-    if (skill->redrawMessage == TRUE && func_02021c1c(wk->printQueue, BmpWin_GetBitmap(skill->windows[12])) == FALSE) {
+    if (skill->redrawMessage == TRUE &&
+        PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(skill->windows[12])) == FALSE) {
         window = skill->windows[12];
         BmpWin_FlushChar(window);
         BmpWin_FlushMap(window);
         GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
         skill->redrawMessage = FALSE;
     }
-    if (skill->isSwapPending == TRUE && func_02021c0c(wk->printQueue) == TRUE) {
+    if (skill->isSwapPending == TRUE && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
         skill->isSwapping = FALSE;
         PStaSkill_SetPlateAnim(&skill->plates[skill->swapSrc], PLATE_ANIM_NORMAL);
         skill->swapSrc = SLOT_NONE;
@@ -439,7 +440,7 @@ static void PStaSkill_DrawDetail(PStatusWork *wk, PStaSkillWork *skill) {
     type2 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE2, NULL);
     func_0204bb58(wk->typeIconChars[type1], &proxy1);
     func_0204c3e4(wk->typeIcons[0], &proxy1);
-    func_0204c378(wk->typeIcons[0], func_0202d7e8(type1), 1);
+    func_0204c378(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
     pos.x = 208;
     pos.y = 120;
     func_0204c140(wk->typeIcons[0], &pos, 0);
@@ -448,7 +449,7 @@ static void PStaSkill_DrawDetail(PStatusWork *wk, PStaSkillWork *skill) {
     if (type1 != type2) {
         func_0204bb58(wk->typeIconChars[type2], &proxy2);
         func_0204c3e4(wk->typeIcons[1], &proxy2);
-        func_0204c378(wk->typeIcons[1], func_0202d7e8(type2), 1);
+        func_0204c378(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
         pos.x = 240;
         pos.y = 120;
         func_0204c140(wk->typeIcons[1], &pos, 0);
@@ -508,12 +509,14 @@ static void PStaSkill_PrintStatValues(PStatusWork *wk, PStaSkillWork *skill) {
     ability = PokeParty_GetParam(pkm, PKM_PARAM_ABILITY, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, ability);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(skill->windows[7]), 5, 17, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(skill->windows[7]), 5, 17, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_NAMES, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, ability);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(skill->windows[7]), 65, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(skill->windows[7]), 65, 1, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
     skill->redrawStats = TRUE;
@@ -573,7 +576,7 @@ static void PStaSkill_PrintMoveDetail(PStatusWork *wk, PStaSkillWork *skill) {
     category = PML_MoveGetCategory(move);
     func_0204bb58(wk->clResources[PSTA_RES_CHAR(4) + category], &proxy);
     func_0204c3e4(skill->actors[1], &proxy);
-    func_0204c378(skill->actors[1], func_0202d800(category), 1);
+    func_0204c378(skill->actors[1], AppMenuCommon_GetCategoryIconPaletteIndex(category), 1);
     PStatus_PrintToWindow(wk, skill->windows[9], 0x93, 1, 1, PRINT_COLOR(15, 2, 0));
     power = PML_MoveGetBasePower(move);
     if (power <= 1) {
@@ -596,7 +599,8 @@ static void PStaSkill_PrintMoveDetail(PStatusWork *wk, PStaSkillWork *skill) {
     }
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_13, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, move);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(skill->windows[11]), 1, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(skill->windows[11]), 1, 1, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
     skill->redrawMessage = FALSE;
@@ -1252,7 +1256,7 @@ static void PStaSkill_LoadPlate(PStatusWork *wk, PStaSkillWork *skill, SkillPlat
     plate->bitmap = GFL_BitmapCreate(11, 4, 32, wk->heapId);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, move);
-    func_02021c7c(wk->printQueue, plate->bitmap, 3, 2, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, plate->bitmap, 3, 2, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
     if (move != MOVE_NONE) {
@@ -1298,7 +1302,7 @@ static void PStaSkill_DrawPlate(PStatusWork *wk, PStaSkillWork *skill, SkillPlat
             type = PML_MoveGetType(move);
             func_0204bb58(wk->typeIconChars[type], &proxy);
             func_0204c3e4(plate->typeIcon, &proxy);
-            func_0204c378(plate->typeIcon, func_0202d7e8(type), 1);
+            func_0204c378(plate->typeIcon, AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
             func_0204c124(plate->typeIcon, TRUE);
         } else {
             func_0204c124(plate->typeIcon, FALSE);

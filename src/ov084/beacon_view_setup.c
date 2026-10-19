@@ -181,7 +181,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
     case BEACON_VIEW_EVENT_MENU:
     case BEACON_VIEW_EVENT_MENU_WIFI:
         func_0202d7b8(work->status, 0);
-        func_0201740c(work->gameData, 0);
+        GameData_SetCGearPowerRequest(work->gameData, 0);
         event = EventFieldMenuReturn_Create(work->gsys, work->field, 0);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_RETURN);
         break;
@@ -393,8 +393,8 @@ static void BeaconView_InitData(BeaconViewWork *work) {
     SaveControl *save;
     PlayerInfo *info;
 
-    work->status = func_020174d4(work->gameData);
-    work->log = func_0202d7a8(work->status);
+    work->status = GameData_GetBeaconStatus(work->gameData);
+    work->log = BeaconStatus_GetInfoTable(work->status);
     work->logCount = GameBeaconInfoTable_GetCount(work->log);
     work->top = func_0202d7ac(work->status);
     if (work->logCount < BEACON_VIEW_LINE_MAX) {
@@ -440,11 +440,11 @@ static void BeaconView_InitSystems(BeaconViewWork *work) {
     work->paletteFade = PaletteFade_Create(work->heapId);
     PaletteFade_AllocBuffer(work->paletteFade, 1, 0x1c0, work->heapId);
     PaletteFade_AllocBuffer(work->paletteFade, 3, 0x200, work->heapId);
-    work->printQueue = func_02021998(work->heapId);
-    func_02021a20(work->printQueue, TRUE);
-    func_02021a34(work->printQueue, 500);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
+    PrintQueue_SetQueueAlways(work->printQueue, TRUE);
+    PrintQueue_SetTimeLimit(work->printQueue, 500);
     work->font = func_ov036_0218799c(Field_GetMsgBGSys(work->field));
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     work->wordSet = GFL_WordSetSystemCreate(8, 64, work->heapId);
     work->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_BEACON, work->heapId);
     work->strTemplate = GFL_StrBufCreate(217, work->heapId);
@@ -458,9 +458,9 @@ static void BeaconView_FreeSystems(BeaconViewWork *work) {
     GFL_StrBufFree(work->strTemplate);
     GFL_MsgDataFree(work->msgData);
     GFL_WordSetSystemFree(work->wordSet);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
-    func_020232d8();
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
+    GFL_TextRndResetColorIndexLUT();
     PaletteFade_FreeBuffer(work->paletteFade, 3);
     PaletteFade_FreeBuffer(work->paletteFade, 1);
     PaletteFade_Free(work->paletteFade);

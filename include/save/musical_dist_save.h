@@ -31,7 +31,7 @@ typedef struct {
 } MusicalDistWork; // size: 0x2c
 
 // The size of the block and its init
-u32 func_0200cc94(void);
-void func_0200cc9c(void *block);
+u32 MusicalDist_GetSaveSize(void);
+void MusicalDist_InitBlock(void *block);
 
 #endif // POKEBW2_SAVE_MUSICAL_DIST_SAVE_H

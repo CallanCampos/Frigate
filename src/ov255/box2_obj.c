@@ -372,9 +372,11 @@ static void func_ov255_021cf734(Box2AppWork *app) {
 static void func_ov255_021cf84c(Box2AppWork *app) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_BOX2_APP);
 
-    app->chrRes[124] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->palRes[7] = func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, 0x120, HEAPID_BOX2_APP);
-    app->cellRes[8] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), HEAPID_BOX2_APP);
+    app->chrRes[124] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->palRes[7] =
+        func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x120, HEAPID_BOX2_APP);
+    app->cellRes[8] =
+        func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
@@ -979,10 +981,12 @@ static void func_ov255_021d07d0(Box2AppWork *app) {
     u32 i;
 
     for (i = 0; i < 17; i++) {
-        app->chrRes[99 + i] = func_0204b81c(arc, func_0202d7f4(i), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
+        app->chrRes[99 + i] =
+            func_0204b81c(arc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
     }
-    app->cellRes[4] = func_0204bde0(arc, func_0202d7f8(2), func_0202d7fc(2), HEAPID_BOX2_APP);
-    app->palRes[4] = func_0204bba0(arc, func_0202d7e4(), CLACT_VRAM_SUB, 0, HEAPID_BOX2_APP);
+    app->cellRes[4] =
+        func_0204bde0(arc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), HEAPID_BOX2_APP);
+    app->palRes[4] = func_0204bba0(arc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB, 0, HEAPID_BOX2_APP);
     app->chrRes[126] = func_0204b81c(arc, func_0202d948(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
     app->cellRes[10] = func_0204bde0(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
     app->palRes[9] = func_0204bba0(arc, func_0202d944(), CLACT_VRAM_SUB, 0xa0, HEAPID_BOX2_APP);
@@ -1004,7 +1008,7 @@ static void func_ov255_021d0978(Box2AppWork *app) {
     for (i = 0; i < 17; i++) {
         data.chr = 99 + i;
         app->actors[32 + i] = func_ov255_021cf51c(app, &data);
-        func_0204c378(app->actors[32 + i], func_0202d7e8(i), 1);
+        func_0204c378(app->actors[32 + i], AppMenuCommon_GetTypeIconPaletteIndex(i), 1);
         func_ov255_021cf63c(app, 32 + i, FALSE);
     }
 }

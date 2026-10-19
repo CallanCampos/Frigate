@@ -401,10 +401,14 @@ static void BtlvGauge_LoadResources(BtlvGauge *gauge) {
                                  func_0204bdc0(gauge->palettes[i], FALSE) / 2, 0x20);
     }
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(gauge->heapId));
-    gauge->statusChars = func_0204b81c(arc, func_0202d8b4(), FALSE, CLACT_VRAM_MAIN, gauge->heapId);
-    gauge->statusCellAnims = func_0204bde0(arc, func_0202d8b8(1), func_0202d8bc(1), gauge->heapId);
-    gauge->statusPalette = func_0204bba0(arc, func_0202d8b0(), CLACT_VRAM_MAIN, 0x100, gauge->heapId);
-    gauge->statusPaletteDark = func_0204bba0(arc, func_0202d8b0(), CLACT_VRAM_MAIN, 0x120, gauge->heapId);
+    gauge->statusChars =
+        func_0204b81c(arc, AppMenuCommon_GetStatusIconCharFile(), FALSE, CLACT_VRAM_MAIN, gauge->heapId);
+    gauge->statusCellAnims = func_0204bde0(arc, AppMenuCommon_GetStatusIconCellFile(1),
+                                           AppMenuCommon_GetStatusIconAnimFile(1), gauge->heapId);
+    gauge->statusPalette =
+        func_0204bba0(arc, AppMenuCommon_GetStatusIconPaletteFile(), CLACT_VRAM_MAIN, 0x100, gauge->heapId);
+    gauge->statusPaletteDark =
+        func_0204bba0(arc, AppMenuCommon_GetStatusIconPaletteFile(), CLACT_VRAM_MAIN, 0x120, gauge->heapId);
     PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,
                              func_0204bdc0(gauge->statusPalette, FALSE) / 2, 0x20);
     PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,

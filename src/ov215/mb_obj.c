@@ -196,9 +196,10 @@ static void MailBox_LoadButtonResources(MailBoxView *view) {
     view->cellAnims[1] = func_0204bde0(arc, 45, 46, HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_MAILBOX_VIEW);
-    view->chars[4] = func_0204b81c(arc, func_0202d814(), FALSE, 0, HEAPID_MAILBOX_VIEW);
-    view->palettes[2] = func_0204bba0(arc, func_0202d810(), 0, 0x80, HEAPID_MAILBOX_VIEW);
-    view->cellAnims[2] = func_0204bde0(arc, func_0202d818(0), func_0202d81c(0), HEAPID_MAILBOX_VIEW);
+    view->chars[4] = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, HEAPID_MAILBOX_VIEW);
+    view->palettes[2] = func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x80, HEAPID_MAILBOX_VIEW);
+    view->cellAnims[2] = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0),
+                                       HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
 }
 

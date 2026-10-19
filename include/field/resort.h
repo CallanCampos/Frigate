@@ -25,7 +25,7 @@ typedef struct {
     JoinAvenuePersonList *list;
     // A second list, or NULL
     JoinAvenuePersonList *list2;
-    // The twelve entries of func_02037f04
+    // The twelve entries of JoinAvenueEntryList_Get
     void *entries;
     JoinAvenueInfo *info;
 } ResortSysSetup;
@@ -60,7 +60,7 @@ typedef struct {
 typedef struct {
     MMSys *mmSys;
     u32 unk4;
-    // The index of the avenue's zone, for func_0203950c
+    // The index of the avenue's zone, for ResortLayout_GetZoneId
     u32 zone;
     JoinAvenueInfo *info;
     // The NPCs' table, of ResortBinary_Load

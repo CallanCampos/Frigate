@@ -214,12 +214,12 @@ static BOOL MonolithTop_Exit(GameProc *proc, u32 *state, void *param, void *work
     MonolithScreenParam *screen = param;
     MonolithTopWork *mtw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG3);
     if (mtw->print_stream != NULL) {
-        func_020223cc(mtw->print_stream);
+        PrintStream_Delete(mtw->print_stream);
     }
     if (mtw->msgStr != NULL) {
         GFL_StrBufFree(mtw->msgStr);
@@ -315,7 +315,7 @@ static void MonolithTop_ClearMessage(MonolithTopWork *mtw) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(mtw->msgWindow);
 
     GFL_ASSERT(mtw->print_stream != NULL);
-    func_020223cc(mtw->print_stream);
+    PrintStream_Delete(mtw->print_stream);
     mtw->print_stream = NULL;
     GFL_StrBufFree(mtw->msgStr);
     mtw->msgStr = NULL;

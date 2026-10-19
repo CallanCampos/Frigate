@@ -38,7 +38,7 @@ static void setState(NetSave *save, NetSaveState state) {
     save->state = state;
 }
 
-NetSave *func_02012ee4(HeapID heapId, GameData *gameData) {
+NetSave *NetSave_Create(HeapID heapId, GameData *gameData) {
     NetSave *save = GFL_HeapAllocate(heapId, sizeof(NetSave), TRUE, "net_save.c", 117);
 
     save->gameData = gameData;
@@ -47,7 +47,7 @@ NetSave *func_02012ee4(HeapID heapId, GameData *gameData) {
     return save;
 }
 
-NetSave *func_02012f1c(HeapID heapId, GameData *gameData, void (*func)(void *work), void *work) {
+NetSave *NetSave_CreateWithCallback(HeapID heapId, GameData *gameData, void (*func)(void *work), void *work) {
     NetSave *save = GFL_HeapAllocate(heapId, sizeof(NetSave), TRUE, "net_save.c", 135);
 
     save->func = func;
@@ -58,13 +58,13 @@ NetSave *func_02012f1c(HeapID heapId, GameData *gameData, void (*func)(void *wor
     return save;
 }
 
-BOOL func_02012f5c(NetSave *save) {
+BOOL NetSave_Update(NetSave *save) {
     if (save->state != NULL) {
         save->state(save);
     }
     if (GFL_NetErrCheck()) {
         if (save->gameData != NULL) {
-            func_02017884(save->gameData);
+            GameData_CancelSave(save->gameData);
         }
         return TRUE;
     }
@@ -74,20 +74,20 @@ BOOL func_02012f5c(NetSave *save) {
     return FALSE;
 }
 
-void func_02012f8c(NetSave *save) {
+void NetSave_Free(NetSave *save) {
     GFL_HeapFree(save);
 }
 
 static void stateStart(NetSave *save) {
     if (func_02040664(func_02040440(), NET_SAVE_TIMING_START, NET_SAVE_TIMING_GROUP)) {
-        func_0201782c(save->gameData);
+        GameData_StartSave(save->gameData);
         setState(save, stateWrite);
     }
 }
 
 // Writes all but the end of the save, then waits a random time, so that the two machines don't end together
 static void stateWrite(NetSave *save) {
-    if (func_02017850(save->gameData) == 1) {
+    if (GameData_UpdateSave(save->gameData) == 1) {
         func_02040624(func_02040440(), NET_SAVE_TIMING_WRITTEN, NET_SAVE_TIMING_GROUP);
         save->wait = GFL_RandomLC(NET_SAVE_WAIT_MAX);
         setState(save, stateWritten);
@@ -118,7 +118,7 @@ static void stateFinish(NetSave *save) {
     if (save->func != NULL) {
         save->func(save->work);
     }
-    if (func_02017850(save->gameData) == 2) {
+    if (GameData_UpdateSave(save->gameData) == 2) {
         save->gameData = NULL;
         func_02040624(func_02040440(), NET_SAVE_TIMING_END, NET_SAVE_TIMING_GROUP);
         setState(save, stateEnd);

@@ -555,7 +555,7 @@ static BOOL PokemonCenter_IsType8Caught(MedalCheckContext *ctx, GameData *gameDa
 }
 
 static BOOL func_ov065_021e6064(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return func_0200ae58(getMusicalInfoBlkAddress(gameData));
+    return MusicalSave_HasAllProps(getMusicalInfoBlkAddress(gameData));
 }
 
 static BOOL PokemonCenter_CheckBoxCount(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
@@ -567,15 +567,17 @@ static BOOL PokemonCenter_CheckBoxCount(MedalCheckContext *ctx, GameData *gameDa
 }
 
 static BOOL func_ov065_021e609c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(func_0201795c(gameData), 0), threshold);
+    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(GameData_GetBSubwayScoreData(gameData), 0),
+                                        threshold);
 }
 
 static BOOL func_ov065_021e60b4(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(func_0201795c(gameData), 1), threshold);
+    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(GameData_GetBSubwayScoreData(gameData), 1),
+                                        threshold);
 }
 
 static BOOL func_ov065_021e60cc(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    void *block = func_0201795c(gameData);
+    void *block = GameData_GetBSubwayScoreData(gameData);
     u16 a = BSubwayScoreData_GetMaxStreak(block, 2);
     u16 b = BSubwayScoreData_GetMaxStreak(block, 3);
 
@@ -591,7 +593,7 @@ static BOOL func_ov065_021e6100(MedalCheckContext *ctx, GameData *gameData, u32 
     WifiList *wifiList = GameData_GetWifiList(gameData);
 
     for (i = 0; i < 32; i++) {
-        if (func_0200a138(wifiList, i) && func_02009f80(wifiList, i, 9) != 2) {
+        if (WifiList_IsFriendValid(wifiList, i) && WifiList_GetFriendParam(wifiList, i, 9) != 2) {
             count++;
         }
     }
@@ -798,17 +800,17 @@ BOOL func_ov065_021e6508(VM *vm, FieldScriptEnv *env) {
 
     switch (info) {
     case 0:
-        *var = func_0200f300(record);
+        *var = RecordSave_IsMatchInProgress(record);
         break;
     case 1:
-        *var = func_0200f308(record);
+        *var = RecordSave_IsMacAddressSame(record);
         break;
     case 2:
-        *var = func_0200f334(record);
+        *var = RecordSave_IsMatchTimedOut(record);
         break;
     case 3:
-        *var = func_02017b8c(gameData);
-        func_02017bb4(gameData);
+        *var = GameData_GetCounter(gameData);
+        GameData_ResetCounter(gameData);
         break;
     case 4:
         *var = func_0200f384(record);
@@ -821,8 +823,8 @@ BOOL func_ov065_021e658c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
 
-    func_0200f2dc(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
-    func_02017bb4(gameData);
+    RecordSave_SetMatchInProgress(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
+    GameData_ResetCounter(gameData);
     return FALSE;
 }
 
@@ -858,7 +860,7 @@ BOOL func_ov065_021e6634(VM *vm, FieldScriptEnv *env) {
     RecordSave *record = getRecordBlkAddress(GameData_GetSaveControl(gameData));
     u16 value = ScriptReadAny(vm, env);
 
-    BSubwayScoreData_AddBattlePoints(func_0201795c(gameData), value);
+    BSubwayScoreData_AddBattlePoints(GameData_GetBSubwayScoreData(gameData), value);
     if (value != 0) {
         RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), 0x21, value);
     }

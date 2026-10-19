@@ -93,9 +93,9 @@ static void func_ov136_021eed44(GimmickWork *work) {
 
 static void func_ov136_021eed50(GimmickWork *work, u32 poster) {
     HeapID heapId = HEAPID_TAIL(Field_GetHeapID(work->field));
-    PokewoodSave *save = func_02011040(GSYS_GetGameData(Field_GetGameSystem(work->field)));
+    PokewoodSave *save = PokewoodSave_Get(GSYS_GetGameData(Field_GetGameSystem(work->field)));
     void *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
-    int series = func_02011270(save, poster);
+    int series = PokewoodSave_GetLastSeries(save, poster);
 
     if (series > 0) {
         func_ov136_021eedc0(texResource, sPosterTexNames[poster], sPosterPlttNames[poster], series - 1, heapId);

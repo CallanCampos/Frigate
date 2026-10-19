@@ -54,8 +54,8 @@
 #include "text/script/scrcmd_shop.h"
 
 // The command's shop IDs past the Poké Marts', whose items are in file ID + 6 of ARCID_SHOP_ITEMS. The special marts'
-// stock grows with a level that func_02010274 keeps in the key system's data, its value 0 for 0xf7 to 0xfa and 1 for
-// 0xef to 0xf2
+// stock grows with a level that KeyDataSave_GetProgress keeps in the key system's data, its value 0 for 0xf7 to 0xfa
+// and 1 for 0xef to 0xf2
 #define SHOP_ID_SPECIAL_MART_1_FIRST 0xef
 #define SHOP_ID_SPECIAL_MART_1_LAST 0xf2
 #define SHOP_ID_MOVE_TUTOR_NACRENE 0xf3
@@ -301,7 +301,7 @@ static const ShopWindowSetup sWindowMessage = { 1, 1, 19, 30, 4, 11, 631 };
 
 static const ShopWindowSetup sWindowBP = { 1, 2, 2, 8, 2, 11, 38 };
 
-// The level of a special mart for each value of func_02010274
+// The level of a special mart for each value of KeyDataSave_GetProgress
 static const int sSpecialMartLevels[] = { 0, 2, 4, 6, 8, 10 };
 
 // The areas of BG 1 that the list's windows cover: all of them, and those of the amount
@@ -863,7 +863,7 @@ static void func_ov036_021ac1d0(ShopUIWork *wk) {
 static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
     s32 index;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     if (wk->listShown == 0) {
@@ -890,18 +890,18 @@ static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
 }
 
 static u8 ShopUI_WaitAB(ShopUIWork *wk) {
-    u32 state = func_020223b4(wk->printStream);
+    u32 state = PrintStream_GetState(wk->printStream);
 
     if (state == PRINT_STREAM_DONE) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         return wk->nextState;
     } else if (state == PRINT_STREAM_RUNNING) {
         if ((GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) || (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B)) {
-            func_020223e0(wk->printStream, 0);
+            PrintStream_SkipWait(wk->printStream, 0);
         }
     } else if (state == PRINT_STREAM_PAUSED) {
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B)) {
-            func_020223bc(wk->printStream);
+            PrintStream_Continue(wk->printStream);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
         }
     }
@@ -1027,7 +1027,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         ShopUI_FreeText(wk);
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PrintWindow_Flush(&wk->printWindow, wk->printQueue);
     GFL_TCBExMgrUpdate(wk->tcbManager);
     GFL_TCBExMgrUpdate(wk->tcbManager);
@@ -1121,9 +1121,9 @@ static void ShopUI_LoadSpecialPokeMartItems(ShopUIWork *wk, int shopId) {
     u32 i;
 
     if (shopId >= SHOP_ID_SPECIAL_MART_0_FIRST && shopId <= SHOP_ID_SPECIAL_MART_0_LAST) {
-        value = func_02010274(wk->keyData, 0);
+        value = KeyDataSave_GetProgress(wk->keyData, 0);
     } else {
-        value = func_02010274(wk->keyData, 1);
+        value = KeyDataSave_GetProgress(wk->keyData, 1);
     }
     for (i = 0; i < NELEMS(sSpecialMartLevels); i++) {
         if (value >= sSpecialMartLevels[i]) {
@@ -1318,7 +1318,7 @@ static void ShopUI_SetupBmpWin(ShopUIWork *wk) {
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->windows[0]), 0, 0, strbuf, wk->font, PRINT_COLOR(15, 2, 15));
     GFL_StrBufFree(strbuf);
     PrintWindow_Init(&wk->printWindow, wk->windows[2]);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     if (wk->currency == SHOP_CURRENCY_BP || wk->currency == SHOP_CURRENCY_SHARDS) {
         BmpWin_TransferNow(wk->windows[1]);
     } else {
@@ -1330,8 +1330,8 @@ static void ShopUI_SetupBmpWin(ShopUIWork *wk) {
 static void ShopUI_FreeSprites(ShopUIWork *wk) {
     int i;
 
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     for (i = 0; i < 7; i++) {
         BmpWin_Free(wk->windows[i]);
     }
@@ -1467,7 +1467,7 @@ static void func_ov036_021ad48c(PrintQueue *queue, GFLBitmap *bitmap, int x, int
     if (y <= 8) {
         GFL_TextRendererDrawToBitmapEx(bitmap, x, y, strbuf, font, color);
     } else {
-        func_02021c7c(queue, bitmap, x, y, strbuf, font, color);
+        PrintQueue_PrintColor(queue, bitmap, x, y, strbuf, font, color);
     }
 }
 
@@ -1559,8 +1559,9 @@ static void ShopUI_SetStatusDialogue(ShopUIWork *wk, u32 msgId, u16 item, BOOL p
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, func_ov036_021ad6e0);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov036_021ad6e0);
     BmpWin_TransferNow(wk->windows[6]);
 }
 
@@ -1594,8 +1595,9 @@ static void func_ov036_021ad864(ShopUIWork *wk, u32 msgId) {
 
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
     GFL_StrBufFree(strbuf);
-    wk->printStream = func_02022294(wk->windows[6], 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 0,
-                                    wk->heapId, 0xffff, NULL);
+    wk->printStream =
+        PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, NULL);
     BmpWin_TransferNow(wk->windows[6]);
 }
 

@@ -374,7 +374,7 @@ BOOL s0228_RecordGet(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021c783c(VM *vm, FieldScriptEnv *env) {
-    func_02038bc8(VM_Read16(vm));
+    JoinAvenue_RecordActivity(VM_Read16(vm));
     return FALSE;
 }
 

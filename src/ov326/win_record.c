@@ -381,7 +381,7 @@ static BOOL WinRecord_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIN_RECORD, wk->heapId);
     wk->msgData[1] = NULL;
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     WinRecord_InitWork(wk);
     GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
@@ -412,7 +412,7 @@ static BOOL WinRecord_Exit(GameProc *proc, u32 *state, void *param, void *work) 
         }
     }
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     WinRecordGraphic_Delete(wk->graphic);
     heapId = wk->heapId;
@@ -432,7 +432,7 @@ static BOOL WinRecord_Main(GameProc *proc, u32 *state, void *param, void *work) 
         }
         break;
     case 1:
-        if (wk->seq == WIN_RECORD_SEQ_END && func_02021c0c(wk->printQueue) == TRUE) {
+        if (wk->seq == WIN_RECORD_SEQ_END && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -549,7 +549,7 @@ static void WinRecord_Seq(WinRecordWork *wk) {
 static void WinRecord_FlushWindows(WinRecordWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WIN_RECORD_WINDOW_COUNT; i++) {
         PrintWindow_Flush(&wk->windows[i], wk->printQueue);
     }
@@ -663,10 +663,10 @@ static void WinRecord_LoadObjRes(WinRecordWork *wk, u32 vramType, const WinRecor
 static void WinRecord_LoadUIRes(WinRecordWork *wk, u32 vramType) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
     ClActUnit *unit = WinRecordGraphic_GetClActUnit(wk->graphic);
-    u32 pltt = func_0202d810();
-    u32 chars = func_0202d814();
-    u32 cells = func_0202d818(2);
-    u32 anims = func_0202d81c(2);
+    u32 pltt = AppMenuCommon_GetTouchBarPaletteFile();
+    u32 chars = AppMenuCommon_GetTouchBarCharFile();
+    u32 cells = AppMenuCommon_GetTouchBarCellFile(2);
+    u32 anims = AppMenuCommon_GetTouchBarAnimFile(2);
 
     wk->res[WIN_RECORD_RES_UI_PLTT] = func_0204bbb8(arc, pltt, vramType, 0x160, 0, 4, wk->heapId);
     wk->res[WIN_RECORD_RES_UI_CHARS] = func_0204b81c(arc, chars, FALSE, vramType, wk->heapId);
@@ -892,7 +892,7 @@ static void WinRecord_InitWins(WinRecordWork *wk) {
         wk->trainerClass = 1;
     }
     for (i = 0; i < WIN_RECORD_TOURNAMENT_COUNT; i++) {
-        wins = func_0200feac(wk->param->save, sWinRecordTournaments[i]);
+        wins = WbtSave_GetCount(wk->param->save, sWinRecordTournaments[i]);
         if (wins >= WIN_RECORD_MAX_WINS) {
             wins = WIN_RECORD_MAX_WINS;
         }

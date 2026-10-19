@@ -65,7 +65,7 @@ typedef struct {
 } FestMissionOffers;
 
 void FestMissionLogEntry_Clear(FestMissionLogEntry *entry);
-void func_02015018(const FestMissionLogEntry *entry, StrBuf *dest);
+void FestMissionLogEntry_GetName(const FestMissionLogEntry *entry, StrBuf *dest);
 void FestMissionLog_Clear(FestMissionLog *log);
 // Logs what a beacon says its player did
 void FestMissionLog_AddBeacon(LinkFestival *festival, const GameBeacon *beacon, u32 score, u32 mode, u32 own);
@@ -73,11 +73,11 @@ void FestMissionLog_AddBeacon(LinkFestival *festival, const GameBeacon *beacon, 
 void FestMissionLog_AddPlayer(FestMissionLog *log, GameData *gameData, u8 joined);
 
 void FestMissionPassPower_Clear(FestMissionPassPower *passPower);
-void func_02015198(FestMissionPassPowers *passPowers);
+void FestMissionPassPowers_Clear(FestMissionPassPowers *passPowers);
 // Takes the Pass Power of a beacon of type 0x32, once
 BOOL FestMissionPassPowers_AddBeacon(FestMissionPassPowers *passPowers, const GameBeacon *beacon);
 // The Pass Power of a log entry
-u16 func_02015248(FestMissionPassPower *passPower, const FestMissionLogEntry *entry);
+u16 FestMissionPassPower_FromLogEntry(FestMissionPassPower *passPower, const FestMissionLogEntry *entry);
 
 // Keeps the mission of a beacon as an offer
 void FestMissionOffers_AddBeacon(LinkFestival *festival, const GameBeacon *beacon);
@@ -86,7 +86,7 @@ void FestMissionOffers_DropExpired(LinkFestival *festival);
 // Drops the offer of a mission
 void FestMissionOffers_Remove(LinkFestival *festival, FestMissionConfig *config);
 // What a log entry's value is, by its kind
-u8 func_02015444(u32 kind);
+u8 FestMission_GetLogCategory(u32 kind);
 // Whether a beacon's mission is not a valid one
 BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beacon);
 

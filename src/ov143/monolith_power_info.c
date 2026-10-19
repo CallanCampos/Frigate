@@ -130,7 +130,7 @@ static BOOL MonolithPowerInfo_Init(GameProc *proc, u32 *state, void *param, void
 // which is what this file alone uses. printsys.h's returns nothing
 static inline BOOL MonolithPowerInfo_FlushWindow(PrintWindow *printWindow, PrintQueue *queue) {
     if (printWindow->flushPending) {
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(printWindow->window))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(printWindow->window))) {
             BmpWin_FlushChar(printWindow->window);
             printWindow->flushPending = FALSE;
         }
@@ -150,7 +150,7 @@ static BOOL MonolithPowerInfo_Main(GameProc *proc, u32 *state, void *param, void
     for (i = 0; i < MONOLITH_POWER_INFO_WINDOW_COUNT; i++) {
         printed[i] = MonolithPowerInfo_FlushWindow(&piw->prints[i], screen->work->printQueue);
     }
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     if (*state == MONOLITH_POWER_INFO_SEQ_MAIN) {
@@ -171,7 +171,7 @@ static BOOL MonolithPowerInfo_Exit(GameProc *proc, u32 *state, void *param, void
     MonolithScreenParam *screen = param;
     MonolithPowerInfoWork *piw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_BGSysSetEnabledBGsA(GX_PLANEMASK_BG3);

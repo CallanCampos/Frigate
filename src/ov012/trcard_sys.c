@@ -321,10 +321,10 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
 
     save = GameData_GetSaveControl(gameData);
     box = SaveControl_GetMedalBox(save);
-    wbt = func_0200fea0(save);
+    wbt = TrialHouseSave_GetWbtSave(save);
     avenue = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(save));
     records = getTrainerCardInfoBlkAddress(save);
-    unk = func_02010dec(save);
+    unk = FestRecords_GetFromSave(save);
     data->lastMedal = MedalBox_GetLastMedal(box);
     data->medalCount = MedalBox_GetObtainedCount(box, 0);
     data->medalRank = MedalBox_GetRank(box);
@@ -335,7 +335,7 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
         data->medalDay = day;
     }
     for (i = 0; i < 29; i++) {
-        wins += func_0200feac(wbt, i);
+        wins += WbtSave_GetCount(wbt, i);
     }
     if (wins > 9999) {
         wins = 9999;
@@ -344,7 +344,7 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
     data->unk688 = RecordGet(records, 0x83);
     JoinAvenue_GetParam(avenue, 0, data->avenueName);
     data->unk68A = RecordGet(records, 0x7f);
-    data->unk684 = func_02010e50(unk);
+    data->unk684 = FestRecords_GetCompleted(unk);
     eventWork = GameData_GetEventWork(gameData);
     if (data->pwtWins != 0) {
         data->unk690_2 = TRUE;
@@ -428,7 +428,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     u8 i;
     u8 bit;
 
-    if (!func_02008b5c(playerInfo)) {
+    if (!PlayerInfo_IsNameEmpty(playerInfo)) {
         MIi_CpuCopy16(GetPlayerName(playerInfo), data->name, sizeof(data->name));
     } else {
         data->name[0] = 'N';
@@ -455,17 +455,17 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         }
     }
     if (isSnapshot == TRUE) {
-        PlayTime *playTime = (PlayTime *)func_02017a40(gameData);
+        PlayTime *playTime = (PlayTime *)GameData_GetPlayTime(gameData);
 
         data->unk06 = func_02008bf4(playerInfo);
         data->isOwn = FALSE;
         data->playTime = NULL;
-        data->playHours = func_02008cec(playTime);
-        data->playMinutes = func_02008cf0(playTime);
+        data->playHours = PlayTime_GetHours(playTime);
+        data->playMinutes = PlayTime_GetMinutes(playTime);
     } else {
         data->unk06 = func_02008bf4(playerInfo);
         data->isOwn = TRUE;
-        data->playTime = (PlayTime *)func_02017a40(gameData);
+        data->playTime = (PlayTime *)GameData_GetPlayTime(gameData);
     }
     data->unk48 = func_020091e8(timeSig);
     data->unk04_4 = func_02009204(timeSig);
@@ -499,14 +499,15 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     data->unk5C = func_ov012_02169738(records, 7, 9999);
     highLink = getHighLinkBlockAddress(save);
     passPowerData = PassPowerData_Create(heapId);
-    func_0200c6d8(highLink, passPowerFlags, 2);
-    data->passPowerCount = GetUnlockedPassPowerCount(passPowerData, func_02017208(gameData), passPowerFlags);
+    HighLinkSave_GetSpecialFlags(highLink, passPowerFlags, 2);
+    data->passPowerCount =
+        GetUnlockedPassPowerCount(passPowerData, GameData_GetMyPassPowerLevels(gameData), passPowerFlags);
     PassPowerData_Free(passPowerData);
     data->unk60 = func_ov012_02169738(records, 8, 9999);
     data->palParkHighScore = TrainerGameInfo_GetPalParkHighScore(card);
-    data->unk64 = func_02009650(records);
-    data->battleTestRank = func_02009628(records);
-    data->unk68_0 = func_020098c0(func_02009924(gameData));
+    data->unk64 = RecordGetTrialHousePoints(records);
+    data->battleTestRank = RecordGetTrialHouseRank(records);
+    data->unk68_0 = CGearSettings_IsOn(CGearSettings_GetFromGameData(gameData));
     if (data->unk60 != 0) {
         data->unk68_2 = TRUE;
     }
@@ -522,7 +523,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         data->unk04_2 = FALSE;
     }
     data->seenCount = countSeenDexPokes(pokedex, heapId);
-    data->unk04_3 = func_020091ac(timeSig);
+    data->unk04_3 = TimeSigSave_HasSignature(timeSig);
     MI_CpuCopy8(func_020091a8(timeSig), data->unk74, sizeof(data->unk74));
     data->canEdit = canEdit;
 }
@@ -555,11 +556,11 @@ u32 func_ov012_02169b78(GameData *gameData) {
     u32 stars = 0;
     SaveControl *save = GameData_GetSaveControl(gameData);
     // Read but unused
-    BSubwayScoreData *bsubway = func_0201795c(gameData);
+    BSubwayScoreData *bsubway = GameData_GetBSubwayScoreData(gameData);
     MusicalSave *musical = getMusicalInfoBlkAddress(gameData);
-    void *levels = func_02017208(gameData);
-    PokewoodSave *pokewood = func_02011040(gameData);
-    void *wbt = func_0200fea0(save);
+    void *levels = GameData_GetMyPassPowerLevels(gameData);
+    PokewoodSave *pokewood = PokewoodSave_Get(gameData);
+    void *wbt = TrialHouseSave_GetWbtSave(save);
 
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), 0x960)) {
         stars++;
@@ -567,13 +568,13 @@ u32 func_ov012_02169b78(GameData *gameData) {
     if (PokeDex_IsCompleteNational(GameData_GetPokedex(gameData))) {
         stars++;
     }
-    if (func_0200c5dc(levels) >= 30 && func_0200c5e0(levels) >= 30) {
+    if (PassPowerLevel_GetWhite(levels) >= 30 && PassPowerLevel_GetBlack(levels) >= 30) {
         stars++;
     }
-    if (func_0200feac(wbt, 17) != 0) {
+    if (WbtSave_GetCount(wbt, 17) != 0) {
         stars++;
     }
-    if ((int)func_020112d8(pokewood, 0) >= POKEWOOD_MOVIE_COUNT) {
+    if ((int)PokewoodSave_CountFlags(pokewood, 0) >= POKEWOOD_MOVIE_COUNT) {
         stars++;
     }
     return stars;

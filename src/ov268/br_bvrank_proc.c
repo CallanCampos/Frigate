@@ -128,7 +128,7 @@ static BOOL BrBvRank_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
     }
@@ -178,7 +178,7 @@ static BOOL BrBvRank_ProcExit(GameProc *proc, u32 *state, void *param, void *wor
         BrBallEff_Exit(p_wk->ballEff[i]);
     }
     BmpOam_Exit(p_wk->bmpoam);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }
@@ -200,7 +200,7 @@ static BOOL BrBvRank_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->captionWin != NULL) {
         BrMsgWin_Main(p_wk->captionWin);
     }
@@ -438,7 +438,7 @@ static void BrBvRank_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             if (ret) {
                 for (i = 0; i < p_wk->p_param->p_outline->data_num; i++) {
                     p_wk->p_param->p_outline->isSecure[i] =
-                        func_0200c124(&p_wk->p_param->p_outline->data[i].header, BATTLE_REC_HEADER_UNK2A, 0);
+                        BattleRec_GetHeaderValue(&p_wk->p_param->p_outline->data[i].header, BATTLE_REC_HEADER_UNK2A, 0);
                 }
                 BrSeq_SetNext(p_seqwk, BrBvRank_SeqDownloadEnd);
             } else {
@@ -824,7 +824,7 @@ static void BrBvRank_GetPokeData(BrOutline *outline, BrBvRankPokeData *poke) {
 
     MI_CpuFill8(poke, 0, sizeof(BrBvRankPokeData));
     header = &outline->header;
-    mode = func_0200c124(header, BATTLE_REC_HEADER_MODE, 0);
+    mode = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_MODE, 0);
     switch (mode) {
     case 0x10:
     case 0x11:
@@ -847,9 +847,9 @@ static void BrBvRank_GetPokeData(BrOutline *outline, BrBvRankPokeData *poke) {
         if (isSmallTeam && 3 <= i && i <= 5) {
             continue;
         }
-        species = func_0200c124(header, BATTLE_REC_HEADER_SPECIES, i);
-        form = func_0200c124(header, BATTLE_REC_HEADER_FORM, i);
-        gender = func_0200c124(header, BATTLE_REC_HEADER_GENDER, i);
+        species = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_SPECIES, i);
+        form = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_FORM, i);
+        gender = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_GENDER, i);
         if (species >= BR_BVRANK_SPECIES_END) {
             species = 0;
         }

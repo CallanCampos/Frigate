@@ -206,7 +206,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
     menu->cursorDirty = menu->keyMode = func_0203d554() ^ TRUE;
     menu->curItem = NULL;
     menu->vblankTcb = GFL_VBlankTCBAdd(func_ov036_021a040c, menu, 0);
-    menu->printQueue = func_02021998(menu->heapId);
+    menu->printQueue = PrintQueue_CreateDefault(menu->heapId);
     menu->scrollDirty = FALSE;
     menu->scrollY = 0;
     arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_MENU, menu->tmpHeapId);
@@ -263,8 +263,8 @@ void FieldMenu_Free(FieldMenu *menu) {
     GFL_BGSysReleaseBG(7);
     GFL_BGSysReleaseBG(5);
     GFL_BGSysReleaseBG(6);
-    func_02021c44(menu->printQueue);
-    func_02021a18(menu->printQueue);
+    PrintQueue_Clear(menu->printQueue);
+    PrintQueue_Free(menu->printQueue);
     GFL_HeapFree(menu);
 }
 
@@ -279,7 +279,7 @@ static void func_ov036_0219fc34(void) {
 void FieldMenu_Update(FieldMenu *menu) {
     switch (menu->state) {
     case 1:
-        if (func_02021c0c(menu->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(menu->printQueue) == TRUE) {
             u8 i;
 
             func_ov036_02198884(menu->subscreen, menu->tmpHeapId);
@@ -371,7 +371,7 @@ void FieldMenu_Update(FieldMenu *menu) {
         menu->scrollDirty = TRUE;
         break;
     }
-    func_02021a3c(menu->printQueue);
+    PrintQueue_Main(menu->printQueue);
 }
 
 // Scrolls the actors with the BGs, hiding the icons that leave the screen
@@ -438,9 +438,11 @@ static void func_ov036_0219ff20(FieldMenu *menu, ArcTool *arc, u8 menuType, void
     menu->menuChars = func_0204b81c(arc, 0xf, FALSE, CLACT_VRAM_SUB, menu->heapId);
     menu->menuCellAnims = func_0204bde0(arc, 0x1f, 0x2a, menu->heapId);
     common = GFL_ArcSysCreateFileHandle(getUINarcIdx(), menu->tmpHeapId);
-    menu->commonPalette = func_0204bbb8(common, func_0202d810(), CLACT_VRAM_SUB, 0x160, 0, 2, menu->heapId);
-    menu->commonChars = func_0204b81c(common, func_0202d814(), FALSE, CLACT_VRAM_SUB, menu->heapId);
-    menu->commonCellAnims = func_0204bde0(common, func_0202d818(0), func_0202d81c(0), menu->heapId);
+    menu->commonPalette =
+        func_0204bbb8(common, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0x160, 0, 2, menu->heapId);
+    menu->commonChars = func_0204b81c(common, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, menu->heapId);
+    menu->commonCellAnims =
+        func_0204bde0(common, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0), menu->heapId);
     GFL_ArcToolFree(common);
     GFL_BGSysLoadScr(5);
     menu->actUnit = func_0204bf1c(8, 0, menu->heapId);
@@ -527,7 +529,7 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
 
         if (itemId == 4) {
             setup.name = GFL_StrBufCreate(16, menu->tmpHeapId);
-            if (!func_02008b5c(menu->playerInfo)) {
+            if (!PlayerInfo_IsNameEmpty(menu->playerInfo)) {
                 GFL_StrBufLoadString(setup.name, GetPlayerName(menu->playerInfo));
             } else {
                 name = noName;
@@ -783,7 +785,7 @@ static void func_ov036_021a0820(FieldMenu *menu, FieldMenuItem *item, const Fiel
     item->win = BmpWin_CreateDynamic(6, setup->winX, setup->winY, 8, 2, 13, TRUE);
     BmpWin_FlushMap(item->win);
     GFL_BitmapFill(BmpWin_GetBitmap(item->win), 0);
-    func_02021c7c(menu->printQueue, BmpWin_GetBitmap(item->win), 2, 1, setup->name, font, 0x440);
+    PrintQueue_PrintColor(menu->printQueue, BmpWin_GetBitmap(item->win), 2, 1, setup->name, font, 0x440);
     if (setup->arc != NULL) {
         item->chars = func_0204b81c(setup->arc, setup->charFile, FALSE, CLACT_VRAM_SUB, menu->heapId);
         item->cellAnims = func_0204bde0(setup->arc, setup->cellFile, setup->animFile, menu->heapId);
@@ -838,9 +840,9 @@ static void func_ov036_021a0970(HeapID heapId, u32 bg) {
     u16 *raw;
     int i;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 4, 0x60, 0x20, heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0x80, 0, FALSE, heapId);
-    data = GFL_G2DIOReadNSCRArc(arc, func_0202d828(), FALSE, &screen, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0x60, 0x20, heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0x80, 0, FALSE, heapId);
+    data = GFL_G2DIOReadNSCRArc(arc, AppMenuCommon_GetBarScreenFile(), FALSE, &screen, heapId);
     GFL_ArcToolFree(arc);
     raw = (u16 *)screen->rawData;
     for (i = 0; i < 0x300; i++) {

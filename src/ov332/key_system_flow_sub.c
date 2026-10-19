@@ -119,7 +119,7 @@ void KeySystemKeyState_Init(KeySystemKeyState *keys, KeyInfoSave *keyInfo) {
     MI_CpuFill8(keys, 0, sizeof(KeySystemKeyState));
     keys->version = GAME_VERSION;
     for (i = 0; i < KEY_SYSTEM_KEY_COUNT; i++) {
-        keys->unlocked[i] = func_020104c4(keyInfo, i);
+        keys->unlocked[i] = KeyInfo_IsKeyUnlocked(keyInfo, i);
         keys->enabled[i] = keyEnabler(keyInfo, i);
     }
 }
@@ -129,10 +129,10 @@ void KeySystemKeyState_Save(KeySystemKeyState *keys, KeyInfoSave *keyInfo) {
 
     for (i = 0; i < KEY_SYSTEM_KEY_COUNT; i++) {
         if (keys->unlocked[i]) {
-            func_020104b0(keyInfo, i);
+            KeyInfo_UnlockKey(keyInfo, i);
         }
         if (keys->enabled[i]) {
-            func_020104e0(keyInfo, i);
+            KeyInfo_EnableKey(keyInfo, i);
         }
     }
 }
@@ -411,7 +411,7 @@ static int KeySystemKeySelect_SelectCity(int index, KeySystemKeySelect *keySelec
         if (index == 1 && !keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_CITY)) {
             return KEY_SELECT_LOCKED;
         }
-        func_02010550(keySelect->keyInfo, index);
+        KeyInfo_SetCityKey(keySelect->keyInfo, index);
         setup = KeySystemList_GetSetup(*keySelect->list);
         KeySystemKeySelect_MoveCursor(KeySystemClAct_GetActor(keySelect->clact, 7), setup, index);
     }
@@ -434,13 +434,13 @@ static void KeySystemKeySelect_SetupChamber(KeySystemKeySelect *keySelect, KeySy
         func_0204c124(KeySystemClAct_GetActor(keySelect->clact, 6), TRUE);
     }
     cursor = KeySystemClAct_GetActor(keySelect->clact, 7);
-    KeySystemKeySelect_MoveCursor(cursor, setup, func_020105a0(keySelect->keyInfo));
+    KeySystemKeySelect_MoveCursor(cursor, setup, KeyInfo_GetChamberKey(keySelect->keyInfo));
 }
 
 static int KeySystemKeySelect_SelectChamber(int index, KeySystemKeySelect *keySelect) {
     const KeySystemListSetup *setup;
 
-    if (index == func_020105a0(keySelect->keyInfo)) {
+    if (index == KeyInfo_GetChamberKey(keySelect->keyInfo)) {
         return KEY_SELECT_CURRENT;
     }
     if (index < 3) {
@@ -456,7 +456,7 @@ static int KeySystemKeySelect_SelectChamber(int index, KeySystemKeySelect *keySe
             }
             break;
         }
-        func_0201058c(keySelect->keyInfo, index);
+        KeyInfo_SetChamberKey(keySelect->keyInfo, index);
         setup = KeySystemList_GetSetup(*keySelect->list);
         KeySystemKeySelect_MoveCursor(KeySystemClAct_GetActor(keySelect->clact, 7), setup, index);
     }
@@ -476,7 +476,7 @@ u16 KeySystemFlow_GetCityMsg(KeyInfoSave *keyInfo) {
 }
 
 u16 KeySystemFlow_GetChamberMsg(KeyInfoSave *keyInfo) {
-    return func_020105a0(keyInfo) + 94;
+    return KeyInfo_GetChamberKey(keyInfo) + 94;
 }
 
 u16 KeySystemFlow_GetSettingsMsg(KeyInfoSave *keyInfo, u16 item) {

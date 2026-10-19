@@ -70,7 +70,7 @@ int ZknListUI_Main(ZknListWork *wk) {
             if (wk->param->searched == TRUE) {
                 return -1;
             }
-            if (func_0200d1f8(wk->param->pokedex) != 1) {
+            if (PokeDex_GetMode(wk->param->pokedex) != 1) {
                 return -1;
             }
             func_0203d564(TRUE);
@@ -85,11 +85,11 @@ int ZknListUI_Main(ZknListWork *wk) {
             }
             // The button of the Pokédex that the list is of does nothing
             if (PokeDex_IsNationalObtained(wk->param->pokedex) == TRUE) {
-                if (func_0200d1f8(wk->param->pokedex) == 1) {
+                if (PokeDex_GetMode(wk->param->pokedex) == 1) {
                     return -1;
                 }
             } else {
-                if (func_0200d1f8(wk->param->pokedex) == 1) {
+                if (PokeDex_GetMode(wk->param->pokedex) == 1) {
                     return -1;
                 }
             }

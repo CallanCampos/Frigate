@@ -468,7 +468,7 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
         } else if (param->mode == NAME_ENTRY_POKEMON_RENAME) {
             slot = NAME_ENTRY_POKEMON;
         }
-        keyboardType = func_0200c84c(param->gameInfo, slot);
+        keyboardType = TrainerGameInfo_GetKeyboardType(param->gameInfo, slot);
         if (keyboardType >= 5) {
             keyboardType = 0;
         }
@@ -485,7 +485,7 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
     }
 
     work->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_NAMEIN);
-    work->queue = func_020219a8(0x1000, HEAPID_NAMEIN);
+    work->queue = PrintQueue_Create(0x1000, HEAPID_NAMEIN);
     work->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_NAMEIN);
     work->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_NAMEIN);
     work->graphic = NameinGraphic_Create(0, HEAPID_NAMEIN);
@@ -550,8 +550,8 @@ BOOL NameEntry_ProcExit(GameProc *proc, u32 *state, void *param, void *arg) {
     NameinGraphic_Delete(work->graphic);
     GFL_WordSetSystemFree(work->wordSet);
     GFL_MsgDataFree(work->msgData);
-    func_02021c44(work->queue);
-    func_02021a18(work->queue);
+    PrintQueue_Clear(work->queue);
+    PrintQueue_Free(work->queue);
     GFL_FontFree(work->font);
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_NAMEIN);
@@ -564,7 +564,7 @@ BOOL NameEntry_ProcMain(GameProc *proc, u32 *state, void *param, void *arg) {
 
     NameEntryTask_Run(&work->task);
     NameinGraphic_Main(work->graphic);
-    func_02021a3c(work->queue);
+    PrintQueue_Main(work->queue);
     NameEntryIcon_UpdateLabel(&work->icon);
     if (NameEntryTask_IsDone(&work->task)) {
         return TRUE;
@@ -927,10 +927,10 @@ static BOOL NameBox_Update(NameBox *box) {
                 }
                 if (i >= box->length) {
                     queue = box->queue;
-                    func_02021c7c(queue, BmpWin_GetBitmap(box->printWindow), x, 0, box->buf, box->font, 0xc80);
+                    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(box->printWindow), x, 0, box->buf, box->font, 0xc80);
                 } else {
                     queue = box->queue;
-                    func_02021c54(queue, BmpWin_GetBitmap(box->printWindow), x, 0, box->buf, box->font);
+                    PrintQueue_Print(queue, BmpWin_GetBitmap(box->printWindow), x, 0, box->buf, box->font);
                 }
                 box->printing = TRUE;
             }
@@ -1053,7 +1053,7 @@ static BOOL NameBox_IsPrintDone(NameBox *box) {
     PrintQueue *queue = box->queue;
 
     if (box->printing) {
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(box->printWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(box->printWindow))) {
             BmpWin_FlushChar(box->printWindow);
             box->printing = FALSE;
         }
@@ -1316,7 +1316,7 @@ static void KeyLayout_PrintKeys(KeyLayout *layout, KeyPrint *print, PrintQueue *
                     y = rect.top + (rect.bottom - rect.top) / 2 - 5 * 8;
                     x -= GFL_FontGetBlockWidth(buf, font, 0) / 2;
                     y -= GFL_FontGetBlockHeight(buf, font) / 2;
-                    func_02021c54(queue, BmpWin_GetBitmap(print->window), x - 1, y, buf, font);
+                    PrintQueue_Print(queue, BmpWin_GetBitmap(print->window), x - 1, y, buf, font);
                     print->printing = TRUE;
                 }
             }
@@ -2107,7 +2107,7 @@ static BOOL Keyboard_IsPrintDone(Keyboard *kb) {
     PrintQueue *queue = kb->queue;
 
     if (kb->print.printing) {
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(kb->print.window))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(kb->print.window))) {
             BmpWin_FlushChar(kb->print.window);
             kb->print.printing = FALSE;
         }
@@ -2609,13 +2609,13 @@ static void NameEntryMessage_Free(NameEntryMessage *message) {
 static void NameEntryMessage_Print(NameEntryMessage *message, u32 messageId) {
     PrintQueue *queue;
 
-    while (func_02021c1c(message->queue, BmpWin_GetBitmap(message->window))) {
-        func_02021a3c(message->queue);
+    while (PrintQueue_IsBitmapPending(message->queue, BmpWin_GetBitmap(message->window))) {
+        PrintQueue_Main(message->queue);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(message->window), message->fillColor);
     GFL_MsgDataLoadStrbuf(message->msgData, messageId, message->buf);
     queue = message->queue;
-    func_02021c54(queue, BmpWin_GetBitmap(message->printWindow), 0, 0, message->buf, message->font);
+    PrintQueue_Print(queue, BmpWin_GetBitmap(message->printWindow), 0, 0, message->buf, message->font);
     message->printing = TRUE;
 }
 
@@ -2637,7 +2637,7 @@ static void NameEntryMessage_PrintPokemon(NameEntryMessage *message, u32 message
     format = GFL_MsgDataLoadStrbufNew(message->msgData, messageId);
     GFL_WordSetFormatStrbuf(message->wordSet, message->buf, format);
     queue = message->queue;
-    func_02021c54(queue, BmpWin_GetBitmap(message->printWindow), 0, 0, message->buf, message->font);
+    PrintQueue_Print(queue, BmpWin_GetBitmap(message->printWindow), 0, 0, message->buf, message->font);
     message->printing = TRUE;
     GFL_StrBufFree(format);
 }
@@ -2646,7 +2646,7 @@ static BOOL NameEntryMessage_IsPrintDone(NameEntryMessage *message) {
     PrintQueue *queue = message->queue;
 
     if (message->printing) {
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(message->printWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(message->printWindow))) {
             BmpWin_FlushChar(message->printWindow);
             message->printing = FALSE;
         }
@@ -2664,7 +2664,7 @@ static void NameEntryTalk_Init(NameEntryTalk *talk, HeapID heapId) {
 
 static void NameEntryTalk_Free(NameEntryTalk *talk) {
     if (talk->stream != NULL) {
-        func_020223cc(talk->stream);
+        PrintStream_Delete(talk->stream);
     }
     GFL_TCBExMgrFree(talk->tcbManager);
     MI_CpuFill8(talk, 0, sizeof(NameEntryTalk));
@@ -2685,13 +2685,13 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
     }
     loadBoxNameForDisplay(wordSet, 1, (void *)param->unk10, param->unk14);
     if (talk->stream != NULL) {
-        func_020223cc(talk->stream);
+        PrintStream_Delete(talk->stream);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(message->window), message->fillColor);
     GFL_StrBufClear(message->buf);
     GFL_WordSetFormatStrbuf(wordSet, message->buf, (const StrBuf *)param->unkC);
-    talk->stream = func_02022268(message->window, 0, 0, message->buf, message->font, func_02017bcc(), talk->tcbManager,
-                                 2, heapId, message->fillColor);
+    talk->stream = PrintStream_Create(message->window, 0, 0, message->buf, message->font, TextSpeed_GetCurrentWait(),
+                                      talk->tcbManager, 2, heapId, message->fillColor);
     talk->frame = 0;
     talk->next = NameEntryTask_FadeOut;
     talk->waitFrames = 60;
@@ -2849,7 +2849,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
         }
         icon->label = GFL_MsgDataLoadStrbufNew(msgData, messageId);
         GFL_BitmapFill(icon->labelBitmap, 0);
-        func_02021c7c(queue, icon->labelBitmap, 0, 0, icon->label, font, color);
+        PrintQueue_PrintColor(queue, icon->labelBitmap, 0, 0, icon->label, font, color);
         icon->labelQueue = queue;
         icon->labelDirty = TRUE;
     }
@@ -2904,7 +2904,7 @@ static void NameEntryIcon_Update(NameEntryIcon *icon) {
 
 static void NameEntryIcon_UpdateLabel(NameEntryIcon *icon) {
     if (icon->labelDirty) {
-        if (!func_02021c1c(icon->labelQueue, icon->labelBitmap)) {
+        if (!PrintQueue_IsBitmapPending(icon->labelQueue, icon->labelBitmap)) {
             BmpOam_ActorBmpTrans(icon->labelActor);
             icon->labelDirty = FALSE;
         }
@@ -3027,7 +3027,7 @@ static StrBuf *NameEntry_LoadPresetName(NameEntryParam *param, u32 which, HeapID
         GFL_StrBufLoadString(buf, TrainerGameInfo_GetThanks(param->gameInfo));
         break;
     case 2:
-        GFL_StrBufLoadString(buf, func_0201150c(param->unk30));
+        GFL_StrBufLoadString(buf, CGearName_Get(param->unk30));
         break;
     default:
         return NULL;
@@ -3103,7 +3103,7 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
                 GFL_StrBufLoadString(preset, TrainerGameInfo_GetThanks(work->param->gameInfo));
                 break;
             case 2:
-                GFL_StrBufLoadString(preset, func_0201150c(work->param->unk30));
+                GFL_StrBufLoadString(preset, CGearName_Get(work->param->unk30));
                 break;
             }
             if (GFL_StrBufCmp(preset, work->param->name)) {
@@ -3118,7 +3118,7 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
         work->param->unk1C = TRUE;
     }
     if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unk1C == FALSE) {
-        func_02038bc8(12);
+        JoinAvenue_RecordActivity(12);
     }
 }
 
@@ -3243,10 +3243,10 @@ static void NameEntryTask_Talk(NameEntryTask *task, u32 *state, NameEntryWork *w
     switch (*state) {
     case 0:
         GFL_TCBExMgrUpdate(talk->tcbManager);
-        switch (func_020223b4(talk->stream)) {
+        switch (PrintStream_GetState(talk->stream)) {
         case PRINT_STREAM_RUNNING:
             if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-                func_020223e0(talk->stream, 0);
+                PrintStream_SkipWait(talk->stream, 0);
                 if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                     func_0203d564(FALSE);
                 } else {
@@ -3259,7 +3259,7 @@ static void NameEntryTask_Talk(NameEntryTask *task, u32 *state, NameEntryWork *w
             break;
         case PRINT_STREAM_PAUSED:
             if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-                func_020223bc(talk->stream);
+                PrintStream_Continue(talk->stream);
                 if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                     func_0203d564(FALSE);
                 } else {
@@ -3463,7 +3463,7 @@ static void NameEntryTask_SaveKeyboardType(NameEntryTask *task, u32 *state, Name
         } else if (slot == NAME_ENTRY_POKEMON_RENAME) {
             slot = NAME_ENTRY_POKEMON;
         }
-        func_0200c844(work->param->gameInfo, slot, Keyboard_GetType(&work->keyboard));
+        TrainerGameInfo_SetKeyboardType(work->param->gameInfo, slot, Keyboard_GetType(&work->keyboard));
     }
     if (work->param->saveTask != NULL) {
         NameEntryTask_SetFunc(task, NameEntryTask_PauseSave);

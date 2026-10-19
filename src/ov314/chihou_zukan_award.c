@@ -143,7 +143,7 @@ static BOOL ChihouZukanAward_Init(GameProc *proc, u32 *state, void *param, void 
     wk->param = param;
     wk->graphic = ChihouZukanAwardGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(1, 1);
     GFL_BGSysSetBGPriority(2, 0);
     wk->vblankTask = GFL_VBlankTCBAdd(ChihouZukanAward_VBlank, wk, 1);
@@ -198,8 +198,8 @@ static BOOL ChihouZukanAward_Exit(GameProc *proc, u32 *state, void *param, void 
     ChihouZukanAward_FreeText(wk);
     ChihouZukanAward_Unused(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ChihouZukanAwardGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -277,7 +277,7 @@ static BOOL ChihouZukanAward_Main(GameProc *proc, u32 *state, void *param, void 
     case STEP_END:
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     ChihouZukanAward_TransferPrinted(wk);
     if ((s32)*state >= STEP_WAIT_FADE_IN && (s32)*state <= STEP_WAIT_FADE_OUT) {
         ChihouZukanAward_UpdateSlide(wk);
@@ -332,20 +332,20 @@ static void ChihouZukanAward_InitText(ChihouZukanAwardWork *wk) {
     strbuf = GFL_StrBufCreate(32, wk->heapId);
     copyVarForText(wordSet, 0, playerInfo);
     GFL_WordSetFormatStrbuf(wordSet, strbuf, format);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_PLAYER_NAME]), 0, 0, strbuf, wk->font,
-                  PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_PLAYER_NAME]), 0, 0, strbuf, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(strbuf);
     GFL_StrBufFree(format);
     GFL_WordSetSystemFree(wordSet);
 
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_DocumentCertifiesHaveMade);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]), 0, 0, strbuf, wk->font,
-                  PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]), 0, 0, strbuf, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(strbuf);
 
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_GameFreakAllStaff);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]), 0, 0, strbuf, wk->font,
-                  PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]), 0, 0, strbuf, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(strbuf);
 
     for (i = 1; i < WINDOW_COUNT; i++) {
@@ -372,7 +372,7 @@ static void ChihouZukanAward_TransferPrinted(ChihouZukanAwardWork *wk) {
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        if (!wk->printed[i] && !func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->windows[i]))) {
+        if (!wk->printed[i] && !PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->windows[i]))) {
             BmpWin_Transfer(wk->windows[i]);
             wk->printed[i] = TRUE;
         }

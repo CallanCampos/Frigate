@@ -149,7 +149,7 @@ BOOL func_ov028_0217128c(u32 value) {
 void func_ov028_021712ac(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
-    func_02008b34(data, func_02017378(unisys->param->gameData, netId));
+    PlayerInfo_Copy(data, GameData_GetPlayerInfoByNetID(unisys->param->gameData, netId));
     unisys->situ.mycomm.unk47 |= (u8)(1 << netId);
 }
 
@@ -409,7 +409,7 @@ void func_ov028_02171920(int netId, int size, const void *data, void *work, NetH
     if (netId != func_02042a6c(func_02040440())) {
         self->mycomm.unk4C = 1;
         JoinAvenuePerson_SetParam((JoinAvenuePerson *)data, JOIN_AVE_PARAM_UNK_26, 3);
-        func_02010078(joinAvenue, unisys->param->gameData, (void *)data, TRUE);
+        JoinAvenue_Add(joinAvenue, unisys->param->gameData, (void *)data, TRUE);
     }
 }
 
@@ -418,7 +418,7 @@ BOOL func_ov028_0217196c(u8 sendTo, u8 leftNetId) {
 }
 
 BOOL func_ov028_0217199c(UnionSystem *unisys) {
-    func_02036dc0(&unisys->joinPerson, GSYS_GetGameData(unisys->param->gsys));
+    JoinAvenuePerson_InitPlayer(&unisys->joinPerson, GSYS_GetGameData(unisys->param->gsys));
     return func_02042c18(func_02040440(), 0xff, UNION_NET_CMD_JOIN_AVENUE, sizeof(JoinAvenuePerson),
                          &unisys->joinPerson, TRUE, FALSE, TRUE);
 }

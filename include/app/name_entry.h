@@ -77,8 +77,8 @@ BOOL func_ov012_02165b10(NameEntryParam *param, const StrBuf *str);
 void func_ov012_021603ec(StrBuf *name, u8 value);
 
 // The keyboard that each mode last used, a byte of the trainer's info save (not declared in save_control.h)
-u8 func_0200c84c(TrainerGameInfoSave *info, u32 index);
-void func_0200c844(TrainerGameInfoSave *info, u32 index, u8 value);
+u8 TrainerGameInfo_GetKeyboardType(TrainerGameInfoSave *info, u32 index);
+void TrainerGameInfo_SetKeyboardType(TrainerGameInfoSave *info, u32 index, u8 value);
 
 extern const GameProcFunctions NAME_ENTRY_PROC_FUNCTIONS;
 // The sound sequences that the name entry plays, which the new game loads before it

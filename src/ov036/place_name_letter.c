@@ -300,12 +300,12 @@ static u32 func_ov036_021b6adc(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
         if (getGameVersion() == 0x16) {
             color = 0x3c40;
         }
-        func_02021c7c(wk->queue, wk->bitmap, 0, 0, wk->text.name, wk->text.font, color);
+        PrintQueue_PrintColor(wk->queue, wk->bitmap, 0, 0, wk->text.name, wk->text.font, color);
         (*step)++;
         break;
     }
     case 2:
-        if (!func_02021c1c(wk->queue, wk->bitmap)) {
+        if (!PrintQueue_IsBitmapPending(wk->queue, wk->bitmap)) {
             BmpOam_ActorBmpTrans(wk->oamActor);
             (*step)++;
         }

@@ -9,11 +9,11 @@
 
 #define SAVE_BLOCK_MUSICAL 0x2a
 
-u32 func_0200ac58(void) {
+u32 MusicalSave_GetSize(void) {
     return sizeof(MusicalSave);
 }
 
-void func_0200ac60(MusicalSave *musical) {
+void MusicalSave_Init(MusicalSave *musical) {
     u8 i;
 
     MI_CpuFill8(musical, 0, sizeof(MusicalSave));
@@ -23,21 +23,21 @@ void func_0200ac60(MusicalSave *musical) {
     }
     musical->unk29D = 0;
     musical->unk29E = 0;
-    func_0200add8(musical, 0x30);
-    func_0200add8(musical, 0x46);
-    func_0200add8(musical, 0x53);
-    func_0200add8(musical, 0x4b);
-    func_0200add8(musical, 0x0);
-    func_0200add8(musical, 0x1);
-    func_0200add8(musical, 0xa);
-    func_0200add8(musical, 0x1c);
-    func_0200add8(musical, 0x8);
-    func_0200add8(musical, 0x3b);
-    func_0200add8(musical, 0x3f);
-    func_0200add8(musical, 0x42);
-    func_0200add8(musical, 0x10);
-    func_0200add8(musical, 0x59);
-    func_0200add8(musical, 0x4c);
+    MusicalSave_AddProp(musical, 0x30);
+    MusicalSave_AddProp(musical, 0x46);
+    MusicalSave_AddProp(musical, 0x53);
+    MusicalSave_AddProp(musical, 0x4b);
+    MusicalSave_AddProp(musical, 0x0);
+    MusicalSave_AddProp(musical, 0x1);
+    MusicalSave_AddProp(musical, 0xa);
+    MusicalSave_AddProp(musical, 0x1c);
+    MusicalSave_AddProp(musical, 0x8);
+    MusicalSave_AddProp(musical, 0x3b);
+    MusicalSave_AddProp(musical, 0x3f);
+    MusicalSave_AddProp(musical, 0x42);
+    MusicalSave_AddProp(musical, 0x10);
+    MusicalSave_AddProp(musical, 0x59);
+    MusicalSave_AddProp(musical, 0x4c);
 }
 
 MusicalSave *getAddressOfMusicalDataInfo(SaveControl *save) {
@@ -56,18 +56,18 @@ MusicalSaveUnk1B0 *func_0200ad44(MusicalSave *musical) {
     return musical->unk1B0;
 }
 
-BOOL func_0200ad4c(MusicalSave *musical) {
+BOOL MusicalSave_HasShot(MusicalSave *musical) {
     if (musical->shot.month) {
         return TRUE;
     }
     return FALSE;
 }
 
-MusicalShot *func_0200ad5c(MusicalSave *musical) {
+MusicalShot *MusicalSave_GetShot(MusicalSave *musical) {
     return &musical->shot;
 }
 
-BOOL func_0200ad60(MusicalSave *musical, u8 prop) {
+BOOL MusicalSave_HasProp(MusicalSave *musical, u8 prop) {
     if (prop < MUSICAL_PROP_MAX) {
         u8 byte = prop / 8;
         u8 bit = prop % 8;
@@ -78,7 +78,7 @@ BOOL func_0200ad60(MusicalSave *musical, u8 prop) {
     return FALSE;
 }
 
-BOOL func_0200ad9c(MusicalSave *musical, u8 prop) {
+BOOL MusicalSave_IsPropNew(MusicalSave *musical, u8 prop) {
     if (prop < MUSICAL_PROP_MAX) {
         u8 byte = prop / 8;
         u8 bit = prop % 8;
@@ -89,7 +89,7 @@ BOOL func_0200ad9c(MusicalSave *musical, u8 prop) {
     return FALSE;
 }
 
-void func_0200add8(MusicalSave *musical, u8 prop) {
+void MusicalSave_AddProp(MusicalSave *musical, u8 prop) {
     if (prop < MUSICAL_PROP_MAX) {
         u8 shift = prop % 8;
         u32 mask = 1 << shift;
@@ -99,7 +99,7 @@ void func_0200add8(MusicalSave *musical, u8 prop) {
     }
 }
 
-void func_0200ae14(MusicalSave *musical) {
+void MusicalSave_ClearNewProps(MusicalSave *musical) {
     u8 i;
 
     for (i = 0; i < MUSICAL_PROP_BYTES; i++) {
@@ -107,20 +107,20 @@ void func_0200ae14(MusicalSave *musical) {
     }
 }
 
-u32 func_0200ae30(MusicalSave *musical) {
+u32 MusicalSave_CountProps(MusicalSave *musical) {
     u32 count = 0;
     s32 i;
 
     for (i = 0; i < 256; i++) {
-        if (func_0200ad60(musical, i) == TRUE) {
+        if (MusicalSave_HasProp(musical, i) == TRUE) {
             count++;
         }
     }
     return count;
 }
 
-BOOL func_0200ae58(MusicalSave *musical) {
-    if (func_0200ae30(musical) == MUSICAL_PROP_MAX) {
+BOOL MusicalSave_HasAllProps(MusicalSave *musical) {
+    if (MusicalSave_CountProps(musical) == MUSICAL_PROP_MAX) {
         return TRUE;
     }
     return FALSE;
@@ -182,7 +182,7 @@ void func_0200af08(MusicalSave *musical, u8 value) {
     musical->unk29E = value;
 }
 
-const u16 *func_0200af14(MusicalSave *musical) {
+const u16 *MusicalSave_GetName(MusicalSave *musical) {
     return musical->name;
 }
 
@@ -199,22 +199,22 @@ u16 func_0200af38(MusicalSave *musical) {
     return musical->unk256;
 }
 
-BOOL func_0200af44(MusicalSave *musical) {
+BOOL MusicalSave_GetDressingRoomVisited(MusicalSave *musical) {
     return musical->dressingRoomVisited;
 }
 
-void func_0200af50(MusicalSave *musical, BOOL value) {
+void MusicalSave_SetDressingRoomVisited(MusicalSave *musical, BOOL value) {
     musical->dressingRoomVisited = value;
 }
 
-u8 func_0200af5c(MusicalSave *musical) {
+u8 MusicalSave_GetDownloadedProps(MusicalSave *musical) {
     return musical->downloadedProps;
 }
 
-void func_0200af64(MusicalSave *musical, u8 value) {
+void MusicalSave_SetDownloadedProps(MusicalSave *musical, u8 value) {
     musical->downloadedProps = value;
 }
 
-u8 *func_0200af6c(MusicalSave *musical) {
+u8 *MusicalSave_GetProps(MusicalSave *musical) {
     return musical->props;
 }

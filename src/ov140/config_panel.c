@@ -499,7 +499,7 @@ static BOOL ConfigPanel_Init(GameProc *proc, u32 *state, void *param, void *work
     wk->param->result = FALSE;
     ConfigPanelGraphic_Init(&wk->graphic, HEAPID_CONFIG_PANEL);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_CONFIG_PANEL);
-    wk->queue = func_02021998(HEAPID_CONFIG_PANEL);
+    wk->queue = PrintQueue_CreateDefault(HEAPID_CONFIG_PANEL);
     wk->buttonRes = AppTaskMenuRes_Create(BG_BAR, 13, wk->font, wk->queue, HEAPID_CONFIG_PANEL);
     wk->confirmRes = AppTaskMenuRes_Create(BG_CONFIRM, 9, wk->font, wk->queue, HEAPID_CONFIG_PANEL);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_2, HEAPID_CONFIG_PANEL);
@@ -533,7 +533,7 @@ static BOOL ConfigPanel_Exit(GameProc *proc, u32 *state, void *param, void *work
     GFL_MsgDataFree(wk->msgData);
     AppTaskMenuRes_Free(wk->confirmRes);
     AppTaskMenuRes_Free(wk->buttonRes);
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_FontFree(wk->font);
     ConfigPanelGraphic_Exit(&wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -547,7 +547,7 @@ static BOOL ConfigPanel_Main(GameProc *proc, u32 *state, void *param, void *work
 
     ConfigPanelSeq_Main(&wk->seq);
     ConfigPanelGraphic_Main(&wk->graphic);
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     GFL_TCBExMgrUpdate(wk->tcbManager);
     ConfigPanelAppBar_UpdateButtons(&wk->appBar);
     if (ConfigPanelSeq_IsEnded(&wk->seq)) {
@@ -568,7 +568,7 @@ static void ConfigPanelGraphic_Init(ConfigPanelGraphic *graphic, HeapID heapId) 
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_TextRndUpdateColorIndexLUT(15, 14, 0);
     ConfigPanelBg_Init(&graphic->bg, heapId);
     ConfigPanelObj_Init(&graphic->obj, &sConfigPanelVRAMConfig, heapId);
@@ -579,7 +579,7 @@ static void ConfigPanelGraphic_Exit(ConfigPanelGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTcb);
     ConfigPanelObj_Exit(&graphic->obj);
     ConfigPanelBg_Exit(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -968,7 +968,7 @@ static void ConfigPanelMsg_Init(ConfigPanelMsg *msg, BmpWin *window, Font *font,
 
 static void ConfigPanelMsg_Exit(ConfigPanelMsg *msg) {
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     GFL_StrBufFree(msg->strbuf);
@@ -984,15 +984,15 @@ static void ConfigPanelMsg_PrintFrom(ConfigPanelMsg *msg, MsgData *msgData, u32 
     GFL_BitmapFill(BmpWin_GetBitmap(msg->window), msg->clearColor);
     GFL_MsgDataLoadStrbuf(msgData, msgId, msg->strbuf);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     if (!stream) {
         PrintWindow_PrintNoColor(&msg->printWindow, msg->queue, 0, 0, msg->strbuf, msg->font);
         msg->mode = MSG_MODE_QUEUE;
     } else {
-        msg->stream = func_02022268(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 0, msg->heapId,
-                                    msg->clearColor);
+        msg->stream = PrintStream_Create(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 0,
+                                         msg->heapId, msg->clearColor);
         msg->mode = MSG_MODE_STREAM;
     }
 }
@@ -1537,9 +1537,9 @@ static void ConfigPanelScroll_TouchItems(ConfigPanelScroll *scroll, const Config
 static void ConfigPanelScroll_ApplySound(ConfigPanelScroll *scroll, s8 sound, BOOL force) {
     if (scroll->cursor == OPTION_SOUND || force == TRUE) {
         if (sound == 0) {
-            func_02005c80(TRUE);
+            GFL_SndSetStereo(TRUE);
         } else {
-            func_02005c80(FALSE);
+            GFL_SndSetStereo(FALSE);
         }
     }
 }
@@ -1669,11 +1669,11 @@ static void ConfigPanelOptions_Init(ConfigPanelOptions *options, Config *config)
     MI_CpuFill8(options, 0, sizeof(ConfigPanelOptions));
     options->changed = ITEM_COUNT;
     options->config = config;
-    options->values[OPTION_TEXT_SPEED] = func_02008a14(config);
-    options->values[OPTION_BATTLE_SCENE] = func_02008a4c(config);
-    options->values[OPTION_BATTLE_STYLE] = func_02008a68(config);
+    options->values[OPTION_TEXT_SPEED] = Config_GetTextSpeed(config);
+    options->values[OPTION_BATTLE_SCENE] = Config_GetBattleScene(config);
+    options->values[OPTION_BATTLE_STYLE] = Config_GetBattleStyle(config);
     options->values[OPTION_SOUND] = getSoundFlags(config);
-    options->values[OPTION_SAVE_BEFORE_IR] = func_02008ac8(config);
+    options->values[OPTION_SAVE_BEFORE_IR] = Config_GetSaveBeforeIR(config);
 }
 
 static void ConfigPanelOptions_Exit(ConfigPanelOptions *options) {
@@ -1682,11 +1682,11 @@ static void ConfigPanelOptions_Exit(ConfigPanelOptions *options) {
 
 // Writes the options to the save's
 static void ConfigPanelOptions_Apply(const ConfigPanelOptions *options) {
-    func_02008a1c(options->config, options->values[OPTION_TEXT_SPEED]);
-    func_02008a54(options->config, options->values[OPTION_BATTLE_SCENE]);
-    func_02008a70(options->config, options->values[OPTION_BATTLE_STYLE]);
-    func_02008a38(options->config, options->values[OPTION_SOUND]);
-    func_02008ad0(options->config, options->values[OPTION_SAVE_BEFORE_IR]);
+    Config_SetTextSpeed(options->config, options->values[OPTION_TEXT_SPEED]);
+    Config_SetBattleScene(options->config, options->values[OPTION_BATTLE_SCENE]);
+    Config_SetBattleStyle(options->config, options->values[OPTION_BATTLE_STYLE]);
+    Config_SetSoundFlags(options->config, options->values[OPTION_SOUND]);
+    Config_SetSaveBeforeIR(options->config, options->values[OPTION_SAVE_BEFORE_IR]);
 }
 
 static void ConfigPanelOptions_SetItem(ConfigPanelOptions *options, u32 item) {
@@ -1729,7 +1729,7 @@ static BOOL ConfigPanelOptions_IsSet(const ConfigPanelOptions *options, u32 item
 
 // The wait between characters of the text speed, which ConfigPanelOptions_Apply has already written to the save
 static s32 ConfigPanelOptions_GetTextWait(const ConfigPanelOptions *options) {
-    return func_02017bcc();
+    return TextSpeed_GetCurrentWait();
 }
 
 static u32 ConfigPanelOptions_PopChanged(ConfigPanelOptions *options) {
@@ -1813,7 +1813,7 @@ static void ConfigPanelSeq_Input(ConfigPanelSeq *seq, u32 *state, void *data) {
     ConfigPanelWork *wk = data;
     s32 button;
 
-    if (!func_02021c0c(wk->queue)) {
+    if (!PrintQueue_IsEmpty(wk->queue)) {
         return;
     }
 

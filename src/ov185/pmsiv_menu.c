@@ -524,9 +524,11 @@ static void PMSIVMenu_SetupReturnButton(PMSIVMenu *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_PMS_INPUT);
     ClActorSetup setup;
 
-    wk->returnPalette = func_0204bbb8(arc, func_0202d810(), CLACT_VRAM_MAIN, 0x180, 0, 3, HEAPID_PMS_INPUT);
-    wk->returnChars = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
-    wk->returnCellAnims = func_0204bde0(arc, func_0202d818(1), func_0202d81c(1), HEAPID_PMS_INPUT);
+    wk->returnPalette =
+        func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x180, 0, 3, HEAPID_PMS_INPUT);
+    wk->returnChars = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
+    wk->returnCellAnims = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(1), AppMenuCommon_GetTouchBarAnimFile(1),
+                                        HEAPID_PMS_INPUT);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 232;

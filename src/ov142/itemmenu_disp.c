@@ -297,7 +297,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     G2_BlendNone();
     GFL_BGSysCreate(work->heapId);
     BmpWin_InitAllocator(work->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sItemMenuVRAMConfig);
     ClActSys_Create(&sItemMenuClActSetup, &sItemMenuVRAMConfig, work->heapId);
     {
@@ -308,7 +308,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     ItemMenuDisp_InitBGs();
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     work->cursorImageChars = LoadCursorImageEndOfHeap(3, 13, 0, work->heapId);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
@@ -349,13 +349,15 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     ItemMenuDisp_CreateButtons(work);
 
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), work->heapId);
-    work->typeIconPlt = func_0204bbb8(uiArc, func_0202d7e4(), 1, 0x80, 0, 3, work->heapId);
-    work->typeIconCel = func_0204bde0(uiArc, func_0202d7f8(2), func_0202d7fc(2), work->heapId);
+    work->typeIconPlt = func_0204bbb8(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0x80, 0, 3, work->heapId);
+    work->typeIconCel =
+        func_0204bde0(uiArc, AppMenuCommon_GetTypeIconCellFile(2), AppMenuCommon_GetTypeIconAnimFile(2), work->heapId);
     for (i = 0; i < NELEMS(work->categoryIconChr); i++) {
-        work->categoryIconChr[i] = func_0204b81c(uiArc, func_0202d80c(i), FALSE, 1, work->heapId);
+        work->categoryIconChr[i] =
+            func_0204b81c(uiArc, AppMenuCommon_GetCategoryIconCharFile(i), FALSE, 1, work->heapId);
     }
     for (i = 0; i < NELEMS(work->typeIconChr); i++) {
-        work->typeIconChr[i] = func_0204b81c(uiArc, func_0202d7f4(i), FALSE, 1, work->heapId);
+        work->typeIconChr[i] = func_0204b81c(uiArc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, 1, work->heapId);
     }
     GFL_ArcToolFree(uiArc);
 
@@ -367,7 +369,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     for (i = 0; i < NELEMS(work->categoryIcons); i++) {
         work->categoryIcons[i] = func_0204c040(work->actorUnit, work->categoryIconChr[i], work->typeIconPlt,
                                                work->typeIconCel, &categorySetup, 1, work->heapId);
-        func_0204c378(work->categoryIcons[i], func_0202d800(i), 1);
+        func_0204c378(work->categoryIcons[i], AppMenuCommon_GetCategoryIconPaletteIndex(i), 1);
         func_0204c124(work->categoryIcons[i], FALSE);
         func_0204c5c8(work->categoryIcons[i], FALSE);
     }
@@ -379,7 +381,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     for (i = 0; i < NELEMS(work->typeIcons); i++) {
         work->typeIcons[i] = func_0204c040(work->actorUnit, work->typeIconChr[i], work->typeIconPlt, work->typeIconCel,
                                            &typeSetup, 1, work->heapId);
-        func_0204c378(work->typeIcons[i], func_0202d7e8(i), 1);
+        func_0204c378(work->typeIcons[i], AppMenuCommon_GetTypeIconPaletteIndex(i), 1);
         func_0204c124(work->typeIcons[i], FALSE);
         func_0204c5c8(work->typeIcons[i], FALSE);
     }
@@ -1145,8 +1147,8 @@ void ItemMenuDisp_ShowMessage(ItemMenuWork *work, BOOL stream) {
     GFL_BitmapFill(BmpWin_GetBitmap(window->window), 15);
     BmpWin_FlushChar(window->window);
     if (stream == TRUE) {
-        work->printStream = func_02022268(window->window, 0, 0, work->expandBuf, work->font, func_02017bcc(),
-                                          work->tcbManager, 2, work->heapId, 15);
+        work->printStream = PrintStream_Create(window->window, 0, 0, work->expandBuf, work->font,
+                                               TextSpeed_GetCurrentWait(), work->tcbManager, 2, work->heapId, 15);
     } else {
         ItemMenuDisp_Print(work, window, work->expandBuf, 0, 0, PRINT_COLOR(1, 2, 15));
     }
@@ -1168,12 +1170,12 @@ void ItemMenuDisp_SetItemMenuMessage(ItemMenuWork *work, u32 item) {
 // Whether the message is printed and read
 BOOL ItemMenuDisp_IsMessageDone(ItemMenuWork *work) {
     if (work->printStream != NULL) {
-        u32 state = func_020223b4(work->printStream);
+        u32 state = PrintStream_GetState(work->printStream);
 
         KeyCursor_Update(work->keyCursor, work->printStream, work->msgWindow.window);
         switch (state) {
         case PRINT_STREAM_DONE:
-            func_020223cc(work->printStream);
+            PrintStream_Delete(work->printStream);
             work->printStream = NULL;
             work->streamResumed = FALSE;
             break;
@@ -1181,13 +1183,13 @@ BOOL ItemMenuDisp_IsMessageDone(ItemMenuWork *work) {
             if (work->streamResumed == FALSE &&
                 ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(work->printStream);
+                PrintStream_Continue(work->printStream);
                 work->streamResumed = TRUE;
             }
             break;
         case PRINT_STREAM_RUNNING:
             if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-                func_020223e0(work->printStream, 0);
+                PrintStream_SkipWait(work->printStream, 0);
             }
             work->streamResumed = FALSE;
             break;
@@ -1492,7 +1494,7 @@ static void ItemMenuDisp_TransferScreen(PrintWindow *window) {
 
 // Prints the queue's text and sends the windows that are done to VRAM
 void ItemMenuDisp_FlushWindows(ItemMenuWork *work) {
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     PrintWindow_Flush(&work->tmInfoWindow, work->printQueue);
     PrintWindow_Flush(&work->pocketLabelWindow, work->printQueue);
     PrintWindow_Flush(&work->itemNameWindow, work->printQueue);

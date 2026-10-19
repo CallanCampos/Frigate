@@ -326,7 +326,7 @@ static const Box2YesNoFuncs sYesNoFuncs[] = {
 // clang-format on
 
 BOOL Box2Seq_Main(Box2SysWork *syswk, u32 *seq) {
-    if (syswk->app == NULL || syswk->app->printQueue == NULL || func_02021c0c(syswk->app->printQueue) != FALSE) {
+    if (syswk->app == NULL || syswk->app->printQueue == NULL || PrintQueue_IsEmpty(syswk->app->printQueue) != FALSE) {
         if (syswk->app != NULL) {
             func_ov255_021ced6c(syswk);
         }
@@ -535,7 +535,7 @@ static int Box2Seq_Start(Box2SysWork *syswk) {
 }
 
 static int Box2Seq_StartWait(Box2SysWork *syswk) {
-    if (func_02021c0c(syswk->app->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(syswk->app->printQueue) == FALSE) {
         return BOX2SEQ_START_WAIT;
     }
     return func_ov255_021cbe68(syswk, syswk->app->msgNextSeq);

@@ -500,7 +500,7 @@ static void LocalTvtFace_Update(LocalTvtFace *face) {
     {
         PrintQueue *queue = LocalTvtMessage_GetPrintQueue(face->chara->setup.message);
 
-        if (face->namePending == TRUE && func_02021c0c(queue) == TRUE) {
+        if (face->namePending == TRUE && PrintQueue_IsEmpty(queue) == TRUE) {
             BmpWin_FlushChar(face->nameWindow);
             face->namePending = FALSE;
         }
@@ -643,16 +643,16 @@ static void LocalTvtFace_CreateName(LocalTvtFace *face, LocalTvtChara *chara, He
     }
     face->nameWidth = GFL_FontGetBlockWidth(name, font, 0);
     // The outline, then the name
-    func_02021c7c(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2 + 1, 1, name, font,
-                  PRINT_COLOR(15, 0, 0));
-    func_02021c7c(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2 - 1, 1, name, font,
-                  PRINT_COLOR(15, 0, 0));
-    func_02021c7c(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2, 2, name, font,
-                  PRINT_COLOR(15, 0, 0));
-    func_02021c7c(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2, 0, name, font,
-                  PRINT_COLOR(15, 0, 0));
-    func_02021c7c(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2, 1, name, font,
-                  PRINT_COLOR(1, 0, 0));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2 + 1, 1, name, font,
+                          PRINT_COLOR(15, 0, 0));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2 - 1, 1, name, font,
+                          PRINT_COLOR(15, 0, 0));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2, 2, name, font,
+                          PRINT_COLOR(15, 0, 0));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2, 0, name, font,
+                          PRINT_COLOR(15, 0, 0));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(face->nameWindow), (96 - face->nameWidth) / 2, 1, name, font,
+                          PRINT_COLOR(1, 0, 0));
     GFL_StrBufFree(name);
     face->namePending = TRUE;
 }

@@ -105,8 +105,8 @@ int func_ov012_02165320(u8 question) {
 }
 
 u16 func_ov012_02165330(SaveControl *save) {
-    void *survey = func_0200ec2c(save);
-    u16 question = func_0200ca7c(getTrainerCardData_wrapper(save));
+    void *survey = SurveySave_Get(save);
+    u16 question = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     u8 type = func_ov012_021652cc(question);
 
     if (type == 0) {
@@ -131,7 +131,7 @@ BOOL func_ov012_0216538c(GameData *gameData) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     TrainerCardSave *info = getTrainerCardData_wrapper(save);
     EventWork *eventWork = GameData_GetEventWork(gameData);
-    u16 question = func_0200ca7c(info);
+    u16 question = TrainerGameInfo_GetSurveyQuestion(info);
 
     if (question == 0) {
         return FALSE;
@@ -146,7 +146,7 @@ BOOL func_ov012_0216538c(GameData *gameData) {
 }
 
 u16 func_ov012_021653d8(SaveControl *save, u8 question) {
-    void *survey = func_0200ec2c(save);
+    void *survey = SurveySave_Get(save);
     u8 type;
 
     getTrainerCardData_wrapper(save);
@@ -172,7 +172,7 @@ u16 detectLengthSinceLastSession(SaveControl *save) {
     RTCDate date;
     RTCTime time;
 
-    if (func_0200ca7c(info) == 0) {
+    if (TrainerGameInfo_GetSurveyQuestion(info) == 0) {
         return 0;
     }
     start = getSecondsFromTrainerCardData(info);
@@ -184,7 +184,7 @@ u16 detectLengthSinceLastSession(SaveControl *save) {
 }
 
 u32 func_ov012_02165480(void *survey, u8 answer) {
-    u32 count = func_0200ecf0(survey, answer) + func_0200ed14(survey, answer);
+    u32 count = SurveySave_GetTodayCount(survey, answer) + SurveySave_GetTotalCount(survey, answer);
 
     if (count > SURVEY_COUNT_MAX) {
         count = SURVEY_COUNT_MAX;
@@ -213,8 +213,8 @@ static BOOL func_ov012_021654e8(SaveControl *save) {
     u16 question;
     int hours;
 
-    func_0200ec2c(save);
-    question = func_0200ca7c(getTrainerCardData_wrapper(save));
+    SurveySave_Get(save);
+    question = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     hours = detectLengthSinceLastSession(save);
     if (func_ov012_02165320(question) > hours) {
         return FALSE;
@@ -224,11 +224,11 @@ static BOOL func_ov012_021654e8(SaveControl *save) {
 
 static BOOL func_ov012_02165518(SaveControl *save) {
     TrainerCardSave *info = getTrainerCardData_wrapper(save);
-    u8 count = func_ov012_021652dc(func_0200ca7c(info));
+    u8 count = func_ov012_021652dc(TrainerGameInfo_GetSurveyQuestion(info));
     int i;
 
     for (i = 0; i < count; i++) {
-        if (!func_0200ca9c(info, i)) {
+        if (!TrainerGameInfo_GetSurveyCount(info, i)) {
             return FALSE;
         }
     }

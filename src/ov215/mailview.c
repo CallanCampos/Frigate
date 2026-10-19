@@ -115,7 +115,7 @@ BOOL MailView_Unload(MailSysWork *work) {
 }
 
 static void MailView_CreatePMSDraw(MailSysWork *work) {
-    work->pmsQueue = func_02021998(work->heapId);
+    work->pmsQueue = PrintQueue_CreateDefault(work->heapId);
     work->pmsClUnit = func_0204bf1c(8, 1, work->heapId);
     work->pmsDraw = PMSDraw_Create(work->pmsClUnit, 0, work->pmsQueue, work->font, 0, 4, work->heapId);
     PMSDraw_SetBackColor(work->pmsDraw, 0);
@@ -123,7 +123,7 @@ static void MailView_CreatePMSDraw(MailSysWork *work) {
 
 static void MailView_DeletePMSDraw(MailSysWork *work) {
     PMSDraw_Delete(work->pmsDraw);
-    func_02021a18(work->pmsQueue);
+    PrintQueue_Free(work->pmsQueue);
     work->pmsQueue = NULL;
     func_0204bf98(work->pmsClUnit);
 }
@@ -198,7 +198,7 @@ static void MailView_LoadGraphics(MailSysWork *work) {
     PaletteFade_LoadNCLR(work->palFade, ARCID_FONT, 5, work->heapId, 0, 0x20, 0x50);
     PaletteFade_LoadNCLR(work->palFade, ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(0), work->heapId, 0, 0x20, 0x40);
     PaletteFade_LoadNCLR(work->palFade, ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(1), work->heapId, 0, 0x20, 0x60);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_ArcToolFree(arc);
     GFL_BGSysFillScrArea(4, 0x2001, 0, 0, 32, 32, 0x11);
     GFL_BGSysQueueScrLoad(4);
@@ -240,7 +240,7 @@ static void MailView_CreateWindows(MailSysWork *work) {
         work->entries[i].win = work->windows[i];
         work->entries[i].drawn = FALSE;
     }
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     for (i = 0; i < 7; i++) {
         GFL_BitmapFill(BmpWin_GetBitmap(work->windows[i]), 0);
         if (i < 5) {
@@ -271,7 +271,7 @@ static void MailView_DeleteWindows(MailSysWork *work) {
         GFL_StrBufFree(work->buttonItems[0].str);
         GFL_StrBufFree(work->buttonItems[1].str);
     }
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     work->printQueue = NULL;
     for (i = 0; i < 7; i++) {
         BmpWin_ClearScreenNow(work->windows[i]);
@@ -297,8 +297,8 @@ static void MailView_PrintMail(MailSysWork *work) {
     if (work->phase == MAIL_PHASE_VIEW) {
         PrintQueue *queue = work->printQueue;
 
-        func_02021c7c(queue, BmpWin_GetBitmap(work->entries[5].win), 0, 2, work->edit->name, work->font,
-                      PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(queue, BmpWin_GetBitmap(work->entries[5].win), 0, 2, work->edit->name, work->font,
+                              PRINT_COLOR(1, 2, 0));
         work->entries[5].drawn = TRUE;
         BmpWin_TransferNow(work->windows[5]);
     }

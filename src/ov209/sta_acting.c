@@ -394,10 +394,10 @@ StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
 
 void StaActing_Term(StaActing *stage) {
     if (stage->bgmPlaying == TRUE) {
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
     }
     if (stage->seqPlaying == TRUE) {
-        func_02006574();
+        GFL_SndBGMStopSeq();
     }
     if (stage->strmPlaying == TRUE) {
         func_02006588();
@@ -411,8 +411,8 @@ void StaActing_Term(StaActing *stage) {
     if (stage->msgStr != NULL) {
         GFL_StrBufFree(stage->msgStr);
     }
-    func_02021c44(stage->printQueue);
-    func_02021a18(stage->printQueue);
+    PrintQueue_Clear(stage->printQueue);
+    PrintQueue_Free(stage->printQueue);
     GFL_MsgDataFree(stage->msgData);
     BmpWin_Free(stage->msgWin);
     GFL_FontFree(stage->font);
@@ -824,18 +824,18 @@ static void StaActing_InitMessage(StaActing *stage) {
     stage->printStream = NULL;
     stage->msgStr = NULL;
     stage->printing = FALSE;
-    stage->printQueue = func_02021998(stage->heapId);
+    stage->printQueue = PrintQueue_CreateDefault(stage->heapId);
 }
 
 static void StaActing_UpdateMessage(StaActing *stage) {
     GFL_TCBExMgrUpdate(stage->tcbExMgr);
-    if (stage->printStream != NULL && func_020223b4(stage->printStream) == 2) {
-        func_020223cc(stage->printStream);
+    if (stage->printStream != NULL && PrintStream_GetState(stage->printStream) == 2) {
+        PrintStream_Delete(stage->printStream);
         stage->printStream = NULL;
     }
     if (stage->printing == TRUE) {
-        func_02021a3c(stage->printQueue);
-        if (func_02021c0c(stage->printQueue) == TRUE) {
+        PrintQueue_Main(stage->printQueue);
+        if (PrintQueue_IsEmpty(stage->printQueue) == TRUE) {
             BmpWin_FlushChar(stage->msgWin);
             stage->printing = FALSE;
         }
@@ -844,7 +844,7 @@ static void StaActing_UpdateMessage(StaActing *stage) {
 
 void StaActing_PrintMessage(StaActing *stage, u16 msgId, u32 wait) {
     if (stage->printStream != NULL) {
-        func_020223cc(stage->printStream);
+        PrintStream_Delete(stage->printStream);
         stage->printStream = NULL;
     }
     if (stage->msgStr != NULL) {
@@ -854,10 +854,10 @@ void StaActing_PrintMessage(StaActing *stage, u16 msgId, u32 wait) {
     GFL_BitmapFill(BmpWin_GetBitmap(stage->msgWin), 0);
     stage->msgStr = GFL_MsgDataLoadStrbufNew(stage->msgData, msgId);
     if (wait != 0xff) {
-        stage->printStream =
-            func_02022268(stage->msgWin, 0, 0, stage->msgStr, stage->font, wait, stage->tcbExMgr, 2, stage->heapId, 0);
+        stage->printStream = PrintStream_Create(stage->msgWin, 0, 0, stage->msgStr, stage->font, wait, stage->tcbExMgr,
+                                                2, stage->heapId, 0);
     } else {
-        func_02021c54(stage->printQueue, BmpWin_GetBitmap(stage->msgWin), 0, 0, stage->msgStr, stage->font);
+        PrintQueue_Print(stage->printQueue, BmpWin_GetBitmap(stage->msgWin), 0, 0, stage->msgStr, stage->font);
         stage->printing = TRUE;
         GFL_StrBufFree(stage->msgStr);
         stage->msgStr = NULL;
@@ -866,7 +866,7 @@ void StaActing_PrintMessage(StaActing *stage, u16 msgId, u32 wait) {
 
 void StaActing_ClearMessage(StaActing *stage) {
     if (stage->printStream != NULL) {
-        func_020223cc(stage->printStream);
+        PrintStream_Delete(stage->printStream);
         stage->printStream = NULL;
     }
     if (stage->msgStr != NULL) {
@@ -949,17 +949,17 @@ static void StaActing_UpdateRanks(StaActing *stage) {
 
 void StaActing_PlayStrm(StaActing *stage, u16 seq) {
     stage->strmPlaying = TRUE;
-    func_020064b8(stage->sound[0], stage->sound[1], seq);
+    GFL_SndBGMSetLoadedData(stage->sound[0], stage->sound[1], seq);
 }
 
 void StaActing_PlaySeq(StaActing *stage, u16 seq) {
     stage->seqPlaying = TRUE;
-    func_02006564(seq);
+    GFL_SndBGMStartSeq(seq);
 }
 
 void StaActing_StopSeq(StaActing *stage) {
     stage->seqPlaying = FALSE;
-    func_02006574();
+    GFL_SndBGMStopSeq();
 }
 
 void StaActing_PlayWave(StaActing *stage, u16 waveArc, u16 a2, u16 a3) {
@@ -973,7 +973,7 @@ void StaActing_PlayBgm(StaActing *stage, u32 bgm) {
 
 void StaActing_StopBgm(StaActing *stage) {
     stage->bgmPlaying = FALSE;
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
 }
 
 void StaActing_PlayApplause(StaActing *stage) {

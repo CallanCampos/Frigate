@@ -10,7 +10,7 @@
 #include "system/game_data.h"
 
 RivalEntry *func_ov073_021e8be0(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     return &entries[func_ov073_021e8d00(context, id)];
 }
 
@@ -19,7 +19,7 @@ void func_ov073_021e8bfc(RivalSelectContext *context, u32 id) {
     int i;
     u8 current = func_ov073_021e8d00(context, id);
     u8 count = 0;
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     u8 choice;
 
     if (current == 10) {
@@ -61,7 +61,7 @@ BOOL func_ov073_021e8c64(RivalSelectContext *context) {
 }
 
 BOOL func_ov073_021e8cac(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id && entries[i].selected == 1 && entries[i].active != 0) {
@@ -72,7 +72,7 @@ BOOL func_ov073_021e8cac(RivalSelectContext *context, u32 id) {
 }
 
 void func_ov073_021e8cdc(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {
@@ -82,7 +82,7 @@ void func_ov073_021e8cdc(RivalSelectContext *context, u32 id) {
 }
 
 u8 func_ov073_021e8d00(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {

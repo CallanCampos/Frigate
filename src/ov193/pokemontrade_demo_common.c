@@ -221,7 +221,7 @@ static void PokemonTradeDemoCommon_StateSetUpMoves(PokemonTradeWork *wk) {
     TradeMcssMove_Free(wk->mcssMoves[1]);
     wk->mcssMoves[1] = TradeMcssMove_Create(wk->mcss[1], PokemonTradeDemo_Frames(84), &second, wk->heapId);
     MCSS_SetAnimationEndCallback(wk->mcss[0], (u32)wk, (MCSSAnimationCallback)func_ov194_021beab4, TRUE);
-    func_0201ae2c(wk->mcss[1], 0, 16, (s8)(PokemonTradeDemo_Frames(14) / 16), 0);
+    MCSS_StartFade(wk->mcss[1], 0, 16, (s8)(PokemonTradeDemo_Frames(14) / 16), 0);
     func_ov194_021bfe70(wk);
     GFL_BGSysResetStdPalette(1, 0);
     GFL_BGSysResetStdPalette(5, 0);

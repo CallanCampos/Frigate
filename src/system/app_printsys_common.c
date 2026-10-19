@@ -21,13 +21,13 @@ void AppPrintsysCommon_Init(AppPrintsysCommon *work, u32 flags) {
 
 BOOL AppPrintsysCommon_Update(AppPrintsysCommon *work, PrintStream *stream) {
     if (stream != NULL) {
-        switch (func_020223b4(stream)) {
+        switch (PrintStream_GetState(stream)) {
         case PRINT_STREAM_DONE:
             return TRUE;
         case PRINT_STREAM_PAUSED:
             if (AppPrintsysCommon_IsPressed(work->flags)) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(stream);
+                PrintStream_Continue(stream);
             }
             break;
         case PRINT_STREAM_RUNNING:
@@ -38,7 +38,7 @@ BOOL AppPrintsysCommon_Update(AppPrintsysCommon *work, PrintStream *stream) {
                         work->released = TRUE;
                     }
                 } else if (AppPrintsysCommon_IsHeld(work->flags)) {
-                    func_020223e0(stream, 0);
+                    PrintStream_SkipWait(stream, 0);
                 }
             }
             break;

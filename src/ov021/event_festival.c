@@ -127,5 +127,5 @@ void func_ov021_0216e848(FestivalEventParam *param, GameSystem *gsys, GameData *
     param->mode = mode;
     param->festival = GSYS_GetLinkFestival(gsys);
     param->missionConfig = GetFestMissionCfg(param->festival);
-    param->saveBlock = func_02010dec(save);
+    param->saveBlock = FestRecords_GetFromSave(save);
 }

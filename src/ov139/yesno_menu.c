@@ -160,18 +160,20 @@ void TwoChoiceMenu_Open(TwoChoiceMenu *menu, StrBuf *first, StrBuf *second) {
     GFL_BitmapFill(BmpWin_GetBitmap(menu->secondWindow), 0);
     width = GFL_FontGetBlockWidth(first, menu->font, 0);
     x = (256 - width) / 2;
-    func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->firstWindow), x, 16, first, menu->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(menu->queue, BmpWin_GetBitmap(menu->firstWindow), x, 16, first, menu->font,
+                          PRINT_COLOR(15, 2, 0));
     width = GFL_FontGetBlockWidth(second, menu->font, 0);
     x = (256 - width) / 2;
-    func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->secondWindow), x, 16, second, menu->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(menu->queue, BmpWin_GetBitmap(menu->secondWindow), x, 16, second, menu->font,
+                          PRINT_COLOR(15, 2, 0));
     menu->firstSent = FALSE;
     menu->secondSent = FALSE;
     GFL_BGSysSetBGEnabled(menu->textBg, TRUE);
-    if (!menu->firstSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
+    if (!menu->firstSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
         BmpWin_Transfer(menu->firstWindow);
         menu->firstSent = TRUE;
     }
-    if (!menu->secondSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
+    if (!menu->secondSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
         BmpWin_Transfer(menu->secondWindow);
         menu->secondSent = TRUE;
     }
@@ -316,11 +318,11 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
     }
 
     if (menu->state != TWO_CHOICE_MENU_STATE_CLOSED) {
-        if (!menu->firstSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
+        if (!menu->firstSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
             BmpWin_Transfer(menu->firstWindow);
             menu->firstSent = TRUE;
         }
-        if (!menu->secondSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
+        if (!menu->secondSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
             BmpWin_Transfer(menu->secondWindow);
             menu->secondSent = TRUE;
         }

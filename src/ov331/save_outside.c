@@ -144,10 +144,10 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
     work->keysLoaded = FALSE;
     work->keysBroken = FALSE;
     if (loaded[BLOCK_KEYS] == FALSE) {
-        func_02010448(work->keys.data);
+        KeySystemData_Init(work->keys.data);
     } else if (broken[BLOCK_KEYS] == TRUE) {
         work->keysBroken = TRUE;
-        func_02010448(work->keys.data);
+        KeySystemData_Init(work->keys.data);
     } else {
         work->keysLoaded = TRUE;
     }
@@ -279,7 +279,7 @@ void *SaveOutside_GetKeyData(SaveOutside *work) {
 }
 
 void SaveOutside_CopyKeysToSave(SaveOutside *work, SaveControl *save) {
-    KeyInfoSave *keyInfo = func_0201046c(SaveOutside_GetKeyData(work));
+    KeyInfoSave *keyInfo = KeySystemData_GetKeyInfo(SaveOutside_GetKeyData(work));
 
-    func_02010490(getKeyInfoSaveBlk(save), keyInfo);
+    KeyInfoSave_Copy(getKeyInfoSaveBlk(save), keyInfo);
 }

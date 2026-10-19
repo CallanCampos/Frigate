@@ -129,7 +129,7 @@ void func_ov072_021e8ddc(FesGimmick *gimmick, u16 *count, u16 *answer, u16 *answ
     u8 j;
 
     MI_CpuFill8(quiz, 0, sizeof(FesMissionQuiz));
-    quiz->count = func_020145d8(gimmick->festival);
+    quiz->count = LinkFestival_GetScore(gimmick->festival);
     if (quiz->count < 3) {
         quiz->count = 3;
     } else if (quiz->count > 10) {

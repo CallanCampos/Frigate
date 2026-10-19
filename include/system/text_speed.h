@@ -9,8 +9,8 @@
 // Sets the save control whose options give the text speed
 void saveMainSaveAreaAddress(SaveControl *save);
 // Returns the wait between characters for the text speed in the save data, or for a text speed from 0 to 4
-s32 func_02017bcc(void);
-s32 func_02017c50(u32 speed);
+s32 TextSpeed_GetCurrentWait(void);
+s32 TextSpeed_GetWait(u32 speed);
 // The waits of the two faster speeds
 s32 func_02017bf0(void);
 s32 func_02017c20(void);

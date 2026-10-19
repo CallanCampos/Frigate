@@ -25,22 +25,22 @@ struct PlayTime {
 };
 
 PlayTime *setupPlaytimeCounters(HeapID heapId);
-void func_02008c40(PlayTime *time);
+void PlayTime_Init(PlayTime *time);
 // Adds seconds to the play time, which stops at PLAYTIME_MAX_HOURS:59:59
 void updateGameTime(PlayTime *time, u32 addSeconds);
-void func_02008cdc(PlayTime *dest, const PlayTime *src);
-u16 func_02008cec(PlayTime *time);
-u8 func_02008cf0(PlayTime *time);
-u8 func_02008cf4(PlayTime *time);
+void PlayTime_Copy(PlayTime *dest, const PlayTime *src);
+u16 PlayTime_GetHours(PlayTime *time);
+u8 PlayTime_GetMinutes(PlayTime *time);
+u8 PlayTime_GetSeconds(PlayTime *time);
 // Sets the date and time of the last save to now
-void func_02008cf8(PlayTime *time);
-u32 func_02008d68(PlayTime *time);
-u32 func_02008d70(PlayTime *time);
-u32 func_02008d78(PlayTime *time);
-u32 func_02008d80(PlayTime *time);
-u32 func_02008d88(PlayTime *time);
+void PlayTime_SetLastSavedToNow(PlayTime *time);
+u32 PlayTime_GetLastSavedYear(PlayTime *time);
+u32 PlayTime_GetLastSavedMonth(PlayTime *time);
+u32 PlayTime_GetLastSavedDay(PlayTime *time);
+u32 PlayTime_GetLastSavedHour(PlayTime *time);
+u32 PlayTime_GetLastSavedMinute(PlayTime *time);
 // Copy the word with the date and time of the last save out and back
-void func_02008d90(PlayTime *time, u32 *copy);
-void func_02008d98(PlayTime *time, u32 *copy);
+void PlayTime_GetLastSaved(PlayTime *time, u32 *copy);
+void PlayTime_SetLastSaved(PlayTime *time, u32 *copy);
 
 #endif // POKEBW2_SAVE_PLAYTIME_H

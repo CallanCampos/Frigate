@@ -519,7 +519,7 @@ static BOOL PselProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         return TRUE;
     }
     if (*seq >= PSEL_SEQ_LOAD && *seq <= PSEL_SEQ_UNLOAD) {
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
         PselText_Update(wk);
         PselGraphic_Update(wk->graphic);
         PselGraphic_Begin3D(wk->graphic);
@@ -1277,7 +1277,7 @@ static void PselText_Free(PselWork *wk) {
     u8 i;
 
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     if (wk->strbuf != NULL) {
         GFL_StrBufFree(wk->strbuf);
@@ -1301,7 +1301,7 @@ static BOOL PselText_Flush(PselWork *wk) {
 
     for (i = 0; i < 3; i++) {
         if (!wk->winDone[i]) {
-            if (func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->win[i]))) {
+            if (PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->win[i]))) {
                 done = FALSE;
             } else {
                 BmpWin_Transfer(wk->win[i]);
@@ -1324,7 +1324,7 @@ static void PselText_StartStream(PselWork *wk, u32 messageId) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(win), 0);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     if (wk->strbuf != NULL) {
         GFL_StrBufFree(wk->strbuf);
@@ -1340,7 +1340,8 @@ static void PselText_StartStream(PselWork *wk, u32 messageId) {
     if (winHeight > height) {
         y = (winHeight - height) / 2;
     }
-    wk->stream = func_02022268(win, x, y, wk->strbuf, wk->font, func_02017bcc(), wk->tcbMgr, 2, wk->heapId, 0);
+    wk->stream =
+        PrintStream_Create(win, x, y, wk->strbuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2, wk->heapId, 0);
     BmpWin_Transfer(win);
 }
 
@@ -1348,10 +1349,10 @@ static void PselText_StartStream(PselWork *wk, u32 messageId) {
 static BOOL PselText_UpdateStream(PselWork *wk) {
     BOOL done = FALSE;
 
-    switch (func_020223b4(wk->stream)) {
+    switch (PrintStream_GetState(wk->stream)) {
     case 0:
         if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(wk->stream, 0);
+            PrintStream_SkipWait(wk->stream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                 wk->touchMode = FALSE;
             } else {
@@ -1361,7 +1362,7 @@ static BOOL PselText_UpdateStream(PselWork *wk) {
         break;
     case 1:
         if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-            func_020223bc(wk->stream);
+            PrintStream_Continue(wk->stream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                 wk->touchMode = FALSE;
             } else {
@@ -1380,7 +1381,7 @@ static void PselText_ClearStream(PselWork *wk) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->win[1]), 0);
     BmpWin_Transfer(wk->win[1]);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     wk->stream = NULL;
     if (wk->strbuf != NULL) {
@@ -1416,7 +1417,7 @@ static void PselText_PrintType(PselWork *wk, s32 ball) {
     if (winHeight > height) {
         y = (winHeight - height) / 2;
     }
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(win), 0, y, str, wk->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(win), 0, y, str, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(str);
     *done = FALSE;
     PselText_Flush(wk);
@@ -1705,7 +1706,7 @@ static s32 PselSeq_Start(PselWork *wk, s32 *step) {
 static s32 PselSeq_Init(PselWork *wk, s32 *step) {
     wk->graphic = PselGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(0, 2);
     GFL_BGSysSetBGPriority(3, 3);
     GFL_BGSysSetBGPriority(1, 1);
@@ -2049,8 +2050,8 @@ static s32 PselSeq_Free(PselWork *wk, s32 *step) {
     PselBand_Free(wk);
     Psel3D_Free(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     PselGraphic_Free(wk->graphic);
     return PSEL_SEQ_END;

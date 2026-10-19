@@ -191,7 +191,7 @@ static BOOL BrBvSearch_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     MI_CpuFill8(p_wk, 0, sizeof(BrBvSearchWork));
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
     p_wk->text = BrText_Init(p_param->res, p_wk->que, p_wk->heapId);
     BrText_Print(p_wk->text, p_param->res, 0x6b);
@@ -221,7 +221,7 @@ static BOOL BrBvSearch_ProcExit(GameProc *proc, u32 *state, void *param, void *w
     }
     BrText_Exit(p_wk->text, p_param->res);
     BmpOam_Exit(p_wk->bmpoam);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }
@@ -328,7 +328,7 @@ static BOOL BrBvSearch_ProcMain(GameProc *proc, u32 *state, void *param, void *w
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }

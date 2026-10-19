@@ -370,21 +370,21 @@ u8 func_02016b2c(GameSystem *gsys) {
     return gsys->unk36;
 }
 
-u32 func_02016b34(GameSystem *gsys) {
-    return func_02017614(gsys->gameData);
+u32 GSYS_IsCGearOn(GameSystem *gsys) {
+    return GameData_IsCGearOn(gsys->gameData);
 }
 
-void func_02016b40(GameSystem *gsys, u32 value) {
-    func_0201762c(gsys->gameData, value);
+void GSYS_SetCGearOn(GameSystem *gsys, u32 value) {
+    GameData_SetCGearOn(gsys->gameData, value);
 }
 
 static BOOL GSYS_CanBootGameComm(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
     u16 zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
 
-    if (gsys->unk36 == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() && func_02016b34(gsys) == TRUE &&
+    if (gsys->unk36 == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() && GSYS_IsCGearOn(gsys) == TRUE &&
         func_ov012_021535dc(gsys) == TRUE && !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE) &&
-        func_020098c0(func_02009924(gsys->gameData))) {
+        CGearSettings_IsOn(CGearSettings_GetFromGameData(gsys->gameData))) {
         return TRUE;
     }
     return FALSE;
@@ -412,9 +412,9 @@ void func_02016bf8(GameSystem *gsys) {
 static void GSYS_UICallback(void *work) {
     GameSystem *gsys = work;
 
-    if (func_02016b34(gsys)) {
-        func_02016b40(gsys, FALSE);
-        func_0201740c(GSYS_GetGameData(gsys), 0);
+    if (GSYS_IsCGearOn(gsys)) {
+        GSYS_SetCGearOn(gsys, FALSE);
+        GameData_SetCGearPowerRequest(GSYS_GetGameData(gsys), 0);
         gsys->unk37_0 = TRUE;
     }
 }
@@ -440,7 +440,7 @@ static BOOL GSYS_SleepCheckCallback(void *work) {
     if (GetIsShouldUICallback()) {
         return FALSE;
     }
-    if (func_02016b34(gsys)) {
+    if (GSYS_IsCGearOn(gsys)) {
         return TRUE;
     }
     return FALSE;

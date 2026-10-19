@@ -223,9 +223,12 @@ static void ZknListObj_LoadResources(ZknListWork *wk) {
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    wk->charRes[CHAR_RES_TOUCHBAR] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
-    wk->paletteRes[RES_TOUCHBAR] = func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, 7 * 0x20, HEAPID_ZUKAN_LIST);
-    wk->cellRes[RES_TOUCHBAR] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), HEAPID_ZUKAN_LIST);
+    wk->charRes[CHAR_RES_TOUCHBAR] =
+        func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
+    wk->paletteRes[RES_TOUCHBAR] =
+        func_0204bba0(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 7 * 0x20, HEAPID_ZUKAN_LIST);
+    wk->cellRes[RES_TOUCHBAR] = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                              AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_ZUKAN_LIST);
     GFL_ArcToolFree(arc);
 }
 
@@ -307,7 +310,7 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
         ZknListObj_SetAnmSeq(wk, ZKNLIST_OBJ_NATIONAL, 14);
         ZknListObj_EndAnm(wk, ZKNLIST_OBJ_NATIONAL);
     } else if (national == TRUE && habitat == TRUE) {
-        if (func_0200d1f8(wk->param->pokedex) != 1) {
+        if (PokeDex_GetMode(wk->param->pokedex) != 1) {
             ZknListObj_SetAnmSeq(wk, ZKNLIST_OBJ_UNOVA, 14);
             ZknListObj_EndAnm(wk, ZKNLIST_OBJ_UNOVA);
         } else {
@@ -386,7 +389,8 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
     } else {
         u32 personality;
 
-        func_0200d3c8(wk->param->pokedex, species, &sex, &rare, &form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
+        PokeDex_GetShownSexRareForm(wk->param->pokedex, species, &sex, &rare, &form,
+                                    HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         arc = MakePokeGraArcHandle(HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         if (species == SPECIES_SPINDA) {
             personality = func_0200da18(wk->param->pokedex, 0);
@@ -499,7 +503,7 @@ void ZknListObj_PutIcon(ZknListWork *wk, u16 species, s16 y, BOOL touchScreen) {
     u32 sex, form, rare;
     u32 id;
 
-    func_0200d3c8(wk->param->pokedex, species, &sex, &rare, &form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
+    PokeDex_GetShownSexRareForm(wk->param->pokedex, species, &sex, &rare, &form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
     id = ZknListObj_FindFreeIcon(wk, touchScreen);
     ZknListObj_LoadIcon(wk, id, species, form, sex, touchScreen);
     ZknListObj_SetVisible(wk, id, TRUE);

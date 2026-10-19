@@ -313,7 +313,7 @@ static void ManualTouchBar_CreateWindows(ManualTouchBar *bar) {
 static void ManualTouchBar_FreeWindows(ManualTouchBar *bar) {
     u8 i;
 
-    func_02021c44(bar->common->touchBarQueue);
+    PrintQueue_Clear(bar->common->touchBarQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         bar->printing[i] = FALSE;
         BmpWin_Free(bar->windows[i]);
@@ -326,7 +326,7 @@ static void ManualTouchBar_UpdateWindows(ManualTouchBar *bar) {
 
     for (i = 0; i < WINDOW_COUNT; i++) {
         if (bar->printing[i]) {
-            if (!func_02021c1c(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[i]))) {
+            if (!PrintQueue_IsBitmapPending(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[i]))) {
                 BmpWin *window = bar->windows[i];
 
                 BmpWin_FlushChar(window);
@@ -339,7 +339,7 @@ static void ManualTouchBar_UpdateWindows(ManualTouchBar *bar) {
 }
 
 static void ManualTouchBar_ClearText(ManualTouchBar *bar) {
-    func_02021c44(bar->common->touchBarQueue);
+    PrintQueue_Clear(bar->common->touchBarQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]), 0);
     BmpWin_FlushChar(bar->windows[WINDOW_TEXT]);
     bar->printing[WINDOW_TEXT] = FALSE;
@@ -348,11 +348,11 @@ static void ManualTouchBar_ClearText(ManualTouchBar *bar) {
 static void ManualTouchBar_PrintCategoryPrompt(ManualTouchBar *bar) {
     StrBuf *str;
 
-    func_02021c44(bar->common->touchBarQueue);
+    PrintQueue_Clear(bar->common->touchBarQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]), 0);
     str = GFL_MsgDataLoadStrbufNew(bar->common->msgSystem, Title7_Text_PleaseSelectCategory);
-    func_02021c7c(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]),
-                  sManualTouchBarTextX[MANUAL_TOUCHBAR_MODE_CATEGORY], 4, str, bar->common->font, TEXT_COLOR);
+    PrintQueue_PrintColor(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]),
+                          sManualTouchBarTextX[MANUAL_TOUCHBAR_MODE_CATEGORY], 4, str, bar->common->font, TEXT_COLOR);
     GFL_StrBufFree(str);
     bar->printing[WINDOW_TEXT] = TRUE;
     ManualTouchBar_UpdateWindows(bar);
@@ -361,11 +361,11 @@ static void ManualTouchBar_PrintCategoryPrompt(ManualTouchBar *bar) {
 static void ManualTouchBar_PrintTitlePrompt(ManualTouchBar *bar) {
     StrBuf *str;
 
-    func_02021c44(bar->common->touchBarQueue);
+    PrintQueue_Clear(bar->common->touchBarQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]), 0);
     str = GFL_MsgDataLoadStrbufNew(bar->common->msgSystem, Title7_Text_PleaseSelectWhatWant);
-    func_02021c7c(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]),
-                  sManualTouchBarTextX[MANUAL_TOUCHBAR_MODE_TITLE], 4, str, bar->common->font, TEXT_COLOR);
+    PrintQueue_PrintColor(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]),
+                          sManualTouchBarTextX[MANUAL_TOUCHBAR_MODE_TITLE], 4, str, bar->common->font, TEXT_COLOR);
     GFL_StrBufFree(str);
     bar->printing[WINDOW_TEXT] = TRUE;
     ManualTouchBar_UpdateWindows(bar);
@@ -376,7 +376,7 @@ static void ManualTouchBar_PrintPage(ManualTouchBar *bar) {
     StrBuf *format;
     StrBuf *str;
 
-    func_02021c44(bar->common->touchBarQueue);
+    PrintQueue_Clear(bar->common->touchBarQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]), 0);
     wordSet = GFL_WordSetSystemCreateDefault(bar->common->heapId);
     format = GFL_MsgDataLoadStrbufNew(bar->common->msgSystem, Title7_Text_Empty);
@@ -384,8 +384,8 @@ static void ManualTouchBar_PrintPage(ManualTouchBar *bar) {
     WordSetNumber(wordSet, 0, bar->page + 1, 1, 0, TRUE);
     WordSetNumber(wordSet, 1, bar->pageCount, 1, 0, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
-    func_02021c7c(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]),
-                  sManualTouchBarTextX[MANUAL_TOUCHBAR_MODE_EXPLAIN], 4, str, bar->common->font, TEXT_COLOR);
+    PrintQueue_PrintColor(bar->common->touchBarQueue, BmpWin_GetBitmap(bar->windows[WINDOW_TEXT]),
+                          sManualTouchBarTextX[MANUAL_TOUCHBAR_MODE_EXPLAIN], 4, str, bar->common->font, TEXT_COLOR);
     GFL_StrBufFree(str);
     GFL_StrBufFree(format);
     GFL_WordSetSystemFree(wordSet);
@@ -397,9 +397,11 @@ static void ManualTouchBar_CreateArrows(ManualTouchBar *bar) {
     u8 i;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), bar->common->heapId);
 
-    bar->palette = func_0204bbb8(arc, func_0202d810(), CLACT_VRAM_SUB, 4 * 0x20, 0, 3, bar->common->heapId);
-    bar->chars = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_SUB, bar->common->heapId);
-    bar->cellAnims = func_0204bde0(arc, func_0202d818(0), func_0202d81c(0), bar->common->heapId);
+    bar->palette =
+        func_0204bbb8(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 4 * 0x20, 0, 3, bar->common->heapId);
+    bar->chars = func_0204b81c(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, bar->common->heapId);
+    bar->cellAnims = func_0204bde0(arc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0),
+                                   bar->common->heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ARROW_COUNT; i++) {
         bar->arrows[i] = func_0204c040(ManualGraphic_GetClActUnit(bar->common->graphic), bar->chars, bar->palette,

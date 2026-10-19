@@ -1278,7 +1278,7 @@ static void func_ov194_021bdcc4(PokemonTradeWork *wk) {
                         if (PML_ItemIsMail(item)) {
                             MailData *mail = CreateMailData(wk->heapId);
                             PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
-                            func_02009738(mail, GFL_StrBufGetStringPtr(name));
+                            MailData_SetTrainerName(mail, GFL_StrBufGetStringPtr(name));
                             PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
                             GFL_HeapFree(mail);
                         }
@@ -1331,7 +1331,7 @@ static void func_ov194_021bde60(PokemonTradeWork *wk) {
     int i;
     int count = 0;
     DWCRapCommon_SetSubHeap(13, 0x10000, wk->heapId);
-    wk->unk0 = NHttpRap_Create(wk->heapId, func_02008bdc(wk->myInfo), wk->param->buffer);
+    wk->unk0 = NHttpRap_Create(wk->heapId, PlayerInfo_GetProfileId(wk->myInfo), wk->param->buffer);
     DWCRap_SetErrorFunc(func_ov194_021bdca4, wk);
     for (i = 0; i < 3; i++) {
         if (func_ov194_021b774c((u8 *)wk->negoPkm[1][i])) {

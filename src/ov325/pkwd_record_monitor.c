@@ -612,7 +612,7 @@ static BOOL PkwdRecordMonitor_Init(GameProc *proc, u32 *state, void *param, void
     wk->param = param;
     wk->graphic = PkwdRecordMonitorGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     PkwdRecordMonitor_Setup(wk);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
@@ -625,7 +625,7 @@ static BOOL PkwdRecordMonitor_Exit(GameProc *proc, u32 *state, void *param, void
 
     PkwdRecordMonitor_Cleanup(wk);
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     PkwdRecordMonitorGraphic_Free(wk->graphic);
     heapId = wk->heapId;
@@ -825,9 +825,9 @@ static void PkwdRecordMonitor_LoadTouchBarBG(PkwdRecordMonitorWork *wk, u32 bg, 
     s32 x;
     s32 y;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 4, palette * 0x20, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, wk->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 4, palette * 0x20, 0x20, wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, wk->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, wk->heapId);
     buffer = GFL_BGSysIsScrHeapExists(bg);
     tiles = (u16)(palette << 12);
     for (y = 0; y < 24; y++) {
@@ -848,10 +848,10 @@ static void PkwdRecordMonitor_LoadCommonRes(PkwdRecordMonitorWork *wk, u32 vramT
     u32 animFile;
 
     PkwdRecordMonitorGraphic_GetClActUnit(wk->graphic);
-    paletteFile = func_0202d810();
-    charsFile = func_0202d814();
-    cellFile = func_0202d818(2);
-    animFile = func_0202d81c(2);
+    paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    charsFile = AppMenuCommon_GetTouchBarCharFile();
+    cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    animFile = AppMenuCommon_GetTouchBarAnimFile(2);
     wk->res.of.commonPalette = func_0204bbb8(arc, paletteFile, vramType, 4 * 0x20, 0, 4, wk->heapId);
     wk->res.of.commonChars = func_0204b81c(arc, charsFile, FALSE, vramType, wk->heapId);
     wk->res.of.commonCell = func_0204bde0(arc, cellFile, animFile, wk->heapId);
@@ -1153,7 +1153,7 @@ static void PkwdRecordMonitor_FreeWindows(PkwdRecordMonitorWork *wk, u32 screen)
 static void PkwdRecordMonitor_FlushWindows(PkwdRecordMonitorWork *wk) {
     s32 i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WINDOW_MAX; i++) {
         if (wk->subWindows[i].window != NULL) {
             PrintWindow_Flush(&wk->subWindows[i], wk->printQueue);
@@ -1256,7 +1256,7 @@ static void PkwdRecordMonitor_PrintLabels(PkwdRecordMonitorWork *wk, u32 screen,
 
 static void PkwdRecordMonitor_UpdateBGPos(PkwdRecordMonitorWork *wk) {
     if (wk->flags & FLAG_MOVE_BG) {
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             PkwdRecordMonitor_SetBGPos(wk, wk->page);
             wk->flags &= ~FLAG_MOVE_BG;
         }
@@ -1368,7 +1368,7 @@ static void PkwdRecordMonitor_MainMode(PkwdRecordMonitorWork *wk) {
         }
         break;
     case LIST_STATE_WAIT_PRINT:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             if (wk->flags & FLAG_SHOW_DETAILS) {
                 PkwdRecordMonitor_ShowDetails(wk, TRUE);
                 wk->flags &= ~FLAG_SHOW_DETAILS;
@@ -1394,7 +1394,7 @@ static void PkwdRecordMonitor_Input(PkwdRecordMonitorWork *wk) {
     u32 action;
     s32 touch;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     action = PkwdRecordMonitor_HandleListResult(wk, PkwdRecordMonitor_UpdateList(wk));
@@ -1489,7 +1489,7 @@ static void PkwdRecordMonitor_PrintMovie(PkwdRecordMonitorWork *wk, BOOL movieOn
         PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_PLAYER, 0, 0, strbuf, ALIGN_RIGHT, PRINT_COLOR(13, 10, 11));
         GFL_StrBufFree(strbuf);
     }
-    record = func_02011194(wk->param->save, movie);
+    record = PokewoodSave_GetRecord(wk->param->save, movie);
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, movie + sPkwdRecordMonitorMovieMessages[MOVIE_MESSAGE_TITLE]);
     PkwdRecordMonitor_Print(wk, SCREEN_MAIN, WINDOW_TITLE, 0, 0, strbuf, ALIGN_LEFT, PRINT_COLOR(13, 10, 11));
     GFL_StrBufFree(strbuf);
@@ -1549,7 +1549,7 @@ static void PkwdRecordMonitor_SetArrows(PkwdRecordMonitorWork *wk, s32 first, s3
 // Shows the cast of the movie under the cursor, with the marks of its famous Pokémon, and the movie's marks
 static void PkwdRecordMonitor_ShowMovie(PkwdRecordMonitorWork *wk) {
     s32 movie = PkwdRecordMonitor_GetMovie(wk, wk->selected);
-    PokewoodRecord *record = func_02011194(wk->param->save, movie);
+    PokewoodRecord *record = PokewoodSave_GetRecord(wk->param->save, movie);
     s32 i;
     u32 species;
     u32 form;
@@ -1637,8 +1637,8 @@ static void PkwdRecordMonitor_LoadMovies(PkwdRecordMonitorWork *wk) {
     count = 0;
 
     for (movie = 0; movie < POKEWOOD_MOVIE_COUNT; movie++) {
-        if (func_020110ac(wk->param->save, 5, movie) == TRUE) {
-            PokewoodRecord *record = func_02011194(wk->param->save, movie);
+        if (PokewoodSave_CheckFlag(wk->param->save, 5, movie) == TRUE) {
+            PokewoodRecord *record = PokewoodSave_GetRecord(wk->param->save, movie);
 
             wk->entries[count].movie = movie;
             if (!record->hasRecord) {
@@ -1655,13 +1655,13 @@ static void PkwdRecordMonitor_LoadMovies(PkwdRecordMonitorWork *wk) {
                 best[bestCount] = movie;
                 bestCount++;
             }
-            if (func_020110ac(wk->param->save, 2, movie) == TRUE) {
+            if (PokewoodSave_CheckFlag(wk->param->save, 2, movie) == TRUE) {
                 wk->entries[count].flags |= 1 << 0;
             }
-            if (func_020110ac(wk->param->save, 6, movie) == TRUE) {
+            if (PokewoodSave_CheckFlag(wk->param->save, 6, movie) == TRUE) {
                 wk->entries[count].flags |= 1 << 1;
             }
-            if (func_020110ac(wk->param->save, 4, movie) == TRUE) {
+            if (PokewoodSave_CheckFlag(wk->param->save, 4, movie) == TRUE) {
                 wk->entries[count].flags |= 1 << 2;
             }
             wk->entries[count].series = sPkwdRecordMonitorSeries[movie] & 3;
@@ -1680,7 +1680,7 @@ static void PkwdRecordMonitor_MarkRecordsSeen(PkwdRecordMonitorWork *wk) {
 
     for (i = 0; i < wk->count; i++) {
         if (wk->entries[i].flags & ENTRY_SEEN) {
-            func_0201117c(wk->param->save, wk->entries[i].movie);
+            PokewoodSave_MarkRecordSeen(wk->param->save, wk->entries[i].movie);
         }
     }
 }

@@ -155,7 +155,7 @@ BOOL func_ov050_021e5854(VM *vm, FieldScriptEnv *env) {
     void *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
 
-    func_ov033_0217b664(gsys, func_0201794c(GSYS_GetGameData(gsys)));
+    func_ov033_0217b664(gsys, GameData_GetBSubwayScrWork(GSYS_GetGameData(gsys)));
     return FALSE;
 }
 
@@ -168,7 +168,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
-    BSubwayScrWork *bsw = func_0201794c(gameData);
+    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     BSubwayPlayData *playData = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY);
     u32 mode = BSubwayPlayData_GetData(playData, 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
@@ -705,7 +705,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
 
         if (bsw->unkC_10 == 0) {
             bsw->unkC_10 = 1;
-            if (func_0200bcf8(save, 4, &buffer, 0) == 1) {
+            if (BattleRec_IsSlotValid(save, 4, &buffer, 0) == 1) {
                 bsw->unkC_10 = 2;
             }
         }
@@ -719,9 +719,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 345:
-        func_0200c1f0();
+        BattleRec_LoadToolOverlay();
         BattleRecTool_StoreSetup(bsw->btlSetup);
-        func_0200c200();
+        BattleRec_UnloadToolOverlay();
         break;
     case 346:
         bsw->unk7EC = 0;
@@ -929,7 +929,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 416:
         *retWk = FALSE;
-        if (bsw->btlSetup != NULL && func_0200c1d0(bsw->btlSetup->unkAD) == TRUE) {
+        if (bsw->btlSetup != NULL && BattleRec_IsVersionSupported(bsw->btlSetup->unkAD) == TRUE) {
             *retWk = TRUE;
         }
         break;
@@ -943,7 +943,8 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL func_ov050_021e69a8(VM *vm, void *env) {
-    BSubwayScrWork *bsw = func_0201794c(GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env))));
+    BSubwayScrWork *bsw =
+        GameData_GetBSubwayScrWork(GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env))));
 
     if (func_ov012_02161a48(bsw) == TRUE) {
         return TRUE;
@@ -954,7 +955,7 @@ static BOOL func_ov050_021e69a8(VM *vm, void *env) {
 static BOOL func_ov050_021e69cc(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
-    BSubwayScrWork *bsw = func_0201794c(gameData);
+    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     u16 *var = ScriptWork_GetWkAddr(work, gameData, bsw->unk72A);
 
     if (GFL_NetErrCheck()) {
@@ -974,7 +975,7 @@ static BOOL func_ov050_021e6a20(VM *vm, void *env) {
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
-    BSubwayScrWork *bsw = func_0201794c(gameData);
+    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     u32 answer = func_ov036_021c3f98(bsw->unk71C);
@@ -1004,7 +1005,7 @@ static BOOL func_ov050_021e6ab4(VM *vm, void *env) {
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
-    BSubwayScrWork *bsw = func_0201794c(gameData);
+    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     u32 answer = func_ov036_021c3f98(bsw->unk71C);
@@ -1028,7 +1029,7 @@ static BOOL func_ov050_021e6ab4(VM *vm, void *env) {
 static BOOL func_ov050_021e6b38(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
-    BSubwayScrWork *bsw = func_0201794c(gameData);
+    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
 
     if (func_ov012_02161a94(bsw, ScriptWork_GetWkAddr(work, gameData, bsw->unk72A)) == TRUE) {
         return TRUE;
@@ -1238,7 +1239,7 @@ static void func_ov050_021e6e9c(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, 
 
 static BOOL func_ov050_021e6ee0(VM *vm, void *env) {
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env)));
-    BSubwayScrWork *bsw = func_0201794c(gameData);
+    BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     u32 regulation = 20;
     int count = bsw->unk10;
     u32 result;
@@ -1258,7 +1259,7 @@ static BOOL func_ov050_021e6ee0(VM *vm, void *env) {
     if (count > BSUBWAY_COUNT_MAX) {
         count = BSUBWAY_COUNT_MAX;
     }
-    result = func_0200be50(gameData, 4, regulation, count, 0, &bsw->unk7EC, &bsw->unk7EE);
+    result = BattleRec_FinishAndSaveSlot(gameData, 4, regulation, count, 0, &bsw->unk7EC, &bsw->unk7EE);
     if (result == 2 || result == 3) {
         return TRUE;
     }
@@ -1315,7 +1316,7 @@ static u32 func_ov050_021e6f90(Field *field) {
 }
 
 static u16 func_ov050_021e6fd4(PlayerInfo *info) {
-    u8 unk1B = func_02008bfc(info);
+    u8 unk1B = PlayerInfo_GetVersion(info);
     u32 gender = getTrainerGender(info);
 
     if (unk1B == 22 || unk1B == 23) {

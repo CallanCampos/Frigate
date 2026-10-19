@@ -128,7 +128,7 @@ BrPokeSearch *BrPokeSearch_Init(PokeDexSave *pokedex, BrRes *res, ClActUnit *uni
     p_wk->fade = fade;
     p_wk->unit = unit;
     p_wk->bmpoam = bmpoam;
-    p_wk->que = func_02021998(p_wk->heap_id);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heap_id);
     p_wk->monsno_table = BrPokeSearch_LoadMonsTable(HEAPID_TAIL(heapId), &p_wk->monsno_table_num);
     p_wk->ball_main = ballMain;
     p_wk->ball_sub = ballSub;
@@ -145,7 +145,7 @@ void BrPokeSearch_Exit(BrPokeSearch *p_wk) {
         p_wk->p_monsno_buff = NULL;
     }
     GFL_HeapFree(p_wk->monsno_table);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_HeapFree(p_wk);
 }
 
@@ -256,7 +256,7 @@ BOOL BrPokeSearch_PrintMain(BrPokeSearch *p_wk) {
             ret &= BrMsgWin_Main(p_wk->msgwin[i]);
         }
     }
-    return ret & func_02021a3c(p_wk->que);
+    return ret & PrintQueue_Main(p_wk->que);
 }
 
 void BrPokeSearch_StartUp(BrPokeSearch *p_wk) {

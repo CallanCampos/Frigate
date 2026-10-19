@@ -271,7 +271,7 @@ CtvtComm *CtvtComm_Create(CommTvtWork *sys, HeapID heapId) {
     comm->sendGamePacket = FALSE;
     comm->sendGameData = FALSE;
 
-    func_02008b34(GetGameDataPlayerInfo(CommTvt_GetParam(sys)->gameData), &comm->beacon.player);
+    PlayerInfo_Copy(GetGameDataPlayerInfo(CommTvt_GetParam(sys)->gameData), &comm->beacon.player);
     comm->beacon.memberCount = 1;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 6; j++) {
@@ -280,7 +280,7 @@ CtvtComm *CtvtComm_Create(CommTvtWork *sys, HeapID heapId) {
     }
     comm->beacon.cameraEnabled = CommTvt_IsCameraEnabled();
     comm->beacon.inviteOnly = FALSE;
-    func_02008b34(GetGameDataPlayerInfo(CommTvt_GetParam(sys)->gameData), (PlayerInfo *)comm->selfInfo.playerInfo);
+    PlayerInfo_Copy(GetGameDataPlayerInfo(CommTvt_GetParam(sys)->gameData), (PlayerInfo *)comm->selfInfo.playerInfo);
     comm->selfInfo.cameraEnabled = CommTvt_IsCameraEnabled();
     comm->selfInfo.canExchangePhotos = canPlayerExchangePhotos();
     comm->unk0 = 1;
@@ -819,7 +819,7 @@ static BOOL CtvtComm_IsMemberTalking(CommTvtWork *sys, CtvtComm *comm, CtvtCommM
     if (member->isSelf == TRUE) {
         return FALSE;
     }
-    status = func_02008bfc((PlayerInfo *)member->info.playerInfo);
+    status = PlayerInfo_GetVersion((PlayerInfo *)member->info.playerInfo);
     if (status == 0x16 || status == 0x17) {
         return FALSE;
     }

@@ -786,11 +786,11 @@ static int IrcSyncCheckModel_GetAnimation(IrcSyncCheckModel *model) {
 
 static void IrcSyncCheckText_Init(IrcSyncCheckText *text, BOOL keepFont, HeapID heapId) {
     MI_CpuFill8(text, 0, sizeof(IrcSyncCheckText));
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     if (!keepFont) {
         text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     }
-    text->queue = func_02021998(heapId);
+    text->queue = PrintQueue_CreateDefault(heapId);
     text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_3, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
 }
@@ -798,13 +798,13 @@ static void IrcSyncCheckText_Init(IrcSyncCheckText *text, BOOL keepFont, HeapID 
 static void IrcSyncCheckText_Free(IrcSyncCheckText *text) {
     GFL_WordSetSystemFree(text->wordSet);
     GFL_MsgDataFree(text->msgData);
-    func_02021a18(text->queue);
+    PrintQueue_Free(text->queue);
     GFL_FontFree(text->font);
     MI_CpuFill8(text, 0, sizeof(IrcSyncCheckText));
 }
 
 static BOOL IrcSyncCheckText_Update(IrcSyncCheckText *text) {
-    return func_02021a3c(text->queue);
+    return PrintQueue_Main(text->queue);
 }
 
 static Font *IrcSyncCheckText_GetFont(IrcSyncCheckText *text) {
@@ -863,7 +863,7 @@ static void IrcSyncCheckWindow_PrintMsg(IrcSyncCheckWindow *win, IrcSyncCheckTex
 
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), win->color);
     GFL_MsgDataLoadStrbuf(msgData, msgId, win->strbuf);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     PrintWindow_PrintNoColor(&win->printWindow, queue, x, y, win->strbuf, font);
 }
 
@@ -880,7 +880,7 @@ static void IrcSyncCheckWindow_PrintMsgCentered(IrcSyncCheckWindow *win, IrcSync
     y = BmpWin_GetSizeY(win->window) * 4;
     x -= (u16)(GFL_FontGetBlockWidth(win->strbuf, font, 0) / 2);
     y -= (u16)(GFL_FontGetBlockHeight(win->strbuf, font) / 2);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     PrintWindow_Print(&win->printWindow, queue, x, y, win->strbuf, font, PRINT_COLOR(15, 14, 4));
 }
 
@@ -901,7 +901,7 @@ static void IrcSyncCheckWindow_PrintMsgPlayer(IrcSyncCheckWindow *win, IrcSyncCh
     GFL_StrBufFree(format);
     queue = IrcSyncCheckText_GetQueue(text);
     font = IrcSyncCheckText_GetFont(text);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     PrintWindow_PrintNoColor(&win->printWindow, queue, x, y, win->strbuf, font);
 }
 
@@ -1144,8 +1144,8 @@ static void IrcSyncCheck_StepResult(IrcSyncCheckWork *wk, u16 *state) {
         data.retries = wk->retries;
         if (wk->param->gsys != NULL) {
             save = GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys));
-            log = func_0200afbc(save);
-            data.isNew = func_0200b0f0(log, getIDAsUInt(&wk->param->profile->trainer)) ? FALSE : TRUE;
+            log = TrainerLogSave_Get(save);
+            data.isNew = TrainerLogSave_HasId(log, getIDAsUInt(&wk->param->profile->trainer)) ? FALSE : TRUE;
         }
         if (!IrcSyncNet_Send(&wk->net, &data)) {
             break;

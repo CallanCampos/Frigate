@@ -108,8 +108,8 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         }
         break;
     case 5:
-        func_02006e0c(2);
-        if (func_02006e3c() == TRUE) {
+        SndMic_AddCount(2);
+        if (SndMic_IsOverLimit() == TRUE) {
             WaitIcon_Free(work->waitIcon);
             func_ov036_02188474(work->talkWindow);
             func_ov036_0218836c(work->talkWindow, 0, 0, 1);
@@ -119,7 +119,7 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         break;
     case 6:
         if (func_ov036_021883e8(work->talkWindow) == TRUE) {
-            if (func_02006e80(func_ov033_02178fcc, &work->recorded) == 0) {
+            if (SndMic_StartRecording(func_ov033_02178fcc, &work->recorded) == 0) {
                 *state = 7;
             } else {
                 message = GFL_MsgDataLoadStrbufNew(work->msgData, 3);
@@ -137,7 +137,7 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         break;
     case 7:
         if (work->recorded == TRUE) {
-            func_02006ec0(work->chatter);
+            SndMic_EncodeChatter(work->chatter);
             ampOffFreeBlocks();
             GCTX_HIDUnblockSleep(8);
             GameEvent_ChainNext(event, EventPushBGMFinish_Create(work->gsys, 0, 30));

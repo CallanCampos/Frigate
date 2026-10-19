@@ -199,7 +199,7 @@ static BOOL BrBtlSubway_ProcInit(GameProc *proc, u32 *state, void *param, void *
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
     wk->bmpoam = BmpOam_Init(wk->heapId, p->unit);
-    wk->que = func_02021998(wk->heapId);
+    wk->que = PrintQueue_CreateDefault(wk->heapId);
     wk->ballEff = BrBallEff_Init(p->unit, p->res, CLACT_SURFACE_SUB, wk->heapId);
     BrRes_LoadOBJ(p->res, BR_RES_OBJ_BTLSUBWAY_BP, wk->heapId);
 
@@ -218,7 +218,7 @@ static BOOL BrBtlSubway_ProcExit(GameProc *proc, u32 *state, void *param, void *
     GFL_BGSysLoadScr(1);
     BrRes_UnloadOBJ(p->res, BR_RES_OBJ_BTLSUBWAY_BP);
     BrBallEff_Exit(wk->ballEff);
-    func_02021a18(wk->que);
+    PrintQueue_Free(wk->que);
     BmpOam_Exit(wk->bmpoam);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -328,7 +328,7 @@ static BOOL BrBtlSubway_ProcMain(GameProc *proc, u32 *state, void *param, void *
             BrMsgWin_Main(wk->msgWin[i]);
         }
     }
-    func_02021a3c(wk->que);
+    PrintQueue_Main(wk->que);
     if (wk->text != NULL) {
         BrText_Main(wk->text);
     }

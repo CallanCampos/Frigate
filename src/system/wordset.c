@@ -382,7 +382,7 @@ void loadPokewoodLineToStrbuf(WordSet *wordSet, u32 index, u32 line) {
     GFL_WordSetLoadMsg(wordSet, index, 0x162, line + 0x2a);
 }
 
-void func_0202483c(WordSet *wordSet, u32 index, u32 tournament) {
+void WordSet_LoadPWTTournamentType(WordSet *wordSet, u32 index, u32 tournament) {
     if (tournament >= 0x29) {
         GFL_WordSetClearBuf(wordSet, index);
         return;
@@ -391,7 +391,7 @@ void func_0202483c(WordSet *wordSet, u32 index, u32 tournament) {
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }
 
-void func_02024868(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
+void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
     // The mission's config, whose first 0x14 bytes are a FestMission (system/fest_mission.h)
     FestMissionConfig *buffer;
     FestivalText *text;

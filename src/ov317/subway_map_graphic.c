@@ -119,7 +119,7 @@ SubwayMapGraphic *SubwayMapGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     SubwayMapBG_Init(&graphic->bg, heapId);
     SubwayMapClAct_Init(&graphic->clact, &sSubwayMapVRAMConfig, heapId);
     SubwayMapG3dSys_Init(&graphic->g3d, heapId);
@@ -132,7 +132,7 @@ void SubwayMapGraphic_Free(SubwayMapGraphic *graphic) {
     SubwayMapG3dSys_Free(&graphic->g3d);
     SubwayMapClAct_Free(&graphic->clact);
     SubwayMapBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

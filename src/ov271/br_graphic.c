@@ -132,7 +132,7 @@ BrGraphic *BrGraphic_Init(u32 type, u32 displayLayout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
 
     BrGraphic_BG_Init(&p_wk->bg, heapId);
     BrGraphic_OBJ_Init(&p_wk->obj, cp_vram, heapId);
@@ -144,7 +144,7 @@ void BrGraphic_Exit(BrGraphic *p_wk) {
     GFL_TCBRemove(p_wk->vblankTask);
     BrGraphic_OBJ_Exit(&p_wk->obj);
     BrGraphic_BG_Exit(&p_wk->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

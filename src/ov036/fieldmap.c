@@ -228,7 +228,7 @@ BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work) {
         break;
     }
     case 1:
-        if (!func_02016b34(gsys)) {
+        if (!GSYS_IsCGearOn(gsys)) {
             GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
             switch (GameCommSys_BootCheck(comm)) {
@@ -283,19 +283,19 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
         season = GameSystem_GetSeason(gsys);
     } else if (func_02018f60(areaId)) {
         if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
-            season = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
+            season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
     } else if (func_02018f78(areaId)) {
         season = func_02017b70(field->gameData);
     } else if (func_02018f90(areaId)) {
-        WbtSystem **wbt = func_020179f0(field->gameData);
+        WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
             season = func_ov036_021c98f4(*wbt);
         }
     }
     field->areaData = AreaData_Create(heapId, areaId, season);
-    ResortWork_UpdateRecords(func_02017b84(field->gameData), GameData_GetSaveControl(field->gameData));
+    ResortWork_UpdateRecords(GameData_GetResortWork(field->gameData), GameData_GetSaveControl(field->gameData));
     field->ctrlVTable = GetZoneFieldmapCtrlVTable(field->zoneId);
     return field;
 }
@@ -318,7 +318,7 @@ u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);
     BmpWin_InitAllocator(heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_G3DSysCreate(0, 3, 0, 1, FX32_ONE, field->heapId, FieldG3D_InitCallback);
     FieldG3D_Init(field);
     field->g3DMapper = FieldG3DMapper_Create(field->heapId, GameData_GetSeason(field->gameData));
@@ -1258,7 +1258,7 @@ void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId) {
         if (isOther == FALSE) {
             city = GameData_GetMyCityState(field->gameData);
         } else {
-            city = func_0201722c(field->gameData, 0);
+            city = GameData_GetCityState(field->gameData, 0);
         }
         func_ov036_021852f4(field->g3DMapper, city, isOther);
     }

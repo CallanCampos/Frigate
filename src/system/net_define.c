@@ -22,13 +22,13 @@ u32 getWifiIconNarcIdxNum(void) {
     return 0;
 }
 
-void func_020116b0(WmIconFiles *files) {
+void WmIconFiles_Init(WmIconFiles *files) {
     files->chars[0] = 2;
     files->chars[1] = 4;
     files->pltt = 1;
 }
 
-const GFLNetDevTable *func_020116c0(int type) {
+const GFLNetDevTable *NetDefine_LoadDevice(int type) {
     switch (type) {
     case GFL_NET_TYPE_WIFI_GTS:
         GFL_OvlUnload(OVERLAY_ID(12));
@@ -61,7 +61,7 @@ const GFLNetDevTable *func_020116c0(int type) {
     return NULL;
 }
 
-void func_02011778(int type) {
+void NetDefine_UnloadDevice(int type) {
     switch (type) {
     case GFL_NET_TYPE_WIFI_GTS:
         GFL_OvlUnload(OVERLAY_ID(189));

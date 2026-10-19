@@ -124,7 +124,8 @@ GameEvent *func_ov155_021f59e0(u8 type, u8 unused, u16 endBlack, GameSystem *gsy
     FaceUpAnim_Init(&work->eyes);
     FaceUpAnim_Init(&work->mouth);
 
-    textSpeed = func_02008a14((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    textSpeed =
+        Config_GetTextSpeed((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     if (textSpeed == 0) {
         work->mouth.interval = 3;
     } else if (textSpeed == 1) {
