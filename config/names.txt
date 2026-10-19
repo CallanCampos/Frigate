@@ -8678,6 +8678,13 @@ overlays/ov073 0x021e8c64 RivalSelect_RemoveHollowActor
 overlays/ov073 0x021e8cac RivalSelect_IsSelectedAndActive
 overlays/ov073 0x021e8cdc RivalSelect_SetActive
 overlays/ov073 0x021e8d00 RivalSelect_FindEntryIndex
+overlays/ov074 0x021e90c0 Sunny_Init
+overlays/ov074 0x021e9108 Sunny_FadeIn
+overlays/ov074 0x021e9170 Sunny_InitNoFade
+overlays/ov074 0x021e91b8 Sunny_Main
+overlays/ov074 0x021e91bc Sunny_InitFadeOut
+overlays/ov074 0x021e91e0 Sunny_FadeOut
+overlays/ov074 0x021e91f4 Sunny_Exit
 overlays/ov074 0x021e9240 SUNNY_WEATHER
 overlays/ov075 0x021e90c0 Flake_Init
 overlays/ov075 0x021e9118 Flake_FadeIn
