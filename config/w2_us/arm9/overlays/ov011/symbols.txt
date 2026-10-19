@@ -2704,8 +2704,8 @@ sWcmAnchor kind:bss addr:0x0218dfb4
 sWcmGlobal kind:bss addr:0x0218dfbc
 data_ov011_0218df88 kind:bss addr:0x0218dfc8
 data_ov011_0218dfac kind:bss addr:0x0218dfec
-data_ov011_0218dfb4 kind:bss addr:0x0218dff4
-data_ov011_0218dfb5 kind:bss addr:0x0218dff5
+sWcmRssiCursor kind:bss addr:0x0218dff4
+sWcmRssiSamples kind:bss addr:0x0218dff5
 data_ov011_0218dfc8 kind:bss addr:0x0218e008
 data_ov011_0218dfd0 kind:bss addr:0x0218e010
 data_ov011_0218dfd4 kind:bss addr:0x0218e014

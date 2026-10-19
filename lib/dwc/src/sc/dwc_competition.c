@@ -1,34 +1,13 @@
-#include "dwc/competition.h"
+#include "competition_internal.h"
 #include "dwc/dwc.h"
 #include "dwc/ext.h"
-#include "dwc/soap.h"
+#include "dwc/md5.h"
 #include "nitro/std.h"
 
-// GameSpy's competition service, as the Wi-Fi library of overlay 260 talks to it: a client with the three requests, and
-// the report that the game builds. The report's numbers are big-endian, as the service reads them; its first 0x44 bytes
-// are a header.
-
-// The header of the report's buffer. The fields up to the sizes are set when it is made and finished; the digest is
-// made when the report is submitted
-typedef struct ScReportHeader {
-    u32 version;
-    u32 id;
-    u8 digest[0x10];
-    u32 value;
-    u32 flags;
-    u16 playerNum;
-    u16 teamNum;
-    u16 gameRecordNum;
-    u16 playerRecordNum;
-    u16 teamRecordNum;
-    u16 unk_2a;
-    u32 playerSize;
-    u32 teamSize;
-    u32 resultSize;
-    u32 gameSize;
-    u32 playerRecordSize;
-    u32 teamRecordSize;
-} ScReportHeader;
+// GameSpy's competition service, as the Wi-Fi library of overlay 260 talks to it: the client, the calls that start its
+// three requests, and the report that the game builds. The report's numbers are big-endian, as the service reads them;
+// its first 0x44 bytes are a header. The requests' SOAP messages are in dwc_competition_soap.c. The ROM names neither
+// file; both names are ours.
 
 // The last eight bytes of a GUID
 typedef struct ScGuidTail {
@@ -47,8 +26,6 @@ static inline u32 Sc_SwapU32(u32 value) {
 static int ScClient_Alloc(ScClient **client);
 static int ScClient_Init(ScClient *client);
 static void ScClient_Reset(ScClient *client);
-static void ScClient_CopyCsid(ScClient *client, const char *csid);
-static void ScClient_CopyCcid(ScClient *client, const char *ccid);
 static char *ScClient_BuildUrl(void);
 static int ScReport_Create(const char *csid, int version, int playerNum, int teamNum, ScReport **report);
 static int ScReport_Destroy(ScReport *report);
@@ -68,42 +45,27 @@ static u8 *Sc_PutByte(u8 *dest, int value);
 static u8 *Sc_PutU16(u8 *dest, s16 value);
 static u8 *Sc_PutU32(u8 *dest, u32 value);
 static u8 *Sc_PutGuid(u8 *dest, const char *text);
-static int ScClient_Begin(ScClient *client, ScClient *self);
-static void ScClient_End(ScClient *client);
-static void ScClient_RunLibrary(ScClient *client);
-static int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *certificate, AuthKeys *keys,
-                                      ScClientFunc func, int timeout, void *userData);
-static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader, void *userData);
-static int ScClient_PostReportIntention(ScClient *client, int gameId, const char *csid, const char *ccid,
-                                        int authoritative, AuthCertificate *certificate, AuthKeys *keys,
-                                        ScClientFunc func, int timeout, void *userData);
-static void ScClient_OnReportIntention(int status, int unused, SoapReader *reader, void *userData);
-static void ScClient_PutReportForm(void *form, void *userData);
-static int ScClient_PostReport(ScClient *client, int gameId, const char *csid, const char *ccid, ScReport *report,
-                               int authoritative, AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func,
-                               int timeout, void *userData);
-static void ScClient_OnSubmitReport(int status, int unused, SoapReader *reader, void *userData);
 
 // The URL of the competition service, set by ScClient_SetServers or once it is asked for
-static char sCompetitionUrl[128];
+char gCompetitionUrl[128];
 
 void ScClient_SetServers(int server) {
     switch (server) {
     case 1:
-        OS_SNPrintf(sCompetitionUrl, 128,
+        OS_SNPrintf(gCompetitionUrl, 128,
                     "https://%s.secure2.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
                     data_ov011_021917bc);
-        DWCi_SetGHTTPRootCA(sCompetitionUrl);
+        DWCi_SetGHTTPRootCA(gCompetitionUrl);
         OS_SNPrintf(gAuthUrl, 128, "https://%s.secure2.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
                     data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     case 0:
     default:
-        OS_SNPrintf(sCompetitionUrl, 128,
+        OS_SNPrintf(gCompetitionUrl, 128,
                     "https://%s.secure.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
                     data_ov011_021917bc);
-        DWCi_SetGHTTPRootCA(sCompetitionUrl);
+        DWCi_SetGHTTPRootCA(gCompetitionUrl);
         OS_SNPrintf(gAuthUrl, 128, "https://%s.secure.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
                     data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gAuthUrl);
@@ -113,8 +75,8 @@ void ScClient_SetServers(int server) {
 
 static int ScClient_Alloc(ScClient **client) {
     if (__GSIACResult == 1) {
-        if (sCompetitionUrl[0] == '\0') {
-            OS_SNPrintf(sCompetitionUrl, 128,
+        if (gCompetitionUrl[0] == '\0') {
+            OS_SNPrintf(gCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
                         __GSIACGamename);
         }
@@ -153,7 +115,7 @@ static void ScClient_Reset(ScClient *client) {
     client->valid = 0;
 }
 
-static void ScClient_CopyCsid(ScClient *client, const char *csid) {
+void ScClient_CopyCsid(ScClient *client, const char *csid) {
     if (csid == NULL) {
         client->csid[0] = '\0';
     } else {
@@ -161,7 +123,7 @@ static void ScClient_CopyCsid(ScClient *client, const char *csid) {
     }
 }
 
-static void ScClient_CopyCcid(ScClient *client, const char *ccid) {
+void ScClient_CopyCcid(ScClient *client, const char *ccid) {
     if (ccid == NULL) {
         client->ccid[0] = '\0';
     } else {
@@ -171,12 +133,12 @@ static void ScClient_CopyCcid(ScClient *client, const char *ccid) {
 
 static char *ScClient_BuildUrl(void) {
     if (__GSIACResult == 1) {
-        if (sCompetitionUrl[0] == '\0') {
-            OS_SNPrintf(sCompetitionUrl, 128,
+        if (gCompetitionUrl[0] == '\0') {
+            OS_SNPrintf(gCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
                         __GSIACGamename);
         }
-        return sCompetitionUrl;
+        return gCompetitionUrl;
     }
     gsDebugFormat(0, 3, 1, "No availability\r\n");
     return NULL;
@@ -431,13 +393,21 @@ static int ScReport_Destroy(ScReport *report) {
     return 0;
 }
 
+// Each player's record after the header is 0x14 bytes: the 0x10-byte GUID of its connection, then its key
 static int ScReport_SetPlayerId(ScReport *report, int index, const char *id) {
-    Sc_PutGuid(report->buffer + (sizeof(ScReportHeader) + index * 0x14), id);
+    u32 offset = sizeof(ScReportHeader);
+
+    offset += index * 0x14;
+    Sc_PutGuid(report->buffer + offset, id);
     return 0;
 }
 
 static int ScReport_SetPlayerKey(ScReport *report, int index, int key) {
-    Sc_PutU32(report->buffer + (sizeof(ScReportHeader) + index * 0x14 + 0x10), key);
+    u32 offset = sizeof(ScReportHeader);
+
+    offset += index * 0x14;
+    offset += 0x10;
+    Sc_PutU32(report->buffer + offset, key);
     return 0;
 }
 
@@ -609,260 +579,4 @@ static u8 *Sc_PutGuid(u8 *dest, const char *text) {
     dest = Sc_PutU16(dest, data3);
     *(ScGuidTail *)dest = tail;
     return dest + sizeof(tail);
-}
-
-// The declaration of the messages' namespace
-static const char *sCompetitionNamespaces[] = { "gsc=\"http://gamespy.net/competition/\"" };
-
-static int ScClient_Begin(ScClient *client, ScClient *self) {
-    if (gsCoreIsShutdown() != 0) {
-        return 4;
-    }
-    client->self = self;
-    client->createSessionFunc = NULL;
-    client->reportIntentionFunc = NULL;
-    client->submitReportFunc = NULL;
-    client->createSessionData = NULL;
-    client->reportIntentionData = NULL;
-    client->submitReportData = NULL;
-    client->createSessionBusy = 0;
-    client->reportIntentionBusy = 0;
-    client->submitReportBusy = 0;
-    client->ready = 1;
-    return 0;
-}
-
-static void ScClient_End(ScClient *client) {
-    client->ready = 0;
-    client->createSessionFunc = NULL;
-    client->reportIntentionFunc = NULL;
-    client->submitReportFunc = NULL;
-    client->createSessionData = NULL;
-    client->reportIntentionData = NULL;
-    client->submitReportData = NULL;
-    client->createSessionBusy = 0;
-    client->reportIntentionBusy = 0;
-    client->submitReportBusy = 0;
-    client->self = NULL;
-}
-
-static void ScClient_RunLibrary(ScClient *client) {
-    gsCoreThink(0);
-}
-
-static int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *certificate, AuthKeys *keys,
-                                      ScClientFunc func, int timeout, void *userData) {
-    SoapWriter *writer;
-
-    if (client->createSessionBusy != 0) {
-        return 6;
-    }
-    writer = gsXmlCreateStreamWriter(sCompetitionNamespaces, 1);
-    if (writer == NULL) {
-        return 5;
-    }
-    if (!gsXmlWriteOpenTag(writer, "gsc", "CreateSession") || !gsXmlWriteOpenTag(writer, "gsc", "certificate") ||
-        !Auth_WriteCertificate(certificate, "gsc", writer) || !gsXmlWriteCloseTag(writer, "gsc", "certificate") ||
-        !gsXmlWriteHexBinaryElement(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
-        !gsXmlWriteIntElement(writer, "gsc", "gameid", gameId) || !gsXmlWriteCloseTag(writer, "gsc", "CreateSession") ||
-        !gsXmlCloseWriter(writer)) {
-        gsXmlFreeWriter(writer);
-        return 7;
-    }
-    client->createSessionFunc = func;
-    client->createSessionData = userData;
-    client->createSessionBusy = 1;
-    gsiExecuteSoap(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/CreateSession\"", writer,
-                   ScClient_OnCreateSession, client);
-    return 0;
-}
-
-static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader, void *userData) {
-    ScClient *client = userData;
-    int result;
-    char csid[0xff];
-    char ccid[0xff];
-    ScClientFunc func;
-    int error = 7;
-
-    if (client->ready) {
-        if (status == 0) {
-            result = 0;
-            if (!gsXmlMoveToStart(reader)) {
-                error = 9;
-            } else if (!gsXmlMoveToNext(reader, "CreateSessionResponse") &&
-                       !gsXmlMoveToNext(reader, "CreateMatchlessSessionResponse")) {
-                error = 9;
-            }
-            if (!gsXmlMoveToNext(reader, "CreateSessionResult") &&
-                !gsXmlMoveToNext(reader, "CreateMatchlessSessionResult")) {
-                error = 9;
-            }
-            if (!gsXmlReadChildAsInt(reader, "result", &result)) {
-                error = 9;
-            } else {
-                if (error != 9) {
-                    if (result == 0) {
-                        if (!gsXmlReadChildAsStringNT(reader, "csid", csid, sizeof(csid)) ||
-                            !gsXmlReadChildAsStringNT(reader, "ccid", ccid, sizeof(ccid))) {
-                            error = 9;
-                        } else {
-                            ScClient_CopyCsid(client->self, csid);
-                            ScClient_CopyCcid(client->self, ccid);
-                            error = 0;
-                        }
-                    } else {
-                        error = 9;
-                    }
-                }
-            }
-        }
-        func = client->createSessionFunc;
-        client->createSessionBusy = 0;
-        if (func != NULL) {
-            func(client->self, status, error, client->createSessionData);
-            client->createSessionData = NULL;
-            client->createSessionFunc = NULL;
-        }
-    }
-}
-
-static int ScClient_PostReportIntention(ScClient *client, int gameId, const char *csid, const char *ccid,
-                                        int authoritative, AuthCertificate *certificate, AuthKeys *keys,
-                                        ScClientFunc func, int timeout, void *userData) {
-    SoapWriter *writer;
-
-    if (client->reportIntentionBusy != 0) {
-        return 6;
-    }
-    writer = gsXmlCreateStreamWriter(sCompetitionNamespaces, 1);
-    if (writer == NULL) {
-        return 5;
-    }
-    if (!gsXmlWriteOpenTag(writer, "gsc", "SetReportIntention") || !gsXmlWriteOpenTag(writer, "gsc", "certificate") ||
-        !Auth_WriteCertificate(certificate, "gsc", writer) || !gsXmlWriteCloseTag(writer, "gsc", "certificate") ||
-        !gsXmlWriteHexBinaryElement(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
-        !gsXmlWriteStringElement(writer, "gsc", "csid", csid) ||
-        !gsXmlWriteStringElement(writer, "gsc", "ccid", ccid) ||
-        !gsXmlWriteIntElement(writer, "gsc", "gameid", gameId) ||
-        !gsXmlWriteIntElement(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
-        !gsXmlWriteCloseTag(writer, "gsc", "SetReportIntention") || !gsXmlCloseWriter(writer)) {
-        gsXmlFreeWriter(writer);
-        return 7;
-    }
-    client->reportIntentionFunc = func;
-    client->reportIntentionData = userData;
-    client->reportIntentionBusy = 1;
-    gsiExecuteSoap(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/SetReportIntention\"", writer,
-                   ScClient_OnReportIntention, client);
-    return 0;
-}
-
-static void ScClient_OnReportIntention(int status, int unused, SoapReader *reader, void *userData) {
-    ScClient *client = userData;
-    int result;
-    char ccid[0xff];
-    ScClientFunc func;
-    int error;
-
-    if (client->ready) {
-        if (status == 0) {
-            error = 0;
-            result = 0;
-            if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "SetReportIntentionResponse") ||
-                !gsXmlMoveToNext(reader, "SetReportIntentionResult") ||
-                !gsXmlReadChildAsInt(reader, "result", &result) ||
-                !gsXmlReadChildAsStringNT(reader, "ccid", ccid, sizeof(ccid))) {
-                error = 9;
-            } else if (result == 0) {
-                ScClient_CopyCcid(client->self, ccid);
-            } else {
-                error = 8;
-            }
-        } else {
-            error = 7;
-        }
-        func = client->reportIntentionFunc;
-        client->reportIntentionBusy = 0;
-        if (func != NULL) {
-            func(client->self, status, error, client->reportIntentionData);
-            client->reportIntentionData = NULL;
-            client->reportIntentionFunc = NULL;
-        }
-    }
-}
-
-static void ScClient_PutReportForm(void *form, void *userData) {
-    ScClient *client = userData;
-
-    ghttpPostAddFileFromMemory(form, "report", client->report, client->reportSize, "report", "application/bin");
-}
-
-static int ScClient_PostReport(ScClient *client, int gameId, const char *csid, const char *ccid, ScReport *report,
-                               int authoritative, AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func,
-                               int timeout, void *userData) {
-    SoapWriter *writer;
-
-    if (client->submitReportBusy != 0) {
-        return 6;
-    }
-    if (report->used < sizeof(ScReportHeader)) {
-        return 12;
-    }
-    writer = gsXmlCreateStreamWriter(sCompetitionNamespaces, 1);
-    if (writer == NULL) {
-        return 5;
-    }
-    if (!gsXmlWriteOpenTag(writer, "gsc", "SubmitReport") || !gsXmlWriteOpenTag(writer, "gsc", "certificate") ||
-        !Auth_WriteCertificate(certificate, "gsc", writer) || !gsXmlWriteCloseTag(writer, "gsc", "certificate") ||
-        !gsXmlWriteHexBinaryElement(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
-        !gsXmlWriteStringElement(writer, "gsc", "csid", csid) ||
-        !gsXmlWriteStringElement(writer, "gsc", "ccid", ccid) ||
-        !gsXmlWriteIntElement(writer, "gsc", "gameid", gameId) ||
-        !gsXmlWriteIntElement(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
-        !gsXmlWriteCloseTag(writer, "gsc", "SubmitReport") || !gsXmlCloseWriter(writer)) {
-        gsXmlFreeWriter(writer);
-        return 5;
-    }
-    client->report = report->buffer;
-    client->reportSize = report->used;
-    client->submitReportFunc = func;
-    client->submitReportData = userData;
-    client->submitReportBusy = 1;
-    gsiExecuteSoapCustom(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/SubmitReport\"", writer,
-                         ScClient_OnSubmitReport, ScClient_PutReportForm, client);
-    return 0;
-}
-
-static void ScClient_OnSubmitReport(int status, int unused, SoapReader *reader, void *userData) {
-    ScClient *client = userData;
-    int result;
-    ScClientFunc func;
-    int error;
-
-    if (client->ready) {
-        if (status == 0) {
-            error = 0;
-            result = 0;
-            if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "SubmitReportResponse") ||
-                !gsXmlMoveToNext(reader, "SubmitReportResult") || !gsXmlReadChildAsInt(reader, "result", &result)) {
-                error = 9;
-            } else if (result != 0) {
-                if (result == 7) {
-                    error = 12;
-                } else {
-                    error = 8;
-                }
-            }
-        } else {
-            error = 7;
-        }
-        func = client->submitReportFunc;
-        client->submitReportBusy = 0;
-        if (func != NULL) {
-            func(client->self, status, error, client->submitReportData);
-            client->submitReportData = NULL;
-            client->submitReportFunc = NULL;
-        }
-    }
 }

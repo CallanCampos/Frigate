@@ -1,8 +1,11 @@
-#include "dwc/gt2Socket.h"
+#include <string.h>
+// Before dwc/ext.h: MWCC builds the bound address's 8-byte memset in place, as the ROM does, only when
+// <string.h> declares them first
 #include "dwc/ext.h"
 #include "dwc/gt2Callback.h"
 #include "dwc/gt2Connection.h"
 #include "dwc/gt2Message.h"
+#include "dwc/gt2Socket.h"
 #include "dwc/gt2Utility.h"
 
 // GameSpy GT2's sockets (gt2Socket.c). The functions' names, from pret/pokerevo's Wii build, are in dwc/gt2Socket.h
@@ -55,8 +58,10 @@ GTI2Connection *func_ov011_0217e7a4(GTI2Socket *socket, u32 ip, u16 port) {
 int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int outgoingBufferSize,
                         int incomingBufferSize, GTI2SocketErrorCallback onSocketError, int protocol) {
     u16 port;
-    u32 ip;
+    SocAddrIn address;
     GTI2Socket *socket;
+    u32 ip;
+    int addressSize;
 
     SocketStartUp();
     if (incomingBufferSize == 0) {
@@ -102,27 +107,23 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
         gsifree(socket);
         return 3;
     }
-    {
-        SocAddrIn address = { 0 };
-        int addressSize;
-
-        address.family = 2;
-        address.addr = ip;
-        address.port = GTI2_SWAP16(port);
-        if (protocol != 3) {
-            if (bind(socket->handle, &address, sizeof(address)) == -1) {
-                closesocket(socket->handle);
-                func_ov011_0217187c(socket->connections);
-                func_ov011_02171558(socket->closedConnections);
-                gsifree(socket);
-                return 3;
-            }
+    memset(&address, 0, sizeof(address));
+    address.family = 2;
+    address.addr = ip;
+    address.port = GTI2_SWAP16(port);
+    if (protocol != 3) {
+        if (bind(socket->handle, &address, sizeof(address)) == -1) {
+            closesocket(socket->handle);
+            func_ov011_0217187c(socket->connections);
+            func_ov011_02171558(socket->closedConnections);
+            gsifree(socket);
+            return 3;
         }
-        addressSize = sizeof(address);
-        getsockname(socket->handle, &address, &addressSize);
-        socket->ip = address.addr;
-        socket->port = GTI2_SWAP16(address.port);
     }
+    addressSize = sizeof(address);
+    getsockname(socket->handle, &address, &addressSize);
+    socket->ip = address.addr;
+    socket->port = GTI2_SWAP16(address.port);
     *socketOut = socket;
     return 0;
 }

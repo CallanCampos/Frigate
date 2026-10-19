@@ -156,7 +156,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
 | `gt2Main.c` | `0x0217d144`–`0x0217d3ac` | 22 | complete | descriptive |
 | `gt2Message.c` | `0x0217d3ac`–`0x0217e768` | 51 | partial | descriptive |
-| `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | partial | descriptive |
+| `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 
 ### Overlay 12
@@ -1608,7 +1608,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `btlv_effvm.c` | `0x021e0de4`–`0x021e67b8` | 138 | complete | string at `0x021f4174` |
 | `btlv_mcss.c` | `0x021e67b8`–`0x021e982c` | 95 | partial | string at `0x021f4188` |
 | `btlv_clact.c` | `0x021e982c`–`0x021ea2a8` | 23 | complete | string at `0x021f4194` |
-| `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | partial | string at `0x021f41c8` |
+| `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | complete | string at `0x021f41c8` |
 | `btlv_gauge.c` | `0x021ef794`–`0x021f1c84` | 58 | complete | string at `0x021f41d8` |
 | `btlv_b_gauge.c` | `0x021f1c84`–`0x021f2174` | 7 | complete | string at `0x021f41e8` |
 | `btlv_timer.c` | `0x021f2174`–`0x021f26b8` | 8 | complete | string at `0x021f41f8` |
@@ -1750,7 +1750,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-180 of 1113 functions are in source files.
+252 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1765,8 +1765,18 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |
+| `dwc_util_fade.c` | `0x021bba6c`–`0x021bbc50` | 7 | complete | descriptive |
+| `dwc_util_text.c` | `0x021bbc50`–`0x021bc1a8` | 15 | partial | descriptive |
 | `dwc_util_display.c` | `0x021bc1a8`–`0x021bc468` | 7 | complete | descriptive |
 | `dwc_util_heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
+| `dwc_util_touch.c` | `0x021bc544`–`0x021bcaac` | 15 | partial | descriptive |
+| `dwc_util_irq.c` | `0x021bcaac`–`0x021bcb3c` | 3 | complete | descriptive |
+| `dwc_util_list.c` | `0x021bcb3c`–`0x021bcbc8` | 6 | complete | descriptive |
+| `dwc_util_oam_buf.c` | `0x021bcbc8`–`0x021bccec` | 6 | complete | descriptive |
+| `dwc_util_vram_alloc.c` | `0x021bccec`–`0x021bcef8` | 3 | complete | descriptive |
+| `dwc_util_string.c` | `0x021bcef8`–`0x021bcf38` | 2 | complete | descriptive |
+| `dwc_util_bank.c` | `0x021bcf38`–`0x021bd0d4` | 5 | complete | descriptive |
+| `dwc_util_task.c` | `0x021bd0d4`–`0x021bd2cc` | 10 | complete | descriptive |
 
 ### Overlay 184
 
@@ -1842,7 +1852,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ghttpCallbacks.c` | `0x021a1980`–`0x021a1a44` | 3 | partial | descriptive |
 | `ghttpCommon.c` | `0x021a1a44`–`0x021a1e0c` | 8 | partial | descriptive |
 | `ghttpConnection.c` | `0x021a1e0c`–`0x021a23d8` | 10 | partial | descriptive |
-| `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | partial | descriptive |
+| `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | complete | descriptive |
 | `ghttpMain.c` | `0x021a2c50`–`0x021a3074` | 16 | partial | descriptive |
 | `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | partial | descriptive |
 | `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | complete | descriptive |
@@ -2246,7 +2256,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `sake_storage.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
 | `sake_records.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
-| `dwc_competition.c` | `0x021bda1c`–`0x021beaa0` | 55 | partial | descriptive |
+| `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
+| `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | partial | descriptive |
 | `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 

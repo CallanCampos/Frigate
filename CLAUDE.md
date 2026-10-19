@@ -25,8 +25,10 @@ a rule here changes, change it there too.
   in `config/names.txt`. Types swan doesn't name are named after their owner. Rename a static's symbol to its C name.
   Library code in `lib/` (NitroSDK, NitroSystem, TwlSDK, DWC) uses the SDK's own names where the code shows them, even
   over swan's; the header notes swan's name where it differs. The user chose this.
-- **Write C from the asm.** pret (pokeplatinum, pokeheartgold) and other decomps are references for names and
-  structure, never code to copy. The user chose this explicitly for SPL.
+- **Write C from the asm.** pret (pokeplatinum, pokeheartgold), ntrtwl's SDK reconstructions and other decomps are
+  references for names and structure. A function may follow another decomp's structure where that is what matches,
+  rewritten in this project's names, types and format and checked against the asm; never paste their code. The user
+  chose this on 2026-10-18, after ntrtwl's NitroSDK shapes matched libfx.
 - **Natural C only.** No inline asm, permuter noise, unexplained `volatile`, casts that reach a field by byte offset or
   meaningless temporaries. A pointer sum of the element's own type (`*(p + i + 1)`, `(p + n - 1)->next`) is plain C,
   which MWCC compiles differently from indexing: write it when it gives the original's address computation. A function

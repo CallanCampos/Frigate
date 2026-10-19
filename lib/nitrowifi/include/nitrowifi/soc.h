@@ -145,7 +145,7 @@ int SOC_Connect(int sock, const SocAddrIn *address);
 int SOC_Read(int sock, void *buffer, int size, int flags);
 // On a nonnegative result, only from->port/addr are written when from is nonnull; len/family are unchanged.
 // SSL command reads do not supply peer outputs, so this wrapper does not establish a valid peer on that path.
-int SOC_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from);
+int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from);
 // Copies caller data into the send ring before return; SendTo also copies destination scalars without retaining to.
 // Positive results count admitted payload bytes, not transmission completion. Nonblocking sends can return a prefix;
 // a later admission failure can return an error after an earlier prefix was queued.

@@ -28,11 +28,13 @@ lib/nitrowifi/src/cps/cps.c:
     .bss        start:0x0218ba4c end:0x0218dc20
 
 lib/nitrowifi/src/soc/socl_startup.c:
+    complete
     .text       start:0x02155e74 end:0x02156040
     .data       start:0x021854ac end:0x021854b4
     .bss        start:0x0218dc20 end:0x0218dc60
 
 lib/nitrowifi/src/soc/socl_command.c:
+    complete
     .text       start:0x02156040 end:0x02156240
     .bss        start:0x0218dc60 end:0x0218dc84
 
@@ -41,17 +43,21 @@ lib/nitrowifi/src/soc/socl_create.c:
     .text       start:0x02156240 end:0x0215650c
 
 lib/nitrowifi/src/soc/socl_bind.c:
+    complete
     .text       start:0x0215650c end:0x02156718
     .data       start:0x021854b4 end:0x021854b8
 
 lib/nitrowifi/src/soc/socl_read.c:
+    complete
     .text       start:0x02156718 end:0x02156dcc
     .bss        start:0x0218dc84 end:0x0218dc8c
 
 lib/nitrowifi/src/soc/socl_write.c:
+    complete
     .text       start:0x02156dcc end:0x0215728c
 
 lib/nitrowifi/src/soc/socl_shutdown.c:
+    complete
     .text       start:0x0215728c end:0x02157334
 
 lib/nitrowifi/src/soc/socl_close.c:
@@ -63,6 +69,7 @@ lib/nitrowifi/src/soc/socl_cleanup.c:
     .text       start:0x02157660 end:0x021578d4
 
 lib/nitrowifi/src/soc/socl_poll.c:
+    complete
     .text       start:0x021578d4 end:0x021579b8
 
 lib/nitrowifi/src/soc/socl_misc.c:
@@ -89,6 +96,7 @@ lib/nitrowifi/src/ssl/ssl.c:
     .bss        start:0x0218de28 end:0x0218dfb4
 
 lib/nitrowifi/src/ssl/md5.c:
+    complete
     .text       start:0x0215a6f4 end:0x0215ab44
     .data       start:0x0218557c end:0x021856fc
 
@@ -148,6 +156,7 @@ lib/dwc/src/gt2/gt2Message.c:
     .data       start:0x02189114 end:0x02189120
 
 lib/dwc/src/gt2/gt2Socket.c:
+    complete
     .text       start:0x0217e7a8 end:0x0217ed54
 
 lib/dwc/src/gt2/gt2Utility.c:
