@@ -2248,6 +2248,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   offset", or that match only with `(&a[i])[11]`, are candidates. `size_t` is `unsigned long` as well, and an SDK
   prototype that takes one needs it: `STD_TVSNPrintf`'s `str.start[len - 1]` is `adds r0, p, len; subs r0, #1; strb
   [r0]` with a `size_t len` and `subs; strb [p, r0]` with a `u32`.
+  The `int` types stay the default all the same: with `s32` and `u32` as `long` and `fx32` as `long` throughout, three
+  rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `func_ov036_021ad8e8`) and 92
+  matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
+  the type of the code.
 - `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
   problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
   constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two
