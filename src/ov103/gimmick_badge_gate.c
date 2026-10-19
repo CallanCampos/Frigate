@@ -54,18 +54,18 @@ typedef struct {
     Field *field;
 } BadgeGateLastEventData;
 
-void func_ov103_021eecfc(BadgeGateWork *work);
-BOOL func_ov103_021eefbc(u32 badge, EventWork *work);
+void BadgeGate_InitActors(BadgeGateWork *work);
+BOOL BadgeGate_IsGateOpened(u32 badge, EventWork *work);
 GameEventReturnCode BadgeGate_CheckEvent(GameEvent *event, u32 *state, void *data);
-void func_ov103_021ef188(BadgeGateCheckEventData *data);
-BadgeGateActor *func_ov103_021ef1ac(BadgeGateWork *work, u32 index, u32 scene);
-void func_ov103_021ef1dc(BadgeGateActor *actor, u16 anm, BOOL paused);
-fx32 func_ov103_021ef200(BadgeGateWork *work);
+void BadgeGate_PlayCheckSounds(BadgeGateCheckEventData *data);
+BadgeGateActor *BadgeGate_GetActor(BadgeGateWork *work, u32 index, u32 scene);
+void BadgeGate_SetAnimPaused(BadgeGateActor *actor, u16 anm, BOOL paused);
+fx32 BadgeGate_GetOpenAnimFrame(BadgeGateWork *work);
 GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *data);
-void func_ov103_021ef5dc(BadgeGateLastEventData *data);
-void func_ov103_021ef518(BadgeGateLastEventData *data);
-void func_ov103_021ef630(BadgeGateActor *actor, FieldExpObjSystem *system);
-void func_ov103_021ef788(FieldExpObjSystem *system);
+void BadgeGate_PlayLastGateSounds(BadgeGateLastEventData *data);
+void BadgeGate_UpdateCameraShakes(BadgeGateLastEventData *data);
+void BadgeGate_AddLastGateScene(BadgeGateActor *actor, FieldExpObjSystem *system);
+void BadgeGate_FreeLastGateScene(FieldExpObjSystem *system);
 
 // A shake of the camera during the last gate's event, between two of its frames
 typedef struct {
@@ -192,7 +192,7 @@ static const VecFx32 sGatePositions[9] = {
     { 36 * GRID_SIZE, 5 * GRID_SIZE, 47 * GRID_SIZE },
 };
 
-void func_ov103_021eec80(Field *field) {
+void BadgeGate_Setup(Field *field) {
     HeapID heapId;
     GameData *gameData;
     BadgeGateWork *work;
@@ -209,10 +209,10 @@ void func_ov103_021eec80(Field *field) {
     LoadFieldExpandObjData(work->expObj, &sScene0, 0);
     LoadFieldExpandObjData(work->expObj, &sScene1, 1);
     LoadFieldExpandObjData(work->expObj, &sScene2, 2);
-    func_ov103_021eecfc(work);
+    BadgeGate_InitActors(work);
 }
 
-void func_ov103_021eecfc(BadgeGateWork *work) {
+void BadgeGate_InitActors(BadgeGateWork *work) {
     s32 i;
     s32 j;
     BadgeGateActor *actor;
@@ -246,9 +246,9 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
         FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 0, TRUE);
         FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 0, 0);
         FieldExpObjAnm_SetLooped(anm0, FALSE);
-        func_ov103_021ef1dc(actor, 0, TRUE);
+        BadgeGate_SetAnimPaused(actor, 0, TRUE);
         anm1 = FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 1);
-        func_ov103_021ef1dc(actor, 1, TRUE);
+        BadgeGate_SetAnimPaused(actor, 1, TRUE);
         FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 1, TRUE);
         FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 1, 0);
         FieldExpObjAnm_SetLooped(anm1, FALSE);
@@ -256,7 +256,7 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
     for (j = 0; j < 9; j++) {
         actor = &work->actors1[j];
         FieldExpObj_GetActorMatrixPtr(actor->expObj, 1, actor->actor)->translation = sGatePositions[j];
-        if (func_ov103_021eefbc(j, work->eventWork)) {
+        if (BadgeGate_IsGateOpened(j, work->eventWork)) {
             FieldExpObj_SetActorHidden(actor->expObj, actor->scene, actor->actor, TRUE);
         } else {
             FieldExpObj_SetActorHidden(actor->expObj, actor->scene, actor->actor, FALSE);
@@ -267,11 +267,11 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
         actor = &work->actors2[i];
         FieldExpObj_GetActorMatrixPtr(actor->expObj, actor->scene, actor->actor)->translation = sGatePositions[i];
         FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 0, TRUE);
-        if (func_ov103_021eefbc(i, work->eventWork)) {
-            func_ov103_021ef1dc(actor, 0, FALSE);
+        if (BadgeGate_IsGateOpened(i, work->eventWork)) {
+            BadgeGate_SetAnimPaused(actor, 0, FALSE);
             FieldExpObj_SetActorHidden(actor->expObj, actor->scene, actor->actor, FALSE);
         } else {
-            func_ov103_021ef1dc(actor, 0, TRUE);
+            BadgeGate_SetAnimPaused(actor, 0, TRUE);
             FieldExpObj_SetActorHidden(actor->expObj, actor->scene, actor->actor, TRUE);
         }
         func_ov036_021b8248(actor->expObj, actor->scene, actor->actor, 1);
@@ -280,14 +280,14 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
     }
 }
 
-BOOL func_ov103_021eefbc(u32 badge, EventWork *work) {
+BOOL BadgeGate_IsGateOpened(u32 badge, EventWork *work) {
     u16 *value;
 
     value = EventWork_GetWkPtr(work, sGateWorks[badge]);
     return *value == 2;
 }
 
-void func_ov103_021eefe0(Field *field) {
+void BadgeGate_End(Field *field) {
     BadgeGateWork *work;
 
     work = Field_GetGimmickWorkBlock(field, 0);
@@ -297,7 +297,7 @@ void func_ov103_021eefe0(Field *field) {
     Field_DeleteGimmickWorkBlock(field, 0);
 }
 
-void func_ov103_021ef010(Field *field) {
+void BadgeGate_Update(Field *field) {
     BadgeGateWork *work;
 
     work = Field_GetGimmickWorkBlock(field, 0);
@@ -329,24 +329,24 @@ GameEventReturnCode BadgeGate_CheckEvent(GameEvent *event, u32 *state, void *arg
     fx32 frame;
 
     data = arg;
-    entry0 = func_ov103_021ef1ac(data->gimmickWork, data->badge, 0);
-    entry1 = func_ov103_021ef1ac(data->gimmickWork, data->badge, 1);
-    entry2 = func_ov103_021ef1ac(data->gimmickWork, data->badge, 2);
-    func_ov103_021ef188(data);
+    entry0 = BadgeGate_GetActor(data->gimmickWork, data->badge, 0);
+    entry1 = BadgeGate_GetActor(data->gimmickWork, data->badge, 1);
+    entry2 = BadgeGate_GetActor(data->gimmickWork, data->badge, 2);
+    BadgeGate_PlayCheckSounds(data);
     data->state++;
 
     switch (*state) {
     case 0:
         FieldExpObj_SetActorHidden(entry1->expObj, entry1->scene, entry1->actor, TRUE);
         FieldExpObj_SetActorHidden(entry0->expObj, entry0->scene, entry0->actor, FALSE);
-        func_ov103_021ef1dc(entry0, 0, FALSE);
-        func_ov103_021ef1dc(entry0, 1, FALSE);
+        BadgeGate_SetAnimPaused(entry0, 0, FALSE);
+        BadgeGate_SetAnimPaused(entry0, 1, FALSE);
         (*state)++;
         break;
     case 1:
         anm = FieldExpObj_GetAnmInfo(entry0->expObj, entry0->scene, entry0->actor, 0);
         if (FieldExpObjAnm_IsPlaybackFinished(anm) == TRUE) {
-            func_ov103_021ef1dc(entry0, 0, TRUE);
+            BadgeGate_SetAnimPaused(entry0, 0, TRUE);
             (*state)++;
             return GAMEEVENT_CONTINUE_DIRECT;
         }
@@ -354,15 +354,15 @@ GameEventReturnCode BadgeGate_CheckEvent(GameEvent *event, u32 *state, void *arg
     case 2:
         FieldExpObj_SetActorHidden(entry0->expObj, entry0->scene, entry0->actor, TRUE);
         FieldExpObj_SetActorHidden(entry2->expObj, entry2->scene, entry2->actor, FALSE);
-        frame = func_ov103_021ef200(data->gimmickWork);
+        frame = BadgeGate_GetOpenAnimFrame(data->gimmickWork);
         FieldExpObj_SetAnmFrame(entry2->expObj, entry2->scene, entry2->actor, 0, frame);
-        func_ov103_021ef1dc(entry2, 0, FALSE);
+        BadgeGate_SetAnimPaused(entry2, 0, FALSE);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov103_021ef188(BadgeGateCheckEventData *data) {
+void BadgeGate_PlayCheckSounds(BadgeGateCheckEventData *data) {
     if (data->state == 0) {
         GFL_SndSEPlay(0x8a0);
     }
@@ -371,7 +371,7 @@ void func_ov103_021ef188(BadgeGateCheckEventData *data) {
     }
 }
 
-BadgeGateActor *func_ov103_021ef1ac(BadgeGateWork *work, u32 index, u32 scene) {
+BadgeGateActor *BadgeGate_GetActor(BadgeGateWork *work, u32 index, u32 scene) {
     switch (scene) {
     case 0:
         return &work->actors0[index];
@@ -384,17 +384,17 @@ BadgeGateActor *func_ov103_021ef1ac(BadgeGateWork *work, u32 index, u32 scene) {
     }
 }
 
-void func_ov103_021ef1dc(BadgeGateActor *actor, u16 anm, BOOL paused) {
+void BadgeGate_SetAnimPaused(BadgeGateActor *actor, u16 anm, BOOL paused) {
     FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, anm), paused);
 }
 
-fx32 func_ov103_021ef200(BadgeGateWork *work) {
+fx32 BadgeGate_GetOpenAnimFrame(BadgeGateWork *work) {
     s32 i;
     BadgeGateActor *entry;
     FieldExpObjAnm *anm;
 
     for (i = 0; i < 8; i++) {
-        entry = func_ov103_021ef1ac(work, i, 2);
+        entry = BadgeGate_GetActor(work, i, 2);
         anm = FieldExpObj_GetAnmInfo(entry->expObj, entry->scene, entry->actor, 0);
         if (!func_ov036_021b84ec(anm)) {
             return func_ov036_021b8520(entry->expObj, entry->scene, entry->actor, 0);
@@ -424,18 +424,18 @@ GameEvent *BadgeGate_CreateLastGateEvent(GameSystem *gsys) {
 
 GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *arg) {
     BadgeGateLastEventData *data = arg;
-    BadgeGateActor *gate = func_ov103_021ef1ac(data->gimmickWork, 8, 1);
-    BadgeGateActor *open = func_ov103_021ef1ac(data->gimmickWork, 8, 2);
+    BadgeGateActor *gate = BadgeGate_GetActor(data->gimmickWork, 8, 1);
+    BadgeGateActor *open = BadgeGate_GetActor(data->gimmickWork, 8, 2);
     FieldTaskManager *tasks;
     FieldEvCameraAnimationSetup setup;
     u32 i;
 
-    func_ov103_021ef518(data);
+    BadgeGate_UpdateCameraShakes(data);
     switch (*state) {
     case 4:
     case 5:
     case 6:
-        func_ov103_021ef5dc(data);
+        BadgeGate_PlayLastGateSounds(data);
         data->state++;
         break;
     }
@@ -462,7 +462,7 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
         setup.flags.animateExtraTranslation = FALSE;
         setup.flags.animateFOV = FALSE;
         FieldCameraAnm_SetAnimation(data->camera, &setup, 1);
-        func_ov103_021ef630(&data->lastActor, data->gimmickWork->expObj);
+        BadgeGate_AddLastGateScene(&data->lastActor, data->gimmickWork->expObj);
         (*state)++;
         break;
     case 2:
@@ -476,26 +476,26 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
         }
         FieldExpObj_SetActorHidden(gate->expObj, gate->scene, gate->actor, TRUE);
         FieldExpObj_SetActorHidden(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, FALSE);
-        func_ov103_021ef1dc(&data->lastActor, 1, FALSE);
+        BadgeGate_SetAnimPaused(&data->lastActor, 1, FALSE);
         (*state)++;
         break;
     case 4:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene,
                                                                      data->lastActor.actor, 1)) == TRUE) {
-            func_ov103_021ef1dc(&data->lastActor, 1, TRUE);
+            BadgeGate_SetAnimPaused(&data->lastActor, 1, TRUE);
             FieldExpObj_SetAnm(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 1, FALSE);
             FieldExpObj_SetAnm(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 2, TRUE);
-            func_ov103_021ef1dc(&data->lastActor, 2, FALSE);
-            func_ov103_021ef1dc(&data->lastActor, 0, FALSE);
+            BadgeGate_SetAnimPaused(&data->lastActor, 2, FALSE);
+            BadgeGate_SetAnimPaused(&data->lastActor, 0, FALSE);
             FieldExpObj_SetAnmFrame(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 2,
-                                    func_ov103_021ef200(data->gimmickWork));
+                                    BadgeGate_GetOpenAnimFrame(data->gimmickWork));
             (*state)++;
         }
         break;
     case 5:
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene,
                                                                      data->lastActor.actor, 0)) == TRUE) {
-            func_ov103_021ef1dc(&data->lastActor, 0, TRUE);
+            BadgeGate_SetAnimPaused(&data->lastActor, 0, TRUE);
             (*state)++;
         }
         break;
@@ -506,16 +506,17 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
             }
         }
         FieldExpObj_SetActorHidden(open->expObj, open->scene, open->actor, FALSE);
-        FieldExpObj_SetAnmFrame(open->expObj, open->scene, open->actor, 0, func_ov103_021ef200(data->gimmickWork));
-        func_ov103_021ef1dc(open, 0, FALSE);
+        FieldExpObj_SetAnmFrame(open->expObj, open->scene, open->actor, 0,
+                                BadgeGate_GetOpenAnimFrame(data->gimmickWork));
+        BadgeGate_SetAnimPaused(open, 0, FALSE);
         FieldExpObj_SetActorHidden(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, TRUE);
-        func_ov103_021ef788(data->gimmickWork->expObj);
+        BadgeGate_FreeLastGateScene(data->gimmickWork->expObj);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov103_021ef518(BadgeGateLastEventData *data) {
+void BadgeGate_UpdateCameraShakes(BadgeGateLastEventData *data) {
     u32 i;
     VecFx32 eye;
     VecFx32 target;
@@ -543,7 +544,7 @@ void func_ov103_021ef518(BadgeGateLastEventData *data) {
     }
 }
 
-void func_ov103_021ef5dc(BadgeGateLastEventData *data) {
+void BadgeGate_PlayLastGateSounds(BadgeGateLastEventData *data) {
     if (data->state == 100) {
         GFL_SndSEPlay(0x89d);
     }
@@ -559,7 +560,7 @@ void func_ov103_021ef5dc(BadgeGateLastEventData *data) {
     }
 }
 
-void func_ov103_021ef630(BadgeGateActor *actor, FieldExpObjSystem *system) {
+void BadgeGate_AddLastGateScene(BadgeGateActor *actor, FieldExpObjSystem *system) {
     FieldExpObjAnm *anm;
     SRTMatrix *matrix;
 
@@ -575,18 +576,18 @@ void func_ov103_021ef630(BadgeGateActor *actor, FieldExpObjSystem *system) {
     FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 0, TRUE);
     FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 0, 0);
     FieldExpObjAnm_SetLooped(anm, FALSE);
-    func_ov103_021ef1dc(actor, 0, TRUE);
+    BadgeGate_SetAnimPaused(actor, 0, TRUE);
     anm = FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 1);
-    func_ov103_021ef1dc(actor, 1, TRUE);
+    BadgeGate_SetAnimPaused(actor, 1, TRUE);
     FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 1, TRUE);
     FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 1, 0);
     FieldExpObjAnm_SetLooped(anm, FALSE);
-    func_ov103_021ef1dc(actor, 2, TRUE);
+    BadgeGate_SetAnimPaused(actor, 2, TRUE);
     FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 2, FALSE);
     FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 2, 0);
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 2), TRUE);
 }
 
-void func_ov103_021ef788(FieldExpObjSystem *system) {
+void BadgeGate_FreeLastGateScene(FieldExpObjSystem *system) {
     FieldExpObj_FreeScene(system, 3);
 }

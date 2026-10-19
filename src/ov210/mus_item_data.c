@@ -35,7 +35,7 @@ u32 MusItemData_GetTexSize(MusicalItemData *item) {
     return item->texSize;
 }
 
-BOOL func_ov210_021eef98(MusicalItemData *item, s32 pos) {
+BOOL MusItemData_CanEquipAtPos(MusicalItemData *item, s32 pos) {
     switch (pos) {
     case 0:
     case 1:
@@ -80,7 +80,7 @@ BOOL func_ov210_021eef98(MusicalItemData *item, s32 pos) {
     return FALSE;
 }
 
-BOOL func_ov210_021ef018(MusicalItemData *item, s32 pos) {
+BOOL MusItemData_CanEquipInGroup(MusicalItemData *item, s32 pos) {
     switch (pos) {
     case 0:
     case 1:
@@ -120,7 +120,7 @@ BOOL func_ov210_021ef018(MusicalItemData *item, s32 pos) {
     return FALSE;
 }
 
-BOOL func_ov210_021ef088(MusicalItemData *item, s32 pos) {
+BOOL MusItemData_IsCategoryOfGroup(MusicalItemData *item, s32 pos) {
     switch (pos) {
     case 0:
     case 1:
@@ -160,21 +160,21 @@ BOOL func_ov210_021ef088(MusicalItemData *item, s32 pos) {
     return FALSE;
 }
 
-BOOL func_ov210_021ef0f4(MusicalItemData *item) {
+BOOL MusItemData_GetFlag7(MusicalItemData *item) {
     if (item->flags & 0x80) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov210_021ef104(MusicalItemData *item) {
+BOOL MusItemData_GetFlag9(MusicalItemData *item) {
     if (item->flags & 0x200) {
         return TRUE;
     }
     return FALSE;
 }
 
-s32 func_ov210_021ef118(s32 pos) {
+s32 MusItemData_GetPosGroup(s32 pos) {
     switch (pos) {
     case 0:
         return 0;
@@ -199,7 +199,7 @@ s32 func_ov210_021ef118(s32 pos) {
     return 9;
 }
 
-u32 func_ov210_021ef164(MusItemData *items, u16 itemId) {
+u32 MusItemData_GetKind(MusItemData *items, u16 itemId) {
     return MusItemData_GetItem(items, itemId)->unk9;
 }
 

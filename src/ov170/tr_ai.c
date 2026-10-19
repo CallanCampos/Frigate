@@ -217,7 +217,7 @@ BOOL AIIfCanUseLastResort(VM *vm, void *work);
 BOOL AIGetMoveCategory(VM *vm, void *work);
 BOOL AIGetLastMoveCategory(VM *vm, void *work);
 BOOL AIGetOrderInTurn(VM *vm, void *work);
-BOOL func_ov170_0218119c(VM *vm, void *work);
+BOOL AIGetTurnsOnField(VM *vm, void *work);
 BOOL AIIfPartyMemberDealsMoreDamage(VM *vm, void *work);
 BOOL AIIfHasSuperEffectiveMove(VM *vm, void *work);
 BOOL AIIfLastMoveDealsMoreDamage(VM *vm, void *work);
@@ -239,7 +239,7 @@ BOOL AIEqualToTurnRandom(VM *vm, void *work);
 BOOL AINotEqualToTurnRandom(VM *vm, void *work);
 void CompareToTurnRandom(VM *vm, TrAIContext *wk, u32 op);
 BOOL AIJumpByMoveEffect(VM *vm, void *work);
-BOOL func_ov170_02181734(VM *vm, void *work);
+BOOL AIIfFutureSightPending(VM *vm, void *work);
 BOOL AIIsAtkLessThanSpAtk(VM *vm, void *work);
 BOOL AIIsAtkGreaterThanSpAtk(VM *vm, void *work);
 BOOL AIIsAtkEqualToSpAtk(VM *vm, void *work);
@@ -357,7 +357,7 @@ static const VMCommand sTrAICommands[] = {
     AIGetMoveCategory,
     AIGetLastMoveCategory,
     AIGetOrderInTurn,
-    func_ov170_0218119c,
+    AIGetTurnsOnField,
     AIIfPartyMemberDealsMoreDamage,
     AIIfHasSuperEffectiveMove,
     AIIfLastMoveDealsMoreDamage,
@@ -377,7 +377,7 @@ static const VMCommand sTrAICommands[] = {
     AIEqualToTurnRandom,
     AINotEqualToTurnRandom,
     AIJumpByMoveEffect,
-    func_ov170_02181734,
+    AIIfFutureSightPending,
     AIIsAtkLessThanSpAtk,
     AIIsAtkGreaterThanSpAtk,
     AIIsAtkEqualToSpAtk,
@@ -1814,7 +1814,7 @@ BOOL AIGetOrderInTurn(VM *vm, void *work) {
 
 // Loads the 16-bit value at 0x146 in the Pokemon at the position. Gen 4's AI has its command that loads the turns
 // since the Pokemon switched in at this place in the command table
-BOOL func_ov170_0218119c(VM *vm, void *work) {
+BOOL AIGetTurnsOnField(VM *vm, void *work) {
     TrAIContext *wk = work;
 
     wk->result = BattleMon_GetTurnsOnField(TrAI_GetBattleMon(wk, TrAI_GetTargetPos(wk, VM_Read32(vm))));
@@ -2079,7 +2079,7 @@ BOOL AIJumpByMoveEffect(VM *vm, void *work) {
 }
 
 // Jumps if overlay 169's check for position effect 3 at the position returns TRUE
-BOOL func_ov170_02181734(VM *vm, void *work) {
+BOOL AIIfFutureSightPending(VM *vm, void *work) {
     TrAIContext *wk = work;
     u32 side = VM_Read32(vm);
     s32 offset = VM_Read32(vm);

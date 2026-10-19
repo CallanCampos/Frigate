@@ -205,15 +205,16 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         u32 args = 0;
 
         event = FMissionViewSetup_CreateCallEvent(
-            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_FESTIVAL, func_ov021_0216e80c, &args),
+            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_FESTIVAL, EventFestival_Create, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_INFO);
         break;
     }
     case FMISSION_VIEW_EVENT_QUIT:
-        event = FMissionViewSetup_CreateCallEvent(
-            view,
-            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION, func_ov157_021f5ae4, view->field),
-            CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
+        event = FMissionViewSetup_CreateCallEvent(view,
+                                                  GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION,
+                                                                                  EventFestMissionRetire_Create,
+                                                                                  view->field),
+                                                  CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
         break;
     case FMISSION_VIEW_EVENT_PASS_POWER: {
         u32 args = 1;
@@ -221,7 +222,7 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         event = FMissionViewSetup_CreateCallEvent(
             view,
             GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_PASS_POWER,
-                                            (GameEventProvider)func_ov014_0216e8ac, &args),
+                                            (GameEventProvider)EventPassPower_Create, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_PASS_POWER);
         break;
     }
@@ -389,7 +390,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
 }
 
 static void FMissionViewSetup_FreeData(FMissionView *view) {
-    func_ov027_02170b00(view->festText);
+    FestivalText_Free(view->festText);
     PassPowerData_Free(view->passPowerData);
     GFL_HeapFree(view->newEntry);
     GFL_HeapFree(view->unk54);

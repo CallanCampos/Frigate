@@ -37,12 +37,12 @@ typedef struct {
     VirbankMusic music;
 } VirbankWork;
 
-static void func_ov100_021eed80(VirbankWork *work, BOOL hidden);
-static void func_ov100_021eee34(VirbankWork *work);
-static void func_ov100_021eee40(VirbankWork *work);
-static void func_ov100_021eee4c(VirbankMusic *music, Field *field);
-static BOOL func_ov100_021eefac(VirbankMusic *music);
-static u32 func_ov100_021ef004(VirbankMusic *music);
+static void GymVirbank_PlaceModels(VirbankWork *work, BOOL hidden);
+static void GymVirbank_FreeModels(VirbankWork *work);
+static void GymVirbank_StepAnimations(VirbankWork *work);
+static void GymVirbank_InitMusic(VirbankMusic *music, Field *field);
+static BOOL GymVirbank_UpdateMusicVolume(VirbankMusic *music);
+static u32 GymVirbank_GetVolumeIndex(VirbankMusic *music);
 
 static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 }, { 2, 0 } };
 
@@ -110,7 +110,7 @@ static const u32 sVolumeIndicesRoom2[16][17] = {
 
 // clang-format on
 
-void func_ov100_021eec80(Field *field) {
+void GymVirbank_Init(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     VirbankWork *work =
         Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(VirbankWork));
@@ -120,27 +120,27 @@ void func_ov100_021eec80(Field *field) {
     if (Field_GetPlayerStateZoneID(field) == ZONE_VIRBANK_CITY_GYM_2) {
         hidden = FALSE;
     }
-    func_ov100_021eed80(work, hidden);
-    func_ov100_021eee4c(&work->music, field);
+    GymVirbank_PlaceModels(work, hidden);
+    GymVirbank_InitMusic(&work->music, field);
 }
 
-void func_ov100_021eecd0(Field *field) {
+void GymVirbank_End(Field *field) {
     VirbankWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
     ISSSwitchSys_ResetMuteStateChangeRequests(work->music.switchSys);
     ISSSwitchSys_ResetMasterVolumeChangeRequest(work->music.switchSys);
-    func_ov100_021eee34(work);
+    GymVirbank_FreeModels(work);
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
-void func_ov100_021eecf8(Field *field) {
+void GymVirbank_Update(Field *field) {
     VirbankWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
-    func_ov100_021eee40(work);
-    func_ov100_021eefac(&work->music);
+    GymVirbank_StepAnimations(work);
+    GymVirbank_UpdateMusicVolume(&work->music);
 }
 
-void func_ov100_021eed10(GameSystem *gsys, int model) {
+void GymVirbank_StopModelAnimations(GameSystem *gsys, int model) {
     VirbankWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
     u16 modelId = model;
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, modelId, 0);
@@ -151,14 +151,14 @@ void func_ov100_021eed10(GameSystem *gsys, int model) {
     FieldExpObjAnm_SetLooped(anm, FALSE);
 }
 
-void func_ov100_021eed64(GameSystem *gsys, int actorId) {
+void GymVirbank_SetActorFlag(GameSystem *gsys, int actorId) {
     FieldActor *actor = FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId);
 
     SetActorFlag(actor, 0x10);
 }
 
 // Places the models and plays their animations, looping and paused
-static void func_ov100_021eed80(VirbankWork *work, BOOL hidden) {
+static void GymVirbank_PlaceModels(VirbankWork *work, BOOL hidden) {
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
     u8 i = 0;
@@ -184,16 +184,16 @@ static void func_ov100_021eed80(VirbankWork *work, BOOL hidden) {
     }
 }
 
-static void func_ov100_021eee34(VirbankWork *work) {
+static void GymVirbank_FreeModels(VirbankWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov100_021eee40(VirbankWork *work) {
+static void GymVirbank_StepAnimations(VirbankWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
 // Unmutes the music's tracks as the event variables say, and sets its volume
-static void func_ov100_021eee4c(VirbankMusic *music, Field *field) {
+static void GymVirbank_InitMusic(VirbankMusic *music, Field *field) {
     BOOL unmute0 = TRUE;
     VirbankWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
     EventWork *eventWork = GameData_GetEventWork(GSYS_GetGameData(Field_GetGameSystem(field)));
@@ -229,7 +229,7 @@ static void func_ov100_021eee4c(VirbankMusic *music, Field *field) {
         }
     }
     const int volumes[4] = { 127, 78, 38, 12 };
-    volumeIndex = func_ov100_021ef004(music);
+    volumeIndex = GymVirbank_GetVolumeIndex(music);
     if (volumeIndex != NO_VOLUME_INDEX) {
         ISSSwitchSys_ReqMasterVolumeChange(music->switchSys, volumes[volumeIndex], VOLUME_FADE_FRAMES,
                                            SEQ_BGM_POISONE_GYM_01);
@@ -237,9 +237,9 @@ static void func_ov100_021eee4c(VirbankMusic *music, Field *field) {
 }
 
 // Fades the music to the volume of where the player stands, if it has changed
-static BOOL func_ov100_021eefac(VirbankMusic *music) {
+static BOOL GymVirbank_UpdateMusicVolume(VirbankMusic *music) {
     FieldPlayer *player = Field_GetPlayer(music->field);
-    u32 volumeIndex = func_ov100_021ef004(music);
+    u32 volumeIndex = GymVirbank_GetVolumeIndex(music);
 
     if (volumeIndex == NO_VOLUME_INDEX) {
         return FALSE;
@@ -255,7 +255,7 @@ static BOOL func_ov100_021eefac(VirbankMusic *music) {
 }
 
 // Which volume the player's place has, or NO_VOLUME_INDEX outside the rooms' grids
-static u32 func_ov100_021ef004(VirbankMusic *music) {
+static u32 GymVirbank_GetVolumeIndex(VirbankMusic *music) {
     s16 x;
     s16 y;
     s16 z;

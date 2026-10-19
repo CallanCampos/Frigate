@@ -209,7 +209,7 @@ u32 WihDwc_GetStatus(WifiList *wifiList) {
     }
     for (i = 0; i < init->unk62; i++) {
         if (GFL_NetGetBeaconData(i) != NULL) {
-            u8 service = func_ov030_021740a4(i);
+            u8 service = NetWhpipe_GetBeaconCommandBase(i);
 
             if (service >= 0x14 && service <= 0x1b) {
                 status |= 0x10;
@@ -297,7 +297,8 @@ int WihDwc_FindFriendInvite(WifiList *wifiList) {
         GFL_NetGetInitData();
         OS_GetMacAddress(mac);
         for (i = 0; i < 16; i++) {
-            if (func_ov030_02173b78(i) == 0x20 && CtvtBeacon_IsFriendInvite(GFL_NetGetBeaconData(i), wifiList, mac)) {
+            if (NetWhpipe_GetBeaconService(i) == 0x20 &&
+                CtvtBeacon_IsFriendInvite(GFL_NetGetBeaconData(i), wifiList, mac)) {
                 return i;
             }
         }

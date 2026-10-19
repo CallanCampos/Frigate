@@ -82,7 +82,7 @@ void WifiBattleMatchMenu_Free(WifiBattleMatchMenu *menu);
 s32 WifiBattleMatchMenu_Update(WifiBattleMatchMenu *menu);
 
 // Count a match in the records. mode is the kind of match
-void func_ov262_021c5c94(GameData *gameData, u32 mode);
-void func_ov262_021c5cd4(GameData *gameData, u32 mode);
+void WifiBattleMatch_RecordResult(GameData *gameData, u32 mode);
+void WifiBattleMatch_RecordBattleTime(GameData *gameData, u32 mode);
 
 #endif // POKEBW2_APP_WIFIBATTLEMATCH_UTIL_H

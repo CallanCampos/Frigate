@@ -294,7 +294,7 @@ Same instructions, registers swapped.
   `poke_regulation.c`'s `checkPicked` swaps its last loop's counter and `requiredForm` between `r2` and `r3` with
   either earlier loop's counter, and matches once that loop counts with a `k` of its own, wherever `k` is declared.
 - A pair of values computed twice and spilled to two different slots is two pairs of variables, and the second pair
-  repeats the first's declaration order. `gimmick_passing_vehicles.c`'s `func_ov128_021eeec8` takes the sine and
+  repeats the first's declaration order. `gimmick_passing_vehicles.c`'s `PassingVehicles_PlaceVehicle` takes the sine and
   cosine of 90 and then of 270 degrees: one reused `cos, sin` pair gave the second cosine `r7` and spilled the sine,
   `fx32 cos; fx32 sin; fx32 cos2; fx32 sin2;` matches, and `sin, cos, sin2, cos2` is further off.
 - Variables declared in an inner block are allocated apart from the function's variables of the same name: in
@@ -557,7 +557,7 @@ Same instructions, registers swapped.
   made non-`const` although it sits in `.rodata`.
 - A copy's size computed by a call and held in a local before the `MI_CpuCopy8` or `MI_CpuFill8` is scheduled
   differently from the call written as the size argument: the musical's `MusComm_SendAllPokes`,
-  `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `func_ov211_021ef3e4` all matched with
+  `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `MusComm_SetUp` all matched with
   `u32 size = ...GetSize();` first. In `MusComm_Main`, `requesters[count] = i; count++;` in place of
   `requesters[count++] = i;` and `requests += chosen << 16;` as its own statement before the call were each needed.
 - A struct field that is a pointer to `const` explains several users at once: loop bounds read through it are loaded
@@ -593,7 +593,7 @@ Same instructions, registers swapped.
   to the first of them (`const u16 *values = &place->pos.rail.componentId;` then `values[0]`, `values[1]`,
   `values[2]`).
 - Whether a constant shared by two uses is kept in a register or rebuilt can depend on how many temporaries the
-  function has, not on the constant: the resort's `func_ov059_021e6630` keeps its zero in `r5` once three of its
+  function has, not on the constant: the resort's `ResortCmd_PayAndSetShopFlag` keeps its zero in `r5` once three of its
   nested call results are held in locals (`field`, `people`, `person`), and no spelling of the zero itself does it.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
@@ -613,13 +613,13 @@ Same instructions, registers swapped.
   as an immediate at each use up to that edge, and as a copy of the register (`mov r3, r7`) at every use past it.
   The edge is counted in IR nodes, not instructions, so a respelling that compiles to the same bytes moves it: a
   one-argument call is about 3 nodes, a call without arguments 1, a parameter as an argument 1, a field load 1, a
-  `u16` narrowing 1; casts of constants and dead code are free. The badge gate's `func_ov103_021ef630` (16 bytes
+  `u16` narrowing 1; casts of constants and dead code are free. The badge gate's `BadgeGate_AddLastGateScene` (16 bytes
   off, immediates where the ROM copies) matched when a call's result went through a local
   (`matrix = FieldExpObj_GetActorMatrixPtr(...); matrix->translation = ...;`), which is the same code for that
   statement and three nodes more before the edge. So when the only difference is which uses of a constant are
   immediates and which are register copies, look for a statement before the first copy that the original wrote with
   one more (or one fewer) named step, and measure by padding rather than counting. This also explains "holding three
-  nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`). The Battle Recorder's
+  nested call results in locals keeps the zero in a register" (`ResortCmd_PayAndSetShopFlag`). The Battle Recorder's
   `BrProfile_Init` (4 bytes off: a `1` copied from `r7` where the original has `movs r1, #1` at both uses) showed
   three more things. There the budget counted from the start of the `if (species != 0)` block, not of the function:
   removing statements before the `if` never moved the edge. Pointer and `u8`-to-`u32` conversions were free. And the
@@ -835,7 +835,7 @@ Same code, other `sp` offsets or frame size.
 - A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
   saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
   a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
-  123's `func_ov123_021eed54` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
+  123's `GrimsleyRoom_Init` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
   with its own `u8 index` parameter (`for (; index < GROUP_MODEL_COUNT; index++)`): the earlier loop then loads its
   zeros from that slot and keeps the 1 for `SetPaused` in `r7`, as the original does. A local counter set from a
   parameter (`i = first`) doesn't.
@@ -895,7 +895,7 @@ Same code, other `sp` offsets or frame size.
   with `BattleServer_SendRecStartChunk`, which it passes the result to, taking a `BOOL` too, since a `u8` parameter there
   narrows the argument. The local whose width matters need not be the one whose store moves: `ctvt_call.c`'s
   `CtvtCall_Scan` stores its spilled `found = TRUE` after the `stale = FALSE` field store, where the original does,
-  only with `u8 service = func_ov030_02173b78(i);`, the callee's return type and that of the `gameServiceId` field it
+  only with `u8 service = NetWhpipe_GetBeaconService(i);`, the callee's return type and that of the `gameServiceId` field it
   is compared with. As a `u32`, the flag's store follows its `movs r0, #1` at once, and no width of `found` itself
   moves it. When a flag's store is misplaced, sweep the block's other spilled locals against their callees' returns.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
@@ -2047,7 +2047,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag set with `b = TRUE; if (*p != 0) { b = FALSE; }` is live before `*p` is loaded, so `b` and `p` need two
   registers, and a spilled flag is stored twice. `b = (*p == 0) ? TRUE : FALSE;` reads `*p` first, takes `p`'s
   register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
-  can mix the two: `gym_virbank.c`'s `func_ov100_021eee4c` has the first of its four flags as `TRUE` plus `if` (its
+  can mix the two: `gym_virbank.c`'s `GymVirbank_InitMusic` has the first of its four flags as `TRUE` plus `if` (its
   `movs r5, #1` is in the prologue) and the other three as ternaries; one spelling for all four leaves a pointer
   spilled and the frame larger. Where both spellings give the same instructions, the ternary still allocates the
   rest of the function differently: `scrcmd_musical.c`'s `s0163_MusicalCall` swaps its `vm` and `env` between

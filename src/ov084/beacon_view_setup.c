@@ -191,8 +191,8 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
 
         args |= work->selected << 16;
 
-        event =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(13), (GameEventProvider)func_ov013_0216e770, &args);
+        event = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(13), (GameEventProvider)EventBeaconDetail_Create,
+                                                &args);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_TASKS, 0);
         break;
     }
@@ -202,16 +202,16 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
 
         args |= work->selected << 16;
 
-        event =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(15), (GameEventProvider)func_ov015_0216e770, &args);
+        event = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(15),
+                                                (GameEventProvider)EventMedalInfoBeacon_Create, &args);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_MEDAL, work->selectedPanel);
         break;
     }
     case BEACON_VIEW_EVENT_PASS_POWER: {
         u32 args = 0;
 
-        event =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(14), (GameEventProvider)func_ov014_0216e8ac, &args);
+        event = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(14), (GameEventProvider)EventPassPower_Create,
+                                                &args);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_PASS_POWER);
         break;
     }
@@ -426,7 +426,7 @@ static void BeaconView_InitData(BeaconViewWork *work) {
 
 static void BeaconView_FreeData(BeaconViewWork *work) {
     GameBeaconInfoTable_MarkAllNew(work->newTable);
-    func_ov027_02170b00(work->festText);
+    FestivalText_Free(work->festText);
     PassPowerData_Free(work->passPowerData);
     GFL_HeapFree(work->newBeacon);
     GFL_HeapFree(work->countBeacon);

@@ -9,18 +9,18 @@
 // Marshal's Japanese name, SEQ_SE_SW_RENBU_04
 
 // Overlay 36's gimmick table calls these
-void func_ov124_021eec80(Field *field);
-void func_ov124_021eecc8(Field *field);
-void func_ov124_021eece0(Field *field);
+void MarshalRoom_Init(Field *field);
+void MarshalRoom_End(Field *field);
+void MarshalRoom_Update(Field *field);
 
 // The League's script plugin (overlay 52) calls these
 // Plays the two animations of model 0
-void func_ov124_021eecf0(GameSystem *gsys);
+void MarshalRoom_PlayModel0Anims(GameSystem *gsys);
 // Plays one of model 3's two animations, the first when which is 0, and pauses the other
-void func_ov124_021eed20(GameSystem *gsys, u16 which);
+void MarshalRoom_PlayModel3Anim(GameSystem *gsys, u16 which);
 // Plays the three animations of model 1
-void func_ov124_021eed40(GameSystem *gsys);
+void MarshalRoom_PlayModel1Anims(GameSystem *gsys);
 // The event that lowers the platform with the player on it
-GameEvent *func_ov124_021eed6c(GameSystem *gsys);
+GameEvent *MarshalRoom_LowerPlatform(GameSystem *gsys);
 
 #endif // POKEBW2_FIELD_GIMMICK_LEAGUE_MARSHAL_H

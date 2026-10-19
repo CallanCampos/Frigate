@@ -40,7 +40,7 @@ typedef struct {
 static GameEvent *PlasmaFrigate_CreatePasswordEvent(GameSystem *gsys, u16 *result);
 static u8 PlasmaFrigate_GetPasswordIndex(PlayerInfo *playerInfo);
 
-static BOOL func_ov064_021e5800(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_PressSwitch(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = GimmickPlasmaFrigate_CallSwitchEvent(gsys, VM_Read16(vm));
@@ -52,7 +52,7 @@ static BOOL func_ov064_021e5800(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov064_021e5838(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_SetLightsState(VM *vm, FieldScriptEnv *env) {
     u16 a;
     GameSystem *gsys;
 
@@ -62,14 +62,14 @@ static BOOL func_ov064_021e5838(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov064_021e586c(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_PlayGroupASecond(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickPlasmaFrigate_CallPlayGroupASecond(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL func_ov064_021e588c(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_PlayGroupBSecond(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickPlasmaFrigate_CallPlayGroupBSecond(gsys, VM_Read16(vm));
@@ -98,27 +98,27 @@ static BOOL PlasmaFrigateCmd_GetPasswordIndex(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov064_021e5910(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_SetSwitchLightState(VM *vm, FieldScriptEnv *env) {
     u16 a;
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     a = VM_Read16(vm);
-    func_ov119_021eecd0(gsys, a, ScriptReadAny(vm, env) != 0);
+    PlasmaFrigateLights_ShowSwitchState(gsys, a, ScriptReadAny(vm, env) != 0);
     return FALSE;
 }
 
-static BOOL func_ov064_021e5944(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_PlaySwitchAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov119_021eed10(gsys, VM_Read16(vm));
+    PlasmaFrigateLights_PlaySwitchAnim(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL func_ov064_021e5964(VM *vm, FieldScriptEnv *env) {
+static BOOL PlasmaFrigateCmd_PlaySwitchLightAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov119_021eed34(gsys, VM_Read16(vm));
+    PlasmaFrigateLights_PlayLightAnim(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -188,14 +188,8 @@ static u8 PlasmaFrigate_GetPasswordIndex(PlayerInfo *playerInfo) {
 }
 
 const FieldScriptCommand PLASMA_FRIGATE_SCRIPT_COMMANDS[] = {
-    func_ov064_021e5800,
-    func_ov064_021e5838,
-    func_ov064_021e586c,
-    func_ov064_021e588c,
-    PlasmaFrigateCmd_EnterPassword,
-    PlasmaFrigateCmd_GetPasswordIndex,
-    func_ov064_021e5910,
-    func_ov064_021e5944,
-    func_ov064_021e5964,
+    PlasmaFrigateCmd_PressSwitch,         PlasmaFrigateCmd_SetLightsState, PlasmaFrigateCmd_PlayGroupASecond,
+    PlasmaFrigateCmd_PlayGroupBSecond,    PlasmaFrigateCmd_EnterPassword,  PlasmaFrigateCmd_GetPasswordIndex,
+    PlasmaFrigateCmd_SetSwitchLightState, PlasmaFrigateCmd_PlaySwitchAnim, PlasmaFrigateCmd_PlaySwitchLightAnim,
     (FieldScriptCommand)0xFFFFFFFF,
 };

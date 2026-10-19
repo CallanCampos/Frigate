@@ -26,12 +26,12 @@ struct RivalSelectContext {
 RivalEntry *LinkFestival_GetEntries(void *owner);
 u8 getHollowNum(RivalDataSave *save);
 
-RivalEntry *func_ov073_021e8be0(RivalSelectContext *context, u32 id);
-void func_ov073_021e8bfc(RivalSelectContext *context, u32 id);
-BOOL func_ov073_021e8c4c(RivalSelectContext *context);
-BOOL func_ov073_021e8c64(RivalSelectContext *context);
-BOOL func_ov073_021e8cac(RivalSelectContext *context, u32 id);
-void func_ov073_021e8cdc(RivalSelectContext *context, u32 id);
-u8 func_ov073_021e8d00(RivalSelectContext *context, u32 id);
+RivalEntry *RivalSelect_GetEntry(RivalSelectContext *context, u32 id);
+void RivalSelect_SelectOtherRandom(RivalSelectContext *context, u32 id);
+BOOL RivalSelect_RemoveHollowActorIfMission(RivalSelectContext *context);
+BOOL RivalSelect_RemoveHollowActor(RivalSelectContext *context);
+BOOL RivalSelect_IsSelectedAndActive(RivalSelectContext *context, u32 id);
+void RivalSelect_SetActive(RivalSelectContext *context, u32 id);
+u8 RivalSelect_FindEntryIndex(RivalSelectContext *context, u32 id);
 
 #endif // POKEBW2_FIELD_RIVAL_SELECT_H

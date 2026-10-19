@@ -290,75 +290,75 @@ static const ResortShopWindowSetup *sWindowSetups[] = {
     &sWindow0, &sWindow1, &sWindow2, &sWindow3, &sWindow4, &sWindow5, &sWindow6,
 };
 
-static BOOL func_ov060_021e5c8c(VM *vm, void *env);
-static void func_ov060_021e5d60(ResortShopWork *wk);
-static void func_ov060_021e6064(ResortShop *shop);
-static BOOL func_ov060_021e60ac(ResortShop *shop);
-static void func_ov060_021e6100(ResortShop *shop);
-static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static BOOL func_ov060_021e66c4(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e688c(ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e6c90(ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e6d94(ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e6fd8(ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e70e0(ResortShopWork *wk);
-static u8 func_ov060_021e7128(ResortShopWork *wk, u8 mode);
-static void func_ov060_021e7178(ResortShopWork *wk);
-static void func_ov060_021e71c8(ResortShopWork *wk, u32 mode);
-static void func_ov060_021e7274(ResortShopWork *wk);
-static void func_ov060_021e7294(ResortShopWork *wk);
-static void func_ov060_021e7318(ResortShopWork *wk);
-static void func_ov060_021e737c(ResortShopWork *wk, u16 item);
-static void func_ov060_021e7404(ResortShopWork *wk, u16 objCode);
-static void func_ov060_021e7470(ResortShopWork *wk, const ClActorSetup *iconSetup);
-static void func_ov060_021e75b8(ResortShopWork *wk);
-static void func_ov060_021e75dc(ResortShopWork *wk);
-static void func_ov060_021e7604(ResortShopWork *wk);
-static void func_ov060_021e766c(ResortShopWork *wk);
-static void func_ov060_021e76d0(ResortShopWork *wk);
-static void func_ov060_021e7750(ResortShopWork *wk);
-static void func_ov060_021e77a8(ResortShopWork *wk);
-static void func_ov060_021e77d4(ResortShopWork *wk);
-static void func_ov060_021e786c(ResortShopWork *wk, u16 item);
-static void func_ov060_021e791c(ResortShopWork *wk, StrBuf *strbuf);
-static void func_ov060_021e7974(ResortShopWork *wk, BmpMenuListCursorCallback cursorCallback,
-                                BmpMenuListPrintCallback printCallback);
-static void func_ov060_021e7a70(BmpMenuList *list, s32 value, u8 y);
-static void func_ov060_021e7b68(ResortShopWork *wk);
-static BOOL func_ov060_021e7b7c(u32 event);
-static void func_ov060_021e7b80(ResortShopWork *wk, u32 msgId, u16 item, u16 count);
-static void func_ov060_021e7bc8(ResortShopWork *wk, u32 msgId);
-static void func_ov060_021e7c94(ResortShopWork *wk, u32 msgId);
-static void func_ov060_021e7d3c(BmpWin *window);
-static void func_ov060_021e7d58(ResortShopWork *wk, u32 msgId);
-static void func_ov060_021e7e00(ResortShopWork *wk, u32 msgId, ResortShopEntry *entry);
-static void func_ov060_021e7e84(u32 which);
-static ResortPeople *func_ov060_021e7ecc(Field *field);
-static void *func_ov060_021e7efc(Field *field);
-static void func_ov060_021e7f2c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e7f58(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e7f5c(BmpMenuList *list, s32 value, u8 a2);
-static void func_ov060_021e7fe0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e800c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e8010(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e803c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
-static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person);
-static void func_ov060_021e8190(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry);
-static void func_ov060_021e827c(BmpMenuList *list, s32 value, u8 a2);
-static void func_ov060_021e82f0(BmpMenuList *list, s32 value, u8 a2);
-static void func_ov060_021e837c(ResortShopWork *wk);
-static void func_ov060_021e841c(ResortShopWork *wk, u8 mode, u8 subMode);
-static void func_ov060_021e85b0(ResortShopWork *wk, u8 mode, u8 subMode);
-static u8 func_ov060_021e8708(u32 index);
-static void func_ov060_021e8720(ArcTool *handle, u16 objCode, u8 *texture, u16 *fileId);
-static u32 func_ov060_021e8758(ResortShopWork *wk, u32 price);
-static void func_ov060_021e8804(ResortShop *shop, Field *field, u16 cameraMode);
-static BOOL func_ov060_021e8924(ResortShop *shop, Field *field, int *seq);
-static BOOL func_ov060_021e89bc(ResortShop *shop, Field *field, int *seq);
+static BOOL ResortShop_Run(VM *vm, void *env);
+static void ResortShop_LoadPriceStrings(ResortShopWork *wk);
+static void ResortShop_Create(ResortShop *shop);
+static BOOL ResortShop_ShowList(ResortShop *shop);
+static void ResortShop_Destroy(ResortShop *shop);
+static BOOL ResortShop_UpdateShop(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static BOOL ResortShop_UpdateRecords(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static BOOL ResortShop_UpdateOrder(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_MakeItemEntries(ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_MakeRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_MakePersonEntries(ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_SwapRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_SwapPersonEntries(ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_FreeEntries(ResortShopWork *wk);
+static u8 ResortShop_InitMessages(ResortShopWork *wk, u8 mode);
+static void ResortShop_FreeMessages(ResortShopWork *wk);
+static void ResortShop_LoadBG(ResortShopWork *wk, u32 mode);
+static void ResortShop_ClearBG(ResortShopWork *wk);
+static void ResortShop_LoadCursorResources(ResortShopWork *wk);
+static void ResortShop_LoadItemIconResources(ResortShopWork *wk);
+static void ResortShop_ShowItemIcon(ResortShopWork *wk, u16 item);
+static void ResortShop_ShowPersonModel(ResortShopWork *wk, u16 objCode);
+static void ResortShop_CreateActors(ResortShopWork *wk, const ClActorSetup *iconSetup);
+static void ResortShop_CreateClActUnit(ResortShopWork *wk);
+static void ResortShop_CreateItemActors(ResortShopWork *wk);
+static void ResortShop_CreatePersonActors(ResortShopWork *wk);
+static void ResortShop_FreeActors(ResortShopWork *wk);
+static void ResortShop_CreateWindows(ResortShopWork *wk);
+static void ResortShop_PrintMoneyLabel(ResortShopWork *wk);
+static void ResortShop_FreeWindows(ResortShopWork *wk);
+static void ResortShop_PrintMoney(ResortShopWork *wk);
+static void ResortShop_PrintBagCount(ResortShopWork *wk, u16 item);
+static void ResortShop_PrintDescription(ResortShopWork *wk, StrBuf *strbuf);
+static void ResortShop_CreateList(ResortShopWork *wk, BmpMenuListCursorCallback cursorCallback,
+                                  BmpMenuListPrintCallback printCallback);
+static void ResortShop_PrintPrice(BmpMenuList *list, s32 value, u8 y);
+static void ResortShop_FreeList(ResortShopWork *wk);
+static BOOL ResortShop_PrintStreamCallback(u32 event);
+static void ResortShop_PrintItemMessage(ResortShopWork *wk, u32 msgId, u16 item, u16 count);
+static void ResortShop_PrintMessage(ResortShopWork *wk, u32 msgId);
+static void ResortShop_PrintMessageNoWait(ResortShopWork *wk, u32 msgId);
+static void ResortShop_DrawMessageFrame(BmpWin *window);
+static void ResortShop_PrintMessageInFrame(ResortShopWork *wk, u32 msgId);
+static void ResortShop_PrintEntryMessage(ResortShopWork *wk, u32 msgId, ResortShopEntry *entry);
+static void ResortShop_ClearListScreen(u32 which);
+static ResortPeople *ResortShop_GetPeople(Field *field);
+static void *ResortShop_GetNPC(Field *field);
+static void ResortShop_CreateItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_DestroyItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_ItemCursorCallback(BmpMenuList *list, s32 value, u8 a2);
+static void ResortShop_CreateRecordList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_DestroyRecordList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_CreatePersonList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_DestroyPersonList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
+static StrBuf *ResortShop_MakePersonDescription(ResortShopWork *wk, JoinAvenuePerson *person);
+static void ResortShop_MakePersonEntry(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry);
+static void ResortShop_ModelCursorCallback(BmpMenuList *list, s32 value, u8 a2);
+static void ResortShop_OrderCursorCallback(BmpMenuList *list, s32 value, u8 a2);
+static void ResortShop_UpdateMoveArrow(ResortShopWork *wk);
+static void ResortShop_ApplyRecordOrder(ResortShopWork *wk, u8 mode, u8 subMode);
+static void ResortShop_ApplyPersonOrder(ResortShopWork *wk, u8 mode, u8 subMode);
+static u8 ResortShop_GetTextureIndex(u32 index);
+static void ResortShop_GetModelTexture(ArcTool *handle, u16 objCode, u8 *texture, u16 *fileId);
+static u32 ResortShop_GetDiscountedPrice(ResortShopWork *wk, u32 price);
+static void ResortShop_SetCamera(ResortShop *shop, Field *field, u16 cameraMode);
+static BOOL ResortShop_FadeIn(ResortShop *shop, Field *field, int *seq);
+static BOOL ResortShop_FadeOut(ResortShop *shop, Field *field, int *seq);
 
-BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
+BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 subMode = ScriptReadAny(vm, env);
     u16 cameraMode = ScriptReadAny(vm, env);
@@ -393,8 +393,8 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     shop->work.info = ResortSys_GetInfo(sys);
     shop->work.sys = sys;
     shop->work.cameraMode = cameraMode;
-    shop->work.people = func_ov060_021e7ecc(field);
-    shop->work.npc = func_ov060_021e7efc(field);
+    shop->work.people = ResortShop_GetPeople(field);
+    shop->work.npc = ResortShop_GetNPC(field);
     shop->gsys = gsys;
     shop->work.person = ResortSys_GetScriptPerson(env, shop->work.people);
     if (JoinAvenue_GetParam(shop->work.info, 13, 0) != 0) {
@@ -402,8 +402,8 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     } else {
         shop->work.unk300 = FALSE;
     }
-    shop->fadeIn = func_ov060_021e8924;
-    shop->fadeOut = func_ov060_021e89bc;
+    shop->fadeIn = ResortShop_FadeIn;
+    shop->fadeOut = ResortShop_FadeOut;
     shop->work.msgBase = ResortPerson_GetParam(shop->work.person, 2, NULL);
     *shop->work.vars[0] = 0;
     shop->work.mode = mode;
@@ -413,11 +413,11 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
         GameBeacon_BroadcastJoinAvenueShopping();
         shop->mode = mode;
         shop->subMode = 0;
-        shop->work.update = func_ov060_021e6140;
-        shop->work.create = func_ov060_021e7f2c;
-        shop->work.destroy = func_ov060_021e7f58;
-        shop->work.cursorCallback = func_ov060_021e7f5c;
-        shop->work.printCallback = func_ov060_021e7a70;
+        shop->work.update = ResortShop_UpdateShop;
+        shop->work.create = ResortShop_CreateItemList;
+        shop->work.destroy = ResortShop_DestroyItemList;
+        shop->work.cursorCallback = ResortShop_ItemCursorCallback;
+        shop->work.printCallback = ResortShop_PrintPrice;
         shop->work.flags = JoinAvenuePerson_GetShop(ResortPerson_GetJoinAvenuePerson(shop->work.person));
         shop->work.row =
             ResortShopData_GetPersonShop(shop->work.shops, ResortPerson_GetJoinAvenuePerson(shop->work.person));
@@ -425,39 +425,39 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     case 1:
         shop->mode = mode;
         shop->subMode = subMode;
-        shop->work.update = func_ov060_021e64b0;
+        shop->work.update = ResortShop_UpdateRecords;
         switch (subMode) {
         case 0:
         default:
-            shop->work.create = func_ov060_021e7fe0;
-            shop->work.destroy = func_ov060_021e800c;
+            shop->work.create = ResortShop_CreateRecordList;
+            shop->work.destroy = ResortShop_DestroyRecordList;
             shop->work.msgs[1] = 52;
             shop->work.msgs[2] = 53;
-            shop->work.cursorCallback = func_ov060_021e827c;
+            shop->work.cursorCallback = ResortShop_ModelCursorCallback;
             shop->work.printCallback = NULL;
             break;
         case 1:
-            shop->work.create = func_ov060_021e7fe0;
-            shop->work.destroy = func_ov060_021e800c;
+            shop->work.create = ResortShop_CreateRecordList;
+            shop->work.destroy = ResortShop_DestroyRecordList;
             shop->work.msgs[1] = 50;
             shop->work.msgs[2] = 51;
-            shop->work.cursorCallback = func_ov060_021e827c;
+            shop->work.cursorCallback = ResortShop_ModelCursorCallback;
             shop->work.printCallback = NULL;
             break;
         case 2:
-            shop->work.create = func_ov060_021e8010;
-            shop->work.destroy = func_ov060_021e803c;
+            shop->work.create = ResortShop_CreatePersonList;
+            shop->work.destroy = ResortShop_DestroyPersonList;
             shop->work.msgs[1] = 54;
             shop->work.msgs[2] = 55;
-            shop->work.cursorCallback = func_ov060_021e827c;
+            shop->work.cursorCallback = ResortShop_ModelCursorCallback;
             shop->work.printCallback = NULL;
             break;
         case 3:
-            shop->work.create = func_ov060_021e8010;
-            shop->work.destroy = func_ov060_021e803c;
+            shop->work.create = ResortShop_CreatePersonList;
+            shop->work.destroy = ResortShop_DestroyPersonList;
             shop->work.msgs[1] = 56;
             shop->work.msgs[2] = 57;
-            shop->work.cursorCallback = func_ov060_021e827c;
+            shop->work.cursorCallback = ResortShop_ModelCursorCallback;
             shop->work.printCallback = NULL;
             break;
         }
@@ -465,38 +465,38 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     case 2:
         shop->mode = mode;
         shop->subMode = subMode;
-        shop->work.update = func_ov060_021e66c4;
+        shop->work.update = ResortShop_UpdateOrder;
         switch (subMode) {
         case 0:
-            shop->work.create = func_ov060_021e7fe0;
-            shop->work.destroy = func_ov060_021e800c;
-            shop->work.swapEntries = func_ov060_021e6d94;
-            shop->work.applyOrder = func_ov060_021e841c;
+            shop->work.create = ResortShop_CreateRecordList;
+            shop->work.destroy = ResortShop_DestroyRecordList;
+            shop->work.swapEntries = ResortShop_SwapRecordEntries;
+            shop->work.applyOrder = ResortShop_ApplyRecordOrder;
             shop->work.msgs[0] = 67;
             shop->work.msgs[1] = 59;
             shop->work.msgs[2] = 68;
-            shop->work.cursorCallback = func_ov060_021e82f0;
+            shop->work.cursorCallback = ResortShop_OrderCursorCallback;
             shop->work.printCallback = NULL;
             break;
         case 1:
-            shop->work.create = func_ov060_021e8010;
-            shop->work.destroy = func_ov060_021e803c;
-            shop->work.swapEntries = func_ov060_021e6fd8;
-            shop->work.applyOrder = func_ov060_021e85b0;
+            shop->work.create = ResortShop_CreatePersonList;
+            shop->work.destroy = ResortShop_DestroyPersonList;
+            shop->work.swapEntries = ResortShop_SwapPersonEntries;
+            shop->work.applyOrder = ResortShop_ApplyPersonOrder;
             shop->work.msgs[0] = 58;
             shop->work.msgs[1] = 59;
             shop->work.msgs[2] = 60;
-            shop->work.cursorCallback = func_ov060_021e82f0;
+            shop->work.cursorCallback = ResortShop_OrderCursorCallback;
             shop->work.printCallback = NULL;
             break;
         }
         break;
     }
-    VM_SetNativeCallback(vm, func_ov060_021e5c8c);
+    VM_SetNativeCallback(vm, ResortShop_Run);
     return TRUE;
 }
 
-static BOOL func_ov060_021e5c8c(VM *vm, void *env) {
+static BOOL ResortShop_Run(VM *vm, void *env) {
     void **ptr = ScriptWork_GetUserHeapPtr(FieldScriptEnv_GetScriptWork(env));
     ResortShop *shop = *ptr;
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -529,33 +529,33 @@ static BOOL func_ov060_021e5c8c(VM *vm, void *env) {
     return FALSE;
 }
 
-static void func_ov060_021e5d34(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_Init(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
     GetGameDataPlayerInfo(GSYS_GetGameData(gsys));
-    func_ov060_021e7128(wk, mode);
-    func_ov060_021e5d60(wk);
-    func_ov060_021e76d0(wk);
-    func_ov060_021e75b8(wk);
+    ResortShop_InitMessages(wk, mode);
+    ResortShop_LoadPriceStrings(wk);
+    ResortShop_CreateWindows(wk);
+    ResortShop_CreateClActUnit(wk);
 }
 
-static void func_ov060_021e5d60(ResortShopWork *wk) {
+static void ResortShop_LoadPriceStrings(ResortShopWork *wk) {
     wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty);
     wk->boughtLabel = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_2);
 }
 
-static u32 func_ov060_021e5d84(ResortShopWork *wk) {
+static u32 ResortShop_GetCash(ResortShopWork *wk) {
     return getCash(wk->trainerCard);
 }
 
 // Buying the chosen item: the answers when it was bought already, does not fit in the bag or costs too much, and else
 // the question
-static void func_ov060_021e5d90(ResortShopWork *wk) {
-    u32 cash = func_ov060_021e5d84(wk);
+static void ResortShop_TryBuy(ResortShopWork *wk) {
+    u32 cash = ResortShop_GetCash(wk);
 
     if (JoinAvenueShop_GetFlag(wk->flags, wk->selected->id) == TRUE) {
         if (wk->selected->kind == 0) {
-            func_ov060_021e7bc8(wk, wk->msgBase + 17);
+            ResortShop_PrintMessage(wk, wk->msgBase + 17);
         } else {
-            func_ov060_021e7bc8(wk, wk->msgBase + 21);
+            ResortShop_PrintMessage(wk, wk->msgBase + 21);
         }
         wk->state = 8;
         wk->nextState = 2;
@@ -563,27 +563,27 @@ static void func_ov060_021e5d90(ResortShopWork *wk) {
     }
     if (wk->selected->kind == 0 &&
         !BagSave_CheckAvailItemSpace(wk->bag, wk->selected->item, wk->selected->count, wk->heapId)) {
-        func_ov060_021e7bc8(wk, wk->msgBase + 10);
+        ResortShop_PrintMessage(wk, wk->msgBase + 10);
         wk->state = 8;
         wk->nextState = 2;
         return;
     }
     if (cash < wk->selected->price) {
-        func_ov060_021e7bc8(wk, wk->msgBase);
+        ResortShop_PrintMessage(wk, wk->msgBase);
         wk->state = 8;
         wk->nextState = 2;
         return;
     }
     if (wk->selected->kind == 0) {
-        func_ov060_021e7e00(wk, wk->msgBase + 4, wk->selected);
+        ResortShop_PrintEntryMessage(wk, wk->msgBase + 4, wk->selected);
     } else {
-        func_ov060_021e7e00(wk, wk->msgBase + 6, wk->selected);
+        ResortShop_PrintEntryMessage(wk, wk->msgBase + 6, wk->selected);
     }
     wk->state = 8;
     wk->nextState = 3;
 }
 
-static void func_ov060_021e5e54(ResortShopWork *wk) {
+static void ResortShop_UpdateItemList(ResortShopWork *wk) {
     s32 result = BmpMenuList_Update(wk->list);
 
     if (result == BMPMENULIST_NULL) {
@@ -595,10 +595,10 @@ static void func_ov060_021e5e54(ResortShopWork *wk) {
         return;
     }
     wk->selected = &wk->entries[result];
-    func_ov060_021e5d90(wk);
+    ResortShop_TryBuy(wk);
 }
 
-static void func_ov060_021e5e94(ResortShopWork *wk) {
+static void ResortShop_UpdateRecordList(ResortShopWork *wk) {
     s32 result = BmpMenuList_Update(wk->list);
 
     if (result == BMPMENULIST_NULL) {
@@ -610,13 +610,13 @@ static void func_ov060_021e5e94(ResortShopWork *wk) {
         return;
     }
     wk->selected = &wk->entries[result];
-    func_ov060_021e7e00(wk, wk->msgs[1], wk->selected);
+    ResortShop_PrintEntryMessage(wk, wk->msgs[1], wk->selected);
     wk->state = 7;
     wk->nextState = 3;
 }
 
 // The list of mode 2, where the first choice picks an entry up and the second puts it down
-static void func_ov060_021e5ee0(ResortShopWork *wk) {
+static void ResortShop_UpdateOrderList(ResortShopWork *wk) {
     s32 result = BmpMenuList_Update(wk->list);
 
     if (result == BMPMENULIST_NULL) {
@@ -644,11 +644,11 @@ static void func_ov060_021e5ee0(ResortShopWork *wk) {
     wk->moving = TRUE;
     wk->selected = &wk->entries[result];
     BmpMenuList_GetPos(wk->list, &wk->moveTop, &wk->moveCursor);
-    func_ov060_021e837c(wk);
+    ResortShop_UpdateMoveArrow(wk);
 }
 
 // Prints the message, returning the next state once it is done
-static u8 func_ov060_021e5f88(ResortShopWork *wk) {
+static u8 ResortShop_UpdateMessage(ResortShopWork *wk) {
     u32 state = PrintStream_GetState(wk->printStream);
 
     if (wk->keyCursor != NULL) {
@@ -681,26 +681,26 @@ static u8 func_ov060_021e5f88(ResortShopWork *wk) {
     return wk->state;
 }
 
-static void func_ov060_021e6044(ResortShopWork *wk, u32 price) {
+static void ResortShop_Pay(ResortShopWork *wk, u32 price) {
     subCashFromTotal(wk->trainerCard, price);
     RecordAdd(wk->records, 22, price);
     RecordAddOne(wk->records, 21);
 }
 
-static void func_ov060_021e6064(ResortShop *shop) {
+static void ResortShop_Create(ResortShop *shop) {
     ResortShopWork *wk = &shop->work;
 
-    func_ov060_021e5d34(shop->gsys, wk, shop->mode, shop->subMode);
-    func_ov060_021e71c8(wk, shop->mode);
+    ResortShop_Init(shop->gsys, wk, shop->mode, shop->subMode);
+    ResortShop_LoadBG(wk, shop->mode);
     if (shop->mode == 0) {
-        func_ov060_021e7750(wk);
-        func_ov060_021e77d4(wk);
+        ResortShop_PrintMoneyLabel(wk);
+        ResortShop_PrintMoney(wk);
     }
     wk->create(shop->gsys, wk, shop->mode, shop->subMode);
 }
 
 // Shows the list's window once everything is printed
-static BOOL func_ov060_021e60ac(ResortShop *shop) {
+static BOOL ResortShop_ShowList(ResortShop *shop) {
     ResortShopWork *wk = &shop->work;
 
     if (!PrintQueue_IsEmpty(wk->printQueue)) {
@@ -714,30 +714,30 @@ static BOOL func_ov060_021e60ac(ResortShop *shop) {
     return FALSE;
 }
 
-static void func_ov060_021e6100(ResortShop *shop) {
+static void ResortShop_Destroy(ResortShop *shop) {
     ResortShopWork *wk = &shop->work;
 
     wk->destroy(shop->gsys, wk, shop->mode, shop->subMode);
-    func_ov060_021e7b68(wk);
-    func_ov060_021e766c(wk);
-    func_ov060_021e77a8(wk);
-    func_ov060_021e7274(wk);
-    func_ov060_021e70e0(wk);
-    func_ov060_021e7178(wk);
+    ResortShop_FreeList(wk);
+    ResortShop_FreeActors(wk);
+    ResortShop_FreeWindows(wk);
+    ResortShop_ClearBG(wk);
+    ResortShop_FreeEntries(wk);
+    ResortShop_FreeMessages(wk);
 }
 
 // Mode 0, a shop
-static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static BOOL ResortShop_UpdateShop(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
     u32 result;
 
     switch (wk->state) {
     case 0:
-        func_ov060_021e5e54(wk);
+        ResortShop_UpdateItemList(wk);
         break;
     case 1:
         break;
     case 2:
-        func_ov060_021e7e84(0);
+        ResortShop_ClearListScreen(0);
         BmpWin_FlushMap(wk->windows[2]);
         BmpWin_FlushMap(wk->windows[5]);
         GFL_BGSysQueueScrLoad(1);
@@ -746,17 +746,17 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         wk->state = 0;
         break;
     case 3:
-        func_ov060_021e7e84(1);
+        ResortShop_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
         if (wk->selected->kind == 0) {
-            func_ov060_021e786c(wk, wk->selected->item);
+            ResortShop_PrintBagCount(wk, wk->selected->item);
         }
         wk->state = 5;
         break;
     case 4:
-        func_ov060_021e7e84(1);
+        ResortShop_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
@@ -767,7 +767,7 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         if (result != BMPMENU_NULL) {
             if (result == 0) {
                 wk->state = 6;
-                func_ov060_021e7e84(1);
+                ResortShop_ClearListScreen(1);
                 BmpMenuList_Redraw(wk->list);
                 BmpWin_FlushMap(wk->windows[2]);
                 GFL_BGSysQueueScrLoad(1);
@@ -779,23 +779,23 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
     case 6:
         if (wk->selected->kind == 0) {
             GFL_SndSEPlay(1621);
-            func_ov060_021e7b80(wk, wk->msgBase + 8, wk->selected->item, wk->selected->count);
-            func_ov060_021e6044(wk, wk->selected->price);
-            func_ov060_021e77d4(wk);
+            ResortShop_PrintItemMessage(wk, wk->msgBase + 8, wk->selected->item, wk->selected->count);
+            ResortShop_Pay(wk, wk->selected->price);
+            ResortShop_PrintMoney(wk);
             BagSave_AddItem(wk->bag, wk->selected->item, wk->selected->count, wk->heapId);
             JoinAvenueShop_SetFlag(wk->flags, wk->selected->id, TRUE);
             wk->state = 8;
             wk->nextState = 2;
         } else if (wk->selected->kind == 11) {
             GFL_SndSEPlay(1621);
-            func_ov060_021e7e00(wk, wk->msgBase + 61, wk->selected);
-            func_ov060_021e6044(wk, wk->selected->price);
-            func_ov060_021e77d4(wk);
+            ResortShop_PrintEntryMessage(wk, wk->msgBase + 61, wk->selected);
+            ResortShop_Pay(wk, wk->selected->price);
+            ResortShop_PrintMoney(wk);
             JoinAvenueShop_SetFlag(wk->flags, wk->selected->id, TRUE);
             wk->state = 8;
             wk->nextState = 7;
         } else {
-            func_ov060_021e7bc8(wk, wk->msgBase + 15);
+            ResortShop_PrintMessage(wk, wk->msgBase + 15);
             wk->state = 8;
             wk->nextState = 9;
         }
@@ -812,17 +812,17 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
 
         func_0202437c(wk->wordSet, 2, wk->selected->name, 2, 1, 2);
         if (BagSave_CheckAvailItemSpace(wk->bag, prize, 1, wk->heapId)) {
-            func_ov060_021e7b80(wk, wk->msgBase + 63, prize, 1);
+            ResortShop_PrintItemMessage(wk, wk->msgBase + 63, prize, 1);
             BagSave_AddItem(wk->bag, prize, 1, wk->heapId);
         } else {
-            func_ov060_021e7b80(wk, wk->msgBase + 65, prize, 1);
+            ResortShop_PrintItemMessage(wk, wk->msgBase + 65, prize, 1);
         }
         wk->state = 8;
         wk->nextState = 2;
         break;
     }
     case 8:
-        wk->state = func_ov060_021e5f88(wk);
+        wk->state = ResortShop_UpdateMessage(wk);
         break;
     case 9:
         if (wk->selected != NULL) {
@@ -848,17 +848,17 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
 }
 
 // Mode 1, the records
-static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static BOOL ResortShop_UpdateRecords(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
     u32 result;
 
     switch (wk->state) {
     case 0:
-        func_ov060_021e5e94(wk);
+        ResortShop_UpdateRecordList(wk);
         break;
     case 1:
         break;
     case 2:
-        func_ov060_021e7e84(0);
+        ResortShop_ClearListScreen(0);
         BmpWin_FlushMap(wk->windows[2]);
         BmpWin_FlushMap(wk->windows[5]);
         GFL_BGSysQueueScrLoad(1);
@@ -867,14 +867,14 @@ static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         wk->state = 0;
         break;
     case 3:
-        func_ov060_021e7e84(1);
+        ResortShop_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
         wk->state = 5;
         break;
     case 4:
-        func_ov060_021e7e84(1);
+        ResortShop_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
@@ -885,7 +885,7 @@ static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         if (result != BMPMENU_NULL) {
             if (result == 0) {
                 wk->state = 6;
-                func_ov060_021e7e84(1);
+                ResortShop_ClearListScreen(1);
                 BmpMenuList_Redraw(wk->list);
                 BmpWin_FlushMap(wk->windows[2]);
                 GFL_BGSysQueueScrLoad(1);
@@ -904,13 +904,13 @@ static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         gender = joinAveTextHandler(wk->selected->person, 2, NULL);
         func_0202437c(wk->wordSet, 2, strbuf, gender, 1, 2);
         GFL_StrBufFree(strbuf);
-        func_ov060_021e7bc8(wk, wk->msgs[2]);
+        ResortShop_PrintMessage(wk, wk->msgs[2]);
         wk->state = 7;
         wk->nextState = 8;
         break;
     }
     case 7:
-        wk->state = func_ov060_021e5f88(wk);
+        wk->state = ResortShop_UpdateMessage(wk);
         break;
     case 8:
         if (wk->selected != NULL) {
@@ -936,22 +936,22 @@ static BOOL func_ov060_021e64b0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
 }
 
 // Mode 2, the order of the records or the people
-static BOOL func_ov060_021e66c4(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static BOOL ResortShop_UpdateOrder(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
     u32 result;
 
     switch (wk->state) {
     case 0:
-        func_ov060_021e7c94(wk, wk->msgs[0]);
+        ResortShop_PrintMessageNoWait(wk, wk->msgs[0]);
         wk->state = 8;
         wk->nextState = 3;
         break;
     case 1:
-        func_ov060_021e5ee0(wk);
+        ResortShop_UpdateOrderList(wk);
         break;
     case 2:
         break;
     case 3:
-        func_ov060_021e7e84(0);
+        ResortShop_ClearListScreen(0);
         BmpWin_FlushMap(wk->windows[2]);
         BmpWin_FlushMap(wk->windows[5]);
         GFL_BGSysQueueScrLoad(1);
@@ -963,23 +963,23 @@ static BOOL func_ov060_021e66c4(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         wk->swapEntries(wk, mode, subMode);
         wk->moving = FALSE;
         ClActor_SetVisible(wk->actors[5], FALSE);
-        func_ov060_021e7b68(wk);
-        func_ov060_021e7974(wk, wk->cursorCallback, wk->printCallback);
+        ResortShop_FreeList(wk);
+        ResortShop_CreateList(wk, wk->cursorCallback, wk->printCallback);
         BmpWin_FlushMap(wk->windows[2]);
         GFL_BGSysQueueScrLoad(1);
-        func_ov060_021e7bc8(wk, wk->msgs[2]);
+        ResortShop_PrintMessage(wk, wk->msgs[2]);
         wk->state = 8;
         wk->nextState = 3;
         break;
     case 5:
-        func_ov060_021e7e84(1);
+        ResortShop_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
         wk->state = 7;
         break;
     case 6:
-        func_ov060_021e7e84(1);
+        ResortShop_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
@@ -996,7 +996,7 @@ static BOOL func_ov060_021e66c4(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         }
         break;
     case 8:
-        wk->state = func_ov060_021e5f88(wk);
+        wk->state = ResortShop_UpdateMessage(wk);
         break;
     case 9:
         wk->applyOrder(wk, mode, subMode);
@@ -1011,7 +1011,7 @@ static BOOL func_ov060_021e66c4(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
 }
 
 // The shop's items
-static void func_ov060_021e688c(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_MakeItemEntries(ResortShopWork *wk, u8 mode, u8 subMode) {
     int i;
     int count;
     MsgData *itemNames;
@@ -1033,7 +1033,7 @@ static void func_ov060_021e688c(ResortShopWork *wk, u8 mode, u8 subMode) {
         }
         wk->entries[n].id = i;
         wk->entries[n].kind = ResortShopData_GetGoodsParam(item, 5);
-        wk->entries[n].price = func_ov060_021e8758(wk, price * 10);
+        wk->entries[n].price = ResortShop_GetDiscountedPrice(wk, price * 10);
         wk->entries[n].item = ResortShopData_GetGoodsParam(item, 6);
         wk->entries[n].count = ResortShopData_GetGoodsParam(item, 7);
         if (ResortShopData_GetGoodsParam(item, 1) != 0) {
@@ -1059,7 +1059,7 @@ static void func_ov060_021e688c(ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // The four records
-static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_MakeRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode) {
     int i;
     int count;
     int n;
@@ -1123,7 +1123,7 @@ static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // The avenue's people, from the last
-static void func_ov060_021e6c90(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_MakePersonEntries(ResortShopWork *wk, u8 mode, u8 subMode) {
     int count = JoinAvenueOccupants_CountPeople(wk->occupants);
     int n;
     int i;
@@ -1146,7 +1146,7 @@ static void func_ov060_021e6c90(ResortShopWork *wk, u8 mode, u8 subMode) {
         wk->entries[n].item = joinAveTextHandler(person, 3, NULL);
         wk->entries[n].count = 0;
         wk->entries[n].person = person;
-        func_ov060_021e8190(wk, data, n, &wk->entries[n]);
+        ResortShop_MakePersonEntry(wk, data, n, &wk->entries[n]);
         ListMenuCore_AppendStrBufOption(&wk->options[n], wk->entries[n].label, n, wk->heapId);
         n++;
     }
@@ -1155,7 +1155,7 @@ static void func_ov060_021e6c90(ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // Swaps the moved record with the one it was put on, and remakes the list
-static void func_ov060_021e6d94(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_SwapRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode) {
     ResortShopEntry entry;
     int i;
     u16 name[8];
@@ -1197,7 +1197,7 @@ static void func_ov060_021e6d94(ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // The same for the people
-static void func_ov060_021e6fd8(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_SwapPersonEntries(ResortShopWork *wk, u8 mode, u8 subMode) {
     ResortShopEntry entry;
     int i;
 
@@ -1208,13 +1208,13 @@ static void func_ov060_021e6fd8(ResortShopWork *wk, u8 mode, u8 subMode) {
     ListMenuCore_FreeOptionList(wk->options);
     wk->options = ListMenuCore_CreateOptionList(wk->entryCount + 1, wk->heapId);
     for (i = 0; i < wk->entryCount; i++) {
-        func_ov060_021e8190(wk, ResortDatas_FindByPerson(wk->datas, wk->entries[i].person), i, &wk->entries[i]);
+        ResortShop_MakePersonEntry(wk, ResortDatas_FindByPerson(wk->datas, wk->entries[i].person), i, &wk->entries[i]);
         ListMenuCore_AppendStrBufOption(&wk->options[i], wk->entries[i].label, i, wk->heapId);
     }
     ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, 12, BMPMENULIST_CANCEL, wk->heapId);
 }
 
-static void func_ov060_021e70e0(ResortShopWork *wk) {
+static void ResortShop_FreeEntries(ResortShopWork *wk) {
     int i;
 
     ListMenuCore_FreeOptionList(wk->options);
@@ -1234,7 +1234,7 @@ static void func_ov060_021e70e0(ResortShopWork *wk) {
     }
 }
 
-static u8 func_ov060_021e7128(ResortShopWork *wk, u8 mode) {
+static u8 ResortShop_InitMessages(ResortShopWork *wk, u8 mode) {
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_SCRCMD_RESORT_SHOP, wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 64, wk->heapId);
     wk->message = GFL_StrBufCreate(200, wk->heapId);
@@ -1242,7 +1242,7 @@ static u8 func_ov060_021e7128(ResortShopWork *wk, u8 mode) {
     return mode;
 }
 
-static void func_ov060_021e7178(ResortShopWork *wk) {
+static void ResortShop_FreeMessages(ResortShopWork *wk) {
     GFL_TCBExMgrFree(wk->tcbManager);
     GFL_WordSetSystemFree(wk->wordSet);
     if (wk->keyCursor != NULL) {
@@ -1255,7 +1255,7 @@ static void func_ov060_021e7178(ResortShopWork *wk) {
     GFL_MsgDataFree(wk->msgData);
 }
 
-static void func_ov060_021e71c8(ResortShopWork *wk, u32 mode) {
+static void ResortShop_LoadBG(ResortShopWork *wk, u32 mode) {
     ArcTool *arc;
 
     G2_BlendNone();
@@ -1273,14 +1273,14 @@ static void func_ov060_021e71c8(ResortShopWork *wk, u32 mode) {
     }
 }
 
-static void func_ov060_021e7274(ResortShopWork *wk) {
+static void ResortShop_ClearBG(ResortShopWork *wk) {
     GFL_BGSysClearScr(1);
     GFL_BGSysClearScr(2);
     GFL_BGSysSetBGPriority(2, 0);
     setAlphaBlend_wrapper(TRUE);
 }
 
-static void func_ov060_021e7294(ResortShopWork *wk) {
+static void ResortShop_LoadCursorResources(ResortShopWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SCRCMD_SHOP, wk->heapId);
 
     wk->res[0].palette = ClActSys_LoadPlttRange(arc, 11, 0, 0, 0, 2, wk->heapId);
@@ -1291,7 +1291,7 @@ static void func_ov060_021e7294(ResortShopWork *wk) {
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov060_021e7318(ResortShopWork *wk) {
+static void ResortShop_LoadItemIconResources(ResortShopWork *wk) {
     wk->res[2].palette =
         ClActSys_LoadPlttRange(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 64, 0, 1, wk->heapId);
     wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
@@ -1299,7 +1299,7 @@ static void func_ov060_021e7318(ResortShopWork *wk) {
 }
 
 // Shows an item's icon, or hides the icon for anything past the last item
-static void func_ov060_021e737c(ResortShopWork *wk, u16 item) {
+static void ResortShop_ShowItemIcon(ResortShopWork *wk, u16 item) {
     NNSG2dCharacterData *character;
     NNSG2dPaletteData *palette;
     void *nclr;
@@ -1319,14 +1319,14 @@ static void func_ov060_021e737c(ResortShopWork *wk, u16 item) {
 }
 
 // Shows a person's model as the icon, or hides it for 0xffff
-static void func_ov060_021e7404(ResortShopWork *wk, u16 objCode) {
+static void ResortShop_ShowPersonModel(ResortShopWork *wk, u16 objCode) {
     ArcTool *arc;
     u8 texture;
     u16 fileId;
 
     if (objCode != 0xffff) {
         arc = GFL_ArcSysCreateFileHandle(ARCID_MMODEL_TBL, wk->heapId);
-        func_ov060_021e8720(arc, objCode, &texture, &fileId);
+        ResortShop_GetModelTexture(arc, objCode, &texture, &fileId);
         GFL_ArcToolFree(arc);
         NsbtxToClwk_LoadTexture(wk->actors[4], ARCID_MMODEL_GRA, fileId, texture, 4, 4, 0, 0, wk->heapId);
         ClActor_SetVisible(wk->actors[4], TRUE);
@@ -1335,7 +1335,7 @@ static void func_ov060_021e7404(ResortShopWork *wk, u16 objCode) {
     }
 }
 
-static void func_ov060_021e7470(ResortShopWork *wk, const ClActorSetup *iconSetup) {
+static void ResortShop_CreateActors(ResortShopWork *wk, const ClActorSetup *iconSetup) {
     wk->actors[0] = ClActor_Create(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims,
                                    &sActorSetups[0], 0, wk->heapId);
     wk->actors[1] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
@@ -1356,27 +1356,27 @@ static void func_ov060_021e7470(ResortShopWork *wk, const ClActorSetup *iconSetu
     ClActor_SetVisible(wk->actors[3], FALSE);
 }
 
-static void func_ov060_021e75b8(ResortShopWork *wk) {
+static void ResortShop_CreateClActUnit(ResortShopWork *wk) {
     wk->clactUnit = ClActUnit_Create(6, 1, wk->heapId);
     ClActUnit_SetActive(wk->clactUnit, TRUE);
-    func_ov060_021e7294(wk);
+    ResortShop_LoadCursorResources(wk);
 }
 
-static void func_ov060_021e75dc(ResortShopWork *wk) {
+static void ResortShop_CreateItemActors(ResortShopWork *wk) {
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, wk->heapId);
-    func_ov060_021e7318(wk);
-    func_ov060_021e7470(wk, &sActorSetups[4]);
+    ResortShop_LoadItemIconResources(wk);
+    ResortShop_CreateActors(wk, &sActorSetups[4]);
 }
 
-static void func_ov060_021e7604(ResortShopWork *wk) {
+static void ResortShop_CreatePersonActors(ResortShopWork *wk) {
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, wk->heapId);
     wk->res[2].palette = ClActSys_LoadPlttRange(wk->iconArc, 0, 0, 64, 2, 1, wk->heapId);
     wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, 49, 0, 0, wk->heapId);
     wk->res[2].cellAnims = ClActSys_LoadCellAnims(wk->iconArc, 65, 66, wk->heapId);
-    func_ov060_021e7470(wk, &sActorSetups[5]);
+    ResortShop_CreateActors(wk, &sActorSetups[5]);
 }
 
-static void func_ov060_021e766c(ResortShopWork *wk) {
+static void ResortShop_FreeActors(ResortShopWork *wk) {
     ClActSys_FreeCellAnims(wk->res[2].cellAnims);
     ClActSys_FreeCellAnims(wk->res[1].cellAnims);
     ClActSys_FreeCellAnims(wk->res[0].cellAnims);
@@ -1389,7 +1389,7 @@ static void func_ov060_021e766c(ResortShopWork *wk) {
     ClActUnit_Delete(wk->clactUnit);
 }
 
-static void func_ov060_021e76d0(ResortShopWork *wk) {
+static void ResortShop_CreateWindows(ResortShopWork *wk) {
     int i;
 
     for (i = 0; i < 7; i++) {
@@ -1404,7 +1404,7 @@ static void func_ov060_021e76d0(ResortShopWork *wk) {
     BmpWin_TransferNow(wk->windows[1]);
 }
 
-static void func_ov060_021e7750(ResortShopWork *wk) {
+static void ResortShop_PrintMoneyLabel(ResortShopWork *wk) {
     StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Money);
 
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->windows[0]), 0, 0, strbuf, wk->font, PRINT_COLOR(15, 2, 15));
@@ -1412,7 +1412,7 @@ static void func_ov060_021e7750(ResortShopWork *wk) {
     BmpWin_TransferNow(wk->windows[0]);
 }
 
-static void func_ov060_021e77a8(ResortShopWork *wk) {
+static void ResortShop_FreeWindows(ResortShopWork *wk) {
     int i;
 
     PrintQueue_Clear(wk->printQueue);
@@ -1423,7 +1423,7 @@ static void func_ov060_021e77a8(ResortShopWork *wk) {
 }
 
 // The player's money
-static void func_ov060_021e77d4(ResortShopWork *wk) {
+static void ResortShop_PrintMoney(ResortShopWork *wk) {
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_6);
     StrBuf *strbuf = GFL_StrBufCreate(10, wk->heapId);
     GFLBitmap *bitmap;
@@ -1439,7 +1439,7 @@ static void func_ov060_021e77d4(ResortShopWork *wk) {
 }
 
 // How many of the item the bag holds
-static void func_ov060_021e786c(ResortShopWork *wk, u16 item) {
+static void ResortShop_PrintBagCount(ResortShopWork *wk, u16 item) {
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Bag);
     StrBuf *strbuf = GFL_StrBufCreate(20, wk->heapId);
     GFLBitmap *bitmap;
@@ -1456,7 +1456,7 @@ static void func_ov060_021e786c(ResortShopWork *wk, u16 item) {
 }
 
 // The description of the entry at the cursor
-static void func_ov060_021e791c(ResortShopWork *wk, StrBuf *strbuf) {
+static void ResortShop_PrintDescription(ResortShopWork *wk, StrBuf *strbuf) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(wk->windows[5]);
 
     GFL_BitmapFill(bitmap, 0);
@@ -1466,8 +1466,8 @@ static void func_ov060_021e791c(ResortShopWork *wk, StrBuf *strbuf) {
     BmpWin_TransferNow(wk->windows[5]);
 }
 
-static void func_ov060_021e7974(ResortShopWork *wk, BmpMenuListCursorCallback cursorCallback,
-                                BmpMenuListPrintCallback printCallback) {
+static void ResortShop_CreateList(ResortShopWork *wk, BmpMenuListCursorCallback cursorCallback,
+                                  BmpMenuListPrintCallback printCallback) {
     BmpMenuListHeader header;
 
     header.options = wk->options;
@@ -1499,8 +1499,8 @@ static void func_ov060_021e7974(ResortShopWork *wk, BmpMenuListCursorCallback cu
 }
 
 // Prints straight to the bitmap in the first row, and through the print queue below it
-static void func_ov060_021e7a2c(PrintQueue *queue, GFLBitmap *bitmap, int x, int y, const StrBuf *strbuf, Font *font,
-                                u16 color) {
+static void ResortShop_PrintToRow(PrintQueue *queue, GFLBitmap *bitmap, int x, int y, const StrBuf *strbuf, Font *font,
+                                  u16 color) {
     if (y <= 8) {
         GFL_TextRendererDrawToBitmapEx(bitmap, x, y, strbuf, font, color);
     } else {
@@ -1509,7 +1509,7 @@ static void func_ov060_021e7a2c(PrintQueue *queue, GFLBitmap *bitmap, int x, int
 }
 
 // Prints an item's price, or that it was bought, at the right of its row
-static void func_ov060_021e7a70(BmpMenuList *list, s32 value, u8 y) {
+static void ResortShop_PrintPrice(BmpMenuList *list, s32 value, u8 y) {
     ResortShopWork *wk = BmpMenuList_GetWork(list);
     s32 width;
     u32 windowWidth;
@@ -1520,40 +1520,40 @@ static void func_ov060_021e7a70(BmpMenuList *list, s32 value, u8 y) {
     if (JoinAvenueShop_GetFlag(wk->flags, wk->entries[value].id)) {
         width = GFL_FontGetBlockWidth(wk->boughtLabel, wk->font, 0);
         windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[2]));
-        func_ov060_021e7a2c(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->boughtLabel,
-                            wk->font, PRINT_COLOR(12, 13, 0));
+        ResortShop_PrintToRow(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->boughtLabel,
+                              wk->font, PRINT_COLOR(12, 13, 0));
         return;
     }
     WordSetNumber(wk->wordSet, 1, wk->entries[value].price, 5, 1, 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, wk->priceFormat);
     width = GFL_FontGetBlockWidth(wk->message, wk->font, 0);
     windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[2]));
-    func_ov060_021e7a2c(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->message, wk->font,
-                        PRINT_COLOR(12, 13, 0));
+    ResortShop_PrintToRow(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->message,
+                          wk->font, PRINT_COLOR(12, 13, 0));
 }
 
-static void func_ov060_021e7b68(ResortShopWork *wk) {
+static void ResortShop_FreeList(ResortShopWork *wk) {
     u16 a1;
     u16 a2;
 
     BmpMenuList_Free(wk->list, &a1, &a2);
 }
 
-static BOOL func_ov060_021e7b7c(u32 event) {
+static BOOL ResortShop_PrintStreamCallback(u32 event) {
     return FALSE;
 }
 
 // Puts an item's name and pocket in the word set, and prints a message
-static void func_ov060_021e7b80(ResortShopWork *wk, u32 msgId, u16 item, u16 count) {
+static void ResortShop_PrintItemMessage(ResortShopWork *wk, u32 msgId, u16 item, u16 count) {
     u32 pocket = BagSave_GetActualItemPocket(wk->bag, item);
 
     loadItemText(wk->wordSet, 0, item, count != 1, FALSE);
     loadBagPocketNameToStrbuf(wk->wordSet, 1, pocket);
-    func_ov060_021e7bc8(wk, msgId);
+    ResortShop_PrintMessage(wk, msgId);
 }
 
 // Prints a message in a new frame, waiting for a button at its end
-static void func_ov060_021e7bc8(ResortShopWork *wk, u32 msgId) {
+static void ResortShop_PrintMessage(ResortShopWork *wk, u32 msgId) {
     StrBuf *strbuf;
     BmpWin *window;
 
@@ -1564,7 +1564,7 @@ static void func_ov060_021e7bc8(ResortShopWork *wk, u32 msgId) {
     GFL_StrBufFree(strbuf);
     wk->printStream =
         PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
-                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov060_021e7b7c);
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, ResortShop_PrintStreamCallback);
     if (wk->keyCursor != NULL) {
         KeyCursor_Free(wk->keyCursor);
         wk->keyCursor = NULL;
@@ -1574,7 +1574,7 @@ static void func_ov060_021e7bc8(ResortShopWork *wk, u32 msgId) {
 }
 
 // The same without waiting for a button
-static void func_ov060_021e7c94(ResortShopWork *wk, u32 msgId) {
+static void ResortShop_PrintMessageNoWait(ResortShopWork *wk, u32 msgId) {
     StrBuf *strbuf;
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[6]), 15);
@@ -1584,17 +1584,17 @@ static void func_ov060_021e7c94(ResortShopWork *wk, u32 msgId) {
     GFL_StrBufFree(strbuf);
     wk->printStream =
         PrintStream_CreateWithCallback(wk->windows[6], 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
-                                       wk->tcbManager, 0, wk->heapId, 0xffff, func_ov060_021e7b7c);
+                                       wk->tcbManager, 0, wk->heapId, 0xffff, ResortShop_PrintStreamCallback);
     BmpWin_TransferNow(wk->windows[6]);
 }
 
-static void func_ov060_021e7d3c(BmpWin *window) {
+static void ResortShop_DrawMessageFrame(BmpWin *window) {
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
     BmpWin_DrawFrame(window, WINFRAME_TRANSFER_NOW, 228, 9);
 }
 
-// func_ov060_021e7bc8 in the frame that is there already
-static void func_ov060_021e7d58(ResortShopWork *wk, u32 msgId) {
+// ResortShop_PrintMessage in the frame that is there already
+static void ResortShop_PrintMessageInFrame(ResortShopWork *wk, u32 msgId) {
     StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
@@ -1611,8 +1611,8 @@ static void func_ov060_021e7d58(ResortShopWork *wk, u32 msgId) {
 }
 
 // A message about an entry, with its name, count and price in the word set
-static void func_ov060_021e7e00(ResortShopWork *wk, u32 msgId, ResortShopEntry *entry) {
-    func_ov060_021e7d3c(wk->windows[6]);
+static void ResortShop_PrintEntryMessage(ResortShopWork *wk, u32 msgId, ResortShopEntry *entry) {
+    ResortShop_DrawMessageFrame(wk->windows[6]);
     if (entry->kind == 0 && wk->mode == 0) {
         loadItemNameToStrbuf(wk->wordSet, 0, entry->item);
     } else {
@@ -1620,15 +1620,15 @@ static void func_ov060_021e7e00(ResortShopWork *wk, u32 msgId, ResortShopEntry *
     }
     WordSetNumber(wk->wordSet, 1, entry->count, 2, NUM_PAD_NONE, 1);
     WordSetNumber(wk->wordSet, 2, entry->price, 7, NUM_PAD_NONE, 1);
-    func_ov060_021e7d58(wk, msgId);
+    ResortShop_PrintMessageInFrame(wk, msgId);
 }
 
-static void func_ov060_021e7e84(u32 which) {
+static void ResortShop_ClearListScreen(u32 which) {
     GFL_BGSysFillScrArea(1, 0, sListRects[which].x, sListRects[which].y, sListRects[which].width,
                          sListRects[which].height, 0);
 }
 
-static ResortPeople *func_ov060_021e7ecc(Field *field) {
+static ResortPeople *ResortShop_GetPeople(Field *field) {
     ResortPeople *people = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
@@ -1639,7 +1639,7 @@ static ResortPeople *func_ov060_021e7ecc(Field *field) {
     return people;
 }
 
-static void *func_ov060_021e7efc(Field *field) {
+static void *ResortShop_GetNPC(Field *field) {
     void *npc = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
@@ -1650,17 +1650,17 @@ static void *func_ov060_021e7efc(Field *field) {
     return npc;
 }
 
-static void func_ov060_021e7f2c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
-    func_ov060_021e75dc(wk);
-    func_ov060_021e688c(wk, mode, subMode);
-    func_ov060_021e7974(wk, wk->cursorCallback, wk->printCallback);
+static void ResortShop_CreateItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+    ResortShop_CreateItemActors(wk);
+    ResortShop_MakeItemEntries(wk, mode, subMode);
+    ResortShop_CreateList(wk, wk->cursorCallback, wk->printCallback);
 }
 
-static void func_ov060_021e7f58(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_DestroyItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // Moves the cursor's arrow, and shows the entry's description and icon
-static void func_ov060_021e7f5c(BmpMenuList *list, s32 value, u8 a2) {
+static void ResortShop_ItemCursorCallback(BmpMenuList *list, s32 value, u8 a2) {
     ResortShopWork *wk = BmpMenuList_GetWork(list);
     u16 top;
     u16 cursor;
@@ -1671,38 +1671,38 @@ static void func_ov060_021e7f5c(BmpMenuList *list, s32 value, u8 a2) {
     pos.y = cursor * 16 + 22;
     ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
     if (value < NELEMS(wk->entries)) {
-        func_ov060_021e791c(wk, wk->entries[value].description);
+        ResortShop_PrintDescription(wk, wk->entries[value].description);
         if (wk->entries[value].kind == 0) {
-            func_ov060_021e737c(wk, wk->entries[value].item);
+            ResortShop_ShowItemIcon(wk, wk->entries[value].item);
         } else {
-            func_ov060_021e737c(wk, 0xffff);
+            ResortShop_ShowItemIcon(wk, 0xffff);
         }
     } else {
-        func_ov060_021e791c(wk, NULL);
-        func_ov060_021e737c(wk, 0xffff);
+        ResortShop_PrintDescription(wk, NULL);
+        ResortShop_ShowItemIcon(wk, 0xffff);
     }
 }
 
-static void func_ov060_021e7fe0(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
-    func_ov060_021e7604(wk);
-    func_ov060_021e6a28(wk, mode, subMode);
-    func_ov060_021e7974(wk, wk->cursorCallback, wk->printCallback);
+static void ResortShop_CreateRecordList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+    ResortShop_CreatePersonActors(wk);
+    ResortShop_MakeRecordEntries(wk, mode, subMode);
+    ResortShop_CreateList(wk, wk->cursorCallback, wk->printCallback);
 }
 
-static void func_ov060_021e800c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_DestroyRecordList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
-static void func_ov060_021e8010(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
-    func_ov060_021e7604(wk);
-    func_ov060_021e6c90(wk, mode, subMode);
-    func_ov060_021e7974(wk, wk->cursorCallback, wk->printCallback);
+static void ResortShop_CreatePersonList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+    ResortShop_CreatePersonActors(wk);
+    ResortShop_MakePersonEntries(wk, mode, subMode);
+    ResortShop_CreateList(wk, wk->cursorCallback, wk->printCallback);
 }
 
-static void func_ov060_021e803c(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_DestroyPersonList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // A person's shop, its level and the date, as the description of the person
-static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person) {
+static StrBuf *ResortShop_MakePersonDescription(ResortShopWork *wk, JoinAvenuePerson *person) {
     void *flags = JoinAvenuePerson_GetShop(person);
     StrBuf *strbuf = GFL_StrBufCreate(128, wk->heapId);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(wk->shops, person), 0);
@@ -1729,12 +1729,12 @@ static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person)
 }
 
 // Makes a person's entry's strings, or remakes them
-static void func_ov060_021e8190(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry) {
+static void ResortShop_MakePersonEntry(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry) {
     JoinAvenuePerson *person = ResortData_GetPerson(data);
     u16 flag = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
     StrBuf *label = GFL_StrBufCreate(64, wk->heapId);
     StrBuf *name = ResortSys_FormatShopText(wk->shops, data, flag, wk->heapId);
-    StrBuf *description = func_ov060_021e8040(wk, person);
+    StrBuf *description = ResortShop_MakePersonDescription(wk, person);
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_11);
     u8 gender = joinAveTextHandler(person, 2, NULL);
 
@@ -1757,7 +1757,7 @@ static void func_ov060_021e8190(ResortShopWork *wk, ResortPersonData *data, u32 
 }
 
 // Moves the cursor's arrow, and shows the entry's description and model
-static void func_ov060_021e827c(BmpMenuList *list, s32 value, u8 a2) {
+static void ResortShop_ModelCursorCallback(BmpMenuList *list, s32 value, u8 a2) {
     ResortShopWork *wk = BmpMenuList_GetWork(list);
     u16 top;
     u16 cursor;
@@ -1768,16 +1768,16 @@ static void func_ov060_021e827c(BmpMenuList *list, s32 value, u8 a2) {
     pos.y = cursor * 16 + 22;
     ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
     if (value < NELEMS(wk->entries)) {
-        func_ov060_021e791c(wk, wk->entries[value].description);
-        func_ov060_021e7404(wk, wk->entries[value].item);
+        ResortShop_PrintDescription(wk, wk->entries[value].description);
+        ResortShop_ShowPersonModel(wk, wk->entries[value].item);
     } else {
-        func_ov060_021e791c(wk, NULL);
-        func_ov060_021e7404(wk, 0xffff);
+        ResortShop_PrintDescription(wk, NULL);
+        ResortShop_ShowPersonModel(wk, 0xffff);
     }
 }
 
 // The same, and moves the arrow of the entry being moved
-static void func_ov060_021e82f0(BmpMenuList *list, s32 value, u8 a2) {
+static void ResortShop_OrderCursorCallback(BmpMenuList *list, s32 value, u8 a2) {
     ResortShopWork *wk = BmpMenuList_GetWork(list);
     u16 top;
     u16 cursor;
@@ -1788,21 +1788,21 @@ static void func_ov060_021e82f0(BmpMenuList *list, s32 value, u8 a2) {
     pos.y = cursor * 16 + 22;
     ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
     if (value < NELEMS(wk->entries)) {
-        func_ov060_021e791c(wk, wk->entries[value].description);
-        func_ov060_021e7404(wk, wk->entries[value].item);
+        ResortShop_PrintDescription(wk, wk->entries[value].description);
+        ResortShop_ShowPersonModel(wk, wk->entries[value].item);
     } else {
-        func_ov060_021e791c(wk, NULL);
-        func_ov060_021e7404(wk, 0xffff);
+        ResortShop_PrintDescription(wk, NULL);
+        ResortShop_ShowPersonModel(wk, 0xffff);
     }
     if (wk->moving) {
-        func_ov060_021e837c(wk);
+        ResortShop_UpdateMoveArrow(wk);
     } else {
         ClActor_SetVisible(wk->actors[5], FALSE);
     }
 }
 
 // Puts the arrow of the entry being moved at its row, showing it while the row is on the screen
-static void func_ov060_021e837c(ResortShopWork *wk) {
+static void ResortShop_UpdateMoveArrow(ResortShopWork *wk) {
     u16 top;
     u16 cursor;
     ClActorPos pos;
@@ -1832,7 +1832,7 @@ static void func_ov060_021e837c(ResortShopWork *wk) {
 }
 
 // Puts the records in the new order, keeping fields 0, 1 and 31 in their places
-static void func_ov060_021e841c(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_ApplyRecordOrder(ResortShopWork *wk, u8 mode, u8 subMode) {
     int pass;
     int i;
     u16 tmp;
@@ -1875,7 +1875,7 @@ static void func_ov060_021e841c(ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 // Puts the people in the new order, keeping fields 0 and 1 in their places. The list runs from the last person
-static void func_ov060_021e85b0(ResortShopWork *wk, u8 mode, u8 subMode) {
+static void ResortShop_ApplyPersonOrder(ResortShopWork *wk, u8 mode, u8 subMode) {
     int pass;
     int i;
     u16 tmp;
@@ -1915,22 +1915,22 @@ static void func_ov060_021e85b0(ResortShopWork *wk, u8 mode, u8 subMode) {
     }
 }
 
-static u8 func_ov060_021e8708(u32 index) {
+static u8 ResortShop_GetTextureIndex(u32 index) {
     return data_ov036_021cf1c8[index].unk0[1]->face;
 }
 
-static void func_ov060_021e8720(ArcTool *handle, u16 objCode, u8 *texture, u16 *fileId) {
+static void ResortShop_GetModelTexture(ArcTool *handle, u16 objCode, u8 *texture, u16 *fileId) {
     FieldActorConfig record;
     u32 offset = GetIndexOfObjID(objCode) * sizeof(FieldActorConfig) + 4;
 
     GFL_ArcToolReadRange(handle, 0, offset, sizeof(record), &record);
-    *texture = func_ov060_021e8708(record.spriteControllerType);
+    *texture = ResortShop_GetTextureIndex(record.spriteControllerType);
     *fileId = record.rscIndices.res1;
 }
 
 // A price with the avenue's discount, which grows with its rank up to 39 and is 40% from rank 40, 75% more with
 // ResortSys_GetInfoFlag1b, and rounded to 10
-static u32 func_ov060_021e8758(ResortShopWork *wk, u32 price) {
+static u32 ResortShop_GetDiscountedPrice(ResortShopWork *wk, u32 price) {
     fx32 rate;
     u32 rank;
     u32 discount;
@@ -1963,7 +1963,7 @@ static u32 func_ov060_021e8758(ResortShopWork *wk, u32 price) {
 }
 
 // Points the camera at the shop, from the side of the avenue the player is on or the person's side
-static void func_ov060_021e8804(ResortShop *shop, Field *field, u16 cameraMode) {
+static void ResortShop_SetCamera(ResortShop *shop, Field *field, u16 cameraMode) {
     FieldCamera *camera = Field_GetCameraSystem(field);
     int camIndex = 0;
     VecFx32 target;
@@ -2015,7 +2015,7 @@ static void func_ov060_021e8804(ResortShop *shop, Field *field, u16 cameraMode) 
     FieldCamera_CoordsSetTarget(camera, &target);
 }
 
-static BOOL func_ov060_021e8924(ResortShop *shop, Field *field, int *seq) {
+static BOOL ResortShop_FadeIn(ResortShop *shop, Field *field, int *seq) {
     switch (*seq) {
     case 0:
         GFL_FadeSet(3, 0, 16, 1);
@@ -2027,16 +2027,16 @@ static BOOL func_ov060_021e8924(ResortShop *shop, Field *field, int *seq) {
         }
         break;
     case 2:
-        func_ov060_021e8804(shop, field, shop->work.cameraMode);
+        ResortShop_SetCamera(shop, field, shop->work.cameraMode);
         ResortSys_HideOverlappingActors(shop->work.people, shop->work.npc, field, shop->work.person, 0);
         (*seq)++;
         break;
     case 3:
-        func_ov060_021e6064(shop);
+        ResortShop_Create(shop);
         (*seq)++;
         break;
     case 4:
-        if (func_ov060_021e60ac(shop)) {
+        if (ResortShop_ShowList(shop)) {
             (*seq)++;
         }
         break;
@@ -2054,7 +2054,7 @@ static BOOL func_ov060_021e8924(ResortShop *shop, Field *field, int *seq) {
     return FALSE;
 }
 
-static BOOL func_ov060_021e89bc(ResortShop *shop, Field *field, int *seq) {
+static BOOL ResortShop_FadeOut(ResortShop *shop, Field *field, int *seq) {
     FieldCamera *camera = Field_GetCameraSystem(field);
 
     switch (*seq) {
@@ -2070,7 +2070,7 @@ static BOOL func_ov060_021e89bc(ResortShop *shop, Field *field, int *seq) {
     case 2:
         ResortPeople_ApplyVisibility(shop->work.people);
         ResortNPC_SetVisible(shop->work.npc, 1);
-        func_ov060_021e6100(shop);
+        ResortShop_Destroy(shop);
         FieldCamera_LoadDefaults(camera);
         FieldCamera_ResetBind(camera);
         FieldCamera_SetUseBoundaryEnable(camera, shop->useBoundary);

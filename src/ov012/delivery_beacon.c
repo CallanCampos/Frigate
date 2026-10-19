@@ -184,29 +184,29 @@ static void DeliveryBeacon_SeqReceive(void *work) {
     u16 crc;
 
     for (i = 0; i < 16; i++) {
-        beacon = func_ov030_02173b24(i);
+        beacon = NetWhpipe_GetBeaconData(i);
         if (beacon == NULL) {
             continue;
         }
         if (beacon->region != pWork->aInit.data[0].region) {
-            func_ov030_02173ba4(i);
+            NetWhpipe_RemoveBeacon(i);
         } else if ((beacon->mask & pWork->aInit.data[0].mask) == 0) {
-            func_ov030_02173ba4(i);
+            NetWhpipe_RemoveBeacon(i);
         } else if (beacon->unk5E != pWork->unk5E && pWork->unk5E != 0xff) {
-            func_ov030_02173ba4(i);
+            NetWhpipe_RemoveBeacon(i);
         } else {
             index = beacon->index - 1;
             if (index < DELIVERY_BEACON_MAX_NUM && pWork->beacons[0][index].index == 0) {
                 crc = getCRC16(beacon->data, DELIVERY_BEACON_ONCE_NUM);
                 if (crc != beacon->crc) {
-                    func_ov030_02173ba4(i);
+                    NetWhpipe_RemoveBeacon(i);
                 } else {
                     if (pWork->unk5E == 0xff) {
                         pWork->unk5E = beacon->unk5E;
                     }
-                    func_ov030_021740d0(i);
+                    NetWhpipe_SetScanTarget(i);
                     MI_CpuCopy8(beacon, &pWork->beacons[0][index], sizeof(DeliveryBeaconData));
-                    func_ov030_02173bc4();
+                    NetWhpipe_RemoveAllBeacons();
                 }
             }
         }

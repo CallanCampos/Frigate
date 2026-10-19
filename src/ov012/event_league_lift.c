@@ -171,8 +171,8 @@ static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32
         }
         break;
     case 2:
-        func_ov106_021eecd4(data->field);
-        func_ov106_021eed78(data->field);
+        GimmickLeagueLift_PlayLiftAnim(data->field);
+        GimmickLeagueLift_PlayArrivalModel(data->field);
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(data->gsys, data->field, 0, 0, 1, 0, 0));
         (*state)++;
         break;
@@ -202,9 +202,9 @@ static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32
         }
         break;
     case 4:
-        if (func_ov106_021eed18(data->field) && func_ov106_021eedc8(data->field)) {
-            func_ov106_021eed04(data->field);
-            func_ov106_021eed48(data->field);
+        if (GimmickLeagueLift_IsLiftAnimDone(data->field) && GimmickLeagueLift_IsArrivalModelDone(data->field)) {
+            GimmickLeagueLift_StopLiftAnim(data->field);
+            GimmickLeagueLift_HideArrivalModel(data->field);
             (*state)++;
         }
         break;

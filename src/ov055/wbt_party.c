@@ -44,32 +44,32 @@ static u16 sRentalFiles[2][2][2] = {
     { { 133, 208 }, { 559, 908 } },
 };
 
-static u16 func_ov055_021e6b04(MATHRandContext32 *rand);
-static BOOL func_ov055_021e6c70(const WbtPartyFilter *filter, u16 species, u16 item, s16 file);
-static WbtPartyChoices *func_ov055_021e6cfc(HeapID heapId, u32 arcId, u16 count, const u16 *files);
-static void func_ov055_021e6d88(WbtPartyChoices *choices);
-static u16 func_ov055_021e6d9c(WbtPartyChoices *choices, WbtPartyFilter *filter);
-static u16 func_ov055_021e6de0(WbtPartyChoices *choices, u32 index);
-static void func_ov055_021e6e0c(WbtPartyChoices *choices, WbtPartyFilter *filter, u16 index);
-static void func_ov055_021e6e34(u16 *dest, WbtPartyChoices *choices, u32 count, WbtPartyFilter *filter,
-                                MATHRandContext32 *rand, HeapID heapId);
-static void func_ov055_021e6eb0(u32 tournament, u32 group, u16 *first, u16 *last);
-static u16 *func_ov055_021e6ee0(u32 tournament, u32 group, HeapID heapId, u16 *count);
-static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3, u8 count, const u16 *species);
+static u16 WbtParty_Random(MATHRandContext32 *rand);
+static BOOL WbtPartyFilter_Excludes(const WbtPartyFilter *filter, u16 species, u16 item, s16 file);
+static WbtPartyChoices *WbtPartyChoices_Load(HeapID heapId, u32 arcId, u16 count, const u16 *files);
+static void WbtPartyChoices_Free(WbtPartyChoices *choices);
+static u16 WbtPartyChoices_Filter(WbtPartyChoices *choices, WbtPartyFilter *filter);
+static u16 WbtPartyChoices_GetAvailable(WbtPartyChoices *choices, u32 index);
+static void WbtPartyChoices_Take(WbtPartyChoices *choices, WbtPartyFilter *filter, u16 index);
+static void WbtPartyChoices_Pick(u16 *dest, WbtPartyChoices *choices, u32 count, WbtPartyFilter *filter,
+                                 MATHRandContext32 *rand, HeapID heapId);
+static void WbtParty_GetRentalFileRange(u32 tournament, u32 group, u16 *first, u16 *last);
+static u16 *WbtParty_CreateRentalFiles(u32 tournament, u32 group, HeapID heapId, u16 *count);
+static void WbtParty_MakeParty(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3, u8 count, const u16 *species);
 
 // A random number below 0x10000, from rand, or from GFL_RandomLC without it
-static u16 func_ov055_021e6b04(MATHRandContext32 *rand) {
+static u16 WbtParty_Random(MATHRandContext32 *rand) {
     if (rand == NULL) {
         return GFL_RandomLC(0xffffffff) / 0xffff;
     }
     return MATH_Rand32(rand, 0xffffffff) / 0xffff;
 }
 
-WbtPartyFilter *func_ov055_021e6b58(HeapID heapId, u32 tournament) {
+WbtPartyFilter *WbtPartyFilter_Create(HeapID heapId, u32 tournament) {
     WbtPartyFilter *filter = GFL_HeapAllocate(heapId, sizeof(WbtPartyFilter), TRUE, "wbt_party.c", 127);
 
     filter->unk0 = FALSE;
-    if (tournament != 12 && func_ov055_021e6794(tournament) == 0) {
+    if (tournament != 12 && WbtTournament_GetKind(tournament) == 0) {
         filter->unk0 = TRUE;
     }
     filter->speciesCount = 12;
@@ -82,14 +82,14 @@ WbtPartyFilter *func_ov055_021e6b58(HeapID heapId, u32 tournament) {
     return filter;
 }
 
-void func_ov055_021e6bdc(WbtPartyFilter *filter) {
+void WbtPartyFilter_Free(WbtPartyFilter *filter) {
     GFL_HeapFree(filter->species);
     GFL_HeapFree(filter->items);
     GFL_HeapFree(filter->files);
     GFL_HeapFree(filter);
 }
 
-void func_ov055_021e6bfc(WbtPartyFilter *filter, u16 item) {
+void WbtPartyFilter_AddItem(WbtPartyFilter *filter, u16 item) {
     int i;
 
     for (i = 0; i < filter->itemCount; i++) {
@@ -100,7 +100,7 @@ void func_ov055_021e6bfc(WbtPartyFilter *filter, u16 item) {
     }
 }
 
-void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species) {
+void WbtPartyFilter_AddSpecies(WbtPartyFilter *filter, u16 species) {
     int i;
 
     for (i = 0; i < filter->speciesCount; i++) {
@@ -111,7 +111,7 @@ void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species) {
     }
 }
 
-void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file) {
+void WbtPartyFilter_AddFile(WbtPartyFilter *filter, s16 file) {
     int i;
 
     for (i = 0; i < filter->fileCount; i++) {
@@ -123,7 +123,7 @@ void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file) {
 }
 
 // Whether the filter keeps out the Pokémon
-static BOOL func_ov055_021e6c70(const WbtPartyFilter *filter, u16 species, u16 item, s16 file) {
+static BOOL WbtPartyFilter_Excludes(const WbtPartyFilter *filter, u16 species, u16 item, s16 file) {
     int i;
 
     if (filter == NULL) {
@@ -149,7 +149,7 @@ static BOOL func_ov055_021e6c70(const WbtPartyFilter *filter, u16 species, u16 i
     return FALSE;
 }
 
-static WbtPartyChoices *func_ov055_021e6cfc(HeapID heapId, u32 arcId, u16 count, const u16 *files) {
+static WbtPartyChoices *WbtPartyChoices_Load(HeapID heapId, u32 arcId, u16 count, const u16 *files) {
     WbtPartyChoices *choices = GFL_HeapAllocate(heapId, sizeof(WbtPartyChoices), TRUE, "wbt_party.c", 274);
     ArcTool *handle;
     int i;
@@ -168,20 +168,20 @@ static WbtPartyChoices *func_ov055_021e6cfc(HeapID heapId, u32 arcId, u16 count,
     return choices;
 }
 
-static void func_ov055_021e6d88(WbtPartyChoices *choices) {
+static void WbtPartyChoices_Free(WbtPartyChoices *choices) {
     GFL_HeapFree(choices->choices);
     GFL_HeapFree(choices);
 }
 
 // Takes the choices the filter keeps out away, and counts those left
-static u16 func_ov055_021e6d9c(WbtPartyChoices *choices, WbtPartyFilter *filter) {
+static u16 WbtPartyChoices_Filter(WbtPartyChoices *choices, WbtPartyFilter *filter) {
     int count = 0;
     int i;
 
     for (i = 0; i < choices->count; i++) {
         WbtPartyChoice *choice = &choices->choices[i];
 
-        if (func_ov055_021e6c70(filter, choice->data.species, choice->data.item, choice->file) == TRUE) {
+        if (WbtPartyFilter_Excludes(filter, choice->data.species, choice->data.item, choice->file) == TRUE) {
             choice->available = FALSE;
         }
         if (choice->available) {
@@ -192,7 +192,7 @@ static u16 func_ov055_021e6d9c(WbtPartyChoices *choices, WbtPartyFilter *filter)
 }
 
 // The index of the choice that is the index-th of those left
-static u16 func_ov055_021e6de0(WbtPartyChoices *choices, u32 index) {
+static u16 WbtPartyChoices_GetAvailable(WbtPartyChoices *choices, u32 index) {
     u32 i;
 
     for (i = 0; i < choices->count; i++) {
@@ -206,17 +206,17 @@ static u16 func_ov055_021e6de0(WbtPartyChoices *choices, u32 index) {
     return i;
 }
 
-static void func_ov055_021e6e0c(WbtPartyChoices *choices, WbtPartyFilter *filter, u16 index) {
+static void WbtPartyChoices_Take(WbtPartyChoices *choices, WbtPartyFilter *filter, u16 index) {
     WbtPartyChoice *choice;
 
     choices->choices[index].available = FALSE;
     choice = &choices->choices[index];
-    func_ov055_021e6c20(filter, choice->data.species);
-    func_ov055_021e6bfc(filter, choice->data.item);
+    WbtPartyFilter_AddSpecies(filter, choice->data.species);
+    WbtPartyFilter_AddItem(filter, choice->data.item);
 }
 
-static void func_ov055_021e6e34(u16 *dest, WbtPartyChoices *choices, u32 count, WbtPartyFilter *filter,
-                                MATHRandContext32 *rand, HeapID heapId) {
+static void WbtPartyChoices_Pick(u16 *dest, WbtPartyChoices *choices, u32 count, WbtPartyFilter *filter,
+                                 MATHRandContext32 *rand, HeapID heapId) {
     u16 picked[6];
     u16 index;
     int i;
@@ -225,10 +225,10 @@ static void func_ov055_021e6e34(u16 *dest, WbtPartyChoices *choices, u32 count, 
     i = 0;
     MI_CpuFill8(picked, 0, sizeof(picked));
     for (; i != count; i++) {
-        u32 left = func_ov055_021e6d9c(choices, filter);
+        u32 left = WbtPartyChoices_Filter(choices, filter);
 
-        index = func_ov055_021e6de0(choices, func_ov055_021e6b04(rand) % left);
-        func_ov055_021e6e0c(choices, filter, index);
+        index = WbtPartyChoices_GetAvailable(choices, WbtParty_Random(rand) % left);
+        WbtPartyChoices_Take(choices, filter, index);
         picked[i] = index;
     }
     for (j = 0; j < i; j++) {
@@ -236,7 +236,7 @@ static void func_ov055_021e6e34(u16 *dest, WbtPartyChoices *choices, u32 count, 
     }
 }
 
-static void func_ov055_021e6eb0(u32 tournament, u32 group, u16 *first, u16 *last) {
+static void WbtParty_GetRentalFileRange(u32 tournament, u32 group, u16 *first, u16 *last) {
     int master;
 
     switch (tournament) {
@@ -252,14 +252,14 @@ static void func_ov055_021e6eb0(u32 tournament, u32 group, u16 *first, u16 *last
     *last = sRentalFiles[group][master][1];
 }
 
-static u16 *func_ov055_021e6ee0(u32 tournament, u32 group, HeapID heapId, u16 *count) {
+static u16 *WbtParty_CreateRentalFiles(u32 tournament, u32 group, HeapID heapId, u16 *count) {
     u16 first;
     u16 last;
     u16 n;
     u16 *files;
     int i;
 
-    func_ov055_021e6eb0(tournament, group, &first, &last);
+    WbtParty_GetRentalFileRange(tournament, group, &first, &last);
     n = last - first + 1;
     files = GFL_HeapAllocate(heapId, n * sizeof(u16), TRUE, "wbt_party.c", 505);
     for (i = 0; i < n; i++) {
@@ -269,20 +269,20 @@ static u16 *func_ov055_021e6ee0(u32 tournament, u32 group, HeapID heapId, u16 *c
     return files;
 }
 
-void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files, u32 arcId,
-                         u8 count, MATHRandContext32 *rand) {
+void WbtParty_PickFiles(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files, u32 arcId,
+                        u8 count, MATHRandContext32 *rand) {
     WbtPartyChoices *choices;
 
     OS_GetTick();
-    choices = func_ov055_021e6cfc(heapId, arcId, fileCount, files);
-    func_ov055_021e6e34(dest, choices, count, filter, rand, heapId);
-    func_ov055_021e6d88(choices);
+    choices = WbtPartyChoices_Load(heapId, arcId, fileCount, files);
+    WbtPartyChoices_Pick(dest, choices, count, filter, rand, heapId);
+    WbtPartyChoices_Free(choices);
     OS_GetTick();
 }
 
-static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3, u8 count, const u16 *species) {
+static void WbtParty_MakeParty(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3, u8 count, const u16 *species) {
     HeapID heapId = HEAPID_TAIL(sys->heapId);
-    WbtPartyFilter *filter = func_ov055_021e6b58(heapId, sys->tournament);
+    WbtPartyFilter *filter = WbtPartyFilter_Create(heapId, sys->tournament);
     u16 fileCount;
     u16 picked[6];
     u16 *files;
@@ -291,34 +291,34 @@ static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3,
 
     if (species != NULL) {
         for (i = 0; i < count; i++) {
-            func_ov055_021e6c20(filter, species[i]);
+            WbtPartyFilter_AddSpecies(filter, species[i]);
         }
     }
     MI_CpuFill8(picked, 0, sizeof(picked));
     switch (sys->unk13E4) {
     case 0:
     default:
-        files = func_ov055_021e6ee0(sys->tournament, 0, heapId, &fileCount);
-        func_ov055_021e6f34(picked, filter, heapId, fileCount, files, 257, count, NULL);
+        files = WbtParty_CreateRentalFiles(sys->tournament, 0, heapId, &fileCount);
+        WbtParty_PickFiles(picked, filter, heapId, fileCount, files, 257, count, NULL);
         GFL_HeapFree(files);
         break;
     case 1:
-        files = func_ov055_021e6ee0(sys->tournament, 1, heapId, &fileCount);
-        func_ov055_021e6f34(picked, filter, heapId, fileCount, files, 257, count, NULL);
+        files = WbtParty_CreateRentalFiles(sys->tournament, 1, heapId, &fileCount);
+        WbtParty_PickFiles(picked, filter, heapId, fileCount, files, 257, count, NULL);
         GFL_HeapFree(files);
         break;
     case 2:
-        files = func_ov055_021e6ee0(sys->tournament, 1, heapId, &fileCount);
-        func_ov055_021e6f34(picked, filter, heapId, fileCount, files, 257, 3, NULL);
+        files = WbtParty_CreateRentalFiles(sys->tournament, 1, heapId, &fileCount);
+        WbtParty_PickFiles(picked, filter, heapId, fileCount, files, 257, 3, NULL);
         GFL_HeapFree(files);
         if (count > 3) {
-            files = func_ov055_021e6ee0(sys->tournament, 0, heapId, &fileCount);
-            func_ov055_021e6f34(&picked[3], filter, heapId, fileCount, files, 257, count - 3, NULL);
+            files = WbtParty_CreateRentalFiles(sys->tournament, 0, heapId, &fileCount);
+            WbtParty_PickFiles(&picked[3], filter, heapId, fileCount, files, 257, count - 3, NULL);
             GFL_HeapFree(files);
         }
         break;
     }
-    func_ov055_021e6bdc(filter);
+    WbtPartyFilter_Free(filter);
     pkms = GFL_HeapAllocate(HEAPID_TAIL(heapId), 6 * sizeof(BSubwayPokemon), FALSE, "wbt_party.c", 626);
     for (i = 0; i < count; i++) {
         BtlInst_MakeRomPokemon(&pkms[i], 257, picked[i], a2, 0, a3, i, 0, heapId);
@@ -328,14 +328,14 @@ static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3,
 }
 
 // Makes the rental party
-void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 placeName) {
+void WbtParty_MakeRentalParty(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 placeName) {
     HeapID heapId;
     StrBuf *name;
     MsgData *msgData;
     PartyPkm *pkm;
     int i;
 
-    func_ov055_021e6f74(sys, sys->partyC4, 41122, 20, 6, NULL);
+    WbtParty_MakeParty(sys, sys->partyC4, 41122, 20, 6, NULL);
     heapId = HEAPID_TAIL(sys->heapId);
     name = GFL_StrBufCreate(14, heapId);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, heapId);
@@ -354,10 +354,10 @@ void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 pla
 }
 
 // Makes the party of the player's opponent, without the species of the player's party
-void func_ov055_021e71ec(WbtSystem *sys) {
-    u32 count = func_ov055_021e5d7c(sys);
+void WbtParty_MakeOpponentParty(WbtSystem *sys) {
+    u32 count = WbtSystem_GetEntryCount(sys);
     int n = PokeParty_GetPkmCount(sys->partyBC);
-    u8 a3 = func_ov055_021e5e18(WbtBattle_GetOpponent(sys));
+    u8 a3 = WbtEntrant_GetIv(WbtBattle_GetOpponent(sys));
     u16 species[6];
     int i;
 
@@ -365,5 +365,5 @@ void func_ov055_021e71ec(WbtSystem *sys) {
     for (i = 0; i < n; i++) {
         species[i] = PokeParty_GetParam(PokeParty_GetPkm(sys->partyBC, i), PKM_PARAM_SPECIES, NULL);
     }
-    func_ov055_021e6f74(sys, sys->partyC0, 12345, a3, count, species);
+    WbtParty_MakeParty(sys, sys->partyC0, 12345, a3, count, species);
 }

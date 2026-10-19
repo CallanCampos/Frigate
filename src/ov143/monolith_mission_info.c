@@ -297,11 +297,11 @@ static void MonolithMissionInfo_DrawAll(MonolithScreenParam *screen, MonolithWor
 static void MonolithMissionInfo_LoadMissions(MonolithMissionInfoWork *miw) {
     miw->festText = getTextFileForFestMissions(HEAPID_MONOLITH);
     miw->arc = GFL_ArcSysCreateFileHandle(0x121, HEAPID_MONOLITH);
-    miw->missions = func_ov027_02170b50(miw->arc, HEAPID_MONOLITH);
+    miw->missions = FestMissionData_LoadAll(miw->arc, HEAPID_MONOLITH);
 }
 
 static void MonolithMissionInfo_FreeMissions(MonolithMissionInfoWork *miw) {
-    func_ov027_02170b00(miw->festText);
+    FestivalText_Free(miw->festText);
     miw->festText = NULL;
     GFL_ArcToolFree(miw->arc);
     GFL_HeapFree(miw->missions);
@@ -320,9 +320,9 @@ static void MonolithMissionInfo_DrawDescription(MonolithWork *wk, MonolithMissio
     StrBuf *str;
 
     GFL_BitmapFill(BmpWin_GetBitmap(miw->prints[MONOLITH_MISSION_INFO_WINDOW_DESCRIPTION].window), 0);
-    func_ov027_02170cf8(miw->festText, mission, level, &data);
+    FestivalText_LoadMission(miw->festText, mission, level, &data);
     str = GFL_StrBufCreate(256, HEAPID_MONOLITH);
-    func_ov027_02170d90(miw->festText, str, &data, HEAPID_MONOLITH);
+    FestMission_GetResultMessage(miw->festText, str, &data, HEAPID_MONOLITH);
     PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_DESCRIPTION], wk->printQueue, 0, 0, str,
                              wk->font);
     GFL_StrBufFree(str);
@@ -380,7 +380,7 @@ static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, Monolit
     u32 width;
     s16 msgId;
 
-    func_ov027_02170cf8(miw->festText, mission, 0, &data);
+    FestivalText_LoadMission(miw->festText, mission, 0, &data);
     record.best = FestRecords_GetMissionBest(records, mission);
     if (record.best == 0) {
         unplayed = TRUE;

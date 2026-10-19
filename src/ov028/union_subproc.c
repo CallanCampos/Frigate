@@ -308,7 +308,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         }
         break;
     case 6:
-        if (func_ov069_0217cd64(unisys->alloc.uniapp) == TRUE) {
+        if (UnionApp_IsTurnReceived(unisys->alloc.uniapp) == TRUE) {
             *step = 7;
         }
         break;
@@ -480,7 +480,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     int i;
 
     if (*step > 2 && *step < 7) {
-        func_ov164_021998d4((NetSyncWork *)param);
+        NetSync_Update((NetSyncWork *)param);
     }
     switch (*step) {
     case 0:
@@ -495,7 +495,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         break;
     case 2:
         GFL_OvlLoad(OVERLAY_ID(164));
-        func_ov164_021998c0((NetSyncWork *)param);
+        NetSync_Init((NetSyncWork *)param);
         (*step)++;
         break;
     case 3:
@@ -533,7 +533,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         *step = 3;
         break;
     case 7:
-        func_ov164_021998c8((NetSyncWork *)param);
+        NetSync_Exit((NetSyncWork *)param);
         GFL_OvlUnload(OVERLAY_ID(164));
         *step = 8;
         break;
@@ -555,7 +555,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             PokeParty_AddPkm(party, PokeParty_GetPkm(tmpParty, param->list.picked[i] - 1));
         }
         GFL_HeapFree(tmpParty);
-        func_ov028_02172b4c(colosseum, TRUE);
+        Colosseum_ClearParties(colosseum, TRUE);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 22, 0x14);
         (*step)++;
         break;
@@ -582,7 +582,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             *step = 17;
             break;
         }
-        if (func_ov028_02172b20(colosseum) == TRUE) {
+        if (Colosseum_AreAllPartiesReceived(colosseum) == TRUE) {
             (*step)++;
         }
         break;
@@ -628,7 +628,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
                 }
             }
         }
-        func_ov028_02172c60(&battle->players);
+        Colosseum_ClearPlayers(&battle->players);
         *step = 16;
         break;
     case 14:

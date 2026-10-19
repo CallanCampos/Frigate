@@ -16,9 +16,9 @@ struct EventEggDemo {
     EggDemoParam demo;
 };
 
-GameEventReturnCode func_ov016_0216e660(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEventReturnCode func_ov016_0216e660(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventEggDemo_Callback(GameEvent *event, u32 *state, void *data) {
     EventEggDemo *work = data;
     GameSystem *gsys = work->gsys;
     GameData *gameData = work->gameData;
@@ -64,8 +64,8 @@ GameEventReturnCode func_ov016_0216e660(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov016_0216e754(GameSystem *gsys, PartyPkm *pkm) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov016_0216e660, sizeof(EventEggDemo));
+GameEvent *EventEggDemo_Create(GameSystem *gsys, PartyPkm *pkm) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventEggDemo_Callback, sizeof(EventEggDemo));
     EventEggDemo *work = GameEvent_GetData(event);
 
     work->gsys = gsys;

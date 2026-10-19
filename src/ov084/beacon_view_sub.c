@@ -1009,7 +1009,7 @@ BOOL BeaconView_ShowBeaconMessage(BeaconViewWork *work, const GameBeacon *beacon
 
 static void BeaconView_ShowTypeMessage(BeaconViewWork *work, const GameBeacon *beacon) {
     GameBeacon_SetMessageWords(beacon, work->wordSet, work->tmpHeapId);
-    BeaconView_ExpandMessage(work, func_ov083_021eab38(beacon));
+    BeaconView_ExpandMessage(work, BeaconView_GetTypeMsgId(beacon));
     BeaconView_StartMessage(work, work->strExpand, &work->pending);
 }
 

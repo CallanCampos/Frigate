@@ -481,7 +481,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0177_WildBattleIsVictory,                // 0x177
     s0178_WildBattleGetResult,                // 0x178
     s0179_CallCaptureDemo,                    // 0x179
-    func_ov104_021efb90,                      // 0x17a
+    GimmickGateCmd_ViewBoard,                 // 0x17a
     func_ov012_02157bdc,                      // 0x17b
     func_ov036_021ab1a8,                      // 0x17c
     func_ov036_021ab1e0,                      // 0x17d
@@ -612,22 +612,22 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s01FA_PepQuizGenerate,                    // 0x1fa
     s01FB_ItemCollectorCheckGroup,            // 0x1fb
     s01FC_ItemCollectorGetPrice,              // 0x1fc
-    func_ov027_021704e0,                      // 0x1fd
-    func_ov027_02170580,                      // 0x1fe
+    SurveyCmd_Start,                          // 0x1fd
+    SurveyCmd_Clear,                          // 0x1fe
     s01FF_SurveyGetCurrentQuestionID,         // 0x1ff
     s0200_SurveyGetCurrentAnswerIDs,          // 0x200
     s0201_SurveyGetPopularOptionMsgID,        // 0x201
-    func_ov027_021706bc,                      // 0x202
-    func_ov027_0217070c,                      // 0x203
+    SurveyCmd_GetQuestionState,               // 0x202
+    SurveyCmd_GetCurrentRemaining,            // 0x203
     s0204_SurveyGetTime,                      // 0x204
     s0205_CallGreetingPhraseInput,            // 0x205
     s0206_CallThanksPhraseInput,              // 0x206
     func_ov036_021a7c64,                      // 0x207
     func_ov036_021a7cb4,                      // 0x208
-    func_ov027_02170650,                      // 0x209
-    func_ov027_02170698,                      // 0x20a
-    func_ov027_021703a8,                      // 0x20b
-    func_ov027_021703dc,                      // 0x20c
+    SurveyCmd_WriteOwnAnswer,                 // 0x209
+    SurveyCmd_ShowRankMessage,                // 0x20a
+    SurveyCmd_GetRank,                        // 0x20b
+    SurveyCmd_RaiseRank,                      // 0x20c
     s020D_PokePartyFindEx,                    // 0x20d
     s020E_SpPokeJump,                         // 0x20e
     s020F_SpPokeAppear,                       // 0x20f

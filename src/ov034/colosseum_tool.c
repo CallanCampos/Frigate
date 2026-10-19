@@ -159,7 +159,7 @@ void UnionEff_UpdateColosseumCommPlayers(UnionColosseum *colosseum) {
         if (self == i) {
             continue;
         }
-        if (func_ov028_02172ae8(colosseum, i, &choice) != 1) {
+        if (Colosseum_TakeChoice(colosseum, i, &choice) != 1) {
             continue;
         }
         if (CommPlayer_IsActive(colosseum->commPlayer, i) == FALSE) {

@@ -215,7 +215,7 @@ void MusShotInfo_Main(MusShotInfo *info) {
             }
             if (info->comm != NULL) {
                 info->state = MUS_SHOT_INFO_STATE_SYNC;
-                func_ov211_021ef988(info->comm, MUS_SHOT_INFO_SYNC_ID);
+                MusComm_SendTiming(info->comm, MUS_SHOT_INFO_SYNC_ID);
                 MusShotInfo_PrintMessageNow(info, 6);
             } else {
                 info->state = MUS_SHOT_INFO_STATE_END;
@@ -226,7 +226,7 @@ void MusShotInfo_Main(MusShotInfo *info) {
         }
         break;
     case MUS_SHOT_INFO_STATE_SYNC:
-        if (func_ov211_021ef99c(info->comm, MUS_SHOT_INFO_SYNC_ID) == TRUE) {
+        if (MusComm_IsTimingReached(info->comm, MUS_SHOT_INFO_SYNC_ID) == TRUE) {
             info->state = MUS_SHOT_INFO_STATE_END;
         } else if (GFL_NetErrCheck()) {
             info->state = MUS_SHOT_INFO_STATE_END;

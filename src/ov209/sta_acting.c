@@ -351,7 +351,7 @@ StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
             stage->playerPos = 1;
         }
     } else {
-        stage->playerPos = func_ov211_021f0470(stage->param->comm);
+        stage->playerPos = MusComm_GetSelfPos(stage->param->comm);
     }
     for (i = 0; i < 4; i++) {
         stage->bonusPoints[i] = 0;
@@ -458,7 +458,7 @@ BOOL StaActing_Main(StaActing *stage) {
         if (GFL_WipeIsFinished() == TRUE) {
             if (stage->param->comm != NULL) {
                 stage->seq = STA_ACTING_SEQ_SYNC;
-                func_ov211_021ef988(stage->param->comm, 200);
+                MusComm_SendTiming(stage->param->comm, 200);
             } else {
                 stage->seq = STA_ACTING_SEQ_WAIT;
             }
@@ -498,7 +498,7 @@ BOOL StaActing_Main(StaActing *stage) {
         }
         break;
     case STA_ACTING_SEQ_SYNC:
-        if (func_ov211_021ef99c(stage->param->comm, 200) == TRUE) {
+        if (MusComm_IsTimingReached(stage->param->comm, 200) == TRUE) {
             stage->seq = STA_ACTING_SEQ_WAIT;
         }
         break;
@@ -1029,7 +1029,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 
     StaActing_UpdateNpcItemUse(stage);
     if (stage->param->comm != NULL && stage->commSendPending == TRUE &&
-        func_ov211_021f0460(stage->param->comm, stage->commSendEquip) == TRUE) {
+        MusComm_RequestEquip(stage->param->comm, stage->commSendEquip) == TRUE) {
         stage->commSendPending = FALSE;
     }
     if (stage->param->comm == NULL) {
@@ -1059,7 +1059,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
             stage->audienceRefresh = TRUE;
         }
     } else {
-        u8 lightUpPos = func_ov211_021f0598(stage->param->comm);
+        u8 lightUpPos = MusComm_GetLimelightPos(stage->param->comm);
 
         if (lightUpPos < STA_ACTING_NO_POKE) {
             if (stage->lightUpPos == STA_ACTING_NO_POKE) {
@@ -1069,16 +1069,16 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
             }
             stage->lightUpTimer = STA_ACTING_LIGHT_UP_FRAMES;
             stage->lightUpPos = lightUpPos;
-            stage->lightUpEquip = func_ov211_021f053c(stage->param->comm, lightUpPos);
+            stage->lightUpEquip = MusComm_GetEquipUsed(stage->param->comm, lightUpPos);
             stage->audienceRefresh = TRUE;
-            func_ov211_021f05b4(stage->param->comm);
+            MusComm_ClearLimelightPos(stage->param->comm);
         }
         for (i = 0; i < 4; i++) {
-            u8 equip = func_ov211_021f053c(stage->param->comm, i);
+            u8 equip = MusComm_GetEquipUsed(stage->param->comm, i);
 
             if (equip != STA_ACTING_EQUIP_NONE) {
                 StaActPoke_StartItemEffect(stage->pokeSys, stage->pokes[i], equip);
-                func_ov211_021f056c(stage->param->comm, i);
+                MusComm_ClearEquipUsed(stage->param->comm, i);
                 if (equip == STA_ACTING_EQUIP_HAND_R) {
                     stage->handPropUsed[i][0] = TRUE;
                 } else if (equip == STA_ACTING_EQUIP_HAND_L) {
@@ -1101,9 +1101,9 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
                     GFL_SndSEPlay(se);
                 } else if (GFL_NetIsParent() == TRUE) {
                     if (StaActing_ScoreItem(stage, stage->lightUpPos, stage->lightUpEquip) == SEQ_SE_MSCL_11) {
-                        func_ov211_021f05c0(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 1);
+                        MusComm_QueueEquipResult(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 1);
                     } else {
-                        func_ov211_021f05c0(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 2);
+                        MusComm_QueueEquipResult(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 2);
                     }
                 }
             }
@@ -1117,7 +1117,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 static u32 StaActing_ScoreItem(StaActing *stage, u8 pos, u8 equip) {
     u8 points = MusicalProgram_GetPropPoints(
         stage->param->program,
-        func_ov210_021ef164(StaActing_GetItemData(stage), stage->param->pokes[pos]->equips[equip].itemId));
+        MusItemData_GetKind(StaActing_GetItemData(stage), stage->param->pokes[pos]->equips[equip].itemId));
 
     stage->bonusPoints[pos] += points;
     StaActing_UpdateRanks(stage);
@@ -1138,7 +1138,7 @@ static void StaActing_UpdateNpcItemUse(StaActing *stage) {
                     if (stage->param->comm == NULL) {
                         StaActing_RequestItemUse(stage, i, stage->npcUseEquip[i]);
                     } else {
-                        func_ov211_021f0510(stage->param->comm, i, stage->npcUseEquip[i]);
+                        MusComm_SetEquipRequest(stage->param->comm, i, stage->npcUseEquip[i]);
                     }
                 }
             }

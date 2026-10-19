@@ -46,9 +46,10 @@ typedef struct {
     Vehicle vehicles[2];
 } GimmickWork;
 
-static void func_ov128_021eecfc(FieldSound *sound, const VecFx32 *playerPos, Vehicle *vehicle, fx32 vehicleX, u32 se);
-static void func_ov128_021eeea0(GimmickWork *work, Field *field);
-static void func_ov128_021eeec8(GimmickWork *work, Field *field, u32 first, u32 second);
+static void PassingVehicles_PlayPassSound(FieldSound *sound, const VecFx32 *playerPos, Vehicle *vehicle, fx32 vehicleX,
+                                          u32 se);
+static void PassingVehicles_PlaceAll(GimmickWork *work, Field *field);
+static void PassingVehicles_PlaceVehicle(GimmickWork *work, Field *field, u32 first, u32 second);
 
 static const G3DSceneResourceSetup sResources[MODEL_COUNT] = {
     { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 },
@@ -63,7 +64,7 @@ static const G3DSceneActorSetup sActors[MODEL_COUNT * 2] = {
 
 static G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov128_021eec80(Field *field) {
+void PassingVehicles_Init(Field *field) {
     FieldExpObjSystem *expObj;
     GimmickWork *work;
     HeapID heapId;
@@ -74,17 +75,18 @@ void func_ov128_021eec80(Field *field) {
     Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(GimmickWork));
     work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
     LoadFieldExpandObjData(expObj, &sSceneSetup, 0);
-    func_ov128_021eeea0(work, field);
+    PassingVehicles_PlaceAll(work, field);
 }
 
-void func_ov128_021eecd4(Field *field) {
+void PassingVehicles_End(Field *field) {
     GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field)));
     FieldExpObj_FreeScene(Field_GetExpObjSystem(field), 0);
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
 // Plays the sound of a vehicle when it passes the player
-static void func_ov128_021eecfc(FieldSound *sound, const VecFx32 *playerPos, Vehicle *vehicle, fx32 vehicleX, u32 se) {
+static void PassingVehicles_PlayPassSound(FieldSound *sound, const VecFx32 *playerPos, Vehicle *vehicle, fx32 vehicleX,
+                                          u32 se) {
     if (playerPos->z < FX32_CONST(8224)) {
         return;
     }
@@ -107,7 +109,7 @@ static void func_ov128_021eecfc(FieldSound *sound, const VecFx32 *playerPos, Veh
     FieldSnd_PlayAmbience(sound, se);
 }
 
-void func_ov128_021eed48(Field *field) {
+void PassingVehicles_Update(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     FieldExpObjSystem *expObj;
     GimmickWork *work;
@@ -141,7 +143,7 @@ void func_ov128_021eed48(Field *field) {
             vehicle->wait = 30 + GFL_RandomLC(30);
             vehicle->lane = GFL_RandomLC(LANE_COUNT);
         } else {
-            func_ov128_021eecfc(sound, &playerPos, vehicle, x, SEQ_SE_FLD_140);
+            PassingVehicles_PlayPassSound(sound, &playerPos, vehicle, x, SEQ_SE_FLD_140);
         }
         matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, model + 1);
         x = ROAD_START_X + VEHICLE_LENGTH + vehicle->distance * FX32_CONST(16);
@@ -167,7 +169,7 @@ void func_ov128_021eed48(Field *field) {
         down->wait = GFL_RandomLC(30);
         down->lane = GFL_RandomLC(LANE_COUNT);
     } else {
-        func_ov128_021eecfc(sound, &playerPos, down, x, SEQ_SE_FLD_141);
+        PassingVehicles_PlayPassSound(sound, &playerPos, down, x, SEQ_SE_FLD_141);
     }
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, downModel + 1);
     x = ROAD_END_X - VEHICLE_LENGTH - down->distance * FX32_CONST(16);
@@ -177,14 +179,14 @@ void func_ov128_021eed48(Field *field) {
     }
 }
 
-static void func_ov128_021eeea0(GimmickWork *work, Field *field) {
-    func_ov128_021eeec8(work, field, 0, 1);
-    func_ov128_021eeec8(work, field, 4, 5);
-    func_ov128_021eeec8(work, field, 8, 9);
+static void PassingVehicles_PlaceAll(GimmickWork *work, Field *field) {
+    PassingVehicles_PlaceVehicle(work, field, 0, 1);
+    PassingVehicles_PlaceVehicle(work, field, 4, 5);
+    PassingVehicles_PlaceVehicle(work, field, 8, 9);
 }
 
 // Places a vehicle's models for both lanes, the first model and the one behind it
-static void func_ov128_021eeec8(GimmickWork *work, Field *field, u32 first, u32 second) {
+static void PassingVehicles_PlaceVehicle(GimmickWork *work, Field *field, u32 first, u32 second) {
     HeapID heapId;
     FieldExpObjSystem *expObj;
     SRTMatrix *matrix;

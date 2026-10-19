@@ -36,7 +36,7 @@
 // The script plugin of the Join Avenue (plugin 8), commands from 1000. Its command table is in overlay 58, so that
 // the shops' overlay 60 can take this overlay's place
 
-// The page of records that func_ov059_021e79a4 shows, while the script waits
+// The page of records that ResortCmd_ShowRecords shows, while the script waits
 typedef struct {
     void *window;
     s16 page;
@@ -50,14 +50,14 @@ static const u16 sUnk7db4[2][8] = {
     { 241, 251, 261, 271, 281, 291, 301, 311 },
 };
 
-static ResortPeople *func_ov059_021e7b98(Field *field);
-static u16 func_ov059_021e7bc8(FieldScriptEnv *env);
-static void *func_ov059_021e7bd8(Field *field);
-static int func_ov059_021e7c08(int value, int others, int change);
+static ResortPeople *ResortCmd_GetPeople(Field *field);
+static u16 ResortCmd_GetActorUID(FieldScriptEnv *env);
+static void *ResortCmd_GetNPC(Field *field);
+static int ResortCmd_ApplyEffortChange(int value, int others, int change);
 
-BOOL func_ov059_021e58c0(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_StartTalk(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    ResortPerson *person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(gsys)));
+    ResortPerson *person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(gsys)));
 
     ResortPerson_SetParam(person, 27, 1);
     ResortPerson_SetTalking(person, 1);
@@ -67,9 +67,9 @@ BOOL func_ov059_021e58c0(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e591c(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_EndTalk(VM *vm, FieldScriptEnv *env) {
     ResortPerson *person =
-        ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
+        ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
 
     if (person != NULL) {
         ResortPerson_SetParam(person, 27, 0);
@@ -79,7 +79,7 @@ BOOL func_ov059_021e591c(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to one of 65 things about the avenue and the person the script is about
-BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u32 which = ScriptReadAny(vm, env);
@@ -87,7 +87,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     ResortSys *sys = ResortSys_Get(field);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     JoinAvenueOccupants *occupants = ResortSys_GetOccupants(sys);
-    ResortPeople *people = func_ov059_021e7b98(field);
+    ResortPeople *people = ResortCmd_GetPeople(field);
     void *shops = ResortSys_GetShopData(sys);
     void *table = ResortSys_GetRanks(sys);
     ResortPerson *person = ResortSys_GetScriptPerson(env, people);
@@ -343,13 +343,13 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e5eb0(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_GetScriptValue(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u16 a0 = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
-    ResortPeople *people = func_ov059_021e7b98(field);
+    ResortPeople *people = ResortCmd_GetPeople(field);
     HeapID heapId = Field_GetHeapID(field);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     ResortSys *sys = ResortSys_Get(field);
@@ -364,7 +364,7 @@ BOOL func_ov059_021e5eb0(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e5f38(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_MakeData(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 mode = VM_Read16(vm);
     u16 *var = ScriptReadVar(vm, env);
@@ -373,7 +373,7 @@ BOOL func_ov059_021e5f38(VM *vm, FieldScriptEnv *env) {
     ResortPersonData *data;
 
     ResortSys_GetSlots(sys);
-    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     data = ResortPerson_GetData(person);
     switch (mode) {
     case 2: {
@@ -406,7 +406,7 @@ BOOL func_ov059_021e5f38(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6014(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -417,13 +417,13 @@ BOOL func_ov059_021e6014(VM *vm, FieldScriptEnv *env) {
     u16 a2 = ScriptReadAny(vm, env);
     u16 a3 = VM_Read16(vm);
     ResortSys *sys = ResortSys_Get(field);
-    ResortPerson *person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    ResortPerson *person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
 
     ResortSys_SetScriptWord(a0, a1, a2, a3, sys, person, wordSet, GSYS_GetGameData(gsys), heapId);
     return FALSE;
 }
 
-BOOL func_ov059_021e60a4(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_RemovePerson(VM *vm, FieldScriptEnv *env) {
     Field *field;
     ResortSys *sys;
     ResortPeople *people;
@@ -438,7 +438,7 @@ BOOL func_ov059_021e60a4(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     sys = ResortSys_Get(field);
-    people = func_ov059_021e7b98(field);
+    people = ResortCmd_GetPeople(field);
     unk30 = ResortSys_GetDatas(sys);
     ResortSys_GetOccupants(sys);
     unk34 = ResortSys_GetSlots(sys);
@@ -478,18 +478,18 @@ BOOL func_ov059_021e60a4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e619c(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SaveShopId(VM *vm, FieldScriptEnv *env) {
     ResortPerson *person;
     u16 value;
 
     FieldScriptEnv_GetScriptWork(env);
-    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
+    person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     value = JoinAvenueShop_GetField(ResortPerson_GetShop(person), 0);
     ResortPerson_SetParam(person, 19, value);
     return FALSE;
 }
 
-BOOL func_ov059_021e61d8(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_RaffleShopItem(VM *vm, FieldScriptEnv *env) {
     Field *field;
     ResortSys *sys;
     void *shops;
@@ -511,7 +511,7 @@ BOOL func_ov059_021e61d8(VM *vm, FieldScriptEnv *env) {
     index = ScriptReadAny(vm, env);
     var1 = ScriptReadVar(vm, env);
     var2 = ScriptReadVar(vm, env);
-    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     data = ResortPerson_GetData(person);
     *var2 = 0;
     row = ResortShopData_GetGoods(shops, ResortShopData_GetPersonShop(shops, ResortPerson_GetJoinAvenuePerson(person)),
@@ -527,7 +527,7 @@ BOOL func_ov059_021e61d8(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a Pokémon's friendship
-BOOL func_ov059_021e62a8(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetFriendship(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 slot;
     u16 value;
@@ -551,7 +551,7 @@ BOOL func_ov059_021e62a8(VM *vm, FieldScriptEnv *env) {
 }
 
 // Raises a Pokémon's level, up to 100
-BOOL func_ov059_021e6318(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_RaiseLevel(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 slot;
     s16 levels;
@@ -587,7 +587,7 @@ BOOL func_ov059_021e6318(VM *vm, FieldScriptEnv *env) {
 }
 
 // Raises or, for stats from 6, lowers one of a Pokémon's effort values
-BOOL func_ov059_021e63d4(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_ChangeEffortValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 slot;
     u16 stat;
@@ -618,7 +618,7 @@ BOOL func_ov059_021e63d4(VM *vm, FieldScriptEnv *env) {
             current = PokeParty_GetParam(pkm, PKM_PARAM_EV_HP + i, NULL);
         }
     }
-    value = func_ov059_021e7c08(current, total - current, change);
+    value = ResortCmd_ApplyEffortChange(current, total - current, change);
     if (value != -1) {
         PokeParty_SetParam(pkm, PKM_PARAM_EV_HP + stat, value);
         PokeParty_RecalcStats(pkm);
@@ -630,7 +630,7 @@ BOOL func_ov059_021e63d4(VM *vm, FieldScriptEnv *env) {
 }
 
 // Shortens the steps an egg of the party needs to hatch, by the shop's rate
-BOOL func_ov059_021e64a0(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -658,7 +658,7 @@ BOOL func_ov059_021e64a0(VM *vm, FieldScriptEnv *env) {
     index = ScriptReadAny(vm, env);
     slot = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
-    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     data = ResortPerson_GetData(person);
     rate = 0;
     shops = ResortSys_GetShopData(sys);
@@ -693,21 +693,21 @@ BOOL func_ov059_021e64a0(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e65fc(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetShopFlag(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     JoinAvenueShop_SetFlag(JoinAvenuePerson_GetShop(ResortPerson_GetJoinAvenuePerson(ResortSys_GetScriptPerson(
-                               env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))))),
+                               env, ResortCmd_GetPeople(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))))),
                            0, TRUE);
     return FALSE;
 }
 
 // Takes ten times the amount from the player's money, and sets a flag of the person
-BOOL func_ov059_021e6630(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_PayAndSetShopFlag(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     Field *field = GSYS_GetField(gsys);
-    ResortPeople *people = func_ov059_021e7b98(field);
+    ResortPeople *people = ResortCmd_GetPeople(field);
     ResortPerson *person = ResortSys_GetScriptPerson(env, people);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u16 amount = ScriptReadAny(vm, env);
@@ -726,7 +726,7 @@ BOOL func_ov059_021e6630(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e66d8(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_GetPersonVisit(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortPerson *person;
@@ -742,7 +742,7 @@ BOOL func_ov059_021e66d8(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     sys = ResortSys_Get(field);
     occupants = ResortSys_GetOccupants(sys);
     Field_GetHeapID(field);
@@ -756,7 +756,7 @@ BOOL func_ov059_021e66d8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6778(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_AddShopExperience(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -770,7 +770,7 @@ BOOL func_ov059_021e6778(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     sys = ResortSys_Get(field);
     occupants = ResortSys_GetOccupants(sys);
     index = ScriptReadAny(vm, env);
@@ -781,7 +781,7 @@ BOOL func_ov059_021e6778(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e67f8(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_AddPopularity(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
@@ -793,7 +793,7 @@ BOOL func_ov059_021e67f8(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     gameData = FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     sys = ResortSys_Get(field);
     ResortSys_GetOccupants(sys);
     a2 = ScriptReadAny(vm, env);
@@ -802,7 +802,7 @@ BOOL func_ov059_021e67f8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6868(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetOccupantsLocked(VM *vm, FieldScriptEnv *env) {
     JoinAvenueOccupants *occupants;
 
     FieldScriptEnv_GetScriptWork(env);
@@ -811,7 +811,7 @@ BOOL func_ov059_021e6868(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e689c(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_HideActors(VM *vm, FieldScriptEnv *env) {
     Field *field;
     ResortPeople *people;
     void *unk;
@@ -819,8 +819,8 @@ BOOL func_ov059_021e689c(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    people = func_ov059_021e7b98(field);
-    unk = func_ov059_021e7bd8(field);
+    people = ResortCmd_GetPeople(field);
+    unk = ResortCmd_GetNPC(field);
     person = ResortSys_GetScriptPerson(env, people);
     switch (ScriptReadAny(vm, env)) {
     case 0:
@@ -843,7 +843,7 @@ BOOL func_ov059_021e689c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_Visit(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -864,7 +864,7 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
     field = GSYS_GetField(gsys);
     sys = ResortSys_Get(field);
     ResortSys_GetInfo(sys);
-    data = ResortPerson_GetData(ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field)));
+    data = ResortPerson_GetData(ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field)));
     unk38 = ResortSys_GetWork(sys);
     unk28 = ResortSys_GetTexts(sys);
     unk30 = ResortSys_GetDatas(sys);
@@ -953,7 +953,7 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6b68(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_CheckRank100Unlock(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     ResortSys *sys;
@@ -978,7 +978,7 @@ BOOL func_ov059_021e6b68(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6bd4(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_NameEntry(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a0 = VM_Read16(vm);
@@ -988,17 +988,17 @@ BOOL func_ov059_021e6bd4(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov059_021e6c10(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_MarkRaffled(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
-    ResortPerson_SetParam(ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(gsys))), 20, 1);
+    ResortPerson_SetParam(ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(GSYS_GetField(gsys))), 20, 1);
     return FALSE;
 }
 
-BOOL func_ov059_021e6c48(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_GetNPCValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     void *unk;
     u16 id;
@@ -1008,16 +1008,16 @@ BOOL func_ov059_021e6c48(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
-    unk = func_ov059_021e7bd8(GSYS_GetField(gsys));
+    unk = ResortCmd_GetNPC(GSYS_GetField(gsys));
     id = ScriptReadAny(vm, env);
     mode = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
     switch (mode) {
     case 0:
-        *var = func_ov059_021e7bc8(env);
+        *var = ResortCmd_GetActorUID(env);
         break;
     case 1:
-        *var = func_ov059_021e7bc8(env) - 148;
+        *var = ResortCmd_GetActorUID(env) - 148;
         break;
     case 2:
         *var = ResortNPC_GetTextEntry(unk, id - 148, 5);
@@ -1070,7 +1070,7 @@ BOOL func_ov059_021e6c48(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6d50(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetOccupantWords(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     Field *field;
@@ -1147,7 +1147,7 @@ BOOL func_ov059_021e6d50(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e6f14(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetNPCWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field;
@@ -1167,7 +1167,7 @@ BOOL func_ov059_021e6f14(VM *vm, FieldScriptEnv *env) {
     index = VM_Read16(vm);
     wordSet = ScriptWork_GetWordSet(work);
     heapId = Field_GetHeapID(field);
-    unk = func_ov059_021e7bd8(field);
+    unk = ResortCmd_GetNPC(field);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
     strbuf = GFL_MsgDataLoadStrbufNew(msgData, ResortNPC_GetTextEntry(unk, id, column + 7));
     func_0202437c(wordSet, index, strbuf, 2, 1, 2);
@@ -1178,7 +1178,7 @@ BOOL func_ov059_021e6f14(VM *vm, FieldScriptEnv *env) {
 
 // Puts things about one of the avenue's people in the script's WordSet, and sets a variable to the message that
 // tells them
-BOOL func_ov059_021e6fc8(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_DescribeOccupant(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     Field *field;
@@ -1208,7 +1208,7 @@ BOOL func_ov059_021e6fc8(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    func_ov059_021e7bd8(field);
+    ResortCmd_GetNPC(field);
     occupants =
         getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     wordSet = ScriptWork_GetWordSet(work);
@@ -1385,7 +1385,7 @@ BOOL func_ov059_021e6fc8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e742c(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_GetGoodsValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     void *shops;
@@ -1400,7 +1400,7 @@ BOOL func_ov059_021e742c(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
     shops = ResortSys_GetShopData(ResortSys_Get(field));
-    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, ResortCmd_GetPeople(field));
     row = ResortShopData_GetPersonShop(shops, ResortPerson_GetJoinAvenuePerson(person));
     index = ScriptReadAny(vm, env);
     mode = ScriptReadAny(vm, env);
@@ -1418,7 +1418,7 @@ BOOL func_ov059_021e742c(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a field of the player's own entry or the avenue's info
-BOOL func_ov059_021e74cc(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_SetOwnValue(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -1485,7 +1485,7 @@ BOOL func_ov059_021e74cc(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to a field of the player's own entry or the avenue's info
-BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_GetOwnValue(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
@@ -1555,7 +1555,7 @@ BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e7710(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_StartSceneAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
 
@@ -1567,7 +1567,7 @@ BOOL func_ov059_021e7710(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e7748(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_IsSceneAnimDone(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     u16 a1;
@@ -1583,7 +1583,7 @@ BOOL func_ov059_021e7748(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e778c(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_EndSceneAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
 
@@ -1595,7 +1595,7 @@ BOOL func_ov059_021e778c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e77c4(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_AddEntryOrRecord(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
@@ -1621,7 +1621,7 @@ BOOL func_ov059_021e77c4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov059_021e7834(VM *vm, void *data) {
+static BOOL ResortCmd_UpdateRecords(VM *vm, void *data) {
     FieldScriptEnv *env = data;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -1682,7 +1682,7 @@ static BOOL func_ov059_021e7834(VM *vm, void *data) {
 }
 
 // Shows the avenue's records, from the page, and sets a variable to the page it closes on
-BOOL func_ov059_021e79a4(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_ShowRecords(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field;
@@ -1703,11 +1703,11 @@ BOOL func_ov059_021e79a4(VM *vm, FieldScriptEnv *env) {
     wk->page = page;
     wk->var = var;
     *ptr = wk;
-    VM_SetNativeCallback(vm, func_ov059_021e7834);
+    VM_SetNativeCallback(vm, ResortCmd_UpdateRecords);
     return TRUE;
 }
 
-BOOL func_ov059_021e7a28(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_AddRecordPerson(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     ResortSys *sys;
@@ -1723,7 +1723,7 @@ BOOL func_ov059_021e7a28(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
     sys = ResortSys_Get(field);
-    people = func_ov059_021e7b98(field);
+    people = ResortCmd_GetPeople(field);
     unk30 = ResortSys_GetDatas(sys);
     zoneId = Field_GetPlayerStateZoneID(field);
     index = ScriptReadAny(vm, env);
@@ -1742,7 +1742,7 @@ BOOL func_ov059_021e7a28(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov059_021e7ad8(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_RecreatePeople(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     Field *field;
     void *unk30;
@@ -1754,7 +1754,7 @@ BOOL func_ov059_021e7ad8(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
     unk30 = ResortSys_GetDatas(ResortSys_Get(field));
-    people = func_ov059_021e7b98(field);
+    people = ResortCmd_GetPeople(field);
     index = ScriptReadAny(vm, env);
     switch (index) {
     case 0:
@@ -1784,7 +1784,7 @@ BOOL func_ov059_021e7ad8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static ResortPeople *func_ov059_021e7b98(Field *field) {
+static ResortPeople *ResortCmd_GetPeople(Field *field) {
     ResortPeople *people = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
@@ -1797,11 +1797,11 @@ static ResortPeople *func_ov059_021e7b98(Field *field) {
 }
 
 // The UID of the script's actor
-static u16 func_ov059_021e7bc8(FieldScriptEnv *env) {
+static u16 ResortCmd_GetActorUID(FieldScriptEnv *env) {
     return GetActorUID(ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env)));
 }
 
-static void *func_ov059_021e7bd8(Field *field) {
+static void *ResortCmd_GetNPC(Field *field) {
     void *unk;
 
     if (Field_CheckGimmickWorkPassword(field, 1)) {
@@ -1815,7 +1815,7 @@ static void *func_ov059_021e7bd8(Field *field) {
 }
 
 // Changes an effort value, keeping it to 252 and the total to 510, or returns -1 if it can't change
-static int func_ov059_021e7c08(int value, int others, int change) {
+static int ResortCmd_ApplyEffortChange(int value, int others, int change) {
     if (value == 0 && change < 0) {
         return -1;
     }

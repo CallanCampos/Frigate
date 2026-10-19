@@ -246,7 +246,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
             u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
 
             setup->fieldSituation.env.terrain =
-                func_ov127_021f0dd8(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
+                InfinityDungeon_GetVersion(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
             setup->fieldSituation.env.bgType = level;
             setup->unkDD_5 = TRUE;
             setup->unkDE_0 = TRUE;

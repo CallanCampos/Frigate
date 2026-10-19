@@ -118,9 +118,9 @@ static BOOL ZukanToroku_Init(GameProc *proc, u32 *state, void *param, void *work
     if (prm->mode != 0) {
         cryOnly = TRUE;
     }
-    wk->info =
-        func_ov296_0219d6e0(wk->heapId, prm->pkm, prm->nationalDex, TRUE, cryOnly, 0, 0,
-                            ZukanTorokuGraphic_GetClActUnit(wk->graphic), wk->font, wk->printQueue, NULL, NULL, NULL);
+    wk->info = ZukanInfo_CreateForPartyPkm(wk->heapId, prm->pkm, prm->nationalDex, TRUE, cryOnly, 0, 0,
+                                           ZukanTorokuGraphic_GetClActUnit(wk->graphic), wk->font, wk->printQueue, NULL,
+                                           NULL, NULL);
     wk->nickname =
         ZukanNickname_Create(wk->heapId, prm->pkm, prm->boxMessage, prm->boxes, prm->box,
                              ZukanTorokuGraphic_GetClActUnit(wk->graphic), wk->font, wk->printQueue, prm->gameData);
@@ -139,7 +139,7 @@ static BOOL ZukanToroku_Exit(GameProc *proc, u32 *state, void *param, void *work
     GFL_TCBRemove(wk->vblankTask);
     ZukanToroku_FreeCover(wk);
     ZukanNickname_Free(wk->nickname);
-    func_ov296_0219dbcc(wk->info);
+    ZukanInfo_Free(wk->info);
     PrintQueue_Clear(wk->printQueue);
     PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
@@ -159,14 +159,14 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
     BOOL touched;
     BOOL nicknameDone;
 
-    func_ov296_0219dc74(wk->info);
+    ZukanInfo_Update(wk->info);
     nicknameDone = ZukanNickname_Update(wk->nickname);
     switch (wk->phase) {
     case PHASE_ENTRY:
         switch (wk->step) {
         case ENTRY_WAIT_FADE_IN:
             if (!GFL_FadeIsRunning()) {
-                func_ov296_0219de44(wk->info);
+                ZukanInfo_Start(wk->info);
                 wk->step = ENTRY_WAIT_KEY;
             }
             break;
@@ -182,12 +182,12 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
                 GCTX_HIDSetUsingTouch(TRUE);
             }
             if (pressed) {
-                func_ov296_0219de14(wk->info);
+                ZukanInfo_SetReady(wk->info);
                 wk->step = ENTRY_WAIT_SLIDE;
             }
             break;
         case ENTRY_WAIT_SLIDE:
-            if (func_ov296_0219de24(wk->info) || func_ov296_0219de34(wk->info)) {
+            if (ZukanInfo_IsSlidingIn(wk->info) || ZukanInfo_IsDone(wk->info)) {
                 wk->blendTimer = 0;
                 wk->blend = 16;
                 wk->step = ENTRY_FADE_OUT;
@@ -201,7 +201,7 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
             }
             G2x_SetBlendBrightnessExt_(REG_BLDCNT_ADDR, BLEND_BGS, BLEND_BGS, wk->blend, 0, wk->blend - 16);
             if (wk->blend == 0) {
-                func_ov296_0219ddcc(wk->info);
+                ZukanInfo_FreeEntry(wk->info);
                 ZukanToroku_LoadCover(wk);
                 wk->step = ENTRY_FADE_IN;
             }
@@ -218,7 +218,7 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
             }
             break;
         case ENTRY_WAIT_DONE:
-            if (func_ov296_0219de34(wk->info)) {
+            if (ZukanInfo_IsDone(wk->info)) {
                 wk->phase = PHASE_NICKNAME;
                 wk->step = NICKNAME_START;
             }
@@ -229,7 +229,7 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
         switch (wk->step) {
         case NICKNAME_WAIT_FADE_IN:
             if (!GFL_FadeIsRunning()) {
-                func_ov296_0219de1c(wk->info);
+                ZukanInfo_RequestCry(wk->info);
                 wk->step = NICKNAME_START;
             }
             break;

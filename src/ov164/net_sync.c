@@ -3,17 +3,17 @@
 #include "gfl/net_command.h"
 #include "gfl/net_sync.h"
 
-const NetSyncCommand data_ov164_021999e8 = { func_ov164_02199984, NULL };
+const NetSyncCommand data_ov164_021999e8 = { NetSync_RecvCallback, NULL };
 
-void func_ov164_021998c0(NetSyncWork *work) {
+void NetSync_Init(NetSyncWork *work) {
     work->state = 0;
 }
 
-void func_ov164_021998c8(NetSyncWork *work) {
+void NetSync_Exit(NetSyncWork *work) {
     NetCommand_RemoveTable(0x2d00);
 }
 
-void func_ov164_021998d4(NetSyncWork *work) {
+void NetSync_Update(NetSyncWork *work) {
     switch (work->state) {
     case 0:
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 1, 0x2d);
@@ -33,7 +33,7 @@ void func_ov164_021998d4(NetSyncWork *work) {
     }
 }
 
-u32 func_ov164_02199944(NetSyncWork *work, u8 kind, u16 value) {
+u32 NetSync_Send(NetSyncWork *work, u8 kind, u16 value) {
     NetHandle *handle = NetHandle_GetOwn();
     NetSyncPacket packet;
     packet.kind = kind;
@@ -44,18 +44,18 @@ u32 func_ov164_02199944(NetSyncWork *work, u8 kind, u16 value) {
     return GFL_NetSendCommandToMachine(handle, 0xff, 0x2d00, 4, &packet, 1, 0, 0);
 }
 
-void func_ov164_02199984(u32 a0, u32 a1, const NetSyncPacket *packet, NetSyncWork *work) {
+void NetSync_RecvCallback(u32 a0, u32 a1, const NetSyncPacket *packet, NetSyncWork *work) {
     GFL_NetGetHandleNetId(NetHandle_GetOwn());
     if (packet->kind == 0) {
         work->received++;
     }
 }
 
-void func_ov164_021999a8(u32 ignored, u32 a1) {
+void NetSync_StartTiming(u32 ignored, u32 a1) {
     NetHandle_SendTimingPair(NetHandle_GetOwn(), a1, 0x2d);
 }
 
-BOOL func_ov164_021999bc(NetSyncWork *work, u32 a1) {
+BOOL NetSync_IsTimingDone(NetSyncWork *work, u32 a1) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), a1, 0x2d) == 1) {
         return TRUE;
     }

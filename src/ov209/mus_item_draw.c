@@ -120,23 +120,23 @@ static void MusItemDraw_GetFaceSize(MusItemDraw *item, u8 *width, u8 *height) {
 }
 
 BOOL MusItemDraw_CanEquipPos(MusItemDraw *item, s32 pos) {
-    return func_ov210_021eef98(item->data, pos);
+    return MusItemData_CanEquipAtPos(item->data, pos);
 }
 
 BOOL MusItemDraw_ItemCanEquipPos(MusItemDrawSys *sys, u16 itemId, s32 pos) {
-    return func_ov210_021ef018(MusItemData_GetItem(sys->itemData, itemId), pos);
+    return MusItemData_CanEquipInGroup(MusItemData_GetItem(sys->itemData, itemId), pos);
 }
 
 BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, s32 pos) {
-    return func_ov210_021ef088(MusItemData_GetItem(sys->itemData, itemId), pos);
+    return MusItemData_IsCategoryOfGroup(MusItemData_GetItem(sys->itemData, itemId), pos);
 }
 
 BOOL MusItemDraw_GetItemFlag7(MusItemDraw *item) {
-    return func_ov210_021ef0f4(item->data);
+    return MusItemData_GetFlag7(item->data);
 }
 
 BOOL MusItemDraw_GetItemFlag9(MusItemDraw *item) {
-    return func_ov210_021ef104(item->data);
+    return MusItemData_GetFlag9(item->data);
 }
 
 void *MusItemDraw_LoadTexResource(u16 itemId) {

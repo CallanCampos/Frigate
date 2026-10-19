@@ -64,8 +64,8 @@ static BOOL MusicalDressUpProc_Main(GameProc *proc, u32 *state, void *param, voi
     case 0:
         wk->work = DupFitting_Create(wk->dressUp, HEAPID_MUSICAL_DRESSUP);
         *state = 1;
-        if (wk->param->comm != NULL && func_ov211_021f04a0(wk->param->comm) == TRUE) {
-            func_ov211_021f00c8(wk->param->comm);
+        if (wk->param->comm != NULL && MusComm_IsParent(wk->param->comm) == TRUE) {
+            MusComm_StartSendingSound(wk->param->comm);
         }
         break;
     case 1:

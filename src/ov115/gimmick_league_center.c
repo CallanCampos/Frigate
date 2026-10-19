@@ -32,12 +32,12 @@ typedef struct {
     BOOL bgLoaded;
 } GimmickWork;
 
-static void func_ov115_021eed28(GimmickWork *work);
-static void func_ov115_021eedc8(GimmickWork *work);
-static void func_ov115_021eedd4(GimmickWork *work);
-static void func_ov115_021eee58(GimmickWork *work);
-static void func_ov115_021eee64(GimmickWork *work);
-static void func_ov115_021eee70(FieldExpObjSystem *system, u16 actor);
+static void LeagueCenter_LoadBG(GimmickWork *work);
+static void LeagueCenter_FreeBG(GimmickWork *work);
+static void LeagueCenter_LoadModel(GimmickWork *work);
+static void LeagueCenter_FreeScene(GimmickWork *work);
+static void LeagueCenter_StepAnimations(GimmickWork *work);
+static void LeagueCenter_PlayActor(FieldExpObjSystem *system, u16 actor);
 
 static const G3DSceneResourceSetup sResources[] = {
     { ARCID_GIMMICK, 0, 0 },
@@ -54,7 +54,7 @@ static const G3DSceneActorSetup sActors[] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov115_021eec80(Field *field) {
+void LeagueCenter_Init(Field *field) {
     GimmickWork *work;
 
     Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(GimmickWork));
@@ -62,40 +62,40 @@ void func_ov115_021eec80(Field *field) {
     work->field = field;
     work->expObj = Field_GetExpObjSystem(field);
     work->bgLoaded = FALSE;
-    func_ov115_021eedd4(work);
+    LeagueCenter_LoadModel(work);
     FieldLight_StartFlashOneWay(Field_GetLightSystem(field), GX_RGB(11, 11, 16), 1);
 }
 
-void func_ov115_021eecc8(Field *field) {
+void LeagueCenter_End(Field *field) {
     GimmickWork *work;
 
     work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
-    func_ov115_021eedc8(work);
-    func_ov115_021eee58(work);
+    LeagueCenter_FreeBG(work);
+    LeagueCenter_FreeScene(work);
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
-void func_ov115_021eece8(Field *field) {
+void LeagueCenter_Update(Field *field) {
     GimmickWork *work;
 
     work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
     if (!work->bgLoaded) {
-        func_ov115_021eed28(work);
+        LeagueCenter_LoadBG(work);
         work->bgLoaded = TRUE;
     }
-    func_ov115_021eee64(work);
+    LeagueCenter_StepAnimations(work);
 }
 
-void func_ov115_021eed08(GameSystem *gsys) {
+void LeagueCenter_PlayModel(GameSystem *gsys) {
     GameData *gameData;
     GimmickWork *work;
 
     gameData = GSYS_GetGameData(gsys);
     work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
-    func_ov115_021eee70(work->expObj, 0);
+    LeagueCenter_PlayActor(work->expObj, 0);
 }
 
-static void func_ov115_021eed28(GimmickWork *work) {
+static void LeagueCenter_LoadBG(GimmickWork *work) {
     HeapID heapId;
     ArcTool *arc;
 
@@ -127,12 +127,12 @@ static void func_ov115_021eed28(GimmickWork *work) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
 }
 
-static void func_ov115_021eedc8(GimmickWork *work) {
+static void LeagueCenter_FreeBG(GimmickWork *work) {
     GFL_BGSysReleaseBG(GIMMICK_BG);
 }
 
 // Loads the model, at its place, with its animations stopped at their first frame
-static void func_ov115_021eedd4(GimmickWork *work) {
+static void LeagueCenter_LoadModel(GimmickWork *work) {
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
     u32 i;
@@ -152,16 +152,16 @@ static void func_ov115_021eedd4(GimmickWork *work) {
     }
 }
 
-static void func_ov115_021eee58(GimmickWork *work) {
+static void LeagueCenter_FreeScene(GimmickWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov115_021eee64(GimmickWork *work) {
+static void LeagueCenter_StepAnimations(GimmickWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
 // Plays the actor's animations from their first frame
-static void func_ov115_021eee70(FieldExpObjSystem *system, u16 actor) {
+static void LeagueCenter_PlayActor(FieldExpObjSystem *system, u16 actor) {
     FieldExpObjAnm *anm;
     s32 i;
 

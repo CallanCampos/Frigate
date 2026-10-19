@@ -338,7 +338,7 @@ void WifiBattleMatchTask_ReturnToSeq(WifiBattleMatchTask *task) {
 }
 
 // Counts a match in the records, by kind
-void func_ov262_021c5c94(GameData *gameData, u32 mode) {
+void WifiBattleMatch_RecordResult(GameData *gameData, u32 mode) {
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
 
     switch (mode) {
@@ -357,7 +357,7 @@ void func_ov262_021c5c94(GameData *gameData, u32 mode) {
     RecordAddOne(records, 0x11);
 }
 
-void func_ov262_021c5cd4(GameData *gameData, u32 mode) {
+void WifiBattleMatch_RecordBattleTime(GameData *gameData, u32 mode) {
     RecordSave_UpdateMatchSeconds(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
     if (mode != 3 && mode != 6) {
         GameData_IncCounter(gameData);

@@ -350,7 +350,7 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
     EventPokewood_SetupMovieTrainer(movie, POKEWOOD_KIND_FILM, setup->trainers[1], playerInfo, heapId);
     EventPokewood_CreateCastParty(playerInfo, setup->party[1], heapId, movie, 1);
     setup->unk34[0] = GetGameDataPlayerInfo(gameData);
-    if (func_ov062_021e62a8(*sys) == 1) {
+    if (PokewoodSystem_GetUsePlayerCast(*sys) == 1) {
         PokewoodSystem_CopyCast(*sys, gameData, setup->party[0]);
         setup->unkE0 = 0;
     } else {
@@ -625,8 +625,8 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
             if (var != NULL) {
                 *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
                 if (*var != 0) {
-                    func_ov062_021e636c(sys, gameData, wk->setup->unkDF, wk->setup->unk124);
-                    func_ov062_021e65b4(gameData, sys, wk->setup->unk124, param->slot);
+                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->unk124);
+                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->unk124, param->slot);
                     PokewoodSave_SetFlag(save, 5, wk->setup->unkDF);
                     Pokewood_CheckMedals(gameData);
                     EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->unk124, wk->setup->unk130);
@@ -723,7 +723,7 @@ static GameEventReturnCode EventPokewood_RunFilm(GameEvent *event, u32 *state, v
             *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
         }
         PokewoodSystem_SetRecord(sys, wk->setup, wk->setup->unkDF);
-        func_ov062_021e6668(sys, param->slotInfo);
+        PokewoodSystem_SetSlotInfo(sys, param->slotInfo);
         EventPokewood_FreeSetup(wk->setup);
         (*state)++;
         break;
@@ -902,7 +902,7 @@ static GameEventReturnCode EventPokewood_RunCastSelect(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 5:
-        func_ov062_021e61a0(wk->sys, &wk->pokeList);
+        PokewoodSystem_SetCastFromPokeList(wk->sys, &wk->pokeList);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -918,8 +918,8 @@ GameEvent *EventPokewood_CreateCastSelectEvent(GameSystem *gsys, void *args) {
     wk->gsys = gsys;
     wk->field = field;
     wk->sys = sys;
-    func_ov062_021e61e8(sys, gameData, &wk->pokeList);
-    func_ov062_021e6254(sys, gameData, &wk->status);
+    PokewoodSystem_SetupPokeList(sys, gameData, &wk->pokeList);
+    PokewoodSystem_SetupPStatus(sys, gameData, &wk->status);
     return event;
 }
 

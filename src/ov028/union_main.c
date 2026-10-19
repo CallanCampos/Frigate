@@ -131,19 +131,19 @@ void UnionMain_OnFieldOut(void *param, void *work, Field *field) {
     unisys->fieldActive = FALSE;
 }
 
-u32 func_ov028_021710a4(UnionSystem *unisys) {
+u32 UnionMain_GetAtCounter(UnionSystem *unisys) {
     return unisys->unk3630;
 }
 
-u32 func_ov028_021710b0(UnionSystem *unisys) {
+u32 UnionMain_GetExiting(UnionSystem *unisys) {
     return unisys->unk3634;
 }
 
-void func_ov028_021710bc(UnionSystem *unisys, u8 value) {
+void UnionMain_SetSituUnk02(UnionSystem *unisys, u8 value) {
     unisys->situ.unk02 = value;
 }
 
-u8 func_ov028_021710c8(UnionSystem *unisys) {
+u8 UnionMain_GetSituUnk02(UnionSystem *unisys) {
     return unisys->situ.unk02;
 }
 

@@ -506,16 +506,16 @@ static BOOL IntroCmd_Talk(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
         break;
     case 1:
         if (IntroMsg_UpdatePrint(cmd->msg)) {
-            func_ov294_021a3798(cmd->mcss, sprite, TRUE);
+            IntroMcss_SetFlipV(cmd->mcss, sprite, TRUE);
             return TRUE;
         }
         switch (IntroMsg_GetPrintState(cmd->msg)) {
         case PRINT_STREAM_PAUSED:
-            func_ov294_021a3798(cmd->mcss, sprite, TRUE);
+            IntroMcss_SetFlipV(cmd->mcss, sprite, TRUE);
             work->counter = 0;
             break;
         case PRINT_STREAM_RUNNING:
-            func_ov294_021a3798(cmd->mcss, sprite, work->counter % 12 < 6 ? TRUE : FALSE);
+            IntroMcss_SetFlipV(cmd->mcss, sprite, work->counter % 12 < 6 ? TRUE : FALSE);
             work->counter++;
             break;
         case PRINT_STREAM_DONE:

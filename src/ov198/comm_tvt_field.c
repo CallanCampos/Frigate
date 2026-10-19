@@ -591,7 +591,7 @@ static void CommTvtField_WaitExitWipe(CommTvtFieldWork *wk) {
 static void CommTvtField_StartExit(CommTvtFieldWork *wk) {
     wk->leaving = TRUE;
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
-    func_ov030_02174120(NULL, NULL);
+    NetWhpipe_SetScanCallback(NULL, NULL);
     if (wk->mode == 1) {
         if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(wk->gsys))) {
             GameCommSys_ExitReq(GSYS_GetGameCommSystem(wk->gsys));
@@ -953,7 +953,7 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     GFL_NetSetIconScreen(FALSE, wk->heapId);
     if (GFL_NetIsInitialized()) {
         // The callback takes the command as an int; net_whpipe.h says u8
-        func_ov030_02174120((void (*)(void *, const void *, u8, u8))CommTvtField_OnBeacon, wk);
+        NetWhpipe_SetScanCallback((void (*)(void *, const void *, u8, u8))CommTvtField_OnBeacon, wk);
     }
     GCTX_HIDSetUsingTouch(TRUE);
     return TRUE;
@@ -1006,7 +1006,7 @@ static BOOL CommTvtFieldApp_Exit(GameProc *proc, u32 *state, void *param, void *
         return FALSE;
     }
     if (GFL_NetIsInitialized()) {
-        func_ov030_02174120(NULL, NULL);
+        NetWhpipe_SetScanCallback(NULL, NULL);
     }
     CommTvtField_FreeGraphics(wk);
     fieldParam->mode = wk->mode;

@@ -138,7 +138,7 @@ GameEvent *EventFestMissionInfo_Create(GameSystem *gsys, void *args) {
     return event;
 }
 
-GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args) {
+GameEvent *EventFestMissionRetire_Create(GameSystem *gsys, void *args) {
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFestMissionEnd_Callback, sizeof(FestMissionEventWork));
     FestMissionEventWork *work = GameEvent_GetData(event);
@@ -148,7 +148,7 @@ GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args) {
     return event;
 }
 
-GameEvent *func_ov157_021f5b18(GameSystem *gsys, void *args) {
+GameEvent *EventFestMissionDisconnect_Create(GameSystem *gsys, void *args) {
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFestMissionEnd_Callback, sizeof(FestMissionEventWork));
     FestMissionEventWork *work = GameEvent_GetData(event);
@@ -183,7 +183,7 @@ static void FestMissionEvent_Exit(FestMissionEventWork *work) {
     GFL_WordSetSystemFree(work->wordSet);
     GFL_MsgDataFree(work->msgData);
     PassPowerData_Free(work->passPowerData);
-    func_ov027_02170b00(work->festText);
+    FestivalText_Free(work->festText);
     EnableAllActorsMovement(work->actorSystem);
 }
 
@@ -359,8 +359,8 @@ static GameEventReturnCode EventFestMissionMenu_Callback(GameEvent *event, u32 *
         break;
     case 2:
         menuArgs = 1;
-        GameEvent_ChainNext(
-            event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL, func_ov021_0216e80c, &menuArgs));
+        GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL,
+                                                                   EventFestival_Create, &menuArgs));
         (*state)++;
         break;
     default:
@@ -454,10 +454,10 @@ static void FestMission_Print(FestMissionEventWork *work) {
     s32 minutes;
 
     GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
-    func_ov027_02170d04(work->festText, work->formatted, &work->mission, work->tailHeapId);
+    FestMission_GetMessage(work->festText, work->formatted, &work->mission, work->tailHeapId);
     func_0202437c(work->wordSet, 0, work->formatted, 0, 1, 2);
     FestMission_PrintLine(work, work->strbuf, 0, 0);
-    func_ov027_02170d90(work->festText, work->strbuf, &work->mission, work->heapId);
+    FestMission_GetResultMessage(work->festText, work->strbuf, &work->mission, work->heapId);
     FestMission_PrintLine(work, work->strbuf, 0, 2);
     minutes = seconds / 60;
     WordSetNumber(work->wordSet, 2, minutes, 4, NUM_PAD_NONE, TRUE);

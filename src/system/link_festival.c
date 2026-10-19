@@ -36,7 +36,7 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
     festival->gsys = gsys;
     festival->gameData = GSYS_GetGameData(gsys);
     festival->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
-    festival->headers = func_ov027_02170b18(festival->archive, heapId);
+    festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
     festival->info = (FestMissionInfo *)&festival->config;
     festival->unk54 = &festival->config.type;

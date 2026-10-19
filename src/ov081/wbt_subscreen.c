@@ -168,7 +168,7 @@ void WbtSubscreen_Update(WbtSubscreen *work) {
     WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
 }
 
-void func_ov081_021ea934(WbtSubscreen *work) {
+void WbtSubscreen_Draw(WbtSubscreen *work) {
 }
 
 void WbtSubscreen_Free(WbtSubscreen *work) {
@@ -270,12 +270,12 @@ static void WbtSubscreen_PrintTournament(WbtSubscreen *work) {
     }
 
     strbuf = GFL_StrBufCreate(128, work->heapId);
-    func_ov055_021e5d44(*sys, func_ov055_021e5ca4(*sys), strbuf);
+    WbtSystem_LoadTournamentName(*sys, WbtSystem_GetTournament(*sys), strbuf);
     WbtSubscreen_PrintCentered(work, WINDOW_TOURNAMENT, 112, 0, strbuf);
     GFL_StrBufFree(strbuf);
 
     strbuf = GFL_StrBufCreate(128, work->heapId);
-    func_ov055_021e6488(func_ov055_021e5cac(*sys), strbuf);
+    WbtStyle_LoadName(WbtSystem_GetStyle(*sys), strbuf);
     WbtSubscreen_PrintCentered(work, WINDOW_STYLE, 112, 0, strbuf);
     GFL_StrBufFree(strbuf);
 }

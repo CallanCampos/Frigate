@@ -115,7 +115,7 @@ static void UnionApp_CheckJoinedLeft(UnionApp *app) {
     }
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
         bit = 1 << i;
-        if ((app->status.joined & bit) && !(connected & bit) && func_ov028_0217196c(connected, i) == TRUE) {
+        if ((app->status.joined & bit) && !(connected & bit) && UnionMain_SendLeave(connected, i) == TRUE) {
             UnionApp_OnLeave(app, i);
             app->status.joined ^= bit;
         }
@@ -123,7 +123,7 @@ static void UnionApp_CheckJoinedLeft(UnionApp *app) {
 }
 
 static void UnionApp_SendStatus(UnionApp *app) {
-    if (app->statusSendTo != 0 && func_ov028_02171724(&app->status, app->statusSendTo) == TRUE) {
+    if (app->statusSendTo != 0 && UnionMain_SendStatus(&app->status, app->statusSendTo) == TRUE) {
         app->statusSendTo = 0;
     }
 }
@@ -156,14 +156,14 @@ static void UnionApp_UpdateQueue(UnionApp *app) {
 }
 
 static void UnionApp_SendCurrent(UnionApp *app) {
-    if (app->currentPending != 0xff && func_ov028_02171664(app->currentPending) == TRUE) {
+    if (app->currentPending != 0xff && UnionMain_SendUnkE(app->currentPending) == TRUE) {
         app->currentPending = 0xff;
     }
 }
 
 static void UnionApp_SendProfile(UnionApp *app) {
     if (app->profileSendTo != 0 &&
-        func_ov028_0217181c(app->profileSendTo, &app->members[GFL_NetGetHandleNetId(NetHandle_GetOwn())]) == TRUE) {
+        UnionMain_SendProfile(app->profileSendTo, &app->members[GFL_NetGetHandleNetId(NetHandle_GetOwn())]) == TRUE) {
         app->profileSendTo = 0;
     }
 }
@@ -233,11 +233,11 @@ void UnionApp_Enqueue(UnionApp *app, u8 netId) {
     app->queued |= 1 << netId;
 }
 
-void func_ov069_0217cd5c(UnionApp *app) {
+void UnionApp_SetTurnReceived(UnionApp *app) {
     app->unk12 = TRUE;
 }
 
-u8 func_ov069_0217cd64(UnionApp *app) {
+u8 UnionApp_IsTurnReceived(UnionApp *app) {
     return app->unk12;
 }
 

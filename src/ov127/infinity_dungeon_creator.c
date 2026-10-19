@@ -61,7 +61,7 @@ void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u32 rank, u32 seed,
         MI_CpuFill8(trainers, 0xff, 2000);
         count = InfinityDungeonCreator_PickTrainers(dungeon, rank, trainers, &rnd, heapId);
         MI_CpuFill8(dungeon->trainerIds[floor], 0xff, sizeof(dungeon->trainerIds[floor]));
-        func_ov127_021f0bfc(trainers, count, &rnd);
+        InfinityDungeon_ShuffleU32(trainers, count, &rnd);
         for (i = 0; i < INFINITY_DUNGEON_FLOOR_TRAINER_MAX; i++) {
             dungeon->trainerIds[floor][i] = trainers[i];
         }
@@ -104,7 +104,7 @@ static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 ran
     const u8 *classCounts;
     int i;
 
-    version = func_ov127_021f0dd8(dungeon);
+    version = InfinityDungeon_GetVersion(dungeon);
     candidateCount = 0;
     candidates = GFL_HeapAllocate(HEAPID_TAIL(heapId), 2000, TRUE, "infinity_dungeon_creator.c", 1022);
     group = GFL_HeapAllocate(HEAPID_TAIL(heapId), 2000, TRUE, "infinity_dungeon_creator.c", 1023);
@@ -117,7 +117,7 @@ static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 ran
             candidateCount++;
         }
     }
-    classCounts = func_ov127_021f0b74(rank, version);
+    classCounts = InfinityDungeon_GetTrainerClassShares(rank, version);
     for (trainerClass = 0; trainerClass < INFINITY_DUNGEON_TRAINER_CLASS_COUNT; trainerClass++) {
         int count = classCounts[trainerClass];
 
@@ -128,12 +128,12 @@ static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 ran
 
             MI_CpuFill8(group, 0, sizeof(u32));
             for (j = 0; j < candidateCount; j++) {
-                if (trainerClass == func_ov127_021f0a90(candidates[j])) {
+                if (trainerClass == InfinityDungeon_GetTrainerClass(candidates[j])) {
                     group[groupCount] = candidates[j];
                     groupCount++;
                 }
             }
-            func_ov127_021f0bfc(group, groupCount, rnd);
+            InfinityDungeon_ShuffleU32(group, groupCount, rnd);
             while (count > 0) {
                 trainers[trainerCount] = group[picked];
                 trainerCount++;
@@ -194,7 +194,7 @@ static void InfinityDungeonCreator_PlaceSpecialTrainer(InfinityDungeon *dungeon,
         if (slot < total) {
             dungeon->trainerIds[floor][slot] = special;
             dungeon->specialTrainers[*specialCount] = special;
-            dungeon->specialRoom[floor] = func_ov127_021f0de4(dungeon, floor, slot);
+            dungeon->specialRoom[floor] = InfinityDungeon_GetSlotRoom(dungeon, floor, slot);
             (*specialCount)++;
             return;
         }
@@ -243,7 +243,7 @@ static int InfinityDungeonCreator_ListGoalCandidates(InfinityDungeon *dungeon, u
 // The five special trainers of a rank, shuffled
 static void InfinityDungeonCreator_PickSpecialTrainers(InfinityDungeon *dungeon, u32 rank, u16 *specials,
                                                        InfinityDungeonRandom *rnd) {
-    u8 version = func_ov127_021f0dd8(dungeon);
+    u8 version = InfinityDungeon_GetVersion(dungeon);
     u16 first;
     int i;
 
@@ -277,5 +277,5 @@ static void InfinityDungeonCreator_PickSpecialTrainers(InfinityDungeon *dungeon,
     for (i = 0; i < INFINITY_DUNGEON_SPECIAL_RANK_COUNT; i++) {
         specials[i] = first + i;
     }
-    func_ov127_021f0ca8(specials, INFINITY_DUNGEON_SPECIAL_RANK_COUNT, rnd);
+    InfinityDungeon_ShuffleU16(specials, INFINITY_DUNGEON_SPECIAL_RANK_COUNT, rnd);
 }

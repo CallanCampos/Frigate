@@ -38,15 +38,15 @@ void MusItemData_GetOffset(MusicalItemData *item, s32 *offset);
 // The BlAct size of its texture
 u32 MusItemData_GetTexSize(MusicalItemData *item);
 // Whether the prop can be worn at a position, by its flags
-BOOL func_ov210_021eef98(MusicalItemData *item, s32 pos);
-BOOL func_ov210_021ef018(MusicalItemData *item, s32 pos);
+BOOL MusItemData_CanEquipAtPos(MusicalItemData *item, s32 pos);
+BOOL MusItemData_CanEquipInGroup(MusicalItemData *item, s32 pos);
 // Whether the prop's category is that of a position
-BOOL func_ov210_021ef088(MusicalItemData *item, s32 pos);
+BOOL MusItemData_IsCategoryOfGroup(MusicalItemData *item, s32 pos);
 // Its flags 0x80 and 0x200
-BOOL func_ov210_021ef0f4(MusicalItemData *item);
-BOOL func_ov210_021ef104(MusicalItemData *item);
-s32 func_ov210_021ef118(s32 pos);
-u32 func_ov210_021ef164(MusItemData *items, u16 itemId);
+BOOL MusItemData_GetFlag7(MusicalItemData *item);
+BOOL MusItemData_GetFlag9(MusicalItemData *item);
+s32 MusItemData_GetPosGroup(s32 pos);
+u32 MusItemData_GetKind(MusItemData *items, u16 itemId);
 // The kind of a prop's effect when it is used
 u8 MusItemData_GetEffect(MusItemData *items, u16 itemId);
 u8 MusItemData_GetCategory(MusItemData *items, u16 itemId);
