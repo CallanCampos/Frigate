@@ -5,8 +5,8 @@
 - **Plan:** §4.5 (heaps), §6 (T5), §7 phase 5 ("sanitizer-clean replays")
 - **Upstream:** `993e6c49b` (as merged into the port's `main` by `1f0c184f6`)
 - **Note (2026-10-19):** accepted on its branch, `port-sanitizers`, and kept accepted at the branch's merge into
-  `port-integrate` by the port's developer, as every earlier ADR was. The branch's commits numbered it 0013, which the
-  Windows track's ADR took; it is 0014 everywhere in the tree.
+  `port-integrate` (`93cf59b99`) by the port's developer, as every earlier ADR was. The branch's commits numbered it
+  0013, which the Windows track's ADR took; it is 0014 everywhere in the tree.
 
 ## Context
 

@@ -66,6 +66,11 @@ ctest --test-dir build/port-san -L route                       # every route, wi
     plain build's limits: configuring one with `PORT_SANITIZE` is refused.
   - The macOS app and its disk image built here link the toolchain's ASan runtime: they are for testing, never for
     giving out.
+  - With `-DPORT_MACOS_DISTRIBUTION=ON`, in a directory of its own (`build/port-san-dist`), both slices are built
+    sanitized for macOS 11.0, with SDL3 linked statically and left as it is: ctest runs the Mac's slice, and
+    [../tools/ctest_one_slice.sh](../tools/ctest_one_slice.sh) the other, the x86_64 one under Rosetta on Apple
+    Silicon, where ASan runs too. That is how the x86_64 code's routes are checked here: CI's Intel runners have no
+    ROM. Its app is a sanitized one, never one to give out.
 
 ## Reading a report
 

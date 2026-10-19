@@ -26,6 +26,106 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-19: the sanitized build merged (ADR 0014), clean on every route of both versions, the Pokédex's included
+
+- **Upstream:** `56ee36977` (merge of PR #391), as merged into the port's `main` by `6b50636b1`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `6b50636b1`: `93cf59b99` (the merge of
+  `port-sanitizers`), `77326dde8` (the track's notes confirmed), `3dfcec981` (the Pokédex under the sanitizers), then
+  this entry; pushed to `port-sanitizers` on origin (new there) for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `93cf59b99` and
+  `3dfcec981`. `check_mwcc_neutral.py` finds 3,238 of 3,242 file and version pairs identical to `56ee36977` at the
+  merge, the track's three game files among them; the other four are `vm.c`'s and `event_field_proclink.c`'s Neutral
+  rows, as before. At `3dfcec981`, `src/gfl/arc_util.c` and `src/system/scroll_bar.c`, both complete, are identical
+  in both versions (4 of 4).
+- **Host build:** macOS 26.5.1 on an M2, Xcode 26.6 (SDK 26.5, Apple clang 21.0.0), RelWithDebInfo, Ninja:
+  - `build/port-n` (Black 2) and `build/port-w2` (White 2), plain, built again at each commit; the oracle is
+    `build/oracle`'s `pbw-oracle` and the saves their `oracle-saves` (White 2's starter save, SHA-1 `3b9dac231d1f`).
+  - `build/port-san` (Black 2) and `build/port-san-w2` (White 2), `-DPORT_SANITIZE=ON`, made from nothing at the merge
+    (1,808 steps each), with the same oracle and saves copied in.
+  - `build/port-san-dist`, `-DPORT_SANITIZE=ON -DPORT_MACOS_DISTRIBUTION=ON` (Black 2): both slices for macOS 11.0, SDL3
+    built along and linked statically, 2,060 steps; no availability error.
+  - Warnings: 264 in each plain and sanitized build, the decomp's, as the last entries; 528 in the sanitized
+    distribution build (two slices); none in `port/`.
+  - CI, `port-ci.yml` dispatched on `port-sanitizers`: run
+    [39201456935](https://github.com/CallanCampos/Frigate/actions/runs/39201456935) (`77326dde8`), the `sanitize`
+    job's first run, green on eight of nine jobs and red on Windows (Work done); run
+    [39204084628](https://github.com/CallanCampos/Frigate/actions/runs/39204084628) (`3dfcec981`) is green on all
+    nine. macOS 240 pass and 46 skip of 286; Linux 222 pass and 47 skip of 269; Windows 212 pass and 57 skip of 269;
+    the distribution job, 240 pass and 46 skip of 286 on each of `macos-26`, `macos-15`, `macos-26-intel` and
+    `macos-15-intel`, with the app checked; the `sanitize` job on `macos-26`, 238 pass and 25 skip of the 263 tests
+    that aren't routes, then the routes that need no oracle, 3 pass (the smoke test and the replays' fixtures) and 8
+    skip of 11; on `ubuntu-26.04`, with LeakSanitizer at every program's exit and the function check, 220 pass and 26
+    skip of 246, then the same 3 and 8 of 11. Warnings: 264 on macOS, 263 on Linux and Windows, 528 in the
+    distribution job, none in `port/`. 457 function stubs and 46 data placeholders on every host, 456 and 46 in the
+    sanitized builds.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle, the two builds at once at a load average of 20 to 30, at
+    `3dfcec981`: Black 2, 285 pass and 1 skip of 286 (1,194 s); White 2, 283 pass and 1 skip of 284 (1,079 s). The
+    skip is `app_universal_slices`, which a development build's one slice skips. White 2's starter-save routes
+    (`oracle_continue_starter`, `oracle_launch_party_menus`, `launch_summary_standalone`, `launch_touch_then_party`)
+    pass.
+  - T5, the sanitized build, at the merge (`93cf59b99`, with `77326dde8`'s tests): Black 2, of the 260 tests that
+    aren't routes 259 pass and `app_universal_slices` skips (264 s), and 24 of its 25 routes pass (977 s); White 2,
+    280 pass, 1 skips and 1 fails of 282 (996 s). Both versions stopped on the test launcher's Pokédex in
+    `oracle_launch_party_menus`, first on UBSan's division by zero in `scroll_bar.c` (R5), then, once fixed, on ASan's
+    read past a heap block in the touch bar's load (H4): fixed at `3dfcec981` (Work done). Every other route ran
+    clean: the opening, the title, the start menu, New Game (Black 2), CONTINUE from both saves, the field menu's apps
+    from both saves, White 2's starter-save routes, the sound's sequences.
+  - T5 at `3dfcec981`, `ctest -j4` with the oracle, both builds at once: Black 2, 286 pass and 1 skip of 287 (854 s),
+    its 25 routes among them; White 2, 284 pass and 1 skip of 285 (820 s), its 23 routes among them; the skip is
+    `app_universal_slices`. No test's output has a sanitizer's report. The host seam's tests (`host_*`) pass under the
+    sanitizers in both, and so do the new `nnsys_ds_reads`, `nnsys_ds_read_outside` and `app_check_exit`.
+  - The sanitized distribution build: all 263 of the arm64 slice's tests that aren't routes pass (280 s),
+    `app_slices` and `app_universal_slices` (both slices' opening, the x86_64 one under Rosetta) among them; the x86_64
+    slice, by `ctest_one_slice.sh` under Rosetta, 252 pass and 1 skip of its 253 (320 s), and `replay_start_menu`,
+    `smoke_reaches_game_main` and `oracle_launch_party_menus`, the Pokédex pass for pass against melonDS, pass on it
+    (302 s). Before the fix, the plain distribution app's x86_64 slice (`build/port-dist`, at `c4c273e33`) ended at
+    the Pokédex with SIGFPE (status 136), without a report.
+  - Every run passed `--save-dir`, with `HOME` a scratch directory, and none wrote under `~/Library`: its
+    `Application Support/Frigate` and `Logs/Frigate` still hold files from 16:33 on 2026-10-18 at the latest. T7 not
+    yet.
+- **Tiers:** not measured: no new decomp C, two `PLATFORM_PC` blocks in complete files.
+- **Trap stubs:** 457 function stubs and 46 data placeholders in each version, as the last entries; 456 in the
+  sanitized builds, whose `nwm.c` doesn't reference `func_02769520`.
+- **64-bit warnings:** none of the pointer and integer size kinds; the counts of other kinds are the last entries'.
+- **Work done:**
+  - **The merge of `port-sanitizers`** (`93cf59b99`), every conflict keeping both sides. Main's host seam owns the
+    pages, faults and backtraces that `trap.c` and `fiber.c` used, so the track's changes sit on it: the placeholders'
+    pages become readable at exit through a new `port_host_protect_read` (`port/hal/host`, POSIX's `mprotect`,
+    Windows' `VirtualProtect`, which also forgets the region; `host_files` checks it), and `fiber.c` keeps main's
+    dummy return slot and guard with the track's LeakSanitizer roots and `FreeFakeStack`. `CMakeLists.txt` has the
+    availability check and the sanitized build's options; `port-ci.yml` the four jobs; `oracle.cmake` main's 1,800 s
+    with the labels, and `launch_summary_standalone` and `launch_touch_then_party`, now in both versions, labelled
+    `route` and `oracle`. The track's ADR is 0014 (file, index, every reference), accepted.
+  - **The track's notes confirmed** (`77326dde8`). The claim that a sanitizer's report fails a test whatever else it
+    expects was false for a test with `WILL_FAIL`, which turns ctest's failure on the report in its output into a
+    pass: `integrate_unknown_option` runs through `check_exit.py --status 2`, configuring stops on any `WILL_FAIL`,
+    and `check_exit.py` fails a run with a report whatever ending it wants (its `--crash` took a sanitized program's
+    abort for a crash, and ctest saw only the tail it printed); it gains `--abort`, and `test_check_exit.py` checks
+    it. `port_heap_ds_read_begin` checks, in every build, that its span (widened to ASan's granules where it unpoisons
+    them) lies in one of the game's expanded or frame heaps alive or else in the main arena
+    (`port_os_main_arena_holds`), and aborts with a message otherwise (`nnsys_ds_reads`, `nnsys_ds_read_outside`).
+    The documents say which check holds where.
+  - **The Pokédex under the sanitizers** (`3dfcec981`), the two reports on what main added since the track was cut,
+    each fixed at its cause in the game's file under `PLATFORM_PC`, with rows in game-changes.md and decomp-findings.md:
+    R5, `ScrollBar_GetPos` divides by a list's `max`, 0 when its rows all fit, where the DS's `_u32_div_f` returns the
+    dividend and x86-64 faults; H4, the touch bars ask the dynamic character load for 2 KiB of a 128-byte file, which
+    read past its heap block into characters the bar never shows: the host reserves the same characters and copies
+    the file's alone. CI's Windows failures of run 39201456935, `app_check_exit` (Python's own abort ends with
+    0xc0000409 there, so its stand-in turns the report off as the port's programs do) and `nnsys_ds_read_outside`
+    (`%p` prints no `0x` on Windows), are fixed too.
+  - **Documents:** sanitizers.md (which check makes a report fail a test, R5, H4, the merged tree's run, the sanitized
+    distribution build), the feature map's row, the guides (`cmake/`, `tests/`, `hal/`, `tools/`), GLOSSARY.md, the
+    ADR index and ADR 0014's note, game-changes.md (`arc_util.c`'s first row names `9c5b9bfce`, the two new rows
+    `3dfcec981`), decomp-findings.md, and lessons.md.
+- **Next:** the user's review of ADR 0014's acceptance; for T5, a nightly run of both versions' sanitized routes and of
+  the x86_64 slice's; the host's fault handler on macOS and Linux reports SIGSEGV and SIGBUS only, so a SIGFPE or
+  SIGILL ends the program without a report, where Windows reports every exception; `package_macos.sh
+  --distribution` would package a sanitized build's app too. Then as the last entries: the apps no route reaches yet,
+  and a save with an adventure made by the port, once overlay 36 lets it into the field.
+- **Blockers:** as the last entries: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
+  to 14 have no runner and no virtual machine here.
+
 ## 2026-10-18: the sanitized build after review: the copyright screen's read kept, every report fatal on Linux
 
 - **Upstream:** `993e6c49b`, as merged into the port's `main` by `1f0c184f6`; no sync in this task.

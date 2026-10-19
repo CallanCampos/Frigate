@@ -3,6 +3,30 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: the sanitized build merged with the host seam, the distribution build and White 2's starter save
+
+- **ctest's `WILL_FAIL` inverts a `FAIL_REGULAR_EXPRESSION` match too.** A match fails the test, and `WILL_FAIL` turns
+  that failure into a pass; only a program killed by a signal stays a failure. So the sanitized build's check of every
+  test's output for a report meant nothing for a `WILL_FAIL` test. A test of a failure checks how its program ends
+  through a wrapper (`check_exit.py --status`), and configuring refuses `WILL_FAIL`.
+- **A wrapper shows ctest only what it prints.** `check_exit.py` printed the last 12 lines of the program's output, and
+  an ASan report's `SUMMARY` line sits above its shadow bytes' legend, so it never reached ctest, while `--crash` took
+  the report's abort for the crash it wanted. A wrapper that judges how a program ends judges a sanitizer's report
+  itself.
+- **A division by zero is the runtime's on the DS and undefined on a host.** MWCC's `u32` division calls `_u32_div_f`,
+  which returns the dividend for a divisor of 0, and the game relies on it (a scroll bar of a list that can't scroll).
+  arm64 gives 0 and carries on with another answer; x86-64 faults with SIGFPE, which the host's fault handler doesn't
+  report (it takes SIGSEGV and SIGBUS), so the x86_64 slice died without a word. UBSan's divide check on arm64 finds
+  what x86-64 would crash on.
+- **A route that only one architecture runs isn't a test of the other.** CI's Intel runners have no ROM, so the
+  distribution app's x86_64 slice had never reached the Pokédex; Rosetta runs it here, under the sanitizers too.
+- **A read past a heap block can hide behind the next block.** Poisoning shows ASan the memory between the game's
+  blocks, not the blocks themselves, so a read that runs into the next allocated block is never reported. The general
+  touch bar (`src/ov139/touchbar.c`) asks the loader for the same 2 KiB of the same 128-byte file as the Pokédex's,
+  which alone reported it: fix the read in the loader, not in the caller that happened to report.
+- **On Windows, Python's `os.abort()` ends with 0xc0000409**, the UCRT's fail-fast, unless `_set_abort_behavior` turns
+  the report off as the host seam does for the port's programs (status 3); and `%p` prints no `0x` there.
+
 ## 2026-10-18: the sanitized build, after review
 
 - **A sanitizer's report in the game's code isn't yet a bug to fix: find what the DS does with the bytes.** The
