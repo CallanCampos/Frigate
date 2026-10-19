@@ -5,8 +5,8 @@
 #include "struct_decls.h"
 
 // The statue gimmick of the Pokémon League, overlay 105. Overlay 36's gimmick table calls these
-void func_ov105_021eec80(Field *field);
-void func_ov105_021eecac(Field *field);
-void func_ov105_021eecc8(Field *field);
+void LeagueStatue_Init(Field *field);
+void LeagueStatue_End(Field *field);
+void LeagueStatue_Update(Field *field);
 
 #endif // POKEBW2_FIELD_GIMMICK_LEAGUE_STATUE_H

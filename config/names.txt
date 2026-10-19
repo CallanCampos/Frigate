@@ -9853,6 +9853,12 @@ overlays/ov104 0x021f02fc GimmickGateEvent_Create
 overlays/ov104 0x021f0324 GimmickGateBoardEntry_Load
 overlays/ov104 0x021f0334 GimmickGateBoardEntry_MatchesZone
 overlays/ov104 0x021f037c GimmickGateBoardEntry_MatchesVersion
+overlays/ov105 0x021eec80 LeagueStatue_Init
+overlays/ov105 0x021eecac LeagueStatue_End
+overlays/ov105 0x021eecc8 LeagueStatue_Update
+overlays/ov105 0x021eecd4 LeagueStatue_LoadScene
+overlays/ov105 0x021eee24 LeagueStatue_DummyInit
+overlays/ov105 0x021eee28 LeagueStatue_DummyEnd
 overlays/ov107 0x021eec80 FindStoneTable
 overlays/ov107 0x021eeca0 GetStonePositions
 overlays/ov107 0x021eecac GetStoneCount
