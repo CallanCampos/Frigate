@@ -5,6 +5,7 @@
 #include "field/field_actor.h"
 #include "field/field_event.h"
 #include "field/game_beacon_search.h"
+#include "field/height_ex.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/overlay.h"
@@ -30,7 +31,6 @@ typedef struct HeightExList {
 } HeightExList;
 
 GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data);
-GameEvent *func_ov036_021ba6c8(GameSystem *gsys);
 u32 func_ov036_021ba684(void *a0);
 BOOL func_ov036_021ba804(GameProc *proc, u32 *state, void *param, void *work);
 BOOL func_ov036_021ba808(GameProc *proc, u32 *state, void *param, void *work);
@@ -105,7 +105,7 @@ void func_ov036_021ba6bc(u8 index, BOOL inUse, void *listPtr) {
     list->entries[index].inUse = inUse;
 }
 
-GameEvent *func_ov036_021ba6c8(GameSystem *gsys) {
+GameEvent *func_ov036_021ba6c8(GameSystem *gsys, Field *field) {
     return GameEvent_Create(gsys, NULL, func_ov036_021ba6dc, 0);
 }
 
@@ -148,14 +148,14 @@ GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data
 
     switch (*state) {
     case 0:
-        if (func_02042788()) {
-            func_02042860(NULL);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetExit(NULL);
         }
         (*state)++;
         break;
     case 1:
-        if (func_020427a4() == TRUE) {
-            func_02012144();
+        if (GFL_NetIsEnded() == TRUE) {
+            GFL_NetErrClear();
             func_02016b0c(gsys, 0);
             (*state)++;
         }
@@ -170,7 +170,7 @@ GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data
     case 3:
         work = GameCommSys_GetWork(comm);
         if (work != NULL && GameCommSys_BootCheck(comm)) {
-            func_ov012_0215f94c(work);
+            GameBeaconSearch_StartType35Wait(work);
             return TRUE;
         }
         break;

@@ -12,6 +12,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "field/field_sound.h"
 #include "field/townmap_util.h"
 #include "gfl/heap.h"
@@ -138,7 +139,7 @@ GameEvent *EventFestMissionInfo_Create(GameSystem *gsys, void *args) {
     return event;
 }
 
-GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args) {
+GameEvent *EventFestMissionRetire_Create(GameSystem *gsys, void *args) {
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFestMissionEnd_Callback, sizeof(FestMissionEventWork));
     FestMissionEventWork *work = GameEvent_GetData(event);
@@ -148,7 +149,7 @@ GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args) {
     return event;
 }
 
-GameEvent *func_ov157_021f5b18(GameSystem *gsys, void *args) {
+GameEvent *EventFestMissionDisconnect_Create(GameSystem *gsys, void *args) {
     Field *field = GSYS_GetField(gsys);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFestMissionEnd_Callback, sizeof(FestMissionEventWork));
     FestMissionEventWork *work = GameEvent_GetData(event);
@@ -183,7 +184,7 @@ static void FestMissionEvent_Exit(FestMissionEventWork *work) {
     GFL_WordSetSystemFree(work->wordSet);
     GFL_MsgDataFree(work->msgData);
     PassPowerData_Free(work->passPowerData);
-    func_ov027_02170b00(work->festText);
+    FestivalText_Free(work->festText);
     EnableAllActorsMovement(work->actorSystem);
 }
 
@@ -243,11 +244,11 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
     switch (*state) {
     case 0:
         save = GameData_GetSaveControl(work->gameData);
-        records = func_02010dec(save);
+        records = FestRecords_GetFromSave(save);
         medalBox = SaveControl_GetMedalBox(save);
         if (work->joined) {
             joinedCount = FestRecords_AddJoined(records);
-            func_0201472c(work->festival, &work->mission, work->joined);
+            LinkFestival_StartMission(work->festival, &work->mission, work->joined);
             work->mission = *(FestMission *)GetFestMissionCfg(work->festival);
             FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
             if (joinedCount >= 1) {
@@ -268,9 +269,10 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
             next = EventMEPlay_Create(work->gsys, SEQ_ME_MISSION_START);
         }
         GameEvent_ChainNext(event, next);
-        FestMissionLog_AddPlayer(func_020146fc(work->festival), work->gameData, work->joined);
-        func_02038bc8(7);
-        func_02014844(work->festival, func_ov012_02160eb4(work->gameData, Field_GetPlayerStateZoneID(work->field)));
+        FestMissionLog_AddPlayer(LinkFestival_GetLog(work->festival), work->gameData, work->joined);
+        JoinAvenue_RecordActivity(7);
+        LinkFestival_IsNewZoneFromOutside(work->festival,
+                                          TownMap_GetMapZone(work->gameData, Field_GetPlayerStateZoneID(work->field)));
         work->window = func_ov036_02187ca0(work->msgBGSys, work->msgData, 1, 1, 30, 20);
         func_ov036_02187d38(work->window);
         FestMission_PrintStart(work);
@@ -293,7 +295,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         func_ov036_02187d38(work->window);
         func_ov036_02187d10(work->window);
         func_ov036_021b65e8(Field_GetFesGimmick(work->field));
-        func_ov012_021683f4(work->gsys, Field_GetPlayerStateZoneID(work->field));
+        FestMission_OnZoneEnter(work->gsys, Field_GetPlayerStateZoneID(work->field));
         if (!work->joined) {
             *state = 6;
             break;
@@ -336,7 +338,7 @@ static GameEventReturnCode EventFestMissionMessage_Callback(GameEvent *event, u3
         break;
     case 1:
         FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
-        func_02014964(work->festival, &work->mission);
+        LinkFestival_AddRecord(work->festival, &work->mission);
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
     }
@@ -358,8 +360,8 @@ static GameEventReturnCode EventFestMissionMenu_Callback(GameEvent *event, u32 *
         break;
     case 2:
         menuArgs = 1;
-        GameEvent_ChainNext(
-            event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL, func_ov021_0216e80c, &menuArgs));
+        GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_EVENT_FESTIVAL,
+                                                                   EventFestival_Create, &menuArgs));
         (*state)++;
         break;
     default:
@@ -453,10 +455,10 @@ static void FestMission_Print(FestMissionEventWork *work) {
     s32 minutes;
 
     GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
-    func_ov027_02170d04(work->festText, work->formatted, &work->mission, work->tailHeapId);
+    FestMission_GetMessage(work->festText, work->formatted, &work->mission, work->tailHeapId);
     func_0202437c(work->wordSet, 0, work->formatted, 0, 1, 2);
     FestMission_PrintLine(work, work->strbuf, 0, 0);
-    func_ov027_02170d90(work->festText, work->strbuf, &work->mission, work->heapId);
+    FestMission_GetResultMessage(work->festText, work->strbuf, &work->mission, work->heapId);
     FestMission_PrintLine(work, work->strbuf, 0, 2);
     minutes = seconds / 60;
     WordSetNumber(work->wordSet, 2, minutes, 4, NUM_PAD_NONE, TRUE);

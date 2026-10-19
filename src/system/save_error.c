@@ -63,17 +63,17 @@ void showSavegameAltError(BOOL noResponse) {
 static void playSavegameError(u32 message) {
     SaveControl_Free();
     displaySavegameError(message);
-    if (func_02042788()) {
-        func_020428a0();
-        func_02042860(NULL);
-        func_020429f0();
+    if (GFL_NetIsInitialized()) {
+        GFL_NetCancelEnd();
+        GFL_NetExit(NULL);
+        GFL_NetIwFree();
         do {
-            func_020428e0();
-        } while (func_020427a4() == FALSE);
+            GFL_NetMainWhileWaiting();
+        } while (GFL_NetIsEnded() == FALSE);
     }
     GCTX_HIDUnblockSoftReset(2);
     while (TRUE) {
-        func_02005430();
+        Machine_ProcessExitRequest();
     }
 }
 

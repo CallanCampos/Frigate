@@ -161,9 +161,9 @@ void PMSIParam_SetResult(PMSIParam *param, const u16 *words, const PMSData *sent
 }
 
 BOOL func_02029b40(const PMSIParam *param) {
-    return func_0203d554();
+    return GCTX_HIDIsUsingTouch();
 }
 
 void func_02029b48(PMSIParam *param, BOOL touch) {
-    func_0203d564(touch);
+    GCTX_HIDSetUsingTouch(touch);
 }

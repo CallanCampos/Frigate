@@ -67,7 +67,7 @@ void ScriptWork_Free(ScriptWork *work) {
     if (work->altStrBuf != NULL) {
         GFL_StrBufFree(work->altStrBuf);
     }
-    func_ov012_021550e4(work->subwork);
+    FreeScriptSubwork(work->subwork);
     GFL_HeapFree(work);
 }
 
@@ -100,11 +100,11 @@ StrBuf *ScriptWork_GetAltStrBuf(ScriptWork *work) {
     return work->altStrBuf;
 }
 
-void func_ov012_02153ed0(ScriptWork *work, void *value) {
+void ScriptWork_SetSignFont(ScriptWork *work, void *value) {
     work->unk38 = value;
 }
 
-void *func_ov012_02153ed4(ScriptWork *work) {
+void *ScriptWork_GetSignFont(ScriptWork *work) {
     return work->unk38;
 }
 

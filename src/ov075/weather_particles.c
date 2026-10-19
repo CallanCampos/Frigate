@@ -361,7 +361,7 @@ static void Flake_Add(WeatherTask *task, int count, HeapID heapId) {
             }
             flake = func_ov036_02199c5c(obj);
             actor = func_ov036_02199c64(obj);
-            func_0204c504(actor, GFL_RandomLC(4));
+            ClActor_SetAnimFrame(actor, GFL_RandomLC(4));
             flake->acc = 0;
             flake->swayIdx = 0;
             flake->state = 0;
@@ -481,7 +481,7 @@ static void BlizzardFlake_Move(WeatherObj *obj) {
     ClActor *actor = func_ov036_02199c64(obj);
     ClActorPos pos;
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     switch (flake->state) {
     case 0:
         pos.x += (s16)flake->speedX;
@@ -495,7 +495,7 @@ static void BlizzardFlake_Move(WeatherObj *obj) {
                 flake->speedY--;
             }
         }
-        func_0204c140(actor, &pos, 0);
+        ClActor_SetSurfacePos(actor, &pos, 0);
         break;
     case 1:
         func_ov036_0219980c(obj);
@@ -527,7 +527,7 @@ static void Blizzard_AddFlakes(WeatherTask *task, int count, HeapID heapId) {
         flake->frame = 0;
         flake->lifetime = GFL_RandomLC(3) + 9;
         size = GFL_RandomLC(4);
-        func_0204c504(actor, size);
+        ClActor_SetAnimFrame(actor, size);
         flake->speedX = (size + 1) * sBlizzardSpeedX[index];
         flake->speedY = (size + 1) * sBlizzardSpeedY[index];
         flake->state = 0;
@@ -538,7 +538,7 @@ static void Blizzard_AddFlakes(WeatherTask *task, int count, HeapID heapId) {
         flake->accelX = sBlizzardSpeedX[index];
         pos.x = -GFL_RandomLC(24);
         pos.y = GFL_RandomLC(168) - 0x20;
-        func_0204c140(actor, &pos, 0);
+        ClActor_SetSurfacePos(actor, &pos, 0);
     }
 }
 
@@ -665,7 +665,7 @@ static void FlutterFlake_Move(WeatherObj *obj) {
             flake->frame = flake->seed % 4 * 2 + 8;
             flake->speedX = 2;
             flake->speedY = 2;
-            func_0204c504(actor, func_0204c510(actor) + 3);
+            ClActor_SetAnimFrame(actor, ClActor_GetAnimFrame(actor) + 3);
             return;
         }
         pos.x += (s16)flake->speedX;
@@ -725,7 +725,7 @@ static void Flutter_AddFlakes(WeatherTask *task, int count, HeapID heapId) {
         } else if (seed % 100 < 100) {
             kind = 2;
         }
-        func_0204c504(actor, 2 - kind);
+        ClActor_SetAnimFrame(actor, 2 - kind);
         m = seed % 23;
         flake->speedY = m + (kind + 1) * 10;
         if (kind == 2) {
@@ -891,6 +891,6 @@ static void Speck_Add(WeatherTask *task, int count, HeapID heapId) {
         } else {
             frame = a % 4;
         }
-        func_0204c504(actor, frame);
+        ClActor_SetAnimFrame(actor, frame);
     }
 }

@@ -7,6 +7,7 @@
 #include "field/field_actor.h"
 #include "field/field_ambience.h"
 #include "field/field_camera.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/field_task.h"
 #include "field/scrcmd_field.h"
@@ -271,7 +272,7 @@ static void EventFieldPokeDisp_InitClAct(EventFieldPokeDisp *data, u32 species, 
                                          u32 personality) {
     ArcTool *arc;
 
-    data->unit = func_0204bf1c(1, 0, 0x8015);
+    data->unit = ClActUnit_Create(1, 0, 0x8015);
     arc = MakePokeGraArcHandle(0x8015);
     data->chars = PokeGra_LoadClActChars(arc, species, form, sex, rare, 0, 0, personality, 0, 0x8015);
     data->palette = PokeGra_LoadClActPalette(arc, species, form, sex, rare, 0, 0, 0, 0xc0, 0x8015);
@@ -280,16 +281,16 @@ static void EventFieldPokeDisp_InitClAct(EventFieldPokeDisp *data, u32 species, 
     {
         ClActorSetup setup = { 0x80, 0x48, 0, 0, 0 };
 
-        data->actor = func_0204c040(data->unit, data->chars, data->palette, data->cellAnims, &setup, 0, 0x8015);
+        data->actor = ClActor_Create(data->unit, data->chars, data->palette, data->cellAnims, &setup, 0, 0x8015);
     }
 }
 
 static void EventFieldPokeDisp_UpdateClAct(EventFieldPokeDisp *data) {
-    func_0204c108(data->actor);
-    func_0204b98c(data->chars);
-    func_0204bcd0(data->palette);
-    func_0204be64(data->cellAnims);
-    func_0204bf98(data->unit);
+    ClActor_Delete(data->actor);
+    ClActSys_FreeChars(data->chars);
+    ClActSys_FreePltt(data->palette);
+    ClActSys_FreeCellAnims(data->cellAnims);
+    ClActUnit_Delete(data->unit);
 }
 
 static GameEventReturnCode EventFieldPokeDisp_Callback(GameEvent *event, u32 *state, void *data) {
@@ -374,7 +375,7 @@ BOOL s0228_RecordGet(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021c783c(VM *vm, FieldScriptEnv *env) {
-    func_02038bc8(VM_Read16(vm));
+    JoinAvenue_RecordActivity(VM_Read16(vm));
     return FALSE;
 }
 

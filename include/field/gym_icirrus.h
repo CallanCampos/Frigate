@@ -9,16 +9,16 @@
 // the overlay has no string, and the only scripts that use the commands are the zone's
 
 // Overlay 36's gimmick table calls these
-void func_ov098_021eec80(Field *field);
-void func_ov098_021eedb8(Field *field);
-void func_ov098_021eeddc(Field *field);
+void GymIcirrus_Init(Field *field);
+void GymIcirrus_End(Field *field);
+void GymIcirrus_Update(Field *field);
 
 // The gym's script commands
 // The event that plays a switch's animation, or NULL if there are fewer switches
-GameEvent *func_ov098_021eee0c(GameSystem *gsys, int switchIndex);
+GameEvent *GymIcirrus_CreateSwitchAnimEvent(GameSystem *gsys, int switchIndex);
 // The same event with the sound, and the switch's state flipped when it ends
-GameEvent *func_ov098_021eee48(GameSystem *gsys, int switchIndex);
+GameEvent *GymIcirrus_CreateFlipSwitchEvent(GameSystem *gsys, int switchIndex);
 // Switches the player between grid and rail movement if the switch is in the state that the place calls for
-void func_ov098_021eee84(GameSystem *gsys, int place);
+void GymIcirrus_ToggleMovementAtPlace(GameSystem *gsys, int place);
 
 #endif // POKEBW2_FIELD_GYM_ICIRRUS_H

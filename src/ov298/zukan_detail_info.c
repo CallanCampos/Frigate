@@ -179,8 +179,8 @@ static BOOL ZukanDetailInfo_Exit(ZukanDetailProcSys *sys, int *seq, void *param_
 
     ZukanDetailInfo_StopGlow(param, wk, common);
     ZukanDetailInfo_FreeGlow(param, wk, common);
-    func_ov296_0219dbcc(wk->infoSub);
-    func_ov296_0219dbcc(wk->infoMain);
+    ZukanInfo_Free(wk->infoSub);
+    ZukanInfo_Free(wk->infoMain);
     ZukanDetailInfo_FreeButtons(param, wk, common);
     GFL_FontFree(wk->font);
     GFL_MsgDataFree(wk->msgData[2]);
@@ -247,7 +247,7 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         ZukanDetailInfo_CreateButtons(param, wk, common);
         pokedex = GameData_GetPokedex(ZukanDetailCommon_GetGameData(common));
         unit = ZukanDetailGraphic_GetClActUnit(ZukanDetailCommon_GetGraphic(common));
-        switch (func_0200d1f8(pokedex)) {
+        switch (PokeDex_GetMode(pokedex)) {
         case 0:
             national = FALSE;
             break;
@@ -259,13 +259,13 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
             break;
         }
         ZukanDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught, languages);
-        wk->infoMain = func_ov296_0219d768(param->heapId, species, form, sex, rare, personality, national, caught, 2, 0,
-                                           1, unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
-                                           wk->msgData[1], wk->msgData[2]);
-        wk->infoSub = func_ov296_0219d768(param->heapId, species, form, sex, rare, personality, national, caught, 2, 1,
-                                          1, unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
-                                          wk->msgData[1], wk->msgData[2]);
-        func_ov296_0219e0c8(wk->infoSub);
+        wk->infoMain = ZukanInfo_Create(param->heapId, species, form, sex, rare, personality, national, caught, 2, 0, 1,
+                                        unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
+                                        wk->msgData[1], wk->msgData[2]);
+        wk->infoSub = ZukanInfo_Create(param->heapId, species, form, sex, rare, personality, national, caught, 2, 1, 1,
+                                       unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
+                                       wk->msgData[1], wk->msgData[2]);
+        ZukanInfo_Hide(wk->infoSub);
         ZukanDetailInfo_ResetButtons(param, wk, common, languages);
         ZukanDetailInfo_InitGlow(param, wk, common);
         ZukanDetailInfo_StartGlow(param, wk, common);
@@ -318,8 +318,8 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
 
     if (*seq >= INFO_SEQ_WAIT_FADE_IN) {
         ZukanDetailInfo_UpdateButton(param, wk, common);
-        func_ov296_0219dc74(wk->infoMain);
-        func_ov296_0219dc74(wk->infoSub);
+        ZukanInfo_Update(wk->infoMain);
+        ZukanInfo_Update(wk->infoSub);
         if (wk->pushed == LANGUAGE_NONE) {
             ZukanDetailInfo_UpdateGlow(param, wk, common);
         }
@@ -428,11 +428,11 @@ static BOOL ZukanDetailInfo_CheckTouch(ZukanDetailInfoParam *param, ZukanDetailI
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             u8 i;
 
             for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-                if (func_0204c138(wk->buttons[i].actor) && wk->buttons[i].rect[0] <= x &&
+                if (ClActor_IsVisible(wk->buttons[i].actor) && wk->buttons[i].rect[0] <= x &&
                     x < wk->buttons[i].rect[0] + wk->buttons[i].rect[2] && wk->buttons[i].rect[1] <= y &&
                     y < wk->buttons[i].rect[1] + wk->buttons[i].rect[3]) {
                     if (wk->language != i) {
@@ -448,9 +448,9 @@ static BOOL ZukanDetailInfo_CheckTouch(ZukanDetailInfoParam *param, ZukanDetailI
     if (pushed) {
         ZukanDetailInfo_SetLanguage(param, wk, common, wk->pushed);
         wk->buttons[wk->pushed].state = BUTTON_PUSHED;
-        func_0204c488(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
+        ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
         GFL_SndSEPlay(SEQ_SE_SELECT3);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         ZukanDetailTouchbar_SetActive(touchbar, FALSE);
     }
     return pushed;
@@ -469,7 +469,7 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
         if (wk->language == LANGUAGE_NONE) {
             if ((typed & (PAD_BUTTON_L | PAD_BUTTON_R)) || (pressed & PAD_BUTTON_A)) {
                 for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-                    if (func_0204c138(wk->buttons[i].actor)) {
+                    if (ClActor_IsVisible(wk->buttons[i].actor)) {
                         wk->pushed = i;
                         pushed = TRUE;
                         break;
@@ -480,7 +480,7 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
             for (i = 1; i < LANGUAGE_BUTTON_COUNT; i++) {
                 u8 button = (wk->language + i) % LANGUAGE_BUTTON_COUNT;
 
-                if (func_0204c138(wk->buttons[button].actor)) {
+                if (ClActor_IsVisible(wk->buttons[button].actor)) {
                     wk->pushed = button;
                     pushed = TRUE;
                     break;
@@ -490,7 +490,7 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
             for (i = 1; i < LANGUAGE_BUTTON_COUNT; i++) {
                 u8 button = (wk->language + LANGUAGE_BUTTON_COUNT - i) % LANGUAGE_BUTTON_COUNT;
 
-                if (func_0204c138(wk->buttons[button].actor)) {
+                if (ClActor_IsVisible(wk->buttons[button].actor)) {
                     wk->pushed = button;
                     pushed = TRUE;
                     break;
@@ -502,9 +502,9 @@ static BOOL ZukanDetailInfo_CheckKeys(ZukanDetailInfoParam *param, ZukanDetailIn
     if (pushed) {
         ZukanDetailInfo_SetLanguage(param, wk, common, wk->pushed);
         wk->buttons[wk->pushed].state = BUTTON_PUSHED;
-        func_0204c488(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
+        ClActor_SetSequence(wk->buttons[wk->pushed].actor, wk->buttons[wk->pushed].pushedAnim);
         GFL_SndSEPlay(SEQ_SE_SELECT3);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ZukanDetailTouchbar_SetActive(touchbar, FALSE);
     }
     return pushed;
@@ -524,7 +524,7 @@ static void ZukanDetailInfo_ChangePokemon(ZukanDetailInfoParam *param, ZukanDeta
 
     ZukanDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught, languages);
     ownLanguage = TRUE;
-    func_ov296_0219de50(wk->infoMain, species, form, sex, rare, personality, caught);
+    ZukanInfo_SetPokemon(wk->infoMain, species, form, sex, rare, personality, caught);
     if (wk->language != LANGUAGE_NONE) {
         if (languages[wk->language]) {
             ownLanguage = FALSE;
@@ -534,9 +534,9 @@ static void ZukanDetailInfo_ChangePokemon(ZukanDetailInfoParam *param, ZukanDeta
         }
     }
     if (ownLanguage) {
-        func_ov296_0219e0c8(wk->infoSub);
+        ZukanInfo_Hide(wk->infoSub);
     } else {
-        func_ov296_0219dfb0(wk->infoSub, species, form, sex, rare, personality, caught, wk->language);
+        ZukanInfo_SetPokemonInLanguage(wk->infoSub, species, form, sex, rare, personality, caught, wk->language);
     }
     ZukanDetailInfo_ResetButtons(param, wk, common, languages);
 }
@@ -555,10 +555,10 @@ static void ZukanDetailInfo_SetLanguage(ZukanDetailInfoParam *param, ZukanDetail
 
             ZukanDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught,
                                        languages);
-            func_ov296_0219dfb0(wk->infoSub, species, form, sex, rare, personality, caught, language);
-            func_ov296_0219e114(wk->infoSub);
+            ZukanInfo_SetPokemonInLanguage(wk->infoSub, species, form, sex, rare, personality, caught, language);
+            ZukanInfo_Show(wk->infoSub);
         } else {
-            func_ov296_0219df4c(wk->infoSub, language);
+            ZukanInfo_SetLanguage(wk->infoSub, language);
         }
         ZukanDetailInfo_StopGlow(param, wk, common);
         wk->language = language;
@@ -576,8 +576,8 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
     u8 i;
 
     wk->palette = ZukanDetailTouchbar_GetIconPalette(touchbar);
-    wk->chars = func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->cellAnims = func_0204bde0(arc, 28, 45, param->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 28, 45, param->heapId);
     GFL_ArcToolFree(arc);
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
@@ -594,9 +594,9 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
         setup.y = sZukanDetailInfoLanguageButtons[i].y;
         setup.sequence = wk->buttons[i].anim;
         wk->buttons[i].actor =
-            func_0204c040(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
+            ClActor_Create(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
         func_0204c520(wk->buttons[i].actor, TRUE);
-        func_0204c318(wk->buttons[i].actor, 1);
+        ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
 }
 
@@ -605,10 +605,10 @@ static void ZukanDetailInfo_FreeButtons(ZukanDetailInfoParam *param, ZukanDetail
     u8 i;
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i].actor);
+        ClActor_Delete(wk->buttons[i].actor);
     }
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
 }
 
 static void ZukanDetailInfo_UpdateButton(ZukanDetailInfoParam *param, ZukanDetailInfoWork *wk,
@@ -625,12 +625,12 @@ static void ZukanDetailInfo_UpdateButton(ZukanDetailInfoParam *param, ZukanDetai
             wk->buttons[i].state = BUTTON_WAIT_ANIM;
             break;
         case BUTTON_WAIT_ANIM:
-            if (!func_0204c560(wk->buttons[i].actor)) {
+            if (!ClActor_IsAnimActive(wk->buttons[i].actor)) {
                 wk->buttons[i].state = BUTTON_DONE;
             }
             break;
         case BUTTON_DONE:
-            func_0204c488(wk->buttons[i].actor, wk->buttons[i].anim);
+            ClActor_SetSequence(wk->buttons[i].actor, wk->buttons[i].anim);
             wk->buttons[i].state = BUTTON_IDLE;
             wk->pushed = LANGUAGE_NONE;
             ZukanDetailTouchbar_SetActive(touchbar, TRUE);
@@ -645,9 +645,9 @@ static void ZukanDetailInfo_ResetButtons(ZukanDetailInfoParam *param, ZukanDetai
     u8 i;
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        func_0204c124(wk->buttons[i].actor, visible[i]);
+        ClActor_SetVisible(wk->buttons[i].actor, visible[i]);
         wk->buttons[i].state = BUTTON_IDLE;
-        func_0204c488(wk->buttons[i].actor, wk->buttons[i].anim);
+        ClActor_SetSequence(wk->buttons[i].actor, wk->buttons[i].anim);
     }
     wk->pushed = LANGUAGE_NONE;
 }
@@ -665,13 +665,13 @@ static void ZukanDetailInfo_GetPokemon(ZukanDetailInfoParam *param, ZukanDetailI
     BOOL seenLanguages[LANGUAGE_BUTTON_COUNT];
     u8 i;
 
-    func_0200d3c8(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
+    PokeDex_GetShownSexRareForm(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
     if (shown == SPECIES_SPINDA) {
         shownPersonality = func_0200da18(pokedex, shownPersonality);
     }
     shownCaught = PokeDex_IsCaught(pokedex, shown);
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        seenLanguages[i] = func_0200db5c(pokedex, shown, wk->buttons[i].language);
+        seenLanguages[i] = PokeDex_HasLanguage(pokedex, shown, wk->buttons[i].language);
     }
 
     *species = shown;
@@ -711,7 +711,7 @@ static void ZukanDetailInfo_StartGlow(ZukanDetailInfoParam *param, ZukanDetailIn
 
 static void ZukanDetailInfo_StopGlow(ZukanDetailInfoParam *param, ZukanDetailInfoWork *wk, ZukanDetailCommon *common) {
     if (wk->language != LANGUAGE_NONE) {
-        func_0204c378(wk->buttons[wk->language].actor, 0, 0);
+        ClActor_SetPalette(wk->buttons[wk->language].actor, 0, 0);
         wk->glowStart = FALSE;
     }
 }
@@ -724,7 +724,7 @@ static void ZukanDetailInfo_UpdateGlow(ZukanDetailInfoParam *param, ZukanDetailI
 
     if (wk->glowStart) {
         if (wk->language != LANGUAGE_NONE) {
-            func_0204c378(wk->buttons[wk->language].actor, 2, 0);
+            ClActor_SetPalette(wk->buttons[wk->language].actor, 2, 0);
         }
         wk->glowStart = FALSE;
     }

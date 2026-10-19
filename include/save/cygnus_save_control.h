@@ -54,8 +54,8 @@ void initDreamRadarSave(DreamRadarSave *save);
 u32 ValidateDreamRadarSave(CygnusSaveData *data);
 
 // Whether the card holds data of Dream Radar's, read with a buffer of heapId's
-BOOL func_020115a8(HeapID heapId);
+BOOL DreamRadar_LoadAndCheckSaveData(HeapID heapId);
 // Marks the card's data read with the save's seed and Pokémon, and writes it
-void func_020115f0(SaveControl *save);
+void DreamRadar_MarkRead(SaveControl *save);
 
 #endif // POKEBW2_SAVE_CYGNUS_SAVE_CONTROL_H

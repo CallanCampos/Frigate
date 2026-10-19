@@ -72,7 +72,7 @@ static BOOL isLocked(WMBssDesc *bss);
 static WifiConfig *_localcfg;
 static WihDwcWork *_localWork;
 
-void *func_02012908(int num, HeapID heapId) {
+void *WihDwc_Create(int num, HeapID heapId) {
     WihDwcWork *work;
 
     GFL_ASSERT(num <= _ALLBEACON_MAX);
@@ -89,24 +89,24 @@ void *func_02012908(int num, HeapID heapId) {
     return work;
 }
 
-void func_02012994(void *work) {
+void WihDwc_Destroy(void *work) {
     WihDwcWork *wk = work;
 
     GFL_ASSERT(_localWork);
     WH_SetScanInfoCallback(NULL);
-    func_02042ed0(wk->parseWork);
-    func_02042ed0(wk);
+    GFL_NetFreeAligned32(wk->parseWork);
+    GFL_NetFreeAligned32(wk);
     _localWork = NULL;
     GFL_OvlUnload(OVERLAY_ID(31));
 }
 
-void func_020129e0(void) {
+void WihDwc_Pause(void) {
     if (_localWork != NULL) {
         _localWork->paused = TRUE;
     }
 }
 
-void func_020129f8(void) {
+void WihDwc_Resume(void) {
     if (_localWork != NULL) {
         _localWork->paused = FALSE;
     }
@@ -119,7 +119,7 @@ static void scanInfoCallback(const void *beacon, void *work, u16 linkLevel) {
     }
 }
 
-void func_02012a4c(void) {
+void WihDwc_TickTimers(void) {
     if (_localWork != NULL && _localWork->paused) {
         return;
     }
@@ -192,24 +192,24 @@ static BOOL isLocked(WMBssDesc *bss) {
     return FALSE;
 }
 
-u32 func_02012be4(WifiList *wifiList) {
+u32 WihDwc_GetStatus(WifiList *wifiList) {
     u32 status = 0;
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
     int i;
     DWCApInfo apInfo;
 
     if (_localWork == NULL) {
         return status;
     }
-    if (func_02012e54(wifiList) != -1) {
+    if (WihDwc_FindFriendInvite(wifiList) != -1) {
         status |= 0x8;
     }
-    if (init->gameCommandBase == 0x35 && func_02042a78() > 1) {
+    if (init->gameCommandBase == 0x35 && GFL_NetGetNegotiatedCount() > 1) {
         status |= 0x4;
     }
     for (i = 0; i < init->unk62; i++) {
-        if (func_020428a8(i) != NULL) {
-            u8 service = func_ov030_021740a4(i);
+        if (GFL_NetGetBeaconData(i) != NULL) {
+            u8 service = NetWhpipe_GetBeaconCommandBase(i);
 
             if (service >= 0x14 && service <= 0x1b) {
                 status |= 0x10;
@@ -289,15 +289,16 @@ void downloadPlayConfigForWifi(void) {
     func_0205e038(_localcfg, 0);
 }
 
-int func_02012e54(WifiList *wifiList) {
+int WihDwc_FindFriendInvite(WifiList *wifiList) {
     int i;
     u8 mac[6];
 
-    if (func_02042788()) {
-        func_02042e84();
+    if (GFL_NetIsInitialized()) {
+        GFL_NetGetInitData();
         OS_GetMacAddress(mac);
         for (i = 0; i < 16; i++) {
-            if (func_ov030_02173b78(i) == 0x20 && CtvtBeacon_IsFriendInvite(func_020428a8(i), wifiList, mac)) {
+            if (NetWhpipe_GetBeaconService(i) == 0x20 &&
+                CtvtBeacon_IsFriendInvite(GFL_NetGetBeaconData(i), wifiList, mac)) {
                 return i;
             }
         }
@@ -305,14 +306,14 @@ int func_02012e54(WifiList *wifiList) {
     return -1;
 }
 
-u16 func_02012ea0(void) {
+u16 WihDwc_GetLinkLevel(void) {
     if (_localWork != NULL) {
         return _localWork->linkLevel;
     }
     return 0;
 }
 
-void func_02012ebc(u8 linkLevel) {
+void WihDwc_SetBestLinkLevel(u8 linkLevel) {
     if (_localWork != NULL && _localWork->bestLinkLevel < linkLevel && linkLevel < LINK_LEVEL_MAX) {
         _localWork->bestLinkLevel = linkLevel;
     }

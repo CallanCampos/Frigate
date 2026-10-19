@@ -11,7 +11,7 @@
 #include "struct_decls.h"
 #include "system/pms.h"
 
-// The Battle Subway's work while the player is on the subway, which func_0201794c returns. Overlay 33's
+// The Battle Subway's work while the player is on the subway, which GameData_GetBSubwayScrWork returns. Overlay 33's
 // bsubway_scr.c and overlay 12 keep it, and script plugin 1 (overlay 50) drives it
 
 // A Pokémon of a Battle Subway Trainer, which genSubwayBtlInstitutePoke makes a party Pokémon of. The fields are
@@ -143,7 +143,8 @@ struct BSubwayScrWork {
     u16 sendBuf[BSUBWAY_COMM_BUF_LEN];
     u16 recvBuf[BSUBWAY_COMM_BUF_LEN];
     BSubwayBeacon beacon;
-    void *unk71C;
+    // The menu that gathers the partner of a multi train over the wireless network
+    CommEntryMenu *entryMenu;
     u16 *resultVar;
     // How many of the commands sent have arrived, counting this machine's own
     u8 recvCount;
@@ -165,33 +166,33 @@ struct BSubwayScrWork {
 };
 
 // Overlay 12's bsubway_comm.c
-void func_ov012_02161844(BSubwayScrWork *bsw);
-void func_ov012_02161894(BSubwayScrWork *bsw);
-void func_ov012_021618ac(BSubwayScrWork *bsw);
-void func_ov012_021618b8(u8 timing);
-BOOL func_ov012_021618c8(u8 timing);
+void BSubwayComm_InitNet(BSubwayScrWork *bsw);
+void BSubwayComm_AddCommands(BSubwayScrWork *bsw);
+void BSubwayComm_RemoveCommands(BSubwayScrWork *bsw);
+void BSubwayComm_SendTiming(u8 timing);
+BOOL BSubwayComm_IsTimingRecv(u8 timing);
 // Fills the send buffer for a command, mode being the command's number
-void func_ov012_02161990(BSubwayScrWork *bsw, u16 mode, u16 value);
-BOOL func_ov012_02161a48(BSubwayScrWork *bsw);
-void func_ov012_02161a88(BSubwayScrWork *bsw, u8 mode);
-BOOL func_ov012_02161a94(BSubwayScrWork *bsw, u16 *var);
+void BSubwayComm_SetSendData(BSubwayScrWork *bsw, u16 mode, u16 value);
+BOOL BSubwayComm_Send(BSubwayScrWork *bsw);
+void BSubwayComm_SetRecvMode(BSubwayScrWork *bsw, u8 mode);
+BOOL BSubwayComm_CheckRecv(BSubwayScrWork *bsw, u16 *var);
 // Overlay 12
 // Makes a party of count Pokémon at the level
-void func_ov012_021621d4(PokeParty *party, const BSubwayPokemon *pkms, u16 level, int count, HeapID heapId);
+void BtlInst_MakeParty(PokeParty *party, const BSubwayPokemon *pkms, u16 level, int count, HeapID heapId);
 // Makes a Pokémon from the file of the Battle Subway's Pokémon arc, with the personality, or one made from id when it
 // is 0, the IVs and, when rentalItem is set, the rental item of the index. Returns the personality
-u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pid, u8 iv, u8 index, BOOL rentalItem,
-                        HeapID heapId);
-void *func_ov012_021628c0(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16 msgFile, HeapID heapId);
+u32 BtlInst_MakeRomPokemon(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pid, u8 iv, u8 index, BOOL rentalItem,
+                           HeapID heapId);
+void *BtlInst_MakeRomTrainer(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16 msgFile, HeapID heapId);
 // Overlay 12's event_bsubway.c
 // The party screen for picking the Pokémon to enter, from the rental party when rental is set
-GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental);
-GameEvent *func_ov012_02166070(BSubwayScrWork *bsw, GameSystem *gsys, Field *field);
+GameEvent *EventBSubwayPokeSelect_Create(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental);
+GameEvent *EventBSubwayBattle_Create(BSubwayScrWork *bsw, GameSystem *gsys, Field *field);
 // The message of a trainer of the train in a balloon over the actor
-GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos);
-GameEvent *func_ov012_02166294(GameSystem *gsys);
+GameEvent *EventBSubwayTrainerMsg_Create(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos);
+GameEvent *EventBSubwayRecords_Create(GameSystem *gsys);
 // The message of a saved leader in a balloon over the actor
-GameEvent *func_ov012_0216657c(GameSystem *gsys, u16 index, u16 actorId);
+GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId);
 
 // Overlay 33's bsubway_scr.c
 void func_ov033_0217b468(GameSystem *gsys);

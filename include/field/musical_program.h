@@ -8,20 +8,20 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-MusicalProgram *func_ov012_021522d8(HeapID heapId, Ov210Work *ov210, u16 shots);
-void func_ov012_0215241c(MusicalProgram *program);
-void func_ov012_02152424(HeapID heapId, MusicalProgram *program, MusicalStageParam *stage);
-u8 func_ov012_0215250c(MusicalProgram *program, u8 kind);
-u32 func_ov012_02152510(MusicalProgram *program);
-void func_ov012_02152528(MusicalProgram *program, u32 value);
-u32 func_ov012_02152548(MusicalProgram *program);
-void func_ov012_02152558(MusicalProgram *program, u32 value);
-u8 func_ov012_02152570(MusicalProgram *program);
-void func_ov012_02152594(MusicalProgram *program, MusicalStageParam *stage, u8 pos, u8 cpu, HeapID heapId);
+MusicalProgram *MusicalProgram_Create(HeapID heapId, Ov210Work *ov210, u16 shots);
+void MusicalProgram_Free(MusicalProgram *program);
+void MusicalProgram_CalcPoints(HeapID heapId, MusicalProgram *program, MusicalStageParam *stage);
+u8 MusicalProgram_GetKindPoints(MusicalProgram *program, u8 kind);
+u32 MusicalProgram_PackPoints(MusicalProgram *program);
+void MusicalProgram_UnpackPoints(MusicalProgram *program, u32 value);
+u32 MusicalProgram_PackNpcs(MusicalProgram *program);
+void MusicalProgram_UnpackNpcs(MusicalProgram *program, u32 value);
+u8 MusicalProgram_GetTopKind(MusicalProgram *program);
+void MusicalProgram_PutNpcOnStage(MusicalProgram *program, MusicalStageParam *stage, u8 pos, u8 cpu, HeapID heapId);
 u8 func_ov012_02152614(MusicalProgram *program);
-u8 func_ov012_0215261c(MusicalProgram *program);
-u8 func_ov012_02152624(MusicalProgram *program, u8 cpu);
-u8 func_ov012_02152634(MusicalProgram *program, u8 cpu);
-u8 func_ov012_02152644(MusicalProgram *program, u8 kind);
+u8 MusicalProgram_GetPropList(MusicalProgram *program);
+u8 MusicalProgram_GetNpcTrainerClass(MusicalProgram *program, u8 cpu);
+u8 MusicalProgram_GetNpcNameMsg(MusicalProgram *program, u8 cpu);
+u8 MusicalProgram_GetPropPoints(MusicalProgram *program, u8 kind);
 
 #endif // POKEBW2_FIELD_MUSICAL_PROGRAM_H

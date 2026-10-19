@@ -1,9 +1,9 @@
-func_ov133_021eec80 kind:function(thumb,size=0x104) addr:0x021eecc0
-func_ov133_021eed84 kind:function(thumb,size=0x18) addr:0x021eedc4
-func_ov133_021eed9c kind:function(thumb,size=0x80) addr:0x021eeddc
-func_ov133_021eee1c kind:function(thumb,size=0x60) addr:0x021eee5c
-func_ov133_021eee7c kind:function(thumb,size=0x14) addr:0x021eeebc
-func_ov133_021eee90 kind:function(thumb,size=0x1e) addr:0x021eeed0
+GimmickNuvema_Init kind:function(thumb,size=0x104) addr:0x021eecc0
+GimmickNuvema_End kind:function(thumb,size=0x18) addr:0x021eedc4
+GimmickNuvema_Update kind:function(thumb,size=0x80) addr:0x021eeddc
+GimmickNuvema_PlayModel kind:function(thumb,size=0x60) addr:0x021eee5c
+GimmickNuvema_CreateWaitEvent kind:function(thumb,size=0x14) addr:0x021eeebc
+GimmickNuvema_WaitEvent kind:function(thumb,size=0x1e) addr:0x021eeed0
 data_ov133_021eeeb0 kind:data(any) addr:0x021eeef0
 data_ov133_021eeeb8 kind:data(any) addr:0x021eeef8
 data_ov133_021eeec0 kind:data(any) addr:0x021eef00 ambiguous

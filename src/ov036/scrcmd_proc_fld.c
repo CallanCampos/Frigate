@@ -169,12 +169,12 @@ BOOL s0156_CallGameClear(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s0197_CGearPowerOn(VM *vm, FieldScriptEnv *env) {
-    CGearSettings *cgear = func_02009918(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
+    CGearSettings *cgear = CGearSettings_GetFromSave(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 bootComm = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_020098bc(cgear, 1);
+    CGearSettings_SetOn(cgear, 1);
     ScriptWork_CallEvent(work, EventCGearPowerOn_Create(gsys, bootComm));
     return TRUE;
 }

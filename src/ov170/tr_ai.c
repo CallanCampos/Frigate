@@ -217,7 +217,7 @@ BOOL AIIfCanUseLastResort(VM *vm, void *work);
 BOOL AIGetMoveCategory(VM *vm, void *work);
 BOOL AIGetLastMoveCategory(VM *vm, void *work);
 BOOL AIGetOrderInTurn(VM *vm, void *work);
-BOOL func_ov170_0218119c(VM *vm, void *work);
+BOOL AIGetTurnsOnField(VM *vm, void *work);
 BOOL AIIfPartyMemberDealsMoreDamage(VM *vm, void *work);
 BOOL AIIfHasSuperEffectiveMove(VM *vm, void *work);
 BOOL AIIfLastMoveDealsMoreDamage(VM *vm, void *work);
@@ -239,7 +239,7 @@ BOOL AIEqualToTurnRandom(VM *vm, void *work);
 BOOL AINotEqualToTurnRandom(VM *vm, void *work);
 void CompareToTurnRandom(VM *vm, TrAIContext *wk, u32 op);
 BOOL AIJumpByMoveEffect(VM *vm, void *work);
-BOOL func_ov170_02181734(VM *vm, void *work);
+BOOL AIIfFutureSightPending(VM *vm, void *work);
 BOOL AIIsAtkLessThanSpAtk(VM *vm, void *work);
 BOOL AIIsAtkGreaterThanSpAtk(VM *vm, void *work);
 BOOL AIIsAtkEqualToSpAtk(VM *vm, void *work);
@@ -357,7 +357,7 @@ static const VMCommand sTrAICommands[] = {
     AIGetMoveCategory,
     AIGetLastMoveCategory,
     AIGetOrderInTurn,
-    func_ov170_0218119c,
+    AIGetTurnsOnField,
     AIIfPartyMemberDealsMoreDamage,
     AIIfHasSuperEffectiveMove,
     AIIfLastMoveDealsMoreDamage,
@@ -377,7 +377,7 @@ static const VMCommand sTrAICommands[] = {
     AIEqualToTurnRandom,
     AINotEqualToTurnRandom,
     AIJumpByMoveEffect,
-    func_ov170_02181734,
+    AIIfFutureSightPending,
     AIIsAtkLessThanSpAtk,
     AIIsAtkGreaterThanSpAtk,
     AIIsAtkEqualToSpAtk,
@@ -627,8 +627,8 @@ BOOL TrAI_ChooseMoveAndTarget(VM *vm, TrAIContext *wk) {
         wk->bestMoves[wk->defenderPos] = bestMoves[GFL_RandomMTRange(count)];
         wk->bestScores[wk->defenderPos] = bestScores[0];
         // Don't target a partner unless the move scored at least the initial score
-        if (!AreClientsOnOppositeSides(wk->mainModule, func_ov167_0219c650(wk->mainModule, wk->attackerPos),
-                                       func_ov167_0219c650(wk->mainModule, wk->defenderPos)) &&
+        if (!AreClientsOnOppositeSides(wk->mainModule, GetClientIDFromPos(wk->mainModule, wk->attackerPos),
+                                       GetClientIDFromPos(wk->mainModule, wk->defenderPos)) &&
             wk->bestScores[wk->defenderPos] < TRAI_SCORE_INITIAL) {
             wk->bestScores[wk->defenderPos] = -1;
         }
@@ -911,8 +911,9 @@ void CheckSideEffect(VM *vm, TrAIContext *wk, u32 op) {
     u32 sideEffect = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
 
-    AIConditionalJump(vm, op, func_ov167_021abe10(wk->serverFlow, TrAI_GetTargetPos(wk, side), sideEffect) != 0, TRUE,
-                      offset);
+    AIConditionalJump(vm, op,
+                      BtlServerFlow_GetSideEffectLayers(wk->serverFlow, TrAI_GetTargetPos(wk, side), sideEffect) != 0,
+                      TRUE, offset);
 }
 
 BOOL AIIfLessThan(VM *vm, void *work) {
@@ -1147,8 +1148,8 @@ BOOL AICompareSpeed(VM *vm, void *work) {
     TrAIContext *wk = work;
     u32 op = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
-    u16 attackerSpeed = func_ov167_021abd08(wk->serverFlow, wk->attacker, TRUE);
-    u16 defenderSpeed = func_ov167_021abd08(wk->serverFlow, wk->defender, TRUE);
+    u16 attackerSpeed = BtlServerFlow_CalcSpeed(wk->serverFlow, wk->attacker, TRUE);
+    u16 defenderSpeed = BtlServerFlow_CalcSpeed(wk->serverFlow, wk->defender, TRUE);
 
     switch (op) {
     case COMPARE_SPEED_FASTER:
@@ -1167,7 +1168,7 @@ BOOL AICompareSpeed(VM *vm, void *work) {
 
 BOOL AICheckTeamCount(VM *vm, void *work) {
     TrAIContext *wk = work;
-    u8 clientId = func_ov167_0219c650(wk->mainModule, TrAI_GetTargetPos(wk, VM_Read32(vm)));
+    u8 clientId = GetClientIDFromPos(wk->mainModule, TrAI_GetTargetPos(wk, VM_Read32(vm)));
     BattleParty *party = GetClientParty(wk->pokeCon, clientId);
     s32 i = GetClientBattlerCount(wk->mainModule, clientId);
 
@@ -1237,7 +1238,7 @@ BOOL AIIfStatusNotInParty(VM *vm, void *work) {
 void CheckStatusInParty(VM *vm, TrAIContext *wk, u32 op) {
     u32 side = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
-    u8 clientId = func_ov167_0219c650(wk->mainModule, TrAI_GetTargetPos(wk, side));
+    u8 clientId = GetClientIDFromPos(wk->mainModule, TrAI_GetTargetPos(wk, side));
     BattleParty *party = GetClientParty(wk->pokeCon, clientId);
     s32 i = GetClientBattlerCount(wk->mainModule, clientId);
     BattleMon *mon;
@@ -1701,7 +1702,7 @@ BOOL AIGetSideEffect(VM *vm, void *work) {
     u32 side = VM_Read32(vm);
     u32 sideEffect = VM_Read32(vm);
 
-    wk->result = func_ov167_021abe10(wk->serverFlow, TrAI_GetTargetPos(wk, side), sideEffect);
+    wk->result = BtlServerFlow_GetSideEffectLayers(wk->serverFlow, TrAI_GetTargetPos(wk, side), sideEffect);
     return wk->cmdReturn;
 }
 
@@ -1712,7 +1713,7 @@ BOOL AIIfPartyMemberDamaged(VM *vm, void *work) {
     u32 side = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
     u8 pos = TrAI_GetTargetPos(wk, side);
-    u8 clientId = func_ov167_0219c650(wk->mainModule, pos);
+    u8 clientId = GetClientIDFromPos(wk->mainModule, pos);
     BattleParty *party = GetClientParty(wk->pokeCon, clientId);
     s32 i = GetClientBattlerCount(wk->mainModule, clientId);
 
@@ -1732,7 +1733,7 @@ BOOL AIIfPartyMemberUsedPP(VM *vm, void *work) {
     u32 side = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
     u8 pos = TrAI_GetTargetPos(wk, side);
-    u8 clientId = func_ov167_0219c650(wk->mainModule, pos);
+    u8 clientId = GetClientIDFromPos(wk->mainModule, pos);
     BattleParty *party = GetClientParty(wk->pokeCon, clientId);
     s32 i = GetClientBattlerCount(wk->mainModule, clientId);
     s32 j;
@@ -1806,16 +1807,17 @@ BOOL AIGetLastMoveCategory(VM *vm, void *work) {
 BOOL AIGetOrderInTurn(VM *vm, void *work) {
     TrAIContext *wk = work;
 
-    wk->result = func_ov167_021abd10(wk->serverFlow, TrAI_GetBattleMon(wk, TrAI_GetTargetPos(wk, VM_Read32(vm))), TRUE);
+    wk->result = BtlServerFlow_CountFasterMons(wk->serverFlow,
+                                               TrAI_GetBattleMon(wk, TrAI_GetTargetPos(wk, VM_Read32(vm))), TRUE);
     return wk->cmdReturn;
 }
 
 // Loads the 16-bit value at 0x146 in the Pokemon at the position. Gen 4's AI has its command that loads the turns
 // since the Pokemon switched in at this place in the command table
-BOOL func_ov170_0218119c(VM *vm, void *work) {
+BOOL AIGetTurnsOnField(VM *vm, void *work) {
     TrAIContext *wk = work;
 
-    wk->result = func_ov167_021bb3a4(TrAI_GetBattleMon(wk, TrAI_GetTargetPos(wk, VM_Read32(vm))));
+    wk->result = BattleMon_GetTurnsOnField(TrAI_GetBattleMon(wk, TrAI_GetTargetPos(wk, VM_Read32(vm))));
     return wk->cmdReturn;
 }
 
@@ -1824,7 +1826,7 @@ BOOL AIIfPartyMemberDealsMoreDamage(VM *vm, void *work) {
     TrAIContext *wk = work;
     u32 damageRoll = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
-    u8 clientId = func_ov167_0219c650(wk->mainModule, wk->attackerPos);
+    u8 clientId = GetClientIDFromPos(wk->mainModule, wk->attackerPos);
     BattleParty *party = GetClientParty(wk->pokeCon, clientId);
     s32 i = GetClientBattlerCount(wk->mainModule, clientId);
     u32 damage = TrAI_GetMaxDamage(wk, wk->attacker, wk->defender, damageRoll);
@@ -1929,7 +1931,7 @@ BOOL AINop104(VM *vm, void *work) {
 BOOL AIGetHighestDamagingMoveWithPartners(VM *vm, void *work) {
     TrAIContext *wk = work;
     u32 damageRoll = VM_Read32(vm);
-    u8 clientId = func_ov167_0219c650(wk->mainModule, wk->attackerPos);
+    u8 clientId = GetClientIDFromPos(wk->mainModule, wk->attackerPos);
     BattleParty *party = GetClientParty(wk->pokeCon, clientId);
     s32 i;
     s32 attackerIndex;
@@ -2077,12 +2079,12 @@ BOOL AIJumpByMoveEffect(VM *vm, void *work) {
 }
 
 // Jumps if overlay 169's check for position effect 3 at the position returns TRUE
-BOOL func_ov170_02181734(VM *vm, void *work) {
+BOOL AIIfFutureSightPending(VM *vm, void *work) {
     TrAIContext *wk = work;
     u32 side = VM_Read32(vm);
     s32 offset = VM_Read32(vm);
 
-    if (func_ov167_021abe34(wk->serverFlow, TrAI_GetTargetPos(wk, side), 3)) {
+    if (BtlServerFlow_IsPosEffectFree(wk->serverFlow, TrAI_GetTargetPos(wk, side), 3)) {
         VM_Jump(vm, vm->pc + offset);
     }
     return wk->cmdReturn;
@@ -2272,7 +2274,7 @@ u32 GuessAbility(TrAIContext *wk, u32 side, u8 pos) {
 }
 
 BattleMon *TrAI_GetBattleMon(TrAIContext *wk, u8 pos) {
-    return func_ov167_0219d188(wk->pokeCon, pos);
+    return PokeCon_GetPosMonInner(wk->pokeCon, pos);
 }
 
 BattleMon *TrAI_GetPartyMon(BattleParty *party, u8 index) {

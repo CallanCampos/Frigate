@@ -83,12 +83,12 @@ BOOL GFL_BMN_Main(ButtonMan *mgr) {
     BOOL touchedNow;
     u32 i;
 
-    touching = func_0203da2c();
+    touching = GFL_HIDIsTouchHeld();
     if (touching) {
-        s32 held = func_0203d9c8(mgr->rects);
-        s32 touched = func_0203da0c(mgr->rects);
+        s32 held = GFL_HIDGetTouchHeldRect(mgr->rects);
+        s32 touched = GFL_HIDGetTouchPressedRect(mgr->rects);
 
-        touchedNow = func_0203da48();
+        touchedNow = GFL_HIDIsTouchPressed();
         for (i = 0; i < mgr->count; i++) {
             Button *button = &mgr->buttons[i];
 

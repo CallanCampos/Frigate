@@ -9,35 +9,35 @@
 #include "nitro/math.h"
 #include "struct_decls.h"
 
-void func_ov167_021b18c4(BtlClient *client);
-void *func_ov167_021b18d4(BtlClient *client, u32 *size);
-void func_ov167_021b190c(BtlClient *client, BtlvCore *viewCore);
-void func_ov167_021b1934(BtlClient *client, u32 arg1);
-void func_ov167_021b1960(BtlClient *client);
-u32 func_ov167_021b19a4(BtlClient *client);
-void func_ov167_021b19b0(BtlClient *client, u8 value);
-BOOL func_ov167_021b1d64(BtlClient *client);
-BOOL func_ov167_021b1d90(BtlClient *client);
+void BattleClient_SetForceQuit(BtlClient *client);
+void *BattleClient_GetRecordData(BtlClient *client, u32 *size);
+void BattleClient_SetViewCore(BtlClient *client, BtlvCore *viewCore);
+void BattleClient_StartChapterSkip(BtlClient *client, u32 arg1);
+void BattleClient_EndChapterSkip(BtlClient *client);
+u32 BattleClient_GetFirstActionMove(BtlClient *client);
+void BattleClient_AddShooterEnergy(BtlClient *client, u8 value);
+BOOL BattleClient_IsGameTimeUp(BtlClient *client);
+BOOL BattleClient_IsRecPlayCanceled(BtlClient *client);
 
 BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle,
                                u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
                                HeapID heapId);
 void BattleClient_Delete(BtlClient *client);
-void func_ov167_021b18e8(BtlClient *client, void *data);
-void func_ov167_021b1910(BtlClient *client, BtlServer *server);
-BtlAdapter *func_ov167_021b1928(BtlClient *client);
-BOOL func_ov167_021b192c(BtlClient *client);
-void func_ov167_021b1d58(BtlClient *client, BtlClientIDList *list);
+void BattleClient_SetRecPlayData(BtlClient *client, void *data);
+void BattleClient_SetCmdCheckServer(BtlClient *client, BtlServer *server);
+BtlAdapter *BattleClient_GetAdapter(BtlClient *client);
+BOOL BattleClient_Main(BtlClient *client);
+void BattleClient_GetClientIDList(BtlClient *client, BtlClientIDList *list);
 
-BOOL func_ov167_021b1978(BtlClient *client);
-u16 func_ov167_021b198c(BtlClient *client);
-BOOL func_ov167_021b1990(BtlClient *client);
+BOOL BattleClient_IsRecPlay(BtlClient *client);
+u16 BattleClient_GetRecMaxChapter(BtlClient *client);
+BOOL BattleClient_IsChapterSkipping(BtlClient *client);
 u8 BattleClient_GetClientId(BtlClient *client);
 BattleParty *BattleClient_GetParty(BtlClient *client);
 u8 BattleClient_GetShooterEnergy(BtlClient *client);
 
-u8 func_ov167_021b9188(BtlClient *client);
-u16 func_ov167_021b9194(BtlClient *client);
-u32 func_ov167_021b919c(BtlClient *client);
+u8 BattleClient_GetWeather(BtlClient *client);
+u16 BattleClient_GetAudienceSize(BtlClient *client);
+u32 BattleClient_GetAudienceMask(BtlClient *client);
 
 #endif // POKEBW2_BATTLE_BTL_CLIENT_H

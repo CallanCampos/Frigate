@@ -10,7 +10,7 @@ static BOOL sOverlayLoaded;
 #define CONSOLE_TYPE_DEV_HIGH_BIT 0x2000000
 
 // Loads overlay 219, only on a development console
-void func_ov167_021ce10c(void) {
+void BattleOverlay_LoadDev(void) {
     if (OS_GetConsoleType() & CONSOLE_TYPE_DEV_HIGH_BIT) {
         GFL_OvlLoad(OVERLAY_ID(219));
         sOverlayLoaded = TRUE;
@@ -19,7 +19,7 @@ void func_ov167_021ce10c(void) {
     }
 }
 
-void func_ov167_021ce138(void) {
+void BattleOverlay_UnloadDev(void) {
     if (sOverlayLoaded) {
         GFL_OvlUnload(OVERLAY_ID(219));
         sOverlayLoaded = FALSE;

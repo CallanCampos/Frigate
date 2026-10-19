@@ -10,7 +10,7 @@
 #define HIGH_LINK_POWER_MAX 3
 #define HIGH_LINK_POWER_NONE 0x30
 
-// What func_02017208 returns: the Entralink's two levels, White then Black
+// What GameData_GetMyPassPowerLevels returns: the Entralink's two levels, White then Black
 typedef struct {
     u8 unk00[0xc];
     u16 level1;
@@ -38,8 +38,8 @@ void setupProbabilityTable(PassPowerLevel *levels);
 int HighLinkSave_AddWhiteLevel(PassPowerLevel *levels, int add);
 int HighLinkSave_AddBlackLevel(PassPowerLevel *levels, int add);
 // Copies the levels into the save, and out of it
-void func_0200c638(SaveControl *save, const PassPowerLevel *levels);
-void func_0200c650(SaveControl *save, PassPowerLevel *levels);
+void HighLinkSave_SetLevels(SaveControl *save, const PassPowerLevel *levels);
+void HighLinkSave_GetLevels(SaveControl *save, PassPowerLevel *levels);
 // Puts a pass power in one of the three slots
 void HighLinkSave_SetPassPower(HighLinkSave *save, u32 passPower, int index);
 // The pass power in a slot, or HIGH_LINK_POWER_NONE; a slot with an invalid one is cleared
@@ -47,7 +47,7 @@ u32 HighLinkSave_GetPassPower(HighLinkSave *save, int index);
 // Sets the flag of a special pass power
 void HighLinkSave_SetSpecialPowerFlag(HighLinkSave *save, u32 id);
 // Copies the two bytes of the special pass powers' flags into dest
-void func_0200c6d8(HighLinkSave *save, u8 *dest, u32 a2);
+void HighLinkSave_GetSpecialFlags(HighLinkSave *save, u8 *dest, u32 a2);
 // Counts play time in seconds: mode 0 starts the count, 1 adds the time since the start to the save's total and
 // 2 returns the total as it would be. Returns the total
 u64 HighLinkSave_CountPlaySeconds(HighLinkSave *save, PlayTime *playTime, u32 mode);
@@ -107,7 +107,7 @@ BOOL PassPower_IsIDInvalid(int passPower);
 BOOL PassPower_IsIDValid(int passPower);
 // Whether Black and White know the pass power
 BOOL PassPower_IsBW1Compatible(int passPower);
-// The bit of a special pass power in the two bytes of func_0200c6d8, or 0xff
+// The bit of a special pass power in the two bytes of HighLinkSave_GetSpecialFlags, or 0xff
 u8 PassPower_GetSPowerBaseID(int passPower);
 // Starts a pass power, bought with Pass Orbs when paid is set. It ends the pass power of the opposite effect
 void PassPower_Activate(u32 passPower, const void *data, BOOL paid);
@@ -148,9 +148,9 @@ u32 PassPower_ApplyGrottoVolume(u32 volume);
 u32 PassPower_ApplyLuckyEncProb(u32 row);
 u32 PassPower_ApplyLuckyShiny(u32 rolls);
 
-// Two levels of what func_02017208 returns, which the pass powers need
-u16 func_0200c5dc(void *levels);
-u16 func_0200c5e0(void *levels);
+// Two levels of what GameData_GetMyPassPowerLevels returns, which the pass powers need
+u16 PassPowerLevel_GetWhite(void *levels);
+u16 PassPowerLevel_GetBlack(void *levels);
 // Overlay 12's pass_power_check.c: whether a pass power is unlocked (0), nearly (1) or not (2), and how many are
 u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags);
 u32 GetUnlockedPassPowerCount(void *data, void *levels, u8 *flags);

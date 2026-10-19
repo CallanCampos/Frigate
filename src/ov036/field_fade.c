@@ -533,8 +533,8 @@ static GameEventReturnCode func_ov036_021b9c90(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 1:
-        if (func_ov012_02166ecc(actor) == 1) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == 1) {
+            FldAct_EndAcmd(actor);
             (*state)++;
         }
         break;

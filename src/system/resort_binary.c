@@ -101,7 +101,7 @@ u32 ResortShopData_FindShop(ResortShopData *data, u16 key0, u16 key2, u16 key1) 
 }
 
 const u16 *ResortShopData_GetPersonShop(ResortShopData *data, JoinAvenuePerson *person) {
-    u16 id = func_020363e0(func_02038470(person), 0);
+    u16 id = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
 
     return ResortBinary_GetRow(data->shops, id);
 }

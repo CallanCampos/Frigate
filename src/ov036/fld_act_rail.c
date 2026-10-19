@@ -82,6 +82,15 @@ static void func_ov036_02196080(FieldActor *actor);
 static void func_ov036_021960b8(FieldActor *actor);
 static void func_ov036_021961f8(FieldActor *actor);
 
+// The rail actors' turns and their first action command, done by fldmmdl_g3dobj.c's functions;
+// ACTOR_ACTION_COMMAND_TABLES_RAIL (fldmmdl_movedata.c) lists them with the rest of this file's tables
+const ActorAcmdTurnFuncs data_ov036_021cf374 = { func_ov036_02194f4c, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf37c = { func_ov036_02194f40, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf384 = { func_ov036_02194f28, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf38c = { func_ov036_02194f34, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf394 = { func_ov036_02194ef8, func_ov036_02194ee8 };
+const ActorAcmdFuncs data_ov036_021cf39c = { func_ov036_021952bc, func_ov036_02195168, func_ov036_02194ee8 };
+
 const ActorAcmdFuncs data_ov036_021cf3a8 = { func_ov036_02195528, func_ov036_02195378, func_ov036_02194ee8 };
 const ActorAcmdFuncs data_ov036_021cf3b4 = { func_ov036_0219519c, func_ov036_02195168, func_ov036_02194ee8 };
 const ActorAcmdFuncs data_ov036_021cf3c0 = { func_ov036_0219526c, func_ov036_02195168, func_ov036_02194ee8 };
@@ -224,7 +233,7 @@ static BOOL func_ov036_02195378(FieldActor *actor) {
     }
     SetActorMovementFlag(actor, 0x540);
     SetActorInitialGPosToNowGPos(actor);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     GFL_SndSEPlay(0x67b);
     return TRUE;
@@ -325,7 +334,7 @@ static u32 func_ov036_02195668(FieldActor *actor, const RailPosition *from, cons
     if (!func_ov036_021b0794(rail->unit, to)) {
         flags |= 1;
     }
-    if (!func_ov012_021677a4(actor)) {
+    if (!FldAct_IsMapAttrDisabled(actor)) {
         u32 tileType = FieldNoGridMapper_GetTileAtPos(mapper, to);
 
         if (GetTileFlags(tileType) & 1) {
@@ -447,12 +456,12 @@ FieldActor *func_ov036_0219584c(MMSys *mmSys, const RailPosition *pos, BOOL chec
     return NULL;
 }
 
-void func_ov036_02195928(FieldActor *actor, RailPosition *position) {
+BOOL func_ov036_02195928(FieldActor *actor, RailPosition *position) {
     ActorRailWork *rail;
 
     FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
     rail = RAIL_WORK(actor);
-    func_ov036_021b0814(rail->unit, ConvDirToRailDir(GetActorFaceDir(actor)), position, NULL);
+    return func_ov036_021b0814(rail->unit, ConvDirToRailDir(GetActorFaceDir(actor)), position, NULL);
 }
 
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position) {
@@ -630,7 +639,7 @@ static u32 func_ov036_02195c34(s32 speed) {
 static void *func_ov036_02195c5c(FieldActor *actor, u32 size) {
     RailPosition posData;
     RailPosition *pos = &posData;
-    BOOL set = func_ov012_0215ede4(actor, pos);
+    BOOL set = GetActorInitPositionRail(actor, pos);
     ActorRailWork *rail = (ActorRailWork *)ClearActorPositionBlock(actor, size);
 
     func_ov036_02195d50(rail, actor);
@@ -739,8 +748,8 @@ static void func_ov036_02195e0c(FieldActor *actor, u16 dirs) {
 
     work->wait = func_ov036_02195d04(WAIT_TIMES, -1);
     work->dirs = dirs;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
 }
 
 static void func_ov036_02195e40(FieldActor *actor) {
@@ -768,8 +777,8 @@ static void func_ov036_02195e94(FieldActor *actor, u32 dir) {
     work->dir = dir;
     work->front = pos.posFront;
     work->side = pos.posSide;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
 }
 
 static void func_ov036_02195ee8(FieldActor *actor) {
@@ -777,9 +786,9 @@ static void func_ov036_02195ee8(FieldActor *actor) {
 
     switch (work->state) {
     case 0:
-        func_ov012_021674bc(actor);
-        func_ov012_021674e8(actor);
-        func_ov012_02166eb0(actor, (u32)GetAcmdForDir((u32)GetActorFaceDir(actor), 0));
+        FldAct_ClearMoving(actor);
+        FldAct_ClearMoveEnd(actor);
+        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir((u32)GetActorFaceDir(actor), 0));
         work->state++;
         break;
     case 1:
@@ -814,13 +823,13 @@ static void func_ov036_02195ee8(FieldActor *actor) {
             work->state = 0;
             break;
         }
-        func_ov012_02166eb0(actor, (u32)GetAcmdForDir(dir, 0xc));
-        func_ov012_021674b0(actor);
+        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir(dir, 0xc));
+        FldAct_SetMoving(actor);
         work->state++;
     }
     case 4:
         if (func_ov036_0218f01c(actor)) {
-            func_ov012_021674bc(actor);
+            FldAct_ClearMoving(actor);
             work->state = 0;
         }
         break;
@@ -841,8 +850,8 @@ static void func_ov036_02196080(FieldActor *actor) {
     work->reversed = 0;
     work->front = pos.posFront;
     work->side = pos.posSide;
-    func_ov012_021670f4(actor, 0);
-    func_ov012_021674bc(actor);
+    FldAct_SetDrawStatus(actor, 0);
+    FldAct_ClearMoving(actor);
 }
 
 static void func_ov036_021960b8(FieldActor *actor) {
@@ -890,14 +899,14 @@ static void func_ov036_021960b8(FieldActor *actor) {
         if (blocked) {
             acmd = 0x20;
         }
-        func_ov012_02166eb0(actor, (u32)GetAcmdForDir(dir, (u16)acmd));
-        func_ov012_021674b0(actor);
+        FldAct_SetLocalAcmd(actor, (u32)GetAcmdForDir(dir, (u16)acmd));
+        FldAct_SetMoving(actor);
         work->state = 2;
         break;
     }
     case 2:
         if (func_ov036_0218f01c(actor) == 1) {
-            func_ov012_021674bc(actor);
+            FldAct_ClearMoving(actor);
             work->state = 0;
         }
         break;

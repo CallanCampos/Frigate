@@ -133,7 +133,7 @@ void ZukanHabitatGraphic_Exit(ZukanHabitatGraphic *graphic) {
 void ZukanHabitatGraphic_VBlank(ZukanHabitatGraphic *graphic) {
     int i;
 
-    func_0204b7c8();
+    ClActSys_VBlank();
     for (i = 0; i < ZUKAN_HABITAT_ICON_COUNT; i++) {
         if (graphic->iconRequests[i].requested == TRUE) {
             ZukanHabitatGraphic_LoadIcon(graphic, i);
@@ -187,7 +187,7 @@ void ZukanHabitatGraphic_Main(ZukanHabitatGraphic *graphic) {
         GFL_BGSysMoveBGReq(3, BG_MOVE_RIGHT, 1);
         graphic->scrollTimer = 0;
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void ZukanHabitatGraphic_UpdateMessage(ZukanHabitatGraphic *graphic) {
@@ -390,15 +390,15 @@ static void ZukanHabitatGraphic_InitBG(void) {
 
 static void ZukanHabitatGraphic_InitObj(ZukanHabitatGraphic *graphic) {
     ZukanHabitatGraphic_InitClActSys();
-    graphic->unit = func_0204bf1c(94, 0, HEAPID_ZUKAN_HABITAT);
-    func_0204c028(graphic->unit);
+    graphic->unit = ClActUnit_Create(94, 0, HEAPID_ZUKAN_HABITAT);
+    ClActUnit_UseSystemRenderer(graphic->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void ZukanHabitatGraphic_InitWindows(ZukanHabitatGraphic *graphic) {
     BmpWin_InitAllocator(HEAPID_ZUKAN_HABITAT);
-    graphic->printQueue = func_02021998(HEAPID_ZUKAN_HABITAT);
+    graphic->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_HABITAT);
 
     graphic->windows[ZUKAN_HABITAT_WIN_MAIN] = BmpWin_CreateDynamic(0, 0, 0, 32, 24, 15, FALSE);
     BmpWin_FlushMap(graphic->windows[ZUKAN_HABITAT_WIN_MAIN]);
@@ -475,10 +475,10 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
     barSetup.vramType = CLACT_SURFACE_MAIN;
     barSetup.flags = 0;
     barSetup.arcId = getUINarcIdx();
-    barSetup.paletteFile = func_0202d810();
-    barSetup.charFile = func_0202d814();
-    barSetup.cellFile = func_0202d818(2);
-    barSetup.animFile = func_0202d81c(2);
+    barSetup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    barSetup.charFile = AppMenuCommon_GetTouchBarCharFile();
+    barSetup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    barSetup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
     barSetup.paletteOffset = 8;
     barSetup.paletteCount = 3;
     barSetup.paletteStart = 0;
@@ -510,24 +510,24 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
 
     graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 20, 60, 24, HEAPID_ZUKAN_HABITAT);
-    func_0204c468(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT], 1);
+    ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT], 1);
     func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT], TRUE);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 236, 60, 22, HEAPID_ZUKAN_HABITAT);
-    func_0204c468(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT], 1);
+    ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT], 1);
     func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT], TRUE);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_FRAME] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 128, 96, 31, HEAPID_ZUKAN_HABITAT);
-    func_0204c468(graphic->actors[ZUKAN_HABITAT_OBJ_FRAME], 1);
-    func_0204c438(graphic->actors[ZUKAN_HABITAT_OBJ_FRAME], 1);
+    ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_FRAME], 1);
+    ClActor_SetPriority(graphic->actors[ZUKAN_HABITAT_OBJ_FRAME], 1);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_STAMP] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 224, 20, 27, HEAPID_ZUKAN_HABITAT);
     func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], FALSE);
-    func_0204c124(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], FALSE);
-    func_0204c244(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], 2);
+    ClActor_SetVisible(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], FALSE);
+    ClActor_SetAffineMode(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], 2);
 
     for (i = ZUKAN_HABITAT_OBJ_NEW; i <= ZUKAN_HABITAT_OBJ_NEW + 2; i++) {
         u8 x = (i - ZUKAN_HABITAT_OBJ_NEW) * 40;
@@ -549,22 +549,22 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
         ZukanHabitatGraphic_GetCellPos(i, &pos);
         graphic->actors[ZUKAN_HABITAT_OBJ_MARK + i] =
             UIObjRes_CreateActor(&graphic->objRes, graphic->unit, pos.x + 10, pos.y - 2, 9, HEAPID_ZUKAN_HABITAT);
-        func_0204c468(graphic->actors[ZUKAN_HABITAT_OBJ_MARK + i], 1);
+        ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_MARK + i], 1);
     }
 
     graphic->actors[ZUKAN_HABITAT_OBJ_INFO] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 160, 180, 28, HEAPID_ZUKAN_HABITAT);
-    func_0204c124(graphic->actors[ZUKAN_HABITAT_OBJ_INFO], FALSE);
-    func_0204c468(graphic->actors[ZUKAN_HABITAT_OBJ_INFO], 1);
+    ClActor_SetVisible(graphic->actors[ZUKAN_HABITAT_OBJ_INFO], FALSE);
+    ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_INFO], 1);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER] =
         UIObjRes_CreateActor(&graphic->mapRes, graphic->unit, 0, 0, 6, HEAPID_ZUKAN_HABITAT);
-    func_0204c124(graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER], FALSE);
+    ClActor_SetVisible(graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER], FALSE);
     func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER], TRUE);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_AREA] =
         UIObjRes_CreateActor(&graphic->areaRes, graphic->unit, 0, 0, 0, HEAPID_ZUKAN_HABITAT);
-    func_0204c318(graphic->actors[ZUKAN_HABITAT_OBJ_AREA], 1);
+    ClActor_SetObjMode(graphic->actors[ZUKAN_HABITAT_OBJ_AREA], 1);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_AREA_UP] =
         UIObjRes_CreateActor(&graphic->barRes, graphic->unit, 0, 168, 3, HEAPID_ZUKAN_HABITAT);
@@ -582,7 +582,7 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
         ClActor *icon = ZukanHabitatGraphic_CreateIcon(graphic, 0, 0, 0, i);
 
         ZukanHabitatGraphic_GetCellPos(i, &pos);
-        func_0204c140(icon, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(icon, &pos, CLACT_SURFACE_MAIN);
     }
 }
 
@@ -601,10 +601,10 @@ static ClActor *ZukanHabitatGraphic_CreateIcon(ZukanHabitatGraphic *graphic, u32
     setup.paletteCount = 3;
     UIObjRes_Load(&graphic->iconRes[cell], &setup, graphic->unit, HEAPID_ZUKAN_HABITAT);
     graphic->icons[cell] = UIObjRes_CreateActor(&graphic->iconRes[cell], graphic->unit, 0, 0, 1, HEAPID_ZUKAN_HABITAT);
-    func_0204c438(graphic->icons[cell], 2);
-    func_0204c468(graphic->icons[cell], 1);
+    ClActor_SetPriority(graphic->icons[cell], 2);
+    ClActor_SetBgPriority(graphic->icons[cell], 1);
     func_0204c520(graphic->icons[cell], FALSE);
-    func_0204c378(graphic->icons[cell], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
+    ClActor_SetPalette(graphic->icons[cell], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
     return graphic->icons[cell];
 }
 
@@ -648,8 +648,8 @@ static void ZukanHabitatGraphic_FreeObj(ZukanHabitatGraphic *graphic) {
     }
     UIObjRes_Free(&graphic->objRes);
     UIObjRes_Free(&graphic->mapRes);
-    func_0204bf98(graphic->unit);
-    func_0204b758();
+    ClActUnit_Delete(graphic->unit);
+    ClActSys_Delete();
 }
 
 static void ZukanHabitatGraphic_FreePaletteFade(ZukanHabitatGraphic *graphic) {
@@ -666,8 +666,8 @@ static void ZukanHabitatGraphic_FreeBlink(ZukanHabitatGraphic *graphic) {
 }
 
 static void ZukanHabitatGraphic_FreeWindows(ZukanHabitatGraphic *graphic) {
-    func_02021c44(graphic->printQueue);
-    func_02021a18(graphic->printQueue);
+    PrintQueue_Clear(graphic->printQueue);
+    PrintQueue_Free(graphic->printQueue);
     GFL_FontFree(graphic->font);
     KeyCursor_Free(graphic->keyCursor);
     GFL_TCBExMgrFree(graphic->tcbManager);
@@ -711,7 +711,7 @@ static void ZukanHabitatGraphic_UpdatePrints(ZukanHabitatGraphic *graphic) {
     int i;
 
     graphic->printed = TRUE;
-    func_02021a3c(graphic->printQueue);
+    PrintQueue_Main(graphic->printQueue);
     for (i = 0; i < ZUKAN_HABITAT_WIN_COUNT; i++) {
         PrintWindow_Flush(&graphic->prints[i], graphic->printQueue);
         if (PrintWindow_IsPrinted(&graphic->prints[i]) == FALSE) {
@@ -763,21 +763,21 @@ void ZukanHabitatGraphic_SetTab(ZukanHabitatGraphic *graphic, u32 tab, u32 state
     switch (tab) {
     case 0:
         actor = ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_TAB);
-        func_0204c124(actor, visible[state]);
-        func_0204c488(actor, anims[0][state]);
-        func_0204c4d4(actor, 0);
+        ClActor_SetVisible(actor, visible[state]);
+        ClActor_SetSequence(actor, anims[0][state]);
+        ClActor_SetAnimTime(actor, 0);
         break;
     case 1:
         actor = ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_TAB + 1);
-        func_0204c124(actor, visible[state]);
-        func_0204c488(actor, anims[1][state]);
-        func_0204c4d4(actor, 0);
+        ClActor_SetVisible(actor, visible[state]);
+        ClActor_SetSequence(actor, anims[1][state]);
+        ClActor_SetAnimTime(actor, 0);
         break;
     case 2:
         actor = ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_TAB + 2);
-        func_0204c124(actor, visible[state]);
-        func_0204c488(actor, anims[2][state]);
-        func_0204c4d4(actor, 0);
+        ClActor_SetVisible(actor, visible[state]);
+        ClActor_SetSequence(actor, anims[2][state]);
+        ClActor_SetAnimTime(actor, 0);
         break;
     }
     GFL_BGSysQueueScrLoad(2);
@@ -798,22 +798,22 @@ static void ZukanHabitatGraphic_LoadIcon(ZukanHabitatGraphic *graphic, u8 cell) 
     void *file = GFL_G2DIOReadOBJNCGRArc(graphic->iconArc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE,
                                          &character, HEAPID_ZUKAN_HABITAT);
 
-    func_0204bab8(func_0204c428(graphic->icons[cell]), character->rawData, 0x400, 0, 0);
-    func_0204ba40(func_0204c428(graphic->icons[cell]), character);
-    func_0204c378(graphic->icons[cell], PokeIcon_GetPalette(species, form, sex, FALSE), 1);
+    ClActSys_WriteCharData(ClActor_GetCharIdx(graphic->icons[cell]), character->rawData, 0x400, 0, 0);
+    ClActSys_ReplaceCharData(ClActor_GetCharIdx(graphic->icons[cell]), character);
+    ClActor_SetPalette(graphic->icons[cell], PokeIcon_GetPalette(species, form, sex, FALSE), 1);
     GFL_HeapFree(file);
     ZukanHabitatGraphic_SetIconVisible(graphic, cell, TRUE);
 }
 
 void ZukanHabitatGraphic_AnimateIcon(ZukanHabitatGraphic *graphic, u8 cell, BOOL play) {
     if (graphic->icons[cell] != NULL) {
-        func_0204c540(graphic->icons[cell]);
+        ClActor_StartAnim(graphic->icons[cell]);
         func_0204c520(graphic->icons[cell], play);
     }
 }
 
 void ZukanHabitatGraphic_SetIconVisible(ZukanHabitatGraphic *graphic, u8 cell, BOOL visible) {
-    func_0204c124(graphic->icons[cell], visible);
+    ClActor_SetVisible(graphic->icons[cell], visible);
 }
 
 void ZukanHabitatGraphic_SetCellPalette(ZukanHabitatGraphic *graphic, u8 cell, u32 state) {
@@ -836,16 +836,16 @@ static void ZukanHabitatGraphic_GetCellPos(u8 cell, ClActorPos *pos) {
 }
 
 void ZukanHabitatGraphic_SetArea(ZukanHabitatGraphic *graphic, u16 zone) {
-    u16 place = TownMapData_GetPlaceByZone(graphic->townmap, func_ov012_02160eb4(graphic->gameData, zone));
+    u16 place = TownMapData_GetPlaceByZone(graphic->townmap, TownMap_GetMapZone(graphic->gameData, zone));
     ClActorPos pos;
 
-    func_0204c488(graphic->actors[ZUKAN_HABITAT_OBJ_AREA],
-                  TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_ANIM));
+    ClActor_SetSequence(graphic->actors[ZUKAN_HABITAT_OBJ_AREA],
+                        TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_ANIM));
     MI_CpuFill8(&pos, 0, sizeof(pos));
     pos.x = TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_X);
     pos.y = TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_Y);
     pos.y += 24;
-    func_0204c140(graphic->actors[ZUKAN_HABITAT_OBJ_AREA], &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(graphic->actors[ZUKAN_HABITAT_OBJ_AREA], &pos, CLACT_SURFACE_SUB);
     ZukanHabitatGraphic_StartGlow(graphic);
 }
 
@@ -870,15 +870,15 @@ void ZukanHabitatGraphic_SetMark(ZukanHabitatGraphic *graphic, u16 cell, u32 sta
 
     switch (state) {
     case ZUKAN_HABITAT_MARK_CAUGHT:
-        func_0204c124(actor, TRUE);
-        func_0204c488(actor, 9);
+        ClActor_SetVisible(actor, TRUE);
+        ClActor_SetSequence(actor, 9);
         break;
     case ZUKAN_HABITAT_MARK_SEEN:
-        func_0204c124(actor, TRUE);
-        func_0204c488(actor, 10);
+        ClActor_SetVisible(actor, TRUE);
+        ClActor_SetSequence(actor, 10);
         break;
     case ZUKAN_HABITAT_MARK_NONE:
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
         break;
     }
 }
@@ -899,8 +899,8 @@ void ZukanHabitatGraphic_StartMessage(StrBuf *strbuf, ZukanHabitatGraphic *graph
     BmpWin_FlushMap(win);
     LoadSysMsgBox(1, 1, 12, 0, HEAPID_ZUKAN_HABITAT);
     BmpWin_DrawFrame(win, TRUE, 1, 12);
-    graphic->stream = func_02022268(graphic->windows[ZUKAN_HABITAT_WIN_MESSAGE], 0, 0, strbuf, graphic->font,
-                                    func_02017bcc(), graphic->tcbManager, 0, HEAPID_ZUKAN_HABITAT, 15);
+    graphic->stream = PrintStream_Create(graphic->windows[ZUKAN_HABITAT_WIN_MESSAGE], 0, 0, strbuf, graphic->font,
+                                         TextSpeed_GetCurrentWait(), graphic->tcbManager, 0, HEAPID_ZUKAN_HABITAT, 15);
     graphic->messageWaiting = FALSE;
     GFL_BGSysQueueScrLoad(1);
     BmpWin_FlushChar(win);
@@ -909,7 +909,7 @@ void ZukanHabitatGraphic_StartMessage(StrBuf *strbuf, ZukanHabitatGraphic *graph
 void ZukanHabitatGraphic_CloseMessage(ZukanHabitatGraphic *graphic) {
     BmpWin *win = ZukanHabitatGraphic_GetWindow(graphic, ZUKAN_HABITAT_WIN_MESSAGE);
 
-    func_020223cc(graphic->stream);
+    PrintStream_Delete(graphic->stream);
     BmpWin_ClearFrame(win, TRUE);
     BmpWin_ClearScreen(win);
     GFL_BGSysQueueScrLoad(0);
@@ -919,7 +919,7 @@ void ZukanHabitatGraphic_CloseMessage(ZukanHabitatGraphic *graphic) {
 }
 
 u32 ZukanHabitatGraphic_GetMessageState(ZukanHabitatGraphic *graphic) {
-    return func_020223b4(graphic->stream);
+    return PrintStream_GetState(graphic->stream);
 }
 
 void ZukanHabitatGraphic_WaitMessage(ZukanHabitatGraphic *graphic) {
@@ -941,17 +941,17 @@ static BmpWin *ZukanHabitatGraphic_GetWindow(ZukanHabitatGraphic *graphic, u8 wi
 void ZukanHabitatGraphic_StartActorAnim(ZukanHabitatGraphic *graphic, u32 actor, u32 anim) {
     ClActor *act = ZukanHabitatGraphic_GetActor(graphic, actor);
 
-    func_0204c488(act, anim);
-    func_0204c4d4(act, 0);
+    ClActor_SetSequence(act, anim);
+    ClActor_SetAnimTime(act, 0);
     func_0204c520(act, TRUE);
-    func_0204c124(act, TRUE);
+    ClActor_SetVisible(act, TRUE);
 }
 
 void ZukanHabitatGraphic_UpdatePlayerMarker(ZukanHabitatGraphic *graphic) {
     ClActor *actor = graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER];
     u16 place = TownMapData_GetPlaceByZone(
         graphic->townmap,
-        func_ov012_02160eb4(graphic->gameData, PlayerState_GetZoneID(GameData_GetPlayerState(graphic->gameData))));
+        TownMap_GetMapZone(graphic->gameData, PlayerState_GetZoneID(GameData_GetPlayerState(graphic->gameData))));
 
     if (place != TOWNMAP_PLACE_NONE) {
         ClActorPos pos;
@@ -959,10 +959,10 @@ void ZukanHabitatGraphic_UpdatePlayerMarker(ZukanHabitatGraphic *graphic) {
         pos.x = TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_X);
         pos.y = TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_Y);
         pos.y += 24;
-        func_0204c140(actor, &pos, CLACT_SURFACE_SUB);
-        func_0204c124(actor, TRUE);
+        ClActor_SetSurfacePos(actor, &pos, CLACT_SURFACE_SUB);
+        ClActor_SetVisible(actor, TRUE);
     } else {
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
     }
 }
 
@@ -974,9 +974,9 @@ void ZukanHabitatGraphic_Scroll(ZukanHabitatGraphic *graphic, int value, BOOL ob
             ClActor *actor = graphic->actors[i];
             ClActorPos pos;
 
-            func_0204c178(actor, &pos, CLACT_SURFACE_MAIN);
+            ClActor_GetSurfacePos(actor, &pos, CLACT_SURFACE_MAIN);
             pos.y += value;
-            func_0204c140(actor, &pos, CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(actor, &pos, CLACT_SURFACE_MAIN);
         }
     } else {
         GFL_BGSysMoveBGReq(4, BG_MOVE_UP, value);
@@ -1010,7 +1010,7 @@ BOOL ZukanHabitatGraphic_IsPaletteRequested(ZukanHabitatGraphic *graphic) {
 }
 
 static inline BOOL ZukanHabitatGraphic_IsPlaceHidden(GameData *gameData, u16 flag) {
-    if (func_ov012_02160f74(gameData, flag) == FALSE) {
+    if (TownMap_CheckFlag(gameData, flag) == FALSE) {
         return TRUE;
     }
     return FALSE;
@@ -1036,9 +1036,9 @@ static void ZukanHabitatGraphic_CreatePlaces(ZukanHabitatGraphic *graphic) {
                 graphic->places[i].state = PLACE_SHOWN;
                 graphic->places[i].actor =
                     UIObjRes_CreateActor(&graphic->mapRes, graphic->unit, x, y, anim, HEAPID_ZUKAN_HABITAT);
-                func_0204c124(graphic->places[i].actor, TRUE);
+                ClActor_SetVisible(graphic->places[i].actor, TRUE);
                 func_0204c520(graphic->places[i].actor, TRUE);
-                func_0204c318(graphic->places[i].actor, 0);
+                ClActor_SetObjMode(graphic->places[i].actor, 0);
             }
         } else {
             graphic->places[i].state = PLACE_NONE;
@@ -1052,7 +1052,7 @@ void ZukanHabitatGraphic_SetBlinkStopped(ZukanHabitatGraphic *graphic, BOOL stop
 }
 
 void ZukanHabitatGraphic_SetNewMarksVisible(ZukanHabitatGraphic *graphic, BOOL visible) {
-    func_0204c124(ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_NEW), visible);
-    func_0204c124(ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_NEW + 1), visible);
-    func_0204c124(ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_NEW + 2), visible);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_NEW), visible);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_NEW + 1), visible);
+    ClActor_SetVisible(ZukanHabitatGraphic_GetActor(graphic, ZUKAN_HABITAT_OBJ_NEW + 2), visible);
 }

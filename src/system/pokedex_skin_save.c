@@ -6,33 +6,33 @@
 // The downloaded Pokédex skin, extra save block 7: the characters and the palette of the Pokédex's cover. The ROM has
 // no string for the file, so the name is a guess
 
-u32 func_0200f164(void) {
+u32 PokedexSkinSave_GetSize(void) {
     return sizeof(PokedexSkinSave);
 }
 
-void func_0200f16c(void *block) {
-    MI_CpuFill8(block, 0, func_0200f164());
+void PokedexSkinSave_Init(void *block) {
+    MI_CpuFill8(block, 0, PokedexSkinSave_GetSize());
 }
 
-void *func_0200f180(void *block) {
+void *PokedexSkinSave_GetChars(void *block) {
     PokedexSkinSave *skin = block;
 
     return skin->chars;
 }
 
-void *func_0200f184(void *block) {
+void *PokedexSkinSave_GetPalette(void *block) {
     PokedexSkinSave *skin = block;
 
     return skin->palette;
 }
 
-BOOL func_0200f18c(void *block) {
+BOOL PokedexSkinSave_IsValid(void *block) {
     PokedexSkinSave *skin = block;
 
     return skin->valid;
 }
 
-void func_0200f194(void *block, u32 valid) {
+void PokedexSkinSave_SetValid(void *block, u32 valid) {
     PokedexSkinSave *skin = block;
 
     skin->valid = valid;

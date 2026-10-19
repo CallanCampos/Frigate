@@ -187,7 +187,7 @@ void ResetBtlFieldStatus(BtlFieldStatus *status);
 void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId);
 void BtlSetup_FreeForRecord(BtlSetup *setup);
 void BtlSetup_AllocRecBuffer(BtlSetup *setup, HeapID heapId);
-void func_0200bb24(HeapID heapId);
+void BattleRec_Init(HeapID heapId);
 void freeVSPlayerBlkClearPtr(void);
 
 #endif // POKEBW2_BATTLE_BTL_SETUP_H

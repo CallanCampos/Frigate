@@ -44,29 +44,29 @@ static const u8 data_ov012_0216cdc8[4][4] = {
     { 2, 3, 1, 0 },
 };
 
-void func_ov012_0215dabc(FieldActor *actor) {
-    func_ov012_02167174(actor);
+void FldAct_InitMoveProcGrid(FieldActor *actor) {
+    FldAct_CallMoveInitProc(actor);
     func_ov036_021925a4(actor);
     SetActorFlag(actor, 2);
 }
 
-void func_ov012_0215dad4(FieldActor *actor) {
-    if (func_ov012_0216748c(actor, 2) == 0) {
-        func_ov012_0215dba0(actor);
-        func_ov012_0215dbb8(actor);
-        func_ov012_0215dbdc(actor);
+void FldAct_UpdateMoveProcGrid(FieldActor *actor) {
+    if (CheckActorMMSysFlag(actor, 2) == 0) {
+        FldAct_RecalcHeightIfError(actor);
+        FldAct_CacheTerrainIfError(actor);
+        FldAct_ProcPendingMoveStart(actor);
         if (CheckActorMovementFlag(actor, 0x200)) {
             func_ov036_0218eff4(actor);
-        } else if (func_ov012_02167600(actor) == FALSE && func_ov012_0215db3c(actor) == TRUE &&
+        } else if (IsActorMovementDisabled(actor) == FALSE && FldAct_CanRunMoveProc(actor) == TRUE &&
                    func_ov036_021925ac(actor) == FALSE) {
-            func_ov012_02167188(actor);
+            FldAct_CallMoveProc(actor);
         }
-        func_ov012_0215dc00(actor);
-        func_ov012_0215dc34(actor);
+        FldAct_ProcMoveStartEffects(actor);
+        FldAct_ProcMoveEndEffects(actor);
     }
 }
 
-BOOL func_ov012_0215db3c(FieldActor *actor) {
+BOOL FldAct_CanRunMoveProc(FieldActor *actor) {
     u32 flags;
 
     if (IsActorFlag16(actor) == FALSE) {
@@ -76,51 +76,51 @@ BOOL func_ov012_0215db3c(FieldActor *actor) {
         if (GetActorMoveCode(actor) == 0x32) {
             return TRUE;
         }
-        flags = func_ov012_02166fe4(actor);
-        if ((flags & 0x1000) && func_ov012_02167658(actor) == FALSE) {
+        flags = GetActorMovementFlags(actor);
+        if ((flags & 0x1000) && FldAct_IsHeightCalcDisabled(actor) == FALSE) {
             return FALSE;
         }
-        if ((flags & 0x800) && func_ov012_021677a4(actor) == FALSE) {
+        if ((flags & 0x800) && FldAct_IsMapAttrDisabled(actor) == FALSE) {
             return FALSE;
         }
     }
     return TRUE;
 }
 
-void func_ov012_0215dba0(FieldActor *actor) {
+void FldAct_RecalcHeightIfError(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x1000)) {
         CheckRecalcActorY(actor);
     }
 }
 
-void func_ov012_0215dbb8(FieldActor *actor) {
+void FldAct_CacheTerrainIfError(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x800) && FldAct_CacheTerrainInfo(actor) == TRUE) {
-        func_ov012_021674dc(actor);
+        FldAct_SetMoveStart(actor);
     }
 }
 
-void func_ov012_0215dbdc(FieldActor *actor) {
+void FldAct_ProcPendingMoveStart(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x20)) {
         func_ov012_0215ec28(actor);
-        func_ov012_0215dcdc(actor);
+        ActorTerrainEffect_ApplyOnSet(actor);
     }
     ClearActorMovementFlag(actor, 0xa0);
 }
 
-void func_ov012_0215dc00(FieldActor *actor) {
+void FldAct_ProcMoveStartEffects(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x80)) {
-        func_ov012_0215ddb4(actor);
+        ActorTerrainEffect_ApplyJumpStart(actor);
     } else if (CheckActorMovementFlag(actor, 0x20)) {
         ActorTerrainEffect_ApplyAll(actor);
     }
     ClearActorMovementFlag(actor, 0xa0);
 }
 
-void func_ov012_0215dc34(FieldActor *actor) {
+void FldAct_ProcMoveEndEffects(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x100)) {
-        func_ov012_0215de7c(actor);
+        ActorTerrainEffect_ApplyJumpEnd(actor);
     } else if (CheckActorMovementFlag(actor, 0x40)) {
-        func_ov012_0215de0c(actor);
+        ActorTerrainEffect_ApplyMoveEnd(actor);
     }
     ClearActorMovementFlag(actor, 0x140);
 }
@@ -142,17 +142,17 @@ void ActorTerrainEffect_InitParam(FieldActor *actor, ActorTerrainEffectParam *pa
     param->season = FieldEffects_GetSeason(param->effects);
 }
 
-void func_ov012_0215dcdc(FieldActor *actor) {
+void ActorTerrainEffect_ApplyOnSet(FieldActor *actor) {
     ActorTerrainEffectParam param;
 
     FldAct_CacheTerrainInfo(actor);
-    if (CheckActorMovementFlag(actor, 0x800) == 0 && func_ov012_02167614(actor) == TRUE) {
+    if (CheckActorMovementFlag(actor, 0x800) == 0 && FldAct_IsDrawReady(actor) == TRUE) {
         ActorTerrainEffect_InitParam(actor, &param);
-        func_ov012_0215dfb4(actor, &param);
-        func_ov012_0215e110(actor, &param);
-        func_ov012_0215e1ec(actor, &param);
-        func_ov012_0215def4(actor, &param);
-        func_ov012_0215e2b8(actor, &param);
+        ActorTerrainEffect_GrassStill(actor, &param);
+        ActorTerrainEffect_Splash(actor, &param);
+        ActorTerrainEffect_AddShadow(actor, &param);
+        ActorTerrainEffect_DeepSand(actor, &param);
+        ActorTerrainEffect_Reflection(actor, &param);
         ActorTerrainEffect_Shadow(actor, &param);
     }
 }
@@ -161,81 +161,81 @@ void ActorTerrainEffect_ApplyAll(FieldActor *actor) {
     ActorTerrainEffectParam param;
 
     FldAct_CacheTerrainInfo(actor);
-    if (CheckActorMovementFlag(actor, 0x800) == 0 && func_ov012_02167614(actor) == TRUE) {
+    if (CheckActorMovementFlag(actor, 0x800) == 0 && FldAct_IsDrawReady(actor) == TRUE) {
         ActorTerrainEffect_InitParam(actor, &param);
         ActorTerrainEffect_TallGrass(actor, &param);
-        func_ov012_0215e05c(actor, &param);
-        func_ov012_0215e0f4(actor, &param);
-        func_ov012_0215e148(actor, &param);
-        func_ov012_0215e1ec(actor, &param);
-        func_ov012_0215e278(actor, &param);
-        func_ov012_0215e2b8(actor, &param);
-        func_ov012_0215e39c(actor, &param);
+        ActorTerrainEffect_Footmark(actor, &param);
+        ActorTerrainEffect_FallenLeaves(actor, &param);
+        ActorTerrainEffect_SplashOrSwamp(actor, &param);
+        ActorTerrainEffect_AddShadow(actor, &param);
+        ActorTerrainEffect_RippleOrigY(actor, &param);
+        ActorTerrainEffect_Reflection(actor, &param);
+        ActorTerrainEffect_None(actor, &param);
         ActorTerrainEffect_Shadow(actor, &param);
     }
 }
 
-void func_ov012_0215ddb4(FieldActor *actor) {
+void ActorTerrainEffect_ApplyJumpStart(FieldActor *actor) {
     ActorTerrainEffectParam param;
 
     FldAct_CacheTerrainInfo(actor);
-    if (CheckActorMovementFlag(actor, 0x800) == 0 && func_ov012_02167614(actor) == TRUE) {
+    if (CheckActorMovementFlag(actor, 0x800) == 0 && FldAct_IsDrawReady(actor) == TRUE) {
         ActorTerrainEffect_InitParam(actor, &param);
-        func_ov012_0215e1ec(actor, &param);
-        func_ov012_0215e2b8(actor, &param);
-        func_ov012_0215e198(actor, &param);
-        func_ov012_0215e39c(actor, &param);
+        ActorTerrainEffect_AddShadow(actor, &param);
+        ActorTerrainEffect_Reflection(actor, &param);
+        ActorTerrainEffect_ClearSplash(actor, &param);
+        ActorTerrainEffect_None(actor, &param);
         ActorTerrainEffect_Shadow(actor, &param);
     }
 }
 
-void func_ov012_0215de0c(FieldActor *actor) {
+void ActorTerrainEffect_ApplyMoveEnd(FieldActor *actor) {
     ActorTerrainEffectParam param;
 
     FldAct_CacheTerrainInfo(actor);
-    if (CheckActorMovementFlag(actor, 0x800) == 0 && func_ov012_02167614(actor) == TRUE) {
+    if (CheckActorMovementFlag(actor, 0x800) == 0 && FldAct_IsDrawReady(actor) == TRUE) {
         ActorTerrainEffect_InitParam(actor, &param);
-        func_ov012_0215def4(actor, &param);
-        func_ov012_0215e008(actor, &param);
-        func_ov012_0215e298(actor, &param);
-        func_ov012_0215e148(actor, &param);
-        func_ov012_0215e33c(actor, &param);
-        func_ov012_0215e228(actor, &param);
-        func_ov012_0215e380(actor, &param);
+        ActorTerrainEffect_DeepSand(actor, &param);
+        ActorTerrainEffect_TallGrassUp(actor, &param);
+        ActorTerrainEffect_Ripple(actor, &param);
+        ActorTerrainEffect_SplashOrSwamp(actor, &param);
+        ActorTerrainEffect_UpdateReflection(actor, &param);
+        ActorTerrainEffect_UpdateShadowVisible(actor, &param);
+        ActorTerrainEffect_ElectricField(actor, &param);
         ActorTerrainEffect_Shadow(actor, &param);
     }
 }
 
-void func_ov012_0215de7c(FieldActor *actor) {
+void ActorTerrainEffect_ApplyJumpEnd(FieldActor *actor) {
     ActorTerrainEffectParam param;
 
     FldAct_CacheTerrainInfo(actor);
-    if (CheckActorMovementFlag(actor, 0x800) == 0 && func_ov012_02167614(actor) == TRUE) {
+    if (CheckActorMovementFlag(actor, 0x800) == 0 && FldAct_IsDrawReady(actor) == TRUE) {
         ActorTerrainEffect_InitParam(actor, &param);
-        func_ov012_0215def4(actor, &param);
-        func_ov012_0215e298(actor, &param);
-        func_ov012_0215e148(actor, &param);
-        func_ov012_0215e33c(actor, &param);
-        func_ov012_0215e228(actor, &param);
-        func_ov012_0215e038(actor, &param);
-        func_ov012_0215e258(actor, &param);
-        func_ov012_0215e380(actor, &param);
+        ActorTerrainEffect_DeepSand(actor, &param);
+        ActorTerrainEffect_Ripple(actor, &param);
+        ActorTerrainEffect_SplashOrSwamp(actor, &param);
+        ActorTerrainEffect_UpdateReflection(actor, &param);
+        ActorTerrainEffect_UpdateShadowVisible(actor, &param);
+        ActorTerrainEffect_TallGrassLanding(actor, &param);
+        ActorTerrainEffect_LandingDust(actor, &param);
+        ActorTerrainEffect_ElectricField(actor, &param);
         ActorTerrainEffect_Shadow(actor, &param);
     }
 }
 
-void func_ov012_0215def4(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_DeepSand(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov012_021676f0(actor) == FALSE && MapTile_IsDeepSand(param->tileClass)) {
         // How far an actor sinks into deep sand
         VecFx32 offset = { 0, -FX32_CONST(7), 0 };
-        func_ov012_0216736c(actor, &offset);
+        FldAct_SetAttrDrawOffset(actor, &offset);
     } else {
         VecFx32 offset = { 0, 0, 0 };
-        func_ov012_0216736c(actor, &offset);
+        FldAct_SetAttrDrawOffset(actor, &offset);
     }
 }
 
-u32 func_ov012_0215df40(u32 tileClass, u8 season) {
+u32 ActorTerrainEffect_GetGrassKind(u32 tileClass, u8 season) {
     u32 kind = 0;
 
     if (func_ov036_021a2df4(tileClass)) {
@@ -261,9 +261,10 @@ u32 func_ov012_0215df40(u32 tileClass, u8 season) {
     return kind;
 }
 
-void func_ov012_0215dfb4(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_GrassStill(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (param->tileFlags & 0x20) {
-        func_ov036_021a40ac(param->effects, actor, FALSE, func_ov012_0215df40(param->tileClass, param->season));
+        func_ov036_021a40ac(param->effects, actor, FALSE,
+                            ActorTerrainEffect_GetGrassKind(param->tileClass, param->season));
     }
 }
 
@@ -273,33 +274,34 @@ void ActorTerrainEffect_TallGrass(FieldActor *actor, ActorTerrainEffectParam *pa
 
     if (param->tileFlags & 0x20) {
         dir = GetActorMotionDir(actor);
-        kind = func_ov012_0215df40(param->tileClass, param->season);
+        kind = ActorTerrainEffect_GetGrassKind(param->tileClass, param->season);
         if (dir != DIR_UP) {
             func_ov036_021a40ac(param->effects, actor, TRUE, kind);
         }
     }
 }
 
-void func_ov012_0215e008(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_TallGrassUp(FieldActor *actor, ActorTerrainEffectParam *param) {
     u16 dir;
     u32 kind;
 
     if (param->tileFlags & 0x20) {
         dir = GetActorMotionDir(actor);
-        kind = func_ov012_0215df40(param->tileClass, param->season);
+        kind = ActorTerrainEffect_GetGrassKind(param->tileClass, param->season);
         if (dir == DIR_UP) {
             func_ov036_021a40ac(param->effects, actor, TRUE, kind);
         }
     }
 }
 
-void func_ov012_0215e038(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_TallGrassLanding(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (param->tileFlags & 0x20) {
-        func_ov036_021a40ac(param->effects, actor, TRUE, func_ov012_0215df40(param->tileClass, param->season));
+        func_ov036_021a40ac(param->effects, actor, TRUE,
+                            ActorTerrainEffect_GetGrassKind(param->tileClass, param->season));
     }
 }
 
-void func_ov012_0215e05c(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_Footmark(FieldActor *actor, ActorTerrainEffectParam *param) {
     u32 kind;
 
     if (param->tileFlagsOrigY & 8) {
@@ -338,48 +340,48 @@ void func_ov012_0215e05c(FieldActor *actor, ActorTerrainEffectParam *param) {
     }
 }
 
-void func_ov012_0215e0f4(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_FallenLeaves(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov036_021a2cd4(param->tileClassOrigY) == TRUE) {
         func_ov036_021c94e0(param->effects, actor);
     }
 }
 
-void func_ov012_0215e110(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_Splash(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov036_021a2c04(param->tileClass) == TRUE) {
-        if (func_ov012_021676d8(actor) == FALSE) {
+        if (FldAct_IsSplashed(actor) == FALSE) {
             func_ov036_021bea3c(param->effects, actor);
-            func_ov012_021676bc(actor, TRUE);
+            FldAct_SetSplashed(actor, TRUE);
         }
     } else {
-        func_ov012_021676bc(actor, FALSE);
+        FldAct_SetSplashed(actor, FALSE);
     }
 }
 
-void func_ov012_0215e148(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_SplashOrSwamp(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov036_021a2c04(param->tileClass) == TRUE) {
-        if (func_ov012_021676d8(actor) == FALSE) {
+        if (FldAct_IsSplashed(actor) == FALSE) {
             func_ov036_021bea3c(param->effects, actor);
-            func_ov012_021676bc(actor, TRUE);
+            FldAct_SetSplashed(actor, TRUE);
         }
     } else if (MapTile_IsSwamp(param->tileClass) == TRUE) {
         func_ov036_021be828(param->effects, actor, 1, 0);
     } else {
-        func_ov012_021676bc(actor, FALSE);
+        FldAct_SetSplashed(actor, FALSE);
     }
 }
 
-void func_ov012_0215e198(FieldActor *actor, ActorTerrainEffectParam *param) {
-    func_ov012_021676bc(actor, FALSE);
+void ActorTerrainEffect_ClearSplash(FieldActor *actor, ActorTerrainEffectParam *param) {
+    FldAct_SetSplashed(actor, FALSE);
 }
 
-BOOL func_ov012_0215e1a4(FieldActor *actor, ActorTerrainEffectParam *param) {
-    if (func_ov012_021673f8(GetActorMModelSystem(actor)) == FALSE || param->config->enableShadow == FALSE) {
+BOOL ActorTerrainEffect_IsShadowEnabled(FieldActor *actor, ActorTerrainEffectParam *param) {
+    if (FldActSys_AreShadowsEnabled(GetActorMModelSystem(actor)) == FALSE || param->config->enableShadow == FALSE) {
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov012_0215e1c4(ActorTerrainEffectParam *param) {
+BOOL ActorTerrainEffect_IsShadowTile(ActorTerrainEffectParam *param) {
     if (!(param->tileFlags & 0x80)) {
         return FALSE;
     }
@@ -389,17 +391,17 @@ BOOL func_ov012_0215e1c4(ActorTerrainEffectParam *param) {
     return TRUE;
 }
 
-void func_ov012_0215e1ec(FieldActor *actor, ActorTerrainEffectParam *param) {
-    if (func_ov012_0215e1a4(actor, param) == TRUE && func_ov012_0215e1c4(param) == TRUE &&
+void ActorTerrainEffect_AddShadow(FieldActor *actor, ActorTerrainEffectParam *param) {
+    if (ActorTerrainEffect_IsShadowEnabled(actor, param) == TRUE && ActorTerrainEffect_IsShadowTile(param) == TRUE &&
         CheckActorMovementFlag(actor, 0x4000) == 0) {
         func_ov036_021a3bf0(actor, param->effects);
         SetActorMovementFlag(actor, 0x4000);
     }
 }
 
-void func_ov012_0215e228(FieldActor *actor, ActorTerrainEffectParam *param) {
-    if (func_ov012_0215e1a4(actor, param) == TRUE) {
-        if (func_ov012_0215e1c4(param) == FALSE) {
+void ActorTerrainEffect_UpdateShadowVisible(FieldActor *actor, ActorTerrainEffectParam *param) {
+    if (ActorTerrainEffect_IsShadowEnabled(actor, param) == TRUE) {
+        if (ActorTerrainEffect_IsShadowTile(param) == FALSE) {
             SetActorMovementFlag(actor, 0x8000);
         } else {
             ClearActorMovementFlag(actor, 0x8000);
@@ -407,25 +409,25 @@ void func_ov012_0215e228(FieldActor *actor, ActorTerrainEffectParam *param) {
     }
 }
 
-void func_ov012_0215e258(FieldActor *actor, ActorTerrainEffectParam *param) {
-    if (!(param->tileFlags & 2) && func_ov012_021677f4(actor) == FALSE) {
+void ActorTerrainEffect_LandingDust(FieldActor *actor, ActorTerrainEffectParam *param) {
+    if (!(param->tileFlags & 2) && FldAct_IsLandingDustDisabled(actor) == FALSE) {
         func_ov036_021a3e74(actor, param->effects);
     }
 }
 
-void func_ov012_0215e278(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_RippleOrigY(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov036_021a2bf4(param->tileClassOrigY) == TRUE) {
         func_ov036_021be828(param->effects, actor, 0, 1);
     }
 }
 
-void func_ov012_0215e298(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_Ripple(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov036_021a2bf4(param->tileClass) == TRUE) {
         func_ov036_021be828(param->effects, actor, 0, 0);
     }
 }
 
-void func_ov012_0215e2b8(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_Reflection(FieldActor *actor, ActorTerrainEffectParam *param) {
     u32 tileType;
     u32 nextTileType;
     u32 tileClass;
@@ -437,7 +439,7 @@ void func_ov012_0215e2b8(FieldActor *actor, ActorTerrainEffectParam *param) {
         if (param->tileFlags & 0x40) {
             tileType = param->tileType;
         } else {
-            nextTileType = func_ov012_0215e9b0(actor, DIR_DOWN);
+            nextTileType = FldAct_GetTileTypeInDir(actor, DIR_DOWN);
             if (GetTileFlags(nextTileType) & 0x40) {
                 tileType = nextTileType;
             }
@@ -455,11 +457,11 @@ void func_ov012_0215e2b8(FieldActor *actor, ActorTerrainEffectParam *param) {
     }
 }
 
-void func_ov012_0215e33c(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_UpdateReflection(FieldActor *actor, ActorTerrainEffectParam *param) {
     u32 tileType;
 
     if (param->config->enableReflections && FldAct_CheckReflectingFlag(actor)) {
-        tileType = func_ov012_0215e9b0(actor, DIR_DOWN);
+        tileType = FldAct_GetTileTypeInDir(actor, DIR_DOWN);
         if (tileType == -1) {
             FldAct_SetReflectingFlag(actor, FALSE);
         } else if (!(GetTileFlags(tileType) & 0x40)) {
@@ -468,13 +470,13 @@ void func_ov012_0215e33c(FieldActor *actor, ActorTerrainEffectParam *param) {
     }
 }
 
-void func_ov012_0215e380(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_ElectricField(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (MapTile_IsElectricField(param->tileClass) == TRUE) {
         func_ov036_021c289c(actor, param->effects);
     }
 }
 
-void func_ov012_0215e39c(FieldActor *actor, ActorTerrainEffectParam *param) {
+void ActorTerrainEffect_None(FieldActor *actor, ActorTerrainEffectParam *param) {
 }
 
 void ActorTerrainEffect_Shadow(FieldActor *actor, ActorTerrainEffectParam *param) {
@@ -637,7 +639,7 @@ BOOL CheckBlockedCollPathToPosition(FieldActor *actor, u16 dir, VecFx32 position
     VecFx32 rowPosition;
     VecFx32 tilePosition;
 
-    if (func_ov012_021677a4(actor) == FALSE) {
+    if (FldAct_IsMapAttrDisabled(actor) == FALSE) {
         found = FALSE;
         width = GetActorCollWidth(actor);
         height = GetActorCollHeight(actor);
@@ -700,7 +702,7 @@ BOOL GetHeightFromMap(FieldActor *actor, const VecFx32 *position, fx32 *height) 
     return FALSE;
 }
 
-void func_ov012_0215e8ec(FieldActor *actor, u16 dir) {
+void FldAct_StepGPosInDir(FieldActor *actor, u16 dir) {
     fx32 height;
     VecFx32 position;
 
@@ -722,7 +724,7 @@ void SetActorInitialGPosToNowGPos(FieldActor *actor) {
     SetActorInitialGPosZ(actor, GetGPosZ(actor));
 }
 
-u32 func_ov012_0215e9b0(FieldActor *actor, u16 dir) {
+u32 FldAct_GetTileTypeInDir(FieldActor *actor, u16 dir) {
     u32 tileType;
     VecFx32 position;
 
@@ -734,7 +736,7 @@ u32 func_ov012_0215e9b0(FieldActor *actor, u16 dir) {
     return tileType;
 }
 
-void func_ov012_0215e9fc(FieldActor *actor, const VecFx32 *offset) {
+void FldAct_AddWPos(FieldActor *actor, const VecFx32 *offset) {
     VecFx32 position;
 
     CopyActorWPos(actor, &position);
@@ -744,7 +746,7 @@ void func_ov012_0215e9fc(FieldActor *actor, const VecFx32 *offset) {
     SetActorWPosValue(actor, &position);
 }
 
-void func_ov012_0215ea30(FieldActor *actor, u16 dir, fx32 distance) {
+void FldAct_MoveWPosInDir(FieldActor *actor, u16 dir, fx32 distance) {
     VecFx32 position;
 
     CopyActorWPos(actor, &position);
@@ -776,7 +778,7 @@ BOOL CheckRecalcActorY(FieldActor *actor) {
     if (CheckActorFlag(actor, 0x2000)) {
         return FALSE;
     }
-    if (func_ov012_02167658(actor) == TRUE) {
+    if (FldAct_IsHeightCalcDisabled(actor) == TRUE) {
         ClearActorMovementFlag(actor, 0x1000);
         return FALSE;
     }
@@ -807,7 +809,7 @@ BOOL FldAct_CacheTerrainInfo(FieldActor *actor) {
     found = FALSE;
     tileTypeOrigY = -1;
     tileType = -1;
-    if (func_ov012_021677a4(actor) == FALSE) {
+    if (FldAct_IsMapAttrDisabled(actor) == FALSE) {
         x = FldAct_GetInitGPosX(actor);
         y = FldAct_GetInitGPosY(actor);
         z = FldAct_GetInitGPosZ(actor);
@@ -835,7 +837,7 @@ BOOL FldAct_CacheTerrainInfo(FieldActor *actor) {
     return FALSE;
 }
 
-BOOL func_ov012_0215ebd8(FieldActor *actor) {
+BOOL FldAct_IsNearPlayer(FieldActor *actor) {
     FieldActor *player;
     s16 playerX;
     s16 playerZ;
@@ -863,15 +865,15 @@ void func_ov012_0215ec28(FieldActor *actor) {
     u16 moveCode = GetActorMoveCode(actor);
 
     if (moveCode == 0x33 || moveCode == 0x34 || moveCode == 0x35 || moveCode == 0x36 || moveCode == 0x55) {
-        func_ov012_02167188(actor);
+        FldAct_CallMoveProc(actor);
     }
 }
 
-s16 GetDirectionVectorCompX(u32 direction) {
+s16 GetDirectionVectorCompX(u16 direction) {
     return DIRECTION_VEC_X[direction];
 }
 
-s16 GetDirectionVectorCompZ(u32 direction) {
+s16 GetDirectionVectorCompZ(u16 direction) {
     return DIRECTION_VEC_Z[direction];
 }
 
@@ -940,7 +942,7 @@ u16 GetDirFromPosToPos(s32 x1, s32 z1, s32 x2, s32 z2) {
     return direction;
 }
 
-u8 func_ov012_0215ed38(u32 direction, u16 angle) {
+u8 RotateDirByAngle(u32 direction, u16 angle) {
     u16 rotated = data_ov012_0216cd60[direction] + angle;
 
     return data_ov012_0216cdc8[data_ov012_0216cd68[rotated / 0x1000]][DIR_DOWN];
@@ -975,7 +977,7 @@ void SetActorInitPositionRail(FieldActor *actor, const RailPosition *position) {
     rail->unk0 = ACTOR_RAIL_POS_SET;
 }
 
-BOOL func_ov012_0215ede4(FieldActor *actor, RailPosition *position) {
+BOOL GetActorInitPositionRail(FieldActor *actor, RailPosition *position) {
     ActorPositionRail *rail = GetNPCRailPosPtrAddr(actor);
 
     if (rail->unk0 == ACTOR_RAIL_POS_SET) {

@@ -84,7 +84,8 @@ static u16 sGtsNegoMessageLevels[] = {
 };
 
 static u16 sGtsNegoMessageKinds[] = {
-    GtsnegoProc_Text_AnyKind_2, GtsnegoProc_Text_Cool, GtsnegoProc_Text_Cute, GtsnegoProc_Text_Scary, GtsnegoProc_Text_Strange,
+    GtsnegoProc_Text_AnyKind_2, GtsnegoProc_Text_Cool,    GtsnegoProc_Text_Cute,
+    GtsnegoProc_Text_Scary,     GtsnegoProc_Text_Strange,
 };
 
 // The main menu's buttons
@@ -112,9 +113,9 @@ GtsNegoMessage *GtsNegoMessage_Create(HeapID heapId, u32 bank) {
 
     msg->heapId = heapId;
     BmpWin_InitAllocator(msg->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     msg->tcbManager = GFL_TCBExMgrCreate(msg->heapId, msg->heapId, 1, 0);
-    msg->printQueue = func_02021998(msg->heapId);
+    msg->printQueue = PrintQueue_CreateDefault(msg->heapId);
     msg->messageStrbuf = GFL_StrBufCreate(240, msg->heapId);
     msg->strbuf = GFL_StrBufCreate(240, msg->heapId);
     msg->formatStrbuf = GFL_StrBufCreate(240, msg->heapId);
@@ -132,7 +133,7 @@ GtsNegoMessage *GtsNegoMessage_Create(HeapID heapId, u32 bank) {
 void GtsNegoMessage_Update(GtsNegoMessage *msg) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     GFL_TCBExMgrUpdate(msg->tcbManager);
-    func_02021a3c(msg->printQueue);
+    PrintQueue_Main(msg->printQueue);
     if (msg->cancelButton != NULL) {
         AppTaskMenuWin_Update(msg->cancelButton);
     }
@@ -147,7 +148,7 @@ void GtsNegoMessage_Free(GtsNegoMessage *msg) {
     GFL_BGSysFreeCharMemory(1, CHAR_POS(msg->mainFrameChars), CHAR_SIZE(msg->mainFrameChars));
     GFL_BGSysFreeCharMemory(6, CHAR_POS(msg->subFrameChars), CHAR_SIZE(msg->subFrameChars));
     GtsNegoMessage_FreeButtons(msg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_MsgDataFree(msg->msgData);
     GFL_FontFree(msg->font);
     GFL_StrBufFree(msg->strbuf);
@@ -155,7 +156,7 @@ void GtsNegoMessage_Free(GtsNegoMessage *msg) {
     GFL_StrBufFree(msg->formatStrbuf);
     GtsNegoMessage_FreePMSDraw(msg);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     GFL_WordSetSystemFree(msg->wordSet);
@@ -165,8 +166,8 @@ void GtsNegoMessage_Free(GtsNegoMessage *msg) {
     }
     AppTaskMenuRes_Free(msg->menuRes);
     GFL_TCBExMgrFree(msg->tcbManager);
-    func_02021c44(msg->printQueue);
-    func_02021a18(msg->printQueue);
+    PrintQueue_Clear(msg->printQueue);
+    PrintQueue_Free(msg->printQueue);
     if (msg->messageWin != NULL) {
         BmpWin_Free(msg->messageWin);
     }
@@ -245,14 +246,14 @@ void GtsNegoMessage_PrintShort(GtsNegoMessage *msg, u32 msgNo) {
 // Whether no message is being printed a character at a time, which A continues
 BOOL GtsNegoMessage_IsDone(GtsNegoMessage *msg) {
     if (msg->stream != NULL) {
-        switch (func_020223b4(msg->stream)) {
+        switch (PrintStream_GetState(msg->stream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(msg->stream);
+            PrintStream_Delete(msg->stream);
             msg->stream = NULL;
             break;
         case PRINT_STREAM_PAUSED:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A) {
-                func_020223bc(msg->stream);
+                PrintStream_Continue(msg->stream);
             }
             break;
         }
@@ -695,7 +696,7 @@ void GtsNegoMessage_CreateCancelButton(GtsNegoMessage *msg, ButtonManCallback ca
     msg->items[0].color = GTSNEGO_BUTTON_COLOR;
     msg->items[0].type = 0;
     msg->cancelButton = AppTaskMenuWin_CreateEx(msg->menuRes, &msg->items[0], 10, 21, 12, 3, FALSE, TRUE, msg->heapId);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         AppTaskMenuWin_SetActive(msg->cancelButton, TRUE);
     }
     GFL_StrBufFree(msg->items[0].str);

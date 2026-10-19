@@ -227,7 +227,7 @@ static void ResearchCommon_InitClAct(ResearchCommon *common) {
 }
 
 static void ResearchCommon_ExitClAct(ResearchCommon *common) {
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void ResearchCommon_ClearObjRes(ResearchCommon *common) {
@@ -241,9 +241,9 @@ static void ResearchCommon_ClearObjRes(ResearchCommon *common) {
 static void ResearchCommon_LoadObjRes(ResearchCommon *common) {
     HeapID heapId = common->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(heapId));
-    u32 chars = func_0204b81c(handle, 20, FALSE, CLACT_VRAM_MAIN, heapId);
-    u32 palette = func_0204bbb8(handle, 19, CLACT_VRAM_MAIN, 0, 0, 4, heapId);
-    u32 cellAnims = func_0204bde0(handle, 21, 24, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 20, FALSE, CLACT_VRAM_MAIN, heapId);
+    u32 palette = ClActSys_LoadPlttRange(handle, 19, CLACT_VRAM_MAIN, 0, 0, 4, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 21, 24, heapId);
 
     common->objRes[OBJ_RES_CHARS] = chars;
     common->objRes[OBJ_RES_PALETTE] = palette;
@@ -252,9 +252,9 @@ static void ResearchCommon_LoadObjRes(ResearchCommon *common) {
 }
 
 static void ResearchCommon_FreeObjRes(ResearchCommon *common) {
-    func_0204b98c(common->objRes[OBJ_RES_CHARS]);
-    func_0204bcd0(common->objRes[OBJ_RES_PALETTE]);
-    func_0204be64(common->objRes[OBJ_RES_CELL_ANIMS]);
+    ClActSys_FreeChars(common->objRes[OBJ_RES_CHARS]);
+    ClActSys_FreePltt(common->objRes[OBJ_RES_PALETTE]);
+    ClActSys_FreeCellAnims(common->objRes[OBJ_RES_CELL_ANIMS]);
 }
 
 static void ResearchCommon_ClearUnits(ResearchCommon *common) {
@@ -262,11 +262,11 @@ static void ResearchCommon_ClearUnits(ResearchCommon *common) {
 }
 
 static void ResearchCommon_CreateUnits(ResearchCommon *common) {
-    common->units[0] = func_0204bf1c(1, 2, common->heapId);
+    common->units[0] = ClActUnit_Create(1, 2, common->heapId);
 }
 
 static void ResearchCommon_DeleteUnits(ResearchCommon *common) {
-    func_0204bf98(common->units[0]);
+    ClActUnit_Delete(common->units[0]);
 }
 
 static void ResearchCommon_ClearActors(ResearchCommon *common) {
@@ -293,13 +293,13 @@ static void ResearchCommon_CreateActors(ResearchCommon *common) {
         chars = ResearchCommon_GetObjRes(common, entry->chars);
         palette = ResearchCommon_GetObjRes(common, entry->palette);
         cellAnims = ResearchCommon_GetObjRes(common, entry->cellAnims);
-        common->actors[i] = func_0204c040(unit, chars, palette, cellAnims, &setup, entry->surface, common->heapId);
-        func_0204c124(common->actors[i], TRUE);
+        common->actors[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, entry->surface, common->heapId);
+        ClActor_SetVisible(common->actors[i], TRUE);
     }
 }
 
 static void ResearchCommon_DeleteActors(ResearchCommon *common) {
-    func_0204c108(common->actors[0]);
+    ClActor_Delete(common->actors[0]);
 }
 
 static void ResearchCommon_ClearPaletteFade(ResearchCommon *common) {

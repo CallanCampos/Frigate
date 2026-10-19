@@ -121,7 +121,7 @@ BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, cons
     return TRUE;
 }
 
-u32 func_ov012_02169fb0(void) {
+u32 G3DTextDraw_GetTexDimCount(void) {
     return TEX_DIM_COUNT;
 }
 

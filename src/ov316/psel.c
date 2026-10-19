@@ -471,7 +471,7 @@ static BOOL PselProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->param = param;
     wk->fadeFreq = GFL_FadeGetUpdateFreq();
     GFL_FadeSetUpdateFreq(1);
-    wk->touchMode = func_0203d554();
+    wk->touchMode = GCTX_HIDIsUsingTouch();
     wk->choice = PSEL_CHOICE_NONE;
     wk->ball = PSEL_CHOICE_NONE;
     wk->pokeArrived = FALSE;
@@ -483,7 +483,7 @@ static BOOL PselProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PselWork *wk = work;
 
     GFL_FadeSet(FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE, 16, 16, 0);
-    func_0203d564(wk->touchMode);
+    GCTX_HIDSetUsingTouch(wk->touchMode);
     GFL_FadeSetUpdateFreq(wk->fadeFreq);
     switch (wk->choice) {
     case 0:
@@ -519,7 +519,7 @@ static BOOL PselProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
         return TRUE;
     }
     if (*seq >= PSEL_SEQ_LOAD && *seq <= PSEL_SEQ_UNLOAD) {
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
         PselText_Update(wk);
         PselGraphic_Update(wk->graphic);
         PselGraphic_Begin3D(wk->graphic);
@@ -731,7 +731,7 @@ static void PselBall_Select(PselWork *wk, s32 ball) {
             GFL_G3DActorBindAnm(actor, i);
             GFL_G3DActorSetAnmFrame(actor, i, &frame);
         }
-        func_0204c504(wk->cursor, 0);
+        ClActor_SetAnimFrame(wk->cursor, 0);
     }
     wk->ball = ball;
 }
@@ -774,15 +774,16 @@ static void PselPoke_Load(PselWork *wk) {
         setup.priority = 2;
         setup.bgPriority = 3;
         wk->poke[i].clact[0] =
-            func_0204c040(PselGraphic_GetClActUnit(wk->graphic), wk->poke[i].res[0].chars, wk->poke[i].res[0].pltt,
-                          wk->poke[i].res[0].cellAnim, &setup, 1, wk->heapId);
-        func_0204c124(wk->poke[i].clact[0], FALSE);
+            ClActor_Create(PselGraphic_GetClActUnit(wk->graphic), wk->poke[i].res[0].chars, wk->poke[i].res[0].pltt,
+                           wk->poke[i].res[0].cellAnim, &setup, 1, wk->heapId);
+        ClActor_SetVisible(wk->poke[i].clact[0], FALSE);
     }
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_PSEL, wk->heapId);
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
-        wk->poke[i].res[1].chars = func_0204b81c(arc, sPselPokeFiles[i].chars, FALSE, 1, wk->heapId);
-        wk->poke[i].res[1].cellAnim = func_0204bde0(arc, sPselPokeFiles[i].cell, sPselPokeFiles[i].anim, wk->heapId);
+        wk->poke[i].res[1].chars = ClActSys_LoadChars(arc, sPselPokeFiles[i].chars, FALSE, 1, wk->heapId);
+        wk->poke[i].res[1].cellAnim =
+            ClActSys_LoadCellAnims(arc, sPselPokeFiles[i].cell, sPselPokeFiles[i].anim, wk->heapId);
     }
     GFL_ArcToolFree(arc);
 
@@ -802,9 +803,9 @@ static void PselPoke_Load(PselWork *wk) {
         setup.rotation = 0;
         setup.affineMode = 1;
         wk->poke[i].clact[1] =
-            func_0204c0a4(PselGraphic_GetClActUnit(wk->graphic), wk->poke[i].res[1].chars, wk->poke[i].res[0].pltt,
-                          wk->poke[i].res[1].cellAnim, &setup, 1, wk->heapId);
-        func_0204c124(wk->poke[i].clact[1], FALSE);
+            ClActor_CreateEx(PselGraphic_GetClActUnit(wk->graphic), wk->poke[i].res[1].chars, wk->poke[i].res[0].pltt,
+                             wk->poke[i].res[1].cellAnim, &setup, 1, wk->heapId);
+        ClActor_SetVisible(wk->poke[i].clact[1], FALSE);
     }
 
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
@@ -823,12 +824,12 @@ static void PselPoke_Unload(PselWork *wk) {
 
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
         for (j = 0; j < 2; j++) {
-            func_0204c108(wk->poke[i].clact[j]);
-            func_0204be64(wk->poke[i].res[j].cellAnim);
-            func_0204b98c(wk->poke[i].res[j].chars);
+            ClActor_Delete(wk->poke[i].clact[j]);
+            ClActSys_FreeCellAnims(wk->poke[i].res[j].cellAnim);
+            ClActSys_FreeChars(wk->poke[i].res[j].chars);
             // The scaled picture uses the still one's palette
             if (j != 1) {
-                func_0204bcd0(wk->poke[i].res[j].pltt);
+                ClActSys_FreePltt(wk->poke[i].res[j].pltt);
             }
         }
     }
@@ -882,8 +883,8 @@ static void PselPoke_Update(PselWork *wk) {
             switch (poke->state) {
             case PSEL_POKE_BACK:
                 if (dir > 0) {
-                    func_0204c124(poke->clact[0], FALSE);
-                    func_0204c124(poke->clact[1], TRUE);
+                    ClActor_SetVisible(poke->clact[0], FALSE);
+                    ClActor_SetVisible(poke->clact[1], TRUE);
                     poke->frame = 0;
                     poke->state = PSEL_POKE_JUMP_1;
                     poke->unmoved = FALSE;
@@ -902,8 +903,8 @@ static void PselPoke_Update(PselWork *wk) {
                     pos.x = move->pos[0][0];
                     pos.y = move->pos[0][1];
                     scale.x = scale.y = FX32_CONST(move->scale[0] / 16.0f);
-                    func_0204c140(poke->clact[1], &pos, 1);
-                    func_0204c270(poke->clact[1], &scale);
+                    ClActor_SetSurfacePos(poke->clact[1], &pos, 1);
+                    ClActor_SetScale(poke->clact[1], &scale);
                 } else {
                     ClActorPos pos;
                     ClActorScale scale;
@@ -912,12 +913,12 @@ static void PselPoke_Update(PselWork *wk) {
                                                  move->pos[1][1], move->scale[0], move->scale[1], move->duration[0],
                                                  move->height[0], poke->frame);
                     jumped[i] = TRUE;
-                    func_0204c140(poke->clact[1], &pos, 1);
-                    func_0204c270(poke->clact[1], &scale);
+                    ClActor_SetSurfacePos(poke->clact[1], &pos, 1);
+                    ClActor_SetScale(poke->clact[1], &scale);
                 }
                 if (poke->frame == 0 && dir < 0) {
-                    func_0204c124(poke->clact[0], TRUE);
-                    func_0204c124(poke->clact[1], FALSE);
+                    ClActor_SetVisible(poke->clact[0], TRUE);
+                    ClActor_SetVisible(poke->clact[1], FALSE);
                     poke->frame = 0;
                     poke->state = PSEL_POKE_BACK;
                     poke->unmoved = FALSE;
@@ -937,8 +938,8 @@ static void PselPoke_Update(PselWork *wk) {
                 pos.x = move->pos[1][0];
                 pos.y = move->pos[1][1];
                 scale.x = scale.y = FX32_CONST(move->scale[1] / 16.0f);
-                func_0204c140(poke->clact[1], &pos, 1);
-                func_0204c270(poke->clact[1], &scale);
+                ClActor_SetSurfacePos(poke->clact[1], &pos, 1);
+                ClActor_SetScale(poke->clact[1], &scale);
                 if (poke->frame == 0 && dir < 0) {
                     poke->frame = move->duration[0] - 1;
                     poke->state = PSEL_POKE_JUMP_1;
@@ -961,8 +962,8 @@ static void PselPoke_Update(PselWork *wk) {
                     pos.x = move->pos[1][0];
                     pos.y = move->pos[1][1];
                     scale.x = scale.y = FX32_CONST(move->scale[1] / 16.0f);
-                    func_0204c140(poke->clact[1], &pos, 1);
-                    func_0204c270(poke->clact[1], &scale);
+                    ClActor_SetSurfacePos(poke->clact[1], &pos, 1);
+                    ClActor_SetScale(poke->clact[1], &scale);
                 } else {
                     ClActorPos pos;
                     ClActorScale scale;
@@ -971,8 +972,8 @@ static void PselPoke_Update(PselWork *wk) {
                                                  move->pos[2][1], move->scale[1], move->scale[2], move->duration[1],
                                                  move->height[1], poke->frame);
                     jumped[i] = TRUE;
-                    func_0204c140(poke->clact[1], &pos, 1);
-                    func_0204c270(poke->clact[1], &scale);
+                    ClActor_SetSurfacePos(poke->clact[1], &pos, 1);
+                    ClActor_SetScale(poke->clact[1], &scale);
                 }
                 if (poke->frame == 0 && dir < 0) {
                     poke->frame = move->wait - 1;
@@ -994,15 +995,15 @@ static void PselPoke_Update(PselWork *wk) {
                 pos.x = move->pos[2][0];
                 pos.y = move->pos[2][1];
                 scale.x = scale.y = FX32_CONST(move->scale[2] / 16.0f);
-                func_0204c140(poke->clact[1], &pos, 1);
-                func_0204c270(poke->clact[1], &scale);
+                ClActor_SetSurfacePos(poke->clact[1], &pos, 1);
+                ClActor_SetScale(poke->clact[1], &scale);
                 if (dir < 0) {
-                    func_0204c468(poke->clact[1], 3);
+                    ClActor_SetBgPriority(poke->clact[1], 3);
                     poke->frame = move->duration[1] - 1;
                     poke->state = PSEL_POKE_JUMP_2;
                     poke->unmoved = FALSE;
                 } else if (poke->request == PSEL_POKE_REQ_FRONT) {
-                    func_0204c468(poke->clact[1], 2);
+                    ClActor_SetBgPriority(poke->clact[1], 2);
                     poke->request = PSEL_POKE_REQ_NONE;
                     if (!poke->unmoved) {
                         wk->pokeArrived = TRUE;
@@ -1024,7 +1025,7 @@ static void PselPoke_Update(PselWork *wk) {
             if (jumped[i]) {
                 y[i] = baseY[i];
             } else {
-                func_0204c178(wk->poke[i].clact[1], &pos, 1);
+                ClActor_GetSurfacePos(wk->poke[i].clact[1], &pos, 1);
                 y[i] = pos.y;
             }
         }
@@ -1048,7 +1049,7 @@ static void PselPoke_Update(PselWork *wk) {
             } else {
                 priority = 2;
             }
-            func_0204c438(wk->poke[i].clact[1], priority);
+            ClActor_SetPriority(wk->poke[i].clact[1], priority);
         }
     }
 }
@@ -1077,7 +1078,7 @@ static void PselPoke_StartFadeIn(PselWork *wk) {
     u8 i;
 
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
-        func_0204c318(wk->poke[i].clact[0], GX_OAM_MODE_XLU);
+        ClActor_SetObjMode(wk->poke[i].clact[0], GX_OAM_MODE_XLU);
     }
     wk->fadeCount = 0;
     wk->fadeState = 1;
@@ -1097,7 +1098,7 @@ static void PselPoke_UpdateFadeIn(PselWork *wk) {
     switch (wk->fadeState) {
     case 1:
         for (i = 0; i < PSEL_POKE_COUNT; i++) {
-            func_0204c124(wk->poke[i].clact[0], TRUE);
+            ClActor_SetVisible(wk->poke[i].clact[0], TRUE);
         }
         wk->fadeState = 2;
         break;
@@ -1106,7 +1107,7 @@ static void PselPoke_UpdateFadeIn(PselWork *wk) {
             wk->fadeCount++;
             if (wk->fadeCount == 16) {
                 for (i = 0; i < PSEL_POKE_COUNT; i++) {
-                    func_0204c318(wk->poke[i].clact[0], GX_OAM_MODE_NORMAL);
+                    ClActor_SetObjMode(wk->poke[i].clact[0], GX_OAM_MODE_NORMAL);
                 }
                 wk->fadeState = 3;
             }
@@ -1126,9 +1127,9 @@ static void PselCursor_Load(PselWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PSEL, wk->heapId);
     ClActorSetup setup;
 
-    wk->cursorPltt = func_0204bbb8(arc, PSEL_ARC_CURSOR_NCLR, 0, 0, 0, 1, wk->heapId);
-    wk->cursorChars = func_0204b81c(arc, PSEL_ARC_CURSOR_NCGR, FALSE, 0, wk->heapId);
-    wk->cursorCellAnim = func_0204bde0(arc, PSEL_ARC_CURSOR_NCER, PSEL_ARC_CURSOR_NANR, wk->heapId);
+    wk->cursorPltt = ClActSys_LoadPlttRange(arc, PSEL_ARC_CURSOR_NCLR, 0, 0, 0, 1, wk->heapId);
+    wk->cursorChars = ClActSys_LoadChars(arc, PSEL_ARC_CURSOR_NCGR, FALSE, 0, wk->heapId);
+    wk->cursorCellAnim = ClActSys_LoadCellAnims(arc, PSEL_ARC_CURSOR_NCER, PSEL_ARC_CURSOR_NANR, wk->heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 42;
@@ -1136,17 +1137,17 @@ static void PselCursor_Load(PselWork *wk) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 2;
-    wk->cursor = func_0204c040(PselGraphic_GetClActUnit(wk->graphic), wk->cursorChars, wk->cursorPltt,
-                               wk->cursorCellAnim, &setup, 0, wk->heapId);
+    wk->cursor = ClActor_Create(PselGraphic_GetClActUnit(wk->graphic), wk->cursorChars, wk->cursorPltt,
+                                wk->cursorCellAnim, &setup, 0, wk->heapId);
     func_0204c520(wk->cursor, TRUE);
     PselCursor_Show(wk, FALSE);
 }
 
 static void PselCursor_Unload(PselWork *wk) {
-    func_0204c108(wk->cursor);
-    func_0204be64(wk->cursorCellAnim);
-    func_0204b98c(wk->cursorChars);
-    func_0204bcd0(wk->cursorPltt);
+    ClActor_Delete(wk->cursor);
+    ClActSys_FreeCellAnims(wk->cursorCellAnim);
+    ClActSys_FreeChars(wk->cursorChars);
+    ClActSys_FreePltt(wk->cursorPltt);
 }
 
 // Puts the cursor on the picked ball, or off the screen
@@ -1158,7 +1159,7 @@ static void PselCursor_Show(PselWork *wk, BOOL show) {
 
         pos.x = 400;
         pos.y = 300;
-        func_0204c140(wk->cursor, &pos, 0);
+        ClActor_SetSurfacePos(wk->cursor, &pos, 0);
     }
 }
 
@@ -1167,7 +1168,7 @@ static void PselCursor_Move(PselWork *wk) {
 
     pos.x = sPselCursorPositions[wk->choice].x;
     pos.y = sPselCursorPositions[wk->choice].y;
-    func_0204c140(wk->cursor, &pos, 0);
+    ClActor_SetSurfacePos(wk->cursor, &pos, 0);
 }
 
 // The palette and the two characters of the black bands on BG1 and on the sub screen's BG2
@@ -1277,7 +1278,7 @@ static void PselText_Free(PselWork *wk) {
     u8 i;
 
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     if (wk->strbuf != NULL) {
         GFL_StrBufFree(wk->strbuf);
@@ -1301,7 +1302,7 @@ static BOOL PselText_Flush(PselWork *wk) {
 
     for (i = 0; i < 3; i++) {
         if (!wk->winDone[i]) {
-            if (func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->win[i]))) {
+            if (PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->win[i]))) {
                 done = FALSE;
             } else {
                 BmpWin_Transfer(wk->win[i]);
@@ -1324,7 +1325,7 @@ static void PselText_StartStream(PselWork *wk, u32 messageId) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(win), 0);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     if (wk->strbuf != NULL) {
         GFL_StrBufFree(wk->strbuf);
@@ -1340,7 +1341,8 @@ static void PselText_StartStream(PselWork *wk, u32 messageId) {
     if (winHeight > height) {
         y = (winHeight - height) / 2;
     }
-    wk->stream = func_02022268(win, x, y, wk->strbuf, wk->font, func_02017bcc(), wk->tcbMgr, 2, wk->heapId, 0);
+    wk->stream =
+        PrintStream_Create(win, x, y, wk->strbuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2, wk->heapId, 0);
     BmpWin_Transfer(win);
 }
 
@@ -1348,10 +1350,10 @@ static void PselText_StartStream(PselWork *wk, u32 messageId) {
 static BOOL PselText_UpdateStream(PselWork *wk) {
     BOOL done = FALSE;
 
-    switch (func_020223b4(wk->stream)) {
+    switch (PrintStream_GetState(wk->stream)) {
     case 0:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(wk->stream, 0);
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
+            PrintStream_SkipWait(wk->stream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                 wk->touchMode = FALSE;
             } else {
@@ -1360,8 +1362,8 @@ static BOOL PselText_UpdateStream(PselWork *wk) {
         }
         break;
     case 1:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-            func_020223bc(wk->stream);
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
+            PrintStream_Continue(wk->stream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
                 wk->touchMode = FALSE;
             } else {
@@ -1380,7 +1382,7 @@ static void PselText_ClearStream(PselWork *wk) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->win[1]), 0);
     BmpWin_Transfer(wk->win[1]);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
     }
     wk->stream = NULL;
     if (wk->strbuf != NULL) {
@@ -1416,7 +1418,7 @@ static void PselText_PrintType(PselWork *wk, s32 ball) {
     if (winHeight > height) {
         y = (winHeight - height) / 2;
     }
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(win), 0, y, str, wk->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(win), 0, y, str, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(str);
     *done = FALSE;
     PselText_Flush(wk);
@@ -1705,7 +1707,7 @@ static s32 PselSeq_Start(PselWork *wk, s32 *step) {
 static s32 PselSeq_Init(PselWork *wk, s32 *step) {
     wk->graphic = PselGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(0, 2);
     GFL_BGSysSetBGPriority(3, 3);
     GFL_BGSysSetBGPriority(1, 1);
@@ -1856,8 +1858,8 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
                     PselBGPal_SetTarget(wk, PSEL_BG_PAL_OF(wk->choice));
                     changed = TRUE;
                 }
-            } else if (func_0203da48()) {
-                s32 hit = func_0203da0c(sPselTouchRects);
+            } else if (GFL_HIDIsTouchPressed()) {
+                s32 hit = GFL_HIDGetTouchPressedRect(sPselTouchRects);
 
                 if (hit >= 0 && hit <= 2) {
                     if (wk->choice != hit) {
@@ -1877,8 +1879,8 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
             if (GCTX_HIDGetPressedKeys()) {
                 wk->touchMode = FALSE;
                 *step = 3;
-            } else if (func_0203da48()) {
-                s32 hit = func_0203da0c(sPselTouchRects);
+            } else if (GFL_HIDIsTouchPressed()) {
+                s32 hit = GFL_HIDGetTouchPressedRect(sPselTouchRects);
 
                 if (hit >= 0 && hit <= 2) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1909,8 +1911,8 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
                 GFL_BGSysQueueScrLoad(2);
                 *step = 3;
             }
-        } else if (func_0203da48()) {
-            s32 hit = func_0203da0c(sPselTouchRects);
+        } else if (GFL_HIDIsTouchPressed()) {
+            s32 hit = GFL_HIDGetTouchPressedRect(sPselTouchRects);
 
             if (hit == 3) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1948,7 +1950,7 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
         }
         break;
     case 10:
-        func_0203d564(wk->touchMode);
+        GCTX_HIDSetUsingTouch(wk->touchMode);
         PselYesNo_Create(wk);
         *step = 11;
         break;
@@ -1958,7 +1960,7 @@ static s32 PselSeq_Main(PselWork *wk, s32 *step) {
             BOOL yes = PselYesNo_IsYes(wk);
 
             PselYesNo_Free(wk);
-            wk->touchMode = func_0203d554();
+            wk->touchMode = GCTX_HIDIsUsingTouch();
             if (yes) {
                 wk->bgRequest |= PSEL_BG_REQ_MAIN_OFF;
                 PselText_ClearStream(wk);
@@ -2049,8 +2051,8 @@ static s32 PselSeq_Free(PselWork *wk, s32 *step) {
     PselBand_Free(wk);
     Psel3D_Free(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     PselGraphic_Free(wk->graphic);
     return PSEL_SEQ_END;

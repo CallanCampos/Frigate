@@ -32,8 +32,8 @@ void CommPlayerSupport_Init(CommPlayerSupport *support) {
     support->type = COMM_PLAYER_SUPPORT_NONE;
     support->usedType = COMM_PLAYER_SUPPORT_NONE;
     support->lastType = COMM_PLAYER_SUPPORT_NONE;
-    func_02008b40(&support->supporter);
-    func_02008b40(&support->usedSupporter);
+    PlayerInfo_Init(&support->supporter);
+    PlayerInfo_Init(&support->usedSupporter);
 }
 
 PlayerInfo *CommPlayerSupport_GetSupporter(CommPlayerSupport *support) {

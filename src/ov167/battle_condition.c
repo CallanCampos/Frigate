@@ -10,7 +10,7 @@ BattleCondition ZeroConditionTurns(void) {
     return condition;
 }
 
-BOOL func_ov167_021ce168(BattleCondition condition) {
+BOOL Condition_IsNull(BattleCondition condition) {
     if (condition.common.type == 0) {
         return TRUE;
     }
@@ -37,7 +37,7 @@ BattleCondition AddTurnCondition(u32 turns, u16 param) {
     return condition;
 }
 
-BattleCondition func_ov167_021ce1dc(u32 turns) {
+BattleCondition MakeConditionDependPoke(u32 turns) {
     BattleCondition condition;
 
     condition.raw = 0;
@@ -63,7 +63,7 @@ BattleCondition MakeConditionParamPermanent(u16 param) {
     return condition;
 }
 
-BattleCondition func_ov167_021ce238(u8 turns, u16 param) {
+BattleCondition MakeConditionPermanentTurnsParam(u8 turns, u16 param) {
     BattleCondition condition;
 
     condition.raw = 0;
@@ -73,7 +73,7 @@ BattleCondition func_ov167_021ce238(u8 turns, u16 param) {
     return condition;
 }
 
-BattleCondition func_ov167_021ce268(u32 monId, u8 turns) {
+BattleCondition MakeConditionDependPokeTurns(u32 monId, u8 turns) {
     BattleCondition condition;
 
     condition.raw = 0;
@@ -83,7 +83,7 @@ BattleCondition func_ov167_021ce268(u32 monId, u8 turns) {
     return condition;
 }
 
-BattleCondition func_ov167_021ce298(void) {
+BattleCondition MakeConditionBadlyPoisoned(void) {
     BattleCondition condition;
 
     condition.raw = 0;
@@ -118,7 +118,7 @@ u8 Condition_GetMonID(BattleCondition condition) {
     return 31;
 }
 
-void func_ov167_021ce308(BattleCondition *condition, u32 value) {
+void Condition_SetMonID(BattleCondition *condition, u32 value) {
     if (condition->common.type == 3) {
         condition->common.turns = value;
         return;
@@ -128,7 +128,7 @@ void func_ov167_021ce308(BattleCondition *condition, u32 value) {
     }
 }
 
-u8 func_ov167_021ce33c(BattleCondition condition) {
+u8 Condition_GetTurns(BattleCondition condition) {
     u32 type;
     u32 turns;
 
@@ -143,7 +143,7 @@ u8 func_ov167_021ce33c(BattleCondition condition) {
     return 0;
 }
 
-void func_ov167_021ce368(BattleCondition *condition, u16 value) {
+void Condition_SetParam(BattleCondition *condition, u16 value) {
     if (condition->common.type == 1) {
         condition->timed.param = value;
         return;
@@ -195,7 +195,7 @@ void SetConditionFlag(BattleCondition *condition, u32 flag) {
     }
 }
 
-u32 func_ov167_021ce464(BattleCondition condition) {
+u32 GetConditionFlag(BattleCondition condition) {
     if (condition.common.type == 1) {
         return condition.one.flag;
     }

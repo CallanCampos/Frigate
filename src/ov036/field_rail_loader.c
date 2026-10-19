@@ -171,8 +171,8 @@ RailDataHandle *FieldRailLoader_GetRailData(RailLoader *loader) {
     return &loader->data;
 }
 
-GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, u32 unused1, u32 scriptId, u32 unused3, FieldActor *actor,
-                                        HeapID heapId) {
+GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scriptId, FieldActor *player,
+                                        FieldActor *actor, HeapID heapId) {
     return EventScriptCall_Create(gsys, scriptId, actor, heapId);
 }
 
@@ -200,8 +200,8 @@ void func_ov036_0219634c(FieldActor *actor, u16 *anim, u16 *step) {
         if (work->index != BLACT_NONE) {
             BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
 
-            *anim = func_0204f700(sys, work->index);
-            *step = func_0204f724(sys, work->index);
+            *anim = BlActSys_GetActorAnim(sys, work->index);
+            *step = BlActSys_GetActorStep(sys, work->index);
             return;
         }
         *anim = 0;
@@ -219,8 +219,8 @@ void func_ov036_021963a4(FieldActor *actor, u16 anim, u16 step) {
         if (work->index != BLACT_NONE) {
             BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
 
-            func_0204f6ec(sys, work->index, anim);
-            func_0204f70c(sys, work->index, step);
+            BlActSys_SetActorAnim(sys, work->index, anim);
+            BlActSys_SetActorStep(sys, work->index, step);
         }
     }
 }
@@ -266,17 +266,17 @@ static void func_ov036_02196488(FieldActor *actor) {
     if (work->index != BLACT_NONE) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         u8 dir = func_ov036_02197404(actor);
-        u16 state = func_ov012_021670f8(actor);
+        u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
         if (work->anim.dir != dir) {
             work->anim.dir = dir;
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, dir);
+            BlActSys_SetActorAnim(sys, work->index, dir);
             changed = TRUE;
         } else if (work->anim.state != state) {
-            func_0204f6ec(sys, work->index, dir);
-            func_0204f70c(sys, work->index, changed);
+            BlActSys_SetActorAnim(sys, work->index, dir);
+            BlActSys_SetActorStep(sys, work->index, changed);
             work->anim.state = state;
         }
         func_ov036_0219743c(actor, sys, work->index, changed, FALSE);
@@ -341,7 +341,7 @@ static void func_ov036_021965cc(FieldActor *actor) {
         anim += dir;
         if (work->anim.dir != dir) {
             work->anim.dir = dir;
-            func_0204f6ec(sys, work->index, anim);
+            BlActSys_SetActorAnim(sys, work->index, anim);
             changed = TRUE;
         }
         func_ov036_0219743c(actor, sys, work->index, changed, flag);
@@ -360,7 +360,7 @@ static void func_ov036_02196680(FieldActor *actor) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         VecFx32 pos;
 
-        state = func_ov012_021670f8(actor);
+        state = FldAct_GetDrawStatus(actor);
         if (state >= 10) {
             BOOL changed = FALSE;
             u8 dir = func_ov036_02197404(actor);
@@ -370,7 +370,7 @@ static void func_ov036_02196680(FieldActor *actor) {
                 work->anim.step = 0;
                 work->anim.state = state;
                 work->anim.dir = dir;
-                func_0204f6ec(sys, work->index, state + 30);
+                BlActSys_SetActorAnim(sys, work->index, state + 30);
             }
             func_ov036_0219743c(actor, sys, work->index, changed, FALSE);
         } else {
@@ -388,7 +388,7 @@ static void func_ov036_02196728(FieldActor *actor) {
 
     if (work->index != BLACT_NONE) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
-        u16 state = func_ov012_021670f8(actor);
+        u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
         if (state >= 10) {
@@ -398,7 +398,7 @@ static void func_ov036_02196728(FieldActor *actor) {
                 work->anim.dir = dir;
                 work->anim.state = state;
                 work->anim.step = 0;
-                func_0204f6ec(sys, work->index, state + 30);
+                BlActSys_SetActorAnim(sys, work->index, state + 30);
             }
             func_ov036_0219743c(actor, sys, work->index, TRUE, FALSE);
         } else {
@@ -425,16 +425,16 @@ static void func_ov036_021967d4(FieldActor *actor) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         VecFx32 pos;
 
-        state = func_ov012_021670f8(actor);
+        state = FldAct_GetDrawStatus(actor);
         if (work->anim.state >= 2) {
             work->anim.state = 0;
-            func_0204f6ec(sys, work->index, work->anim.state);
-            func_0204f70c(sys, work->index, 0);
+            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
+            BlActSys_SetActorStep(sys, work->index, 0);
         }
         if (state < 2 && work->anim.state != state) {
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, work->anim.state);
-            func_0204f70c(sys, work->index, 0);
+            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
+            BlActSys_SetActorStep(sys, work->index, 0);
         }
         func_ov036_0219743c(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
@@ -451,16 +451,16 @@ static void func_ov036_02196870(FieldActor *actor) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         VecFx32 pos;
 
-        state = func_ov012_021670f8(actor);
+        state = FldAct_GetDrawStatus(actor);
         if (work->anim.state >= 3) {
             work->anim.state = 0;
-            func_0204f6ec(sys, work->index, work->anim.state);
-            func_0204f70c(sys, work->index, 0);
+            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
+            BlActSys_SetActorStep(sys, work->index, 0);
         }
         if (state < 3 && work->anim.state != state) {
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, work->anim.state);
-            func_0204f70c(sys, work->index, 0);
+            BlActSys_SetActorAnim(sys, work->index, work->anim.state);
+            BlActSys_SetActorStep(sys, work->index, 0);
         }
         func_ov036_0219743c(actor, sys, work->index, FALSE, FALSE);
         CopyActorPosAllAdd(actor, &pos);
@@ -504,7 +504,7 @@ static void func_ov036_02196978(FieldActor *actor) {
     if (work->index != BLACT_NONE) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         u8 dir = func_ov036_02197404(actor);
-        u16 state = func_ov012_021670f8(actor);
+        u16 state = FldAct_GetDrawStatus(actor);
         u16 anim = dir + state * 4;
         VecFx32 pos;
         VecFx32 offset;
@@ -513,13 +513,14 @@ static void func_ov036_02196978(FieldActor *actor) {
             changed = TRUE;
             work->anim.dir = dir;
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, anim);
-            func_0204f70c(sys, work->index, 0);
+            BlActSys_SetActorAnim(sys, work->index, anim);
+            BlActSys_SetActorStep(sys, work->index, 0);
         }
         func_ov036_0219743c(actor, sys, work->index, changed, TRUE);
         CopyActorPosAllAdd(actor, &pos);
         func_ov036_021973ec(actor, &pos);
-        func_ov036_0219696c(actor, func_0204f700(sys, work->index), func_0204f724(sys, work->index), &offset);
+        func_ov036_0219696c(actor, BlActSys_GetActorAnim(sys, work->index), BlActSys_GetActorStep(sys, work->index),
+                            &offset);
         pos.x += offset.x;
         pos.y += offset.y;
         pos.z += offset.z;
@@ -547,8 +548,8 @@ static void func_ov036_02196a94(FieldActor *actor) {
         VecFx32 pos;
 
         if (work->anim.dir != dir) {
-            func_0204f6ec(sys, work->index, dir);
-            func_0204f70c(sys, work->index, 0);
+            BlActSys_SetActorAnim(sys, work->index, dir);
+            BlActSys_SetActorStep(sys, work->index, 0);
             work->anim.dir = dir;
         }
         func_ov036_0219743c(actor, sys, work->index, FALSE, FALSE);
@@ -599,8 +600,8 @@ BOOL func_ov036_02196b10(FieldActor *actor, u16 time) {
         time = 12;
     }
     sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
-    if (func_0204f724(sys, work->index) != time) {
-        func_0204f70c(sys, work->index, 0);
+    if (BlActSys_GetActorStep(sys, work->index) != time) {
+        BlActSys_SetActorStep(sys, work->index, 0);
     }
     return TRUE;
 }
@@ -646,11 +647,11 @@ static void func_ov036_02196c38(FieldActor *actor) {
             work->dir = dir;
             work->frame = 0;
             work->unk8 = 0;
-            func_0204f6ec(sys, work->index, work->dir);
+            BlActSys_SetActorAnim(sys, work->index, work->dir);
             {
                 VecFx32 zero = { 0, 0, 0 };
 
-                func_ov012_0216731c(actor, &zero);
+                CopyActorWPosOffset(actor, &zero);
             }
         }
         func_ov036_02196cd4(actor, work, dir);
@@ -681,7 +682,7 @@ static void func_ov036_02196cd4(FieldActor *actor, RailNpcWork *work, u8 dir) {
     offset.y = 0;
     offset.z = 0;
     hidden = func_ov036_0218ed68(actor);
-    func_ov012_0216731c(actor, &base);
+    CopyActorWPosOffset(actor, &base);
     gx = GetGPosX(actor);
     zone = GetActorZoneID(actor);
     uid = GetActorUID(actor);
@@ -807,7 +808,7 @@ static void func_ov036_02196f10(FieldActor *actor) {
     {
         sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         u16 objCode = FldAct_GetObjCode(actor);
-        u16 state = func_ov012_021670f8(actor);
+        u16 state = FldAct_GetDrawStatus(actor);
         u8 dir = func_ov036_02197404(actor);
         u32 i;
         VecFx32 pos;
@@ -877,7 +878,7 @@ static void func_ov036_02196f10(FieldActor *actor) {
             }
             changed = TRUE;
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, anim);
+            BlActSys_SetActorAnim(sys, work->index, anim);
         }
         func_ov036_0219743c(actor, sys, work->index, changed, TRUE);
         CopyActorPosAllAdd(actor, &pos);
@@ -901,8 +902,8 @@ BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step) {
         if (work->index != BLACT_NONE) {
             BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
 
-            *anim = func_0204f700(sys, work->index);
-            *step = func_0204f724(sys, work->index);
+            *anim = BlActSys_GetActorAnim(sys, work->index);
+            *step = BlActSys_GetActorStep(sys, work->index);
             return TRUE;
         }
         return FALSE;
@@ -921,8 +922,8 @@ BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step) {
         if (work->index != BLACT_NONE) {
             BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
 
-            *anim = func_0204f700(sys, work->index);
-            *step = func_0204f724(sys, work->index);
+            *anim = BlActSys_GetActorAnim(sys, work->index);
+            *step = BlActSys_GetActorStep(sys, work->index);
             return TRUE;
         }
         return FALSE;
@@ -938,12 +939,12 @@ static void func_ov036_02197114(FieldActor *actor) {
 
     if (work->index != BLACT_NONE) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
-        u16 state = func_ov012_021670f8(actor);
+        u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
         if (state != work->anim.state && state < 2) {
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, state);
+            BlActSys_SetActorAnim(sys, work->index, state);
             changed = TRUE;
         }
         func_ov036_0219743c(actor, sys, work->index, changed, FALSE);
@@ -960,7 +961,7 @@ static void func_ov036_0219718c(FieldActor *actor) {
     if (work->index != BLACT_NONE) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
         u16 objCode = FldAct_GetObjCode(actor);
-        u16 state = func_ov012_021670f8(actor);
+        u16 state = FldAct_GetDrawStatus(actor);
         VecFx32 pos;
 
         if (state != work->anim.state) {
@@ -982,7 +983,7 @@ static void func_ov036_0219718c(FieldActor *actor) {
                 anim = 4;
             }
             work->anim.state = state;
-            func_0204f6ec(sys, work->index, anim);
+            BlActSys_SetActorAnim(sys, work->index, anim);
             changed = TRUE;
         }
         func_ov036_0219743c(actor, sys, work->index, changed, FALSE);
@@ -1004,7 +1005,7 @@ BOOL func_ov036_02197238(FieldActor *actor) {
         if (index != BLACT_NONE) {
             u16 cmd;
 
-            if (func_0204f768(FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor)), index, &cmd) == TRUE) {
+            if (BlActSys_GetActorLastCmd(FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor)), index, &cmd) == TRUE) {
                 return TRUE;
             }
         }
@@ -1019,7 +1020,7 @@ void func_ov036_02197288(FieldActor *actor) {
         u16 index = FldAct_GetBlActIdx(actor, 0);
 
         if (index != BLACT_NONE) {
-            func_0204f70c(FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor)), index, 0);
+            BlActSys_SetActorStep(FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor)), index, 0);
         }
     }
 }
@@ -1033,7 +1034,7 @@ static void func_ov036_021972e0(RailActorAnim *anim, FieldActor *actor, BlActSys
     BOOL changed = FALSE;
     u16 animId;
     u8 dir = func_ov036_02197404(actor);
-    u16 state = func_ov012_021670f8(actor);
+    u16 state = FldAct_GetDrawStatus(actor);
 
     animId = dir + state * 4;
     if (anim->pending != 0 && state == anim->state) {
@@ -1044,7 +1045,7 @@ static void func_ov036_021972e0(RailActorAnim *anim, FieldActor *actor, BlActSys
         anim->state = state;
         anim->dir = dir;
         anim->step = 0;
-        func_0204f6ec(sys, index, animId);
+        BlActSys_SetActorAnim(sys, index, animId);
     } else if (state != anim->state) {
         changed = TRUE;
         if (state == 0) {
@@ -1057,25 +1058,25 @@ static void func_ov036_021972e0(RailActorAnim *anim, FieldActor *actor, BlActSys
                 {
                     u8 steps[4] = { 0, 2, 2, 0 };
 
-                    anim->step = func_0204f724(sys, index);
+                    anim->step = BlActSys_GetActorStep(sys, index);
                     if (anim->step >= 4) {
                         anim->step = 0;
                     }
                     anim->step = steps[anim->step];
                 }
             }
-            func_0204f6ec(sys, index, animId);
+            BlActSys_SetActorAnim(sys, index, animId);
         } else {
             if (anim->state != 0) {
-                anim->step = func_0204f724(sys, index);
+                anim->step = BlActSys_GetActorStep(sys, index);
                 if (anim->step >= 2) {
                     anim->step = 0;
                 } else {
                     anim->step = 2;
                 }
             }
-            func_0204f6ec(sys, index, animId);
-            func_0204f70c(sys, index, anim->step);
+            BlActSys_SetActorAnim(sys, index, animId);
+            BlActSys_SetActorStep(sys, index, anim->step);
         }
         anim->state = state;
         anim->pending = 0;
@@ -1089,13 +1090,13 @@ static void func_ov036_021973ec(FieldActor *actor, VecFx32 *pos) {
 }
 
 static u8 func_ov036_02197404(FieldActor *actor) {
-    u16 angle = func_ov012_02166fb0(GetActorMModelSystem(actor));
+    u16 angle = FldActSys_GetCameraAngle(GetActorMModelSystem(actor));
     u16 dir = GetActorFaceDir(actor);
 
     if (CheckActorFlag(actor, 0x2000)) {
         return func_ov036_021949a4(actor, angle);
     }
-    return func_ov012_0215ed38(dir, angle);
+    return RotateDirByAngle(dir, angle);
 }
 
 static void func_ov036_0219743c(FieldActor *actor, BlActSys *sys, u16 index, BOOL changed, BOOL flag) {
@@ -1112,12 +1113,12 @@ static void func_ov036_0219743c(FieldActor *actor, BlActSys *sys, u16 index, BOO
             animate = FALSE;
         }
     }
-    func_0204f6c8(sys, index, animate);
+    BlActSys_SetActorAnimating(sys, index, animate);
     visible = TRUE;
-    if (func_ov012_02167520(actor) == 1) {
+    if (IsActorHidden(actor) == 1) {
         visible = FALSE;
     }
-    func_0204f664(sys, index, visible);
+    BlActSys_SetActorVisible(sys, index, visible);
 }
 
 static void func_ov036_0219749c(FieldActor *actor) {
@@ -1135,7 +1136,7 @@ static void func_ov036_021974b4(FieldActor *actor) {
     CopyActorPosAllAdd(actor, &pos);
     FieldG3DObjSystem_SetObjPosition(g3d, *work, &pos);
     hidden = FALSE;
-    if (func_ov012_02167520(actor) == 1) {
+    if (IsActorHidden(actor) == 1) {
         hidden = TRUE;
     }
     func_ov036_021c0154(g3d, *work, hidden);

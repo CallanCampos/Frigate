@@ -253,7 +253,7 @@ void TryClearRepeatableHiddenItemFlags(EventWork *eventWork) {
     }
 }
 
-const HiddenItem *func_ov012_0215f2c4(u16 *count) {
+const HiddenItem *GetHiddenItems(u16 *count) {
     *count = HIDDEN_ITEM_COUNT;
     return HIDDEN_ITEMS;
 }

@@ -48,6 +48,24 @@ struct EncEffGridParam {
     BOOL (*cellUpdate)(EncEffCell *cell);
 };
 
+#define ENCEFF_COUNT 38
+
+typedef GameEvent *(*EncEffCreateFunc)(GameSystem *gsys, Field *field, u32 param);
+
+// What it takes to run an effect
+typedef struct {
+    EncEffCreateFunc create;
+    void (*render)(EncEff *effect);
+    // The overlay with the effect's code, or -1 for none
+    s32 overlay;
+    u32 param;
+    // The smallest part of the heap that is free for the effect to run
+    u32 heapSize;
+} EncEffInfo;
+
+// Every encounter effect, by its ID, which EncEff_StartEvent runs
+extern const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT];
+
 void func_ov036_021c5ea0(EncEff *effect);
 // Loads overlay 148 alone, for the effects that draw the captured screen themselves
 void func_ov036_021c5ebc(EncEff *effect);
@@ -67,15 +85,15 @@ GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param
 void EncEffGrid_ClearAndDraw(EncEff *effect);
 void EncEffGrid_Draw(EncEffGrid *grid);
 
-GameEvent *func_ov152_021f6200(GameSystem *gsys, Field *field);
-GameEvent *func_ov152_021f623c(GameSystem *gsys);
-void func_ov152_021f6264(EncEffGrid *grid);
-BOOL func_ov152_021f62a4(EncEffCell *cell);
+GameEvent *EncEffCells_Create(GameSystem *gsys, Field *field);
+GameEvent *EncEffCells_CreateGridEvent(GameSystem *gsys);
+void EncEffCells_Update(EncEffGrid *grid);
+BOOL EncEffCells_UpdateCell(EncEffCell *cell);
 
-GameEvent *func_ov153_021f6200(GameSystem *gsys, Field *field);
-GameEvent *func_ov153_021f623c(GameSystem *gsys);
-void func_ov153_021f6268(EncEffGrid *grid);
-BOOL func_ov153_021f62c4(EncEffCell *cell);
+GameEvent *EncEffColumns_Create(GameSystem *gsys, Field *field);
+GameEvent *EncEffColumns_CreateGridEvent(GameSystem *gsys);
+void EncEffColumns_Update(EncEffGrid *grid);
+BOOL EncEffColumns_UpdateCell(EncEffCell *cell);
 EncEff *EncEff_Create(HeapID heapId, Field *field);
 void EncEff_Free(EncEff *encEff);
 

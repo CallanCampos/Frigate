@@ -72,23 +72,23 @@ typedef struct {
     u32 unk34;
 } TrainerCardSysWork;
 
-static BOOL func_ov012_02169274(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_021692a4(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_0216936c(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_021691c0(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_02169324(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL TrainerCardSys_InitView(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL TrainerCardSys_Main(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL TrainerCardSys_ExitView(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL TrainerCardSys_Init(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL TrainerCardSys_Exit(GameProc *proc, u32 *state, void *param, void *work);
 
 // The order of the declarations gives the order of the tables, which MWCC sorts by size
 const GameProcFunctions data_ov012_0216dd78 = {
-    func_ov012_021691c0,
-    func_ov012_021692a4,
-    func_ov012_02169324,
+    TrainerCardSys_Init,
+    TrainerCardSys_Main,
+    TrainerCardSys_Exit,
 };
 
 const GameProcFunctions data_ov012_0216dd6c = {
-    func_ov012_02169274,
-    func_ov012_021692a4,
-    func_ov012_0216936c,
+    TrainerCardSys_InitView,
+    TrainerCardSys_Main,
+    TrainerCardSys_ExitView,
 };
 
 static const GameProcFunctions data_ov012_0216dd60 = {
@@ -110,19 +110,19 @@ static const u16 data_ov012_0216dd84[9][7] = {
     { 0x72, 0x74 },
 };
 
-static u32 func_ov012_02169388(TrainerCardSysWork *wk, TrainerCardParam *param);
-static u32 func_ov012_021693b4(TrainerCardSysWork *wk);
-static u32 func_ov012_021693e0(TrainerCardSysWork *wk);
-static u32 func_ov012_02169414(TrainerCardSysWork *wk);
-static u32 func_ov012_02169450(TrainerCardSysWork *wk);
-static u32 func_ov012_021694ac(TrainerCardSysWork *wk);
-static u32 func_ov012_021694e4(TrainerCardSysWork *wk);
-static u32 func_ov012_02169668(TrainerCardSysWork *wk);
-static u32 func_ov012_0216970c(TrainerCardSysWork *wk);
-static u32 func_ov012_02169738(GameRecords *records, u32 row, u32 max);
+static u32 TrainerCardSys_SeqStart(TrainerCardSysWork *wk, TrainerCardParam *param);
+static u32 TrainerCardSys_SeqCard(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqCardWait(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqGreeting(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqGreetingWait(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqOther(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqOtherWait(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqMedal(TrainerCardSysWork *wk);
+static u32 TrainerCardSys_SeqMedalWait(TrainerCardSysWork *wk);
+static u32 TrainerCardData_SumRecords(GameRecords *records, u32 row, u32 max);
 
 // Runs the screen's proc manager, and frees it when the screen has ended
-static BOOL func_ov012_0216919c(GameProcManager **procMgr) {
+static BOOL TrainerCardSys_UpdateProcMgr(GameProcManager **procMgr) {
     if (*procMgr != NULL && GFL_ProcMgrUpdate(*procMgr) == FALSE) {
         FreeGameProcManager(*procMgr);
         *procMgr = NULL;
@@ -131,7 +131,7 @@ static BOOL func_ov012_0216919c(GameProcManager **procMgr) {
     return FALSE;
 }
 
-static BOOL func_ov012_021691c0(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL TrainerCardSys_Init(GameProc *proc, u32 *state, void *param, void *work) {
     TrainerCardParam *cardParam = param;
     TrainerCardSysWork *wk;
 
@@ -143,13 +143,13 @@ static BOOL func_ov012_021691c0(GameProc *proc, u32 *state, void *param, void *w
     *wk->param = *cardParam;
     wk->param->data = GFL_HeapAllocate(wk->heapId, sizeof(TrainerCardData), TRUE, "trcard_sys.c", 180);
     wk->param->shownData = wk->param->data;
-    func_ov012_02169770(wk->param->shownData, cardParam->gameData, FALSE, wk->param->canEdit, wk->heapId);
-    func_ov012_02169508(wk->param->data, cardParam->gameData, wk->heapId);
+    TrainerCardData_Fill(wk->param->shownData, cardParam->gameData, FALSE, wk->param->canEdit, wk->heapId);
+    TrainerCardData_FillExtras(wk->param->data, cardParam->gameData, wk->heapId);
     wk->unk34 = wk->param->shownData->unk06;
     return TRUE;
 }
 
-static BOOL func_ov012_02169274(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL TrainerCardSys_InitView(GameProc *proc, u32 *state, void *param, void *work) {
     TrainerCardSysWork *wk;
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TRAINER_CARD, 0x29000);
@@ -160,34 +160,34 @@ static BOOL func_ov012_02169274(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov012_021692a4(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL TrainerCardSys_Main(GameProc *proc, u32 *state, void *param, void *work) {
     switch (*state) {
     case TRCARD_SEQ_START:
-        *state = func_ov012_02169388(work, param);
+        *state = TrainerCardSys_SeqStart(work, param);
         break;
     case TRCARD_SEQ_CARD:
-        *state = func_ov012_021693b4(work);
+        *state = TrainerCardSys_SeqCard(work);
         break;
     case TRCARD_SEQ_CARD_WAIT:
-        *state = func_ov012_021693e0(work);
+        *state = TrainerCardSys_SeqCardWait(work);
         break;
     case TRCARD_SEQ_GREETING:
-        *state = func_ov012_02169414(work);
+        *state = TrainerCardSys_SeqGreeting(work);
         break;
     case TRCARD_SEQ_GREETING_WAIT:
-        *state = func_ov012_02169450(work);
+        *state = TrainerCardSys_SeqGreetingWait(work);
         break;
     case TRCARD_SEQ_OTHER:
-        *state = func_ov012_021694ac(work);
+        *state = TrainerCardSys_SeqOther(work);
         break;
     case TRCARD_SEQ_OTHER_WAIT:
-        *state = func_ov012_021694e4(work);
+        *state = TrainerCardSys_SeqOtherWait(work);
         break;
     case TRCARD_SEQ_MEDAL:
-        *state = func_ov012_02169668(work);
+        *state = TrainerCardSys_SeqMedal(work);
         break;
     case TRCARD_SEQ_MEDAL_WAIT:
-        *state = func_ov012_0216970c(work);
+        *state = TrainerCardSys_SeqMedalWait(work);
         break;
     case TRCARD_SEQ_END:
     default:
@@ -196,7 +196,7 @@ static BOOL func_ov012_021692a4(GameProc *proc, u32 *state, void *param, void *w
     return FALSE;
 }
 
-static BOOL func_ov012_02169324(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL TrainerCardSys_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     TrainerCardParam *cardParam = param;
     TrainerCardSysWork *wk = work;
 
@@ -215,7 +215,7 @@ static BOOL func_ov012_02169324(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov012_0216936c(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL TrainerCardSys_ExitView(GameProc *proc, u32 *state, void *param, void *work) {
     TrainerCardSysWork *wk = work;
 
     GFL_HeapFree(wk->param);
@@ -224,7 +224,7 @@ static BOOL func_ov012_0216936c(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static u32 func_ov012_02169388(TrainerCardSysWork *wk, TrainerCardParam *param) {
+static u32 TrainerCardSys_SeqStart(TrainerCardSysWork *wk, TrainerCardParam *param) {
     switch (param->appParam) {
     case 0:
         break;
@@ -238,7 +238,7 @@ static u32 func_ov012_02169388(TrainerCardSysWork *wk, TrainerCardParam *param) 
     return TRCARD_SEQ_CARD;
 }
 
-static u32 func_ov012_021693b4(TrainerCardSysWork *wk) {
+static u32 TrainerCardSys_SeqCard(TrainerCardSysWork *wk) {
     if (wk->procMgr == NULL) {
         wk->procMgr = CreateGameProcManager(wk->heapId);
     }
@@ -246,8 +246,8 @@ static u32 func_ov012_021693b4(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_CARD_WAIT;
 }
 
-static u32 func_ov012_021693e0(TrainerCardSysWork *wk) {
-    if (!func_ov012_0216919c(&wk->procMgr)) {
+static u32 TrainerCardSys_SeqCardWait(TrainerCardSysWork *wk) {
+    if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_CARD_WAIT;
     }
     if (wk->param->next == 1) {
@@ -262,7 +262,7 @@ static u32 func_ov012_021693e0(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_END;
 }
 
-static u32 func_ov012_02169414(TrainerCardSysWork *wk) {
+static u32 TrainerCardSys_SeqGreeting(TrainerCardSysWork *wk) {
     if (wk->procMgr == NULL) {
         wk->procMgr = CreateGameProcManager(wk->heapId);
     }
@@ -271,10 +271,10 @@ static u32 func_ov012_02169414(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_GREETING_WAIT;
 }
 
-static u32 func_ov012_02169450(TrainerCardSysWork *wk) {
+static u32 TrainerCardSys_SeqGreetingWait(TrainerCardSysWork *wk) {
     void *cgear;
 
-    if (!func_ov012_0216919c(&wk->procMgr)) {
+    if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_GREETING_WAIT;
     }
     if (wk->greeting.result != NULL) {
@@ -286,7 +286,7 @@ static u32 func_ov012_02169450(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_CARD;
 }
 
-static u32 func_ov012_021694ac(TrainerCardSysWork *wk) {
+static u32 TrainerCardSys_SeqOther(TrainerCardSysWork *wk) {
     if (wk->procMgr == NULL) {
         wk->procMgr = CreateGameProcManager(wk->heapId);
     }
@@ -295,8 +295,8 @@ static u32 func_ov012_021694ac(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_OTHER_WAIT;
 }
 
-static u32 func_ov012_021694e4(TrainerCardSysWork *wk) {
-    if (!func_ov012_0216919c(&wk->procMgr)) {
+static u32 TrainerCardSys_SeqOtherWait(TrainerCardSysWork *wk) {
+    if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_OTHER_WAIT;
     }
     if (wk->param->next == 3) {
@@ -305,7 +305,7 @@ static u32 func_ov012_021694e4(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_END;
 }
 
-void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapId) {
+void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapID heapId) {
     SaveControl *save;
     MedalBox *box;
     void *wbt;
@@ -321,10 +321,10 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
 
     save = GameData_GetSaveControl(gameData);
     box = SaveControl_GetMedalBox(save);
-    wbt = func_0200fea0(save);
+    wbt = TrialHouseSave_GetWbtSave(save);
     avenue = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(save));
     records = getTrainerCardInfoBlkAddress(save);
-    unk = func_02010dec(save);
+    unk = FestRecords_GetFromSave(save);
     data->lastMedal = MedalBox_GetLastMedal(box);
     data->medalCount = MedalBox_GetObtainedCount(box, 0);
     data->medalRank = MedalBox_GetRank(box);
@@ -335,7 +335,7 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
         data->medalDay = day;
     }
     for (i = 0; i < 29; i++) {
-        wins += func_0200feac(wbt, i);
+        wins += WbtSave_GetCount(wbt, i);
     }
     if (wins > 9999) {
         wins = 9999;
@@ -344,7 +344,7 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
     data->unk688 = RecordGet(records, 0x83);
     JoinAvenue_GetParam(avenue, 0, data->avenueName);
     data->unk68A = RecordGet(records, 0x7f);
-    data->unk684 = func_02010e50(unk);
+    data->unk684 = FestRecords_GetCompleted(unk);
     eventWork = GameData_GetEventWork(gameData);
     if (data->pwtWins != 0) {
         data->unk690_2 = TRUE;
@@ -361,7 +361,7 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
     }
 }
 
-static u32 func_ov012_02169668(TrainerCardSysWork *wk) {
+static u32 TrainerCardSys_SeqMedal(TrainerCardSysWork *wk) {
     // Read but unused
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(wk->param->gameData));
 
@@ -382,8 +382,8 @@ static u32 func_ov012_02169668(TrainerCardSysWork *wk) {
     return TRCARD_SEQ_MEDAL_WAIT;
 }
 
-static u32 func_ov012_0216970c(TrainerCardSysWork *wk) {
-    if (!func_ov012_0216919c(&wk->procMgr)) {
+static u32 TrainerCardSys_SeqMedalWait(TrainerCardSysWork *wk) {
+    if (!TrainerCardSys_UpdateProcMgr(&wk->procMgr)) {
         return TRCARD_SEQ_MEDAL_WAIT;
     }
     GFL_StrBufFree(wk->medal.name);
@@ -395,7 +395,7 @@ static u32 func_ov012_0216970c(TrainerCardSysWork *wk) {
 }
 
 // Adds up a row of the records, up to max
-static u32 func_ov012_02169738(GameRecords *records, u32 row, u32 max) {
+static u32 TrainerCardData_SumRecords(GameRecords *records, u32 row, u32 max) {
     u32 sum = 0;
     int i;
 
@@ -411,7 +411,7 @@ static u32 func_ov012_02169738(GameRecords *records, u32 row, u32 max) {
     return sum;
 }
 
-void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnapshot, BOOL canEdit, HeapID heapId) {
+void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnapshot, BOOL canEdit, HeapID heapId) {
     RTCDate date;
     RTCTime time;
     u8 passPowerFlags[2];
@@ -428,7 +428,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     u8 i;
     u8 bit;
 
-    if (!func_02008b5c(playerInfo)) {
+    if (!PlayerInfo_IsNameEmpty(playerInfo)) {
         MIi_CpuCopy16(GetPlayerName(playerInfo), data->name, sizeof(data->name));
     } else {
         data->name[0] = 'N';
@@ -439,7 +439,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         data->name[5] = 'e';
         data->name[6] = GFL_StrBufGetTerminator();
     }
-    data->stars = func_ov012_02169b78(gameData);
+    data->stars = TrainerCard_CountStars(gameData);
     data->gender = getTrainerGender(playerInfo);
     data->trainerId = getIDAsUInt(playerInfo);
     data->money = getCash(card);
@@ -455,17 +455,17 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         }
     }
     if (isSnapshot == TRUE) {
-        PlayTime *playTime = (PlayTime *)func_02017a40(gameData);
+        PlayTime *playTime = (PlayTime *)GameData_GetPlayTime(gameData);
 
         data->unk06 = func_02008bf4(playerInfo);
         data->isOwn = FALSE;
         data->playTime = NULL;
-        data->playHours = func_02008cec(playTime);
-        data->playMinutes = func_02008cf0(playTime);
+        data->playHours = PlayTime_GetHours(playTime);
+        data->playMinutes = PlayTime_GetMinutes(playTime);
     } else {
         data->unk06 = func_02008bf4(playerInfo);
         data->isOwn = TRUE;
-        data->playTime = (PlayTime *)func_02017a40(gameData);
+        data->playTime = (PlayTime *)GameData_GetPlayTime(gameData);
     }
     data->unk48 = func_020091e8(timeSig);
     data->unk04_4 = func_02009204(timeSig);
@@ -488,25 +488,26 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         data->clearHour = time.hour;
         data->clearMinute = time.minute;
     }
-    data->unk38 = func_ov012_02169738(records, 0, 999999999);
-    data->unk3C = func_ov012_02169738(records, 1, 999999999);
-    data->unk40 = func_ov012_02169738(records, 2, 999999999);
-    data->unk44 = func_ov012_02169738(records, 3, 999999999);
-    data->unk4C = func_ov012_02169738(records, 4, 999999999);
-    data->unk50 = func_ov012_02169738(records, 5, 999999999);
-    data->unk54 = func_ov012_02169738(records, 6, 999999999);
+    data->unk38 = TrainerCardData_SumRecords(records, 0, 999999999);
+    data->unk3C = TrainerCardData_SumRecords(records, 1, 999999999);
+    data->unk40 = TrainerCardData_SumRecords(records, 2, 999999999);
+    data->unk44 = TrainerCardData_SumRecords(records, 3, 999999999);
+    data->unk4C = TrainerCardData_SumRecords(records, 4, 999999999);
+    data->unk50 = TrainerCardData_SumRecords(records, 5, 999999999);
+    data->unk54 = TrainerCardData_SumRecords(records, 6, 999999999);
     data->unk58 = func_0200c924(card);
-    data->unk5C = func_ov012_02169738(records, 7, 9999);
+    data->unk5C = TrainerCardData_SumRecords(records, 7, 9999);
     highLink = getHighLinkBlockAddress(save);
     passPowerData = PassPowerData_Create(heapId);
-    func_0200c6d8(highLink, passPowerFlags, 2);
-    data->passPowerCount = GetUnlockedPassPowerCount(passPowerData, func_02017208(gameData), passPowerFlags);
+    HighLinkSave_GetSpecialFlags(highLink, passPowerFlags, 2);
+    data->passPowerCount =
+        GetUnlockedPassPowerCount(passPowerData, GameData_GetMyPassPowerLevels(gameData), passPowerFlags);
     PassPowerData_Free(passPowerData);
-    data->unk60 = func_ov012_02169738(records, 8, 9999);
+    data->unk60 = TrainerCardData_SumRecords(records, 8, 9999);
     data->palParkHighScore = TrainerGameInfo_GetPalParkHighScore(card);
-    data->unk64 = func_02009650(records);
-    data->battleTestRank = func_02009628(records);
-    data->unk68_0 = func_020098c0(func_02009924(gameData));
+    data->unk64 = RecordGetTrialHousePoints(records);
+    data->battleTestRank = RecordGetTrialHouseRank(records);
+    data->unk68_0 = CGearSettings_IsOn(CGearSettings_GetFromGameData(gameData));
     if (data->unk60 != 0) {
         data->unk68_2 = TRUE;
     }
@@ -522,12 +523,12 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         data->unk04_2 = FALSE;
     }
     data->seenCount = countSeenDexPokes(pokedex, heapId);
-    data->unk04_3 = func_020091ac(timeSig);
+    data->unk04_3 = TimeSigSave_HasSignature(timeSig);
     MI_CpuCopy8(func_020091a8(timeSig), data->unk74, sizeof(data->unk74));
     data->canEdit = canEdit;
 }
 
-void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit) {
+void *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOOL canEdit) {
     TrainerCardParam *param = GFL_HeapAllocate(heapId, sizeof(TrainerCardParam), TRUE, "trcard_sys.c", 975);
 
     MI_CpuFill8(param, 0, sizeof(TrainerCardParam));
@@ -538,7 +539,7 @@ void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit) {
     return param;
 }
 
-TrainerCardParam *func_ov012_02169b3c(GameData *gameData, TrainerCardData *data, HeapID heapId) {
+TrainerCardParam *TrainerCardParam_CreateView(GameData *gameData, TrainerCardData *data, HeapID heapId) {
     TrainerCardParam *param = GFL_HeapAllocate(heapId, sizeof(TrainerCardParam), TRUE, "trcard_sys.c", 1000);
 
     param->data = data;
@@ -551,15 +552,15 @@ TrainerCardParam *func_ov012_02169b3c(GameData *gameData, TrainerCardData *data,
 }
 
 // The stars on the card
-u32 func_ov012_02169b78(GameData *gameData) {
+u32 TrainerCard_CountStars(GameData *gameData) {
     u32 stars = 0;
     SaveControl *save = GameData_GetSaveControl(gameData);
     // Read but unused
-    BSubwayScoreData *bsubway = func_0201795c(gameData);
+    BSubwayScoreData *bsubway = GameData_GetBSubwayScoreData(gameData);
     MusicalSave *musical = getMusicalInfoBlkAddress(gameData);
-    void *levels = func_02017208(gameData);
-    PokewoodSave *pokewood = func_02011040(gameData);
-    void *wbt = func_0200fea0(save);
+    void *levels = GameData_GetMyPassPowerLevels(gameData);
+    PokewoodSave *pokewood = PokewoodSave_Get(gameData);
+    void *wbt = TrialHouseSave_GetWbtSave(save);
 
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), 0x960)) {
         stars++;
@@ -567,22 +568,22 @@ u32 func_ov012_02169b78(GameData *gameData) {
     if (PokeDex_IsCompleteNational(GameData_GetPokedex(gameData))) {
         stars++;
     }
-    if (func_0200c5dc(levels) >= 30 && func_0200c5e0(levels) >= 30) {
+    if (PassPowerLevel_GetWhite(levels) >= 30 && PassPowerLevel_GetBlack(levels) >= 30) {
         stars++;
     }
-    if (func_0200feac(wbt, 17) != 0) {
+    if (WbtSave_GetCount(wbt, 17) != 0) {
         stars++;
     }
-    if ((int)func_020112d8(pokewood, 0) >= POKEWOOD_MOVIE_COUNT) {
+    if ((int)PokewoodSave_CountFlags(pokewood, 0) >= POKEWOOD_MOVIE_COUNT) {
         stars++;
     }
     return stars;
 }
 
-u16 func_ov012_02169c04(TrainerCardData *data) {
+u16 TrainerCardData_GetMedalCount(TrainerCardData *data) {
     return data->medalCount;
 }
 
-u8 func_ov012_02169c10(TrainerCardData *data) {
+u8 TrainerCardData_GetMedalRank(TrainerCardData *data) {
     return data->medalRank;
 }

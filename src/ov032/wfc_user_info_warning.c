@@ -74,11 +74,11 @@ void WFCUserInfoWarning_Show(void) {
     WFCUserInfoWarning_Init(isRunningOnDSi() ? MSG_USER_INFO_ERASED_DSI : MSG_USER_INFO_ERASED);
     // Wait for the keys to be released, then pressed
     while (ReadKeys() & CLOSE_KEYS) {
-        func_02005430();
+        Machine_ProcessExitRequest();
         GCTX_HIDUpdate();
     }
     while (!(ReadKeys() & CLOSE_KEYS)) {
-        func_02005430();
+        Machine_ProcessExitRequest();
         GCTX_HIDUpdate();
     }
     WFCUserInfoWarning_Exit();

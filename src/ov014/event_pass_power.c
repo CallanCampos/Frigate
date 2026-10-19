@@ -22,10 +22,10 @@ struct EventPassPower {
     void *exitArgument;
 };
 
-void func_ov014_0216e660(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item);
-GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data);
+void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item);
+GameEventReturnCode EventPassPower_Callback(GameEvent *event, u32 *state, void *data);
 
-void func_ov014_0216e660(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item) {
+void EventPassPower_SetupParam(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     BagSave *bag;
     HighLinkSave *highLink;
@@ -69,7 +69,7 @@ void func_ov014_0216e660(PassPowerParam *param, u32 argument, GameSystem *gsys, 
     }
 }
 
-GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventPassPower_Callback(GameEvent *event, u32 *state, void *data) {
     EventPassPower *work = data;
     GameSystem *gsys = work->gsys;
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -88,7 +88,7 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
         GameEvent_ChainNext(event, EventBGMPlayPushEx_Create(gsys, 0x483, 6, 0));
         (*state)++;
     case 3:
-        func_ov014_0216e660(&work->param, work->paramArgument, gsys, gameData, 0x8004);
+        EventPassPower_SetupParam(&work->param, work->paramArgument, gsys, gameData, 0x8004);
         GSYS_QueueProc(gsys, OVERLAY_PASS_POWER_APP, &GPOWER_APP_PROC_FUNCTIONS, &work->param);
         (*state)++;
         break;
@@ -142,9 +142,9 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov014_0216e8ac(GameSystem *gsys, const u32 *args) {
+GameEvent *EventPassPower_Create(GameSystem *gsys, const u32 *args) {
     u32 argument = args[0];
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov014_0216e73c, sizeof(EventPassPower));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventPassPower_Callback, sizeof(EventPassPower));
     EventPassPower *work = GameEvent_GetData(event);
 
     work->gameData = GSYS_GetGameData(gsys);

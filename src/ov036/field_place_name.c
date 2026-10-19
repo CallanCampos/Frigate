@@ -2,6 +2,7 @@
 #include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "field/place_name_letter.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
@@ -259,7 +260,7 @@ void func_ov036_021b5064(PlaceName *wk) {
         _endColorBlending(wk);
         break;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
 }
 
 void func_ov036_021b50c8(PlaceName *wk, s32 zoneId) {
@@ -390,12 +391,12 @@ void func_ov036_021b52fc(PlaceName *wk) {
 }
 
 void func_ov036_021b5318(PlaceName *wk) {
-    wk->renderer = func_0204be9c(&sPlaceNameSurfaceSetup, 1, wk->heapId);
+    wk->renderer = ClActRenderer_Create(&sPlaceNameSurfaceSetup, 1, wk->heapId);
 }
 
 void func_ov036_021b5330(PlaceName *wk) {
     if (wk->renderer != NULL) {
-        func_0204becc(wk->renderer);
+        ClActRenderer_Delete(wk->renderer);
         wk->renderer = NULL;
     }
 }
@@ -403,33 +404,33 @@ void func_ov036_021b5330(PlaceName *wk) {
 void func_ov036_021b5344(PlaceName *wk) {
     HeapID heapId = FieldPlaceName_GetHeapID(wk);
     ArcTool *arc = FieldPlaceName_GetArc(wk);
-    wk->palettes[0] = func_0204bbb8(arc, 10, 0, 0x20, 0, 1, heapId);
-    wk->palettes[1] = func_0204bbb8(arc, 9, 0, 0x80, 0, 1, heapId);
-    wk->chars = func_0204b81c(arc, 8, 0, 0, heapId);
-    wk->cellAnims = func_0204bde0(arc, 7, 6, heapId);
+    wk->palettes[0] = ClActSys_LoadPlttRange(arc, 10, 0, 0x20, 0, 1, heapId);
+    wk->palettes[1] = ClActSys_LoadPlttRange(arc, 9, 0, 0x80, 0, 1, heapId);
+    wk->chars = ClActSys_LoadChars(arc, 8, 0, 0, heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 7, 6, heapId);
 }
 
 void func_ov036_021b53a8(PlaceName *wk) {
     int i;
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
     for (i = 0; i < 2; i++) {
-        func_0204bcd0(wk->palettes[i]);
+        ClActSys_FreePltt(wk->palettes[i]);
     }
 }
 
 void func_ov036_021b53cc(PlaceName *wk) {
-    wk->clactUnit = func_0204bf1c(0x20, 1, FieldPlaceName_GetHeapID(wk));
-    func_0204bfd4(wk->clactUnit, TRUE);
+    wk->clactUnit = ClActUnit_Create(0x20, 1, FieldPlaceName_GetHeapID(wk));
+    ClActUnit_SetActive(wk->clactUnit, TRUE);
 }
 
 void func_ov036_021b53e8(PlaceName *wk) {
-    func_0204bf98(wk->clactUnit);
+    ClActUnit_Delete(wk->clactUnit);
 }
 
 void func_ov036_021b53f4(PlaceName *wk, u32 index) {
     if (wk->renderer != NULL) {
-        func_0204c018((&wk->clactUnit)[index], wk->renderer);
+        ClActUnit_SetRenderer((&wk->clactUnit)[index], wk->renderer);
     }
 }
 
@@ -797,8 +798,8 @@ void func_ov036_021b5a0c(PlaceName *wk) {
 }
 
 void func_ov036_021b5a14(PlaceName *wk) {
-    wk->printQueue = func_02021998(FieldPlaceName_GetHeapID(wk));
-    func_02021a20(wk->printQueue, TRUE);
+    wk->printQueue = PrintQueue_CreateDefault(FieldPlaceName_GetHeapID(wk));
+    PrintQueue_SetQueueAlways(wk->printQueue, TRUE);
 }
 
 void func_ov036_021b5a2c(PlaceName *wk) {
@@ -811,7 +812,7 @@ void func_ov036_021b5a44(PlaceName *wk) {
 
 void func_ov036_021b5a58(PlaceName *wk) {
     if (wk->printQueue != NULL) {
-        func_02021a18(wk->printQueue);
+        PrintQueue_Free(wk->printQueue);
         wk->printQueue = NULL;
     }
 }

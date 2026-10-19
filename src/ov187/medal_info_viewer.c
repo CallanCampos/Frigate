@@ -228,7 +228,7 @@ MedalInfoViewer *MedalInfoViewer_Create(MedalInfoViewerParam *param) {
     MedalInfoViewer_Init(viewer, param);
     MedalInfoViewer_GraphicInit(viewer);
     MedalInfoViewer_PrintQueueInit(viewer);
-    func_02042ba8(TRUE, viewer->heapId);
+    GFL_NetSetIconScreen(TRUE, viewer->heapId);
     if (viewer->hasMedal == TRUE) {
         MedalInfoViewer_PrintMedal(viewer);
     } else {
@@ -263,8 +263,8 @@ BOOL MedalInfoViewer_Main(MedalInfoViewer *viewer) {
         MedalInfoViewer_ChangeEntry(viewer);
         break;
     case MEDAL_INFO_STATE_WAIT_BUTTON:
-        if (func_0204c560(viewer->actors[MEDAL_INFO_ACTOR_BACK]) &&
-            func_0204c560(viewer->actors[MEDAL_INFO_ACTOR_EXIT])) {
+        if (ClActor_IsAnimActive(viewer->actors[MEDAL_INFO_ACTOR_BACK]) &&
+            ClActor_IsAnimActive(viewer->actors[MEDAL_INFO_ACTOR_EXIT])) {
             break;
         }
         GFL_FadeSet(3, 0, 16, 0);
@@ -281,12 +281,12 @@ BOOL MedalInfoViewer_Main(MedalInfoViewer *viewer) {
         break;
     }
     viewer->printing = FALSE;
-    func_02021a3c(viewer->printQueue);
+    PrintQueue_Main(viewer->printQueue);
     PrintWindow_Flush(&viewer->printWindow, viewer->printQueue);
     if (PrintWindow_IsPrinted(&viewer->printWindow) == FALSE) {
         viewer->printing = TRUE;
     }
-    func_0204b794();
+    ClActSys_Draw();
     return done;
 }
 
@@ -315,37 +315,37 @@ static void MedalInfoViewer_HandleInput(MedalInfoViewer *viewer) {
     } else if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_BACK_OR_FIELD) {
         if (keys & PAD_BUTTON_X) {
             MedalInfoViewer_ExitToField(viewer);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return;
         }
     }
     if (keys & PAD_BUTTON_B) {
         MedalInfoViewer_Back(viewer);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return;
     }
-    touch = func_0203da0c(sMedalInfoTouchRects);
+    touch = GFL_HIDGetTouchPressedRect(sMedalInfoTouchRects);
     if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_BACK_OR_FIELD) {
         switch (touch) {
         case MEDAL_INFO_TOUCH_BACK:
             MedalInfoViewer_Back(viewer);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             break;
         case MEDAL_INFO_TOUCH_FIELD:
             MedalInfoViewer_ExitToField(viewer);
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             break;
         }
     } else if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_BACK) {
         if (touch == MEDAL_INFO_TOUCH_BACK) {
             MedalInfoViewer_Back(viewer);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
     } else if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_LIST) {
         switch (touch) {
         case MEDAL_INFO_TOUCH_BACK:
             MedalInfoViewer_Back(viewer);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             break;
         case MEDAL_INFO_TOUCH_PREV:
             MedalInfoViewer_Prev(viewer);
@@ -358,7 +358,7 @@ static void MedalInfoViewer_HandleInput(MedalInfoViewer *viewer) {
 }
 
 static void MedalInfoViewer_ExitToField(MedalInfoViewer *viewer) {
-    func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_EXIT], MEDAL_INFO_SEQ_EXIT_PRESSED);
+    ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_EXIT], MEDAL_INFO_SEQ_EXIT_PRESSED);
     func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
     MedalInfoViewer_SetState(viewer, MEDAL_INFO_STATE_WAIT_BUTTON);
     GFL_SndSEPlay(SEQ_SE_CLOSE1);
@@ -366,7 +366,7 @@ static void MedalInfoViewer_ExitToField(MedalInfoViewer *viewer) {
 }
 
 static void MedalInfoViewer_Back(MedalInfoViewer *viewer) {
-    func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_BACK], MEDAL_INFO_SEQ_BACK_PRESSED);
+    ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_BACK], MEDAL_INFO_SEQ_BACK_PRESSED);
     func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_BACK], TRUE);
     MedalInfoViewer_SetState(viewer, MEDAL_INFO_STATE_WAIT_BUTTON);
     GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -375,10 +375,10 @@ static void MedalInfoViewer_Back(MedalInfoViewer *viewer) {
 
 static void MedalInfoViewer_Prev(MedalInfoViewer *viewer) {
     if (viewer->index > 0 && viewer->param->count > 1) {
-        func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_PRESSED);
-        func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
+        ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_PRESSED);
+        ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
         func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_PREV], TRUE);
-        func_0204c4d4(viewer->actors[MEDAL_INFO_ACTOR_PREV], 0);
+        ClActor_SetAnimTime(viewer->actors[MEDAL_INFO_ACTOR_PREV], 0);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         MedalInfoViewer_ShowPrev(viewer);
     }
@@ -386,10 +386,10 @@ static void MedalInfoViewer_Prev(MedalInfoViewer *viewer) {
 
 static void MedalInfoViewer_Next(MedalInfoViewer *viewer) {
     if (viewer->param->count > viewer->index + 1) {
-        func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_PRESSED);
-        func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
+        ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_PRESSED);
+        ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
         func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_NEXT], TRUE);
-        func_0204c4d4(viewer->actors[MEDAL_INFO_ACTOR_NEXT], 0);
+        ClActor_SetAnimTime(viewer->actors[MEDAL_INFO_ACTOR_NEXT], 0);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         MedalInfoViewer_ShowNext(viewer);
     }
@@ -419,19 +419,19 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
 
     switch (viewer->subState) {
     case 0:
-        if (func_0204c560(viewer->actors[MEDAL_INFO_ACTOR_PREV]) &&
-            func_0204c560(viewer->actors[MEDAL_INFO_ACTOR_NEXT])) {
+        if (ClActor_IsAnimActive(viewer->actors[MEDAL_INFO_ACTOR_PREV]) &&
+            ClActor_IsAnimActive(viewer->actors[MEDAL_INFO_ACTOR_NEXT])) {
             return;
         }
         if (viewer->index <= 0) {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
         } else {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV);
         }
         if (viewer->param->count == viewer->index + 1) {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
         } else {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT);
         }
         GFL_BitmapFill(BmpWin_GetBitmap(viewer->window), 0);
         viewer->subState++;
@@ -445,12 +445,12 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
         arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_MEDAL_DATA, viewer->heapId);
         if (viewer->hasMedal == TRUE) {
             GFL_ArcToolRead(arc, viewer->entry->medal, &data);
-            func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], TRUE);
+            ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], TRUE);
         } else {
-            func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], FALSE);
+            ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], FALSE);
             GFL_ArcToolRead(arc, 0, &data);
         }
-        func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], data.sequence);
+        ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], data.sequence);
         GFL_ArcToolFree(arc);
         if (viewer->hasMedal == TRUE) {
             MedalInfoViewer_PrintMedal(viewer);
@@ -534,7 +534,7 @@ static void MedalInfoViewer_GraphicInit(MedalInfoViewer *viewer) {
     GFL_BGSysSetDisplayLayout(0);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MedalInfoViewer_BGInit(viewer);
     MedalInfoViewer_ClActInit(viewer);
     MedalInfoViewer_WindowInit(viewer);
@@ -629,12 +629,12 @@ static void MedalInfoViewer_WindowExit(MedalInfoViewer *viewer) {
 }
 
 static void MedalInfoViewer_PrintQueueInit(MedalInfoViewer *viewer) {
-    viewer->printQueue = func_02021998(viewer->heapId);
+    viewer->printQueue = PrintQueue_CreateDefault(viewer->heapId);
 }
 
 static void MedalInfoViewer_PrintQueueExit(MedalInfoViewer *viewer) {
-    func_02021c44(viewer->printQueue);
-    func_02021a18(viewer->printQueue);
+    PrintQueue_Clear(viewer->printQueue);
+    PrintQueue_Free(viewer->printQueue);
 }
 
 // Prints the title, the medal count, the medal's name and description, and for a Join Avenue visitor the date
@@ -743,20 +743,20 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
     int i;
 
     ClActSys_Create(&setup, &sMedalInfoVRAMConfig, heapId);
-    viewer->clActUnit = func_0204bf1c(128, 1, heapId);
-    func_0204c028(viewer->clActUnit);
+    viewer->clActUnit = ClActUnit_Create(128, 1, heapId);
+    ClActUnit_UseSystemRenderer(viewer->clActUnit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 
     res = viewer->res;
     arcs[1] = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
     arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL, heapId);
-    res[0].cellAnims = func_0204bde0(arcs[0], 2, 3, heapId);
-    res[0].palette = func_0204bbb8(arcs[0], 0, CLACT_VRAM_BOTH, 0, 0, 6, heapId);
-    res[0].chars = func_0204b81c(arcs[0], 1, FALSE, CLACT_VRAM_BOTH, heapId);
-    res[1].cellAnims = func_0204bde0(arcs[1], 23, 26, heapId);
-    res[1].palette = func_0204bbb8(arcs[1], 19, CLACT_VRAM_MAIN, 0xc0, 0, 4, heapId);
-    res[1].chars = func_0204b81c(arcs[1], 20, FALSE, CLACT_VRAM_MAIN, heapId);
+    res[0].cellAnims = ClActSys_LoadCellAnims(arcs[0], 2, 3, heapId);
+    res[0].palette = ClActSys_LoadPlttRange(arcs[0], 0, CLACT_VRAM_BOTH, 0, 0, 6, heapId);
+    res[0].chars = ClActSys_LoadChars(arcs[0], 1, FALSE, CLACT_VRAM_BOTH, heapId);
+    res[1].cellAnims = ClActSys_LoadCellAnims(arcs[1], 23, 26, heapId);
+    res[1].palette = ClActSys_LoadPlttRange(arcs[1], 19, CLACT_VRAM_MAIN, 0xc0, 0, 4, heapId);
+    res[1].chars = ClActSys_LoadChars(arcs[1], 20, FALSE, CLACT_VRAM_MAIN, heapId);
     for (i = 0; i < 2; i++) {
         GFL_ArcToolFree(arcs[i]);
     }
@@ -773,14 +773,14 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
     actorSetup.bgPriority = 1;
     actorSetup.priority = 0;
     viewer->actors[MEDAL_INFO_ACTOR_MEDAL] =
-        func_0204c040(viewer->clActUnit, viewer->res[0].chars, viewer->res[0].palette, viewer->res[0].cellAnims,
-                      &actorSetup, CLACT_SURFACE_MAIN, heapId);
-    func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], data.sequence);
+        ClActor_Create(viewer->clActUnit, viewer->res[0].chars, viewer->res[0].palette, viewer->res[0].cellAnims,
+                       &actorSetup, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], data.sequence);
     GFL_ArcToolFree(medalArc);
     if (viewer->hasMedal == TRUE) {
-        func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], TRUE);
+        ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], TRUE);
     } else {
-        func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], FALSE);
+        ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], FALSE);
     }
 
     MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
@@ -789,9 +789,9 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
     actorSetup.x = 232;
     actorSetup.y = 168;
     viewer->actors[MEDAL_INFO_ACTOR_BACK] =
-        func_0204c040(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
-                      &actorSetup, CLACT_SURFACE_MAIN, heapId);
-    func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_BACK], MEDAL_INFO_SEQ_BACK);
+        ClActor_Create(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
+                       &actorSetup, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_BACK], MEDAL_INFO_SEQ_BACK);
 
     MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.bgPriority = 0;
@@ -799,14 +799,14 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
     actorSetup.x = 200;
     actorSetup.y = 168;
     viewer->actors[MEDAL_INFO_ACTOR_EXIT] =
-        func_0204c040(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
-                      &actorSetup, CLACT_SURFACE_MAIN, heapId);
-    func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_EXIT], 0);
-    func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
+        ClActor_Create(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
+                       &actorSetup, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_EXIT], 0);
+    ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
     if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_BACK_OR_FIELD) {
-        func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
+        ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
     } else {
-        func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_EXIT], FALSE);
+        ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_EXIT], FALSE);
     }
 
     if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_LIST) {
@@ -816,14 +816,14 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
         actorSetup.x = 168;
         actorSetup.y = 168;
         viewer->actors[MEDAL_INFO_ACTOR_PREV] =
-            func_0204c040(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
-                          &actorSetup, CLACT_SURFACE_MAIN, heapId);
+            ClActor_Create(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
+                           &actorSetup, CLACT_SURFACE_MAIN, heapId);
         if (viewer->index == 0) {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
         } else {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV);
         }
-        func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_PREV], TRUE);
+        ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_PREV], TRUE);
 
         MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 0;
@@ -831,14 +831,14 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
         actorSetup.x = 200;
         actorSetup.y = 168;
         viewer->actors[MEDAL_INFO_ACTOR_NEXT] =
-            func_0204c040(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
-                          &actorSetup, CLACT_SURFACE_MAIN, heapId);
+            ClActor_Create(viewer->clActUnit, viewer->res[1].chars, viewer->res[1].palette, viewer->res[1].cellAnims,
+                           &actorSetup, CLACT_SURFACE_MAIN, heapId);
         if (viewer->param->count == viewer->index + 1) {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
         } else {
-            func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT);
+            ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT);
         }
-        func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_NEXT], TRUE);
+        ClActor_SetVisible(viewer->actors[MEDAL_INFO_ACTOR_NEXT], TRUE);
     }
 }
 
@@ -847,21 +847,21 @@ static void MedalInfoViewer_ClActExit(MedalInfoViewer *viewer) {
 
     for (i = 0; i < MEDAL_INFO_ACTOR_COUNT; i++) {
         if (viewer->actors[i] != NULL) {
-            func_0204c108(viewer->actors[i]);
+            ClActor_Delete(viewer->actors[i]);
         }
     }
-    func_0204be64(viewer->res[0].cellAnims);
-    func_0204b98c(viewer->res[0].chars);
-    func_0204bcd0(viewer->res[0].palette);
-    func_0204be64(viewer->res[1].cellAnims);
-    func_0204b98c(viewer->res[1].chars);
-    func_0204bcd0(viewer->res[1].palette);
+    ClActSys_FreeCellAnims(viewer->res[0].cellAnims);
+    ClActSys_FreeChars(viewer->res[0].chars);
+    ClActSys_FreePltt(viewer->res[0].palette);
+    ClActSys_FreeCellAnims(viewer->res[1].cellAnims);
+    ClActSys_FreeChars(viewer->res[1].chars);
+    ClActSys_FreePltt(viewer->res[1].palette);
     if (viewer->clActUnit != NULL) {
-        func_0204bf98(viewer->clActUnit);
+        ClActUnit_Delete(viewer->clActUnit);
     }
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void MedalInfoViewer_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }

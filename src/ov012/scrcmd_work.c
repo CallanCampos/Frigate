@@ -3,6 +3,7 @@
 #include "constants/script_text_banks.h"
 #include "field/field_acmd.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
@@ -28,7 +29,7 @@ ScriptSubwork *InitScriptSubwork(ScriptWork *work, HeapID heapId) {
     return subwork;
 }
 
-void func_ov012_021550e4(void *subwork) {
+void FreeScriptSubwork(void *subwork) {
     GFL_HeapFree(subwork);
 }
 
@@ -48,7 +49,7 @@ void FreeFieldScriptEnv(FieldScriptEnv *env) {
     if (env->msgData != NULL) {
         GFL_MsgDataFree(env->msgData);
     }
-    func_ov012_021552c8(env);
+    FieldScriptEnv_RemoveAcmdTasks(env);
     GFL_HeapFree(env);
 }
 
@@ -84,7 +85,7 @@ ScriptWork *FieldScriptEnv_GetScriptWork(FieldScriptEnv *env) {
     return env->subwork->work;
 }
 
-void *func_ov012_0215518c(FieldScriptEnv *env) {
+void *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env) {
     return *(void **)ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 }
 
@@ -108,7 +109,7 @@ void SetSpecialMessageIconPtr(FieldScriptEnv *env, void *icon) {
     env->subwork->specialMessageIcon = icon;
 }
 
-void *func_ov012_021551c0(FieldScriptEnv *env) {
+void *GetSpecialMessageIconPtr(FieldScriptEnv *env) {
     return env->subwork->specialMessageIcon;
 }
 
@@ -197,7 +198,7 @@ BOOL FieldScriptEnv_CheckAcmdQueueRunning(FieldScriptEnv *env) {
     return running;
 }
 
-void func_ov012_021552c8(FieldScriptEnv *env) {
+void FieldScriptEnv_RemoveAcmdTasks(FieldScriptEnv *env) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -214,7 +215,9 @@ void SetFieldScriptEnvMsgData(FieldScriptEnv *env, u32 arcId, u32 fileNo) {
 }
 
 // The list menu's window
-static const ListMenuRequest sListMenuRequest = { 1, 6, 0, 0xd, 0x1000, 0x2f, 0, 1, 0, 1, 0xc, 0xd, 0, 0, 0, 0, 0 };
+static const ListMenuRequest sListMenuRequest = {
+    1, 6, 0, 0xd, 0, 0, 1, 0xf, 2, 0, 1, 0, 1, 0xc, 0xd, 0, 0, 0, 0, NULL
+};
 
 void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 align, u16 *result, WordSet *wordSet,
                   MsgData *msgData) {
@@ -261,7 +264,7 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env) {
     u32 width;
     ScriptListMenu *menu = &env->subwork->listMenu;
     ListMenuRequest request = sListMenuRequest;
-    void *msgBGSys = func_ov012_0215518c(env);
+    void *msgBGSys = FieldScriptEnv_GetMsgBGSys(env);
     u32 count;
     u32 rows;
     BOOL scrolls;
@@ -271,17 +274,17 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env) {
         menu->flags &= 0x7f;
         request.rowHeight = 14;
     }
-    width = CalcListMenuWidth(msgBGSys, menu->options, request.unk10, request.unk0A_0);
+    width = CalcListMenuWidth(msgBGSys, menu->options, request.fontSizeX, request.letterSpacing);
     if (menu->align == 1) {
         menu->x -= (u16)width;
     }
     count = ListMenuCore_GetOptionCount(menu->options);
     rows = count > 6 ? 6 : count;
     scrolls = count > 6 ? TRUE : FALSE;
-    height = CalcListMenuHeight(rows, request.rowHeight, request.unk0A_3, scrolls);
+    height = CalcListMenuHeight(rows, request.rowHeight, request.lineSpacing, scrolls);
     ListMenuRequest_Set(&request, ListMenuCore_GetOptionCount(menu->options), menu->x, menu->y, width, height);
-    menu->ui =
-        ListMenuUI_Create(msgBGSys, &request, menu->options, func_ov012_02155568, env, 0, menu->cursor, menu->flags);
+    menu->ui = ListMenuUI_Create(msgBGSys, &request, menu->options, ListMenu_ShowDescription, env, 0, menu->cursor,
+                                 menu->flags);
 }
 
 void FreeListMenuWork(ScriptListMenu *menu) {
@@ -329,7 +332,7 @@ BOOL FieldScriptEnv_UpdateListMenuEx(FieldScriptEnv *env) {
     return done;
 }
 
-void func_ov012_02155568(BmpMenuList *list, s32 value, u8 a2) {
+void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2) {
     u16 index = 0;
     FieldScriptEnv *env = BmpMenuList_GetWork(list);
     ScriptListMenu *menu = &env->subwork->listMenu;

@@ -313,9 +313,9 @@ void func_ov036_0219d060(FieldPlayerNoGrid *nogrid) {
         FieldActor *actor = nogrid->actor;
         u16 dir = GetActorFaceDir(actor);
 
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        func_ov012_021670f4(actor, 0);
+        FldAct_SetDrawStatus(actor, 0);
         FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
     }
 }
@@ -514,7 +514,7 @@ static u32 func_ov036_0219d498(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return func_ov036_0219d374(nogrid, actor, pressedKeys, heldKeys, dir, a5);
     }
     if (!IsAllActorAcmdFinished(actor)) {
@@ -542,7 +542,7 @@ static void func_ov036_0219d514(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
 
 static void func_ov036_0219d54c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
-    u32 acmd;
+    u16 acmd;
 
     if (a5 == TRUE) {
         acmd = ACMD_WALK_2F;
@@ -702,7 +702,7 @@ static u32 func_ov036_0219d870(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return func_ov036_0219d74c(nogrid, actor, pressedKeys, heldKeys, dir, a5);
     }
     if (!IsAllActorAcmdFinished(actor)) {
@@ -798,7 +798,7 @@ static void func_ov036_0219da60(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
 
 static void func_ov036_0219da98(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
-    u32 acmd = ACMD_WALK_2F;
+    u16 acmd = ACMD_WALK_2F;
 
     if (a5 != TRUE) {
         acmd = ACMD_WALK_4F;
@@ -909,7 +909,7 @@ static u32 func_ov036_0219dcdc(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return func_ov036_0219dbfc(nogrid, actor, pressedKeys, heldKeys, dir, a5);
     }
     if (!IsAllActorAcmdFinished(actor)) {

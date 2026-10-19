@@ -68,7 +68,7 @@ struct FestMissionConfig {
     u8 unk1A;
     u32 unk1C;
     u32 unk20;
-    // When the mission's time started, in the RTC's seconds, or -1 until it starts (func_02014dac)
+    // When the mission's time started, in the RTC's seconds, or -1 until it starts (FestMissionConfig_StartTimer)
     s64 unk24;
 };
 
@@ -77,8 +77,8 @@ void ClearFesMissionCfg(FestMissionConfig *config);
 // Copies a mission to start it, or to join it when joined is set
 void FestMissionConfig_Start(FestMissionConfig *config, const FestMissionConfig *src, u8 joined);
 // Starts the mission's time
-void func_02014dac(FestMissionConfig *config);
-void func_02014db4(FestMissionConfig *config);
+void FestMissionConfig_StartTimer(FestMissionConfig *config);
+void FestMissionConfig_Clear(FestMissionConfig *config);
 void UpdateFesMissionConfigSecondsTime(FestMissionConfig *config);
 // The mission's seconds left
 u32 FestMissionConfig_GetSecondsLeft(FestMissionConfig *config);

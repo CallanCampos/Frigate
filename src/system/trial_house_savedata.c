@@ -8,15 +8,15 @@
 
 #define SAVE_BLOCK_TRIAL_HOUSE 0x3f
 
-u32 func_0200f19c(void) {
+u32 TrialHouseSave_GetSize(void) {
     return sizeof(TrialHouseSave);
 }
 
-void func_0200f1a0(TrialHouseSave *save) {
+void TrialHouseSave_Init(TrialHouseSave *save) {
     MI_CpuFill8(save, 0, sizeof(TrialHouseSave));
-    func_0200fe80(save->unk5C);
+    WbtSave_Init(save->unk5C);
 }
 
-TrialHouseSave *func_0200f1b8(SaveControl *save) {
+TrialHouseSave *TrialHouseSave_Get(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRIAL_HOUSE);
 }

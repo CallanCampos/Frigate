@@ -156,7 +156,7 @@ int WorldTrade_Title_End(WorldTradeWork *wk, int seq) {
         wk->subLcdBgKeep = 1;
     }
     WorldTrade_SubLcdBgExit(wk);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     WorldTrade_SubProcessUpdate(wk);
     return WT_SEQ_INIT;
 }
@@ -342,7 +342,7 @@ static void Title_DemoBgSet(WorldTradeWork *wk) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, FALSE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, FALSE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG2, FALSE);
-    func_0204c124(wk->cursorAct, FALSE);
+    ClActor_SetVisible(wk->cursorAct, FALSE);
 }
 
 static void Title_BgGraphicSet(WorldTradeWork *wk) {
@@ -373,23 +373,23 @@ static void Title_SetCellActor(WorldTradeWork *wk) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 1;
-    wk->cursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
-                                  wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                  wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    wk->cursorAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
+                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                                   wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
     func_0204c520(wk->cursorAct, TRUE);
-    func_0204c488(wk->cursorAct, 0);
+    ClActor_SetSequence(wk->cursorAct, 0);
     // The cursor only shows while the keys are used
-    if (func_0203d554() == TRUE) {
-        func_0204c124(wk->cursorAct, FALSE);
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
+        ClActor_SetVisible(wk->cursorAct, FALSE);
     } else {
-        func_0204c488(wk->cursorAct, 0);
-        func_0204c124(wk->cursorAct, TRUE);
+        ClActor_SetSequence(wk->cursorAct, 0);
+        ClActor_SetVisible(wk->cursorAct, TRUE);
     }
-    func_02042ba8(FALSE, HEAPID_WORLDTRADE);
+    GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);
 }
 
 static void Title_DelCellActor(WorldTradeWork *wk) {
-    func_0204c108(wk->cursorAct);
+    ClActor_Delete(wk->cursorAct);
 }
 
 static void Title_BmpWinInit(WorldTradeWork *wk) {
@@ -489,7 +489,7 @@ static const TouchRect sTitleTouchRects[] = {
 };
 
 static int Title_TouchPanelFunc(WorldTradeWork *wk) {
-    return func_0203da0c(sTitleTouchRects);
+    return GFL_HIDGetTouchPressedRect(sTitleTouchRects);
 }
 
 static void Title_DecideFunc(WorldTradeWork *wk, int decide) {
@@ -531,10 +531,10 @@ static int Title_SubSeqMain(WorldTradeWork *wk) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         WorldTrade_CLACT_PosChange(wk->cursorAct, sTitleCursorPos[wk->titleCursorPos].x,
                                    sTitleCursorPos[wk->titleCursorPos].y);
-        func_0204c124(wk->cursorAct, TRUE);
-        func_0204c488(wk->cursorAct, 1);
+        ClActor_SetVisible(wk->cursorAct, TRUE);
+        ClActor_SetSequence(wk->cursorAct, 1);
         wk->subprocessSeq = TITLE_SEQ_CURSOR_ANIM_WAIT;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         if (wk->titleCursorPos == TITLE_MENU_EXIT) {
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
         } else {
@@ -544,9 +544,9 @@ static int Title_SubSeqMain(WorldTradeWork *wk) {
     }
 
     // A key in touch mode only shows the cursor
-    if (GCTX_HIDGetPressedKeys() && func_0203d554() == TRUE) {
-        func_0204c124(wk->cursorAct, TRUE);
-        func_0203d564(FALSE);
+    if (GCTX_HIDGetPressedKeys() && GCTX_HIDIsUsingTouch() == TRUE) {
+        ClActor_SetVisible(wk->cursorAct, TRUE);
+        GCTX_HIDSetUsingTouch(FALSE);
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         return WT_SEQ_MAIN;
     }
@@ -555,21 +555,21 @@ static int Title_SubSeqMain(WorldTradeWork *wk) {
         wk->titleCursorPos = TITLE_MENU_EXIT;
         WorldTrade_CLACT_PosChange(wk->cursorAct, sTitleCursorPos[wk->titleCursorPos].x,
                                    sTitleCursorPos[wk->titleCursorPos].y);
-        func_0204c124(wk->cursorAct, TRUE);
-        func_0204c488(wk->cursorAct, 1);
+        ClActor_SetVisible(wk->cursorAct, TRUE);
+        ClActor_SetSequence(wk->cursorAct, 1);
         wk->subprocessSeq = TITLE_SEQ_CURSOR_ANIM_WAIT;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-        func_0204c124(wk->cursorAct, TRUE);
-        func_0204c488(wk->cursorAct, 1);
+        ClActor_SetVisible(wk->cursorAct, TRUE);
+        ClActor_SetSequence(wk->cursorAct, 1);
         wk->subprocessSeq = TITLE_SEQ_CURSOR_ANIM_WAIT;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
     } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
         if (wk->titleCursorPos != 0) {
             wk->titleCursorPos--;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0204c124(wk->cursorAct, TRUE);
-            func_0204c56c(wk->cursorAct);
+            ClActor_SetVisible(wk->cursorAct, TRUE);
+            ClActor_RestartAnim(wk->cursorAct);
             WorldTrade_CLACT_PosChange(wk->cursorAct, sTitleCursorPos[wk->titleCursorPos].x,
                                        sTitleCursorPos[wk->titleCursorPos].y);
         }
@@ -577,8 +577,8 @@ static int Title_SubSeqMain(WorldTradeWork *wk) {
         if (wk->titleCursorPos < 2) {
             wk->titleCursorPos++;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0204c124(wk->cursorAct, TRUE);
-            func_0204c56c(wk->cursorAct);
+            ClActor_SetVisible(wk->cursorAct, TRUE);
+            ClActor_RestartAnim(wk->cursorAct);
             WorldTrade_CLACT_PosChange(wk->cursorAct, sTitleCursorPos[wk->titleCursorPos].x,
                                        sTitleCursorPos[wk->titleCursorPos].y);
         }
@@ -631,7 +631,7 @@ static int Title_SubSeqYesNoSelect(WorldTradeWork *wk) {
         Title_ClearWin(wk->talkWin);
         Title_ClearWin(wk->explainWin);
         GFL_BGSysSetBGEnabled(6, FALSE);
-        func_0204c124(wk->promptDsAct, FALSE);
+        ClActor_SetVisible(wk->promptDsAct, FALSE);
         WorldTrade_SubProcessChange(wk, WORLDTRADE_ENTER, 20);
         wk->subprocessSeq = TITLE_SEQ_END_DEMO;
     } else if (ret == 2) {
@@ -640,18 +640,18 @@ static int Title_SubSeqYesNoSelect(WorldTradeWork *wk) {
         Title_ClearWin(wk->talkWin);
         func_0204c520(wk->cursorAct, TRUE);
         wk->subprocessSeq = TITLE_SEQ_START;
-        func_0204c124(wk->cursorAct, TRUE);
+        ClActor_SetVisible(wk->cursorAct, TRUE);
     }
     return WT_SEQ_MAIN;
 }
 
 static int Title_SubSeqCursorAnimWait(WorldTradeWork *wk) {
-    if (!func_0204c560(wk->cursorAct)) {
-        func_0204c488(wk->cursorAct, 0);
-        if (func_0203d554() == TRUE) {
-            func_0204c124(wk->cursorAct, FALSE);
+    if (!ClActor_IsAnimActive(wk->cursorAct)) {
+        ClActor_SetSequence(wk->cursorAct, 0);
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
+            ClActor_SetVisible(wk->cursorAct, FALSE);
         } else {
-            func_0204c124(wk->cursorAct, TRUE);
+            ClActor_SetVisible(wk->cursorAct, TRUE);
         }
         Title_DecideFunc(wk, wk->titleCursorPos);
     }
@@ -737,7 +737,7 @@ void WorldTrade_SubLcdWinGraphicSet(WorldTradeWork *wk) {
         GFL_G2DIOLoadNSCRAsync(arc, 34, 6, 0, 0, 0, FALSE, HEAPID_WORLDTRADE);
         GFL_ArcToolFree(arc);
     }
-    func_0204c124(wk->promptDsAct, TRUE);
+    ClActor_SetVisible(wk->promptDsAct, TRUE);
 }
 
 void WorldTrade_SubLcdExplainPut(WorldTradeWork *wk, int explain) {

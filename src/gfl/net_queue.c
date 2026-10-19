@@ -4,16 +4,16 @@
 #include "gfl/net_ring_buff.h"
 #include "gfl/std.h"
 
-static NetQueueEntry *func_0203e154(NetQueue *queue);
-static int func_0203e188(NetQueue *queue);
-static BOOL func_0203e1ac(NetQueueList *list);
-static void func_0203e1d0(NetSendBuffer *buffer, u8 byte);
-static BOOL func_0203e1e4(NetQueueEntry *entry, NetSendBuffer *buffer);
-static BOOL func_0203e22c(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBuff *ring, BOOL checkSpace);
-static NetQueueEntry *func_0203e364(NetQueue *queue);
-static void func_0203e384(NetQueue *queue);
+static NetQueueEntry *NetQueue_FindFreeEntry(NetQueue *queue);
+static int NetQueue_CountEntries(NetQueue *queue);
+static BOOL NetQueueList_PopHead(NetQueueList *list);
+static void NetSendBuffer_PutByte(NetSendBuffer *buffer, u8 byte);
+static BOOL NetQueueEntry_WriteHeader(NetQueueEntry *entry, NetSendBuffer *buffer);
+static BOOL NetQueueEntry_Write(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBuff *ring, BOOL checkSpace);
+static NetQueueEntry *NetQueue_GetNext(NetQueue *queue);
+static void NetQueue_RemoveNext(NetQueue *queue);
 
-static NetQueueEntry *func_0203e154(NetQueue *queue) {
+static NetQueueEntry *NetQueue_FindFreeEntry(NetQueue *queue) {
     NetQueueEntry *entry = queue->entries;
     int i;
 
@@ -25,14 +25,14 @@ static NetQueueEntry *func_0203e154(NetQueue *queue) {
     return NULL;
 }
 
-BOOL func_0203e174(NetQueue *queue) {
-    if (func_0203e188(queue) == 0) {
+BOOL NetQueue_IsEmpty(NetQueue *queue) {
+    if (NetQueue_CountEntries(queue) == 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static int func_0203e188(NetQueue *queue) {
+static int NetQueue_CountEntries(NetQueue *queue) {
     NetQueueEntry *entry = queue->entries;
     int i;
     int count = 0;
@@ -46,7 +46,7 @@ static int func_0203e188(NetQueue *queue) {
     return count;
 }
 
-static BOOL func_0203e1ac(NetQueueList *list) {
+static BOOL NetQueueList_PopHead(NetQueueList *list) {
     if (list->head != NULL) {
         NetQueueEntry *next = list->head->next;
 
@@ -62,31 +62,31 @@ static BOOL func_0203e1ac(NetQueueList *list) {
     return FALSE;
 }
 
-static void func_0203e1d0(NetSendBuffer *buffer, u8 byte) {
+static void NetSendBuffer_PutByte(NetSendBuffer *buffer, u8 byte) {
     *buffer->ptr = byte;
     buffer->ptr++;
     buffer->size--;
 }
 
-static BOOL func_0203e1e4(NetQueueEntry *entry, NetSendBuffer *buffer) {
-    func_0203e1d0(buffer, entry->command >> 8);
-    func_0203e1d0(buffer, entry->command);
-    func_0203e1d0(buffer, entry->size >> 8);
-    func_0203e1d0(buffer, entry->size);
-    func_0203e1d0(buffer, entry->netId);
+static BOOL NetQueueEntry_WriteHeader(NetQueueEntry *entry, NetSendBuffer *buffer) {
+    NetSendBuffer_PutByte(buffer, entry->command >> 8);
+    NetSendBuffer_PutByte(buffer, entry->command);
+    NetSendBuffer_PutByte(buffer, entry->size >> 8);
+    NetSendBuffer_PutByte(buffer, entry->size);
+    NetSendBuffer_PutByte(buffer, entry->netId);
     return FALSE;
 }
 
-static BOOL func_0203e22c(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBuff *ring, BOOL checkSpace) {
+static BOOL NetQueueEntry_Write(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBuff *ring, BOOL checkSpace) {
     if (!entry->headerSent) {
         if (checkSpace && buffer->size < entry->size + NET_QUEUE_HEADER_SIZE) {
             return FALSE;
         }
-        func_0203e1e4(entry, buffer);
+        NetQueueEntry_WriteHeader(entry, buffer);
     }
     if (buffer->size < entry->size) {
         if (entry->data == NULL) {
-            func_0203e038(ring, buffer->ptr, buffer->size, buffer->size);
+            NetRingBuff_Read(ring, buffer->ptr, buffer->size, buffer->size);
         } else {
             MI_CpuCopy8(entry->data, buffer->ptr, buffer->size);
             entry->data += buffer->size;
@@ -97,7 +97,7 @@ static BOOL func_0203e22c(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBu
         return TRUE;
     }
     if (entry->data == NULL) {
-        func_0203e038(ring, buffer->ptr, entry->size, entry->size);
+        NetRingBuff_Read(ring, buffer->ptr, entry->size, entry->size);
     } else {
         MI_CpuCopy8(entry->data, buffer->ptr, entry->size);
     }
@@ -106,8 +106,8 @@ static BOOL func_0203e22c(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBu
     return TRUE;
 }
 
-BOOL func_0203e2c0(NetQueue *queue, int command, u8 *data, int size, u32 unused, BOOL copy, int netId) {
-    NetQueueEntry *entry = func_0203e154(queue);
+BOOL NetQueue_Push(NetQueue *queue, int command, u8 *data, int size, u32 unused, BOOL copy, int netId) {
+    NetQueueEntry *entry = NetQueue_FindFreeEntry(queue);
 
     if (entry == NULL) {
         GFL_ASSERT(0);
@@ -117,12 +117,12 @@ BOOL func_0203e2c0(NetQueue *queue, int command, u8 *data, int size, u32 unused,
     GFL_ASSERT((u16)size < (0xffff/2));
     // clang-format on
     if (copy) {
-        if (size + NET_QUEUE_HEADER_SIZE >= func_0203e110(queue->ring)) {
+        if (size + NET_QUEUE_HEADER_SIZE >= NetRingBuff_GetFreeSize(queue->ring)) {
             GFL_ASSERT(0);
             return FALSE;
         }
-        func_0203dfd0(queue->ring, data, size);
-        func_0203e150(queue->ring);
+        NetRingBuff_Write(queue->ring, data, size);
+        NetRingBuff_Commit(queue->ring);
         entry->data = NULL;
     } else {
         entry->data = data;
@@ -142,7 +142,7 @@ BOOL func_0203e2c0(NetQueue *queue, int command, u8 *data, int size, u32 unused,
     return TRUE;
 }
 
-static NetQueueEntry *func_0203e364(NetQueue *queue) {
+static NetQueueEntry *NetQueue_GetNext(NetQueue *queue) {
     if (queue->current != NULL) {
         return queue->current;
     }
@@ -155,31 +155,31 @@ static NetQueueEntry *func_0203e364(NetQueue *queue) {
     return NULL;
 }
 
-static void func_0203e384(NetQueue *queue) {
+static void NetQueue_RemoveNext(NetQueue *queue) {
     BOOL ret;
 
     if (queue->current != NULL) {
         queue->current = NULL;
         return;
     }
-    ret = func_0203e1ac(&queue->list);
+    ret = NetQueueList_PopHead(&queue->list);
     if (!ret) {
-        ret = func_0203e1ac(&queue->list2);
+        ret = NetQueueList_PopHead(&queue->list2);
         GFL_ASSERT(ret);
     }
 }
 
-BOOL func_0203e3bc(NetQueue *queue, NetSendBuffer *buffer) {
+BOOL NetQueue_FillBuffer(NetQueue *queue, NetSendBuffer *buffer) {
     BOOL checkSpace = FALSE;
 
     while (buffer->size != 0) {
-        NetQueueEntry *entry = func_0203e364(queue);
+        NetQueueEntry *entry = NetQueue_GetNext(queue);
 
         if (entry == NULL) {
             break;
         }
-        func_0203e384(queue);
-        if (!func_0203e22c(entry, buffer, queue->ring, checkSpace)) {
+        NetQueue_RemoveNext(queue);
+        if (!NetQueueEntry_Write(entry, buffer, queue->ring, checkSpace)) {
             queue->current = entry;
             break;
         }
@@ -193,14 +193,14 @@ BOOL func_0203e3bc(NetQueue *queue, NetSendBuffer *buffer) {
     return TRUE;
 }
 
-void func_0203e418(NetQueue *queue, int count, NetRingBuff *ring, HeapID heapId) {
+void NetQueue_Init(NetQueue *queue, int count, NetRingBuff *ring, HeapID heapId) {
     MI_CpuFill8(queue, 0, sizeof(NetQueue));
     queue->entries = GFL_HeapAllocate(heapId, count * sizeof(NetQueueEntry), TRUE, "net_queue.c", 371);
     queue->count = count;
     queue->ring = ring;
 }
 
-void func_0203e44c(NetQueue *queue) {
+void NetQueue_Clear(NetQueue *queue) {
     MI_CpuFill8(queue->entries, 0, sizeof(NetQueueEntry) * queue->count);
     queue->list.head = NULL;
     queue->list.tail = NULL;
@@ -209,11 +209,11 @@ void func_0203e44c(NetQueue *queue) {
     queue->current = NULL;
 }
 
-void func_0203e46c(NetQueue *queue) {
+void NetQueue_Free(NetQueue *queue) {
     GFL_HeapFree(queue->entries);
 }
 
-BOOL func_0203e478(NetQueue *queue, u16 command) {
+BOOL NetQueue_HasCommand(NetQueue *queue, u16 command) {
     int i;
     NetQueueEntry *entry = queue->entries;
 

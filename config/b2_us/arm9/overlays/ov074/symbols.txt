@@ -1,8 +1,8 @@
-func_ov074_021e90c0 kind:function(thumb,size=0x48) addr:0x021e90c0
-func_ov074_021e9108 kind:function(thumb,size=0x68) addr:0x021e9108
-func_ov074_021e9170 kind:function(thumb,size=0x46) addr:0x021e9170
-func_ov074_021e91b8 kind:function(thumb,size=0x4) addr:0x021e91b8
-func_ov074_021e91bc kind:function(thumb,size=0x24) addr:0x021e91bc
-func_ov074_021e91e0 kind:function(thumb,size=0x12) addr:0x021e91e0
-func_ov074_021e91f4 kind:function(thumb,size=0x2c) addr:0x021e91f4
+Sunny_Init kind:function(thumb,size=0x48) addr:0x021e90c0
+Sunny_FadeIn kind:function(thumb,size=0x68) addr:0x021e9108
+Sunny_InitNoFade kind:function(thumb,size=0x46) addr:0x021e9170
+Sunny_Main kind:function(thumb,size=0x4) addr:0x021e91b8
+Sunny_InitFadeOut kind:function(thumb,size=0x24) addr:0x021e91bc
+Sunny_FadeOut kind:function(thumb,size=0x12) addr:0x021e91e0
+Sunny_Exit kind:function(thumb,size=0x2c) addr:0x021e91f4
 SUNNY_WEATHER kind:data(any) addr:0x021e9240

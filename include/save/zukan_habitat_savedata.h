@@ -36,10 +36,10 @@ typedef struct ZukanHabitatSave {
 } ZukanHabitatSave; // size: 0x96
 
 // A habitat's flag, and setting it
-BOOL func_02010cfc(ZukanHabitatSave *save, u8 habitat);
-void func_02010d08(ZukanHabitatSave *save, u8 habitat);
+BOOL ZukanHabitatSave_IsHabitatFlagSet(ZukanHabitatSave *save, u8 habitat);
+void ZukanHabitatSave_SetHabitatFlag(ZukanHabitatSave *save, u8 habitat);
 // Sets what the player has done of a habitat's kind of habitat, ZUKAN_HABITAT_TYPE_*
-void func_02010d14(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value);
+void ZukanHabitatSave_SetHabitatField(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value);
 // The two flags at the end of the list, and setting them
 u8 func_02010da0(ZukanHabitatSave *save);
 u8 func_02010da8(ZukanHabitatSave *save);

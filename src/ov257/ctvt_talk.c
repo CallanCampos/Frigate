@@ -240,8 +240,8 @@ void CtvtTalk_Delete(CommTvtWork *sys, CtvtTalk *talk) {
 // The resources of the actors are the system's: characters, palette and cells
 static inline ClActor *CtvtTalk_CreateActor(CommTvtWork *sys, int chars, int palette, int cells,
                                             const ClActorSetup *setup, HeapID heapId) {
-    return func_0204c040(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
-                         CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
+    return ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
+                          CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, 1, heapId);
 }
 
 void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
@@ -264,33 +264,33 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     setup.priority = 0;
     setup.bgPriority = 2;
     talk->speedCursor = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
-    func_0204c124(talk->speedCursor, TRUE);
+    ClActor_SetVisible(talk->speedCursor, TRUE);
     if (func_ov257_021aab18(sys) == TRUE) {
         setup.sequence = 21;
     } else {
         setup.sequence = 22;
     }
     talk->zoomButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
-    func_0204c124(talk->zoomButton, TRUE);
+    ClActor_SetVisible(talk->zoomButton, TRUE);
     setup.sequence = 20;
     talk->exitButton = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
-    func_0204c124(talk->exitButton, TRUE);
+    ClActor_SetVisible(talk->exitButton, TRUE);
     setup.sequence = 36;
     talk->gameButtons[0] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
-    func_0204c124(talk->gameButtons[0], TRUE);
+    ClActor_SetVisible(talk->gameButtons[0], TRUE);
     setup.sequence = 37;
     talk->gameButtons[1] = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
-    func_0204c124(talk->gameButtons[1], TRUE);
+    ClActor_SetVisible(talk->gameButtons[1], TRUE);
     setup.sequence = 24;
     talk->voiceIcon = CtvtTalk_CreateActor(sys, 5, 1, 9, &setup, heapId);
-    func_0204c124(talk->voiceIcon, TRUE);
+    ClActor_SetVisible(talk->voiceIcon, TRUE);
     setup.x = 232;
     setup.y = 168;
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
     talk->talkButton = CtvtTalk_CreateActor(sys, 6, 2, 10, &setup, heapId);
-    func_0204c124(talk->talkButton, TRUE);
+    ClActor_SetVisible(talk->talkButton, TRUE);
     func_0204c520(talk->talkButton, TRUE);
 
     talk->voiceIconState = 0;
@@ -323,8 +323,8 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
         talk->voiceIconState = 2;
     }
     if (CommTvt_GetSelfIndex(sys) != 0 || func_ov257_021aab3c(sys) == TRUE || talk->notAlone == TRUE) {
-        func_0204c504(talk->gameButtons[0], 1);
-        func_0204c504(talk->gameButtons[1], 1);
+        ClActor_SetAnimFrame(talk->gameButtons[0], 1);
+        ClActor_SetAnimFrame(talk->gameButtons[1], 1);
     }
 }
 
@@ -334,7 +334,7 @@ static inline void CtvtTalk_ClearWindow(BmpWin *window) {
 }
 
 void CtvtTalk_Leave(CommTvtWork *sys, CtvtTalk *talk) {
-    func_02021c44(CommTvt_GetPrintQueue(sys));
+    PrintQueue_Clear(CommTvt_GetPrintQueue(sys));
     if (talk->exitMenu != NULL) {
         AppTaskMenu_Free(talk->exitMenu);
     }
@@ -352,13 +352,13 @@ void CtvtTalk_Leave(CommTvtWork *sys, CtvtTalk *talk) {
     CtvtTalk_ClearWindow(talk->gameWindowSub);
     BmpWin_Free(talk->gameWindow);
     BmpWin_Free(talk->gameWindowSub);
-    func_0204c108(talk->talkButton);
-    func_0204c108(talk->voiceIcon);
-    func_0204c108(talk->exitButton);
-    func_0204c108(talk->gameButtons[0]);
-    func_0204c108(talk->gameButtons[1]);
-    func_0204c108(talk->zoomButton);
-    func_0204c108(talk->speedCursor);
+    ClActor_Delete(talk->talkButton);
+    ClActor_Delete(talk->voiceIcon);
+    ClActor_Delete(talk->exitButton);
+    ClActor_Delete(talk->gameButtons[0]);
+    ClActor_Delete(talk->gameButtons[1]);
+    ClActor_Delete(talk->zoomButton);
+    ClActor_Delete(talk->speedCursor);
     GFL_BGSysClearScr(6);
     GFL_BGSysLoadScr(6);
     reg_G2S_DB_BLDCNT = 0;
@@ -389,7 +389,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     case TALK_STATE_FADE_OUT: {
         CtvtCamera *camera;
 
-        if (talk->next == TALK_NEXT_DRAW && func_0204c560(talk->exitButton) == TRUE) {
+        if (talk->next == TALK_NEXT_DRAW && ClActor_IsAnimActive(talk->exitButton) == TRUE) {
             break;
         }
         camera = CommTvt_GetCamera(sys);
@@ -660,12 +660,12 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             talk->messageFrames--;
         }
         if (talk->messageFrames == 0) {
-            func_02040624(func_02040440(), 10, 32);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 32);
             talk->state = TALK_STATE_GAME_CANCELLED_SYNC;
         }
         break;
     case TALK_STATE_GAME_CANCELLED_SYNC:
-        if (func_02040664(func_02040440(), 10, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 32) == TRUE) {
             CtvtTalk_CloseGameWindow(sys, talk);
         }
         break;
@@ -695,7 +695,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         talk->waitSound = TRUE;
         break;
     case TALK_STATE_WAIT_DISCONNECTED:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
             CtvtCamera_StopCamera(sys, CommTvt_GetCamera(sys));
@@ -722,7 +722,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_WAIT_PARENT_LEFT:
         talk->waitFrames++;
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) ||
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) ||
             talk->waitFrames >= 300) {
             talk->state = TALK_STATE_SYNC_EXIT;
         }
@@ -750,7 +750,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         talk->waitSound = TRUE;
         break;
     case TALK_STATE_WAIT_ALONE:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             talk->next = TALK_NEXT_EXIT;
             talk->state = TALK_STATE_FADE_OUT;
             func_ov257_021aab14(sys, TRUE);
@@ -765,7 +765,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->messagePending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(talk->messageWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(talk->messageWindow))) {
             BmpWin_FlushChar(talk->messageWindow);
             BmpWin_FlushMap(talk->messageWindow);
             GFL_BGSysLoadScr(4);
@@ -779,7 +779,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->gameWindowPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(talk->gameWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(talk->gameWindow))) {
             BmpWin_DrawFrame(talk->gameWindow, 1, 0x200, 9);
             BmpWin_FlushChar(talk->gameWindow);
             BmpWin_FlushMap(talk->gameWindow);
@@ -790,7 +790,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->gameWindowSubPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(talk->gameWindowSub))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(talk->gameWindowSub))) {
             BmpWin_FlushChar(talk->gameWindowSub);
             BmpWin_FlushMap(talk->gameWindowSub);
             GFL_BGSysLoadScr(4);
@@ -830,11 +830,11 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
             CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)packet + 0x800), 3, size * frames / length, size);
         }
     }
-    if (func_0204c560(talk->talkButton) == FALSE) {
+    if (ClActor_IsAnimActive(talk->talkButton) == FALSE) {
         if (talk->state == TALK_STATE_EXIT_MENU) {
-            func_0204c488(talk->talkButton, 15);
+            ClActor_SetSequence(talk->talkButton, 15);
         } else {
-            func_0204c488(talk->talkButton, 1);
+            ClActor_SetSequence(talk->talkButton, 1);
         }
     }
     return COMM_TVT_MODE_TALK;
@@ -896,30 +896,30 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
 
     if (talk->state == TALK_STATE_MAIN) {
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) ||
-            func_0203da0c(sExitButtons) != TOUCH_RECT_NONE) {
+            GFL_HIDGetTouchPressedRect(sExitButtons) != TOUCH_RECT_NONE) {
             talk->state = TALK_STATE_FADE_OUT;
             talk->next = TALK_NEXT_DRAW;
-            func_0204c488(talk->exitButton, 20);
+            ClActor_SetSequence(talk->exitButton, 20);
             func_0204c520(talk->exitButton, TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
     }
     if (talk->state == TALK_STATE_MAIN) {
         if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
-            func_0203da0c(sGameButtons1) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
+            GFL_HIDGetTouchPressedRect(sGameButtons1) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
             CtvtGame_SetType(CommTvt_GetGame(sys), 0);
             CtvtTalk_OpenGameWindow(sys, talk);
             talk->state = TALK_STATE_INVITE;
-            func_0204c488(talk->gameButtons[0], 36);
+            ClActor_SetSequence(talk->gameButtons[0], 36);
             func_0204c520(talk->gameButtons[0], TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
         if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
-            func_0203da0c(sGameButtons2) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
+            GFL_HIDGetTouchPressedRect(sGameButtons2) != TOUCH_RECT_NONE && talk->notAlone == FALSE) {
             CtvtGame_SetType(CommTvt_GetGame(sys), 1);
             CtvtTalk_OpenGameWindow(sys, talk);
             talk->state = TALK_STATE_INVITE;
-            func_0204c488(talk->gameButtons[1], 37);
+            ClActor_SetSequence(talk->gameButtons[1], 37);
             func_0204c520(talk->gameButtons[1], TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
@@ -928,40 +928,40 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             talk->state = TALK_STATE_INVITED;
         }
         if (talk->notAloneChanged == TRUE) {
-            u16 frame = func_0204c510(talk->gameButtons[0]);
+            u16 frame = ClActor_GetAnimFrame(talk->gameButtons[0]);
 
             if ((frame == 0 || frame == 2) && talk->notAlone == TRUE) {
-                func_0204c504(talk->gameButtons[0], 1);
-                func_0204c504(talk->gameButtons[1], 1);
-                func_0204c550(talk->gameButtons[0]);
-                func_0204c550(talk->gameButtons[1]);
+                ClActor_SetAnimFrame(talk->gameButtons[0], 1);
+                ClActor_SetAnimFrame(talk->gameButtons[1], 1);
+                ClActor_StopAnim(talk->gameButtons[0]);
+                ClActor_StopAnim(talk->gameButtons[1]);
             } else if (frame == 1 && talk->notAlone == FALSE) {
-                func_0204c504(talk->gameButtons[0], 0);
-                func_0204c504(talk->gameButtons[1], 0);
-                func_0204c550(talk->gameButtons[0]);
-                func_0204c550(talk->gameButtons[1]);
+                ClActor_SetAnimFrame(talk->gameButtons[0], 0);
+                ClActor_SetAnimFrame(talk->gameButtons[1], 0);
+                ClActor_StopAnim(talk->gameButtons[0]);
+                ClActor_StopAnim(talk->gameButtons[1]);
             }
             talk->notAloneChanged = FALSE;
         }
     }
     if (talk->state == TALK_STATE_MAIN) {
-        hit = func_0203da0c(sZoomButtons);
+        hit = GFL_HIDGetTouchPressedRect(sZoomButtons);
         if (hit == 0 || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B)) {
             if (hit == 0) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             } else {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
             talk->state = TALK_STATE_ASK_EXIT;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
-            func_0204c488(talk->talkButton, 9);
+            ClActor_SetSequence(talk->talkButton, 9);
         } else if (hit == 1 || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START))) {
             func_ov257_021aab1c(sys);
             GFL_SndSEPlay(SEQ_SE_SYS_48);
             if (func_ov257_021aab18(sys) == TRUE) {
-                func_0204c488(talk->zoomButton, 21);
+                ClActor_SetSequence(talk->zoomButton, 21);
             } else {
-                func_0204c488(talk->zoomButton, 22);
+                ClActor_SetSequence(talk->zoomButton, 22);
             }
         }
     }
@@ -1070,18 +1070,18 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
 static void CtvtTalk_UpdateVoiceIcon(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->voiceIconState != talk->shownVoiceIconState) {
         if (talk->voiceIconState == 1) {
-            func_0204c488(talk->voiceIcon, 23);
+            ClActor_SetSequence(talk->voiceIcon, 23);
         } else if (talk->voiceIconState == 2) {
-            func_0204c488(talk->voiceIcon, 35);
+            ClActor_SetSequence(talk->voiceIcon, 35);
         } else {
-            func_0204c488(talk->voiceIcon, 24);
+            ClActor_SetSequence(talk->voiceIcon, 24);
         }
     }
 }
 
 static void CtvtTalk_UpdateSpeed(CommTvtWork *sys, CtvtTalk *talk) {
-    u32 trig = func_0203da0c(sSpeedButtons);
-    u32 cont = func_0203d9c8(sSpeedButtons);
+    u32 trig = GFL_HIDGetTouchPressedRect(sSpeedButtons);
+    u32 cont = GFL_HIDGetTouchHeldRect(sSpeedButtons);
     u32 dir = TOUCH_RECT_NONE;
     BOOL changed = FALSE;
 
@@ -1121,12 +1121,12 @@ static void CtvtTalk_UpdateSpeed(CommTvtWork *sys, CtvtTalk *talk) {
         if (talk->speed < CTVT_TALK_SPEEDS - 1) {
             changed = TRUE;
             talk->speed++;
-            func_0204c488(talk->speedCursor, talk->speed + 25);
+            ClActor_SetSequence(talk->speedCursor, talk->speed + 25);
         }
     } else if (dir == 1 && talk->speed != 0) {
         changed = TRUE;
         talk->speed--;
-        func_0204c488(talk->speedCursor, talk->speed + 25);
+        ClActor_SetSequence(talk->speedCursor, talk->speed + 25);
     }
     if (changed == TRUE) {
         int pitch = (talk->speed - 4) * 64;
@@ -1177,10 +1177,10 @@ static void CtvtTalk_PrintMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgId) {
     PrintQueue *queue = CommTvt_GetPrintQueue(sys);
     StrBuf *str;
 
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(talk->messageWindow), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-    func_02021c7c(queue, BmpWin_GetBitmap(talk->messageWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(talk->messageWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(talk->messageWindow);
     BmpWin_FlushMap(talk->messageWindow);
@@ -1206,7 +1206,7 @@ static void CtvtTalk_PrintCountdown(CommTvtWork *sys, CtvtTalk *talk, u32 msgId,
     WordSetNumber(wordSet, 1, count, 2, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, talk->expanded, talk->message);
     GFL_StrBufFree(gameName);
-    func_02021c7c(queue, BmpWin_GetBitmap(talk->gameWindow), 0, 0, talk->expanded, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(talk->gameWindow), 0, 0, talk->expanded, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     talk->gameWindowPending = TRUE;
 }
@@ -1222,7 +1222,7 @@ static void CtvtTalk_PrintGameMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgI
     StrBuf *message;
     StrBuf *gameName;
 
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(talk->gameWindowSub), 15);
     message = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     if (name != NULL) {
@@ -1234,7 +1234,7 @@ static void CtvtTalk_PrintGameMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgI
     GFL_StrBufFree(gameName);
     GFL_WordSetFormatStrbuf(wordSet, talk->expanded, message);
     GFL_StrBufFree(message);
-    func_02021c7c(queue, BmpWin_GetBitmap(talk->gameWindowSub), 0, 0, talk->expanded, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(talk->gameWindowSub), 0, 0, talk->expanded, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(talk->gameWindowSub);
     BmpWin_FlushMap(talk->gameWindowSub);
@@ -1253,8 +1253,8 @@ static void CtvtTalk_AskExit(CommTvtWork *sys, CtvtTalk *talk) {
     }
     talk->exitMenu = func_ov257_021aab80(sys);
     talk->state = TALK_STATE_EXIT_MENU;
-    if (func_0204c560(talk->talkButton) == FALSE) {
-        func_0204c488(talk->talkButton, 15);
+    if (ClActor_IsAnimActive(talk->talkButton) == FALSE) {
+        ClActor_SetSequence(talk->talkButton, 15);
     }
 }
 
@@ -1292,7 +1292,7 @@ static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk) {
         BmpWin_ClearScreen(talk->messageWindow);
         BmpWin_FlushMap(talk->waveWindow);
         GFL_BGSysLoadScr(4);
-        func_0204c488(talk->talkButton, 1);
+        ClActor_SetSequence(talk->talkButton, 1);
     }
     AppTaskMenu_Free(talk->exitMenu);
     talk->exitMenu = NULL;
@@ -1373,9 +1373,9 @@ static BOOL CtvtTalk_IsTalkButtonTouched(CommTvtWork *sys, CtvtTalk *talk, BOOL 
     u32 x, y;
 
     if (held == FALSE) {
-        func_0203dac8(&x, &y);
+        GFL_HIDGetTouchPressedPoint(&x, &y);
     } else {
-        func_0203da84(&x, &y);
+        GFL_HIDGetTouchHeldPoint(&x, &y);
     }
     if (y >= 104) {
         int dx = 128 - x;

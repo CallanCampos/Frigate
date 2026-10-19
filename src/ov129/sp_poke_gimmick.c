@@ -260,7 +260,7 @@ void SpPokeGimmickB_Update(Field *field) {
 
                 CopyActorWPos(curve->actor, &actorPos);
                 matrix->translation = actorPos;
-                if (func_ov036_021b8520(system, 0, 2, 0) == FX32_CONST(12)) {
+                if (FieldExpObj_GetAnmFrame(system, 0, 2, 0) == FX32_CONST(12)) {
                     if (curve->phase == 2) {
                         FldAct_UpdateBlInfoForNewObjCode(curve->actor, OBJ_CODE_SP_POKE_SWORD);
                     } else {
@@ -465,7 +465,7 @@ static void SpPokeGimmick_InitScene(SpPokeGimmickWork *work) {
         matrix->translation.x = sActorPositions[actor].x;
         matrix->translation.y = sActorPositions[actor].y;
         matrix->translation.z = sActorPositions[actor].z;
-        func_ov036_021b8248(work->system, 0, actor, 1);
+        FieldExpObj_SetActorCulling(work->system, 0, actor, 1);
         FieldExpObj_SetActorHidden(work->system, 0, actor, TRUE);
         for (anm = 0; anm < anmCount; anm++) {
             FieldExpObjAnm *info = FieldExpObj_GetAnmInfo(work->system, 0, actor, anm);

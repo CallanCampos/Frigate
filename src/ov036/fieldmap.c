@@ -228,7 +228,7 @@ BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work) {
         break;
     }
     case 1:
-        if (!func_02016b34(gsys)) {
+        if (!GSYS_IsCGearOn(gsys)) {
             GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
             switch (GameCommSys_BootCheck(comm)) {
@@ -283,19 +283,19 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
         season = GameSystem_GetSeason(gsys);
     } else if (func_02018f60(areaId)) {
         if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
-            season = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
+            season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
     } else if (func_02018f78(areaId)) {
         season = func_02017b70(field->gameData);
     } else if (func_02018f90(areaId)) {
-        WbtSystem **wbt = func_020179f0(field->gameData);
+        WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
             season = func_ov036_021c98f4(*wbt);
         }
     }
     field->areaData = AreaData_Create(heapId, areaId, season);
-    ResortWork_UpdateRecords(func_02017b84(field->gameData), GameData_GetSaveControl(field->gameData));
+    ResortWork_UpdateRecords(GameData_GetResortWork(field->gameData), GameData_GetSaveControl(field->gameData));
     field->ctrlVTable = GetZoneFieldmapCtrlVTable(field->zoneId);
     return field;
 }
@@ -306,7 +306,7 @@ void Field_Free(Field *field) {
     AreaData_Free(field->areaData);
     GFL_HeapFree(field);
     GSYS_SetField(gsys, NULL);
-    func_0203e874(0, 0);
+    WmIcon_SetPos(0, 0);
 }
 
 u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
@@ -318,7 +318,7 @@ u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);
     BmpWin_InitAllocator(heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_G3DSysCreate(0, 3, 0, 1, FX32_ONE, field->heapId, FieldG3D_InitCallback);
     FieldG3D_Init(field);
     field->g3DMapper = FieldG3DMapper_Create(field->heapId, GameData_GetSeason(field->gameData));
@@ -342,7 +342,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
 
     switch (field->subroutinePhase) {
     case 0:
-        func_ov012_0215ef28(gameData, field->zoneId);
+        ZoneChange_OnFieldLoad(gameData, field->zoneId);
         field->msgBGSys = CreateFieldMsgBGSystem(field->heapId, field->g3dCamera);
         field->moneyWin = NULL;
         field->placeName = FieldPlaceName_Create(gsys, 0x93, field->msgBGSys);
@@ -478,7 +478,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         FieldG3D_Update(field);
         FieldG3D_RenderPhase1(field);
         FieldG3D_RenderPhase2(field);
-        func_0204b794();
+        ClActSys_Draw();
         if (field->msgBGSys != NULL) {
             func_ov036_021878d0(field->msgBGSys);
         }
@@ -524,14 +524,14 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     }
     if (field->effectRunningFlag) {
         Field_RenderStart(field);
-        func_0204b794();
+        ClActSys_Draw();
         return 0;
     }
     GCTX_HIDResetFrameCount();
     Field_CheckDoRealTimeLoad(field);
     if (!GSYS_GetEventRunningFlag(gsys)) {
         field->ctrlVTable->update(field, &field->playerPos);
-        func_ov012_02162f44(field->gameData);
+        EvTime_Update(field->gameData);
     }
     if (field->placeName != NULL) {
         func_ov036_021b4ff8(field->placeName);
@@ -567,7 +567,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     FieldG3DMapper_SetPlayerPos(field->g3DMapper, &field->playerPos);
     FieldG3D_Update(field);
     func_ov036_021c20e0(*GameData_GetPleasureBoatPtr(field->gameData));
-    func_0204b794();
+    ClActSys_Draw();
     Field_RenderStart(field);
     return 0;
 }
@@ -673,7 +673,7 @@ u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
     GFL_TCBRemove(field->asyncActorMatLoadTCB);
     FieldG3DMapper_Free(field->g3DMapper);
     FieldG3D_Free(field);
-    func_0204b758();
+    ClActSys_Delete();
     BmpWin_FreeAllocator();
     Field_FreeGraphicsSystems(field);
     if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
@@ -1031,7 +1031,7 @@ void FldActSys_AsyncMatLoadTCBFunc(TCB *tcb, void *data) {
             FieldG3DObjSystem_SetupResources(field->g3DObjSystem);
         }
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     if (field->dispControl != NULL) {
         FieldDispControl_Update(field->dispControl);
     }
@@ -1081,14 +1081,14 @@ void Field_InitActorSystem(Field *field) {
                               FieldPlayer_GetObjCodeByExState(getTrainerGender(GetGameDataPlayerInfo(gameData)), 0));
     FesGimmick_BindActorSystem(field->fesGimmick, actorSystem);
     FieldActorG3DSystem_Create(field->actorSystem, field->g3DObjSystem);
-    func_ov012_021667cc(field->actorSystem, func_ov036_021863d8(field->cameraSystem));
-    func_ov012_02166d48(field->actorSystem);
-    func_ov012_021673e0(actorSystem, func_ov036_021813b8(field->zoneId));
+    FldActSys_InitDraw(field->actorSystem, func_ov036_021863d8(field->cameraSystem));
+    FldActSys_WakeUpAllActors(field->actorSystem);
+    FldActSys_SetShadowsEnabled(actorSystem, func_ov036_021813b8(field->zoneId));
 }
 
 void Field_SuspendActorSystem(Field *field) {
     FldActSys_SuspendAllActors(field->actorSystem);
-    func_ov012_02166764(field->actorSystem);
+    FldActSys_DetachField(field->actorSystem);
     field->actorSystem = NULL;
 }
 
@@ -1155,7 +1155,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     EventData_Reset(eventData);
     EventData_LoadEntities(eventData, zoneId, GameData_GetSeason(gameData));
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
-    func_ov012_0215ee10(gameData, field);
+    ZoneChange_OnSeamless(gameData, field);
     Field_SwapZoneBGM(field, zoneId);
     Field_SwapFog(field, zoneId);
     Field_SwapWeather(field, zoneId);
@@ -1173,7 +1173,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     resetRebattleTrainers(GameData_GetEventWork(gameData));
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     Field_HotswapSpawnActors(field, gameData, actorSystem, eventData, zoneId);
-    func_ov012_021683f4(field->gameSystem, zoneId);
+    FestMission_OnZoneEnter(field->gameSystem, zoneId);
     func_ov036_021b6660(field->fesGimmick);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     func_ov012_02153668(GSYS_GetGameCommSystem(field->gameSystem));
@@ -1258,7 +1258,7 @@ void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId) {
         if (isOther == FALSE) {
             city = GameData_GetMyCityState(field->gameData);
         } else {
-            city = func_0201722c(field->gameData, 0);
+            city = GameData_GetCityState(field->gameData, 0);
         }
         func_ov036_021852f4(field->g3DMapper, city, isOther);
     }

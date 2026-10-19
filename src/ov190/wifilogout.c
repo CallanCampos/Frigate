@@ -89,9 +89,9 @@ static BOOL WifiLogoutProc_Init(GameProc *proc, u32 *state, void *param, void *w
         }
     }
     if (logoutParam->unk8 == 0) {
-        func_02042ba8(FALSE, wk->heapId);
+        GFL_NetSetIconScreen(FALSE, wk->heapId);
     } else {
-        func_02042ba8(TRUE, wk->heapId);
+        GFL_NetSetIconScreen(TRUE, wk->heapId);
     }
     return TRUE;
 }
@@ -105,7 +105,7 @@ static BOOL WifiLogoutProc_Exit(GameProc *proc, u32 *state, void *param, void *w
     }
     WifiLoginMessage_Free(wk->msg);
     WifiLoginDisp_Free(wk->disp);
-    func_02012144();
+    GFL_NetErrClear();
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_WIFILOGOUT);
     return TRUE;
@@ -170,15 +170,15 @@ static void WifiLogout_StateWaitDisconnecting(WifiLogoutWork *work) {
 
 static void WifiLogout_StateDisconnect(WifiLogoutWork *work) {
     if (GFL_NetErrCheck()) {
-        func_020428a0();
-        func_020429f0();
-        func_02042478();
-        func_020424e4();
-        func_02012144();
+        GFL_NetCancelEnd();
+        GFL_NetIwFree();
+        NetState_ClearError();
+        NetState_ClearWifiError();
+        GFL_NetErrClear();
     }
-    if (func_020427a4()) {
+    if (GFL_NetIsEnded()) {
         WifiLogout_ChangeState(work, WifiLogout_StatePrintDisconnected, 452);
-    } else if (func_02042860(WifiLogout_OnDisconnected)) {
+    } else if (GFL_NetExit(WifiLogout_OnDisconnected)) {
         WifiLogout_ChangeState(work, WifiLogout_StateWaitDisconnected, 460);
     }
 }

@@ -95,11 +95,11 @@ int CursorMove_UpdatePressed(CursorMove *cursor) {
     }
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return cursor->pos;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return CURSOR_MOVE_CANCEL;
     }
     return CURSOR_MOVE_NONE;
@@ -137,11 +137,11 @@ u32 CursorMove_Update(CursorMove *cursor) {
     }
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return cursor->pos;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return CURSOR_MOVE_CANCEL;
     }
     return CURSOR_MOVE_NONE;
@@ -161,7 +161,7 @@ static int CursorMove_Touch(CursorMove *cursor, int *pos) {
             break;
         }
         rects[0] = cursor->data[i].rect;
-        if (func_0203da0c(rects) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchPressedRect(rects) != TOUCH_RECT_NONE) {
             touched = TRUE;
             if (CursorMove_IsPosEnabled(cursor->enabled, i) == TRUE) {
                 cursor->prevPos = cursor->pos;
@@ -174,7 +174,7 @@ static int CursorMove_Touch(CursorMove *cursor, int *pos) {
                 cursor->prevPos = CURSOR_MOVE_NO_LINK;
                 cursor->returnPos = CURSOR_MOVE_NO_LINK;
                 *pos = i;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 break;
             }
         }
@@ -203,7 +203,7 @@ static u8 CursorMoveData_GetLink(const CursorMoveData *data, u8 pos, u8 dir) {
 }
 
 static int CursorMove_ShowCursor(CursorMove *cursor) {
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     cursor->cursorVisible = TRUE;
     cursor->prevPos = CURSOR_MOVE_NO_LINK;
     cursor->returnPos = CURSOR_MOVE_NO_LINK;
@@ -231,7 +231,7 @@ static int CursorMove_ShowCursorByKey(CursorMove *cursor) {
 static int CursorMove_Move(CursorMove *cursor, u8 dir, u8 next) {
     BOOL direct;
 
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     if (next & CURSOR_MOVE_LINK_RETURN) {
         if (cursor->returnPos != CURSOR_MOVE_NO_LINK) {
             next = cursor->returnPos;

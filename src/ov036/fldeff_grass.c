@@ -177,7 +177,7 @@ static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
     u16 actorIndex;
 
     grassTask->params = *params;
-    func_ov012_02167d88(params->actor, &grassTask->identity);
+    FldAct_GetIdentity(params->actor, &grassTask->identity);
     func_ov036_021a3ae8(task, &params->pos);
     kind = grassTask->params.kind;
     request.texMat = grassTask->params.grass->matIndices[kind];
@@ -195,10 +195,10 @@ static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
         func_ov036_021a3a70(task);
         return;
     }
-    func_0204f6d4(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
+    BlActSys_SetActorAnims(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
     actorIndex = grassTask->actorIndex;
-    func_0204f6ec(blact, actorIndex, 0);
-    func_0204f6c8(blact, actorIndex, TRUE);
+    BlActSys_SetActorAnim(blact, actorIndex, 0);
+    BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
     if (func_ov036_021a3abc(task) == FALSE) {
         grassTask->state = 1;
     }
@@ -225,30 +225,30 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
         if (GRASS_ENDS_ON_LEAVE[grassTask->params.kind] == TRUE) {
             FieldActor *actor = grassTask->params.actor;
 
-            if (func_ov012_02167da8(actor, &grassTask->identity) == TRUE && !func_ov036_021a4324(grassTask) &&
+            if (FldAct_CheckIdentity(actor, &grassTask->identity) == TRUE && !func_ov036_021a4324(grassTask) &&
                 GetActorMotionDir(actor) == 1) {
                 func_ov036_021a3a70(task);
                 return;
             }
         }
-        if (func_0204f768(blact, grassTask->actorIndex, &cmd)) {
+        if (BlActSys_GetActorLastCmd(blact, grassTask->actorIndex, &cmd)) {
             grassTask->state++;
         }
         break;
     case 1:
         // Settle
-        if (!func_ov012_02167da8(grassTask->params.actor, &grassTask->identity)) {
+        if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             func_ov036_021a3a70(task);
             return;
         }
-        func_0204f70c(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
+        BlActSys_SetActorStep(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
         grassTask->state++;
         break;
     case 2:
         grassTask->state++;
     case 3:
         // Stay until the actor leaves the tile
-        if (!func_ov012_02167da8(grassTask->params.actor, &grassTask->identity)) {
+        if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             func_ov036_021a3a70(task);
             return;
         }

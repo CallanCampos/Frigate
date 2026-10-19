@@ -88,7 +88,7 @@ static int (*sMyPokeSubSeqTable[])(WorldTradeWork *wk) = {
 };
 
 int WorldTrade_MyPoke_Init(WorldTradeWork *wk, int seq) {
-    PartyPkm *pkm = func_0200b4d0(wk->param->worldtrade_data);
+    PartyPkm *pkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
 
     MyPoke_InitWork(wk);
     MyPoke_BgInit();
@@ -125,7 +125,7 @@ int WorldTrade_MyPoke_End(WorldTradeWork *wk, int seq) {
     MyPoke_BmpWinDelete(wk);
     MyPoke_BgExit();
     WorldTrade_SubLcdBgExit(wk);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     WorldTrade_SubProcessUpdate(wk);
     return WT_SEQ_INIT;
 }
@@ -229,18 +229,18 @@ static void MyPoke_SetCellActor(WorldTradeWork *wk) {
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 208;
     setup.y = 58;
-    wk->pokemonAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    wk->pokemonAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
     func_0204c520(wk->pokemonAct, TRUE);
-    func_0204c488(wk->pokemonAct, 36);
-    func_0204c468(wk->pokemonAct, 1);
-    func_0204c124(wk->pokemonAct, TRUE);
-    func_02042ba8(FALSE, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->pokemonAct, 36);
+    ClActor_SetBgPriority(wk->pokemonAct, 1);
+    ClActor_SetVisible(wk->pokemonAct, TRUE);
+    GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);
 }
 
 static void MyPoke_DelCellActor(WorldTradeWork *wk) {
-    func_0204c108(wk->pokemonAct);
+    ClActor_Delete(wk->pokemonAct);
 }
 
 // The windows of the Pokémon's information
@@ -318,9 +318,9 @@ static int MyPoke_SubSeqStart(WorldTradeWork *wk) {
 }
 
 static int MyPoke_SubSeqMain(WorldTradeWork *wk) {
-    PartyPkm *pkm = func_0200b4d0(wk->param->worldtrade_data);
+    PartyPkm *pkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
 
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || GFL_HIDIsTouchPressed()) {
         MyPoke_SubSeqMessagePrint(wk, 5, 1, 0, 0xf0f, pkm);
         WorldTrade_SetNextSeq(wk, MYPOKE_SEQ_MESSAGE_WAIT, MYPOKE_SEQ_SELECT_LIST);
         GFL_SndSEPlay(0x54c);
@@ -381,7 +381,7 @@ static int MyPoke_SubSeqSelectWait(WorldTradeWork *wk) {
     if (ret == 1) {
         WorldTrade_SelBoxEnd(wk);
         ListMenuCore_FreeOptionList(wk->menuList);
-        pkm = func_0200b4d0(wk->param->worldtrade_data);
+        pkm = WorldTradeData_GetPkmPtr(wk->param->worldtrade_data);
         // A Pokémon with mail goes to the party, which must have room
         if (WorldTrade_PokemonMailCheck(pkm) && PokeParty_GetPkmCount(wk->param->myparty) == 6) {
             MyPoke_SubSeqMessagePrint(wk, 0x2a, 1, 0, 0xf0f, pkm);

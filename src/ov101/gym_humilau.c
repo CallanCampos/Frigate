@@ -396,7 +396,7 @@ static void GymHumilau_SetupObjects(HumilauGymWork *work) {
                 matrix->translation.z = z;
             }
             matrix->translation.y = PLATFORM_Y;
-            func_ov036_021b8248(work->expObj, 0, i, 1);
+            FieldExpObj_SetActorCulling(work->expObj, 0, i, 1);
             FieldExpObj_SetActorHidden(work->expObj, 0, i, FALSE);
 
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, i, ANM_FLOAT);
@@ -416,7 +416,7 @@ static void GymHumilau_SetupObjects(HumilauGymWork *work) {
         matrix->translation.x = 0;
         matrix->translation.z = 0;
         matrix->translation.y = PLATFORM_Y;
-        func_ov036_021b8248(work->expObj, 0, actor, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, actor, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, actor, TRUE);
         for (j = 0; j < 2; j++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, actor, j);
@@ -432,7 +432,7 @@ static void GymHumilau_SetupObjects(HumilauGymWork *work) {
         matrix->translation.x = 0;
         matrix->translation.z = 0;
         matrix->translation.y = PLATFORM_Y;
-        func_ov036_021b8248(work->expObj, 0, splash, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, splash, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, splash, TRUE);
         for (j = 0; j < 2; j++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, splash, j);
@@ -446,7 +446,7 @@ static void GymHumilau_SetupObjects(HumilauGymWork *work) {
     matrix->translation.x = 0;
     matrix->translation.y = 0;
     matrix->translation.z = 0;
-    func_ov036_021b8248(work->expObj, 0, ACTOR_LEADER_SPLASH, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, ACTOR_LEADER_SPLASH, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, ACTOR_LEADER_SPLASH, TRUE);
     for (j = 0; j < 2; j++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, ACTOR_LEADER_SPLASH, j);
@@ -459,7 +459,7 @@ static void GymHumilau_SetupObjects(HumilauGymWork *work) {
     matrix->translation.x = 0;
     matrix->translation.y = 0;
     matrix->translation.z = 0;
-    func_ov036_021b8248(work->expObj, 0, ACTOR_LEADER_WAVES, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, ACTOR_LEADER_WAVES, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, ACTOR_LEADER_WAVES, TRUE);
     for (j = 0; j < 3; j++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, ACTOR_LEADER_WAVES, j);
@@ -516,8 +516,8 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         GymHumilau_ClearAreas(work);
         GymHumilau_AddRideAreas(work, ev->ride);
         actor = FieldPlayer_GetActor(ev->player);
-        if (!func_ov012_02166ecc(actor) && func_ov036_0219a5dc(ev->player) == TRUE) {
-            func_ov012_02166f2c(actor);
+        if (!FldAct_CheckAcmdEnd(actor) && func_ov036_0219a5dc(ev->player) == TRUE) {
+            FldAct_FreeAcmd(actor);
         }
         *state = 1;
         break;
@@ -1082,7 +1082,7 @@ static void GymHumilau_PlayWake(HumilauGymRideEvent *ev, u16 platform) {
     u16 wake;
 
     for (actor = ACTOR_WAKE_FIRST; actor < ACTOR_WAKE_END; actor++) {
-        if (func_ov036_021b84ec(FieldExpObj_GetAnmInfo(expObj, 0, actor, 0))) {
+        if (FieldExpObjAnm_IsPaused(FieldExpObj_GetAnmInfo(expObj, 0, actor, 0))) {
             wake = actor;
             allBusy = FALSE;
             break;

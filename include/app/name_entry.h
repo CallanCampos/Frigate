@@ -68,17 +68,17 @@ NameEntryParam *setupPokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLengt
                                       TrainerGameInfoSave *gameInfo);
 NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, u32 unkC, u32 unk10,
                                  u32 unk14, TrainerGameInfoSave *gameInfo);
-void func_ov012_02165ae8(NameEntryParam *param);
+void NameEntryParam_Free(NameEntryParam *param);
 // Copies the entered name, and compares it with a string
-void func_ov012_02165afc(NameEntryParam *param, StrBuf *dest);
+void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest);
 BOOL func_ov012_02165b0c(NameEntryParam *param);
-BOOL func_ov012_02165b10(NameEntryParam *param, const StrBuf *str);
+BOOL NameEntryParam_CompareName(NameEntryParam *param, const StrBuf *str);
 // Overlay 12
-void func_ov012_021603ec(StrBuf *name, u8 value);
+void GameBeacon_BroadcastPhrase(StrBuf *name, u8 value);
 
 // The keyboard that each mode last used, a byte of the trainer's info save (not declared in save_control.h)
-u8 func_0200c84c(TrainerGameInfoSave *info, u32 index);
-void func_0200c844(TrainerGameInfoSave *info, u32 index, u8 value);
+u8 TrainerGameInfo_GetKeyboardType(TrainerGameInfoSave *info, u32 index);
+void TrainerGameInfo_SetKeyboardType(TrainerGameInfoSave *info, u32 index, u8 value);
 
 extern const GameProcFunctions NAME_ENTRY_PROC_FUNCTIONS;
 // The sound sequences that the name entry plays, which the new game loads before it

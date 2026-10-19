@@ -99,7 +99,7 @@ static void func_ov036_021c9394(HollowEventWork *work);
 static void func_ov036_021c93c0(HollowEventWork *work);
 static u32 func_ov036_021c9440(u32 hollow);
 
-void generateHollow(RivalDataSave *data, u32 hollow) {
+void generateHollow(RivalDataSave *data, u8 hollow) {
     u8 slot = 10;
     u8 group = GFL_RandomLC(4);
     u32 volume = PassPower_ApplyGrottoVolume(1);
@@ -157,8 +157,8 @@ BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     slot = getSlotNumber(rival, hollow);
     group = getGroupNumber(rival, hollow);
     gimmick = Field_GetFesGimmick(field);
-    if (hollowFesMissions(gimmick, hollow) && func_ov073_021e8cac(gimmick, hollow) == 1) {
-        entry = func_ov073_021e8be0(gimmick, hollow);
+    if (hollowFesMissions(gimmick, hollow) && RivalSelect_IsSelectedAndActive(gimmick, hollow) == 1) {
+        entry = RivalSelect_GetEntry(gimmick, hollow);
         mission = TRUE;
     }
     switch (param) {
@@ -239,11 +239,11 @@ BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env) {
     u8 hollow = getHollowNum(rival);
     void *gimmick = Field_GetFesGimmick(field);
 
-    if (hollowFesMissions(gimmick, hollow) && func_ov073_021e8cac(gimmick, hollow) == 1) {
+    if (hollowFesMissions(gimmick, hollow) && RivalSelect_IsSelectedAndActive(gimmick, hollow) == 1) {
         mission = TRUE;
     }
     if (mission) {
-        func_ov073_021e8bfc(gimmick, hollow);
+        RivalSelect_SelectOtherRandom(gimmick, hollow);
     } else {
         setHollowStatus(rival, hollow, FALSE);
     }
@@ -331,7 +331,7 @@ static void SetupHiddenHollowEvents(HollowEventWork *work) {
             break;
         }
     } else {
-        if (func_ov073_021e8cac(gimmick, work->hollow)) {
+        if (RivalSelect_IsSelectedAndActive(gimmick, work->hollow)) {
             func_ov036_021c9394(work);
         }
         EventWork_FlagReset(work->eventWork, FLAG_HOLLOW_EVENT);
@@ -466,7 +466,7 @@ BOOL s02E5_HiddenHollowSet(VM *vm, FieldScriptEnv *env) {
 
 static void func_ov036_021c9394(HollowEventWork *work) {
     void *gimmick = Field_GetFesGimmick(work->field);
-    RivalEntry *entry = func_ov073_021e8be0(gimmick, work->hollow);
+    RivalEntry *entry = RivalSelect_GetEntry(gimmick, work->hollow);
 
     CreateHiddenHollowPokemonActor(work->actors, entry->unk4, entry->unk1, entry->unk6, 1, 0x15);
 }
@@ -477,7 +477,7 @@ static void func_ov036_021c93c0(HollowEventWork *work) {
     getTypeOfFilledSlot(work->rival, work->hollow);
     gimmick = Field_GetFesGimmick(work->field);
     if (hollowFesMissions(gimmick, work->hollow)) {
-        func_ov073_021e8cdc(gimmick, work->hollow);
+        RivalSelect_SetActive(gimmick, work->hollow);
     }
 }
 

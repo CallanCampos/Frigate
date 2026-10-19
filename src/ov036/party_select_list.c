@@ -1,6 +1,8 @@
 #include "types.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/union_msg.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
@@ -15,6 +17,7 @@
 #include "system/gf_font.h"
 #include "system/poke_icon.h"
 #include "system/wordset.h"
+#include "text/system/0104.h"
 
 #define PARTY_SELECT_LIST_MAX 6
 
@@ -77,7 +80,11 @@ static void func_ov036_021c3aa4(PartySelectList *psl);
 static void func_ov036_021c3abc(PartySelectList *psl, PokeParty *party);
 static void func_ov036_021c3a70(PartySelectList *psl);
 
-static const u32 data_ov036_021d2508[6] = { 0, 0, 1, 1, 2, 2 };
+static const ListMenuRow data_ov036_021d2508[3] = {
+    { Bank0104_Text_Party, { 0 } },
+    { Bank0104_Text_BattleBox, { 1 } },
+    { Bank0104_Text_Cancel, { 2 } },
+};
 static const ListMenuRequest data_ov036_021d2520 = { 3, 3,   0,    0x0d, 0x1000, 0x2f, 0, 1, 0,
                                                      0, 0xc, 0x10, 0x12, 0xb,    0xd,  6, 0 };
 
@@ -92,7 +99,7 @@ void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 p
     psl->heapId = heapId;
     psl->partyOk = partyOk;
     psl->bboxOk = bboxOk;
-    psl->unit = func_0204bf1c(32, 10, psl->heapId);
+    psl->unit = ClActUnit_Create(32, 10, psl->heapId);
     psl->font = GFL_FontCreate(23, 3, 0, 0, psl->heapId);
     func_ov036_021c3924(psl);
     func_ov036_021c3344(psl);
@@ -113,7 +120,7 @@ int func_ov036_021c3218(void *select, u32 *out) {
     func_ov036_021c340c(psl);
     func_ov036_021c3950(psl);
     GFL_FontFree(psl->font);
-    func_0204bf98(psl->unit);
+    ClActUnit_Delete(psl->unit);
     GFL_HeapFree(psl);
     return result;
 }
@@ -174,18 +181,18 @@ static void func_ov036_021c3344(PartySelectList *psl) {
     int count;
     int i;
 
-    psl->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 0, 192, psl->heapId);
-    psl->iconCells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), psl->heapId);
+    psl->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 0, 192, psl->heapId);
+    psl->iconCells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), psl->heapId);
     count = PokeParty_GetPkmCount(psl->temoti);
     for (i = 0; i < count; i++) {
-        psl->partyChars[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->temoti, i))),
-                                           0, 0, psl->heapId);
+        psl->partyChars[i] = ClActSys_LoadChars(
+            arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->temoti, i))), 0, 0, psl->heapId);
     }
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
         for (i = 0; i < count; i++) {
-            psl->bboxChars[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->bbox, i))),
-                                              0, 0, psl->heapId);
+            psl->bboxChars[i] = ClActSys_LoadChars(
+                arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->bbox, i))), 0, 0, psl->heapId);
         }
     }
     GFL_ArcToolFree(arc);
@@ -198,15 +205,15 @@ static void func_ov036_021c340c(PartySelectList *psl) {
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
         for (i = 0; i < count; i++) {
-            func_0204b98c(psl->bboxChars[i]);
+            ClActSys_FreeChars(psl->bboxChars[i]);
         }
     }
     count = PokeParty_GetPkmCount(psl->temoti);
     for (i = 0; i < count; i++) {
-        func_0204b98c(psl->partyChars[i]);
+        ClActSys_FreeChars(psl->partyChars[i]);
     }
-    func_0204be64(psl->iconCells);
-    func_0204bcd0(psl->iconPalette);
+    ClActSys_FreeCellAnims(psl->iconCells);
+    ClActSys_FreePltt(psl->iconPalette);
 }
 
 static void func_ov036_021c3468(PartySelectList *psl) {
@@ -227,7 +234,7 @@ static void func_ov036_021c3468(PartySelectList *psl) {
 
         setup.x = i * 40 + 24;
         psl->partyIcons[i] =
-            func_0204c040(psl->unit, psl->partyChars[i], psl->iconPalette, psl->iconCells, &setup, 0, psl->heapId);
+            ClActor_Create(psl->unit, psl->partyChars[i], psl->iconPalette, psl->iconCells, &setup, 0, psl->heapId);
         pkm = PokeParty_GetPkm(psl->temoti, i);
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
@@ -238,8 +245,8 @@ static void func_ov036_021c3468(PartySelectList *psl) {
         }
         sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
         palette = PokeIcon_GetPalette(species, form, sex, egg);
-        func_0204c378(psl->partyIcons[i], (u8)palette, 1);
-        func_0204c124(psl->partyIcons[i], FALSE);
+        ClActor_SetPalette(psl->partyIcons[i], (u8)palette, 1);
+        ClActor_SetVisible(psl->partyIcons[i], FALSE);
     }
     if (psl->bbox != NULL) {
         bboxCount = PokeParty_GetPkmCount(psl->bbox);
@@ -251,7 +258,7 @@ static void func_ov036_021c3468(PartySelectList *psl) {
 
             setup.x = i * 40 + 24;
             psl->bboxIcons[i] =
-                func_0204c040(psl->unit, psl->bboxChars[i], psl->iconPalette, psl->iconCells, &setup, 0, psl->heapId);
+                ClActor_Create(psl->unit, psl->bboxChars[i], psl->iconPalette, psl->iconCells, &setup, 0, psl->heapId);
             pkm = PokeParty_GetPkm(psl->bbox, i);
             species2 = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
             form2 = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
@@ -262,8 +269,8 @@ static void func_ov036_021c3468(PartySelectList *psl) {
             }
             sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
             palette = PokeIcon_GetPalette(species2, form2, sex, egg);
-            func_0204c378(psl->bboxIcons[i], (u8)palette, 1);
-            func_0204c124(psl->bboxIcons[i], FALSE);
+            ClActor_SetPalette(psl->bboxIcons[i], (u8)palette, 1);
+            ClActor_SetVisible(psl->bboxIcons[i], FALSE);
         }
     }
 }
@@ -273,12 +280,12 @@ static void func_ov036_021c3600(PartySelectList *psl) {
     int i;
 
     for (i = 0; i < count; i++) {
-        func_0204c108(psl->partyIcons[i]);
+        ClActor_Delete(psl->partyIcons[i]);
     }
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
         for (i = 0; i < count; i++) {
-            func_0204c108(psl->bboxIcons[i]);
+            ClActor_Delete(psl->bboxIcons[i]);
         }
     }
 }
@@ -288,22 +295,22 @@ static void func_ov036_021c3648(PartySelectList *psl, u32 mode) {
 
     for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
         if (psl->partyIcons[i] != NULL) {
-            func_0204c124(psl->partyIcons[i], FALSE);
+            ClActor_SetVisible(psl->partyIcons[i], FALSE);
         }
         if (psl->bboxIcons[i] != NULL) {
-            func_0204c124(psl->bboxIcons[i], FALSE);
+            ClActor_SetVisible(psl->bboxIcons[i], FALSE);
         }
     }
     if (mode == 0) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->partyIcons[i] != NULL) {
-                func_0204c124(psl->partyIcons[i], TRUE);
+                ClActor_SetVisible(psl->partyIcons[i], TRUE);
             }
         }
     } else if (mode == 1) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->bboxIcons[i] != NULL) {
-                func_0204c124(psl->bboxIcons[i], TRUE);
+                ClActor_SetVisible(psl->bboxIcons[i], TRUE);
             }
         }
     }
@@ -312,16 +319,16 @@ static void func_ov036_021c3648(PartySelectList *psl, u32 mode) {
 static void func_ov036_021c36b8(PartySelectList *psl) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(0x52, psl->heapId);
 
-    psl->itemPalette = func_0204bbb8(arc, func_0202d890(), 0, 0x120, 0, 1, psl->heapId);
-    psl->itemCells = func_0204bde0(arc, func_0202d898(1), func_0202d89c(1), psl->heapId);
-    psl->itemChars = func_0204b81c(arc, func_0202d894(), 0, 0, psl->heapId);
+    psl->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), 0, 0x120, 0, 1, psl->heapId);
+    psl->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(1), func_0202d89c(1), psl->heapId);
+    psl->itemChars = ClActSys_LoadChars(arc, func_0202d894(), 0, 0, psl->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void func_ov036_021c3730(PartySelectList *psl) {
-    func_0204b98c(psl->itemChars);
-    func_0204be64(psl->itemCells);
-    func_0204bcd0(psl->itemPalette);
+    ClActSys_FreeChars(psl->itemChars);
+    ClActSys_FreeCellAnims(psl->itemCells);
+    ClActSys_FreePltt(psl->itemPalette);
 }
 
 static void func_ov036_021c3750(PartySelectList *psl) {
@@ -340,8 +347,8 @@ static void func_ov036_021c3750(PartySelectList *psl) {
             }
             setup.x = i * 40 + 32;
             psl->partyItems[i] =
-                func_0204c040(psl->unit, psl->itemChars, psl->itemPalette, psl->itemCells, &setup, 0, psl->heapId);
-            func_0204c124(psl->partyItems[i], FALSE);
+                ClActor_Create(psl->unit, psl->itemChars, psl->itemPalette, psl->itemCells, &setup, 0, psl->heapId);
+            ClActor_SetVisible(psl->partyItems[i], FALSE);
         }
     }
     if (psl->bbox != NULL) {
@@ -357,8 +364,8 @@ static void func_ov036_021c3750(PartySelectList *psl) {
                 }
                 setup.x = i * 40 + 32;
                 psl->bboxItems[i] =
-                    func_0204c040(psl->unit, psl->itemChars, psl->itemPalette, psl->itemCells, &setup, 0, psl->heapId);
-                func_0204c124(psl->bboxItems[i], FALSE);
+                    ClActor_Create(psl->unit, psl->itemChars, psl->itemPalette, psl->itemCells, &setup, 0, psl->heapId);
+                ClActor_SetVisible(psl->bboxItems[i], FALSE);
             }
         }
     }
@@ -370,14 +377,14 @@ static void func_ov036_021c3864(PartySelectList *psl) {
 
     for (i = 0; i < count; i++) {
         if (psl->partyItems[i] != NULL) {
-            func_0204c108(psl->partyItems[i]);
+            ClActor_Delete(psl->partyItems[i]);
         }
     }
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
         for (i = 0; i < count; i++) {
             if (psl->bboxItems[i] != NULL) {
-                func_0204c108(psl->bboxItems[i]);
+                ClActor_Delete(psl->bboxItems[i]);
             }
         }
     }
@@ -388,22 +395,22 @@ static void func_ov036_021c38b4(PartySelectList *psl, u32 mode) {
 
     for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
         if (psl->partyItems[i] != NULL) {
-            func_0204c124(psl->partyItems[i], FALSE);
+            ClActor_SetVisible(psl->partyItems[i], FALSE);
         }
         if (psl->bboxItems[i] != NULL) {
-            func_0204c124(psl->bboxItems[i], FALSE);
+            ClActor_SetVisible(psl->bboxItems[i], FALSE);
         }
     }
     if (mode == 0) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->partyItems[i] != NULL) {
-                func_0204c124(psl->partyItems[i], TRUE);
+                ClActor_SetVisible(psl->partyItems[i], TRUE);
             }
         }
     } else if (mode == 1) {
         for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
             if (psl->bboxItems[i] != NULL) {
-                func_0204c124(psl->bboxItems[i], TRUE);
+                ClActor_SetVisible(psl->bboxItems[i], TRUE);
             }
         }
     }
@@ -412,7 +419,7 @@ static void func_ov036_021c38b4(PartySelectList *psl, u32 mode) {
 static void func_ov036_021c3924(PartySelectList *psl) {
     void *msgBGSys = Field_GetMsgBGSys(psl->field);
 
-    psl->msgData = func_ov036_021879a0(msgBGSys, 0x68);
+    psl->msgData = func_ov036_021879a0(msgBGSys, TEXT_BANK_0104);
     psl->msgBGSys = msgBGSys;
     psl->wordSet = GFL_WordSetSystemCreateDefault(psl->heapId);
 }

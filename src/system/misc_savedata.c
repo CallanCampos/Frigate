@@ -103,7 +103,7 @@ void setHollowStatus(RivalDataSave *data, u32 hollow, BOOL filled) {
     data->hollows[hollow].filled = filled;
 }
 
-BOOL isHollowFilled(RivalDataSave *data, u32 hollow) {
+BOOL isHollowFilled(RivalDataSave *data, u8 hollow) {
     return data->hollows[hollow].filled;
 }
 

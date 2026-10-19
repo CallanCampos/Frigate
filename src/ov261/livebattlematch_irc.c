@@ -103,16 +103,16 @@ LiveBattleMatchIrc *LiveBattleMatchIrc_Create(GameData *gameData, HeapID heapId)
 
     MI_CpuFill8(irc, 0, sizeof(LiveBattleMatchIrc));
     irc->heapId = heapId;
-    if (func_02042788()) {
-        func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
-                      LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
+    if (GFL_NetIsInitialized()) {
+        NetCommand_AddTable(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
+                            LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
     }
     return irc;
 }
 
 void LiveBattleMatchIrc_Delete(LiveBattleMatchIrc *irc) {
-    if (func_02042788()) {
-        func_02040c64(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
+    if (GFL_NetIsInitialized()) {
+        NetCommand_RemoveTable(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
     }
     GFL_HeapFree(irc);
 }
@@ -123,12 +123,12 @@ void LiveBattleMatchIrc_Main(LiveBattleMatchIrc *irc) {
 BOOL LiveBattleMatchIrc_CheckError(LiveBattleMatchIrc *irc) {
     if (GFL_NetErrCheck()) {
         if (irc->p_delivery != NULL) {
-            func_ov012_02153150(irc->p_delivery);
+            DeliveryIrc_End(irc->p_delivery);
             irc->p_delivery = NULL;
         }
-        func_02012154();
-        func_02011de0();
-        func_02012144();
+        GFL_NetErrShutdown();
+        GFL_NetErrShowScreen();
+        GFL_NetErrClear();
         return TRUE;
     }
     return FALSE;
@@ -142,18 +142,18 @@ BOOL LiveBattleMatchIrc_ResetLink(LiveBattleMatchIrc *irc) {
 int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
     switch (irc->state) {
     case 0:
-        func_020425ec(&sLiveBattleMatchIrcNetInit, NULL, NULL);
+        GFL_NetInit(&sLiveBattleMatchIrcNetInit, NULL, NULL);
         sLiveBattleMatchIrcIsLinked = TRUE;
         irc->state = 1;
         break;
     case 1:
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             irc->state = 2;
         }
         break;
     case 2:
-        func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
-                      LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
+        NetCommand_AddTable(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
+                            LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
         NetDevIrc_SetPeerFilter(LiveBattleMatchIrc_OnLinkChanged);
         irc->state = 3;
         break;
@@ -162,7 +162,7 @@ int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
         irc->state = 4;
         break;
     case 4:
-        if (func_02042a78() > 1) {
+        if (GFL_NetGetNegotiatedCount() > 1) {
             irc->state = 5;
         }
         if (!sLiveBattleMatchIrcIsLinked) {
@@ -181,7 +181,7 @@ int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
 
 void LiveBattleMatchIrc_CancelLink(LiveBattleMatchIrc *irc) {
     if (irc->state >= 2) {
-        func_02040c64(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
+        NetCommand_RemoveTable(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
     }
     NetDevIrc_SetPeerFilter(NULL);
     irc->state = 0;
@@ -190,15 +190,15 @@ void LiveBattleMatchIrc_CancelLink(LiveBattleMatchIrc *irc) {
 BOOL LiveBattleMatchIrc_StepCancel(LiveBattleMatchIrc *irc) {
     switch (irc->state) {
     case 0:
-        if (func_02042788()) {
-            func_02042860(NULL);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetExit(NULL);
             irc->state = 1;
         } else {
             irc->state = 2;
         }
         break;
     case 1:
-        if (func_020427a4()) {
+        if (GFL_NetIsEnded()) {
             irc->state = 2;
         }
         break;
@@ -216,12 +216,12 @@ BOOL LiveBattleMatchIrc_ResetEnd(LiveBattleMatchIrc *irc) {
 BOOL LiveBattleMatchIrc_StepEnd(LiveBattleMatchIrc *irc) {
     switch (irc->state) {
     case 0:
-        func_02040c64(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
-        func_02042860(NULL);
+        NetCommand_RemoveTable(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
+        GFL_NetExit(NULL);
         irc->state = 1;
         break;
     case 1:
-        if (func_020427a4()) {
+        if (GFL_NetIsEnded()) {
             irc->state = 2;
         }
         break;
@@ -232,11 +232,12 @@ BOOL LiveBattleMatchIrc_StepEnd(LiveBattleMatchIrc *irc) {
 }
 
 BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, void *data) {
-    u8 partnerId = func_02042a6c(func_02040440()) ? 0 : 1;
-    NetHandle *handle = func_02040440();
+    u8 partnerId = GFL_NetGetHandleNetId(NetHandle_GetOwn()) ? 0 : 1;
+    NetHandle *handle = NetHandle_GetOwn();
 
-    return func_02042c18(handle, partnerId, LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA,
-                         PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, data, TRUE, TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(handle, partnerId, LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA,
+                                       PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, data, TRUE,
+                                       TRUE, TRUE);
 }
 
 BOOL LiveBattleMatchIrc_TakePlayerData(LiveBattleMatchIrc *irc, void **data) {
@@ -250,11 +251,11 @@ BOOL LiveBattleMatchIrc_TakePlayerData(LiveBattleMatchIrc *irc, void **data) {
 }
 
 BOOL LiveBattleMatchIrc_SendParty(LiveBattleMatchIrc *irc, PokeParty *party) {
-    u8 partnerId = func_02042a6c(func_02040440()) ? 0 : 1;
-    NetHandle *handle = func_02040440();
+    u8 partnerId = GFL_NetGetHandleNetId(NetHandle_GetOwn()) ? 0 : 1;
+    NetHandle *handle = NetHandle_GetOwn();
 
-    return func_02042c18(handle, partnerId, LIVEBATTLEMATCH_IRC_COMMAND_PARTY, PokeParty_GetSaveDataSize(), party, TRUE,
-                         TRUE, TRUE);
+    return GFL_NetSendCommandToMachine(handle, partnerId, LIVEBATTLEMATCH_IRC_COMMAND_PARTY,
+                                       PokeParty_GetSaveDataSize(), party, TRUE, TRUE, TRUE);
 }
 
 BOOL LiveBattleMatchIrc_TakeParty(LiveBattleMatchIrc *irc, PokeParty *party) {
@@ -268,10 +269,10 @@ BOOL LiveBattleMatchIrc_TakeParty(LiveBattleMatchIrc *irc, PokeParty *party) {
 }
 
 BOOL LiveBattleMatchIrc_SendReady(LiveBattleMatchIrc *irc, const u32 *flag) {
-    u8 partnerId = func_02042a6c(func_02040440()) ? 0 : 1;
+    u8 partnerId = GFL_NetGetHandleNetId(NetHandle_GetOwn()) ? 0 : 1;
 
-    return func_02042c18(func_02040440(), partnerId, LIVEBATTLEMATCH_IRC_COMMAND_READY, sizeof(u32), flag, TRUE, TRUE,
-                         TRUE);
+    return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), partnerId, LIVEBATTLEMATCH_IRC_COMMAND_READY, sizeof(u32),
+                                       flag, TRUE, TRUE, TRUE);
 }
 
 BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag) {
@@ -297,32 +298,32 @@ void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, void *buffer) {
     init.data[0].mask = LIVEBATTLEMATCH_VERSION_MASK;
     init.dataNum = 1;
     GFL_ASSERT(p_wk->p_delivery == NULL);
-    p_wk->p_delivery = func_ov012_0215309c(&init);
+    p_wk->p_delivery = DeliveryIrc_Init(&init);
     p_wk->state = 0;
 }
 
 int LiveBattleMatchIrc_StepDelivery(LiveBattleMatchIrc *irc) {
     if (irc->p_delivery != NULL) {
-        func_ov012_0215313c(irc->p_delivery);
+        DeliveryIrc_Main(irc->p_delivery);
     }
     switch (irc->state) {
     case 0:
-        func_ov012_021530f8(irc->p_delivery);
+        DeliveryIrc_RecvStart(irc->p_delivery);
         irc->state++;
         break;
     case 1:
-        irc->deliveryResult = func_ov012_02153130(irc->p_delivery);
+        irc->deliveryResult = DeliveryIrc_GetResult(irc->p_delivery);
         if (irc->deliveryResult != 0) {
             irc->state++;
         }
         break;
     case 2:
-        func_ov012_02153150(irc->p_delivery);
+        DeliveryIrc_End(irc->p_delivery);
         irc->p_delivery = NULL;
         irc->state++;
         break;
     case 3:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             switch (irc->deliveryResult) {
             case 1:
                 return 1;
@@ -344,18 +345,18 @@ void LiveBattleMatchIrc_ResetDeliveryEnd(LiveBattleMatchIrc *irc) {
 
 BOOL LiveBattleMatchIrc_StepDeliveryEnd(LiveBattleMatchIrc *irc) {
     if (irc->p_delivery != NULL) {
-        func_ov012_0215313c(irc->p_delivery);
+        DeliveryIrc_Main(irc->p_delivery);
     }
     switch (irc->state) {
     case 0:
         if (irc->p_delivery != NULL) {
-            func_ov012_02153150(irc->p_delivery);
+            DeliveryIrc_End(irc->p_delivery);
             irc->p_delivery = NULL;
         }
         irc->state++;
         break;
     case 1:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             return TRUE;
         }
         break;
@@ -366,7 +367,7 @@ BOOL LiveBattleMatchIrc_StepDeliveryEnd(LiveBattleMatchIrc *irc) {
 static void LiveBattleMatchIrc_OnPlayerData(int netId, int size, const void *data, void *work, NetHandle *handle) {
     LiveBattleMatchIrc *irc = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         irc->playerDataArrived = TRUE;
     }
 }
@@ -374,7 +375,7 @@ static void LiveBattleMatchIrc_OnPlayerData(int netId, int size, const void *dat
 static void LiveBattleMatchIrc_OnParty(int netId, int size, const void *data, void *work, NetHandle *handle) {
     LiveBattleMatchIrc *irc = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         irc->partyArrived = TRUE;
     }
 }
@@ -382,7 +383,7 @@ static void LiveBattleMatchIrc_OnParty(int netId, int size, const void *data, vo
 static void LiveBattleMatchIrc_OnUnused(int netId, int size, const void *data, void *work, NetHandle *handle) {
     LiveBattleMatchIrc *irc = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         irc->unusedArrived = TRUE;
     }
 }
@@ -390,7 +391,7 @@ static void LiveBattleMatchIrc_OnUnused(int netId, int size, const void *data, v
 static void LiveBattleMatchIrc_OnReady(int netId, int size, const void *data, void *work, NetHandle *handle) {
     LiveBattleMatchIrc *irc = work;
 
-    if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
+    if (handle == NetHandle_GetOwn() && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         irc->readyArrived = TRUE;
     }
 }
@@ -398,7 +399,7 @@ static void LiveBattleMatchIrc_OnReady(int netId, int size, const void *data, vo
 static void *LiveBattleMatchIrc_GetBuffer(int netId, void *work, int size) {
     LiveBattleMatchIrc *irc = work;
 
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         GFL_ASSERT(0);
         return NULL;
     }

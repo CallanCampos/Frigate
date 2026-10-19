@@ -327,7 +327,7 @@ struct JoinAvenueSave {
     u8 unk13E0[0x2c8];
 };
 
-// What a person is added from, the kind that func_020388e8 takes
+// What a person is added from, the kind that JoinAvenueOccupants_Merge takes
 typedef enum {
     JOIN_AVE_SOURCE_VISITOR = 0,
     JOIN_AVE_SOURCE_PERSON = 1,
@@ -335,133 +335,138 @@ typedef enum {
 } JoinAvenueSourceKind;
 
 // The block's size and its initial state
-u32 func_0200fffc(void);
-void func_02010004(JoinAvenueSave *joinAvenue);
+u32 JoinAvenueSave_GetSize(void);
+void JoinAvenueSave_Init(JoinAvenueSave *joinAvenue);
 
 JoinAvenuePersonList *JoinAvenuePersonList_Create(HeapID heapId, u32 count);
 void JoinAvenuePersonList_Free(JoinAvenuePersonList *list);
-void func_02037ffc(JoinAvenuePersonList *list, u32 count);
+void JoinAvenuePersonList_Init(JoinAvenuePersonList *list, u32 count);
 JoinAvenuePerson *JoinAvenuePersonList_Get(JoinAvenuePersonList *list, u32 index);
 u32 JoinAvenuePersonList_GetCount(JoinAvenuePersonList *list);
 // The number of people in the list
-u32 func_02038030(JoinAvenuePersonList *list);
+u32 JoinAvenuePersonList_CountUsed(JoinAvenuePersonList *list);
 // Merges into the person of the list who matches, returning 1 when merged, 2 when it can't, and 0 if none matches
-u32 func_0203806c(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor);
-u32 func_02038090(JoinAvenuePersonList *list, const JoinAvenuePerson *src);
-u32 func_020380b4(JoinAvenuePersonList *list, const JoinAvenueEntry *entry);
+u32 JoinAvenuePersonList_MergeVisitor(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor);
+u32 JoinAvenuePersonList_MergePerson(JoinAvenuePersonList *list, const JoinAvenuePerson *src);
+u32 JoinAvenuePersonList_MergeEntry(JoinAvenuePersonList *list, const JoinAvenueEntry *entry);
 // Adds to an empty place or in place of a person whose stay is over: 1 when added, 2 when it can't, and 0 if there's
 // no room or the visitor came today
-u32 func_020380d8(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor);
-u32 func_0203815c(JoinAvenuePersonList *list, const JoinAvenuePerson *src);
+u32 JoinAvenuePersonList_AddVisitor(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor);
+u32 JoinAvenuePersonList_AddPerson(JoinAvenuePersonList *list, const JoinAvenuePerson *src);
 BOOL JoinAvenuePerson_IsEmpty(JoinAvenuePerson *person);
 void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam param, u32 value);
 JoinAvenueInfo *JoinAvenue_GetInfo(JoinAvenueSave *joinAvenue);
-void func_02038e54(JoinAvenueInfo *info);
+void JoinAvenueInfo_Init(JoinAvenueInfo *info);
 // A field of the info, which reads into the buffer for the avenue's names
 u32 JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer);
 JoinAvenuePersonList *JoinAvenue_GetPersonList(JoinAvenueSave *joinAvenue);
 // Records an activity of the player's, the latest of the four recent ones
-void func_02038bc8(u32 id);
+void JoinAvenue_RecordActivity(u32 id);
 // Sets a field of the info
-void func_02039064(JoinAvenueInfo *info, u32 param, u32 value);
-void func_020392d4(JoinAvenueInfo *info, BOOL fullDay);
+void JoinAvenueInfo_SetParam(JoinAvenueInfo *info, u32 param, u32 value);
+void JoinAvenueInfo_ResetDaily(JoinAvenueInfo *info, BOOL fullDay);
 // Where the info and occupants of the save are, for the functions that don't take them
 void setImportantJABlockAddresses(SaveControl *save);
 
 // A person's fields. joinAveTextHandler reads one, into the buffer for a name
 u32 joinAveTextHandler(const JoinAvenuePerson *person, JoinAvenuePersonParam param, void *buffer);
 // Allocates a person, frees one and clears one
-JoinAvenuePerson *func_02036d94(HeapID heapId);
-void func_02036db8(JoinAvenuePerson *person);
-void func_02036e14(JoinAvenuePerson *person);
+JoinAvenuePerson *JoinAvenuePerson_Create(HeapID heapId);
+void JoinAvenuePerson_Free(JoinAvenuePerson *person);
+void JoinAvenuePerson_Clear(JoinAvenuePerson *person);
 // Fills the player's own person
-void func_02036dc0(JoinAvenuePerson *person, GameData *gameData);
+void JoinAvenuePerson_InitPlayer(JoinAvenuePerson *person, GameData *gameData);
 // Whether the person's data are all valid
-BOOL func_020370a4(JoinAvenuePerson *person);
+BOOL JoinAvenuePerson_IsValid(JoinAvenuePerson *person);
 // A random number from the person's seed, of the count-th step: below max, or any if max is 0
-u32 func_020378f8(JoinAvenuePerson *person, int count, u32 max);
+u32 JoinAvenuePerson_Random(JoinAvenuePerson *person, int count, u32 max);
 // The entries, twelve from 4 bytes into the Join Avenue's save at 0x628, with the same functions as a person's
-JoinAvenueEntryList *func_02010054(JoinAvenueSave *joinAvenue);
-void func_02037e4c(JoinAvenueEntryList *list, u32 count);
+JoinAvenueEntryList *JoinAvenue_GetEntryList(JoinAvenueSave *joinAvenue);
+void JoinAvenueEntryList_Init(JoinAvenueEntryList *list, u32 count);
 // Adds an entry to an empty place: 1 when added, 2 when it isn't valid and 0 if there's no room
-u32 func_02037e7c(JoinAvenueEntryList *list, JoinAvenueEntry *entry);
-JoinAvenueEntry *func_02037f04(JoinAvenueEntryList *list, u32 index);
+u32 JoinAvenueEntryList_Add(JoinAvenueEntryList *list, JoinAvenueEntry *entry);
+JoinAvenueEntry *JoinAvenueEntryList_Get(JoinAvenueEntryList *list, u32 index);
 // The number of entries, and the number that aren't empty
-u32 func_02037ed4(JoinAvenueEntryList *list);
-u32 func_02037ed8(JoinAvenueEntryList *list);
+u32 JoinAvenueEntryList_GetCount(JoinAvenueEntryList *list);
+u32 JoinAvenueEntryList_CountUsed(JoinAvenueEntryList *list);
 // Whether one matches, and merging an entry into the one that matches
-BOOL func_02037f10(JoinAvenueEntryList *list, const JoinAvenueVisitor *visitor);
-BOOL func_02037f24(JoinAvenueEntryList *list, const JoinAvenuePerson *person);
-BOOL func_02037f38(JoinAvenueEntryList *list, const JoinAvenueEntry *entry);
+BOOL JoinAvenueEntryList_HasVisitor(JoinAvenueEntryList *list, const JoinAvenueVisitor *visitor);
+BOOL JoinAvenueEntryList_HasPerson(JoinAvenueEntryList *list, const JoinAvenuePerson *person);
+BOOL JoinAvenueEntryList_MergeEntry(JoinAvenueEntryList *list, const JoinAvenueEntry *entry);
 // Called with an entry by overlay 137, which counts a result of 2 and stops at 0
-u32 func_02010078(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3);
-void func_02010098(JoinAvenueSave *joinAvenue);
-BOOL func_020100a4(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out);
+u32 JoinAvenue_Add(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3);
+void JoinAvenue_ResetAddStep(JoinAvenueSave *joinAvenue);
+BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out);
 // The visitor of a beacon
-JoinAvenueVisitor *func_02037910(HeapID heapId);
-void func_02037930(JoinAvenueVisitor *visitor);
+JoinAvenueVisitor *JoinAvenueVisitor_Create(HeapID heapId);
+void JoinAvenueVisitor_Free(JoinAvenueVisitor *visitor);
 // Fills the visitor with the player's data and the extra data of the index, and puts the extra data in the beacon
-void func_02037938(JoinAvenueVisitor *visitor, int index, GameData *gameData);
-void func_02037970(JoinAvenueVisitor *visitor, GameBeacon *beacon);
-void func_02037998(JoinAvenueVisitor *visitor, const GameBeacon *beacon, u32 a2);
-BOOL func_020379f8(JoinAvenueVisitor *visitor);
-JoinAvenueEntry *func_02037a40(HeapID heapId);
-void func_02037a68(JoinAvenueEntry *entry);
-void func_02037ab4(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 species, u32 type);
-void func_02037a70(JoinAvenueEntry *entry);
-BOOL func_02037a90(JoinAvenueEntry *entry);
-BOOL func_02037a98(JoinAvenueEntry *entry);
-u32 func_02037b38(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buffer);
-void func_02037c70(JoinAvenueEntry *entry, JoinAvenuePersonParam param, u32 value);
-u32 func_02037e34(JoinAvenueEntry *entry, int count, u32 max);
+void JoinAvenueVisitor_InitPlayer(JoinAvenueVisitor *visitor, int index, GameData *gameData);
+void JoinAvenueVisitor_StoreInBeacon(JoinAvenueVisitor *visitor, GameBeacon *beacon);
+void JoinAvenueVisitor_InitFromBeacon(JoinAvenueVisitor *visitor, const GameBeacon *beacon, u32 a2);
+BOOL JoinAvenueVisitor_IsValid(JoinAvenueVisitor *visitor);
+JoinAvenueEntry *JoinAvenueEntry_Create(HeapID heapId);
+void JoinAvenueEntry_Free(JoinAvenueEntry *entry);
+void JoinAvenueEntry_Init(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 species, u32 type);
+void JoinAvenueEntry_Clear(JoinAvenueEntry *entry);
+BOOL JoinAvenueEntry_IsEmpty(JoinAvenueEntry *entry);
+BOOL JoinAvenueEntry_IsValid(JoinAvenueEntry *entry);
+u32 JoinAvenueEntry_GetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buffer);
+void JoinAvenueEntry_SetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, u32 value);
+u32 JoinAvenueEntry_Random(JoinAvenueEntry *entry, int count, u32 max);
 // Whether the person has the extra data of the index
-BOOL func_02036e4c(JoinAvenuePerson *person, u32 index);
-JoinAvenueShop *func_02038470(JoinAvenuePerson *person);
+BOOL JoinAvenuePerson_HasExtraData(JoinAvenuePerson *person, u32 index);
+JoinAvenueShop *JoinAvenuePerson_GetShop(JoinAvenuePerson *person);
 // The shop the player would run: the player's own choice, or the default one of the player's ID and version
-u32 func_02038a20(JoinAvenuePerson *person, PlayerInfo *playerInfo);
+u32 JoinAvenuePerson_GetShopId(JoinAvenuePerson *person, PlayerInfo *playerInfo);
 // The fields of a person's shop: 0 the ID, 1 the level, 2 and 3 the flags
-u32 func_020363e0(JoinAvenueShop *shop, u32 which);
-void func_0203640c(JoinAvenueShop *shop, u32 which, u32 value);
-BOOL func_02036434(JoinAvenueShop *shop, u32 bit);
-void func_02036448(JoinAvenueShop *shop, u32 bit, BOOL set);
+u32 JoinAvenueShop_GetField(JoinAvenueShop *shop, u32 which);
+void JoinAvenueShop_SetField(JoinAvenueShop *shop, u32 which, u32 value);
+BOOL JoinAvenueShop_GetFlag(JoinAvenueShop *shop, u32 bit);
+void JoinAvenueShop_SetFlag(JoinAvenueShop *shop, u32 bit, BOOL set);
 // Makes the person a copy of src, or of the entry, at the slot and row, with the shop set up
-void func_02038274(JoinAvenuePerson *person, const JoinAvenuePerson *src, ResortShopData *shops, u32 slot, u16 row);
-void func_020382d8(JoinAvenuePerson *person, const JoinAvenueEntry *entry, ResortShopData *shops, u32 slot, u16 row);
+void JoinAvenuePerson_InitFromPerson(JoinAvenuePerson *person, const JoinAvenuePerson *src, ResortShopData *shops,
+                                     u32 slot, u16 row);
+void JoinAvenuePerson_InitFromEntry(JoinAvenuePerson *person, const JoinAvenueEntry *entry, ResortShopData *shops,
+                                    u32 slot, u16 row);
 
 // The avenue's people: 8 of 0xc4 bytes, then 4 of 0x58 bytes, and the player's own entry at 0x780
 JoinAvenueOccupants *getAddressOfBeginningOfOccupants(JoinAvenueSave *joinAvenue);
-void func_0203880c(JoinAvenueOccupants *occupants);
-JoinAvenuePerson *func_02038860(JoinAvenueOccupants *occupants, u32 index);
+void JoinAvenueOccupants_Init(JoinAvenueOccupants *occupants);
+JoinAvenuePerson *JoinAvenueOccupants_GetPerson(JoinAvenueOccupants *occupants, u32 index);
 // The number of the eight people who are there
-u32 func_02038868(JoinAvenueOccupants *occupants);
-JoinAvenueRecord *func_0203888c(JoinAvenueOccupants *occupants, u32 index);
+u32 JoinAvenueOccupants_CountPeople(JoinAvenueOccupants *occupants);
+JoinAvenueRecord *JoinAvenueOccupants_GetRecord(JoinAvenueOccupants *occupants, u32 index);
 // The number of the four records that are not empty
-u32 func_0203889c(JoinAvenueOccupants *occupants);
+u32 JoinAvenueOccupants_CountRecords(JoinAvenueOccupants *occupants);
 // The first empty record, or NULL
-JoinAvenueRecord *func_020388c0(JoinAvenueOccupants *occupants);
+JoinAvenueRecord *JoinAvenueOccupants_GetEmptyRecord(JoinAvenueOccupants *occupants);
 // Merges a visitor (kind 0), a person (1) or an entry (2) into the occupant or record who matches
-u32 func_020388e8(JoinAvenueOccupants *occupants, const void *source, u32 kind);
-void func_02038a0c(JoinAvenueOccupants *occupants, u32 locked);
-void func_020389a0(JoinAvenueOccupants *occupants, BOOL fullDay);
-JoinAvenuePerson *func_02038a18(JoinAvenueOccupants *occupants);
+u32 JoinAvenueOccupants_Merge(JoinAvenueOccupants *occupants, const void *source, u32 kind);
+void JoinAvenueOccupants_SetLocked(JoinAvenueOccupants *occupants, u32 locked);
+void JoinAvenueOccupants_ResetDaily(JoinAvenueOccupants *occupants, BOOL fullDay);
+JoinAvenuePerson *JoinAvenueOccupants_GetPlayerPerson(JoinAvenueOccupants *occupants);
 // The records: allocated, freed and cleared as a person is
-JoinAvenueRecord *func_020384a4(HeapID heapId);
-void func_020384cc(JoinAvenueRecord *record);
-void func_020384d4(JoinAvenueRecord *record);
-BOOL func_020384e0(JoinAvenueRecord *record);
+JoinAvenueRecord *JoinAvenueRecord_Create(HeapID heapId);
+void JoinAvenueRecord_Free(JoinAvenueRecord *record);
+void JoinAvenueRecord_Clear(JoinAvenueRecord *record);
+BOOL JoinAvenueRecord_IsEmpty(JoinAvenueRecord *record);
 // A field of a record, which reads into the buffer for a name, as joinAveTextHandler does for a person
-u32 func_020385a8(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *buffer);
-void func_02038680(JoinAvenueRecord *record, JoinAvenuePersonParam param, u32 value);
+u32 JoinAvenueRecord_GetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *buffer);
+void JoinAvenueRecord_SetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, u32 value);
 // Makes the record of a person, or of an entry, at the slot and row
-void func_020386f4(JoinAvenueRecord *record, const JoinAvenuePerson *person, u32 slot, u32 row, u16 shopKind);
-void func_02038778(JoinAvenueRecord *record, const JoinAvenueEntry *entry, u32 slot, u32 row, u16 shopKind);
-u32 func_020387f4(JoinAvenueRecord *record, int count, u32 max);
+void JoinAvenueRecord_InitFromPerson(JoinAvenueRecord *record, const JoinAvenuePerson *person, u32 slot, u32 row,
+                                     u16 shopKind);
+void JoinAvenueRecord_InitFromEntry(JoinAvenueRecord *record, const JoinAvenueEntry *entry, u32 slot, u32 row,
+                                    u16 shopKind);
+u32 JoinAvenueRecord_Random(JoinAvenueRecord *record, int count, u32 max);
 
 // The shop a person runs: the shop of the ID, or the default one of the trainer ID and version when there is none or
 // it may not be run
-u16 func_020394b0(u16 shopId, u16 trainerId, u16 version, BOOL unk18, JoinAvenueInfo *info, ResortShopData *shops);
+u16 JoinAvenue_ChooseShop(u16 shopId, u16 trainerId, u16 version, BOOL unk18, JoinAvenueInfo *info,
+                          ResortShopData *shops);
 // A random number of the count-th step of the generator from the seed: below max, or any if max is 0
-u32 func_0203941c(u32 seed, int count, u32 max);
-u32 func_020393e4(JoinAvenueInfo *info, int count, u32 max);
+u32 JoinAvenue_RandomFromSeed(u32 seed, int count, u32 max);
+u32 JoinAvenueInfo_Random(JoinAvenueInfo *info, int count, u32 max);
 
 #endif // POKEBW2_SAVE_JOIN_AVENUE_H

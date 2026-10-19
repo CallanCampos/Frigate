@@ -1,2 +1,2 @@
-func_ov017_0216e660 kind:function(thumb,size=0x13c) addr:0x0216e660
-func_ov017_0216e79c kind:function(thumb,size=0x30) addr:0x0216e79c
+EventCommTvt_Callback kind:function(thumb,size=0x13c) addr:0x0216e660
+EventCommTvt_Create kind:function(thumb,size=0x30) addr:0x0216e79c

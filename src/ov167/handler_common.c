@@ -13,7 +13,7 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0) where it has them
 
 // Whether a mon is among the event's targets
-BOOL func_ov167_021cde38(u32 monId) {
+BOOL IsEventTargetMon(u32 monId) {
     u32 count = BattleEventVar_GetValue(5);
     u32 i;
 
@@ -26,7 +26,7 @@ BOOL func_ov167_021cde38(u32 monId) {
 }
 
 BOOL IsMonLastInTurnOrder(BtlServerFlow *flow, u8 monId) {
-    if (func_ov167_021abbec(flow, monId)) {
+    if (BtlServerFlow_IsLastToAct(flow, monId)) {
         return TRUE;
     }
     return FALSE;
@@ -56,7 +56,7 @@ BOOL GiratinaArceusGenesectItemCheck(u16 species, u16 item) {
 
 // Whether a mon's item can't be taken away from it
 // Whether a mon's item can't be taken away from it
-BOOL func_ov167_021cdedc(BtlServerFlow *flow, u8 monId) {
+BOOL IsItemUnremovable(BtlServerFlow *flow, u8 monId) {
     BattleMon *mon = GetBattleMon(flow, monId);
     u16 species = GetBattleMonSpecies(mon);
     u16 item = GetBattleMonHeldItem(mon);
@@ -67,9 +67,9 @@ BOOL func_ov167_021cdedc(BtlServerFlow *flow, u8 monId) {
     return FALSE;
 }
 
-BOOL func_ov167_021cdf08(BtlServerFlow *flow, u8 monId) {
-    if (func_ov167_021abca8(flow) == 0) {
-        u32 client = func_ov167_0219c648(monId);
+BOOL IsWildOpponent(BtlServerFlow *flow, u8 monId) {
+    if (BtlServerFlow_GetBattleType(flow) == 0) {
+        u32 client = GetClientIDFromMonID(monId);
 
         // The original tests the client against 1 twice (`beq` to the next instruction, then `bne`), as two
         // constants of the same value would
@@ -82,16 +82,16 @@ BOOL func_ov167_021cdf08(BtlServerFlow *flow, u8 monId) {
 
 // Whether two mons' items can't be swapped
 // Whether two mons' items can't be swapped
-BOOL func_ov167_021cdf28(BtlServerFlow *flow, u8 monId, u8 otherId) {
+BOOL IsItemSwapBlocked(BtlServerFlow *flow, u8 monId, u8 otherId) {
     BattleMon *mon;
     BattleMon *other;
     u16 species;
     u16 item;
 
-    if (func_ov167_021cdf08(flow, monId)) {
+    if (IsWildOpponent(flow, monId)) {
         return TRUE;
     }
-    if (func_ov167_021cdedc(flow, otherId)) {
+    if (IsItemUnremovable(flow, otherId)) {
         return TRUE;
     }
     mon = GetBattleMon(flow, monId);
@@ -112,7 +112,7 @@ void CommonMagicCoatCheckMoveEffect(BattleEventItem *item, BtlServerFlow *flow, 
         u16 move = BattleEventVar_GetValue(0x12);
 
         if (PML_MoveGetQuality(move) == 0xb && getMoveFlag(move, 4) && BattleEventVar_RewriteValue(0x22, 0x19)) {
-            func_ov167_021abf74(flow, monId, attacker);
+            BtlServerFlow_AddMagicCoatReflect(flow, monId, attacker);
         }
     }
 }
@@ -123,13 +123,13 @@ void CommonMagicCoatWait(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
         BattleEventVar_RewriteValue(0x40, 1)) {
         u8 attacker = BattleEventVar_GetValue(3);
 
-        func_ov167_021abf74(flow, monId, attacker);
+        BtlServerFlow_AddMagicCoatReflect(flow, monId, attacker);
         BattleEventVar_RewriteValue(0x51, 1);
     }
 }
 
 // The message that a mon is protected from a move
-void func_ov167_021ce044(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+void CommonMoveProtectedMessage(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     BattleHandlerMessageParam *param;
 
     if (monId == BattleEventVar_GetValue(2) && !IsSemiInvulnMove(GetBattleMon(flow, monId))) {

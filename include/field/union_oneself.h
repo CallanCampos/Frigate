@@ -77,7 +77,8 @@ enum {
 
 void UnionOneself_CheckEntries(UnionSystem *unisys);
 GameEvent *UnionOneself_CreateCommandEvent(GameSystem *gsys, Field *field);
-BOOL UnionOneself_ReturnFalse(void);
+// The event that the A button would start in the Union Room; there is none
+GameEvent *UnionOneself_ReturnFalse(GameSystem *gsys, Field *field);
 u8 UnionOneself_RunStep(UnionSystem *unisys, Field *field);
 void UnionOneself_SetUpdateDisabled(UnionSystem *unisys, Field *field, u8 disable);
 
@@ -86,8 +87,5 @@ void UnionOneself_SetUpdateDisabled(UnionSystem *unisys, Field *field, u8 disabl
 BOOL Misc_IsMetTrainer(RivalDataSave *rival, u32 trainerId);
 // (overlay 36) adds the player of a beacon heard to the visitors the field shows
 void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *entry, const u16 *look, u8 state);
-// (overlay 36) sets the callbacks that add and remove a colosseum player to the screen the object stands for
-void *func_ov036_021c3f1c(void *obj, UnionSystem *unisys, void (*add)(UnionSystem *, PlayerInfo *, const u8 *),
-                          void (*remove)(UnionSystem *, int, const u8 *));
 
 #endif // POKEBW2_FIELD_UNION_ONESELF_H

@@ -82,7 +82,7 @@ static BOOL WifiBattleMatchSys_BattleProcExit(GameProc *proc, u32 *state, void *
         wk->ov167Loaded = FALSE;
     }
     if (wk->commandsSet) {
-        func_02040c64(0x100);
+        NetCommand_RemoveTable(0x100);
         wk->commandsSet = FALSE;
     }
     FreeGameProcManager(wk->manager);
@@ -121,13 +121,13 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
     case 2:
         GFL_OvlLoad(OVERLAY_ID(167));
         wk->ov167Loaded = TRUE;
-        func_02040c20(0x100, data_ov167_021d7448, 9, NULL);
+        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
         wk->commandsSet = TRUE;
-        func_02040624(func_02040440(), 0xc8, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xc8, 0x24);
         *state = 3;
         break;
     case 3:
-        if (func_02040664(func_02040440(), 0xc8, 0x24)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xc8, 0x24)) {
             *state = 4;
         }
         break;
@@ -146,22 +146,22 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         *state = 7;
         break;
     case 7:
-        func_02040624(func_02040440(), 0xd2, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xd2, 0x24);
         wk->timer = 0;
         *state = 8;
         break;
     case 8:
-        if (func_02040664(func_02040440(), 0xd2, 0x24)) {
-            func_02040c64(0x100);
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xd2, 0x24)) {
+            NetCommand_RemoveTable(0x100);
             wk->commandsSet = FALSE;
             GFL_OvlUnload(OVERLAY_ID(167));
             wk->ov167Loaded = FALSE;
             *state = 9;
         }
-        if (func_02042788()) {
-            if (func_02042e84()->bNetType == NET_TYPE_IRC) {
+        if (GFL_NetIsInitialized()) {
+            if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
                 if (wk->timer++ > 600) {
-                    func_02040c64(0x100);
+                    NetCommand_RemoveTable(0x100);
                     wk->commandsSet = FALSE;
                     GFL_OvlUnload(OVERLAY_ID(167));
                     wk->ov167Loaded = FALSE;
@@ -172,16 +172,16 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         }
         break;
     case 9:
-        func_02040624(func_02040440(), 0xd3, 0x24);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 0xd3, 0x24);
         *state = 10;
         wk->timer = 0;
         break;
     case 10:
-        if (func_02040664(func_02040440(), 0xd3, 0x24)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xd3, 0x24)) {
             *state = 11;
         }
-        if (func_02042788()) {
-            if (func_02042e84()->bNetType == NET_TYPE_IRC) {
+        if (GFL_NetIsInitialized()) {
+            if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
                 if (wk->timer++ > 600) {
                     *state = 11;
                     wk->timer = 0;
@@ -272,8 +272,8 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         }
         break;
     }
-    if (func_02042788() && running != TRUE) {
-        if (func_02042e84()->bNetType == NET_TYPE_IRC) {
+    if (GFL_NetIsInitialized() && running != TRUE) {
+        if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 battle->result = 1;

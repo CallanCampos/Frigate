@@ -98,7 +98,7 @@ static void func_ov036_021b49f4(FieldEffectTask *task, void *data) {
     if (work->params.type == 2) {
         work->swingSpeed = 0;
     }
-    func_ov012_02167d88(params->actor, &work->identity);
+    FldAct_GetIdentity(params->actor, &work->identity);
 }
 
 static void func_ov036_021b4a30(FieldEffectTask *task, void *data) {
@@ -117,7 +117,7 @@ static void func_ov036_021b4a48(FieldEffectTask *task, void *data) {
     u16 x;
     u16 y;
 
-    if (!func_ov012_02167da8(work->params.actor, &work->identity) || !FldAct_CheckReflectingFlag(work->params.actor)) {
+    if (!FldAct_CheckIdentity(work->params.actor, &work->identity) || !FldAct_CheckReflectingFlag(work->params.actor)) {
         func_ov036_021a3a70(task);
         return;
     }
@@ -157,7 +157,7 @@ static void func_ov036_021b4a48(FieldEffectTask *task, void *data) {
 static void func_ov036_021b4b18(FieldEffectTask *task, void *data) {
     ReflectTask *work = data;
 
-    if (func_ov012_02167da8(work->params.actor, &work->identity) == 1 && work->created && work->blAct[1] != 0xffff) {
+    if (FldAct_CheckIdentity(work->params.actor, &work->identity) == 1 && work->created && work->blAct[1] != 0xffff) {
         func_ov036_021b4b44(work->blAct[1], work);
     }
 }
@@ -185,24 +185,24 @@ static void func_ov036_021b4b44(u16 blActIdx, void *data) {
         return;
     }
     zoneId = Field_GetPlayerStateZoneID(FieldEffects_GetField(work->params.effect->effects));
-    visible = func_0204f684(sys, (u16)actorIdx);
+    visible = BlActSys_IsActorVisible(sys, (u16)actorIdx);
     if (visible && func_ov012_0216754c(work->params.actor)) {
         visible = 0;
     }
-    func_0204f664(sys, blActIdx, visible);
-    func_0204f6c8(sys, blActIdx, 0);
+    BlActSys_SetActorVisible(sys, blActIdx, visible);
+    BlActSys_SetActorAnimating(sys, blActIdx, 0);
     actor = work->params.actor;
     config = GetActorMdlInfo(actor);
     CopyActorWPos(actor, &pos);
     pos.z += REFLECT_BILLBOARD_OFFSET_Z[config->billboardSize];
-    func_ov012_0216731c(actor, &offset);
+    CopyActorWPosOffset(actor, &offset);
     pos.x += offset.x;
     pos.z -= offset.z;
     if (GetHeightFromMap(actor, &pos, &height) == 1) {
         pos.y = height;
     }
     pos.y += REFLECT_TYPE_OFFSET_Y[work->params.type];
-    func_ov012_0216733c(actor, &offset);
+    FldAct_GetOuterDrawOffset(actor, &offset);
     pos.x += offset.x;
     pos.y -= offset.y;
     pos.z -= offset.z;
@@ -227,21 +227,21 @@ static void func_ov036_021b4b44(u16 blActIdx, void *data) {
     func_ov036_021b4e3c(camera, zoneId, &target, &pos);
     BlActScene_SetActorPos(scene, blActIdx, &pos);
     flip = TRUE;
-    self = func_0204f750(sys, (u16)actorIdx);
-    other = func_0204f750(sys, blActIdx);
+    self = BlActSys_GetSceneActor(sys, (u16)actorIdx);
+    other = BlActSys_GetSceneActor(sys, blActIdx);
     rot[3] = work->swing;
     rot[2] = work->scaleY;
     rot[2] += (s16)func_ov036_021b4d98(zoneId);
     rot[1] = 0;
     rot[0] = 0;
-    func_0204e9f8(scene, self, (u16 *)&rot[1]);
-    func_0204ea08(scene, other, (u16 *)&rot[1]);
-    func_0204ea3c(scene, self, (u16 *)&rot[0]);
-    func_0204ea4c(scene, other, (u16 *)&rot[0]);
-    func_0204ea5c(scene, other, &rot[3], &rot[2]);
-    func_0204eb7c(scene, other, &flip);
-    flip = func_0204eb48(scene, self);
-    func_0204eb58(scene, other, &flip);
+    BlActScene_GetActorMaterial(scene, self, (u16 *)&rot[1]);
+    BlActScene_SetActorMaterial(scene, other, (u16 *)&rot[1]);
+    BlActScene_GetActorFace(scene, self, (u16 *)&rot[0]);
+    BlActScene_SetActorFace(scene, other, (u16 *)&rot[0]);
+    BlActScene_SetActorScale(scene, other, &rot[3], &rot[2]);
+    BlActScene_SetActorFlipT(scene, other, &flip);
+    flip = BlActScene_GetActorFlipS(scene, self);
+    BlActScene_SetActorFlipS(scene, other, &flip);
 }
 
 static s32 func_ov036_021b4d98(u32 zoneId) {

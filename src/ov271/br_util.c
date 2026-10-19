@@ -216,14 +216,14 @@ static const BrProfileMsgWinData sc_profile_msgwin[BR_PROFILE_MSGWIN_MAX] = {
 static inline void BrList_UpdateArrow(BrList *p_wk) {
     if (p_wk->is_slide) {
         if (p_wk->list == 0) {
-            func_0204c124(p_wk->clwk[0], FALSE);
+            ClActor_SetVisible(p_wk->clwk[0], FALSE);
         } else {
-            func_0204c124(p_wk->clwk[0], TRUE);
+            ClActor_SetVisible(p_wk->clwk[0], TRUE);
         }
         if (p_wk->list + p_wk->line_max == p_wk->param.list_max) {
-            func_0204c124(p_wk->clwk[1], FALSE);
+            ClActor_SetVisible(p_wk->clwk[1], FALSE);
         } else {
-            func_0204c124(p_wk->clwk[1], TRUE);
+            ClActor_SetVisible(p_wk->clwk[1], TRUE);
         }
     }
 }
@@ -377,11 +377,11 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
                 setup.y = i == 0 ? 64 : 184;
             }
             setup.sequence = i;
-            p_wk->clwk[i] = func_0204c040(cp_param->unit, obj.chr, obj.plt, obj.cell, &setup, display, heapId);
+            p_wk->clwk[i] = ClActor_Create(cp_param->unit, obj.chr, obj.plt, obj.cell, &setup, display, heapId);
             func_0204c520(p_wk->clwk[i], TRUE);
-            func_0204c318(p_wk->clwk[i], TRUE);
+            ClActor_SetObjMode(p_wk->clwk[i], TRUE);
         }
-        func_0204c124(p_wk->clwk[0], FALSE);
+        ClActor_SetVisible(p_wk->clwk[0], FALSE);
     }
     {
         ClActorSetup setup;
@@ -397,8 +397,8 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
         for (i = 2; i < 4; i++) {
             setup.x = i == 2 ? 24 : 232;
             p_wk->clwk[i] =
-                func_0204c040(p_wk->param.unit, obj.chr, obj.plt, obj.cell, &setup, CLACT_SURFACE_SUB, heapId);
-            func_0204c318(p_wk->clwk[i], TRUE);
+                ClActor_Create(p_wk->param.unit, obj.chr, obj.plt, obj.cell, &setup, CLACT_SURFACE_SUB, heapId);
+            ClActor_SetObjMode(p_wk->clwk[i], TRUE);
         }
     }
     {
@@ -418,8 +418,8 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
 
     if (cp_param->list_max < p_wk->line_max) {
         p_wk->is_slide = FALSE;
-        func_0204c124(p_wk->clwk[0], FALSE);
-        func_0204c124(p_wk->clwk[1], FALSE);
+        ClActor_SetVisible(p_wk->clwk[0], FALSE);
+        ClActor_SetVisible(p_wk->clwk[1], FALSE);
     } else {
         p_wk->is_slide = TRUE;
         BrList_UpdateArrow(p_wk);
@@ -440,7 +440,7 @@ void BrList_Exit(BrList *p_wk) {
         BrBallEff_Start(p_wk->param.ballCursor, BR_BALL_EFFECT_NONE, NULL);
     }
     for (i = 0; i < 4; i++) {
-        func_0204c108(p_wk->clwk[i]);
+        ClActor_Delete(p_wk->clwk[i]);
     }
     for (i = 0; i < p_wk->param.list_max; i++) {
         if (p_wk->bmp[i] != NULL && p_wk->param.cp_list[i].str != NULL) {
@@ -533,10 +533,10 @@ static void BrList_WriteCore(BrList *p_wk, u16 list) {
 static s32 BrList_GetSlide(BrList *p_wk) {
     s32 ret = 0;
 
-    if (func_0203d9c8(sc_slide_rect) != TOUCH_RECT_NONE) {
+    if (GFL_HIDGetTouchHeldRect(sc_slide_rect) != TOUCH_RECT_NONE) {
         u32 x, y;
 
-        func_0203da84(&x, &y);
+        GFL_HIDGetTouchHeldPoint(&x, &y);
         if (!p_wk->is_hold) {
             p_wk->is_hold = TRUE;
             p_wk->hold_y = y;
@@ -620,13 +620,13 @@ static void BrList_Decide_Touch(BrList *p_wk) {
     s32 trg;
 
     p_wk->select = BR_LIST_SELECT_NONE;
-    trg = func_0203da0c(p_wk->hittbl);
+    trg = GFL_HIDGetTouchPressedRect(p_wk->hittbl);
     if (trg != TOUCH_RECT_NONE) {
         if (p_wk->param.ballDecide != NULL) {
             u32 x, y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->param.ballDecide, BR_BALL_EFFECT_SPREAD, &pos);
@@ -782,21 +782,21 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             ClActorSetup setup;
 
             p_wk->pokeIconPlt =
-                func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, HEAPID_TAIL(heapId));
-            p_wk->pokeIconCel =
-                func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
-            p_wk->pokeIconChr = func_0204b81c(handle, PokeParty_GetIconIndex(species, form, gender, egg), FALSE,
-                                              CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
+                ClActSys_LoadPlttEx(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, HEAPID_TAIL(heapId));
+            p_wk->pokeIconCel = ClActSys_LoadCellAnims(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(),
+                                                       HEAPID_TAIL(heapId));
+            p_wk->pokeIconChr = ClActSys_LoadChars(handle, PokeParty_GetIconIndex(species, form, gender, egg), FALSE,
+                                                   CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
             GFL_ArcToolFree(handle);
 
             MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
             setup.x = 75;
             setup.y = 64;
             setup.sequence = 1;
-            p_wk->pokeIcon = func_0204c040(unit, p_wk->pokeIconChr, p_wk->pokeIconPlt, p_wk->pokeIconCel, &setup,
-                                           CLACT_SURFACE_MAIN, heapId);
-            func_0204c378(p_wk->pokeIcon, PokeIcon_GetPalette(species, form, gender, egg), 0);
-            func_0204c318(p_wk->pokeIcon, TRUE);
+            p_wk->pokeIcon = ClActor_Create(unit, p_wk->pokeIconChr, p_wk->pokeIconPlt, p_wk->pokeIconCel, &setup,
+                                            CLACT_SURFACE_MAIN, heapId);
+            ClActor_SetPalette(p_wk->pokeIcon, PokeIcon_GetPalette(species, form, gender, egg), 0);
+            ClActor_SetObjMode(p_wk->pokeIcon, TRUE);
         }
     }
 
@@ -817,9 +817,9 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             anm = 22;
         }
         handle = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_TAIL(heapId));
-        p_wk->trainerPlt = func_0204bbb8(handle, plt, CLACT_VRAM_MAIN, 0x1a0, 0, 1, heapId);
-        p_wk->trainerCel = func_0204bde0(handle, cel, anm, heapId);
-        p_wk->trainerChr = func_0204b81c(handle, chr, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_wk->trainerPlt = ClActSys_LoadPlttRange(handle, plt, CLACT_VRAM_MAIN, 0x1a0, 0, 1, heapId);
+        p_wk->trainerCel = ClActSys_LoadCellAnims(handle, cel, anm, heapId);
+        p_wk->trainerChr = ClActSys_LoadChars(handle, chr, FALSE, CLACT_VRAM_MAIN, heapId);
         GFL_ArcToolFree(handle);
         break;
     }
@@ -827,9 +827,9 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
         u32 view = GdsProfile_GetUnionView(cp_profile);
         ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, HEAPID_TAIL(heapId));
 
-        p_wk->trainerPlt = func_0204bbb8(handle, 0, CLACT_VRAM_MAIN, 0x1a0, sc_union_plt[view], 1, heapId);
-        p_wk->trainerCel = func_0204bde0(handle, 65, 66, heapId);
-        p_wk->trainerChr = func_0204b81c(handle, view + 49, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_wk->trainerPlt = ClActSys_LoadPlttRange(handle, 0, CLACT_VRAM_MAIN, 0x1a0, sc_union_plt[view], 1, heapId);
+        p_wk->trainerCel = ClActSys_LoadCellAnims(handle, 65, 66, heapId);
+        p_wk->trainerChr = ClActSys_LoadChars(handle, view + 49, FALSE, CLACT_VRAM_MAIN, heapId);
         GFL_ArcToolFree(handle);
         break;
     }
@@ -841,10 +841,10 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
         MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = 48;
         setup.y = 64;
-        p_wk->trainer = func_0204c040(unit, p_wk->trainerChr, p_wk->trainerPlt, p_wk->trainerCel, &setup,
-                                      CLACT_SURFACE_MAIN, heapId);
-        func_0204c378(p_wk->trainer, 0, 1);
-        func_0204c318(p_wk->trainer, TRUE);
+        p_wk->trainer = ClActor_Create(unit, p_wk->trainerChr, p_wk->trainerPlt, p_wk->trainerCel, &setup,
+                                       CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetPalette(p_wk->trainer, 0, 1);
+        ClActor_SetObjMode(p_wk->trainer, TRUE);
     }
     return p_wk;
 }
@@ -853,16 +853,16 @@ void BrProfile_Exit(BrProfile *p_wk) {
     int i;
 
     if (p_wk->trainer != NULL) {
-        func_0204c108(p_wk->trainer);
-        func_0204bcd0(p_wk->trainerPlt);
-        func_0204b98c(p_wk->trainerChr);
-        func_0204be64(p_wk->trainerCel);
+        ClActor_Delete(p_wk->trainer);
+        ClActSys_FreePltt(p_wk->trainerPlt);
+        ClActSys_FreeChars(p_wk->trainerChr);
+        ClActSys_FreeCellAnims(p_wk->trainerCel);
     }
     if (p_wk->pokeIcon != NULL) {
-        func_0204c108(p_wk->pokeIcon);
-        func_0204bcd0(p_wk->pokeIconPlt);
-        func_0204b98c(p_wk->pokeIconChr);
-        func_0204be64(p_wk->pokeIconCel);
+        ClActor_Delete(p_wk->pokeIcon);
+        ClActSys_FreePltt(p_wk->pokeIconPlt);
+        ClActSys_FreeChars(p_wk->pokeIconChr);
+        ClActSys_FreeCellAnims(p_wk->pokeIconCel);
     }
     for (i = 0; i < BR_PROFILE_MSGWIN_MAX; i++) {
         if (p_wk->msgwin[i] != NULL) {
@@ -943,9 +943,9 @@ BrBallEffect *BrBallEff_Init(ClActUnit *unit, BrRes *res, u32 display, HeapID he
         ret = BrRes_GetObjData(p_wk->res, display + 9, &obj);
         GFL_ASSERT(ret);
         for (i = 0; i < BR_BALL_NUM; i++) {
-            p_wk->clwk[i] = func_0204c040(unit, obj.chr, obj.plt, obj.cell, &setup, display, heapId);
-            func_0204c124(p_wk->clwk[i], FALSE);
-            func_0204c318(p_wk->clwk[i], TRUE);
+            p_wk->clwk[i] = ClActor_Create(unit, obj.chr, obj.plt, obj.cell, &setup, display, heapId);
+            ClActor_SetVisible(p_wk->clwk[i], FALSE);
+            ClActor_SetObjMode(p_wk->clwk[i], TRUE);
         }
     }
     return p_wk;
@@ -955,7 +955,7 @@ void BrBallEff_Exit(BrBallEffect *p_wk) {
     int i;
 
     for (i = 0; i < BR_BALL_NUM; i++) {
-        func_0204c108(p_wk->clwk[i]);
+        ClActor_Delete(p_wk->clwk[i]);
     }
     BrRes_UnloadOBJ(p_wk->res, p_wk->display + 9);
     BrSeq_Exit(p_wk->seq);
@@ -1014,7 +1014,7 @@ void BrBallEff_SetAnmSeq(BrBallEffect *p_wk, u32 seq) {
     int i;
 
     for (i = 0; i < BR_BALL_NUM; i++) {
-        func_0204c488(p_wk->clwk[i], seq);
+        ClActor_SetSequence(p_wk->clwk[i], seq);
     }
 }
 
@@ -1025,7 +1025,7 @@ static void BrBallEff_Seq_Wait(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     switch (*p_seq) {
     case 0:
         for (i = 0; i < BR_BALL_NUM; i++) {
-            func_0204c124(p_wk->clwk[i], FALSE);
+            ClActor_SetVisible(p_wk->clwk[i], FALSE);
         }
         p_wk->is_end = TRUE;
         *p_seq = 1;
@@ -1044,7 +1044,7 @@ static void BrBallEff_Seq_Spread(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         p_wk->cnt = 0;
         for (i = 0; i < 6; i++) {
             BrBallCircle_Init(&p_wk->move[i].circle, &p_wk->pos, 8, 20, 0xffff * i / 6, 0xffff * i / 6 + 0x3333, 15);
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         *p_seq = 1;
         // fallthrough
@@ -1056,7 +1056,7 @@ static void BrBallEff_Seq_Spread(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             BrBallCircle_Main(&p_wk->move[i].circle, &now, p_wk->cnt);
             pos.x = now.x;
             pos.y = now.y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         if (p_wk->cnt++ > 15) {
             *p_seq = 2;
@@ -1079,7 +1079,7 @@ static void BrBallEff_Seq_Line(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         p_wk->cnt = 0;
         for (i = 0; i < BR_BALL_NUM; i++) {
             p_wk->ball[i] = sc_ball_pos_top;
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         BrBallLine_Init(&p_wk->move[0].line, &p_wk->ball[0], &sc_ball_pos_below, 0, 50);
         for (i = 1; i < BR_BALL_NUM; i++) {
@@ -1097,7 +1097,7 @@ static void BrBallEff_Seq_Line(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         for (i = 0; i < BR_BALL_NUM; i++) {
             pos.x = p_wk->ball[i].x;
             pos.y = p_wk->ball[i].y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         p_wk->cnt++;
         if (isEnd) {
@@ -1119,7 +1119,7 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         p_wk->cnt = 0;
         for (i = 0; i < 6; i++) {
             p_wk->ball[i] = sc_ball_pos_above;
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         BrBallLine_Init(&p_wk->move[0].line, &p_wk->ball[0], &sc_ball_pos_center, 0, 36);
         for (i = 1; i < 6; i++) {
@@ -1138,11 +1138,11 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
 
             pos.x = p_wk->ball[i].x;
             pos.y = p_wk->ball[i].y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         p_wk->cnt++;
         if (p_wk->is_move_end[0]) {
-            func_0204c124(p_wk->clwk[0], FALSE);
+            ClActor_SetVisible(p_wk->clwk[0], FALSE);
             *p_seq = 2;
         }
         break;
@@ -1150,7 +1150,7 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         p_wk->cnt = 0;
         for (i = 6; i < BR_BALL_NUM; i++) {
             BrBallRot_Init(&p_wk->move[i].rot, &sc_ball_pos_center, 15, 0xffff * (i - 6) / 6, 90);
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         *p_seq = 3;
         // fallthrough
@@ -1161,7 +1161,7 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         for (i = 1; i < 6; i++) {
             p_wk->is_move_end[i] = BrBallFollow_Main(&p_wk->move[i].follow, &p_wk->ball[i]);
             if (p_wk->is_move_end[i]) {
-                func_0204c124(p_wk->clwk[i], FALSE);
+                ClActor_SetVisible(p_wk->clwk[i], FALSE);
             }
         }
         for (i = 0; i < BR_BALL_NUM; i++) {
@@ -1169,7 +1169,7 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
 
             pos.x = p_wk->ball[i].x;
             pos.y = p_wk->ball[i].y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         p_wk->is_end = TRUE;
         p_wk->cnt++;
@@ -1186,7 +1186,7 @@ static void BrBallEff_Seq_Rot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         p_wk->cnt = 0;
         for (i = 0; i < 6; i++) {
             BrBallRot_Init(&p_wk->move[i].rot, &p_wk->pos, 15, 0xffff * i / 6, 90);
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         GFL_SndSEPlay(0x705);
         *p_seq = 1;
@@ -1199,7 +1199,7 @@ static void BrBallEff_Seq_Rot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             BrBallRot_Main(&p_wk->move[i].rot, &now, p_wk->cnt);
             pos.x = now.x;
             pos.y = now.y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         p_wk->cnt++;
         break;
@@ -1215,7 +1215,7 @@ static void BrBallEff_Seq_RotSmall(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
         p_wk->cnt = 0;
         for (i = 0; i < 6; i++) {
             BrBallRot_Init(&p_wk->move[i].rot, &p_wk->pos, 10, 0xffff * i / 6, 90);
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         *p_seq = 1;
         // fallthrough
@@ -1227,7 +1227,7 @@ static void BrBallEff_Seq_RotSmall(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
             BrBallRot_Main(&p_wk->move[i].rot, &now, p_wk->cnt);
             pos.x = now.x;
             pos.y = now.y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         p_wk->cnt++;
         break;
@@ -1246,7 +1246,7 @@ static void BrBallEff_Seq_Touch(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         p_wk->cnt = 0;
         for (i = 0; i < 6; i++) {
             BrBallCircle_Init(&p_wk->move[i].circle, &p_wk->pos, 8, 20, 0xffff * i / 6, 0xffff * i / 6 + 0x3333, 16);
-            func_0204c124(p_wk->clwk[i], TRUE);
+            ClActor_SetVisible(p_wk->clwk[i], TRUE);
         }
         *p_seq = 1;
         // fallthrough
@@ -1257,7 +1257,7 @@ static void BrBallEff_Seq_Touch(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             BrBallCircle_Main(&p_wk->move[i].circle, &p_wk->ball[i], p_wk->cnt);
             pos.x = p_wk->ball[i].x;
             pos.y = p_wk->ball[i].y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         if (p_wk->cnt++ > 16) {
             *p_seq = 2;
@@ -1281,7 +1281,7 @@ static void BrBallEff_Seq_Touch(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             isEnd &= BrBallFollow_Main(&p_wk->move[i].follow, &p_wk->ball[i]);
             pos.x = p_wk->ball[i].x;
             pos.y = p_wk->ball[i].y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         if (isEnd) {
             *p_seq = 5;
@@ -1311,7 +1311,7 @@ static void BrBallEff_Seq_Ring(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
 #endif
 
             BrBallCircle_Init(&p_wk->move[i].circle, &sc_ball_pos_center, 15, 1, rot, rot + 0xf000, 30);
-            func_0204c318(p_wk->clwk[i], FALSE);
+            ClActor_SetObjMode(p_wk->clwk[i], FALSE);
         }
         p_wk->cnt = 0;
         *p_seq = 1;
@@ -1324,7 +1324,7 @@ static void BrBallEff_Seq_Ring(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             BrBallCircle_Main(&p_wk->move[i].circle, &now, p_wk->cnt);
             pos.x = now.x;
             pos.y = now.y;
-            func_0204c140(p_wk->clwk[i], &pos, p_wk->display);
+            ClActor_SetSurfacePos(p_wk->clwk[i], &pos, p_wk->display);
         }
         if (p_wk->cnt++ > 60) {
             *p_seq = 2;

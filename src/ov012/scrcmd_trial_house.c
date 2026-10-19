@@ -44,11 +44,11 @@ BOOL s01E9_TrialHouseCallTeamSelect(VM *vm, FieldScriptEnv *env) {
     u16 battleBox = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    ScriptWork_CallEvent(work, func_ov012_02162c48(gsys, *workPtr, mode, battleBox, result));
+    ScriptWork_CallEvent(work, CallTrialHouseTeamSelect(gsys, *workPtr, mode, battleBox, result));
     return TRUE;
 }
 
-BOOL func_ov012_02164564(VM *vm, FieldScriptEnv *env) {
+BOOL s01EA_TrialHouseSetTrainer(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     TrialHouseWork **workPtr;
     u16 mode;
@@ -82,7 +82,7 @@ BOOL s01EC_TrialHouseStartBattle(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_0216462c(VM *vm, FieldScriptEnv *env) {
+BOOL s01ED_TrialHouseSetDownloadMode(VM *vm, FieldScriptEnv *env) {
     TrialHouseWork **workPtr;
 
     FieldScriptEnv_GetScriptWork(env);
@@ -91,14 +91,14 @@ BOOL func_ov012_0216462c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216465c(VM *vm, FieldScriptEnv *env) {
+BOOL s01EE_TrialHouseSetBattleTestRank(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u16 rank;
 
     FieldScriptEnv_GetScriptWork(env);
     gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     rank = ScriptReadAny(vm, env);
-    func_02009618(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), rank);
+    RecordSetTrialHouseRank(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), rank);
     return FALSE;
 }
 
@@ -109,11 +109,11 @@ BOOL s01EF_TrialHouseGetBattleTestRank(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     result = ScriptReadVar(vm, env);
-    *result = func_02009628(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)));
+    *result = RecordGetTrialHouseRank(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)));
     return FALSE;
 }
 
-BOOL func_ov012_021646cc(VM *vm, FieldScriptEnv *env) {
+BOOL s01F0_TrialHouseDownloadExamination(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     TrialHouseWork **workPtr = GetTrialHouseWkPPtr(GSYS_GetGameData(gsys));
@@ -137,7 +137,7 @@ BOOL s01F1_TrialHouseCalcPointsStars(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216474c(VM *vm, FieldScriptEnv *env) {
+BOOL s01F2_TrialHouseGetExaminationType(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     TrialHouseWork **workPtr;
     u16 *result;
@@ -159,7 +159,7 @@ BOOL s01F3_TrialHouseSaveData(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_021647c4(VM *vm, FieldScriptEnv *env) {
+BOOL s01F4_TrialHouseCallResults(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a1;
@@ -168,11 +168,11 @@ BOOL func_ov012_021647c4(VM *vm, FieldScriptEnv *env) {
     GetTrialHouseWkPPtr(GSYS_GetGameData(gsys));
     a1 = ScriptReadAny(vm, env);
     a2 = ScriptReadAny(vm, env);
-    ScriptWork_CallEvent(work, func_ov012_02162eb4(gsys, a1, a2));
+    ScriptWork_CallEvent(work, CallTrialHouseResults(gsys, a1, a2));
     return TRUE;
 }
 
-BOOL func_ov012_0216480c(VM *vm, FieldScriptEnv *env) {
+BOOL s01F5_TrialHouseGetRecordMask(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 *result;
 
