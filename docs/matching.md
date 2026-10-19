@@ -2130,6 +2130,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - An `int` assigned to a `u8` bitfield is narrowed (`lsl`/`lsr #0x18`) before the bit insert; a `u8` value isn't
   (game_comm.c, a `BOOL flag` stored in a 1-bit field).
+- A mask written before the store to a bit-field at bit 0 stays as an `and` of its own (`movs r2, #0xf; ands r3, r2`)
+  ahead of the insert's own `and`: `d->a = s[0] & 0xf;` keeps it, 2 bytes, where `d->a = s[0];` doesn't. For a field
+  higher up, whose value is shifted into place (`lsl #0x1c; lsr #0x18`), the mask folds into the shifts. A doubled
+  `and` with the field's width before an insert is a mask in the source.
 - Loads still move above stores to other known offsets of the same pointer: in `GameCommSys_Main`,
   `comm->work = NULL; comm->commNo = 0; cb = comm->exitCallback;` reads the callback first, and only that source order
   gives the original's registers.
@@ -2150,6 +2154,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`).
 - A range test `subs; subs; cmp; bhi` is an unsigned difference in the source, `x - left <= right - left` on `u32`
   values; MWCC doesn't fold `x >= left && x <= right` into it (`AppTaskMenuWin_IsTouched`).
+- Two range tests joined by a bitwise `&` each build a 0/1 (`cmp; bhs; movs rN, #1; b; movs rN, #0`) and combine them
+  with `ands`, and the second test runs even when the first fails. `&&` instead zeroes one result register up front
+  and branches past the second test. Game Freak's touch hit tests are written this way: `namein.c`'s
+  `NameEntry_PointInRect` returns `(touch->x - rect->left <= rect->right - rect->left) & (touch->y - rect->top <=
+  rect->bottom - rect->top)`.
 - A test of `x == 1 || x == 2` repeated after a call subtracts again at each test on a `u32`, and on an `int` is
   worked out once into a saved register and compared again (`sub r4, r6, #0x1; cmp r4, #0x1` ... `cmp r4, #0x1`):
   `gf_overlay.c`'s `GFL_OvlLoad` matches with `int region`. Its loop also stores through
@@ -3046,6 +3055,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
   `btlv_mcss.c`'s idle task does.
+- An angle index one below a round value, 0x3fff for 90 degrees or 0x1fff for 45, is GFL's conversion
+  `degrees * 0xffff / 360`, as `math_util.c`'s sine and cosine by degrees compute it. `DEG_TO_IDX` and
+  `FX_DEG_TO_IDX(FX32_CONST(...))` give the round 0x4000 and 0x2000.
 - Float arithmetic calls MWCC's runtime helpers, such as `_fadd` and `_ffix`, which swan names `__aeabi_*`. When a
   complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`, or, when the AEABI
   name is in use, give it the MWCC name as a second one with `config_fixes.py add-label`, as `_ddiv` and `_dsub` for

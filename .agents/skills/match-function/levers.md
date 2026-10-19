@@ -480,6 +480,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- An `and` with a bit-0 bit-field's width mask before an insert that masks again: the source masks the value before the
+  store, `d->a = s[0] & 0xf;`. (matching.md: "A mask written before a bit-field store")
 - A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
   the function, before the calls. (matching.md: "A constant narrowed at a call")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
@@ -686,6 +688,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   constants for both arms as well. (matching.md: "also has enum constants for both arms")
 - A negated range test whose branch targets differ: write the positive test of the complement, an `||` chain.
   (matching.md: "A negated test and its expansion")
+- Two 0/1 values built by `movs #1; b; movs #0` and combined with `ands`, no branch between the tests: a bitwise `&` of
+  two comparisons, as in a touch hit test. (matching.md: "joined by a bitwise `&`")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
 - A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
@@ -848,6 +852,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Floats and runtime helpers
 
+- An angle constant one below a round index (0x3fff, 0x1fff): `degrees * 0xffff / 360`, not `DEG_TO_IDX`.
+  (matching.md: "An angle index one below a round value")
 - Float arithmetic calls `_fadd`, `_ffix` and others (swan's `__aeabi_*`). Rename to MWCC's name when a complete file
   fails to link. (matching.md: "MWCC's runtime helpers")
 - An arithmetic operation on a literal passes the literal first; a constant in a local keeps its source position, and
