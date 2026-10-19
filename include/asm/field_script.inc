@@ -5190,26 +5190,26 @@
 
     // Plugin 12
 
-    // func_ov064_021e5800
+    // PlasmaFrigateCmd_PressSwitch
     .macro Plugin12_Cmd1000 a0
     FieldCommand 1000
     .2byte \a0
     .endm
 
-    // func_ov064_021e5838
+    // PlasmaFrigateCmd_SetLightsState
     .macro Plugin12_Cmd1001 a0, a1
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov064_021e586c
+    // PlasmaFrigateCmd_PlayGroupASecond
     .macro Plugin12_Cmd1002 a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // func_ov064_021e588c
+    // PlasmaFrigateCmd_PlayGroupBSecond
     .macro Plugin12_Cmd1003 a0
     FieldCommand 1003
     .2byte \a0
@@ -5225,20 +5225,20 @@
     .2byte \a0
     .endm
 
-    // func_ov064_021e5910
+    // PlasmaFrigateCmd_SetSwitchLightState
     .macro Plugin12_Cmd1006 a0, a1
     FieldCommand 1006
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov064_021e5944
+    // PlasmaFrigateCmd_PlaySwitchAnim
     .macro Plugin12_Cmd1007 a0
     FieldCommand 1007
     .2byte \a0
     .endm
 
-    // func_ov064_021e5964
+    // PlasmaFrigateCmd_PlaySwitchLightAnim
     .macro Plugin12_Cmd1008 a0
     FieldCommand 1008
     .2byte \a0
