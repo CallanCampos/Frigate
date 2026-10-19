@@ -31,6 +31,9 @@ def stand_in(lines: list[str], ending: str) -> list[str]:
     code = ["import os, sys"]
     code += [f"print({line!r}, file=sys.stderr, flush=True)" for line in lines]
     if ending == "abort":
+        # Without the C runtime's report of a fault on Windows, as the port's programs abort there (port/hal/host):
+        # status 3, where Python's own abort() ends with a fail-fast's 0xc0000409
+        code.append("import ctypes; ctypes.CDLL('ucrtbase')._set_abort_behavior(0, 3) if os.name == 'nt' else None")
         code.append("os.abort()")
     elif ending == "crash":
         code.append("import ctypes; ctypes.string_at(1)")

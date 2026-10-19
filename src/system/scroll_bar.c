@@ -22,6 +22,13 @@ u32 ScrollBar_GetValue(u32 max, u32 pos, u32 top, u32 bottom, u32 barSize) {
 u32 ScrollBar_GetPos(u32 max, u32 value, u32 top, u32 bottom, u32 barSize) {
     u32 range = (bottom - top - barSize) << 8;
 
+#ifdef PLATFORM_PC
+    // A list that can't scroll has a max of 0 (the Pokédex's list of a few Pokémon, src/ov139/frame_list.c). The DS's
+    // unsigned division (_u32_div_f) gives the dividend for a divisor of 0, which C leaves undefined: arm64 gives 0,
+    // and x86-64 faults
+    value = (max == 0 ? range * value : range * value / max) >> 8;
+#else
     value = (range * value / max) >> 8;
+#endif
     return top + value + barSize / 2;
 }

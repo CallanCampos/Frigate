@@ -94,7 +94,21 @@ static u32 GFL_BGSysLoadNCGRDynamicCore(void *file, u32 bg, u32 size) {
         if (size == 0) {
             size = character->size;
         }
+#ifdef PLATFORM_PC
+        // A size larger than the file's characters (the touch bars' 32 * 64 bytes of a file of 4 characters,
+        // src/ov139/touchbar.c and src/ov298/zknd_tbar.c) reserves that many characters, and on the DS also copies
+        // what follows the file in the heap, past the end of its block, into the characters after the file's, which
+        // the bar's screen never shows. The host reserves the same characters and copies the file's alone, where the
+        // dynamic load puts them on a BG of 16 colors (port/docs/sanitizers.md)
+        if (size > character->size && GFL_BGSysGetBGBytesPerTile(bg) == BGSYS_TILE_SIZE_16) {
+            pos = GFL_BGSysAllocChar(bg, size, FALSE);
+            GFL_BGSysLoadChar(bg, character->rawData, character->size, pos);
+        } else {
+            pos = GFL_BGSysLoadCharDynamic(bg, character->rawData, size);
+        }
+#else
         pos = GFL_BGSysLoadCharDynamic(bg, character->rawData, size);
+#endif
         if (pos != (u32)-1) {
             return ((u16)size << 16) | (u16)pos;
         }

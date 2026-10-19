@@ -308,9 +308,9 @@ void port_heap_ds_read_begin(const void *start, unsigned int size) {
 
     if (size != 0 && !InGameMemory((const u8 *)from, (const u8 *)to)) {
         fprintf(stderr,
-                "port: fnd_hooks: a read past a heap block, 0x%x bytes from %p, reaches outside the game's heaps and "
-                "the main arena\n",
-                size, start);
+                "port: fnd_hooks: a read past a heap block, 0x%x bytes from 0x%llx, reaches outside the game's heaps "
+                "and the main arena\n",
+                size, (unsigned long long)(uptr)start);
         abort();
     }
 #ifdef PORT_POISON_HEAPS
