@@ -5004,7 +5004,7 @@
 
     // Plugin 10
 
-    // func_ov062_021e5914
+    // PokewoodCmd_Film
     .macro Plugin10_Cmd1000 a0, a1, a2
     FieldCommand 1000
     .2byte \a0
@@ -5012,33 +5012,33 @@
     .2byte \a2
     .endm
 
-    // func_ov062_021e5a00
+    // PokewoodCmd_WatchSlot
     .macro Plugin10_Cmd1001 a0, a1
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov062_021e5aa8
+    // PokewoodCmd_PickMovie
     .macro Plugin10_Cmd1002 a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // func_ov062_021e5b14
+    // PokewoodCmd_OpenMenu
     .macro Plugin10_Cmd1003 a0, a1
     FieldCommand 1003
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov062_021e5fb0
+    // PokewoodCmd_SetSaveSlot
     .macro Plugin10_Cmd1004 a0
     FieldCommand 1004
     .2byte \a0
     .endm
 
-    // func_ov062_021e5cbc
+    // PokewoodCmd_SetMessageWord
     .macro Plugin10_Cmd1005 a0, a1
     FieldCommand 1005
     .byte \a0
@@ -5069,7 +5069,7 @@
     .2byte \a1
     .endm
 
-    // func_ov062_021e5c7c
+    // PokewoodCmd_GetDownloadedMovieResult
     .macro Plugin10_Cmd1010 a0, a1
     FieldCommand 1010
     .2byte \a0
@@ -5084,19 +5084,19 @@
     FieldCommand 1012
     .endm
 
-    // func_ov062_021e597c
+    // PokewoodCmd_SelectCast
     .macro Plugin10_Cmd1013 a0
     FieldCommand 1013
     .2byte \a0
     .endm
 
-    // func_ov062_021e59cc
+    // PokewoodCmd_SetUsePlayerCast
     .macro Plugin10_Cmd1014 a0
     FieldCommand 1014
     .2byte \a0
     .endm
 
-    // func_ov062_021e5de4
+    // PokewoodCmd_GetNewUnlockKind
     .macro Plugin10_Cmd1015 a0, a1, a2
     FieldCommand 1015
     .2byte \a0
@@ -5104,13 +5104,13 @@
     .2byte \a2
     .endm
 
-    // func_ov062_021e5e94
+    // PokewoodCmd_TestAndSetLevelBit
     .macro Plugin10_Cmd1016 a0
     FieldCommand 1016
     .2byte \a0
     .endm
 
-    // func_ov062_021e5ec8
+    // PokewoodCmd_GetSlotFlag
     .macro Plugin10_Cmd1017 a0, a1
     FieldCommand 1017
     .2byte \a0
@@ -5145,13 +5145,13 @@
     .2byte \a0
     .endm
 
-    // func_ov062_021e5ef8
+    // PokewoodCmd_SetSlotFlag
     .macro Plugin10_Cmd1022 a0
     FieldCommand 1022
     .2byte \a0
     .endm
 
-    // func_ov062_021e6040
+    // PokewoodCmd_OpenRecordMonitor
     .macro Plugin10_Cmd1023 a0
     FieldCommand 1023
     .2byte \a0
@@ -5172,7 +5172,7 @@
     .2byte \a1
     .endm
 
-    // func_ov062_021e5a60
+    // PokewoodCmd_WatchBlock
     .macro Plugin10_Cmd1026
     FieldCommand 1026
     .endm

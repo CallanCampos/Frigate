@@ -32,7 +32,7 @@ typedef struct {
     s32 score;
 } PokewoodBattleResult;
 
-// What func_ov062_021e65b4 adds for each result
+// What PokewoodSystem_AddGradePoints adds for each result
 static s32 sAmounts[] = { 1, 3, 15 };
 // The change to the cast's Pokéstar fame for each result
 static s32 sFameChanges[] = { -50, 25, 255 };
@@ -50,7 +50,7 @@ void PokewoodSystem_Free(PokewoodSystem *sys) {
     GFL_HeapFree(sys);
 }
 
-void func_ov062_021e61a0(PokewoodSystem *sys, const PokeListParam *param) {
+void PokewoodSystem_SetCastFromPokeList(PokewoodSystem *sys, const PokeListParam *param) {
     MI_CpuCopy8(param->picked, sys->castSlots, sizeof(sys->castSlots));
     sys->unkE = param->index;
     sys->unk10 = param->result;
@@ -61,7 +61,7 @@ void func_ov062_021e61a0(PokewoodSystem *sys, const PokeListParam *param) {
     }
 }
 
-void func_ov062_021e61e8(PokewoodSystem *sys, GameData *gameData, PokeListParam *param) {
+void PokewoodSystem_SetupPokeList(PokewoodSystem *sys, GameData *gameData, PokeListParam *param) {
     PokewoodMovie *movie;
 
     PokeListParam_Setup(param, gameData, 0x16, GameData_GetParty(gameData));
@@ -78,7 +78,7 @@ void func_ov062_021e61e8(PokewoodSystem *sys, GameData *gameData, PokeListParam 
     param->unk48 = 0;
 }
 
-void func_ov062_021e6254(PokewoodSystem *sys, GameData *gameData, PStatusParam *param) {
+void PokewoodSystem_SetupPStatus(PokewoodSystem *sys, GameData *gameData, PStatusParam *param) {
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
 
     MIi_CpuClear32(0, param, sizeof(PStatusParam));
@@ -99,11 +99,11 @@ u16 *PokewoodSystem_GetResultVar(PokewoodSystem *sys) {
     return sys->resultVar;
 }
 
-void func_ov062_021e62a0(PokewoodSystem *sys, u16 value) {
+void PokewoodSystem_SetUsePlayerCast(PokewoodSystem *sys, u16 value) {
     sys->unkD8 = value;
 }
 
-u16 func_ov062_021e62a8(PokewoodSystem *sys) {
+u16 PokewoodSystem_GetUsePlayerCast(PokewoodSystem *sys) {
     return sys->unkD8;
 }
 
@@ -115,11 +115,11 @@ u16 PokewoodSystem_GetMovie(PokewoodSystem *sys) {
     return sys->movie;
 }
 
-void func_ov062_021e62c0(PokewoodSystem *sys, u16 value) {
+void PokewoodSystem_SetSaveSlot(PokewoodSystem *sys, u16 value) {
     sys->unkDA = value;
 }
 
-u16 func_ov062_021e62c8(PokewoodSystem *sys) {
+u16 PokewoodSystem_GetSaveSlot(PokewoodSystem *sys) {
     return sys->unkDA;
 }
 
@@ -156,7 +156,7 @@ void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty 
     GFL_HeapFree(copy);
 }
 
-void func_ov062_021e636c(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result) {
+void PokewoodSystem_SetResultFlag(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result) {
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (result == 1) {
@@ -177,7 +177,7 @@ static const PokewoodSeries sSeries[SERIES_COUNT] = {
 };
 
 // Whether every movie of a series is in flag list 1
-static BOOL func_ov062_021e63a4(PokewoodSave *save, u32 series) {
+static BOOL Pokewood_IsSeriesComplete(PokewoodSave *save, u32 series) {
     u32 i;
 
     for (i = 0; sSeries[series].movies[i] != 0xff; i++) {
@@ -198,7 +198,7 @@ void Pokewood_CheckMedals(GameData *gameData) {
     u32 count;
 
     for (i = 0; i < SERIES_COUNT; i++) {
-        if (func_ov062_021e63a4(save, i)) {
+        if (Pokewood_IsSeriesComplete(save, i)) {
             MedalBox_GiveMedal(box, sSeries[i].medal);
         }
     }
@@ -253,7 +253,7 @@ void PokewoodSystem_KeepBestRecord(GameData *gameData, PokewoodSystem *sys) {
     }
 }
 
-void func_ov062_021e6584(GameData *gameData, PokewoodSystem *sys) {
+void PokewoodSystem_RecordScore(GameData *gameData, PokewoodSystem *sys) {
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
 
     if (sys->record.score > 0) {
@@ -264,7 +264,7 @@ void func_ov062_021e6584(GameData *gameData, PokewoodSystem *sys) {
     }
 }
 
-void func_ov062_021e65b4(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot) {
+void PokewoodSystem_AddGradePoints(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot) {
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (func_020111a0(save, slot) == 0) {
@@ -296,7 +296,7 @@ void PokewoodSystem_UpdateCastFame(GameData *gameData, PokewoodSystem *sys) {
     }
 }
 
-void func_ov062_021e663c(GameData *gameData, PokewoodSystem *sys, u32 slot) {
+void PokewoodSystem_PushLastSeries(GameData *gameData, PokewoodSystem *sys, u32 slot) {
     // The series of each movie. The table has room for 4 more movies, left 0
     static const u8 sMovieSeries[POKEWOOD_MOVIE_COUNT + 4] = {
         0, 11, 11, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4,  4,  4,  5,  5,
@@ -309,7 +309,7 @@ void func_ov062_021e663c(GameData *gameData, PokewoodSystem *sys, u32 slot) {
     }
 }
 
-void func_ov062_021e6668(PokewoodSystem *sys, const u8 *src) {
+void PokewoodSystem_SetSlotInfo(PokewoodSystem *sys, const u8 *src) {
     int i;
 
     for (i = 0; i < 8; i++) {

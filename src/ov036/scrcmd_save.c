@@ -45,7 +45,7 @@ static GameEventReturnCode func_ov036_021a6b80(GameEvent *event, u32 *state, voi
             GameData_StartSave(gameData);
             *state = 1;
         } else {
-            GameEvent_ChainNext(event, func_ov062_021e682c(save->gsys, save->result));
+            GameEvent_ChainNext(event, EventPokewoodSave_Create(save->gsys, save->result));
             *state = 2;
         }
         break;
