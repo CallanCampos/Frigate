@@ -404,7 +404,7 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     }
     shop->fadeIn = func_ov060_021e8924;
     shop->fadeOut = func_ov060_021e89bc;
-    shop->work.msgBase = func_ov137_021f10e8(shop->work.person, 2, NULL);
+    shop->work.msgBase = ResortPerson_GetParam(shop->work.person, 2, NULL);
     *shop->work.vars[0] = 0;
     shop->work.mode = mode;
     switch (mode) {
@@ -418,8 +418,9 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
         shop->work.destroy = func_ov060_021e7f58;
         shop->work.cursorCallback = func_ov060_021e7f5c;
         shop->work.printCallback = func_ov060_021e7a70;
-        shop->work.flags = JoinAvenuePerson_GetShop(func_ov137_021f0f58(shop->work.person));
-        shop->work.row = ResortShopData_GetPersonShop(shop->work.shops, func_ov137_021f0f58(shop->work.person));
+        shop->work.flags = JoinAvenuePerson_GetShop(ResortPerson_GetJoinAvenuePerson(shop->work.person));
+        shop->work.row =
+            ResortShopData_GetPersonShop(shop->work.shops, ResortPerson_GetJoinAvenuePerson(shop->work.person));
         break;
     case 1:
         shop->mode = mode;
@@ -801,11 +802,11 @@ static BOOL func_ov060_021e6140(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
         break;
     case 7: {
         u16 row = wk->selected->item;
-        ResortPersonData *data = func_ov137_021f1110(wk->person);
+        ResortPersonData *data = ResortPerson_GetData(wk->person);
         u32 prize = ResortBinary_Get(
             wk->table, row,
             join_ave_raffle_shop(wk->table, row,
-                                 func_ov137_021f1990(data, wk->selected->id + 5, ResortBinary_Get(wk->table, row, 0))) *
+                                 ResortData_Roll(data, wk->selected->id + 5, ResortBinary_Get(wk->table, row, 0))) *
                     2 +
                 3);
 
@@ -1136,7 +1137,7 @@ static void func_ov060_021e6c90(ResortShopWork *wk, u8 mode, u8 subMode) {
         if (JoinAvenuePerson_IsEmpty(person)) {
             continue;
         }
-        data = func_ov137_021f1b6c(wk->datas, person);
+        data = ResortDatas_FindByPerson(wk->datas, person);
         wk->initialOrder[n] = i;
         wk->order[n] = i;
         wk->entries[n].id = i;
@@ -1207,7 +1208,7 @@ static void func_ov060_021e6fd8(ResortShopWork *wk, u8 mode, u8 subMode) {
     ListMenuCore_FreeOptionList(wk->options);
     wk->options = ListMenuCore_CreateOptionList(wk->entryCount + 1, wk->heapId);
     for (i = 0; i < wk->entryCount; i++) {
-        func_ov060_021e8190(wk, func_ov137_021f1b6c(wk->datas, wk->entries[i].person), i, &wk->entries[i]);
+        func_ov060_021e8190(wk, ResortDatas_FindByPerson(wk->datas, wk->entries[i].person), i, &wk->entries[i]);
         ListMenuCore_AppendStrBufOption(&wk->options[i], wk->entries[i].label, i, wk->heapId);
     }
     ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, 12, BMPMENULIST_CANCEL, wk->heapId);
@@ -1631,9 +1632,9 @@ static ResortPeople *func_ov060_021e7ecc(Field *field) {
     ResortPeople *people = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
-        people = func_ov137_021f0e74(field);
+        people = ResortField0_GetPeople(field);
     } else if (Field_CheckGimmickWorkPassword(field, 1)) {
-        people = func_ov137_021eeeac(field);
+        people = ResortField_GetPeople(field);
     }
     return people;
 }
@@ -1642,9 +1643,9 @@ static void *func_ov060_021e7efc(Field *field) {
     void *npc = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
-        npc = func_ov137_021f0e8c(field);
+        npc = ResortField0_GetNPC(field);
     } else if (Field_CheckGimmickWorkPassword(field, 1)) {
-        npc = func_ov137_021eeebc(field);
+        npc = ResortField_GetNPC(field);
     }
     return npc;
 }
@@ -1729,7 +1730,7 @@ static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person)
 
 // Makes a person's entry's strings, or remakes them
 static void func_ov060_021e8190(ResortShopWork *wk, ResortPersonData *data, u32 index, ResortShopEntry *entry) {
-    JoinAvenuePerson *person = func_ov137_021f1980(data);
+    JoinAvenuePerson *person = ResortData_GetPerson(data);
     u16 flag = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
     StrBuf *label = GFL_StrBufCreate(64, wk->heapId);
     StrBuf *name = ResortSys_FormatShopText(wk->shops, data, flag, wk->heapId);
@@ -1972,7 +1973,7 @@ static void func_ov060_021e8804(ResortShop *shop, Field *field, u16 cameraMode) 
     FieldCamera_ClearBind(camera);
     switch (cameraMode) {
     case 1: {
-        JoinAvenuePerson *person = func_ov137_021f0f58(shop->work.person);
+        JoinAvenuePerson *person = ResortPerson_GetJoinAvenuePerson(shop->work.person);
 
         for (camIndex = 0; camIndex < 8; camIndex++) {
             if (JoinAvenueOccupants_GetPerson(shop->work.occupants, camIndex) == person) {
@@ -2067,8 +2068,8 @@ static BOOL func_ov060_021e89bc(ResortShop *shop, Field *field, int *seq) {
         }
         break;
     case 2:
-        func_ov137_021f152c(shop->work.people);
-        func_ov137_021f1d04(shop->work.npc, 1);
+        ResortPeople_ApplyVisibility(shop->work.people);
+        ResortNPC_SetVisible(shop->work.npc, 1);
         func_ov060_021e6100(shop);
         FieldCamera_LoadDefaults(camera);
         FieldCamera_ResetBind(camera);

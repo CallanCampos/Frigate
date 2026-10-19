@@ -187,14 +187,14 @@ ResortSys *ResortSys_Create(const ResortSysSetup *setup, ResortWork *resortWork,
     sys->unk24 = ResortBinary_Load(8, 22, heapId);
     sys->texts = ResortBinary_Load(9, 23, heapId);
     sys->unk2c = ResortBinary_Load(5, 11, heapId);
-    sys->datas = func_ov137_021f19c4(setup, heapId);
-    sys->slots = func_ov137_021f1710(sys->datas, heapId);
+    sys->datas = ResortDatas_Create(setup, heapId);
+    sys->slots = ResortSlots_Create(sys->datas, heapId);
     return sys;
 }
 
 void ResortSys_Free(ResortSys *sys) {
-    func_ov137_021f1740(sys->slots);
-    func_ov137_021f1ac0(sys->datas);
+    ResortSlots_Free(sys->slots);
+    ResortDatas_Free(sys->datas);
     ResortBinary_Free(sys->unk2c);
     ResortBinary_Free(sys->texts);
     ResortBinary_Free(sys->unk24);
@@ -217,7 +217,7 @@ ResortBinary *ResortSys_GetRanks(ResortSys *sys) {
     return sys->ranks;
 }
 
-ResortBinary *ResortSys_GetUnk20Table(ResortSys *sys) {
+ResortBinary *ResortSys_GetPosOffsets(ResortSys *sys) {
     return sys->unk20;
 }
 
@@ -291,9 +291,9 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
     shopKind = 0;
     gender = 0;
     if (data != NULL) {
-        gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
-        kind = (u16)func_ov137_021f1984(data);
-        shopKind = func_ov137_021f1968(data, JOIN_AVE_PARAM_SHOP_KIND, NULL);
+        gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
+        kind = (u16)ResortData_GetType(data);
+        shopKind = ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_KIND, NULL);
     }
 
     switch (query) {
@@ -302,8 +302,8 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
     case 2:
     case 3: {
         u16 result = 0;
-        u32 activity = func_ov137_021f1968(data, JOIN_AVE_PARAM_RECENT_ID + query, NULL);
-        u16 date = func_ov137_021f1968(data, JOIN_AVE_PARAM_RECENT_DATE + query, NULL);
+        u32 activity = ResortData_GetParam(data, JOIN_AVE_PARAM_RECENT_ID + query, NULL);
+        u16 date = ResortData_GetParam(data, JOIN_AVE_PARAM_RECENT_DATE + query, NULL);
 
         WordSetNumber(wordSet, 0, (date >> 9) & 0x7f, 2, NUM_PAD_ZERO, TRUE);
         WordSetNumber(wordSet, 2, (date >> 5) & 0xf, 2, NUM_PAD_NONE, TRUE);
@@ -319,10 +319,10 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         if (kind == 1 && shopKind == 5) {
             return ResortSys_GetTrainerTypeText(texts, data, 12);
         }
-        personType = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_6, NULL);
+        personType = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_6, NULL);
         if (personType == 0) {
             personType = ResortSys_ChoosePersonType(data, sys, gameData);
-            func_ov137_021f1974(data, JOIN_AVE_PARAM_UNK_6, personType);
+            ResortData_SetParam(data, JOIN_AVE_PARAM_UNK_6, personType);
         }
         if (gender == 0) {
             return ResortBinary_Get(types, personType, 0);
@@ -330,17 +330,17 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         return ResortBinary_Get(types, personType, 1);
     }
     case 5: {
-        u16 shopId = func_ov137_021f1968(data, JOIN_AVE_PARAM_SHOP_ID, NULL);
-        u16 trainerId = func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
-        u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
-        u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
+        u16 shopId = ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_ID, NULL);
+        u16 trainerId = ResortData_GetParam(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
+        u16 version = ResortData_GetParam(data, JOIN_AVE_PARAM_VERSION, NULL);
+        u16 unk18 = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_18, NULL);
         u32 shop = JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData);
 
         return ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shop), 0) +
                ResortSys_PickByGender(gender, 1120, 1128);
     }
     case 6: {
-        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 0);
+        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 0);
 
         return ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0) +
                ResortSys_PickByGender(gender, 328, 336);
@@ -355,9 +355,9 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         return ResortSys_PickByGender(gender, 1048, 1081);
     case 50: {
         u32 message;
-        u32 unk26 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_26, NULL);
-        u32 dataCount = func_ov137_021f1968(data, JOIN_AVE_PARAM_DATA_COUNT, NULL);
-        u32 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
+        u32 unk26 = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_26, NULL);
+        u32 dataCount = ResortData_GetParam(data, JOIN_AVE_PARAM_DATA_COUNT, NULL);
+        u32 version = ResortData_GetParam(data, JOIN_AVE_PARAM_VERSION, NULL);
 
         if (version == VERSION_WHITE2 || version == VERSION_BLACK2) {
             if (unk26 == 8) {
@@ -370,7 +370,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
             } else if (unk26 == 9) {
                 return ResortSys_PickByGender(gender, 15, 34);
             } else if (unk26 == 7) {
-                u16 species = func_ov137_021f1968(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
+                u16 species = ResortData_GetParam(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
 
                 if (species == 0) {
                     species = SPECIES_BULBASAUR;
@@ -378,7 +378,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
                 WordSet_LoadSpeciesName(wordSet, 1, species);
                 return ResortSys_PickByGender(gender, 7, 26);
             } else if (unk26 == 6) {
-                u16 species = func_ov137_021f1968(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
+                u16 species = ResortData_GetParam(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
 
                 if (species == 0) {
                     species = SPECIES_BULBASAUR;
@@ -391,7 +391,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
             message = ResortSys_PickByGender(gender, 1, 20);
             return message + unk26 - 1;
         } else if (unk26 == 6) {
-            u16 species = func_ov137_021f1968(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
+            u16 species = ResortData_GetParam(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
 
             if (species == 0) {
                 species = SPECIES_BULBASAUR;
@@ -399,7 +399,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
             WordSet_LoadSpeciesName(wordSet, 1, species);
             return ResortSys_PickByGender(gender, 6, 25);
         } else if (unk26 == 7) {
-            u16 species = func_ov137_021f1968(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
+            u16 species = ResortData_GetParam(data, JOIN_AVE_PARAM_ENTRY_SPECIES, NULL);
 
             if (species == 0) {
                 species = SPECIES_BULBASAUR;
@@ -410,8 +410,8 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         return ResortSys_PickByGender(gender, 19, 38);
     }
     case 51: {
-        u32 country = func_ov137_021f1968(data, JOIN_AVE_PARAM_COUNTRY, NULL);
-        u32 area = func_ov137_021f1968(data, JOIN_AVE_PARAM_AREA, NULL);
+        u32 country = ResortData_GetParam(data, JOIN_AVE_PARAM_COUNTRY, NULL);
+        u32 area = ResortData_GetParam(data, JOIN_AVE_PARAM_AREA, NULL);
 
         if (country != 0 && area != 0) {
             loadCountryToStrbuf(wordSet, 1, country);
@@ -525,7 +525,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
     case 116:
         return ResortSys_PickByGender(gender, 154, 171);
     case 86: {
-        u16 level = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 1);
+        u16 level = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 1);
 
         if (level >= 9) {
             return ResortSys_PickByGender(gender, 80, 85);
@@ -620,12 +620,12 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         u16 shopId;
 
         query -= 12;
-        occupant = func_ov137_021f1b94(datas, 0, query);
+        occupant = ResortDatas_Get(datas, 0, query);
         shopName =
-            ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shopData, func_ov137_021f1980(occupant)), 0);
-        shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(occupant)), 0);
+            ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shopData, ResortData_GetPerson(occupant)), 0);
+        shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(occupant)), 0);
         name = ResortSys_FormatShopText(shopData, occupant, shopId, heapId);
-        func_0202437c(wordSet, 0, name, func_ov137_021f1968(occupant, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
+        func_0202437c(wordSet, 0, name, ResortData_GetParam(occupant, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(name);
         return shopName + 2165;
     }
@@ -633,7 +633,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         u32 message;
         u32 candidates[9] = { 0 };
         s32 count = 0;
-        JoinAvenuePerson *person = func_ov137_021f1980(data);
+        JoinAvenuePerson *person = ResortData_GetPerson(data);
         BOOL hasRecord = FALSE;
         s32 i;
         u32 pick;
@@ -819,12 +819,12 @@ BOOL ResortSys_GetPersonVisit(ResortPersonData *data, JoinAvenuePerson *person, 
     u16 shopKind;
     u32 index;
 
-    personType = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_6, NULL);
+    personType = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_6, NULL);
     isShop5 = FALSE;
-    gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
+    gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
     multiplier = 0;
-    kind = func_ov137_021f1984(data);
-    shopKind = func_ov137_021f1968(data, JOIN_AVE_PARAM_SHOP_KIND, NULL);
+    kind = ResortData_GetType(data);
+    shopKind = ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_KIND, NULL);
     if (kind == 1 && shopKind == 5) {
         isShop5 = TRUE;
     }
@@ -840,8 +840,8 @@ BOOL ResortSys_GetPersonVisit(ResortPersonData *data, JoinAvenuePerson *person, 
         *a5 = ResortBinary_Get(types, personType, 4);
         multiplier = ResortBinary_Get(types, personType, index * 6 + 8);
         *a5 = (*a5 * sShopKindMultipliers[multiplier]) >> 12;
-        if (func_ov137_021f1984(data) == 1) {
-            switch (func_ov137_021f1968(data, JOIN_AVE_PARAM_SHOP_KIND, NULL)) {
+        if (ResortData_GetType(data) == 1) {
+            switch (ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_KIND, NULL)) {
             case 5:
                 *a5 = (*a5 * 0x2000) >> 12;
                 break;
@@ -970,15 +970,15 @@ u32 ResortSys_GetInfoFlag1b(ResortSys *sys) {
 BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys) {
     ResortPersonData **datas = ResortSys_GetDatas(sys);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
-    ResortDataIter iter = func_ov137_021f1ae0(datas, sOccupantKinds, 1);
+    ResortDataIter iter = ResortDatas_StartIter(datas, sOccupantKinds, 1);
     ResortPersonData *data;
 
     for (;;) {
-        data = func_ov137_021f1b0c(datas, &iter, sOccupantKinds, 1);
+        data = ResortDatas_NextIter(datas, &iter, sOccupantKinds, 1);
         if (data == NULL) {
             break;
         }
-        if (JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 1) != 9) {
+        if (JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 1) != 9) {
             return FALSE;
         }
     }
@@ -1001,22 +1001,22 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         data = NULL;
         break;
     case 0xfe:
-        data = func_ov137_021f1110(person);
-        joinPerson = func_ov137_021f1980(data);
+        data = ResortPerson_GetData(person);
+        joinPerson = ResortData_GetPerson(data);
         break;
     default:
-        data = func_ov137_021f1ba8(ResortSys_GetDatas(sys), who, index);
-        joinPerson = func_ov137_021f1980(data);
+        data = ResortDatas_GetByScript(ResortSys_GetDatas(sys), who, index);
+        joinPerson = ResortData_GetPerson(data);
         break;
     }
 
     switch (type) {
     case 0: {
         StrBuf *buf = GFL_StrBufCreate(8, HEAPID_TAIL(heapId));
-        u32 gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
+        u32 gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
         u16 name[8];
 
-        func_ov137_021f1968(data, JOIN_AVE_PARAM_NAME, name);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_NAME, name);
         GFL_StrBufLoadString(buf, name);
         func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
@@ -1026,28 +1026,28 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(joinPerson), 0);
         StrBuf *buf = ResortSys_FormatShopText(shopData, data, shopId, heapId);
 
-        func_0202437c(wordSet, wordIndex, buf, func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
+        func_0202437c(wordSet, wordIndex, buf, ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
     case 14: {
-        u16 shopId = func_ov137_021f1968(data, JOIN_AVE_PARAM_SHOP_ID, NULL);
-        u16 trainerId = func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
-        u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
-        u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
+        u16 shopId = ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_ID, NULL);
+        u16 trainerId = ResortData_GetParam(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
+        u16 version = ResortData_GetParam(data, JOIN_AVE_PARAM_VERSION, NULL);
+        u16 unk18 = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_18, NULL);
         StrBuf *buf = ResortSys_FormatShopText(
             shopData, data, JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData), heapId);
 
-        func_0202437c(wordSet, wordIndex, buf, func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
+        func_0202437c(wordSet, wordIndex, buf, ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
     case 3: {
         StrBuf *buf = GFL_StrBufCreate(9, HEAPID_TAIL(heapId));
-        u32 gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
+        u32 gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
         u16 greeting[9];
 
-        func_ov137_021f1968(data, JOIN_AVE_PARAM_GREETING, greeting);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_GREETING, greeting);
         GFL_StrBufLoadString(buf, greeting);
         func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
@@ -1066,10 +1066,10 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
     }
     case 6: {
         StrBuf *buf = GFL_StrBufCreate(9, HEAPID_TAIL(heapId));
-        u32 gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
+        u32 gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
         u16 message[9];
 
-        func_ov137_021f1968(data, JOIN_AVE_PARAM_MESSAGE1, message);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_MESSAGE1, message);
         GFL_StrBufLoadString(buf, message);
         func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
@@ -1077,10 +1077,10 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
     }
     case 18: {
         StrBuf *buf = GFL_StrBufCreate(9, HEAPID_TAIL(heapId));
-        u32 gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
+        u32 gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
         u16 message[9];
 
-        func_ov137_021f1968(data, JOIN_AVE_PARAM_MESSAGE2, message);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_MESSAGE2, message);
         GFL_StrBufLoadString(buf, message);
         func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
@@ -1111,13 +1111,13 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 21:
-        WordSetNumber(wordSet, wordIndex, func_ov137_021f1968(data, JOIN_AVE_PARAM_YEAR, NULL), 2, NUM_PAD_ZERO, TRUE);
+        WordSetNumber(wordSet, wordIndex, ResortData_GetParam(data, JOIN_AVE_PARAM_YEAR, NULL), 2, NUM_PAD_ZERO, TRUE);
         break;
     case 22:
-        WordSetNumber(wordSet, wordIndex, func_ov137_021f1968(data, JOIN_AVE_PARAM_MONTH, NULL), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, wordIndex, ResortData_GetParam(data, JOIN_AVE_PARAM_MONTH, NULL), 2, NUM_PAD_NONE, TRUE);
         break;
     case 23:
-        WordSetNumber(wordSet, wordIndex, func_ov137_021f1968(data, JOIN_AVE_PARAM_DAY, NULL), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, wordIndex, ResortData_GetParam(data, JOIN_AVE_PARAM_DAY, NULL), 2, NUM_PAD_NONE, TRUE);
         break;
     case 7: {
         u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(joinPerson), 0);
@@ -1132,10 +1132,10 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 15: {
-        u16 shopId = func_ov137_021f1968(data, JOIN_AVE_PARAM_SHOP_ID, NULL);
-        u16 trainerId = func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
-        u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
-        u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
+        u16 shopId = ResortData_GetParam(data, JOIN_AVE_PARAM_SHOP_ID, NULL);
+        u16 trainerId = ResortData_GetParam(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
+        u16 version = ResortData_GetParam(data, JOIN_AVE_PARAM_VERSION, NULL);
+        u16 unk18 = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_18, NULL);
         u32 shopName = ResortShopData_GetShopParam(
             ResortShopData_GetShop(shopData, JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData)),
             0);
@@ -1233,7 +1233,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     }
     case 5: {
-        u32 unk26 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_26, NULL);
+        u32 unk26 = ResortData_GetParam(data, JOIN_AVE_PARAM_UNK_26, NULL);
         MsgData *msgData =
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, unk26 + 1488);
@@ -1252,7 +1252,7 @@ static u32 ResortSys_RollTier(ResortPersonData *data, ResortSys *sys) {
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     u32 total = 0;
     u32 range = ResortBinary_FindRange(ranks, JoinAvenue_GetParam(info, RESORT_INFO_RANK, NULL));
-    u32 roll = func_ov137_021f1990(data, 2, 100);
+    u32 roll = ResortData_Roll(data, 2, 100);
     s32 tier;
 
     for (tier = 0; tier < 4; tier++) {
@@ -1320,7 +1320,7 @@ static u32 ResortSys_PickTypeOfTier(ResortPersonData *data, ResortSys *sys, u32 
         }
     }
 
-    pick = func_ov137_021f1990(data, 3, count);
+    pick = ResortData_Roll(data, 3, count);
     count = 0;
     for (row = 1; row < ResortBinary_GetRowCount(types); row++) {
         u32 rowTier = ResortBinary_Get(types, row, 3);
@@ -1364,7 +1364,7 @@ static u32 ResortSys_ChoosePersonType(ResortPersonData *data, ResortSys *sys, Ga
     }
 
     if (hasPlayerShop) {
-        s32 roll = func_ov137_021f1990(data, 4, 100);
+        s32 roll = ResortData_Roll(data, 4, 100);
 
         if (roll < sNewShopChances[tier]) {
             return playerShopKind + 1;
@@ -1694,7 +1694,7 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
 
 // The column of the texts for a person's trainer type
 u32 ResortSys_GetTrainerTypeText(ResortBinary *texts, ResortPersonData *data, u32 column) {
-    u32 trainerType = func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL);
+    u32 trainerType = ResortData_GetParam(data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL);
     u32 row;
 
     for (row = 0; row < ResortBinary_GetRowCount(texts); row++) {
@@ -1719,11 +1719,11 @@ void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field
         mode = 1;
     }
 
-    for (i = 0; i < func_ov137_021f134c(people); i++) {
-        ResortPerson *other = func_ov137_021f1634(people, i);
+    for (i = 0; i < ResortPeople_GetCount(people); i++) {
+        ResortPerson *other = ResortPeople_GetByIndex(people, i);
 
         if (other != NULL) {
-            u32 type = func_ov137_021f10f4(other, 0);
+            u32 type = ResortPerson_GetAttr(other, 0);
             const u32 *hidden = sHiddenTypes[mode];
             s32 j;
 
@@ -1732,12 +1732,12 @@ void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field
                     BOOL hide = TRUE;
 
                     if (cameraOnly) {
-                        if (ResortActor_IsBehindCamera(func_ov137_021f110c(other), camera)) {
+                        if (ResortActor_IsBehindCamera(ResortPerson_GetActor(other), camera)) {
                             hide = FALSE;
                         }
                     }
                     if (hide) {
-                        func_ov137_021f1098(other, 1);
+                        ResortPerson_ApplyVisibility(other, 1);
                     }
                     break;
                 }
@@ -1754,15 +1754,15 @@ void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field
     }
 
     if (cameraOnly) {
-        for (i = 0; i < func_ov137_021f1d00(npc); i++) {
-            FieldActor *actor = func_ov137_021f1cc8(npc, i);
+        for (i = 0; i < ResortNPC_GetCount(npc); i++) {
+            FieldActor *actor = ResortNPC_GetActor(npc, i);
 
             if (actor != NULL && !ResortActor_IsBehindCamera(actor, camera)) {
                 SetActorHidden(actor, TRUE);
             }
         }
     } else {
-        func_ov137_021f1d04(npc, FALSE);
+        ResortNPC_SetVisible(npc, FALSE);
     }
 }
 
@@ -1793,13 +1793,13 @@ static BOOL ResortUnlock_AllPeople(ResortSys *sys, GameData *gameData) {
 
 ResortSys *ResortSys_Get(Field *field) {
     if (Field_CheckGimmickWorkPassword(field, 1)) {
-        return func_ov137_021eeec8(field);
+        return ResortField_GetSys(field);
     }
-    return func_ov137_021f0e80(field);
+    return ResortField0_GetSys(field);
 }
 
 ResortPerson *ResortSys_GetScriptPerson(FieldScriptEnv *env, ResortPeople *people) {
-    return func_ov137_021f15cc(people, ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env)));
+    return ResortPeople_FindByActor(people, ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env)));
 }
 
 // Makes the person of a kind of data of the avenue from another, or gives the data a new shop of its kind. Returns the
@@ -1809,12 +1809,12 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
     ResortShopData *shopData = ResortSys_GetShopData(sys);
     ResortPersonData *made = NULL;
     u32 row = func_020395a0((u16)kind);
-    u32 dataKind = func_ov137_021f1984(data);
+    u32 dataKind = ResortData_GetType(data);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     u16 slot;
 
     if (dataKind == kind) {
-        JoinAvenuePerson *person = func_ov137_021f1980(data);
+        JoinAvenuePerson *person = ResortData_GetPerson(data);
         u16 oldShopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
         const u16 *shop = ResortShopData_GetShop(shopData, oldShopId);
         u16 column2 = ResortShopData_GetShopParam(shop, 2);
@@ -1835,37 +1835,38 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_18, 1);
         JoinAvenuePerson_InitFromPerson(person, person, shopData, slot, row);
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_18, status);
-        return func_ov137_021f198c(data);
+        return ResortData_GetIndex(data);
     }
 
-    if (ResortSys_GetEmptyData(sys, func_ov137_021f17fc(kind), row, &slot, &made)) {
+    if (ResortSys_GetEmptyData(sys, ResortData_GetMakeKind(kind), row, &slot, &made)) {
         switch (sMakeKinds[kind][dataKind]) {
         case 1:
-            JoinAvenuePerson_InitFromPerson(func_ov137_021f1980(made), func_ov137_021f1980(data), shopData, slot, row);
+            JoinAvenuePerson_InitFromPerson(ResortData_GetPerson(made), ResortData_GetPerson(data), shopData, slot,
+                                            row);
             break;
         case 2:
-            JoinAvenuePerson_InitFromEntry(func_ov137_021f1980(made), func_ov137_021f1980(data), shopData, slot, row);
+            JoinAvenuePerson_InitFromEntry(ResortData_GetPerson(made), ResortData_GetPerson(data), shopData, slot, row);
             break;
         case 3: {
-            JoinAvenueRecord *record = func_ov137_021f1980(made);
-            u16 shopKind = func_ov137_021f198c(made);
+            JoinAvenueRecord *record = ResortData_GetPerson(made);
+            u16 shopKind = ResortData_GetIndex(made);
 
-            JoinAvenueRecord_InitFromPerson(record, func_ov137_021f1980(data), slot, (u16)row, shopKind);
+            JoinAvenueRecord_InitFromPerson(record, ResortData_GetPerson(data), slot, (u16)row, shopKind);
             break;
         }
         case 4: {
-            JoinAvenueRecord *record = func_ov137_021f1980(made);
-            u16 shopKind = func_ov137_021f198c(made);
+            JoinAvenueRecord *record = ResortData_GetPerson(made);
+            u16 shopKind = ResortData_GetIndex(made);
 
-            JoinAvenueRecord_InitFromEntry(record, func_ov137_021f1980(data), slot, (u16)row, shopKind);
+            JoinAvenueRecord_InitFromEntry(record, ResortData_GetPerson(data), slot, (u16)row, shopKind);
             break;
         }
         default:
             return 0;
         }
 
-        func_ov137_021f1748(slots);
-        return func_ov137_021f198c(made);
+        ResortSlots_Fill(slots);
+        return ResortData_GetIndex(made);
     }
     return 0;
 }
@@ -1874,8 +1875,8 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
 static BOOL ResortSys_GetEmptyData(ResortSys *sys, u32 kind, u32 row, u16 *slot, ResortPersonData **data) {
     ResortSlots *slots = ResortSys_GetSlots(sys);
     ResortPersonData **datas = ResortSys_GetDatas(sys);
-    u16 emptySlot = func_ov137_021f184c(slots, row);
-    ResortPersonData *empty = func_ov137_021f1bd0(datas, kind);
+    u16 emptySlot = ResortSlots_FindEmpty(slots, row);
+    ResortPersonData *empty = ResortDatas_FindEmpty(datas, kind);
 
     if (emptySlot == 0xffff) {
         return FALSE;
@@ -1900,10 +1901,10 @@ StrBuf *ResortSys_FormatShopText(ResortShopData *shops, ResortPersonData *data, 
     StrBuf *src = GFL_MsgDataLoadStrbufNew(msgData, ResortShopData_GetShopParam(shop, 4));
     StrBuf *nameBuf = GFL_StrBufCreate(8, HEAPID_TAIL(heapId));
     StrBuf *dest = GFL_StrBufCreate(64, heapId);
-    u32 gender = func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL);
+    u32 gender = ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL);
     u16 name[8];
 
-    func_ov137_021f1968(data, JOIN_AVE_PARAM_NAME, name);
+    ResortData_GetParam(data, JOIN_AVE_PARAM_NAME, name);
     GFL_StrBufLoadString(nameBuf, name);
     func_0202437c(wordSet, 0, nameBuf, gender, 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, dest, src);
@@ -2103,9 +2104,9 @@ void ResortSys_AddEntryOrRecord(ResortSys *sys, PlayerInfo *playerInfo, u32 mode
             }
         }
         record = JoinAvenueRecord_Create(HEAPID_TAIL(heapId));
-        ResortRecord_Setup(sys, record, type, shopKind, func_ov137_021f184c(slots, 2), heapId);
+        ResortRecord_Setup(sys, record, type, shopKind, ResortSlots_FindEmpty(slots, 2), heapId);
         MI_CpuCopy8(record, JoinAvenueOccupants_GetEmptyRecord(occupants), sizeof(JoinAvenueRecord));
-        func_ov137_021f1748(slots);
+        ResortSlots_Fill(slots);
         JoinAvenueRecord_Free(record);
         break;
     }
@@ -2125,7 +2126,7 @@ void ResortSys_ChooseVisitGroup(ResortSys *sys, ResortPersonData *a1, ResortPers
     ResortSys_GetInfo(sys);
     work = ResortSys_GetWork(sys);
     selected = 0xffff;
-    roll = func_ov137_021f199c(a1, data, 25, 100);
+    roll = ResortData_RollPair(a1, data, 25, 100);
     total = 0;
     table = ResortBinary_Load(12, 8, HEAPID_GAMEEVENT);
     for (i = 0; i < ResortBinary_GetRowCount(table); i++) {
@@ -2140,7 +2141,7 @@ void ResortSys_ChooseVisitGroup(ResortSys *sys, ResortPersonData *a1, ResortPers
     }
     ResortBinary_Free(table);
     ResortSys_ResetWork(sys, selected);
-    index = func_ov137_021f198c(a1);
+    index = ResortData_GetIndex(a1);
     ResortWork_Set(work, index + RESORT_WORK_MET_FIRST, 1);
 }
 
@@ -2167,7 +2168,7 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
     u32 pick;
 
     ResortSys_GetInfo(sys);
-    index = func_ov137_021f198c(a1);
+    index = ResortData_GetIndex(a1);
 
     count = 0;
     for (i = 0; sPeopleRows[index].near[i] != -1; i++) {
@@ -2180,7 +2181,7 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
     if (count > 0) {
         u32 near;
 
-        pick = func_ov137_021f199c(a1, data, 23, count);
+        pick = ResortData_RollPair(a1, data, 23, count);
         near = 0;
 
         for (i = 0; sPeopleRows[index].near[i] != -1; i++) {
@@ -2207,7 +2208,7 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
     if (count > 0) {
         u32 near;
 
-        pick = func_ov137_021f199c(a1, data, 24, count);
+        pick = ResortData_RollPair(a1, data, 24, count);
         near = 0;
 
         for (i = 0; sPeopleRows[index].far[i] != -1; i++) {
@@ -2241,9 +2242,9 @@ u32 ResortSys_GetVisitPoints(ResortSys *sys, ResortPersonData *data) {
     ResortSys_GetWork(sys);
     base = JoinAvenue_GetParam(info, 5, NULL);
     RTC_GetCachedDate(&date);
-    shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(func_ov137_021f1980(data)), 0);
+    shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 0);
     shopKind = ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0);
-    trainerType = UnionView_FindTrainerType((u8)func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL));
+    trainerType = UnionView_FindTrainerType((u8)ResortData_GetParam(data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL));
     if (trainerType >= 8) {
         trainerType -= 8;
     }

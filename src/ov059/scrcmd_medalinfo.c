@@ -23,16 +23,16 @@ BOOL func_ov059_021e7c70(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MedalInfoParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MedalInfoParam), TRUE, "scrcmd_medalinfo.c", 88);
     ResortPerson *person = func_ov059_021e7d7c(field, env);
-    u16 date = func_ov137_021f10e8(person, 42, NULL);
+    u16 date = ResortPerson_GetParam(person, 42, NULL);
     u16 name[8];
     u16 unkC;
     u16 unkE;
     u16 unk10;
 
-    func_ov137_021f10e8(person, JOIN_AVE_PARAM_NAME, name);
-    unkC = func_ov137_021f10e8(person, 41, NULL);
-    unkE = func_ov137_021f10e8(person, 43, NULL);
-    unk10 = func_ov137_021f10e8(person, 40, NULL);
+    ResortPerson_GetParam(person, JOIN_AVE_PARAM_NAME, name);
+    unkC = ResortPerson_GetParam(person, 41, NULL);
+    unkE = ResortPerson_GetParam(person, 43, NULL);
+    unk10 = ResortPerson_GetParam(person, 40, NULL);
     param->nameBuf = GFL_StrBufCreate(8, HEAPID_GAMEEVENT);
     GFL_StrBufLoadString(param->nameBuf, name);
     param->name = param->nameBuf;
@@ -63,9 +63,9 @@ static ResortPerson *func_ov059_021e7d7c(Field *field, FieldScriptEnv *env) {
     ResortPeople *people = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
-        people = func_ov137_021f0e74(field);
+        people = ResortField0_GetPeople(field);
     } else if (Field_CheckGimmickWorkPassword(field, 1)) {
-        people = func_ov137_021eeeac(field);
+        people = ResortField_GetPeople(field);
     }
     return ResortSys_GetScriptPerson(env, people);
 }
