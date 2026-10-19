@@ -152,7 +152,7 @@ BOOL func_ov036_021aaf1c(VM *vm, FieldScriptEnv *env) {
         a2 = TRUE;
         break;
     }
-    event = func_ov097_021eede4(gsys, a1, a2);
+    event = DriftveilLift_CreateMoveEvent(gsys, a1, a2);
     if (event == NULL) {
         return TRUE;
     }
@@ -168,7 +168,7 @@ BOOL func_ov036_021aaf78(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021aaf88(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov097_021eefe4(gsys, VM_Read16(vm));
+    DriftveilLift_PlaceAtBottom(gsys, VM_Read16(vm));
     return FALSE;
 }
 

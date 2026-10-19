@@ -9606,7 +9606,12 @@ overlays/ov096 0x021efc94 sGymDriftveilSceneSetup
 overlays/ov096 0x021efcd4 sGymDriftveilResources
 overlays/ov096 0x021eff98 sPads
 overlays/ov096 0x021f0228 sGymDriftveilActors
+overlays/ov097 0x021eec80 DriftveilLift_Init
+overlays/ov097 0x021eedb4 DriftveilLift_End
+overlays/ov097 0x021eedd8 DriftveilLift_Update
+overlays/ov097 0x021eede4 DriftveilLift_CreateMoveEvent
 overlays/ov097 0x021eee80 DriftveilLift_MoveEvent
+overlays/ov097 0x021eefe4 DriftveilLift_PlaceAtBottom
 overlays/ov097 0x021ef0ac DriftveilLift_HasArrived
 overlays/ov097 0x021ef0cc DriftveilLift_ResetAnm
 overlays/ov099 0x021eec80 GymOpelucid_Init
