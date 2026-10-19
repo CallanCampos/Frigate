@@ -116,23 +116,23 @@ static const BSubwayActor sActors[] = {
     { 52, 10, 20, 0, 16, 114, 0, 0 },   { 52, 18, 28, 0, 14, 115, 116, 206 }, { 0xffff },
 };
 
-static BOOL func_ov050_021e69a8(VM *vm, void *env);
-static BOOL func_ov050_021e69cc(VM *vm, void *env);
-static BOOL func_ov050_021e6a20(VM *vm, void *env);
-static BOOL func_ov050_021e6ab4(VM *vm, void *env);
-static BOOL func_ov050_021e6b38(VM *vm, void *env);
-static GameEvent *func_ov050_021e6be0(GameSystem *gsys, BSubwayScrWork *bsw);
-static GameEvent *func_ov050_021e6c88(GameSystem *gsys, FieldScriptEnv *env, u16 *var, u32 message);
-static void func_ov050_021e6cb0(BSubwayScrWork *bsw, GameData *gameData, MMSys *mmSys, Field *field);
+static BOOL ScriptNative_BSubwaySendWait(VM *vm, void *env);
+static BOOL ScriptNative_BSubwayTimingWait(VM *vm, void *env);
+static BOOL ScriptNative_BSubwayParentEntryMenuWait(VM *vm, void *env);
+static BOOL ScriptNative_BSubwayChildEntryMenuWait(VM *vm, void *env);
+static BOOL ScriptNative_BSubwayRecvWait(VM *vm, void *env);
+static GameEvent *EventBSubwayCommEnd_Create(GameSystem *gsys, BSubwayScrWork *bsw);
+static GameEvent *EventBSubwayMsgWindow_Create(GameSystem *gsys, FieldScriptEnv *env, u16 *var, u32 message);
+static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMSys *mmSys, Field *field);
 static u16 func_ov050_021e6e6c(FieldActor *actor);
 static BOOL func_ov050_021e6e78(BSubwayScrWork *bsw, u16 index);
 static void func_ov050_021e6e9c(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, u16 *c);
-static BOOL func_ov050_021e6ee0(VM *vm, void *env);
-static u32 func_ov050_021e6f60(u32 mode);
-static u32 func_ov050_021e6f90(Field *field);
-static u16 func_ov050_021e6fd4(PlayerInfo *info);
+static BOOL ScriptNative_BSubwayBattleRecSaveWait(VM *vm, void *env);
+static u32 BSubway_GetModeRegulation(u32 mode);
+static u32 BSubway_GetZonePlayMode(Field *field);
+static u16 BSubway_GetPlayerObjCode(PlayerInfo *info);
 
-BOOL func_ov050_021e5800(VM *vm, FieldScriptEnv *env) {
+BOOL BSubwayCmd_CreateWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
@@ -142,7 +142,7 @@ BOOL func_ov050_021e5800(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov050_021e5838(VM *vm, FieldScriptEnv *env) {
+BOOL BSubwayCmd_ClearWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *fieldWork = ScriptWork_GetFieldWork(work);
 
@@ -150,7 +150,7 @@ BOOL func_ov050_021e5838(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov050_021e5854(VM *vm, FieldScriptEnv *env) {
+BOOL BSubwayCmd_FreeWork(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *fieldWork = ScriptWork_GetFieldWork(work);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
@@ -187,7 +187,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     }
     switch (cmd) {
     case 0:
-        *retWk = func_ov050_021e6f90(field);
+        *retWk = BSubway_GetZonePlayMode(field);
         break;
     case 1:
         OS_ResetSystem(0);
@@ -432,13 +432,13 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         if (param0 == TRUE) {
             message = TRUE;
         }
-        ScriptWork_CallEvent(work, func_ov050_021e6c88(gsys, env, retWk, message));
+        ScriptWork_CallEvent(work, EventBSubwayMsgWindow_Create(gsys, env, retWk, message));
         result = TRUE;
         break;
     }
     case 45: {
         ZoneSpawnInfo spawn;
-        u16 index = func_ov050_021e6f90(field);
+        u16 index = BSubway_GetZonePlayMode(field);
         const VecFx32 *pos = &sWarpPositions[index];
 
         CreateZoneChangeData(&spawn, sWarpZones[index], 4, pos->x, pos->y, pos->z);
@@ -615,7 +615,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 329:
-        func_ov050_021e6cb0(bsw, gameData, Field_GetActorSystem(field), field);
+        BSubway_PlacePassengers(bsw, gameData, Field_GetActorSystem(field), field);
         break;
     case 330:
         bsw->unkC_8 = param0;
@@ -674,7 +674,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
 
         *retWk = 0;
         useBattleBox = BSubwayPlayData_GetData(playData, 10, NULL);
-        regulation = PokeRegulation_LoadNew(func_ov050_021e6f60(mode), HEAPID_GAMEEVENT);
+        regulation = PokeRegulation_LoadNew(BSubway_GetModeRegulation(mode), HEAPID_GAMEEVENT);
         if (useBattleBox == TRUE) {
             party = convertBoxedPokeSetToParty(getBattleBox(save), HEAPID_GAMEEVENT);
             checked = party;
@@ -695,7 +695,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         func_ov033_0217bd34(bsw);
         break;
     case 341:
-        *retWk = func_ov050_021e6f60(mode);
+        *retWk = BSubway_GetModeRegulation(mode);
         break;
     case 342:
         *retWk = func_ov033_0217bdc0(mode);
@@ -727,7 +727,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         bsw->unk7EC = 0;
         bsw->unk7EE = 0;
         bsw->unk10 = param0;
-        VM_SetNativeCallback(vm, func_ov050_021e6ee0);
+        VM_SetNativeCallback(vm, ScriptNative_BSubwayBattleRecSaveWait);
         bsw->unkC_10 = 2;
         result = TRUE;
         break;
@@ -842,37 +842,37 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 401:
-        ScriptWork_CallEvent(work, func_ov050_021e6be0(gsys, bsw));
+        ScriptWork_CallEvent(work, EventBSubwayCommEnd_Create(gsys, bsw));
         result = TRUE;
         break;
     case 402:
         bsw->unk727 = param0;
         bsw->unk72A = retWkId;
         BSubwayComm_SendTiming(bsw->unk727);
-        VM_SetNativeCallback(vm, func_ov050_021e69cc);
+        VM_SetNativeCallback(vm, ScriptNative_BSubwayTimingWait);
         result = TRUE;
         break;
     case 403:
         bsw->resultVar = retWk;
         bsw->unk71C = func_ov036_021c3d9c(GetGameDataPlayerInfo(gameData), field, 2, 2, 4, 0, 2, 0);
-        VM_SetNativeCallback(vm, func_ov050_021e6a20);
+        VM_SetNativeCallback(vm, ScriptNative_BSubwayParentEntryMenuWait);
         result = TRUE;
         break;
     case 404:
         bsw->resultVar = retWk;
         bsw->unk71C = func_ov036_021c3d9c(GetGameDataPlayerInfo(gameData), field, 2, 2, 4, 1, 2, 0);
         result = TRUE;
-        VM_SetNativeCallback(vm, func_ov050_021e6ab4);
+        VM_SetNativeCallback(vm, ScriptNative_BSubwayChildEntryMenuWait);
         break;
     case 405:
         BSubwayComm_SetSendData(bsw, param0, param1);
-        VM_SetNativeCallback(vm, func_ov050_021e69a8);
+        VM_SetNativeCallback(vm, ScriptNative_BSubwaySendWait);
         result = TRUE;
         break;
     case 406:
         BSubwayComm_SetRecvMode(bsw, param0);
         bsw->unk72A = retWkId;
-        VM_SetNativeCallback(vm, func_ov050_021e6b38);
+        VM_SetNativeCallback(vm, ScriptNative_BSubwayRecvWait);
         result = TRUE;
         break;
     case 407:
@@ -909,11 +909,11 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 411:
         *retWk = NetSystem_GetNetId() == FALSE
                      ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)
-                     : func_ov050_021e6fd4(&bsw->partner);
+                     : BSubway_GetPlayerObjCode(&bsw->partner);
         break;
     case 412:
         *retWk = NetSystem_GetNetId() == FALSE
-                     ? func_ov050_021e6fd4(&bsw->partner)
+                     ? BSubway_GetPlayerObjCode(&bsw->partner)
                      : FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0);
         break;
     case 413:
@@ -943,7 +943,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     return result;
 }
 
-static BOOL func_ov050_021e69a8(VM *vm, void *env) {
+static BOOL ScriptNative_BSubwaySendWait(VM *vm, void *env) {
     BSubwayScrWork *bsw =
         GameData_GetBSubwayScrWork(GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env))));
 
@@ -953,7 +953,7 @@ static BOOL func_ov050_021e69a8(VM *vm, void *env) {
     return FALSE;
 }
 
-static BOOL func_ov050_021e69cc(VM *vm, void *env) {
+static BOOL ScriptNative_BSubwayTimingWait(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
@@ -970,7 +970,7 @@ static BOOL func_ov050_021e69cc(VM *vm, void *env) {
     return FALSE;
 }
 
-static BOOL func_ov050_021e6a20(VM *vm, void *env) {
+static BOOL ScriptNative_BSubwayParentEntryMenuWait(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *fieldWork = ScriptWork_GetFieldWork(work);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
@@ -1000,7 +1000,7 @@ static BOOL func_ov050_021e6a20(VM *vm, void *env) {
     return FALSE;
 }
 
-static BOOL func_ov050_021e6ab4(VM *vm, void *env) {
+static BOOL ScriptNative_BSubwayChildEntryMenuWait(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *fieldWork = ScriptWork_GetFieldWork(work);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
@@ -1027,7 +1027,7 @@ static BOOL func_ov050_021e6ab4(VM *vm, void *env) {
     return FALSE;
 }
 
-static BOOL func_ov050_021e6b38(VM *vm, void *env) {
+static BOOL ScriptNative_BSubwayRecvWait(VM *vm, void *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
@@ -1038,7 +1038,7 @@ static BOOL func_ov050_021e6b38(VM *vm, void *env) {
     return FALSE;
 }
 
-static GameEventReturnCode func_ov050_021e6b78(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventBSubwayCommEnd_Callback(GameEvent *event, u32 *state, void *data) {
     BSubwayScrWork **bsw = data;
 
     switch (*state) {
@@ -1071,15 +1071,15 @@ static GameEventReturnCode func_ov050_021e6b78(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov050_021e6be0(GameSystem *gsys, BSubwayScrWork *bsw) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov050_021e6b78, sizeof(BSubwayScrWork *));
+static GameEvent *EventBSubwayCommEnd_Create(GameSystem *gsys, BSubwayScrWork *bsw) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayCommEnd_Callback, sizeof(BSubwayScrWork *));
     BSubwayScrWork **data = GameEvent_GetData(event);
 
     *data = bsw;
     return event;
 }
 
-static GameEventReturnCode func_ov050_021e6c00(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventBSubwayMsgWindow_Callback(GameEvent *event, u32 *state, void *data) {
     BSubwayMsgEvent *wk = data;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(wk->env);
 
@@ -1115,8 +1115,8 @@ static GameEventReturnCode func_ov050_021e6c00(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov050_021e6c88(GameSystem *gsys, FieldScriptEnv *env, u16 *var, u32 message) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov050_021e6c00, sizeof(BSubwayMsgEvent));
+static GameEvent *EventBSubwayMsgWindow_Create(GameSystem *gsys, FieldScriptEnv *env, u16 *var, u32 message) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayMsgWindow_Callback, sizeof(BSubwayMsgEvent));
     BSubwayMsgEvent *wk = GameEvent_GetData(event);
 
     wk->env = env;
@@ -1135,7 +1135,7 @@ typedef struct {
 
 // Places the subway's passengers: in mode 4 the players of the records in block 0x3a, and otherwise the actors of the
 // stage the player has reached
-static void func_ov050_021e6cb0(BSubwayScrWork *bsw, GameData *gameData, MMSys *mmSys, Field *field) {
+static void BSubway_PlacePassengers(BSubwayScrWork *bsw, GameData *gameData, MMSys *mmSys, Field *field) {
     int i = 0;
     u32 zoneId = Field_GetPlayerStateZoneID(field);
     u16 id = 0x80;
@@ -1238,7 +1238,7 @@ static void func_ov050_021e6e9c(BSubwayScrWork *bsw, u16 index, u16 *a, u16 *b, 
     *c = entry->unkE;
 }
 
-static BOOL func_ov050_021e6ee0(VM *vm, void *env) {
+static BOOL ScriptNative_BSubwayBattleRecSaveWait(VM *vm, void *env) {
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env)));
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
     u32 regulation = 20;
@@ -1268,7 +1268,7 @@ static BOOL func_ov050_021e6ee0(VM *vm, void *env) {
 }
 
 // The regulation of a play mode, in arc 106
-static u32 func_ov050_021e6f60(u32 mode) {
+static u32 BSubway_GetModeRegulation(u32 mode) {
     u32 regulation = 20;
 
     switch (mode) {
@@ -1286,7 +1286,7 @@ static u32 func_ov050_021e6f60(u32 mode) {
     return regulation;
 }
 
-static u32 func_ov050_021e6f90(Field *field) {
+static u32 BSubway_GetZonePlayMode(Field *field) {
     u16 zoneId = Field_GetPlayerStateZoneID(field);
     u32 index = 0;
 
@@ -1316,7 +1316,7 @@ static u32 func_ov050_021e6f90(Field *field) {
     return index;
 }
 
-static u16 func_ov050_021e6fd4(PlayerInfo *info) {
+static u16 BSubway_GetPlayerObjCode(PlayerInfo *info) {
     u8 unk1B = PlayerInfo_GetVersion(info);
     u32 gender = getTrainerGender(info);
 

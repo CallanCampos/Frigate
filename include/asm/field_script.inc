@@ -3891,19 +3891,19 @@
 
     // Plugin 1
 
-    // func_ov050_021e5838
+    // BSubwayCmd_ClearWork
     .macro Plugin1_Cmd1000
     FieldCommand 1000
     .endm
 
-    // func_ov050_021e5800
+    // BSubwayCmd_CreateWork
     .macro Plugin1_Cmd1001 a0, a1
     FieldCommand 1001
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov050_021e5854
+    // BSubwayCmd_FreeWork
     .macro Plugin1_Cmd1002
     FieldCommand 1002
     .endm
