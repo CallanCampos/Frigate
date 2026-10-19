@@ -8671,6 +8671,13 @@ overlays/ov072 0x021e8f48 FesMissionGimmick_DeleteBlockedPeople
 overlays/ov072 0x021e8fec FesMissionGimmick_IsGridPlaceBlocked
 overlays/ov072 0x021e9058 FesMissionGimmick_IsRailPlaceBlocked
 overlays/ov072 0x021e909c FesMissionGimmick_DeletePersonActor
+overlays/ov073 0x021e8be0 RivalSelect_GetEntry
+overlays/ov073 0x021e8bfc RivalSelect_SelectOtherRandom
+overlays/ov073 0x021e8c4c RivalSelect_RemoveHollowActorIfMission
+overlays/ov073 0x021e8c64 RivalSelect_RemoveHollowActor
+overlays/ov073 0x021e8cac RivalSelect_IsSelectedAndActive
+overlays/ov073 0x021e8cdc RivalSelect_SetActive
+overlays/ov073 0x021e8d00 RivalSelect_FindEntryIndex
 overlays/ov074 0x021e9240 SUNNY_WEATHER
 overlays/ov075 0x021e90c0 Flake_Init
 overlays/ov075 0x021e9118 Flake_FadeIn
