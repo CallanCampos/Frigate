@@ -233,6 +233,7 @@ typedef struct CtvtGameShot CtvtGameShot;
 typedef struct CtvtGameTarget CtvtGameTarget;
 typedef struct CtvtMic CtvtMic;
 typedef struct CtvtTalk CtvtTalk;
+typedef struct DayCare DayCare;
 typedef struct DayCareSave DayCareSave;
 typedef struct DiveEventData DiveEventData;
 typedef struct DreamRadarSave DreamRadarSave;

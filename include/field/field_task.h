@@ -15,7 +15,13 @@ typedef BOOL (*FieldTaskCallback)(void *data);
 
 // Allocates dataSize bytes of data for the task
 FieldTask *FieldTask_Create(HeapID heapId, u32 dataSize, FieldTaskCallback callback);
+void FieldTask_Free(FieldTask *task);
+// Runs the callback once the task has started, and ends the task when it returns TRUE
+void FieldTask_Run(FieldTask *task);
+void FieldTask_SetStarted(FieldTask *task);
 void *FieldTask_GetData(FieldTask *task);
+BOOL FieldTask_CheckStateReqEnd(FieldTask *task);
+u32 FieldTask_GetState(FieldTask *task);
 FieldTaskCallback FieldTask_GetCallback(FieldTask *task);
 void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, u32 a2);
 // Whether a task with the callback is running

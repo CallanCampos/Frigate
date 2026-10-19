@@ -166,6 +166,9 @@ u32 CalcListMenuHeight(u32 rows, u32 rowHeight, u32 a2, BOOL scrolls);
 void ListMenuRequest_Set(ListMenuRequest *request, u16 count, u16 x, u16 y, u16 width, u16 height);
 ListMenuUI *ListMenuUI_Create(void *msgBGSys, ListMenuRequest *request, ListMenuOption *options,
                               BmpMenuListCursorCallback callback, void *work, u16 a5, u16 cursor, u32 flags);
+// Overlay 36's field_msgbg.c, not written yet: ListMenuUI_Create with a callback that prints each option
+ListMenuUI *func_ov036_02187e1c(void *msgBGSys, const ListMenuRequest *request, ListMenuOption *options, u32 a3, u32 a4,
+                                BmpMenuListCursorCallback callback, BmpMenuListPrintCallback printCallback, void *work);
 // BMPMENULIST_NULL until an option is chosen or the menu is cancelled
 s32 ListMenuUI_Update(ListMenuUI *menu);
 // A window that describes the list menu's options: clear and print
@@ -176,8 +179,12 @@ void *func_ov036_021880d4(void *msgBGSys, u32 a1);
 void func_ov036_02187c1c(void *window);
 BOOL func_ov036_02187c70(void *window);
 void func_ov036_02187c7c(void *window);
+// Overlay 36's field_msgbg.c, not written yet: prints an icon in the window at a position
+void func_ov036_02187c34(void *window, u16 x, u16 y, u32 icon);
 // Prints a string in the window at a position
 void func_ov036_02187c4c(void *window, u16 x, u16 y, StrBuf *strbuf);
+// Overlay 36's field_msgbg.c, not written yet: prints a string in a color and a font
+void func_ov036_02187c58(void *window, u16 x, u16 y, StrBuf *strbuf, u32 color, Font *font);
 BmpWin *func_ov036_02187c9c(void *window);
 u32 func_ov036_02189cb0(void *msgBGSys);
 void func_ov036_02189cd8(u32 value);
@@ -188,10 +195,10 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
 GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId);
 u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u8 battleBoxOk,
+void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u32 battleBoxOk,
                           HeapID heapId);
 BOOL func_ov036_021c3278(void *select);
-u16 func_ov036_021c3218(void *select, u32 *a1);
+int func_ov036_021c3218(void *select, u32 *a1);
 u32 func_ov036_0218816c(void *window);
 void func_ov036_02187ea0(void *window);
 void *func_ov036_021c3d9c(PlayerInfo *info, Field *field, u32 a2, u32 a3, u32 a4, u32 a5, u32 a6, u32 a7);

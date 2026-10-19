@@ -5,6 +5,7 @@
 #include "constants/pokemon.h"
 #include "field/field.h"
 #include "field/field_event.h"
+#include "field/shortcut_menu.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/str.h"
@@ -26,7 +27,7 @@ typedef struct {
     NameEntryParam *nameEntry;
     PartyPkm *pkm;
     u16 *result;
-    GameEventReturnCode (*callback)(GameEvent *event, u32 *state, void *data);
+    BOOL transition;
     StrBuf *name;
 } EventPokeNameEntry;
 
@@ -36,8 +37,7 @@ typedef struct {
     Field *field;
     NameEntryParam *nameEntry;
     u16 *result;
-    u16 target;
-    GameEventReturnCode (*callback)(GameEvent *event, u32 *state, void *data);
+    u32 target;
 } EventJoinAvenueNameEntry;
 
 // The name of the rival in the Hidden Hollow
@@ -60,20 +60,20 @@ typedef struct {
 } EventPokeNameWordSetInput;
 
 static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, u32 slot,
-                                          GameEventReturnCode (*callback)(GameEvent *event, u32 *state, void *data)) {
-    GameData *gameData = GSYS_GetGameData(gsys);
+GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, int slot, BOOL transition) {
     PartyPkm *pkm;
-    StrBuf *name;
     TrainerGameInfoSave *gameInfo;
     EventPokeNameEntry *work;
     GameEvent *event;
+    GameData *gameData;
     u32 species;
     u32 sexAndForm;
 
-    if (PokeParty_GetPkmCount(GameData_GetParty(gameData)) <= slot) {
+    if (PokeParty_GetPkmCount(GameData_GetParty(GSYS_GetGameData(gsys))) <= slot) {
         slot = 0;
     }
     event = GameEvent_Create(gsys, 0, PokeNameEntry_Callback, sizeof(EventPokeNameEntry));
@@ -81,58 +81,76 @@ GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, u32 slo
     work->gsys = gsys;
     work->field = GSYS_GetField(gsys);
     work->result = result;
-    work->callback = callback;
+    work->transition = transition;
     gameData = GSYS_GetGameData(work->gsys);
     pkm = PokeParty_GetPkm(GameData_GetParty(gameData), slot);
     gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(gameData));
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     sexAndForm = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL) | (PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL) << 8);
-    name = GFL_StrBufCreate(32, HEAPID_GAMEEVENT);
-    work->name = name;
-    PokeParty_GetParam(pkm, PKM_PARAM_NICKNAME, name);
-    work->pkm = pkm;
+    work->name = GFL_StrBufCreate(32, HEAPID_GAMEEVENT);
+    PokeParty_GetParam(pkm, PKM_PARAM_NICKNAME, work->name);
     work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_POKEMON, species, sexAndForm, 10, NULL, gameInfo);
+    work->pkm = pkm;
     return event;
 }
 
 static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, void *data) {
     EventPokeNameEntry *work = data;
 
-    if (*state == 0) {
-        GameEvent_ChainNext(event, prepareForPokemonNameEntryData(work->gsys, work->result, 0, work->callback));
+    switch (*state) {
+    case 0:
+        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, work->transition));
         (*state)++;
-        return FALSE;
-    }
-    if (work->nameEntry->unk1C != 1) {
-        if (GFL_StrBufCmp(work->nameEntry->name, work->name) == 0) {
-            PokeParty_SetParam(work->pkm, PKM_PARAM_NICKNAME, (u32)work->nameEntry->name);
-        } else {
-            work->nameEntry->unk1C = 1;
+        break;
+    case 1:
+        if (work->nameEntry->unk1C != 1) {
+            if (GFL_StrBufCmp(work->nameEntry->name, work->name) == 0) {
+                PokeParty_SetParam(work->pkm, PKM_PARAM_NICKNAME, (u32)work->nameEntry->name);
+            } else {
+                work->nameEntry->unk1C = 1;
+            }
         }
+        *work->result = (work->nameEntry->unk1C != 1);
+        if (*work->result == 1) {
+            RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gsys)), 0x1e);
+        }
+        GFL_StrBufFree(work->name);
+        func_ov012_02165ae8(work->nameEntry);
+        return TRUE;
     }
-    *work->result = (work->nameEntry->unk1C != 1);
-    if (*work->result == 1) {
-        RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gsys)), 0x1e);
-    }
-    GFL_StrBufFree(work->name);
-    func_ov012_02165ae8(work->nameEntry);
-    return TRUE;
+    return FALSE;
 }
 
 GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent) {
     GameData *gameData = GSYS_GetGameData(gsys);
-    JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
-    JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
-    JoinAvenuePerson *person = func_02038a18(getAddressOfBeginningOfOccupants(save));
-    TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(gameData));
+    TrainerGameInfoSave *gameInfo;
+    PlayerInfo *playerInfo;
+    JoinAvenueOccupants *occupants;
+    JoinAvenueInfo *info;
+    JoinAvenueSave *save;
+    JoinAvenuePerson *person;
     StrBuf *name;
-    EventJoinAvenueNameEntry *work;
-    GameEvent *event;
     u32 mode;
     u32 maxLength;
-    u16 buffer[16];
+    EventJoinAvenueNameEntry *work;
+    GameEvent *event;
+    u16 buffer[64];
+
+    gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(gameData));
+    playerInfo = GetGameDataPlayerInfo(gameData);
+    save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
+    occupants = getAddressOfBeginningOfOccupants(save);
+    info = JoinAvenue_GetInfo(save);
+    person = func_02038a18(occupants);
+    name = GFL_StrBufCreate(64, 0x8004);
 
     switch (target) {
+    case 0:
+    default:
+        mode = NAME_ENTRY_AVENUE_NAME;
+        maxLength = 10;
+        JoinAvenue_GetParam(info, 0, buffer);
+        break;
     case 1:
         mode = NAME_ENTRY_AVENUE_TITLE;
         maxLength = 10;
@@ -148,13 +166,7 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
         maxLength = 8;
         joinAveTextHandler(person, JOIN_AVE_PARAM_MESSAGE2, buffer);
         break;
-    default:
-        mode = NAME_ENTRY_AVENUE_NAME;
-        maxLength = 10;
-        JoinAvenue_GetParam(info, 0, buffer);
-        break;
     }
-    name = GFL_StrBufCreate(64, 0x8004);
     GFL_StrBufLoadString(name, buffer);
     if (GFL_StrBufGetCharCount(name) > 10) {
         GFL_StrBufClear(name);
@@ -164,55 +176,68 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     work->gsys = gsys;
     work->field = GSYS_GetField(gsys);
     work->result = result;
+    if (useCurrent) {
+        work->nameEntry =
+            setupNameEntry(HEAPID_GAMEEVENT, mode, getTrainerGender(playerInfo), 0, maxLength, name, gameInfo);
+    } else {
+        work->nameEntry =
+            setupNameEntry(HEAPID_GAMEEVENT, mode, getTrainerGender(playerInfo), 0, maxLength, NULL, gameInfo);
+    }
     work->target = target;
-    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, mode, getTrainerGender(GetGameDataPlayerInfo(gameData)), 0,
-                                     maxLength, useCurrent ? name : NULL, gameInfo);
     GFL_StrBufFree(name);
     return event;
 }
 
-GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, void *data) {
     EventJoinAvenueNameEntry *work = data;
-    u16 name[16];
+    u16 name[22];
 
-    if (*state == 0) {
-        GameEvent_ChainNext(event, JoinAvenueNameEntry_Create(work->target, work->gsys, work->result, 0));
+    switch (*state) {
+    case 0:
+        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
-        return FALSE;
-    }
-    if (work->nameEntry->unk1C != 1) {
-        JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
-        JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
-        JoinAvenuePerson *person = func_02038a18(getAddressOfBeginningOfOccupants(save));
-        const u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
+        break;
+    case 1:
+        if (work->nameEntry->unk1C != 1) {
+            JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
+            JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(save);
+            JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
+            JoinAvenuePerson *person = func_02038a18(occupants);
+            const u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
 
-        switch (work->target) {
-        case 1:
-            func_02039064(info, 1, (u32)str);
-            break;
-        case 2:
-            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
-            break;
-        case 3:
-            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE2, (u32)str);
-            break;
-        default:
-            func_02039064(info, 0, (u32)str);
-            break;
+            switch (work->target) {
+            case 0:
+                func_02039064(info, 0, (u32)str);
+                break;
+            case 1:
+                func_02039064(info, 1, (u32)str);
+                break;
+            case 2:
+                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
+                break;
+            case 3:
+                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE2, (u32)str);
+                break;
+            }
+        } else if (work->target == 0) {
+            JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
+            JoinAvenueInfo *info;
+            MsgData *msgData;
+
+            getAddressOfBeginningOfOccupants(save);
+            info = JoinAvenue_GetInfo(save);
+            msgData = GFL_MsgSysLoadData(FALSE, 2, 0x6d, HEAPID_GAMEEVENT);
+            GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
+            GFL_MsgDataFree(msgData);
+            func_02039064(info, 0, (u32)name);
         }
-    } else if (work->target == 0) {
-        JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
-        MsgData *msgData = GFL_MsgSysLoadData(FALSE, 0x16d, 0x2, HEAPID_GAMEEVENT);
-
-        GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
-        GFL_MsgDataFree(msgData);
-        func_02039064(JoinAvenue_GetInfo(save), 0, (u32)name);
+        if (work->result != NULL) {
+            *work->result = (work->nameEntry->unk1C != 1);
+        }
+        func_ov012_02165ae8(work->nameEntry);
+        return TRUE;
     }
-    if (work->result != NULL) {
-        *work->result = (work->nameEntry->unk1C != 1);
-    }
-    func_ov012_02165ae8(work->nameEntry);
-    return TRUE;
+    return FALSE;
 }
 
 GameEvent *RivalNameEntry_Create(GameSystem *gsys, u16 *result) {
@@ -229,24 +254,27 @@ GameEvent *RivalNameEntry_Create(GameSystem *gsys, u16 *result) {
     return event;
 }
 
-GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state, void *data) {
     EventRivalNameEntry *work = data;
 
-    if (*state == 0) {
-        GameEvent_ChainNext(event, RivalNameEntry_Create(work->gsys, work->result));
+    switch (*state) {
+    case 0:
+        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
-        return FALSE;
-    }
-    if (work->nameEntry->unk1C != 1) {
-        SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(work->gsys));
+        break;
+    case 1:
+        if (work->nameEntry->unk1C != 1) {
+            SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(work->gsys));
 
-        copyRivalNameIntoHollowBlock(getHollow_RivalData(save), GFL_StrBufGetStringPtr(work->nameEntry->name));
+            copyRivalNameIntoHollowBlock(getHollow_RivalData(save), GFL_StrBufGetStringPtr(work->nameEntry->name));
+        }
+        if (work->result != NULL) {
+            *work->result = (work->nameEntry->unk1C != 1);
+        }
+        func_ov012_02165ae8(work->nameEntry);
+        return TRUE;
     }
-    if (work->result != NULL) {
-        *work->result = (work->nameEntry->unk1C != 1);
-    }
-    func_ov012_02165ae8(work->nameEntry);
-    return TRUE;
+    return FALSE;
 }
 
 GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 species, u16 form, u16 *result, WordSet *wordSet) {
@@ -262,7 +290,7 @@ GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 species, u16 f
     work->form = form;
     work->species = species;
     work->wordSet = wordSet;
-    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_PLAYER, species, 0, 10, NULL, gameInfo);
+    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_POKEMON_RENAME, species, 0, 10, NULL, gameInfo);
     return event;
 }
 
@@ -270,24 +298,28 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
     EventPokeNameWordSetInput *work = data;
     StrBuf *speciesName;
 
-    if (*state == 0) {
-        GameEvent_ChainNext(event, EventPokeNameWordSetInput_Create(work->gsys, work->species, work->form, work->result,
-                                                                    work->wordSet));
+    switch (*state) {
+    case 0:
+        GameEvent_ChainNext(event, func_ov036_021bf890(work->gsys, work->field, work->nameEntry, TRUE));
         (*state)++;
-        return FALSE;
+        break;
+    case 1:
+        speciesName = GFL_StrBufCreate(32, HEAPID_GAMEEVENT);
+        GFL_MsgDataLoadStrbuf(g_PMLSpeciesNamesResident, work->species, speciesName);
+        if (work->nameEntry->unk1C != 1) {
+            if (GFL_StrBufCmpIgnoreAccents(work->nameEntry->name, speciesName) == 1) {
+                *work->result = 1;
+                func_0202437c(work->wordSet, work->form, speciesName, 0, 1, 2);
+            } else {
+                *work->result = 2;
+                func_0202437c(work->wordSet, work->form, work->nameEntry->name, 0, 1, 2);
+            }
+        } else {
+            *work->result = 0;
+        }
+        GFL_StrBufFree(speciesName);
+        func_ov012_02165ae8(work->nameEntry);
+        return TRUE;
     }
-    speciesName = GFL_StrBufCreate(32, HEAPID_GAMEEVENT);
-    GFL_MsgDataLoadStrbuf(g_PMLSpeciesNamesResident, work->species, speciesName);
-    if (work->nameEntry->unk1C == 1) {
-        *work->result = 0;
-    } else if (GFL_StrBufCmpIgnoreAccents(work->nameEntry->name, speciesName) == 1) {
-        *work->result = 1;
-        func_0202437c(work->wordSet, work->form, speciesName, 0, 1, 2);
-    } else {
-        *work->result = 2;
-        func_0202437c(work->wordSet, work->form, work->nameEntry->name, 0, 1, 2);
-    }
-    GFL_StrBufFree(speciesName);
-    func_ov012_02165ae8(work->nameEntry);
-    return TRUE;
+    return FALSE;
 }

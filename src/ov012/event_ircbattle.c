@@ -24,29 +24,6 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-struct EventIRCWork {
-    GameSystem *gsys;
-    GameData *gameData;
-    PokemonTradeParam trade;
-    PokeParty *party;
-    // The parties of the players, by net ID
-    PokeParty *parties[4];
-    SaveControl *save;
-    // What the infrared menu chose
-    u32 mode;
-    // The music to bring back after the battle
-    u32 bgm;
-    BOOL useBattleBox;
-    GameSystem *ov175Param;
-    IrcBattleMatchParam ircMatch;
-    u32 unk88;
-    BtlSetup *btlSetup;
-    BattlePlayers players;
-    u8 unkE0[4];
-    GameRecords *records;
-    u32 counter;
-};
-
 void setPartyLv50(PokeParty *party) {
     int i;
 

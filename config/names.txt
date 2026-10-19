@@ -5683,6 +5683,7 @@ overlays/ov036 0x021d09f8 sActorSetups
 overlays/ov036 0x021d0a20 sCameraTargetOffsets
 overlays/ov036 0x021d0fa4 DEFAULT_RAIL_CAMERA
 overlays/ov036 0x021d0fc8 DEFAULT_RAIL_CURVE
+overlays/ov036 0x021d1078 NO_MAC
 overlays/ov036 0x021d10d8 REFLECT_BILLBOARD_OFFSET_Z
 overlays/ov036 0x021d10e4 REFLECT_BILLBOARD_OFFSET_Y
 overlays/ov036 0x021d10f0 REFLECT_TYPE_OFFSET_Y
@@ -5716,6 +5717,11 @@ overlays/ov036 0x021d29f4 SAVE_ANIME_STEPS
 overlays/ov036 0x021d4818 HOLLOW_SLOT_CHANCES
 overlays/ov036 0x021d48e0 HOLLOW_MISSION_LEVELS
 overlays/ov036 0x021d48f4 OCHIBA_TASK_VTABLE
+overlays/ov036 0x021d4c34 sIrcMenuBrightenAmounts
+overlays/ov036 0x021d4c54 sWinRects2
+overlays/ov036 0x021d4c74 sIrcMenuVRAMConfig
+overlays/ov036 0x021d4ca4 sWinRects3
+overlays/ov036 0x021d4ce4 sWinRectsA
 overlays/ov036 0x021d4d74 sJumpHeights
 overlays/ov036 0x021d4e4c WEATHER_TRANSITION_FUNCS
 overlays/ov036 0x021d4ec0 sPlayerTemplate
