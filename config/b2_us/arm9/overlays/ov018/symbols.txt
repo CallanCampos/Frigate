@@ -1,4 +1,4 @@
-func_ov018_0216e660 kind:function(thumb,size=0xa8) addr:0x0216e660
-func_ov018_0216e708 kind:function(thumb,size=0x3c) addr:0x0216e708
+EventResearchRadar_Callback kind:function(thumb,size=0xa8) addr:0x0216e660
+EventResearchRadar_Create kind:function(thumb,size=0x3c) addr:0x0216e708
 data_ov018_0216e760 kind:data(any) addr:0x0216e760
 data_ov018_0216e771 kind:data(any) addr:0x0216e771 ambiguous

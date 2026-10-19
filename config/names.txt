@@ -6871,6 +6871,8 @@ overlays/ov016 0x0216e660 EventEggDemo_Callback
 overlays/ov016 0x0216e754 EventEggDemo_Create
 overlays/ov017 0x0216e660 EventCommTvt_Callback
 overlays/ov017 0x0216e79c EventCommTvt_Create
+overlays/ov018 0x0216e660 EventResearchRadar_Callback
+overlays/ov018 0x0216e708 EventResearchRadar_Create
 overlays/ov020 0x0216e660 EventPokeSelect_Create
 overlays/ov020 0x0216e6b4 EventMoveTutorPokeSelect_Create
 overlays/ov020 0x0216e714 EventMusicalPokeSelect_Create

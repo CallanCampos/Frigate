@@ -2578,8 +2578,8 @@ static GameEventReturnCode CGearSw_EventMain(GameEvent *event, u32 *state, void 
         next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(17), EventCommTvt_Create, NULL);
         break;
     case ACTION_RADAR:
-        next =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(18), (GameEventProvider)func_ov018_0216e708, field);
+        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(18), (GameEventProvider)EventResearchRadar_Create,
+                                               field);
         break;
     case ACTION_LOG:
         GameBeaconSys_ClearNotice(1);
