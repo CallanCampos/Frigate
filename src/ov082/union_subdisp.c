@@ -180,7 +180,7 @@ UnionSubdisp *UnionSubdisp_Create(GameSystem *gsys) {
     PMSDraw_SetBackColor(work->pmsDraw, 0);
     sys = GameCommSys_GetWork(comm);
     if (sys != NULL) {
-        work->selected = func_ov028_021710c8(sys);
+        work->selected = UnionMain_GetSituUnk02(sys);
         UnionSubdisp_DrawAllLines(work, &sys->visitorList);
         UnionSubdisp_ShowSelected(work);
     }
@@ -300,7 +300,7 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
         UnionSubdisp_UpdateFlash(work, &sys->visitorList);
     }
     if (GameCommSys_BootCheck(comm) == 3 && sys != NULL) {
-        func_ov028_021710bc(sys, work->selected);
+        UnionMain_SetSituUnk02(sys, work->selected);
     }
 }
 

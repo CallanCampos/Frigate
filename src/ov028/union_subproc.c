@@ -555,7 +555,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             PokeParty_AddPkm(party, PokeParty_GetPkm(tmpParty, param->list.picked[i] - 1));
         }
         GFL_HeapFree(tmpParty);
-        func_ov028_02172b4c(colosseum, TRUE);
+        Colosseum_ClearParties(colosseum, TRUE);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 22, 0x14);
         (*step)++;
         break;
@@ -582,7 +582,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             *step = 17;
             break;
         }
-        if (func_ov028_02172b20(colosseum) == TRUE) {
+        if (Colosseum_AreAllPartiesReceived(colosseum) == TRUE) {
             (*step)++;
         }
         break;
@@ -628,7 +628,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
                 }
             }
         }
-        func_ov028_02172c60(&battle->players);
+        Colosseum_ClearPlayers(&battle->players);
         *step = 16;
         break;
     case 14:

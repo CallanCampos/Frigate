@@ -145,7 +145,7 @@ static void Colosseum_RecvUnk4(int netId, int size, const void *data, void *work
     }
 }
 
-BOOL func_ov028_021725c8(UnionColosseum *colosseum) {
+BOOL Colosseum_SendUnk4(UnionColosseum *colosseum) {
     u8 value = Colosseum_GetUnkDC(colosseum);
 
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COLOSSEUM_CMD_UNK4, 1, &value, TRUE, FALSE, FALSE);
@@ -205,7 +205,7 @@ static void Colosseum_RecvUnk8(int netId, int size, const void *data, void *work
     }
 }
 
-BOOL func_ov028_02172704(void) {
+BOOL Colosseum_SendUnk8(void) {
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COLOSSEUM_CMD_UNK8, 0, NULL, TRUE, FALSE, FALSE);
 }
 
@@ -219,7 +219,7 @@ static void Colosseum_RecvUnk9(int netId, int size, const void *data, void *work
     }
 }
 
-BOOL func_ov028_02172748(void) {
+BOOL Colosseum_SendUnk9(void) {
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, COLOSSEUM_CMD_UNK9, 0, NULL, TRUE, FALSE, FALSE);
 }
 
@@ -268,6 +268,6 @@ static void Colosseum_RecvUnkD(int netId, int size, const void *data, void *work
     }
 }
 
-BOOL func_ov028_02172818(void) {
+BOOL Colosseum_SendUnkD(void) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), COLOSSEUM_CMD_UNKD, 0, NULL);
 }

@@ -75,18 +75,18 @@ void *UnionNet_GetRecvBuffer(int netId, void *work, int size) {
     return unisys->recvBuf[netId];
 }
 
-void func_ov028_02171138(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvGroupDone(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     UnionComm_ActivateGroup(unisys);
     unisys->situ.mycomm.doneMask |= (u8)(1 << netId);
 }
 
-BOOL func_ov028_0217115c(void) {
+BOOL UnionMain_SendGroupDone(void) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_UNK0, 0, NULL);
 }
 
-void func_ov028_02171170(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvUnk19(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionSelf *self = &unisys->situ;
     const u32 *value = data;
@@ -96,11 +96,11 @@ void func_ov028_02171170(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_02171194(u32 value) {
+BOOL UnionMain_SendUnk19(u32 value) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_UNK1, sizeof(u32), &value);
 }
 
-void func_ov028_021711b4(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvUnk1A(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionSelf *self = &unisys->situ;
     const u32 *value = data;
@@ -110,11 +110,11 @@ void func_ov028_021711b4(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_021711d8(u32 value) {
+BOOL UnionMain_SendUnk1A(u32 value) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_UNK2, sizeof(u32), &value);
 }
 
-void func_ov028_021711f8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvMac(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionSelf *self = &unisys->situ;
 
@@ -123,7 +123,7 @@ void func_ov028_021711f8(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_02171220(void) {
+BOOL UnionMain_SendMac(void) {
     u8 mac[8];
 
     MI_CpuFill8(mac, 0, sizeof(mac));
@@ -132,7 +132,7 @@ BOOL func_ov028_02171220(void) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_MAC, sizeof(mac), mac);
 }
 
-void func_ov028_02171254(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvUnk46_2(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionSelf *self = &unisys->situ;
     const u32 *value = data;
@@ -142,23 +142,23 @@ void func_ov028_02171254(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_0217128c(u32 value) {
+BOOL UnionMain_SendUnk46_2(u32 value) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_UNK4, sizeof(u32), &value);
 }
 
-void func_ov028_021712ac(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     PlayerInfo_Copy(data, GameData_GetPlayerInfoByNetID(unisys->param->gameData, netId));
     unisys->situ.mycomm.unk47 |= (u8)(1 << netId);
 }
 
-BOOL func_ov028_021712dc(UnionSystem *unisys) {
+BOOL UnionMain_SendPlayerInfo(UnionSystem *unisys) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_PLAYER_INFO, PlayerInfo_GetSize(),
                               GetGameDataPlayerInfo(unisys->param->gameData));
 }
 
-void func_ov028_02171308(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvCard(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionSelf *self = &unisys->situ;
 
@@ -168,19 +168,19 @@ void func_ov028_02171308(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_02171340(UnionSystem *unisys) {
+BOOL UnionMain_SendCard(UnionSystem *unisys) {
     GFL_ASSERT(unisys->alloc.my_card != NULL);
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, UNION_NET_CMD_CARD_A, 0x6c4, unisys->alloc.my_card,
                                        TRUE, FALSE, TRUE);
 }
 
-BOOL func_ov028_02171390(UnionSystem *unisys) {
+BOOL UnionMain_SendCardHead(UnionSystem *unisys) {
     GFL_ASSERT(unisys->alloc.my_card != NULL);
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, UNION_NET_CMD_CARD_A, 0x678, unisys->alloc.my_card,
                                        TRUE, FALSE, TRUE);
 }
 
-void func_ov028_021713e0(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvColosseumMember(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionColosseum *colosseum = unisys->colosseum_sys;
     GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
@@ -194,7 +194,7 @@ void func_ov028_021713e0(int netId, int size, const void *data, void *work, NetH
     func_ov036_021c3f34(colosseum->unk178, netId, GetGameDataPlayerInfo(gameData), ((const u8 *)data)[0x27], mac);
 }
 
-void func_ov028_0217144c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvColosseumUnkDE(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionColosseum *colosseum = unisys->colosseum_sys;
     const u32 *value = data;
@@ -206,7 +206,7 @@ void func_ov028_0217144c(int netId, int size, const void *data, void *work, NetH
     colosseum->unkDE = *value;
 }
 
-void func_ov028_02171478(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvColosseumUnkCA(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionColosseum *colosseum = unisys->colosseum_sys;
 
@@ -217,11 +217,11 @@ void func_ov028_02171478(int netId, int size, const void *data, void *work, NetH
     colosseum->unkCA = 1;
 }
 
-BOOL func_ov028_021714a4(void) {
+BOOL UnionMain_SendColosseumUnkCA(void) {
     return GFL_NetSendCommand(NetHandle_GetOwn(), UNION_NET_CMD_UNK9, 0, NULL);
 }
 
-void func_ov028_021714bc(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvEntryRequest(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (unisys->alloc.uniapp == NULL) {
@@ -236,7 +236,7 @@ void func_ov028_021714bc(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_0217152c(UnionSystem *unisys) {
+BOOL UnionMain_SendEntryRequest(UnionSystem *unisys) {
     NetHandle *handle;
     u32 size;
 
@@ -247,29 +247,29 @@ BOOL func_ov028_0217152c(UnionSystem *unisys) {
                                        GetGameDataPlayerInfo(unisys->param->gameData), TRUE, FALSE, FALSE);
 }
 
-void func_ov028_02171570(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvEntryReply2(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     unisys->entryReply = 2;
 }
 
-BOOL func_ov028_0217157c(u8 sendTo) {
+BOOL UnionMain_SendEntryReply2(u8 sendTo) {
     return GFL_NetSendCommandToBits(NetHandle_GetOwn(), sendTo, UNION_NET_CMD_ENTRY_REPLY_2, 0, NULL, TRUE, FALSE,
                                     FALSE);
 }
 
-void func_ov028_021715a4(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvEntryReply1(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     unisys->entryReply = 1;
 }
 
-BOOL func_ov028_021715b0(u8 sendTo) {
+BOOL UnionMain_SendEntryReply1(u8 sendTo) {
     return GFL_NetSendCommandToBits(NetHandle_GetOwn(), sendTo, UNION_NET_CMD_ENTRY_REPLY_1, 0, NULL, TRUE, FALSE,
                                     FALSE);
 }
 
-void func_ov028_021715d8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvEnqueue(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (GFL_NetIsParent()) {
@@ -285,7 +285,7 @@ BOOL UnionMain_SendEnqueue(void) {
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0, UNION_NET_CMD_ENQUEUE, 0, NULL, TRUE, FALSE, FALSE);
 }
 
-void func_ov028_02171638(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvUnkE(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (unisys->alloc.uniapp == NULL) {
@@ -295,11 +295,11 @@ void func_ov028_02171638(int netId, int size, const void *data, void *work, NetH
     func_ov069_0217cd5c(unisys->alloc.uniapp);
 }
 
-BOOL func_ov028_02171664(u8 netId) {
+BOOL UnionMain_SendUnkE(u8 netId) {
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), netId, UNION_NET_CMD_UNKE, 0, NULL, TRUE, FALSE, FALSE);
 }
 
-void func_ov028_0217168c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvRequestStatus(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (GFL_NetIsParent()) {
@@ -316,7 +316,7 @@ BOOL UnionMain_SendRequestStatus(void) {
                                        FALSE);
 }
 
-void func_ov028_021716ec(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvStatus(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (GFL_NetIsParent() != TRUE) {
@@ -328,14 +328,14 @@ void func_ov028_021716ec(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_02171724(const UnionAppStatus *status, u8 sendTo) {
+BOOL UnionMain_SendStatus(const UnionAppStatus *status, u8 sendTo) {
     NetHandle *handle = NetHandle_GetOwn();
 
     return GFL_NetSendCommandToBits(handle, sendTo, UNION_NET_CMD_STATUS, UnionApp_GetStatusSize(), status, TRUE, FALSE,
                                     FALSE);
 }
 
-void func_ov028_02171758(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvAppProfile(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (unisys->alloc.uniapp == NULL) {
@@ -356,7 +356,7 @@ BOOL UnionMain_SendAppProfile(u8 sendTo, const PlayerInfo *info) {
                                     &member, TRUE, FALSE, FALSE);
 }
 
-void func_ov028_021717e8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvProfile(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (unisys->alloc.uniapp == NULL) {
@@ -366,12 +366,12 @@ void func_ov028_021717e8(int netId, int size, const void *data, void *work, NetH
     UnionApp_SetMemberProfile(unisys->alloc.uniapp, unisys, netId, (UnionAppMember *)data);
 }
 
-BOOL func_ov028_0217181c(u8 sendTo, const UnionAppMember *member) {
+BOOL UnionMain_SendProfile(u8 sendTo, const UnionAppMember *member) {
     return GFL_NetSendCommandToBits(NetHandle_GetOwn(), sendTo, UNION_NET_CMD_PROFILE, sizeof(UnionAppMember), member,
                                     TRUE, FALSE, FALSE);
 }
 
-void func_ov028_02171848(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvConfirmProfile(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
 
     if (netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
@@ -394,7 +394,7 @@ BOOL UnionMain_SendConfirmProfile(u8 sendTo, const PlayerInfo *info) {
                                     &member, TRUE, FALSE, FALSE);
 }
 
-void func_ov028_021718e4(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvLeave(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     const u8 *leftNetId = data;
 
@@ -407,7 +407,7 @@ void func_ov028_021718e4(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-void func_ov028_02171920(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void UnionNet_RecvJoinAvenue(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
     UnionSelf *self = &unisys->situ;
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(unisys->param->gameData));
@@ -419,11 +419,11 @@ void func_ov028_02171920(int netId, int size, const void *data, void *work, NetH
     }
 }
 
-BOOL func_ov028_0217196c(u8 sendTo, u8 leftNetId) {
+BOOL UnionMain_SendLeave(u8 sendTo, u8 leftNetId) {
     return GFL_NetSendCommandToBits(NetHandle_GetOwn(), sendTo, UNION_NET_CMD_LEAVE, 1, &leftNetId, TRUE, FALSE, FALSE);
 }
 
-BOOL func_ov028_0217199c(UnionSystem *unisys) {
+BOOL UnionMain_SendJoinAvenue(UnionSystem *unisys) {
     JoinAvenuePerson_InitPlayer(&unisys->joinPerson, GSYS_GetGameData(unisys->param->gsys));
     return GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, UNION_NET_CMD_JOIN_AVENUE, sizeof(JoinAvenuePerson),
                                        &unisys->joinPerson, TRUE, FALSE, TRUE);

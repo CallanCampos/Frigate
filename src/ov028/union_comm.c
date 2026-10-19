@@ -87,28 +87,28 @@ static const GFLNetInitData data_ov028_02172c94 = {
 // clang-format on
 
 static const NetCommand data_ov028_02172d04[22] = {
-    { func_ov028_02171138, NULL },
-    { func_ov028_02171170, NULL },
-    { func_ov028_021711b4, NULL },
-    { func_ov028_021711f8, NULL },
-    { func_ov028_02171254, NULL },
-    { func_ov028_021712ac, NULL },
-    { func_ov028_02171308, UnionNet_GetRecvBuffer },
-    { func_ov028_021713e0, UnionNet_GetRecvBuffer },
-    { func_ov028_0217144c, UnionNet_GetRecvBuffer },
-    { func_ov028_02171478, NULL },
-    { func_ov028_021714bc, NULL },
-    { func_ov028_02171570, NULL },
-    { func_ov028_021715a4, NULL },
-    { func_ov028_021715d8, NULL },
-    { func_ov028_02171638, NULL },
-    { func_ov028_0217168c, NULL },
-    { func_ov028_021716ec, NULL },
-    { func_ov028_02171758, NULL },
-    { func_ov028_021717e8, NULL },
-    { func_ov028_02171848, NULL },
-    { func_ov028_021718e4, NULL },
-    { func_ov028_02171920, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvGroupDone, NULL },
+    { UnionNet_RecvUnk19, NULL },
+    { UnionNet_RecvUnk1A, NULL },
+    { UnionNet_RecvMac, NULL },
+    { UnionNet_RecvUnk46_2, NULL },
+    { UnionNet_RecvPlayerInfo, NULL },
+    { UnionNet_RecvCard, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvColosseumMember, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvColosseumUnkDE, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvColosseumUnkCA, NULL },
+    { UnionNet_RecvEntryRequest, NULL },
+    { UnionNet_RecvEntryReply2, NULL },
+    { UnionNet_RecvEntryReply1, NULL },
+    { UnionNet_RecvEnqueue, NULL },
+    { UnionNet_RecvUnkE, NULL },
+    { UnionNet_RecvRequestStatus, NULL },
+    { UnionNet_RecvStatus, NULL },
+    { UnionNet_RecvAppProfile, NULL },
+    { UnionNet_RecvProfile, NULL },
+    { UnionNet_RecvConfirmProfile, NULL },
+    { UnionNet_RecvLeave, NULL },
+    { UnionNet_RecvJoinAvenue, UnionNet_GetRecvBuffer },
 };
 
 UnionSystem *UnionComm_Create(UnionBootParam *param) {
@@ -316,7 +316,7 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
     }
     switch (self->mycomm.step) {
     case 0:
-        if (func_ov028_0217115c() == TRUE) {
+        if (UnionMain_SendGroupDone() == TRUE) {
             self->mycomm.step++;
         }
         break;
@@ -344,12 +344,12 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
 static void UnionComm_UpdateEntries(UnionSystem *unisys) {
     if (GFL_NetGetNegotiatedCount() > 1) {
         if (unisys->entryRepliedTo != 0) {
-            if (func_ov028_0217157c(unisys->entryRepliedTo) == 1) {
+            if (UnionMain_SendEntryReply2(unisys->entryRepliedTo) == 1) {
                 unisys->entryRepliedTo = 0;
             }
         }
         if (unisys->entryAcceptedTo != 0) {
-            if (func_ov028_021715b0(unisys->entryAcceptedTo) == 1) {
+            if (UnionMain_SendEntryReply1(unisys->entryAcceptedTo) == 1) {
                 unisys->entryAcceptedTo = 0;
             }
         }
@@ -380,8 +380,8 @@ static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
         }
         UnionEff_UpdateColosseumCommPlayers(unisys->colosseum_sys);
     }
-    func_ov028_02172a1c(unisys->colosseum_sys);
-    func_ov028_02172a50(unisys->colosseum_sys);
+    Colosseum_SendVoteReplies(unisys->colosseum_sys);
+    Colosseum_UpdateReadySync(unisys->colosseum_sys);
 }
 
 static void UnionComm_ReceiveBeacons(UnionSystem *unisys) {

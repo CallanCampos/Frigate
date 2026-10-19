@@ -632,11 +632,11 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
     case 2:
         if (situ->mycomm.unk10[6] == 1) {
             if (GFL_STD_MemCmp(situ->mycomm.unk10, situ->mycomm.unk4->mac, 6) != 0) {
-                if (func_ov028_0217128c(2) == TRUE) {
+                if (UnionMain_SendUnk46_2(2) == TRUE) {
                     func_02042e9c(FALSE);
                     *seq = 6;
                 }
-            } else if (func_ov028_0217128c(1) == TRUE) {
+            } else if (UnionMain_SendUnk46_2(1) == TRUE) {
                 GFL_SndSEPlay(SEQ_SE_SYS_101);
                 UnionOneself_SetNextStep(unisys, UNION_STEP_PARENT);
                 UnionComm_SetSelf(unisys, 3, (u32)situ->mycomm.unk4);
@@ -678,7 +678,7 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
         }
         break;
     case 8:
-        if (func_ov028_0217199c(unisys)) {
+        if (UnionMain_SendJoinAvenue(unisys)) {
             *seq = 9;
         }
         break;
@@ -740,7 +740,7 @@ static BOOL UnionOneself_StepAskedRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         }
         break;
     case 3:
-        if (func_ov028_02171220() == TRUE) {
+        if (UnionMain_SendMac() == TRUE) {
             if (situ->mycomm.answer_pc->beacon.version == VERSION_WHITE2 ||
                 situ->mycomm.answer_pc->beacon.version == VERSION_BLACK2) {
                 *seq = 6;
@@ -772,7 +772,7 @@ static BOOL UnionOneself_StepAskedRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         }
         break;
     case 6:
-        if (func_ov028_0217199c(unisys)) {
+        if (UnionMain_SendJoinAvenue(unisys)) {
             *seq = 7;
         }
         break;
@@ -813,7 +813,7 @@ static BOOL UnionOneself_StepParentBegin(UnionSystem *unisys, UnionSelf *situ, F
         }
         break;
     case 2:
-        if (func_ov028_021712dc(unisys) == TRUE) {
+        if (UnionMain_SendPlayerInfo(unisys) == TRUE) {
             (*seq)++;
         }
         break;
@@ -912,7 +912,7 @@ static BOOL UnionOneself_StepOfferRun(UnionSystem *unisys, UnionSelf *situ, Fiel
     }
     switch (*seq) {
     case 0:
-        if (func_ov028_02171194(situ->mycomm.unk19) == TRUE) {
+        if (UnionMain_SendUnk19(situ->mycomm.unk19) == TRUE) {
             if (situ->mycomm.unk19 == 0) {
                 UnionOneself_SetNextStep(unisys, UNION_STEP_LEAVE);
                 return TRUE;
@@ -962,7 +962,7 @@ static BOOL UnionOneself_StepOfferBegin(UnionSystem *unisys, UnionSelf *situ, Fi
         }
         break;
     case 2:
-        if (func_ov028_021712dc(unisys) == TRUE) {
+        if (UnionMain_SendPlayerInfo(unisys) == TRUE) {
             (*seq)++;
         }
         break;
@@ -1008,7 +1008,7 @@ static BOOL UnionOneself_StepOfferParty(UnionSystem *unisys, UnionSelf *situ, Fi
             } else {
                 *seq = 3;
             }
-        } else if (func_ov028_021711d8(0) == TRUE) {
+        } else if (UnionMain_SendUnk1A(0) == TRUE) {
             UnionMsg_CreateAndPrint(unisys, field, 0x13d);
             UnionOneself_SetNextStep(unisys, UNION_STEP_LEAVE);
             return TRUE;
@@ -1057,7 +1057,7 @@ static BOOL UnionOneself_StepOfferParty(UnionSystem *unisys, UnionSelf *situ, Fi
         }
         break;
     case 5:
-        if (func_ov028_021711d8(situ->mycomm.unk1A) == TRUE) {
+        if (UnionMain_SendUnk1A(situ->mycomm.unk1A) == TRUE) {
             if (situ->partyCheck != 0 && situ->boxCheck != 0) {
                 *seq = 6;
             } else {
@@ -1558,12 +1558,12 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         }
         break;
     case 2:
-        if (func_ov028_02171340(unisys) == TRUE) {
+        if (UnionMain_SendCard(unisys) == TRUE) {
             *seq = 4;
         }
         break;
     case 3:
-        if (func_ov028_02171390(unisys) == TRUE) {
+        if (UnionMain_SendCardHead(unisys) == TRUE) {
             *seq = 4;
         }
         break;
@@ -1884,7 +1884,7 @@ static BOOL UnionOneself_StepJoinRun(UnionSystem *unisys, UnionSelf *situ, Field
         }
         break;
     case 6:
-        if (func_ov028_0217152c(unisys) == TRUE) {
+        if (UnionMain_SendEntryRequest(unisys) == TRUE) {
             (*seq)++;
         }
         break;
@@ -2029,7 +2029,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
         if (UnionMsg_GetTableByte(situ->mycomm.unk19) == 2) {
             clsys->unkDE = 1;
             if (GFL_NetIsParent() == TRUE) {
-                if (func_ov028_021714a4() == TRUE) {
+                if (UnionMain_SendColosseumUnkCA() == TRUE) {
                     *seq = 0x64;
                 }
             } else {
@@ -2220,7 +2220,7 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
                 Misc_AddMetTrainer(rival, getIDAsUInt(&clsys->members[i].info));
             }
         }
-        func_ov028_021729a0(clsys, TRUE);
+        Colosseum_SetUnkC8_0(clsys, TRUE);
         UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_IDLE);
         return TRUE;
     }
@@ -2248,7 +2248,7 @@ static BOOL UnionOneself_StepIdleColosseumRun(UnionSystem *unisys, UnionSelf *si
     }
     if (*seq == 0) {
         if (UnionEff_GetEntrySpot(field, UnionMsg_GetTableByte(situ->mycomm.unk19), &pos) == TRUE) {
-            func_ov028_021729bc(clsys, pos);
+            Colosseum_SetUnkDC(clsys, pos);
             UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_SIT);
             UnionOneself_SetUpdateDisabled(unisys, field, TRUE);
             return TRUE;
@@ -2293,13 +2293,13 @@ static BOOL UnionOneself_StepColosseumSeatRun(UnionSystem *unisys, UnionSelf *si
         (*seq)++;
         break;
     case 1:
-        if (func_ov028_021725c8(clsys) == TRUE) {
+        if (Colosseum_SendUnk4(clsys) == TRUE) {
             (*seq)++;
         }
         break;
     case 2:
         if (UnionMsg_IsPrintDone(unisys)) {
-            u8 result = func_ov028_021729dc(clsys);
+            u8 result = Colosseum_GetUnkDD(clsys);
 
             if (result == 1) {
                 (*seq)++;
@@ -2340,16 +2340,16 @@ static BOOL UnionOneself_StepColosseumLeaveRun(UnionSystem *unisys, UnionSelf *s
     }
     switch (*seq) {
     case 0:
-        func_ov028_021729bc(clsys, 0xff);
+        Colosseum_SetUnkDC(clsys, 0xff);
         (*seq)++;
         break;
     case 1:
-        if (func_ov028_021725c8(clsys) == TRUE) {
+        if (Colosseum_SendUnk4(clsys) == TRUE) {
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov028_021729dc(clsys) != 0xff) {
+        if (Colosseum_GetUnkDD(clsys) != 0xff) {
             (*seq)++;
         }
         break;
@@ -2502,7 +2502,7 @@ static BOOL UnionOneself_StepPartyWaitRun(UnionSystem *unisys, UnionSelf *situ, 
         (*seq)++;
         break;
     case 1:
-        if (func_ov028_02172704() == TRUE) {
+        if (Colosseum_SendUnk8() == TRUE) {
             clsys->unkDF = 1;
             (*seq)++;
         }
@@ -2513,7 +2513,7 @@ static BOOL UnionOneself_StepPartyWaitRun(UnionSystem *unisys, UnionSelf *situ, 
         }
         break;
     case 0x64:
-        if (func_ov028_02172748() == TRUE) {
+        if (Colosseum_SendUnk9() == TRUE) {
             (*seq)++;
         }
         break;
@@ -2554,9 +2554,9 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
         (*seq)++;
         break;
     case 1:
-        func_ov028_02172b4c(clsys, TRUE);
+        Colosseum_ClearParties(clsys, TRUE);
         UnionEff_ClearColosseumUnk170(clsys);
-        func_ov028_02172b14(clsys);
+        Colosseum_ResetUnk171(clsys);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x14, 0x14);
         (*seq)++;
         break;
@@ -2571,7 +2571,7 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
         }
         break;
     case 4:
-        if (func_ov028_02172b20(clsys) == TRUE) {
+        if (Colosseum_AreAllPartiesReceived(clsys) == TRUE) {
             (*seq)++;
         }
         break;
@@ -2783,7 +2783,7 @@ static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *sit
         }
         break;
     case 1:
-        if (func_ov028_02172818() == TRUE) {
+        if (Colosseum_SendUnkD() == TRUE) {
             (*seq)++;
         }
         break;
