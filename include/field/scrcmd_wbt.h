@@ -12,23 +12,23 @@ WbtSystem *WbtCmd_GetSystem(FieldScriptEnv *env);
 
 // Overlay 56
 BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7620(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7674(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_IsTournamentAvailable(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_WouldOpenTournament(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_CheckRegulation(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e76f4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7710(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7750(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetRegulationId(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CheckEntryParties(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CallEntryPartySelect(VM *vm, FieldScriptEnv *env);
 BOOL func_ov056_021e77b0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7808(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SetUseBattleBox(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_MakeRentalParty(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7894(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7988(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e79c0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e79f0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7a30(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7a4c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7a9c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7b00(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetSlotTrainerObjCodes(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetSlot(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CountDownloads(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SetDownloadSlot(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetDownloadSlot(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CallPokeSelect(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowDownloads(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowWinRecord(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_Download(VM *vm, FieldScriptEnv *env);
 
 // Overlay 57

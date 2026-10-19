@@ -18,7 +18,7 @@
 
 // The commands of the Pokémon World Tournament's entrance (plugin 6) that overlay 55 doesn't have
 
-static BSubwayScoreData *func_ov056_021e75c0(FieldScriptEnv *env) {
+static BSubwayScoreData *WbtEntrance_GetBSubwayScoreData(FieldScriptEnv *env) {
     return SaveControl_GetBlockPtr(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)), SAVE_BLOCK_BSUBWAY_SCORE);
 }
 
@@ -29,7 +29,7 @@ BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env) {
     u16 battlePoints = WbtMakeMatch_GetBattlePoints(sys);
 
     if (battlePoints != 0) {
-        BSubwayScoreData_AddBattlePoints(func_ov056_021e75c0(env), battlePoints);
+        BSubwayScoreData_AddBattlePoints(WbtEntrance_GetBSubwayScoreData(env), battlePoints);
         RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))), 0x21,
                   battlePoints);
     }
@@ -37,7 +37,7 @@ BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e7620(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_IsTournamentAvailable(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 tournament = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
@@ -53,7 +53,7 @@ BOOL func_ov056_021e7620(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets a variable to whether winning the current tournament would open a tournament
-BOOL func_ov056_021e7674(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_WouldOpenTournament(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 tournament = ScriptReadAny(vm, env);
@@ -76,14 +76,14 @@ BOOL WbtCmd_CheckRegulation(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e76f4(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_GetRegulationId(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
     *var = WbtSystem_GetRegulationId(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
-BOOL func_ov056_021e7710(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_CheckEntryParties(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 *var = ScriptReadVar(vm, env);
@@ -93,7 +93,7 @@ BOOL func_ov056_021e7710(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e7750(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_CallEntryPartySelect(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -134,7 +134,7 @@ BOOL func_ov056_021e77b0(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e7808(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_SetUseBattleBox(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u8 value;
 
@@ -167,7 +167,7 @@ BOOL WbtCmd_MakeRentalParty(VM *vm, FieldScriptEnv *env) {
 }
 
 // Sets three variables to the Trainers that the save's three entries name, for those with unk8_0 of at least 3
-BOOL func_ov056_021e7894(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_GetSlotTrainerObjCodes(VM *vm, FieldScriptEnv *env) {
     void *save = func_020179f8(FieldScriptEnv_GetGameData(env));
     u16 *var1 = ScriptReadVar(vm, env);
     u16 *var2 = ScriptReadVar(vm, env);
@@ -193,7 +193,7 @@ BOOL func_ov056_021e7894(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e7988(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_GetSlot(VM *vm, FieldScriptEnv *env) {
     void *save = func_020179f8(FieldScriptEnv_GetGameData(env));
     u16 index = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
@@ -202,7 +202,7 @@ BOOL func_ov056_021e7988(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e79c0(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_CountDownloads(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 *var = ScriptReadVar(vm, env);
@@ -211,7 +211,7 @@ BOOL func_ov056_021e79c0(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e79f0(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_SetDownloadSlot(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     WbtSystem *sys = WbtCmd_GetSystem(env);
 
@@ -222,14 +222,14 @@ BOOL func_ov056_021e79f0(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov056_021e7a30(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_GetDownloadSlot(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
     *var = WbtSystem_GetDownloadSlot(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
-BOOL func_ov056_021e7a4c(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_CallPokeSelect(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
     u16 *var = ScriptReadVar(vm, env);
@@ -240,7 +240,7 @@ BOOL func_ov056_021e7a4c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov056_021e7a9c(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_ShowDownloads(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -252,7 +252,7 @@ BOOL func_ov056_021e7a9c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov056_021e7b00(VM *vm, FieldScriptEnv *env) {
+BOOL WbtCmd_ShowWinRecord(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);

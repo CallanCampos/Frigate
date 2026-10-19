@@ -4126,14 +4126,14 @@
     FieldCommand 1005
     .endm
 
-    // func_ov056_021e7620
+    // WbtCmd_IsTournamentAvailable
     .macro Plugin6_Cmd1006 a0, a1
     FieldCommand 1006
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov056_021e7674
+    // WbtCmd_WouldOpenTournament
     .macro Plugin6_Cmd1007 a0, a1
     FieldCommand 1007
     .2byte \a0
@@ -4203,14 +4203,14 @@
     .2byte \a0
     .endm
 
-    // func_ov056_021e7988
+    // WbtCmd_GetSlot
     .macro Plugin6_Cmd1022 a0, a1
     FieldCommand 1022
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov056_021e7894
+    // WbtCmd_GetSlotTrainerObjCodes
     .macro Plugin6_Cmd1023 a0, a1, a2
     FieldCommand 1023
     .2byte \a0
@@ -4224,31 +4224,31 @@
     .2byte \a0
     .endm
 
-    // func_ov056_021e79c0
+    // WbtCmd_CountDownloads
     .macro Plugin6_Cmd1025 a0
     FieldCommand 1025
     .2byte \a0
     .endm
 
-    // func_ov056_021e79f0
+    // WbtCmd_SetDownloadSlot
     .macro Plugin6_Cmd1026 a0
     FieldCommand 1026
     .2byte \a0
     .endm
 
-    // func_ov056_021e7a30
+    // WbtCmd_GetDownloadSlot
     .macro Plugin6_Cmd1027 a0
     FieldCommand 1027
     .2byte \a0
     .endm
 
-    // func_ov056_021e7808
+    // WbtCmd_SetUseBattleBox
     .macro Plugin6_Cmd1028 a0
     FieldCommand 1028
     .2byte \a0
     .endm
 
-    // func_ov056_021e7894
+    // WbtCmd_GetSlotTrainerObjCodes
     .macro Plugin6_Cmd1031 a0, a1, a2
     FieldCommand 1031
     .2byte \a0
@@ -4268,7 +4268,7 @@
     .2byte \a1
     .endm
 
-    // func_ov056_021e7750
+    // WbtCmd_CallEntryPartySelect
     .macro Plugin6_Cmd1046 a0
     FieldCommand 1046
     .2byte \a0
@@ -4280,20 +4280,20 @@
     .2byte \a0
     .endm
 
-    // func_ov056_021e7a4c
+    // WbtCmd_CallPokeSelect
     .macro Plugin6_Cmd1048 a0
     FieldCommand 1048
     .2byte \a0
     .endm
 
-    // func_ov056_021e7a9c
+    // WbtCmd_ShowDownloads
     .macro Plugin6_Cmd1049 a0, a1
     FieldCommand 1049
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov056_021e7b00
+    // WbtCmd_ShowWinRecord
     .macro Plugin6_Cmd1050 a0
     FieldCommand 1050
     .2byte \a0
@@ -4305,7 +4305,7 @@
     .2byte \a1
     .endm
 
-    // func_ov056_021e76f4
+    // WbtCmd_GetRegulationId
     .macro Plugin6_Cmd1057 a0
     FieldCommand 1057
     .2byte \a0
@@ -4317,7 +4317,7 @@
     .2byte \a0
     .endm
 
-    // func_ov056_021e7710
+    // WbtCmd_CheckEntryParties
     .macro Plugin6_Cmd1059 a0
     FieldCommand 1059
     .2byte \a0
