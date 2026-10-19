@@ -53,8 +53,10 @@ matches first - a group with one matched copy, whose C proves the others - then 
 each unmatched copy it says whether the function is `global` (referenced from outside its file, so it is emitted as
 soon as it is written), `static` (it needs the in-file callers the row lists, up to a global function), `static?`
 (every reference is inside a range the delinks have not covered yet, so its boundary has to be found first, as in the
-`decomp-file` skill) or `unreferenced`. Near-duplicates are not reported, and a pointer dsd did not record is not
-seen. How a shared group is written is in [Code organization](code-organization.md).
+`decomp-file` skill), `global?` (every reference from outside its file names more than one overlay that could hold the
+target, so which one is meant is not recorded; check by hand) or `unreferenced`. Near-duplicates are not reported,
+and a pointer dsd did not record is not seen. How a shared group is written is in
+[Code organization](code-organization.md).
 
 `tools/decomp/rodata_order.py` predicts how MWCC lays out a file's static data and searches small reorderings; when
 no structured order reaches the ROM's layout, `tools/decomp/rodata_solver.py` anneals the sequence of sizes by
