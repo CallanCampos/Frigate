@@ -4342,13 +4342,13 @@
     .2byte \a0
     .endm
 
-    // func_ov057_021e7814
+    // WbtCmd_GetRoundRemaining
     .macro Plugin7_Cmd1019 a0
     FieldCommand 1019
     .2byte \a0
     .endm
 
-    // func_ov057_021e7894
+    // WbtCmd_ResetPicks
     .macro Plugin7_Cmd1023
     FieldCommand 1023
     .endm
@@ -4359,52 +4359,52 @@
     .2byte \a0
     .endm
 
-    // func_ov057_021e7850
+    // WbtCmd_ShowPartyList
     .macro Plugin7_Cmd1029
     FieldCommand 1029
     .endm
 
-    // func_ov057_021e7878
+    // WbtCmd_ClosePartyList
     .macro Plugin7_Cmd1030
     FieldCommand 1030
     .endm
 
-    // func_ov057_021e7894
+    // WbtCmd_ResetPicks
     .macro Plugin7_Cmd1031
     FieldCommand 1031
     .endm
 
-    // func_ov057_021e78a4
+    // WbtCmd_RandomPick
     .macro Plugin7_Cmd1032 a0
     FieldCommand 1032
     .2byte \a0
     .endm
 
-    // func_ov057_021e78c8
+    // WbtCmd_SetPick
     .macro Plugin7_Cmd1033 a0, a1
     FieldCommand 1033
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov057_021e78fc
+    // WbtCmd_WordSetPickSpecies
     .macro Plugin7_Cmd1034 a0, a1
     FieldCommand 1034
     .byte \a0
     .2byte \a1
     .endm
 
-    // func_ov057_021e7948
+    // WbtCmd_ListPartyPokemon
     .macro Plugin7_Cmd1035
     FieldCommand 1035
     .endm
 
-    // func_ov057_021e79e8
+    // WbtCmd_Dummy
     .macro Plugin7_Cmd1036
     FieldCommand 1036
     .endm
 
-    // func_ov057_021e79ec
+    // WbtCmd_SwapPickedPokemon
     .macro Plugin7_Cmd1037
     FieldCommand 1037
     .endm
@@ -4413,26 +4413,26 @@
     FieldCommand 1039
     .endm
 
-    // func_ov057_021e760c
+    // WbtCmd_GetOpponentObjCode
     .macro Plugin7_Cmd1040 a0
     FieldCommand 1040
     .2byte \a0
     .endm
 
-    // func_ov057_021e7630
+    // WbtCmd_ShowOpponentLine
     .macro Plugin7_Cmd1041 a0, a1
     FieldCommand 1041
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov057_021e76a8
+    // WbtCmd_CallBattle
     .macro Plugin7_Cmd1042 a0
     FieldCommand 1042
     .2byte \a0
     .endm
 
-    // func_ov057_021e770c
+    // WbtCmd_ShowOpponentLine7
     .macro Plugin7_Cmd1043 a0
     FieldCommand 1043
     .2byte \a0
@@ -4445,7 +4445,7 @@
     .2byte \a1
     .endm
 
-    // func_ov057_021e777c
+    // WbtCmd_WordSetOpponentName
     .macro Plugin7_Cmd1045 a0
     FieldCommand 1045
     .byte \a0
@@ -4457,38 +4457,38 @@
     .2byte \a0
     .endm
 
-    // func_ov057_021e7b20
+    // WbtCmd_ShowPortraits
     .macro Plugin7_Cmd1052 a0
     FieldCommand 1052
     .2byte \a0
     .endm
 
-    // func_ov057_021e7b60
+    // WbtCmd_LoadPortraitScene
     .macro Plugin7_Cmd1053 a0, a1
     FieldCommand 1053
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov057_021e7ba0
+    // WbtCmd_PlayStadiumIntro
     .macro Plugin7_Cmd1054
     FieldCommand 1054
     .endm
 
-    // func_ov057_021e7bb4
+    // WbtCmd_SwitchLights
     .macro Plugin7_Cmd1055 a0, a1
     FieldCommand 1055
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov057_021e7bec
+    // WbtCmd_PlayCrowd
     .macro Plugin7_Cmd1056 a0
     FieldCommand 1056
     .2byte \a0
     .endm
 
-    // func_ov057_021e79fc
+    // WbtCmd_SetNamePlates
     .macro Plugin7_Cmd1060 a0
     FieldCommand 1060
     .2byte \a0
