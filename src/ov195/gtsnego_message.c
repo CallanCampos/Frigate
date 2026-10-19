@@ -84,7 +84,8 @@ static u16 sGtsNegoMessageLevels[] = {
 };
 
 static u16 sGtsNegoMessageKinds[] = {
-    GtsnegoProc_Text_AnyKind_2, GtsnegoProc_Text_Cool, GtsnegoProc_Text_Cute, GtsnegoProc_Text_Scary, GtsnegoProc_Text_Strange,
+    GtsnegoProc_Text_AnyKind_2, GtsnegoProc_Text_Cool,    GtsnegoProc_Text_Cute,
+    GtsnegoProc_Text_Scary,     GtsnegoProc_Text_Strange,
 };
 
 // The main menu's buttons
