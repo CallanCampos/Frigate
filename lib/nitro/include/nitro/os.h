@@ -51,6 +51,16 @@ void OSi_TerminateCore(void);
 #define OS_PXI_COMMAND_TERMINATE 0x20
 // NitroSDK's OSi_DoResetSystem, in ITCM: the function that OS_ResetSystem ends in
 void OSi_DoResetSystem(void);
+// The rest of the boot code in ITCM, which OSi_DoResetSystem calls and ends by jumping to OSi_StartProgram with: the
+// check of the images that the card loaded against the hashes of the DSi header, the load of the program's images, the
+// card read, the word fill and the jump to the program's entry. All but OSi_DoResetSystem are named as guesses from
+// what their code does
+BOOL OSi_VerifyHmac(const void *data, u32 size, const void *hash);
+void OSi_VerifyRomBlocks(void);
+void OSi_LoadProgram(BOOL twl);
+void OSi_ReadRom(u32 address, void *dest, u32 size);
+void OSi_Clear32(u32 value, void *dest, u32 size);
+void OSi_StartProgram(void);
 // NitroSDK's OS_Halt (swan's cp15_halt): stops the CPU until an interrupt
 void OS_Halt(void);
 // Writes a range of the data cache back to memory, before DMA reads it. NitroSDK's DC_FlushRange
@@ -277,6 +287,9 @@ u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask); // swan's CPU_SetIRQFIQMask
 // NitroSDK's OS_IrqHandler (swan's CPU_IRQInvoke), in ITCM: the IRQ dispatcher. WCM also uses its address as a special
 // mutex-owner marker
 void OS_IrqHandler(void);
+// NitroSDK's OS_IrqHandler_ThreadSwitch, in ITCM: the dispatcher's second half, which an interrupt handler returns
+// into, and which switches to the highest-priority ready thread
+void OS_IrqHandler_ThreadSwitch(void);
 // NitroSDK's OS_GetCpsrIrq: the CPSR's IRQ-disable bit, 0x80 while IRQs are off
 u32 OS_GetCpsrIrq(void); // swan's CPU_GetIRQMask
 // NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler

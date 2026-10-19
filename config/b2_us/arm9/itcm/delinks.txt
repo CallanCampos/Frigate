@@ -12,3 +12,11 @@ lib/nitro/src/mi/mi_dma_itcm.c:
 src/gfl/clact_itcm.c:
     complete
     .text       start:0x01ff8020 end:0x01ff8bf0
+
+lib/nitro/src/os/os_irqHandler_itcm.c:
+    complete
+    .text       start:0x01ff8c88 end:0x01ff8e40
+
+lib/nitro/src/os/os_reset_itcm.c:
+    complete
+    .text       start:0x01ff8e40 end:0x01ff936c
