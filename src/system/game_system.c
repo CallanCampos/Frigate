@@ -383,7 +383,7 @@ static BOOL GSYS_CanBootGameComm(GameSystem *gsys) {
     u16 zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
 
     if (gsys->unk36 == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() && GSYS_IsCGearOn(gsys) == TRUE &&
-        func_ov012_021535dc(gsys) == TRUE && !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE) &&
+        Intrude_CanBootGameComm(gsys) == TRUE && !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE) &&
         CGearSettings_IsOn(CGearSettings_GetFromGameData(gsys->gameData))) {
         return TRUE;
     }

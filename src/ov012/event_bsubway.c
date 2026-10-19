@@ -109,19 +109,19 @@ typedef struct {
     u8 unk20[2];
 } BSubwayLeader;
 
-static BOOL func_ov012_021662bc(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_021662e4(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_02166300(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL BSubwayCommBattleProc_Init(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL BSubwayCommBattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL BSubwayCommBattleProc_Main(GameProc *proc, u32 *state, void *param, void *work);
 
 static const GameProcFunctions data_ov012_0216dc5c = {
-    func_ov012_021662bc,
-    func_ov012_02166300,
-    func_ov012_021662e4,
+    BSubwayCommBattleProc_Init,
+    BSubwayCommBattleProc_Main,
+    BSubwayCommBattleProc_Exit,
 };
 
-static GameEvent *func_ov012_02166508(BSubwayScrWork *bsw, GameSystem *gsys, Field *field);
+static GameEvent *EventBSubwayCommBattle_CreateFromScrWork(BSubwayScrWork *bsw, GameSystem *gsys, Field *field);
 
-static GameEventReturnCode func_ov012_02165eb8(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventBSubwayPokeSelect_Callback(GameEvent *event, u32 *state, void *work) {
     BSubwayPokeSelectData *data = work;
     GameSystem *gsys = data->gsys;
 
@@ -170,7 +170,7 @@ static inline void InitSummaryParam(BSubwayPokeSelectData *data, PokeParty *part
     param->isNationalDex = PokeDex_IsNationalObtained(pokedex);
 }
 
-GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental) {
+GameEvent *EventBSubwayPokeSelect_Create(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental) {
     Field *field;
     GameEvent *event;
     GameData *gameData;
@@ -182,7 +182,7 @@ GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental)
 
     gameData = GSYS_GetGameData(gsys);
     field = GSYS_GetField(gsys);
-    event = GameEvent_Create(gsys, NULL, func_ov012_02165eb8, sizeof(BSubwayPokeSelectData));
+    event = GameEvent_Create(gsys, NULL, EventBSubwayPokeSelect_Callback, sizeof(BSubwayPokeSelectData));
     data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->field = field;
@@ -218,16 +218,16 @@ GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental)
     return event;
 }
 
-GameEvent *func_ov012_02166070(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
+GameEvent *EventBSubwayBattle_Create(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
     BattleRec_Init(HEAPID_GAMEEVENT);
     bsw->btlSetup = func_ov033_0217c094(bsw, gsys);
     if (bsw->playMode == 3 || bsw->playMode == 8) {
-        return func_ov012_02166508(bsw, gsys, field);
+        return EventBSubwayCommBattle_CreateFromScrWork(bsw, gsys, field);
     }
-    return func_ov012_0216881c(gsys, field, bsw->btlSetup);
+    return EventBSubwayBattleCall_Create(gsys, field, bsw->btlSetup);
 }
 
-static GameEventReturnCode func_ov012_021660b0(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventBSubwayTrainerMsg_Callback(GameEvent *event, u32 *state, void *work) {
     BSubwayTrainerMsgData *data = work;
 
     switch (*state) {
@@ -255,7 +255,7 @@ static GameEventReturnCode func_ov012_021660b0(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos) {
+GameEvent *EventBSubwayTrainerMsg_Create(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos) {
     GameEvent *event;
     GameData *gameData;
     void *msgBGSys;
@@ -272,7 +272,7 @@ GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index,
     gameData = GSYS_GetGameData(gsys);
     field = GSYS_GetField(gsys);
     msgBGSys = Field_GetMsgBGSys(field);
-    event = GameEvent_Create(gsys, NULL, func_ov012_021660b0, sizeof(BSubwayTrainerMsgData));
+    event = GameEvent_Create(gsys, NULL, EventBSubwayTrainerMsg_Callback, sizeof(BSubwayTrainerMsgData));
     data = GameEvent_GetData(event);
     data->gsys = gsys;
     data->actorId = actorId;
@@ -301,7 +301,7 @@ GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index,
     return event;
 }
 
-static GameEventReturnCode func_ov012_02166230(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventBSubwayRecords_Callback(GameEvent *event, u32 *state, void *work) {
     BSubwayRecordsData *data = work;
     void *bsubwaySave;
 
@@ -322,9 +322,9 @@ static GameEventReturnCode func_ov012_02166230(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov012_02166294(GameSystem *gsys) {
+GameEvent *EventBSubwayRecords_Create(GameSystem *gsys) {
     Field *field = GSYS_GetField(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02166230, sizeof(BSubwayRecordsData));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayRecords_Callback, sizeof(BSubwayRecordsData));
     BSubwayRecordsData *data = GameEvent_GetData(event);
 
     data->gsys = gsys;
@@ -332,7 +332,7 @@ GameEvent *func_ov012_02166294(GameSystem *gsys) {
     return event;
 }
 
-static BOOL func_ov012_021662bc(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL BSubwayCommBattleProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     BSubwayCommBattleWork *procWork;
 
     GFL_HeapCreateChild(HEAPID_USER, 0x76, 0x4000);
@@ -341,7 +341,7 @@ static BOOL func_ov012_021662bc(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov012_021662e4(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL BSubwayCommBattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BSubwayCommBattleWork *procWork = work;
 
     FreeGameProcManager(procWork->procManager);
@@ -350,7 +350,7 @@ static BOOL func_ov012_021662e4(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov012_02166300(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL BSubwayCommBattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     BSubwayCommBattleParam *battleParam = param;
     BSubwayCommBattleWork *procWork = work;
     BOOL running = GFL_ProcMgrUpdate(procWork->procManager);
@@ -389,7 +389,7 @@ static BOOL func_ov012_02166300(GameProc *proc, u32 *state, void *param, void *w
     return FALSE;
 }
 
-static GameEventReturnCode func_ov012_021663ac(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventBSubwayCommBattleProc_Callback(GameEvent *event, u32 *state, void *work) {
     BSubwayCommBattleData *data = work;
     GameSystem *gsys = data->gsys;
     BSubwayCommBattleParam *param;
@@ -412,8 +412,8 @@ static GameEventReturnCode func_ov012_021663ac(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov012_02166400(GameSystem *gsys, BtlSetup *setup, void *a2) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_021663ac, sizeof(BSubwayCommBattleData));
+static GameEvent *EventBSubwayCommBattleProc_Create(GameSystem *gsys, BtlSetup *setup, void *a2) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayCommBattleProc_Callback, sizeof(BSubwayCommBattleData));
     BSubwayCommBattleData *data = GameEvent_GetData(event);
 
     data->gsys = gsys;
@@ -422,7 +422,7 @@ static GameEvent *func_ov012_02166400(GameSystem *gsys, BtlSetup *setup, void *a
     return event;
 }
 
-static GameEventReturnCode func_ov012_02166428(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventBSubwayCommBattle_Callback(GameEvent *event, u32 *state, void *work) {
     BSubwayBattleData *data = work;
     GameSystem *gsys = data->gsys;
     Field *field = data->field;
@@ -446,7 +446,7 @@ static GameEventReturnCode func_ov012_02166428(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, func_ov012_02166400(gsys, data->setup, data->unk0C));
+        GameEvent_ChainNext(event, EventBSubwayCommBattleProc_Create(gsys, data->setup, data->unk0C));
         (*state)++;
         break;
     case 5:
@@ -473,8 +473,8 @@ static GameEventReturnCode func_ov012_02166428(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov012_021664dc(GameSystem *gsys, Field *field, BtlSetup *setup, void *a3) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02166428, sizeof(BSubwayBattleData));
+static GameEvent *EventBSubwayCommBattle_Create(GameSystem *gsys, Field *field, BtlSetup *setup, void *a3) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayCommBattle_Callback, sizeof(BSubwayBattleData));
     BSubwayBattleData *data = GameEvent_GetData(event);
 
     data->gsys = gsys;
@@ -484,11 +484,11 @@ static GameEvent *func_ov012_021664dc(GameSystem *gsys, Field *field, BtlSetup *
     return event;
 }
 
-static GameEvent *func_ov012_02166508(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
-    return func_ov012_021664dc(gsys, field, bsw->btlSetup, func_ov033_0217c110(bsw));
+static GameEvent *EventBSubwayCommBattle_CreateFromScrWork(BSubwayScrWork *bsw, GameSystem *gsys, Field *field) {
+    return EventBSubwayCommBattle_Create(gsys, field, bsw->btlSetup, func_ov033_0217c110(bsw));
 }
 
-static GameEventReturnCode func_ov012_02166528(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventBSubwayLeaderMsg_Callback(GameEvent *event, u32 *state, void *work) {
     BSubwayLeaderMsgData *data = work;
 
     switch (*state) {
@@ -513,11 +513,11 @@ static GameEventReturnCode func_ov012_02166528(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov012_0216657c(GameSystem *gsys, u16 index, u16 actorId) {
+GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId) {
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
     void *msgBGSys = Field_GetMsgBGSys(field);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02166528, sizeof(BSubwayLeaderMsgData));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBSubwayLeaderMsg_Callback, sizeof(BSubwayLeaderMsgData));
     BSubwayLeaderMsgData *data = GameEvent_GetData(event);
     MMSys *actorSystem;
     FieldActor *player;

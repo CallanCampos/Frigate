@@ -648,7 +648,7 @@ static GameEventReturnCode GimmickShauntal_RoomChangeEvent(GameEvent *event, u32
         *state = 1;
         break;
     case 1:
-        if (func_ov012_02166ecc(eventWork->player)) {
+        if (FldAct_CheckAcmdEnd(eventWork->player)) {
             GimmickShauntal_PlayModel0Opening(work);
             GFL_SndSEPlay(SEQ_SE_SW_SHIKIMI_03);
             *state = 2;

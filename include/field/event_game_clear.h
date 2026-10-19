@@ -42,7 +42,7 @@ extern const GameProcFunctions GAME_CLEAR_SAVE_PROC_FUNCTIONS;
 GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *data);
 GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param);
 void SetGameClearGameData(GameClearWork *work);
-void func_ov012_0215a50c(GameClearWork *work);
+void SetGameClearStaffRollParam(GameClearWork *work);
 void SetGameClearStatusSequence(GameClearWork *work);
 void EventGameClear_GiveMonotypeMedals(GameClearWork *work);
 u32 EventGameClear_Get3DDemoID(void);

@@ -151,7 +151,7 @@ static GameEventReturnCode PlasmaFrigate_PasswordEvent(GameEvent *event, u32 *st
         break;
     case 1:
         PlasmaFrigate_CheckPassword(wk, wk->nameEntry);
-        func_ov012_02165ae8(wk->nameEntry);
+        NameEntryParam_Free(wk->nameEntry);
         (*state)++;
         break;
     case 2:

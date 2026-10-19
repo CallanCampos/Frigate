@@ -94,7 +94,7 @@ const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15] = {
     FieldScriptSubEventFinish_Subscreen,
     func_ov036_021a9808,
     FieldScriptSubEventFinish_MEPlayback,
-    func_ov012_02159cf8,
+    GameCommPause_Finish,
     func_ov036_021a6f08,
     FieldScriptSubEventFinish_BGMPlayback,
     NULL,
@@ -304,12 +304,12 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s00C6_CallWaterfall,                      // 0x0c6
     s00C7_CallCut,                            // 0x0c7
     s00C8_CallDiving,                         // 0x0c8
-    func_ov012_02155608,                      // 0x0c9
-    func_ov012_02155638,                      // 0x0ca
+    s00C9_ConfigToggleKanji,                  // 0x0c9
+    s00CA_ConfigGetKanji,                     // 0x0ca
     s00CB_Random,                             // 0x0cb
     s00CC_RTGetTextFile,                      // 0x0cc
     s00CD_RTCGetDayPart,                      // 0x0cd
-    func_ov012_0215569c,                      // 0x0ce
+    s00CE_TrainerCardGetStars,                // 0x0ce
     s00CF_RTCGetWeekDay,                      // 0x0cf
     s00D0_RTCGetDate,                         // 0x0d0
     s00D1_RTCGetTime,                         // 0x0d1
@@ -331,11 +331,11 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s00E1_TrainerCardGetSex,                  // 0x0e1
     s00E2_SaveDataCheckRequired,              // 0x0e2
     s00E3_GiveRunningShoes,                   // 0x0e3
-    func_ov012_02155d00,                      // 0x0e4
+    s00E4_BoxUnlockWallpapers,                // 0x0e4
     func_ov012_02155d30,                      // 0x0e5
-    func_ov012_02155d80,                      // 0x0e6
-    func_ov012_02155db4,                      // 0x0e7
-    func_ov012_02155dd4,                      // 0x0e8
+    s00E6_StartMenuIsItemUnlocked,            // 0x0e6
+    s00E7_StartMenuUnlockItem,                // 0x0e7
+    s00E8_StartMenuIsItemSelected,            // 0x0e8
     NULL,                                     // 0x0e9
     s00EA_HOFCheckIntegrity,                  // 0x0ea
     s00EB_DayCareCheckSpawnFlag,              // 0x0eb
@@ -419,9 +419,9 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0139_GameCommDisconnect,                 // 0x139
     s013A_GameCommGetStatus,                  // 0x13a
     s013B_GameCommCheckDSiWiFi,               // 0x13b
-    func_ov012_02159c80,                      // 0x13c
-    func_ov012_02159c90,                      // 0x13d
-    func_ov012_02159cd8,                      // 0x13e
+    s013C_GameCommTryBoot,                    // 0x13c
+    s013D_GameCommPause,                      // 0x13d
+    s013E_GameCommResume,                     // 0x13e
     s013F_EvCameraInit,                       // 0x13f
     s0140_EvCameraEnd,                        // 0x140
     s0141_EvCameraUnbind,                     // 0x141
@@ -454,22 +454,22 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov036_021adcb4,                      // 0x15c
     s015D_NetConnectWiFiClub,                 // 0x15d
     s015E_NetConnectGTS,                      // 0x15e
-    func_ov012_02157a78,                      // 0x15f
+    s015F_Nop,                                // 0x15f
     s0160_NetConnectWiFiBattle,               // 0x160
     s0161_NetConnectBattleVideo,              // 0x161
     s0162_NetConnectGTSNegotiation,           // 0x162
-    func_ov012_021580c4,                      // 0x163
-    func_ov012_021581e4,                      // 0x164
-    func_ov012_02158280,                      // 0x165
-    func_ov012_02158550,                      // 0x166
-    func_ov012_021588d4,                      // 0x167
-    func_ov012_021585e0,                      // 0x168
-    func_ov012_02158858,                      // 0x169
-    func_ov012_0215887c,                      // 0x16a
+    s0163_MusicalCall,                        // 0x163
+    s0164_MusicalCallDressUp,                 // 0x164
+    s0165_MusicalGetInfo,                     // 0x165
+    s0166_MusicalGetAudienceGift,             // 0x166
+    s0167_MusicalComm,                        // 0x167
+    s0168_MusicalAddProp,                     // 0x168
+    s0169_MusicalClearAudienceGift,           // 0x169
+    s016A_MusicalSelectPoke,                  // 0x16a
     NULL,                                     // 0x16b
     NULL,                                     // 0x16c
     NULL,                                     // 0x16d
-    func_ov012_02157814,                      // 0x16e
+    s016E_CallMonolith,                       // 0x16e
     NULL,                                     // 0x16f
     func_ov033_021772f4,                      // 0x170
     NULL,                                     // 0x171
@@ -520,7 +520,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                     // 0x19e
     NULL,                                     // 0x19f
     NULL,                                     // 0x1a0
-    func_ov012_02160a90,                      // 0x1a1
+    s01A1_PleasureBoatGetRoomInfo,            // 0x1a1
     s01A2_CallRoyalUnovaView,                 // 0x1a2
     s01A3_FadeInBlackQ,                       // 0x1a3
     s01A4_FadeOutBlackQ,                      // 0x1a4
@@ -565,7 +565,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s01CB_NDemoReadyTalkMotion,               // 0x1cb
     func_ov036_021afd9c,                      // 0x1cc
     func_ov036_021afcfc,                      // 0x1cd
-    func_ov012_02160cdc,                      // 0x1ce
+    s01CE_UnityTowerGetTrainerClass,          // 0x1ce
     s01CF_UnityTowerGetStateParam,            // 0x1cf
     s01D0_UnityTowerCallFloorSelect,          // 0x1d0
     s01D1_MoveTutorCheckParty,                // 0x1d1
@@ -579,7 +579,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s01D9_ObjInitNPCGPos,                     // 0x1d9
     s01DA_CallPhraseSelect,                   // 0x1da
     func_ov033_02177d78,                      // 0x1db
-    func_ov012_02158ff4,                      // 0x1dc
+    s01DC_DreamWorldItems,                    // 0x1dc
     func_ov036_021c3018,                      // 0x1dd
     s01DE_PassPowerPopDepletedID,             // 0x1de
     func_ov036_021c315c,                      // 0x1df
@@ -593,18 +593,18 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s01E7_TrialHouseWorkDelete,               // 0x1e7
     s01E8_TrialHousePrepareParty,             // 0x1e8
     s01E9_TrialHouseCallTeamSelect,           // 0x1e9
-    func_ov012_02164564,                      // 0x1ea
+    s01EA_TrialHouseSetTrainer,               // 0x1ea
     s01EB_TrialHouseMsgDisp,                  // 0x1eb
     s01EC_TrialHouseStartBattle,              // 0x1ec
-    func_ov012_0216462c,                      // 0x1ed
-    func_ov012_0216465c,                      // 0x1ee
+    s01ED_TrialHouseSetDownloadMode,          // 0x1ed
+    s01EE_TrialHouseSetBattleTestRank,        // 0x1ee
     s01EF_TrialHouseGetBattleTestRank,        // 0x1ef
-    func_ov012_021646cc,                      // 0x1f0
+    s01F0_TrialHouseDownloadExamination,      // 0x1f0
     s01F1_TrialHouseCalcPointsStars,          // 0x1f1
-    func_ov012_0216474c,                      // 0x1f2
+    s01F2_TrialHouseGetExaminationType,       // 0x1f2
     s01F3_TrialHouseSaveData,                 // 0x1f3
-    func_ov012_021647c4,                      // 0x1f4
-    func_ov012_0216480c,                      // 0x1f5
+    s01F4_TrialHouseCallResults,              // 0x1f4
+    s01F5_TrialHouseGetRecordMask,            // 0x1f5
     func_ov033_021777dc,                      // 0x1f6
     func_ov033_02177844,                      // 0x1f7
     func_ov033_02177908,                      // 0x1f8
@@ -629,14 +629,14 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov027_021703a8,                      // 0x20b
     func_ov027_021703dc,                      // 0x20c
     s020D_PokePartyFindEx,                    // 0x20d
-    func_ov012_02165598,                      // 0x20e
-    func_ov012_0216564c,                      // 0x20f
-    func_ov012_021656a8,                      // 0x210
-    func_ov012_021656e0,                      // 0x211
-    func_ov012_02164838,                      // 0x212
-    func_ov012_0216491c,                      // 0x213
+    s020E_SpPokeJump,                         // 0x20e
+    s020F_SpPokeAppear,                       // 0x20f
+    s0210_SpPokeWaitAnimEnd,                  // 0x210
+    s0211_SpPokeWaitFrame,                    // 0x211
+    s0212_ActorMoveToHeight,                  // 0x212
+    s0213_ActorHoldPos,                       // 0x213
     s0214_CallPokemonPreview,                 // 0x214
-    func_ov012_021658c8,                      // 0x215
+    s0215_SetSpecialTransferUsed,             // 0x215
     func_ov036_021c7698,                      // 0x216
     s0217_MapChangeEntreeForest,              // 0x217
     func_ov012_02164c68,                      // 0x218
@@ -644,7 +644,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s021A_WordSetLoadEntreeForestPkmName,     // 0x21a
     s021B_EntreeForestSpawnAllPkm,            // 0x21b
     s021C_EntreeForestStartBattle,            // 0x21c
-    func_ov012_02164b94,                      // 0x21d
+    s021D_EntreeForestRemovePkm,              // 0x21d
     s021E_FishingChallengeGetRandomPkm,       // 0x21e
     func_ov012_02156104,                      // 0x21f
     func_ov012_02156128,                      // 0x220
@@ -675,8 +675,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov036_021aa968,                      // 0x239
     func_ov036_021a7340,                      // 0x23a
     func_ov012_02169c1c,                      // 0x23b
-    func_ov012_02169c2c,                      // 0x23c
-    func_ov012_02169c40,                      // 0x23d
+    s023C_NuvemaGimmickPlay,                  // 0x23c
+    s023D_NuvemaGimmickWaitAnim,              // 0x23d
     s023E_DayCareGetSexForNamePrint,          // 0x23e
     s023F_CallPlaceNameDisp,                  // 0x23f
     func_ov036_021a6e74,                      // 0x240
@@ -688,8 +688,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0246_BGMFadeOutAll,                      // 0x246
     s0247_MapChangeRail,                      // 0x247
     s0248_PlayerMoveToYAsync_,                // 0x248
-    func_ov012_02159f90,                      // 0x249
-    func_ov012_02159d10,                      // 0x24a
+    s0249_GetRandomDistinctSix,               // 0x249
+    s024A_FieldSubscreenIsEnabled,            // 0x24a
     s024B_FieldSubscreenDisable,              // 0x24b
     s024C_BGMAmbienceResume,                  // 0x24c
     func_ov036_021ab208,                      // 0x24d
@@ -713,11 +713,11 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     func_ov036_021aadc8,                      // 0x25f
     NULL,                                     // 0x260
     NULL,                                     // 0x261
-    func_ov012_0216a6a4,                      // 0x262
-    func_ov012_0216a718,                      // 0x263
+    s0262_HollowRivalSetValue,                // 0x262
+    s0263_HollowRivalSetFlag,                 // 0x263
     func_ov012_0216a748,                      // 0x264
     func_ov036_021ae18c,                      // 0x265
-    func_ov012_0216a79c,                      // 0x266
+    s0266_HollowRivalGetCounter,              // 0x266
     func_ov012_0216a7cc,                      // 0x267
     func_ov036_021aae48,                      // 0x268
     func_ov036_021aae74,                      // 0x269
@@ -789,16 +789,16 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                     // 0x2ab
     s02AC_CallLeafPileStuck,                  // 0x2ac
     NULL,                                     // 0x2ad
-    func_ov012_0216a82c,                      // 0x2ae
+    s02AE_GameGetMyCity,                      // 0x2ae
     s02AF_GameGetDifficulty,                  // 0x2af
     s02B0_CallUnovaLinkKeyUnlock,             // 0x2b0
-    func_ov012_0216a894,                      // 0x2b1
-    func_ov012_0216a950,                      // 0x2b2
-    func_ov012_0216a994,                      // 0x2b3
-    func_ov012_0216a9d8,                      // 0x2b4
-    func_ov012_0216aa1c,                      // 0x2b5
-    func_ov012_0216aabc,                      // 0x2b6
-    func_ov012_0216ab30,                      // 0x2b7
+    s02B1_KeyInfoGetChamberKey,               // 0x2b1
+    s02B2_MemoryLinkCheckFlag,                // 0x2b2
+    s02B3_MemoryLinkGetVar,                   // 0x2b3
+    s02B4_MemoryLinkIsPlayerLinked,           // 0x2b4
+    s02B5_WordSetMemoryLinkPlayerName,        // 0x2b5
+    s02B6_MemoryLinkCheckMusical,             // 0x2b6
+    s02B7_MemoryLinkAddMusicalProps,          // 0x2b7
     s02B8_PedometerStart,                     // 0x2b8
     s02B9_PedometerEnd,                       // 0x2b9
     s02BA_PedometerGet,                       // 0x2ba
@@ -811,14 +811,14 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     NULL,                                     // 0x2c1
     s02C2_RepelRearm,                         // 0x2c2
     func_ov012_0216a7f4,                      // 0x2c3
-    func_ov012_0216ac74,                      // 0x2c4
+    s02C4_HiddenHollowSetPeriod,              // 0x2c4
     func_ov036_021c783c,                      // 0x2c5
     s02C6_JoinAvenueStoreStart,               // 0x2c6
     s02C6_JoinAvenueStoreEnd,                 // 0x2c7, which swan's name numbers 0x2c6
     NULL,                                     // 0x2c8
     NULL,                                     // 0x2c9
     s02CA_CallHappyPhraseInput,               // 0x2ca
-    func_ov012_0216acfc,                      // 0x2cb
+    s02CB_PokewoodGetLevel,                   // 0x2cb
     NULL,                                     // 0x2cc
     NULL,                                     // 0x2cd
     NULL,                                     // 0x2ce
@@ -826,7 +826,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02D0_PokeDexEnableHabitatList,           // 0x2d0
     func_ov036_021c9a40,                      // 0x2d1
     s02D2_FieldOpenRestoreLCD,                // 0x2d2
-    func_ov012_0216a6dc,                      // 0x2d3
+    s02D3_HollowRivalGetValue,                // 0x2d3
     s02D4_ItemGetTMCount,                     // 0x2d4
     func_ov036_021c9a7c,                      // 0x2d5
     NULL,                                     // 0x2d6
@@ -852,12 +852,12 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s02EA_PokePartyAddNPoke,                  // 0x2ea
     NULL,                                     // 0x2eb
     NULL,                                     // 0x2ec
-    func_ov012_02155bec,                      // 0x2ed
+    s02ED_SetSoftResetBlocked,                // 0x2ed
     s02EE_MusicalIsPropOwned,                 // 0x2ee
     s02EF_MusicalGetOwnedPropCount,           // 0x2ef
     NULL,                                     // 0x2f0
-    func_ov012_02155c30,                      // 0x2f1
-    func_ov012_02155c64,                      // 0x2f2
+    s02F1_SetOneShotDRObtained,               // 0x2f1
+    s02F2_IsOneShotDRObtained,                // 0x2f2
 };
 
 // MWCC lays the file's data out by size, so the count comes first in the ROM, ahead of the tables

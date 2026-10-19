@@ -258,8 +258,8 @@ void func_ov036_0219e8c8(Field *field, FieldmapCtrlHybrid *controller, u32 type,
         return;
     }
     actor = FieldPlayer_GetActor(controller->player);
-    if (func_ov012_0216773c(actor)) {
-        func_ov012_02166f2c(actor);
+    if (FldAct_CheckAcmdSet(actor)) {
+        FldAct_FreeAcmd(actor);
     }
     if (type == HYBRID_GRID) {
         vec = pos;

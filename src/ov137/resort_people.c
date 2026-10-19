@@ -105,7 +105,7 @@ static ResortPerson *func_ov137_021f0e98(HeapID heapId, const ResortPersonSetup 
     if (person->actor == NULL) {
         func_ov137_021f122c(person, setup);
     }
-    person->visible = !func_ov012_02167520(person->actor);
+    person->visible = !IsActorHidden(person->actor);
     return person;
 }
 
@@ -194,13 +194,13 @@ static BOOL func_ov137_021f1060(ResortPerson *person, ResortPersonData *data) {
 void func_ov137_021f1070(ResortPerson *person, BOOL visible) {
     FieldActor *actor = func_ov137_021f110c(person);
     SetActorHidden(actor, visible == FALSE);
-    func_ov012_02167580(actor, visible);
+    SetActorCollisionEnabled(actor, visible);
     person->visible = visible;
 }
 
 void func_ov137_021f1098(ResortPerson *person, u32 mode) {
     FieldActor *actor = func_ov137_021f110c(person);
-    func_ov012_02167520(actor);
+    IsActorHidden(actor);
     switch (mode) {
     case 0:
         SetActorHidden(actor, FALSE);
@@ -247,7 +247,7 @@ static void func_ov137_021f1114(ResortPerson *person, const ResortPersonSetup *s
 
     func_ov137_021f113c(person, &x, &z, &dir);
     npc->direction = dir;
-    func_ov012_021682c0(npc, x, z, 0);
+    ZoneNPC_SetGridPos(npc, x, z, 0);
 }
 
 static void func_ov137_021f113c(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
@@ -266,12 +266,12 @@ static void func_ov137_021f113c(ResortPerson *person, u16 *x, u16 *z, u16 *dir) 
 
 static void func_ov137_021f11b8(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
     npc->direction = 0;
-    func_ov012_021682c0(npc, 0, 0, 0);
+    ZoneNPC_SetGridPos(npc, 0, 0, 0);
 }
 
 static void func_ov137_021f11cc(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
     npc->direction = 0;
-    func_ov012_021682c0(npc, 0, 0, 0);
+    ZoneNPC_SetGridPos(npc, 0, 0, 0);
 }
 
 static void func_ov137_021f11e0(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc) {
@@ -281,7 +281,7 @@ static void func_ov137_021f11e0(ResortPerson *person, const ResortPersonSetup *s
 
     func_ov137_021f1208(person, &x, &z, &dir);
     npc->direction = dir;
-    func_ov012_021682c0(npc, x, z, 0);
+    ZoneNPC_SetGridPos(npc, x, z, 0);
 }
 
 static void func_ov137_021f1208(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
@@ -298,7 +298,7 @@ static void func_ov137_021f122c(ResortPerson *person, const ResortPersonSetup *s
     person->actor = CreateNewActorByEntityNoWKOBJCODE(setup->mmSys, &npc, ResortLayout_GetZoneId(setup->zone));
     func_ov137_021f10dc(person, 0, setup->index);
     func_ov137_021f10dc(person, 1, setup->zone);
-    person->visible = !func_ov012_02167520(person->actor);
+    person->visible = !IsActorHidden(person->actor);
 }
 
 ResortPeople *func_ov137_021f12b4(const ResortPeopleSetup *setup, HeapID heapId) {
@@ -317,7 +317,7 @@ void func_ov137_021f1300(ResortPeople *people) {
         if (person != NULL) {
             FieldActor *actor = func_ov137_021f110c(person);
             if (FldAct_GetAcmd(actor) == 0xbe) {
-                func_ov012_02166f2c(actor);
+                FldAct_FreeAcmd(actor);
             }
         }
     }

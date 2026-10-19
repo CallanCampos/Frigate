@@ -10,7 +10,7 @@
 
 #define SHAYMIN_FORM_SKY 1
 
-static void func_ov012_02164330(GameData *gameData, PokeParty *party) {
+static void RevertPartyShaymin(GameData *gameData, PokeParty *party) {
     int count = PokeParty_GetPkmCount(party);
     int i;
     PartyPkm *pkm;
@@ -27,7 +27,7 @@ static void func_ov012_02164330(GameData *gameData, PokeParty *party) {
     }
 }
 
-BOOL func_ov012_02164384(GameData *gameData, PokeParty *party, s32 minutes, const RTCTime *time, u32 season) {
+BOOL ShayminForm_CheckNightPassed(GameData *gameData, PokeParty *party, s32 minutes, const RTCTime *time, u32 season) {
     int nightStart = GetLightChangeHoursForSeasons(season, 3);
     int morning = GetLightChangeHoursForSeasons(season, 0);
     int hour;
@@ -41,32 +41,32 @@ BOOL func_ov012_02164384(GameData *gameData, PokeParty *party, s32 minutes, cons
         hour -= nightStart;
         elapsed = time->minute + hour * 60;
         if (elapsed < minutes + 1) {
-            func_ov012_02164330(gameData, party);
+            RevertPartyShaymin(gameData, party);
             return TRUE;
         }
         return FALSE;
     }
     elapsed = time->minute + (time->hour - morning) * 60;
     if (elapsed < minutes) {
-        func_ov012_02164330(gameData, party);
+        RevertPartyShaymin(gameData, party);
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov012_021643f0(GameData *gameData, PokeParty *party, const RTCTime *time, u8 season) {
+BOOL ShayminForm_CheckNight(GameData *gameData, PokeParty *party, const RTCTime *time, u8 season) {
     int nightStart = GetLightChangeHoursForSeasons(season, 3);
     int morning = GetLightChangeHoursForSeasons(season, 0);
     BOOL night = FALSE;
 
     if (time->hour >= nightStart || time->hour < morning) {
-        func_ov012_02164428(gameData, party);
+        ShayminForm_RevertPartyAndRegister(gameData, party);
         night = TRUE;
     }
     return night;
 }
 
-void func_ov012_02164428(GameData *gameData, PokeParty *party) {
+void ShayminForm_RevertPartyAndRegister(GameData *gameData, PokeParty *party) {
     int count;
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     BOOL registered = FALSE;

@@ -4,11 +4,13 @@
 #include "gfl/std.h"
 #include "save/save_control.h"
 
-static u8 func_ov012_02161298(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int start, int count);
-static u32 func_ov012_021612e4(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count);
-static u32 func_ov012_021612fc(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count);
-static u16 func_ov012_02161314(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count);
-static u16 func_ov012_02161334(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count);
+static u8 SymbolSaveField_CopyPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int start, int count);
+static u32 SymbolSaveField_CopySlots0To9(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count);
+static u32 SymbolSaveField_CopySlots10To19(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count);
+static u16 SymbolSaveField_CopyUpperRowAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area,
+                                                   u8 *count);
+static u16 SymbolSaveField_CopyLowerAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area,
+                                                u8 *count);
 
 u32 func_ov012_02161260(AreaNPCSave *npcData) {
     u8 value;
@@ -19,7 +21,7 @@ u32 func_ov012_02161260(AreaNPCSave *npcData) {
     return value;
 }
 
-u32 func_ov012_0216127c(AreaNPCSave *npcData) {
+u32 SymbolSaveField_GetDeepestArea(AreaNPCSave *npcData) {
     u8 value;
 
     SymbolSave_Decrypt(npcData);
@@ -29,7 +31,7 @@ u32 func_ov012_0216127c(AreaNPCSave *npcData) {
 }
 
 // Copies count Pokémon from start, and returns how many there are before the first empty one
-static u8 func_ov012_02161298(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int start, int count) {
+static u8 SymbolSaveField_CopyPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int start, int count) {
     int i = 0;
 
     MI_CpuFill8(dest, 0, max * sizeof(EntreeForestPokemon));
@@ -44,43 +46,45 @@ static u8 func_ov012_02161298(AreaNPCSave *npcData, EntreeForestPokemon *dest, i
     return i;
 }
 
-static u32 func_ov012_021612e4(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count) {
-    *count = func_ov012_02161298(npcData, dest, max, 0, 10);
+static u32 SymbolSaveField_CopySlots0To9(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count) {
+    *count = SymbolSaveField_CopyPokemon(npcData, dest, max, 0, 10);
     return 0;
 }
 
-static u32 func_ov012_021612fc(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count) {
-    *count = func_ov012_02161298(npcData, dest, max, 10, 10);
+static u32 SymbolSaveField_CopySlots10To19(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, u8 *count) {
+    *count = SymbolSaveField_CopyPokemon(npcData, dest, max, 10, 10);
     return 10;
 }
 
-static u16 func_ov012_02161314(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count) {
+static u16 SymbolSaveField_CopyUpperRowAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area,
+                                                   u8 *count) {
     u16 start = area * 10 + 20;
 
-    *count = func_ov012_02161298(npcData, dest, max, start, 10);
+    *count = SymbolSaveField_CopyPokemon(npcData, dest, max, start, 10);
     return start;
 }
 
-static u16 func_ov012_02161334(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count) {
+static u16 SymbolSaveField_CopyLowerAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area,
+                                                u8 *count) {
     u16 start = area * 20 + 50;
 
-    *count = func_ov012_02161298(npcData, dest, max, start, 20);
+    *count = SymbolSaveField_CopyPokemon(npcData, dest, max, start, 20);
     return start;
 }
 
-u32 func_ov012_02161354(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count) {
+u32 SymbolSaveField_GetAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count) {
     u8 extra = 0;
     u32 start;
 
     MI_CpuFill8(dest, 0, max * sizeof(EntreeForestPokemon));
     if (area == 0) {
-        start = func_ov012_021612e4(npcData, dest, max, count);
-        func_ov012_021612fc(npcData, dest + 10, max - 10, &extra);
+        start = SymbolSaveField_CopySlots0To9(npcData, dest, max, count);
+        SymbolSaveField_CopySlots10To19(npcData, dest + 10, max - 10, &extra);
         *count += extra;
     } else if (area >= 1 && area < 4) {
-        start = func_ov012_02161314(npcData, dest, max, area - 1, count);
+        start = SymbolSaveField_CopyUpperRowAreaPokemon(npcData, dest, max, area - 1, count);
     } else {
-        start = func_ov012_02161334(npcData, dest, max, area - 4, count);
+        start = SymbolSaveField_CopyLowerAreaPokemon(npcData, dest, max, area - 4, count);
     }
     return start;
 }

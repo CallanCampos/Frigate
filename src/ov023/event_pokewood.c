@@ -416,7 +416,7 @@ static BtlSetup *EventPokewood_LoadWatchSetup(GameSystem *gsys, Field *field, He
         return EventPokewood_LoadBlockSetup(gsys, field, heapId);
     }
     setup = EventPokewood_LoadDownloadedSetup(gsys, field, heapId, slot);
-    func_ov012_02160488(setup->unkDF);
+    GameBeacon_BroadcastPokestarWatching(setup->unkDF);
     return setup;
 }
 

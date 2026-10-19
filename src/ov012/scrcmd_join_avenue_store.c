@@ -23,7 +23,7 @@ BOOL s02C6_JoinAvenueStoreEnd(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216acfc(VM *vm, FieldScriptEnv *env) {
+BOOL s02CB_PokewoodGetLevel(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u32 level = func_020111ec(func_020111b0(PokewoodSave_Get(FieldScriptEnv_GetGameData(env))));
 

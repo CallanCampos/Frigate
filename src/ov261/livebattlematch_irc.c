@@ -123,7 +123,7 @@ void LiveBattleMatchIrc_Main(LiveBattleMatchIrc *irc) {
 BOOL LiveBattleMatchIrc_CheckError(LiveBattleMatchIrc *irc) {
     if (GFL_NetErrCheck()) {
         if (irc->p_delivery != NULL) {
-            func_ov012_02153150(irc->p_delivery);
+            DeliveryIrc_End(irc->p_delivery);
             irc->p_delivery = NULL;
         }
         GFL_NetErrShutdown();
@@ -298,27 +298,27 @@ void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, void *buffer) {
     init.data[0].mask = LIVEBATTLEMATCH_VERSION_MASK;
     init.dataNum = 1;
     GFL_ASSERT(p_wk->p_delivery == NULL);
-    p_wk->p_delivery = func_ov012_0215309c(&init);
+    p_wk->p_delivery = DeliveryIrc_Init(&init);
     p_wk->state = 0;
 }
 
 int LiveBattleMatchIrc_StepDelivery(LiveBattleMatchIrc *irc) {
     if (irc->p_delivery != NULL) {
-        func_ov012_0215313c(irc->p_delivery);
+        DeliveryIrc_Main(irc->p_delivery);
     }
     switch (irc->state) {
     case 0:
-        func_ov012_021530f8(irc->p_delivery);
+        DeliveryIrc_RecvStart(irc->p_delivery);
         irc->state++;
         break;
     case 1:
-        irc->deliveryResult = func_ov012_02153130(irc->p_delivery);
+        irc->deliveryResult = DeliveryIrc_GetResult(irc->p_delivery);
         if (irc->deliveryResult != 0) {
             irc->state++;
         }
         break;
     case 2:
-        func_ov012_02153150(irc->p_delivery);
+        DeliveryIrc_End(irc->p_delivery);
         irc->p_delivery = NULL;
         irc->state++;
         break;
@@ -345,12 +345,12 @@ void LiveBattleMatchIrc_ResetDeliveryEnd(LiveBattleMatchIrc *irc) {
 
 BOOL LiveBattleMatchIrc_StepDeliveryEnd(LiveBattleMatchIrc *irc) {
     if (irc->p_delivery != NULL) {
-        func_ov012_0215313c(irc->p_delivery);
+        DeliveryIrc_Main(irc->p_delivery);
     }
     switch (irc->state) {
     case 0:
         if (irc->p_delivery != NULL) {
-            func_ov012_02153150(irc->p_delivery);
+            DeliveryIrc_End(irc->p_delivery);
             irc->p_delivery = NULL;
         }
         irc->state++;

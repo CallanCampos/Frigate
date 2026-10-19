@@ -446,7 +446,7 @@ PartyPkm *func_ov033_021780d8(FieldScriptEnv *env, MysteryGift *gift) {
 
     heapId = FieldScriptEnv_GetHeapID(env);
     gameData = FieldScriptEnv_GetGameData(env);
-    return func_ov012_02153160(gift, heapId, gameData);
+    return CreateMysteryGiftPokemon(gift, heapId, gameData);
 }
 
 BOOL doesPartyHaveSpace(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {

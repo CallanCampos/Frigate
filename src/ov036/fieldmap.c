@@ -342,7 +342,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
 
     switch (field->subroutinePhase) {
     case 0:
-        func_ov012_0215ef28(gameData, field->zoneId);
+        ZoneChange_OnFieldLoad(gameData, field->zoneId);
         field->msgBGSys = CreateFieldMsgBGSystem(field->heapId, field->g3dCamera);
         field->moneyWin = NULL;
         field->placeName = FieldPlaceName_Create(gsys, 0x93, field->msgBGSys);
@@ -531,7 +531,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     Field_CheckDoRealTimeLoad(field);
     if (!GSYS_GetEventRunningFlag(gsys)) {
         field->ctrlVTable->update(field, &field->playerPos);
-        func_ov012_02162f44(field->gameData);
+        EvTime_Update(field->gameData);
     }
     if (field->placeName != NULL) {
         func_ov036_021b4ff8(field->placeName);
@@ -1081,14 +1081,14 @@ void Field_InitActorSystem(Field *field) {
                               FieldPlayer_GetObjCodeByExState(getTrainerGender(GetGameDataPlayerInfo(gameData)), 0));
     FesGimmick_BindActorSystem(field->fesGimmick, actorSystem);
     FieldActorG3DSystem_Create(field->actorSystem, field->g3DObjSystem);
-    func_ov012_021667cc(field->actorSystem, func_ov036_021863d8(field->cameraSystem));
-    func_ov012_02166d48(field->actorSystem);
-    func_ov012_021673e0(actorSystem, func_ov036_021813b8(field->zoneId));
+    FldActSys_InitDraw(field->actorSystem, func_ov036_021863d8(field->cameraSystem));
+    FldActSys_WakeUpAllActors(field->actorSystem);
+    FldActSys_SetShadowsEnabled(actorSystem, func_ov036_021813b8(field->zoneId));
 }
 
 void Field_SuspendActorSystem(Field *field) {
     FldActSys_SuspendAllActors(field->actorSystem);
-    func_ov012_02166764(field->actorSystem);
+    FldActSys_DetachField(field->actorSystem);
     field->actorSystem = NULL;
 }
 
@@ -1155,7 +1155,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     EventData_Reset(eventData);
     EventData_LoadEntities(eventData, zoneId, GameData_GetSeason(gameData));
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
-    func_ov012_0215ee10(gameData, field);
+    ZoneChange_OnSeamless(gameData, field);
     Field_SwapZoneBGM(field, zoneId);
     Field_SwapFog(field, zoneId);
     Field_SwapWeather(field, zoneId);
@@ -1173,7 +1173,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     resetRebattleTrainers(GameData_GetEventWork(gameData));
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     Field_HotswapSpawnActors(field, gameData, actorSystem, eventData, zoneId);
-    func_ov012_021683f4(field->gameSystem, zoneId);
+    FestMission_OnZoneEnter(field->gameSystem, zoneId);
     func_ov036_021b6660(field->fesGimmick);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     func_ov012_02153668(GSYS_GetGameCommSystem(field->gameSystem));

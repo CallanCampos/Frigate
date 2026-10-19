@@ -338,7 +338,8 @@ void func_ov127_021efde0(InfinityDungeonRoomChange *roomChange, InfinityDungeonR
             u16 trainerId = InfinityDungeon_GetTrainerId(roomChange->dungeon, roomChange->floor, slot);
 
             if (trainerId != INFINITY_DUNGEON_TRAINER_NONE) {
-                u16 objCode = func_ov012_02162b0c(INFINITY_DUNGEON_ARC_TRAINERS, trainerId, roomChange->heapId);
+                u16 objCode =
+                    BtlInst_GetRomTrainerObjCode(INFINITY_DUNGEON_ARC_TRAINERS, trainerId, roomChange->heapId);
                 FieldActor *actor =
                     CreateNewActorByParam(roomChange->actorSystem, roomNpc->x, roomNpc->y, npc->direction, 176 + slot,
                                           objCode, npc->moveCode, destination->zoneId);
@@ -374,8 +375,8 @@ GameEvent *func_ov127_021efeec(GameSystem *gsys, Field *field, u8 a2) {
     u8 partyCount;
 
     MATH_InitRand32(&rand, seed);
-    trainerData = func_ov012_021628c0(&trainer, INFINITY_DUNGEON_ARC_TRAINERS, trainerId, 0x35, HEAPID_FIELDMAP);
-    func_ov012_0216292c(trainerData, trainerId, trainer.pokemon, 2, INFINITY_DUNGEON_ARC_POKEMON, NULL, NULL, NULL,
+    trainerData = BtlInst_MakeRomTrainer(&trainer, INFINITY_DUNGEON_ARC_TRAINERS, trainerId, 0x35, HEAPID_FIELDMAP);
+    BtlInst_MakeRomTeam(trainerData, trainerId, trainer.pokemon, 2, INFINITY_DUNGEON_ARC_POKEMON, NULL, NULL, NULL,
                         &rand, func_ov127_021f0b68(mode), HEAPID_FIELDMAP);
     GFL_HeapFree(trainerData);
     levels = func_ov127_021f0b5c(mode);
@@ -386,10 +387,10 @@ GameEvent *func_ov127_021efeec(GameSystem *gsys, Field *field, u8 a2) {
     for (i = 0; i < partyCount; i++) {
         PokeParty_AddPkm(battleParty, PokeParty_GetPkm(party, i));
     }
-    setup = func_ov012_02162068(gsys, battleParty, partyCount, 0, 2, &trainer, 0, 0x500, levels->maxLevel,
-                                levels->minLevel, 0, version, mode, field, &rand);
+    setup = SetupInfinityDungeonBattle(gsys, battleParty, partyCount, 0, 2, &trainer, 0, 0x500, levels->maxLevel,
+                                       levels->minLevel, 0, version, mode, field, &rand);
     GFL_HeapFree(battleParty);
-    return func_ov012_021688ac(gsys, field, setup);
+    return EventInfinityDungeonBattleCall_Create(gsys, field, setup);
 }
 
 void func_ov127_021f0040(KeyDataSave *keyData, InfinityDungeon *dungeon) {
@@ -783,7 +784,7 @@ static u32 func_ov127_021f0724(InfinityDungeonNpcScriptArg *arg) {
 
 static u32 func_ov127_021f0798(InfinityDungeonNpcScriptArg *arg) {
     BSubwayTrainer trainer;
-    u16 *trainerData = func_ov012_021628c0(
+    u16 *trainerData = BtlInst_MakeRomTrainer(
         &trainer, INFINITY_DUNGEON_ARC_TRAINERS,
         InfinityDungeon_GetTrainerId(arg->dungeon, arg->dungeon->targetFloor, arg->dungeon->targetSlot), 0x35,
         HEAPID_FIELDMAP);

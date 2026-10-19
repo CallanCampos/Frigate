@@ -43,7 +43,7 @@ BOOL s0276_FunfestMissionBroadcast(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameSystem(env);
     type = ScriptReadAny(vm, env);
     value = ScriptReadAny(vm, env);
-    func_ov012_0216063c(type, value);
+    GameBeacon_BroadcastMission(type, value);
     return TRUE;
 }
 

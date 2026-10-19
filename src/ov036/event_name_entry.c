@@ -115,7 +115,7 @@ static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, 
             RecordAddOne(GameData_GetRecords(GSYS_GetGameData(work->gsys)), 0x1e);
         }
         GFL_StrBufFree(work->name);
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;
@@ -234,7 +234,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);
         }
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;
@@ -271,7 +271,7 @@ static GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state,
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);
         }
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;
@@ -318,7 +318,7 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
             *work->result = 0;
         }
         GFL_StrBufFree(speciesName);
-        func_ov012_02165ae8(work->nameEntry);
+        NameEntryParam_Free(work->nameEntry);
         return TRUE;
     }
     return FALSE;

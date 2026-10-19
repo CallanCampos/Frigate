@@ -8,12 +8,12 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL func_ov012_02165598(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216564c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_021656a8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_021656e0(VM *vm, FieldScriptEnv *env);
+BOOL s020E_SpPokeJump(VM *vm, FieldScriptEnv *env);
+BOOL s020F_SpPokeAppear(VM *vm, FieldScriptEnv *env);
+BOOL s0210_SpPokeWaitAnimEnd(VM *vm, FieldScriptEnv *env);
+BOOL s0211_SpPokeWaitFrame(VM *vm, FieldScriptEnv *env);
 BOOL s020D_PokePartyFindEx(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_021658c8(VM *vm, FieldScriptEnv *env);
+BOOL s0215_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02165950(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_SP_POKE_GIMMICK_H

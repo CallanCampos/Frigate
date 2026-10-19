@@ -112,7 +112,7 @@ void UnionMain_OnFieldIn(void *param, void *work, Field *field) {
         UnionOneself_UpdateMarks(unisys, GSYS_GetGameData(unisys->param->gsys), field);
     }
     if (colosseum != NULL && colosseum->unkC8_0 == TRUE) {
-        func_ov012_021615a4(colosseum->commPlayer);
+        CommPlayer_RestoreActors(colosseum->commPlayer);
     }
 }
 
@@ -125,7 +125,7 @@ void UnionMain_OnFieldOut(void *param, void *work, Field *field) {
             Colosseum_Free(colosseum, unisys->param->gsys);
             unisys->colosseum_sys = NULL;
         } else if (colosseum->unkC8_0 == TRUE) {
-            func_ov012_02161544(colosseum->commPlayer);
+            CommPlayer_HideActors(colosseum->commPlayer);
         }
     }
     unisys->fieldActive = FALSE;

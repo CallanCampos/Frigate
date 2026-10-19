@@ -18,12 +18,12 @@ typedef struct {
 } DeliveryIrcInit;
 
 // The work is passed as void * by the screens that use it
-void *func_ov012_0215309c(const DeliveryIrcInit *init);
+void *DeliveryIrc_Init(const DeliveryIrcInit *init);
 // Starts the network, unless it is busy
-BOOL func_ov012_021530f8(void *work);
+BOOL DeliveryIrc_RecvStart(void *work);
 // 1 once the data came or went, 2 if it came damaged, 3 if there was none to give
-u8 func_ov012_02153130(void *work);
-void func_ov012_0215313c(void *work);
-void func_ov012_02153150(void *work);
+u8 DeliveryIrc_GetResult(void *work);
+void DeliveryIrc_Main(void *work);
+void DeliveryIrc_End(void *work);
 
 #endif // POKEBW2_FIELD_DELIVERY_IRC_H

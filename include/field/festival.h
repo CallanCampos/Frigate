@@ -114,9 +114,9 @@ u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
 void *GetFestMissionCfg(LinkFestival *festival);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone
-u16 func_ov012_02168320(u16 zoneId);
-void func_ov012_02168348(u32 seed, int skip, MATHRandContext32 *rand);
-u32 func_ov012_021683a8(MATHRandContext32 *rand, u32 max, const u32 *list, int count);
+u16 FestMission_GetMissionZone(u16 zoneId);
+void FestMission_InitRand(u32 seed, int skip, MATHRandContext32 *rand);
+u32 FestMission_RandExcluding(MATHRandContext32 *rand, u32 max, const u32 *list, int count);
 LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys);
 void FreeLinkFestival(LinkFestival *festival);
 void LinkFestival_Update(LinkFestival *festival);

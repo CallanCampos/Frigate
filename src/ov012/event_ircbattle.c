@@ -65,7 +65,7 @@ void TrimPartyTo3Members(PokeParty *party) {
     }
 }
 
-void func_ov012_02150484(EventIRCWork *work) {
+void TrimPartiesTo3Members(EventIRCWork *work) {
     s32 i;
 
     TrimPartyTo3Members(work->party);
@@ -75,7 +75,7 @@ void func_ov012_02150484(EventIRCWork *work) {
 }
 
 // Records the battle with each other player in the friend list
-void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
+void EventIRC_RecordFriendBattles(EventIRCWork *work, GameData *gameData) {
     s32 partner = 0;
     s32 count;
     u32 place;
@@ -120,7 +120,7 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
 }
 
 // Puts each player's party and info in their place in the battle
-void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
+void EventIRC_SetBattlePlayers(EventIRCWork *work, GameSystem *gsys) {
     if (work->btlSetup->fieldSituation.unk1a) {
         if (work->ircMatch.order[GFL_NetGetHandleNetId(NetHandle_GetOwn())] < 2) {
             s32 i = 0;
@@ -285,7 +285,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
                                       HEAPID_GAMEEVENT);
             work->btlSetup->fieldSituation.unk1a = 1;
             work->btlSetup->battleStyle = 1;
-            func_ov012_02150484(work);
+            TrimPartiesTo3Members(work);
             break;
         }
         }
@@ -319,7 +319,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
     case 11: {
         EventMakeArgs args;
 
-        func_ov012_02150588(work, gsys);
+        EventIRC_SetBattlePlayers(work, gsys);
         GFL_OvlUnload(OVERLAY_BATTLE_MAIN);
         args.setup = work->btlSetup;
         args.players = &work->players;
@@ -332,11 +332,11 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
-        func_ov012_021504a4(work, GSYS_GetGameData(gsys));
+        EventIRC_RecordFriendBattles(work, GSYS_GetGameData(gsys));
         BtlSetup_Free(work->btlSetup);
         work->btlSetup = NULL;
         GFL_SndBGMStopImmediate();
-        func_ov012_02150ccc(work);
+        EventIRC_RestoreBgm(work);
         *state = 17;
         break;
     case 13:
@@ -410,7 +410,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         }
         break;
     case 21:
-        func_ov012_02150ccc(work);
+        EventIRC_RestoreBgm(work);
         GameEvent_ChainNext(event, EventFieldOpen_CreateHeadless(gsys));
         (*state)++;
         break;
@@ -420,7 +420,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         break;
     case 23:
         GFL_NetIwFree();
-        func_ov012_02150cac(work);
+        EventIRC_FreeParties(work);
         return GAMEEVENT_DONE;
     case 24:
         (*state)++;
@@ -464,7 +464,7 @@ GameEvent *CallIRC(GameSystem *gsys, Field *field, GameEvent *event, BOOL create
     return event;
 }
 
-void func_ov012_02150cac(EventIRCWork *work) {
+void EventIRC_FreeParties(EventIRCWork *work) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -474,7 +474,7 @@ void func_ov012_02150cac(EventIRCWork *work) {
 }
 
 // Brings back the music from before the battle
-void func_ov012_02150ccc(EventIRCWork *work) {
+void EventIRC_RestoreBgm(EventIRCWork *work) {
     if (work->bgm) {
         GFL_SndBGMPlay(work->bgm, SND_CHANNEL_MASK_ALL);
         GFL_SndBGMFadeIn(60);
@@ -483,14 +483,14 @@ void func_ov012_02150ccc(EventIRCWork *work) {
 }
 
 // Accessors for the infrared menu of overlay 36
-void func_ov012_02150cec(EventIRCWork *work, u32 mode) {
+void EventIRC_SetMode(EventIRCWork *work, u32 mode) {
     work->mode = mode;
 }
 
-GameSystem *func_ov012_02150cf0(EventIRCWork *work) {
+GameSystem *EventIRC_GetGameSystem(EventIRCWork *work) {
     return work->gsys;
 }
 
-SaveControl *func_ov012_02150cf4(EventIRCWork *work) {
+SaveControl *EventIRC_GetSaveControl(EventIRCWork *work) {
     return work->save;
 }

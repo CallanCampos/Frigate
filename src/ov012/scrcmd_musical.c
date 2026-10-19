@@ -54,23 +54,23 @@ typedef struct {
     u32 unk8;
 } MusicalOv020Args;
 
-void func_ov012_02158bfc(ScriptWork *work, GameData *gameData);
-void func_ov012_02158c40(MusicalCommWork *work, GameData *gameData);
-void func_ov012_02158c6c(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value);
-void func_ov012_02158c78(MusicalCommWork *work);
-GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *data);
-GameEventReturnCode func_ov012_02158d24(GameEvent *event, u32 *state, void *data);
-void func_ov012_02158da0(void *arg);
-void func_ov012_02158dac(void *arg);
+void MusicalCommWork_Create(ScriptWork *work, GameData *gameData);
+void MusicalCommWork_Free(MusicalCommWork *work, GameData *gameData);
+void MusicalCommWork_BootComm(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value);
+void MusicalCommWork_QuitComm(MusicalCommWork *work);
+GameEventReturnCode MusicalCallEvent_Callback(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode MusicalDressUpEvent_Callback(GameEvent *event, u32 *state, void *data);
+void MusicalShotHolder_Free(void *arg);
+void MusicalIrcMatch_OnReturn(void *arg);
 BOOL func_ov012_02158de8(VM *vm, void *arg);
 BOOL func_ov012_02158e44(VM *vm, void *arg);
-BOOL func_ov012_02158e9c(VM *vm, void *arg);
-BOOL func_ov012_02158ee4(VM *vm, void *arg);
-BOOL func_ov012_02158f20(VM *vm, void *arg);
-BOOL func_ov012_02158f64(VM *vm, void *arg);
-BOOL func_ov012_02158fb8(VM *vm, void *arg);
+BOOL ScriptNative_MusicalTimingWait(VM *vm, void *arg);
+BOOL ScriptNative_MusicalScriptRecvWait(VM *vm, void *arg);
+BOOL ScriptNative_MusicalCommBootWait(VM *vm, void *arg);
+BOOL ScriptNative_MusicalCommEndWait(VM *vm, void *arg);
+BOOL ScriptNative_MusicalPokesRecvWait(VM *vm, void *arg);
 
-BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
+BOOL s0163_MusicalCall(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -90,10 +90,10 @@ BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
     if (kind <= 1) {
         commWork = GameData_GetMusicalCommWork(gameData);
         online = kind != 0 ? TRUE : FALSE;
-        event = GameEvent_Create(gsys, NULL, func_ov012_02158c8c, sizeof(MusicalCallEvent));
+        event = GameEvent_Create(gsys, NULL, MusicalCallEvent_Callback, sizeof(MusicalCallEvent));
         data = GameEvent_GetData(event);
         MI_CpuFill8(data, 0, sizeof(MusicalCallEvent));
-        data->event = func_ov012_02150cf8(gsys, gameData, arg, online, commWork);
+        data->event = MusicalEvent_Create(gsys, gameData, arg, online, commWork);
         data->work = commWork;
         data->online = online;
         ScriptWork_SetPostEvent(work, event);
@@ -110,11 +110,11 @@ BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
     holder->param->loadData = TRUE;
     ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(
                                    gsys, field, OVERLAY_ID(209), &MUSICAL_SHOT_PROC_FUNCTIONS, holder->param,
-                                   func_ov012_02158da0, holder));
+                                   MusicalShotHolder_Free, holder));
     return TRUE;
 }
 
-BOOL func_ov012_021581e4(VM *vm, FieldScriptEnv *env) {
+BOOL s0164_MusicalCallDressUp(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -128,7 +128,7 @@ BOOL func_ov012_021581e4(VM *vm, FieldScriptEnv *env) {
     slot = ScriptReadAny(vm, env);
     save = getMusicalInfoBlkAddress(gameData);
     poke = MusicalSystem_InitPokeFromPkm(PokeParty_GetPkm(GameData_GetParty(gameData), slot), HEAPID_GAMEEVENT);
-    event = GameEvent_Create(gsys, NULL, func_ov012_02158d24, sizeof(MusicalDressUpEvent));
+    event = GameEvent_Create(gsys, NULL, MusicalDressUpEvent_Callback, sizeof(MusicalDressUpEvent));
     data = GameEvent_GetData(event);
     MI_CpuFill8(data, 0, sizeof(MusicalDressUpEvent));
     data->param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MusicalDressUpParam), TRUE, "scrcmd_musical.c", 218);
@@ -139,7 +139,7 @@ BOOL func_ov012_021581e4(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02158280(VM *vm, FieldScriptEnv *env) {
+BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u32 mostIndex;
     u32 fewestIndex;
@@ -308,37 +308,37 @@ BOOL func_ov012_02158280(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 30:
-        *result = func_ov012_02151b80(event);
+        *result = MusicalEvent_GetPlayerPos(event);
         break;
     case 31:
-        *result = func_ov012_02151bf4(event);
+        *result = MusicalEvent_GetMaxPoints(event);
         break;
     case 32:
-        *result = func_ov012_02151c18(event);
+        *result = MusicalEvent_GetMinPoints(event);
         break;
     case 33:
-        *result = func_ov012_02151bd4(event, arg);
+        *result = MusicalEvent_GetPoints(event, arg);
         break;
     case 35:
-        *result = func_ov012_02151b88(event, arg);
+        *result = MusicalEvent_GetEntryIndex(event, arg);
         break;
     case 36:
-        *result = func_ov012_02151ba8(event);
+        *result = MusicalEvent_GetTopPropKind(event);
         break;
     case 37:
-        *result = func_ov012_02151c3c(event, arg);
+        *result = MusicalEvent_GetPosAtRank(event, arg);
         break;
     case 38:
-        *result = func_ov012_02151c44(event, arg);
+        *result = MusicalEvent_GetBestPropKind(event, arg);
         break;
     case 39:
-        *result = func_ov012_02151c8c(event, arg);
+        *result = MusicalEvent_GetOwnerTrainerClass(event, arg);
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov012_02158550(VM *vm, FieldScriptEnv *env) {
+BOOL s0166_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 arg = ScriptReadAny(vm, env);
     u8 kind = VM_Read8(vm);
     u16 *result = ScriptReadVar(vm, env);
@@ -380,7 +380,7 @@ BOOL func_ov012_02158550(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_021585e0(VM *vm, FieldScriptEnv *env) {
+BOOL s0168_MusicalAddProp(VM *vm, FieldScriptEnv *env) {
     u16 prop = ScriptReadAny(vm, env);
 
     MusicalSave_AddProp(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), prop);
@@ -428,7 +428,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         GFL_MsgDataFree(msgData);
         break;
     case 2:
-        str = func_ov012_02151bb4(GameData_GetMusicalCommWork(gameData)->event, heapId);
+        str = MusicalEvent_GetProgramTitle(GameData_GetMusicalCommWork(gameData)->event, heapId);
         func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         break;
@@ -447,10 +447,10 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         GFL_MsgDataFree(msgData);
         break;
     case 5:
-        func_ov012_02151cd4(GameData_GetMusicalCommWork(gameData)->event, arg, wordSet, wordIndex);
+        MusicalEvent_WordSetOwnerName(GameData_GetMusicalCommWork(gameData)->event, arg, wordSet, wordIndex);
         break;
     case 6:
-        func_ov012_02151d6c(GameData_GetMusicalCommWork(gameData)->event, arg, wordSet, wordIndex);
+        MusicalEvent_WordSetPokeName(GameData_GetMusicalCommWork(gameData)->event, arg, wordSet, wordIndex);
         break;
     case 7:
         musical = getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env));
@@ -501,14 +501,14 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02158858(VM *vm, FieldScriptEnv *env) {
+BOOL s0169_MusicalClearAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
     func_0200ae6c(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), index)->unk1 = 0;
     return FALSE;
 }
 
-BOOL func_ov012_0215887c(VM *vm, FieldScriptEnv *env) {
+BOOL s016A_MusicalSelectPoke(VM *vm, FieldScriptEnv *env) {
     u16 *a0 = ScriptReadVar(vm, env);
     u16 *a1 = ScriptReadVar(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -523,7 +523,7 @@ BOOL func_ov012_0215887c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
+BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -545,25 +545,25 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
     if (kind != 0 && kind != 21) {
         commWork = GameData_GetMusicalCommWork(gameData);
         if (commWork->event != NULL) {
-            func_ov012_02151e44(commWork->event);
-            if (func_ov012_02151e64(commWork->event) == TRUE) {
+            MusicalEvent_CheckNetError(commWork->event);
+            if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
                 lost = TRUE;
             }
         }
     }
     switch (kind) {
     case 0:
-        func_ov012_02158bfc(work, gameData);
+        MusicalCommWork_Create(work, gameData);
         break;
     case 1:
-        func_ov012_02158c40(commWork, gameData);
+        MusicalCommWork_Free(commWork, gameData);
         break;
     case 10:
-        func_ov012_02158c6c(commWork, gsys, GSYS_GetGameCommSystem(gsys), arg);
+        MusicalCommWork_BootComm(commWork, gsys, GSYS_GetGameCommSystem(gsys), arg);
         break;
     case 11:
-        func_ov012_02158c78(commWork);
-        VM_SetNativeCallback(vm, func_ov012_02158f64);
+        MusicalCommWork_QuitComm(commWork);
+        VM_SetNativeCallback(vm, ScriptNative_MusicalCommEndWait);
         return TRUE;
     case 12:
         commWork->result = result;
@@ -592,22 +592,22 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         if (allowed) {
             commWork->value = arg;
             func_ov211_021ef988(commWork->comm, commWork->value);
-            VM_SetNativeCallback(vm, func_ov012_02158e9c);
+            VM_SetNativeCallback(vm, ScriptNative_MusicalTimingWait);
             return TRUE;
         }
         break;
     case 15:
         if (commWork->comm != NULL && !lost) {
-            VM_SetNativeCallback(vm, func_ov012_02158ee4);
+            VM_SetNativeCallback(vm, ScriptNative_MusicalScriptRecvWait);
             return TRUE;
         }
         break;
     case 16:
-        VM_SetNativeCallback(vm, func_ov012_02158f20);
+        VM_SetNativeCallback(vm, ScriptNative_MusicalCommBootWait);
         return TRUE;
     case 17:
         if (commWork->comm != NULL && !lost) {
-            VM_SetNativeCallback(vm, func_ov012_02158fb8);
+            VM_SetNativeCallback(vm, ScriptNative_MusicalPokesRecvWait);
             return TRUE;
         }
         break;
@@ -627,7 +627,7 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         }
         ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(
                                        gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
-                                       &commWork->ircMatch, func_ov012_02158dac, holder));
+                                       &commWork->ircMatch, MusicalIrcMatch_OnReturn, holder));
         return TRUE;
     case 19:
         if (commWork->comm != NULL && lost == TRUE) {
@@ -677,7 +677,7 @@ BOOL s02EF_MusicalGetOwnedPropCount(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-void func_ov012_02158bfc(ScriptWork *work, GameData *gameData) {
+void MusicalCommWork_Create(ScriptWork *work, GameData *gameData) {
     MusicalCommWork *commWork =
         GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MusicalCommWork), TRUE, "scrcmd_musical.c", 1138);
 
@@ -688,25 +688,25 @@ void func_ov012_02158bfc(ScriptWork *work, GameData *gameData) {
     GFL_OvlLoad(OVERLAY_ID(211));
 }
 
-void func_ov012_02158c40(MusicalCommWork *work, GameData *gameData) {
+void MusicalCommWork_Free(MusicalCommWork *work, GameData *gameData) {
     GFL_OvlUnload(OVERLAY_ID(211));
     GFL_OvlUnload(OVERLAY_ID(210));
     GFL_HeapFree(work);
     GameData_SetMusicalCommWork(gameData, NULL);
 }
 
-void func_ov012_02158c6c(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value) {
+void MusicalCommWork_BootComm(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value) {
     func_ov211_021ef1e0(HEAPID_GAMEEVENT, gsys, comm, value);
 }
 
-void func_ov012_02158c78(MusicalCommWork *work) {
+void MusicalCommWork_QuitComm(MusicalCommWork *work) {
     if (work->comm != NULL) {
         func_ov211_021ef220(work->comm);
         work->comm = NULL;
     }
 }
 
-GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *arg) {
+GameEventReturnCode MusicalCallEvent_Callback(GameEvent *event, u32 *state, void *arg) {
     MusicalCallEvent *data = arg;
     GameData *gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
     GameCommSys *comm;
@@ -718,7 +718,7 @@ GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *arg)
         break;
     case 1:
         GameData_GetFieldSoundSystem(gameData);
-        func_ov012_02158c78(data->work);
+        MusicalCommWork_QuitComm(data->work);
         (*state)++;
         break;
     case 2:
@@ -733,7 +733,7 @@ GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *arg)
             if (data->online == TRUE) {
                 GSYS_TryBootGameComm(GameEvent_GetGameSystem(event));
             }
-            func_ov012_02158c40(data->work, gameData);
+            MusicalCommWork_Free(data->work, gameData);
             (*state)++;
             return GAMEEVENT_DONE;
         }
@@ -742,7 +742,7 @@ GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *arg)
     return GAMEEVENT_CONTINUE;
 }
 
-GameEventReturnCode func_ov012_02158d24(GameEvent *event, u32 *state, void *arg) {
+GameEventReturnCode MusicalDressUpEvent_Callback(GameEvent *event, u32 *state, void *arg) {
     MusicalDressUpEvent *data = arg;
     GameSystem *gsys = GameEvent_GetGameSystem(event);
 
@@ -779,13 +779,13 @@ GameEventReturnCode func_ov012_02158d24(GameEvent *event, u32 *state, void *arg)
     return GAMEEVENT_CONTINUE;
 }
 
-void func_ov012_02158da0(void *arg) {
+void MusicalShotHolder_Free(void *arg) {
     MusicalShotHolder *holder = arg;
 
     GFL_HeapFree(holder->param);
 }
 
-void func_ov012_02158dac(void *arg) {
+void MusicalIrcMatch_OnReturn(void *arg) {
     MusicalIrcMatchHolder *holder = arg;
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(holder->env);
 
@@ -862,15 +862,15 @@ BOOL func_ov012_02158e44(VM *vm, void *arg) {
     return done;
 }
 
-BOOL func_ov012_02158e9c(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalTimingWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     MusicalCommWork *commWork;
 
     FieldScriptEnv_GetScriptWork(env);
     commWork = GameData_GetMusicalCommWork(FieldScriptEnv_GetGameData(env));
     if (commWork->event != NULL) {
-        func_ov012_02151e44(commWork->event);
-        if (func_ov012_02151e64(commWork->event) == TRUE) {
+        MusicalEvent_CheckNetError(commWork->event);
+        if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
             return TRUE;
         }
     }
@@ -880,14 +880,14 @@ BOOL func_ov012_02158e9c(VM *vm, void *arg) {
     return FALSE;
 }
 
-BOOL func_ov012_02158ee4(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalScriptRecvWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     MusicalCommWork *commWork;
 
     FieldScriptEnv_GetScriptWork(env);
     commWork = GameData_GetMusicalCommWork(FieldScriptEnv_GetGameData(env));
-    func_ov012_02151e44(commWork->event);
-    if (func_ov012_02151e64(commWork->event) == TRUE) {
+    MusicalEvent_CheckNetError(commWork->event);
+    if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
         return TRUE;
     }
     if (func_ov211_021f03e0(commWork->comm) == TRUE) {
@@ -896,7 +896,7 @@ BOOL func_ov012_02158ee4(VM *vm, void *arg) {
     return FALSE;
 }
 
-BOOL func_ov012_02158f20(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalCommBootWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     GameSystem *gsys;
     GameData *gameData;
@@ -915,7 +915,7 @@ BOOL func_ov012_02158f20(VM *vm, void *arg) {
     return FALSE;
 }
 
-BOOL func_ov012_02158f64(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalCommEndWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     GameSystem *gsys;
     GameData *gameData;
@@ -928,8 +928,8 @@ BOOL func_ov012_02158f64(VM *vm, void *arg) {
     comm = GSYS_GetGameCommSystem(gsys);
     commWork = GameData_GetMusicalCommWork(gameData);
     if (commWork->event != NULL) {
-        func_ov012_02151e44(commWork->event);
-        if (func_ov012_02151e64(commWork->event) == TRUE) {
+        MusicalEvent_CheckNetError(commWork->event);
+        if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
             return TRUE;
         }
     }
@@ -939,14 +939,14 @@ BOOL func_ov012_02158f64(VM *vm, void *arg) {
     return FALSE;
 }
 
-BOOL func_ov012_02158fb8(VM *vm, void *arg) {
+BOOL ScriptNative_MusicalPokesRecvWait(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     MusicalCommWork *commWork;
 
     FieldScriptEnv_GetScriptWork(env);
     commWork = GameData_GetMusicalCommWork(FieldScriptEnv_GetGameData(env));
-    func_ov012_02151e44(commWork->event);
-    if (func_ov012_02151e64(commWork->event) == TRUE) {
+    MusicalEvent_CheckNetError(commWork->event);
+    if (MusicalEvent_IsNetError(commWork->event) == TRUE) {
         return TRUE;
     }
     if (func_ov211_021f04ac(commWork->comm) == TRUE) {
@@ -956,7 +956,7 @@ BOOL func_ov012_02158fb8(VM *vm, void *arg) {
 }
 
 // The items sent from the Dream World
-BOOL func_ov012_02158ff4(VM *vm, FieldScriptEnv *env) {
+BOOL s01DC_DreamWorldItems(VM *vm, FieldScriptEnv *env) {
     u16 kind = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);

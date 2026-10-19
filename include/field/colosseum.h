@@ -29,7 +29,7 @@ typedef struct {
 } ColosseumMember;
 
 struct UnionColosseum {
-    CommPlayerSys *commPlayer; // from func_ov012_021613d0
+    CommPlayerSys *commPlayer; // from CommPlayer_Init
     u8 unk04[0x14];
     ColosseumMember members[COLOSSEUM_MEMBER_MAX];
     u8 unkC8_0 : 1;

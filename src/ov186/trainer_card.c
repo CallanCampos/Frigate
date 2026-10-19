@@ -1849,12 +1849,12 @@ static void TrainerCard_SetSideActors(TrainerCardWork *wk, int mode, BOOL canEdi
 static void TrainerCard_InitRank(TrainerCardWork *wk) {
     int rank;
 
-    if (func_ov012_02169c04(wk->param->data) == 0) {
+    if (TrainerCardData_GetMedalCount(wk->param->data) == 0) {
         wk->rankFlags &= ~1;
         TrainerCard_SetActorVisible(wk, TRCARD_ACTOR_RANK, FALSE);
         return;
     }
-    rank = func_ov012_02169c10(wk->param->data);
+    rank = TrainerCardData_GetMedalRank(wk->param->data);
     if (rank >= 4) {
         rank = 4;
         if (wk->data->version != VERSION_BLACK2) {

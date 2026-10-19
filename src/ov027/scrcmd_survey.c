@@ -282,9 +282,9 @@ BOOL func_ov027_021706bc(VM *vm, FieldScriptEnv *env) {
     index = ScriptReadAny(vm, env);
     out = ScriptReadVar(vm, env);
     if (index == TrainerGameInfo_GetSurveyQuestion(card)) {
-        *out = func_ov012_02165330(save);
+        *out = Survey_GetCurrentState(save);
     } else {
-        *out = func_ov012_021653d8(save, index);
+        *out = Survey_GetQuestionState(save, index);
     }
     return FALSE;
 }
@@ -299,7 +299,7 @@ BOOL func_ov027_0217070c(VM *vm, FieldScriptEnv *env) {
     save = GameData_GetSaveControl(FieldScriptEnv_GetGameData(env));
     card = getTrainerCardData_wrapper(save);
     out = ScriptReadVar(vm, env);
-    kind = func_ov012_021652cc(TrainerGameInfo_GetSurveyQuestion(card));
+    kind = Survey_GetQuestionType(TrainerGameInfo_GetSurveyQuestion(card));
     switch (kind) {
     case 1:
         result = func_ov027_021707b8(save);
@@ -324,12 +324,12 @@ u16 func_ov027_02170758(SaveControl *save) {
 
     survey = SurveySave_Get(save);
     index = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
-    maximum = func_ov012_02165310(index);
-    count = (u8)func_ov012_021652dc(index);
-    func_ov012_021652ec(index, answers);
+    maximum = Survey_GetQuestionThreshold(index);
+    count = (u8)Survey_GetQuestionAnswerCount(index);
+    Survey_GetQuestionAnswers(index, answers);
     minimum = 0xf694e;
     for (i = 0; i < count; i++) {
-        value = func_ov012_02165480(survey, answers[i]);
+        value = Survey_GetAnswerCount(survey, answers[i]);
         if (value < minimum)
             minimum = value;
     }
@@ -344,7 +344,7 @@ u16 func_ov027_021707b8(SaveControl *save) {
     SurveySave_Get(save);
     index = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     length = detectLengthSinceLastSession(save);
-    result = func_ov012_02165320((u8)index) - length;
+    result = Survey_GetQuestionHours((u8)index) - length;
     if (result < 0)
         result = 0;
     return result;

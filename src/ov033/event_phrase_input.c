@@ -128,11 +128,11 @@ void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *para
         break;
     case 7:
         GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
-        func_ov012_021603ec(param->name, param->unk34);
+        GameBeacon_BroadcastPhrase(param->name, param->unk34);
         break;
     case 14:
         GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
-        func_ov012_021603ec(param->name, param->unk34);
+        GameBeacon_BroadcastPhrase(param->name, param->unk34);
         break;
     }
 }

@@ -17,17 +17,17 @@ typedef struct {
     MusicalDressUpParam *param;
 } MusicalDressUpWork;
 
-static BOOL func_ov012_02151e68(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_02151ecc(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov012_02151efc(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL MusicalDressUpProc_Init(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL MusicalDressUpProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL MusicalDressUpProc_Main(GameProc *proc, u32 *state, void *param, void *work);
 
 GameProcFunctions data_ov012_0216dfc4 = {
-    func_ov012_02151e68,
-    func_ov012_02151efc,
-    func_ov012_02151ecc,
+    MusicalDressUpProc_Init,
+    MusicalDressUpProc_Main,
+    MusicalDressUpProc_Exit,
 };
 
-static BOOL func_ov012_02151e68(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL MusicalDressUpProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     MusicalDressUpParam *dressUp = param;
     MusicalDressUpWork *wk;
 
@@ -45,7 +45,7 @@ static BOOL func_ov012_02151e68(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov012_02151ecc(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL MusicalDressUpProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     MusicalDressUpWork *wk = work;
 
     GFL_HeapFree(wk->dressUp);
@@ -56,7 +56,7 @@ static BOOL func_ov012_02151ecc(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov012_02151efc(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL MusicalDressUpProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     MusicalDressUpWork *wk = work;
     u32 result;
 
@@ -82,7 +82,7 @@ static BOOL func_ov012_02151efc(GameProc *proc, u32 *state, void *param, void *w
     return FALSE;
 }
 
-MusicalDressUpParam *func_ov012_02151f5c(HeapID heapId, MusicalPoke *poke, SaveControl *save) {
+MusicalDressUpParam *MusicalDressUpParam_Create(HeapID heapId, MusicalPoke *poke, SaveControl *save) {
     MusicalDressUpParam *param =
         GFL_HeapAllocate(heapId, sizeof(MusicalDressUpParam), FALSE, "musical_dressup_sys.c", 168);
 
@@ -92,6 +92,6 @@ MusicalDressUpParam *func_ov012_02151f5c(HeapID heapId, MusicalPoke *poke, SaveC
     return param;
 }
 
-void func_ov012_02151f88(MusicalDressUpParam *param) {
+void MusicalDressUpParam_Free(MusicalDressUpParam *param) {
     GFL_HeapFree(param);
 }

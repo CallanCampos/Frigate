@@ -134,7 +134,7 @@ void func_ov033_0217ade8(TrialHouseWork *work, u32 mode) {
         break;
     }
     value = base + GFL_RandomLC(range);
-    func_ov012_02162864(&work->trainer, value, work->capacity, NULL, NULL, NULL, HEAPID_TAIL(work->heapId));
+    BtlInst_MakeRomTrainerAndTeam(&work->trainer, value, work->capacity, NULL, NULL, NULL, HEAPID_TAIL(work->heapId));
 }
 
 void func_ov033_0217ae5c(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
@@ -153,11 +153,11 @@ void func_ov033_0217ae5c(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
 }
 
 u32 func_ov033_0217aed0(TrialHouseWork *work) {
-    return func_ov012_02162b38(work->trainer.trainerId);
+    return BtlInst_GetTrainerClassObjCode(work->trainer.trainerId);
 }
 
 GameEvent *func_ov033_0217aedc(GameSystem *gsys, TrialHouseWork *work, u32 index, u32 actorId) {
-    return func_ov012_02161e6c(gsys, &work->trainer, index, (u16)actorId);
+    return EventBtlInstTrainerMsg_Create(gsys, &work->trainer, index, (u16)actorId);
 }
 
 GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *result) {
@@ -199,8 +199,8 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
     gsys = data->gsys;
     switch (*state) {
     case 0:
-        data->subwork = func_ov012_02152990(&data->init);
-        if (func_ov012_02152b64(data->subwork) == 0) {
+        data->subwork = DeliveryBeacon_Init(&data->init);
+        if (DeliveryBeacon_RecvStart(data->subwork) == 0) {
             *data->result = 0;
             *state = 4;
         } else {
@@ -213,7 +213,7 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
             *state = 4;
             break;
         }
-        func_ov012_02152bec(data->subwork);
+        DeliveryBeacon_Main(data->subwork);
         data->timeout++;
         if (data->timeout > 120) {
             *state = 2;
@@ -225,8 +225,8 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
             *state = 4;
             break;
         }
-        func_ov012_02152bec(data->subwork);
-        if (func_ov012_02152bb4(data->subwork)) {
+        DeliveryBeacon_Main(data->subwork);
+        if (DeliveryBeacon_IsAnyReceived(data->subwork)) {
             *state = 3;
         } else {
             *data->result = 0;
@@ -239,8 +239,8 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
             *state = 4;
             break;
         }
-        func_ov012_02152bec(data->subwork);
-        if (!func_ov012_02152bd4(data->subwork)) {
+        DeliveryBeacon_Main(data->subwork);
+        if (!DeliveryBeacon_IsReceiveDone(data->subwork)) {
             break;
         }
         gameData = GSYS_GetGameData(gsys);
@@ -261,7 +261,7 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
         *state = 4;
         break;
     case 4:
-        func_ov012_02152bfc(data->subwork);
+        DeliveryBeacon_End(data->subwork);
         *state = 5;
         break;
     case 5:

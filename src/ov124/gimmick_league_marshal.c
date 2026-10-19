@@ -393,7 +393,7 @@ static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, voi
         break;
     case 3:
         if (FieldTaskManager_IsIdle(Field_GetTaskManager(work->field))) {
-            func_ov012_02166f2c(work->player);
+            FldAct_FreeAcmd(work->player);
             ClearActorFlag(work->player, 0x10);
             return GAMEEVENT_DONE;
         }

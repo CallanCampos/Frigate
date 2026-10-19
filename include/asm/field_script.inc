@@ -1208,7 +1208,7 @@
     .2byte \a0
     .endm
 
-    // func_ov012_0215569c
+    // s00CE_TrainerCardGetStars
     .macro Cmd_00CE a0
     FieldCommand 206
     .2byte \a0
@@ -1332,7 +1332,7 @@
     FieldCommand 227
     .endm
 
-    // func_ov012_02155d00
+    // s00E4_BoxUnlockWallpapers
     .macro Cmd_00E4 a0
     FieldCommand 228
     .2byte \a0
@@ -1850,17 +1850,17 @@
     .2byte \a0
     .endm
 
-    // func_ov012_02159c80
+    // s013C_GameCommTryBoot
     .macro Cmd_013C
     FieldCommand 316
     .endm
 
-    // func_ov012_02159c90
+    // s013D_GameCommPause
     .macro Cmd_013D
     FieldCommand 317
     .endm
 
-    // func_ov012_02159cd8
+    // s013E_GameCommResume
     .macro Cmd_013E
     FieldCommand 318
     .endm
@@ -2036,7 +2036,7 @@
     FieldCommand 350
     .endm
 
-    // func_ov012_02157a78
+    // s015F_Nop
     .macro Cmd_015F
     FieldCommand 351
     .endm
@@ -2081,7 +2081,7 @@
     .2byte \a2
     .endm
 
-    // func_ov012_021588d4
+    // s0167_MusicalComm
     .macro Cmd_0167 a0, a1, a2, a3
     FieldCommand 359
     .2byte \a0
@@ -2100,7 +2100,7 @@
     .2byte \a0
     .endm
 
-    // func_ov012_0215887c
+    // s016A_MusicalSelectPoke
     .macro Cmd_016A a0, a1
     FieldCommand 362
     .2byte \a0
@@ -2257,7 +2257,7 @@
     .2byte \a0
     .endm
 
-    // func_ov012_02160a90
+    // s01A1_PleasureBoatGetRoomInfo
     .macro Cmd_01A1 a0, a1, a2, a3
     FieldCommand 417
     .2byte \a0
@@ -2427,7 +2427,7 @@
     .2byte \a0
     .endm
 
-    // func_ov012_02160cdc
+    // s01CE_UnityTowerGetTrainerClass
     .macro Cmd_01CE a0, a1
     FieldCommand 462
     .2byte \a0
@@ -2667,7 +2667,7 @@
     .2byte \a1
     .endm
 
-    // func_ov012_0216480c
+    // s01F5_TrialHouseGetRecordMask
     .macro Cmd_01F5 a0
     FieldCommand 501
     .2byte \a0
@@ -2823,7 +2823,7 @@
     .2byte \a3
     .endm
 
-    // func_ov012_02165598
+    // s020E_SpPokeJump
     .macro Cmd_020E a0, a1, a2, a3, a4, a5
     FieldCommand 526
     .2byte \a0
@@ -2834,7 +2834,7 @@
     .2byte \a5
     .endm
 
-    // func_ov012_0216564c
+    // s020F_SpPokeAppear
     .macro Cmd_020F a0, a1, a2, a3
     FieldCommand 527
     .2byte \a0
@@ -2843,19 +2843,19 @@
     .2byte \a3
     .endm
 
-    // func_ov012_021656a8
+    // s0210_SpPokeWaitAnimEnd
     .macro Cmd_0210 a0
     FieldCommand 528
     .2byte \a0
     .endm
 
-    // func_ov012_021656e0
+    // s0211_SpPokeWaitFrame
     .macro Cmd_0211 a0
     FieldCommand 529
     .2byte \a0
     .endm
 
-    // func_ov012_02164838
+    // s0212_ActorMoveToHeight
     .macro Cmd_0212 a0, a1, a2
     FieldCommand 530
     .2byte \a0
@@ -2863,7 +2863,7 @@
     .2byte \a2
     .endm
 
-    // func_ov012_0216491c
+    // s0213_ActorHoldPos
     .macro Cmd_0213 a0
     FieldCommand 531
     .2byte \a0
@@ -2877,7 +2877,7 @@
     .2byte \a3
     .endm
 
-    // func_ov012_021658c8
+    // s0215_SetSpecialTransferUsed
     .macro Cmd_0215 a0, a1
     FieldCommand 533
     .2byte \a0
@@ -3101,12 +3101,12 @@
     FieldCommand 571
     .endm
 
-    // func_ov012_02169c2c
+    // s023C_NuvemaGimmickPlay
     .macro Cmd_023C
     FieldCommand 572
     .endm
 
-    // func_ov012_02169c40
+    // s023D_NuvemaGimmickWaitAnim
     .macro Cmd_023D
     FieldCommand 573
     .endm
@@ -3162,7 +3162,7 @@
     .2byte \a3
     .endm
 
-    // func_ov012_02159f90
+    // s0249_GetRandomDistinctSix
     .macro Cmd_0249 a0, a1, a2, a3, a4, a5
     FieldCommand 585
     .2byte \a0
@@ -3173,7 +3173,7 @@
     .2byte \a5
     .endm
 
-    // func_ov012_02159d10
+    // s024A_FieldSubscreenIsEnabled
     .macro Cmd_024A a0
     FieldCommand 586
     .2byte \a0
@@ -3584,7 +3584,7 @@
     FieldCommand 684
     .endm
 
-    // func_ov012_0216a82c
+    // s02AE_GameGetMyCity
     .macro Cmd_02AE a0
     FieldCommand 686
     .2byte \a0
@@ -3605,28 +3605,28 @@
     .2byte \a0
     .endm
 
-    // func_ov012_0216a950
+    // s02B2_MemoryLinkCheckFlag
     .macro Cmd_02B2 a0, a1
     FieldCommand 690
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov012_0216a994
+    // s02B3_MemoryLinkGetVar
     .macro Cmd_02B3 a0, a1
     FieldCommand 691
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov012_0216a9d8
+    // s02B4_MemoryLinkIsPlayerLinked
     .macro Cmd_02B4 a0, a1
     FieldCommand 692
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov012_0216aa1c
+    // s02B5_WordSetMemoryLinkPlayerName
     .macro Cmd_02B5 a0, a1
     FieldCommand 693
     .2byte \a0
@@ -3697,7 +3697,7 @@
     .2byte \a0
     .endm
 
-    // func_ov012_0216ac74
+    // s02C4_HiddenHollowSetPeriod
     .macro Cmd_02C4
     FieldCommand 708
     .endm
@@ -3721,7 +3721,7 @@
     .2byte \a0
     .endm
 
-    // func_ov012_0216acfc
+    // s02CB_PokewoodGetLevel
     .macro Cmd_02CB a0
     FieldCommand 715
     .2byte \a0
@@ -3860,7 +3860,7 @@
     .2byte \a5
     .endm
 
-    // func_ov012_02155bec
+    // s02ED_SetSoftResetBlocked
     .macro Cmd_02ED a0, a1
     FieldCommand 749
     .2byte \a0

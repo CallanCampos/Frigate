@@ -1172,7 +1172,7 @@ static void TownMapPlaces_Deselect(TownMapPlaces *places) {
 // The place the town map shows for a zone, or NULL
 static TownMapPlace *TownMapPlaces_GetByZone(const TownMapPlaces *places, u16 zoneId, u16 escapeZoneId) {
     u32 i;
-    u16 zone = func_ov012_02160eb4(places->gameData, zoneId);
+    u16 zone = TownMap_GetMapZone(places->gameData, zoneId);
 
     for (i = 0; i < places->count; i++) {
         TownMapPlace *place = &places->places[i];
@@ -1205,7 +1205,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
     place->index = index;
     flag = TownMapData_GetParam(data, index, TOWNMAP_PARAM_ARRIVAL_FLAG);
     if (flag != TOWNMAP_NO_FLAG) {
-        place->arrived = func_ov012_02160f74(gameData, flag);
+        place->arrived = TownMap_CheckFlag(gameData, flag);
     } else {
         place->arrived = FALSE;
     }
@@ -1222,7 +1222,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
     }
     flag = TownMapData_GetParam(place->data, place->index, TOWNMAP_PARAM_FLAG);
     if (flag != TOWNMAP_NO_FLAG) {
-        place->hidden = func_ov012_02160f74(gameData, flag) == FALSE ? TRUE : FALSE;
+        place->hidden = TownMap_CheckFlag(gameData, flag) == FALSE ? TRUE : FALSE;
     } else {
         place->hidden = FALSE;
     }

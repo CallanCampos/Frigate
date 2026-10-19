@@ -260,7 +260,7 @@ static void UnionEff_UpdateFocus(FocusMan *focus_man) {
     UnionEffSlot *slot = &focus_man->slot[0];
 
     if (slot->g3dActor != NULL) {
-        if (func_ov012_0216749c(slot->actor) == TRUE) {
+        if (FldAct_IsInUse(slot->actor) == TRUE) {
             UnionEff_StepFocusSlot(slot);
         } else {
             UnionEff_FreeFocusSlot(slot);
@@ -272,7 +272,7 @@ static void UnionEff_DrawFocus(FocusMan *focus_man) {
     SRTMatrix mtx = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE }, { 0 } };
 
     MTX_Identity33_(&mtx.rotation);
-    if (focus_man->slot[0].g3dActor != NULL && func_ov012_0216749c(focus_man->slot[0].actor) == TRUE) {
+    if (focus_man->slot[0].g3dActor != NULL && FldAct_IsInUse(focus_man->slot[0].actor) == TRUE) {
         UnionEff_DrawFocusSlot(&focus_man->slot[0], &mtx);
     }
 }
@@ -369,7 +369,7 @@ static void UnionEff_UpdateMarks(MarkMan *mark_man) {
         UnionEffSlot *slot = &mark_man->slot[i];
 
         if (slot->g3dActor != NULL) {
-            if (func_ov012_0216749c(slot->actor) == TRUE) {
+            if (FldAct_IsInUse(slot->actor) == TRUE) {
                 UnionEff_StepMarkSlot(slot);
             } else {
                 UnionEff_FreeMarkSlot(slot);
@@ -386,7 +386,7 @@ static void UnionEff_DrawMarks(MarkMan *mark_man) {
     for (i = 0; i < MARK_SLOT_MAX; i++) {
         UnionEffSlot *slot = &mark_man->slot[i];
 
-        if (slot->g3dActor != NULL && func_ov012_0216749c(slot->actor) == TRUE) {
+        if (slot->g3dActor != NULL && FldAct_IsInUse(slot->actor) == TRUE) {
             UnionEff_DrawMarkSlot(slot, &mtx);
         }
     }

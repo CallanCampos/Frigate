@@ -108,7 +108,7 @@ static void func_ov036_021a3c20(FieldEffectTask *task, void *work) {
 
     shadowTask->shadow = params->shadow;
     shadowTask->actor = params->actor;
-    func_ov012_02167d88(params->actor, &shadowTask->identity);
+    FldAct_GetIdentity(params->actor, &shadowTask->identity);
     request.texMat = 0;
     request.scaleX = FX32_ONE;
     request.scaleY = FX32_ONE;
@@ -141,15 +141,15 @@ static void func_ov036_021a3cb4(FieldEffectTask *task, void *work) {
 static void func_ov036_021a3cd4(FieldEffectTask *task, void *work) {
     ShadowTask *shadowTask = work;
 
-    if (!func_ov012_02167da8(shadowTask->actor, &shadowTask->identity)) {
+    if (!FldAct_CheckIdentity(shadowTask->actor, &shadowTask->identity)) {
         func_ov036_021a3a70(task);
         return;
     }
-    if (!func_ov012_021673f8(GetActorMModelSystem(shadowTask->actor))) {
+    if (!FldActSys_AreShadowsEnabled(GetActorMModelSystem(shadowTask->actor))) {
         func_ov036_021a3a70(task);
         return;
     }
-    if (func_ov012_02167520(shadowTask->actor) == TRUE || CheckActorMovementFlag(shadowTask->actor, 0x8000)) {
+    if (IsActorHidden(shadowTask->actor) == TRUE || CheckActorMovementFlag(shadowTask->actor, 0x8000)) {
         shadowTask->hidden = TRUE;
     } else {
         shadowTask->hidden = FALSE;
@@ -172,7 +172,7 @@ static void func_ov036_021a3d28(FieldEffectTask *task, void *work) {
         VEC_Add(&pos, &offset, &pos);
         if (config->sceneNodeType == 10 || config->sceneNodeType == 11) {
             if (GetZoneIsEntreeForest(GetActorZoneID(shadowTask->actor))) {
-                func_ov012_0216731c(shadowTask->actor, &offset);
+                CopyActorWPosOffset(shadowTask->actor, &offset);
                 offset.y = 0;
             } else {
                 offset.x = 0;

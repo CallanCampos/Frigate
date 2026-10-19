@@ -560,7 +560,7 @@ static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *
 // A Trainer of a downloaded tournament
 static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank) {
     u32 trainerClass = func_ov055_021e67e4(trainer->unk3D4);
-    u32 objCode = func_ov012_02162b38(trainerClass);
+    u32 objCode = BtlInst_GetTrainerClassObjCode(trainerClass);
 
     WbtEntrant_Set(entrant, 1, 0, TrainerClass_GetSex(trainerClass), rank, 0, unk3_6, FALSE, TYPE_NULL, objCode,
                    trainerClass, trainer->unk3DC);

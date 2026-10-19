@@ -528,8 +528,8 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         init.dataNum = 1;
         init.flag4 = 0;
         init.heapId = download->param.heapId;
-        download->beacon = func_ov012_02152990(&init);
-        func_ov012_02152b64(download->beacon);
+        download->beacon = DeliveryBeacon_Init(&init);
+        DeliveryBeacon_RecvStart(download->beacon);
         download->stopBeacon = FALSE;
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
         (*state)++;
@@ -541,8 +541,8 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         }
         break;
     case 2:
-        func_ov012_02152bec(download->beacon);
-        if (func_ov012_02152bd4(download->beacon)) {
+        DeliveryBeacon_Main(download->beacon);
+        if (DeliveryBeacon_IsReceiveDone(download->beacon)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_DONE;
             *state = 3;
         } else if (download->stopBeacon) {
@@ -551,7 +551,7 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         }
         break;
     case 3:
-        func_ov012_02152bfc(download->beacon);
+        DeliveryBeacon_End(download->beacon);
         (*state)++;
         break;
     case 4:

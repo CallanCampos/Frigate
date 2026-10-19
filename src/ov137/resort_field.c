@@ -675,7 +675,7 @@ static void func_ov137_021ef3b0(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
         if (walker->unk14 && !walker->unk15) {
             switch (walker->unk54) {
             case 0:
-                func_ov012_02166eb0(actor, 0xbe);
+                FldAct_SetLocalAcmd(actor, 0xbe);
                 walker->unk54++;
             case 1:
                 if (func_ov036_0218f01c(actor)) {
@@ -697,7 +697,7 @@ static void func_ov137_021ef418(ResortWalker *walker, ResortPerson *person, void
                                 JoinAvenueOccupants *occupants) {
     func_ov137_021ef470(walker);
     walker->person = person;
-    func_ov012_021682e8(func_ov137_021f110c(person), &sWalkerMoveCode);
+    FldAct_SetMoveCodeFuncs(func_ov137_021f110c(person), &sWalkerMoveCode);
     func_ov137_021f1070(walker->person, FALSE);
     func_ov137_021ef9a8(walker, shops, unkb1c, occupants);
     switch (func_ov137_021f10f4(walker->person, 0)) {
@@ -874,8 +874,8 @@ static BOOL func_ov137_021ef710(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
     FieldActor *actor = func_ov137_021f110c(walker->person);
 
     if (func_ov137_021ef624(walker, mmSys, player, 1, 0)) {
-        func_ov012_02166eb0(actor, 0x3f);
-        func_ov012_021674b0(actor);
+        FldAct_SetLocalAcmd(actor, 0x3f);
+        FldAct_SetMoving(actor);
         walker->state = 2;
     } else if (func_ov137_021efa68(walker, player)) {
         walker->state = 4;
@@ -883,9 +883,9 @@ static BOOL func_ov137_021ef710(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
         walker->lookState = 0;
         walker->state = 3;
     } else {
-        func_ov012_02166eb0(actor, GetAcmdForDir(walker->dir, walker->acmd));
+        FldAct_SetLocalAcmd(actor, GetAcmdForDir(walker->dir, walker->acmd));
         SetActorMotionDir(actor, walker->dir);
-        func_ov012_021674b0(actor);
+        FldAct_SetMoving(actor);
         walker->steps--;
         walker->state = 2;
     }
@@ -895,7 +895,7 @@ static BOOL func_ov137_021ef710(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
 static BOOL func_ov137_021ef798(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) {
     FieldActor *actor = func_ov137_021f110c(walker->person);
     if (func_ov036_0218f01c(actor)) {
-        func_ov012_021674bc(actor);
+        FldAct_ClearMoving(actor);
         walker->state = 0;
     }
     return FALSE;
@@ -907,7 +907,7 @@ static BOOL func_ov137_021ef7bc(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
     switch (walker->lookState) {
     case 0:
         walker->lookDir = GFL_RandomMTRange(2) ? DIR_LEFT : DIR_RIGHT;
-        func_ov012_02166eb0(actor, walker->lookDir);
+        FldAct_SetLocalAcmd(actor, walker->lookDir);
         walker->lookState++;
     case 1:
         if (func_ov036_0218f01c(actor)) {
@@ -924,7 +924,7 @@ static BOOL func_ov137_021ef7bc(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
         }
     case 3:
         walker->lookDir = walker->lookDir == DIR_RIGHT ? DIR_LEFT : DIR_RIGHT;
-        func_ov012_02166eb0(actor, walker->lookDir);
+        FldAct_SetLocalAcmd(actor, walker->lookDir);
         walker->lookState++;
     case 4:
         if (func_ov036_0218f01c(actor)) {
@@ -951,9 +951,9 @@ static BOOL func_ov137_021ef8e4(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
 
     switch (walker->stopState) {
     case 0:
-        func_ov012_021674bc(actor);
-        func_ov012_021674e8(actor);
-        func_ov012_02166eb0(actor, walker->stopAcmd[walker->stop]);
+        FldAct_ClearMoving(actor);
+        FldAct_ClearMoveEnd(actor);
+        FldAct_SetLocalAcmd(actor, walker->stopAcmd[walker->stop]);
         walker->stopState++;
     case 1:
         if (func_ov036_0218f01c(actor)) {
@@ -1849,7 +1849,7 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
 
         ResortSys_GetEntries(sys);
         entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
-        unk = func_ov012_02169b78(gameData);
+        unk = TrainerCard_CountStars(gameData);
         badges = getBadgeCount(getTrainerGameInfoAddress(save));
         rank = MedalBox_GetRank(SaveControl_GetMedalBox(save));
         count = 0;

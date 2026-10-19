@@ -131,7 +131,7 @@ FieldEffectTask *func_ov036_021b3f14(FieldEffects *effects, FieldActor *actor, u
     params.playSE = playSE;
     params.gyoe = FieldEffects_GetHandleData(effects, 4);
     params.actor = actor;
-    func_ov012_02167d88(actor, &params.identity);
+    FldAct_GetIdentity(actor, &params.identity);
     params.field = FieldEffects_GetField(effects);
     if (playSE == TRUE) {
         func_ov036_021b4164(kind);
@@ -146,7 +146,7 @@ FieldEffectTask *func_ov036_021b3f64(FieldEffects *effects, FieldActor *actor, u
     params.playSE = playSE;
     params.gyoe = FieldEffects_GetHandleData(effects, 4);
     params.actor = actor;
-    func_ov012_02167d88(actor, &params.identity);
+    FldAct_GetIdentity(actor, &params.identity);
     params.field = FieldEffects_GetField(effects);
     if (playSE == TRUE) {
         func_ov036_021b4164(kind);
@@ -180,7 +180,7 @@ static void func_ov036_021b3ff8(FieldEffectTask *task, void *work) {
     GyoeTask *gyoeTask = work;
     VecFx32 pos;
 
-    if (!func_ov012_02167da8(gyoeTask->params.actor, &gyoeTask->params.identity)) {
+    if (!FldAct_CheckIdentity(gyoeTask->params.actor, &gyoeTask->params.identity)) {
         gyoeTask->done = TRUE;
         return;
     }
@@ -194,7 +194,7 @@ static void func_ov036_021b4034(FieldEffectTask *task, void *work) {
     GyoeTask *gyoeTask = work;
     VecFx32 pos;
 
-    if (gyoeTask->done == TRUE || !func_ov012_02167da8(gyoeTask->params.actor, &gyoeTask->params.identity)) {
+    if (gyoeTask->done == TRUE || !FldAct_CheckIdentity(gyoeTask->params.actor, &gyoeTask->params.identity)) {
         func_ov036_021a3a70(task);
         return;
     }

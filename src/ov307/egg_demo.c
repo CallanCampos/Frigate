@@ -328,16 +328,16 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
             if (func_ov012_02165b0c(wk->nameEntryParam) == FALSE) {
                 name = GFL_StrBufCreate(32, wk->heapId);
                 oldName = GFL_StrBufCreate(32, wk->heapId);
-                func_ov012_02165afc(wk->nameEntryParam, name);
+                NameEntryParam_GetName(wk->nameEntryParam, name);
                 PokeParty_GetParam(demoParam->pkm, PKM_PARAM_NICKNAME, oldName);
                 PokeParty_SetParam(demoParam->pkm, PKM_PARAM_NICKNAME, (u32)name);
-                if (func_ov012_02165b10(wk->nameEntryParam, oldName) == FALSE) {
+                if (NameEntryParam_CompareName(wk->nameEntryParam, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(demoParam->gameData), 30);
                 }
                 GFL_StrBufFree(oldName);
                 GFL_StrBufFree(name);
             }
-            func_ov012_02165ae8(wk->nameEntryParam);
+            NameEntryParam_Free(wk->nameEntryParam);
             wk->state = EGG_DEMO_WAIT_BGM_NAMED;
             EggDemo_FadeOutBGM(param, wk);
             break;

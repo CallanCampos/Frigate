@@ -345,7 +345,7 @@ static BOOL EventTrainerEyeSub_ForceTrainerDir(EventTrainerEyeWork *work) {
 static BOOL EventTrainerEyeSub_DecideJumpOut(EventTrainerEyeWork *work) {
     u32 moveCode;
 
-    if (!func_ov012_02166ecc(FieldPlayer_GetActor(work->player))) {
+    if (!FldAct_CheckAcmdEnd(FieldPlayer_GetActor(work->player))) {
         return FALSE;
     }
     work->seq = TRAINER_EYE_SEQ_TURN_TRAINER;
@@ -371,7 +371,7 @@ static BOOL EventTrainerEyeSub_TurnTrainer(EventTrainerEyeWork *work) {
 }
 
 static BOOL EventTrainerEyeSub_WaitTurnTrainer(EventTrainerEyeWork *work) {
-    if (!func_ov012_02166ecc(work->data.actor)) {
+    if (!FldAct_CheckAcmdEnd(work->data.actor)) {
         return FALSE;
     }
     work->seq = TRAINER_EYE_SEQ_START_TERRAIN_EFFECT;
@@ -400,7 +400,7 @@ static BOOL EventTrainerEyeSub_JumpOut(EventTrainerEyeWork *work) {
 }
 
 static BOOL EventTrainerEyeSub_WaitJumpOut(EventTrainerEyeWork *work) {
-    if (func_ov012_02166ecc(work->data.actor) == TRUE) {
+    if (FldAct_CheckAcmdEnd(work->data.actor) == TRUE) {
         work->seq = TRAINER_EYE_SEQ_WAIT_30F;
     }
     return FALSE;
@@ -432,7 +432,7 @@ static BOOL EventTrainerEyeSub_WalkOneStepToPlayer(EventTrainerEyeWork *work) {
 }
 
 static BOOL EventTrainerEyeSub_DecrementClashDist(EventTrainerEyeWork *work) {
-    if (!func_ov012_02166ecc(work->data.actor)) {
+    if (!FldAct_CheckAcmdEnd(work->data.actor)) {
         return FALSE;
     }
     work->data.range--;
@@ -469,16 +469,16 @@ static BOOL EventTrainerEyeSub_TurnPlayer(EventTrainerEyeWork *work) {
 static BOOL EventTrainerEyeSub_WaitTurnPlayer(EventTrainerEyeWork *work) {
     FieldActor *player = FieldPlayer_GetActor(work->player);
 
-    if (!func_ov012_02166ecc(player)) {
+    if (!FldAct_CheckAcmdEnd(player)) {
         return FALSE;
     }
-    func_ov012_02166ef8(player);
+    FldAct_EndAcmd(player);
     work->seq = TRAINER_EYE_SEQ_SET_IDLE_MOVE_CODE;
     return TRUE;
 }
 
 static BOOL EventTrainerEyeSub_SetIdleMoveCode(EventTrainerEyeWork *work) {
-    func_ov012_02166ef8(work->data.actor);
+    FldAct_EndAcmd(work->data.actor);
     ChangeActorMoveCodeSeq(work->data.actor, 0);
     work->seq = TRAINER_EYE_SEQ_FINISH;
     return TRUE;
@@ -518,7 +518,7 @@ static GameEventReturnCode EventTrainerEye_Callback(GameEvent *event, u32 *state
 
 // How the actor looks for the player: 1 the way it faces, 2 every way
 static u16 func_ov036_021a643c(FieldActor *actor) {
-    return func_ov012_02168024(GetActorEvType(actor));
+    return EvType_GetSightType(GetActorEvType(actor));
 }
 
 // Whether anything stands between the Trainer and the tile range tiles away in dir

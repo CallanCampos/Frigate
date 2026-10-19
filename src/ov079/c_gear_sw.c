@@ -617,7 +617,7 @@ static void CGearSw_SetLampPattern(CGearSw *work, int pattern, int lamp, BOOL in
         light = 0;
     }
     bits = WihDwc_GetStatus(GameData_GetWifiList(work->gameData));
-    intrude = func_ov012_02153658(comm);
+    intrude = Intrude_GetAlertState(comm);
     if (alert) {
         if (intrude == 3) {
             CGearSw_TryLampPattern(work, 1, 3, fast, pattern, lamp);
@@ -2239,7 +2239,7 @@ void CGearSw_Update(CGearSw *work, BOOL active) {
     }
     CGearSw_SetActive(work, active);
     if (!CGearSw_IsDark(work)) {
-        u32 intrude = func_ov012_02153658(GSYS_GetGameCommSystem(work->gsys));
+        u32 intrude = Intrude_GetAlertState(GSYS_GetGameCommSystem(work->gsys));
 
         CGearSw_UpdateIntrudeAlert(work, intrude);
         CGearSw_UpdateCallAlert(work, intrude);

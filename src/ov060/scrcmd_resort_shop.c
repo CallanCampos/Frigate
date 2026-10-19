@@ -410,7 +410,7 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     switch (mode) {
     case 0:
     default:
-        func_ov012_02160574();
+        GameBeacon_BroadcastJoinAvenueShopping();
         shop->mode = mode;
         shop->subMode = 0;
         shop->work.update = func_ov060_021e6140;

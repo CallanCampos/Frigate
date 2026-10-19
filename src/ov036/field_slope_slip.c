@@ -79,7 +79,7 @@ GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, SlopeSlipW
         break;
     case 1:
         func_ov036_021c23e8(work);
-        if (func_ov012_02166ecc(work->actor)) {
+        if (FldAct_CheckAcmdEnd(work->actor)) {
             func_ov036_021c2460(work);
             if (func_ov036_021c2474(work)) {
                 GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35));

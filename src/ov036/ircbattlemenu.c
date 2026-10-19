@@ -547,7 +547,7 @@ static void func_ov036_0218d824(IrcMenuWork *wk) {
 static void func_ov036_0218d878(IrcMenuWork *wk) {
     if (GFL_WipeIsFinished()) {
         if (wk->mode != 12) {
-            if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(func_ov012_02150cf0(wk->param)))) {
+            if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
                 func_ov036_0218d0ec(wk, NULL, 866);
             }
         } else {
@@ -560,8 +560,8 @@ static void func_ov036_0218d8c0(IrcMenuWork *wk) {
     wk->ending = TRUE;
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     if (wk->mode != 12) {
-        if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(func_ov012_02150cf0(wk->param)))) {
-            GameCommSys_ExitReq(GSYS_GetGameCommSystem(func_ov012_02150cf0(wk->param)));
+        if (GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
+            GameCommSys_ExitReq(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)));
         }
     }
     if (wk->mode >= 1 && wk->mode <= 8) {
@@ -578,7 +578,7 @@ static void func_ov036_0218d938(u32 param, fx32 frame) {
         func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 917);
         return;
     }
-    if (Config_GetSaveBeforeIR((const Config *)getTrainerDataBlkAddress(func_ov012_02150cf4(wk->param))) == 1) {
+    if (Config_GetSaveBeforeIR((const Config *)getTrainerDataBlkAddress(EventIRC_GetSaveControl(wk->param))) == 1) {
         func_ov036_0218d0ec(wk, func_ov036_0218e7cc, 920);
         return;
     }
@@ -1271,7 +1271,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     func_ov036_0218d0ec(wk, func_ov036_0218d7a8, 0x844);
     wk->param = param;
-    wk->gameData = GSYS_GetGameData(func_ov012_02150cf0(wk->param));
+    wk->gameData = GSYS_GetGameData(EventIRC_GetGameSystem(wk->param));
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
     GFL_NetSetIconScreen(FALSE, wk->heapId);
     GFL_BGSysSetEnabledBGsA(0x13);
@@ -1302,9 +1302,9 @@ static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *w
     PrintQueue_Main(wk->printQueue);
     ClActSys_Draw();
     if (!wk->ending) {
-        GSYS_TryBootGameComm(func_ov012_02150cf0(wk->param));
+        GSYS_TryBootGameComm(EventIRC_GetGameSystem(wk->param));
     }
-    if (GFL_WipeIsFinished() && func_02016bec(func_ov012_02150cf0(wk->param))) {
+    if (GFL_WipeIsFinished() && func_02016bec(EventIRC_GetGameSystem(wk->param))) {
         wk->mode = 12;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
@@ -1321,7 +1321,7 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
         return FALSE;
     }
     func_ov036_0218d824(wk);
-    func_ov012_02150cec(event, wk->mode);
+    EventIRC_SetMode(event, wk->mode);
     event->useBattleBox = wk->choice;
     if (wk->waitIcon != NULL) {
         WaitIcon_Free(wk->waitIcon);

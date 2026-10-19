@@ -9,7 +9,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-BOOL func_ov012_02159bc0(VM *vm, void *arg) {
+BOOL ScriptNative_WaitGameCommDisconnect(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
     GameSystem *gsys;
     ScriptWork *work;
@@ -48,7 +48,7 @@ BOOL s0139_GameCommDisconnect(VM *vm, FieldScriptEnv *env) {
     *slot = memory;
     *(u16 **)memory = result;
     *result = 0;
-    VM_SetNativeCallback(vm, func_ov012_02159bc0);
+    VM_SetNativeCallback(vm, ScriptNative_WaitGameCommDisconnect);
     return TRUE;
 }
 
@@ -58,7 +58,7 @@ BOOL s013B_GameCommCheckDSiWiFi(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02159c80(VM *vm, FieldScriptEnv *env) {
+BOOL s013C_GameCommTryBoot(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -66,7 +66,7 @@ BOOL func_ov012_02159c80(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02159c90(VM *vm, FieldScriptEnv *env) {
+BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameCommSys *commSys;
 
@@ -88,7 +88,7 @@ BOOL func_ov012_02159c90(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02159cd8(VM *vm, FieldScriptEnv *env) {
+BOOL s013E_GameCommResume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -98,7 +98,7 @@ BOOL func_ov012_02159cd8(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02159cf8(FinishScriptSubEventsWork *work, u32 *state) {
+BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state) {
     GameSystem *gsys;
 
     gsys = work->gsys;
@@ -107,7 +107,7 @@ BOOL func_ov012_02159cf8(FinishScriptSubEventsWork *work, u32 *state) {
     return TRUE;
 }
 
-BOOL func_ov012_02159d10(VM *vm, FieldScriptEnv *env) {
+BOOL s024A_FieldSubscreenIsEnabled(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     u16 *value;
 

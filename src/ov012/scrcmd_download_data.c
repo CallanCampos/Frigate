@@ -13,7 +13,7 @@
 #include "system/game_system.h"
 #include "system/wordset.h"
 
-BOOL func_ov012_0216a950(VM *vm, FieldScriptEnv *env) {
+BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -24,7 +24,7 @@ BOOL func_ov012_0216a950(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216a994(VM *vm, FieldScriptEnv *env) {
+BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -35,7 +35,7 @@ BOOL func_ov012_0216a994(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216a9d8(VM *vm, FieldScriptEnv *env) {
+BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -47,7 +47,7 @@ BOOL func_ov012_0216a9d8(VM *vm, FieldScriptEnv *env) {
 }
 
 // Puts the name of the entry in the buffer
-BOOL func_ov012_0216aa1c(VM *vm, FieldScriptEnv *env) {
+BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     void *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
@@ -66,7 +66,7 @@ BOOL func_ov012_0216aa1c(VM *vm, FieldScriptEnv *env) {
 }
 
 // Mode 0: whether the downloaded props were added. Mode 1: whether the musical's program is at least the downloaded one
-BOOL func_ov012_0216aabc(VM *vm, FieldScriptEnv *env) {
+BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
@@ -92,7 +92,7 @@ BOOL func_ov012_0216aabc(VM *vm, FieldScriptEnv *env) {
 }
 
 // Adds the downloaded props the musical doesn't have, and sets the result when it added any
-BOOL func_ov012_0216ab30(VM *vm, FieldScriptEnv *env) {
+BOOL s02B7_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     void *data = SaveControl_GetMemoryLink(save);

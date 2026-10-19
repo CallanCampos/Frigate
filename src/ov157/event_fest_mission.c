@@ -271,7 +271,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         FestMissionLog_AddPlayer(LinkFestival_GetLog(work->festival), work->gameData, work->joined);
         JoinAvenue_RecordActivity(7);
         LinkFestival_IsNewZoneFromOutside(work->festival,
-                                          func_ov012_02160eb4(work->gameData, Field_GetPlayerStateZoneID(work->field)));
+                                          TownMap_GetMapZone(work->gameData, Field_GetPlayerStateZoneID(work->field)));
         work->window = func_ov036_02187ca0(work->msgBGSys, work->msgData, 1, 1, 30, 20);
         func_ov036_02187d38(work->window);
         FestMission_PrintStart(work);
@@ -294,7 +294,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         func_ov036_02187d38(work->window);
         func_ov036_02187d10(work->window);
         func_ov036_021b65e8(Field_GetFesGimmick(work->field));
-        func_ov012_021683f4(work->gsys, Field_GetPlayerStateZoneID(work->field));
+        FestMission_OnZoneEnter(work->gsys, Field_GetPlayerStateZoneID(work->field));
         if (!work->joined) {
             *state = 6;
             break;

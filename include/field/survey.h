@@ -42,17 +42,17 @@ void TrainerGameInfo_SetSurveyCount(TrainerGameInfoSave *info, u8 index, u16 val
 // Whether the survey's answer of the index has been given
 BOOL TrainerGameInfo_GetSurveyCount(TrainerGameInfoSave *info, u8 index);
 BOOL func_0201148c(u8 question);
-BOOL func_ov012_0216538c(GameData *gameData);
+BOOL Survey_IsCurrentDone(GameData *gameData);
 // Overlay 12's survey.c: the questions of the surveys, and whether one is done
-u32 func_ov012_021652cc(u16 question);
-u32 func_ov012_021652dc(u16 question);
-void func_ov012_021652ec(u16 question, u8 *answers);
-u32 func_ov012_02165310(u16 question);
-int func_ov012_02165320(u8 question);
-u16 func_ov012_02165330(SaveControl *save);
-BOOL func_ov012_0216538c(GameData *gameData);
-u16 func_ov012_021653d8(SaveControl *save, u8 question);
-u32 func_ov012_02165480(void *survey, u8 answer);
+u32 Survey_GetQuestionType(u16 question);
+u32 Survey_GetQuestionAnswerCount(u16 question);
+void Survey_GetQuestionAnswers(u16 question, u8 *answers);
+u32 Survey_GetQuestionThreshold(u16 question);
+int Survey_GetQuestionHours(u8 question);
+u16 Survey_GetCurrentState(SaveControl *save);
+BOOL Survey_IsCurrentDone(GameData *gameData);
+u16 Survey_GetQuestionState(SaveControl *save, u8 question);
+u32 Survey_GetAnswerCount(void *survey, u8 answer);
 u16 func_ov027_02170758(SaveControl *save);
 u16 func_ov027_021707b8(SaveControl *save);
 GameEvent *func_ov027_02170860(GameSystem *gsys);

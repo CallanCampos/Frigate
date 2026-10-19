@@ -61,13 +61,13 @@ typedef struct {
 static const VecFx32 data_ov012_0216dac4 = { 0x1f8000, 0x20000, 0x168000 };
 
 static FieldActor *FieldScriptEnv_FindActor(FieldScriptEnv *env, u16 actorId);
-static void func_ov012_02164dcc(FieldScriptEnv *env, EntreeForestPokemon *pokemon);
+static void GetTalkActorEntreeForestPkm(FieldScriptEnv *env, EntreeForestPokemon *pokemon);
 static PartyPkm *CreateEntreeForestPkmFromActor(FieldScriptEnv *env, FieldActor *actor, HeapID heapId,
                                                 EntreeForestPokemon *pokemon);
 static GameEvent *EventEntreeForestBattleCall_Create(GameSystem *gsys, Field *field, PartyPkm *pkm,
                                                      EntreeForestPokemon pokemon, u16 *result, HeapID heapId);
 static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event, u32 *state, void *work);
-static void func_ov012_021650f8(const VecFx32 *pos, u32 dir, VecFx32 *dest);
+static void GetEntreeForestArrivalPos(const VecFx32 *pos, u32 dir, VecFx32 *dest);
 static GameEvent *EventEntreeForestWarp_CreateToAnother(GameSystem *gsys, u32 dir, u32 area);
 static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 *state, void *work);
 
@@ -94,7 +94,7 @@ BOOL s021B_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u32 actorIdBase;
-    SymbolMapList *list = func_ov012_02160870(FieldScriptEnv_GetHeapID(env), gsys, &actorIdBase);
+    SymbolMapList *list = SymbolMap_CreatePokemonList(FieldScriptEnv_GetHeapID(env), gsys, &actorIdBase);
 
     if (list != NULL) {
         EntreeForest_SpawnAllPokemon(field, actorIdBase, list->pokemon, list->count, list->unk50_18);
@@ -103,7 +103,7 @@ BOOL s021B_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02164b94(VM *vm, FieldScriptEnv *env) {
+BOOL s021D_EntreeForestRemovePkm(VM *vm, FieldScriptEnv *env) {
     u16 actorId = ScriptReadAny(vm, env);
     AreaNPCSave *npcData = getAreaNPCData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     FieldActor *actor = FieldScriptEnv_FindActor(env, actorId);
@@ -121,7 +121,7 @@ BOOL func_ov012_02164bcc(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = FieldScriptEnv_FindActor(env, actorId);
 
     if (actor != NULL) {
-        *result = func_ov012_02160668(npcData, GetActorUserParam0(actor));
+        *result = SymbolMap_ToggleKeepPokemon(npcData, GetActorUserParam0(actor));
     } else {
         *result = FALSE;
     }
@@ -158,17 +158,17 @@ BOOL func_ov012_02164c68(VM *vm, FieldScriptEnv *env) {
         *result = TRUE;
         break;
     case 1:
-        *result = func_ov012_02160974(GameData_GetEntreeForestArea(gameData));
+        *result = SymbolMap_IsTopArea(GameData_GetEntreeForestArea(gameData));
         break;
     case 2:
-        *result = func_ov012_02160988(GameData_GetEntreeForestArea(gameData));
+        *result = SymbolMap_IsEntranceArea(GameData_GetEntreeForestArea(gameData));
         break;
     case 3:
-        func_ov012_02164dcc(env, &speciesPokemon);
+        GetTalkActorEntreeForestPkm(env, &speciesPokemon);
         *result = speciesPokemon.species;
         break;
     case 4:
-        func_ov012_02164dcc(env, &formPokemon);
+        GetTalkActorEntreeForestPkm(env, &formPokemon);
         *result = formPokemon.form;
         break;
     }
@@ -186,7 +186,7 @@ BOOL s0217_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
     VecFx32 pos;
     VecFx32 playerPos;
 
-    if (dir == 1 && func_ov012_02160988(area)) {
+    if (dir == 1 && SymbolMap_IsEntranceArea(area)) {
         field = GSYS_GetField(gsys);
         FieldPlayer_GetWPos(Field_GetPlayer(field), &playerPos);
         pos = data_ov012_0216dac4;
@@ -194,7 +194,7 @@ BOOL s0217_MapChangeEntreeForest(VM *vm, FieldScriptEnv *env) {
         event = EventMapChangeWarp_CreateGrid(gsys, field, 0x117, &pos, 1, 0);
     } else {
         if (dir != ENTREE_FOREST_DIR_EXIT) {
-            area = func_ov012_0216094c(gsys, GameData_GetEntreeForestArea(gameData), dir);
+            area = SymbolMap_GetAdjacentArea(gsys, GameData_GetEntreeForestArea(gameData), dir);
         }
         event = EventEntreeForestWarp_CreateToAnother(gsys, dir, area);
     }
@@ -206,7 +206,7 @@ static FieldActor *FieldScriptEnv_FindActor(FieldScriptEnv *env, u16 actorId) {
     return FindFieldActor(Field_GetActorSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))), actorId);
 }
 
-static void func_ov012_02164dcc(FieldScriptEnv *env, EntreeForestPokemon *pokemon) {
+static void GetTalkActorEntreeForestPkm(FieldScriptEnv *env, EntreeForestPokemon *pokemon) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 actorId = ScriptWork_ResolveHybridValue(work, FieldScriptEnv_GetGameData(env), VAR_TALK_ACTOR);
 
@@ -340,7 +340,7 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
 }
 
 // Where the player comes out in the area in the direction
-static void func_ov012_021650f8(const VecFx32 *pos, u32 dir, VecFx32 *dest) {
+static void GetEntreeForestArrivalPos(const VecFx32 *pos, u32 dir, VecFx32 *dest) {
     *dest = *pos;
     switch (dir) {
     case 0:
@@ -382,7 +382,7 @@ static GameEvent *EventEntreeForestWarp_CreateToAnother(GameSystem *gsys, u32 di
     VecFx32 pos;
 
     GSYS_GetGameData(gsys);
-    func_ov012_021650f8(GetMModelWPosPtr(FieldPlayer_GetActor(Field_GetPlayer(field))), dir, &pos);
+    GetEntreeForestArrivalPos(GetMModelWPosPtr(FieldPlayer_GetActor(Field_GetPlayer(field))), dir, &pos);
     return EventEntreeForestWarp_Create(gsys, dir != ENTREE_FOREST_DIR_EXIT, &pos, dir, area);
 }
 
@@ -405,7 +405,7 @@ static GameEventReturnCode EventEntreeForestWarp_Callback(GameEvent *event, u32 
         (*state)++;
         break;
     case 2:
-        data->zoneId = func_ov012_0216092c(gsys, data->area);
+        data->zoneId = SymbolMap_GetZone(gsys, data->area);
         GameData_SetEntreeForestArea(gameData, data->area);
         GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(gsys, field, data->zoneId, &data->pos, data->dir));
         (*state)++;

@@ -144,7 +144,7 @@ void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FieldEffectFootmark *footmark = FieldEffects_GetHandleData(effects, 5);
 
     params.footmark = footmark;
-    texture = func_ov036_021b4778(footmark, kind, GetActorFaceDir(actor), func_ov012_0216707c(actor));
+    texture = func_ov036_021b4778(footmark, kind, GetActorFaceDir(actor), GetActorLastFaceDir(actor));
     CopyActorWPos(actor, &pos);
     ConvGXZToVector(FldAct_GetInitGPosX(actor), FldAct_GetInitGPosZ(actor), &pos);
     // Footprints to the left or right, whose texture is the direction, sit a little further back.

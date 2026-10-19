@@ -41,15 +41,15 @@ typedef struct {
     ThAwardParam param;
 } TrialHouseResultsData;
 
-static GameEventReturnCode func_ov012_02162ccc(GameEvent *event, u32 *state, void *work);
-static GameEventReturnCode func_ov012_02162f08(GameEvent *event, u32 *state, void *work);
+static GameEventReturnCode EventTrialHouseTeamSelect_Callback(GameEvent *event, u32 *state, void *work);
+static GameEventReturnCode EventTrialHouseResults_Callback(GameEvent *event, u32 *state, void *work);
 
-GameEvent *func_ov012_02162c48(GameSystem *gsys, TrialHouseWork *work, u32 mode, BOOL battleBox, u16 *result) {
+GameEvent *CallTrialHouseTeamSelect(GameSystem *gsys, TrialHouseWork *work, u32 mode, BOOL battleBox, u16 *result) {
     GameEvent *event;
     GameData *gameData = GSYS_GetGameData(gsys);
     TrialHousePokeSelectData *data;
 
-    event = GameEvent_Create(gsys, NULL, func_ov012_02162ccc, sizeof(TrialHousePokeSelectData));
+    event = GameEvent_Create(gsys, NULL, EventTrialHouseTeamSelect_Callback, sizeof(TrialHousePokeSelectData));
     data = GameEvent_GetData(event);
 
     data->gsys = gsys;
@@ -78,15 +78,15 @@ GameEvent *func_ov012_02162c48(GameSystem *gsys, TrialHouseWork *work, u32 mode,
     return event;
 }
 
-static GameEventReturnCode func_ov012_02162ccc(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventTrialHouseTeamSelect_Callback(GameEvent *event, u32 *state, void *work) {
     TrialHousePokeSelectData *data = work;
     GameSystem *gsys = data->gsys;
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event,
-                            func_ov012_02161c88(gsys, data->unk10, 0x17, data->regulationId, data->party, data->picked,
-                                                &data->choice, &data->screenResult, data->work->party));
+        GameEvent_ChainNext(event, EventBtlInstPokeSelect_Create(gsys, data->unk10, 0x17, data->regulationId,
+                                                                 data->party, data->picked, &data->choice,
+                                                                 &data->screenResult, data->work->party));
         *state = 1;
         break;
     case 1:
@@ -144,9 +144,9 @@ void SyncTrialHouseWkStatsFromBattle(TrialHouseWork *work, BtlSetup *setup) {
     work->stats[10] += (u16)(setup->unkD0 * 100 / totalHp);
 }
 
-GameEvent *func_ov012_02162eb4(GameSystem *gsys, u32 a1, u32 a2) {
+GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 a1, u32 a2) {
     GameData *gameData = GSYS_GetGameData(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02162f08, sizeof(TrialHouseResultsData));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventTrialHouseResults_Callback, sizeof(TrialHouseResultsData));
     TrialHouseResultsData *data = GameEvent_GetData(event);
 
     data->gsys = gsys;
@@ -158,7 +158,7 @@ GameEvent *func_ov012_02162eb4(GameSystem *gsys, u32 a1, u32 a2) {
     return event;
 }
 
-static GameEventReturnCode func_ov012_02162f08(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventTrialHouseResults_Callback(GameEvent *event, u32 *state, void *work) {
     TrialHouseResultsData *data = GameEvent_GetData(event);
 
     switch (*state) {

@@ -126,8 +126,8 @@ static void func_ov137_021f1d7c(ResortNPC *npc) {
             }
             zoneNpc.areaW = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_AREA_W);
             zoneNpc.areaH = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_AREA_H);
-            func_ov012_021682c0(&zoneNpc, ResortBinary_Get(npc->table, i, RESORT_NPC_COL_X),
-                                ResortBinary_Get(npc->table, i, RESORT_NPC_COL_Z), 0);
+            ZoneNPC_SetGridPos(&zoneNpc, ResortBinary_Get(npc->table, i, RESORT_NPC_COL_X),
+                               ResortBinary_Get(npc->table, i, RESORT_NPC_COL_Z), 0);
             CreateNewActorByEntityNoWKOBJCODE(npc->setup.mmSys, &zoneNpc, ResortLayout_GetZoneId(npc->setup.zone));
             npc->count++;
         }

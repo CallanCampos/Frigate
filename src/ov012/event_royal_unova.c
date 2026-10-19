@@ -20,13 +20,13 @@ typedef struct {
     u16 *result;
 } EventRoyalUnovaWork;
 
-static u32 func_ov012_021609b4(PleasureBoat *boat, u32 room);
+static u32 PleasureBoat_GetRoomObjCode(PleasureBoat *boat, u32 room);
 static GameEvent *EventRoyalUnova_Create(GameSystem *gsys, PleasureBoat *boat, u16 *result);
 static GameEventReturnCode EventRoyalUnova_Callback(GameEvent *event, u32 *state, void *data);
-static s16 func_ov012_02160a68(PleasureBoat *boat);
-static void func_ov012_02160a70(PleasureBoat *boat, u32 clock);
+static s16 PleasureBoat_GetClock(PleasureBoat *boat);
+static void PleasureBoat_SetClock(PleasureBoat *boat, u32 clock);
 
-static u32 func_ov012_021609b4(PleasureBoat *boat, u32 room) {
+static u32 PleasureBoat_GetRoomObjCode(PleasureBoat *boat, u32 room) {
     if (boat == NULL) {
         return 10;
     }
@@ -40,7 +40,7 @@ static GameEvent *EventRoyalUnova_Create(GameSystem *gsys, PleasureBoat *boat, u
     work->boat = boat;
     work->result = result;
     SetupPlaySequenceEventRealTime(&work->param, gsys, 1, 0);
-    work->param.unk08 = func_ov012_02160a68(boat);
+    work->param.unk08 = PleasureBoat_GetClock(boat);
     return event;
 }
 
@@ -65,17 +65,17 @@ static GameEventReturnCode EventRoyalUnova_Callback(GameEvent *event, u32 *state
         } else {
             *work->result = FALSE;
         }
-        func_ov012_02160a70(work->boat, work->param.unk10);
+        PleasureBoat_SetClock(work->boat, work->param.unk10);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-static s16 func_ov012_02160a68(PleasureBoat *boat) {
+static s16 PleasureBoat_GetClock(PleasureBoat *boat) {
     return boat->clock;
 }
 
-static void func_ov012_02160a70(PleasureBoat *boat, u32 clock) {
+static void PleasureBoat_SetClock(PleasureBoat *boat, u32 clock) {
     s32 period;
 
     boat->clock = clock;
@@ -85,7 +85,7 @@ static void func_ov012_02160a70(PleasureBoat *boat, u32 clock) {
     }
 }
 
-BOOL func_ov012_02160a90(VM *vm, FieldScriptEnv *env) {
+BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env) {
     PleasureBoat **boat;
     u16 room;
     u16 kind;
@@ -100,7 +100,7 @@ BOOL func_ov012_02160a90(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     switch (kind) {
     case 4:
-        *result = func_ov012_021609b4(*boat, room);
+        *result = PleasureBoat_GetRoomObjCode(*boat, room);
         break;
     case 5:
         *result = func_ov036_021c2220(*boat, room);

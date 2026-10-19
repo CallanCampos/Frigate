@@ -6,7 +6,7 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
-BOOL func_ov012_021535dc(GameSystem *gsys) {
+BOOL Intrude_CanBootGameComm(GameSystem *gsys) {
     GameCommSys *commSys = GSYS_GetGameCommSystem(gsys);
 
     if (GameData_IsForceSeasonSync(GSYS_GetGameData(gsys)) == TRUE && func_0202be08(commSys)) {
@@ -15,7 +15,7 @@ BOOL func_ov012_021535dc(GameSystem *gsys) {
     return TRUE;
 }
 
-void *func_ov012_02153608(GameCommSys *commSys) {
+void *Intrude_GetCommWork(GameCommSys *commSys) {
     void *work = GameCommSys_GetWork(commSys);
 
     if (GFL_NetErrCheck() || GameCommSys_BootCheck(commSys) != 2 || GameCommSys_IsTransitioning(commSys) == TRUE ||
@@ -48,7 +48,7 @@ u32 func_ov012_02153650(GameCommSys *commSys) {
 void func_ov012_02153654(GameCommSys *commSys) {
 }
 
-u32 func_ov012_02153658(GameCommSys *commSys) {
+u32 Intrude_GetAlertState(GameCommSys *commSys) {
     return 0;
 }
 

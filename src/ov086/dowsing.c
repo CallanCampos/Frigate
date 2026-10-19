@@ -280,7 +280,7 @@ static BOOL DowsingSearch_Next(DowsingSearch *search, DowsingHit *hit, u32 mode,
     u16 count;
     BOOL found = FALSE;
     DowsingHit candidate;
-    const HiddenItem *items = func_ov012_0215f2c4(&count);
+    const HiddenItem *items = GetHiddenItems(&count);
 
     if (mode <= 1) {
         if (!GetZoneIsHiddenGroto(zoneId)) {

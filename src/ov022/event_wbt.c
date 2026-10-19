@@ -147,7 +147,7 @@ static GameEventReturnCode EventWbtBattle_Callback(GameEvent *event, u32 *state,
     case 0:
         field = GSYS_GetField(gsys);
         work->setup = WbtBattle_SetupBattle(sys, gsys);
-        GameEvent_ChainNext(event, func_ov012_02168924(gsys, field, work->setup));
+        GameEvent_ChainNext(event, EventWbtBattleCall_Create(gsys, field, work->setup));
         *state = 1;
         break;
     case 1:

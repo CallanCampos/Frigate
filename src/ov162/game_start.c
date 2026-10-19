@@ -370,7 +370,7 @@ static BOOL NewGame_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     FreeGameProcManager(wk->procManager);
     func_ov162_021a04e8(save);
     procData = GameSystem_CreateProcData(GAME_ENTRYPOINT_OPENING, 0, &spawnPos, 0);
-    func_ov012_02165ae8(wk->nameEntryParam);
+    NameEntryParam_Free(wk->nameEntryParam);
     GFL_ProcReleaseSubsystem(proc);
     GCTX_ProcMgrReplaceProc(OVERLAY_NONE, &GAMESYSTEM_PROC_FUNCTIONS, procData);
     return TRUE;

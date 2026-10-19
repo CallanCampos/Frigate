@@ -16,10 +16,10 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
-static u32 func_ov012_0215aa68(u32 index);
-static BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg);
-static BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg);
-static BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg);
+static u32 FieldMenu_GetAppId(u32 index);
+static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg);
+static BOOL FieldMenu_CanLeaveField(FieldAppCallInput *input, void *arg);
+static BOOL FieldMenu_OnAppEnd(FieldAppCallInput *input, void *arg);
 
 GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     FieldSubscreen *subscreen = Field_GetSubscreen(field);
@@ -36,9 +36,9 @@ GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     work->appCall.gameSystem = gsys;
     work->appCall.field = field;
     work->appCall.parent = event;
-    work->appCall.canRetry = func_ov012_0215aa74;
-    work->appCall.callback1 = func_ov012_0215aa90;
-    work->appCall.callback2 = func_ov012_0215aa94;
+    work->appCall.canRetry = FieldMenu_CanRetry;
+    work->appCall.callback1 = FieldMenu_CanLeaveField;
+    work->appCall.callback2 = FieldMenu_OnAppEnd;
     work->appCall.arg = work;
     work->appCall.appParam = -1;
     screenId = FieldSubscreen_GetScreenID(subscreen);
@@ -107,7 +107,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         selection = func_ov036_02198854(Field_GetSubscreen(work->field));
         func_020173f8(gameData, selection);
         work->unk10 = func_ov036_02198854(Field_GetSubscreen(work->field));
-        work->appCall.appId = func_ov012_0215aa68(selection);
+        work->appCall.appId = FieldMenu_GetAppId(selection);
         work->state = 5;
         break;
     case 3:
@@ -121,7 +121,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
     case 4:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(GSYS_GetField(work->gameSystem), &action);
-        func_ov012_02159418(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
+        HiddenEventArgs_Set(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
         next = CreateHidenEvent(work->appCall.eventId, &args, &action);
         if (next == NULL) {
             return GAMEEVENT_DONE;
@@ -178,11 +178,11 @@ static const s32 sFieldMenuAppIds[9] = {
     FIELD_APP_INF_DUNGEON_RETIRE,
 };
 
-static u32 func_ov012_0215aa68(u32 index) {
+static u32 FieldMenu_GetAppId(u32 index) {
     return sFieldMenuAppIds[index];
 }
 
-static BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg) {
+static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg) {
     FieldMenuWork *menu = arg;
     FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
 
@@ -192,11 +192,11 @@ static BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg) {
     return TRUE;
 }
 
-static BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg) {
+static BOOL FieldMenu_CanLeaveField(FieldAppCallInput *input, void *arg) {
     return TRUE;
 }
 
-static BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg) {
+static BOOL FieldMenu_OnAppEnd(FieldAppCallInput *input, void *arg) {
     FieldMenuWork *menu = arg;
     GameData *gameData = GSYS_GetGameData(menu->gameSystem);
 

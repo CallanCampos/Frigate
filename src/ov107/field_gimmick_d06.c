@@ -336,9 +336,9 @@ static GameEventReturnCode PushEvent(GameEvent *event, u32 *state, void *data) {
         }
         break;
     case 2:
-        if (func_ov012_02166ecc(player) == TRUE) {
-            func_ov012_02166ef8(push->slot->actor);
-            func_ov012_02166ef8(player);
+        if (FldAct_CheckAcmdEnd(player) == TRUE) {
+            FldAct_EndAcmd(push->slot->actor);
+            FldAct_EndAcmd(player);
             func_ov036_021c29bc(push->slot->effect);
             return GAMEEVENT_DONE;
         }
@@ -368,8 +368,8 @@ static GameEventReturnCode BlockedEvent(GameEvent *event, u32 *state, void *data
         }
         (*state)++;
     case 3:
-        if (func_ov012_02166ecc(player) == TRUE) {
-            func_ov012_02166ef8(player);
+        if (FldAct_CheckAcmdEnd(player) == TRUE) {
+            FldAct_EndAcmd(player);
             return GAMEEVENT_DONE;
         }
         break;

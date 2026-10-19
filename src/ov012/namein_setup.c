@@ -65,12 +65,12 @@ NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, co
     return param;
 }
 
-void func_ov012_02165ae8(NameEntryParam *param) {
+void NameEntryParam_Free(NameEntryParam *param) {
     GFL_StrBufFree(param->name);
     GFL_HeapFree(param);
 }
 
-void func_ov012_02165afc(NameEntryParam *param, StrBuf *dest) {
+void NameEntryParam_GetName(NameEntryParam *param, StrBuf *dest) {
     GFL_StrBufCopy(dest, param->name);
 }
 
@@ -78,6 +78,6 @@ BOOL func_ov012_02165b0c(NameEntryParam *param) {
     return param->unk1C;
 }
 
-BOOL func_ov012_02165b10(NameEntryParam *param, const StrBuf *str) {
+BOOL NameEntryParam_CompareName(NameEntryParam *param, const StrBuf *str) {
     return GFL_StrBufCmp(param->name, str);
 }
