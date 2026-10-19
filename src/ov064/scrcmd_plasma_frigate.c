@@ -104,21 +104,21 @@ static BOOL PlasmaFrigateCmd_SetSwitchLightState(VM *vm, FieldScriptEnv *env) {
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     a = VM_Read16(vm);
-    func_ov119_021eecd0(gsys, a, ScriptReadAny(vm, env) != 0);
+    PlasmaFrigateLights_ShowSwitchState(gsys, a, ScriptReadAny(vm, env) != 0);
     return FALSE;
 }
 
 static BOOL PlasmaFrigateCmd_PlaySwitchAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov119_021eed10(gsys, VM_Read16(vm));
+    PlasmaFrigateLights_PlaySwitchAnim(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 static BOOL PlasmaFrigateCmd_PlaySwitchLightAnim(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov119_021eed34(gsys, VM_Read16(vm));
+    PlasmaFrigateLights_PlayLightAnim(gsys, VM_Read16(vm));
     return FALSE;
 }
 
