@@ -3,6 +3,17 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: the sanitized build's merge, after review
+
+- **A change to what a function does in every build reaches every description of it.** `port_heap_ds_read_begin`
+  began checking its span in every build (`77326dde8`), and the documents written for that change said so, while its
+  declaration's comment (`port/include/port_host.h`) and the game-changes row of its caller still said it did nothing
+  outside the sanitized build. `git grep` the function's name across `port/` and `.github/` and read each hit.
+- **A test checks its pass condition, not its name.** `smoke_reaches_game_main` passes on a line the program logs
+  before it looks for the ROM, and ctest's `PASS_REGULAR_EXPRESSION` ignores the status a program exits with (a signal
+  still fails it), so without a ROM the test passes where the ROM check stops the program: no CI run reaches the
+  game's `main()`. What a CI run covers is read from the test's pass condition and the code after the line it matches.
+
 ## 2026-10-19: the sanitized build merged with the host seam, the distribution build and White 2's starter save
 
 - **ctest's `WILL_FAIL` inverts a `FAIL_REGULAR_EXPRESSION` match too.** A match fails the test, and `WILL_FAIL` turns

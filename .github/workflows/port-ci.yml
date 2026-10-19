@@ -225,8 +225,9 @@ jobs:
   # oracle (ctest -L route -LE oracle) only the smoke test runs, as far as the program's look for the ROM, with the
   # replays' fixtures; the replays and the port's checks of the oracle's hashes skip, as in the host job, and the routes
   # themselves run only where the ROM is. Linux adds what Apple clang lacks: UndefinedBehaviorSanitizer's function
-  # check for C, and LeakSanitizer at every program's exit, the smoke test's included, which is CI's one run of the
-  # program into the game's main()
+  # check for C, and LeakSanitizer at every program's exit, the smoke test's included. No run here reaches the game's
+  # main(): the smoke test passes on the line the program logs before it looks for the ROM, which stops it, so its leak
+  # check covers the program's start-up as far as that look
   sanitize:
     name: Sanitized build (${{ matrix.os }})
     strategy:

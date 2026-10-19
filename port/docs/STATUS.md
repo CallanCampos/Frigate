@@ -26,10 +26,56 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-19: the sanitized build's merge after review: the read check and CI's smoke test described as they are
+
+- **Upstream:** `56ee36977` (merge of PR #391), as merged into the port's `main` by `6b50636b1`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` after `5691f92a5`; pushed to `port-sanitizers` on origin for CI,
+  not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to
+  rebuild). No file outside `port/` and `.github/` changed.
+- **Host build:** the last entry's machine and builds. `build/port-n`, `build/port-w2`, `build/port-san` and
+  `build/port-san-w2` built again, every decomp file among them, since `port/include/port_host.h` is force-included in
+  each. Warnings: 264 in each, the decomp's, none in `port/`. CI: `port-ci.yml` dispatched once on `port-sanitizers`
+  at this commit, whose result the next entry gives.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4` with `build/oracle`'s `pbw-oracle` and the cached saves, the two builds at once:
+    Black 2, 285 pass and 1 skip of 286 (565 s); White 2, 283 pass and 1 skip of 284 (556 s). Each version's 15
+    `oracle` tests pass, White 2's starter-save routes among them.
+  - T5, the sanitized builds, every test, both at once: Black 2, 286 pass and 1 skip of 287 (666 s), its 25 `route`
+    and 15 `oracle` tests among them; White 2, 284 pass and 1 skip of 285 (639 s), its 23 `route` and 15 `oracle`
+    tests among them. Every test carries the sanitizers' report patterns, so no output had a report.
+  - The skip is `app_universal_slices` in all four, which a development build's one slice skips. Every run passed
+    `--save-dir`, with `HOME` a scratch directory, and nothing under `~/Library`'s `Application Support/Frigate` or
+    `Logs/Frigate` is newer than 16:33 on 2026-10-18. T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** as the last entry: 457 function stubs and 46 data placeholders in each version, 456 and 46 in the
+  sanitized builds.
+- **64-bit warnings:** as the last entry.
+- **Work done:** the review of the merge (`93cf59b99` to `5691f92a5`) found the merge, the game's changes, the
+  ignorelist, the ADRs, the sanitized routes and CI sound, and three problems of text:
+  - **The read check's descriptions.** Since `77326dde8`, `port_heap_ds_read_begin` checks in every build that its
+    span lies in one of the game's heaps alive or the main arena, and stops the program otherwise, but its
+    declaration's comment in `port/include/port_host.h` and game-changes.md's row of the copyright screen's read
+    (`src/gfl/arc_util.c`, `9c5b9bfce`) still said both hooks do nothing outside the sanitized build. Both now say what
+    sanitizers.md, `hal/README.md` and GLOSSARY.md already did.
+  - **CI's smoke test.** The `sanitize` job's comment in `port-ci.yml` and sanitizers.md called the smoke test CI's
+    one run of the program into the game's `main()`. Without a ROM the program logs the line the test passes on
+    (`port/app/main.c`) and `port_rom_boot` then stops it, before `port_os_run(NitroMain)`; ctest's
+    `PASS_REGULAR_EXPRESSION` ignores the status it exits with (a signal still fails the test, as a probe of ctest
+    showed). Both now say that no CI run reaches the game's `main()`, so that LeakSanitizer's check at exit on Linux
+    covers start-up as far as the ROM check; the smoke test's comment in `port/CMakeLists.txt` says what it passes on.
+  - **The merge's message** (`93cf59b99`) says "three memory fixes": at `9c5b9bfce` the track had two, `gf_font.c`'s
+    and `printsys.c`'s, since it kept the copyright screen's read rather than fixing it. The tree counts them right
+    (game-changes.md, the feature map: those two and the touch bars' load in `arc_util.c`, with `scroll_bar.c`'s
+    division, the last two at `3dfcec981`); the message stays, since history isn't rewritten.
+  - lessons.md has the round's two lessons.
+- **Next:** as the last entry, the user's review of ADR 0014's acceptance first.
+- **Blockers:** as the last entry.
+
 ## 2026-10-19: the sanitized build merged (ADR 0014), clean on every route of both versions, the Pokédex's included
 
 - **Upstream:** `56ee36977` (merge of PR #391), as merged into the port's `main` by `6b50636b1`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `6b50636b1`: `93cf59b99` (the merge of
+- **Port:** `5691f92a5`, on the branch `port-integrate` from `main` at `6b50636b1`: `93cf59b99` (the merge of
   `port-sanitizers`), `77326dde8` (the track's notes confirmed), `3dfcec981` (the Pokédex under the sanitizers), then
   this entry; pushed to `port-sanitizers` on origin (new there) for CI, not to `main`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `93cf59b99` and

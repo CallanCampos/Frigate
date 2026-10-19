@@ -395,9 +395,11 @@ if(WIN32)
     endforeach()
 endif()
 
-# Tests (ctest --test-dir build/port). The smoke test runs the game's first frame: it passes once the program enters
-# the game's main() and the frame ends without a crash (a trap stub stopping it is still accepted). Like every test that
-# runs the program, it has a save directory in the build tree, never the player's own
+# Tests (ctest --test-dir build/port). The smoke test runs the game's first frame: it passes on the line the program
+# logs before it looks for the ROM and enters the game's main(), whatever status the program then exits with, so a trap
+# stub stopping the frame is accepted, and so is the stop for want of a ROM (port_rom_boot, which is where it ends in
+# CI); a crash, which the fault handler ends as the fault would have (a signal, or an exception's status on Windows),
+# fails it. Like every test that runs the program, it has a save directory in the build tree, never the player's own
 enable_testing()
 add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless --frames 1 --watchdog 30
     --save-dir "${CMAKE_CURRENT_BINARY_DIR}/smoke_saves")

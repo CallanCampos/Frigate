@@ -47,9 +47,11 @@ ctest --test-dir build/port-san -L route                       # every route, wi
 - **CI** builds the sanitized Black 2 on macOS and Linux on every push and pull request (the `sanitize` job of
   `.github/workflows/port-ci.yml`) and runs every test that isn't a route, then the routes that need no oracle. CI has
   no ROM, so of those only the smoke test runs, as far as the program's look for the ROM, and the replays' fixtures,
-  which empty their save directories; the replays and the port's checks of the oracle's hashes skip. The smoke test is
-  CI's one run of the program into the game's `main()`, which LeakSanitizer checks at its exit on Linux. The routes
-  themselves run only on a machine with the ROM (a nightly run of them is still to come).
+  which empty their save directories; the replays and the port's checks of the oracle's hashes skip. No CI run reaches
+  the game's `main()`: the smoke test passes on the line the program logs before it looks for the ROM
+  (`port/app/main.c`), whatever status the program then exits with, and the ROM check stops it there
+  (`port_rom_boot`), so LeakSanitizer's check at its exit on Linux covers the program's start-up as far as that look.
+  The routes themselves run only on a machine with the ROM (a nightly run of them is still to come).
 - **A survey** of every report of a route, rather than the first: `-DPORT_SANITIZE=ON -DPORT_SANITIZE_RECOVER=ON` in
   another build directory (the second alone is refused) makes every check go on after a report, and ASan's
   `halt_on_error=0` the default ([../hal/os/sanitizers.c](../hal/os/sanitizers.c)). ASan reports each place once

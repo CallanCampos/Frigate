@@ -58,10 +58,12 @@ int port_launcher_take_field_open(struct GameEvent *event);
 
 // A read the DS makes past the end of one of the game's heap blocks, into what its heap holds after the block, whose
 // bytes the game uses as the DS does (src/gfl/arc_util.c: the copyright screen's characters, which the title screen's
-// bottom screen shows). In the sanitized build, which poisons the game's heaps between their blocks
-// (port/hal/nnsys/fnd_hooks.c), the reads between the two calls may reach [start, start + size), and what was poisoned
-// there is poisoned again at the end; elsewhere both do nothing. One at a time, with nothing allocated or freed in
-// between. The size is u32
+// bottom screen shows). Both are in port/hal/nnsys/fnd_hooks.c. In every build, port_heap_ds_read_begin first checks
+// that [start, start + size) lies in the game's memory, one of its expanded or frame heaps alive or else the main
+// arena, and stops the program with a message if it doesn't. In the sanitized build, which poisons the game's heaps
+// between their blocks, the span checked is widened to ASan's 8-byte granules, the reads between the two calls may
+// reach it, and what was poisoned there is poisoned again at the end; elsewhere the check is all they do. One at a
+// time, with nothing allocated or freed in between. The size is u32
 void port_heap_ds_read_begin(const void *start, unsigned int size);
 void port_heap_ds_read_end(void);
 
