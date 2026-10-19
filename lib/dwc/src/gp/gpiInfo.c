@@ -346,16 +346,16 @@ int gpiProcessGetInfo(GPConnection *connection, GPIOperation *operation, const c
         profile = gpiProfileListAdd(connection, pid);
     }
     if (saveSig) {
-        func_ov011_0216ddfc(profile->peerSig);
+        gsifree(profile->peerSig);
         profile->peerSig = NULL;
-        profile->peerSig = func_ov011_0216e2c8(buffer);
+        profile->peerSig = goastrdup(buffer);
     }
     if (iconnection->infoCaching) {
         gpiSetInfoCache(connection, profile, &cache);
     }
     callback = operation->callback;
     if (callback.callback != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPGetInfoResponseArg));
+        arg = gsimalloc(sizeof(GPGetInfoResponseArg));
         if (arg == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -630,7 +630,7 @@ int gpiSetInfos(GPConnection *connection, int info, const char *value) {
             return 2;
         }
         strzcpy(buffer, value, 51);
-        func_ov011_0216e2f0(buffer);
+        _strlwr(buffer);
         strzcpy(iconnection->email, buffer, 51);
         result = gpiSendUserInfo(connection, "\\email\\", buffer);
         if (result != 0) {
@@ -705,7 +705,7 @@ int gpiSetInfos(GPConnection *connection, int info, const char *value) {
         }
         break;
     case 0x706:
-        func_ov011_0216ee7c(buffer, value, 256);
+        gsiSafeStrcpyA(buffer, value, 256);
         result = gpiSendLocalInfo(connection, "\\icquin\\", buffer);
         if (result != 0) {
             return result;
@@ -863,7 +863,7 @@ int gpiGetInfo(GPConnection *connection, int profile, int checkCache, int blocki
         useCache = FALSE;
     }
     if (callback != NULL && useCache && gpiGetProfile(connection, profile, &pProfile) && pProfile->cache != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPGetInfoResponseArg));
+        arg = gsimalloc(sizeof(GPGetInfoResponseArg));
         if (arg == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -910,16 +910,16 @@ static BOOL gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const
         return TRUE;
     }
     gpiFreeInfoCache(profile);
-    profile->cache = func_ov011_0216dddc(sizeof(GPIInfoCache));
+    profile->cache = gsimalloc(sizeof(GPIInfoCache));
     if (profile->cache != NULL) {
         *profile->cache = *cache;
-        profile->cache->nick = func_ov011_0216e2c8(cache->nick);
-        profile->cache->uniquenick = func_ov011_0216e2c8(cache->uniquenick);
-        profile->cache->email = func_ov011_0216e2c8(cache->email);
-        profile->cache->firstname = func_ov011_0216e2c8(cache->firstname);
-        profile->cache->lastname = func_ov011_0216e2c8(cache->lastname);
-        profile->cache->homepage = func_ov011_0216e2c8(cache->homepage);
-        profile->cache->aimname = func_ov011_0216e2c8(cache->aimname);
+        profile->cache->nick = goastrdup(cache->nick);
+        profile->cache->uniquenick = goastrdup(cache->uniquenick);
+        profile->cache->email = goastrdup(cache->email);
+        profile->cache->firstname = goastrdup(cache->firstname);
+        profile->cache->lastname = goastrdup(cache->lastname);
+        profile->cache->homepage = goastrdup(cache->homepage);
+        profile->cache->aimname = goastrdup(cache->aimname);
     }
     if (profile->cache != NULL) {
         return TRUE;
@@ -929,21 +929,21 @@ static BOOL gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const
 
 void gpiFreeInfoCache(GPIProfile *profile) {
     if (profile->cache != NULL) {
-        func_ov011_0216ddfc(profile->cache->nick);
+        gsifree(profile->cache->nick);
         profile->cache->nick = NULL;
-        func_ov011_0216ddfc(profile->cache->uniquenick);
+        gsifree(profile->cache->uniquenick);
         profile->cache->uniquenick = NULL;
-        func_ov011_0216ddfc(profile->cache->email);
+        gsifree(profile->cache->email);
         profile->cache->email = NULL;
-        func_ov011_0216ddfc(profile->cache->firstname);
+        gsifree(profile->cache->firstname);
         profile->cache->firstname = NULL;
-        func_ov011_0216ddfc(profile->cache->lastname);
+        gsifree(profile->cache->lastname);
         profile->cache->lastname = NULL;
-        func_ov011_0216ddfc(profile->cache->homepage);
+        gsifree(profile->cache->homepage);
         profile->cache->homepage = NULL;
-        func_ov011_0216ddfc(profile->cache->aimname);
+        gsifree(profile->cache->aimname);
         profile->cache->aimname = NULL;
-        func_ov011_0216ddfc(profile->cache);
+        gsifree(profile->cache);
         profile->cache = NULL;
     }
 }

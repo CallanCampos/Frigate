@@ -75,22 +75,22 @@ BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) 
 int gpiCheckSocketConnect(GPConnection *connection, int sock, int *state) {
     int writeFlag = 0;
     int exceptFlag = 0;
-    int result = func_ov011_0216dfb4(sock, NULL, &writeFlag, &exceptFlag);
+    int result = GSISocketSelect(sock, NULL, &writeFlag, &exceptFlag);
 
     if (result == -1) {
-        func_ov011_0216cca8(1, 0, 1, "Error connecting\n");
+        gsDebugFormat(1, 0, 1, "Error connecting\n");
         gpiSetError(connection, 5, "There was an error checking for a completed connection.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
     if (result > 0) {
         if (exceptFlag) {
-            func_ov011_0216cca8(1, 0, 1, "Connection rejected\n");
+            gsDebugFormat(1, 0, 1, "Connection rejected\n");
             *state = 4;
             return 0;
         }
         if (writeFlag) {
-            func_ov011_0216cca8(1, 0, 8, "Connection accepted\n");
+            gsDebugFormat(1, 0, 8, "Connection accepted\n");
             *state = 3;
             return 0;
         }
@@ -160,11 +160,11 @@ void gpiEncodeString(const char *unencodedString, char *encodedString) {
     char key;
 
     length = strlen(unencodedString);
-    func_ov011_0216e654(0x79707367);
+    Util_RandSeed(0x79707367);
     for (i = 0; i < length; i++) {
-        key = func_ov011_0216e670(0, 0xff);
+        key = Util_RandInt(0, 0xff);
         scrambled[i] = key ^ unencodedString[i];
     }
     scrambled[i] = '\0';
-    func_ov011_0216e878(scrambled, encodedString, length, 1);
+    B64Encode(scrambled, encodedString, length, 1);
 }
