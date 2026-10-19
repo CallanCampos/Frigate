@@ -26,18 +26,18 @@ static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operati
     int error;
 
     search->inputBuffer.size = 0x1000;
-    search->inputBuffer.buffer = func_ov011_0216dddc(0x1001);
+    search->inputBuffer.buffer = gsimalloc(0x1001);
     if (search->inputBuffer.buffer == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
     }
-    search->sock = func_ov011_0216de20(2, 1, 0);
+    search->sock = gsiSocket(2, 1, 0);
     if (search->sock == -1) {
         gpiSetError(connection, 5, "There was an error creating a socket.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
-    if (func_ov011_0216e054(search->sock, 0) == 0) {
+    if (SetSockBlocking(search->sock, 0) == 0) {
         gpiSetError(connection, 5, "There was an error making a socket non-blocking.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
@@ -55,8 +55,8 @@ static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operati
         address.addr = *(u32 *)host->addrList[0];
         // Port 29901, in network order
         address.port = 0xcd74;
-        if (func_ov011_0216dec4(search->sock, &address, 8) == -1) {
-            error = func_ov011_0216dfa8(search->sock);
+        if (connect(search->sock, &address, 8) == -1) {
+            error = GOAGetLastError(search->sock);
             if (error != -6 && error != -26 && error != -76) {
                 gpiSetError(connection, 5, "There was an error connecting a socket.");
                 gpiCallErrorCallback(connection, 3, 1);
@@ -65,12 +65,12 @@ static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operati
         }
     }
     operation->state = GPI_CONNECTING;
-    search->searchStartTime = func_ov011_0216e324();
+    search->searchStartTime = current_time();
     return 0;
 }
 
 static int gpiInitSearchData(GPConnection *connection, GPISearchData **searchData, int type) {
-    GPISearchData *data = func_ov011_0216dddc(sizeof(GPISearchData));
+    GPISearchData *data = gsimalloc(sizeof(GPISearchData));
 
     if (data == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
@@ -86,7 +86,7 @@ static int gpiInitSearchData(GPConnection *connection, GPISearchData **searchDat
     data->outputBuffer.len = 0;
     data->outputBuffer.pos = 0;
     data->outputBuffer.size = 0x1000;
-    data->outputBuffer.buffer = func_ov011_0216dddc(0x1001);
+    data->outputBuffer.buffer = gsimalloc(0x1001);
     if (data->outputBuffer.buffer == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
@@ -152,7 +152,7 @@ int gpiProfileSearch(GPConnection *connection, const char *nick, const char *uni
     } else {
         strzcpy(search->email, email, sizeof(search->email));
     }
-    func_ov011_0216e2f0(search->email);
+    _strlwr(search->email);
     if (firstname == NULL) {
         search->firstname[0] = '\0';
     } else {
@@ -221,7 +221,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
     int result;
     int i;
 
-    if (operation->blocking == 0 && func_ov011_0216e324() - search->searchStartTime > 60000) {
+    if (operation->blocking == 0 && current_time() - search->searchStartTime > 60000) {
         search->remove = 1;
         gpiSetError(connection, 0xd02, "The search timed out");
         gpiCallErrorCallback(connection, 3, 0);
@@ -401,7 +401,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                     gpiAppendIntToBuffer(connection, &search->outputBuffer, search->maxResults);
                 }
                 gpiAppendStringToBuffer(connection, &search->outputBuffer, "\\gamename\\");
-                gpiAppendStringToBuffer(connection, &search->outputBuffer, data_ov011_0219069c);
+                gpiAppendStringToBuffer(connection, &search->outputBuffer, __GSIACGamename);
                 gpiAppendStringToBuffer(connection, &search->outputBuffer, "\\final\\");
                 operation->state = GPI_WAITING;
             }
@@ -415,7 +415,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                 gpiCallErrorCallback(connection, 3, 0);
                 return 3;
             }
-            if (operation->blocking != 0 && func_ov011_0216e324() - search->searchStartTime > 60000) {
+            if (operation->blocking != 0 && current_time() - search->searchStartTime > 60000) {
                 search->remove = 1;
                 gpiSetError(connection, 0xd02, "The search timed out");
                 gpiCallErrorCallback(connection, 3, 0);
@@ -458,8 +458,8 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                             searchDone = 1;
                         } else if (strcmp(key, "bsr") == 0) {
                             response.numMatches++;
-                            response.matches = func_ov011_0216ddec(response.matches,
-                                                                   response.numMatches * sizeof(GPProfileSearchMatch));
+                            response.matches =
+                                gsirealloc(response.matches, response.numMatches * sizeof(GPProfileSearchMatch));
                             if (response.matches == NULL) {
                                 gpiSetErrorString(connection, "Out of memory.");
                                 return 1;
@@ -512,7 +512,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                             return result;
                         }
                     }
-                    func_ov011_0216ddfc(response.matches);
+                    gsifree(response.matches);
                     response.matches = NULL;
                 } else if (search->type == GPI_SEARCH_IS_VALID) {
                     validCallback = operation->callback;
@@ -528,7 +528,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                             gpiCallErrorCallback(connection, 3, 1);
                             return 3;
                         }
-                        data = func_ov011_0216dddc(sizeof(GPIsValidEmailResponseArg));
+                        data = gsimalloc(sizeof(GPIsValidEmailResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -546,13 +546,13 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                     if (nicksCallback.callback != NULL) {
                         GPGetUserNicksResponseArg *data;
 
-                        data = func_ov011_0216dddc(sizeof(GPGetUserNicksResponseArg));
+                        data = gsimalloc(sizeof(GPGetUserNicksResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
                         }
                         data->result = 0;
-                        func_ov011_0216ee7c(data->email, search->email, 0x33);
+                        gsiSafeStrcpyA(data->email, search->email, 0x33);
                         data->numNicks = 0;
                         data->nicks = NULL;
                         data->uniquenicks = NULL;
@@ -571,12 +571,12 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                 return result;
                             }
                             if (strcmp(key, "nick") == 0) {
-                                data->nicks = func_ov011_0216ddec(data->nicks, (data->numNicks + 1) * 4);
+                                data->nicks = gsirealloc(data->nicks, (data->numNicks + 1) * 4);
                                 if (data->nicks == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
                                 }
-                                data->nicks[data->numNicks] = func_ov011_0216dddc(0x1f);
+                                data->nicks[data->numNicks] = gsimalloc(0x1f);
                                 if (data->nicks[data->numNicks] == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
@@ -585,12 +585,12 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                 data->numNicks++;
                             } else if (strcmp(key, "uniquenick") == 0) {
                                 if (data->numNicks > 0) {
-                                    data->uniquenicks = func_ov011_0216ddec(data->uniquenicks, data->numNicks * 4);
+                                    data->uniquenicks = gsirealloc(data->uniquenicks, data->numNicks * 4);
                                     if (data->uniquenicks == NULL) {
                                         gpiSetErrorString(connection, "Out of memory.");
                                         return 1;
                                     }
-                                    data->uniquenicks[data->numNicks - 1] = func_ov011_0216dddc(0x15);
+                                    data->uniquenicks[data->numNicks - 1] = gsimalloc(0x15);
                                     if (data->uniquenicks[data->numNicks - 1] == NULL) {
                                         gpiSetErrorString(connection, "Out of memory.");
                                         return 1;
@@ -616,7 +616,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                         GPFindPlayersResponseArg *data;
                         GPFindPlayerMatch *match;
 
-                        data = func_ov011_0216dddc(sizeof(GPFindPlayersResponseArg));
+                        data = gsimalloc(sizeof(GPFindPlayersResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -642,8 +642,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                     return 3;
                                 }
                                 data->numMatches++;
-                                data->matches =
-                                    func_ov011_0216ddec(data->matches, data->numMatches * sizeof(GPFindPlayerMatch));
+                                data->matches = gsirealloc(data->matches, data->numMatches * sizeof(GPFindPlayerMatch));
                                 if (data->matches == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
@@ -706,7 +705,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                             }
                             pid = atol(value);
                         }
-                        data = func_ov011_0216dddc(sizeof(GPCheckResponseArg));
+                        data = gsimalloc(sizeof(GPCheckResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -748,7 +747,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                         } else {
                             pid = atol(value);
                         }
-                        data = func_ov011_0216dddc(sizeof(GPNewUserResponseArg));
+                        data = gsimalloc(sizeof(GPNewUserResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -765,7 +764,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                     if (othersCallback.callback != NULL) {
                         GPGetReverseBuddiesResponseArg *data;
 
-                        data = func_ov011_0216dddc(sizeof(GPGetReverseBuddiesResponseArg));
+                        data = gsimalloc(sizeof(GPGetReverseBuddiesResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -799,8 +798,8 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                     gpiCallErrorCallback(connection, 3, 1);
                                     return 3;
                                 }
-                                data->profiles = func_ov011_0216ddec(data->profiles, (data->numProfiles + 1) *
-                                                                                         sizeof(GPProfileSearchMatch));
+                                data->profiles =
+                                    gsirealloc(data->profiles, (data->numProfiles + 1) * sizeof(GPProfileSearchMatch));
                                 if (data->profiles == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
@@ -844,7 +843,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                     if (othersListCallback.callback != NULL) {
                         GPGetReverseBuddiesListResponseArg *data;
 
-                        data = func_ov011_0216dddc(sizeof(GPGetReverseBuddiesListResponseArg));
+                        data = gsimalloc(sizeof(GPGetReverseBuddiesListResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -878,8 +877,8 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                     gpiCallErrorCallback(connection, 3, 1);
                                     return 3;
                                 }
-                                data->matches = func_ov011_0216ddec(data->matches, (data->numOfUniqueMatchs + 1) *
-                                                                                       sizeof(GPUniqueMatch));
+                                data->matches =
+                                    gsirealloc(data->matches, (data->numOfUniqueMatchs + 1) * sizeof(GPUniqueMatch));
                                 if (data->matches == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
@@ -917,7 +916,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                         GPSuggestUniqueNickResponseArg *data;
                         int count = 0;
 
-                        data = func_ov011_0216dddc(sizeof(GPSuggestUniqueNickResponseArg));
+                        data = gsimalloc(sizeof(GPSuggestUniqueNickResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -935,7 +934,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                             return 3;
                         }
                         data->numSuggestedNicks = atol(value);
-                        data->suggestedNicks = func_ov011_0216dddc(data->numSuggestedNicks * 4);
+                        data->suggestedNicks = gsimalloc(data->numSuggestedNicks * 4);
                         if (data->suggestedNicks == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -947,7 +946,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                 return result;
                             }
                             if (strcmp(key, "nick") == 0) {
-                                data->suggestedNicks[count] = func_ov011_0216dddc(0x15);
+                                data->suggestedNicks[count] = gsimalloc(0x15);
                                 if (data->suggestedNicks[count] == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
@@ -974,7 +973,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                     if (profileListCallback.callback != NULL) {
                         GPGetProfileListResponseArg *data;
 
-                        data = func_ov011_0216dddc(sizeof(GPGetProfileListResponseArg));
+                        data = gsimalloc(sizeof(GPGetProfileListResponseArg));
                         if (data == NULL) {
                             gpiSetErrorString(connection, "Out of memory.");
                             return 1;
@@ -1007,7 +1006,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
                                 int count = atol(value);
 
                                 if (count > 0) {
-                                    data->profiles = func_ov011_0216dddc(count * 4);
+                                    data->profiles = gsimalloc(count * 4);
                                     if (data->profiles == NULL) {
                                         gpiSetErrorString(connection, "Out of memory.");
                                         return 1;
@@ -1036,7 +1035,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
         if (!blocking) {
             return 0;
         }
-        func_ov011_0216e360(10);
+        msleep(10);
     }
 }
 
@@ -1051,7 +1050,7 @@ int gpiProcessSearches(GPConnection *connection) {
     int result;
 
     if (iconnection->numSearches > 0) {
-        list = func_ov011_0216dddc(iconnection->numSearches * 4);
+        list = gsimalloc(iconnection->numSearches * 4);
         if (list == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -1077,7 +1076,7 @@ int gpiProcessSearches(GPConnection *connection) {
                 gpiRemoveOperation(connection, list[i]);
             }
         }
-        func_ov011_0216ddfc(list);
+        gsifree(list);
     }
     return 0;
 }

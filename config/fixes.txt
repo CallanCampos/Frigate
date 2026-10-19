@@ -1302,6 +1302,8 @@ overlays/ov036 0x02183a18 reloc_addend 4
 overlays/ov036 0x02183ca8 reloc_addend 8
 overlays/ov036 0x021841e8 reloc_addend 2
 overlays/ov036 0x02184440 reloc_module overlay(12)
+overlays/ov036 0x0218d0e8 section_end src/ov036/talkmsgwin.c:.text
+overlays/ov036 0x0218d0e8 section_start src/ov036/ircbattlemenu.c:.text
 overlays/ov036 0x02191228 section_end src/ov036/fldmmdl_acmd.c:.text
 overlays/ov036 0x02194b68 reloc_module overlay(12)
 overlays/ov036 0x02194bc8 reloc_module overlay(12)
@@ -1393,7 +1395,8 @@ overlays/ov036 0x021ca8b8 remove_symbol
 overlays/ov036 0x021ca8bc remove_symbol
 overlays/ov036 0x021ca8e6 remove_symbol
 overlays/ov036 0x021cac9c remove_reloc
-overlays/ov036 0x021cacf4 section_end src/ov036/ircbattlemenu.c:.rodata
+overlays/ov036 0x021cacac section_start src/ov036/fldmmdl_acmd.c:.rodata
+overlays/ov036 0x021cacac section_end src/ov036/ircbattlemenu.c:.rodata
 overlays/ov036 0x021cb87c section_end src/ov036/fldmmdl_acmd.c:.rodata
 overlays/ov036 0x021cf2e4 section_end src/ov036/fldmmdl_blact.c:.rodata
 overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata

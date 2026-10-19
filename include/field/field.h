@@ -66,10 +66,10 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
 GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId);
 u32 func_ov036_021aece0(GameSystem *gsys, u32 a1, Regulation *regulation, HeapID heapId);
 // The screen that picks the party or the Battle Box for a battle, whether it is done, and the choice
-void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u8 battleBoxOk,
+void *func_ov036_021c3180(Field *field, PokeParty *party, PokeParty *battleBoxParty, u8 partyOk, u32 battleBoxOk,
                           HeapID heapId);
 BOOL func_ov036_021c3278(void *select);
-u16 func_ov036_021c3218(void *select, u32 *a1);
+int func_ov036_021c3218(void *select, u32 *a1);
 void *func_ov036_021c6574(void *effects, u32 a1, const VecFx32 *pos);
 void func_ov036_021c65a8(void *obj, u16 a1);
 void func_ov036_021c65e8(void *obj, u16 a1);

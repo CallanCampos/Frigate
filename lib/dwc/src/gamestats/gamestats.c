@@ -130,7 +130,7 @@ static BOOL CheckAnswer(char *data, int size) {
         return FALSE;
     }
     CopySecret(buffer);
-    func_ov011_0216e878(data, buffer + 0x14, bodySize, 2);
+    B64Encode(data, buffer + 0x14, bodySize, 2);
     CopySecret(buffer + 0x14 + GamestatsEncodedSize(bodySize));
     MATH_CalcSHA1(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
     DWC_Free(8, buffer, 0);
@@ -242,7 +242,7 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     buffer[1] = sum >> 16;
     buffer[2] = sum >> 8;
     buffer[3] = sum;
-    func_ov011_0216e878(buffer, dest, total + 4, 2);
+    B64Encode(buffer, dest, total + 4, 2);
     DWC_Free(8, buffer, 0);
     dest[GamestatsEncodedSize(total + 4)] = '\0';
     return 0;

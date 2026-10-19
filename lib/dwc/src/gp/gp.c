@@ -14,7 +14,7 @@
 // empty results
 
 int gpInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
-    if (data_ov011_02190698 != 1) {
+    if (__GSIACResult != 1) {
         return 2;
     }
     if (connection == NULL) {
@@ -232,7 +232,7 @@ int gpDenyBuddyRequest(GPConnection *connection, int profile) {
     }
     pProfile->requestCount--;
     if (!iconnection->infoCaching && pProfile->requestCount <= 0) {
-        func_ov011_0216ddfc(pProfile->authSig);
+        gsifree(pProfile->authSig);
         pProfile->authSig = NULL;
         if (gpiCanFreeProfile(pProfile)) {
             gpiRemoveProfile(connection, pProfile);

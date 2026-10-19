@@ -5396,7 +5396,7 @@ data_ov036_021d1004 kind:data(any) addr:0x021d1038
 data_ov036_021d1014 kind:data(any) addr:0x021d1048
 data_ov036_021d1028 kind:data(any) addr:0x021d105c
 data_ov036_021d103c kind:data(any) addr:0x021d1070
-data_ov036_021d1078 kind:data(any) addr:0x021d10ac
+NO_MAC kind:data(any) addr:0x021d10ac
 data_ov036_021d1080 kind:data(any) addr:0x021d10b4
 data_ov036_021d1090 kind:data(any) addr:0x021d10c4
 data_ov036_021d10a4 kind:data(any) addr:0x021d10d8
@@ -5609,11 +5609,11 @@ data_ov036_021d4bd0 kind:data(any) addr:0x021d4c10
 TALKMSG_WIN_TEX kind:data(any) addr:0x021d4c24
 TALKMSG_WIN_PLT kind:data(any) addr:0x021d4c44
 data_ov036_021d4c24 kind:data(any) addr:0x021d4c64
-data_ov036_021d4c34 kind:data(any) addr:0x021d4c74
-data_ov036_021d4c54 kind:data(any) addr:0x021d4c94
-data_ov036_021d4c74 kind:data(any) addr:0x021d4cb4
-data_ov036_021d4ca4 kind:data(any) addr:0x021d4ce4
-data_ov036_021d4ce4 kind:data(any) addr:0x021d4d24
+sIrcMenuBrightenAmounts kind:data(any) addr:0x021d4c74
+sWinRects2 kind:data(any) addr:0x021d4c94
+sIrcMenuVRAMConfig kind:data(any) addr:0x021d4cb4
+sWinRects3 kind:data(any) addr:0x021d4ce4
+sWinRectsA kind:data(any) addr:0x021d4d24
 data_ov036_021d4d24 kind:data(any) addr:0x021d4d64
 data_ov036_021d4d34 kind:data(any) addr:0x021d4d74
 data_ov036_021d4d40 kind:data(any) addr:0x021d4d80
