@@ -459,7 +459,8 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
 
 - Story progression through replay routes, each kept as a regression test; sanitizer-clean replays; 60 fps with
   headroom; controller support; one executable for both versions; an ad-hoc signed `.app` in a DMG, with "Open
-  Anyway" instructions (no notarization, D11).
+  Anyway" instructions (no notarization, D11), one universal app for Apple Silicon and Intel Macs with macOS 11 or
+  later ([ADR 0015](adr/0015-universal-macos-app-for-macos-11.md)).
 - Windows and Linux builds in CI.
 - **Exit:** the story can be finished on Black 2 and White 2; a private release candidate.
 

@@ -1,11 +1,15 @@
 # 0015: A universal macOS app for macOS 11, with the pinned SDL3 linked statically
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-18
 - **Plan:** D11, §7 phase 5 (an ad-hoc signed `.app` in a DMG), after
   [ADR 0003](0003-ad-hoc-signing-no-apple-developer-account.md) and
   [ADR 0010](0010-macos-app-as-a-signed-copy-of-the-program.md)
 - **Upstream:** `993e6c49b` (merged by the port's `1f0c184f6`)
+- **Note (2026-10-18):** accepted at the macOS distribution track's merge into `port-integrate` (`4122413bf`) by the
+  port's developer, as every earlier ADR was: the deployment target, macOS 11, and the architectures, arm64 and x86_64
+  in one app, are the developer's call. The branch's first commits numbered it 0013, which the Windows track's ADR
+  took; it is 0015 everywhere in the tree.
 
 ## Context
 
