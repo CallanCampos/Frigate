@@ -301,7 +301,7 @@ Same instructions, registers swapped.
   `ShinkaDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
   while the other branches keep theirs in registers.
 - Two values that the original keeps in one register, one dead before the other is set, were one variable: the PC
-  box's `func_ov255_021cdcc8` keeps the party position and then its result in the same variable, where two
+  box's `GetDepositBlock` keeps the party position and then its result in the same variable, where two
   variables get two registers.
 - A value tested before a branch and the value a loop in that branch works out can be one variable even when the
   two end up in two registers, and that split frees a register for a pointer that both branches share. Overlay 30's
@@ -312,7 +312,7 @@ Same instructions, registers swapped.
   declaration order, width and inline helper tried. An explicit `WIH *info = _pWmInfo;` is a plain copy that MWCC
   removes (it is absent from the `-g` DWARF), so it moves nothing.
 - A loop condition written with a local for its row start, `start = pos + j * 6; if (x >= start && x < w + start)`,
-  allocates registers differently from the same sums written in both comparisons: the PC box's `func_ov255_021d229c`
+  allocates registers differently from the same sums written in both comparisons: the PC box's `IsInPickedRange`
   only matched with the sums written out.
 - A parameter that the callers narrow with shifts before the call is a `u16` or `u8`, and the type also decides how it
   is spilled: `BagItemList_GetItem` spills `pocket` first and compares the reloaded copy only once `pocket` and `index`
@@ -692,13 +692,13 @@ Same code, other `sp` offsets or frame size.
 
 - A pointer to an array element written to a local, `font = &app->fontOam[i]; font->bitmap = ...; font->oam = ...`,
   keeps the array's address in a register and spills the element's offset, where `app->fontOam[i].bitmap` folds the
-  offsets into each access: the PC box's `func_ov255_021d1c30` matched only with the pointer.
+  offsets into each access: the PC box's `CreateFontOams` matched only with the pointer.
 - A padding slot stored twice before a call (`str r4, [sp]; adds r4, #0x80; str r4, [sp]`), with one field then read
   through the pointer's register and another through the reloaded slot, is a pointer local to a field of a field, used
   in two statements: NitroSDK's `OS_GetLowEntropyData` (`os_entropy.c`) declares `const u8 *macAddress = ((const
   NVRAMConfig *)work->nvramUserInfo)->macAddress;`, and MWCC keeps both the pointer and its base. It matched only
   together with the SDK's order of the `^` operands, which alone failed as well.
-- Declaration order does move spill slots in longer functions: `func_ov255_021d0374` matched with its loop counters
+- Declaration order does move spill slots in longer functions: `Box2Obj_PickUpRangeIcons` matched with its loop counters
   declared first and `y` before the row width.
 - Stack locals are laid out in reverse declaration order.
   When values must be read in one order (a script's arguments, say) but the original's slots follow another, declare
@@ -750,7 +750,7 @@ Same code, other `sp` offsets or frame size.
   spilled takes the lowest slot whatever the declarations say. When the original has a case's spilled value among the
   declared variables' slots, that case had a variable of its own, as case 9 of the records command does.
 - A loop counter stored to the slot of a local whose address is passed elsewhere is that local reused: in the PC box's
-  range pick, `func_ov255_021c445c`, the row loop counts with `y`, the touch position's `&y`, so the counter lives in
+  range pick, `Box2Seq_RangeMain`, the row loop counts with `y`, the touch position's `&y`, so the counter lives in
   `y`'s slot and the frame has no slot of its own for it. Pairs such as `width, height` that the original keeps in two
   sets of slots are block locals in two blocks; declaring them once at the top shares the slots and shrinks the frame.
   In `PokeIconMoveDataMake` the slots only matched once each reused variable was made block local and the loops used the
@@ -1778,7 +1778,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   constant gets a register of its own and the difference goes straight to the argument (`subs r2, r0, r1`), as in
   `fieldmap.c`'s `FieldmapProc_Init`. The result in a local and the subtraction in the argument don't do it.
 - `res -= 34;` lets MWCC fold a later `res + 36` into `res + 2`; a variable of its own, `u32 slot = res - 34;`, keeps the
-  difference in its register and adds 36 to it, as the PC box's `func_ov255_021c445c` does.
+  difference in its register and adds 36 to it, as the PC box's `Box2Seq_RangeMain` does.
 - Two constants applied to a field in one expression are folded into one (`x = x - 0x100 + 1` becomes `subs #0xff`);
   as two statements, `work->winV -= 0x100; work->winV++;`, both operations stay, as `btlv_effvm.c`'s
   `BtlvEffvm_WindowTask` needs (an unsigned `1u` mixed in also keeps them apart, but less naturally).
@@ -1817,7 +1817,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u8` itself: `GetBattleMon` hands its ID straight to `GetPokeParam`, so both take a `u8`, and so do the ability
   helpers that pass their mon's ID to `GetBattleMon`.
 - A wider parameter stored into a narrow bit field is narrowed to the field's type and then shifted into place, while
-  a `u8` parameter is trusted and shifted at once. The PC box's `func_ov255_021cc460` takes its button's actor and
+  a `u8` parameter is trusted and shifted at once. The PC box's `Box2Seq_AnimActorButton` takes its button's actor and
   palette as `u32` and narrows them in the stores to its 7- and 4-bit fields.
 - A sum that the original truncates to `s16` before comparing it was stored in an `s16` local, as the edges of the
   Join Avenue's balloons are; casting it in the comparison gives the same code but is not needed.
@@ -2218,7 +2218,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `u32` is `unsigned int` in our `types.h` and `unsigned long` in the SDK, and MWCC treats the two differently in an
   index: for `&sActorData[15 + i]` with an `unsigned int i` it adds first and multiplies (`adds r1, #0xf; muls`), and
   with an `unsigned long i` it keeps `i * 0x18` and adds the constant's offset, and folds the constant of
-  `actors[ret + 11]` into the load's offset. The PC box's `func_ov255_021d0d70` and `func_ov255_021d57a0` match with
+  `actors[ret + 11]` into the load's offset. The PC box's `CreateFixedActors` and `BoxSearch_SeqMarkingList` match with
   the counter and the result declared `unsigned long`. Rows that say "the original folds the constant into the
   offset", or that match only with `(&a[i])[11]`, are candidates. `size_t` is `unsigned long` as well, and an SDK
   prototype that takes one needs it: `STD_TVSNPrintf`'s `str.start[len - 1]` is `adds r0, p, len; subs r0, #1; strb
@@ -2438,7 +2438,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary is the same: `fieldmap.c`'s `FldActSys_VRAMUploadFunc` branches with `bne` and puts the `a` value first
   only as `!type ? a : b`; `type == 0 ? a : b` branches with `beq` and puts `b` first.
 - The operands of `==` between two fields are compared in source order: `syswk->tray == syswk->getTray` gives
-  `cmp tray, getTray`, as the PC box's `func_ov255_021cc8dc` needs.
+  `cmp tray, getTray`, as the PC box's `Box2Seq_ArrangeSummaryReturn` needs.
 - `Aoss_Decrypt` needs the `u8` returned by `Aoss_Checksum` stored in a local before it is compared with the
   `checksum` parameter; comparing the call directly swaps the `cmp` operands, even when the expression is reversed.
 - The left operand of a comparison is loaded first, even before a store just above it: `sw->nowFrame++; if
@@ -2446,7 +2446,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ISSSwitch_AdvanceFade` does, where `sw->nowFrame > sw->endFrame` is 2 bytes off.
 - A store picked by a test, `if (pos < 30) syswk->pos = pos; else syswk->pos = 0;`, branches past the second value with
   `bhs` and `b`, while clamping a local first, `if (pos >= 30) pos = 0; syswk->pos = pos;`, uses one `blo`. The PC box's
-  `func_ov255_021c8b38` is the first.
+  `Box2Seq_ItemMain` is the first.
 - `x = x == 0 ? 3 : x - 1;` reads `x` once, and `if (x == 0) { x = 3; } else { x--; }` reads it again in the `else`
   branch before the shared store, as the Pokédex habitat map's season changes do.
 - The last test of a condition branches to the code written second. `if (a == x || a == y) { return TRUE; } return
@@ -2938,7 +2938,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   is merged into it, leaving a `b` to the next case. The original's code is that `b`, so write each case out in full
   with its own `done = TRUE; break;`, as wipe_sub.c's `WipeBright_Main` does, rather than a fall-through.
 - The comparison tree depends only on the set of case values, and evenly spaced cases are grouped from the low end:
-  the PC box search's `func_ov255_021d40e8` cases {0, 3, 9, 15, 21, 24, 27, 30} split at 27, and no order, type or
+  the PC box search's `BoxSearch_PrintInfo` cases {0, 3, 9, 15, 21, 24, 27, 30} split at 27, and no order, type or
   `default:` changes that.
 - A switch whose comparisons start with a value outside its jump table, `cmp r0, #5; beq other; cmp r0, #3; bls table`,
   with that value's code after the cases, is `if (x != 5) { switch (x) { ... } } else { ... }`; the same test before
@@ -3016,7 +3016,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
   unchanged: `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHidenResult` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
   (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
-  bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
+  bytes), and `box_search.c`'s `BoxSearch_PrintInfo` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
   for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. The pinned wibo
   release configures the guest at 0x27f; if an older binary is used, check that before trying a "gap of 4" or a tree
   rooted one case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
