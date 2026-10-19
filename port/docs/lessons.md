@@ -3,6 +3,15 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the Windows track's merge, after review
+
+- **Trace a warning count that moved against the base's own CI run, file and line.** The last STATUS entry's count
+  can come from a branch older than the base: the Pokédex's 263 predated upstream's `gpiInfo.c`, which `main`'s run
+  at the merge's base already warned about. Diff the warning lines of the two jobs' logs (`gh run view --job N --log`)
+  by file and line; the rest of the difference shows too, such as a host's own warning or one that the merge removed.
+- **Ninja's `[n/total]` counts what runs, not the build.** A rebuild after the merge's flags changed ran 1,701 of a
+  fresh build's 1,797 steps; only a fresh build directory's total is the build's size.
+
 ## 2026-10-18: Windows in CI, after review
 
 - **On Windows, nothing up a fiber's stack reaches the unhandled-exception filter.** The system looks for a handler

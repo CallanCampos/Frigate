@@ -26,24 +26,96 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the Windows track's merge after review: its warnings traced and its steps counted
+
+- **Upstream:** `9b486e486`, as merged into the port's `main` by `334077ba7`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` after `d02026b0b`: this entry, which also corrects the last;
+  pushed to `port-windows` (a fast-forward from `d02026b0b`) for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `d02026b0b`
+  with this entry's documents. No game file changed.
+- **Host build:**
+  - arm64 macOS, RelWithDebInfo, `build/port-n` (Black 2) and `build/port-w2` (White 2), both Ninja, built again at
+    `d02026b0b` with this entry's documents: CMake ran again and nothing else had to (no source changed since the last
+    entry's builds), so their 264 warnings stand, none in `port/`. The review's fresh builds of `d02026b0b` (since
+    deleted) had 1,797 steps and 264 warnings each, none in `port/`. The oracle is `build/oracle`'s `pbw-oracle` in
+    both builds' `oracle/`, and the saves their `oracle-saves`.
+  - CI: run [39175404511](https://github.com/CallanCampos/Frigate/actions/runs/39175404511), at `d02026b0b`, green on
+    all three hosts (263 warnings on Linux and Windows, 264 on macOS, none in `port/`); this entry changes only
+    documents, and its own run on `port-windows` is the next entry's.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 at `d02026b0b` with this entry's documents, the two builds at once, `ctest -j6` (Black 2) and
+    `ctest -j4` (White 2), with the oracle in both, under a load average of 20 to 85 from the other tracks' runs:
+    Black 2, 280 of 281 pass (2,075 s), none skipped, and `asm_oracle` timed out at its 900 s and passes on its own
+    (138 s), so all 281 pass; `oracle_launch_party_menus` (the Pokédex among its apps) passes in 1,175 s and
+    `oracle_continue_starter` in 1,434 s. White 2, 275 of 277 pass (2,182 s), `asm_oracle` among them (459 s), and
+    `oracle_continue_starter` and `oracle_launch_party_menus` skip as before (no SHA-1 of White 2's `starter_save`).
+  - CI, run 39175404511: macOS 236 pass and 45 skip of 281; Linux 219 pass and 47 skip of 266; Windows 209 pass and
+    57 skip of 266, the same tests and skips as the Windows track's last run (39162189835), as the review found.
+  - Every run passed `--save-dir`: the tests left `~/Library` alone (nothing in its `Frigate` folders is newer than
+    this task's start, and the folders were last written at 16:31). This entry changes no C, and the relative links
+    of STATUS.md and lessons.md resolve, anchors included (checked by script). T5's nightly runs and T7 not yet; on
+    Windows, nothing with a ROM has run yet (not yet).
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 474 function stubs and 46 data placeholders in each version (each build's `gen/stubs.c`), as in the
+  last entry.
+- **64-bit warnings:** not measured: no game or `lib/` code changed. The last entry's field gave none of those kinds
+  among the 264 warnings, which the game's target leaves off; it now says not measured too, with why.
+- **Work done:** the review of the Windows track's merge (`d294567e3` to `d02026b0b`): clean, with three nits, each
+  checked against the logs and fixed in this entry, but one.
+  - **The 264th warning, traced:** the last entry called it "not traced". It is `lib/dwc/src/gp/gpiInfo.c:138:16`'s
+    `-Wtautological-pointer-compare`, in upstream's GameSpy `gpiInfo.c` (`1ec257379`, merged by `4fee9b918`): the
+    Pokédex entry's 263 came from its branch, from `2da26e048`, which predates it, and `main`'s own macOS job at
+    `77263e609` (run 39171576539) has the same 264, file and line for file and line, as the merge's local builds and
+    its macOS job have. On Linux the merge took one away: `main`'s job had 264 with `port/app/run_dir.c:8`'s
+    `_POSIX_C_SOURCE` redefinition, which the host seam's `run_dir.c` no longer has, and Windows' 263 are Linux's.
+    macOS's one more than Linux is `src/ov011/dwc_rap.c:320`'s `sprintf`, which only macOS's SDK marks deprecated.
+    The last entry's Host build field says so.
+  - **The steps, counted:** the last entry said its builds ran "every step again (1,701 each)". A fresh build has
+    1,797 steps, as the review's builds and CI's macOS job had; 1,701 of them ran in the merge's. The field says so.
+  - **The last entry's 64-bit warnings** said none of the pointer and integer size kinds were among the 264, which
+    measures nothing while the game's target leaves them off (`port/CMakeLists.txt`; `port/tools/compile-probe` counts
+    them); it now says not measured, as the launcher's review had its entry say. Its Port field names `d02026b0b`.
+  - **Not changed: the merge's message.** `d294567e3` names neither of its two conflicted files, as `859e4c1cf`'s and
+    `77263e609`'s messages did. They were `port/docs/STATUS.md` and `port/docs/lessons.md`; the last entry's Work done
+    names them, and so does this entry's commit message. Rewording the merge would rewrite `port-windows`, which holds
+    it, and so need a force-push.
+  - **ADR 0013's acceptance:** the review could confirm that the integration task asked for it, not that the user
+    approved. It was accepted by the developer, as ADR 0012 was at publishing (`bbfab4c72`), and no record here holds
+    the user's own word on the toolchain, so the user is told; reverting `f86bca826` puts the ADR back to proposed.
+  - **lessons.md:** a moved warning count is traced against the base's own CI run, file and line, and Ninja's
+    `[n/total]` counts what runs, not the build.
+- **Next:** as in the last entry: Windows' stage 4 (a run with a ROM on a Windows machine, sanitizers on CLANG64, a
+  build without a console, a package, the memory-mapped ROM, ARM64 and VRAM aliasing); White 2's starter route; the
+  apps no route reaches yet; a save with an adventure made by the port; a sound comparison sequence.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the Windows track merged under today's names, and ADR 0013 accepted
 
 - **Upstream:** `9b486e486`, as merged into the port's `main` by `334077ba7`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `77263e609`: `d294567e3` (the merge of
+- **Port:** `d02026b0b`, on the branch `port-integrate` from `main` at `77263e609`: `d294567e3` (the merge of
   `port-windows` at `a49a40626`), `f86bca826` (ADR 0013 accepted), `d6fe067d8` (the Windows track under today's
   names), then this entry; pushed to `port-windows` (a fast-forward from `a49a40626`) for CI, not to `main`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `d294567e3` and
   `d6fe067d8`. No game file changed: the Windows track changes only `port/` and Frigate's own `port-ci.yml`.
 - **Host build:**
   - arm64 macOS, RelWithDebInfo, `build/port-n` (Black 2) and `build/port-w2` (White 2), both Ninja, rebuilt from
-    `d294567e3`: every step again (1,701 each), since the merge brought the Windows track's flags; no errors, 264
-    warnings in each, one more than the Pokédex entry's 263 (not traced: upstream's C merged by `4fee9b918` and
-    `334077ba7` came since, and so did `-fno-builtin-wcslen`), none in `port/` and none of the pointer and integer size
-    kinds. The oracle is `build/oracle`'s `pbw-oracle` in both builds' `oracle/`, and the saves their `oracle-saves`.
+    `d294567e3`: 1,701 of a fresh build's 1,797 steps ran again, since the merge brought the Windows track's flags; no
+    errors, 264 warnings in each, none in `port/`. That is one more than the Pokédex entry's 263:
+    `lib/dwc/src/gp/gpiInfo.c:138:16`'s `-Wtautological-pointer-compare`, in upstream's GameSpy `gpiInfo.c`
+    (`1ec257379`, merged by `4fee9b918`), which the Pokédex's branch, from `2da26e048`, predates. `main`'s own macOS
+    job at `77263e609` (run [39171576539](https://github.com/CallanCampos/Frigate/actions/runs/39171576539)) has the
+    same 264, file and line for file and line, so the merge added none. The game's target turns the pointer and
+    integer casts' warnings off and leaves `-Wshorten-64-to-32` off (`port/CMakeLists.txt`; `port/tools/compile-probe`
+    counts them), so the 264 are other kinds. The oracle is `build/oracle`'s `pbw-oracle` in both builds' `oracle/`,
+    and the saves their `oracle-saves`.
   - CI, `port-ci.yml` dispatched on `port-windows` at `d6fe067d8`: run
     [39173987503](https://github.com/CallanCampos/Frigate/actions/runs/39173987503), green on all three hosts. Windows
     built with MSYS2's clang 22.1.8, CMake 4.4.3, Python 3.14.7 and SDL3 3.4.16; 263 warnings there and on Linux, 264
-    on macOS, none in `port/` on any.
+    on macOS, none in `port/` on any. Windows' 263 are Linux's; macOS's one more is `src/ov011/dwc_rap.c:320`'s
+    `sprintf`, which only macOS's SDK marks deprecated. `main`'s Linux job at `77263e609` had 264: the 264th was
+    `port/app/run_dir.c:8`'s `_POSIX_C_SOURCE` redefinition, a `port/` warning that the host seam's `run_dir.c` no
+    longer has.
 - **Tests:** T0 as above.
   - T2, T3, T4, T6 on `d294567e3`, the two builds at once, `ctest -j6` (Black 2) and `ctest -j4` (White 2), with the
     oracle in both, under a load average of 40 to 180 from the other tracks' runs: Black 2, all 281 pass (2,173 s),
@@ -65,8 +137,8 @@ level that doesn't exist yet says "not yet"; no field is left out.
   Pokédex entry's 512 and 46: upstream's C merged by `4fee9b918` and `334077ba7` (among it libfx and libmath, NitroWiFi
   and DWC), which the last entries didn't count. The host's C library provides 34 of the ROM's symbols on macOS, 35 on
   Linux and 36 on Windows.
-- **64-bit warnings:** none of the pointer and integer size kinds among the 264 warnings, in each version; no game or
-  `lib/` code changed in this task.
+- **64-bit warnings:** not measured: no game or `lib/` code changed in this task. The host build's 264 warnings (Host
+  build above) are of other kinds, since the game's target leaves those off.
 - **Work done:**
   - **The merge** (`d294567e3`, `git merge --no-ff origin/port-windows`): two conflicts, both documents, both kept
     whole. STATUS.md and lessons.md take the Windows track's entries above `main`'s, newest first, and the Windows
