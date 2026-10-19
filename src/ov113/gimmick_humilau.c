@@ -31,11 +31,11 @@ typedef struct {
     VecFx32 end;
 } JumpWork;
 
-static void func_ov113_021eedf4(GimmickWork *work);
-static void func_ov113_021eee68(GimmickWork *work);
-static void func_ov113_021eee74(GimmickWork *work);
-static void func_ov113_021eee80(FieldExpObjSystem *system, u16 actor);
-static GameEventReturnCode func_ov113_021eeee0(GameEvent *event, u32 *state, void *data);
+static void GimmickHumilau_LoadSplash(GimmickWork *work);
+static void GimmickHumilau_FreeScene(GimmickWork *work);
+static void GimmickHumilau_StepAnimations(GimmickWork *work);
+static void GimmickHumilau_PlayActor(FieldExpObjSystem *system, u16 actor);
+static GameEventReturnCode GimmickHumilau_JumpEvent(GameEvent *event, u32 *state, void *data);
 
 static const G3DSceneResourceSetup sResources[] = {
     { 0x114, 22, 0 },
@@ -59,26 +59,26 @@ static const fx32 sJumpHeights[] = {
     FX32_CONST(29), FX32_CONST(28), FX32_CONST(26), FX32_CONST(24), FX32_CONST(22),
 };
 
-void func_ov113_021eec80(Field *field) {
+void GimmickHumilau_Init(Field *field) {
     GimmickWork *work;
 
     Field_AllocGimmickWorkBlock(field, 1, Field_GetHeapID(field), sizeof(GimmickWork));
     work = Field_GetGimmickWorkBlock(field, 1);
     work->field = field;
     work->system = Field_GetExpObjSystem(field);
-    func_ov113_021eedf4(work);
+    GimmickHumilau_LoadSplash(work);
 }
 
-void func_ov113_021eecb0(Field *field) {
-    func_ov113_021eee68(Field_GetGimmickWorkBlock(field, 1));
+void GimmickHumilau_End(Field *field) {
+    GimmickHumilau_FreeScene(Field_GetGimmickWorkBlock(field, 1));
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
-void func_ov113_021eecc8(Field *field) {
-    func_ov113_021eee74(Field_GetGimmickWorkBlock(field, 1));
+void GimmickHumilau_Update(Field *field) {
+    GimmickHumilau_StepAnimations(Field_GetGimmickWorkBlock(field, 1));
 }
 
-void func_ov113_021eecd8(GameSystem *gsys, u16 x, u16 y, u16 z) {
+void GimmickHumilau_ShowSplash(GameSystem *gsys, u16 x, u16 y, u16 z) {
     GameData *gameData;
     Field *field;
     GimmickWork *work;
@@ -95,11 +95,11 @@ void func_ov113_021eecd8(GameSystem *gsys, u16 x, u16 y, u16 z) {
     matrix->translation.y = y * GRID_SIZE;
     matrix->translation.z = z * GRID_SIZE;
     FieldExpObj_SetActorHidden(system, 0, 0, FALSE);
-    func_ov113_021eee80(work->system, 0);
+    GimmickHumilau_PlayActor(work->system, 0);
     GFL_SndSEPlay(SEQ_SE_SW_SHIZUI);
 }
 
-GameEvent *func_ov113_021eed38(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 a4) {
+GameEvent *GimmickHumilau_CreateJumpEvent(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 a4) {
     GameData *gameData;
     FieldActor *actor;
     GameEvent *event;
@@ -126,7 +126,7 @@ GameEvent *func_ov113_021eed38(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 
     GetHeightFromMap(actor, &end, &height);
     end.y = height;
 
-    event = GameEvent_Create(gsys, NULL, func_ov113_021eeee0, sizeof(JumpWork));
+    event = GameEvent_Create(gsys, NULL, GimmickHumilau_JumpEvent, sizeof(JumpWork));
     work = GameEvent_GetData(event);
     work->actor = actor;
     work->frame = 0;
@@ -136,7 +136,7 @@ GameEvent *func_ov113_021eed38(GameSystem *gsys, u16 actorId, u16 x, u16 z, u16 
     return event;
 }
 
-static void func_ov113_021eedf4(GimmickWork *work) {
+static void GimmickHumilau_LoadSplash(GimmickWork *work) {
     u32 i;
     FieldExpObjAnm *anm;
     SRTMatrix *matrix;
@@ -156,16 +156,16 @@ static void func_ov113_021eedf4(GimmickWork *work) {
     }
 }
 
-static void func_ov113_021eee68(GimmickWork *work) {
+static void GimmickHumilau_FreeScene(GimmickWork *work) {
     FieldExpObj_FreeScene(work->system, 0);
 }
 
-static void func_ov113_021eee74(GimmickWork *work) {
+static void GimmickHumilau_StepAnimations(GimmickWork *work) {
     FieldExpObj_StepAllAnimations(work->system);
 }
 
 // Shows an actor and plays its animations once from the start
-static void func_ov113_021eee80(FieldExpObjSystem *system, u16 actor) {
+static void GimmickHumilau_PlayActor(FieldExpObjSystem *system, u16 actor) {
     u32 i;
     FieldExpObjAnm *anm;
 
@@ -180,7 +180,7 @@ static void func_ov113_021eee80(FieldExpObjSystem *system, u16 actor) {
 }
 
 // Moves the actor along the jump, then lowers it to the ground
-static GameEventReturnCode func_ov113_021eeee0(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode GimmickHumilau_JumpEvent(GameEvent *event, u32 *state, void *data) {
     JumpWork *work = data;
     VecFx32 pos;
 

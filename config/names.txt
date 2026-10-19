@@ -9964,6 +9964,16 @@ overlays/ov112 0x021eee0c AspertiaCity_LoadModels
 overlays/ov112 0x021eeec8 AspertiaCity_FreeScene
 overlays/ov112 0x021eeed4 AspertiaCity_StepAnimations
 overlays/ov112 0x021eeee0 AspertiaCity_ShowSeasonModel
+overlays/ov113 0x021eec80 GimmickHumilau_Init
+overlays/ov113 0x021eecb0 GimmickHumilau_End
+overlays/ov113 0x021eecc8 GimmickHumilau_Update
+overlays/ov113 0x021eecd8 GimmickHumilau_ShowSplash
+overlays/ov113 0x021eed38 GimmickHumilau_CreateJumpEvent
+overlays/ov113 0x021eedf4 GimmickHumilau_LoadSplash
+overlays/ov113 0x021eee68 GimmickHumilau_FreeScene
+overlays/ov113 0x021eee74 GimmickHumilau_StepAnimations
+overlays/ov113 0x021eee80 GimmickHumilau_PlayActor
+overlays/ov113 0x021eeee0 GimmickHumilau_JumpEvent
 overlays/ov116 0x021eec80 GimmickGC6_Setup
 overlays/ov116 0x021eecb0 GimmickGC6_End
 overlays/ov116 0x021eecc8 GimmickGC6_Update

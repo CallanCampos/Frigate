@@ -12,7 +12,7 @@ static BOOL Plugin15Cmd_ShowSplash(VM *vm, FieldScriptEnv *env) {
     u16 y = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
 
-    func_ov113_021eecd8(gsys, x, y, z);
+    GimmickHumilau_ShowSplash(gsys, x, y, z);
     return FALSE;
 }
 
@@ -23,7 +23,7 @@ static BOOL Plugin15Cmd_JumpActorOut(VM *vm, FieldScriptEnv *env) {
     u16 x = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
     u16 a4 = ScriptReadAny(vm, env);
-    GameEvent *event = func_ov113_021eed38(gsys, actorId, x, z, a4);
+    GameEvent *event = GimmickHumilau_CreateJumpEvent(gsys, actorId, x, z, a4);
 
     if (event == NULL) {
         return FALSE;
