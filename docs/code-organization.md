@@ -86,6 +86,14 @@ every section.
   external data with `extern` there, and include the header at each use. Do not add `extern` declarations or
   prototypes of other files' functions in a `.c` file. A file includes its own header, so its definitions are checked
   against the declarations.
+- A function the build compiled into more than one file (`tools/decomp/find_duplicates.py` lists them) is written
+  once. Its body goes in the owner's header as a `static inline` named after the owner's function with an `Inline`
+  suffix, and the owner and each copy keep their own names and linkage (a `static` copy stays `static`) and are each
+  one call to it. The header gains the includes the body needs; `ninja` compiles every file that includes it. The
+  file's compiler has to inline the call: the game's `-inline on,noauto` and the 2.0 library default do, while
+  `-inline off` leaves a call. A copy that doesn't match this way is written out in its own file, with a comment
+  naming the function it copies. Only `identical` groups are shared: in a `same via duplicates` group each copy calls
+  its own duplicate, which one inline cannot, and a `same shape` group is not proven to be the same code.
 - Each proc that an event starts has a header in `app/` with its parameter struct, proc table and overlay ID, such as
   `app/worldtrade.h`. Each event has a header in `field/` with its create functions, such as
   `field/event_worldtrade.h`. A proc built from many files keeps their headers in a directory of `app/` named after

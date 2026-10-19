@@ -72,9 +72,11 @@ order you write them.
   `.venv/bin/python tools/decomp/version_map.py b2_us w2_us -o build/version_map.tsv` (without it White 2 is not
   scanned) and `.venv/bin/python tools/decomp/find_duplicates.py -o build/duplicates.tsv`, then
   `grep -E 'FUNC_A|FUNC_B' build/duplicates.tsv` for the file's functions. A row with a matched copy has C already:
-  read it before writing this one. Write the file as usual, and list each copy the file shares (the other copies'
-  names and addresses; a row's `group` number changes from run to run) in the commit message and the PR, since how
-  shared copies are organised is still being settled in #315.
+  read it before writing this one. Write the file as usual, with each copy in an `identical` group written as the
+  shared function `docs/code-organization.md` describes. Change the owner's file only when it is unclaimed or under
+  your claim; otherwise write the copy out with a comment naming its original, and list it on the owner's overlay
+  issue. List each copy the file shares (the other copies' names and addresses; a row's `group` number changes from
+  run to run) in the commit message and the PR.
 
 ## 4. Write the C
 
