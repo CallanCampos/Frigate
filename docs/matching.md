@@ -1408,9 +1408,11 @@ Same instructions, scheduled in another order.
   list's count again in every iteration because its filter is `const`, where a plain pointer's count is loaded once
   before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
   `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
-  The pointer has to be a parameter of the function: `field_rail.c`'s line searches `func_ov036_021b21b0` and
-  `func_ov036_021b1e8c` match with `const RailDataHandle *data`, where a `const` local pointer, initialized or not,
-  or a `const` parameter of a `static inline` helper still has the count hoisted (`SetWkToActorRailPos`).
+  The pointer can be a parameter or a local: `field_rail.c`'s line searches `func_ov036_021b21b0` and
+  `func_ov036_021b1e8c` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
+  `FieldBlAct_IsAsyncLoadPending` with `const AsyncLoader *loader = blact->loader;` (its own field read through a
+  plain pointer). In `SetWkToActorRailPos` neither a `const` local nor a `const` parameter of a `static inline`
+  helper stops the hoist, so the count there is held some other way.
 - A field load scheduled ahead of a store it doesn't depend on, where MWCC keeps the written order, can come from an
   inline helper's argument: arguments are evaluated before the body's stores. The PC box's sequences set the picked
   position with `u8 pos = func_0202ba60(...); Box2Seq_SetGetPos(syswk, pos, syswk->tray);`, which loads `tray` before

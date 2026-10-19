@@ -170,11 +170,11 @@ static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, void *resource, u32 
         size = &MMDL_BILLBOARD_SIZES_INT[sizeIdx];
         texKey = GFL_G3DResGetTexVRAMHandle(resource);
         plttKey = GFL_G3DResGetPltVRAMHandle(resource);
-        material = BlActSys_AddTexMat(
-            sys,
-            BlActScene_AddMaterialExistTex(scene, texKey, plttKey, 0, MMDL_TEXTURE_ATLAS_SIZE_BITS[atlasIdx],
-                                           MMDL_BILLBOARD_SIZES_INT[sizeIdx].width, size->height),
-            NULL);
+        material = BlActSys_AddTexMat(sys,
+                                      BlActScene_AddMaterialExistTex(scene, texKey, plttKey, 0,
+                                                                     MMDL_TEXTURE_ATLAS_SIZE_BITS[atlasIdx],
+                                                                     size->width, size->height),
+                                      NULL);
         GFL_G3DResFree(resource);
     }
     return material;
@@ -599,36 +599,28 @@ static void func_ov036_02193e70(FieldBlAct *blact) {
 }
 
 static BOOL FieldBlAct_IsAsyncLoadPending(FieldBlAct *blact) {
-    AsyncRead *read = blact->loader->reads;
+    const AsyncLoader *loader = blact->loader;
+    u32 i;
+    AsyncRead *read = loader->reads;
     AsyncResource *resource;
     PendingActor *actor;
-    u32 i;
 
-    i = 0;
-    while (i < blact->loader->readCount) {
+    for (i = 0; i < loader->readCount; i++, read++) {
         if (read->objCode != BLACT_NONE) {
             return TRUE;
         }
-        i++;
-        read++;
     }
-    resource = blact->loader->resources;
-    i = 0;
-    while (i < blact->loader->resourceCount) {
+    resource = loader->resources;
+    for (i = 0; i < loader->resourceCount; i++, resource++) {
         if (resource->resource != NULL) {
             return TRUE;
         }
-        i++;
-        resource++;
     }
-    actor = blact->loader->actors;
-    i = 0;
-    while (i < blact->loader->actorCount) {
+    actor = loader->actors;
+    for (i = 0; i < loader->actorCount; i++, actor++) {
         if (actor->index != NULL && actor->resource != NULL) {
             return TRUE;
         }
-        i++;
-        actor++;
     }
     return FALSE;
 }
@@ -728,9 +720,9 @@ static void FieldBlAct_FinishAsyncMatLoad(FieldBlAct *blact) {
 
 static BOOL FldBlAct_CheckAsyncLoading(FieldBlAct *blact, u16 objCode, u16 *flags) {
     AsyncLoader *loader = blact->loader;
-    AsyncRead *read = loader->reads;
     AsyncResource *resource;
     u32 i;
+    AsyncRead *read = loader->reads;
 
     for (i = 0; i < loader->readCount; i++, read++) {
         if (read->objCode == objCode) {
@@ -750,9 +742,9 @@ static BOOL FldBlAct_CheckAsyncLoading(FieldBlAct *blact, u16 objCode, u16 *flag
 
 static BOOL func_ov036_02194144(FieldBlAct *blact, u16 objCode) {
     AsyncLoader *loader = blact->loader;
-    AsyncRead *read = loader->reads;
     AsyncResource *resource;
     u32 i;
+    AsyncRead *read = loader->reads;
 
     for (i = 0; i < loader->readCount; i++, read++) {
         if (read->objCode == objCode) {
