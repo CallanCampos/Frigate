@@ -522,7 +522,8 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
 
         draw->cursorColor = GX_RGB(level, level, level);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0xde, &draw->cursorColor, sizeof(draw->cursorColor));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0xde, &draw->cursorColor,
+                                       sizeof(draw->cursorColor));
     return COMM_TVT_MODE_DRAW;
 }
 
