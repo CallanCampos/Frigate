@@ -42,9 +42,9 @@ static void SetTexParamsAndGetTexCoord_(const GXOamAttr *oam, const NNSG2dImageA
     GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
     int shapeIdx = (shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT;
     int sizeIdx = (shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT;
-    u16 charName = oam->charNo;
-    BOOL flipH;
+    u16 charName;
     BOOL flipV;
+    BOOL flipH;
     GXTexFmt fmt;
     u16 cParam;
     u32 pltOffset;
@@ -52,6 +52,7 @@ static void SetTexParamsAndGetTexCoord_(const GXOamAttr *oam, const NNSG2dImageA
     coord->w = NNSi_objSizeWTbl[shapeIdx][sizeIdx];
     coord->h = NNSi_objSizeHTbl[shapeIdx][sizeIdx];
 
+    charName = oam->charNo;
     if (texImageAttr->mappingType == GX_OBJVRAMMODE_CHAR_2D) {
         G3_TexImageParam(texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texImageAttr->sizeS, texImageAttr->sizeT,
                          GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr);
