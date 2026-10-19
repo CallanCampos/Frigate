@@ -26,6 +26,97 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-19: frames with headroom: 3D in bands on worker threads, still 3D kept, frame times measured and held
+
+- **Upstream:** `2825ea75f`, as merged into the port's `main` by `607ccd1a6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-perf` from `origin/main` at `607ccd1a6`: `8cb006454` (`--frame-times`,
+  `frame_times.py` and the timing routes), `b9b46a0a9` (the still 3D picture kept), `f6f924be2` (the 3D frame in bands
+  on worker threads, ADR 0016), `8aef262f2` (the game's thread at user-interactive QoS), `889fcc3de` (the geometry
+  engine's entries fed straight to the executor), `f14b27045` (capture a line at a time), `a41ad3171` (the 2D sources
+  kept until the VRAM layout changes), `795455dd7` (the 2D colour effects only where a line can blend), `bf43d595b`
+  (SHA-1 through the ARMv8 SHA instructions), then this entry; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at every commit. No
+  file outside `port/` changed.
+- **Host build:** macOS 26.5.1 on an M2 MacBook Air (4 performance and 4 efficiency cores, 16 GB), Xcode 26.6 (Apple
+  clang 21.0.0), RelWithDebInfo, Ninja, in the worktree `build/wt-perf`: `build/port` (Black 2) and `build/port-w2`
+  (White 2), with `build/verify-tree`'s `pbw-oracle` and cached saves copied in; `build/port-san` (Black 2,
+  `-DPORT_SANITIZE=ON`). Warnings: 264 in each, the decomp's, none in `port/`. Not pushed, so no CI run: Linux and
+  Windows weren't built here, and the Windows halves of the host's new clock, threads and signals (`host_windows.c`)
+  have been compiled by no one yet.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle and its saves, both builds at once: Black 2, 291 pass and 1
+    skip of 292 (567 s); White 2, 288 pass and 1 skip of 289 (531 s). The skip is `app_universal_slices`, which a
+    development build's one slice skips. The new tests pass: `frame_times_tool`, `g3d_ds3d_bands` and its sanitized
+    twin, and the timing routes `frame_times_title`, `frame_times_party_menus` (both versions) and
+    `frame_times_new_game` (Black 2) within the default budget, 8.36 ms.
+  - Output unchanged, commit by commit: `frames.tsv` of the opening, title, CONTINUE, New Game and both launcher routes
+    (Black 2, `--run-dir`, every frame's VBlank count, GFL count, game frame and both screens' SHA-1s) is byte for byte
+    `607ccd1a6`'s after each commit, with `--frame-times` on too, and for the title, New Game and the party apps at
+    `--render-threads` 1, 2 and 8. `g3d_ds3d` runs every hand-worked 3D scene in one band and in three, and
+    `g3d_ds3d_bands` draws random 2,000-triangle scenes in 2 to 8 bands against one, pixel, depth, ID and fog flag.
+  - T5, the sanitized Black 2 build (`build/port-san`, made from nothing), with the oracle and its saves: its 25 routes
+    pass (407 s), the game's thread and the 3D renderer's workers under ASan and UBSan, and the 266 other tests, 265
+    pass and `app_universal_slices` skips (107 s); no output has a sanitizer's report. White 2's sanitized build wasn't
+    run. T7 not yet.
+  - Every run passed `--save-dir` with `HOME` a scratch directory; `~/Library`'s `Application Support/Frigate` and
+    `Logs/Frigate` hold nothing newer than 16:33 on 2026-10-18.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** 457 function stubs and 46 data placeholders in each version, as the last entry.
+- **64-bit warnings:** as the last entry.
+- **Work done:** making Frigate's frames with headroom, from the measurement of 2026-10-19 (every route under the
+  16.7 ms budget, the worst scene's 95th percentile 4.7 ms headless, 3D frames about 6 ms paced; the CPU 3D renderer
+  about three quarters of a 3D frame), in its order of gain, each change in a commit of its own with its measured gain
+  and its proof of unchanged output.
+  - **The measurement, repeatable** (`8cb006454`): `--frame-times FILE` (`port/hal/os/frame_time.c`) writes each
+    frame's host time with and without the pacing wait and its parts (the 3D frame, the geometry engine, the 2D lines,
+    capture, the ARM7, the window, the pacing, the rest), timed where their work is, and prints the median, 95th
+    percentile and most; `port/tools/frame_times.py` reads runs of a route, each frame the least of the runs, by scene,
+    and `check` holds them to a budget. The timing routes run 3 times each, alone, labelled `timing` (`ctest -LE
+    timing` leaves them out; `PORT_FRAME_TIME_REPORT_ONLY` makes them report only); CI, without a ROM, skips them.
+  - **The gains**, Black 2 on the M2, headless, each frame the least of 3 runs, the frame without the pacing wait,
+    median and 95th percentile in ms, before and after:
+
+    | Scene | Before | After |
+    | --- | --- | --- |
+    | Boot, logos, opening movies (2D) | 0.53, 0.71 | 0.41, 0.59 |
+    | Title screen's 3D | 4.24, 4.45 | 1.97, 2.04 |
+    | Start menu | 2.53, 3.95 | 0.56, 1.86 |
+    | New Game's intro (Juniper's sprites) | 0.82, 1.23 | 0.63, 0.82 |
+    | New Game's 3D flight | 3.78, 4.68 | 1.80, 2.08 |
+    | CONTINUE (title, menu, CONTINUE) | 4.18, 4.41 | 1.94, 2.03 |
+    | The bag and the trainer card | 2.54, 2.69 | 0.57, 0.70 |
+    | The party list, summary, Pokédex, card and bag | 0.82, 3.29 | 0.71, 0.94 |
+
+    White 2 after: the movies 0.41, 0.58; the title 1.94, 2.00; the start menu 0.56, 1.75; CONTINUE 1.90, 2.00; the bag
+    and card 0.57, 0.70; the party apps 0.71, 0.95 (the earlier measurement had none). Paced, on SDL's dummy video
+    driver (software presenting, so that no window opens), the title's frame went from 6.66, 7.01 to 5.23, 5.43, of
+    which 1.4 present; a paced 2D scene's frame took as long as before (the movies 3.8 against 3.9), what it no longer
+    does given back to a core that clocks down while the program sleeps. The program's start to its first frame: 0.65
+    to 0.25 s.
+  - **Each commit's share:** the still 3D picture kept (the start menu 2.53 to 0.62, the bag and card 2.54 to 0.66,
+    the party apps' p95 3.29 to 1.04); the 3D frame in bands, four on the M2 (the title 4.25 to 2.24, its 3D 2.98 to
+    0.98; the flight 3.79 to 1.93); the game's thread at user-interactive QoS (no change measured, quiet or under 4 and
+    8 busy loops: kept so that the command line runs as the app does); the geometry engine (0.50 to 0.43 on the title,
+    0.62 to 0.59 in the flight); capture (0.18 to 0.08 on the title); the kept 2D sources (the 2D lines 0.03 to 0.04
+    faster); the 2D colour effects (0.02 to 0.06 faster); SHA-1 (the start 0.65 to 0.25 s, the run directory's routes
+    18 to 40% shorter).
+  - **Measured and not kept:** pacing with one sleep to 2 or 4 ms before the frame's time, then `SDL_DelayPrecise`:
+    half the wake-ups and of the system CPU, but frames 7% slower after the longer sleep and woken up to 4 ms late (17.4
+    to 21.4 ms at the 99th percentile against 16.74). Also measured: the game's thread's QoS (above), and fewer or more
+    render threads paced (the title 6.61 ms on 1, 5.55 on 2, 5.18 on 4, 5.00 on 8), which keeps the default at the
+    performance cores.
+  - **Documents:** ARCHITECTURE.md's "Where a frame's time goes" (the hot paths, their files and functions, the
+    numbers) and its threads, rules and feature map; ADR 0016 (proposed); README.md, MODDING.md ("How fast it runs"),
+    GLOSSARY.md (frame times, bands and workers), the guides of `app/`, `gfx/`, `hal/`, `cmake/`, `tests/` and `tools/`,
+    `--help`, and lessons.md.
+- **Next:** the user's review of ADR 0016; CI's first run of the branch (Linux and Windows build the new host threads
+  and clock); the x86_64 slice's frame times under Rosetta, unmeasured since the bands; then as the last entries: the
+  apps no route reaches yet, and a save with an adventure made by the port, once overlay 36 lets it into the field.
+  Further gains, if wanted: the geometry engine is now the 3D frame's largest part on the game's thread (0.43 to 0.59
+  ms), then the 2D text backgrounds; the workers' wake-up each frame, and the paced core's clock.
+- **Blockers:** as the last entries: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
+  to 14 have no runner and no virtual machine here.
+
 ## 2026-10-19: the sanitized build's merge after review: the read check and CI's smoke test described as they are
 
 - **Upstream:** `56ee36977` (merge of PR #391), as merged into the port's `main` by `6b50636b1`; no sync in this task.

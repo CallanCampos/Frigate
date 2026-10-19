@@ -34,9 +34,9 @@ order.
 - **The workers.** As many parts as the host has performance cores (`port_host_performance_cores`: macOS's
   `hw.perflevel0.physicalcpu`, every online processor elsewhere), at most 8, the game's thread being part 0;
   `--render-threads N` (1 to 8) overrides it, and 1 draws on the game's thread alone. The workers are started once at
-  boot, at macOS's user-interactive QoS, with the asynchronous signals blocked so that the watchdog's SIGALRM reaches the
-  game's thread (`port/hal/host`'s threads and signals, pthreads or Win32). A waiting thread spins briefly (20 µs for
-  the next job, 0.5 ms for the other parts) before it sleeps on a host signal (a count, a mutex and a condition
+  boot, at macOS's user-interactive QoS, with the asynchronous signals blocked so that the watchdog's SIGALRM reaches
+  the game's thread (`port/hal/host`'s threads and signals, pthreads or Win32). A waiting thread spins briefly (20 µs
+  for the next job, 0.5 ms for the other parts) before it sleeps on a host signal (a count, a mutex and a condition
   variable).
 - **Only renderer code runs on the workers**, on memory the parts share out by lines. The game, the platform layer, the
   frame and scanline hooks, the geometry engine and the 2D renderer stay on the game's one thread, so a run stays
@@ -65,8 +65,9 @@ order.
 
 - The 3D frame costs about a third as much: the title's 3.0 ms to 1.0, New Game's flight 2.7 to 0.8, Juniper's intro
   0.21 to 0.08 on the M2 in four bands, which takes the title's frames from 4.25 to 2.24 ms and the flight's from 3.79
-  to 1.93 (STATUS.md, 2026-10-19). Under heavy load the workers wake later and the gain shrinks; it never changes the
-  picture.
+  to 1.93 (STATUS.md, 2026-10-19). Paced, the gain is smaller, since the game's thread's other work runs on a core
+  that has clocked down while it slept: the title's frame takes 6.61 ms on one thread and 5.18 on four (SDL's dummy
+  video driver). Under heavy load the workers wake later and the gain shrinks; it never changes the picture.
 - The program uses up to 8 threads while it draws 3D. `ctest -j4` runs four programs at once, each with its own
   workers; the timing tests run alone (`RUN_SERIAL`).
 - The renderer must keep every pixel a function of its own line and the polygons' order. A new pass that reads

@@ -3,6 +3,29 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: frame times and the hot paths
+
+- **On a loaded machine, a replay's frame times are the least of a few runs.** A replay does the same work at every
+  run, so what other programs take from one run doesn't take it from the others: each frame's least time over 3 runs
+  matched a quiet run's to 0.01 ms while single runs at a load of 30 doubled their 95th percentile.
+  `port/tools/frame_times.py` does that, and the `frame_times_*` tests run alone.
+- **A frame's cost is in the renderers.** The game's C is about 0.1 ms of a frame; the 3D rasterizer, the geometry
+  engine and the 2D lines are the rest. Measure before guessing: the profile put the 3D renderer at 70% of the title's
+  samples, and showed `ParamCount` and the geometry queue, the capture's per-pixel page lookups and `ensure_ready`
+  behind every 2D line as the next costs, none of which the code's structure suggested.
+- **A long sleep slows the next frame.** One sleep to just before the frame's time, in place of `SDL_DelayPrecise`'s
+  1 ms sleeps, halved the wake-ups, but the core clocked down meanwhile and the frame's work took 7% longer, and macOS
+  woke the program up to 4 ms late. Paced frames already cost about 1.4 times a headless run's for the same reason.
+- **A loop of SIMD instructions with a constant trip count may still need unrolling.** The ARMv8 SHA-1 written as a
+  loop over its 20 groups ran at half the speed of the same code unrolled (`#pragma clang loop unroll(full)`), since
+  the group's choices and the message ring's slots stay variables otherwise. Check a hand-vectorized loop's speed
+  against a library's (here `openssl sha1`, 2.4 GB/s).
+- **What a pixel depends on decides whether it can be drawn apart.** The 3D renderer's pixels depend only on their own
+  line and the polygons' order, but for edge marking, which reads its neighbours' depths and IDs, and the shadow
+  stencil, which a mask clears: bands of lines drawn on several threads then make the same picture, if every band sees
+  every polygon (its stencil clears, its edges' walk) and edge marking waits for all of them. A test that draws random
+  scenes both ways, pixel for pixel, is what holds it.
+
 ## 2026-10-19: the sanitized build's merge, after review
 
 - **A change to what a function does in every build reaches every description of it.** `port_heap_ds_read_begin`

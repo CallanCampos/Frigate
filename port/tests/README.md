@@ -9,10 +9,10 @@ belong to (T0 to T7) are in [../CLAUDE.md](../CLAUDE.md#testing-planmd-6) and
 Most tests need nothing but the build. The ones that need the player's ROM (`orig/baserom_<version>.nds`, or the
 `FRIGATE_ROM` variable) skip without it, so CI, which has no ROM, passes; they are the `rom_game_*` tests, most of the
 `rom_*` ones, `nnsys_g2d_rom_equivalence`, `snd_rom_*`, the `replay_*` tests, `integrate_launch_never_asked`, the
-`frame_times_*` routes and the `oracle_*` and `launch_*` tests that run the game. `asm_oracle` also needs the extracted ROM, its own Python
-environment and a host build directory configured with `-G Ninja`, whose `build.ninja` it reads the game's flags from
-(it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup), and on macOS
-in one with no slice for its Python's architecture, such as an x86_64 build on Apple Silicon), and the
+`frame_times_*` routes and the `oracle_*` and `launch_*` tests that run the game. `asm_oracle` also needs the extracted
+ROM, its own Python environment and a host build directory configured with `-G Ninja`, whose `build.ninja` it reads the
+game's flags from (it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup),
+and on macOS in one with no slice for its Python's architecture, such as an x86_64 build on Apple Silicon), and the
 `oracle_*` tests that run melonDS need the oracle, built with `-DPORT_BUILD_ORACLE=ON`
 ([../tools/oracle/README.md](../tools/oracle/README.md)), as do the test launcher's `launch_*` tests, which start from
 saves the oracle makes (`oracle_saves`). The oracle counts game frames with the ROM build's link map

@@ -129,9 +129,9 @@ never asked for the field, the launcher stepped aside because the field's proces
 field); 2 when the `--launch` list isn't one it can read, or when the save's field menu doesn't offer an app, which it
 checks as the menu does (no Pokémon, no Pokédex, the Black Tower's or White Treehollow's menu without its BAG). A status
 of the run's own comes first, such as a trap's 70, a deadlock's 72, the watchdog's 73 or a 1 of the program's own (the
-window didn't open, a write to the run directory or the sound trace failed during the run, a module ran out of host
-memory or found a build that can't work). Each says why on a `port:` line; `--help` (from [app/main.c](app/main.c)) and
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every status.
+window didn't open, a write to the run directory or the sound trace failed during the run or of `--frame-times`' file at
+its end, a module ran out of host memory or found a build that can't work). Each says why on a `port:` line; `--help`
+(from [app/main.c](app/main.c)) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every status.
 
 [docs/MODDING.md](docs/MODDING.md#reaching-the-field-menus-apps) says how to reach a menu with it, and where its saves
 come from; [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes;
