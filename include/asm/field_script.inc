@@ -2794,14 +2794,14 @@
     .byte \a0
     .endm
 
-    // func_ov027_02170650
+    // SurveyCmd_WriteOwnAnswer
     .macro Cmd_0209 a0, a1
     FieldCommand 521
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov027_02170698
+    // SurveyCmd_ShowRankMessage
     .macro Cmd_020A
     FieldCommand 522
     .endm

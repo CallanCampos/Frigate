@@ -208,7 +208,7 @@ static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data
     work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, work->heapId);
     work->missionText = getTextFileForFestMissions(work->heapId);
     work->missionArc = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_DATA, work->heapId);
-    work->missions = func_ov027_02170b50(work->missionArc, work->heapId);
+    work->missions = FestMissionData_LoadAll(work->missionArc, work->heapId);
     work->best = LinkFestivalBest_Create(work->heapId);
     work->log = FMissionLogFApp_Create(work->heapId);
     LinkFestival_GetRanking(work->param->festival, &work->ranking);
@@ -237,7 +237,7 @@ static BOOL FMissionApp_Exit(GameProc *proc, u32 *state, void *param, void *data
         }
     }
     GFL_WordSetSystemFree(work->wordSet);
-    func_ov027_02170b00(work->missionText);
+    FestivalText_Free(work->missionText);
     work->missionText = NULL;
     GFL_ArcToolFree(work->missionArc);
     GFL_HeapFree(work->missions);
@@ -808,10 +808,12 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
 
     if (text == TEXT_RESULT) {
         strbuf = GFL_StrBufCreate(256, work->heapId);
-        func_ov027_02170d90(work->missionText, strbuf, (const FestMission *)work->param->missionConfig, work->heapId);
+        FestMission_GetResultMessage(work->missionText, strbuf, (const FestMission *)work->param->missionConfig,
+                                     work->heapId);
     } else if (text == TEXT_MISSION) {
         strbuf = GFL_StrBufCreate(128, work->heapId);
-        func_ov027_02170d04(work->missionText, strbuf, (const FestMission *)work->param->missionConfig, work->heapId);
+        FestMission_GetMessage(work->missionText, strbuf, (const FestMission *)work->param->missionConfig,
+                               work->heapId);
     } else if (text == TEXT_GOAL) {
         u32 unit = work->missions[index].params.unk05;
 

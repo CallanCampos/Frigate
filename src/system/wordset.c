@@ -405,10 +405,10 @@ void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3
     }
     buffer = allocateForFestMission(HEAPID_TAIL((HeapID)wordSet->heapId));
     text = getTextFileForFestMissions(HEAPID_TAIL((HeapID)wordSet->heapId));
-    func_ov027_02170b98(text->archive, mission, a3, (FestMission *)buffer);
-    func_ov027_02170d04(text, wordSet->tmp, (const FestMission *)buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
+    FestMission_Load(text->archive, mission, a3, (FestMission *)buffer);
+    FestMission_GetMessage(text, wordSet->tmp, (const FestMission *)buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
-    func_ov027_02170b00(text);
+    FestivalText_Free(text);
     GFL_HeapFree(buffer);
 }
 

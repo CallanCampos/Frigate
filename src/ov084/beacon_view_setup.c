@@ -426,7 +426,7 @@ static void BeaconView_InitData(BeaconViewWork *work) {
 
 static void BeaconView_FreeData(BeaconViewWork *work) {
     GameBeaconInfoTable_MarkAllNew(work->newTable);
-    func_ov027_02170b00(work->festText);
+    FestivalText_Free(work->festText);
     PassPowerData_Free(work->passPowerData);
     GFL_HeapFree(work->newBeacon);
     GFL_HeapFree(work->countBeacon);

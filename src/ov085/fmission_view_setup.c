@@ -389,7 +389,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
 }
 
 static void FMissionViewSetup_FreeData(FMissionView *view) {
-    func_ov027_02170b00(view->festText);
+    FestivalText_Free(view->festText);
     PassPowerData_Free(view->passPowerData);
     GFL_HeapFree(view->newEntry);
     GFL_HeapFree(view->unk54);

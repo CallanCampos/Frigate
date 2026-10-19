@@ -444,7 +444,7 @@ static BOOL BeaconView_CheckMission(BeaconViewWork *work) {
         return FALSE;
     }
     func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
-    func_ov027_02170d04(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
+    FestMission_GetMessage(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
     func_0202437c(work->wordSet, 1, work->strTemplate, 0, 1, 2);
     BeaconView_OfferMission(work, &config, &work->pending);
     return TRUE;

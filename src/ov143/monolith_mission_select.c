@@ -615,7 +615,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
                 if (mfw->flags & MONOLITH_MISSION_FLAG_CHEAT) {
                     level = MONOLITH_MISSION_LEVEL_CHEAT;
                 }
-                func_ov027_02170cf8(mfw->festText, picked, level, &mission);
+                FestivalText_LoadMission(mfw->festText, picked, level, &mission);
                 LinkFestival_StartMission(mfw->festival, &mission, 0);
                 if (bootState == 1) {
                     *state = MONOLITH_MISSION_SEQ_END;
@@ -699,7 +699,7 @@ static void MonolithMission_LoadFestival(MonolithScreenParam *screen, MonolithMi
 }
 
 static void MonolithMission_FreeFestival(MonolithScreenParam *screen, MonolithMissionWork *mfw) {
-    func_ov027_02170b00(mfw->festText);
+    FestivalText_Free(mfw->festText);
 }
 
 static void MonolithMission_CreateBGs(void) {
@@ -861,8 +861,8 @@ static BOOL MonolithMission_DrawList(MonolithMissionWork *mfw, MonolithWork *wk,
 
     for (i = mfw->drawnCount; i < mfw->count; i++) {
         if (i >= 1 && i < mfw->count - 1) {
-            func_ov027_02170cf8(mfw->festText, mfw->ids[i], 0, &mission);
-            func_ov027_02170d04(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
+            FestivalText_LoadMission(mfw->festText, mfw->ids[i], 0, &mission);
+            FestMission_GetMessage(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
             GFL_TextRendererDrawToBitmapEx(mfw->listBitmaps[i], 0, 0, str, wk->font, MONOLITH_MISSION_TEXT_COLOR);
         }
         if (++drawn >= 100) {
@@ -884,8 +884,8 @@ static void MonolithMission_RedrawRow(MonolithMissionWork *mfw, MonolithWork *wk
 
     GFL_BitmapFill(mfw->listBitmaps[mfw->cursor], 0);
     str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
-    func_ov027_02170cf8(mfw->festText, mfw->ids[mfw->cursor], level, &mission);
-    func_ov027_02170d04(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
+    FestivalText_LoadMission(mfw->festText, mfw->ids[mfw->cursor], level, &mission);
+    FestMission_GetMessage(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
     GFL_TextRendererDrawToBitmapEx(mfw->listBitmaps[mfw->cursor], 0, 0, str, wk->font, MONOLITH_MISSION_TEXT_COLOR);
     GFL_StrBufFree(str);
     MonolithMission_UpdateRows(mfw);
@@ -1261,7 +1261,7 @@ static void MonolithMission_InitState(MonolithScreenParam *screen, MonolithMissi
         mfw->records[i].flags = 0;
     }
     mfw->font = GFL_FontCreate(23, 3, 0, FALSE, HEAPID_MONOLITH);
-    mfw->missions = func_ov027_02170b8c(mfw->festText, HEAPID_MONOLITH);
+    mfw->missions = FestivalText_LoadAllMissions(mfw->festText, HEAPID_MONOLITH);
     mfw->flags |= MONOLITH_MISSION_FLAG_FIRST_VISIT;
     if (EventWork_FlagGet(eventWork, MONOLITH_FLAG_VISITED) == TRUE) {
         mfw->flags &= ~MONOLITH_MISSION_FLAG_FIRST_VISIT;
@@ -1622,8 +1622,8 @@ static void MonolithMission_ShowStartMessage(MonolithScreenParam *screen, Monoli
         level = MONOLITH_MISSION_LEVEL_CHEAT;
     }
     str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
-    func_ov027_02170cf8(mfw->festText, mfw->ids[mfw->cursor], level, &mission);
-    func_ov027_02170d04(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
+    FestivalText_LoadMission(mfw->festText, mfw->ids[mfw->cursor], level, &mission);
+    FestMission_GetMessage(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
     func_0202437c(screen->work->wordSet, 0, str, 0, 1, 2);
     GFL_StrBufFree(str);
     level = mfw->level + 1;

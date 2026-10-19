@@ -183,7 +183,7 @@ static void FestMissionEvent_Exit(FestMissionEventWork *work) {
     GFL_WordSetSystemFree(work->wordSet);
     GFL_MsgDataFree(work->msgData);
     PassPowerData_Free(work->passPowerData);
-    func_ov027_02170b00(work->festText);
+    FestivalText_Free(work->festText);
     EnableAllActorsMovement(work->actorSystem);
 }
 
@@ -454,10 +454,10 @@ static void FestMission_Print(FestMissionEventWork *work) {
     s32 minutes;
 
     GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
-    func_ov027_02170d04(work->festText, work->formatted, &work->mission, work->tailHeapId);
+    FestMission_GetMessage(work->festText, work->formatted, &work->mission, work->tailHeapId);
     func_0202437c(work->wordSet, 0, work->formatted, 0, 1, 2);
     FestMission_PrintLine(work, work->strbuf, 0, 0);
-    func_ov027_02170d90(work->festText, work->strbuf, &work->mission, work->heapId);
+    FestMission_GetResultMessage(work->festText, work->strbuf, &work->mission, work->heapId);
     FestMission_PrintLine(work, work->strbuf, 0, 2);
     minutes = seconds / 60;
     WordSetNumber(work->wordSet, 2, minutes, 4, NUM_PAD_NONE, TRUE);
