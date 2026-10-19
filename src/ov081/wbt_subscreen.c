@@ -168,7 +168,7 @@ void WbtSubscreen_Update(WbtSubscreen *work) {
     WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
 }
 
-void func_ov081_021ea934(WbtSubscreen *work) {
+void WbtSubscreen_Draw(WbtSubscreen *work) {
 }
 
 void WbtSubscreen_Free(WbtSubscreen *work) {

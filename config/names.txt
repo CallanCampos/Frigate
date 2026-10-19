@@ -8989,6 +8989,7 @@ overlays/ov081 0x021ea894 WbtSubscreen_Exit
 overlays/ov081 0x021ea8e4 WbtSubscreen_FuncNone
 overlays/ov081 0x021ea8e8 WbtSubscreen_Create
 overlays/ov081 0x021ea918 WbtSubscreen_Update
+overlays/ov081 0x021ea934 WbtSubscreen_Draw
 overlays/ov081 0x021ea938 WbtSubscreen_Free
 overlays/ov081 0x021ea954 WbtSubscreen_InitBG
 overlays/ov081 0x021ea9c4 WbtSubscreen_LoadGraphics
