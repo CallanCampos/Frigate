@@ -55,7 +55,7 @@ static u32 PokemonLeague_GetRoomCamera(u16 room) {
 static BOOL PokemonLeagueCmd_PlayGrimsleyGroup(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov123_021eed08(gsys, VM_Read16(vm));
+    GimmickGrimsley_PlayGroup(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -63,7 +63,7 @@ static BOOL PokemonLeagueCmd_PlayGrimsleyGroup(VM *vm, FieldScriptEnv *env) {
 static BOOL PokemonLeagueCmd_PlayGrimsleyModel0Animation(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov123_021eed3c(gsys, VM_Read16(vm));
+    GimmickGrimsley_PlayModel0Animation(gsys, VM_Read16(vm));
     return FALSE;
 }
 
