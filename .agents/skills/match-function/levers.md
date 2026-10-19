@@ -864,9 +864,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   SDK's inline `asm` block does it, which a call can't. (matching.md: "The inline's `asm` block")
 - A `memcpy`/`memset` of a constant size inlined where the ROM calls it: `<string.h>` declares it; declare it in the
   library's own header instead. (matching.md: "a header named `string.h`")
-- The reverse, a `memset` built in place (an `stmia` loop) in a file whose library header declares the string
-  functions: include `<string.h>` before that header, since MWCC goes by the first declaration. (matching.md: "goes by
-  the first declaration")
+- The reverse, a `memset` or `memcpy` built in place (an `stmia` loop, or `strb`s for a few bytes) in a file whose
+  library header declares the string functions: include `<string.h>` before that header, since MWCC goes by the first
+  declaration. (matching.md: "goes by the first declaration")
 - Two-bytes-a-pass copy loops (`ldrb [r3, #1]; ldrb [r3], #2`) where ours calls `strcpy` with a literal: take
   `strcpy` from `<string.h>`. (matching.md: "`strcpy` of a string literal")
 

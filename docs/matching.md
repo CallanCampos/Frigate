@@ -3028,8 +3028,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declares them, and `strcpy` of a string literal as a loop that copies two bytes a pass (`ldrb [r3, #1]; ldrb [r3], #2;
   subs; strb; strb; bne`, and the last byte); the same prototypes from any other header leave a call. `include/string.h`
   (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s `memset` of a
-  `VCTSession`) and `ghttpEncryption.c`, declares the C library's string functions in its own header (`dwc/ext.h`) and
-  doesn't include `<string.h>`. MSL's own files include it, and so does TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies
+  `VCTSession`), declares the C library's string functions in its own header (`dwc/ext.h`) and doesn't include
+  `<string.h>`. MSL's own files include it, and so does TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies
   the stats server's host name with those loops. `strcmp` and `strlen` stay calls either way, but the code around them
   changes: with `<string.h>`, NitroWiFi's `SSLi_FindNamedParam` (`ssl.c`) keeps `name` in r7 where the ROM spills it to
   `[sp]`, so `ssl_internal.h` declares them itself. DWC's `DWCAc_AddCandidate` (`dwc_ac_wcm.c`) came closer with
@@ -3039,7 +3039,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `Auth_OnResponse` then clears the 0x5a4-byte result in place, as the ROM does, while its `memcpy` of a 0x104-byte
   `BigNum` stays a call, also as in the ROM: a call to `memcpy` in the ROM doesn't rule `<string.h>` out. `poke_net.c`
   also includes `<string.h>` first: its `POKE_NET_Release` clears the 0x138-byte authentication structure in place,
-  while its variable-size copies remain calls. The other functions retain their matches, apart from
+  while its variable-size copies remain calls. GT2's `gt2Message.c` and `gt2Socket.c` include it first too, for
+  the packets' 2-byte `memcpy`s (`add r2, sp, #0; adds r2, #2`, then `ldrb`/`strb` pairs) and the bound address's
+  8-byte `memset`, and so does ghttp's `ghttpEncryption.c`, whose `ghiEncryptorSslInitFunc` clears its 8-byte state
+  with eight `strb`, where every loop spelling stays a loop and `memset` from `dwc/ext.h` stays a call. The other functions retain their matches, apart from
   `POKE_NET_Connecting`'s documented scheduling difference.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
@@ -3071,6 +3074,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   built with `-ipa function` (`file_flags` in `lib/nnsys/library.toml`), while the other sound files are reached from
   one base and need `-ipa file`. A struct that looks like another file's extern, or a gap in `.bss` that seems to need
   a stand-in function, is the first thing to try this on.
+- The names that `__FUNCTION__` gives are data objects too, and tell a file's setting where nothing else does. Without
+  `-ipa file` they go out in the order of their functions, after a literal that an earlier function used; under
+  `-ipa file` they are sorted by size ahead of the file's other strings. ghttp's `ghttpEncryption.c` starts its `.data`
+  with its nine function names from 14 to 29 bytes and then `"https://"`, and links only with `-ipa file` in
+  `lib/dwc/library.toml`: every function matched under the probe without it, which doesn't compare data.
 - Under `-ipa function` MWCC writes out the data waiting to be emitted each time it emits a function, and sorts each
   batch by size on its own, so an object defined above the first function comes out ahead of every table defined below
   it, whatever their sizes. A function's local initializers go out with it in declaration order, and a `static inline`
