@@ -193,7 +193,7 @@ BOOL s02BB_Gym0601FanAmbienceStart(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab004(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov098_021eee0c(gsys, VM_Read16(vm));
+    GameEvent *event = GymIcirrus_CreateSwitchAnimEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;
@@ -205,7 +205,7 @@ BOOL func_ov036_021ab004(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab03c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov098_021eee48(gsys, VM_Read16(vm));
+    GameEvent *event = GymIcirrus_CreateFlipSwitchEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;
@@ -217,7 +217,7 @@ BOOL func_ov036_021ab03c(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab074(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov098_021eee84(gsys, VM_Read16(vm));
+    GymIcirrus_ToggleMovementAtPlace(gsys, VM_Read16(vm));
     return FALSE;
 }
 

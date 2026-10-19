@@ -9614,6 +9614,17 @@ overlays/ov097 0x021eee80 DriftveilLift_MoveEvent
 overlays/ov097 0x021eefe4 DriftveilLift_PlaceAtBottom
 overlays/ov097 0x021ef0ac DriftveilLift_HasArrived
 overlays/ov097 0x021ef0cc DriftveilLift_ResetAnm
+overlays/ov098 0x021eec80 GymIcirrus_Init
+overlays/ov098 0x021eedb8 GymIcirrus_End
+overlays/ov098 0x021eeddc GymIcirrus_Update
+overlays/ov098 0x021eee0c GymIcirrus_CreateSwitchAnimEvent
+overlays/ov098 0x021eee48 GymIcirrus_CreateFlipSwitchEvent
+overlays/ov098 0x021eee84 GymIcirrus_ToggleMovementAtPlace
+overlays/ov098 0x021eeec8 GymIcirrus_IsPlaceSwitchReady
+overlays/ov098 0x021eeef8 GymIcirrus_ShowSwitchState
+overlays/ov098 0x021eef68 GymIcirrus_IsSwitchFlipped
+overlays/ov098 0x021eef78 GymIcirrus_SwitchAnimEvent
+overlays/ov098 0x021ef028 GymIcirrus_FlipSwitchEvent
 overlays/ov099 0x021eec80 GymOpelucid_Init
 overlays/ov099 0x021eed44 GymOpelucid_InitObjects
 overlays/ov099 0x021eee3c GymOpelucid_StartMoveAnimations

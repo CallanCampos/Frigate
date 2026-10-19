@@ -41,11 +41,11 @@ typedef struct {
     u16 flipped;
 } PlacePrecondition;
 
-static BOOL func_ov098_021eeec8(IcirrusGymState *state, int place);
-static void func_ov098_021eeef8(FieldExpObjSystem *expObj, BOOL flipped, int switchIndex, int second);
-static BOOL func_ov098_021eef68(IcirrusGymState *state, int switchIndex);
-static GameEventReturnCode func_ov098_021eef78(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov098_021ef028(GameEvent *event, u32 *state, void *data);
+static BOOL GymIcirrus_IsPlaceSwitchReady(IcirrusGymState *state, int place);
+static void GymIcirrus_ShowSwitchState(FieldExpObjSystem *expObj, BOOL flipped, int switchIndex, int second);
+static BOOL GymIcirrus_IsSwitchFlipped(IcirrusGymState *state, int switchIndex);
+static GameEventReturnCode GymIcirrus_SwitchAnimEvent(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode GymIcirrus_FlipSwitchEvent(GameEvent *event, u32 *state, void *data);
 
 // The animation of a model
 static inline FieldExpObjAnm *GetAnimation(FieldExpObjSystem *expObj, u8 model, u8 animation) {
@@ -89,7 +89,7 @@ static const PlacePrecondition sPlacePreconditions[PLACE_COUNT] = {
     { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 }, { 2, 0 }, { 2, 0 }, { 2, 1 }, { 2, 1 },
 };
 
-void func_ov098_021eec80(Field *field) {
+void GymIcirrus_Init(Field *field) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     IcirrusGymState *state = GimmickState_GetUserData(
         GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
@@ -119,12 +119,12 @@ void func_ov098_021eec80(Field *field) {
             FieldExpObjAnm_SetLooped(anm, FALSE);
             FieldExpObjAnm_SetPaused(anm, TRUE);
         }
-        func_ov098_021eeef8(expObj, state->flipped[i], i, TRUE);
-        func_ov098_021eeef8(expObj, state->flipped[i], i, FALSE);
+        GymIcirrus_ShowSwitchState(expObj, state->flipped[i], i, TRUE);
+        GymIcirrus_ShowSwitchState(expObj, state->flipped[i], i, FALSE);
     }
 }
 
-void func_ov098_021eedb8(Field *field) {
+void GymIcirrus_End(Field *field) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
 
     Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
@@ -132,7 +132,7 @@ void func_ov098_021eedb8(Field *field) {
     FieldExpObj_FreeScene(expObj, 0);
 }
 
-void func_ov098_021eeddc(Field *field) {
+void GymIcirrus_Update(Field *field) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
 
     Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
@@ -140,7 +140,7 @@ void func_ov098_021eeddc(Field *field) {
     FieldExpObj_StepAllAnimations(expObj);
 }
 
-GameEvent *func_ov098_021eee0c(GameSystem *gsys, int switchIndex) {
+GameEvent *GymIcirrus_CreateSwitchAnimEvent(GameSystem *gsys, int switchIndex) {
     Field *field = GSYS_GetField(gsys);
     IcirrusGymWork *work;
 
@@ -150,10 +150,10 @@ GameEvent *func_ov098_021eee0c(GameSystem *gsys, int switchIndex) {
         return NULL;
     }
     work->switchIndex = switchIndex;
-    return GameEvent_Create(gsys, NULL, func_ov098_021eef78, 0);
+    return GameEvent_Create(gsys, NULL, GymIcirrus_SwitchAnimEvent, 0);
 }
 
-GameEvent *func_ov098_021eee48(GameSystem *gsys, int switchIndex) {
+GameEvent *GymIcirrus_CreateFlipSwitchEvent(GameSystem *gsys, int switchIndex) {
     Field *field = GSYS_GetField(gsys);
     IcirrusGymWork *work;
 
@@ -163,24 +163,24 @@ GameEvent *func_ov098_021eee48(GameSystem *gsys, int switchIndex) {
         return NULL;
     }
     work->switchIndex = switchIndex;
-    return GameEvent_Create(gsys, NULL, func_ov098_021ef028, 0);
+    return GameEvent_Create(gsys, NULL, GymIcirrus_FlipSwitchEvent, 0);
 }
 
-void func_ov098_021eee84(GameSystem *gsys, int place) {
+void GymIcirrus_ToggleMovementAtPlace(GameSystem *gsys, int place) {
     Field *field = GSYS_GetField(gsys);
     u32 controllerType = Field_GetControllerTypeID(field);
     IcirrusGymState *state = GimmickState_GetUserData(
         GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
 
     if (place < PLACE_COUNT && controllerType == CONTROLLER_TYPE_HYBRID) {
-        if (func_ov098_021eeec8(state, place)) {
+        if (GymIcirrus_IsPlaceSwitchReady(state, place)) {
             func_ov036_0219e434(Field_GetController(field), field);
         }
     }
 }
 
 // Whether the switch of the place is in the state that the place calls for
-static BOOL func_ov098_021eeec8(IcirrusGymState *state, int place) {
+static BOOL GymIcirrus_IsPlaceSwitchReady(IcirrusGymState *state, int place) {
     u16 flipped = state->flipped[sPlacePreconditions[place].switchIndex] != 0 ? TRUE : FALSE;
 
     if (flipped == sPlacePreconditions[place].flipped) {
@@ -190,7 +190,7 @@ static BOOL func_ov098_021eeec8(IcirrusGymState *state, int place) {
 }
 
 // Sets the switch's first or second model to the end of the animation of its state, paused
-static void func_ov098_021eeef8(FieldExpObjSystem *expObj, BOOL flipped, int switchIndex, int second) {
+static void GymIcirrus_ShowSwitchState(FieldExpObjSystem *expObj, BOOL flipped, int switchIndex, int second) {
     int playing;
     int other;
     int model = switchIndex;
@@ -211,14 +211,14 @@ static void func_ov098_021eeef8(FieldExpObjSystem *expObj, BOOL flipped, int swi
     FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(expObj, 0, model, playing), TRUE);
 }
 
-static BOOL func_ov098_021eef68(IcirrusGymState *state, int switchIndex) {
+static BOOL GymIcirrus_IsSwitchFlipped(IcirrusGymState *state, int switchIndex) {
     if (state->flipped[switchIndex] != 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static GameEventReturnCode func_ov098_021eef78(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode GymIcirrus_SwitchAnimEvent(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     IcirrusGymWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
@@ -231,17 +231,18 @@ static GameEventReturnCode func_ov098_021eef78(GameEvent *event, u32 *state, voi
     case 0:
         switchIndex = work->switchIndex;
         FieldExpObjAnm_SetPaused(
-            GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, func_ov098_021eef68(gymState, switchIndex)), FALSE);
+            GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, GymIcirrus_IsSwitchFlipped(gymState, switchIndex)),
+            FALSE);
         (*state)++;
         break;
     case 1:
         switchIndex = work->switchIndex;
-        if (FieldExpObjAnm_IsPlaybackFinished(
-                GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, func_ov098_021eef68(gymState, switchIndex)))) {
+        if (FieldExpObjAnm_IsPlaybackFinished(GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET,
+                                                           GymIcirrus_IsSwitchFlipped(gymState, switchIndex)))) {
             if (gymState->flipped[work->switchIndex] != 0) {
                 flipped = FALSE;
             }
-            func_ov098_021eeef8(expObj, flipped, work->switchIndex, FALSE);
+            GymIcirrus_ShowSwitchState(expObj, flipped, work->switchIndex, FALSE);
             return TRUE;
         }
         break;
@@ -249,7 +250,7 @@ static GameEventReturnCode func_ov098_021eef78(GameEvent *event, u32 *state, voi
     return FALSE;
 }
 
-static GameEventReturnCode func_ov098_021ef028(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode GymIcirrus_FlipSwitchEvent(GameEvent *event, u32 *state, void *data) {
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     IcirrusGymWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
@@ -262,20 +263,21 @@ static GameEventReturnCode func_ov098_021ef028(GameEvent *event, u32 *state, voi
     switch (*state) {
     case 0:
         switchIndex = work->switchIndex;
-        FieldExpObjAnm_SetPaused(GetAnimation(expObj, switchIndex, func_ov098_021eef68(gymState, switchIndex)), FALSE);
+        FieldExpObjAnm_SetPaused(GetAnimation(expObj, switchIndex, GymIcirrus_IsSwitchFlipped(gymState, switchIndex)),
+                                 FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_65);
         (*state)++;
         break;
     case 1:
         switchIndex = work->switchIndex;
         if (FieldExpObjAnm_IsPlaybackFinished(
-                GetAnimation(expObj, switchIndex, func_ov098_021eef68(gymState, switchIndex)))) {
+                GetAnimation(expObj, switchIndex, GymIcirrus_IsSwitchFlipped(gymState, switchIndex)))) {
             GFL_SndStop();
             GFL_SndSEPlay(SEQ_SE_FLD_95);
             if (gymState->flipped[work->switchIndex] != 0) {
                 flipped = FALSE;
             }
-            func_ov098_021eeef8(expObj, flipped, work->switchIndex, TRUE);
+            GymIcirrus_ShowSwitchState(expObj, flipped, work->switchIndex, TRUE);
             newFlipped = TRUE;
             if (gymState->flipped[work->switchIndex] != 0) {
                 newFlipped = FALSE;
