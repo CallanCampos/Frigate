@@ -156,7 +156,7 @@ static BOOL PokemonLeagueCmd_CallShauntalModels6And9Event(VM *vm, FieldScriptEnv
 
 // Marshal's room
 static BOOL PokemonLeagueCmd_PlayMarshalModel0(VM *vm, FieldScriptEnv *env) {
-    func_ov124_021eecf0(FieldScriptEnv_GetGameSystem(env));
+    MarshalRoom_PlayModel0Anims(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -164,20 +164,20 @@ static BOOL PokemonLeagueCmd_PlayMarshalModel0(VM *vm, FieldScriptEnv *env) {
 static BOOL PokemonLeagueCmd_PlayMarshalModel3Animation(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov124_021eed20(gsys, VM_Read16(vm));
+    MarshalRoom_PlayModel3Anim(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 // Marshal's room
 static BOOL PokemonLeagueCmd_PlayMarshalModel1(VM *vm, FieldScriptEnv *env) {
-    func_ov124_021eed40(FieldScriptEnv_GetGameSystem(env));
+    MarshalRoom_PlayModel1Anims(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 // Marshal's room
 static BOOL PokemonLeagueCmd_CallMarshalPlatformEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov124_021eed6c(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = MarshalRoom_LowerPlatform(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;
