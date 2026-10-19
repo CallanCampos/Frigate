@@ -9916,6 +9916,9 @@ overlays/ov108 0x021eeeb0 ShakeMove
 overlays/ov108 0x021eef58 GetZoneGimmick
 overlays/ov108 0x021eef9c sZoneGimmicks
 overlays/ov108 0x021eefec sGimmickFuncs
+overlays/ov109 0x021eec80 SkyarrowBridge_Setup
+overlays/ov109 0x021eecf4 SkyarrowBridge_End
+overlays/ov109 0x021eed38 SkyarrowBridge_Update
 overlays/ov109 0x021eede8 SkyarrowBridge_Init
 overlays/ov109 0x021eef38 SkyarrowBridge_LoadWaitRanges
 overlays/ov109 0x021eef7c SkyarrowBridge_LoadBGMParams
