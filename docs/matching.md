@@ -3575,6 +3575,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   as one array no order of its 13 file-scope objects works. About 120 orders of those objects then fit, so the
   file's order is one of them and says so. The compiled object's symbol table lists data objects in their sorted
   order across sections, ties included, which checks a model far better than `--check`.
+- A bias on a data symbol lands in the literal's addend (`SYM + 0x2200` in `.rela.text`) only through element-pointer
+  arithmetic, `&x + 0x2200 / sizeof(u32)` or `arr + 0x880`, as `Func + 0x2200` does for a function; byte arithmetic,
+  `(u32)&x + 0x2200` or `(u8 *)&x + 0x2200`, loads the plain symbol and adds 0x2200 at run time. A `- 0x2200` on that
+  biased value survives only when the value reaches the load after constant folding: a `static inline` that returns
+  `(T *)(biased - 0x2200)` keeps the run-time `sub` when the result indexes an array (DS Protect's callback pair), and
+  folds it away for a scalar read, as does every direct spelling, a `u32`, `const` or pointer local, a macro, or
+  `[-0x880]` indexing. Only a store read back through a walked pointer (`checks[0] = biased; check = checks; index =
+  *(u32 *)(*check++ - 0x2200);`) gives the original's `ldr =SYM+0x2200; sub #0x2000; ldr [#-0x200]` for
+  `DSProt_RunChecks1`, and that is a dead store written to be read back, which `docs/code-standards.md` rejects.
 
 ## When nothing moves it
 

@@ -34,9 +34,9 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
     args.arg0 = arg0;
     args.arg1 = arg1;
     args.result = NULL;
-    args.failed = 0;
     checks[0] = (u32)(DSProt_CallCheckFlashcartA + 0x2200);
     checks[1] = (u32)(DSProt_CallCheckFlashcartAStub + 0x2200);
+    args.failed = 0;
     checks[2] = 0;
     check = checks;
     total = 0x30eb87;
@@ -48,7 +48,7 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -84,9 +84,9 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
     args.arg0 = arg0;
     args.arg1 = arg1;
     args.result = NULL;
-    args.failed = 0;
     checks[0] = (u32)(DSProt_CallCheckFlashcartB + 0x2200);
     checks[1] = (u32)(DSProt_CallCheckFlashcartBStub + 0x2200);
+    args.failed = 0;
     checks[2] = 0;
     check = checks;
     total = 0x30eb87;
@@ -98,7 +98,7 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -134,9 +134,9 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
     args.arg0 = arg0;
     args.arg1 = arg1;
     args.result = NULL;
-    args.failed = 0;
     checks[0] = (u32)(DSProt_CallCheckEmulatorA + 0x2200);
     checks[1] = (u32)(DSProt_CallCheckEmulatorAStub + 0x2200);
+    args.failed = 0;
     checks[2] = 0;
     check = checks;
     total = 0x30eb87;
@@ -148,7 +148,7 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -184,9 +184,9 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
     args.arg0 = arg0;
     args.arg1 = arg1;
     args.result = NULL;
-    args.failed = 0;
     checks[0] = (u32)(DSProt_CallCheckEmulatorB + 0x2200);
     checks[1] = (u32)(DSProt_CallCheckEmulatorBStub + 0x2200);
+    args.failed = 0;
     checks[2] = 0;
     check = checks;
     total = 0x30eb87;
@@ -198,7 +198,7 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
