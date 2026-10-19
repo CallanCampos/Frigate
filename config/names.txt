@@ -9417,6 +9417,9 @@ overlays/ov089 0x021eef0c RoomPicker_Find
 overlays/ov089 0x021eef24 RoomPicker_Get
 overlays/ov089 0x021eef34 RoomPicker_Remove
 overlays/ov089 0x021eef58 RoomPicker_PickOrder
+overlays/ov090 0x021eec80 GimmickState_SetNimbasaGym
+overlays/ov090 0x021eec98 GimmickState_ResetOpelucid
+overlays/ov090 0x021eecc0 GimmickState_SetNimbasaFlags
 overlays/ov091 0x021eec80 GymInsect_Init
 overlays/ov091 0x021eed8c GymInsect_End
 overlays/ov091 0x021eeda4 GymInsect_Update

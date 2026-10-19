@@ -422,7 +422,7 @@ BOOL func_ov012_02157b7c(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     value = ScriptReadAny(vm, env);
     GFL_OvlLoad(OVERLAY_ID(90));
-    func_ov090_021eec80(gsys, value);
+    GimmickState_SetNimbasaGym(gsys, value);
     GFL_OvlUnload(OVERLAY_ID(90));
     return FALSE;
 }
@@ -432,7 +432,7 @@ BOOL func_ov012_02157bb4(VM *vm, FieldScriptEnv *env) {
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     GFL_OvlLoad(OVERLAY_ID(90));
-    func_ov090_021eec98(gsys);
+    GimmickState_ResetOpelucid(gsys);
     GFL_OvlUnload(OVERLAY_ID(90));
     return FALSE;
 }
@@ -446,7 +446,7 @@ BOOL func_ov012_02157bdc(VM *vm, FieldScriptEnv *env) {
     first = ScriptReadVar(vm, env);
     second = ScriptReadVar(vm, env);
     GFL_OvlLoad(OVERLAY_ID(90));
-    func_ov090_021eecc0(gsys, *first, *second);
+    GimmickState_SetNimbasaFlags(gsys, *first, *second);
     GFL_OvlUnload(OVERLAY_ID(90));
     return FALSE;
 }
