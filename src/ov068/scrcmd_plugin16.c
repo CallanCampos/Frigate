@@ -18,7 +18,7 @@ static BOOL Plugin16Cmd_ShowRuinsModel(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov114_021eecd8(gsys, ScriptReadAny(vm, env));
+    UndergroundRuins_ShowModel(gsys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -26,7 +26,7 @@ static BOOL Plugin16Cmd_SetRuinsAnimFrame(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov114_021eed34(gsys, ScriptReadAny(vm, env));
+    UndergroundRuins_SetAnmEnd(gsys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -34,7 +34,7 @@ static BOOL Plugin16Cmd_PlayRuinsAnim(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov114_021eeda0(gsys, ScriptReadAny(vm, env));
+    UndergroundRuins_PlayAnm(gsys, ScriptReadAny(vm, env));
     return FALSE;
 }
 

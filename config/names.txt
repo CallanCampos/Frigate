@@ -9974,6 +9974,15 @@ overlays/ov113 0x021eee68 GimmickHumilau_FreeScene
 overlays/ov113 0x021eee74 GimmickHumilau_StepAnimations
 overlays/ov113 0x021eee80 GimmickHumilau_PlayActor
 overlays/ov113 0x021eeee0 GimmickHumilau_JumpEvent
+overlays/ov114 0x021eec80 UndergroundRuins_Init
+overlays/ov114 0x021eecb0 UndergroundRuins_End
+overlays/ov114 0x021eecc8 UndergroundRuins_Update
+overlays/ov114 0x021eecd8 UndergroundRuins_ShowModel
+overlays/ov114 0x021eed34 UndergroundRuins_SetAnmEnd
+overlays/ov114 0x021eeda0 UndergroundRuins_PlayAnm
+overlays/ov114 0x021eee0c UndergroundRuins_LoadScene
+overlays/ov114 0x021eeedc UndergroundRuins_FreeScene
+overlays/ov114 0x021eeee8 UndergroundRuins_StepAnimations
 overlays/ov116 0x021eec80 GimmickGC6_Setup
 overlays/ov116 0x021eecb0 GimmickGC6_End
 overlays/ov116 0x021eecc8 GimmickGC6_Update
