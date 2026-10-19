@@ -1149,8 +1149,8 @@ static void func_ov036_0218e710(IrcMenuWork *wk, BOOL instant) {
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     if (!instant) {
-        wk->printStream =
-            PrintStream_Create(win, 0, 0, wk->strBuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2, wk->heapId, 15);
+        wk->printStream = PrintStream_Create(win, 0, 0, wk->strBuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2,
+                                             wk->heapId, 15);
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(win), 0, 0, wk->strBuf, wk->font);
         wk->printStream = NULL;
