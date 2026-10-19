@@ -118,8 +118,8 @@ static BOOL Continue_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Continue_Main(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static void NewGame_SetUpPlayer(PlayerInfo *info, StrBuf *name, u32 gender);
-static void func_ov162_021a04a8(SaveControl *save);
-static void func_ov162_021a04e8(SaveControl *save);
+static void NewGame_EraseOutsideKeys(SaveControl *save);
+static void NewGame_ImportOutsideData(SaveControl *save);
 static BOOL DebugGameStart_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL DebugGameStart_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *work);
@@ -221,7 +221,7 @@ static BOOL NewGame_Init(GameProc *proc, u32 *state, void *param, void *work) {
     u32 pokeVoice;
 
     wk->saveTask = SaveControlIntr_Create(HEAPID_USER, save);
-    func_ov162_021a04a8(save);
+    NewGame_EraseOutsideKeys(save);
     SaveControl_InitNewGame(save);
     wk->save = save;
     wk->newPlayerInfo = PlayerInfo_Create(HEAPID_USER);
@@ -368,7 +368,7 @@ static BOOL NewGame_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapFree(wk->newPlayerInfo);
     GFL_HeapFree(wk->newConfig);
     FreeGameProcManager(wk->procManager);
-    func_ov162_021a04e8(save);
+    NewGame_ImportOutsideData(save);
     procData = GameSystem_CreateProcData(GAME_ENTRYPOINT_OPENING, 0, &spawnPos, 0);
     NameEntryParam_Free(wk->nameEntryParam);
     GFL_ProcReleaseSubsystem(proc);
@@ -437,7 +437,7 @@ static void NewGame_SetUpPlayer(PlayerInfo *info, StrBuf *name, u32 gender) {
     func_02008bf8(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
 }
 
-static void func_ov162_021a04a8(SaveControl *save) {
+static void NewGame_EraseOutsideKeys(SaveControl *save) {
     void *work;
 
     if (SaveControl_GetErrors(save) & 2) {
@@ -451,7 +451,7 @@ static void func_ov162_021a04a8(SaveControl *save) {
     }
 }
 
-static void func_ov162_021a04e8(SaveControl *save) {
+static void NewGame_ImportOutsideData(SaveControl *save) {
     void *work;
 
     if (SaveControl_GetStatus(save) == 1 && !SaveControl_IsDataAlreadyPresent(save)) {

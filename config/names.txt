@@ -12119,6 +12119,8 @@ overlays/ov162 0x021a0364 Continue_Init
 overlays/ov162 0x021a0390 Continue_Main
 overlays/ov162 0x021a03dc Continue_Exit
 overlays/ov162 0x021a0460 NewGame_SetUpPlayer
+overlays/ov162 0x021a04a8 NewGame_EraseOutsideKeys
+overlays/ov162 0x021a04e8 NewGame_ImportOutsideData
 overlays/ov162 0x021a0544 DebugGameStart_Init
 overlays/ov162 0x021a0584 DebugGameStart_Exit
 overlays/ov162 0x021a05c0 DebugGameStart_Main
