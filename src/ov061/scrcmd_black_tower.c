@@ -35,7 +35,7 @@ static BOOL BlackTowerCmd_CreateWalls(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    func_ov127_021efd60(gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)));
+    InfinityDungeon_CreateCurrentWalls(gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)));
     return FALSE;
 }
 
@@ -103,7 +103,7 @@ static BOOL BlackTowerCmd_CallBattleEvent(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     u8 actor = GetActorUID(ScriptWork_GetParentActor(work)) - 0xb0;
 
-    ScriptWork_CallEvent(work, func_ov127_021efeec(gsys, field, actor));
+    ScriptWork_CallEvent(work, InfinityDungeon_CreateBattleEvent(gsys, field, actor));
     return TRUE;
 }
 
@@ -206,7 +206,7 @@ static BOOL BlackTowerCmd_SetSpecialTrainerFlag(VM *vm, FieldScriptEnv *env) {
     u16 set = ScriptReadAny(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    KeyDataSave_SetFlag(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a), set);
+    KeyDataSave_SetFlag(keyData, InfinityDungeon_FindSpecialTrainer(InfinityDungeonGimmick_GetDungeon(field), a), set);
     return FALSE;
 }
 
@@ -219,7 +219,8 @@ static BOOL BlackTowerCmd_GetSpecialTrainerFlag(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    *var = KeyDataSave_IsFlagSet(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a));
+    *var =
+        KeyDataSave_IsFlagSet(keyData, InfinityDungeon_FindSpecialTrainer(InfinityDungeonGimmick_GetDungeon(field), a));
     return FALSE;
 }
 
@@ -229,7 +230,7 @@ static BOOL BlackTowerCmd_GetGoalFloor(VM *vm, FieldScriptEnv *env) {
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
     u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(save));
-    u32 unk = func_ov127_021f02e0(dungeon);
+    u32 unk = InfinityDungeon_GetGoalFloor(dungeon);
 
     *var = unk + KeyDataSave_GetAreaFirstFloor(level) + 1;
     return FALSE;
@@ -287,7 +288,7 @@ static BOOL BlackTowerCmd_GetVersion(VM *vm, FieldScriptEnv *env) {
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0dd8(dungeon);
+    *var = InfinityDungeon_GetVersion(dungeon);
     return FALSE;
 }
 
@@ -317,14 +318,14 @@ static BOOL BlackTowerCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
         *var = KeyDataSave_GetFloorInArea(keyData);
         break;
     case 3:
-        *var = func_ov127_021f08e8(dungeon);
+        *var = InfinityDungeon_CountTrainers(dungeon);
         break;
     case 4:
         *var = KeyDataSave_CountDefeatedTrainers(keyData);
         break;
     case 5:
         unk = KeyDataSave_GetRoom(keyData);
-        *var = func_ov127_021f093c(dungeon, KeyDataSave_GetFloorInArea(keyData), unk);
+        *var = InfinityDungeon_IsBelowGoal(dungeon, KeyDataSave_GetFloorInArea(keyData), unk);
         break;
     case 9:
         *var = dungeon->rewardItem;
@@ -345,7 +346,7 @@ static BOOL BlackTowerCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Used in the area where func_ov127_021f0dd8 returns 0x17
+// Used in the area where InfinityDungeon_GetVersion returns 0x17
 static const BlackTowerUnkPair sUnkPairs17[] = {
     { 0xb8, 0x22 }, { 0xba, 0x23 }, { 0xbc, 0x24 }, { 0xbe, 0x25 },  { 0xc0, 0x20 },  { 0xc2, 0x1f },
     { 0xc4, 0x1e }, { 0xc6, 0x21 }, { 0xc8, 0x20 }, { 0xca, 0x130 }, { 0x1f9, 0x21 },
@@ -360,7 +361,7 @@ static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
-    u32 area = func_ov127_021f0dd8(dungeon);
+    u32 area = InfinityDungeon_GetVersion(dungeon);
     const BlackTowerUnkPair *pairs = area == 0x17 ? sUnkPairs17 : sUnkPairs;
 
     if (level == 9 && area != AREA_VERSION_UNK) {
@@ -376,7 +377,7 @@ static BOOL BlackTowerCmd_IsTargetSlot(VM *vm, FieldScriptEnv *env) {
     u16 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0db4(dungeon, KeyDataSave_GetFloorInArea(keyData), actor);
+    *var = InfinityDungeon_IsTargetSlot(dungeon, KeyDataSave_GetFloorInArea(keyData), actor);
     return FALSE;
 }
 
@@ -390,7 +391,7 @@ static BOOL BlackTowerCmd_GetNpcScriptByResult(VM *vm, FieldScriptEnv *env) {
     u16 objCode = FldAct_GetObjCode(actor);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
 
-    *var = func_ov127_021f03dc(getKeyDataBlkAddress(save), dungeon, objCode, a);
+    *var = InfinityDungeon_GetNpcScriptByResult(getKeyDataBlkAddress(save), dungeon, objCode, a);
     return FALSE;
 }
 
