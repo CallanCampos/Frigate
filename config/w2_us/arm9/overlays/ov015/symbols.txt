@@ -1,2 +1,2 @@
-func_ov015_0216e660 kind:function(thumb,size=0x110) addr:0x0216e6a0
-func_ov015_0216e770 kind:function(thumb,size=0x38) addr:0x0216e7b0
+EventMedalInfoBeacon_Callback kind:function(thumb,size=0x110) addr:0x0216e6a0
+EventMedalInfoBeacon_Create kind:function(thumb,size=0x38) addr:0x0216e7b0

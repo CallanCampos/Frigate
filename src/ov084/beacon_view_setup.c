@@ -202,8 +202,8 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
 
         args |= work->selected << 16;
 
-        event =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(15), (GameEventProvider)func_ov015_0216e770, &args);
+        event = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(15),
+                                                (GameEventProvider)EventMedalInfoBeacon_Create, &args);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_MEDAL, work->selectedPanel);
         break;
     }
