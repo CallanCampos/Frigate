@@ -300,11 +300,6 @@ in both versions.
 
 ## Matching, but not linkable as is
 
-- `lib/dsprot/src/dsprot_stub_check_multi.c` and `dsprot_decrypt_multi.c` (overlay 337) match every function, but
-  linked complete they fail the module check: the literal pool of `dsprot_cipher_multi.c`'s still-delinked code at
-  `0x02180270` / `0x021802b0`, words of a code address plus 0x2200, then resolves to 0x2200 plus small offsets. They
-  stay incomplete until those address-plus-0x2200 references link.
-
 - `lib/msl/src/fp/fp_fastI.c` (ARM9 main), MSL's soft-float and integer runtime, has a `.text` byte for byte the ROM's
   in both versions, but linked complete it leaves 17 names undefined (`_dadd`, `_ddiv`, `_deq`, `_dflt`, `_dfltu`,
   `_dls`, `_dmul`, `_dneq`, `_dsub`, `_f2d`, `_fflt`, `_ll_mod`, `_ll_mul`, `_ll_shl`, `_ll_udiv`, `_ll_ufrom_d`,
