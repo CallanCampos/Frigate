@@ -14809,6 +14809,7 @@ overlays/ov170 0x02180ecc AIGetSideEffect
 overlays/ov170 0x02180f00 AIIfPartyMemberDamaged
 overlays/ov170 0x02180f9c AIIfPartyMemberUsedPP
 overlays/ov170 0x021810dc AIIfCanUseLastResort
+overlays/ov170 0x0218119c AIGetTurnsOnField
 overlays/ov170 0x021811c0 AIIfPartyMemberDealsMoreDamage
 overlays/ov170 0x02181278 AIIfHasSuperEffectiveMove
 overlays/ov170 0x021812fc AIIfLastMoveDealsMoreDamage
@@ -14819,6 +14820,7 @@ overlays/ov170 0x02181678 AIEqualToTurnRandom
 overlays/ov170 0x02181688 AINotEqualToTurnRandom
 overlays/ov170 0x02181698 CompareToTurnRandom
 overlays/ov170 0x021816c0 AIJumpByMoveEffect
+overlays/ov170 0x02181734 AIIfFutureSightPending
 overlays/ov170 0x02181860 TrAI_GetTargetPos
 overlays/ov170 0x021819fc TrAI_GetBattleMon
 overlays/ov170 0x02181a08 TrAI_GetPartyMon
