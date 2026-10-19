@@ -3199,8 +3199,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
-  doesn't have, as their own function-local statics, which an unemitted handler takes with it. Making them globals
-  read by unemitted statics was not tried; it would put names on data Game Freak kept local.
+  doesn't have, as their own function-local statics, which an unemitted handler takes with it. Made globals read by
+  one unemitted function, in a declaration order found from the size sort, about 47 of them reproduce both sections
+  byte for byte in both versions (the live handlers' line patterns as function-local statics); that isn't kept, as
+  it names data Game Freak kept local and invents a reader for it.
 - Tables that only code the linker dropped read can be kept in the shared section as globals read by unemitted
   static functions. `mbp.c` (overlay 181) keeps NitroSDK's demo tables of state and callback names this way, after
   its heap ID and before their strings: a `static` table read only by an unemitted function is dropped with it, and a
@@ -3327,7 +3329,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - One initialized array retains entries that no code indexes, where MWCC drops separate unreferenced statics. If
   live `.data` objects have gaps filled by unused records, indexing a shared array preserves the ROM's offsets:
   `wipe_sub.c`'s seven `WipeLinePattern` entries put its four used patterns at 0, 0x10, 0x20 and 0x28, matching all
-  four line-wipe functions in both versions without pointer casts.
+  four line-wipe functions in both versions without pointer casts. The sections' full layout needs the patterns
+  apart, though: ten 8-byte patterns as one array make an 80-byte object, which gets a section of its own after the
+  file's 24-byte objects, where the ROM has them first.
 - The linker starts each `.rodata` section on a 4-byte boundary, whatever the section's own alignment, so a 6-byte
   `u16` table followed by a `u8` initializer leaves 2 bytes of padding between them, as at the start of
   `btl_server_flow.c`'s `.rodata`. `scrcmd_ochiba.c`'s 150-byte and 342-byte tables, both 2-aligned, end where only
