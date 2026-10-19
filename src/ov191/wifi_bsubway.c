@@ -60,8 +60,8 @@
 #include "system/union_view.h"
 #include "system/version.h"
 #include "system/wordset.h"
-#include "text/system/wifi_bsubway.h"
 #include "text/system/ability_handlers_btl_main.h"
+#include "text/system/wifi_bsubway.h"
 
 // The Wi-Fi Battle Subway's screen: its proc, the three things it does with the Battle Subway's server (sending the
 // player's record, downloading a train's trainers and downloading a train's leaders), the requests behind them and the

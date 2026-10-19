@@ -1292,8 +1292,9 @@ static void ZukanHabitat_PrintHabitat(ZukanHabitatWork *wk) {
 
 static u32 ZukanHabitat_GetHabitatMessage(u32 type, u32 land) {
     u32 landMessages[] = {
-        ZukanHabitat_Text_PokemonLivingTallGrass, ZukanHabitat_Text_PokemonLivingSand,    ZukanHabitat_Text_PokemonLivingSwamp,
-        ZukanHabitat_Text_PokemonLivingPlace,     ZukanHabitat_Text_PokemonLivingPlace_2, ZukanHabitat_Text_PokemonLivingLand,
+        ZukanHabitat_Text_PokemonLivingTallGrass, ZukanHabitat_Text_PokemonLivingSand,
+        ZukanHabitat_Text_PokemonLivingSwamp,     ZukanHabitat_Text_PokemonLivingPlace,
+        ZukanHabitat_Text_PokemonLivingPlace_2,   ZukanHabitat_Text_PokemonLivingLand,
         ZukanHabitat_Text_NoPokemonLivesHere,
     };
 
