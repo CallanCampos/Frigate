@@ -457,7 +457,7 @@ static void MusicalEvent_AddLikedPropPoints(MusicalEventWork *work) {
         poke = work->stage->pokes[i];
         for (j = 0; j < 9; j++) {
             if (poke->unk54[j] == TRUE) {
-                kind = func_ov210_021ef164(items, poke->equips[j].itemId);
+                kind = MusItemData_GetKind(items, poke->equips[j].itemId);
                 poke->points += MusicalProgram_GetPropPoints(work->program, kind);
             }
         }
@@ -595,7 +595,7 @@ static void MusicalEvent_RecordShow(MusicalEventWork *work) {
         poke = work->stage->pokes[work->playerPos];
         for (i = 0; i < 9; i++) {
             if (poke->equips[i].itemId != 0xff) {
-                counts[(u8)func_ov210_021ef164(items, poke->equips[i].itemId)]++;
+                counts[(u8)MusItemData_GetKind(items, poke->equips[i].itemId)]++;
             }
         }
         for (i = 0; i < 4; i++) {

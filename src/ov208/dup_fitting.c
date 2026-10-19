@@ -1560,12 +1560,12 @@ static void DupFitting_WearItem(DupFittingWork *work) {
     DupFittingItemNode_GetDraw(work->heldNode);
     heldDraw = DupFittingItemNode_GetDraw(work->heldNode);
     if (DupFitting_HasWornInCategory(work, work->hoverPos) == TRUE) {
-        s32 category = func_ov210_021ef118(work->hoverPos);
+        s32 category = MusItemData_GetPosGroup(work->hoverPos);
         DupFittingItemNode *other;
 
         for (other = DupFittingItemList_GetHead(work->wornList); other != NULL;
              other = DupFittingItemNode_GetNext(other)) {
-            if (category == func_ov210_021ef118(DupFittingItemNode_GetEquipPos(other))) {
+            if (category == MusItemData_GetPosGroup(DupFittingItemNode_GetEquipPos(other))) {
                 break;
             }
         }
@@ -1708,7 +1708,7 @@ static BOOL DupFitting_SelectCategory(DupFittingWork *work) {
     touch[1] = work->touchY - 112;
     pos = DupFitting_FindNearestEquipPos(work, NULL, touch, &distance);
     if (pos != DUP_FITTING_EQUIP_NONE) {
-        category = func_ov210_021ef118(pos);
+        category = MusItemData_GetPosGroup(pos);
         if (category == 7) {
             category = 6;
         }
@@ -1785,11 +1785,11 @@ static void DupFitting_UpdateTilt(DupFittingWork *work) {
 }
 
 static BOOL DupFitting_HasWornInCategory(DupFittingWork *work, s32 pos) {
-    s32 category = func_ov210_021ef118(pos);
+    s32 category = MusItemData_GetPosGroup(pos);
     DupFittingItemNode *node;
 
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
-        if (category == func_ov210_021ef118(DupFittingItemNode_GetEquipPos(node))) {
+        if (category == MusItemData_GetPosGroup(DupFittingItemNode_GetEquipPos(node))) {
             return TRUE;
         }
     }

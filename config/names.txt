@@ -20031,6 +20031,13 @@ overlays/ov210 0x021eef64 MusItemData_Free
 overlays/ov210 0x021eef78 MusItemData_GetItem
 overlays/ov210 0x021eef84 MusItemData_GetOffset
 overlays/ov210 0x021eef94 MusItemData_GetTexSize
+overlays/ov210 0x021eef98 MusItemData_CanEquipAtPos
+overlays/ov210 0x021ef018 MusItemData_CanEquipInGroup
+overlays/ov210 0x021ef088 MusItemData_IsCategoryOfGroup
+overlays/ov210 0x021ef0f4 MusItemData_GetFlag7
+overlays/ov210 0x021ef104 MusItemData_GetFlag9
+overlays/ov210 0x021ef118 MusItemData_GetPosGroup
+overlays/ov210 0x021ef164 MusItemData_GetKind
 overlays/ov210 0x021ef170 MusItemData_GetEffect
 overlays/ov210 0x021ef17c MusItemData_GetCategory
 overlays/ov211 0x021ef5d4 MusComm_Free

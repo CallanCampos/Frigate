@@ -128,7 +128,7 @@ void MusicalProgram_CalcPoints(HeapID heapId, MusicalProgram *program, MusicalSt
 
         for (slot = 0; slot < 9; slot++) {
             if (poke->equips[slot].itemId != 0xff) {
-                u8 kind = func_ov210_021ef164(items, poke->equips[slot].itemId);
+                u8 kind = MusItemData_GetKind(items, poke->equips[slot].itemId);
 
                 counts[i][kind]++;
                 totals[kind]++;
