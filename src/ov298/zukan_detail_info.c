@@ -179,8 +179,8 @@ static BOOL ZukanDetailInfo_Exit(ZukanDetailProcSys *sys, int *seq, void *param_
 
     ZukanDetailInfo_StopGlow(param, wk, common);
     ZukanDetailInfo_FreeGlow(param, wk, common);
-    func_ov296_0219dbcc(wk->infoSub);
-    func_ov296_0219dbcc(wk->infoMain);
+    ZukanInfo_Free(wk->infoSub);
+    ZukanInfo_Free(wk->infoMain);
     ZukanDetailInfo_FreeButtons(param, wk, common);
     GFL_FontFree(wk->font);
     GFL_MsgDataFree(wk->msgData[2]);
@@ -259,13 +259,13 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
             break;
         }
         ZukanDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught, languages);
-        wk->infoMain = func_ov296_0219d768(param->heapId, species, form, sex, rare, personality, national, caught, 2, 0,
-                                           1, unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
-                                           wk->msgData[1], wk->msgData[2]);
-        wk->infoSub = func_ov296_0219d768(param->heapId, species, form, sex, rare, personality, national, caught, 2, 1,
-                                          1, unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
-                                          wk->msgData[1], wk->msgData[2]);
-        func_ov296_0219e0c8(wk->infoSub);
+        wk->infoMain = ZukanInfo_Create(param->heapId, species, form, sex, rare, personality, national, caught, 2, 0, 1,
+                                        unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
+                                        wk->msgData[1], wk->msgData[2]);
+        wk->infoSub = ZukanInfo_Create(param->heapId, species, form, sex, rare, personality, national, caught, 2, 1, 1,
+                                       unit, wk->font, ZukanDetailCommon_GetPrintQueue(common), wk->msgData[0],
+                                       wk->msgData[1], wk->msgData[2]);
+        ZukanInfo_Hide(wk->infoSub);
         ZukanDetailInfo_ResetButtons(param, wk, common, languages);
         ZukanDetailInfo_InitGlow(param, wk, common);
         ZukanDetailInfo_StartGlow(param, wk, common);
@@ -318,8 +318,8 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
 
     if (*seq >= INFO_SEQ_WAIT_FADE_IN) {
         ZukanDetailInfo_UpdateButton(param, wk, common);
-        func_ov296_0219dc74(wk->infoMain);
-        func_ov296_0219dc74(wk->infoSub);
+        ZukanInfo_Update(wk->infoMain);
+        ZukanInfo_Update(wk->infoSub);
         if (wk->pushed == LANGUAGE_NONE) {
             ZukanDetailInfo_UpdateGlow(param, wk, common);
         }
@@ -524,7 +524,7 @@ static void ZukanDetailInfo_ChangePokemon(ZukanDetailInfoParam *param, ZukanDeta
 
     ZukanDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught, languages);
     ownLanguage = TRUE;
-    func_ov296_0219de50(wk->infoMain, species, form, sex, rare, personality, caught);
+    ZukanInfo_SetPokemon(wk->infoMain, species, form, sex, rare, personality, caught);
     if (wk->language != LANGUAGE_NONE) {
         if (languages[wk->language]) {
             ownLanguage = FALSE;
@@ -534,9 +534,9 @@ static void ZukanDetailInfo_ChangePokemon(ZukanDetailInfoParam *param, ZukanDeta
         }
     }
     if (ownLanguage) {
-        func_ov296_0219e0c8(wk->infoSub);
+        ZukanInfo_Hide(wk->infoSub);
     } else {
-        func_ov296_0219dfb0(wk->infoSub, species, form, sex, rare, personality, caught, wk->language);
+        ZukanInfo_SetPokemonInLanguage(wk->infoSub, species, form, sex, rare, personality, caught, wk->language);
     }
     ZukanDetailInfo_ResetButtons(param, wk, common, languages);
 }
@@ -555,10 +555,10 @@ static void ZukanDetailInfo_SetLanguage(ZukanDetailInfoParam *param, ZukanDetail
 
             ZukanDetailInfo_GetPokemon(param, wk, common, &species, &form, &sex, &rare, &personality, &caught,
                                        languages);
-            func_ov296_0219dfb0(wk->infoSub, species, form, sex, rare, personality, caught, language);
-            func_ov296_0219e114(wk->infoSub);
+            ZukanInfo_SetPokemonInLanguage(wk->infoSub, species, form, sex, rare, personality, caught, language);
+            ZukanInfo_Show(wk->infoSub);
         } else {
-            func_ov296_0219df4c(wk->infoSub, language);
+            ZukanInfo_SetLanguage(wk->infoSub, language);
         }
         ZukanDetailInfo_StopGlow(param, wk, common);
         wk->language = language;

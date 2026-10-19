@@ -295,22 +295,22 @@ static const u16 sMsgBanks[ZUKAN_INFO_MSG_COUNT] = {
 
 // clang-format on
 
-ZukanInfo *func_ov296_0219d6e0(HeapID heapId, PartyPkm *pkm, BOOL national, BOOL caught, u32 mode, u32 engine,
-                               u8 bgPriority, ClActUnit *unit, Font *font, PrintQueue *printQueue, MsgData *msgData0,
-                               MsgData *msgData1, MsgData *msgData2) {
+ZukanInfo *ZukanInfo_CreateForPartyPkm(HeapID heapId, PartyPkm *pkm, BOOL national, BOOL caught, u32 mode, u32 engine,
+                                       u8 bgPriority, ClActUnit *unit, Font *font, PrintQueue *printQueue,
+                                       MsgData *msgData0, MsgData *msgData1, MsgData *msgData2) {
     u16 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     u16 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
     u8 sex = PokeParty_GetSex(pkm);
     u16 rare = PokeParty_IsRare(pkm);
     u32 personality = PokeParty_GetParam(pkm, PKM_PARAM_PID, NULL);
 
-    return func_ov296_0219d768(heapId, species, form, sex, rare, personality, national, caught, mode, engine,
-                               bgPriority, unit, font, printQueue, msgData0, msgData1, msgData2);
+    return ZukanInfo_Create(heapId, species, form, sex, rare, personality, national, caught, mode, engine, bgPriority,
+                            unit, font, printQueue, msgData0, msgData1, msgData2);
 }
 
-ZukanInfo *func_ov296_0219d768(HeapID heapId, u16 species, u16 form, u16 sex, u16 rare, u32 personality, BOOL national,
-                               BOOL caught, u32 mode, u32 engine, u8 bgPriority, ClActUnit *unit, Font *font,
-                               PrintQueue *printQueue, MsgData *msgData0, MsgData *msgData1, MsgData *msgData2) {
+ZukanInfo *ZukanInfo_Create(HeapID heapId, u16 species, u16 form, u16 sex, u16 rare, u32 personality, BOOL national,
+                            BOOL caught, u32 mode, u32 engine, u8 bgPriority, ClActUnit *unit, Font *font,
+                            PrintQueue *printQueue, MsgData *msgData0, MsgData *msgData1, MsgData *msgData2) {
     ZukanInfo *info = GFL_HeapAllocate(heapId, sizeof(ZukanInfo), FALSE, "zukan_info.c", 1225);
     void *file;
     int x;
@@ -466,16 +466,16 @@ ZukanInfo *func_ov296_0219d768(HeapID heapId, u16 species, u16 form, u16 sex, u1
     return info;
 }
 
-void func_ov296_0219dbcc(ZukanInfo *info) {
+void ZukanInfo_Free(ZukanInfo *info) {
     u8 i;
 
-    func_ov296_0219e114(info);
+    ZukanInfo_Show(info);
     info->hidden = FALSE;
     for (i = 0; i < 2; i++) {
         ZukanInfo_UnloadSprite(info, i);
     }
     if (info->mode == ZUKAN_INFO_MODE_DETAIL) {
-        func_ov296_0219ddcc(info);
+        ZukanInfo_FreeEntry(info);
     }
     ZukanInfo_FreeFootprints(info);
     ZukanInfo_FreeTypeIcons(info);
@@ -493,7 +493,7 @@ void func_ov296_0219dbcc(ZukanInfo *info) {
     GFL_HeapFree(info);
 }
 
-void func_ov296_0219dc74(ZukanInfo *info) {
+void ZukanInfo_Update(ZukanInfo *info) {
     ClActorPos pos;
     BOOL xDone;
     BOOL yDone;
@@ -567,7 +567,7 @@ void func_ov296_0219dc74(ZukanInfo *info) {
     PrintQueue_Main(info->printQueue);
 }
 
-void func_ov296_0219ddcc(ZukanInfo *info) {
+void ZukanInfo_FreeEntry(ZukanInfo *info) {
     ZukanInfo_ClearWindows(info);
     ZukanInfo_FreeWindows(info);
     ZukanInfo_UnloadFootprint(info, info->footprintSlot);
@@ -580,15 +580,15 @@ static void ZukanInfo_ClearDisplay(ZukanInfo *info) {
     ZukanInfo_FreeTypeActors(info, info->typeSlot);
 }
 
-void func_ov296_0219de14(ZukanInfo *info) {
+void ZukanInfo_SetReady(ZukanInfo *info) {
     info->ready = TRUE;
 }
 
-void func_ov296_0219de1c(ZukanInfo *info) {
+void ZukanInfo_RequestCry(ZukanInfo *info) {
     info->cryRequested = TRUE;
 }
 
-BOOL func_ov296_0219de24(ZukanInfo *info) {
+BOOL ZukanInfo_IsSlidingIn(ZukanInfo *info) {
     BOOL sliding = FALSE;
 
     if (info->state == ZUKAN_INFO_STATE_SLIDE_IN) {
@@ -597,7 +597,7 @@ BOOL func_ov296_0219de24(ZukanInfo *info) {
     return sliding;
 }
 
-BOOL func_ov296_0219de34(ZukanInfo *info) {
+BOOL ZukanInfo_IsDone(ZukanInfo *info) {
     BOOL done = FALSE;
 
     if (info->state == ZUKAN_INFO_STATE_DONE) {
@@ -606,13 +606,13 @@ BOOL func_ov296_0219de34(ZukanInfo *info) {
     return done;
 }
 
-void func_ov296_0219de44(ZukanInfo *info) {
+void ZukanInfo_Start(ZukanInfo *info) {
     if (info->state == ZUKAN_INFO_STATE_WAIT_START) {
         info->state = ZUKAN_INFO_STATE_DELAY;
     }
 }
 
-void func_ov296_0219de50(ZukanInfo *info, u16 species, u16 form, u16 sex, u16 rare, u32 personality, BOOL caught) {
+void ZukanInfo_SetPokemon(ZukanInfo *info, u16 species, u16 form, u16 sex, u16 rare, u32 personality, BOOL caught) {
     int x;
     int y;
     u16 formCount;
@@ -668,7 +668,7 @@ void func_ov296_0219de50(ZukanInfo *info, u16 species, u16 form, u16 sex, u16 ra
     ZukanInfo_SetVisible(info, !info->hidden);
 }
 
-void func_ov296_0219df4c(ZukanInfo *info, u32 language) {
+void ZukanInfo_SetLanguage(ZukanInfo *info, u32 language) {
     if (info->typeSlot != 0) {
         info->typeSlot = 0;
     } else {
@@ -685,8 +685,8 @@ void func_ov296_0219df4c(ZukanInfo *info, u32 language) {
     }
 }
 
-void func_ov296_0219dfb0(ZukanInfo *info, u16 species, u16 form, u16 sex, u16 rare, u32 personality, BOOL caught,
-                         u32 language) {
+void ZukanInfo_SetPokemonInLanguage(ZukanInfo *info, u16 species, u16 form, u16 sex, u16 rare, u32 personality,
+                                    BOOL caught, u32 language) {
     int x;
     int y;
     u16 formCount;
@@ -746,7 +746,7 @@ void func_ov296_0219dfb0(ZukanInfo *info, u16 species, u16 form, u16 sex, u16 ra
     ZukanInfo_SetVisible(info, !info->hidden);
 }
 
-void func_ov296_0219e0c8(ZukanInfo *info) {
+void ZukanInfo_Hide(ZukanInfo *info) {
     BOOL visible;
 
     if (!info->hidden) {
@@ -762,7 +762,7 @@ void func_ov296_0219e0c8(ZukanInfo *info) {
     }
 }
 
-void func_ov296_0219e114(ZukanInfo *info) {
+void ZukanInfo_Show(ZukanInfo *info) {
     BOOL visible;
 
     if (info->hidden) {
