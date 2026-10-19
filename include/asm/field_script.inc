@@ -5288,36 +5288,36 @@
 
     // Plugin 14
 
-    // func_ov066_021e597c
+    // Plugin14Cmd_StartAspertiaSeasonAnimations
     .macro Plugin14_Cmd1000
     FieldCommand 1000
     .endm
 
-    // func_ov066_021e5800
+    // Plugin14Cmd_ShowGC6Model
     .macro Plugin14_Cmd1001 a0
     FieldCommand 1001
     .2byte \a0
     .endm
 
-    // func_ov066_021e5820
+    // Plugin14Cmd_PlayGC6Model
     .macro Plugin14_Cmd1002 a0
     FieldCommand 1002
     .2byte \a0
     .endm
 
-    // func_ov066_021e5840
+    // Plugin14Cmd_StartActorHover
     .macro Plugin14_Cmd1003 a0
     FieldCommand 1003
     .2byte \a0
     .endm
 
-    // func_ov066_021e5860
+    // Plugin14Cmd_PlayGC6Model23
     .macro Plugin14_Cmd1004 a0
     FieldCommand 1004
     .2byte \a0
     .endm
 
-    // func_ov066_021e5888
+    // Plugin14Cmd_HideGC6Model3
     .macro Plugin14_Cmd1005
     FieldCommand 1005
     .endm
@@ -5330,12 +5330,12 @@
     .2byte \a2
     .endm
 
-    // func_ov066_021e5910
+    // Plugin14Cmd_ResetLCDToBlack
     .macro Plugin14_Cmd1007
     FieldCommand 1007
     .endm
 
-    // func_ov066_021e598c
+    // Plugin14Cmd_StartLeagueCenterAnimations
     .macro Plugin14_Cmd1009
     FieldCommand 1009
     .endm
@@ -5346,17 +5346,17 @@
     .2byte \a0
     .endm
 
-    // func_ov066_021e5a1c
+    // Plugin14Cmd_LoadAspertiaBG3Picture
     .macro Plugin14_Cmd1011
     FieldCommand 1011
     .endm
 
-    // func_ov066_021e5a2c
+    // Plugin14Cmd_CallDT9ReleaseEvent
     .macro Plugin14_Cmd1012
     FieldCommand 1012
     .endm
 
-    // func_ov066_021e5a54
+    // Plugin14Cmd_CallDT9ThrowEvent
     .macro Plugin14_Cmd1013 a0, a1, a2, a3, a4, a5
     FieldCommand 1013
     .2byte \a0
@@ -5367,7 +5367,7 @@
     .2byte \a5
     .endm
 
-    // func_ov066_021e5b00
+    // Plugin14Cmd_PlayDT9Thrown
     .macro Plugin14_Cmd1014 a0, a1, a2
     FieldCommand 1014
     .2byte \a0
@@ -5375,12 +5375,12 @@
     .2byte \a2
     .endm
 
-    // func_ov066_021e5b50
+    // Plugin14Cmd_CallDT9WaitThrownDoneEvent
     .macro Plugin14_Cmd1015
     FieldCommand 1015
     .endm
 
-    // func_ov066_021e5b78
+    // Plugin14Cmd_CallDT9WaitFifthFrameEvent
     .macro Plugin14_Cmd1016
     FieldCommand 1016
     .endm

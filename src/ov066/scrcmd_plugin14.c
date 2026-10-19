@@ -23,35 +23,35 @@ typedef struct {
     s32 volume;
 } Plugin14SeqFadeOut;
 
-static BOOL func_ov066_021e5800(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_ShowGC6Model(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_ShowModel01(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL func_ov066_021e5820(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_PlayGC6Model(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_PlayModel01(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL func_ov066_021e5840(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_StartActorHover(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_CallStartHover(gsys, VM_Read16(vm));
     return FALSE;
 }
 
-static BOOL func_ov066_021e5860(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_PlayGC6Model23(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     GimmickGC6_PlayModel23(gsys, ScriptReadAny(vm, env) == TRUE);
     return FALSE;
 }
 
-static BOOL func_ov066_021e5888(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_HideGC6Model3(VM *vm, FieldScriptEnv *env) {
     GimmickGC6_HideModel3(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
@@ -77,7 +77,7 @@ static BOOL Plugin14Cmd_ShiftActor(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov066_021e5910(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_ResetLCDToBlack(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u32 enabledA = GFL_BGSysGetEnabledBGsA();
     u32 enabledB = GFL_BGSysGetEnabledBGsB();
@@ -93,12 +93,12 @@ static BOOL func_ov066_021e5910(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov066_021e597c(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_StartAspertiaSeasonAnimations(VM *vm, FieldScriptEnv *env) {
     func_ov112_021eed04(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-static BOOL func_ov066_021e598c(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_StartLeagueCenterAnimations(VM *vm, FieldScriptEnv *env) {
     func_ov115_021eed08(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
@@ -134,12 +134,12 @@ static BOOL Plugin14_SeqFadeOutTask(void *data) {
     return FALSE;
 }
 
-static BOOL func_ov066_021e5a1c(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_LoadAspertiaBG3Picture(VM *vm, FieldScriptEnv *env) {
     func_ov112_021eed44(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
-static BOOL func_ov066_021e5a2c(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_CallDT9ReleaseEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickDT9_CreateReleaseEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -150,7 +150,7 @@ static BOOL func_ov066_021e5a2c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov066_021e5a54(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_CallDT9ThrowEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -179,7 +179,7 @@ static BOOL func_ov066_021e5a54(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov066_021e5b00(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_PlayDT9Thrown(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 x = ScriptReadAny(vm, env);
     u16 y = ScriptReadAny(vm, env);
@@ -193,7 +193,7 @@ static BOOL func_ov066_021e5b00(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov066_021e5b50(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_CallDT9WaitThrownDoneEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickDT9_CreateWaitThrownDoneEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -204,7 +204,7 @@ static BOOL func_ov066_021e5b50(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov066_021e5b78(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin14Cmd_CallDT9WaitFifthFrameEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameEvent *event = GimmickDT9_CreateWaitFifthFrameEvent(FieldScriptEnv_GetGameSystem(env));
 
@@ -216,10 +216,22 @@ static BOOL func_ov066_021e5b78(VM *vm, FieldScriptEnv *env) {
 }
 
 const FieldScriptCommand PLUGIN_14_SCRIPT_COMMANDS[] = {
-    func_ov066_021e597c,    func_ov066_021e5800,    func_ov066_021e5820,
-    func_ov066_021e5840,    func_ov066_021e5860,    func_ov066_021e5888,
-    Plugin14Cmd_ShiftActor, func_ov066_021e5910,    NULL,
-    func_ov066_021e598c,    Plugin14Cmd_FadeOutSeq, func_ov066_021e5a1c,
-    func_ov066_021e5a2c,    func_ov066_021e5a54,    func_ov066_021e5b00,
-    func_ov066_021e5b50,    func_ov066_021e5b78,    (FieldScriptCommand)0xFFFFFFFF,
+    Plugin14Cmd_StartAspertiaSeasonAnimations,
+    Plugin14Cmd_ShowGC6Model,
+    Plugin14Cmd_PlayGC6Model,
+    Plugin14Cmd_StartActorHover,
+    Plugin14Cmd_PlayGC6Model23,
+    Plugin14Cmd_HideGC6Model3,
+    Plugin14Cmd_ShiftActor,
+    Plugin14Cmd_ResetLCDToBlack,
+    NULL,
+    Plugin14Cmd_StartLeagueCenterAnimations,
+    Plugin14Cmd_FadeOutSeq,
+    Plugin14Cmd_LoadAspertiaBG3Picture,
+    Plugin14Cmd_CallDT9ReleaseEvent,
+    Plugin14Cmd_CallDT9ThrowEvent,
+    Plugin14Cmd_PlayDT9Thrown,
+    Plugin14Cmd_CallDT9WaitThrownDoneEvent,
+    Plugin14Cmd_CallDT9WaitFifthFrameEvent,
+    (FieldScriptCommand)0xFFFFFFFF,
 };
