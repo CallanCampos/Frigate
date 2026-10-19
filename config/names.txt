@@ -9942,6 +9942,17 @@ overlays/ov110 0x021eee70 TubelineBridge_SaveFrames
 overlays/ov110 0x021eeea4 TubelineBridge_LoadFrames
 overlays/ov110 0x021eeed8 TubelineBridge_StartWait
 overlays/ov110 0x021eeefc TubelineBridge_RestartTrain
+overlays/ov111 0x021eec80 MarineTube_Init
+overlays/ov111 0x021eecd8 MarineTube_End
+overlays/ov111 0x021eecf8 MarineTube_Update
+overlays/ov111 0x021eed08 MarineTube_ShowStage
+overlays/ov111 0x021eedac MarineTube_PlaceModels
+overlays/ov111 0x021eef70 MarineTube_FreeScene
+overlays/ov111 0x021eef7c MarineTube_StepAnimations
+overlays/ov111 0x021eef88 MarineTube_InitModel
+overlays/ov111 0x021ef010 MarineTube_ShowModel
+overlays/ov111 0x021ef074 MarineTube_SaveFrames
+overlays/ov111 0x021ef0c8 MarineTube_LoadFrames
 overlays/ov116 0x021eec80 GimmickGC6_Setup
 overlays/ov116 0x021eecb0 GimmickGC6_End
 overlays/ov116 0x021eecc8 GimmickGC6_Update
