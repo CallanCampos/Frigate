@@ -8975,6 +8975,10 @@ overlays/ov080 0x021ea8f4 NoGear_SetupBGs
 overlays/ov080 0x021ea9f8 NoGear_Init
 overlays/ov080 0x021eaa1c NoGear_Release
 overlays/ov080 0x021eaa64 NoGear_Idle
+overlays/ov080 0x021eaa68 NoGear_Create
+overlays/ov080 0x021eaa98 NoGear_Update
+overlays/ov080 0x021eaab4 NoGear_Draw
+overlays/ov080 0x021eaab8 NoGear_Free
 overlays/ov080 0x021eaad4 sPaletteFileIds
 overlays/ov080 0x021eaadc sBG6Setup
 overlays/ov080 0x021eaafc sBG5Setup

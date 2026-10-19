@@ -5,10 +5,10 @@ NoGear_SetupBGs kind:function(thumb,size=0x104) addr:0x021ea934
 NoGear_Init kind:function(thumb,size=0x24) addr:0x021eaa38
 NoGear_Release kind:function(thumb,size=0x48) addr:0x021eaa5c
 NoGear_Idle kind:function(thumb,size=0x2) addr:0x021eaaa4
-func_ov080_021eaa68 kind:function(thumb,size=0x30) addr:0x021eaaa8
-func_ov080_021eaa98 kind:function(thumb,size=0x1c) addr:0x021eaad8
-func_ov080_021eaab4 kind:function(thumb,size=0x2) addr:0x021eaaf4
-func_ov080_021eaab8 kind:function(thumb,size=0x1c) addr:0x021eaaf8
+NoGear_Create kind:function(thumb,size=0x30) addr:0x021eaaa8
+NoGear_Update kind:function(thumb,size=0x1c) addr:0x021eaad8
+NoGear_Draw kind:function(thumb,size=0x2) addr:0x021eaaf4
+NoGear_Free kind:function(thumb,size=0x1c) addr:0x021eaaf8
 sPaletteFileIds kind:data(any) addr:0x021eab14
 sBG6Setup kind:data(any) addr:0x021eab1c
 data_ov080_021eaaf1 kind:data(any) addr:0x021eab31 ambiguous
