@@ -1547,7 +1547,11 @@ Same instructions, scheduled in another order.
   `adds r1, r0, #0; adds r1, #0x18; ldr r1, [r1, r4]`, and with `const` data a later pass drops the second load.
   A pointer local such as `entries = data->entries` is kept, not folded into `data`, once it has a use in a later
   block than its definition, but reads with no store between are merged first. Overlay 332's
-  `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order (see its row).
+  `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order. In the original's
+  order (`*type = data->entries[index].type; *id = ...;`) its two reads of the type are merged, and it matches byte
+  for byte only under one of the three pragmas, like `UpdateScroll` (see both rows). Each file also matches whole at
+  `-O3,p`, where only that one function's code differs from `-O4,p` (data and relocations byte-identical), which is
+  not used: nothing else in either file shows the setting, and the files beside them lose functions at `-O3,p`.
 - Two fields of one element of a static table read from the same base, one as `ldr r0, [r1, r2]` and the other
   after `adds r1, r1, r2; ldrb r1, [r1, #4]`, are a plain read and a read through an inline taking an `int` index.
   Written plainly, the second field's offset folds into the table's literal (`sMenuInfo+4`); through an element
