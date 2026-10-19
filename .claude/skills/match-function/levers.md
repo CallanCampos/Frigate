@@ -325,9 +325,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   be in the lower half of its own object; an unknown index counts as 0. A store kept below one through a pointer, as
   in the original, can need its field in the upper half of a smaller struct. (matching.md: "below half the object's
   size")
-- A struct field's load above an indexed store that its offset can't give: the fields are separate statics, each at
-  offset 0 of its own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its
-  own object")
+- A struct field's load above an indexed store that its offset can't give, or a reload scheduled between two stores to
+  fields that the original keeps after both: the fields are separate statics, each at offset 0 of its own object, and
+  a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its own object")
 - A table's row offset added to its address before the column (`add r0, table, row*3; ldrb [col, r0]`), where ours
   adds it to the column: a two-dimensional table indexed `[row][col]`. (matching.md: "A two-dimensional table
   indexed")

@@ -3784,7 +3784,7 @@ ltd_autoload_0 0x0276c30c sUnloaded
 ltd_autoload_0 0x0276c310 sBlockBuf
 ltd_autoload_0 0x0276c520 sFatfs
 ltd_autoload_0 0x0276c58c sFatfsInitialized
-ltd_autoload_0 0x0276c590 sSndex
+ltd_autoload_0 0x0276c590 sVolume
 ltd_autoload_0 0x0276c5ec sProcessList
 ltd_autoload_0 0x0276c5f8 sDspExitCallbackInfo
 ltd_autoload_0 0x0276c608 sDspSleepCallbackInfo
