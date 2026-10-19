@@ -8,6 +8,7 @@
 // CAMERA, SCFG, SNDEX) have no service yet: a word sent with them comes back with the error bit, as from an ARM7 that
 // has no callback for the tag.
 #include "hal/pxi/arm7.h"
+#include "hal/os/frame_time.h"
 #include "hal/os/port_os.h"
 #include "hal/pxi/pxi_bus.h"
 
@@ -16,17 +17,20 @@
 static BOOL sBooted;
 static BOOL sFrameHookAdded;
 
-// The ARM7's work at each VBlank, on the host's stack
+// The ARM7's work at each VBlank, on the host's stack; with --frame-times, timed as the frame's ARM7 part
 static void Arm7Frame(void) {
     u64 cycles;
+    uint64_t begin;
 
     if (!sBooted) {
         return;
     }
+    begin = port_frame_time_begin();
     cycles = port_os_cycles();
     port_tp7_frame(cycles);
     port_snd7_frame(cycles);
     port_mic7_frame(cycles);
+    port_frame_time_end(PORT_FRAME_TIME_ARM7, begin);
 }
 
 void port_arm7_boot(void) {

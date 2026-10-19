@@ -4,7 +4,9 @@
 # builds the sources it tests itself, so that each can have its own flags; the game program gets them through
 # port_gfx, which builds every C file under gfx/.
 set(port_g3d_ge "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ge/ge.c")
-set(port_g3d_ds3d "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ref/ds3d.c")
+# The renderer draws in bands on the renderers' workers (gfx/workers.c), whose threads are the host's (port/hal/host)
+set(port_g3d_ds3d "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ref/ds3d.c" "${CMAKE_CURRENT_SOURCE_DIR}/gfx/workers.c"
+    ${port_host_sources})
 set(port_g3d_hal "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ge/ge_hal.c")
 set(port_g3d_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/g3d")
 
@@ -28,7 +30,11 @@ endfunction()
 
 port_g3d_test(ge "${port_g3d_tests}/test_ge.c" ${port_g3d_ge})
 port_g3d_test(ds3d "${port_g3d_tests}/test_ds3d.c" ${port_g3d_ge} ${port_g3d_ds3d})
-port_g3d_test(hal "${port_g3d_tests}/test_g3d_hal.c" ${port_g3d_ge} ${port_g3d_ds3d} ${port_g3d_hal})
+# The bands against one band, on random scenes (g3d_scene.h, the timing's)
+port_g3d_test(ds3d_bands "${port_g3d_tests}/test_ds3d_bands.c" ${port_g3d_ge} ${port_g3d_ds3d})
+# The glue times the geometry engine's runs for --frame-times (port/hal/os/frame_time.c, with the host's clock)
+port_g3d_test(hal "${port_g3d_tests}/test_g3d_hal.c" ${port_g3d_ge} ${port_g3d_ds3d} ${port_g3d_hal}
+    "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/frame_time.c")
 
 # The timing, always at -O2 (a later -O wins). The bench is always built, so that it compiles on every host, but it is a
 # test only with PORT_G3D_TIMING_GATE (or the 2D renderer's PORT_GFX_TIMING_GATE) on: wall-clock limits depend on the

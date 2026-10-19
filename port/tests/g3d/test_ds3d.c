@@ -1,7 +1,9 @@
 // Tests of port/gfx/ref/ds3d.c, the CPU 3D renderer, driven through the geometry engine as the game drives it. Each
 // test builds a small scene and checks exact pixels worked out by hand in the comments, from GBATEK's rules and, where
 // ds3d.c says it follows melonDS's measurements, from those (the fill rules, the colour widening, the depth margins);
-// the anti-aliasing test checks the port's approximation, which ds3d.c describes. No ROM is needed.
+// the anti-aliasing test checks the port's approximation, which ds3d.c describes. Every test runs twice: in one band of
+// lines, and in three on the renderers' workers (port/gfx/workers.h), which must draw the same pixels. No ROM is
+// needed.
 //
 // Screen positions: with identity matrices and the whole screen as the viewport, x = X * 32 - 0x1000 lands on screen
 // X exactly, and y = 0x1000 - ceil(Y * 128 / 3) on screen Y (Y = (0x1000 - y) * 192 / 0x2000 rounded down). Colours:
@@ -9,6 +11,7 @@
 // and a 5-bit alpha as (a << 3) | (a >> 2) (OUT).
 #include "g3d_test.h"
 #include "gfx/ref/ds3d.h"
+#include "gfx/workers.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -1087,26 +1090,34 @@ int main(void) {
     for (int i = 0; i < 6; i++) {
         sSrc.texpltt_pages[i] = sPltt + i * 0x4000;
     }
-    TestClear();
-    TestCoverage();
-    TestSharedEdge();
-    TestDepth();
-    TestTranslucent();
-    TestTextures();
-    TestModes();
-    TestFog();
-    TestEdgeMarking();
-    TestShadow();
-    TestWireframeAndDot();
-    TestEdgeWalker();
-    TestEdgeInterpolation();
-    TestAntialias();
-    TestAntialiasSharedEdge();
-    TestAntialiasEdgeMarking();
-    TestFrontFacing();
-    TestWBuffer();
-    TestPerspective();
-    TestSorting();
+    // One band, then three, which splits the 24 blocks of 8 lines unevenly from the scenes' point of view
+    for (int parts = 1; parts <= 3; parts += 2) {
+        int failures = sFailures;
+        CHECK_EQ(port_workers_start(parts), parts);
+        TestClear();
+        TestCoverage();
+        TestSharedEdge();
+        TestDepth();
+        TestTranslucent();
+        TestTextures();
+        TestModes();
+        TestFog();
+        TestEdgeMarking();
+        TestShadow();
+        TestWireframeAndDot();
+        TestEdgeWalker();
+        TestEdgeInterpolation();
+        TestAntialias();
+        TestAntialiasSharedEdge();
+        TestAntialiasEdgeMarking();
+        TestFrontFacing();
+        TestWBuffer();
+        TestPerspective();
+        TestSorting();
+        if (sFailures != failures) {
+            printf("(the failures above are in %d band%s)\n", parts, parts != 1 ? "s" : "");
+        }
+    }
     port_ge_destroy(sGe);
     free(sTex);
     free(sPltt);

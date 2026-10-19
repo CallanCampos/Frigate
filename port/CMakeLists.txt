@@ -359,7 +359,9 @@ target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
 #           are its routes (port/docs/sanitizers.md)
 #   oracle  needs the melonDS oracle, or the saves it makes (skips without them). The routes that need no oracle are
 #           ctest -L route -LE oracle
-#   timing  a timing gate (PORT_G3D_TIMING_GATE, PORT_GFX_TIMING_GATE), which a loaded machine can fail
+#   timing  a limit on the host's time, which a slow or loaded machine can fail: the frame_times_* routes, in an
+#           optimized build only (port/cmake/frame_times.cmake), and the timing gates (PORT_G3D_TIMING_GATE,
+#           PORT_GFX_TIMING_GATE)
 function(port_test_labels test)
     set_property(TEST ${test} APPEND PROPERTY LABELS ${ARGN})
 endfunction()

@@ -44,17 +44,6 @@ static uint32_t WriteStart(uint32_t dispcapcnt, unsigned width, int line) {
     return ((((dispcapcnt >> 18) & 3) << 14) + (uint32_t)line * width) & (PORT_CAPTURE_BANK_HALFWORDS - 1);
 }
 
-static uint16_t ReadHalf(const uint8_t *const pages[PORT_CAPTURE_BANK_PAGES], uint32_t index) {
-    uint16_t value;
-
-    memcpy(&value, pages[index / PAGE_HALFWORDS] + (index % PAGE_HALFWORDS) * 2, sizeof(value));
-    return value;
-}
-
-static void WriteHalf(uint8_t *const pages[PORT_CAPTURE_BANK_PAGES], uint32_t index, uint16_t value) {
-    memcpy(pages[index / PAGE_HALFWORDS] + (index % PAGE_HALFWORDS) * 2, &value, sizeof(value));
-}
-
 static int BankMapped(const uint8_t *const pages[PORT_CAPTURE_BANK_PAGES]) {
     for (int i = 0; i < PORT_CAPTURE_BANK_PAGES; i++) {
         if (pages[i] == NULL) {
@@ -62,6 +51,34 @@ static int BankMapped(const uint8_t *const pages[PORT_CAPTURE_BANK_PAGES]) {
         }
     }
     return 1;
+}
+
+// Source A's pixel x in 5-bit channels with its alpha in bit 15, as a capture of source A alone writes it. The composed
+// picture is opaque everywhere, the backdrop included; a 3D pixel is opaque when its alpha isn't 0 (melonDS)
+static uint16_t SourceA3d(const uint32_t *line_3d, unsigned x) {
+    uint32_t dot = line_3d != NULL ? line_3d[x] : 0;
+
+    return (uint16_t)(((dot >> 19) & 0x1F) | ((dot >> 11) & 0x1F) << 5 | ((dot >> 3) & 0x1F) << 10 |
+                      (unsigned)((dot >> 27) != 0) << 15);
+}
+
+static uint16_t SourceAComposed(const uint32_t *source_a, unsigned x) {
+    uint32_t dot = source_a[x];
+
+    return (uint16_t)(((dot >> 17) & 0x1F) | ((dot >> 9) & 0x1F) << 5 | ((dot >> 1) & 0x1F) << 10 | 1u << 15);
+}
+
+// The blend of A and B, (A * alphaA * EVA + B * alphaB * EVB) / 16 with each channel at most 31; melonDS rounds it to
+// nearest. The result is opaque where a source that counts (its factor isn't 0) is
+static uint16_t Blend(uint16_t valueA, uint16_t valueB, unsigned eva, unsigned evb) {
+    unsigned aA = valueA >> 15;
+    unsigned aB = valueB >> 15;
+    unsigned r = ((valueA & 0x1F) * aA * eva + (valueB & 0x1F) * aB * evb + 8) >> 4;
+    unsigned g = (((valueA >> 5) & 0x1F) * aA * eva + ((valueB >> 5) & 0x1F) * aB * evb + 8) >> 4;
+    unsigned b = (((valueA >> 10) & 0x1F) * aA * eva + ((valueB >> 10) & 0x1F) * aB * evb + 8) >> 4;
+    unsigned a = (eva != 0 && aA) || (evb != 0 && aB);
+
+    return (uint16_t)((r > 31 ? 31 : r) | (g > 31 ? 31 : g) << 5 | (b > 31 ? 31 : b) << 10 | a << 15);
 }
 
 unsigned port_capture_line(uint32_t dispcapcnt, uint32_t dispcnt, int line, const uint32_t *source_a,
@@ -89,54 +106,42 @@ unsigned port_capture_line(uint32_t dispcapcnt, uint32_t dispcnt, int line, cons
     }
     srcBIndex &= PORT_CAPTURE_BANK_HALFWORDS - 1;
 
-    for (unsigned x = 0; x < width; x++) {
-        unsigned rA = 0;
-        unsigned gA = 0;
-        unsigned bA = 0;
-        unsigned aA = 0;
-        uint16_t valueB = 0;
-        uint16_t out;
+    // A line is one run of halfwords in one page of each bank: it starts at a multiple of its width, 128 or 256, of
+    // which a page (8,192 halfwords) and the bank are multiples. So it is made in a buffer, one source mode for the
+    // whole line, and written at once
+    uint16_t valuesA[256];
+    uint16_t valuesB[256];
+    uint16_t out[256];
+    int sourceA3d = (dispcapcnt & DISPCAPCNT_SOURCE_A_3D) != 0;
 
-        // Source A in 5-bit channels. The composed picture is opaque everywhere, the backdrop included; a 3D pixel is
-        // opaque when its alpha isn't 0 (melonDS)
-        if (dispcapcnt & DISPCAPCNT_SOURCE_A_3D) {
-            uint32_t dot = line_3d != NULL ? line_3d[x] : 0;
-
-            rA = (dot >> 19) & 0x1F;
-            gA = (dot >> 11) & 0x1F;
-            bA = (dot >> 3) & 0x1F;
-            aA = (dot >> 27) != 0;
-        } else if (source_a != NULL) {
-            uint32_t dot = source_a[x];
-
-            rA = (dot >> 17) & 0x1F;
-            gA = (dot >> 9) & 0x1F;
-            bA = (dot >> 1) & 0x1F;
-            aA = 1;
-        }
-        if (haveB && !fromFifo) {
-            valueB = ReadHalf(src_b, srcBIndex);
-        }
-
-        if (source == 0) {
-            out = (uint16_t)(rA | gA << 5 | bA << 10 | aA << 15);
-        } else if (source == 1) {
-            out = valueB;
-        } else {
-            // The blend, (A * alphaA * EVA + B * alphaB * EVB) / 16 with each channel at most 31; melonDS rounds it
-            // to nearest. The result is opaque where a source that counts (its factor isn't 0) is
-            unsigned aB = valueB >> 15;
-            unsigned r = (rA * aA * eva + (valueB & 0x1F) * aB * evb + 8) >> 4;
-            unsigned g = (gA * aA * eva + ((valueB >> 5) & 0x1F) * aB * evb + 8) >> 4;
-            unsigned b = (bA * aA * eva + ((valueB >> 10) & 0x1F) * aB * evb + 8) >> 4;
-            unsigned a = (eva != 0 && aA) || (evb != 0 && aB);
-
-            out = (uint16_t)((r > 31 ? 31 : r) | (g > 31 ? 31 : g) << 5 | (b > 31 ? 31 : b) << 10 | a << 15);
-        }
-        WriteHalf(dst, dstIndex, out);
-        dstIndex = (dstIndex + 1) & (PORT_CAPTURE_BANK_HALFWORDS - 1);
-        srcBIndex = (srcBIndex + 1) & (PORT_CAPTURE_BANK_HALFWORDS - 1);
+    if (haveB && !fromFifo) {
+        memcpy(valuesB, src_b[srcBIndex / PAGE_HALFWORDS] + (srcBIndex % PAGE_HALFWORDS) * 2, width * 2);
+    } else {
+        memset(valuesB, 0, width * 2);
     }
+    if (source != 1) {
+        if (sourceA3d) {
+            for (unsigned x = 0; x < width; x++) {
+                valuesA[x] = SourceA3d(line_3d, x);
+            }
+        } else if (source_a != NULL) {
+            for (unsigned x = 0; x < width; x++) {
+                valuesA[x] = SourceAComposed(source_a, x);
+            }
+        } else {
+            memset(valuesA, 0, width * 2);
+        }
+    }
+    if (source == 0) {
+        memcpy(out, valuesA, width * 2);
+    } else if (source == 1) {
+        memcpy(out, valuesB, width * 2);
+    } else {
+        for (unsigned x = 0; x < width; x++) {
+            out[x] = Blend(valuesA[x], valuesB[x], eva, evb);
+        }
+    }
+    memcpy(dst[dstIndex / PAGE_HALFWORDS] + (dstIndex % PAGE_HALFWORDS) * 2, out, width * 2);
     return width;
 }
 

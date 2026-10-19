@@ -2,13 +2,14 @@
 // vectored exception handler that moves the report to a stack of its own, crashes nobody handles through the
 // unhandled-exception filter, backtraces by unwinding the x64 stack with the image's unwind tables, the names of the
 // program's functions and globals from the COFF symbol table that lld keeps in an unstripped MinGW program, the
-// watchdog as a thread, and the program's static data from the PE image's writable sections. It also sets up every
-// program that links it before main(): stdout and stderr in binary mode, so that "\n" stays "\n" as on macOS and
-// Linux; no error dialog on a crash or abort(), which would hold a test or a CI run forever; and both exception
-// handlers. It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers' guards
+// watchdog as a thread, the program's static data from the PE image's writable sections, the performance counter as the
+// monotonic clock, and the renderer's threads with their signals (a slim reader/writer lock and a condition variable).
+// It also sets up every program that links it before main(): stdout and stderr in binary mode, so that "\n" stays "\n"
+// as on macOS and Linux; no error dialog on a crash or abort(), which would hold a test or a CI run forever; and both
+// exception handlers. It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers' guards
 // (port/hal/os/fiber.c), the PXI pointers into static data (port/hal/pxi/pointer.c), --run-dump's globals
-// (port/app/main.c) and the watchdog (port/app/main.c) stand on it. macOS and Linux have host_posix.c instead
-// (port/docs/adr/0013).
+// (port/app/main.c), the watchdog (port/app/main.c), --frame-times' clock (port/hal/os/frame_time.c) and the 3D
+// renderer's workers (port/gfx/workers.c) stand on it. macOS and Linux have host_posix.c instead (port/docs/adr/0013).
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
@@ -18,6 +19,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <io.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -688,6 +690,117 @@ void port_host_watchdog_kick(void) {
     if (sWatchdogKick != NULL) {
         SetEvent(sWatchdogKick);
     }
+}
+
+// --- Time -----------------------------------------------------------------------------------------------------------
+
+// The performance counter's ticks a second (10 MHz on current Windows), read once for every thread that reads the
+// clock: the game's and the renderer's workers, which wait by it (port/gfx/workers.c), so the first reads may come at
+// once from several threads, and INIT_ONCE makes them wait for the one that reads it
+static INIT_ONCE sFrequencyOnce = INIT_ONCE_STATIC_INIT;
+static LARGE_INTEGER sFrequency;
+
+static BOOL CALLBACK ReadFrequency(INIT_ONCE *once, void *parameter, void **context) {
+    (void)once;
+    (void)parameter;
+    (void)context;
+    QueryPerformanceFrequency(&sFrequency);
+    return TRUE;
+}
+
+// The performance counter, in nanoseconds
+uint64_t port_host_now_ns(void) {
+    LARGE_INTEGER now;
+
+    InitOnceExecuteOnce(&sFrequencyOnce, ReadFrequency, NULL, NULL);
+    QueryPerformanceCounter(&now);
+    return (uint64_t)(now.QuadPart / sFrequency.QuadPart) * 1000000000u +
+           (uint64_t)(now.QuadPart % sFrequency.QuadPart) * 1000000000u / (uint64_t)sFrequency.QuadPart;
+}
+
+// --- Threads --------------------------------------------------------------------------------------------------------
+
+typedef struct ThreadStart {
+    void (*entry)(void *);
+    void *argument;
+} ThreadStart;
+
+static DWORD WINAPI ThreadMain(void *pointer) {
+    ThreadStart start = *(ThreadStart *)pointer;
+
+    free(pointer);
+    start.entry(start.argument);
+    return 0;
+}
+
+// Windows has no signals to block: its watchdog is a thread that suspends the main one
+int port_host_thread_start(void (*entry)(void *), void *argument) {
+    ThreadStart *start = malloc(sizeof(*start));
+    HANDLE thread;
+
+    if (start == NULL) {
+        return -1;
+    }
+    start->entry = entry;
+    start->argument = argument;
+    thread = CreateThread(NULL, 0, ThreadMain, start, 0, NULL);
+    if (thread == NULL) {
+        free(start);
+        return -1;
+    }
+    CloseHandle(thread);
+    return 0;
+}
+
+void port_host_thread_set_interactive(void) {
+}
+
+int port_host_performance_cores(void) {
+    DWORD count = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
+
+    return count > 0 ? (int)count : 1;
+}
+
+struct PortHostSignal {
+    SRWLOCK lock;
+    CONDITION_VARIABLE changed;
+    atomic_uint count;
+};
+
+PortHostSignal *port_host_signal_create(void) {
+    PortHostSignal *signal = calloc(1, sizeof(*signal));
+
+    if (signal == NULL) {
+        return NULL;
+    }
+    InitializeSRWLock(&signal->lock);
+    InitializeConditionVariable(&signal->changed);
+    atomic_init(&signal->count, 0);
+    return signal;
+}
+
+unsigned port_host_signal_count(PortHostSignal *signal) {
+    return atomic_load_explicit(&signal->count, memory_order_acquire);
+}
+
+// The count changes under the lock, so that a waiter that saw the old count under it is already waiting when the wake
+// comes
+void port_host_signal_raise(PortHostSignal *signal) {
+    AcquireSRWLockExclusive(&signal->lock);
+    atomic_fetch_add_explicit(&signal->count, 1, memory_order_release);
+    ReleaseSRWLockExclusive(&signal->lock);
+    WakeAllConditionVariable(&signal->changed);
+}
+
+unsigned port_host_signal_wait(PortHostSignal *signal, unsigned seen) {
+    unsigned count;
+
+    AcquireSRWLockExclusive(&signal->lock);
+    while ((count = atomic_load_explicit(&signal->count, memory_order_acquire)) == seen) {
+        SleepConditionVariableSRW(&signal->changed, &signal->lock, INFINITE, 0);
+    }
+    ReleaseSRWLockExclusive(&signal->lock);
+    return count;
 }
 
 // --- Files and the environment ---------------------------------------------------------------------------------------

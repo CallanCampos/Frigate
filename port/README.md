@@ -45,9 +45,21 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
 - **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
   from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
   frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
-  `--input FILE` plays a replay, and `--launch APPS` opens the field menu's apps for the tests
-  ([the test launcher](#the-test-launcher)).
+  `--input FILE` plays a replay, `--launch APPS` opens the field menu's apps for the tests
+  ([the test launcher](#the-test-launcher)), `--frame-times FILE` writes how long each frame took on this machine, and
+  `--render-threads N` draws the 3D frame on N threads (the machine's performance cores by default; the frames are the
+  same whatever N).
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
+- **How fast it runs:** `--frame-times FILE` writes a row a frame, the frame's host time with and without the pacing
+  wait and its parts (the 3D frame, the geometry engine, the 2D lines, capture, the ARM7, the window), and prints the
+  median, 95th percentile and most frame; [tools/frame_times.py](tools/frame_times.py) reports runs of a route scene by
+  scene, each frame the least of the runs, and its `check` holds them to a budget, as the `frame_times_*` tests do:
+
+  ```sh
+  build/port/frigate-black2 --headless --frames 3600 --input port/tests/oracle/title_b2_us.pbwinput \
+      --save-dir /tmp/saves --frame-times /tmp/title.tsv
+  python3 port/tools/frame_times.py summary /tmp/title.tsv --scene title=1110-3100 --scene start_menu=3110-3599
+  ```
 - **The sanitized build**, `cmake -S port -B build/port-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
   -DPORT_SANITIZE=ON`, runs the game and every test under AddressSanitizer and UndefinedBehaviorSanitizer, the game's
   own heaps included, and stops at the first report; `ctest -L route` runs its routes. How to read a report, and the
@@ -117,9 +129,9 @@ never asked for the field, the launcher stepped aside because the field's proces
 field); 2 when the `--launch` list isn't one it can read, or when the save's field menu doesn't offer an app, which it
 checks as the menu does (no Pokémon, no Pokédex, the Black Tower's or White Treehollow's menu without its BAG). A status
 of the run's own comes first, such as a trap's 70, a deadlock's 72, the watchdog's 73 or a 1 of the program's own (the
-window didn't open, a write to the run directory or the sound trace failed during the run, a module ran out of host
-memory or found a build that can't work). Each says why on a `port:` line; `--help` (from [app/main.c](app/main.c)) and
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every status.
+window didn't open, a write to the run directory or the sound trace failed during the run or of `--frame-times`' file at
+its end, a module ran out of host memory or found a build that can't work). Each says why on a `port:` line; `--help`
+(from [app/main.c](app/main.c)) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every status.
 
 [docs/MODDING.md](docs/MODDING.md#reaching-the-field-menus-apps) says how to reach a menu with it, and where its saves
 come from; [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes;

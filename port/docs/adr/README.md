@@ -21,7 +21,7 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
 - Numbers are given in the order ADRs are written, starting at 0001, and never reused. The decisions below that are
   waiting for an ADR take the next free number when someone writes them.
 - 0014, the sanitized build's ADR, was written on the branch `port-sanitizers` as 0013 before the Windows build's took
-  that number, and became 0014 when the branch merged; the next free number is 0016.
+  that number, and became 0014 when the branch merged; the next free number is 0017.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, or to "accepted; amended by NNNN" when a later ADR changes part of it. Typos and broken links may be fixed.
 - Each ADR gets a row in the index below in the same commit.
@@ -73,6 +73,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0013](0013-windows-build-with-msys2-clang64.md) | Windows built with MSYS2's CLANG64, its differences behind port/hal/host | D4, §4.4, §7 phase 5 | accepted |
 | [0014](0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted | §4.5, §6, §7 phase 5 | accepted |
 | [0015](0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically | D11, §7 | accepted |
+| [0016](0016-3d-frame-in-bands-on-worker-threads.md) | The 3D frame drawn in bands on worker threads, the game on one | §4.6, §7 phase 5 | proposed |
 
 ## Decisions waiting for an ADR
 

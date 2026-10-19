@@ -5,8 +5,16 @@
 // sub-pixel precision). The buffers keep two layers: the pixel on top and, under an opaque edge pixel while
 // anti-aliasing is on, the one beneath it, which the edge blends with by its coverage.
 //
+// The frame is drawn in bands of lines at once, one a part of a job of the renderers' workers (port/gfx/workers.h,
+// --render-threads): each band draws every polygon in the same order, on its own lines only. A pixel is the work of
+// the polygons drawn over it, in order, and of nothing on another line but edge marking's look at the neighbours'
+// depths and polygon IDs, which waits until every band has drawn its polygons; so the picture is the same however many
+// bands draw it, and this file is the hot path of every 3D scene (port/docs/ARCHITECTURE.md, "Where a frame's time
+// goes").
+//
 // Facts are GBATEK's unless a comment says they are melonDS's measured behaviour or the port's choice.
 #include "gfx/ref/ds3d.h"
+#include "gfx/workers.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -108,7 +116,36 @@ typedef struct Frame {
     int fillEdges; // anti-aliasing or edge marking: every edge's pixels belong to its polygon
     int lastWasShadowMask;
     uint32_t toon[32]; // the toon table as pixels
+    int band;          // the band this Frame draws, of bands (OwnsLine)
+    int bands;
 } Frame;
+
+// The bands: blocks of 8 lines dealt round them in turn, so that the busy lines of a scene, which tend to gather, are
+// shared out. Band b draws the lines y with (y / 8) % bands == b, and with one band, every line
+#define BLOCK_SHIFT 3
+
+static int OwnsLine(const Frame *f, int32_t y) {
+    return ((y >> BLOCK_SHIFT) % f->bands) == f->band;
+}
+
+// Whether any line of [y0, y1) is the band's
+static int OwnsAnyLine(const Frame *f, int32_t y0, int32_t y1) {
+    for (int32_t block = y0 >> BLOCK_SHIFT; y0 < y1 && block <= (y1 - 1) >> BLOCK_SHIFT; block++) {
+        if (block % f->bands == f->band) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// The band's part of a per-pixel buffer of the frame: its lines' bytes cleared
+static void ClearLines(const Frame *f, uint8_t *buffer, uint8_t value) {
+    for (int32_t y = 0; y < HEIGHT; y++) {
+        if (OwnsLine(f, y)) {
+            memset(buffer + y * WIDTH, value, WIDTH);
+        }
+    }
+}
 
 // A 5-bit channel widened to 6 bits: 0 stays 0, c becomes c * 2 + 1 (melonDS's measurement; GBATEK says only that
 // the engine works in 6 bits). Vertex colours come from the geometry engine as c * 16 + 15, which is the same with
@@ -886,12 +923,17 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
     }
     poly.textured = (f->cnt & CNT_TEXTURE) && TEX_FORMAT(p->tex_param) != FORMAT_NONE;
     poly.front = (p->flags & PORT_GE_POLYGON_FRONT) != 0;
-    // The stencil is cleared when a shadow mask follows anything but a shadow mask (melonDS)
+    // The stencil is cleared when a shadow mask follows anything but a shadow mask (melonDS); each band clears its
+    // lines, so every band sees every polygon to here
     int mask = poly.mode == MODE_SHADOW && poly.id == 0;
     if (mask && !f->lastWasShadowMask) {
-        memset(sStencil, 0, sizeof(sStencil));
+        ClearLines(f, sStencil, 0);
     }
     f->lastWasShadowMask = mask;
+    int yEnd = yBottom > yTop ? yBottom : yTop + 1;
+    if (!OwnsAnyLine(f, yTop, yEnd < HEIGHT ? yEnd : HEIGHT)) {
+        return;
+    }
     // Every edge's run is drawn with anti-aliasing or edge marking on, for a wireframe polygon, and for a translucent
     // one while blending is on (melonDS)
     int fill = poly.wire || f->fillEdges || (ATTR_ALPHA(p->attr) < 31 && (f->cnt & CNT_BLEND));
@@ -905,7 +947,6 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
     // Clockwise on the screen (positive area with Y down): going forward from the top runs down the right side
     int stepLeft = area > 0 ? n - 1 : 1;
     int stepRight = n - stepLeft;
-    int yEnd = yBottom > yTop ? yBottom : yTop + 1;
     int flat = yBottom == yTop;
     int l = top;
     int r = top;
@@ -957,6 +998,10 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
             if (moved) {
                 EdgeSetup(&er, &v[r], &v[rNext], 1);
             }
+        }
+        // The edges move on every line, the band's or not; only the band's lines are drawn
+        if (!OwnsLine(f, y)) {
+            continue;
         }
         int64_t posL = EdgePos(&el, y, 0);
         int64_t posR = EdgePos(&er, y, 1);
@@ -1047,11 +1092,11 @@ static uint32_t ClearDepth(uint32_t d) {
     return d * 0x200 + ((d + 1) / 0x8000) * 0x1ff;
 }
 
-// The layer beneath starts as the rear plane too; only an edge pixel's is ever read, and drawing it set it
-static void ClearBelow(void) {
-    memcpy(sBelowColor, sColor, sizeof(sBelowColor));
-    memcpy(sBelowDepth, sDepth, sizeof(sBelowDepth));
-    memcpy(sBelowAttr, sAttr, sizeof(sBelowAttr));
+// The layer beneath starts as the rear plane too, line y's; only an edge pixel's is ever read, and drawing it set it
+static void ClearBelow(int32_t y) {
+    memcpy(&sBelowColor[y * WIDTH], &sColor[y * WIDTH], WIDTH * sizeof(*sBelowColor));
+    memcpy(&sBelowDepth[y * WIDTH], &sDepth[y * WIDTH], WIDTH * sizeof(*sBelowDepth));
+    memcpy(&sBelowAttr[y * WIDTH], &sAttr[y * WIDTH], WIDTH * sizeof(*sBelowAttr));
 }
 
 // The rear plane (GBATEK "DS 3D Rear-Plane"): the clear colour, alpha, depth, polygon ID and fog flag everywhere, or
@@ -1061,34 +1106,34 @@ static void Clear(const Frame *f) {
     const PortDs3dRegs *regs = &f->src->regs;
     uint32_t color = regs->clear_color;
     uint32_t id = (color >> 24) & 63;
-    memset(sStencil, 0, sizeof(sStencil));
-    memset(sCoverage, FULL_COVERAGE, sizeof(sCoverage));
-    if (!(f->cnt & CNT_CLEAR_IMAGE)) {
-        uint32_t pixel = Rgb15(color, (color >> 16) & 31);
-        uint32_t depth = ClearDepth(regs->clear_depth);
-        uint32_t attr = id | ((color & 0x8000) ? PA_FOG : 0);
-        for (int i = 0; i < WIDTH * HEIGHT; i++) {
-            sColor[i] = pixel;
-            sDepth[i] = depth;
-            sAttr[i] = attr;
-        }
-        ClearBelow();
-        return;
-    }
+    uint32_t pixel = Rgb15(color, (color >> 16) & 31);
+    uint32_t depth = ClearDepth(regs->clear_depth);
+    uint32_t attr = id | ((color & 0x8000) ? PA_FOG : 0);
     uint32_t ox = regs->clear_offset & 0xff;
     uint32_t oy = regs->clear_offset >> 8;
+    ClearLines(f, sStencil, 0);
+    ClearLines(f, sCoverage, FULL_COVERAGE);
     for (int y = 0; y < HEIGHT; y++) {
+        if (!OwnsLine(f, y)) {
+            continue;
+        }
         for (int x = 0; x < WIDTH; x++) {
+            int i = y * WIDTH + x;
+            if (!(f->cnt & CNT_CLEAR_IMAGE)) {
+                sColor[i] = pixel;
+                sDepth[i] = depth;
+                sAttr[i] = attr;
+                continue;
+            }
             uint32_t offset = ((((uint32_t)y + oy) & 255) * 256 + (((uint32_t)x + ox) & 255)) * 2;
             uint32_t c = TexRead16(f, 0x40000 + offset);
             uint32_t d = TexRead16(f, 0x60000 + offset);
-            int i = y * WIDTH + x;
             sColor[i] = Rgb15(c, (c & 0x8000) ? 31 : 0);
             sDepth[i] = ClearDepth(d);
             sAttr[i] = id | ((d & 0x8000) ? PA_FOG : 0);
         }
+        ClearBelow(y);
     }
-    ClearBelow();
 }
 
 // The neighbour's polygon ID and depth for edge marking; off the picture they are the rear plane's (the port's
@@ -1120,26 +1165,25 @@ static int DiffersFromNeighbour(const Frame *f, int x, int y, int checkDepth) {
 
 // Edge marking (GBATEK "DS 3D Toon, Edge, Fog, Alpha-Blending, Anti-Aliasing"): an edge pixel of an opaque polygon
 // takes EDGE_COLOR[ID / 8] where a neighbour above, below, left or right has another polygon ID and is farther. The
-// alpha stays, and the pixel's anti-aliasing coverage becomes EDGE_MARK_COVERAGE (melonDS)
+// alpha stays, and the pixel's anti-aliasing coverage becomes EDGE_MARK_COVERAGE (melonDS). The test reads only the
+// depths and polygon IDs, which marking leaves alone, so each pixel is marked as it is found, on the band's lines,
+// once every band has drawn its polygons
 static void EdgeMarking(const Frame *f) {
-    static uint32_t marked[HEIGHT * WIDTH];
     uint32_t colors[8];
-    int count = 0;
     for (int k = 0; k < 8; k++) {
         colors[k] = Rgb15(f->src->regs.edge_color[k], 0);
     }
     for (int y = 0; y < HEIGHT; y++) {
+        if (!OwnsLine(f, y)) {
+            continue;
+        }
         for (int x = 0; x < WIDTH; x++) {
             int i = y * WIDTH + x;
             if ((sAttr[i] & PA_EDGES) && DiffersFromNeighbour(f, x, y, 1)) {
-                marked[count++] = (uint32_t)i;
+                sColor[i] = colors[PA_ID(sAttr[i]) >> 3] | (sColor[i] & PIXEL(0, 0, 0, 31));
+                sCoverage[i] = EDGE_MARK_COVERAGE;
             }
         }
-    }
-    for (int k = 0; k < count; k++) {
-        uint32_t i = marked[k];
-        sColor[i] = colors[PA_ID(sAttr[i]) >> 3] | (sColor[i] & PIXEL(0, 0, 0, 31));
-        sCoverage[i] = EDGE_MARK_COVERAGE;
     }
 }
 
@@ -1188,8 +1232,8 @@ static uint32_t Fogged(const FogParams *p, uint32_t c, uint32_t depth) {
     return PIXEL(r, g, b, alpha);
 }
 
-// Fogs the whole frame after it is drawn: every pixel with the fog flag, and with anti-aliasing on, the pixel beneath
-// an edge pixel too
+// Fogs the band's lines after they are drawn: every pixel with the fog flag, and with anti-aliasing on, the pixel
+// beneath an edge pixel too
 static void Fog(const Frame *f) {
     FogParams p;
     p.regs = &f->src->regs;
@@ -1198,12 +1242,17 @@ static void Fog(const Frame *f) {
     p.start = ((uint32_t)(p.regs->fog_offset & 0x7fff) << 9) + p.step;
     p.color = Rgb15(p.regs->fog_color, (p.regs->fog_color >> 16) & 31);
     p.alphaOnly = (f->cnt & CNT_FOG_ALPHA_ONLY) != 0;
-    for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        if (sAttr[i] & PA_FOG) {
-            sColor[i] = Fogged(&p, sColor[i], sDepth[i]);
+    for (int y = 0; y < HEIGHT; y++) {
+        if (!OwnsLine(f, y)) {
+            continue;
         }
-        if (f->antialias && (sAttr[i] & PA_EDGES) && (sBelowAttr[i] & PA_FOG)) {
-            sBelowColor[i] = Fogged(&p, sBelowColor[i], sBelowDepth[i]);
+        for (int i = y * WIDTH; i < (y + 1) * WIDTH; i++) {
+            if (sAttr[i] & PA_FOG) {
+                sColor[i] = Fogged(&p, sColor[i], sDepth[i]);
+            }
+            if (f->antialias && (sAttr[i] & PA_EDGES) && (sBelowAttr[i] & PA_FOG)) {
+                sBelowColor[i] = Fogged(&p, sBelowColor[i], sBelowDepth[i]);
+            }
         }
     }
 }
@@ -1213,31 +1262,36 @@ static void Fog(const Frame *f) {
 // shows (top * (c + 1) + beneath * (31 - c)) / 32 for red, green and blue, unless the pixel beneath has alpha 0, and
 // the same for alpha always; coverage 0 shows the pixel beneath alone. An edge pixel's coverage comes from the walker
 // (EdgeLineSetup), so polygons sharing an edge draw every pixel of it between them: whichever is on top shows the
-// other beneath it
-static void Antialias(void) {
-    for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        uint32_t cov = sCoverage[i];
-        if (cov >= FULL_COVERAGE || !(sAttr[i] & PA_EDGES)) {
+// other beneath it. The band's lines
+static void Antialias(const Frame *f) {
+    for (int y = 0; y < HEIGHT; y++) {
+        if (!OwnsLine(f, y)) {
             continue;
         }
-        uint32_t below = sBelowColor[i];
-        if (cov == 0) {
-            sColor[i] = below;
-            continue;
+        for (int i = y * WIDTH; i < (y + 1) * WIDTH; i++) {
+            uint32_t cov = sCoverage[i];
+            if (cov >= FULL_COVERAGE || !(sAttr[i] & PA_EDGES)) {
+                continue;
+            }
+            uint32_t below = sBelowColor[i];
+            if (cov == 0) {
+                sColor[i] = below;
+                continue;
+            }
+            uint32_t c = sColor[i];
+            uint32_t top = cov + 1;
+            uint32_t rest = 32 - top;
+            uint32_t r = PIXEL_R(c);
+            uint32_t g = PIXEL_G(c);
+            uint32_t b = PIXEL_B(c);
+            if (PIXEL_A(below) != 0) {
+                r = (r * top + PIXEL_R(below) * rest) >> 5;
+                g = (g * top + PIXEL_G(below) * rest) >> 5;
+                b = (b * top + PIXEL_B(below) * rest) >> 5;
+            }
+            uint32_t alpha = (PIXEL_A(c) * top + PIXEL_A(below) * rest) >> 5;
+            sColor[i] = PIXEL(r, g, b, alpha);
         }
-        uint32_t c = sColor[i];
-        uint32_t top = cov + 1;
-        uint32_t rest = 32 - top;
-        uint32_t r = PIXEL_R(c);
-        uint32_t g = PIXEL_G(c);
-        uint32_t b = PIXEL_B(c);
-        if (PIXEL_A(below) != 0) {
-            r = (r * top + PIXEL_R(below) * rest) >> 5;
-            g = (g * top + PIXEL_G(below) * rest) >> 5;
-            b = (b * top + PIXEL_B(below) * rest) >> 5;
-        }
-        uint32_t alpha = (PIXEL_A(c) * top + PIXEL_A(below) * rest) >> 5;
-        sColor[i] = PIXEL(r, g, b, alpha);
     }
 }
 
@@ -1262,9 +1316,55 @@ void port_ds3d_regs_from_io(PortDs3dRegs *regs, const uint8_t *io) {
     }
 }
 
+// One frame's job for the workers: the frame as each band starts it, the polygons in drawing order, the picture
+typedef struct Job {
+    const Frame *frame;
+    const uint32_t *keys;
+    size_t count;
+    uint32_t *out;
+} Job;
+
+// One band of the frame (port/gfx/workers.h's part of the job): the rear plane, every polygon on the band's lines, then
+// once every band has drawn its polygons, which edge marking looks across, the passes over the picture and the
+// picture's pixels
+static void DrawBand(void *context, int band, int bands) {
+    const Job *job = context;
+    Frame f = *job->frame;
+
+    f.band = band;
+    f.bands = bands;
+    Clear(&f);
+    for (size_t i = 0; i < job->count; i++) {
+        DrawPolygon(&f, &f.src->list->polygons[job->keys[i] & 0x7ff]);
+    }
+    if (f.cnt & CNT_EDGE_MARK) {
+        port_workers_sync();
+        EdgeMarking(&f);
+    }
+    if (f.cnt & CNT_FOG) {
+        Fog(&f);
+    }
+    if (f.cnt & CNT_ANTIALIAS) {
+        Antialias(&f);
+    }
+    for (int y = 0; y < HEIGHT; y++) {
+        if (!OwnsLine(&f, y)) {
+            continue;
+        }
+        for (int i = y * WIDTH; i < (y + 1) * WIDTH; i++) {
+            uint32_t c = sColor[i];
+            uint32_t a = PIXEL_A(c);
+            job->out[i] = a == 0 ? 0
+                                 : ((a << 3) | (a >> 2)) << 24 | Widen8(PIXEL_R(c)) << 16 | Widen8(PIXEL_G(c)) << 8 |
+                                       Widen8(PIXEL_B(c));
+        }
+    }
+}
+
 void port_ds3d_render(const PortDs3dSource *src, uint32_t *out) {
     static uint32_t keys[PORT_GE_MAX_POLYGONS];
     Frame f;
+    Job job;
 
     memset(&f, 0, sizeof(f));
     f.src = src;
@@ -1275,29 +1375,12 @@ void port_ds3d_render(const PortDs3dSource *src, uint32_t *out) {
     for (int i = 0; i < 32; i++) {
         f.toon[i] = Rgb15(src->regs.toon_table[i], 0);
     }
-    Clear(&f);
-    if (src->list != NULL) {
-        size_t count = SortPolygons(src->list, keys);
-        for (size_t i = 0; i < count; i++) {
-            DrawPolygon(&f, &src->list->polygons[keys[i] & 0x7ff]);
-        }
-    }
-    if (f.cnt & CNT_EDGE_MARK) {
-        EdgeMarking(&f);
-    }
-    if (f.cnt & CNT_FOG) {
-        Fog(&f);
-    }
-    if (f.cnt & CNT_ANTIALIAS) {
-        Antialias();
-    }
-    for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        uint32_t c = sColor[i];
-        uint32_t a = PIXEL_A(c);
-        out[i] = a == 0 ? 0
-                        : ((a << 3) | (a >> 2)) << 24 | Widen8(PIXEL_R(c)) << 16 | Widen8(PIXEL_G(c)) << 8 |
-                              Widen8(PIXEL_B(c));
-    }
+    f.bands = 1;
+    job.frame = &f;
+    job.keys = keys;
+    job.count = src->list != NULL ? SortPolygons(src->list, keys) : 0;
+    job.out = out;
+    port_workers_run(DrawBand, &job);
 }
 
 uint32_t port_ds3d_depth(int x, int y) {

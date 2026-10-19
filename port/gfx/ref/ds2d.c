@@ -1172,6 +1172,42 @@ static void StackObjs(uint32_t *restrict top, uint32_t *restrict below, const ui
     }
 }
 
+// The colour effects over a line's stack. A semi-transparent or bitmap OBJ, and the 3D layer, blend with a 2nd target
+// below them whatever BLDCNT's mode, 1st targets and the window say (GBATEK for the OBJs and, unsure, for 3D; melonDS
+// measured both ignoring the window). Otherwise the top layer, as a 1st target where the window allows effects, gets
+// BLDCNT's effect. Always inlined, and called with each effect as a constant, so that each kind of line gets a loop of
+// its own without the other effects' tests: every line of every screen runs it, twice
+static inline __attribute__((always_inline)) void ApplyEffects(const Engine *engine, uint32_t *out, unsigned bldcnt,
+                                                               unsigned effect, unsigned eva, unsigned evb,
+                                                               unsigned evy) {
+    for (unsigned x = 0; x < 256; x++) {
+        uint32_t top = engine->top[x];
+        uint32_t result = top & PX_COLOR;
+        int secondTarget = (bldcnt & (0x100u << PX_LAYER(engine->below[x]))) != 0;
+
+        if ((top & (PX_SEMI | PX_BITMAP)) && secondTarget) {
+            if (top & PX_BITMAP) {
+                result = BlendAlpha(top, engine->below[x], PX_ALPHA(top), 16 - PX_ALPHA(top));
+            } else {
+                result = BlendAlpha(top, engine->below[x], eva, evb);
+            }
+        } else if ((top & PX_3D) && secondTarget) {
+            result = Blend3d(top, engine->below[x], PX_ALPHA(top));
+        } else if (effect != 0 && (bldcnt & (1u << PX_LAYER(top))) && (engine->winMask[x] & WINCTL_EFFECTS)) {
+            if (effect == 1) {
+                if (secondTarget) {
+                    result = BlendAlpha(top, engine->below[x], eva, evb);
+                }
+            } else if (effect == 2) {
+                result = Brighten(top, evy, 8);
+            } else {
+                result = Darken(top, evy, 7);
+            }
+        }
+        out[x] = result;
+    }
+}
+
 // BG, OBJ and 3D after the colour effects, before master brightness: display capture's source A
 static void Compose(Engine *engine, const Line *ln) {
     const Regs *regs = ln->regs;
@@ -1239,35 +1275,38 @@ static void Compose(Engine *engine, const Line *ln) {
         }
     }
 
-    // Colour effects. A semi-transparent or bitmap OBJ, and the 3D layer, blend with a 2nd target below them whatever
-    // BLDCNT's mode, 1st targets and the window say (GBATEK for the OBJs and, unsure, for 3D; melonDS measured both
-    // ignoring the window). Otherwise the top layer, as a 1st target where the window allows effects, gets BLDCNT's
-    // effect
+    // Colour effects. Most lines blend nowhere: a pixel can change only where its top layer is a semi-transparent or
+    // bitmap OBJ or the 3D layer over a 2nd target, or a 1st target of an effect where the window allows effects. A
+    // line with no such pixel goes out as its colours are, in loops without branches; the others take the effect's own
+    // loop
+    uint32_t mayBlend = 0;
     for (x = 0; x < 256; x++) {
         uint32_t top = engine->top[x];
-        uint32_t result = top & PX_COLOR;
-        int secondTarget = (bldcnt & (0x100u << PX_LAYER(engine->below[x]))) != 0;
+        uint32_t special = (top & (PX_SEMI | PX_BITMAP | PX_3D)) != 0;
+        uint32_t second = (bldcnt >> (8 + PX_LAYER(engine->below[x]))) & 1;
+        uint32_t first = (bldcnt >> PX_LAYER(top)) & ((engine->winMask[x] & WINCTL_EFFECTS) != 0);
 
-        if ((top & (PX_SEMI | PX_BITMAP)) && secondTarget) {
-            if (top & PX_BITMAP) {
-                result = BlendAlpha(top, engine->below[x], PX_ALPHA(top), 16 - PX_ALPHA(top));
-            } else {
-                result = BlendAlpha(top, engine->below[x], eva, evb);
-            }
-        } else if ((top & PX_3D) && secondTarget) {
-            result = Blend3d(top, engine->below[x], PX_ALPHA(top));
-        } else if (effect != 0 && (bldcnt & (1u << PX_LAYER(top))) && (engine->winMask[x] & WINCTL_EFFECTS)) {
-            if (effect == 1) {
-                if (secondTarget) {
-                    result = BlendAlpha(top, engine->below[x], eva, evb);
-                }
-            } else if (effect == 2) {
-                result = Brighten(top, evy, 8);
-            } else {
-                result = Darken(top, evy, 7);
-            }
+        mayBlend |= (special & second) | (first & (effect != 0));
+    }
+    if (!mayBlend) {
+        for (x = 0; x < 256; x++) {
+            out[x] = engine->top[x] & PX_COLOR;
         }
-        out[x] = result;
+        return;
+    }
+    switch (effect) {
+    case 0:
+        ApplyEffects(engine, out, bldcnt, 0, eva, evb, evy);
+        break;
+    case 1:
+        ApplyEffects(engine, out, bldcnt, 1, eva, evb, evy);
+        break;
+    case 2:
+        ApplyEffects(engine, out, bldcnt, 2, eva, evb, evy);
+        break;
+    default:
+        ApplyEffects(engine, out, bldcnt, 3, eva, evb, evy);
+        break;
     }
 }
 

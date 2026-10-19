@@ -1,17 +1,18 @@
-// The host operating system's services that the platform layer, the program and the tests share, where macOS, Linux
-// and Windows differ: memory pages and their protection, faults (a trap placeholder touched, a fiber's stack
-// overflowing into its guard, a crash), backtraces and the names of the program's functions and globals, the watchdog
-// that stops a frame which never ends, writes to stderr that take no lock, directories, the environment and the
-// program's static data. It touches no part of the game itself: it is what the code above it stands on, so that
-// trap.c, fiber.c and the tests are the same on every host (port/docs/adr/0013). A module whose own feature is a
-// host's keeps its branches instead (the saves' folder and files in port/hal/card/backup.c, the VRAM's aliasing in
-// port/hal/gx/vram_os.c, the mapped ROM in port/hal/rom/rom.c, the overlays' sections by object format in
-// port/hal/fs/ovsec.c, the RTC's local time, the macOS app's log, the window's icon); port/hal/README.md lists them.
-// Each host's half is one file, chosen by the compiler: host_posix.c for macOS and Linux, host_windows.c for Windows;
-// the other compiles to nothing. Its users: port/hal/trap.c (traps and crashes), port/hal/os/fiber.c (the fibers'
-// stacks and guards), port/hal/pxi/pointer.c (the static data), port/hal/os/os_terminate.c (backtraces),
-// port/hal/gx (the page size), port/app/main.c (the watchdog, --run-dump's globals), port/app/run_dir.c, and the tests'
-// harnesses. Plain C types only.
+// The host operating system's services that the platform layer, the program and the tests share, where macOS, Linux and
+// Windows differ: memory pages and their protection, faults (a trap placeholder touched, a fiber's stack overflowing
+// into its guard, a crash), backtraces and the names of the program's functions and globals, the watchdog that stops a
+// frame which never ends, the monotonic clock that times the frames, the 3D renderer's threads and the signals they
+// wait on, writes to stderr that take no lock, directories, the environment and the program's static data. It touches
+// no part of the game itself: it is what the code above it stands on, so that trap.c, fiber.c and the tests are the
+// same on every host (port/docs/adr/0013). A module whose own feature is a host's keeps its branches instead (the
+// saves' folder and files in port/hal/card/backup.c, the VRAM's aliasing in port/hal/gx/vram_os.c, the mapped ROM in
+// port/hal/rom/rom.c, the overlays' sections by object format in port/hal/fs/ovsec.c, the RTC's local time, the macOS
+// app's log, the window's icon); port/hal/README.md lists them. Each host's half is one file, chosen by the compiler:
+// host_posix.c for macOS and Linux, host_windows.c for Windows; the other compiles to nothing. Its users:
+// port/hal/trap.c (traps and crashes), port/hal/os/fiber.c (the fibers' stacks and guards), port/hal/pxi/pointer.c (the
+// static data), port/hal/os/os_terminate.c (backtraces), port/hal/gx (the page size), port/hal/os/frame_time.c (the
+// clock), port/gfx/workers.c (the 3D renderer's threads and signals), port/app/main.c (the watchdog, --run-dump's
+// globals, the game's thread's class), port/app/run_dir.c, and the tests' harnesses. Plain C types only.
 //
 // On Windows, every program that links host_windows.c also gets, before main(): stdout and stderr in binary mode, no
 // error dialog on a crash or abort(), and both exception handlers, which report the crashes nobody handles (see
@@ -123,6 +124,43 @@ void port_host_watchdog_start(unsigned seconds, const char *message, int status)
 
 // Starts the watchdog's seconds again (port/app/main.c kicks it each frame)
 void port_host_watchdog_kick(void);
+
+// --- Time -----------------------------------------------------------------------------------------------------------
+
+// The host's monotonic clock in nanoseconds, from an arbitrary start: how long the program's own work takes, for
+// --frame-times (port/hal/os/frame_time.h), and how long the renderer's workers spin before they sleep
+// (port/gfx/workers.c). Any thread may read it, the first time included. Nothing of the game reads it, so a run stays
+// the same
+uint64_t port_host_now_ns(void);
+
+// --- Threads --------------------------------------------------------------------------------------------------------
+
+// Frigate runs the game on one thread; only the renderer's workers run beside it (port/gfx/workers.c), and they run
+// renderer code alone. These are what they need of the host.
+
+// Starts a thread that runs entry(argument) until the program ends, in the class the host gives a program's
+// interactive work (macOS's user-interactive QoS), with the asynchronous signals blocked, so that the watchdog's
+// SIGALRM reaches the game's thread; 0 when it started
+int port_host_thread_start(void (*entry)(void *), void *argument);
+
+// Puts the calling thread in that class: on macOS the user-interactive QoS that an app's main thread gets, which keeps
+// it on the performance cores whatever started the program (a shell, a test); nothing elsewhere
+void port_host_thread_set_interactive(void);
+
+// The processor cores that run a program's interactive work at full speed: macOS's performance cores
+// (hw.perflevel0.physicalcpu, else every core), every online processor elsewhere; at least 1
+int port_host_performance_cores(void);
+
+// A signal threads wait on: a count that port_host_signal_raise adds one to, waking every thread waiting on it, and
+// that port_host_signal_wait waits to see differ from a count the caller saw, so that a raise between the caller's
+// look and its wait isn't lost. port_host_signal_count reads the count without waiting (with acquire order: what the
+// raiser wrote before raising is seen), for a thread that spins a little before it waits. Made once, never freed; NULL
+// when memory runs out
+typedef struct PortHostSignal PortHostSignal;
+PortHostSignal *port_host_signal_create(void);
+unsigned port_host_signal_count(PortHostSignal *signal);
+void port_host_signal_raise(PortHostSignal *signal);
+unsigned port_host_signal_wait(PortHostSignal *signal, unsigned seen);
 
 // --- Files and the environment ---------------------------------------------------------------------------------------
 

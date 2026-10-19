@@ -10,7 +10,8 @@
 //     becomes the one drawn, and the rendering registers are latched.
 //   - The screens call port_g3d_render_frame() before line 0 of each frame and pass port_g3d_line(line) as engine A's
 //     bg0_3d_line. The hardware draws the 3D picture during the frame from the list swapped and the registers latched
-//     at the VBlank before it, and keeps drawing that list until the next swap.
+//     at the VBlank before it, and keeps drawing that list until the next swap; here a frame whose inputs are all the
+//     last one's keeps the last picture, which is the same.
 //   - port_g3d_reset() runs once the I/O registers' memory is set up: it writes DISP_1DOT_DEPTH's power-on value there.
 // Plain C types only.
 #ifndef PORT_GFX_GE_GE_HAL_H
@@ -32,8 +33,11 @@ void port_g3d_sync(void);
 void port_g3d_vblank(void);
 
 // Draws the 3D picture from the swapped-in list, the rendering registers the last VBlank latched and the texture and
-// palette slots as they are now
+// palette slots as they are now. When the list, the registers, the slots' pages and their memory are all what the last
+// picture was drawn from, the picture and the renderer's buffers are already what drawing would make, and it isn't
+// drawn again; port_g3d_draws counts the pictures drawn, for tests
 void port_g3d_render_frame(void);
+uint32_t port_g3d_draws(void);
 // Line 0..191 of the picture (256 pixels, 0xAARRGGBB with alpha 0 transparent), or NULL for another line; and the
 // whole picture, line after line
 const uint32_t *port_g3d_line(int line);

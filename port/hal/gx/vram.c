@@ -52,6 +52,10 @@ typedef struct Vram {
 
 static Vram sVram;
 
+// The layout's epoch: it moves on whenever the slots' pages may change (a new layout applied, the views set up or torn
+// down), never back, so that what was taken from the slots in one epoch is known good while it lasts
+static uint32_t sLayoutEpoch = 1;
+
 static bool same_slot(PortVramSlot a, PortVramSlot b) {
     return a.bank == b.bank && a.page == b.page && a.mirror == b.mirror;
 }
@@ -243,6 +247,7 @@ static void apply(void) {
         }
     }
     sVram.layout = sVram.next;
+    sLayoutEpoch++;
 }
 
 int port_vram_backend_available(PortVramBackend backend) {
@@ -257,6 +262,7 @@ void port_vram_shutdown(void) {
     if (!sVram.ready) {
         return;
     }
+    sLayoutEpoch++;
     if (sVram.backend == PORT_VRAM_BACKEND_COPY) {
         for (int view = 0; view < PORT_VRAM_CPU_VIEW_COUNT; view++) {
             memset(sVram.views[view], 0, port_vram_view_size[view]);
@@ -334,6 +340,7 @@ int port_vram_init(PortVramBackend backend) {
     port_vram_layout_compute(sVram.vramcnt, &sVram.layout);
     sVram.stats.os_calls = sVram.os.calls;
     sVram.ready = true;
+    sLayoutEpoch++;
     return 0;
 
 fail:
@@ -544,14 +551,20 @@ static const uint8_t *ext_palette(PortVramView view, int slot8k) {
     return page != NULL ? page + (slot8k % 2) * 0x2000 : NULL;
 }
 
-void port_vram_fill_source(PortDs2dSource *src, int engine) {
+// What port_vram_fill_source gives each engine: its slots, as the layout's epoch had them. The screens fill both
+// engines' sources at the start of every line (port/gfx/screens.c), and the slots change only with the layout
+static struct {
+    uint32_t epoch;
+    PortDs2dSource src;
+} sFilled[2];
+
+static void FillSource(PortDs2dSource *src, int engine) {
     PortVramView bg = engine == 0 ? PORT_VRAM_VIEW_BG_A : PORT_VRAM_VIEW_BG_B;
     PortVramView obj = engine == 0 ? PORT_VRAM_VIEW_OBJ_A : PORT_VRAM_VIEW_OBJ_B;
     PortVramView bgExt = engine == 0 ? PORT_VRAM_VIEW_BGEXT_A : PORT_VRAM_VIEW_BGEXT_B;
     PortVramView objExt = engine == 0 ? PORT_VRAM_VIEW_OBJEXT_A : PORT_VRAM_VIEW_OBJEXT_B;
     int count;
 
-    ensure_ready();
     // The engine's registers from 0x04000000 or 0x04001000, its 1 KiB of palettes from 0x05000000 or 0x05000400 (BG,
     // then OBJ) and its OAM from 0x07000000 or 0x07000400
     src->io = port_hw_pointer(0x04000000u + (uint32_t)engine * 0x1000);
@@ -573,6 +586,18 @@ void port_vram_fill_source(PortDs2dSource *src, int engine) {
     for (int i = 0; i < PORT_VRAM_PAGE_COUNT; i++) {
         src->lcdc_slots[i] = engine == 0 ? port_vram_slot_ptr(PORT_VRAM_VIEW_LCDC, i) : NULL;
     }
+}
+
+void port_vram_fill_source(PortDs2dSource *src, int engine) {
+    const uint32_t *bg0 = src->bg0_3d_line;
+
+    ensure_ready();
+    if (sFilled[engine].epoch != sLayoutEpoch) {
+        FillSource(&sFilled[engine].src, engine);
+        sFilled[engine].epoch = sLayoutEpoch;
+    }
+    *src = sFilled[engine].src;
+    src->bg0_3d_line = bg0;
 }
 
 const PortVramStats *port_vram_stats(void) {

@@ -23,6 +23,7 @@
 // program's own actions, so a run is deterministic.
 #include "hal/hw/hw.h"
 #include "hal/os/fiber.h"
+#include "hal/os/frame_time.h"
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
 #include "nitro/gx.h"
@@ -400,7 +401,10 @@ static void RunHostWork(void) {
             port_os_frame_hooks();
         } else if (item <= WORK_TIMED) {
             if (sTimedWork[WORK_TIMED - item].work != NULL) {
+                // The only timed work is the ARM7's (the sound driver's alarms), timed with its frame
+                uint64_t begin = port_frame_time_begin();
                 sTimedWork[WORK_TIMED - item].work();
+                port_frame_time_end(PORT_FRAME_TIME_ARM7, begin);
             }
         } else if (port_os_scanline_hook != NULL) {
             port_os_scanline_hook(item);

@@ -1,12 +1,14 @@
 // The geometry engine and the 3D renderer in the running program (ge_hal.h): one engine fed from the platform layer's
 // log of geometry writes (port/hal/hw), the readback registers' values for hw.c's accessors, the swap at each
-// VBlank, and the 3D frame rasterized before line 0 for engine A's BG0. Every 3D scene of the game (the title screen,
-// the field, battles, Pokémon sprites) reaches the screens through here.
+// VBlank, and the 3D frame rasterized before line 0 for engine A's BG0, unless it would be the last one again. Every 3D
+// scene of the game (the title screen, the field, battles, Pokémon sprites) reaches the screens through here. With
+// --frame-times, the geometry engine's runs are timed here (port/hal/os/frame_time.h).
 #include "gfx/ge/ge_hal.h"
 #include "gfx/ge/ge.h"
 #include "gfx/ref/ds3d.h"
 #include "hal/gx/vram.h"
 #include "hal/hw/hw.h"
+#include "hal/os/frame_time.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +23,28 @@ static struct PortGe *sGe;
 static uint32_t sFrame[PORT_DS3D_HEIGHT * PORT_DS3D_WIDTH];
 // The rendering registers as the last VBlank latched them
 static PortDs3dRegs sRegs;
+
+// What the frame in sFrame was drawn from. The renderer keeps nothing from one frame to the next, so a frame drawn from
+// the same list, registers and texture memory is the same picture, with the same buffers behind it
+// (port/gfx/ref/ds3d.c's depth and polygon IDs), and isn't drawn again: the hardware draws the last list every frame
+// until the next swap, and a still 3D scene (a menu over the title's Kyurem, the bag's) would cost a whole frame's
+// drawing each time. The list is named by its pointer and sListChanges, which counts the swaps and resets, the only
+// times polygon RAM's lists change (port/gfx/ge/ge.h); the registers and the slots' pages by value; the texture image
+// and palette memory by content, against copies made once a list is drawn twice in a row, so that a scene whose list
+// changes every frame copies nothing (a still list whose textures change is copied at each change)
+static uint32_t sListChanges;
+static struct {
+    int valid;
+    int copied;
+    const PortGeList *list;
+    uint32_t listChanges;
+    PortDs3dRegs regs;
+    const uint8_t *texPages[PORT_VRAM_TEX_PAGES];
+    const uint8_t *plttPages[PORT_VRAM_TEXPLTT_PAGES];
+} sDrawn;
+static uint8_t sTexCopy[PORT_VRAM_TEX_PAGES][PORT_VRAM_SLOT_SIZE];
+static uint8_t sPlttCopy[PORT_VRAM_TEXPLTT_PAGES][PORT_VRAM_SLOT_SIZE];
+static uint32_t sDraws;
 
 // What the accessors hand out. GXSTAT's word is compared at the next access with what it was given, to see a write
 static uint32_t sGxStat;
@@ -59,6 +83,8 @@ void port_g3d_reset(void) {
     port_ge_reset(port_g3d_engine());
     memset(sFrame, 0, sizeof(sFrame));
     memset(&sRegs, 0, sizeof(sRegs));
+    sListChanges++;
+    sDrawn.valid = 0;
     sGxStat = sGxStatGiven = port_ge_gxstat(sGe);
     sDisp3dcntRouted = 0;
     // DISP_1DOT_DEPTH's power-on value is the engine's, which hides no dot (ge.h); every sync copies the register
@@ -78,19 +104,62 @@ void port_g3d_sync(void) {
     const PortG3Write *writes = port_hw_g3_take(&count);
     ApplyGxStatWrite();
     port_ge_set_1dot_depth(ge, Read16(REG_DISP_1DOT_DEPTH));
+    // Timed only when there are commands: the readbacks sync before each read
+    uint64_t begin = count != 0 ? port_frame_time_begin() : 0;
     port_ge_run(ge, writes, count);
+    port_frame_time_end(PORT_FRAME_TIME_GEOMETRY, begin);
 }
 
 // The rendering registers are latched at every VBlank, with the swap when there is one, and the frame after it is
 // drawn from them (melonDS's measurement)
 void port_g3d_vblank(void) {
     port_g3d_sync();
-    port_ge_vblank(sGe);
+    if (port_ge_vblank(sGe)) {
+        sListChanges++;
+    }
     port_ds3d_regs_from_io(&sRegs, port_hw_pointer(REG_IO));
+}
+
+// Whether src names what the last frame was drawn from, all but the memory's content
+static int SameSource(const PortDs3dSource *src) {
+    return sDrawn.valid && src->list == sDrawn.list && sListChanges == sDrawn.listChanges &&
+           memcmp(&sRegs, &sDrawn.regs, sizeof(sRegs)) == 0 &&
+           memcmp(src->tex_pages, sDrawn.texPages, sizeof(sDrawn.texPages)) == 0 &&
+           memcmp(src->texpltt_pages, sDrawn.plttPages, sizeof(sDrawn.plttPages)) == 0;
+}
+
+// Whether the slots' memory holds what the copies do; a slot without a page reads 0 and has no copy
+static int SameMemory(const PortDs3dSource *src) {
+    for (int i = 0; i < PORT_VRAM_TEX_PAGES; i++) {
+        if (src->tex_pages[i] != NULL && memcmp(src->tex_pages[i], sTexCopy[i], PORT_VRAM_SLOT_SIZE) != 0) {
+            return 0;
+        }
+    }
+    for (int i = 0; i < PORT_VRAM_TEXPLTT_PAGES; i++) {
+        if (src->texpltt_pages[i] != NULL && memcmp(src->texpltt_pages[i], sPlttCopy[i], PORT_VRAM_SLOT_SIZE) != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static void CopyMemory(const PortDs3dSource *src) {
+    for (int i = 0; i < PORT_VRAM_TEX_PAGES; i++) {
+        if (src->tex_pages[i] != NULL) {
+            memcpy(sTexCopy[i], src->tex_pages[i], PORT_VRAM_SLOT_SIZE);
+        }
+    }
+    for (int i = 0; i < PORT_VRAM_TEXPLTT_PAGES; i++) {
+        if (src->texpltt_pages[i] != NULL) {
+            memcpy(sPlttCopy[i], src->texpltt_pages[i], PORT_VRAM_SLOT_SIZE);
+        }
+    }
 }
 
 void port_g3d_render_frame(void) {
     PortDs3dSource src;
+    int same;
+
     memset(&src, 0, sizeof(src));
     src.list = port_ge_render_list(port_g3d_engine());
     src.regs = sRegs;
@@ -100,7 +169,28 @@ void port_g3d_render_frame(void) {
     for (int i = 0; i < PORT_VRAM_TEXPLTT_PAGES; i++) {
         src.texpltt_pages[i] = port_vram_texpltt_page(i);
     }
+    same = SameSource(&src);
+    if (same && sDrawn.copied && SameMemory(&src)) {
+        return;
+    }
     port_ds3d_render(&src, sFrame);
+    sDraws++;
+    // The memory is copied whenever this frame is drawn from the same list, registers and pages as the last one, and
+    // checked at the next
+    sDrawn.copied = same;
+    if (same) {
+        CopyMemory(&src);
+    }
+    sDrawn.valid = 1;
+    sDrawn.list = src.list;
+    sDrawn.listChanges = sListChanges;
+    memcpy(&sDrawn.regs, &sRegs, sizeof(sRegs));
+    memcpy(sDrawn.texPages, src.tex_pages, sizeof(sDrawn.texPages));
+    memcpy(sDrawn.plttPages, src.texpltt_pages, sizeof(sDrawn.plttPages));
+}
+
+uint32_t port_g3d_draws(void) {
+    return sDraws;
 }
 
 const uint32_t *port_g3d_line(int line) {

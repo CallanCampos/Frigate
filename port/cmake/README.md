@@ -11,8 +11,9 @@ are read in one place.
 | --- | --- | --- | --- |
 | [app.cmake](app.cmake) | The rest of the program's own files (`port_app` starts with `app/main.c`): the window, gamepads, the macOS log, replays, the run directory, the sound driver's trace, the oracle's input file reader; the window icon's generator; the replay tests; the test launcher's option and gate | The window, the controls, replays, the sound for the oracle (its trace), the field menu's items | `app_window_icon_*`, `app_about`, `app_symbols`, `app_run_dir_*`, `app_launcher_spec_*`, `app_gamepad_*`, `replay_start_menu(_clean)`, `replay_new_game(_clean)` (Black 2), `replay_same_save` |
 | [assets.cmake](assets.cmake) | The check of Frigate's artwork ([../assets/branding](../assets/branding/README.md)) | None: the program's look | `assets_branding` |
+| [frame_times.cmake](frame_times.cmake) | The test of [../tools/frame_times.py](../tools/frame_times.py), the reader of `--frame-times`' files ([../hal/os/frame_time.h](../hal/os/frame_time.h)), and the timing routes, which play routes 3 times each and hold each scene's 95th percentile frame to a budget, skipping a scene over it while other programs load the machine (only in an optimized build: `Release`, `RelWithDebInfo` or `MinSizeRel`, and not the sanitized one) | How fast the game's frames are made on this machine: the title's 3D, New Game's intro and 3D flight, the field menu's apps | `frame_times_tool`, `frame_times_title`, `frame_times_new_game` (Black 2), `frame_times_party_menus` |
 | [fx_tests.cmake](fx_tests.cmake) | The decomp's libfx C built for a test | 3D maths (cameras, models) | `fx_libfx` |
-| [g3d.cmake](g3d.cmake) | The geometry engine and 3D renderer's tests, plain and sanitized, and their timing gate | 3D scenes | `g3d_ge*`, `g3d_ds3d*`, `g3d_hal*`, `g3d_timing` |
+| [g3d.cmake](g3d.cmake) | The geometry engine and 3D renderer's tests, plain and sanitized (the renderer with its workers, [../gfx/workers.c](../gfx/workers.c), and the host's threads), and their timing gate | 3D scenes | `g3d_ge*`, `g3d_ds3d*`, `g3d_hal*`, `g3d_timing` |
 | [gfx_tests.cmake](gfx_tests.cmake) | The 2D renderer and capture tests, plain and sanitized, and the renderer's timing gate | 2D screens, capture | `gfx_ds2d*`, `gfx_capture_*`, `gfx_ds2d_timing` |
 | [gx.cmake](gx.cmake) | The `port_sdk_` renames of `gx_vramcnt.c`, `gx_state.c`, `mi_wram.c` and `gx_load2d.c`, which [../hal/gx](../hal/README.md#the-modules) wraps | VRAM banks, palette loads | `gx_*` |
 | [hal_tests.cmake](hal_tests.cmake) | The known-vector tests of the SDK's assembly in C, the card slot's SPI bus and infrared chip, and the asm oracle (which skips without the extracted ROM, `build/port-venv` or a Ninja build directory) | Copies, fills, decompression, matrices, sorting, SHA-1, RC4; the genuine-card check | `hal_mi`, `hal_fx`, `hal_card_spi_*`, `asm_oracle` |
@@ -47,17 +48,18 @@ Each is given at configure time, `cmake -S port -B build/port -DNAME=VALUE`.
 | `PORT_OVSEC_LAYOUT` | `split` | [overlay_sections.cmake](overlay_sections.cmake) | `split` (data and bss sections apart) or `combined` (one section per overlay) |
 | `PORT_OVSEC_BUDGET` | `150` | [overlay_sections.cmake](overlay_sections.cmake) | The most overlay sections a Mach-O link may have before the check stops it |
 | `PORT_TEST_BOOT_LOGOS` | `OFF` | [integrate.cmake](integrate.cmake) | Adds `integrate_boot_logos`, 120 frames to the first logo screen |
+| `PORT_FRAME_TIME_BUDGET_MS`, `PORT_FRAME_TIME_REPORT_ONLY` | `8.36`, `OFF` | [frame_times.cmake](frame_times.cmake) | The most a `frame_times_*` route's scene may take at its 95th percentile, each frame's least over 3 runs without the pacing wait, in ms (half the DS's frame); and whether those tests only report their scenes, for a machine too slow or too loaded for the budget |
 | `PORT_GFX_TIMING_GATE`, `PORT_GFX_TIMING_LIMIT_US` | `OFF`, `2000` | [gfx_tests.cmake](gfx_tests.cmake) | Runs the 2D renderer's timing as a test, with its limit in microseconds |
 | `PORT_G3D_TIMING_GATE`, `PORT_G3D_TIMING_LIMIT_US` | `OFF`, `5000` | [g3d.cmake](g3d.cmake) | The same for the 3D renderer |
 
 The sanitized build is a build directory of its own (`-DPORT_SANITIZE=ON`, in `build/port-san`);
-[sanitizer_ignorelist.txt](sanitizer_ignorelist.txt) lists, for clang, the checks it leaves out of the game's code,
-each with the reason it is safe on a host. The tests carry labels by what they need, which each fragment gives its
-tests where it defines them, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): `route`
-(the program runs the game from power-on on the player's ROM), `oracle` (the melonDS oracle or its saves) and `timing`
-(a timing gate), so that `ctest -L route -LE oracle` runs the routes that need no oracle
-([../tests/README.md](../tests/README.md)). A new fragment's test that runs the game from power-on gets `route` there,
-and `oracle` too when it needs the oracle.
+[sanitizer_ignorelist.txt](sanitizer_ignorelist.txt) lists, for clang, the checks it leaves out of the game's code, each
+with the reason it is safe on a host. The tests carry labels by what they need, which each fragment gives its tests
+where it defines them, with `port_test_labels(TEST LABEL...)` ([../CMakeLists.txt](../CMakeLists.txt)): `route` (the
+program runs the game from power-on on the player's ROM), `oracle` (the melonDS oracle or its saves) and `timing` (a
+limit on the host's time: the `frame_times_*` routes and the timing gates), so that `ctest -L route -LE oracle` runs the
+routes that need no oracle ([../tests/README.md](../tests/README.md)). A new fragment's test that runs the game from
+power-on gets `route` there, and `oracle` too when it needs the oracle.
 
 ## Adding a fragment
 
