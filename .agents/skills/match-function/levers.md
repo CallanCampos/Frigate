@@ -1001,17 +1001,19 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 scheduler; `#pragma optimization_level 1` shows each constant built at its use (matching.md: "leave 1.1p1's Thumb
 code as it is").
 
-Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
-(a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
-restructures it. `opt_common_subs off` alone gives it the original's size too, and with a 0/1 loop test leaves 186
-lines against level 1's 249: its original computes `work + i * 4` and `param + i` again after every call, where ours
-keeps them in registers across the calls. A function whose loop enters with a `b` to the test at -O4 may be one the
-original's global optimizer gave up on, or one that reads an object with an explicit alignment:
-`WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned
-it), as did `NNS_SndArcStrmInit` with its decode buffer aligned, and `MBGameInfo_SendMembers` shows the same symptom
-in its row. Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`,
-which showed it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md:
-"has a test whose value is 0/1").
+Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles` (a
+loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
+restructures it. `opt_common_subs off` alone gives it the original's size too, and with a 0/1 loop test leaves 186 lines
+against level 1's 249: its original computes `work + i * 4` and `param + i` again after every call, where the C without
+the alignment below keeps them in registers across the calls. A function whose loop enters with a `b` to the test at -O4
+may be one the original's global optimizer gave up on, or one that reads an object with an explicit alignment:
+`WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
+as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
+(its 0/1 test, its `optimization_level 1` shape and its common subexpressions above all went with it, plus `u8` color
+getters and a heap ID getter evaluated right to left), and `MBGameInfo_SendMembers` shows the same symptom in its row.
+Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
+it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
+whose value is 0/1").
 `#pragma opt_common_subs off` around one function alone matched `btlv_mcss.c`'s `BtlvMcss_MoveTaskEnd_Circle` and
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
