@@ -10528,6 +10528,12 @@ overlays/ov132 0x021ef09c GimmickDT9_CreateWaitThrownDoneEvent
 overlays/ov132 0x021ef0b8 GimmickDT9_ThrowEvent
 overlays/ov132 0x021ef16c GimmickDT9_PastFifthFrameEvent
 overlays/ov132 0x021ef198 GimmickDT9_ThrownDoneEvent
+overlays/ov133 0x021eec80 GimmickNuvema_Init
+overlays/ov133 0x021eed84 GimmickNuvema_End
+overlays/ov133 0x021eed9c GimmickNuvema_Update
+overlays/ov133 0x021eee1c GimmickNuvema_PlayModel
+overlays/ov133 0x021eee7c GimmickNuvema_CreateWaitEvent
+overlays/ov133 0x021eee90 GimmickNuvema_WaitEvent
 overlays/ov134 0x021eec80 WbtStadiumGimmick_Setup
 overlays/ov134 0x021eecc8 WbtStadiumGimmick_End
 overlays/ov134 0x021eece0 WbtStadiumGimmick_Update
