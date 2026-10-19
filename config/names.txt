@@ -5182,6 +5182,7 @@ itcm 0x01ff8610 sharedParamsRenderer
 itcm 0x01ff8900 sharedParamsVisibleAnimRenderer
 itcm 0x01ff8bf0 MIi_DmaSetParameters
 itcm 0x01ff8c88 OS_IrqHandler
+itcm 0x01ff8ce0 OS_IrqHandler_ThreadSwitch
 itcm 0x01ff8fac OSi_DoResetSystem
 itcm 0x01ff936c SCFGi_SwitchCpuSpeed
 ltd_autoload_0 0x02700000 RTCi_ProcessExCommand
