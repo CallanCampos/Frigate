@@ -199,58 +199,58 @@ static void BattleClient_SetMainProc(BtlClient *client, BOOL (*mainProc)(BtlClie
 static BOOL BattleClient_MainProcNormal(BtlClient *client);
 static BOOL BattleClient_MainProcRecPlay(BtlClient *client);
 static void BattleClient_SetDummyReturnData(BtlClient *client);
-static void func_ov167_021b1da0(BtlClientStudioWork *studio);
-static BOOL func_ov167_021b1dcc(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b1ea4(BtlClient *client, s32 *seq);
-static void func_ov167_021b1ee4(BtlClient *client);
-static u32 func_ov167_021b1f00(BtlClient *client);
-static BattleMon *func_ov167_021b1f34(BtlClient *client);
-static BOOL func_ov167_021b1f70(BtlClient *client, s32 *seq);
+static void Studio_InitAudienceTimers(BtlClientStudioWork *studio);
+static BOOL BattleClient_SetupView(BtlClient *client, s32 *seq);
+static BOOL BattleClient_RecPlaySetupView(BtlClient *client, s32 *seq);
+static void BattleClient_SaveFrontMonHp(BtlClient *client);
+static u32 BattleClient_GetFrontMonHpLossRatio(BtlClient *client);
+static BattleMon *BattleClient_GetSingleBattleFrontMon(BtlClient *client);
+static BOOL BattleClient_PlayerSelectRotation(BtlClient *client, s32 *seq);
 static u8 BattleClient_PickRotation(u8 dir);
-static BOOL func_ov167_021b2058(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b205c(BtlClient *client, s32 *seq);
-static void func_ov167_021b2080(BtlClient *client);
+static BOOL BattleClient_RecPlaySelectRotation(BtlClient *client, s32 *seq);
+static BOOL BattleClient_AISelectRotation(BtlClient *client, s32 *seq);
+static void BattleClient_StartCmdLimitTimer(BtlClient *client);
 static BOOL CheckIfOverCmdLimit(BtlClient *client);
 static BOOL CheckActionSelectForceQuit(BtlClient *client, BOOL (*proc)(BtlClient *client, s32 *seq));
-static void func_ov167_021b20f8(BtlClient *client);
-static void func_ov167_021b2110(BtlClient *client, BattleMon *mon, BtlvStringParam *param);
+static void BattleClient_HideCmdLimitTimer(BtlClient *client);
+static void BattleClient_SetActionPromptMsg(BtlClient *client, BattleMon *mon, BtlvStringParam *param);
 static void BattleClient_SetSelActProc(BtlClient *client, BOOL (*proc)(BtlClient *client, s32 *seq));
 static BOOL BattleClient_RunSelActProc(BtlClient *client);
-static s32 func_ov167_021b2188(void);
-static u32 func_ov167_021b2194(BtlClient *client);
-static void func_ov167_021b2210(BtlClient *client, u32 value);
-static BOOL func_ov167_021b2218(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b226c(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b23b8(BtlClient *client, s32 *seq);
+static s32 BattleClient_GetSelectSeq(void);
+static u32 Studio_GetTurnMsgId(BtlClient *client);
+static void Studio_SetLastChoiceResult(BtlClient *client, u32 value);
+static BOOL BattleClient_PlayerSelectActionNormal(BtlClient *client, s32 *seq);
+static BOOL BattleClient_PlayerSelectActionStudio(BtlClient *client, s32 *seq);
+static BOOL BattleClient_PlayerSelectAction(BtlClient *client, s32 *seq);
 static void Studio_SetSeq(BtlClientStudioWork *studio, u8 seq, u8 nextSeq);
-static BOOL func_ov167_021b23e4(BtlClient *client);
-static s32 func_ov167_021b2538(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 arg3);
-static BOOL func_ov167_021b261c(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn);
-static void func_ov167_021b264c(const BtlScriptedRules *rules, BtlClientStudioWork *studio);
-static BOOL func_ov167_021b2674(const BtlScriptedRules *rules, BtlClientStudioWork *studio);
-static u32 func_ov167_021b26a8(BtlClient *client, BtlClientStudioWork *studio);
-static void func_ov167_021b26c4(BtlClient *client, s32 scene, u32 value);
-static u32 func_ov167_021b26dc(BtlClient *client);
-static void func_ov167_021b26ec(BtlClient *client, u32 value);
-static void func_ov167_021b2700(BtlClient *client, const BtlScriptedRules *rules, s32 scene);
-static void func_ov167_021b2748(BtlClient *client, const BtlScriptedRules *rules, s32 scene);
-static void func_ov167_021b2790(BtlClientStudioWork *studio);
-static void func_ov167_021b2798(BtlClient *client, const BtlScriptedRules *rules, BtlClientStudioWork *studio);
+static BOOL Studio_PlayTurnMessages(BtlClient *client);
+static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 arg3);
+static BOOL Studio_HasChoiceScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn);
+static void Studio_SetChoiceField(const BtlScriptedRules *rules, BtlClientStudioWork *studio);
+static BOOL Studio_IsStateReached(const BtlScriptedRules *rules, BtlClientStudioWork *studio);
+static u32 Studio_GetSavedChoice(BtlClient *client, BtlClientStudioWork *studio);
+static void Studio_SaveChoice(BtlClient *client, s32 scene, u32 value);
+static u32 Studio_GetEnding(BtlClient *client);
+static void Studio_SetEnding(BtlClient *client, u32 value);
+static void Studio_DecideEnding(BtlClient *client, const BtlScriptedRules *rules, s32 scene);
+static void Studio_ScoreEndScene(BtlClient *client, const BtlScriptedRules *rules, s32 scene);
+static void Studio_ClearSceneTriggers(BtlClientStudioWork *studio);
+static void Studio_StartChoiceSelect(BtlClient *client, const BtlScriptedRules *rules, BtlClientStudioWork *studio);
 static void Studio_FreeChoiceStrBufs(BtlClientStudioWork *studio);
-static BOOL func_ov167_021b2864(BtlClient *client);
-static void func_ov167_021b2cf0(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 scene, u32 value);
+static BOOL Studio_PlayScene(BtlClient *client);
+static void Studio_RecordChoice(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 scene, u32 value);
 static s32 Studio_GetNextState(BtlClientStudioWork *studio, s32 event);
-static void func_ov167_021b2dd0(BtlClientStudioWork *studio, u8 nextSeq);
-static BOOL func_ov167_021b2dd8(const BtlScriptedRules *rules, BtlClient *client);
+static void Studio_SetStagingWait(BtlClientStudioWork *studio, u8 nextSeq);
+static BOOL Studio_UpdateStaging(const BtlScriptedRules *rules, BtlClient *client);
 static s16 StudioRules_GetTurnEvent(const BtlScriptedRules *rules, u8 turn);
-static BOOL func_ov167_021b2fb8(BtlClient *client);
+static BOOL Studio_ChangeField(BtlClient *client);
 static u32 Studio_GetResultMsgId(BtlClient *client, const BtlScriptedRules *rules, BtlSetup *setup);
-static BOOL func_ov167_021b3100(BtlClient *client);
+static BOOL Studio_ShowResult(BtlClient *client);
 static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2);
 static BOOL RecPlaySelectAction(BtlClient *client, s32 *seq);
 static void SetNullReturnAction(BtlClient *client);
 static BOOL BattleClient_ActionSelectInit(BtlClient *client, s32 *seq);
-static void func_ov167_021b350c(BtlClient *client, const BtlvStringParam *param);
+static void BattleClient_ShowSelectMsg(BtlClient *client, const BtlvStringParam *param);
 static BOOL BattleClient_ActionForceQuit(BtlClient *client, s32 *seq);
 static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq);
 static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq);
@@ -260,8 +260,8 @@ static void SetupRotationSelectParam(BtlClient *client, BtlvSelectTargetParam *p
 static BOOL BattleClient_ActionViewMoveInfo(BtlClient *client, s32 *seq);
 static BOOL BattleClient_ActionSwitchPokemon(BtlClient *client, s32 *seq);
 static BOOL BattleClient_ActionSelectItem(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b4168(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b41d4(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ActionViewScript(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ActionSelectStudioChoice(BtlClient *client, s32 *seq);
 static BOOL IsPokeBallTargetHiding(BtlClient *client);
 static BOOL BattleClient_ActionSelectEscape(BtlClient *client, s32 *seq);
 static BOOL BattleClient_ActionSelectAutoRest(BtlClient *client, s32 *seq);
@@ -306,161 +306,161 @@ static u8 AIPickRotationPos(BtlClient *client);
 static BOOL AISelectAction(BtlClient *client, s32 *seq);
 static u8 GetNumBattleReadyPartyMons(BtlClient *client, u8 *list);
 static void PickBestMonToSwitchInto(BtlClient *client, u8 *list, u8 count, BattleMon *defender);
-static void func_ov167_021b5d7c(BtlClient *client, u8 mode, u8 count, BtlvPokeListCmd *cmd,
-                                BtlvPokeSelectParam *select);
-static void func_ov167_021b5dd8(BtlClient *client, const BtlvPokeSelectParam *select);
-static void func_ov167_021b5e1c(BtlClient *client);
+static void BattleClient_SetupPokeSelect(BtlClient *client, u8 mode, u8 count, BtlvPokeListCmd *cmd,
+                                         BtlvPokeSelectParam *select);
+static void BattleClient_SetSelectedChangeActions(BtlClient *client, const BtlvPokeSelectParam *select);
+static void BattleClient_SetAutoChangeActions(BtlClient *client);
 static u8 CollectOwnChangePositions(BtlClient *client, u8 *positions);
-static BOOL func_ov167_021b5f30(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b5fa4(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b5fb0(BtlClient *client, s32 *seq);
+static BOOL BattleClient_PlayerConfirmUseNextPoke(BtlClient *client, s32 *seq);
+static BOOL BattleClient_PlayerSelectChangePokeFainted(BtlClient *client, s32 *seq);
+static BOOL BattleClient_PlayerSelectChangePokeMidTurn(BtlClient *client, s32 *seq);
 static BOOL AISelectChangePoke(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b60e0(BtlClient *client, s32 *seq);
+static BOOL BattleClient_RecPlaySelectChangePoke(BtlClient *client, s32 *seq);
 static BOOL PlayerSelectChangePoke(BtlClient *client, s32 *seq, u8 mode);
 static BOOL IsRotationFrontFainted(BtlClient *client);
 static u32 RotateToLivingMon(BtlClient *client, BattleAction *action);
-static BOOL func_ov167_021b6328(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b64ac(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b64ec(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq);
+static BOOL BattleClient_PlayerConfirmShiftSwitch(BtlClient *client, s32 *seq);
+static BOOL BattleClient_StoreRecordData(BtlClient *client, s32 *seq);
+static BOOL BattleClient_RecPlayExitCommBattle(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ExitCommBattle(BtlClient *client, s32 *seq);
 static u32 GetBattleResultForClient(BtlClient *client);
-static BOOL func_ov167_021b666c(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6a98(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq);
+static BOOL BattleClient_RecPlayExitTrainerBattle(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq);
+static BOOL BattleClient_RecPlayExitFacilityBattle(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ExitFacilityBattle(BtlClient *client, s32 *seq);
 static void ShowTrainerWinLoseMsg(BtlClient *client, u32 result, u8 which);
-static BOOL func_ov167_021b6c98(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6d0c(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6dc4(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6e0c(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ExitWildBattleWin(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ExitWildBattleLose(BtlClient *client, s32 *seq);
+static BOOL BattleClient_ShowTimeUpMsg(BtlClient *client, s32 *seq);
+static BOOL BattleClient_RecPlayServerCmdLoop(BtlClient *client, s32 *seq);
 static BOOL BattleClient_ServerCmdLoop(BtlClient *client, s32 *seq);
-static BOOL func_ov167_021b6f7c(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScRecallMsg(BtlClient *client, s32 *seq, const u32 *args);
 static u16 BattleClient_GetRecallMsg(BtlClient *client, u8 clientId, BOOL *withName);
-static BOOL func_ov167_021b7058(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b70a0(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScRecall(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSendOut(BtlClient *client, s32 *seq, const u32 *args);
 static u16 BattleClient_GetPlayerSendOutMsg(BtlClient *client);
-static BOOL func_ov167_021b7230(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7278(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b72d4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b731c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7378(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMsgStd(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMsgStdSE(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMsgSet(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMsgSetSE(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMoveMsg(BtlClient *client, s32 *seq, const u32 *args);
 static s32 BattleClient_GetMoveAnimType(BtlClient *client, u16 move, u8 pos);
-static BOOL func_ov167_021b73f4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7480(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b74d0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7520(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7598(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b75f8(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b763c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b76e4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7750(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7794(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7800(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMoveAnim(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSetMonVisible(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScDamage(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScDamagePlural(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOneHitKO(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSetGaugeStatus(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScConfusionDamage(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScFaint(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScShowMon(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScStatDownEffect(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScStatUpEffect(BtlClient *client, s32 *seq, const u32 *args);
 static BOOL BattleClient_ScWeatherStart(BtlClient *client, s32 *seq, const u32 *args);
 static BOOL BattleClient_ScWeatherEnd(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b795c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b79a0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7a04(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7a60(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7af4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7c08(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7c40(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScUpdateHpGauge(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScUseHeldItem(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScFaintHpGauge(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSwapPos(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScMoveToCenter(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSubstituteCreate(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSubstituteDelete(BtlClient *client, s32 *seq, const u32 *args);
 static BOOL BattleClient_ScTransform(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7d24(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7d84(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b7d90(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScDamageEffect(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScPlayBgm(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScHideMsgWindow(BtlClient *client, s32 *seq, const u32 *args);
 static BOOL BattleClient_ScAddEVs(BtlClient *client, s32 *seq, const u32 *args);
 static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args);
 static BOOL BattleClient_ForgetMoveSECallback(u32 arg0);
 static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mon);
-static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b853c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b85a4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8650(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b86e4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8850(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b88b4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b88ec(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b896c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b89cc(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8a34(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8a8c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8ad0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8af0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8b10(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8b38(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8b60(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8b80(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8b98(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8bbc(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8be0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8c00(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8c20(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8c98(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8cb0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8cc8(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8ce4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8d04(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8d1c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8d38(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8d8c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8dac(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8e24(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8e44(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8e80(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8e9c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8eb8(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8ed4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8ef0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8f0c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8f2c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8f60(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8f78(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8f8c(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8fa0(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8fb4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8fc4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b8fe4(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9010(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9030(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9048(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9074(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9094(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b90ac(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b90cc(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9100(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9120(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9130(BtlClient *client, s32 *seq, const u32 *args);
-static BOOL func_ov167_021b9154(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScBallThrow(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScBallThrowTrainer(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScRotation(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScChangeAbility(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScSwapAbility(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScIllusionBreak(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScEffect(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScEffectByPos(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScEffectBetweenPos(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScChangeForm(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScAbilityPopupIn(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScAbilityPopupOut(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSubtractHp(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddHp(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSubtractPP(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSubtractOriginalPP(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetMoveUsed(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpZeroHp(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddPP(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddOriginalPP(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpRaiseStatStage(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpLowerStatStage(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetStatStages(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpRecoverStatStages(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpResetStatStages(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddCritStage(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetCondition(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpCureCondition(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpCureMoveCondition(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSendIn(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpChangeType(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpConditionTurnCheck(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpConsumeItem(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpUpdateUsedMove(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetConditionFlag(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpClearConditionFlag(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetTurnFlag(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpClearTurnFlag(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpChangeAbility(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetItem(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpUpdateMove(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpClearForSwitch(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddFieldEffect(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddFieldEffectDependMon(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpRemoveFieldEffectDependMon(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpRemoveFieldEffect(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetCounter(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpBatonPass(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpCreateSubstitute(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpDeleteSubstitute(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddShooterEnergy(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetupIllusion(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpClearConsumedItem(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpCureMonDependentConditions(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpAddDamageRecord(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpTurnCheck(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpFieldTurnCheck(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetBaseStat(BtlClient *client, s32 *seq, const u32 *args);
+static BOOL BattleClient_ScOpSetWeight(BtlClient *client, s32 *seq, const u32 *args);
 static void BattleClient_LoadAIItems(BtlClient *client);
 static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party);
 static BOOL IsXItem(u16 item, BattleMon *mon);
 static BOOL IsStatusCureItem(u16 item, BattleMon *mon);
 static void RecPlayer_Init(BtlClientRecPlayer *recPlayer);
 static void RecPlayer_SetMaxChapter(BtlClientRecPlayer *recPlayer, u32 maxChapter);
-static BOOL func_ov167_021b9360(BtlClientRecPlayer *recPlayer);
-static void func_ov167_021b9368(BtlClientRecPlayer *recPlayer);
-static u32 func_ov167_021b9374(BtlClientRecPlayer *recPlayer);
+static BOOL RecPlayer_IsQuitDone(BtlClientRecPlayer *recPlayer);
+static void RecPlayer_ReachChapter(BtlClientRecPlayer *recPlayer);
+static u32 RecPlayer_GetResult(BtlClientRecPlayer *recPlayer);
 static void RecPlayer_StartSkip(BtlClientRecPlayer *recPlayer, u32 target);
-static void func_ov167_021b939c(BtlClientRecPlayer *recPlayer);
-static BOOL func_ov167_021b93ac(BtlClientRecPlayer *recPlayer);
-static u32 func_ov167_021b93bc(BtlClientRecPlayer *recPlayer);
-static BOOL func_ov167_021b93c0(BtlClientRecPlayer *recPlayer);
-static void func_ov167_021b93d8(BtlClientRecPlayer *recPlayer);
-static void func_ov167_021b93e4(BtlClientRecPlayer *recPlayer);
+static void RecPlayer_EndSkip(BtlClientRecPlayer *recPlayer);
+static BOOL RecPlayer_IsSkipDone(BtlClientRecPlayer *recPlayer);
+static u32 RecPlayer_GetSkipTarget(BtlClientRecPlayer *recPlayer);
+static BOOL RecPlayer_TryLock(BtlClientRecPlayer *recPlayer);
+static void RecPlayer_Unlock(BtlClientRecPlayer *recPlayer);
+static void RecPlayer_SetDataEnd(BtlClientRecPlayer *recPlayer);
 static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer);
-static void func_ov167_021b9570(BtlClientStudioWork *studio, u32 reaction);
+static void Studio_PlayAudienceSE(BtlClientStudioWork *studio, u32 reaction);
 static void Studio_ReactAudience(BtlvCore *core, BtlClientStudioWork *studio, u32 reaction);
 static void Studio_AudienceLeave(BtlvCore *core, BtlClientStudioWork *studio, u16 level);
-static void func_ov167_021b96b0(BtlvCore *core, BtlClientStudioWork *studio);
-static void func_ov167_021b96e0(BtlvCore *core, BtlClientStudioWork *studio, int fame);
-static void func_ov167_021b96f0(BtlClient *client, BtlClientStudioWork *studio, BattleParty *party);
-static void func_ov167_021b9750(BtlClient *client, BtlClientStudioScore *score, s32 scene);
-static void func_ov167_021b9774(BtlClient *client, BtlClientStudioScore *score);
-static void func_ov167_021b97a4(BtlClient *client, BtlClientStudioScore *score, s32 scene, u32 index);
+static void Studio_ReactToScenePoints(BtlvCore *core, BtlClientStudioWork *studio);
+static void Studio_ReactToFame(BtlvCore *core, BtlClientStudioWork *studio, int fame);
+static void Studio_AddFamePoints(BtlClient *client, BtlClientStudioWork *studio, BattleParty *party);
+static void StudioScore_AddScenePoints(BtlClient *client, BtlClientStudioScore *score, s32 scene);
+static void StudioScore_SetTurnPoints(BtlClient *client, BtlClientStudioScore *score);
+static void StudioScore_AddChoicePoints(BtlClient *client, BtlClientStudioScore *score, s32 scene, u32 index);
 static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score);
 static void Studio_UpdateAudience(BtlClient *client);
-static void func_ov167_021b9910(BtlMainModule *mainModule);
+static void Studio_PlayEndingBgm(BtlMainModule *mainModule);
 
 // A server command a client handles, with its handler for each client type
 typedef struct {
@@ -473,21 +473,21 @@ static const u8 data_ov167_021d6eb4[5] = { 0, 0, 0, 1, 2 };
 
 // 0x021d7070: the commands that the clients handle (also used by the other ranges' handlers)
 static const BtlClientCmdEntry sCmdProcTable[15] = {
-    { 1, 1, { func_ov167_021b1dcc, NULL, func_ov167_021b1ea4 } },
-    { 2, 0, { func_ov167_021b1f70, func_ov167_021b205c, func_ov167_021b2058 } },
-    { 3, 0, { func_ov167_021b23b8, AISelectAction, RecPlaySelectAction } },
-    { 7, 0, { func_ov167_021b5f30, NULL, NULL } },
-    { 5, 0, { func_ov167_021b5fa4, AISelectChangePoke, func_ov167_021b60e0 } },
-    { 6, 0, { func_ov167_021b5fb0, AISelectChangePoke, func_ov167_021b60e0 } },
-    { 4, 0, { func_ov167_021b6328, NULL, func_ov167_021b60e0 } },
-    { 8, 0, { BattleClient_ServerCmdLoop, NULL, func_ov167_021b6e0c } },
-    { 10, 0, { func_ov167_021b64ac, NULL, NULL } },
-    { 11, 1, { func_ov167_021b6680, NULL, func_ov167_021b666c } },
-    { 12, 1, { func_ov167_021b6aac, NULL, func_ov167_021b6a98 } },
-    { 14, 1, { func_ov167_021b6c98, NULL, NULL } },
-    { 15, 1, { func_ov167_021b6d0c, NULL, NULL } },
-    { 13, 1, { func_ov167_021b6500, NULL, func_ov167_021b64ec } },
-    { 16, 1, { func_ov167_021b6dc4, NULL, NULL } },
+    { 1, 1, { BattleClient_SetupView, NULL, BattleClient_RecPlaySetupView } },
+    { 2, 0, { BattleClient_PlayerSelectRotation, BattleClient_AISelectRotation, BattleClient_RecPlaySelectRotation } },
+    { 3, 0, { BattleClient_PlayerSelectAction, AISelectAction, RecPlaySelectAction } },
+    { 7, 0, { BattleClient_PlayerConfirmUseNextPoke, NULL, NULL } },
+    { 5, 0, { BattleClient_PlayerSelectChangePokeFainted, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
+    { 6, 0, { BattleClient_PlayerSelectChangePokeMidTurn, AISelectChangePoke, BattleClient_RecPlaySelectChangePoke } },
+    { 4, 0, { BattleClient_PlayerConfirmShiftSwitch, NULL, BattleClient_RecPlaySelectChangePoke } },
+    { 8, 0, { BattleClient_ServerCmdLoop, NULL, BattleClient_RecPlayServerCmdLoop } },
+    { 10, 0, { BattleClient_StoreRecordData, NULL, NULL } },
+    { 11, 1, { BattleClient_ExitTrainerBattle, NULL, BattleClient_RecPlayExitTrainerBattle } },
+    { 12, 1, { BattleClient_ExitFacilityBattle, NULL, BattleClient_RecPlayExitFacilityBattle } },
+    { 14, 1, { BattleClient_ExitWildBattleWin, NULL, NULL } },
+    { 15, 1, { BattleClient_ExitWildBattleLose, NULL, NULL } },
+    { 13, 1, { BattleClient_ExitCommBattle, NULL, BattleClient_RecPlayExitCommBattle } },
+    { 16, 1, { BattleClient_ShowTimeUpMsg, NULL, NULL } },
 };
 
 // The studio's next step for each state, by the event that happened
@@ -564,7 +564,7 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
     client->clientId = clientId;
     client->heapId = heapId;
     client->clientType = isAI;
-    client->adapter = func_ov167_021d4a44(netHandle, clientId, netFlag, heapId);
+    client->adapter = BtlAdapter_Create(netHandle, clientId, netFlag, heapId);
     client->party = GetClientParty(pokeCon, clientId);
     client->mainModule = mainModule;
     client->pokeCon = pokeCon;
@@ -589,32 +589,32 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
     client->forceQuit = 0;
     client->unk1BA_4 = 0;
     client->unk1BA_5 = 0;
-    client->field = func_ov167_0219d9a8(mainModule);
+    client->field = GetBtlField(mainModule);
     client->turnCount = 0;
     client->bagMode = arg7;
-    func_ov167_021bda58(&client->clientIdList);
+    BtlClientIDList_Init(&client->clientIdList);
     RecPlayer_Init(&client->recPlayer);
     BattleClient_LoadAIItems(client);
     client->aiRand = *rand;
     if (client->clientType == 1 && recPlay == 0) {
-        u32 aiFlags = func_ov167_0219d8d4(client->mainModule, client->clientId);
+        u32 aiFlags = GetClientAIFlags(client->mainModule, client->clientId);
 
-        client->aiVM = TrAI_CreateVM(client->mainModule, func_ov167_0219e158(client->mainModule), client->pokeCon,
-                                     aiFlags, client->heapId);
+        client->aiVM = TrAI_CreateVM(client->mainModule, GetServerFlow(client->mainModule), client->pokeCon, aiFlags,
+                                     client->heapId);
     } else {
         client->aiVM = NULL;
     }
     for (i = 0; i < 4; i++) {
         client->hintShown[i] = 0;
     }
-    type = func_ov167_0219c988(client->mainModule);
-    if (client->clientType == 0 && func_ov167_0219c964(client->mainModule)) {
-        client->recorder = func_ov167_021d45b0(heapId, type);
+    type = GetStudioMode(client->mainModule);
+    if (client->clientType == 0 && IsRecordingEnabled(client->mainModule)) {
+        client->recorder = BtlRecorder_Create(heapId, type);
     } else {
         client->recorder = NULL;
     }
     if (type == 2) {
-        BtlSetup *setup = func_ov167_0219e30c(client->mainModule);
+        BtlSetup *setup = GetBattleSetup(client->mainModule);
         client->studio.unk58 = setup->unk128;
         client->studio.audienceMask = setup->unk12C;
     }
@@ -623,85 +623,85 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
 
 void BattleClient_Delete(BtlClient *client) {
     if (client->recorder != NULL) {
-        func_ov167_021d45e8(client->recorder);
+        BtlRecorder_Delete(client->recorder);
     }
     if (client->aiVM != NULL) {
         TrAI_DeleteVM(client->aiVM);
     }
     GFL_HeapFree(client->cmdQueue);
-    func_ov167_021d4acc(client->adapter);
+    BtlAdapter_Delete(client->adapter);
     GFL_HeapFree(client);
 }
 
-void func_ov167_021b18c4(BtlClient *client) {
+void BattleClient_SetForceQuit(BtlClient *client) {
     client->forceQuit = TRUE;
 }
 
-void *func_ov167_021b18d4(BtlClient *client, u32 *size) {
+void *BattleClient_GetRecordData(BtlClient *client, u32 *size) {
     if (client->recorder != NULL) {
-        return func_ov167_021d4628(client->recorder, size);
+        return BtlRecorder_GetData(client->recorder, size);
     }
     return NULL;
 }
 
-void func_ov167_021b18e8(BtlClient *client, void *data) {
+void BattleClient_SetRecPlayData(BtlClient *client, void *data) {
     client->clientType = 2;
     client->recReader = data;
-    RecPlayer_SetMaxChapter(&client->recPlayer, func_ov167_021d481c(data));
+    RecPlayer_SetMaxChapter(&client->recPlayer, BtlRecReader_CountChapters(data));
 }
 
-void func_ov167_021b190c(BtlClient *client, BtlvCore *viewCore) {
+void BattleClient_SetViewCore(BtlClient *client, BtlvCore *viewCore) {
     client->viewCore = viewCore;
 }
 
-void func_ov167_021b1910(BtlClient *client, BtlServer *server) {
+void BattleClient_SetCmdCheckServer(BtlClient *client, BtlServer *server) {
     client->cmdCheckServer = server;
     client->cmdCheckEnable = TRUE;
 }
 
-BtlAdapter *func_ov167_021b1928(BtlClient *client) {
+BtlAdapter *BattleClient_GetAdapter(BtlClient *client) {
     return client->adapter;
 }
 
-BOOL func_ov167_021b192c(BtlClient *client) {
+BOOL BattleClient_Main(BtlClient *client) {
     return client->mainProc(client);
 }
 
-void func_ov167_021b1934(BtlClient *client, u32 arg1) {
-    func_ov167_021d4660(client->recReader);
-    func_ov167_021d4bc8(client->adapter);
+void BattleClient_StartChapterSkip(BtlClient *client, u32 arg1) {
+    BtlRecReader_Reset(client->recReader);
+    BtlAdapter_ClearSendCmd(client->adapter);
     RecPlayer_StartSkip(&client->recPlayer, arg1);
     BattleClient_SetMainProc(client, BattleClient_MainProcRecPlay);
 }
 
-void func_ov167_021b1960(BtlClient *client) {
-    func_ov167_021b939c(&client->recPlayer);
+void BattleClient_EndChapterSkip(BtlClient *client) {
+    RecPlayer_EndSkip(&client->recPlayer);
     BattleClient_SetMainProc(client, BattleClient_MainProcNormal);
 }
 
-BOOL func_ov167_021b1978(BtlClient *client) {
+BOOL BattleClient_IsRecPlay(BtlClient *client) {
     if (client->clientType == 2) {
         return TRUE;
     }
     return FALSE;
 }
 
-u16 func_ov167_021b198c(BtlClient *client) {
+u16 BattleClient_GetRecMaxChapter(BtlClient *client) {
     return client->recPlayer.maxChapter;
 }
 
-BOOL func_ov167_021b1990(BtlClient *client) {
+BOOL BattleClient_IsChapterSkipping(BtlClient *client) {
     if (client->mainProc == BattleClient_MainProcRecPlay) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov167_021b19a4(BtlClient *client) {
+u32 BattleClient_GetFirstActionMove(BtlClient *client) {
     return client->actions[0].bits.move;
 }
 
-void func_ov167_021b19b0(BtlClient *client, u8 value) {
+void BattleClient_AddShooterEnergy(BtlClient *client, u8 value) {
     client->shooterEnergy += value;
     if (client->shooterEnergy > 14) {
         client->shooterEnergy = 14;
@@ -717,7 +717,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
     RecPlayer_Update(client, &client->recPlayer);
     switch (client->mainSeq) {
     case 0: {
-        u32 cmd = func_ov167_021d4bd4(client->adapter);
+        u32 cmd = BtlAdapter_GetRecvCmd(client->adapter);
 
         if (client->clientType == 2 && (client->unk1BA_4 || client->unk1BA_5) && cmd == 0) {
             return FALSE;
@@ -726,7 +726,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
         if (cmd == 9) {
             const BtlClientIDList *list;
 
-            func_ov167_021d4c0c(client->adapter, (const void **)&list);
+            BtlAdapter_GetRecvData(client->adapter, (const void **)&list);
             client->clientIdList = *list;
             client->cmdSeq = 0;
             client->mainSeq = 3;
@@ -735,12 +735,12 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
 
             client->cmdProc = BattleClient_GetCmdProc(client, cmd, &unk01);
             if (unk01) {
-                if (!func_ov167_021b93c0(&client->recPlayer)) {
+                if (!RecPlayer_TryLock(&client->recPlayer)) {
                     client->mainSeq = 6;
                     break;
                 }
             } else {
-                func_ov167_021b93d8(&client->recPlayer);
+                RecPlayer_Unlock(&client->recPlayer);
             }
             if (client->cmdProc != NULL) {
                 client->mainSeq = 1;
@@ -759,7 +759,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
             if (client->forceQuit) {
                 return TRUE;
             }
-            if (func_ov167_021b9360(&client->recPlayer)) {
+            if (RecPlayer_IsQuitDone(&client->recPlayer)) {
                 client->mainSeq = 4;
             } else {
                 client->mainSeq = 2;
@@ -767,7 +767,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
         }
         break;
     case 2:
-        if (func_ov167_021d4c38(client->adapter, client->returnData, client->returnDataSize)) {
+        if (BtlAdapter_SetReturnData(client->adapter, client->returnData, client->returnDataSize)) {
             client->mainSeq = 0;
         }
         if (client->forceQuit) {
@@ -775,7 +775,7 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
         }
         break;
     case 3:
-        if (func_ov167_021d4c38(client->adapter, client->returnData, client->returnDataSize)) {
+        if (BtlAdapter_SetReturnData(client->adapter, client->returnData, client->returnDataSize)) {
             client->mainSeq = 7;
         }
         if (client->forceQuit) {
@@ -783,12 +783,12 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
         }
         break;
     case 6:
-        if (func_ov167_021b9360(&client->recPlayer)) {
+        if (RecPlayer_IsQuitDone(&client->recPlayer)) {
             client->mainSeq = 4;
         }
         break;
     case 4:
-        if (func_ov167_021b9374(&client->recPlayer) == 1) {
+        if (RecPlayer_GetResult(&client->recPlayer) == 1) {
             client->mainSeq = 7;
             break;
         }
@@ -800,10 +800,10 @@ static BOOL BattleClient_MainProcNormal(BtlClient *client) {
         break;
     case 5:
         if (!GFL_SndBGMIsFading()) {
-            u32 chapter = func_ov167_021b93bc(&client->recPlayer);
+            u32 chapter = RecPlayer_GetSkipTarget(&client->recPlayer);
 
             GFL_SndPlayerSetMuteStateEx(0, 1);
-            func_ov167_0219e074(client->mainModule, chapter);
+            BtlMain_StartRecSkip(client->mainModule, chapter);
             PokeVoice_SetMasterVolume(0);
         }
         break;
@@ -820,8 +820,8 @@ static BOOL BattleClient_MainProcRecPlay(BtlClient *client) {
     case 0:
         client->mainSeq = 1;
     case 1:
-        if (!func_ov167_021b93ac(&client->recPlayer)) {
-            u32 cmd = func_ov167_021d4bd4(client->adapter);
+        if (!RecPlayer_IsSkipDone(&client->recPlayer)) {
+            u32 cmd = BtlAdapter_GetRecvCmd(client->adapter);
 
             if (cmd != 0) {
                 client->cmdProc = BattleClient_GetCmdProc(client, cmd, NULL);
@@ -837,7 +837,7 @@ static BOOL BattleClient_MainProcRecPlay(BtlClient *client) {
         } else {
             if (client->viewCore != NULL) {
                 GFL_SndPlayerSetMuteStateEx(1, 1);
-                func_ov167_021d09f8(client->viewCore);
+                BtlvCore_StartFadeIn(client->viewCore);
                 GFL_SndBGMFadeIn(30);
                 BtlvEffect_SetFlag26(0);
                 PokeVoice_ResetMasterVolume();
@@ -855,16 +855,16 @@ static BOOL BattleClient_MainProcRecPlay(BtlClient *client) {
         }
         break;
     case 3:
-        if (func_ov167_021d4c38(client->adapter, client->returnData, client->returnDataSize)) {
+        if (BtlAdapter_SetReturnData(client->adapter, client->returnData, client->returnDataSize)) {
             client->mainSeq = 1;
         }
         break;
     case 4:
-        if (client->viewCore != NULL && func_ov167_021d0a08(client->viewCore) && !GFL_SndBGMIsFading()) {
-            u16 chapter = func_ov167_021b93bc(&client->recPlayer);
+        if (client->viewCore != NULL && BtlvCore_WaitFadeIn(client->viewCore) && !GFL_SndBGMIsFading()) {
+            u16 chapter = RecPlayer_GetSkipTarget(&client->recPlayer);
 
-            func_ov167_021d0a48(client->viewCore, chapter, chapter);
-            func_ov167_0219e130(client->mainModule);
+            BtlvCore_ShowRecorderChapter(client->viewCore, chapter, chapter);
+            BtlMain_EndRecSkip(client->mainModule);
         }
         break;
     case 5:
@@ -893,11 +893,11 @@ static BtlClientCmdProc BattleClient_GetCmdProc(BtlClient *client, u32 cmd, u32 
     return NULL;
 }
 
-void func_ov167_021b1d58(BtlClient *client, BtlClientIDList *list) {
+void BattleClient_GetClientIDList(BtlClient *client, BtlClientIDList *list) {
     *list = client->clientIdList;
 }
 
-BOOL func_ov167_021b1d64(BtlClient *client) {
+BOOL BattleClient_IsGameTimeUp(BtlClient *client) {
     if (client->clientType != 2) {
         if (client->gameLimitTime != 0) {
             return BtlvEffect_IsTimeUp(0);
@@ -907,11 +907,11 @@ BOOL func_ov167_021b1d64(BtlClient *client) {
     return client->unk1BA_4;
 }
 
-BOOL func_ov167_021b1d90(BtlClient *client) {
+BOOL BattleClient_IsRecPlayCanceled(BtlClient *client) {
     return client->unk1BA_5;
 }
 
-static void func_ov167_021b1da0(BtlClientStudioWork *studio) {
+static void Studio_InitAudienceTimers(BtlClientStudioWork *studio) {
     int i;
 
     for (i = 0; i < 22; i++) {
@@ -921,33 +921,33 @@ static void func_ov167_021b1da0(BtlClientStudioWork *studio) {
     }
 }
 
-static BOOL func_ov167_021b1dcc(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_SetupView(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
         if (BtlSetup_GetBattleType(client->mainModule) != 4) {
-            func_ov167_021ce8dc(client->viewCore, FALSE);
+            BtlvCore_StartCommand(client->viewCore, FALSE);
         } else {
-            func_ov167_021ce8dc(client->viewCore, TRUE);
+            BtlvCore_StartCommand(client->viewCore, TRUE);
         }
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021ce90c(client->viewCore)) {
-            client->cmdLimitTime = func_ov167_0219defc(client->mainModule);
-            client->gameLimitTime = func_ov167_0219df08(client->mainModule);
+        if (BtlvCore_WaitCommand(client->viewCore)) {
+            client->cmdLimitTime = GetCommandTimeLimit(client->mainModule);
+            client->gameLimitTime = GetGameTimeLimit(client->mainModule);
             if (client->cmdLimitTime != 0 || client->gameLimitTime != 0) {
                 BtlvEffect_CreateTimer(client->gameLimitTime, client->cmdLimitTime);
                 if (client->gameLimitTime != 0) {
                     BtlvEffect_SetTimerVisible(0, 1, 1);
                 }
             }
-            func_ov167_021b1ee4(client);
-            if (func_ov167_021b1990(client)) {
-                func_ov167_021d0a7c(client->viewCore, func_ov167_021b93bc(&client->recPlayer));
+            BattleClient_SaveFrontMonHp(client);
+            if (BattleClient_IsChapterSkipping(client)) {
+                func_ov167_021d0a7c(client->viewCore, RecPlayer_GetSkipTarget(&client->recPlayer));
             }
-            client->studio.audienceMask = func_ov167_021d0be4(client->viewCore);
-            func_ov167_021b1da0(&client->studio);
-            func_ov167_021b96f0(client, &client->studio, client->party);
+            client->studio.audienceMask = BtlvCore_GetTypeMask(client->viewCore);
+            Studio_InitAudienceTimers(&client->studio);
+            Studio_AddFamePoints(client, &client->studio, client->party);
             return TRUE;
         }
         break;
@@ -955,29 +955,29 @@ static BOOL func_ov167_021b1dcc(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b1ea4(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlaySetupView(BtlClient *client, s32 *seq) {
     if (client->viewCore != NULL) {
-        BOOL done = func_ov167_021b1dcc(client, seq);
+        BOOL done = BattleClient_SetupView(client, seq);
 
-        if (done && func_ov167_021d4674(client->recReader, client->clientId)) {
-            func_ov167_021b9368(&client->recPlayer);
+        if (done && BtlRecReader_SkipTurnChunk(client->recReader, client->clientId)) {
+            RecPlayer_ReachChapter(&client->recPlayer);
         }
         return done;
     }
-    func_ov167_021d4674(client->recReader, client->clientId);
+    BtlRecReader_SkipTurnChunk(client->recReader, client->clientId);
     return TRUE;
 }
 
-static void func_ov167_021b1ee4(BtlClient *client) {
-    BattleMon *mon = func_ov167_021b1f34(client);
+static void BattleClient_SaveFrontMonHp(BtlClient *client) {
+    BattleMon *mon = BattleClient_GetSingleBattleFrontMon(client);
 
     if (mon != NULL) {
         client->savedHp = GetBattleMonStat(mon, 13);
     }
 }
 
-static u32 func_ov167_021b1f00(BtlClient *client) {
-    BattleMon *mon = func_ov167_021b1f34(client);
+static u32 BattleClient_GetFrontMonHpLossRatio(BtlClient *client) {
+    BattleMon *mon = BattleClient_GetSingleBattleFrontMon(client);
 
     if (mon != NULL) {
         u32 hp = GetBattleMonStat(mon, 13);
@@ -990,29 +990,29 @@ static u32 func_ov167_021b1f00(BtlClient *client) {
     return 0;
 }
 
-static BattleMon *func_ov167_021b1f34(BtlClient *client) {
-    if (BtlSetup_GetBattleStyle(client->mainModule) == 0 && !func_ov167_0219bee4(client->mainModule)) {
-        u8 pos = func_ov167_0219c8d0(client->mainModule, client->clientId, 0);
+static BattleMon *BattleClient_GetSingleBattleFrontMon(BtlClient *client) {
+    if (BtlSetup_GetBattleStyle(client->mainModule) == 0 && !GetCommMode(client->mainModule)) {
+        u8 pos = GetOpponentClientID(client->mainModule, client->clientId, 0);
 
         return GetClientMonData(client->pokeCon, pos, 0);
     }
     return NULL;
 }
 
-static BOOL func_ov167_021b1f70(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerSelectRotation(BtlClient *client, s32 *seq) {
     u8 select;
 
     switch (*seq) {
     case 0:
-        func_ov167_021d05d4(client->viewCore, client->unkCC);
-        func_ov167_021b2080(client);
+        BtlvCore_ShowRotationScreen(client->viewCore, client->unkCC);
+        BattleClient_StartCmdLimitTimer(client);
         (*seq)++;
         break;
     case 1:
         if (CheckIfOverCmdLimit(client)) {
-            func_ov167_021d0630(client->viewCore);
+            BtlvCore_HideRotationScreen(client->viewCore);
             *seq = 2;
-        } else if (func_ov167_021d0608(client->viewCore, &select)) {
+        } else if (BtlvCore_PollRotationInput(client->viewCore, &select)) {
             client->unkCC = select;
             *seq = 3;
         }
@@ -1022,7 +1022,7 @@ static BOOL func_ov167_021b1f70(BtlClient *client, s32 *seq) {
         (*seq)++;
         break;
     case 3:
-        func_ov167_021b20f8(client);
+        BattleClient_HideCmdLimitTimer(client);
         (*seq)++;
         break;
     case 4:
@@ -1061,18 +1061,18 @@ static u8 BattleClient_PickRotation(u8 dir) {
     return dir;
 }
 
-static BOOL func_ov167_021b2058(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlaySelectRotation(BtlClient *client, s32 *seq) {
     return TRUE;
 }
 
-static BOOL func_ov167_021b205c(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_AISelectRotation(BtlClient *client, s32 *seq) {
     client->unkCC = BattleClient_PickRotation(client->unkCC);
     client->returnData = &client->unkCC;
     client->returnDataSize = 1;
     return TRUE;
 }
 
-static void func_ov167_021b2080(BtlClient *client) {
+static void BattleClient_StartCmdLimitTimer(BtlClient *client) {
     if (client->cmdLimitTime != 0) {
         BtlvEffect_SetTimerVisible(1, 1, 1);
         client->cmdLimitOver = FALSE;
@@ -1099,21 +1099,21 @@ static BOOL CheckActionSelectForceQuit(BtlClient *client, BOOL (*proc)(BtlClient
     return FALSE;
 }
 
-static void func_ov167_021b20f8(BtlClient *client) {
+static void BattleClient_HideCmdLimitTimer(BtlClient *client) {
     if (client->cmdLimitTime != 0) {
         BtlvEffect_SetTimerVisible(1, 0, 0);
     }
 }
 
-static void func_ov167_021b2110(BtlClient *client, BattleMon *mon, BtlvStringParam *param) {
+static void BattleClient_SetActionPromptMsg(BtlClient *client, BattleMon *mon, BtlvStringParam *param) {
     if (BtlSetup_GetBattleStyle(client->mainModule) != 3) {
         Btlv_StringParam_Setup(param, 1, 0x45);
         Btlv_StringParam_AddArg(param, GetMonID(mon));
-        func_ov167_021d0b4c(param, 0);
+        Btlv_StringParam_SetWait(param, 0);
     } else {
         Btlv_StringParam_Setup(param, 1, 0x46);
         Btlv_StringParam_AddArg(param, client->clientId);
-        func_ov167_021d0b4c(param, 0);
+        Btlv_StringParam_SetWait(param, 0);
     }
 }
 
@@ -1129,13 +1129,13 @@ static BOOL BattleClient_RunSelActProc(BtlClient *client) {
 // The step the action selection is at
 static s32 sSelectSeq;
 
-static s32 func_ov167_021b2188(void) {
+static s32 BattleClient_GetSelectSeq(void) {
     return sSelectSeq;
 }
 
-static u32 func_ov167_021b2194(BtlClient *client) {
-    BtlSetup *setup = func_ov167_0219e310(client->mainModule);
-    const BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+static u32 Studio_GetTurnMsgId(BtlClient *client) {
+    BtlSetup *setup = GetBattleSetupParam(client->mainModule);
+    const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
     u8 group = data_ov167_021d6eb4[setup->unk129];
     u32 msgId;
 
@@ -1159,18 +1159,18 @@ static u32 func_ov167_021b2194(BtlClient *client) {
     return msgId;
 }
 
-static void func_ov167_021b2210(BtlClient *client, u32 value) {
+static void Studio_SetLastChoiceResult(BtlClient *client, u32 value) {
     client->studio.score.unk10 = value;
 }
 
-static BOOL func_ov167_021b2218(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerSelectActionNormal(BtlClient *client, s32 *seq) {
     sSelectSeq = *seq;
     switch (*seq) {
     case 0:
         *seq = 8;
     case 8:
         BattleClient_SetSelActProc(client, BattleClient_ActionSelectInit);
-        func_ov167_021b2080(client);
+        BattleClient_StartCmdLimitTimer(client);
         (*seq)++;
         break;
     case 9:
@@ -1183,7 +1183,7 @@ static BOOL func_ov167_021b2218(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b226c(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerSelectActionStudio(BtlClient *client, s32 *seq) {
     sSelectSeq = *seq;
     switch (*seq) {
     case 0:
@@ -1192,15 +1192,15 @@ static BOOL func_ov167_021b226c(BtlClient *client, s32 *seq) {
             *seq = 8;
             return FALSE;
         }
-        if (func_ov167_021b261c(func_ov167_0219e39c(client->mainModule), &client->studio, client->turnCount)) {
+        if (Studio_HasChoiceScene(GetStudioRules(client->mainModule), &client->studio, client->turnCount)) {
             (*seq)++;
         } else {
             *seq = 3;
-            func_ov167_021b2790(&client->studio);
+            Studio_ClearSceneTriggers(&client->studio);
         }
         break;
     case 1:
-        if (func_ov167_021b2864(client)) {
+        if (Studio_PlayScene(client)) {
             client->studio.seq = 0;
             *seq = 3;
         }
@@ -1208,21 +1208,21 @@ static BOOL func_ov167_021b226c(BtlClient *client, s32 *seq) {
     case 2:
         break;
     case 3:
-        func_ov167_021d0b70(client->viewCore, client->turnCount);
+        BtlvCore_ShowClactPopup(client->viewCore, client->turnCount);
         *seq = 4;
         break;
     case 4:
-        if (!func_ov167_021d0b90(client->viewCore)) {
+        if (!BtlvCore_IsClactPopupShowing(client->viewCore)) {
             *seq = 5;
         }
         break;
     case 5:
-        Btlv_StringParam_Setup(&client->strParam, 9, func_ov167_021b2194(client));
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        Btlv_StringParam_Setup(&client->strParam, 9, Studio_GetTurnMsgId(client));
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         *seq = 6;
         break;
     case 6:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 7;
             client->studio.waitTimer = 30;
         }
@@ -1233,19 +1233,19 @@ static BOOL func_ov167_021b226c(BtlClient *client, s32 *seq) {
         }
         break;
     case 8: {
-        const BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+        const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
 
-        func_ov167_021d0b50(client->viewCore, rules->turnLimit, client->turnCount);
+        BtlvCore_SetClactGauge(client->viewCore, rules->turnLimit, client->turnCount);
         client->turnCount++;
         BattleClient_SetSelActProc(client, BattleClient_ActionSelectInit);
-        func_ov167_021b2080(client);
+        BattleClient_StartCmdLimitTimer(client);
         (*seq)++;
         break;
     }
     case 9:
         CheckIfOverCmdLimit(client);
         if (BattleClient_RunSelActProc(client)) {
-            client->studio.unk24 = func_ov167_021b19a4(client);
+            client->studio.unk24 = BattleClient_GetFirstActionMove(client);
             return TRUE;
         }
         break;
@@ -1253,11 +1253,11 @@ static BOOL func_ov167_021b226c(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b23b8(BtlClient *client, s32 *seq) {
-    if (func_ov167_0219c988(client->mainModule) == 1) {
-        return func_ov167_021b226c(client, seq);
+static BOOL BattleClient_PlayerSelectAction(BtlClient *client, s32 *seq) {
+    if (GetStudioMode(client->mainModule) == 1) {
+        return BattleClient_PlayerSelectActionStudio(client, seq);
     }
-    return func_ov167_021b2218(client, seq);
+    return BattleClient_PlayerSelectActionNormal(client, seq);
 }
 
 static void Studio_SetSeq(BtlClientStudioWork *studio, u8 seq, u8 nextSeq) {
@@ -1265,8 +1265,8 @@ static void Studio_SetSeq(BtlClientStudioWork *studio, u8 seq, u8 nextSeq) {
     studio->nextSeq = nextSeq;
 }
 
-static BOOL func_ov167_021b23e4(BtlClient *client) {
-    const BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+static BOOL Studio_PlayTurnMessages(BtlClient *client) {
+    const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
     s16 msgId;
 
     switch (client->studio.seq) {
@@ -1274,13 +1274,13 @@ static BOOL func_ov167_021b23e4(BtlClient *client) {
         if (rules->unkA8[client->turnCount - 1] == -1 && rules->unkD0[client->turnCount - 1] == -1) {
             client->studio.seq = 9;
         } else {
-            func_ov167_021d5944();
+            BtlString_SetStudioWords();
             client->studio.seq++;
         }
         break;
     case 1:
-        BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                              0, 0);
+        BtlvEffect_SetTrainer(
+            GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 9, 0, 0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         Studio_SetSeq(&client->studio, 10, 2);
@@ -1293,14 +1293,14 @@ static BOOL func_ov167_021b23e4(BtlClient *client) {
         msgId = rules->unkA8[client->turnCount - 1];
         if (msgId != -1) {
             Btlv_StringParam_Setup(&client->strParam, 8, msgId);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             client->studio.seq++;
         } else {
             client->studio.seq = 5;
         }
         break;
     case 4:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             client->studio.seq++;
         }
         break;
@@ -1308,14 +1308,14 @@ static BOOL func_ov167_021b23e4(BtlClient *client) {
         msgId = rules->unkD0[client->turnCount - 1];
         if (msgId != -1) {
             Btlv_StringParam_Setup(&client->strParam, 8, msgId);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             client->studio.seq++;
         } else {
             client->studio.seq = 7;
         }
         break;
     case 6:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             client->studio.seq++;
         }
         break;
@@ -1338,7 +1338,7 @@ static BOOL func_ov167_021b23e4(BtlClient *client) {
     return FALSE;
 }
 
-static s32 func_ov167_021b2538(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 arg3) {
+static s32 Studio_FindScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn, s32 arg3) {
     s32 found = -1;
     s32 i;
 
@@ -1379,9 +1379,9 @@ static s32 func_ov167_021b2538(const BtlScriptedRules *rules, BtlClientStudioWor
     return found;
 }
 
-static BOOL func_ov167_021b261c(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn) {
+static BOOL Studio_HasChoiceScene(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 turn) {
     BOOL result = FALSE;
-    s32 scene = func_ov167_021b2538(rules, studio, turn, 0);
+    s32 scene = Studio_FindScene(rules, studio, turn, 0);
 
     if (scene < 0) {
         return result;
@@ -1392,7 +1392,7 @@ static BOOL func_ov167_021b261c(const BtlScriptedRules *rules, BtlClientStudioWo
     return result;
 }
 
-static void func_ov167_021b264c(const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
+static void Studio_SetChoiceField(const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
     s16 value = rules->scenes[studio->scene].choices[studio->unk08].unk06;
 
     if (value != -1) {
@@ -1400,7 +1400,7 @@ static void func_ov167_021b264c(const BtlScriptedRules *rules, BtlClientStudioWo
     }
 }
 
-static BOOL func_ov167_021b2674(const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
+static BOOL Studio_IsStateReached(const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
     s16 value = rules->scenes[studio->scene].events[studio->unk04];
 
     if (value != -1 && value != studio->unk2C) {
@@ -1409,63 +1409,63 @@ static BOOL func_ov167_021b2674(const BtlScriptedRules *rules, BtlClientStudioWo
     return TRUE;
 }
 
-static u32 func_ov167_021b26a8(BtlClient *client, BtlClientStudioWork *studio) {
-    BtlSetup *setup = func_ov167_0219e30c(client->mainModule);
+static u32 Studio_GetSavedChoice(BtlClient *client, BtlClientStudioWork *studio) {
+    BtlSetup *setup = GetBattleSetup(client->mainModule);
 
     return setup->unk110[client->studio.scene];
 }
 
-static void func_ov167_021b26c4(BtlClient *client, s32 scene, u32 value) {
-    BtlSetup *setup = func_ov167_0219e30c(client->mainModule);
+static void Studio_SaveChoice(BtlClient *client, s32 scene, u32 value) {
+    BtlSetup *setup = GetBattleSetup(client->mainModule);
 
     setup->unk110[scene] = value;
 }
 
-static u32 func_ov167_021b26dc(BtlClient *client) {
-    BtlSetup *setup = func_ov167_0219e30c(client->mainModule);
+static u32 Studio_GetEnding(BtlClient *client) {
+    BtlSetup *setup = GetBattleSetup(client->mainModule);
 
     return setup->unk124;
 }
 
-static void func_ov167_021b26ec(BtlClient *client, u32 value) {
-    BtlSetup *setup = func_ov167_0219e30c(client->mainModule);
+static void Studio_SetEnding(BtlClient *client, u32 value) {
+    BtlSetup *setup = GetBattleSetup(client->mainModule);
 
     setup->unk124 = value;
 }
 
-static void func_ov167_021b2700(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
-    if (func_ov167_0219c988(client->mainModule) == 1) {
+static void Studio_DecideEnding(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
+    if (GetStudioMode(client->mainModule) == 1) {
         if (rules->unk0E == scene) {
-            func_ov167_021b26ec(client, 1);
+            Studio_SetEnding(client, 1);
         } else if (rules->scenes[scene].unk0A >= 60) {
-            func_ov167_021b26ec(client, 2);
+            Studio_SetEnding(client, 2);
         } else {
-            func_ov167_021b26ec(client, 0);
+            Studio_SetEnding(client, 0);
         }
     }
 }
 
-static void func_ov167_021b2748(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
+static void Studio_ScoreEndScene(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
     int type = rules->scenes[scene].unk00;
 
     if (type == 100 || type == 101) {
-        func_ov167_021b9750(client, &client->studio.score, scene);
-        if (func_ov167_0219c988(client->mainModule) == 2) {
+        StudioScore_AddScenePoints(client, &client->studio.score, scene);
+        if (GetStudioMode(client->mainModule) == 2) {
             BtlSetup *setup;
 
-            func_ov167_021b96b0(client->viewCore, &client->studio);
-            setup = func_ov167_0219e30c(client->mainModule);
+            Studio_ReactToScenePoints(client->viewCore, &client->studio);
+            setup = GetBattleSetup(client->mainModule);
             setup->unk12C = client->studio.audienceMask;
         }
     }
 }
 
-static void func_ov167_021b2790(BtlClientStudioWork *studio) {
+static void Studio_ClearSceneTriggers(BtlClientStudioWork *studio) {
     studio->unk24 = 0;
     studio->unk26 = 0;
 }
 
-static void func_ov167_021b2798(BtlClient *client, const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
+static void Studio_StartChoiceSelect(BtlClient *client, const BtlScriptedRules *rules, BtlClientStudioWork *studio) {
     s32 count = 0;
     s32 i;
 
@@ -1474,13 +1474,13 @@ static void func_ov167_021b2798(BtlClient *client, const BtlScriptedRules *rules
             count++;
         }
     }
-    func_ov167_021cfb28(client->viewCore, count, &studio->unk08);
+    BtlvCore_SetupChoice(client->viewCore, count, &studio->unk08);
     for (i = 0; i < count; i++) {
         studio->strBufs[i] = GFL_StrBufCreate(0x28, client->heapId);
-        func_ov167_021d5904(studio->strBufs[i], rules->scenes[studio->scene].choices[i].msgId);
-        func_ov167_021cfb34(client->viewCore, i, studio->strBufs[i]);
+        BtlString_FormatMovieScriptMsg(studio->strBufs[i], rules->scenes[studio->scene].choices[i].msgId);
+        BtlvCore_SetChoiceStr(client->viewCore, i, studio->strBufs[i]);
     }
-    BattleClient_SetSelActProc(client, func_ov167_021b41d4);
+    BattleClient_SetSelActProc(client, BattleClient_ActionSelectStudioChoice);
 }
 
 static void Studio_FreeChoiceStrBufs(BtlClientStudioWork *studio) {
@@ -1494,24 +1494,24 @@ static void Studio_FreeChoiceStrBufs(BtlClientStudioWork *studio) {
     }
 }
 
-static BOOL func_ov167_021b2864(BtlClient *client) {
-    const BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+static BOOL Studio_PlayScene(BtlClient *client) {
+    const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
     BtlMainUnk478 *result = func_ov167_0219e3ac(client->mainModule);
-    PokewoodCutin *cutin = func_ov167_0219e3bc(client->mainModule);
+    PokewoodCutin *cutin = GetPokewoodCutin(client->mainModule);
     s16 msgId;
 
     switch (client->studio.seq) {
     case 0:
         client->studio.scene =
-            func_ov167_021b2538(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
-        func_ov167_021b2748(client, rules, client->studio.scene);
-        func_ov167_021b2700(client, rules, client->studio.scene);
-        func_ov167_021d5944();
+            Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
+        Studio_ScoreEndScene(client, rules, client->studio.scene);
+        Studio_DecideEnding(client, rules, client->studio.scene);
+        BtlString_SetStudioWords();
         if (client->studio.scene >= 0) {
-            if (func_ov167_0219c988(client->mainModule) == 2) {
-                u32 value = func_ov167_021b26dc(client);
+            if (GetStudioMode(client->mainModule) == 2) {
+                u32 value = Studio_GetEnding(client);
 
-                if (func_ov167_021d5fe8(rules, client->studio.scene, value, ReturnZero(client->mainModule, 11))) {
+                if (PokewoodCutin_HasCutin(rules, client->studio.scene, value, ReturnZero(client->mainModule, 11))) {
                     client->studio.seq = 25;
                     client->studio.unk0C = -1;
                     break;
@@ -1526,7 +1526,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         }
         break;
     case 1:
-        if (!func_ov167_021b2674(rules, &client->studio)) {
+        if (!Studio_IsStateReached(rules, &client->studio)) {
             client->studio.seq = 2;
         } else {
             if ((rules->scenes[client->studio.scene].messages[0][client->studio.unk04] == -1 &&
@@ -1539,7 +1539,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         }
         break;
     case 2:
-        if (func_ov167_021b2dd8(rules, client)) {
+        if (Studio_UpdateStaging(rules, client)) {
             client->studio.seq = 1;
         }
         break;
@@ -1547,7 +1547,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         msgId = rules->scenes[client->studio.scene].messages[0][client->studio.unk04];
         if (msgId != -1) {
             Btlv_StringParam_Setup(&client->strParam, 8, msgId);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, 24, 8);
         } else {
             client->studio.seq = 8;
@@ -1557,7 +1557,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         msgId = rules->scenes[client->studio.scene].messages[1][client->studio.unk04];
         if (msgId != -1) {
             Btlv_StringParam_Setup(&client->strParam, 8, msgId);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, 24, 1);
         } else {
             client->studio.seq = 1;
@@ -1575,9 +1575,9 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         break;
     case 14:
         if (rules->scenes[client->studio.scene].choices[0].msgId != -1) {
-            if (func_ov167_0219c988(client->mainModule) == 1) {
+            if (GetStudioMode(client->mainModule) == 1) {
                 client->studio.seq = 15;
-                func_ov167_021b2798(client, rules, &client->studio);
+                Studio_StartChoiceSelect(client, rules, &client->studio);
             } else {
                 client->studio.seq = 16;
             }
@@ -1588,32 +1588,32 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
     case 15:
         if (BattleClient_RunSelActProc(client)) {
             Studio_FreeChoiceStrBufs(&client->studio);
-            func_ov167_021b26c4(client, client->studio.scene, client->studio.unk08);
-            func_ov167_021b2cf0(rules, &client->studio, client->studio.scene, client->studio.unk08);
+            Studio_SaveChoice(client, client->studio.scene, client->studio.unk08);
+            Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.unk08);
             result->unk08 = rules->scenes[client->studio.scene].choices[client->studio.unk08].unk04;
-            func_ov167_021b97a4(client, &client->studio.score, client->studio.scene, client->studio.unk08);
-            func_ov167_021b264c(rules, &client->studio);
+            StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.unk08);
+            Studio_SetChoiceField(rules, &client->studio);
             client->studio.seq = 17;
         }
         break;
     case 16:
-        client->studio.unk08 = func_ov167_021b26a8(client, &client->studio);
-        func_ov167_021b2cf0(rules, &client->studio, client->studio.scene, client->studio.unk08);
+        client->studio.unk08 = Studio_GetSavedChoice(client, &client->studio);
+        Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.unk08);
         result->unk08 = rules->scenes[client->studio.scene].choices[client->studio.unk08].unk04;
-        func_ov167_021b97a4(client, &client->studio.score, client->studio.scene, client->studio.unk08);
-        func_ov167_021b264c(rules, &client->studio);
+        StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.unk08);
+        Studio_SetChoiceField(rules, &client->studio);
         client->studio.seq = 17;
         break;
     case 17:
         Btlv_StringParam_Setup(&client->strParam, 8,
                                rules->scenes[client->studio.scene].choices[client->studio.unk08].msgId);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         Studio_SetSeq(&client->studio, 24, 19);
         break;
     case 19:
         Btlv_StringParam_Setup(&client->strParam, 8,
                                rules->scenes[client->studio.scene].choices[client->studio.unk08].msgId2);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         Studio_SetSeq(&client->studio, 24, 21);
         break;
     case 21:
@@ -1628,7 +1628,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         if (client->studio.scene >= 0) {
             client->studio.usedEventMask |= 1 << client->studio.scene;
         }
-        func_ov167_021b2790(&client->studio);
+        Studio_ClearSceneTriggers(&client->studio);
         return TRUE;
     case 23:
         if (!BtlvEffect_IsBusy()) {
@@ -1636,7 +1636,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         }
         break;
     case 24:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             client->studio.seq = client->studio.nextSeq;
         }
         break;
@@ -1649,21 +1649,21 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
         Studio_SetSeq(&client->studio, 23, 27);
         break;
     case 27: {
-        PlayerInfo *info = func_ov167_0219bf68(client->mainModule);
+        PlayerInfo *info = GetPlayerInfo(client->mainModule);
 
-        func_ov167_021d5fe4(cutin, client->viewCore);
-        func_ov167_021d5fc4(cutin, rules, client->studio.scene, func_ov167_021b26a8(client, &client->studio),
+        PokewoodCutin_SetViewCore(cutin, client->viewCore);
+        PokewoodCutin_Start(cutin, rules, client->studio.scene, Studio_GetSavedChoice(client, &client->studio),
                             getTrainerGender(info));
-        client->studio.unk08 = func_ov167_021b26a8(client, &client->studio);
-        func_ov167_021b2cf0(rules, &client->studio, client->studio.scene, client->studio.unk08);
-        func_ov167_021b264c(rules, &client->studio);
+        client->studio.unk08 = Studio_GetSavedChoice(client, &client->studio);
+        Studio_RecordChoice(rules, &client->studio, client->studio.scene, client->studio.unk08);
+        Studio_SetChoiceField(rules, &client->studio);
         client->studio.seq++;
         break;
     }
     case 28:
-        func_ov167_021d5e90(cutin);
-        if (func_ov167_021d5fc0(cutin)) {
-            func_ov167_021b97a4(client, &client->studio.score, client->studio.scene, client->studio.unk08);
+        PokewoodCutin_Main(cutin);
+        if (PokewoodCutin_IsDone(cutin)) {
+            StudioScore_AddChoicePoints(client, &client->studio.score, client->studio.scene, client->studio.unk08);
             client->studio.seq = 29;
         }
         break;
@@ -1679,7 +1679,7 @@ static BOOL func_ov167_021b2864(BtlClient *client) {
     return FALSE;
 }
 
-static void func_ov167_021b2cf0(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 scene, u32 value) {
+static void Studio_RecordChoice(const BtlScriptedRules *rules, BtlClientStudioWork *studio, s32 scene, u32 value) {
     const BtlStudioScene *s = &rules->scenes[scene];
     if (s->unk00 != -1 || s->unk02 != -1 || (u16)s->unk04 > 1) {
         studio->unk10 = value + 1;
@@ -1730,15 +1730,15 @@ static s32 Studio_GetNextState(BtlClientStudioWork *studio, s32 event) {
     return next;
 }
 
-static void func_ov167_021b2dd0(BtlClientStudioWork *studio, u8 nextSeq) {
+static void Studio_SetStagingWait(BtlClientStudioWork *studio, u8 nextSeq) {
     studio->unk02 = 9;
     studio->unk03 = nextSeq;
 }
 
-static BOOL func_ov167_021b2dd8(const BtlScriptedRules *rules, BtlClient *client) {
+static BOOL Studio_UpdateStaging(const BtlScriptedRules *rules, BtlClient *client) {
     switch (client->studio.unk02) {
     case 0:
-        if (func_ov167_021b2674(rules, &client->studio)) {
+        if (Studio_IsStateReached(rules, &client->studio)) {
             client->studio.unk02 = 10;
         } else {
             client->studio.unk02 =
@@ -1746,50 +1746,50 @@ static BOOL func_ov167_021b2dd8(const BtlScriptedRules *rules, BtlClient *client
         }
         break;
     case 1:
-        BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                              0, 0);
+        BtlvEffect_SetTrainer(
+            GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 9, 0, 0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = (client->studio.unk2C & 0xf) | 0x10;
         break;
     case 2:
         BtlvEffect_Start(0x294);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = (client->studio.unk2C & 0xf0) | 0x01;
         break;
     case 3:
         BtlvEffect_Start(0x299);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = client->studio.unk2C & 0xf;
         break;
     case 4:
         BtlvEffect_Start(0x295);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = client->studio.unk2C & 0xf0;
         break;
     case 5:
         BtlvEffect_Start(0x29a);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = (client->studio.unk2C & 0xf) | 0x20;
         break;
     case 6:
         BtlvEffect_Start(0x29b);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = (client->studio.unk2C & 0xf0) | 0x02;
         break;
     case 7:
-        BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                              0, 0);
+        BtlvEffect_SetTrainer(
+            GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 9, 0, 0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         BtlvEffect_Start(0x29c);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = (client->studio.unk2C & 0xf) | 0x10;
         break;
     case 8:
         BtlvEffect_Start(0x29d);
-        func_ov167_021b2dd0(&client->studio, 0);
+        Studio_SetStagingWait(&client->studio, 0);
         client->studio.unk2C = (client->studio.unk2C & 0xf0) | 0x01;
         break;
     case 9:
@@ -1816,12 +1816,12 @@ static s16 StudioRules_GetTurnEvent(const BtlScriptedRules *rules, u8 turn) {
     return -1;
 }
 
-static BOOL func_ov167_021b2fb8(BtlClient *client) {
-    const BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+static BOOL Studio_ChangeField(BtlClient *client) {
+    const BtlScriptedRules *rules = GetStudioRules(client->mainModule);
 
     switch (client->studio.seq) {
     case 0:
-        if (func_ov167_0219c988(client->mainModule) != 2) {
+        if (GetStudioMode(client->mainModule) != 2) {
             return TRUE;
         }
         if (client->studio.unk0C < 0) {
@@ -1863,7 +1863,7 @@ static BOOL func_ov167_021b2fb8(BtlClient *client) {
 
 static u32 Studio_GetResultMsgId(BtlClient *client, const BtlScriptedRules *rules, BtlSetup *setup) {
     u32 msgId;
-    s32 scene = func_ov167_021b2538(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
+    s32 scene = Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
     s16 value = rules->scenes[scene].unk0A;
     u8 rank = data_ov167_021d6eb4[setup->unk110[0x19]];
 
@@ -1877,14 +1877,14 @@ static u32 Studio_GetResultMsgId(BtlClient *client, const BtlScriptedRules *rule
     return msgId;
 }
 
-static BOOL func_ov167_021b3100(BtlClient *client) {
+static BOOL Studio_ShowResult(BtlClient *client) {
     BtlSetup *setup;
     const BtlScriptedRules *rules;
 
     switch (client->studio.seq) {
     case 0:
-        setup = func_ov167_0219e310(client->mainModule);
-        rules = func_ov167_0219e39c(client->mainModule);
+        setup = GetBattleSetupParam(client->mainModule);
+        rules = GetStudioRules(client->mainModule);
         if (GetBattleResultForClient(client) == 1) {
             client->turnCount = 100;
         } else {
@@ -1898,8 +1898,8 @@ static BOOL func_ov167_021b3100(BtlClient *client) {
         Studio_SetSeq(&client->studio, 8, 3);
         break;
     case 3:
-        BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                              0, 0);
+        BtlvEffect_SetTrainer(
+            GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 9, 0, 0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         Studio_SetSeq(&client->studio, 8, 4);
@@ -1911,7 +1911,7 @@ static BOOL func_ov167_021b3100(BtlClient *client) {
     case 5:
         if (client->studio.msgId1 >= 0) {
             Btlv_StringParam_Setup(&client->strParam, 9, client->studio.msgId1);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, 7, 9);
         } else {
             client->studio.seq = 6;
@@ -1920,14 +1920,14 @@ static BOOL func_ov167_021b3100(BtlClient *client) {
     case 6:
         if (client->studio.msgId2 >= 0) {
             Btlv_StringParam_Setup(&client->strParam, 8, client->studio.msgId2);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             Studio_SetSeq(&client->studio, 7, 9);
         } else {
             client->studio.seq = 9;
         }
         break;
     case 7:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             client->studio.seq = client->studio.nextSeq;
         }
         break;
@@ -1953,17 +1953,17 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
             SetNullReturnAction(client);
             return TRUE;
         }
-        action = func_ov167_021d46a4(client->recReader, client->clientId, &count, &chapter);
+        action = BtlRecReader_ReadActions(client->recReader, client->clientId, &count, &chapter);
         if (chapter) {
-            func_ov167_021b9368(&client->recPlayer);
+            RecPlayer_ReachChapter(&client->recPlayer);
         }
         client->returnData = action;
         client->returnDataSize = count * 4;
         if (action->bits.action == 8) {
-            func_ov167_021b93e4(&client->recPlayer);
+            RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0xb7);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = 1;
             } else {
                 SetNullReturnAction(client);
@@ -1972,10 +1972,10 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
             }
         } else if (action->bits.action == 9) {
             client->unk1BA_5 = TRUE;
-            func_ov167_021b93e4(&client->recPlayer);
+            RecPlayer_SetDataEnd(&client->recPlayer);
             if (client->viewCore != NULL) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0xb8);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = 2;
             } else {
                 SetNullReturnAction(client);
@@ -1990,20 +1990,20 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         break;
     }
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             SetNullReturnAction(client);
             client->unk1BA_4 = TRUE;
             return TRUE;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             SetNullReturnAction(client);
             return TRUE;
         }
         break;
     case 3:
-        if (func_ov167_0219c988(client->mainModule) == 0) {
+        if (GetStudioMode(client->mainModule) == 0) {
             client->studio.seq = 0;
             return TRUE;
         }
@@ -2019,21 +2019,21 @@ static BOOL RecPlaySelectActionCore(BtlClient *client, s32 *seq, BOOL arg2) {
         }
         break;
     case 4:
-        if (func_ov167_021b2864(client)) {
+        if (Studio_PlayScene(client)) {
             client->studio.seq = 0;
             *seq = 5;
         }
         break;
     case 5:
-        if (func_ov167_021b2fb8(client)) {
+        if (Studio_ChangeField(client)) {
             client->studio.seq = 0;
             client->turnCount++;
             *seq = 6;
         }
         break;
     case 6:
-        if (func_ov167_021b23e4(client)) {
-            client->studio.unk24 = func_ov167_021b19a4(client);
+        if (Studio_PlayTurnMessages(client)) {
+            client->studio.unk24 = BattleClient_GetFirstActionMove(client);
             return TRUE;
         }
         break;
@@ -2059,14 +2059,14 @@ static BOOL BattleClient_ActionSelectInit(BtlClient *client, s32 *seq) {
     client->prevActionIdx = -1;
     client->firstActionIdx = 0;
     client->escapeSelected = FALSE;
-    func_ov167_021b5d7c(client, 0, client->numCoverPos, &client->pokeListCmd, &client->pokeSelect);
+    BattleClient_SetupPokeSelect(client, 0, client->numCoverPos, &client->pokeListCmd, &client->pokeSelect);
     shooterWork_Init(client);
     selItemWork_Init(client);
     for (i = 0; i < 3; i++) {
         BattleAction_SetNull(&client->actions[i]);
     }
     for (i = 0; i < client->numCoverPos; i++) {
-        if (!AutoSelectAction(client, func_ov167_0219d1e8(client->pokeCon, client->clientId, i), NULL)) {
+        if (!AutoSelectAction(client, PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, i), NULL)) {
             client->firstActionIdx = i;
             break;
         }
@@ -2075,8 +2075,8 @@ static BOOL BattleClient_ActionSelectInit(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static void func_ov167_021b350c(BtlClient *client, const BtlvStringParam *param) {
-    func_ov167_021d01ec(client->viewCore, param);
+static void BattleClient_ShowSelectMsg(BtlClient *client, const BtlvStringParam *param) {
+    BtlvCore_StartMsg(client->viewCore, param);
     client->forceActionMsg = TRUE;
 }
 
@@ -2089,7 +2089,7 @@ static BOOL BattleClient_ActionForceQuit(BtlClient *client, s32 *seq) {
     case 1:
         if (BattleClientCmd_ForceQuitInputWait(client->viewCore)) {
             for (; client->procActionIdx < client->numCoverPos; client->procActionIdx++) {
-                client->procMon = func_ov167_0219d1e8(client->pokeCon, client->clientId, client->procActionIdx);
+                client->procMon = PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, client->procActionIdx);
                 client->procAction = &client->actions[client->procActionIdx];
                 BattleAction_SetNull(client->procAction);
                 if (!AutoSelectAction(client, client->procMon, client->procAction)) {
@@ -2120,7 +2120,7 @@ static BOOL BattleClient_ActionForceQuit(BtlClient *client, s32 *seq) {
 static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
-        client->procMon = func_ov167_0219d1e8(client->pokeCon, client->clientId, client->procActionIdx);
+        client->procMon = PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, client->procActionIdx);
         client->procAction = &client->actions[client->procActionIdx];
         client->extraActionCount = 0;
         BattleAction_SetNull(client->procAction);
@@ -2134,8 +2134,8 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         break;
     case 1:
         if (client->prevActionIdx != client->procActionIdx || client->forceActionMsg) {
-            func_ov167_021b2110(client, client->procMon, &client->strParam);
-            func_ov167_021d0234(client->viewCore, &client->strParam);
+            BattleClient_SetActionPromptMsg(client, client->procMon, &client->strParam);
+            BtlvCore_PrintMsg(client->viewCore, &client->strParam);
             client->forceActionMsg = FALSE;
             client->prevActionIdx = client->procActionIdx;
             (*seq)++;
@@ -2144,25 +2144,25 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         }
         break;
     case 2:
-        if (!func_ov167_021d02e8(client->viewCore)) {
+        if (!BtlvCore_WaitMsg(client->viewCore)) {
             return FALSE;
         }
         (*seq)++;
         // fallthrough
     case 3:
-        func_ov167_021cefec(client->viewCore, client->procMon, client->procActionIdx > client->firstActionIdx,
-                            client->procAction);
+        BtlvCore_StartCommandSelect(client->viewCore, client->procMon, client->procActionIdx > client->firstActionIdx,
+                                    client->procAction);
         (*seq)++;
         break;
     case 4:
         if (CheckActionSelectForceQuit(client, BattleClient_ActionForceQuit)) {
-            func_ov167_021cf028(client->viewCore);
+            BtlvCore_StopCommandSelect(client->viewCore);
             return FALSE;
         }
-        switch (func_ov167_021cf030(client->viewCore)) {
+        switch (BtlvCore_WaitCommandSelect(client->viewCore)) {
         case 3:
             if (CheckCondition(client->procMon, 0x21)) {
-                func_ov167_021cf1f0(client->viewCore);
+                BtlvCore_ResetScreen(client->viewCore);
                 *seq = 6;
             } else {
                 shooterWork_SetCost(client, client->procActionIdx, 0);
@@ -2177,10 +2177,10 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             if (CheckCondition(client->procMon, 0x21)) {
                 *seq = 6;
             } else if (client->bagMode == 1 && !func_ov167_0219db08(client->mainModule)) {
-                func_ov167_021cf1f0(client->viewCore);
+                BtlvCore_ResetScreen(client->viewCore);
                 *seq = 5;
-            } else if (func_ov167_0219c988(client->mainModule) == 1) {
-                BattleClient_SetSelActProc(client, func_ov167_021b4168);
+            } else if (GetStudioMode(client->mainModule) == 1) {
+                BattleClient_SetSelActProc(client, BattleClient_ActionViewScript);
             } else {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectItem);
             }
@@ -2196,9 +2196,9 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
             } else {
                 while (client->procActionIdx != 0) {
                     client->procActionIdx--;
-                    if (!AutoSelectAction(client,
-                                          func_ov167_0219d1e8(client->pokeCon, client->clientId, client->procActionIdx),
-                                          NULL)) {
+                    if (!AutoSelectAction(
+                            client, PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, client->procActionIdx),
+                            NULL)) {
                         client->shooterEnergy += shooterWork_GetCost(client, client->procActionIdx);
                         if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 3) {
                             PokeSelect_Pop(&client->pokeSelect);
@@ -2215,24 +2215,24 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
         }
         break;
     case 5:
-        if (func_ov167_021cf200(client->viewCore)) {
+        if (BtlvCore_IsScreenIdle(client->viewCore)) {
             *seq = 3;
         }
         break;
     case 6:
-        func_ov167_021cf1e0(client->viewCore);
+        BtlvCore_ResetScreenIfShown(client->viewCore);
         (*seq)++;
         break;
     case 7:
-        if (func_ov167_021cf200(client->viewCore)) {
+        if (BtlvCore_IsScreenIdle(client->viewCore)) {
             Btlv_StringParam_Setup(&client->strParam, 1, 0xc5);
             Btlv_StringParam_AddArg(&client->strParam, GetMonID(client->procMon));
-            func_ov167_021b350c(client, &client->strParam);
+            BattleClient_ShowSelectMsg(client, &client->strParam);
             (*seq)++;
         }
         break;
     case 8:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 1;
         }
         break;
@@ -2243,13 +2243,13 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
 static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0: {
-        u8 clientId = func_ov167_0219c8b8(client->mainModule, 0);
-        u16 trainerId = func_ov167_0219d91c(client->mainModule, clientId);
-        BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, clientId), 9, 0, 0, 0);
+        u8 clientId = GetPlayerOpponentClientID(client->mainModule, 0);
+        u16 trainerId = GetClientTrainerID(client->mainModule, clientId);
+        BtlvEffect_SetTrainer(GetClientTrainerClass(client->mainModule, clientId), 9, 0, 0, 0);
         BtlvEffect_Start(0x270);
-        func_ov167_021d0288(client->viewCore, trainerId, client->hintMsgId);
+        BtlvCore_StartMsgTrainer(client->viewCore, trainerId, client->hintMsgId);
         if ((client->hintMsgId == 19 || client->hintMsgId == 20) &&
-            func_ov167_021bd760(func_ov167_0219d938(client->mainModule, clientId)) && !client->unk1BA_0) {
+            BtlCalc_IsGymLeaderClass(GetClientTrainerClass(client->mainModule, clientId)) && !client->unk1BA_0) {
             BtlvEffect_ReserveBgm(0x47b);
             if (!BtlvEffect_IsPinchBgm()) {
                 GFL_SndBGMFadeOut(8);
@@ -2268,7 +2268,7 @@ static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq) {
         }
         break;
     case 2:
-        if (!BtlvEffect_IsBusy() && func_ov167_021d02e8(client->viewCore)) {
+        if (!BtlvEffect_IsBusy() && BtlvCore_WaitMsg(client->viewCore)) {
             BtlvEffect_Start(0x271);
             (*seq)++;
         }
@@ -2295,17 +2295,17 @@ static BOOL CheckTrainerHintMsg(BtlClient *client, u16 *msgId) {
 
     if (BtlSetup_GetBattleType(client->mainModule) == 1) {
         i = 0;
-        clientId = func_ov167_0219c8b8(client->mainModule, 0);
-        trainerId = func_ov167_0219d91c(client->mainModule, clientId);
+        clientId = GetPlayerOpponentClientID(client->mainModule, 0);
+        trainerId = GetClientTrainerID(client->mainModule, clientId);
 
         if (trainerId != 0) {
             party = GetPartyData(client->pokeCon, clientId);
-            mon = func_ov167_0219d1e8(client->pokeCon, clientId, i);
+            mon = PokeCon_GetClientPartyMon(client->pokeCon, clientId, i);
 
             if (IsFainted(mon)) {
                 count = GetClientBattlerCount(client->mainModule, clientId);
                 for (i = 1; i < count; i++) {
-                    mon = func_ov167_0219d1e8(client->pokeCon, clientId, i);
+                    mon = PokeCon_GetClientPartyMon(client->pokeCon, clientId, i);
                     if (!IsFainted(mon)) {
                         break;
                     }
@@ -2372,19 +2372,19 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
         }
         break;
     case 1:
-        func_ov167_021cf048(client->viewCore, client->procMon, client->procAction);
+        BtlvCore_StartMoveSelect(client->viewCore, client->procMon, client->procAction);
         *seq = 3;
         break;
     case 2:
-        func_ov167_021cf094(client->viewCore, &client->rotationParam, client->procAction);
+        BtlvCore_StartRotationSelect(client->viewCore, &client->rotationParam, client->procAction);
         *seq = 3;
         break;
     case 3:
         if (CheckActionSelectForceQuit(client, BattleClient_ActionForceQuit)) {
-            func_ov167_021cf138(client->viewCore);
+            BtlvCore_StopMoveSelect(client->viewCore);
             return FALSE;
         }
-        if (func_ov167_021cf140(client->viewCore)) {
+        if (BtlvCore_WaitMoveSelect(client->viewCore)) {
             u32 action = BattleAction_GetAction(client->procAction);
             if (action == 0) {
                 BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
@@ -2398,26 +2398,26 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
 
                 if (BtlSetup_GetBattleStyle(client->mainModule) == BTL_STYLE_ROTATION) {
                     rotatePos = client->rotationParam.rotateAction.bits.target;
-                    pos = func_ov167_0219d38c(rotatePos);
+                    pos = GetRotationInSlot(rotatePos);
                     mon = client->rotationParam.mons[pos].mon;
                 }
-                if (func_ov167_021bdb54(procAction)) {
+                if (BattleAction_GetMoveInfoFlag(procAction)) {
                     client->moveInfoPos = pos;
-                    client->moveInfoIdx = func_ov167_021baf78(mon, procAction->bits.move);
+                    client->moveInfoIdx = BattleMon_FindMoveSlot(mon, procAction->bits.move);
                     if (client->moveInfoIdx != 4) {
                         BattleClient_SetSelActProc(client, BattleClient_ActionViewMoveInfo);
                         return FALSE;
                     }
                 }
                 if (IsUnselectableMove(client, mon, procAction->bits.move, &client->strParam)) {
-                    func_ov167_021d0b4c(&client->strParam, 0xff);
-                    func_ov167_021b350c(client, &client->strParam);
+                    Btlv_StringParam_SetWait(&client->strParam, 0xff);
+                    BattleClient_ShowSelectMsg(client, &client->strParam);
                     *seq = 7;
                 } else {
                     if (BtlSetup_GetBattleStyle(client->mainModule) == BTL_STYLE_ROTATION && rotatePos != 0 &&
                         rotatePos != 1 && !IsFainted(mon)) {
-                        u16 move = func_ov167_021bdb68(&client->rotationParam.action);
-                        func_ov167_021bdc24(client->procAction++, rotatePos);
+                        u16 move = BattleAction_GetFightMove(&client->rotationParam.action);
+                        BattleAction_SetRotationParam(client->procAction++, rotatePos);
                         BattleAction_SetFightParam(client->procAction, move, 6);
                         client->extraActionCount++;
                     }
@@ -2427,23 +2427,23 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
         }
         break;
     case 4:
-        if (func_ov167_021bd718(BtlSetup_GetBattleStyle(client->mainModule))) {
+        if (BtlCalc_IsDoubleOrTripleStyle(BtlSetup_GetBattleStyle(client->mainModule))) {
             *seq = 5;
         } else {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
         }
         break;
     case 5:
-        func_ov167_021cf148(client->viewCore, client->procMon, client->procAction);
+        BtlvCore_StartTargetSelect(client->viewCore, client->procMon, client->procAction);
         *seq = 6;
         break;
     case 6: {
         u32 result;
         if (CheckActionSelectForceQuit(client, BattleClient_ActionForceQuit)) {
-            func_ov167_021cf1ac(client->viewCore);
+            BtlvCore_StopTargetSelect(client->viewCore);
             return FALSE;
         }
-        result = func_ov167_021cf174(client->viewCore);
+        result = BtlvCore_WaitTargetSelect(client->viewCore);
         if (result == 1) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
         } else if (result == 2) {
@@ -2452,8 +2452,8 @@ static BOOL BattleClient_ActionSelectFight(BtlClient *client, s32 *seq) {
         break;
     }
     case 7:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            func_ov167_021cf0e4(client->viewCore);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            BtlvCore_ResumeMoveSelect(client->viewCore);
             *seq = 3;
         }
         break;
@@ -2534,7 +2534,7 @@ static BOOL BattleClient_ActionSwitchPokemon(BtlClient *client, s32 *seq) {
             if (!PokeSelect_IsSelecting(&client->pokeSelect)) {
                 u8 slot = PokeSelect_GetLast(&client->pokeSelect);
                 if (slot < 6) {
-                    func_ov167_021bdbbc(client->procAction, client->procActionIdx, slot);
+                    BattleAction_SetChangeParam(client->procAction, client->procActionIdx, slot);
                     BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
                     break;
                 }
@@ -2564,16 +2564,16 @@ static BOOL BattleClient_ActionSelectItem(BtlClient *client, s32 *seq) {
     }
     case 1:
         if (CheckActionSelectForceQuit(client, NULL)) {
-            func_ov167_021cf72c(client->viewCore);
+            BtlvCore_QuitItemSelect(client->viewCore);
             *seq = 2;
             return FALSE;
         }
-        if (func_ov167_021cf73c(client->viewCore)) {
-            u16 item = func_ov167_021cf8d8(client->viewCore);
-            u16 target = func_ov167_021cf900(client->viewCore);
+        if (BtlvCore_WaitItemSelect(client->viewCore)) {
+            u16 item = BtlvCore_GetSelectedItem(client->viewCore);
+            u16 target = BtlvCore_GetSelectedPartyIndex(client->viewCore);
             if (item != 0 && target != 6) {
-                u8 cost = func_ov167_021cf8ec(client->viewCore);
-                u32 param = func_ov167_021cf908(client->viewCore);
+                u8 cost = BtlvCore_GetItemCost(client->viewCore);
+                u32 param = BtlvCore_GetSelectedMoveSlot(client->viewCore);
                 if (client->shooterEnergy >= cost) {
                     client->shooterEnergy -= cost;
                 } else {
@@ -2581,8 +2581,8 @@ static BOOL BattleClient_ActionSelectItem(BtlClient *client, s32 *seq) {
                     cost = client->shooterEnergy;
                 }
                 shooterWork_SetCost(client, client->procActionIdx, cost);
-                func_ov167_021bdb80(client->procAction, item, target, param);
-                func_ov167_021cf914(client->viewCore);
+                BattleAction_SetItemParam(client->procAction, item, target, param);
+                BtlvCore_SaveBagCursor(client->viewCore);
                 if (ItemGetParam(item, 15) == 4) {
                     client->escapeSelected = TRUE;
                 }
@@ -2594,7 +2594,7 @@ static BOOL BattleClient_ActionSelectItem(BtlClient *client, s32 *seq) {
         }
         break;
     case 2:
-        if (func_ov167_021cf73c(client->viewCore)) {
+        if (BtlvCore_WaitItemSelect(client->viewCore)) {
             BattleClient_SetSelActProc(client, BattleClient_ActionForceQuit);
         }
         break;
@@ -2602,24 +2602,24 @@ static BOOL BattleClient_ActionSelectItem(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b4168(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ActionViewScript(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_021cf95c(client->viewCore, client->turnCount);
+        BtlvCore_StartScenario(client->viewCore, client->turnCount);
         (*seq)++;
         break;
     case 1:
         if (CheckActionSelectForceQuit(client, NULL)) {
-            func_ov167_021cf9c0(client->viewCore);
+            BtlvCore_QuitScenario(client->viewCore);
             *seq = 2;
             return FALSE;
         }
-        if (func_ov167_021cf9cc(client->viewCore)) {
+        if (BtlvCore_WaitScenario(client->viewCore)) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
         }
         break;
     case 2:
-        if (func_ov167_021cf9cc(client->viewCore)) {
+        if (BtlvCore_WaitScenario(client->viewCore)) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
         }
         break;
@@ -2627,14 +2627,14 @@ static BOOL func_ov167_021b4168(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b41d4(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ActionSelectStudioChoice(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_021cfaec(client->viewCore);
+        BtlvCore_StartChoice(client->viewCore);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cfb40(client->viewCore)) {
+        if (BtlvCore_WaitChoice(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -2646,7 +2646,7 @@ static BOOL IsPokeBallTargetHiding(BtlClient *client) {
     if (BtlSetup_GetBattleType(client->mainModule) == 0) {
         BattleParty *party = GetClientParty(client->pokeCon, 1);
         u32 numMons = GetNumMonsInParty(party);
-        u32 numFront = func_ov167_0219be8c(client->mainModule);
+        u32 numFront = GetActivePosCount(client->mainModule);
         BOOL hiding;
         u32 i;
         u32 alive;
@@ -2691,50 +2691,50 @@ static BOOL BattleClient_ActionSelectEscape(BtlClient *client, s32 *seq) {
                 } else {
                     Btlv_StringParam_Setup(&client->strParam, 1, 0x4a);
                 }
-                func_ov167_021b350c(client, &client->strParam);
+                BattleClient_ShowSelectMsg(client, &client->strParam);
                 *seq = 1;
             }
             break;
         case 1:
             Btlv_StringParam_Setup(&client->strParam, 1, 0x4c);
-            func_ov167_021b350c(client, &client->strParam);
+            BattleClient_ShowSelectMsg(client, &client->strParam);
             *seq = 1;
             break;
         case 2:
             Btlv_StringParam_Setup(&client->strParam, 1, 0x4d);
-            func_ov167_021d0b4c(&client->strParam, 0xff);
-            func_ov167_021b350c(client, &client->strParam);
+            Btlv_StringParam_SetWait(&client->strParam, 0xff);
+            BattleClient_ShowSelectMsg(client, &client->strParam);
             *seq = 3;
             break;
         }
         break;
     }
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            func_ov167_021b2110(client, client->procMon, &client->strParam);
-            func_ov167_021d0234(client->viewCore, &client->strParam);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            BattleClient_SetActionPromptMsg(client, client->procMon, &client->strParam);
+            BtlvCore_PrintMsg(client->viewCore, &client->strParam);
             *seq = 2;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             BattleClient_SetSelActProc(client, BattleClient_ActionSelectRoot);
         }
         break;
     case 3:
-        func_ov167_021d02e8(client->viewCore);
-        if (func_ov167_021d02f8(client->viewCore)) {
+        BtlvCore_WaitMsg(client->viewCore);
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             Btlv_StringParam_Setup(&client->strParam, 3, 8);
             Btlv_StringParam_Setup(&client->strParam2, 3, 9);
-            func_ov167_021d0798(client->viewCore, &client->strParam, &client->strParam2, 1);
+            BtlvCore_ShowYesNo(client->viewCore, &client->strParam, &client->strParam2, 1);
             *seq = 4;
         }
         break;
     case 4:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             u32 result;
 
-            if (func_ov167_021d0828(client->viewCore, &result)) {
+            if (BtlvCore_PollYesNo(client->viewCore, &result)) {
                 if (result == 0) {
                     *seq = 5;
                 } else {
@@ -2746,7 +2746,7 @@ static BOOL BattleClient_ActionSelectEscape(BtlClient *client, s32 *seq) {
         }
         break;
     case 5:
-        func_ov167_021bdc3c(client->procAction);
+        BattleAction_SetEscape(client->procAction);
         client->escapeSelected = TRUE;
         BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
         break;
@@ -2757,11 +2757,11 @@ static BOOL BattleClient_ActionSelectEscape(BtlClient *client, s32 *seq) {
 static BOOL BattleClient_ActionSelectAutoRest(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_021cf1f0(client->viewCore);
+        BtlvCore_ResetScreen(client->viewCore);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cf200(client->viewCore)) {
+        if (BtlvCore_IsScreenIdle(client->viewCore)) {
             client->procActionIdx++;
             if (client->procActionIdx < client->numCoverPos) {
                 if (!client->escapeSelected) {
@@ -2769,7 +2769,8 @@ static BOOL BattleClient_ActionSelectAutoRest(BtlClient *client, s32 *seq) {
                     break;
                 }
                 while (client->procActionIdx < client->numCoverPos) {
-                    BattleMon *mon = func_ov167_0219d1e8(client->pokeCon, client->clientId, client->procActionIdx);
+                    BattleMon *mon =
+                        PokeCon_GetClientPartyMon(client->pokeCon, client->clientId, client->procActionIdx);
                     if (!AutoSelectAction(client, mon, &client->actions[client->procActionIdx])) {
                         BattleAction_SetNull(&client->actions[client->procActionIdx]);
                     }
@@ -2793,22 +2794,22 @@ static BOOL BattleClient_ActionSelectFinish(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
         selItemWork_Quit(client);
-        if (func_ov167_0219bee4(client->mainModule)) {
+        if (GetCommMode(client->mainModule)) {
             client->waitMsgShown = TRUE;
-            func_ov167_021d03d4(client->viewCore);
+            BtlvCore_StartWaitMsg(client->viewCore);
             (*seq)++;
         } else {
             *seq += 2;
         }
         break;
     case 1:
-        if (func_ov167_021d03ec(client->viewCore)) {
+        if (BtlvCore_IsWaitMsgDone(client->viewCore)) {
             (*seq)++;
         }
         break;
     case 2:
         if (!BtlvEffect_IsBusy()) {
-            func_ov167_021b20f8(client);
+            BattleClient_HideCmdLimitTimer(client);
             (*seq)++;
             return TRUE;
         }
@@ -2898,7 +2899,7 @@ static BOOL AutoSelectAction(BtlClient *client, BattleMon *mon, BattleAction *ac
     if (CheckCondition(mon, 26)) {
         u16 move = GetPreviousMoveID(mon);
         u8 target = GetPrevTargetPos(mon);
-        func_ov167_021baf78(mon, move);
+        BattleMon_FindMoveSlot(mon, move);
         if (action != NULL) {
             BattleAction_SetFightParam(action, move, target);
         }
@@ -3080,8 +3081,8 @@ static u32 CheckEscapeBlocked(BtlClient *client, u8 *trapMonId, u16 *trapAbility
 static u32 IsMonTrapped(BtlClient *client, BattleMon *mon, u8 *trapMonId, u16 *trapAbility) {
     u8 monIds[4];
     u8 count =
-        func_ov167_0219c5a4(client->mainModule, client->pokeCon,
-                            0x100 | MonIDToBattlePos(client->mainModule, client->pokeCon, GetMonID(mon)), monIds);
+        ExpandPosFlagsToMonIDs(client->mainModule, client->pokeCon,
+                               0x100 | MonIDToBattlePos(client->mainModule, client->pokeCon, GetMonID(mon)), monIds);
     u8 i;
     for (i = 0; i < count; i++) {
         BattleMon *opponent = GetPokeParam(client->pokeCon, monIds[i]);
@@ -3244,7 +3245,7 @@ static BOOL AISwitchChecks(BtlClient *client, BattleMon *mon, u8 index, u8 *slot
 
 static BattleMon *PickRandomOpponent(BtlClient *client, u8 pos) {
     u8 monIds[4];
-    u8 count = func_ov167_0219c5a4(client->mainModule, client->pokeCon, 0x100 | pos, monIds);
+    u8 count = ExpandPosFlagsToMonIDs(client->mainModule, client->pokeCon, 0x100 | pos, monIds);
     if (count != 0) {
         u8 index = MATH_Rand32(&client->aiRand, count);
         return GetPokeParam(client->pokeCon, monIds[index]);
@@ -3255,8 +3256,8 @@ static BattleMon *PickRandomOpponent(BtlClient *client, u8 pos) {
 static BOOL ShouldSwitchIfPerishSongLastTurn(BtlClient *client, BattleMon *mon) {
     if (CheckCondition(mon, CONDITION_PERISH_SONG)) {
         BattleConditionCont cont = GetConditionContinuationParam(mon, CONDITION_PERISH_SONG);
-        u8 turns = func_ov167_021ce33c(cont);
-        u8 count = func_ov167_021bbb1c(mon, CONDITION_PERISH_SONG);
+        u8 turns = Condition_GetTurns(cont);
+        u8 count = BattleMon_GetConditionTurnCount(mon, CONDITION_PERISH_SONG);
         if (count + 1 == turns) {
             return TRUE;
         }
@@ -3285,7 +3286,7 @@ static BOOL ShouldSwitchIfNoEffectiveMoves(BtlClient *client, BattleMon *mon, Ba
     for (i = 0; i < moveCount; i++) {
         u16 move = MoveGetID(mon, i);
         if (PML_MoveIsDamaging(move)) {
-            if (func_ov167_021bd1b0(PML_MoveGetType(move), targetType) != TYPE_EFFECTIVENESS_IMMUNE) {
+            if (BtlCalc_GetTypePairEffectiveness(PML_MoveGetType(move), targetType) != TYPE_EFFECTIVENESS_IMMUNE) {
                 return FALSE;
             }
             damaging++;
@@ -3312,7 +3313,8 @@ static BOOL ShouldSwitchIfChoicedIntoIneffectiveMove(BtlClient *client, BattleMo
         if (move != 0) {
             BOOL isDamaging = PML_MoveIsDamaging(move);
             u8 type = PML_MoveGetType(move);
-            if (func_ov167_021bd1b0(type, GetPokeType(target)) == TYPE_EFFECTIVENESS_IMMUNE && isDamaging) {
+            if (BtlCalc_GetTypePairEffectiveness(type, GetPokeType(target)) == TYPE_EFFECTIVENESS_IMMUNE &&
+                isDamaging) {
                 if (CheckIfMonToSwitchToWithSEMove(client, target, TYPE_EFFECTIVENESS_DOUBLE)) {
                     return MATH_Rand32(&client->aiRand, 3) < 2;
                 }
@@ -3412,7 +3414,7 @@ static BOOL FinalSwitchChecks(BtlClient *client, BattleMon *mon, BattleMon *targ
             if (!IsAISwitchReserved(client, i)) {
                 BattleMon *candidate = GetBattleMonFromParty(client->party, i);
                 if (DoesMonHaveSuperEffectiveMove(client, candidate, target, TYPE_EFFECTIVENESS_DOUBLE)) {
-                    s32 effectiveness = func_ov167_021bd1b0(record.type, GetPokeType(candidate));
+                    s32 effectiveness = BtlCalc_GetTypePairEffectiveness(record.type, GetPokeType(candidate));
                     if (effectiveness == TYPE_EFFECTIVENESS_IMMUNE) {
                         if (MATH_Rand32(&client->aiRand, 2) == 0) {
                             *slot = i;
@@ -3477,7 +3479,7 @@ static BOOL FindPartyMonResistingType(BtlClient *client, u8 moveType, s32 maxEff
     for (i = GetNumMonsOnField(BtlSetup_GetBattleStyle(client->mainModule), client->numCoverPos); i < count; i++) {
         if (!IsAISwitchReserved(client, i)) {
             mon = GetBattleMonFromParty(client->party, i);
-            if (CanPokemonBattle(mon) && func_ov167_021bd1b0(moveType, GetPokeType(mon)) <= maxEffect) {
+            if (CanPokemonBattle(mon) && BtlCalc_GetTypePairEffectiveness(moveType, GetPokeType(mon)) <= maxEffect) {
                 *partyIdx = i;
                 return TRUE;
             }
@@ -3499,7 +3501,7 @@ static BOOL DoesMonHaveSuperEffectiveMove(BtlClient *client, BattleMon *attacker
             move = MoveGetID(attacker, i);
             if (GetMovePP(attacker, i) != 0 && PML_MoveIsDamaging(move) &&
                 !IsUnselectableMove(client, attacker, move, NULL) &&
-                func_ov167_021bd1b0(PML_MoveGetType(move), types) >= minEffect) {
+                BtlCalc_GetTypePairEffectiveness(PML_MoveGetType(move), types) >= minEffect) {
                 return TRUE;
             }
         }
@@ -3513,10 +3515,10 @@ static u8 AIPickRotationPos(BtlClient *client) {
     u32 count = 1;
 
     positions[0] = 1;
-    if (!IsFainted(GetPartyMonAt(client, func_ov167_0219d38c(2)))) {
+    if (!IsFainted(GetPartyMonAt(client, GetRotationInSlot(2)))) {
         positions[count++] = 2;
     }
-    if (!IsFainted(GetPartyMonAt(client, func_ov167_0219d38c(3)))) {
+    if (!IsFainted(GetPartyMonAt(client, GetRotationInSlot(3)))) {
         positions[count++] = 3;
     }
     if (count > 1) {
@@ -3538,8 +3540,8 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
 
     switch (*seq) {
     case 0:
-        if (func_ov167_0219c988(client->mainModule) == 1) {
-            if (func_ov167_021b2188() >= 8) {
+        if (GetStudioMode(client->mainModule) == 1) {
+            if (BattleClient_GetSelectSeq() >= 8) {
                 *seq = 1;
             }
         } else {
@@ -3569,21 +3571,21 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
         }
         item = AICheckItemUse(client, client->procMon, client->party);
         if (item != 0) {
-            func_ov167_021bdb80(client->procAction, item, client->procActionIdx, 0);
+            BattleAction_SetItemParam(client->procAction, item, client->procActionIdx, 0);
             *seq = 4;
             break;
         }
         if (BtlSetup_GetBattleType(client->mainModule) != 0 &&
             AISwitchChecks(client, client->procMon, client->procActionIdx, &partyIdx)) {
-            func_ov167_021bdbbc(client->procAction, client->procActionIdx, partyIdx);
+            BattleAction_SetChangeParam(client->procAction, client->procActionIdx, partyIdx);
             *seq = 4;
             break;
         }
         if (BtlSetup_GetBattleStyle(client->mainModule) == BTL_STYLE_ROTATION) {
             rotatePos = AIPickRotationPos(client);
             if (rotatePos != 1) {
-                partyPos = func_ov167_0219d38c(rotatePos);
-                func_ov167_021bdc24(client->procAction, rotatePos);
+                partyPos = GetRotationInSlot(rotatePos);
+                BattleAction_SetRotationParam(client->procAction, rotatePos);
                 client->procMon = GetBattleMonFromParty(client->party, partyPos);
                 client->extraActionCount = 1;
                 client->procAction++;
@@ -3625,7 +3627,7 @@ static BOOL AISelectAction(BtlClient *client, s32 *seq) {
             *seq = 4;
             break;
         }
-        func_ov167_021bdc3c(client->procAction);
+        BattleAction_SetEscape(client->procAction);
         *seq = 4;
         break;
     case 4:
@@ -3687,7 +3689,7 @@ static void PickBestMonToSwitchInto(BtlClient *client, u8 *list, u8 count, Battl
                         if (basePower < 10) {
                             basePower = 60;
                         }
-                        switch (func_ov167_021bd1b0(moveType, types)) {
+                        switch (BtlCalc_GetTypePairEffectiveness(moveType, types)) {
                         case 5:
                             basePower *= 4;
                             break;
@@ -3727,24 +3729,24 @@ static void PickBestMonToSwitchInto(BtlClient *client, u8 *list, u8 count, Battl
     }
 }
 
-static void func_ov167_021b5d7c(BtlClient *client, u8 mode, u8 count, BtlvPokeListCmd *cmd,
-                                BtlvPokeSelectParam *select) {
+static void BattleClient_SetupPokeSelect(BtlClient *client, u8 mode, u8 count, BtlvPokeListCmd *cmd,
+                                         BtlvPokeSelectParam *select) {
     PokeListCmd_Init(cmd, client->party, count, mode);
     PokeListCmd_SetCoverSlots(cmd, client->numCoverPos);
     PokeSelect_Init(select, cmd);
 }
 
-static void func_ov167_021b5dd8(BtlClient *client, const BtlvPokeSelectParam *select) {
+static void BattleClient_SetSelectedChangeActions(BtlClient *client, const BtlvPokeSelectParam *select) {
     u8 i;
 
     for (i = 0; i < select->count; i++) {
-        func_ov167_021bdbbc(&client->actions[i], select->position[i], select->partyIndex[i]);
+        BattleAction_SetChangeParam(&client->actions[i], select->position[i], select->partyIndex[i]);
     }
     client->returnData = client->actions;
     client->returnDataSize = select->count * sizeof(BattleAction);
 }
 
-static void func_ov167_021b5e1c(BtlClient *client) {
+static void BattleClient_SetAutoChangeActions(BtlClient *client) {
     u8 start;
     u8 num = 0;
     u8 partyCount = GetNumMonsInParty(client->party);
@@ -3753,12 +3755,12 @@ static void func_ov167_021b5e1c(BtlClient *client) {
     u8 clientId;
     u8 idx;
 
-    start = func_ov167_0219d29c(client->mainModule, client->clientId);
+    start = GetClientBenchStart(client->mainModule, client->clientId);
     for (i = 0; i < client->changePokeCount; i++) {
-        func_ov167_0219c694(client->mainModule, client->changePokePos[i], &clientId, &idx);
+        GetPosClientAndIndex(client->mainModule, client->changePokePos[i], &clientId, &idx);
         for (j = start; j < partyCount; j++) {
             if (!IsFainted(GetBattleMonFromParty(client->party, j))) {
-                func_ov167_021bdbbc(&client->actions[num++], idx, j);
+                BattleAction_SetChangeParam(&client->actions[num++], idx, j);
                 start = j + 1;
                 break;
             }
@@ -3771,19 +3773,19 @@ static void func_ov167_021b5e1c(BtlClient *client) {
 // Collects the positions in the server's request that belong to this client
 static u8 CollectOwnChangePositions(BtlClient *client, u8 *positions) {
     const u8 *data;
-    u8 size = func_ov167_021d4c0c(client->adapter, (const void **)&data);
+    u8 size = BtlAdapter_GetRecvData(client->adapter, (const void **)&data);
     u32 i;
     u32 count;
 
     for (i = 0, count = 0; i < size; i++) {
-        if (client->clientId == func_ov167_0219c650(client->mainModule, data[i])) {
+        if (client->clientId == GetClientIDFromPos(client->mainModule, data[i])) {
             positions[count++] = data[i];
         }
     }
     return count;
 }
 
-static BOOL func_ov167_021b5f30(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerConfirmUseNextPoke(BtlClient *client, s32 *seq) {
     u32 result;
     u8 yes;
 
@@ -3791,11 +3793,11 @@ static BOOL func_ov167_021b5f30(BtlClient *client, s32 *seq) {
     case 0:
         Btlv_StringParam_Setup(&client->strParam, 3, 5);
         Btlv_StringParam_Setup(&client->strParam2, 3, 1);
-        func_ov167_021d0798(client->viewCore, &client->strParam, &client->strParam2, 0);
+        BtlvCore_ShowYesNo(client->viewCore, &client->strParam, &client->strParam2, 0);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0828(client->viewCore, &result)) {
+        if (BtlvCore_PollYesNo(client->viewCore, &result)) {
             yes = FALSE;
             if (result != 0) {
                 yes = TRUE;
@@ -3810,11 +3812,11 @@ static BOOL func_ov167_021b5f30(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b5fa4(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerSelectChangePokeFainted(BtlClient *client, s32 *seq) {
     return PlayerSelectChangePoke(client, seq, 2);
 }
 
-static BOOL func_ov167_021b5fb0(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerSelectChangePokeMidTurn(BtlClient *client, s32 *seq) {
     return PlayerSelectChangePoke(client, seq, 1);
 }
 
@@ -3850,8 +3852,8 @@ static BOOL AISelectChangePoke(BtlClient *client, s32 *seq) {
                 count = num;
             }
             for (i = 0; i < count; i++) {
-                func_ov167_0219c694(client->mainModule, client->changePokePos[i], &clientId, &idx);
-                func_ov167_021bdbbc(&client->actions[i], idx, list[i]);
+                GetPosClientAndIndex(client->mainModule, client->changePokePos[i], &clientId, &idx);
+                BattleAction_SetChangeParam(&client->actions[i], idx, list[i]);
             }
             client->returnData = client->actions;
             client->returnDataSize = count * sizeof(BattleAction);
@@ -3864,7 +3866,7 @@ static BOOL AISelectChangePoke(BtlClient *client, s32 *seq) {
                     return TRUE;
                 }
             }
-            func_ov167_021bdbec(client->actions);
+            BattleAction_SetChangeDepleteParam(client->actions);
             client->returnData = client->actions;
             client->returnDataSize = sizeof(BattleAction);
         }
@@ -3876,7 +3878,7 @@ static BOOL AISelectChangePoke(BtlClient *client, s32 *seq) {
     return TRUE;
 }
 
-static BOOL func_ov167_021b60e0(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlaySelectChangePoke(BtlClient *client, s32 *seq) {
     return RecPlaySelectActionCore(client, seq, 0);
 }
 
@@ -3903,17 +3905,17 @@ static BOOL PlayerSelectChangePoke(BtlClient *client, s32 *seq, u8 mode) {
                 if (IsRotationFrontFainted(client)) {
                     mon = GetBattleMonFromParty(client->party, 0);
                     if (num == 1 && IsFainted(mon)) {
-                        func_ov167_021bdbbc(&client->actions[0], 0, list[0]);
+                        BattleAction_SetChangeParam(&client->actions[0], 0, list[0]);
                         client->returnData = client->actions;
                         client->returnDataSize = sizeof(BattleAction);
                         *seq = 4;
                         break;
                     }
                 }
-                func_ov167_0219c694(client->mainModule, client->changePokePos[0], &clientId, &idx);
-                func_ov167_021b5d7c(client, mode, count, &client->pokeListCmd, &client->pokeSelect);
+                GetPosClientAndIndex(client->mainModule, client->changePokePos[0], &clientId, &idx);
+                BattleClient_SetupPokeSelect(client, mode, count, &client->pokeListCmd, &client->pokeSelect);
                 BattleClientCmd_StartPokeList(client->viewCore, &client->pokeListCmd, idx, 0, &client->pokeSelect);
-                func_ov167_021b2080(client);
+                BattleClient_StartCmdLimitTimer(client);
                 *seq = 1;
             } else {
                 if (IsRotationFrontFainted(client)) {
@@ -3925,7 +3927,7 @@ static BOOL PlayerSelectChangePoke(BtlClient *client, s32 *seq, u8 mode) {
                         break;
                     }
                 }
-                func_ov167_021bdbec(client->actions);
+                BattleAction_SetChangeDepleteParam(client->actions);
                 client->returnData = client->actions;
                 client->returnDataSize = sizeof(BattleAction);
                 *seq = 4;
@@ -3942,31 +3944,31 @@ static BOOL PlayerSelectChangePoke(BtlClient *client, s32 *seq, u8 mode) {
             BattleClientCmd_QuitPokeSelect(client->viewCore);
             *seq = 2;
         } else if (BattleClientCmd_WaitPokeSelect(client->viewCore)) {
-            func_ov167_021b5dd8(client, &client->pokeSelect);
+            BattleClient_SetSelectedChangeActions(client, &client->pokeSelect);
             *seq = 3;
         }
         break;
     case 2:
         if (BattleClientCmd_WaitPokeSelect(client->viewCore)) {
-            func_ov167_021b5e1c(client);
+            BattleClient_SetAutoChangeActions(client);
             *seq = 3;
         }
         break;
     case 3:
-        func_ov167_021b20f8(client);
+        BattleClient_HideCmdLimitTimer(client);
         *seq = 4;
         break;
     case 4:
-        if (func_ov167_0219bee4(client->mainModule)) {
+        if (GetCommMode(client->mainModule)) {
             client->waitMsgShown = TRUE;
-            func_ov167_021d03d4(client->viewCore);
+            BtlvCore_StartWaitMsg(client->viewCore);
             *seq = 5;
         } else {
             *seq = 6;
         }
         break;
     case 5:
-        if (func_ov167_021d03ec(client->viewCore)) {
+        if (BtlvCore_IsWaitMsgDone(client->viewCore)) {
             *seq = 6;
         }
         break;
@@ -3986,49 +3988,49 @@ static BOOL IsRotationFrontFainted(BtlClient *client) {
 
 // Rotates to the first position whose mon can fight, returning the action's size, or 0 when none can
 static u32 RotateToLivingMon(BtlClient *client, BattleAction *action) {
-    if (!IsFainted(GetPartyMonAt(client, func_ov167_0219d38c(2)))) {
-        func_ov167_021bdc24(action, 2);
+    if (!IsFainted(GetPartyMonAt(client, GetRotationInSlot(2)))) {
+        BattleAction_SetRotationParam(action, 2);
         return sizeof(BattleAction);
     }
-    if (!IsFainted(GetPartyMonAt(client, func_ov167_0219d38c(3)))) {
-        func_ov167_021bdc24(action, 3);
+    if (!IsFainted(GetPartyMonAt(client, GetRotationInSlot(3)))) {
+        BattleAction_SetRotationParam(action, 3);
         return sizeof(BattleAction);
     }
     return 0;
 }
 
-static BOOL func_ov167_021b6328(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_PlayerConfirmShiftSwitch(BtlClient *client, s32 *seq) {
     const u8 *data;
     u32 result;
     u8 partyIdx;
 
     switch (*seq) {
     case 0:
-        func_ov167_021d4c0c(client->adapter, (const void **)&data);
+        BtlAdapter_GetRecvData(client->adapter, (const void **)&data);
         if (*data != 0x1f) {
             Btlv_StringParam_Setup(&client->strParam, 1, 20);
             Btlv_StringParam_AddArg(&client->strParam, 1);
             Btlv_StringParam_AddArg(&client->strParam, *data);
-            func_ov167_021d0b4c(&client->strParam, 0xff);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            Btlv_StringParam_SetWait(&client->strParam, 0xff);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             *seq = 1;
         } else {
             *seq = 4;
         }
         break;
     case 1:
-        func_ov167_021d02e8(client->viewCore);
-        if (func_ov167_021d02f8(client->viewCore)) {
+        BtlvCore_WaitMsg(client->viewCore);
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             Btlv_StringParam_Setup(&client->strParam, 3, 6);
             Btlv_StringParam_Setup(&client->strParam2, 3, 7);
-            func_ov167_021d0798(client->viewCore, &client->strParam, &client->strParam2, 1);
+            BtlvCore_ShowYesNo(client->viewCore, &client->strParam, &client->strParam2, 1);
             *seq = 2;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore) && func_ov167_021d0828(client->viewCore, &result)) {
+        if (BtlvCore_WaitMsg(client->viewCore) && BtlvCore_PollYesNo(client->viewCore, &result)) {
             if (result == 0) {
-                func_ov167_021b5d7c(client, 0, 1, &client->pokeListCmd, &client->pokeSelect);
+                BattleClient_SetupPokeSelect(client, 0, 1, &client->pokeListCmd, &client->pokeSelect);
                 BattleClientCmd_StartPokeList(client->viewCore, &client->pokeListCmd, 0, 0, &client->pokeSelect);
                 *seq = 3;
             } else {
@@ -4040,7 +4042,7 @@ static BOOL func_ov167_021b6328(BtlClient *client, s32 *seq) {
         if (BattleClientCmd_WaitPokeSelect(client->viewCore)) {
             if (!PokeSelect_IsSelecting(&client->pokeSelect) &&
                 (partyIdx = PokeSelect_GetLast(&client->pokeSelect)) != 0 && partyIdx < 6) {
-                func_ov167_021bdbbc(client->actions, 0, partyIdx);
+                BattleAction_SetChangeParam(client->actions, 0, partyIdx);
                 *seq = 5;
             } else {
                 *seq = 4;
@@ -4059,28 +4061,28 @@ static BOOL func_ov167_021b6328(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b64ac(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_StoreRecordData(BtlClient *client, s32 *seq) {
     const void *data;
-    u16 size = func_ov167_021d4c0c(client->adapter, &data);
+    u16 size = BtlAdapter_GetRecvData(client->adapter, &data);
 
     if (client->recorder != NULL) {
-        func_ov167_021d45f0(client->recorder, data, size);
+        BtlRecorder_AddData(client->recorder, data, size);
     }
     if (client->cmdCheckServer != NULL) {
-        func_ov167_0219eee4(client->cmdCheckServer, data, size);
-        client->cmdCheckReq = func_ov167_021d4624(data);
+        BattleServer_ReadRecActions(client->cmdCheckServer, data, size);
+        client->cmdCheckReq = BtlRec_GetCmdCheckReq(data);
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021b64ec(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlayExitCommBattle(BtlClient *client, s32 *seq) {
     if (client->viewCore != NULL) {
-        return func_ov167_021b6500(client, seq);
+        return BattleClient_ExitCommBattle(client, seq);
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ExitCommBattle(BtlClient *client, s32 *seq) {
     u32 name;
     u32 result;
     u8 isMulti;
@@ -4091,10 +4093,10 @@ static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq) {
         if (client->unk1BA_5) {
             return TRUE;
         }
-        name = func_ov167_0219c8b8(client->mainModule, 0);
+        name = GetPlayerOpponentClientID(client->mainModule, 0);
         result = GetBattleResultForClient(client);
-        isMulti = func_ov167_0219beec(client->mainModule);
-        func_ov167_0219ca48(client->mainModule, result);
+        isMulti = IsMultiMode(client->mainModule);
+        SetBattleResult(client->mainModule, result);
         switch (result) {
         case 1:
             msg = isMulti ? 0x31 : 0x30;
@@ -4111,11 +4113,11 @@ static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq) {
         Btlv_StringParam_Setup(&client->strParam, 1, msg);
         Btlv_StringParam_AddArg(&client->strParam, name);
         if (isMulti) {
-            Btlv_StringParam_AddArg(&client->strParam, func_ov167_0219c8b8(client->mainModule, 1));
+            Btlv_StringParam_AddArg(&client->strParam, GetPlayerOpponentClientID(client->mainModule, 1));
         }
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         if (result == 1) {
-            GFL_SndBGMPlay(func_ov167_0219bf00(client->mainModule), 0xffff);
+            GFL_SndBGMPlay(GetWinBGM(client->mainModule), 0xffff);
             (*seq)++;
         } else {
             GFL_SndBGMFadeOut(30);
@@ -4123,12 +4125,12 @@ static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq) {
         }
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             (*seq)++;
         }
         break;
@@ -4146,7 +4148,7 @@ static BOOL func_ov167_021b6500(BtlClient *client, s32 *seq) {
 static u32 GetBattleResultForClient(BtlClient *client) {
     const u16 *data;
 
-    func_ov167_021d4c0c(client->adapter, (const void **)&data);
+    BtlAdapter_GetRecvData(client->adapter, (const void **)&data);
     switch (data[1]) {
     case 0:
         if (!IsAllyClientID(data[0], client->clientId)) {
@@ -4162,14 +4164,14 @@ static u32 GetBattleResultForClient(BtlClient *client) {
     return data[1];
 }
 
-static BOOL func_ov167_021b666c(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlayExitTrainerBattle(BtlClient *client, s32 *seq) {
     if (client->viewCore != NULL) {
-        return func_ov167_021b6680(client, seq);
+        return BattleClient_ExitTrainerBattle(client, seq);
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
     u32 name1;
     u32 name2;
     u32 result;
@@ -4180,11 +4182,11 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
 
     switch (*seq) {
     case 0:
-        if (func_ov167_0219c988(client->mainModule) == 0) {
+        if (GetStudioMode(client->mainModule) == 0) {
             if (GetBattleResultForClient(client) == 1) {
-                BtlvEffect_PlayBgm(func_ov167_0219bf00(client->mainModule));
-                name1 = func_ov167_0219c8b8(client->mainModule, 0);
-                name2 = func_ov167_0219c8b8(client->mainModule, 1);
+                BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
+                name1 = GetPlayerOpponentClientID(client->mainModule, 0);
+                name2 = GetPlayerOpponentClientID(client->mainModule, 1);
                 if (name1 == name2) {
                     Btlv_StringParam_Setup(&client->strParam, 1, 0x2c);
                     Btlv_StringParam_AddArg(&client->strParam, name1);
@@ -4193,21 +4195,21 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
                     Btlv_StringParam_AddArg(&client->strParam, name1);
                     Btlv_StringParam_AddArg(&client->strParam, name2);
                 }
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = 1;
             } else if (!BtlSetup_IsBattleType(client->mainModule, 0x100)) {
                 name1 = GetPlayerClientID(client->mainModule);
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x36);
                 Btlv_StringParam_AddArg(&client->strParam, name1);
                 Btlv_StringParam_AddArg(&client->strParam, name1);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = 9;
             } else {
                 return TRUE;
             }
-        } else if (func_ov167_0219c988(client->mainModule) == 2) {
+        } else if (GetStudioMode(client->mainModule) == 2) {
             result = GetBattleResultForClient(client);
-            func_ov167_021b9774(client, &client->studio.score);
+            StudioScore_SetTurnPoints(client, &client->studio.score);
             if (result == 1) {
                 client->studio.seq = 0;
                 client->turnCount = 100;
@@ -4216,17 +4218,18 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
                 client->turnCount = 101;
             }
             *seq = 11;
-            func_ov167_021b9910(client->mainModule);
-        } else if (func_ov167_0219c988(client->mainModule) == 1) {
-            func_ov167_021b9774(client, &client->studio.score);
+            Studio_PlayEndingBgm(client->mainModule);
+        } else if (GetStudioMode(client->mainModule) == 1) {
+            StudioScore_SetTurnPoints(client, &client->studio.score);
             client->studio.seq = 0;
             *seq = 12;
         }
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)),
-                                  9, 0, 0, 0);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            BtlvEffect_SetTrainer(
+                GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 0)), 9, 0, 0,
+                0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             *seq = 2;
@@ -4234,15 +4237,16 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
         break;
     case 2:
         if (!BtlvEffect_IsBusy()) {
-            func_ov167_021d0288(client->viewCore,
-                                func_ov167_0219d91c(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)), 1);
+            BtlvCore_StartMsgTrainer(
+                client->viewCore,
+                GetClientTrainerID(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 0)), 1);
             *seq = 3;
         }
         break;
     case 3:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            name1 = func_ov167_0219c8b8(client->mainModule, 0);
-            if (name1 != func_ov167_0219c8b8(client->mainModule, 1)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            name1 = GetPlayerOpponentClientID(client->mainModule, 0);
+            if (name1 != GetPlayerOpponentClientID(client->mainModule, 1)) {
                 BtlvEffect_Start(0x271);
                 *seq = 4;
             } else {
@@ -4252,8 +4256,9 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
         break;
     case 4:
         if (!BtlvEffect_IsBusy()) {
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)),
-                                  9, 0, 0, 0);
+            BtlvEffect_SetTrainer(
+                GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 9, 0, 0,
+                0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             *seq = 5;
@@ -4261,85 +4266,86 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
         break;
     case 5:
         if (!BtlvEffect_IsBusy()) {
-            func_ov167_021d0288(client->viewCore,
-                                func_ov167_0219d91c(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 1);
+            BtlvCore_StartMsgTrainer(
+                client->viewCore,
+                GetClientTrainerID(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 1);
             *seq = 6;
         }
         break;
     case 6:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 7;
         }
         break;
     case 7:
-        value = func_ov167_0219ca78(client->mainModule);
+        value = FixPrizeMoney(client->mainModule);
         if (value != 0) {
             name1 = GetPlayerClientID(client->mainModule);
             Btlv_StringParam_Setup(&client->strParam, 1, 0x3a);
             Btlv_StringParam_AddArg(&client->strParam, name1);
             Btlv_StringParam_AddArg(&client->strParam, value);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
         }
-        if (!func_ov167_0219caec(client->mainModule)) {
+        if (!GetBonusMoney(client->mainModule)) {
             *seq = 13;
         } else {
             *seq = 8;
         }
         break;
     case 8:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            value = func_ov167_0219caec(client->mainModule);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            value = GetBonusMoney(client->mainModule);
             if (value != 0) {
                 name1 = GetPlayerClientID(client->mainModule);
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x3b);
                 Btlv_StringParam_AddArg(&client->strParam, name1);
                 Btlv_StringParam_AddArg(&client->strParam, value);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
             }
             *seq = 13;
         }
         break;
     case 9:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            value = func_ov167_0219cb20(client->mainModule);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            value = CalcLossMoney(client->mainModule);
             if (value != 0) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x38);
                 Btlv_StringParam_AddArg(&client->strParam, client->clientId);
                 Btlv_StringParam_AddArg(&client->strParam, value);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
             }
             *seq = 10;
         }
         break;
     case 10:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             Btlv_StringParam_Setup(&client->strParam, 1, 0x39);
             Btlv_StringParam_AddArg(&client->strParam, client->clientId);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             *seq = 13;
         }
         break;
     case 11:
-        if (func_ov167_021b2864(client)) {
-            setup = func_ov167_0219e30c(client->mainModule);
+        if (Studio_PlayScene(client)) {
+            setup = GetBattleSetup(client->mainModule);
             setup->unk130 = StudioScore_CalcTotal(client, &client->studio.score);
             return TRUE;
         }
         break;
     case 12:
-        if (func_ov167_021b3100(client)) {
-            setup = func_ov167_0219e30c(client->mainModule);
-            rules = func_ov167_0219e39c(client->mainModule);
+        if (Studio_ShowResult(client)) {
+            setup = GetBattleSetup(client->mainModule);
+            rules = GetStudioRules(client->mainModule);
             score =
-                func_ov167_021b2538(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
-            func_ov167_021b2748(client, rules, score);
-            func_ov167_021b2700(client, rules, score);
+                Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
+            Studio_ScoreEndScene(client, rules, score);
+            Studio_DecideEnding(client, rules, score);
             setup->unk130 = StudioScore_CalcTotal(client, &client->studio.score);
             return TRUE;
         }
         break;
     case 13:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4349,14 +4355,14 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b6a98(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlayExitFacilityBattle(BtlClient *client, s32 *seq) {
     if (client->viewCore != NULL) {
-        return func_ov167_021b6aac(client, seq);
+        return BattleClient_ExitFacilityBattle(client, seq);
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ExitFacilityBattle(BtlClient *client, s32 *seq) {
     u32 result;
 
     switch (*seq) {
@@ -4365,13 +4371,14 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
             return TRUE;
         }
         result = GetBattleResultForClient(client);
-        func_ov167_0219ca48(client->mainModule, result);
+        SetBattleResult(client->mainModule, result);
         if (result == 1) {
-            BtlvEffect_PlayBgm(func_ov167_0219bf00(client->mainModule));
+            BtlvEffect_PlayBgm(GetWinBGM(client->mainModule));
         }
         if (result <= 1) {
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)),
-                                  9, 0, 0, 0);
+            BtlvEffect_SetTrainer(
+                GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 0)), 9, 0, 0,
+                0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             ShowTrainerWinLoseMsg(client, result, 0);
@@ -4381,13 +4388,13 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
         return TRUE;
     case 1:
         if (!BtlvEffect_IsBusy()) {
-            func_ov167_021d01d8(client->viewCore);
+            BtlvCore_StartMadeMsg(client->viewCore);
             *seq = 2;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            if (func_ov167_0219c8b8(client->mainModule, 0) == func_ov167_0219c8b8(client->mainModule, 1)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            if (GetPlayerOpponentClientID(client->mainModule, 0) == GetPlayerOpponentClientID(client->mainModule, 1)) {
                 return TRUE;
             }
             BtlvEffect_Start(0x271);
@@ -4397,8 +4404,9 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
     case 3:
         if (!BtlvEffect_IsBusy()) {
             result = GetBattleResultForClient(client);
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)),
-                                  9, 0, 0, 0);
+            BtlvEffect_SetTrainer(
+                GetClientTrainerClass(client->mainModule, GetPlayerOpponentClientID(client->mainModule, 1)), 9, 0, 0,
+                0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             ShowTrainerWinLoseMsg(client, result, 1);
@@ -4407,12 +4415,12 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
         break;
     case 4:
         if (!BtlvEffect_IsBusy()) {
-            func_ov167_021d01d8(client->viewCore);
+            BtlvCore_StartMadeMsg(client->viewCore);
             *seq = 5;
         }
         break;
     case 5:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4422,46 +4430,46 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
 
 // Shows a trainer's win or lose message: their easy chat sentence if they have one, else their trainer data's message
 static void ShowTrainerWinLoseMsg(BtlClient *client, u32 result, u8 which) {
-    u8 clientId = func_ov167_0219c8b8(client->mainModule, which);
-    const PMSData *sentence = func_ov167_0219d944(client->mainModule, clientId, result);
+    u8 clientId = GetPlayerOpponentClientID(client->mainModule, which);
+    const PMSData *sentence = GetClientTrainerMsg(client->mainModule, clientId, result);
     StrBuf *str;
     u16 trainerId;
 
     if (sentence != NULL && PMSData_IsNotEmpty(sentence)) {
         str = PMSData_ToString(sentence, HEAPID_TAIL(client->heapId));
-        func_ov167_021d01bc(client->viewCore, str);
+        BtlvCore_CopyMsgStr(client->viewCore, str);
         GFL_StrBufFree(str);
     } else {
-        trainerId = func_ov167_0219d91c(client->mainModule, clientId);
+        trainerId = GetClientTrainerID(client->mainModule, clientId);
         if (trainerId != 0) {
             Btlv_StringParam_Setup(&client->strParam, 7, 0);
             Btlv_StringParam_AddArg(&client->strParam, trainerId);
             Btlv_StringParam_AddArg(&client->strParam, result);
-            func_ov167_021d01c8(client->viewCore, &client->strParam);
+            BtlvCore_MakeMsg(client->viewCore, &client->strParam);
         }
     }
 }
 
-static BOOL func_ov167_021b6c98(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ExitWildBattleWin(BtlClient *client, s32 *seq) {
     u32 value;
     u8 playerId;
 
     switch (*seq) {
     case 0:
         if (!BtlSetup_IsBattleType(client->mainModule, 0x200)) {
-            value = func_ov167_0219caec(client->mainModule);
+            value = GetBonusMoney(client->mainModule);
             if (value != 0) {
                 playerId = GetPlayerClientID(client->mainModule);
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x3b);
                 Btlv_StringParam_AddArg(&client->strParam, playerId);
                 Btlv_StringParam_AddArg(&client->strParam, value);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
             }
         }
         (*seq)++;
         // fallthrough
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4469,38 +4477,38 @@ static BOOL func_ov167_021b6c98(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b6d0c(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ExitWildBattleLose(BtlClient *client, s32 *seq) {
     u32 value;
 
     switch (*seq) {
     case 0:
         Btlv_StringParam_Setup(&client->strParam, 1, 0x36);
         Btlv_StringParam_AddArg(&client->strParam, client->clientId);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            value = func_ov167_0219cb20(client->mainModule);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            value = CalcLossMoney(client->mainModule);
             if (value != 0) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x37);
                 Btlv_StringParam_AddArg(&client->strParam, client->clientId);
                 Btlv_StringParam_AddArg(&client->strParam, value);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
             }
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             Btlv_StringParam_Setup(&client->strParam, 1, 0x39);
             Btlv_StringParam_AddArg(&client->strParam, client->clientId);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             (*seq)++;
         }
         break;
     case 3:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             (*seq)++;
         }
         break;
@@ -4522,37 +4530,99 @@ typedef struct {
 
 // The handlers of the server's commands
 static const BtlClientServerCmdEntry sServerCmdTable[] = {
-    { 0x5a, func_ov167_021b7230 },       { 0x5c, func_ov167_021b7278 },   { 0x5b, func_ov167_021b72d4 },
-    { 0x5d, func_ov167_021b731c },       { 0x59, func_ov167_021b7378 },   { 0x30, func_ov167_021b73f4 },
-    { 0x31, func_ov167_021b7480 },       { 0x32, func_ov167_021b74d0 },   { 0x33, func_ov167_021b7520 },
-    { 0x34, func_ov167_021b7598 },       { 0x35, func_ov167_021b75f8 },   { 0x36, func_ov167_021b763c },
-    { 0x39, func_ov167_021b76e4 },       { 0x3a, func_ov167_021b7750 },   { 0x3b, func_ov167_021b6f7c },
-    { 0x3c, func_ov167_021b7058 },       { 0x3d, func_ov167_021b70a0 },   { 0x37, func_ov167_021b7800 },
-    { 0x38, func_ov167_021b7794 },       { 0x3e, BattleClient_ScAddEVs }, { 0x3f, BattleClient_ScWeatherStart },
-    { 0x40, BattleClient_ScWeatherEnd }, { 0x41, func_ov167_021b795c },   { 0x42, func_ov167_021b79a0 },
-    { 0x57, func_ov167_021b8a34 },       { 0x58, func_ov167_021b8a8c },   { 0x01, func_ov167_021b8ad0 },
-    { 0x02, func_ov167_021b8af0 },       { 0x03, func_ov167_021b8b80 },   { 0x04, func_ov167_021b8b10 },
-    { 0x05, func_ov167_021b8b38 },       { 0x06, func_ov167_021b8b60 },   { 0x07, func_ov167_021b8b98 },
-    { 0x08, func_ov167_021b8bbc },       { 0x09, func_ov167_021b8be0 },   { 0x0a, func_ov167_021b8c00 },
-    { 0x0b, func_ov167_021b8c20 },       { 0x0c, func_ov167_021b8c98 },   { 0x0d, func_ov167_021b8cb0 },
-    { 0x0e, func_ov167_021b8cc8 },       { 0x0f, func_ov167_021b8ce4 },   { 0x10, func_ov167_021b8d04 },
-    { 0x11, func_ov167_021b8d1c },       { 0x12, func_ov167_021b8d38 },   { 0x13, func_ov167_021b9130 },
-    { 0x14, func_ov167_021b9154 },       { 0x16, func_ov167_021b8d8c },   { 0x15, func_ov167_021b8dac },
-    { 0x17, func_ov167_021b8e24 },       { 0x18, func_ov167_021b8e44 },   { 0x19, func_ov167_021b8e80 },
-    { 0x1a, func_ov167_021b8e9c },       { 0x1b, func_ov167_021b8eb8 },   { 0x1c, func_ov167_021b8ed4 },
-    { 0x1d, func_ov167_021b8ef0 },       { 0x1e, func_ov167_021b8f0c },   { 0x1f, func_ov167_021b8f2c },
-    { 0x20, func_ov167_021b8f60 },       { 0x21, func_ov167_021b8f78 },   { 0x22, func_ov167_021b8f8c },
-    { 0x23, func_ov167_021b8fa0 },       { 0x24, func_ov167_021b8fb4 },   { 0x25, func_ov167_021b8fc4 },
-    { 0x26, func_ov167_021b8fe4 },       { 0x27, func_ov167_021b9010 },   { 0x28, func_ov167_021b9030 },
-    { 0x29, func_ov167_021b9048 },       { 0x2a, func_ov167_021b9074 },   { 0x2b, func_ov167_021b9094 },
-    { 0x2c, func_ov167_021b90ac },       { 0x2d, func_ov167_021b90cc },   { 0x2e, func_ov167_021b9100 },
-    { 0x2f, func_ov167_021b9120 },       { 0x43, func_ov167_021b7a04 },   { 0x44, func_ov167_021b7a60 },
-    { 0x45, BattleClient_ScExpGain },    { 0x46, func_ov167_021b83dc },   { 0x47, func_ov167_021b853c },
-    { 0x48, func_ov167_021b85a4 },       { 0x49, func_ov167_021b8650 },   { 0x4a, func_ov167_021b86e4 },
-    { 0x4b, func_ov167_021b8850 },       { 0x4c, func_ov167_021b88b4 },   { 0x4d, func_ov167_021b88ec },
-    { 0x4e, func_ov167_021b896c },       { 0x4f, func_ov167_021b89cc },   { 0x50, func_ov167_021b7af4 },
-    { 0x51, func_ov167_021b7c08 },       { 0x52, func_ov167_021b7c40 },   { 0x53, BattleClient_ScTransform },
-    { 0x54, func_ov167_021b7d24 },       { 0x55, func_ov167_021b7d84 },   { 0x56, func_ov167_021b7d90 },
+    { 0x5a, BattleClient_ScMsgStd },
+    { 0x5c, BattleClient_ScMsgStdSE },
+    { 0x5b, BattleClient_ScMsgSet },
+    { 0x5d, BattleClient_ScMsgSetSE },
+    { 0x59, BattleClient_ScMoveMsg },
+    { 0x30, BattleClient_ScMoveAnim },
+    { 0x31, BattleClient_ScSetMonVisible },
+    { 0x32, BattleClient_ScDamage },
+    { 0x33, BattleClient_ScDamagePlural },
+    { 0x34, BattleClient_ScOneHitKO },
+    { 0x35, BattleClient_ScSetGaugeStatus },
+    { 0x36, BattleClient_ScConfusionDamage },
+    { 0x39, BattleClient_ScFaint },
+    { 0x3a, BattleClient_ScShowMon },
+    { 0x3b, BattleClient_ScRecallMsg },
+    { 0x3c, BattleClient_ScRecall },
+    { 0x3d, BattleClient_ScSendOut },
+    { 0x37, BattleClient_ScStatUpEffect },
+    { 0x38, BattleClient_ScStatDownEffect },
+    { 0x3e, BattleClient_ScAddEVs },
+    { 0x3f, BattleClient_ScWeatherStart },
+    { 0x40, BattleClient_ScWeatherEnd },
+    { 0x41, BattleClient_ScUpdateHpGauge },
+    { 0x42, BattleClient_ScUseHeldItem },
+    { 0x57, BattleClient_ScAbilityPopupIn },
+    { 0x58, BattleClient_ScAbilityPopupOut },
+    { 0x01, BattleClient_ScOpSubtractHp },
+    { 0x02, BattleClient_ScOpAddHp },
+    { 0x03, BattleClient_ScOpZeroHp },
+    { 0x04, BattleClient_ScOpSubtractPP },
+    { 0x05, BattleClient_ScOpSubtractOriginalPP },
+    { 0x06, BattleClient_ScOpSetMoveUsed },
+    { 0x07, BattleClient_ScOpAddPP },
+    { 0x08, BattleClient_ScOpAddOriginalPP },
+    { 0x09, BattleClient_ScOpRaiseStatStage },
+    { 0x0a, BattleClient_ScOpLowerStatStage },
+    { 0x0b, BattleClient_ScOpSetStatStages },
+    { 0x0c, BattleClient_ScOpRecoverStatStages },
+    { 0x0d, BattleClient_ScOpResetStatStages },
+    { 0x0e, BattleClient_ScOpAddCritStage },
+    { 0x0f, BattleClient_ScOpSetCondition },
+    { 0x10, BattleClient_ScOpCureCondition },
+    { 0x11, BattleClient_ScOpCureMoveCondition },
+    { 0x12, BattleClient_ScOpSendIn },
+    { 0x13, BattleClient_ScOpSetBaseStat },
+    { 0x14, BattleClient_ScOpSetWeight },
+    { 0x16, BattleClient_ScOpChangeType },
+    { 0x15, BattleClient_ScOpConditionTurnCheck },
+    { 0x17, BattleClient_ScOpConsumeItem },
+    { 0x18, BattleClient_ScOpUpdateUsedMove },
+    { 0x19, BattleClient_ScOpSetConditionFlag },
+    { 0x1a, BattleClient_ScOpClearConditionFlag },
+    { 0x1b, BattleClient_ScOpSetTurnFlag },
+    { 0x1c, BattleClient_ScOpClearTurnFlag },
+    { 0x1d, BattleClient_ScOpChangeAbility },
+    { 0x1e, BattleClient_ScOpSetItem },
+    { 0x1f, BattleClient_ScOpUpdateMove },
+    { 0x20, BattleClient_ScOpClearForSwitch },
+    { 0x21, BattleClient_ScOpAddFieldEffect },
+    { 0x22, BattleClient_ScOpAddFieldEffectDependMon },
+    { 0x23, BattleClient_ScOpRemoveFieldEffectDependMon },
+    { 0x24, BattleClient_ScOpRemoveFieldEffect },
+    { 0x25, BattleClient_ScOpSetCounter },
+    { 0x26, BattleClient_ScOpBatonPass },
+    { 0x27, BattleClient_ScOpCreateSubstitute },
+    { 0x28, BattleClient_ScOpDeleteSubstitute },
+    { 0x29, BattleClient_ScOpAddShooterEnergy },
+    { 0x2a, BattleClient_ScOpSetupIllusion },
+    { 0x2b, BattleClient_ScOpClearConsumedItem },
+    { 0x2c, BattleClient_ScOpCureMonDependentConditions },
+    { 0x2d, BattleClient_ScOpAddDamageRecord },
+    { 0x2e, BattleClient_ScOpTurnCheck },
+    { 0x2f, BattleClient_ScOpFieldTurnCheck },
+    { 0x43, BattleClient_ScFaintHpGauge },
+    { 0x44, BattleClient_ScSwapPos },
+    { 0x45, BattleClient_ScExpGain },
+    { 0x46, BattleClient_ScBallThrow },
+    { 0x47, BattleClient_ScBallThrowTrainer },
+    { 0x48, BattleClient_ScRotation },
+    { 0x49, BattleClient_ScChangeAbility },
+    { 0x4a, BattleClient_ScSwapAbility },
+    { 0x4b, BattleClient_ScIllusionBreak },
+    { 0x4c, BattleClient_ScEffect },
+    { 0x4d, BattleClient_ScEffectByPos },
+    { 0x4e, BattleClient_ScEffectBetweenPos },
+    { 0x4f, BattleClient_ScChangeForm },
+    { 0x50, BattleClient_ScMoveToCenter },
+    { 0x51, BattleClient_ScSubstituteCreate },
+    { 0x52, BattleClient_ScSubstituteDelete },
+    { 0x53, BattleClient_ScTransform },
+    { 0x54, BattleClient_ScDamageEffect },
+    { 0x55, BattleClient_ScPlayBgm },
+    { 0x56, BattleClient_ScHideMsgWindow },
 };
 
 // The message and sound effect of each weather's start
@@ -4564,15 +4634,15 @@ static const struct {
 };
 
 // The effort values that the effort value command raises, in its arguments' order
-static BOOL func_ov167_021b6dc4(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_ShowTimeUpMsg(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
         Btlv_StringParam_Setup(&client->strParam, 1, 0xb7);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             (*seq)++;
         }
         break;
@@ -4582,7 +4652,7 @@ static BOOL func_ov167_021b6dc4(BtlClient *client, s32 *seq) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b6e0c(BtlClient *client, s32 *seq) {
+static BOOL BattleClient_RecPlayServerCmdLoop(BtlClient *client, s32 *seq) {
     if (client->viewCore != NULL) {
         return BattleClient_ServerCmdLoop(client, seq);
     }
@@ -4596,10 +4666,10 @@ static BOOL BattleClient_ServerCmdLoop(BtlClient *client, s32 *seq) {
             const void *data;
             u32 size;
 
-            size = func_ov167_021d4c0c(client->adapter, &data);
+            size = BtlAdapter_GetRecvData(client->adapter, &data);
             if (client->cmdCheckServer != NULL && client->cmdCheckReq && client->cmdCheckEnable) {
-                if (func_ov167_0219ef74(client->cmdCheckServer, client->cmdCheckReq, data, size)) {
-                    func_ov167_0219ca60(client->mainModule);
+                if (BattleServer_CheckCmdMismatch(client->cmdCheckServer, client->cmdCheckReq, data, size)) {
+                    SetCmdCheckError(client->mainModule);
                     client->cmdCheckEnable = FALSE;
                 }
                 client->cmdCheckReq = 0;
@@ -4607,7 +4677,7 @@ static BOOL BattleClient_ServerCmdLoop(BtlClient *client, s32 *seq) {
             BtlServerCmdQueue_Setup(client->cmdQueue, data, size);
             if (client->waitMsgShown) {
                 client->waitMsgShown = FALSE;
-                func_ov167_021d03fc(client->viewCore);
+                BtlvCore_EndWaitMsg(client->viewCore);
             }
             (*seq)++;
         }
@@ -4616,14 +4686,14 @@ static BOOL BattleClient_ServerCmdLoop(BtlClient *client, s32 *seq) {
                 *seq = 4;
                 return TRUE;
             }
-            if (func_ov167_021b9360(&client->recPlayer)) {
+            if (RecPlayer_IsQuitDone(&client->recPlayer)) {
                 return TRUE;
             }
             (*seq)++;
         case 2: {
             u32 i;
 
-            client->serverCmd = func_ov167_021b1564(client->cmdQueue, client->cmdArgs);
+            client->serverCmd = BtlServerCmdQueue_Read(client->cmdQueue, client->cmdArgs);
             if (client->serverCmd == 0x5e) {
                 return TRUE;
             }
@@ -4653,7 +4723,7 @@ static BOOL BattleClient_ServerCmdLoop(BtlClient *client, s32 *seq) {
     }
 }
 
-static BOOL func_ov167_021b6f7c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScRecallMsg(BtlClient *client, s32 *seq, const u32 *args) {
     BOOL withName;
 
     switch (*seq) {
@@ -4663,11 +4733,11 @@ static BOOL func_ov167_021b6f7c(BtlClient *client, s32 *seq, const u32 *args) {
             Btlv_StringParam_AddArg(&client->strParam, args[0]);
         }
         Btlv_StringParam_AddArg(&client->strParam, args[1]);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4678,8 +4748,8 @@ static BOOL func_ov167_021b6f7c(BtlClient *client, s32 *seq, const u32 *args) {
 static u16 BattleClient_GetRecallMsg(BtlClient *client, u8 clientId, BOOL *withName) {
     if (clientId == client->clientId) {
         *withName = FALSE;
-        if (BtlSetup_GetBattleStyle(client->mainModule) == 0 && !func_ov167_0219bee4(client->mainModule)) {
-            u32 ratio = func_ov167_021b1f00(client);
+        if (BtlSetup_GetBattleStyle(client->mainModule) == 0 && !GetCommMode(client->mainModule)) {
+            u32 ratio = BattleClient_GetFrontMonHpLossRatio(client);
 
             if (ratio >= 75) {
                 return 0x1d;
@@ -4698,21 +4768,21 @@ static u16 BattleClient_GetRecallMsg(BtlClient *client, u8 clientId, BOOL *withN
         return 0x1a;
     } else {
         *withName = TRUE;
-        if (func_ov167_0219d888(client->mainModule, clientId)) {
+        if (IsClientNPCTrainer(client->mainModule, clientId)) {
             return 0x1e;
         }
         return 0x1f;
     }
 }
 
-static BOOL func_ov167_021b7058(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScRecall(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021d0018(client->viewCore, func_ov167_0219c6dc(client->mainModule, args[0]), args[1]);
+        BtlvCore_StartSwitchOut(client->viewCore, BattlePosToViewPos(client->mainModule, args[0]), args[1]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0038(client->viewCore)) {
+        if (BtlvCore_WaitSwitchOut(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4720,7 +4790,7 @@ static BOOL func_ov167_021b7058(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b70a0(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSendOut(BtlClient *client, s32 *seq, const u32 *args) {
     u8 clientId = args[0];
     u8 slot = args[1];
     u8 showMsg = args[3];
@@ -4734,39 +4804,39 @@ static BOOL func_ov167_021b70a0(BtlClient *client, s32 *seq, const u32 *args) {
                 if (client->clientId == clientId) {
                     Btlv_StringParam_Setup(&client->strParam, 1, BattleClient_GetPlayerSendOutMsg(client));
                     Btlv_StringParam_AddArg(&client->strParam, monId);
-                    func_ov167_021d01ec(client->viewCore, &client->strParam);
+                    BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 } else {
                     Btlv_StringParam_Setup(&client->strParam, 1, 0x11);
                     Btlv_StringParam_AddArg(&client->strParam, clientId);
                     Btlv_StringParam_AddArg(&client->strParam, monId);
-                    func_ov167_021d01ec(client->viewCore, &client->strParam);
+                    BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 }
-            } else if (func_ov167_0219d888(client->mainModule, clientId)) {
+            } else if (IsClientNPCTrainer(client->mainModule, clientId)) {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0xe);
                 Btlv_StringParam_AddArg(&client->strParam, clientId);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
             } else {
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x11);
                 Btlv_StringParam_AddArg(&client->strParam, clientId);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
             }
         }
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            func_ov167_021d0048(client->viewCore, func_ov167_0219c458(client->mainModule, clientId, slot), clientId,
-                                slot);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            BtlvCore_StartSwitchIn(client->viewCore, GetClientBattlePos(client->mainModule, clientId, slot), clientId,
+                                   slot);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d0084(client->viewCore)) {
-            func_ov167_021b1ee4(client);
+        if (BtlvCore_WaitSwitchIn(client->viewCore)) {
+            BattleClient_SaveFrontMonHp(client);
             if (clientId == GetPlayerClientID(client->mainModule)) {
-                func_ov167_021b96f0(client, &client->studio, client->party);
+                Studio_AddFamePoints(client, &client->studio, client->party);
             }
             return TRUE;
         }
@@ -4777,7 +4847,7 @@ static BOOL func_ov167_021b70a0(BtlClient *client, s32 *seq, const u32 *args) {
 
 static u16 BattleClient_GetPlayerSendOutMsg(BtlClient *client) {
     if (BtlSetup_GetBattleStyle(client->mainModule) == 0) {
-        u8 clientId = func_ov167_0219c8d0(client->mainModule, client->clientId, 0);
+        u8 clientId = GetOpponentClientID(client->mainModule, client->clientId, 0);
         BattleMon *mon = GetClientMonData(client->pokeCon, clientId, 0);
         fx32 ratio;
 
@@ -4802,17 +4872,17 @@ static u16 BattleClient_GetPlayerSendOutMsg(BtlClient *client) {
     return 0xb;
 }
 
-static BOOL func_ov167_021b7230(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMsgStd(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        func_ov167_021d0250(client->viewCore, args[0], &args[1]);
+        BtlvCore_StartMsgStd(client->viewCore, args[0], &args[1]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4820,20 +4890,20 @@ static BOOL func_ov167_021b7230(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7278(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMsgStdSE(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        func_ov167_021d0250(client->viewCore, args[0], &args[2]);
+        BtlvCore_StartMsgStd(client->viewCore, args[0], &args[2]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02f8(client->viewCore)) {
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             GFL_SndSEPlay(args[1]);
         }
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4841,17 +4911,17 @@ static BOOL func_ov167_021b7278(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b72d4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMsgSet(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        func_ov167_021d026c(client->viewCore, args[0], &args[1]);
+        BtlvCore_StartMsgSet(client->viewCore, args[0], &args[1]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4859,20 +4929,20 @@ static BOOL func_ov167_021b72d4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b731c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMsgSetSE(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        func_ov167_021d026c(client->viewCore, args[0], &args[2]);
+        BtlvCore_StartMsgSet(client->viewCore, args[0], &args[2]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02f8(client->viewCore)) {
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             GFL_SndSEPlay(args[1]);
         }
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4880,17 +4950,17 @@ static BOOL func_ov167_021b731c(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7378(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMoveMsg(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        func_ov167_021d02cc(client->viewCore, args[0], args[1]);
+        BtlvCore_StartMsgMove(client->viewCore, args[0], args[1]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4902,22 +4972,22 @@ static s32 BattleClient_GetMoveAnimType(BtlClient *client, u16 move, u8 pos) {
     if (move != 0xae) {
         return PML_MoveGetParam(move, 0x1b);
     } else {
-        BattleMon *mon = func_ov167_0219d188(client->pokeCon, pos);
+        BattleMon *mon = PokeCon_GetPosMonInner(client->pokeCon, pos);
 
         if (mon != NULL) {
-            return func_ov167_021bd8d0(mon);
+            return BtlCalc_GetCurseTarget(mon);
         }
         return PML_MoveGetParam(move, 0x1b);
     }
 }
 
-static BOOL func_ov167_021b73f4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMoveAnim(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        if (func_ov167_0219bd88(client->mainModule)) {
+        if (IsBattleSceneOff(client->mainModule)) {
             u16 move;
             u8 attackerPos;
             u8 targetPos;
@@ -4929,13 +4999,13 @@ static BOOL func_ov167_021b73f4(BtlClient *client, s32 *seq, const u32 *args) {
             move = args[2];
             arg3 = args[3];
             arg4 = BattleClient_GetMoveAnimType(client, move, attackerPos);
-            func_ov167_021cfc60(client->viewCore, attackerPos, targetPos, move, arg4, arg3, 0);
+            BtlvCore_StartMoveEffect(client->viewCore, attackerPos, targetPos, move, arg4, arg3, 0);
             (*seq)++;
             break;
         }
         return TRUE;
     case 1:
-        if (func_ov167_021cfca4(client->viewCore)) {
+        if (BtlvCore_WaitMoveEffect(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4943,12 +5013,12 @@ static BOOL func_ov167_021b73f4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7480(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSetMonVisible(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
-        u8 pos = func_ov167_0219c62c(client->mainModule, client->pokeCon, args[0]);
+        u8 pos = MonIDToViewPos(client->mainModule, client->pokeCon, args[0]);
 
-        func_ov167_021cff14(client->viewCore, pos, args[1] ? TRUE : FALSE);
+        BtlvCore_SetMonVisible(client->viewCore, pos, args[1] ? TRUE : FALSE);
         (*seq)++;
         break;
     }
@@ -4958,15 +5028,15 @@ static BOOL func_ov167_021b7480(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b74d0(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScDamage(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021cfcb4(client->viewCore, args[2], MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]),
-                            args[1]);
+        BtlvCore_StartDamage(client->viewCore, args[2], MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]),
+                             args[1]);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cfce0(client->viewCore)) {
+        if (BtlvCore_WaitDamage(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4974,7 +5044,7 @@ static BOOL func_ov167_021b74d0(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7520(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScDamagePlural(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
         u16 count = args[0];
@@ -4984,14 +5054,14 @@ static BOOL func_ov167_021b7520(BtlClient *client, s32 *seq, const u32 *args) {
         u8 i;
 
         for (i = 0; i < count; i++) {
-            monIds[i] = func_ov167_021b15c8(client->cmdQueue);
+            monIds[i] = BtlServerCmdQueue_ReadByte(client->cmdQueue);
         }
-        func_ov167_021cfe40(client->viewCore, count, type, monIds, arg2);
+        BtlvCore_StartMultiDamage(client->viewCore, count, type, monIds, arg2);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021cfe7c(client->viewCore)) {
+        if (BtlvCore_WaitMultiDamage(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -4999,20 +5069,20 @@ static BOOL func_ov167_021b7520(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7598(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOneHitKO(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021cff44(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+        BtlvCore_StartGaugeHP(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cff60(client->viewCore)) {
-            func_ov167_021d0250(client->viewCore, 0x61, args);
+        if (BtlvCore_WaitGaugeHP(client->viewCore)) {
+            BtlvCore_StartMsgStd(client->viewCore, 0x61, args);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5020,12 +5090,12 @@ static BOOL func_ov167_021b7598(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b75f8(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSetGaugeStatus(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
         BtlvEffect_SetGaugeStatus(
             args[1],
-            func_ov167_0219c6dc(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0])));
+            BattlePosToViewPos(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0])));
         (*seq)++;
         break;
     case 1:
@@ -5034,29 +5104,29 @@ static BOOL func_ov167_021b75f8(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b763c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScConfusionDamage(BtlClient *client, s32 *seq, const u32 *args) {
     u8 pos;
 
     switch (*seq) {
     case 0:
-        if (!func_ov167_021b1990(client)) {
+        if (!BattleClient_IsChapterSkipping(client)) {
             pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
-            func_ov167_021cfc60(client->viewCore, pos, pos, 1, PML_MoveGetParam(1, 0x1b), 0, 0);
+            BtlvCore_StartMoveEffect(client->viewCore, pos, pos, 1, PML_MoveGetParam(1, 0x1b), 0, 0);
         }
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cfca4(client->viewCore)) {
+        if (BtlvCore_WaitMoveEffect(client->viewCore)) {
             pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
-            if (!func_ov167_021b1990(client)) {
+            if (!BattleClient_IsChapterSkipping(client)) {
                 GFL_SndSEPlay(0x564);
             }
-            func_ov167_021cfcb4(client->viewCore, 1, pos, 1);
+            BtlvCore_StartDamage(client->viewCore, 1, pos, 1);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021cfce0(client->viewCore)) {
+        if (BtlvCore_WaitDamage(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5064,15 +5134,15 @@ static BOOL func_ov167_021b763c(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b76e4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScFaint(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021cffcc(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+        BtlvCore_StartFaint(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
         client->studio.unk26 = GetBattleMonSpecies(GetPokeParamConst(client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cffe8(client->viewCore)) {
+        if (BtlvCore_WaitFaint(client->viewCore)) {
             Clear_ForFainted(GetPokeParam(client->pokeCon, args[0]));
             return TRUE;
         }
@@ -5081,14 +5151,14 @@ static BOOL func_ov167_021b76e4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7750(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScShowMon(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021cfff8(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+        BtlvCore_StartShowMon(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0008(client->viewCore)) {
+        if (BtlvCore_WaitShowMon(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5096,23 +5166,22 @@ static BOOL func_ov167_021b7750(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7794(BtlClient *client, s32 *seq, const u32 *args) {
-    u8 viewPos =
-        func_ov167_0219c6dc(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+static BOOL BattleClient_ScStatDownEffect(BtlClient *client, s32 *seq, const u32 *args) {
+    u8 viewPos = BattlePosToViewPos(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
 
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        if (!func_ov167_0219bd88(client->mainModule)) {
+        if (!IsBattleSceneOff(client->mainModule)) {
             return TRUE;
         }
-        func_ov167_021d03a0(client->viewCore, viewPos);
+        BtlvCore_StartRankDownEffect(client->viewCore, viewPos);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d03c0(client->viewCore, viewPos)) {
+        if (BtlvCore_WaitRankEffect(client->viewCore, viewPos)) {
             return TRUE;
         }
         break;
@@ -5120,23 +5189,22 @@ static BOOL func_ov167_021b7794(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7800(BtlClient *client, s32 *seq, const u32 *args) {
-    u8 viewPos =
-        func_ov167_0219c6dc(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+static BOOL BattleClient_ScStatUpEffect(BtlClient *client, s32 *seq, const u32 *args) {
+    u8 viewPos = BattlePosToViewPos(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
 
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        if (!func_ov167_0219bd88(client->mainModule)) {
+        if (!IsBattleSceneOff(client->mainModule)) {
             return TRUE;
         }
-        func_ov167_021d03b0(client->viewCore, viewPos);
+        BtlvCore_StartRankUpEffect(client->viewCore, viewPos);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d03c0(client->viewCore, viewPos)) {
+        if (BtlvCore_WaitRankEffect(client->viewCore, viewPos)) {
             return TRUE;
         }
         break;
@@ -5149,8 +5217,8 @@ static BOOL BattleClient_ScWeatherStart(BtlClient *client, s32 *seq, const u32 *
 
     switch (*seq) {
     case 0:
-        func_ov167_021d5aec(client->field, weather, args[1]);
-        if (func_ov167_021b1990(client)) {
+        BtlField_SetWeather(client->field, weather, args[1]);
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
         if (weather < NELEMS(sWeatherStartTable)) {
@@ -5160,12 +5228,12 @@ static BOOL BattleClient_ScWeatherStart(BtlClient *client, s32 *seq, const u32 *
         break;
     case 1:
         if (!BtlvEffect_IsBusy()) {
-            func_ov167_021d0250(client->viewCore, sWeatherStartTable[weather].msg, NULL);
+            BtlvCore_StartMsgStd(client->viewCore, sWeatherStartTable[weather].msg, NULL);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5194,13 +5262,13 @@ static BOOL BattleClient_ScWeatherEnd(BtlClient *client, s32 *seq, const u32 *ar
         default:
             return TRUE;
         }
-        func_ov167_021d0250(client->viewCore, msg, NULL);
+        BtlvCore_StartMsgStd(client->viewCore, msg, NULL);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021d02e8(client->viewCore)) {
-            func_ov167_021d5af4(client->field);
+        if (BtlvCore_WaitMsg(client->viewCore)) {
+            BtlField_ClearWeather(client->field);
             return TRUE;
         }
         break;
@@ -5208,14 +5276,14 @@ static BOOL BattleClient_ScWeatherEnd(BtlClient *client, s32 *seq, const u32 *ar
     return FALSE;
 }
 
-static BOOL func_ov167_021b795c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScUpdateHpGauge(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021cff44(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+        BtlvCore_StartGaugeHP(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cff60(client->viewCore)) {
+        if (BtlvCore_WaitGaugeHP(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5223,22 +5291,22 @@ static BOOL func_ov167_021b795c(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b79a0(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScUseHeldItem(BtlClient *client, s32 *seq, const u32 *args) {
     u8 pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
 
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        if (!func_ov167_0219bd88(client->mainModule)) {
+        if (!IsBattleSceneOff(client->mainModule)) {
             return TRUE;
         }
-        func_ov167_021d0410(client->viewCore, pos);
+        BtlvCore_StartUseItemEffect(client->viewCore, pos);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0428(client->viewCore, pos)) {
+        if (BtlvCore_WaitUseItemEffect(client->viewCore, pos)) {
             return TRUE;
         }
         break;
@@ -5246,17 +5314,17 @@ static BOOL func_ov167_021b79a0(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7a04(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScFaintHpGauge(BtlClient *client, s32 *seq, const u32 *args) {
     u8 monId = args[0];
 
     switch (*seq) {
     case 0:
-        func_ov167_021cff44(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, monId));
+        BtlvCore_StartGaugeHP(client->viewCore, MonIDToBattlePos(client->mainModule, client->pokeCon, monId));
         client->studio.unk26 = GetBattleMonSpecies(GetPokeParamConst(client->pokeCon, args[0]));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021cff60(client->viewCore)) {
+        if (BtlvCore_WaitGaugeHP(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5264,24 +5332,24 @@ static BOOL func_ov167_021b7a04(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7a60(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSwapPos(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
         u8 clientId = args[0];
         u8 pos1 = args[1];
         u8 pos2 = args[2];
-        u8 slot1 = func_ov167_0219c658(client->mainModule, pos1);
-        u8 slot2 = func_ov167_0219c658(client->mainModule, pos2);
-        u8 viewPos1 = func_ov167_0219c6dc(client->mainModule, pos1);
-        u8 viewPos2 = func_ov167_0219c6dc(client->mainModule, pos2);
+        u8 slot1 = GetPosIndexInClient(client->mainModule, pos1);
+        u8 slot2 = GetPosIndexInClient(client->mainModule, pos2);
+        u8 viewPos1 = BattlePosToViewPos(client->mainModule, pos1);
+        u8 viewPos2 = BattlePosToViewPos(client->mainModule, pos2);
 
-        func_ov167_0219d504(GetPartyData(client->pokeCon, clientId), slot1, slot2);
-        func_ov167_021d04dc(client->viewCore, clientId, viewPos1, viewPos2, slot1, slot2);
+        BattleParty_Swap(GetPartyData(client->pokeCon, clientId), slot1, slot2);
+        BtlvCore_StartSwapPokemon(client->viewCore, clientId, viewPos1, viewPos2, slot1, slot2);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021d0528(client->viewCore)) {
+        if (BtlvCore_WaitSwapPokemon(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5289,7 +5357,7 @@ static BOOL func_ov167_021b7a60(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7af4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScMoveToCenter(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
         BtlvEffect_Start(0x281);
@@ -5299,32 +5367,32 @@ static BOOL func_ov167_021b7af4(BtlClient *client, s32 *seq, const u32 *args) {
         if (!BtlvEffect_IsBusy()) {
             u8 clientId = args[0];
             u8 slot = args[1];
-            u8 pos1 = func_ov167_0219c458(client->mainModule, clientId, slot);
-            u8 pos2 = func_ov167_0219c458(client->mainModule, clientId, 1);
-            u8 viewPos1 = func_ov167_0219c6dc(client->mainModule, pos1);
-            u8 viewPos2 = func_ov167_0219c6dc(client->mainModule, pos2);
+            u8 pos1 = GetClientBattlePos(client->mainModule, clientId, slot);
+            u8 pos2 = GetClientBattlePos(client->mainModule, clientId, 1);
+            u8 viewPos1 = BattlePosToViewPos(client->mainModule, pos1);
+            u8 viewPos2 = BattlePosToViewPos(client->mainModule, pos2);
 
-            func_ov167_0219d504(GetPartyData(client->pokeCon, clientId), slot, 1);
-            func_ov167_021d04dc(client->viewCore, clientId, viewPos1, viewPos2, slot, 1);
+            BattleParty_Swap(GetPartyData(client->pokeCon, clientId), slot, 1);
+            BtlvCore_StartSwapPokemon(client->viewCore, clientId, viewPos1, viewPos2, slot, 1);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d0528(client->viewCore)) {
+        if (BtlvCore_WaitSwapPokemon(client->viewCore)) {
             u8 clientId = args[2];
             u8 slot = args[3];
-            u8 pos1 = func_ov167_0219c458(client->mainModule, clientId, slot);
-            u8 pos2 = func_ov167_0219c458(client->mainModule, clientId, 1);
-            u8 viewPos1 = func_ov167_0219c6dc(client->mainModule, pos1);
-            u8 viewPos2 = func_ov167_0219c6dc(client->mainModule, pos2);
+            u8 pos1 = GetClientBattlePos(client->mainModule, clientId, slot);
+            u8 pos2 = GetClientBattlePos(client->mainModule, clientId, 1);
+            u8 viewPos1 = BattlePosToViewPos(client->mainModule, pos1);
+            u8 viewPos2 = BattlePosToViewPos(client->mainModule, pos2);
 
-            func_ov167_0219d504(GetPartyData(client->pokeCon, clientId), slot, 1);
-            func_ov167_021d04dc(client->viewCore, clientId, viewPos1, viewPos2, slot, 1);
+            BattleParty_Swap(GetPartyData(client->pokeCon, clientId), slot, 1);
+            BtlvCore_StartSwapPokemon(client->viewCore, clientId, viewPos1, viewPos2, slot, 1);
             (*seq)++;
         }
         break;
     case 3:
-        if (func_ov167_021d0528(client->viewCore)) {
+        if (BtlvCore_WaitSwapPokemon(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5332,10 +5400,10 @@ static BOOL func_ov167_021b7af4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7c08(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSubstituteCreate(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        BtlvEffect_StartEffect26E(func_ov167_0219c6dc(client->mainModule, args[0]));
+        BtlvEffect_StartEffect26E(BattlePosToViewPos(client->mainModule, args[0]));
         (*seq)++;
         break;
     case 1:
@@ -5347,12 +5415,12 @@ static BOOL func_ov167_021b7c08(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7c40(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSubstituteDelete(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
-        u8 viewPos = func_ov167_0219c6dc(client->mainModule, args[0]);
+        u8 viewPos = BattlePosToViewPos(client->mainModule, args[0]);
 
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             BtlvEffect_SetFlag26(TRUE);
         }
         BtlvEffect_StartEffect26F(viewPos);
@@ -5361,7 +5429,7 @@ static BOOL func_ov167_021b7c40(BtlClient *client, s32 *seq, const u32 *args) {
     }
     case 1:
         if (!BtlvEffect_IsBusy()) {
-            if (func_ov167_021b1990(client)) {
+            if (BattleClient_IsChapterSkipping(client)) {
                 BtlvEffect_SetFlag26(FALSE);
             }
             return TRUE;
@@ -5376,16 +5444,16 @@ static BOOL BattleClient_ScTransform(BtlClient *client, s32 *seq, const u32 *arg
     case 0: {
         BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
         BattleMon *target = GetPokeParam(client->pokeCon, args[1]);
-        u8 pos = func_ov167_0219c62c(client->mainModule, client->pokeCon, args[0]);
-        u8 targetPos = func_ov167_0219c62c(client->mainModule, client->pokeCon, args[1]);
+        u8 pos = MonIDToViewPos(client->mainModule, client->pokeCon, args[0]);
+        u8 targetPos = MonIDToViewPos(client->mainModule, client->pokeCon, args[1]);
 
         TransformSet(mon, target);
-        func_ov167_021d048c(client->viewCore, pos, targetPos);
+        BtlvCore_StartTransform(client->viewCore, pos, targetPos);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021d04ac(client->viewCore)) {
+        if (BtlvCore_WaitTransform(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5393,19 +5461,19 @@ static BOOL BattleClient_ScTransform(BtlClient *client, s32 *seq, const u32 *arg
     return FALSE;
 }
 
-static BOOL func_ov167_021b7d24(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScDamageEffect(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        if (!func_ov167_021b1990(client)) {
+        if (!BattleClient_IsChapterSkipping(client)) {
             u8 pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
 
-            func_ov167_021cfd78(client->viewCore, args[2], pos, func_ov167_021bd2e8(args[1]));
+            BtlvCore_StartDamageEffect(client->viewCore, args[2], pos, BtlCalc_GetEffectivenessCategory(args[1]));
             (*seq)++;
             break;
         }
         return TRUE;
     case 1:
-        if (func_ov167_021cfdb0(client->viewCore)) {
+        if (BtlvCore_WaitDamageEffect(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5413,19 +5481,19 @@ static BOOL func_ov167_021b7d24(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b7d84(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScPlayBgm(BtlClient *client, s32 *seq, const u32 *args) {
     BtlvEffect_PlayBgm(args[0]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b7d90(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScHideMsgWindow(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        func_ov167_021d04bc(client->viewCore);
+        BtlvCore_StartHideMsgWin(client->viewCore);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d04cc(client->viewCore)) {
+        if (BtlvCore_WaitHideMsgWin(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5458,7 +5526,7 @@ static BOOL BattleClient_ScAddEVs(BtlClient *client, s32 *seq, const u32 *args) 
 static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args) {
     u8 monId = args[0];
     BattleMon *mon = GetPokeParam(client->pokeCon, monId);
-    u32 pos = func_ov167_0219c62c(client->mainModule, client->pokeCon, monId);
+    u32 pos = MonIDToViewPos(client->mainModule, client->pokeCon, monId);
     BOOL visible = FALSE;
 
     if (pos != 0xff && BtlvEffect_CheckGaugeExist(pos)) {
@@ -5474,7 +5542,7 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         if (sExpLeft != 0) {
             u32 exp = sExpLeft;
 
-            if (func_ov167_021bc1b8(mon, &exp, &sLevelUp)) {
+            if (BattleMon_AddExp(mon, &exp, &sLevelUp)) {
                 *seq = 3;
             } else {
                 if (visible) {
@@ -5496,9 +5564,9 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         }
         break;
     case 3:
-        func_ov167_021bc6a0(mon);
+        BattleMon_RecalcStats(mon);
         JoinAvenue_RecordActivity(9);
-        func_ov167_021bc3fc(mon);
+        BattleMon_ReloadSrcData(mon);
         func_ov167_021bc6ac(mon);
         if (visible) {
             BtlvEffect_CalcGaugeExpLevelUp(pos, mon);
@@ -5509,12 +5577,12 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         break;
     case 4:
         if (!BtlvEffect_CheckExecuteGauge() && !GFL_SndPlayerIsActiveAny()) {
-            func_ov167_021cff78(client->viewCore, pos, 0x25d);
+            BtlvCore_StartPosEffect(client->viewCore, pos, 0x25d);
             *seq = 5;
         }
         break;
     case 5:
-        if (func_ov167_021cff94(client->viewCore)) {
+        if (BtlvCore_WaitPosEffect(client->viewCore)) {
             *seq = 6;
         }
         break;
@@ -5522,16 +5590,16 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         Btlv_StringParam_Setup(&client->strParam, 1, 0x3c);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLevelUp.level);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         *seq = 7;
         break;
     case 7:
-        if (func_ov167_021d02f8(client->viewCore)) {
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             GFL_SndBGMSetPaused(TRUE);
             GFL_SndBGMPush();
             GFL_SndBGMPlay(0x515, 0xffff);
         }
-        if (func_ov167_021d02e8(client->viewCore) && !GFL_SndBGMIsPlaying()) {
+        if (BtlvCore_WaitMsg(client->viewCore) && !GFL_SndBGMIsPlaying()) {
             GFL_SndBGMPop();
             GFL_SndBGMSetPaused(FALSE);
             sExpSeq = 0;
@@ -5542,25 +5610,26 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         sExpSeq++;
         if ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed() || sExpSeq > 80) {
             sExpSeq = 0;
-            func_ov167_0219db64(client->mainModule, mon);
-            func_ov167_021d0978(client->viewCore, mon, &sLevelUp);
+            NotifyMonLevelUp(client->mainModule, mon);
+            BtlvCore_StartLevelUpWin(client->viewCore, mon, &sLevelUp);
             *seq = 9;
         }
         break;
     case 9:
-        if (func_ov167_021d0988(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed())) {
-            func_ov167_021d0998(client->viewCore);
+        if (BtlvCore_WaitLevelUpWin(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed())) {
+            BtlvCore_StartLevelUpStats(client->viewCore);
             *seq = 10;
         }
         break;
     case 10:
-        if (func_ov167_021d09a8(client->viewCore) && ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed())) {
-            func_ov167_021d09b8(client->viewCore);
+        if (BtlvCore_WaitLevelUpStats(client->viewCore) &&
+            ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed())) {
+            BtlvCore_StartCloseLevelUpWin(client->viewCore);
             *seq = 11;
         }
         break;
     case 11:
-        if (func_ov167_021d09c8(client->viewCore)) {
+        if (BtlvCore_WaitCloseLevelUpWin(client->viewCore)) {
             sExpSeq = 0;
             *seq = 12;
         }
@@ -5571,7 +5640,7 @@ static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args)
         }
         break;
     case 13:
-        func_ov167_0219cc34(client->mainModule, monId);
+        SyncServerMonMoves(client->mainModule, monId);
         return TRUE;
     }
     return FALSE;
@@ -5618,20 +5687,20 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         BattleMon *bpp = GetPokeParam(client->pokeCon, monId);
 
         GetSrcData(bpp);
-        func_ov167_021bc3fc(bpp);
+        BattleMon_ReloadSrcData(bpp);
         Btlv_StringParam_Setup(&client->strParam, 5, 3);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         *seq = 3;
     }
     case 3:
-        if (func_ov167_021d02f8(client->viewCore)) {
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             GFL_SndBGMSetPaused(TRUE);
             GFL_SndBGMPush();
             GFL_SndBGMPlay(0x515, 0xffff);
         }
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 4;
         }
         break;
@@ -5646,30 +5715,30 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         Btlv_StringParam_Setup(&client->strParam, 5, 4);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
-        func_ov167_021d0b4c(&client->strParam, 0xff);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        Btlv_StringParam_SetWait(&client->strParam, 0xff);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         *seq = 6;
     case 6:
-        if (func_ov167_021d02f8(client->viewCore)) {
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             BtlvStringParam yesParam;
             BtlvStringParam noParam;
 
             Btlv_StringParam_Setup(&yesParam, 6, 2);
             Btlv_StringParam_Setup(&noParam, 6, 3);
-            func_ov167_021d0798(client->viewCore, &yesParam, &noParam, 1);
+            BtlvCore_ShowYesNo(client->viewCore, &yesParam, &noParam, 1);
         }
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 7;
         }
         break;
     case 7: {
         u32 answer;
 
-        if (func_ov167_021d0828(client->viewCore, &answer)) {
+        if (BtlvCore_PollYesNo(client->viewCore, &answer)) {
             if (answer == 0) {
-                func_ov167_021d0838(client->viewCore,
-                                    func_ov167_0219d5b0(GetClientParty(client->pokeCon, client->clientId), monId),
-                                    sLearnMove);
+                BtlvCore_StartForgetMoveSelect(
+                    client->viewCore, BattleParty_FindMonID(GetClientParty(client->pokeCon, client->clientId), monId),
+                    sLearnMove);
                 *seq = 8;
             } else {
                 *seq = 10;
@@ -5680,7 +5749,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
     case 8: {
         u8 slot;
 
-        if (func_ov167_021d0854(client->viewCore, &slot)) {
+        if (BtlvCore_WaitForgetMoveSelect(client->viewCore, &slot)) {
             if (slot == 4) {
                 *seq = 5;
             } else {
@@ -5691,14 +5760,14 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
                 Btlv_StringParam_Setup(&client->strParam, 5, 5);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
                 Btlv_StringParam_AddArg(&client->strParam, oldMove);
-                func_ov167_021d0210(client->viewCore, &client->strParam, BattleClient_ForgetMoveSECallback);
+                BtlvCore_StartMsgCallback(client->viewCore, &client->strParam, BattleClient_ForgetMoveSECallback);
                 *seq = 9;
             }
         }
         break;
     }
     case 9:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 2;
         }
         break;
@@ -5706,12 +5775,12 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         Btlv_StringParam_Setup(&client->strParam, 5, 7);
         Btlv_StringParam_AddArg(&client->strParam, monId);
         Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
-        func_ov167_021d0b4c(&client->strParam, 0xff);
-        func_ov167_021d01ec(client->viewCore, &client->strParam);
+        Btlv_StringParam_SetWait(&client->strParam, 0xff);
+        BtlvCore_StartMsg(client->viewCore, &client->strParam);
         *seq = 11;
         break;
     case 11:
-        if (func_ov167_021d02f8(client->viewCore)) {
+        if (BtlvCore_IsMsgJustDone(client->viewCore)) {
             BtlvStringParam yesParam;
             BtlvStringParam noParam;
 
@@ -5719,21 +5788,21 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
             Btlv_StringParam_AddArg(&yesParam, sLearnMove);
             Btlv_StringParam_Setup(&noParam, 6, 5);
             Btlv_StringParam_AddArg(&noParam, sLearnMove);
-            func_ov167_021d0798(client->viewCore, &yesParam, &noParam, 1);
+            BtlvCore_ShowYesNo(client->viewCore, &yesParam, &noParam, 1);
         }
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 12;
         }
         break;
     case 12: {
         u32 answer;
 
-        if (func_ov167_021d0828(client->viewCore, &answer)) {
+        if (BtlvCore_PollYesNo(client->viewCore, &answer)) {
             if (answer == 0) {
                 Btlv_StringParam_Setup(&client->strParam, 5, 8);
                 Btlv_StringParam_AddArg(&client->strParam, monId);
                 Btlv_StringParam_AddArg(&client->strParam, sLearnMove);
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 *seq = 13;
             } else {
                 *seq = 5;
@@ -5742,7 +5811,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         break;
     }
     case 13:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             *seq = 1;
         }
         break;
@@ -5750,20 +5819,20 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
     return FALSE;
 }
 
-static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScBallThrow(BtlClient *client, s32 *seq, const u32 *args) {
     static const u16 sEscapeMessages[4] = { 0x3d, 0x3e, 0x3f, 0x40 };
     BattleMon *mon;
     u16 message;
 
     switch (*seq) {
     case 0:
-        BtlvEffect_StartEffect23A(func_ov167_0219c6dc(client->mainModule, args[0]), args[5], args[1], args[2], args[4]);
+        BtlvEffect_StartEffect23A(BattlePosToViewPos(client->mainModule, args[0]), args[5], args[1], args[2], args[4]);
         (*seq)++;
         break;
     case 1:
         if (!BtlvEffect_IsBusy()) {
             if (args[2]) {
-                mon = func_ov167_0219d188(client->pokeCon, args[0]);
+                mon = PokeCon_GetPosMonInner(client->pokeCon, args[0]);
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x41);
                 Btlv_StringParam_AddArg(&client->strParam, GetMonID(mon));
                 BtlvEffect_PlayBgmNoPinch(0x518);
@@ -5775,15 +5844,15 @@ static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args) {
                 }
                 Btlv_StringParam_Setup(&client->strParam, 1, message);
             }
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             if (args[2]) {
-                mon = func_ov167_0219d188(client->pokeCon, args[0]);
-                func_ov167_0219dc00(client->mainModule, mon);
+                mon = PokeCon_GetPosMonInner(client->pokeCon, args[0]);
+                NotifyMonCaught(client->mainModule, mon);
                 (*seq)++;
             } else {
                 return TRUE;
@@ -5794,12 +5863,12 @@ static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args) {
         if (!GFL_SndBGMIsPlaying()) {
             BtlvEffect_Resume();
             GFL_SndBGMPlay(0x47c, 0xffff);
-            func_ov167_0219cb7c(client->mainModule);
+            SkipExitBGMFadeOut(client->mainModule);
             if (args[3]) {
-                mon = func_ov167_0219d188(client->pokeCon, args[0]);
+                mon = PokeCon_GetPosMonInner(client->pokeCon, args[0]);
                 Btlv_StringParam_Setup(&client->strParam, 1, 0x42);
                 Btlv_StringParam_AddArg(&client->strParam, GetMonID(mon));
-                func_ov167_021d01ec(client->viewCore, &client->strParam);
+                BtlvCore_StartMsg(client->viewCore, &client->strParam);
                 (*seq)++;
             } else {
                 return TRUE;
@@ -5807,7 +5876,7 @@ static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args) {
         }
         break;
     case 4:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             (*seq)++;
         }
         break;
@@ -5817,21 +5886,21 @@ static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b853c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScBallThrowTrainer(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0:
-        BtlvEffect_StartEffect23D(func_ov167_0219c6dc(client->mainModule, args[0]), args[1]);
+        BtlvEffect_StartEffect23D(BattlePosToViewPos(client->mainModule, args[0]), args[1]);
         (*seq)++;
         break;
     case 1:
         if (!BtlvEffect_IsBusy()) {
             Btlv_StringParam_Setup(&client->strParam, 1, 0x43);
-            func_ov167_021d01ec(client->viewCore, &client->strParam);
+            BtlvCore_StartMsg(client->viewCore, &client->strParam);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5839,19 +5908,19 @@ static BOOL func_ov167_021b853c(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b85a4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScRotation(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
         u8 clientId = args[0];
         u8 result = args[1];
 
-        func_ov167_0219d544(GetPartyData(client->pokeCon, clientId), result, NULL, NULL);
-        func_ov167_021d0640(client->viewCore, clientId, result);
+        BattleParty_Rotate(GetPartyData(client->pokeCon, clientId), result, NULL, NULL);
+        BtlvCore_StartRotation(client->viewCore, clientId, result);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021d06ac(client->viewCore)) {
+        if (BtlvCore_WaitRotation(client->viewCore)) {
             u8 result = args[1];
             u8 isNpc;
             u16 message;
@@ -5859,18 +5928,18 @@ static BOOL func_ov167_021b85a4(BtlClient *client, s32 *seq, const u32 *args) {
             if (result == 1) {
                 return TRUE;
             }
-            isNpc = func_ov167_0219d888(client->mainModule, args[0]);
+            isNpc = IsClientNPCTrainer(client->mainModule, args[0]);
             if (result == 3) {
                 message = isNpc ? 0x26 : 0x27;
             } else {
                 message = isNpc ? 0x28 : 0x29;
             }
-            func_ov167_021d0250(client->viewCore, message, args);
+            BtlvCore_StartMsgStd(client->viewCore, message, args);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d02e8(client->viewCore)) {
+        if (BtlvCore_WaitMsg(client->viewCore)) {
             return TRUE;
         }
         break;
@@ -5878,28 +5947,28 @@ static BOOL func_ov167_021b85a4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b8650(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScChangeAbility(BtlClient *client, s32 *seq, const u32 *args) {
     u8 monId = args[0];
     u8 pos = MonIDToBattlePos(client->mainModule, client->pokeCon, monId);
 
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             ChangeAbility(GetPokeParam(client->pokeCon, monId), args[1]);
             return TRUE;
         }
-        func_ov167_021d0340(client->viewCore, pos, 0);
+        BtlvCore_ShowAbilityWin(client->viewCore, pos, 0);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0350(client->viewCore, pos)) {
+        if (BtlvCore_WaitShowAbilityWin(client->viewCore, pos)) {
             ChangeAbility(GetPokeParam(client->pokeCon, monId), args[1]);
-            func_ov167_021d0380(client->viewCore, pos);
+            BtlvCore_UpdateAbilityWin(client->viewCore, pos);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_021d0390(client->viewCore, pos)) {
+        if (BtlvCore_WaitUpdateAbilityWin(client->viewCore, pos)) {
             (*seq)++;
         }
         break;
@@ -5909,7 +5978,7 @@ static BOOL func_ov167_021b8650(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b86e4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScSwapAbility(BtlClient *client, s32 *seq, const u32 *args) {
     u8 monId1 = args[0];
     u8 monId2 = args[1];
     u16 ability1 = args[2];
@@ -5921,7 +5990,7 @@ static BOOL func_ov167_021b86e4(BtlClient *client, s32 *seq, const u32 *args) {
 
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             ChangeAbility(mon1, ability1);
             ChangeAbility(mon2, ability2);
             return TRUE;
@@ -5931,22 +6000,22 @@ static BOOL func_ov167_021b86e4(BtlClient *client, s32 *seq, const u32 *args) {
             ChangeAbility(mon2, ability2);
             return TRUE;
         }
-        func_ov167_021d0340(client->viewCore, pos1, 0);
+        BtlvCore_ShowAbilityWin(client->viewCore, pos1, 0);
         sSwapTimer = 8;
         (*seq)++;
         break;
     case 1:
-        func_ov167_021d0350(client->viewCore, pos1);
+        BtlvCore_WaitShowAbilityWin(client->viewCore, pos1);
         if (sSwapTimer != 0) {
             sSwapTimer--;
         } else {
-            func_ov167_021d0340(client->viewCore, pos2, 0);
+            BtlvCore_ShowAbilityWin(client->viewCore, pos2, 0);
             (*seq)++;
         }
         break;
     case 2: {
-        u8 done1 = func_ov167_021d0350(client->viewCore, pos1);
-        u8 done2 = func_ov167_021d0350(client->viewCore, pos2);
+        u8 done1 = BtlvCore_WaitShowAbilityWin(client->viewCore, pos1);
+        u8 done2 = BtlvCore_WaitShowAbilityWin(client->viewCore, pos2);
 
         if (done1 && done2) {
             (*seq)++;
@@ -5961,18 +6030,18 @@ static BOOL func_ov167_021b86e4(BtlClient *client, s32 *seq, const u32 *args) {
         break;
     case 4:
         if (++sSwapTimer > 8) {
-            func_ov167_021d0380(client->viewCore, pos1);
+            BtlvCore_UpdateAbilityWin(client->viewCore, pos1);
             (*seq)++;
         }
         break;
     case 5:
-        if (func_ov167_021d0390(client->viewCore, pos1)) {
-            func_ov167_021d0380(client->viewCore, pos2);
+        if (BtlvCore_WaitUpdateAbilityWin(client->viewCore, pos1)) {
+            BtlvCore_UpdateAbilityWin(client->viewCore, pos2);
             (*seq)++;
         }
         break;
     case 6:
-        if (func_ov167_021d0390(client->viewCore, pos2)) {
+        if (BtlvCore_WaitUpdateAbilityWin(client->viewCore, pos2)) {
             (*seq)++;
         }
         break;
@@ -5982,21 +6051,21 @@ static BOOL func_ov167_021b86e4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b8850(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScIllusionBreak(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
         u8 monId = args[0];
         u8 pos = MonIDToBattlePos(client->mainModule, client->pokeCon, monId);
         BattleMon *mon = GetPokeParam(client->pokeCon, monId);
-        BOOL skip = func_ov167_021b1990(client);
+        BOOL skip = BattleClient_IsChapterSkipping(client);
 
         IllusionBreak(mon);
-        func_ov167_021d0440(client->viewCore, pos, skip);
+        BtlvCore_StartIllusionBreak(client->viewCore, pos, skip);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021d0450(client->viewCore)) {
+        if (BtlvCore_WaitIllusionBreak(client->viewCore)) {
             (*seq)++;
         }
         break;
@@ -6006,9 +6075,9 @@ static BOOL func_ov167_021b8850(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b88b4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScEffect(BtlClient *client, s32 *seq, const u32 *args) {
     if (*seq == 0) {
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
         BtlvEffect_Start(args[0]);
@@ -6019,53 +6088,52 @@ static BOOL func_ov167_021b88b4(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b88ec(BtlClient *client, s32 *seq, const u32 *args) {
-    u8 pos = func_ov167_0219c6dc(client->mainModule, args[0]);
+static BOOL BattleClient_ScEffectByPos(BtlClient *client, s32 *seq, const u32 *args) {
+    u8 pos = BattlePosToViewPos(client->mainModule, args[0]);
 
     if (*seq == 0) {
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        if (!func_ov167_0219bd88(client->mainModule) && IsStatEffectId(args[1])) {
+        if (!IsBattleSceneOff(client->mainModule) && IsStatEffectId(args[1])) {
             return TRUE;
         }
-        func_ov167_021cff78(client->viewCore, pos, args[1]);
+        BtlvCore_StartPosEffect(client->viewCore, pos, args[1]);
         (*seq)++;
-    } else if (func_ov167_021cff94(client->viewCore)) {
+    } else if (BtlvCore_WaitPosEffect(client->viewCore)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov167_021b896c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScEffectBetweenPos(BtlClient *client, s32 *seq, const u32 *args) {
     if (*seq == 0) {
         u8 pos1;
 
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        pos1 = func_ov167_0219c6dc(client->mainModule, args[0]);
-        func_ov167_021cffa8(client->viewCore, pos1, func_ov167_0219c6dc(client->mainModule, args[1]), args[2]);
+        pos1 = BattlePosToViewPos(client->mainModule, args[0]);
+        BtlvCore_StartAtkDefEffect(client->viewCore, pos1, BattlePosToViewPos(client->mainModule, args[1]), args[2]);
         (*seq)++;
-    } else if (func_ov167_021cffb8(client->viewCore)) {
+    } else if (BtlvCore_WaitAtkDefEffect(client->viewCore)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov167_021b89cc(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScChangeForm(BtlClient *client, s32 *seq, const u32 *args) {
     switch (*seq) {
     case 0: {
-        u8 pos =
-            func_ov167_0219c6dc(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
+        u8 pos = BattlePosToViewPos(client->mainModule, MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]));
 
         ChangeForm(GetPokeParam(client->pokeCon, args[0]), args[1]);
-        func_ov167_021d0460(client->viewCore, pos);
+        BtlvCore_StartFormChange(client->viewCore, pos);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_021d047c(client->viewCore)) {
+        if (BtlvCore_WaitFormChange(client->viewCore)) {
             (*seq)++;
         }
         break;
@@ -6075,19 +6143,19 @@ static BOOL func_ov167_021b89cc(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b8a34(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScAbilityPopupIn(BtlClient *client, s32 *seq, const u32 *args) {
     u8 pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
 
     switch (*seq) {
     case 0:
-        if (func_ov167_021b1990(client)) {
+        if (BattleClient_IsChapterSkipping(client)) {
             return TRUE;
         }
-        func_ov167_021d0340(client->viewCore, pos, 1);
+        BtlvCore_ShowAbilityWin(client->viewCore, pos, 1);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0350(client->viewCore, pos)) {
+        if (BtlvCore_WaitShowAbilityWin(client->viewCore, pos)) {
             (*seq)++;
         }
         break;
@@ -6097,16 +6165,16 @@ static BOOL func_ov167_021b8a34(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b8a8c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScAbilityPopupOut(BtlClient *client, s32 *seq, const u32 *args) {
     u8 pos = MonIDToBattlePos(client->mainModule, client->pokeCon, args[0]);
 
     switch (*seq) {
     case 0:
-        func_ov167_021d0360(client->viewCore, pos);
+        BtlvCore_HideAbilityWin(client->viewCore, pos);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_021d0370(client->viewCore, pos)) {
+        if (BtlvCore_WaitHideAbilityWin(client->viewCore, pos)) {
             return TRUE;
         }
         break;
@@ -6114,96 +6182,96 @@ static BOOL func_ov167_021b8a8c(BtlClient *client, s32 *seq, const u32 *args) {
     return FALSE;
 }
 
-static BOOL func_ov167_021b8ad0(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb790(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpSubtractHp(BtlClient *client, s32 *seq, const u32 *args) {
+    HPSub(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8af0(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpAddHp(BtlClient *client, s32 *seq, const u32 *args) {
     HPAdd(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8b10(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSubtractPP(BtlClient *client, s32 *seq, const u32 *args) {
     u8 moveIdx = args[1];
     u8 amount = args[2];
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
 
-    func_ov167_021bae08(mon, moveIdx, amount);
+    Move_DecrementPP(mon, moveIdx, amount);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8b38(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSubtractOriginalPP(BtlClient *client, s32 *seq, const u32 *args) {
     u8 moveIdx = args[1];
     u8 amount = args[2];
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
 
-    func_ov167_021bae40(mon, moveIdx, amount);
+    Move_DecrementPP_Org(mon, moveIdx, amount);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8b60(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetMoveUsed(BtlClient *client, s32 *seq, const u32 *args) {
     u8 moveIdx = args[1];
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
 
-    func_ov167_021baecc(mon, moveIdx);
+    Move_SetUsed(mon, moveIdx);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8b80(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpZeroHp(BtlClient *client, s32 *seq, const u32 *args) {
     HPZero(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b8b98(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpAddPP(BtlClient *client, s32 *seq, const u32 *args) {
     Move_IncrementPP(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8bbc(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpAddOriginalPP(BtlClient *client, s32 *seq, const u32 *args) {
     Move_IncrementPP_Org(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8be0(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb5c0(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
+static BOOL BattleClient_ScOpRaiseStatStage(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_RaiseStatStage(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8c00(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb638(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
+static BOOL BattleClient_ScOpLowerStatStage(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_LowerStatStage(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8c20(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetStatStages(BtlClient *client, s32 *seq, const u32 *args) {
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
 
-    func_ov167_021bb6a8(mon, 1, args[1]);
-    func_ov167_021bb6a8(mon, 2, args[2]);
-    func_ov167_021bb6a8(mon, 3, args[3]);
-    func_ov167_021bb6a8(mon, 4, args[4]);
-    func_ov167_021bb6a8(mon, 5, args[5]);
-    func_ov167_021bb6a8(mon, 6, args[6]);
-    func_ov167_021bb6a8(mon, 7, args[7]);
+    BattleMon_SetStatStage(mon, 1, args[1]);
+    BattleMon_SetStatStage(mon, 2, args[2]);
+    BattleMon_SetStatStage(mon, 3, args[3]);
+    BattleMon_SetStatStage(mon, 4, args[4]);
+    BattleMon_SetStatStage(mon, 5, args[5]);
+    BattleMon_SetStatStage(mon, 6, args[6]);
+    BattleMon_SetStatStage(mon, 7, args[7]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8c98(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpRecoverStatStages(BtlClient *client, s32 *seq, const u32 *args) {
     StatStageRecover(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b8cb0(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpResetStatStages(BtlClient *client, s32 *seq, const u32 *args) {
     StatStageReset(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b8cc8(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb738(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpAddCritStage(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_AddCritStage(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8ce4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetCondition(BtlClient *client, s32 *seq, const u32 *args) {
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
     BattleCondition value;
 
@@ -6212,44 +6280,44 @@ static BOOL func_ov167_021b8ce4(BtlClient *client, s32 *seq, const u32 *args) {
     return TRUE;
 }
 
-static BOOL func_ov167_021b8d04(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpCureCondition(BtlClient *client, s32 *seq, const u32 *args) {
     CureCondition(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b8d1c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpCureMoveCondition(BtlClient *client, s32 *seq, const u32 *args) {
     CureMoveCondition(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8d38(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSendIn(BtlClient *client, s32 *seq, const u32 *args) {
     u8 pos1 = client->cmdArgs[1];
     u8 pos2 = client->cmdArgs[2];
     BattleParty *party = GetPartyData(client->pokeCon, (u8)client->cmdArgs[0]);
     BattleMon *mon;
 
     if (pos1 != pos2) {
-        func_ov167_0219d504(party, pos1, pos2);
+        BattleParty_Swap(party, pos1, pos2);
     }
-    mon = func_ov167_0219d4e4(party, pos1);
-    func_ov167_021bbbec(mon, args[3]);
-    func_ov167_021bbd80(mon);
+    mon = BattleParty_GetMon(party, pos1);
+    BattleMon_SetAppearTurn(mon, args[3]);
+    BattleMon_ClearForSwitchIn(mon);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8d8c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpChangeType(BtlClient *client, s32 *seq, const u32 *args) {
     ChangePokeType(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8dac(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpConditionTurnCheck(BtlClient *client, s32 *seq, const u32 *args) {
     u8 monIds[6];
     u32 numMons = args[0];
     u32 i;
     u32 numConditions = args[1];
     u32 j;
 
-    func_ov167_021bd8b8(args[2], monIds);
+    BtlCalc_UnpackMonIDs(args[2], monIds);
     for (i = 0; i < numConditions; i++) {
         u32 condition = GetConditionByIndex(i);
 
@@ -6260,64 +6328,64 @@ static BOOL func_ov167_021b8dac(BtlClient *client, s32 *seq, const u32 *args) {
             BattleMon *mon = GetPokeParam(client->pokeCon, monIds[j]);
 
             if (!IsFainted(mon)) {
-                func_ov167_021bb864(mon, condition, NULL, NULL);
+                BattleMon_TickCondition(mon, condition, NULL, NULL);
             }
         }
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021b8e24(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpConsumeItem(BtlClient *client, s32 *seq, const u32 *args) {
     ConsumeItem(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8e44(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bbf44(GetPokeParam(client->pokeCon, args[0]), args[1], args[2], args[3], args[4], args[5]);
+static BOOL BattleClient_ScOpUpdateUsedMove(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_SetPrevMove(GetPokeParam(client->pokeCon, args[0]), args[1], args[2], args[3], args[4], args[5]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8e80(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb7e4(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpSetConditionFlag(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_SetConditionFlag(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8e9c(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb808(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpClearConditionFlag(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_ClearConditionFlag(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8eb8(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bb7c0(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpSetTurnFlag(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_SetTurnFlag(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8ed4(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bbc40(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpClearTurnFlag(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_ClearTurnFlag(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8ef0(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpChangeAbility(BtlClient *client, s32 *seq, const u32 *args) {
     ChangeAbility(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8f0c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetItem(BtlClient *client, s32 *seq, const u32 *args) {
     SetItem(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8f2c(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpUpdateMove(BtlClient *client, s32 *seq, const u32 *args) {
     Move_UpdateID(GetPokeParam(client->pokeCon, args[0]), args[1], args[4], args[2], args[3]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8f60(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpClearForSwitch(BtlClient *client, s32 *seq, const u32 *args) {
     Clear_ForSwitch(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b8f78(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpAddFieldEffect(BtlClient *client, s32 *seq, const u32 *args) {
     BattleCondition value;
 
     value.raw = args[1];
@@ -6325,95 +6393,95 @@ static BOOL func_ov167_021b8f78(BtlClient *client, s32 *seq, const u32 *args) {
     return TRUE;
 }
 
-static BOOL func_ov167_021b8f8c(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021d5c04(client->field, args[0], args[1]);
+static BOOL BattleClient_ScOpAddFieldEffectDependMon(BtlClient *client, s32 *seq, const u32 *args) {
+    BtlField_AddDependPoke(client->field, args[0], args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8fa0(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021d5c60(client->field, args[0]);
+static BOOL BattleClient_ScOpRemoveFieldEffectDependMon(BtlClient *client, s32 *seq, const u32 *args) {
+    BtlField_RemoveDependPoke(client->field, args[0]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8fb4(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021d5bc0(client->field, args[0]);
+static BOOL BattleClient_ScOpRemoveFieldEffect(BtlClient *client, s32 *seq, const u32 *args) {
+    BtlField_RemoveEffect(client->field, args[0]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8fc4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetCounter(BtlClient *client, s32 *seq, const u32 *args) {
     COUNTER_Set(GetPokeParam(client->pokeCon, args[0]), args[1], args[2]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b8fe4(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpBatonPass(BtlClient *client, s32 *seq, const u32 *args) {
     BattleMon *source = GetPokeParam(client->pokeCon, args[0]);
 
     CopyBatonPassParams(GetPokeParam(client->pokeCon, args[1]), source);
     return TRUE;
 }
 
-static BOOL func_ov167_021b9010(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bc55c(GetPokeParam(client->pokeCon, args[0]), args[1]);
+static BOOL BattleClient_ScOpCreateSubstitute(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_SetSubstituteHP(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b9030(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpDeleteSubstitute(BtlClient *client, s32 *seq, const u32 *args) {
     ResetSpActPriority(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b9048(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpAddShooterEnergy(BtlClient *client, s32 *seq, const u32 *args) {
     u8 clientId = args[0];
     u8 value = args[1];
 
     if (clientId == client->clientId) {
-        func_ov167_021b19b0(client, value);
+        BattleClient_AddShooterEnergy(client, value);
     } else {
-        func_ov167_0219d404(client->mainModule, clientId, value);
+        AddClientShooterEnergy(client->mainModule, clientId, value);
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021b9074(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetupIllusion(BtlClient *client, s32 *seq, const u32 *args) {
     u8 clientId = args[0];
 
-    func_ov167_0219d604(client->mainModule, GetPartyData(client->pokeCon, clientId), clientId);
+    UpdatePartyIllusionDisguises(client->mainModule, GetPartyData(client->pokeCon, clientId), clientId);
     return TRUE;
 }
 
-static BOOL func_ov167_021b9094(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpClearConsumedItem(BtlClient *client, s32 *seq, const u32 *args) {
     ClearConsumedItem(GetPokeParam(client->pokeCon, args[0]));
     return TRUE;
 }
 
-static BOOL func_ov167_021b90ac(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021bba64(GetPokeParam(client->pokeCon, args[0]), (u8)args[1]);
+static BOOL BattleClient_ScOpCureMonDependentConditions(BtlClient *client, s32 *seq, const u32 *args) {
+    BattleMon_CureConditionsFromMon(GetPokeParam(client->pokeCon, args[0]), (u8)args[1]);
     return TRUE;
 }
 
-static BOOL func_ov167_021b90cc(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpAddDamageRecord(BtlClient *client, s32 *seq, const u32 *args) {
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
     BattleMonDamageRecord record;
 
     BattleMonDamageRecord_Init(&record, args[1], args[2], args[4], args[3], args[5]);
-    func_ov167_021bc048(mon, &record);
+    BattleMon_AddDamageRecord(mon, &record);
     return TRUE;
 }
 
-static BOOL func_ov167_021b9100(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpTurnCheck(BtlClient *client, s32 *seq, const u32 *args) {
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
 
-    func_ov167_021bbc08(mon);
+    BattleMon_EndTurn(mon);
     ComboMove_ClearParam(mon);
     return TRUE;
 }
 
-static BOOL func_ov167_021b9120(BtlClient *client, s32 *seq, const u32 *args) {
-    func_ov167_021d5da4(client->field, NULL, NULL);
+static BOOL BattleClient_ScOpFieldTurnCheck(BtlClient *client, s32 *seq, const u32 *args) {
+    BtlField_TurnCheck(client->field, NULL, NULL);
     return TRUE;
 }
 
-static BOOL func_ov167_021b9130(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetBaseStat(BtlClient *client, s32 *seq, const u32 *args) {
     u32 stat = args[1];
     BattleMon *mon = GetPokeParam(client->pokeCon, args[0]);
 
@@ -6421,7 +6489,7 @@ static BOOL func_ov167_021b9130(BtlClient *client, s32 *seq, const u32 *args) {
     return TRUE;
 }
 
-static BOOL func_ov167_021b9154(BtlClient *client, s32 *seq, const u32 *args) {
+static BOOL BattleClient_ScOpSetWeight(BtlClient *client, s32 *seq, const u32 *args) {
     SetWeight(GetPokeParam(client->pokeCon, args[0]), args[1]);
     return TRUE;
 }
@@ -6434,15 +6502,15 @@ BattleParty *BattleClient_GetParty(BtlClient *client) {
     return client->party;
 }
 
-u8 func_ov167_021b9188(BtlClient *client) {
-    return func_ov167_021d5ad4(client->field);
+u8 BattleClient_GetWeather(BtlClient *client) {
+    return BtlField_GetWeather(client->field);
 }
 
-u16 func_ov167_021b9194(BtlClient *client) {
+u16 BattleClient_GetAudienceSize(BtlClient *client) {
     return client->studio.unk58;
 }
 
-u32 func_ov167_021b919c(BtlClient *client) {
+u32 BattleClient_GetAudienceMask(BtlClient *client) {
     return client->studio.audienceMask;
 }
 
@@ -6454,7 +6522,7 @@ static void BattleClient_LoadAIItems(BtlClient *client) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        client->aiItems[i] = func_ov167_0219d89c(client->mainModule, client->clientId, i);
+        client->aiItems[i] = GetClientTrainerItem(client->mainModule, client->clientId, i);
     }
 }
 
@@ -6506,7 +6574,7 @@ static BOOL IsXItem(u16 item, BattleMon *mon) {
             return TRUE;
         }
     }
-    if (ItemGetParam(item, 0x24) && func_ov167_021bb714(mon) == 0) {
+    if (ItemGetParam(item, 0x24) && BattleMon_GetCritStage(mon) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -6547,15 +6615,15 @@ static void RecPlayer_SetMaxChapter(BtlClientRecPlayer *recPlayer, u32 maxChapte
     recPlayer->maxChapter = maxChapter;
 }
 
-static BOOL func_ov167_021b9360(BtlClientRecPlayer *recPlayer) {
+static BOOL RecPlayer_IsQuitDone(BtlClientRecPlayer *recPlayer) {
     return recPlayer->quitDone;
 }
 
-static void func_ov167_021b9368(BtlClientRecPlayer *recPlayer) {
+static void RecPlayer_ReachChapter(BtlClientRecPlayer *recPlayer) {
     recPlayer->chapterReached = TRUE;
 }
 
-static u32 func_ov167_021b9374(BtlClientRecPlayer *recPlayer) {
+static u32 RecPlayer_GetResult(BtlClientRecPlayer *recPlayer) {
     return recPlayer->result;
 }
 
@@ -6567,23 +6635,23 @@ static void RecPlayer_StartSkip(BtlClientRecPlayer *recPlayer, u32 target) {
     recPlayer->quitDone = FALSE;
 }
 
-static void func_ov167_021b939c(BtlClientRecPlayer *recPlayer) {
+static void RecPlayer_EndSkip(BtlClientRecPlayer *recPlayer) {
     recPlayer->seq = 0;
     recPlayer->skipping = FALSE;
 }
 
-static BOOL func_ov167_021b93ac(BtlClientRecPlayer *recPlayer) {
+static BOOL RecPlayer_IsSkipDone(BtlClientRecPlayer *recPlayer) {
     if (recPlayer->skipCount == recPlayer->skipTarget) {
         return TRUE;
     }
     return FALSE;
 }
 
-static u32 func_ov167_021b93bc(BtlClientRecPlayer *recPlayer) {
+static u32 RecPlayer_GetSkipTarget(BtlClientRecPlayer *recPlayer) {
     return recPlayer->skipTarget;
 }
 
-static BOOL func_ov167_021b93c0(BtlClientRecPlayer *recPlayer) {
+static BOOL RecPlayer_TryLock(BtlClientRecPlayer *recPlayer) {
     if (recPlayer->quitStarted) {
         return FALSE;
     }
@@ -6591,11 +6659,11 @@ static BOOL func_ov167_021b93c0(BtlClientRecPlayer *recPlayer) {
     return TRUE;
 }
 
-static void func_ov167_021b93d8(BtlClientRecPlayer *recPlayer) {
+static void RecPlayer_Unlock(BtlClientRecPlayer *recPlayer) {
     recPlayer->unk2_4 = FALSE;
 }
 
-static void func_ov167_021b93e4(BtlClientRecPlayer *recPlayer) {
+static void RecPlayer_SetDataEnd(BtlClientRecPlayer *recPlayer) {
     recPlayer->dataEnd = TRUE;
 }
 
@@ -6619,7 +6687,7 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                     if (recPlayer->skipCount == recPlayer->skipTarget) {
                         recPlayer->chapter = recPlayer->skipTarget;
                         if (client->viewCore != NULL) {
-                            func_ov167_021d0a48(client->viewCore, recPlayer->chapter, recPlayer->skipTarget);
+                            BtlvCore_ShowRecorderChapter(client->viewCore, recPlayer->chapter, recPlayer->skipTarget);
                         }
                     }
                 }
@@ -6629,23 +6697,23 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
         if (recPlayer->chapter != 0 && client->viewCore != NULL) {
             switch (recPlayer->seq) {
             case 0: {
-                u32 input = func_ov167_021d0a38(client->viewCore);
+                u32 input = BtlvCore_CheckRecorderInput(client->viewCore);
                 BOOL changed = FALSE;
 
                 switch (input) {
                 case 2:
                     recPlayer->result = 1;
-                    func_ov167_021d09d8(client->viewCore);
+                    BtlvCore_StartFadeOut(client->viewCore);
                     recPlayer->quitStarted = TRUE;
                     recPlayer->seq = 1;
-                    func_ov167_021d0aa0(client->viewCore, recPlayer->chapter, 1);
+                    BtlvCore_ShowRecorderMessage(client->viewCore, recPlayer->chapter, 1);
                     func_ov167_0219c9d4(client->mainModule);
                     func_ov167_0219bdf0(client->mainModule);
                     GFL_SndBGMFadeOut(30);
                     GFL_SndPlayerSetMuteStateEx(0, 0x3e);
                     PokeVoice_SetMasterVolume(0);
                     BtlvEffect_ReleaseVoices();
-                    func_ov167_0219cb7c(client->mainModule);
+                    SkipExitBGMFadeOut(client->mainModule);
                     break;
                 case 0:
                     if (recPlayer->skipTarget > 1) {
@@ -6663,13 +6731,13 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                     break;
                 }
                 if (changed || update) {
-                    func_ov167_021d0a48(client->viewCore, recPlayer->chapter, recPlayer->skipTarget);
+                    BtlvCore_ShowRecorderChapter(client->viewCore, recPlayer->chapter, recPlayer->skipTarget);
                 }
                 if (recPlayer->quitTimer != 0) {
                     recPlayer->quitTimer--;
                     if (recPlayer->quitTimer == 0) {
                         recPlayer->result = 2;
-                        func_ov167_021d09d8(client->viewCore);
+                        BtlvCore_StartFadeOut(client->viewCore);
                         recPlayer->quitStarted = TRUE;
                         recPlayer->seq = 1;
                         GFL_SndBGMFadeOut(30);
@@ -6681,7 +6749,7 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
                 break;
             }
             case 1:
-                if (func_ov167_021d09e8(client->viewCore)) {
+                if (BtlvCore_WaitFadeOut(client->viewCore)) {
                     recPlayer->quitDone = TRUE;
                     recPlayer->seq = 2;
                 }
@@ -6693,7 +6761,7 @@ static void RecPlayer_Update(BtlClient *client, BtlClientRecPlayer *recPlayer) {
     }
 }
 
-static void func_ov167_021b9570(BtlClientStudioWork *studio, u32 reaction) {
+static void Studio_PlayAudienceSE(BtlClientStudioWork *studio, u32 reaction) {
     static const BtlClientAudienceSE sAudienceSE[9] = {
         { 0, 0 },         { 0x8c1, 0x8c1 }, { 0x8c5, 0x8c6 }, { 0x8c7, 0x8c8 }, { 0x8c9, 0x8ca },
         { 0x8bf, 0x8c0 }, { 0x8c3, 0x8c4 }, { 0x8cb, 0x8cc }, { 0x8cd, 0x8ce },
@@ -6716,13 +6784,13 @@ static void Studio_ReactAudience(BtlvCore *core, BtlClientStudioWork *studio, u3
 
     for (i = 0; i < 22; i++) {
         if ((studio->audienceMask >> i) & 1) {
-            func_ov167_021d0bac(core, 1, i, reaction);
+            BtlvCore_SetTypeIconVisible(core, 1, i, reaction);
             studio->audienceTimers[i] = GFL_RandomLC(300) + 400;
             count++;
         }
     }
     if (count != 0) {
-        func_ov167_021b9570(studio, reaction);
+        Studio_PlayAudienceSE(studio, reaction);
     }
 }
 
@@ -6753,7 +6821,7 @@ static void Studio_AudienceLeave(BtlvCore *core, BtlClientStudioWork *studio, u1
         int member = members[r];
 
         if (member >= 0) {
-            func_ov167_021d0bac(core, 1, member, 9);
+            BtlvCore_SetTypeIconVisible(core, 1, member, 9);
             studio->audienceTimers[member] = 0;
             studio->audienceMask ^= 1 << member;
             left++;
@@ -6762,7 +6830,7 @@ static void Studio_AudienceLeave(BtlvCore *core, BtlClientStudioWork *studio, u1
     }
 }
 
-static void func_ov167_021b96b0(BtlvCore *core, BtlClientStudioWork *studio) {
+static void Studio_ReactToScenePoints(BtlvCore *core, BtlClientStudioWork *studio) {
     if (studio->score.points[2] < 0) {
         Studio_AudienceLeave(core, studio, studio->unk58);
         Studio_ReactAudience(core, studio, 5);
@@ -6771,13 +6839,13 @@ static void func_ov167_021b96b0(BtlvCore *core, BtlClientStudioWork *studio) {
     }
 }
 
-static void func_ov167_021b96e0(BtlvCore *core, BtlClientStudioWork *studio, int fame) {
+static void Studio_ReactToFame(BtlvCore *core, BtlClientStudioWork *studio, int fame) {
     if (fame != 0) {
         Studio_ReactAudience(core, studio, 1);
     }
 }
 
-static void func_ov167_021b96f0(BtlClient *client, BtlClientStudioWork *studio, BattleParty *party) {
+static void Studio_AddFamePoints(BtlClient *client, BtlClientStudioWork *studio, BattleParty *party) {
     static const u8 sFameBonus[5] = { 0, 1, 5, 10, 15 };
     PartyPkm *pkm = GetSrcData(GetBattleMonFromParty(party, 0));
     int fame;
@@ -6786,18 +6854,18 @@ static void func_ov167_021b96f0(BtlClient *client, BtlClientStudioWork *studio, 
     fame = PML_GetPokestarFameLevel(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL));
     studio->score.points[1] += sFameBonus[fame];
     studio->score.counts[1]++;
-    func_ov167_021b96e0(client->viewCore, &client->studio, fame);
+    Studio_ReactToFame(client->viewCore, &client->studio, fame);
 }
 
-static void func_ov167_021b9750(BtlClient *client, BtlClientStudioScore *score, s32 scene) {
-    BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+static void StudioScore_AddScenePoints(BtlClient *client, BtlClientStudioScore *score, s32 scene) {
+    BtlScriptedRules *rules = GetStudioRules(client->mainModule);
 
     score->counts[2] = scene;
     score->points[2] += rules->scenes[scene].unk0A;
 }
 
-static void func_ov167_021b9774(BtlClient *client, BtlClientStudioScore *score) {
-    BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+static void StudioScore_SetTurnPoints(BtlClient *client, BtlClientStudioScore *score) {
+    BtlScriptedRules *rules = GetStudioRules(client->mainModule);
     int points = 5 - MATH_ABS(rules->unk0C - client->turnCount);
 
     if (points < 0) {
@@ -6807,11 +6875,11 @@ static void func_ov167_021b9774(BtlClient *client, BtlClientStudioScore *score) 
     score->counts[0] = client->turnCount;
 }
 
-static void func_ov167_021b97a4(BtlClient *client, BtlClientStudioScore *score, s32 scene, u32 index) {
+static void StudioScore_AddChoicePoints(BtlClient *client, BtlClientStudioScore *score, s32 scene, u32 index) {
     static const u32 sReactions[5][3] = {
         { 2, 5, 0 }, { 3, 6, 0 }, { 4, 6, 0 }, { 4, 5, 0 }, { 3, 6, 0 },
     };
-    BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
+    BtlScriptedRules *rules = GetStudioRules(client->mainModule);
     int points = rules->scenes[scene].choices[index].points;
     u32 reaction;
 
@@ -6819,20 +6887,20 @@ static void func_ov167_021b97a4(BtlClient *client, BtlClientStudioScore *score, 
     score->counts[3]++;
     if (points > 0) {
         reaction = sReactions[rules->scenes[scene].unk08][0];
-        func_ov167_021b2210(client, 1);
+        Studio_SetLastChoiceResult(client, 1);
     } else if (points < 0) {
         reaction = sReactions[rules->scenes[scene].unk08][1];
-        func_ov167_021b2210(client, 3);
+        Studio_SetLastChoiceResult(client, 3);
     } else {
         reaction = sReactions[rules->scenes[scene].unk08][2];
-        func_ov167_021b2210(client, 2);
+        Studio_SetLastChoiceResult(client, 2);
     }
     Studio_ReactAudience(client->viewCore, &client->studio, reaction);
 }
 
 static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score) {
-    BtlScriptedRules *rules = func_ov167_0219e39c(client->mainModule);
-    BtlSetup *setup = func_ov167_0219e310(client->mainModule);
+    BtlScriptedRules *rules = GetStudioRules(client->mainModule);
+    BtlSetup *setup = GetBattleSetupParam(client->mainModule);
     s32 total;
     s32 sum;
 
@@ -6857,26 +6925,26 @@ static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score)
 static void Studio_UpdateAudience(BtlClient *client) {
     int i;
 
-    if (func_ov167_0219c988(client->mainModule) == 2 && client->clientId == 0) {
+    if (GetStudioMode(client->mainModule) == 2 && client->clientId == 0) {
         for (i = 0; i < 22; i++) {
             if (client->studio.audienceTimers[i] != 0) {
                 client->studio.audienceTimers[i]--;
                 if (client->studio.audienceTimers[i] == 0) {
-                    func_ov167_021d0bf4(client->viewCore, i);
-                    func_ov167_021d0bac(client->viewCore, 1, i, 0);
+                    BtlvCore_StartTypeIconAnim(client->viewCore, i);
+                    BtlvCore_SetTypeIconVisible(client->viewCore, 1, i, 0);
                 }
             }
         }
     }
 }
 
-static void func_ov167_021b9910(BtlMainModule *mainModule) {
-    BtlSetup *setup = func_ov167_0219e310(mainModule);
+static void Studio_PlayEndingBgm(BtlMainModule *mainModule) {
+    BtlSetup *setup = GetBattleSetupParam(mainModule);
 
     if (setup->unk124 == 0) {
         BtlvEffect_PlayBgm(func_ov167_0219bf08(mainModule));
     } else if (setup->unk124 == 1) {
-        BtlvEffect_PlayBgm(func_ov167_0219bf00(mainModule));
+        BtlvEffect_PlayBgm(GetWinBGM(mainModule));
     } else if (setup->unk124 == 2) {
         BtlvEffect_PlayBgm(func_ov167_0219bf14(mainModule));
     }

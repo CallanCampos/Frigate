@@ -321,11 +321,11 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
     gauge->entries[index].mon.expAnim = GAUGE_ANIM_START;
     gauge->entries[index].mon.expDelta = 0;
     gauge->entries[index].mon.unk2e = 0;
-    gauge->entries[index].mon.caught = func_ov167_0219bf70(mainModule, mon);
-    if (PokeParty_GetParam(func_ov167_021bb064(mon), PKM_PARAM_SHOW_SEX, NULL) == 0) {
+    gauge->entries[index].mon.caught = IsMonCaught(mainModule, mon);
+    if (PokeParty_GetParam(BattleMon_GetViewSrcData(mon), PKM_PARAM_SHOW_SEX, NULL) == 0) {
         gauge->entries[index].mon.sex = 2;
     } else {
-        gauge->entries[index].mon.sex = PokeParty_GetSex(func_ov167_021bb064(mon));
+        gauge->entries[index].mon.sex = PokeParty_GetSex(BattleMon_GetViewSrcData(mon));
     }
     if (Condition_IsBadlyPoisoned(GetConditionContinuationParam(mon, CONDITION_POISON)) == TRUE &&
         GetBattleMonStatus(mon) == CONDITION_POISON) {
@@ -337,7 +337,7 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
     BtlvGauge_SetPos(gauge, index, NULL);
     BtlvGauge_ShowHpParts(gauge, index, TRUE);
     BtlvGauge_CalcHpDots(&gauge->entries[index]);
-    BtlvGauge_Show(gauge, type, index, func_ov167_021bb064(mon));
+    BtlvGauge_Show(gauge, type, index, BattleMon_GetViewSrcData(mon));
 }
 
 void BtlvGauge_SetPartyPkm(BtlvGauge *gauge, PokeDexSave *pokedex, PartyPkm *pkm, u32 type, int index) {

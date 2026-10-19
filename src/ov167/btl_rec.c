@@ -30,7 +30,7 @@ struct BtlRecorder {
     u32 capacity;
 };
 
-BtlRecorder *func_ov167_021d45b0(HeapID heapId, u32 type) {
+BtlRecorder *BtlRecorder_Create(HeapID heapId, u32 type) {
     BtlRecorder *recorder = GFL_HeapAllocate(heapId, sizeof(BtlRecorder), TRUE, "btl_rec.c", 0x67);
     if (type == 0) {
         recorder->capacity = sizeof(recorder->data);
@@ -40,11 +40,11 @@ BtlRecorder *func_ov167_021d45b0(HeapID heapId, u32 type) {
     return recorder;
 }
 
-void func_ov167_021d45e8(BtlRecorder *recorder) {
+void BtlRecorder_Delete(BtlRecorder *recorder) {
     GFL_HeapFree(recorder);
 }
 
-void func_ov167_021d45f0(BtlRecorder *recorder, const void *data, u32 size) {
+void BtlRecorder_AddData(BtlRecorder *recorder, const void *data, u32 size) {
     if (!recorder->overflow) {
         u32 end = recorder->size + (size - 1);
         if (end <= recorder->capacity) {
@@ -56,16 +56,16 @@ void func_ov167_021d45f0(BtlRecorder *recorder, const void *data, u32 size) {
     }
 }
 
-u8 func_ov167_021d4624(const void *data) {
+u8 BtlRec_GetCmdCheckReq(const void *data) {
     return *(const u8 *)data;
 }
 
-void *func_ov167_021d4628(BtlRecorder *recorder, u32 *size) {
+void *BtlRecorder_GetData(BtlRecorder *recorder, u32 *size) {
     *size = recorder->size;
     return recorder->data;
 }
 
-void func_ov167_021d4630(BtlRecReader *reader, const void *data, u32 size) {
+void BtlRecReader_Init(BtlRecReader *reader, const void *data, u32 size) {
     u32 i;
 
     reader->data = data;
@@ -76,7 +76,7 @@ void func_ov167_021d4630(BtlRecReader *reader, const void *data, u32 size) {
     }
 }
 
-void func_ov167_021d4660(BtlRecReader *reader) {
+void BtlRecReader_Reset(BtlRecReader *reader) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
@@ -84,7 +84,7 @@ void func_ov167_021d4660(BtlRecReader *reader) {
     }
 }
 
-BOOL func_ov167_021d4674(BtlRecReader *reader, u8 clientId) {
+BOOL BtlRecReader_SkipTurnChunk(BtlRecReader *reader, u8 clientId) {
     u8 header = reader->data[reader->pos[clientId]];
     BtlRecChunkType type = (header >> 4) & 7;
     u8 chapter = (header >> 7) & 1;
@@ -96,13 +96,13 @@ BOOL func_ov167_021d4674(BtlRecReader *reader, u8 clientId) {
     return FALSE;
 }
 
-BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, u8 *chapter) {
+BattleAction *BtlRecReader_ReadActions(BtlRecReader *reader, u8 clientId, u8 *count, u8 *chapter) {
     u32 *pos;
     BattleAction *actions;
 
     if (reader->error) {
         actions = reader->actions[clientId];
-        func_ov167_021bdc98(actions);
+        BattleAction_SetRecError(actions);
         *count = 1;
         *chapter = 0;
         return actions;
@@ -145,7 +145,7 @@ BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, 
             }
         } else if (type == BTL_REC_CHUNK_TIMEOUT) {
             actions = reader->actions[clientId];
-            func_ov167_021bdc84(actions);
+            BattleAction_SetRecTimeout(actions);
             *count = 1;
             *chapter = 0;
             return actions;
@@ -159,13 +159,13 @@ BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, 
 
     reader->error = TRUE;
     actions = reader->actions[clientId];
-    func_ov167_021bdc98(actions);
+    BattleAction_SetRecError(actions);
     *count = 1;
     *chapter = 0;
     return actions;
 }
 
-u32 func_ov167_021d481c(BtlRecReader *reader) {
+u32 BtlRecReader_CountChapters(BtlRecReader *reader) {
     u32 pos, chapters;
 
     pos = 0;
@@ -197,7 +197,7 @@ u32 func_ov167_021d481c(BtlRecReader *reader) {
     return chapters;
 }
 
-BOOL func_ov167_021d4880(BtlRecReader *reader, u8 clientId) {
+BOOL BtlRecReader_IsReadComplete(BtlRecReader *reader, u8 clientId) {
     if (!reader->error) {
         u32 pos = reader->pos[clientId];
         if (pos == reader->size) {
@@ -208,19 +208,19 @@ BOOL func_ov167_021d4880(BtlRecReader *reader, u8 clientId) {
     return TRUE;
 }
 
-void func_ov167_021d48a0(BtlRecTool *tool, BOOL chapter) {
+void BtlRecTool_Init(BtlRecTool *tool, BOOL chapter) {
     MI_CpuFill8(tool, 0, sizeof(BtlRecTool));
     tool->chapter = chapter;
 }
 
-void *func_ov167_021d48c4(BtlRecTool *tool, u32 *size, BOOL chapter) {
+void *BtlRecTool_MakeTurnChunk(BtlRecTool *tool, u32 *size, BOOL chapter) {
     tool->data[0] = 4;
     tool->data[1] = MakeHeader(0, BTL_REC_CHUNK_TURN, chapter);
     *size = 2;
     return tool->data;
 }
 
-void func_ov167_021d48e0(BtlRecTool *tool, u8 clientId, const void *actions, u8 count) {
+void BtlRecTool_AddClientActions(BtlRecTool *tool, u8 clientId, const void *actions, u8 count) {
     if (tool->size == 0) {
         tool->type = 1;
         tool->size = 2;
@@ -240,7 +240,7 @@ void func_ov167_021d48e0(BtlRecTool *tool, u8 clientId, const void *actions, u8 
     }
 }
 
-void *func_ov167_021d4958(BtlRecTool *tool, u8 value, u32 *size) {
+void *BtlRecTool_FinishChunk(BtlRecTool *tool, u8 value, u32 *size) {
     if (!tool->overflow) {
         tool->data[0] = value;
         tool->data[1] = MakeHeader(tool->numClients, tool->type, tool->chapter);
@@ -250,14 +250,14 @@ void *func_ov167_021d4958(BtlRecTool *tool, u8 value, u32 *size) {
     return NULL;
 }
 
-void *func_ov167_021d4990(BtlRecTool *tool, u32 *size) {
+void *BtlRecTool_MakeTimeoutChunk(BtlRecTool *tool, u32 *size) {
     tool->data[0] = 0;
     tool->data[1] = MakeHeader(0, BTL_REC_CHUNK_TIMEOUT, FALSE);
     *size = 2;
     return tool->data;
 }
 
-void func_ov167_021d49a0(BtlRecTool *tool, const void *data, u32 size) {
+void BtlRecTool_SetData(BtlRecTool *tool, const void *data, u32 size) {
     MI_CpuCopy8(data, tool->data, size);
     tool->size = size;
     tool->clientFlags = 0;
@@ -267,7 +267,7 @@ void func_ov167_021d49a0(BtlRecTool *tool, const void *data, u32 size) {
     tool->overflow = 0;
 }
 
-BOOL func_ov167_021d49d0(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, void *actions) {
+BOOL BtlRecTool_ReadClientActions(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, void *actions) {
     if (*pos == 0) {
         *pos = 2;
     }

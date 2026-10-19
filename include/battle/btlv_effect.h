@@ -13,12 +13,12 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// The move effect func_ov167_021d3094 starts, which BtlvEffect_StartMove reads
+// The move effect BtlvScu_StartMoveEffect starts, which BtlvEffect_StartMove reads
 typedef struct BtlvMoveEffectParam {
     u16 move;          // 0x00
     u32 attackerPos;   // 0x04
     u32 targetPos;     // 0x08
-    u8 unk0C;          // 0x0C arg5 of func_ov167_021d3094
+    u8 unk0C;          // 0x0C arg5 of BtlvScu_StartMoveEffect
     u8 unk0D;          // 0x0D its arg6
     s32 unk10;         // 0x10 its arg4, PML_MoveGetParam(move, 27); BtlvEffect_StartMove keeps a byte of it
 } BtlvMoveEffectParam; // size 0x14

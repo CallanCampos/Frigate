@@ -1028,12 +1028,12 @@ void BtlvInput_SetScreen(BtlvInput *work, u32 screen, void *param) {
         BtlvInputScreenTask *task;
         const BtlvInputRecorderParam *recorder = param;
         StrBuf *strbuf = NULL;
-        // func_ov167_0219c988 is the battle's Pokestar Studios mode, 0 for none; mode 2 shows this screen without its
+        // GetStudioMode is the battle's Pokestar Studios mode, 0 for none; mode 2 shows this screen without its
         // count and animation
         BOOL studioMode2 = FALSE;
         int i;
 
-        if (func_ov167_0219c988(BtlvEffect_GetMainModule()) == 2) {
+        if (GetStudioMode(BtlvEffect_GetMainModule()) == 2) {
             studioMode2 = TRUE;
         }
         for (i = 0; i < 3; i++) {
@@ -1769,7 +1769,7 @@ static void BtlvInput_StandbyToMessageTask(TCB *tcb, void *data) {
     BtlvInputScreenTask *param = data;
     BOOL studioMode2 = FALSE;
 
-    if (func_ov167_0219c988(BtlvEffect_GetMainModule()) == 2) {
+    if (GetStudioMode(BtlvEffect_GetMainModule()) == 2) {
         studioMode2 = TRUE;
     }
     switch (param->seq) {
@@ -1801,7 +1801,7 @@ static void BtlvInput_StandbyToMessageTask(TCB *tcb, void *data) {
                 BtlvInput_StartSetLayers(param->work, 4, param->x, param->y, 1, 1, 2, 0);
             }
             BtlvInput_EndTask(param->work, tcb);
-            func_ov167_0219c988(BtlvEffect_GetMainModule());
+            GetStudioMode(BtlvEffect_GetMainModule());
         }
         break;
     }
@@ -2664,7 +2664,7 @@ static void BtlvInput_SetupMoveScreen(BtlvInput *work) {
         param.maxPP[i] = 0;
     }
     for (i = 0; i < GetBattleMonMoveCount(work->mons[work->pokeSlot]); i++) {
-        param.moves[i] = func_ov167_021bad28(work->mons[work->pokeSlot], i, &param.pp[i], &param.maxPP[i]);
+        param.moves[i] = BattleMon_GetMoveInfo(work->mons[work->pokeSlot], i, &param.pp[i], &param.maxPP[i]);
     }
     BtlvInput_DrawMoveTiles(work, &param);
     work->buttonEnabled[5] = data_ov168_021f35dc[work->pokeSlot][0];

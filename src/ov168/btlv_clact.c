@@ -37,7 +37,7 @@ struct BtlvClact {
     BtlvClactEntry popup[2]; // 0x198  the popup and the message drawn into the gauge's characters
     u32 moveFlags;           // 0x1b8  bit n: entries[n] moves, bit 31: the popup shows
     u32 scaleFlags;          // 0x1bc  bit n: entries[n] scales
-    u32 mode;                // 0x1c0  func_ov167_0219c988's value. 1: the gauge, 2: no effect actors
+    u32 mode;                // 0x1c0  GetStudioMode's value. 1: the gauge, 2: no effect actors
     HeapID heapId;           // 0x1c4
 };
 
@@ -451,7 +451,7 @@ static void BtlvClact_PrintPopupMessage(BtlvClact *wk, int number, Font *font) {
     GFLBitmap *bitmap = GFL_BitmapCreate(8, 2, 0x20, wk->heapId);
     int width;
 
-    func_ov167_021d4ec0(strbuf, number + 0xc9, 0);
+    BtlString_FormatStdMsg(strbuf, number + 0xc9, 0);
     width = GFL_FontGetBlockWidth(strbuf, font, 0);
     GFL_BitmapFill(bitmap, 0xff);
     GFL_TextRendererDrawToBitmapEx(bitmap, 32 - width / 2, 0, strbuf, font, 0x1d0f);

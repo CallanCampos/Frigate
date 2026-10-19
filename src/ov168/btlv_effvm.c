@@ -2649,7 +2649,7 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
         BtlvScu *scu = BtlvEffect_GetScu();
 
         if (scu != NULL) {
-            func_ov167_021d0ff8(scu);
+            BtlvScu_RestoreBG3(scu);
         }
         GFL_BGSysSetBGPriority(3, 0);
         wk->bgMoved = FALSE;

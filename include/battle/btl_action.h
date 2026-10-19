@@ -42,20 +42,20 @@ static inline u16 BattleAction_GetMove(const BattleAction *action) {
 
 void BattleAction_SetFightParam(BattleAction *action, u16 move, u8 target);
 void BattleAction_ChangeFightTargetPos(BattleAction *action, u8 target);
-void func_ov167_021bdb40(BattleAction *action);
-BOOL func_ov167_021bdb54(const BattleAction *action);
-u16 func_ov167_021bdb68(const BattleAction *action);
-void func_ov167_021bdb80(BattleAction *action, u16 item, u8 target, u8 param);
-void func_ov167_021bdbbc(BattleAction *action, u8 pos, u8 slot);
-void func_ov167_021bdbec(BattleAction *action);
-BOOL func_ov167_021bdc08(const BattleAction *action);
-void func_ov167_021bdc24(BattleAction *action, u8 target);
-void func_ov167_021bdc3c(BattleAction *action);
-void func_ov167_021bdc4c(BattleAction *action);
+void BattleAction_SetMoveInfoFlag(BattleAction *action);
+BOOL BattleAction_GetMoveInfoFlag(const BattleAction *action);
+u16 BattleAction_GetFightMove(const BattleAction *action);
+void BattleAction_SetItemParam(BattleAction *action, u16 item, u8 target, u8 param);
+void BattleAction_SetChangeParam(BattleAction *action, u8 pos, u8 slot);
+void BattleAction_SetChangeDepleteParam(BattleAction *action);
+BOOL BattleAction_IsChangeDeplete(const BattleAction *action);
+void BattleAction_SetRotationParam(BattleAction *action, u8 target);
+void BattleAction_SetEscape(BattleAction *action);
+void BattleAction_SetShift(BattleAction *action);
 void BattleAction_SetNull(BattleAction *action);
 void BattleAction_SetSkip(BattleAction *action);
 u32 BattleAction_GetAction(const BattleAction *action);
-void func_ov167_021bdc84(BattleAction *action);
-void func_ov167_021bdc98(BattleAction *action);
+void BattleAction_SetRecTimeout(BattleAction *action);
+void BattleAction_SetRecError(BattleAction *action);
 
 #endif // POKEBW2_BATTLE_BTL_ACTION_H

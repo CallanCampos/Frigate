@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-void func_ov167_021ce10c(void);
-void func_ov167_021ce138(void);
+void BattleOverlay_LoadDev(void);
+void BattleOverlay_UnloadDev(void);
 
 #endif // POKEBW2_BATTLE_BATTLE_OVERLAY_H
