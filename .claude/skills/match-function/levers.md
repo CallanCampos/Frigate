@@ -1009,8 +1009,8 @@ the alignment below keeps them in registers across the calls. A function whose l
 may be one the original's global optimizer gave up on, or one that reads an object with an explicit alignment:
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
-(its 0/1 test, its `optimization_level 1` shape and its common subexpressions above all went with it, plus `u8` color
-getters and a heap ID getter evaluated right to left), and `MBGameInfo_SendMembers` shows the same symptom in its row.
+(the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
+arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").
