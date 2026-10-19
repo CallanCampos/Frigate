@@ -74,7 +74,7 @@ int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const c
         func_ov011_0217d168(socket);
         done = created->state >= 5;
         if (!done) {
-            func_ov011_0216e360(1);
+            msleep(1);
         }
     } while (!done);
     created->callbackLevel--;
