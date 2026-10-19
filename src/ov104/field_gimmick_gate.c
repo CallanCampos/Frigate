@@ -67,49 +67,50 @@ struct GimmickGateWork {
     u16 flag;
 };
 
-void func_ov104_021eed78(GimmickGateWork *work);
-void func_ov104_021eedb0(GimmickGateWork *work);
-void func_ov104_021eedcc(GimmickGateWork *work);
-void func_ov104_021eede4(GimmickGateWork *work);
-void func_ov104_021eee24(GimmickGateWork *work);
-GimmickGateWork *func_ov104_021eee34(Field *field);
-void func_ov104_021eeebc(GimmickGateWork *work);
-void func_ov104_021eef84(GimmickGateWork *work);
-void func_ov104_021eef98(GimmickGateWork *work);
-void func_ov104_021eefc0(GimmickGateWork *work);
-void func_ov104_021ef02c(GimmickGateWork *work, u32 kind, u32 flag);
-u32 func_ov104_021ef04c(GimmickGateWork *work);
-u32 func_ov104_021ef068(GimmickGateWork *work);
-void func_ov104_021ef084(const GimmickGateWork *work, u32 *species, s32 *count);
-void func_ov104_021ef114(GimmickGateWork *work);
-void func_ov104_021ef168(GimmickGateWork *work);
-GimmickGateBoardEntry *func_ov104_021ef180(GimmickGateWork *work);
-GimmickGateBoardEntry *func_ov104_021ef204(GimmickGateWork *work);
-u32 func_ov104_021ef278(GimmickGateWork *work);
-void func_ov104_021ef28c(GimmickGateWork *work, ElboardMessageArg *message, u32 kind, GimmickGateBoardEntry *entry);
-void func_ov104_021ef2cc(GimmickGateWork *work);
-void func_ov104_021ef2fc(GimmickGateWork *work);
-void func_ov104_021ef344(GimmickGateWork *work);
-void func_ov104_021ef380(GimmickGateWork *work);
-void func_ov104_021ef3c0(GimmickGateWork *work);
-void func_ov104_021ef43c(GimmickGateWork *work);
-void func_ov104_021ef5ac(GimmickGateWork *work);
-void func_ov104_021ef658(GimmickGateWork *work);
-void func_ov104_021ef6dc(GimmickGateWork *work);
-void func_ov104_021ef760(GimmickGateWork *work);
-void func_ov104_021ef7e4(GimmickGateWork *work);
-void func_ov104_021ef868(GimmickGateWork *work);
-void func_ov104_021ef924(GimmickGateWork *work);
-void func_ov104_021ef94c(GimmickGateWork *work, GimmickGateBoardEntry *entry, u32 index);
-void func_ov104_021ef994(GimmickGateWork *work);
-s32 func_ov104_021ef9c8(const GimmickGateZoneList *list);
-void func_ov104_021ef9f8(GimmickGateZoneList *list);
-void func_ov104_021efa18(GimmickGateWork *work, GimmickGateZoneList *list);
-void func_ov104_021efad0(GimmickGateWork *work, GimmickGateZoneList *list);
-void func_ov104_021efb30(GimmickGateWork *work, GimmickGateZoneList *list);
-void func_ov104_021eeea0(GimmickGateWork *work);
-void func_ov104_021eeee0(GimmickGateWork *work);
-GimmickGateSave *func_ov104_021eed58(Field *field);
+void GimmickGate_SaveWork(GimmickGateWork *work);
+void GimmickGate_LoadWork(GimmickGateWork *work);
+void GimmickGate_ApplyTrainerCardFlag(GimmickGateWork *work);
+void GimmickGate_RestoreEventFlags(GimmickGateWork *work);
+void GimmickGate_RestoreBoardTime(GimmickGateWork *work);
+GimmickGateWork *GimmickGate_CreateWork(Field *field);
+void GimmickGate_InitFlag(GimmickGateWork *work);
+void GimmickGate_FreeZoneData(GimmickGateWork *work);
+void GimmickGate_StartBoardAnimation(GimmickGateWork *work);
+void GimmickGate_PlaceBoard(GimmickGateWork *work);
+void GimmickGate_AddMessage(GimmickGateWork *work, u32 kind, u32 flag);
+u32 GimmickGate_ShouldShowHallOfFame(GimmickGateWork *work);
+u32 GimmickGate_IsHallOfFameFlagSet(GimmickGateWork *work);
+void GimmickGate_GetHallOfFameSpecies(const GimmickGateWork *work, u32 *species, s32 *count);
+void GimmickGate_LoadBoardEntries(GimmickGateWork *work);
+void GimmickGate_FreeBoardEntries(GimmickGateWork *work);
+GimmickGateBoardEntry *GimmickGate_FindBoardEntry(GimmickGateWork *work);
+GimmickGateBoardEntry *GimmickGate_FindListEntry(GimmickGateWork *work);
+u32 GimmickGate_HasBoardEntry(GimmickGateWork *work);
+void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *message, u32 kind,
+                                 GimmickGateBoardEntry *entry);
+void GimmickGate_SetupMessages(GimmickGateWork *work);
+void GimmickGate_SetupDefaultMessages(GimmickGateWork *work);
+void GimmickGate_SetupHallOfFameMessages(GimmickGateWork *work);
+void GimmickGate_SetupEntryMessages(GimmickGateWork *work);
+void GimmickGate_AddDateMessage(GimmickGateWork *work);
+void GimmickGate_AddWeatherMessage(GimmickGateWork *work);
+void GimmickGate_AddSwarmMessage(GimmickGateWork *work);
+void GimmickGate_AddWeekdayMessage3(GimmickGateWork *work);
+void GimmickGate_AddWeekdayMessage4(GimmickGateWork *work);
+void GimmickGate_AddWeekdayMessage5(GimmickGateWork *work);
+void GimmickGate_AddWeekdayMessage6(GimmickGateWork *work);
+void GimmickGate_AddHallOfFameMessage(GimmickGateWork *work);
+void GimmickGate_AddEntryMessages(GimmickGateWork *work);
+void GimmickGate_AddEntryMessage(GimmickGateWork *work, GimmickGateBoardEntry *entry, u32 index);
+void GimmickGate_AddListEntryMessages(GimmickGateWork *work);
+s32 GimmickGateZoneList_Count(const GimmickGateZoneList *list);
+void GimmickGateZoneList_Clear(GimmickGateZoneList *list);
+void GimmickGate_GetWeatherZones(GimmickGateWork *work, GimmickGateZoneList *list);
+void GimmickGate_GetReportedWeatherZones(GimmickGateWork *work, GimmickGateZoneList *list);
+void GimmickGate_GetRoamerZones(GimmickGateWork *work, GimmickGateZoneList *list);
+void GimmickGate_FreeWork(GimmickGateWork *work);
+void GimmickGate_LoadZoneData(GimmickGateWork *work);
+GimmickGateSave *GimmickGate_GetSave(Field *field);
 
 // The board's scenes
 typedef enum GimmickGateScene {
@@ -188,7 +189,7 @@ static u32 sWeatherMessages[15] = {
     0xb5, 0xb6, 0xb7, 0xb8, 0xba, 0xbb, 0xbe, 0xbf, 0xbd, 0xbc, 0xbc, 0xbc, 0xb9, 0xbc, 0xbc,
 };
 
-void func_ov104_021eec80(Field *field) {
+void GimmickGate_Setup(Field *field) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     GimmickGateWork *work;
     GimmickGateScene scene;
@@ -197,42 +198,42 @@ void func_ov104_021eec80(Field *field) {
         (Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
     scene = GATE_SCENE_1;
     LoadFieldExpandObjData(expObj, &sSceneSetups[scene], scene);
-    work = func_ov104_021eee34(field);
-    func_ov104_021eeee0(work);
-    func_ov104_021ef114(work);
-    func_ov104_021eedb0(work);
+    work = GimmickGate_CreateWork(field);
+    GimmickGate_LoadZoneData(work);
+    GimmickGate_LoadBoardEntries(work);
+    GimmickGate_LoadWork(work);
     if (work->value == 0) {
-        func_ov104_021eeebc(work);
+        GimmickGate_InitFlag(work);
     } else {
-        func_ov104_021eedcc(work);
-        func_ov104_021eede4(work);
+        GimmickGate_ApplyTrainerCardFlag(work);
+        GimmickGate_RestoreEventFlags(work);
     }
-    func_ov104_021ef2cc(work);
-    func_ov104_021eee24(work);
-    func_ov104_021eefc0(work);
-    func_ov104_021eef98(work);
+    GimmickGate_SetupMessages(work);
+    GimmickGate_RestoreBoardTime(work);
+    GimmickGate_PlaceBoard(work);
+    GimmickGate_StartBoardAnimation(work);
 }
 
-void func_ov104_021eed00(Field *field) {
+void GimmickGate_Delete(Field *field) {
     GimmickGateWork *work;
 
     work = Field_GetGimmickWorkBlock(field, 0);
-    func_ov104_021eed78(work);
+    GimmickGate_SaveWork(work);
     if (work->board != 0) {
-        func_ov104_021efc8c(work->board);
+        Elboard_Free(work->board);
     }
-    func_ov104_021eeea0(work);
+    GimmickGate_FreeWork(work);
 }
 
-void func_ov104_021eed20(Field *field) {
+void GimmickGate_Update(Field *field) {
     GimmickGateWork *work;
 
     work = Field_GetGimmickWorkBlock(field, 0);
-    func_ov104_021efcc4(work->board, sBoardStep);
+    Elboard_Update(work->board, sBoardStep);
     FieldExpObj_StepAllAnimations(Field_GetExpObjSystem(field));
 }
 
-u32 func_ov104_021eed44(Field *field) {
+u32 GimmickGate_GetDirection(Field *field) {
     GimmickGateWork *work;
     GimmickGateZoneData *zoneData;
 
@@ -241,7 +242,7 @@ u32 func_ov104_021eed44(Field *field) {
     return (u8)zoneData->direction;
 }
 
-GimmickGateSave *func_ov104_021eed58(Field *field) {
+GimmickGateSave *GimmickGate_GetSave(Field *field) {
     GimmickState *state;
     u32 id;
 
@@ -250,26 +251,26 @@ GimmickGateSave *func_ov104_021eed58(Field *field) {
     return GimmickState_GetUserData(state, id);
 }
 
-void func_ov104_021eed78(GimmickGateWork *work) {
+void GimmickGate_SaveWork(GimmickGateWork *work) {
     GimmickGateSave *data;
 
-    data = func_ov104_021eed58(work->field);
+    data = GimmickGate_GetSave(work->field);
     data->value = work->value;
-    data->boardTime = func_ov104_021efcf0(work->board) >> 12;
+    data->boardTime = Elboard_GetTime(work->board) >> 12;
     data->flag = work->flag;
     data->messages = work->messages;
 }
 
-void func_ov104_021eedb0(GimmickGateWork *work) {
+void GimmickGate_LoadWork(GimmickGateWork *work) {
     GimmickGateSave *data;
 
-    data = func_ov104_021eed58(work->field);
+    data = GimmickGate_GetSave(work->field);
     work->value = data->value;
     work->boardTime = data->boardTime;
     work->flag = data->flag;
 }
 
-void func_ov104_021eedcc(GimmickGateWork *work) {
+void GimmickGate_ApplyTrainerCardFlag(GimmickGateWork *work) {
     SaveControl *save;
     TrainerCardSave *card;
 
@@ -278,13 +279,13 @@ void func_ov104_021eedcc(GimmickGateWork *work) {
     func_0200cb08(card, work->flag);
 }
 
-void func_ov104_021eede4(GimmickGateWork *work) {
+void GimmickGate_RestoreEventFlags(GimmickGateWork *work) {
     EventWork *eventWork;
     s32 i;
     GimmickGateMessageList *list;
 
     eventWork = GameData_GetEventWork(work->gameData);
-    list = &func_ov104_021eed58(work->field)->messages;
+    list = &GimmickGate_GetSave(work->field)->messages;
     for (i = 0; i < list->count; i++) {
         if (list->kinds[i] == 8) {
             EventWork_FlagSet(eventWork, list->flags[i]);
@@ -292,11 +293,11 @@ void func_ov104_021eede4(GimmickGateWork *work) {
     }
 }
 
-void func_ov104_021eee24(GimmickGateWork *work) {
-    func_ov104_021efcfc(work->board, work->boardTime << 12);
+void GimmickGate_RestoreBoardTime(GimmickGateWork *work) {
+    Elboard_SetTime(work->board, work->boardTime << 12);
 }
 
-GimmickGateWork *func_ov104_021eee34(Field *field) {
+GimmickGateWork *GimmickGate_CreateWork(Field *field) {
     u16 heapId;
     FieldExpObjSystem *system;
     GimmickGateWork *work;
@@ -316,19 +317,19 @@ GimmickGateWork *func_ov104_021eee34(Field *field) {
     init.unk03 = 8;
     init.unk04 = 3;
     init.actor = FieldExpObj_GetActor(system, 1, 0);
-    work->board = func_ov104_021efbd8(&init);
+    work->board = Elboard_Create(&init);
     return work;
 }
 
-void func_ov104_021eeea0(GimmickGateWork *work) {
+void GimmickGate_FreeWork(GimmickGateWork *work) {
     if (work != 0) {
-        func_ov104_021eef84(work);
-        func_ov104_021ef168(work);
+        GimmickGate_FreeZoneData(work);
+        GimmickGate_FreeBoardEntries(work);
         Field_DeleteGimmickWorkBlock(work->field, 0);
     }
 }
 
-void func_ov104_021eeebc(GimmickGateWork *work) {
+void GimmickGate_InitFlag(GimmickGateWork *work) {
     SaveControl *save;
     TrainerCardSave *card;
 
@@ -340,7 +341,7 @@ void func_ov104_021eeebc(GimmickGateWork *work) {
     }
 }
 
-void func_ov104_021eeee0(GimmickGateWork *work) {
+void GimmickGate_LoadZoneData(GimmickGateWork *work) {
     GimmickGateZoneData temp;
     u32 i;
     u32 count;
@@ -354,7 +355,7 @@ void func_ov104_021eeee0(GimmickGateWork *work) {
         GFL_HeapAllocate(work->heapId, sizeof(struct GimmickGateZoneData), FALSE, "field_gimmick_gate.c", 0x39b);
     count = GFL_ArcSysGetDataMax(0xac);
     for (i = 0; i < count; i++) {
-        func_ov104_021f0150(&temp, 0xac, i);
+        GimmickGateZoneData_Load(&temp, 0xac, i);
         if (temp.zoneId != zone) {
             continue;
         }
@@ -364,7 +365,7 @@ void func_ov104_021eeee0(GimmickGateWork *work) {
         if (zone == 0x177 || zone == 0x17b) {
             switch (GameData_GetMyCity(work->gameData)) {
             case 0:
-                func_ov104_021f0150(&temp, 0xac, i + 1);
+                GimmickGateZoneData_Load(&temp, 0xac, i + 1);
                 break;
             case 1:
                 break;
@@ -375,14 +376,14 @@ void func_ov104_021eeee0(GimmickGateWork *work) {
     }
 }
 
-void func_ov104_021eef84(GimmickGateWork *work) {
+void GimmickGate_FreeZoneData(GimmickGateWork *work) {
     if (work->zoneData != 0) {
         GFL_HeapFree(work->zoneData);
         work->zoneData = 0;
     }
 }
 
-void func_ov104_021eef98(GimmickGateWork *work) {
+void GimmickGate_StartBoardAnimation(GimmickGateWork *work) {
     FieldExpObjSystem *system;
     u32 anm;
 
@@ -391,7 +392,7 @@ void func_ov104_021eef98(GimmickGateWork *work) {
     FieldExpObj_SetAnm(system, 1, 0, sBoardAnimations[anm], TRUE);
 }
 
-void func_ov104_021eefc0(GimmickGateWork *work) {
+void GimmickGate_PlaceBoard(GimmickGateWork *work) {
     FieldExpObjSystem *system;
     SRTMatrix *matrix;
     GimmickGateZoneData *state;
@@ -423,7 +424,7 @@ void func_ov104_021eefc0(GimmickGateWork *work) {
     MAT3_RotationEulerZYX(0, (u16)(angle * 182), 0, &matrix->rotation);
 }
 
-void func_ov104_021ef02c(GimmickGateWork *work, u32 kind, u32 flag) {
+void GimmickGate_AddMessage(GimmickGateWork *work, u32 kind, u32 flag) {
     GimmickGateMessageList *list;
     s32 count;
 
@@ -436,14 +437,14 @@ void func_ov104_021ef02c(GimmickGateWork *work, u32 kind, u32 flag) {
     }
 }
 
-u32 func_ov104_021ef04c(GimmickGateWork *work) {
-    if (func_ov104_021ef068(work) == 1 && work->flag != 0) {
+u32 GimmickGate_ShouldShowHallOfFame(GimmickGateWork *work) {
+    if (GimmickGate_IsHallOfFameFlagSet(work) == 1 && work->flag != 0) {
         return 1;
     }
     return 0;
 }
 
-u32 func_ov104_021ef068(GimmickGateWork *work) {
+u32 GimmickGate_IsHallOfFameFlagSet(GimmickGateWork *work) {
     EventWork *eventWork;
 
     eventWork = GameData_GetEventWork(work->gameData);
@@ -453,7 +454,7 @@ u32 func_ov104_021ef068(GimmickGateWork *work) {
     return 0;
 }
 
-void func_ov104_021ef084(const GimmickGateWork *work, u32 *species, s32 *count) {
+void GimmickGate_GetHallOfFameSpecies(const GimmickGateWork *work, u32 *species, s32 *count) {
     GameData *gameData = work->gameData;
     SaveControl *save;
     HallOfFameSave *hallOfFame;
@@ -481,7 +482,7 @@ void func_ov104_021ef084(const GimmickGateWork *work, u32 *species, s32 *count) 
     freeIntermediateSaveExtraBlksAfterLoad(save, 8);
 }
 
-void func_ov104_021ef114(GimmickGateWork *work) {
+void GimmickGate_LoadBoardEntries(GimmickGateWork *work) {
     s32 count;
     s32 i;
 
@@ -490,13 +491,13 @@ void func_ov104_021ef114(GimmickGateWork *work) {
         work->boardEntries = GFL_HeapAllocate(work->heapId, count * sizeof(struct GimmickGateBoardEntry), FALSE,
                                               "field_gimmick_gate.c", 0x4b5);
         for (i = 0; i < count; i++) {
-            func_ov104_021f0324(&work->boardEntries[i], 0xa4, i);
+            GimmickGateBoardEntry_Load(&work->boardEntries[i], 0xa4, i);
         }
         work->boardEntryCount = count;
     }
 }
 
-void func_ov104_021ef168(GimmickGateWork *work) {
+void GimmickGate_FreeBoardEntries(GimmickGateWork *work) {
     if (work->boardEntries != 0) {
         GFL_HeapFree(work->boardEntries);
         work->boardEntries = 0;
@@ -504,7 +505,7 @@ void func_ov104_021ef168(GimmickGateWork *work) {
     }
 }
 
-GimmickGateBoardEntry *func_ov104_021ef180(GimmickGateWork *work) {
+GimmickGateBoardEntry *GimmickGate_FindBoardEntry(GimmickGateWork *work) {
     u16 zone;
     EventWork *eventWork;
     s32 i;
@@ -518,15 +519,15 @@ GimmickGateBoardEntry *func_ov104_021ef180(GimmickGateWork *work) {
     }
     for (i = 0; i < work->boardEntryCount; i++) {
         flag = EventWork_FlagGet(eventWork, work->boardEntries[i].flagId);
-        zoneMatch = func_ov104_021f0334(&work->boardEntries[i], zone);
-        if (func_ov104_021f037c(&work->boardEntries[i]) && flag && zoneMatch) {
+        zoneMatch = GimmickGateBoardEntry_MatchesZone(&work->boardEntries[i], zone);
+        if (GimmickGateBoardEntry_MatchesVersion(&work->boardEntries[i]) && flag && zoneMatch) {
             return &work->boardEntries[i];
         }
     }
     return 0;
 }
 
-GimmickGateBoardEntry *func_ov104_021ef204(GimmickGateWork *work) {
+GimmickGateBoardEntry *GimmickGate_FindListEntry(GimmickGateWork *work) {
     u16 zone;
     EventWork *eventWork;
     s32 i;
@@ -541,7 +542,7 @@ GimmickGateBoardEntry *func_ov104_021ef204(GimmickGateWork *work) {
     }
     for (i = 0; i < work->boardEntryCount; i++) {
         flag = EventWork_FlagGet(eventWork, work->boardEntries[i].flagId);
-        zoneMatch = func_ov104_021f0334(&work->boardEntries[i], zone);
+        zoneMatch = GimmickGateBoardEntry_MatchesZone(&work->boardEntries[i], zone);
         if (flag && zoneMatch) {
             entry = &work->boardEntries[i];
             if (entry->type == 2) {
@@ -552,70 +553,71 @@ GimmickGateBoardEntry *func_ov104_021ef204(GimmickGateWork *work) {
     return 0;
 }
 
-u32 func_ov104_021ef278(GimmickGateWork *work) {
-    if (func_ov104_021ef180(work) != 0) {
+u32 GimmickGate_HasBoardEntry(GimmickGateWork *work) {
+    if (GimmickGate_FindBoardEntry(work) != 0) {
         return 1;
     }
     return 0;
 }
 
-void func_ov104_021ef28c(GimmickGateWork *work, ElboardMessageArg *message, u32 kind, GimmickGateBoardEntry *entry) {
-    func_ov104_021efc6c(work->board, message);
+void GimmickGate_AddBoardMessage(GimmickGateWork *work, ElboardMessageArg *message, u32 kind,
+                                 GimmickGateBoardEntry *entry) {
+    Elboard_AddMessage(work->board, message);
     if (kind == 8) {
-        func_ov104_021ef02c(work, kind, entry->flagId);
+        GimmickGate_AddMessage(work, kind, entry->flagId);
     } else {
-        func_ov104_021ef02c(work, kind, 0);
+        GimmickGate_AddMessage(work, kind, 0);
     }
     if (kind == 8 && entry->unk08 == 1) {
         EventWork_FlagReset(GameData_GetEventWork(work->gameData), entry->flagId);
     }
 }
 
-void func_ov104_021ef2cc(GimmickGateWork *work) {
-    if (func_ov104_021ef04c(work) == 1) {
-        func_ov104_021ef344(work);
+void GimmickGate_SetupMessages(GimmickGateWork *work) {
+    if (GimmickGate_ShouldShowHallOfFame(work) == 1) {
+        GimmickGate_SetupHallOfFameMessages(work);
         return;
     }
-    if (func_ov104_021ef278(work) != 0) {
-        func_ov104_021ef380(work);
+    if (GimmickGate_HasBoardEntry(work) != 0) {
+        GimmickGate_SetupEntryMessages(work);
         return;
     }
-    func_ov104_021ef2fc(work);
+    GimmickGate_SetupDefaultMessages(work);
 }
 
-void func_ov104_021ef2fc(GimmickGateWork *work) {
-    if (!func_ov104_021efcf8(work->board) && work->zoneData && work->zoneData->enabled) {
-        func_ov104_021ef5ac(work);
-        func_ov104_021ef3c0(work);
-        func_ov104_021ef43c(work);
-        func_ov104_021ef658(work);
-        func_ov104_021ef6dc(work);
-        func_ov104_021ef760(work);
-        func_ov104_021ef7e4(work);
+void GimmickGate_SetupDefaultMessages(GimmickGateWork *work) {
+    if (!Elboard_GetMessageCount(work->board) && work->zoneData && work->zoneData->enabled) {
+        GimmickGate_AddSwarmMessage(work);
+        GimmickGate_AddDateMessage(work);
+        GimmickGate_AddWeatherMessage(work);
+        GimmickGate_AddWeekdayMessage3(work);
+        GimmickGate_AddWeekdayMessage4(work);
+        GimmickGate_AddWeekdayMessage5(work);
+        GimmickGate_AddWeekdayMessage6(work);
     }
 }
 
-void func_ov104_021ef344(GimmickGateWork *work) {
-    if (!func_ov104_021efcf8(work->board) && work->zoneData && work->zoneData->enabled) {
-        func_ov104_021ef5ac(work);
-        func_ov104_021ef3c0(work);
-        func_ov104_021ef43c(work);
-        func_ov104_021ef868(work);
-        func_ov104_021ef7e4(work);
+void GimmickGate_SetupHallOfFameMessages(GimmickGateWork *work) {
+    if (!Elboard_GetMessageCount(work->board) && work->zoneData && work->zoneData->enabled) {
+        GimmickGate_AddSwarmMessage(work);
+        GimmickGate_AddDateMessage(work);
+        GimmickGate_AddWeatherMessage(work);
+        GimmickGate_AddHallOfFameMessage(work);
+        GimmickGate_AddWeekdayMessage6(work);
     }
 }
 
-void func_ov104_021ef380(GimmickGateWork *work) {
-    if (!func_ov104_021efcf8(work->board) && work->boardEntries && work->zoneData && work->zoneData->enabled) {
-        func_ov104_021ef924(work);
-        func_ov104_021ef5ac(work);
-        func_ov104_021ef3c0(work);
-        func_ov104_021ef43c(work);
-        func_ov104_021ef7e4(work);
+void GimmickGate_SetupEntryMessages(GimmickGateWork *work) {
+    if (!Elboard_GetMessageCount(work->board) && work->boardEntries && work->zoneData && work->zoneData->enabled) {
+        GimmickGate_AddEntryMessages(work);
+        GimmickGate_AddSwarmMessage(work);
+        GimmickGate_AddDateMessage(work);
+        GimmickGate_AddWeatherMessage(work);
+        GimmickGate_AddWeekdayMessage6(work);
     }
 }
 
-void func_ov104_021ef3c0(GimmickGateWork *work) {
+void GimmickGate_AddDateMessage(GimmickGateWork *work) {
     WordSet *wordSet;
     ElboardMessageArg arg;
     RTCDate date;
@@ -632,11 +634,11 @@ void func_ov104_021ef3c0(GimmickGateWork *work) {
     arg.messageFile = 0x2b;
     arg.messageId = work->zoneData->messageIds[0];
     arg.wordSet = wordSet;
-    func_ov104_021ef28c(work, &arg, 1, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 1, 0);
     GFL_WordSetSystemFree(wordSet);
 }
 
-void func_ov104_021ef43c(GimmickGateWork *work) {
+void GimmickGate_AddWeatherMessage(GimmickGateWork *work) {
     ElboardMessageArg arg;
     GimmickGateZoneList list;
     u32 message;
@@ -651,7 +653,7 @@ void func_ov104_021ef43c(GimmickGateWork *work) {
     s32 i;
     u8 weather;
 
-    func_ov104_021efa18(work, &list);
+    GimmickGate_GetWeatherZones(work, &list);
     wordSet = GFL_WordSetSystemCreate(4, 0x100, work->heapId);
     placeMessages = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, work->heapId);
     weatherMessages = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GYM_INSECT, work->heapId);
@@ -677,7 +679,7 @@ void func_ov104_021ef43c(GimmickGateWork *work) {
     }
     GFL_MsgDataFree(weatherMessages);
     GFL_MsgDataFree(placeMessages);
-    switch (func_ov104_021ef9c8(&list)) {
+    switch (GimmickGateZoneList_Count(&list)) {
     case 1:
         message = 0xc1;
         break;
@@ -698,11 +700,11 @@ void func_ov104_021ef43c(GimmickGateWork *work) {
     arg.messageFile = 0x2b;
     arg.messageId = message;
     arg.wordSet = wordSet;
-    func_ov104_021ef28c(work, &arg, 2, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 2, 0);
     GFL_WordSetSystemFree(wordSet);
 }
 
-void func_ov104_021ef5ac(GimmickGateWork *work) {
+void GimmickGate_AddSwarmMessage(GimmickGateWork *work) {
     u16 zone;
     WordSet *wordSet;
     MsgData *msgData;
@@ -726,11 +728,11 @@ void func_ov104_021ef5ac(GimmickGateWork *work) {
     arg.messageFile = 0x2b;
     arg.messageId = work->zoneData->messageIds[2];
     arg.wordSet = wordSet;
-    func_ov104_021ef28c(work, &arg, 3, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 3, 0);
     GFL_WordSetSystemFree(wordSet);
 }
 
-void func_ov104_021ef658(GimmickGateWork *work) {
+void GimmickGate_AddWeekdayMessage3(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
@@ -764,10 +766,10 @@ void func_ov104_021ef658(GimmickGateWork *work) {
     arg.messageArc = 2;
     arg.messageFile = 0x2b;
     arg.wordSet = 0;
-    func_ov104_021ef28c(work, &arg, 4, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 4, 0);
 }
 
-void func_ov104_021ef6dc(GimmickGateWork *work) {
+void GimmickGate_AddWeekdayMessage4(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
@@ -801,10 +803,10 @@ void func_ov104_021ef6dc(GimmickGateWork *work) {
     arg.messageArc = 2;
     arg.messageFile = 0x2b;
     arg.wordSet = 0;
-    func_ov104_021ef28c(work, &arg, 5, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 5, 0);
 }
 
-void func_ov104_021ef760(GimmickGateWork *work) {
+void GimmickGate_AddWeekdayMessage5(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
@@ -838,10 +840,10 @@ void func_ov104_021ef760(GimmickGateWork *work) {
     arg.messageArc = 2;
     arg.messageFile = 0x2b;
     arg.wordSet = 0;
-    func_ov104_021ef28c(work, &arg, 6, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 6, 0);
 }
 
-void func_ov104_021ef7e4(GimmickGateWork *work) {
+void GimmickGate_AddWeekdayMessage6(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
@@ -875,10 +877,10 @@ void func_ov104_021ef7e4(GimmickGateWork *work) {
     arg.messageArc = 2;
     arg.messageFile = 0x2b;
     arg.wordSet = 0;
-    func_ov104_021ef28c(work, &arg, 7, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 7, 0);
 }
 
-void func_ov104_021ef868(GimmickGateWork *work) {
+void GimmickGate_AddHallOfFameMessage(GimmickGateWork *work) {
     s32 count;
     ElboardMessageArg arg;
     u32 species[6];
@@ -886,8 +888,8 @@ void func_ov104_021ef868(GimmickGateWork *work) {
     u32 message;
     s32 i;
 
-    wordSet = GFL_WordSetSystemCreateDefault(func_ov104_021efcf4(work->board));
-    func_ov104_021ef084(work, species, &count);
+    wordSet = GFL_WordSetSystemCreateDefault(Elboard_GetHeapID(work->board));
+    GimmickGate_GetHallOfFameSpecies(work, species, &count);
     switch (count) {
     case 1:
         message = 0xcd;
@@ -919,25 +921,25 @@ void func_ov104_021ef868(GimmickGateWork *work) {
     arg.messageFile = 0x2b;
     arg.messageId = message;
     arg.wordSet = wordSet;
-    func_ov104_021ef28c(work, &arg, 9, 0);
+    GimmickGate_AddBoardMessage(work, &arg, 9, 0);
     GFL_WordSetSystemFree(wordSet);
 }
 
-void func_ov104_021ef924(GimmickGateWork *work) {
+void GimmickGate_AddEntryMessages(GimmickGateWork *work) {
     GimmickGateBoardEntry *entry;
 
-    entry = func_ov104_021ef180(work);
+    entry = GimmickGate_FindBoardEntry(work);
     switch (entry->type) {
     case 0:
-        func_ov104_021ef94c(work, entry, 3);
+        GimmickGate_AddEntryMessage(work, entry, 3);
         break;
     case 2:
-        func_ov104_021ef994(work);
+        GimmickGate_AddListEntryMessages(work);
         break;
     }
 }
 
-void func_ov104_021ef94c(GimmickGateWork *work, GimmickGateBoardEntry *entry, u32 index) {
+void GimmickGate_AddEntryMessage(GimmickGateWork *work, GimmickGateBoardEntry *entry, u32 index) {
     ElboardMessageArg arg;
 
     arg.kind = sMessageKinds[index];
@@ -947,22 +949,22 @@ void func_ov104_021ef94c(GimmickGateWork *work, GimmickGateBoardEntry *entry, u3
     arg.messageFile = 0x2b;
     arg.messageId = entry->unk0c;
     arg.wordSet = NULL;
-    func_ov104_021ef28c(work, &arg, 8, entry);
+    GimmickGate_AddBoardMessage(work, &arg, 8, entry);
 }
 
-void func_ov104_021ef994(GimmickGateWork *work) {
+void GimmickGate_AddListEntryMessages(GimmickGateWork *work) {
     s32 index;
     GimmickGateBoardEntry *entry;
 
     index = 0;
-    entry = func_ov104_021ef204(work);
+    entry = GimmickGate_FindListEntry(work);
     while (entry && index < 3) {
-        func_ov104_021ef94c(work, entry, sEntrySlots[index++]);
-        entry = func_ov104_021ef204(work);
+        GimmickGate_AddEntryMessage(work, entry, sEntrySlots[index++]);
+        entry = GimmickGate_FindListEntry(work);
     }
 }
 
-s32 func_ov104_021ef9c8(const GimmickGateZoneList *list) {
+s32 GimmickGateZoneList_Count(const GimmickGateZoneList *list) {
     s32 index;
     s32 count;
 
@@ -975,7 +977,7 @@ s32 func_ov104_021ef9c8(const GimmickGateZoneList *list) {
     return count;
 }
 
-void func_ov104_021ef9f8(GimmickGateZoneList *list) {
+void GimmickGateZoneList_Clear(GimmickGateZoneList *list) {
     s32 index;
 
     for (index = 0; index < 4; index++) {
@@ -984,7 +986,7 @@ void func_ov104_021ef9f8(GimmickGateZoneList *list) {
     }
 }
 
-void func_ov104_021efa18(GimmickGateWork *work, GimmickGateZoneList *out) {
+void GimmickGate_GetWeatherZones(GimmickGateWork *work, GimmickGateZoneList *out) {
     GimmickGateZoneList second;
     GimmickGateZoneList first;
     s32 count;
@@ -992,9 +994,9 @@ void func_ov104_021efa18(GimmickGateWork *work, GimmickGateZoneList *out) {
     GimmickGateZoneData *zoneData;
 
     count = 0;
-    func_ov104_021ef9f8(out);
-    func_ov104_021efad0(work, &second);
-    func_ov104_021efb30(work, &first);
+    GimmickGateZoneList_Clear(out);
+    GimmickGate_GetReportedWeatherZones(work, &second);
+    GimmickGate_GetRoamerZones(work, &first);
     for (i = 0; i < 4; i++) {
         if (first.zones[i] == 0x267 || first.weather[i] == 0xffff || count >= 2) {
             break;
@@ -1023,14 +1025,14 @@ void func_ov104_021efa18(GimmickGateWork *work, GimmickGateZoneList *out) {
     }
 }
 
-void func_ov104_021efad0(GimmickGateWork *work, GimmickGateZoneList *list) {
+void GimmickGate_GetReportedWeatherZones(GimmickGateWork *work, GimmickGateZoneList *list) {
     s32 count;
     int i;
     int j;
     u16 zone;
     u8 weather;
 
-    func_ov104_021ef9f8(list);
+    GimmickGateZoneList_Clear(list);
     count = 0;
     for (i = 0; i < NELEMS(sWeatherZones); i++) {
         zone = sWeatherZones[i];
@@ -1048,7 +1050,7 @@ void func_ov104_021efad0(GimmickGateWork *work, GimmickGateZoneList *list) {
     }
 }
 
-void func_ov104_021efb30(GimmickGateWork *work, GimmickGateZoneList *list) {
+void GimmickGate_GetRoamerZones(GimmickGateWork *work, GimmickGateZoneList *list) {
     EncountSave *save;
     u32 version;
     u32 slot;
@@ -1056,7 +1058,7 @@ void func_ov104_021efb30(GimmickGateWork *work, GimmickGateZoneList *list) {
     u16 zone;
 
     save = SaveControl_GetEncountSave(GameData_GetSaveControl(work->gameData));
-    func_ov104_021ef9f8(list);
+    GimmickGateZoneList_Clear(list);
     if (func_ov012_02159218(save)) {
         version = getGameVersion();
         switch (version) {
@@ -1083,7 +1085,7 @@ void func_ov104_021efb30(GimmickGateWork *work, GimmickGateZoneList *list) {
     }
 }
 
-BOOL func_ov104_021efb90(VM *vm, FieldScriptEnv *env) {
+BOOL GimmickGateCmd_ViewBoard(VM *vm, FieldScriptEnv *env) {
     ScriptWork *scriptWork;
     GameSystem *gsys;
     Field *field;
@@ -1095,7 +1097,7 @@ BOOL func_ov104_021efb90(VM *vm, FieldScriptEnv *env) {
     field = GSYS_GetField(gsys);
     id = ScriptReadAny(vm, env);
     GFL_SndSEPlay(0x547);
-    event = func_ov104_021f02fc(gsys, field, id);
+    event = GimmickGateEvent_Create(gsys, field, id);
     ScriptWork_CallEvent(scriptWork, event);
     return TRUE;
 }

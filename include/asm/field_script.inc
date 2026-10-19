@@ -2150,7 +2150,7 @@
     FieldCommand 377
     .endm
 
-    // func_ov104_021efb90
+    // GimmickGateCmd_ViewBoard
     .macro Cmd_017A a0
     FieldCommand 378
     .2byte \a0

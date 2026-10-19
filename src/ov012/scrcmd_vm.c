@@ -481,7 +481,7 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s0177_WildBattleIsVictory,                // 0x177
     s0178_WildBattleGetResult,                // 0x178
     s0179_CallCaptureDemo,                    // 0x179
-    func_ov104_021efb90,                      // 0x17a
+    GimmickGateCmd_ViewBoard,                 // 0x17a
     func_ov012_02157bdc,                      // 0x17b
     func_ov036_021ab1a8,                      // 0x17c
     func_ov036_021ab1e0,                      // 0x17d
