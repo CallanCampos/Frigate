@@ -4496,51 +4496,51 @@
 
     // Plugin 8
 
-    // func_ov059_021e58c0
+    // ResortCmd_StartTalk
     .macro Plugin8_Cmd1000
     FieldCommand 1000
     .endm
 
-    // func_ov059_021e591c
+    // ResortCmd_EndTalk
     .macro Plugin8_Cmd1001
     FieldCommand 1001
     .endm
 
-    // func_ov059_021e5950
+    // ResortCmd_GetValue
     .macro Plugin8_Cmd1002 a0, a1
     FieldCommand 1002
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e5eb0
+    // ResortCmd_GetScriptValue
     .macro Plugin8_Cmd1003 a0, a1
     FieldCommand 1003
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e79a4
+    // ResortCmd_ShowRecords
     .macro Plugin8_Cmd1004 a0, a1
     FieldCommand 1004
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e5f38
+    // ResortCmd_MakeData
     .macro Plugin8_Cmd1005 a0, a1
     FieldCommand 1005
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e7ad8
+    // ResortCmd_RecreatePeople
     .macro Plugin8_Cmd1006 a0
     FieldCommand 1006
     .2byte \a0
     .endm
 
-    // func_ov059_021e6014
+    // ResortCmd_SetWord
     .macro Plugin8_Cmd1007 a0, a1, a2, a3
     FieldCommand 1007
     .2byte \a0
@@ -4549,7 +4549,7 @@
     .2byte \a3
     .endm
 
-    // func_ov059_021e60a4
+    // ResortCmd_RemovePerson
     .macro Plugin8_Cmd1008 a0, a1, a2
     FieldCommand 1008
     .2byte \a0
@@ -4557,7 +4557,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e6778
+    // ResortCmd_AddShopExperience
     .macro Plugin8_Cmd1009 a0, a1, a2, a3
     FieldCommand 1009
     .2byte \a0
@@ -4566,7 +4566,7 @@
     .2byte \a3
     .endm
 
-    // func_ov059_021e67f8
+    // ResortCmd_AddPopularity
     .macro Plugin8_Cmd1010 a0, a1, a2
     FieldCommand 1010
     .2byte \a0
@@ -4574,29 +4574,29 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e58c0
+    // ResortCmd_StartTalk
     .macro Plugin8_Cmd1011
     FieldCommand 1011
     .endm
 
-    // func_ov059_021e619c
+    // ResortCmd_SaveShopId
     .macro Plugin8_Cmd1012
     FieldCommand 1012
     .endm
 
-    // func_ov059_021e6868
+    // ResortCmd_SetOccupantsLocked
     .macro Plugin8_Cmd1013 a0
     FieldCommand 1013
     .2byte \a0
     .endm
 
-    // func_ov059_021e689c
+    // ResortCmd_HideActors
     .macro Plugin8_Cmd1014 a0
     FieldCommand 1014
     .2byte \a0
     .endm
 
-    // func_ov059_021e61d8
+    // ResortCmd_RaffleShopItem
     .macro Plugin8_Cmd1015 a0, a1, a2
     FieldCommand 1015
     .2byte \a0
@@ -4604,7 +4604,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e62a8
+    // ResortCmd_SetFriendship
     .macro Plugin8_Cmd1016 a0, a1, a2
     FieldCommand 1016
     .2byte \a0
@@ -4612,7 +4612,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e6318
+    // ResortCmd_RaiseLevel
     .macro Plugin8_Cmd1017 a0, a1, a2
     FieldCommand 1017
     .2byte \a0
@@ -4620,7 +4620,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e63d4
+    // ResortCmd_ChangeEffortValue
     .macro Plugin8_Cmd1018 a0, a1, a2, a3
     FieldCommand 1018
     .2byte \a0
@@ -4629,7 +4629,7 @@
     .2byte \a3
     .endm
 
-    // func_ov059_021e64a0
+    // ResortCmd_ShortenEggSteps
     .macro Plugin8_Cmd1019 a0, a1, a2
     FieldCommand 1019
     .2byte \a0
@@ -4637,19 +4637,19 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e65fc
+    // ResortCmd_SetShopFlag
     .macro Plugin8_Cmd1020
     FieldCommand 1020
     .endm
 
-    // func_ov059_021e6630
+    // ResortCmd_PayAndSetShopFlag
     .macro Plugin8_Cmd1021 a0, a1
     FieldCommand 1021
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e66d8
+    // ResortCmd_GetPersonVisit
     .macro Plugin8_Cmd1022 a0, a1, a2, a3, a4
     FieldCommand 1022
     .2byte \a0
@@ -4659,14 +4659,14 @@
     .2byte \a4
     .endm
 
-    // func_ov059_021e6bd4
+    // ResortCmd_NameEntry
     .macro Plugin8_Cmd1023 a0, a1
     FieldCommand 1023
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e6934
+    // ResortCmd_Visit
     .macro Plugin8_Cmd1024 a0, a1, a2, a3
     FieldCommand 1024
     .2byte \a0
@@ -4675,32 +4675,32 @@
     .2byte \a3
     .endm
 
-    // func_ov059_021e6b68
+    // ResortCmd_CheckRank100Unlock
     .macro Plugin8_Cmd1025 a0
     FieldCommand 1025
     .2byte \a0
     .endm
 
-    // func_ov059_021e6c10
+    // ResortCmd_MarkRaffled
     .macro Plugin8_Cmd1026
     FieldCommand 1026
     .endm
 
-    // func_ov059_021e7a28
+    // ResortCmd_AddRecordPerson
     .macro Plugin8_Cmd1027 a0, a1
     FieldCommand 1027
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e77c4
+    // ResortCmd_AddEntryOrRecord
     .macro Plugin8_Cmd1028 a0, a1
     FieldCommand 1028
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e6c48
+    // ResortCmd_GetNPCValue
     .macro Plugin8_Cmd1029 a0, a1, a2
     FieldCommand 1029
     .2byte \a0
@@ -4708,21 +4708,21 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e74cc
+    // ResortCmd_SetOwnValue
     .macro Plugin8_Cmd1030 a0, a1
     FieldCommand 1030
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e7608
+    // ResortCmd_GetOwnValue
     .macro Plugin8_Cmd1031 a0, a1
     FieldCommand 1031
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e6d50
+    // ResortCmd_SetOccupantWords
     .macro Plugin8_Cmd1032 a0, a1, a2
     FieldCommand 1032
     .2byte \a0
@@ -4730,7 +4730,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e6f14
+    // ResortCmd_SetNPCWord
     .macro Plugin8_Cmd1033 a0, a1, a2
     FieldCommand 1033
     .2byte \a0
@@ -4738,7 +4738,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e742c
+    // ResortCmd_GetGoodsValue
     .macro Plugin8_Cmd1034 a0, a1, a2
     FieldCommand 1034
     .2byte \a0
@@ -4746,7 +4746,7 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e6fc8
+    // ResortCmd_DescribeOccupant
     .macro Plugin8_Cmd1035 a0, a1, a2
     FieldCommand 1035
     .2byte \a0
@@ -4754,25 +4754,25 @@
     .2byte \a2
     .endm
 
-    // func_ov059_021e7c70
+    // ResortCmd_ShowMedalInfo
     .macro Plugin8_Cmd1036
     FieldCommand 1036
     .endm
 
-    // func_ov059_021e7710
+    // ResortCmd_StartSceneAnim
     .macro Plugin8_Cmd1037 a0
     FieldCommand 1037
     .2byte \a0
     .endm
 
-    // func_ov059_021e7748
+    // ResortCmd_IsSceneAnimDone
     .macro Plugin8_Cmd1038 a0, a1
     FieldCommand 1038
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov059_021e778c
+    // ResortCmd_EndSceneAnim
     .macro Plugin8_Cmd1039 a0
     FieldCommand 1039
     .2byte \a0

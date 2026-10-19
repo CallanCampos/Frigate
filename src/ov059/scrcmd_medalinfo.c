@@ -13,16 +13,16 @@
 
 // The Join Avenue's command that shows a visitor's medals
 
-static void func_ov059_021e7d68(void *arg);
-static ResortPerson *func_ov059_021e7d7c(Field *field, FieldScriptEnv *env);
+static void ResortCmd_FreeMedalInfo(void *arg);
+static ResortPerson *ResortCmd_GetMedalPerson(Field *field, FieldScriptEnv *env);
 
-BOOL func_ov059_021e7c70(VM *vm, FieldScriptEnv *env) {
+BOOL ResortCmd_ShowMedalInfo(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     MedalInfoParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MedalInfoParam), TRUE, "scrcmd_medalinfo.c", 88);
-    ResortPerson *person = func_ov059_021e7d7c(field, env);
+    ResortPerson *person = ResortCmd_GetMedalPerson(field, env);
     u16 date = ResortPerson_GetParam(person, 42, NULL);
     u16 name[8];
     u16 unkC;
@@ -48,18 +48,18 @@ BOOL func_ov059_021e7c70(VM *vm, FieldScriptEnv *env) {
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_MEDAL_INFO,
                                                                                  &MedalInfo_ProcFunctions, param,
-                                                                                 func_ov059_021e7d68, param));
+                                                                                 ResortCmd_FreeMedalInfo, param));
     return TRUE;
 }
 
-static void func_ov059_021e7d68(void *arg) {
+static void ResortCmd_FreeMedalInfo(void *arg) {
     MedalInfoParam *param = arg;
 
     GFL_StrBufFree(param->nameBuf);
     GFL_HeapFree(param);
 }
 
-static ResortPerson *func_ov059_021e7d7c(Field *field, FieldScriptEnv *env) {
+static ResortPerson *ResortCmd_GetMedalPerson(Field *field, FieldScriptEnv *env) {
     ResortPeople *people = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {
