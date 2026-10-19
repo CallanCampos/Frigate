@@ -2147,7 +2147,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
   A product computed again in a register shows it too: libVCT's `VCT_UpdateTiming` (`vct_buffer.c`) loads 0x8b18 again
   and multiplies a second time for `playoutDelay` after the signed `delayFloor = (int)quotient * 0x8b18 - 0x458c`,
-  with `u32 quotient`.
+  with `u32 quotient`. A `u16` index widens as unsigned, so a `(u32)`, `(unsigned long)` or `(u16)` cast on one of its
+  subscripts compiles the same as none and shares the others' product, while `(int)` or `(long)` splits it off: with a
+  `u16` stack parameter, `T[(int)i].b` after `T[i].c` loads `i` again and shifts it again. `mystery_album.c`'s
+  `MysteryCardView_DrawCard` recomputes its cursor's `index * 8` that way with `(int)` on the y read, as the original
+  does, but MWCC then also reads `index` from its home slot with `ldr` rather than loading it at entry with `ldrh`, so
+  that cast is not the original's spelling.
 - A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
   second read through a `static inline` that takes a pointer to `const`: a load through a `const` pointer is a
   different expression from the plain read, so the two are not shared. The Wi-Fi login's `WifiLoginMessage_PrintFrom`
