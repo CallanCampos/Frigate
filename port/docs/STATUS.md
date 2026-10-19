@@ -26,6 +26,92 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the macOS distribution and White 2 starter tracks merged, ADR 0015 accepted, green on every host
+
+- **Upstream:** `81eea95ee` (merge of PR #387), as merged into the port's `main` by `4d0ce54b7`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `62a4e5e2f`: `4122413bf` (the merge of
+  `port-macos-dist`), `b23ccc24f` (ADR 0015 accepted), `b57e219d6` (the mac track's two notes corrected),
+  `3dd85670c` (the merge of `port-w2-starter`), `cee1e635d` (`host_trap_placeholder_fiber` on an Intel Mac), then this
+  entry; pushed to `port-macos-dist` on origin (new there) for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `3dd85670c`
+  and `cee1e635d`. No game file changed: outside `port/`, only the landing page and `port-ci.yml`.
+- **Host build:** macOS 26.5.1 on an M2, Xcode 26.6 (SDK 26.5, Apple clang 21.0.0), RelWithDebInfo, Ninja:
+  - `build/port-n` (Black 2), built again at `4122413bf`, and `build/port-w2` (White 2), at `3dd85670c`: 1,338 of a
+    fresh build's steps each (`81eea95ee`'s C merged since their last build, and `host.h`), then CMake alone at the
+    later commits; no error, no warning in `port/`. The oracle is `build/oracle`'s `pbw-oracle` in both
+    builds' `oracle/` (no oracle source changed), and the saves their `oracle-saves`: Black 2's two, White 2's
+    `first_save` and its `starter_save`, copied from the White 2 track's build (SHA-1 `3b9dac231d1f`, the one
+    `SAVES` keeps).
+  - `build/port-dist` and `build/port-dist-w2`, the distribution builds, made from nothing by
+    `package_macos.sh --distribution` and `--distribution --version w2_us`: 1,873 steps each, SDL3's included, both
+    slices for macOS 11.0; 528 warnings each, the decomp's 264 a slice, none in `port/`, no availability error, no
+    linker warning; 119 sections on arm64 and 117 on x86_64, as predicted, and no leaks.
+  - CI, `port-ci.yml` dispatched on `port-macos-dist`: run
+    [39190187078](https://github.com/CallanCampos/Frigate/actions/runs/39190187078) (`3dd85670c`) was green on macOS,
+    Linux, Windows and the distribution job's `macos-26` and `macos-15`, and red on `macos-26-intel` and
+    `macos-15-intel` (Work done); run [39191368934](https://github.com/CallanCampos/Frigate/actions/runs/39191368934)
+    (`cee1e635d`) is green on all seven jobs. Warnings: 264 on macOS (the distribution job's 528, two slices), 263 on
+    Linux and Windows, as the last entries, none in `port/`.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 with the oracle, `ctest -j4`, the two builds at once at a load average of 15 to 35, at
+    `3dd85670c`: Black 2, 282 pass and 1 skips of 283 (683 s); White 2, 280 pass and 1 skips of 281 (672 s). The skip is
+    `app_universal_slices`, which a development build's one slice skips. White 2's new tests pass:
+    `oracle_continue_starter`, `oracle_launch_party_menus`, `launch_summary_standalone` and `launch_touch_then_party`,
+    with `oracle_saves` taking both saves from the cache. At `cee1e635d`, the 12 `host_*` tests pass in each build,
+    and the two trap tests in `build/port-dist` (arm64); its x86_64 slice, run by hand under Rosetta, reports `+0x0`
+    too.
+  - The distribution apps: `check_app.sh "build/port-dist/Frigate Black 2.app" --archs "arm64 x86_64" --minimum 11.0
+    --run-every-slice`, and the same for `Frigate White 2.app`, pass: both slices macOS 11.0 (SDK 26.5),
+    `LSMinimumSystemVersion` 11.0, no `Contents/Frameworks`, signed ad hoc without the hardened runtime, and every
+    slice starts, the x86_64 one under Rosetta. Their disk images, `Frigate Black 2 0.0.2864.dmg` and
+    `Frigate White 2 0.0.2864.dmg`, 13 MB each, were checked by `package_macos.sh`.
+  - CI, run 39191368934: macOS 237 pass and 46 skip of 283; Linux 219 pass and 47 skip of 266; Windows 209 pass and 57
+    skip of 266; the distribution job, 237 pass and 46 skip of 283 on each of `macos-26` (macOS 26.6.2), `macos-15`
+    (15.7.9, Xcode 26.3), `macos-26-intel` (26.6.1) and `macos-15-intel` (15.7.9), the Intel ones running the x86_64
+    slices natively; there `package_macos.sh --distribution` made the app and its image, and `check_app.sh` passed
+    it, every slice started on Apple Silicon (the x86_64 one under Rosetta) and the x86_64 one on Intel.
+  - Every run passed `--save-dir`, and none wrote under `~/Library`: its `Application Support/Frigate` and
+    `Logs/Frigate` hold files from 16:33 at the latest, before this task. T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed in this task.
+- **Trap stubs:** 457 function stubs and 46 data placeholders in each version, locally and on every CI host, from 474
+  at the last entries: upstream's C merged by `4d0ce54b7`. A continued game without `--launch` still stops on
+  `FIELDMAP_PROC_FUNCS`.
+- **64-bit warnings:** none of the pointer and integer size kinds, which the game's target leaves off; the counts of
+  other kinds are the last entries' (Host build above).
+- **Work done:**
+  - **The merge of `port-macos-dist`** (`4122413bf`), every conflict keeping both sides. The x86_64 Mach-O alignment
+    folds into the Windows track's seam: `PORT_HOST_PAGE_ALIGNMENT` in `port/hal/host/host.h` is 4096 on Windows and
+    for Apple x86_64 (`#if defined(_WIN32) || (defined(__APPLE__) && defined(__x86_64__))`), 16384 elsewhere, and
+    `hw.c`, `gen_stubs.py` and `test_gx.c` take it, without the branch's own `#if`s or `PORT_TRAP_PAGE_ALIGNMENT`;
+    `test_gx.c` keeps the branch's check that each view starts a slot of region 0x06's window. `overlay_sections.cmake`
+    has the branch's JSON predictions with `main`'s `checked_objects.txt`; `port-ci.yml` has the `host`,
+    `host-windows` and `macos-distribution` jobs; the guides, the feature map and the indexes have both sides' rows.
+    The entries and lessons of the merged branches went above `main`'s, each top `PORT_SHA` filled (`6489c0795`,
+    `6c0aed21f`, `807116946`).
+  - **ADR 0015 accepted** (`b23ccc24f`) by the port's developer, as every earlier ADR: macOS 11 and the two
+    architectures are the developer's call. It keeps 0015, the Windows track holding 0013 (the branch's first commits
+    say 0013: history); PLAN.md §7 phase 5 and ADR 0010's note name it.
+  - **The mac track's notes, corrected** (`b57e219d6`): its entry after review and lessons.md said that
+    `-Wno-everything` silences `-Werror=unguarded-availability` in either order. Probed again with `/usr/bin/cc`,
+    `-Wno-everything -Werror=unguarded-availability` holds in a file of its own; `-w`, or a `-Wno-everything` after
+    the `-Werror=`, cancels it; and `minicoro.h` is reached through `-isystem`, which hides the diagnostic whatever the
+    flags, so the fix, `--no-system-header-prefix=minicoro.h` without `-w`, stands. The README's distribution steps
+    build the tests (`cmake --build build/port-dist`) before `ctest`, since `package_macos.sh` builds only the app.
+  - **The merge of `port-w2-starter`** (`3dd85670c`): only STATUS.md and lessons.md conflicted.
+  - **An Intel Mac's `memset`** (`cee1e635d`): the distribution job ran the Windows track's host tests on Intel Macs
+    first, and `host_trap_placeholder_fiber` alone failed there: the C library's `memset`, clearing a placeholder's
+    first 4 bytes on a fiber, touches `+0x3` first, where the test wanted `+0x0`. The test takes any of the four; a
+    lesson says why Rosetta didn't show it.
+  - **The documents** say what CI ran: the README's quick start and distribution build, the landing page, the app
+    guide's and the glossary's rows and the feature map's macOS app row (tested on macOS 15 and 26 by CI, with the ROM
+    on 26 only), and a note on ADR 0015.
+- **Next:** as the last entries: the apps no route reaches yet (the town map, the Xtransceiver, the medal box, the
+  options); White 2's Route 19 save; Windows' stage 4; a save with an adventure made by the port, once overlay 36 lets
+  it into the field; a sound comparison sequence on the game's count; the distribution build on a macOS older than 15.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7. macOS 11 to
+  14 have no runner and no virtual machine here.
+
 ## 2026-10-18: White 2's starter save, and its party list and Pokédex against melonDS pass for pass
 
 - **Upstream:** `9b486e486`, merged by `334077ba7`; no sync in this task.

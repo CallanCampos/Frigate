@@ -10,6 +10,9 @@
   port's developer, as every earlier ADR was: the deployment target, macOS 11, and the architectures, arm64 and x86_64
   in one app, are the developer's call. The branch's first commits numbered it 0013, which the Windows track's ADR
   took; it is 0015 everywhere in the tree.
+- **Note (2026-10-18):** CI's `macos-distribution` job first ran at the merge (run 39191368934): green on `macos-26`,
+  `macos-26-intel`, `macos-15` and `macos-15-intel` once a host test took the byte an Intel Mac's `memset` touches
+  first; macOS 15 is tested there without the ROM, and 11 to 14 still aren't.
 
 ## Context
 
