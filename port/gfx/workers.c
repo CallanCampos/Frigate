@@ -1,7 +1,7 @@
 // The renderers' worker threads (workers.h): the 3D renderer's frame drawn in bands of lines at once
 // (port/gfx/ref/ds3d.c), on the game's thread and up to 7 workers, which the program starts with --render-threads
-// (port/app/main.c). A job's parts start when the caller raises the job's signal and end when the last worker's part
-// raises the done signal; a waiting thread spins a little before it sleeps, since the parts of one frame end close
+// (port/app/main.c). A job's parts start when the caller raises its workers' signals and end when the last worker's
+// part raises the done signal; a waiting thread spins a little before it sleeps, since the parts of one frame end close
 // together. The threads, their signals and the host's clock are port/hal/host's. The workers run renderer code only,
 // on memory a job's parts share out between them, so the game stays on one thread and every frame is the same however
 // many parts draw it.
@@ -15,17 +15,21 @@
 #define SPIN_FOR_JOB_NS 20000u
 #define SPIN_FOR_PARTS_NS 500000u
 
+// The parts the next job runs in, as port_workers_start last set them, and the workers started (part 1 to sWorkers)
 static int sParts = 1;
 static int sWorkers;
-// The job signal's count when each worker was started: the jobs it is to run are those raised after
-static unsigned sStartCount[PORT_WORKERS_MAX];
+// The job running: its function, its argument and its parts. They change only between jobs, and a worker reads them
+// only in a job it takes part in, which the caller waits for
 static PortWorkersJob sJob;
 static void *sContext;
+static int sJobParts = 1;
 // The workers whose parts are still running, and the parts that have reached the sync
 static atomic_int sPending;
 static atomic_int sArrived;
-// Raised for each job, when the last worker's part is done, and when the last part reaches a sync
-static PortHostSignal *sJobs;
+// Each worker's own signal, raised for each job it takes part in (so that a worker past a job's parts, after a start
+// with fewer parts than workers, sleeps through it); raised when the last worker's part is done, and when the last part
+// reaches a sync
+static PortHostSignal *sGo[PORT_WORKERS_MAX];
 static PortHostSignal *sDone;
 static PortHostSignal *sSynced;
 
@@ -54,18 +58,14 @@ static unsigned Await(PortHostSignal *signal, unsigned seen, uint64_t spinNs) {
     }
 }
 
-// A worker: its part of each job, then the next job. A worker whose part is past the job's parts (after a start with
-// fewer parts than workers) sits the job out
+// A worker: its part of each job it is given, then the next
 static void Worker(void *argument) {
     int part = (int)(intptr_t)argument;
-    unsigned seen = sStartCount[part];
+    unsigned seen = 0;
 
     for (;;) {
-        seen = Await(sJobs, seen, SPIN_FOR_JOB_NS);
-        if (part >= sParts) {
-            continue;
-        }
-        sJob(sContext, part, sParts);
+        seen = Await(sGo[part], seen, SPIN_FOR_JOB_NS);
+        sJob(sContext, part, sJobParts);
         if (atomic_fetch_sub_explicit(&sPending, 1, memory_order_acq_rel) == 1) {
             port_host_signal_raise(sDone);
         }
@@ -77,22 +77,22 @@ int port_workers_start(int parts) {
         parts = port_host_performance_cores();
     }
     parts = parts < 1 ? 1 : parts > PORT_WORKERS_MAX ? PORT_WORKERS_MAX : parts;
-    if (parts > 1 && sJobs == NULL) {
-        sJobs = port_host_signal_create();
+    if (parts > 1 && sDone == NULL) {
         sDone = port_host_signal_create();
         sSynced = port_host_signal_create();
-        if (sJobs == NULL || sDone == NULL || sSynced == NULL) {
-            sJobs = NULL;
+        if (sDone == NULL || sSynced == NULL) {
+            sDone = NULL;
             parts = 1;
         }
     }
     while (sWorkers < parts - 1) {
-        sStartCount[sWorkers + 1] = port_host_signal_count(sJobs);
-        if (port_host_thread_start(Worker, (void *)(intptr_t)(sWorkers + 1)) != 0) {
-            parts = sWorkers + 1;
+        int part = sWorkers + 1;
+        sGo[part] = port_host_signal_create();
+        if (sGo[part] == NULL || port_host_thread_start(Worker, (void *)(intptr_t)part) != 0) {
+            parts = part;
             break;
         }
-        sWorkers++;
+        sWorkers = part;
     }
     sParts = parts;
     return parts;
@@ -105,17 +105,20 @@ int port_workers_parts(void) {
 void port_workers_run(PortWorkersJob job, void *context) {
     unsigned done;
 
+    sJobParts = sParts;
     if (sParts <= 1) {
         job(context, 0, 1);
         return;
     }
-    // The job's fields before the raise, which publishes them to the workers that see its count
+    // The job's fields before the raises, which publish them to the workers that see their signals' counts
     done = port_host_signal_count(sDone);
     sJob = job;
     sContext = context;
     atomic_store_explicit(&sPending, sParts - 1, memory_order_relaxed);
     atomic_store_explicit(&sArrived, 0, memory_order_relaxed);
-    port_host_signal_raise(sJobs);
+    for (int part = 1; part < sParts; part++) {
+        port_host_signal_raise(sGo[part]);
+    }
     job(context, 0, sParts);
     // The last worker raises the done signal once its part and every other worker's are done, so what they wrote is
     // seen here
@@ -125,11 +128,12 @@ void port_workers_run(PortWorkersJob job, void *context) {
 void port_workers_sync(void) {
     unsigned synced;
 
-    if (sParts <= 1) {
+    // A job run on the caller alone (one part) has no one to wait for
+    if (sJobParts <= 1) {
         return;
     }
     synced = port_host_signal_count(sSynced);
-    if (atomic_fetch_add_explicit(&sArrived, 1, memory_order_acq_rel) + 1 == sParts) {
+    if (atomic_fetch_add_explicit(&sArrived, 1, memory_order_acq_rel) + 1 == sJobParts) {
         atomic_store_explicit(&sArrived, 0, memory_order_relaxed);
         port_host_signal_raise(sSynced);
         return;
