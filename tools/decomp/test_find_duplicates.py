@@ -161,8 +161,9 @@ class EmissionTests(Fixture):
                      function("funcCaller2", 0x1060, 0x10), function("funcOther", 0x1080, 0x10)],
                     (), text=(0x1000, 0x1100), files=list(files))
         module = self.modules["overlays/ov001"]
-        for source, target in relocs:
-            module.relocs[source] = ("load", target, "overlays(1)")
+        for reloc in relocs:
+            source, target = reloc[:2]
+            module.relocs[source] = ("load", target, reloc[2] if len(reloc) > 2 else "overlays(1)")
         module.reloc_sources = sorted(module.relocs)
         return fd.EmissionIndex({VERSION: self.modules})
 
@@ -185,6 +186,21 @@ class EmissionTests(Fixture):
         # A Thumb pointer to funcS at 0x1000 must be seen as a reference to it.
         emission = self.emission(self.build([(0x1084, 0x1001)]))
         self.assertEqual(emission.kind, "global")
+
+    def test_a_reference_through_an_ambiguous_relocation_is_global_but_uncertain(self):
+        # funcOther in src/b.c points at funcS through overlays(1,2), so the reloc names more than one module that
+        # could hold the target; which copy it means is not recorded.
+        emission = self.emission(self.build([(0x1084, 0x1000, "overlays(1,2)")]))
+        self.assertEqual(emission.kind, "global?")
+        self.assertEqual(emission.callers, ())
+        self.assertEqual(emission.stops, ())
+
+    def test_one_unambiguous_outside_reference_makes_an_ambiguous_copy_global(self):
+        # src/b.c references funcS twice: once through overlays(1,2), once through overlays(1) alone.
+        emission = self.emission(self.build([(0x1084, 0x1000, "overlays(1,2)"), (0x1088, 0x1000)]))
+        self.assertEqual(emission.kind, "global")
+        self.assertEqual(emission.callers, ())
+        self.assertEqual(emission.stops, ())
 
     def test_a_function_called_only_in_its_file_stops_at_its_global_caller(self):
         emission = self.emission(self.build([(0x1044, 0x1000), (0x1084, 0x1040)]))

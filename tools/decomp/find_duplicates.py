@@ -23,10 +23,12 @@ relocates to its function's address with bit 0 set:
 Emission. MWCC drops a `static` function nothing in its file references (docs/decompiling.md), so an unmatched copy
 whose only references are inside its own delinked source file needs those in-file callers written as well, up to a
 function that is global or that nothing references. Each unmatched copy's row says whether it is `global` (referenced
-from outside its file, so it is emitted as soon as it is written), `static` (needs the callers listed), `static?`
-(every reference is inside the unassigned range it sits in, which holds several original files, so its file boundary
-has to be found first and no callers are guessed), or `unreferenced` (nothing calls it, so it has to be written as
-global). References come from `relocs.txt`; a pointer dsd did not record is not seen.
+from outside its file, so it is emitted as soon as it is written), `global?` (every outside reference comes through a
+relocation naming more than one candidate module, so which one holds the target is not recorded; check by hand),
+`static` (needs the callers listed), `static?` (every reference is inside the unassigned range it sits in, which holds
+several original files, so its file boundary has to be found first and no callers are guessed), or `unreferenced`
+(nothing calls it, so it has to be written as global). References come from `relocs.txt`; a pointer dsd did not
+record is not seen.
 
 Output. TSV on stdout, or `-o FILE`. One row per group, free matches first (by how many functions they unlock), then
 unmatched groups by copies x size, then the fully matched groups. A row is the group columns `group status label
@@ -63,6 +65,7 @@ FREE = "free"
 UNMATCHED = "unmatched"
 ALL_MATCHED = "all-matched"
 GLOBAL = "global"
+GLOBAL_AMBIGUOUS = "global?"
 STATIC = "static"
 STATIC_UNASSIGNED = "static?"
 UNREFERENCED = "unreferenced"
@@ -90,8 +93,9 @@ class Copy:
 class Emission:
     """What has to be written for an unemitted copy to reach the object.
 
-    `kind` is `global`, `static` or `unreferenced`; `callers` are the in-file functions that must be written, in walk
-    order; `stops` are the functions the walk stopped at, which are global or referenced by nothing.
+    `kind` is `global`, `global?`, `static`, `static?` or `unreferenced`; `callers` are the in-file functions that
+    must be written, in walk order; `stops` are the functions the walk stopped at, which are global or referenced by
+    nothing.
     """
     kind: str
     callers: tuple
@@ -299,8 +303,8 @@ def module_scopes(module) -> tuple:
 
 
 def in_file(module, scope, site) -> bool:
-    """Whether a reference site (source module, source address, kind) is inside a function's own file."""
-    source_module, source_addr, _kind = site
+    """Whether a reference site (source module, source address, kind, ambiguous) is inside a function's own file."""
+    source_module, source_addr = site[:2]
     return source_module == module and scope is not None and scope[0] <= source_addr < scope[1]
 
 
@@ -314,10 +318,12 @@ class EmissionIndex:
         for version, modules in modules_by_version.items():
             for name, module in modules.items():
                 for source, (kind, target, module_string) in module.relocs.items():
-                    for target_module in reloc_module_names(module_string):
-                        self.references[(version, target_module, target)].append((name, source, kind))
+                    names = reloc_module_names(module_string)
+                    ambiguous = len(names) > 1
+                    for target_module in names:
+                        self.references[(version, target_module, target)].append((name, source, kind, ambiguous))
                         # A Thumb function pointer targets the function's address with bit 0 set.
-                        self.references[(version, target_module, target - 1)].append((name, source, kind))
+                        self.references[(version, target_module, target - 1)].append((name, source, kind, ambiguous))
             for name, module in modules.items():
                 self.scopes[(version, name)] = module_scopes(module)
 
@@ -354,8 +360,11 @@ class EmissionIndex:
         """
         scope = self.scope(copy.version, copy.module, copy.addr)
         sites = self.references.get((copy.version, copy.module, copy.addr), ())
-        if any(not in_file(copy.module, scope, site) for site in sites):
-            return Emission(GLOBAL, (), ())
+        outside = [site for site in sites if not in_file(copy.module, scope, site)]
+        if outside:
+            # A relocation that names several modules records no winner, so none of them owns the reference.
+            ambiguous = all(site[3] for site in outside)
+            return Emission(GLOBAL_AMBIGUOUS if ambiguous else GLOBAL, (), ())
         if not sites:
             return Emission(UNREFERENCED, (), ())
         if scope is not None and scope[2] is None:
@@ -526,7 +535,8 @@ def summarise(groups) -> None:
 
     kinds = collections.Counter(emission.kind for group in groups for emission in group.emissions.values())
     print("emission of unmatched copies: " + ", ".join(f"{kind} {kinds.get(kind, 0)}"
-                                                       for kind in (GLOBAL, STATIC, STATIC_UNASSIGNED, UNREFERENCED)),
+                                                       for kind in (GLOBAL, GLOBAL_AMBIGUOUS, STATIC, STATIC_UNASSIGNED,
+                                                                    UNREFERENCED)),
           file=sys.stderr)
     labels = collections.Counter(group.label for group in groups)
     print("labels: " + ", ".join(f"{label} {labels.get(label, 0)}" for label in LABELS), file=sys.stderr)
