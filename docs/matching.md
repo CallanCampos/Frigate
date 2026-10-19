@@ -1421,7 +1421,12 @@ Same instructions, scheduled in another order.
   `A(11)`, `Use4(A(11), B(22), IA(), 1)` makes the inline's call to `A` first, and `Use4(IA(), IB(), C(33), 1)` calls
   `B`, then `A`, then `C`. So a call made before the calls of earlier arguments was inside an inline helper. In
   `ctvt_talk.c`'s `CtvtTalk_UpdateRecord`, an inline returning the recorded buffer plus 0x800 builds the constant
-  before the `CtvtMic_GetRecordedSize` call of a later argument, in `r7`, where the plain sum builds it after.
+  before the `CtvtMic_GetRecordedSize` call of a later argument, in `r7`, where the plain sum builds it after. Inlines
+  that make no call can be too, depending on the code around the call: overlay 168's `BtlvInput_DrawMoveTiles` computes
+  `GFL_TextRndUpdateColorIndexLUT`'s three color fields from the last to the first, each narrowed to `u8`, as three `u8`
+  getters (`BtlvInput_ColorLetter(color)` and the like) give, where the shifts and masks written in the arguments are
+  computed in order (233 bytes differ), and computes its `HEAPID_TAIL(work->heapId)` argument before an earlier
+  argument's `getUINarcIdx()` call, as a getter gives; a small test with the same getters computes them in order.
 - An argument that is loaded before a call among the arguments, such as a print queue loaded before
   `BmpWin_GetBitmap(...)` in the same call, was passed to an inlined helper that makes the call, like
   `PrintWindow_Print`. A block-scoped local set from the field before the call does the same: bmp_menu.c's
@@ -2816,7 +2821,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `for (i = 0; i < num; i++)` matches, loop entry, registers and the `first + i` its call's arguments share, where a
   0/1 test left 18 bytes. `ATTRIBUTE_ALIGN(1)`, `(2)` and `(4)` give the same code and `.rodata`, so the attribute
   does it, not its value (8 and more move the table 4 bytes), and the table before it ends on that boundary, so the
-  ROM can't say whether the original aligned it. The file's other reader of the table matches either way.
+  ROM can't say whether the original aligned it. The file's other reader of the table matches either way. Overlay 168's
+  `BtlvInput_DrawMoveTiles` is the same: the 0/1 loop test it kept goes, and a plain `i < 4` matches with the attribute
+  on its type-palette table, which only it reads, and whose address allows nothing above 4. The attribute on any other
+  object it reads matches as well.
   NitroSystem's 2.0/sp2p2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
   test and indexes its arrays with a multiply on each pass only with `sDecodeBuffer`, which it reads, aligned (4 to
   16 give the same code and fit the buffer's address, 32 does not). There a `u8` array with `ATTRIBUTE_ALIGN(4)` gets
@@ -3271,6 +3279,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   with those in the list a top-of-file permutation matches. `rodata_order.py --from-object FILE.o` lists every data
   object a compile produced so none is dropped, and `rodata_order.py ... --check FILE.o` fails loudly when the model
   and the compiler disagree; run the check against a real compile before trusting any verdict.
+- Function-local initializers of one size tie in the sort too, and `--check` doesn't compare their order. Their own
+  declaration order also sets their function's stack slots, so the tie is fixed by moving other declarations:
+  `btlv_input.c`'s `BtlvInput_CreateBallSlideActors` declares `palettes`, `xs` and `ys` (20 bytes each) in the order
+  its code needs, and they come out `xs`, `ys`, `palettes`, as in the ROM, only with the top-of-file
+  `data_ov168_021f3700` declared after `data_ov168_021f3780` and `data_ov168_021f3610` after
+  `data_ov168_021f3864`. The model predicted it: all 87 two-move orders it gave compiled to the ROM's layout.
 - A run of fields that every function reaches from one literal, at fixed offsets, can be several small statics of the
   shared section rather than a struct. The size sort tells them apart: `snd_sys.c`'s `.bss` has a 2-byte mask, six
   4-byte statics and a 24-byte struct (0x34 bytes) before a 40-byte array, which a 0x34-byte struct would follow.
