@@ -34,7 +34,9 @@ level that doesn't exist yet says "not yet"; no field is left out.
   on worker threads, ADR 0016), `8aef262f2` (the game's thread at user-interactive QoS), `889fcc3de` (the geometry
   engine's entries fed straight to the executor), `f14b27045` (capture a line at a time), `a41ad3171` (the 2D sources
   kept until the VRAM layout changes), `795455dd7` (the 2D colour effects only where a line can blend), `bf43d595b`
-  (SHA-1 through the ARMv8 SHA instructions), then this entry; not pushed.
+  (SHA-1 through the ARMv8 SHA instructions), `8772bcc84` (this entry), `e0f4ce2d0` (the host layer's headers name
+  the clock's and the threads' users), `4baae6d5b` (each worker waits on a signal of its own), then this entry's update
+  with the tests of the last code; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at every commit. No
   file outside `port/` changed.
 - **Host build:** macOS 26.5.1 on an M2 MacBook Air (4 performance and 4 efficiency cores, 16 GB), Xcode 26.6 (Apple
@@ -44,20 +46,21 @@ level that doesn't exist yet says "not yet"; no field is left out.
   Windows weren't built here, and the Windows halves of the host's new clock, threads and signals (`host_windows.c`)
   have been compiled by no one yet.
 - **Tests:** T0 as above.
-  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle and its saves, both builds at once: Black 2, 291 pass and 1
-    skip of 292 (567 s); White 2, 288 pass and 1 skip of 289 (531 s). The skip is `app_universal_slices`, which a
-    development build's one slice skips. The new tests pass: `frame_times_tool`, `g3d_ds3d_bands` and its sanitized
-    twin, and the timing routes `frame_times_title`, `frame_times_party_menus` (both versions) and
-    `frame_times_new_game` (Black 2) within the default budget, 8.36 ms.
+  - T2, T3, T4, T6, plain, `ctest -j4` with the oracle and its saves, both builds at once, at `4baae6d5b`: Black 2, 291
+    pass and 1 skip of 292 (521 s); White 2, 288 pass and 1 skip of 289 (489 s); the same at `bf43d595b`. The skip is
+    `app_universal_slices`, which a development build's one slice skips. The new tests pass: `frame_times_tool`,
+    `g3d_ds3d_bands` and its sanitized twin, and the timing routes `frame_times_title`, `frame_times_party_menus` (both
+    versions) and `frame_times_new_game` (Black 2) within the default budget, 8.36 ms.
   - Output unchanged, commit by commit: `frames.tsv` of the opening, title, CONTINUE, New Game and both launcher routes
     (Black 2, `--run-dir`, every frame's VBlank count, GFL count, game frame and both screens' SHA-1s) is byte for byte
     `607ccd1a6`'s after each commit, with `--frame-times` on too, and for the title, New Game and the party apps at
-    `--render-threads` 1, 2 and 8. `g3d_ds3d` runs every hand-worked 3D scene in one band and in three, and
-    `g3d_ds3d_bands` draws random 2,000-triangle scenes in 2 to 8 bands against one, pixel, depth, ID and fog flag.
-  - T5, the sanitized Black 2 build (`build/port-san`, made from nothing), with the oracle and its saves: its 25 routes
-    pass (407 s), the game's thread and the 3D renderer's workers under ASan and UBSan, and the 266 other tests, 265
-    pass and `app_universal_slices` skips (107 s); no output has a sanitizer's report. White 2's sanitized build wasn't
-    run. T7 not yet.
+    `--render-threads` 1, 2 and 8 (the title and New Game at 8 again at `4baae6d5b`). `g3d_ds3d` runs every
+    hand-worked 3D scene in one band and in three, and `g3d_ds3d_bands` draws random 2,000-triangle scenes in 2 to 8
+    bands against one, pixel, depth, ID and fog flag.
+  - T5, the sanitized Black 2 build (`build/port-san`, made from nothing at `bf43d595b`), with the oracle and its saves:
+    at `4baae6d5b`, 289 pass and `app_universal_slices` skips of 290 (406 s), its 24 routes among them, the game's
+    thread and the 3D renderer's workers under ASan and UBSan; at `bf43d595b` the same. No output has a sanitizer's
+    report. White 2's sanitized build wasn't run. T7 not yet.
   - Every run passed `--save-dir` with `HOME` a scratch directory; `~/Library`'s `Application Support/Frigate` and
     `Logs/Frigate` hold nothing newer than 16:33 on 2026-10-18.
 - **Tiers:** not measured: no decomp C changed.
