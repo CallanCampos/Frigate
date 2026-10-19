@@ -599,7 +599,7 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     if (shopId != SHOP_ID_BP_ITEMS && shopId != SHOP_ID_BP_TMS && shopId != SHOP_ID_MOVE_TUTOR_DRIFTVEIL &&
         shopId != SHOP_ID_MOVE_TUTOR_LENTIMAS && shopId != SHOP_ID_MOVE_TUTOR_HUMILAU &&
         shopId != SHOP_ID_MOVE_TUTOR_NACRENE) {
-        func_ov012_02160124();
+        GameBeacon_BroadcastShopping();
     }
     return TRUE;
 }

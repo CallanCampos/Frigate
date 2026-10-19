@@ -24,9 +24,9 @@
 static BOOL calcPokerusDecay(AdventureTime *adventureTime, const RTCDate *date, const RTCTime *time, s32 *days,
                              s32 *minutes);
 static void midnight(GameData *gameData, s32 days);
-static void func_ov012_021630e8(GameData *gameData, s32 minutes, const RTCTime *time);
+static void minutesPassed(GameData *gameData, s32 minutes, const RTCTime *time);
 
-void func_ov012_02162f44(GameData *gameData) {
+void EvTime_Update(GameData *gameData) {
     AdventureTime *adventureTime = getSaveAdventureTimeBlock(GameData_GetSaveControl(gameData));
     RTCDate date;
     RTCTime time;
@@ -46,7 +46,7 @@ void func_ov012_02162f44(GameData *gameData) {
     }
     if (minutes != 0) {
         dayCountdownTest(adventureTime, minutes);
-        func_ov012_021630e8(gameData, minutes, &time);
+        minutesPassed(gameData, minutes, &time);
     }
     if (days != 0) {
         midnight(gameData, days);
@@ -103,10 +103,10 @@ static void midnight(GameData *gameData, s32 days) {
     JoinAvenueOccupants_ResetDaily(occupants, fullDay);
 }
 
-static void func_ov012_021630e8(GameData *gameData, s32 minutes, const RTCTime *time) {
+static void minutesPassed(GameData *gameData, s32 minutes, const RTCTime *time) {
     PokeParty *party = SaveControl_GetPokePartySave(GameData_GetSaveControl(gameData));
 
-    func_ov012_02164384(gameData, party, minutes, time, GameData_GetSeason(gameData));
+    ShayminForm_CheckNightPassed(gameData, party, minutes, time, GameData_GetSeason(gameData));
     func_0200cb10(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
 }
 

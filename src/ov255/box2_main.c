@@ -2735,7 +2735,7 @@ int Box2Main_NameInExit(Box2SysWork *syswk) {
         getBoxNameFromStrbuf(syswk->param->boxes, syswk->tray, work->param->name);
     }
     syswk->subRet = work->param->unk1C;
-    func_ov012_02165ae8(work->param);
+    NameEntryParam_Free(work->param);
     GFL_StrBufFree(work->name);
     GFL_HeapFree(syswk->subProcWork);
     Box2Main_InitSettings(syswk);

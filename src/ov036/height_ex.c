@@ -170,7 +170,7 @@ GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data
     case 3:
         work = GameCommSys_GetWork(comm);
         if (work != NULL && GameCommSys_BootCheck(comm)) {
-            func_ov012_0215f94c(work);
+            GameBeaconSearch_StartType35Wait(work);
             return TRUE;
         }
         break;

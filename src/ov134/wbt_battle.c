@@ -153,7 +153,7 @@ void *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
 
     list->env = env;
     list->sys = sys;
-    list->msgBGSys = func_ov012_0215518c(env);
+    list->msgBGSys = FieldScriptEnv_GetMsgBGSys(env);
     list->msgData = GetFieldScriptMsgData(env);
     list->wordSet = ScriptWork_GetWordSet(scriptWork);
     list->mainStrBuf = ScriptWork_GetMainStrBuf(scriptWork);
@@ -346,9 +346,9 @@ static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament
     if (func_ov055_021e5e4c(entrant) == 1) {
         u16 file;
 
-        trainerFile = func_ov012_021627c0(arc, trainer, heapId);
+        trainerFile = BtlInst_LoadTrainerData(arc, trainer, heapId);
         file = trainerFile->files[0];
-        func_ov012_02162490(dest, arc + 2, file, trainer, 0, iv, 0, FALSE, heapId);
+        BtlInst_MakeRomPokemon(dest, arc + 2, file, trainer, 0, iv, 0, FALSE, heapId);
         func_ov055_021e6c20(filter, dest->species);
         func_ov055_021e6bfc(filter, dest->item);
         func_ov055_021e6c44(filter, file);
@@ -357,10 +357,10 @@ static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament
         GFL_HeapFree(trainerFile);
     }
     MI_CpuClear16(files, sizeof(files));
-    trainerFile = func_ov012_021627c0(arc + 1, trainer, heapId);
+    trainerFile = BtlInst_LoadTrainerData(arc + 1, trainer, heapId);
     func_ov055_021e6f34(files, filter, heapId, trainerFile->count, trainerFile->files, arc + 2, count, NULL);
     for (i = 0; i < count; i++) {
-        func_ov012_02162490(&dest[i], arc + 2, files[i], trainer, 0, iv, i, FALSE, heapId);
+        BtlInst_MakeRomPokemon(&dest[i], arc + 2, files[i], trainer, 0, iv, i, FALSE, heapId);
     }
     GFL_HeapFree(trainerFile);
     func_ov055_021e6bdc(filter);
@@ -373,7 +373,7 @@ static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant,
         GFL_HeapAllocate(HEAPID_TAIL(heapId), 6 * sizeof(BSubwayPokemon), FALSE, "wbt_battle.c", 769);
 
     WbtBattle_MakeTournamentPokemon(pokemon, tournament, entrant, count, heapId);
-    func_ov012_021621d4(party, pokemon, 50, count, heapId);
+    BtlInst_MakeParty(party, pokemon, 50, count, heapId);
     GFL_HeapFree(pokemon);
 }
 

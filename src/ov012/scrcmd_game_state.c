@@ -42,7 +42,7 @@ BOOL s00E0_GameGetVersion(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155608(VM *vm, FieldScriptEnv *env) {
+BOOL s00C9_ConfigToggleKanji(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     Config *trainerData;
@@ -61,7 +61,7 @@ BOOL func_ov012_02155608(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155638(VM *vm, FieldScriptEnv *env) {
+BOOL s00CA_ConfigGetKanji(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     Config *trainerData;
@@ -88,13 +88,13 @@ BOOL s00CC_RTGetTextFile(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0215569c(VM *vm, FieldScriptEnv *env) {
+BOOL s00CE_TrainerCardGetStars(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u16 *value;
 
     gameData = FieldScriptEnv_GetGameData(env);
     value = ScriptReadVar(vm, env);
-    *value = func_ov012_02169b78(gameData);
+    *value = TrainerCard_CountStars(gameData);
     return FALSE;
 }
 
@@ -380,10 +380,10 @@ BOOL s02D0_PokeDexEnableHabitatList(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// The system UI flags that func_ov012_02155bec sets and clears
+// The system UI flags that s02ED_SetSoftResetBlocked sets and clears
 static const u32 sSystemUIFlags[1] = { 0x40 };
 
-BOOL func_ov012_02155bec(VM *vm, FieldScriptEnv *env) {
+BOOL s02ED_SetSoftResetBlocked(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
 
@@ -398,7 +398,7 @@ BOOL func_ov012_02155bec(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155c30(VM *vm, FieldScriptEnv *env) {
+BOOL s02F1_SetOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
@@ -407,7 +407,7 @@ BOOL func_ov012_02155c30(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155c64(VM *vm, FieldScriptEnv *env) {
+BOOL s02F2_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
@@ -442,7 +442,7 @@ BOOL s00E3_GiveRunningShoes(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155d00(VM *vm, FieldScriptEnv *env) {
+BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env) {
     u16 flags = ScriptReadAny(vm, env);
     BoxSaveAccessor *box = GameData_GetBoxSaveAccessor(FieldScriptEnv_GetGameData(env));
 
@@ -465,7 +465,7 @@ BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155d80(VM *vm, FieldScriptEnv *env) {
+BOOL s00E6_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -476,14 +476,14 @@ BOOL func_ov012_02155d80(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155db4(VM *vm, FieldScriptEnv *env) {
+BOOL s00E7_StartMenuUnlockItem(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
 
     TrainerGameInfo_AddStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item, 1);
     return FALSE;
 }
 
-BOOL func_ov012_02155dd4(VM *vm, FieldScriptEnv *env) {
+BOOL s00E8_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 

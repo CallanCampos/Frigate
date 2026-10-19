@@ -21,9 +21,9 @@ typedef struct {
     u32 mode;
 } UnovaLinkKeyParam;
 
-static void func_ov012_0216a8cc(void *param);
+static void FreeUnovaLinkKeyParam(void *param);
 
-BOOL func_ov012_0216a82c(VM *vm, FieldScriptEnv *env) {
+BOOL s02AE_GameGetMyCity(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u16 *result;
 
@@ -45,7 +45,7 @@ BOOL s02AF_GameGetDifficulty(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0216a894(VM *vm, FieldScriptEnv *env) {
+BOOL s02B1_KeyInfoGetChamberKey(VM *vm, FieldScriptEnv *env) {
     KeyInfoSave *keyInfo;
     u16 *result;
 
@@ -56,7 +56,7 @@ BOOL func_ov012_0216a894(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static void func_ov012_0216a8cc(void *param) {
+static void FreeUnovaLinkKeyParam(void *param) {
     GFL_HeapFree(param);
 }
 
@@ -74,6 +74,6 @@ BOOL s02B0_CallUnovaLinkKeyUnlock(VM *vm, FieldScriptEnv *env) {
     param->mode = mode;
     ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(332),
                                                                                  &UNOVA_LINK_PROC_FUNCTIONS, param,
-                                                                                 func_ov012_0216a8cc, param));
+                                                                                 FreeUnovaLinkKeyParam, param));
     return TRUE;
 }

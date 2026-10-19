@@ -14,35 +14,35 @@
 #include "save/player_info.h"
 #include "system/game_data.h"
 
-static void *func_ov012_02161858(void *work);
-static int func_ov012_02161884(void *work);
-static BOOL func_ov012_02161888(int a, int b);
-static void func_ov012_021618d8(BSubwayScrWork *bsw, GameData *gameData);
-static void func_ov012_02161930(BSubwayScrWork *bsw);
-static void func_ov012_02161948(BSubwayScrWork *bsw, u16 retire);
-static void func_ov012_02161960(BSubwayScrWork *bsw);
-static void func_ov012_0216196c(BSubwayScrWork *bsw, u16 value);
-static void func_ov012_02161978(BSubwayScrWork *bsw, u16 value);
-static void func_ov012_02161984(BSubwayScrWork *bsw, u16 value);
-static void func_ov012_02161ad8(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161b4c(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161b80(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161bbc(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161be8(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161c1c(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161c40(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02161c64(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *BSubwayComm_GetBeacon(void *work);
+static int BSubwayComm_GetBeaconSize(void *work);
+static BOOL BSubwayComm_IsMatchingBeacon(int a, int b);
+static void BSubwayComm_SetMembersData(BSubwayScrWork *bsw, GameData *gameData);
+static void BSubwayComm_SetTrainersData(BSubwayScrWork *bsw);
+static void BSubwayComm_SetRetireData(BSubwayScrWork *bsw, u16 retire);
+static void BSubwayComm_SetPlayModeData(BSubwayScrWork *bsw);
+static void BSubwayComm_SetCommand5Data(BSubwayScrWork *bsw, u16 value);
+static void BSubwayComm_SetCommand6Data(BSubwayScrWork *bsw, u16 value);
+static void BSubwayComm_SetCommand7Data(BSubwayScrWork *bsw, u16 value);
+static void BSubwayComm_RecvMembers(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvTrainers(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvRetire(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvPlayMode(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvCommand5(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvCommand6(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void BSubwayComm_RecvCommand7(int netId, int size, const void *data, void *work, NetHandle *handle);
 
 // clang-format off
 static const NetCommand data_ov012_0216d8fc[] = {
-    {func_ov012_02161ad8, NULL},
-    {func_ov012_02161b4c, NULL},
-    {func_ov012_02161b80, NULL},
-    {func_ov012_02161bbc, NULL},
-    {func_ov012_02161be8, NULL},
-    {func_ov012_02161c1c, NULL},
-    {func_ov012_02161c40, NULL},
-    {func_ov012_02161c64, NULL},
+    {BSubwayComm_RecvMembers, NULL},
+    {BSubwayComm_RecvTrainers, NULL},
+    {BSubwayComm_RecvRetire, NULL},
+    {BSubwayComm_RecvPlayerInfo, NULL},
+    {BSubwayComm_RecvPlayMode, NULL},
+    {BSubwayComm_RecvCommand5, NULL},
+    {BSubwayComm_RecvCommand6, NULL},
+    {BSubwayComm_RecvCommand7, NULL},
 };
 
 // clang-format on
@@ -55,9 +55,9 @@ static const GFLNetInitData data_ov012_0216d93c = {
     NULL,
     NULL,
     NULL,
-    func_ov012_02161858,
-    func_ov012_02161884,
-    func_ov012_02161888,
+    BSubwayComm_GetBeacon,
+    BSubwayComm_GetBeaconSize,
+    BSubwayComm_IsMatchingBeacon,
     NULL,
     NULL,
     NULL,
@@ -88,11 +88,11 @@ static const GFLNetInitData data_ov012_0216d93c = {
 
 // clang-format on
 
-void func_ov012_02161844(BSubwayScrWork *bsw) {
+void BSubwayComm_InitNet(BSubwayScrWork *bsw) {
     GFL_NetInit(&data_ov012_0216d93c, NULL, bsw);
 }
 
-static void *func_ov012_02161858(void *work) {
+static void *BSubwayComm_GetBeacon(void *work) {
     BSubwayScrWork *bsw = work;
     BSubwayBeacon *beacon = &bsw->beacon;
 
@@ -102,35 +102,35 @@ static void *func_ov012_02161858(void *work) {
     return beacon;
 }
 
-static int func_ov012_02161884(void *work) {
+static int BSubwayComm_GetBeaconSize(void *work) {
     return sizeof(BSubwayBeacon);
 }
 
-static BOOL func_ov012_02161888(int a, int b) {
+static BOOL BSubwayComm_IsMatchingBeacon(int a, int b) {
     if (a == b) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov012_02161894(BSubwayScrWork *bsw) {
+void BSubwayComm_AddCommands(BSubwayScrWork *bsw) {
     // The count passed is the end command, not the table's length
     NetCommand_AddTable(BSUBWAY_COMM_MEMBERS, data_ov012_0216d8fc, BSUBWAY_COMM_MAX, bsw);
 }
 
-void func_ov012_021618ac(BSubwayScrWork *bsw) {
+void BSubwayComm_RemoveCommands(BSubwayScrWork *bsw) {
     NetCommand_RemoveTable(BSUBWAY_COMM_MEMBERS);
 }
 
-void func_ov012_021618b8(u8 timing) {
+void BSubwayComm_SendTiming(u8 timing) {
     GFL_NetSendTiming(NetHandle_GetOwn(), timing);
 }
 
-BOOL func_ov012_021618c8(u8 timing) {
+BOOL BSubwayComm_IsTimingRecv(u8 timing) {
     return GFL_NetIsTimingRecv(NetHandle_GetOwn(), timing);
 }
 
-static void func_ov012_021618d8(BSubwayScrWork *bsw, GameData *gameData) {
+static void BSubwayComm_SetMembersData(BSubwayScrWork *bsw, GameData *gameData) {
     PlayerInfo *info = GetGameDataPlayerInfo(gameData);
     PokeParty *party = func_ov033_0217bd60(bsw);
     int i;
@@ -142,46 +142,46 @@ static void func_ov012_021618d8(BSubwayScrWork *bsw, GameData *gameData) {
     bsw->sendBuf[3] = func_ov033_0217be1c(func_ov033_0217bd84(bsw));
 }
 
-static void func_ov012_02161930(BSubwayScrWork *bsw) {
+static void BSubwayComm_SetTrainersData(BSubwayScrWork *bsw) {
     MI_CpuCopy8(bsw->unk32, bsw->sendBuf, 14 * sizeof(u16));
 }
 
-static void func_ov012_02161948(BSubwayScrWork *bsw, u16 retire) {
+static void BSubwayComm_SetRetireData(BSubwayScrWork *bsw, u16 retire) {
     bsw->unkC_3 = retire;
     bsw->sendBuf[0] = retire;
 }
 
-static void func_ov012_02161960(BSubwayScrWork *bsw) {
+static void BSubwayComm_SetPlayModeData(BSubwayScrWork *bsw) {
     *(u32 *)bsw->sendBuf = bsw->playMode;
 }
 
-static void func_ov012_0216196c(BSubwayScrWork *bsw, u16 value) {
+static void BSubwayComm_SetCommand5Data(BSubwayScrWork *bsw, u16 value) {
     *(u32 *)bsw->sendBuf = value;
 }
 
-static void func_ov012_02161978(BSubwayScrWork *bsw, u16 value) {
+static void BSubwayComm_SetCommand6Data(BSubwayScrWork *bsw, u16 value) {
     *(u32 *)bsw->sendBuf = value;
 }
 
-static void func_ov012_02161984(BSubwayScrWork *bsw, u16 value) {
+static void BSubwayComm_SetCommand7Data(BSubwayScrWork *bsw, u16 value) {
     *(u32 *)bsw->sendBuf = value;
 }
 
-void func_ov012_02161990(BSubwayScrWork *bsw, u16 mode, u16 value) {
+void BSubwayComm_SetSendData(BSubwayScrWork *bsw, u16 mode, u16 value) {
     GameData *gameData = bsw->gameData;
 
     switch (mode) {
     case 0:
         bsw->sendCommand = BSUBWAY_COMM_MEMBERS;
-        func_ov012_021618d8(bsw, gameData);
+        BSubwayComm_SetMembersData(bsw, gameData);
         break;
     case 1:
         bsw->sendCommand = BSUBWAY_COMM_TRAINERS;
-        func_ov012_02161930(bsw);
+        BSubwayComm_SetTrainersData(bsw);
         break;
     case 2:
         bsw->sendCommand = BSUBWAY_COMM_RETIRE;
-        func_ov012_02161948(bsw, value);
+        BSubwayComm_SetRetireData(bsw, value);
         break;
     case 3:
         bsw->sendCommand = BSUBWAY_COMM_PLAYER_INFO;
@@ -189,19 +189,19 @@ void func_ov012_02161990(BSubwayScrWork *bsw, u16 mode, u16 value) {
         break;
     case 4:
         bsw->sendCommand = BSUBWAY_COMM_PLAY_MODE;
-        func_ov012_02161960(bsw);
+        BSubwayComm_SetPlayModeData(bsw);
         break;
     case 5:
         bsw->sendCommand = BSUBWAY_COMM_5;
-        func_ov012_0216196c(bsw, value);
+        BSubwayComm_SetCommand5Data(bsw, value);
         break;
     case 6:
         bsw->sendCommand = BSUBWAY_COMM_6;
-        func_ov012_02161978(bsw, value);
+        BSubwayComm_SetCommand6Data(bsw, value);
         break;
     case 7:
         bsw->sendCommand = BSUBWAY_COMM_7;
-        func_ov012_02161984(bsw, value);
+        BSubwayComm_SetCommand7Data(bsw, value);
         break;
     default:
         bsw->sendCommand = BSUBWAY_COMM_MAX;
@@ -209,7 +209,7 @@ void func_ov012_02161990(BSubwayScrWork *bsw, u16 mode, u16 value) {
     }
 }
 
-BOOL func_ov012_02161a48(BSubwayScrWork *bsw) {
+BOOL BSubwayComm_Send(BSubwayScrWork *bsw) {
     u16 command;
 
     if (GFL_NetErrCheck()) {
@@ -225,11 +225,11 @@ BOOL func_ov012_02161a48(BSubwayScrWork *bsw) {
     return FALSE;
 }
 
-void func_ov012_02161a88(BSubwayScrWork *bsw, u8 mode) {
+void BSubwayComm_SetRecvMode(BSubwayScrWork *bsw, u8 mode) {
     bsw->recvMode = mode;
 }
 
-BOOL func_ov012_02161a94(BSubwayScrWork *bsw, u16 *var) {
+BOOL BSubwayComm_CheckRecv(BSubwayScrWork *bsw, u16 *var) {
     u8 count;
 
     if (GFL_NetErrCheck()) {
@@ -249,7 +249,7 @@ BOOL func_ov012_02161a94(BSubwayScrWork *bsw, u16 *var) {
     return FALSE;
 }
 
-static void func_ov012_02161ad8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvMembers(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
     const u16 *recv = data;
     u16 result = 0;
@@ -272,7 +272,7 @@ static void func_ov012_02161ad8(int netId, int size, const void *data, void *wor
     bsw->recvResult = result;
 }
 
-static void func_ov012_02161b4c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvTrainers(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
 
     bsw->recvCount++;
@@ -282,7 +282,7 @@ static void func_ov012_02161b4c(int netId, int size, const void *data, void *wor
     MI_CpuCopy8(data, bsw->unk32, 14 * sizeof(u16));
 }
 
-static void func_ov012_02161b80(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvRetire(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
     const u16 *recv = data;
 
@@ -296,7 +296,7 @@ static void func_ov012_02161b80(int netId, int size, const void *data, void *wor
     }
 }
 
-static void func_ov012_02161bbc(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
 
     bsw->recvCount++;
@@ -306,7 +306,7 @@ static void func_ov012_02161bbc(int netId, int size, const void *data, void *wor
     MI_CpuCopy8(data, &bsw->partner, sizeof(PlayerInfo));
 }
 
-static void func_ov012_02161be8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvPlayMode(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
     const u16 *recv = data;
 
@@ -321,7 +321,7 @@ static void func_ov012_02161be8(int netId, int size, const void *data, void *wor
     }
 }
 
-static void func_ov012_02161c1c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvCommand5(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
     const u16 *recv = data;
 
@@ -332,7 +332,7 @@ static void func_ov012_02161c1c(int netId, int size, const void *data, void *wor
     bsw->recvResult = recv[0];
 }
 
-static void func_ov012_02161c40(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvCommand6(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
     const u16 *recv = data;
 
@@ -343,7 +343,7 @@ static void func_ov012_02161c40(int netId, int size, const void *data, void *wor
     bsw->recvResult = recv[0];
 }
 
-static void func_ov012_02161c64(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void BSubwayComm_RecvCommand7(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BSubwayScrWork *bsw = work;
     const u16 *recv = data;
 

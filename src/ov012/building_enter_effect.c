@@ -12,12 +12,12 @@ typedef struct {
     u32 unk4;
 } BuildingEnterEffect;
 
-static void func_ov012_02160dc8(void *data);
+static void buildingEnterVBlankCallback(void *data);
 
 static f32 sScaleStep = 0.0044f;
 static BuildingEnterEffect sEffect;
 
-static void func_ov012_02160dc8(void *data) {
+static void buildingEnterVBlankCallback(void *data) {
     MtxFx22 mtx;
     f32 zoom = 0.0f;
     fx32 scale;
@@ -34,10 +34,10 @@ static void func_ov012_02160dc8(void *data) {
 void setBuildingEnterVBlankCallback(void) {
     sEffect.scale = 1.0f;
     sEffect.unk4 = 0;
-    GFL_VBlankSetCallback(func_ov012_02160dc8, NULL);
+    GFL_VBlankSetCallback(buildingEnterVBlankCallback, NULL);
 }
 
-void func_ov012_02160e88(void) {
+void resetBuildingEnterVBlankCallback(void) {
     MtxFx22 mtx;
 
     MTX_Identity22_(&mtx);

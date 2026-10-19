@@ -30,8 +30,8 @@ struct CityState {
 };
 
 void SetAllowVersionSpecificZone(u32 side, u32 allow);
-void func_ov012_0215cd58(CityState *state);
-void func_ov012_0215cd8c(CityState *state);
+void CityState_ApplyVersionZones(CityState *state);
+void CityState_Init(CityState *state);
 BOOL func_ov012_0215cd98(s32 value);
 
 GameData *GameData_Create(HeapID heapId);

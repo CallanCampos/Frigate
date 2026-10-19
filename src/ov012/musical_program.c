@@ -47,7 +47,7 @@ struct MusicalProgram {
     MusicalProgramData *data;
 };
 
-MusicalProgram *func_ov012_021522d8(HeapID heapId, Ov210Work *ov210, u16 shots) {
+MusicalProgram *MusicalProgram_Create(HeapID heapId, Ov210Work *ov210, u16 shots) {
     MusicalProgram *program;
     u8 i;
     u8 left;
@@ -104,12 +104,12 @@ MusicalProgram *func_ov012_021522d8(HeapID heapId, Ov210Work *ov210, u16 shots) 
     return program;
 }
 
-void func_ov012_0215241c(MusicalProgram *program) {
+void MusicalProgram_Free(MusicalProgram *program) {
     GFL_HeapFree(program);
 }
 
 // Shares out each kind's points among the props of that kind on the stage, and gives the Pokémon their points
-void func_ov012_02152424(HeapID heapId, MusicalProgram *program, MusicalStageParam *stage) {
+void MusicalProgram_CalcPoints(HeapID heapId, MusicalProgram *program, MusicalStageParam *stage) {
     void *items = MusItemData_Init(heapId);
     u8 i;
     u8 j;
@@ -151,33 +151,33 @@ void func_ov012_02152424(HeapID heapId, MusicalProgram *program, MusicalStagePar
     MusItemData_Free(items);
 }
 
-u8 func_ov012_0215250c(MusicalProgram *program, u8 kind) {
+u8 MusicalProgram_GetKindPoints(MusicalProgram *program, u8 kind) {
     return program->points[kind];
 }
 
-u32 func_ov012_02152510(MusicalProgram *program) {
+u32 MusicalProgram_PackPoints(MusicalProgram *program) {
     return program->points[0] + (program->points[1] << 8) + (program->points[2] << 16) + (program->points[3] << 24);
 }
 
-void func_ov012_02152528(MusicalProgram *program, u32 value) {
+void MusicalProgram_UnpackPoints(MusicalProgram *program, u32 value) {
     program->points[0] = value;
     program->points[1] = (value & 0xff00) >> 8;
     program->points[2] = (value & 0xff0000) >> 16;
     program->points[3] = (value & 0xff000000) >> 24;
 }
 
-u32 func_ov012_02152548(MusicalProgram *program) {
+u32 MusicalProgram_PackNpcs(MusicalProgram *program) {
     return program->npcs[0] + (program->npcs[1] << 8) + (program->npcs[2] << 16);
 }
 
-void func_ov012_02152558(MusicalProgram *program, u32 value) {
+void MusicalProgram_UnpackNpcs(MusicalProgram *program, u32 value) {
     program->npcs[0] = value;
     program->npcs[1] = (value & 0xff00) >> 8;
     program->npcs[2] = (value & 0xff0000) >> 16;
 }
 
 // The kind of prop with the most points
-u8 func_ov012_02152570(MusicalProgram *program) {
+u8 MusicalProgram_GetTopKind(MusicalProgram *program) {
     u8 i;
     u8 max = 0;
     u8 best = 0;
@@ -192,16 +192,16 @@ u8 func_ov012_02152570(MusicalProgram *program) {
 }
 
 // Puts a performer of the program on the stage
-void func_ov012_02152594(MusicalProgram *program, MusicalStageParam *stage, u8 pos, u8 cpu, HeapID heapId) {
+void MusicalProgram_PutNpcOnStage(MusicalProgram *program, MusicalStageParam *stage, u8 pos, u8 cpu, HeapID heapId) {
     MusicalNpc *npc = &program->data->npcs[program->npcs[cpu]];
     u8 i;
 
-    func_ov012_02152280(stage, pos, npc->species, npc->form,
-                        npc->trainerClass + (npc->name << 8) + (npc->unk4 << 16) + (npc->form << 24), npc->unk6,
-                        heapId);
+    MusicalStageParam_CreateNpcPoke(stage, pos, npc->species, npc->form,
+                                    npc->trainerClass + (npc->name << 8) + (npc->unk4 << 16) + (npc->form << 24),
+                                    npc->unk6, heapId);
     for (i = 0; i < 8; i++) {
         if (npc->equips[i].itemId != 0x1fe && npc->equips[i].itemId != 0x1ff) {
-            func_ov012_021522bc(stage, pos, npc->equips[i].slot, npc->equips[i].itemId, 0, i);
+            MusicalStageParam_SetEquip(stage, pos, npc->equips[i].slot, npc->equips[i].itemId, 0, i);
         }
     }
 }
@@ -210,18 +210,18 @@ u8 func_ov012_02152614(MusicalProgram *program) {
     return program->data->unk0;
 }
 
-u8 func_ov012_0215261c(MusicalProgram *program) {
+u8 MusicalProgram_GetPropList(MusicalProgram *program) {
     return program->data->propList;
 }
 
-u8 func_ov012_02152624(MusicalProgram *program, u8 cpu) {
+u8 MusicalProgram_GetNpcTrainerClass(MusicalProgram *program, u8 cpu) {
     return program->data->npcs[program->npcs[cpu]].trainerClass;
 }
 
-u8 func_ov012_02152634(MusicalProgram *program, u8 cpu) {
+u8 MusicalProgram_GetNpcNameMsg(MusicalProgram *program, u8 cpu) {
     return program->data->npcs[program->npcs[cpu]].name;
 }
 
-u8 func_ov012_02152644(MusicalProgram *program, u8 kind) {
+u8 MusicalProgram_GetPropPoints(MusicalProgram *program, u8 kind) {
     return program->propPoints[kind];
 }

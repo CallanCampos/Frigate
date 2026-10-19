@@ -27,6 +27,6 @@ u16 GetHiddenItemNoBySCRID(u16 scrId);
 u16 GetHiddenItemEventFlagNoBySCRID(u16 scrId);
 void TryClearRepeatableHiddenItemFlags(EventWork *eventWork);
 // The table, for overlay 86
-const HiddenItem *func_ov012_0215f2c4(u16 *count);
+const HiddenItem *GetHiddenItems(u16 *count);
 
 #endif // POKEBW2_FIELD_HIDDEN_ITEM_H

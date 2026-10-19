@@ -36,17 +36,17 @@ typedef enum {
 
 static void BtlSetup_SetTrialHouseParty(BtlSetup *setup, BSubwayTrainer *trainer, int client, u32 mode, int count,
                                         HeapID heapId);
-static void func_ov012_02162394(u32 mode, u32 trainerId, const BSubwayTrainer *trainer, BtlSetupTrainer *dest,
-                                u32 aiFlags, BOOL clearWords, BOOL copyWords);
+static void BtlInst_SetSetupTrainer(u32 mode, u32 trainerId, const BSubwayTrainer *trainer, BtlSetupTrainer *dest,
+                                    u32 aiFlags, BOOL clearWords, BOOL copyWords);
 static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFieldStatus *status, BOOL a3,
                                                HeapID heapId);
 static void RestrictPlayerParty(PokeParty *src, PokeParty *dest, int count, u16 level, HeapID heapId);
 static void LoadTrialHouseParty(BSubwayTrainer *trainer, PokeParty *party, u16 level, int count, HeapID heapId);
 static void genSubwayBtlInstitutePoke(const BSubwayPokemon *src, PartyPkm *pkm, u16 level);
-static void func_ov012_021627b0(u32 arcId, BSubwayPokemonData *data, u32 file);
-static u16 func_ov012_021627d4(MATHRandContext32 *rand);
-static u8 func_ov012_02162828(u32 trainerId);
-static BOOL func_ov012_02162ae8(const BSubwayTrainer *trainer);
+static void BtlInst_ReadPokemonData(u32 arcId, BSubwayPokemonData *data, u32 file);
+static u16 BtlInst_Random16(MATHRandContext32 *rand);
+static u8 BtlInst_GetTrainerIV(u32 trainerId);
+static BOOL BtlInst_TrainerHasWords(const BSubwayTrainer *trainer);
 
 // The items of the rental Pokémon
 static const u16 data_ov012_0216d9ac[4] = { 213, 157, 234, 217 };
@@ -85,7 +85,7 @@ static void BtlSetup_SetTrialHouseParty(BtlSetup *setup, BSubwayTrainer *trainer
         copyWords = FALSE;
         break;
     }
-    func_ov012_02162394(mode, trainer->unk00, trainer, dest, 0x87, clearWords, copyWords);
+    BtlInst_SetSetupTrainer(mode, trainer->unk00, trainer, dest, 0x87, clearWords, copyWords);
     LoadTrialHouseParty(trainer, setup->party[client], 50, count, heapId);
 }
 
@@ -115,14 +115,14 @@ BtlSetup *SetupTrialHouseBattle(GameSystem *gsys, PokeParty *party, u32 mode, BS
 static inline void SetTrialHouseTrainer(BtlSetup *setup, SetupClient client, const BSubwayTrainer *trainer,
                                         u32 trainerIdBase) {
     setup->trainers[client]->trainerId = trainer->unk00 - 1;
-    func_ov012_02162394(0, trainerIdBase + setup->trainers[client]->trainerId, trainer, setup->trainers[client], 0x87,
-                        TRUE, FALSE);
+    BtlInst_SetSetupTrainer(0, trainerIdBase + setup->trainers[client]->trainerId, trainer, setup->trainers[client],
+                            0x87, TRUE, FALSE);
 }
 
 // A Trial House battle against one trainer, of levels between minLevel and maxLevel
-BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount, int mode, int count,
-                              BSubwayTrainer *trainer, u32 a6, u32 trainerIdBase, u16 maxLevel, u16 minLevel, u32 a10,
-                              u8 a11, u32 a12, Field *field, MATHRandContext32 *rand) {
+BtlSetup *SetupInfinityDungeonBattle(GameSystem *gsys, PokeParty *party, int partyCount, int mode, int count,
+                                     BSubwayTrainer *trainer, u32 a6, u32 trainerIdBase, u16 maxLevel, u16 minLevel,
+                                     u32 a10, u8 a11, u32 a12, Field *field, MATHRandContext32 *rand) {
     GameData *gameData = GSYS_GetGameData(gsys);
     BtlFieldStatus status;
     BtlSetup *setup;
@@ -140,7 +140,7 @@ BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount
     RestrictPlayerParty(party, setup->party[client], partyCount, 0, 4);
     client = CLIENT_ENEMY;
     SetTrialHouseTrainer(setup, client, trainer, trainerIdBase);
-    level = minLevel + func_ov012_021627d4(rand) % (maxLevel - minLevel + 1);
+    level = minLevel + BtlInst_Random16(rand) % (maxLevel - minLevel + 1);
     LoadTrialHouseParty(trainer, setup->party[client], level, count, 4);
     if (a11 == 0x17) {
         setup->fieldSituation.env.bgType = a12;
@@ -185,7 +185,7 @@ BtlSetup *BtlSetup_SetTrainerRental(GameSystem *gsys, PokeParty *party, int mode
     return setup;
 }
 
-void func_ov012_021621d4(PokeParty *party, const BSubwayPokemon *pkms, u16 level, int count, HeapID heapId) {
+void BtlInst_MakeParty(PokeParty *party, const BSubwayPokemon *pkms, u16 level, int count, HeapID heapId) {
     int i;
     PartyPkm *pkm;
 
@@ -256,8 +256,8 @@ static void RestrictPlayerParty(PokeParty *src, PokeParty *dest, int count, u16 
     GFL_HeapFree(pkm);
 }
 
-static void func_ov012_02162394(u32 mode, u32 trainerId, const BSubwayTrainer *trainer, BtlSetupTrainer *dest,
-                                u32 aiFlags, BOOL clearWords, BOOL copyWords) {
+static void BtlInst_SetSetupTrainer(u32 mode, u32 trainerId, const BSubwayTrainer *trainer, BtlSetupTrainer *dest,
+                                    u32 aiFlags, BOOL clearWords, BOOL copyWords) {
     dest->trainerId = trainerId;
     dest->trainerClass = trainer->trainerId;
     dest->aiFlags = aiFlags;
@@ -267,11 +267,11 @@ static void func_ov012_02162394(u32 mode, u32 trainerId, const BSubwayTrainer *t
         PMSData_Clear(&dest->unk20);
     }
     if (copyWords == TRUE) {
-        // The trainer keeps its phrases as four words each, which func_ov012_02162ae8 checks one by one
+        // The trainer keeps its phrases as four words each, which BtlInst_TrainerHasWords checks one by one
         if (mode == 4) {
             dest->unk18 = *(const PMSData *)trainer->winWords;
             dest->unk20 = *(const PMSData *)trainer->loseWords;
-        } else if (func_ov012_02162ae8(trainer)) {
+        } else if (BtlInst_TrainerHasWords(trainer)) {
             dest->unk18 = *(const PMSData *)trainer->winWords;
             dest->unk20 = *(const PMSData *)trainer->loseWords;
         }
@@ -291,8 +291,8 @@ static void LoadTrialHouseParty(BSubwayTrainer *trainer, PokeParty *party, u16 l
     GFL_HeapFree(pkm);
 }
 
-u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pid, u8 iv, u8 index, BOOL rentalItem,
-                        HeapID heapId) {
+u32 BtlInst_MakeRomPokemon(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pid, u8 iv, u8 index, BOOL rentalItem,
+                           HeapID heapId) {
     BSubwayPokemonData data;
     u32 personality;
     int i;
@@ -303,7 +303,7 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     MsgData *msgData;
 
     MI_CpuFill8(pkm, 0, sizeof(BSubwayPokemon));
-    func_ov012_021627b0(arcId, &data, file);
+    BtlInst_ReadPokemonData(arcId, &data, file);
     pkm->species = data.species;
     pkm->form = data.form;
     if (rentalItem) {
@@ -409,22 +409,22 @@ static void genSubwayBtlInstitutePoke(const BSubwayPokemon *src, PartyPkm *pkm, 
     PokeParty_SetParam(pkm, PKM_PARAM_LEVEL, PokeParty_GetLevel(pkm));
 }
 
-static void func_ov012_021627b0(u32 arcId, BSubwayPokemonData *data, u32 file) {
+static void BtlInst_ReadPokemonData(u32 arcId, BSubwayPokemonData *data, u32 file) {
     GFL_ArcSysRead(data, arcId, file);
 }
 
-void *func_ov012_021627c0(u32 arcId, u16 file, HeapID heapId) {
+void *BtlInst_LoadTrainerData(u32 arcId, u16 file, HeapID heapId) {
     return GFL_ArcSysReadHeapNewLZ(arcId, (u16)(file + 1), FALSE, heapId);
 }
 
-static u16 func_ov012_021627d4(MATHRandContext32 *rand) {
+static u16 BtlInst_Random16(MATHRandContext32 *rand) {
     if (rand == NULL) {
         return GFL_RandomLC(0xffffffff) / (0xffffffff / 0x10000);
     }
     return MATH_Rand32(rand, 0xffffffff) / (0xffffffff / 0x10000);
 }
 
-static u8 func_ov012_02162828(u32 trainerId) {
+static u8 BtlInst_GetTrainerIV(u32 trainerId) {
     if (trainerId < 50) {
         return 3;
     }
@@ -449,23 +449,23 @@ static u8 func_ov012_02162828(u32 trainerId) {
     return 31;
 }
 
-BOOL func_ov012_02162864(BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species, const u16 *items,
-                         BSubwayTeamConfig *config, HeapID heapId) {
-    void *trainerData = func_ov012_021628c0(trainer, 0xd4, trainerId, 0xf, heapId);
-    BOOL result = func_ov012_0216292c(trainerData, trainerId, trainer->pokemon, count, 0xd3, species, items, config,
-                                      NULL, func_ov012_02162828(trainerId), heapId);
+BOOL BtlInst_MakeRomTrainerAndTeam(BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species,
+                                   const u16 *items, BSubwayTeamConfig *config, HeapID heapId) {
+    void *trainerData = BtlInst_MakeRomTrainer(trainer, 0xd4, trainerId, 0xf, heapId);
+    BOOL result = BtlInst_MakeRomTeam(trainerData, trainerId, trainer->pokemon, count, 0xd3, species, items, config,
+                                      NULL, BtlInst_GetTrainerIV(trainerId), heapId);
 
     GFL_HeapFree(trainerData);
     return result;
 }
 
-void *func_ov012_021628c0(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16 msgFile, HeapID heapId) {
+void *BtlInst_MakeRomTrainer(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16 msgFile, HeapID heapId) {
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, msgFile, heapId);
     u16 *trainerData;
     StrBuf *name;
 
     MI_CpuFill8(trainer, 0, sizeof(BSubwayTrainer));
-    trainerData = func_ov012_021627c0(arcId, trainerId, heapId);
+    trainerData = BtlInst_LoadTrainerData(arcId, trainerId, heapId);
     trainer->unk00 = trainerId + 1;
     trainer->message.type = 0xffff;
     trainer->message.id = trainerId * 3;
@@ -482,7 +482,7 @@ void *func_ov012_021628c0(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16
     return trainerData;
 }
 
-BOOL func_ov012_0216292c(const u16 *trainerData, u16 trainerId, BSubwayPokemon *pkms, u8 count, u32 arcId,
+BOOL BtlInst_MakeRomTeam(const u16 *trainerData, u16 trainerId, BSubwayPokemon *pkms, u8 count, u32 arcId,
                          const u16 *species, const u16 *items, BSubwayTeamConfig *config, MATHRandContext32 *rand,
                          u8 iv, HeapID heapId) {
     u32 files[4];
@@ -502,11 +502,11 @@ BOOL func_ov012_0216292c(const u16 *trainerData, u16 trainerId, BSubwayPokemon *
     retries = 0;
     n = 0;
     while (n != count) {
-        index = func_ov012_021627d4(rand) % trainerData[1];
+        index = BtlInst_Random16(rand) % trainerData[1];
         file = trainerData[2 + index];
-        func_ov012_021627b0(arcId, &data, file);
+        BtlInst_ReadPokemonData(arcId, &data, file);
         for (i = 0; i < n; i++) {
-            func_ov012_021627b0(arcId, &other, files[i]);
+            BtlInst_ReadPokemonData(arcId, &other, files[i]);
             if (other.species == data.species) {
                 break;
             }
@@ -526,7 +526,7 @@ BOOL func_ov012_0216292c(const u16 *trainerData, u16 trainerId, BSubwayPokemon *
         }
         if (retries < 50) {
             for (i = 0; i < n; i++) {
-                func_ov012_021627b0(arcId, &other, files[i]);
+                BtlInst_ReadPokemonData(arcId, &other, files[i]);
                 if (other.item != 0 && other.item == data.item) {
                     break;
                 }
@@ -551,12 +551,12 @@ BOOL func_ov012_0216292c(const u16 *trainerData, u16 trainerId, BSubwayPokemon *
         natures[n] = data.nature;
         n++;
     }
-    seed = func_ov012_021627d4(rand) | (func_ov012_021627d4(rand) << 16);
+    seed = BtlInst_Random16(rand) | (BtlInst_Random16(rand) << 16);
     if (retries >= 50) {
         failed = TRUE;
     }
     for (i = 0; i < n; i++) {
-        pids[i] = func_ov012_02162490(&pkms[i], arcId, files[i], seed, 0, iv, i, failed, heapId);
+        pids[i] = BtlInst_MakeRomPokemon(&pkms[i], arcId, files[i], seed, 0, iv, i, failed, heapId);
     }
     if (config == NULL) {
         return failed;
@@ -570,7 +570,7 @@ BOOL func_ov012_0216292c(const u16 *trainerData, u16 trainerId, BSubwayPokemon *
     return failed;
 }
 
-static BOOL func_ov012_02162ae8(const BSubwayTrainer *trainer) {
+static BOOL BtlInst_TrainerHasWords(const BSubwayTrainer *trainer) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -584,23 +584,23 @@ static BOOL func_ov012_02162ae8(const BSubwayTrainer *trainer) {
     return FALSE;
 }
 
-u16 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId) {
-    u16 *trainerData = func_ov012_021627c0(arcId, file, heapId);
-    u16 value = func_ov012_02162b38(trainerData[0]);
+u16 BtlInst_GetRomTrainerObjCode(u32 arcId, u16 file, HeapID heapId) {
+    u16 *trainerData = BtlInst_LoadTrainerData(arcId, file, heapId);
+    u16 value = BtlInst_GetTrainerClassObjCode(trainerData[0]);
 
     GFL_HeapFree(trainerData);
     return value;
 }
 
-u16 func_ov012_02162b28(u32 arcId, u16 file, HeapID heapId) {
-    u16 *trainerData = func_ov012_021627c0(arcId, file, heapId);
+u16 BtlInst_GetRomTrainerClass(u32 arcId, u16 file, HeapID heapId) {
+    u16 *trainerData = BtlInst_LoadTrainerData(arcId, file, heapId);
     u16 trainerClass = trainerData[0];
 
     GFL_HeapFree(trainerData);
     return trainerClass;
 }
 
-u16 func_ov012_02162b38(u32 trainerClass) {
+u16 BtlInst_GetTrainerClassObjCode(u32 trainerClass) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov012_0216d9b4); i++) {

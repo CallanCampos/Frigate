@@ -22,10 +22,10 @@ typedef struct {
     BattlePlayers *players;
 } EventColosseumBattleWork;
 
-static GameEventReturnCode func_ov012_0215264c(GameEvent *event, u32 *state, void *data);
-static void func_ov012_02152910(u32 *rule, u32 value);
+static GameEventReturnCode EventColosseumBattle_Callback(GameEvent *event, u32 *state, void *data);
+static void SetRuleIfNone(u32 *rule, u32 value);
 
-static GameEventReturnCode func_ov012_0215264c(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventColosseumBattle_Callback(GameEvent *event, u32 *state, void *data) {
     EventColosseumBattleWork *work = data;
     GameSystem *gsys = work->gsys;
     EventMakeArgs args;
@@ -69,14 +69,14 @@ static GameEventReturnCode func_ov012_0215264c(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, ColosseumBattleParam *param) {
+GameEvent *EventColosseumBattle_Create(GameSystem *gsys, Field *field, u32 category, ColosseumBattleParam *param) {
     u32 rule = RULE_NONE;
     GameEvent *event;
     EventColosseumBattleWork *work;
     BtlSetup *setup;
     GameData *gameData;
 
-    event = GameEvent_Create(gsys, NULL, func_ov012_0215264c, sizeof(EventColosseumBattleWork));
+    event = GameEvent_Create(gsys, NULL, EventColosseumBattle_Callback, sizeof(EventColosseumBattleWork));
     work = GameEvent_GetData(event);
     work->gsys = gsys;
     work->field = field;
@@ -84,57 +84,57 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     setup = &work->setup;
     switch (category) {
     case 5:
-        func_ov012_02152910(&rule, 0);
+        SetRuleIfNone(&rule, 0);
     case 4:
-        func_ov012_02152910(&rule, 2);
+        SetRuleIfNone(&rule, 2);
     case 7:
-        func_ov012_02152910(&rule, 1);
+        SetRuleIfNone(&rule, 1);
     case 6:
-        func_ov012_02152910(&rule, 3);
+        SetRuleIfNone(&rule, 3);
         gameData = GSYS_GetGameData(gsys);
         BtlSetup_SetNet1v1Single(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 9:
-        func_ov012_02152910(&rule, 4);
+        SetRuleIfNone(&rule, 4);
     case 8:
-        func_ov012_02152910(&rule, 6);
+        SetRuleIfNone(&rule, 6);
     case 11:
-        func_ov012_02152910(&rule, 5);
+        SetRuleIfNone(&rule, 5);
     case 10:
-        func_ov012_02152910(&rule, 7);
+        SetRuleIfNone(&rule, 7);
         gameData = GSYS_GetGameData(gsys);
         BtlSetup_SetNet1v1Double(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 13:
-        func_ov012_02152910(&rule, 8);
+        SetRuleIfNone(&rule, 8);
     case 12:
-        func_ov012_02152910(&rule, 10);
+        SetRuleIfNone(&rule, 10);
     case 15:
-        func_ov012_02152910(&rule, 9);
+        SetRuleIfNone(&rule, 9);
     case 14:
-        func_ov012_02152910(&rule, 11);
+        SetRuleIfNone(&rule, 11);
         gameData = GSYS_GetGameData(gsys);
         BtlSetup_SetNetTriple(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 17:
-        func_ov012_02152910(&rule, 12);
+        SetRuleIfNone(&rule, 12);
     case 16:
-        func_ov012_02152910(&rule, 14);
+        SetRuleIfNone(&rule, 14);
     case 19:
-        func_ov012_02152910(&rule, 13);
+        SetRuleIfNone(&rule, 13);
     case 18:
-        func_ov012_02152910(&rule, 15);
+        SetRuleIfNone(&rule, 15);
         gameData = GSYS_GetGameData(gsys);
         BtlSetup_SetNetRotation(setup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 21:
-        func_ov012_02152910(&rule, 16);
+        SetRuleIfNone(&rule, 16);
     case 20:
-        func_ov012_02152910(&rule, 18);
+        SetRuleIfNone(&rule, 18);
     case 23:
-        func_ov012_02152910(&rule, 17);
+        SetRuleIfNone(&rule, 17);
     case 22:
-        func_ov012_02152910(&rule, 19);
+        SetRuleIfNone(&rule, 19);
         gameData = GSYS_GetGameData(gsys);
         BtlSetup_SetNetMultiVsNet(setup, gameData, NetHandle_GetOwn(), 1, param->unk12, HEAPID_GAMEEVENT);
         break;
@@ -153,7 +153,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
 }
 
 // Sets the rule, unless one is set
-static void func_ov012_02152910(u32 *rule, u32 value) {
+static void SetRuleIfNone(u32 *rule, u32 value) {
     if (*rule == RULE_NONE) {
         *rule = value;
     }

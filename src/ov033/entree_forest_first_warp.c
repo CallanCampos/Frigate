@@ -19,7 +19,7 @@ GameEvent *CheckEntralinkForestFirstWarpEvent(Field *field, GameSystem *gsys, Fi
     fx32 startX;
 
     zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
-    func_ov012_02153608(GSYS_GetGameCommSystem(gsys));
+    Intrude_GetCommWork(GSYS_GetGameCommSystem(gsys));
     if (!IsZoneEntralinkHub(zoneId)) {
         return NULL;
     }

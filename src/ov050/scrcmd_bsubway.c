@@ -306,14 +306,14 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
             CopyActorWPos(actor, &pos);
             pos.y = y;
             SetActorWPosAll(actor, &pos, GetActorFaceDir(actor));
-            func_ov012_0216763c(actor, TRUE);
+            FldAct_SetHeightCalcDisabled(actor, TRUE);
         }
         break;
     }
     case 24:
         actor = FindFieldActor(Field_GetActorSystem(field), param0);
         if (actor != NULL) {
-            func_ov012_0216763c(actor, FALSE);
+            FldAct_SetHeightCalcDisabled(actor, FALSE);
         }
         break;
     case 25:
@@ -378,7 +378,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 37:
         actor = FindFieldActor(Field_GetActorSystem(field), param0);
-        ScriptWork_CallEvent(work, func_ov012_0216657c(gsys, GetActorUserParam(actor, 0), param0));
+        ScriptWork_CallEvent(work, EventBSubwayLeaderMsg_Create(gsys, GetActorUserParam(actor, 0), param0));
         result = TRUE;
         break;
     case 38:
@@ -496,7 +496,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = BSubwayWifiData_HasLeaders(data3A);
         break;
     case 111:
-        ScriptWork_CallEvent(work, func_ov012_02166294(gsys));
+        ScriptWork_CallEvent(work, EventBSubwayRecords_Create(gsys));
         result = TRUE;
         break;
     case 112:
@@ -524,7 +524,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 300: {
         u8 value = BSubwayPlayData_GetData(playData, 10, NULL);
 
-        ScriptWork_CallEvent(work, func_ov012_02165f70(bsw, gsys, value));
+        ScriptWork_CallEvent(work, EventBSubwayPokeSelect_Create(bsw, gsys, value));
         result = TRUE;
         break;
     }
@@ -557,7 +557,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = func_ov033_0217bca0(bsw, param0);
         break;
     case 309:
-        ScriptWork_CallEvent(work, func_ov012_02166070(bsw, gsys, field));
+        ScriptWork_CallEvent(work, EventBSubwayBattle_Create(bsw, gsys, field));
         result = TRUE;
         break;
     case 310:
@@ -589,7 +589,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         MI_CpuFill8(bsw->recvBuf, 0, sizeof(bsw->recvBuf));
         break;
     case 320:
-        ScriptWork_CallEvent(work, func_ov012_02166118(bsw, gsys, param0, param1, 5));
+        ScriptWork_CallEvent(work, EventBSubwayTrainerMsg_Create(bsw, gsys, param0, param1, 5));
         result = TRUE;
         break;
     case 321:
@@ -778,7 +778,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 352:
-        ScriptWork_CallEvent(work, func_ov012_02166118(bsw, gsys, param0, param1, 6));
+        ScriptWork_CallEvent(work, EventBSubwayTrainerMsg_Create(bsw, gsys, param0, param1, 6));
         result = TRUE;
         break;
     case 353:
@@ -836,9 +836,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 400:
         if (bsw->unkC_9 == TRUE) {
-            func_ov012_02161894(bsw);
+            BSubwayComm_AddCommands(bsw);
         } else {
-            func_ov012_02161844(bsw);
+            BSubwayComm_InitNet(bsw);
         }
         break;
     case 401:
@@ -848,7 +848,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 402:
         bsw->unk727 = param0;
         bsw->unk72A = retWkId;
-        func_ov012_021618b8(bsw->unk727);
+        BSubwayComm_SendTiming(bsw->unk727);
         VM_SetNativeCallback(vm, func_ov050_021e69cc);
         result = TRUE;
         break;
@@ -865,12 +865,12 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         VM_SetNativeCallback(vm, func_ov050_021e6ab4);
         break;
     case 405:
-        func_ov012_02161990(bsw, param0, param1);
+        BSubwayComm_SetSendData(bsw, param0, param1);
         VM_SetNativeCallback(vm, func_ov050_021e69a8);
         result = TRUE;
         break;
     case 406:
-        func_ov012_02161a88(bsw, param0);
+        BSubwayComm_SetRecvMode(bsw, param0);
         bsw->unk72A = retWkId;
         VM_SetNativeCallback(vm, func_ov050_021e6b38);
         result = TRUE;
@@ -947,7 +947,7 @@ static BOOL func_ov050_021e69a8(VM *vm, void *env) {
     BSubwayScrWork *bsw =
         GameData_GetBSubwayScrWork(GSYS_GetGameData(ScriptWork_GetGameSystem(FieldScriptEnv_GetScriptWork(env))));
 
-    if (func_ov012_02161a48(bsw) == TRUE) {
+    if (BSubwayComm_Send(bsw) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -963,7 +963,7 @@ static BOOL func_ov050_021e69cc(VM *vm, void *env) {
         *var = 0;
         return TRUE;
     }
-    if (func_ov012_021618c8(bsw->unk727) == TRUE) {
+    if (BSubwayComm_IsTimingRecv(bsw->unk727) == TRUE) {
         *var = 1;
         return TRUE;
     }
@@ -1032,7 +1032,7 @@ static BOOL func_ov050_021e6b38(VM *vm, void *env) {
     GameData *gameData = GSYS_GetGameData(ScriptWork_GetGameSystem(work));
     BSubwayScrWork *bsw = GameData_GetBSubwayScrWork(gameData);
 
-    if (func_ov012_02161a94(bsw, ScriptWork_GetWkAddr(work, gameData, bsw->unk72A)) == TRUE) {
+    if (BSubwayComm_CheckRecv(bsw, ScriptWork_GetWkAddr(work, gameData, bsw->unk72A)) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -1047,7 +1047,7 @@ static GameEventReturnCode func_ov050_021e6b78(GameEvent *event, u32 *state, voi
             func_02042e9c(FALSE);
         }
         if ((*bsw)->unkC_9 == TRUE) {
-            func_ov012_021618ac(*bsw);
+            BSubwayComm_RemoveCommands(*bsw);
         }
         (*state)++;
         break;

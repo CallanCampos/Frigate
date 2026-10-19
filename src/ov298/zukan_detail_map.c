@@ -977,7 +977,7 @@ static void ZukanDetailMap_FreeAreas(ZukanDetailMapParam *param, ZukanDetailMapW
 }
 
 static inline BOOL ZukanDetailMap_IsPlaceHidden(GameData *gameData, u16 flag) {
-    if (func_ov012_02160f74(gameData, flag) == FALSE) {
+    if (TownMap_CheckFlag(gameData, flag) == FALSE) {
         return TRUE;
     }
     return FALSE;
@@ -1271,7 +1271,7 @@ static u8 ZukanDetailMap_GetPlayerPlace(ZukanDetailMapParam *param, ZukanDetailM
     GameData *gameData = ZukanDetailCommon_GetGameData(common);
     u16 zone = PlayerState_GetZoneID(GameData_GetPlayerState(gameData));
     u8 place = NO_PLACE;
-    u16 found = TownMapData_GetPlaceByZone(wk->townmap, func_ov012_02160eb4(gameData, zone));
+    u16 found = TownMapData_GetPlaceByZone(wk->townmap, TownMap_GetMapZone(gameData, zone));
 
     if (found != TOWNMAP_PLACE_NONE) {
         place = found;

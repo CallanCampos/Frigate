@@ -421,7 +421,7 @@ void func_ov033_0217bbac(BSubwayScrWork *bsw) {
 }
 
 u32 func_ov033_0217bca0(BSubwayScrWork *bsw, u16 index) {
-    return func_ov012_02162b38(bsw->trainers[index].trainerId);
+    return BtlInst_GetTrainerClassObjCode(bsw->trainers[index].trainerId);
 }
 
 u16 func_ov033_0217bcb4(BSubwayScoreData *score, GameSystem *gsys, u32 op) {
@@ -763,7 +763,7 @@ u16 func_ov033_0217c11c(BSubwayScrWork *bsw, u16 level, u8 index, u32 mode, u8 s
 
 BOOL func_ov033_0217c264(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species,
                          const u16 *items, BSubwayTeamConfig *config, HeapID heapId) {
-    return func_ov012_02162864(trainer, trainerId, count, species, items, config, heapId);
+    return BtlInst_MakeRomTrainerAndTeam(trainer, trainerId, count, species, items, config, heapId);
 }
 
 u8 func_ov033_0217c288(u32 value) {
@@ -797,11 +797,11 @@ void func_ov033_0217c2c4(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 train
     void *temp;
     s32 i;
 
-    temp = func_ov012_021628c0(trainer, 0xd4, trainerId, 15, heapId);
+    temp = BtlInst_MakeRomTrainer(trainer, 0xd4, trainerId, 15, heapId);
     iv = func_ov033_0217c288(trainerId);
     for (i = 0; i < 2; i++) {
-        func_ov012_02162490(&trainer->pokemon[i], 0xd3, config->files[i], config->id, config->pids[i], iv, i, count,
-                            heapId);
+        BtlInst_MakeRomPokemon(&trainer->pokemon[i], 0xd3, config->files[i], config->id, config->pids[i], iv, i, count,
+                               heapId);
     }
     GFL_HeapFree(temp);
 }

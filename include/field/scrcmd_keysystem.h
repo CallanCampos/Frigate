@@ -8,9 +8,9 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
-BOOL func_ov012_0216a82c(VM *vm, FieldScriptEnv *env);
+BOOL s02AE_GameGetMyCity(VM *vm, FieldScriptEnv *env);
 BOOL s02AF_GameGetDifficulty(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216a894(VM *vm, FieldScriptEnv *env);
+BOOL s02B1_KeyInfoGetChamberKey(VM *vm, FieldScriptEnv *env);
 BOOL s02B0_CallUnovaLinkKeyUnlock(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_KEYSYSTEM_H

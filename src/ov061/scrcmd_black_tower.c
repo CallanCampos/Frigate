@@ -250,7 +250,7 @@ static BOOL func_ov061_021e5d58(VM *vm, FieldScriptEnv *env) {
     u16 a = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov012_02162b28(0x106, a, heapId);
+    *var = BtlInst_GetRomTrainerClass(0x106, a, heapId);
     return FALSE;
 }
 

@@ -177,7 +177,7 @@ static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
     u16 actorIndex;
 
     grassTask->params = *params;
-    func_ov012_02167d88(params->actor, &grassTask->identity);
+    FldAct_GetIdentity(params->actor, &grassTask->identity);
     func_ov036_021a3ae8(task, &params->pos);
     kind = grassTask->params.kind;
     request.texMat = grassTask->params.grass->matIndices[kind];
@@ -225,7 +225,7 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
         if (GRASS_ENDS_ON_LEAVE[grassTask->params.kind] == TRUE) {
             FieldActor *actor = grassTask->params.actor;
 
-            if (func_ov012_02167da8(actor, &grassTask->identity) == TRUE && !func_ov036_021a4324(grassTask) &&
+            if (FldAct_CheckIdentity(actor, &grassTask->identity) == TRUE && !func_ov036_021a4324(grassTask) &&
                 GetActorMotionDir(actor) == 1) {
                 func_ov036_021a3a70(task);
                 return;
@@ -237,7 +237,7 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
         break;
     case 1:
         // Settle
-        if (!func_ov012_02167da8(grassTask->params.actor, &grassTask->identity)) {
+        if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             func_ov036_021a3a70(task);
             return;
         }
@@ -248,7 +248,7 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
         grassTask->state++;
     case 3:
         // Stay until the actor leaves the tile
-        if (!func_ov012_02167da8(grassTask->params.actor, &grassTask->identity)) {
+        if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             func_ov036_021a3a70(task);
             return;
         }

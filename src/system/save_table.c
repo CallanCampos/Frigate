@@ -116,7 +116,7 @@ static const SaveBlockDef SAVEDATA_INIT[SAVE_BLOCK_MAX] = {
     { SAVE_BLOCK_BATTLE_BOX, BattleBoxSave_GetSize, (SaveBlockInit)BattleBoxSave_Init },
     { SAVE_BLOCK_DAY_CARE, getSizeofBreedingBlock, (SaveBlockInit)setEggArea },
     // The only block whose functions are an overlay's, the field's (overlay 12)
-    { SAVE_BLOCK_STRENGTH_ROCKS, func_ov012_02168064, (SaveBlockInit)func_ov012_0216806c },
+    { SAVE_BLOCK_STRENGTH_ROCKS, StrengthRockSave_GetSize, (SaveBlockInit)StrengthRockSave_Init },
     { SAVE_BLOCK_TRAINER_GAME_INFO, TrainerGameInfo_GetSize, (SaveBlockInit)TrainerGameInfo_Init },
     { SAVE_BLOCK_HIGH_LINK, getSizeofProbabilityTable, (SaveBlockInit)probability },
     { SAVE_BLOCK_POKEDEX, getSizeofPokedexData, (SaveBlockInit)initPokedex },

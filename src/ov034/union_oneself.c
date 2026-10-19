@@ -1539,8 +1539,8 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         unisys->alloc.my_card = GFL_HeapAllocate(HEAPID_UNION, sizeof(TrainerCardData), TRUE, "union_oneself.c", 2594);
         unisys->alloc.target_card =
             GFL_HeapAllocate(HEAPID_UNION, sizeof(TrainerCardData), TRUE, "union_oneself.c", 2596);
-        func_ov012_02169770(unisys->alloc.my_card, unisys->param->gameData, TRUE, FALSE, HEAPID_UNION);
-        func_ov012_02169508(unisys->alloc.my_card, unisys->param->gameData, HEAPID_UNION);
+        TrainerCardData_Fill(unisys->alloc.my_card, unisys->param->gameData, TRUE, FALSE, HEAPID_UNION);
+        TrainerCardData_FillExtras(unisys->alloc.my_card, unisys->param->gameData, HEAPID_UNION);
         MI_CpuCopy8(unisys->alloc.my_card, unisys->alloc.target_card, 0x678);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0x14);
         UnionMsg_CreateAndPrint(unisys, field,
@@ -1571,7 +1571,7 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         if (situ->mycomm.recvFlag == 1 && UnionMsg_IsPrintDone(unisys) == TRUE) {
             unisys->alloc.target_card->unk04_5 = 1;
             unisys->alloc.cardParam =
-                func_ov012_02169b3c(unisys->param->gameData, unisys->alloc.target_card, HEAPID_UNION);
+                TrainerCardParam_CreateView(unisys->param->gameData, unisys->alloc.target_card, HEAPID_UNION);
             (*seq)++;
         }
         break;
@@ -2268,7 +2268,7 @@ static BOOL UnionOneself_StepIdleColosseumRun(UnionSystem *unisys, UnionSelf *si
             s16 x, y, z;
 
             FieldPlayer_GetGPosInFront(player, &x, &y, &z);
-            if (func_ov012_021617e8(clsys->commPlayer, x, y, z, &out, &dir) == TRUE) {
+            if (CommPlayer_FindActor(clsys->commPlayer, x, y, z, &out, &dir) == TRUE) {
                 clsys->unk17C[0] = out;
                 UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_CARD);
                 UnionOneself_SetUpdateDisabled(unisys, field, TRUE);
@@ -2319,8 +2319,8 @@ static BOOL UnionOneself_StepColosseumSeatRun(UnionSystem *unisys, UnionSelf *si
         break;
     case 4:
         actor = FieldPlayer_GetActor(Field_GetPlayer(field));
-        if (func_ov012_02166ecc(actor) == TRUE) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == TRUE) {
+            FldAct_EndAcmd(actor);
             UnionOneself_SetNextStep(unisys, UNION_STEP_PARTY_SELECT);
             return TRUE;
         }
@@ -2365,8 +2365,8 @@ static BOOL UnionOneself_StepColosseumLeaveRun(UnionSystem *unisys, UnionSelf *s
         }
         break;
     case 5:
-        if (func_ov012_02166ecc(actor) == TRUE) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == TRUE) {
+            FldAct_EndAcmd(actor);
             UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_IDLE);
             return TRUE;
         }
@@ -2752,8 +2752,8 @@ static BOOL UnionOneself_StepQuitRun(UnionSystem *unisys, UnionSelf *situ, Field
         }
         break;
     case 4:
-        if (func_ov012_02166ecc(actor) == TRUE) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == TRUE) {
+            FldAct_EndAcmd(actor);
             UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_IDLE);
             return TRUE;
         }
@@ -2917,7 +2917,7 @@ static BOOL UnionOneself_StepColosseumCardRun(UnionSystem *unisys, UnionSelf *si
             UnionMsg_FreeAll(unisys);
             clsys->cardCheck[clsys->unk17C[0]]->unk04_5 = 1;
             unisys->cmdArg =
-                func_ov012_02169b3c(unisys->param->gameData, clsys->cardCheck[clsys->unk17C[0]], HEAPID_UNION);
+                TrainerCardParam_CreateView(unisys->param->gameData, clsys->cardCheck[clsys->unk17C[0]], HEAPID_UNION);
             UnionCommand_Set(unisys, 0x1c, unisys->cmdArg);
             (*seq)++;
         }

@@ -51,7 +51,7 @@ void FieldColorPostFX_Apply(void *postFx, void *texture);
 fx32 func_ov036_02181324(Field *field);
 void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 // A number below 6 that overlay 137 reads from the game data
-u32 func_ov012_02169b78(GameData *gameData);
+u32 TrainerCard_CountStars(GameData *gameData);
 // The size of a message in the field's message BG, in tiles
 void CalcMsgWindowDimensions(void *msgBGSys, StrBuf *strbuf, u8 *width, u8 *height);
 // Shows a message as a balloon of an index in the field's message BG, and removes it
@@ -256,8 +256,8 @@ FieldTaskManager *Field_GetTaskManager(Field *field);
 void Field_SetSeasonBannerOverdrawFlag(Field *field, BOOL flag);
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId);
 void ShutdownFollowWork(GameData *gameData);
-void func_ov012_02162f44(GameData *gameData);
-void func_ov012_021683f4(GameSystem *gsys, u16 zoneId);
+void EvTime_Update(GameData *gameData);
+void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId);
 void func_ov036_0219ad24(FieldPlayer *player, RailPosition *pos);
 void func_ov036_021a2398(EncountSystem *encount, u32 a1);
 

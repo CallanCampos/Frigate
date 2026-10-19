@@ -836,7 +836,7 @@ static void ZukanHabitatGraphic_GetCellPos(u8 cell, ClActorPos *pos) {
 }
 
 void ZukanHabitatGraphic_SetArea(ZukanHabitatGraphic *graphic, u16 zone) {
-    u16 place = TownMapData_GetPlaceByZone(graphic->townmap, func_ov012_02160eb4(graphic->gameData, zone));
+    u16 place = TownMapData_GetPlaceByZone(graphic->townmap, TownMap_GetMapZone(graphic->gameData, zone));
     ClActorPos pos;
 
     ClActor_SetSequence(graphic->actors[ZUKAN_HABITAT_OBJ_AREA],
@@ -951,7 +951,7 @@ void ZukanHabitatGraphic_UpdatePlayerMarker(ZukanHabitatGraphic *graphic) {
     ClActor *actor = graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER];
     u16 place = TownMapData_GetPlaceByZone(
         graphic->townmap,
-        func_ov012_02160eb4(graphic->gameData, PlayerState_GetZoneID(GameData_GetPlayerState(graphic->gameData))));
+        TownMap_GetMapZone(graphic->gameData, PlayerState_GetZoneID(GameData_GetPlayerState(graphic->gameData))));
 
     if (place != TOWNMAP_PLACE_NONE) {
         ClActorPos pos;
@@ -1010,7 +1010,7 @@ BOOL ZukanHabitatGraphic_IsPaletteRequested(ZukanHabitatGraphic *graphic) {
 }
 
 static inline BOOL ZukanHabitatGraphic_IsPlaceHidden(GameData *gameData, u16 flag) {
-    if (func_ov012_02160f74(gameData, flag) == FALSE) {
+    if (TownMap_CheckFlag(gameData, flag) == FALSE) {
         return TRUE;
     }
     return FALSE;

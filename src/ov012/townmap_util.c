@@ -15,7 +15,7 @@
 
 // The Union Room, the Plasma Frigate, the Hidden Grottoes and the Black Tower or White Treehollow with Black City's or
 // White Forest's gates show on the map where the player entered them, or where the game state puts them
-u16 func_ov012_02160eb4(GameData *gameData, u16 zoneId) {
+u16 TownMap_GetMapZone(GameData *gameData, u16 zoneId) {
     u16 parent = GetZoneParentZone(zoneId);
 
     if (parent == ZONE_UNION_ROOM) {
@@ -54,7 +54,7 @@ u16 func_ov012_02160eb4(GameData *gameData, u16 zoneId) {
     return parent;
 }
 
-BOOL func_ov012_02160f74(GameData *gameData, u16 flag) {
+BOOL TownMap_CheckFlag(GameData *gameData, u16 flag) {
     EventWork *eventWork = GameData_GetEventWork(gameData);
     TrainerCardSave *trainerCard = getTrainerCardDataBlkAddress(gameData);
     PlayerInfo *info = GetGameDataPlayerInfo(gameData);

@@ -221,7 +221,7 @@ GameData *GameData_Create(HeapID heapId) {
         setupProbabilityTable(&gameData->levels[i]);
     }
     for (i = 0; i < GAME_DATA_CITY_MAX; i++) {
-        func_ov012_0215cd8c(&gameData->cityStates[i]);
+        CityState_Init(&gameData->cityStates[i]);
     }
 
     gameData->playTime = setupPlaytimeCounters(heapId);

@@ -659,7 +659,7 @@ static BOOL PokemonCenter_HasPokerus(MedalCheckContext *ctx, GameData *gameData,
 }
 
 static BOOL func_ov065_021e6268(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(func_ov012_021682a0(GameData_GetMMSys(gameData)), threshold);
+    return PokemonCenter_MeetsThreshold(CountMovedStrengthRocks(GameData_GetMMSys(gameData)), threshold);
 }
 
 static BOOL func_ov065_021e6280(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {

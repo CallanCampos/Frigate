@@ -20,13 +20,13 @@ typedef struct {
     u16 *selectedResult;
 } UnityTowerFloorSelectEvent;
 
-static u8 func_ov012_02160b80(const UnityTowerFloor *state, u8 index);
+static u8 UnityTowerState_GetTrainerClass(const UnityTowerFloor *state, u8 index);
 static u8 UnityTowerState_GetParam(const UnityTowerFloor *state, u16 param);
-static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorResult, u16 *countryResult,
-                                      u16 *selectedResult);
-static GameEventReturnCode func_ov012_02160c64(GameEvent *event, u32 *state, void *data);
+static GameEvent *EventUnityTowerFloorSelect_Create(GameSystem *gsys, u16 floor, u16 *floorResult, u16 *countryResult,
+                                                    u16 *selectedResult);
+static GameEventReturnCode EventUnityTowerFloorSelect_Callback(GameEvent *event, u32 *state, void *data);
 
-static u8 func_ov012_02160b80(const UnityTowerFloor *state, u8 index) {
+static u8 UnityTowerState_GetTrainerClass(const UnityTowerFloor *state, u8 index) {
     if (index >= state->count) {
         return 11;
     }
@@ -45,9 +45,10 @@ static u8 UnityTowerState_GetParam(const UnityTowerFloor *state, u16 param) {
     return 0;
 }
 
-static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorResult, u16 *countryResult,
-                                      u16 *selectedResult) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02160c64, sizeof(UnityTowerFloorSelectEvent));
+static GameEvent *EventUnityTowerFloorSelect_Create(GameSystem *gsys, u16 floor, u16 *floorResult, u16 *countryResult,
+                                                    u16 *selectedResult) {
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventUnityTowerFloorSelect_Callback, sizeof(UnityTowerFloorSelectEvent));
     UnityTowerFloorSelectEvent *work = GameEvent_GetData(event);
     UnityTowerSurveySave *survey;
     int country;
@@ -80,7 +81,7 @@ static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorRes
     return event;
 }
 
-static GameEventReturnCode func_ov012_02160c64(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventUnityTowerFloorSelect_Callback(GameEvent *event, u32 *state, void *data) {
     UnityTowerFloorSelectEvent *work = GameEvent_GetData(event);
 
     switch (*state) {
@@ -103,7 +104,7 @@ static GameEventReturnCode func_ov012_02160c64(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL func_ov012_02160cdc(VM *vm, FieldScriptEnv *env) {
+BOOL s01CE_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env) {
     const UnityTowerFloor *state;
     u8 index;
     u16 *result;
@@ -112,7 +113,7 @@ BOOL func_ov012_02160cdc(VM *vm, FieldScriptEnv *env) {
     state = GameData_GetUnityTowerSave(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     index = VM_Read16(vm);
     result = ScriptReadVar(vm, env);
-    *result = func_ov012_02160b80(state, index);
+    *result = UnityTowerState_GetTrainerClass(state, index);
     return FALSE;
 }
 
@@ -143,7 +144,7 @@ BOOL s01D0_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env) {
     floorResult = ScriptReadVar(vm, env);
     countryResult = ScriptReadVar(vm, env);
     selectedResult = ScriptReadVar(vm, env);
-    event = func_ov012_02160bb0(gsys, floor, floorResult, countryResult, selectedResult);
+    event = EventUnityTowerFloorSelect_Create(gsys, floor, floorResult, countryResult, selectedResult);
     if (event == NULL) {
         return TRUE;
     }

@@ -181,7 +181,7 @@ void FieldPlayerCore_UpdateActionStatusObserver(FieldPlayerCore *core) {
             return;
         }
     }
-    if (func_ov012_02166ecc(actor) == TRUE) {
+    if (FldAct_CheckAcmdEnd(actor) == TRUE) {
         switch (moveStatus) {
         case 0:
             return;
@@ -573,7 +573,7 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_NONE(FieldPlayerCore *core) {
         func_ov036_021a3a70((FieldEffectTask *)tcb);
         func_ov036_0219b138(core, NULL);
     }
-    func_ov012_0216734c(actor, &offset);
+    FldAct_SetOuterDrawOffset(actor, &offset);
     core->seqDone = 1;
     return FALSE;
 }

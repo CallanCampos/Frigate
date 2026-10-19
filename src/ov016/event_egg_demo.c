@@ -55,7 +55,7 @@ GameEventReturnCode func_ov016_0216e660(GameEvent *event, u32 *state, void *data
         break;
     case 6:
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
-        func_ov012_021600d0((u16)PokeParty_GetParam(work->pkm, PKM_PARAM_SPECIES, NULL));
+        GameBeacon_BroadcastEggHatched((u16)PokeParty_GetParam(work->pkm, PKM_PARAM_SPECIES, NULL));
         *state = 7;
         break;
     case 7:

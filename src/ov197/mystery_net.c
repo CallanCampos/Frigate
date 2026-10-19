@@ -439,8 +439,8 @@ static void MysteryNet_BeaconStart(MysteryNetSeq *seq, int *state, void *work) {
         init.dataNum = 1;
         init.flag4 = 0;
         init.heapId = net->heapId;
-        net->beacon = func_ov012_02152990(&init);
-        func_ov012_02152b64(net->beacon);
+        net->beacon = DeliveryBeacon_Init(&init);
+        DeliveryBeacon_RecvStart(net->beacon);
         GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);
         net->result = MYSTERY_NET_RECV_NONE;
         *state = 1;
@@ -463,7 +463,7 @@ static void MysteryNet_BeaconEnd(MysteryNetSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        func_ov012_02152bfc(net->beacon);
+        DeliveryBeacon_End(net->beacon);
         *state = 1;
         break;
     case 1:
@@ -480,8 +480,8 @@ static void MysteryNet_BeaconEnd(MysteryNetSeq *seq, int *state, void *work) {
 static void MysteryNet_BeaconWait(MysteryNetSeq *seq, int *state, void *work) {
     MysteryNet *net = work;
 
-    func_ov012_02152bec(net->beacon);
-    if (func_ov012_02152bd4(net->beacon)) {
+    DeliveryBeacon_Main(net->beacon);
+    if (DeliveryBeacon_IsReceiveDone(net->beacon)) {
         net->result = MYSTERY_NET_RECV_OK;
         MysteryNetSeq_SetNext(seq, MysteryNet_BeaconEnd);
     }
@@ -502,8 +502,8 @@ static void MysteryNet_IrcStart(MysteryNetSeq *seq, int *state, void *work) {
         init.data[0].region = region;
         init.dataNum = 1;
         init.data[0].mask = 1 << GAME_VERSION;
-        net->irc = func_ov012_0215309c(&init);
-        func_ov012_021530f8(net->irc);
+        net->irc = DeliveryIrc_Init(&init);
+        DeliveryIrc_RecvStart(net->irc);
         net->result = MYSTERY_NET_RECV_NONE;
         *state = 1;
         break;
@@ -524,7 +524,7 @@ static void MysteryNet_IrcEnd(MysteryNetSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        func_ov012_02153150(net->irc);
+        DeliveryIrc_End(net->irc);
         *state = 1;
         break;
     case 1:
@@ -542,8 +542,8 @@ static void MysteryNet_IrcWait(MysteryNetSeq *seq, int *state, void *work) {
     MysteryNet *net = work;
     u8 ret;
 
-    func_ov012_0215313c(net->irc);
-    ret = func_ov012_02153130(net->irc);
+    DeliveryIrc_Main(net->irc);
+    ret = DeliveryIrc_GetResult(net->irc);
     if (ret != 0) {
         switch (ret) {
         case 1:

@@ -605,7 +605,7 @@ static int BeaconView_UpdateThanks(BeaconViewWork *work) {
         func_0202437c(work->wordSet, 0, panel->name, panel->gender, 1, 2);
         BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
         BeaconView_ShowMessage(work, GameBeacon_Text_Thanked);
-        func_ov012_02160390(work->gameData, panel->trainerId);
+        GameBeacon_BroadcastThanks(work->gameData, panel->trainerId);
         work->subSeq = THANKS_SENT;
         break;
     }

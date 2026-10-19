@@ -98,7 +98,7 @@ static void func_ov036_021b49f4(FieldEffectTask *task, void *data) {
     if (work->params.type == 2) {
         work->swingSpeed = 0;
     }
-    func_ov012_02167d88(params->actor, &work->identity);
+    FldAct_GetIdentity(params->actor, &work->identity);
 }
 
 static void func_ov036_021b4a30(FieldEffectTask *task, void *data) {
@@ -117,7 +117,7 @@ static void func_ov036_021b4a48(FieldEffectTask *task, void *data) {
     u16 x;
     u16 y;
 
-    if (!func_ov012_02167da8(work->params.actor, &work->identity) || !FldAct_CheckReflectingFlag(work->params.actor)) {
+    if (!FldAct_CheckIdentity(work->params.actor, &work->identity) || !FldAct_CheckReflectingFlag(work->params.actor)) {
         func_ov036_021a3a70(task);
         return;
     }
@@ -157,7 +157,7 @@ static void func_ov036_021b4a48(FieldEffectTask *task, void *data) {
 static void func_ov036_021b4b18(FieldEffectTask *task, void *data) {
     ReflectTask *work = data;
 
-    if (func_ov012_02167da8(work->params.actor, &work->identity) == 1 && work->created && work->blAct[1] != 0xffff) {
+    if (FldAct_CheckIdentity(work->params.actor, &work->identity) == 1 && work->created && work->blAct[1] != 0xffff) {
         func_ov036_021b4b44(work->blAct[1], work);
     }
 }
@@ -195,14 +195,14 @@ static void func_ov036_021b4b44(u16 blActIdx, void *data) {
     config = GetActorMdlInfo(actor);
     CopyActorWPos(actor, &pos);
     pos.z += REFLECT_BILLBOARD_OFFSET_Z[config->billboardSize];
-    func_ov012_0216731c(actor, &offset);
+    CopyActorWPosOffset(actor, &offset);
     pos.x += offset.x;
     pos.z -= offset.z;
     if (GetHeightFromMap(actor, &pos, &height) == 1) {
         pos.y = height;
     }
     pos.y += REFLECT_TYPE_OFFSET_Y[work->params.type];
-    func_ov012_0216733c(actor, &offset);
+    FldAct_GetOuterDrawOffset(actor, &offset);
     pos.x += offset.x;
     pos.y -= offset.y;
     pos.z -= offset.z;

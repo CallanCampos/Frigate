@@ -33,38 +33,38 @@ struct DeliveryBeaconWork {
     DeliveryBeaconSeq seq;
 };
 
-static void func_ov012_0215291c(void *work, int netId);
-static void func_ov012_02152920(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02152924(void *work, int netId);
+static void DeliveryBeacon_OnDisconnect(void *work, int netId);
+static void DeliveryBeacon_RecvDummy(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void DeliveryBeacon_OnNegotiation(void *work, int netId);
 static void func_ov012_02152928(void *work);
-static void *func_ov012_0215292c(void *work);
-static int func_ov012_02152968(void *work);
-static BOOL func_ov012_0215296c(u32 a, u32 b);
-static void func_ov012_02152978(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq);
-static void func_ov012_02152984(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq, u32 line);
-static void func_ov012_0215298c(void *work);
-static void func_ov012_021529c0(DeliveryBeaconWork *pWork);
-static BOOL func_ov012_021529e8(DeliveryBeaconWork *pWork);
-static void func_ov012_02152a24(void *work);
-static void func_ov012_02152adc(DeliveryBeaconWork *pWork);
-static void func_ov012_02152b34(void *work);
-static void func_ov012_02152b50(void *work);
+static void *DeliveryBeacon_GetSendBeacon(void *work);
+static int DeliveryBeacon_GetBeaconSize(void *work);
+static BOOL DeliveryBeacon_IsMatchingBeacon(u32 a, u32 b);
+static void DeliveryBeacon_SetSeq(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq);
+static void DeliveryBeacon_SetSeqWithLine(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq, u32 line);
+static void DeliveryBeacon_SeqIdle(void *work);
+static void DeliveryBeacon_CheckDataSize(DeliveryBeaconWork *pWork);
+static BOOL DeliveryBeacon_IsAllReceived(DeliveryBeaconWork *pWork);
+static void DeliveryBeacon_SeqReceive(void *work);
+static void DeliveryBeacon_DecryptData(DeliveryBeaconWork *pWork);
+static void DeliveryBeacon_SeqStartNet(void *work);
+static void DeliveryBeacon_OnNetInit(void *work);
 
 static const NetCommand data_ov012_0216af34[] = {
-    { func_ov012_02152920, NULL },
+    { DeliveryBeacon_RecvDummy, NULL },
 };
 
 // clang-format off
 static GFLNetInitData data_ov012_0216e034 = {
     data_ov012_0216af34,
     NELEMS(data_ov012_0216af34),
-    func_ov012_0215291c,
-    func_ov012_02152924,
+    DeliveryBeacon_OnDisconnect,
+    DeliveryBeacon_OnNegotiation,
     NULL,
     NULL,
-    func_ov012_0215292c,
-    func_ov012_02152968,
-    func_ov012_0215296c,
+    DeliveryBeacon_GetSendBeacon,
+    DeliveryBeacon_GetBeaconSize,
+    DeliveryBeacon_IsMatchingBeacon,
     NULL,
     NULL,
     func_ov012_02152928,
@@ -95,20 +95,20 @@ static GFLNetInitData data_ov012_0216e034 = {
 
 // clang-format on
 
-static void func_ov012_0215291c(void *work, int netId) {
+static void DeliveryBeacon_OnDisconnect(void *work, int netId) {
 }
 
-static void func_ov012_02152920(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void DeliveryBeacon_RecvDummy(int netId, int size, const void *data, void *work, NetHandle *handle) {
 }
 
-static void func_ov012_02152924(void *work, int netId) {
+static void DeliveryBeacon_OnNegotiation(void *work, int netId) {
 }
 
 static void func_ov012_02152928(void *work) {
 }
 
 // The beacon to send
-static void *func_ov012_0215292c(void *work) {
+static void *DeliveryBeacon_GetSendBeacon(void *work) {
     DeliveryBeaconWork *pWork = work;
     int index = pWork->sendIndex % DELIVERY_BEACON_MAX_NUM;
     int dataIndex = pWork->sendIndex / DELIVERY_BEACON_MAX_NUM;
@@ -120,29 +120,29 @@ static void *func_ov012_0215292c(void *work) {
     return &pWork->beacons[dataIndex][index];
 }
 
-static int func_ov012_02152968(void *work) {
+static int DeliveryBeacon_GetBeaconSize(void *work) {
     return sizeof(DeliveryBeaconData);
 }
 
-static BOOL func_ov012_0215296c(u32 a, u32 b) {
+static BOOL DeliveryBeacon_IsMatchingBeacon(u32 a, u32 b) {
     if (a == b) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov012_02152978(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq) {
+static void DeliveryBeacon_SetSeq(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq) {
     pWork->seq = seq;
 }
 
-static void func_ov012_02152984(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq, u32 line) {
-    func_ov012_02152978(pWork, seq);
+static void DeliveryBeacon_SetSeqWithLine(DeliveryBeaconWork *pWork, DeliveryBeaconSeq seq, u32 line) {
+    DeliveryBeacon_SetSeq(pWork, seq);
 }
 
-static void func_ov012_0215298c(void *work) {
+static void DeliveryBeacon_SeqIdle(void *work) {
 }
 
-void *func_ov012_02152990(const DeliveryInit *init) {
+void *DeliveryBeacon_Init(const DeliveryInit *init) {
     DeliveryBeaconWork *pWork =
         GFL_HeapAllocate(init->heapId, sizeof(DeliveryBeaconWork), TRUE, "delivery_beacon.c", 295);
 
@@ -150,7 +150,7 @@ void *func_ov012_02152990(const DeliveryInit *init) {
     return pWork;
 }
 
-static void func_ov012_021529c0(DeliveryBeaconWork *pWork) {
+static void DeliveryBeacon_CheckDataSize(DeliveryBeaconWork *pWork) {
     if (pWork->aInit.data[0].datasize != 0) {
         // The assert's text is the game's, spacing included
         // clang-format off
@@ -160,7 +160,7 @@ static void func_ov012_021529c0(DeliveryBeaconWork *pWork) {
 }
 
 // Whether every beacon has come
-static BOOL func_ov012_021529e8(DeliveryBeaconWork *pWork) {
+static BOOL DeliveryBeacon_IsAllReceived(DeliveryBeaconWork *pWork) {
     int i;
     int count = pWork->beacons[0][0].count;
 
@@ -176,7 +176,7 @@ static BOOL func_ov012_021529e8(DeliveryBeaconWork *pWork) {
 }
 
 // Takes the beacons that have come
-static void func_ov012_02152a24(void *work) {
+static void DeliveryBeacon_SeqReceive(void *work) {
     DeliveryBeaconWork *pWork = work;
     int i;
     int index;
@@ -214,7 +214,7 @@ static void func_ov012_02152a24(void *work) {
 }
 
 // Decrypts the beacons' data into the buffer
-static void func_ov012_02152adc(DeliveryBeaconWork *pWork) {
+static void DeliveryBeacon_DecryptData(DeliveryBeaconWork *pWork) {
     int i;
     DeliveryBeaconData *beacon;
     u16 pos;
@@ -233,16 +233,16 @@ static void func_ov012_02152adc(DeliveryBeaconWork *pWork) {
     }
 }
 
-static void func_ov012_02152b34(void *work) {
+static void DeliveryBeacon_SeqStartNet(void *work) {
     func_02042968();
-    func_ov012_02152984(work, func_ov012_02152a24, 471);
+    DeliveryBeacon_SetSeqWithLine(work, DeliveryBeacon_SeqReceive, 471);
 }
 
-static void func_ov012_02152b50(void *work) {
-    func_ov012_02152984(work, func_ov012_02152b34, 477);
+static void DeliveryBeacon_OnNetInit(void *work) {
+    DeliveryBeacon_SetSeqWithLine(work, DeliveryBeacon_SeqStartNet, 477);
 }
 
-BOOL func_ov012_02152b64(void *work) {
+BOOL DeliveryBeacon_RecvStart(void *work) {
     DeliveryBeaconWork *pWork = work;
 
     if (GFL_NetIsInitialized()) {
@@ -250,13 +250,13 @@ BOOL func_ov012_02152b64(void *work) {
     }
     data_ov012_0216e034.gameCommandBase = pWork->aInit.code;
     pWork->unk5E = 0xff;
-    func_ov012_021529c0(pWork);
-    GFL_NetInit(&data_ov012_0216e034, func_ov012_02152b50, pWork);
-    func_ov012_02152984(pWork, func_ov012_0215298c, 498);
+    DeliveryBeacon_CheckDataSize(pWork);
+    GFL_NetInit(&data_ov012_0216e034, DeliveryBeacon_OnNetInit, pWork);
+    DeliveryBeacon_SetSeqWithLine(pWork, DeliveryBeacon_SeqIdle, 498);
     return TRUE;
 }
 
-BOOL func_ov012_02152bb4(void *work) {
+BOOL DeliveryBeacon_IsAnyReceived(void *work) {
     DeliveryBeaconWork *pWork = work;
     int i;
 
@@ -268,22 +268,22 @@ BOOL func_ov012_02152bb4(void *work) {
     return FALSE;
 }
 
-BOOL func_ov012_02152bd4(void *work) {
-    BOOL done = func_ov012_021529e8(work);
+BOOL DeliveryBeacon_IsReceiveDone(void *work) {
+    BOOL done = DeliveryBeacon_IsAllReceived(work);
 
     if (done) {
-        func_ov012_02152adc(work);
+        DeliveryBeacon_DecryptData(work);
     }
     return done;
 }
 
-void func_ov012_02152bec(void *work) {
+void DeliveryBeacon_Main(void *work) {
     DeliveryBeaconWork *pWork = work;
 
     pWork->seq(pWork);
 }
 
-void func_ov012_02152bfc(void *work) {
+void DeliveryBeacon_End(void *work) {
     GFL_HeapFree(work);
     GFL_NetExit(NULL);
 }

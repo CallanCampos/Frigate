@@ -1115,9 +1115,9 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 
 // Adds the points of a prop to the Pokémon's, and returns the sound of the audience's reaction
 static u32 StaActing_ScoreItem(StaActing *stage, u8 pos, u8 equip) {
-    u8 points =
-        func_ov012_02152644(stage->param->program, func_ov210_021ef164(StaActing_GetItemData(stage),
-                                                                       stage->param->pokes[pos]->equips[equip].itemId));
+    u8 points = MusicalProgram_GetPropPoints(
+        stage->param->program,
+        func_ov210_021ef164(StaActing_GetItemData(stage), stage->param->pokes[pos]->equips[equip].itemId));
 
     stage->bonusPoints[pos] += points;
     StaActing_UpdateRanks(stage);

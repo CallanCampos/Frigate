@@ -2679,7 +2679,7 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
         loadPokemonNicknameToStrbuf(wordSet, 0, param->pkm);
     } else {
         name = GFL_StrBufClone(param->name, heapId);
-        func_ov012_02165afc(param, name);
+        NameEntryParam_GetName(param, name);
         func_0202437c(wordSet, 0, name, 0, 0, 0);
         GFL_StrBufFree(name);
     }

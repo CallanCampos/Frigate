@@ -201,7 +201,7 @@ GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param) {
     work->ov295Param.param = param;
     func_ov012_02159220(gameData);
     SetGameClearGameData(work);
-    func_ov012_0215a50c(work);
+    SetGameClearStaffRollParam(work);
     work->unovaLinkParam.gameData = gameData;
     work->unovaLinkParam.mode = UNOVA_LINK_MODE_GAME_CLEAR;
 #ifdef BLACK2
@@ -219,7 +219,7 @@ void SetGameClearGameData(GameClearWork *work) {
     work->ov265Param.playTime = GameData_GetPlayTime(work->gameData);
 }
 
-void func_ov012_0215a50c(GameClearWork *work) {
+void SetGameClearStaffRollParam(GameClearWork *work) {
     u32 value;
 
     work->staffRollParam.skippable = work->unk08 == 1;

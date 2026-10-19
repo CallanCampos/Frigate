@@ -969,7 +969,7 @@ static void func_ov036_02194514(FieldBlAct *blact, UnloadEntry *entry) {
             BlActSys_SetActorLight(blact->sys, index, FALSE, 3);
         }
     }
-    if (!func_ov012_0216749c(actor)) {
+    if (!FldAct_IsInUse(actor)) {
         FieldBlAct_UnbindActorObjCode(blact, actor, entry->index, entry->objCode);
         BlActSys_DeleteActors(blact->sys, entry->index, 1);
         entry->actor = NULL;

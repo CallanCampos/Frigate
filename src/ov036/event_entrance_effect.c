@@ -81,7 +81,7 @@ void func_ov036_0219f178(Field *field, VecFx32 *pos) {
 }
 
 static void func_ov036_0219f180(Field *field) {
-    func_ov012_02166f2c(FieldPlayer_GetActor(Field_GetPlayer(field)));
+    FldAct_FreeAcmd(FieldPlayer_GetActor(Field_GetPlayer(field)));
 }
 
 GameEvent *func_ov036_0219f190(WarpSequence *warp) {

@@ -125,7 +125,7 @@ u32 func_ov033_0217aad8(WordSet *wordSet, GameSystem *gsys, UnityTowerFloor *sav
 void LoadUnityTowerVisitorWordSet(WordSet *wordSet, GameData *gameData, u32 index);
 
 // Overlay 12's scrcmd_unity_tower.c
-BOOL func_ov012_02160cdc(VM *vm, FieldScriptEnv *env);
+BOOL s01CE_UnityTowerGetTrainerClass(VM *vm, FieldScriptEnv *env);
 BOOL s01CF_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env);
 BOOL s01D0_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env);
 

@@ -212,7 +212,7 @@ static BOOL func_ov072_021e8f48(FesGimmick *gimmick, FesMissionWork *work) {
             if (place->isRail == FALSE) {
                 VecFx32 position;
 
-                func_ov012_0215d4d0(place, &position);
+                GetBGEntityCenterPosGrid(place, &position);
                 if (func_ov072_021e8fec(gimmick, work, i, &position)) {
                     zone->removed[i] = TRUE;
                     func_ov072_021e909c(work, i);
@@ -220,7 +220,7 @@ static BOOL func_ov072_021e8f48(FesGimmick *gimmick, FesMissionWork *work) {
             } else {
                 RailPosition position;
 
-                func_ov012_0215d4ec(place, &position);
+                GetBGEntityPosRail(place, &position);
                 if (func_ov072_021e9058(gimmick, work, i, &position)) {
                     zone->removed[i] = TRUE;
                     func_ov072_021e909c(work, i);

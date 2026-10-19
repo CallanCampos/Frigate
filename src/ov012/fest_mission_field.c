@@ -20,9 +20,9 @@ static const FestMissionZone data_ov012_0216dc68[10] = {
     { 0x217, 0x21d }, { 0x218, 0x21e }, { 0x24b, 0x252 }, { 0x24d, 0x253 }, { 0x0, 0x1a8 },
 };
 
-static BOOL func_ov012_02168444(u32 value, const u32 *list, int count);
+static BOOL ListContains(u32 value, const u32 *list, int count);
 
-u16 func_ov012_02168320(u16 zoneId) {
+u16 FestMission_GetMissionZone(u16 zoneId) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov012_0216dc68); i++) {
@@ -33,7 +33,7 @@ u16 func_ov012_02168320(u16 zoneId) {
     return zoneId;
 }
 
-void func_ov012_02168348(u32 seed, int skip, MATHRandContext32 *rand) {
+void FestMission_InitRand(u32 seed, int skip, MATHRandContext32 *rand) {
     int i;
     u8 count;
 
@@ -45,17 +45,17 @@ void func_ov012_02168348(u32 seed, int skip, MATHRandContext32 *rand) {
 }
 
 // A random number below max that the list doesn't have
-u32 func_ov012_021683a8(MATHRandContext32 *rand, u32 max, const u32 *list, int count) {
+u32 FestMission_RandExcluding(MATHRandContext32 *rand, u32 max, const u32 *list, int count) {
     u32 value;
 
     do {
         rand->x = rand->mul * rand->x + rand->add;
         value = ((rand->x >> 32) * max) >> 32;
-    } while (func_ov012_02168444(value, list, count));
+    } while (ListContains(value, list, count));
     return value;
 }
 
-void func_ov012_021683f4(GameSystem *gsys, u16 zoneId) {
+void FestMission_OnZoneEnter(GameSystem *gsys, u16 zoneId) {
     LinkFestival *festival = GSYS_GetLinkFestival(gsys);
     RivalEntry *entry = LinkFestival_GetEntries(festival);
     FestMissionConfig *config;
@@ -75,7 +75,7 @@ void func_ov012_021683f4(GameSystem *gsys, u16 zoneId) {
     }
 }
 
-static BOOL func_ov012_02168444(u32 value, const u32 *list, int count) {
+static BOOL ListContains(u32 value, const u32 *list, int count) {
     int i;
 
     for (i = 0; i < count; i++) {

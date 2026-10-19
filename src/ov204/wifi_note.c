@@ -2706,7 +2706,7 @@ static BOOL WifiNoteCodeIn_Main(WifiNoteCodeIn *codeIn, WifiNoteWork *wk, WifiNo
         }
         break;
     case CODE_IN_SEQ_NEW_END:
-        func_ov012_02165ae8(codeIn->nameParam);
+        NameEntryParam_Free(codeIn->nameParam);
         CodeInParam_Free(codeIn->codeParam);
         GFL_OvlLoad(OVERLAY_APP_UI);
         WifiNote_InitDraw(wk, heapId);
@@ -2734,7 +2734,7 @@ static BOOL WifiNoteCodeIn_Main(WifiNoteCodeIn *codeIn, WifiNoteWork *wk, WifiNo
         }
         break;
     case CODE_IN_SEQ_NAME_END:
-        func_ov012_02165ae8(codeIn->nameParam);
+        NameEntryParam_Free(codeIn->nameParam);
         GFL_OvlLoad(OVERLAY_APP_UI);
         WifiNote_InitDraw(wk, heapId);
         return TRUE;

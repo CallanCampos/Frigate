@@ -77,47 +77,47 @@ static const SurveyQuestion data_ov012_0216dad0[] = {
 
 // clang-format on
 
-static BOOL func_ov012_021654a4(void *survey, u16 question);
-static BOOL func_ov012_021654e8(SaveControl *save);
-static BOOL func_ov012_02165518(SaveControl *save);
-static BOOL func_ov012_02165550(void *survey, u16 question);
+static BOOL Survey_AreAnswersAtThreshold(void *survey, u16 question);
+static BOOL Survey_HasRunLongEnough(SaveControl *save);
+static BOOL Survey_AreAllAnswersCounted(SaveControl *save);
+static BOOL Survey_AreAnswersAtMax(void *survey, u16 question);
 
-u32 func_ov012_021652cc(u16 question) {
+u32 Survey_GetQuestionType(u16 question) {
     return data_ov012_0216dad0[question].type;
 }
 
-u32 func_ov012_021652dc(u16 question) {
+u32 Survey_GetQuestionAnswerCount(u16 question) {
     return data_ov012_0216dad0[question].answerCount;
 }
 
-void func_ov012_021652ec(u16 question, u8 *answers) {
+void Survey_GetQuestionAnswers(u16 question, u8 *answers) {
     answers[0] = data_ov012_0216dad0[question].answers[0];
     answers[1] = data_ov012_0216dad0[question].answers[1];
     answers[2] = data_ov012_0216dad0[question].answers[2];
 }
 
-u32 func_ov012_02165310(u16 question) {
+u32 Survey_GetQuestionThreshold(u16 question) {
     return data_ov012_0216dad0[question].threshold;
 }
 
-int func_ov012_02165320(u8 question) {
+int Survey_GetQuestionHours(u8 question) {
     return data_ov012_0216dad0[question].days;
 }
 
-u16 func_ov012_02165330(SaveControl *save) {
+u16 Survey_GetCurrentState(SaveControl *save) {
     void *survey = SurveySave_Get(save);
     u16 question = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
-    u8 type = func_ov012_021652cc(question);
+    u8 type = Survey_GetQuestionType(question);
 
     if (type == 0) {
-        if (func_ov012_021654a4(survey, question)) {
+        if (Survey_AreAnswersAtThreshold(survey, question)) {
             return 1;
         }
         return 2;
     }
     if (type == 1) {
-        if (func_ov012_021654e8(save)) {
-            if (func_ov012_02165518(save)) {
+        if (Survey_HasRunLongEnough(save)) {
+            if (Survey_AreAllAnswersCounted(save)) {
                 return 1;
             }
             return 4;
@@ -127,7 +127,7 @@ u16 func_ov012_02165330(SaveControl *save) {
     return 2;
 }
 
-BOOL func_ov012_0216538c(GameData *gameData) {
+BOOL Survey_IsCurrentDone(GameData *gameData) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     TrainerCardSave *info = getTrainerCardData_wrapper(save);
     EventWork *eventWork = GameData_GetEventWork(gameData);
@@ -139,26 +139,26 @@ BOOL func_ov012_0216538c(GameData *gameData) {
     if (EventWork_FlagGet(eventWork, question + FLAG_SURVEY_DONE_BASE)) {
         return FALSE;
     }
-    if (func_ov012_02165330(save) == 1) {
+    if (Survey_GetCurrentState(save) == 1) {
         return TRUE;
     }
     return FALSE;
 }
 
-u16 func_ov012_021653d8(SaveControl *save, u8 question) {
+u16 Survey_GetQuestionState(SaveControl *save, u8 question) {
     void *survey = SurveySave_Get(save);
     u8 type;
 
     getTrainerCardData_wrapper(save);
-    type = func_ov012_021652cc(question);
+    type = Survey_GetQuestionType(question);
     if (type == 0) {
-        if (func_ov012_021654a4(survey, question)) {
+        if (Survey_AreAnswersAtThreshold(survey, question)) {
             return 1;
         }
         return 2;
     }
     if (type == 1) {
-        if (func_ov012_02165550(survey, question)) {
+        if (Survey_AreAnswersAtMax(survey, question)) {
             return 1;
         }
         return 3;
@@ -183,7 +183,7 @@ u16 detectLengthSinceLastSession(SaveControl *save) {
     return time.hour;
 }
 
-u32 func_ov012_02165480(void *survey, u8 answer) {
+u32 Survey_GetAnswerCount(void *survey, u8 answer) {
     u32 count = SurveySave_GetTodayCount(survey, answer) + SurveySave_GetTotalCount(survey, answer);
 
     if (count > SURVEY_COUNT_MAX) {
@@ -192,39 +192,39 @@ u32 func_ov012_02165480(void *survey, u8 answer) {
     return count;
 }
 
-static BOOL func_ov012_021654a4(void *survey, u16 question) {
+static BOOL Survey_AreAnswersAtThreshold(void *survey, u16 question) {
     u8 answers[3];
     u8 count;
     u32 threshold;
     int i;
 
-    func_ov012_021652ec(question, answers);
-    count = func_ov012_021652dc(question);
-    threshold = func_ov012_02165310(question);
+    Survey_GetQuestionAnswers(question, answers);
+    count = Survey_GetQuestionAnswerCount(question);
+    threshold = Survey_GetQuestionThreshold(question);
     for (i = 0; i < count; i++) {
-        if (func_ov012_02165480(survey, answers[i]) < threshold) {
+        if (Survey_GetAnswerCount(survey, answers[i]) < threshold) {
             return FALSE;
         }
     }
     return TRUE;
 }
 
-static BOOL func_ov012_021654e8(SaveControl *save) {
+static BOOL Survey_HasRunLongEnough(SaveControl *save) {
     u16 question;
     int hours;
 
     SurveySave_Get(save);
     question = TrainerGameInfo_GetSurveyQuestion(getTrainerCardData_wrapper(save));
     hours = detectLengthSinceLastSession(save);
-    if (func_ov012_02165320(question) > hours) {
+    if (Survey_GetQuestionHours(question) > hours) {
         return FALSE;
     }
     return TRUE;
 }
 
-static BOOL func_ov012_02165518(SaveControl *save) {
+static BOOL Survey_AreAllAnswersCounted(SaveControl *save) {
     TrainerCardSave *info = getTrainerCardData_wrapper(save);
-    u8 count = func_ov012_021652dc(TrainerGameInfo_GetSurveyQuestion(info));
+    u8 count = Survey_GetQuestionAnswerCount(TrainerGameInfo_GetSurveyQuestion(info));
     int i;
 
     for (i = 0; i < count; i++) {
@@ -235,16 +235,16 @@ static BOOL func_ov012_02165518(SaveControl *save) {
     return TRUE;
 }
 
-static BOOL func_ov012_02165550(void *survey, u16 question) {
+static BOOL Survey_AreAnswersAtMax(void *survey, u16 question) {
     u8 answers[3];
     u8 count;
     int i;
 
-    func_ov012_021652ec(question, answers);
-    count = func_ov012_021652dc(question);
-    func_ov012_02165310(question);
+    Survey_GetQuestionAnswers(question, answers);
+    count = Survey_GetQuestionAnswerCount(question);
+    Survey_GetQuestionThreshold(question);
     for (i = 0; i < count; i++) {
-        if (func_ov012_02165480(survey, answers[i]) < SURVEY_COUNT_MAX) {
+        if (Survey_GetAnswerCount(survey, answers[i]) < SURVEY_COUNT_MAX) {
             return FALSE;
         }
     }

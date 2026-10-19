@@ -321,9 +321,9 @@ static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3,
     func_ov055_021e6bdc(filter);
     pkms = GFL_HeapAllocate(HEAPID_TAIL(heapId), 6 * sizeof(BSubwayPokemon), FALSE, "wbt_party.c", 626);
     for (i = 0; i < count; i++) {
-        func_ov012_02162490(&pkms[i], 257, picked[i], a2, 0, a3, i, 0, heapId);
+        BtlInst_MakeRomPokemon(&pkms[i], 257, picked[i], a2, 0, a3, i, 0, heapId);
     }
-    func_ov012_021621d4(party, pkms, 50, count, heapId);
+    BtlInst_MakeParty(party, pkms, 50, count, heapId);
     GFL_HeapFree(pkms);
 }
 

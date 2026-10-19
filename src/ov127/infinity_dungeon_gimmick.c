@@ -693,10 +693,10 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
         }
         destination = &roomChange->destination;
         InfinityDungeonRoomChange_SetNextPosition(roomChange);
-        func_ov012_0215ef2c(Field_GetActorSystem(roomChange->field));
+        ZoneChange_ResetStrengthRocks(Field_GetActorSystem(roomChange->field));
         if (roomChange->direction == DIR_ARRIVAL) {
             SetPlayerSpecialState(GameData_GetPlayerState(roomChange->gameData), 0);
-            func_ov012_021591b4(roomChange->gameData);
+            GameData_ResetPhenomenonSteps(roomChange->gameData);
         }
         GameEvent_ChainNext(event, EventMapChange_CreateGridDefault(roomChange->gsys, roomChange->field,
                                                                     destination->zoneId, &destination->pos,

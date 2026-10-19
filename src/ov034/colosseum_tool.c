@@ -162,11 +162,11 @@ void UnionEff_UpdateColosseumCommPlayers(UnionColosseum *colosseum) {
         if (func_ov028_02172ae8(colosseum, i, &choice) != 1) {
             continue;
         }
-        if (func_ov012_0216165c(colosseum->commPlayer, i) == FALSE) {
-            func_ov012_0216148c(colosseum->commPlayer, i, UnionEff_GetMemberLook(&colosseum->members[i].info),
-                                (CommPlayerStatus *)&choice);
+        if (CommPlayer_IsActive(colosseum->commPlayer, i) == FALSE) {
+            CommPlayer_Add(colosseum->commPlayer, i, UnionEff_GetMemberLook(&colosseum->members[i].info),
+                           (CommPlayerStatus *)&choice);
         } else {
-            func_ov012_0216168c(colosseum->commPlayer, i, (CommPlayerStatus *)&choice);
+            CommPlayer_SetStatus(colosseum->commPlayer, i, (CommPlayerStatus *)&choice);
         }
     }
 }

@@ -209,7 +209,7 @@ static GameEventReturnCode SpPokeEvent_AppearMain(GameEvent *event, u32 *state, 
         if (npcCount != 0) {
             EventWork *eventWork = GameData_GetEventWork(gameData);
             FieldActor *actor =
-                func_ov012_021668f8(actorSystem, GetZoneNPCs(eventData), zoneId, npcCount, eventWork, uid);
+                SpawnZoneNPCByUID(actorSystem, GetZoneNPCs(eventData), zoneId, npcCount, eventWork, uid);
 
             if (actor != NULL) {
                 DisableActorMovement(actor);

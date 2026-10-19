@@ -472,7 +472,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         MIi_CpuClearFast(0, (void *)0x6800000, 0x20000);
         GX_DisableBankForLCDC();
         GX_SetBankForBG(8);
-        func_ov012_02160e88();
+        resetBuildingEnterVBlankCallback();
         (*state)++;
         break;
     case 2:

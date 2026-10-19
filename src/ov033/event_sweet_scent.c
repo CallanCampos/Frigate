@@ -60,7 +60,7 @@ GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void 
         (*state)++;
         break;
     case 2:
-        if (func_ov012_02166ef8(FieldPlayer_GetActor(work->player)) != TRUE) {
+        if (FldAct_EndAcmd(FieldPlayer_GetActor(work->player)) != TRUE) {
             break;
         }
         next = EventFieldEffect_CreatePokeSprite(work->gsys, Field_Get3DCi(work->field), work->partySlot);

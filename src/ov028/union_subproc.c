@@ -596,7 +596,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             battle->bgm = 0x48a;
         }
         Colosseum_BuildBattlePlayers(colosseum, gsys, &battle->players, 0x41);
-        *next = func_ov012_02152704(gsys, field, self->activity, battle);
+        *next = EventColosseumBattle_Create(gsys, field, self->activity, battle);
         (*step)++;
         break;
     case 13:
@@ -655,7 +655,7 @@ static BOOL Colosseum_CommandBattle(GameSystem *gsys, UnionSystem *unisys, Field
     UnionSelf *self = &unisys->situ;
 
     if (*step == 0) {
-        *next = func_ov012_02152704(gsys, field, self->activity, param);
+        *next = EventColosseumBattle_Create(gsys, field, self->activity, param);
     } else {
         return TRUE;
     }

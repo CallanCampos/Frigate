@@ -365,10 +365,10 @@ static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
     }
     if (UnionMain_IsFieldReady(unisys) == TRUE) {
         if (!UnionCommand_IsActive(unisys)) {
-            func_ov012_0216144c(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
+            CommPlayer_Update(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
             if (unisys->colosseum_sys->unk17F == 0) {
-                if (func_ov012_021616b0(unisys->colosseum_sys->commPlayer,
-                                        (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
+                if (CommPlayer_GetMyStatus(unisys->colosseum_sys->commPlayer,
+                                           (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
                     unisys->colosseum_sys->unk17F = 1;
                 }
             }

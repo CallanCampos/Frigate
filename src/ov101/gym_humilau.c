@@ -516,8 +516,8 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         GymHumilau_ClearAreas(work);
         GymHumilau_AddRideAreas(work, ev->ride);
         actor = FieldPlayer_GetActor(ev->player);
-        if (!func_ov012_02166ecc(actor) && func_ov036_0219a5dc(ev->player) == TRUE) {
-            func_ov012_02166f2c(actor);
+        if (!FldAct_CheckAcmdEnd(actor) && func_ov036_0219a5dc(ev->player) == TRUE) {
+            FldAct_FreeAcmd(actor);
         }
         *state = 1;
         break;

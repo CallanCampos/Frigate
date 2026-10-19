@@ -513,7 +513,7 @@ static void GameBeaconSys_UpdateNotices(GameBeaconSystem *sys, const GameBeacon 
     if (sys->gsys == NULL) {
         return;
     }
-    if (func_ov012_0216538c(sys->gameData)) {
+    if (Survey_IsCurrentDone(sys->gameData)) {
         GameBeaconSys_SetNotice(0);
     }
     if (isNew) {
@@ -716,7 +716,7 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     if (GetZoneIsUnionRoom(beacon->zoneId) == TRUE || IsZone150Or151(beacon->zoneId) == TRUE) {
         beacon->zoneId = GameData_GetNextZone(gameData)->zoneId;
     }
-    beacon->parentZoneId = func_ov012_02160eb4(gameData, beacon->zoneId);
+    beacon->parentZoneId = TownMap_GetMapZone(gameData, beacon->zoneId);
     if (IsZoneBlackCityOrWhiteForestLobby(beacon->zoneId)) {
         beacon->zoneId = beacon->parentZoneId;
     }
@@ -1130,11 +1130,11 @@ static void GameBeacon_UpdateZone(GameBeacon *beacon, u16 zoneId, GameData *game
     LinkFestival *festival;
 
     if (IsZoneBlackCityOrWhiteForestLobby(zoneId)) {
-        beacon->zoneId = func_ov012_02160eb4(gameData, zoneId);
+        beacon->zoneId = TownMap_GetMapZone(gameData, zoneId);
     } else {
         beacon->zoneId = zoneId;
     }
-    beacon->parentZoneId = func_ov012_02160eb4(gameData, zoneId);
+    beacon->parentZoneId = TownMap_GetMapZone(gameData, zoneId);
     beacon->recentKind = GAME_BEACON_RECENT_NONE;
     GameBeacon_ClearRecent(beacon);
     festival = GSYS_GetLinkFestival(GameBeaconSys->gsys);

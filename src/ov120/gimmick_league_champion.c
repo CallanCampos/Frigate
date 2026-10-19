@@ -134,11 +134,11 @@ GameEvent *GimmickChampion_CallOpenEvent(GameSystem *gsys) {
 }
 
 void GimmickChampion_HideActorShadow(GameSystem *gsys, u32 actorId) {
-    func_ov012_0216783c(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), TRUE);
+    FldAct_SetForceOffShadow(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), TRUE);
 }
 
 void GimmickChampion_ShowActorShadow(GameSystem *gsys, u32 actorId) {
-    func_ov012_0216783c(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), FALSE);
+    FldAct_SetForceOffShadow(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), FALSE);
 }
 
 void GimmickChampion_CallSetOpen(GameSystem *gsys) {

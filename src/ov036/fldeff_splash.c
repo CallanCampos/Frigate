@@ -87,7 +87,7 @@ static void func_ov036_021bea68(FieldEffectTask *task, void *work) {
     VecFx32 pos;
 
     *(SplashTaskParams *)splashTask = *params;
-    func_ov012_02167d88(splashTask->actor, &splashTask->identity);
+    FldAct_GetIdentity(splashTask->actor, &splashTask->identity);
     CopyActorWPos(splashTask->actor, &pos);
     pos.z += FX32_CONST(8);
     func_ov036_021a3ae8(task, &pos);
@@ -103,11 +103,11 @@ static void func_ov036_021beab0(FieldEffectTask *task, void *work) {
     u16 obj;
     VecFx32 pos;
 
-    if (func_ov012_02167da8(splashTask->actor, &splashTask->identity) == FALSE) {
+    if (FldAct_CheckIdentity(splashTask->actor, &splashTask->identity) == FALSE) {
         func_ov036_021a3a70(task);
         return;
     }
-    if (func_ov012_021676d8(splashTask->actor) == FALSE) {
+    if (FldAct_IsSplashed(splashTask->actor) == FALSE) {
         func_ov036_021a3a70(task);
         return;
     }

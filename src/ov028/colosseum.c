@@ -28,7 +28,7 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     ColosseumMember *member;
 
     colosseum = GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionColosseum), TRUE, "colosseum.c", 53);
-    colosseum->commPlayer = func_ov012_021613d0(4, gsys, HEAPID_UNION, 0);
+    colosseum->commPlayer = CommPlayer_Init(4, gsys, HEAPID_UNION, 0);
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
         colosseum->card[i] = GFL_HeapAllocate(HEAPID_UNION, sizeof(TrainerCardData), TRUE, "colosseum.c", 56);
         colosseum->cardCheck[i] = colosseum->card[i];
@@ -51,8 +51,8 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     }
     member->unk27 = value;
     member->unk28 = 100;
-    func_ov012_02169770(colosseum->cardCheck[self], gameData, TRUE, FALSE, HEAPID_UNION);
-    func_ov012_02169508(colosseum->card[self], gameData, HEAPID_UNION);
+    TrainerCardData_Fill(colosseum->cardCheck[self], gameData, TRUE, FALSE, HEAPID_UNION);
+    TrainerCardData_FillExtras(colosseum->card[self], gameData, HEAPID_UNION);
     colosseum->cardReady[self] = TRUE;
     return colosseum;
 }
@@ -64,7 +64,7 @@ void Colosseum_Free(UnionColosseum *colosseum, GameSystem *gsys) {
         GFL_HeapFree(colosseum->card[i]);
         GFL_HeapFree(colosseum->party[i]);
     }
-    func_ov012_02161404(gsys, colosseum->commPlayer);
+    CommPlayer_Exit(gsys, colosseum->commPlayer);
     GFL_HeapFree(colosseum);
 }
 
