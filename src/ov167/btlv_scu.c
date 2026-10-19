@@ -109,8 +109,9 @@ struct BtlvScu {
     BtlMainModule *mainModule;         // 0x134
     BtlPokeCon *pokeCon;               // 0x138
     HeapID heapId;                     // 0x13C
-    u8 printedAtOnce; // 0x13E set by BtlvScu_PrintMsgAtOnce: the window is neither cleared nor streamed
-    u8 msgSeq;        // 0x13F the state of BtlvScu_WaitMsg, 7 when done
+    u8 printedAtOnce;                  // 0x13E set by BtlvScu_PrintMsgAtOnce: the window is neither cleared nor
+                                       //       streamed
+    u8 msgSeq;                         // 0x13F the state of BtlvScu_WaitMsg, 7 when done
     u8 clientId;                       // 0x140 only stored
     u8 msgFinished;                    // 0x141 set when the stream reports PRINT_STREAM_DONE, read and cleared by
                                        //       BtlvScu_IsMsgFinished
