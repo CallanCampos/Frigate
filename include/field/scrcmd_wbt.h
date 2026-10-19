@@ -8,7 +8,7 @@
 // WBT_SCRIPT_COMMANDS lists. Overlay 55 has the commands both plugins use, and overlays 56 and 57 the others
 
 // The tournament's system, which the plugins' commands work on
-WbtSystem *func_ov055_021e5800(FieldScriptEnv *env);
+WbtSystem *WbtCmd_GetSystem(FieldScriptEnv *env);
 
 // Overlay 56
 BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env);

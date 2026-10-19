@@ -33,7 +33,7 @@ static void func_ov057_021e75e4(FieldScriptEnv *env, PokeParty *party, u8 slot, 
 }
 
 BOOL func_ov057_021e760c(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 *var = ScriptReadVar(vm, env);
 
     *var = WbtBattle_GetOpponentObjCode(sys);
@@ -42,7 +42,7 @@ BOOL func_ov057_021e760c(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov057_021e7630(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 message = ScriptReadAny(vm, env);
     u16 value = ScriptReadAny(vm, env);
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(work);
@@ -59,11 +59,11 @@ BOOL func_ov057_021e76a8(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 *var = ScriptReadVar(vm, env);
 
     GameData_SetLastBtlResult(gameData, 1);
-    func_ov055_021e5cd8(sys, var);
+    WbtSystem_SetResultVar(sys, var);
     ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(22), EventWbtBattle_Create, sys));
     return TRUE;
 }
@@ -72,7 +72,7 @@ BOOL func_ov057_021e770c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(work);
     u16 value = ScriptReadAny(vm, env);
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
 
@@ -86,7 +86,7 @@ BOOL func_ov057_021e770c(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov057_021e777c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u8 index = VM_Read8(vm);
     u32 unk = WbtBattle_GetOpponentFlag(sys);
     StrBuf *strbuf = ScriptWork_GetAltStrBuf(work);
@@ -99,13 +99,13 @@ BOOL func_ov057_021e777c(VM *vm, FieldScriptEnv *env) {
 // Makes the opponent's party
 BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     WbtEntrant *opponent = WbtBattle_GetOpponent(sys);
 
-    switch (func_ov055_021e5ca4(sys)) {
+    switch (WbtSystem_GetTournament(sys)) {
     case 12:
     case 13:
-        func_ov055_021e71ec(sys);
+        WbtParty_MakeOpponentParty(sys);
         break;
     default:
         WbtBattle_MakeOpponentParty(sys, gsys, opponent);
@@ -115,12 +115,12 @@ BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov057_021e7814(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
-    u16 round = func_ov055_021e5cc4(sys);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
+    u16 round = WbtSystem_GetRound(sys);
     u16 *var = ScriptReadVar(vm, env);
     u8 value = WbtBattle_GetRoundRemaining(sys, round);
 
-    if (value == func_ov055_021e5d7c(sys)) {
+    if (value == WbtSystem_GetEntryCount(sys)) {
         value = 0xff;
     }
     *var = value;
@@ -128,16 +128,16 @@ BOOL func_ov057_021e7814(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov057_021e7850(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     void *work = WbtBattle_CreatePartyList(env, sys);
 
-    func_ov055_021e5cfc(sys, work);
+    WbtSystem_SetPartyList(sys, work);
     WbtBattle_ShowPartyList(work);
     return FALSE;
 }
 
 BOOL func_ov057_021e7878(VM *vm, FieldScriptEnv *env) {
-    void *work = func_ov055_021e5d08(func_ov055_021e5800(env));
+    void *work = WbtSystem_GetPartyList(WbtCmd_GetSystem(env));
 
     WbtBattle_ClosePartyList(work);
     WbtBattle_FreePartyList(work);
@@ -145,19 +145,19 @@ BOOL func_ov057_021e7878(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov057_021e7894(VM *vm, FieldScriptEnv *env) {
-    WbtBattle_ResetPicks(func_ov055_021e5800(env));
+    WbtBattle_ResetPicks(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
 BOOL func_ov057_021e78a4(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
 
     WbtBattle_RandomPick(sys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
 BOOL func_ov057_021e78c8(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 index = ScriptReadAny(vm, env);
 
     WbtBattle_SetPick(sys, index, ScriptReadAny(vm, env));
@@ -166,16 +166,16 @@ BOOL func_ov057_021e78c8(VM *vm, FieldScriptEnv *env) {
 
 // Puts the species of one of the Pokémon that WbtBattle_GetPick picks in a word of the script's WordSet
 BOOL func_ov057_021e78fc(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u8 index = VM_Read8(vm);
     u16 which = ScriptReadAny(vm, env);
     u8 slot = WbtBattle_GetPick(sys, which);
     PokeParty *party;
 
     if (which <= 1) {
-        party = func_ov055_021e5d68(sys);
+        party = WbtSystem_GetPlayerParty(sys);
     } else {
-        party = func_ov055_021e5d74(sys);
+        party = WbtSystem_GetOpponentParty(sys);
     }
     func_ov057_021e75e4(env, party, slot, index);
     return FALSE;
@@ -183,12 +183,12 @@ BOOL func_ov057_021e78fc(VM *vm, FieldScriptEnv *env) {
 
 // Adds each Pokémon of the party to the list menu
 BOOL func_ov057_021e7948(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     StrBuf *strbuf = ScriptWork_GetMainStrBuf(work);
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
-    int count = func_ov055_021e5d7c(sys);
-    PokeParty *party = func_ov055_021e5d74(sys);
+    int count = WbtSystem_GetEntryCount(sys);
+    PokeParty *party = WbtSystem_GetOpponentParty(sys);
     u8 picked1 = WbtBattle_GetPick(sys, 2);
     u8 picked2 = WbtBattle_GetPick(sys, 3);
     int i;
@@ -213,7 +213,7 @@ BOOL func_ov057_021e79e8(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov057_021e79ec(VM *vm, FieldScriptEnv *env) {
-    WbtBattle_SwapPickedPokemon(func_ov055_021e5800(env));
+    WbtBattle_SwapPickedPokemon(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
@@ -236,10 +236,10 @@ BOOL func_ov057_021e79fc(VM *vm, FieldScriptEnv *env) {
     heapId = FieldScriptEnv_GetHeapID(env);
     work = FieldScriptEnv_GetScriptWork(env);
     field = GSYS_GetField(gsys);
-    sys = func_ov055_021e5800(env);
+    sys = WbtCmd_GetSystem(env);
     mode = ScriptReadAny(vm, env);
-    opponentUnk = func_ov055_021e5e2c(WbtBattle_GetOpponent(sys));
-    playerUnk = func_ov055_021e5e2c(func_ov055_021e5d28(sys));
+    opponentUnk = WbtEntrant_GetTrainerClass(WbtBattle_GetOpponent(sys));
+    playerUnk = WbtEntrant_GetTrainerClass(WbtSystem_GetPlayerEntrant(sys));
     switch (mode) {
     case 0:
         name = ScriptWork_GetAltStrBuf(work);
@@ -292,7 +292,7 @@ BOOL func_ov057_021e7b20(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameData(env);
     FieldScriptEnv_GetHeapID(env);
     field = GSYS_GetField(gsys);
-    func_ov055_021e5800(env);
+    WbtCmd_GetSystem(env);
     value = ScriptReadAny(vm, env);
     WbtStadiumGimmick_ShowPortraits(field, value);
     return FALSE;

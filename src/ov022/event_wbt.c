@@ -130,7 +130,7 @@ static GameEventReturnCode EventWbtList_Callback(GameEvent *event, u32 *state, v
         *state = 1;
         break;
     case 1:
-        func_ov055_021e6870(work->setup);
+        WbtSetup_Free(work->setup);
         GFL_SndPlayerSetVolume(2, 127);
         return GAMEEVENT_DONE;
     }
@@ -189,7 +189,7 @@ static GameEventReturnCode EventWbtWinRecord_Callback(GameEvent *event, u32 *sta
         *state = 1;
         break;
     case 1:
-        func_ov055_021e6ac0(work->param);
+        WbtSetup_FreeWinRecordParam(work->param);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -217,7 +217,7 @@ static GameEventReturnCode EventWbtDownload_Callback(GameEvent *event, u32 *stat
         *state = 1;
         break;
     case 1:
-        func_ov055_021e6afc(work->param);
+        WbtSetup_FreeDownloadParam(work->param);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

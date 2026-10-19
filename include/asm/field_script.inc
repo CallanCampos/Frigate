@@ -4121,7 +4121,7 @@
     .2byte \a0
     .endm
 
-    // func_ov055_021e5960
+    // WbtCmd_MakeMatch
     .macro Plugin6_Cmd1005
     FieldCommand 1005
     .endm
@@ -4175,13 +4175,13 @@
     .2byte \a0
     .endm
 
-    // func_ov055_021e5a30
+    // WbtCmd_SetCategory
     .macro Plugin6_Cmd1015 a0
     FieldCommand 1015
     .2byte \a0
     .endm
 
-    // func_ov055_021e5a4c
+    // WbtCmd_GetCategory
     .macro Plugin6_Cmd1016 a0
     FieldCommand 1016
     .2byte \a0
@@ -4218,7 +4218,7 @@
     .2byte \a2
     .endm
 
-    // func_ov055_021e5ab8
+    // WbtCmd_GetEntryCount
     .macro Plugin6_Cmd1024 a0
     FieldCommand 1024
     .2byte \a0
@@ -4261,7 +4261,7 @@
     .2byte \a0
     .endm
 
-    // func_ov055_021e5adc
+    // WbtCmd_SetTournamentNameWord
     .macro Plugin6_Cmd1044 a0, a1
     FieldCommand 1044
     .byte \a0
@@ -4274,7 +4274,7 @@
     .2byte \a0
     .endm
 
-    // func_ov055_021e5b38
+    // WbtCmd_ShowTrainerList
     .macro Plugin6_Cmd1047 a0
     FieldCommand 1047
     .2byte \a0
@@ -4325,18 +4325,18 @@
 
     // Plugin 7
 
-    // func_ov055_021e5960
+    // WbtCmd_MakeMatch
     .macro Plugin7_Cmd1005
     FieldCommand 1005
     .endm
 
-    // func_ov055_021e5a30
+    // WbtCmd_SetCategory
     .macro Plugin7_Cmd1015 a0
     FieldCommand 1015
     .2byte \a0
     .endm
 
-    // func_ov055_021e5a4c
+    // WbtCmd_GetCategory
     .macro Plugin7_Cmd1016 a0
     FieldCommand 1016
     .2byte \a0
@@ -4353,7 +4353,7 @@
     FieldCommand 1023
     .endm
 
-    // func_ov055_021e5ab8
+    // WbtCmd_GetEntryCount
     .macro Plugin7_Cmd1024 a0
     FieldCommand 1024
     .2byte \a0
@@ -4438,7 +4438,7 @@
     .2byte \a0
     .endm
 
-    // func_ov055_021e5adc
+    // WbtCmd_SetTournamentNameWord
     .macro Plugin7_Cmd1044 a0, a1
     FieldCommand 1044
     .byte \a0
@@ -4451,7 +4451,7 @@
     .byte \a0
     .endm
 
-    // func_ov055_021e5b38
+    // WbtCmd_ShowTrainerList
     .macro Plugin7_Cmd1047 a0
     FieldCommand 1047
     .2byte \a0
