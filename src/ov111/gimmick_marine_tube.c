@@ -191,7 +191,7 @@ static void func_ov111_021eef88(FieldExpObjSystem *expObj, u16 model, int animCo
     matrix->translation.x = pos.x;
     matrix->translation.y = y;
     matrix->translation.z = z;
-    func_ov036_021b8248(expObj, 0, model, 0);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 0);
     FieldExpObj_SetActorHidden(expObj, 0, model, TRUE);
     for (i = 0; i < animCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);
@@ -227,7 +227,7 @@ static void func_ov111_021ef074(MarineTubeWork *work) {
     for (i = 0; i < MODEL_COUNT; i++) {
         animCount = sAnimationCounts[i];
         for (j = 0; j < animCount; j++) {
-            state->frames[i + j] = func_ov036_021b8520(expObj, 0, i, (u16)j);
+            state->frames[i + j] = FieldExpObj_GetAnmFrame(expObj, 0, i, (u16)j);
         }
     }
 }

@@ -49,7 +49,7 @@ void func_020098dc(CGearSettings *settings, u32 place, u32 panel);
 u8 func_020098e8(CGearSettings *settings, u32 place);
 void func_020098f4(CGearSettings *settings, s32 index, u8 color);
 u8 func_02009900(CGearSettings *settings, s32 index);
-void func_02009910(CGearSettings *settings, u8 value);
+void func_02009910(CGearSettings *settings, u32 value);
 u8 func_02009914(CGearSettings *settings);
 CGearSettings *func_02009918(SaveControl *save);
 CGearSettings *func_02009924(GameData *gameData);

@@ -4,6 +4,7 @@
 #include "field/field_effect.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
+#include "field/field_water_current.h"
 #include "gfl/sound.h"
 #include "system/game_event.h"
 
@@ -84,8 +85,6 @@ const WaterCurrentTileAcmd *func_ov036_021c24f0(u32 tileClass) {
 
 u16 func_ov036_021c2630(EventWaterCurrentMove *work);
 GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data);
-GameEvent *EventWaterCurrentMove_Create(GameEvent *parent, GameSystem *gsys, Field *field);
-BOOL IsTileWaterCurrent(u32 tileClass);
 void func_ov036_021c2750(EventWaterCurrentMove *work);
 void func_ov036_021c268c(EventWaterCurrentMove *work);
 void func_ov036_021c26dc(EventWaterCurrentMove *work);

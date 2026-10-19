@@ -2,6 +2,7 @@
 #include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "field/place_name_letter.h"
 #include "field/zone.h"
 #include "gfl/arc.h"

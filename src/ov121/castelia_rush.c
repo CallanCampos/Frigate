@@ -8,6 +8,7 @@
 #include "field/castelia_rush.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"

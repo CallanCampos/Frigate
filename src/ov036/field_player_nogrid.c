@@ -542,7 +542,7 @@ static void func_ov036_0219d514(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
 
 static void func_ov036_0219d54c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
-    u32 acmd;
+    u16 acmd;
 
     if (a5 == TRUE) {
         acmd = ACMD_WALK_2F;
@@ -798,7 +798,7 @@ static void func_ov036_0219da60(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
 
 static void func_ov036_0219da98(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
-    u32 acmd = ACMD_WALK_2F;
+    u16 acmd = ACMD_WALK_2F;
 
     if (a5 != TRUE) {
         acmd = ACMD_WALK_4F;

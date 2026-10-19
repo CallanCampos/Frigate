@@ -727,6 +727,11 @@ Same code, other `sp` offsets or frame size.
   keeps it in `r4`, ahead of `slot`, only with that function taking `u8 netId`; with the old `int netId` the counter
   was the converted copy in `r5`, after `slot`. A `u16` or `u32` parameter matched too, but the function's other
   callers pass their `int` counters as `(u8)i`, which a `u8` parameter explains.
+  A narrowing to the callee's type is hoisted out of the loop, and an explicit cast at the call is not the same:
+  `field_msgbg.c`'s `func_ov036_02187f58` passes its `u32 spacing` to `GFL_FontGetBlockWidth` in a loop and
+  matches only with that function taking `u16 spacing`, which narrows the spacing once before the loop into the
+  slot after the widest option's index. With a `u32` parameter and `(u16)spacing` at the call the two slots
+  were swapped (5 bytes), and every order of the declarations kept them so.
 - In NitroSDK's Thumb files built without `-ipa file`, the frame runs from the top down through the back end's
   temporaries, the function-scope locals in declaration order, the block locals in parse order (nested blocks after
   their parent), the loop-invariant temporaries, and the spilled parameters at the bottom, so a block local sits below
@@ -867,7 +872,7 @@ Same code, other `sp` offsets or frame size.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
-  `func_ov036_021b8520` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
+  `FieldExpObj_GetAnmFrame` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
   cast at the call does not do it. When such a local's slot is off, check the callees' prototypes first.
 - A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
   `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
@@ -1173,6 +1178,13 @@ Same code, other `sp` offsets or frame size.
   and shares the temporary. A read through a `const` pointer is kept apart too, but is loaded again. The
   original's `BtlvMcss_MoveTaskEnd_Circle` and `_Shake` load `work` first while eight siblings of the same C load
   `pos` first; each of these spellings matches them and is only a second path to the field, so they stay rows.
+- A bit tested in an `if`'s condition and set in its body, `if (ready & 1 << i) { mask |= 1 << i; }`, is a common
+  subexpression built ahead of the condition's load (`movs r0, #1` first, the load's address in `r1`). The original
+  loads first (`ldr r0, [sp]; ldrb r1, [r4, r0]; movs r0, #1; lsls r0, r5`) when the two shifts differ in
+  signedness, and still reuses the test's register for the body: `comm_entry_menu.c`'s `CommEntryMenu_UpdateLeader`
+  sets `mask |= 1U << i`. A test of another mask before a call in the same loop keeps its own `1 << i` when it is a
+  `static inline` with a `u32` parameter (`CommEntryMenu_IsChecked`); written in the loop, MWCC keeps one shift across
+  the call for both tests and spills the mask instead.
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
   one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
   of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy

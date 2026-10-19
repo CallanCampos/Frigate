@@ -188,7 +188,7 @@ void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos) {
     FieldPlayerCore_SetWPos(player->core, pos);
 }
 
-u32 FieldPlayer_GetFaceDir(FieldPlayer *player) {
+u16 FieldPlayer_GetFaceDir(FieldPlayer *player) {
     return FieldPlayerCore_GetFaceDir(player->core);
 }
 
@@ -399,7 +399,7 @@ void FieldPlayer_GetGPosInFront(FieldPlayer *player, s16 *x, s16 *y, s16 *z) {
     GetPlayerGPosPlusDir(player, GetActorFaceDir(FieldPlayer_GetActor(player)), x, y, z);
 }
 
-void func_ov036_0219aab0(FieldPlayer *player, u32 dir, VecFx32 *vec) {
+void func_ov036_0219aab0(FieldPlayer *player, u16 dir, VecFx32 *vec) {
     VecFx16 dirVec;
     FieldActor *actor = FieldPlayerCore_GetActor(player->core);
 

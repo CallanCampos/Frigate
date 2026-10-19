@@ -5,6 +5,7 @@
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
+#include "field/field_msgbg.h"
 #include "field/resort.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
@@ -1762,7 +1763,7 @@ static BOOL func_ov137_021f08dc(ResortFieldScene *scene) {
     SRTMatrix *matrix0;
     SRTMatrix *matrix1;
 
-    if (!func_ov036_021b8268(scene->expObj, 0, 0) && FieldExpObjAnm_IsPlaybackFinished(anm) == TRUE) {
+    if (!FieldExpObj_IsActorHidden(scene->expObj, 0, 0) && FieldExpObjAnm_IsPlaybackFinished(anm) == TRUE) {
         FieldExpObj_SetActorHidden(scene->expObj, 0, 0, TRUE);
         FieldExpObj_SetActorHidden(scene->expObj, 0, 1, FALSE);
         for (i = 0; i < 2; i++) {

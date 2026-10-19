@@ -2289,7 +2289,7 @@ BOOL CGearSw_Reload(CGearSw *work) {
     return FALSE;
 }
 
-GameEvent *CGearSw_CheckEvent(CGearSw *work, BOOL enabled) {
+GameEvent *CGearSw_CheckEvent(CGearSw *work, BOOL enabled, FieldSubscreen *subscreen) {
     GameEvent *event = NULL;
     Field *field;
 

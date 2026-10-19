@@ -8,6 +8,7 @@
 #include "field/field_actor.h"
 #include "field/field_comm_actor.h"
 #include "field/field_effect.h"
+#include "field/field_event.h"
 #include "field/field_script_event.h"
 #include "field/pair_sys.h"
 #include "field/trainer_script.h"

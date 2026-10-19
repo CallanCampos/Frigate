@@ -1,0 +1,1457 @@
+// The move codes by which actors look around, wander in a rectangle or by a mask of directions, turn, pace back and
+// forth and walk around a square: the functions that fldmmdl_movedata.c's tables list for each, and the steps they
+// run. The ROM gives this file no name, so fldmmdl_movecode.c is a guess. It follows fldmmdl_acmd.c, and its
+// .rodata, sorted by size on its own, starts at 0x021cb87c (Black 2). The code was first written by mariano54 on
+// their parallel-decomp branch
+
+#include "types.h"
+#include "constants/directions.h"
+#include "field/event_trainer_eye.h"
+#include "field/field_actor.h"
+#include "field/field_actor_internal.h"
+#include "field/fldmmdl_movecode.h"
+#include "gfl/key.h"
+#include "gfl/random.h"
+
+// The facing a walking code keeps for actors that turn and then restore it: the facing before, a row of
+// data_ov036_021cbb44 and whether movement flag 8 was set
+typedef struct {
+    u8 dir;
+    s8 row;
+    u8 hadFlag8;
+} ActorFaceMemory;
+
+// The work of a wandering rail actor: pause is set while it is held, mask picks the directions it may turn to
+typedef struct {
+    u16 pause;
+    s16 timer;
+    u32 mask;
+} RailWanderWork;
+
+// The work of a rail actor that walks along the directions of a mask
+typedef struct {
+    s16 state;
+    s16 timer;
+    s32 mode;
+    s32 acmdBase;
+    u32 mask;
+} RailWalkWork;
+
+// The rectangle of grid positions a move code walks in
+typedef struct {
+    s32 minX;
+    s32 minZ;
+    s32 maxX;
+    s32 maxZ;
+} WalkRect;
+
+// The work of an actor that faces a direction once
+typedef struct {
+    u32 dir;
+    u32 state;
+} RailFaceWork;
+
+// The work of an actor that turns around a rotation of directions: turn is 2 for a clockwise one, state picks the
+// function of the table that runs
+typedef struct {
+    s8 turn;
+    u8 pad1;
+    s8 state;
+    u8 pad3;
+    s32 count;
+} RailTurnWork;
+
+// The work of an actor that paces back and forth: flip is set after it was blocked, wait counts a pause down
+typedef struct {
+    u8 state;
+    u8 flip;
+    u8 wait;
+    u8 pad3;
+    ActorFaceMemory face;
+    u8 pad;
+} RailPaceWork;
+
+// The work of an actor that paces a fixed number of steps
+typedef struct {
+    u8 state;
+    u8 flip;
+    u8 steps;
+    u8 turns;
+    u8 speed;
+    u8 pad5[3];
+    ActorFaceMemory face;
+    u8 pad;
+} RailStepWork;
+
+// The block of the codes that walk back and forth along one axis
+typedef struct {
+    u8 state;
+    s8 dirIdx;
+    u8 limit;
+    u8 axis;
+    u8 dirTable;
+    u8 reverse;
+    u8 wait;
+    u8 unk7;
+    ActorFaceMemory face;
+} ActorPatrolWork;
+
+// The block of the codes that walk around a square
+typedef struct {
+    u8 state;
+    u8 dirIdx;
+    u8 limit;
+    u8 axis;
+    u8 dirTable;
+    u8 wait;
+    u8 unk6[2];
+    ActorFaceMemory face;
+} ActorRoundWork;
+
+typedef struct {
+    u16 first;
+    u16 second;
+} ActorMoveCodePair;
+
+typedef struct {
+    s32 key;
+    const s32 *dirs;
+} ActorDirTableEntry;
+
+static void func_ov036_02191228(FieldActor *actor, u32 mask);
+static u16 func_ov036_02191378(u16 moveCode, u16 faceDir);
+static void func_ov036_02191420(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode);
+static void func_ov036_02191568(FieldActor *actor, WalkRect *rect);
+static BOOL func_ov036_0219165c(FieldActor *actor, u32 dir);
+static void func_ov036_021916b8(FieldActor *actor, u32 dir);
+static void func_ov036_02191734(FieldActor *actor, u32 turn);
+static BOOL func_ov036_02191794(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_021917c8(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_021917f0(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_0219185c(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_02191910(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_02191938(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_02191954(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_0219196c(FieldActor *actor, RailTurnWork *work);
+static BOOL func_ov036_02191a50(FieldActor *actor, RailPaceWork *work);
+static BOOL func_ov036_02191a90(FieldActor *actor, RailPaceWork *work);
+static BOOL func_ov036_02191b98(FieldActor *actor, RailPaceWork *work);
+static void func_ov036_02191bc8(FieldActor *actor, u32 steps, u32 turns, u32 speed);
+static BOOL func_ov036_02191d1c(FieldActor *actor, ActorRoundWork *work);
+static BOOL func_ov036_02191e78(FieldActor *actor, ActorRoundWork *work);
+static void func_ov036_02191ea8(FieldActor *actor, u32 limit, u32 axis, u32 dirTable);
+static void func_ov036_02191f7c(ActorPatrolWork *work);
+static BOOL func_ov036_02191fa0(FieldActor *actor, ActorPatrolWork *work);
+static BOOL func_ov036_02191ff8(FieldActor *actor, ActorPatrolWork *work);
+static BOOL func_ov036_02192058(FieldActor *actor, ActorPatrolWork *work);
+static BOOL func_ov036_021921c0(FieldActor *actor, ActorPatrolWork *work);
+static BOOL func_ov036_021921f0(void);
+static BOOL func_ov036_02192204(FieldActor *actor);
+static BOOL func_ov036_02192254(void);
+static u32 func_ov036_02192268(const s32 *list, u32 end);
+static s32 func_ov036_02192280(const s32 *list, u32 end);
+static s32 func_ov036_02192294(u32 index, u32 end);
+static const s32 *func_ov036_021922b0(u32 index);
+static u32 func_ov036_021922cc(FieldActor *actor);
+static u32 func_ov036_02192390(FieldActor *actor, u32 index, u32 end);
+static BOOL func_ov036_02192478(FieldActor *actor, u8 *wait);
+static BOOL func_ov036_021924c4(FieldActor *actor);
+static BOOL func_ov036_021924e8(FieldActor *actor);
+static void func_ov036_02192504(FieldActor *actor, ActorFaceMemory *face);
+static void func_ov036_02192520(FieldActor *actor, ActorFaceMemory *face);
+static void func_ov036_02192594(FieldActor *actor, ActorFaceMemory *face);
+
+// The tables are declared in this order because MWCC lays out objects of the same size by where each was declared:
+// it is one that gives the ROM's .rodata (found with tools/decomp/rodata_order.py's model), not the original's, which
+// is unknown. data_ov036_021cb8d8, data_ov036_021cbb64 and data_ov036_021cbc70 follow func_ov036_0219196c for the same
+// reason
+static BOOL (*const data_ov036_021cb87c[])(FieldActor *actor, ActorRoundWork *work) = { func_ov036_02191d1c,
+                                                                                        func_ov036_02191e78 };
+
+static const s32 data_ov036_021cb9f0[] = { DIR_LEFT, DIR_UP, DIR_DOWN, DIR_RIGHT };
+
+static const s32 data_ov036_021cb8e4[] = { DIR_UP, DIR_DOWN, DIR_NONE };
+
+static const s32 data_ov036_021cb8b4[] = { DIR_DOWN, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cb884[] = { DIR_UP, DIR_LEFT, DIR_NONE };
+
+static const s32 data_ov036_021cb8cc[] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cb890[] = { DIR_DOWN, DIR_LEFT, DIR_NONE };
+
+static const s32 data_ov036_021cb9c0[] = { DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_DOWN };
+
+static const s32 data_ov036_021cb8a8[] = { DIR_UP, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cb89c[] = { DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cb990[] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT };
+
+static const s32 data_ov036_021cb950[] = { DIR_DOWN, DIR_UP, DIR_LEFT, DIR_RIGHT };
+
+static const s32 data_ov036_021cb8c0[] = { DIR_UP, DIR_DOWN, DIR_NONE };
+
+static const s32 data_ov036_021cb980[] = { DIR_LEFT, DIR_UP, DIR_RIGHT, DIR_DOWN };
+
+static const s32 data_ov036_021cb9b0[] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP };
+
+static const s32 data_ov036_021cbb1c[] = { 0x10, 0x20, 0x30, 0x40, -1 };
+
+static const s32 data_ov036_021cba90[] = { DIR_RIGHT, DIR_UP, DIR_LEFT, DIR_DOWN };
+
+static const s32 data_ov036_021cba80[] = { DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_UP };
+
+static const s32 data_ov036_021cba00[] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT };
+
+static const s32 data_ov036_021cba40[] = { DIR_UP, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cba50[] = { DIR_RIGHT, DIR_LEFT, DIR_UP, DIR_DOWN };
+
+static const s32 data_ov036_021cba70[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE };
+
+static const s32 data_ov036_021cbab0[] = { DIR_LEFT, DIR_DOWN, DIR_UP, DIR_RIGHT };
+
+static const s32 data_ov036_021cba20[] = { DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_UP };
+
+static const s32 data_ov036_021cba10[] = { DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_LEFT };
+
+static const s32 data_ov036_021cb910[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+
+static BOOL (*const data_ov036_021cb8f0[])(FieldActor *actor,
+                                           ActorPatrolWork *work) = { func_ov036_02191fa0, func_ov036_02191ff8,
+                                                                      func_ov036_02192058, func_ov036_021921c0 };
+
+static const s32 data_ov036_021cb9e0[] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
+
+static const s32 data_ov036_021cb9d0[] = { DIR_RIGHT, DIR_LEFT, DIR_DOWN, DIR_UP };
+
+static const s32 data_ov036_021cbb44[][4] = { { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT },
+                                              { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT } };
+
+static const s32 data_ov036_021cb940[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
+
+static const s32 data_ov036_021cb9a0[] = { DIR_LEFT, DIR_RIGHT, DIR_DOWN, DIR_UP };
+
+static BOOL (*const data_ov036_021cb960[])(FieldActor *actor, RailTurnWork *work) = {
+    func_ov036_02191794,
+    func_ov036_021917c8,
+    func_ov036_021917f0,
+    func_ov036_0219185c,
+};
+
+static const s32 data_ov036_021cb970[] = { DIR_DOWN, DIR_LEFT, DIR_UP, DIR_RIGHT };
+
+static const s32 data_ov036_021cbaf4[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cbaa0[] = { DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP };
+
+static const s32 data_ov036_021cba30[] = { DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cba60[] = { DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cbac0[] = { DIR_RIGHT, DIR_DOWN, DIR_UP, DIR_LEFT };
+
+static const s32 data_ov036_021cb920[] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
+
+static const s32 data_ov036_021cbae0[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cb900[] = { DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN };
+
+static BOOL (*const data_ov036_021cb930[])(FieldActor *actor, RailTurnWork *work) = {
+    func_ov036_02191910,
+    func_ov036_02191938,
+    func_ov036_02191954,
+    func_ov036_0219196c,
+};
+
+// The directions that each move code turns between, in turn, after the move code and ended by DIR_NONE. A move code
+// of 0xff ends the table
+static const u16 data_ov036_021cbbec[][6] = {
+    { 4, DIR_UP, DIR_DOWN, DIR_NONE },
+    { 5, DIR_LEFT, DIR_RIGHT, DIR_NONE },
+    { 6, DIR_UP, DIR_LEFT, DIR_NONE },
+    { 7, DIR_UP, DIR_RIGHT, DIR_NONE },
+    { 8, DIR_DOWN, DIR_LEFT, DIR_NONE },
+    { 9, DIR_DOWN, DIR_RIGHT, DIR_NONE },
+    { 10, DIR_UP, DIR_DOWN, DIR_LEFT, DIR_NONE },
+    { 11, DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_NONE },
+    { 12, DIR_UP, DIR_RIGHT, DIR_LEFT, DIR_NONE },
+    { 13, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE },
+    { 0xff },
+};
+
+static const ActorMoveCodePair data_ov036_021cbb08[] = {
+    { 0x25, 0x2b }, { 0x26, 0x2c }, { 0x27, 0x2a }, { 0x28, 0x29 }, { 0xff, 0xff },
+};
+
+static const s32 data_ov036_021cbb30[] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE };
+
+static const s32 data_ov036_021cbad0[] = { DIR_DOWN, DIR_RIGHT, DIR_UP, DIR_LEFT };
+
+static void func_ov036_02191228(FieldActor *actor, u32 mask) {
+    RailWanderWork *work = ClearActorPositionBlock(actor, sizeof(RailWanderWork));
+    work->timer = func_ov036_02192280(data_ov036_021cbb1c, -1);
+    work->mask = mask;
+    func_ov012_021670f4(actor, 0);
+    func_ov012_021674bc(actor);
+}
+
+void func_ov036_0219125c(FieldActor *actor) {
+    func_ov036_02191228(actor, 0);
+}
+
+void func_ov036_02191268(FieldActor *actor) {
+    func_ov036_02191228(actor, 1);
+}
+
+void func_ov036_02191274(FieldActor *actor) {
+    func_ov036_02191228(actor, 2);
+}
+
+void func_ov036_02191280(FieldActor *actor) {
+    func_ov036_02191228(actor, 3);
+}
+
+void func_ov036_0219128c(FieldActor *actor) {
+    func_ov036_02191228(actor, 4);
+}
+
+void func_ov036_02191298(FieldActor *actor) {
+    func_ov036_02191228(actor, 5);
+}
+
+void func_ov036_021912a4(FieldActor *actor) {
+    func_ov036_02191228(actor, 6);
+}
+
+void func_ov036_021912b0(FieldActor *actor) {
+    func_ov036_02191228(actor, 7);
+}
+
+void func_ov036_021912bc(FieldActor *actor) {
+    func_ov036_02191228(actor, 8);
+}
+
+void func_ov036_021912c8(FieldActor *actor) {
+    func_ov036_02191228(actor, 9);
+}
+
+void func_ov036_021912d4(FieldActor *actor) {
+    func_ov036_02191228(actor, 10);
+}
+
+void func_ov036_021912e0(FieldActor *actor) {
+    RailWanderWork *work = GetNPCRailPosPtrAddr(actor);
+    if (GetActorEvType(actor) == 0xb) {
+        if (func_ov012_0215ebd8(actor) == TRUE && func_ov036_02192254() == TRUE) {
+            u16 faceDir = GetActorFaceDir(actor);
+            u16 dir = func_ov036_02191378(GetActorMoveCode(actor), faceDir);
+            if (dir != DIR_NONE) {
+                CheckSetActorFaceDir(actor, dir);
+            }
+        }
+    } else {
+        u32 dir = func_ov036_02192390(actor, work->mask, DIR_NONE);
+        if (dir != DIR_NONE) {
+            CheckSetActorFaceDir(actor, dir);
+        } else if (work->pause == 0) {
+            work->timer--;
+            if (work->timer <= 0) {
+                work->timer = func_ov036_02192280(data_ov036_021cbb1c, -1);
+                dir = func_ov036_02192294(work->mask, DIR_NONE);
+                CheckSetActorFaceDir(actor, dir);
+            }
+        }
+    }
+    SetActorInitialGPosToNowGPos(actor);
+}
+
+static u16 func_ov036_02191378(u16 moveCode, u16 faceDir) {
+    s32 i = 0;
+    do {
+        if (moveCode == data_ov036_021cbbec[i][0]) {
+            const u16 *entry;
+            s32 j = 1;
+
+            entry = data_ov036_021cbbec[i];
+            if (entry[1] != DIR_NONE) {
+                while (TRUE) {
+                    if (faceDir == entry[j]) {
+                        j++;
+                        if (entry[j] == DIR_NONE) {
+                            j = 1;
+                        }
+                        return entry[j];
+                    }
+                    j++;
+                    if (entry[j] == DIR_NONE) {
+                        break;
+                    }
+                }
+            }
+            return DIR_NONE;
+        }
+        i++;
+    } while (data_ov036_021cbbec[i][0] != 0xff);
+    return DIR_NONE;
+}
+
+void func_ov036_021913dc(FieldActor *actor) {
+}
+
+void func_ov036_021913e0(FieldActor *actor) {
+    func_ov036_02191420(actor, 12, 11, 0);
+}
+
+void func_ov036_021913f0(FieldActor *actor) {
+    func_ov036_02191420(actor, 12, 12, 0);
+}
+
+void func_ov036_02191400(FieldActor *actor) {
+    func_ov036_02191420(actor, 12, 13, 0);
+}
+
+void func_ov036_02191410(FieldActor *actor) {
+    func_ov036_02191420(actor, 12, 13, 2);
+}
+
+static void func_ov036_02191420(FieldActor *actor, u32 acmdBase, u32 dirMask, u32 mode) {
+    RailWalkWork *work = ClearActorPositionBlock(actor, sizeof(RailWalkWork));
+    work->mode = mode;
+    work->acmdBase = acmdBase;
+    work->mask = dirMask;
+    func_ov012_021670f4(actor, 0);
+    func_ov012_021674bc(actor);
+}
+
+void func_ov036_02191448(FieldActor *actor) {
+    RailWalkWork *work = GetNPCRailPosPtrAddr(actor);
+    u32 dir;
+    u32 collision;
+    u32 acmd;
+    switch (work->state) {
+    case 0:
+        func_ov012_021674bc(actor);
+        func_ov012_021674e8(actor);
+        dir = GetActorFaceDir(actor);
+        acmd = GetAcmdForDir(dir, 0);
+        func_ov012_02166eb0(actor, acmd);
+        work->state++;
+        break;
+    case 1:
+        if (!func_ov036_0218f01c(actor)) {
+            break;
+        }
+        work->timer = func_ov036_02192280(data_ov036_021cbb1c, -1);
+        work->state++;
+    case 2:
+        work->timer--;
+        if (work->timer != 0) {
+            break;
+        }
+        work->state++;
+    case 3:
+        dir = func_ov036_02192294(work->mask, DIR_NONE);
+        ChangeActorDirection(actor, dir);
+        if (work->mode == 1 && func_ov036_0219165c(actor, dir) == 0) {
+            work->state = 0;
+            return;
+        }
+        collision = ActorRouteCollCheckOneTileInDir(actor, dir);
+        if (collision != 0) {
+            if (work->mode == 2) {
+                if (collision & 1) {
+                    work->state = 0;
+                    return;
+                }
+            } else {
+                work->state = 0;
+                return;
+            }
+        }
+        acmd = GetAcmdForDir(dir, work->acmdBase);
+        func_ov012_02166eb0(actor, acmd);
+        func_ov012_021674b0(actor);
+        work->state++;
+    case 4:
+        if (func_ov036_0218f01c(actor)) {
+            func_ov012_021674bc(actor);
+            work->state = 0;
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+static void func_ov036_02191568(FieldActor *actor, WalkRect *rect) {
+    s32 z;
+    s32 x = GetActorDefaultGPosX(actor);
+    s32 w;
+    s32 h;
+    z = GetActorDefaultGPosZ(actor);
+    w = GetActorWalkAreaW(actor);
+    h = GetActorWalkAreaH(actor);
+    switch (GetActorMoveCode(actor)) {
+    case 6:
+        rect->minX = x - w;
+        rect->maxX = x;
+        rect->minZ = z - h;
+        rect->maxZ = z;
+        break;
+    case 7:
+        rect->minX = x;
+        rect->maxX = x + w;
+        rect->minZ = z - h;
+        rect->maxZ = z;
+        break;
+    case 8:
+        rect->minX = x - w;
+        rect->maxX = x;
+        rect->minZ = z;
+        rect->maxZ = z + h;
+        break;
+    case 9:
+        rect->maxX = x + w;
+        rect->minX = x;
+        rect->minZ = z;
+        rect->maxZ = z + h;
+        break;
+    case 10:
+        rect->minX = x - w;
+        rect->maxX = x;
+        rect->minZ = z - h;
+        rect->maxZ = z + h;
+        break;
+    case 11:
+        rect->maxX = x + w;
+        rect->minX = x;
+        rect->minZ = z - h;
+        rect->maxZ = z + h;
+        break;
+    case 12:
+        rect->minX = x - w;
+        rect->maxX = x + w;
+        rect->minZ = z - h;
+        rect->maxZ = z;
+        break;
+    case 13:
+        rect->minX = x - w;
+        rect->maxX = x + w;
+        rect->minZ = z;
+        rect->maxZ = z + h;
+        break;
+    }
+}
+
+static BOOL func_ov036_0219165c(FieldActor *actor, u32 dir) {
+    WalkRect rect;
+    s32 x;
+    s32 z;
+    func_ov036_02191568(actor, &rect);
+    x = GetGPosX(actor) + GetDirectionVectorCompX(dir);
+    z = GetGPosZ(actor) + GetDirectionVectorCompZ(dir);
+    if (rect.minX > x || rect.maxX < x) {
+        return FALSE;
+    }
+    if (rect.minZ > z || rect.maxZ < z) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+static void func_ov036_021916b8(FieldActor *actor, u32 dir) {
+    RailFaceWork *work = ClearActorPositionBlock(actor, sizeof(RailFaceWork));
+    work->dir = dir;
+    func_ov012_021670f4(actor, 0);
+    func_ov012_021674bc(actor);
+    SetActorInitialGPosToNowGPos(actor);
+}
+
+void func_ov036_021916dc(FieldActor *actor) {
+    RailFaceWork *work = GetNPCRailPosPtrAddr(actor);
+    switch (work->state) {
+    case 0:
+        CheckSetActorFaceDir(actor, work->dir);
+        work->state++;
+        break;
+    case 1:
+        break;
+    }
+}
+
+void func_ov036_02191704(FieldActor *actor) {
+    func_ov036_021916b8(actor, DIR_UP);
+}
+
+void func_ov036_02191710(FieldActor *actor) {
+    func_ov036_021916b8(actor, DIR_DOWN);
+}
+
+void func_ov036_0219171c(FieldActor *actor) {
+    func_ov036_021916b8(actor, DIR_LEFT);
+}
+
+void func_ov036_02191728(FieldActor *actor) {
+    func_ov036_021916b8(actor, DIR_RIGHT);
+}
+
+static void func_ov036_02191734(FieldActor *actor, u32 turn) {
+    RailTurnWork *work = ClearActorPositionBlock(actor, sizeof(RailTurnWork));
+    work->turn = turn;
+    func_ov012_021670f4(actor, 0);
+    func_ov012_021674bc(actor);
+    SetActorInitialGPosToNowGPos(actor);
+}
+
+void func_ov036_02191758(FieldActor *actor) {
+    func_ov036_02191734(actor, 2);
+}
+
+void func_ov036_02191764(FieldActor *actor) {
+    func_ov036_02191734(actor, 3);
+}
+
+void func_ov036_02191770(FieldActor *actor) {
+    RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
+    while (data_ov036_021cb960[work->state](actor, work) == TRUE) {
+    }
+}
+
+static BOOL func_ov036_02191794(FieldActor *actor, RailTurnWork *work) {
+    u32 acmd;
+    u32 dir = func_ov036_02192390(actor, 0x26, DIR_NONE);
+    if (dir == DIR_NONE) {
+        dir = GetActorFaceDir(actor);
+    }
+    acmd = GetAcmdForDir(dir, 0);
+    func_ov012_02166eb0(actor, acmd);
+    work->state = 1;
+    return TRUE;
+}
+
+static BOOL func_ov036_021917c8(FieldActor *actor, RailTurnWork *work) {
+    if (!func_ov036_0218f01c(actor)) {
+        return FALSE;
+    }
+    if (GetActorEvType(actor) != 0xb) {
+        work->count = 0;
+    }
+    work->state = 2;
+    return TRUE;
+}
+
+static BOOL func_ov036_021917f0(FieldActor *actor, RailTurnWork *work) {
+    if (GetActorEvType(actor) == 0xb) {
+        if (work->count != 0) {
+            work->count = 0;
+            return FALSE;
+        }
+        if (!func_ov012_0215ebd8(actor)) {
+            return FALSE;
+        }
+        if (!func_ov036_02192254()) {
+            return FALSE;
+        }
+        work->count++;
+    } else {
+        if (work->count != 0 && func_ov036_02192390(actor, 0x26, DIR_NONE) != DIR_NONE) {
+            work->state = 0;
+            return TRUE;
+        }
+        work->count++;
+        if (work->count < 0x18) {
+            return FALSE;
+        }
+    }
+    work->state = 3;
+    return TRUE;
+}
+
+static BOOL func_ov036_0219185c(FieldActor *actor, RailTurnWork *work) {
+    u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+    u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
+    u32 *dirs = clockwise;
+    u32 face;
+    s32 i;
+    if (work->turn != 2) {
+        dirs = counter;
+    }
+    face = GetActorFaceDir(actor);
+    for (i = 0; dirs[i] != DIR_NONE; i++) {
+        if (face == dirs[i]) {
+            break;
+        }
+    }
+    i++;
+    if (dirs[i] == DIR_NONE) {
+        i = 0;
+    }
+    CheckSetActorFaceDir(actor, dirs[i]);
+    work->state = 0;
+    return TRUE;
+}
+
+void func_ov036_021918e0(FieldActor *actor) {
+    func_ov036_02191734(actor, 3);
+}
+
+void func_ov036_021918ec(FieldActor *actor) {
+    RailTurnWork *work = GetNPCRailPosPtrAddr(actor);
+    while (data_ov036_021cb930[work->state](actor, work) == TRUE) {
+    }
+}
+
+static BOOL func_ov036_02191910(FieldActor *actor, RailTurnWork *work) {
+    u32 dir = GetActorFaceDir(actor);
+    u32 acmd = GetAcmdForDir(dir, 0);
+    func_ov012_02166eb0(actor, acmd);
+    work->state = 1;
+    return TRUE;
+}
+
+static BOOL func_ov036_02191938(FieldActor *actor, RailTurnWork *work) {
+    if (!func_ov036_0218f01c(actor)) {
+        return FALSE;
+    }
+    work->count = 0;
+    work->state = 2;
+    return TRUE;
+}
+
+static BOOL func_ov036_02191954(FieldActor *actor, RailTurnWork *work) {
+    work->count++;
+    if (work->count < 0x18) {
+        return FALSE;
+    }
+    work->state = 3;
+    return TRUE;
+}
+
+static BOOL func_ov036_0219196c(FieldActor *actor, RailTurnWork *work) {
+    u32 clockwise[5] = { DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT, DIR_NONE };
+    u32 counter[5] = { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_NONE };
+    u32 *dirs = clockwise;
+    u32 face;
+    s32 i;
+    if (work->turn != 2) {
+        dirs = counter;
+    }
+    face = GetActorFaceDir(actor);
+    for (i = 0; dirs[i] != DIR_NONE; i++) {
+        if (face == dirs[i]) {
+            break;
+        }
+    }
+    i++;
+    if (dirs[i] == DIR_NONE) {
+        i = 0;
+    }
+    CheckSetActorFaceDir(actor, dirs[i]);
+    if (GetActorFaceDir(actor) == GetDefaultActorDir(actor)) {
+        work->turn = GetInverseDirection(work->turn);
+    }
+    work->state = 0;
+    return TRUE;
+}
+
+static BOOL (*const data_ov036_021cb8d8[])(FieldActor *actor, RailPaceWork *work) = {
+    func_ov036_02191a50,
+    func_ov036_02191a90,
+    func_ov036_02191b98,
+};
+
+static const u32 data_ov036_021cbb64[] = {
+    0x2, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0x2d, 0x2e, 0x12, 0x13, 0xff,
+};
+
+static const ActorDirTableEntry data_ov036_021cbc70[] = {
+    { 0, data_ov036_021cbb30 },  { 1, data_ov036_021cb884 },  { 2, data_ov036_021cb8a8 },  { 3, data_ov036_021cb890 },
+    { 4, data_ov036_021cb8b4 },  { 5, data_ov036_021cba70 },  { 6, data_ov036_021cba30 },  { 7, data_ov036_021cba40 },
+    { 8, data_ov036_021cba60 },  { 9, data_ov036_021cb8e4 },  { 10, data_ov036_021cb8cc }, { 11, data_ov036_021cbae0 },
+    { 12, data_ov036_021cb8c0 }, { 13, data_ov036_021cb89c }, { 14, data_ov036_021cb9c0 }, { 15, data_ov036_021cb9d0 },
+    { 16, data_ov036_021cb9e0 }, { 17, data_ov036_021cbab0 }, { 18, data_ov036_021cb9a0 }, { 19, data_ov036_021cb940 },
+    { 20, data_ov036_021cb950 }, { 21, data_ov036_021cbac0 }, { 22, data_ov036_021cb9f0 }, { 23, data_ov036_021cba00 },
+    { 24, data_ov036_021cba50 }, { 25, data_ov036_021cba80 }, { 26, data_ov036_021cba10 }, { 27, data_ov036_021cb910 },
+    { 28, data_ov036_021cb900 }, { 29, data_ov036_021cb9b0 }, { 30, data_ov036_021cb990 }, { 31, data_ov036_021cbad0 },
+    { 32, data_ov036_021cba20 }, { 33, data_ov036_021cba90 }, { 34, data_ov036_021cb920 }, { 35, data_ov036_021cb970 },
+    { 36, data_ov036_021cb980 }, { 37, data_ov036_021cbaa0 }, { 38, data_ov036_021cbaf4 }, { 0x27, NULL },
+};
+
+void func_ov036_02191a0c(FieldActor *actor) {
+    RailPaceWork *work = ClearActorPositionBlock(actor, sizeof(RailPaceWork));
+    if (func_ov036_021924e8(actor) == TRUE) {
+        func_ov036_02192504(actor, &work->face);
+    }
+}
+
+void func_ov036_02191a2c(FieldActor *actor) {
+    RailPaceWork *work = GetNPCRailPosPtrAddr(actor);
+    while (data_ov036_021cb8d8[work->state](actor, work) == TRUE) {
+    }
+}
+
+static BOOL func_ov036_02191a50(FieldActor *actor, RailPaceWork *work) {
+    u32 dir = GetDefaultActorDir(actor);
+    if (work->flip == 1) {
+        dir = GetInverseDirection((u16)dir);
+    }
+    SetActorMotionDir(actor, dir);
+    if (func_ov036_021924e8(actor) == 0) {
+        CheckSetActorFaceDir(actor, dir);
+    }
+    work->state = 1;
+    return TRUE;
+}
+
+static BOOL func_ov036_02191a90(FieldActor *actor, RailPaceWork *work) {
+    u32 collision;
+    u32 dir;
+    u32 acmdBase;
+    if (func_ov036_02192478(actor, &work->wait) == 0) {
+        return FALSE;
+    }
+    if (work->flip != 0) {
+        s32 defaultX = GetActorDefaultGPosX(actor);
+        s32 defaultZ = GetActorDefaultGPosZ(actor);
+        s32 x = GetGPosX(actor);
+        s32 z = GetGPosZ(actor);
+        if (defaultX == x && defaultZ == z) {
+            dir = GetInverseDirection(GetActorMotionDir(actor));
+            SetActorMotionDir(actor, dir);
+            if (func_ov036_021924e8(actor) == 0) {
+                CheckSetActorFaceDir(actor, dir);
+            }
+            work->flip = 0;
+        }
+    }
+    dir = GetActorMotionDir(actor);
+    collision = ActorRouteCollCheckOneTileInDir(actor, dir);
+    if (collision & 1) {
+        work->flip = 1;
+        dir = GetInverseDirection((u16)dir);
+        collision = ActorRouteCollCheckOneTileInDir(actor, dir);
+    }
+    acmdBase = 12;
+    if (func_ov036_021924c4(actor) != 0) {
+        if (func_ov036_021921f0() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+            acmdBase = 16;
+        }
+    }
+    if (collision != 0) {
+        acmdBase = 32;
+    }
+    u32 acmd = GetAcmdForDir(dir, acmdBase);
+    func_ov012_02166eb0(actor, acmd);
+    if (func_ov036_021924e8(actor) == TRUE) {
+        func_ov036_02192520(actor, &work->face);
+    }
+    func_ov012_021674b0(actor);
+    work->state = 2;
+    return TRUE;
+}
+
+static BOOL func_ov036_02191b98(FieldActor *actor, RailPaceWork *work) {
+    if (func_ov036_0218f01c(actor) == TRUE) {
+        func_ov012_021674bc(actor);
+        if (func_ov036_021924e8(actor) == TRUE) {
+            func_ov036_02192594(actor, &work->face);
+        }
+        work->state = 0;
+    }
+    return FALSE;
+}
+
+static void func_ov036_02191bc8(FieldActor *actor, u32 steps, u32 turns, u32 speed) {
+    RailStepWork *work = ClearActorPositionBlock(actor, sizeof(RailStepWork));
+    work->steps = steps;
+    work->turns = turns;
+    work->speed = speed;
+    if (func_ov036_021924e8(actor) == TRUE) {
+        func_ov036_02192504(actor, &work->face);
+    }
+}
+
+void func_ov036_02191bf8(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 14);
+}
+
+void func_ov036_02191c08(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 15);
+}
+
+void func_ov036_02191c18(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 16);
+}
+
+void func_ov036_02191c28(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 17);
+}
+
+void func_ov036_02191c38(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 18);
+}
+
+void func_ov036_02191c48(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 19);
+}
+
+void func_ov036_02191c58(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 20);
+}
+
+void func_ov036_02191c68(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 21);
+}
+
+void func_ov036_02191c78(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 22);
+}
+
+void func_ov036_02191c88(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 23);
+}
+
+void func_ov036_02191c98(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 24);
+}
+
+void func_ov036_02191ca8(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 25);
+}
+
+void func_ov036_02191cb8(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 26);
+}
+
+void func_ov036_02191cc8(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 1, 27);
+}
+
+void func_ov036_02191cd8(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 28);
+}
+
+void func_ov036_02191ce8(FieldActor *actor) {
+    func_ov036_02191bc8(actor, 2, 0, 29);
+}
+
+void func_ov036_02191cf8(FieldActor *actor) {
+    ActorRoundWork *work = GetNPCRailPosPtrAddr(actor);
+
+    while (data_ov036_021cb87c[work->state](actor, work) == TRUE) {
+    }
+}
+
+static BOOL func_ov036_02191d1c(FieldActor *actor, ActorRoundWork *work) {
+    s32 blocked;
+    const s32 *dirs;
+    s32 dir;
+
+    if (!func_ov036_02192478(actor, &work->wait)) {
+        return FALSE;
+    }
+    if (work->dirIdx == work->limit) {
+        if (work->axis == 0) {
+            if (GetActorDefaultGPosX(actor) == GetGPosX(actor)) {
+                work->dirIdx++;
+            }
+        } else if (GetActorDefaultGPosZ(actor) == GetGPosZ(actor)) {
+            work->dirIdx++;
+        }
+    }
+    if (work->dirIdx == 3) {
+        s16 defaultX = GetActorDefaultGPosX(actor);
+        s16 defaultZ = GetActorDefaultGPosZ(actor);
+        s16 x = GetGPosX(actor);
+        s16 z = GetGPosZ(actor);
+
+        if (defaultX == x && defaultZ == z) {
+            work->dirIdx = 0;
+        }
+    }
+    dirs = func_ov036_021922b0(work->dirTable);
+    dir = dirs[work->dirIdx];
+    SetActorMotionDir(actor, dir);
+    if (func_ov036_021924e8(actor) == FALSE) {
+        CheckSetActorFaceDir(actor, dir);
+    }
+    blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
+    if (blocked & 1) {
+        work->dirIdx++;
+        dir = dirs[work->dirIdx];
+        SetActorMotionDir(actor, dir);
+        if (func_ov036_021924e8(actor) == FALSE) {
+            CheckSetActorFaceDir(actor, dir);
+        }
+        blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
+    }
+    u32 speed = 12;
+
+    if (func_ov036_021924c4(actor)) {
+        if (func_ov036_021921f0() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+            speed = 16;
+        }
+    }
+    if (blocked) {
+        speed = 32;
+    }
+    StartDirAcmd(actor, dir, speed);
+    if (func_ov036_021924e8(actor) == TRUE) {
+        func_ov036_02192520(actor, &work->face);
+    }
+    func_ov012_021674b0(actor);
+    work->state = 1;
+    return TRUE;
+}
+
+static BOOL func_ov036_02191e78(FieldActor *actor, ActorRoundWork *work) {
+    if (func_ov036_0218f01c(actor) == TRUE) {
+        func_ov012_021674bc(actor);
+        if (func_ov036_021924e8(actor) == TRUE) {
+            func_ov036_02192594(actor, &work->face);
+        }
+        work->state = 0;
+    }
+    return FALSE;
+}
+
+static void func_ov036_02191ea8(FieldActor *actor, u32 limit, u32 axis, u32 dirTable) {
+    ActorRoundWork *work = ClearActorPositionBlock(actor, 12);
+
+    work->limit = limit;
+    work->axis = axis;
+    work->dirTable = dirTable;
+    if (func_ov036_021924e8(actor) == TRUE) {
+        func_ov036_02192504(actor, &work->face);
+    }
+}
+
+void func_ov036_02191ed8(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 1, 0x1e);
+}
+
+void func_ov036_02191ee8(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 1, 0x1f);
+}
+
+void func_ov036_02191ef8(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 0, 0x20);
+}
+
+void func_ov036_02191f08(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 0, 0x21);
+}
+
+void func_ov036_02191f18(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 1, 0x22);
+}
+
+void func_ov036_02191f28(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 1, 0x23);
+}
+
+void func_ov036_02191f38(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 0, 0x24);
+}
+
+void func_ov036_02191f48(FieldActor *actor) {
+    func_ov036_02191ea8(actor, 2, 0, 0x25);
+}
+
+void func_ov036_02191f58(FieldActor *actor) {
+    ActorPatrolWork *work = GetNPCRailPosPtrAddr(actor);
+
+    while (data_ov036_021cb8f0[work->state](actor, work) == TRUE) {
+    }
+}
+
+static void func_ov036_02191f7c(ActorPatrolWork *work) {
+    if (work->reverse == TRUE) {
+        work->dirIdx--;
+        if (work->dirIdx < 0) {
+            work->dirIdx = 3;
+        }
+    } else {
+        work->dirIdx++;
+    }
+}
+
+static BOOL func_ov036_02191fa0(FieldActor *actor, ActorPatrolWork *work) {
+    if (GetActorEvType(actor) == 10) {
+        u16 dir = GetActorFaceDir(actor);
+
+        if (func_ov036_021a5e30(actor, dir, GetActorUserParam(actor, 0), NULL) != -1) {
+            func_ov012_02166eb0(actor, GetAcmdForDir(dir, 0x30));
+            func_ov012_021674b0(actor);
+            work->state = 1;
+            return TRUE;
+        }
+    }
+    work->state = 2;
+    return TRUE;
+}
+
+static BOOL func_ov036_02191ff8(FieldActor *actor, ActorPatrolWork *work) {
+    if (func_ov036_0218f01c(actor) == TRUE) {
+        u16 other = 0xff;
+        u16 moveCode = GetActorMoveCode(actor);
+        const ActorMoveCodePair *pair;
+
+        for (pair = data_ov036_021cbb08; pair->first != 0xff; pair++) {
+            if (pair->first == moveCode) {
+                other = pair->second;
+            } else if (pair->second == moveCode) {
+                other = pair->first;
+            }
+            if (other != 0xff) {
+                s32 dirIdx = 4 - (work->dirIdx + 1);
+
+                ChangeActorMoveCodeSeq(actor, other);
+                work->dirIdx = dirIdx;
+                break;
+            }
+        }
+        func_ov012_021674bc(actor);
+        work->state = 2;
+    }
+    return FALSE;
+}
+
+static BOOL func_ov036_02192058(FieldActor *actor, ActorPatrolWork *work) {
+    s32 blocked;
+    const s32 *dirs;
+    s32 dir;
+
+    if (!func_ov036_02192478(actor, &work->wait)) {
+        return FALSE;
+    }
+    if (work->dirIdx == work->limit) {
+        if (work->axis == 0) {
+            if (GetActorDefaultGPosX(actor) == GetGPosX(actor)) {
+                func_ov036_02191f7c(work);
+            }
+        } else if (GetActorDefaultGPosZ(actor) == GetGPosZ(actor)) {
+            func_ov036_02191f7c(work);
+        }
+    }
+    if (work->dirIdx == 3) {
+        s16 defaultX = GetActorDefaultGPosX(actor);
+        s16 defaultZ = GetActorDefaultGPosZ(actor);
+        s16 x = GetGPosX(actor);
+        s16 z = GetGPosZ(actor);
+
+        if (defaultX == x && defaultZ == z) {
+            work->dirIdx = 0;
+        }
+    }
+    dirs = func_ov036_021922b0(work->dirTable);
+    dir = dirs[work->dirIdx];
+    SetActorMotionDir(actor, dir);
+    if (func_ov036_021924e8(actor) == FALSE) {
+        CheckSetActorFaceDir(actor, dir);
+    }
+    blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
+    if (blocked & 1) {
+        func_ov036_02191f7c(work);
+        dir = dirs[work->dirIdx];
+        SetActorMotionDir(actor, dir);
+        if (func_ov036_021924e8(actor) == FALSE) {
+            CheckSetActorFaceDir(actor, dir);
+        }
+        blocked = ActorRouteCollCheckOneTileInDir(actor, dir);
+    }
+    u32 speed = 12;
+
+    if (func_ov036_021924c4(actor)) {
+        if (func_ov036_021921f0() == TRUE && func_ov012_0215ebd8(actor) == TRUE) {
+            speed = 16;
+        }
+    }
+    if (blocked) {
+        speed = 32;
+    }
+    StartDirAcmd(actor, dir, speed);
+    if (func_ov036_021924e8(actor) == TRUE) {
+        func_ov036_02192520(actor, &work->face);
+    }
+    func_ov012_021674b0(actor);
+    work->state = 3;
+    return TRUE;
+}
+
+static BOOL func_ov036_021921c0(FieldActor *actor, ActorPatrolWork *work) {
+    if (func_ov036_0218f01c(actor) == TRUE) {
+        func_ov012_021674bc(actor);
+        if (func_ov036_021924e8(actor) == TRUE) {
+            func_ov036_02192594(actor, &work->face);
+        }
+        work->state = 0;
+    }
+    return FALSE;
+}
+
+static BOOL func_ov036_021921f0(void) {
+    if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_B) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL func_ov036_02192204(FieldActor *actor) {
+    FieldActor *player = FindPlayerFieldActor(GetActorMModelSystem(actor));
+
+    if (player != NULL) {
+        switch (FldAct_GetAcmd(player)) {
+        case 0x58:
+        case 0x59:
+        case 0x5a:
+        case 0x5b:
+        case 0xa3:
+        case 0xa4:
+        case 0xa5:
+        case 0xa6:
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static BOOL func_ov036_02192254(void) {
+    if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static u32 func_ov036_02192268(const s32 *list, u32 end) {
+    u32 count = 0;
+
+    while (end != list[count]) {
+        count++;
+    }
+    return count;
+}
+
+static s32 func_ov036_02192280(const s32 *list, u32 end) {
+    return list[GFL_RandomLC(func_ov036_02192268(list, end))];
+}
+
+static s32 func_ov036_02192294(u32 index, u32 end) {
+    const s32 *list = func_ov036_021922b0(index);
+
+    return list[GFL_RandomLC(func_ov036_02192268(list, end))];
+}
+
+static const s32 *func_ov036_021922b0(u32 index) {
+    const ActorDirTableEntry *entry = data_ov036_021cbc70;
+
+    for (; entry->key != 0x27; entry++) {
+        if (entry->key == index) {
+            return entry->dirs;
+        }
+    }
+    return NULL;
+}
+
+static u32 func_ov036_021922cc(FieldActor *actor) {
+    FieldActor *player;
+    s32 range;
+    s32 playerX;
+    s32 playerZ;
+    s32 x;
+    s32 z;
+    s32 zMax;
+    s32 xMin;
+    s32 zMin;
+    s32 xMax;
+    u16 evType = GetActorEvType(actor);
+    u32 moveCode;
+    u32 entry;
+    u32 i;
+
+    if (evType != 1 && evType != 2) {
+        return DIR_NONE;
+    }
+    if (!func_ov036_02192204(actor)) {
+        return DIR_NONE;
+    }
+    i = 0;
+    moveCode = GetActorMoveCode(actor);
+    do {
+        entry = data_ov036_021cbb64[i];
+        i++;
+    } while (entry != moveCode && entry != 0xff);
+    if (moveCode != entry) {
+        return DIR_NONE;
+    }
+    player = FindPlayerFieldActor(GetActorMModelSystem(actor));
+    if (player == NULL) {
+        return DIR_NONE;
+    }
+    if (FldAct_GetGPosY(player) != FldAct_GetGPosY(actor)) {
+        return DIR_NONE;
+    }
+    playerX = GetGPosX(player);
+    playerZ = GetGPosZ(player);
+    range = GetActorUserParam(actor, 0);
+    x = GetGPosX(actor);
+    z = GetGPosZ(actor);
+    xMin = x - range;
+    xMax = x + range;
+    zMin = z - range;
+    zMax = z + range;
+    if (zMin <= playerZ && zMax >= playerZ && xMin <= playerX && xMax >= playerX) {
+        return GetDirFromPosToPos(x, z, playerX, playerZ);
+    }
+    return DIR_NONE;
+}
+
+static u32 func_ov036_02192390(FieldActor *actor, u32 index, u32 end) {
+    const s32 *dirs = func_ov036_021922b0(index);
+    s32 count = func_ov036_02192268(dirs, end);
+    FieldActor *player;
+    s32 actorX;
+    s32 actorZ;
+    s32 playerX;
+    s32 playerZ;
+    s32 dirX;
+    s32 dirZ;
+    s32 dir;
+    s32 i;
+
+    if (count == 1) {
+        return DIR_NONE;
+    }
+    dir = func_ov036_021922cc(actor);
+    if (dir == DIR_NONE) {
+        return dir;
+    }
+    i = 0;
+    do {
+        if (dir == dirs[i]) {
+            return dir;
+        }
+        i++;
+    } while (i < count);
+    player = FindPlayerFieldActor(GetActorMModelSystem(actor));
+    dirX = DIR_NONE;
+    dirZ = DIR_NONE;
+    actorX = GetGPosX(actor);
+    actorZ = GetGPosZ(actor);
+    playerX = GetGPosX(player);
+    playerZ = GetGPosZ(player);
+    if (actorX > playerX) {
+        dirX = DIR_LEFT;
+    } else if (actorX < playerX) {
+        dirX = DIR_RIGHT;
+    }
+    if (actorZ > playerZ) {
+        dirZ = DIR_UP;
+    } else if (actorZ < playerZ) {
+        dirZ = DIR_DOWN;
+    }
+    i = 0;
+    if (dirX == DIR_NONE) {
+        do {
+            if (dirZ == dirs[i]) {
+                return dirZ;
+            }
+            i++;
+        } while (i < count);
+    } else if (dirZ == DIR_NONE) {
+        do {
+            if (dirX == dirs[i]) {
+                return dirX;
+            }
+            i++;
+        } while (i < count);
+    } else {
+        do {
+            if (dirX == dirs[i]) {
+                return dirX;
+            }
+            if (dirZ == dirs[i]) {
+                return dirZ;
+            }
+            i++;
+        } while (i < count);
+    }
+    return DIR_NONE;
+}
+
+static BOOL func_ov036_02192478(FieldActor *actor, u8 *wait) {
+    if (GetActorEvType(actor) != 12) {
+        return TRUE;
+    }
+    if (*wait == 0) {
+        if (!func_ov012_0215ebd8(actor)) {
+            return FALSE;
+        }
+        if (!func_ov036_02192254()) {
+            return FALSE;
+        }
+        *wait = GetActorUserParam(actor, 1);
+    }
+    if (*wait != 0) {
+        (*wait)--;
+    }
+    return TRUE;
+}
+
+static BOOL func_ov036_021924c4(FieldActor *actor) {
+    u16 evType = GetActorEvType(actor);
+
+    if (evType == 13 || evType == 15 || evType == 16 || evType == 17 || evType == 18 || evType == 19) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL func_ov036_021924e8(FieldActor *actor) {
+    int evType = GetActorEvType(actor);
+
+    if (evType == 7 || evType == 8 || evType == 17 || evType == 18) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static void func_ov036_02192504(FieldActor *actor, ActorFaceMemory *face) {
+    u16 evType = GetActorEvType(actor);
+
+    if (evType == 7 || evType == 17) {
+        face->row = 0;
+    } else {
+        face->row = 1;
+    }
+}
+
+static void func_ov036_02192520(FieldActor *actor, ActorFaceMemory *face) {
+    u16 dir = GetActorFaceDir(actor);
+    s32 i;
+    s32 nextDir;
+
+    i = 0;
+    while (i < 4 && dir != data_ov036_021cbb44[face->row][i]) {
+        i++;
+    }
+    i++;
+    face->dir = dir;
+    i %= 4;
+    nextDir = data_ov036_021cbb44[face->row][i];
+    if (CheckActorFlag(actor, 8)) {
+        face->hadFlag8 = 1;
+    } else {
+        face->hadFlag8 = 0;
+    }
+    CheckSetActorFaceDir(actor, nextDir);
+    SetActorFlag(actor, 8);
+}
+
+static void func_ov036_02192594(FieldActor *actor, ActorFaceMemory *face) {
+    if (face->hadFlag8 == 0) {
+        ClearActorFlag(actor, 8);
+    }
+}

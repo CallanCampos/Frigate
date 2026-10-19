@@ -7,6 +7,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/resort.h"
 #include "gfl/heap.h"

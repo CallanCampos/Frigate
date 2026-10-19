@@ -24,7 +24,7 @@ typedef struct {
     Field *field;
     MsgData *messages;
     void *window;
-    u32 unk10;
+    void *unk10;
     WordSet *wordSet;
     StrBuf *first;
     StrBuf *second;

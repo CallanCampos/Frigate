@@ -7,6 +7,7 @@
 #include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
+#include "field/field_msgbg.h"
 #include "field/field_task.h"
 #include "gfl/arc_util.h"
 #include "gfl/bmp.h"
@@ -229,7 +230,7 @@ void WbtStadiumGimmick_LoadPortraitScene(Field *field, u8 position, u8 side) {
     matrix->translation.x = (side << 21) + (1 << 20);
     matrix->translation.y = 0;
     matrix->translation.z = 1 << 20;
-    func_ov036_021b8248(work->expObj, 2, 0, TRUE);
+    FieldExpObj_SetActorCulling(work->expObj, 2, 0, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 2, 0, FALSE);
     for (i = 0; i < 3; i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 2, 0, i);
@@ -307,8 +308,8 @@ static void WbtStadiumGimmick_LoadMainScene(GimmickWork *work) {
     WbtStadiumGimmick_SetupActor(work->expObj, 4, 1, posA);
     WbtStadiumGimmick_SetupActor(work->expObj, 5, 2, posB);
     WbtStadiumGimmick_SetupActor(work->expObj, 6, 2, posB);
-    func_ov036_021b8248(work->expObj, 0, 5, FALSE);
-    func_ov036_021b8248(work->expObj, 0, 6, FALSE);
+    FieldExpObj_SetActorCulling(work->expObj, 0, 5, FALSE);
+    FieldExpObj_SetActorCulling(work->expObj, 0, 6, FALSE);
     WbtStadiumGimmick_SetupActor(work->expObj, 7, 0, posB);
     WbtStadiumGimmick_SetupActor(work->expObj, 8, 0, posC);
     WbtStadiumGimmick_SetupActor(work->expObj, 9, 0, posB);
@@ -359,7 +360,7 @@ static void WbtStadiumGimmick_SetupActor(FieldExpObjSystem *expObj, u16 actor, s
     matrix->translation.x = pos.x;
     matrix->translation.y = y;
     matrix->translation.z = z;
-    func_ov036_021b8248(expObj, 0, actor, TRUE);
+    FieldExpObj_SetActorCulling(expObj, 0, actor, TRUE);
     FieldExpObj_SetActorHidden(expObj, 0, actor, TRUE);
     for (i = 0; i < anmCount; i++) {
         FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(expObj, 0, actor, i);
@@ -701,7 +702,7 @@ static void WbtStadiumGimmick_LoadSinglePortraitScene(GimmickWork *work, u8 side
     matrix->translation.x = (side << 21) + (1 << 20);
     matrix->translation.y = 0;
     matrix->translation.z = 1 << 20;
-    func_ov036_021b8248(work->expObj, 2, 0, TRUE);
+    FieldExpObj_SetActorCulling(work->expObj, 2, 0, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 2, 0, FALSE);
     anm = FieldExpObj_GetAnmInfo(work->expObj, 2, 0, 0);
     FieldExpObj_SetAnm(work->expObj, 2, 0, 0, TRUE);
@@ -712,7 +713,7 @@ static void WbtStadiumGimmick_LoadSinglePortraitScene(GimmickWork *work, u8 side
     matrix->translation.x = (side << 21) + (1 << 20);
     matrix->translation.y = 0;
     matrix->translation.z = 1 << 20;
-    func_ov036_021b8248(work->expObj, 2, 1, TRUE);
+    FieldExpObj_SetActorCulling(work->expObj, 2, 1, TRUE);
     FieldExpObj_SetActorHidden(work->expObj, 2, 1, TRUE);
     for (i = 0; i < 3; i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 2, 1, i);

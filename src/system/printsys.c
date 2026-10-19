@@ -853,7 +853,7 @@ u32 func_0202284c(const StrBuf *strbuf) {
     return lines;
 }
 
-u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u32 spacing) {
+u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u16 spacing) {
     u32 width = 0;
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
 

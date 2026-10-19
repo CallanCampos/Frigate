@@ -241,7 +241,7 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
         actor = &work->actors0[j];
         FieldExpObj_GetActorMatrixPtr(actor->expObj, 0, actor->actor)->translation = sGatePositions[j];
         FieldExpObj_SetActorHidden(actor->expObj, 0, actor->actor, TRUE);
-        func_ov036_021b8248(actor->expObj, 0, actor->actor, 1);
+        FieldExpObj_SetActorCulling(actor->expObj, 0, actor->actor, 1);
         anm0 = FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 0);
         FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 0, TRUE);
         FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 0, 0);
@@ -261,7 +261,7 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
         } else {
             FieldExpObj_SetActorHidden(actor->expObj, actor->scene, actor->actor, FALSE);
         }
-        func_ov036_021b8248(actor->expObj, 1, actor->actor, 1);
+        FieldExpObj_SetActorCulling(actor->expObj, 1, actor->actor, 1);
     }
     for (i = 0; i < 9; i++) {
         actor = &work->actors2[i];
@@ -274,7 +274,7 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
             func_ov103_021ef1dc(actor, 0, TRUE);
             FieldExpObj_SetActorHidden(actor->expObj, actor->scene, actor->actor, TRUE);
         }
-        func_ov036_021b8248(actor->expObj, actor->scene, actor->actor, 1);
+        FieldExpObj_SetActorCulling(actor->expObj, actor->scene, actor->actor, 1);
         FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 0, 0);
         FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 0), TRUE);
     }
@@ -396,8 +396,8 @@ fx32 func_ov103_021ef200(BadgeGateWork *work) {
     for (i = 0; i < 8; i++) {
         entry = func_ov103_021ef1ac(work, i, 2);
         anm = FieldExpObj_GetAnmInfo(entry->expObj, entry->scene, entry->actor, 0);
-        if (!func_ov036_021b84ec(anm)) {
-            return func_ov036_021b8520(entry->expObj, entry->scene, entry->actor, 0);
+        if (!FieldExpObjAnm_IsPaused(anm)) {
+            return FieldExpObj_GetAnmFrame(entry->expObj, entry->scene, entry->actor, 0);
         }
     }
     return 0;
@@ -570,7 +570,7 @@ void func_ov103_021ef630(BadgeGateActor *actor, FieldExpObjSystem *system) {
     matrix = FieldExpObj_GetActorMatrixPtr(actor->expObj, 3, actor->actor);
     matrix->translation = sGatePositions[8];
     FieldExpObj_SetActorHidden(actor->expObj, 3, actor->actor, TRUE);
-    func_ov036_021b8248(actor->expObj, 3, actor->actor, 1);
+    FieldExpObj_SetActorCulling(actor->expObj, 3, actor->actor, 1);
     anm = FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 0);
     FieldExpObj_SetAnm(actor->expObj, actor->scene, actor->actor, 0, TRUE);
     FieldExpObj_SetAnmFrame(actor->expObj, actor->scene, actor->actor, 0, 0);

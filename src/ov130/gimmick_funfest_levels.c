@@ -188,7 +188,7 @@ static void GimmickFunfestLevels_InitModels(FunfestLevelsWork *work) {
         matrix->translation.x = TRIGGER_X;
         matrix->translation.y = FX32_CONST(32);
         matrix->translation.z = TRIGGER_X;
-        func_ov036_021b8248(work->expObj, 0, model, TRUE);
+        FieldExpObj_SetActorCulling(work->expObj, 0, model, TRUE);
         FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
     }
     for (model = MODEL_EFFECT_0; model <= MODEL_LEAVE_EFFECT; model++) {
@@ -197,7 +197,7 @@ static void GimmickFunfestLevels_InitModels(FunfestLevelsWork *work) {
         matrix->translation.x = FX32_CONST(512);
         matrix->translation.y = 0;
         matrix->translation.z = FX32_CONST(512);
-        func_ov036_021b8248(work->expObj, 0, model, TRUE);
+        FieldExpObj_SetActorCulling(work->expObj, 0, model, TRUE);
         FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
         for (i = 0; i < count; i++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, i);

@@ -135,7 +135,7 @@ static inline void GrimsleyRoom_InitGroupModels(GrimsleyRoomWork *work, u8 index
         matrix->translation.x = positions[index].x;
         matrix->translation.y = positions[index].y;
         matrix->translation.z = positions[index].z;
-        func_ov036_021b8248(work->expObj, 0, model, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, model, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
         for (anim = 0; anim < NELEMS(sGroupModelAnimations); anim++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, anim);
@@ -157,7 +157,7 @@ static void func_ov123_021eed54(GrimsleyRoomWork *work) {
     matrix->translation.x = FX32_CONST(256);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(256);
-    func_ov036_021b8248(work->expObj, 0, MODEL_0, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, MODEL_0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_0, FALSE);
     for (i = 0; i < NELEMS(sModel0Animations); i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, i);
@@ -191,7 +191,7 @@ static void func_ov123_021eee88(GrimsleyRoomWork *work) {
     if (group0Played == TRUE && group1Played == FALSE) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, 0);
         FieldExpObj_SetAnm(work->expObj, 0, MODEL_0, 0, TRUE);
-        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, 0, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, 0, FieldExpObjAnm_GetLastFrame(anm));
     }
 }
 
@@ -230,7 +230,7 @@ static BOOL func_ov123_021eef3c(GroupPlayback *playback) {
     for (model = sGroupFirstModels[playback->group]; model <= lastModel; model++) {
         for (anim = 0; anim <= 1; anim++) {
             anm = FieldExpObj_GetAnmInfo(playback->expObj, 0, model, anim);
-            func_ov036_021b8520(playback->expObj, 0, model, anim);
+            FieldExpObj_GetAnmFrame(playback->expObj, 0, model, anim);
             if (!FieldExpObjAnm_IsPlaybackFinished(anm)) {
                 return FALSE;
             }

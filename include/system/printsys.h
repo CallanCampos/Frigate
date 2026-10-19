@@ -114,7 +114,7 @@ BOOL func_02022458(PrintStream *stream);
 u32 GFL_FontGetLineWidth(const u16 *str, Font *font, u32 spacing, const u16 **end);
 u32 func_0202284c(const StrBuf *strbuf);
 // The width in pixels of a string's widest line
-u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u32 spacing);
+u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u16 spacing);
 // The width of each line, up to maxLines. Returns the count of lines
 u32 func_020228c0(const StrBuf *strbuf, Font *font, u32 spacing, u32 *widths, u32 maxLines);
 // Copies a line of the string, with its commands. Returns whether it has the line

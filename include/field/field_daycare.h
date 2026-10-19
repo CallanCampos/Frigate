@@ -34,5 +34,7 @@ u32 DayCare_CalcWithdrawCost(DayCareSave *dayCare, u32 slot);
 u32 getNameGenderStatus(PartyPkm *pkm);
 void *DayCare_Create(HeapID heapId, Field *field, DayCareSave *save);
 void DayCare_Free(void *dayCare);
+// Counts a step of the Pokémon left there, and returns TRUE when an egg appears
+BOOL DayCare_Update(DayCareSave *dayCare);
 
 #endif // POKEBW2_FIELD_FIELD_DAYCARE_H

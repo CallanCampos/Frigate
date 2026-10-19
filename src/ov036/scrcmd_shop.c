@@ -13,6 +13,7 @@
 #include "field/event_poke_status.h"
 #include "field/field.h"
 #include "field/field_camera.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/game_beacon_set.h"
 #include "field/musical.h"

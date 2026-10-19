@@ -12,6 +12,7 @@
 #include "constants/zones.h"
 #include "demo/shinka_demo.h"
 #include "field/colosseum.h"
+#include "field/comm_entry_menu.h"
 #include "field/comm_player.h"
 #include "field/field_actor.h"
 #include "field/field_controller.h"
@@ -109,8 +110,8 @@ static BOOL UnionOneself_StepJoinRun(UnionSystem *unisys, UnionSelf *situ, Field
 static BOOL UnionOneself_StepColosseumChildRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 static BOOL UnionOneself_StepColosseumParentRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
-static void UnionOneself_AddColosseumMember(UnionSystem *unisys, PlayerInfo *info, const u8 *mac);
-static void UnionOneself_RemoveColosseumMember(UnionSystem *unisys, int netId, const u8 *mac);
+static void UnionOneself_AddColosseumMember(void *work, const PlayerInfo *info, const u8 *mac);
+static void UnionOneself_RemoveColosseumMember(void *work, const PlayerInfo *info, const u8 *mac);
 static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 static BOOL UnionOneself_StepIdleColosseumBegin(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 static BOOL UnionOneself_StepIdleColosseumRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
@@ -222,8 +223,8 @@ GameEvent *UnionOneself_CreateCommandEvent(GameSystem *gsys, Field *field) {
     return event;
 }
 
-BOOL UnionOneself_ReturnFalse(void) {
-    return FALSE;
+GameEvent *UnionOneself_ReturnFalse(GameSystem *gsys, Field *field) {
+    return NULL;
 }
 
 u8 UnionOneself_RunStep(UnionSystem *unisys, Field *field) {
@@ -2017,8 +2018,8 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
     func_02042a6c(func_02040440());
     GFL_ASSERT(clsys != NULL);
     if (UnionOneself_CheckNetErrorEnd(unisys) == TRUE) {
-        if (clsys->unk178 != NULL) {
-            func_ov036_021c3eb4(clsys->unk178);
+        if (clsys->entryMenu != NULL) {
+            CommEntryMenu_Free(clsys->entryMenu);
         }
         UnionMsg_FreeAll(unisys);
         return TRUE;
@@ -2039,18 +2040,21 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
         func_02042e9c(FALSE);
         if (func_02042bc4() == TRUE) {
             info = GetGameDataPlayerInfo(unisys->param->gameData);
-            clsys->unk178 = func_ov036_021c3d9c(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
-                                                UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION, 0, 0, 0);
-            func_ov036_021c3f1c(clsys->unk178, unisys, UnionOneself_AddColosseumMember,
-                                UnionOneself_RemoveColosseumMember);
+            clsys->entryMenu = CommEntryMenu_Create(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
+                                                    UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION,
+                                                    COMM_ENTRY_MENU_LEADER, COMM_ENTRY_MENU_MULTI_BATTLE, NULL);
+            CommEntryMenu_SetCallbacks(clsys->entryMenu, unisys, UnionOneself_AddColosseumMember,
+                                       UnionOneself_RemoveColosseumMember);
         } else if (situ->mycomm.unk46_1 == 0) {
             info = GetGameDataPlayerInfo(unisys->param->gameData);
-            clsys->unk178 = func_ov036_021c3d9c(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
-                                                UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION, 2, 0, 0);
+            clsys->entryMenu = CommEntryMenu_Create(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
+                                                    UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION,
+                                                    COMM_ENTRY_MENU_JOIN, COMM_ENTRY_MENU_MULTI_BATTLE, NULL);
         } else {
             info = GetGameDataPlayerInfo(unisys->param->gameData);
-            clsys->unk178 = func_ov036_021c3d9c(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
-                                                UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION, 3, 0, 0);
+            clsys->entryMenu = CommEntryMenu_Create(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
+                                                    UnionMsg_GetTableByte(situ->mycomm.unk19), HEAPID_UNION,
+                                                    COMM_ENTRY_MENU_ASK_TO_JOIN, COMM_ENTRY_MENU_MULTI_BATTLE, NULL);
         }
         if (situ->mycomm.unk46_1 == 0) {
             UnionComm_SetCommandBase(situ->activity);
@@ -2074,23 +2078,23 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
     case 4:
         break;
     case 3: {
-        u32 result = func_ov036_021c3f98(clsys->unk178);
+        u32 result = CommEntryMenu_Update(clsys->entryMenu);
 
-        if (result != 0) {
-            clsys->unk17C[2] = func_ov036_021c3eb4(clsys->unk178);
-            clsys->unk178 = NULL;
+        if (result != COMM_ENTRY_MENU_RUNNING) {
+            clsys->unk17C[2] = CommEntryMenu_Free(clsys->entryMenu);
+            clsys->entryMenu = NULL;
             switch (result) {
-            case 1:
+            case COMM_ENTRY_MENU_DONE:
                 *seq = 0x64;
                 func_02042e9c(TRUE);
                 break;
-            case 2:
+            case COMM_ENTRY_MENU_CANCELLED:
                 *seq = 0xc8;
                 break;
-            case 3:
+            case COMM_ENTRY_MENU_REFUSED:
                 *seq = 0xc8;
                 break;
-            case 4:
+            case COMM_ENTRY_MENU_ERROR:
                 *seq = 0xc8;
                 break;
             default:
@@ -2125,11 +2129,15 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
     return FALSE;
 }
 
-static void UnionOneself_AddColosseumMember(UnionSystem *unisys, PlayerInfo *info, const u8 *mac) {
+static void UnionOneself_AddColosseumMember(void *work, const PlayerInfo *info, const u8 *mac) {
+    UnionSystem *unisys = work;
+
     UnionGroup_AddMember(&unisys->situ.mycomm, mac, func_02008bf4(info), getTrainerGender(info));
 }
 
-static void UnionOneself_RemoveColosseumMember(UnionSystem *unisys, int netId, const u8 *mac) {
+static void UnionOneself_RemoveColosseumMember(void *work, const PlayerInfo *info, const u8 *mac) {
+    UnionSystem *unisys = work;
+
     UnionGroup_RemoveMember(&unisys->situ.mycomm, mac);
 }
 

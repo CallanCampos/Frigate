@@ -211,7 +211,7 @@ static void GimmickCaitlin_InitModel(FieldExpObjSystem *expObj, u16 model, int a
     matrix->translation.x = FX32_CONST(256);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(256);
-    func_ov036_021b8248(expObj, 0, model, 1);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 1);
     FieldExpObj_SetActorHidden(expObj, 0, model, TRUE);
     for (i = 0; i < animCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);

@@ -1167,7 +1167,7 @@ GameEvent *EventUnionRoomWarp_Create(GameSystem *gsys, Field *field) {
     return event;
 }
 
-GameEvent *EventMapChangeUnionRoomExit_Create(GameSystem *gsys) {
+GameEvent *EventMapChangeUnionRoomExit_Create(GameSystem *gsys, Field *field) {
     ZoneSpawnInfo *next = GameData_GetNextZone(GSYS_GetGameData(gsys));
     GameEvent *event = GameEvent_Create(gsys, NULL, EventMapChangeUnionRoomExit_Callback, sizeof(EventMapChange));
     EventMapChange *wk = GameEvent_GetData(event);

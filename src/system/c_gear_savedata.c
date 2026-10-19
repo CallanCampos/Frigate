@@ -98,7 +98,7 @@ u8 func_02009900(CGearSettings *settings, s32 index) {
     return settings->colors[index];
 }
 
-void func_02009910(CGearSettings *settings, u8 value) {
+void func_02009910(CGearSettings *settings, u32 value) {
     settings->unk06 = value;
 }
 

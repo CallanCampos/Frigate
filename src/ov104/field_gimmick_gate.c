@@ -196,7 +196,8 @@ void func_ov104_021eec80(Field *field) {
     func_02008a84(
         (Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
     scene = GATE_SCENE_1;
-    LoadFieldExpandObjData(expObj, &sSceneSetups[scene], scene);
+    // Loaded as the expansion objects' scene 1, where the board's functions find it
+    LoadFieldExpandObjData(expObj, &sSceneSetups[scene], 1);
     work = func_ov104_021eee34(field);
     func_ov104_021eeee0(work);
     func_ov104_021ef114(work);

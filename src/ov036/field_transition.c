@@ -6,6 +6,7 @@
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_lens_flare.h"
+#include "field/field_msgbg.h"
 #include "field/fld_exp_obj.h"
 #include "field/zone.h"
 #include "gfl/bg_sys.h"
@@ -435,7 +436,7 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
         reg_GX_DISPCAPCNT = 0x80330010;
         OS_WaitVBlankIntr();
         OS_WaitVBlankIntr();
-        config = data_ov036_021d1624;
+        config = gEnterBuildingLCDConfig;
         GFL_BGSysSetLCDConfig(&config);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x4084;
         GX_SetBankForBG(8);

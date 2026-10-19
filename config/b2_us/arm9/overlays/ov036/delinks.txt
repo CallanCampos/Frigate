@@ -351,7 +351,7 @@ src/ov036/field_comm_actor.c:
     .rodata     start:0x021caab4 end:0x021caad8
     .data       start:0x021d4bd0 end:0x021d4be4
 
-src/ov036/ctalkmsgwin.c:
+src/ov036/talkmsgwin.c:
     .text       start:0x0218b1f8 end:0x0218d0f4
     .data       start:0x021d4be4 end:0x021d4c34
 
@@ -365,8 +365,8 @@ src/ov036/field_menu_event.c:
     .text       start:0x0218b12c end:0x0218b1f8
 
 src/ov036/fldmmdl_acmd.c:
-    .text       start:0x0218ed18 end:0x02193680
-    .rodata     start:0x021cacf4 end:0x021ce3a0
+    .text       start:0x0218ed18 end:0x02191228
+    .rodata     start:0x021cacf4 end:0x021cb87c
     .data       start:0x021d4d34 end:0x021d4d50
 
 src/ov036/fldmmdl_blact.c:
@@ -375,18 +375,19 @@ src/ov036/fldmmdl_blact.c:
     .data       start:0x021d4d50 end:0x021d4d60
 
 src/ov036/fldmmdl_g3dobj.c:
+    complete
     .text       start:0x021946b4 end:0x02195378
-    .rodata     start:0x021cf364 end:0x021cf3a8
+    .rodata     start:0x021cf364 end:0x021cf374
     .data       start:0x021d4d60 end:0x021d4d74
 
 src/ov036/fld_act_rail.c:
     .text       start:0x02195378 end:0x02196238
-    .rodata     start:0x021cf3a8 end:0x021cf7c8
+    .rodata     start:0x021cf374 end:0x021cf7c8
     .data       start:0x021d4d74 end:0x021d4de8
 
 src/ov036/field_rail_loader.c:
     .text       start:0x02196238 end:0x02197534
-    .rodata     start:0x021cf7c8 end:0x021cf9dc
+    .rodata     start:0x021cf7c8 end:0x021cf9b8
     .data       start:0x021d4de8 end:0x021d4dfc
 
 src/ov036/field_fog.c:
@@ -404,8 +405,9 @@ src/ov036/field_light.c:
     .data       start:0x021d4e18 end:0x021d4e28
 
 src/ov036/field_subscreen.c:
+    complete
     .text       start:0x02198198 end:0x02198bc0
-    .rodata     start:0x021cf9dc end:0x021cfb44
+    .rodata     start:0x021cf9b8 end:0x021cfb44
     .data       start:0x021d4e28 end:0x021d4e3c
 
 src/ov036/field_3dbg.c:
@@ -473,6 +475,7 @@ src/ov036/field_place_name.c:
     .data       start:0x021d534c end:0x021d5360
 
 src/ov036/field_fmission_info.c:
+    complete
     .text       start:0x021b5b7c end:0x021b64b0
     .rodata     start:0x021d1140 end:0x021d1170
     .data       start:0x021d5360 end:0x021d5378
@@ -497,6 +500,7 @@ src/ov036/field_gimmick.c:
     .rodata     start:0x021d1274 end:0x021d1624
 
 src/ov036/fld_exp_obj.c:
+    complete
     .text       start:0x021b804c end:0x021b86d4
     .rodata     start:0x021d1624 end:0x021d1634
     .data       start:0x021d53d8 end:0x021d53e8
@@ -628,13 +632,15 @@ src/ov036/field_bbd_color.c:
     .data       start:0x021d5620 end:0x021d5634
 
 src/ov036/comm_entry_menu.c:
+    complete
     .text       start:0x021c3d9c end:0x021c5d7c
     .rodata     start:0x021d2560 end:0x021d25ec
     .data       start:0x021d5634 end:0x021d5648
 
 src/ov036/enceff.c:
+    complete
     .text       start:0x021c5d7c end:0x021c649c
-    .rodata     start:0x021d25ec end:0x021d2920
+    .rodata     start:0x021d28e4 end:0x021d2920
     .data       start:0x021d5648 end:0x021d5654
 
 src/ov036/fldeff_btrain.c:
@@ -674,3 +680,25 @@ src/ov036/fldeff_ochiba.c:
     .text       start:0x021c944c end:0x021c97b8
     .rodata     start:0x021d48f4 end:0x021d4920
     .data       start:0x021d5758 end:0x021d5768
+
+src/ov036/enceff_data.c:
+    complete
+    .rodata     start:0x021d25ec end:0x021d28e4
+
+src/ov036/fldmmdl_movecode.c:
+    complete
+    .text       start:0x02191228 end:0x021925a4
+    .rodata     start:0x021cb87c end:0x021cbdb0
+
+src/ov036/fldmmdl_evtype.c:
+    complete
+    .text       start:0x021925a4 end:0x02192a4c
+    .rodata     start:0x021cbdb0 end:0x021cbeec
+
+src/ov036/fldmmdl_movecode_pair.c:
+    complete
+    .text       start:0x02192a4c end:0x02193680
+    .rodata     start:0x021cbeec end:0x021cc004
+
+src/ov036/fldmmdl_movedata.c:
+    .rodata     start:0x021cc004 end:0x021cd0f0

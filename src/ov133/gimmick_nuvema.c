@@ -64,7 +64,7 @@ void func_ov133_021eec80(Field *field) {
 
         FieldExpObj_GetActorMatrixPtr(system, 0, 0)->translation = position;
     }
-    func_ov036_021b8248(system, 0, 0, 1);
+    FieldExpObj_SetActorCulling(system, 0, 0, 1);
     FieldExpObj_SetActorHidden(system, 0, 0, *state ? FALSE : TRUE);
     for (i = 0; i < 2; i++) {
         anm = FieldExpObj_GetAnmInfo(system, 0, 0, i);
@@ -88,7 +88,7 @@ void func_ov133_021eed9c(Field *field) {
     work = Field_GetGimmickWorkBlock(field, 1);
     if (work->playing) {
         FieldExpObj_StepAllAnimations(system);
-        if (!work->night && func_ov036_021b8520(system, 0, 0, 0) == FX32_CONST(60)) {
+        if (!work->night && FieldExpObj_GetAnmFrame(system, 0, 0, 0) == FX32_CONST(60)) {
             GFL_SndSEPlay(SEQ_SE_OPEN_03);
         }
         if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(system, 0, 0, 0))) {

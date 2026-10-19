@@ -318,7 +318,7 @@ static GameEventReturnCode PushEvent(GameEvent *event, u32 *state, void *data) {
     case 1:
         if (IsAllActorAcmdFinished(push->slot->actor) == TRUE) {
             if (push->distance > 0) {
-                u32 acmd = ACMD_WALK_16F;
+                u16 acmd = ACMD_WALK_16F;
 
                 if (push->distance <= 1) {
                     acmd = ACMD_WALK_4F;

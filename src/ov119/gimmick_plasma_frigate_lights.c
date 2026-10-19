@@ -155,7 +155,7 @@ static void func_ov119_021eee18(FieldExpObjSystem *expObj, u16 model, int animCo
     matrix->translation.x = pos.x;
     matrix->translation.y = y;
     matrix->translation.z = z;
-    func_ov036_021b8248(expObj, 0, model, 1);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 1);
     FieldExpObj_SetActorHidden(expObj, 0, model, FALSE);
     for (i = 0; i < animCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);
@@ -198,7 +198,7 @@ static void func_ov119_021eef44(PlasmaFrigateLightsWork *work, u16 index) {
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 0);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 0, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, FieldExpObjAnm_GetLastFrame(anm));
     func_ov119_021eeeec(work->expObj, model, 1);
 }
 
@@ -208,7 +208,7 @@ static void func_ov119_021eef90(PlasmaFrigateLightsWork *work, u16 index) {
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 1);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 1, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, FieldExpObjAnm_GetLastFrame(anm));
     func_ov119_021eeeec(work->expObj, model, 0);
 }
 
@@ -223,7 +223,7 @@ static void func_ov119_021eefec(PlasmaFrigateLightsWork *work, u16 index) {
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 1);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 1, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, FieldExpObjAnm_GetLastFrame(anm));
     func_ov119_021eeeec(work->expObj, model, 0);
 }
 

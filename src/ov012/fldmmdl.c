@@ -878,14 +878,14 @@ MMSys *GetActorMModelSystem(FieldActor *actor) {
     return actor->actorSystem;
 }
 
-ActorPositionRail *ClearActorPositionBlock(FieldActor *actor, u32 size) {
-    ActorPositionRail *block = GetNPCRailPosPtrAddr(actor);
+void *ClearActorPositionBlock(FieldActor *actor, u32 size) {
+    void *block = GetNPCRailPosPtrAddr(actor);
 
     MI_CpuFill8(block, 0, size);
     return block;
 }
 
-ActorPositionRail *GetNPCRailPosPtrAddr(FieldActor *actor) {
+void *GetNPCRailPosPtrAddr(FieldActor *actor) {
     return &actor->defaultRailPos;
 }
 

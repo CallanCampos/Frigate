@@ -6,6 +6,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/game_beacon_set.h"
 #include "field/resort.h"
@@ -1985,12 +1986,13 @@ static void func_ov060_021e8804(ResortShop *shop, Field *field, u16 cameraMode) 
     case 0:
     default: {
         FieldPlayer *player = Field_GetPlayer(field);
+        u32 dir = FieldPlayer_GetFaceDir(player);
         s16 x;
         s16 y;
         s16 z;
         u32 i;
 
-        GetPlayerGPosPlusDir(player, FieldPlayer_GetFaceDir(player), &x, &y, &z);
+        GetPlayerGPosPlusDir(player, dir, &x, &y, &z);
         for (i = 0; i < NELEMS(sAreas); i++) {
             if (sAreas[i].xMin <= x && x < sAreas[i].xMax && sAreas[i].zMin <= z && z < sAreas[i].zMax) {
                 camIndex = sAreas[i].camera;

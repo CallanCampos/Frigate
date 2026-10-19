@@ -3,6 +3,7 @@
 #include "constants/script_text_banks.h"
 #include "field/festival.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/survey.h"
 #include "gfl/bg_sys.h"

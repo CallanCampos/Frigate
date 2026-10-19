@@ -174,7 +174,7 @@ static void func_ov100_021eed80(VirbankWork *work, BOOL hidden) {
         matrix->translation.x = positions[i].x;
         matrix->translation.y = positions[i].y;
         matrix->translation.z = positions[i].z;
-        func_ov036_021b8248(work->expObj, 0, i, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, i, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, i, hidden);
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, i, 0);
         FieldExpObj_SetAnm(work->expObj, 0, i, 0, TRUE);

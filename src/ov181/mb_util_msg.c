@@ -106,12 +106,12 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
 
         GFL_OvlLoad(OVERLAY_ID(36));
         setup.heapId = heapId;
-        setup.unk4 = 0;
+        setup.camera = NULL;
         setup.font = msg->font;
-        setup.unkC = 10;
+        setup.frameChar = 10;
         setup.bg = msgBg;
-        setup.unk14 = 12;
-        setup.unk15 = 14;
+        setup.framePalette = 12;
+        setup.winPalette = 14;
         msg->talkWin = func_ov036_0218b1f8(&setup);
     } else {
         msg->talkWin = NULL;
@@ -259,7 +259,7 @@ void MBUtilMsg_Print(MBUtilMsg *msg, u32 msgId, s32 wait) {
     }
     msg->stream = func_02022268(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5ac(msg->talkWin, msg->window, 0);
+        func_ov036_0218b5ac(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
     } else {
         BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
     }
@@ -295,7 +295,7 @@ void MBUtilMsg_PrintAtOnce(MBUtilMsg *msg, u32 msgId) {
     func_02021c54(msg->queue, BmpWin_GetBitmap(msg->window), 0, 0, msg->strbuf, msg->font);
     msg->queued = TRUE;
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5ac(msg->talkWin, msg->window, 0);
+        func_ov036_0218b5ac(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
         GFL_BGSysLoadScr(msg->msgBg);
     } else {
         BmpWin_DrawFrame(msg->window, TRUE, 1, 13);

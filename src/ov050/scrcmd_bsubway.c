@@ -3,10 +3,12 @@
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "field/bsubway_scr.h"
+#include "field/comm_entry_menu.h"
 #include "field/event_wifi_bsubway.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_gimmick_bsubway.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/player_state.h"
 #include "field/scrcmd_bsubway.h"
@@ -854,13 +856,15 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 403:
         bsw->resultVar = retWk;
-        bsw->unk71C = func_ov036_021c3d9c(GetGameDataPlayerInfo(gameData), field, 2, 2, 4, 0, 2, 0);
+        bsw->entryMenu = CommEntryMenu_Create(GetGameDataPlayerInfo(gameData), field, 2, 2, HEAPID_GAMEEVENT,
+                                              COMM_ENTRY_MENU_LEADER, COMM_ENTRY_MENU_BATTLE_SUBWAY, NULL);
         VM_SetNativeCallback(vm, func_ov050_021e6a20);
         result = TRUE;
         break;
     case 404:
         bsw->resultVar = retWk;
-        bsw->unk71C = func_ov036_021c3d9c(GetGameDataPlayerInfo(gameData), field, 2, 2, 4, 1, 2, 0);
+        bsw->entryMenu = CommEntryMenu_Create(GetGameDataPlayerInfo(gameData), field, 2, 2, HEAPID_GAMEEVENT,
+                                              COMM_ENTRY_MENU_SELECT_LEADER, COMM_ENTRY_MENU_BATTLE_SUBWAY, NULL);
         result = TRUE;
         VM_SetNativeCallback(vm, func_ov050_021e6ab4);
         break;
@@ -977,19 +981,19 @@ static BOOL func_ov050_021e6a20(VM *vm, void *env) {
     BSubwayScrWork *bsw = func_0201794c(gameData);
     u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
-    u32 answer = func_ov036_021c3f98(bsw->unk71C);
+    u32 answer = CommEntryMenu_Update(bsw->entryMenu);
 
-    if (answer != 0) {
-        func_ov036_021c3eb4(bsw->unk71C);
-        bsw->unk71C = NULL;
+    if (answer != COMM_ENTRY_MENU_RUNNING) {
+        CommEntryMenu_Free(bsw->entryMenu);
+        bsw->entryMenu = NULL;
         switch (answer) {
-        case 1:
+        case COMM_ENTRY_MENU_DONE:
             *bsw->resultVar = 0;
             return TRUE;
-        case 2:
+        case COMM_ENTRY_MENU_CANCELLED:
             *bsw->resultVar = 1;
             return TRUE;
-        case 4:
+        case COMM_ENTRY_MENU_ERROR:
         default:
             *bsw->resultVar = 2;
             return TRUE;
@@ -1007,16 +1011,16 @@ static BOOL func_ov050_021e6ab4(VM *vm, void *env) {
     BSubwayScrWork *bsw = func_0201794c(gameData);
     u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
-    u32 answer = func_ov036_021c3f98(bsw->unk71C);
+    u32 answer = CommEntryMenu_Update(bsw->entryMenu);
 
-    if (answer != 0) {
-        func_ov036_021c3eb4(bsw->unk71C);
-        bsw->unk71C = NULL;
+    if (answer != COMM_ENTRY_MENU_RUNNING) {
+        CommEntryMenu_Free(bsw->entryMenu);
+        bsw->entryMenu = NULL;
         switch (answer) {
-        case 1:
+        case COMM_ENTRY_MENU_DONE:
             *bsw->resultVar = 0;
             return TRUE;
-        case 2:
+        case COMM_ENTRY_MENU_CANCELLED:
         default:
             *bsw->resultVar = 1;
             return TRUE;

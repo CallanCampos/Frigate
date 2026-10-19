@@ -84,6 +84,15 @@ struct ZoneBGEntity {
     } pos;
 };
 
+// A trigger's rectangle of the grid
+struct ZoneTriggerGridPosition {
+    u16 x;
+    u16 z;
+    u16 width;
+    u16 height;
+    s16 y;
+};
+
 // Field names from swan.
 struct ZoneTrigger {
     u16 scrId;
@@ -92,13 +101,7 @@ struct ZoneTrigger {
     u16 type;
     u16 isRail;
     union {
-        struct {
-            u16 x;
-            u16 z;
-            u16 width;
-            u16 height;
-            s16 y;
-        } grid;
+        ZoneTriggerGridPosition grid;
         struct {
             u16 componentId;
             u16 posFront;
@@ -153,8 +156,8 @@ extern const u16 GEAR_STATION_PLATFORM_ZONES[9];
 u16 ConvDirToWarpDir(u16 dir);
 u32 ConvDirToRailDir(u32 direction);
 u32 ConvDirToTriggerDir(u32 dir);
-s16 GetDirectionVectorCompX(u32 direction);
-s16 GetDirectionVectorCompZ(u32 direction);
+s16 GetDirectionVectorCompX(u16 direction);
+s16 GetDirectionVectorCompZ(u16 direction);
 void VecGPosToWPos(s32 x, s32 y, s32 z, VecFx32 *position);
 u16 GetInverseDirection(u32 direction);
 u16 GetDirFromPosToPos(s32 x1, s32 z1, s32 x2, s32 z2);
@@ -209,9 +212,9 @@ BOOL GetZoneIsHiddenGroto(u16 zoneId);
 ZoneTrigger *FindCollidingZoneTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
 ZoneTrigger *FindTriggerAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
 ZoneTrigger *FindTriggerAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);
-u32 GetTriggerSCRIDAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
-u32 GetSCRIDOfCollidingTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
-u32 GetTriggerSCRIDAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);
+u16 GetTriggerSCRIDAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
+u16 GetSCRIDOfCollidingTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
+u16 GetTriggerSCRIDAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);
 u32 GetZoneFlashFlags(u16 zoneId);
 BOOL GetZoneIsMusicalTheater(u16 zoneId);
 BOOL GetZoneIsPWTBattleStage(u16 zoneId);

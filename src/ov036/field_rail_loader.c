@@ -171,8 +171,8 @@ RailDataHandle *FieldRailLoader_GetRailData(RailLoader *loader) {
     return &loader->data;
 }
 
-GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, u32 unused1, u32 scriptId, u32 unused3, FieldActor *actor,
-                                        HeapID heapId) {
+GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scriptId, FieldActor *player,
+                                        FieldActor *actor, HeapID heapId) {
     return EventScriptCall_Create(gsys, scriptId, actor, heapId);
 }
 

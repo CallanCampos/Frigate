@@ -3,6 +3,7 @@
 #include "constants/language.h"
 #include "constants/text_banks.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/unity_tower.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -23,17 +24,8 @@
 
 #define UNION_HEAPID 0x41
 
-// A row of a menu: the message, and its value or the menu it opens
-typedef struct UnionMenuRow {
-    u32 msg;
-    union {
-        u32 value;
-        const struct UnionMenuRow *sub;
-    };
-} UnionMenuRow;
-
 typedef struct {
-    const UnionMenuRow *rows;
+    const ListMenuRow *rows;
     u8 count;
 } UnionMenuInfo;
 
@@ -42,20 +34,20 @@ static void UnionMsg_SetLanguageFlag(GameData *gameData, u32 language);
 static void UnionMsg_CreateWordSet(UnionSystem *unisys);
 static void UnionMsg_FreeWordSet(UnionSystem *unisys);
 static void UnionMsg_FreeMsgSystem(UnionSystem *unisys);
-static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const UnionMenuRow *rows, u32 count,
+static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const ListMenuRow *rows, u32 count,
                                 ListMenuRequest *request);
 static void UnionMsg_FreeMenu(UnionSystem *unisys);
 static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field);
 
 // The menus of the battle rules, each row a message and a value or the menu it opens
-static const UnionMenuRow sMenu_029c[3];
-static const UnionMenuRow sMenu_02b4[3];
-static const UnionMenuRow sMenu_02cc[3];
-static const UnionMenuRow sMenu_02e4[3];
-static const UnionMenuRow sMenu_02fc[3];
-static const UnionMenuRow sMenu_0374[5];
-static const UnionMenuRow sMenu_039c[5];
-static const UnionMenuRow sMenu_03f4[6];
+static const ListMenuRow sMenu_029c[3];
+static const ListMenuRow sMenu_02b4[3];
+static const ListMenuRow sMenu_02cc[3];
+static const ListMenuRow sMenu_02e4[3];
+static const ListMenuRow sMenu_02fc[3];
+static const ListMenuRow sMenu_0374[5];
+static const ListMenuRow sMenu_039c[5];
+static const ListMenuRow sMenu_03f4[6];
 
 // The tables are declared in the order that gives the ROM's .rodata: MWCC heapsorts the objects of equal size by where
 // they are declared. The pairs are the messages of a gender, or of a language, by the lookups above
@@ -208,38 +200,38 @@ static const u16 sTable_0424[26] = { 11, 18, 22, 22, 23, 23, 25, 25, 26, 26, 28,
 static const u16 sTable_0458[26] = { 17, 20, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
                                      36, 36, 36, 36, 36, 36, 36, 36, 36, 39, 46, 46, 0 };
 
-static const UnionMenuRow sMenu_029c[3] = {
+static const ListMenuRow sMenu_029c[3] = {
     { UnionMsg_Text_NoRestrictions, { 0x0 } },
     { UnionMsg_Text_FlatBattle, { 0x1 } },
     { UnionMsg_Text_Cancel_6, { .sub = sMenu_03f4 } },
 };
 
-static const UnionMenuRow sMenu_02b4[3] = {
+static const ListMenuRow sMenu_02b4[3] = {
     { UnionMsg_Text_WonderLauncher, { 0x0 } },
     { UnionMsg_Text_WonderLauncherOff, { 0x1 } },
     { UnionMsg_Text_Cancel_6, { .sub = sMenu_03f4 } },
 };
 
-static const UnionMenuRow sMenu_02cc[3] = {
+static const ListMenuRow sMenu_02cc[3] = {
     { UnionMsg_Text_BattlesTwo, { .sub = sMenu_03f4 } },
     { UnionMsg_Text_BattlesFour, { .sub = sMenu_039c } },
     { UnionMsg_Text_Cancel_4, { BMPMENULIST_CANCEL } },
 };
 
-static const UnionMenuRow sMenu_02e4[3] = {
+static const ListMenuRow sMenu_02e4[3] = {
     { UnionMsg_Text_NoRestrictions, { 0x0 } },
     { UnionMsg_Text_FlatBattle, { 0x1 } },
     { UnionMsg_Text_Cancel_6, { .sub = sMenu_039c } },
 };
 
-static const UnionMenuRow sMenu_02fc[3] = {
+static const ListMenuRow sMenu_02fc[3] = {
     { UnionMsg_Text_WonderLauncher, { 0x0 } },
     { UnionMsg_Text_WonderLauncherOff, { 0x1 } },
     { UnionMsg_Text_Cancel_6, { .sub = sMenu_039c } },
 };
 
 // clang-format off
-static const UnionMenuRow sMenu_0374[5] = {
+static const ListMenuRow sMenu_0374[5] = {
     { UnionMsg_Text_SingleBattle, { 0x0 } },
     { UnionMsg_Text_DoubleBattle, { 0x1 } },
     { UnionMsg_Text_TripleBattle, { 0x2 } },
@@ -249,7 +241,7 @@ static const UnionMenuRow sMenu_0374[5] = {
 
 // clang-format on
 
-static const UnionMenuRow sMenu_039c[5] = {
+static const ListMenuRow sMenu_039c[5] = {
     { UnionMsg_Text_DoubleBattle, { .sub = sMenu_02e4 } },
     { UnionMsg_Text_TripleBattle, { .sub = sMenu_02fc } },
     { UnionMsg_Text_Confirm, { 0x64 } },
@@ -257,7 +249,7 @@ static const UnionMenuRow sMenu_039c[5] = {
     { UnionMsg_Text_Cancel_5, { .sub = sMenu_02cc } },
 };
 
-static const UnionMenuRow sMenu_03f4[6] = {
+static const ListMenuRow sMenu_03f4[6] = {
     { UnionMsg_Text_SingleBattle, { .sub = sMenu_0374 } },
     { UnionMsg_Text_DoubleBattle, { .sub = sMenu_029c } },
     { UnionMsg_Text_TripleBattle, { .sub = sMenu_02b4 } },
@@ -277,18 +269,18 @@ static const u8 sRuleResult[5][2][2] = {
     { { 16, 17 }, { 18, 19 } }, { { 20, 21 }, { 22, 23 } },
 };
 
-static const UnionMenuRow sMenuMain[6] = {
+static const ListMenuRow sMenuMain[6] = {
     { UnionMsg_Text_Greet, { 2 } }, { UnionMsg_Text_Battle, { 0x1b } }, { UnionMsg_Text_Trade, { 0x18 } },
     { UnionMsg_Text_Draw, { 3 } },  { UnionMsg_Text_Spin, { 0x19 } },   { UnionMsg_Text_Cancel, { 0 } },
 };
 
 static const u32 sLanguageFlags[8] = { 0, 1, 2, 3, 4, 7, 5, 6 };
 
-static const ListMenuRequest sMenuMainRequest = { 6, 6,    0,    0x0d, 0x1000, 0x2f, 0,    0, 0,
-                                                  1, 0x0c, 0x10, 1,    1,      0x0d, 0x0c, 0 };
+static const ListMenuRequest sMenuMainRequest = { 6, 6, 0, 0x0d, 0,    0, 1, 0xf,  2,    0,
+                                                  0, 0, 1, 0x0c, 0x10, 1, 1, 0x0d, 0x0c, NULL };
 
-static const ListMenuRequest sMenuRulesRequest = { 3, 3,    0,    0x0d, 0x1000, 0x2f, 0,    0, 0,
-                                                   1, 0x0c, 0x10, 1,    1,      0x13, 0x0e, 0 };
+static const ListMenuRequest sMenuRulesRequest = { 3, 3, 0, 0x0d, 0,    0, 1, 0xf,  2,    0,
+                                                   0, 0, 1, 0x0c, 0x10, 1, 1, 0x13, 0x0e, NULL };
 
 static const struct {
     u8 value;
@@ -592,7 +584,7 @@ void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field) {
         unisys->msgbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         unisys->fmtbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         UnionMsg_CreateWordSet(unisys);
-        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, (u32)unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
+        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
     } else {
         func_ov036_02188ae8(unisys->fld_msgwin_stream);
     }
@@ -662,7 +654,7 @@ BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes) {
     return TRUE;
 }
 
-static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const UnionMenuRow *rows, u32 count,
+static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const ListMenuRow *rows, u32 count,
                                 ListMenuRequest *request) {
     void *msgBGSys = Field_GetMsgBGSys(field);
 
@@ -705,14 +697,14 @@ s32 UnionMsg_UpdateMainMenu(UnionSystem *unisys, Field *field) {
 
 // Opens the menu of the battle rules: the kind says which of sMenuInfo's, and which choices the rows show
 void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ruleSel) {
-    UnionMenuRow *rows;
+    ListMenuRow *rows;
     u8 count;
 
     ruleSel[3] = kind;
     ListMenuRequest request = sMenuRulesRequest;
     count = sMenuInfo[kind].count;
     request.count = count;
-    request.unk02 = count;
+    request.maxShown = count;
     request.height = request.count * 2;
     if (kind == 1 || kind == 5) {
         request.width = 30;
@@ -722,18 +714,18 @@ void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ru
     }
 
     if (kind == 1) {
-        rows = GFL_HeapAllocate(UNION_HEAPID, sizeof(UnionMenuRow) * 6, TRUE, "union_msg.c", 0x647);
-        MI_CpuCopy8(sMenu_03f4, rows, sizeof(UnionMenuRow) * 6);
-        rows[0].msg = UnionMsg_Text_BattleFormatSingleBattle + ruleSel[0];
-        rows[1].msg = UnionMsg_Text_BattleRulesNoRestrictions + ruleSel[1];
-        rows[2].msg = UnionMsg_Text_WonderLauncher_2 + ruleSel[2];
+        rows = GFL_HeapAllocate(UNION_HEAPID, sizeof(ListMenuRow) * 6, TRUE, "union_msg.c", 0x647);
+        MI_CpuCopy8(sMenu_03f4, rows, sizeof(ListMenuRow) * 6);
+        rows[0].messageId = UnionMsg_Text_BattleFormatSingleBattle + ruleSel[0];
+        rows[1].messageId = UnionMsg_Text_BattleRulesNoRestrictions + ruleSel[1];
+        rows[2].messageId = UnionMsg_Text_WonderLauncher_2 + ruleSel[2];
         UnionMsg_CreateMenu(unisys, field, rows, count, &request);
         GFL_HeapFree(rows);
     } else if (kind == 5) {
-        rows = GFL_HeapAllocate(UNION_HEAPID, sizeof(UnionMenuRow) * 5, TRUE, "union_msg.c", 0x657);
-        MI_CpuCopy8(sMenu_039c, rows, sizeof(UnionMenuRow) * 5);
-        rows[0].msg = UnionMsg_Text_BattleRulesNoRestrictions + ruleSel[1];
-        rows[1].msg = UnionMsg_Text_WonderLauncher_2 + ruleSel[2];
+        rows = GFL_HeapAllocate(UNION_HEAPID, sizeof(ListMenuRow) * 5, TRUE, "union_msg.c", 0x657);
+        MI_CpuCopy8(sMenu_039c, rows, sizeof(ListMenuRow) * 5);
+        rows[0].messageId = UnionMsg_Text_BattleRulesNoRestrictions + ruleSel[1];
+        rows[1].messageId = UnionMsg_Text_WonderLauncher_2 + ruleSel[2];
         UnionMsg_CreateMenu(unisys, field, rows, count, &request);
         GFL_HeapFree(rows);
     } else {
@@ -796,7 +788,7 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
     }
 
     for (i = 0; UnionMsg_IsMenuKind(i); i++) {
-        if (UnionMsg_GetMenuInfo(i)->rows == (const UnionMenuRow *)ret) {
+        if (UnionMsg_GetMenuInfo(i)->rows == (const ListMenuRow *)ret) {
             *picked = TRUE;
             return i;
         }
@@ -840,7 +832,7 @@ void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field) {
     if (unisys->fldmsgwin == NULL) {
         void *msgBGSys = Field_GetMsgBGSys(field);
 
-        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, (u32)unisys->msgdata, 0, 1, 1, 0x1e, 2);
+        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1e, 2);
         func_ov036_02188b18(unisys->fldmsgwin, 0, 0, UnionMsg_Text_BattleFormatMultiBattle);
     }
 }
@@ -866,7 +858,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     if (battleType != 1) {
         isMulti = FALSE;
     }
-    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, (u32)unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
+    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
     unisys->alloc.rpm = PokeRegulation_CreatePrintMsg(unisys->alloc.regulation, unisys->wordset, UNION_HEAPID, isMulti);
     UnionMsg_SetupWordSet(unisys);
 
@@ -881,7 +873,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
 
     for (i = 0; i < 6; i++) {
         RegulationRulesText *rpm;
-        u32 color;
+        u16 color;
 
         if (okMask & (1 << i)) {
             color = PRINT_COLOR(4, 2, 0);

@@ -9,6 +9,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "field/fld_btl_inst_event.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"

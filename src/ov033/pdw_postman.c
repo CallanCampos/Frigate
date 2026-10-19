@@ -5,6 +5,7 @@
 #include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/mystery_gift_pokemon.h"
 #include "field/pdw_postman.h"

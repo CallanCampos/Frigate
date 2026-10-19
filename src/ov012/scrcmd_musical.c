@@ -3,6 +3,7 @@
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
+#include "field/comm_entry_menu.h"
 #include "field/event_poke_status.h"
 #include "field/field.h"
 #include "field/field_script.h"
@@ -567,12 +568,14 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         return TRUE;
     case 12:
         commWork->result = result;
-        commWork->menu = func_ov036_021c3d9c(GetGameDataPlayerInfo(gameData), field, 2, 4, HEAPID_GAMEEVENT, 0, 1, 0);
+        commWork->menu = CommEntryMenu_Create(GetGameDataPlayerInfo(gameData), field, 2, 4, HEAPID_GAMEEVENT,
+                                              COMM_ENTRY_MENU_LEADER, COMM_ENTRY_MENU_MUSICAL, NULL);
         VM_SetNativeCallback(vm, func_ov012_02158de8);
         return TRUE;
     case 13:
         commWork->result = result;
-        commWork->menu = func_ov036_021c3d9c(GetGameDataPlayerInfo(gameData), field, 2, 4, HEAPID_GAMEEVENT, 1, 1, 0);
+        commWork->menu = CommEntryMenu_Create(GetGameDataPlayerInfo(gameData), field, 2, 4, HEAPID_GAMEEVENT,
+                                              COMM_ENTRY_MENU_SELECT_LEADER, COMM_ENTRY_MENU_MUSICAL, NULL);
         VM_SetNativeCallback(vm, func_ov012_02158e44);
         return TRUE;
     case 14:
@@ -807,25 +810,25 @@ BOOL func_ov012_02158de8(VM *vm, void *arg) {
 
     FieldScriptEnv_GetScriptWork(env);
     commWork = func_020179dc(FieldScriptEnv_GetGameData(env));
-    choice = func_ov036_021c3f98(commWork->menu);
+    choice = CommEntryMenu_Update(commWork->menu);
     done = FALSE;
     switch (choice) {
-    case 1:
+    case COMM_ENTRY_MENU_DONE:
         *commWork->result = 0;
         func_ov211_021ef3a0(commWork->comm);
         done = TRUE;
         break;
-    case 2:
+    case COMM_ENTRY_MENU_CANCELLED:
         *commWork->result = 1;
         done = TRUE;
         break;
-    case 4:
+    case COMM_ENTRY_MENU_ERROR:
         *commWork->result = 2;
         done = TRUE;
         break;
     }
     if (done == TRUE) {
-        func_ov036_021c3eb4(commWork->menu);
+        CommEntryMenu_Free(commWork->menu);
         commWork->menu = NULL;
     }
     return done;
@@ -839,23 +842,23 @@ BOOL func_ov012_02158e44(VM *vm, void *arg) {
     FieldScriptEnv_GetScriptWork(env);
     commWork = func_020179dc(FieldScriptEnv_GetGameData(env));
     done = FALSE;
-    switch (func_ov036_021c3f98(commWork->menu)) {
-    case 1:
+    switch (CommEntryMenu_Update(commWork->menu)) {
+    case COMM_ENTRY_MENU_DONE:
         *commWork->result = 3;
         func_ov211_021ef3a0(commWork->comm);
         done = TRUE;
         break;
-    case 2:
+    case COMM_ENTRY_MENU_CANCELLED:
         *commWork->result = 4;
         done = TRUE;
         break;
-    case 4:
+    case COMM_ENTRY_MENU_ERROR:
         *commWork->result = 2;
         done = TRUE;
         break;
     }
     if (done == TRUE) {
-        func_ov036_021c3eb4(commWork->menu);
+        CommEntryMenu_Free(commWork->menu);
         commWork->menu = NULL;
     }
     return done;
