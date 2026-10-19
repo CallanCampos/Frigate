@@ -24,8 +24,8 @@ frame by frame against melonDS; its sound too: the sound driver run by run, the 
 the music by its envelope and levels. New Game's intro runs to the field's first script, and CONTINUE loads a save,
 which stays interchangeable with melonDS's, up to the field. The field engine (overlay 36) is still being decompiled
 upstream; code that isn't C yet stops the game with its name. Meanwhile a test launcher opens the field menu's apps in
-the field's place, where the bag and the trainer card match melonDS pass for pass in both versions, and the party list
-and the Pokédex in Black 2 so far. The log, newest entry first, is [port/docs/STATUS.md](../port/docs/STATUS.md).
+the field's place, where the bag, the trainer card, the party list and the Pokédex match melonDS pass for pass in both
+versions. The log, newest entry first, is [port/docs/STATUS.md](../port/docs/STATUS.md).
 
 The decomp's progress, from upstream's CI:
 

@@ -18,8 +18,8 @@ doesn't have, and runs it as a program, with no emulator. The ROM is only where 
 for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run, the title's stream and the
 cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and CONTINUE
 loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there). Meanwhile
-Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag and the trainer card
-match melonDS pass for pass in both versions, and the party list and the Pokédex in Black 2 so far.
+Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag, the trainer card, the
+party list and the Pokédex match melonDS pass for pass in both versions.
 [docs/STATUS.md](docs/STATUS.md) has the current state.
 
 ## Quick start

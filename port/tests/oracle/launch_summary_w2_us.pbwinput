@@ -1,0 +1,21 @@
+pbwinput 1
+# A smoke test of Frigate's test launcher on the port alone (ctest launch_summary_standalone): the continue sequence's
+# presses take the starter save's CONTINUE to where the game asks for the field, the launcher opens Tepig's summary
+# as the game does without the party list (--launch summary, the standalone path of event_field_proclink.c's
+# func_ov012_0215bb70), and B closes it. On game frames. White 2: Black 2's presses, from White 2's own starter save.
+version w2_us
+# START in the opening skips it to the title (count 1115 on both)
+1100 START
+1101 -
+# START brings back the layers the title hid at count 2877
+3000 START
+3001 -
+# START leaves for the start menu, which shows from count 3249
+3100 START
+3101 -
+# CONTINUE
+3400 A
+3401 -
+# B closes the summary, which the launcher opened at once
+3700 B
+3706 -

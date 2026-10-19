@@ -254,8 +254,10 @@ SAVES = {
                                     "w2_us": "479529f98b29cdd852502360aeb33531ca111d7f"}),
     # first_save's CONTINUE, then the story from the player's room to the Aspertia City lookout: Mom's and Hugh's
     # scenes, Bianca's two talks, the middle ball (Tepig, level 5), NO to the nickname, the Pokédex, and the field
-    # menu's SAVE. Event flags 0x961 (a Pokémon) and 0x962 (the Pokédex) are set, so the field menu has every item
-    "starter_save": SaveMaker(17000, {"b2_us": "ce71fe0b8c1d93436d62678400d1e0722632b67e"}, start="first_save"),
+    # menu's SAVE. Event flags 0x961 (a Pokémon) and 0x962 (the Pokédex) are set, so the field menu has every item.
+    # White 2's walk to the stairs takes another street: a townsperson wanders into Black 2's there (README.md, Saves)
+    "starter_save": SaveMaker(17000, {"b2_us": "ce71fe0b8c1d93436d62678400d1e0722632b67e",
+                                      "w2_us": "3b9dac231d1f73a3599a60131311c9b375eb7342"}, start="first_save"),
     # starter_save's CONTINUE, Hugh's trainer battle (Tepig grows to level 6), the Pokémon Center's scene, Mom's, the
     # gate's gift and Bianca's catching lesson, then SAVE beside Route 19's grass: for battles, which no test runs yet
     "route19_save": SaveMaker(28600, {"b2_us": "826bc561a328d1943d6435b9bdae7f0abc6fd3e8"}, start="starter_save"),
@@ -1245,7 +1247,8 @@ class Launch:
 # The known differences of the launch routes
 SUMMARY_SCROLL = ("the summary scrolls its background a pixel every 4 VBlanks since it started (PStatus_Main, "
                   "src/ov207/p_sta_sys.c:263-271), and the DS spends some 37 VBlanks more than passes loading it "
-                  "(counts 4526-4531, 4530 alone 30 frames): its background is about 9 pixels further on throughout")
+                  "(38 in White 2; counts 4526-4531, 4530 alone 30 frames): its background is about 9 pixels further "
+                  "on throughout")
 LAUNCHES = {
     # From the first save (no Pokémon, no Pokédex): X opens the field menu, A on BAG opens the bag, its items pocket
     # empty, B closes it; RIGHT and A open the trainer card, B closes it; B closes the menu. The bag's first frame shows
@@ -1256,11 +1259,13 @@ LAUNCHES = {
     # From the starter save (Tepig, the Pokédex): the party list, Tepig's menu, its summary and back, the Pokédex and
     # Tepig's entry, the trainer card with its Pokédex line, and the bag. The party list's first frame shows at count
     # 4046 on the oracle (two passes after its opening on the port), the Pokédex's at 5477 (four), the card's at 6978
-    # (four), the bag's at 7675 (two)
-    "party_menus": Launch("starter_save", 11100, 8400, {"b2_us": "party@4044,pokedex@5473,card@6974,bag@7673"},
-                          (0, 0, 0, 0), spans={"b2_us": "4046-5123,5477-6624,6978-7330,7675-8023"},
-                          known={"b2_us": {"summary": SUMMARY_SCROLL}},
-                          known_spans={"b2_us": {"4533-4821": SUMMARY_SCROLL}}),
+    # (four), the bag's at 7675 (two), in both versions, each from its own starter save
+    "party_menus": Launch("starter_save", 11100, 8400, {"b2_us": "party@4044,pokedex@5473,card@6974,bag@7673",
+                                                         "w2_us": "party@4044,pokedex@5473,card@6974,bag@7673"},
+                          (0, 0, 0, 0), spans={"b2_us": "4046-5123,5477-6624,6978-7330,7675-8023",
+                                               "w2_us": "4046-5123,5477-6624,6978-7330,7675-8023"},
+                          known={"b2_us": {"summary": SUMMARY_SCROLL}, "w2_us": {"summary": SUMMARY_SCROLL}},
+                          known_spans={"b2_us": {"4533-4821": SUMMARY_SCROLL}, "w2_us": {"4533-4821": SUMMARY_SCROLL}}),
 }
 
 

@@ -159,37 +159,42 @@ foreach(route IN ITEMS field_menus party_menus)
         FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 3600)
 endforeach()
 
-# The launcher on the port alone, from the starter save the oracle made: --launch summary opens Tepig's summary as the
-# game does without the party list, and B closes it, without a trap and without writing the save. Black 2 only, since
-# White 2 has no starter save yet; skipped (77) without the save (no oracle) or the ROM
+# The save file's name in a launcher test's save directory, the game code's (port/hal/card/port_card.h)
 if(PORT_VERSION STREQUAL "b2_us")
-    add_test(NAME launch_summary_standalone
-        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
-            "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
-                --save "${port_oracle_saves}/starter_save_b2_us.sav" --save-name IREO.sav
-                --expect "--launch: summary: opened at count [0-9]+, closed at count [0-9]+: result 0, event type 0"
-                -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4200 --watchdog 30
-                --input "${port_oracle_tests}/launch_summary_b2_us.pbwinput" --launch summary
-        WORKING_DIRECTORY "${REPO_ROOT}")
-    set_tests_properties(launch_summary_standalone PROPERTIES
-        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
-
-    # Each app opens as the field menu's choice by a key leaves it, whatever the app before it did: here the trainer
-    # card closed by a touch, which sets the UI's touch flag, then the party list, which must show the oracle's party
-    # list of the party_menus route at count 4250 (opened by a key there), not the one a touch leaves (its bottom
-    # screen differs). Black 2 only, from the starter save
-    add_test(NAME launch_touch_then_party
-        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
-            "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
-                --save "${port_oracle_saves}/starter_save_b2_us.sav" --save-name IREO.sav
-                --expect "--launch: party: opened at count 4044, closed at count [0-9]+: result 0, event type 0"
-                --table "${port_oracle_tests}/launch_party_menus_b2_us.screens.tsv" --show party
-                -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4500 --watchdog 30
-                --input "${port_oracle_tests}/launch_touch_card_b2_us.pbwinput" --launch card,party@4044
-        WORKING_DIRECTORY "${REPO_ROOT}")
-    set_tests_properties(launch_touch_then_party PROPERTIES
-        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+    set(port_launch_save_name IREO.sav)
+else()
+    set(port_launch_save_name IRDO.sav)
 endif()
+
+# The launcher on the port alone, from the starter save the oracle made, in both versions: --launch summary opens
+# Tepig's summary as the game does without the party list, and B closes it, without a trap and without writing the
+# save; skipped (77) without the save (no oracle) or the ROM
+add_test(NAME launch_summary_standalone
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+            --save "${port_oracle_saves}/starter_save_${PORT_VERSION}.sav" --save-name ${port_launch_save_name}
+            --expect "--launch: summary: opened at count [0-9]+, closed at count [0-9]+: result 0, event type 0"
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4200 --watchdog 30
+            --input "${port_oracle_tests}/launch_summary_${PORT_VERSION}.pbwinput" --launch summary
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(launch_summary_standalone PROPERTIES
+    FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+
+# Each app opens as the field menu's choice by a key leaves it, whatever the app before it did: here the trainer card
+# closed by a touch, which sets the UI's touch flag, then the party list, which must show the oracle's party list of
+# the party_menus route at count 4250 (opened by a key there), not the one a touch leaves (its bottom screen differs).
+# From the starter save, in both versions, each against its own route's table
+add_test(NAME launch_touch_then_party
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+            --save "${port_oracle_saves}/starter_save_${PORT_VERSION}.sav" --save-name ${port_launch_save_name}
+            --expect "--launch: party: opened at count 4044, closed at count [0-9]+: result 0, event type 0"
+            --table "${port_oracle_tests}/launch_party_menus_${PORT_VERSION}.screens.tsv" --show party
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4500 --watchdog 30
+            --input "${port_oracle_tests}/launch_touch_card_${PORT_VERSION}.pbwinput" --launch card,party@4044
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(launch_touch_then_party PROPERTIES
+    FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
 
 # The launcher's other exit statuses (port/app/launcher.h), from the first save the oracle made, in both versions:
 # - launch_unfinished: field_menus' presses with --frames short of the card's count, so the bag opens and closes but
@@ -197,11 +202,6 @@ endif()
 # - launch_not_offered: the party list from a save without a Pokémon, whose field menu (type 3, event flag 0x961
 #   clear) has no POKéMON item, as the oracle's menu on that save shows: status 2 before anything opens.
 # Skipped (77) without the save (no oracle) or the ROM
-if(PORT_VERSION STREQUAL "b2_us")
-    set(port_launch_save_name IREO.sav)
-else()
-    set(port_launch_save_name IRDO.sav)
-endif()
 add_test(NAME launch_unfinished
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
         "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
