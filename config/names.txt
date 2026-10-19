@@ -5183,7 +5183,13 @@ itcm 0x01ff8900 sharedParamsVisibleAnimRenderer
 itcm 0x01ff8bf0 MIi_DmaSetParameters
 itcm 0x01ff8c88 OS_IrqHandler
 itcm 0x01ff8ce0 OS_IrqHandler_ThreadSwitch
+itcm 0x01ff8e40 OSi_VerifyHmac
+itcm 0x01ff8f04 OSi_VerifyRomBlocks
 itcm 0x01ff8fac OSi_DoResetSystem
+itcm 0x01ff8ff8 OSi_StartProgram
+itcm 0x01ff90c4 OSi_Clear32
+itcm 0x01ff90d8 OSi_LoadProgram
+itcm 0x01ff9298 OSi_ReadRom
 itcm 0x01ff936c SCFGi_SwitchCpuSpeed
 ltd_autoload_0 0x02700000 RTCi_ProcessExCommand
 ltd_autoload_0 0x027000f8 CAMERA_SetVsyncCallbackCore

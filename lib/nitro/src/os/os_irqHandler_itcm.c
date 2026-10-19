@@ -125,4 +125,5 @@ asm void OS_IrqHandler_ThreadSwitch(void) {
     stmda sp!, {r0, r1, r2, r3, ip, lr}
     ldmia sp!, {pc}
 }
+
 // clang-format on
