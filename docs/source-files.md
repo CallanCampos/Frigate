@@ -1595,7 +1595,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `btlv_effvm.c` | `0x021e0de4`–`0x021e67b8` | 138 | complete | string at `0x021f4174` |
 | `btlv_mcss.c` | `0x021e67b8`–`0x021e982c` | 95 | complete | string at `0x021f4188` |
 | `btlv_clact.c` | `0x021e982c`–`0x021ea2a8` | 23 | complete | string at `0x021f4194` |
-| `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | partial | string at `0x021f41c8` |
+| `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | complete | string at `0x021f41c8` |
 | `btlv_gauge.c` | `0x021ef794`–`0x021f1c84` | 58 | complete | string at `0x021f41d8` |
 | `btlv_b_gauge.c` | `0x021f1c84`–`0x021f2174` | 7 | complete | string at `0x021f41e8` |
 | `btlv_timer.c` | `0x021f2174`–`0x021f26b8` | 8 | complete | string at `0x021f41f8` |
