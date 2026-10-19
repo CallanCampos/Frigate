@@ -1260,7 +1260,10 @@ Same instructions, scheduled in another order.
   last, as in the original. `VCT_InitSessions` (`vct_session.c`) keeps its zero store into `sSessionState.mask`
   (offset 4) below the store through the free list's last link only with the state an 8-byte struct of `count` and
   `mask` and the request time a `u64` static beside it, which `-ipa file` pools right after the state; with the time
-  as the state's third field, the store moves above the link's.
+  as the state's third field, the store moves above the link's. The split moves a stack reload too, around stores at
+  constant offsets: TwlSDK's `SNDEX_SetIirFilter` (`sndex.c`) clears two flags and then reloads `result`, a local
+  whose address it passed to `OS_ReceiveMessage`. With the two flags as fields at 0x18 and 4 of a 0x5c-byte struct,
+  the reload goes between the two stores, and with them separate statics it stays after both, as in the original.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
