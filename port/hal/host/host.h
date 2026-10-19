@@ -128,7 +128,9 @@ void port_host_watchdog_kick(void);
 // --- Time -----------------------------------------------------------------------------------------------------------
 
 // The host's monotonic clock in nanoseconds, from an arbitrary start: how long the program's own work takes, for
-// --frame-times (port/hal/os/frame_time.h). Nothing of the game reads it, so a run stays the same
+// --frame-times (port/hal/os/frame_time.h), and how long the renderer's workers spin before they sleep
+// (port/gfx/workers.c). Any thread may read it, the first time included. Nothing of the game reads it, so a run stays
+// the same
 uint64_t port_host_now_ns(void);
 
 // --- Threads --------------------------------------------------------------------------------------------------------

@@ -694,17 +694,28 @@ void port_host_watchdog_kick(void) {
 
 // --- Time -----------------------------------------------------------------------------------------------------------
 
-// The performance counter, in nanoseconds: its frequency (10 MHz on current Windows) is read once
+// The performance counter's ticks a second (10 MHz on current Windows), read once for every thread that reads the
+// clock: the game's and the renderer's workers, which wait by it (port/gfx/workers.c), so the first reads may come at
+// once from several threads, and INIT_ONCE makes them wait for the one that reads it
+static INIT_ONCE sFrequencyOnce = INIT_ONCE_STATIC_INIT;
+static LARGE_INTEGER sFrequency;
+
+static BOOL CALLBACK ReadFrequency(INIT_ONCE *once, void *parameter, void **context) {
+    (void)once;
+    (void)parameter;
+    (void)context;
+    QueryPerformanceFrequency(&sFrequency);
+    return TRUE;
+}
+
+// The performance counter, in nanoseconds
 uint64_t port_host_now_ns(void) {
-    static LARGE_INTEGER frequency;
     LARGE_INTEGER now;
 
-    if (frequency.QuadPart == 0) {
-        QueryPerformanceFrequency(&frequency);
-    }
+    InitOnceExecuteOnce(&sFrequencyOnce, ReadFrequency, NULL, NULL);
     QueryPerformanceCounter(&now);
-    return (uint64_t)(now.QuadPart / frequency.QuadPart) * 1000000000u +
-           (uint64_t)(now.QuadPart % frequency.QuadPart) * 1000000000u / (uint64_t)frequency.QuadPart;
+    return (uint64_t)(now.QuadPart / sFrequency.QuadPart) * 1000000000u +
+           (uint64_t)(now.QuadPart % sFrequency.QuadPart) * 1000000000u / (uint64_t)sFrequency.QuadPart;
 }
 
 // --- Threads --------------------------------------------------------------------------------------------------------
