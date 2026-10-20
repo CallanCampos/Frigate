@@ -786,10 +786,10 @@ static void PrintStream_ExecStreamCmd(PrintStream *stream) {
             steps[1] = stream->baseCharsPerStep;
             break;
         case 1:
-            PrintStream_GetWaitSteps(func_02017bf0(), steps);
+            PrintStream_GetWaitSteps(TextSpeed_GetFasterWait(), steps);
             break;
         case 2:
-            PrintStream_GetWaitSteps(func_02017c20(), steps);
+            PrintStream_GetWaitSteps(TextSpeed_GetSlowerWait(), steps);
             break;
         }
         stream->wait = steps[0];

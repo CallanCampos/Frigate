@@ -231,7 +231,7 @@ static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
     ClActorSetup setup;
 
     if (plate->pkm != NULL) {
-        BoxPkm *pkm = func_0201d624(plate->pkm);
+        BoxPkm *pkm = PokeParty_ToBoxPkm(plate->pkm);
 
         file = PokeIcon_GetFileOfPkm(pkm);
         palette = PokeIcon_GetPaletteOfPkm(pkm);

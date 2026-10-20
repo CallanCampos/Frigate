@@ -91,7 +91,7 @@ static void midnight(GameData *gameData, s32 days) {
     EventWork_ResetDailyFlags(GameData_GetEventWork(gameData));
     EncountSave_RerollSwarmLocation(save);
     pokerusDecay(GameData_GetParty(gameData), days);
-    func_020095e0(GameData_GetRecords(gameData));
+    RecordFinishDay(GameData_GetRecords(gameData));
     UnityTower_AgeTodayRegions(getUnityTower_SurveySaveBlkAddrress(save));
     SurveySave_FinishDay(SurveySave_Get(save));
     TrainerLogSave_ClearToday(TrainerLogSave_Get(save));

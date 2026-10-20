@@ -1619,8 +1619,8 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
         pkm = PokeParty_GetPkm(party, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
-            list->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(pkm)), FALSE, CLACT_VRAM_MAIN,
-                                                HEAPID_TAIL(heapId));
+            list->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(pkm)), FALSE,
+                                                CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
         }
     }
     GFL_ArcToolFree(arc);
@@ -1644,7 +1644,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
             setup.x = i * 40 + 24;
             list->actors[i] =
                 ClActor_Create(unit, list->chars[i], list->palette, list->cells, &setup, CLACT_VRAM_MAIN, heapId);
-            ClActor_SetPalette(list->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), 0);
+            ClActor_SetPalette(list->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm)), 0);
             if (PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL)) {
                 itemSetup = setup;
                 itemSetup.x += 12;

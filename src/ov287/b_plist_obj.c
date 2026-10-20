@@ -137,7 +137,7 @@ static void BPlistObj_LoadPokeIconRes(BPlistWork *wk) {
 
     for (i = 0; i < 6; i++) {
         if (wk->pokemon[i].species != 0) {
-            res[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE,
+            res[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(wk->pokemon[i].pkm)), FALSE,
                                         CLACT_VRAM_SUB, wk->param->heapId);
         } else {
             res[i] = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB,

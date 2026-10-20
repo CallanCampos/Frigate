@@ -1525,7 +1525,7 @@ static u16 CheckFieldEnvInteraction(FieldInteractWk *wk, Field *field) {
             }
         }
     }
-    if (!func_02018c38(wk->zoneId) || GameData_IsForceSeasonSync(wk->gameData) == TRUE) {
+    if (!IsZoneNormal(wk->zoneId) || GameData_IsForceSeasonSync(wk->gameData) == TRUE) {
         return SCRID_NONE;
     }
     if (CheckSurfHeightAllow(wk->player, wk->faceDir) &&

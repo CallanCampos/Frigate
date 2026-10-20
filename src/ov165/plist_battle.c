@@ -295,7 +295,7 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
         GFL_HeapAllocate(wk->heapId, sizeof(PokeListPartnerPkm), FALSE, "plist_battle.c", 409);
     BOOL isEgg = PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
-    BoxPkm *boxPkm = func_0201d624(pkm);
+    BoxPkm *boxPkm = PokeParty_ToBoxPkm(pkm);
     u32 palette;
     u32 item;
     u32 sex;

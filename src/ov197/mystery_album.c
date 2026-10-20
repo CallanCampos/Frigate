@@ -1807,7 +1807,8 @@ MysteryAlbum *MysteryAlbum_CreateReceived(MysteryGift *gift, MysteryCardRes *res
                                           PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL), PokeParty_IsRare(pkm), 0,
                                           PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL));
         album->palBuf = GFL_G2DIOReadNCLRArc(arc, palFile, &album->pal, album->heapId);
-        album->charBuf = LoadSingleCellSpindaGraphicsByBoxData(&album->chars, func_0201d624(pkm), 0, album->heapId);
+        album->charBuf =
+            LoadSingleCellSpindaGraphicsByBoxData(&album->chars, PokeParty_ToBoxPkm(pkm), 0, album->heapId);
         GFL_HeapFree(pkm);
         GFL_ArcToolFree(arc);
     }

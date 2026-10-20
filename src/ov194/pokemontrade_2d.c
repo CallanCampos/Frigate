@@ -145,7 +145,7 @@ static void func_ov194_021c2bc0(PokemonTradeWork *wk, PokeParty *party, u8 *colo
 
     for (i = 0; i < 6; i++) {
         if (count > i) {
-            colors[i] = func_ov194_021c2b08(func_0201d620(PokeParty_GetPkm(party, i)), wk->heapId);
+            colors[i] = func_ov194_021c2b08(PokeParty_GetBoxPkm(PokeParty_GetPkm(party, i)), wk->heapId);
         } else {
             colors[i] = 0;
         }
@@ -1336,8 +1336,8 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     }
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
-    pkm0 = func_0201d624(PokemonTrade_GetPkm(wk, 0));
-    pkm1 = func_0201d624(PokemonTrade_GetPkm(wk, 1));
+    pkm0 = PokeParty_ToBoxPkm(PokemonTrade_GetPkm(wk, 0));
+    pkm1 = PokeParty_ToBoxPkm(PokemonTrade_GetPkm(wk, 1));
     wk->objRes[TRADE_OBJRES_CHAR_ICON0] =
         ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
     wk->objRes[TRADE_OBJRES_CHAR_ICON1] =
@@ -1713,7 +1713,7 @@ static const u32 sNegoIconPosSub[6][2] = {
 
 // Sets up the icon of a Pokémon offered in a negotiation, in the row of the main screen or on the sub screen's panel
 void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pkm, BOOL onMain, BOOL visible) {
-    BoxPkm *boxPkm = func_0201d620(pkm);
+    BoxPkm *boxPkm = PokeParty_GetBoxPkm(pkm);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     ClActorSetup setup;
     u32 vramType;

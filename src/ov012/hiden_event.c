@@ -100,7 +100,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
             action->flags |= 8;
         }
     }
-    if (!func_02018c38(action->zoneId)) {
+    if (!IsZoneNormal(action->zoneId)) {
         action->flags = 0;
     } else {
         action->flags |= 0x100;

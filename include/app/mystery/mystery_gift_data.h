@@ -215,7 +215,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
     } else {
         location = poke->metLocation;
     }
-    setFatefulEncounterPkmData(func_0201d620(pkm), location, year - 2000, month, day);
+    setFatefulEncounterPkmData(PokeParty_GetBoxPkm(pkm), location, year - 2000, month, day);
     PokeParty_RecalcStats(pkm);
     if (PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL)) {
         GFL_HeapFree(pkm);

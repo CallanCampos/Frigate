@@ -106,7 +106,7 @@ u8 ShortcutSave_MoveItemToIndex(ShortcutSave *shortcutSave, u32 shortcut, u8 ind
     return index;
 }
 
-void func_0200cc34(ShortcutSave *shortcutSave, u32 shortcut) {
+void ShortcutSave_SwitchDNASplicers(ShortcutSave *shortcutSave, u32 shortcut) {
     int i;
     u32 other;
 

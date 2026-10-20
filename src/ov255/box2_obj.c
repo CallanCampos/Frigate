@@ -526,7 +526,7 @@ void Box2Obj_SetPartyPokeIcons(Box2SysWork *syswk) {
     u32 i;
 
     for (i = 0; i < count; i++) {
-        SetPokeIcon(syswk, func_0201d624(PokeParty_GetPkm(syswk->param->party, i)),
+        SetPokeIcon(syswk, PokeParty_ToBoxPkm(PokeParty_GetPkm(syswk->param->party, i)),
                     syswk->app->pokeIconId[BOX2_PARTY_POS + i]);
         Box2Obj_SetVisible(syswk->app, syswk->app->pokeIconId[BOX2_PARTY_POS + i], FALSE);
     }

@@ -2334,7 +2334,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             u32 hiden = PokeList_GetHidenResult(wk->pkm, wk->menuItem - 16);
 
             if (hiden == 22 || hiden == 23) {
-                if (func_02018c38(wk->param->zoneId) == FALSE) {
+                if (IsZoneNormal(wk->param->zoneId) == FALSE) {
                     PokeList_ShowMessage(wk, 0x51, TRUE, PokeList_MessageDoneSelect);
                 } else {
                     u32 maxHp = PokeParty_GetParam(wk->pkm, PKM_PARAM_MAX_HP, NULL);

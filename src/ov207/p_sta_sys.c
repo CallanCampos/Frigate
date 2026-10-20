@@ -1139,9 +1139,9 @@ static void PStatus_UpdateRedraw(PStatusWork *wk) {
 BoxPkm *PStatus_GetBoxPkm(PStatusWork *wk) {
     switch (wk->param->dataType) {
     case PSTATUS_DATA_PARTY_PKM:
-        return func_0201d620(wk->param->party);
+        return PokeParty_GetBoxPkm(wk->param->party);
     case PSTATUS_DATA_PARTY:
-        return func_0201d620(PokeParty_GetPkm(wk->param->party, wk->partyIndex));
+        return PokeParty_GetBoxPkm(PokeParty_GetPkm(wk->param->party, wk->partyIndex));
     case PSTATUS_DATA_BOX:
         return (BoxPkm *)((u8 *)wk->param->party + PML_GetPkmRawSize() * wk->partyIndex);
     }

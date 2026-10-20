@@ -967,7 +967,7 @@ BOOL GameData_AddBoxPkm(GameData *gameData, BoxPkmCreateParams *params) {
         return FALSE;
     }
     pkm = GameData_MakeBoxPkm(gameData, params);
-    boxPkm = func_0201d624(pkm);
+    boxPkm = PokeParty_ToBoxPkm(pkm);
     BoxSaveAccessor_InsertPkm(boxes, boxPkm);
     dex = GameData_GetPokedex(gameData);
     addPkmToDex(dex, pkm);

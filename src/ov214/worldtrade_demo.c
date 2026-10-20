@@ -268,6 +268,6 @@ static void Demo_StoreTradedPokemon(WorldTradeWork *wk) {
 
         BoxSaveAccessor_ClearPkm(wk->param->mybox, wk->evoPokeInfo.boxNo, wk->evoPokeInfo.pos);
         BoxSaveAccessor_GetNextFreeBoxSlot(wk->param->mybox, &box, &slot);
-        BoxSaveAccessor_InsertPkmCore(wk->param->mybox, box, func_0201d624(pkm));
+        BoxSaveAccessor_InsertPkmCore(wk->param->mybox, box, PokeParty_ToBoxPkm(pkm));
     }
 }

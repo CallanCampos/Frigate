@@ -97,8 +97,8 @@ int WorldTrade_MyPoke_Init(WorldTradeWork *wk, int seq) {
     MyPoke_BmpWinInit(wk);
     MyPoke_SetCellActor(wk);
 
-    WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0], func_0201d620(pkm),
-                               &wk->uploadPokemonData.postSimple, &wk->print);
+    WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0],
+                               PokeParty_GetBoxPkm(pkm), &wk->uploadPokemonData.postSimple, &wk->print);
     WorldTrade_PokeInfoPrint2(wk->msgManager, &wk->infoWin[7], GetPlayerName(wk->param->mystatus), pkm,
                               &wk->infoWin[12], &wk->print);
     WorldTrade_MyPokeWantPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[9],
@@ -534,7 +534,7 @@ void WorldTrade_PokeInfoPrint2(MsgData *msgManager, BmpWin **win, u16 *name, Par
 
 void WorldTrade_TransPokeGraphic(PartyPkm *pkm) {
     NNSG2dCharacterData *charData;
-    void *buf = LoadSingleCellSpindaGraphicsByBoxData(&charData, func_0201d620(pkm), 0, HEAPID_WORLDTRADE);
+    void *buf = LoadSingleCellSpindaGraphicsByBoxData(&charData, PokeParty_GetBoxPkm(pkm), 0, HEAPID_WORLDTRADE);
     u32 arcId;
     u32 palette;
 

@@ -468,7 +468,7 @@ BoxPkm *PokemonTrade_GetBoxPkm(BoxSaveAccessor *boxes, int box, int slot, Pokemo
         }
         party = wk->party;
         if (slot < PokeParty_GetPkmCount(party) && slot != -1) {
-            return func_0201d624(PokeParty_GetPkm(party, slot));
+            return PokeParty_ToBoxPkm(PokeParty_GetPkm(party, slot));
         }
     }
     return NULL;

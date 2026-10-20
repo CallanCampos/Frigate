@@ -105,7 +105,7 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     Partner_SetCellActor(wk);
 
     WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0],
-                               func_0201d624((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData),
+                               PokeParty_ToBoxPkm((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData),
                                &wk->downloadPokemonData[wk->touchTrainerPos].postSimple, &wk->print);
     WorldTrade_PokeInfoPrint2(wk->msgManager, &wk->infoWin[7], wk->downloadPokemonData[wk->touchTrainerPos].name,
                               (PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData, &wk->infoWin[12],

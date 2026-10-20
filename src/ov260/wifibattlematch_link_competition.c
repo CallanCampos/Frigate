@@ -3001,7 +3001,7 @@ static BOOL WifiBattleMatchLink_CompetitionCompareParties(PokeParty *party, Poke
             PartyPkm *pkm = PokeParty_GetPkm(party, i);
             PartyPkm *otherPkm = PokeParty_GetPkm(otherParty, i);
 
-            if (GFL_STD_MemCmp(func_0201d620(pkm), func_0201d620(otherPkm), PML_GetPkmRawSize()) != 0) {
+            if (GFL_STD_MemCmp(PokeParty_GetBoxPkm(pkm), PokeParty_GetBoxPkm(otherPkm), PML_GetPkmRawSize()) != 0) {
                 return FALSE;
             }
         }

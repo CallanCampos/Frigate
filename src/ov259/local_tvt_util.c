@@ -635,8 +635,8 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
     select->iconCellAnims = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), heapId);
     for (i = 0; i < PokeParty_GetPkmCount(select->setup.party); i++) {
         PartyPkm *pkm = PokeParty_GetPkm(select->setup.party, i);
-        u32 iconFile = PokeIcon_GetFileOfPkm(func_0201d624(pkm));
-        u32 iconPalette = PokeIcon_GetPaletteOfPkm(func_0201d624(pkm));
+        u32 iconFile = PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(pkm));
+        u32 iconPalette = PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm));
         ClActorSetup actorSetup;
 
         MI_CpuFill8(&actorSetup, 0, sizeof(actorSetup));

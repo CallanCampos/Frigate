@@ -216,13 +216,13 @@ static void PartySelectList_LoadIconResources(PartySelectList *psl) {
     count = PokeParty_GetPkmCount(psl->temoti);
     for (i = 0; i < count; i++) {
         psl->partyChars[i] = ClActSys_LoadChars(
-            arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->temoti, i))), 0, 0, psl->heapId);
+            arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(PokeParty_GetPkm(psl->temoti, i))), 0, 0, psl->heapId);
     }
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
         for (i = 0; i < count; i++) {
             psl->bboxChars[i] = ClActSys_LoadChars(
-                arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->bbox, i))), 0, 0, psl->heapId);
+                arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(PokeParty_GetPkm(psl->bbox, i))), 0, 0, psl->heapId);
         }
     }
     GFL_ArcToolFree(arc);

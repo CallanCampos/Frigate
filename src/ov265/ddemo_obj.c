@@ -267,7 +267,7 @@ void DDemoObj_AddPoke(DDemoWork *wk) {
         DDemoObj_FreeCellAnims(wk, DDEMO_CEL_POKE_BACK);
     }
     arc = MakePokeGraArcHandle(HEAPID_DENDOU_DEMO);
-    pkm = func_0201d620(wk->mons[wk->monIndex]);
+    pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     wasEncrypted = PML_PkmDecrypt(pkm);
     wk->chrRes[DDEMO_CHR_POKE_FRONT] =
         PokeGra_LoadClActCharsByBoxData(arc, pkm, 0, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
@@ -351,7 +351,7 @@ static void DDemoObj_InitFontOam1st(DDemoWork *wk) {
 
 // Draws the name and level of the Pokémon being shown
 void DDemoObj_PrintPokeInfo(DDemoWork *wk) {
-    BoxPkm *pkm = func_0201d620(wk->mons[wk->monIndex]);
+    BoxPkm *pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     BOOL wasEncrypted = PML_PkmDecrypt(pkm);
     StrBuf *str;
     u32 width;

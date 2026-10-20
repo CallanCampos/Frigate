@@ -474,8 +474,8 @@ static void Report_CreateActors(ReportScreen *wk) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     for (i = 0; i < count; i++) {
-        wk->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(PokeParty_GetPkm(party, i))), FALSE,
-                                          CLACT_VRAM_SUB, wk->heapId);
+        wk->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(PokeParty_GetPkm(party, i))),
+                                          FALSE, CLACT_VRAM_SUB, wk->heapId);
     }
     wk->palettes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
     wk->cellAnims[0] =
@@ -496,7 +496,7 @@ static void Report_CreateActors(ReportScreen *wk) {
                                        CLACT_SURFACE_SUB, wk->heapId);
         ClActor_SetVisible(wk->actors[i], FALSE);
         setup.x += 32;
-        ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), TRUE);
+        ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm)), TRUE);
     }
 
     setup = sReportActorSetups[1];

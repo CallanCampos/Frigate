@@ -77,7 +77,7 @@ void RecordSetTrialHouseRank(GameRecords *records, u8 rank);
 u8 RecordGetTrialHouseRank(GameRecords *records);
 // Record 0x7c
 u32 RecordGetTrialHousePoints(GameRecords *records);
-void func_020095e0(GameRecords *records);
+void RecordFinishDay(GameRecords *records);
 void RecordSetTrialHousePoints(GameRecords *records, u32 points);
 // The block's size and its initial state
 u32 RecordSave_GetSize(void);

@@ -152,7 +152,7 @@ GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BO
     if (work->online == TRUE) {
         work->state = 11;
         work->subState = 0;
-        MusComm_SetUp(work->comm, GetGameDataPlayerInfo(work->gameData), func_0201d620(work->pkm), work->gameComm,
+        MusComm_SetUp(work->comm, GetGameDataPlayerInfo(work->gameData), PokeParty_GetBoxPkm(work->pkm), work->gameComm,
                       work->ov210, HEAPID_GAMEEVENT);
     } else {
         shots = MusicalSave_GetTotalPoints(work->musicalSave);

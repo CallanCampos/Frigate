@@ -1023,7 +1023,7 @@ static void WazaOshie_DrawText(WazaOshieWork *work) {
     BmpWin_Transfer(work->windows[WINDOW_TITLE]);
 
     moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_WAZA_OSHIE);
-    boxPkm = func_0201d624(work->param->pkm);
+    boxPkm = PokeParty_ToBoxPkm(work->param->pkm);
     for (i = 0; i < 4; i++) {
         move = PML_PkmGetParam(boxPkm, PKM_PARAM_MOVE1 + i, NULL);
         if (move == 0) {
@@ -1398,7 +1398,7 @@ static void WazaOshie_LoadActorResources(WazaOshieWork *work, ArcTool *arc) {
     GFL_ArcToolFree(commonArc);
 
     pokeArc = MakePokeGraArcHandle(HEAPID_WAZA_OSHIE);
-    boxPkm = func_0201d620(work->param->pkm);
+    boxPkm = PokeParty_GetBoxPkm(work->param->pkm);
     wasEncrypted = PML_PkmDecrypt(boxPkm);
     work->chars[8] = PokeGra_LoadClActCharsByBoxData(pokeArc, boxPkm, 0, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
     work->palettes[4] =

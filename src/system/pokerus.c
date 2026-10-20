@@ -117,7 +117,7 @@ static u32 pokerusBitmaskForPartyPKM(PokeParty *party) {
 }
 
 BOOL pokerusDuration(PartyPkm *pkm) {
-    return doesPokerusHaveDuration(func_0201d620(pkm));
+    return doesPokerusHaveDuration(PokeParty_GetBoxPkm(pkm));
 }
 
 BOOL doesPokerusHaveDuration(BoxPkm *pkm) {
@@ -130,7 +130,7 @@ BOOL doesPokerusHaveDuration(BoxPkm *pkm) {
 }
 
 BOOL pokeHasPkrs(PartyPkm *pkm) {
-    return doesPokeHavePokerus(func_0201d620(pkm));
+    return doesPokeHavePokerus(PokeParty_GetBoxPkm(pkm));
 }
 
 // Whether the Pokémon has had Pokérus and is over it

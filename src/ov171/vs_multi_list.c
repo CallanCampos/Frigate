@@ -597,7 +597,7 @@ static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
         u16 icon;
 
         if (wk->pkm[i] != NULL) {
-            icon = PokeIcon_GetFileOfPkm(func_0201d624(wk->pkm[i]));
+            icon = PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(wk->pkm[i]));
         } else {
             icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
         }
@@ -656,7 +656,7 @@ static void VsMultiList_CreateActors(VsMultiListWork *wk) {
             u16 item;
 
             func_0204c520(wk->actors[i], TRUE);
-            ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(wk->pkm[i])), TRUE);
+            ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(wk->pkm[i])), TRUE);
             item = PokeParty_GetParam(wk->pkm[i], PKM_PARAM_ITEM, NULL);
             if (item == 0) {
                 ClActor_SetVisible(wk->actors[i + 6], FALSE);

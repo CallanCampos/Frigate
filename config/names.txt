@@ -182,6 +182,7 @@
 . 0x020093d0 GameRecords_GetSize
 . 0x020094cc RecordSet
 . 0x02009508 RecordSetIfHigher
+. 0x020095e0 RecordFinishDay
 . 0x02009618 RecordSetTrialHouseRank
 . 0x02009628 RecordGetTrialHouseRank
 . 0x02009638 RecordSetTrialHousePoints
@@ -502,6 +503,7 @@
 . 0x0200cb10 TrainerGameInfo_SubHallOfFameMinutes
 . 0x0200cb30 TrainerCard_GetBattleRecorderColor
 . 0x0200cb3c TrainerCard_SetBattleRecorderColor
+. 0x0200cc34 ShortcutSave_SwitchDNASplicers
 . 0x0200cc94 MusicalDist_GetSaveSize
 . 0x0200cc9c MusicalDist_InitBlock
 . 0x0200cca0 MusicalDist_Load
@@ -1181,6 +1183,8 @@
 . 0x02017b98 GameData_IncCounter
 . 0x02017bb4 GameData_ResetCounter
 . 0x02017bcc TextSpeed_GetCurrentWait
+. 0x02017bf0 TextSpeed_GetFasterWait
+. 0x02017c20 TextSpeed_GetSlowerWait
 . 0x02017c50 TextSpeed_GetWait
 . 0x02017cac BtlSetup_FreeContents
 . 0x02017cfc BtlSetup_SetParty
@@ -1192,6 +1196,7 @@
 . 0x020186b0 BtlSetup_AllocRecBuffer
 . 0x02018b10 IsZoneGameCommDisabled
 . 0x02018c10 IsZoneJoinAvenueSubZone
+. 0x02018c38 IsZoneNormal
 . 0x02018ecc IsZoneInVictoryRoad
 . 0x02018f60 AreaData_IsInfinityDungeon
 . 0x02018f78 AreaData_IsJoinAvenue
@@ -1305,6 +1310,8 @@
 . 0x0201d2d0 PokeParty_SetMoveKeepPP
 . 0x0201d2d8 PML_PkmSetMoveKeepPP
 . 0x0201d358 PokeParty_LearnNextLevelMove
+. 0x0201d620 PokeParty_GetBoxPkm
+. 0x0201d624 PokeParty_ToBoxPkm
 . 0x0201eb78 PML_PkmAddParam
 . 0x0201ecc8 addClampedU8
 . 0x0201ef8c PML_ItemGetGenesectDriveForme
@@ -1598,6 +1605,7 @@
 . 0x02029bc8 PMSData_Init
 . 0x02029be4 PMSData_InitWithSentence
 . 0x02029bfc PMSData_InitPreset
+. 0x02029c68 PMSData_InitGreeting
 . 0x02029c80 PMSData_ToString
 . 0x02029c8c PMSData_ToStringWithWords
 . 0x02029d40 PMSData_GetSentenceString

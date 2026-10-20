@@ -1655,7 +1655,7 @@ static void WifiP2PMatch_CreatePartyIcons(WIFIP2PMATCH_WORK *wk, PokeParty *part
     int i;
 
     for (i = 0; i < count; i++) {
-        BoxPkm *pkm = func_0201d624(PokeParty_GetPkm(party, i));
+        BoxPkm *pkm = PokeParty_ToBoxPkm(PokeParty_GetPkm(party, i));
         ClActorSetup setup;
 
         setup.x = i * 40 + 22;
