@@ -9568,6 +9568,10 @@ overlays/ov036 0x021b01e0 s0222_AnvilleTrainGetDailyIndex
 overlays/ov036 0x021b02c0 FieldRailSystem_Free
 overlays/ov036 0x021b02f8 FieldRailSystem_Reset
 overlays/ov036 0x021b05b8 FieldRailSystem_SetLineEnabled
+overlays/ov036 0x021b0774 RailUnit_GetRailPos
+overlays/ov036 0x021b0794 RailUnit_IsRailPosInBounds
+overlays/ov036 0x021b0814 RailUnit_PredictNextPos
+overlays/ov036 0x021b0888 RailUnit_GetPreviousCalcPos
 overlays/ov036 0x021b09ec RailUnit_GetMoveDirection
 overlays/ov036 0x021b09f4 RailUnit_IsMovePending
 overlays/ov036 0x021b0a8c RailUnit_GetLineDirection
@@ -9594,6 +9598,8 @@ overlays/ov036 0x021b1f74 RailDisabledLines_AllowsPosition
 overlays/ov036 0x021b1fc0 RailPoint_GetLineDirection
 overlays/ov036 0x021b1ff0 RailLine_CheckEndpointDirections
 overlays/ov036 0x021b2060 RailPoint_CheckConnections
+overlays/ov036 0x021b2404 RailMath_SlerpDirections
+overlays/ov036 0x021b3830 RailMath_TryProjectWorldPointToSegment
 overlays/ov036 0x021b3da8 FieldNoGridMapper_SetLineEnabled
 overlays/ov036 0x021b445c UnionChat_AppendLine
 overlays/ov036 0x021b45cc UnionChat_AllocateLine

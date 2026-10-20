@@ -4,9 +4,10 @@
 // The rail system of the no-grid maps, where the player moves along rails. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except FieldRailSystem_Free, FieldRailSystem_Reset and
 // FieldRailSystem_SetLineEnabled, RailUnit_GetMoveDirection, RailUnit_IsMovePending, RailUnit_GetLineDirection,
-// RailUnit_RequestMove and RailUnit_UpdateMove, which are our descriptive names. Layouts from swan's RailPoint,
-// RailLine, RailCurve, RailCamera, RailDataHandle, RailUnit and FieldRailSystem. Additional movement state field
-// names describe recovered behavior; direction follows swan's Direction field.
+// RailUnit_RequestMove, RailUnit_UpdateMove, RailUnit_GetRailPos, RailUnit_IsRailPosInBounds,
+// RailUnit_PredictNextPos and RailUnit_GetPreviousCalcPos, which are our descriptive names. Layouts from swan's
+// RailPoint, RailLine, RailCurve, RailCamera, RailDataHandle, RailUnit and FieldRailSystem. Additional movement state
+// field names describe recovered behavior; direction follows swan's Direction field.
 
 #include "types.h"
 #include "field/zone.h"
@@ -86,10 +87,17 @@ struct RailDisabledLines {
     u16 lineIds[18];
 };
 
+// RailUnit's component tag; a unit has no component before placement
+enum {
+    RAIL_COMPONENT_POINT = 0,
+    RAIL_COMPONENT_LINE = 1,
+    RAIL_COMPONENT_NONE = 2,
+};
+
 // Something that moves along the rails: the point it is at, or the line, with its position along the line (front)
 // and across it (side), in sixteenths of a tile
 struct RailUnit {
-    u16 onLine; // 0 point, 1 line, 2 no component
+    u16 onLine; // RAIL_COMPONENT_*, the tag of component
     u16 acquired;
     union {
         RailPoint *point;
@@ -189,12 +197,13 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
 void func_ov036_021b06ec(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos);
 s32 func_ov036_021b0704(FieldRailSystem *rail, const RailPosition *pos);
 void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos);
-void func_ov036_021b0774(const RailUnit *unit, RailPosition *pos);
-// Whether the rail position is on the rail data
-BOOL func_ov036_021b0794(RailUnit *unit, const RailPosition *pos);
-// The rail and world position a step from the unit in a direction, kept until the unit moves, and whether there is one
-u8 func_ov036_021b0814(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec);
-void func_ov036_021b0888(RailUnit *unit, VecFx32 *pos);
+void RailUnit_GetRailPos(const RailUnit *unit, RailPosition *pos);
+// Checks the component ID and, for lines, the front and side bounds
+BOOL RailUnit_IsRailPosInBounds(RailUnit *unit, const RailPosition *pos);
+// Caches a one-tile attempt in dir until the unit moves. Either output may be NULL; requested outputs are filled
+// even when the attempt fails.
+u8 RailUnit_PredictNextPos(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec);
+void RailUnit_GetPreviousCalcPos(RailUnit *unit, VecFx32 *pos);
 void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos);
 void RailUnit_GetCalcPos(RailUnit *unit, VecFx32 *pos);
 // The placement direction or most recent accepted movement result
@@ -217,7 +226,7 @@ RailCurve *GetRailHnd2Curve(FieldRailSystem *rail, u32 id);
 fx32 FieldRailSystem_GetTileWidth(FieldRailSystem *rail);
 RailUnit *func_ov036_021b0c00(FieldRailSystem *rail);
 void func_ov036_021b0c04(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out);
-// Returns the component tag: 0 point, 1 line, 2 no component
+// Returns the RAIL_COMPONENT_* tag
 u16 RailUnit_IsOnLine(RailUnit *unit);
 RailLine *GetCurrentLine(RailUnit *unit);
 s32 GetCurrentLinePosV(RailUnit *unit);
