@@ -39,6 +39,7 @@ lib/dwcutilui/src/dwc_util_screen.c:
     .bss        start:0x021c402c end:0x021c4030
 
 lib/dwcutilui/src/dwc_util_ui_effect.c:
+    complete
     .text       start:0x021ab040 end:0x021ab17c
     .rodata     start:0x021bfb18 end:0x021bfb24
     .bss        start:0x021c4024 end:0x021c4028
@@ -191,6 +192,7 @@ lib/dwcutilui/src/dwc_util_msg_resource.c:
     .bss        start:0x021c40ac end:0x021c40b0
 
 lib/dwcutilui/src/dwc_util_move.c:
+    complete
     .text       start:0x021ae134 end:0x021ae3d8
     .data       start:0x021c0b8c end:0x021c0bec
     .bss        start:0x021c40b0 end:0x021c40b4

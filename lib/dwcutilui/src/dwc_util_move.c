@@ -17,8 +17,9 @@ typedef struct DWCUtilMove {
     MBUserInfo user;
     DWCUtilMoveCallback callback;
     DWCUtilTask *task;
-    // Whether a console downloaded the program before there was a callback to tell, and whether the move ended
-    u8 entered;
+    // Whether an event came while there was no callback to tell (the next update tells it as an entry, whatever it
+    // was), and whether the move ended
+    u8 pending;
     u8 ended;
 } DWCUtilMove;
 
@@ -35,7 +36,7 @@ void DWCUtilMove_Start(DWCUtilMoveCallback callback) {
 
     sMove = DWCUtilHeap_AllocClear(sizeof(DWCUtilMove), 32);
     sMove->callback = callback;
-    sMove->entered = FALSE;
+    sMove->pending = FALSE;
     sMove->ended = FALSE;
     game = sGame;
     game.gameNamep = DWCUtilMsg_Get(gDWCUtilMsg, 0);
@@ -83,7 +84,7 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
     u8 changed;
 
     func_ov182_021ba974();
-    if (sMove->entered && !sMove->ended) {
+    if (sMove->pending && !sMove->ended) {
         if (sMove->callback == NULL) {
             return;
         }
@@ -101,7 +102,7 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_ENTERED);
             return;
         }
-        sMove->entered = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_CHILD_LEFT:
         if (!changed) {
@@ -111,7 +112,7 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_CHILD_LEFT);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_WIRELESS:
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_PEER:
@@ -122,7 +123,7 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_ENDED);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_CANCEL:
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_ERROR:
@@ -133,7 +134,7 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_FAILED);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_DONE:
         if (!changed) {
@@ -143,27 +144,16 @@ static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_DONE);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED:
         DWCUtilTask_QueueRemoval(0, task);
         DWCUtilHeap_FreeAndNull(&sMove);
         return;
-    case DOWNLOAD_PLAY_SYS_STATE_NONE:
     case DOWNLOAD_PLAY_SYS_STATE_READY:
     case DOWNLOAD_PLAY_SYS_STATE_START_WIRELESS:
     case DOWNLOAD_PLAY_SYS_STATE_INIT_PARENT:
     case DOWNLOAD_PLAY_SYS_STATE_ENTRY:
-    case DOWNLOAD_PLAY_SYS_STATE_SENDING:
-    case DOWNLOAD_PLAY_SYS_STATE_START_CONNECT:
-    case DOWNLOAD_PLAY_SYS_STATE_CONNECT:
-    case DOWNLOAD_PLAY_SYS_STATE_CONNECT_PEER:
-    case DOWNLOAD_PLAY_SYS_STATE_CONNECT_ASKED:
-    case DOWNLOAD_PLAY_SYS_STATE_PEER_DONE:
-    case DOWNLOAD_PLAY_SYS_STATE_END_PARENT:
-    case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_PARENT:
-    case DOWNLOAD_PLAY_SYS_STATE_SENT:
-    case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_WIRELESS:
     default:
         return;
     }

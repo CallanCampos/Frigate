@@ -62,41 +62,6 @@ enum {
 };
 
 typedef struct {
-    u8 hasSsid;                 // 0x00: whether the settings named the network, which the last message tells
-    void *(*alloc)(u32 size);   // 0x04
-    WCMConfig *config;          // 0x08
-    void (*free)(void *ptr);    // 0x0c
-    BOOL cancel;                // 0x10
-    int packetSize;             // 0x14
-    int apIndex;                // 0x18: the setup's access point in the list
-    int step;                   // 0x1c: of UtilAc_Run
-    BOOL connected;             // 0x20: to the access point
-    BOOL socStarted;            // 0x24
-    void *wepDesc;              // 0x28
-    int wcmState;               // 0x2c
-    void *stack;                // 0x30
-    int messageSize;            // 0x34
-    int state;                  // 0x38: AC_STATE_*
-    void *wcmWork;              // 0x3c
-    void *wcmBuffer;            // 0x40
-    const u8 *bssid;            // 0x44
-    const u8 *essid;            // 0x48
-    void *bssDesc;              // 0x4c
-    int secure;                 // 0x50: from the hello, whether the access point asks for the MAC address
-    void *block;                // 0x54
-    u32 connectOption;          // 0x58
-    u8 *apList;                 // 0x5c
-    u32 searchOption;           // 0x60
-    BOOL running;               // 0x64: the thread
-    int eventWrite;             // 0x68
-    int eventRead;              // 0x6c
-    int apCount;                // 0x70
-    BOOL started;               // 0x74: the WCM
-    int result;                 // 0x78
-    DWCUtilAcCallback callback; // 0x7c
-} UtilAcWork;
-
-typedef struct {
     u8 *items;     // 0x00: where a message's items go, after its header
     BOOL debug;    // 0x04: formats the MAC addresses (for a print that is left out)
     u32 stackSize; // 0x08
@@ -223,7 +188,6 @@ static u8 sAcMessage[0x800];
 static u8 sAcOwnMac[6];
 static u8 sAcApMac[6];
 static char sAcApSsid[0x21];
-static UtilAcWork sAcWork;
 static const HelloId sAcHelloId = { { 6, 0, 1, 2, 3, 4, 5 } };
 static UtilAcConfig sAcConfig = { sAcMessage + 8, TRUE, 0x800, 0xffffffff, 0x40 };
 // The name that the console gives (the word before the 4 points to it, as in dwc_ac_soc.c's configuration)
@@ -246,14 +210,48 @@ static SocConfig sAcSocConfig = {
     0,
     { 0, 0, 0, 0, 0, (u32)sAcHostName, 4, 0, 0 },
 };
-static DWCWcmCallback sAcWcmCallback;
-static int sAcEvents[4];
-static OSMutex sAcSocMutex;
-static OSThread sAcThread;
+// The setup's state, defined with initializers so that the functions reach it from one base. MWCC 2.0 lays out a
+// file's initialized statics by size with a heapsort, and this order of definitions gives the ROM's layout
+static UtilAcSettings sAcSettings = { 0 };
+static DWCUtilAcResult sAcResult = { 0 };
+static OSThread sAcThread = { 0 };
+static OSMutex sAcSocMutex = { 0 };
+static int sAcEvents[4] = { 0 };
+static DWCUtilAcCallback sAcCallback = NULL;
+static u8 sAcHasSsid = 0;          // Whether the settings named the network, which the last message tells
+static BOOL sAcWcmStarted = FALSE; // Whether the WCM is started
+static int sAcApCount = 0;
+static int sAcEventRead = 0;
+static int sAcEventWrite = 0;
+static BOOL sAcRunning = FALSE; // Whether the thread runs
+static u32 sAcSearchOption = 0;
+static u8 *sAcApList = NULL;
+static u32 sAcConnectOption = 0;
+static void *sAcBlock = NULL;
+static int sAcSecure = 0; // From the hello, whether the access point asks for the MAC address
+static int sAcStep = 0;   // The step of UtilAc_Run
+static void *sAcWcmWork = NULL;
+static int sAcState = 0;          // AC_STATE_*
+static BOOL sAcConnected = FALSE; // Whether it joined the access point
+static int sAcStatusResult = 0;   // 1, or the negative error that ended the setup, as the status says
+static WCMConfig *sAcWcmConfig = NULL;
+static int sAcMessageSize = 0;
+static void *sAcStack = NULL;
+static int sAcWcmState = 0;
+static void *sAcWepDesc = NULL;
+static BOOL sAcSocStarted = FALSE;
+static int sAcApIndex = 0; // The setup's access point in the list
+static void *sAcBssDesc = NULL;
+static DWCWcmCallback sAcWcmCallback = NULL;
+static int sAcPacketSize = 0;
+static BOOL sAcCancel = FALSE;
+static u8 *sAcSearchEssid = NULL;
+static void (*sAcFree)(void *ptr) = NULL;
+static void *(*sAcAlloc)(u32 size) = NULL;
+static void *sAcWcmBuffer = NULL;
+static u8 *sAcSearchBssid = NULL;
 static u8 sAcBssid[6];
 static u8 sAcEssid[0x20];
-static UtilAcSettings sAcSettings;
-static DWCUtilAcResult sAcResult;
 
 static void UtilAcWcm_Notify(WCMNotice *notice) {
     if (notice == NULL) {
@@ -262,28 +260,28 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
     switch (notice->notify) {
     case WCM_NOTIFY_STARTUP:
         if (notice->result == 0) {
-            if (sAcWork.wcmState == STATE_STOPPING) {
-                sAcWork.wcmState = STATE_IDLE;
+            if (sAcWcmState == STATE_STOPPING) {
+                sAcWcmState = STATE_IDLE;
                 if (sAcWcmCallback != NULL) {
                     sAcWcmCallback(DWC_WCM_EVENT_STARTED, 0);
                 }
-            } else if (sAcWork.wcmState == STATE_SEARCH_STARTING) {
-                if (WCM_SearchAsync(sAcWork.bssid, sAcWork.essid, sAcWork.searchOption) != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_SEARCH_STARTING) {
+                if (WCM_SearchAsync(sAcSearchBssid, sAcSearchEssid, sAcSearchOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
-            } else if (sAcWork.wcmState == STATE_CONNECTING) {
-                if (WCM_ConnectAsync(sAcWork.bssDesc, sAcWork.wepDesc, sAcWork.connectOption) != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_CONNECTING) {
+                if (WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             }
         } else {
-            sAcWork.wcmState = STATE_INITIALIZED;
+            sAcWcmState = STATE_INITIALIZED;
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
             }
@@ -291,14 +289,14 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
         break;
     case WCM_NOTIFY_BEGIN_SEARCH:
         if (notice->result == 0) {
-            if (sAcWork.wcmState == STATE_SEARCH_STARTING) {
-                sAcWork.wcmState = STATE_SEARCHING;
+            if (sAcWcmState == STATE_SEARCH_STARTING) {
+                sAcWcmState = STATE_SEARCHING;
                 if (sAcWcmCallback != NULL) {
                     sAcWcmCallback(DWC_WCM_EVENT_SEARCHING, 0);
                 }
             }
         } else {
-            sAcWork.wcmState = STATE_IDLE;
+            sAcWcmState = STATE_IDLE;
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_SEARCH_FAILED, 0);
             }
@@ -306,14 +304,14 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
         break;
     case WCM_NOTIFY_CONNECT:
         if (notice->result == 0) {
-            if (sAcWork.wcmState == STATE_CONNECTING) {
-                sAcWork.wcmState = STATE_CONNECTED;
+            if (sAcWcmState == STATE_CONNECTING) {
+                sAcWcmState = STATE_CONNECTED;
                 if (sAcWcmCallback != NULL) {
                     sAcWcmCallback(DWC_WCM_EVENT_CONNECTED, 0);
                 }
             }
         } else {
-            sAcWork.wcmState = STATE_IDLE;
+            sAcWcmState = STATE_IDLE;
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_CONNECT_FAILED, 0);
             }
@@ -321,35 +319,35 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
         break;
     case WCM_NOTIFY_END_SEARCH:
         if (notice->result == 0) {
-            if (sAcWork.wcmState == STATE_STOPPING) {
-                sAcWork.wcmState = STATE_IDLE;
+            if (sAcWcmState == STATE_STOPPING) {
+                sAcWcmState = STATE_IDLE;
                 if (sAcWcmCallback != NULL) {
                     sAcWcmCallback(DWC_WCM_EVENT_SEARCH_ENDED, 0);
                 }
-            } else if (sAcWork.wcmState == STATE_SEARCH_STARTING) {
-                if (WCM_SearchAsync(sAcWork.bssid, sAcWork.essid, sAcWork.searchOption) != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_SEARCH_STARTING) {
+                if (WCM_SearchAsync(sAcSearchBssid, sAcSearchEssid, sAcSearchOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
-            } else if (sAcWork.wcmState == STATE_CLEANING_UP) {
+            } else if (sAcWcmState == STATE_CLEANING_UP) {
                 if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
-            } else if (sAcWork.wcmState == STATE_CONNECTING) {
-                if (WCM_ConnectAsync(sAcWork.bssDesc, sAcWork.wepDesc, sAcWork.connectOption) != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_CONNECTING) {
+                if (WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             }
         } else {
-            sAcWork.wcmState = STATE_IDLE;
+            sAcWcmState = STATE_IDLE;
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_END_SEARCH_FAILED, 0);
             }
@@ -357,37 +355,37 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
         break;
     case WCM_NOTIFY_DISCONNECT:
         if (notice->result == 0) {
-            if (sAcWork.wcmState == STATE_STOPPING) {
-                sAcWork.wcmState = STATE_IDLE;
+            if (sAcWcmState == STATE_STOPPING) {
+                sAcWcmState = STATE_IDLE;
                 if (sAcWcmCallback != NULL) {
                     sAcWcmCallback(DWC_WCM_EVENT_DISCONNECTED, 0);
                 }
-            } else if (sAcWork.wcmState == STATE_SEARCH_STARTING) {
-                if (WCM_SearchAsync(sAcWork.bssid, sAcWork.essid, sAcWork.searchOption) != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_SEARCH_STARTING) {
+                if (WCM_SearchAsync(sAcSearchBssid, sAcSearchEssid, sAcSearchOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
-            } else if (sAcWork.wcmState == STATE_CLEANING_UP) {
+            } else if (sAcWcmState == STATE_CLEANING_UP) {
                 if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
-            } else if (sAcWork.wcmState == STATE_CONNECTING) {
-                if (WCM_ConnectAsync(sAcWork.bssDesc, sAcWork.wepDesc, sAcWork.connectOption) != WCM_RESULT_ACCEPT) {
-                    sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_CONNECTING) {
+                if (WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
                     if (sAcWcmCallback != NULL) {
                         sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
-            } else if (sAcWork.wcmState == STATE_CONNECTED) {
-                sAcWork.wcmState = STATE_IDLE;
+            } else if (sAcWcmState == STATE_CONNECTED) {
+                sAcWcmState = STATE_IDLE;
             }
         } else {
-            sAcWork.wcmState = STATE_IDLE;
+            sAcWcmState = STATE_IDLE;
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_DISCONNECT_FAILED, 0);
             }
@@ -395,22 +393,22 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
         break;
     case WCM_NOTIFY_CLEANUP:
         if (notice->result == 0) {
-            if (sAcWork.wcmState == STATE_CLEANING_UP) {
+            if (sAcWcmState == STATE_CLEANING_UP) {
                 WCM_Finish();
-                sAcWork.wcmState = STATE_OFF;
+                sAcWcmState = STATE_OFF;
                 if (sAcWcmCallback != NULL) {
                     sAcWcmCallback(DWC_WCM_EVENT_CLEANED_UP, 0);
                 }
             }
         } else {
-            sAcWork.wcmState = STATE_IDLE;
+            sAcWcmState = STATE_IDLE;
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
             }
         }
         break;
     case WCM_NOTIFY_FOUND_AP:
-        if (sAcWork.wcmState == STATE_SEARCHING) {
+        if (sAcWcmState == STATE_SEARCHING) {
             if (sAcWcmCallback != NULL) {
                 sAcWcmCallback(DWC_WCM_EVENT_FOUND_AP, 0);
             }
@@ -422,7 +420,7 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
         }
         break;
     case WCM_NOTIFY_TERMINATE:
-        sAcWork.wcmState = STATE_OFF;
+        sAcWcmState = STATE_OFF;
         if (sAcWcmCallback != NULL) {
             sAcWcmCallback(DWC_WCM_EVENT_TERMINATED, 0);
         }
@@ -437,7 +435,7 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
 
 // Stops what the state says is under way, and reports whether the WCM took it
 static BOOL UtilAcWcm_Abort(void) {
-    switch (sAcWork.wcmState) {
+    switch (sAcWcmState) {
     case STATE_SEARCHING:
         if (WCM_SearchAsync(NULL, NULL, 0) != WCM_RESULT_ACCEPT) {
             return FALSE;
@@ -449,7 +447,7 @@ static BOOL UtilAcWcm_Abort(void) {
         }
         break;
     case STATE_INITIALIZED:
-        if (WCM_StartupAsync(sAcWork.config, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sAcWcmConfig, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
             return FALSE;
         }
         break;
@@ -490,17 +488,17 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
     u32 irq = OS_DisableInterrupts();
     int i;
 
-    sAcWork.searchOption = option;
-    sAcWork.bssid = sAcBssid;
+    sAcSearchOption = option;
+    sAcSearchBssid = sAcBssid;
     if (bssid != NULL) {
         for (i = 0; i < 6; i++) {
             sAcBssid[i] = *bssid++;
         }
     } else {
         MI_CpuFill8(sAcBssid, 0xff, 6);
-        sAcWork.bssid = WCMiAnyBssid;
+        sAcSearchBssid = (u8 *)WCMiAnyBssid;
     }
-    sAcWork.essid = sAcEssid;
+    sAcSearchEssid = sAcEssid;
     if (essid != NULL && essidLength > 0 && essidLength < 0x20) {
         for (i = 0; i < essidLength; i++) {
             sAcEssid[i] = *essid++;
@@ -510,16 +508,16 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
         }
     } else {
         MI_CpuFill8(sAcEssid, 0xff, 0x20);
-        sAcWork.essid = WCMiAnyEssid;
+        sAcSearchEssid = (u8 *)WCMiAnyEssid;
     }
-    if (sAcWork.wcmState == STATE_IDLE) {
-        if (WCM_SearchAsync(sAcBssid, sAcWork.essid, sAcWork.searchOption) == WCM_RESULT_ACCEPT) {
-            sAcWork.wcmState = STATE_SEARCH_STARTING;
+    if (sAcWcmState == STATE_IDLE) {
+        if (WCM_SearchAsync(sAcBssid, sAcSearchEssid, sAcSearchOption) == WCM_RESULT_ACCEPT) {
+            sAcWcmState = STATE_SEARCH_STARTING;
             OS_RestoreInterrupts(irq);
             return TRUE;
         }
     } else if (UtilAcWcm_Abort() == TRUE) {
-        sAcWork.wcmState = STATE_SEARCH_STARTING;
+        sAcWcmState = STATE_SEARCH_STARTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
@@ -530,8 +528,8 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
 static BOOL UtilAcWcm_Disconnect(void) {
     u32 irq = OS_DisableInterrupts();
 
-    if (sAcWork.wcmState == STATE_CONNECTED && WCM_DisconnectAsync() == WCM_RESULT_ACCEPT) {
-        sAcWork.wcmState = STATE_STOPPING;
+    if (sAcWcmState == STATE_CONNECTED && WCM_DisconnectAsync() == WCM_RESULT_ACCEPT) {
+        sAcWcmState = STATE_STOPPING;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
@@ -542,17 +540,17 @@ static BOOL UtilAcWcm_Disconnect(void) {
 static BOOL UtilAcWcm_Cleanup(void) {
     u32 irq = OS_DisableInterrupts();
 
-    if (sAcWork.wcmState == STATE_IDLE) {
+    if (sAcWcmState == STATE_IDLE) {
         if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
             OS_RestoreInterrupts(irq);
             return FALSE;
         }
-        sAcWork.wcmState = STATE_CLEANING_UP;
+        sAcWcmState = STATE_CLEANING_UP;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
     if (UtilAcWcm_Abort() == TRUE) {
-        sAcWork.wcmState = STATE_CLEANING_UP;
+        sAcWcmState = STATE_CLEANING_UP;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
@@ -563,21 +561,20 @@ static BOOL UtilAcWcm_Cleanup(void) {
 static BOOL UtilAcWcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
     u32 irq = OS_DisableInterrupts();
 
-    sAcWork.connectOption = option;
+    sAcConnectOption = option;
     if (wepDesc != NULL) {
-        MI_CpuCopy8(wepDesc, sAcWork.wepDesc, 0x60);
+        MI_CpuCopy8(wepDesc, sAcWepDesc, 0x60);
     } else {
-        MI_CpuFill8(sAcWork.wepDesc, 0, 0x60);
+        MI_CpuFill8(sAcWepDesc, 0, 0x60);
     }
-    MIi_CpuCopy32(bssDesc, sAcWork.bssDesc, WCM_APLIST_SIZE);
+    MIi_CpuCopy32(bssDesc, sAcBssDesc, WCM_APLIST_SIZE);
     if (UtilAcWcm_Abort() == TRUE) {
-        sAcWork.wcmState = STATE_CONNECTING;
+        sAcWcmState = STATE_CONNECTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    if (sAcWork.wcmState == STATE_IDLE &&
-        WCM_ConnectAsync(sAcWork.bssDesc, sAcWork.wepDesc, sAcWork.connectOption) == WCM_RESULT_ACCEPT) {
-        sAcWork.wcmState = STATE_CONNECTING;
+    if (sAcWcmState == STATE_IDLE && WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) == WCM_RESULT_ACCEPT) {
+        sAcWcmState = STATE_CONNECTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
@@ -591,28 +588,28 @@ static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size) {
     u32 irq = OS_DisableInterrupts();
     u8 *buf = work;
 
-    sAcWork.wepDesc = buf;
-    sAcWork.config = (WCMConfig *)(((u32)buf + 0x63) & ~3);
-    sAcWork.wcmWork = (void *)(((u32)sAcWork.config + 0x2f) & ~0x1f);
-    sAcWork.bssDesc = (void *)(((u32)sAcWork.wcmWork + WCM_WORK_SIZE + 0x1f) & ~0x1f);
-    sAcWork.config->pbdbuffer = (void *)(((u32)sAcWork.bssDesc + 0xdf) & ~0x1f);
-    sAcWork.config->nbdbuffer = (s32)(buf + size) - (s32)sAcWork.config->pbdbuffer;
-    sAcWork.config->nbdmode = 0;
-    sAcWork.config->dmano = 3;
+    sAcWepDesc = buf;
+    sAcWcmConfig = (WCMConfig *)(((u32)buf + 0x63) & ~3);
+    sAcWcmWork = (void *)(((u32)sAcWcmConfig + 0x2f) & ~0x1f);
+    sAcBssDesc = (void *)(((u32)sAcWcmWork + WCM_WORK_SIZE + 0x1f) & ~0x1f);
+    sAcWcmConfig->pbdbuffer = (void *)(((u32)sAcBssDesc + 0xdf) & ~0x1f);
+    sAcWcmConfig->nbdbuffer = (s32)(buf + size) - (s32)sAcWcmConfig->pbdbuffer;
+    sAcWcmConfig->nbdmode = 0;
+    sAcWcmConfig->dmano = 3;
     sAcWcmCallback = callback;
-    if (sAcWork.wcmState == STATE_OFF) {
-        if (WCM_Init(sAcWork.wcmWork, WCM_WORK_SIZE) != 0) {
+    if (sAcWcmState == STATE_OFF) {
+        if (WCM_Init(sAcWcmWork, WCM_WORK_SIZE) != 0) {
             OS_RestoreInterrupts(irq);
             return FALSE;
         }
-        sAcWork.wcmState = STATE_INITIALIZED;
+        sAcWcmState = STATE_INITIALIZED;
     }
-    if (sAcWork.wcmState == STATE_INITIALIZED) {
-        if (WCM_StartupAsync(sAcWork.config, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
+    if (sAcWcmState == STATE_INITIALIZED) {
+        if (WCM_StartupAsync(sAcWcmConfig, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
             OS_RestoreInterrupts(irq);
             return FALSE;
         }
-        sAcWork.wcmState = STATE_STOPPING;
+        sAcWcmState = STATE_STOPPING;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
@@ -621,7 +618,7 @@ static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size) {
 }
 
 static int UtilAcWcm_GetState(void) {
-    return sAcWork.wcmState;
+    return sAcWcmState;
 }
 
 // The allocator of the sockets, which can be called from the setup's thread and the socket layer's
@@ -630,7 +627,7 @@ static void *UtilAc_SocAlloc(u32 name, s32 size) {
 
     if (size > 0) {
         OS_LockMutex(&sAcSocMutex);
-        ptr = sAcWork.alloc(size);
+        ptr = sAcAlloc(size);
         OS_UnlockMutex(&sAcSocMutex);
         return ptr;
     }
@@ -640,7 +637,7 @@ static void *UtilAc_SocAlloc(u32 name, s32 size) {
 static void UtilAc_SocFree(u32 name, void *ptr, s32 size) {
     if (ptr != NULL && size > 0) {
         OS_LockMutex(&sAcSocMutex);
-        sAcWork.free(ptr);
+        sAcFree(ptr);
         OS_UnlockMutex(&sAcSocMutex);
     }
 }
@@ -649,8 +646,8 @@ static void UtilAc_ClearEvents(void) {
     u32 irq = OS_DisableInterrupts();
     int i;
 
-    sAcWork.eventWrite = 0;
-    sAcWork.eventRead = 0;
+    sAcEventWrite = 0;
+    sAcEventRead = 0;
     for (i = 0; i < 4; i++) {
         sAcEvents[i] = 0;
     }
@@ -660,16 +657,16 @@ static void UtilAc_ClearEvents(void) {
 // The oldest event of the ring, or 0 for none
 static int UtilAc_PopEvent(void) {
     u32 irq = OS_DisableInterrupts();
-    int read = sAcWork.eventRead;
+    int read = sAcEventRead;
     int event;
 
-    if (sAcWork.eventWrite == read) {
+    if (sAcEventWrite == read) {
         event = 0;
     } else {
         event = sAcEvents[read];
-        sAcWork.eventRead = read + 1;
-        if (sAcWork.eventRead >= 4) {
-            sAcWork.eventRead = 0;
+        sAcEventRead = read + 1;
+        if (sAcEventRead >= 4) {
+            sAcEventRead = 0;
         }
     }
     OS_RestoreInterrupts(irq);
@@ -678,16 +675,16 @@ static int UtilAc_PopEvent(void) {
 
 // The WCM wrapper's callback, which puts the event in the ring unless it is full
 static void UtilAc_OnEvent(int event, int param) {
-    int write = sAcWork.eventWrite;
-    int read = sAcWork.eventRead;
+    int write = sAcEventWrite;
+    int read = sAcEventRead;
 
     if (write + 1 == read || write == read + 3) {
         return;
     }
     sAcEvents[write] = event;
-    sAcWork.eventWrite = write + 1;
-    if (sAcWork.eventWrite >= 4) {
-        sAcWork.eventWrite = 0;
+    sAcEventWrite = write + 1;
+    if (sAcEventWrite >= 4) {
+        sAcEventWrite = 0;
     }
 }
 
@@ -701,16 +698,16 @@ static int UtilAc_StartWcm(int apCount) {
     int result;
     int wcmSize;
 
-    sAcWork.apCount = apCount;
+    sAcApCount = apCount;
     UtilAc_ClearEvents();
     wcmSize = apCount * 0xd0;
-    sAcWork.block = sAcWork.alloc(wcmSize + 0x24d0 + apCount * WCM_APLIST_SIZE);
-    if (sAcWork.block == NULL) {
+    sAcBlock = sAcAlloc(wcmSize + 0x24d0 + apCount * WCM_APLIST_SIZE);
+    if (sAcBlock == NULL) {
         return RESULT_NO_MEMORY;
     }
-    sAcWork.wcmBuffer = (void *)(((int)sAcWork.block + 0x1f) & ~0x1f);
-    sAcWork.apList = (u8 *)(((int)sAcWork.wcmBuffer + wcmSize + 0x2490 + 0x1f) & ~0x1f);
-    if (!UtilAcWcm_Start(UtilAc_OnEvent, sAcWork.wcmBuffer, wcmSize + 0x2490)) {
+    sAcWcmBuffer = (void *)(((int)sAcBlock + 0x1f) & ~0x1f);
+    sAcApList = (u8 *)(((int)sAcWcmBuffer + wcmSize + 0x2490 + 0x1f) & ~0x1f);
+    if (!UtilAcWcm_Start(UtilAc_OnEvent, sAcWcmBuffer, wcmSize + 0x2490)) {
         return RESULT_WIRELESS;
     }
     do {
@@ -759,9 +756,9 @@ static int UtilAc_EndWcm(void) {
             }
         } while (waiting);
     }
-    if (sAcWork.block != NULL) {
-        sAcWork.free(sAcWork.block);
-        sAcWork.block = NULL;
+    if (sAcBlock != NULL) {
+        sAcFree(sAcBlock);
+        sAcBlock = NULL;
     }
     return RESULT_OK;
 }
@@ -771,7 +768,7 @@ static int UtilAc_Connect(void) {
     BOOL waiting = TRUE;
     int result = RESULT_WIRELESS;
     OSAlarm alarm;
-    WMBssDesc *bss = (WMBssDesc *)(sAcWork.apList + sAcWork.apIndex * WCM_APLIST_SIZE);
+    WMBssDesc *bss = (WMBssDesc *)(sAcApList + sAcApIndex * WCM_APLIST_SIZE);
 
     if (bss == NULL) {
         return 0;
@@ -788,7 +785,7 @@ static int UtilAc_Connect(void) {
             result = RESULT_SCAN_TIMEOUT;
             break;
         }
-        if (sAcWork.cancel) {
+        if (sAcCancel) {
             result = RESULT_CANCELLED;
             break;
         }
@@ -805,7 +802,7 @@ static int UtilAc_Connect(void) {
                 result = RESULT_OK;
                 break;
             case DWC_WCM_EVENT_CONNECT_FAILED:
-                if (sAcWork.cancel) {
+                if (sAcCancel) {
                     waiting = FALSE;
                     result = RESULT_CANCELLED;
                 } else if (!UtilAcWcm_Connect(bss, NULL, WCM_OPTION_POWER_ACTIVE)) {
@@ -822,11 +819,11 @@ static int UtilAc_Connect(void) {
     while (UtilAc_PopEvent() != 0) {
     }
     if (result > 0) {
-        sAcWork.connected = TRUE;
+        sAcConnected = TRUE;
         if (SOC_Startup(&sAcSocConfig) < 0) {
             result = RESULT_WIRELESS;
         } else {
-            sAcWork.socStarted = TRUE;
+            sAcSocStarted = TRUE;
         }
     }
     return result;
@@ -835,7 +832,7 @@ static int UtilAc_Connect(void) {
 static void UtilAc_Disconnect(void) {
     BOOL waiting = TRUE;
 
-    if (sAcWork.connected) {
+    if (sAcConnected) {
         if (UtilAcWcm_Disconnect()) {
             do {
                 int event;
@@ -856,10 +853,10 @@ static void UtilAc_Disconnect(void) {
                 }
             } while (waiting);
         }
-        sAcWork.connected = FALSE;
+        sAcConnected = FALSE;
     }
-    if (sAcWork.socStarted) {
-        sAcWork.socStarted = FALSE;
+    if (sAcSocStarted) {
+        sAcSocStarted = FALSE;
         SOC_Cleanup();
     }
 }
@@ -938,7 +935,7 @@ static int UtilAc_Scan(void) {
     UtilAcScan *scan = NULL;
     UtilAcScan *previous = NULL;
     int result = RESULT_NO_MEMORY;
-    int size = sAcWork.apCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
+    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
     int round;
     int foundIndex = 0;
 
@@ -946,7 +943,7 @@ static int UtilAc_Scan(void) {
     if (scan != NULL) {
         previous = UtilAc_Calloc(1, size);
         if (previous != NULL) {
-            for (round = 0; round < 30 && !sAcWork.cancel; round++) {
+            for (round = 0; round < 30 && !sAcCancel; round++) {
                 OSAlarm alarm;
                 BOOL waiting = TRUE;
                 int count = 0;
@@ -965,7 +962,7 @@ static int UtilAc_Scan(void) {
                     int event;
 
                     OS_Sleep(10);
-                    if (UtilAc_GetMilliseconds() >= sAcConfig.deadline || sAcWork.cancel) {
+                    if (UtilAc_GetMilliseconds() >= sAcConfig.deadline || sAcCancel) {
                         break;
                     }
                     while ((event = UtilAc_PopEvent()) != 0) {
@@ -978,7 +975,7 @@ static int UtilAc_Scan(void) {
                             waiting = FALSE;
                             break;
                         case DWC_WCM_EVENT_FOUND_AP: {
-                            int found = UtilAcWcm_GetApList(sAcWork.apList, sAcWork.apCount);
+                            int found = UtilAcWcm_GetApList(sAcApList, sAcApCount);
 
                             if (found > count) {
                                 count = found;
@@ -991,6 +988,20 @@ static int UtilAc_Scan(void) {
                         case DWC_WCM_EVENT_SEARCH_ENDED:
                             waiting = FALSE;
                             break;
+                        case 0:
+                        case DWC_WCM_EVENT_UNKNOWN:
+                        case DWC_WCM_EVENT_FAILED:
+                        case DWC_WCM_EVENT_TERMINATED:
+                        case DWC_WCM_EVENT_STARTED:
+                        case 7:
+                        case DWC_WCM_EVENT_SEARCH_FAILED:
+                        case DWC_WCM_EVENT_END_SEARCH_FAILED:
+                        case DWC_WCM_EVENT_CONNECTED:
+                        case DWC_WCM_EVENT_CONNECT_FAILED:
+                        case DWC_WCM_EVENT_DISCONNECTED:
+                        case DWC_WCM_EVENT_DISCONNECT_FAILED:
+                        case 16:
+                        case 17:
                         default:
                             waiting = FALSE;
                             break;
@@ -1000,15 +1011,15 @@ static int UtilAc_Scan(void) {
                 OS_CancelAlarm(&alarm);
                 while (UtilAc_PopEvent() != 0) {
                 }
-                if (sAcWork.cancel) {
+                if (sAcCancel) {
                     break;
                 }
-                if (count >= sAcWork.apCount) {
+                if (count >= sAcApCount) {
                     result = RESULT_TOO_MANY_APS;
                     goto done;
                 }
                 for (i = 0; i < count; i++) {
-                    WMBssDesc *bss = (WMBssDesc *)sAcWork.apList + i;
+                    WMBssDesc *bss = (WMBssDesc *)sAcApList + i;
 
                     memcpy(scan->entries[i].ssid, bss->ssid, 0x20);
                     scan->entries[i].ssidLength = bss->ssidLength;
@@ -1021,22 +1032,22 @@ static int UtilAc_Scan(void) {
                     memcpy(scan->entries[i].bssid, bss->bssid, 6);
                 }
                 scan->count = count;
-                if (sAcWork.state != AC_STATE_SCANNING && UtilAc_FindSetupAp(scan, previous, &foundIndex)) {
+                if (sAcState != AC_STATE_SCANNING && UtilAc_FindSetupAp(scan, previous, &foundIndex)) {
                     UtilAcScanEntry *entry = &scan->entries[foundIndex];
 
-                    sAcWork.apIndex = foundIndex;
+                    sAcApIndex = foundIndex;
                     strcpy(sAcApSsid, entry->ssid);
                     memcpy(sAcApMac, entry->bssid, 6);
                     result = RESULT_OK;
                     goto done;
                 }
                 memcpy(previous, scan, size);
-                sAcWork.state = AC_STATE_SCANNED;
+                sAcState = AC_STATE_SCANNED;
                 UtilAc_NotifyStatus();
             }
             if (round >= 30 || UtilAc_GetMilliseconds() > sAcConfig.deadline) {
                 result = RESULT_SCAN_TIMEOUT;
-            } else if (sAcWork.cancel) {
+            } else if (sAcCancel) {
                 result = RESULT_CANCELLED;
             } else {
                 result = RESULT_OK;
@@ -1274,11 +1285,11 @@ static int UtilAc_BuildHello(u8 *out) {
     data.id = sAcHelloId;
     end = UtilAc_AppendItem(sAcConfig.items, 1, &data.version, sizeof(data.version));
     end = UtilAc_AppendItem(end, 2, &data.version, sizeof(data.version));
-    if (sAcWork.secure) {
+    if (sAcSecure) {
         end = UtilAc_AppendItem(end, 5, &data.version, sizeof(data.version));
     }
     end = UtilAc_AppendItem(end, 3, &data.id, sizeof(data.id));
-    if (sAcWork.secure) {
+    if (sAcSecure) {
         end = UtilAc_AppendItem(end, 4, sAcOwnMac, 6);
     }
     return UtilAc_BuildPacket(out, 2, sAcMessage, end - sAcConfig.items + 8, NULL);
@@ -1324,6 +1335,7 @@ static int UtilAc_ParseSettings(const u8 *message) {
     u32 length;
     int found = 0;
     int i;
+    u16 value;
 
     while ((data = UtilAc_NextItem(&cursor, end, &type, &length)) != NULL) {
         switch (type) {
@@ -1336,13 +1348,15 @@ static int UtilAc_ParseSettings(const u8 *message) {
             sAcSettings.security = SWAP16(*(u16 *)data);
             break;
         case 0x203:
+            value = SWAP16(*(u16 *)data);
             for (i = 0; i < 4; i++) {
-                sAcSettings.keys[i].format = SWAP16(*(u16 *)data);
+                sAcSettings.keys[i].format = value;
             }
             break;
         case 0x204:
+            value = SWAP16(*(u16 *)data);
             for (i = 0; i < 4; i++) {
-                sAcSettings.keys[i].type = SWAP16(*(u16 *)data);
+                sAcSettings.keys[i].type = value;
             }
             break;
         case 0x205:
@@ -1459,13 +1473,13 @@ static int UtilAc_MakeResult(void) {
                     sAcResult.wepMode = 2;
                     memcpy(sAcResult.keys[i], text, 13);
                     break;
-                case 16:
-                    sAcResult.wepMode = 3;
-                    memcpy(sAcResult.keys[i], text, 16);
-                    break;
                 case 26:
                     sAcResult.wepMode = 2;
                     UtilAc_ParseHex(sAcResult.keys[i], text, 26);
+                    break;
+                case 16:
+                    sAcResult.wepMode = 3;
+                    memcpy(sAcResult.keys[i], text, 16);
                     break;
                 case 32:
                     sAcResult.wepMode = 3;
@@ -1508,18 +1522,18 @@ static int UtilAc_Run(void) {
     u32 now;
     const u8 *data;
 
-    sAcWork.step = 1;
-    while (!done && !sAcWork.cancel) {
+    sAcStep = 1;
+    while (!done && !sAcCancel) {
         OS_Sleep(500);
-        switch (sAcWork.step) {
+        switch (sAcStep) {
         case 1:
             result = UtilAc_Scan();
             if (result != RESULT_OK) {
                 done = TRUE;
             } else {
-                sAcWork.state = AC_STATE_FOUND;
+                sAcState = AC_STATE_FOUND;
                 UtilAc_NotifyStatus();
-                sAcWork.step = 2;
+                sAcStep = 2;
             }
             break;
         case 2:
@@ -1527,7 +1541,7 @@ static int UtilAc_Run(void) {
             if (result != RESULT_OK) {
                 done = TRUE;
             } else {
-                sAcWork.step = 3;
+                sAcStep = 3;
             }
             break;
         case 3:
@@ -1546,7 +1560,7 @@ static int UtilAc_Run(void) {
                     result = RESULT_WIRELESS;
                     done = TRUE;
                 } else {
-                    sAcWork.step = 4;
+                    sAcStep = 4;
                 }
             }
             break;
@@ -1559,19 +1573,19 @@ static int UtilAc_Run(void) {
                 from.len = sizeof(SocAddrIn);
                 UtilAc_MakeIds(&sAcKey, &from);
                 if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
-                    UtilAc_ParseHello(sAcPacket, &sAcWork.secure)) {
+                    UtilAc_ParseHello(sAcPacket, &sAcSecure)) {
                     sAcConfig.deadline = UtilAc_GetMilliseconds() + 30000;
-                    sAcWork.step = 5;
-                    sAcWork.state = AC_STATE_HELLO;
+                    sAcStep = 5;
+                    sAcState = AC_STATE_HELLO;
                     UtilAc_NotifyStatus();
                 }
             }
             break;
         case 5:
-            sAcWork.packetSize = UtilAc_BuildHello(sAcPacket);
-            UtilAc_Send(sock, &from, sAcPacket, sAcWork.packetSize);
+            sAcPacketSize = UtilAc_BuildHello(sAcPacket);
+            UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
             sentAt = UtilAc_GetMilliseconds();
-            sAcWork.step = 6;
+            sAcStep = 6;
             break;
         case 6:
             if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
@@ -1586,56 +1600,56 @@ static int UtilAc_Run(void) {
                     memcpy(sAcSessionKey, data, 8);
                     UtilAc_Md5(sAcSessionKey + 8, (u8 *)&now, sizeof(now));
                     retries = 0;
-                    sAcWork.step = 7;
-                    sAcWork.state = AC_STATE_KEY;
+                    sAcStep = 7;
+                    sAcState = AC_STATE_KEY;
                     sAcConfig.deadline = 0xffffffff;
                     UtilAc_NotifyStatus();
                 }
             } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
-                sAcWork.step = 5;
+                sAcStep = 5;
             }
             break;
         case 7:
-            sAcWork.messageSize = UtilAc_BuildMessage(sAcMessage, 0x102, sAcSessionKey + 8, 8);
-            sAcWork.packetSize = UtilAc_BuildPacket(sAcPacket, 4, sAcMessage, sAcWork.messageSize, (u8 *)&sAcKey);
-            UtilAc_Send(sock, &from, sAcPacket, sAcWork.packetSize);
+            sAcMessageSize = UtilAc_BuildMessage(sAcMessage, 0x102, sAcSessionKey + 8, 8);
+            sAcPacketSize = UtilAc_BuildPacket(sAcPacket, 4, sAcMessage, sAcMessageSize, (u8 *)&sAcKey);
+            UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
             sentAt = UtilAc_GetMilliseconds();
             memset(&sAcSettings, 0, sizeof(sAcSettings));
-            sAcWork.step = 8;
+            sAcStep = 8;
             break;
         case 8:
             if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
-                (sAcWork.messageSize = UtilAc_ParseBody(sAcPacket, 5, sAcMessage, sAcSessionKey)) != 0 &&
+                (sAcMessageSize = UtilAc_ParseBody(sAcPacket, 5, sAcMessage, sAcSessionKey)) != 0 &&
                 UtilAc_ParseSettings(sAcMessage)) {
                 if (sAcSettings.ssid[0] != 0) {
-                    sAcWork.hasSsid = TRUE;
+                    sAcHasSsid = TRUE;
                 } else {
-                    sAcWork.hasSsid = FALSE;
+                    sAcHasSsid = FALSE;
                 }
                 retries = 0;
-                sAcWork.step = 9;
+                sAcStep = 9;
             } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
                 if (++retries >= 10) {
                     SOC_Close(sock);
                     result = RESULT_WIRELESS;
                     done = TRUE;
                 } else {
-                    sAcWork.step = 7;
+                    sAcStep = 7;
                 }
             }
             break;
         case 9:
-            sAcWork.messageSize = UtilAc_BuildMessage(sAcMessage, 0x301, &sAcWork.hasSsid, 1);
-            sAcWork.packetSize = UtilAc_BuildPacket(sAcPacket, 6, sAcMessage, sAcWork.messageSize, sAcSessionKey);
+            sAcMessageSize = UtilAc_BuildMessage(sAcMessage, 0x301, &sAcHasSsid, 1);
+            sAcPacketSize = UtilAc_BuildPacket(sAcPacket, 6, sAcMessage, sAcMessageSize, sAcSessionKey);
             if (UtilAcWcm_GetState() != STATE_CONNECTED) {
                 // The connection is gone: wait a second and give up on the answer
                 sentAt = UtilAc_GetMilliseconds() + 1000;
                 retries = 10;
-                sAcWork.step = 10;
+                sAcStep = 10;
             } else {
-                UtilAc_Send(sock, &from, sAcPacket, sAcWork.packetSize);
+                UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
                 sentAt = UtilAc_GetMilliseconds();
-                sAcWork.step = 10;
+                sAcStep = 10;
             }
             break;
         case 10:
@@ -1644,7 +1658,7 @@ static int UtilAc_Run(void) {
                     done = TRUE;
                     result = UtilAc_MakeResult();
                 } else {
-                    sAcWork.step = 9;
+                    sAcStep = 9;
                 }
             }
             break;
@@ -1653,7 +1667,7 @@ static int UtilAc_Run(void) {
     if (sock != 0) {
         SOC_Close(sock);
     }
-    if (sAcWork.cancel) {
+    if (sAcCancel) {
         result = RESULT_CANCELLED;
     }
     return result;
@@ -1663,12 +1677,12 @@ static int UtilAc_Run(void) {
 static void UtilAc_Thread(void *arg) {
     int result = UtilAc_Run();
 
-    sAcWork.result = result;
+    sAcStatusResult = result;
     UtilAc_Disconnect();
     if (result == RESULT_OK) {
-        sAcWork.state = AC_STATE_DONE;
+        sAcState = AC_STATE_DONE;
     } else {
-        sAcWork.state = AC_STATE_FAILED;
+        sAcState = AC_STATE_FAILED;
     }
     sAcConfig.deadline = 0xffffffff;
     UtilAc_NotifyStatus();
@@ -2529,7 +2543,7 @@ static u32 UtilAc_GetMilliseconds(void) {
 
 static void *UtilAc_Calloc(int count, int size) {
     int total = count * size;
-    void *ptr = sAcWork.alloc(total);
+    void *ptr = sAcAlloc(total);
 
     if (ptr != NULL) {
         memset(ptr, 0, total);
@@ -2538,7 +2552,7 @@ static void *UtilAc_Calloc(int count, int size) {
 }
 
 static void UtilAc_Free(void *ptr) {
-    sAcWork.free(ptr);
+    sAcFree(ptr);
 }
 
 // Writes the two hex digits of a byte, in capitals; their count
@@ -2584,48 +2598,48 @@ int DWCUtilAc_Start(u32 priority, int apCount, DWCUtilAcCallback callback, void 
                     void (*free)(void *ptr), u32 stackSize) {
     int result;
 
-    if (sAcWork.state >= AC_STATE_SCANNING && sAcWork.state <= AC_STATE_KEY) {
+    if (sAcState >= AC_STATE_SCANNING && sAcState <= AC_STATE_KEY) {
         return RESULT_BUSY;
     }
     sAcConfig.apCount = apCount;
-    sAcWork.state = AC_STATE_FAILED;
-    sAcWork.callback = callback;
-    sAcWork.alloc = alloc;
-    sAcWork.free = free;
+    sAcState = AC_STATE_FAILED;
+    sAcCallback = callback;
+    sAcAlloc = alloc;
+    sAcFree = free;
     sAcConfig.stackSize = stackSize;
     result = UtilAc_StartWcm(apCount);
-    sAcWork.started = TRUE;
+    sAcWcmStarted = TRUE;
     if (result < 0) {
-        sAcWork.result = result;
+        sAcStatusResult = result;
         return result;
     }
-    sAcWork.stack = sAcWork.alloc(sAcConfig.stackSize);
-    if (sAcWork.stack == NULL) {
-        sAcWork.result = RESULT_NO_MEMORY;
+    sAcStack = sAcAlloc(sAcConfig.stackSize);
+    if (sAcStack == NULL) {
+        sAcStatusResult = RESULT_NO_MEMORY;
         return RESULT_NO_MEMORY;
     }
     if (OS_IsThreadAvailable() != TRUE) {
-        sAcWork.result = RESULT_NO_THREADS;
+        sAcStatusResult = RESULT_NO_THREADS;
         return RESULT_NO_THREADS;
     }
-    OS_CreateThread(&sAcThread, UtilAc_Thread, NULL, (u8 *)sAcWork.stack + (sAcConfig.stackSize & ~7),
-                    sAcConfig.stackSize, priority);
-    sAcWork.state = AC_STATE_SCANNING;
+    OS_CreateThread(&sAcThread, UtilAc_Thread, NULL, (u8 *)sAcStack + (sAcConfig.stackSize & ~7), sAcConfig.stackSize,
+                    priority);
+    sAcState = AC_STATE_SCANNING;
     sAcConfig.deadline = UtilAc_GetMilliseconds() + 60000;
-    sAcWork.cancel = FALSE;
+    sAcCancel = FALSE;
     memset(&sAcResult, 0, sizeof(sAcResult));
     UtilAc_NotifyStatus();
     OS_WakeupThreadDirect(&sAcThread);
-    sAcWork.running = TRUE;
+    sAcRunning = TRUE;
     return RESULT_OK;
 }
 
 int DWCUtilAc_Cancel(void) {
-    if (sAcWork.running) {
-        int state = sAcWork.state;
+    if (sAcRunning) {
+        int state = sAcState;
 
-        sAcWork.cancel = TRUE;
-        while (sAcWork.state >= AC_STATE_SCANNING && sAcWork.state <= AC_STATE_KEY) {
+        sAcCancel = TRUE;
+        while (sAcState >= AC_STATE_SCANNING && sAcState <= AC_STATE_KEY) {
             OS_Sleep(100);
         }
         OS_Sleep(500);
@@ -2635,32 +2649,32 @@ int DWCUtilAc_Cancel(void) {
                 OS_JoinThread(&sAcThread);
             } while (!OS_IsThreadTerminated(&sAcThread));
         }
-        if (sAcWork.stack != NULL) {
-            sAcWork.free(sAcWork.stack);
-            sAcWork.stack = NULL;
+        if (sAcStack != NULL) {
+            sAcFree(sAcStack);
+            sAcStack = NULL;
         }
-        sAcWork.running = FALSE;
-        if (state != sAcWork.state) {
+        sAcRunning = FALSE;
+        if (state != sAcState) {
             UtilAc_NotifyStatus();
         }
     }
-    if (sAcWork.started > 0) {
+    if (sAcWcmStarted > 0) {
         int result = UtilAc_EndWcm();
 
-        sAcWork.started = FALSE;
+        sAcWcmStarted = FALSE;
         return result;
     }
     return RESULT_BUSY;
 }
 
 static int UtilAc_GetStatus(DWCUtilAcStatus *status) {
-    status->state = sAcWork.state;
+    status->state = sAcState;
     if (sAcConfig.deadline == 0xffffffff) {
         status->timeLeft = 0xffffffff;
     } else {
         status->timeLeft = sAcConfig.deadline - UtilAc_GetMilliseconds();
     }
-    status->result = sAcWork.result;
+    status->result = sAcStatusResult;
     return 1;
 }
 
@@ -2673,5 +2687,5 @@ static void UtilAc_NotifyStatus(void) {
     DWCUtilAcStatus status;
 
     UtilAc_GetStatus(&status);
-    sAcWork.callback(&status);
+    sAcCallback(&status);
 }

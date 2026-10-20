@@ -156,14 +156,10 @@ static DWCUtilAddressSettingsState sAddressSettings;
 
 // The palette rows of the three buttons
 static const u8 sAddressButtonPalettes[3] = { 6, 8, 7 };
-// The title's label by language
-static const s8 sAddressTitleLabels[7] = { -1, 0x23, 0x27, -1, 0x23, 0x2f, -1 };
-// Where the rows are touched: the row's field, and the two answers of a row of DHCP
-static const DWCUtilAddressRect sAddressRowRects[3] = {
-    { { 0xcc, 0x34, 0x1c, 0x18 } },
-    { { 0x8f, 0x34, 0x2c, 0x18 } },
-    { { 0xc0, 0x34, 0x2c, 0x18 } },
-};
+// Where a row is touched: its field, and the "No" and "Yes" answers of a row of DHCP
+static const DWCUtilAddressRect sAddressFieldRect = { { 0xcc, 0x34, 0x1c, 0x18 } };
+static const DWCUtilAddressRect sAddressNoRect = { { 0x8f, 0x34, 0x2c, 0x18 } };
+static const DWCUtilAddressRect sAddressYesRect = { { 0xc0, 0x34, 0x2c, 0x18 } };
 // The item of each row, ADDRESS_ITEM_NONE for a row of DHCP, whose answers are the items
 static const u8 sAddressRowItems[9] = {
     ADDRESS_ITEM_SSID,    ADDRESS_ITEM_WEP_KEY, ADDRESS_ITEM_NONE, ADDRESS_ITEM_IP,   ADDRESS_ITEM_NETMASK,
@@ -171,6 +167,8 @@ static const u8 sAddressRowItems[9] = {
 };
 // How far down the BG of the rows' labels is, by the top row
 static const u8 sAddressLabelOffsets[9] = { 0, 5, 2, 7, 4, 1, 6, 3, 0 };
+// The title's label by language
+static const s8 sAddressTitleLabels[7] = { -1, 0x23, 0x27, -1, 0x23, 0x2f, -1 };
 // The row of each item
 static const u8 sAddressItemRows[11] = { 0, 1, 2, 2, 3, 4, 5, 6, 6, 7, 8 };
 // The cells of the marks: none, an arrow, the lit, the unlit and the greyed answers
@@ -960,7 +958,7 @@ static int DWCUtilAddressSettings_GetTouchedItem(void) {
         return ADDRESS_ITEM_NONE;
     }
     top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
-    rect = sAddressRowRects[0];
+    rect = sAddressFieldRect;
     for (i = 0; i < 4; i++) {
         if (top != ADDRESS_ROW_AUTO_ADDRESS && top != ADDRESS_ROW_AUTO_DNS &&
             DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
@@ -972,12 +970,12 @@ static int DWCUtilAddressSettings_GetTouchedItem(void) {
     top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     for (i = 0; i < 4; i++) {
         if (top == ADDRESS_ROW_AUTO_ADDRESS) {
-            rect = sAddressRowRects[2];
+            rect = sAddressYesRect;
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
             if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_ADDRESS_YES;
             }
-            rect = sAddressRowRects[1];
+            rect = sAddressNoRect;
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
             if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_ADDRESS_NO;
@@ -989,12 +987,12 @@ static int DWCUtilAddressSettings_GetTouchedItem(void) {
     top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     for (i = 0; i < 4; i++) {
         if (top == ADDRESS_ROW_AUTO_DNS) {
-            rect = sAddressRowRects[2];
+            rect = sAddressYesRect;
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
             if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_DNS_YES;
             }
-            rect = sAddressRowRects[1];
+            rect = sAddressNoRect;
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
             if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_DNS_NO;
