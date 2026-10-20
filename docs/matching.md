@@ -3770,7 +3770,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`add r0, sp, #0`) at each call, where dsi/1.1p1 keeps it in a saved register even at `optimization_level 1`, may have
   been built with NitroSystem's 2.0/sp2p2. TwlSDK's `syscall_twl_ltd.c` matches whole under it, with plain indexed pad
   loops, and under no dsi compiler, while all but four of `lib/twl`'s other files break under it. Probe 2.0/sp2p2 before
-  grinding such a function; configure.py has no per-file compiler yet.
+  grinding such a function. A file gets a compiler of its own in its `library.toml`'s `file_compilers`, as
+  `syscall_twl_ltd.c` does, and keeps the library's flags.
 
 - MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
   `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands

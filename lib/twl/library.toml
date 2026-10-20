@@ -49,3 +49,8 @@ flags = [
 "dsp/dsp_pipe.c" = ["-nothumb"]
 "dsp/dsp_g711.c" = ["-nothumb"]
 "dsp/dsp_graphics.c" = ["-nothumb"]
+
+# TwlSDK's system call library was built with NitroSystem's compiler: its LTD half's HMAC-SHA-1 matches under 2.0/sp2p2
+# and under no dsi compiler, which index its pad loops and keep the context's address in a register
+[file_compilers]
+"syscall/syscall_twl_ltd.c" = "2.0/sp2p2"
