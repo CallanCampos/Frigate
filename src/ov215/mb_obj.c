@@ -181,10 +181,11 @@ static void MailBox_LoadActorResources(MailBoxView *view) {
     u32 i;
 
     for (i = 0; i <= 2; i++) {
-        view->chars[i] = ClActSys_LoadChars(arc, func_0202d894(), FALSE, TRUE, HEAPID_MAILBOX_VIEW);
+        view->chars[i] = ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, TRUE, HEAPID_MAILBOX_VIEW);
     }
     view->palettes[0] = ClActSys_LoadPltt(arc, PokeIcon_GetPaletteFile(), 1, 0, HEAPID_MAILBOX_VIEW);
-    view->cellAnims[0] = ClActSys_LoadCellAnims(arc, func_0202d898(0), func_0202d89c(0), HEAPID_MAILBOX_VIEW);
+    view->cellAnims[0] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(0),
+                                                AppMenuCommon_GetItemIconAnimFile(0), HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
 }
 

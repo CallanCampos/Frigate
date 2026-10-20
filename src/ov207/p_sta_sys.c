@@ -425,12 +425,18 @@ static void PStatus_LoadResources(PStatusWork *wk) {
         ClActSys_LoadChars(uiArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
     wk->clResources[PSTA_RES_CELL(1)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetTouchBarCellFile(2),
                                                                AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(9)] = ClActSys_LoadPlttRange(uiArc, func_0202d964(), 0, 0xa0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(10)] = ClActSys_LoadChars(uiArc, func_0202d968(2), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(9)] = ClActSys_LoadCellAnims(uiArc, func_0202d96c(2), func_0202d970(2), wk->heapId);
-    wk->clResources[PSTA_RES_PLTT(2)] = ClActSys_LoadPlttRange(uiArc, func_0202d944(), 0, 0xc0, 0, 1, wk->heapId);
-    wk->clResources[PSTA_RES_CHAR(3)] = ClActSys_LoadChars(uiArc, func_0202d948(2), FALSE, 0, wk->heapId);
-    wk->clResources[PSTA_RES_CELL(3)] = ClActSys_LoadCellAnims(uiArc, func_0202d94c(2), func_0202d950(2), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(9)] =
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetPokerusIconPaletteFile(), 0, 0xa0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(10)] =
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetPokerusIconCharFile(2), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(9)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetPokerusIconCellFile(2),
+                                                               AppMenuCommon_GetPokerusIconAnimFile(2), wk->heapId);
+    wk->clResources[PSTA_RES_PLTT(2)] =
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetMarkingIconPaletteFile(), 0, 0xc0, 0, 1, wk->heapId);
+    wk->clResources[PSTA_RES_CHAR(3)] =
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetMarkingIconCharFile(2), FALSE, 0, wk->heapId);
+    wk->clResources[PSTA_RES_CELL(3)] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetMarkingIconCellFile(2),
+                                                               AppMenuCommon_GetMarkingIconAnimFile(2), wk->heapId);
     wk->clResources[PSTA_RES_PLTT(10)] =
         ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
     wk->clResources[PSTA_RES_CHAR(11)] =

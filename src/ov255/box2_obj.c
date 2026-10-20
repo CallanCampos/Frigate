@@ -989,15 +989,24 @@ static void LoadInfoResources(Box2AppWork *app) {
     app->cellRes[4] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTypeIconCellFile(2),
                                              AppMenuCommon_GetTypeIconAnimFile(2), HEAPID_BOX2_APP);
     app->palRes[4] = ClActSys_LoadPltt(arc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB, 0, HEAPID_BOX2_APP);
-    app->chrRes[126] = ClActSys_LoadChars(arc, func_0202d948(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
-    app->cellRes[10] = ClActSys_LoadCellAnims(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
-    app->palRes[9] = ClActSys_LoadPltt(arc, func_0202d944(), CLACT_VRAM_SUB, 0xa0, HEAPID_BOX2_APP);
-    app->chrRes[127] = ClActSys_LoadChars(arc, func_0202d968(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
-    app->cellRes[11] = ClActSys_LoadCellAnims(arc, func_0202d96c(2), func_0202d970(2), HEAPID_BOX2_APP);
-    app->palRes[10] = ClActSys_LoadPltt(arc, func_0202d964(), CLACT_VRAM_SUB, 0xc0, HEAPID_BOX2_APP);
-    app->chrRes[125] = ClActSys_LoadChars(arc, func_0202d948(2), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
-    app->cellRes[9] = ClActSys_LoadCellAnims(arc, func_0202d94c(2), func_0202d950(2), HEAPID_BOX2_APP);
-    app->palRes[8] = ClActSys_LoadPltt(arc, func_0202d944(), CLACT_VRAM_MAIN, 0x1c0, HEAPID_BOX2_APP);
+    app->chrRes[126] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetMarkingIconCharFile(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
+    app->cellRes[10] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetMarkingIconCellFile(2),
+                                              AppMenuCommon_GetMarkingIconAnimFile(2), HEAPID_BOX2_APP);
+    app->palRes[9] =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetMarkingIconPaletteFile(), CLACT_VRAM_SUB, 0xa0, HEAPID_BOX2_APP);
+    app->chrRes[127] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetPokerusIconCharFile(2), FALSE, CLACT_VRAM_SUB, HEAPID_BOX2_APP);
+    app->cellRes[11] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetPokerusIconCellFile(2),
+                                              AppMenuCommon_GetPokerusIconAnimFile(2), HEAPID_BOX2_APP);
+    app->palRes[10] =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetPokerusIconPaletteFile(), CLACT_VRAM_SUB, 0xc0, HEAPID_BOX2_APP);
+    app->chrRes[125] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetMarkingIconCharFile(2), FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
+    app->cellRes[9] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetMarkingIconCellFile(2),
+                                             AppMenuCommon_GetMarkingIconAnimFile(2), HEAPID_BOX2_APP);
+    app->palRes[8] =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetMarkingIconPaletteFile(), CLACT_VRAM_MAIN, 0x1c0, HEAPID_BOX2_APP);
     app->chrRes[128] = ClActSys_LoadChars(arc, 175, FALSE, CLACT_VRAM_MAIN, HEAPID_BOX2_APP);
     app->cellRes[12] = ClActSys_LoadCellAnims(arc, 174, 173, HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);

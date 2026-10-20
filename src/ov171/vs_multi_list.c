@@ -614,9 +614,12 @@ static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
     wk->charRes[6] = ClActSys_LoadChars(uiArc, 65, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
     wk->palRes[1] = ClActSys_LoadPltt(uiArc, 66, CLACT_VRAM_MAIN, 128, HEAPID_VS_MULTI_LIST);
     wk->cellRes[1] = ClActSys_LoadCellAnims(uiArc, 69, 72, HEAPID_VS_MULTI_LIST);
-    wk->charRes[8] = ClActSys_LoadChars(uiArc, func_0202d958(2), FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
-    wk->palRes[3] = ClActSys_LoadPltt(uiArc, func_0202d954(), CLACT_VRAM_MAIN, 160, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[3] = ClActSys_LoadCellAnims(uiArc, func_0202d95c(2), func_0202d960(2), HEAPID_VS_MULTI_LIST);
+    wk->charRes[8] =
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetHpBarCharFile(2), FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
+    wk->palRes[3] =
+        ClActSys_LoadPltt(uiArc, AppMenuCommon_GetHpBarPaletteFile(), CLACT_VRAM_MAIN, 160, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[3] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetHpBarCellFile(2), AppMenuCommon_GetHpBarAnimFile(2),
+                                            HEAPID_VS_MULTI_LIST);
     GFL_ArcToolFree(uiArc);
 }
 

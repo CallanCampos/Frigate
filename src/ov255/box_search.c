@@ -660,10 +660,10 @@ static void BoxSearch_LoadObjs(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId
     setup.vramType = 0;
     setup.flags = 0;
     setup.arcId = getUINarcIdx();
-    setup.paletteFile = func_0202d944();
-    setup.charFile = func_0202d948(2);
-    setup.cellFile = func_0202d94c(2);
-    setup.animFile = func_0202d950(2);
+    setup.paletteFile = AppMenuCommon_GetMarkingIconPaletteFile();
+    setup.charFile = AppMenuCommon_GetMarkingIconCharFile(2);
+    setup.cellFile = AppMenuCommon_GetMarkingIconCellFile(2);
+    setup.animFile = AppMenuCommon_GetMarkingIconAnimFile(2);
     setup.paletteOffset = 9;
     setup.paletteStart = 0;
     setup.paletteCount = 1;

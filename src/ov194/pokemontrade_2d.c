@@ -1507,10 +1507,10 @@ void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         }
         setup.flags = 0;
         setup.arcId = getUINarcIdx();
-        setup.paletteFile = func_0202d890();
-        setup.charFile = func_0202d894();
-        setup.cellFile = func_0202d898(2);
-        setup.animFile = func_0202d89c(2);
+        setup.paletteFile = AppMenuCommon_GetItemIconPaletteFile();
+        setup.charFile = AppMenuCommon_GetItemIconCharFile();
+        setup.cellFile = AppMenuCommon_GetItemIconCellFile(2);
+        setup.animFile = AppMenuCommon_GetItemIconAnimFile(2);
         setup.paletteStart = 0;
         setup.paletteCount = 1;
         UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);
@@ -1590,10 +1590,10 @@ static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         setup.paletteOffset = 14;
         setup.flags = 0;
         setup.arcId = getUINarcIdx();
-        setup.paletteFile = func_0202d944();
-        setup.charFile = func_0202d948(2);
-        setup.cellFile = func_0202d94c(2);
-        setup.animFile = func_0202d950(2);
+        setup.paletteFile = AppMenuCommon_GetMarkingIconPaletteFile();
+        setup.charFile = AppMenuCommon_GetMarkingIconCharFile(2);
+        setup.cellFile = AppMenuCommon_GetMarkingIconCellFile(2);
+        setup.animFile = AppMenuCommon_GetMarkingIconAnimFile(2);
         setup.paletteStart = 0;
         setup.paletteCount = 1;
         UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);
@@ -1614,10 +1614,10 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
     setup.vramType = CLACT_VRAM_MAIN;
     setup.flags = 0;
     setup.arcId = getUINarcIdx();
-    setup.paletteFile = func_0202d944();
-    setup.charFile = func_0202d948(2);
-    setup.cellFile = func_0202d94c(2);
-    setup.animFile = func_0202d950(2);
+    setup.paletteFile = AppMenuCommon_GetMarkingIconPaletteFile();
+    setup.charFile = AppMenuCommon_GetMarkingIconCharFile(2);
+    setup.cellFile = AppMenuCommon_GetMarkingIconCellFile(2);
+    setup.animFile = AppMenuCommon_GetMarkingIconAnimFile(2);
     setup.paletteOffset = 13;
     setup.paletteStart = 0;
     setup.paletteCount = 1;

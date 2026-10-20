@@ -681,18 +681,24 @@ static void PokeList_LoadResources(PokeListWork *wk) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d82c(), 1, 0, 0, FALSE, wk->heapId);
 #endif
     GFL_BGSysSetScrPaletteNo(1, 0, 0, 0x40, 0x20, 0xb);
-    wk->clResources[CL_RES_PLTT(5)] = ClActSys_LoadPlttRange(commonArc, func_0202d954(), 0, 0xa0, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(6)] = ClActSys_LoadChars(commonArc, func_0202d958(2), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(6)] = ClActSys_LoadCellAnims(commonArc, func_0202d95c(2), func_0202d960(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(5)] =
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetHpBarPaletteFile(), 0, 0xa0, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(6)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetHpBarCharFile(2), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(6)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetHpBarCellFile(2),
+                                                             AppMenuCommon_GetHpBarAnimFile(2), wk->heapId);
     wk->clResources[CL_RES_PLTT(1)] =
         ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x120, 0, 3, wk->heapId);
     wk->clResources[CL_RES_CHAR(2)] =
         ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
     wk->clResources[CL_RES_CELL(2)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTouchBarCellFile(2),
                                                              AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(2)] = ClActSys_LoadPlttRange(commonArc, func_0202d890(), 0, 0x60, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(3)] = ClActSys_LoadChars(commonArc, func_0202d894(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(3)] = ClActSys_LoadCellAnims(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(2)] =
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetItemIconPaletteFile(), 0, 0x60, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(3)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetItemIconCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(3)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetItemIconCellFile(2),
+                                                             AppMenuCommon_GetItemIconAnimFile(2), wk->heapId);
     wk->clResources[CL_RES_PLTT(4)] =
         ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
     wk->clResources[CL_RES_CHAR(5)] =

@@ -538,10 +538,10 @@ static void WbtList_CreateTrainerActors(WbtList *work, const WbtListTrainerSetup
         resSetup.vramType = CLACT_VRAM_MAIN;
         resSetup.flags = 0;
         resSetup.arcId = getUINarcIdx();
-        resSetup.paletteFile = func_0202d8a0();
-        resSetup.charFile = func_0202d8a4();
-        resSetup.cellFile = func_0202d8a8(2);
-        resSetup.animFile = func_0202d8ac(2);
+        resSetup.paletteFile = AppMenuCommon_GetMModelIconPaletteFile();
+        resSetup.charFile = AppMenuCommon_GetMModelIconCharFile();
+        resSetup.cellFile = AppMenuCommon_GetMModelIconCellFile(2);
+        resSetup.animFile = AppMenuCommon_GetMModelIconAnimFile(2);
         resSetup.paletteOffset = setups->palette;
         resSetup.paletteStart = 0;
         resSetup.paletteCount = 1;

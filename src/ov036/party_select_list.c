@@ -349,9 +349,11 @@ static void PartySelectList_ShowIcons(PartySelectList *psl, u32 mode) {
 static void PartySelectList_LoadItemResources(PartySelectList *psl) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, psl->heapId);
 
-    psl->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), CLACT_VRAM_MAIN, 0x120, 0, 1, psl->heapId);
-    psl->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(1), func_0202d89c(1), psl->heapId);
-    psl->itemChars = ClActSys_LoadChars(arc, func_0202d894(), 0, 0, psl->heapId);
+    psl->itemPalette =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), CLACT_VRAM_MAIN, 0x120, 0, 1, psl->heapId);
+    psl->itemCells = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(1),
+                                            AppMenuCommon_GetItemIconAnimFile(1), psl->heapId);
+    psl->itemChars = ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), 0, 0, psl->heapId);
     GFL_ArcToolFree(arc);
 }
 

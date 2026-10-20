@@ -1082,10 +1082,12 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     }
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    card->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), card->surface, (card->iconPaletteSlot + 3) << 5, 0,
-                                               1, HEAPID_TAIL(heapId));
-    card->itemChars = ClActSys_LoadChars(arc, func_0202d894(), FALSE, card->surface, HEAPID_TAIL(heapId));
-    card->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(2), func_0202d89c(2), heapId);
+    card->itemPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), card->surface,
+                                               (card->iconPaletteSlot + 3) << 5, 0, 1, HEAPID_TAIL(heapId));
+    card->itemChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, card->surface, HEAPID_TAIL(heapId));
+    card->itemCells =
+        ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2), AppMenuCommon_GetItemIconAnimFile(2), heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.y = 168;
@@ -1624,9 +1626,12 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     i = 0;
-    list->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), CLACT_VRAM_MAIN, 256, i, 1, HEAPID_TAIL(heapId));
-    list->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(2), func_0202d89c(2), HEAPID_TAIL(heapId));
-    list->itemChars = ClActSys_LoadChars(arc, func_0202d894(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
+    list->itemPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), CLACT_VRAM_MAIN, 256, i, 1,
+                                               HEAPID_TAIL(heapId));
+    list->itemCells = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2),
+                                             AppMenuCommon_GetItemIconAnimFile(2), HEAPID_TAIL(heapId));
+    list->itemChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 24;

@@ -2723,10 +2723,10 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     case ICON_TYPE_PLAYER:
     case ICON_TYPE_RIVAL:
         arcId = getUINarcIdx();
-        paletteFile = func_0202d8a0();
-        charsFile = func_0202d8a4();
-        cellFile = func_0202d8a8(2);
-        animFile = func_0202d8ac(2);
+        paletteFile = AppMenuCommon_GetMModelIconPaletteFile();
+        charsFile = AppMenuCommon_GetMModelIconCharFile();
+        cellFile = AppMenuCommon_GetMModelIconCellFile(2);
+        animFile = AppMenuCommon_GetMModelIconAnimFile(2);
         sex = species;
         break;
     case ICON_TYPE_FRIEND:
