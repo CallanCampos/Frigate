@@ -237,7 +237,7 @@ BOOL CompatibleIrcSys_StartNegotiation(CompatibleIrcSys *sys) {
     }
     switch (sys->state) {
     case 0:
-        func_020429f8(NULL);
+        GFL_NetChangeoverConnect(NULL);
         sys->state = 1;
         sys->negotiating = TRUE;
         sys->connected = FALSE;

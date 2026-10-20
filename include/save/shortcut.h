@@ -27,6 +27,6 @@ u16 ShortcutSave_GetShortcutCount(ShortcutSave *shortcutSave);
 // Moves a shortcut to a slot, or to the first free one when index is SHORTCUT_NONE. Returns the slot
 u8 ShortcutSave_MoveItemToIndex(ShortcutSave *shortcutSave, u32 shortcut, u8 index);
 // Replaces shortcut 7 (DNA Splicers that fuse) with 8 (that separate), or 8 with 7
-void func_0200cc34(ShortcutSave *shortcutSave, u32 shortcut);
+void ShortcutSave_SwitchDNASplicers(ShortcutSave *shortcutSave, u32 shortcut);
 
 #endif // POKEBW2_SAVE_SHORTCUT_H

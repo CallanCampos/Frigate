@@ -10,12 +10,12 @@
 
 typedef BOOL (*FestMissionTargetFunc)(const FestMissionConfig *config, u32 value);
 
-static BOOL func_02014e50(FestMissionConfig *config);
+static BOOL FestMissionConfig_IsActive(FestMissionConfig *config);
 static u8 FestMissionConfig_GetExtraSeconds(FestMissionConfig *config);
 static BOOL FestMissionConfig_MatchesTarget(const FestMissionConfig *config, u32 value);
 static BOOL FestMissionConfig_AnyTarget(const FestMissionConfig *config, u32 value);
 
-// The seconds a gain of time gives, by the mission's unk10_9
+// The seconds a gain of time gives, by the mission's extraSecondsIndex
 static const u8 FestMission_ExtraSeconds[4] = { 0, 30, 60, 180 };
 
 // Whether a value is the mission's target, by the mission's kind
@@ -43,15 +43,15 @@ void ClearFesMissionCfg(FestMissionConfig *config) {
     MI_CpuFill8(config, 0, sizeof(FestMissionConfig));
     config->info.count = 0x3fff;
     config->info.index = FEST_MISSION_NONE;
-    config->unk24 = -1;
+    config->startSeconds = -1;
 }
 
 void FestMissionConfig_Start(FestMissionConfig *config, const FestMissionConfig *src, u8 joined) {
     ClearFesMissionCfg(config);
     *config = *src;
     if (!joined) {
-        config->unk1C = GFL_RandomLC(0);
-        config->unk24 = -1;
+        config->seed = GFL_RandomLC(0);
+        config->startSeconds = -1;
     } else {
         config->missionId = 0;
     }
@@ -66,7 +66,7 @@ void FestMissionConfig_Clear(FestMissionConfig *config) {
 }
 
 void UpdateFesMissionConfigSecondsTime(FestMissionConfig *config) {
-    config->unk24 = RTC_ConvertSecondsCached();
+    config->startSeconds = RTC_ConvertSecondsCached();
 }
 
 u32 FestMissionConfig_GetSecondsLeft(FestMissionConfig *config) {
@@ -77,10 +77,10 @@ u32 FestMissionConfig_GetSecondsLeft(FestMissionConfig *config) {
     if (now == -1) {
         return 0;
     }
-    if (config->unk24 == -1) {
+    if (config->startSeconds == -1) {
         return config->info.seconds;
     }
-    elapsed = now - config->unk24;
+    elapsed = now - config->startSeconds;
     if (elapsed < 0) {
         return 0;
     }
@@ -98,7 +98,7 @@ BOOL FestMissionConfig_HasTimeLeft(FestMissionConfig *config) {
     return FALSE;
 }
 
-static BOOL func_02014e50(FestMissionConfig *config) {
+static BOOL FestMissionConfig_IsActive(FestMissionConfig *config) {
     if (config->info.index != FEST_MISSION_NONE) {
         return TRUE;
     }
@@ -148,7 +148,7 @@ BOOL FestMissionConfig_IsTarget(FestMissionConfig *config, u32 kind, u32 value) 
 BOOL FestMissionConfig_AddScore(FestMissionConfig *config, u32 kind, u32 value, int count) {
     int score;
 
-    if (!func_02014e50(config)) {
+    if (!FestMissionConfig_IsActive(config)) {
         return FALSE;
     }
     if (!FestMissionConfig_IsTarget(config, kind, value)) {
@@ -179,14 +179,14 @@ u32 FestMissionConfig_AddSeconds(FestMissionConfig *config, u16 gain) {
 }
 
 BOOL FestMissionConfig_IsSame(const FestMissionConfig *config, const FestMissionConfig *other) {
-    if (config->unk1C != other->unk1C || config->unk00[0] != other->unk00[0]) {
+    if (config->seed != other->seed || config->unk00[0] != other->unk00[0]) {
         return FALSE;
     }
     return TRUE;
 }
 
 static u8 FestMissionConfig_GetExtraSeconds(FestMissionConfig *config) {
-    return FestMission_ExtraSeconds[config->info.unk10_9];
+    return FestMission_ExtraSeconds[config->info.extraSecondsIndex];
 }
 
 static BOOL FestMissionConfig_MatchesTarget(const FestMissionConfig *config, u32 value) {
@@ -208,7 +208,7 @@ BOOL FestMissionConfig_FromBeacon(FestMissionConfig *config, const GameBeacon *b
         config->info = *(const FestMissionInfo *)&beacon->payload;
         config->missionId = beacon->arg.mission.missionId;
         config->unk1A = beacon->arg.mission.unk;
-        config->unk1C = beacon->missionWord;
+        config->seed = beacon->missionWord;
         return TRUE;
     }
     return FALSE;

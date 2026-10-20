@@ -17,12 +17,12 @@ void MusicalSave_Init(MusicalSave *musical) {
     u8 i;
 
     MI_CpuFill8(musical, 0, sizeof(MusicalSave));
-    func_0200ad20(musical);
+    MusicalSave_ClearEquips(musical);
     for (i = 0; i < 10; i++) {
-        musical->unk1E0[i].unk0 = 4;
+        musical->audienceGifts[i].topKind = 4;
     }
-    musical->unk29D = 0;
-    musical->unk29E = 0;
+    musical->program = 0;
+    musical->hasDistProgram = 0;
     MusicalSave_AddProp(musical, 0x30);
     MusicalSave_AddProp(musical, 0x46);
     MusicalSave_AddProp(musical, 0x53);
@@ -44,16 +44,16 @@ MusicalSave *getAddressOfMusicalDataInfo(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_MUSICAL);
 }
 
-void func_0200ad20(MusicalSave *musical) {
+void MusicalSave_ClearEquips(MusicalSave *musical) {
     u8 i;
 
     for (i = 0; i < 8; i++) {
-        musical->unk1B0[i].unk0 = 10;
+        musical->equips[i].pos = 10;
     }
 }
 
-MusicalSaveUnk1B0 *func_0200ad44(MusicalSave *musical) {
-    return musical->unk1B0;
+MusicalSaveEquip *MusicalSave_GetEquips(MusicalSave *musical) {
+    return musical->equips;
 }
 
 BOOL MusicalSave_HasShot(MusicalSave *musical) {
@@ -126,77 +126,77 @@ BOOL MusicalSave_HasAllProps(MusicalSave *musical) {
     return FALSE;
 }
 
-MusicalSaveUnk1E0 *func_0200ae6c(MusicalSave *musical, u8 index) {
-    return &musical->unk1E0[index];
+MusicalAudienceGift *MusicalSave_GetAudienceGift(MusicalSave *musical, u8 index) {
+    return &musical->audienceGifts[index];
 }
 
-u16 func_0200ae78(MusicalSave *musical) {
-    return musical->unk252;
+u16 MusicalSave_GetShowCount(MusicalSave *musical) {
+    return musical->showCount;
 }
 
-void func_0200ae84(MusicalSave *musical) {
-    if (musical->unk252 < 0xffff) {
-        musical->unk252++;
+void MusicalSave_IncShowCount(MusicalSave *musical) {
+    if (musical->showCount < 0xffff) {
+        musical->showCount++;
     }
 }
 
-u16 func_0200ae9c(MusicalSave *musical) {
-    return musical->unk254;
+u16 MusicalSave_GetWinCount(MusicalSave *musical) {
+    return musical->winCount;
 }
 
-void func_0200aea4(MusicalSave *musical) {
-    if (musical->unk254 < 0xffff) {
-        musical->unk254++;
+void MusicalSave_IncWinCount(MusicalSave *musical) {
+    if (musical->winCount < 0xffff) {
+        musical->winCount++;
     }
 }
 
-u8 func_0200aebc(MusicalSave *musical, u8 index) {
-    return musical->unk298[index];
+u8 MusicalSave_GetPropKindCount(MusicalSave *musical, u8 index) {
+    return musical->propKindCounts[index];
 }
 
-void func_0200aec8(MusicalSave *musical, u8 index, u8 value) {
-    musical->unk298[index] = value;
+void MusicalSave_SetPropKindCount(MusicalSave *musical, u8 index, u8 value) {
+    musical->propKindCounts[index] = value;
 }
 
-u8 func_0200aed4(MusicalSave *musical) {
-    return musical->unk29C;
+u8 MusicalSave_GetLastPoints(MusicalSave *musical) {
+    return musical->lastPoints;
 }
 
-void func_0200aedc(MusicalSave *musical, u8 value) {
-    musical->unk29C = value;
+void MusicalSave_SetLastPoints(MusicalSave *musical, u8 value) {
+    musical->lastPoints = value;
 }
 
-u8 func_0200aee4(MusicalSave *musical) {
-    return musical->unk29D;
+u8 MusicalSave_GetProgram(MusicalSave *musical) {
+    return musical->program;
 }
 
-void func_0200aef0(MusicalSave *musical, u8 value) {
-    musical->unk29D = value;
+void MusicalSave_SetProgram(MusicalSave *musical, u8 value) {
+    musical->program = value;
 }
 
-u8 func_0200aefc(MusicalSave *musical) {
-    return musical->unk29E;
+u8 MusicalSave_HasDistProgram(MusicalSave *musical) {
+    return musical->hasDistProgram;
 }
 
-void func_0200af08(MusicalSave *musical, u8 value) {
-    musical->unk29E = value;
+void MusicalSave_SetHasDistProgram(MusicalSave *musical, u8 value) {
+    musical->hasDistProgram = value;
 }
 
 const u16 *MusicalSave_GetName(MusicalSave *musical) {
     return musical->name;
 }
 
-void func_0200af1c(MusicalSave *musical, u16 value) {
-    s32 sum = musical->unk256 + value;
+void MusicalSave_AddTotalPoints(MusicalSave *musical, u16 value) {
+    s32 sum = musical->totalPoints + value;
     if (sum < 0xffff) {
-        musical->unk256 = sum;
+        musical->totalPoints = sum;
     } else {
-        musical->unk256 = 0xffff;
+        musical->totalPoints = 0xffff;
     }
 }
 
-u16 func_0200af38(MusicalSave *musical) {
-    return musical->unk256;
+u16 MusicalSave_GetTotalPoints(MusicalSave *musical) {
+    return musical->totalPoints;
 }
 
 BOOL MusicalSave_GetDressingRoomVisited(MusicalSave *musical) {

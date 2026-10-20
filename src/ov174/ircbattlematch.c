@@ -418,7 +418,7 @@ static void IrcBattleMatch_CreateActor(IrcBattleMatch *work, s16 x, s16 y, int s
         setup.bgPriority = 2;
         work->actors[slot] = ClActor_Create(work->actUnit, work->actorChars, work->actorPalette, work->actorCells,
                                             &setup, CLACT_SURFACE_MAIN, work->heapId);
-        func_0204c520(work->actors[slot], TRUE);
+        ClActor_SetAutoAnim(work->actors[slot], TRUE);
         ClActor_SetVisible(work->actors[slot], TRUE);
         ClActor_SetAffineMode(work->actors[slot], 2);
     }
@@ -520,7 +520,7 @@ static void IrcBattleMatch_RecvFriendData(int netId, int size, const void *data,
         if (netId != NetSystem_GetNetId()) {
             PlayerInfo *info = GameData_GetPlayerInfoByNetID(gameData, netId);
 
-            work->friendResult = func_02011b30(gameData, info, data, work->heapId);
+            work->friendResult = WifiList_AddFriend(gameData, info, data, work->heapId);
         }
     }
 }
@@ -584,7 +584,7 @@ static void IrcBattleMatch_StateWaitJingle(IrcBattleMatch *work) {
 static void IrcBattleMatch_StateWaitResultSync(IrcBattleMatch *work) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), IRCMATCH_TIMING_RESULT, IRCMATCH_TIMING_GROUP)) {
         func_02042e94(0);
-        func_02042e9c(0);
+        GFL_NetSetDisconnectError(0);
         work->counter = 0;
         IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitJingle);
     }
@@ -860,7 +860,7 @@ static void IrcBattleMatch_StateRegisterCommands(IrcBattleMatch *work) {
     NetCommand_AddTable(IRCMATCH_CMD_MODE, sIrcBattleMatchCommands, IRCMATCH_CMD_COUNT, work);
     NetHandle_SendTimingPair(NetHandle_GetOwn(), IRCMATCH_TIMING_COMMANDS, IRCMATCH_TIMING_GROUP);
     func_02042e94(1);
-    func_02042e9c(1);
+    GFL_NetSetDisconnectError(1);
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitStart);
 }
 
@@ -1075,7 +1075,7 @@ static void IrcBattleMatch_ShowMemberCount(u32 msgId, IrcBattleMatch *work) {
     BmpWin_FlushChar(work->countWindow);
     BmpWin_DrawFrame(work->countWindow, 0, CHAR_POS(work->windowFrameChars), 14);
     GFL_MsgDataLoadStrbuf(work->msgData, msgId, work->strbuf);
-    WordSetNumber(work->wordSet, 0, func_02042a48(), 1, 0, TRUE);
+    WordSetNumber(work->wordSet, 0, GFL_NetIwGetLinkedCount(), 1, 0, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->strbufFormatted, work->strbuf);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(work->countWindow), 0, 2, work->strbufFormatted, work->font);
     BmpWin_FlushChar(work->countWindow);
@@ -1270,33 +1270,33 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
         init.gameCommandBase = 0x2c;
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
-        init.unk6E = 0x11;
+        init.negotiationCommandBase = 0x11;
         init.gameCommandBase = 0x13;
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
-        init.unk6C = work->param->musicalNetInit->unk6C;
+        init.parentPacketSize = work->param->musicalNetInit->parentPacketSize;
         work->shownCount = -1;
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
-        init.unk6E = 0x11;
+        init.negotiationCommandBase = 0x11;
         init.gameCommandBase = 0x12;
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
-        init.unk6C = work->param->musicalNetInit->unk6C;
+        init.parentPacketSize = work->param->musicalNetInit->parentPacketSize;
         work->shownCount = -1;
         break;
     }
     GFL_NetInit(&init, NULL, work);
     switch (work->mode) {
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
-        func_020429e8(IrcBattleMatch_IsSameMusicalGame);
+        GFL_NetIwSetPeerFilter(IrcBattleMatch_IsSameMusicalGame);
         GFL_NetIwOverrideNetId(1);
         GFL_NetIwSetGameCommandBase(0x11);
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
-        func_020429e8(IrcBattleMatch_IsSameMusicalGame);
+        GFL_NetIwSetPeerFilter(IrcBattleMatch_IsSameMusicalGame);
         GFL_NetIwOverrideNetId(0);
         GFL_NetIwSetGameCommandBase(0x11);
         break;
@@ -1331,7 +1331,8 @@ static void IrcBattleMatch_StateWaitNet(IrcBattleMatch *work) {
             NetDevIrc_SetPeerFilter(IrcBattleMatch_IsSameMusicalGame);
             break;
         }
-        func_020429a8(IrcBattleMatch_OnMacsKnown, IrcBattleMatch_OnLinkChanged, IrcBattleMatch_OnConnectDone);
+        GFL_NetIwChangeoverConnect(IrcBattleMatch_OnMacsKnown, IrcBattleMatch_OnLinkChanged,
+                                   IrcBattleMatch_OnConnectDone);
         IrcBattleMatch_SetState(work, IrcBattleMatch_StateConnectLoop);
     }
 }
@@ -1381,7 +1382,7 @@ static void IrcBattleMatch_StateWaitBackWaiting(IrcBattleMatch *work) {
 }
 
 static void IrcBattleMatch_StateWaitMembers(IrcBattleMatch *work) {
-    if (func_02042a38()) {
+    if (GFL_NetIwFinishCollecting()) {
         IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitBackWaiting);
         return;
     }
@@ -1634,8 +1635,8 @@ static void IrcBattleMatch_StateConnectLoop(IrcBattleMatch *work) {
             IrcBattleMatch_FreeActor(work, 5);
             work->messagePending = FALSE;
             if (work->actors[0] != NULL) {
-                func_0204c520(work->actors[0], FALSE);
-                func_0204c520(work->actors[2], FALSE);
+                ClActor_SetAutoAnim(work->actors[0], FALSE);
+                ClActor_SetAutoAnim(work->actors[2], FALSE);
             }
         }
         IrcBattleMatch_MoveActor(work, 0, -2, 0);
@@ -1667,9 +1668,9 @@ static void IrcBattleMatch_StateConnectLoop(IrcBattleMatch *work) {
             IrcBattleMatch_SetState(work, IrcBattleMatch_StateShowQuitPromptConnect);
         }
     } else if (work->mode == IRCBATTLEMATCH_MODE_MUSICAL_ARG0) {
-        if (work->shownCount != func_02042a48()) {
+        if (work->shownCount != GFL_NetIwGetLinkedCount()) {
             IrcBattleMatch_ShowMemberCount(IRCMATCH_MSG_MEMBER_COUNT, work);
-            work->shownCount = func_02042a48();
+            work->shownCount = GFL_NetIwGetLinkedCount();
         }
         if (work->shownCount > 0 && work->backOnly == TRUE) {
             AppTaskMenu_Free(work->menu);

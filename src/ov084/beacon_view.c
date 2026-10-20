@@ -380,7 +380,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
 static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
     u32 state = func_ov012_02153650(work->commSys);
 
-    if (func_02016bec(work->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return TRUE;
     }
@@ -397,13 +397,13 @@ static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
 
 // Shows the player's new greeting once it has been entered
 static BOOL BeaconView_CheckGreeting(BeaconViewWork *work) {
-    u16 *changed = (u16 *)func_0202d7d0(work->status);
+    u16 *changed = (u16 *)BeaconStatus_GetGreetingChanged(work->status);
 
     if (*changed == FALSE) {
         return FALSE;
     }
     *changed = FALSE;
-    func_0202437c(work->wordSet, 0, BeaconStatus_GetGreeting(work->status), work->gender, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, BeaconStatus_GetGreeting(work->status), work->gender, 1, 2);
     BeaconView_ShowMessage(work, GameBeacon_Text_Said);
     return TRUE;
 }
@@ -417,7 +417,7 @@ static BOOL BeaconView_CheckPassPower(BeaconViewWork *work) {
             BeaconStatus_ClearGivenPassPower(work->status);
             return FALSE;
         }
-        func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
         BeaconView_OfferPassPower(work, passPower, FALSE, &work->pending);
         return TRUE;
     }
@@ -443,9 +443,9 @@ static BOOL BeaconView_CheckMission(BeaconViewWork *work) {
     if (!BeaconView_GetMissionOffer(work->festival, &config, work->strTemplate)) {
         return FALSE;
     }
-    func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
     FestMission_GetMessage(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
-    func_0202437c(work->wordSet, 1, work->strTemplate, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 1, work->strTemplate, 0, 1, 2);
     BeaconView_OfferMission(work, &config, &work->pending);
     return TRUE;
 }
@@ -465,7 +465,7 @@ static BOOL BeaconView_TakeNewBeacon(BeaconViewWork *work) {
         work->newPanel = BeaconView_FindPanel(work, work->newIndex);
     } else {
         work->newPanel = NULL;
-        work->passerbyCount = func_0200c928((TrainerGameInfoSave *)work->trainerCard);
+        work->passerbyCount = TrainerGameInfo_IncPasserbyCount((TrainerGameInfoSave *)work->trainerCard);
     }
     if (work->newPanel != NULL && work->newPanel->printTask != NULL) {
         work->subSeq = 0;
@@ -602,7 +602,7 @@ static int BeaconView_UpdateThanks(BeaconViewWork *work) {
         u8 dataIndex = GameBeaconInfoTable_RingIndex(work->log, work->selected + work->top);
         BeaconViewPanel *panel = BeaconView_FindPanel(work, dataIndex);
 
-        func_0202437c(work->wordSet, 0, panel->name, panel->gender, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, panel->name, panel->gender, 1, 2);
         BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
         BeaconView_ShowMessage(work, GameBeacon_Text_Thanked);
         GameBeacon_BroadcastThanks(work->gameData, panel->trainerId);
@@ -633,7 +633,7 @@ static int BeaconView_CheckThanksTouch(BeaconViewWork *work) {
     BeaconViewTouch touch;
     int hit;
 
-    if (func_02016bec(work->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return THANKS_END;
     }

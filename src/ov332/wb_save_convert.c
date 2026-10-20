@@ -90,7 +90,7 @@ static void WBSaveConvert_ReadPlayer(void *save, WBSavePlayer *player) {
     player->id = info->id;
     MI_CpuCopy8(info->name, player->name, sizeof(player->name));
     player->gender = info->gender;
-    player->unk15 = info->version;
+    player->version = info->version;
 }
 
 static void WBSaveConvert_ReadMemories(void *save, WBSaveMemories *memories) {
@@ -126,7 +126,7 @@ static void WBSaveConvert_ReadMemories(void *save, WBSaveMemories *memories) {
     }
     unk42 = WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK42);
     MI_CpuCopy8(unk42 + 0x258, memories->props, sizeof(memories->props));
-    memories->unk28 = *(u16 *)(unk42 + 0x256);
-    memories->unk2A = *(u16 *)(unk42 + 0x252);
+    memories->musicalTotalPoints = *(u16 *)(unk42 + 0x256);
+    memories->musicalShowCount = *(u16 *)(unk42 + 0x252);
     MI_CpuCopy8(WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK66), memories->unk2C, sizeof(memories->unk2C));
 }

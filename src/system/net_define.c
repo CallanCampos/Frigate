@@ -93,7 +93,7 @@ void NetDefine_UnloadDevice(int type) {
     }
 }
 
-void func_02011818(void) {
+void NetDefine_Update(void) {
     if (GFL_NetGetGameCommandBase() == 0x35) {
         if (!sSkipFrame) {
             sSkipFrame = GFL_NetMainWhileWaiting();

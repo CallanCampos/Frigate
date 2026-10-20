@@ -14,7 +14,8 @@
 
 struct ResortWork {
     // 0 and 5: sums of records 0xc, 0x10 and 0x24, and of 0xd, 0x11 and 0x25. 1, 3, 6 and 7: records 0x1e, 0x16, 7
-    // and 9. 2: records 0x7f and 0x80 summed. 4: func_0200c924 of the trainer card. 8 is a flag the map change sets
+    // and 9. 2: records 0x7f and 0x80 summed. 4: TrainerCard_GetPasserbyCount of the trainer card. 8 is a flag the map
+    // change sets
     u32 values[RESORT_WORK_VALUE_COUNT];
 };
 

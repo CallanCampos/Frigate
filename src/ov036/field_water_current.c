@@ -214,20 +214,20 @@ void func_ov036_021c26fc(EventWaterCurrentMove *work) {
 }
 
 void func_ov036_021c2714(EventWaterCurrentMove *work) {
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         GFL_SndPlayerStop(work->loopPlayer);
         GFL_SEPlayKeepVol(SEQ_SE_DANSA, work->flowPlayer);
     }
 }
 
 void func_ov036_021c2734(EventWaterCurrentMove *work) {
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         GFL_SEPlayKeepVol(SEQ_SE_FLD_83, work->endPlayer);
     }
 }
 
 void func_ov036_021c2750(EventWaterCurrentMove *work) {
-    if (!func_02005cbc() && !work->flowing && !GFL_SndPlayerIsActive(work->loopPlayer)) {
+    if (!GFL_SndIsLoadThreadRunning() && !work->flowing && !GFL_SndPlayerIsActive(work->loopPlayer)) {
         GFL_SEPlayKeepVol(SEQ_SE_FLD_129, work->loopPlayer);
     }
 }

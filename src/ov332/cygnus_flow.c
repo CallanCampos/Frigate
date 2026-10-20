@@ -819,11 +819,11 @@ static void CygnusAppear_Load(CygnusAppear *appear, PartyPkm *pkm) {
     ClActorSetup setup;
 
     appear->palette =
-        PokeGra_LoadClActPaletteByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, 0x80, appear->heapId);
+        PokeGra_LoadClActPaletteByBoxData(arc, PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 0, 0x80, appear->heapId);
     appear->cellAnims =
-        PokeGra_LoadClActCellAnimsByBoxData(func_0201d624(pkm), POKEGRA_DIR_FRONT, 2, 0, appear->heapId);
-    appear->chars = PokeGra_LoadClActCharsByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, appear->heapId);
-    appear->offset = CygnusAppear_GetSpriteBottom(func_0201d624(pkm), appear->heapId) - 48;
+        PokeGra_LoadClActCellAnimsByBoxData(PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 2, 0, appear->heapId);
+    appear->chars = PokeGra_LoadClActCharsByBoxData(arc, PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 0, appear->heapId);
+    appear->offset = CygnusAppear_GetSpriteBottom(PokeParty_ToBoxPkm(pkm), appear->heapId) - 48;
     appear->offset = MATH_CLAMP(appear->offset, 0, 48);
     GFL_ArcToolFree(arc);
     MI_CpuCopy8((void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), appear->spritePalette,
@@ -1065,7 +1065,7 @@ static PartyPkm *CygnusData_CreatePokemon(const CygnusData *data, u32 index, Hea
         PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, 25);
         PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, game_version);
         PokeParty_SetParam(pkm, PKM_PARAM_REGION, region);
-        setDreamRadarPokeMetInfo(func_0201d620(pkm));
+        setDreamRadarPokeMetInfo(PokeParty_GetBoxPkm(pkm));
         PokeParty_RecalcStats(pkm);
         if (PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL)) {
             GFL_HeapFree(pkm);
@@ -1147,7 +1147,7 @@ static void CygnusData_Receive(CygnusData *data, HeapID heapId) {
                 setOneShotDRObtained(getTrainerCardDataBlkAddress(data->gameData), 7, player);
             }
             addPkmToDex(pokedex, pkm);
-            BoxSaveAccessor_InsertPkm(boxes, func_0201d620(pkm));
+            BoxSaveAccessor_InsertPkm(boxes, PokeParty_GetBoxPkm(pkm));
             GFL_HeapFree(pkm);
         }
     }
@@ -1391,8 +1391,8 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
         icon->palette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 0, 0x80, heapId);
         cells = PokeIcon_GetCellFile_Main();
         icon->cellAnims = ClActSys_LoadCellAnims(arc, cells, getOBJTileMapping_MainEng(), heapId);
-        icon->chars = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d620(pkm)), FALSE, 0, heapId);
-        iconPalette = PokeIcon_GetPaletteOfPkm(func_0201d620(pkm));
+        icon->chars = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(pkm)), FALSE, 0, heapId);
+        iconPalette = PokeIcon_GetPaletteOfPkm(PokeParty_GetBoxPkm(pkm));
         GFL_ArcToolFree(arc);
         GFL_HeapFree(pkm);
         break;

@@ -91,11 +91,11 @@ static void midnight(GameData *gameData, s32 days) {
     EventWork_ResetDailyFlags(GameData_GetEventWork(gameData));
     EncountSave_RerollSwarmLocation(save);
     pokerusDecay(GameData_GetParty(gameData), days);
-    func_020095e0(GameData_GetRecords(gameData));
+    RecordFinishDay(GameData_GetRecords(gameData));
     UnityTower_AgeTodayRegions(getUnityTower_SurveySaveBlkAddrress(save));
     SurveySave_FinishDay(SurveySave_Get(save));
     TrainerLogSave_ClearToday(TrainerLogSave_Get(save));
-    func_0200ff78(getHollow_RivalBlk(save), 0);
+    HollowRivalSave_SetMeetingToday(getHollow_RivalBlk(save), 0);
     joinAvenue = SaveControl_GetJoinAvenue(save);
     info = JoinAvenue_GetInfo(joinAvenue);
     occupants = getAddressOfBeginningOfOccupants(joinAvenue);
@@ -107,7 +107,7 @@ static void minutesPassed(GameData *gameData, s32 minutes, const RTCTime *time) 
     PokeParty *party = SaveControl_GetPokePartySave(GameData_GetSaveControl(gameData));
 
     ShayminForm_CheckNightPassed(gameData, party, minutes, time, GameData_GetSeason(gameData));
-    func_0200cb10(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
+    TrainerGameInfo_SubHallOfFameMinutes(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
 }
 
 RTCDate *getAddressAdventureTimeBlk(GameData *gameData) {

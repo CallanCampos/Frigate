@@ -798,7 +798,7 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
         setup.x = sConfigPanelItems[i - ACTOR_ITEM].x;
         setup.y = sConfigPanelItems[i - ACTOR_ITEM].y;
         obj->actors[i] = ClActor_Create(obj->unit, obj->chars, obj->palette, obj->cellAnims, &setup, 0, heapId);
-        func_0204c520(obj->actors[i], FALSE);
+        ClActor_SetAutoAnim(obj->actors[i], FALSE);
     }
 
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
@@ -1866,7 +1866,7 @@ static void ConfigPanelSeq_Input(ConfigPanelSeq *seq, u32 *state, void *data) {
 
         // The save of another game can't be overwritten, so there is nothing to save before infrared
         {
-            BOOL otherSave = func_0200746c(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
+            BOOL otherSave = SaveControl_IsNewGameOverSave(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
             ConfigPanelOptions options;
 
             ConfigPanelScroll_GetOptions(&wk->scroll, &options);

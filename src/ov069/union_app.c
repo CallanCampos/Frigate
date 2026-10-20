@@ -259,7 +259,8 @@ void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, u8 netId, UnionA
     app->members[netId] = *member;
     app->hasProfile |= 1 << netId;
     if (netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
-        UnionGroup_AddMember(&self->mycomm, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
+        UnionGroup_AddMember(&self->mycomm, member->mac, PlayerInfo_GetUnionView(&member->info),
+                             getTrainerGender(&member->info));
     }
 }
 
@@ -333,7 +334,7 @@ void UnionApp_SetCallbacks(UnionApp *app, UnionAppMemberCallback onJoin, UnionAp
 
 BOOL UnionApp_CloseEntry(UnionApp *app) {
     if (app->entering == 0) {
-        func_02042a9c(NetHandle_GetOwn(), FALSE);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), FALSE);
         app->entryMode = UNION_APP_ENTRY_CLOSED;
         return TRUE;
     }
@@ -341,13 +342,13 @@ BOOL UnionApp_CloseEntry(UnionApp *app) {
 }
 
 void UnionApp_OpenEntry(UnionApp *app) {
-    func_02042a9c(NetHandle_GetOwn(), TRUE);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
     app->entryMode = UNION_APP_ENTRY_OPEN;
 }
 
 void UnionApp_LimitEntry(UnionApp *app, u8 limit) {
     if (GFL_NetIsInitialized()) {
-        func_02042a9c(NetHandle_GetOwn(), TRUE);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
         app->entryMode = UNION_APP_ENTRY_LIMITED;
         app->entryLimit = limit;
         app->entryCount = 0;

@@ -84,7 +84,7 @@ static void Demo3DExpCCruiser_Init(Demo3DExp *exp) {
     work->marker = UIObjRes_CreateActor(&work->objRes, unit, sDemo3DExpCCruiserPositions[work->position].x,
                                         sDemo3DExpCCruiserPositions[work->position].y, 0, exp->heapId);
     ClActor_SetVisible(work->marker, TRUE);
-    func_0204c520(work->marker, TRUE);
+    ClActor_SetAutoAnim(work->marker, TRUE);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }

@@ -957,10 +957,10 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     }
     work->badgeFrame = 0;
     {
-        MusicalSaveUnk1B0 *saved = func_0200ad44(work->param->save);
+        MusicalSaveEquip *saved = MusicalSave_GetEquips(work->param->save);
 
         for (i = 0; i < 8; i++) {
-            if (saved[i].unk0 != DUP_FITTING_EQUIP_NONE) {
+            if (saved[i].pos != DUP_FITTING_EQUIP_NONE) {
                 DupFitting_AddStageItem(work, saved[i].itemId);
             }
         }
@@ -2166,17 +2166,17 @@ static void DupFitting_RotateHeld(DupFittingWork *work) {
 }
 
 static void DupFitting_SaveWornItems(DupFittingWork *work) {
-    MusicalSaveUnk1B0 *saved = func_0200ad44(work->param->save);
+    MusicalSaveEquip *saved = MusicalSave_GetEquips(work->param->save);
     DupFittingItemNode *node;
     u8 i = 0;
 
-    func_0200ad20(work->param->save);
+    MusicalSave_ClearEquips(work->param->save);
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL && i < 8;
          node = DupFittingItemNode_GetNext(node), i++) {
         u16 pos = DupFittingItemNode_GetEquipPos(node);
 
         MusPokeDraw_GetEquipPos(work->poke, pos);
-        saved[i].unk0 = pos;
+        saved[i].pos = pos;
         saved[i].itemId = DupFittingItemNode_GetEntry(node)->itemId;
         saved[i].rotation = work->param->poke->equips[pos].unk2;
         work->param->poke->equips[pos].itemId = DupFittingItemNode_GetEntry(node)->itemId;
@@ -2401,8 +2401,8 @@ static void DupFitting_PrintItemName(DupFittingWork *work, DupFittingItemNode *n
 
     category += TitleS005dWordSetMusicalInfo_Text_Ear;
     categoryName = GFL_MsgDataLoadStrbufNew(work->categoryMsg, category);
-    func_0202437c(wordSet, 0, itemName, 0, 1, 2);
-    func_0202437c(wordSet, 1, categoryName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, itemName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 1, categoryName, 0, 1, 2);
     DupFitting_PrintMessage(work, Title3_Text_PropLooksNice, wordSet);
     GFL_StrBufFree(categoryName);
     GFL_StrBufFree(itemName);
@@ -2443,7 +2443,7 @@ static void DupFitting_PrintCategory(DupFittingWork *work, s32 category) {
     }
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     name = GFL_MsgDataLoadStrbufNew(work->categoryMsg, messageId);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     DupFitting_PrintMessage(work, Title3_Text_PropsLookNiceWere, wordSet);
     GFL_StrBufFree(name);
     GFL_WordSetSystemFree(wordSet);
@@ -2463,7 +2463,7 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
         work->sparkles[i] = ClActor_Create(work->clactUnit, work->clactRes[2], work->clactRes[5], work->clactRes[8],
                                            &sparkle, CLACT_SURFACE_SUB, work->heapId);
         ClActor_SetVisible(work->sparkles[i], TRUE);
-        func_0204c520(work->sparkles[i], TRUE);
+        ClActor_SetAutoAnim(work->sparkles[i], TRUE);
         ClActor_SetObjMode(work->sparkles[i], 0);
         work->sparkleTimer[i] = 0;
     }
@@ -2475,12 +2475,12 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
     work->okMark = ClActor_Create(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
                                   CLACT_SURFACE_MAIN, work->heapId);
     ClActor_SetVisible(work->okMark, FALSE);
-    func_0204c520(work->okMark, TRUE);
+    ClActor_SetAutoAnim(work->okMark, TRUE);
     setup.sequence = 2;
     work->touchEffect = ClActor_Create(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
                                        CLACT_SURFACE_MAIN, work->heapId);
     ClActor_SetVisible(work->touchEffect, FALSE);
-    func_0204c520(work->touchEffect, TRUE);
+    ClActor_SetAutoAnim(work->touchEffect, TRUE);
 }
 
 static void DupFitting_FreeSparkles(DupFittingWork *work) {

@@ -330,7 +330,7 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
     wk->cursorAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->cursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
     ClActor_SetSequence(wk->cursorAct, 4);
     if (GCTX_HIDIsUsingTouch() == TRUE) {
         ClActor_SetVisible(wk->cursorAct, FALSE);
@@ -395,7 +395,7 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
     ClActor_SetSequence(wk->fingerAct, 12);
-    func_0204c520(wk->fingerAct, TRUE);
+    ClActor_SetAutoAnim(wk->fingerAct, TRUE);
     ClActor_StopAnim(wk->fingerAct);
     ClActor_SetVisible(wk->fingerAct, FALSE);
 
@@ -613,14 +613,14 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
     if (touch != -1) {
         switch (touch) {
         case 31:
-            func_0204c520(wk->boxArrowAct[0], TRUE);
+            ClActor_SetAutoAnim(wk->boxArrowAct[0], TRUE);
             ClActor_SetSequence(wk->boxArrowAct[0], 38);
             wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, 1);
             Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
             GFL_SndSEPlay(0x548);
             break;
         case 32:
-            func_0204c520(wk->boxArrowAct[1], TRUE);
+            ClActor_SetAutoAnim(wk->boxArrowAct[1], TRUE);
             ClActor_SetSequence(wk->boxArrowAct[1], 39);
             wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, -1);
             Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
@@ -708,7 +708,7 @@ static void Box_CursorControl(WorldTradeWork *wk) {
             if (next == 99 || next == 101) {
                 u8 arrow = next == 101 ? 0 : 1;
 
-                func_0204c520(wk->boxArrowAct[arrow], TRUE);
+                ClActor_SetAutoAnim(wk->boxArrowAct[arrow], TRUE);
                 ClActor_SetSequence(wk->boxArrowAct[arrow], arrow + 38);
                 wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, next - 100);
                 Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
@@ -1126,7 +1126,7 @@ static void Box_NowBoxPageInfoGet(WorldTradeWork *wk, int now) {
     } else if (now == BOX_TRAY_PARTY) {
         num = PokeParty_GetPkmCount(wk->param->myparty);
         for (i = 0; i < num; i++) {
-            pkm = func_0201d624(PokeParty_GetPkm(wk->param->myparty, i));
+            pkm = PokeParty_ToBoxPkm(PokeParty_GetPkm(wk->param->myparty, i));
             Box_PokemonLevelSet(pkm, &wk->boxWork[i]);
             Box_PokemonIconSet(pkm, wk->pokeIconAct[i], wk->itemIconAct[i], &no[i], i, handle, &wk->boxWork[i],
                                &pbuf[i]);
@@ -1169,7 +1169,7 @@ BoxPkm *WorldTrade_GetPokePtr(PokeParty *party, BoxSaveAccessor *box, int tray, 
         if (pos > PokeParty_GetPkmCount(party) - 1) {
             return NULL;
         }
-        return func_0201d624(PokeParty_GetPkm(party, pos));
+        return PokeParty_ToBoxPkm(PokeParty_GetPkm(party, pos));
     }
     return BoxSaveAccessor_GetPkm(box, tray, pos);
 }
@@ -1272,7 +1272,7 @@ static void Box_MakeExchangePokemonData(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
     dtd->postSimple = post;
     WorldTrade_PostPokemonBaseDataMake(dtd, wk);
 
-    pkm = func_0201d624((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData);
+    pkm = PokeParty_ToBoxPkm((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData);
     want.characterNo = PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL);
     want.gender = PML_PkmGetParam(pkm, PKM_PARAM_SEX, NULL) + 1;
     want.level_min = 0;

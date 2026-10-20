@@ -284,7 +284,7 @@ static void BeaconDetail_FreeData(BeaconDetailWork *work) {
         if (count - logIndex < LOG_LIST_ROWS) {
             logIndex = count - LOG_LIST_ROWS;
         }
-        func_0202d7b8(work->beaconStatus, logIndex);
+        BeaconStatus_SetLogTop(work->beaconStatus, logIndex);
     }
     TownMapData_Free(work->townMapData);
     GFL_HeapFree(work->beacon);

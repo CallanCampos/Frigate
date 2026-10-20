@@ -376,7 +376,7 @@ static void Title_SetCellActor(WorldTradeWork *wk) {
     wk->cursorAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->cursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
     ClActor_SetSequence(wk->cursorAct, 0);
     // The cursor only shows while the keys are used
     if (GCTX_HIDIsUsingTouch() == TRUE) {
@@ -476,7 +476,7 @@ static int Title_SubSeqOpeningWait(WorldTradeWork *wk) {
 static int Title_SubSeqStart(WorldTradeWork *wk) {
     Title_MessagePrint(wk, 4, 1, 0, 0xf0f);
     WorldTrade_SetNextSeq(wk, TITLE_SEQ_MES_WAIT, TITLE_SEQ_MAIN);
-    func_0204c520(wk->cursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
     WorldTrade_BoxPokeNumGetStart(wk);
     return WT_SEQ_MAIN;
 }
@@ -638,7 +638,7 @@ static int Title_SubSeqYesNoSelect(WorldTradeWork *wk) {
         WorldTrade_TouchWinYesNoDel(wk);
         BmpWin_ClearFrame(wk->talkWin, 2);
         Title_ClearWin(wk->talkWin);
-        func_0204c520(wk->cursorAct, TRUE);
+        ClActor_SetAutoAnim(wk->cursorAct, TRUE);
         wk->subprocessSeq = TITLE_SEQ_START;
         ClActor_SetVisible(wk->cursorAct, TRUE);
     }

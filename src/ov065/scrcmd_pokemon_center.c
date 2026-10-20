@@ -663,8 +663,8 @@ static BOOL PokemonCenter_CheckStrengthRocks(MedalCheckContext *ctx, GameData *g
 }
 
 static BOOL func_ov065_021e6280(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(func_0200c924(getTrainerCardData_wrapper(GameData_GetSaveControl(gameData))),
-                                        threshold);
+    return PokemonCenter_MeetsThreshold(
+        TrainerCard_GetPasserbyCount(getTrainerCardData_wrapper(GameData_GetSaveControl(gameData))), threshold);
 }
 
 static BOOL func_ov065_021e629c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
@@ -794,7 +794,7 @@ static u32 PokemonCenter_CountSetFlags(const u32 *flags, EventWork *eventWork, i
 BOOL PokemonCenterCmd_GetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
-    RecordSave *record = func_0200f2bc(GameData_GetSaveControl(gameData));
+    RecordSave *record = SaveControl_GetRecordSave(GameData_GetSaveControl(gameData));
     u16 info = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 

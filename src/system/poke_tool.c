@@ -1099,11 +1099,11 @@ void PokeParty_RecalcStats(PartyPkm *pkm) {
     PokeParty_EncryptPkm(pkm, wasEncrypted);
 }
 
-BoxPkm *func_0201d620(PartyPkm *pkm) {
+BoxPkm *PokeParty_GetBoxPkm(PartyPkm *pkm) {
     return &pkm->base;
 }
 
-BoxPkm *func_0201d624(PartyPkm *pkm) {
+BoxPkm *PokeParty_ToBoxPkm(PartyPkm *pkm) {
     return &pkm->base;
 }
 
@@ -2507,7 +2507,7 @@ s8 statAffectedByNature(u8 nature, u32 stat) {
 }
 
 void setNicknameToNick(PartyPkm *pkm) {
-    setNameToNick(func_0201d620(pkm));
+    setNameToNick(PokeParty_GetBoxPkm(pkm));
 }
 
 static void setNameToNick(BoxPkm *pkm) {

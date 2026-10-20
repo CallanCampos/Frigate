@@ -381,7 +381,7 @@ static void GSyncMenu_OnButtonAnimEnd(u32 param, fx32 frame) {
     GSyncMenuWork *wk = (GSyncMenuWork *)param;
 
     ClActor_ClearAnimCallback(wk->actors[wk->selected]);
-    func_0204c520(wk->actors[wk->selected], FALSE);
+    ClActor_SetAutoAnim(wk->actors[wk->selected], FALSE);
     if (wk->result == GSYNC_RESULT_WIFI_SETTINGS) {
         if (wk->msgWin != NULL) {
             BmpWin_Free(wk->msgWin);
@@ -502,7 +502,7 @@ static void GSyncMenu_CreateActors(GSyncMenuWork *wk) {
         setup.bgPriority = 2;
         wk->actors[i] =
             ClActor_Create(wk->clUnit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -607,7 +607,7 @@ static void GSyncMenu_StatePressButton(GSyncMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = GSyncMenu_OnButtonAnimEnd;
-    func_0204c520(wk->actors[wk->selected], TRUE);
+    ClActor_SetAutoAnim(wk->actors[wk->selected], TRUE);
     ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
     ClActor_RestartAnim(wk->actors[wk->selected]);
     GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitButtonAnim, 886);
@@ -638,7 +638,7 @@ static BOOL GSyncMenu_OnTouch(u32 button, GSyncMenuWork *wk) {
 
 static void GSyncMenu_SetSignalSequence(GSyncMenuWork *wk, int sequence) {
     if (sequence != ClActor_GetSequence(wk->actors[GSYNC_MENU_BUTTON_GSYNC])) {
-        func_0204c520(wk->actors[GSYNC_MENU_BUTTON_GSYNC], TRUE);
+        ClActor_SetAutoAnim(wk->actors[GSYNC_MENU_BUTTON_GSYNC], TRUE);
         ClActor_SetSequence(wk->actors[GSYNC_MENU_BUTTON_GSYNC], sequence);
     }
 }
@@ -822,7 +822,7 @@ static void GSyncMenu_StateStartSave(GSyncMenuWork *wk) {
 static void GSyncMenu_StateSaveAnswer(GSyncMenuWork *wk) {
     if (AppTaskMenu_IsFlashFinished(wk->yesNoMenu)) {
         if (AppTaskMenu_GetCursorPos(wk->yesNoMenu) == 0) {
-            if (func_0200746c(GameData_GetSaveControl(wk->gameData))) {
+            if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(wk->gameData))) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, GsyncMenu_Text_ThereAlreadySavedGame, wk->strBuf);
                 GSyncMenu_PrintMessageStream(wk);
                 GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitMessageTouch, 1293);
@@ -936,7 +936,7 @@ static BOOL GSyncMenu_ProcMain(GameProc *proc, u32 *state, void *param, void *wo
     if (!wk->ending) {
         GSYS_TryBootGameComm(wk->gsys);
     }
-    if (GFL_WipeIsFinished() && func_02016bec(wk->gsys)) {
+    if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(wk->gsys)) {
         wk->result = GSYNC_RESULT_NONE;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);

@@ -282,8 +282,8 @@ ClActUnit *ClActUnit_Create(u16 count, u8 priority, HeapID heapId);
 void ClActUnit_Delete(ClActUnit *unit);
 void ClActUnit_SetActive(ClActUnit *unit, BOOL active);
 BOOL ClActUnit_IsActive(ClActUnit *unit);
-void func_0204bff0(ClActUnit *unit, BOOL a1);
-void func_0204c004(ClActUnit *unit, BOOL a1);
+void ClActUnit_SetVisibleAnimOnly(ClActUnit *unit, BOOL a1);
+void ClActUnit_SetSharedParams(ClActUnit *unit, BOOL a1);
 void ClActUnit_SetRenderer(ClActUnit *unit, ClActRenderer *renderer);
 void ClActUnit_UseSystemRenderer(ClActUnit *unit);
 
@@ -341,9 +341,9 @@ void ClActor_SetAnimSpeed(ClActor *actor, fx32 speed);
 fx32 ClActor_GetAnimTime(ClActor *actor);
 void ClActor_SetAnimFrame(ClActor *actor, u16 frame);
 u16 ClActor_GetAnimFrame(ClActor *actor);
-void func_0204c520(ClActor *actor, BOOL a1);
-BOOL func_0204c534(ClActor *actor);
-void func_0204c53c(ClActor *actor, fx32 a1);
+void ClActor_SetAutoAnim(ClActor *actor, BOOL a1);
+BOOL ClActor_IsAutoAnim(ClActor *actor);
+void ClActor_SetAutoAnimSpeed(ClActor *actor, fx32 a1);
 void ClActor_StartAnim(ClActor *actor);
 void ClActor_StopAnim(ClActor *actor);
 BOOL ClActor_IsAnimActive(ClActor *actor);
@@ -351,7 +351,7 @@ void ClActor_RestartAnim(ClActor *actor);
 void ClActor_SetPlayMode(ClActor *actor, u32 playMode);
 void ClActor_SetAnimCallback(ClActor *actor, const ClActorCallback *callback);
 void ClActor_ClearAnimCallback(ClActor *actor);
-void func_0204c5c8(ClActor *actor, BOOL a1);
+void ClActor_SetDrawAnim(ClActor *actor, BOOL a1);
 // The actor system, which the renderers of clact_itcm.c read
 extern ClActSys *g_ClActSys;
 

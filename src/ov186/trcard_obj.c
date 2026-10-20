@@ -71,8 +71,8 @@ void TrCardObj_AddActors(TrainerCardObjWork *obj) {
                            obj->res[defs[i].cellRes].cellAnims, &setup, CLACT_SURFACE_SUB, obj->heapId);
 #endif
         ClActor_SetVisible(obj->actors[i], TRUE);
-        func_0204c53c(obj->actors[i], FX32_ONE);
-        func_0204c520(obj->actors[i], TRUE);
+        ClActor_SetAutoAnimSpeed(obj->actors[i], FX32_ONE);
+        ClActor_SetAutoAnim(obj->actors[i], TRUE);
         if (i == TRCARD_ACTOR_3) {
             ClActor_SetVisible(obj->actors[i], FALSE);
         }

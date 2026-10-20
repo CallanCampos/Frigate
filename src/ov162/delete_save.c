@@ -226,7 +226,7 @@ static void DeleteSave_Delete(DeleteSaveWork *wk, u32 *state) {
         SaveOutside_Erase(HEAPID_SAVEDATA_DELETE);
         GFL_OvlUnload(OVERLAY_ID(331));
         DreamRadar_EraseSaveData(HEAPID_SAVEDATA_DELETE);
-        func_020074ac(save);
+        SaveControl_Erase(save);
         for (i = 0; i < SAVE_BLOCK_COUNT; i++) {
             if (SaveControl_OpenExtraBlock(save, i, HEAPID_SAVEDATA_DELETE) == TRUE) {
                 SaveControl_ClearExtraBlock(save, i, HEAPID_SAVEDATA_DELETE);

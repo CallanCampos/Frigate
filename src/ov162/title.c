@@ -701,7 +701,7 @@ static void TitleObj_Init(TitleObj *obj, HeapID heapId) {
     setup.bgPriority = 0;
     setup.priority = 0;
     obj->actor = ClActor_Create(obj->unit, obj->chars, obj->palette, obj->cellAnims, &setup, 1, heapId);
-    func_0204c520(obj->actor, TRUE);
+    ClActor_SetAutoAnim(obj->actor, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     GFL_ArcToolFree(arc);
 }

@@ -177,7 +177,7 @@ static void MailBox_RegisterAuthorName(MailBoxWork *work, int unused) {
     // The original fetches the name twice and drops the first result
     MailData_GetTrainerName(mail);
     GFL_StrBufLoadString(name, MailData_GetTrainerName(mail));
-    func_0202437c(work->view->wordSet, 0, name, MailData_GetTrainerGender(mail), 1, 2);
+    GFL_WordSetSetStrbuf(work->view->wordSet, 0, name, MailData_GetTrainerGender(mail), 1, 2);
     GFL_StrBufFree(name);
 }
 
@@ -247,7 +247,7 @@ void MailBox_PrintMail(MailBoxWork *work) {
     }
     work->view->stampSentence.type = 6;
     work->view->stampSentence.id = 0;
-    work->view->stampSentence.words[0] = func_02009764(work->view->mails[work->mailIndex]);
+    work->view->stampSentence.words[0] = MailData_GetStampWord(work->view->mails[work->mailIndex]);
     if (work->view->stampSentence.words[0] != 0) {
         PMSDraw_Print(work->view->pmsDraw, work->view->windows[MAILBOX_WIN_STAMP], &work->view->stampSentence, 3);
     }

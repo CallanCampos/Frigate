@@ -1029,7 +1029,7 @@ static BOOL FieldSnd_BGMChangeOut(FieldSound *fieldSound) {
     fieldSound->loadingBGM = fieldSound->nextBGM;
     fieldSound->nextBGM = 0;
     fieldSound->currentBGM = 0;
-    func_02042a1c(2);
+    GFL_NetHoldScan(2);
     return TRUE;
 }
 
@@ -1037,7 +1037,7 @@ static BOOL FieldSnd_BGMChangeOut(FieldSound *fieldSound) {
 static BOOL FieldSnd_BGMChangeIn(FieldSound *fieldSound) {
     BOOL loaded = GFL_SndBGMLoadStep(fieldSound->loadingBGM, &fieldSound->loadStep, FALSE);
 
-    func_02042a1c(2);
+    GFL_NetHoldScan(2);
     if (loaded) {
         fieldSound->currentBGM = fieldSound->loadingBGM;
         fieldSound->loadingBGM = 0;

@@ -53,7 +53,8 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     zero476Bytes(ctrl->memoryLink);
 
     result = SaveData_Load(ctrl->sv, HEAPID_USER);
-    if ((result == SAVE_LOAD_RESULT_OK || result == SAVE_LOAD_RESULT_OK_PARTIAL) && func_02008df4(ctrl) == TRUE) {
+    if ((result == SAVE_LOAD_RESULT_OK || result == SAVE_LOAD_RESULT_OK_PARTIAL) &&
+        TrainerDataSave_IsIntroSave(ctrl) == TRUE) {
         result = SAVE_LOAD_RESULT_NONE;
     }
     ctrl->errors = 0;
@@ -75,7 +76,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
                 case SAVE_LOAD_RESULT_OK:
                 case SAVE_LOAD_RESULT_OK_PARTIAL:
                     if (i == SAVE_EXTRA_ID_MUSICAL_DIST) {
-                        func_0200af08(getAddressOfMusicalDataInfo(ctrl), TRUE);
+                        MusicalSave_SetHasDistProgram(getAddressOfMusicalDataInfo(ctrl), TRUE);
                     }
                     break;
                 case SAVE_LOAD_RESULT_NONE:
@@ -83,12 +84,12 @@ SaveControl *SaveControl_Create(HeapID heapId) {
                 case SAVE_LOAD_RESULT_ERROR:
                     ctrl->errors |= SAVE_CONTROL_ERROR_EXTRA(i);
                     if (i == SAVE_EXTRA_ID_MUSICAL_DIST) {
-                        func_0200af08(getAddressOfMusicalDataInfo(ctrl), FALSE);
+                        MusicalSave_SetHasDistProgram(getAddressOfMusicalDataInfo(ctrl), FALSE);
                     }
                     break;
                 }
             } else if (i == SAVE_EXTRA_ID_MUSICAL_DIST) {
-                func_0200af08(getAddressOfMusicalDataInfo(ctrl), FALSE);
+                MusicalSave_SetHasDistProgram(getAddressOfMusicalDataInfo(ctrl), FALSE);
             }
         }
         break;
@@ -124,9 +125,9 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     }
 
     if (!DreamRadar_LoadAndCheckSaveData(HEAPID_TAIL(HEAPID_USER)) || ctrl->newGame == TRUE || !ctrl->dataExists) {
-        ctrl->unk8 = TRUE;
+        ctrl->markDreamRadarRead = TRUE;
     } else {
-        ctrl->unk8 = FALSE;
+        ctrl->markDreamRadarRead = FALSE;
     }
     return ctrl;
 }
@@ -157,14 +158,14 @@ u32 SaveControl_Reload(SaveControl *save) {
     case SAVE_LOAD_RESULT_OK_PARTIAL:
         save->dataExists = TRUE;
         musical = getAddressOfMusicalDataInfo(save);
-        func_0200af08(musical, FALSE);
+        MusicalSave_SetHasDistProgram(musical, FALSE);
         if (TrainerDataSave_IsMarkerSet(save, SAVE_EXTRA_ID_MUSICAL_DIST) == TRUE) {
             extraResult = SaveControl_OpenExtraBlock(save, SAVE_EXTRA_ID_MUSICAL_DIST, HEAPID_USER);
             freeIntermediateSaveExtraBlksAfterLoad(save, SAVE_EXTRA_ID_MUSICAL_DIST);
             switch (extraResult) {
             case SAVE_LOAD_RESULT_OK:
             case SAVE_LOAD_RESULT_OK_PARTIAL:
-                func_0200af08(musical, TRUE);
+                MusicalSave_SetHasDistProgram(musical, TRUE);
                 break;
             }
         }
@@ -181,8 +182,8 @@ u32 SaveControl_Reload(SaveControl *save) {
 }
 
 void SaveControl_StartSave(SaveControl *save) {
-    save->unk3 = func_02008df4(save);
-    func_02008e14(save);
+    save->wasIntroSave = TrainerDataSave_IsIntroSave(save);
+    TrainerDataSave_ClearIntroSave(save);
     SaveData_SaveStart(save->sv);
 }
 
@@ -202,10 +203,10 @@ u32 SaveControl_ContinueSave(SaveControl *save) {
         return SAVE_RESULT_CONTINUE;
     }
     result = SaveData_SaveStep(save->sv);
-    if (result == SAVE_RESULT_OK && func_02008df4(save) == FALSE) {
-        if (save->unk8) {
+    if (result == SAVE_RESULT_OK && TrainerDataSave_IsIntroSave(save) == FALSE) {
+        if (save->markDreamRadarRead) {
             DreamRadar_MarkRead(save);
-            save->unk8 = FALSE;
+            save->markDreamRadarRead = FALSE;
         }
         save->newGame = FALSE;
         save->dataExists = TRUE;
@@ -215,8 +216,8 @@ u32 SaveControl_ContinueSave(SaveControl *save) {
 
 void SaveControl_CancelSave(SaveControl *save) {
     SaveData_SaveCancel(save->sv);
-    if (save->unk3 == TRUE) {
-        func_02008e04(save);
+    if (save->wasIntroSave == TRUE) {
+        TrainerDataSave_SetIntroSave(save);
     }
 }
 
@@ -244,7 +245,7 @@ BOOL SaveControl_IsDataAlreadyPresent(SaveControl *save) {
     return save->dataExists;
 }
 
-BOOL func_0200746c(SaveControl *save) {
+BOOL SaveControl_IsNewGameOverSave(SaveControl *save) {
     if (SaveControl_GetStatus(save) == TRUE && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
         return TRUE;
     }
@@ -273,12 +274,12 @@ void SaveControl_InitNewGame(SaveControl *save) {
     initSaveBlkCallbacks(save->sv);
 }
 
-void func_020074ac(SaveControl *save) {
+void SaveControl_Erase(SaveControl *save) {
     SaveData_Erase(save->sv, HEAPID_USER);
 }
 
-void func_020074b8(SaveControl *save, u32 *a1, u32 *a2) {
-    SaveData_GetChangedSize(save->sv, a1, a2);
+void SaveControl_GetChangedSize(SaveControl *save, u32 *changed, u32 *total) {
+    SaveData_GetChangedSize(save->sv, changed, total);
 }
 
 BOOL SaveControl_ReadBlockCopy(SaveControl *save, u32 block, u32 copy, void *dest, u32 size) {
@@ -310,7 +311,7 @@ u32 SaveControl_OpenExtraBlock(SaveControl *save, u32 block, HeapID heapId) {
     if (TrainerDataSave_IsMarkerSet(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
     }
-    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *func_02008e74(save, block));
+    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *TrainerDataSave_GetExtraSaveCount(save, block));
 }
 
 void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *ctrl, u32 extra_id) {
@@ -324,7 +325,7 @@ u32 SaveControl_LoadExtraBlock(SaveControl *save, u32 block, HeapID heapId, void
     if (TrainerDataSave_IsMarkerSet(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
     }
-    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *func_02008e74(save, block));
+    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *TrainerDataSave_GetExtraSaveCount(save, block));
 }
 
 void SaveControl_InitExtraBlock(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size) {
@@ -340,7 +341,7 @@ void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *ctrl, u32 extra_id) {
 void SaveControl_StartExtraSave(SaveControl *ctrl, u32 extra_id) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
     TrainerDataSave_SetMarker(ctrl, extra_id);
-    SaveData_DualSaveStart(ctrl->sv, ctrl->sv_extra[extra_id], func_02008e74(ctrl, extra_id));
+    SaveData_DualSaveStart(ctrl->sv, ctrl->sv_extra[extra_id], TrainerDataSave_GetExtraSaveCount(ctrl, extra_id));
 }
 
 u32 SaveControl_ContinueExtraSave(SaveControl *ctrl, u32 extra_id) {

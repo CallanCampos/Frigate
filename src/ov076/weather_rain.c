@@ -783,8 +783,8 @@ static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleDa
     data->x = pos.x << 3;
     data->y = pos.y << 3;
     ClActor_SetSequence(actor, 0);
-    func_0204c520(actor, 1);
-    func_0204c53c(actor, 1 << 13);
+    ClActor_SetAutoAnim(actor, 1);
+    ClActor_SetAutoAnimSpeed(actor, 1 << 13);
 }
 
 static void GustStreak_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
@@ -815,8 +815,8 @@ static void GustStreak_Init(WeatherObj *obj, const GustWork *work, GustParticleD
     data->x = pos.x << 3;
     data->y = pos.y << 3;
     ClActor_SetSequence(actor, 1);
-    func_0204c520(actor, 1);
-    func_0204c53c(actor, 1 << 13);
+    ClActor_SetAutoAnim(actor, 1);
+    ClActor_SetAutoAnimSpeed(actor, 1 << 13);
 }
 
 static void GustDriven_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
@@ -860,8 +860,8 @@ static void GustDriven_Init(WeatherObj *obj, const GustWork *work, GustParticleD
     data->x = pos.x << 3;
     data->y = pos.y << 3;
     ClActor_SetSequence(actor, 2);
-    func_0204c520(actor, 1);
-    func_0204c53c(actor, 1 << 13);
+    ClActor_SetAutoAnim(actor, 1);
+    ClActor_SetAutoAnimSpeed(actor, 1 << 13);
 }
 
 static void Gust_StartLull(WeatherTask *task, GustWork *work, u32 arg, BOOL noFade) {

@@ -163,7 +163,7 @@ u32 GFL_SndBGMGetRequestedID(void) {
     return sBGMChange.seq;
 }
 
-BOOL func_02005cbc(void) {
+BOOL GFL_SndIsLoadThreadRunning(void) {
     if (sThread == NULL) {
         return FALSE;
     }
@@ -203,7 +203,7 @@ void GFL_SndPlayerSetVolumeEx(u32 volume, u32 playerMask) {
 }
 
 static BOOL GFL_SndSeqVerify(u32 seq) {
-    if (func_02005cbc() == FALSE) {
+    if (GFL_SndIsLoadThreadRunning() == FALSE) {
         return TRUE;
     }
     if (sSeqVerifyCallback == NULL) {
@@ -218,7 +218,7 @@ void GFL_SndSetSeqVerifyCallback(BOOL (*callback)(u32 seq)) {
 
 static void StopBGM(void) {
     NNS_SndPlayerStopSeq(GFL_SndBGMStack_GetHandle(), 0);
-    func_02005a24();
+    GFL_SndBGMStack_FreeSeq();
 }
 
 void GFL_SndBGMStopImmediate(void) {
@@ -432,7 +432,7 @@ static void UpdateBGMChange(void) {
         break;
     case BGM_LOAD_SEQ:
         if (IsLoadThreadDone() == TRUE) {
-            func_020059d8();
+            GFL_SndBGMStack_SaveSeqLevel();
             StartLoadThread(sBGMChange.seq, SND_THREAD_LOAD_WAVE);
             sBGMChange.loadState = BGM_LOAD_WAVE;
         } else {
@@ -442,7 +442,7 @@ static void UpdateBGMChange(void) {
     case BGM_LOAD_WAVE:
         if (IsLoadThreadDone() == TRUE) {
             NNS_SndArcSetLoadBlockSize(0);
-            func_020059fc(sBGMChange.seq);
+            GFL_SndBGMStack_SetLoadedSeq(sBGMChange.seq);
             NNS_SndArcPlayerStartSeqEx(GFL_SndBGMStack_GetHandle(), 0, -1, -1, sBGMChange.seq);
             NNS_SndPlayerSetVolume(handle, 0);
             sBGMChange.loadState = BGM_LOAD_IDLE;
@@ -619,7 +619,7 @@ BOOL GFL_SndBGMLoadStep(u32 seq, u32 *step, BOOL start) {
             break;
         case 1:
             if (IsLoadThreadDone() == TRUE) {
-                func_020059d8();
+                GFL_SndBGMStack_SaveSeqLevel();
                 StartLoadThread(seq, SND_THREAD_LOAD_WAVE);
                 (*step)++;
             } else {
@@ -629,7 +629,7 @@ BOOL GFL_SndBGMLoadStep(u32 seq, u32 *step, BOOL start) {
         case 2:
             if (IsLoadThreadDone() == TRUE) {
                 NNS_SndArcSetLoadBlockSize(0);
-                func_020059fc(seq);
+                GFL_SndBGMStack_SetLoadedSeq(seq);
                 NNS_SndArcPlayerStartSeqEx(GFL_SndBGMStack_GetHandle(), 0, -1, -1, seq);
                 (*step)++;
                 return TRUE;
@@ -648,7 +648,7 @@ BOOL GFL_SndBGMSetLoadedData(void *seqData, void *bankData, u32 seq) {
     u32 bankFileId = bankInfo->fileId;
     int i;
 
-    func_020059d8();
+    GFL_SndBGMStack_SaveSeqLevel();
     for (i = 0; i < NNS_SND_ARC_BANK_TO_WAVEARC_NUM; i++) {
         if (bankInfo->waveArcNo[i] != NNS_SND_ARC_INVALID_WAVEARC_NO) {
             if (NNS_SndArcLoadWaveArc(bankInfo->waveArcNo[i], sSndHeap) == FALSE) {
@@ -658,11 +658,11 @@ BOOL GFL_SndBGMSetLoadedData(void *seqData, void *bankData, u32 seq) {
     }
     NNS_SndArcSetFileAddress(bankFileId, bankData);
     NNS_SndArcSetFileAddress(seqFileId, seqData);
-    func_020059fc(seq);
+    GFL_SndBGMStack_SetLoadedSeq(seq);
     return TRUE;
 }
 
-BOOL func_02006528(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex) {
+BOOL GFL_SndReplaceWave(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex) {
     const NNSSndArcWaveArcInfo *info = NNS_SndArcGetWaveArcInfo(waveArc);
     SNDWaveArc *loaded;
 
@@ -683,14 +683,14 @@ void GFL_SndBGMStartSeq(u16 seq) {
 
 void GFL_SndBGMStopSeq(void) {
     NNS_SndPlayerStopSeq(GFL_SndBGMStack_GetHandle(), 0);
-    func_02005a24();
+    GFL_SndBGMStack_FreeSeq();
 }
 
-// Clears the addresses of the files of bank and sequence 0x3f2 (SEQ_BGM_SHINKA), as GFL_SndBGMSetLoadedData sets them
+// Clears the addresses of the files of bank 0x3f2 and sequence SEQ_BGM_SHINKA, as GFL_SndBGMSetLoadedData sets them
 // to data in memory
-void func_02006588(void) {
+void GFL_SndBGMClearLoadedData(void) {
     u32 bankFileId = NNS_SndArcGetBankInfo(0x3f2)->fileId;
-    u32 seqFileId = NNS_SndArcGetSeqInfo(0x3f2)->fileId;
+    u32 seqFileId = NNS_SndArcGetSeqInfo(SEQ_BGM_SHINKA)->fileId;
 
     NNS_SndArcSetFileAddress(bankFileId, NULL);
     NNS_SndArcSetFileAddress(seqFileId, NULL);

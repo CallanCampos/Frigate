@@ -626,7 +626,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
             ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shopData, ResortData_GetPerson(occupant)), 0);
         shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(occupant)), 0);
         name = ResortSys_FormatShopText(shopData, occupant, shopId, heapId);
-        func_0202437c(wordSet, 0, name, ResortData_GetParam(occupant, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, name, ResortData_GetParam(occupant, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(name);
         return shopName + 2165;
     }
@@ -1019,7 +1019,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         ResortData_GetParam(data, JOIN_AVE_PARAM_NAME, name);
         GFL_StrBufLoadString(buf, name);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1027,7 +1027,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(joinPerson), 0);
         StrBuf *buf = ResortSys_FormatShopText(shopData, data, shopId, heapId);
 
-        func_0202437c(wordSet, wordIndex, buf, ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1039,7 +1039,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         StrBuf *buf = ResortSys_FormatShopText(
             shopData, data, JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, info, shopData), heapId);
 
-        func_0202437c(wordSet, wordIndex, buf, ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, ResortData_GetParam(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1050,7 +1050,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         ResortData_GetParam(data, JOIN_AVE_PARAM_GREETING, greeting);
         GFL_StrBufLoadString(buf, greeting);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1061,7 +1061,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         JoinAvenue_GetParam(info, 1, name);
         GFL_StrBufLoadString(buf, name);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1072,7 +1072,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         ResortData_GetParam(data, JOIN_AVE_PARAM_MESSAGE1, message);
         GFL_StrBufLoadString(buf, message);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1083,7 +1083,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         ResortData_GetParam(data, JOIN_AVE_PARAM_MESSAGE2, message);
         GFL_StrBufLoadString(buf, message);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1095,7 +1095,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE1, message);
         GFL_StrBufLoadString(buf, message);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1107,7 +1107,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE2, message);
         GFL_StrBufLoadString(buf, message);
-        func_0202437c(wordSet, wordIndex, buf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1127,7 +1127,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, shopName + 280);
 
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         GFL_MsgDataFree(msgData);
         break;
@@ -1144,7 +1144,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, shopName + 280);
 
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         GFL_MsgDataFree(msgData);
         break;
@@ -1159,7 +1159,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, shopName + 280);
 
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         GFL_MsgDataFree(msgData);
         break;
@@ -1170,7 +1170,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
 
         JoinAvenue_GetParam(info, 0, name);
         GFL_StrBufLoadString(buf, name);
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
@@ -1206,7 +1206,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, message);
 
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         GFL_MsgDataFree(msgData);
         break;
@@ -1228,7 +1228,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, shopName + 320);
 
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         GFL_MsgDataFree(msgData);
         break;
@@ -1239,7 +1239,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
             GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         StrBuf *buf = GFL_MsgDataLoadStrbufNew(msgData, unk26 + 1488);
 
-        func_0202437c(wordSet, wordIndex, buf, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         GFL_MsgDataFree(msgData);
         break;
@@ -1510,7 +1510,7 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
 
             joinAveTextHandler(person, JOIN_AVE_PARAM_NAME, name);
             GFL_StrBufLoadString(nameBuf, name);
-            func_0202437c(wordSet, 0, nameBuf, gender, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, nameBuf, gender, 1, 2);
         }
         GFL_WordSetFormatStrbuf(wordSet, lineBuf, templateBuf);
         GFL_FontGetBlockWidth(lineBuf, font, 0);
@@ -1809,7 +1809,7 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
     ResortSlots *slots = ResortSys_GetSlots(sys);
     ResortShopData *shopData = ResortSys_GetShopData(sys);
     ResortPersonData *made = NULL;
-    u32 row = func_020395a0((u16)kind);
+    u32 row = ResortLayout_GetSlotRow((u16)kind);
     u32 dataKind = ResortData_GetType(data);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     u16 slot;
@@ -1907,7 +1907,7 @@ StrBuf *ResortSys_FormatShopText(ResortShopData *shops, ResortPersonData *data, 
 
     ResortData_GetParam(data, JOIN_AVE_PARAM_NAME, name);
     GFL_StrBufLoadString(nameBuf, name);
-    func_0202437c(wordSet, 0, nameBuf, gender, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, nameBuf, gender, 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, dest, src);
     GFL_StrBufFree(nameBuf);
     GFL_StrBufFree(src);

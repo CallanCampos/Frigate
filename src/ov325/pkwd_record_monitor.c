@@ -952,7 +952,7 @@ static void PkwdRecordMonitor_CreateActors(PkwdRecordMonitorWork *wk, u32 surfac
         if (setup->flags & ACTOR_ANIMATE) {
             flag = TRUE;
         }
-        func_0204c520(actors[i], flag);
+        ClActor_SetAutoAnim(actors[i], flag);
         if (setup->flags & ACTOR_FLIP_V) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -1018,25 +1018,25 @@ static void PkwdRecordMonitor_SetActorSequence(PkwdRecordMonitorWork *wk, u32 gr
         if (index < BUTTON_COUNT) {
             actors = wk->buttons;
             ClActor_SetSequence(actors[index], sequence);
-            func_0204c520(actors[index], TRUE);
+            ClActor_SetAutoAnim(actors[index], TRUE);
         }
     } else if (group == ACTOR_GROUP_ICON) {
         if (index < CAST_COUNT) {
             actors = wk->icons;
             ClActor_SetSequence(actors[index], sequence);
-            func_0204c520(actors[index], TRUE);
+            ClActor_SetAutoAnim(actors[index], TRUE);
         }
     } else if (group == ACTOR_GROUP_LIST) {
         if (index < LIST_ACTOR_COUNT) {
             actors = wk->listActors;
             ClActor_SetSequence(actors[index], sequence);
-            func_0204c520(actors[index], TRUE);
+            ClActor_SetAutoAnim(actors[index], TRUE);
         }
     } else if (group == ACTOR_GROUP_MARK) {
         if (index < MARK_COUNT) {
             actors = wk->marks;
             ClActor_SetSequence(actors[index], sequence);
-            func_0204c520(actors[index], TRUE);
+            ClActor_SetAutoAnim(actors[index], TRUE);
             ClActor_RestartAnim(actors[index]);
         }
     }

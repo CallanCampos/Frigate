@@ -77,7 +77,7 @@ static const SpindaSpotPixel *sMcssSpindaSpots[SPINDA_SPOT_COUNT] = {
 };
 
 void SetupPokemonLoaderByPartyPkm(PartyPkm *pkm, MCSSLoadInfo *info, u32 dir) {
-    SetupPokemonLoaderByBoxData(func_0201d624(pkm), info, dir);
+    SetupPokemonLoaderByBoxData(PokeParty_ToBoxPkm(pkm), info, dir);
 }
 
 static void SetupPokemonLoaderByBoxData(BoxPkm *pkm, MCSSLoadInfo *info, u32 dir) {

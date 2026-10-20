@@ -13,8 +13,9 @@
 // A prop a Pokémon wears in a musical shot, by the slot it is worn on
 typedef struct {
     u16 itemId;
-    s16 unk2;
-    u8 unk4;
+    s16 rotation;
+    // The position it is worn at, 10 for none
+    u8 pos;
     u8 unk5[3];
 } MusicalShotEquip;
 
@@ -45,36 +46,41 @@ typedef struct {
     u8 unk1AF;
 } MusicalShot;
 
+// A gift of the audience after a show: the top kind of the show (4 for no gift), and whether it holds a prop and which
 typedef struct {
-    u8 unk0;
-    u8 unk1;
-    u16 unk2;
-} MusicalSaveUnk1E0;
+    u8 topKind;
+    u8 hasProp;
+    u16 prop;
+} MusicalAudienceGift;
 
 // A prop that the Pokémon wears: its position (10 for none), the prop and its rotation
 typedef struct {
-    u8 unk0;
+    u8 pos;
     u8 unk1;
     u16 itemId;
     s16 rotation;
-} MusicalSaveUnk1B0;
+} MusicalSaveEquip;
 
 struct MusicalSave {
     MusicalShot shot;
-    MusicalSaveUnk1B0 unk1B0[8];
-    MusicalSaveUnk1E0 unk1E0[10];
+    // The props the Pokémon wore last, which the dressing room puts on it again
+    MusicalSaveEquip equips[8];
+    MusicalAudienceGift audienceGifts[10];
     // A name of 0x25 characters
     u16 name[0x25];
-    u16 unk252;
-    u16 unk254;
-    u16 unk256;
+    // The shows played and won, and the points of all the shows, up to 0xffff
+    u16 showCount;
+    u16 winCount;
+    u16 totalPoints;
     // A bit per prop owned, and per prop not yet looked at
     u8 props[MUSICAL_PROP_BYTES];
     u8 newProps[MUSICAL_PROP_BYTES];
-    u8 unk298[4];
-    u8 unk29C;
-    u8 unk29D;
-    u8 unk29E;
+    // How many of the props worn in the last show were of each kind, and its points
+    u8 propKindCounts[4];
+    u8 lastPoints;
+    // The program to play, and whether a program was downloaded
+    u8 program;
+    u8 hasDistProgram;
     // Whether the dressing room has been visited
     u8 dressingRoomVisited;
     // Whether the downloaded props were added
@@ -86,8 +92,8 @@ struct MusicalSave {
 u32 MusicalSave_GetSize(void);
 void MusicalSave_Init(MusicalSave *musical);
 MusicalSave *getAddressOfMusicalDataInfo(SaveControl *save);
-void func_0200ad20(MusicalSave *musical);
-MusicalSaveUnk1B0 *func_0200ad44(MusicalSave *musical);
+void MusicalSave_ClearEquips(MusicalSave *musical);
+MusicalSaveEquip *MusicalSave_GetEquips(MusicalSave *musical);
 // Whether a musical photo is saved
 BOOL MusicalSave_HasShot(MusicalSave *musical);
 MusicalShot *MusicalSave_GetShot(MusicalSave *musical);
@@ -100,24 +106,24 @@ void MusicalSave_ClearNewProps(MusicalSave *musical);
 // How many props are owned, and whether all of them are
 u32 MusicalSave_CountProps(MusicalSave *musical);
 BOOL MusicalSave_HasAllProps(MusicalSave *musical);
-MusicalSaveUnk1E0 *func_0200ae6c(MusicalSave *musical, u8 index);
-// The counters at 0x252 and 0x254, and adding one to them, up to 0xffff
-u16 func_0200ae78(MusicalSave *musical);
-void func_0200ae84(MusicalSave *musical);
-u16 func_0200ae9c(MusicalSave *musical);
-void func_0200aea4(MusicalSave *musical);
-u8 func_0200aebc(MusicalSave *musical, u8 index);
-void func_0200aec8(MusicalSave *musical, u8 index, u8 value);
-u8 func_0200aed4(MusicalSave *musical);
-void func_0200aedc(MusicalSave *musical, u8 value);
-u8 func_0200aee4(MusicalSave *musical);
-void func_0200aef0(MusicalSave *musical, u8 value);
-u8 func_0200aefc(MusicalSave *musical);
-void func_0200af08(MusicalSave *musical, u8 value);
+MusicalAudienceGift *MusicalSave_GetAudienceGift(MusicalSave *musical, u8 index);
+// The shows played and won, and adding one to them, up to 0xffff
+u16 MusicalSave_GetShowCount(MusicalSave *musical);
+void MusicalSave_IncShowCount(MusicalSave *musical);
+u16 MusicalSave_GetWinCount(MusicalSave *musical);
+void MusicalSave_IncWinCount(MusicalSave *musical);
+u8 MusicalSave_GetPropKindCount(MusicalSave *musical, u8 index);
+void MusicalSave_SetPropKindCount(MusicalSave *musical, u8 index, u8 value);
+u8 MusicalSave_GetLastPoints(MusicalSave *musical);
+void MusicalSave_SetLastPoints(MusicalSave *musical, u8 value);
+u8 MusicalSave_GetProgram(MusicalSave *musical);
+void MusicalSave_SetProgram(MusicalSave *musical, u8 value);
+u8 MusicalSave_HasDistProgram(MusicalSave *musical);
+void MusicalSave_SetHasDistProgram(MusicalSave *musical, u8 value);
 const u16 *MusicalSave_GetName(MusicalSave *musical);
-// The counter at 0x256, and adding to it, up to 0xffff
-void func_0200af1c(MusicalSave *musical, u16 value);
-u16 func_0200af38(MusicalSave *musical);
+// The points of all the shows, and adding to them, up to 0xffff
+void MusicalSave_AddTotalPoints(MusicalSave *musical, u16 value);
+u16 MusicalSave_GetTotalPoints(MusicalSave *musical);
 BOOL MusicalSave_GetDressingRoomVisited(MusicalSave *musical);
 void MusicalSave_SetDressingRoomVisited(MusicalSave *musical, BOOL value);
 // Whether the downloaded props were added, which MusicalSave_SetDownloadedProps sets

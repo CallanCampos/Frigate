@@ -134,7 +134,7 @@ int BtlvClact_AddActorEx(BtlvClact *wk, u32 arcId, u32 charFileId, u32 plttFileI
         wk->entries[i].actor = ClActor_CreateEx(wk->unit, wk->entries[i].chars, wk->entries[i].palette,
                                                 wk->entries[i].cellAnims, &setup, 0, wk->heapId);
     }
-    func_0204c520(wk->entries[i].actor, TRUE);
+    ClActor_SetAutoAnim(wk->entries[i].actor, TRUE);
     GFL_ArcToolFree(arc);
     return i;
 }
@@ -167,7 +167,7 @@ static void BtlvClact_InitGauge(BtlvClact *wk) {
         setup.x = i * 8;
         wk->gauge[i].actor = ClActor_Create(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
                                             &setup, 0, wk->heapId);
-        func_0204c520(wk->gauge[i].actor, TRUE);
+        ClActor_SetAutoAnim(wk->gauge[i].actor, TRUE);
     }
     BtlvClact_SetGauge(wk, 10, 0);
 
@@ -176,7 +176,7 @@ static void BtlvClact_InitGauge(BtlvClact *wk) {
     setupEx.affineMode = 1;
     wk->popup[0].actor = ClActor_CreateEx(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
                                           &setupEx, 0, wk->heapId);
-    func_0204c520(wk->popup[0].actor, TRUE);
+    ClActor_SetAutoAnim(wk->popup[0].actor, TRUE);
     ClActor_SetVisible(wk->popup[0].actor, FALSE);
     ClActor_SetSequence(wk->popup[0].actor, 20);
     ClActor_SetPriority(wk->popup[0].actor, 1);
@@ -185,8 +185,8 @@ static void BtlvClact_InitGauge(BtlvClact *wk) {
     setup.y = 96;
     wk->popup[1].actor = ClActor_Create(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
                                         &setup, 0, wk->heapId);
-    func_0204c520(wk->popup[1].actor, TRUE);
-    func_0204c520(wk->popup[1].actor, TRUE);
+    ClActor_SetAutoAnim(wk->popup[1].actor, TRUE);
+    ClActor_SetAutoAnim(wk->popup[1].actor, TRUE);
     ClActor_SetVisible(wk->popup[1].actor, FALSE);
     ClActor_SetSequence(wk->popup[1].actor, 21);
     GFL_ArcToolFree(arc);

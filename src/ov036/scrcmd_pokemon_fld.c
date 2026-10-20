@@ -61,7 +61,7 @@ void func_ov036_021afa2c(FieldScriptEnv *env, u32 partyIdx) {
         boxPkm = boxPkmRegenToPartyPkm(BoxSaveAccessor_GetPkm(boxes, box, slot), heapId);
         copyPkmIntoPartyBlk(party, partyIdx, boxPkm);
         GFL_HeapFree(boxPkm);
-        BoxSaveAccessor_SetPkm(boxes, box, slot, func_0201d620(pkm));
+        BoxSaveAccessor_SetPkm(boxes, box, slot, PokeParty_GetBoxPkm(pkm));
         GFL_HeapFree(pkm);
     }
 }

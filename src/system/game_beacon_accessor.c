@@ -296,7 +296,7 @@ BOOL GameBeacon_IsInvalid(const GameBeacon *beacon) {
     if (beacon->zoneId >= BEACON_ZONE_COUNT || beacon->parentZoneId >= BEACON_ZONE_COUNT) {
         return TRUE;
     }
-    if (beacon->unk04 > 99999 || beacon->unk08 > 99999) {
+    if (beacon->passerbyCount > 99999 || beacon->thankedCount > 99999) {
         return TRUE;
     }
     if (sFormatChecks[GameBeacon_GetTypeFormat(beacon->type)](beacon)) {
@@ -336,7 +336,7 @@ u8 GameBeacon_GetRegion(const GameBeacon *beacon) {
     return beacon->region;
 }
 
-u8 func_02013cd8(GameBeacon *beacon) {
+u8 GameBeacon_GetJob(GameBeacon *beacon) {
     u32 answer = SurveySave_ReadAnswer(beacon->surveyAnswers, 0x1a);
 
     if (answer == 0) {
@@ -345,7 +345,7 @@ u8 func_02013cd8(GameBeacon *beacon) {
     return answer;
 }
 
-u8 func_02013cf0(GameBeacon *beacon) {
+u8 GameBeacon_GetHobby(GameBeacon *beacon) {
     u32 answer = SurveySave_ReadAnswer(beacon->surveyAnswers, 0x19);
 
     if (answer == 0) {
@@ -408,16 +408,16 @@ u16 GameBeacon_GetParentZone(const GameBeacon *beacon) {
     return beacon->parentZoneId;
 }
 
-u32 func_02013db8(const GameBeacon *beacon) {
-    return beacon->unk08;
+u32 GameBeacon_GetThankedCount(const GameBeacon *beacon) {
+    return beacon->thankedCount;
 }
 
-u32 func_02013dc0(const GameBeacon *beacon) {
-    return beacon->unk04;
+u32 GameBeacon_GetPasserbyCount(const GameBeacon *beacon) {
+    return beacon->passerbyCount;
 }
 
-u8 func_02013dc8(const GameBeacon *beacon) {
-    return beacon->unk5B;
+u8 GameBeacon_GetFavoriteMedal(const GameBeacon *beacon) {
+    return beacon->favoriteMedal;
 }
 
 u8 GameBeacon_GetMedalCount(const GameBeacon *beacon) {
@@ -661,11 +661,11 @@ static u8 GameBeacon_GetTypeFormat(int type) {
     return sTypeFormats[type].format;
 }
 
-u8 func_020140cc(int type) {
+u8 GameBeacon_GetTypeIcon(int type) {
     if (type >= BEACON_FORMAT_TYPE_MAX) {
         return 0;
     }
-    return sTypeFormats[type].unk1;
+    return sTypeFormats[type].icon;
 }
 
 void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, HeapID heapId) {
@@ -681,7 +681,7 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         return;
     }
     GameBeacon_GetName(beacon, str);
-    func_0202437c(wordSet, 0, str, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, str, 0, 1, 2);
     format = GameBeacon_GetTypeFormat(GameBeacon_GetType(beacon));
     switch (format) {
     case BEACON_FORMAT_TRAINER: {
@@ -700,7 +700,7 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         // fallthrough
     case BEACON_FORMAT_NICKNAME:
         GameBeacon_GetNickname(beacon, str);
-        func_0202437c(wordSet, 2, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 2, str, 0, 1, 2);
         break;
     case BEACON_FORMAT_ITEM:
         loadItemTextNameToStrbuf(wordSet, 1, GameBeacon_GetItem(beacon));
@@ -731,7 +731,7 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         break;
     case BEACON_FORMAT_TEXT:
         GameBeacon_GetTextMessage(beacon, str);
-        func_0202437c(wordSet, 1, str, GameBeacon_GetGender(beacon), 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 1, str, GameBeacon_GetGender(beacon), 1, 2);
         break;
     case BEACON_FORMAT_POKEWOOD:
         loadPokewoodLineToStrbuf(wordSet, 1, GameBeacon_GetPokewoodLine(beacon));

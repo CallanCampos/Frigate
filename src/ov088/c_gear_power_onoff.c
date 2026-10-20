@@ -398,13 +398,13 @@ static BOOL CGearPowerOnOff_SeqPowerOn(CGearPowerOnOff *work) {
         work->seq++;
         break;
     case 4:
-        if (KeyCursor_UpdateWait(work->keyCursor, work->messageWindow) || func_02016bec(work->gsys)) {
+        if (KeyCursor_UpdateWait(work->keyCursor, work->messageWindow) || GSYS_IsLowBatteryCGearOff(work->gsys)) {
             KeyCursor_Erase(work->keyCursor, BmpWin_GetBitmap(work->messageWindow), WINDOW_BG_COLOR);
             work->seq++;
         }
         break;
     case 5:
-        if (func_02016bec(work->gsys)) {
+        if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
             if (GameCommSys_BootCheck(work->comm)) {
                 GameCommSys_ExitReq(work->comm);
             }
@@ -438,8 +438,8 @@ static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
         }
         break;
     case 2:
-        if (CGearPowerOnOff_IsYesNoFinished(work) || func_02016bec(work->gsys) == TRUE) {
-            if (CGearPowerOnOff_GetYesNoPos(work) == YESNO_YES || func_02016bec(work->gsys) == TRUE) {
+        if (CGearPowerOnOff_IsYesNoFinished(work) || GSYS_IsLowBatteryCGearOff(work->gsys) == TRUE) {
+            if (CGearPowerOnOff_GetYesNoPos(work) == YESNO_YES || GSYS_IsLowBatteryCGearOff(work->gsys) == TRUE) {
                 if (GameCommSys_BootCheck(work->comm)) {
                     GameCommSys_ExitReq(work->comm);
                 }

@@ -312,7 +312,7 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
     case CTVT_NET_IDLE:
         if (comm->nextConnectType != 0) {
             if (comm->nextConnectType == CTVT_CONNECT_EXISTING) {
-                func_02042d8c(FALSE);
+                GFL_NetSetMPSendEnabled(FALSE);
                 comm->netState = CTVT_NET_ADD_COMMANDS;
                 comm->connectType = comm->nextConnectType;
             } else {
@@ -328,11 +328,11 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
         if (GFL_NetIsInitialized() == TRUE) {
             switch (comm->nextConnectType) {
             case CTVT_CONNECT_PARENT:
-                func_02042968();
+                GFL_NetStartScan();
                 comm->netState = CTVT_NET_CONNECTED;
                 break;
             case CTVT_CONNECT_SCAN:
-                func_02042970();
+                GFL_NetStartServer();
                 WH_SetScanFilter(CtvtComm_FilterInvited);
                 comm->netState = CTVT_NET_WAIT_CONNECT;
                 break;
@@ -436,7 +436,7 @@ static void CtvtComm_InitNet(CommTvtWork *sys, CtvtComm *comm) {
 
     CommTvt_GetHeapId(sys);
     GFL_NetInit(&init, NULL, comm);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
 }
 
 void CtvtComm_Disconnect(CommTvtWork *sys, CtvtComm *comm) {

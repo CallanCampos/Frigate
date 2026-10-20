@@ -416,7 +416,7 @@ static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     SaveLocation location;
 
     gameInfoValues[0] = TrainerGameInfo_GetStartMenuFlags(wk->gameInfo);
-    gameInfoValues[1] = func_0200ca74(wk->gameInfo);
+    gameInfoValues[1] = TrainerGameInfo_GetKeyNotice(wk->gameInfo);
     SaveControl_Reload(save);
     Config_ApplyMsgLanguage((Config *)getTrainerDataBlkAddress(save));
     SaveControl_GetPlayerLocation(save, &location);
@@ -425,7 +425,7 @@ static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
         GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId, &location.pos, location.unk18));
     Config_SetCGearOn(wk->config, cgearOn);
     TrainerGameInfo_SetStartMenuFlags(wk->gameInfo, gameInfoValues[0]);
-    func_0200ca78(wk->gameInfo, gameInfoValues[1]);
+    TrainerGameInfo_SetKeyNotice(wk->gameInfo, gameInfoValues[1]);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }
@@ -434,7 +434,7 @@ static void NewGame_SetUpPlayer(PlayerInfo *info, StrBuf *name, u32 gender) {
     copyTrainerNameFromStrbuf(info, name);
     setTrainerGender(info, gender);
     setIDAsUInt(info, GFL_RandomLCAlt(0xffffffff));
-    func_02008bf8(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
+    PlayerInfo_SetUnionView(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
 }
 
 static void NewGame_EraseOutsideKeys(SaveControl *save) {

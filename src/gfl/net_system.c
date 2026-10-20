@@ -55,7 +55,8 @@ typedef struct {
     NetQueue mpQueue;
     NetRecvState recvStates[GFL_NET_MACHINE_MAX];
     NetRecvState serverRecvState;
-    BOOL unk1AC;
+    // Whether the parent sends its MP packets (Wi-Fi turns it off while it waits)
+    BOOL mpSendEnabled;
     int serverSends;
     // The packets sent to each machine that have not come back
     int sends[GFL_NET_MACHINE_MAX];
@@ -66,13 +67,17 @@ typedef struct {
     int recvSize;
     u16 connectBits;
     u8 unk1E6;
-    u8 unk1E7;
+    // Set while the Wi-Fi is connected
+    u8 wifiConnected;
     u8 unk1E8;
     u8 error;
-    u8 unk1EA;
-    u8 unk1EB;
+    // Set by an error, which stops the sending and receiving
+    u8 stopped;
+    // Whether the last step of the data sharing went through
+    u8 dataShareOk;
     u8 unk1EC;
-    u8 unk1ED;
+    // Set while a Wi-Fi packet is written and not yet sent
+    u8 wifiPacketReady;
 } NetSystem;
 
 typedef struct {
@@ -87,7 +92,7 @@ typedef struct {
         NetSystem_SetError();                                                                                          \
         err = NetState_GetErrorInfo();                                                                                 \
         if (!err->type) {                                                                                              \
-            NetState_RecordError(err->code, err->unk4, err->unk8, line);                                               \
+            NetState_RecordError(err->code, err->errorType, err->error, line);                                         \
         }                                                                                                              \
     } while (0)
 
@@ -98,17 +103,17 @@ static BOOL NetSystem_Alloc(int size, HeapID heapId, BOOL useSysSize);
 static void NetSystem_ResetBuffers(void);
 static void NetSystem_ResetMachine(int netID);
 static BOOL NetSystem_RecvInfraredCallback(u16 netId, u8 *data, u16 size);
-static void func_0203ed18(int netId);
-static void func_0203ed40(int netId);
+static void NetSystem_OnConnectAsParent(int netId);
+static void NetSystem_OnConnectAsChild(int netId);
 static void NetSystem_FreeWhenDone(void);
 static BOOL NetSystem_BuildSendPacket(BOOL server);
 static void NetSystem_SendOwnPacket(void);
-static void func_0203f234(void);
-static void func_0203f2cc(void);
+static void NetSystem_UpdateDataSharing(void);
+static void NetSystem_UpdateInfrared(void);
 static BOOL NetSystem_RecvInfraredPacket(u16 netId, u8 *data, u16 size);
 static void NetSystem_SendInfraredPacket(u8 *data, int size);
-static void func_0203f46c(void);
-static void func_0203f4f0(void);
+static void NetSystem_UpdateWifiSend(void);
+static void NetSystem_UpdateOwnSend(void);
 static void NetSystem_UpdateMPSendStep(void);
 static BOOL NetSystem_AllSendsReturned(void);
 static void NetSystem_CountSends(void);
@@ -143,8 +148,8 @@ static void NetRecvState_Reset(NetRecvState *state) {
 static int NetSystem_GetParentPacketSize(void) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->aNetInit.bMPMode && sys->aNetInit.unk6C) {
-        return sys->aNetInit.unk6C;
+    if (sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize) {
+        return sys->aNetInit.parentPacketSize;
     }
     return GFL_NetGetMaxSendSize() * GFL_NetGetMaxConnectNum();
 }
@@ -169,11 +174,11 @@ static BOOL NetSystem_Alloc(int size, HeapID heapId, BOOL useSysSize) {
         sNetSys->mpRingData = GFL_HeapAllocate(heapId, sendSize * 2, TRUE, "net_system.c", 239);
         NetQueue_Init(&sNetSys->sendQueue, 100, &sNetSys->sendRing, heapId);
         NetQueue_Init(&sNetSys->mpQueue, 180, &sNetSys->mpRing, heapId);
-        sNetSys->unk1AC = TRUE;
+        sNetSys->mpSendEnabled = TRUE;
         NetSystem_ResetBuffers();
     }
     sNetSys->connectBits = 0;
-    sNetSys->unk1E7 = 0;
+    sNetSys->wifiConnected = 0;
     return TRUE;
 }
 
@@ -212,9 +217,9 @@ static void NetSystem_ResetBuffers(void) {
     NetQueue_Clear(&sNetSys->sendQueue);
     NetQueue_Clear(&sNetSys->mpQueue);
     sNetSys->unk1E8 = 0;
-    sNetSys->unk1EB = 1;
-    sNetSys->unk1EA = 0;
-    sNetSys->unk1ED = 0;
+    sNetSys->dataShareOk = 1;
+    sNetSys->stopped = 0;
+    sNetSys->wifiPacketReady = 0;
 }
 
 static void NetSystem_ResetMachine(int netID) {
@@ -229,17 +234,17 @@ BOOL NetSystem_StartWireless(int size, HeapID heapId) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    NetSystem_Alloc(size, heapId, sys->aNetInit.bMPMode && sys->aNetInit.unk6C);
+    NetSystem_Alloc(size, heapId, sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize);
     sys->pDevTable->init(ini->heapId, sys, 0, sys->devWork);
-    sys->pDevTable->unk08(0);
+    sys->pDevTable->start(0);
     sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
     return TRUE;
 }
 
-int func_0203ecac(int a0) {
+int NetSystem_CanConnectFriend(int a0) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    return sys->pDevTable->unk90(a0);
+    return sys->pDevTable->canConnectFriend(a0);
 }
 
 static BOOL NetSystem_RecvInfraredCallback(u16 netId, u8 *data, u16 size) {
@@ -250,7 +255,7 @@ BOOL NetSystem_StartInfrared(int a0) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    ini->unk66 = a0;
+    ini->changeTgid = a0;
     sys->pDevTable->setRecvCallback(NetSystem_RecvInfraredCallback);
     NetSystem_Alloc(0x80, ini->heapId, FALSE);
     NetSystem_ResetMachine(0);
@@ -259,7 +264,7 @@ BOOL NetSystem_StartInfrared(int a0) {
     return TRUE;
 }
 
-static void func_0203ed18(int netId) {
+static void NetSystem_OnConnectAsParent(int netId) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
@@ -269,7 +274,7 @@ static void func_0203ed18(int netId) {
     }
 }
 
-static void func_0203ed40(int netId) {
+static void NetSystem_OnConnectAsChild(int netId) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
@@ -279,42 +284,42 @@ static void func_0203ed40(int netId) {
     }
 }
 
-int func_0203ed68(int a0, int size, int a2, BOOL (*callback)(void)) {
+int NetSystem_StartParent(int a0, int size, int a2, BOOL (*callback)(void)) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
     BOOL useSysSize;
 
-    ini->unk66 = a0;
-    sys->pDevTable->setDisconnectCallback(func_0203ed18);
+    ini->changeTgid = a0;
+    sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsParent);
     sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
-    useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+    useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
     NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
-    return sys->pDevTable->unk40(a2, callback);
+    return sys->pDevTable->startParent(a2, callback);
 }
 
-BOOL func_0203ede0(int a0, int size) {
+BOOL NetSystem_StartScan(int a0, int size) {
     GFLNetSys *sys = GFL_NetGetSys();
     BOOL result;
 
-    sys->pDevTable->setDisconnectCallback(func_0203ed40);
-    result = sys->pDevTable->unk44(a0, 0);
+    sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsChild);
+    result = sys->pDevTable->startScan(a0, 0);
     if (result == TRUE) {
         BOOL useSysSize;
 
         sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
-        useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+        useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
         NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
         sState.recvState = 4;
     }
     return result;
 }
 
-BOOL func_0203ee50(int size) {
+BOOL NetSystem_StartSearch(int size) {
     GFLNetSys *sys = GFL_NetGetSys();
     BOOL result;
 
-    sys->pDevTable->setDisconnectCallback(func_0203ed40);
-    result = sys->pDevTable->unkBC();
+    sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsChild);
+    result = sys->pDevTable->startSearch();
     if (result == TRUE) {
         sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
         NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, FALSE);
@@ -323,26 +328,26 @@ BOOL func_0203ee50(int size) {
     return result;
 }
 
-void func_0203eea4(int a0) {
+void NetSystem_HoldScan(int a0) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     if (sys->pDevTable != NULL) {
-        sys->pDevTable->unkC0(a0);
+        sys->pDevTable->holdScan(a0);
     }
 }
 
-int func_0203eec0(BOOL a0, const u8 *mac, int size, void (*callback)(void)) {
+int NetSystem_StartChild(BOOL a0, const u8 *mac, int size, void (*callback)(void)) {
     GFLNetSys *sys = GFL_NetGetSys();
     GFLNetInitData *ini = GFL_NetGetInitData();
 
     sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
     if (a0) {
-        BOOL useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+        BOOL useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
 
         NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
         sState.recvState = 4;
     }
-    return sys->pDevTable->unk48(a0, mac, 0, 0, callback);
+    return sys->pDevTable->startChild(a0, mac, 0, 0, callback);
 }
 
 void NetSystem_Free(void) {
@@ -396,18 +401,18 @@ BOOL NetSystem_Update(void) {
     if (sys->pDevTable->getSignalLevel != NULL) {
         WmIcon_SetStrength(sys->pDevTable->getSignalLevel());
     }
-    if (!sNetSys->unk1EA && !NetSystem_HasError()) {
+    if (!sNetSys->stopped && !NetSystem_HasError()) {
         if (!ini->bMPMode && (ini->bNetType == 0 || ini->bNetType == 5)) {
-            func_0203f234();
+            NetSystem_UpdateDataSharing();
             NetSystem_ReadRecvRings();
         } else if (ini->bNetType == 3 || ini->bNetType == 4) {
-            func_0203f2cc();
+            NetSystem_UpdateInfrared();
             NetSystem_ReadRecvRings();
         } else if (ini->bNetType == 1 || ini->bNetType == 2) {
-            func_0203f46c();
+            NetSystem_UpdateWifiSend();
             NetSystem_ReadRecvRings();
         } else {
-            func_0203f4f0();
+            NetSystem_UpdateOwnSend();
             NetSystem_ReadServerRing();
             if (!NetSystem_GetNetId() && NetSystem_IsMachineConnected(0) && ini->bMPMode) {
                 NetSystem_UpdateMPSend();
@@ -482,44 +487,44 @@ static void NetSystem_SendOwnPacket(void) {
     }
 }
 
-static void func_0203f234(void) {
+static void NetSystem_UpdateDataSharing(void) {
     int i;
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk58()) {
-        if (sNetSys->unk1EB) {
+    if (sys->pDevTable->isDataSharing()) {
+        if (sNetSys->dataShareOk) {
             NetSystem_BuildSendPacket(TRUE);
         }
-        if (sys->pDevTable->unk5C(sNetSys->sendData) == TRUE) {
+        if (sys->pDevTable->stepDataSharing(sNetSys->sendData) == TRUE) {
             int dataSize;
             int machineMax;
 
             sState.recvState = 4;
-            sNetSys->unk1EB = TRUE;
+            sNetSys->dataShareOk = TRUE;
             dataSize = GFL_NetGetMaxSendSize();
             machineMax = GFL_NetGetMaxConnectNum();
             for (i = 0; i < machineMax; i++) {
                 NetSystem_RecvPacket(i, sys->pDevTable->getRecvData(i), dataSize);
             }
         } else {
-            sNetSys->unk1EB = FALSE;
+            sNetSys->dataShareOk = FALSE;
         }
     }
 }
 
-static void func_0203f2cc(void) {
+static void NetSystem_UpdateInfrared(void) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     if (NetQueue_IsEmpty(&sNetSys->sendQueue)) {
         GFL_NetSendCommand(NetHandle_GetOwn(), 0x10, 0, NULL);
     }
-    if (sys->pDevTable->unk9C != NULL) {
-        sys->pDevTable->unk9C();
+    if (sys->pDevTable->poll != NULL) {
+        sys->pDevTable->poll();
     }
-    if (sys->pDevTable->unk6C() == TRUE) {
+    if (sys->pDevTable->isRunning() == TRUE) {
         int dataSize = GFL_NetGetMaxSendSize();
 
-        if (sys->pDevTable->unkA0() == TRUE && NetSystem_BuildSendPacket(FALSE)) {
+        if (sys->pDevTable->canSend() == TRUE && NetSystem_BuildSendPacket(FALSE)) {
             NetSystem_SendInfraredPacket(sNetSys->sendData, dataSize);
             sState.recvState = 4;
         }
@@ -560,7 +565,7 @@ static void NetSystem_SendInfraredPacket(u8 *data, int size) {
 
     GFL_NetGetInitData();
     sys = GFL_NetGetSys();
-    if (!sys->pDevTable->unkA4() || !sys->pDevTable->unkAC()) {
+    if (!sys->pDevTable->isSendTurn() || !sys->pDevTable->isLinked()) {
         GFL_ASSERT(0);
         return;
     }
@@ -571,7 +576,7 @@ static void NetSystem_SendInfraredPacket(u8 *data, int size) {
     }
 }
 
-static void func_0203f46c(void) {
+static void NetSystem_UpdateWifiSend(void) {
     GFLNetSys *sys;
     int dataSize;
     NetSystem *net;
@@ -580,21 +585,21 @@ static void func_0203f46c(void) {
     sys = GFL_NetGetSys();
     dataSize = GFL_NetGetMaxSendSize();
     net = sNetSys;
-    if (net->unk1E7) {
-        if (!net->unk1ED) {
+    if (net->wifiConnected) {
+        if (!net->wifiPacketReady) {
             if (NetSystem_WritePacket(net->sendData, &net->sendQueue, GFL_NetGetMaxSendSize(), net->sendSeq)) {
-                sNetSys->unk1ED = TRUE;
+                sNetSys->wifiPacketReady = TRUE;
             }
         }
-        if (sNetSys->unk1ED == TRUE) {
+        if (sNetSys->wifiPacketReady == TRUE) {
             if (sys->pDevTable->send(sNetSys->sendData, dataSize, 0, NULL)) {
-                sNetSys->unk1ED = FALSE;
+                sNetSys->wifiPacketReady = FALSE;
             }
         }
     }
 }
 
-static void func_0203f4f0(void) {
+static void NetSystem_UpdateOwnSend(void) {
     GFLNetSys *sys;
 
     GFL_NetGetInitData();
@@ -617,7 +622,7 @@ static void NetSystem_UpdateMPSendStep(void) {
                 NetSystem_SetSendState(1, 1134);
             }
         } else if (GFL_NetGetInitData()->bNetType == 3 || GFL_NetGetInitData()->bNetType == 4) {
-            if (!sys->pDevTable->unkA0()) {
+            if (!sys->pDevTable->canSend()) {
                 NetSystem_SetSendState(1, 1141);
             } else {
                 if (sNetSys->mpSendData[PACKET_SIZE] == 0) {
@@ -669,7 +674,7 @@ static void NetSystem_UpdateMPSend(void) {
             return;
         }
         GFL_ASSERT(!pNetIni->bMPMode);
-        if (sState.sendState == 4 && sNetSys->unk1AC && NetSystem_AllSendsReturned()) {
+        if (sState.sendState == 4 && sNetSys->mpSendEnabled && NetSystem_AllSendsReturned()) {
             NetSystem_SetSendState(1, 1242);
         }
         if (sState.sendState == 1) {
@@ -845,7 +850,7 @@ BOOL NetSystem_QueueCommand(int command, u8 *data, int size, u32 unused, int des
     if (NetSystem_HasErrorChecked() || NetState_GetError()) {
         return FALSE;
     }
-    if (!func_02040198()) {
+    if (!NetSystem_IsDataShareOk()) {
         return FALSE;
     }
     if (size >= sNetSys->recvSize && copy == TRUE) {
@@ -1014,7 +1019,7 @@ BOOL NetSystem_IsMachineConnected(u16 netId) {
         return FALSE;
     }
     if (ini->bNetType == 1 || ini->bNetType == 2) {
-        if (sNetSys->unk1E7 && sys->pDevTable->getNetId() != -1) {
+        if (sNetSys->wifiConnected && sys->pDevTable->getNetId() != -1) {
             if (netId == 0) {
                 return TRUE;
             }
@@ -1074,7 +1079,7 @@ BOOL NetSystem_IsDeviceReady(void) {
     if (sNetSys != NULL && (ini->bNetType == 1 || ini->bNetType == 2 || ini->bNetType == 3 || ini->bNetType == 4)) {
         return TRUE;
     }
-    return sys->pDevTable->unk6C();
+    return sys->pDevTable->isRunning();
 }
 
 u16 NetSystem_GetNetId(void) {
@@ -1137,15 +1142,15 @@ BOOL NetSystem_IsSendQueueEmpty(void) {
     return NetQueue_IsEmpty(&sNetSys->sendQueue);
 }
 
-void func_02040104(u8 a0) {
-    sNetSys->unk1E7 = a0;
+void NetSystem_SetWifiConnected(u8 a0) {
+    sNetSys->wifiConnected = a0;
 }
 
-void func_02040118(BOOL a0) {
+void NetSystem_SetMPSendEnabled(BOOL a0) {
     GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (ini->bNetType == 1 || ini->bNetType == 2) {
-        sNetSys->unk1AC = a0;
+        sNetSys->mpSendEnabled = a0;
         if (a0) {
             sNetSys->serverSends = 0;
             sNetSys->sends[0] = 0;
@@ -1162,18 +1167,18 @@ void NetSystem_ClearError(void) {
     sNetSys->error = FALSE;
 }
 
-void func_02040180(void) {
+void NetSystem_Stop(void) {
     if (sNetSys != NULL) {
-        sNetSys->unk1EA = TRUE;
+        sNetSys->stopped = TRUE;
     }
 }
 
-BOOL func_02040198(void) {
+BOOL NetSystem_IsDataShareOk(void) {
     if (sNetSys != NULL) {
         GFLNetInitData *ini = GFL_NetGetInitData();
 
         if (!ini->bMPMode && (ini->bNetType == 0 || ini->bNetType == 5)) {
-            return sNetSys->unk1EB;
+            return sNetSys->dataShareOk;
         }
     }
     return TRUE;

@@ -216,13 +216,13 @@ static void PartySelectList_LoadIconResources(PartySelectList *psl) {
     count = PokeParty_GetPkmCount(psl->temoti);
     for (i = 0; i < count; i++) {
         psl->partyChars[i] = ClActSys_LoadChars(
-            arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->temoti, i))), 0, 0, psl->heapId);
+            arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(PokeParty_GetPkm(psl->temoti, i))), 0, 0, psl->heapId);
     }
     if (psl->bbox != NULL) {
         count = PokeParty_GetPkmCount(psl->bbox);
         for (i = 0; i < count; i++) {
             psl->bboxChars[i] = ClActSys_LoadChars(
-                arc, PokeIcon_GetFileOfPkm(func_0201d620(PokeParty_GetPkm(psl->bbox, i))), 0, 0, psl->heapId);
+                arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(PokeParty_GetPkm(psl->bbox, i))), 0, 0, psl->heapId);
         }
     }
     GFL_ArcToolFree(arc);
@@ -349,9 +349,11 @@ static void PartySelectList_ShowIcons(PartySelectList *psl, u32 mode) {
 static void PartySelectList_LoadItemResources(PartySelectList *psl) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, psl->heapId);
 
-    psl->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), CLACT_VRAM_MAIN, 0x120, 0, 1, psl->heapId);
-    psl->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(1), func_0202d89c(1), psl->heapId);
-    psl->itemChars = ClActSys_LoadChars(arc, func_0202d894(), 0, 0, psl->heapId);
+    psl->itemPalette =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), CLACT_VRAM_MAIN, 0x120, 0, 1, psl->heapId);
+    psl->itemCells = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(1),
+                                            AppMenuCommon_GetItemIconAnimFile(1), psl->heapId);
+    psl->itemChars = ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), 0, 0, psl->heapId);
     GFL_ArcToolFree(arc);
 }
 

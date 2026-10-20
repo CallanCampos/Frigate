@@ -62,7 +62,7 @@ void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     MI_CpuFill8(work->places, 0, sizeof(work->places));
     MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
     MI_CpuFill8(work->values, 0, sizeof(work->values));
-    FestMission_InitRand(mission->unk1C, FestMission_GetMissionZone(zoneId), &rand);
+    FestMission_InitRand(mission->seed, FestMission_GetMissionZone(zoneId), &rand);
     FestSparklePlace_PickPlaces(gsys, work, mission, zoneId, &rand);
     FestSparklePlace_AddZone(work, zoneId);
 }

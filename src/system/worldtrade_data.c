@@ -41,12 +41,12 @@ void WorldTradeData_SetPkm(WorldTradeData *data, PartyPkm *pkm, u32 box) {
     MI_CpuCopy8(pkm, &data->pkm, PokeParty_GetPkmRawSize());
 }
 
-void func_0200b4ec(WorldTradeData *data, u32 value) {
-    data->unkF0 = value;
+void WorldTradeData_SetDepositTradeDate(WorldTradeData *data, u32 value) {
+    data->depositTradeDate = value;
 }
 
-void func_0200b4f4(WorldTradeData *data, u32 value) {
-    data->unkF4 = value;
+void WorldTradeData_SetExchangeDate(WorldTradeData *data, u32 value) {
+    data->exchangeDate = value;
 }
 
 u16 func_0200b4fc(WorldTradeData *data) {

@@ -564,7 +564,7 @@ static void BtlvGauge_CreateActors(BtlvGauge *gauge, u32 type, int index) {
                 ClActor_Create(gauge->unit, gauge->statusChars, gauge->statusPalette, gauge->statusCellAnims, &setup,
                                CLACT_SURFACE_MAIN, gauge->heapId);
         }
-        func_0204c520(gauge->entries[index].statusActor, TRUE);
+        ClActor_SetAutoAnim(gauge->entries[index].statusActor, TRUE);
         setup.priority = priority;
         gauge->entries[index].damageActor =
             ClActor_Create(gauge->unit, gauge->entries[index].damageChars, gauge->palettes[slot],

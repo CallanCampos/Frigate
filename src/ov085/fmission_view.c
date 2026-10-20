@@ -469,13 +469,13 @@ static int FMissionView_GetHeldScroll(FMissionView *view) {
 
 // Shows the player's new greeting, once it was changed
 static BOOL FMissionView_CheckGreeting(FMissionView *view) {
-    u16 *changed = (u16 *)func_0202d7d0(view->beaconStatus);
+    u16 *changed = (u16 *)BeaconStatus_GetGreetingChanged(view->beaconStatus);
 
     if (*changed == 0) {
         return FALSE;
     }
     *changed = 0;
-    func_0202437c(view->wordSet, 0, BeaconStatus_GetGreeting(view->beaconStatus), view->gender, 1, 2);
+    GFL_WordSetSetStrbuf(view->wordSet, 0, BeaconStatus_GetGreeting(view->beaconStatus), view->gender, 1, 2);
     FMissionView_ShowMessage(view, FmissionViewSetup_Text_Said);
     return TRUE;
 }
@@ -1121,7 +1121,7 @@ static BOOL FMissionView_OfferEntryPassPower(FMissionView *view, FestMissionLogE
 }
 
 static BOOL FMissionView_OfferPassPower(FMissionView *view, u32 passPower, StrBuf *name, int received) {
-    func_0202437c(view->wordSet, 0, name, 2, 1, 2);
+    GFL_WordSetSetStrbuf(view->wordSet, 0, name, 2, 1, 2);
     return FMissionView_StartPassPower(view, passPower, received, &view->pending);
 }
 

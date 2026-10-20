@@ -924,7 +924,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         GFL_NetErrMarkShown();
         break;
     case 414:
-        func_02016b0c(gsys, 1);
+        GSYS_SetNetErrorPending(gsys, 1);
         break;
     case 415:
         *retWk = FALSE;
@@ -1048,7 +1048,7 @@ static GameEventReturnCode EventBSubwayCommEnd_Callback(GameEvent *event, u32 *s
     switch (*state) {
     case 0:
         if (GFL_NetIsParent() == TRUE) {
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
         }
         if ((*bsw)->unkC_9 == TRUE) {
             BSubwayComm_RemoveCommands(*bsw);

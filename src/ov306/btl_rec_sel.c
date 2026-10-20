@@ -654,7 +654,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
                                                          &wk->saveSeq, &wk->saveSubSeq);
         }
         if (wk->saveResult == 2 || wk->saveResult == 3) {
-            func_0200bbb4();
+            BattleRec_DecryptBody();
             WaitIcon_Free(wk->waitIcon);
             if (wk->saveResult == 2) {
                 GFL_SndSEPlay(SEQ_SE_SAVE);
@@ -1278,7 +1278,7 @@ static ClActor *BtlRecSel_CreateIcon(ClActUnit *unit, HeapID heapId, u32 vramTyp
     actor = UIObjRes_CreateActor(res, unit, x, y, anim, heapId);
     ClActor_SetBgPriority(actor, bgPriority);
     ClActor_SetPriority(actor, priority);
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     return actor;
 }
@@ -1411,7 +1411,7 @@ static void BtlRecSel_FreePaletteFade(BtlRecSelParam *param, BtlRecSelWork *work
     PaletteFade_FreeBuffer(work->fade, 0);
     PaletteFade_FreeBuffer(work->fade, 2);
     PaletteFade_Free(work->fade);
-    func_0203a610(work->tcbManager);
+    GFL_TCBMgrDelete(work->tcbManager);
     GFL_HeapFree(work->tcbManagerWork);
 }
 

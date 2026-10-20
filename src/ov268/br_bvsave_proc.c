@@ -647,8 +647,8 @@ static void BrBvSave_CreateConfirm(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_para
     wordSet = BrRes_GetWordSet(p_param->res);
     src = GFL_MsgDataLoadStrbufNew(BrRes_GetMsgData(p_param->res), 0x141);
     str = GFL_StrBufCreate(0x80, p_wk->heapId);
-    func_0202437c(wordSet, 0, p_param->recordInfo->name[p_wk->select + 1], p_param->recordInfo->sex[p_wk->select + 1],
-                  1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, p_param->recordInfo->name[p_wk->select + 1],
+                         p_param->recordInfo->sex[p_wk->select + 1], 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(str);
@@ -747,7 +747,7 @@ static void BrBvSave_CreateSelect(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_param
 
         if (p_param->recordInfo->isValid[slot]) {
             GFL_MsgDataLoadStrbuf(msg, 0x1a, src);
-            func_0202437c(wordSet, 0, p_param->recordInfo->name[slot], p_param->recordInfo->sex[slot], 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, p_param->recordInfo->name[slot], p_param->recordInfo->sex[slot], 1, 2);
             GFL_WordSetFormatStrbuf(wordSet, str, src);
         } else {
             GFL_MsgDataLoadStrbuf(msg, 9, str);
@@ -767,7 +767,7 @@ static void BrBvSave_CreateSelect(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_param
         p_wk->text = BrText_Init(p_param->res, p_wk->que, p_wk->heapId);
     }
     GFL_MsgDataLoadStrbuf(msg, 0x5c, src);
-    func_0202437c(wordSet, 0, name, GdsProfile_GetSex(profile), 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, GdsProfile_GetSex(profile), 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(name);

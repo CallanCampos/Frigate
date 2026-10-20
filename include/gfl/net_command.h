@@ -30,7 +30,7 @@ void NetCommand_Dispatch(int netId, int netIds, int command, int size, void *dat
 BOOL NetCommand_HasCallback(int command);
 BOOL NetCommand_HasBufferFunc(int command);
 void *NetCommand_GetRecvBuffer(int command, int netId, int size);
-void func_02040e0c(void);
+void NetCommand_RecvDummy(void);
 // Handlers for data in chunks: a chunk, and the header before the chunks
 void NetCommand_RecvHugeChunk(int netId, int size, const void *data, void *work, NetHandle *handle);
 void NetCommand_RecvHugeHeader(int netId, int size, const void *data, void *work, NetHandle *handle);

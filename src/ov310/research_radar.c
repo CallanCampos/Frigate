@@ -151,7 +151,7 @@ static BOOL ResearchRadar_Main(GameProc *proc, u32 *state, void *param, void *wo
     u32 next;
 
     ResearchRadar_UpdateComm(wk);
-    if (func_02016bec(wk->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(wk->gsys)) {
         ResearchCommon_SetForceExit(wk->common);
     }
 

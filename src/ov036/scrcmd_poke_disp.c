@@ -236,8 +236,8 @@ BOOL func_ov036_021c784c(VM *vm, FieldScriptEnv *env) {
         WordSet_LoadSpeciesName(wordSet, 3, SPECIES_CINCCINO);
     }
     rival = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
-    if (func_0200ffa8(rival) == TRUE) {
-        WordSet_LoadSpeciesName(wordSet, 1, func_0200ffb4(rival));
+    if (HollowRivalSave_HasSpecies(rival) == TRUE) {
+        WordSet_LoadSpeciesName(wordSet, 1, HollowRivalSave_GetSpecies(rival));
     }
     switch (kind) {
     case 0:
@@ -253,20 +253,20 @@ BOOL func_ov036_021c784c(VM *vm, FieldScriptEnv *env) {
             if (value >= 10) {
                 rival = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
                 if (value == 11) {
-                    if (func_0200ffcc(rival) == FALSE) {
+                    if (HollowRivalSave_IsMet(rival) == FALSE) {
                         value--;
                     }
                 } else if (value == 10) {
-                    if (func_0200ffcc(rival) == TRUE) {
+                    if (HollowRivalSave_IsMet(rival) == TRUE) {
                         value++;
                     }
                 }
                 if (value == 13) {
-                    if (func_0200ffa8(rival) == FALSE) {
+                    if (HollowRivalSave_HasSpecies(rival) == FALSE) {
                         value--;
                     }
                 } else if (value == 12) {
-                    if (func_0200ffa8(rival) == TRUE) {
+                    if (HollowRivalSave_HasSpecies(rival) == TRUE) {
                         value++;
                     }
                 }

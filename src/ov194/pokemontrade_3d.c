@@ -594,8 +594,8 @@ static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, Pa
         f32 x;
 
         // The result is left unused
-        func_0201ade0(mcss);
-        width = func_0201adf0(mcss);
+        MCSS_GetWidth(mcss);
+        width = MCSS_GetOffsetX(mcss);
         if (scale->x < 0) {
             x = width * 0.33f;
         } else {

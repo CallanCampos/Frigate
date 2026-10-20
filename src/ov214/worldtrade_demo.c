@@ -234,7 +234,7 @@ PlayerInfo *WorldTrade_MakePartnerStatus(Dpw_Tr_Data *dtd) {
     PlayerInfo_SetVersion(info, dtd->versionCode);
     PlayerInfo_SetRegion(info, dtd->langCode);
     setTrainerGender(info, dtd->gender);
-    func_02008bf8(info, dtd->trainerType);
+    PlayerInfo_SetUnionView(info, dtd->trainerType);
     PlayerInfo_SetCountryAndProvince(info, dtd->countryCode, dtd->localCode);
     info->id = dtd->trainerID;
     info->profileId = dtd->id;
@@ -268,6 +268,6 @@ static void Demo_StoreTradedPokemon(WorldTradeWork *wk) {
 
         BoxSaveAccessor_ClearPkm(wk->param->mybox, wk->evoPokeInfo.boxNo, wk->evoPokeInfo.pos);
         BoxSaveAccessor_GetNextFreeBoxSlot(wk->param->mybox, &box, &slot);
-        BoxSaveAccessor_InsertPkmCore(wk->param->mybox, box, func_0201d624(pkm));
+        BoxSaveAccessor_InsertPkmCore(wk->param->mybox, box, PokeParty_ToBoxPkm(pkm));
     }
 }

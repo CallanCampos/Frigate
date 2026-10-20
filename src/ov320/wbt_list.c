@@ -538,10 +538,10 @@ static void WbtList_CreateTrainerActors(WbtList *work, const WbtListTrainerSetup
         resSetup.vramType = CLACT_VRAM_MAIN;
         resSetup.flags = 0;
         resSetup.arcId = getUINarcIdx();
-        resSetup.paletteFile = func_0202d8a0();
-        resSetup.charFile = func_0202d8a4();
-        resSetup.cellFile = func_0202d8a8(2);
-        resSetup.animFile = func_0202d8ac(2);
+        resSetup.paletteFile = AppMenuCommon_GetMModelIconPaletteFile();
+        resSetup.charFile = AppMenuCommon_GetMModelIconCharFile();
+        resSetup.cellFile = AppMenuCommon_GetMModelIconCellFile(2);
+        resSetup.animFile = AppMenuCommon_GetMModelIconAnimFile(2);
         resSetup.paletteOffset = setups->palette;
         resSetup.paletteStart = 0;
         resSetup.paletteCount = 1;
@@ -888,7 +888,7 @@ static void WbtList_CreateActors(WbtList *work, u32 vramType, const WbtListActor
         if (setups->flags & ACTOR_FLAG_ANIMATE) {
             animate = TRUE;
         }
-        func_0204c520(work->actors[i], animate);
+        ClActor_SetAutoAnim(work->actors[i], animate);
         if (setups->flags & ACTOR_FLAG_FLIP_Y) {
             ClActor_SetFlip(work->actors[i], 1, TRUE);
         }
@@ -959,7 +959,7 @@ static void WbtList_FreeObjects(WbtList *work) {
 
 static void WbtList_SetActorAnim(WbtList *work, s32 actor, s32 sequence) {
     ClActor_SetSequence(work->actors[actor], sequence);
-    func_0204c520(work->actors[actor], TRUE);
+    ClActor_SetAutoAnim(work->actors[actor], TRUE);
 }
 
 static void WbtList_SetActorVisible(WbtList *work, s32 actor, BOOL visible) {
@@ -1173,8 +1173,8 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
         words = 2;
     }
     if (work->mode == MODE_OPENING && words == 1) {
-        func_0202437c(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
-        func_0202437c(wordSet, 1, work->setup->unk9C, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 1, work->setup->unk9C, 0, 1, 2);
     } else {
         first = WbtList_GetMatchValue(work, MATCH_FIRST, 0);
         second = WbtList_GetMatchValue(work, MATCH_SECOND, 0);
@@ -1182,11 +1182,11 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
             first = WbtList_GetMatchValue(work, MATCH_WINNER, 0);
         }
         if (words == 2) {
-            func_0202437c(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
-            func_0202437c(wordSet, 1, work->setup->unk9C, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 1, work->setup->unk9C, 0, 1, 2);
         } else {
-            func_0202437c(wordSet, 0, work->setup->entrants[first].name, 0, 1, 2);
-            func_0202437c(wordSet, 1, work->setup->entrants[second].name, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, work->setup->entrants[first].name, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 1, work->setup->entrants[second].name, 0, 1, 2);
         }
     }
     if (work->stream != NULL) {
@@ -1291,7 +1291,7 @@ static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side) {
     index += side * LINE_VALUE_COUNT;
     ClActor_SetSequence(work->actors[ACTOR_LINE + line], sWbtListLines[drawn + (index + LINE_SEQUENCE)]);
     ClActor_SetVisible(work->actors[ACTOR_LINE + line], TRUE);
-    func_0204c520(work->actors[ACTOR_LINE + line], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_LINE + line], TRUE);
     position = sWbtListLines[index + LINE_POSITION];
     // The sum's order folds the column into the load's base, as *(data + pos + 1) does
     flags = *(sWbtListLines + index + LINE_FLAGS);

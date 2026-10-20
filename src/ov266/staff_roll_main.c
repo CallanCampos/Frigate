@@ -696,7 +696,7 @@ static void StaffRoll_InitClAct(ArcTool *arc, StaffRollClAct *clact) {
     setup.priority = 0;
     clact->actor = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0,
                                   HEAPID_TAIL(HEAPID_STAFF_ROLL));
-    func_0204c520(clact->actor, TRUE);
+    ClActor_SetAutoAnim(clact->actor, TRUE);
     ClActor_SetVisible(clact->actor, FALSE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 }
@@ -1243,7 +1243,7 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
         if (StaffRollPicture_Fade(picture, TRUE, work->fastForward) == TRUE) {
             picture->state = PICTURE_END;
             if (picture->isLast == TRUE) {
-                func_0204c520(work->clact.actor, FALSE);
+                ClActor_SetAutoAnim(work->clact.actor, FALSE);
                 ClActor_StopAnim(work->clact.actor);
                 ClActor_SetVisible(work->clact.actor, FALSE);
             }

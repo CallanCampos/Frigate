@@ -92,7 +92,7 @@ BOOL WbtCmd_WordSetOpponentName(VM *vm, FieldScriptEnv *env) {
     StrBuf *strbuf = ScriptWork_GetAltStrBuf(work);
 
     WbtBattle_GetOpponentName(sys, strbuf);
-    func_0202437c(wordSet, index, strbuf, unk, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strbuf, unk, 1, 2);
     return FALSE;
 }
 

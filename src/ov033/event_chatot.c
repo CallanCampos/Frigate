@@ -210,7 +210,7 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     ClActorSetup setup;
 
     work->unit = ClActUnit_Create(1, 0, 21);
-    pkm = func_0201d620(work->pkm);
+    pkm = PokeParty_GetBoxPkm(work->pkm);
     arc = MakePokeGraArcHandle(21);
     encrypted = PML_PkmDecrypt(pkm);
     work->chars = PokeGra_LoadClActCharsByBoxData(arc, pkm, 0, 0, 21);

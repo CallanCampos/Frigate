@@ -400,7 +400,7 @@ static BOOL WifiBSubway_ProcInit(GameProc *proc, u32 *state, void *paramPtr, voi
     wk->adventure = getSaveAdventureDataBlk(save);
     wk->wifiList = GameData_GetWifiList(gameData);
     wk->playerInfo = GetGameDataPlayerInfo(gameData);
-    wk->wifiData = func_02017968(gameData);
+    wk->wifiData = GameData_GetBSubwayWifiData(gameData);
     wk->score = GameData_GetBSubwayScoreData(gameData);
     WifiBSubwayRoom_Init(&wk->room);
     WifiBSubwayUpload_Init(&wk->upload, HEAPID_WIFI_BSUBWAY);
@@ -645,7 +645,7 @@ static void WifiBSubwayRoom_FixData(WifiBSubwayRoom *room) {
             Country_GetValidCountry(players[i].countryCode, players[i].localCode, players[i].langCode);
         players[i].localCode =
             Country_GetValidRegion(players[i].countryCode, players[i].localCode, players[i].langCode);
-        players[i].trainerType = func_0202b5e8(func_0202b630(players[i].trainerType));
+        players[i].trainerType = UnionView_GetTrainerClass(UnionView_FindTrainerClass(players[i].trainerType));
     }
     for (i = 0; i < ROOM_LEADER_COUNT; i++) {
         leaders[i].countryCode =
@@ -732,7 +732,7 @@ static u32 WifiBSubwayUpload_WaitCheckName(WifiBSubwayUpload *upload, HeapID hea
 // Sends the player's profile and fills the record
 static void WifiBSubwayUpload_SetProfile(WifiBSubwayUpload *upload, GameData *gameData, WifiBSubwayError *error) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    BSubwayWifiData *wifiData = func_02017968(gameData);
+    BSubwayWifiData *wifiData = GameData_GetBSubwayWifiData(gameData);
     BSubwayScoreData *score = GameData_GetBSubwayScoreData(gameData);
     PlayerInfo *playerInfo = upload->playerInfo;
 
@@ -770,8 +770,8 @@ static void WifiBSubwayUpload_FillPlayer(Dpw_Bt_Player *player, GameData *gameDa
     player->countryCode = UnityTowerVisitor_GetCountry(playerInfo);
     player->localCode = UnityTowerVisitor_GetProvince(playerInfo);
     player->gender = getTrainerGender(playerInfo);
-    player->trainerType = func_02008bf4(playerInfo);
-    player->trainerType = func_0202b5e8(player->trainerType);
+    player->trainerType = PlayerInfo_GetUnionView(playerInfo);
+    player->trainerType = UnionView_GetTrainerClass(player->trainerType);
     for (i = 0; i < PLAYER_MESSAGE_COUNT; i++) {
         CGearPhrases_Get(cgear, i + 1, (PMSData *)player->messages[i]);
     }

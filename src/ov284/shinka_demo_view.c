@@ -619,9 +619,9 @@ static void ShinkaDemoView_SetMcssOffsets(ShinkaDemoView *view) {
 
     for (i = 0; i < NELEMS(view->mcss); i++) {
         if (view->mcss[i] != NULL) {
-            height = func_0201ade8(view->mcss[i]);
-            top = func_0201adf8(view->mcss[i]);
-            left = func_0201adf0(view->mcss[i]);
+            height = MCSS_GetHeight(view->mcss[i]);
+            top = MCSS_GetOffsetY(view->mcss[i]);
+            left = MCSS_GetOffsetX(view->mcss[i]);
             height *= view->scale / 16.0f;
             if (height > 96.0f) {
                 height = 96.0f;

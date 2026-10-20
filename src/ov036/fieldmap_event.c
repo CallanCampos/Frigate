@@ -415,7 +415,7 @@ static GameEvent *FieldEventProvider_Grid_CheckForEvent(GameSystem *gsys, Field 
             }
         }
     }
-    if (func_02016b14(gsys) == TRUE && GFL_WipeIsFinished() && wk.canAct) {
+    if (GSYS_IsNetErrorPending(gsys) == TRUE && GFL_WipeIsFinished() && wk.canAct) {
         return func_ov036_021ba6c8(gsys, field);
     }
     if (wk.xPressed && GFL_WipeIsFinished()) {
@@ -530,7 +530,7 @@ GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data) {
             }
         }
     }
-    if (func_02016b14(gsys) == TRUE && GFL_WipeIsFinished()) {
+    if (GSYS_IsNetErrorPending(gsys) == TRUE && GFL_WipeIsFinished()) {
         return func_ov036_021ba6c8(gsys, field);
     }
     if (UnionMain_IsIdle(gsys) == FALSE) {
@@ -646,7 +646,7 @@ static GameEvent *FieldEventProvider_NoGrid_CheckForEvent(GameSystem *gsys, Fiel
             }
         }
     }
-    if (func_02016b14(gsys) == TRUE && GFL_WipeIsFinished() && wk.canAct) {
+    if (GSYS_IsNetErrorPending(gsys) == TRUE && GFL_WipeIsFinished() && wk.canAct) {
         return func_ov036_021ba6c8(gsys, field);
     }
     if (wk.xPressed && GFL_WipeIsFinished()) {
@@ -1525,7 +1525,7 @@ static u16 CheckFieldEnvInteraction(FieldInteractWk *wk, Field *field) {
             }
         }
     }
-    if (!func_02018c38(wk->zoneId) || GameData_IsForceSeasonSync(wk->gameData) == TRUE) {
+    if (!IsZoneNormal(wk->zoneId) || GameData_IsForceSeasonSync(wk->gameData) == TRUE) {
         return SCRID_NONE;
     }
     if (CheckSurfHeightAllow(wk->player, wk->faceDir) &&

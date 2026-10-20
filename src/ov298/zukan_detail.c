@@ -56,7 +56,7 @@ static BOOL ZukanDetail_Init(GameProc *proc, u32 *state, void *param_, void *wor
     wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->vblankTcb = GFL_VBlankTCBAdd(ZukanDetail_VBlank, wk, 1);
     wk->touchbar =
-        ZukanDetailTouchbar_Create(wk->heapId, func_0200d1dc(GameData_GetPokedex(param->gameData)), param->mode);
+        ZukanDetailTouchbar_Create(wk->heapId, PokeDex_IsGiven(GameData_GetPokedex(param->gameData)), param->mode);
     wk->headbar = ZukanDetailHeadbar_Create(wk->heapId, wk->font);
     wk->common = ZukanDetailCommon_Create(wk->heapId, param->gameData, wk->graphic, wk->font, wk->printQueue,
                                           wk->touchbar, wk->headbar, param->list, param->count, &param->index);

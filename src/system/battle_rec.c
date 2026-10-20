@@ -64,7 +64,7 @@ void clearVSPlayerBlk(BattleRecVideo *video) {
     MIi_CpuClear32(0, video, sizeof(BattleRecVideo));
 }
 
-BOOL func_0200bb80(void) {
+BOOL BattleRec_HasVideo(void) {
     if (addUpDataStream((u8 *)&data_02140f64->body, sizeof(BattleRecBody)) != 0) {
         return TRUE;
     }
@@ -75,11 +75,11 @@ void clearVSPlayer(void) {
     clearVSPlayerBlk(data_02140f64);
 }
 
-void func_0200bbb4(void) {
+void BattleRec_DecryptBody(void) {
     __decryptData(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 
-void func_0200bbdc(void) {
+void BattleRec_EncryptBody(void) {
     decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 
@@ -365,8 +365,8 @@ u64 BattleRec_GetHeaderValue(BattleRecHeader *header, u32 id, u32 index) {
         return 0;
     case BATTLE_REC_HEADER_DATA_NUMBER:
         return header->dataNumber;
-    case BATTLE_REC_HEADER_UNK2A:
-        return header->unk2A;
+    case BATTLE_REC_HEADER_SECURE:
+        return header->secure;
     case BATTLE_REC_HEADER_GENDER:
         return (header->formGender[index] & 0x80) >> 7;
     case BATTLE_REC_HEADER_VERSION:

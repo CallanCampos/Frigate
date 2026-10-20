@@ -115,7 +115,7 @@ BmpOamActor *BmpOam_ActorAdd(BmpOamSys *sys, const BmpOamActorSetup *setup) {
                 ClActor_Create(sys->unit, actor->chars[y * width + x], setup->palette, sys->cellAnims[mapping],
                                &clSetup, setup->surface, sys->heapId);
             ClActor_SetPalette(actor->actors[y * width + x], (u8)setup->paletteOffset, 0);
-            func_0204c5c8(actor->actors[y * width + x], FALSE);
+            ClActor_SetDrawAnim(actor->actors[y * width + x], FALSE);
         }
     }
     return actor;

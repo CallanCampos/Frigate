@@ -212,7 +212,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         if (wk->boxMessage == NULL) {
             PokeParty_AddPkm(party, prm->pkm);
         } else {
-            BoxSaveAccessor_InsertPkm(GameData_GetBoxSaveAccessor(prm->gameData), func_0201d620(prm->pkm));
+            BoxSaveAccessor_InsertPkm(GameData_GetBoxSaveAccessor(prm->gameData), PokeParty_GetBoxPkm(prm->pkm));
         }
         (*state)++;
         break;

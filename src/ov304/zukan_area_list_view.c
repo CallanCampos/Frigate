@@ -555,7 +555,7 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
     view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE] =
         UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 64, 15, HEAPID_ZUKAN_AREA_LIST);
     ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
-    func_0204c520(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
+    ClActor_SetAutoAnim(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_MODE_UPPER] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 110, 13, HEAPID_ZUKAN_AREA_LIST);
@@ -1067,7 +1067,7 @@ void ZukanAreaListView_SetActorAnim(ZukanAreaListView *view, u32 index, u32 anim
 
     ClActor_SetSequence(actor, anim);
     ClActor_SetAnimTime(actor, 0);
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
 }
 
 static BOOL ZukanAreaListView_IsActorAnimating(ZukanAreaListView *view, u32 index) {

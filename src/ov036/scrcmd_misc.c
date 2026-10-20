@@ -89,8 +89,8 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     data = TrainerLogSave_Get(GameData_GetSaveControl(gameData));
     date = getAddressAdventureTimeBlk(gameData);
     OS_GetOwnerInfo(&ownerInfo);
-    index = func_0200b05c(data, ownerInfo.birthday.month, ownerInfo.birthday.day, date);
-    if (func_0200b014(data, index) == TRUE) {
+    index = TrainerLogSave_FindFortuneEntry(data, ownerInfo.birthday.month, ownerInfo.birthday.day, date);
+    if (TrainerLogSave_IsEntryMale(data, index) == TRUE) {
         article = FALSE;
     } else {
         article = TRUE;
@@ -99,7 +99,7 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     strBuf = GFL_StrBufCreate(8, HEAPID_TAIL(HEAPID_USER));
     GFL_StrBufLoadString(strBuf, name);
-    func_0202437c(wordSet, wordIndex, strBuf, article, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, wordIndex, strBuf, article, 1, 2);
     GFL_StrBufFree(strBuf);
     return FALSE;
 }

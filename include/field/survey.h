@@ -41,7 +41,7 @@ void TrainerGameInfo_SetSurveyAnswer(TrainerGameInfoSave *info, u8 index, u8 val
 void TrainerGameInfo_SetSurveyCount(TrainerGameInfoSave *info, u8 index, u16 value);
 // Whether the survey's answer of the index has been given
 BOOL TrainerGameInfo_GetSurveyCount(TrainerGameInfoSave *info, u8 index);
-BOOL func_0201148c(u8 question);
+BOOL SurveyQuestion_IsNewInB2W2(u8 question);
 BOOL Survey_IsCurrentDone(GameData *gameData);
 // Overlay 12's survey.c: the questions of the surveys, and whether one is done
 u32 Survey_GetQuestionType(u16 question);

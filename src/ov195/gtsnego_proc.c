@@ -514,7 +514,7 @@ static void GtsNego_StateShowPartner(GtsNegoWork *wk) {
         }
     }
     GtsNegoMessage_ShowPartner(wk->msg, partner, count);
-    GtsNegoDisp_ShowPartner(wk->disp, func_02008bf4(partner));
+    GtsNegoDisp_ShowPartner(wk->disp, PlayerInfo_GetUnionView(partner));
     wk->timer = 180;
     GtsNego_ChangeState(wk, GtsNego_StateWaitPartnerShown, 675);
 }
@@ -692,7 +692,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
     if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
         GtsNegoMessage_PressCancelButton(wk->msg);
         if (GFL_NetIsInitialized()) {
-            func_020421ac(TRUE);
+            NetState_WifiDisconnect(TRUE);
         }
         GCTX_HIDSetUsingTouch(FALSE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -707,7 +707,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
             return;
         }
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
     }
     GtsNegoMessage_ClearWindow(wk->msg);
     GtsNegoMessage_PrintShort(wk->msg, GtsnegoProc_Text_GettingInformationFromOther);
@@ -785,7 +785,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
             return;
         }
         friend = NULL;
-        func_02042d8c(FALSE);
+        GFL_NetSetMPSendEnabled(FALSE);
         // The token is made in the values' buffer, which they then overwrite
         WifiList_CreateExchangeTokenFromUserData(&wk->wifiList->myUserData, (DWCFriendData *)values);
         values[GTSNEGO_KEY_MY_ID] = wk->myId;
@@ -814,7 +814,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
         }
         STD_TSPrintf(wk->query, "ty=%d And db=%d", wk->mode, 1);
         if (DWCRap_StartMatchQuery(wk->query, 2, GtsNego_EvalMatch, wk)) {
-            func_0204204c();
+            NetState_WaitGtsMatch();
             DWCRap_SetVoiceChatEnabled(0);
             GtsNegoMessage_CreateCancelButton(wk->msg, GtsNego_OnCancelButton, wk);
             GtsNego_ChangeState(wk, GtsNego_StateSearching, 1163);
@@ -1003,7 +1003,7 @@ static void GtsNego_OnCancelButton(u32 button, u32 event, void *work) {
     if (event == 0) {
         if (wk->state == GtsNego_StateSearching) {
             GtsNegoMessage_PressCancelButton(wk->msg);
-            func_020421ac(TRUE);
+            NetState_WifiDisconnect(TRUE);
             GCTX_HIDSetUsingTouch(TRUE);
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             GtsNego_ChangeState(wk, GtsNego_StateWaitCancelPressed, 1635);
@@ -1500,7 +1500,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
 static void GtsNego_HandleDisconnect(GtsNegoWork *wk) {
     if (wk->param->result != GTSNEGO_RESULT_EXIT) {
         func_02042e94(0);
-        func_02042e9c(FALSE);
+        GFL_NetSetDisconnectError(FALSE);
         GtsNegoMessage_FreePMSDraw(wk->msg);
         GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
         GFL_BGSysSetBGEnabled(4, FALSE);
@@ -1586,7 +1586,7 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
                 Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
                 break;
             case 3:
-                func_02011d20();
+                GFL_NetErrShowFatal();
                 break;
             }
         }

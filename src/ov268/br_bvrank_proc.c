@@ -437,8 +437,8 @@ static void BrBvRank_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             }
             if (ret) {
                 for (i = 0; i < p_wk->p_param->p_outline->data_num; i++) {
-                    p_wk->p_param->p_outline->isSecure[i] =
-                        BattleRec_GetHeaderValue(&p_wk->p_param->p_outline->data[i].header, BATTLE_REC_HEADER_UNK2A, 0);
+                    p_wk->p_param->p_outline->isSecure[i] = BattleRec_GetHeaderValue(
+                        &p_wk->p_param->p_outline->data[i].header, BATTLE_REC_HEADER_SECURE, 0);
                 }
                 BrSeq_SetNext(p_seqwk, BrBvRank_SeqDownloadEnd);
             } else {

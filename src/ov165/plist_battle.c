@@ -157,13 +157,19 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
     // BUG: The common archive's graphics are loaded from the closed handle of the first archive, as in
     // PokeList_LoadResources
 #ifdef BUGFIX
-    wk->clResources[CL_RES_PLTT(3)] = ClActSys_LoadPltt(commonArc, func_0202d890(), 1, 0x60, wk->heapId);
-    wk->clResources[CL_RES_CHAR(4)] = ClActSys_LoadChars(commonArc, func_0202d894(), FALSE, 1, wk->heapId);
-    wk->clResources[CL_RES_CELL(4)] = ClActSys_LoadCellAnims(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(3)] =
+        ClActSys_LoadPltt(commonArc, AppMenuCommon_GetItemIconPaletteFile(), 1, 0x60, wk->heapId);
+    wk->clResources[CL_RES_CHAR(4)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetItemIconCharFile(), FALSE, 1, wk->heapId);
+    wk->clResources[CL_RES_CELL(4)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetItemIconCellFile(2),
+                                                             AppMenuCommon_GetItemIconAnimFile(2), wk->heapId);
 #else
-    wk->clResources[CL_RES_PLTT(3)] = ClActSys_LoadPltt(arc, func_0202d890(), 1, 0x60, wk->heapId);
-    wk->clResources[CL_RES_CHAR(4)] = ClActSys_LoadChars(arc, func_0202d894(), FALSE, 1, wk->heapId);
-    wk->clResources[CL_RES_CELL(4)] = ClActSys_LoadCellAnims(arc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(3)] =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetItemIconPaletteFile(), 1, 0x60, wk->heapId);
+    wk->clResources[CL_RES_CHAR(4)] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, 1, wk->heapId);
+    wk->clResources[CL_RES_CELL(4)] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2),
+                                                             AppMenuCommon_GetItemIconAnimFile(2), wk->heapId);
 #endif
     if (wk->param->timerEnabled == TRUE) {
 #ifdef BUGFIX
@@ -289,7 +295,7 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
         GFL_HeapAllocate(wk->heapId, sizeof(PokeListPartnerPkm), FALSE, "plist_battle.c", 409);
     BOOL isEgg = PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
-    BoxPkm *boxPkm = func_0201d624(pkm);
+    BoxPkm *boxPkm = PokeParty_ToBoxPkm(pkm);
     u32 palette;
     u32 item;
     u32 sex;
@@ -308,7 +314,7 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     partnerPkm->icon = ClActor_Create(wk->partnerUnit, partnerPkm->iconChars, wk->clResources[CL_RES_PLTT(7)],
                                       wk->clResources[CL_RES_CELL(7)], &iconSetup, 1, wk->heapId);
     ClActor_SetPalette(partnerPkm->icon, palette, 1);
-    func_0204c520(partnerPkm->icon, TRUE);
+    ClActor_SetAutoAnim(partnerPkm->icon, TRUE);
     item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
     itemSetup.x = x + 32;
     itemSetup.y = y + 16;

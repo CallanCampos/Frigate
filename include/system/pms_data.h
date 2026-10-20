@@ -26,7 +26,7 @@ void PMSData_Init(PMSData *data, u16 type);
 void PMSData_InitWithSentence(PMSData *data, u16 type, u16 id);
 // One of four fixed sentences
 void PMSData_InitPreset(PMSData *data, u32 preset);
-void func_02029c68(PMSData *data);
+void PMSData_InitGreeting(PMSData *data);
 StrBuf *PMSData_ToString(const PMSData *data, u32 heapId);
 // The sentence with its first wordCount words filled in
 StrBuf *PMSData_ToStringWithWords(const PMSData *data, u32 heapId, int wordCount);

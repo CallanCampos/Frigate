@@ -112,35 +112,35 @@ void AppMenuCommon_LoadBarScreen(ArcTool *arc, u8 bg, HeapID heapId, u32 charBas
     }
 }
 
-u32 func_0202d890(void) {
+u32 AppMenuCommon_GetItemIconPaletteFile(void) {
     return 0x42;
 }
 
-u32 func_0202d894(void) {
+u32 AppMenuCommon_GetItemIconCharFile(void) {
     return 0x41;
 }
 
-u32 func_0202d898(u32 mapping) {
+u32 AppMenuCommon_GetItemIconCellFile(u32 mapping) {
     return 0x43 + mapping;
 }
 
-u32 func_0202d89c(u32 mapping) {
+u32 AppMenuCommon_GetItemIconAnimFile(u32 mapping) {
     return 0x46 + mapping;
 }
 
-u32 func_0202d8a0(void) {
+u32 AppMenuCommon_GetMModelIconPaletteFile(void) {
     return 0x49;
 }
 
-u32 func_0202d8a4(void) {
+u32 AppMenuCommon_GetMModelIconCharFile(void) {
     return 0x4a;
 }
 
-u32 func_0202d8a8(u32 mapping) {
+u32 AppMenuCommon_GetMModelIconCellFile(u32 mapping) {
     return 0x4b + mapping;
 }
 
-u32 func_0202d8ac(u32 mapping) {
+u32 AppMenuCommon_GetMModelIconAnimFile(u32 mapping) {
     return 0x4e + mapping;
 }
 
@@ -220,50 +220,50 @@ u32 AppMenuCommon_GetBallAnimFile(u32 ball, u32 mapping) {
     return 0x8c + mapping;
 }
 
-u32 func_0202d944(void) {
+u32 AppMenuCommon_GetMarkingIconPaletteFile(void) {
     return 0x8f;
 }
 
-u32 func_0202d948(u32 mapping) {
+u32 AppMenuCommon_GetMarkingIconCharFile(u32 mapping) {
     return 0x90 + mapping;
 }
 
-u32 func_0202d94c(u32 mapping) {
+u32 AppMenuCommon_GetMarkingIconCellFile(u32 mapping) {
     return 0x93 + mapping;
 }
 
-u32 func_0202d950(u32 mapping) {
+u32 AppMenuCommon_GetMarkingIconAnimFile(u32 mapping) {
     return 0x96 + mapping;
 }
 
-u32 func_0202d954(void) {
+u32 AppMenuCommon_GetHpBarPaletteFile(void) {
     return 0;
 }
 
-u32 func_0202d958(u32 mapping) {
+u32 AppMenuCommon_GetHpBarCharFile(u32 mapping) {
     return 2 + mapping;
 }
 
-u32 func_0202d95c(u32 mapping) {
+u32 AppMenuCommon_GetHpBarCellFile(u32 mapping) {
     return 5 + mapping;
 }
 
-u32 func_0202d960(u32 mapping) {
+u32 AppMenuCommon_GetHpBarAnimFile(u32 mapping) {
     return 8 + mapping;
 }
 
-u32 func_0202d964(void) {
+u32 AppMenuCommon_GetPokerusIconPaletteFile(void) {
     return 0x99;
 }
 
-u32 func_0202d968(u32 mapping) {
+u32 AppMenuCommon_GetPokerusIconCharFile(u32 mapping) {
     return 0x9a + mapping;
 }
 
-u32 func_0202d96c(u32 mapping) {
+u32 AppMenuCommon_GetPokerusIconCellFile(u32 mapping) {
     return 0x9d + mapping;
 }
 
-u32 func_0202d970(u32 mapping) {
+u32 AppMenuCommon_GetPokerusIconAnimFile(u32 mapping) {
     return 0xa0 + mapping;
 }

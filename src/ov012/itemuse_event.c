@@ -130,7 +130,7 @@ static FieldActionResult FieldActionBlockCheck_Cycling(GameData *gameData, Field
 static FieldActionResult FieldActionBlockCheck_EscapeRope(GameData *gameData, Field *field, PlayerState *state) {
     u16 zoneId = PlayerState_GetZoneID(state);
 
-    if (!func_02018c38(zoneId)) {
+    if (!IsZoneNormal(zoneId)) {
         return FIELD_ACTION_BLOCKED;
     }
     if (!GetZoneFlagsEnableEscapeRope(zoneId)) {
@@ -143,14 +143,14 @@ static FieldActionResult FieldActionBlockCheck_EscapeRope(GameData *gameData, Fi
 }
 
 static FieldActionResult FieldActionBlockCheck_NormalZone(GameData *gameData, Field *field, PlayerState *state) {
-    if (func_02018c38(PlayerState_GetZoneID(state))) {
+    if (IsZoneNormal(PlayerState_GetZoneID(state))) {
         return FIELD_ACTION_ALLOWED;
     }
     return FIELD_ACTION_BLOCKED;
 }
 
 static FieldActionResult FieldActionBlockCheck_Surf(GameData *gameData, Field *field, PlayerState *state) {
-    if (!func_02018c38(PlayerState_GetZoneID(state))) {
+    if (!IsZoneNormal(PlayerState_GetZoneID(state))) {
         return FIELD_ACTION_BLOCKED;
     }
     if (!CreateSurfPos(gameData, field, NULL)) {
@@ -169,7 +169,7 @@ static FieldActionResult FieldActionBlockCheck_NormalZoneNotRoyalUnova(GameData 
     if (IsZoneRoyalUnova(zoneId)) {
         return FIELD_ACTION_BLOCKED;
     }
-    if (func_02018c38(zoneId)) {
+    if (IsZoneNormal(zoneId)) {
         return FIELD_ACTION_ALLOWED;
     }
     return FIELD_ACTION_BLOCKED;

@@ -67,8 +67,8 @@ void PokewoodSystem_SetupPokeList(PokewoodSystem *sys, GameData *gameData, PokeL
     PokeListParam_Setup(param, gameData, 0x16, GameData_GetParty(gameData));
     PokeRegulation_Load(POKEWOOD_REGULATION, &sys->regulation);
     movie = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, sys->movie, HEAPID_GAMEEVENT);
-    sys->regulation.unk2 = movie->castCount;
-    sys->regulation.unk3 = movie->castCount;
+    sys->regulation.minCount = movie->castCount;
+    sys->regulation.maxCount = movie->castCount;
     GFL_HeapFree(movie);
     sys->unkCE = 0x11;
     sys->unkCF = 1;
@@ -142,7 +142,7 @@ void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty 
     heapId = HEAPID_TAIL(sys->heapId);
     copy = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), FALSE, "pokewood_system.c", 269);
     PokeParty_ClearPkm(copy);
-    count = sys->regulation.unk3;
+    count = sys->regulation.maxCount;
     for (i = 0; i < count; i++) {
         slot = sys->castSlots[i];
         if (slot == 0) {
@@ -209,7 +209,7 @@ void Pokewood_CheckMedals(GameData *gameData) {
     if (PokewoodSave_CountFlags(save, 2) == POKEWOOD_MOVIE_COUNT) {
         MedalBox_GiveMedal(box, 0xd9);
     }
-    if (func_020111ec(func_020111b0(save)) >= 2) {
+    if (PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save)) >= 2) {
         MedalBox_DiscoverMedal(box, 0xd9);
     }
     count = PokewoodSave_CountFlags(save, 4);
@@ -268,7 +268,7 @@ void PokewoodSystem_AddGradePoints(GameData *gameData, PokewoodSystem *sys, u32 
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (func_020111a0(save, slot) == 0) {
-        func_020111d0(save, sAmounts[result]);
+        PokewoodSave_AddLevelPoints(save, sAmounts[result]);
     }
 }
 
@@ -280,7 +280,7 @@ void PokewoodSystem_UpdateCastFame(GameData *gameData, PokewoodSystem *sys) {
     int count;
 
     if (sys->unkD8 != 0) {
-        count = sys->regulation.unk3;
+        count = sys->regulation.maxCount;
         for (i = 0; i < count; i++) {
             pkm = PokeParty_GetPkm(party, sys->castSlots[i] - 1);
             fame = PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL);

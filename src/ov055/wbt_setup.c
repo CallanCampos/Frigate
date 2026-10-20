@@ -134,7 +134,7 @@ WbtOv326Param *WbtSetup_CreateWinRecordParam(HeapID heapId, GameSystem *gsys, u1
     int i;
 
     param->unk0 = 0;
-    param->save = func_020179f8(gameData);
+    param->save = GameData_GetWbtSave(gameData);
     param->playerInfo = GetGameDataPlayerInfo(gameData);
     for (i = 0; i < 29; i++) {
         param->open[i] = WbtTournament_IsOpen(gameData, WbtTournament_FromRecord(i));

@@ -195,7 +195,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     setup.y = 192;
     setup.sequence = 1;
     draw->buttons[5] = CtvtDraw_CreateActor(sys, 7, 3, 10, &setup, 0, heapId);
-    func_0204c520(draw->buttons[5], TRUE);
+    ClActor_SetAutoAnim(draw->buttons[5], TRUE);
     for (i = 0; i < CTVT_DRAW_BUTTONS; i++) {
         ClActor_SetVisible(draw->buttons[i], TRUE);
     }
@@ -584,7 +584,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         draw->inputHandled = TRUE;
         draw->penMenuOpen = TRUE;
         ClActor_SetVisible(draw->penMenu, TRUE);
-        func_0204c520(draw->penMenu, TRUE);
+        ClActor_SetAutoAnim(draw->penMenu, TRUE);
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
     if (hit == DRAW_TOOL_PICK) {
@@ -606,7 +606,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         draw->inputHandled = TRUE;
         draw->stampMenuOpen = TRUE;
         ClActor_SetVisible(draw->stampMenu, TRUE);
-        func_0204c520(draw->stampMenu, TRUE);
+        ClActor_SetAutoAnim(draw->stampMenu, TRUE);
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
     if (hit == 4) {
@@ -626,7 +626,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
 
                 ClActor_SetVisible(draw->menuCursor, TRUE);
                 ClActor_RestartAnim(draw->menuCursor);
-                func_0204c520(draw->menuCursor, TRUE);
+                ClActor_SetAutoAnim(draw->menuCursor, TRUE);
                 ClActor_SetSequence(draw->menuCursor, pen + 17);
                 ClActor_SetSurfacePos(draw->menuCursor, &pos, 0);
             }
@@ -646,7 +646,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
 
                 ClActor_SetVisible(draw->menuCursor, TRUE);
                 ClActor_RestartAnim(draw->menuCursor);
-                func_0204c520(draw->menuCursor, TRUE);
+                ClActor_SetAutoAnim(draw->menuCursor, TRUE);
                 ClActor_SetSequence(draw->menuCursor, stamp + 20);
                 ClActor_SetSurfacePos(draw->menuCursor, &pos, 0);
             }
@@ -882,7 +882,7 @@ static void CtvtDraw_RefreshButtons(CommTvtWork *sys, CtvtDraw *draw) {
         ClActor_SetVisible(draw->penMenu, FALSE);
         ClActor_RestartAnim(draw->penMenu);
         ClActor_SetAnimTime(draw->penMenu, 0);
-        func_0204c520(draw->penMenu, FALSE);
+        ClActor_SetAutoAnim(draw->penMenu, FALSE);
         ClActor_SetVisible(draw->selectFrame, FALSE);
     }
     if (draw->tool != DRAW_TOOL_STAMP && draw->stampMenuOpen == TRUE) {
@@ -890,7 +890,7 @@ static void CtvtDraw_RefreshButtons(CommTvtWork *sys, CtvtDraw *draw) {
         ClActor_SetVisible(draw->stampMenu, FALSE);
         ClActor_RestartAnim(draw->stampMenu);
         ClActor_SetAnimTime(draw->stampMenu, 0);
-        func_0204c520(draw->stampMenu, FALSE);
+        ClActor_SetAutoAnim(draw->stampMenu, FALSE);
         ClActor_SetVisible(draw->selectFrame, FALSE);
     }
 }
@@ -991,8 +991,8 @@ static void CtvtDraw_CloseMenus(CommTvtWork *sys, CtvtDraw *draw) {
     ClActor_RestartAnim(draw->menuCursor);
     ClActor_SetAnimTime(draw->penMenu, 0);
     ClActor_SetAnimTime(draw->stampMenu, 0);
-    func_0204c520(draw->penMenu, FALSE);
-    func_0204c520(draw->stampMenu, FALSE);
+    ClActor_SetAutoAnim(draw->penMenu, FALSE);
+    ClActor_SetAutoAnim(draw->stampMenu, FALSE);
     ClActor_SetVisible(draw->penMenu, FALSE);
     ClActor_SetVisible(draw->stampMenu, FALSE);
     ClActor_SetVisible(draw->menuCursor, FALSE);

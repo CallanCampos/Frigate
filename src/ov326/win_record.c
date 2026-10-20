@@ -638,7 +638,7 @@ static void WinRecord_CreateActors(WinRecordWork *wk, u32 surface, const WinReco
         if (data->flags & 1) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (data->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -720,17 +720,17 @@ static void WinRecord_SetActorAnim(WinRecordWork *wk, int kind, int index, int a
     if (kind == WIN_RECORD_ACTOR_SCROLL) {
         if (index < WIN_RECORD_SCROLL_ACTOR_COUNT) {
             ClActor_SetSequence(wk->scrollActors[index], anim);
-            func_0204c520(wk->scrollActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->scrollActors[index], TRUE);
         }
     } else if (kind == WIN_RECORD_ACTOR_BUTTON) {
         if (index < WIN_RECORD_BUTTON_COUNT) {
             ClActor_SetSequence(wk->buttons[index], anim);
-            func_0204c520(wk->buttons[index], TRUE);
+            ClActor_SetAutoAnim(wk->buttons[index], TRUE);
         }
     } else if (kind == WIN_RECORD_ACTOR_TRAINER) {
         if (index < WIN_RECORD_TRAINER_ACTOR_COUNT) {
             ClActor_SetSequence(wk->trainer[index], anim);
-            func_0204c520(wk->trainer[index], TRUE);
+            ClActor_SetAutoAnim(wk->trainer[index], TRUE);
         }
     }
 }
@@ -836,7 +836,7 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
 
     name = GFL_StrBufCreate(64, wk->heapId);
     textCopy(wk->param->playerInfo->name, name);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], WinRecord_Text_Empty_3);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
@@ -851,7 +851,7 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
 
     number = GFL_StrBufCreate(64, wk->heapId);
     GFL_WordSetFormatNumber(number, wk->totalWins, 4, 1, TRUE);
-    func_0202437c(wk->wordSet, 0, number, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, number, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], WinRecord_Text_Empty_2);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
@@ -1176,7 +1176,7 @@ static void WinRecord_PrintItemAt(WinRecordWork *wk, PrintWindow *window, PrintQ
     GFL_StrBufFree(strbuf);
     number = GFL_StrBufCreate(64, wk->heapId);
     GFL_WordSetFormatNumber(number, wk->wins[wk->items[index]], 4, 1, TRUE);
-    func_0202437c(wk->wordSet, 0, number, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, number, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], WinRecord_Text_Empty_2);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);

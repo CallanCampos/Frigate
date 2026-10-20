@@ -50,6 +50,6 @@ GameEvent *EventBattleLose_Create(GameSystem *gsys) {
     data->returnNonLeague = IsReturnLocationNonLeaguePokeCen(gameData);
     data->playerInfo = GetGameDataPlayerInfo(gameData);
     PleasureBoat_Free(GameData_GetPleasureBoatPtr(gameData));
-    func_02016b24(gsys, 0);
+    GSYS_SetGameCommPaused(gsys, 0);
     return event;
 }

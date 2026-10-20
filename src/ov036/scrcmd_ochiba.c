@@ -207,7 +207,7 @@ BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021c9a7c(VM *vm, FieldScriptEnv *env) {
-    void *block = func_020179f8(FieldScriptEnv_GetGameData(env));
+    void *block = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 

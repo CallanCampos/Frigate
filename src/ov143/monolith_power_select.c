@@ -470,7 +470,8 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
                 getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
                 mpw->ids[mpw->selected], 0);
             comm = GSYS_GetGameCommSystem(screen->param->gsys);
-            func_0202bf68(comm, GameData_GetNetID(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
+            GameCommSys_LogPassPowerReceived(comm, GameData_GetNetID(GSYS_GetGameData(screen->param->gsys)),
+                                             screen->param->netId);
             mpw->selected = MONOLITH_POWER_NONE;
             MonolithTool_SetPanelPulse(screen, TRUE, 1);
             MonolithTool_SetTextCursor(screen, &mpw->receiveButton, 1, 0xff, 3);

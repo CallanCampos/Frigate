@@ -524,7 +524,7 @@ static BOOL GdsRap_SubProcSaveDataNumber(GdsRapWork *gdsrap, GdsRapSubProc *sub)
         s32 clientCount;
         s32 pkmCount;
 
-        func_0200bbb4();
+        BattleRec_DecryptBody();
         BattleRec_GetModeCounts(video->header.mode, &clientCount, &pkmCount);
         for (i = 0; i < BATTLE_REC_HEADER_PKM_MAX; i++) {
             if (!GdsRap_GetVideoPokemonPos(gdsrap, i, &client, &pos)) {
@@ -534,7 +534,7 @@ static BOOL GdsRap_SubProcSaveDataNumber(GdsRapWork *gdsrap, GdsRapSubProc *sub)
             GdsRap_CopyNickname(gdsrap->nicknames[i], pkm->nickname, 11);
         }
         BattleRec_UpdateBodyCRC(BattleRec_GetBody());
-        func_0200bbdc();
+        BattleRec_EncryptBody();
     }
 
     res = POKE_NET_GDS_GetResponse();

@@ -605,7 +605,7 @@ static void IrcRhythmClAct_Init(IrcRhythmClAct *clact, const BGSysVRAMConfig *vr
                                           CLACT_SURFACE_MAIN, heapId);
         ClActor_SetVisible(clact->actors[i], FALSE);
         ClActor_SetBgPriority(clact->actors[i], 3);
-        func_0204c520(clact->actors[i], TRUE);
+        ClActor_SetAutoAnim(clact->actors[i], TRUE);
         ClActor_SetSequence(clact->actors[i], 0);
     }
     setup.x = 128;

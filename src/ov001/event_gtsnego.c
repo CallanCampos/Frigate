@@ -105,7 +105,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
             } else {
                 NetHandle_SendTimingPair(NetHandle_GetOwn(), 1, 12);
                 func_02042e94(FALSE);
-                func_02042e9c(FALSE);
+                GFL_NetSetDisconnectError(FALSE);
                 wk->timeout = 100;
                 *state = 8;
             }
@@ -121,7 +121,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         }
         break;
     case 9:
-        func_020421ac(1);
+        NetState_WifiDisconnect(1);
         *state = 4;
         break;
     case 10: {

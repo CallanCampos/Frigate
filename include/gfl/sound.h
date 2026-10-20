@@ -21,7 +21,7 @@ NNSSndHeapHandle GFL_SndGetHeap(void);
 // The BGM about to play: the next one while the BGM changes with a fade, else the one playing
 u32 GFL_SndBGMGetRequestedID(void);
 // Whether the sound thread is still loading the next BGM
-BOOL func_02005cbc(void);
+BOOL GFL_SndIsLoadThreadRunning(void);
 // Whether the card's data transfer interrupt is enabled
 BOOL GFL_IRQCartDataTransferIsEnabled(void);
 // Sets the output to stereo or mono
@@ -67,10 +67,10 @@ void GFL_SndBGMStopImmediate(void);
 // Sound the musical's stage plays: names unknown
 BOOL GFL_SndBGMSetLoadedData(void *seqData, void *bankData, u32 seq);
 // Points wave index of the loaded wave archive waveArc at wave srcIndex of srcWaveArc
-BOOL func_02006528(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex);
+BOOL GFL_SndReplaceWave(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex);
 void GFL_SndBGMStartSeq(u16 seq);
 void GFL_SndBGMStopSeq(void);
-void func_02006588(void);
+void GFL_SndBGMClearLoadedData(void);
 // Sets the callback that says whether a sequence may play while the sound thread is loading
 void GFL_SndSetSeqVerifyCallback(BOOL (*callback)(u32 seq));
 BOOL GFL_SndIsPlaying(u32 seq);
@@ -82,19 +82,19 @@ void GFL_SndPlayerSetMuteStateEx(BOOL on, u32 playerMask);
 // The BGM stack (snd_bgm_stack.c): the BGM player's handle and sequence at each level, with the sound heap's levels.
 // GFL_SndBGMStack_SetHeap gives it the sound heap, GFL_SndBGMStack_Init resets it for the BGM player.
 // GFL_SndGetLastResID is the sequence of the current level, or 0, and GFL_SndBGMStack_GetDepth the level.
-// GFL_SndBGMStack_LoadSeq loads a BGM's sequence, bank and waves; func_020059d8 and func_020059fc record the heap's
-// level after a thread loaded the sequence and bank, and the waves of seq. func_02005a24 frees the current BGM's files.
-// GFL_SndBGMStack_Push pushes a level, freeing the waves of the BGM below, and GFL_SndBGMStack_Pop pops one, loading
-// them again
+// GFL_SndBGMStack_LoadSeq loads a BGM's sequence, bank and waves; GFL_SndBGMStack_SaveSeqLevel and
+// GFL_SndBGMStack_SetLoadedSeq record the heap's level after a thread loaded the sequence and bank, and the waves of
+// seq. GFL_SndBGMStack_FreeSeq frees the current BGM's files. GFL_SndBGMStack_Push pushes a level, freeing the waves of
+// the BGM below, and GFL_SndBGMStack_Pop pops one, loading them again
 void GFL_SndBGMStack_SetHeap(NNSSndHeapHandle *heap);
 void GFL_SndBGMStack_Init(u16 player);
 u32 GFL_SndGetLastResID(void);
 s32 GFL_SndBGMStack_GetDepth(void);
 NNSSndHandle *GFL_SndBGMStack_GetHandle(void);
 BOOL GFL_SndBGMStack_LoadSeq(u32 seq);
-void func_020059d8(void);
-BOOL func_020059fc(u32 seq);
-void func_02005a24(void);
+void GFL_SndBGMStack_SaveSeqLevel(void);
+BOOL GFL_SndBGMStack_SetLoadedSeq(u32 seq);
+void GFL_SndBGMStack_FreeSeq(void);
 BOOL GFL_SndBGMStack_Push(void);
 BOOL GFL_SndBGMStack_Pop(void);
 // Loads sound sequences ahead of time, and frees them

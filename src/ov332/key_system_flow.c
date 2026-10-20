@@ -91,7 +91,7 @@ void KeySystemFlow_Exit(KeySystemWork *wk) {
 
     if (param->mode == UNOVA_LINK_MODE_GAME_CLEAR) {
         if (param->key <= KEY_SYSTEM_KEY_CHALLENGE) {
-            func_0200ca78(getTrainerCardDataBlkAddress(param->gameData), 1);
+            TrainerGameInfo_SetKeyNotice(getTrainerCardDataBlkAddress(param->gameData), 1);
         }
         GFL_SndBGMPop();
     }

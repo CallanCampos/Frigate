@@ -702,11 +702,11 @@ BOOL ClActUnit_IsActive(ClActUnit *unit) {
     return unit->active;
 }
 
-void func_0204bff0(ClActUnit *unit, BOOL a1) {
+void ClActUnit_SetVisibleAnimOnly(ClActUnit *unit, BOOL a1) {
     unit->visibleAnimOnly = a1;
 }
 
-void func_0204c004(ClActUnit *unit, BOOL a1) {
+void ClActUnit_SetSharedParams(ClActUnit *unit, BOOL a1) {
     unit->sharedParams = a1;
 }
 
@@ -1003,15 +1003,15 @@ u16 ClActor_GetAnimFrame(ClActor *actor) {
     return NNS_G2dGetAnimCtrlCurrentFrame(ClActAnim_GetCtrl2(&actor->anim));
 }
 
-void func_0204c520(ClActor *actor, BOOL a1) {
+void ClActor_SetAutoAnim(ClActor *actor, BOOL a1) {
     actor->autoAnim = a1;
 }
 
-BOOL func_0204c534(ClActor *actor) {
+BOOL ClActor_IsAutoAnim(ClActor *actor) {
     return actor->autoAnim;
 }
 
-void func_0204c53c(ClActor *actor, fx32 a1) {
+void ClActor_SetAutoAnimSpeed(ClActor *actor, fx32 a1) {
     actor->autoAnimSpeed = a1;
 }
 
@@ -1053,7 +1053,7 @@ void ClActor_ClearAnimCallback(ClActor *actor) {
     ClActAnim_ClearCallback(&actor->anim);
 }
 
-void func_0204c5c8(ClActor *actor, BOOL a1) {
+void ClActor_SetDrawAnim(ClActor *actor, BOOL a1) {
     if (a1) {
         actor->cellOnly = 0;
     } else {

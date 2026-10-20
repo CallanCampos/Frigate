@@ -311,10 +311,10 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
         if (work->nameEntry->unk1C != 1) {
             if (GFL_StrBufCmpIgnoreAccents(work->nameEntry->name, speciesName) == 1) {
                 *work->result = 1;
-                func_0202437c(work->wordSet, work->form, speciesName, 0, 1, 2);
+                GFL_WordSetSetStrbuf(work->wordSet, work->form, speciesName, 0, 1, 2);
             } else {
                 *work->result = 2;
-                func_0202437c(work->wordSet, work->form, work->nameEntry->name, 0, 1, 2);
+                GFL_WordSetSetStrbuf(work->wordSet, work->form, work->nameEntry->name, 0, 1, 2);
             }
         } else {
             *work->result = 0;

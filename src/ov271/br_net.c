@@ -343,7 +343,7 @@ u32 BrNet_CheckError(BrNet *net) {
         return 2;
     case 3:
         GFL_SndStop();
-        func_02011d20();
+        GFL_NetErrShowFatal();
         break;
     }
     return FALSE;

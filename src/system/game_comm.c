@@ -53,8 +53,9 @@ struct GameCommSys {
     // An exit requested while booting
     u8 exitReq : 1;
     u8 exitReqAgain : 1;
-    u8 unkFlag2 : 1;
-    u8 unkFlag3 : 1;
+    // Set while the research graph (research_graph.c) is shown, and while a Funfest mission runs
+    u8 inResearchGraph : 1;
+    u8 inFunfestMission : 1;
     u8 commNo;
     u8 lastCommNo;
     u32 unk8;
@@ -94,7 +95,7 @@ static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
         NULL,
         NULL,
     },
-    [GAME_COMM_NO_UNK2] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+    [GAME_COMM_NO_INTRUDE] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
     [GAME_COMM_NO_UNION] = {
         UnionComm_Init,
         UnionComm_InitWait,
@@ -320,16 +321,16 @@ static void GameComm_SetSeq(GameCommSeq *seq, u8 next) {
     seq->changed = TRUE;
 }
 
-void func_0202be14(GameCommSys *comm, BOOL flag) {
-    comm->unkFlag2 = flag;
+void GameCommSys_SetInResearchGraph(GameCommSys *comm, BOOL flag) {
+    comm->inResearchGraph = flag;
 }
 
-void func_0202be28(GameCommSys *comm, BOOL flag) {
-    comm->unkFlag3 = flag;
+void GameCommSys_SetInFunfestMission(GameCommSys *comm, BOOL flag) {
+    comm->inFunfestMission = flag;
 }
 
-BOOL func_0202be3c(GameCommSys *comm) {
-    if (comm->unkFlag2 || comm->unkFlag3) {
+BOOL GameCommSys_IsInResearchGraphOrMission(GameCommSys *comm) {
+    if (comm->inResearchGraph || comm->inFunfestMission) {
         return TRUE;
     }
     return FALSE;
@@ -380,13 +381,13 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
     }
 }
 
-void func_0202bf68(GameCommSys *comm, u32 netId1, u32 netId2) {
+void GameCommSys_LogPassPowerReceived(GameCommSys *comm, u32 netId1, u32 netId2) {
     u16 beaconType = netId1 == netId2 ? 0x27 : 0x26;
 
     GameCommSys_LogPlayers(comm, netId1, netId2, beaconType);
 }
 
-void func_0202bf7c(GameCommSys *comm) {
+void GameCommSys_LogMissionJoined(GameCommSys *comm) {
     u32 netId = GameData_GetNetID(comm->gameData);
 
     GameCommSys_LogPlayers(comm, netId, netId, 0x37);

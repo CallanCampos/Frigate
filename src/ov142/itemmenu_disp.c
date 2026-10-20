@@ -372,7 +372,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
                                                 work->typeIconCel, &categorySetup, 1, work->heapId);
         ClActor_SetPalette(work->categoryIcons[i], AppMenuCommon_GetCategoryIconPaletteIndex(i), 1);
         ClActor_SetVisible(work->categoryIcons[i], FALSE);
-        func_0204c5c8(work->categoryIcons[i], FALSE);
+        ClActor_SetDrawAnim(work->categoryIcons[i], FALSE);
     }
     typeSetup.x = 82;
     typeSetup.y = 165;
@@ -384,7 +384,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
                                             &typeSetup, 1, work->heapId);
         ClActor_SetPalette(work->typeIcons[i], AppMenuCommon_GetTypeIconPaletteIndex(i), 1);
         ClActor_SetVisible(work->typeIcons[i], FALSE);
-        func_0204c5c8(work->typeIcons[i], FALSE);
+        ClActor_SetDrawAnim(work->typeIcons[i], FALSE);
     }
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
@@ -399,9 +399,9 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     sortSetup.sequence = 0;
     work->sortButton = ClActor_Create(work->actorUnit, work->sortButtonChr, work->sortButtonPlt, work->sortButtonCel,
                                       &sortSetup, 0, work->heapId);
-    func_0204c520(work->sortButton, TRUE);
+    ClActor_SetAutoAnim(work->sortButton, TRUE);
     ClActor_SetVisible(work->sortButton, TRUE);
-    func_0204c5c8(work->sortButton, FALSE);
+    ClActor_SetDrawAnim(work->sortButton, FALSE);
     ItemMenuDisp_UpdateSortButton(work);
 }
 
@@ -630,9 +630,9 @@ static void ItemMenuDisp_ShowSelIcon(ItemMenuWork *work, u32 item) {
     setup.bgPriority = 0;
     work->selIcon =
         ClActor_Create(work->actorUnit, work->selIconChr, work->selIconPlt, work->selIconCel, &setup, 1, work->heapId);
-    func_0204c520(work->selIcon, TRUE);
+    ClActor_SetAutoAnim(work->selIcon, TRUE);
     ClActor_SetVisible(work->selIcon, TRUE);
-    func_0204c5c8(work->selIcon, FALSE);
+    ClActor_SetDrawAnim(work->selIcon, FALSE);
 }
 
 void ItemMenuDisp_Update(ItemMenuWork *work) {
@@ -678,8 +678,8 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
     work->scrollBar = ClActor_Create(work->actorUnit, work->listCursorChr, work->listCursorPlt, work->listCursorCel,
                                      &scrollSetup, 0, work->heapId);
     ClActor_SetVisible(work->scrollBar, TRUE);
-    func_0204c520(work->scrollBar, TRUE);
-    func_0204c5c8(work->scrollBar, FALSE);
+    ClActor_SetAutoAnim(work->scrollBar, TRUE);
+    ClActor_SetDrawAnim(work->scrollBar, FALSE);
     ItemMenuDisp_UpdateScrollBar(work);
 
     cursorSetup.x = 140;
@@ -689,9 +689,9 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
     cursorSetup.sequence = 1;
     work->listCursor = ClActor_Create(work->actorUnit, work->listCursorChr, work->listCursorPlt, work->listCursorCel,
                                       &cursorSetup, 0, work->heapId);
-    func_0204c5c8(work->listCursor, FALSE);
+    ClActor_SetDrawAnim(work->listCursor, FALSE);
     ClActor_SetVisible(work->listCursor, TRUE);
-    func_0204c520(work->listCursor, TRUE);
+    ClActor_SetAutoAnim(work->listCursor, TRUE);
 
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
         rowSetup.x = 140;
@@ -707,8 +707,8 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
                                            &rowSetup, 0, work->heapId);
         ClActor_SetVisible(work->rowNames[i], FALSE);
         ClActor_SetVisible(work->rowMarks[i], FALSE);
-        func_0204c5c8(work->rowNames[i], FALSE);
-        func_0204c5c8(work->rowMarks[i], FALSE);
+        ClActor_SetDrawAnim(work->rowNames[i], FALSE);
+        ClActor_SetDrawAnim(work->rowMarks[i], FALSE);
     }
 }
 
@@ -913,7 +913,7 @@ static void ItemMenuDisp_CreateButtons(ItemMenuWork *work) {
             work->buttons[i] = ClActor_Create(work->actorUnit, work->buttonChr, work->buttonPlt, work->buttonCel,
                                               &setup, 0, work->heapId);
             ClActor_SetVisible(work->buttons[i], TRUE);
-            func_0204c5c8(work->buttons[i], FALSE);
+            ClActor_SetDrawAnim(work->buttons[i], FALSE);
         }
     }
     setup.x = 146;
@@ -922,8 +922,8 @@ static void ItemMenuDisp_CreateButtons(ItemMenuWork *work) {
     work->filterButton = ClActor_Create(work->actorUnit, work->filterButtonChr, work->buttonPlt, work->filterButtonCel,
                                         &setup, 0, work->heapId);
     ClActor_SetVisible(work->filterButton, FALSE);
-    func_0204c520(work->filterButton, TRUE);
-    func_0204c5c8(work->filterButton, FALSE);
+    ClActor_SetAutoAnim(work->filterButton, TRUE);
+    ClActor_SetDrawAnim(work->filterButton, FALSE);
     if (ItemMenu_CanRegister(work) == FALSE) {
         ClActor_SetVisible(work->buttons[2], FALSE);
     }
@@ -943,9 +943,9 @@ static void ItemMenuDisp_CreateButtons(ItemMenuWork *work) {
             button = i + 5;
             work->buttons[button] = ClActor_Create(work->actorUnit, work->buttonChr, work->buttonPlt, work->buttonCel,
                                                    &setup, 0, work->heapId);
-            func_0204c520(work->buttons[button], TRUE);
+            ClActor_SetAutoAnim(work->buttons[button], TRUE);
             ClActor_SetVisible(work->buttons[button], FALSE);
-            func_0204c5c8(work->buttons[button], FALSE);
+            ClActor_SetDrawAnim(work->buttons[button], FALSE);
         }
     }
 }
@@ -970,7 +970,7 @@ void ItemMenuDisp_CreatePocketTabs(ItemMenuWork *work) {
         setup.sequence = sPocketTabSequences[i][1];
         work->pocketTabs[i] = ClActor_Create(work->actorUnit, work->pocketTabChr, work->pocketTabPlt,
                                              work->pocketTabCel, &setup, 0, work->heapId);
-        func_0204c520(work->pocketTabs[i], TRUE);
+        ClActor_SetAutoAnim(work->pocketTabs[i], TRUE);
     }
 }
 

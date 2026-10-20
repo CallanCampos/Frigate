@@ -23,7 +23,7 @@ BOOL MusicalSystem_CanJoin(PartyPkm *pkm) {
     if (PokeParty_GetParam(pkm, 0xaa, NULL) == TRUE) {
         return result;
     }
-    if (hasPokemonChangedForm(func_0201d620(pkm)) != TRUE) {
+    if (hasPokemonChangedForm(PokeParty_GetBoxPkm(pkm)) != TRUE) {
         result = TRUE;
     }
     return result;

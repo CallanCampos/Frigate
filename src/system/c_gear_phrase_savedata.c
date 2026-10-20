@@ -9,7 +9,7 @@
 #define SAVE_BLOCK_CGEAR 0x20
 
 void CGearPhrases_Init(PMSData *phrases) {
-    func_02029c68(&phrases[0]);
+    PMSData_InitGreeting(&phrases[0]);
     PMSData_InitPreset(&phrases[1], 0);
     PMSData_InitPreset(&phrases[2], 1);
     PMSData_InitPreset(&phrases[3], 2);

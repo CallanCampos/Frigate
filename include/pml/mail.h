@@ -12,11 +12,11 @@ typedef struct MailData {
     u8 trainerGender;
     u8 region;
     u8 gameVersion;
-    u8 unk07;
+    u8 design;
     u16 trainerName[8];
     u16 unk18[3];
-    // 0xffff when there is none
-    u16 unk1E;
+    // The word of the mail's stamp, 0xffff when there is none
+    u16 stampWord;
     PMSData message[3];
 } MailData;
 
@@ -42,19 +42,19 @@ u8 MailData_GetDesign(const MailData *mail);
 void MailData_SetDesign(MailData *mail, u32 design);
 u8 MailData_GetRegion(const MailData *mail);
 u8 MailData_GetGameVersion(const MailData *mail);
-u16 func_02009764(const MailData *mail);
-void func_02009768(MailData *mail, u16 value);
+u16 MailData_GetStampWord(const MailData *mail);
+void MailData_SetStampWord(MailData *mail, u16 value);
 PMSData *MailData_GetMessage(MailData *mail, u8 index);
 void MailData_SetMessage(MailData *mail, const PMSData *src, u8 index);
 // The save block of mail, and its size
 void *MailBox_GetFromGameData(GameData *gameData);
 u32 MailBox_GetSize(void);
 // Empties all of the mails of a mailbox
-void func_020097a8(MailData *mails);
+void MailBox_Clear(MailData *mails);
 // The mail of the save's mailbox (box 0) or of a Pokémon: the free slot, and clearing, copying and reading a slot's
 // mail
 s32 MailBox_GetFreeSlot(MailData *mails, u32 box);
-void func_020097d0(MailData *mails, u32 box, u32 index);
+void MailBox_ResetMail(MailData *mails, u32 box, u32 index);
 void MailBox_SetMail(MailData *mails, u32 box, u32 index, const MailData *mail);
 MailData *MailBox_CopyMail(MailData *mails, u32 box, u32 index, HeapID heapId);
 s32 MailBox_FindFree(MailData *mails, s32 count);

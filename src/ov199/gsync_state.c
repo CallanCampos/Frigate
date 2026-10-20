@@ -527,7 +527,7 @@ static void GSync_ReceivePokemon(GSyncWork *wk) {
             }
             setLevel(pkm, level);
         }
-        BoxSaveAccessor_InsertPkm(wk->boxes, func_0201d624(pkm));
+        BoxSaveAccessor_InsertPkm(wk->boxes, PokeParty_ToBoxPkm(pkm));
         wk->pkm = pkm;
         DreamWorldSave_SetPokemonAsleep(dreamWorld, FALSE);
         DreamWorldSave_SetLastResultID(dreamWorld, wk->resultId);
@@ -556,7 +556,7 @@ static void GSync_StateWaitReceiveSave(GSyncWork *wk) {
         callback.func = GSync_OnPokemonAnimEnd;
         GSyncDisp_SetActorCallback(wk->disp, 0, &callback);
         GSyncDisp_StartFade(wk->disp, FALSE);
-        GSyncDisp_CreatePokeIcon(wk->disp, func_0201d620(wk->pkm), CLACT_SURFACE_MAIN);
+        GSyncDisp_CreatePokeIcon(wk->disp, PokeParty_GetBoxPkm(wk->pkm), CLACT_SURFACE_MAIN);
         GSyncDisp_PokeIconSequence1(wk->disp);
         GFL_SndSEPlay(SEQ_SE_SYS_25);
         GSync_ChangeState(wk, GSync_StateWaitReceived, 686);
@@ -1653,7 +1653,7 @@ static void GSync_StateSendAnimIcon(GSyncWork *wk) {
 }
 
 static void GSync_StateSendShowIcon(GSyncWork *wk) {
-    GSyncDisp_CreatePokeIcon(wk->disp, func_0201d620(wk->pkm), CLACT_SURFACE_SUB);
+    GSyncDisp_CreatePokeIcon(wk->disp, PokeParty_GetBoxPkm(wk->pkm), CLACT_SURFACE_SUB);
     wk->timer = 10;
     GSync_ChangeState(wk, GSync_StateSendAnimIcon, 2621);
 }
@@ -1704,7 +1704,7 @@ static void GSync_RestoreDreamWorld(GSyncWork *wk) {
     if (wk->pkmTaken) {
         PartyPkm *pkm = DreamWorldSave_GetPkm(dreamWorld);
 
-        BoxSaveAccessor_SetPkm(wk->boxes, wk->boxTray, wk->boxPos, func_0201d624(pkm));
+        BoxSaveAccessor_SetPkm(wk->boxes, wk->boxTray, wk->boxPos, PokeParty_ToBoxPkm(pkm));
         PokeParty_ClearPkm(pkm);
         DreamWorldSave_SetPokemonAsleep(dreamWorld, FALSE);
         wk->pkmTaken = FALSE;
@@ -1736,7 +1736,7 @@ static void GSync_PersonToPlayerInfo(GSyncResultPerson *person, PlayerInfo *info
         offset = 8;
     }
     style = style + (u16)offset;
-    func_02008bf8(info, style);
+    PlayerInfo_SetUnionView(info, style);
 }
 
 static void GSync_AddJoinAvenuePeople(GameData *gameData, GSyncResultPerson *people, HeapID heapId) {

@@ -41,7 +41,7 @@ int ZknListUI_Main(ZknListWork *wk) {
     }
     if (ret != -1) {
         if (ret == ZKNLIST_UI_START) {
-            if (func_0200d1dc(wk->param->pokedex) == 0) {
+            if (PokeDex_IsGiven(wk->param->pokedex) == 0) {
                 return -1;
             }
         }
@@ -116,7 +116,7 @@ int ZknListUI_Main(ZknListWork *wk) {
         return ZKNLIST_UI_EXIT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        if (func_0200d1dc(wk->param->pokedex) == 1) {
+        if (PokeDex_IsGiven(wk->param->pokedex) == 1) {
             GCTX_HIDSetUsingTouch(FALSE);
             return ZKNLIST_UI_START;
         }

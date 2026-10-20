@@ -105,7 +105,7 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     Partner_SetCellActor(wk);
 
     WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0],
-                               func_0201d624((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData),
+                               PokeParty_ToBoxPkm((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData),
                                &wk->downloadPokemonData[wk->touchTrainerPos].postSimple, &wk->print);
     WorldTrade_PokeInfoPrint2(wk->msgManager, &wk->infoWin[7], wk->downloadPokemonData[wk->touchTrainerPos].name,
                               (PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData, &wk->infoWin[12],
@@ -251,7 +251,7 @@ static void Partner_SetCellActor(WorldTradeWork *wk) {
     wk->pokemonAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->pokemonAct, TRUE);
+    ClActor_SetAutoAnim(wk->pokemonAct, TRUE);
     ClActor_SetSequence(wk->pokemonAct, 36);
     ClActor_SetVisible(wk->pokemonAct, TRUE);
     GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);

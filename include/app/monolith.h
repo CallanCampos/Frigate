@@ -14,7 +14,7 @@ typedef struct {
     u8 unk04[0x28];
     // The special pass powers' flags, the two bytes of HighLinkSave_GetSpecialFlags, then byte 2 set
     u8 powerFlags[4];
-    // The net ID passed to func_0202bf68 once a pass power is received
+    // The net ID passed to GameCommSys_LogPassPowerReceived once a pass power is received
     u8 netId;
     u8 unk31;
 } MonolithParam;

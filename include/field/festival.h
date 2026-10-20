@@ -58,14 +58,16 @@ struct LinkFestival {
     u8 recordCount;
     // Where the next seen mission goes in records
     u8 recordIndex;
-    // The frames between two calls of func_0202d5cc, and those left until the next
+    // The frames between two calls of GameBeaconSys_SendMission, and those left until the next
     u16 beaconInterval;
     u16 beaconTimer;
-    u16 unk10;
-    u16 unk12;
-    u16 unk14;
+    // The total and the player's score that the field's mission panel shows, and the seconds gained that it has not
+    // shown yet
+    u16 shownTotal;
+    u16 shownScore;
+    u16 secondsGained;
     u16 zoneId;
-    // The total that unk14 was last raised for
+    // The total that secondsGained was last raised for
     u16 lastTotal;
     ArcTool *archive;
     // File 0 of the archive: every mission's FestMissionHeader (field/fest_mission_data.h)
@@ -73,13 +75,14 @@ struct LinkFestival {
     FestMissionConfig config;
     // The two parts of config
     FestMissionInfo *info;
-    void *unk54;
+    // The FestMissionHeader at the start of config
+    void *missionHeader;
     FestMissionRecord records[LINK_FESTIVAL_RECORD_COUNT];
     // The current mission
     FestMissionRecord current;
     LinkFestivalBest *best;
-    // A second log, which func_02014708 gives
-    FestMissionLog unk37C;
+    // The log that the mission viewer lists, which it moves the entries of log into
+    FestMissionLog viewLog;
     FestMissionLog log;
     FestMissionPassPowers passPowers;
     FestMissionOffers offers;
@@ -128,18 +131,18 @@ u16 LinkFestival_GetScore(LinkFestival *festival);
 u16 LinkFestival_GetSecondsLeft(LinkFestival *festival);
 void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *ranking);
 void *LinkFestival_GetLog(LinkFestival *festival);
-void *func_02014708(LinkFestival *festival);
+void *LinkFestival_GetViewLog(LinkFestival *festival);
 void *LinkFestival_GetPassPowers(LinkFestival *festival);
 // Copies a mission's FestMissionHeader to dest
 void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionHeader *dest);
 void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined);
 void LinkFestival_SetState(LinkFestival *festival, u32 state);
 int LinkFestival_GetState(LinkFestival *festival);
-u16 func_02014828(LinkFestival *festival);
-u16 func_0201482c(LinkFestival *festival);
-void func_02014830(LinkFestival *festival, u16 value);
-u16 func_02014838(LinkFestival *festival);
-void func_0201483c(LinkFestival *festival);
+u16 LinkFestival_GetShownTotal(LinkFestival *festival);
+u16 LinkFestival_GetShownScore(LinkFestival *festival);
+void LinkFestival_SetShownTotal(LinkFestival *festival, u16 value);
+u16 LinkFestival_GetSecondsGained(LinkFestival *festival);
+void LinkFestival_ClearSecondsGained(LinkFestival *festival);
 BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId);
 // Whether the festival's total has reached what the mission wants; total gets it
 BOOL LinkFestival_IsTargetReached(LinkFestival *festival, u32 *total);
@@ -151,7 +154,7 @@ int LinkFestival_GetMemberCount(LinkFestival *festival);
 // Remembers a mission seen while none is on
 void LinkFestival_AddRecord(LinkFestival *festival, void *mission);
 // Whether a mission of a beacon is not to be offered
-BOOL func_020149b0(LinkFestival *festival, FestMissionConfig *config);
+BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config);
 // A score for best: the player's own when name is NULL
 void LinkFestival_UpdateBest(LinkFestival *festival, u16 trainerId, u16 value, StrBuf *name);
 BOOL LinkFestival_IsBestChanged(LinkFestival *festival);
@@ -161,7 +164,7 @@ LinkFestivalBest *LinkFestivalBest_Create(HeapID heapId);
 void LinkFestivalBest_Free(LinkFestivalBest *best);
 void FestMissionEntry_Clear(FestMissionEntry *entry);
 int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u32 *out);
-void func_02014774(LinkFestival *festival, u32 arg1);
+void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1);
 u32 GetTrainerCardTextMSGID(u32 type);
 void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
 void FieldFMissionInfo_Free(void *work);

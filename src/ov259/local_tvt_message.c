@@ -289,7 +289,7 @@ void LocalTvtMessage_SetPokemonNickname(LocalTvtMessage *message, PartyPkm *pkm,
 void LocalTvtMessage_SetWord(LocalTvtMessage *message, MsgData *msgData, u16 messageId, u16 index) {
     StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(msgData, messageId);
 
-    func_0202437c(message->wordSet, index, strbuf, 2, 1, 1);
+    GFL_WordSetSetStrbuf(message->wordSet, index, strbuf, 2, 1, 1);
     GFL_StrBufFree(strbuf);
 }
 

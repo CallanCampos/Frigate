@@ -331,7 +331,8 @@ static void BSubwayRecords_InitData(BSubwayRecordsWork *wk, BSubwayRecordsParam 
     wk->strbuf = GFL_StrBufCreate(0x40, HEAPID_BSUBWAY_RECORDS);
     wk->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_BSUBWAY_RECORDS);
     wk->vblankTcb = GFL_VBlankTCBAdd(BSubwayRecords_VBlank, wk, 0);
-    wk->records = BSubwayWifiData_AllocLeaders(func_02017968(wk->param->gameData), HEAPID_BSUBWAY_RECORDS);
+    wk->records =
+        BSubwayWifiData_AllocLeaders(GameData_GetBSubwayWifiData(wk->param->gameData), HEAPID_BSUBWAY_RECORDS);
     wk->count = BSubwayWifiLeader_CountList(wk->records);
     BSubwayRecords_InitPages(wk);
 }
@@ -473,7 +474,7 @@ static void BSubwayRecords_CreateActors(BSubwayRecordsWork *wk) {
         setup.priority = 0;
         wk->actors[i] = ClActor_Create(wk->clUnits[0], wk->objRes[def->charIndex], wk->objRes[def->palIndex],
                                        wk->objRes[def->cellIndex], &setup, 0, HEAPID_BSUBWAY_RECORDS);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
 }
 

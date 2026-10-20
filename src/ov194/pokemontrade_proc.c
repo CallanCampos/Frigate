@@ -267,8 +267,8 @@ static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
 
 void func_ov194_021b772c(PokemonTradeWork *wk) {
     func_02042e94(FALSE);
-    func_02042e9c(FALSE);
-    func_020421ac(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
+    NetState_WifiDisconnect(FALSE);
     wk->param->next = 3;
 }
 
@@ -468,7 +468,7 @@ BoxPkm *PokemonTrade_GetBoxPkm(BoxSaveAccessor *boxes, int box, int slot, Pokemo
         }
         party = wk->party;
         if (slot < PokeParty_GetPkmCount(party) && slot != -1) {
-            return func_0201d624(PokeParty_GetPkm(party, slot));
+            return PokeParty_ToBoxPkm(PokeParty_GetPkm(party, slot));
         }
     }
     return NULL;
@@ -1654,7 +1654,7 @@ static void func_ov194_021b9904(PokemonTradeWork *wk) {
 static void func_ov194_021b993c(PokemonTradeWork *wk) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 22, 8)) {
         func_02042e94(TRUE);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         wk->timer = 0;
         PokemonTrade_SetState(wk, func_ov194_021b9904);
     }
@@ -2158,7 +2158,7 @@ static void func_ov194_021ba5f0(PokemonTradeWork *wk) {
     if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
         if (wk->unk1088) {
             if (x >= 64 && x < 192 && y >= 168 && y < 188) {
-                func_0204c520(wk->actors[2], TRUE);
+                ClActor_SetAutoAnim(wk->actors[2], TRUE);
                 wk->scrollSpeed = (x - wk->scrollTouchX) * 2;
                 wk->scrollTouchX = x;
                 wk->scrollX -= wk->scrollSpeed;
@@ -2504,7 +2504,7 @@ static void func_ov194_021babc4(PokemonTradeWork *wk) {
         }
         wk->unk1088 = 0;
         wk->unkF5C = 0;
-        func_0204c520(wk->actors[2], FALSE);
+        ClActor_SetAutoAnim(wk->actors[2], FALSE);
     }
     func_ov194_021ba5f0(wk);
     if (GFL_HIDIsTouchHeld()) {
@@ -2805,7 +2805,7 @@ static BOOL PokemonTrade_Init(GameProc *proc, u32 *state, PokemonTradeParam *par
     if (PokemonTrade_IsNetwork(wk)) {
         NetCommand_AddTable(TRADE_NET_CMD_BASE, sNetCommands, NELEMS(sNetCommands), wk);
         func_02042e94(TRUE);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
     }
     wk->vblankTcb = GFL_VBlankTCBAdd(PokemonTrade_VBlank, wk, 0);
     wk->heldIcon = NULL;

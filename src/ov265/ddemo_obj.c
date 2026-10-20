@@ -131,7 +131,7 @@ static void DDemoObj_Animate(DDemoWork *wk) {
 
     for (i = 0; i < DDEMOOBJ_COUNT; i++) {
         if (wk->clact[i] != NULL) {
-            if (func_0204c534(wk->clact[i]) != TRUE) {
+            if (ClActor_IsAutoAnim(wk->clact[i]) != TRUE) {
                 ClActor_SetAnimSpeed(wk->clact[i], FX32_ONE);
             }
         }
@@ -173,7 +173,7 @@ void DDemoObj_SetVisible(DDemoWork *wk, u32 id, BOOL visible) {
 void DDemoObj_SetAnime(DDemoWork *wk, u32 id, u32 sequence) {
     ClActor_SetAnimTime(wk->clact[id], 0);
     ClActor_SetSequence(wk->clact[id], sequence);
-    func_0204c520(wk->clact[id], TRUE);
+    ClActor_SetAutoAnim(wk->clact[id], TRUE);
 }
 
 BOOL DDemoObj_IsAnimating(DDemoWork *wk, u32 id) {
@@ -267,7 +267,7 @@ void DDemoObj_AddPoke(DDemoWork *wk) {
         DDemoObj_FreeCellAnims(wk, DDEMO_CEL_POKE_BACK);
     }
     arc = MakePokeGraArcHandle(HEAPID_DENDOU_DEMO);
-    pkm = func_0201d620(wk->mons[wk->monIndex]);
+    pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     wasEncrypted = PML_PkmDecrypt(pkm);
     wk->chrRes[DDEMO_CHR_POKE_FRONT] =
         PokeGra_LoadClActCharsByBoxData(arc, pkm, 0, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
@@ -351,7 +351,7 @@ static void DDemoObj_InitFontOam1st(DDemoWork *wk) {
 
 // Draws the name and level of the Pokémon being shown
 void DDemoObj_PrintPokeInfo(DDemoWork *wk) {
-    BoxPkm *pkm = func_0201d620(wk->mons[wk->monIndex]);
+    BoxPkm *pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     BOOL wasEncrypted = PML_PkmDecrypt(pkm);
     StrBuf *str;
     u32 width;

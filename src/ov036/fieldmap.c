@@ -221,13 +221,13 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
     areaId = ZoneData_GetAreaID(field->zoneId);
     if (AreaData_HasSeasons(areaId)) {
         season = GameSystem_GetSeason(gsys);
-    } else if (func_02018f60(areaId)) {
+    } else if (AreaData_IsInfinityDungeon(areaId)) {
         if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
             season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
-    } else if (func_02018f78(areaId)) {
-        season = func_02017b70(field->gameData);
-    } else if (func_02018f90(areaId)) {
+    } else if (AreaData_IsJoinAvenue(areaId)) {
+        season = GameData_GetJoinAvenueSeason(field->gameData);
+    } else if (AreaData_IsWbt(areaId)) {
         WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
@@ -428,7 +428,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         field->subroutinePhase++;
     case 1:
         if (FieldStatus_CheckContinueFlag(GameData_GetFieldStatus(field->gameData)) == TRUE &&
-            IsZoneTwoPassLoad(field->zoneId) == TRUE && func_02005cbc()) {
+            IsZoneTwoPassLoad(field->zoneId) == TRUE && GFL_SndIsLoadThreadRunning()) {
             return 0;
         }
         if (FieldStatus_GetNewLoadFlag(GameData_GetFieldStatus(field->gameData))) {
@@ -606,7 +606,7 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
 }
 
 u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
-    func_0203a610(field->tcbManager);
+    GFL_TCBMgrDelete(field->tcbManager);
     GFL_HeapFree(field->tcbManagerHeap);
     FieldDispControl_Free(field->dispControl);
     field->dispControl = NULL;
@@ -939,7 +939,7 @@ void FieldG3D_Update(Field *field) {
     loading = FieldG3DMapper_Update(field->g3DMapper);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     if (loading) {
-        func_02042a1c(2);
+        GFL_NetHoldScan(2);
     }
 }
 
@@ -1095,7 +1095,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     VecFx32 pos;
     u32 zoneId;
 
-    func_02042a1c(2);
+    GFL_NetHoldScan(2);
     EncountSystem_CancelPhenomenon(field->encountSystem);
     GetPlayerZoneStateWPos(zoneState, &pos);
     zoneId = GetZoneIDAtMatrixXZWorld(matrix, pos.x, pos.z);

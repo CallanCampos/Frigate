@@ -539,7 +539,7 @@ static void PMSIVMenu_SetupReturnButton(PMSIVMenu *wk) {
     setup.bgPriority = 3;
     wk->returnButton = ClActor_Create(PMSIView_GetActUnit(wk->vwk), wk->returnChars, wk->returnPalette,
                                       wk->returnCellAnims, &setup, CLACT_SURFACE_MAIN, HEAPID_PMS_INPUT);
-    func_0204c520(wk->returnButton, TRUE);
+    ClActor_SetAutoAnim(wk->returnButton, TRUE);
     ClActor_SetVisible(wk->returnButton, FALSE);
     wk->returnSeq = RETURN_SEQ_NONE;
 }

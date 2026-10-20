@@ -117,7 +117,7 @@ GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data
     switch (*state) {
     case 0:
         DisableAllActorsMovement(Field_GetActorSystem(field));
-        if (GameCommSys_GetLastCommNo(GSYS_GetGameCommSystem(gsys)) == 2) {
+        if (GameCommSys_GetLastCommNo(GSYS_GetGameCommSystem(gsys)) == GAME_COMM_NO_INTRUDE) {
             if (GameData_IsForceSeasonSync(GSYS_GetGameData(gsys)) == TRUE) {
                 GFL_NetErrMarkShown();
                 next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &data_ov036_021d1760, gsys);
@@ -156,7 +156,7 @@ GameEventReturnCode func_ov036_021ba77c(GameEvent *event, u32 *state, void *data
     case 1:
         if (GFL_NetIsEnded() == TRUE) {
             GFL_NetErrClear();
-            func_02016b0c(gsys, 0);
+            GSYS_SetNetErrorPending(gsys, 0);
             (*state)++;
         }
         break;
@@ -187,6 +187,6 @@ BOOL func_ov036_021ba808(GameProc *proc, u32 *state, void *param, void *work) {
 }
 
 BOOL func_ov036_021ba80c(GameProc *proc, u32 *state, void *param, void *work) {
-    func_02016b0c(param, 0);
+    GSYS_SetNetErrorPending(param, 0);
     return TRUE;
 }

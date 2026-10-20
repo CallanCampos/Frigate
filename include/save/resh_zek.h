@@ -7,7 +7,8 @@
 
 // Save block 0x2b, which swan calls ReshZek: the Reshiram or Zekrom fused with Kyurem, kept while they are one
 struct ReshZekSave {
-    u32 unk0;
+    // A copy of the game data's own CityState, Black City's or White Forest's
+    u32 cityState;
     PartyPkm pkm;
 }; // size: 0xe0
 
@@ -16,8 +17,8 @@ u32 ReshZekSave_GetSize(void);
 void ReshZekSave_Init(ReshZekSave *reshZek);
 ReshZekSave *getReshZekBlkAddress(SaveControl *save);
 // Copies the word at the start in and out
-void func_0200af8c(ReshZekSave *reshZek, const u32 *src);
-void func_0200af9c(ReshZekSave *reshZek, u32 *dest);
+void ReshZekSave_SetCityState(ReshZekSave *reshZek, const u32 *src);
+void ReshZekSave_GetCityState(ReshZekSave *reshZek, u32 *dest);
 // The fused Pokémon, and storing one
 PartyPkm *ReshZekSave_GetPkm(ReshZekSave *reshZek);
 void ReshZekSave_SetPkm(ReshZekSave *reshZek, const PartyPkm *pkm);
