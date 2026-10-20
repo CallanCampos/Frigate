@@ -4,6 +4,7 @@
 // RailUnit_MoveOnLine/TryEnterLine/ClampSideToLineWidth/ApplyLineStep, RailDirection_*, RailLine_IsPointA/B,
 // RailLine_CheckEndpointDirections, RailPoint_GetLineDirection/CheckConnections, RailDataHandle_Clear/Copy,
 // RailDisabledLines_* and GetRailLineIfEnabled are our descriptive names.
+// RailUnit_GetMoveDirection/IsMovePending/GetLineDirection/RequestMove/UpdateMove are descriptive names too.
 // The private inline directional handlers are our extraction and names for MoveOnLine's four paths;
 // their boundaries are not recovered original functions. Directions name the request relative to the entry line.
 #include "types.h"
@@ -11,6 +12,7 @@
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
+#include "nitro/math.h"
 #include "nitro/mi.h"
 
 static BOOL func_ov036_021b09fc(RailUnit *unit);
@@ -283,8 +285,8 @@ void FieldRailSystem_NormalizePos(FieldRailSystem *rail, RailDataHandle *data, u
 
 BOOL func_ov036_021b0644(FieldRailSystem *rail, const RailPosition *pos, u32 arg, VecFx32 *calcPos) {
     RailUnit_SetRailPos(rail->playerUnit, pos);
-    func_ov036_021b0a94(rail->playerUnit, 4, arg);
-    func_ov036_021b0ac0(rail->playerUnit);
+    RailUnit_RequestMove(rail->playerUnit, 4, arg);
+    RailUnit_UpdateMove(rail->playerUnit);
     RailUnit_GetCalcPos(rail->playerUnit, calcPos);
     if (GFL_STD_MemCmp(pos, &rail->playerUnit->railPos, sizeof(RailPosition)) == 0) {
         return FALSE;
@@ -296,8 +298,8 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
     RailPosition start = *railPos;
 
     RailUnit_SetRailPos(rail->playerUnit, railPos);
-    func_ov036_021b0a94(rail->playerUnit, 4, railDir);
-    func_ov036_021b0ac0(rail->playerUnit);
+    RailUnit_RequestMove(rail->playerUnit, 4, railDir);
+    RailUnit_UpdateMove(rail->playerUnit);
     func_ov036_021b0774(rail->playerUnit, next);
     if (GFL_STD_MemCmp(&start, next, sizeof(RailPosition)) == 0) {
         return FALSE;
@@ -449,9 +451,9 @@ void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos) {
     length = GetLineTileLengthWorldSpace(line, unit->tileWidth, unit->handle);
     width = GetLerpedLineWidthByLineYPos(line, front, length, unit->handle);
     RailUnit_SetLineInfo(unit, line, dir, front, side, length, width);
-    unit->unk33 = 1;
-    unit->unk32 = dir;
-    unit->active = 1;
+    unit->lastMoveSpeedIndex = 1;
+    unit->direction = dir;
+    unit->positionInitialized = 1;
     func_ov036_021b1bac(unit, &unit->calcPos);
     unit->railPos = *pos;
     unit->prevRailPos = *pos;
@@ -462,12 +464,12 @@ void RailUnit_GetCalcPos(RailUnit *unit, VecFx32 *pos) {
     *pos = unit->calcPos;
 }
 
-u8 func_ov036_021b09ec(RailUnit *unit) {
-    return unit->unk32;
+u8 RailUnit_GetMoveDirection(RailUnit *unit) {
+    return unit->direction;
 }
 
-u8 func_ov036_021b09f4(RailUnit *unit) {
-    return unit->pending;
+u8 RailUnit_IsMovePending(RailUnit *unit) {
+    return unit->movePending;
 }
 
 static BOOL func_ov036_021b09fc(RailUnit *unit) {
@@ -506,56 +508,56 @@ void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir) {
     VEC_Fx16Set(dir, to.x, to.y, to.z);
 }
 
-u32 func_ov036_021b0a8c(RailUnit *unit) {
+u32 RailUnit_GetLineDirection(RailUnit *unit) {
     return unit->component.line->dir;
 }
 
-BOOL func_ov036_021b0a94(RailUnit *unit, u32 a, u32 b) {
-    if (unit->pending == 0) {
-        unit->pending = 1;
-        unit->counter = 0;
-        unit->pendingArgB = b;
-        unit->pendingArgA = a;
+BOOL RailUnit_RequestMove(RailUnit *unit, u32 speedIndex, u32 dir) {
+    if (unit->movePending == 0) {
+        unit->movePending = 1;
+        unit->moveProgress = 0;
+        unit->pendingDir = dir;
+        unit->pendingSpeedIndex = speedIndex;
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov036_021b0ac0(RailUnit *unit) {
+void RailUnit_UpdateMove(RailUnit *unit) {
     u32 resultDir;
     u16 onLine;
     u8 step;
     u16 dir;
     s32 rem;
 
-    if (unit->rail->loaded == 0 || unit->active == 0 || !func_ov036_021b1b60(unit)) {
+    if (unit->rail->loaded == 0 || unit->positionInitialized == 0 || !func_ov036_021b1b60(unit)) {
         return;
     }
     resultDir = 0;
     unit->unk34 = 0;
-    if (unit->pending == 0) {
+    if (unit->movePending == 0) {
         return;
     }
-    dir = unit->pendingArgB;
+    dir = unit->pendingDir;
     onLine = unit->onLine;
-    step = sPendingSteps[unit->pendingArgA];
-    unit->counter += (s8)step;
+    step = sPendingSteps[unit->pendingSpeedIndex];
+    unit->moveProgress += (s8)step;
     if (onLine == 1) {
         resultDir = RailUnit_MoveOnLine(unit, dir, step);
     }
     if (resultDir != 0) {
-        unit->unk32 = resultDir;
-        unit->unk33 = unit->pendingArgA;
+        unit->direction = resultDir;
+        unit->lastMoveSpeedIndex = unit->pendingSpeedIndex;
         unit->unk34 = 1;
         func_ov036_021b1bac(unit, &unit->calcPos);
     }
     if (onLine != unit->onLine) {
         func_ov036_021b2130(unit);
     }
-    if (unit->counter < 16 && resultDir != 0) {
+    if (unit->moveProgress < 16 && resultDir != 0) {
         return;
     }
-    unit->pending = 0;
+    unit->movePending = 0;
     unit->nextCached = 0;
     unit->prevRailPos = unit->railPos;
     func_ov036_021b1bec(unit, &unit->railPos);
@@ -979,7 +981,9 @@ static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
 }
 
 // step uses sixteenths of a tile; the result is dir (1 up, 2 right, 3 down, 4 left) or 0.
-static inline s32 RailUnit_MoveForward(RailUnit *unit, RailLine *line, s32 length, u32 dir, s32 step) {
+static inline s32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
+    RailLine *line = unit->component.line;
+    s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     RailLine *next1;
@@ -1065,7 +1069,9 @@ static inline s32 RailUnit_MoveForward(RailUnit *unit, RailLine *line, s32 lengt
     return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
 }
 
-static inline s32 RailUnit_MoveBackward(RailUnit *unit, RailLine *line, s32 length, u32 dir, s32 step) {
+static inline s32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
+    RailLine *line = unit->component.line;
+    s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     RailLine *next1;
@@ -1157,7 +1163,9 @@ static inline s32 RailUnit_MoveBackward(RailUnit *unit, RailLine *line, s32 leng
     return 0;
 }
 
-static inline s32 RailUnit_MoveRight(RailUnit *unit, RailLine *line, s32 length, u32 dir, s32 step) {
+static inline s32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
+    RailLine *line = unit->component.line;
+    s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     s32 width;
@@ -1219,7 +1227,9 @@ static inline s32 RailUnit_MoveRight(RailUnit *unit, RailLine *line, s32 length,
     return dir;
 }
 
-static inline s32 RailUnit_MoveLeft(RailUnit *unit, RailLine *line, s32 length, u32 dir, s32 step) {
+static inline s32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
+    RailLine *line = unit->component.line;
+    s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     s32 width;
@@ -1227,7 +1237,7 @@ static inline s32 RailUnit_MoveLeft(RailUnit *unit, RailLine *line, s32 length, 
     s32 absOffset;
 
     RailUnit_ApplyLineStep(unit->disabled, unit, 0, -step, dir);
-    if (unit->side < 0 && unit->side % 16 == 0) {
+    if (unit->side < 0 && MATH_ABS(unit->side) % 16 == 0) {
         point = GetRailPoint(unit->handle, line->pointA);
         next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
         if (next0 != NULL) {
@@ -1308,7 +1318,7 @@ static inline s32 RailUnit_MoveLeft(RailUnit *unit, RailLine *line, s32 length, 
             }
         }
     }
-    if (unit->side < 0 && -unit->side <= unit->width) {
+    if (unit->side < 0 && MATH_ABS(unit->side) <= unit->width) {
         return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
     }
     return dir;
@@ -1316,15 +1326,14 @@ static inline s32 RailUnit_MoveLeft(RailUnit *unit, RailLine *line, s32 length, 
 
 static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
-    s32 length = unit->length;
     if (dir == line->dir) {
-        return RailUnit_MoveForward(unit, line, length, dir, step);
+        return RailUnit_MoveForward(unit, dir, step);
     } else if (dir == RailDirection_GetOpposite(line->dir)) {
-        return RailUnit_MoveBackward(unit, line, length, dir, step);
+        return RailUnit_MoveBackward(unit, dir, step);
     } else if (dir == RailDirection_TurnRight(line->dir)) {
-        return RailUnit_MoveRight(unit, line, length, dir, step);
+        return RailUnit_MoveRight(unit, dir, step);
     } else if (dir == RailDirection_TurnLeft(line->dir)) {
-        return RailUnit_MoveLeft(unit, line, length, dir, step);
+        return RailUnit_MoveLeft(unit, dir, step);
     }
     return 0;
 }
@@ -1333,9 +1342,9 @@ static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRail
     unit->handle = data;
     unit->tileWidth = data->tileWidth;
     unit->onLine = 2;
-    unit->unk33 = 0;
-    unit->unk32 = 0;
-    unit->pending = 0;
+    unit->lastMoveSpeedIndex = 0;
+    unit->direction = 0;
+    unit->movePending = 0;
     unit->rail = rail;
     unit->component.point = NULL;
     unit->front = 0;
@@ -1343,7 +1352,7 @@ static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRail
     unit->dir = 0;
     unit->disabled = &rail->disabledLines;
     unit->nextCached = 0;
-    unit->active = 0;
+    unit->positionInitialized = 0;
 }
 
 static void RailUnit_SetData(RailUnit *unit, RailDataHandle *data) {
@@ -1462,14 +1471,14 @@ static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 di
     s32 i;
 
     RailUnit_SetRailPos(rail->playerUnit, pos);
-    func_ov036_021b0a94(rail->playerUnit, 4, dir);
-    func_ov036_021b0ac0(rail->playerUnit);
-    func_ov036_021b0a94(rail->playerUnit, 0, dir);
+    RailUnit_RequestMove(rail->playerUnit, 4, dir);
+    RailUnit_UpdateMove(rail->playerUnit);
+    RailUnit_RequestMove(rail->playerUnit, 0, dir);
     for (i = 0; i < 16; i++) {
         if (extra == i) {
             RailUnit_GetCalcPos(rail->playerUnit, out);
         }
-        func_ov036_021b0ac0(rail->playerUnit);
+        RailUnit_UpdateMove(rail->playerUnit);
     }
     if (GFL_STD_MemCmp(pos, &rail->playerUnit->railPos, sizeof(RailPosition)) == 0) {
         return FALSE;

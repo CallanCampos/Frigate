@@ -129,8 +129,8 @@ void GetActorRailPos(FieldActor *actor, RailPosition *position) {
     FieldNoGridMapper_GetRailSystem(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)));
     ActorRailWork *rail = RAIL_WORK(actor);
 
-    if (func_ov036_021b09f4(rail->unit)) {
-        func_ov036_021b0814(rail->unit, func_ov036_021b09ec(rail->unit), position, NULL);
+    if (RailUnit_IsMovePending(rail->unit)) {
+        func_ov036_021b0814(rail->unit, RailUnit_GetMoveDirection(rail->unit), position, NULL);
     } else {
         func_ov036_021b0774(rail->unit, position);
     }
@@ -147,7 +147,7 @@ RailUnit *FldAct_GetRailUnit(FieldActor *actor) {
 void func_ov036_02195624(FieldActor *actor) {
     ActorRailWork *rail = RAIL_WORK(actor);
 
-    func_ov036_021b0ac0(rail->unit);
+    RailUnit_UpdateMove(rail->unit);
     RailActor_SaveUnitPosition(rail, actor);
 }
 
@@ -155,7 +155,7 @@ void func_ov036_02195640(FieldActor *actor, u16 dir, u32 speed) {
     ActorRailWork *rail = RAIL_WORK(actor);
     u32 railDir = RailActor_ConvertDirection(dir);
 
-    func_ov036_021b0a94(rail->unit, RailActor_GetSpeedIndex(speed), railDir);
+    RailUnit_RequestMove(rail->unit, RailActor_GetSpeedIndex(speed), railDir);
 }
 
 static u32 RailActor_CheckCollision(FieldActor *actor, const RailPosition *from, const RailPosition *to, u32 *tile) {
@@ -233,8 +233,8 @@ static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition 
             continue;
         }
         unit = FldAct_GetRailUnit(other);
-        if (func_ov036_021b09f4(unit)) {
-            func_ov036_021b0814(unit, func_ov036_021b09ec(unit), NULL, &otherPos);
+        if (RailUnit_IsMovePending(unit)) {
+            func_ov036_021b0814(unit, RailUnit_GetMoveDirection(unit), NULL, &otherPos);
             if (func_ov036_021b0d64(&target, &otherPos, radius)) {
                 return TRUE;
             }
@@ -341,7 +341,7 @@ void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest) {
     VecFx32 vec;
 
     func_ov036_021b0a04(unit, dest);
-    angle = DIR_ANGLES[TURN_DIRS[func_ov036_021b0a8c(unit)][dir]];
+    angle = DIR_ANGLES[TURN_DIRS[RailUnit_GetLineDirection(unit)][dir]];
     cos = FX_CosIdx(angle);
     dest->y = FX_MUL(cos, dest->y);
     VEC_Set(&vec, dest->x, dest->y, dest->z);
