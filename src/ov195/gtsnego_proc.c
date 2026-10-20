@@ -815,7 +815,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
         STD_TSPrintf(wk->query, "ty=%d And db=%d", wk->mode, 1);
         if (DWCRap_StartMatchQuery(wk->query, 2, GtsNego_EvalMatch, wk)) {
             func_0204204c();
-            func_ov011_02151e40(0);
+            DWCRap_SetVoiceChatEnabled(0);
             GtsNegoMessage_CreateCancelButton(wk->msg, GtsNego_OnCancelButton, wk);
             GtsNego_ChangeState(wk, GtsNego_StateSearching, 1163);
         } else {

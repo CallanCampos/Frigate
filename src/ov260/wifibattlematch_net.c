@@ -537,7 +537,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
     case 0:
         if (DWCRap_StartMatchQuery(p_wk->matchQuery, 2, p_wk->evalFunc, p_wk)) {
             func_0204200c();
-            func_ov011_02151e40(0);
+            DWCRap_SetVoiceChatEnabled(0);
             p_wk->matchState = 1;
         } else {
             func_020421ac(TRUE);

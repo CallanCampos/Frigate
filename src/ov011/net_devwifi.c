@@ -222,7 +222,7 @@ static int NetDevWifi_Unk90(int a0) {
 }
 
 static int NetDevWifi_Unk94(void) {
-    return func_ov011_02151dec();
+    return DWCRap_IsVoiceChatEnabled();
 }
 
 static int NetDevWifi_Unk98(void) {
@@ -230,7 +230,7 @@ static int NetDevWifi_Unk98(void) {
 }
 
 static void NetDevWifi_UnkB8(int a0) {
-    func_ov011_02151fec(a0);
+    DWCRap_SetAcceptConnect(a0);
 }
 
 static BOOL NetDevWifi_UnkAC(void) {

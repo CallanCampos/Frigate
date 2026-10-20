@@ -142,7 +142,7 @@ static void DWCRap_OnMatched(int index);
 static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static int DWCRap_EvalCallback(int index, void *param);
 static void DWCRap_SendCallback(int size, u8 aid, void *param);
-static void DWCRap_SetUnk790(u32 header);
+static void DWCRap_SetPeerVctReady(u32 header);
 static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param);
 static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
 static u32 DWCRap_HandleError(void);
@@ -606,7 +606,7 @@ static void DWCRap_SendCallback(int size, u8 aid, void *param) {
     }
 }
 
-static void DWCRap_SetUnk790(u32 header) {
+static void DWCRap_SetPeerVctReady(u32 header) {
     if (header & 0x100) {
         _dWork->peerVctReady = 1;
     } else {
@@ -622,7 +622,7 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->connected = 1;
         if ((u8)header == 1) {
-            DWCRap_SetUnk790(header);
+            DWCRap_SetPeerVctReady(header);
             _dWork->recvSeq = data[2];
             _dWork->ackPending = 1;
         } else if ((u8)header == 3) {
@@ -854,7 +854,7 @@ static void DWCRap_VctEndCallback(void) {
     _dWork->vctActive = 0;
 }
 
-void func_ov011_021515a4(void) {
+void DWCRap_SetVoiceChatReady(void) {
     _dWork->vctReady = 1;
 }
 
@@ -1247,11 +1247,11 @@ static void DWCRap_ConnectedCallback(int index, void *param) {
     }
 }
 
-BOOL func_ov011_02151de4(void) {
+BOOL DWCRap_GetVoiceChatSpeaking(void) {
     return DWCRapVChat_GetSpeaking();
 }
 
-s16 func_ov011_02151dec(void) {
+s16 DWCRap_IsVoiceChatEnabled(void) {
     if (_dWork != NULL) {
         return _dWork->vctEnabled;
     }
@@ -1265,15 +1265,15 @@ int DWCRap_GetLastNetId(void) {
     return 0;
 }
 
-s16 func_ov011_02151e24(void) {
+s16 DWCRap_GetLastIndex(void) {
     if (_dWork != NULL) {
         return _dWork->lastIndex;
     }
     return -1;
 }
 
-void func_ov011_02151e40(s16 a0) {
-    _dWork->vctEnabled = a0;
+void DWCRap_SetVoiceChatEnabled(s16 enabled) {
+    _dWork->vctEnabled = enabled;
 }
 
 static void DWCRap_FreeRecvBuffer(int aid) {
@@ -1346,8 +1346,8 @@ int DWCRap_GetStatus(void) {
     return _dWork->errorCode;
 }
 
-void func_ov011_02151fec(int a0) {
-    _dWork->acceptConnect = a0;
+void DWCRap_SetAcceptConnect(int accept) {
+    _dWork->acceptConnect = accept;
 }
 
 BOOL DWCRap_IsEnding(void) {

@@ -5437,7 +5437,7 @@ overlays/ov011 0x02150fa4 DWCRap_OnMatched
 overlays/ov011 0x02150fb4 DWCRap_MatchedCallback
 overlays/ov011 0x02150ff4 DWCRap_EvalCallback
 overlays/ov011 0x02150ff8 DWCRap_SendCallback
-overlays/ov011 0x0215101c DWCRap_SetUnk790
+overlays/ov011 0x0215101c DWCRap_SetPeerVctReady
 overlays/ov011 0x02151044 DWCRap_RecvCallback
 overlays/ov011 0x02151118 DWCRap_ClosedCallback
 overlays/ov011 0x021511d4 DWCRap_HandleError
@@ -5446,6 +5446,7 @@ overlays/ov011 0x021513d0 DWCRap_SendIdlePing
 overlays/ov011 0x02151434 DWCRap_Update
 overlays/ov011 0x02151560 DWCRap_GetNetId
 overlays/ov011 0x02151590 DWCRap_VctEndCallback
+overlays/ov011 0x021515a4 DWCRap_SetVoiceChatReady
 overlays/ov011 0x021515b8 DWCRap_StartVct
 overlays/ov011 0x02151634 DWCRap_StartVoiceChat
 overlays/ov011 0x02151644 DWCRap_StopVoiceChat
@@ -5465,7 +5466,11 @@ overlays/ov011 0x02151cb8 DWCRap_GetFriendIndex
 overlays/ov011 0x02151cd4 DWCRap_AnybodyMatchedCallback
 overlays/ov011 0x02151d94 DWCRap_FriendMatchedCallback
 overlays/ov011 0x02151db8 DWCRap_ConnectedCallback
+overlays/ov011 0x02151de4 DWCRap_GetVoiceChatSpeaking
+overlays/ov011 0x02151dec DWCRap_IsVoiceChatEnabled
 overlays/ov011 0x02151e08 DWCRap_GetLastNetId
+overlays/ov011 0x02151e24 DWCRap_GetLastIndex
+overlays/ov011 0x02151e40 DWCRap_SetVoiceChatEnabled
 overlays/ov011 0x02151e54 DWCRap_FreeRecvBuffer
 overlays/ov011 0x02151e7c DWCRap_AllocRecvBuffer
 overlays/ov011 0x02151edc DWCRap_FreeRecvBuffers
@@ -5475,6 +5480,7 @@ overlays/ov011 0x02151f28 DWCRap_IsReady
 overlays/ov011 0x02151f4c DWCRap_IsConnected
 overlays/ov011 0x02151f70 DWCRap_FlushPendingErrors
 overlays/ov011 0x02151fd8 DWCRap_GetStatus
+overlays/ov011 0x02151fec DWCRap_SetAcceptConnect
 overlays/ov011 0x02152000 DWCRap_IsEnding
 overlays/ov011 0x0215202c DWCRap_SetReportError
 overlays/ov011 0x02152040 DWCRap_SetErrorFunc
