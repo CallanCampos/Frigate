@@ -1437,7 +1437,7 @@ static int UtilAc_MakeResult(void) {
         if (sAcSettings.keyCount == 0) {
             result = RESULT_BAD_KEY;
         } else {
-            sAcResult.unk_24 = sAcSettings.keyCount;
+            sAcResult.keyCount = sAcSettings.keyCount;
             for (i = 0; i < 4; i++) {
                 u32 length;
 

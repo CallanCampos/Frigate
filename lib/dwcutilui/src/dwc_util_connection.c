@@ -46,7 +46,7 @@ int func_ov182_021ae440(void) {
         if (DWCUtilAc_GetResult(&result) != TRUE) {
             OS_Terminate();
         }
-        if (result.wepMode >= 0 && result.wepMode <= 3 && result.unk_24 == 1) {
+        if (result.wepMode >= 0 && result.wepMode <= 3 && result.keyCount == 1) {
             return 3;
         }
         return 5;
