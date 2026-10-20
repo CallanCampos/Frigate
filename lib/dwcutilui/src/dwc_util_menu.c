@@ -138,7 +138,9 @@ void DWCUtilMenu_Open(void) {
     }
     label[1] = 0;
     for (i = 0; i < 4; i++) {
-        sMenu->rows[i] = DWCUtilText_CreateObj(0, 0xc, 4, 0, &objCount, 0);
+        DWCUtilText *text = DWCUtilText_CreateObj(0, 0xc, 4, 0, &objCount, 0);
+
+        sMenu->rows[i] = text;
         rect.x = 0;
         for (j = 0, k = i * 3; j < 3; j++, k++) {
             label[0] = sLabels[k];
