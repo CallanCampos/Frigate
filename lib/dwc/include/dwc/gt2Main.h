@@ -35,7 +35,7 @@ typedef struct GTI2Connection GTI2Connection;
 // and a datagram that isn't GT2's, which returns whether the app handled it
 typedef void (*GTI2SocketErrorCallback)(GTI2Socket *socket);
 typedef void (*GTI2ConnectAttemptCallback)(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port,
-                                           u32 latency, const void *message, int length);
+                                           int latency, const void *message, int length);
 typedef void (*GTI2DumpCallback)(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, BOOL reset,
                                  const void *message, int length);
 typedef BOOL (*GTI2UnrecognizedMessageCallback)(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length);

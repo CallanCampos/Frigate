@@ -129,7 +129,7 @@ static void DWCRap_MatchFailed(void);
 static BOOL DWCRap_SendAck(const void *data, int size);
 static void DWCRap_FlushAck(void);
 static void DWCRap_LoginCallback(int error);
-static void DWCRap_TimeoutCallback(u8 aid);
+static void DWCRap_TimeoutCallback(u8 aid, void *param);
 static void DWCRap_UpdateServersCallback(int error);
 static void DWCRap_FriendStatusCallback(int index, u8 status, const char *location, void *param);
 static void DWCRap_DeleteFriendCallback(int deleteIndex, int srcIndex, void *param);
@@ -139,9 +139,9 @@ static void DWCRap_SetRecvTimeouts(void);
 static void DWCRap_OnMatched(int index);
 static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static int DWCRap_EvalCallback(int index, void *param);
-static void DWCRap_SendCallback(int size, u8 aid);
+static void DWCRap_SendCallback(int size, u8 aid, void *param);
 static void DWCRap_SetUnk790(u32 header);
-static void DWCRap_RecvCallback(u8 aid, u8 *data, int size);
+static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param);
 static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
 static u32 DWCRap_HandleError(void);
 static BOOL DWCRap_CanPing(void);
@@ -512,7 +512,7 @@ static void DWCRap_LoginCallback(int error) {
     }
 }
 
-static void DWCRap_TimeoutCallback(u8 aid) {
+static void DWCRap_TimeoutCallback(u8 aid, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         if (_dWork->connected != 0) {
             func_ov011_02160170();
@@ -597,7 +597,7 @@ static int DWCRap_EvalCallback(int index, void *param) {
     return 1;
 }
 
-static void DWCRap_SendCallback(int size, u8 aid) {
+static void DWCRap_SendCallback(int size, u8 aid, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->sending = 0;
         _dWork->idleFrames[aid] = 0;
@@ -613,7 +613,7 @@ static void DWCRap_SetUnk790(u32 header) {
 }
 
 // clang-format off
-static void DWCRap_RecvCallback(u8 aid, u8 *data, int size) {
+static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
     u32 header = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 
     GFL_ASSERT(aid < 2);
