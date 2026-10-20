@@ -1660,7 +1660,7 @@ sBgBuffer kind:bss addr:0x021c4190
 sScrollbar kind:bss addr:0x021c419c
 sApScan kind:bss addr:0x021c41a0
 sWifiSettings kind:bss addr:0x021c41a4
-data_ov182_021c4168 kind:bss addr:0x021c41a8
+sSound kind:bss addr:0x021c41a8
 data_ov182_021c416c kind:bss addr:0x021c41ac
 data_ov182_021c4170 kind:bss addr:0x021c41b0
 data_ov182_021c4174 kind:bss addr:0x021c41b4

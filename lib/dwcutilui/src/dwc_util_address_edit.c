@@ -14,6 +14,7 @@
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_text.h"
 #include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"

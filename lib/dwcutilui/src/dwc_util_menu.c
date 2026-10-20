@@ -6,6 +6,7 @@
 #include "dwc_util_oam_attr.h"
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_task.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"

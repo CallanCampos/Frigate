@@ -8,6 +8,7 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_ap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_text.h"
 #include "dwc_util_ui_object.h"
 #include "dwc_util_usb_setup.h"

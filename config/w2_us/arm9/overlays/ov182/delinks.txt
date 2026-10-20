@@ -410,3 +410,9 @@ lib/dwcutilui/src/dwc_util_wifi_settings.c:
     .rodata     start:0x021c0470 end:0x021c0474
     .data       start:0x021c1424 end:0x021c1434
     .bss        start:0x021c41a4 end:0x021c41a8
+
+lib/dwcutilui/src/dwc_util_sound.c:
+    complete
+    .text       start:0x021b8090 end:0x021b8194
+    .data       start:0x021c1434 end:0x021c144c
+    .bss        start:0x021c41a8 end:0x021c41ac

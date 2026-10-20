@@ -11406,6 +11406,7 @@ overlays/ov182 0x021c4150 sBgBuffer
 overlays/ov182 0x021c415c sScrollbar
 overlays/ov182 0x021c4160 sApScan
 overlays/ov182 0x021c4164 sWifiSettings
+overlays/ov182 0x021c4168 sSound
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

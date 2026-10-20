@@ -8,6 +8,7 @@
 #include "dwc_util_notice_screen.h"
 #include "dwc_util_page_multi5.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_text.h"
 #include "dwc_util_timed_notice.h"
 #include "dwc_util_touch.h"

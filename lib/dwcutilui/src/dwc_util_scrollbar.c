@@ -4,6 +4,7 @@
 #include "dwc_util_heap.h"
 #include "dwc_util_oam.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_task.h"
 #include "dwc_util_touch.h"
 #include "nitro/fx.h"

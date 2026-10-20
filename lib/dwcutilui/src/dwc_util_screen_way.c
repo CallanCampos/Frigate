@@ -13,6 +13,7 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_ap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_test_start.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"

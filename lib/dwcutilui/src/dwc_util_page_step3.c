@@ -9,6 +9,7 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_way.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_task.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"

@@ -28,14 +28,6 @@ void func_ov182_021b849c(void);
 BOOL func_ov182_021b854c(void);
 BOOL func_ov182_021b87b0(void);
 
-// The utility's sound: its start and its end, around the main loop
-void func_ov182_021b8050(void);
-void func_ov182_021b80d4(void);
-// Starts the sound effect, from the utility's sound archive
-void func_ov182_021b80f4(int seq);
-// Stops the music
-void func_ov182_021b8138(void);
-
 // Loads the sub screen's BG 1 of one of the layouts at the next VBlank
 void func_ov182_021b87d0(int layout);
 
@@ -57,10 +49,6 @@ typedef void (*DWCUtilUsbScanCallback)(int result);
 BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback);
 BOOL func_ov182_021b895c(void);
 void func_ov182_021b89e8(DWCUtilUsbScanCallback callback);
-
-// The volume and the pitch of the sound effect (their file is not written yet)
-void func_ov182_021b810c(int volume);
-void func_ov182_021b8120(u32 trackMask, int pitch);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet
