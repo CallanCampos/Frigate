@@ -24,13 +24,13 @@ static void func_ov182_021bbb40(DWCUtilTask *task, void *arg);
 static void func_ov182_021bbc2c(DWCUtilTask *task, void *arg);
 
 void func_ov182_021bba6c(void) {
-    sFades = func_ov182_021bc4d8(sizeof(DWCUtilFade) * 2, 4);
+    sFades = DWCUtilHeap_AllocClear(sizeof(DWCUtilFade) * 2, 4);
     G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, DWC_UTIL_FADE_PLANES, 16);
     G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, DWC_UTIL_FADE_PLANES, 16);
 }
 
 void func_ov182_021bba9c(void) {
-    func_ov182_021bc4f0(&sFades);
+    DWCUtilHeap_FreeAndNull(&sFades);
 }
 
 u8 func_ov182_021bbaac(int screen) {
@@ -61,7 +61,7 @@ BOOL func_ov182_021bbac4(int type, int screen, u32 planes, int length) {
     } else {
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, planes, start[type]);
     }
-    fade->task = func_ov182_021bd200(1, func_ov182_021bbb40, fade, 200);
+    fade->task = DWCUtilTask_Create(1, func_ov182_021bbb40, fade, 200);
     fade->frame = 0;
     fade->type = type;
     fade->length = length;
@@ -92,7 +92,7 @@ static void func_ov182_021bbb40(DWCUtilTask *task, void *arg) {
             G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, end[fade->type]);
         }
         fade->active = FALSE;
-        func_ov182_021bd268(1, task);
+        DWCUtilTask_QueueRemoval(1, task);
     }
 }
 
@@ -102,7 +102,7 @@ BOOL func_ov182_021bbbf4(int length) {
     if (fade->active) {
         return FALSE;
     }
-    fade->task = func_ov182_021bd200(1, func_ov182_021bbc2c, fade, 200);
+    fade->task = DWCUtilTask_Create(1, func_ov182_021bbc2c, fade, 200);
     fade->frame = 0;
     fade->length = length;
     fade->active = TRUE;
@@ -115,6 +115,6 @@ static void func_ov182_021bbc2c(DWCUtilTask *task, void *arg) {
     fade->frame++;
     if (fade->frame >= fade->length) {
         fade->active = FALSE;
-        func_ov182_021bd268(1, task);
+        DWCUtilTask_QueueRemoval(1, task);
     }
 }

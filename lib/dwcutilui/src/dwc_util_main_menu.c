@@ -60,34 +60,34 @@ static DWCUtilMainMenu sMainMenu;
 void func_ov182_021ae4f4(void) {
     func_ov182_021bbac4(3, 1, 0x3f, 0x14);
     func_ov182_021bbac4(3, 0, 0x3f, 0x14);
-    func_ov182_021adfbc(func_ov182_021ae51c);
+    DWCUtilMain_SetUpdate(func_ov182_021ae51c);
 }
 
 static void func_ov182_021ae51c(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021bd2b8(0, 0);
-        func_ov182_021bd2b8(1, 0);
+        DWCUtilTask_SetActive(0, 0);
+        DWCUtilTask_SetActive(1, 0);
         func_ov182_021bb8fc(1);
         func_ov182_021bb8fc(0);
         func_ov182_021ab95c();
         func_ov182_021ab7dc();
-        func_ov182_021ae0ec(data_ov182_021c40b8);
-        func_ov182_021ae0a8();
+        DWCUtilMsg_Close(data_ov182_021c40b8);
+        DWCUtilMsg_Exit();
         func_ov182_021b780c();
-        func_ov182_021ae04c();
+        DWCUtilMain_Finish();
     }
 }
 
 void func_ov182_021ae574(void) {
     func_ov182_021b77dc();
-    func_ov182_021ae084();
+    DWCUtilMsg_Init();
     func_ov182_021ab7c8();
     func_ov182_021ab90c();
     DWCUtilScreen_Reset();
-    if (func_ov182_021ae018() == 1 && func_ov182_021ae034(2)) {
-        data_ov182_021c40b8 = func_ov182_021ae0b8("msg/usa.bmg.l");
+    if (DWCUtilMain_GetLanguage() == 1 && DWCUtilMain_HasFlag(2)) {
+        data_ov182_021c40b8 = DWCUtilMsg_Open("msg/usa.bmg.l");
     } else {
-        data_ov182_021c40b8 = func_ov182_021ae0b8(sMsgPaths[func_ov182_021ae018()]);
+        data_ov182_021c40b8 = DWCUtilMsg_Open(sMsgPaths[DWCUtilMain_GetLanguage()]);
     }
     func_ov182_021bb8dc(1, func_ov182_021ab63c("char/jtMain.nce.l"));
     func_ov182_021bb8dc(0, func_ov182_021ab63c("char/jbMain.nce.l"));
@@ -99,7 +99,7 @@ void func_ov182_021ae574(void) {
     func_ov182_021ab67c("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     func_ov182_021ab67c("char/jbObjMain.ncg.l", GX_LoadOBJ);
     func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    switch (func_ov182_021ae024()) {
+    switch (DWCUtilMain_GetStartScreen()) {
     case 0:
         func_ov182_021ab67c("char/jtTop.nsc.l", GXS_LoadBG1Scr);
         break;
@@ -112,25 +112,25 @@ void func_ov182_021ae574(void) {
     G2_SetBG1Priority(3);
     func_ov182_021bc1dc(1, 2);
     func_ov182_021bc1dc(0, 2);
-    func_ov182_021adfbc(func_ov182_021ae6d0);
+    DWCUtilMain_SetUpdate(func_ov182_021ae6d0);
 }
 
 static void func_ov182_021ae6d0(void) {
     func_ov182_021bbac4(2, 1, 2, 0x14);
     func_ov182_021bbac4(2, 0, 2, 0x14);
-    func_ov182_021adfbc(func_ov182_021ae6f8);
+    DWCUtilMain_SetUpdate(func_ov182_021ae6f8);
 }
 
 static void func_ov182_021ae6f8(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        switch (func_ov182_021ae024()) {
+        switch (DWCUtilMain_GetStartScreen()) {
         case 0:
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021ae748);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021ae748);
             break;
         case 1:
-            func_ov182_021adfc8(1, 1);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(1, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b536c);
             break;
         }
     }
@@ -143,7 +143,7 @@ void func_ov182_021ae748(void) {
     func_ov182_021b87d0(4);
     func_ov182_021ab85c(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
                         sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
-    func_ov182_021adfbc(func_ov182_021ae838);
+    DWCUtilMain_SetUpdate(func_ov182_021ae838);
 }
 
 static void func_ov182_021ae7a0(void) {
@@ -152,7 +152,7 @@ static void func_ov182_021ae7a0(void) {
     func_ov182_021ab67c("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
     func_ov182_021ab67c("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     func_ov182_021ab67c("char/jb2Menu.nsc.l", GX_LoadBG2Scr);
-    sMainMenu.palette = func_ov182_021bb37c(func_ov182_021ab63c(palettePath), NULL, 4);
+    sMainMenu.palette = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -164,20 +164,20 @@ static void func_ov182_021ae838(void) {
     func_ov182_021bbac4(2, 0, 0x14, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x14);
-    func_ov182_021adfbc(func_ov182_021ae870);
+    DWCUtilMain_SetUpdate(func_ov182_021ae870);
 }
 
 static void func_ov182_021ae870(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(0);
-        func_ov182_021adfbc(func_ov182_021ae89c);
+        DWCUtilMain_SetUpdate(func_ov182_021ae89c);
     }
 }
 
 static void func_ov182_021ae89c(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021ae8bc);
+        DWCUtilMain_SetUpdate(func_ov182_021ae8bc);
     }
 }
 
@@ -220,13 +220,13 @@ static void func_ov182_021ae990(void) {
 static void func_ov182_021ae994(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
-        func_ov182_021adfbc(func_ov182_021ae4f4);
+        DWCUtilSound_PlaySe(7);
+        DWCUtilMain_SetUpdate(func_ov182_021ae4f4);
         break;
     case 1:
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021aead4();
-        func_ov182_021adfbc(func_ov182_021ae9cc);
+        DWCUtilMain_SetUpdate(func_ov182_021ae9cc);
         break;
     }
 }
@@ -234,14 +234,14 @@ static void func_ov182_021ae994(void) {
 static void func_ov182_021ae9cc(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021ae9e4);
+    DWCUtilMain_SetUpdate(func_ov182_021ae9e4);
 }
 
 static void func_ov182_021ae9e4(void) {
     if (func_ov182_021bbaac(1) == 0) {
         func_ov182_021bbac4(3, 1, 1, 8);
         func_ov182_021bbac4(3, 0, 0x16, 8);
-        func_ov182_021adfbc(func_ov182_021aea18);
+        DWCUtilMain_SetUpdate(func_ov182_021aea18);
     }
 }
 
@@ -249,17 +249,17 @@ static void func_ov182_021aea18(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab8e4();
         DWCUtilScreen_Stop();
-        func_ov182_021bb420(sMainMenu.palette);
+        DWCUtilRomResource_FreeFile(sMainMenu.palette);
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x14);
         switch (sMainMenu.selection) {
         case 0:
-            func_ov182_021adfc8(1, 0);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(1, 0);
+            DWCUtilMain_SetUpdate(func_ov182_021b536c);
             break;
         case 1:
-            func_ov182_021adfc8(0, 0);
-            func_ov182_021adfbc(func_ov182_021af25c);
+            DWCUtilMain_SetLayout(0, 0);
+            DWCUtilMain_SetUpdate(func_ov182_021af25c);
             break;
         }
     }
@@ -269,7 +269,7 @@ static void func_ov182_021aea18(void) {
 static void func_ov182_021aea8c(int direction) {
     if (direction != 1 && direction != 3) {
         sMainMenu.selection ^= 1;
-        func_ov182_021b80f4(8);
+        DWCUtilSound_PlaySe(8);
         func_ov182_021ab85c(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
                             sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
     }

@@ -44,7 +44,7 @@ void DWCUtilUiObject_Init(int variant) {
     int count = sCounts[variant];
     int i;
 
-    sUiObject = func_ov182_021bc4d8(sizeof(DWCUtilUiObject), 4);
+    sUiObject = DWCUtilHeap_AllocClear(sizeof(DWCUtilUiObject), 4);
     sUiObject->state = -2;
     sUiObject->variant = variant;
     for (i = 0; i < count; i++) {
@@ -54,12 +54,12 @@ void DWCUtilUiObject_Init(int variant) {
     sUiObject->objects[2] = func_ov182_021bb97c(0, 1, 1);
     func_ov182_021bb878(sUiObject->objects[2], -1, 1);
     DWCUtilUiObject_SetPosition(0xc0);
-    sUiObject->task = func_ov182_021bd200(0, DWCUtilUiObject_Raise, NULL, 0x78);
+    sUiObject->task = DWCUtilTask_Create(0, DWCUtilUiObject_Raise, NULL, 0x78);
 }
 
 void DWCUtilUiObject_Exit(void) {
     sUiObject->exiting = TRUE;
-    func_ov182_021bd264(sUiObject->task, DWCUtilUiObject_Lower);
+    DWCUtilTask_SetCallback(sUiObject->task, DWCUtilUiObject_Lower);
 }
 
 int DWCUtilUiObject_GetState(void) {
@@ -113,7 +113,7 @@ static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg) {
     DWCUtilUiObject_SetPosition(y);
     if (y <= 0xa8) {
         DWCUtilUiObject_SetPosition(0xa8);
-        func_ov182_021bd264(task, DWCUtilUiObject_RaiseDone);
+        DWCUtilTask_SetCallback(task, DWCUtilUiObject_RaiseDone);
     }
 }
 
@@ -122,7 +122,7 @@ static void DWCUtilUiObject_RaiseDone(DWCUtilTask *task, void *arg) {
     sUiObject->counter++;
     if (sUiObject->counter >= 4) {
         sUiObject->counter = 0;
-        func_ov182_021bd264(task, DWCUtilUiObject_Select);
+        DWCUtilTask_SetCallback(task, DWCUtilUiObject_Select);
     }
 }
 
@@ -149,7 +149,7 @@ static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
             func_ov182_021bb7e0(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x,
                                 sPositions[sPosIndex[sUiObject->variant][i]].y);
             func_ov182_021bb878(sUiObject->objects[i], -1, 1);
-            sUiObject->selectTask = func_ov182_021bd200(0, DWCUtilUiObject_Revert, NULL, 0x6e);
+            sUiObject->selectTask = DWCUtilTask_Create(0, DWCUtilUiObject_Revert, NULL, 0x6e);
             sUiObject->state = i;
             return;
         }
@@ -165,16 +165,16 @@ static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg) {
     y += 4;
     DWCUtilUiObject_SetPosition(y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, DWCUtilUiObject_Destroy);
+        DWCUtilTask_SetCallback(task, DWCUtilUiObject_Destroy);
     }
 }
 
 static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg) {
     int i;
 
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
     if (sUiObject->selectTask != NULL) {
-        func_ov182_021bd268(0, sUiObject->selectTask);
+        DWCUtilTask_QueueRemoval(0, sUiObject->selectTask);
     }
     for (i = 0; i < 2; i++) {
         if (sUiObject->objects[i] != NULL) {
@@ -182,7 +182,7 @@ static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg) {
         }
     }
     func_ov182_021bb690(sUiObject->objects[2]);
-    func_ov182_021bc4f0(&sUiObject);
+    DWCUtilHeap_FreeAndNull(&sUiObject);
 }
 
 static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg) {
@@ -205,6 +205,6 @@ static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg) {
     sUiObject->state = -1;
     if (sUiObject->selectTask != NULL) {
         sUiObject->selectTask = NULL;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }

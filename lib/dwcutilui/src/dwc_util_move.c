@@ -33,29 +33,29 @@ static DWCUtilMove *sMove;
 void func_ov182_021ae134(DWCUtilMoveCallback callback) {
     DownloadPlaySysGame game;
 
-    sMove = func_ov182_021bc4d8(sizeof(DWCUtilMove), 32);
+    sMove = DWCUtilHeap_AllocClear(sizeof(DWCUtilMove), 32);
     sMove->callback = callback;
     sMove->entered = FALSE;
     sMove->ended = FALSE;
     game = sGame;
-    game.gameNamep = func_ov182_021ae108(data_ov182_021c40b8, 0);
-    game.gameIntroductionp = func_ov182_021ae108(data_ov182_021c40b8, 1);
+    game.gameNamep = DWCUtilMsg_Get(data_ov182_021c40b8, 0);
+    game.gameIntroductionp = DWCUtilMsg_Get(data_ov182_021c40b8, 1);
     game.maxPlayerNum = func_ov182_021ae058();
     func_ov182_021ba768(&sMove->context, &game);
     if (!func_ov182_021ba918()) {
         OS_Terminate();
     }
-    sMove->task = func_ov182_021bd200(0, func_ov182_021ae254, NULL, 0x78);
+    sMove->task = DWCUtilTask_Create(0, func_ov182_021ae254, NULL, 0x78);
 }
 
 void func_ov182_021ae1d4(void) {
-    func_ov182_021bd200(0, func_ov182_021ae1e8, NULL, 0x78);
+    DWCUtilTask_Create(0, func_ov182_021ae1e8, NULL, 0x78);
 }
 
 static void func_ov182_021ae1e8(DWCUtilTask *task, void *arg) {
     if (func_ov182_021ba81c()) {
         sMove->ended = TRUE;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }
 
@@ -146,8 +146,8 @@ static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
         sMove->ended = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED:
-        func_ov182_021bd268(0, task);
-        func_ov182_021bc4f0(&sMove);
+        DWCUtilTask_QueueRemoval(0, task);
+        DWCUtilHeap_FreeAndNull(&sMove);
         return;
     case DOWNLOAD_PLAY_SYS_STATE_NONE:
     case DOWNLOAD_PLAY_SYS_STATE_READY:

@@ -52,7 +52,7 @@ static inline u16 PAD_Read(void) {
 void func_ov182_021bc544(void) {
     TPCalibrateParam calibrate;
 
-    sTouch.input = func_ov182_021bc4d8(sizeof(DWCUtilInput), 4);
+    sTouch.input = DWCUtilHeap_AllocClear(sizeof(DWCUtilInput), 4);
     if (!TP_GetUserInfo(&calibrate)) {
         OS_Terminate();
     }
@@ -70,7 +70,7 @@ void func_ov182_021bc598(void) {
         TP_RequestAutoSamplingStopAsync();
         TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_OFF);
     } while (TP_CheckError(TP_REQUEST_COMMAND_FLAG_AUTO_OFF));
-    func_ov182_021bc4f0(&sTouch.input);
+    DWCUtilHeap_FreeAndNull(&sTouch.input);
 }
 
 void func_ov182_021bc5bc(void) {

@@ -24,9 +24,9 @@ static char *sScreenPaths[20] = {
 static void *sOverlayScreen;
 
 void func_ov182_021ab90c(void) {
-    sOverlayScreen = func_ov182_021bc4d8(DWC_UTIL_BG_OVERLAY_SIZE, 4);
+    sOverlayScreen = DWCUtilHeap_AllocClear(DWC_UTIL_BG_OVERLAY_SIZE, 4);
     func_ov182_021ab67c("char/jbBgHl.ncg.l", GX_LoadBG1Char);
-    switch (func_ov182_021ae024()) {
+    switch (DWCUtilMain_GetStartScreen()) {
     case 0:
         func_ov182_021ab67c(sScreenPaths[0], GX_LoadBG1Scr);
         break;
@@ -37,15 +37,15 @@ void func_ov182_021ab90c(void) {
 }
 
 void func_ov182_021ab95c(void) {
-    func_ov182_021bc4f0(&sOverlayScreen);
+    DWCUtilHeap_FreeAndNull(&sOverlayScreen);
 }
 
 void func_ov182_021ab96c(int index) {
-    void *data = func_ov182_021bb37c(func_ov182_021ab63c(sScreenPaths[index]), NULL, 4);
+    void *data = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(sScreenPaths[index]), NULL, 4);
 
     MIi_CpuCopyFast(data, sOverlayScreen, DWC_UTIL_BG_OVERLAY_SIZE);
-    func_ov182_021bb420(data);
-    func_ov182_021bd200(1, func_ov182_021ab9d4, NULL, 0x78);
+    DWCUtilRomResource_FreeFile(data);
+    DWCUtilTask_Create(1, func_ov182_021ab9d4, NULL, 0x78);
 }
 
 void func_ov182_021ab9ac(void) {
@@ -59,5 +59,5 @@ void func_ov182_021ab9c0(void) {
 static void func_ov182_021ab9d4(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sOverlayScreen, DWC_UTIL_BG_OVERLAY_SIZE);
     GX_LoadBG1Scr(sOverlayScreen, 0, DWC_UTIL_BG_OVERLAY_SIZE);
-    func_ov182_021bd268(1, task);
+    DWCUtilTask_QueueRemoval(1, task);
 }

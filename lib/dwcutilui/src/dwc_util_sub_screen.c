@@ -57,16 +57,16 @@ static void *sSubScreenData;
 void func_ov182_021b8154(int step) {
     int i;
 
-    sSubScreenRow = func_ov182_021bc4d8(sizeof(DWCUtilSubScreenRow), 4);
+    sSubScreenRow = DWCUtilHeap_AllocClear(sizeof(DWCUtilSubScreenRow), 4);
     for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
         sSubScreenRow->objects[i] = func_ov182_021bb97c(1, sSubScreenCells[step][i], TRUE);
         func_ov182_021bb878(sSubScreenRow->objects[i], -1, 0);
         func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, -42, sSubScreenPositions[i][1]);
         func_ov182_021bb778(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
     }
-    sSubScreenRow->task = func_ov182_021bd200(0, func_ov182_021b8200, NULL, 120);
+    sSubScreenRow->task = DWCUtilTask_Create(0, func_ov182_021b8200, NULL, 120);
     func_ov182_021b87d0(step);
-    func_ov182_021b80f4(0xd);
+    DWCUtilSound_PlaySe(0xd);
 }
 
 // The slide in: the objects from the first that hasn't stopped on move 8 pixels a frame until it stops
@@ -86,7 +86,7 @@ static void func_ov182_021b8200(DWCUtilTask *task, void *arg) {
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8288);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8288);
     }
 }
 
@@ -106,7 +106,7 @@ static void func_ov182_021b8288(DWCUtilTask *task, void *arg) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8310);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8310);
     }
 }
 
@@ -126,7 +126,7 @@ static void func_ov182_021b8310(DWCUtilTask *task, void *arg) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8398);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8398);
     }
 }
 
@@ -146,7 +146,7 @@ static void func_ov182_021b8398(DWCUtilTask *task, void *arg) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8420);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8420);
     }
 }
 
@@ -161,18 +161,18 @@ static void func_ov182_021b8420(DWCUtilTask *task, void *arg) {
     } else {
         x = 0xb0;
         func_ov182_021bb7e0(sSubScreenRow->objects[4], -1, x, 0x21);
-        func_ov182_021bd264(task, func_ov182_021b8484);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8484);
     }
 }
 
 static void func_ov182_021b8484(DWCUtilTask *task, void *arg) {
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
     sSubScreenRow->task = NULL;
 }
 
 void func_ov182_021b849c(void) {
     sSubScreenRow->leaving = TRUE;
-    sSubScreenRow->task = func_ov182_021bd200(0, func_ov182_021b8564, NULL, 120);
+    sSubScreenRow->task = DWCUtilTask_Create(0, func_ov182_021b8564, NULL, 120);
 }
 
 void func_ov182_021b84c0(int step) {
@@ -207,7 +207,7 @@ static void func_ov182_021b8564(DWCUtilTask *task, void *arg) {
     } else {
         x = 0x98;
         func_ov182_021bb7e0(sSubScreenRow->objects[4], -1, x, 0x21);
-        func_ov182_021bd264(task, func_ov182_021b85bc);
+        DWCUtilTask_SetCallback(task, func_ov182_021b85bc);
     }
 }
 
@@ -227,7 +227,7 @@ static void func_ov182_021b85bc(DWCUtilTask *task, void *arg) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8638);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8638);
     }
 }
 
@@ -247,7 +247,7 @@ static void func_ov182_021b8638(DWCUtilTask *task, void *arg) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b86b4);
+        DWCUtilTask_SetCallback(task, func_ov182_021b86b4);
     }
 }
 
@@ -267,7 +267,7 @@ static void func_ov182_021b86b4(DWCUtilTask *task, void *arg) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8730);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8730);
     }
 }
 
@@ -283,11 +283,11 @@ static void func_ov182_021b8730(DWCUtilTask *task, void *arg) {
         func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
     }
     if (x <= 0x1d6 && x >= 0x100) {
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
             func_ov182_021bb690(sSubScreenRow->objects[i]);
         }
-        func_ov182_021bc4f0(&sSubScreenRow);
+        DWCUtilHeap_FreeAndNull(&sSubScreenRow);
     }
 }
 
@@ -304,13 +304,13 @@ BOOL func_ov182_021b87b0(void) {
 }
 
 void func_ov182_021b87d0(int screen) {
-    sSubScreenData = func_ov182_021bb37c(func_ov182_021ab63c(sSubScreenNames[screen]), NULL, 4);
-    func_ov182_021bd200(1, func_ov182_021b8804, NULL, 120);
+    sSubScreenData = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(sSubScreenNames[screen]), NULL, 4);
+    DWCUtilTask_Create(1, func_ov182_021b8804, NULL, 120);
 }
 
 static void func_ov182_021b8804(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sSubScreenData, 0x600);
     GXS_LoadBG1Scr(sSubScreenData, 0, 0x600);
-    func_ov182_021bb420(sSubScreenData);
-    func_ov182_021bd268(1, task);
+    DWCUtilRomResource_FreeFile(sSubScreenData);
+    DWCUtilTask_QueueRemoval(1, task);
 }

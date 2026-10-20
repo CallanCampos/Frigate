@@ -25,7 +25,7 @@ BOOL DWCUtilScreen_Start(int msgIndex, int slot, int value) {
     func_ov182_021ab67c(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
     text = func_ov182_021bbdec(1, 0);
-    str = func_ov182_021ae118(data_ov182_021c40b8, msgIndex, slot, value);
+    str = DWCUtilMsg_GetWithDigit(data_ov182_021c40b8, msgIndex, slot, value);
     flags = func_ov182_021ab7b4();
     func_ov182_021bc0a4(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
     func_ov182_021bc184(text);

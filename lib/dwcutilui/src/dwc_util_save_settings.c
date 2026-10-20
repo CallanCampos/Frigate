@@ -24,7 +24,7 @@ void func_ov182_021b4404(void) {
     func_ov182_021b4420();
     func_ov182_021ab9ac();
     func_ov182_021b7bb0();
-    func_ov182_021adfbc(func_ov182_021b4488);
+    DWCUtilMain_SetUpdate(func_ov182_021b4488);
 }
 
 static void func_ov182_021b4420(void) {
@@ -42,14 +42,14 @@ static void func_ov182_021b4488(void) {
     func_ov182_021bbac4(2, 0, 0x14, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x14);
-    func_ov182_021adfbc(func_ov182_021b44c0);
+    DWCUtilMain_SetUpdate(func_ov182_021b44c0);
 }
 
 // Shows the message of the save once the screens have faded in
 static void func_ov182_021b44c0(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021b8cf0(0x44, 5, 1, -1, 0);
-        func_ov182_021adfbc(func_ov182_021b44f4);
+        DWCUtilMain_SetUpdate(func_ov182_021b44f4);
     }
 }
 
@@ -57,7 +57,7 @@ static void func_ov182_021b44f4(void) {
     func_ov182_021b4514();
     func_ov182_021b4518();
     if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b451c);
+        DWCUtilMain_SetUpdate(func_ov182_021b451c);
     }
 }
 
@@ -70,7 +70,7 @@ static void func_ov182_021b4518(void) {
 static void func_ov182_021b451c(void) {
     func_ov182_021bbac4(3, 1, 1, 8);
     func_ov182_021bbac4(3, 0, 0x14, 8);
-    func_ov182_021adfbc(func_ov182_021b4544);
+    DWCUtilMain_SetUpdate(func_ov182_021b4544);
 }
 
 static void func_ov182_021b4544(void) {
@@ -78,7 +78,7 @@ static void func_ov182_021b4544(void) {
         DWCUtilScreen_Stop();
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x14);
-        func_ov182_021adfc8(2, 1);
-        func_ov182_021adfbc(func_ov182_021b536c);
+        DWCUtilMain_SetLayout(2, 1);
+        DWCUtilMain_SetUpdate(func_ov182_021b536c);
     }
 }

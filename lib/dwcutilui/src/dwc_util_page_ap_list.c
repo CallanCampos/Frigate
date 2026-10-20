@@ -119,8 +119,8 @@ static DWCUtilApList *sApList;
 void func_ov182_021b0c28(void) {
     int again;
 
-    sApList = func_ov182_021bc4d8(sizeof(DWCUtilApList), 4);
-    func_ov182_021adffc(&again, NULL);
+    sApList = DWCUtilHeap_AllocClear(sizeof(DWCUtilApList), 4);
+    DWCUtilMain_GetScreenArgs(&again, NULL);
     if (again == 0) {
         sApListPos.cursor = 0;
         sApListPos.scroll = 0;
@@ -133,10 +133,10 @@ void func_ov182_021b0c28(void) {
     func_ov182_021b0d74();
     func_ov182_021b0de4();
     sApList->text = func_ov182_021bbdec(0, 0);
-    sApList->vblankTask = func_ov182_021bd200(1, func_ov182_021b17bc, NULL, 0x6e);
+    sApList->vblankTask = DWCUtilTask_Create(1, func_ov182_021b17bc, NULL, 0x6e);
     func_ov182_021b14c0();
     func_ov182_021b17f8();
-    func_ov182_021adfbc(func_ov182_021b0ebc);
+    DWCUtilMain_SetUpdate(func_ov182_021b0ebc);
 }
 
 static void func_ov182_021b0cb4(void) {
@@ -144,10 +144,10 @@ static void func_ov182_021b0cb4(void) {
     char palettePath[] = "char/ybBgStep31.ncl.l";
 
     func_ov182_021ab67c("char/jb4ApList.nsc.l", GX_LoadBG3Scr);
-    sApList->backScreen = func_ov182_021bb37c(func_ov182_021ab63c(backPath), NULL, 4);
+    sApList->backScreen = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(backPath), NULL, 4);
     func_ov182_021b6f38(sApList->backScreen);
     func_ov182_021b6f98();
-    sApList->palette = func_ov182_021bb37c(func_ov182_021ab63c(palettePath), NULL, 4);
+    sApList->palette = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -210,20 +210,20 @@ static void func_ov182_021b0ebc(void) {
     func_ov182_021bbac4(2, 0, 0x1d, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x1d);
-    func_ov182_021adfbc(func_ov182_021b0ef4);
+    DWCUtilMain_SetUpdate(func_ov182_021b0ef4);
 }
 
 static void func_ov182_021b0ef4(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(0);
-        func_ov182_021adfbc(func_ov182_021b0f20);
+        DWCUtilMain_SetUpdate(func_ov182_021b0f20);
     }
 }
 
 static void func_ov182_021b0f20(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b0f40);
+        DWCUtilMain_SetUpdate(func_ov182_021b0f40);
     }
 }
 
@@ -261,7 +261,7 @@ static void func_ov182_021b0f50(void) {
                     break;
                 }
                 if (i >= sApList->count) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     break;
                 }
                 DWCUtilUiObject_SetStateIfIdle(1);
@@ -322,37 +322,37 @@ static void func_ov182_021b10c8(void) {
         sApList->dragging = FALSE;
         DWCUtilUiObject_Enable();
         sApListPos.scroll = FX_DivS32(func_ov182_021b7144() * sApList->scrollMax, sApList->barLength);
-        func_ov182_021b80f4(0x13);
+        DWCUtilSound_PlaySe(0x13);
         func_ov182_021b14c0();
         offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
         if (offset == 0) {
             func_ov182_021b17f8();
         } else if (offset < AP_LIST_ROW_HEIGHT / 2) {
-            sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b16d4, NULL, 0x78);
+            sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b16d4, NULL, 0x78);
         } else {
-            sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b1754, NULL, 0x78);
+            sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b1754, NULL, 0x78);
         }
         break;
     case 4:
         if (sApListPos.scroll == 0) {
             if (!sApList->barAtEnd) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sApList->barAtEnd = TRUE;
             }
         } else {
-            func_ov182_021b80f4(0x13);
-            sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b16d4, NULL, 0x78);
+            DWCUtilSound_PlaySe(0x13);
+            sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b16d4, NULL, 0x78);
         }
         break;
     case 6:
         if (sApList->count <= AP_LIST_ROWS || sApListPos.scroll == sApList->scrollMax) {
             if (!sApList->barAtEnd) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sApList->barAtEnd = TRUE;
             }
         } else {
-            func_ov182_021b80f4(0x13);
-            sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b1754, NULL, 0x78);
+            DWCUtilSound_PlaySe(0x13);
+            sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b1754, NULL, 0x78);
         }
         break;
     case 5:
@@ -370,38 +370,38 @@ static void func_ov182_021b1254(void) {
     }
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
         if (sApListPos.cursor == AP_LIST_BUTTON) {
             sApList->confirmed = TRUE;
-            func_ov182_021b80f4(6);
+            DWCUtilSound_PlaySe(6);
             func_ov182_021b1994();
         } else {
             index = sApListPos.cursor + FX_DivS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
             if (sApList->entries[index].security == 2) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 func_ov182_021b7174();
                 DWCUtilUiObject_Disable();
                 func_ov182_021b8cf0(0xe, 1, 1, -1, 0);
-                func_ov182_021adfbc(func_ov182_021b19b4);
+                DWCUtilMain_SetUpdate(func_ov182_021b19b4);
                 return;
             }
             sApList->confirmed = TRUE;
             sApList->chosen = index;
-            func_ov182_021b80f4(6);
+            DWCUtilSound_PlaySe(6);
         }
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021b1308);
+    DWCUtilMain_SetUpdate(func_ov182_021b1308);
 }
 
 static void func_ov182_021b1308(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b1320);
+    DWCUtilMain_SetUpdate(func_ov182_021b1320);
 }
 
 static void func_ov182_021b1320(void) {
@@ -413,7 +413,7 @@ static void func_ov182_021b1320(void) {
         }
         func_ov182_021bbac4(3, 1, 1, 8);
         func_ov182_021bbac4(3, 0, 0x1d, 8);
-        func_ov182_021adfbc(func_ov182_021b136c);
+        DWCUtilMain_SetUpdate(func_ov182_021b136c);
     }
 }
 
@@ -424,7 +424,7 @@ static void func_ov182_021b136c(void) {
     if (func_ov182_021bbaac(1) != 0 || func_ov182_021bbaac(0) != 0 || !DWCUtilUiObject_IsIdle()) {
         return;
     }
-    func_ov182_021bd280(1, sApList->vblankTask);
+    DWCUtilTask_Remove(1, sApList->vblankTask);
     for (i = 0; i < AP_LIST_ROWS + 1; i++) {
         if (sApList->securityOams[i] != NULL) {
             func_ov182_021bcc9c(sApList->securityOams[i]);
@@ -438,8 +438,8 @@ static void func_ov182_021b136c(void) {
     func_ov182_021ab8e4();
     DWCUtilScreen_Stop();
     func_ov182_021b6f78();
-    func_ov182_021bb420(sApList->backScreen);
-    func_ov182_021bb420(sApList->palette);
+    DWCUtilRomResource_FreeFile(sApList->backScreen);
+    DWCUtilRomResource_FreeFile(sApList->palette);
     func_ov182_021bc228(1, 1);
     func_ov182_021bc228(0, 0x1d);
     G2_SetBG0Offset(0, 0);
@@ -447,26 +447,26 @@ static void func_ov182_021b136c(void) {
     if (!sApList->confirmed) {
         func_ov182_021b74f4();
         func_ov182_021b7b20(func_ov182_021b781c()->index);
-        func_ov182_021adfc8(2, 0);
-        func_ov182_021adfbc(func_ov182_021b5bb8);
+        DWCUtilMain_SetLayout(2, 0);
+        DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
     } else if (sApListPos.cursor == AP_LIST_BUTTON) {
         func_ov182_021b74f4();
-        func_ov182_021adfc8(0, 1);
-        func_ov182_021adfbc(func_ov182_021b5000);
+        DWCUtilMain_SetLayout(0, 1);
+        DWCUtilMain_SetUpdate(func_ov182_021b5000);
     } else {
         func_ov182_021b7854(sApList->entries[sApList->chosen].ssid);
-        func_ov182_021adfc8(0, 0);
+        DWCUtilMain_SetLayout(0, 0);
         if (sApList->entries[sApList->chosen].security != 0) {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adff0(1, 1);
-            func_ov182_021adfbc(func_ov182_021b19f4);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetScreenArgs(1, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b19f4);
         } else {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adff0(0, 1);
-            func_ov182_021adfbc(func_ov182_021b6588);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetScreenArgs(0, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b6588);
         }
     }
-    func_ov182_021bc4f0(&sApList);
+    DWCUtilHeap_FreeAndNull(&sApList);
 }
 
 // Draws the rows on the screen from the scroll
@@ -492,7 +492,7 @@ static void func_ov182_021b14c0(void) {
 
 // The access point's SSID, on two lines when it is longer than 16 characters
 static void func_ov182_021b1528(int index, int row) {
-    int length = func_ov182_021bcef8(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
+    int length = DWCUtilString_Length(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
     int y = row * AP_LIST_ROW_HEIGHT;
     u16 line[17];
     int count;
@@ -571,7 +571,7 @@ static void func_ov182_021b16d4(DWCUtilTask *task, void *arg) {
         func_ov182_021b7164();
         func_ov182_021b17f8();
         sApList->scrollTask = NULL;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }
 
@@ -593,7 +593,7 @@ static void func_ov182_021b1754(DWCUtilTask *task, void *arg) {
     func_ov182_021b7164();
     func_ov182_021b17f8();
     sApList->scrollTask = NULL;
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
 }
 
 static void func_ov182_021b17bc(DWCUtilTask *task, void *arg) {
@@ -627,8 +627,8 @@ static void func_ov182_021b182c(int direction) {
             if (sApListPos.scroll == 0) {
                 sApListPos.cursor = AP_LIST_BUTTON;
             } else {
-                func_ov182_021b80f4(0x13);
-                sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b16d4, NULL, 0x78);
+                DWCUtilSound_PlaySe(0x13);
+                sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b16d4, NULL, 0x78);
                 return;
             }
         } else if (sApList->count > 1) {
@@ -668,11 +668,11 @@ static void func_ov182_021b182c(int direction) {
     }
     if (!moved) {
         if (!sApList->atEnd) {
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             sApList->atEnd = TRUE;
         }
     } else {
-        func_ov182_021b80f4(8);
+        DWCUtilSound_PlaySe(8);
         func_ov182_021b17f8();
     }
 }
@@ -681,12 +681,12 @@ static void func_ov182_021b182c(int direction) {
 static void func_ov182_021b18f8(void) {
     if (sApListPos.scroll == 0) {
         if (!sApList->atEnd) {
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             sApList->atEnd = TRUE;
         }
     } else {
-        func_ov182_021b80f4(0x13);
-        sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b16d4, NULL, 0x78);
+        DWCUtilSound_PlaySe(0x13);
+        sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b16d4, NULL, 0x78);
     }
 }
 
@@ -694,12 +694,12 @@ static void func_ov182_021b18f8(void) {
 static void func_ov182_021b193c(void) {
     if (sApListPos.scroll == sApList->scrollMax || sApList->count <= AP_LIST_ROWS) {
         if (!sApList->atEnd) {
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             sApList->atEnd = TRUE;
         }
     } else {
-        func_ov182_021b80f4(0x13);
-        sApList->scrollTask = func_ov182_021bd200(0, func_ov182_021b1754, NULL, 0x78);
+        DWCUtilSound_PlaySe(0x13);
+        sApList->scrollTask = DWCUtilTask_Create(0, func_ov182_021b1754, NULL, 0x78);
     }
 }
 
@@ -712,9 +712,9 @@ static void func_ov182_021b1994(void) {
 
 static void func_ov182_021b19b4(void) {
     if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b19d4);
+        DWCUtilMain_SetUpdate(func_ov182_021b19d4);
     }
 }
 
@@ -722,6 +722,6 @@ static void func_ov182_021b19d4(void) {
     if (!func_ov182_021b8f24()) {
         DWCUtilUiObject_Enable();
         func_ov182_021b7164();
-        func_ov182_021adfbc(func_ov182_021b0f40);
+        DWCUtilMain_SetUpdate(func_ov182_021b0f40);
     }
 }

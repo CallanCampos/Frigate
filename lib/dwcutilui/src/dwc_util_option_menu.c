@@ -78,7 +78,7 @@ void func_ov182_021af25c(void) {
     G2_SetOBJPriority(sOptionMenu.cursor, 3);
     func_ov182_021ab85c(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
                         sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
-    func_ov182_021adfbc(func_ov182_021af3f0);
+    DWCUtilMain_SetUpdate(func_ov182_021af3f0);
 }
 
 // Loads the menu's graphics; without a Wi-Fi ID, the rows of the erasing's and the move's buttons are greyed out
@@ -91,8 +91,8 @@ static void func_ov182_021af2ec(void) {
 
     func_ov182_021ab67c("char/jbBgOption.ncg.l", GX_LoadBG2Char);
     func_ov182_021ab67c("char/jb5OptMenu.nsc.l", GX_LoadBG2Scr);
-    sOptionMenu.palette = func_ov182_021bb37c(func_ov182_021ab63c(rowsPlttPath), NULL, 4);
-    pltt = func_ov182_021bb37c(func_ov182_021ab63c(plttPath), NULL, 4);
+    sOptionMenu.palette = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(rowsPlttPath), NULL, 4);
+    pltt = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(plttPath), NULL, 4);
     DWCBm_GetWifiIdInfo(&info);
     if (info.id == 0) {
         u8 *src = pltt + 0xc0;
@@ -106,7 +106,7 @@ static void func_ov182_021af2ec(void) {
     }
     DC_FlushRange(pltt, 0x200);
     GX_LoadBGPltt(pltt, 0, 0x200);
-    func_ov182_021bb420(pltt);
+    DWCUtilRomResource_FreeFile(pltt);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -118,20 +118,20 @@ static void func_ov182_021af3f0(void) {
     func_ov182_021bbac4(2, 0, 0x14, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x14);
-    func_ov182_021adfbc(func_ov182_021af428);
+    DWCUtilMain_SetUpdate(func_ov182_021af428);
 }
 
 static void func_ov182_021af428(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(0);
-        func_ov182_021adfbc(func_ov182_021af454);
+        DWCUtilMain_SetUpdate(func_ov182_021af454);
     }
 }
 
 static void func_ov182_021af454(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021af474);
+        DWCUtilMain_SetUpdate(func_ov182_021af474);
     }
 }
 
@@ -173,29 +173,29 @@ static void func_ov182_021af528(void) {
 
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
         DWCBm_GetWifiIdInfo(&info);
         if (sOptionMenu.selection != 0 && info.id == 0) {
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             DWCUtilUiObject_SetState(-1);
             return;
         }
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021af6f8();
         sOptionMenu.started = TRUE;
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021af598);
+    DWCUtilMain_SetUpdate(func_ov182_021af598);
 }
 
 static void func_ov182_021af598(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021af5b0);
+    DWCUtilMain_SetUpdate(func_ov182_021af5b0);
 }
 
 static void func_ov182_021af5b0(void) {
@@ -205,7 +205,7 @@ static void func_ov182_021af5b0(void) {
         }
         func_ov182_021bbac4(3, 1, 1, 8);
         func_ov182_021bbac4(3, 0, 0x14, 8);
-        func_ov182_021adfbc(func_ov182_021af5f0);
+        DWCUtilMain_SetUpdate(func_ov182_021af5f0);
     }
 }
 
@@ -214,25 +214,25 @@ static void func_ov182_021af5f0(void) {
         func_ov182_021bcc9c(sOptionMenu.cursor);
         func_ov182_021ab8e4();
         DWCUtilScreen_Stop();
-        func_ov182_021bb420(sOptionMenu.palette);
+        DWCUtilRomResource_FreeFile(sOptionMenu.palette);
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x14);
         if (!sOptionMenu.started) {
-            func_ov182_021adfc8(0, 0);
-            func_ov182_021adfbc(func_ov182_021ae748);
+            DWCUtilMain_SetLayout(0, 0);
+            DWCUtilMain_SetUpdate(func_ov182_021ae748);
         } else {
             switch (sOptionMenu.selection) {
             case 0:
-                func_ov182_021adfc8(0, 1);
-                func_ov182_021adfbc(func_ov182_021aef34);
+                DWCUtilMain_SetLayout(0, 1);
+                DWCUtilMain_SetUpdate(func_ov182_021aef34);
                 break;
             case 1:
-                func_ov182_021adfc8(0, 1);
-                func_ov182_021adfbc(func_ov182_021aeafc);
+                DWCUtilMain_SetLayout(0, 1);
+                DWCUtilMain_SetUpdate(func_ov182_021aeafc);
                 break;
             case 2:
-                func_ov182_021adfc8(0, 1);
-                func_ov182_021adfbc(func_ov182_021afba4);
+                DWCUtilMain_SetLayout(0, 1);
+                DWCUtilMain_SetUpdate(func_ov182_021afba4);
                 break;
             }
         }
@@ -246,7 +246,7 @@ static void func_ov182_021af6a4(int direction) {
     } else {
         sOptionMenu.selection = FX_ModS32(sOptionMenu.selection + 1, 3);
     }
-    func_ov182_021b80f4(8);
+    DWCUtilSound_PlaySe(8);
     func_ov182_021ab85c(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
                         sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
 }

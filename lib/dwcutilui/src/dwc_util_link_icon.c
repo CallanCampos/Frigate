@@ -23,19 +23,19 @@ void func_ov182_021ab9fc(int set) {
     if (sLinkIcon != NULL) {
         return;
     }
-    sLinkIcon = func_ov182_021bc4d8(sizeof(DWCUtilLinkIcon), 4);
+    sLinkIcon = DWCUtilHeap_AllocClear(sizeof(DWCUtilLinkIcon), 4);
     sLinkIcon->set = set;
     sLinkIcon->oam = func_ov182_021bb960(0, sLevelCells[set][0]);
     G2_SetOBJPosition(sLinkIcon->oam, 0xe5, 0x26);
     G2_SetOBJPriority(sLinkIcon->oam, 2);
-    sLinkIcon->task = func_ov182_021bd200(0, func_ov182_021aba9c, NULL, 0x78);
+    sLinkIcon->task = DWCUtilTask_Create(0, func_ov182_021aba9c, NULL, 0x78);
 }
 
 void func_ov182_021aba70(void) {
     if (sLinkIcon != NULL) {
-        func_ov182_021bd280(0, sLinkIcon->task);
+        DWCUtilTask_Remove(0, sLinkIcon->task);
         func_ov182_021bcc9c(sLinkIcon->oam);
-        func_ov182_021bc4f0(&sLinkIcon);
+        DWCUtilHeap_FreeAndNull(&sLinkIcon);
     }
 }
 

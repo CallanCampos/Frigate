@@ -67,11 +67,11 @@ void func_ov182_021b19f4(void) {
     int field;
     int fromList;
 
-    sWepKeyboard = func_ov182_021bc4d8(sizeof(DWCUtilWepKeyboard), 4);
-    func_ov182_021adffc(&field, &fromList);
+    sWepKeyboard = DWCUtilHeap_AllocClear(sizeof(DWCUtilWepKeyboard), 4);
+    DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (field == 0) {
         func_ov182_021b7a08(sWepKeyboard->str);
-        sWepKeyboard->length = func_ov182_021bcef8(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+        sWepKeyboard->length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
     func_ov182_021b1ab4();
     func_ov182_021ab96c(field + 9);
@@ -86,7 +86,7 @@ void func_ov182_021b19f4(void) {
     G2_SetOBJPriority(sWepKeyboard->cursor, 3);
     func_ov182_021b1f04();
     func_ov182_021b1e74();
-    func_ov182_021adfbc(func_ov182_021b1b34);
+    DWCUtilMain_SetUpdate(func_ov182_021b1b34);
 }
 
 // Where the characters are drawn: the two rows' y, the size of a character and each column's x
@@ -113,26 +113,26 @@ static void func_ov182_021b1b34(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b1b6c);
+    DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
 }
 
 static void func_ov182_021b1b6c(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021abb10();
-        func_ov182_021b80f4(0x14);
+        DWCUtilSound_PlaySe(0x14);
         if (sWepKeyboard->length == 0) {
             func_ov182_021abda4(FALSE);
         }
         if (sWepKeyboard->length == WEP_KEYBOARD_LENGTH) {
             func_ov182_021abdb8(FALSE);
         }
-        func_ov182_021adfbc(func_ov182_021b1bc4);
+        DWCUtilMain_SetUpdate(func_ov182_021b1bc4);
     }
 }
 
 static void func_ov182_021b1bc4(void) {
     if (func_ov182_021abd94() != 0xff) {
-        func_ov182_021adfbc(func_ov182_021b1bdc);
+        DWCUtilMain_SetUpdate(func_ov182_021b1bdc);
     }
 }
 
@@ -149,7 +149,7 @@ static void func_ov182_021b1be8(void) {
         break;
     case 0x80:
         if (sWepKeyboard->length != 0) {
-            func_ov182_021b80f4(3);
+            DWCUtilSound_PlaySe(3);
             sWepKeyboard->length--;
             sWepKeyboard->str[sWepKeyboard->length] = '\0';
             if (sWepKeyboard->length == 0) {
@@ -159,25 +159,25 @@ static void func_ov182_021b1be8(void) {
         }
         break;
     case 0x82:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         sWepKeyboard->result = WEP_KEYBOARD_CANCELLED;
-        func_ov182_021adfbc(func_ov182_021b1d04);
+        DWCUtilMain_SetUpdate(func_ov182_021b1d04);
         return;
     case 0x83:
         if (func_ov182_021b1ff8()) {
-            func_ov182_021b80f4(6);
+            DWCUtilSound_PlaySe(6);
             sWepKeyboard->result = WEP_KEYBOARD_ENTERED;
         } else {
             sWepKeyboard->result = WEP_KEYBOARD_INVALID;
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
         }
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
-        func_ov182_021adfbc(func_ov182_021b1d04);
+        DWCUtilMain_SetUpdate(func_ov182_021b1d04);
         return;
     case WEP_KEYBOARD_SPACE:
     default:
         if (sWepKeyboard->length != WEP_KEYBOARD_LENGTH) {
-            func_ov182_021b80f4(1);
+            DWCUtilSound_PlaySe(1);
             sWepKeyboard->str[sWepKeyboard->length] = key;
             sWepKeyboard->length++;
             func_ov182_021abda4(TRUE);
@@ -196,14 +196,14 @@ static void func_ov182_021b1d00(void) {
 
 static void func_ov182_021b1d04(void) {
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b1d18);
+    DWCUtilMain_SetUpdate(func_ov182_021b1d18);
 }
 
 static void func_ov182_021b1d18(void) {
     if (func_ov182_021bbaac(1) == 0) {
         func_ov182_021abd6c();
-        func_ov182_021b80f4(0x15);
-        func_ov182_021adfbc(func_ov182_021b1d3c);
+        DWCUtilSound_PlaySe(0x15);
+        DWCUtilMain_SetUpdate(func_ov182_021b1d3c);
     }
 }
 
@@ -214,17 +214,17 @@ static void func_ov182_021b1d3c(void) {
 
     if (!func_ov182_021abdc8()) {
         if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
-            func_ov182_021adfbc(func_ov182_021b1dc4);
+            DWCUtilMain_SetUpdate(func_ov182_021b1dc4);
             return;
         }
         if (sWepKeyboard->result == WEP_KEYBOARD_INVALID) {
             func_ov182_021b8cf0(6, 3, 1, -1, 0);
-            func_ov182_021adfbc(func_ov182_021b20d4);
+            DWCUtilMain_SetUpdate(func_ov182_021b20d4);
             return;
         }
-        func_ov182_021adffc(NULL, &fromList);
+        DWCUtilMain_GetScreenArgs(NULL, &fromList);
         func_ov182_021b8cf0(msgIndices[fromList], 2, 1, -1, 0);
-        func_ov182_021adfbc(func_ov182_021b1f50);
+        DWCUtilMain_SetUpdate(func_ov182_021b1f50);
     }
 }
 
@@ -240,21 +240,21 @@ static void func_ov182_021b1dc4(void) {
     func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     func_ov182_021bc228(1, 1);
     func_ov182_021bc228(0, 0x15);
-    func_ov182_021adffc(&field, &fromList);
+    DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (fromList == 0) {
-        func_ov182_021adfc8(2, 1);
-        func_ov182_021adff0(0, field);
-        func_ov182_021adfbc(func_ov182_021b2d48);
+        DWCUtilMain_SetLayout(2, 1);
+        DWCUtilMain_SetScreenArgs(0, field);
+        DWCUtilMain_SetUpdate(func_ov182_021b2d48);
     } else if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
-        func_ov182_021adfc8(0, 1);
-        func_ov182_021adff0(1, 0);
-        func_ov182_021adfbc(func_ov182_021b0c28);
+        DWCUtilMain_SetLayout(0, 1);
+        DWCUtilMain_SetScreenArgs(1, 0);
+        DWCUtilMain_SetUpdate(func_ov182_021b0c28);
     } else {
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adff0(0, 1);
-        func_ov182_021adfbc(func_ov182_021b6588);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetScreenArgs(0, 1);
+        DWCUtilMain_SetUpdate(func_ov182_021b6588);
     }
-    func_ov182_021bc4f0(&sWepKeyboard);
+    DWCUtilHeap_FreeAndNull(&sWepKeyboard);
 }
 
 // Draws the text, one character at a time, as a string of one character
@@ -302,16 +302,16 @@ static void func_ov182_021b1f50(void) {
     sWepKeyboard->result = func_ov182_021b8f14();
     switch (sWepKeyboard->result) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        func_ov182_021b80f4(0xe);
+        DWCUtilSound_PlaySe(0xe);
         break;
     default:
         return;
     }
     func_ov182_021b8eec();
-    func_ov182_021adfbc(func_ov182_021b1f8c);
+    DWCUtilMain_SetUpdate(func_ov182_021b1f8c);
 }
 
 // Takes the text into the connection being edited as its SSID or its WEP key, or goes back to the keyboard
@@ -322,12 +322,12 @@ static void func_ov182_021b1f8c(void) {
     if (!func_ov182_021b8f24()) {
         if (sWepKeyboard->result == 0) {
             G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
-            func_ov182_021adfbc(func_ov182_021b1b6c);
+            DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
             return;
         }
-        func_ov182_021adffc(&field, NULL);
+        DWCUtilMain_GetScreenArgs(&field, NULL);
         take[field](sWepKeyboard->str);
-        func_ov182_021adfbc(func_ov182_021b1dc4);
+        DWCUtilMain_SetUpdate(func_ov182_021b1dc4);
     }
 }
 
@@ -339,11 +339,11 @@ static BOOL func_ov182_021b1ff8(void) {
     int length;
     int i;
 
-    func_ov182_021adffc(&field, &fromList);
+    DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (fromList == 1) {
         DWCUtilScreen_Start(0x35, -1, 0);
     }
-    func_ov182_021adffc(&field, &fromList);
+    DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (field == 0) {
         if (sWepKeyboard->str[0] != '\0') {
             return TRUE;
@@ -353,7 +353,7 @@ static BOOL func_ov182_021b1ff8(void) {
     if (fromList == 1 && sWepKeyboard->str[0] == '\0') {
         return FALSE;
     }
-    length = func_ov182_021bcef8(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+    length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     switch (length) {
     case 0:
     case 5:
@@ -378,15 +378,15 @@ static BOOL func_ov182_021b1ff8(void) {
 
 static void func_ov182_021b20d4(void) {
     if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b20f4);
+        DWCUtilMain_SetUpdate(func_ov182_021b20f4);
     }
 }
 
 static void func_ov182_021b20f4(void) {
     if (!func_ov182_021b8f24()) {
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
-        func_ov182_021adfbc(func_ov182_021b1b6c);
+        DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
     }
 }

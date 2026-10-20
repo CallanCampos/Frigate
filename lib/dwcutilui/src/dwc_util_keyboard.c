@@ -167,7 +167,7 @@ void func_ov182_021abb10(void) {
 
     rect[2] = 0x11;
     rect[3] = 0x12;
-    sKeyboard = func_ov182_021bc4d8(sizeof(DWCUtilKeyboard), 4);
+    sKeyboard = DWCUtilHeap_AllocClear(sizeof(DWCUtilKeyboard), 4);
     sKeyboard->key = 0xff;
     sKeyboard->cursorPos = 0;
     sKeyboard->backspaceEnabled = TRUE;
@@ -208,13 +208,13 @@ void func_ov182_021abb10(void) {
     sKeyboard->cursor = func_ov182_021bb97c(0, 0x40, TRUE);
     func_ov182_021bb6f8(sKeyboard->cursor, -1, 0x200, 0);
     func_ov182_021bb878(sKeyboard->cursor, -1, 2);
-    sKeyboard->task = func_ov182_021bd200(0, func_ov182_021abddc, NULL, 0x78);
+    sKeyboard->task = DWCUtilTask_Create(0, func_ov182_021abddc, NULL, 0x78);
     func_ov182_021ac608(sKeyboard->mode, 0, 0xc0);
 }
 
 void func_ov182_021abd6c(void) {
     func_ov182_021bb690(sKeyboard->cursor);
-    func_ov182_021bd264(sKeyboard->task, func_ov182_021acbac);
+    DWCUtilTask_SetCallback(sKeyboard->task, func_ov182_021acbac);
 }
 
 u8 func_ov182_021abd94(void) {
@@ -245,7 +245,7 @@ static void func_ov182_021abddc(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ac608(sKeyboard->mode, 0, 0x51);
     func_ov182_021ac608(sKeyboard->mode, 1, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021abe34);
+    DWCUtilTask_SetCallback(task, func_ov182_021abe34);
 }
 
 static void func_ov182_021abe34(DWCUtilTask *task, void *arg) {
@@ -257,7 +257,7 @@ static void func_ov182_021abe34(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ac608(sKeyboard->mode, 1, 0x67);
     func_ov182_021ac608(sKeyboard->mode, 2, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021abe8c);
+    DWCUtilTask_SetCallback(task, func_ov182_021abe8c);
 }
 
 static void func_ov182_021abe8c(DWCUtilTask *task, void *arg) {
@@ -269,7 +269,7 @@ static void func_ov182_021abe8c(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ac608(sKeyboard->mode, 2, 0x7d);
     func_ov182_021ac608(sKeyboard->mode, 3, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021abee8);
+    DWCUtilTask_SetCallback(task, func_ov182_021abee8);
 }
 
 static void func_ov182_021abee8(DWCUtilTask *task, void *arg) {
@@ -281,7 +281,7 @@ static void func_ov182_021abee8(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ac608(sKeyboard->mode, 3, 0x93);
     func_ov182_021ac608(sKeyboard->mode, 4, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021abf44);
+    DWCUtilTask_SetCallback(task, func_ov182_021abf44);
 }
 
 static void func_ov182_021abf44(DWCUtilTask *task, void *arg) {
@@ -296,7 +296,7 @@ static void func_ov182_021abf44(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ac608(sKeyboard->mode, 4, 0xaa);
     func_ov182_021ac898();
-    func_ov182_021bd264(task, func_ov182_021abf9c);
+    DWCUtilTask_SetCallback(task, func_ov182_021abf9c);
 }
 
 static void func_ov182_021abf9c(DWCUtilTask *task, void *arg) {
@@ -316,10 +316,10 @@ static void func_ov182_021abfb0(void) {
             func_ov182_021bc1c0(&sCharKeyPositions[i], sCharKeySize, rect);
             if (func_ov182_021bc888(rect)) {
                 if (!sKeyboard->charsEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sKeyboard->touched = i;
                 return;
             }
@@ -328,10 +328,10 @@ static void func_ov182_021abfb0(void) {
             func_ov182_021bc1c0(&sSpecialPositions[i], &sSpecialSizes[i], rect);
             if (func_ov182_021bc888(rect)) {
                 if ((i == 3 && !sKeyboard->backspaceEnabled) || (i == 2 && !sKeyboard->charsEnabled)) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
-                func_ov182_021b80f4(sSpecialSounds[i]);
+                DWCUtilSound_PlaySe(sSpecialSounds[i]);
                 sKeyboard->touched = i + KEYBOARD_FIRST_SPECIAL;
                 return;
             }
@@ -339,7 +339,7 @@ static void func_ov182_021abfb0(void) {
         for (i = 0; i < 2; i++) {
             func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
             if (func_ov182_021bc888(rect)) {
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sKeyboard->touched = i + KEYBOARD_FIRST_BUTTON;
                 return;
             }
@@ -424,12 +424,12 @@ static void func_ov182_021ac0e8(void) {
 
 static void func_ov182_021ac2bc(void) {
     func_ov182_021ac7a0(sKeyboard->mode == 2 ? 0 : 2);
-    func_ov182_021b80f4(1);
+    DWCUtilSound_PlaySe(1);
 }
 
 static void func_ov182_021ac2e4(void) {
     func_ov182_021ac7a0(sKeyboard->mode == 1 ? 0 : 1);
-    func_ov182_021b80f4(1);
+    DWCUtilSound_PlaySe(1);
 }
 
 static void func_ov182_021ac30c(void) {
@@ -461,7 +461,7 @@ static void func_ov182_021ac30c(void) {
                         return;
                     }
                     if (!sKeyboard->backspaceEnabled) {
-                        func_ov182_021b80f4(9);
+                        DWCUtilSound_PlaySe(9);
                         sKeyboard->touched = -1;
                         return;
                     }
@@ -520,7 +520,7 @@ static void func_ov182_021ac478(void) {
         key = sKeyboard->cursorPos;
         if (key < KEYBOARD_CHAR_KEYS) {
             if (!sKeyboard->charsEnabled) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 return;
             }
             sKeyboard->key = sKeyCodes[sKeyboard->mode][key];
@@ -540,13 +540,13 @@ static void func_ov182_021ac478(void) {
                 return;
             case 2:
                 if (!sKeyboard->charsEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
                 break;
             case 3:
                 if (!sKeyboard->backspaceEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
                 break;
@@ -564,7 +564,7 @@ static void func_ov182_021ac478(void) {
             if (sKeyboard->errorPlayed) {
                 return;
             }
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             sKeyboard->errorPlayed = TRUE;
             return;
         }
@@ -802,7 +802,7 @@ static void func_ov182_021ac928(int direction) {
         }
     }
     func_ov182_021ac898();
-    func_ov182_021b80f4(8);
+    DWCUtilSound_PlaySe(8);
 }
 
 static void func_ov182_021acbac(DWCUtilTask *task, void *arg) {
@@ -810,7 +810,7 @@ static void func_ov182_021acbac(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ac608(sKeyboard->mode, 4, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021acbf4);
+        DWCUtilTask_SetCallback(task, func_ov182_021acbf4);
     }
 }
 
@@ -819,7 +819,7 @@ static void func_ov182_021acbf4(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ac608(sKeyboard->mode, 3, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021acc34);
+        DWCUtilTask_SetCallback(task, func_ov182_021acc34);
     }
 }
 
@@ -828,7 +828,7 @@ static void func_ov182_021acc34(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ac608(sKeyboard->mode, 2, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021acc74);
+        DWCUtilTask_SetCallback(task, func_ov182_021acc74);
     }
 }
 
@@ -837,7 +837,7 @@ static void func_ov182_021acc74(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ac608(sKeyboard->mode, 1, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021accb0);
+        DWCUtilTask_SetCallback(task, func_ov182_021accb0);
     }
 }
 
@@ -846,7 +846,7 @@ static void func_ov182_021accb0(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ac608(sKeyboard->mode, 0, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021accec);
+        DWCUtilTask_SetCallback(task, func_ov182_021accec);
     }
 }
 
@@ -854,7 +854,7 @@ static void func_ov182_021accec(DWCUtilTask *task, void *arg) {
     int i;
     int j;
 
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 4; j++) {
             func_ov182_021bbdcc(sKeyboard->labels[i][j]);
@@ -872,5 +872,5 @@ static void func_ov182_021accec(DWCUtilTask *task, void *arg) {
     for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
         func_ov182_021bcc9c(sKeyboard->charOams[i]);
     }
-    func_ov182_021bc4f0(&sKeyboard);
+    DWCUtilHeap_FreeAndNull(&sKeyboard);
 }

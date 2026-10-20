@@ -39,7 +39,7 @@ void func_ov182_021aff3c(void) {
     func_ov182_021aff68();
     func_ov182_021ab6f0(0x20);
     sNoticeScreen.subScreen = DWCUtilScreen_Start(0x3c, -1, 0);
-    func_ov182_021adfbc(func_ov182_021affb8);
+    DWCUtilMain_SetUpdate(func_ov182_021affb8);
 }
 
 static void func_ov182_021aff68(void) {
@@ -58,20 +58,20 @@ static void func_ov182_021affb8(void) {
         func_ov182_021bbac4(2, 1, 1, 8);
         func_ov182_021bc1dc(1, 1);
     }
-    func_ov182_021adfbc(func_ov182_021b0000);
+    DWCUtilMain_SetUpdate(func_ov182_021b0000);
 }
 
 static void func_ov182_021b0000(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(3);
-        func_ov182_021adfbc(func_ov182_021b0028);
+        DWCUtilMain_SetUpdate(func_ov182_021b0028);
     }
 }
 
 static void func_ov182_021b0028(void) {
     if (DWCUtilUiObject_GetState() != -2 && func_ov182_021ae210()) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b0050);
+        DWCUtilMain_SetUpdate(func_ov182_021b0050);
     }
 }
 
@@ -92,22 +92,22 @@ static void func_ov182_021b008c(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 1:
         sNoticeScreen.yes = TRUE;
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         break;
     case 0:
         sNoticeScreen.yes = FALSE;
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021b00c0);
+    DWCUtilMain_SetUpdate(func_ov182_021b00c0);
 }
 
 static void func_ov182_021b00c0(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b00d8);
+    DWCUtilMain_SetUpdate(func_ov182_021b00d8);
 }
 
 static void func_ov182_021b00d8(void) {
@@ -117,7 +117,7 @@ static void func_ov182_021b00d8(void) {
             func_ov182_021bbac4(3, 1, 1, 8);
         }
         func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b011c);
+        DWCUtilMain_SetUpdate(func_ov182_021b011c);
     }
 }
 
@@ -130,11 +130,11 @@ static void func_ov182_021b011c(void) {
         }
         func_ov182_021bc228(0, 0x15);
         if (!sNoticeScreen.yes) {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021af25c);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021af25c);
         } else {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021b043c);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b043c);
         }
     }
 }

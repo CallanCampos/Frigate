@@ -59,7 +59,7 @@ static const u8 sScrollbarCells[3] = { 0x10, 0x0f, 0x0e };
 static DWCUtilScrollbar *sScrollbar;
 
 void func_ov182_021b70a0(int kind, int range, u16 x, u16 y, int pos) {
-    sScrollbar = func_ov182_021bc4d8(sizeof(DWCUtilScrollbar), 4);
+    sScrollbar = DWCUtilHeap_AllocClear(sizeof(DWCUtilScrollbar), 4);
     sScrollbar->kind = kind;
     sScrollbar->range = range;
     sScrollbar->pos = pos;
@@ -67,13 +67,13 @@ void func_ov182_021b70a0(int kind, int range, u16 x, u16 y, int pos) {
     sScrollbar->handle = func_ov182_021bb97c(0, sScrollbarCells[kind], TRUE);
     func_ov182_021bb7e0(sScrollbar->handle, -1, x, y + pos);
     func_ov182_021bb878(sScrollbar->handle, -1, 1);
-    sScrollbar->task = func_ov182_021bd200(0, func_ov182_021b7184, NULL, 0x80);
+    sScrollbar->task = DWCUtilTask_Create(0, func_ov182_021b7184, NULL, 0x80);
 }
 
 void func_ov182_021b711c(void) {
-    func_ov182_021bd280(0, sScrollbar->task);
+    DWCUtilTask_Remove(0, sScrollbar->task);
     func_ov182_021bb690(sScrollbar->handle);
-    func_ov182_021bc4f0(&sScrollbar);
+    DWCUtilHeap_FreeAndNull(&sScrollbar);
 }
 
 u8 func_ov182_021b7144(void) {
@@ -106,8 +106,8 @@ static void func_ov182_021b7184(DWCUtilTask *task, void *arg) {
         switch (func_ov182_021b73ac()) {
         case SCROLLBAR_PART_HANDLE:
             if (sScrollbar->kind != 0) {
-                func_ov182_021b80f4(0x16);
-                func_ov182_021b810c(0);
+                DWCUtilSound_PlaySe(0x16);
+                DWCUtilSound_SetVolume(0);
                 sScrollbar->event = DWC_UTIL_SCROLLBAR_GRAB;
                 func_ov182_021bc9e4(sScrollbar->grabPoint);
                 sScrollbar->grabPos = sScrollbar->pos;
@@ -171,7 +171,7 @@ static void func_ov182_021b726c(void) {
             return;
         }
     }
-    func_ov182_021b8138();
+    DWCUtilSound_StopSe();
     sScrollbar->state = SCROLLBAR_IDLE;
     sScrollbar->event = DWC_UTIL_SCROLLBAR_RELEASE;
 }
@@ -192,7 +192,7 @@ static void func_ov182_021b72ec(int pos) {
     } else {
         volume = 0x7f;
     }
-    func_ov182_021b810c(volume);
+    DWCUtilSound_SetVolume(volume);
     if (distance < 2) {
         pitch = -0x100;
     } else if (distance < 6) {
@@ -200,7 +200,7 @@ static void func_ov182_021b72ec(int pos) {
     } else {
         pitch = 0x100;
     }
-    func_ov182_021b8120(0xffff, pitch);
+    DWCUtilSound_SetTrackPitch(0xffff, pitch);
 }
 
 // An arrow is held

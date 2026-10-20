@@ -25,14 +25,14 @@ static struct {
 } sBgBuffer;
 
 void func_ov182_021b6f38(const void *screen) {
-    sBgBuffer.buffer = func_ov182_021bc4d8(sizeof(DWCUtilBgBuffer), 4);
+    sBgBuffer.buffer = DWCUtilHeap_AllocClear(sizeof(DWCUtilBgBuffer), 4);
     MIi_CpuCopyFast(screen, sBgBuffer.buffer->screen, sizeof(sBgBuffer.buffer->screen));
-    sBgBuffer.buffer->task = func_ov182_021bd200(1, func_ov182_021b6fe0, NULL, 120);
+    sBgBuffer.buffer->task = DWCUtilTask_Create(1, func_ov182_021b6fe0, NULL, 120);
 }
 
 void func_ov182_021b6f78(void) {
-    func_ov182_021bd280(1, sBgBuffer.buffer->task);
-    func_ov182_021bc4f0(&sBgBuffer.buffer);
+    DWCUtilTask_Remove(1, sBgBuffer.buffer->task);
+    DWCUtilHeap_FreeAndNull(&sBgBuffer.buffer);
 }
 
 void func_ov182_021b6f98(void) {
@@ -61,20 +61,20 @@ static void func_ov182_021b6fe0(DWCUtilTask *task, void *arg) {
 void func_ov182_021b7014(const void *palette, int src, int dest) {
     sBgBuffer.paletteSrc = (const u8 *)palette + src * 32;
     sBgBuffer.paletteDest = (void *)(HW_BG_PLTT + dest * 32);
-    func_ov182_021bd200(1, func_ov182_021b7040, NULL, 120);
+    DWCUtilTask_Create(1, func_ov182_021b7040, NULL, 120);
 }
 
 static void func_ov182_021b7040(DWCUtilTask *task, void *arg) {
     MI_CpuCopy16(sBgBuffer.paletteSrc, sBgBuffer.paletteDest, 32);
-    func_ov182_021bd268(1, task);
+    DWCUtilTask_QueueRemoval(1, task);
 }
 
 void func_ov182_021b7060(const void *palette) {
     sBgBuffer.paletteSrc = palette;
-    func_ov182_021bd200(1, func_ov182_021b707c, NULL, 120);
+    DWCUtilTask_Create(1, func_ov182_021b707c, NULL, 120);
 }
 
 static void func_ov182_021b707c(DWCUtilTask *task, void *arg) {
     MI_CpuCopy16(sBgBuffer.paletteSrc, (void *)HW_BG_PLTT, 0x200);
-    func_ov182_021bd268(1, task);
+    DWCUtilTask_QueueRemoval(1, task);
 }

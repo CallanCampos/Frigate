@@ -36,7 +36,7 @@ void func_ov182_021afba4(void) {
     func_ov182_021ab96c(0x13);
     DWCUtilScreen_Start(0x3c, -1, 0);
     func_ov182_021ab6f0(0x1b);
-    func_ov182_021adfbc(func_ov182_021afc28);
+    DWCUtilMain_SetUpdate(func_ov182_021afc28);
 }
 
 static void func_ov182_021afbd8(void) {
@@ -53,20 +53,20 @@ static void func_ov182_021afc28(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021afc60);
+    DWCUtilMain_SetUpdate(func_ov182_021afc60);
 }
 
 static void func_ov182_021afc60(void) {
     if (func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(3);
-        func_ov182_021adfbc(func_ov182_021afc80);
+        DWCUtilMain_SetUpdate(func_ov182_021afc80);
     }
 }
 
 static void func_ov182_021afc80(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021afca0);
+        DWCUtilMain_SetUpdate(func_ov182_021afca0);
     }
 }
 
@@ -86,22 +86,22 @@ static void func_ov182_021afcd8(void) {
 static void func_ov182_021afcdc(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         sYes = TRUE;
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021afd10);
+    DWCUtilMain_SetUpdate(func_ov182_021afd10);
 }
 
 static void func_ov182_021afd10(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021afd28);
+    DWCUtilMain_SetUpdate(func_ov182_021afd28);
 }
 
 static void func_ov182_021afd28(void) {
@@ -111,7 +111,7 @@ static void func_ov182_021afd28(void) {
             func_ov182_021bbac4(3, 1, 1, 8);
         }
         func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021afd6c);
+        DWCUtilMain_SetUpdate(func_ov182_021afd6c);
     }
 }
 
@@ -124,11 +124,11 @@ static void func_ov182_021afd6c(void) {
         }
         func_ov182_021bc228(0, 0x15);
         if (!sYes) {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021af25c);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021af25c);
         } else {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021afa28);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021afa28);
         }
     }
 }

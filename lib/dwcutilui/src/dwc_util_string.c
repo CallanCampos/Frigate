@@ -1,6 +1,6 @@
 #include "dwc_util_string.h"
 
-int func_ov182_021bcef8(const u8 *str, int max) {
+int DWCUtilString_Length(const u8 *str, int max) {
     int i;
 
     for (i = 0; i < max; i++) {
@@ -11,7 +11,7 @@ int func_ov182_021bcef8(const u8 *str, int max) {
     return i;
 }
 
-int func_ov182_021bcf10(u16 *dst, const u8 *src, int size) {
+int DWCUtilString_Widen(u16 *dst, const u8 *src, int size) {
     int i;
 
     for (i = 0; i < size - 1; i++) {

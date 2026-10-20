@@ -25,13 +25,13 @@ static const u8 sWifiSettingsZeroAddress[4] = { 0, 0, 0, 0 };
 static DWCUtilWifiSettings *sWifiSettings;
 
 void func_ov182_021b77dc(void) {
-    sWifiSettings = func_ov182_021bc4d8(sizeof(DWCUtilWifiSettings), 32);
+    sWifiSettings = DWCUtilHeap_AllocClear(sizeof(DWCUtilWifiSettings), 32);
     MATHi_CRC16InitTableRev(&sWifiSettings->crcTable, 0xa001);
     DWCBm_ReadAllNtrPages(sWifiSettings);
 }
 
 void func_ov182_021b780c(void) {
-    func_ov182_021bc4f0(&sWifiSettings);
+    DWCUtilHeap_FreeAndNull(&sWifiSettings);
 }
 
 DWCUtilSettingsEdit *func_ov182_021b781c(void) {
@@ -57,7 +57,7 @@ void func_ov182_021b7874(const u8 *key) {
     u8 *dest;
 
     MI_CpuFill8(sWifiSettings->edit.connection.wepKey[0], 0, sizeof(sWifiSettings->edit.connection.wepKey[0]));
-    length = func_ov182_021bcef8(key, 32);
+    length = DWCUtilString_Length(key, 32);
     switch (length) {
     case 0:
     case 10:
@@ -317,9 +317,9 @@ static void func_ov182_021b7f08(int index) {
                 MATH_CalcCRC16(&sWifiSettings->crcTable, &sWifiSettings->pages[i], sizeof(DWCBmNtrPage) - sizeof(u16));
         }
     }
-    scratch = func_ov182_021bc4d8(0x100, 32);
+    scratch = DWCUtilHeap_AllocClear(0x100, 32);
     DWCBm_WriteNtrPages(sWifiSettings, write, scratch);
-    func_ov182_021bc4f0(&scratch);
+    DWCUtilHeap_FreeAndNull(&scratch);
 }
 
 void func_ov182_021b7ff0(const u8 *digits, u8 *address) {

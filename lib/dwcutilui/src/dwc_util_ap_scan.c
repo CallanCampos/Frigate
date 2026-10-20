@@ -32,7 +32,7 @@ static DWCUtilApScan *sApScan;
 
 void func_ov182_021b74d4(void) {
     if (sApScan == NULL) {
-        sApScan = func_ov182_021bc4d8(sizeof(DWCUtilApScan), 32);
+        sApScan = DWCUtilHeap_AllocClear(sizeof(DWCUtilApScan), 32);
     }
 }
 
@@ -40,7 +40,7 @@ void func_ov182_021b74f4(void) {
     if (sApScan != NULL) {
         while (WM_GetAllowedChannel() != 0x8000) {
         }
-        func_ov182_021bc4f0(&sApScan);
+        DWCUtilHeap_FreeAndNull(&sApScan);
     }
 }
 

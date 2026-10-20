@@ -36,7 +36,7 @@ void func_ov182_021b688c(void) {
     DWCUtilScreen_Start(0x38, -1, 0);
     func_ov182_021ab6a4(1);
     func_ov182_021ab6f0(0x27);
-    func_ov182_021adfbc(func_ov182_021b6938);
+    DWCUtilMain_SetUpdate(func_ov182_021b6938);
 }
 
 static void func_ov182_021b68c8(void) {
@@ -55,20 +55,20 @@ static void func_ov182_021b6938(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b6970);
+    DWCUtilMain_SetUpdate(func_ov182_021b6970);
 }
 
 static void func_ov182_021b6970(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(6);
-        func_ov182_021adfbc(func_ov182_021b6998);
+        DWCUtilMain_SetUpdate(func_ov182_021b6998);
     }
 }
 
 static void func_ov182_021b6998(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b69b8);
+        DWCUtilMain_SetUpdate(func_ov182_021b69b8);
     }
 }
 
@@ -88,22 +88,22 @@ static void func_ov182_021b69f0(void) {
 static void func_ov182_021b69f4(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         sUsbIntroYes = TRUE;
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021b6a28);
+    DWCUtilMain_SetUpdate(func_ov182_021b6a28);
 }
 
 static void func_ov182_021b6a28(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b6a40);
+    DWCUtilMain_SetUpdate(func_ov182_021b6a40);
 }
 
 static void func_ov182_021b6a40(void) {
@@ -113,7 +113,7 @@ static void func_ov182_021b6a40(void) {
             func_ov182_021bbac4(3, 1, 1, 8);
         }
         func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b6a84);
+        DWCUtilMain_SetUpdate(func_ov182_021b6a84);
     }
 }
 
@@ -126,11 +126,11 @@ static void func_ov182_021b6a84(void) {
         }
         func_ov182_021bc228(0, 0x15);
         if (!sUsbIntroYes) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b536c);
         } else {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b6b1c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b6b1c);
         }
     }
 }

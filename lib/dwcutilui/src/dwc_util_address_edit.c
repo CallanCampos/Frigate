@@ -79,8 +79,8 @@ void func_ov182_021b2120(void) {
     int field;
     DWCUtilAddressEdit *edit;
 
-    sAddressEdit = func_ov182_021bc4d8(sizeof(DWCUtilAddressEdit), 4);
-    func_ov182_021adffc(&field, NULL);
+    sAddressEdit = DWCUtilHeap_AllocClear(sizeof(DWCUtilAddressEdit), 4);
+    DWCUtilMain_GetScreenArgs(&field, NULL);
     read[field](sAddressEdit->digits);
     edit = sAddressEdit;
     if (memcmp(edit->digits, "  0", 3) != 0) {
@@ -98,7 +98,7 @@ void func_ov182_021b2120(void) {
     G2_SetOBJPriority(sAddressEdit->cursor, 3);
     func_ov182_021b26f4();
     func_ov182_021b267c();
-    func_ov182_021adfbc(func_ov182_021b2290);
+    DWCUtilMain_SetUpdate(func_ov182_021b2290);
 }
 
 static void func_ov182_021b2210(void) {
@@ -118,13 +118,13 @@ static void func_ov182_021b2290(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b22c8);
+    DWCUtilMain_SetUpdate(func_ov182_021b22c8);
 }
 
 static void func_ov182_021b22c8(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021acd80();
-        func_ov182_021b80f4(0x14);
+        DWCUtilSound_PlaySe(0x14);
         if (sAddressEdit->group == 0) {
             func_ov182_021acfac(FALSE);
             func_ov182_021acfcc(FALSE);
@@ -134,13 +134,13 @@ static void func_ov182_021b22c8(void) {
             }
             func_ov182_021acfcc(FALSE);
         }
-        func_ov182_021adfbc(func_ov182_021b2324);
+        DWCUtilMain_SetUpdate(func_ov182_021b2324);
     }
 }
 
 static void func_ov182_021b2324(void) {
     if (func_ov182_021acf9c() != 0x1f) {
-        func_ov182_021adfbc(func_ov182_021b233c);
+        DWCUtilMain_SetUpdate(func_ov182_021b233c);
     }
 }
 
@@ -161,7 +161,7 @@ static void func_ov182_021b2348(void) {
         if (sAddressEdit->group == 0 && sAddressEdit->digits[2] == 0) {
             break;
         }
-        func_ov182_021b80f4(3);
+        DWCUtilSound_PlaySe(3);
         if (sAddressEdit->digits[sAddressEdit->group * 3 + 2] == 0) {
             sAddressEdit->group--;
         }
@@ -174,35 +174,35 @@ static void func_ov182_021b2348(void) {
         break;
     case 0x11:
         if (sAddressEdit->group < ADDRESS_EDIT_LAST_GROUP && sAddressEdit->digits[sAddressEdit->group * 3 + 2] != 0) {
-            func_ov182_021b80f4(1);
+            DWCUtilSound_PlaySe(1);
             sAddressEdit->group++;
             func_ov182_021acfcc(FALSE);
         }
         break;
     case 0x12:
         sAddressEdit->result = ADDRESS_EDIT_CANCELLED;
-        func_ov182_021b80f4(7);
-        func_ov182_021adfbc(func_ov182_021b256c);
+        DWCUtilSound_PlaySe(7);
+        DWCUtilMain_SetUpdate(func_ov182_021b256c);
         return;
     case 0x13:
         if (func_ov182_021b281c()) {
-            func_ov182_021b80f4(6);
+            DWCUtilSound_PlaySe(6);
             sAddressEdit->result = ADDRESS_EDIT_ENTERED;
         } else {
             sAddressEdit->result = ADDRESS_EDIT_INVALID;
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
         }
         sAddressEdit->group = ADDRESS_EDIT_LAST_GROUP;
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
         func_ov182_021b26f4();
         func_ov182_021b27d4();
-        func_ov182_021adfbc(func_ov182_021b256c);
+        DWCUtilMain_SetUpdate(func_ov182_021b256c);
         return;
     default:
         if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && func_ov182_021b2510(26)) {
             break;
         }
-        func_ov182_021b80f4(1);
+        DWCUtilSound_PlaySe(1);
         digits = sAddressEdit->digits;
         first = sAddressEdit->group * 3;
         if (digits[first + 2] == 0) {
@@ -265,14 +265,14 @@ static void func_ov182_021b2568(void) {
 
 static void func_ov182_021b256c(void) {
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b2580);
+    DWCUtilMain_SetUpdate(func_ov182_021b2580);
 }
 
 static void func_ov182_021b2580(void) {
     if (func_ov182_021bbaac(1) == 0) {
         func_ov182_021acf7c();
-        func_ov182_021b80f4(0x15);
-        func_ov182_021adfbc(func_ov182_021b25a4);
+        DWCUtilSound_PlaySe(0x15);
+        DWCUtilMain_SetUpdate(func_ov182_021b25a4);
     }
 }
 
@@ -280,16 +280,16 @@ static void func_ov182_021b2580(void) {
 static void func_ov182_021b25a4(void) {
     if (!func_ov182_021acfdc()) {
         if (sAddressEdit->result == ADDRESS_EDIT_CANCELLED) {
-            func_ov182_021adfbc(func_ov182_021b2604);
+            DWCUtilMain_SetUpdate(func_ov182_021b2604);
             return;
         }
         if (sAddressEdit->result == ADDRESS_EDIT_INVALID) {
             func_ov182_021b8cf0(6, 3, 1, -1, 0);
-            func_ov182_021adfbc(func_ov182_021b28f0);
+            DWCUtilMain_SetUpdate(func_ov182_021b28f0);
             return;
         }
         func_ov182_021b8cf0(0x47, 2, 1, -1, 0);
-        func_ov182_021adfbc(func_ov182_021b272c);
+        DWCUtilMain_SetUpdate(func_ov182_021b272c);
     }
 }
 
@@ -303,14 +303,14 @@ static void func_ov182_021b2604(void) {
     func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     func_ov182_021bc228(1, 1);
     func_ov182_021bc228(0, 0x15);
-    func_ov182_021adffc(&field, NULL);
+    DWCUtilMain_GetScreenArgs(&field, NULL);
     if (field >= 3) {
         field++;
     }
-    func_ov182_021adfc8(2, 1);
-    func_ov182_021adff0(0, field + 3);
-    func_ov182_021adfbc(func_ov182_021b2d48);
-    func_ov182_021bc4f0(&sAddressEdit);
+    DWCUtilMain_SetLayout(2, 1);
+    DWCUtilMain_SetScreenArgs(0, field + 3);
+    DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+    DWCUtilHeap_FreeAndNull(&sAddressEdit);
 }
 
 // Draws the digits, one at a time, as a string of one character
@@ -345,16 +345,16 @@ static void func_ov182_021b272c(void) {
     sAddressEdit->result = func_ov182_021b8f14();
     switch (sAddressEdit->result) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        func_ov182_021b80f4(0xe);
+        DWCUtilSound_PlaySe(0xe);
         break;
     default:
         return;
     }
     func_ov182_021b8eec();
-    func_ov182_021adfbc(func_ov182_021b2764);
+    DWCUtilMain_SetUpdate(func_ov182_021b2764);
 }
 
 // Takes the address into the connection being edited, or goes back to the keypad
@@ -367,12 +367,12 @@ static void func_ov182_021b2764(void) {
     if (!func_ov182_021b8f24()) {
         if (sAddressEdit->result == 0) {
             G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
-            func_ov182_021adfbc(func_ov182_021b22c8);
+            DWCUtilMain_SetUpdate(func_ov182_021b22c8);
             return;
         }
-        func_ov182_021adffc(&field, NULL);
+        DWCUtilMain_GetScreenArgs(&field, NULL);
         take[field](sAddressEdit->digits);
-        func_ov182_021adfbc(func_ov182_021b2604);
+        DWCUtilMain_SetUpdate(func_ov182_021b2604);
     }
 }
 
@@ -419,7 +419,7 @@ static BOOL func_ov182_021b281c(void) {
     }
     func_ov182_021b7ff0(sAddressEdit->digits, address);
     result = FALSE;
-    func_ov182_021adffc(&field, NULL);
+    DWCUtilMain_GetScreenArgs(&field, NULL);
     if (field == 1) {
         for (i = 0; i < 4; i++) {
             for (j = 0; j < 8; j++) {
@@ -442,15 +442,15 @@ static BOOL func_ov182_021b281c(void) {
 
 static void func_ov182_021b28f0(void) {
     if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b2910);
+        DWCUtilMain_SetUpdate(func_ov182_021b2910);
     }
 }
 
 static void func_ov182_021b2910(void) {
     if (!func_ov182_021b8f24()) {
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
-        func_ov182_021adfbc(func_ov182_021b22c8);
+        DWCUtilMain_SetUpdate(func_ov182_021b22c8);
     }
 }

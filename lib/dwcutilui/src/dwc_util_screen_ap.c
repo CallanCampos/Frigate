@@ -95,7 +95,7 @@ static const u16 sScreenApButtonPos[SCREEN_AP_CONNECTIONS * 2][2] = {
 static DWCUtilScreenApState sScreenAp;
 
 void func_ov182_021b536c(void) {
-    sScreenAp.work = func_ov182_021bc4d8(sizeof(DWCUtilScreenAp), 4);
+    sScreenAp.work = DWCUtilHeap_AllocClear(sizeof(DWCUtilScreenAp), 4);
     sScreenAp.work->end = SCREEN_AP_RUNNING;
     func_ov182_021b53b4();
     func_ov182_021ab96c(1);
@@ -103,7 +103,7 @@ void func_ov182_021b536c(void) {
     func_ov182_021ab6a4(0);
     func_ov182_021b5464();
     func_ov182_021b58a8();
-    func_ov182_021adfbc(func_ov182_021b550c);
+    DWCUtilMain_SetUpdate(func_ov182_021b550c);
 }
 
 static void func_ov182_021b53b4(void) {
@@ -113,7 +113,7 @@ static void func_ov182_021b53b4(void) {
     func_ov182_021ab67c("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
     func_ov182_021ab67c("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     func_ov182_021ab67c("char/jb2Ap.nsc.l", GX_LoadBG2Scr);
-    sScreenAp.work->palette = func_ov182_021bb37c(func_ov182_021ab63c(palettePath), NULL, 4);
+    sScreenAp.work->palette = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(palettePath), NULL, 4);
     func_ov182_021bc1dc(1, 0x10);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -149,20 +149,20 @@ static void func_ov182_021b550c(void) {
     func_ov182_021bbac4(2, 0, 0x14, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x14);
-    func_ov182_021adfbc(func_ov182_021b5544);
+    DWCUtilMain_SetUpdate(func_ov182_021b5544);
 }
 
 static void func_ov182_021b5544(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(0);
-        func_ov182_021adfbc(func_ov182_021b5570);
+        DWCUtilMain_SetUpdate(func_ov182_021b5570);
     }
 }
 
 static void func_ov182_021b5570(void) {
     if (DWCUtilUiObject_GetState() != -2 && func_ov182_021b854c() != TRUE) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b5598);
+        DWCUtilMain_SetUpdate(func_ov182_021b5598);
     }
 }
 
@@ -206,14 +206,14 @@ static void func_ov182_021b564c(void) {
 
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        switch (func_ov182_021ae024()) {
+        switch (DWCUtilMain_GetStartScreen()) {
         case 0:
-            func_ov182_021b80f4(7);
+            DWCUtilSound_PlaySe(7);
             sScreenAp.work->end = SCREEN_AP_CANCELLED;
             break;
         case 1:
             DWCUtilUiObject_Disable();
-            func_ov182_021adfbc(func_ov182_021ae4f4);
+            DWCUtilMain_SetUpdate(func_ov182_021ae4f4);
             return;
         }
         break;
@@ -222,27 +222,27 @@ static void func_ov182_021b564c(void) {
         if (sScreenAp.cursor >= SCREEN_AP_FIRST_ERASE) {
             index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
             if (func_ov182_021b7b0c(index) == DWC_BM_CONNECTION_UNUSED) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 DWCUtilUiObject_SetState(-1);
                 return;
             }
-            func_ov182_021b80f4(6);
-            func_ov182_021b8cf0(0x46, 0, 1, sScreenApMsgSlots[func_ov182_021ae018()], index + 1);
+            DWCUtilSound_PlaySe(6);
+            func_ov182_021b8cf0(0x46, 0, 1, sScreenApMsgSlots[DWCUtilMain_GetLanguage()], index + 1);
             func_ov182_021b59f0();
             DWCUtilUiObject_Disable();
-            func_ov182_021adfbc(func_ov182_021b5a48);
+            DWCUtilMain_SetUpdate(func_ov182_021b5a48);
             return;
         }
         if (sScreenAp.cursor <= 2) {
             func_ov182_021b7b20(sScreenAp.cursor);
         }
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b5b3c();
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021b5710);
+    DWCUtilMain_SetUpdate(func_ov182_021b5710);
 }
 
 static void func_ov182_021b5710(void) {
@@ -251,7 +251,7 @@ static void func_ov182_021b5710(void) {
     }
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b573c);
+    DWCUtilMain_SetUpdate(func_ov182_021b573c);
 }
 
 static void func_ov182_021b573c(void) {
@@ -263,7 +263,7 @@ static void func_ov182_021b573c(void) {
         }
         func_ov182_021bbac4(3, 1, 1, 8);
         func_ov182_021bbac4(3, 0, 0x14, 8);
-        func_ov182_021adfbc(func_ov182_021b5790);
+        DWCUtilMain_SetUpdate(func_ov182_021b5790);
     }
 }
 
@@ -288,34 +288,34 @@ static void func_ov182_021b5790(void) {
     }
     func_ov182_021ab8e4();
     DWCUtilScreen_Stop();
-    func_ov182_021bb420(sScreenAp.work->palette);
+    DWCUtilRomResource_FreeFile(sScreenAp.work->palette);
     func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     func_ov182_021bc228(1, 1);
     func_ov182_021bc228(0, 0x14);
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adfbc(func_ov182_021ae748);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetUpdate(func_ov182_021ae748);
     } else {
         switch (sScreenAp.cursor) {
         case 0:
         case 1:
         case 2:
-            func_ov182_021adfc8(2, 0);
+            DWCUtilMain_SetLayout(2, 0);
             if (func_ov182_021b781c()->connection.status == DWC_BM_CONNECTION_UNUSED) {
-                func_ov182_021adfbc(func_ov182_021b5bb8);
+                DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
             } else {
-                func_ov182_021adff0(0, 0);
+                DWCUtilMain_SetScreenArgs(0, 0);
                 func_ov182_021b43f8(0);
-                func_ov182_021adfbc(func_ov182_021b2d48);
+                DWCUtilMain_SetUpdate(func_ov182_021b2d48);
             }
             break;
         case SCREEN_AP_WIDE_BUTTON:
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b688c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b688c);
             break;
         }
     }
-    func_ov182_021bc4f0(&sScreenAp.work);
+    DWCUtilHeap_FreeAndNull(&sScreenAp.work);
 }
 
 // Frames the button under the cursor: the buttons of the top row and the wide button with the four corners, an erase
@@ -422,7 +422,7 @@ static void func_ov182_021b58f4(int direction) {
         break;
     }
     if (moved) {
-        func_ov182_021b80f4(8);
+        DWCUtilSound_PlaySe(8);
         func_ov182_021b58a8();
     }
 }
@@ -444,7 +444,7 @@ static void func_ov182_021b5a48(void) {
 
     switch (func_ov182_021b8f14()) {
     case 1:
-        func_ov182_021b80f4(0xe);
+        DWCUtilSound_PlaySe(0xe);
         func_ov182_021b7e78(index);
         func_ov182_021bb914(0, 0x56, func_ov182_021bb6ec(sScreenAp.work->buttons[index], 0));
         func_ov182_021bb7e0(sScreenAp.work->buttons[index], -1, sScreenApButtonPos[index][0],
@@ -454,7 +454,7 @@ static void func_ov182_021b5a48(void) {
         sScreenAp.work->eraseButtons[index] = NULL;
         break;
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         func_ov182_021bb914(0, 0x11, func_ov182_021bb6ec(sScreenAp.work->eraseButtons[index], 0));
         func_ov182_021bb7e0(sScreenAp.work->eraseButtons[index], -1, sScreenApButtonPos[index + 3][0],
                             sScreenApButtonPos[index + 3][1]);
@@ -464,13 +464,13 @@ static void func_ov182_021b5a48(void) {
         return;
     }
     func_ov182_021b8eec();
-    func_ov182_021adfbc(func_ov182_021b5b20);
+    DWCUtilMain_SetUpdate(func_ov182_021b5b20);
 }
 
 static void func_ov182_021b5b20(void) {
     if (!func_ov182_021b8f24()) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b5598);
+        DWCUtilMain_SetUpdate(func_ov182_021b5598);
     }
 }
 

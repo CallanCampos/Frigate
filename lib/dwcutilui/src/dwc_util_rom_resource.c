@@ -19,12 +19,12 @@ typedef struct DWCUtilResource {
 static const char sArchiveName[] = "dwc";
 static DWCUtilResource *sResource;
 
-static FSResult func_ov182_021bb2f8(FSFile *file, FSCommandType command);
-static FSResult func_ov182_021bb338(FSArchive *arc, void *buffer, u32 position, u32 length);
-static void func_ov182_021bb36c(void *arc);
-static FSResult func_ov182_021bb378(FSArchive *arc, const void *buffer, u32 position, u32 length);
+static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType command);
+static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length);
+static void DWCUtilRomResource_ReadDone(void *arc);
+static FSResult DWCUtilRomResource_WriteArchive(FSArchive *arc, const void *buffer, u32 position, u32 length);
 
-void func_ov182_021bb18c(void) {
+void DWCUtilRomResource_Init(void) {
     FSFile file;
     char path[0x80];
     u32 fnt[2];
@@ -32,7 +32,7 @@ void func_ov182_021bb18c(void) {
     u32 base;
     u32 size;
 
-    sResource = func_ov182_021bc4d8(sizeof(DWCUtilResource), 4);
+    sResource = DWCUtilHeap_AllocClear(sizeof(DWCUtilResource), 4);
     FS_InitFile(&file);
     if (!FS_OpenFile(&file, "rom:/dwc/utility.bin")) {
         OS_Terminate();
@@ -46,34 +46,34 @@ void func_ov182_021bb18c(void) {
     if (!FS_RegisterArchiveName(&sResource->archive, sArchiveName, 3)) {
         OS_Terminate();
     }
-    FS_SetArchiveProc(&sResource->archive, func_ov182_021bb2f8,
+    FS_SetArchiveProc(&sResource->archive, DWCUtilRomResource_ArchiveProc,
                       (1 << FS_COMMAND_WRITEFILE) | (1 << FS_COMMAND_ACTIVATE) | (1 << FS_COMMAND_IDLE));
-    if (!FS_LoadArchive(&sResource->archive, base, fat[0], fat[1], fnt[0], fnt[1], func_ov182_021bb338,
-                        func_ov182_021bb378)) {
+    if (!FS_LoadArchive(&sResource->archive, base, fat[0], fat[1], fnt[0], fnt[1], DWCUtilRomResource_ReadArchive,
+                        DWCUtilRomResource_WriteArchive)) {
         OS_Terminate();
     }
     size = FS_LoadArchiveTables(&sResource->archive, NULL, 0);
-    sResource->tables = func_ov182_021bc4d8(size, 4);
+    sResource->tables = DWCUtilHeap_AllocClear(size, 4);
     FS_LoadArchiveTables(&sResource->archive, sResource->tables, size);
     sResource->openFileStack = func_ov182_021bb9c8(32, (u8 *)sResource->openFiles, sizeof(void *));
     OS_SPrintf(path, "%s:/", sArchiveName);
     FS_ChangeDir(path);
 }
 
-void func_ov182_021bb2a4(void) {
+void DWCUtilRomResource_Exit(void) {
     FS_ChangeDir("rom:/");
     FS_UnloadArchiveTables(&sResource->archive);
     FS_UnloadArchive(&sResource->archive);
     FS_ReleaseArchiveName(&sResource->archive);
     OS_ReleaseLockID(sResource->lockId);
     sResource->lockId = 0;
-    func_ov182_021bc4f0(&sResource->tables);
+    DWCUtilHeap_FreeAndNull(&sResource->tables);
     sResource->tables = NULL;
-    func_ov182_021bc4f0(&sResource);
+    DWCUtilHeap_FreeAndNull(&sResource);
 }
 
 // The archive's hook: the card is locked while the archive is active, and it can't be written
-static FSResult func_ov182_021bb2f8(FSFile *file, FSCommandType command) {
+static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType command) {
     switch (command) {
     case FS_COMMAND_ACTIVATE:
         CARD_LockRom(sResource->lockId);
@@ -88,20 +88,20 @@ static FSResult func_ov182_021bb2f8(FSFile *file, FSCommandType command) {
     }
 }
 
-static FSResult func_ov182_021bb338(FSArchive *arc, void *buffer, u32 position, u32 length) {
-    CARDi_ReadRom((u32)-1, position + FS_GetArchiveBase(arc), buffer, length, func_ov182_021bb36c, arc, TRUE);
+static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length) {
+    CARDi_ReadRom((u32)-1, position + FS_GetArchiveBase(arc), buffer, length, DWCUtilRomResource_ReadDone, arc, TRUE);
     return FS_RESULT_PROC_ASYNC;
 }
 
-static void func_ov182_021bb36c(void *arc) {
+static void DWCUtilRomResource_ReadDone(void *arc) {
     FS_NotifyArchiveAsyncEnd(arc, FS_RESULT_SUCCESS);
 }
 
-static FSResult func_ov182_021bb378(FSArchive *arc, const void *buffer, u32 position, u32 length) {
+static FSResult DWCUtilRomResource_WriteArchive(FSArchive *arc, const void *buffer, u32 position, u32 length) {
     return FS_RESULT_FAILURE;
 }
 
-void *func_ov182_021bb37c(const char *path, u32 *size, int align) {
+void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
     FSFile file;
     void *data;
     u32 length;
@@ -117,12 +117,12 @@ void *func_ov182_021bb37c(const char *path, u32 *size, int align) {
         *size = length;
     }
     // A compressed file is read to the end of the heap, as it is freed once it is decompressed
-    if (func_ov182_021bb444(path, ".l", 2)) {
+    if (DWCUtilRomResource_EndsWith(path, ".l", 2)) {
         alignment = -4;
     } else {
         alignment = align;
     }
-    data = func_ov182_021bc4d8(length, alignment);
+    data = DWCUtilHeap_AllocClear(length, alignment);
     FS_ReadFile(&file, data, length);
     FS_CloseFile(&file);
     if (alignment > 0) {
@@ -135,19 +135,19 @@ void *func_ov182_021bb37c(const char *path, u32 *size, int align) {
         if (size != NULL) {
             *size = length;
         }
-        out = func_ov182_021bc4d8(length, align);
+        out = DWCUtilHeap_AllocClear(length, align);
         MI_UncompressLZ8(data, out);
-        func_ov182_021bc4f0(&data);
+        DWCUtilHeap_FreeAndNull(&data);
         return out;
     }
 }
 
-void func_ov182_021bb420(void *data) {
-    func_ov182_021bc4f0(&data);
+void DWCUtilRomResource_FreeFile(void *data) {
+    DWCUtilHeap_FreeAndNull(&data);
     func_ov182_021bba00(sResource->openFileStack, data);
 }
 
-BOOL func_ov182_021bb444(const char *str, const char *suffix, int length) {
+BOOL DWCUtilRomResource_EndsWith(const char *str, const char *suffix, int length) {
     int strLength = strlen(str);
     int suffixLength = strlen(suffix);
 

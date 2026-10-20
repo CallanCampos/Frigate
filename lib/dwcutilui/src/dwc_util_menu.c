@@ -115,7 +115,7 @@ void func_ov182_021acd80(void) {
 
     rect.width = 0x1c;
     rect.height = 0x14;
-    sMenu = func_ov182_021bc4d8(sizeof(DWCUtilMenu), 4);
+    sMenu = DWCUtilHeap_AllocClear(sizeof(DWCUtilMenu), 4);
     sMenu->code = 0x1f;
     sMenu->cursorPos = 0;
     sMenu->leftEnabled = TRUE;
@@ -150,13 +150,13 @@ void func_ov182_021acd80(void) {
     sMenu->cursor = func_ov182_021bb97c(0, 0x44, TRUE);
     func_ov182_021bb6f8(sMenu->cursor, -1, GX_OAM_EFFECT_NODISPLAY, 0);
     func_ov182_021bb878(sMenu->cursor, -1, 2);
-    sMenu->task = func_ov182_021bd200(0, func_ov182_021acff0, NULL, 0x78);
+    sMenu->task = DWCUtilTask_Create(0, func_ov182_021acff0, NULL, 0x78);
     func_ov182_021ad634(0, 0xc0);
 }
 
 void func_ov182_021acf7c(void) {
     func_ov182_021bb690(sMenu->cursor);
-    func_ov182_021bd264(sMenu->task, func_ov182_021ad90c);
+    DWCUtilTask_SetCallback(sMenu->task, func_ov182_021ad90c);
 }
 
 u8 func_ov182_021acf9c(void) {
@@ -191,7 +191,7 @@ static void func_ov182_021acff0(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ad634(0, 0x4c);
     func_ov182_021ad634(1, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad038);
+    DWCUtilTask_SetCallback(task, func_ov182_021ad038);
 }
 
 static void func_ov182_021ad038(DWCUtilTask *task, void *arg) {
@@ -203,7 +203,7 @@ static void func_ov182_021ad038(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ad634(1, 0x63);
     func_ov182_021ad634(2, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad080);
+    DWCUtilTask_SetCallback(task, func_ov182_021ad080);
 }
 
 static void func_ov182_021ad080(DWCUtilTask *task, void *arg) {
@@ -215,7 +215,7 @@ static void func_ov182_021ad080(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ad634(2, 0x7a);
     func_ov182_021ad634(3, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad0c8);
+    DWCUtilTask_SetCallback(task, func_ov182_021ad0c8);
 }
 
 static void func_ov182_021ad0c8(DWCUtilTask *task, void *arg) {
@@ -227,7 +227,7 @@ static void func_ov182_021ad0c8(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ad634(3, 0x91);
     func_ov182_021ad634(4, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad110);
+    DWCUtilTask_SetCallback(task, func_ov182_021ad110);
 }
 
 static void func_ov182_021ad110(DWCUtilTask *task, void *arg) {
@@ -242,7 +242,7 @@ static void func_ov182_021ad110(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021ad634(4, 0xaa);
     func_ov182_021ad838();
-    func_ov182_021bd264(task, func_ov182_021ad15c);
+    DWCUtilTask_SetCallback(task, func_ov182_021ad15c);
 }
 
 static void func_ov182_021ad15c(DWCUtilTask *task, void *arg) {
@@ -263,10 +263,10 @@ static void func_ov182_021ad170(void) {
             func_ov182_021bc1c0(&sKeyPositions[i], sKeySize, rect);
             if (func_ov182_021bc888(rect)) {
                 if (!sMenu->digitsEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sMenu->touched = i;
                 return;
             }
@@ -275,10 +275,10 @@ static void func_ov182_021ad170(void) {
             func_ov182_021bc1c0(&sArrowPositions[i], sArrowSize, rect);
             if (func_ov182_021bc888(rect)) {
                 if ((i == 0 && !sMenu->leftEnabled) || (i == 1 && !sMenu->rightEnabled)) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sMenu->touched = i + 10;
                 return;
             }
@@ -286,7 +286,7 @@ static void func_ov182_021ad170(void) {
         for (i = 0; i < 2; i++) {
             func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
             if (func_ov182_021bc888(rect)) {
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sMenu->touched = i + 12;
                 return;
             }
@@ -370,7 +370,7 @@ static void func_ov182_021ad3b4(void) {
                     return;
                 }
                 if (!sMenu->leftEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     sMenu->touched = -1;
                     return;
                 }
@@ -429,12 +429,12 @@ static void func_ov182_021ad518(void) {
                 sMenu->code = sDigitCodes[key];
                 return;
             }
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             return;
         }
         if (key - 10 < 2) {
             if ((key - 10 == 0 && !sMenu->leftEnabled) || (key - 10 == 1 && !sMenu->rightEnabled)) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 return;
             }
             sMenu->code = sArrowCodes[key - 10];
@@ -445,7 +445,7 @@ static void func_ov182_021ad518(void) {
     if (func_ov182_021bc7c8(2)) {
         if (!sMenu->leftEnabled) {
             if (!sMenu->buzzed) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sMenu->buzzed = TRUE;
             }
         } else {
@@ -530,7 +530,7 @@ static void func_ov182_021ad894(int direction) {
         }
     }
     func_ov182_021ad838();
-    func_ov182_021b80f4(8);
+    DWCUtilSound_PlaySe(8);
 }
 
 static void func_ov182_021ad90c(DWCUtilTask *task, void *arg) {
@@ -538,7 +538,7 @@ static void func_ov182_021ad90c(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ad634(4, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad948);
+        DWCUtilTask_SetCallback(task, func_ov182_021ad948);
     }
 }
 
@@ -547,7 +547,7 @@ static void func_ov182_021ad948(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ad634(3, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad97c);
+        DWCUtilTask_SetCallback(task, func_ov182_021ad97c);
     }
 }
 
@@ -556,7 +556,7 @@ static void func_ov182_021ad97c(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ad634(2, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad9b0);
+        DWCUtilTask_SetCallback(task, func_ov182_021ad9b0);
     }
 }
 
@@ -565,7 +565,7 @@ static void func_ov182_021ad9b0(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ad634(1, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad9e4);
+        DWCUtilTask_SetCallback(task, func_ov182_021ad9e4);
     }
 }
 
@@ -574,14 +574,14 @@ static void func_ov182_021ad9e4(DWCUtilTask *task, void *arg) {
 
     func_ov182_021ad634(0, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ada18);
+        DWCUtilTask_SetCallback(task, func_ov182_021ada18);
     }
 }
 
 static void func_ov182_021ada18(DWCUtilTask *task, void *arg) {
     int i;
 
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
     for (i = 0; i < 4; i++) {
         func_ov182_021bb690(sMenu->rowNodes[i]);
         func_ov182_021bbdcc(sMenu->rows[i]);
@@ -595,5 +595,5 @@ static void func_ov182_021ada18(DWCUtilTask *task, void *arg) {
     for (i = 0; i < 10; i++) {
         func_ov182_021bcc9c(sMenu->keyOams[i]);
     }
-    func_ov182_021bc4f0(&sMenu);
+    DWCUtilHeap_FreeAndNull(&sMenu);
 }

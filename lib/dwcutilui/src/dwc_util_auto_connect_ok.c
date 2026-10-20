@@ -27,7 +27,7 @@ void func_ov182_021b63dc(void) {
     sAutoConnectOkFrames = 0;
     func_ov182_021b6400();
     func_ov182_021ab6f0(0x2d);
-    func_ov182_021adfbc(func_ov182_021b6448);
+    DWCUtilMain_SetUpdate(func_ov182_021b6448);
 }
 
 static void func_ov182_021b6400(void) {
@@ -41,12 +41,12 @@ static void func_ov182_021b6400(void) {
 static void func_ov182_021b6448(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b646c);
+    DWCUtilMain_SetUpdate(func_ov182_021b646c);
 }
 
 static void func_ov182_021b646c(void) {
     if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b6484);
+        DWCUtilMain_SetUpdate(func_ov182_021b6484);
     }
 }
 
@@ -61,13 +61,13 @@ static void func_ov182_021b6490(void) {
 static void func_ov182_021b6494(void) {
     int from;
 
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from != 0) {
         func_ov182_021b849c();
     }
     func_ov182_021bbac4(3, 1, 1, 8);
     func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021b64cc);
+    DWCUtilMain_SetUpdate(func_ov182_021b64cc);
 }
 
 // Once the fades and the buttons are done, back to the settings of the connection, or to the menu that the utility
@@ -85,13 +85,13 @@ static void func_ov182_021b64cc(void) {
     DWCUtilScreen_Stop();
     func_ov182_021bc228(1, 1);
     func_ov182_021bc228(0, 0x15);
-    func_ov182_021adfc8(2, 1);
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilMain_SetLayout(2, 1);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from == 0) {
-        func_ov182_021adff0(0, 0);
-        func_ov182_021adfbc(func_ov182_021b2d48);
+        DWCUtilMain_SetScreenArgs(0, 0);
+        DWCUtilMain_SetUpdate(func_ov182_021b2d48);
     } else {
-        func_ov182_021adfbc(func_ov182_021ae748);
+        DWCUtilMain_SetUpdate(func_ov182_021ae748);
     }
 }
 
@@ -101,17 +101,17 @@ static void func_ov182_021b6540(void) {
 
     sAutoConnectOkFrames++;
     if (sAutoConnectOkFrames >= 180) {
-        func_ov182_021adffc(NULL, &from);
-        switch (func_ov182_021ae024()) {
+        DWCUtilMain_GetScreenArgs(NULL, &from);
+        switch (DWCUtilMain_GetStartScreen()) {
         case 0:
             break;
         case 1:
             if (from != 0) {
-                func_ov182_021adfbc(func_ov182_021ae4f4);
+                DWCUtilMain_SetUpdate(func_ov182_021ae4f4);
                 return;
             }
             break;
         }
-        func_ov182_021adfbc(func_ov182_021b6494);
+        DWCUtilMain_SetUpdate(func_ov182_021b6494);
     }
 }

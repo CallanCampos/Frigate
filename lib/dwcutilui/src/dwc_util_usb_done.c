@@ -27,8 +27,8 @@ void func_ov182_021b6728(void) {
     func_ov182_021b6758();
     func_ov182_021ab96c(8);
     func_ov182_021ab6f0(0x29);
-    func_ov182_021b80f4(0x10);
-    func_ov182_021adfbc(func_ov182_021b67a8);
+    DWCUtilSound_PlaySe(0x10);
+    DWCUtilMain_SetUpdate(func_ov182_021b67a8);
 }
 
 static void func_ov182_021b6758(void) {
@@ -43,12 +43,12 @@ static void func_ov182_021b6758(void) {
 static void func_ov182_021b67a8(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b67cc);
+    DWCUtilMain_SetUpdate(func_ov182_021b67cc);
 }
 
 static void func_ov182_021b67cc(void) {
     if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b67e4);
+        DWCUtilMain_SetUpdate(func_ov182_021b67e4);
     }
 }
 
@@ -63,7 +63,7 @@ static void func_ov182_021b67f0(void) {
 static void func_ov182_021b67f4(void) {
     func_ov182_021bbac4(3, 1, 1, 8);
     func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021b681c);
+    DWCUtilMain_SetUpdate(func_ov182_021b681c);
 }
 
 // Once both screens have faded out, goes on to the message before the connection test with auto-connect
@@ -73,15 +73,15 @@ static void func_ov182_021b681c(void) {
         DWCUtilScreen_Stop();
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adff0(0, 2);
-        func_ov182_021adfbc(func_ov182_021b6588);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetScreenArgs(0, 2);
+        DWCUtilMain_SetUpdate(func_ov182_021b6588);
     }
 }
 
 static void func_ov182_021b686c(void) {
     sUsbDoneFrames++;
     if (sUsbDoneFrames >= 120) {
-        func_ov182_021adfbc(func_ov182_021b67f4);
+        DWCUtilMain_SetUpdate(func_ov182_021b67f4);
     }
 }

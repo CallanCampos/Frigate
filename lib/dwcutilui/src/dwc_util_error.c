@@ -44,7 +44,7 @@ static int sErrorCode;
 void func_ov182_021b293c(void) {
     func_ov182_021b2954();
     func_ov182_021b29a4();
-    func_ov182_021adfbc(func_ov182_021b2bbc);
+    DWCUtilMain_SetUpdate(func_ov182_021b2bbc);
 }
 
 static void func_ov182_021b2954(void) {
@@ -68,7 +68,7 @@ static void func_ov182_021b29a4(void) {
     u16 x;
     u16 y;
 
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     code = sErrorCode;
     if (code >= -20099) {
         type = 0;
@@ -148,12 +148,12 @@ static void func_ov182_021b29a4(void) {
         type = 2;
     }
 
-    text = func_ov182_021bbdec(0, sErrorFonts[func_ov182_021ae018()]);
-    msg = func_ov182_021ae108(data_ov182_021c40b8, type);
+    text = func_ov182_021bbdec(0, sErrorFonts[DWCUtilMain_GetLanguage()]);
+    msg = DWCUtilMsg_Get(data_ov182_021c40b8, type);
     OS_SNPrintf(digits, sizeof(digits), "%d", -sErrorCode);
-    func_ov182_021bcf10(str, (u8 *)digits, 8);
-    y = sErrorCodePos[func_ov182_021ae018()][1];
-    x = sErrorCodePos[func_ov182_021ae018()][0];
+    DWCUtilString_Widen(str, (u8 *)digits, 8);
+    y = sErrorCodePos[DWCUtilMain_GetLanguage()][1];
+    x = sErrorCodePos[DWCUtilMain_GetLanguage()][0];
     func_ov182_021bc030(text, x, y, 2, 10, str, 0);
     func_ov182_021bc0a4(text, sErrorMsgRect[0], sErrorMsgRect[1], sErrorMsgRect[2], sErrorMsgRect[3], 2,
                         func_ov182_021ab7b4(), msg);
@@ -163,20 +163,20 @@ static void func_ov182_021b29a4(void) {
 static void func_ov182_021b2bbc(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b2be0);
+    DWCUtilMain_SetUpdate(func_ov182_021b2be0);
 }
 
 static void func_ov182_021b2be0(void) {
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(4);
-        func_ov182_021adfbc(func_ov182_021b2c08);
+        DWCUtilMain_SetUpdate(func_ov182_021b2c08);
     }
 }
 
 static void func_ov182_021b2c08(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b2c28);
+        DWCUtilMain_SetUpdate(func_ov182_021b2c28);
     }
 }
 
@@ -197,15 +197,15 @@ static void func_ov182_021b2c4c(void) {
 
 static void func_ov182_021b2c50(void) {
     if (DWCUtilUiObject_GetState() == 0) {
-        func_ov182_021b80f4(6);
-        func_ov182_021adfbc(func_ov182_021b2c6c);
+        DWCUtilSound_PlaySe(6);
+        DWCUtilMain_SetUpdate(func_ov182_021b2c6c);
     }
 }
 
 static void func_ov182_021b2c6c(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b2c84);
+    DWCUtilMain_SetUpdate(func_ov182_021b2c84);
 }
 
 static void func_ov182_021b2c84(void) {
@@ -213,7 +213,7 @@ static void func_ov182_021b2c84(void) {
         DWCUtilUiObject_Exit();
         func_ov182_021bbac4(3, 1, 1, 8);
         func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b2cbc);
+        DWCUtilMain_SetUpdate(func_ov182_021b2cbc);
     }
 }
 
@@ -226,15 +226,15 @@ static void func_ov182_021b2cbc(void) {
         DWCUtilScreen_Stop();
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x15);
-        func_ov182_021adffc(NULL, &from);
+        DWCUtilMain_GetScreenArgs(NULL, &from);
         if (from != 0) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b536c);
         } else {
-            func_ov182_021adfc8(2, 0);
-            func_ov182_021adff0(0, 0);
+            DWCUtilMain_SetLayout(2, 0);
+            DWCUtilMain_SetScreenArgs(0, 0);
             func_ov182_021b43f8(0);
-            func_ov182_021adfbc(func_ov182_021b2d48);
+            DWCUtilMain_SetUpdate(func_ov182_021b2d48);
         }
     }
 }

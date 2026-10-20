@@ -25,7 +25,7 @@ void func_ov182_021afdec(void) {
     sFrames = 0;
     func_ov182_021afe10();
     func_ov182_021ab6f0(0x21);
-    func_ov182_021adfbc(func_ov182_021afe58);
+    DWCUtilMain_SetUpdate(func_ov182_021afe58);
 }
 
 static void func_ov182_021afe10(void) {
@@ -39,12 +39,12 @@ static void func_ov182_021afe10(void) {
 static void func_ov182_021afe58(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021afe7c);
+    DWCUtilMain_SetUpdate(func_ov182_021afe7c);
 }
 
 static void func_ov182_021afe7c(void) {
     if (func_ov182_021bbaac(0) == 0 && func_ov182_021ae210()) {
-        func_ov182_021adfbc(func_ov182_021afe9c);
+        DWCUtilMain_SetUpdate(func_ov182_021afe9c);
     }
 }
 
@@ -59,7 +59,7 @@ static void func_ov182_021afea8(void) {
 static void func_ov182_021afeac(void) {
     func_ov182_021bbac4(3, 1, 1, 8);
     func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021afed4);
+    DWCUtilMain_SetUpdate(func_ov182_021afed4);
 }
 
 static void func_ov182_021afed4(void) {
@@ -68,14 +68,14 @@ static void func_ov182_021afed4(void) {
         DWCUtilScreen_Stop();
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 1);
-        func_ov182_021adfbc(func_ov182_021af25c);
+        DWCUtilMain_SetLayout(0, 1);
+        DWCUtilMain_SetUpdate(func_ov182_021af25c);
     }
 }
 
 static void func_ov182_021aff1c(void) {
     sFrames++;
     if (sFrames >= 120) {
-        func_ov182_021adfbc(func_ov182_021afeac);
+        DWCUtilMain_SetUpdate(func_ov182_021afeac);
     }
 }

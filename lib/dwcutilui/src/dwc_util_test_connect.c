@@ -51,7 +51,7 @@ void func_ov182_021b4880(void) {
     func_ov182_021ab9ac();
     func_ov182_021ab6f0(0x2a);
     DWCUtilUiEffect_Init(2);
-    func_ov182_021adfbc(func_ov182_021b48fc);
+    DWCUtilMain_SetUpdate(func_ov182_021b48fc);
 }
 
 static void func_ov182_021b48ac(void) {
@@ -66,20 +66,20 @@ static void func_ov182_021b48ac(void) {
 static void func_ov182_021b48fc(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b4920);
+    DWCUtilMain_SetUpdate(func_ov182_021b4920);
 }
 
 static void func_ov182_021b4920(void) {
     if (func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(1);
-        func_ov182_021adfbc(func_ov182_021b4940);
+        DWCUtilMain_SetUpdate(func_ov182_021b4940);
     }
 }
 
 static void func_ov182_021b4940(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b4960);
+        DWCUtilMain_SetUpdate(func_ov182_021b4960);
     }
 }
 
@@ -105,16 +105,16 @@ static void func_ov182_021b49a0(void) {
 // The button ends the test
 static void func_ov182_021b49a4(void) {
     if (DWCUtilUiObject_GetState() == 0) {
-        func_ov182_021b8138();
-        func_ov182_021b80f4(7);
-        func_ov182_021adfbc(func_ov182_021b49c4);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(7);
+        DWCUtilMain_SetUpdate(func_ov182_021b49c4);
     }
 }
 
 static void func_ov182_021b49c4(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b49dc);
+    DWCUtilMain_SetUpdate(func_ov182_021b49dc);
 }
 
 static void func_ov182_021b49dc(void) {
@@ -124,7 +124,7 @@ static void func_ov182_021b49dc(void) {
             func_ov182_021bbac4(3, 1, 1, 8);
         }
         func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b4a20);
+        DWCUtilMain_SetUpdate(func_ov182_021b4a20);
     }
 }
 
@@ -139,11 +139,11 @@ static void func_ov182_021b4a20(void) {
         }
         func_ov182_021ae424();
         if (!sTestConnectPassed) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b5bb8);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
         } else {
-            func_ov182_021adfc8(0, 0);
-            func_ov182_021adfbc(func_ov182_021b4b68);
+            DWCUtilMain_SetLayout(0, 0);
+            DWCUtilMain_SetUpdate(func_ov182_021b4b68);
         }
     }
 }
@@ -153,39 +153,39 @@ static void func_ov182_021b4a9c(void) {
     switch (func_ov182_021ae440()) {
     case 3:
         sTestConnectPassed = TRUE;
-        func_ov182_021b8138();
+        DWCUtilSound_StopSe();
         func_ov182_021ae4b0();
-        func_ov182_021adfbc(func_ov182_021b49c4);
+        DWCUtilMain_SetUpdate(func_ov182_021b49c4);
         break;
     case 4:
         sTestConnectPassed = FALSE;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(9);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(9);
         func_ov182_021b8cf0(0xd, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b4b30);
+        DWCUtilMain_SetUpdate(func_ov182_021b4b30);
         break;
     case 5:
         sTestConnectPassed = FALSE;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(0x12);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(0x12);
         func_ov182_021b8cf0(0xe, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b4b30);
+        DWCUtilMain_SetUpdate(func_ov182_021b4b30);
         break;
     }
 }
 
 static void func_ov182_021b4b30(void) {
     if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b4b50);
+        DWCUtilMain_SetUpdate(func_ov182_021b4b50);
     }
 }
 
 static void func_ov182_021b4b50(void) {
     if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b49c4);
+        DWCUtilMain_SetUpdate(func_ov182_021b49c4);
     }
 }

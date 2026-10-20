@@ -63,16 +63,16 @@ static inline NNSG2dTextDirection DWCUtilText_GetDirection(const NNSG2dFont *fon
 void func_ov182_021bbc50(void) {
     int i;
 
-    sTextWork = func_ov182_021bc4d8(sizeof(DWCUtilTextWork), 4);
+    sTextWork = DWCUtilHeap_AllocClear(sizeof(DWCUtilTextWork), 4);
     sTextWork->freeObjTexts = func_ov182_021bb9c8(0x20, sTextWork->objTexts[0], sizeof(DWCUtilText));
-    if (func_ov182_021ae018() == 6) {
+    if (DWCUtilMain_GetLanguage() == 6) {
         for (i = 0; i < 2; i++) {
-            sTextWork->fontFiles[i] = func_ov182_021bb37c(sKcFontPaths[i], NULL, 4);
+            sTextWork->fontFiles[i] = DWCUtilRomResource_LoadFile(sKcFontPaths[i], NULL, 4);
             NNS_G2dFontInitUTF16(&sTextWork->fonts[i], sTextWork->fontFiles[i]);
         }
     } else {
         for (i = 0; i < 2; i++) {
-            sTextWork->fontFiles[i] = func_ov182_021bb37c(sFontPaths[i], NULL, 4);
+            sTextWork->fontFiles[i] = DWCUtilRomResource_LoadFile(sFontPaths[i], NULL, 4);
             NNS_G2dFontInitUTF16(&sTextWork->fonts[i], sTextWork->fontFiles[i]);
         }
     }
@@ -82,10 +82,10 @@ void func_ov182_021bbd00(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_ov182_021bb420(sTextWork->fontFiles[i]);
+        DWCUtilRomResource_FreeFile(sTextWork->fontFiles[i]);
     }
     func_ov182_021bb9ec(sTextWork->freeObjTexts);
-    func_ov182_021bc4f0(&sTextWork);
+    DWCUtilHeap_FreeAndNull(&sTextWork);
 }
 
 DWCUtilText *func_ov182_021bbd3c(int screen, int width, int height, s16 fromFront, int *objCount, int font) {
@@ -94,7 +94,7 @@ DWCUtilText *func_ov182_021bbd3c(int screen, int width, int height, s16 fromFron
 
     text->u.obj.width = width;
     text->u.obj.height = height;
-    text->buffer = func_ov182_021bcdbc(screen, width * height, fromFront, &charName);
+    text->buffer = DWCUtilVramAlloc_Alloc(screen, width * height, fromFront, &charName);
     text->u.obj.charName = charName;
     *objCount = NNS_G2dCalcRequireOBJ1D(width, height);
     NNS_G2dCharCanvasInitForOBJ1D(&text->canvas,
@@ -106,7 +106,7 @@ DWCUtilText *func_ov182_021bbd3c(int screen, int width, int height, s16 fromFron
 }
 
 void func_ov182_021bbdcc(DWCUtilText *text) {
-    func_ov182_021bcec4(text->buffer);
+    DWCUtilVramAlloc_Free(text->buffer);
     func_ov182_021bba00(sTextWork->freeObjTexts, text);
 }
 
@@ -115,7 +115,7 @@ DWCUtilText *func_ov182_021bbdec(int screen, int font) {
     u16 height = sBgSizes[screen].height;
     u16 width = sBgSizes[screen].width;
 
-    text->buffer = func_ov182_021bc4d8(width * height * 0x20, 0x20);
+    text->buffer = DWCUtilHeap_AllocClear(width * height * 0x20, 0x20);
     if (screen == 1) {
         G2S_BG0Mosaic(FALSE);
         G2S_SetBG0Control(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x6000, GX_BG_CHARBASE_0x00000,
@@ -130,7 +130,7 @@ DWCUtilText *func_ov182_021bbdec(int screen, int font) {
     NNS_G2dMapScrToCharText(screen == 1 ? G2S_GetBG0ScrPtr() : G2_GetBG0ScrPtr(), width, height, 0, 0, 32,
                             sBgCharNames[screen], 15);
     func_ov182_021bc118(text, 0);
-    text->u.task = func_ov182_021bd200(1, func_ov182_021bbed4, &sTextWork->dirty[screen], 200);
+    text->u.task = DWCUtilTask_Create(1, func_ov182_021bbed4, &sTextWork->dirty[screen], 200);
     return text;
 }
 
@@ -150,7 +150,7 @@ void func_ov182_021bbed4(DWCUtilTask *task, void *arg) {
 }
 
 void func_ov182_021bbf38(DWCUtilText *text) {
-    func_ov182_021bd280(1, text->u.task);
+    DWCUtilTask_Remove(1, text->u.task);
     if (text == &sTextWork->bgTexts[0]) {
         MI_CpuClear16(G2_GetBG0CharPtr(), 0x6000);
     } else {
@@ -161,7 +161,7 @@ void func_ov182_021bbf38(DWCUtilText *text) {
         MI_CpuClear16(G2_GetBG0CharPtr(), 0x3000);
 #endif
     }
-    func_ov182_021bc4f0(&text->buffer);
+    DWCUtilHeap_FreeAndNull(&text->buffer);
 }
 
 void func_ov182_021bbf7c(int screen) {

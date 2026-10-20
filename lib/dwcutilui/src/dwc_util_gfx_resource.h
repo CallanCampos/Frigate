@@ -12,7 +12,7 @@
 char *func_ov182_021ab63c(const char *path);
 // Reads the file, localized, and hands it to upload, a GX_Load function
 void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32));
-// Shows the buttons of the layout set through func_ov182_021adfc8
+// Shows the buttons of the layout set through DWCUtilMain_SetLayout
 void func_ov182_021ab6a4(int variant);
 void func_ov182_021ab6d0(int variant);
 // Draws the message into the main screen's message box, alone or under a string

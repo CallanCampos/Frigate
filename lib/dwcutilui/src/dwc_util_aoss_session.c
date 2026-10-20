@@ -21,7 +21,7 @@ static DWCUtilAoss sAoss;
 void func_ov182_021ada94(void) {
     AossClientInfo client;
 
-    sAoss.param = func_ov182_021bc4d8(sizeof(AossParam), 4);
+    sAoss.param = DWCUtilHeap_AllocClear(sizeof(AossParam), 4);
     sAoss.done = FALSE;
     MI_CpuClear16(&client, sizeof(client));
     client.version = 0x50;
@@ -45,7 +45,7 @@ void func_ov182_021adb38(BOOL saveKeys) {
     if (saveKeys && sAoss.param->error == 0 && sAoss.done == TRUE) {
         func_ov182_021b7d80(&sAoss.param->result);
     }
-    func_ov182_021bc4f0(&sAoss.param);
+    DWCUtilHeap_FreeAndNull(&sAoss.param);
 }
 
 int func_ov182_021adb74(void) {
@@ -63,9 +63,9 @@ int func_ov182_021adb74(void) {
 }
 
 static void *func_ov182_021adbac(u32 size) {
-    return func_ov182_021bc4d8(size, 32);
+    return DWCUtilHeap_AllocClear(size, 32);
 }
 
 static void func_ov182_021adbb8(void *ptr) {
-    func_ov182_021bc51c(ptr);
+    DWCUtilHeap_Free(ptr);
 }

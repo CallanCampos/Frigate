@@ -21,20 +21,20 @@ static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg);
 void DWCUtilUiEffect_Init(u8 variant) {
     int mode = 4;
 
-    sEffect = func_ov182_021bc4d8(sizeof(DWCUtilUiEffect), 4);
+    sEffect = DWCUtilHeap_AllocClear(sizeof(DWCUtilUiEffect), 4);
     sEffect->variant = variant;
     sEffect->oam = func_ov182_021bb960(0, 0x47);
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0xfffff3ff) | (mode << 8);
     sEffect->oam->attr01 &= 0xfffff3ff;
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0x0fff) | (sEffectData[variant] << 12);
     sEffect->oam->attr01 = (sEffect->oam->attr01 & 0xfe00ff00) | 0x00e6008b;
-    sEffect->task = func_ov182_021bd200(1, DWCUtilUiEffect_Update, NULL, 0x78);
+    sEffect->task = DWCUtilTask_Create(1, DWCUtilUiEffect_Update, NULL, 0x78);
 }
 
 void DWCUtilUiEffect_Destroy(void) {
-    func_ov182_021bd280(1, sEffect->task);
+    DWCUtilTask_Remove(1, sEffect->task);
     func_ov182_021bcc9c(sEffect->oam);
-    func_ov182_021bc4f0(&sEffect);
+    DWCUtilHeap_FreeAndNull(&sEffect);
 }
 
 static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg) {

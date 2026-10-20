@@ -23,9 +23,9 @@ static inline void func_ov182_021b0bb8Inline(void) {
         DWCUtilScreen_Stop();
         func_ov182_021bc228(1, 1);
         func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adff0(0, 1);
-        func_ov182_021adfbc(func_ov182_021b6588);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetScreenArgs(0, 1);
+        DWCUtilMain_SetUpdate(func_ov182_021b6588);
     }
 }
 

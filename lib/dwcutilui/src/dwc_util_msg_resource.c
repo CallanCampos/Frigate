@@ -25,22 +25,22 @@ typedef struct DWCUtilMsgWork {
 
 static DWCUtilMsgWork *sMsgWork;
 
-void func_ov182_021ae084(void) {
-    sMsgWork = func_ov182_021bc4d8(sizeof(DWCUtilMsgWork), 4);
+void DWCUtilMsg_Init(void) {
+    sMsgWork = DWCUtilHeap_AllocClear(sizeof(DWCUtilMsgWork), 4);
     sMsgWork->freeMsgs = func_ov182_021bb9c8(8, (u8 *)sMsgWork->msgs, sizeof(DWCUtilMsg));
 }
 
-void func_ov182_021ae0a8(void) {
-    func_ov182_021bc4f0(&sMsgWork);
+void DWCUtilMsg_Exit(void) {
+    DWCUtilHeap_FreeAndNull(&sMsgWork);
 }
 
-DWCUtilMsg *func_ov182_021ae0b8(const char *path) {
+DWCUtilMsg *DWCUtilMsg_Open(const char *path) {
     u32 size;
     DWCUtilMsgFile *file;
     DWCUtilMsgInfo *info;
     DWCUtilMsg *msg = func_ov182_021bba38(sMsgWork->freeMsgs);
 
-    file = func_ov182_021bb37c(path, &size, 4);
+    file = DWCUtilRomResource_LoadFile(path, &size, 4);
     msg->file = file;
     info = &file->info;
     msg->offsets = info->offsets;
@@ -48,16 +48,16 @@ DWCUtilMsg *func_ov182_021ae0b8(const char *path) {
     return msg;
 }
 
-void func_ov182_021ae0ec(DWCUtilMsg *msg) {
-    func_ov182_021bb420(msg->file);
+void DWCUtilMsg_Close(DWCUtilMsg *msg) {
+    DWCUtilRomResource_FreeFile(msg->file);
     func_ov182_021bba00(sMsgWork->freeMsgs, msg);
 }
 
-u16 *func_ov182_021ae108(DWCUtilMsg *msg, int index) {
+u16 *DWCUtilMsg_Get(DWCUtilMsg *msg, int index) {
     return (u16 *)(msg->text + msg->offsets[(u16)index]);
 }
 
-u16 *func_ov182_021ae118(DWCUtilMsg *msg, int index, int slot, int value) {
+u16 *DWCUtilMsg_GetWithDigit(DWCUtilMsg *msg, int index, int slot, int value) {
     u16 *str = (u16 *)(msg->text + msg->offsets[(u16)index]);
 
     if (slot >= 0) {

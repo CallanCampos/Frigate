@@ -12,12 +12,12 @@ static const u8 sPairCells[6][2] = { { 0x0a, 0x0b }, { 0x04, 0x05 }, { 0x02, 0x0
 static DWCUtilButtonSprites *sButtonSprites;
 
 void func_ov182_021ab7c8(void) {
-    sButtonSprites = func_ov182_021bc4d8(sizeof(DWCUtilButtonSprites), 4);
+    sButtonSprites = DWCUtilHeap_AllocClear(sizeof(DWCUtilButtonSprites), 4);
 }
 
 void func_ov182_021ab7dc(void) {
     func_ov182_021ab8e4();
-    func_ov182_021bc4f0(&sButtonSprites);
+    DWCUtilHeap_FreeAndNull(&sButtonSprites);
 }
 
 void func_ov182_021ab7f0(int pair, int x0, int x1, int y) {

@@ -26,7 +26,7 @@ void func_ov182_021b6588(void) {
     int from;
 
     func_ov182_021b74f4();
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     func_ov182_021b65c8();
     DWCUtilScreen_Start(0x31, -1, 0);
     if (from != 2) {
@@ -35,7 +35,7 @@ void func_ov182_021b6588(void) {
     if (from == 1) {
         func_ov182_021b7bb0();
     }
-    func_ov182_021adfbc(func_ov182_021b6610);
+    DWCUtilMain_SetUpdate(func_ov182_021b6610);
 }
 
 static void func_ov182_021b65c8(void) {
@@ -51,7 +51,7 @@ static void func_ov182_021b6610(void) {
     func_ov182_021bbac4(2, 0, 0x14, 8);
     func_ov182_021bc1dc(1, 1);
     func_ov182_021bc1dc(0, 0x14);
-    func_ov182_021adfbc(func_ov182_021b6648);
+    DWCUtilMain_SetUpdate(func_ov182_021b6648);
 }
 
 // Shows the message of where the utility was started from in a dialog with one button
@@ -60,9 +60,9 @@ static void func_ov182_021b6648(void) {
     int from;
 
     if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adffc(NULL, &from);
+        DWCUtilMain_GetScreenArgs(NULL, &from);
         func_ov182_021b8cf0(msgIndices[from], 1, 1, -1, 0);
-        func_ov182_021adfbc(func_ov182_021b66a0);
+        DWCUtilMain_SetUpdate(func_ov182_021b66a0);
     }
 }
 
@@ -70,10 +70,10 @@ static void func_ov182_021b66a0(void) {
     func_ov182_021b66d0();
     func_ov182_021b66d4();
     if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021b80f4(6);
-        func_ov182_021adfbc(func_ov182_021b66d8);
+        DWCUtilSound_PlaySe(6);
+        DWCUtilMain_SetUpdate(func_ov182_021b66d8);
     }
 }
 
@@ -86,14 +86,14 @@ static void func_ov182_021b66d4(void) {
 static void func_ov182_021b66d8(void) {
     if (!func_ov182_021b8f24()) {
         func_ov182_021bbac4(3, 0, 0x14, 8);
-        func_ov182_021adfbc(func_ov182_021b66fc);
+        DWCUtilMain_SetUpdate(func_ov182_021b66fc);
     }
 }
 
 static void func_ov182_021b66fc(void) {
     if (func_ov182_021bbaac(0) == 0) {
         func_ov182_021bc228(0, 0x14);
-        func_ov182_021adfc8(0, 1);
-        func_ov182_021adfbc(func_ov182_021b6104);
+        DWCUtilMain_SetLayout(0, 1);
+        DWCUtilMain_SetUpdate(func_ov182_021b6104);
     }
 }

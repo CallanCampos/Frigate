@@ -56,7 +56,7 @@ static DWCUtilUsbScan *sUsbScan;
 BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback) {
     OSOwnerInfo info;
 
-    sUsbScan = func_ov182_021bc4d8(sizeof(DWCUtilUsbScan), 32);
+    sUsbScan = DWCUtilHeap_AllocClear(sizeof(DWCUtilUsbScan), 32);
     sUsbScan->callback = callback;
     sUsbScan->startTick = OS_GetTick();
     if (WM_Initialize(sUsbScan, func_ov182_021b89fc, 3) == WM_ERRCODE_OPERATING) {
@@ -71,11 +71,11 @@ BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback) {
         sUsbScan->param.ssid[9] = TRUE;
         MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
         if (func_ov182_021b8934()) {
-            sUsbScan->task = func_ov182_021bd200(0, func_ov182_021b8c18, NULL, 120);
+            sUsbScan->task = DWCUtilTask_Create(0, func_ov182_021b8c18, NULL, 120);
             return TRUE;
         }
     }
-    func_ov182_021bc4f0(&sUsbScan);
+    DWCUtilHeap_FreeAndNull(&sUsbScan);
     return FALSE;
 }
 
@@ -101,11 +101,11 @@ BOOL func_ov182_021b895c(void) {
         return FALSE;
     }
     if (sUsbScan->task != NULL) {
-        func_ov182_021bd280(0, sUsbScan->task);
+        DWCUtilTask_Remove(0, sUsbScan->task);
     }
     while (sUsbScan->stopping != 2) {
     }
-    func_ov182_021bc4f0(&sUsbScan);
+    DWCUtilHeap_FreeAndNull(&sUsbScan);
     return TRUE;
 }
 
@@ -258,6 +258,6 @@ static void func_ov182_021b8c18(DWCUtilTask *task, void *arg) {
         }
         sUsbScan->task = NULL;
         sUsbScan->listed = TRUE;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }

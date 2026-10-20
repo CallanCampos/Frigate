@@ -26,8 +26,8 @@ void func_ov182_021b4b68(void) {
     func_ov182_021b4b94();
     func_ov182_021ab9ac();
     func_ov182_021ab6f0(0x26);
-    func_ov182_021b80f4(0x10);
-    func_ov182_021adfbc(func_ov182_021b4be4);
+    DWCUtilSound_PlaySe(0x10);
+    DWCUtilMain_SetUpdate(func_ov182_021b4be4);
 }
 
 static void func_ov182_021b4b94(void) {
@@ -42,12 +42,12 @@ static void func_ov182_021b4b94(void) {
 static void func_ov182_021b4be4(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b4c08);
+    DWCUtilMain_SetUpdate(func_ov182_021b4c08);
 }
 
 static void func_ov182_021b4c08(void) {
     if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b4c20);
+        DWCUtilMain_SetUpdate(func_ov182_021b4c20);
     }
 }
 
@@ -62,7 +62,7 @@ static void func_ov182_021b4c2c(void) {
 static void func_ov182_021b4c30(void) {
     func_ov182_021bbac4(3, 1, 1, 8);
     func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021b4c58);
+    DWCUtilMain_SetUpdate(func_ov182_021b4c58);
 }
 
 static void func_ov182_021b4c58(void) {
@@ -72,6 +72,6 @@ static void func_ov182_021b4c58(void) {
 static void func_ov182_021b4ca8(void) {
     sTestDoneFrames++;
     if (sTestDoneFrames >= 120) {
-        func_ov182_021adfbc(func_ov182_021b4c30);
+        DWCUtilMain_SetUpdate(func_ov182_021b4c30);
     }
 }

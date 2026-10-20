@@ -19,11 +19,11 @@ static DWCUtilCell *sCells[2];
 void func_ov182_021bb8dc(int screen, const char *path) {
     u32 size;
 
-    sCells[screen] = func_ov182_021bb37c(path, &size, 4);
+    sCells[screen] = DWCUtilRomResource_LoadFile(path, &size, 4);
 }
 
 void func_ov182_021bb8fc(int screen) {
-    func_ov182_021bb420(sCells[screen]);
+    DWCUtilRomResource_FreeFile(sCells[screen]);
     sCells[screen] = NULL;
 }
 
@@ -57,7 +57,7 @@ DWCUtilOamNode *func_ov182_021bb97c(int screen, int cell, BOOL fromFront) {
 
 // The stack has a slot more than its items: pushing into the last one stops the game
 DWCUtilStack *func_ov182_021bb9ac(int count) {
-    DWCUtilStack *stack = func_ov182_021bc4d8((count + 1) * sizeof(void *) + 8, 4);
+    DWCUtilStack *stack = DWCUtilHeap_AllocClear((count + 1) * sizeof(void *) + 8, 4);
 
     stack->capacity = count + 1;
     stack->head = 0;
@@ -78,7 +78,7 @@ DWCUtilStack *func_ov182_021bb9c8(int count, u8 *first, int stride) {
 }
 
 void func_ov182_021bb9ec(DWCUtilStack *stack) {
-    func_ov182_021bc4f0(&stack);
+    DWCUtilHeap_FreeAndNull(&stack);
 }
 
 void func_ov182_021bba00(DWCUtilStack *stack, void *item) {

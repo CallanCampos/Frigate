@@ -70,8 +70,8 @@ void func_ov182_021b6b1c(void) {
     func_ov182_021ab738(nickName, 0x28);
     DWCUtilUiEffect_Init(0);
     func_ov182_021b8834(func_ov182_021b6dcc);
-    func_ov182_021b80f4(0xb);
-    func_ov182_021adfbc(func_ov182_021b6bfc);
+    DWCUtilSound_PlaySe(0xb);
+    DWCUtilMain_SetUpdate(func_ov182_021b6bfc);
 }
 
 static void func_ov182_021b6b8c(void) {
@@ -88,20 +88,20 @@ static void func_ov182_021b6b8c(void) {
 static void func_ov182_021b6bfc(void) {
     func_ov182_021bbac4(2, 0, 0x15, 8);
     func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b6c20);
+    DWCUtilMain_SetUpdate(func_ov182_021b6c20);
 }
 
 static void func_ov182_021b6c20(void) {
     if (func_ov182_021bbaac(0) == 0) {
         func_ov182_021ab6d0(2);
-        func_ov182_021adfbc(func_ov182_021b6c40);
+        DWCUtilMain_SetUpdate(func_ov182_021b6c40);
     }
 }
 
 static void func_ov182_021b6c40(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b6c60);
+        DWCUtilMain_SetUpdate(func_ov182_021b6c60);
     }
 }
 
@@ -126,16 +126,16 @@ static void func_ov182_021b6c94(void) {
 static void func_ov182_021b6c98(void) {
     if (sUsbSetupState == USB_SETUP_RUNNING && DWCUtilUiObject_GetState() == 0) {
         sUsbSetupState = USB_SETUP_CANCEL;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(7);
-        func_ov182_021adfbc(func_ov182_021b6cc8);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(7);
+        DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
     }
 }
 
 static void func_ov182_021b6cc8(void) {
     DWCUtilUiObject_Disable();
     func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b6ce0);
+    DWCUtilMain_SetUpdate(func_ov182_021b6ce0);
 }
 
 static void func_ov182_021b6ce0(void) {
@@ -145,7 +145,7 @@ static void func_ov182_021b6ce0(void) {
             func_ov182_021bbac4(3, 1, 1, 8);
         }
         func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b6d28);
+        DWCUtilMain_SetUpdate(func_ov182_021b6d28);
     }
 }
 
@@ -161,14 +161,14 @@ static void func_ov182_021b6d28(void) {
         }
         func_ov182_021bc228(0, 0x15);
         if (sUsbSetupState == USB_SETUP_CANCEL) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b536c);
         } else if (sUsbSetupState == USB_SETUP_RETRY) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b688c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(func_ov182_021b688c);
         } else {
-            func_ov182_021adfc8(0, 0);
-            func_ov182_021adfbc(func_ov182_021b6728);
+            DWCUtilMain_SetLayout(0, 0);
+            DWCUtilMain_SetUpdate(func_ov182_021b6728);
         }
     }
 }
@@ -181,44 +181,44 @@ static void func_ov182_021b6dcc(int result) {
     switch (result) {
     case DWC_UTIL_USB_SCAN_NONE:
         sUsbSetupState = USB_SETUP_RETRY;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(0x12);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(0x12);
         func_ov182_021b8cf0(0x10, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b6e80);
+        DWCUtilMain_SetUpdate(func_ov182_021b6e80);
         break;
     case DWC_UTIL_USB_SCAN_FOUND:
         sUsbSetupState = USB_SETUP_DONE;
-        func_ov182_021b8138();
-        func_ov182_021adfbc(func_ov182_021b6cc8);
+        DWCUtilSound_StopSe();
+        DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
         break;
     case DWC_UTIL_USB_SCAN_SEVERAL:
-        func_ov182_021b8138();
+        DWCUtilSound_StopSe();
         func_ov182_021b89e8(NULL);
         func_ov182_021b8cf0(0x11, 0, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b6eb8);
+        DWCUtilMain_SetUpdate(func_ov182_021b6eb8);
         break;
     case 3:
         sUsbSetupState = USB_SETUP_CANCEL;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(9);
-        func_ov182_021adfbc(func_ov182_021b6cc8);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(9);
+        DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
         break;
     }
 }
 
 static void func_ov182_021b6e80(void) {
     if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b6ea0);
+        DWCUtilMain_SetUpdate(func_ov182_021b6ea0);
     }
 }
 
 static void func_ov182_021b6ea0(void) {
     if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b6cc8);
+        DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
     }
 }
 
@@ -227,29 +227,29 @@ static void func_ov182_021b6eb8(void) {
     switch (func_ov182_021b8f14()) {
     case 1:
         sUsbSetupState = USB_SETUP_RETRY;
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         break;
     case 0:
         sUsbSetupState = USB_SETUP_DONE;
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     default:
         return;
     }
     func_ov182_021b8eec();
-    func_ov182_021adfbc(func_ov182_021b6ef0);
+    DWCUtilMain_SetUpdate(func_ov182_021b6ef0);
 }
 
 static void func_ov182_021b6ef0(void) {
     if (!func_ov182_021b8f24()) {
         if (sUsbSetupState == USB_SETUP_DONE) {
-            func_ov182_021adfbc(func_ov182_021b6cc8);
+            DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
         } else {
-            func_ov182_021b80f4(0xb);
+            DWCUtilSound_PlaySe(0xb);
             DWCUtilUiObject_Enable();
             sUsbSetupState = USB_SETUP_RUNNING;
             func_ov182_021b89e8(func_ov182_021b6dcc);
-            func_ov182_021adfbc(func_ov182_021b6c60);
+            DWCUtilMain_SetUpdate(func_ov182_021b6c60);
         }
     }
 }

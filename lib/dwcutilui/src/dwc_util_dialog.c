@@ -85,8 +85,8 @@ void func_ov182_021b8cf0(int msgIndex, int layout, BOOL fade, int slot, int valu
     u16 *str;
     int i;
 
-    str = func_ov182_021ae118(data_ov182_021c40b8, msgIndex, slot, value);
-    sDialog = func_ov182_021bc4d8(sizeof(DWCUtilDialog), 4);
+    str = DWCUtilMsg_GetWithDigit(data_ov182_021c40b8, msgIndex, slot, value);
+    sDialog = DWCUtilHeap_AllocClear(sizeof(DWCUtilDialog), 4);
     sDialog->layout = layout;
     sDialog->choice = -2;
     sDialog->fade = fade;
@@ -111,15 +111,15 @@ void func_ov182_021b8cf0(int msgIndex, int layout, BOOL fade, int slot, int valu
     func_ov182_021b90f4(0xc0);
     GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
     if (fade) {
-        sDialog->task = func_ov182_021bd200(1, func_ov182_021b8f38, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(1, func_ov182_021b8f38, NULL, 120);
     } else {
-        sDialog->task = func_ov182_021bd200(1, func_ov182_021b8f74, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(1, func_ov182_021b8f74, NULL, 120);
     }
 }
 
 void func_ov182_021b8eec(void) {
-    func_ov182_021bd268(0, sDialog->task);
-    sDialog->task = func_ov182_021bd200(1, func_ov182_021b92c8, NULL, 120);
+    DWCUtilTask_QueueRemoval(0, sDialog->task);
+    sDialog->task = DWCUtilTask_Create(1, func_ov182_021b92c8, NULL, 120);
 }
 
 int func_ov182_021b8f14(void) {
@@ -138,7 +138,7 @@ static void func_ov182_021b8f38(DWCUtilTask *task, void *arg) {
     sDialog->brightness--;
     G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, sDialog->brightness);
     if (sDialog->brightness <= -12) {
-        func_ov182_021bd264(task, func_ov182_021b8f74);
+        DWCUtilTask_SetCallback(task, func_ov182_021b8f74);
     }
 }
 
@@ -155,11 +155,11 @@ static void func_ov182_021b8f74(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021b90f4(sDialogFramePositions[sDialog->layout][1]);
     if (sDialog->layout == DIALOG_LAYOUT_TIMED) {
-        sDialog->task = func_ov182_021bd200(0, func_ov182_021b90b4, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(0, func_ov182_021b90b4, NULL, 120);
     } else {
-        sDialog->task = func_ov182_021bd200(0, func_ov182_021b8fe8, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(0, func_ov182_021b8fe8, NULL, 120);
     }
-    func_ov182_021bd268(1, task);
+    DWCUtilTask_QueueRemoval(1, task);
 }
 
 // The buttons: a touch on one, or A or B, chooses it
@@ -194,8 +194,8 @@ static void func_ov182_021b90b4(DWCUtilTask *task, void *arg) {
     sDialog->choice = -1;
     sDialog->frames++;
     if (sDialog->frames >= 120) {
-        func_ov182_021bd268(0, task);
-        sDialog->task = func_ov182_021bd200(1, func_ov182_021b92c8, NULL, 120);
+        DWCUtilTask_QueueRemoval(0, task);
+        sDialog->task = DWCUtilTask_Create(1, func_ov182_021b92c8, NULL, 120);
     }
 }
 
@@ -264,7 +264,7 @@ static void func_ov182_021b9250(int button) {
 static void func_ov182_021b92c8(DWCUtilTask *task, void *arg) {
     sDialog->delay++;
     if (sDialog->delay >= 8) {
-        func_ov182_021bd264(task, func_ov182_021b92ec);
+        DWCUtilTask_SetCallback(task, func_ov182_021b92ec);
     }
 }
 
@@ -278,9 +278,9 @@ static void func_ov182_021b92ec(DWCUtilTask *task, void *arg) {
     func_ov182_021b90f4(y);
     if (y >= 0xc0) {
         if (sDialog->fade) {
-            func_ov182_021bd264(task, func_ov182_021b9340);
+            DWCUtilTask_SetCallback(task, func_ov182_021b9340);
         } else {
-            func_ov182_021bd264(task, func_ov182_021b9378);
+            DWCUtilTask_SetCallback(task, func_ov182_021b9378);
         }
     }
 }
@@ -289,7 +289,7 @@ static void func_ov182_021b9340(DWCUtilTask *task, void *arg) {
     sDialog->brightness++;
     G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, sDialog->brightness);
     if (sDialog->brightness >= 0) {
-        func_ov182_021bd264(task, func_ov182_021b9378);
+        DWCUtilTask_SetCallback(task, func_ov182_021b9378);
     }
 }
 
@@ -305,6 +305,6 @@ static void func_ov182_021b9378(DWCUtilTask *task, void *arg) {
         }
     }
     func_ov182_021bbdcc(sDialog->text);
-    func_ov182_021bd268(1, task);
-    func_ov182_021bc4f0(&sDialog);
+    DWCUtilTask_QueueRemoval(1, task);
+    DWCUtilHeap_FreeAndNull(&sDialog);
 }
