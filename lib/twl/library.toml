@@ -49,3 +49,11 @@ flags = [
 "dsp/dsp_pipe.c" = ["-nothumb"]
 "dsp/dsp_g711.c" = ["-nothumb"]
 "dsp/dsp_graphics.c" = ["-nothumb"]
+
+# TwlSDK's system call library was built with NitroSystem's compiler, 2.0/sp2p2: its LTD half's HMAC-SHA-1 matches
+# under it and under no dsi compiler, which index its pad loops and keep the context's address in a register, and its
+# ARM9 main half matches under both, so both files take it. The rest of the library needs dsi/1.1p1: built with
+# 2.0/sp2p2, 20 of its other files lose matches (camera, NWM, DSP, JPEG and the others) and none gains any
+[file_compilers]
+"syscall/syscall_twl.c" = "2.0/sp2p2"
+"syscall/syscall_twl_ltd.c" = "2.0/sp2p2"

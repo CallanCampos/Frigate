@@ -33,8 +33,9 @@ every section.
   (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
   code; the rest in overlays 11, 29, 189 and 260, mostly Thumb), `lib/msl/` (Metrowerks' MSL C library for NITRO, the
   C library, fdlibm math and runtime that ARM9 main links after NitroSDK, ARM code built with `dsi/1.2`),
-  `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under DWC in overlay 11, Thumb with the game's
-  compiler), `lib/dpw/` (the Global Trade Station's and the Battle Subway's Wi-Fi library in overlay 189, ARM),
+  `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under DWC in overlay 11, and WCM's DSi
+  backend in the LTD autoload's `.ltdmain`, Thumb with the game's compiler), `lib/dpw/` (the Global Trade Station's
+  and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
   Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's main loop, screens,
   keyboards and selectable objects, and the helpers under them: resources, messages, heap, OAM, cells, fades, text,
@@ -47,7 +48,8 @@ every section.
   autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
   `gfd`, ...) are Thumb built with CodeWarrior 2.0. A file built with other flags than the rest of its library is
   listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
-  (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names
+  (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`), and one built with another compiler
+  under `file_compilers` (TwlSDK's `syscall_twl_ltd.c` takes `2.0/sp2p2`). Library code uses the SDK's own names
   (see [Names](#names)). The C library's headers are MSL's, in `include/` (`string.h`, `stdio.h`, `math.h` and the
   others, and `NMWException.h` for the runtime), and `lib/msl/src/` keeps MSL's private ones. A library whose ROM calls
   the string functions that MWCC builds in place from `<string.h>` declares them in its own header instead (`dwc/ext.h`,

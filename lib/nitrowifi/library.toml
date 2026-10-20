@@ -1,5 +1,6 @@
-# Nintendo's NitroWiFi, the TCP/IP stack (CPS) and socket layer (SOCL) under DWC, in overlay 11. It is Thumb code, built
-# apart from the game with the game's compiler, dsi/1.1p1, and the same flags as DWC (lib/dwc)
+# Nintendo's NitroWiFi, the TCP/IP stack (CPS) and socket layer (SOCL) under DWC, in overlay 11, and WCM's DSi backend
+# in the LTD autoload's .ltdmain (wcm/wcm_dsi.c). It is Thumb code, built apart from the game with the game's compiler,
+# dsi/1.1p1, and the same flags as DWC (lib/dwc)
 compiler = "dsi/1.1p1"
 flags = [
     "-O4,p",               # Optimize for speed

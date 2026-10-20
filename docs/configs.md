@@ -130,8 +130,10 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
     taken for pointers.
   - `.ctor`: the empty static initializer table, a zero, that the autoload list points to.
   - `.ltdmain`, from the next 32-byte boundary: Thumb code that calls main's SDK through linker veneers, such as the
-    NDMA functions (`MI_IsNDmaBusy` at `0x02768234`). It seems to be the DSi-only code of main's library files. The
-    section's name is a guess, after the SDK's LTDMAIN.
+    NDMA functions (`MI_IsNDmaBusy` at `0x02768234`). It seems to be the DSi-only code of main's library files, and
+    ends with NitroWiFi WCM's DSi backend (`wcm_dsi.c`), which overlay 11 calls. The section's name is a guess, after
+    the SDK's LTDMAIN; C code goes there between `#pragma section LTDMAIN begin` and `end`, after
+    `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX`.
   - `.data` and `.bss`.
 - Overlay 169 runs from VRAM, at `0x06898020`. Its code is analyzed like any other overlay's since dsd v0.12.1-dsi.3;
   before, dsd took a branch outside main memory for data and had all of it as `.rodata`.
@@ -145,7 +147,10 @@ followed by three identical veneers. `mwldarm` does this only for a file listed 
 `-overlay` options, which must be how the SDK's response file places each overlay's objects; any other file shares one
 veneer per target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes
 `objects.txt` this way, while the LCF still places the objects. Before, a file that called the same far target twice,
-such as `camera_system.c`, couldn't be completed.
+such as `camera_system.c`, couldn't be completed. The LTD autoload's Thumb code (`.ltdmain`) gives every call its own
+veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
+moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and
+`-overlay LTD_AUTOLOAD_0`, which gives `wcm_dsi.c`'s 56 calls of `WCM_SetState` their 56 veneers.
 
 ## Shifting
 

@@ -707,7 +707,7 @@ data_0276b0e4 kind:bss addr:0x0276b0e4
 data_0276b0e8 kind:bss addr:0x0276b0e8
 PMi_PostExitCallbackList kind:bss addr:0x0276b0ec
 PMi_BatteryLowCallbackInfo kind:bss addr:0x0276b0f0
-data_0276b100 kind:bss addr:0x0276b100
+sConnectIndex kind:bss addr:0x0276b100
 sCameraInitialized kind:bss addr:0x0276b104
 sUnused kind:bss addr:0x0276b108
 sCameraWork kind:bss addr:0x0276b10c
