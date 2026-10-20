@@ -5531,8 +5531,8 @@ BOOL ServerControl_GainExpFromFainted(BtlServerFlow *flow, BattleMon *mon) {
         AddExpAndEVs(flow, party, mon, flow->expEntries);
         if (BtlSetup_GetBattleType(flow->mainModule) == 0) {
             u16 species = GetBattleMonSpecies(mon);
-            func_0202d28c(species, BtlSetup_IsBattleType(flow->mainModule, 0x4000),
-                          BtlSetup_IsBattleType(flow->mainModule, 0x8000));
+            GameBeaconSys_SendDefeatMission(species, BtlSetup_IsBattleType(flow->mainModule, 0x4000),
+                                            BtlSetup_IsBattleType(flow->mainModule, 0x8000));
         }
         return ServerControl_GiveExp(flow, party, flow->expEntries);
     }

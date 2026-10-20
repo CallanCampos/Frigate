@@ -636,7 +636,7 @@ static void BeaconViewPanel_SetMedals(BeaconViewWork *work, BeaconViewPanel *pan
         return;
     }
     panel->medalCount = GameBeacon_GetMedalCount(beacon);
-    panel->unkA = func_02013dc8(beacon);
+    panel->unkA = GameBeacon_GetFavoriteMedal(beacon);
     if (BeaconViewPanel_HasNoMedals(panel)) {
         BeaconView_SetActorAnim(panel->medal, 24);
     } else {
@@ -1330,7 +1330,7 @@ static void BeaconViewPanel_StartIcon(BeaconViewWork *work, BeaconViewPanel *pan
     } else {
         data->type = GameBeacon_GetType(beacon);
     }
-    BeaconViewPanel_SetIcon(work, panel, func_020140cc(data->type));
+    BeaconViewPanel_SetIcon(work, panel, GameBeacon_GetTypeIcon(data->type));
     BeaconViewPanel_SetIconVisible(panel, greeting ? FALSE : TRUE);
 }
 

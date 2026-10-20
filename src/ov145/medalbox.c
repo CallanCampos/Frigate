@@ -2365,10 +2365,10 @@ static void MedalBoxApp_SetFavorite(MedalBoxApp *work, u16 medal, int result) {
     work->favoriteResult = result;
     if (result == FAVORITE_SET) {
         work->data.favoriteMedal = medal;
-        func_0202d194(medal);
+        GameBeaconSys_SetFavoriteMedal(medal);
     } else if (result == FAVORITE_REMOVED) {
         work->data.favoriteMedal = 0xff;
-        func_0202d194(0xff);
+        GameBeaconSys_SetFavoriteMedal(0xff);
     }
 }
 

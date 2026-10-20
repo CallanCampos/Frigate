@@ -336,7 +336,7 @@ u8 GameBeacon_GetRegion(const GameBeacon *beacon) {
     return beacon->region;
 }
 
-u8 func_02013cd8(GameBeacon *beacon) {
+u8 GameBeacon_GetJob(GameBeacon *beacon) {
     u32 answer = SurveySave_ReadAnswer(beacon->surveyAnswers, 0x1a);
 
     if (answer == 0) {
@@ -345,7 +345,7 @@ u8 func_02013cd8(GameBeacon *beacon) {
     return answer;
 }
 
-u8 func_02013cf0(GameBeacon *beacon) {
+u8 GameBeacon_GetHobby(GameBeacon *beacon) {
     u32 answer = SurveySave_ReadAnswer(beacon->surveyAnswers, 0x19);
 
     if (answer == 0) {
@@ -408,15 +408,15 @@ u16 GameBeacon_GetParentZone(const GameBeacon *beacon) {
     return beacon->parentZoneId;
 }
 
-u32 func_02013db8(const GameBeacon *beacon) {
+u32 GameBeacon_GetThankedCount(const GameBeacon *beacon) {
     return beacon->thankedCount;
 }
 
-u32 func_02013dc0(const GameBeacon *beacon) {
+u32 GameBeacon_GetPasserbyCount(const GameBeacon *beacon) {
     return beacon->passerbyCount;
 }
 
-u8 func_02013dc8(const GameBeacon *beacon) {
+u8 GameBeacon_GetFavoriteMedal(const GameBeacon *beacon) {
     return beacon->favoriteMedal;
 }
 
@@ -661,7 +661,7 @@ static u8 GameBeacon_GetTypeFormat(int type) {
     return sTypeFormats[type].format;
 }
 
-u8 func_020140cc(int type) {
+u8 GameBeacon_GetTypeIcon(int type) {
     if (type >= BEACON_FORMAT_TYPE_MAX) {
         return 0;
     }

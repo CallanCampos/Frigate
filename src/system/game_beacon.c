@@ -851,14 +851,14 @@ BOOL GameBeacon_IsMissionType(const GameBeacon *beacon) {
     return TRUE;
 }
 
-BOOL func_0202cf98(const GameBeacon *beacon) {
+BOOL GameBeacon_HasMissionInfo(const GameBeacon *beacon) {
     if (beacon->type < 0x3c || beacon->type > 0x66) {
         return FALSE;
     }
     return TRUE;
 }
 
-u32 func_0202cfac(u32 a0, u16 a1) {
+u32 GameBeaconSys_AddMissionScore(u32 a0, u16 a1) {
     if (GameBeaconSys == NULL || GameBeaconSys->gsys == NULL) {
         return 0;
     }
@@ -976,7 +976,7 @@ void GameBeaconSys_SetMedalCount(u8 count) {
     slot->updated = TRUE;
 }
 
-void func_0202d194(u32 value) {
+void GameBeaconSys_SetFavoriteMedal(u32 value) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
     slot->beacon.favoriteMedal = value;
@@ -1033,14 +1033,14 @@ static BOOL GameBeaconSys_SendCaptureMission(u16 species, BOOL a1, BOOL a2) {
         type = 0x40;
         mission = 6;
     }
-    if (func_0202cfac(mission, species)) {
+    if (GameBeaconSys_AddMissionScore(mission, species)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, type, species);
         return TRUE;
     }
     return FALSE;
 }
 
-void func_0202d28c(u16 species, BOOL a1, BOOL a2) {
+void GameBeaconSys_SendDefeatMission(u16 species, BOOL a1, BOOL a2) {
     u16 type;
     u32 mission;
 
@@ -1054,7 +1054,7 @@ void func_0202d28c(u16 species, BOOL a1, BOOL a2) {
         type = 0x3f;
         mission = 5;
     }
-    if (func_0202cfac(mission, species)) {
+    if (GameBeaconSys_AddMissionScore(mission, species)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, type, species);
     }
 }
@@ -1098,8 +1098,8 @@ static void GameBeacon_SetPlayTime(GameBeacon *beacon, u16 hours) {
     GameBeacon_ClearRecent(beacon);
 }
 
-void func_0202d384(u16 item) {
-    if (func_0202cfac(0xb, item)) {
+void GameBeaconSys_SendItemUse(u16 item) {
+    if (GameBeaconSys_AddMissionScore(0xb, item)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x45, item);
         return;
     }
@@ -1186,7 +1186,7 @@ static void GameBeacon_SetMyCGearRecord(const PMSData *record) {
     GameBeacon_SetCGearRecordFields(&GameBeaconSys->mine.beacon, record);
 }
 
-void func_0202d5cc(void) {
+void GameBeaconSys_SendMission(void) {
     u16 type = 0x3c;
 
     if (GameBeaconSys_CanSendType(type)) {

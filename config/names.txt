@@ -890,6 +890,8 @@
 . 0x02013cc8 GameBeacon_GetLanguage
 . 0x02013cd0 GameBeacon_GetCountry
 . 0x02013cd4 GameBeacon_GetRegion
+. 0x02013cd8 GameBeacon_GetJob
+. 0x02013cf0 GameBeacon_GetHobby
 . 0x02013d08 GameBeacon_GetCGearRecord
 . 0x02013d2c GameBeacon_GetSurveyRank
 . 0x02013d38 GameBeacon_GetFavoriteColorRGB
@@ -901,6 +903,9 @@
 . 0x02013d98 GameBeacon_GetPassPower
 . 0x02013da0 GameBeacon_GetZone
 . 0x02013dac GameBeacon_GetParentZone
+. 0x02013db8 GameBeacon_GetThankedCount
+. 0x02013dc0 GameBeacon_GetPasserbyCount
+. 0x02013dc8 GameBeacon_GetFavoriteMedal
 . 0x02013dd0 GameBeacon_GetMedalCount
 . 0x02013dd8 GameBeacon_GetGreeting
 . 0x02013df4 GameBeacon_GetMessage
@@ -926,6 +931,7 @@
 . 0x02014050 GameBeacon_GetTournamentRound
 . 0x02014098 GameBeacon_GetZoneAndNumber
 . 0x020140b8 GameBeacon_GetTypeFormat
+. 0x020140cc GameBeacon_GetTypeIcon
 . 0x020140e0 GameBeacon_SetMessageWords
 . 0x020142e0 GameBeacon_NeverInvalid
 . 0x020142e4 GameBeacon_IsTrainerInvalid
@@ -1680,6 +1686,8 @@
 . 0x0202ce9c GameBeaconSendSlot_SetMission
 . 0x0202cea8 GameBeaconSendSlot_SetMissionEx
 . 0x0202cf84 GameBeacon_IsMissionType
+. 0x0202cf98 GameBeacon_HasMissionInfo
+. 0x0202cfac GameBeaconSys_AddMissionScore
 . 0x0202cfe8 GameBeaconSys_CanSendType
 . 0x0202d014 GameBeacon_IsSpecialSpecies
 . 0x0202d034 GameBeacon_StoreTextN
@@ -1692,18 +1700,21 @@
 . 0x0202d114 GameBeaconSys_SetTrainerView
 . 0x0202d138 GameBeaconSys_UpdateGreeting
 . 0x0202d17c GameBeaconSys_SetMedalCount
+. 0x0202d194 GameBeaconSys_SetFavoriteMedal
 . 0x0202d1ac GameBeaconSys_SendCapture
 . 0x0202d1dc GameBeaconSys_SendCaptureWild
 . 0x0202d204 GameBeacon_SetCaptureWild
 . 0x0202d214 GameBeaconSys_SendCaptureSpecial
 . 0x0202d23c GameBeacon_SetCaptureSpecial
 . 0x0202d24c GameBeaconSys_SendCaptureMission
+. 0x0202d28c GameBeaconSys_SendDefeatMission
 . 0x0202d2c8 GameBeaconSys_SendNickname
 . 0x0202d2f0 GameBeacon_SetType10
 . 0x0202d304 GameBeaconSys_SendEvolution
 . 0x0202d330 GameBeacon_SetEvolution
 . 0x0202d34c GameBeaconSys_SendPlayTime
 . 0x0202d374 GameBeacon_SetPlayTime
+. 0x0202d384 GameBeaconSys_SendItemUse
 . 0x0202d3e0 GameBeacon_SetItem
 . 0x0202d3f0 GameBeacon_SetZone
 . 0x0202d41c GameBeacon_UpdateZone
@@ -1715,6 +1726,7 @@
 . 0x0202d550 GameBeacon_ClearRecent
 . 0x0202d564 GameBeacon_SetCGearRecordFields
 . 0x0202d5b8 GameBeacon_SetMyCGearRecord
+. 0x0202d5cc GameBeaconSys_SendMission
 . 0x0202d5f0 GameBeaconSys_SetEnabled
 . 0x0202d608 GameBeaconSys_SetAvenuePeople
 . 0x0202d620 GameBeaconSys_SendAvenueAd

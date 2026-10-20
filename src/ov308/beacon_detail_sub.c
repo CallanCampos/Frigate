@@ -456,7 +456,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     GameBeacon_GetName(beacon, work->formatBuf);
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_NAME], work->formatBuf, 6, 48, 13, 2, 0);
 
-    answer = func_02013cd8(beacon);
+    answer = GameBeacon_GetJob(beacon);
     if (answer == 0xff) {
         GFL_StrBufClear(work->textBuf);
     } else {
@@ -465,7 +465,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     }
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_JOB], work->textBuf, 6, 48, 13, 2, 1);
 
-    answer = func_02013cf0(beacon);
+    answer = GameBeacon_GetHobby(beacon);
     if (answer == 0xff) {
         GFL_StrBufClear(work->textBuf);
     } else {
@@ -486,8 +486,8 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     BeaconDetailSub_FormatMessage(work, Startmenu_Text_Empty_4);
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_HOME], work->textBuf, 0, 0, 28, 4, 0);
 
-    WordSetNumber(work->wordSet, 0, func_02013db8(beacon), 5, 1, TRUE);
-    WordSetNumber(work->wordSet, 1, func_02013dc0(beacon), 5, 1, TRUE);
+    WordSetNumber(work->wordSet, 0, GameBeacon_GetThankedCount(beacon), 5, 1, TRUE);
+    WordSetNumber(work->wordSet, 1, GameBeacon_GetPasserbyCount(beacon), 5, 1, TRUE);
     BeaconDetailSub_FormatMessage(work, Startmenu_Text_Empty_5);
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_COUNTS], work->textBuf, 21, 0, 6, 4, 0);
 

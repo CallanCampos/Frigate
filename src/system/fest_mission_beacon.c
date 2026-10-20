@@ -194,7 +194,7 @@ void FestMissionOffers_AddBeacon(LinkFestival *festival, const GameBeacon *beaco
     FestMissionOffer offer;
     int index;
 
-    if (!func_0202cf98(beacon)) {
+    if (!GameBeacon_HasMissionInfo(beacon)) {
         return;
     }
     index = FestMissionOffers_Find(festival, beacon);
@@ -285,7 +285,7 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
     if (FestMission_CheckFuncs[header->kind](info)) {
         return TRUE;
     }
-    if (!func_0202cf98(beacon)) {
+    if (!GameBeacon_HasMissionInfo(beacon)) {
         return FALSE;
     }
     if (info->seconds > FEST_MISSION_SECONDS_MAX || info->count > FEST_MISSION_SCORE_MAX || info->unk8_30 >= 3 ||

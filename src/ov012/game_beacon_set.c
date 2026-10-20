@@ -57,7 +57,7 @@ static const u8 data_ov012_0216d718[5] = { 10, 30, 50, 100, 200 };
 void GameBeacon_BroadcastWildBattleStart(u16 value) {
     if (GameBeacon_IsSpecialSpecies(value)) {
         GameBeacon_TrySpecialBattleStart(value);
-    } else if (func_0202cfac(4, value)) {
+    } else if (GameBeaconSys_AddMissionScore(4, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x3e, value);
     } else {
         GameBeacon_TryWildBattleStart(value);
@@ -126,7 +126,7 @@ static void GameBeacon_FillSpecialBattleWin(GameBeacon *info, u16 value) {
 
 void GameBeacon_BroadcastTrainerBattleStart(u16 itemId) {
     if (itemId < 0x32e) {
-        if (func_0202cfac(8, itemId)) {
+        if (GameBeaconSys_AddMissionScore(8, itemId)) {
             GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x42, itemId);
         } else if (GameBeaconSys_CanSendType(6)) {
             GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
@@ -143,7 +143,7 @@ static void GameBeacon_FillTrainerBattleStart(GameBeacon *info, u16 itemId) {
 
 void GameBeacon_BroadcastTrainerBattleWin(u16 itemId) {
     if (itemId < 0x32e) {
-        if (func_0202cfac(9, itemId)) {
+        if (GameBeaconSys_AddMissionScore(9, itemId)) {
             GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x43, itemId);
         } else if (GameBeaconSys_CanSendType(7)) {
             GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
@@ -160,7 +160,7 @@ static void GameBeacon_FillTrainerBattleWin(GameBeacon *info, u16 itemId) {
 
 void GameBeacon_BroadcastLeaderBattleStart(u16 itemId) {
     if (itemId < 0x32e) {
-        if (func_0202cfac(8, itemId)) {
+        if (GameBeaconSys_AddMissionScore(8, itemId)) {
             GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x42, itemId);
         } else if (GameBeaconSys_CanSendType(8)) {
             GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
@@ -177,7 +177,7 @@ static void GameBeacon_FillLeaderBattleStart(GameBeacon *info, u16 itemId) {
 
 void GameBeacon_BroadcastLeaderBattleWin(u16 itemId) {
     if (itemId < 0x32e) {
-        if (func_0202cfac(9, itemId)) {
+        if (GameBeaconSys_AddMissionScore(9, itemId)) {
             GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x43, itemId);
         } else if (GameBeaconSys_CanSendType(9)) {
             GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
@@ -194,7 +194,7 @@ static void GameBeacon_FillLeaderBattleWin(GameBeacon *info, u16 itemId) {
 
 void GameBeacon_BroadcastSpecialTrainerBattleStart(u16 itemId) {
     if (itemId < 0x32e) {
-        if (func_0202cfac(8, itemId)) {
+        if (GameBeaconSys_AddMissionScore(8, itemId)) {
             GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x42, itemId);
         } else if (GameBeaconSys_CanSendType(10)) {
             GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
@@ -211,7 +211,7 @@ static void GameBeacon_FillSpecialTrainerBattleStart(GameBeacon *info, u16 itemI
 
 void GameBeacon_BroadcastSpecialTrainerBattleWin(u16 itemId) {
     if (itemId < 0x32e) {
-        if (func_0202cfac(9, itemId)) {
+        if (GameBeaconSys_AddMissionScore(9, itemId)) {
             GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x43, itemId);
         } else if (GameBeaconSys_CanSendType(11)) {
             GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
@@ -227,7 +227,7 @@ static void GameBeacon_FillSpecialTrainerBattleWin(GameBeacon *info, u16 itemId)
 }
 
 void GameBeacon_BroadcastPassPower(u32 passPower) {
-    if (func_0202cfac(15, passPower)) {
+    if (GameBeaconSys_AddMissionScore(15, passPower)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x49, passPower);
     } else if (GameBeaconSys_CanSendType(0x12)) {
         if (PassPower_IsBW1Compatible(passPower)) {
@@ -246,7 +246,7 @@ static void GameBeacon_FillPassPower(GameBeacon *info, u32 passPower) {
 }
 
 void GameBeacon_BroadcastFoundItem(u16 value) {
-    if (func_0202cfac(12, value)) {
+    if (GameBeaconSys_AddMissionScore(12, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x46, value);
     } else if (GameBeaconSys_CanSendType(0x13)) {
         if (PML_ItemIsB2W2Only(value)) {
@@ -309,7 +309,7 @@ static void GameBeacon_FillUnionRoomReception(GameBeacon *info) {
 }
 
 void GameBeacon_BroadcastBattleEscape(u16 value) {
-    if (func_0202cfac(7, value)) {
+    if (GameBeaconSys_AddMissionScore(7, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x41, value);
     } else if (GameBeaconSys_CanSendType(0x1e)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -323,7 +323,7 @@ static void GameBeacon_FillBattleEscape(GameBeacon *info) {
 }
 
 void GameBeacon_BroadcastLowHP(u16 value, const StrBuf *name) {
-    if (func_0202cfac(0x2b, value)) {
+    if (GameBeaconSys_AddMissionScore(0x2b, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x65, value);
     } else if (GameBeaconSys_CanSendType(0x1f)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -338,7 +338,7 @@ static void GameBeacon_FillLowHP(GameBeacon *info, const StrBuf *name) {
 }
 
 void GameBeacon_BroadcastLowPP(u16 value, const StrBuf *name) {
-    if (func_0202cfac(0x2c, value)) {
+    if (GameBeaconSys_AddMissionScore(0x2c, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x66, value);
     } else if (GameBeaconSys_CanSendType(0x20)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -353,7 +353,7 @@ static void GameBeacon_FillLowPP(GameBeacon *info, const StrBuf *name) {
 }
 
 void GameBeacon_BroadcastFainted(u16 value, const StrBuf *name) {
-    if (func_0202cfac(0x2a, value)) {
+    if (GameBeaconSys_AddMissionScore(0x2a, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x64, value);
     } else if (GameBeaconSys_CanSendType(0x21)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -381,7 +381,7 @@ static void GameBeacon_FillStatusCondition(GameBeacon *info, const StrBuf *name)
 }
 
 void GameBeacon_BroadcastFieldMove(u16 value) {
-    if (func_0202cfac(13, value)) {
+    if (GameBeaconSys_AddMissionScore(13, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x47, value);
     } else if (GameBeaconSys_CanSendType(0x24)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -396,7 +396,7 @@ static void GameBeacon_FillFieldMove(GameBeacon *info, u16 value) {
 }
 
 void GameBeacon_BroadcastEggReceived(void) {
-    if (func_0202cfac(0x12, 0)) {
+    if (GameBeaconSys_AddMissionScore(0x12, 0)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x4c, 0);
     } else if (GameBeaconSys_CanSendType(0x25)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -410,7 +410,7 @@ static void GameBeacon_FillEggReceived(GameBeacon *info) {
 }
 
 void GameBeacon_BroadcastEggHatched(u16 species) {
-    if (func_0202cfac(0x1b, species)) {
+    if (GameBeaconSys_AddMissionScore(0x1b, species)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x55, species);
     } else if (GameBeaconSys_CanSendType(0x26)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -425,7 +425,7 @@ static void GameBeacon_FillEggHatched(GameBeacon *info, u16 species) {
 }
 
 void GameBeacon_BroadcastShopping(void) {
-    if (func_0202cfac(14, 0)) {
+    if (GameBeaconSys_AddMissionScore(14, 0)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x48, 0);
     } else if (GameBeaconSys_CanSendType(0x27)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -502,7 +502,7 @@ static void GameBeacon_FillBattleInstituteRank(GameBeacon *info, u8 value) {
 }
 
 void GameBeacon_BroadcastFerrisWheel(void) {
-    if (func_0202cfac(16, 0)) {
+    if (GameBeaconSys_AddMissionScore(16, 0)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x4a, 0);
     } else if (GameBeaconSys_CanSendType(0x2d)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -573,7 +573,7 @@ static void GameBeacon_FillThanks(GameBeacon *info, GameData *gameData, u16 valu
 }
 
 void GameBeacon_BroadcastPhrase(StrBuf *name, u8 value) {
-    if (func_0202cfac(0x2d, 0)) {
+    if (GameBeaconSys_AddMissionScore(0x2d, 0)) {
         GameBeaconSendSlot_SetMissionEx(&GameBeaconSys->mine, 0x67, (u32)name, value);
     } else if (GameBeaconSys_CanSendType(0x31)) {
         GameBeaconSendSlot_Reset(&GameBeaconSys->mine);
@@ -675,13 +675,13 @@ static void GameBeacon_FillArea(GameBeacon *info, u8 extra, u16 value, u16 type)
 }
 
 void GameBeacon_BroadcastBattleLostMission(void) {
-    if (func_0202cfac(10, 0)) {
+    if (GameBeaconSys_AddMissionScore(10, 0)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x44, 0);
     }
 }
 
 void GameBeacon_BroadcastMission(u8 type, u16 value) {
-    if (type >= 4 && func_0202cfac(type, value)) {
+    if (type >= 4 && GameBeaconSys_AddMissionScore(type, value)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, type + 0x3a, value);
     }
 }

@@ -793,10 +793,10 @@ static void ItemMenu_StateItemMenu(ItemMenuWork *work) {
             ItemMenuDisp_SetBackButtonActive(work, FALSE);
             if (pocket != BAG_POCKET_FREE_SPACE) {
                 if (pocket != BAG_POCKET_KEY_ITEMS) {
-                    func_0202d384(work->item);
+                    GameBeaconSys_SendItemUse(work->item);
                 }
             } else if (GetItemParam(work->item, ITEM_PARAM_IMPORTANT, work->heapId) == 0) {
-                func_0202d384(work->item);
+                GameBeaconSys_SendItemUse(work->item);
             }
             if (pocket == BAG_POCKET_TMS_HMS) {
                 ItemMenu_SetState(work, ItemMenu_StateUseTM);

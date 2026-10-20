@@ -437,7 +437,7 @@ static void LinkFestival_TickMissionBeacon(LinkFestival *festival) {
         festival->beaconTimer--;
         return;
     }
-    func_0202d5cc();
+    GameBeaconSys_SendMission();
     festival->beaconTimer = festival->beaconInterval;
 }
 

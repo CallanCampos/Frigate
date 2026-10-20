@@ -58,7 +58,7 @@ struct LinkFestival {
     u8 recordCount;
     // Where the next seen mission goes in records
     u8 recordIndex;
-    // The frames between two calls of func_0202d5cc, and those left until the next
+    // The frames between two calls of GameBeaconSys_SendMission, and those left until the next
     u16 beaconInterval;
     u16 beaconTimer;
     // The total and the player's score that the field's mission panel shows, and the seconds gained that it has not
