@@ -25,8 +25,9 @@ typedef struct {
     u8 mac[6];
     u8 netId;
     u8 valid;
-    u8 unkE;
-    u8 unkF;
+    // The command bases of the machine and of the server, which must match the machine's own
+    u8 machineCommandBase;
+    u8 serverCommandBase;
 } NetNegotiation;
 
 struct NetHandle {
@@ -44,7 +45,8 @@ struct NetHandle {
     u8 unk42[2];
     u16 timingRecv;
     u16 timingSend;
-    u8 unk48;
+    // The machines that the timing is sent to, which command 7 sends with it
+    u8 timingNetIds;
     u8 timingSendPending;
     u8 state;
     u8 unk4B[3];

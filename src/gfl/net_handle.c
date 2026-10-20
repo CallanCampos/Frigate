@@ -268,7 +268,7 @@ void NetHandle_RecvTimingFromServer(int netId, int size, const void *data, void 
 
 void NetHandle_SendTiming(NetHandle *handle, u16 timing) {
     handle->timingSend = timing;
-    handle->unk48 = 0xff;
+    handle->timingNetIds = 0xff;
     if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
         handle->timingSendPending = FALSE;
     } else {
@@ -279,7 +279,7 @@ void NetHandle_SendTiming(NetHandle *handle, u16 timing) {
 void NetHandle_SendTimingPair(NetHandle *handle, u32 a1, u32 a2) {
     if (handle != NULL) {
         handle->timingSend = a1 + (a2 << 8);
-        handle->unk48 = 0xff;
+        handle->timingNetIds = 0xff;
         if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
             handle->timingSendPending = FALSE;
         } else {
@@ -400,20 +400,20 @@ void NetHandle_RecvNegotiation(int netId, int size, u8 *data, void *work, NetHan
             OS_GetMacAddress(negotiation->serverMac);
             if (data[8] != 0) {
                 if (data[6] != 0 && data[7] != ini->gameCommandBase && ini->negotiationCommandBase == data[8]) {
-                    negotiation->unkF = ini->negotiationCommandBase;
-                    negotiation->unkE = ini->negotiationCommandBase;
+                    negotiation->serverCommandBase = ini->negotiationCommandBase;
+                    negotiation->machineCommandBase = ini->negotiationCommandBase;
                     return;
                 }
                 if (data[6] == 0 && data[7] == ini->gameCommandBase && ini->negotiationCommandBase == data[8]) {
-                    negotiation->unkF = ini->negotiationCommandBase;
-                    negotiation->unkE = ini->negotiationCommandBase;
+                    negotiation->serverCommandBase = ini->negotiationCommandBase;
+                    negotiation->machineCommandBase = ini->negotiationCommandBase;
                     return;
                 }
-                negotiation->unkF = 0xff;
-                negotiation->unkE = 0;
+                negotiation->serverCommandBase = 0xff;
+                negotiation->machineCommandBase = 0;
             } else {
-                negotiation->unkF = ini->gameCommandBase;
-                negotiation->unkE = data[7];
+                negotiation->serverCommandBase = ini->gameCommandBase;
+                negotiation->machineCommandBase = data[7];
             }
         }
     } else {
@@ -443,17 +443,17 @@ void NetHandle_RecvNegotiationReply(int netId, int size, NetNegotiation *negotia
         return;
     }
     if (ini->negotiationCommandBase != 0) {
-        if (ini->negotiationCommandBase != negotiation->unkF) {
+        if (ini->negotiationCommandBase != negotiation->serverCommandBase) {
             NetHandle_Reject(handle);
         }
-        if (ini->negotiationCommandBase != negotiation->unkE) {
+        if (ini->negotiationCommandBase != negotiation->machineCommandBase) {
             NetHandle_Reject(handle);
         }
     } else {
-        if (ini->gameCommandBase != negotiation->unkF) {
+        if (ini->gameCommandBase != negotiation->serverCommandBase) {
             NetHandle_Reject(handle);
         }
-        if (ini->gameCommandBase != negotiation->unkE) {
+        if (ini->gameCommandBase != negotiation->machineCommandBase) {
             NetHandle_Reject(handle);
         }
     }
@@ -532,7 +532,7 @@ void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHa
 void func_02040b38(NetHandle *handle, int a1, int a2, int a3) {
     if (handle != NULL) {
         handle->timingSend = a1 + (a2 << 8);
-        handle->unk48 = a3;
+        handle->timingNetIds = a3;
         if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
             handle->timingSendPending = FALSE;
         } else {
@@ -549,8 +549,8 @@ void func_02040b68(NetHandle *handle, int value) {
             NetNegotiation *negotiation = handle->negotiations[i];
 
             if (negotiation != NULL && negotiation->valid) {
-                negotiation->unkE = value;
-                negotiation->unkF = value;
+                negotiation->machineCommandBase = value;
+                negotiation->serverCommandBase = value;
             }
         }
     }
