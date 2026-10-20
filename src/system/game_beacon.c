@@ -734,10 +734,10 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     beacon->country = UnityTowerVisitor_GetCountry(player);
     beacon->region = UnityTowerVisitor_GetProvince(player);
     beacon->surveyRank = TrainerGameInfo_GetSurveyRank(info);
-    beacon->unk08 = TrainerCard_GetThankedCount(info);
-    beacon->unk04 = TrainerCard_GetPasserbyCount(info);
+    beacon->thankedCount = TrainerCard_GetThankedCount(info);
+    beacon->passerbyCount = TrainerCard_GetPasserbyCount(info);
     medalBox = SaveControl_GetMedalBox(save);
-    beacon->unk5B = MedalBox_GetLastMedal(medalBox);
+    beacon->favoriteMedal = MedalBox_GetLastMedal(medalBox);
     beacon->medalCount = MedalBox_GetObtainedCount(medalBox, 0);
     playTime = GameData_GetPlayTime(gameData);
     beacon->playHours = PlayTime_GetHours(playTime);
@@ -790,8 +790,8 @@ static void GameBeaconSendSlot_ResetHeader(GameBeaconSendSlot *slot, u8 targetVe
 
     slot->beacon.playHours = PlayTime_GetHours(playTime);
     slot->beacon.playMinutes = PlayTime_GetMinutes(playTime);
-    slot->beacon.unk08 = TrainerCard_GetThankedCount(info);
-    slot->beacon.unk04 = TrainerCard_GetPasserbyCount(info);
+    slot->beacon.thankedCount = TrainerCard_GetThankedCount(info);
+    slot->beacon.passerbyCount = TrainerCard_GetPasserbyCount(info);
     slot->beacon.targetVersions = targetVersions;
     slot->beacon.missionWord = 0;
     slot->beacon.passPower = GAME_BEACON_PASS_POWER_NONE;
@@ -979,7 +979,7 @@ void GameBeaconSys_SetMedalCount(u8 count) {
 void func_0202d194(u32 value) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
-    slot->beacon.unk5B = value;
+    slot->beacon.favoriteMedal = value;
     slot->updated = TRUE;
 }
 

@@ -296,7 +296,7 @@ BOOL GameBeacon_IsInvalid(const GameBeacon *beacon) {
     if (beacon->zoneId >= BEACON_ZONE_COUNT || beacon->parentZoneId >= BEACON_ZONE_COUNT) {
         return TRUE;
     }
-    if (beacon->unk04 > 99999 || beacon->unk08 > 99999) {
+    if (beacon->passerbyCount > 99999 || beacon->thankedCount > 99999) {
         return TRUE;
     }
     if (sFormatChecks[GameBeacon_GetTypeFormat(beacon->type)](beacon)) {
@@ -409,15 +409,15 @@ u16 GameBeacon_GetParentZone(const GameBeacon *beacon) {
 }
 
 u32 func_02013db8(const GameBeacon *beacon) {
-    return beacon->unk08;
+    return beacon->thankedCount;
 }
 
 u32 func_02013dc0(const GameBeacon *beacon) {
-    return beacon->unk04;
+    return beacon->passerbyCount;
 }
 
 u8 func_02013dc8(const GameBeacon *beacon) {
-    return beacon->unk5B;
+    return beacon->favoriteMedal;
 }
 
 u8 GameBeacon_GetMedalCount(const GameBeacon *beacon) {
@@ -665,7 +665,7 @@ u8 func_020140cc(int type) {
     if (type >= BEACON_FORMAT_TYPE_MAX) {
         return 0;
     }
-    return sTypeFormats[type].unk1;
+    return sTypeFormats[type].icon;
 }
 
 void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, HeapID heapId) {

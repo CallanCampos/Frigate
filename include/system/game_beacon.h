@@ -78,10 +78,12 @@ struct GameBeacon {
     u8 region;
     u8 passPower : 7;
     u8 gender : 1;
-    u32 unk04 : 17;
+    // The sender's passerby count (TrainerCard_GetPasserbyCount)
+    u32 passerbyCount : 17;
     u32 zoneId : 10;
     u32 language : 5;
-    u32 unk08 : 17;
+    // The sender's thanked count (TrainerCard_GetThankedCount)
+    u32 thankedCount : 17;
     // Incremented each time the beacon changes, so that receivers tell a new beacon from one already seen
     u32 serial : 5;
     u32 parentZoneId : 10;
@@ -112,7 +114,8 @@ struct GameBeacon {
     u16 recentValue;
     u8 surveyAnswers[10];
     u8 medalCount;
-    u8 unk5B;
+    // The sender's favorite medal, 0xff for none
+    u8 favoriteMedal;
     u32 missionWord;
 };
 
@@ -271,7 +274,8 @@ typedef struct {
     // What the type's message shows and its payload holds, the index of the checks and of GameBeacon_SetMessageWords's
     // cases
     u8 format;
-    u8 unk1;
+    // The icon of the type's panel in the beacon view
+    u8 icon;
 } GameBeaconTypeFormat;
 
 // Moves GameBeaconSys's beacons not yet shown into the list, until it is full, and returns how many
@@ -324,7 +328,7 @@ u16 GameBeacon_GetZone(const GameBeacon *beacon);
 u16 GameBeacon_GetParentZone(const GameBeacon *beacon);
 u32 func_02013db8(const GameBeacon *beacon);
 u32 func_02013dc0(const GameBeacon *beacon);
-// The medal that the beacon's sender wears last, or 0xff, and how many medals it has
+// The beacon's sender's favorite medal, or 0xff, and how many medals it has
 u8 func_02013dc8(const GameBeacon *beacon);
 u8 GameBeacon_GetMedalCount(const GameBeacon *beacon);
 void GameBeacon_GetGreeting(const GameBeacon *beacon, StrBuf *dest);
