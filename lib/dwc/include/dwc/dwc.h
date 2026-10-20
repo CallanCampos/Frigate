@@ -5,6 +5,7 @@
 #include "dwc/account.h"
 #include "dwc/connectinet.h"
 #include "dwc/error.h"
+#include "dwc/gp.h"
 #include "dwc/gsMemory.h"
 // GameSpy's stats (gstats.c): the game's name, which the server URLs are made from, the secret key and the stats
 // server's host, which the start sets
@@ -17,9 +18,9 @@
 // functions do is read off their callers. The account and friend data are in dwc/account.h, the error in dwc/error.h
 // and the start in dwc/init.h
 
-// Starts connecting to the access point; one of the calls that end the connection after a server error; and the
-// connection's state
-void func_ov011_0215dec0(void);
+// Starts connecting to the access point (FALSE if its memory can't be had); one of the calls that end the connection
+// after a server error; and the connection's state
+BOOL func_ov011_0215dec0(void);
 // Starts the connection to the Nintendo Wi-Fi Connection with the access point's name (an empty one takes the
 // default) and the buffer of the connection, returning FALSE if it could not start
 BOOL func_ov011_0215de44(const char *apName, void *buffer);
@@ -52,9 +53,9 @@ BOOL func_ov011_0215fe94(const char *name, void (*callback)(int error), void *us
                          void *deleteParam);
 void func_ov011_0215fc50(void);
 void func_ov011_02160170(void);
-void func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param);
+BOOL func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param);
 u8 func_ov011_0215e410(const DWCFriendData *friendData, char *statusData, int *size);
-void func_ov011_0215e47c(const char *statusData, int size);
+BOOL func_ov011_0215e47c(const char *statusData, int size);
 
 // Matching: with the key and number, anybody, or a friend, and the callbacks that tell how it went
 typedef void (*DWCMatchedFunc)(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
@@ -105,5 +106,17 @@ BOOL func_ov011_02169df8(int server);
 // The settings utility (overlay 182) sets its own for as long as it runs
 void func_ov011_021694d4(const char *url);
 const char *func_ov011_021694e0(void);
+
+// Overlay 11's dwc_match.c, which is not written yet: what friend.c calls in it (its functions that the game
+// calls are above)
+
+// friend.c's: sets the player's status with the matching's texts (SCM, SCN, VER and LCK), returning GP's result; makes
+// the GT2 socket of the matching, returning GT2's result; keeps the profile ID that logged in, and registers the
+// matching's keys with qr2; and the LCK value of a buddy's status
+int func_ov011_02162d80(int status);
+int func_ov011_0216043c(void);
+void func_ov011_02168780(int profileId);
+void func_ov011_02168794(void);
+u8 func_ov011_021686c0(const GPBuddyStatus *status);
 
 #endif // POKEBW2_DWC_DWC_H

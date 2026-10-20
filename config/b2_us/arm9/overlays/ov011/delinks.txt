@@ -368,6 +368,11 @@ lib/dwc/src/serverbrowsing/sb_serverlist.c:
     .data       start:0x0218b9b0 end:0x0218ba00
     .bss        start:0x021922a4 end:0x021922c0
 
+lib/dwc/src/base/friend.c:
+    .text       start:0x0215dd74 end:0x0215fa0c
+    .data       start:0x021856fc end:0x021857bc
+    .bss        start:0x0218dfc8 end:0x0218e018
+
 lib/dwc/src/auth/dwc_nasfunc.c:
     .text       start:0x021694d4 end:0x0216c520
     .data       start:0x02185ae8 end:0x02186e7c
