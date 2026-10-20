@@ -30,8 +30,10 @@ typedef struct FunfestSave {
     u16 hosted;
     u16 joined;
     u16 completed;
-    u16 unkF6;
-    u8 unkF8[2];
+    // How many missions with other players the player had the top score of, up to 9999
+    u16 topScores;
+    // The points left over toward the next White and Black pass power level
+    u8 levelPoints[2];
     // The most participants of a mission, up to 100
     u8 mostParticipants;
     u8 paddingFB;
@@ -44,14 +46,14 @@ void FestRecords_Init(FunfestSave *save);
 void FestRecords_AddCompleted(FunfestSave *save);
 // Keeps the most participants, up to 100
 void FestRecords_UpdateMostParticipants(FunfestSave *save, u32 count);
-// Adds one to the count that func_02010e94 gives, up to 9999
+// Counts one more top score in a mission with other players, up to 9999
 void func_02010e9c(FunfestSave *save);
 // Keep a mission's count and best value, up to 9999, if they are more than the record's: TRUE when they were kept
 BOOL FestRecords_UpdateMissionCount(FunfestSave *save, u32 mission, u32 count);
 BOOL FestRecords_UpdateMissionBest(FunfestSave *save, u32 mission, u32 best);
 // Keeps the level cleared of a mission if it is higher than the record's
 void FestRecords_UpdateMissionLevel(FunfestSave *save, u32 mission, int level);
-// A byte for each of two slots, up to 99
+// The points left over toward the next White (0) and Black (1) pass power level, up to 99
 u8 func_02010fd4(FunfestSave *save, int index);
 void func_02010fe4(FunfestSave *save, int index, u32 value);
 
