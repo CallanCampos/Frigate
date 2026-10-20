@@ -667,7 +667,7 @@ static void ZukanDetailInfo_GetPokemon(ZukanDetailInfoParam *param, ZukanDetailI
 
     PokeDex_GetShownSexRareForm(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
     if (shown == SPECIES_SPINDA) {
-        shownPersonality = func_0200da18(pokedex, shownPersonality);
+        shownPersonality = PokeDex_GetSpindaPersonality(pokedex, shownPersonality);
     }
     shownCaught = PokeDex_IsCaught(pokedex, shown);
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {

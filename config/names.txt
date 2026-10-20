@@ -509,12 +509,14 @@
 . 0x0200ce5c CGearPictureSave_IsValid
 . 0x0200cea4 PokeDex_SetLanguageSeen
 . 0x0200cf88 PokeDex_SetSeenSex
+. 0x0200d1dc PokeDex_IsGiven
 . 0x0200d1e4 PokeDex_SetMode
 . 0x0200d1f8 PokeDex_GetMode
 . 0x0200d200 PokeDex_SetLastSpecies
 . 0x0200d214 PokeDex_GetLastSpecies
 . 0x0200d3c8 PokeDex_GetShownSexRareForm
 . 0x0200d8d4 PokeDex_HasSeenVariant
+. 0x0200da18 PokeDex_GetSpindaPersonality
 . 0x0200db5c PokeDex_HasLanguage
 . 0x0200dbb4 PokeDex_LookupEvaluation
 . 0x0200ddf0 EncountSave_SetUsedRepelItemID

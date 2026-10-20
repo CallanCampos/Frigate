@@ -686,7 +686,7 @@ static void ZukanDetailVoice_CreatePokemon(ZukanDetailVoiceParam *param, ZukanDe
 
     PokeDex_GetShownSexRareForm(pokedex, species, &sex, &rare, &form, param->heapId);
     if (species == SPECIES_SPINDA) {
-        personality = func_0200da18(pokedex, personality);
+        personality = PokeDex_GetSpindaPersonality(pokedex, personality);
     }
     arc = MakePokeGraArcHandle(param->heapId);
     wk->pokemonChars[index] =

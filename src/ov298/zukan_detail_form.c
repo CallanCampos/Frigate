@@ -1783,7 +1783,7 @@ static void ZukanDetailForm_CreateSprites(ZukanDetailFormParam *param, ZukanDeta
     VecFx32 pos;
 
     if (species == SPECIES_SPINDA) {
-        personality = func_0200da18(GameData_GetPokedex(ZukanDetailCommon_GetGameData(common)), 0);
+        personality = PokeDex_GetSpindaPersonality(GameData_GetPokedex(ZukanDetailCommon_GetGameData(common)), 0);
     }
     if (frontSprite != SPRITE_NONE) {
         ZukanDetailForm_CreateSprite(&wk->sprites[frontSprite], param->heapId, wk->mcssSys, species, form, sex, rare, 0,

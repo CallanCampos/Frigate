@@ -293,7 +293,7 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_SCROLL_BAR, FALSE);
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_SCROLL_RAIL, FALSE);
     }
-    if (func_0200d1dc(wk->param->pokedex) == 0) {
+    if (PokeDex_IsGiven(wk->param->pokedex) == 0) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_START, FALSE);
     }
     if (habitat == FALSE) {
@@ -394,7 +394,7 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
                                     HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         arc = MakePokeGraArcHandle(HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         if (species == SPECIES_SPINDA) {
-            personality = func_0200da18(wk->param->pokedex, 0);
+            personality = PokeDex_GetSpindaPersonality(wk->param->pokedex, 0);
         } else {
             personality = 0;
         }

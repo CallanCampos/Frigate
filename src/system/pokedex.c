@@ -313,7 +313,7 @@ void givePlayerPokedex(PokeDexSave *pokedex) {
     pokedex->given = 1;
 }
 
-u32 func_0200d1dc(PokeDexSave *pokedex) {
+u32 PokeDex_IsGiven(PokeDexSave *pokedex) {
     return pokedex->given;
 }
 
@@ -651,7 +651,7 @@ BOOL PokeDex_HasSeenVariant(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rar
     return FALSE;
 }
 
-u32 func_0200da18(PokeDexSave *pokedex, u32 index) {
+u32 PokeDex_GetSpindaPersonality(PokeDexSave *pokedex, u32 index) {
     if (index == 0) {
         return pokedex->spindaPersonality;
     }
