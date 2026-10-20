@@ -238,12 +238,12 @@ void DWCRapVChat_Update(BOOL stalled) {
     }
     switch (sVChatWork->phase) {
     case 0:
-        if (func_ov011_021602c0() == 0) {
+        if (DWC_GetMyAID() == 0) {
             if (RequestVoice(1)) {
                 sVChatWork->phase = 1;
                 sVChatWork->waitFrames = 60;
             }
-        } else if (func_ov011_021602c0() == 1) {
+        } else if (DWC_GetMyAID() == 1) {
             if (AcceptVoice(0)) {
                 sVChatWork->phase = 2;
             }
@@ -306,7 +306,7 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     sVChatWork->callbackKind = 1;
     config.sessions = &sVChatWork->session;
     config.sessionCount = count;
-    config.aid = func_ov011_021602c0();
+    config.aid = DWC_GetMyAID();
     GFL_ASSERT((config.aid != -1));
     if (sVChatWork->callbackKind == 3) {
         config.callback = ManualCallback;

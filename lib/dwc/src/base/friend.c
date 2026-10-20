@@ -383,7 +383,7 @@ static u8 DWC_GetFriendStatusSC(const DWCFriendData *friendData, u8 *scm, u8 *sc
             strcpy(location, status.locationString);
         }
         result = status.status;
-        if (func_ov011_021686c0(&status)) {
+        if (DWCi_GetBuddyStatusLCK(&status)) {
             result = 2;
         }
         return result;
@@ -1257,15 +1257,15 @@ static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseAr
         if (sLogin->state == 2) {
             if (sLogin->userData->gsProfileId == arg->profile) {
                 sLogin->state = 5;
-                if (DWCi_HandleLoginGPError(func_ov011_02162d80(1)) != 0) {
+                if (DWCi_HandleLoginGPError(DWCi_GPSetServerStatus(1)) != 0) {
                     return;
                 }
                 sLogin->callback(DWC_ERROR_NONE, arg->profile, sLogin->param);
-                if (func_ov011_0216043c() != 0) {
+                if (DWCi_GT2Startup() != 0) {
                     return;
                 }
-                func_ov011_02168780(arg->profile);
-                func_ov011_02168794();
+                DWCi_SetMatchProfileID(arg->profile);
+                DWCi_RegisterMatchQR2Keys();
             } else {
                 DWCi_StopLogin(DWC_ERROR_NETWORK, -60000);
             }

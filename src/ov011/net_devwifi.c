@@ -180,7 +180,7 @@ static BOOL NetDevWifi_Unk78(void) {
 }
 
 static int NetDevWifi_GetConnectBits(void) {
-    return func_ov011_02160344();
+    return DWC_GetAIDBitmap();
 }
 
 static int NetDevWifi_GetNetId(void) {

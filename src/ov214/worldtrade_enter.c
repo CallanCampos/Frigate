@@ -551,7 +551,7 @@ static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
         break;
     case 3:
         DpwTr_End();
-        func_ov011_0215fb78();
+        DWC_ShutdownFriendsMatch();
         DWC_CleanupInet();
         wk->localSeq++;
         break;

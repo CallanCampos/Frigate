@@ -499,7 +499,7 @@ void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u
     if (!GFL_NetIsInitialized()) {
         GFL_NetErrAbort();
     }
-    func_ov011_02160170();
+    DWC_CloseAllConnectionsHard();
     WifiBattleMatchNet_SetMatchKey(p_wk, 0, modValue);
     WifiBattleMatchNet_SetMatchKey(p_wk, 1, a3);
     WifiBattleMatchNet_SetMatchKey(p_wk, 2, 1);
@@ -734,7 +734,7 @@ static void WifiBattleMatchNet_SetMatchKey(WifiBattleMatchNet *p_wk, u32 index, 
     key = &p_wk->matchKeys[index];
     MI_CpuCopy8(sMatchKeyNames[index], key->name, 3);
     key->name[3] = '\0';
-    key->keyId = func_ov011_02160e10(key->keyId, key->name, &key->value);
+    key->keyId = DWC_AddMatchKeyInt(key->keyId, key->name, &key->value);
 }
 
 static int WifiBattleMatchNet_EvalAlias(int index, void *work) {
@@ -757,10 +757,10 @@ static int WifiBattleMatchNet_Eval(int index, void *work) {
     int ratioGap;
     int score;
 
-    rating = func_ov011_02160f98(index, p_wk->matchKeys[3].name, -1);
-    disconnects = func_ov011_02160f98(index, p_wk->matchKeys[5].name, -1);
-    matches = func_ov011_02160f98(index, p_wk->matchKeys[6].name, -1);
-    cup = func_ov011_02160f98(index, p_wk->matchKeys[4].name, -1);
+    rating = DWC_GetMatchIntValue(index, p_wk->matchKeys[3].name, -1);
+    disconnects = DWC_GetMatchIntValue(index, p_wk->matchKeys[5].name, -1);
+    matches = DWC_GetMatchIntValue(index, p_wk->matchKeys[6].name, -1);
+    cup = DWC_GetMatchIntValue(index, p_wk->matchKeys[4].name, -1);
 
     if (rating == -1 && disconnects == -1 && cup == -1 && matches == -1) {
         return 0;

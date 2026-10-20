@@ -722,11 +722,11 @@ static int GtsNego_EvalMatch(int index, void *work) {
     GtsNegoWork *wk = work;
     GtsNegoParam *param = wk->param;
     int score = -1;
-    int level = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_LEVEL].key, -1);
-    int wantKind = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_WANT_KIND].key, -1);
-    int myKind = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_MY_KIND].key, -1);
-    u32 id = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_MY_ID].key, 0);
-    u32 friendId = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_FRIEND_ID].key, 0);
+    int level = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_LEVEL].key, -1);
+    int wantKind = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_WANT_KIND].key, -1);
+    int myKind = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_MY_KIND].key, -1);
+    u32 id = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_MY_ID].key, 0);
+    u32 friendId = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_FRIEND_ID].key, 0);
     int i;
 
     if (wk->mode == GTSNEGO_MODE_RENDEZVOUS) {
@@ -810,7 +810,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
 
             MI_CpuCopy8(sGtsNegoKeyNames[i], key->key, 2);
             key->value = values[i];
-            key->keyId = func_ov011_02160e10(key->keyId, key->key, &key->value);
+            key->keyId = DWC_AddMatchKeyInt(key->keyId, key->key, &key->value);
         }
         STD_TSPrintf(wk->query, "ty=%d And db=%d", wk->mode, 1);
         if (DWCRap_StartMatchQuery(wk->query, 2, GtsNego_EvalMatch, wk)) {
