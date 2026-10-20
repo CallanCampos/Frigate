@@ -296,7 +296,7 @@ static GTI2Connection **DWCi_GetGT2ConnectionByIdx(int index);
 static GTI2Connection **DWCi_GetGT2ConnectionByProfileID(s32 profileId, int a1);
 static MatchConnectionInfo *DWCi_GetConnectionInfoByIdx(int index);
 static void DWCi_SetState(int state);
-static s32 DWCi_DeleteAID(int netId);
+static s32 DWCi_DeleteAID(u8 netId);
 static u32 DWCi_GetAIDBitmapFromList(const u8 *netIds, int count);
 static int DWCi_HandleGPError(int result);
 static int DWCi_HandleGT2Error(int result);
@@ -336,12 +336,12 @@ static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *c
                                            int latency, const void *message, int length);
 static void DWCi_FormatProfileID(char *dest, u32 size);
 static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, const void *message, int length);
-static void DWCi_MatchGPRecvBuddyMsgCallback(void *unused, int id, const u8 *str);
+static void DWCi_MatchGPRecvBuddyMsgCallback(void *unused, int id, u8 *str);
 static void DWCi_StopResendingMatchCommand(void);
 static void DWCi_StopMatching(int type, int code);
 static void DWCi_ClearQR2Key(void);
-static void func_ov011_02162958(int conn, int kind, const u32 *msg);
-static void func_ov011_02162bf8(int conn, int kind, const u32 *msg);
+static void func_ov011_02162958(u8 conn, int kind, u32 *msg);
+static void func_ov011_02162bf8(u8 conn, int kind, u32 *msg);
 static void DWCi_CloseConnectionsNotInBitmap(u32 mask);
 static void DWCi_ProcessServerAIDBitmapCommand(const u32 *msg);
 static BOOL DWCi_ProcessMatchClosing(int type, u32 code, s32 profileId);
@@ -357,15 +357,15 @@ static BOOL IsPrivateAddr(u32 ip);
 static int DWCi_NNStartupAsync(int reset, u32 token, DWCNodeInfo *peer);
 static int DWCi_DoNatNegotiationAsync(MatchTarget *target);
 static BOOL DWCi_CanSendMatchCommandByGT2(int type, int id);
-static int DWCi_SendMatchCommand(int type, int id, u32 ip, u16 port, const u32 *data, int count);
+static int DWCi_SendMatchCommand(u8 type, int id, u32 ip, u16 port, const u32 *data, int count);
 static void DWCi_MakeMatchCommandPacket(MatchPacket *packet, int type, const u32 *data, int count);
 static int DWCi_SendSBMsgCommand(int type, u32 ip, u16 port, const u32 *data, int count);
 static int DWCi_SendGPBuddyMsgCommand(void *gp, u8 command, int id, const char *text);
 static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 port, const u32 *data, int count);
-static int DWCi_CheckResvCommand(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie,
-                                 void *userData, int blocked);
-static int func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie,
-                               void *userData, int blocked);
+static u8 DWCi_CheckResvCommand(int profileId, int ip, u16 port, int nodeType, int skipChecks, int cookie,
+                                void *userData, int blocked);
+static u8 func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie, void *userData,
+                              int blocked);
 static int DWCi_ProcessResvOK(int profileId, u32 ip, u32 port);
 static int DWCi_HandleMatchCommandError(int error);
 static int DWCi_SendResvCommand(int profileId, int flag);
@@ -390,11 +390,11 @@ static int DWCi_ResumeMatching(void);
 static int DWCi_CloseCancelHostAsync(int profileId);
 static void DWCi_CloseAllConnectionsByTimeout(void);
 static int DWCi_CloseShutdownClientSC(u32 mask);
-static void DWCi_SendMatchSynPacket(u32 aid, int type);
+static void DWCi_SendMatchSynPacket(u8 aid, u16 type);
 static int DWCi_ProcessMatchSynTimeout(void);
 static int DWCi_CloseSynTimeoutClients(void);
 static void DWCi_SendMatchAckToClients(void);
-static int DWCi_SendCancelMatchSynCommand(int profileId, int message);
+static int DWCi_SendCancelMatchSynCommand(int profileId, u8 message);
 static int DWCi_ProcessCancelMatchSynCommand(int profileId, int message, int value);
 static int DWCi_ProcessCancelMatchSynTimeout(void);
 static u8 DWCi_GetNewMatchKey(void);
@@ -432,7 +432,7 @@ static void DWCi_SetReservationCallback(MatchCheckFunc a, const void *userData, 
 static void DWCi_ChangeToServer(int isHost);
 static void DWCi_StartReservingServer(int profileId);
 static BOOL func_ov011_021679c0(void);
-static BOOL DWCi_SetSuspendAndNotify(u32 index, int set, int mode);
+static BOOL DWCi_SetSuspendAndNotify(u8 index, int set, int mode);
 static BOOL DWCi_StartMatchingAfterSearchOwn(void);
 static void DWCi_SetSuspendRequest(int a, MatchCallback b, int c);
 static BOOL DWCi_ProcessSuspendRequest(void);
@@ -453,7 +453,7 @@ static BOOL DWCi_DeleteNodeInfoByProfileID(int id);
 static DWCNodeInfo *DWCi_GetOwnNodeInfo(void);
 static DWCNodeInfo *DWCi_GetServerNodeInfo(void);
 static DWCNodeInfo *DWCi_GetNodeInfoByProfileID(int id);
-static DWCNodeInfo *DWCi_GetNodeInfoByAID(int index);
+static DWCNodeInfo *DWCi_GetNodeInfoByAID(u8 index);
 static u8 DWCi_GetFreeAID(void);
 static BOOL DWCi_IsNodeNotConnected(int id);
 static void DWCi_ClearTargetNodeInfo(void);
@@ -486,14 +486,8 @@ void DWC_InitFriendsMatch(DWCUserData *userData, int productId, const char *secr
     sMatchRoot.fm->callbacks.onReceived = DWCi_GT2ReceivedCallback;
     sMatchRoot.fm->callbacks.onClosed = DWCi_GT2ClosedCallback;
     sMatchRoot.fm->callbacks.onPing = DWCi_GT2PingCallback;
-    if (sendBufSize == 0) {
-        sendBufSize = 0x2000;
-    }
-    sMatchRoot.fm->sendBufSize = sendBufSize;
-    if (recvBufSize == 0) {
-        recvBufSize = 0x2000;
-    }
-    sMatchRoot.fm->recvBufSize = recvBufSize;
+    sMatchRoot.fm->sendBufSize = sendBufSize ? sendBufSize : 0x2000;
+    sMatchRoot.fm->recvBufSize = recvBufSize ? recvBufSize : 0x2000;
     sMatchRoot.fm->gp = NULL;
     sMatchRoot.fm->userData = userData;
     sMatchRoot.fm->state = 0;
@@ -929,13 +923,14 @@ BOOL DWC_IsServerMyself(void) {
 
 int DWCi_GT2Startup(void) {
     int result;
+    u16 port;
 
     if (sMatchRoot.fm->socket != NULL) {
         return 0;
     }
-    result =
-        func_ov011_0217d144(&sMatchRoot.fm->socket, func_ov011_0217ed14(0, DWCi_GetMathRand32(0x4000) + 0xc000, NULL),
-                            sMatchRoot.fm->sendBufSize, sMatchRoot.fm->recvBufSize, DWCi_GT2SocketErrorCallback);
+    port = DWCi_GetMathRand32(0x4000) + 0xc000;
+    result = func_ov011_0217d144(&sMatchRoot.fm->socket, func_ov011_0217ed14(0, port, NULL), sMatchRoot.fm->sendBufSize,
+                                 sMatchRoot.fm->recvBufSize, DWCi_GT2SocketErrorCallback);
     if (DWCi_HandleGT2Error(result)) {
         return result;
     }
@@ -1019,7 +1014,7 @@ static void DWCi_SetState(int state) {
     sMatchRoot.fm->state = state;
 }
 
-static s32 DWCi_DeleteAID(int netId) {
+static s32 DWCi_DeleteAID(u8 netId) {
     DWCNodeInfo *host = DWCi_GetNodeInfoByAID(netId);
     s32 profileId;
 
@@ -1221,7 +1216,7 @@ static void DWCi_GT2ReceivedCallback(GTI2Connection *connection, const void *mes
 }
 
 static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int isNetId, u8 netId) {
-    int id;
+    u8 id;
     int profileId = 0;
     int errorCode;
     BOOL isHost = FALSE;
@@ -1260,7 +1255,11 @@ static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int
         } else {
             id = netId;
         }
-        hadHost = DWCi_GetNodeInfoByAID(id) != NULL;
+        if (DWCi_GetNodeInfoByAID(id) != NULL) {
+            hadHost = TRUE;
+        } else {
+            hadHost = FALSE;
+        }
         if (!isNetId) {
             DWCi_ClearTransConnection(id);
         }
@@ -1283,8 +1282,10 @@ static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int
         sMatchRoot.fm->match.unlocked = 1;
     } else if (sMatchRoot.fm->match.matchType == 3 || sMatchRoot.fm->match.matchType == 2) {
         sMatchRoot.fm->match.unlocked = 0;
+    } else if (DWC_GetNumConnectionHost() == 1) {
+        sMatchRoot.fm->match.unlocked = 1;
     } else {
-        sMatchRoot.fm->match.unlocked = DWC_GetNumConnectionHost() == 1;
+        sMatchRoot.fm->match.unlocked = 0;
     }
     if (DWCi_IsServerNodeMyself() != 0) {
         sMatchRoot.fm->match.connectedAidBit = 0;
@@ -1349,17 +1350,17 @@ static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int
         DWCi_SetMatchStatus(1);
     }
     if (DWCi_GetNumNodeInfo() == 1) {
-        if (sMatchRoot.fm->ownCloseFlag == 0) {
-            DWCi_SetMatchStatus(0xb);
+        if (sMatchRoot.fm->ownCloseFlag != 0) {
+            DWCi_NNFreeNegotiateList();
+            DWCi_SetState(3);
+            DWCi_ClearQR2Key();
+            sMatchRoot.fm->match.hostState = 0;
             return;
         }
-        DWCi_NNFreeNegotiateList();
-        DWCi_SetState(3);
-        DWCi_ClearQR2Key();
-        sMatchRoot.fm->match.hostState = 0;
+        DWCi_SetMatchStatus(0xb);
         return;
     }
-    if (sMatchRoot.fm->match.mode == 3 && isHost && DWCi_GetNumNodeInfo() > 0) {
+    if (sMatchRoot.fm->match.mode == 3 && isHost && DWCi_GetNumNodeInfo() >= 1) {
         if (DWCi_GetNumNodeInfo() == 1 && func_ov011_02167fd0() != 0) {
             DWCi_SetMatchStatus(0xb);
             return;
@@ -1434,6 +1435,8 @@ static BOOL DWC_IsValidCancelMatching(void) {
 }
 
 u8 DWC_AddMatchKeyInt(u8 keyId, const char *key, const int *valueSrc) {
+    int index;
+
     if (key == NULL || valueSrc == NULL) {
         return 0;
     }
@@ -1447,24 +1450,27 @@ u8 DWC_AddMatchKeyInt(u8 keyId, const char *key, const int *valueSrc) {
             return 0;
         }
     }
-    sKeys[keyId - 100].id = keyId;
-    sKeys[keyId - 100].isText = 0;
-    sKeys[keyId - 100].pad = 0;
-    if (sKeys[keyId - 100].name != NULL) {
-        DWC_Free(4, sKeys[keyId - 100].name, 0);
+    index = keyId - 100;
+    sKeys[index].id = keyId;
+    sKeys[index].isText = 0;
+    sKeys[index].pad = 0;
+    if (sKeys[index].name != NULL) {
+        DWC_Free(4, sKeys[index].name, 0);
     }
-    sKeys[keyId - 100].name = DWC_Alloc(4, strlen(key) + 1);
-    if (sKeys[keyId - 100].name == NULL) {
+    sKeys[index].name = DWC_Alloc(4, strlen(key) + 1);
+    if (sKeys[index].name == NULL) {
         DWCi_StopMatching(9, -80001);
         return 0;
     }
-    strcpy(sKeys[keyId - 100].name, key);
-    sKeys[keyId - 100].value = valueSrc;
-    qr2_register_keyA(keyId, sKeys[keyId - 100].name);
+    strcpy(sKeys[index].name, key);
+    sKeys[index].value = valueSrc;
+    qr2_register_keyA(keyId, sKeys[index].name);
     return keyId;
 }
 
 u8 DWC_AddMatchKeyString(u8 keyId, const char *key, const char *value) {
+    int index;
+
     if (key == NULL || value == NULL) {
         return 0;
     }
@@ -1478,20 +1484,21 @@ u8 DWC_AddMatchKeyString(u8 keyId, const char *key, const char *value) {
             return 0;
         }
     }
-    sKeys[keyId - 100].id = keyId;
-    sKeys[keyId - 100].isText = 1;
-    sKeys[keyId - 100].pad = 0;
-    if (sKeys[keyId - 100].name != NULL) {
-        DWC_Free(4, sKeys[keyId - 100].name, 0);
+    index = keyId - 100;
+    sKeys[index].id = keyId;
+    sKeys[index].isText = 1;
+    sKeys[index].pad = 0;
+    if (sKeys[index].name != NULL) {
+        DWC_Free(4, sKeys[index].name, 0);
     }
-    sKeys[keyId - 100].name = DWC_Alloc(4, strlen(key) + 1);
-    if (sKeys[keyId - 100].name == NULL) {
+    sKeys[index].name = DWC_Alloc(4, strlen(key) + 1);
+    if (sKeys[index].name == NULL) {
         DWCi_StopMatching(9, -80001);
         return 0;
     }
-    strcpy(sKeys[keyId - 100].name, key);
-    sKeys[keyId - 100].value = value;
-    qr2_register_keyA(keyId, sKeys[keyId - 100].name);
+    strcpy(sKeys[index].name, key);
+    sKeys[index].value = value;
+    qr2_register_keyA(keyId, sKeys[index].name);
     return keyId;
 }
 
@@ -1771,6 +1778,7 @@ static void DWCi_SendStateChanged(QR2Implementation *server) {
 // The state machine of the match, run every frame (a0 is 0 when it only has to serve the sockets)
 static void DWCi_MatchProcess(int a0) {
     int i;
+    int j;
     u32 limit;
     u32 mask;
     MatchControl *c;
@@ -2033,8 +2041,8 @@ static void DWCi_MatchProcess(int a0) {
     }
     if (DWCi_GetTopologyType() == 0 && DWCi_GetMatchCnt()->memberConnecting == 0 && DWCi_GetMatchCnt()->state == 1 &&
         DWCi_GetMatchCnt()->pending.profileId == 0 && DWCi_GetNumNodeInfo() > 2) {
-        for (i = 1; i < DWCi_GetNumNodeInfo(); i++) {
-            DWCNodeInfo *node = DWCi_GetNodeInfoByIndex(i);
+        for (j = 1; j < DWCi_GetNumNodeInfo(); j++) {
+            DWCNodeInfo *node = DWCi_GetNodeInfoByIndex(j);
 
             if (DWCi_GetOwnNodeInfo() != node && DWCi_GetGT2Connection(node->aid) == NULL) {
                 if (node->nextConnectTick == 0) {
@@ -2067,7 +2075,7 @@ static void DWCi_MatchProcess(int a0) {
         }
         if (DWCi_GetMatchCnt()->sb != NULL && ServerBrowserState(DWCi_GetMatchCnt()->sb) != 0 &&
             DWCi_GetMatchCnt()->sbUpdateRequestTick != 0 && OS_GetTick() > DWCi_GetMatchCnt()->sbUpdateRequestTick) {
-            DWCi_StopMatching(6, -83986);
+            DWCi_StopMatching(6, -85010);
         }
     }
     sMatchState.nnFreeNegotiateList = 0;
@@ -2098,18 +2106,6 @@ static void DWCi_MatchProcess(int a0) {
     }
 }
 
-static inline void MatchPeer_Read(DWCNodeInfo *peer, const MatchPeerWire *wire) {
-    MI_CpuFill8(peer, 0, sizeof(DWCNodeInfo));
-    peer->aid = wire->packed;
-    peer->hasPrivateAddress = wire->packed >> 16;
-    peer->profileId = wire->id;
-    peer->publicIp = wire->ip;
-    peer->localIp = wire->localIp;
-    peer->publicPort = wire->ports >> 16;
-    peer->localPort = wire->ports;
-    memcpy(&peer->userData, wire->userData, sizeof(u32));
-}
-
 static BOOL DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length) {
     const u8 *data = message;
     SocAddrIn addr;
@@ -2119,20 +2115,21 @@ static BOOL DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 
     }
     MIi_CpuClear32(0, &addr, sizeof(addr));
     addr.family = 2;
-    addr.port = MATCH_SWAP16(port);
     addr.addr = ip;
+    addr.port = MATCH_SWAP16(port);
     if ((data[0] == 0xfe && data[1] == 0xfd) || data[0] == 0x5c) {
         if (DWCi_GetMatchCnt()->qr2 != NULL) {
             qr2_parse_queryA(DWCi_GetMatchCnt()->qr2, (char *)data, length, &addr);
         }
+    } else if (memcmp(data, NNMagicData, NATNEG_MAGIC_LEN) == 0) {
+        NNProcessData((char *)data, length, &addr);
     } else {
-        if (memcmp(data, NNMagicData, NATNEG_MAGIC_LEN) != 0) {
-            if (data[0] == 0xfe) {
-                return FALSE;
-            }
+        switch (data[0]) {
+        case 0xfe:
+            return FALSE;
+        default:
             return FALSE;
         }
-        NNProcessData((char *)data, length, &addr);
     }
     return TRUE;
 }
@@ -2225,6 +2222,9 @@ static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, co
             func_ov011_021685fc();
             return;
         }
+        if (result == 5) {
+            return;
+        }
         if (result == 6) {
             DWCi_GetMatchCnt()->retries++;
             if (DWCi_GetMatchCnt()->retries > 5) {
@@ -2241,11 +2241,13 @@ static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, co
                 DWCi_HandleMatchGT2Error(status);
                 return;
             }
-            if (status != 0) {
-                DWCi_CancelPreConnectedServerProcess(DWCi_GetMatchCnt()->self.profileId);
+            if (status != 0 && DWCi_CancelPreConnectedServerProcess(DWCi_GetMatchCnt()->self.profileId) == 0) {
+                return;
             }
-        } else if (result != 5) {
-            DWCi_CancelPreConnectedServerProcess(DWCi_GetMatchCnt()->self.profileId);
+        } else {
+            if (DWCi_CancelPreConnectedServerProcess(DWCi_GetMatchCnt()->self.profileId) == 0) {
+                return;
+            }
         }
         return;
     }
@@ -2274,7 +2276,7 @@ static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, co
     }
 }
 
-static void DWCi_MatchGPRecvBuddyMsgCallback(void *unused, int id, const u8 *str) {
+static void DWCi_MatchGPRecvBuddyMsgCallback(void *unused, int id, u8 *str) {
     u8 buf[0x200];
     int len = strlen(str) - 1;
     int count;
@@ -2334,12 +2336,24 @@ void DWCi_ProcessMatchSynPacket(u8 aid, int type, const void *data) {
     }
 }
 
-static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
+static inline void MatchPeer_Read(DWCNodeInfo *peer, MatchPeerWire *wire) {
+    MI_CpuFill8(peer, 0, sizeof(DWCNodeInfo));
+    peer->aid = wire->packed;
+    peer->hasPrivateAddress = wire->packed >> 16;
+    peer->profileId = wire->id;
+    peer->publicIp = wire->ip;
+    peer->localIp = wire->localIp;
+    peer->publicPort = wire->ports >> 16;
+    peer->localPort = wire->ports;
+    memcpy(&peer->userData, wire->userData, sizeof(u32));
+}
+
+static void func_ov011_02162958(u8 conn, int kind, u32 *msg) {
     int i;
     int count;
     int duration;
     u32 value;
-    u32 nextId;
+    u16 latency;
     u64 now;
 
     switch (kind) {
@@ -2356,7 +2370,7 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
             } else {
                 DWCNodeInfo client;
 
-                MatchPeer_Read(&client, (const MatchPeerWire *)&msg[1]);
+                MatchPeer_Read(&client, (MatchPeerWire *)&msg[1]);
                 DWCi_GetMatchCnt()->pending = client;
                 value = msg[7];
                 DWCi_GetMatchCnt()->synId = value;
@@ -2375,14 +2389,13 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
         break;
     case 3:
         if (DWCi_GetMatchCnt()->state == 0x13) {
-            value = ((const u8 *)msg)[0] | (((const u8 *)msg)[1] << 8);
+            latency = ((const u8 *)msg)[0] | (((const u8 *)msg)[1] << 8);
             DWCi_GetMatchCnt()->synAckBit |= 1 << conn;
-            if (value > DWCi_GetMatchCnt()->baseLatency) {
-                DWCi_GetMatchCnt()->baseLatency = value;
+            if (latency > DWCi_GetMatchCnt()->baseLatency) {
+                DWCi_GetMatchCnt()->baseLatency = latency;
             }
             if (DWCi_GetAIDBitmask(0) == DWCi_GetMatchCnt()->synAckBit) {
-                nextId = DWCi_GetMathRand32(0xfffffffe);
-                DWCi_GetMatchCnt()->synId = nextId + 1;
+                DWCi_GetMatchCnt()->synId = DWCi_GetMathRand32(0xfffffffe) + 1;
                 DWCi_SendMatchAckToClients();
                 DWCi_GetMatchCnt()->synResendCount = 0;
                 now = OS_GetTick();
@@ -2398,11 +2411,12 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
             if (count != 0) {
                 for (i = 0; i < count; i++) {
                     DWCNodeInfo peer;
+                    MatchPeerWire *wire = (MatchPeerWire *)(msg + 1 + (count - 1 - i) * 6);
 
-                    MatchPeer_Read(&peer, (const MatchPeerWire *)&msg[1 + (count - 1 - i) * 6]);
+                    MatchPeer_Read(&peer, wire);
                     DWCi_PushFrontNodeInfo(&peer);
                 }
-                value = msg[1 + count * 6];
+                value = *(msg + count * 6 + 1);
                 DWCi_GetMatchCnt()->synId = value;
                 DWCi_PushFrontNodeInfo(&DWCi_GetMatchCnt()->self);
                 DWCi_ClearTargetNodeInfo();
@@ -2416,7 +2430,7 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
     }
 }
 
-static void func_ov011_02162bf8(int conn, int kind, const u32 *msg) {
+static void func_ov011_02162bf8(u8 conn, int kind, u32 *msg) {
     func_ov011_02162958(conn, kind, msg);
 }
 
@@ -2657,16 +2671,16 @@ static int DWCi_SBUpdateAsync(u32 pid) {
     int result;
     int len;
 
+    count = 6;
     list[0] = 8;
     list[1] = 10;
     list[2] = 50;
     list[3] = 51;
     list[4] = 52;
     list[5] = 53;
-    list[6] = 54;
-    list[7] = 55;
-    list[8] = 56;
-    count = 9;
+    list[count++] = 54;
+    list[count++] = 55;
+    list[count++] = 56;
     if (DWCi_GetMatchCnt()->matchType == 0 || DWCi_GetMatchCnt()->matchType == 1) {
         for (i = 0; i < 0x9a; i++) {
             if (sKeys[i].id != 0) {
@@ -2684,7 +2698,7 @@ static int DWCi_SBUpdateAsync(u32 pid) {
             roll = DWCi_GetMatchCnt()->sbSearchHostsOnly != 0 ? 2 : 0;
             DWCi_GetMatchCnt()->sbSearchHostsOnly ^= 1;
         } else {
-            roll = DWCi_GetMathRand32(100) < sMatchChance[0] ? 2 : 0;
+            roll = (s32)DWCi_GetMathRand32(100) < sMatchChance[0] ? 2 : 0;
         }
         len = DWCi_GetDefaultMatchFilter(text, DWCi_GetMatchCnt()->profileId, DWCi_GetMatchCnt()->numEntry,
                                          DWCi_GetMatchCnt()->matchType, roll);
@@ -2741,8 +2755,7 @@ static int DWCi_GetDefaultMatchFilter(char *out, u32 a, u32 b, u32 c, u8 kind) {
 }
 
 static BOOL IsPrivateAddr(u32 ip) {
-    u32 swapped =
-        ((ip & 0xff000000) >> 24) | ((ip & 0x00ff0000) >> 8) | ((ip & 0x0000ff00) << 8) | ((ip & 0x000000ff) << 24);
+    u32 swapped = ((ip >> 24) & 0xff) | ((ip >> 8) & 0xff00) | ((ip << 8) & 0x00ff0000) | ((ip << 24) & 0xff000000);
     u8 first = (swapped & 0xff000000) >> 24;
     u8 second = (swapped & 0x00ff0000) >> 16;
 
@@ -2765,14 +2778,14 @@ static int DWCi_NNStartupAsync(int reset, u32 token, DWCNodeInfo *peer) {
 
     NNCancel(DWCi_GetMatchCnt()->target.cookie);
     if (reset == 0) {
-        token = (DWCi_GetMatchCnt()->nnCookieRand << 16) | (u16)DWCi_GetMatchCnt()->profileId;
+        token = (u16)DWCi_GetMatchCnt()->profileId | (DWCi_GetMatchCnt()->nnCookieRand << 16);
         if (peer->hasPrivateAddress != 0) {
-            if (peer->publicIp != ServerBrowserGetMyPublicIPAddr(DWCi_GetMatchCnt()->sb)) {
-                mismatch = 1;
-            } else {
+            if (peer->publicIp == ServerBrowserGetMyPublicIPAddr(DWCi_GetMatchCnt()->sb)) {
                 peer->hostIp = peer->localIp;
                 peer->hostPort = peer->localPort;
                 mismatch = 0;
+            } else {
+                mismatch = 1;
             }
         } else if (IsPrivateAddr(SOC_GetHostID()) != 0) {
             mismatch = 1;
@@ -2799,8 +2812,8 @@ static int DWCi_NNStartupAsync(int reset, u32 token, DWCNodeInfo *peer) {
         DWCi_GetMatchCnt()->target.port = peer->publicPort;
         DWCi_GetMatchCnt()->target.ip = peer->publicIp;
     } else {
-        mismatch = 1;
         DWCi_GetMatchCnt()->target.kind = 1;
+        mismatch = 1;
         DWCi_GetMatchCnt()->target.retryCount = 0;
         DWCi_GetMatchCnt()->target.port = 0;
         DWCi_GetMatchCnt()->target.ip = 0;
@@ -2850,8 +2863,8 @@ static BOOL DWCi_CanSendMatchCommandByGT2(int type, int id) {
     return result;
 }
 
-static int DWCi_SendMatchCommand(int type, int id, u32 ip, u16 port, const u32 *data, int count) {
-    int result = 0;
+static int DWCi_SendMatchCommand(u8 type, int id, u32 ip, u16 port, const u32 *data, int count) {
+    int result;
     MatchPacket packet;
     char text[0x200];
     DWCNodeInfo *peer;
@@ -2862,6 +2875,7 @@ static int DWCi_SendMatchCommand(int type, int id, u32 ip, u16 port, const u32 *
         peer = DWCi_GetNodeInfoByProfileID(id);
         DWCi_MakeMatchCommandPacket(&packet, type, data, count);
         DWCi_SendUnreliable(DWC_GetMyAID(), peer->aid, &packet, packet.header.size + sizeof(MatchPacketHeader), FALSE);
+        result = 0;
     } else if (gpIsBuddy(DWCi_GetMatchCnt()->gp, id)) {
         length = 0;
         if (data != NULL && count != 0) {
@@ -2877,7 +2891,7 @@ static int DWCi_SendMatchCommand(int type, int id, u32 ip, u16 port, const u32 *
         }
         result = DWCi_SendSBMsgCommand(type, ip, port, data, count);
     }
-    if (type == 2 || type == 6 || (u8)(type - 8) <= 1) {
+    if (type == 2 || type == 6 || type == 8 || type == 9) {
         DWCi_GetMatchCnt()->cmdCommand = type;
         DWCi_GetMatchCnt()->cmdPort = port;
         DWCi_GetMatchCnt()->cmdIp = ip;
@@ -2929,9 +2943,9 @@ static int DWCi_SendGPBuddyMsgCommand(void *gp, u8 command, int id, const char *
     int length;
     char *end;
 
-    length = OS_SNPrintf(buffer, 0x200, "%s%dv%s", "GPCM", 0x5a, "MAT", id);
-    buffer[length++] = command;
-    end = buffer + length;
+    length = OS_SNPrintf(buffer, 0x200, "%s%dv%s", "GPCM", 0x5a, "MAT");
+    buffer[length] = command;
+    end = buffer + 1 + length;
     *end = 0;
     if (text != NULL) {
         int textLength = strlen(text);
@@ -2949,7 +2963,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
     DWCNodeInfo accepted;
     SocAddrIn address;
     u32 sendId[1];
-    int result;
+    u8 result;
     u8 saved;
     u32 requestType;
     u32 requestExtra;
@@ -2958,7 +2972,6 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
     u32 joinId;
     u8 joinAid;
     int blocked;
-    DWCNodeInfo *peer;
     u32 requestSkip;
     u32 requestCookie;
     DWCNodeInfo *host;
@@ -2991,32 +3004,32 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
     case 1: {
         blocked = 0;
         requestType = data[0];
-        peer = &request;
-        MI_CpuFill8(peer, 0, sizeof(DWCNodeInfo));
-        peer->profileId = profileId;
-        peer->aid = 0xff;
-        peer->publicIp = data[1];
-        peer->publicPort = data[2];
-        peer->localIp = data[3];
-        peer->localPort = data[4];
-        peer->hasPrivateAddress = data[5];
+        MI_CpuFill8(&request, 0, sizeof(DWCNodeInfo));
+        request.profileId = profileId;
+        request.aid = 0xff;
+        request.publicIp = data[1];
+        request.publicPort = data[2];
+        request.localIp = data[3];
+        request.localPort = data[4];
+        request.hasPrivateAddress = data[5];
         requestSkip = data[6];
         requestCookie = data[7];
-        memcpy(&peer->userData, &data[8], sizeof(u32));
+        memcpy(&request.userData, &data[8], sizeof(u32));
         requestExtra = data[9];
         if (count >= 11 && data[10] == 1) {
             blocked = 1;
         }
-        result = DWCi_CheckResvCommand(peer->profileId, peer->publicIp, peer->publicPort, requestType, requestSkip != 0,
-                                       requestCookie, &peer->userData, blocked);
+        result = DWCi_CheckResvCommand(request.profileId, request.publicIp, request.publicPort, requestType,
+                                       requestSkip != 0, requestCookie, &request.userData, blocked);
         if (result == 2) {
             DWCi_ClearTargetNodeInfo();
-            DWCi_GetMatchCnt()->self = *peer;
+            DWCi_GetMatchCnt()->self = request;
             if (DWCi_HandleMatchCommandError(DWCi_ProcessResvOK(profileId, ip, port)) != 0) {
                 return 0;
             }
             if (DWCi_GetMatchCnt()->memberConnecting != 0) {
-                DWCi_GetMatchCnt()->self.aid = DWCi_GetNodeInfoByProfileID(DWCi_GetMatchCnt()->self.profileId)->aid;
+                node = DWCi_GetNodeInfoByProfileID(DWCi_GetMatchCnt()->self.profileId);
+                DWCi_GetMatchCnt()->self.aid = node->aid;
             }
             if (DWCi_GetMatchCnt()->memberConnecting == 0 && DWCi_GetMatchCnt()->mode == 2 &&
                 DWCi_GetMatchCnt()->state != 0xe &&
@@ -3050,8 +3063,8 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
             n = 1;
         }
         if (result != 0xff) {
-            if (DWCi_HandleMatchCommandError(
-                    DWCi_SendMatchCommand(result, peer->profileId, peer->publicIp, peer->publicPort, reply, n)) != 0) {
+            if (DWCi_HandleMatchCommandError(DWCi_SendMatchCommand(result, request.profileId, request.publicIp,
+                                                                   request.publicPort, reply, n)) != 0) {
                 return 0;
             }
         }
@@ -3112,7 +3125,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
             break;
         }
         if (DWCi_GetMatchCnt()->unk_798 != 0 || DWCi_GetMatchCnt()->matchType == 3) {
-            DWCi_StopMatching(code == 0x10 ? 0xc : 0x15, 0);
+            DWCi_StopMatching(code != 0x10 ? 0x15 : 0xc, 0);
             return 0;
         }
         return DWCi_RetryReserving(DWCi_GetMatchCnt()->reqProfileId);
@@ -3450,22 +3463,26 @@ static inline void MatchNotify(int error, BOOL cancel, BOOL self, BOOL isServer)
                                    DWCi_GetMatchCnt()->notifyParam);
 }
 
-static int DWCi_CheckResvCommand(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie,
-                                 void *userData, int blocked) {
+static u8 DWCi_CheckResvCommand(int profileId, int ip, u16 port, int nodeType, int skipChecks, int cookie,
+                                void *userData, int blocked) {
     u64 now;
-    int result;
+    u8 result;
 
     DWCi_GetMatchCnt()->error = 1;
     switch (DWCi_GetHostState()) {
     case 1:
         if (DWCi_IsNodeNotConnected(profileId) != 0) {
             if (DWCi_GetMatchCnt()->memberConnecting == 0) {
-                if (DWCi_GetMatchCnt()->state == 1 && DWCi_GetMatchCnt()->pending.profileId == 0) {
-                    DWCi_GetMatchCnt()->memberConnecting = 1;
-                    func_ov011_021685fc();
-                    result = 2;
-                    now = OS_GetTick();
-                    DWCi_GetMatchCnt()->cmdSendTime = now;
+                if (DWCi_GetMatchCnt()->state == 1) {
+                    if (DWCi_GetMatchCnt()->pending.profileId == 0) {
+                        DWCi_GetMatchCnt()->memberConnecting = 1;
+                        func_ov011_021685fc();
+                        result = 2;
+                        now = OS_GetTick();
+                        DWCi_GetMatchCnt()->cmdSendTime = now;
+                    } else {
+                        result = 4;
+                    }
                 } else {
                     result = 4;
                 }
@@ -3499,9 +3516,9 @@ static int DWCi_CheckResvCommand(int profileId, int ip, int port, int nodeType, 
     return result;
 }
 
-static int func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie,
-                               void *userData, int blocked) {
-    int result;
+static u8 func_ov011_0216484c(int profileId, int ip, int port, int nodeType, int skipChecks, int cookie, void *userData,
+                              int blocked) {
+    u8 result;
 
     if (DWCi_IsMatchLocked() != 0) {
         DWCi_GetMatchCnt()->error = 0x13;
@@ -4206,29 +4223,33 @@ static int DWCi_CloseShutdownClientSC(u32 mask) {
     int outIds[32];
     int inIds[32];
     int addSelf = 0;
-    int result = 1;
     int i;
-    int inCount = 0;
     int outCount = 0;
+    int inCount = 0;
+    int result = 1;
 
     for (i = 1; i < DWCi_GetNumNodeInfo(); i++) {
         DWCNodeInfo *node = DWCi_GetNodeInfoByIndex(i);
 
         if (node != NULL) {
             if (((1 << node->aid) & mask) != 0) {
-                inIds[inCount++] = node->profileId;
+                inIds[inCount] = node->profileId;
+                inCount++;
             } else {
-                outIds[outCount++] = node->profileId;
+                outIds[outCount] = node->profileId;
+                outCount++;
             }
         }
     }
     if (DWCi_IsTargetNodeInfoValid() != 0) {
-        MatchControl *ctrl = DWCi_GetMatchCnt();
+        DWCNodeInfo *self = &DWCi_GetMatchCnt()->self;
 
-        if ((mask & (1 << ctrl->self.aid)) != 0) {
-            inIds[inCount++] = ctrl->self.profileId;
+        if ((mask & (1 << self->aid)) != 0) {
+            inIds[inCount] = self->profileId;
+            inCount++;
         } else {
-            outIds[outCount++] = ctrl->self.profileId;
+            outIds[outCount] = self->profileId;
+            outCount++;
             addSelf = 1;
         }
     }
@@ -4252,7 +4273,7 @@ static int DWCi_CloseShutdownClientSC(u32 mask) {
         DWCi_ClearTargetNodeInfo();
     }
     for (i = 0; i < outCount; i++) {
-        int aid = DWCi_GetAIDFromProfileID(outIds[i], 0);
+        u8 aid = DWCi_GetAIDFromProfileID(outIds[i], 0);
 
         if (aid != 0xff) {
             DWCi_CloseConnectionHard(aid);
@@ -4262,7 +4283,7 @@ static int DWCi_CloseShutdownClientSC(u32 mask) {
     return result;
 }
 
-static void DWCi_SendMatchSynPacket(u32 aid, int type) {
+static void DWCi_SendMatchSynPacket(u8 aid, u16 type) {
     int size = 4;
     u32 local[2];
     u32 *data = local;
@@ -4447,7 +4468,7 @@ static void DWCi_SendMatchAckToClients(void) {
     }
 }
 
-static int DWCi_SendCancelMatchSynCommand(int profileId, int message) {
+static int DWCi_SendCancelMatchSynCommand(int profileId, u8 message) {
     u32 data;
     DWCNodeInfo *node;
     u64 now;
@@ -4922,15 +4943,20 @@ static void DWCi_SBCallback(ServerBrowser *sb, SBCallbackReason reason, SBServer
                 peer.localPort = SBServerGetPrivateQueryPort(server);
                 peer.hasPrivateAddress = SBServerHasPrivateAddress(server);
                 MI_CpuCopy8(&DWCi_GetMatchCnt()->userData, &peer.userData, sizeof(u32));
-                if (DWCi_GetMatchCnt()->matchType != 0 && DWCi_GetMatchCnt()->matchType != 1) {
-                    if (DWCi_GetMatchCnt()->matchType == 2) {
-                        peer.aid = DWCi_GetFreeAID();
-                    } else if (DWCi_GetMatchCnt()->matchType != 3) {
-                        break;
-                    }
+                if (DWCi_GetMatchCnt()->matchType == 0) {
+                    DWCi_PushFrontNodeInfo(&peer);
+                    DWCi_StartMatchingAfterSearchOwn();
+                } else if (DWCi_GetMatchCnt()->matchType == 1) {
+                    DWCi_PushFrontNodeInfo(&peer);
+                    DWCi_StartMatchingAfterSearchOwn();
+                } else if (DWCi_GetMatchCnt()->matchType == 2) {
+                    peer.aid = DWCi_GetFreeAID();
+                    DWCi_PushFrontNodeInfo(&peer);
+                    DWCi_StartMatchingAfterSearchOwn();
+                } else if (DWCi_GetMatchCnt()->matchType == 3) {
+                    DWCi_PushFrontNodeInfo(&peer);
+                    DWCi_StartMatchingAfterSearchOwn();
                 }
-                DWCi_PushFrontNodeInfo(&peer);
-                DWCi_StartMatchingAfterSearchOwn();
                 break;
             }
             DWCi_GetMatchCnt()->sbUpdateFlag = 2;
@@ -5441,7 +5467,7 @@ static BOOL DWCi_SendSvDownCommands(void) {
     for (i = 1; i < count; i++) {
         DWCNodeInfo *peer = DWCi_GetNodeInfoByIndex(i);
         u32 data = DWC_GetAIDBitmap();
-        u32 type;
+        u8 type;
 
         if (DWCi_GetMatchCnt()->newHostAckBit & (1 << peer->aid)) {
             type = 0x55;
@@ -5563,7 +5589,7 @@ int DWCi_SendServerPoll(BOOL force) {
     return 1;
 }
 
-static BOOL DWCi_SetSuspendAndNotify(u32 index, int set, int mode) {
+static BOOL DWCi_SetSuspendAndNotify(u8 index, int set, int mode) {
     int count = 0;
     DWCNodeInfo *host = DWCi_GetNodeInfoByIndex(0);
     u32 oldFlags = DWCi_GetMatchCnt()->suspendAidBitmap;
@@ -5898,7 +5924,7 @@ static DWCNodeInfo *DWCi_GetNodeInfoByProfileID(int id) {
     return NULL;
 }
 
-static DWCNodeInfo *DWCi_GetNodeInfoByAID(int index) {
+static DWCNodeInfo *DWCi_GetNodeInfoByAID(u8 index) {
     int i;
 
     for (i = 0; i < DWCi_GetMatchCnt()->nodeCount; i++) {
