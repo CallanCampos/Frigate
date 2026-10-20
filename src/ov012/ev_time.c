@@ -95,7 +95,7 @@ static void midnight(GameData *gameData, s32 days) {
     UnityTower_AgeTodayRegions(getUnityTower_SurveySaveBlkAddrress(save));
     SurveySave_FinishDay(SurveySave_Get(save));
     TrainerLogSave_ClearToday(TrainerLogSave_Get(save));
-    func_0200ff78(getHollow_RivalBlk(save), 0);
+    HollowRivalSave_SetMeetingToday(getHollow_RivalBlk(save), 0);
     joinAvenue = SaveControl_GetJoinAvenue(save);
     info = JoinAvenue_GetInfo(joinAvenue);
     occupants = getAddressOfBeginningOfOccupants(joinAvenue);

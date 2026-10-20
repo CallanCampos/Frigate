@@ -236,16 +236,16 @@ void KeyDataSave_SetMoney(KeyDataSave *keyData, u32 value);
 RivalDataSave *getHollow_RivalData(SaveControl *save);
 // Save block 0x42, and setting a byte of it
 void *getHollow_RivalBlk(SaveControl *save);
-void func_0200ff78(void *rival, u32 value);
+void HollowRivalSave_SetMeetingToday(void *rival, u32 value);
 // The rival's hollow data: a value of an index, a flag of an index, and the hollows visited
 void HollowRivalSave_SetValue(void *block, u32 index, u16 value);
 u16 HollowRivalSave_GetValue(void *block, u16 index);
 void HollowRivalSave_SetFlag(void *block, u16 index, u32 value);
-void func_0200ff6c(void *block);
-u16 func_0200ff74(void *block);
-void func_0200ff94(void *block, u32 value);
-void func_0200ffb0(void *block, u16 value);
-void func_0200ffb8(void *block, u32 value);
+void HollowRivalSave_ClearMeeting(void *block);
+u16 HollowRivalSave_GetMeeting(void *block);
+void HollowRivalSave_SetHasSpecies(void *block, u32 value);
+void HollowRivalSave_SetSpecies(void *block, u16 value);
+void HollowRivalSave_SetMet(void *block, u32 value);
 BOOL func_0200ffd4(void *block, int index);
 // The C-Gear's save block (getCGearDataBlkAddress)
 // Copies the C-Gear's record at index, 4 u16

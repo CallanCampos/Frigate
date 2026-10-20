@@ -58,15 +58,15 @@ BOOL s0266_HollowRivalGetCounter(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_0200ff74(getHollow_RivalBlk(GameData_GetSaveControl(gameData)));
+    *result = HollowRivalSave_GetMeeting(getHollow_RivalBlk(GameData_GetSaveControl(gameData)));
     return FALSE;
 }
 
 BOOL func_ov012_0216a7cc(VM *vm, FieldScriptEnv *env) {
     void *block = getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
 
-    func_0200ffb8(block, TRUE);
-    func_0200ff6c(block);
+    HollowRivalSave_SetMet(block, TRUE);
+    HollowRivalSave_ClearMeeting(block);
     return FALSE;
 }
 
@@ -74,7 +74,7 @@ BOOL func_ov012_0216a7f4(VM *vm, FieldScriptEnv *env) {
     void *block = getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 value = ScriptReadAny(vm, env);
 
-    func_0200ff94(block, TRUE);
-    func_0200ffb0(block, value);
+    HollowRivalSave_SetHasSpecies(block, TRUE);
+    HollowRivalSave_SetSpecies(block, value);
     return FALSE;
 }

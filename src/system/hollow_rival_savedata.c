@@ -35,59 +35,59 @@ u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index) {
     return hollowRival->flags[index];
 }
 
-void func_0200ff68(HollowRivalSave *hollowRival, u32 value) {
+void HollowRivalSave_SetMeeting(HollowRivalSave *hollowRival, u32 value) {
     hollowRival->meeting = value;
 }
 
-void func_0200ff6c(void *block) {
+void HollowRivalSave_ClearMeeting(void *block) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->meeting = 0;
 }
 
-u16 func_0200ff74(void *block) {
+u16 HollowRivalSave_GetMeeting(void *block) {
     HollowRivalSave *hollowRival = block;
 
     return hollowRival->meeting;
 }
 
-void func_0200ff78(void *rival, u32 value) {
+void HollowRivalSave_SetMeetingToday(void *rival, u32 value) {
     HollowRivalSave *hollowRival = rival;
 
     hollowRival->meetingToday = value;
 }
 
-BOOL func_0200ff8c(HollowRivalSave *hollowRival) {
+BOOL HollowRivalSave_IsMeetingToday(HollowRivalSave *hollowRival) {
     return hollowRival->meetingToday;
 }
 
-void func_0200ff94(void *block, u32 value) {
+void HollowRivalSave_SetHasSpecies(void *block, u32 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->hasSpecies = value;
 }
 
-BOOL func_0200ffa8(HollowRivalSave *hollowRival) {
+BOOL HollowRivalSave_HasSpecies(HollowRivalSave *hollowRival) {
     return hollowRival->hasSpecies;
 }
 
-void func_0200ffb0(void *block, u16 value) {
+void HollowRivalSave_SetSpecies(void *block, u16 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->species = value;
 }
 
-u16 func_0200ffb4(HollowRivalSave *hollowRival) {
+u16 HollowRivalSave_GetSpecies(HollowRivalSave *hollowRival) {
     return hollowRival->species;
 }
 
-void func_0200ffb8(void *block, u32 value) {
+void HollowRivalSave_SetMet(void *block, u32 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->met = value;
 }
 
-BOOL func_0200ffcc(HollowRivalSave *hollowRival) {
+BOOL HollowRivalSave_IsMet(HollowRivalSave *hollowRival) {
     return hollowRival->met;
 }
 

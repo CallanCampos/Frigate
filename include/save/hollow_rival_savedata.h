@@ -23,10 +23,10 @@ typedef struct {
 } HollowRivalSave;
 
 u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index);
-void func_0200ff68(HollowRivalSave *hollowRival, u32 value);
-BOOL func_0200ff8c(HollowRivalSave *hollowRival);
-BOOL func_0200ffa8(HollowRivalSave *hollowRival);
-u16 func_0200ffb4(HollowRivalSave *hollowRival);
-BOOL func_0200ffcc(HollowRivalSave *hollowRival);
+void HollowRivalSave_SetMeeting(HollowRivalSave *hollowRival, u32 value);
+BOOL HollowRivalSave_IsMeetingToday(HollowRivalSave *hollowRival);
+BOOL HollowRivalSave_HasSpecies(HollowRivalSave *hollowRival);
+u16 HollowRivalSave_GetSpecies(HollowRivalSave *hollowRival);
+BOOL HollowRivalSave_IsMet(HollowRivalSave *hollowRival);
 
 #endif // POKEBW2_SAVE_HOLLOW_RIVAL_SAVEDATA_H
