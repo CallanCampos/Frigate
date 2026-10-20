@@ -536,11 +536,11 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
     switch (p_wk->matchState) {
     case 0:
         if (DWCRap_StartMatchQuery(p_wk->matchQuery, 2, p_wk->evalFunc, p_wk)) {
-            func_0204200c();
+            NetState_WaitWifiMatch();
             func_ov011_02151e40(0);
             p_wk->matchState = 1;
         } else {
-            func_020421ac(TRUE);
+            NetState_WifiDisconnect(TRUE);
             return 2;
         }
         break;
@@ -615,7 +615,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
                 NetState_ClearWifiError();
                 NetState_ClearError();
                 GFL_NetErrClear();
-                func_020421ac(TRUE);
+                NetState_WifiDisconnect(TRUE);
             }
             return 2;
         }
@@ -630,7 +630,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
 void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk) {
     func_02042e94(0);
     func_02042e9c(0);
-    func_020421ac(TRUE);
+    NetState_WifiDisconnect(TRUE);
 }
 
 void WifiBattleMatchNet_ResetEnd(WifiBattleMatchNet *p_wk) {
@@ -663,7 +663,7 @@ BOOL WifiBattleMatchNet_EndMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 4:
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         p_wk->phaseB++;
         break;
     case 5:

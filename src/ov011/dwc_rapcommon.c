@@ -215,7 +215,7 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
             if (a1 != 0) {
                 GFL_NetErrRecord();
                 DWCRapCommon_ShutdownLibrary();
-                func_020421ac(TRUE);
+                NetState_WifiDisconnect(TRUE);
                 GFL_NetErrShowScreen();
                 GFL_NetErrClear();
                 return 4;
@@ -223,7 +223,7 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
             NetState_ClearWifiError();
             GFL_NetErrClear();
             NetState_ClearError();
-            func_020421ac(TRUE);
+            NetState_WifiDisconnect(TRUE);
             return 0;
         }
         if (type == 0x3f2 || type == 0x3f3 || type == 0x3f4 || type == 0x3f6) {

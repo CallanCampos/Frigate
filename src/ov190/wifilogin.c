@@ -308,7 +308,7 @@ static void WifiLogin_StateStartNet(WifiLoginWork *work) {
     sNetInit.gameCommandBase = work->param->unkC;
     sGameType = work->param->unkC;
     GFL_NetInit(&sNetInit, NULL, work);
-    func_020423e0();
+    NetState_StartWifiLogin();
     if (work->param->unk8 == 0) {
         GFL_NetSetIconScreen(FALSE, work->heapId);
     } else {

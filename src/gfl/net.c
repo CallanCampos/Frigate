@@ -161,7 +161,7 @@ BOOL GFL_NetExit(void (*callback)(void *work)) {
 
         pNet->exitCallback = callback;
         if (type == GFL_NET_TYPE_WIFI) {
-            func_0204230c(GFL_NetFinishExit);
+            NetState_EndWifi(GFL_NetFinishExit);
         } else {
             NetState_End(GFL_NetFinishExit);
         }
@@ -228,7 +228,7 @@ void GFL_NetStartAsChild(const u8 *mac) {
 }
 
 void func_02042968(void) {
-    func_020413f0();
+    NetState_StartScan();
 }
 
 void func_02042970(void) {
@@ -237,11 +237,11 @@ void func_02042970(void) {
     switch (pNet->aNetInit.bNetType) {
     case GFL_NET_TYPE_WIFI:
     case GFL_NET_TYPE_WIFI_LOBBY:
-        func_0204208c();
+        NetState_ConnectWifiAny();
         break;
     case 0:
     case 5:
-        func_020414c0(pNet->aNetInit.heapId);
+        NetState_StartParent(pNet->aNetInit.heapId);
         break;
     }
 }
@@ -252,7 +252,7 @@ void func_020429a8(void (*callback)(void *work), void (*a1)(void *work, BOOL a1)
     if (NetIw_IsRunning() == TRUE) {
         callback = NetIw_SetCallbacks(callback, a1, a2);
     }
-    func_02041a30(pNet->aNetInit.heapId, callback, 1);
+    NetState_StartChangeover(pNet->aNetInit.heapId, callback, 1);
 }
 
 void GFL_NetIwSetGameCommandBase(int a0) {
@@ -274,13 +274,13 @@ void GFL_NetIwFree(void) {
 void func_020429f8(void (*callback)(void *work)) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    func_02041a30(pNet->aNetInit.heapId, callback, 1);
+    NetState_StartChangeover(pNet->aNetInit.heapId, callback, 1);
 }
 
 void func_02042a10(int unused) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    func_02041dfc();
+    NetState_StartSearch();
 }
 
 void func_02042a1c(int a0) {
@@ -290,7 +290,7 @@ void func_02042a1c(int a0) {
 }
 
 void func_02042a30(int mode, int a1, const u8 *mac) {
-    func_02041c00(mode, a1, mac);
+    NetState_SetChangeoverMode(mode, a1, mac);
 }
 
 BOOL func_02042a38(void) {
@@ -586,7 +586,7 @@ void func_02042e94(u8 a0) {
 }
 
 void func_02042e9c(BOOL a0) {
-    func_02042424(a0);
+    NetState_SetDisconnectError(a0);
 }
 
 // Allocates 32-byte aligned memory, keeping the allocation just before it for GFL_NetFreeAligned32

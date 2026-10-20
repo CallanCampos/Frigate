@@ -91,7 +91,7 @@ static const NetCommand sBaseCommands[GFL_NET_CMD_BASE_COUNT] = {
     { NetHandle_RecvTimingFromServer, NULL },
     { NetIw_RecvCollectedMacs, NULL },
     { NetHandle_RecvData, NULL },
-    { func_020421f8, NULL },
+    { NetState_RecvWifiDisconnect, NULL },
     { NetCommand_RecvHugeChunk, NULL },
     { NetCommand_RecvHugeHeader, NULL },
     { NetLdata_RecvData, NetLdata_GetRecvPtr },

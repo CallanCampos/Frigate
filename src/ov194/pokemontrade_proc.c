@@ -268,7 +268,7 @@ static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
 void func_ov194_021b772c(PokemonTradeWork *wk) {
     func_02042e94(FALSE);
     func_02042e9c(FALSE);
-    func_020421ac(FALSE);
+    NetState_WifiDisconnect(FALSE);
     wk->param->next = 3;
 }
 

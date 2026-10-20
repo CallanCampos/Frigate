@@ -4136,7 +4136,7 @@ static int WifiP2PMatch_StateConnectStart(WIFIP2PMATCH_WORK *wk, int seq) {
         MI_CpuFill8(wk->matchVChat, 0, sizeof(wk->matchVChat));
         WifiP2PMatch_DrawTitle(wk);
         WifiP2PMatch_NetInit(wk, FALSE);
-        func_020423e0();
+        NetState_StartWifiLogin();
         WifiP2PMatch_PrintMessage(wk, WifiError_Text_ConnectingNintendoWiFi, TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_BG_PRIORITY;
     }
@@ -4224,15 +4224,15 @@ static int WifiP2PMatch_StateDisconnectWait(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (NetState_IsWifiBattleError() || NetState_GetWifiStatus() == 3) {
         WifiP2PMatch_OnNetError(wk);
-    } else if (func_0204223c()) {
+    } else if (NetState_IsWifiReady()) {
         if (WIFI_MCR_GetInitFlag(&wk->room) == TRUE) {
             WifiP2PMatch_RoomExit(wk);
         }
         wk->seq = WifiP2PMatch_LeaveConnection(wk, FALSE);
-    } else if (NetState_GetWifiStatus() < 4 && !func_02042210() && GFL_NetIsNegotiated(0xff)) {
+    } else if (NetState_GetWifiStatus() < 4 && !NetState_IsDisconnectReceived() && GFL_NetIsNegotiated(0xff)) {
         // Still disconnecting
     } else {
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         if (WIFI_MCR_GetInitFlag(&wk->room) == TRUE) {
             WifiP2PMatch_RoomExit(wk);
         }
@@ -4300,7 +4300,7 @@ static BOOL WifiP2PMatch_ConnectRequestFunc(int friendIndex, void *work) {
 }
 
 static int WifiP2PMatch_StateLoginWait(WIFIP2PMATCH_WORK *wk, int seq) {
-    if (!NetState_IsWifiBattleError() && !func_0204223c()) {
+    if (!NetState_IsWifiBattleError() && !NetState_IsWifiReady()) {
         return seq;
     }
     wk->seq = WIFIP2PMATCH_SEQ_ROOM_START;
@@ -4530,7 +4530,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_ERROR;
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         return seq;
     }
     WifiP2PMatch_UpdateFriendList(wk, WIFIP2PMATCH_HEAP);
@@ -4604,7 +4604,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         WIFI_STATUS_SetUseVChat(wk->myStatus, WIFI_STATUS_GetVChatStatus(wk->myStatus));
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
@@ -4982,7 +4982,7 @@ static int WifiP2PMatch_StateVChatEndTiming(WIFIP2PMATCH_WORK *wk, int seq) {
 
 static int WifiP2PMatch_StateVChatDisconnectTiming(WIFIP2PMATCH_WORK *wk, int seq) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x15, 10) || NetHandle_CountNegotiated() != 2) {
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         wk->preConnect = -1;
         wk->timer = 20;
         WifiP2PMatch_EndMessage(wk);
@@ -5019,7 +5019,7 @@ static int WifiP2PMatch_StateConnectFailed(WIFIP2PMATCH_WORK *wk, int seq) {
     wk->timer--;
     if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || wk->timer == 0) {
         WifiP2PMatch_EndMessage(wk);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         WifiP2PMatch_NetInit(wk, FALSE);
         if (!WIFI_MCR_GetInitFlag(&wk->room)) {
             wk->timer = 20;
@@ -5043,7 +5043,7 @@ static int WifiP2PMatch_StateConnectFailedKeyWait(WIFIP2PMATCH_WORK *wk, int seq
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         WifiP2PMatch_EndMessage(wk);
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         wk->timer = 20;
         wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_WAIT;
     }
@@ -5058,7 +5058,7 @@ static int WifiP2PMatch_StateCutConnection(WIFIP2PMATCH_WORK *wk, int seq) {
     WIFI_MCR_NpcPauseOff(&wk->room, WifiP2PMatch_GetMoveObj(wk, WIFI_MCR_PlayerSelect(&wk->room)));
     WifiP2PMatch_EndMessage(wk);
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-    func_020421ac(TRUE);
+    NetState_WifiDisconnect(TRUE);
     WifiP2PMatch_NetInit(wk, FALSE);
     wk->unk135A = 0;
     if (!WIFI_MCR_GetInitFlag(&wk->room)) {
@@ -5087,7 +5087,7 @@ static int WifiP2PMatch_StateConnectError(WIFIP2PMATCH_WORK *wk, int seq) {
         WIFI_MCR_NpcPauseOff(&wk->room, WifiP2PMatch_GetMoveObj(wk, WIFI_MCR_PlayerSelect(&wk->room)));
         WifiP2PMatch_EndMessage(wk);
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         WifiP2PMatch_NetInit(wk, FALSE);
         wk->unk135A = 0;
         if (!WIFI_MCR_GetInitFlag(&wk->room)) {
@@ -5162,7 +5162,7 @@ static int WifiP2PMatch_StateRecruitStopYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
     }
     if (ret == 0) {
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         WifiP2PMatch_NetInit(wk, FALSE);
         WifiP2PMatch_RoomResume(wk);
         wk->seq = WIFIP2PMATCH_SEQ_ROOM;
@@ -5354,7 +5354,7 @@ static int WifiP2PMatch_StateMessageKeyWaitToRoom(WIFIP2PMATCH_WORK *wk, int seq
     }
     if (GCTX_HIDGetPressedKeys()) {
         WifiP2PMatch_EndMessage(wk);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
         wk->preConnect = -1;
         WifiP2PMatch_RoomResume(wk);
@@ -5365,7 +5365,7 @@ static int WifiP2PMatch_StateMessageKeyWaitToRoom(WIFIP2PMATCH_WORK *wk, int seq
 
 static int WifiP2PMatch_StateBackToRoom(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_EndMessage(wk);
-    func_020421ac(TRUE);
+    NetState_WifiDisconnect(TRUE);
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     wk->preConnect = -1;
     WifiP2PMatch_RoomResume(wk);
@@ -5818,7 +5818,7 @@ static int WifiP2PMatch_StateJoinWait(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_AppearsBusy, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
-    } else if (DWCRap_GetStatus() == 4 || func_02042210()) {
+    } else if (DWCRap_GetStatus() == 4 || NetState_IsDisconnectReceived()) {
         WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetFriendIndex());
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
@@ -5851,7 +5851,7 @@ static int WifiP2PMatch_StateJoinTimeout(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ResetVChat(wk);
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     wk->unk135A = 0;
-    func_020421ac(TRUE);
+    NetState_WifiDisconnect(TRUE);
     wk->preConnect = -1;
     wk->seq = WIFIP2PMATCH_SEQ_ROOM;
     WifiP2PMatch_RoomResume(wk);
@@ -5915,7 +5915,7 @@ static BOOL WifiP2PMatch_CheckDisconnect(WIFIP2PMATCH_WORK *wk) {
 // State 0x29: waits for the negotiation with the friend, then starts the exchange of the players' data
 static int WifiP2PMatch_StateNegotiationWait(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_IsMessageEnd(wk);
-    if (NetState_GetWifiStatus() >= 4 || func_02042210()) {
+    if (NetState_GetWifiStatus() >= 4 || NetState_IsDisconnectReceived()) {
         if (wk->unk244) {
             WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendEndedCommunicationBattle, FALSE);
         } else {
@@ -6248,7 +6248,7 @@ static int WifiP2PMatch_StateRetryYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->timer = 30;
     } else {
         WifiP2PMatch_EndMessage(wk);
-        func_020421ac(TRUE);
+        NetState_WifiDisconnect(TRUE);
         wk->timer = 20;
         wk->seq = WIFIP2PMATCH_SEQ_DISCONNECT_WAIT;
     }
@@ -6769,7 +6769,7 @@ static u8 WifiP2PMatch_GetFriendStatus(int friendIndex) {
 
 static BOOL WifiP2PMatch_StartConnect(WIFIP2PMATCH_WORK *wk, int a1) {
     WifiP2PMatchNet_CommandInit(wk);
-    return func_02041fd0(a1);
+    return NetState_ConnectWifiFriend(a1);
 }
 
 // Stops the player in the room

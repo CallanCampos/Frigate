@@ -121,7 +121,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         }
         break;
     case 9:
-        func_020421ac(1);
+        NetState_WifiDisconnect(1);
         *state = 4;
         break;
     case 10: {

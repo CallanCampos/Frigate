@@ -692,7 +692,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
     if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
         GtsNegoMessage_PressCancelButton(wk->msg);
         if (GFL_NetIsInitialized()) {
-            func_020421ac(TRUE);
+            NetState_WifiDisconnect(TRUE);
         }
         GCTX_HIDSetUsingTouch(FALSE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -814,7 +814,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
         }
         STD_TSPrintf(wk->query, "ty=%d And db=%d", wk->mode, 1);
         if (DWCRap_StartMatchQuery(wk->query, 2, GtsNego_EvalMatch, wk)) {
-            func_0204204c();
+            NetState_WaitGtsMatch();
             func_ov011_02151e40(0);
             GtsNegoMessage_CreateCancelButton(wk->msg, GtsNego_OnCancelButton, wk);
             GtsNego_ChangeState(wk, GtsNego_StateSearching, 1163);
@@ -1003,7 +1003,7 @@ static void GtsNego_OnCancelButton(u32 button, u32 event, void *work) {
     if (event == 0) {
         if (wk->state == GtsNego_StateSearching) {
             GtsNegoMessage_PressCancelButton(wk->msg);
-            func_020421ac(TRUE);
+            NetState_WifiDisconnect(TRUE);
             GCTX_HIDSetUsingTouch(TRUE);
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             GtsNego_ChangeState(wk, GtsNego_StateWaitCancelPressed, 1635);
