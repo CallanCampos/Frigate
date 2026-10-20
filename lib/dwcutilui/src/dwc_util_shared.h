@@ -137,8 +137,16 @@ void func_ov182_021b715c(int pos);
 void func_ov182_021b7164(void);
 void func_ov182_021b7174(void);
 
-// The setup of the Nintendo Wi-Fi USB Connector (its file is not written yet)
-void func_ov182_021b6b1c(void);
+// The search for the Nintendo Wi-Fi USB Connector and its results (its file is not written yet)
+enum {
+    DWC_UTIL_USB_SCAN_NONE,
+    DWC_UTIL_USB_SCAN_FOUND,
+    DWC_UTIL_USB_SCAN_SEVERAL,
+};
+typedef void (*DWCUtilUsbScanCallback)(int result);
+BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback);
+BOOL func_ov182_021b895c(void);
+void func_ov182_021b89e8(DWCUtilUsbScanCallback callback);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

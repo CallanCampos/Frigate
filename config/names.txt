@@ -11395,6 +11395,7 @@ overlays/ov182 0x021c413c sAutoConnectSucceeded
 overlays/ov182 0x021c4140 sAutoConnectOkFrames
 overlays/ov182 0x021c4144 sUsbDoneFrames
 overlays/ov182 0x021c4148 sUsbIntroYes
+overlays/ov182 0x021c414c sUsbSetupState
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

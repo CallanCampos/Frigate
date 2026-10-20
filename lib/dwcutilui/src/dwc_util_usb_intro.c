@@ -10,6 +10,7 @@
 #include "dwc_util_shared.h"
 #include "dwc_util_text.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_usb_setup.h"
 #include "nitro/gx.h"
 
 static void func_ov182_021b68c8(void);
