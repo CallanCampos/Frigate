@@ -83,15 +83,17 @@ enum {
 
 // Block 0x47 (pokewood_savedata.c, a descriptive name)
 struct PokewoodSave {
-    u32 flags0[POKEWOOD_FLAG_WORDS];
+    // Flag list 0, the movies that can be filmed
+    u32 unlockedMovies[POKEWOOD_FLAG_WORDS];
     u32 flags1[POKEWOOD_FLAG_WORDS];
     u32 flags2[POKEWOOD_FLAG_WORDS];
-    u32 flags3[POKEWOOD_FLAG_WORDS];
+    // Flag list 3, the unlocked movies that the scripts have announced
+    u32 announcedMovies[POKEWOOD_FLAG_WORDS];
     u8 slots[POKEWOOD_SLOT_COUNT];
     PokewoodRecord records[POKEWOOD_MOVIE_COUNT];
-    // 0 to 99
-    s16 unk348;
-    // A bit for each level of func_020111ec
+    // The points, 0 to 99, that give the level from 0 to 4
+    s16 levelPoints;
+    // A bit for each of those levels
     s16 levelBits;
     // The series (plus 1, 0 for none) of the last movies filmed, from the newest
     u8 lastSeries[POKEWOOD_LAST_SERIES_COUNT];
@@ -108,7 +110,7 @@ PokewoodSave *PokewoodSave_Get(GameData *gameData);
 // Flag lists 0 to 6 of the save, with a flag for each movie
 BOOL PokewoodSave_CheckFlag(PokewoodSave *save, u32 list, u32 movie);
 void PokewoodSave_SetFlag(PokewoodSave *save, u32 list, u32 movie);
-// PokewoodSave_CheckFlag for lists 0 and 1
+// PokewoodSave_CheckFlag for list 0, whether a movie is unlocked, and for list 1
 BOOL func_02011100(PokewoodSave *save, u32 movie);
 BOOL func_02011118(PokewoodSave *save, u32 movie);
 // PokewoodSave_SetFlag for list 1
@@ -121,7 +123,7 @@ PokewoodRecord *PokewoodSave_GetRecord(PokewoodSave *save, u32 movie);
 // A byte for each of 8 slots
 u8 func_020111a0(PokewoodSave *save, u32 slot);
 void func_020111a8(PokewoodSave *save, u32 slot, u8 value);
-// A value from 0 to 99, which func_020111d0 adds to and func_020111ec sorts into levels 0 to 4
+// The level points, 0 to 99, adding to them, and the level from 0 to 4 that points give
 s16 func_020111b0(PokewoodSave *save);
 void func_020111d0(PokewoodSave *save, int amount);
 int func_020111ec(int value);
