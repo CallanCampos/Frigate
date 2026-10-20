@@ -97,7 +97,7 @@ GameEvent *func_ov036_0219f190(WarpSequence *warp) {
     work->timer = 0;
     work->dir = Field_GetPlayerDirection(warp->field);
     work->stepIndex = 0;
-    work->camera = func_ov036_021b7a34(warp->field);
+    work->camera = EntranceCamera_Create(warp->field);
     work->cameraParam.transitionType = warp->transitionType;
     work->cameraParam.isArrival = TRUE;
     work->cameraParam.isDeparture = FALSE;
@@ -203,7 +203,7 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
         }
         break;
     case ENTRANCE_STEP_TRANSITION:
-        func_ov036_021b7a68(work->camera, &work->cameraParam);
+        EntranceCamera_Configure(work->camera, &work->cameraParam);
         FieldSnd_FadeInImmediate(fieldSound, gameData);
         EntranceEffect_ChainArrivalTransition(event, work);
         *state = EntranceEffect_GetNextStep(work);
@@ -227,7 +227,7 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
     case ENTRANCE_STEP_WALK:
         Field_SetPlayerHidden(field, FALSE);
         GameEvent_ChainNext(event, CallMoveOneTileFrontEvent(gsys, field));
-        if (func_ov036_021b7ae0(work->camera) && func_ov036_021b7ae8(work->camera)) {
+        if (func_ov036_021b7ae0(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
             *state = ENTRANCE_STEP_WAIT_TIMER;
             break;
         }
@@ -246,7 +246,7 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
         }
         break;
     case ENTRANCE_STEP_CAMERA:
-        func_ov036_021b7ac0(work->camera);
+        EntranceCamera_StartAnimation(work->camera);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         break;
@@ -261,9 +261,9 @@ static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 
     }
     if (GSYS_GetNowEvent(gsys) == event && EntranceEffect_GetStep(work) == ENTRANCE_STEP_END &&
         FieldTaskManager_IsIdle(taskManager)) {
-        func_ov036_021b7ad4(work->camera);
+        EntranceCamera_FinishCamera(work->camera);
         FieldCamera_LoadDefaults(camera);
-        func_ov036_021b7a58(work->camera);
+        EntranceCamera_Destroy(work->camera);
         EntranceEffect_FreeDoorHandle(work);
         return GAMEEVENT_DONE;
     }
@@ -280,7 +280,7 @@ GameEvent *func_ov036_0219f4e0(WarpSequence *warp) {
     work->timer = 0;
     work->dir = Field_GetPlayerDirection(warp->field);
     work->stepIndex = 0;
-    work->camera = func_ov036_021b7a34(warp->field);
+    work->camera = EntranceCamera_Create(warp->field);
     work->cameraParam.transitionType = warp->unk10;
     work->cameraParam.isArrival = FALSE;
     work->cameraParam.isDeparture = TRUE;
@@ -328,7 +328,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
 
     switch (*state) {
     case 0:
-        func_ov036_021b7a68(work->camera, &work->cameraParam);
+        EntranceCamera_Configure(work->camera, &work->cameraParam);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {
@@ -336,7 +336,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
         }
         break;
     case 1:
-        func_ov036_021b7ac0(work->camera);
+        EntranceCamera_StartAnimation(work->camera);
         *state = EntranceEffect_GetNextStep(work);
         EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {
@@ -355,7 +355,7 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
         if (!FieldTaskManager_IsIdle(taskManager)) {
             break;
         }
-        if (func_ov036_021b7ae0(work->camera) && func_ov036_021b7ae8(work->camera)) {
+        if (func_ov036_021b7ae0(work->camera) && EntranceCamera_HasZeroFrames(work->camera)) {
             *state = 9;
         } else {
             *state = EntranceEffect_GetNextStep(work);
@@ -407,8 +407,8 @@ static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u3
         EntranceEffect_AdvanceStep(work);
         break;
     case 8:
-        func_ov036_021b7ad4(work->camera);
-        func_ov036_021b7a58(work->camera);
+        EntranceCamera_FinishCamera(work->camera);
+        EntranceCamera_Destroy(work->camera);
         EntranceEffect_FreeDoorHandle(work);
         return GAMEEVENT_DONE;
     }
