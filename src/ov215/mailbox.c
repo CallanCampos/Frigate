@@ -22,7 +22,7 @@ static BOOL MailBox_Init(GameProc *proc, u32 *state, void *param, void *work) {
     mailbox = GFL_ProcInitSubsystem(proc, sizeof(MailBoxWork), HEAPID_MAILBOX_PROC);
     MIi_CpuClearFast(0, mailbox, sizeof(MailBoxWork));
     mailbox->param = data;
-    mailbox->mails = func_02009790(data->gameData);
+    mailbox->mails = MailBox_GetFromGameData(data->gameData);
     mailbox->nextState = MAILBOX_STATE_WIPE_IN;
     mailbox->vblankTask = NULL;
     mailbox->procManager = CreateGameProcManager(HEAPID_MAILBOX_PROC);

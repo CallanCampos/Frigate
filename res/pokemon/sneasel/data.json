@@ -1,0 +1,209 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Sneasel",
+    "pokedex": {
+        "category": "Sharp Claw Pokémon",
+        "entry": "A smart and sneaky Pokémon,\nit makes its opponents flinch by suddenly\nshowing the claws hidden in its paws.",
+        "height": "2'11\"",
+        "weight": "61.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Sneasel",
+                "category": "Sharp Claw Pokémon",
+                "entry": "A smart and sneaky Pokémon. A pair\nmay work together to steal eggs by\nhaving one lure the parents away.",
+                "height": "2'11\"",
+                "weight": "61.7 lbs."
+            },
+            "fr": {
+                "name": "Farfuret",
+                "category": "Pokémon Grifacérée",
+                "entry": "Ce Pokémon rusé agit parfois en\néquipe pour voler des œufs, l'un\nd'entre eux faisant diversion.",
+                "height": "0,9 m",
+                "weight": "28,0 kg"
+            },
+            "de": {
+                "name": "Sniebel",
+                "category": "Stichklaue",
+                "entry": "Ein raffiniertes Pokémon, das in\nZusammenarbeit mit einem anderen\nSniebel gern Eier stiehlt.",
+                "height": "0,9 m",
+                "weight": "28,0 kg"
+            },
+            "it": {
+                "name": "Sneasel",
+                "category": "Pokémon Lamartigli",
+                "entry": "Un Pokémon furbo e subdolo. Attira altri\nPokémon lontano dal nido, mentre\nun altro ruba le uova.",
+                "height": "0,9 m",
+                "weight": "28,0 kg"
+            },
+            "ko": {
+                "name": "포푸니",
+                "category": "갈고리손톱포켓몬",
+                "entry": "약삭빠르게 한 마리가 어미를\n유인하고 다른 한 마리가 알을\n훔치는 팀플레이를 보여준다.",
+                "height": "0.9 m",
+                "weight": "28.0 kg"
+            },
+            "es": {
+                "name": "Sneasel",
+                "category": "Pokémon Garra Filo",
+                "entry": "Es muy inteligente. Se empareja\npara robar huevos: uno distrae a\nlos padres, y el otro se los lleva.",
+                "height": "0,9 m",
+                "weight": "28,0 kg"
+            },
+            "ja": {
+                "name": "ニューラ",
+                "category": "かぎづめポケモン",
+                "entry": "ずるがしこく\\x{3000}いっぴきが\\x{3000}おやを\nおびきよせ\\x{3000}もういっぴきが\\x{3000}タマゴを\nとるという\\x{3000}チームプレーも\\x{3000}みせる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff18}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 95,
+        "defense": 55,
+        "speed": 115,
+        "special_attack": 35,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_DARK", "TYPE_ICE" ],
+    "catch_rate": 60,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_GRIP_CLAW",
+        "rare": "ITEM_QUICK_CLAW",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_INNER_FOCUS", "ABILITY_KEEN_EYE" ],
+    "hidden_ability": "ABILITY_PICKPOCKET",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 86,
+    "height": 9,
+    "weight": 280,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_TAUNT" ],
+            [ 8, "MOVE_QUICK_ATTACK" ],
+            [ 10, "MOVE_FAINT_ATTACK" ],
+            [ 14, "MOVE_ICY_WIND" ],
+            [ 16, "MOVE_FURY_SWIPES" ],
+            [ 20, "MOVE_AGILITY" ],
+            [ 22, "MOVE_METAL_CLAW" ],
+            [ 25, "MOVE_HONE_CLAWS" ],
+            [ 28, "MOVE_BEAT_UP" ],
+            [ 32, "MOVE_SCREECH" ],
+            [ 35, "MOVE_SLASH" ],
+            [ 40, "MOVE_SNATCH" ],
+            [ 44, "MOVE_PUNISHMENT" ],
+            [ 47, "MOVE_ICE_SHARD" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM04",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM54",
+            "TM56",
+            "TM63",
+            "TM65",
+            "TM66",
+            "TM67",
+            "TM75",
+            "TM77",
+            "TM81",
+            "TM84",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM94",
+            "TM95",
+            "HM01",
+            "HM03",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_LOW_KICK",
+            "MOVE_ICE_PUNCH",
+            "MOVE_FOUL_PLAY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SPITE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_COUNTER",
+            "MOVE_SPITE",
+            "MOVE_FORESIGHT",
+            "MOVE_BITE",
+            "MOVE_CRUSH_CLAW",
+            "MOVE_FAKE_OUT",
+            "MOVE_DOUBLE_HIT",
+            "MOVE_PUNISHMENT",
+            "MOVE_PURSUIT",
+            "MOVE_ICE_SHARD",
+            "MOVE_ICE_PUNCH",
+            "MOVE_ASSIST",
+            "MOVE_AVALANCHE",
+            "MOVE_FEINT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_HELD_ITEM_NIGHT",
+            "param": "ITEM_RAZOR_CLAW",
+            "species": "SPECIES_WEAVILE"
+        }
+    ],
+    "regional_dex_number": 252,
+    "baby_species": "SPECIES_SNEASEL",
+    "cry_volume": 110
+}

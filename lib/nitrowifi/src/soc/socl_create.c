@@ -6,7 +6,7 @@
 // SOCL's socket creation: SOCL_CreateSocket gets the memory for a socket and its pipes and buffers (their sizes come
 // from a SOCLSocketParam), then has the socket's control pipe register it with CPS. pokediamond's NitroWiFi names the
 // object socl_create.o and every function in it (and has the listen and accept calls here, which this version lacks).
-static int SOCLi_CreateSocketCallBack(SOCLCommandPacket *packet);
+static int SOCLi_CreateSocketCallBack(void *arg);
 static SOCLSocket *SOCLi_StartupSocket(const SOCLSocketParam *param);
 static u32 SOCLi_GetSizeSocket(const SOCLSocketParam *param);
 static u32 SOCLi_GetSizeCommandPipe(const SOCLPipeParam *param);
@@ -35,16 +35,17 @@ int SOCL_CreateSocket(const SOCLSocketParam *param) {
     return (int)socket;
 }
 
-static int SOCLi_CreateSocketCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
-    SOCLCommandPipe *send_pipe;
+static int SOCLi_CreateSocketCallBack(void *arg) {
+    SOCLiCommandCreateSocket *cpacket = (SOCLiCommandCreateSocket *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
+    SOCLSendPipe *send_pipe;
 
     CPS_SocRegister((CPSSoc *)socket);
     send_pipe = socket->send_pipe;
     switch (socket->flag) {
     case 0:
     case 4:
-        CPS_SocDup(&send_pipe->thread);
+        CPS_SocDup(&send_pipe->base.thread);
         CPS_SocUse();
         break;
     case 1:
@@ -105,7 +106,7 @@ static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param) {
     if (param->buffer.rcvbuf_size != 0) {
         SOCLRecvPipe *pipe = (SOCLRecvPipe *)data;
 
-        socket->recv_pipe = &pipe->base;
+        socket->recv_pipe = pipe;
         pipe->rcvbuf_consume_min = param->buffer.rcvbuf_consume_min;
         data = SOCLi_InitCommandPipe(data + sizeof(SOCLRecvPipe), &pipe->base, &param->rcv_pipe);
         data = SOCLi_InitSocketBuffer(data, &socket->rcvbuf, param->buffer.rcvbuf_size);
@@ -116,7 +117,7 @@ static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param) {
     if (param->buffer.sndbuf_size != 0) {
         SOCLSendPipe *pipe = (SOCLSendPipe *)data;
 
-        socket->send_pipe = &pipe->base;
+        socket->send_pipe = pipe;
         pipe->socket = socket;
         data = SOCLi_InitCommandPipe(data + sizeof(SOCLSendPipe), &pipe->base, &param->snd_pipe);
         data = SOCLi_InitSocketBuffer(data, &socket->sndbuf, param->buffer.sndbuf_size);

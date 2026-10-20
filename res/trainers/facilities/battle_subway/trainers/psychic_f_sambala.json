@@ -1,0 +1,38 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Sambala",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "pokemon": [
+        "medicham_4",
+        "jynx_4",
+        "mr_mime_4",
+        "froslass_4",
+        "cofagrigus_4",
+        "golurk_4",
+        "slowbro_4",
+        "spiritomb_4",
+        "musharna_4",
+        "alakazam_4",
+        "slowking_4",
+        "gothitelle_4",
+        "reuniclus_4",
+        "mismagius_4",
+        "drifblim_4",
+        "gengar_4",
+        "claydol_4",
+        "bronzong_4",
+        "gardevoir_4",
+        "gallade_4",
+        "exeggutor_4",
+        "starmie_4",
+        "chandelure_4",
+        "espeon_4",
+        "dusknoir_4",
+        "metagross_4"
+    ],
+    "messages": [
+        "I claim that I am a Psychic,\nbut I cannot use psychic powers.",
+        "I am camouflaging it\nwith my Psychic-ish costume.",
+        "I go to magic classes\nto look like a Psychic."
+    ]
+}

@@ -1,0 +1,11 @@
+DriftveilCity4_Text_WelcomeDriftveilLuxurySuites = Welcome to the Driftveil Luxury Suites.\nI'm so sorry, but we're full.{be01}\nPlease enjoy our lobby.
+DriftveilCity4_Text_AmGratefulCameAll = I am grateful that you came all this way!\nAre you a Trainer?{be01}\nOoh, you have a Pokédex!\nIt's so marvelous!{be01}\nI wonder if you'd please do me a favor.
+DriftveilCity4_Text_OhTrainerImPleased = Oh, Trainer. I'm so pleased that you\ncame all the way here!{be01}\nI'm wondering if you would do me a favor\ntoday, too.
+DriftveilCity4_Text_Empty =                                                                \x{ffff}
+DriftveilCity4_Text_WouldLikeSeePokemon = I would like to see a Pokémon that\nlearned a move called {0107:0}.{be01}\nTo be clear, that's {0107:0}.\nPlease show it to me today.{be01}\nOh, my, my, my!{be01}\nYour {0101:1} can\nuse {0107:0}!{be01}\nDid you go to the trouble of teaching it\nto your Pokémon? Marvelous!{be01}\nThis is a small token of my appreciation.\nPlease don't hesitate to accept this.{be01}
+DriftveilCity4_Text_ImTouchedCameAll = I'm touched that you came all the way\nhere, yet you are being so unkind.
+DriftveilCity4_Text_ClearWouldLikeSee = To be clear, I would like to\nsee a Pokémon that knows {0107:0}.{be00}\nThank you.
+DriftveilCity4_Text_OhGoodnessCanUse = Oh, my goodness. Your {0101:1} can\nuse {0107:0}!{be01}\nYou went to all the trouble of teaching\nit to your Pokémon? That's so touching!{be01}\nThis is a small token of my appreciation.\nPlease don't hesitate to accept this.{be01}
+DriftveilCity4_Text_WonderWhatLooksLike = I wonder what {0107:0} looks like\nwhen it is actually used.{be01}\nI am sure you can use it skillfully!
+DriftveilCity4_Text_DifferentKindsPokemonCan = Different kinds of Pokémon can learn\ndifferent kinds of moves.
+\pad{c0}

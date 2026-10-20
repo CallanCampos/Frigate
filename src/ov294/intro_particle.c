@@ -24,9 +24,9 @@ IntroParticle *IntroParticle_Create(IntroGraphic *graphic, HeapID heapId) {
     IntroParticle *particle;
     G3DCameraProjection projection;
 
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     particle = GFL_HeapAllocate(heapId, sizeof(IntroParticle), TRUE, "intro_particle.c", 86);
-    particle->system = func_0204f968(particle->buffer, INTRO_PARTICLE_BUFFER_SIZE, TRUE, heapId);
+    particle->system = Particle_CreateSystem(particle->buffer, INTRO_PARTICLE_BUFFER_SIZE, TRUE, heapId);
     particle->graphic = graphic;
     particle->heapId = heapId;
     projection.type = G3DCAM_PROJECTION_ORTHO;
@@ -37,20 +37,20 @@ IntroParticle *IntroParticle_Create(IntroGraphic *graphic, HeapID heapId) {
     projection.near = FX32_ONE;
     projection.far = FX32_CONST(1024);
     projection.ndcRangeOverride = FX32_ONE;
-    func_02050178(particle->system);
-    func_020500cc(particle->system, &projection, FX32_CONST(2), &sCameraVectors[1], &sCameraVectors[0],
-                  &sCameraVectors[2], particle->heapId);
-    func_0204fe04(particle->system, func_0204fdf8(6, 6, particle->heapId), TRUE, FALSE);
+    Particle_FreeCamera(particle->system);
+    Particle_SetCamera(particle->system, &projection, FX32_CONST(2), &sCameraVectors[1], &sCameraVectors[0],
+                       &sCameraVectors[2], particle->heapId);
+    Particle_SetResource(particle->system, Particle_ReadResource(6, 6, particle->heapId), TRUE, FALSE);
     return particle;
 }
 
 void IntroParticle_Free(IntroParticle *particle) {
-    func_0204fb4c();
+    Particle_Free();
     GFL_HeapFree(particle);
 }
 
 void IntroParticle_Update(IntroParticle *particle) {
-    func_0204f954();
+    Particle_DrawAndUpdateAll();
 }
 
 void IntroParticle_SetPos(IntroParticle *particle, fx32 x, fx32 y, fx32 z) {
@@ -59,7 +59,7 @@ void IntroParticle_SetPos(IntroParticle *particle, fx32 x, fx32 y, fx32 z) {
     pos.x = x;
     pos.y = y;
     pos.z = z;
-    func_0205006c(particle->system, 0, &pos);
-    func_0205006c(particle->system, 1, &pos);
-    func_0205006c(particle->system, 2, &pos);
+    Particle_CreateEmitter(particle->system, 0, &pos);
+    Particle_CreateEmitter(particle->system, 1, &pos);
+    Particle_CreateEmitter(particle->system, 2, &pos);
 }

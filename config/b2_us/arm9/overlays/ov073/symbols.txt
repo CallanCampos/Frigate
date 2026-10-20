@@ -1,7 +1,7 @@
-func_ov073_021e8be0 kind:function(thumb,size=0x1c) addr:0x021e8be0
-func_ov073_021e8bfc kind:function(thumb,size=0x4e) addr:0x021e8bfc
-func_ov073_021e8c4c kind:function(thumb,size=0x16) addr:0x021e8c4c
-func_ov073_021e8c64 kind:function(thumb,size=0x48) addr:0x021e8c64
-func_ov073_021e8cac kind:function(thumb,size=0x30) addr:0x021e8cac
-func_ov073_021e8cdc kind:function(thumb,size=0x22) addr:0x021e8cdc
-func_ov073_021e8d00 kind:function(thumb,size=0x24) addr:0x021e8d00
+RivalSelect_GetEntry kind:function(thumb,size=0x1c) addr:0x021e8be0
+RivalSelect_SelectOtherRandom kind:function(thumb,size=0x4e) addr:0x021e8bfc
+RivalSelect_RemoveHollowActorIfMission kind:function(thumb,size=0x16) addr:0x021e8c4c
+RivalSelect_RemoveHollowActor kind:function(thumb,size=0x48) addr:0x021e8c64
+RivalSelect_IsSelectedAndActive kind:function(thumb,size=0x30) addr:0x021e8cac
+RivalSelect_SetActive kind:function(thumb,size=0x22) addr:0x021e8cdc
+RivalSelect_FindEntryIndex kind:function(thumb,size=0x24) addr:0x021e8d00

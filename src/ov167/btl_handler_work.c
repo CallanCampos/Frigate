@@ -3,7 +3,7 @@
 #include "battle/btl_handler_work.h"
 #include "gfl/std.h"
 
-void func_ov167_021b083c(BtlActionState *state) {
+void InitState(BtlActionState *state) {
     state->raw = 0;
     MI_CpuFill8(state->work, 0, sizeof(state->work));
 }
@@ -59,7 +59,7 @@ BOOL GetPrevResult(BtlActionState *state) {
     return state->prevResult;
 }
 
-BOOL func_ov167_021b0918(BtlActionState *state) {
+BOOL GetResult(BtlActionState *state) {
     return state->result;
 }
 
@@ -86,7 +86,7 @@ static const BtlHandlerWorkSize data_ov167_021d6dd8[59] = {
 // clang-format on
 
 // Allocates a handler command's work on the stack, zeroed and with its header set up
-void *func_ov167_021b0920(BtlActionState *state, u32 command, u32 monId) {
+void *PushWork(BtlActionState *state, u32 command, u32 monId) {
     u32 i;
     u8 *work;
     u32 pos;

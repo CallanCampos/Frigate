@@ -21,26 +21,26 @@ typedef struct {
     u8 netIds;
 } NetTimingData;
 
-static void func_02040224(NetHandle *handle, int netId);
-static void func_02040298(NetHandle *handle, int netId);
-static NetHandle *func_020402c8(int netId);
-static void func_020404c0(void);
-static BOOL func_02040680(NetHandle *handle);
-static void func_0204092c(NetHandle *handle);
-static u16 func_02040a2c(u16 bits, int netID, BOOL set);
-static BOOL func_02040a6c(u16 bits, int netID);
+static void NetHandle_Reset(NetHandle *handle, int netId);
+static void NetHandle_ClearNegotiation(NetHandle *handle, int netId);
+static NetHandle *NetHandle_Init(int netId);
+static void NetHandle_SendReplies(void);
+static BOOL NetHandle_SendServerNegotiations(NetHandle *handle);
+static void NetHandle_Reject(NetHandle *handle);
+static u16 NetHandle_SetBit(u16 bits, int netID, BOOL set);
+static BOOL NetHandle_TestBit(u16 bits, int netID);
 
 static NetHandleBaseWork *_pBaseWork;
 
-int func_020401dc(NetHandle *handle) {
+int NetHandle_GetNetId(NetHandle *handle) {
     int i;
 
-    func_02042e78();
-    if (func_02040414(GFL_NET_NETID_SERVER) == handle) {
+    GFL_NetGetSys();
+    if (NetHandle_Get(GFL_NET_NETID_SERVER) == handle) {
         return GFL_NET_NETID_SERVER;
     }
     for (i = 0; i < GFL_NET_HANDLE_MAX; i++) {
-        if (func_02040414(i) == handle) {
+        if (NetHandle_Get(i) == handle) {
             return i;
         }
     }
@@ -48,13 +48,13 @@ int func_020401dc(NetHandle *handle) {
     return -1;
 }
 
-static void func_02040224(NetHandle *handle, int netId) {
+static void NetHandle_Reset(NetHandle *handle, int netId) {
     NetNegotiation *negotiations[GFL_NET_HANDLE_MAX];
     int i;
 
     if (netId != GFL_NET_NETID_SERVER) {
         handle->negotiationsSent = 0;
-        handle->serverNegotiationsSent = func_02040a2c(handle->serverNegotiationsSent, netId, FALSE);
+        handle->serverNegotiationsSent = NetHandle_SetBit(handle->serverNegotiationsSent, netId, FALSE);
     }
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         if (handle->negotiations[i] != NULL) {
@@ -70,26 +70,26 @@ static void func_02040224(NetHandle *handle, int netId) {
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         handle->negotiations[i] = negotiations[i];
     }
-    func_0203efd0(netId);
+    NetSystem_ForgetMachine(netId);
 }
 
-static void func_02040298(NetHandle *handle, int netId) {
+static void NetHandle_ClearNegotiation(NetHandle *handle, int netId) {
     if (netId != GFL_NET_NETID_SERVER) {
         handle->negotiationsSent = 0;
-        handle->serverNegotiationsSent = func_02040a2c(handle->serverNegotiationsSent, netId, FALSE);
+        handle->serverNegotiationsSent = NetHandle_SetBit(handle->serverNegotiationsSent, netId, FALSE);
     }
     if (handle->negotiations[netId] != NULL) {
         MI_CpuFill8(handle->negotiations[netId], 0, sizeof(NetNegotiation));
     }
 }
 
-static NetHandle *func_020402c8(int netId) {
-    GFLNetInitData *ini = func_02042e84();
+static NetHandle *NetHandle_Init(int netId) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
     NetHandle *handle;
     int i;
 
-    func_02042e78();
-    handle = func_02040414(netId);
+    GFL_NetGetSys();
+    handle = NetHandle_Get(netId);
     if (netId == GFL_NET_NETID_SERVER) {
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
             if (handle->negotiations[i] != NULL) {
@@ -110,40 +110,40 @@ static NetHandle *func_020402c8(int netId) {
     return handle;
 }
 
-void func_0204034c(void *sys) {
-    GFLNetInitData *ini = func_02042e84();
+void NetHandle_InitAll(void *sys) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
     int i;
 
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        func_020402c8(i);
+        NetHandle_Init(i);
     }
-    func_020402c8(GFL_NET_NETID_SERVER);
+    NetHandle_Init(GFL_NET_NETID_SERVER);
     GFL_ASSERT(!_pBaseWork);
     _pBaseWork = GFL_HeapAllocate(ini->heapId, sizeof(NetHandleBaseWork), TRUE, "net_handle.c", 229);
 }
 
-void func_020403a4(void *sys) {
+void NetHandle_FreeAll(void *sys) {
     NetHandle *handle;
     int i;
 
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        func_02040224(func_02040414(i), i);
+        NetHandle_Reset(NetHandle_Get(i), i);
     }
-    handle = func_02040414(GFL_NET_NETID_SERVER);
+    handle = NetHandle_Get(GFL_NET_NETID_SERVER);
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         if (handle->negotiations[i] != NULL) {
             GFL_HeapFree(handle->negotiations[i]);
             handle->negotiations[i] = NULL;
         }
     }
-    func_02040224(func_02040414(GFL_NET_NETID_SERVER), GFL_NET_NETID_SERVER);
+    NetHandle_Reset(NetHandle_Get(GFL_NET_NETID_SERVER), GFL_NET_NETID_SERVER);
     GFL_ASSERT(_pBaseWork);
     GFL_HeapFree(_pBaseWork);
     _pBaseWork = NULL;
 }
 
-NetHandle *func_02040414(int netId) {
-    GFLNetSys *sys = func_02042e78();
+NetHandle *NetHandle_Get(int netId) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
     if (sys != NULL) {
         if (netId == GFL_NET_NETID_SERVER) {
@@ -156,11 +156,11 @@ NetHandle *func_02040414(int netId) {
     return NULL;
 }
 
-NetHandle *func_02040440(void) {
-    return func_02040414(func_0203ffc4());
+NetHandle *NetHandle_GetOwn(void) {
+    return NetHandle_Get(NetSystem_GetNetId());
 }
 
-BOOL func_0204044c(NetHandle *handle) {
+BOOL NetHandle_IsNegotiated(NetHandle *handle) {
     if (handle != NULL) {
         if (handle->state == NET_HANDLE_STATE_NEGOTIATED) {
             return TRUE;
@@ -170,21 +170,21 @@ BOOL func_0204044c(NetHandle *handle) {
     return FALSE;
 }
 
-u8 func_02040464(NetHandle *handle) {
+u8 NetHandle_GetState(NetHandle *handle) {
     if (handle != NULL) {
         return handle->state;
     }
     return 8;
 }
 
-int func_02040474(void) {
+int NetHandle_CountNegotiated(void) {
     int i;
-    GFLNetSys *sys = func_02042e78();
+    GFLNetSys *sys = GFL_NetGetSys();
     int count = 0;
 
     if (sys != NULL) {
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-            if (func_0204044c(func_02040414(i))) {
+            if (NetHandle_IsNegotiated(NetHandle_Get(i))) {
                 count++;
             }
         }
@@ -192,36 +192,36 @@ int func_02040474(void) {
     return count;
 }
 
-void func_0204049c(int netId) {
-    if (func_0203ffc4() == 0) {
-        NetHandle *handle = func_02040414(GFL_NET_NETID_SERVER);
+void NetHandle_RequestReply(int netId) {
+    if (NetSystem_GetNetId() == 0) {
+        NetHandle *handle = NetHandle_Get(GFL_NET_NETID_SERVER);
 
         handle->replies[netId].netId = netId;
         handle->replies[netId].pending = TRUE;
     }
 }
 
-static void func_020404c0(void) {
-    if (func_0203ffc4() == 0) {
-        NetHandle *handle = func_02040414(GFL_NET_NETID_SERVER);
+static void NetHandle_SendReplies(void) {
+    if (NetSystem_GetNetId() == 0) {
+        NetHandle *handle = NetHandle_Get(GFL_NET_NETID_SERVER);
         int i;
 
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-            if (handle->replies[i].pending && func_02042be8(handle, 5, 2, &handle->replies[i])) {
+            if (handle->replies[i].pending && GFL_NetSendCommand(handle, 5, 2, &handle->replies[i])) {
                 handle->replies[i].pending = FALSE;
             }
         }
     }
 }
 
-BOOL func_02040504(void) {
-    NetHandle *handle = func_02040440();
-    u8 netId = func_020401dc(handle);
+BOOL NetHandle_SendNegotiation(void) {
+    NetHandle *handle = NetHandle_GetOwn();
+    u8 netId = NetHandle_GetNetId(handle);
     GFLNetInitData *ini;
 
-    func_02042e78();
-    ini = func_02042e84();
-    if (func_0203fe74(func_0203ffc4())) {
+    GFL_NetGetSys();
+    ini = GFL_NetGetInitData();
+    if (NetSystem_IsMachineConnected(NetSystem_GetNetId())) {
         if (handle->state == NET_HANDLE_STATE_SEND_NEGOTIATION) {
             u8 data[9];
 
@@ -229,7 +229,7 @@ BOOL func_02040504(void) {
             data[6] = netId;
             data[7] = ini->gameCommandBase;
             data[8] = ini->unk6E;
-            return func_02042be8(handle, 3, sizeof(data), data);
+            return GFL_NetSendCommand(handle, 3, sizeof(data), data);
         } else if (handle->state < NET_HANDLE_STATE_SEND_NEGOTIATION) {
             handle->state++;
         }
@@ -237,16 +237,16 @@ BOOL func_02040504(void) {
     return FALSE;
 }
 
-void func_02040574(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetHandle_RecvTimingFromMachine(int netId, int size, const void *data, void *work, NetHandle *handle) {
     u16 timing = ((NetTimingData *)data)->timing;
     u8 netIds = ((NetTimingData *)data)->netIds;
     int i;
 
-    if (func_020401dc(handle) == GFL_NET_NETID_SERVER && netId != GFL_NET_NETID_SERVER) {
+    if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER && netId != GFL_NET_NETID_SERVER) {
         _pBaseWork->timings[netId] = timing;
         _pBaseWork->timingSend[netId] = netIds;
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-            if (func_0204044c(func_02040414(i))) {
+            if (NetHandle_IsNegotiated(NetHandle_Get(i))) {
                 if (netIds == _pBaseWork->timingSend[i]) {
                     if (timing != _pBaseWork->timings[i]) {
                         return;
@@ -254,7 +254,7 @@ void func_02040574(int netId, int size, const void *data, void *work, NetHandle 
                 } else if ((1 << i) & netIds) {
                     return;
                 }
-            } else if (func_0203fe74(i) == TRUE) {
+            } else if (NetSystem_IsMachineConnected(i) == TRUE) {
                 return;
             }
         }
@@ -262,25 +262,25 @@ void func_02040574(int netId, int size, const void *data, void *work, NetHandle 
     }
 }
 
-void func_020405ec(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetHandle_RecvTimingFromServer(int netId, int size, const void *data, void *work, NetHandle *handle) {
     handle->timingRecv = *(u16 *)data;
 }
 
-void func_020405f8(NetHandle *handle, u16 timing) {
+void NetHandle_SendTiming(NetHandle *handle, u16 timing) {
     handle->timingSend = timing;
     handle->unk48 = 0xff;
-    if (func_020401dc(handle) == GFL_NET_NETID_SERVER) {
+    if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
         handle->timingSendPending = FALSE;
     } else {
         handle->timingSendPending = TRUE;
     }
 }
 
-void func_02040624(NetHandle *handle, u32 a1, u32 a2) {
+void NetHandle_SendTimingPair(NetHandle *handle, u32 a1, u32 a2) {
     if (handle != NULL) {
         handle->timingSend = a1 + (a2 << 8);
         handle->unk48 = 0xff;
-        if (func_020401dc(handle) == GFL_NET_NETID_SERVER) {
+        if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
             handle->timingSendPending = FALSE;
         } else {
             handle->timingSendPending = TRUE;
@@ -288,14 +288,14 @@ void func_02040624(NetHandle *handle, u32 a1, u32 a2) {
     }
 }
 
-BOOL func_02040654(NetHandle *handle, u16 timing) {
+BOOL NetHandle_IsTimingRecv(NetHandle *handle, u16 timing) {
     if (handle->timingRecv == timing) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02040664(NetHandle *handle, u32 a1, u32 a2) {
+BOOL NetHandle_IsTimingPairRecv(NetHandle *handle, u32 a1, u32 a2) {
     if (handle == NULL) {
         return TRUE;
     }
@@ -306,14 +306,14 @@ BOOL func_02040664(NetHandle *handle, u32 a1, u32 a2) {
 }
 
 // Sends the server's negotiations that have not been sent
-static BOOL func_02040680(NetHandle *handle) {
+static BOOL NetHandle_SendServerNegotiations(NetHandle *handle) {
     int i;
 
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        if (handle->negotiations[i]->valid && !func_02040a6c(handle->negotiationsSent, i)) {
-            if (func_02042c18(handle, GFL_NET_NETID_SERVER, 4, sizeof(NetNegotiation), handle->negotiations[i], 1, 0,
-                              1)) {
-                func_02040a2c(handle->negotiationsSent, i, TRUE);
+        if (handle->negotiations[i]->valid && !NetHandle_TestBit(handle->negotiationsSent, i)) {
+            if (GFL_NetSendCommandToMachine(handle, GFL_NET_NETID_SERVER, 4, sizeof(NetNegotiation),
+                                            handle->negotiations[i], 1, 0, 1)) {
+                NetHandle_SetBit(handle->negotiationsSent, i, TRUE);
             } else {
                 return FALSE;
             }
@@ -323,58 +323,59 @@ static BOOL func_02040680(NetHandle *handle) {
     return TRUE;
 }
 
-void func_020406e0(void) {
+void NetHandle_Update(void) {
     NetHandle *handle;
     int i;
 
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        int netId = func_020401d4(i);
+        int netId = NetSystem_ClampNetId(i);
 
-        handle = func_02040414(netId);
-        if (!func_0203fe74(netId)) {
-            func_0204044c(handle);
+        handle = NetHandle_Get(netId);
+        if (!NetSystem_IsMachineConnected(netId)) {
+            NetHandle_IsNegotiated(handle);
         }
     }
-    func_020404c0();
-    if (func_02042bc4()) {
-        handle = func_02040414(GFL_NET_NETID_SERVER);
+    NetHandle_SendReplies();
+    if (GFL_NetIsParent()) {
+        handle = NetHandle_Get(GFL_NET_NETID_SERVER);
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
             if (_pBaseWork->relayPending[i] == TRUE &&
-                func_02042c9c(handle, _pBaseWork->timingSend[i], 8, 2, &_pBaseWork->timings[i], 0, 0, 0)) {
+                GFL_NetSendCommandToBits(handle, _pBaseWork->timingSend[i], 8, 2, &_pBaseWork->timings[i], 0, 0, 0)) {
                 GFL_ASSERT(_pBaseWork->timingSend[i]);
                 _pBaseWork->relayPending[i] = FALSE;
             }
         }
     }
     for (i = 0; i < GFL_NET_HANDLE_MAX; i++) {
-        handle = func_02040414(func_020401d4(i));
-        if (func_02042bd8(handle) && handle->timingSendPending && func_020401dc(handle) != GFL_NET_NETID_SERVER) {
-            if (func_02042be8(handle, 7, 4, &handle->timingSend)) {
+        handle = NetHandle_Get(NetSystem_ClampNetId(i));
+        if (GFL_NetIsHandleNegotiated(handle) && handle->timingSendPending &&
+            NetHandle_GetNetId(handle) != GFL_NET_NETID_SERVER) {
+            if (GFL_NetSendCommand(handle, 7, 4, &handle->timingSend)) {
                 handle->timingSendPending = FALSE;
             }
         }
     }
-    if (func_0203ffc4() == 0) {
-        handle = func_02040414(GFL_NET_NETID_SERVER);
+    if (NetSystem_GetNetId() == 0) {
+        handle = NetHandle_Get(GFL_NET_NETID_SERVER);
         if (handle != NULL) {
             for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
                 if (handle->negotiations[i] != NULL && handle->negotiations[i]->valid &&
-                    !func_02040a6c(handle->serverNegotiationsSent, i) && func_02040680(handle)) {
-                    handle->serverNegotiationsSent = func_02040a2c(handle->serverNegotiationsSent, i, TRUE);
+                    !NetHandle_TestBit(handle->serverNegotiationsSent, i) && NetHandle_SendServerNegotiations(handle)) {
+                    handle->serverNegotiationsSent = NetHandle_SetBit(handle->serverNegotiationsSent, i, TRUE);
                 }
             }
         }
     }
     {
-        GFLNetInitData *ini = func_02042e84();
+        GFLNetInitData *ini = GFL_NetGetInitData();
 
         if (ini->bNetType != 4) {
-            handle = func_02040440();
+            handle = NetHandle_GetOwn();
             if (handle->infoPending == TRUE) {
                 if (ini->getInfo != NULL && ini->getInfoSize != NULL) {
-                    int size = ini->getInfoSize(func_02042d94());
+                    int size = ini->getInfoSize(GFL_NetGetWork());
 
-                    if (func_02042be8(handle, 10, size, ini->getInfo(func_02042d94()))) {
+                    if (GFL_NetSendCommand(handle, 10, size, ini->getInfo(GFL_NetGetWork()))) {
                         handle->infoPending = FALSE;
                     }
                 } else {
@@ -386,10 +387,10 @@ void func_020406e0(void) {
 }
 
 // The server receives a machine's negotiation
-void func_02040880(int netId, int size, u8 *data, void *work, NetHandle *handle) {
-    GFLNetInitData *ini = func_02042e84();
+void NetHandle_RecvNegotiation(int netId, int size, u8 *data, void *work, NetHandle *handle) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
-    if (func_02040414(GFL_NET_NETID_SERVER) == handle) {
+    if (NetHandle_Get(GFL_NET_NETID_SERVER) == handle) {
         NetNegotiation *negotiation = handle->negotiations[netId];
 
         if (!negotiation->valid) {
@@ -420,8 +421,8 @@ void func_02040880(int netId, int size, u8 *data, void *work, NetHandle *handle)
     }
 }
 
-static void func_0204092c(NetHandle *handle) {
-    GFLNetSys *sys = func_02042e78();
+static void NetHandle_Reject(NetHandle *handle) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
     if (sys->unk352 == 0) {
         if (handle->state != NET_HANDLE_STATE_NEGOTIATED) {
@@ -433,48 +434,48 @@ static void func_0204092c(NetHandle *handle) {
 }
 
 // A machine receives the server's reply to its negotiation
-void func_0204095c(int netId, int size, NetNegotiation *negotiation, void *work, NetHandle *handle) {
-    GFLNetInitData *ini = func_02042e84();
+void NetHandle_RecvNegotiationReply(int netId, int size, NetNegotiation *negotiation, void *work, NetHandle *handle) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
     u8 mac[6];
 
-    if (func_020401dc(handle) == GFL_NET_NETID_SERVER) {
+    if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
         handle->state = NET_HANDLE_STATE_NEGOTIATED;
         return;
     }
     if (ini->unk6E != 0) {
         if (ini->unk6E != negotiation->unkF) {
-            func_0204092c(handle);
+            NetHandle_Reject(handle);
         }
         if (ini->unk6E != negotiation->unkE) {
-            func_0204092c(handle);
+            NetHandle_Reject(handle);
         }
     } else {
         if (ini->gameCommandBase != negotiation->unkF) {
-            func_0204092c(handle);
+            NetHandle_Reject(handle);
         }
         if (ini->gameCommandBase != negotiation->unkE) {
-            func_0204092c(handle);
+            NetHandle_Reject(handle);
         }
     }
     OS_GetMacAddress(mac);
-    if (GFL_STD_MemCmp(negotiation->mac, mac, sizeof(mac)) == 0 && negotiation->netId != func_020401dc(handle)) {
-        func_0204092c(handle);
+    if (GFL_STD_MemCmp(negotiation->mac, mac, sizeof(mac)) == 0 && negotiation->netId != NetHandle_GetNetId(handle)) {
+        NetHandle_Reject(handle);
     }
     if (handle->state != NET_HANDLE_STATE_REJECTED) {
-        func_02040414(negotiation->netId)->state = NET_HANDLE_STATE_NEGOTIATED;
+        NetHandle_Get(negotiation->netId)->state = NET_HANDLE_STATE_NEGOTIATED;
         if (ini->negotiationCallback != NULL) {
             ini->negotiationCallback(work, negotiation->netId);
         }
-        func_020430bc(negotiation->mac);
-        func_020430bc(negotiation->serverMac);
+        NetIw_AddCollectedMac(negotiation->mac);
+        NetIw_AddCollectedMac(negotiation->serverMac);
     }
 }
 
-void func_02040a20(int netId, int size, u8 *data) {
-    func_02040a9c(*data);
+void NetHandle_RecvForget(int netId, int size, u8 *data) {
+    NetHandle_Forget(*data);
 }
 
-static u16 func_02040a2c(u16 bits, int netID, BOOL set) {
+static u16 NetHandle_SetBit(u16 bits, int netID, BOOL set) {
     u16 bit;
 
     // clang-format off
@@ -489,7 +490,7 @@ static u16 func_02040a2c(u16 bits, int netID, BOOL set) {
     return bits;
 }
 
-static BOOL func_02040a6c(u16 bits, int netID) {
+static BOOL NetHandle_TestBit(u16 bits, int netID) {
     u8 bit;
 
     // clang-format off
@@ -502,23 +503,23 @@ static BOOL func_02040a6c(u16 bits, int netID) {
     return FALSE;
 }
 
-void func_02040a9c(int netID) {
+void NetHandle_Forget(int netID) {
     // clang-format off
     GFL_ASSERT(netID!=GFL_NET_NETID_SERVER);
     // clang-format on
-    func_02040224(func_02040414(netID), netID);
-    func_02040298(func_02040414(GFL_NET_NETID_SERVER), netID);
+    NetHandle_Reset(NetHandle_Get(netID), netID);
+    NetHandle_ClearNegotiation(NetHandle_Get(GFL_NET_NETID_SERVER), netID);
 }
 
 // Keeps data from a machine
-void func_02040ad0(int netID, int size, const void *data, void *work, NetHandle *handle) {
-    GFLNetInitData *ini = func_02042e84();
+void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHandle *handle) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
-    if (func_020401dc(handle) != GFL_NET_NETID_SERVER) {
+    if (NetHandle_GetNetId(handle) != GFL_NET_NETID_SERVER) {
         NetHandle *target;
 
         GFL_ASSERT(netID < GFL_NET_HANDLE_MAX);
-        target = func_02040414(netID);
+        target = NetHandle_Get(netID);
         if (target->data != NULL) {
             GFL_HeapFree(target->data);
         }
@@ -532,7 +533,7 @@ void func_02040b38(NetHandle *handle, int a1, int a2, int a3) {
     if (handle != NULL) {
         handle->timingSend = a1 + (a2 << 8);
         handle->unk48 = a3;
-        if (func_020401dc(handle) == GFL_NET_NETID_SERVER) {
+        if (NetHandle_GetNetId(handle) == GFL_NET_NETID_SERVER) {
             handle->timingSendPending = FALSE;
         } else {
             handle->timingSendPending = TRUE;

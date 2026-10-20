@@ -230,7 +230,6 @@ from:0x0219dbfe kind:thumb_call to:0x0204b784 module:main
 from:0x0219dc08 kind:thumb_call_arm to:0x020787d4 module:main
 from:0x0219dc14 kind:load to:0x0204b7c1 module:main
 from:0x0219dc1c kind:load to:0x0204b7f5 module:main
-from:0x0219dc6c kind:load to:0x021e0401 module:overlay(36)
 from:0x0219dcac kind:load to:0x0219cec1 module:overlay(313)
 from:0x0219dcb0 kind:load to:0x0219d105 module:overlay(313)
 from:0x0219dcb4 kind:load to:0x0219d081 module:overlay(313)

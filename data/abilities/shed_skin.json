@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Shed Skin",
-    "description": "The Pokémon may heal its\nown status problems."
-}

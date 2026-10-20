@@ -1,0 +1,26 @@
+{
+    "$schema": "../../facility.schema.json",
+    "class": "TRAINER_CLASS_NURSE",
+    "pokemon": [
+        "lickitung_1",
+        "azumarill_1",
+        "sealeo_1",
+        "wigglytuff_1",
+        "quagsire_1",
+        "noctowl_1",
+        "lanturn_1",
+        "tropius_1",
+        "throh_1",
+        "swalot_1",
+        "alomomola_1",
+        "stunfisk_1",
+        "clefable_1",
+        "hariyama_1",
+        "gastrodon_1",
+        "skuntank_1",
+        "exploud_1",
+        "glalie_1",
+        "musharna_1",
+        "kangaskhan_1"
+    ]
+}

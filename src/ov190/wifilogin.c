@@ -159,7 +159,7 @@ static BOOL WifiLogin_IsInputPressed(WifiLoginWork *work) {
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         return TRUE;
     }
-    if (work->param->unk4 != 0 && func_0203da48()) {
+    if (work->param->unk4 != 0 && GFL_HIDIsTouchPressed()) {
         return TRUE;
     }
     return FALSE;
@@ -173,8 +173,8 @@ static void WifiLogin_SetState(WifiLoginWork *work, WifiLoginStateFunc state) {
 static void WifiLogin_OnNetCommand(int netId, int size, const void *data, void *work, NetHandle *handle) {
     WifiLoginWork *wk = work;
 
-    if (handle == func_02040440()) {
-        if (netId != func_0203ffc4()) {
+    if (handle == NetHandle_GetOwn()) {
+        if (netId != NetSystem_GetNetId()) {
             wk->unk1C = 1;
         }
     }
@@ -198,19 +198,19 @@ static int WifiLogin_IsSameGame(int gameCommandBase, int beaconCommandBase) {
 static int WifiLogin_GetUserData(void *work) {
     WifiLoginWork *wk = work;
 
-    return (int)func_02009f7c(GameData_GetWifiList(wk->gameData));
+    return (int)WifiList_GetMyUserData(GameData_GetWifiList(wk->gameData));
 }
 
 static int WifiLogin_GetFriendData(void *work) {
     WifiLoginWork *wk = work;
 
-    return (int)func_0200a0e4(GameData_GetWifiList(wk->gameData), 0);
+    return (int)WifiList_GetFriendData(GameData_GetWifiList(wk->gameData), 0);
 }
 
 static void WifiLogin_OnFriendCode(int code, int param, void *work) {
     WifiLoginWork *wk = work;
 
-    func_0200a340(GameData_GetWifiList(wk->gameData), code, param);
+    WifiList_MergeFriendRecord(GameData_GetWifiList(wk->gameData), code, param);
 }
 
 static void WifiLogin_StateWaitMessageEnd(WifiLoginWork *work) {
@@ -237,7 +237,7 @@ static void WifiLogin_StateWaitInputThenExit(WifiLoginWork *work) {
 
 // Goes on once the network is up: tells the player the settings were fixed, or goes to the connection
 static void WifiLogin_CheckLoggedIn(WifiLoginWork *work) {
-    if (func_02042220()) {
+    if (NetState_IsWifiConnecting()) {
         if (work->userDataInvalid) {
             WifiLoginMessage_ClearTitle(work->msg);
             WifiLoginMessage_ClearWindow(work->msg);
@@ -260,7 +260,7 @@ static void WifiLogin_CheckLoggedIn(WifiLoginWork *work) {
 // Waits for the user data to be saved
 static void WifiLogin_StateWaitSave(WifiLoginWork *work) {
     if (DWCRap_IsUserDataDirty()) {
-        switch (func_02017850(work->gameData)) {
+        switch (GameData_UpdateSave(work->gameData)) {
         case 0:
         case 1:
             return;
@@ -272,8 +272,8 @@ static void WifiLogin_StateWaitSave(WifiLoginWork *work) {
 
 static void WifiLogin_StateStartSave(WifiLoginWork *work) {
     if (WifiLoginMessage_IsDone(work->msg)) {
-        func_02008be0(GetGameDataPlayerInfo(work->gameData), WifiList_GetMyGSID(work->wifiList));
-        func_0201782c(work->gameData);
+        PlayerInfo_InitProfileId(GetGameDataPlayerInfo(work->gameData), WifiList_GetMyGSID(work->wifiList));
+        GameData_StartSave(work->gameData);
         work->saved = TRUE;
         WifiLogin_SetState(work, WifiLogin_StateWaitSave);
     }
@@ -307,12 +307,12 @@ static void WifiLogin_StateStartNet(WifiLoginWork *work) {
     }
     sNetInit.gameCommandBase = work->param->unkC;
     sGameType = work->param->unkC;
-    func_020425ec(&sNetInit, NULL, work);
+    GFL_NetInit(&sNetInit, NULL, work);
     func_020423e0();
     if (work->param->unk8 == 0) {
-        func_02042ba8(FALSE, work->heapId);
+        GFL_NetSetIconScreen(FALSE, work->heapId);
     } else {
-        func_02042ba8(TRUE, work->heapId);
+        GFL_NetSetIconScreen(TRUE, work->heapId);
     }
     WifiLoginMessage_PrintWaiting(work->msg, WifiError_Text_ConnectingNintendoWiFi);
     WifiLoginDisp_SetUnk9C4(work->disp);
@@ -374,7 +374,7 @@ static void WifiLogin_StateOpenConfirmError(WifiLoginWork *work) {
 // Stops at a network error and tells the player, returning whether there was one
 static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
     if (GFL_NetErrCheck()) {
-        switch (func_02042540()->unk4) {
+        switch (NetState_GetErrorInfo()->unk4) {
         case 1:
         case 2:
         case 3:
@@ -384,14 +384,14 @@ static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
             WifiLoginMessage_ClearNotice(work->msg);
             WifiLoginMessage_ClearTitle(work->msg);
             WifiLoginMessage_ClearWindow(work->msg);
-            func_02011de0();
+            GFL_NetErrShowScreen();
             WifiLoginDisp_ResetBlend(work->disp);
-            if (func_02042788()) {
-                func_02012154();
+            if (GFL_NetIsInitialized()) {
+                GFL_NetErrShutdown();
             }
-            func_020424e4();
-            func_02012144();
-            func_02042478();
+            NetState_ClearWifiError();
+            GFL_NetErrClear();
+            NetState_ClearError();
             WifiLoginMessage_PrintNotice(work->msg, WifiError_Text_DisconnectedFromNintendoWi);
             WifiLogin_SetState(work, WifiLogin_StateOpenConfirmError);
             return TRUE;
@@ -534,7 +534,7 @@ static void WifiLogin_StateCheckStart(WifiLoginWork *work) {
         WifiLogin_SetState(work, WifiLogin_StateOpenYesNo);
         return;
     }
-    if (!DWC_CheckHasProfile(func_02009f7c(work->wifiList))) {
+    if (!DWC_CheckHasProfile(WifiList_GetMyUserData(work->wifiList))) {
         work->userDataInvalid = TRUE;
         WifiLoginMessage_ClearTitle(work->msg);
         if (!isRunningOnDSi()) {
@@ -545,7 +545,7 @@ static void WifiLogin_StateCheckStart(WifiLoginWork *work) {
         WifiLogin_SetState(work, WifiLogin_StateOpenConfirmStart);
         return;
     }
-    if (!DWC_CheckValidConsole(func_02009f7c(work->wifiList))) {
+    if (!DWC_CheckValidConsole(WifiList_GetMyUserData(work->wifiList))) {
         work->userDataInvalid = TRUE;
         WifiLoginMessage_ClearTitle(work->msg);
         if (!isRunningOnDSi()) {
@@ -590,12 +590,12 @@ static void WifiLogin_StateRunCallback(WifiLoginWork *work) {
             WifiLoginMessage_ClearNotice(work->msg);
             WifiLoginMessage_ClearTitle(work->msg);
             WifiLoginMessage_ClearWindow(work->msg);
-            if (func_02042788()) {
-                func_02012154();
+            if (GFL_NetIsInitialized()) {
+                GFL_NetErrShutdown();
             }
-            func_020424e4();
-            func_02012144();
-            func_02042478();
+            NetState_ClearWifiError();
+            GFL_NetErrClear();
+            NetState_ClearError();
             WifiLoginMessage_PrintNotice(work->msg, WifiError_Text_DisconnectedFromNintendoWi);
             WifiLogin_SetState(work, WifiLogin_StateOpenConfirmError);
             break;
@@ -657,11 +657,11 @@ static BOOL WifiLoginProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     wk->wifiList = GameData_GetWifiList(loginParam->gameData);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     wk->param = loginParam;
-    if (func_02042788()) {
-        func_020424e4();
-        func_02042478();
-        func_02012154();
-        func_02012144();
+    if (GFL_NetIsInitialized()) {
+        NetState_ClearWifiError();
+        NetState_ClearError();
+        GFL_NetErrShutdown();
+        GFL_NetErrClear();
     }
     WifiLogin_SetState(wk, WifiLogin_StateCheckStart);
     if (wk->param->unk4 == 0) {

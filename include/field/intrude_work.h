@@ -9,15 +9,15 @@
 #include "struct_decls.h"
 
 // Whether the season may change, which it may not while it is kept in sync with another player
-BOOL func_ov012_021535dc(GameSystem *gsys);
-void *func_ov012_02153608(GameCommSys *commSys);
+BOOL Intrude_CanBootGameComm(GameSystem *gsys);
+void *Intrude_GetCommWork(GameCommSys *commSys);
 // The game the other player plays, this one's
 u32 getGameOrigin(GameCommSys *commSys);
 u8 getSeasonFromPlayerData(GameCommSys *commSys);
 u32 func_ov012_0215364c(GameCommSys *commSys, GameData *gameData);
 u32 func_ov012_02153650(GameCommSys *commSys);
 void func_ov012_02153654(GameCommSys *commSys);
-u32 func_ov012_02153658(GameCommSys *commSys);
+u32 Intrude_GetAlertState(GameCommSys *commSys);
 u32 func_ov012_0215365c(void);
 u32 func_ov012_02153660(void);
 u32 func_ov012_02153664(GameCommSys *commSys);

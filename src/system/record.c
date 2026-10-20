@@ -70,7 +70,7 @@ u32 GetRecordCounterMax(u32 id) {
     return nines[kind];
 }
 
-u32 func_020094cc(GameRecords *records, u32 id, u32 value) {
+u32 RecordSet(GameRecords *records, u32 id, u32 value) {
     u32 max = GetRecordCounterMax(id);
     u32 result;
 
@@ -84,7 +84,7 @@ u32 func_020094cc(GameRecords *records, u32 id, u32 value) {
     return result;
 }
 
-u32 func_02009508(GameRecords *records, u32 id, u32 value) {
+u32 RecordSetIfHigher(GameRecords *records, u32 id, u32 value) {
     u32 max = GetRecordCounterMax(id);
     u32 current;
 
@@ -141,27 +141,27 @@ void func_020095e0(GameRecords *records) {
     for (i = 0; i < 5; i++) {
         u32 source = sRecordMoves[i].source;
 
-        func_02009508(records, sRecordMoves[i].destination, RecordGet(records, source));
-        func_020094cc(records, source, 0);
+        RecordSetIfHigher(records, sRecordMoves[i].destination, RecordGet(records, source));
+        RecordSet(records, source, 0);
     }
 }
 
-void func_02009618(GameRecords *records, u8 rank) {
+void RecordSetTrialHouseRank(GameRecords *records, u8 rank) {
     if (rank < 7) {
-        func_02009508(records, 0x7b, rank);
+        RecordSetIfHigher(records, 0x7b, rank);
     }
 }
 
-u8 func_02009628(GameRecords *records) {
+u8 RecordGetTrialHouseRank(GameRecords *records) {
     return RecordGet(records, 0x7b);
 }
 
-void func_02009638(GameRecords *records, u32 points) {
+void RecordSetTrialHousePoints(GameRecords *records, u32 points) {
     if (points < 9999) {
-        func_02009508(records, 0x7c, points);
+        RecordSetIfHigher(records, 0x7c, points);
     }
 }
 
-u32 func_02009650(GameRecords *records) {
+u32 RecordGetTrialHousePoints(GameRecords *records) {
     return RecordGet(records, 0x7c);
 }

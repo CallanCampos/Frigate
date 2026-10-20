@@ -96,19 +96,19 @@ typedef struct {
     u16 maxLevel;
 } InfinityDungeonLevelRange;
 
-void func_ov127_021efd60(GameSystem *gsys, InfinityDungeon *gimmick);
-GameEvent *func_ov127_021efeec(GameSystem *gsys, Field *field, u8 a2);
-u32 func_ov127_021f02e0(InfinityDungeon *gimmick);
+void InfinityDungeon_CreateCurrentWalls(GameSystem *gsys, InfinityDungeon *gimmick);
+GameEvent *InfinityDungeon_CreateBattleEvent(GameSystem *gsys, Field *field, u8 a2);
+u32 InfinityDungeon_GetGoalFloor(InfinityDungeon *gimmick);
 u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *gimmick, u16 objCode, u8 a3);
-u32 func_ov127_021f03dc(KeyDataSave *keyData, InfinityDungeon *gimmick, u16 objCode, u16 a3);
-u32 func_ov127_021f08b4(InfinityDungeon *gimmick, u16 a1);
-u32 func_ov127_021f08e8(InfinityDungeon *gimmick);
-BOOL func_ov127_021f093c(InfinityDungeon *gimmick, u32 floor, u32 room);
-u16 func_ov127_021efdac(u16 direction);
-void func_ov127_021efde0(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room);
-void func_ov127_021f0040(KeyDataSave *keyData, InfinityDungeon *gimmick);
-BOOL func_ov127_021f08d0(InfinityDungeonRoomChange *roomChange);
-BOOL func_ov127_021f096c(InfinityDungeon *gimmick, KeyDataSave *keyData);
+u32 InfinityDungeon_GetNpcScriptByResult(KeyDataSave *keyData, InfinityDungeon *gimmick, u16 objCode, u16 a3);
+u32 InfinityDungeon_FindSpecialTrainer(InfinityDungeon *gimmick, u16 a1);
+u32 InfinityDungeon_CountTrainers(InfinityDungeon *gimmick);
+BOOL InfinityDungeon_IsBelowGoal(InfinityDungeon *gimmick, u32 floor, u32 room);
+u16 InfinityDungeon_GetEntryFacing(u16 direction);
+void InfinityDungeonRoomChange_CreateNpcs(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room);
+void InfinityDungeon_Setup(KeyDataSave *keyData, InfinityDungeon *gimmick);
+BOOL InfinityDungeonRoomChange_UsesFade(InfinityDungeonRoomChange *roomChange);
+BOOL InfinityDungeon_IsTargetDefeated(InfinityDungeon *gimmick, KeyDataSave *keyData);
 
 // One of the dungeon's own 640 trainers, which stands from minRank to maxRank for a version, 0 for both
 typedef struct {

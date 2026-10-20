@@ -43,11 +43,11 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     setupBySrcData(mon, src, TRUE, TRUE);
     mon->moveCount = GetNumMoves(mon, src, TRUE);
     mon->unk143 = 0;
-    func_ov167_021babc0(&mon->statStages);
+    InitStatStages(&mon->statStages);
     ClearMoveStatusWork(mon, 1);
     status = GetStatusCond(src);
     if (status != 0) {
-        mon->core.conditions[status] = func_ov167_021bd52c(status);
+        mon->core.conditions[status] = BtlCalc_MakeStatusCondition(status);
         mon->core.conditionCounters[status] = 0;
     }
     mon->unk148 = 10000;
@@ -62,8 +62,8 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     mon->unk142 = 0;
     MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
-    func_ov167_021bbff4(mon);
-    func_ov167_021bc5c4(mon);
+    BattleMon_ClearDamageRecords(mon);
+    BattleMon_ClearConfrontedMons(mon);
     return mon;
 }
 
@@ -98,7 +98,7 @@ u32 GetNumMoves(BattleMon *mon, PartyPkm *src, BOOL reset) {
         }
     }
     for (i = 0; i < 4; i++) {
-        if (func_ov167_021baa44(&mon->moves[i].truth, src, i)) {
+        if (MoveCore_LoadFromSrc(&mon->moves[i].truth, src, i)) {
             count++;
         }
     }
@@ -125,13 +125,13 @@ void SetMovesAndPP(BattleMon *mon) {
     }
 }
 
-void func_ov167_021ba8b4(BattleMon *mon) {
+void BattleMon_ReloadMoves(BattleMon *mon) {
     PartyPkm *src = mon->core.src;
     u32 i;
 
     mon->moveCount = 0;
     for (i = 0; i < 4; i++) {
-        if (func_ov167_021baa44(&mon->moves[i].truth, src, i)) {
+        if (MoveCore_LoadFromSrc(&mon->moves[i].truth, src, i)) {
             mon->moveCount++;
         }
         if (mon->moves[i].linked) {
@@ -155,7 +155,7 @@ void MoveWork_ClearSurface(BattleMon *mon) {
     }
 }
 
-void func_ov167_021ba9cc(BattleMoveWork *move) {
+void MoveWork_ClearUsedFlags(BattleMoveWork *move) {
     move->surface.flagsLow = 0;
     move->truth.flagsLow = 0;
 }
@@ -192,7 +192,7 @@ void MoveCore_UpdateNumber(BattleMoveCore *core, u16 move, u8 maxPP) {
     core->pp = core->maxPP;
 }
 
-BOOL func_ov167_021baa44(BattleMoveCore *core, PartyPkm *src, u8 index) {
+BOOL MoveCore_LoadFromSrc(BattleMoveCore *core, PartyPkm *src, u8 index) {
     BOOL result = TRUE;
     u16 move = PokeParty_GetParam(src, PKM_PARAM_MOVE1 + index, NULL);
 
@@ -239,7 +239,7 @@ void ClearUsedMoveFlag(BattleMon *mon) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        func_ov167_021ba9cc(&mon->moves[i]);
+        MoveWork_ClearUsedFlags(&mon->moves[i]);
     }
     mon->prevMoveUsed = 0;
     mon->prevMoveId = 0;
@@ -255,11 +255,11 @@ void ClearCounter(BattleMon *mon) {
     }
 }
 
-void func_ov167_021babb8(BattleMon *mon) {
+void BattleMon_Delete(BattleMon *mon) {
     GFL_HeapFree(mon);
 }
 
-void func_ov167_021babc0(BattleMonStatStages *stages) {
+void InitStatStages(BattleMonStatStages *stages) {
     ResetStatStages(stages);
 }
 
@@ -273,7 +273,7 @@ void ResetStatStages(BattleMonStatStages *stages) {
     stages->evasion = 6;
 }
 
-BOOL func_ov167_021babdc(BattleMonStatStages *stages) {
+BOOL RecoverStatStages(BattleMonStatStages *stages) {
     BOOL result = FALSE;
 
     if (stages->attack < 6) {
@@ -319,7 +319,7 @@ u8 GetBattleMonMoveCount(BattleMon *mon) {
     return mon->moveCount;
 }
 
-u8 func_ov167_021bac50(BattleMon *mon) {
+u8 BattleMon_GetOrgMoveCount(BattleMon *mon) {
     u32 count;
     u32 i;
 
@@ -344,7 +344,7 @@ u8 CountUsedMoves(const BattleMon *mon) {
     return count;
 }
 
-u8 func_ov167_021bacb4(BattleMon *mon) {
+u8 BattleMon_GetUsedMoveKindCount(BattleMon *mon) {
     return mon->unk143;
 }
 
@@ -352,7 +352,7 @@ u16 MoveGetID(BattleMon *mon, u8 index) {
     return mon->moves[index].surface.id;
 }
 
-u16 func_ov167_021bacd0(BattleMon *mon, u8 index) {
+u16 BattleMon_GetOrgMoveID(BattleMon *mon, u8 index) {
     return mon->moves[index].truth.id;
 }
 
@@ -360,7 +360,7 @@ u8 CheckIfMoveWasUsed(BattleMon *mon, u8 index) {
     return mon->moves[index].surface.flagsLow;
 }
 
-void func_ov167_021bacf4(BattleMon *mon, BattleMon *dest) {
+void BattleMon_CopyMoves(BattleMon *mon, BattleMon *dest) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
@@ -369,7 +369,7 @@ void func_ov167_021bacf4(BattleMon *mon, BattleMon *dest) {
     dest->moveCount = mon->moveCount;
 }
 
-u16 func_ov167_021bad28(BattleMon *mon, u8 index, u8 *pp, u8 *maxPP) {
+u16 BattleMon_GetMoveInfo(BattleMon *mon, u8 index, u8 *pp, u8 *maxPP) {
     *pp = mon->moves[index].surface.pp;
     *maxPP = mon->moves[index].surface.maxPP;
     return mon->moves[index].surface.id;
@@ -379,7 +379,7 @@ u8 GetMovePPUsed(BattleMon *mon, u8 index) {
     return mon->moves[index].surface.maxPP - mon->moves[index].surface.pp;
 }
 
-u8 func_ov167_021bad68(BattleMon *mon, u8 index) {
+u8 BattleMon_GetOrgMovePPUsed(BattleMon *mon, u8 index) {
     return mon->moves[index].truth.maxPP - mon->moves[index].truth.pp;
 }
 
@@ -390,7 +390,7 @@ u16 GetMovePP(BattleMon *mon, u8 index) {
     return 0;
 }
 
-u8 func_ov167_021bada0(const BattleMon *mon, u16 move) {
+u8 BattleMon_GetPPOfMove(const BattleMon *mon, u16 move) {
     u32 i;
 
     for (i = 0; i < mon->moveCount; i++) {
@@ -415,7 +415,7 @@ BOOL Move_IsPPFull(BattleMon *mon, u8 index, BOOL truth) {
     return FALSE;
 }
 
-void func_ov167_021bae08(BattleMon *mon, u8 index, u8 amount) {
+void Move_DecrementPP(BattleMon *mon, u8 index, u8 amount) {
     if (mon->moves[index].surface.pp >= amount) {
         mon->moves[index].surface.pp -= amount;
     } else {
@@ -427,7 +427,7 @@ void func_ov167_021bae08(BattleMon *mon, u8 index, u8 amount) {
     }
 }
 
-void func_ov167_021bae40(BattleMon *mon, u8 index, u8 amount) {
+void Move_DecrementPP_Org(BattleMon *mon, u8 index, u8 amount) {
     s32 pp;
 
     if (mon->moves[index].linked == 0) {
@@ -468,7 +468,7 @@ u16 Move_IncrementPP_Org(BattleMon *mon, u8 index, u8 amount) {
     return move->truth.id;
 }
 
-void func_ov167_021baecc(BattleMon *mon, u8 index) {
+void Move_SetUsed(BattleMon *mon, u8 index) {
     BattleMoveWork *move = &mon->moves[index];
 
     if (move->surface.flagsHigh == 0) {
@@ -497,7 +497,7 @@ BOOL MoveIsUsable(const BattleMon *mon, u16 move) {
     return FALSE;
 }
 
-u8 func_ov167_021baf78(BattleMon *mon, u16 move) {
+u8 BattleMon_FindMoveSlot(BattleMon *mon, u16 move) {
     u32 i;
 
     if (move != 0) {
@@ -567,12 +567,12 @@ void SetIllusionDisguise(BattleMon *mon, PartyPkm *disguise) {
     mon->core.illusion = 1;
 }
 
-void func_ov167_021bb054(BattleMon *mon) {
+void BattleMon_ResetIllusion(BattleMon *mon) {
     mon->core.illusionDisguise = NULL;
     mon->core.illusion = 0;
 }
 
-PartyPkm *func_ov167_021bb064(const BattleMon *mon) {
+PartyPkm *BattleMon_GetViewSrcData(const BattleMon *mon) {
     PartyPkm *disguise;
 
     disguise = mon->core.illusionDisguise;
@@ -582,7 +582,7 @@ PartyPkm *func_ov167_021bb064(const BattleMon *mon) {
     return mon->core.src;
 }
 
-u32 func_ov167_021bb07c(const BattleMon *mon, u32 stat) {
+u32 BattleMon_ApplyWonderRoom(const BattleMon *mon, u32 stat) {
     switch (stat) {
     case 9:
         if (IsFieldEffectActive(6)) {
@@ -599,7 +599,7 @@ u32 func_ov167_021bb07c(const BattleMon *mon, u32 stat) {
 }
 
 s32 RawBattleMonStat(const BattleMon *mon, u32 stat) {
-    stat = func_ov167_021bb07c(mon, stat);
+    stat = BattleMon_ApplyWonderRoom(mon, stat);
     switch (stat) {
     case 8:
         return mon->attack;
@@ -620,7 +620,7 @@ s32 RawBattleMonStat(const BattleMon *mon, u32 stat) {
     }
 }
 
-void func_ov167_021bb10c(BattleMon *mon, BattleMonLevelUp *stats) {
+void BattleMon_GetSrcStats(BattleMon *mon, BattleMonLevelUp *stats) {
     u8 wasEncrypted;
 
     wasEncrypted = PokeParty_DecryptPkm(mon->core.src);
@@ -634,7 +634,7 @@ void func_ov167_021bb10c(BattleMon *mon, BattleMonLevelUp *stats) {
 }
 
 void SetBaseStatus(BattleMon *mon, u32 stat, u16 value) {
-    switch (func_ov167_021bb07c(mon, stat)) {
+    switch (BattleMon_ApplyWonderRoom(mon, stat)) {
     case 8:
         mon->attack = value;
         break;
@@ -654,7 +654,7 @@ void SetBaseStatus(BattleMon *mon, u32 stat, u16 value) {
 }
 
 u32 GetBattleMonStat(const BattleMon *mon, u32 stat) {
-    stat = func_ov167_021bb07c(mon, stat);
+    stat = BattleMon_ApplyWonderRoom(mon, stat);
     switch (stat) {
     case 8:
         return GetBoostFromStatStage(RawBattleMonStat(mon, stat), mon->statStages.attack);
@@ -709,7 +709,7 @@ u32 CritAtkDefLevel(BattleMon *mon, u32 stat) {
     BOOL useRaw;
 
     useRaw = FALSE;
-    switch (func_ov167_021bb07c(mon, stat)) {
+    switch (BattleMon_ApplyWonderRoom(mon, stat)) {
     case 8:
         if (mon->statStages.attack < 6) {
             useRaw = TRUE;
@@ -771,7 +771,7 @@ BOOL CanPokemonBattle(BattleMon *mon) {
     return result;
 }
 
-u16 func_ov167_021bb3a4(BattleMon *mon) {
+u16 BattleMon_GetTurnsOnField(BattleMon *mon) {
     return mon->unk146;
 }
 
@@ -805,7 +805,7 @@ u32 GetAdditionalConditionFlag(BattleMon *mon, u32 flag) {
     return result;
 }
 
-u32 func_ov167_021bb408(BattleMon *mon) {
+u32 BattleMon_GetSemiInvulnFlag(BattleMon *mon) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
@@ -817,7 +817,7 @@ u32 func_ov167_021bb408(BattleMon *mon) {
 }
 
 BOOL IsSemiInvulnMove(BattleMon *mon) {
-    if (func_ov167_021bb408(mon) != 0x10) {
+    if (BattleMon_GetSemiInvulnFlag(mon) != 0x10) {
         return TRUE;
     }
     return FALSE;
@@ -836,7 +836,7 @@ fx32 GetHPRatio(BattleMon *mon) {
     return (fx32)fixed;
 }
 
-s8 *func_ov167_021bb4b4(BattleMon *mon, u32 stat, s8 *min, s8 *max) {
+s8 *BattleMon_GetStatStagePtr(BattleMon *mon, u32 stat, s8 *min, s8 *max) {
     *min = 0;
     *max = 12;
     switch (stat) {
@@ -864,19 +864,19 @@ BOOL IsStatChangeValid(BattleMon *mon, u32 stat, s32 change) {
     s8 max;
     s8 *stage;
 
-    stage = func_ov167_021bb4b4(mon, stat, &min, &max);
+    stage = BattleMon_GetStatStagePtr(mon, stat, &min, &max);
     if (change > 0) {
         return *stage < max;
     }
     return *stage > min;
 }
 
-s32 func_ov167_021bb550(BattleMon *mon, u32 stat) {
+s32 BattleMon_GetStatRaiseRoom(BattleMon *mon, u32 stat) {
     s8 min;
     s8 max;
     s8 *stage;
 
-    stage = func_ov167_021bb4b4(mon, stat, &min, &max);
+    stage = BattleMon_GetStatStagePtr(mon, stat, &min, &max);
     return max - *stage;
 }
 
@@ -905,7 +905,7 @@ BOOL AreStatsLowered(BattleMon *mon) {
     return FALSE;
 }
 
-u32 func_ov167_021bb5c0(BattleMon *mon, u32 stat, u8 amount) {
+u32 BattleMon_RaiseStatStage(BattleMon *mon, u32 stat, u8 amount) {
     s8 *stage;
 
     switch (stat) {
@@ -943,7 +943,7 @@ u32 func_ov167_021bb5c0(BattleMon *mon, u32 stat, u8 amount) {
     return 0;
 }
 
-u32 func_ov167_021bb638(BattleMon *mon, u32 stat, u8 amount) {
+u32 BattleMon_LowerStatStage(BattleMon *mon, u32 stat, u8 amount) {
     s8 *stage;
 
     switch (stat) {
@@ -981,7 +981,7 @@ u32 func_ov167_021bb638(BattleMon *mon, u32 stat, u8 amount) {
     return 0;
 }
 
-void func_ov167_021bb6a8(BattleMon *mon, u32 stat, u8 value) {
+void BattleMon_SetStatStage(BattleMon *mon, u32 stat, u8 value) {
     s8 *stage;
 
     switch (stat) {
@@ -1015,14 +1015,14 @@ void func_ov167_021bb6a8(BattleMon *mon, u32 stat, u8 value) {
 }
 
 BOOL StatStageRecover(BattleMon *mon) {
-    return func_ov167_021babdc(&mon->statStages);
+    return RecoverStatStages(&mon->statStages);
 }
 
 void StatStageReset(BattleMon *mon) {
     ResetStatStages(&mon->statStages);
 }
 
-u8 func_ov167_021bb714(BattleMon *mon) {
+u8 BattleMon_GetCritStage(BattleMon *mon) {
     u8 stage = mon->unk142;
 
     if (GetAdditionalConditionFlag(mon, 9)) {
@@ -1034,7 +1034,7 @@ u8 func_ov167_021bb714(BattleMon *mon) {
     return stage;
 }
 
-BOOL func_ov167_021bb738(BattleMon *mon, s32 amount) {
+BOOL BattleMon_AddCritStage(BattleMon *mon, s32 amount) {
     s32 decrease;
 
     if (amount > 0) {
@@ -1060,7 +1060,7 @@ BOOL func_ov167_021bb738(BattleMon *mon, s32 amount) {
     return FALSE;
 }
 
-void func_ov167_021bb790(BattleMon *mon, u16 amount) {
+void HPSub(BattleMon *mon, u16 amount) {
     if (mon->core.hp > amount) {
         mon->core.hp -= amount;
     } else {
@@ -1079,19 +1079,19 @@ void HPZero(BattleMon *mon) {
     mon->core.hp = 0;
 }
 
-void func_ov167_021bb7c0(BattleMon *mon, u32 flag) {
+void BattleMon_SetTurnFlag(BattleMon *mon, u32 flag) {
     u8 *flags = mon->turnFlags;
 
     flags[(u8)(flag >> 3)] |= (u8)(1 << (flag & 7));
 }
 
-void func_ov167_021bb7e4(BattleMon *mon, u32 flag) {
+void BattleMon_SetConditionFlag(BattleMon *mon, u32 flag) {
     u8 *flags = mon->conditionFlags;
 
     flags[(u8)(flag >> 3)] |= (u8)(1 << (flag & 7));
 }
 
-void func_ov167_021bb808(BattleMon *mon, u32 flag) {
+void BattleMon_ClearConditionFlag(BattleMon *mon, u32 flag) {
     u8 *flags = mon->conditionFlags;
 
     flags[(u8)(flag >> 3)] &= (u8) ~(u8)(1 << (flag & 7));
@@ -1110,7 +1110,7 @@ static inline BattleCondition *GetConditionPtr(BattleMon *mon, BattleConditionID
     return &mon->core.conditions[id];
 }
 
-BOOL func_ov167_021bb864(BattleMon *mon, u32 index, BattleCondition *prev, BOOL *cured) {
+BOOL BattleMon_TickCondition(BattleMon *mon, u32 index, BattleCondition *prev, BOOL *cured) {
     u8 turns;
     BattleCondition cond;
 
@@ -1118,7 +1118,7 @@ BOOL func_ov167_021bb864(BattleMon *mon, u32 index, BattleCondition *prev, BOOL 
         return FALSE;
     }
     if (GetConditionPtr(mon, index)->common.type != 0) {
-        turns = func_ov167_021ce33c(*GetConditionPtr(mon, index));
+        turns = Condition_GetTurns(*GetConditionPtr(mon, index));
         cond = *GetConditionPtr(mon, index);
         if (prev != NULL) {
             *prev = cond;
@@ -1165,13 +1165,13 @@ static inline BOOL CheckEffectiveAbility(BattleMon *mon, u16 ability) {
     return FALSE;
 }
 
-BOOL func_ov167_021bb930(BattleMon *mon) {
+BOOL BattleMon_TickSleep(BattleMon *mon) {
     BattleCondition *condition = &mon->core.conditions[2];
     u8 turns;
     u8 amount;
 
     if (condition->common.type != 0) {
-        turns = func_ov167_021ce33c(*condition);
+        turns = Condition_GetTurns(*condition);
         if (turns != 0) {
             amount = CheckEffectiveAbility(mon, ABILITY_EARLY_BIRD) ? 2 : 1;
             mon->core.conditionCounters[2] += amount;
@@ -1184,12 +1184,12 @@ BOOL func_ov167_021bb930(BattleMon *mon) {
     }
     return FALSE;
 }
-BOOL func_ov167_021bb9a8(BattleMon *mon) {
+BOOL BattleMon_TickConfusion(BattleMon *mon) {
     BattleCondition *condition = &mon->core.conditions[6];
     u8 turns;
 
     if (condition->common.type != 0) {
-        turns = func_ov167_021ce33c(*condition);
+        turns = Condition_GetTurns(*condition);
         if (turns != 0) {
             mon->core.conditionCounters[6]++;
             if (mon->core.conditionCounters[6] >= turns) {
@@ -1228,12 +1228,12 @@ void CureMoveCondition(BattleMon *mon, u32 condition) {
     }
 }
 
-void func_ov167_021bba64(BattleMon *mon, u32 monId) {
+void BattleMon_CureConditionsFromMon(BattleMon *mon, u32 monId) {
     u32 i;
 
     if (monId != 0x1f) {
         for (i = 0; i < 0x24; i++) {
-            if (!func_ov167_021ce168(mon->core.conditions[i])) {
+            if (!Condition_IsNull(mon->core.conditions[i])) {
                 if (Condition_GetMonID(mon->core.conditions[i]) == monId) {
                     mon->core.conditions[i] = ZeroConditionTurns();
                     CureDependentCondition(mon, i);
@@ -1275,11 +1275,11 @@ BattleConditionCont GetConditionContinuationParam(BattleMon *mon, u32 index) {
     return mon->core.conditions[index];
 }
 
-u8 func_ov167_021bbb1c(BattleMon *mon, u32 index) {
+u8 BattleMon_GetConditionTurnCount(BattleMon *mon, u32 index) {
     return mon->core.conditionCounters[index];
 }
 
-u32 func_ov167_021bbb24(BattleMon *mon, u32 index) {
+u32 BattleMon_GetResidualDamage(BattleMon *mon, u32 index) {
     if (CheckCondition(mon, index)) {
         switch (index) {
         case 5:
@@ -1317,22 +1317,22 @@ void ClearMoveStatusWork(BattleMon *mon, u32 flag) {
     MI_CpuFill8(mon->core.conditionCounters, 0, 0x24);
 }
 
-void func_ov167_021bbbec(BattleMon *mon, u16 turn) {
+void BattleMon_SetAppearTurn(BattleMon *mon, u16 turn) {
     mon->unk148 = turn;
     mon->unk146 = 0;
     mon->core.unk1b_7 = 1;
-    func_ov167_021bbff4(mon);
+    BattleMon_ClearDamageRecords(mon);
 }
 
-void func_ov167_021bbc08(BattleMon *mon) {
+void BattleMon_EndTurn(BattleMon *mon) {
     MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     if (mon->unk146 < 9999) {
         mon->unk146++;
     }
-    func_ov167_021bc024(mon);
+    BattleMon_AdvanceDamageRecordTurn(mon);
 }
 
-void func_ov167_021bbc40(BattleMon *mon, u32 flag) {
+void BattleMon_ClearTurnFlag(BattleMon *mon, u32 flag) {
     u8 *flags = mon->turnFlags;
 
     flags[(u8)(flag >> 3)] &= (u8) ~(u8)(1 << (flag & 7));
@@ -1349,7 +1349,7 @@ void Clear_ForFainted(BattleMon *mon) {
     IllusionBreak(mon);
     ResetSpActPriority(mon);
     ClearMoveStatusWork(mon, 1);
-    func_ov167_021babc0(&mon->statStages);
+    InitStatStages(&mon->statStages);
     mon->form = mon->core.baseForm;
     mon->ability = mon->core.baseAbility;
     PokeParty_SetParam(mon->core.src, PKM_PARAM_FORM, mon->form);
@@ -1367,7 +1367,7 @@ void Clear_ForSwitch(BattleMon *mon) {
     if (!GetAdditionalConditionFlag(mon, 0xe)) {
         ResetSpActPriority(mon);
         ClearMoveStatusWork(mon, 0);
-        func_ov167_021babc0(&mon->statStages);
+        InitStatStages(&mon->statStages);
         MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
     }
     mon->form = mon->core.baseForm;
@@ -1376,14 +1376,14 @@ void Clear_ForSwitch(BattleMon *mon) {
     PokeParty_RecalcStats(mon->core.src);
 }
 
-void func_ov167_021bbd80(BattleMon *mon) {
+void BattleMon_ClearForSwitchIn(BattleMon *mon) {
     setupBySrcData(mon, mon->core.src, FALSE, TRUE);
     MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
     MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     ResetSpActPriority(mon);
     ClearUsedMoveFlag(mon);
     ClearMoveStatusWork(mon, 0);
-    func_ov167_021babc0(&mon->statStages);
+    InitStatStages(&mon->statStages);
 }
 
 void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
@@ -1400,18 +1400,18 @@ void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
         }
     }
     if (GetAdditionalConditionFlag(source, 10)) {
-        func_ov167_021bb7e4(target, 10);
+        BattleMon_SetConditionFlag(target, 10);
         attack = RawBattleMonStat(target, 8);
         defense = RawBattleMonStat(target, 9);
         SetBaseStatus(target, 8, defense);
         SetBaseStatus(target, 9, attack);
     }
     if (GetAdditionalConditionFlag(source, 9)) {
-        func_ov167_021bb7e4(target, 9);
+        BattleMon_SetConditionFlag(target, 9);
     }
     ResetSpActPriority(source);
     ClearMoveStatusWork(source, 0);
-    func_ov167_021babc0(&source->statStages);
+    InitStatStages(&source->statStages);
     MI_CpuFill8(source->conditionFlags, 0, sizeof(source->conditionFlags));
 }
 
@@ -1451,7 +1451,7 @@ u16 GetConsumedItem(BattleMon *mon) {
     return mon->core.consumedItem;
 }
 
-void func_ov167_021bbf44(BattleMon *mon, u8 targetPos, BOOL success, u8 unk144, u16 moveId, u16 moveUsed) {
+void BattleMon_SetPrevMove(BattleMon *mon, u8 targetPos, BOOL success, u8 unk144, u16 moveId, u16 moveUsed) {
     u16 prevMoveId = mon->prevMoveId;
 
     mon->prevMoveUsed = moveUsed;
@@ -1477,7 +1477,7 @@ u16 GetPreviousMoveID(BattleMon *mon) {
     return mon->prevMoveId;
 }
 
-u8 func_ov167_021bbfb0(BattleMon *mon) {
+u8 BattleMon_GetPrevMoveType(BattleMon *mon) {
     return mon->unk144;
 }
 
@@ -1489,7 +1489,7 @@ u8 GetPrevTargetPos(BattleMon *mon) {
     return mon->prevTargetPos;
 }
 
-BOOL func_ov167_021bbfd0(BattleMon *mon) {
+BOOL BattleMon_HasAppeared(BattleMon *mon) {
     return mon->core.unk1b_7;
 }
 
@@ -1504,14 +1504,14 @@ u16 GetBattleMonWeight(BattleMon *mon) {
     return mon->weight;
 }
 
-void func_ov167_021bbff4(BattleMon *mon) {
+void BattleMon_ClearDamageRecords(BattleMon *mon) {
     MI_CpuFill8(mon->damageRecords, 0, sizeof(mon->damageRecords));
     MI_CpuFill8(mon->damageRecordCounts, 0, sizeof(mon->damageRecordCounts));
     mon->damageRecordTurn = 0;
     mon->unk1f0 = 0;
 }
 
-void func_ov167_021bc024(BattleMon *mon) {
+void BattleMon_AdvanceDamageRecordTurn(BattleMon *mon) {
     mon->damageRecordTurn++;
     if (mon->damageRecordTurn >= 3) {
         mon->damageRecordTurn = 0;
@@ -1519,7 +1519,7 @@ void func_ov167_021bc024(BattleMon *mon) {
     mon->damageRecordCounts[mon->damageRecordTurn] = 0;
 }
 
-void func_ov167_021bc048(BattleMon *mon, const BattleMonDamageRecord *record) {
+void BattleMon_AddDamageRecord(BattleMon *mon, const BattleMonDamageRecord *record) {
     u8 turn;
     u8 count;
     u32 i;
@@ -1538,7 +1538,7 @@ void func_ov167_021bc048(BattleMon *mon, const BattleMonDamageRecord *record) {
     }
 }
 
-u8 func_ov167_021bc120(BattleMon *mon, u8 turnsAgo) {
+u8 BattleMon_GetDamageRecordCount(BattleMon *mon, u8 turnsAgo) {
     s32 turn;
 
     if (turnsAgo < 3) {
@@ -1577,7 +1577,7 @@ u8 GetConditionCount(BattleMon *mon, u32 index) {
     return mon->counters[index];
 }
 
-BOOL func_ov167_021bc1b8(BattleMon *mon, u32 *exp, BattleMonLevelUp *levelUp) {
+BOOL BattleMon_AddExp(BattleMon *mon, u32 *exp, BattleMonLevelUp *levelUp) {
     u32 oldExp;
     u32 newExp;
     u32 nextExp;
@@ -1648,7 +1648,7 @@ u32 GetExpForLv100(BattleMon *mon) {
     return PML_UtilGetPkmLvExp(mon->core.species, mon->form, 100);
 }
 
-void func_ov167_021bc384(BattleMon *mon, BOOL keepBaseForm) {
+void BattleMon_WriteToSrc(BattleMon *mon, BOOL keepBaseForm) {
     PartyPkm *src = mon->core.src;
     u32 form;
 
@@ -1670,10 +1670,10 @@ void func_ov167_021bc384(BattleMon *mon, BOOL keepBaseForm) {
     PokeParty_SetParam(src, PKM_PARAM_ITEM, mon->core.heldItem);
 }
 
-void func_ov167_021bc3fc(BattleMon *mon) {
+void BattleMon_ReloadSrcData(BattleMon *mon) {
     if (!mon->core.transformed) {
         setupBySrcData(mon, mon->core.src, TRUE, FALSE);
-        func_ov167_021ba8b4(mon);
+        BattleMon_ReloadMoves(mon);
     } else {
         GetNumMoves(mon, mon->core.src, FALSE);
     }
@@ -1688,7 +1688,7 @@ void IllusionBreak(BattleMon *mon) {
     mon->core.illusionDisguise = NULL;
 }
 
-void func_ov167_021bc43c(BattleMon *mon, PartyPkm *src) {
+void BattleMon_SetSrcData(BattleMon *mon, PartyPkm *src) {
     PokeParty_GetParam(src, PKM_PARAM_SPECIES, NULL);
     mon->core.src = src;
 }
@@ -1729,7 +1729,7 @@ BOOL TransformCheck(BattleMon *mon) {
     return mon->core.transformed;
 }
 
-void func_ov167_021bc55c(BattleMon *mon, u16 value) {
+void BattleMon_SetSubstituteHP(BattleMon *mon, u16 value) {
     mon->substituteHP = value;
     CureMoveCondition(mon, 8);
 }
@@ -1745,11 +1745,11 @@ BOOL IsSubstituteActive(BattleMon *mon) {
     return FALSE;
 }
 
-u32 func_ov167_021bc590(BattleMon *mon) {
+u32 BattleMon_GetSubstituteHP(BattleMon *mon) {
     return mon->substituteHP;
 }
 
-BOOL func_ov167_021bc59c(BattleMon *mon, u16 *damage) {
+BOOL BattleMon_DamageSubstitute(BattleMon *mon, u16 *damage) {
     if (mon->substituteHP <= *damage) {
         *damage = mon->substituteHP;
         mon->substituteHP = 0;
@@ -1759,11 +1759,11 @@ BOOL func_ov167_021bc59c(BattleMon *mon, u16 *damage) {
     return FALSE;
 }
 
-void func_ov167_021bc5c4(BattleMon *mon) {
+void BattleMon_ClearConfrontedMons(BattleMon *mon) {
     mon->core.unkD0Count = 0;
 }
 
-void func_ov167_021bc5cc(BattleMon *mon, u8 monId) {
+void BattleMon_AddConfrontedMon(BattleMon *mon, u8 monId) {
     u32 i;
 
     for (i = 0; i < mon->core.unkD0Count; i++) {
@@ -1777,18 +1777,18 @@ void func_ov167_021bc5cc(BattleMon *mon, u8 monId) {
     }
 }
 
-u8 func_ov167_021bc604(BattleMon *mon) {
+u8 BattleMon_GetConfrontedMonCount(BattleMon *mon) {
     return mon->core.unkD0Count;
 }
 
-u8 func_ov167_021bc60c(BattleMon *mon, u8 index) {
+u8 BattleMon_GetConfrontedMonID(BattleMon *mon, u8 index) {
     if (index < mon->core.unkD0Count) {
         return mon->core.unkD1[index];
     }
     return 0x1f;
 }
 
-void func_ov167_021bc624(BattleMon *mon, u16 item) {
+void BattleMon_SetCaughtBall(BattleMon *mon, u16 item) {
     u32 ball = PML_ItemGetMonsBallID(item);
 
     if (ball == 0) {
@@ -1797,12 +1797,12 @@ void func_ov167_021bc624(BattleMon *mon, u16 item) {
     PokeParty_SetParam(mon->core.src, PKM_PARAM_POKEBALL, ball);
 }
 
-void func_ov167_021bc640(BattleMon *mon, u8 monId, u16 move) {
+void BattleMon_SetComboMove(BattleMon *mon, u8 monId, u16 move) {
     mon->comboMonId = monId;
     mon->comboMove = move;
 }
 
-BOOL func_ov167_021bc650(BattleMon *mon, u8 *monId, u16 *move) {
+BOOL BattleMon_GetComboMove(BattleMon *mon, u8 *monId, u16 *move) {
     if (mon->comboMonId != 0x1f) {
         *monId = mon->comboMonId;
         *move = mon->comboMove;
@@ -1811,7 +1811,7 @@ BOOL func_ov167_021bc650(BattleMon *mon, u8 *monId, u16 *move) {
     return FALSE;
 }
 
-BOOL func_ov167_021bc674(BattleMon *mon) {
+BOOL BattleMon_HasComboMove(BattleMon *mon) {
     if (mon->comboMonId != 0x1f) {
         return TRUE;
     }
@@ -1825,7 +1825,7 @@ void ComboMove_ClearParam(BattleMon *mon) {
     }
 }
 
-void func_ov167_021bc6a0(BattleMon *mon) {
+void BattleMon_RecalcStats(BattleMon *mon) {
     PokeParty_RecalcStats(mon->core.src);
 }
 

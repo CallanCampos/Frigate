@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Hoothoot",
+    "pokedex": {
+        "category": "Owl Pokémon",
+        "entry": "It marks time precisely. Some\ncountries consider it to be a wise\nfriend, versed in the world's ways.",
+        "height": "2'04\"",
+        "weight": "46.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Hoothoot",
+                "category": "Owl Pokémon",
+                "entry": "It marks time precisely. Some\ncountries consider it to be a wise\nfriend, versed in the world's ways.",
+                "height": "2'04\"",
+                "weight": "46.7 lbs."
+            },
+            "fr": {
+                "name": "Hoothoot",
+                "category": "Pokémon Hibou",
+                "entry": "Il hulule chaque jour à la même\nheure. Dans certaines cultures,\nil incarne la sagesse.",
+                "height": "0,7 m",
+                "weight": "21,2 kg"
+            },
+            "de": {
+                "name": "Hoothoot",
+                "category": "Eule",
+                "entry": "Es sagt präzise die Uhrzeit an.\nIn manchen Regionen verehrt man\nes zudem als weisen Freund.",
+                "height": "0,7 m",
+                "weight": "21,2 kg"
+            },
+            "it": {
+                "name": "Hoothoot",
+                "category": "Pokémon Gufo",
+                "entry": "Segna il tempo con precisione. In alcuni\npaesi è considerato un amico saggio ed\nesperto del mondo.",
+                "height": "0,7 m",
+                "weight": "21,2 kg"
+            },
+            "ko": {
+                "name": "부우부",
+                "category": "부엉이포켓몬",
+                "entry": "정확하게 시간을 알리는 것에서\n세상의 이치를 깨우친\n지혜의 신으로 섬기는 나라도 있다.",
+                "height": "0.7 m",
+                "weight": "21.2 kg"
+            },
+            "es": {
+                "name": "Hoothoot",
+                "category": "Pokémon Búho",
+                "entry": "Da la hora con gran exactitud.\nEn algunos países se le considera\ntoda una autoridad por su sabiduría.",
+                "height": "0,7 m",
+                "weight": "21,2 kg"
+            },
+            "ja": {
+                "name": "ホーホー",
+                "category": "ふくろうポケモン",
+                "entry": "せいかくに\\x{3000}ときを\\x{3000}つげることから\nせかいの\\x{3000}ことわりを\\x{3000}わきまえた\nちえのかみさま\\x{3000}とする\\x{3000}くにもある。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 30,
+        "defense": 30,
+        "speed": 50,
+        "special_attack": 36,
+        "special_defense": 56
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_INSOMNIA", "ABILITY_KEEN_EYE" ],
+    "hidden_ability": "ABILITY_TINTED_LENS",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 52,
+    "height": 7,
+    "weight": 212,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_FORESIGHT" ],
+            [ 5, "MOVE_HYPNOSIS" ],
+            [ 9, "MOVE_PECK" ],
+            [ 13, "MOVE_UPROAR" ],
+            [ 17, "MOVE_REFLECT" ],
+            [ 21, "MOVE_CONFUSION" ],
+            [ 25, "MOVE_ECHOED_VOICE" ],
+            [ 29, "MOVE_TAKE_DOWN" ],
+            [ 33, "MOVE_AIR_SLASH" ],
+            [ 37, "MOVE_ZEN_HEADBUTT" ],
+            [ 41, "MOVE_SYNCHRONOISE" ],
+            [ 45, "MOVE_EXTRASENSORY" ],
+            [ 49, "MOVE_PSYCHO_SHIFT" ],
+            [ 53, "MOVE_ROOST" ],
+            [ 57, "MOVE_DREAM_EATER" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM77",
+            "TM83",
+            "TM85",
+            "TM87",
+            "TM88",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_ROOST",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_MIRROR_MOVE",
+            "MOVE_SUPERSONIC",
+            "MOVE_FAINT_ATTACK",
+            "MOVE_WING_ATTACK",
+            "MOVE_WHIRLWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_FEATHER_DANCE",
+            "MOVE_AGILITY",
+            "MOVE_NIGHT_SHADE",
+            "MOVE_DEFOG"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 20,
+            "species": "SPECIES_NOCTOWL"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_HOOTHOOT",
+    "cry_volume": 110
+}

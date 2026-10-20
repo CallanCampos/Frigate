@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Water Spout",
+    "description": "The user spouts water to damage the\nopposing team. The lower the user's HP,\nthe less powerful it becomes.",
+    "type": "TYPE_WATER",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_SPECIAL",
+    "power": 150,
+    "accuracy": 100,
+    "pp": 5,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_DECREASE_POWER_WITH_LESS_USER_HP",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_ADJACENT_FOES",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

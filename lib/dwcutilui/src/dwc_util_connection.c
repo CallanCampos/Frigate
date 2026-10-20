@@ -16,14 +16,14 @@ static DWCUtilAcStatus *sStatus;
 
 void func_ov182_021ae3d8(void) {
     sStatus = func_ov182_021bc4d8(sizeof(DWCUtilAcStatus), -4);
-    if (func_ov182_021aae5c(0xf, 0x40, func_ov182_021ae4cc, func_ov182_021ae4e0, func_ov182_021ae4ec, 0x800) != TRUE) {
+    if (DWCUtilAc_Start(0xf, 0x40, func_ov182_021ae4cc, func_ov182_021ae4e0, func_ov182_021ae4ec, 0x800) != TRUE) {
         OS_Terminate();
     }
     OS_Sleep(10);
 }
 
 void func_ov182_021ae424(void) {
-    if (func_ov182_021aaf44() != TRUE) {
+    if (DWCUtilAc_Cancel() != TRUE) {
         OS_Terminate();
     }
     func_ov182_021bc4f0(&sStatus);
@@ -43,7 +43,7 @@ int func_ov182_021ae440(void) {
     case 4:
         return 2;
     case 6:
-        if (func_ov182_021ab010(&result) != TRUE) {
+        if (DWCUtilAc_GetResult(&result) != TRUE) {
             OS_Terminate();
         }
         if (result.wepMode >= 0 && result.wepMode <= 3 && result.unk_24 == 1) {
@@ -58,7 +58,7 @@ int func_ov182_021ae440(void) {
 void func_ov182_021ae4b0(void) {
     DWCUtilAcResult result;
 
-    if (func_ov182_021ab010(&result) != TRUE) {
+    if (DWCUtilAc_GetResult(&result) != TRUE) {
         OS_Terminate();
     }
     func_ov182_021b7c60(&result);

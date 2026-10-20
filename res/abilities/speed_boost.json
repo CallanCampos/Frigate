@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Speed Boost",
+    "description": "Its Speed stat is\ngradually boosted."
+}

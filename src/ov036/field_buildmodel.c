@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_g3d_mapper.h"
@@ -15,21 +16,29 @@
 #include "system/area_data.h"
 #include "system/rtc.h"
 
-struct FieldPropDoorResInfo {
-    u8 pad[4];
-    u16 id;
-    s16 x;
-    s16 y;
-    s16 z;
+// The sounds of a prop type's animations
+typedef struct {
+    u16 propType;
+    u16 soundIds[4];
+} FieldPropDoorSounds;
+
+// The tables' names are swan's
+static const u8 FIELD_PROP_ANM_IDX_FOR_DAY_PART[DAY_PERIOD_COUNT] = { 0, 1, 2, 3, 3 };
+
+static const FieldPropAnmController FIELD_PROP_ANMCNT_VTABLES[FIELD_PROP_ANMCNT_COUNT] = {
+    { FieldPropAnmController_Static_Init, FieldPropAnmController_Static_Update,
+      FieldPropAnmController_Static_ExecCommand },
+    { FieldPropAnmController_Ambient_Init, FieldPropAnmController_Ambient_Update,
+      FieldPropAnmController_Static_ExecCommand },
+    { FieldPropAnmController_Static_Init, FieldPropAnmController_Dynamic_Update,
+      FieldPropAnmController_Dynamic_ExecCommand },
+    { FieldPropAnmController_RTC_Init, FieldPropAnmController_RTC_Update, FieldPropAnmController_Static_ExecCommand },
 };
 
-struct FieldPropSourceInfo {
-    s32 x;
-    s32 y;
-    s32 z;
-    u16 unkC;
-    u8 highResId;
-    u8 lowResId;
+static const FieldPropDoorSounds DOOR_SOUND_ID_LUT[6] = {
+    { 1, { SEQ_SE_FLD_20, SEQ_SE_FLD_21 } },    { 2, { SEQ_SE_FLD_22, SEQ_SE_FLD_22 } },
+    { 5, { SEQ_SE_FLD_22, SEQ_SE_FLD_22 } },    { 13, { SEQ_SE_FLD_134, SEQ_SE_FLD_134 } },
+    { 14, { SEQ_SE_FLD_138, SEQ_SE_FLD_139 } }, { 15, { SEQ_SE_FLD_22, SEQ_SE_FLD_22 } },
 };
 
 FieldPropSystem *FieldPropSystem_Create(HeapID heapId, FieldG3DMapper *mapper, u16 season) {
@@ -114,7 +123,7 @@ void FieldPropSystem_LoadArea(FieldPropSystem *system, u16 zoneId, AreaData *are
         textureArcId = ARCID_AREA_BMTEX_INT;
         defaultResId = 0x14;
     }
-    FieldPropSystem_LoadResBundle(system, (u16)bundleArcId, bundleId);
+    FieldPropSystem_LoadResBundle(system, bundleArcId, bundleId);
     FieldPropSystem_LoadTextures(system, textureArcId, bundleId, postFx);
     FieldPropSystem_BuildResIDLUT(system, defaultResId);
     FieldPropSystem_InitResources(system, postFx);
@@ -131,22 +140,14 @@ void *FieldPropSystem_GetResInfo(FieldPropSystem *system, u32 index) {
 }
 
 BOOL FieldPropSystem_CheckCreateDoorReq(FieldPropSystem *system, u32 resId, VecFx32 *position, u32 *resIndex) {
-    struct FieldPropDoorResInfo *info;
-    s32 x;
-    s32 y;
-    s32 z;
+    FieldPropResInfo *info;
 
     info = FieldPropSystem_FindResInfo(system, resId);
-    if (info->id == 0xffff) {
+    if (info->doorResId == 0xffff) {
         return FALSE;
     }
-    *resIndex = FieldPropSystem_ConvResIDToIndex(system, info->id);
-    x = info->x << 12;
-    z = info->z << 12;
-    y = info->y << 12;
-    position->x = x;
-    position->y = y;
-    position->z = z;
+    *resIndex = FieldPropSystem_ConvResIDToIndex(system, info->doorResId);
+    VEC_Set(position, info->doorX << FX32_SHIFT, info->doorY << FX32_SHIFT, info->doorZ << FX32_SHIFT);
     return TRUE;
 }
 
@@ -184,16 +185,10 @@ void FieldPropSystem_InstantiateFromInfo(FieldPropSystem *system, FieldChunk *ch
                                          const struct FieldPropSourceInfo *info, u32 propIndex) {
     FieldPropInstance instance;
     u16 resId;
-    s32 x, y, z;
 
     resId = info->lowResId + (info->highResId << 8);
     instance.resIndex = FieldPropSystem_ConvResIDToIndex(system, resId);
-    x = info->x;
-    z = -info->z;
-    y = info->y;
-    instance.pos.position.x = x;
-    instance.pos.position.y = y;
-    instance.pos.position.z = z;
+    VEC_Set(&instance.pos.position, info->x, info->y, -info->z);
     instance.pos.rotationY = info->unkC;
     FieldPropSystem_LinkPropToChunk(system, chunk, &instance, propIndex);
 }
@@ -253,7 +248,7 @@ FieldPropResBank *FieldPropSystem_GetResBank(FieldPropSystem *system) {
     return &system->resBank;
 }
 
-void FieldPropSystem_LoadResBundle(FieldPropSystem *system, u32 arcId, u32 fileId) {
+void FieldPropSystem_LoadResBundle(FieldPropSystem *system, u16 arcId, u32 fileId) {
     ArcTool *arc;
     u32 count;
 
@@ -367,7 +362,7 @@ u8 FieldPropResInfo_GetTypeConv(const FieldPropResInfo *resInfo) {
 }
 
 void FieldPropRTCState_Init(FieldPropRTCState *state, u8 season) {
-    state->dayPeriod = 5;
+    state->dayPeriod = DAY_PERIOD_COUNT;
     state->season = season;
     FieldPropRTCState_Update(state);
 }
@@ -497,6 +492,7 @@ void FieldPropResInstance_Init(FieldPropSystem *system, FieldPropResInstance *in
     G3DModel *model = GFL_G3DMdlCreate(resource->model, 0, system->textureResource);
     void *animations[4];
     s32 i;
+    FieldPropAnmControllerType type;
 
     for (i = 0; i < 4; i++) {
         if (resource->animations[i] != NULL) {
@@ -507,17 +503,15 @@ void FieldPropResInstance_Init(FieldPropSystem *system, FieldPropResInstance *in
     }
     instance->actor = GFL_G3DActorCreate(model, animations, 4);
     instance->resource = resource;
-    FIELD_PROP_ANMCNT_VTABLES[header->controllerType].init(system, instance);
+    type = header->controllerType;
+    FIELD_PROP_ANMCNT_VTABLES[type].init(system, instance);
 }
 
 void FieldPropAnmController_Static_Init(FieldPropSystem *system, FieldPropResInstance *instance) {
     s32 i;
-    u32 state;
 
-    i = 0;
-    state = 0;
-    for (; i < 4; i++) {
-        instance->animationState[i] = state;
+    for (i = 0; i < 4; i++) {
+        instance->animationState[i] = 0;
     }
 }
 
@@ -525,16 +519,13 @@ void FieldPropAnmController_Ambient_Init(FieldPropSystem *system, FieldPropResIn
     FieldPropResAnmHeader *header;
     u32 count;
     s32 i;
-    u32 playing;
 
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     count = header->ambientAnimationCount;
-    i = 0;
-    playing = 1;
-    for (; i < 4 && (u32)i < count; i++) {
+    for (i = 0; i < 4 && i < count; i++) {
         GFL_G3DActorBindAnm(instance->actor, i);
         GFL_G3DActorResetAnmFrame(instance->actor, i);
-        instance->animationState[i] = playing;
+        instance->animationState[i] = 1;
     }
     for (; i < 4; i++) {
         instance->animationState[i] = 0;
@@ -544,15 +535,12 @@ void FieldPropAnmController_Ambient_Init(FieldPropSystem *system, FieldPropResIn
 void FieldPropAnmController_RTC_Init(FieldPropSystem *system, FieldPropResInstance *instance) {
     u32 animation;
     s32 i;
-    u32 stopped;
 
     FieldPropResInfo_GetAnmHeader(instance->resource->info);
     animation = FieldPropRTCState_GetPlayAnmIndex(&system->rtcState);
-    i = 0;
-    stopped = 0;
-    for (; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         if (i != animation) {
-            instance->animationState[i] = stopped;
+            instance->animationState[i] = 0;
         } else {
             GFL_G3DActorBindAnm(instance->actor, i);
             GFL_G3DActorResetAnmFrame(instance->actor, i);
@@ -585,7 +573,7 @@ void FieldPropResInstance_Free(FieldPropResInstance *instance) {
 
 void FieldPropSystem_UpdateResInstance(FieldPropSystem *system, FieldPropResInstance *instance) {
     FieldPropResAnmHeader *header;
-    u32 type;
+    FieldPropAnmControllerType type;
 
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     type = header->controllerType;
@@ -637,7 +625,13 @@ void FieldPropAnmController_Dynamic_Update(FieldPropSystem *system, FieldPropRes
             break;
         case 4:
             if (!GFL_G3DActorStepAnmFrame(instance->actor, i, -step)) {
-                GFL_G3DActorSetAnmFrame(instance->actor, i, 0);
+                // BUG: The frame setter dereferences its frame pointer.
+#ifdef BUGFIX
+                fx32 frame = 0;
+                GFL_G3DActorSetAnmFrame(instance->actor, i, &frame);
+#else
+                GFL_G3DActorSetAnmFrame(instance->actor, i, NULL);
+#endif
                 instance->animationState[i] = 2;
             }
             break;
@@ -658,17 +652,12 @@ void FieldPropResInstance_AnmSetPlay(FieldPropResInstance *instance, u32 animati
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     count = header->ambientAnimationCount;
     offset = count * animation;
-    i = 0;
-    if (count <= 0) {
-        return;
-    }
-    do {
+    for (i = 0; i < header->ambientAnimationCount; i++) {
         index = offset + i;
         GFL_G3DActorBindAnm(instance->actor, index);
         GFL_G3DActorResetAnmFrame(instance->actor, index);
         instance->animationState[offset + i] = 3;
-        i++;
-    } while (i < header->ambientAnimationCount);
+    }
 }
 
 void FieldPropResInstance_AnmSetPlayLoop(FieldPropResInstance *instance, u32 animation) {
@@ -681,17 +670,12 @@ void FieldPropResInstance_AnmSetPlayLoop(FieldPropResInstance *instance, u32 ani
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     count = header->ambientAnimationCount;
     offset = count * animation;
-    i = 0;
-    if (count <= 0) {
-        return;
-    }
-    do {
+    for (i = 0; i < header->ambientAnimationCount; i++) {
         index = offset + i;
         GFL_G3DActorBindAnm(instance->actor, index);
         GFL_G3DActorResetAnmFrame(instance->actor, index);
         instance->animationState[offset + i] = 1;
-        i++;
-    } while (i < header->ambientAnimationCount);
+    }
 }
 
 void FieldPropResInstance_AnmSetPlayInv(FieldPropResInstance *instance, u32 animation) {
@@ -707,11 +691,7 @@ void FieldPropResInstance_AnmSetPlayInv(FieldPropResInstance *instance, u32 anim
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     count = header->ambientAnimationCount;
     offset = count * animation;
-    i = 0;
-    if (count <= 0) {
-        return;
-    }
-    do {
+    for (i = 0; i < header->ambientAnimationCount; i++) {
         index = offset + i;
         GFL_G3DActorBindAnm(instance->actor, index);
         animationObj = GFL_G3DActorGetAnm(instance->actor, index);
@@ -719,8 +699,7 @@ void FieldPropResInstance_AnmSetPlayInv(FieldPropResInstance *instance, u32 anim
         frame = NNS_G3dAnmObjGetNumFrame(renderObj);
         GFL_G3DActorSetAnmFrame(instance->actor, index, &frame);
         instance->animationState[offset + i] = 4;
-        i++;
-    } while (i < header->ambientAnimationCount);
+    }
 }
 
 void FieldPropResInstance_AnmSetPause(FieldPropResInstance *instance, u32 animation) {
@@ -732,16 +711,11 @@ void FieldPropResInstance_AnmSetPause(FieldPropResInstance *instance, u32 animat
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     count = header->ambientAnimationCount;
     offset = count * animation;
-    i = 0;
-    if (count <= 0) {
-        return;
-    }
-    do {
+    for (i = 0; i < header->ambientAnimationCount; i++) {
         if (instance->animationState[offset + i] != 0) {
             instance->animationState[offset + i] = 2;
         }
-        i++;
-    } while (i < header->ambientAnimationCount);
+    }
 }
 
 void FieldPropResInstance_AnmStopAll(FieldPropResInstance *instance) {
@@ -758,7 +732,7 @@ void FieldPropResInstance_AnmStopAll(FieldPropResInstance *instance) {
 void FieldPropResInstance_CallAnmCmd(FieldPropResInstance *instance, u32 animation, u32 command) {
     FieldPropResAnmHeader *header;
     u8 index;
-    u32 type;
+    FieldPropAnmControllerType type;
 
     header = FieldPropResInfo_GetAnmHeader(instance->resource->info);
     type = header->controllerType;
@@ -888,6 +862,13 @@ void FieldChunkPropHolder_ChangeResID(FieldPropSystem *system, FieldChunkPropHol
     holder->instance->resIndex = FieldPropSystem_ConvResIDToIndex(system, resId);
 }
 
+static inline BOOL FieldPropAreaBounds_Contains(const FieldPropAreaBounds *bounds, fx32 x, fx32 z) {
+    if (bounds->minX <= x && bounds->maxX >= x && bounds->minZ <= z && bounds->maxZ >= z) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 FieldChunkPropHolder **FieldPropSystem_FindPropsInArea(FieldPropSystem *system, const FieldPropAreaBounds *bounds,
                                                        u32 filter, u32 *count) {
     u32 found = 0;
@@ -895,9 +876,6 @@ FieldChunkPropHolder **FieldPropSystem_FindPropsInArea(FieldPropSystem *system, 
     u32 i;
     FieldChunkPropHolder *holder;
     VecFx32 position;
-    BOOL inside;
-    fx32 x;
-    fx32 z;
 
     for (i = 0; i < 0x120; i++) {
         holder = &system->chunkPropHolders[i];
@@ -909,14 +887,7 @@ FieldChunkPropHolder **FieldPropSystem_FindPropsInArea(FieldPropSystem *system, 
         }
         FieldChunk_GetWorldPos(holder->chunk, &position);
         VEC_Add(&holder->instance->pos.position, &position, &position);
-        z = position.z;
-        x = position.x;
-        if (bounds->minX <= x && bounds->maxX >= x && bounds->minZ <= z && bounds->maxZ >= z) {
-            inside = TRUE;
-        } else {
-            inside = FALSE;
-        }
-        if (inside == TRUE) {
+        if (FieldPropAreaBounds_Contains(bounds, position.x, position.z) == TRUE) {
             props[found] = holder;
             found++;
         }

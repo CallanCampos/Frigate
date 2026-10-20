@@ -328,5 +328,83 @@ class OrphanRelocationTests(unittest.TestCase):
             "outside source module")
 
 
+class BoundaryRecordTests(unittest.TestCase):
+    """Recording a file's section boundary again replaces its earlier record, so a replay can't undo a move down."""
+
+    # The fixture of the orphan relocation tests, without their tests
+    sections = OrphanRelocationTests.sections
+    relocs = OrphanRelocationTests.relocs
+    orphan = staticmethod(OrphanRelocationTests.orphan)
+    forward = staticmethod(OrphanRelocationTests.forward)
+    snapshot = OrphanRelocationTests.snapshot
+    cli = OrphanRelocationTests.cli
+
+    def setUp(self):
+        OrphanRelocationTests.setUp(self)
+        for addr in (0x5010, 0x5020, 0x5030):
+            self.mapper.addresses[(MODULE, addr, "w2_us")] = addr + 0x1000
+        for version in ("b2_us", "w2_us"):
+            path = fixes.config_dir(version, MODULE) / "delinks.txt"
+            path.write_text(path.read_text() + "\nsrc/next.c:\n    .text start:0xffffffff end:0xffffffff\n")
+            (fixes.config_dir(version, MODULE) / "symbols.txt").write_text("")
+
+    def delinks(self, version="b2_us"):
+        return (fixes.config_dir(version, MODULE) / "delinks.txt").read_text()
+
+    def test_move_down_drops_older_record(self):
+        self.cli("section-end", MODULE, "src/example.c", ".text", "0x5030")
+        self.cli("remove-symbol", MODULE, "0x5030")  # another action at the old address stays
+        self.cli("section-start", MODULE, "src/next.c", ".text", "0x5030")
+        self.cli("section-end", MODULE, "src/example.c", ".text", "0x5010")
+        self.assertEqual(fixes.load_fixes(), [(MODULE, 0x5010, "section_end", "src/example.c:.text"),
+                                              (MODULE, 0x5030, "remove_symbol", ""),
+                                              (MODULE, 0x5030, "section_start", "src/next.c:.text")])
+        after = self.snapshot()
+        self.cli("apply")
+        self.assertEqual(self.snapshot(), after)
+        self.assertIn("end:0x00005010", self.delinks())
+        self.assertIn("end:0x00006010", self.delinks("w2_us"))
+
+    def test_two_addresses_in_one_command_keep_last(self):
+        self.cli("section-end", MODULE, "src/example.c", ".text", "0x5010", "0x5020")
+        self.assertEqual(fixes.load_fixes(), [(MODULE, 0x5020, "section_end", "src/example.c:.text")])
+
+    def add_bss(self, other_start=0x6010):
+        for version, addr in [("b2_us", 0x5010), ("w2_us", other_start)]:
+            path = fixes.config_dir(version, MODULE) / "delinks.txt"
+            text = path.read_text().replace(
+                "src/example.c:\n    .text start:0x00000000 end:0xffffffff\n",
+                "src/example.c:\n    .text start:0x00000000 end:0xffffffff\n"
+                f"    .bss start:{addr:#010x} end:{addr + 12:#010x}\n")
+            path.write_text(text)
+
+    def test_remove_section_maps_both_versions_and_replays_idempotently(self):
+        self.add_bss()
+        self.cli("remove-section", MODULE, "src/example.c", ".bss", "0x5010")
+        for version in ("b2_us", "w2_us"):
+            self.assertNotIn("    .bss", self.delinks(version))
+            self.assertIn("src/example.c:\n    .text", self.delinks(version))
+            self.assertIn("src/next.c:\n    .text", self.delinks(version))
+        self.assertEqual(fixes.load_fixes(), [(MODULE, 0x5010, "remove_section", "src/example.c:.bss")])
+        after = self.snapshot()
+        self.cli("apply")
+        self.cli("remove-section", MODULE, "src/example.c", ".bss", "0x5010")
+        self.assertEqual(self.snapshot(), after)
+
+    def test_remove_section_later_wrong_start_leaves_both_versions_unchanged(self):
+        self.add_bss(other_start=0x6014)
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "does not start"):
+            self.cli("remove-section", MODULE, "src/example.c", ".bss", "0x5010")
+        self.assertEqual(self.snapshot(), before)
+
+    def test_remove_section_missing_owner_is_rejected_without_changes(self):
+        self.add_bss()
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "not registered"):
+            self.cli("remove-section", MODULE, "src/missing.c", ".bss", "0x5010")
+        self.assertEqual(self.snapshot(), before)
+
+
 if __name__ == "__main__":
     unittest.main()

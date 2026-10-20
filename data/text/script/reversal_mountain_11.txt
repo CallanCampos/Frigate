@@ -1,5 +1,0 @@
-ReversalMountain11_Text_WhatPlaceFeelsVery = What is this place?\nIt feels very strange.{be01}\nCould this be the place where\nReversal Mountain started from--{be00}\nthe lair of the Pokémon Heatran?{be01}
-ReversalMountain11_Text_HeatranPokemonMagmaLike = Heatran is a Pokémon with\nmagma-like blood flowing through it!{be01}
-ReversalMountain11_Text_MagmaStoneReactingSomething = The Magma Stone is reacting\nto something...{be00}\nWill you set it down here?
-ReversalMountain11_Text_GwogoboGwobobobo = Gwogobo gwobobobo!
-ReversalMountain11_Text_HeatranVanishedIntoDepths = Heatran vanished into the\ndepths of the volcano...

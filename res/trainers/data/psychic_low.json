@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Low",
+    "class": "TRAINER_CLASS_PSYCHIC_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SOLOSIS",
+            "form": 0,
+            "level": 23,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "...When I am here, I feel like I might\nbe crushed by sorrow.{be01}\nYou there...\nLet us have a bout!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This bout...\nI will not forget it..."
+        },
+        {
+            "type": 2,
+            "text": "This castle will be buried by the sands\nand forgotten in time...{be01}\nWhenever that sad fact strikes me, tears\nnaturally course down my face..."
+        }
+    ]
+}

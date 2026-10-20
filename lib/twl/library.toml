@@ -38,6 +38,7 @@ flags = [
 "rtc/rtc_api_ex.c" = ["-nothumb"]
 "camera/camera_api.c" = ["-nothumb", "-ipa function"]
 "camera/camera.c" = ["-nothumb"]
+"card/card_rom_twl.c" = ["-ipa function"]
 "nwm/nwm.c" = ["-nothumb", "-ipa function"]
 "mic/mic_twl.c" = ["-nothumb"]
 "fatfs/fatfs_api.c" = ["-nothumb", "-O2,p", "-ipa function"]

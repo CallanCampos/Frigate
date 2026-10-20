@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Zen Mode",
+    "description": "Changes the Pokémon's\nshape when HP is halved."
+}

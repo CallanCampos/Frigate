@@ -1,0 +1,4 @@
+Route47_Text_HiWelcomeWellThere = Hi!\nWelcome!{be01}\nWell...\nThere is nothing here.
+Route47_Text_KnowThursdaysSomePokemon = You know, on Thursdays,\nsome Pokémon fly here.
+Route47_Text_IfImBigPokemon = If I'm with a big Pokémon,\neven I look slim!
+\pad{d8}

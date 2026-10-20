@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": "AREA_DRIFTVEIL_CITY_2",
+    "matrix": "MAP_MATRIX_DRIFTVEIL_CITY_11",
+    "scripts": "SCRIPTS_DRIFTVEIL_CITY_11",
+    "text": "SCRIPT_TEXT_DRIFTVEIL_CITY_11",
+    "bgm": "SEQ_BGM_SW_C_5_NEW",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_DRIFTVEIL_CITY",
+    "place": "PLACE_DRIFTVEIL_CITY",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 320,
+    "name_icon": 15,
+    "easy_level": 3,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

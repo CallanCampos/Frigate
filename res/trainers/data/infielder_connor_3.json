@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Connor",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_POTION",
+    "party": [
+        {
+            "species": "SPECIES_TRANQUILL",
+            "form": 0,
+            "level": 25,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SANDILE",
+            "form": 0,
+            "level": 25,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My undefeated Pokémon and I\nhave our eyes set on you for{be00}\nour practice opponent!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I knew I had the right person!"
+        },
+        {
+            "type": 15,
+            "text": "I'm practicing my gift-giving technique\nfor my fans! Here, take this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I got some great practice\nfrom our battle!{be01}\nI'll become even stronger!"
+        }
+    ]
+}

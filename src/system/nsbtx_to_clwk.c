@@ -72,12 +72,12 @@ void NsbtxToClwk_LoadTextureEx(ClActor *actor, u32 arcId, u32 fileId, u8 texture
     bitmap = (u8 *)tex + tex->texInfo.ofsTex;
     chars = GFL_HeapAllocate(HEAPID_TAIL(heapId), size, FALSE, "nsbtx_to_clwk.c", 119);
     NsbtxToClwk_ConvertTiles(bitmap + texOffset, width, 0, 0, width, height, chars);
-    func_0204bab8(func_0204c428(actor), chars, size, offset, vramType);
+    ClActSys_WriteCharData(ClActor_GetCharIdx(actor), chars, size, offset, vramType);
     GFL_HeapFree(chars);
 
     colors = (u8 *)tex + tex->plttInfo.ofsPlttData;
     DC_FlushRange(colors, 32);
-    func_0204c3d0(actor, &proxy);
+    ClActor_GetPlttProxy(actor, &proxy);
 
     if (vramType == CLACT_VRAM_MAIN || vramType == CLACT_VRAM_BOTH) {
         if (fade == NULL) {

@@ -71,14 +71,14 @@ void Percentage_SetVisible(Percentage *percentage, BOOL visible) {
 
 // The hundreds are shown only when they aren't 0, and the tens only when they or the hundreds aren't
 static void Percentage_SetVisibleCore(Percentage *percentage, BOOL visible) {
-    func_0204c124(percentage->actors[ACTOR_PERCENT], visible);
+    ClActor_SetVisible(percentage->actors[ACTOR_PERCENT], visible);
     if (Percentage_GetHundreds(percentage)) {
-        func_0204c124(percentage->actors[ACTOR_HUNDREDS], visible);
+        ClActor_SetVisible(percentage->actors[ACTOR_HUNDREDS], visible);
     }
     if (Percentage_GetHundreds(percentage) || Percentage_GetTens(percentage)) {
-        func_0204c124(percentage->actors[ACTOR_TENS], visible);
+        ClActor_SetVisible(percentage->actors[ACTOR_TENS], visible);
     }
-    func_0204c124(percentage->actors[ACTOR_ONES], visible);
+    ClActor_SetVisible(percentage->actors[ACTOR_ONES], visible);
 }
 
 static void Percentage_UpdateActors(Percentage *percentage) {
@@ -88,35 +88,35 @@ static void Percentage_UpdateActors(Percentage *percentage) {
 
     pos.x = percentage->x;
     pos.y = percentage->y;
-    func_0204c140(actor, &pos, resources->surface);
-    func_0204c488(actor, resources->percentSequence);
-    func_0204c4d4(actor, 0);
-    func_0204c550(actor);
-    func_0204c124(actor, FALSE);
+    ClActor_SetSurfacePos(actor, &pos, resources->surface);
+    ClActor_SetSequence(actor, resources->percentSequence);
+    ClActor_SetAnimTime(actor, 0);
+    ClActor_StopAnim(actor);
+    ClActor_SetVisible(actor, FALSE);
 
     actor = percentage->actors[ACTOR_HUNDREDS];
     Percentage_GetHundredsPos(percentage, &pos.x, &pos.y);
-    func_0204c140(actor, &pos, resources->surface);
-    func_0204c488(actor, resources->digitSequence);
-    func_0204c4d4(actor, Percentage_GetHundreds(percentage) * FX32_ONE);
-    func_0204c550(actor);
-    func_0204c124(actor, FALSE);
+    ClActor_SetSurfacePos(actor, &pos, resources->surface);
+    ClActor_SetSequence(actor, resources->digitSequence);
+    ClActor_SetAnimTime(actor, Percentage_GetHundreds(percentage) * FX32_ONE);
+    ClActor_StopAnim(actor);
+    ClActor_SetVisible(actor, FALSE);
 
     actor = percentage->actors[ACTOR_TENS];
     Percentage_GetTensPos(percentage, &pos.x, &pos.y);
-    func_0204c140(actor, &pos, resources->surface);
-    func_0204c488(actor, resources->digitSequence);
-    func_0204c4d4(actor, Percentage_GetTens(percentage) * FX32_ONE);
-    func_0204c550(actor);
-    func_0204c124(actor, FALSE);
+    ClActor_SetSurfacePos(actor, &pos, resources->surface);
+    ClActor_SetSequence(actor, resources->digitSequence);
+    ClActor_SetAnimTime(actor, Percentage_GetTens(percentage) * FX32_ONE);
+    ClActor_StopAnim(actor);
+    ClActor_SetVisible(actor, FALSE);
 
     actor = percentage->actors[ACTOR_ONES];
     Percentage_GetOnesPos(percentage, &pos.x, &pos.y);
-    func_0204c140(actor, &pos, resources->surface);
-    func_0204c488(actor, resources->digitSequence);
-    func_0204c4d4(actor, Percentage_GetOnes(percentage) * FX32_ONE);
-    func_0204c550(actor);
-    func_0204c124(actor, FALSE);
+    ClActor_SetSurfacePos(actor, &pos, resources->surface);
+    ClActor_SetSequence(actor, resources->digitSequence);
+    ClActor_SetAnimTime(actor, Percentage_GetOnes(percentage) * FX32_ONE);
+    ClActor_StopAnim(actor);
+    ClActor_SetVisible(actor, FALSE);
 }
 
 static void Percentage_SetValueCore(Percentage *percentage, u8 value) {
@@ -199,8 +199,8 @@ static void Percentage_CreateActors(Percentage *percentage) {
     setup.priority = 0;
     setup.bgPriority = 0;
     for (i = 0; i < ACTOR_COUNT; i++) {
-        percentage->actors[i] = func_0204c040(percentage->unit, resources->chars, resources->palette,
-                                              resources->cellAnims, &setup, resources->surface, percentage->heapId);
+        percentage->actors[i] = ClActor_Create(percentage->unit, resources->chars, resources->palette,
+                                               resources->cellAnims, &setup, resources->surface, percentage->heapId);
     }
 }
 
@@ -208,7 +208,7 @@ static void Percentage_DeleteActors(Percentage *percentage) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(percentage->actors[i]);
+        ClActor_Delete(percentage->actors[i]);
     }
 }
 

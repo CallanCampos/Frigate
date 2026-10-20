@@ -31,15 +31,15 @@ static GameEventReturnCode EventCGearPowerOn_Callback(GameEvent *event, u32 *sta
         break;
     case 1:
         if (!GameCommSys_BootCheck(comm)) {
-            func_02016b40(gsys, 0);
+            GSYS_SetCGearOn(gsys, 0);
             (*state)++;
         }
         break;
     case 2:
         if (data->bootComm) {
-            func_02016b40(gsys, 1);
+            GSYS_SetCGearOn(gsys, 1);
             GSYS_TryBootGameComm(gsys);
-            func_0201740c(GSYS_GetGameData(gsys), 0);
+            GameData_SetCGearPowerRequest(GSYS_GetGameData(gsys), 0);
         }
         (*state)++;
         break;

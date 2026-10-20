@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Intimidate",
+    "description": "Lowers the foe's\nAttack stat."
+}

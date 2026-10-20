@@ -57,7 +57,7 @@ static void ISSDungeonSys_ChangeZone(ISSDungeonSys *sys, u16 zoneId);
 
 static void ISSDungeon_SetSeason(ISSDungeonData *data, u8 season) {
     GFL_SndBGMSetParams(SND_CHANNEL_MASK_ALL, data->tempo[season], -1, 0);
-    NNS_SndPlayerSetTrackPitch(func_02005c94(), ISS_DUNGEON_PITCH_TRACKS, data->pitch[season]);
+    NNS_SndPlayerSetTrackPitch(GFL_SndBGMGetHandle(), ISS_DUNGEON_PITCH_TRACKS, data->pitch[season]);
 }
 
 static ISSDungeonList *ISSDungeonSys_LoadArcData(HeapID heapId) {

@@ -361,9 +361,9 @@ static const u16 sDemo3D04_FileIds3_0_0[] = { 265, 266 };
 static const u16 sDemo3D05_FileIds6_0_0[] = { 270, 269 };
 static const Demo3DFiles sDemo3D21_Files3_0[] = { { sDemo3D21_FileIds3_0_0, NELEMS(sDemo3D21_FileIds3_0_0) } };
 static const Demo3DCmd sDemo3D03_Cmds[] = {
-    { DEMO3D_CMD_MESSAGE, 180, { TEXT_BANK_0412, 0, 3, 180, 2, 19, 28, 4 } },
-    { DEMO3D_CMD_MESSAGE, 460, { TEXT_BANK_0412, 1, 3, 180, 2, 19, 28, 4 } },
-    { DEMO3D_CMD_MESSAGE, 760, { TEXT_BANK_0412, 2, 3, 180, 2, 19, 28, 4 } },
+    { DEMO3D_CMD_MESSAGE, 180, { TEXT_BANK_DEMO3D_03, 0, 3, 180, 2, 19, 28, 4 } },
+    { DEMO3D_CMD_MESSAGE, 460, { TEXT_BANK_DEMO3D_03, 1, 3, 180, 2, 19, 28, 4 } },
+    { DEMO3D_CMD_MESSAGE, 760, { TEXT_BANK_DEMO3D_03, 2, 3, 180, 2, 19, 28, 4 } },
     { DEMO3D_CMD_BRIGHTNESS_FADE, 990, { 1, 60, 0, -16 } },
     { DEMO3D_CMD_END },
 };

@@ -1,0 +1,9 @@
+IcirrusCity2_Text_BrycenPastWhenHurt = Brycen: In the past, when I was hurt and\ndepressed, Alder shared this with me...{be01}\nThere is strength in being with other\npeople and Pokémon.{be01}\nReceiving their support makes\nyou stronger.{be01}
+IcirrusCity2_Text_WorkedGymLeaderCame = I worked as a Gym Leader,\nand I came to understand{be00}\nwhat he meant by that.{be01}\nMy desire became to strengthen\nthis relationship that makes everyone{be00}\nstronger--the relationship between{be00}\npeople and Pokémon.{be01}\nBy focusing on the path of an actor,\nI want to make everyone think{be00}\nthat living together with Pokémon{be00}\nis exciting and wonderful.{be01}
+IcirrusCity2_Text_TeachingBeingTaughtExcuse = Teaching is being taught...\nExcuse me, it's time for training.{be01}
+IcirrusCity2_Text_CoolIsntStrongFigure = So cool, isn't it?{be01}\nThat strong figure standing\nthere in the background!
+IcirrusCity2_Text_OhImSorryBrycen = Oh, I'm so sorry.{be01}\nBrycen decided to try to\nreturn to his acting roots.{be01}\nCurrently, he's working hard at\nPokéstar Studios!
+IcirrusCity2_Text_WellSinceCameAll = Well, since you came all the way here...{be01}
+IcirrusCity2_Text_ImGratefulEveryonesSupport = I'm grateful for everyone's support...
+IcirrusCity2_Text_FormerIcirrusCityPokemon = Former Icirrus City\nPokémon Gym
+\pad{3e}

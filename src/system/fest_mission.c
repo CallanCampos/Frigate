@@ -11,9 +11,9 @@
 typedef BOOL (*FestMissionTargetFunc)(const FestMissionConfig *config, u32 value);
 
 static BOOL func_02014e50(FestMissionConfig *config);
-static u8 func_02014f88(FestMissionConfig *config);
-static BOOL func_02014f98(const FestMissionConfig *config, u32 value);
-static BOOL func_02014fac(const FestMissionConfig *config, u32 value);
+static u8 FestMissionConfig_GetExtraSeconds(FestMissionConfig *config);
+static BOOL FestMissionConfig_MatchesTarget(const FestMissionConfig *config, u32 value);
+static BOOL FestMissionConfig_AnyTarget(const FestMissionConfig *config, u32 value);
 
 // The seconds a gain of time gives, by the mission's unk10_9
 static const u8 FestMission_ExtraSeconds[4] = { 0, 30, 60, 180 };
@@ -22,12 +22,12 @@ static const u8 FestMission_ExtraSeconds[4] = { 0, 30, 60, 180 };
 // clang-format off
 static const FestMissionTargetFunc FestMission_TargetFuncs[7] = {
     NULL,
-    func_02014f98,
-    func_02014f98,
-    func_02014fac,
-    func_02014fac,
-    func_02014fac,
-    func_02014fac,
+    FestMissionConfig_MatchesTarget,
+    FestMissionConfig_MatchesTarget,
+    FestMissionConfig_AnyTarget,
+    FestMissionConfig_AnyTarget,
+    FestMissionConfig_AnyTarget,
+    FestMissionConfig_AnyTarget,
 };
 
 // clang-format on
@@ -57,11 +57,11 @@ void FestMissionConfig_Start(FestMissionConfig *config, const FestMissionConfig 
     }
 }
 
-void func_02014dac(FestMissionConfig *config) {
+void FestMissionConfig_StartTimer(FestMissionConfig *config) {
     UpdateFesMissionConfigSecondsTime(config);
 }
 
-void func_02014db4(FestMissionConfig *config) {
+void FestMissionConfig_Clear(FestMissionConfig *config) {
     ClearFesMissionCfg(config);
 }
 
@@ -164,7 +164,7 @@ BOOL FestMissionConfig_AddScore(FestMissionConfig *config, u32 kind, u32 value, 
 }
 
 u32 FestMissionConfig_AddSeconds(FestMissionConfig *config, u16 gain) {
-    u32 seconds = func_02014f88(config) * gain;
+    u32 seconds = FestMissionConfig_GetExtraSeconds(config) * gain;
 
     if (seconds == 0) {
         return 0;
@@ -185,11 +185,11 @@ BOOL FestMissionConfig_IsSame(const FestMissionConfig *config, const FestMission
     return TRUE;
 }
 
-static u8 func_02014f88(FestMissionConfig *config) {
+static u8 FestMissionConfig_GetExtraSeconds(FestMissionConfig *config) {
     return FestMission_ExtraSeconds[config->info.unk10_9];
 }
 
-static BOOL func_02014f98(const FestMissionConfig *config, u32 value) {
+static BOOL FestMissionConfig_MatchesTarget(const FestMissionConfig *config, u32 value) {
     BOOL result = TRUE;
 
     if (config->info.target != 0 && config->info.target != value) {
@@ -198,7 +198,7 @@ static BOOL func_02014f98(const FestMissionConfig *config, u32 value) {
     return result;
 }
 
-static BOOL func_02014fac(const FestMissionConfig *config, u32 value) {
+static BOOL FestMissionConfig_AnyTarget(const FestMissionConfig *config, u32 value) {
     return TRUE;
 }
 

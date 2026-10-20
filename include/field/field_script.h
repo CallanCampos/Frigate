@@ -119,18 +119,14 @@ struct ScriptOverlayWork {
 extern const char data_ov012_0216e1e4[];
 extern const char data_ov012_0216e208[];
 extern const char data_ov012_0216e1b4[];
-extern const u16 data_ov012_0216ca04[2];
-extern const u8 data_ov012_0216ca06[20];
-extern const u16 data_ov012_0216ca1a[12];
-extern const u16 data_ov012_0216ca1c[12];
 
 ScriptSubwork *InitScriptSubwork(ScriptWork *work, HeapID heapId);
-void func_ov012_021550e4(void *subwork);
+void FreeScriptSubwork(void *subwork);
 FieldScriptEnv *CreateFieldScriptEnv(const FieldScriptEnvArgs *args, HeapID heapId);
 void FreeFieldScriptEnv(FieldScriptEnv *env);
 u32 FieldScriptEnv_IsReducedFeatureLevel(FieldScriptEnv *env);
 u32 FieldScriptEnv_GetFeatureLevel(FieldScriptEnv *env);
-void func_ov012_021552c8(FieldScriptEnv *env);
+void FieldScriptEnv_RemoveAcmdTasks(FieldScriptEnv *env);
 void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 align, u16 *result, WordSet *wordSet,
                   MsgData *msgData);
 void AddItemToListMenu(FieldScriptEnv *env, u32 messageId, u32 descriptionId, u32 value, StrBuf *expanded,
@@ -139,14 +135,14 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env);
 void FreeListMenuWork(ScriptListMenu *menu);
 BOOL FieldScriptEnv_UpdateListMenu(FieldScriptEnv *env);
 BOOL FieldScriptEnv_UpdateListMenuEx(FieldScriptEnv *env);
-void func_ov012_02155568(BmpMenuList *list, s32 value, u8 a2);
-void *func_ov012_0215518c(FieldScriptEnv *env);
+void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2);
+void *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
 void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info);
 void *getMapDisplayInfoPtr(FieldScriptEnv *env);
 void SetSpecialMessageIconPtr(FieldScriptEnv *env, void *icon);
-void *func_ov012_021551c0(FieldScriptEnv *env);
+void *GetSpecialMessageIconPtr(FieldScriptEnv *env);
 void *GetFieldScriptActorWk(FieldScriptEnv *env);
 u8 ActorMsgWin_GetPosActual(FieldScriptEnv *env);
 void ActorMsgWin_SetPosActual(FieldScriptEnv *env, u8 pos);
@@ -177,24 +173,6 @@ typedef BOOL (*FieldScriptCommand)(VM *vm, FieldScriptEnv *env);
 
 extern const FieldScriptCommand EVCMD_TABLE[];
 extern const u32 EVCMD_MAX;
-
-struct GlobalScriptEntry {
-    u16 start;
-    u16 end;
-    u16 fileId;
-    u16 msgArcId;
-    u16 msgFileNo;
-};
-
-extern const GlobalScriptEntry GLOBAL_SCRIPT_TABLE[60];
-
-struct OpcodePermissions {
-    u8 level0 : 1;
-    u8 level1 : 1;
-    u8 level2 : 1;
-};
-
-extern const struct OpcodePermissions EVCMD_PERM_TABLE[];
 
 u32 FieldScript_IsVMFeatureSetReduced(u32 featureLevel);
 BOOL FieldScript_CheckSCRID(u16 scriptId);
@@ -233,11 +211,10 @@ BOOL s000D_VMStackSub(VM *vm, FieldScriptEnv *env);
 BOOL s000E_VMStackMul(VM *vm, FieldScriptEnv *env);
 BOOL s000F_VMStackDiv(VM *vm, FieldScriptEnv *env);
 BOOL s0010_VMStackPushFlag(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159c80(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159c90(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159cd8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159cf8(GameSystem **gsysPtr);
-BOOL func_ov012_02159d10(VM *vm, FieldScriptEnv *env);
+BOOL s013C_GameCommTryBoot(VM *vm, FieldScriptEnv *env);
+BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env);
+BOOL s013E_GameCommResume(VM *vm, FieldScriptEnv *env);
+BOOL s024A_FieldSubscreenIsEnabled(VM *vm, FieldScriptEnv *env);
 // scrcmd_phrase_select.c and scrcmd_weather.c
 BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env);
 BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env);
@@ -245,6 +222,15 @@ BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env);
 BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env);
 BOOL s01CA_NDemoEnd(VM *vm, FieldScriptEnv *env);
 BOOL s01CB_NDemoReadyTalkMotion(VM *vm, FieldScriptEnv *env);
+// enceff.c: the count of the trainer IDs of the Pokémon the player didn't catch
+BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env);
+// fldeff_iaigiri.c: the League's lift, the beacon commands, the Pass Power that ran out and its flash
+BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env);
+BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env);
+// fldeff_ochiba.c: the player sinking into a pile of leaves
+BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env);
@@ -291,7 +277,6 @@ BOOL s0013_WorkOr(VM *vm, FieldScriptEnv *env);
 BOOL s0028_WorkSetConst(VM *vm, FieldScriptEnv *env);
 BOOL s0029_WorkGet(VM *vm, FieldScriptEnv *env);
 BOOL s002A_WorkSet(VM *vm, FieldScriptEnv *env);
-extern const u8 VM_CMP_LUT[][3];
 BOOL s001D_RTEndGlobal(VM *vm, FieldScriptEnv *env);
 BOOL s001E_VMJump(VM *vm, FieldScriptEnv *env);
 BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env);
@@ -316,6 +301,8 @@ typedef struct {
 typedef BOOL (*FieldScriptSubEventFinishFunc)(FinishScriptSubEventsWork *work, u32 *state);
 
 extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15];
+// scrcmd_network.c: tries to boot the game's communication again
+BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state);
 // scrcmd_ndemo.c
 BOOL FieldScriptSubEventFinish_NDemo(FinishScriptSubEventsWork *work, u32 *state);
 
@@ -338,7 +325,6 @@ void ScriptWork_SetActorAnmProc(ScriptWork *work, FieldActorAnmProc *proc);
 void ScriptWork_SetStadiumTrainers(ScriptWork *work, void *trainers);
 void *ScriptWork_GetStadiumTrainers(ScriptWork *work);
 void *ScriptWork_GetTrainerState(ScriptWork *work, int index);
-extern u32 g_ActiveFieldScriptSubEvents;
 void FieldScriptSubEvent_ResetAll(void);
 void FieldScriptSubEvent_Register(int id);
 void FieldScriptSubEvent_Unregister(int id);
@@ -390,8 +376,8 @@ BOOL FieldScriptEnv_CheckAcmdQueueRunning(FieldScriptEnv *env);
 GameSystem *ScriptWork_GetGameSystem(ScriptWork *work);
 StrBuf *ScriptWork_GetMainStrBuf(ScriptWork *work);
 StrBuf *ScriptWork_GetAltStrBuf(ScriptWork *work);
-void func_ov012_02153ed0(ScriptWork *work, void *value);
-void *func_ov012_02153ed4(ScriptWork *work);
+void ScriptWork_SetSignFont(ScriptWork *work, void *value);
+void *ScriptWork_GetSignFont(ScriptWork *work);
 FieldActor *ScriptWork_GetParentActor(ScriptWork *work);
 void ScriptWork_SetParentActor(ScriptWork *work, FieldActor *actor);
 // A pointer that a command can keep its own work in while the script waits

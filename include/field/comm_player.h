@@ -51,17 +51,18 @@ struct CommPlayerSys {
     u8 unk90;
 };
 
-CommPlayerSys *func_ov012_021613d0(u8 a0, GameSystem *gsys, HeapID heapId, u8 a3);
-void func_ov012_02161404(GameSystem *gsys, CommPlayerSys *cps);
-void func_ov012_0216144c(GameSystem *gsys, CommPlayerSys *cps);
-void func_ov012_0216148c(CommPlayerSys *cps, int index, u16 a2, const CommPlayerStatus *status);
+CommPlayerSys *CommPlayer_Init(u8 a0, GameSystem *gsys, HeapID heapId, u8 a3);
+void CommPlayer_Exit(GameSystem *gsys, CommPlayerSys *cps);
+void CommPlayer_Update(GameSystem *gsys, CommPlayerSys *cps);
+void CommPlayer_Add(CommPlayerSys *cps, int index, u16 a2, const CommPlayerStatus *status);
 // Takes the actors down before the field closes, and puts them back after
-void func_ov012_02161544(CommPlayerSys *cps);
-void func_ov012_021615a4(CommPlayerSys *cps);
-BOOL func_ov012_0216165c(CommPlayerSys *cps, int index);
-void func_ov012_0216168c(CommPlayerSys *cps, int index, const CommPlayerStatus *status);
+void CommPlayer_HideActors(CommPlayerSys *cps);
+void CommPlayer_RestoreActors(CommPlayerSys *cps);
+BOOL CommPlayer_IsActive(CommPlayerSys *cps, int index);
+void CommPlayer_SetStatus(CommPlayerSys *cps, int index, const CommPlayerStatus *status);
 // The player's own state, and whether it changed since it was last sent
-BOOL func_ov012_021616b0(CommPlayerSys *cps, CommPlayerStatus *status);
-u32 func_ov012_021617e8(CommPlayerSys *cps, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5);
+BOOL CommPlayer_GetMyStatus(CommPlayerSys *cps, CommPlayerStatus *status);
+// Whether another player's actor is at a grid position, with its network ID; *index is where to look from
+BOOL CommPlayer_FindActor(CommPlayerSys *cps, s16 x, s16 y, s16 z, u32 *netId, u32 *index);
 
 #endif // POKEBW2_FIELD_COMM_PLAYER_H

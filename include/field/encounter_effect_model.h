@@ -9,11 +9,11 @@
 // is descriptive, since the overlay embeds no name
 
 // The create functions of the effects, by the model they play. white picks the fade to white that ends the effect
-GameEvent *func_ov149_021f59e0(GameSystem *gsys, Field *field, BOOL white);
-GameEvent *func_ov149_021f59f0(GameSystem *gsys, Field *field, BOOL white);
-GameEvent *func_ov149_021f5a00(GameSystem *gsys, Field *field, BOOL white);
-GameEvent *func_ov149_021f5a10(GameSystem *gsys, Field *field, BOOL white);
-GameEvent *func_ov149_021f5a20(GameSystem *gsys, Field *field, BOOL white);
+GameEvent *EncEffModel_CreateModel7(GameSystem *gsys, Field *field, BOOL white);
+GameEvent *EncEffModel_CreateModel9(GameSystem *gsys, Field *field, BOOL white);
+GameEvent *EncEffModel_CreateModel5(GameSystem *gsys, Field *field, BOOL white);
+GameEvent *EncEffModel_CreateModel3(GameSystem *gsys, Field *field, BOOL white);
+GameEvent *EncEffModel_CreateModel1(GameSystem *gsys, Field *field, BOOL white);
 // Zoroark's, which also plays its sound effect
 GameEvent *EncEffModel_CreateZoroark(GameSystem *gsys, Field *field, BOOL white);
 GameEvent *EncEffModel_Create(GameSystem *gsys, Field *field, u32 modelId, u32 animId, BOOL white);

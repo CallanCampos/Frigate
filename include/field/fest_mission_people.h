@@ -18,7 +18,7 @@ typedef struct {
 extern const FesMissionAnswers FesMissionPeople_Answers[];
 
 // The festival's archive of the missions' data
-ArcTool *func_02014590(LinkFestival *festival);
+ArcTool *LinkFestival_GetArchive(LinkFestival *festival);
 // The highest three bits of a zone's encounter id: which of the game's 6 stages the zone is in
 int GetZoneEncIDHighest3Bits(u16 zoneId);
 

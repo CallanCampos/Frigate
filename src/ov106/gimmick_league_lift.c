@@ -9,9 +9,9 @@ typedef struct {
     u16 heapId;
 } GimmickWork;
 
-void func_ov106_021eedfc(GimmickWork *work, Field *field);
-void func_ov106_021eee50(GimmickWork *work, Field *field);
-void func_ov106_021eee54(GimmickWork *work, Field *field);
+void GimmickLeagueLift_LoadScene(GimmickWork *work, Field *field);
+void GimmickLeagueLift_DummyInit(GimmickWork *work, Field *field);
+void GimmickLeagueLift_DummyEnd(GimmickWork *work, Field *field);
 
 static const G3DSceneAnimationSetup sAnimations01[] = { { 1, 0 } };
 static const G3DSceneAnimationSetup sAnimations03[] = { { 3, 0 }, { 4, 0 } };
@@ -33,30 +33,30 @@ static const VecFx32 sActorPositions[2] = {
     { FX32_CONST(480), FX32_CONST(2), FX32_CONST(1296) },
 };
 
-void func_ov106_021eec80(Field *field) {
+void GimmickLeagueLift_Init(Field *field) {
     u16 heapId;
     GimmickWork *work;
 
     heapId = Field_GetHeapID(field);
     work = Field_AllocGimmickWorkBlock(field, 1, heapId, sizeof(GimmickWork));
     work->heapId = heapId;
-    func_ov106_021eedfc(work, field);
-    func_ov106_021eee50(work, field);
+    GimmickLeagueLift_LoadScene(work, field);
+    GimmickLeagueLift_DummyInit(work, field);
 }
 
-void func_ov106_021eecac(Field *field) {
+void GimmickLeagueLift_End(Field *field) {
     GimmickWork *work;
 
     work = Field_GetGimmickWorkBlock(field, 1);
-    func_ov106_021eee54(work, field);
+    GimmickLeagueLift_DummyEnd(work, field);
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
-void func_ov106_021eecc8(Field *field) {
+void GimmickLeagueLift_Update(Field *field) {
     FieldExpObj_StepAllAnimations(Field_GetExpObjSystem(field));
 }
 
-void func_ov106_021eecd4(Field *field) {
+void GimmickLeagueLift_PlayLiftAnim(Field *field) {
     FieldExpObjSystem *system;
     FieldExpObjAnm *anm;
 
@@ -66,11 +66,11 @@ void func_ov106_021eecd4(Field *field) {
     FieldExpObjAnm_SetLooped(anm, FALSE);
 }
 
-void func_ov106_021eed04(Field *field) {
+void GimmickLeagueLift_StopLiftAnim(Field *field) {
     FieldExpObj_SetAnm(Field_GetExpObjSystem(field), 0, 0, 0, FALSE);
 }
 
-BOOL func_ov106_021eed18(Field *field) {
+BOOL GimmickLeagueLift_IsLiftAnimDone(Field *field) {
     s32 i;
     FieldExpObjSystem *system;
     FieldExpObjAnm *anm;
@@ -85,7 +85,7 @@ BOOL func_ov106_021eed18(Field *field) {
     return TRUE;
 }
 
-void func_ov106_021eed48(Field *field) {
+void GimmickLeagueLift_HideArrivalModel(Field *field) {
     s32 i;
     FieldExpObjSystem *system;
 
@@ -96,7 +96,7 @@ void func_ov106_021eed48(Field *field) {
     }
 }
 
-void func_ov106_021eed78(Field *field) {
+void GimmickLeagueLift_PlayArrivalModel(Field *field) {
     s32 i;
     s32 j;
     FieldExpObjSystem *system;
@@ -113,7 +113,7 @@ void func_ov106_021eed78(Field *field) {
     }
 }
 
-BOOL func_ov106_021eedc8(Field *field) {
+BOOL GimmickLeagueLift_IsArrivalModelDone(Field *field) {
     s32 i;
     FieldExpObjSystem *system;
     FieldExpObjAnm *anm;
@@ -128,7 +128,7 @@ BOOL func_ov106_021eedc8(Field *field) {
     return TRUE;
 }
 
-void func_ov106_021eedfc(GimmickWork *work, Field *field) {
+void GimmickLeagueLift_LoadScene(GimmickWork *work, Field *field) {
     FieldExpObjSystem *system;
     SRTMatrix *matrix;
     s32 i;
@@ -141,12 +141,12 @@ void func_ov106_021eedfc(GimmickWork *work, Field *field) {
         matrix->translation.y = sActorPositions[i].y;
         matrix->translation.z = sActorPositions[i].z;
     }
-    func_ov106_021eed04(field);
-    func_ov106_021eed48(field);
+    GimmickLeagueLift_StopLiftAnim(field);
+    GimmickLeagueLift_HideArrivalModel(field);
 }
 
-void func_ov106_021eee50(GimmickWork *work, Field *field) {
+void GimmickLeagueLift_DummyInit(GimmickWork *work, Field *field) {
 }
 
-void func_ov106_021eee54(GimmickWork *work, Field *field) {
+void GimmickLeagueLift_DummyEnd(GimmickWork *work, Field *field) {
 }

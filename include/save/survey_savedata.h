@@ -24,33 +24,33 @@ typedef struct SurveySave {
 } SurveySave;
 
 // The block's size and its initial state
-u32 func_0200ec00(void);
-void func_0200ec08(SurveySave *survey);
-SurveySave *func_0200ec2c(SaveControl *save);
+u32 SurveySave_GetSize(void);
+void SurveySave_Init(SurveySave *survey);
+SurveySave *SurveySave_Get(SaveControl *save);
 // The player's own answers, which the next two read and write a question's answer of
-u8 *func_0200ec38(SurveySave *survey);
-u32 func_0200ec3c(u8 *answers, u8 question);
-void func_0200ec80(u8 *answers, u8 question, u32 answer);
+u8 *SurveySave_GetOwnAnswers(SurveySave *survey);
+u32 SurveySave_ReadAnswer(u8 *answers, u8 question);
+void SurveySave_WriteAnswer(u8 *answers, u8 question, u32 answer);
 // Sets the survey's question at index, and returns it
-void func_0200ecd8(SurveySave *survey, u8 question, u32 index);
-u8 func_0200ece4(SurveySave *survey, u32 index);
+void SurveySave_SetQuestion(SurveySave *survey, u8 question, u32 index);
+u8 SurveySave_GetQuestion(SurveySave *survey, u32 index);
 // How many people answered a question today, which the second adds to, up to 9999, and before today
-u16 func_0200ecf0(SurveySave *survey, int question);
-void func_0200ecf8(SurveySave *survey, u32 question, u32 count);
-u32 func_0200ed14(SurveySave *survey, int question);
+u16 SurveySave_GetTodayCount(SurveySave *survey, int question);
+void SurveySave_AddTodayCount(SurveySave *survey, u32 question, u32 count);
+u32 SurveySave_GetTotalCount(SurveySave *survey, int question);
 // How many people gave an answer, numbered from 1, today: whether it is full, the count, and adding to it, up to 99
-BOOL func_0200ed34(SurveySave *survey, u16 question, int answer);
-u32 func_0200ed48(SurveySave *survey, u16 question, int answer);
-void func_0200ed64(SurveySave *survey, u16 question, int answer, int count);
+BOOL SurveySave_IsTodayAnswerFull(SurveySave *survey, u16 question, int answer);
+u32 SurveySave_GetTodayAnswerCount(SurveySave *survey, u16 question, int answer);
+void SurveySave_AddTodayAnswerCount(SurveySave *survey, u16 question, int answer, int count);
 // The same count before today
-u32 func_0200ed90(SurveySave *survey, u16 question, int answer);
+u32 SurveySave_GetTotalAnswerCount(SurveySave *survey, u16 question, int answer);
 // Adds today's counts to the totals and clears them
-void func_0200edb0(SurveySave *survey);
+void SurveySave_FinishDay(SurveySave *survey);
 
 // The table of the questions, of a file that is not written yet: how many bits a question's answer takes, the index
 // of its first answer in the answer counts, and the first bit of the player's answer
-u8 func_02011450(u8 question);
-u8 func_02011464(u8 question);
-u8 func_02011478(u8 question);
+u8 SurveyQuestion_GetBitCount(u8 question);
+u8 SurveyQuestion_GetFirstAnswer(u8 question);
+u8 SurveyQuestion_GetFirstBit(u8 question);
 
 #endif // POKEBW2_SAVE_SURVEY_SAVEDATA_H

@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/wf2dmap/wifi_2dchar.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -251,14 +252,14 @@ WF_2DCWK *WF_2DC_WkAdd(WF_2DCSYS *sys, const WF_2DC_WKDATA *data, u32 charaId, u
     setup.sequence = 0;
     setup.priority = data->priority;
     setup.bgPriority = data->bgPriority;
-    wk->actor = func_0204c040(sys->unit, sys->res[charNo].chars, sys->res[charNo].palette,
-                              sys->anmRes[charNo].cellAnims, &setup, 0, heapId);
-    func_0204c468(wk->actor, (u8)data->bgPriority);
+    wk->actor = ClActor_Create(sys->unit, sys->res[charNo].chars, sys->res[charNo].palette,
+                               sys->anmRes[charNo].cellAnims, &setup, 0, heapId);
+    ClActor_SetBgPriority(wk->actor, (u8)data->bgPriority);
 
     if (sys->res[charNo].moveType == WF_2DC_MOVENORMAL) {
-        func_0204c504(wk->actor, 6);
+        ClActor_SetAnimFrame(wk->actor, 6);
     } else {
-        func_0204c504(wk->actor, 1);
+        ClActor_SetAnimFrame(wk->actor, 1);
     }
 
     wk->anmType = WF_2DC_ANMNONE;
@@ -272,9 +273,9 @@ WF_2DCWK *WF_2DC_WkAdd(WF_2DCSYS *sys, const WF_2DC_WKDATA *data, u32 charaId, u
         setup.sequence = 0;
         setup.priority = sys->shadowPriority;
         setup.bgPriority = 0;
-        wk->shadow = func_0204c040(sys->unit, sys->shadowRes.chars, sys->shadowRes.palette, sys->shadowRes.cellAnims,
-                                   &setup, 0, heapId);
-        func_0204c468(wk->shadow, (u8)data->bgPriority);
+        wk->shadow = ClActor_Create(sys->unit, sys->shadowRes.chars, sys->shadowRes.palette, sys->shadowRes.cellAnims,
+                                    &setup, 0, heapId);
+        ClActor_SetBgPriority(wk->shadow, (u8)data->bgPriority);
     } else {
         wk->shadow = NULL;
     }
@@ -283,9 +284,9 @@ WF_2DCWK *WF_2DC_WkAdd(WF_2DCSYS *sys, const WF_2DC_WKDATA *data, u32 charaId, u
 
 void WF_2DC_WkDel(WF_2DCWK *wk) {
     if (wk->shadow != NULL) {
-        func_0204c108(wk->shadow);
+        ClActor_Delete(wk->shadow);
     }
-    func_0204c108(wk->actor);
+    ClActor_Delete(wk->actor);
     MI_CpuFill8(wk, 0, sizeof(WF_2DCWK));
 }
 
@@ -294,37 +295,37 @@ void WF_2DC_WkMatrixSet(WF_2DCWK *wk, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c210(wk->actor, &pos);
+    ClActor_SetPos(wk->actor, &pos);
     if (wk->shadow != NULL) {
         pos.x += WF_2DC_SHADOW_OFS_X;
         pos.y += WF_2DC_SHADOW_OFS_Y;
-        func_0204c210(wk->shadow, &pos);
+        ClActor_SetPos(wk->shadow, &pos);
     }
 }
 
 void WF_2DC_WkDrawPriSet(WF_2DCWK *wk, u16 priority) {
-    func_0204c438(wk->actor, priority);
+    ClActor_SetPriority(wk->actor, priority);
 }
 
 u32 WF_2DC_WkDrawPriGet(const WF_2DCWK *wk) {
-    return func_0204c45c(wk->actor);
+    return ClActor_GetPriority(wk->actor);
 }
 
 void WF_2DC_WkDrawFlagSet(WF_2DCWK *wk, BOOL flag) {
-    func_0204c124(wk->actor, flag);
+    ClActor_SetVisible(wk->actor, flag);
     if (wk->shadow != NULL) {
-        func_0204c124(wk->shadow, flag);
+        ClActor_SetVisible(wk->shadow, flag);
     }
 }
 
 void WF_2DC_WkShadowDrawFlagSet(WF_2DCWK *wk, BOOL flag) {
     if (wk->shadow != NULL) {
-        func_0204c124(wk->shadow, flag);
+        ClActor_SetVisible(wk->shadow, flag);
     }
 }
 
 BOOL WF_2DC_WkDrawFlagGet(const WF_2DCWK *wk) {
-    return func_0204c138(wk->actor);
+    return ClActor_IsVisible(wk->actor);
 }
 
 u32 WF_2DC_WkMoveTypeGet(const WF_2DCWK *wk) {
@@ -336,11 +337,11 @@ u32 WF_2DC_WkAnmTypeGet(const WF_2DCWK *wk) {
 }
 
 void WF_2DC_WkAnmFrameSet(WF_2DCWK *wk, u16 frame) {
-    func_0204c504(wk->actor, frame);
+    ClActor_SetAnimFrame(wk->actor, frame);
 }
 
 u16 WF_2DC_WkAnmFrameGet(const WF_2DCWK *wk) {
-    return func_0204c510(wk->actor);
+    return ClActor_GetAnimFrame(wk->actor);
 }
 
 void WF_2DC_WkShadowMatrixSet(WF_2DCWK *wk, s16 x, s16 y) {
@@ -349,7 +350,7 @@ void WF_2DC_WkShadowMatrixSet(WF_2DCWK *wk, s16 x, s16 y) {
     if (wk->shadow != NULL) {
         pos.x = x + WF_2DC_SHADOW_OFS_X;
         pos.y = y + WF_2DC_SHADOW_OFS_Y;
-        func_0204c210(wk->shadow, &pos);
+        ClActor_SetPos(wk->shadow, &pos);
     }
 }
 
@@ -380,7 +381,8 @@ static void WF_2DC_AnmResLoad(WF_2DCSYS *sys, u32 unused, u32 heapId) {
     int i;
 
     for (i = WF_2DC_CHARA_HERO; i < WF_2DC_CHARA_NUM; i++) {
-        sys->anmRes[i].cellAnims = func_0204bde0(sys->handles[0], WF_2DC_ARC_ANM(i), WF_2DC_ARC_ANM(i) + 1, heapId);
+        sys->anmRes[i].cellAnims =
+            ClActSys_LoadCellAnims(sys->handles[0], WF_2DC_ARC_ANM(i), WF_2DC_ARC_ANM(i) + 1, heapId);
     }
 }
 
@@ -388,7 +390,7 @@ static void WF_2DC_AnmResDel(WF_2DCSYS *sys, u32 unused) {
     int i;
 
     for (i = WF_2DC_CHARA_HERO; i < WF_2DC_CHARA_NUM; i++) {
-        func_0204be64(sys->anmRes[i].cellAnims);
+        ClActSys_FreeCellAnims(sys->anmRes[i].cellAnims);
         sys->anmRes[i].cellAnims = 0;
     }
 }
@@ -410,15 +412,17 @@ static void WF_2DC_CharResLoad(WF_2DCSYS *sys, u32 charaId, u32 vramType, u32 mo
 }
 
 static void WF_2DC_CharResLoadNormal(WF_2DCSYS *sys, u32 charaId, u32 vramType, u32 moveType, u32 heapId) {
-    sys->res[charaId].chars = func_0204b81c(sys->handles[0], WF_2DC_ARC_CHAR(charaId), FALSE, vramType, heapId);
-    sys->res[charaId].palette = func_0204bbb8(sys->handles[0], WF_2DC_ARC_PLTT(charaId), vramType, 0x100, 0, 2, heapId);
+    sys->res[charaId].chars = ClActSys_LoadChars(sys->handles[0], WF_2DC_ARC_CHAR(charaId), FALSE, vramType, heapId);
+    sys->res[charaId].palette =
+        ClActSys_LoadPlttRange(sys->handles[0], WF_2DC_ARC_PLTT(charaId), vramType, 0x100, 0, 2, heapId);
     sys->res[charaId].vramType = vramType;
     sys->res[charaId].moveType = moveType;
     sys->res[charaId].unionChara = FALSE;
 }
 
 static void WF_2DC_CharResLoadUnion(WF_2DCSYS *sys, u32 charaId, u32 vramType, u32 moveType, u32 heapId) {
-    sys->res[charaId].chars = func_0204b81c(sys->handles[1], WF_2DC_ARC_UNIONCHAR(charaId), FALSE, vramType, heapId);
+    sys->res[charaId].chars =
+        ClActSys_LoadChars(sys->handles[1], WF_2DC_ARC_UNIONCHAR(charaId), FALSE, vramType, heapId);
     sys->res[charaId].palette = sys->unionPltt;
     sys->res[charaId].vramType = vramType;
     sys->res[charaId].moveType = moveType;
@@ -434,14 +438,14 @@ static void WF_2DC_CharResDel(WF_2DCSYS *sys, u32 charaId) {
 }
 
 static void WF_2DC_CharResDelNormal(WF_2DCSYS *sys, u32 charaId) {
-    func_0204b98c(sys->res[charaId].chars);
-    func_0204bcd0(sys->res[charaId].palette);
+    ClActSys_FreeChars(sys->res[charaId].chars);
+    ClActSys_FreePltt(sys->res[charaId].palette);
     sys->res[charaId].chars = WF_2DC_RES_NONE;
     sys->res[charaId].palette = WF_2DC_RES_NONE;
 }
 
 static void WF_2DC_CharResDelUnion(WF_2DCSYS *sys, u32 charaId) {
-    func_0204b98c(sys->res[charaId].chars);
+    ClActSys_FreeChars(sys->res[charaId].chars);
     sys->res[charaId].chars = WF_2DC_RES_NONE;
 }
 
@@ -459,18 +463,20 @@ static void WF_2DC_ShResLoad(WF_2DCSYS *sys, u32 vramType, u32 heapId) {
         sys->shadowChara = WF_2DC_CHARA_HEROINE;
     }
 
-    sys->shadowRes.cellAnims = func_0204bde0(sys->handles[0], WF_2DC_ARC_SHADOW_CELL, WF_2DC_ARC_SHADOW_ANM, heapId);
-    sys->shadowRes.chars = func_0204b81c(sys->handles[0], WF_2DC_ARC_SHADOW_CHAR, FALSE, vramType, heapId);
-    sys->shadowRes.palette = func_0204bbb8(sys->handles[0], WF_2DC_ARC_SHADOW_PLTT, vramType, 0x140, 0, 1, heapId);
+    sys->shadowRes.cellAnims =
+        ClActSys_LoadCellAnims(sys->handles[0], WF_2DC_ARC_SHADOW_CELL, WF_2DC_ARC_SHADOW_ANM, heapId);
+    sys->shadowRes.chars = ClActSys_LoadChars(sys->handles[0], WF_2DC_ARC_SHADOW_CHAR, FALSE, vramType, heapId);
+    sys->shadowRes.palette =
+        ClActSys_LoadPlttRange(sys->handles[0], WF_2DC_ARC_SHADOW_PLTT, vramType, 0x140, 0, 1, heapId);
 }
 
 static void WF_2DC_ShResDel(WF_2DCSYS *sys) {
     if (WF_2DC_ShResCheck(&sys->shadowRes) == TRUE) {
-        func_0204b98c(sys->shadowRes.chars);
+        ClActSys_FreeChars(sys->shadowRes.chars);
         sys->shadowRes.chars = WF_2DC_RES_NONE;
-        func_0204bcd0(sys->shadowRes.palette);
+        ClActSys_FreePltt(sys->shadowRes.palette);
         sys->shadowRes.palette = WF_2DC_RES_NONE;
-        func_0204be64(sys->shadowRes.cellAnims);
+        ClActSys_FreeCellAnims(sys->shadowRes.cellAnims);
         sys->shadowRes.cellAnims = WF_2DC_RES_NONE;
     }
 }
@@ -483,12 +489,12 @@ static BOOL WF_2DC_ShResCheck(const WF_2DCSHRES *res) {
 }
 
 static void WF_2DC_UnionPlttLoad(WF_2DCSYS *sys, u32 vramType, u32 plttOffset, u32 heapId) {
-    sys->unionPltt =
-        func_0204bbb8(sys->handles[1], WF_2DC_ARC_UNIONPLTT, vramType, plttOffset, 0, WF_2DC_UNIONPLTT_NUM, heapId);
+    sys->unionPltt = ClActSys_LoadPlttRange(sys->handles[1], WF_2DC_ARC_UNIONPLTT, vramType, plttOffset, 0,
+                                            WF_2DC_UNIONPLTT_NUM, heapId);
 }
 
 static void WF_2DC_UnionPlttDel(WF_2DCSYS *sys) {
-    func_0204bcd0(sys->unionPltt);
+    ClActSys_FreePltt(sys->unionPltt);
     sys->unionPltt = WF_2DC_RES_NONE;
 }
 
@@ -497,7 +503,7 @@ static void WF_2DC_UnionAnmResLoad(WF_2DCSYS *sys, u32 heapId) {
 
     for (i = 0; i < WF_2DC_UNIONCHARA_NUM; i++) {
         sys->anmRes[i].cellAnims =
-            func_0204bde0(sys->handles[1], WF_2DC_ARC_UNIONCELL(i), WF_2DC_ARC_UNIONANM(i), heapId);
+            ClActSys_LoadCellAnims(sys->handles[1], WF_2DC_ARC_UNIONCELL(i), WF_2DC_ARC_UNIONANM(i), heapId);
     }
 }
 
@@ -505,7 +511,7 @@ static void WF_2DC_UnionAnmResDel(WF_2DCSYS *sys) {
     int i;
 
     for (i = 0; i < WF_2DC_UNIONCHARA_NUM; i++) {
-        func_0204be64(sys->anmRes[i].cellAnims);
+        ClActSys_FreeCellAnims(sys->anmRes[i].cellAnims);
         sys->anmRes[i].cellAnims = WF_2DC_RES_NONE;
     }
 }
@@ -529,85 +535,85 @@ static void WF_2DC_WkPatAnmUpdate(WF_2DCWK *wk) {
 
 static void WF_2DC_WkPatAnmWayInit(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way);
+    ClActor_ChangeSequence(wk->actor, way);
 }
 
 static void WF_2DC_WkPatAnmRotaInit(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, 4);
+    ClActor_ChangeSequence(wk->actor, 4);
 }
 
 static void WF_2DC_WkPatAnmWalkInit(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way + 5);
+    ClActor_ChangeSequence(wk->actor, way + 5);
 }
 
 // Finishes in the way the character faced
 static void WF_2DC_WkPatAnmTurnInit(WF_2DCWK *wk, u32 way) {
-    func_0204c4b8(wk->actor, wk->way + 5);
+    ClActor_ChangeSequence(wk->actor, wk->way + 5);
     wk->way = way;
 }
 
 static void WF_2DC_WkPatAnmRunInit(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way + 9);
+    ClActor_ChangeSequence(wk->actor, way + 9);
 }
 
 static void WF_2DC_WkPatAnmWallWalkInit(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way + 5);
+    ClActor_ChangeSequence(wk->actor, way + 5);
 }
 
 static void WF_2DC_WkPatAnmSlowWalkInit(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way + 5);
+    ClActor_ChangeSequence(wk->actor, way + 5);
 }
 
 static void WF_2DC_WkPatAnmHighWalk2Init(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way + 5);
+    ClActor_ChangeSequence(wk->actor, way + 5);
 }
 
 static void WF_2DC_WkPatAnmHighWalk4Init(WF_2DCWK *wk, u32 way) {
     wk->way = way;
-    func_0204c4b8(wk->actor, way + 5);
+    ClActor_ChangeSequence(wk->actor, way + 5);
 }
 
 static void WF_2DC_WkPatAnmRotaMain(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, 2 * FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, 2 * FX32_ONE);
 }
 
 static void WF_2DC_WkPatAnmWalkMain(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, 2 * FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, 2 * FX32_ONE);
 }
 
 // Turns to the new way after the first frame
 static void WF_2DC_WkPatAnmTurnMain(WF_2DCWK *wk) {
     if (wk->frame == 0) {
-        func_0204c4e0(wk->actor, 1);
+        ClActor_SetAnimSpeed(wk->actor, 1);
     } else {
-        func_0204c488(wk->actor, wk->way + 5);
+        ClActor_SetSequence(wk->actor, wk->way + 5);
     }
 }
 
 static void WF_2DC_WkPatAnmRunMain(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, 2 * FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, 2 * FX32_ONE);
 }
 
 static void WF_2DC_WkPatAnmWallWalkMain(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, FX32_ONE);
 }
 
 static void WF_2DC_WkPatAnmSlowWalkMain(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, FX32_ONE);
 }
 
 static void WF_2DC_WkPatAnmHighWalk2Main(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, 8 * FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, 8 * FX32_ONE);
 }
 
 static void WF_2DC_WkPatAnmHighWalk4Main(WF_2DCWK *wk) {
-    func_0204c4e0(wk->actor, 6 * FX32_ONE);
+    ClActor_SetAnimSpeed(wk->actor, 6 * FX32_ONE);
 }
 
 static BOOL WF_2DC_WkCleanCheck(const WF_2DCWK *wk) {

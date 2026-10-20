@@ -38,21 +38,21 @@ typedef struct {
     InfinityDungeonGridPos stack[INFINITY_DUNGEON_WALK_DEPTH];
 } InfinityDungeonWalk;
 
-static void func_ov127_021f0c54(u8 *array, int count, MATHRandContext32 *rand);
-static const u8 *func_ov127_021f0d88(u16 rank, u8 floor, u8 version);
-static u8 func_ov127_021f1308(u32 rank, u8 floor, u8 version, u8 *types);
-static u8 func_ov127_021f1348(u32 rank, u8 floor, u8 version, u8 *types);
-static int func_ov127_021f1388(InfinityDungeonRoom *rooms, int *list, int width, int height);
-static InfinityDungeonRoom *func_ov127_021f13e8(const InfinityDungeonGridPos *pos, InfinityDungeonRoom *rooms);
-static const InfinityDungeonRoom *func_ov127_021f13f8(const InfinityDungeonGridPos *pos,
-                                                      const InfinityDungeonRoom *rooms);
-static void func_ov127_021f1408(u8 direction, InfinityDungeonWalk *walk, InfinityDungeonRoom *rooms);
-static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms, int *directions,
-                               int width, int height, BOOL allowVisited);
-static BOOL func_ov127_021f15d8(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms);
-static void func_ov127_021f15f8(InfinityDungeonWalk *walk, const InfinityDungeonGridPos *pos);
-static void func_ov127_021f160c(InfinityDungeonWalk *walk);
-static BOOL func_ov127_021f1634(const InfinityDungeonRoom *rooms, int width, int height);
+static void InfinityDungeon_ShuffleU8(u8 *array, int count, MATHRandContext32 *rand);
+static const u8 *InfinityDungeon_GetRoomCounts(u16 rank, u8 floor, u8 version);
+static u8 InfinityDungeon_ListRoomTypes(u32 rank, u8 floor, u8 version, u8 *types);
+static u8 InfinityDungeon_ListGoalRoomTypes(u32 rank, u8 floor, u8 version, u8 *types);
+static int InfinityDungeon_ListGoalCandidates(InfinityDungeonRoom *rooms, int *list, int width, int height);
+static InfinityDungeonRoom *InfinityDungeon_GetGridRoom(const InfinityDungeonGridPos *pos, InfinityDungeonRoom *rooms);
+static const InfinityDungeonRoom *InfinityDungeon_GetGridRoomConst(const InfinityDungeonGridPos *pos,
+                                                                   const InfinityDungeonRoom *rooms);
+static void InfinityDungeonWalk_Dig(u8 direction, InfinityDungeonWalk *walk, InfinityDungeonRoom *rooms);
+static int InfinityDungeonWalk_GetDirections(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms,
+                                             int *directions, int width, int height, BOOL allowVisited);
+static BOOL InfinityDungeon_IsRoomUndug(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms);
+static void InfinityDungeonWalk_Push(InfinityDungeonWalk *walk, const InfinityDungeonGridPos *pos);
+static void InfinityDungeonWalk_Pop(InfinityDungeonWalk *walk);
+static BOOL InfinityDungeon_AreAllRoomsDug(const InfinityDungeonRoom *rooms, int width, int height);
 
 static const u8 sIvs[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -1206,7 +1206,7 @@ const InfinityDungeonTrainer *InfinityDungeon_GetTrainer(u16 trainer) {
     return &sTrainers[trainer];
 }
 
-u8 func_ov127_021f0a90(u16 trainer) {
+u8 InfinityDungeon_GetTrainerClass(u16 trainer) {
     return sTrainers[trainer].trainerClass;
 }
 
@@ -1222,47 +1222,47 @@ void InfinityDungeon_GetFloorSize(u32 rank, u32 *width, u32 *height) {
     *height = sSizes[rank].height;
 }
 
-const u16 *func_ov127_021f0acc(u8 version) {
+const u16 *InfinityDungeon_GetRoomZones(u8 version) {
     if (version == VERSION_BLACK2) {
         return sBlack2Zones;
     }
     return sWhite2Zones;
 }
 
-const InfinityDungeonPos *func_ov127_021f0ae0(u8 version) {
+const InfinityDungeonPos *InfinityDungeon_GetFloorPos(u8 version) {
     if (version == VERSION_BLACK2) {
         return &sPos2c2c;
     }
     return &sPos2c20;
 }
 
-const InfinityDungeonPos *func_ov127_021f0af4(u32 index) {
+const InfinityDungeonPos *InfinityDungeon_GetArrivalPos(u32 index) {
     return &sPos2c38[index];
 }
 
-const InfinityDungeonPos *func_ov127_021f0b04(u8 version, u8 kind, u16 direction) {
+const InfinityDungeonPos *InfinityDungeon_GetRoomEntryPos(u8 version, u8 kind, u16 direction) {
     if (version == VERSION_BLACK2) {
         return &sPosBlack2A[kind][direction];
     }
     return &sPosWhite2A[kind][direction];
 }
 
-const InfinityDungeonPos *func_ov127_021f0b30(u8 version, u8 kind, u8 index) {
+const InfinityDungeonPos *InfinityDungeon_GetTrainerPos(u8 version, u8 kind, u8 index) {
     if (version == VERSION_BLACK2) {
         return &sPosBlack2B[kind][index];
     }
     return &sPosWhite2B[kind][index];
 }
 
-const InfinityDungeonLevelRange *func_ov127_021f0b5c(u16 mode) {
+const InfinityDungeonLevelRange *InfinityDungeon_GetLevelRange(u16 mode) {
     return &sLevelRanges[mode];
 }
 
-u8 func_ov127_021f0b68(u16 mode) {
+u8 InfinityDungeon_GetIvs(u16 mode) {
     return sIvs[mode];
 }
 
-const u8 *func_ov127_021f0b74(u16 rank, u8 version) {
+const u8 *InfinityDungeon_GetTrainerClassShares(u16 rank, u8 version) {
     if (version == VERSION_BLACK2) {
         return sTrainerClassSharesBlack2[rank];
     }
@@ -1272,7 +1272,7 @@ const u8 *func_ov127_021f0b74(u16 rank, u8 version) {
 u32 InfinityDungeon_GetNpcScriptIndex(InfinityDungeon *dungeon, u32 objCode, u8 floor, u8 slot) {
     int i;
 
-    if (!func_ov127_021f0db4(dungeon, floor, slot)) {
+    if (!InfinityDungeon_IsTargetSlot(dungeon, floor, slot)) {
         for (i = 0; i < 30; i++) {
             if (objCode == sObjScripts[i].objCode) {
                 return sObjScripts[i].scriptIndex;
@@ -1284,7 +1284,7 @@ u32 InfinityDungeon_GetNpcScriptIndex(InfinityDungeon *dungeon, u32 objCode, u8 
     return 0;
 }
 
-u8 func_ov127_021f0bd0(u32 objCode) {
+u8 InfinityDungeon_GetNpcIndex(u32 objCode) {
     int i;
 
     for (i = 0; i < 30; i++) {
@@ -1295,7 +1295,7 @@ u8 func_ov127_021f0bd0(u32 objCode) {
     return 0;
 }
 
-void func_ov127_021f0bfc(u32 *array, int count, InfinityDungeonRandom *rnd) {
+void InfinityDungeon_ShuffleU32(u32 *array, int count, InfinityDungeonRandom *rnd) {
     int i;
 
     for (i = 0; i < count; i++) {
@@ -1307,7 +1307,7 @@ void func_ov127_021f0bfc(u32 *array, int count, InfinityDungeonRandom *rnd) {
     }
 }
 
-static void func_ov127_021f0c54(u8 *array, int count, MATHRandContext32 *rand) {
+static void InfinityDungeon_ShuffleU8(u8 *array, int count, MATHRandContext32 *rand) {
     int i;
 
     for (i = 0; i < count; i++) {
@@ -1319,7 +1319,7 @@ static void func_ov127_021f0c54(u8 *array, int count, MATHRandContext32 *rand) {
     }
 }
 
-void func_ov127_021f0ca8(u16 *array, int count, InfinityDungeonRandom *rnd) {
+void InfinityDungeon_ShuffleU16(u16 *array, int count, InfinityDungeonRandom *rnd) {
     int i;
 
     for (i = 0; i < count; i++) {
@@ -1348,25 +1348,25 @@ void InfinityDungeon_Seed(InfinityDungeon *dungeon, s32 seed) {
     }
 }
 
-static const u8 *func_ov127_021f0d88(u16 rank, u8 floor, u8 version) {
+static const u8 *InfinityDungeon_GetRoomCounts(u16 rank, u8 floor, u8 version) {
     if (version == VERSION_BLACK2) {
         return sRoomCountsBlack2[rank][floor];
     }
     return sRoomCountsWhite2[rank][floor];
 }
 
-u16 func_ov127_021f0db4(InfinityDungeon *dungeon, u8 floor, u8 slot) {
+u16 InfinityDungeon_IsTargetSlot(InfinityDungeon *dungeon, u8 floor, u8 slot) {
     if (dungeon->targetSlot == slot && dungeon->targetFloor == floor) {
         return 1;
     }
     return 0;
 }
 
-u8 func_ov127_021f0dd8(InfinityDungeon *dungeon) {
+u8 InfinityDungeon_GetVersion(InfinityDungeon *dungeon) {
     return dungeon->version;
 }
 
-u32 func_ov127_021f0de4(InfinityDungeon *dungeon, u32 floor, int slot) {
+u32 InfinityDungeon_GetSlotRoom(InfinityDungeon *dungeon, u32 floor, int slot) {
     int i;
     int total = 0;
 
@@ -1450,7 +1450,7 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, 
         InfinityDungeonRoom *goalRooms = dungeon->floors[goalFloor].rooms;
         InfinityDungeonRoom *room;
 
-        count = func_ov127_021f1388(goalRooms, rooms, width, height);
+        count = InfinityDungeon_ListGoalCandidates(goalRooms, rooms, width, height);
         goalRoom = rooms[MATH_Rand32(&rand, count)];
         room = &goalRooms[goalRoom];
         room->kind = 1;
@@ -1465,29 +1465,29 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, 
         walk.cur = starts[floor];
         walk.top = -1;
         for (i = 0; i < INFINITY_DUNGEON_WALK_DEPTH; i++) {
-            count = func_ov127_021f14c0(&walk.cur, floorRooms, directions, width, height, FALSE);
+            count = InfinityDungeonWalk_GetDirections(&walk.cur, floorRooms, directions, width, height, FALSE);
             if (count > 0) {
-                func_ov127_021f1408(directions[(u8)MATH_Rand32(&rand, count)], &walk, floorRooms);
+                InfinityDungeonWalk_Dig(directions[(u8)MATH_Rand32(&rand, count)], &walk, floorRooms);
             } else {
-                func_ov127_021f160c(&walk);
-                if (func_ov127_021f1634(floorRooms, width, height) == TRUE) {
+                InfinityDungeonWalk_Pop(&walk);
+                if (InfinityDungeon_AreAllRoomsDug(floorRooms, width, height) == TRUE) {
                     break;
                 }
             }
         }
         if (goalFloor == floor) {
             walk.cur = goal;
-            func_ov127_021f1408(1, &walk, floorRooms);
+            InfinityDungeonWalk_Dig(1, &walk, floorRooms);
         }
 
         extraWalk.top = -1;
         for (pos.y = 0; pos.y < height; pos.y++) {
             for (pos.x = 0; pos.x < width; pos.x++) {
                 extraWalk.cur = pos;
-                kind = func_ov127_021f13e8(&pos, floorRooms)->kind;
+                kind = InfinityDungeon_GetGridRoom(&pos, floorRooms)->kind;
                 if (kind != 0 && kind != 1) {
-                    count = func_ov127_021f14c0(&pos, floorRooms, extraDirections, width, height, TRUE);
-                    func_ov127_021f1408(extraDirections[(u8)MATH_Rand32(&rand, count)], &extraWalk, floorRooms);
+                    count = InfinityDungeonWalk_GetDirections(&pos, floorRooms, extraDirections, width, height, TRUE);
+                    InfinityDungeonWalk_Dig(extraDirections[(u8)MATH_Rand32(&rand, count)], &extraWalk, floorRooms);
                 }
             }
         }
@@ -1496,8 +1496,8 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, 
     for (i = 0; i < floorCount; i++) {
         int placed = 0;
 
-        count = func_ov127_021f1308(rank, i, dungeon->version, types);
-        func_ov127_021f0c54(types, count, &rand);
+        count = InfinityDungeon_ListRoomTypes(rank, i, dungeon->version, types);
+        InfinityDungeon_ShuffleU8(types, count, &rand);
         for (j = 0; j < INFINITY_DUNGEON_ROOM_COUNT; j++) {
             if (dungeon->floors[i].rooms[j].kind == 4) {
                 int x = j % INFINITY_DUNGEON_GRID_WIDTH;
@@ -1508,7 +1508,7 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, 
                         const InfinityDungeonRoomTemplate *roomTemplate;
                         u8 type;
 
-                        count = func_ov127_021f1348(rank, i, dungeon->version, goalTypes);
+                        count = InfinityDungeon_ListGoalRoomTypes(rank, i, dungeon->version, goalTypes);
                         type = goalTypes[MATH_Rand32(&rand, count)];
                         roomTemplate = InfinityDungeon_GetRoomTemplate(type);
                         dungeon->floors[i].rooms[j].type = type;
@@ -1530,9 +1530,9 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, 
     }
 }
 
-static u8 func_ov127_021f1308(u32 rank, u8 floor, u8 version, u8 *types) {
+static u8 InfinityDungeon_ListRoomTypes(u32 rank, u8 floor, u8 version, u8 *types) {
     int count = 0;
-    const u8 *counts = func_ov127_021f0d88(rank, floor, version);
+    const u8 *counts = InfinityDungeon_GetRoomCounts(rank, floor, version);
     int i;
 
     MI_CpuFill8(types, INFINITY_DUNGEON_ROOM_TYPE_NONE, INFINITY_DUNGEON_ROOM_COUNT);
@@ -1548,9 +1548,9 @@ static u8 func_ov127_021f1308(u32 rank, u8 floor, u8 version, u8 *types) {
     return count;
 }
 
-static u8 func_ov127_021f1348(u32 rank, u8 floor, u8 version, u8 *types) {
+static u8 InfinityDungeon_ListGoalRoomTypes(u32 rank, u8 floor, u8 version, u8 *types) {
     int count = 0;
-    const u8 *counts = func_ov127_021f0d88(rank, floor, version);
+    const u8 *counts = InfinityDungeon_GetRoomCounts(rank, floor, version);
     int i;
 
     MI_CpuFill8(types, INFINITY_DUNGEON_ROOM_TYPE_NONE, INFINITY_DUNGEON_ROOM_COUNT);
@@ -1563,7 +1563,7 @@ static u8 func_ov127_021f1348(u32 rank, u8 floor, u8 version, u8 *types) {
 }
 
 // The rooms of the floor but its last row that have been set apart, by their number
-static int func_ov127_021f1388(InfinityDungeonRoom *rooms, int *list, int width, int height) {
+static int InfinityDungeon_ListGoalCandidates(InfinityDungeonRoom *rooms, int *list, int width, int height) {
     int count = 0;
     int x;
     int y;
@@ -1574,7 +1574,7 @@ static int func_ov127_021f1388(InfinityDungeonRoom *rooms, int *list, int width,
         for (x = 0; x < width; x++) {
             pos.x = x;
             pos.y = y;
-            if (func_ov127_021f13e8(&pos, rooms)->kind != 0) {
+            if (InfinityDungeon_GetGridRoom(&pos, rooms)->kind != 0) {
                 list[count] = x + y * INFINITY_DUNGEON_GRID_WIDTH;
                 count++;
             }
@@ -1583,48 +1583,48 @@ static int func_ov127_021f1388(InfinityDungeonRoom *rooms, int *list, int width,
     return count;
 }
 
-static InfinityDungeonRoom *func_ov127_021f13e8(const InfinityDungeonGridPos *pos, InfinityDungeonRoom *rooms) {
+static InfinityDungeonRoom *InfinityDungeon_GetGridRoom(const InfinityDungeonGridPos *pos, InfinityDungeonRoom *rooms) {
     return &rooms[pos->x + pos->y * INFINITY_DUNGEON_GRID_WIDTH];
 }
 
-static const InfinityDungeonRoom *func_ov127_021f13f8(const InfinityDungeonGridPos *pos,
-                                                      const InfinityDungeonRoom *rooms) {
+static const InfinityDungeonRoom *InfinityDungeon_GetGridRoomConst(const InfinityDungeonGridPos *pos,
+                                                                   const InfinityDungeonRoom *rooms) {
     return &rooms[pos->x + pos->y * INFINITY_DUNGEON_GRID_WIDTH];
 }
 
 // Opens a passage from the walk's room in the direction (up, down, left or right) and moves into the room beyond
-static void func_ov127_021f1408(u8 direction, InfinityDungeonWalk *walk, InfinityDungeonRoom *rooms) {
+static void InfinityDungeonWalk_Dig(u8 direction, InfinityDungeonWalk *walk, InfinityDungeonRoom *rooms) {
     switch (direction) {
     case 0:
-        func_ov127_021f13e8(&walk->cur, rooms)->open[0] = 1;
-        func_ov127_021f15f8(walk, &walk->cur);
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[0] = 1;
+        InfinityDungeonWalk_Push(walk, &walk->cur);
         walk->cur.y--;
-        func_ov127_021f13e8(&walk->cur, rooms)->open[1] = 1;
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[1] = 1;
         break;
     case 1:
-        func_ov127_021f13e8(&walk->cur, rooms)->open[1] = 1;
-        func_ov127_021f15f8(walk, &walk->cur);
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[1] = 1;
+        InfinityDungeonWalk_Push(walk, &walk->cur);
         walk->cur.y++;
-        func_ov127_021f13e8(&walk->cur, rooms)->open[0] = 1;
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[0] = 1;
         break;
     case 3:
-        func_ov127_021f13e8(&walk->cur, rooms)->open[3] = 1;
-        func_ov127_021f15f8(walk, &walk->cur);
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[3] = 1;
+        InfinityDungeonWalk_Push(walk, &walk->cur);
         walk->cur.x--;
-        func_ov127_021f13e8(&walk->cur, rooms)->open[2] = 1;
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[2] = 1;
         break;
     case 2:
-        func_ov127_021f13e8(&walk->cur, rooms)->open[2] = 1;
-        func_ov127_021f15f8(walk, &walk->cur);
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[2] = 1;
+        InfinityDungeonWalk_Push(walk, &walk->cur);
         walk->cur.x++;
-        func_ov127_021f13e8(&walk->cur, rooms)->open[3] = 1;
+        InfinityDungeon_GetGridRoom(&walk->cur, rooms)->open[3] = 1;
         break;
     }
 }
 
 // The directions that the walk can dig into from a room, which are rooms nobody has dug into yet unless allowVisited
-static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms, int *directions,
-                               int width, int height, BOOL allowVisited) {
+static int InfinityDungeonWalk_GetDirections(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms,
+                                             int *directions, int width, int height, BOOL allowVisited) {
     int count = 0;
     InfinityDungeonGridPos east;
     InfinityDungeonGridPos west;
@@ -1635,9 +1635,9 @@ static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const Infinity
     MI_CpuFill8(directions, 4, 4 * sizeof(int));
     east = *pos;
     east.x++;
-    if (east.x < width && func_ov127_021f13f8(&east, rooms)->kind != 1) {
+    if (east.x < width && InfinityDungeon_GetGridRoomConst(&east, rooms)->kind != 1) {
         if (allowVisited == 0) {
-            if (func_ov127_021f15d8(&east, rooms)) {
+            if (InfinityDungeon_IsRoomUndug(&east, rooms)) {
                 directions[count] = 2;
                 count++;
             }
@@ -1648,9 +1648,9 @@ static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const Infinity
     }
     west = *pos;
     west.x--;
-    if (west.x >= 0 && func_ov127_021f13f8(&west, rooms)->kind != 1) {
+    if (west.x >= 0 && InfinityDungeon_GetGridRoomConst(&west, rooms)->kind != 1) {
         if (allowVisited == 0) {
-            if (func_ov127_021f15d8(&west, rooms)) {
+            if (InfinityDungeon_IsRoomUndug(&west, rooms)) {
                 directions[count] = 3;
                 count++;
             }
@@ -1662,10 +1662,10 @@ static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const Infinity
     south = *pos;
     south.y++;
     if (south.y < height) {
-        kind = func_ov127_021f13f8(&south, rooms)->kind;
+        kind = InfinityDungeon_GetGridRoomConst(&south, rooms)->kind;
         if (kind != 1 && kind != 0) {
             if (allowVisited == 0) {
-                if (func_ov127_021f15d8(&south, rooms)) {
+                if (InfinityDungeon_IsRoomUndug(&south, rooms)) {
                     directions[count] = 1;
                     count++;
                 }
@@ -1676,11 +1676,11 @@ static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const Infinity
         }
     }
     north = *pos;
-    if (func_ov127_021f13f8(&north, rooms)->kind != 0) {
+    if (InfinityDungeon_GetGridRoomConst(&north, rooms)->kind != 0) {
         north.y--;
-        if (func_ov127_021f13f8(&north, rooms)->kind != 1 && north.y >= 0) {
+        if (InfinityDungeon_GetGridRoomConst(&north, rooms)->kind != 1 && north.y >= 0) {
             if (allowVisited == 0) {
-                if (func_ov127_021f15d8(&north, rooms)) {
+                if (InfinityDungeon_IsRoomUndug(&north, rooms)) {
                     directions[count] = 0;
                     count++;
                 }
@@ -1694,8 +1694,8 @@ static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const Infinity
 }
 
 // Whether no passage has been opened into or out of the room
-static BOOL func_ov127_021f15d8(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms) {
-    const InfinityDungeonRoom *room = func_ov127_021f13f8(pos, rooms);
+static BOOL InfinityDungeon_IsRoomUndug(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms) {
+    const InfinityDungeonRoom *room = InfinityDungeon_GetGridRoomConst(pos, rooms);
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -1706,12 +1706,12 @@ static BOOL func_ov127_021f15d8(const InfinityDungeonGridPos *pos, const Infinit
     return TRUE;
 }
 
-static void func_ov127_021f15f8(InfinityDungeonWalk *walk, const InfinityDungeonGridPos *pos) {
+static void InfinityDungeonWalk_Push(InfinityDungeonWalk *walk, const InfinityDungeonGridPos *pos) {
     walk->top++;
     walk->stack[walk->top] = *pos;
 }
 
-static void func_ov127_021f160c(InfinityDungeonWalk *walk) {
+static void InfinityDungeonWalk_Pop(InfinityDungeonWalk *walk) {
     if (walk->top >= 0) {
         walk->cur = walk->stack[walk->top];
         walk->stack[walk->top].x = 0;
@@ -1721,7 +1721,7 @@ static void func_ov127_021f160c(InfinityDungeonWalk *walk) {
 }
 
 // Whether every room that isn't the goal has been dug into
-static BOOL func_ov127_021f1634(const InfinityDungeonRoom *rooms, int width, int height) {
+static BOOL InfinityDungeon_AreAllRoomsDug(const InfinityDungeonRoom *rooms, int width, int height) {
     int x;
     int y;
 
@@ -1729,7 +1729,8 @@ static BOOL func_ov127_021f1634(const InfinityDungeonRoom *rooms, int width, int
         for (x = 0; x < width; x++) {
             InfinityDungeonGridPos pos = { x, y };
 
-            if (func_ov127_021f13f8(&pos, rooms)->kind != 1 && func_ov127_021f15d8(&pos, rooms) == TRUE) {
+            if (InfinityDungeon_GetGridRoomConst(&pos, rooms)->kind != 1 &&
+                InfinityDungeon_IsRoomUndug(&pos, rooms) == TRUE) {
                 return FALSE;
             }
         }

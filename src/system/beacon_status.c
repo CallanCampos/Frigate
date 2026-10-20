@@ -51,7 +51,7 @@ void BeaconStatus_Free(BeaconStatus *status) {
     GFL_HeapFree(status);
 }
 
-GameBeaconInfoTable *func_0202d7a8(BeaconStatus *status) {
+GameBeaconInfoTable *BeaconStatus_GetInfoTable(BeaconStatus *status) {
     return &status->table;
 }
 

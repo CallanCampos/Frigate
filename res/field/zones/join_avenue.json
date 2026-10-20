@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 25,
+    "npc_cache": 24,
+    "area": "AREA_JOIN_AVENUE",
+    "matrix": "MAP_MATRIX_JOIN_AVENUE",
+    "scripts": "SCRIPTS_JOIN_AVENUE",
+    "text": "SCRIPT_TEXT_JOIN_AVENUE",
+    "bgm": "SEQ_BGM_REZO_RIZO",
+    "encounters": null,
+    "enc_slot": 5,
+    "parent": "ZONE_JOIN_AVENUE",
+    "place": "PLACE_JOIN_AVENUE",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 44,
+    "transition": 2,
+    "battle_bg": 9,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 429,
+    "name_icon": 11,
+    "easy_level": 2,
+    "fly": {
+        "x": 15,
+        "y": 0,
+        "z": 77
+    }
+}

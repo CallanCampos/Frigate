@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lina",
+    "class": "TRAINER_CLASS_LADY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 40,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You there!{be01}\nI've become bored, so I shall\nlet you entertain me!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Well, you certainly know how to entertain.\nI thank you for your time."
+        },
+        {
+            "type": 2,
+            "text": "All I see is sand all around me...\nI cannot understand the appeal of{be00}\nsuch a place!"
+        }
+    ]
+}

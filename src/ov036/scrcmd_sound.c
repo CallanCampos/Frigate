@@ -85,7 +85,7 @@ BOOL s0245_BGMFadeOut(VM *vm, FieldScriptEnv *env) {
 
 // The BGM it reads is unused: the result is whether any BGM is playing
 BOOL s009B_BGMIsPlaying(VM *vm, FieldScriptEnv *env) {
-    u16 bgm = VM_Read16(vm);
+    VM_Read16(vm);
     u16 *result = ScriptReadVar(vm, env);
 
     *result = GFL_SndBGMIsPlaying();
@@ -93,8 +93,8 @@ BOOL s009B_BGMIsPlaying(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL isSequenceNotPlaying(VM *vm, void *env) {
-    GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    FieldScriptEnv_GetGameSystem(env);
+    FieldScriptEnv_GetScriptWork(env);
 
     if (GFL_SndBGMIsPlaying() == FALSE) {
         return TRUE;
@@ -111,7 +111,7 @@ BOOL s00A0_BGMWait(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021a6e74(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(gameData);
     u16 volume = ScriptReadAny(vm, env);
     u16 frames = ScriptReadAny(vm, env);
@@ -126,7 +126,7 @@ BOOL func_ov036_021a6e74(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021a6ec4(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(gameData);
     u16 frames = ScriptReadAny(vm, env);
 
@@ -183,8 +183,8 @@ BOOL s0238_BGMChangeMapEx(VM *vm, FieldScriptEnv *env) {
 
 BOOL s009F_BGMPlayPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameData *gameData = GSYS_GetGameData(gsys);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetGameData(gsys);
+    GSYS_GetField(gsys);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 bgm = ScriptReadAny(vm, env);
 
@@ -215,7 +215,7 @@ BOOL s00A2_BGMPop(VM *vm, FieldScriptEnv *env) {
 // Finishes s00A1_BGMPush's sub event: the pushed BGM comes back
 BOOL FieldScriptSubEventFinish_MEPlayback(FinishScriptSubEventsWork *work, u32 *state) {
     ScriptWork *scriptWork = work->scriptWork;
-    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(scriptWork);
+    ScriptWork_GetFieldWork(scriptWork);
 
     switch (*state) {
     case 0:

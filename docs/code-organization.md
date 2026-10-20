@@ -14,8 +14,11 @@ every section.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
-- `src/` holds the code built with the game's compiler and flags. An overlay's files go in `src/ovNNN/`, and the main
+- `src/` holds the code built with the game's compiler. An overlay's files go in `src/ovNNN/`, and the main
   module's in `src/gfl/` (Game Freak's library) and `src/system/` (the game's own code), mirroring `include/`.
+  The default flags are in `configure.py`; a file whose original code and data require another setting goes in
+  `config/compiler_flags.toml`, as `ctvt_draw.c` needs `-ipa function`. Different flags alone do not make a game
+  source a library. See `docs/configs.md` for the shared compiler settings.
 - `lib/` holds the libraries built apart from the game, as in pret's projects: `lib/<name>/include/` for the public
   headers, `lib/<name>/src/` for the sources and private headers (`lib/spl/src/spl_internal.h`), and
   `lib/<name>/library.toml` for the library's compiler and flags, which `configure.py` and the probe read: `lib/spl/`
@@ -37,10 +40,11 @@ every section.
   keyboards and selectable objects, and the helpers under them: resources, messages, heap, OAM, cells, fades, text,
   input, interrupts, lists, OBJ characters, strings, VRAM banks, tasks and display, built with the game's compiler and
   flags but unsigned `char`; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files, built
-  with the game's compiler and flags but `-O2,p`; the name is ours).
-  NitroSDK, TwlSDK and DWC are built with the game's compiler, `dsi/1.1p1`: NitroSDK as ARM code by default, with most
-  of its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the
-  LTD autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
+  with the game's compiler and flags; the name is ours).
+  NitroSDK and TwlSDK are built with the game's compiler, `dsi/1.1p1`, and DWC with `dsi/1.2` (only
+  `DWCi_Acc_CreateLoginId` tells them apart, and it matches from 1.2 on): NitroSDK as ARM code by default, with most of
+  its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the LTD
+  autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
   `gfd`, ...) are Thumb built with CodeWarrior 2.0. A file built with other flags than the rest of its library is
   listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
   (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names
@@ -56,6 +60,12 @@ every section.
   refer to them, and how well each boundary between two functions keeps every section's data references in file
   order and the calls inside one file.
   `docs/source-files.md` lists every overlay's files with the evidence for their names (`source_files.py --markdown`).
+- A binary that the game embeds as it is, and that no compiler of ours can build, is a `const u8` array whose
+  initializer includes the bytes from the base ROM. That covers the DSi DSP's TeakLite programs in the LTD autoload,
+  `lib/twl/src/dsp/dsp_g711_image.c` and `dsp_graphics_image.c`. `ROM_BLOBS` in `configure.py` names each include file
+  under `rom/` of the generated headers with its module and symbol, and `tools/build/rom_blob.py` writes it from the
+  extracted module, with the symbol's address and size from `symbols.txt`. The bytes are never committed. Without a
+  ROM, `compile_all.py` writes zeros of the same size.
 - `struct_decls.h` declares every struct type once, as `typedef struct Name Name;`. The header of the module that
   owns a struct defines its layout when that is known (`struct Name { ... };`, without another typedef), and other
   code only uses pointers to it. A struct that only one file uses, such as an event's work, is defined in that file.
@@ -63,7 +73,7 @@ every section.
   layout with padding is still the one definition.
 - Headers are grouped like the game's code: `system/` (game system, game data, events), `field/`, `save/`, `gfl/`
   (Game Freak's library), `pml/` (Pokémon data), `battle/`, `demo/` and `constants/`, whose ID lists, such as species
-  and items, are generated from `data/constants/` (see [Constant lists](data.md#constant-lists)). The libraries'
+  and items, are generated from `generated/` (see [Constant lists](data.md#constant-lists)). The libraries'
   headers are in `lib/`, as `lib/nitro/include/nitro/`, `lib/nnsys/include/nnsys/`, `lib/spl/include/spl/`,
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),
@@ -76,6 +86,14 @@ every section.
   external data with `extern` there, and include the header at each use. Do not add `extern` declarations or
   prototypes of other files' functions in a `.c` file. A file includes its own header, so its definitions are checked
   against the declarations.
+- A function the build compiled into more than one file (`tools/decomp/find_duplicates.py` lists them) is written
+  once. Its body goes in the owner's header as a `static inline` named after the owner's function with an `Inline`
+  suffix, and the owner and each copy keep their own names and linkage (a `static` copy stays `static`) and are each
+  one call to it. The header gains the includes the body needs; `ninja` compiles every file that includes it. The
+  file's compiler has to inline the call: the game's `-inline on,noauto` and the 2.0 library default do, while
+  `-inline off` leaves a call. A copy that doesn't match this way is written out in its own file, with a comment
+  naming the function it copies. Only `identical` groups are shared: in a `same via duplicates` group each copy calls
+  its own duplicate, which one inline cannot, and a `same shape` group is not proven to be the same code.
 - Each proc that an event starts has a header in `app/` with its parameter struct, proc table and overlay ID, such as
   `app/worldtrade.h`. Each event has a header in `field/` with its create functions, such as
   `field/event_worldtrade.h`. A proc built from many files keeps their headers in a directory of `app/` named after

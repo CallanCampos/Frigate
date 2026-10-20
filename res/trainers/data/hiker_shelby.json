@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Shelby",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'm chasing my dream,\nand I'm fighting for a victory!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I can't catch that dream!"
+        },
+        {
+            "type": 2,
+            "text": "There was once a legendary Pokémon\nhidden away in this cave.{be01}\nWhat do you think it felt?\nWhat do you think it was hoping for?"
+        }
+    ]
+}

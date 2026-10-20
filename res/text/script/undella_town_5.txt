@@ -1,0 +1,21 @@
+UndellaTown5_Text_ElesaSkylaCanAsk = Elesa: Skyla,\ncan I ask you a favor?{be01}
+UndellaTown5_Text_SkylaSureWhatsUp = Skyla: Sure, what's up?{be01}
+UndellaTown5_Text_ElesaIveDecidedNeed = Elesa: I've decided I need\na PR makeover!{be01}\nI wanted to try out my new ideas\nwith you, Skyla!{be01}
+UndellaTown5_Text_SkylaPrMakeover = Skyla: A PR makeover?{be01}
+UndellaTown5_Text_ElesaThatsRightHeres = Elesa: That's right!{be01}\nHere's the thing. I make what everyone\nthinks is cool into a reality, right?{be01}\nWell, I get to do what I want to do,\nand while being a model may be difficult,{be00}\nmost importantly, it's fun!{be01}\nBut the hard parts are really hard.\nI mean, everyone judges me{be00}\nsimply based on my appearance.{be01}\nPeople say that I'm reserved,\nand that I don't look like the{be00}\ntype who would tell jokes!{be01}
+UndellaTown5_Text_Empty = ...
+UndellaTown5_Text_ElesaIveBeenThinking = Elesa: So, I've been thinking about\nit constantly since then!{be01}
+UndellaTown5_Text_SophisticatedJoke = A sophisticated joke!{be01}
+UndellaTown5_Text_HowShouldPutLooks = How should I put it...{be01}\nMy looks suggest that\nI'm not a lot of fun.{be01}\nBut I'll tear down that mistaken\nimage with my own hands!{be01}\nI'll say something silly and give someone\nan opportunity to call me out,{be00}\nso we can all have a good laugh!{be01}
+UndellaTown5_Text_SkylaUhOk = Skyla: Uh... OK...{be01}
+UndellaTown5_Text_ElesaOkGetLoad = Elesa: OK, get a load of this!{be01}\nThrow that misbehaving Klink\nin the clink!{be01}
+UndellaTown5_Text_ElesaCofagrigusCoolDont = Elesa: Cofagrigus is so cool!\nDon't you *cough* agree, Gus?{be01}
+UndellaTown5_Text_ElesaBoughtThoseFossils = Elesa: You bought those Fossils from\nClay? Did you buy them on Clay-away?{be01}
+UndellaTown5_Text_SkylaElesaThoseJust = Skyla: Elesa...{be01}\nThose are just a bunch of bad puns.\nWhere's the joke?{be01}
+UndellaTown5_Text_ElesaExactlyIfMake = Elesa: Exactly! If I make bad puns when\nI'm supposed to be telling a joke,{be00}\ndoesn't it give people even more{be00}\nof an opportunity to tease me{be00}\nand start a funny back-and-forth?{be01}
+UndellaTown5_Text_SkylaUmThatsLittle = Skyla: Um...{be01}\nThat's a little too sophisticated for me.\nActually, it's really hard to understand.{be01}
+UndellaTown5_Text_ElesaReallyGuessIll = Elesa: Really?{be01}\nI guess I'll just rethink\nmy fashion first.{be01}
+UndellaTown5_Text_SkylaSoundsGoodHey = Skyla: Sounds good!{be01}\nHey, as long as we're hanging out,\nsurely you wouldn't mind having{be00}\na Pokémon battle with me, right?{be01}
+UndellaTown5_Text_ElesaBetDontCall = Elesa: You bet!\nAnd don't call me Shirley!{be01}
+UndellaTown5_Text_SkylaOhElesa = Skyla: Oh, Elesa...{be01}
+\pad{98}

@@ -120,7 +120,7 @@ WbtDownloadGraphic *WbtDownloadGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     WbtDownloadBG_Init(&graphic->bg, heapId);
     WbtDownloadClAct_Init(&graphic->clact, &sWbtDownloadVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(WbtDownloadGraphic_VBlank, graphic, 0);
@@ -131,7 +131,7 @@ void WbtDownloadGraphic_Free(WbtDownloadGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     WbtDownloadClAct_Free(&graphic->clact);
     WbtDownloadBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -187,25 +187,25 @@ static void WbtDownloadBG_VBlank(WbtDownloadBG *bg) {
 static void WbtDownloadClAct_Init(WbtDownloadClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(WbtDownloadClAct));
     ClActSys_Create(&sWbtDownloadClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(32, 0, heapId);
-    clact->renderer = func_0204be9c(sWbtDownloadSurfaceSetups, NELEMS(sWbtDownloadSurfaceSetups), heapId);
-    func_0204c018(clact->unit, clact->renderer);
-    func_0204bf14(clact->renderer, TRUE);
+    clact->unit = ClActUnit_Create(32, 0, heapId);
+    clact->renderer = ClActRenderer_Create(sWbtDownloadSurfaceSetups, NELEMS(sWbtDownloadSurfaceSetups), heapId);
+    ClActUnit_SetRenderer(clact->unit, clact->renderer);
+    ClActRenderer_SetCulling(clact->renderer, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void WbtDownloadClAct_Free(WbtDownloadClAct *clact) {
-    func_0204becc(clact->renderer);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActRenderer_Delete(clact->renderer);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(WbtDownloadClAct));
 }
 
 static void WbtDownloadClAct_Update(WbtDownloadClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void WbtDownloadClAct_VBlank(WbtDownloadClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }

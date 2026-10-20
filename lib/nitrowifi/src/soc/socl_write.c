@@ -13,9 +13,9 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 rem
 static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *write_pos, int block);
 static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, int pos, u16 remote_port,
                                   CPSInAddr remote_ip, int block);
-static int SOCLi_WriteCallBack(SOCLCommandPacket *packet);
+static int SOCLi_WriteCallBack(void *arg);
 static int SOCLi_GetOptimumSendBufLen(int len);
-static int SOCLi_MemCpy(u8 *dst, int len, SOCLCommandPacket *packet);
+static int SOCLi_MemCpy(u8 *dst, int len, SOCLiCommandWrite *cpacket);
 
 int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags) {
     SOCLSendPipe *pipe;
@@ -33,7 +33,7 @@ int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CP
             return SOCL_ENOTCONN;
         }
     }
-    pipe = SOCLi_GetSendPipe(socket);
+    pipe = socket->send_pipe;
     if ((flags & SOCLI_WRITE_NOBLOCK) || socket->flag_block == 0) {
         if (!OS_TryLockMutex(&pipe->base.mutex)) {
             return SOCL_EAGAIN;
@@ -50,22 +50,23 @@ int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CP
 
 static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip,
                              int block) {
-    int written = 0;
-    int chunk_max = SOCLi_GetSendPipe(socket)->socket->sndbuf.size;
-    int alloc_len;
+    SOCLSendPipe *pipe = socket->send_pipe;
+    int sndbuf_len;
     int write_pos;
+    int alloc_len;
+    int chunk_max;
+    int written = 0;
 
+    sndbuf_len = pipe->socket->sndbuf.size;
     if (socket->flag == 1) {
-        chunk_max -= 0x2a;
-        if (len > chunk_max) {
+        sndbuf_len -= 0x2a;
+        if (len > sndbuf_len) {
             return SOCL_EMSGSIZE;
         }
         chunk_max = len;
     } else {
-        chunk_max -= 0x36;
-        if (len <= chunk_max) {
-            chunk_max = len;
-        }
+        sndbuf_len -= 0x36;
+        chunk_max = MATH_MIN(len, sndbuf_len);
     }
     while (len > 0) {
         alloc_len = SOCLi_AllocWriteBuffer(socket, len, chunk_max, &write_pos, block);
@@ -74,14 +75,14 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 rem
                 return SOCL_EAGAIN;
             }
             buf += alloc_len;
-            written += alloc_len;
             len -= alloc_len;
+            written += alloc_len;
         }
         if (!(block & 1)) {
-            if (alloc_len > 0) {
-                break;
+            if (alloc_len <= 0) {
+                return SOCL_EAGAIN;
             }
-            return SOCL_EAGAIN;
+            break;
         }
     }
     return written;
@@ -90,7 +91,7 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 rem
 // Finds room for up to len bytes (at least chunk) in the pipe's buffer, sleeping for it when the socket blocks, and
 // gives the position to write at
 static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *write_pos, int block) {
-    SOCLSendPipe *pipe = SOCLi_GetSendPipe(socket);
+    SOCLSendPipe *pipe = socket->send_pipe;
     int free;
     u32 irq;
 
@@ -118,7 +119,7 @@ static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *w
 }
 
 int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket) {
-    SOCLSendPipe *pipe = SOCLi_GetSendPipe(socket);
+    SOCLSendPipe *pipe = socket->send_pipe;
     int size = pipe->buffer.size;
     int write_pos = pipe->write_pos;
     int read_pos = pipe->read_pos;
@@ -132,7 +133,7 @@ int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket) {
 
 static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, int pos, u16 remote_port,
                                   CPSInAddr remote_ip, int block) {
-    SOCLSendPipe *pipe = SOCLi_GetSendPipe(socket);
+    SOCLSendPipe *pipe = socket->send_pipe;
     SOCLCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_WriteCallBack, pipe->socket, block);
     u16 old_write_pos;
     u8 *data;
@@ -142,45 +143,45 @@ static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, in
         return SOCL_EMFILE;
     }
     if ((block & 1) && socket->flag != 1) {
-        packet->flag_block = 3;
+        packet->h.flag_block = 3;
     } else {
-        packet->flag_block = 0;
+        packet->h.flag_block = 0;
     }
     data = pipe->buffer.data;
     size = pipe->buffer.size;
     if (pos + len < size) {
-        packet->args.write.buf1 = data + pos;
-        packet->args.write.len1 = len;
-        packet->args.write.buf2 = NULL;
-        packet->args.write.len2 = 0;
+        packet->write.buf1 = data + pos;
+        packet->write.len1 = len;
+        packet->write.buf2 = NULL;
+        packet->write.len2 = 0;
         pos += len;
     } else {
-        packet->args.write.buf1 = data + pos;
-        packet->args.write.len1 = size - pos;
-        packet->args.write.buf2 = data;
-        packet->args.write.len2 = len - packet->args.write.len1;
-        pos = packet->args.write.len2;
-        MI_CpuCopy(buf + packet->args.write.len1, packet->args.write.buf2, pos);
+        packet->write.buf1 = data + pos;
+        packet->write.len1 = size - pos;
+        packet->write.buf2 = data;
+        packet->write.len2 = len - packet->write.len1;
+        pos = packet->write.len2;
+        MI_CpuCopy(buf + packet->write.len1, packet->write.buf2, pos);
     }
-    MI_CpuCopy(buf, packet->args.write.buf1, packet->args.write.len1);
+    MI_CpuCopy(buf, packet->write.buf1, packet->write.len1);
     old_write_pos = pipe->write_pos;
-    packet->args.write.write_end = pos;
-    pipe->write_pos = packet->args.write.write_end;
+    packet->write.write_end = pos;
+    pipe->write_pos = packet->write.write_end;
     if (socket->flag == 1) {
         if (socket->local_port == 0) {
             socket->local_port = CPSi_GetNewPort();
             ((CPSSoc *)socket)->local_port = socket->local_port;
         }
-        packet->args.write.local_port = socket->local_port;
+        packet->write.local_port = socket->local_port;
         if (socket->remote_ip == 0 || remote_ip != 0) {
-            packet->args.write.remote_ip = remote_ip;
-            packet->args.write.remote_port = remote_port;
+            packet->write.remote_ip = remote_ip;
+            packet->write.remote_port = remote_port;
         } else {
-            packet->args.write.remote_ip = socket->remote_ip;
-            packet->args.write.remote_port = socket->remote_port;
+            packet->write.remote_ip = socket->remote_ip;
+            packet->write.remote_port = socket->remote_port;
         }
     } else {
-        packet->args.write.remote_ip = 0;
+        packet->write.remote_ip = 0;
     }
     if (SOCLi_ExecCommandPacketInSendPipe(pipe->socket, packet) != 0) {
         pipe->write_pos = old_write_pos;
@@ -189,10 +190,11 @@ static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, in
     return len;
 }
 
-static int SOCLi_WriteCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
+static int SOCLi_WriteCallBack(void *arg) {
+    SOCLiCommandWrite *cpacket = (SOCLiCommandWrite *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
     int result = 0;
-    SOCLSendPipe *pipe = SOCLi_GetSendPipe(socket);
+    SOCLSendPipe *pipe = socket->send_pipe;
     u8 *data;
     int overhead;
     s8 mode;
@@ -204,8 +206,8 @@ static int SOCLi_WriteCallBack(SOCLCommandPacket *packet) {
         return SOCL_EINVAL;
     }
     if (socket->flag != 0 && socket->flag != 4 || (socket->state & SOCLI_STATE_CONNECTED)) {
-        if (packet->args.write.remote_ip != 0) {
-            CPS_SocBind(packet->args.write.local_port, packet->args.write.remote_port, packet->args.write.remote_ip);
+        if (cpacket->remote_ip != 0) {
+            CPS_SocBind(cpacket->local_port, cpacket->remote_port, cpacket->remote_ip);
         }
         mode = socket->flag;
         overhead = SOCLi_ModeIsTCP(mode) ? 0x36 : 0x2a;
@@ -216,7 +218,7 @@ static int SOCLi_WriteCallBack(SOCLCommandPacket *packet) {
             chunk = socket->sndbuf.size - overhead;
         }
         while (1) {
-            len = SOCLi_MemCpy(data + overhead, chunk, packet);
+            len = SOCLi_MemCpy(data + overhead, chunk, cpacket);
             if (len <= 0) {
                 break;
             }
@@ -235,7 +237,7 @@ static int SOCLi_WriteCallBack(SOCLCommandPacket *packet) {
     } else {
         result = SOCL_ETIMEDOUT;
     }
-    pipe->read_pos = packet->args.write.write_end;
+    pipe->read_pos = cpacket->write_end;
     OS_WakeupThread(&pipe->wait);
     return result;
 }
@@ -279,9 +281,9 @@ static int SOCLi_GetOptimumSendBufLen(int len) {
 
 // Copies up to len bytes of the command's data (in two parts when it wraps around the pipe's buffer) to dst, and
 // takes them off the command
-static int SOCLi_MemCpy(u8 *dst, int len, SOCLCommandPacket *packet) {
-    int len1 = packet->args.write.len1;
-    int len2 = packet->args.write.len2;
+static int SOCLi_MemCpy(u8 *dst, int len, SOCLiCommandWrite *cpacket) {
+    int len1 = cpacket->len1;
+    int len2 = cpacket->len2;
 
     if (len1 > len) {
         len1 = len;
@@ -290,14 +292,14 @@ static int SOCLi_MemCpy(u8 *dst, int len, SOCLCommandPacket *packet) {
         len2 = len - len1;
     }
     if (len1 > 0) {
-        MI_CpuCopy(packet->args.write.buf1, dst, len1);
-        packet->args.write.buf1 += len1;
-        packet->args.write.len1 -= len1;
+        MI_CpuCopy(cpacket->buf1, dst, len1);
+        cpacket->buf1 += len1;
+        cpacket->len1 -= len1;
     }
     if (len2 > 0) {
-        MI_CpuCopy(packet->args.write.buf2, dst + len1, len2);
-        packet->args.write.buf2 += len2;
-        packet->args.write.len2 -= len2;
+        MI_CpuCopy(cpacket->buf2, dst + len1, len2);
+        cpacket->buf2 += len2;
+        cpacket->len2 -= len2;
     }
     return len1 + len2;
 }

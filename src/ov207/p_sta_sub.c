@@ -167,9 +167,9 @@ void PStaSub_Main(PStatusWork *wk, PStaSubWork *sub) {
             }
             PStaSub_SetBounce(wk, sub, offset.y);
         }
-        func_0201ab54(sub->mcss[0], &offset);
-        func_0201ab54(sub->mcss[1], &offset);
-        func_0201ac0c(sub->mcss[0], &scale);
+        MCSS_SetPositionOffset(sub->mcss[0], &offset);
+        MCSS_SetPositionOffset(sub->mcss[1], &offset);
+        MCSS_SetShadowScale(sub->mcss[0], &scale);
         GFL_G3DCameraSetLookatPos(wk->camera, &target);
         GFL_G3DCameraFlush(wk->camera);
     } else if (sub->state == PSTA_SUB_TURN_TO_BACK) {
@@ -188,11 +188,11 @@ void PStaSub_Main(PStatusWork *wk, PStaSubWork *sub) {
             target.x = targetXs[frame];
             GFL_G3DCameraSetLookatPos(wk->camera, &target);
             GFL_G3DCameraFlush(wk->camera);
-            func_0201ac0c(sub->mcss[0], &scale);
+            MCSS_SetShadowScale(sub->mcss[0], &scale);
         } else {
             MCSS_Hide(sub->mcss[0]);
             MCSS_Show(sub->mcss[1]);
-            func_0201ac0c(sub->mcss[1], &scale);
+            MCSS_SetShadowScale(sub->mcss[1], &scale);
             GFL_G3DCameraSetLookatPos(wk->camera, &target);
             GFL_G3DCameraFlush(wk->camera);
             sub->frontShown = FALSE;
@@ -228,9 +228,9 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     ballSetup.priority = 10;
     ballSetup.bgPriority = 1;
     ballSetup.sequence = defaultSequence;
-    sub->ballIcon = func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(2)], wk->clResources[PSTA_RES_PLTT(1)],
-                                  wk->clResources[PSTA_RES_CELL(2)], &ballSetup, 0, wk->heapId);
-    func_0204c124(sub->ballIcon, FALSE);
+    sub->ballIcon = ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(2)], wk->clResources[PSTA_RES_PLTT(1)],
+                                   wk->clResources[PSTA_RES_CELL(2)], &ballSetup, 0, wk->heapId);
+    ClActor_SetVisible(sub->ballIcon, FALSE);
     iconSetup.y = iconY;
     iconSetup.priority = 10;
     iconSetup.bgPriority = 1;
@@ -238,9 +238,9 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
         iconSetup.x = sIconXs[i];
         iconSetup.sequence = sIconSequences[i];
         sub->icons[i] =
-            func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(3)], wk->clResources[PSTA_RES_PLTT(2)],
-                          wk->clResources[PSTA_RES_CELL(3)], &iconSetup, 0, wk->heapId);
-        func_0204c124(sub->icons[i], TRUE);
+            ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(3)], wk->clResources[PSTA_RES_PLTT(2)],
+                           wk->clResources[PSTA_RES_CELL(3)], &iconSetup, 0, wk->heapId);
+        ClActor_SetVisible(sub->icons[i], TRUE);
     }
     pokerusSetup.x = 236;
     pokerusSetup.y = 26;
@@ -248,29 +248,29 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     pokerusSetup.bgPriority = 1;
     pokerusSetup.sequence = defaultSequence;
     sub->pokerusIcon =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(10)], wk->clResources[PSTA_RES_PLTT(9)],
-                      wk->clResources[PSTA_RES_CELL(9)], &pokerusSetup, 0, wk->heapId);
-    func_0204c124(sub->pokerusIcon, FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(10)], wk->clResources[PSTA_RES_PLTT(9)],
+                       wk->clResources[PSTA_RES_CELL(9)], &pokerusSetup, 0, wk->heapId);
+    ClActor_SetVisible(sub->pokerusIcon, FALSE);
     statusSetup.x = 241;
     statusSetup.y = 31;
     statusSetup.priority = 10;
     statusSetup.bgPriority = 1;
     statusSetup.sequence = defaultSequence;
     sub->statusIcon =
-        func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(11)], wk->clResources[PSTA_RES_PLTT(10)],
-                      wk->clResources[PSTA_RES_CELL(10)], &statusSetup, 0, wk->heapId);
-    func_0204c124(sub->statusIcon, FALSE);
+        ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(11)], wk->clResources[PSTA_RES_PLTT(10)],
+                       wk->clResources[PSTA_RES_CELL(10)], &statusSetup, 0, wk->heapId);
+    ClActor_SetVisible(sub->statusIcon, FALSE);
 }
 
 void PStaSub_FreeActors(PStatusWork *wk, PStaSubWork *sub) {
     u8 i;
 
-    func_0204c108(sub->statusIcon);
-    func_0204c108(sub->pokerusIcon);
+    ClActor_Delete(sub->statusIcon);
+    ClActor_Delete(sub->pokerusIcon);
     for (i = 0; i < PSTA_SUB_ICON_COUNT; i++) {
-        func_0204c108(sub->icons[i]);
+        ClActor_Delete(sub->icons[i]);
     }
-    func_0204c108(sub->ballIcon);
+    ClActor_Delete(sub->ballIcon);
 }
 
 void PStaSub_Load(PStatusWork *wk, PStaSubWork *sub) {
@@ -325,31 +325,31 @@ void PStaSub_Draw(PStatusWork *wk, PStaSubWork *sub) {
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
 
     ball = PML_PkmGetParam(boxPkm, PKM_PARAM_POKEBALL, NULL);
-    file = GFL_G2DIOReadNCLR(getUINarcIdx(), func_0202d91c(ball), &palette, wk->heapId);
-    func_0204bd10(wk->clResources[PSTA_RES_PLTT(1)], palette, 1);
+    file = GFL_G2DIOReadNCLR(getUINarcIdx(), AppMenuCommon_GetBallPaletteFile(ball), &palette, wk->heapId);
+    ClActSys_ReplacePlttData(wk->clResources[PSTA_RES_PLTT(1)], palette, 1);
     GFL_HeapFree(file);
-    file = GFL_G2DIOReadBGNCGR(getUINarcIdx(), func_0202d928(ball), FALSE, &chars, wk->heapId);
-    func_0204ba40(wk->clResources[PSTA_RES_CHAR(2)], chars);
+    file = GFL_G2DIOReadBGNCGR(getUINarcIdx(), AppMenuCommon_GetBallCharFile(ball), FALSE, &chars, wk->heapId);
+    ClActSys_ReplaceCharData(wk->clResources[PSTA_RES_CHAR(2)], chars);
     GFL_HeapFree(file);
-    func_0204c124(sub->ballIcon, TRUE);
+    ClActor_SetVisible(sub->ballIcon, TRUE);
 
     markings = PML_PkmGetParam(boxPkm, PKM_PARAM_MARKINGS, NULL);
     for (i = 0, bit = 1; i < MARKING_COUNT; bit <<= 1, i++) {
         if (markings & bit) {
-            func_0204c488(sub->icons[i], i * 2 + 1);
+            ClActor_SetSequence(sub->icons[i], i * 2 + 1);
         } else {
-            func_0204c488(sub->icons[i], i * 2);
+            ClActor_SetSequence(sub->icons[i], i * 2);
         }
     }
     if (doesPokeHavePokerus(boxPkm) == TRUE) {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_POKERUS], TRUE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_POKERUS], TRUE);
     } else {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_POKERUS], FALSE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_POKERUS], FALSE);
     }
     if (PML_PkmIsRare(boxPkm) == TRUE && wk->isEgg == FALSE) {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_SHINY], TRUE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_SHINY], TRUE);
     } else {
-        func_0204c124(sub->icons[PSTA_SUB_ICON_SHINY], FALSE);
+        ClActor_SetVisible(sub->icons[PSTA_SUB_ICON_SHINY], FALSE);
     }
 
     if (sub->frontShown == TRUE) {
@@ -358,9 +358,9 @@ void PStaSub_Draw(PStatusWork *wk, PStaSubWork *sub) {
         VecFx32 offset = { 0, 0, 0 };
         VecFx32 pos = { FX32_CONST(4.7), 0, FX32_CONST(-32) };
 
-        func_0201ab54(sub->mcss[0], &offset);
+        MCSS_SetPositionOffset(sub->mcss[0], &offset);
         PStaSub_SetSpritePosition(wk, sub, &pos);
-        func_0201ac0c(sub->mcss[0], &scale);
+        MCSS_SetShadowScale(sub->mcss[0], &scale);
         GFL_G3DCameraSetLookatPos(wk->camera, &target);
         GFL_G3DCameraFlush(wk->camera);
         sub->state = PSTA_SUB_FRONT;
@@ -370,32 +370,32 @@ void PStaSub_Draw(PStatusWork *wk, PStaSubWork *sub) {
         VecFx32 offset = { 0, 0, 0 };
         VecFx32 pos = { FX32_CONST(4.7), 0, FX32_CONST(-32) };
 
-        func_0201ab54(sub->mcss[0], &offset);
+        MCSS_SetPositionOffset(sub->mcss[0], &offset);
         PStaSub_SetSpritePosition(wk, sub, &pos);
-        func_0201ac0c(sub->mcss[1], &scale);
+        MCSS_SetShadowScale(sub->mcss[1], &scale);
         GFL_G3DCameraSetLookatPos(wk->camera, &target);
         GFL_G3DCameraFlush(wk->camera);
         sub->state = PSTA_SUB_BACK;
     }
 
     if ((u8)GetStatusCond(pkm) != 0) {
-        func_0204c488(sub->statusIcon, AppMenuCommon_GetStatusIcon(pkm));
-        func_0204c124(sub->statusIcon, TRUE);
-        func_0204c124(sub->pokerusIcon, FALSE);
+        ClActor_SetSequence(sub->statusIcon, AppMenuCommon_GetStatusIcon(pkm));
+        ClActor_SetVisible(sub->statusIcon, TRUE);
+        ClActor_SetVisible(sub->pokerusIcon, FALSE);
     } else {
-        func_0204c124(sub->statusIcon, FALSE);
+        ClActor_SetVisible(sub->statusIcon, FALSE);
         if (doesPokerusHaveDuration(boxPkm) == TRUE) {
-            func_0204c124(sub->pokerusIcon, TRUE);
+            ClActor_SetVisible(sub->pokerusIcon, TRUE);
         } else {
-            func_0204c124(sub->pokerusIcon, FALSE);
+            ClActor_SetVisible(sub->pokerusIcon, FALSE);
         }
     }
 
     {
         VecFx32 offset = { 0, 0, 0 };
 
-        func_0201ab54(sub->mcss[0], &offset);
-        func_0201ab54(sub->mcss[1], &offset);
+        MCSS_SetPositionOffset(sub->mcss[0], &offset);
+        MCSS_SetPositionOffset(sub->mcss[1], &offset);
     }
     sub->swipeX.count = 0;
     sub->swipeX.frames = 0;
@@ -417,7 +417,7 @@ void PStaSub_Unload(PStatusWork *wk, PStaSubWork *sub) {
 
 void PStaSub_Clear(PStatusWork *wk, PStaSubWork *sub) {
     PStaSub_RemoveSprites(wk, sub);
-    func_0204c124(sub->ballIcon, FALSE);
+    ClActor_SetVisible(sub->ballIcon, FALSE);
 }
 
 static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
@@ -431,7 +431,8 @@ static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
     func_0202437c(wordSet, 0, name, 0, 1, 2);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData, 0);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 25, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 25, 1, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(name);
     GFL_StrBufFree(format);
     GFL_StrBufFree(str);
@@ -441,13 +442,13 @@ static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
         sex = PML_PkmGetParam(pkm, PKM_PARAM_SEX, NULL);
         if (sex == GENDER_MALE) {
             str = GFL_MsgDataLoadStrbufNew(wk->msgData, 1);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 89, 1, str, wk->font,
-                          PRINT_COLOR(5, 6, 0));
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 89, 1, str, wk->font,
+                                  PRINT_COLOR(5, 6, 0));
             GFL_StrBufFree(str);
         } else if (sex == GENDER_FEMALE) {
             str = GFL_MsgDataLoadStrbufNew(wk->msgData, 2);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 89, 1, str, wk->font,
-                          PRINT_COLOR(3, 4, 0));
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 89, 1, str, wk->font,
+                                  PRINT_COLOR(3, 4, 0));
             GFL_StrBufFree(str);
         }
     }
@@ -458,14 +459,16 @@ static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
         WordSetNumber(wordSet, 0, PML_PkmGetLevel(pkm), 3, 0, 1);
         format = GFL_MsgDataLoadStrbufNew(wk->msgData, 3);
         GFL_WordSetFormatStrbuf(wordSet, str, format);
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 9, 17, str, wk->font, PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 9, 17, str, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(format);
         GFL_StrBufFree(str);
         GFL_WordSetSystemFree(wordSet);
     }
 
     str = GFL_MsgDataLoadStrbufNew(wk->msgData, 4);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(sub->itemWindow), 10, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->itemWindow), 10, 1, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
 
     wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
@@ -473,7 +476,8 @@ static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
     loadItemNameToStrbuf(wordSet, 0, PML_PkmGetParam(pkm, PKM_PARAM_ITEM, NULL));
     format = GFL_MsgDataLoadStrbufNew(wk->msgData, 5);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(sub->itemWindow), 6, 17, str, wk->font, PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->itemWindow), 6, 17, str, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(format);
     GFL_StrBufFree(str);
     GFL_WordSetSystemFree(wordSet);
@@ -585,7 +589,7 @@ static BOOL PStaSub_AnimSwipeX(PStatusWork *wk, PStaSubWork *sub) {
         break;
     }
     MCSS_SetPosition(sub->mcss[0], &pos);
-    func_0201ab54(sub->mcss[0], &offset);
+    MCSS_SetPositionOffset(sub->mcss[0], &offset);
     sub->animFrame++;
     if (sub->animFrame > 15) {
         sub->animFrame = 0;
@@ -607,7 +611,7 @@ static BOOL PStaSub_AnimSwipeY(PStatusWork *wk, PStaSubWork *sub) {
         offset.y = sin * 32 + FX32_CONST(wk->happiness >> 6);
         PStaSub_SetBounce(wk, sub, offset.y);
     }
-    func_0201ab54(sub->mcss[0], &offset);
+    MCSS_SetPositionOffset(sub->mcss[0], &offset);
     sub->animFrame++;
     if (sub->animFrame > 20) {
         sub->animFrame = 0;
@@ -662,7 +666,7 @@ static BOOL PStaSub_AnimCircle(PStatusWork *wk, PStaSubWork *sub, BOOL spinning)
     }
     offset.y += FX32_CONST(sub->spinSpeed) / 16;
     PStaSub_SetBounce(wk, sub, offset.y);
-    func_0201ab54(sub->mcss[0], &offset);
+    MCSS_SetPositionOffset(sub->mcss[0], &offset);
     MCSS_PauseAnimation(sub->mcss[0]);
     if (sub->spinSpeed == 0 && sub->spinTarget == 0) {
         return TRUE;
@@ -683,13 +687,13 @@ static void PStaSub_HandleTouch(PStatusWork *wk, PStaSubWork *sub) {
     s32 hit;
     u8 i;
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
     if (wk->isEgg) {
         return;
     }
-    pressed = func_0203da48();
-    held = func_0203da2c();
-    hit = func_0203d9c8(rects);
+    pressed = GFL_HIDIsTouchPressed();
+    held = GFL_HIDIsTouchHeld();
+    hit = GFL_HIDGetTouchHeldRect(rects);
     if (sub->state == PSTA_SUB_FRONT) {
         if (hit == 0 || (hit == 1 && pressed == FALSE)) {
             if (pressed == TRUE) {
@@ -746,7 +750,7 @@ static void PStaSub_HandleMarkings(PStatusWork *wk, PStaSubWork *sub) {
     if (wk->param->mode == PSTATUS_MODE_LOCK_MARKINGS) {
         return;
     }
-    hit = func_0203da0c(rects);
+    hit = GFL_HIDGetTouchPressedRect(rects);
     if (hit == TOUCH_RECT_NONE) {
         return;
     }
@@ -757,9 +761,9 @@ static void PStaSub_HandleMarkings(PStatusWork *wk, PStaSubWork *sub) {
     PML_PkmSetParam(pkm, PKM_PARAM_MARKINGS, markings);
     for (i = 0; i < MARKING_COUNT; i++) {
         if (markings & bit) {
-            func_0204c488(sub->icons[i], i * 2 + 1);
+            ClActor_SetSequence(sub->icons[i], i * 2 + 1);
         } else {
-            func_0204c488(sub->icons[i], i * 2);
+            ClActor_SetSequence(sub->icons[i], i * 2);
         }
         bit <<= 1;
     }
@@ -773,7 +777,7 @@ static void PStaSub_TrackGestures(PStatusWork *wk, PStaSubWork *sub) {
     u32 dir;
     BOOL lap;
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
 
     dx = x - sub->swipeX.startX;
     dy = y - sub->swipeX.startY;
@@ -885,18 +889,18 @@ static void PStaSub_CreateSprites(PStatusWork *wk, PStaSubWork *sub, BoxPkm *box
     PartyPkm *pkm = PStatus_GetPartyPkm(wk);
 
     PStaSub_AdjustForSpecies(wk, sub, &size, &scale);
-    sub->mcss[0] = func_0201c14c(wk->mcssSys, pkm, 0, FX32_CONST(216), FX32_CONST(72), 0);
-    func_0201aeb0(sub->mcss[0], 2);
-    func_0201ac5c(sub->mcss[0], DEG_TO_IDX(300));
-    func_0201ac0c(sub->mcss[0], &scale);
-    func_0201c290(sub->mcss[0]);
-    func_0201abb8(sub->mcss[0], &size);
-    sub->mcss[1] = func_0201c14c(wk->mcssSys, pkm, 1, FX32_CONST(216), FX32_CONST(72), 0);
-    func_0201aeb0(sub->mcss[1], 2);
-    func_0201ac5c(sub->mcss[1], DEG_TO_IDX(300));
-    func_0201ac0c(sub->mcss[1], &backScale);
-    func_0201c290(sub->mcss[1]);
-    func_0201abb8(sub->mcss[1], &size);
+    sub->mcss[0] = MCSSSys_AddPartyPkm(wk->mcssSys, pkm, 0, FX32_CONST(216), FX32_CONST(72), 0);
+    MCSS_SetShadowAlpha(sub->mcss[0], 2);
+    MCSS_SetShadowRotX(sub->mcss[0], DEG_TO_IDX(300));
+    MCSS_SetShadowScale(sub->mcss[0], &scale);
+    MCSS_SetLoopAnimation(sub->mcss[0]);
+    MCSS_SetScaleOffset(sub->mcss[0], &size);
+    sub->mcss[1] = MCSSSys_AddPartyPkm(wk->mcssSys, pkm, 1, FX32_CONST(216), FX32_CONST(72), 0);
+    MCSS_SetShadowAlpha(sub->mcss[1], 2);
+    MCSS_SetShadowRotX(sub->mcss[1], DEG_TO_IDX(300));
+    MCSS_SetShadowScale(sub->mcss[1], &backScale);
+    MCSS_SetLoopAnimation(sub->mcss[1]);
+    MCSS_SetScaleOffset(sub->mcss[1], &size);
     PStaSub_SetBounce(wk, sub, 0);
     PStaSub_SetSpritePosition(wk, sub, &pos);
     if (sub->frontShown == TRUE) {
@@ -930,8 +934,8 @@ static void PStaSub_SetSpritePosition(PStatusWork *wk, PStaSubWork *sub, const V
     VecFx32 sum;
 
     VEC_Add(pos, &sub->bounceOffset, &sum);
-    func_0201ac70(sub->mcss[0], &sum);
-    func_0201ac70(sub->mcss[1], &sum);
+    MCSS_SetShadowOffset(sub->mcss[0], &sum);
+    MCSS_SetShadowOffset(sub->mcss[1], &sum);
 }
 
 static void PStaSub_AdjustForSpecies(PStatusWork *wk, PStaSubWork *sub, VecFx32 *size, VecFx32 *scale) {

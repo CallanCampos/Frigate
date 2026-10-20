@@ -32,9 +32,9 @@ static void NetDevIrc_SetTimeoutSlot(int frames);
 static void NetDevIrc_SetPeerFilterSlot(void *filter);
 
 static BOOL NetDevIrc_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work) {
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
 
-    NetIrc_Init(func_02042e84()->unk68.word, init->gameCommandBase);
+    NetIrc_Init(GFL_NetGetInitData()->unk68.word, init->gameCommandBase);
     NetIrc_SetInitialized();
     return TRUE;
 }

@@ -1,0 +1,3 @@
+AbilityNamesUpper_Text_Empty =  -
+\from{abilities.name_upper}
+\pad{30}

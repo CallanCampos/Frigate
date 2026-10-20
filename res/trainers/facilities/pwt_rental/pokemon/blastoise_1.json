@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BLASTOISE",
+    "moves": [ "MOVE_AQUA_RING", "MOVE_ROCK_SLIDE", "MOVE_AQUA_TAIL", "MOVE_IRON_DEFENSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_QUIET",
+    "item": "ITEM_ZOOM_LENS",
+    "form": 0
+}

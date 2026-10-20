@@ -59,8 +59,10 @@ still linked, and objdiff shows how close it is.
   tried. In `lib/` only, a function the SDK, or a library it bundles, wrote in assembly is written as an MWCC `asm`
   function, and assembly the library inlined at several call sites as a `static inline` with an `asm {}` block, each
   with a comment saying so.
-- **Write the C from the assembly.** Other decompilations, such as pret's pokeplatinum and pokeheartgold, are good
-  references for names and structure, but don't copy their code. Never use leaked or otherwise unlawfully obtained
+- **Write the C from the assembly.** Other decompilations, such as pret's pokeplatinum and pokeheartgold and
+  ntrtwl's SDK reconstructions, are good references for names and structure. A function may follow another
+  decompilation's structure where that is what matches, rewritten in this project's names, types and format, but
+  don't paste their code. Never use leaked or otherwise unlawfully obtained
   material, such as leaked source code, in any form.
 - **Names:** use swan's names first (see [Names](docs/code-organization.md#names)). Name anything else through
   `tools/decomp/rename_symbol.py`, which records the name in `config/names.txt` and updates the source. Library

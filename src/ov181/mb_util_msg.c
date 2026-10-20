@@ -91,12 +91,12 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
     } else {
         GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, msg->heapId);
     }
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     msg->tcbManager = GFL_TCBExMgrCreate(msg->heapId, msg->heapId, 3, 0x100);
     msg->stream = NULL;
     msg->strbuf = NULL;
     msg->wordSet = NULL;
-    msg->queue = func_02021998(msg->heapId);
+    msg->queue = PrintQueue_CreateDefault(msg->heapId);
     msg->menuRes = AppTaskMenuRes_Create(msg->menuBg, 10, msg->font, msg->queue, msg->heapId);
     msg->menu = NULL;
     msg->confirm = NULL;
@@ -106,13 +106,13 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
 
         GFL_OvlLoad(OVERLAY_ID(36));
         setup.heapId = heapId;
-        setup.unk4 = 0;
+        setup.camera = NULL;
         setup.font = msg->font;
-        setup.unkC = 10;
+        setup.frameChar = 10;
         setup.bg = msgBg;
-        setup.unk14 = 12;
-        setup.unk15 = 14;
-        msg->talkWin = func_ov036_0218b1f8(&setup);
+        setup.framePalette = 12;
+        setup.winPalette = 14;
+        msg->talkWin = TalkMsgWinSys_Create(&setup);
     } else {
         msg->talkWin = NULL;
     }
@@ -125,7 +125,7 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
 
 void MBUtilMsg_Delete(MBUtilMsg *msg) {
     if (msg->talkWin != NULL) {
-        func_ov036_0218b320(msg->talkWin);
+        TalkMsgWinSys_Free(msg->talkWin);
         GFL_OvlUnload(OVERLAY_ID(36));
     }
     if (msg->menu != NULL) {
@@ -140,9 +140,9 @@ void MBUtilMsg_Delete(MBUtilMsg *msg) {
     }
     KeyCursor_Free(msg->cursor);
     AppTaskMenuRes_Free(msg->menuRes);
-    func_02021a18(msg->queue);
+    PrintQueue_Free(msg->queue);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
     }
     if (msg->strbuf != NULL) {
         GFL_StrBufFree(msg->strbuf);
@@ -167,20 +167,20 @@ void MBUtilMsg_Update(MBUtilMsg *msg) {
 
         KeyCursor_Update(msg->cursor, msg->stream, msg->window);
         if (done == TRUE) {
-            func_020223cc(msg->stream);
+            PrintStream_Delete(msg->stream);
             msg->stream = NULL;
         }
     }
-    func_02021a3c(msg->queue);
+    PrintQueue_Main(msg->queue);
     if (msg->queuedSubWindow != NULL && msg->subQueued) {
         PrintQueue *queue = msg->queue;
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(msg->queuedSubWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(msg->queuedSubWindow))) {
             BmpWin_FlushChar(msg->queuedSubWindow);
             msg->subQueued = FALSE;
         }
     }
-    if (msg->queued == TRUE && !func_02021c1c(msg->queue, BmpWin_GetBitmap(msg->window))) {
+    if (msg->queued == TRUE && !PrintQueue_IsBitmapPending(msg->queue, BmpWin_GetBitmap(msg->window))) {
         BmpWin_FlushChar(msg->window);
         msg->queued = FALSE;
         if (msg->showWaitIcon == TRUE) {
@@ -235,7 +235,7 @@ void MBUtilMsg_SetWindow(MBUtilMsg *msg, u32 type) {
 
 void MBUtilMsg_Print(MBUtilMsg *msg, u32 msgId, s32 wait) {
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     if (msg->waitIcon != NULL) {
@@ -257,9 +257,10 @@ void MBUtilMsg_Print(MBUtilMsg *msg, u32 msgId, s32 wait) {
         GFL_StrBufFree(msg->strbuf);
         msg->strbuf = strbuf;
     }
-    msg->stream = func_02022268(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
+    msg->stream =
+        PrintStream_Create(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5ac(msg->talkWin, msg->window, 0);
+        func_ov036_0218b5ac(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
     } else {
         BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
     }
@@ -272,7 +273,7 @@ void MBUtilMsg_Print(MBUtilMsg *msg, u32 msgId, s32 wait) {
 
 void MBUtilMsg_PrintAtOnce(MBUtilMsg *msg, u32 msgId) {
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     if (msg->waitIcon != NULL) {
@@ -292,10 +293,10 @@ void MBUtilMsg_PrintAtOnce(MBUtilMsg *msg, u32 msgId) {
         GFL_StrBufFree(msg->strbuf);
         msg->strbuf = strbuf;
     }
-    func_02021c54(msg->queue, BmpWin_GetBitmap(msg->window), 0, 0, msg->strbuf, msg->font);
+    PrintQueue_Print(msg->queue, BmpWin_GetBitmap(msg->window), 0, 0, msg->strbuf, msg->font);
     msg->queued = TRUE;
     if (msg->windowType == MB_UTIL_MSG_WINDOW_TALK) {
-        func_ov036_0218b5ac(msg->talkWin, msg->window, 0);
+        func_ov036_0218b5ac(msg->talkWin, msg->window, TALKMSG_WIN_FRAME_NORMAL);
         GFL_BGSysLoadScr(msg->msgBg);
     } else {
         BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
@@ -417,7 +418,7 @@ void MBUtilMsg_PrintNoWireless(MBUtilMsg *msg, s32 wait) {
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, msg->heapId);
 
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     msg->mapShown = FALSE;
@@ -428,7 +429,8 @@ void MBUtilMsg_PrintNoWireless(MBUtilMsg *msg, s32 wait) {
     }
     GFL_BitmapFill(BmpWin_GetBitmap(msg->window), 15);
     msg->strbuf = GFL_MsgDataLoadStrbufNew(msgData, Global10520_Text_WirelessCommunicationsTurnedOff);
-    msg->stream = func_02022268(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
+    msg->stream =
+        PrintStream_Create(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
     BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
     GFL_MsgDataFree(msgData);
     if (msg->useKeys == TRUE) {
@@ -451,7 +453,7 @@ Font *MBUtilMsg_GetFont(MBUtilMsg *msg) {
 }
 
 BOOL MBUtilMsg_IsQueueDone(MBUtilMsg *msg) {
-    return func_02021c0c(msg->queue);
+    return PrintQueue_IsEmpty(msg->queue);
 }
 
 BOOL MBUtilMsg_IsPrintDone(MBUtilMsg *msg) {

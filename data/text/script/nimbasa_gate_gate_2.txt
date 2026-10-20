@@ -1,5 +1,0 @@
-NimbasaGateGate2_Text_WayLeadsRoute16 = This way leads to Route 16\nand Marvelous Bridge!
-NimbasaGateGate2_Text_TwoYearsAgoPokemon = Two years ago, a Pokémon\ncalled Zoroark was hiding it's lair{be00}\nin the Lostlorn Forest on Route 16.
-NimbasaGateGate2_Text_LetsGetTrainingGive = Let's get to training!\nGive your Pokémon this,{be00}\nand get them into shape!{be01}
-NimbasaGateGate2_Text_PokemonsSpeedDecreasesWhen = A Pokémon's Speed decreases when it\nholds a Macho Brace, but it{be00}\ngrows stronger!{be01}\nIt's a tool that is a bit difficult to use,\nbut that's the way it goes!
-\pad{ea}

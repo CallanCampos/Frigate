@@ -13,25 +13,25 @@ void *getHollow_RivalBlk(SaveControl *save) {
     return func_0200f7d8(SaveControl_GetBlockPtr(save, SAVE_BLOCK_MISC));
 }
 
-void func_0200ff50(void *block, u32 index, u16 value) {
+void HollowRivalSave_SetValue(void *block, u32 index, u16 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->values[index] = value;
 }
 
-u16 func_0200ff54(void *block, u16 index) {
+u16 HollowRivalSave_GetValue(void *block, u16 index) {
     HollowRivalSave *hollowRival = block;
 
     return hollowRival->values[index];
 }
 
-void func_0200ff58(void *block, u16 index, u32 value) {
+void HollowRivalSave_SetFlag(void *block, u16 index, u32 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->flags[index] = value;
 }
 
-u8 func_0200ff60(HollowRivalSave *hollowRival, u16 index) {
+u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index) {
     return hollowRival->flags[index];
 }
 

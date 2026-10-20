@@ -237,7 +237,7 @@ static WbtDownloadMessage *WbtDownloadMessage_Create(u16 bg, u16 x, u16 y, u16 w
 
     MI_CpuFill8(p_wk, 0, sizeof(WbtDownloadMessage));
     p_wk->font = font;
-    p_wk->queue = func_02021998(heapId);
+    p_wk->queue = PrintQueue_CreateDefault(heapId);
     p_wk->state = WBT_DOWNLOAD_MSG_STATE_IDLE;
     p_wk->heapId = heapId;
     p_wk->strbuf = GFL_StrBufCreate(0x300, heapId);
@@ -252,7 +252,7 @@ static WbtDownloadMessage *WbtDownloadMessage_Create(u16 bg, u16 x, u16 y, u16 w
 
 static void WbtDownloadMessage_Free(WbtDownloadMessage *p_wk) {
     if (p_wk->stream != NULL) {
-        func_020223cc(p_wk->stream);
+        PrintStream_Delete(p_wk->stream);
         p_wk->stream = NULL;
     }
     if (p_wk->waitIcon != NULL) {
@@ -266,12 +266,12 @@ static void WbtDownloadMessage_Free(WbtDownloadMessage *p_wk) {
     BmpWin_ClearFrame(p_wk->window, 2);
     BmpWin_Free(p_wk->window);
     GFL_StrBufFree(p_wk->strbuf);
-    func_02021a18(p_wk->queue);
+    PrintQueue_Free(p_wk->queue);
     GFL_HeapFree(p_wk);
 }
 
 static void WbtDownloadMessage_Update(WbtDownloadMessage *p_wk) {
-    func_02021a3c(p_wk->queue);
+    PrintQueue_Main(p_wk->queue);
     switch (p_wk->state) {
     case WBT_DOWNLOAD_MSG_STATE_2:
         PrintWindow_Flush(&p_wk->printWindow, p_wk->queue);
@@ -310,10 +310,10 @@ static void WbtDownloadMessage_Print(WbtDownloadMessage *p_wk, u32 mode) {
     WbtDownloadMessagePos pos;
     int wait;
 
-    func_02021c44(p_wk->queue);
+    PrintQueue_Clear(p_wk->queue);
     GFL_BitmapFill(BmpWin_GetBitmap(p_wk->window), WbtDownloadMessage_GetBgColor(p_wk));
     if (p_wk->stream != NULL) {
-        func_020223cc(p_wk->stream);
+        PrintStream_Delete(p_wk->stream);
         p_wk->stream = NULL;
     }
     if (p_wk->p_keycursor != NULL) {
@@ -338,18 +338,18 @@ static void WbtDownloadMessage_Print(WbtDownloadMessage *p_wk, u32 mode) {
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printsys, APP_PRINTSYS_COMMON_KEYS | APP_PRINTSYS_COMMON_NO_SKIP);
         p_wk->p_keycursor = KeyCursor_Create(WbtDownloadMessage_GetBgColor(p_wk), TRUE, FALSE, p_wk->heapId);
-        wait = func_02017c50(1);
-        p_wk->stream = func_02022268(p_wk->window, pos.x, pos.y, p_wk->strbuf, p_wk->font, wait, p_wk->tcbManager, 0,
-                                     p_wk->heapId, WbtDownloadMessage_GetBgColor(p_wk));
+        wait = TextSpeed_GetWait(1);
+        p_wk->stream = PrintStream_Create(p_wk->window, pos.x, pos.y, p_wk->strbuf, p_wk->font, wait, p_wk->tcbManager,
+                                          0, p_wk->heapId, WbtDownloadMessage_GetBgColor(p_wk));
         p_wk->state = WBT_DOWNLOAD_MSG_STATE_STREAM;
         break;
     case WBT_DOWNLOAD_MSG_STREAM:
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printsys, APP_PRINTSYS_COMMON_KEYS);
         p_wk->p_keycursor = KeyCursor_Create(WbtDownloadMessage_GetBgColor(p_wk), TRUE, FALSE, p_wk->heapId);
-        wait = func_02017bcc();
-        p_wk->stream = func_02022268(p_wk->window, pos.x, pos.y, p_wk->strbuf, p_wk->font, wait, p_wk->tcbManager, 0,
-                                     p_wk->heapId, WbtDownloadMessage_GetBgColor(p_wk));
+        wait = TextSpeed_GetCurrentWait();
+        p_wk->stream = PrintStream_Create(p_wk->window, pos.x, pos.y, p_wk->strbuf, p_wk->font, wait, p_wk->tcbManager,
+                                          0, p_wk->heapId, WbtDownloadMessage_GetBgColor(p_wk));
         p_wk->state = WBT_DOWNLOAD_MSG_STATE_STREAM;
         break;
     }
@@ -514,8 +514,8 @@ static BOOL WbtDownloadNet_Init(GameProc *proc, u32 *state, void *param, void *w
     MI_CpuFill8(wk, 0, sizeof(WbtDownloadNetWork));
     wk->param = param;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_WBT_DOWNLOAD_NET);
-    wk->queue = func_02021998(HEAPID_WBT_DOWNLOAD_NET);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0404, HEAPID_WBT_DOWNLOAD_NET);
+    wk->queue = PrintQueue_CreateDefault(HEAPID_WBT_DOWNLOAD_NET);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_DOWNLOAD, HEAPID_WBT_DOWNLOAD_NET);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_WBT_DOWNLOAD_NET);
     wk->graphic = WbtDownloadGraphic_Create(1, HEAPID_WBT_DOWNLOAD_NET);
     WbtDownloadNetBG_Create(&wk->bg, HEAPID_WBT_DOWNLOAD_NET);
@@ -525,7 +525,7 @@ static BOOL WbtDownloadNet_Init(GameProc *proc, u32 *state, void *param, void *w
     downloadParam.dataSize = WBT_DOWNLOAD_BUFFER_SIZE;
     downloadParam.heapId = HEAPID_WBT_DOWNLOAD_NET;
     wk->download = NetCommonDownload_Create(&downloadParam);
-    func_02042ba8(TRUE, HEAPID_WBT_DOWNLOAD_NET);
+    GFL_NetSetIconScreen(TRUE, HEAPID_WBT_DOWNLOAD_NET);
     wk->message = WbtDownloadMessage_Create(1, 1, 0x13, 0x1e, 4, 0xc, wk->font, HEAPID_WBT_DOWNLOAD_NET);
     WbtDownloadMessage_SetColor(wk->message, PRINT_COLOR(1, 2, 15));
     WbtDownloadMessage_DrawFrame(wk->message, WbtDownloadNetBG_GetFrameChars(&wk->bg, 0), 0xd);
@@ -544,7 +544,7 @@ static BOOL WbtDownloadNet_Exit(GameProc *proc, u32 *state, void *param, void *w
     WbtDownloadGraphic_Free(wk->graphic);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_FontFree(wk->font);
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_WBT_DOWNLOAD_NET);
@@ -571,7 +571,7 @@ static BOOL WbtDownloadNet_Main(GameProc *proc, u32 *state, void *param, void *w
     WbtDownloadStack_Run(wk->stack);
     WbtDownloadGraphic_Update(wk->graphic);
     WbtDownloadNetBG_Update(&wk->bg);
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     WbtDownloadMessage_Update(wk->message);
     NetCommonDownload_Step(wk->download);
     if (WbtDownloadStack_IsEmpty(wk->stack)) {

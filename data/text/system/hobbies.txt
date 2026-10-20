@@ -1,9 +1,0 @@
-Hobbies_Text_ThisThat = This & That
-Hobbies_Text_Exercising = Exercising
-Hobbies_Text_Reading = Reading
-Hobbies_Text_Music = Music
-Hobbies_Text_Movies = Movies
-Hobbies_Text_Traveling = Traveling
-Hobbies_Text_Cooking = Cooking
-Hobbies_Text_Fishing = Fishing
-Hobbies_Text_VideoGames = Video Games

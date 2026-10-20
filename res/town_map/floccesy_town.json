@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_FLOCCESY_TOWN",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 33,
+        "y": 127
+    },
+    "cursor": {
+        "x": 33,
+        "y": 127
+    },
+    "hit": {
+        "start": {
+            "x": 33,
+            "y": 123
+        },
+        "end": {
+            "x": 33,
+            "y": 131
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_FLOCCESY_TOWN",
+    "shown_by": null,
+    "description": "TownMap_Text_TownFamousClockTower",
+    "landmarks": [ "TownMap_Text_PokemonCenter_18" ],
+    "area": {
+        "animation": 0,
+        "x": 25,
+        "y": 119
+    }
+}

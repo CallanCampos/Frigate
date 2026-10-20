@@ -1,0 +1,44 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_CASTELIA_CITY",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 132,
+        "y": 130
+    },
+    "cursor": {
+        "x": 132,
+        "y": 130
+    },
+    "hit": {
+        "start": {
+            "x": 132,
+            "y": 126
+        },
+        "end": {
+            "x": 132,
+            "y": 134
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_CASTELIA_CITY",
+    "shown_by": null,
+    "description": "TownMap_Text_BigCitySkyscrapersPiercing",
+    "landmarks": [
+        "TownMap_Text_CasteliaCityGym",
+        "TownMap_Text_PokemonCenter_4",
+        "TownMap_Text_RoyalUnova",
+        "TownMap_Text_PasserbyAnalytics",
+        "TownMap_Text_MedalOffice",
+        "TownMap_Text_NameRatingServices"
+    ],
+    "area": {
+        "animation": 0,
+        "x": 125,
+        "y": 121
+    }
+}

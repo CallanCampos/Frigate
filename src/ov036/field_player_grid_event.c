@@ -1,6 +1,9 @@
 // The events of the grid player's moves into objects: pushing a Strength boulder, and the TCBs that carry the player
 // up and down a waterfall and onto the water to Surf.
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "constants/sound.h"
 #include "field/encounter.h"
 #include "field/field.h"
@@ -74,7 +77,7 @@ static GameEvent *EventStrengthRockPush_Create(FieldPlayerGrid *grid, u16 dir, F
 static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 *state, void *data);
 static void FieldSurfTCB_Callback(TCB *tcb, void *work);
 static void FieldWaterfallTCB_Callback(TCB *tcb, void *work);
-static void func_ov036_021bae58(FieldActor *actor, const VecFx32 *shake);
+static void Waterfall_SetShakeOffset(FieldActor *actor, const VecFx32 *shake);
 static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall);
 static BOOL func_ov036_021bafe0(WaterfallTCB *waterfall);
 static BOOL func_ov036_021bb06c(WaterfallTCB *waterfall);
@@ -95,7 +98,7 @@ GameEvent *FieldPlayerGrid_CheckObjContactEvent(FieldPlayerGrid *grid, u32 press
 
     FieldPlayerGrid_GetPlayerActor(grid);
     dir = FieldPlayerCore_GetMoveDirByKey(core, heldKeys);
-    if (!((BOOL (*)(FieldPlayerGrid *, u16))FieldPlayerGrid_IsAcmdFinished)(grid, dir)) {
+    if (!FieldPlayerGrid_IsAcmdFinished(grid, dir)) {
         return NULL;
     }
     event = FieldPlayerGrid_CheckObjContactEventCore(grid, dir, flags);
@@ -115,8 +118,8 @@ static GameEvent *FieldPlayerGrid_CheckObjContactEventCore(FieldPlayerGrid *grid
     return event;
 }
 
-// Whether the tiles in front of a boulder let it move: 1 if one blocks it, 2 if it can move, and 3 if it also fills
-// a hole
+// Classifies the tiles in front of a boulder: 0 for free tiles, 1 for a blocking non-hole tile,
+// 2 for a mix of free tiles and holes, and 3 when all tiles are holes
 static u32 StrengthRockSpaceCheck(FieldActor *rock, u16 dir, FieldG3DMapper *mapper) {
     VecFx32 pos;
     VecFx32 tilePos;
@@ -218,14 +221,14 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         }
         FldAct_SetAcmd(push->rock, GetAcmdForDir(push->dir, 8));
         FldAct_SetAcmd(push->player, GetAcmdForDir(push->dir, 0x20));
-        GFL_SndSEPlay(1652);
+        GFL_SndSEPlay(SEQ_SE_FLD_03);
         (*state)++;
         break;
     case 1:
-        if (!func_ov012_02166ecc(push->rock)) {
+        if (!FldAct_CheckAcmdEnd(push->rock)) {
             break;
         }
-        if (!func_ov012_02166ecc(push->player)) {
+        if (!FldAct_CheckAcmdEnd(push->player)) {
             break;
         }
         if (push->fillsHole == 0) {
@@ -234,14 +237,14 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         }
         CopyActorWPos(push->rock, &holePos);
         GetHeightFromMap(push->rock, &holePos, &push->height);
-        if (FldAct_GetObjCode(push->rock) == 0x6d) {
+        if (FldAct_GetObjCode(push->rock) == OBJ_CODE_STRENGTH_ROCK) {
             push->height -= FX32_CONST(14);
         } else {
             push->height -= FX32_CONST(26);
         }
-        func_ov012_0216763c(push->rock, TRUE);
-        func_ov012_02167580(push->rock, FALSE);
-        GFL_SndSEPlay(1653);
+        FldAct_SetHeightCalcDisabled(push->rock, TRUE);
+        SetActorCollisionEnabled(push->rock, FALSE);
+        GFL_SndSEPlay(SEQ_SE_FLD_04);
         (*state)++;
         break;
     case 2:
@@ -264,7 +267,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         }
         break;
     case 3:
-        func_ov012_0216734c(push->rock, &push->offset);
+        FldAct_SetOuterDrawOffset(push->rock, &push->offset);
         push->offset.y = -push->offset.y;
         push->counter++;
         if (push->counter & 4) {
@@ -277,8 +280,8 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         if (push->offset.y == 0) {
             CopyActorWPos(push->rock, &settlePos);
             SetActorWPosAll(push->rock, &settlePos, push->dir);
-            func_ov012_0216734c(push->rock, &push->offset);
-            func_ov012_021681b0(push->rock);
+            FldAct_SetOuterDrawOffset(push->rock, &push->offset);
+            SaveActorStrengthRockPosition(push->rock);
             (*state)++;
         }
         break;
@@ -289,8 +292,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
 }
 
 void *FieldSurfTCB_Create(FieldPlayer *player, u32 direction, u32 tileType, HeapID heapId) {
-    SurfTCB *surf =
-        GFL_HeapAllocate((heapId & 0x7fff) | 0x8000, sizeof(SurfTCB), TRUE, "field_player_grid_event.c", 486);
+    SurfTCB *surf = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(SurfTCB), TRUE, "field_player_grid_event.c", 486);
 
     surf->field = FieldPlayer_GetField(player);
     surf->dir = direction;
@@ -343,7 +345,7 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
         GetHeightFromMap(actor, &pos, &height);
         pos.y = height;
         task = func_ov036_021a4484(Field_GetFieldEffects(surf->field), dir, &pos, actor, 0);
-        func_ov036_0219a5b8(surf->player, (TCB *)task);
+        func_ov036_0219a5b8(surf->player, task);
         encounter = Field_GetEncountSystem(surf->field);
         gridPos[0] = HEIGHT_TO_GRID(pos.x);
         gridPos[1] = HEIGHT_TO_GRID(pos.y);
@@ -369,11 +371,11 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
         surf->state++;
         break;
     case 3:
-        if (!func_ov012_02166ecc(actor)) {
+        if (!FldAct_CheckAcmdEnd(actor)) {
             break;
         }
-        func_ov012_02166ef8(actor);
-        func_ov036_021a4504((FieldEffectTask *)func_ov036_0219a5c4(surf->player), 1);
+        FldAct_EndAcmd(actor);
+        func_ov036_021a4504(func_ov036_0219a5c4(surf->player), 1);
         FieldPlayer_SetSpecialSeq(surf->player, 4);
         surf->state++;
         // fall through
@@ -391,7 +393,7 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
 
 void *FieldWaterfallTCB_Create(FieldPlayer *player, u32 direction, u32 param, HeapID heapId) {
     WaterfallTCB *waterfall =
-        GFL_HeapAllocate((heapId & 0x7fff) | 0x8000, sizeof(WaterfallTCB), TRUE, "field_player_grid_event.c", 691);
+        GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(WaterfallTCB), TRUE, "field_player_grid_event.c", 691);
     FieldActor *actor;
     VecFx32 pos;
     VecFx32 ahead;
@@ -423,17 +425,16 @@ void FieldWaterfallTCB_Free(void *tcb) {
     GFL_TCBRemove(tcb);
 }
 
-static void func_ov036_021bae58(FieldActor *actor, const VecFx32 *shake) {
+static void Waterfall_SetShakeOffset(FieldActor *actor, const VecFx32 *shake) {
     VecFx32 offset = *shake;
 
     offset.y += FX32_CONST(1);
     offset.z += FX32_CONST(5);
-    func_ov012_0216734c(actor, &offset);
+    FldAct_SetOuterDrawOffset(actor, &offset);
 }
 
 static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
-    BOOL one = TRUE;
     VecFx32 pos;
     VecFx32 posA;
     VecFx32 posB;
@@ -443,7 +444,7 @@ static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     u32 kind;
     u32 effectId;
 
-    func_ov012_0216763c(actor, TRUE);
+    FldAct_SetHeightCalcDisabled(actor, TRUE);
     CopyActorWPos(actor, &pos);
     posA = pos;
     posB = posA;
@@ -457,8 +458,8 @@ static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     waterfall->stepX = (posB.x - pos.x) / 2 / 16;
     waterfall->stepZ = (posB.z - pos.z) / 2 / 16;
     waterfall->stepY = FX32_CONST(6);
-    waterfall->shake.y = one << 12;
-    task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
+    waterfall->shake.y = FX32_ONE;
+    task = func_ov036_0219a5c4(waterfall->player);
     func_ov036_021a4504(task, 2);
     kind = 1;
     if ((u16)(waterfall->dir + 0xfffe) <= 1) {
@@ -469,7 +470,7 @@ static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     FieldEffects_Load(effects, &effectId, 1);
     waterfall->splash = func_ov036_021a4eb0(effects, kind, task);
     FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
-    GFL_SndSEPlay(1760);
+    GFL_SndSEPlay(SEQ_SE_FLD_81);
     waterfall->state++;
     return TRUE;
 }
@@ -491,14 +492,14 @@ static BOOL func_ov036_021bafe0(WaterfallTCB *waterfall) {
         waterfall->shake.y = 0;
         waterfall->state++;
         func_ov036_021a3a70(waterfall->splash);
-        task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
+        task = func_ov036_0219a5c4(waterfall->player);
         kind = 2;
         if ((u16)(waterfall->dir + 0xfffe) <= 1) {
             kind = 2;
         }
         waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), kind, task);
     }
-    func_ov036_021bae58(actor, &waterfall->shake);
+    Waterfall_SetShakeOffset(actor, &waterfall->shake);
     return FALSE;
 }
 
@@ -561,7 +562,7 @@ static BOOL func_ov036_021bb0f0(WaterfallTCB *waterfall) {
         waterfall->state++;
     }
     SetActorWPosValue(actor, &pos);
-    func_ov036_021bae58(actor, &waterfall->shake);
+    Waterfall_SetShakeOffset(actor, &waterfall->shake);
     return FALSE;
 }
 
@@ -569,12 +570,12 @@ static BOOL func_ov036_021bb190(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     FieldEffectTask *task;
 
-    func_ov012_0216763c(actor, FALSE);
+    FldAct_SetHeightCalcDisabled(actor, FALSE);
     SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
-    task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
+    task = func_ov036_0219a5c4(waterfall->player);
     func_ov036_021a4504(task, 1);
     waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), 0, task);
-    GFL_SndSEPlay(1762);
+    GFL_SndSEPlay(SEQ_SE_FLD_83);
     waterfall->state++;
     return FALSE;
 }
@@ -595,7 +596,6 @@ static BOOL func_ov036_021bb1e4(WaterfallTCB *waterfall) {
 
 static void func_ov036_021bb220(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
-    BOOL one;
     VecFx32 pos;
     VecFx32 startPos;
     VecFx32 posB;
@@ -608,8 +608,7 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
 
     switch (waterfall->state) {
     case 0:
-        one = TRUE;
-        func_ov012_0216763c(actor, TRUE);
+        FldAct_SetHeightCalcDisabled(actor, TRUE);
         CopyActorWPos(actor, &startPos);
         posA = startPos;
         posB = posA;
@@ -624,8 +623,8 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
         waterfall->stepX = (posB.x - startPos.x) / 16;
         waterfall->stepZ = (posB.z - startPos.z) / 16;
         waterfall->stepY = -0x6000;
-        waterfall->shake.y = one << 12;
-        task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
+        waterfall->shake.y = FX32_ONE;
+        task = func_ov036_0219a5c4(waterfall->player);
         func_ov036_021a4504(task, 2);
         func_ov036_021a4514(task, FALSE);
         kind = 1;
@@ -637,7 +636,7 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
         FieldEffects_Load(effects, &effectId, 1);
         waterfall->splash = func_ov036_021a4eb0(effects, kind, task);
         FieldCameraZoomTCB_Create(waterfall->field, 16, FX32_CONST(32));
-        GFL_SndSEPlay(1761);
+        GFL_SndSEPlay(SEQ_SE_FLD_82);
         waterfall->state++;
         // fall through
     case 1:
@@ -652,14 +651,14 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
             waterfall->shake.y = 0;
             waterfall->state++;
             func_ov036_021a3a70(waterfall->splash);
-            task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
+            task = func_ov036_0219a5c4(waterfall->player);
             kind = 2;
             if ((u16)(waterfall->dir + 0xfffe) <= 1) {
                 kind = 2;
             }
             waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), kind, task);
         }
-        func_ov036_021bae58(actor, &waterfall->shake);
+        Waterfall_SetShakeOffset(actor, &waterfall->shake);
         break;
     case 2:
         CopyActorWPos(actor, &pos);
@@ -671,7 +670,7 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
             waterfall->stepZ = (waterfall->dest.z - pos.z) / 16;
             FieldCameraZoomTCB_Create(waterfall->field, 16, -FX32_CONST(32));
             func_ov036_021a3a70(waterfall->splash);
-            task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
+            task = func_ov036_0219a5c4(waterfall->player);
             func_ov036_021a4504(task, 1);
             waterfall->splash = func_ov036_021a4eb0(Field_GetFieldEffects(waterfall->field), 0, task);
         }
@@ -685,15 +684,15 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
         waterfall->counter++;
         if (waterfall->counter >= 16) {
             effects = Field_GetFieldEffects(waterfall->field);
-            func_ov012_0216763c(actor, FALSE);
+            FldAct_SetHeightCalcDisabled(actor, FALSE);
             SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
             func_ov036_021a3a70(waterfall->splash);
             FieldEffects_FreeEffect(effects, 8);
             func_ov036_0219ac0c(waterfall->player);
-            func_ov036_021a4514((FieldEffectTask *)func_ov036_0219a5c4(waterfall->player), TRUE);
+            func_ov036_021a4514(func_ov036_0219a5c4(waterfall->player), TRUE);
             waterfall->splash = NULL;
             waterfall->finished = TRUE;
-            GFL_SndSEPlay(1762);
+            GFL_SndSEPlay(SEQ_SE_FLD_83);
             waterfall->state++;
         }
         break;

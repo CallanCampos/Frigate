@@ -46,7 +46,7 @@ void FieldSnd_StopRingtone(FieldSound *fieldSound);
 // The stop flag that the BGM push sets
 #define FIELD_SND_AMBIENCE_STOP_BGM_PUSH 0x1
 void FieldSnd_PlayAmbience(FieldSound *fieldSound, u32 se);
-void FieldSnd_PlayAmbienceEx(FieldSound *fieldSound, u32 se, u16 volume);
+void FieldSnd_PlayAmbienceEx(FieldSound *fieldSound, u32 se, u32 volume);
 void FieldSnd_SetAmbienceVolume(FieldSound *fieldSound, u32 se, u16 volume);
 void FieldSnd_StopAmbience(FieldSound *fieldSound, u32 se);
 void FieldSnd_StopAmbienceAll(FieldSound *fieldSound, u32 flags);

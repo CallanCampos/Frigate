@@ -1,13 +1,13 @@
-func_ov113_021eec80 kind:function(thumb,size=0x30) addr:0x021eec80
-func_ov113_021eecb0 kind:function(thumb,size=0x18) addr:0x021eecb0
-func_ov113_021eecc8 kind:function(thumb,size=0xe) addr:0x021eecc8
-func_ov113_021eecd8 kind:function(thumb,size=0x60) addr:0x021eecd8
-func_ov113_021eed38 kind:function(thumb,size=0xbc) addr:0x021eed38
-func_ov113_021eedf4 kind:function(thumb,size=0x74) addr:0x021eedf4
-func_ov113_021eee68 kind:function(thumb,size=0xc) addr:0x021eee68
-func_ov113_021eee74 kind:function(thumb,size=0xc) addr:0x021eee74
-func_ov113_021eee80 kind:function(thumb,size=0x5e) addr:0x021eee80
-func_ov113_021eeee0 kind:function(thumb,size=0xf8) addr:0x021eeee0
+GimmickHumilau_Init kind:function(thumb,size=0x30) addr:0x021eec80
+GimmickHumilau_End kind:function(thumb,size=0x18) addr:0x021eecb0
+GimmickHumilau_Update kind:function(thumb,size=0xe) addr:0x021eecc8
+GimmickHumilau_ShowSplash kind:function(thumb,size=0x60) addr:0x021eecd8
+GimmickHumilau_CreateJumpEvent kind:function(thumb,size=0xbc) addr:0x021eed38
+GimmickHumilau_LoadSplash kind:function(thumb,size=0x74) addr:0x021eedf4
+GimmickHumilau_FreeScene kind:function(thumb,size=0xc) addr:0x021eee68
+GimmickHumilau_StepAnimations kind:function(thumb,size=0xc) addr:0x021eee74
+GimmickHumilau_PlayActor kind:function(thumb,size=0x5e) addr:0x021eee80
+GimmickHumilau_JumpEvent kind:function(thumb,size=0xf8) addr:0x021eeee0
 data_ov113_021eefd8 kind:data(any) addr:0x021eefd8
 data_ov113_021eefe0 kind:data(any) addr:0x021eefe0
 data_ov113_021eefe1 kind:data(any) addr:0x021eefe1 ambiguous

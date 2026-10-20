@@ -35,7 +35,7 @@ static void PML_PkmSyncMetLevel(BoxPkm *pkm);
 static void PML_PkmSyncOriginGame(BoxPkm *pkm);
 static void PML_PkmSetSpecialTransferUsed(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo);
 
-void PokeParty_SetupMetData(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo, u16 placeName, HeapID heapId) {
+void PokeParty_SetupMetData(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo, u32 placeName, HeapID heapId) {
     PML_UtilSetupMetData(func_0201d620(pkm), kind, playerInfo, placeName, heapId);
 }
 

@@ -41,9 +41,18 @@
 // The zone of no zone, for a position outside the map
 #define ZONE_NONE 0xffff
 
+// The other version's Route 4, whose hidden items are left out of the search
+#ifdef BLACK2
+#define ZONE_OTHER_ROUTE_4 ZONE_ROUTE_4_16
+#else
+#define ZONE_OTHER_ROUTE_4 ZONE_ROUTE_4
+#endif
+
 // What the search found: nothing or a hidden item
-#define HIT_NONE 0
-#define HIT_HIDDEN_ITEM 1
+typedef enum {
+    HIT_NONE,
+    HIT_HIDDEN_ITEM,
+} DowsingHitType;
 
 // The area that is searched around the player, in tiles: the signal map is 32 wide, the player at its (15, 11)
 #define MAP_WIDTH 32
@@ -94,7 +103,7 @@ typedef struct {
 
 // A hidden item that the search found
 typedef struct {
-    u32 type;
+    DowsingHitType type;
     const HiddenItem *item;
 } DowsingHit;
 
@@ -271,7 +280,7 @@ static BOOL DowsingSearch_Next(DowsingSearch *search, DowsingHit *hit, u32 mode,
     u16 count;
     BOOL found = FALSE;
     DowsingHit candidate;
-    const HiddenItem *items = func_ov012_0215f2c4(&count);
+    const HiddenItem *items = GetHiddenItems(&count);
 
     if (mode <= 1) {
         if (!GetZoneIsHiddenGroto(zoneId)) {
@@ -343,7 +352,7 @@ DowsingWork *Dowsing_Create(HeapID heapId, HeapID subscreenHeapId, FieldSubscree
     GameData_GetSaveControl(gameData);
     work->search = DowsingSearch_Create(work->heapId, eventWork);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0x10, 0x18, 1, 7);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     return work;
 }
 
@@ -439,7 +448,8 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     minZ = playerZ - SEARCH_TOP;
     maxZ = playerZ + SEARCH_BOTTOM;
     DowsingHit hit = { HIT_NONE, NULL };
-    DowsingHit best = hit;
+    DowsingHit best;
+    best.type = HIT_NONE;
     bestDistance = -1;
 
     if (work->searchRestart) {
@@ -478,7 +488,7 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
                 const HiddenItem *item = hit.item;
                 if (zoneId != item->zoneId) {
                     if (!item->outdoors || !zoneIsMatrix0 || GetZoneIsEntralinkAny(item->zoneId) ||
-                        item->zoneId == ZONE_ROUTE_4_16) {
+                        item->zoneId == ZONE_OTHER_ROUTE_4) {
                         continue;
                     }
                 }
@@ -573,21 +583,21 @@ void Dowsing_UpdateAltFrame(DowsingWork *work, BOOL active) {
     if (active) {
         if (work->shownSignal != work->signal) {
             ClActorPos pos;
-            func_0204c124(work->icons[ICON_DIRECTION].actor,
-                          work->signal != SIGNAL_CLOSEST && work->signal != SIGNAL_NONE);
-            func_0204c124(work->icons[ICON_CLOSEST].actor, work->signal == SIGNAL_CLOSEST);
+            ClActor_SetVisible(work->icons[ICON_DIRECTION].actor,
+                               work->signal != SIGNAL_CLOSEST && work->signal != SIGNAL_NONE);
+            ClActor_SetVisible(work->icons[ICON_CLOSEST].actor, work->signal == SIGNAL_CLOSEST);
             pos.x = sSignals[work->signal].x;
             pos.y = sSignals[work->signal].y;
-            func_0204c140(work->icons[ICON_DIRECTION].actor, &pos, 1);
-            func_0204c488(work->icons[ICON_RING].actor, sSignals[work->signal].anims0);
-            func_0204c488(work->icons[ICON_DOT].actor, sSignals[work->signal].anims1);
-            func_0204c488(work->icons[ICON_DIRECTION].actor, sSignals[work->signal].anims2);
+            ClActor_SetSurfacePos(work->icons[ICON_DIRECTION].actor, &pos, 1);
+            ClActor_SetSequence(work->icons[ICON_RING].actor, sSignals[work->signal].anims0);
+            ClActor_SetSequence(work->icons[ICON_DOT].actor, sSignals[work->signal].anims1);
+            ClActor_SetSequence(work->icons[ICON_DIRECTION].actor, sSignals[work->signal].anims2);
             work->shownSignal = work->signal;
         }
         if (work->signal == SIGNAL_CLOSEST && work->restartIcon) {
-            func_0204c488(work->icons[ICON_CLOSEST].actor, 0);
+            ClActor_SetSequence(work->icons[ICON_CLOSEST].actor, 0);
             func_0204c520(work->icons[ICON_CLOSEST].actor, TRUE);
-            func_0204c4d4(work->icons[ICON_CLOSEST].actor, 0);
+            ClActor_SetAnimTime(work->icons[ICON_CLOSEST].actor, 0);
             work->restartIcon = FALSE;
         }
     }
@@ -619,15 +629,15 @@ static void Dowsing_InitBG(DowsingWork *work) {
         GFL_BGSysMoveBG(bg, BG_MOVE_SET_X, 0);
         GFL_BGSysMoveBG(bg, BG_MOVE_SET_Y, 0);
     }
-    work->unit = func_0204bf1c(8, 0, work->heapId);
-    func_0204c028(work->unit);
+    work->unit = ClActUnit_Create(8, 0, work->heapId);
+    ClActUnit_UseSystemRenderer(work->unit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void Dowsing_ExitBG(DowsingWork *work) {
     int i;
 
-    func_0204bf98(work->unit);
+    ClActUnit_Delete(work->unit);
     for (i = 0; i < NELEMS(sDowsingBGSetups); i++) {
         GFL_BGSysReleaseBG(sDowsingBGSetups[i].bg);
     }
@@ -655,7 +665,7 @@ static void Dowsing_InitIcons(DowsingWork *work) {
     u8 i;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DOWSING, work->subscreenHeapId);
 
-    work->iconPalette = func_0204bbb8(arc, 1, 1, 0, 0, 1, work->heapId);
+    work->iconPalette = ClActSys_LoadPlttRange(arc, 1, 1, 0, 0, 1, work->heapId);
     for (i = 0; i < ICON_COUNT; i++) {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
         if (i == ICON_DOT) {
@@ -663,14 +673,14 @@ static void Dowsing_InitIcons(DowsingWork *work) {
             work->icons[i].cellAnims = work->icons[ICON_RING].cellAnims;
         } else {
             const DowsingIconRes *res = &sIconRes[i];
-            work->icons[i].chars = func_0204b81c(arc, res->file, FALSE, 1, work->heapId);
-            work->icons[i].cellAnims = func_0204bde0(arc, res->cellFile, res->animFile, work->heapId);
+            work->icons[i].chars = ClActSys_LoadChars(arc, res->file, FALSE, 1, work->heapId);
+            work->icons[i].cellAnims = ClActSys_LoadCellAnims(arc, res->cellFile, res->animFile, work->heapId);
         }
         setup.priority = i;
-        work->icons[i].actor = func_0204c040(work->unit, work->icons[i].chars, work->iconPalette,
-                                             work->icons[i].cellAnims, &setup, 1, work->heapId);
+        work->icons[i].actor = ClActor_Create(work->unit, work->icons[i].chars, work->iconPalette,
+                                              work->icons[i].cellAnims, &setup, 1, work->heapId);
         func_0204c520(work->icons[i].actor, TRUE);
-        func_0204c318(work->icons[i].actor, 1);
+        ClActor_SetObjMode(work->icons[i].actor, 1);
     }
     GFL_ArcToolFree(arc);
 
@@ -678,13 +688,13 @@ static void Dowsing_InitIcons(DowsingWork *work) {
         ClActorPos pos;
         pos.x = 0x50;
         pos.y = 0x60;
-        func_0204c140(work->icons[ICON_RING].actor, &pos, 1);
+        ClActor_SetSurfacePos(work->icons[ICON_RING].actor, &pos, 1);
         pos.x = 0xb0;
         pos.y = 0x60;
-        func_0204c140(work->icons[ICON_DOT].actor, &pos, 1);
+        ClActor_SetSurfacePos(work->icons[ICON_DOT].actor, &pos, 1);
         pos.x = 0x80;
         pos.y = 0x60;
-        func_0204c140(work->icons[ICON_CLOSEST].actor, &pos, 1);
+        ClActor_SetSurfacePos(work->icons[ICON_CLOSEST].actor, &pos, 1);
     }
 }
 
@@ -692,13 +702,13 @@ static void Dowsing_FreeIcons(DowsingWork *work) {
     u8 i;
 
     for (i = 0; i < ICON_COUNT; i++) {
-        func_0204c108(work->icons[i].actor);
+        ClActor_Delete(work->icons[i].actor);
         if (i != ICON_DOT) {
-            func_0204be64(work->icons[i].cellAnims);
-            func_0204b98c(work->icons[i].chars);
+            ClActSys_FreeCellAnims(work->icons[i].cellAnims);
+            ClActSys_FreeChars(work->icons[i].chars);
         }
     }
-    func_0204bcd0(work->iconPalette);
+    ClActSys_FreePltt(work->iconPalette);
 }
 
 static void Dowsing_InitButton(DowsingWork *work) {
@@ -713,9 +723,9 @@ static void Dowsing_InitButton(DowsingWork *work) {
     InfoWin_Init(BG_INFOWIN, 3, GSYS_GetGameData(Field_GetGameSystem(work->field)), work->heapId);
     ClActorSetup setup = { 0, 0, 0, 0, 0 };
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_SUB_BG, 0x40, 0x20, heapId);
-    work->barChars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), BG_INFOWIN, 0, FALSE, heapId);
-    screenBuffer = GFL_G2DIOReadNSCRArc(arc, func_0202d828(), FALSE, &screen, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_SUB_BG, 0x40, 0x20, heapId);
+    work->barChars = GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), BG_INFOWIN, 0, FALSE, heapId);
+    screenBuffer = GFL_G2DIOReadNSCRArc(arc, AppMenuCommon_GetBarScreenFile(), FALSE, &screen, heapId);
     chars = work->barChars;
     tiles = (u16 *)screen->rawData;
     for (i = 0; i < 0x300; i++) {
@@ -726,25 +736,27 @@ static void Dowsing_InitButton(DowsingWork *work) {
     GFL_BGSysQueueScrLoad(BG_INFOWIN);
     GFL_HeapFree(screenBuffer);
 
-    work->buttonPalette = func_0204bbb8(arc, func_0202d810(), 1, 0x20, 0, 3, work->heapId);
-    work->buttonChars = func_0204b81c(arc, func_0202d814(), FALSE, 1, work->heapId);
-    work->buttonCellAnims = func_0204bde0(arc, func_0202d818(0), func_0202d81c(0), work->heapId);
+    work->buttonPalette =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), 1, 0x20, 0, 3, work->heapId);
+    work->buttonChars = ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 1, work->heapId);
+    work->buttonCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(0),
+                                                   AppMenuCommon_GetTouchBarAnimFile(0), work->heapId);
     setup.x = BUTTON_X;
     setup.y = BUTTON_Y;
-    work->button = func_0204c040(work->unit, work->buttonChars, work->buttonPalette, work->buttonCellAnims, &setup, 1,
-                                 work->heapId);
+    work->button = ClActor_Create(work->unit, work->buttonChars, work->buttonPalette, work->buttonCellAnims, &setup, 1,
+                                  work->heapId);
     func_0204c520(work->button, TRUE);
     func_0204c53c(work->button, 1 << 13);
-    func_0204c488(work->button, 0);
+    ClActor_SetSequence(work->button, 0);
     GFL_ArcToolFree(arc);
     work->buttonState = BUTTON_WAIT;
 }
 
 static void Dowsing_ExitButton(DowsingWork *work) {
-    func_0204c108(work->button);
-    func_0204be64(work->buttonCellAnims);
-    func_0204b98c(work->buttonChars);
-    func_0204bcd0(work->buttonPalette);
+    ClActor_Delete(work->button);
+    ClActSys_FreeCellAnims(work->buttonCellAnims);
+    ClActSys_FreeChars(work->buttonChars);
+    ClActSys_FreePltt(work->buttonPalette);
     GFL_BGSysFreeCharMemory(BG_INFOWIN, CHAR_POS(work->barChars), CHAR_SIZE(work->barChars));
     InfoWin_Exit();
 }
@@ -757,25 +769,26 @@ static void Dowsing_UpdateButton(DowsingWork *work) {
     switch (work->buttonState) {
     case BUTTON_WAIT:
         pressed = FALSE;
-        if (func_0203dac8(&x, &y) && x >= BUTTON_X && x < 256 && y >= BUTTON_Y && y < BUTTON_Y + BUTTON_HEIGHT) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y) && x >= BUTTON_X && x < 256 && y >= BUTTON_Y &&
+            y < BUTTON_Y + BUTTON_HEIGHT) {
             pressed = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (!pressed && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             pressed = TRUE;
         }
         if (pressed) {
             work->buttonState = BUTTON_PRESSED;
-            func_0204c488(work->button, 8);
+            ClActor_SetSequence(work->button, 8);
             GFL_SndSEPlay(SEQ_SE_CLOSE1);
             return;
         }
         break;
     case BUTTON_PRESSED:
-        if (!func_0204c560(work->button)) {
+        if (!ClActor_IsAnimActive(work->button)) {
             work->buttonState = BUTTON_RELEASED;
-            func_0204c488(work->button, 0);
+            ClActor_SetSequence(work->button, 0);
         }
         break;
     case BUTTON_RELEASED:
@@ -835,7 +848,7 @@ static void Dowsing_UpdateFade(DowsingWork *work) {
             PaletteFade_StartFade(work->paletteFade, 8, mask2, 0, 0, 0, 0, work->tcbManager);
             work->fadeState = 0;
             for (i = 0; i < ICON_COUNT; i++) {
-                func_0204c540(work->icons[i].actor);
+                ClActor_StartAnim(work->icons[i].actor);
             }
         }
         break;
@@ -853,7 +866,7 @@ static void Dowsing_UpdateFade(DowsingWork *work) {
             PaletteFade_StartFade(work->paletteFade, 8, mask2, 0, 8, 8, 0, work->tcbManager);
             work->fadeState = 1;
             for (i = 0; i < ICON_COUNT; i++) {
-                func_0204c550(work->icons[i].actor);
+                ClActor_StopAnim(work->icons[i].actor);
             }
         }
         break;

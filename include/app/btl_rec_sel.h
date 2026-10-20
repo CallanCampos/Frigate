@@ -11,9 +11,8 @@
 
 #define OVERLAY_BTL_REC_SEL OVERLAY_ID(306)
 
-// The screen's heap and its archive of graphics. Our names
+// The screen's heap. Our name
 #define HEAPID_BTL_REC_SEL 0x75
-#define ARCID_BTL_REC_SEL 185
 
 // What the screen is called with
 typedef struct {
@@ -25,7 +24,7 @@ typedef struct {
     BOOL comm;
     // Whether the battle was recorded at all; "The last battle cannot be recorded" if not
     BOOL recorded;
-    // The battle mode's index and the header's counter, for func_0200be50
+    // The battle mode's index and the header's counter, for BattleRec_FinishAndSaveSlot
     u32 mode;
     s32 counter;
 } BtlRecSelParam;

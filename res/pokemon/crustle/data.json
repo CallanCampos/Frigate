@@ -1,0 +1,130 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Crustle",
+    "pokedex": {
+        "category": "Stone Home Pokémon",
+        "entry": "When its boulder is broken\nin battles for territory, it feels\nunsure and begins to weaken.",
+        "height": "4'07\"",
+        "weight": "440.9 lbs.",
+        "languages": {
+            "ja": {
+                "category": "いわやどポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 95,
+        "defense": 125,
+        "speed": 45,
+        "special_attack": 65,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_BUG", "TYPE_ROCK" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_HARD_STONE",
+        "very_rare": "ITEM_RARE_BONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_SHELL_ARMOR" ],
+    "hidden_ability": "ABILITY_WEAK_ARMOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 14,
+    "weight": 2000,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SHELL_SMASH" ],
+            [ 1, "MOVE_ROCK_BLAST" ],
+            [ 1, "MOVE_WITHDRAW" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 5, "MOVE_ROCK_BLAST" ],
+            [ 7, "MOVE_WITHDRAW" ],
+            [ 11, "MOVE_SAND_ATTACK" ],
+            [ 13, "MOVE_FAINT_ATTACK" ],
+            [ 17, "MOVE_SMACK_DOWN" ],
+            [ 19, "MOVE_ROCK_POLISH" ],
+            [ 23, "MOVE_BUG_BITE" ],
+            [ 24, "MOVE_STEALTH_ROCK" ],
+            [ 29, "MOVE_ROCK_SLIDE" ],
+            [ 31, "MOVE_SLASH" ],
+            [ 38, "MOVE_X_SCISSOR" ],
+            [ 43, "MOVE_SHELL_SMASH" ],
+            [ 50, "MOVE_FLAIL" ],
+            [ 55, "MOVE_ROCK_WRECKER" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM65",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM75",
+            "TM76",
+            "TM78",
+            "TM80",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_BLOCK",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 116,
+    "baby_species": "SPECIES_DWEBBLE",
+    "cry_volume": 120
+}

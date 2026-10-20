@@ -137,24 +137,25 @@ static void BPlistObj_LoadPokeIconRes(BPlistWork *wk) {
 
     for (i = 0; i < 6; i++) {
         if (wk->pokemon[i].species != 0) {
-            res[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE, CLACT_VRAM_SUB,
-                                   wk->param->heapId);
+            res[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE,
+                                        CLACT_VRAM_SUB, wk->param->heapId);
         } else {
-            res[i] =
-                func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+            res[i] = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB,
+                                        wk->param->heapId);
         }
     }
-    wk->plttRes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->param->heapId);
-    wk->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->param->heapId);
+    wk->plttRes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->param->heapId);
+    wk->cellRes[0] =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void BPlistObj_LoadStatusIconRes(BPlistWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
 
-    wk->charRes[6] = func_0204b81c(arc, 12, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[1] = func_0204bba0(arc, 11, CLACT_VRAM_SUB, 0x60, wk->param->heapId);
-    wk->cellRes[1] = func_0204bde0(arc, 13, 16, wk->param->heapId);
+    wk->charRes[6] = ClActSys_LoadChars(arc, 12, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[1] = ClActSys_LoadPltt(arc, 11, CLACT_VRAM_SUB, 0x60, wk->param->heapId);
+    wk->cellRes[1] = ClActSys_LoadCellAnims(arc, 13, 16, wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -162,40 +163,43 @@ static void BPlistObj_LoadTypeIconRes(BPlistWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
     u32 i;
 
-    wk->plttRes[3] = func_0204bba0(arc, 33, CLACT_VRAM_SUB, 0xa0, wk->param->heapId);
-    wk->cellRes[3] = func_0204bde0(arc, 59, 62, wk->param->heapId);
+    wk->plttRes[3] = ClActSys_LoadPltt(arc, 33, CLACT_VRAM_SUB, 0xa0, wk->param->heapId);
+    wk->cellRes[3] = ClActSys_LoadCellAnims(arc, 59, 62, wk->param->heapId);
     for (i = 8; i <= 21; i++) {
-        wk->charRes[i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+        wk->charRes[i] =
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     }
-    wk->charRes[22] = func_0204b81c(arc, func_0202d80c(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->charRes[23] = func_0204b81c(arc, func_0202d80c(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->charRes[22] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetCategoryIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->charRes[23] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetCategoryIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void BPlistObj_LoadItemIconRes(BPlistWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
 
-    wk->charRes[7] = func_0204b81c(arc, 65, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[2] = func_0204bba0(arc, 66, CLACT_VRAM_SUB, 0x80, wk->param->heapId);
-    wk->cellRes[2] = func_0204bde0(arc, 67, 70, wk->param->heapId);
+    wk->charRes[7] = ClActSys_LoadChars(arc, 65, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[2] = ClActSys_LoadPltt(arc, 66, CLACT_VRAM_SUB, 0x80, wk->param->heapId);
+    wk->cellRes[2] = ClActSys_LoadCellAnims(arc, 67, 70, wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void BPlistObj_LoadCursorRes(BPlistWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(wk->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(wk->param->heapId));
 
-    wk->charRes[24] = func_0204b81c(arc, 424, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[4] = func_0204bbb8(arc, 421, CLACT_VRAM_SUB, 0x100, 4, 1, wk->param->heapId);
-    wk->cellRes[4] = func_0204bde0(arc, 425, 426, wk->param->heapId);
+    wk->charRes[24] = ClActSys_LoadChars(arc, 424, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[4] = ClActSys_LoadPlttRange(arc, 421, CLACT_VRAM_SUB, 0x100, 4, 1, wk->param->heapId);
+    wk->cellRes[4] = ClActSys_LoadCellAnims(arc, 425, 426, wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void BPlistObj_LoadPlateIconRes(BPlistWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(wk->param->heapId));
 
-    wk->charRes[25] = func_0204b81c(arc, func_0202d958(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[5] = func_0204bba0(arc, func_0202d954(), CLACT_VRAM_SUB, 0x120, wk->param->heapId);
-    wk->cellRes[5] = func_0204bde0(arc, func_0202d95c(0), func_0202d960(0), wk->param->heapId);
+    wk->charRes[25] = ClActSys_LoadChars(arc, func_0202d958(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[5] = ClActSys_LoadPltt(arc, func_0202d954(), CLACT_VRAM_SUB, 0x120, wk->param->heapId);
+    wk->cellRes[5] = ClActSys_LoadCellAnims(arc, func_0202d95c(0), func_0202d960(0), wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -207,18 +211,18 @@ static ClActor *BPlistObj_CreateActor(BPlistWork *wk, const BPlistActorSetup *da
     setup.sequence = 0;
     setup.priority = data->priority;
     setup.bgPriority = data->bgPriority;
-    return func_0204c040(wk->actorUnit, wk->charRes[data->chars], wk->plttRes[data->palette],
-                         wk->cellRes[data->cellAnims], &setup, CLACT_SURFACE_SUB, wk->param->heapId);
+    return ClActor_Create(wk->actorUnit, wk->charRes[data->chars], wk->plttRes[data->palette],
+                          wk->cellRes[data->cellAnims], &setup, CLACT_SURFACE_SUB, wk->param->heapId);
 }
 
 static void BPlistObj_CreateActors(BPlistWork *wk) {
     u32 i;
 
-    wk->actorUnit = func_0204bf1c(45, 0, HEAPID_TAIL(wk->param->heapId));
+    wk->actorUnit = ClActUnit_Create(45, 0, HEAPID_TAIL(wk->param->heapId));
     for (i = 0; i < NELEMS(wk->actors); i++) {
         wk->actors[i] = BPlistObj_CreateActor(wk, &data_ov287_021fb134[i]);
     }
-    func_02042ba8(FALSE, wk->param->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->param->heapId);
     PaletteFade_LoadFromVRAM(wk->paletteFade, PALFADE_VRAM_SUB_OBJ, 0, 0x1e0);
     BPlistObj_SetPokeIconPalettes(wk);
 }
@@ -227,24 +231,24 @@ void BPlistObj_Exit(BPlistWork *wk) {
     u32 i;
 
     for (i = 0; i < NELEMS(wk->actors); i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
     BAppCursor_DeleteActors(wk->cursor);
     for (i = 0; i < NELEMS(wk->charRes); i++) {
-        func_0204b98c(wk->charRes[i]);
+        ClActSys_FreeChars(wk->charRes[i]);
     }
     for (i = 0; i < NELEMS(wk->plttRes); i++) {
-        func_0204bcd0(wk->plttRes[i]);
+        ClActSys_FreePltt(wk->plttRes[i]);
     }
     for (i = 0; i < NELEMS(wk->cellRes); i++) {
-        func_0204be64(wk->cellRes[i]);
+        ClActSys_FreeCellAnims(wk->cellRes[i]);
     }
-    func_0204bf98(wk->actorUnit);
+    ClActUnit_Delete(wk->actorUnit);
 }
 
 static void BPlistObj_ShowAt(ClActor *actor, const ClActorPos *pos) {
-    func_0204c124(actor, TRUE);
-    func_0204c140(actor, pos, CLACT_SURFACE_SUB);
+    ClActor_SetVisible(actor, TRUE);
+    ClActor_SetSurfacePos(actor, pos, CLACT_SURFACE_SUB);
 }
 
 static void BPlistObj_SetPokeIconPalettes(BPlistWork *wk) {
@@ -252,10 +256,10 @@ static void BPlistObj_SetPokeIconPalettes(BPlistWork *wk) {
 
     for (i = 0; i < 6; i++) {
         if (wk->pokemon[i].species != 0) {
-            func_0204c378(wk->pokeIcons[i],
-                          PokeIcon_GetPalette(wk->pokemon[i].species, wk->pokemon[i].form, wk->pokemon[i].sex,
-                                              wk->pokemon[i].isEgg),
-                          1);
+            ClActor_SetPalette(wk->pokeIcons[i],
+                               PokeIcon_GetPalette(wk->pokemon[i].species, wk->pokemon[i].form, wk->pokemon[i].sex,
+                                                   wk->pokemon[i].isEgg),
+                               1);
         }
     }
 }
@@ -263,12 +267,13 @@ static void BPlistObj_SetPokeIconPalettes(BPlistWork *wk) {
 static void BPlistObj_LoadTypeIcon(BPlistWork *wk, ClActor *actor, u32 chars, u32 type) {
     NNSG2dCharacterData *charData;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
-    void *file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d7f4(type), FALSE, &charData, HEAPID_TAIL(wk->param->heapId));
+    void *file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, &charData,
+                                         HEAPID_TAIL(wk->param->heapId));
 
-    func_0204ba40(wk->charRes[chars], charData);
+    ClActSys_ReplaceCharData(wk->charRes[chars], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(actor, func_0202d7e8(type), 1);
+    ClActor_SetPalette(actor, AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void BPlistObj_LoadCategoryIcon(BPlistWork *wk, u32 actor, u32 chars, u32 category) {
@@ -279,20 +284,21 @@ static void BPlistObj_LoadCategoryIcon(BPlistWork *wk, u32 actor, u32 chars, u32
     actor += wk->categoryIconBuf;
     chars += wk->categoryIconBuf;
     arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->param->heapId));
-    file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d80c(category), FALSE, &charData, HEAPID_TAIL(wk->param->heapId));
-    func_0204ba40(wk->charRes[chars], charData);
+    file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetCategoryIconCharFile(category), FALSE, &charData,
+                                   HEAPID_TAIL(wk->param->heapId));
+    ClActSys_ReplaceCharData(wk->charRes[chars], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->actors[actor], func_0202d800(category), 1);
+    ClActor_SetPalette(wk->actors[actor], AppMenuCommon_GetCategoryIconPaletteIndex(category), 1);
     wk->categoryIconBuf ^= 1;
 }
 
 static void BPlistObj_ShowStatusIcon(u8 status, ClActor *actor, const ClActorPos *pos) {
     if (status == APP_STATUS_ICON_NONE) {
-        func_0204c140(actor, pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(actor, pos, CLACT_SURFACE_SUB);
         return;
     }
-    func_0204c488(actor, status);
+    ClActor_SetSequence(actor, status);
     BPlistObj_ShowAt(actor, pos);
 }
 
@@ -318,13 +324,13 @@ static void BPlistObj_ShowPokeTypes(BPlistWork *wk, BPlistPokemon *pkm, const Cl
 
 static void BPlistObj_ShowItemIcon(u16 item, ClActor *actor, const ClActorPos *pos) {
     if (item == 0) {
-        func_0204c140(actor, pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(actor, pos, CLACT_SURFACE_SUB);
         return;
     }
     if (PML_ItemIsMail(item) == TRUE) {
-        func_0204c488(actor, 1);
+        ClActor_SetSequence(actor, 1);
     } else {
-        func_0204c488(actor, 0);
+        ClActor_SetSequence(actor, 0);
     }
     BPlistObj_ShowAt(actor, pos);
 }
@@ -333,7 +339,7 @@ void BPlistObj_SetPage(BPlistWork *wk, u8 page) {
     u32 i;
 
     for (i = 0; i < NELEMS(wk->actors); i++) {
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     switch (page) {
     case 0:
@@ -534,9 +540,9 @@ void BPlistObj_ShowMoveTypes(BPlistWork *wk) {
 }
 
 static void BPlistObj_ChangeAnim(ClActor *actor, u16 sequence) {
-    if (sequence != func_0204c4a0(actor)) {
-        func_0204c4d4(actor, 0);
-        func_0204c488(actor, sequence);
+    if (sequence != ClActor_GetSequence(actor)) {
+        ClActor_SetAnimTime(actor, 0);
+        ClActor_SetSequence(actor, sequence);
     }
 }
 
@@ -569,7 +575,7 @@ void BPlistObj_UpdatePokeIconAnims(BPlistWork *wk) {
         if (wk->pokemon[slot].species != 0) {
             u16 seq = BPlistObj_GetPokeIconAnim(&wk->pokemon[slot]);
             BPlistObj_ChangeAnim(wk->pokeIcons[slot], seq);
-            func_0204c4e0(wk->pokeIcons[slot], FX32_ONE);
+            ClActor_SetAnimSpeed(wk->pokeIcons[slot], FX32_ONE);
         }
     }
 }
@@ -583,18 +589,18 @@ void BPlistObj_MovePlate(BPlistWork *wk, int pos, s16 dx) {
     u8 slot = BPlistMain_GetPartySlot(wk, pos);
     ClActorPos p;
 
-    func_0204c178(wk->itemIcons[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->itemIcons[slot], &p, CLACT_SURFACE_SUB);
     p.x += dx;
-    func_0204c140(wk->itemIcons[slot], &p, CLACT_SURFACE_SUB);
-    func_0204c178(wk->pokeIcons[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->itemIcons[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->pokeIcons[slot], &p, CLACT_SURFACE_SUB);
     p.x += dx;
-    func_0204c140(wk->pokeIcons[slot], &p, CLACT_SURFACE_SUB);
-    func_0204c178(wk->statusIcons[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->pokeIcons[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->statusIcons[slot], &p, CLACT_SURFACE_SUB);
     p.x += dx;
-    func_0204c140(wk->statusIcons[slot], &p, CLACT_SURFACE_SUB);
-    func_0204c178(wk->unk1f08[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->statusIcons[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->unk1f08[slot], &p, CLACT_SURFACE_SUB);
     p.x += dx;
-    func_0204c140(wk->unk1f08[slot], &p, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->unk1f08[slot], &p, CLACT_SURFACE_SUB);
 }
 
 void BPlistObj_SwapPlates(BPlistWork *wk, int posA, int posB) {
@@ -603,20 +609,20 @@ void BPlistObj_SwapPlates(BPlistWork *wk, int posA, int posB) {
     ClActorPos a;
     ClActorPos b;
 
-    func_0204c178(wk->itemIcons[slotA], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->itemIcons[slotB], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->itemIcons[slotA], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->itemIcons[slotB], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->pokeIcons[slotA], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->pokeIcons[slotB], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->pokeIcons[slotA], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->pokeIcons[slotB], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->statusIcons[slotA], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->statusIcons[slotB], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->statusIcons[slotA], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->statusIcons[slotB], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->unk1f08[slotA], &a, CLACT_SURFACE_SUB);
-    func_0204c178(wk->unk1f08[slotB], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->unk1f08[slotA], &b, CLACT_SURFACE_SUB);
-    func_0204c140(wk->unk1f08[slotB], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->itemIcons[slotA], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->itemIcons[slotB], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->itemIcons[slotA], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->itemIcons[slotB], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->pokeIcons[slotA], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->pokeIcons[slotB], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->pokeIcons[slotA], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->pokeIcons[slotB], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->statusIcons[slotA], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->statusIcons[slotB], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->statusIcons[slotA], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->statusIcons[slotB], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->unk1f08[slotA], &a, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(wk->unk1f08[slotB], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->unk1f08[slotA], &b, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->unk1f08[slotB], &a, CLACT_SURFACE_SUB);
 }

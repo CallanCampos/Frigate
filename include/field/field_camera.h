@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "field/field_task.h"
+#include "gfl/arc.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
@@ -34,6 +35,114 @@ typedef struct {
     FieldEvCameraAnimationCoords targetCoords;
     FieldEvCameraAnimationFlags flags;
 } FieldEvCameraAnimationSetup;
+
+// field_camera.c's camera. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the
+// layouts are ours, from field_camera.c and field_camera_anime.c
+
+// Where the camera's target or eye is kept inside a rectangle or a circle, or out of a rectangle: a boundary of the
+// zone's file in archive 0x6d
+typedef struct {
+    u32 shape;
+    u32 applyTo;
+    s32 minX;
+    s32 maxX;
+    s32 minZ;
+    s32 maxZ;
+} FieldCameraRect;
+
+typedef struct {
+    u32 shape;
+    u32 applyTo;
+    s32 centerX;
+    s32 centerZ;
+    s32 radius;
+    u16 angleA;
+    u16 angleB;
+} FieldCameraCircle;
+
+typedef union {
+    struct {
+        u32 shape;
+        u32 applyTo;
+    } head;
+    FieldCameraRect rect;
+    FieldCameraCircle circle;
+} FieldCameraBoundary;
+
+// A camera setup of archive 0x3b. With bind, the camera follows what it is bound to, at target from it; without, it
+// looks at target
+typedef struct {
+    s32 zoom;
+    u32 pitch;
+    u32 yaw;
+    u32 unkC;
+    u8 unk10;
+    u8 swapMode;
+    u16 fov;
+    fx32 zNear;
+    fx32 zFar;
+    BOOL bind;
+    VecFx32 target;
+} FieldCameraDefaults;
+
+// The event camera: the coordinates it started from, and the animation that runs (field_camera_anime.c)
+typedef struct {
+    u32 savedTransformType;
+    FieldEvCameraAnimationCoords base;
+    FieldEvCameraAnimationCoords start;
+    FieldEvCameraAnimationCoords end;
+    u16 frames;
+    u16 frame;
+    BOOL initDone;
+    BOOL active;
+    FieldEvCameraAnimationFlags flags;
+    // What the camera's calcFunc is called with
+    void *calcArg;
+} FieldCameraEvAnimation;
+
+struct FieldCamera {
+    u16 heapId;
+    ArcTool *defaultsArc;
+    ArcTool *boundaryArc;
+    G3DCamera *g3dCamera;
+    u32 defaultsIndex;
+    u32 transformType;
+    const VecFx32 *refBind;
+    const VecFx32 *bind;
+    const VecFx32 *eyeBind;
+    VecFx32 eye;
+    VecFx32 eyeOffset;
+    VecFx32 eyeActual;
+    VecFx32 target;
+    VecFx32 targetActual;
+    VecFx32 targetOffset;
+    VecFx32 targetBase;
+    u16 pitch;
+    u16 yaw;
+    fx32 zoom;
+    u16 fov;
+    u16 angleYaw;
+    u16 anglePitch;
+    FieldCameraBoundary bounds[4];
+    u8 boundCount;
+    u8 useBoundary;
+    u16 boundaryId;
+    FieldCameraDelay *delay;
+    FieldCameraEvAnimation ev;
+    // Called before each transform with ev.calcArg, such as the event camera's animation
+    void (*calcFunc)(FieldCamera *camera, void *arg);
+};
+
+u32 FieldCamera_GetTransformType(FieldCamera *camera);
+void FieldCamera_ReadDefaults(FieldCamera *camera, FieldCameraDefaults *defaults);
+// The pitch, yaw and distance of a direction
+void FieldCamera_CoordsDerive(const VecFx32 *vec, u16 *pitch, u16 *yaw, fx32 *zoom);
+// The target and the eye as the camera last put them, after its boundaries
+void FieldCamera_GetTarget(FieldCamera *camera, VecFx32 *target);
+void FieldCamera_GetEye(FieldCamera *camera, VecFx32 *eye);
+// The camera's coordinates, with the target as set or as the camera last put it
+void FieldCamera_BackupCoords(FieldCamera *camera, FieldEvCameraAnimationCoords *coords);
+void FieldCamera_BackupCoordsRealTime(FieldCamera *camera, FieldEvCameraAnimationCoords *coords);
 
 // Where a camera animation of the camera animation controller starts or ends
 typedef struct {
@@ -77,11 +186,11 @@ void FieldCameraAnimationController_SetAnimation(FieldCameraAnimationController 
                                                  const FieldCameraAnimation *animation);
 void FieldCameraAnimationController_PrepareCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_StartAnimation(FieldCameraAnimationController *controller);
-// Overlay 36's field_camera_anime.c, not written yet: releases the camera the animation is bound to, and puts the
+// Overlay 36's field_camera_anime.c: releases the camera the animation is bound to, and puts the
 // camera at the animation's start
 void FieldCameraAnimationController_FinishCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_CommitSrcCoords(FieldCameraAnimationController *controller);
-GameEvent *EventEvCameraShake_Create(GameSystem *gsys, const FieldEvCameraShake *shake);
+GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldEvCameraShake *shake);
 void FieldCamera_CalcTransform(FieldCamera *camera, u16 heldKeys);
 G3DCamera *FieldCamera_GetG3DCamera(FieldCamera *camera);
 void FieldCamera_CoordsGetEyeOffset(FieldCamera *camera, VecFx32 *offset);
@@ -118,9 +227,9 @@ void FieldCamera_FinishDelay(FieldCamera *camera);
 BOOL FieldCamera_IsDelayActive(FieldCamera *camera);
 // What the camera follows
 void *FieldCamera_GetBind(FieldCamera *camera);
-void FieldCamera_SetBind(FieldCamera *camera, void *bind);
+void FieldCamera_SetBind(FieldCamera *camera, const VecFx32 *bind);
 // What the camera follows on a rail map
-void FieldCamera_SetRefBind(FieldCamera *camera, void *bind);
+void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind);
 void *FieldCamera_GetRefBind(FieldCamera *camera);
 // The event camera's animations: start, animate to a target or back over frames, and end
 void FieldCamera_EVCameraInit(FieldCamera *camera);

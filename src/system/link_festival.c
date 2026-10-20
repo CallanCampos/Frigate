@@ -21,11 +21,11 @@
 // The Funfest's work: the current mission, the players in it and the missions seen. The file's name is the ROM's.
 
 static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable);
-static void func_02014b1c(LinkFestival *festival);
-static void func_02014b38(LinkFestival *festival, LinkFestivalBest *best);
+static void LinkFestival_TickMissionBeacon(LinkFestival *festival);
+static void LinkFestivalBest_InitMine(LinkFestival *festival, LinkFestivalBest *best);
 static void ClearLinkFestivalData(LinkFestival *festival);
-static void func_02014bd4(LinkFestival *festival, FestMissionConfig *config);
-static BOOL func_02014bf0(LinkFestival *festival, FestMissionConfig *config);
+static void LinkFestival_SetCurrentRecord(LinkFestival *festival, FestMissionConfig *config);
+static BOOL LinkFestival_HasRecord(LinkFestival *festival, FestMissionConfig *config);
 static void FestMissionRecord_Set(FestMissionRecord *record, const FestMissionConfig *config);
 static BOOL FestMissionRecord_Matches(const FestMissionRecord *record, const FestMissionConfig *config);
 static void FestMissionRecord_Clear(FestMissionRecord *record);
@@ -36,7 +36,7 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
     festival->gsys = gsys;
     festival->gameData = GSYS_GetGameData(gsys);
     festival->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
-    festival->headers = func_ov027_02170b18(festival->archive, heapId);
+    festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
     festival->info = (FestMissionInfo *)&festival->config;
     festival->unk54 = &festival->config.type;
@@ -68,7 +68,7 @@ void LinkFestival_Update(LinkFestival *festival) {
                 festival->unk14 += (u16)added;
             }
         }
-        func_02014b1c(festival);
+        LinkFestival_TickMissionBeacon(festival);
     }
 }
 
@@ -80,23 +80,23 @@ void *GetFestMissionCfg(LinkFestival *festival) {
     return &festival->config;
 }
 
-ArcTool *func_02014590(LinkFestival *festival) {
+ArcTool *LinkFestival_GetArchive(LinkFestival *festival) {
     return festival->archive;
 }
 
-void func_02014594(LinkFestival *festival, void *mission, u16 value) {
+void LinkFestival_FillMissionInfo(LinkFestival *festival, void *mission, u16 value) {
     FestMissionInfo *info = mission;
 
     *info = *festival->info;
     info->unkC_0 = value;
-    info->seconds = func_020145dc(festival);
+    info->seconds = LinkFestival_GetSecondsLeft(festival);
 }
 
-u16 func_020145d8(LinkFestival *festival) {
+u16 LinkFestival_GetScore(LinkFestival *festival) {
     return festival->config.missionId;
 }
 
-u16 func_020145dc(LinkFestival *festival) {
+u16 LinkFestival_GetSecondsLeft(LinkFestival *festival) {
     return FestMissionConfig_GetSecondsLeft(&festival->config);
 }
 
@@ -147,7 +147,7 @@ void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *rankin
     }
 }
 
-void *func_020146fc(LinkFestival *festival) {
+void *LinkFestival_GetLog(LinkFestival *festival) {
     return &festival->log;
 }
 
@@ -155,7 +155,7 @@ void *func_02014708(LinkFestival *festival) {
     return &festival->unk37C;
 }
 
-void *func_02014710(LinkFestival *festival) {
+void *LinkFestival_GetPassPowers(LinkFestival *festival) {
     return &festival->passPowers;
 }
 
@@ -166,20 +166,20 @@ void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionH
     *header = headers[index];
 }
 
-void func_0201472c(LinkFestival *festival, void *mission, u8 joined) {
+void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined) {
     ClearLinkFestivalData(festival);
     FestMissionConfig_Start(&festival->config, mission, joined);
     LinkFestival_SetState(festival, 1);
     func_0202be28(GSYS_GetGameCommSystem(festival->gsys), TRUE);
-    func_02014bd4(festival, &festival->config);
+    LinkFestival_SetCurrentRecord(festival, &festival->config);
     SetFesGimmickResidentEnable(mission, TRUE);
-    func_02017b40(festival->gameData, TRUE);
+    GameData_SetFunfestMission(festival->gameData, TRUE);
 }
 
 void func_02014774(LinkFestival *festival, u32 arg1) {
     if (isFesMissionAvailable(&festival->config)) {
         if (festival->config.unk24 == -1) {
-            func_02014dac(&festival->config);
+            FestMissionConfig_StartTimer(&festival->config);
         }
         LinkFestival_SetState(festival, 2);
     }
@@ -197,9 +197,9 @@ int LinkFestival_GetState(LinkFestival *festival) {
 u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival) {
     u16 zoneId;
 
-    func_02017b40(festival->gameData, FALSE);
+    GameData_SetFunfestMission(festival->gameData, FALSE);
     SetFesGimmickResidentEnable(&festival->config, FALSE);
-    func_02014db4(&festival->config);
+    FestMissionConfig_Clear(&festival->config);
     func_0202be28(GSYS_GetGameCommSystem(festival->gsys), FALSE);
     ClearLinkFestivalData(festival);
     if (GameData_GetNowBGM(festival->gameData) != SEQ_BGM_FES) {
@@ -231,7 +231,7 @@ void func_0201483c(LinkFestival *festival) {
 }
 
 // Whether the player came to a new zone from outside the Entralink
-BOOL func_02014844(LinkFestival *festival, u16 zoneId) {
+BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId) {
     u16 previous = festival->zoneId;
 
     if (previous != zoneId) {
@@ -244,7 +244,7 @@ BOOL func_02014844(LinkFestival *festival, u16 zoneId) {
     return FALSE;
 }
 
-RivalEntry *func_02014864(void *owner) {
+RivalEntry *LinkFestival_GetEntries(void *owner) {
     LinkFestival *festival = owner;
 
     return festival->entries;
@@ -266,7 +266,7 @@ int LinkFestival_GetTotalScore(LinkFestival *festival) {
     return total;
 }
 
-BOOL func_020148a8(LinkFestival *festival, u32 *total) {
+BOOL LinkFestival_IsTargetReached(LinkFestival *festival, u32 *total) {
     BOOL reached = FALSE;
 
     *total = 0;
@@ -277,7 +277,7 @@ BOOL func_020148a8(LinkFestival *festival, u32 *total) {
     return reached;
 }
 
-BOOL func_020148cc(LinkFestival *festival) {
+BOOL LinkFestival_IsMissionOver(LinkFestival *festival) {
     u32 total;
     u16 seconds;
     BOOL over;
@@ -285,8 +285,8 @@ BOOL func_020148cc(LinkFestival *festival) {
     if (!isFesMissionAvailable(&festival->config)) {
         return FALSE;
     }
-    seconds = func_020145dc(festival);
-    if (func_020148a8(festival, &total) && festival->info->unk4_31 == TRUE) {
+    seconds = LinkFestival_GetSecondsLeft(festival);
+    if (LinkFestival_IsTargetReached(festival, &total) && festival->info->unk4_31 == TRUE) {
         over = TRUE;
     } else {
         over = TRUE;
@@ -301,28 +301,28 @@ BOOL func_020148cc(LinkFestival *festival) {
     return over;
 }
 
-u32 func_02014920(GameSystem *gsys, u32 a1, u32 a2) {
+u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 a1, u32 a2) {
     LinkFestival *festival = GSYS_GetLinkFestival(gsys);
     BOOL result = FestMissionConfig_AddScore(&festival->config, a1, a2, 1);
 
     if (result) {
-        func_02014a00(festival, 0, festival->config.missionId, NULL);
+        LinkFestival_UpdateBest(festival, 0, festival->config.missionId, NULL);
     }
     return result;
 }
 
-int func_0201494c(LinkFestival *festival) {
+int LinkFestival_GetMemberCount(LinkFestival *festival) {
     if (isFesMissionAvailable(&festival->config) == FALSE) {
         return 0;
     }
     return festival->recordCount + 1;
 }
 
-void func_02014964(LinkFestival *festival, void *mission) {
+void LinkFestival_AddRecord(LinkFestival *festival, void *mission) {
     if (isFesMissionAvailable(&festival->config)) {
         return;
     }
-    if (func_02014bf0(festival, mission)) {
+    if (LinkFestival_HasRecord(festival, mission)) {
         return;
     }
     FestMissionRecord_Set(&festival->records[festival->recordIndex], mission);
@@ -342,7 +342,7 @@ BOOL func_020149b0(LinkFestival *festival, FestMissionConfig *config) {
     if (festival->current.header.index != FEST_MISSION_NONE && FestMissionRecord_Matches(&festival->current, config)) {
         return TRUE;
     }
-    if (func_02014bf0(festival, config)) {
+    if (LinkFestival_HasRecord(festival, config)) {
         return TRUE;
     }
     if (info->seconds < 30) {
@@ -351,7 +351,7 @@ BOOL func_020149b0(LinkFestival *festival, FestMissionConfig *config) {
     return FALSE;
 }
 
-void func_02014a00(LinkFestival *festival, u16 trainerId, u16 value, StrBuf *name) {
+void LinkFestival_UpdateBest(LinkFestival *festival, u16 trainerId, u16 value, StrBuf *name) {
     LinkFestivalBest *best = festival->best;
 
     if (name == NULL) {
@@ -374,12 +374,12 @@ void func_02014a00(LinkFestival *festival, u16 trainerId, u16 value, StrBuf *nam
     festival->bestChanged = TRUE;
 }
 
-BOOL func_02014a4c(LinkFestival *festival) {
+BOOL LinkFestival_IsBestChanged(LinkFestival *festival) {
     return festival->bestChanged;
 }
 
 // Whether the player has the highest score
-BOOL func_02014a54(LinkFestival *festival) {
+BOOL LinkFestival_IsBestMine(LinkFestival *festival) {
     u16 trainerId = getTrainerID(GetGameDataPlayerInfo(festival->gameData));
 
     if (festival->best->trainerId == trainerId) {
@@ -388,7 +388,7 @@ BOOL func_02014a54(LinkFestival *festival) {
     return FALSE;
 }
 
-void func_02014a78(LinkFestival *festival, LinkFestivalBest *dest) {
+void LinkFestival_GetBest(LinkFestival *festival, LinkFestivalBest *dest) {
     dest->trainerId = festival->best->trainerId;
     dest->score = festival->best->score;
     GFL_StrBufCopy(dest->name, festival->best->name);
@@ -432,7 +432,7 @@ static void SetFesGimmickResidentEnable(FestMissionConfig *config, BOOL enable) 
     }
 }
 
-static void func_02014b1c(LinkFestival *festival) {
+static void LinkFestival_TickMissionBeacon(LinkFestival *festival) {
     if (festival->beaconTimer != 0) {
         festival->beaconTimer--;
         return;
@@ -441,7 +441,7 @@ static void func_02014b1c(LinkFestival *festival) {
     festival->beaconTimer = festival->beaconInterval;
 }
 
-static void func_02014b38(LinkFestival *festival, LinkFestivalBest *best) {
+static void LinkFestivalBest_InitMine(LinkFestival *festival, LinkFestivalBest *best) {
     PlayerInfo *info = GetGameDataPlayerInfo(festival->gameData);
 
     textCopy(info->name, best->name);
@@ -452,7 +452,7 @@ static void func_02014b38(LinkFestival *festival, LinkFestivalBest *best) {
 static void ClearLinkFestivalData(LinkFestival *festival) {
     int i;
 
-    func_02014b38(festival, festival->best);
+    LinkFestivalBest_InitMine(festival, festival->best);
     for (i = 0; i < LINK_FESTIVAL_RECORD_COUNT; i++) {
         FestMissionRecord_Clear(&festival->records[i]);
     }
@@ -468,17 +468,17 @@ static void ClearLinkFestivalData(LinkFestival *festival) {
     festival->bestChanged = FALSE;
     FestMissionLog_Clear(&festival->log);
     FestMissionLog_Clear(&festival->unk37C);
-    func_02015198(&festival->passPowers);
+    FestMissionPassPowers_Clear(&festival->passPowers);
     LinkFestival_SetState(festival, 0);
 }
 
-static void func_02014bd4(LinkFestival *festival, FestMissionConfig *config) {
+static void LinkFestival_SetCurrentRecord(LinkFestival *festival, FestMissionConfig *config) {
     FestMissionRecord_Clear(&festival->current);
     FestMissionRecord_Set(&festival->current, config);
 }
 
 // Whether the mission is among those seen, from the newest
-static BOOL func_02014bf0(LinkFestival *festival, FestMissionConfig *config) {
+static BOOL LinkFestival_HasRecord(LinkFestival *festival, FestMissionConfig *config) {
     int i;
     int index = (festival->recordIndex + LINK_FESTIVAL_RECORD_COUNT - 1) % LINK_FESTIVAL_RECORD_COUNT;
 
@@ -508,7 +508,7 @@ static void FestMissionRecord_Clear(FestMissionRecord *record) {
     record->header.index = FEST_MISSION_NONE;
 }
 
-void func_02014c78(FestMissionEntry *entry) {
+void FestMissionEntry_Clear(FestMissionEntry *entry) {
     MI_CpuFill8(entry, 0, sizeof(FestMissionEntry));
     ClearFesMissionCfg(&entry->config);
     FestMissionRecord_Clear(&entry->record);
@@ -516,7 +516,7 @@ void func_02014c78(FestMissionEntry *entry) {
 
 // Takes a beacon's mission as a member's: 0 when it isn't the current mission or there is no room, 1 for a new member
 // and 2 or 4 for a known one, 2 when the member's zone changed, plus 1 when the score rose. out gets the score
-int func_02014c94(LinkFestival *festival, FestMissionEntry *entry, u32 *out) {
+int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u32 *out) {
     int i = 0;
     FestMissionRecord *record;
 

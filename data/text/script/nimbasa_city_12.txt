@@ -1,6 +1,0 @@
-NimbasaCity12_Text_WhenBattleFriendVia = When you battle with a friend via\nwireless communications, you can{be00}\nuse the Wonder Launcher rule{be00}\nto use items in battle!
-NimbasaCity12_Text_WonderLaunchersEnergyCharges = As the Wonder Launcher's energy\ncharges up, you get more points.{be01}\nYou can spend those points\nto use various battle items.
-NimbasaCity12_Text_FewYearsAgoNimbasas = A few years ago, Nimbasa's\nglitz and glamor was pleasant,{be00}\nbut recently it's too much for me...{be01}\nMaybe I should go relax in the country.\nMy Pokémon might find that{be00}\nmore comfortable as well.
-NimbasaCity12_Text_HearSomePeoplesPokemon = I hear that some people's Pokémon\nwere stolen by Team Plasma,{be00}\nand they still haven't been reunited.
-NimbasaCity12_Text_AboutThosePeopleWhose = So about those people whose Pokémon\nwere stolen...{be01}\nI hear former Team Plasma members\ncame around and returned the Pokémon{be00}\nthey took from a guy.{be01}\nBut is that enough?\nI'm not satisfied by that!
-NimbasaCity12_Text_Tyyyym = Tyyyym!

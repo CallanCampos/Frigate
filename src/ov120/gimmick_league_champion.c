@@ -134,11 +134,11 @@ GameEvent *GimmickChampion_CallOpenEvent(GameSystem *gsys) {
 }
 
 void GimmickChampion_HideActorShadow(GameSystem *gsys, u32 actorId) {
-    func_ov012_0216783c(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), TRUE);
+    FldAct_SetForceOffShadow(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), TRUE);
 }
 
 void GimmickChampion_ShowActorShadow(GameSystem *gsys, u32 actorId) {
-    func_ov012_0216783c(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), FALSE);
+    FldAct_SetForceOffShadow(FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId), FALSE);
 }
 
 void GimmickChampion_CallSetOpen(GameSystem *gsys) {
@@ -178,7 +178,7 @@ static void GimmickChampion_Init(ChampionRoomWork *work) {
     GimmickChampion_PlayAnimation(work->expObj, MODEL_2, 0, 0, TRUE);
     GimmickChampion_InitModel(work->expObj, MODEL_3, NELEMS(sModel2And3Animations), TRUE);
     GimmickChampion_InitModel(work->expObj, MODEL_4, NELEMS(sModel4Animations), TRUE);
-    func_ov036_021b8248(work->expObj, 0, MODEL_4, 0);
+    FieldExpObj_SetActorCulling(work->expObj, 0, MODEL_4, 0);
 }
 
 static void GimmickChampion_Free(ChampionRoomWork *work) {
@@ -199,7 +199,7 @@ static void GimmickChampion_InitModel(FieldExpObjSystem *expObj, u16 model, int 
     matrix->translation.x = FX32_CONST(256);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(768);
-    func_ov036_021b8248(expObj, 0, model, 1);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 1);
     FieldExpObj_SetActorHidden(expObj, 0, model, hidden);
     if (animCount != 0) {
         for (i = 0; i < animCount; i++) {
@@ -242,7 +242,7 @@ static void GimmickChampion_PlayModel4(ChampionRoomWork *work) {
 
 static BOOL GimmickChampion_IsModel4Done(ChampionRoomWork *work) {
     BOOL done = FALSE;
-    fx32 frame = func_ov036_021b8520(work->expObj, 0, MODEL_4, 0);
+    fx32 frame = FieldExpObj_GetAnmFrame(work->expObj, 0, MODEL_4, 0);
 
     if (frame >= FX32_CONST(8)) {
         done = TRUE;
@@ -259,7 +259,7 @@ static void GimmickChampion_ShowModel4End(ChampionRoomWork *work) {
     for (i = 0; i < 2; i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_4, i);
         FieldExpObj_SetAnm(work->expObj, 0, MODEL_4, i, TRUE);
-        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_4, i, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_4, i, FieldExpObjAnm_GetLastFrame(anm));
     }
 }
 
@@ -292,7 +292,8 @@ static GameEventReturnCode GimmickChampion_ChangeEvent(GameEvent *event, u32 *st
         FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_2, TRUE);
         FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_3, FALSE);
         FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_2, 0);
-        GimmickChampion_PlayAnimation(work->expObj, MODEL_3, 0, func_ov036_021b8520(work->expObj, 0, MODEL_2, 0), TRUE);
+        GimmickChampion_PlayAnimation(work->expObj, MODEL_3, 0, FieldExpObj_GetAnmFrame(work->expObj, 0, MODEL_2, 0),
+                                      TRUE);
         GimmickChampion_StopAnimation(work->expObj, MODEL_2, 0);
         GimmickChampion_SetChanged(work->state, TRUE);
         FieldCamera_SetDefaultsIndex(Field_GetCameraSystem(field), CHANGED_CAMERA_INDEX);

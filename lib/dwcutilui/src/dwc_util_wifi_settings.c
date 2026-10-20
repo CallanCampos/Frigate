@@ -220,7 +220,7 @@ void func_ov182_021b7c60(const DWCUtilAcResult *result) {
     }
     edit->connection.wepKeyText = 0;
     for (i = 0; i < 4; i++) {
-        MI_CpuCopy8(result->wepKeys[i], edit->connection.wepKey[i], length);
+        MI_CpuCopy8(result->keys[i], edit->connection.wepKey[i], length);
     }
     edit->connection.status = 2;
     MI_CpuFill8(edit->netmask, 0, 4);

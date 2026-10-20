@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.decomp import compile_all
+from configure import SourceCompiler
 
 
 class CompileAllTests(unittest.TestCase):
@@ -32,8 +33,6 @@ class CompileAllTests(unittest.TestCase):
             'ROOT': self.root,
             'TOOLS': self.root / 'tools',
             'VERSIONS': {'b2_us': {'defines': ['BLACK2']}, 'w2_us': {'defines': ['WHITE2']}},
-            'CC_FLAGS': ['-default flag'],
-            'MWCC_VERSION': 'default/compiler',
             'INCLUDE_DIRS': ['include'],
         }
         for name, value in values.items():
@@ -45,7 +44,8 @@ class CompileAllTests(unittest.TestCase):
             mock = patcher.start()
             self.addCleanup(patcher.stop)
             setattr(self, name, mock)
-        patcher = patch.object(compile_all, 'library_of', return_value=None)
+        patcher = patch.object(compile_all, 'source_compiler', return_value=SourceCompiler(
+            'default/compiler', ('-default flag',), False))
         patcher.start()
         self.addCleanup(patcher.stop)
         patcher = patch.object(compile_all, 'mwcc_command', return_value=[
@@ -132,7 +132,8 @@ class CompileAllTests(unittest.TestCase):
         ]
         for source, library, compiler, flags, expected_env in cases:
             with self.subTest(source=source), patch.dict(os.environ, ambient, clear=True), \
-                    patch.object(compile_all, 'library_of', return_value=library), \
+                    patch.object(compile_all, 'source_compiler', return_value=SourceCompiler(
+                        compiler, tuple(library[1] if library else ['-default flag']), bool(library))), \
                     patch.object(compile_all, 'mwcc_command', return_value=['compiler']) as command, \
                     patch.object(compile_all.subprocess, 'run', return_value=process) as run:
                 result = compile_all.compile_file(source, 'w2_us', self.root / 'objects')

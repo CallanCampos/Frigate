@@ -37,16 +37,16 @@ typedef struct {
     u32 enabled;
 } BoxSearchBGSetup;
 
-static void func_ov255_021d6e44(TCB *tcb, void *data);
-static void func_ov255_021d6e58(BoxSearchBG *bg, HeapID heapId);
-static void func_ov255_021d6eb8(BoxSearchBG *bg);
-static void func_ov255_021d6ef0(BoxSearchBG *bg);
-static void func_ov255_021d6ef4(BoxSearchBG *bg);
-static void func_ov255_021d6efc(BoxSearchClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId);
-static void func_ov255_021d6f3c(BoxSearchClAct *clact);
-static void func_ov255_021d6f58(BoxSearchClAct *clact);
-static void func_ov255_021d6f60(BoxSearchClAct *clact);
-static ClActUnit *func_ov255_021d6f68(BoxSearchClAct *clact);
+static void BoxSearchGraphic_VBlank(TCB *tcb, void *data);
+static void BoxSearchBG_Create(BoxSearchBG *bg, HeapID heapId);
+static void BoxSearchBG_Delete(BoxSearchBG *bg);
+static void BoxSearchBG_Update(BoxSearchBG *bg);
+static void BoxSearchBG_VBlank(BoxSearchBG *bg);
+static void BoxSearchClAct_Create(BoxSearchClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId);
+static void BoxSearchClAct_Delete(BoxSearchClAct *clact);
+static void BoxSearchClAct_Update(BoxSearchClAct *clact);
+static void BoxSearchClAct_VBlank(BoxSearchClAct *clact);
+static ClActUnit *BoxSearchClAct_GetUnit(BoxSearchClAct *clact);
 
 static const BGSysLCDConfig data_ov255_021d9490 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 
@@ -95,7 +95,7 @@ static const BoxSearchBGSetup data_ov255_021d94ec[BG_COUNT] = {
 
 // clang-format on
 
-BoxSearchGraphic *func_ov255_021d6d28(u32 layout, HeapID heapId) {
+BoxSearchGraphic *BoxSearchGraphic_Create(u32 layout, HeapID heapId) {
     BoxSearchGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(BoxSearchGraphic), FALSE, "box_search_graphic.c", 449);
 
     MI_CpuFill8(graphic, 0, sizeof(BoxSearchGraphic));
@@ -109,18 +109,18 @@ BoxSearchGraphic *func_ov255_021d6d28(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
-    func_ov255_021d6e58(&graphic->bg, heapId);
-    func_ov255_021d6efc(&graphic->clact, &data_ov255_021d94bc, heapId);
-    graphic->vblankTask = GFL_VBlankTCBAdd(func_ov255_021d6e44, graphic, 0);
+    GFL_TextRndInitColorIndexLUT();
+    BoxSearchBG_Create(&graphic->bg, heapId);
+    BoxSearchClAct_Create(&graphic->clact, &data_ov255_021d94bc, heapId);
+    graphic->vblankTask = GFL_VBlankTCBAdd(BoxSearchGraphic_VBlank, graphic, 0);
     return graphic;
 }
 
-void func_ov255_021d6dc8(BoxSearchGraphic *graphic) {
+void BoxSearchGraphic_Delete(BoxSearchGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
-    func_ov255_021d6f3c(&graphic->clact);
-    func_ov255_021d6eb8(&graphic->bg);
-    func_020232d8();
+    BoxSearchClAct_Delete(&graphic->clact);
+    BoxSearchBG_Delete(&graphic->bg);
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -129,29 +129,29 @@ void func_ov255_021d6dc8(BoxSearchGraphic *graphic) {
     GFL_HeapFree(graphic);
 }
 
-void func_ov255_021d6e1c(BoxSearchGraphic *graphic) {
-    func_ov255_021d6f58(&graphic->clact);
-    func_ov255_021d6ef0(&graphic->bg);
+void BoxSearchGraphic_Update(BoxSearchGraphic *graphic) {
+    BoxSearchClAct_Update(&graphic->clact);
+    BoxSearchBG_Update(&graphic->bg);
 }
 
-void func_ov255_021d6e30(BoxSearchGraphic *graphic) {
+void BoxSearchGraphic_Begin3D(BoxSearchGraphic *graphic) {
 }
 
-void func_ov255_021d6e34(BoxSearchGraphic *graphic) {
+void BoxSearchGraphic_End3D(BoxSearchGraphic *graphic) {
 }
 
-ClActUnit *func_ov255_021d6e38(BoxSearchGraphic *graphic) {
-    return func_ov255_021d6f68(&graphic->clact);
+ClActUnit *BoxSearchGraphic_GetClActUnit(BoxSearchGraphic *graphic) {
+    return BoxSearchClAct_GetUnit(&graphic->clact);
 }
 
-static void func_ov255_021d6e44(TCB *tcb, void *data) {
+static void BoxSearchGraphic_VBlank(TCB *tcb, void *data) {
     BoxSearchGraphic *graphic = data;
 
-    func_ov255_021d6ef4(&graphic->bg);
-    func_ov255_021d6f60(&graphic->clact);
+    BoxSearchBG_VBlank(&graphic->bg);
+    BoxSearchClAct_VBlank(&graphic->clact);
 }
 
-static void func_ov255_021d6e58(BoxSearchBG *bg, HeapID heapId) {
+static void BoxSearchBG_Create(BoxSearchBG *bg, HeapID heapId) {
     u32 i;
 
     MI_CpuFill8(bg, 0, sizeof(BoxSearchBG));
@@ -165,7 +165,7 @@ static void func_ov255_021d6e58(BoxSearchBG *bg, HeapID heapId) {
     }
 }
 
-static void func_ov255_021d6eb8(BoxSearchBG *bg) {
+static void BoxSearchBG_Delete(BoxSearchBG *bg) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov255_021d94ec); i++) {
@@ -176,36 +176,36 @@ static void func_ov255_021d6eb8(BoxSearchBG *bg) {
     MI_CpuFill8(bg, 0, sizeof(BoxSearchBG));
 }
 
-static void func_ov255_021d6ef0(BoxSearchBG *bg) {
+static void BoxSearchBG_Update(BoxSearchBG *bg) {
 }
 
-static void func_ov255_021d6ef4(BoxSearchBG *bg) {
+static void BoxSearchBG_VBlank(BoxSearchBG *bg) {
     GFL_BGSysUpdate();
 }
 
-static void func_ov255_021d6efc(BoxSearchClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
+static void BoxSearchClAct_Create(BoxSearchClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(BoxSearchClAct));
     ClActSys_Create(&data_ov255_021d94a0, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
-static void func_ov255_021d6f3c(BoxSearchClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+static void BoxSearchClAct_Delete(BoxSearchClAct *clact) {
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(BoxSearchClAct));
 }
 
-static void func_ov255_021d6f58(BoxSearchClAct *clact) {
-    func_0204b794();
+static void BoxSearchClAct_Update(BoxSearchClAct *clact) {
+    ClActSys_Draw();
 }
 
-static void func_ov255_021d6f60(BoxSearchClAct *clact) {
-    func_0204b7c8();
+static void BoxSearchClAct_VBlank(BoxSearchClAct *clact) {
+    ClActSys_VBlank();
 }
 
-static ClActUnit *func_ov255_021d6f68(BoxSearchClAct *clact) {
+static ClActUnit *BoxSearchClAct_GetUnit(BoxSearchClAct *clact) {
     return clact->unit;
 }

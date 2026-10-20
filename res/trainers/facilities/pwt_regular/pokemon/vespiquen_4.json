@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VESPIQUEN",
+    "moves": [ "MOVE_ATTACK_ORDER", "MOVE_DEFEND_ORDER", "MOVE_ROOST", "MOVE_CONFUSE_RAY" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

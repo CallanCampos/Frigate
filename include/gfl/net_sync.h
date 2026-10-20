@@ -25,12 +25,12 @@ struct NetSyncCommand {
 
 extern const NetSyncCommand data_ov164_021999e8;
 
-void func_ov164_021998c0(NetSyncWork *work);
-void func_ov164_021998c8(NetSyncWork *work);
-void func_ov164_021998d4(NetSyncWork *work);
-u32 func_ov164_02199944(NetSyncWork *work, u8 kind, u16 value);
-void func_ov164_02199984(u32 a0, u32 a1, const NetSyncPacket *packet, NetSyncWork *work);
-void func_ov164_021999a8(u32 ignored, u32 a1);
-BOOL func_ov164_021999bc(NetSyncWork *work, u32 a1);
+void NetSync_Init(NetSyncWork *work);
+void NetSync_Exit(NetSyncWork *work);
+void NetSync_Update(NetSyncWork *work);
+u32 NetSync_Send(NetSyncWork *work, u8 kind, u16 value);
+void NetSync_RecvCallback(u32 a0, u32 a1, const NetSyncPacket *packet, NetSyncWork *work);
+void NetSync_StartTiming(u32 ignored, u32 a1);
+BOOL NetSync_IsTimingDone(NetSyncWork *work, u32 a1);
 
 #endif // POKEBW2_GFL_NET_SYNC_H

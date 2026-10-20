@@ -72,8 +72,8 @@ BlActScene *BlActScene_Create(const BlActSceneSetup *setup, HeapID heapId) {
     return scene;
 }
 
-void func_0204e450(BlActScene *scene) {
-    func_0204e7b8(scene);
+void BlActScene_Delete(BlActScene *scene) {
+    BlActScene_FreeAllMaterials(scene);
     GFL_HeapFree(scene->actors);
     GFL_HeapFree(scene->materials);
     GFL_HeapFree(scene);
@@ -117,7 +117,7 @@ void BlActScene_SetTexcoordOffset(BlActScene *scene, s16 s, s16 t) {
     scene->texOffsetT = t;
 }
 
-void func_0204e4d0(int size, u16 *width, u16 *height) {
+void BlAct_GetTexDimensions(int size, u16 *width, u16 *height) {
     if (width != NULL) {
         *width = 1 << (((size & 0x70) >> 4) + 3);
     }
@@ -180,7 +180,8 @@ u32 BlActScene_AddMaterialNewTex(BlActScene *scene, void *texResource, u32 forma
     return idx;
 }
 
-u32 func_0204e614(BlActScene *scene, u32 arcId, u32 fileId, u32 format, int size, u8 faceWidth, u8 faceHeight) {
+u32 BlActScene_AddMaterialArcTex(BlActScene *scene, u32 arcId, u32 fileId, u32 format, int size, u8 faceWidth,
+                                 u8 faceHeight) {
     u32 idx;
 
     if (BlActScene_GetAvailMatSlotIdx(scene, &idx) == TRUE) {
@@ -222,7 +223,7 @@ void BlActScene_FreeMaterial(BlActScene *scene, u32 material) {
     scene->materials[material].texFormat = BLACT_TEXFMT_FREE;
 }
 
-void func_0204e73c(BlActScene *scene, u32 material) {
+void BlActScene_FreeMaterialVramIfTex(BlActScene *scene, u32 material) {
     if (scene->materials[material].texResource != NULL) {
         NNS_GfdFreeTexVram(scene->materials[material].texKey);
         NNS_GfdFreePlttVram(scene->materials[material].plttKey);
@@ -231,14 +232,14 @@ void func_0204e73c(BlActScene *scene, u32 material) {
     scene->materials[material].texFormat = BLACT_TEXFMT_FREE;
 }
 
-void func_0204e77c(BlActScene *scene, u32 material) {
+void BlActScene_FreeMaterialVram(BlActScene *scene, u32 material) {
     NNS_GfdFreeTexVram(scene->materials[material].texKey);
     NNS_GfdFreePlttVram(scene->materials[material].plttKey);
     scene->materials[material].texResource = NULL;
     scene->materials[material].texFormat = BLACT_TEXFMT_FREE;
 }
 
-void func_0204e7b8(BlActScene *scene) {
+void BlActScene_FreeAllMaterials(BlActScene *scene) {
     int i;
     int light;
 
@@ -247,28 +248,29 @@ void func_0204e7b8(BlActScene *scene) {
     }
 }
 
-void func_0204e7d8(BlActScene *scene, u32 material, u32 *texAddr) {
+void BlActScene_GetMaterialTexAddr(BlActScene *scene, u32 material, u32 *texAddr) {
     *texAddr = scene->materials[material].texAddr;
 }
 
-void func_0204e7e8(BlActScene *scene, u32 material, u32 *plttAddr) {
+void BlActScene_GetMaterialPlttAddr(BlActScene *scene, u32 material, u32 *plttAddr) {
     *plttAddr = scene->materials[material].plttAddr;
 }
 
-void func_0204e7f8(BlActScene *scene, u32 material, NNSGfdTexKey *texKey) {
+void BlActScene_GetMaterialTexKey(BlActScene *scene, u32 material, NNSGfdTexKey *texKey) {
     *texKey = scene->materials[material].texKey;
 }
 
-void func_0204e808(BlActScene *scene, u32 material, NNSGfdTexKey texKey) {
+void BlActScene_SetMaterialTexKey(BlActScene *scene, u32 material, NNSGfdTexKey texKey) {
     scene->materials[material].texKey = texKey;
     scene->materials[material].texAddr = NNS_GfdGetTexKeyAddr(scene->materials[material].texKey);
 }
 
-void func_0204e820(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey) {
+void BlActScene_GetMaterialPlttKey(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey) {
     *plttKey = scene->materials[material].plttKey;
 }
 
-void func_0204e830(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize, u8 byRow) {
+void BlActScene_GetMaterialFaceLocation(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize,
+                                        u8 byRow) {
     BlActMaterial *mat = &scene->materials[material];
 
     switch (mat->texFormat) {
@@ -325,11 +327,11 @@ void BlActScene_ClearActorMaterial(BlActScene *scene, u32 actor) {
     }
 }
 
-void func_0204e9f8(BlActScene *scene, u32 actor, u16 *material) {
+void BlActScene_GetActorMaterial(BlActScene *scene, u32 actor, u16 *material) {
     *material = scene->actors[actor].material;
 }
 
-void func_0204ea08(BlActScene *scene, u32 actor, const u16 *material) {
+void BlActScene_SetActorMaterial(BlActScene *scene, u32 actor, const u16 *material) {
     scene->actors[actor].material = *material;
 }
 
@@ -337,28 +339,28 @@ void BlActScene_SetActorPos(BlActScene *scene, u32 actor, const VecFx32 *pos) {
     scene->actors[actor].pos = *pos;
 }
 
-void func_0204ea3c(BlActScene *scene, u32 actor, u16 *face) {
+void BlActScene_GetActorFace(BlActScene *scene, u32 actor, u16 *face) {
     *face = scene->actors[actor].face;
 }
 
-void func_0204ea4c(BlActScene *scene, u32 actor, const u16 *face) {
+void BlActScene_SetActorFace(BlActScene *scene, u32 actor, const u16 *face) {
     scene->actors[actor].face = *face;
 }
 
-void func_0204ea5c(BlActScene *scene, u32 actor, const s16 *scaleX, const s16 *scaleY) {
+void BlActScene_SetActorScale(BlActScene *scene, u32 actor, const s16 *scaleX, const s16 *scaleY) {
     scene->actors[actor].scaleX = *scaleX;
     scene->actors[actor].scaleY = *scaleY;
 }
 
-void func_0204ea78(BlActScene *scene, u32 actor, const u8 *alpha) {
+void BlActScene_SetActorAlpha(BlActScene *scene, u32 actor, const u8 *alpha) {
     scene->actors[actor].alpha = *alpha;
 }
 
-void func_0204ea98(BlActScene *scene, u32 actor, const u8 *polygonId) {
+void BlActScene_SetActorPolygonId(BlActScene *scene, u32 actor, const u8 *polygonId) {
     scene->actors[actor].polygonId = *polygonId;
 }
 
-BOOL func_0204eab8(BlActScene *scene, u32 actor) {
+BOOL BlActScene_IsActorVisible(BlActScene *scene, u32 actor) {
     return scene->actors[actor].visible;
 }
 
@@ -378,19 +380,19 @@ void BlActScene_DisableActorLight(BlActScene *scene, u32 actor, u32 lights) {
     scene->actors[actor].lights &= ~lights;
 }
 
-BOOL func_0204eb48(BlActScene *scene, u32 actor) {
+BOOL BlActScene_GetActorFlipS(BlActScene *scene, u32 actor) {
     return scene->actors[actor].flipS;
 }
 
-void func_0204eb58(BlActScene *scene, u32 actor, const BOOL *flip) {
+void BlActScene_SetActorFlipS(BlActScene *scene, u32 actor, const BOOL *flip) {
     scene->actors[actor].flipS = *flip;
 }
 
-void func_0204eb7c(BlActScene *scene, u32 actor, const BOOL *flip) {
+void BlActScene_SetActorFlipT(BlActScene *scene, u32 actor, const BOOL *flip) {
     scene->actors[actor].flipT = *flip;
 }
 
-void func_0204eba0(BlActScene *scene, u32 actor, const u16 *rotation) {
+void BlActScene_SetActorRotation(BlActScene *scene, u32 actor, const u16 *rotation) {
     scene->actors[actor].rotation = *rotation;
 }
 

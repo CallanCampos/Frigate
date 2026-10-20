@@ -1,1 +1,0 @@
-Bank0497_Text_Empty =         \x{ffff}

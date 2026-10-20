@@ -25,8 +25,10 @@ a rule here changes, change it there too.
   in `config/names.txt`. Types swan doesn't name are named after their owner. Rename a static's symbol to its C name.
   Library code in `lib/` (NitroSDK, NitroSystem, TwlSDK, DWC) uses the SDK's own names where the code shows them, even
   over swan's; the header notes swan's name where it differs. The user chose this.
-- **Write C from the asm.** pret (pokeplatinum, pokeheartgold) and other decomps are references for names and
-  structure, never code to copy. The user chose this explicitly for SPL.
+- **Write C from the asm.** pret (pokeplatinum, pokeheartgold), ntrtwl's SDK reconstructions and other decomps are
+  references for names and structure. A function may follow another decomp's structure where that is what matches,
+  rewritten in this project's names, types and format and checked against the asm; never paste their code. The user
+  chose this on 2026-10-18, after ntrtwl's NitroSDK shapes matched libfx.
 - **Natural C only.** No inline asm, permuter noise, unexplained `volatile`, casts that reach a field by byte offset or
   meaningless temporaries. A pointer sum of the element's own type (`*(p + i + 1)`, `(p + n - 1)->next`) is plain C,
   which MWCC compiles differently from indexing: write it when it gives the original's address computation. A function
@@ -89,7 +91,7 @@ a rule here changes, change it there too.
 | Add a file to both versions | `.venv/bin/python tools/decomp/add_source_file.py src/X.c overlays/ov033 .text:A-B ... --incomplete` |
 | Mark complete | `.venv/bin/python tools/decomp/mark_complete.py src/X.c` |
 | Name a symbol | `.venv/bin/python tools/decomp/rename_symbol.py func_ov033_0217acd4 Name` |
-| Rename a constant of `data/constants/` and its uses | `.venv/bin/python tools/data/rename_constant.py OLD NEW` |
+| Rename a constant of `generated/` and its uses | `.venv/bin/python tools/data/rename_constant.py OLD NEW` |
 | Progress of the local build | `ninja progress` |
 | Build and verify | `python3 configure.py && ninja 2>&1 \| tail -20` (configure only when source files were added) |
 
@@ -120,7 +122,7 @@ Agents in `.claude/agents/`, used to keep large asm and diffs out of the main co
 Reviewers in `.claude/agents/review/`, one per area, for `code-audit`'s partitions and deep reviews, read-only, each
 with evidence discipline (what it read against what it infers) and a list of known bad shapes that grows with each
 real one: `pbw-game-reviewer` (src/, include/), `pbw-library-reviewer` (lib/), `pbw-config-reviewer` (config/ and the
-decomp docs), `pbw-data-reviewer` (data/, tools/data/), `pbw-tools-reviewer` (tools/, CI, the agents' config).
+decomp docs), `pbw-data-reviewer` (res/, tools/data/), `pbw-tools-reviewer` (tools/, CI, the agents' config).
 Experts in `.claude/agents/experts/`, to consult, design or implement: `pbw-mwcc-expert` (matching under MWCC, on
 Opus), `pbw-arm-expert` (reading the assembly), `pbw-sdk-expert` (the Nintendo SDKs' APIs and names).
 

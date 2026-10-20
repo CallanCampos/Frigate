@@ -1,0 +1,40 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Cocome",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "pokemon": [
+        "blastoise_1",
+        "feraligatr_1",
+        "swampert_1",
+        "empoleon_1",
+        "samurott_1",
+        "quagsire_1",
+        "lanturn_1",
+        "whiscash_1",
+        "dewgong_1",
+        "gastrodon_1",
+        "ludicolo_1",
+        "slowbro_1",
+        "slowking_1",
+        "floatzel_1",
+        "carracosta_1",
+        "seismitoad_1",
+        "poliwrath_1",
+        "politoed_1",
+        "wailord_1",
+        "tentacruel_1",
+        "starmie_1",
+        "vaporeon_1",
+        "walrein_1",
+        "lapras_1",
+        "vanilluxe_1",
+        "gyarados_1",
+        "kingdra_1",
+        "milotic_1"
+    ],
+    "messages": [
+        "Hello? Me? What, now?\nI am about to have a battle.",
+        "Hello? Can you hear me?\nI just won the battle.",
+        "Ah... Hello? Can you hear me?\nArgh! I lost..."
+    ]
+}

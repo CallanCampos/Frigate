@@ -229,7 +229,7 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     }
     setup->unk34[0] = GetGameDataPlayerInfo(gameData);
     setup->bag = GameData_GetBag(gameData);
-    setup->unk7C = func_0201734c(gameData);
+    setup->unk7C = GameData_GetBagCursor(gameData);
     setup->pokedex = GameData_GetPokedex(gameData);
     setup->unk88 = GameData_GetCommPlayerSupport(gameData);
     setup->records = GameData_GetRecords(gameData);
@@ -327,7 +327,7 @@ static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, 
     for (i = 0; i < 4; i++) {
         if (i != 0) {
             if (setup->unk34[i] == NULL) {
-                setup->unk34[i] = func_02008b0c(heapId);
+                setup->unk34[i] = PlayerInfo_Create(heapId);
             }
             if (setup->party[i] == NULL) {
                 setup->party[i] = PokeParty_Create(heapId);
@@ -391,11 +391,11 @@ void BtlSetup_SetTrainer2v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus 
 }
 
 void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 0, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 0, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 void BtlSetup_SetNet1v1Double(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 1, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 1, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 void BtlSetup_SetNetMultiVsNet(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, u8 a4, HeapID heapId) {
@@ -411,11 +411,11 @@ void BtlSetup_SetNetMultiVsAI(BtlSetup *setup, GameData *gameData, NetHandle *ha
 }
 
 void BtlSetup_SetNetTriple(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 2, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 2, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 void BtlSetup_SetNetRotation(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId) {
-    BtlSetup_SetNetImpl(setup, gameData, 3, 0, handle, a3, func_02042a6c(handle), heapId);
+    BtlSetup_SetNetImpl(setup, gameData, 3, 0, handle, a3, GFL_NetGetHandleNetId(handle), heapId);
 }
 
 // A setup with a party, a player's info and a trainer for every client, and its own copy of the options
@@ -426,12 +426,12 @@ void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId) 
     MI_CpuFill8(setup, 0, sizeof(BtlSetup));
     for (i = 0; i < 4; i++) {
         setup->party[i] = PokeParty_Create(heapId);
-        setup->unk34[i] = func_02008b0c(heapId);
+        setup->unk34[i] = PlayerInfo_Create(heapId);
         setup->trainers[i] = TrainerBattleSetup_Create(heapId);
     }
     setup->gameData = gameData;
     trainerData = getTrainerDataBlkAddress(GameData_GetSaveControl(gameData));
-    setup->config = func_0200898c(heapId);
+    setup->config = Config_Create(heapId);
     initConfig(&trainerData->config, setup->config);
     setup->pokedex = GameData_GetPokedex(gameData);
     setup->fieldSituation.unk1b = 1;

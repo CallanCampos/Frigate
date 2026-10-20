@@ -137,7 +137,7 @@ static void PdwAcc_StateWaitSavedMessage(PdwAccWork *wk) {
 }
 
 static void PdwAcc_StateWaitSave(PdwAccWork *wk) {
-    int result = func_02017850(wk->gameData);
+    int result = GameData_UpdateSave(wk->gameData);
 
     if (result == 2 || result == 3) {
         wk->saving = FALSE;
@@ -149,7 +149,7 @@ static void PdwAcc_StateWaitSave(PdwAccWork *wk) {
 static void PdwAcc_StateStartSave(PdwAccWork *wk) {
     if (PdwAccMessage_IsPrintFinished(wk->msg)) {
         wk->saving = TRUE;
-        func_0201782c(wk->gameData);
+        GameData_StartSave(wk->gameData);
         PdwAcc_ChangeState(wk, PdwAcc_StateWaitSave, 265);
     }
 }
@@ -163,7 +163,7 @@ static void PdwAcc_StateSave(PdwAccWork *wk) {
 static void PdwAcc_StateIdNext(PdwAccWork *wk) {
     if (GCTX_HIDGetPressedKeys()) {
         PdwAccMessage_ClearInfo(wk->msg);
-        func_020099e8(getDreamWorldStuffAddress(wk->save), TRUE);
+        DreamWorldSave_SetIDShown(getDreamWorldStuffAddress(wk->save), TRUE);
         PdwAcc_ChangeState(wk, PdwAcc_StateSave, 282);
     }
 }
@@ -245,7 +245,7 @@ static void PdwAcc_StateStart(PdwAccWork *wk) {
 }
 
 static void PdwAcc_StateWaitCreate(PdwAccWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!PdwAcc_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             u32 *response = NHttpRap_GetAnswer(wk->http);
 
@@ -265,9 +265,9 @@ static void PdwAcc_StateWaitCreate(PdwAccWork *wk) {
 static void PdwAcc_StateCreate(PdwAccWork *wk) {
     u32 size;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(PDWACC_REQUEST_CREATE, wk->http)) {
-            void *data = func_02007454(wk->save, &size);
+            void *data = SaveControl_GetUploadData(wk->save, &size);
 
             NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), data, 0x80000);
             if (NHttpRap_StartRequest(wk->http) == 0) {
@@ -312,8 +312,8 @@ static BOOL PdwAcc_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     wk->heapId = pdwParam->heapId;
     wk->save = GameData_GetSaveControl(pdwParam->gameData);
     wk->gameData = pdwParam->gameData;
-    wk->profileId = func_02008bdc(GetGameDataPlayerInfo(pdwParam->gameData));
-    if (func_02042788()) {
+    wk->profileId = PlayerInfo_GetProfileId(GetGameDataPlayerInfo(pdwParam->gameData));
+    if (GFL_NetIsInitialized()) {
         wk->http = NHttpRap_Create(pdwParam->heapId, wk->profileId, pdwParam->loginBuffer);
         DWCRap_SetErrorFunc(PdwAcc_OnDisconnect, wk);
     }
@@ -354,7 +354,7 @@ static BOOL PdwAcc_ProcMain(GameProc *proc, u32 *state, void *param, void *work)
         if (GFL_NetErrCheck()) {
             NHttpRap_EndRequest(wk->http);
             if (wk->saving) {
-                func_02017884(wk->gameData);
+                GameData_CancelSave(wk->gameData);
                 wk->saving = FALSE;
             }
             Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
@@ -387,7 +387,7 @@ static BOOL PdwAcc_ProcExit(GameProc *proc, u32 *state, void *param, void *work)
         NHttpRap_Destroy(wk->http);
         wk->http = NULL;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         DWCRap_SetErrorFunc(NULL, NULL);
     }
     GFL_ProcReleaseSubsystem(proc);

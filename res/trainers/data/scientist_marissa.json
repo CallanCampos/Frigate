@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Marissa",
+    "class": "TRAINER_CLASS_SCIENTIST_F_46",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_SPECIAL" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SHELMET",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KARRABLAST",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I shall uncover the mechanism behind\nTrainer and Pokémon relationships!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Why are Pokémon able to understand\ntheir Trainer's orders?"
+        },
+        {
+            "type": 2,
+            "text": "I wonder if Professor Rowan of the Sinnoh\nregion has managed to unlock the mystery{be00}\nof how Pokémon evolve."
+        }
+    ]
+}

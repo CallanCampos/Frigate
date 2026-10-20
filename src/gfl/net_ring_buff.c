@@ -3,72 +3,72 @@
 #include "gfl/net_system.h"
 #include "gfl/std.h"
 
-static int func_0203e09c(NetRingBuff *ring, u8 *dest, int size, int max);
-static int func_0203e120(NetRingBuff *ring, int pos);
-static int func_0203e130(NetRingBuff *ring);
+static int NetRingBuff_Peek(NetRingBuff *ring, u8 *dest, int size, int max);
+static int NetRingBuff_WrapPos(NetRingBuff *ring, int pos);
+static int NetRingBuff_CalcFreeSize(NetRingBuff *ring);
 
-void func_0203dfc0(NetRingBuff *ring, u8 *pDataArea, int size) {
+void NetRingBuff_Init(NetRingBuff *ring, u8 *pDataArea, int size) {
     ring->pDataArea = pDataArea;
     ring->size = (s16)size;
     ring->startPos = 0;
     ring->endPos = 0;
 }
 
-void func_0203dfd0(NetRingBuff *ring, const u8 *pDataArea, int size) {
+void NetRingBuff_Write(NetRingBuff *ring, const u8 *pDataArea, int size) {
     int i;
     int j;
 
-    if (func_0203e130(ring) <= size) {
-        func_02040158();
+    if (NetRingBuff_CalcFreeSize(ring) <= size) {
+        NetSystem_SetError();
         return;
     }
     j = 0;
     for (i = ring->endPos; i < ring->endPos + size; i++, j++) {
         GFL_ASSERT(pDataArea);
-        ring->pDataArea[func_0203e120(ring, i)] = pDataArea[j];
+        ring->pDataArea[NetRingBuff_WrapPos(ring, i)] = pDataArea[j];
     }
-    ring->endPos = func_0203e120(ring, i);
+    ring->endPos = NetRingBuff_WrapPos(ring, i);
 }
 
-int func_0203e038(NetRingBuff *ring, u8 *dest, int size, int max) {
-    int read = func_0203e09c(ring, dest, size, max);
+int NetRingBuff_Read(NetRingBuff *ring, u8 *dest, int size, int max) {
+    int read = NetRingBuff_Peek(ring, dest, size, max);
 
-    ring->startPos = func_0203e120(ring, ring->startPos + read);
+    ring->startPos = NetRingBuff_WrapPos(ring, ring->startPos + read);
     return read;
 }
 
-u8 func_0203e054(NetRingBuff *ring) {
+u8 NetRingBuff_ReadByte(NetRingBuff *ring) {
     u8 byte;
 
-    if (func_0203e038(ring, &byte, 1, 1) == 1) {
+    if (NetRingBuff_Read(ring, &byte, 1, 1) == 1) {
         return byte;
     }
     GFL_ASSERT(0);
     return 0;
 }
 
-int func_0203e080(NetRingBuff *ring) {
-    u16 high = func_0203e054(ring) << 8;
+int NetRingBuff_ReadU16(NetRingBuff *ring) {
+    u16 high = NetRingBuff_ReadByte(ring) << 8;
 
-    return (u16)(high | func_0203e054(ring));
+    return (u16)(high | NetRingBuff_ReadByte(ring));
 }
 
-static int func_0203e09c(NetRingBuff *ring, u8 *dest, int size, int max) {
+static int NetRingBuff_Peek(NetRingBuff *ring, u8 *dest, int size, int max) {
     int i;
     int j = 0;
 
     for (i = ring->startPos; i < ring->startPos + size; i++) {
-        if (ring->endPos == func_0203e120(ring, i) || j == max) {
+        if (ring->endPos == NetRingBuff_WrapPos(ring, i) || j == max) {
             return j;
         }
-        dest[j] = ring->pDataArea[func_0203e120(ring, i)];
+        dest[j] = ring->pDataArea[NetRingBuff_WrapPos(ring, i)];
         j++;
     }
     return j;
 }
 
 // The bytes written but not read
-int func_0203e0f4(NetRingBuff *ring) {
+int NetRingBuff_GetUsedSize(NetRingBuff *ring) {
     if (ring->startPos > ring->endPos) {
         return ring->size + ring->endPos - ring->startPos;
     }
@@ -76,15 +76,15 @@ int func_0203e0f4(NetRingBuff *ring) {
 }
 
 // The bytes that can be written
-int func_0203e110(NetRingBuff *ring) {
-    return ring->size - func_0203e0f4(ring);
+int NetRingBuff_GetFreeSize(NetRingBuff *ring) {
+    return ring->size - NetRingBuff_GetUsedSize(ring);
 }
 
-static int func_0203e120(NetRingBuff *ring, int pos) {
+static int NetRingBuff_WrapPos(NetRingBuff *ring, int pos) {
     return pos % ring->size;
 }
 
-static int func_0203e130(NetRingBuff *ring) {
+static int NetRingBuff_CalcFreeSize(NetRingBuff *ring) {
     int end;
 
     if (ring->startPos > ring->endPos) {
@@ -96,5 +96,5 @@ static int func_0203e130(NetRingBuff *ring) {
     return ring->size - end;
 }
 
-void func_0203e150(NetRingBuff *ring) {
+void NetRingBuff_Commit(NetRingBuff *ring) {
 }

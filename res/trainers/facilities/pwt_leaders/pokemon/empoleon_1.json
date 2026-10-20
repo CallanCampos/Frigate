@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_EMPOLEON",
+    "moves": [ "MOVE_SURF", "MOVE_BLIZZARD", "MOVE_GRASS_KNOT", "MOVE_FEATHER_DANCE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_PETAYA_BERRY",
+    "form": 0
+}

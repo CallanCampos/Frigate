@@ -5,7 +5,7 @@ musicals. Scripts are files in the ROM's NARC archives. Each command is a 16-bit
 
 The trainer AI scripts are built from source. Archive `a/1/6/9` holds 14 scripts, one per AI flag, which run in turn
 for each flag the trainer has: flag bit N runs script N (`AI_FLAG_*` in `include/constants/tr_ai.h`). They are
-written in `data/tr_ai/NN_name.s`, numbered by their flag bit, with the macros in
+written in `res/trainers/ai/NN_name.s`, numbered by their flag bit, with the macros in
 `include/asm/tr_ai.inc`, in the style of [pokeplatinum](https://github.com/pret/pokeplatinum)'s trainer AI. This
 game's scripts grew out of Gen 4's, so most commands, routines and labels are the same as pokeplatinum's, and share
 their names. Gen 5's additions, such as the handlers of the new move effects, are named in the same style. Each
@@ -28,7 +28,7 @@ commands that do nothing here are named `DummyNN` after their ID, as pokeplatinu
 Scripts go through the C preprocessor, so they use the same constants as the C code. The constant headers hold
 only `#define`s for this reason. The constants come from:
 
-- The lists in `data/constants/`, for moves, abilities, items, species, types, sounds, trainers and zones, which the
+- The lists in `generated/`, for moves, abilities, items, species, types, sounds, trainers and zones, which the
   build turns into headers (see [Constant lists](data.md#constant-lists)). They were written from the game's text by
   `tools/data/make_constants.py`, which reads it with `tools/text/msgdata.py`.
 - pokeplatinum, for the move effects and held item effects that Gen 4 has, whose IDs this game keeps. Gen 5's move
@@ -38,7 +38,7 @@ only `#define`s for this reason. The constants come from:
   as pokeplatinum's, its values show which constant is which.
 
 ```sh
-python3 tools/data/make_constants.py extract/b2_us/files/a/0/0/2 data/constants
+python3 tools/data/make_constants.py extract/b2_us/files/a/0/0/2 generated
 ```
 
 `ninja` assembles each script with `clang`, converts it to a binary with `llvm-objcopy`, packs the binaries with
@@ -60,7 +60,7 @@ unless `--labels` gives names.
 
 ## Field scripts
 
-The field scripts, archive `a/0/5/6`, are built from source in `data/field_scripts/<file>.s`, with the macros in
+The field scripts, archive `a/0/5/6`, are built from source in `res/field/scripts/<file>.s`, with the macros in
 `include/asm/field_script.inc`. Both versions have the same archive. It holds a script file and a map script table for
 each zone, and the global scripts, which zones start by their IDs (from 2000 up). A script file starts with the offsets
 of its scripts, followed by the scripts and their movement data. A map script table lists the scripts that the zone runs

@@ -366,7 +366,7 @@ void FieldSnd_PlayAmbience(FieldSound *fieldSound, u32 se) {
     }
 }
 
-void FieldSnd_PlayAmbienceEx(FieldSound *fieldSound, u32 se, u16 volume) {
+void FieldSnd_PlayAmbienceEx(FieldSound *fieldSound, u32 se, u32 volume) {
     if (!FieldAmbience_CheckSoundID(se)) {
         GFL_SndSEPlay(se);
         return;
@@ -526,7 +526,7 @@ static void FieldSnd_ReleaseCore(FieldSound *fieldSound, GameData *gameData) {
     while (fieldSound->bgmStackCount != 0) {
         FieldSnd_BGMPop(fieldSound);
     }
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     FieldSnd_Reset(fieldSound, gameData);
 }
 
@@ -897,7 +897,7 @@ static void FieldSnd_Exec_ChangeIn(FieldSound *fieldSound) {
 
     // Another change came while this one loaded
     if (fieldSound->nextBGM != 0 && fieldSound->nextBGM != fieldSound->currentBGM) {
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
         FieldSnd_SetState(fieldSound, FIELD_SND_STATE_CHANGING_OUT);
         return;
     }
@@ -1025,7 +1025,7 @@ static BOOL FieldSnd_BGMChangeOut(FieldSound *fieldSound) {
         return FALSE;
     }
 
-    func_02006424(fieldSound->nextBGM, &fieldSound->loadStep, TRUE);
+    GFL_SndBGMLoadStep(fieldSound->nextBGM, &fieldSound->loadStep, TRUE);
     fieldSound->loadingBGM = fieldSound->nextBGM;
     fieldSound->nextBGM = 0;
     fieldSound->currentBGM = 0;
@@ -1035,7 +1035,7 @@ static BOOL FieldSnd_BGMChangeOut(FieldSound *fieldSound) {
 
 // Goes on loading the BGM, which becomes the current one once loaded
 static BOOL FieldSnd_BGMChangeIn(FieldSound *fieldSound) {
-    BOOL loaded = func_02006424(fieldSound->loadingBGM, &fieldSound->loadStep, FALSE);
+    BOOL loaded = GFL_SndBGMLoadStep(fieldSound->loadingBGM, &fieldSound->loadStep, FALSE);
 
     func_02042a1c(2);
     if (loaded) {

@@ -1,0 +1,126 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Galvantula",
+    "pokedex": {
+        "category": "EleSpider Pokémon",
+        "entry": "It creates barriers from electrified silk\nthat stun foes. This works as a weapon\nas well as a defense.",
+        "height": "2'07\"",
+        "weight": "31.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "でんきグモポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 77,
+        "defense": 60,
+        "speed": 108,
+        "special_attack": 97,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_BUG", "TYPE_ELECTRIC" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_COMPOUNDEYES", "ABILITY_UNNERVE" ],
+    "hidden_ability": "ABILITY_SWARM",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 165,
+    "height": 8,
+    "weight": 143,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 1, "MOVE_LEECH_LIFE" ],
+            [ 1, "MOVE_SPIDER_WEB" ],
+            [ 1, "MOVE_THUNDER_WAVE" ],
+            [ 4, "MOVE_THUNDER_WAVE" ],
+            [ 7, "MOVE_SCREECH" ],
+            [ 12, "MOVE_FURY_CUTTER" ],
+            [ 15, "MOVE_ELECTROWEB" ],
+            [ 18, "MOVE_BUG_BITE" ],
+            [ 23, "MOVE_GASTRO_ACID" ],
+            [ 26, "MOVE_SLASH" ],
+            [ 29, "MOVE_ELECTRO_BALL" ],
+            [ 34, "MOVE_SIGNAL_BEAM" ],
+            [ 40, "MOVE_AGILITY" ],
+            [ 46, "MOVE_SUCKER_PUNCH" ],
+            [ 54, "MOVE_DISCHARGE" ],
+            [ 60, "MOVE_BUG_BUZZ" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM57",
+            "TM68",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM76",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM93",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_MAGNET_RISE",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 174,
+    "baby_species": "SPECIES_JOLTIK",
+    "cry_volume": 120
+}

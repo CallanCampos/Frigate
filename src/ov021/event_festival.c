@@ -25,10 +25,10 @@ struct FestivalEventWork {
     GameCommSys *comm;
 };
 
-GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data);
-void func_ov021_0216e848(FestivalEventParam *param, GameSystem *gsys, GameData *gameData, u32 mode);
+GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *data);
+void EventFestival_SetupParam(FestivalEventParam *param, GameSystem *gsys, GameData *gameData, u32 mode);
 
-GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *data) {
     FestivalEventWork *work = data;
     GameSystem *gsys = work->gsys;
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -43,8 +43,9 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
             transition = CallFieldMapEntranceOutTransitionDefault(gsys, field, 1, 0);
         }
         GameEvent_ChainNext(event, transition);
-        if (func_02042788() == 1 && func_ov036_02180f80(work->comm) == 1 && !GameCommSys_IsTransitioning(work->comm)) {
-            func_ov030_02174108(1);
+        if (GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm) == 1 &&
+            !GameCommSys_IsTransitioning(work->comm)) {
+            NetWhpipe_SetSearchPaused(1);
             work->communicationFlag = 1;
         }
         (*state)++;
@@ -59,7 +60,7 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
         break;
     case 2:
         FieldSnd_DuckVolume(GameData_GetFieldSoundSystem(gameData), GameSystem_GetISS(gsys));
-        func_ov021_0216e848(&work->param, work->gsys, work->gameData, work->mode);
+        EventFestival_SetupParam(&work->param, work->gsys, work->gameData, work->mode);
         GSYS_QueueProc(gsys, OVERLAY_FESTIVAL_APP, &FMISSION_APP_PROC_FUNCTIONS, &work->param);
         (*state)++;
         break;
@@ -97,8 +98,8 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
         break;
     }
     case 7:
-        if (work->communicationFlag && func_02042788() == 1 && func_ov036_02180f80(work->comm)) {
-            func_ov030_02174108(0);
+        if (work->communicationFlag && GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm)) {
+            NetWhpipe_SetSearchPaused(0);
             work->communicationFlag = 0;
         }
         return GAMEEVENT_DONE;
@@ -106,9 +107,9 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov021_0216e80c(GameSystem *gsys, void *args) {
+GameEvent *EventFestival_Create(GameSystem *gsys, void *args) {
     u32 mode = *(u32 *)args;
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov021_0216e660, sizeof(FestivalEventWork));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventFestival_Callback, sizeof(FestivalEventWork));
     FestivalEventWork *work = GameEvent_GetData(event);
 
     work->gameData = GSYS_GetGameData(gsys);
@@ -119,7 +120,7 @@ GameEvent *func_ov021_0216e80c(GameSystem *gsys, void *args) {
     return event;
 }
 
-void func_ov021_0216e848(FestivalEventParam *param, GameSystem *gsys, GameData *gameData, u32 mode) {
+void EventFestival_SetupParam(FestivalEventParam *param, GameSystem *gsys, GameData *gameData, u32 mode) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     MI_CpuFill8(param, 0, sizeof(*param));
     param->gsys = gsys;
@@ -127,5 +128,5 @@ void func_ov021_0216e848(FestivalEventParam *param, GameSystem *gsys, GameData *
     param->mode = mode;
     param->festival = GSYS_GetLinkFestival(gsys);
     param->missionConfig = GetFestMissionCfg(param->festival);
-    param->saveBlock = func_02010dec(save);
+    param->saveBlock = FestRecords_GetFromSave(save);
 }

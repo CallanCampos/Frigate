@@ -107,7 +107,7 @@ static const G3DSceneActorSetup sActors[OBJ_COUNT] = {
 
 static G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov109_021eec80(Field *field) {
+void SkyarrowBridge_Setup(Field *field) {
     u16 heapId;
     FieldExpObjSystem *system;
     FieldExpObjAnm *anm;
@@ -126,7 +126,7 @@ void func_ov109_021eec80(Field *field) {
     ISS3DSoundSys_ReqChangeMasterVolume(work->soundSys, 127);
 }
 
-void func_ov109_021eecf4(Field *field) {
+void SkyarrowBridge_End(Field *field) {
     s32 i;
     GimmickWork *work;
 
@@ -140,7 +140,7 @@ void func_ov109_021eecf4(Field *field) {
     Field_DeleteGimmickWorkBlock(field, 0);
 }
 
-void func_ov109_021eed38(Field *field) {
+void SkyarrowBridge_Update(Field *field) {
     s32 i;
     GimmickWork *work;
     FieldCamera *camera;

@@ -7,6 +7,16 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// A prop of a chunk's or a land data patch's file: where it is, and its models
+struct FieldPropSourceInfo {
+    s32 x;
+    s32 y;
+    s32 z;
+    u16 unkC;
+    u8 highResId;
+    u8 lowResId;
+};
+
 struct FieldPropAreaBounds {
     fx32 minZ;
     fx32 maxZ;
@@ -14,9 +24,18 @@ struct FieldPropAreaBounds {
     fx32 maxX;
 };
 
+// The ways a prop's animations play, the index of its controller in field_buildmodel.c's FIELD_PROP_ANMCNT_VTABLES
+typedef enum {
+    FIELD_PROP_ANMCNT_STATIC,
+    FIELD_PROP_ANMCNT_AMBIENT,
+    FIELD_PROP_ANMCNT_DYNAMIC,
+    FIELD_PROP_ANMCNT_RTC, // by the time of day
+    FIELD_PROP_ANMCNT_COUNT
+} FieldPropAnmControllerType;
+
 // Partial resource layouts inferred from the Swan-named overlay 36 helpers.
 struct FieldPropResAnmHeader {
-    u8 controllerType;
+    u8 controllerType; // FieldPropAnmControllerType
     u8 unk1;
     u8 ambientAnimationCount;
     u8 unk3;
@@ -135,17 +154,6 @@ struct FieldPropHandle {
     SRTMatrix transform;
 };
 
-extern const u8 FIELD_PROP_ANM_IDX_FOR_DAY_PART[];
-extern const FieldPropAnmController FIELD_PROP_ANMCNT_VTABLES[];
-// The sounds of a prop type's animations
-typedef struct {
-    u16 propType;
-    u16 soundIds[4];
-} FieldPropDoorSounds;
-
-extern const FieldPropDoorSounds DOOR_SOUND_ID_LUT[6];
-extern const char data_ov036_021d4b2c[];
-
 u32 FieldPropResAnmHeader_GetAnmCount(const FieldPropResAnmHeader *header);
 FieldPropResAnmHeader *FieldPropResInfo_GetAnmHeader(FieldPropResInfo *resInfo);
 u8 FieldPropResInfo_GetTypeConv(const FieldPropResInfo *resInfo);
@@ -164,7 +172,7 @@ void FieldPropSystem_InitResources(FieldPropSystem *system, void *postFx);
 void FieldPropSystem_InstantiateResources(FieldPropSystem *system, FieldPropResBank *bank);
 void FieldPropSystem_InitResource(FieldPropSystem *system, FieldPropResource *resource, u32 index, void *postFx);
 void FieldPropResource_Free(FieldPropResource *resource);
-void FieldPropSystem_LoadResBundle(FieldPropSystem *system, u32 arcId, u32 fileId);
+void FieldPropSystem_LoadResBundle(FieldPropSystem *system, u16 arcId, u32 fileId);
 void FieldPropSystem_FreeResBundle(FieldPropSystem *system);
 void FieldPropSystem_BuildResIDLUT(FieldPropSystem *system, u32 defaultResId);
 void FieldPropSystem_FreeTextures(FieldPropSystem *system);

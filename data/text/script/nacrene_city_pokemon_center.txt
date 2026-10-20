@@ -1,4 +1,0 @@
-NacreneCityPokemonCenter_Text_PokemonRightNowOnes = The Pokémon with me right now are the\nones that, out of all those I've met so{be00}\nfar, I've taken a particular shine to!
-NacreneCityPokemonCenter_Text_HearBonesMuseumWere = I hear that the bones in the museum\nwere found in Twist Mountain.{be01}\nThe word is you can find a lot of\nother Fossils there, too.
-NacreneCityPokemonCenter_Text_PhewJustReadAll = Phew! I just read all the articles\nin Help on the PC!
-\pad{0e}

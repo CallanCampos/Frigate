@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_YANMEGA",
+    "moves": [ "MOVE_AIR_SLASH", "MOVE_BUG_BUZZ", "MOVE_DETECT", "MOVE_U_TURN" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_RASH",
+    "item": "ITEM_CHERI_BERRY",
+    "form": 0
+}

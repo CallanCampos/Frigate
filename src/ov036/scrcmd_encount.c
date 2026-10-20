@@ -2,8 +2,10 @@
 // roaming Pokémon, the fishing challenge's random Pokémon and the Repel's rearming. The name is the ROM's own, from
 // GFL_HeapAllocate's file argument. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/items.h"
 #include "constants/sound.h"
+#include "constants/zones.h"
 #include "field/enc_pokeset.h"
 #include "field/encounter.h"
 #include "field/event_battle.h"
@@ -28,7 +30,9 @@
 #define FISHING_SLOT_COUNT 5
 
 // The zones of the fishing challenge, whose fishing Pokémon it picks from
-static const u16 CHALLENGE_FISHING_ZONES[FISHING_CHALLENGE_ZONE_COUNT] = { 255, 317, 321, 324, 370, 423 };
+static const u16 CHALLENGE_FISHING_ZONES[FISHING_CHALLENGE_ZONE_COUNT] = {
+    ZONE_VILLAGE_BRIDGE, ZONE_ROUTE_1, ZONE_ROUTE_3, ZONE_WELLSPRING_CAVE, ZONE_ROUTE_13, ZONE_ROUTE_17,
+};
 
 BOOL s0174_CallWildBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -121,7 +125,7 @@ BOOL s021E_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env) {
 
     result = ScriptReadVar(vm, env);
     season = GameData_GetSeason(gameData);
-    arc = GFL_ArcSysCreateFileHandle(127, HEAPID_TAIL(HEAPID_FIELDMAP));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ENCOUNTDATA, HEAPID_TAIL(HEAPID_FIELDMAP));
     species = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_FIELDMAP), 120, TRUE, "scrcmd_encount.c", 261);
     for (i = 0; i < FISHING_CHALLENGE_ZONE_COUNT; i++) {
         if (EncData_Load(&encData, arc, CHALLENGE_FISHING_ZONES[i], season)) {

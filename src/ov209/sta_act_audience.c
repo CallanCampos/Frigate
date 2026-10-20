@@ -101,7 +101,7 @@ static void StaActAudience_InitMembers(StaActAudience *sys, MusicalStageParam *p
 
     sum = 0;
     for (i = 0; i < 4; i++) {
-        points[i] = func_ov012_0215250c(param->program, i);
+        points[i] = MusicalProgram_GetKindPoints(param->program, i);
         total += points[i];
     }
     for (i = 0; i < 4; i++) {

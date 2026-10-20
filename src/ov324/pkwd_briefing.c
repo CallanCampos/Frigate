@@ -40,15 +40,13 @@
 #include "system/str_tool.h"
 #include "system/text_speed.h"
 #include "system/wordset.h"
-#include "text/system/0313.h"
 #include "text/system/event_pass_power_startmenu.h"
+#include "text/system/pkwd_briefing_common.h"
 
 // Pokéstar Studios' theater: the movie's set in 3D on the upper screen and the audience in its seats on the lower
 // one. Before the battle it shows the briefing of the scene a line at a time; after it, the movie's credits scroll
 // by while the audience reacts to how the movie went. Named after the ROM's "pkwd_briefing.c"
 
-// The archive of the sets and of the audience's graphics
-#define ARCID_PKWD_BRIEFING 11
 // The archive of the movies' data, as in event_pokewood.c
 #define ARCID_PKWD_MOVIE 269
 
@@ -76,7 +74,7 @@ enum {
     FILE_CAMERA = 35,
 };
 
-// The files of the audience in ARCID_PKWD_BRIEFING
+// The files of the audience in ARCID_BTLV
 enum {
     FILE_AUDIENCE_BG_PALETTE = 560,
     FILE_AUDIENCE_BG_CHARS = 561,
@@ -639,120 +637,120 @@ static const BGSysVRAMConfig sPkwdBriefingVRAMConfig = {
 
 // The sets: the model and the animation of each, the animation of its actor, and the actor
 static const G3DSceneResourceSetup sPkwdBriefingSet00Resources[] = {
-    { ARCID_PKWD_BRIEFING, 141, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 146, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 141, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 146, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet01Resources[] = {
-    { ARCID_PKWD_BRIEFING, 205, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 209, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 205, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 209, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet02Resources[] = {
-    { ARCID_PKWD_BRIEFING, 313, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 316, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 313, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 316, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet03Resources[] = {
-    { ARCID_PKWD_BRIEFING, 273, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 278, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 273, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 278, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet04Resources[] = {
-    { ARCID_PKWD_BRIEFING, 189, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 193, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 189, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 193, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet05Resources[] = {
-    { ARCID_PKWD_BRIEFING, 293, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 298, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 293, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 298, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet06Resources[] = {
-    { ARCID_PKWD_BRIEFING, 314, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 317, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 314, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 317, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet07Resources[] = {
-    { ARCID_PKWD_BRIEFING, 161, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 166, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 161, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 166, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet08Resources[] = {
-    { ARCID_PKWD_BRIEFING, 189, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 193, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 189, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 193, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet09Resources[] = {
-    { ARCID_PKWD_BRIEFING, 122, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 127, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 122, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 127, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet10Resources[] = {
-    { ARCID_PKWD_BRIEFING, 207, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 211, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 207, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 211, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet11Resources[] = {
-    { ARCID_PKWD_BRIEFING, 181, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 183, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 181, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 183, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet12Resources[] = {
-    { ARCID_PKWD_BRIEFING, 191, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 195, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 191, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 195, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet13Resources[] = {
-    { ARCID_PKWD_BRIEFING, 163, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 168, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 163, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 168, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet14Resources[] = {
-    { ARCID_PKWD_BRIEFING, 142, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 147, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 142, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 147, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet15Resources[] = {
-    { ARCID_PKWD_BRIEFING, 141, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 146, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 141, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 146, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet16Resources[] = {
-    { ARCID_PKWD_BRIEFING, 253, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 258, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 253, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 258, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet17Resources[] = {
-    { ARCID_PKWD_BRIEFING, 237, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 241, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 237, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 241, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet18Resources[] = {
-    { ARCID_PKWD_BRIEFING, 239, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 243, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 239, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 243, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet19Resources[] = {
-    { ARCID_PKWD_BRIEFING, 294, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 299, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 294, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 299, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet20Resources[] = {
-    { ARCID_PKWD_BRIEFING, 295, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 300, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 295, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 300, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet21Resources[] = {
-    { ARCID_PKWD_BRIEFING, 223, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 227, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 223, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 227, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet22Resources[] = {
-    { ARCID_PKWD_BRIEFING, 257, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 262, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 257, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 262, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet23Resources[] = {
-    { ARCID_PKWD_BRIEFING, 276, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 281, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 276, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 281, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet24Resources[] = {
-    { ARCID_PKWD_BRIEFING, 273, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 278, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 273, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 278, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet25Resources[] = {
-    { ARCID_PKWD_BRIEFING, 274, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 279, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 274, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 279, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet26Resources[] = {
-    { ARCID_PKWD_BRIEFING, 255, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 260, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 255, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 260, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet27Resources[] = {
-    { ARCID_PKWD_BRIEFING, 296, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 301, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 296, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 301, 0, G3D_SCENE_RES_ARCSYS },
 };
 static const G3DSceneResourceSetup sPkwdBriefingSet28Resources[] = {
-    { ARCID_PKWD_BRIEFING, 125, 0, G3D_SCENE_RES_ARCSYS },
-    { ARCID_PKWD_BRIEFING, 130, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 125, 0, G3D_SCENE_RES_ARCSYS },
+    { ARCID_BTLV, 130, 0, G3D_SCENE_RES_ARCSYS },
 };
 
 static const G3DSceneAnimationSetup sPkwdBriefingSet00Anims[] = { { 1, 0 } };
@@ -1052,7 +1050,7 @@ static BOOL PkwdBriefing_Main(GameProc *proc, u32 *state, void *param, void *wor
         PkwdBriefingText_CountLines(&wk->text, wk->sex);
         PkwdBriefingText_PrintLine(&wk->text, 0, wk->sex);
         InfoWin_Init(6, 15, wk->param->gameData, wk->heapId);
-        func_02042ba8(FALSE, wk->heapId);
+        GFL_NetSetIconScreen(FALSE, wk->heapId);
         GFL_FadeSet(3, 16, 0, 2);
         wk->state = STATE_WAIT_FADE_IN;
         wk->lastVBlank = OS_GetVBlankCount();
@@ -1136,7 +1134,7 @@ static BOOL PkwdBriefing_CreditsMain(GameProc *proc, u32 *state, void *param, vo
         PkwdBriefing_LoadCredits(wk->param, &wk->text, wk->param->movie, wk->heapId);
         PkwdBriefingText_CreateCreditsWindows(&wk->text, wk->heapId, wk->layout);
         InfoWin_Init(6, 15, wk->param->gameData, wk->heapId);
-        func_02042ba8(FALSE, wk->heapId);
+        GFL_NetSetIconScreen(FALSE, wk->heapId);
         wk->state = STATE_WAIT_PRINT;
         wk->lastVBlank = OS_GetVBlankCount();
         wk->text.scroll = -192;
@@ -1152,7 +1150,7 @@ static BOOL PkwdBriefing_CreditsMain(GameProc *proc, u32 *state, void *param, vo
         }
         break;
     case STATE_WAIT_PRINT:
-        if (func_02021a3c(wk->text.printQueue) == TRUE) {
+        if (PrintQueue_Main(wk->text.printQueue) == TRUE) {
             GFL_FadeSet(3, 16, 0, 2);
             wk->state = STATE_WAIT_FADE_IN;
         }
@@ -1165,7 +1163,7 @@ static BOOL PkwdBriefing_CreditsMain(GameProc *proc, u32 *state, void *param, vo
             wk->state = STATE_RUN;
         }
         PkwdBriefing_Update(wk);
-        func_02021a3c(wk->text.printQueue);
+        PrintQueue_Main(wk->text.printQueue);
         for (i = 0; i < wk->text.windowCount; i++) {
             PrintWindow_Flush(&wk->text.printWindows[i], wk->text.printQueue);
         }
@@ -1174,7 +1172,7 @@ static BOOL PkwdBriefing_CreditsMain(GameProc *proc, u32 *state, void *param, vo
         PkwdBriefing_Update(wk);
         PkwdBriefing_CheckSkip(wk);
         PkwdBriefing_RunCredits(wk);
-        func_02021a3c(wk->text.printQueue);
+        PrintQueue_Main(wk->text.printQueue);
         for (i = 0; i < wk->text.windowCount; i++) {
             PrintWindow_Flush(&wk->text.printWindows[i], wk->text.printQueue);
         }
@@ -1255,10 +1253,10 @@ static void PkwdBriefing_Update(PkwdBriefingWork *wk) {
 static void PkwdBriefing_VBlank(TCB *tcb, void *data) {
     PkwdBriefingWork *wk = data;
 
-    func_02021a3c(wk->text.printQueue);
+    PrintQueue_Main(wk->text.printQueue);
     PrintWindow_Flush(&wk->text.printWindows[0], wk->text.printQueue);
     PrintWindow_Flush(&wk->text.printWindows[1], wk->text.printQueue);
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -1270,7 +1268,7 @@ static void PkwdBriefing_CreditsVBlank(TCB *tcb, void *data) {
     }
     G2_SetBG1Offset(0, wk->text.scroll);
     G2_SetBG2Offset(0, wk->text.scroll + 16);
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -1278,7 +1276,7 @@ static void PkwdBriefingSystem_Init(PkwdBriefingSystem *system, PkwdBriefingWork
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_G3DSysCreate(FALSE, 2, FALSE, 2, 0x1000, heapId, NULL);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     system->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 4, 32);
     system->vblankTask = GFL_VBlankTCBAdd(PkwdBriefing_VBlank, wk, 5);
     GFL_BGSysSetDisplayLayout(1);
@@ -1289,7 +1287,7 @@ static void PkwdBriefingSystem_InitCredits(PkwdBriefingSystem *system, PkwdBrief
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_G3DSysCreate(FALSE, 2, FALSE, 2, 0x1000, heapId, NULL);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     system->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 4, 32);
     system->vblankTask = GFL_VBlankTCBAdd(PkwdBriefing_CreditsVBlank, wk, 5);
     GFL_BGSysSetDisplayLayout(1);
@@ -1326,7 +1324,7 @@ static void PkwdBriefingText_InitBG(PkwdBriefingText *text, s32 movie, HeapID he
     GFL_BGSysSetBGEnabled(1, FALSE);
     GFL_BGSysSetBGEnabled(2, FALSE);
     text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    text->printQueue = func_02021998(heapId);
+    text->printQueue = PrintQueue_CreateDefault(heapId);
     text->unk1B4 = 1;
 }
 
@@ -1354,12 +1352,12 @@ static void PkwdBriefingText_LoadCreditsEndScreen(PkwdBriefingText *text, HeapID
 }
 
 static void PkwdBriefingText_FreeBG(PkwdBriefingText *text) {
-    func_02021a18(text->printQueue);
+    PrintQueue_Free(text->printQueue);
     GFL_FontFree(text->font);
 }
 
 static void PkwdBriefingText_LoadBriefing(PkwdBriefingText *text, s32 movie, PlayerInfo *playerInfo, HeapID heapId) {
-    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0267 + movie, heapId);
+    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PKWD_BRIEFING_MOVIE_00 + movie, heapId);
     text->lines[0] = GFL_StrBufCreate(304, heapId);
     text->lines[1] = GFL_StrBufCreate(304, heapId);
     text->empty = GFL_StrBufCreate(304, heapId);
@@ -1425,7 +1423,7 @@ static StrBuf *PkwdBriefing_CreatePlayerName(PkwdBriefingParam *param, HeapID he
 
 static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText *text, s32 movie, HeapID heapId) {
     u32 sex = getTrainerGender(param->playerInfo);
-    PokewoodSave *save = func_02011040(param->gameData);
+    PokewoodSave *save = PokewoodSave_Get(param->gameData);
     s32 i;
     s32 starLevel;
     MsgData *msgData;
@@ -1434,18 +1432,19 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
     StrBuf *strbuf;
     PkwdBriefingMovieFile *file;
 
-    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0313, heapId);
+    text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PKWD_BRIEFING_COMMON, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
-    text->empty = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Empty_327);
-    text->unk1D4 = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Empty_328);
+    text->empty = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Empty_327);
+    text->unk1D4 = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Empty_328);
     for (i = 0; i < 15; i++) {
         text->credits[CREDIT_MOVIE + i] = GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + i);
     }
-    text->credits[CREDIT_SCREENPLAY] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Screenplay);
-    text->credits[CREDIT_VFX] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Vfx);
-    text->credits[CREDIT_ART] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_PokestarStudiosArt);
-    text->credits[CREDIT_DIRECTOR] = GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_Director);
-    text->credits[CREDIT_PLAYER_ROLE] = GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + Bank0313_Text_Kid + sex);
+    text->credits[CREDIT_SCREENPLAY] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Screenplay);
+    text->credits[CREDIT_VFX] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Vfx);
+    text->credits[CREDIT_ART] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_PokestarStudiosArt);
+    text->credits[CREDIT_DIRECTOR] = GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_Director);
+    text->credits[CREDIT_PLAYER_ROLE] =
+        GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + PkwdBriefingCommon_Text_Kid + sex);
     text->credits[CREDIT_PLAYER_NAME] = PkwdBriefing_CreatePlayerName(param, heapId);
 
     msgData =
@@ -1469,7 +1468,7 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
 
     file = GFL_ArcSysReadHeapNew(ARCID_PKWD_MOVIE, movie, HEAPID_TAIL(heapId));
     text->credits[CREDIT_DIRECTOR_NAME] =
-        GFL_MsgDataLoadStrbufNew(text->msgData, Bank0313_Text_DavidPokench + file->director);
+        GFL_MsgDataLoadStrbufNew(text->msgData, PkwdBriefingCommon_Text_DavidPokench + file->director);
     starLevel = file->starLevel;
     GFL_HeapFree(file);
 
@@ -1699,18 +1698,18 @@ static void PkwdBriefingSet_Free(PkwdBriefingSet *set) {
 
 static void PkwdBriefingClAct_Init(PkwdBriefingClAct *clact, HeapID heapId) {
     ClActSys_Create(&data_02093f08, &sPkwdBriefingVRAMConfig, heapId);
-    clact->unit = func_0204bf1c(64, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(64, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);
 }
 
 static void PkwdBriefingClAct_Update(PkwdBriefingClAct *clact, HeapID heapId) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void PkwdBriefingClAct_Free(PkwdBriefingClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
 }
 
 // Shows the lines of the briefing one after the other. A line slides in as it fades in and waits for the A Button
@@ -1779,7 +1778,7 @@ static void PkwdBriefing_RunBriefing(PkwdBriefingWork *wk) {
         }
         break;
     case BRIEFING_WAIT_PRINT:
-        if (func_02021c0c(wk->text.printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->text.printQueue) == TRUE) {
             wk->step = BRIEFING_START_LINE;
         }
         break;
@@ -1838,7 +1837,7 @@ static void PkwdBriefingText_CountLines(PkwdBriefingText *text, u32 sex) {
         } else {
             strbuf = GFL_MsgDataLoadStrbufNew(text->msgData, i + LINE_COUNT);
         }
-        text->lineHeights[i] = func_0202284c(strbuf);
+        text->lineHeights[i] = GFL_FontGetLineCount(strbuf);
         GFL_StrBufFree(strbuf);
     }
 }
@@ -1859,11 +1858,11 @@ static BOOL PkwdBriefing_IsLastLine(PkwdBriefingWork *wk) {
 static void PkwdBriefingAudience_Init(PkwdBriefingAudience *audience, HeapID heapId) {
     s32 i;
 
-    audience->arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BRIEFING, heapId);
-    audience->unit = func_0204bf1c(SEAT_COUNT, 1, heapId);
-    audience->chars = func_0204b81c(audience->arc, FILE_AUDIENCE_CHARS, FALSE, 1, heapId);
-    audience->cellAnims = func_0204bde0(audience->arc, FILE_AUDIENCE_CELLS, FILE_AUDIENCE_ANIMS, heapId);
-    audience->palette = func_0204bbb8(audience->arc, FILE_AUDIENCE_PALETTE, 1, 0, 0, 4, heapId);
+    audience->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, heapId);
+    audience->unit = ClActUnit_Create(SEAT_COUNT, 1, heapId);
+    audience->chars = ClActSys_LoadChars(audience->arc, FILE_AUDIENCE_CHARS, FALSE, 1, heapId);
+    audience->cellAnims = ClActSys_LoadCellAnims(audience->arc, FILE_AUDIENCE_CELLS, FILE_AUDIENCE_ANIMS, heapId);
+    audience->palette = ClActSys_LoadPlttRange(audience->arc, FILE_AUDIENCE_PALETTE, 1, 0, 0, 4, heapId);
     for (i = 0; i < SEAT_COUNT; i++) {
         ClActorSetup base = sPkwdBriefingAudienceSetup;
         ClActorSetup setup = base;
@@ -1871,11 +1870,11 @@ static void PkwdBriefingAudience_Init(PkwdBriefingAudience *audience, HeapID hea
         setup.x = sPkwdBriefingSeats[i].x;
         setup.y = sPkwdBriefingSeats[i].y;
         setup.priority = 128 - i;
-        audience->actors[i] = func_0204c040(audience->unit, audience->chars, audience->palette, audience->cellAnims,
-                                            &setup, CLACT_SURFACE_SUB, heapId);
+        audience->actors[i] = ClActor_Create(audience->unit, audience->chars, audience->palette, audience->cellAnims,
+                                             &setup, CLACT_SURFACE_SUB, heapId);
         func_0204c520(audience->actors[i], FALSE);
-        func_0204c124(audience->actors[i], TRUE);
-        func_0204c378(audience->actors[i], sPkwdBriefingSeats[i].palette, 1);
+        ClActor_SetVisible(audience->actors[i], TRUE);
+        ClActor_SetPalette(audience->actors[i], sPkwdBriefingSeats[i].palette, 1);
     }
     PkwdBriefingAudience_LoadPalettes(audience, heapId);
 }
@@ -1887,14 +1886,14 @@ static void PkwdBriefingAudience_Free(PkwdBriefingAudience *audience) {
     PkwdBriefingAudience_FreePalettes(audience);
     for (i = 0; i < SEAT_COUNT; i++) {
         if (audience->actors[i] != NULL) {
-            func_0204c108(audience->actors[i]);
+            ClActor_Delete(audience->actors[i]);
             audience->actors[i] = NULL;
         }
     }
-    func_0204be64(audience->cellAnims);
-    func_0204bcd0(audience->palette);
+    ClActSys_FreeCellAnims(audience->cellAnims);
+    ClActSys_FreePltt(audience->palette);
     if (audience->unit != NULL) {
-        func_0204bf98(audience->unit);
+        ClActUnit_Delete(audience->unit);
     }
     GFL_ArcToolFree(audience->arc);
 }
@@ -1966,12 +1965,12 @@ static void PkwdBriefing_InitAudience(PkwdBriefingWork *wk, BOOL pickSeats, Heap
 }
 
 static void PkwdBriefingAudience_SetVisible(PkwdBriefingAudience *audience, s32 seat, BOOL visible) {
-    func_0204c124(audience->actors[seat], visible);
+    ClActor_SetVisible(audience->actors[seat], visible);
 }
 
 static void PkwdBriefingAudience_SetSequence(PkwdBriefingAudience *audience, s32 seat, u32 sequence) {
-    func_0204c488(audience->actors[seat], sequence);
-    func_0204c378(audience->actors[seat], sPkwdBriefingSeats[seat].palette, 1);
+    ClActor_SetSequence(audience->actors[seat], sequence);
+    ClActor_SetPalette(audience->actors[seat], sPkwdBriefingSeats[seat].palette, 1);
 }
 
 static void PkwdBriefingAudience_SetAllSequences(PkwdBriefingAudience *audience, u32 sequence, u32 seats) {
@@ -2154,7 +2153,7 @@ static void PkwdBriefing_RunCredits(PkwdBriefingWork *wk) {
         break;
     case CREDITS_STOP_MUSIC:
         if (wk->text.timer == 0) {
-            func_02005e08(SEQ_BGM_SILENCE_FIELD, 0xffff, 100, 95);
+            GFL_SndBGMRequestChange(SEQ_BGM_SILENCE_FIELD, 0xffff, 100, 95);
             wk->text.timer++;
         } else if (wk->text.timer == 90) {
             wk->step = CREDITS_REACT;
@@ -2287,7 +2286,7 @@ static void PkwdBriefing_ScrollCredits(PkwdBriefingWork *wk, s32 scroll, u32 lay
     }
     if (scroll == end + 234 && layout != CREDITS_BOTH) {
         PkwdBriefingText_LoadCreditsScreen(&wk->text, heapId, layout);
-        func_02005e08(SEQ_BGM_SILENCE_FIELD, 0xffff, 100, 95);
+        GFL_SndBGMRequestChange(SEQ_BGM_SILENCE_FIELD, 0xffff, 100, 95);
     }
     if (scroll == end + 298 && layout != CREDITS_BOTH) {
         PkwdBriefing_React(wk, wk->param->setup);
@@ -2296,12 +2295,12 @@ static void PkwdBriefing_ScrollCredits(PkwdBriefingWork *wk, s32 scroll, u32 lay
 
 // How long a line of the briefing stays for the text speed: 12 seconds when it is slow, 8 for normal, 4 for fast
 static s32 PkwdBriefing_GetLineWait(PkwdBriefingWork *wk) {
-    s32 wait = func_02017bcc();
+    s32 wait = TextSpeed_GetCurrentWait();
 
-    if (wait >= func_02017c50(0)) {
+    if (wait >= TextSpeed_GetWait(0)) {
         return 720;
     }
-    if (wait >= func_02017c50(1)) {
+    if (wait >= TextSpeed_GetWait(1)) {
         return 480;
     }
     return 240;

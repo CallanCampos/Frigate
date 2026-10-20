@@ -53,47 +53,40 @@ static void md5_transform(MATHMD5Context *context);
 #define MD5_I(b, c, d) ((c) ^ ((b) | ~(d)))
 
 static void md5_transform(MATHMD5Context *context) {
+    const u32 *index;
     u32 a = context->state[0];
     u32 b = context->state[1];
     u32 c = context->state[2];
     u32 d = context->state[3];
     const u32 *x = context->block.words;
-    const u32 *sines = MD5_PARTS_OF_SINES;
-    const u32 *index = MD5_MSG_INDEX;
     const u32 *in = x;
+    const u32 *sines = MD5_PARTS_OF_SINES;
     int i;
 
     for (i = 0; i < 4; i++) {
-        MD5_STEP(a, b, c, d, MD5_F(b, c, d), in[0], sines[0], 7);
-        MD5_STEP(d, a, b, c, MD5_F(a, b, c), in[1], sines[1], 12);
-        MD5_STEP(c, d, a, b, MD5_F(d, a, b), in[2], sines[2], 17);
-        MD5_STEP(b, c, d, a, MD5_F(c, d, a), in[3], sines[3], 22);
-        in += 4;
-        sines += 4;
+        MD5_STEP(a, b, c, d, MD5_F(b, c, d), *in++, *sines++, 7);
+        MD5_STEP(d, a, b, c, MD5_F(a, b, c), *in++, *sines++, 12);
+        MD5_STEP(c, d, a, b, MD5_F(d, a, b), *in++, *sines++, 17);
+        MD5_STEP(b, c, d, a, MD5_F(c, d, a), *in++, *sines++, 22);
+    }
+    index = MD5_MSG_INDEX;
+    for (i = 0; i < 4; i++) {
+        MD5_STEP(a, b, c, d, MD5_G(b, c, d), x[*index++], *sines++, 5);
+        MD5_STEP(d, a, b, c, MD5_G(a, b, c), x[*index++], *sines++, 9);
+        MD5_STEP(c, d, a, b, MD5_G(d, a, b), x[*index++], *sines++, 14);
+        MD5_STEP(b, c, d, a, MD5_G(c, d, a), x[*index++], *sines++, 20);
     }
     for (i = 0; i < 4; i++) {
-        MD5_STEP(a, b, c, d, MD5_G(b, c, d), x[index[0]], sines[0], 5);
-        MD5_STEP(d, a, b, c, MD5_G(a, b, c), x[index[1]], sines[1], 9);
-        MD5_STEP(c, d, a, b, MD5_G(d, a, b), x[index[2]], sines[2], 14);
-        MD5_STEP(b, c, d, a, MD5_G(c, d, a), x[index[3]], sines[3], 20);
-        index += 4;
-        sines += 4;
+        MD5_STEP(a, b, c, d, MD5_H(b, c, d), x[*index++], *sines++, 4);
+        MD5_STEP(d, a, b, c, MD5_H(a, b, c), x[*index++], *sines++, 11);
+        MD5_STEP(c, d, a, b, MD5_H(d, a, b), x[*index++], *sines++, 16);
+        MD5_STEP(b, c, d, a, MD5_H(c, d, a), x[*index++], *sines++, 23);
     }
     for (i = 0; i < 4; i++) {
-        MD5_STEP(a, b, c, d, MD5_H(b, c, d), x[index[0]], sines[0], 4);
-        MD5_STEP(d, a, b, c, MD5_H(a, b, c), x[index[1]], sines[1], 11);
-        MD5_STEP(c, d, a, b, MD5_H(d, a, b), x[index[2]], sines[2], 16);
-        MD5_STEP(b, c, d, a, MD5_H(c, d, a), x[index[3]], sines[3], 23);
-        index += 4;
-        sines += 4;
-    }
-    for (i = 0; i < 4; i++) {
-        MD5_STEP(a, b, c, d, MD5_I(b, c, d), x[index[0]], sines[0], 6);
-        MD5_STEP(d, a, b, c, MD5_I(a, b, c), x[index[1]], sines[1], 10);
-        MD5_STEP(c, d, a, b, MD5_I(d, a, b), x[index[2]], sines[2], 15);
-        MD5_STEP(b, c, d, a, MD5_I(c, d, a), x[index[3]], sines[3], 21);
-        index += 4;
-        sines += 4;
+        MD5_STEP(a, b, c, d, MD5_I(b, c, d), x[*index++], *sines++, 6);
+        MD5_STEP(d, a, b, c, MD5_I(a, b, c), x[*index++], *sines++, 10);
+        MD5_STEP(c, d, a, b, MD5_I(d, a, b), x[*index++], *sines++, 15);
+        MD5_STEP(b, c, d, a, MD5_I(c, d, a), x[*index++], *sines++, 21);
     }
     context->state[0] += a;
     context->state[1] += b;
@@ -110,7 +103,7 @@ void MATH_MD5Init(MATHMD5Context *context) {
 }
 
 void MATH_MD5Update(MATHMD5Context *context, const void *data, u32 size) {
-    const u8 *src = data;
+    const u8 *src;
     u32 pos = (u32)context->length & (MD5_BLOCK_SIZE - 1);
     u32 room;
     int blocks;
@@ -119,13 +112,13 @@ void MATH_MD5Update(MATHMD5Context *context, const void *data, u32 size) {
     room = MD5_BLOCK_SIZE - pos;
     if (room > size) {
         if (size != 0) {
-            MI_CpuCopy8(src, &context->block.bytes[pos], size);
+            MI_CpuCopy8(data, &context->block.bytes[pos], size);
         }
         return;
     }
-    MI_CpuCopy8(src, &context->block.bytes[pos], room);
+    MI_CpuCopy8(data, &context->block.bytes[pos], room);
     md5_transform(context);
-    src += room;
+    src = (const u8 *)data + room;
     size -= room;
     for (blocks = size >> 6; blocks > 0; blocks--) {
         MI_CpuCopy8(src, context->block.bytes, MD5_BLOCK_SIZE);
@@ -143,7 +136,7 @@ void MATH_MD5GetHash(MATHMD5Context *context, void *digest) {
     u32 room;
 
     MATH_MD5Update(context, &MD5_PADDING, 1);
-    pos = (u32)context->length & (MD5_BLOCK_SIZE - 1);
+    pos = context->length & (MD5_BLOCK_SIZE - 1);
     room = MD5_BLOCK_SIZE - pos;
     if (room < 8) {
         MI_CpuFill8(&context->block.bytes[pos], 0, room);

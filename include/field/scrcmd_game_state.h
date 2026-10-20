@@ -10,11 +10,11 @@
 #include "system/vm.h"
 
 BOOL s00E0_GameGetVersion(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155608(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155638(VM *vm, FieldScriptEnv *env);
+BOOL s00C9_ConfigToggleKanji(VM *vm, FieldScriptEnv *env);
+BOOL s00CA_ConfigGetKanji(VM *vm, FieldScriptEnv *env);
 BOOL s00CB_Random(VM *vm, FieldScriptEnv *env);
 BOOL s00CC_RTGetTextFile(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0215569c(VM *vm, FieldScriptEnv *env);
+BOOL s00CE_TrainerCardGetStars(VM *vm, FieldScriptEnv *env);
 BOOL s00CD_RTCGetDayPart(VM *vm, FieldScriptEnv *env);
 BOOL s00CF_RTCGetWeekDay(VM *vm, FieldScriptEnv *env);
 BOOL s00D0_RTCGetDate(VM *vm, FieldScriptEnv *env);
@@ -39,16 +39,16 @@ BOOL s01C6_PokeDexGiveNational(VM *vm, FieldScriptEnv *env);
 BOOL s01C7_PokeDexHaveNational(VM *vm, FieldScriptEnv *env);
 BOOL s01C8_PokeDexEnable(VM *vm, FieldScriptEnv *env);
 BOOL s02D0_PokeDexEnableHabitatList(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155bec(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155c30(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155c64(VM *vm, FieldScriptEnv *env);
+BOOL s02ED_SetSoftResetBlocked(VM *vm, FieldScriptEnv *env);
+BOOL s02F1_SetOneShotDRObtained(VM *vm, FieldScriptEnv *env);
+BOOL s02F2_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env);
 BOOL s00E2_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env);
 BOOL s00E3_GiveRunningShoes(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155d00(VM *vm, FieldScriptEnv *env);
+BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155d80(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155db4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02155dd4(VM *vm, FieldScriptEnv *env);
+BOOL s00E6_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env);
+BOOL s00E7_StartMenuUnlockItem(VM *vm, FieldScriptEnv *env);
+BOOL s00E8_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env);
 BOOL s00EA_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env);
 BOOL s01D7_ObjInitPointGPos(VM *vm, FieldScriptEnv *env);
 BOOL s01D8_ObjInitWarpGPos(VM *vm, FieldScriptEnv *env);

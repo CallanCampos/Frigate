@@ -224,20 +224,20 @@ static void BattleChampionshipFlow_DeleteSeq(BattleChampionshipFlow *wk) {
 static void BattleChampionshipFlow_CreateUI(BattleChampionshipFlow *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ENTREE_FOREST, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->msgBox = WifiBattleMatchMsgBox_Create(0, 15, 14, 10, wk->printQueue, wk->font, wk->heapId);
 }
 
 static void BattleChampionshipFlow_DeleteUI(BattleChampionshipFlow *wk) {
     WifiBattleMatchMsgBox_Free(wk->msgBox);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
 }
 
 static void BattleChampionshipFlow_UpdateUI(BattleChampionshipFlow *wk) {
     WifiBattleMatchMsgBox_Update(wk->msgBox);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
 }
 
 static void BattleChampionshipFlow_TaskDispatch(WifiBattleMatchTask *task, u32 *seq, void *work) {
@@ -756,16 +756,16 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(WifiBattleMatchTask *task, 
 
     switch (*seq) {
     case 0:
-        if (func_0200f300(record)) {
-            if (func_0200f308(record)) {
-                if (func_0200f334(record)) {
+        if (RecordSave_IsMatchInProgress(record)) {
+            if (RecordSave_IsMacAddressSame(record)) {
+                if (RecordSave_IsMatchTimedOut(record)) {
                     RecordAddOne(getTrainerCardInfoBlkAddress(save), 0x35);
                     *seq = 1;
                 } else {
                     *seq = 4;
                 }
             } else {
-                func_0200f2dc(record);
+                RecordSave_SetMatchInProgress(record);
                 *seq = 2;
             }
         } else {
@@ -773,7 +773,7 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 1:
-        func_0200f2dc(record);
+        RecordSave_SetMatchInProgress(record);
         WifiBattleMatchTask_SetReturnSeq(task, 9);
         *seq = 6;
         break;
@@ -802,11 +802,11 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(WifiBattleMatchTask *task, 
         break;
     case 7:
         GCTX_HIDBlockSoftReset(0x40);
-        func_0201782c(menu->param.gameData);
+        GameData_StartSave(menu->param.gameData);
         *seq = 8;
         break;
     case 8:
-        switch (func_02017850(menu->param.gameData)) {
+        switch (GameData_UpdateSave(menu->param.gameData)) {
         case 2:
         case 3:
             WifiBattleMatchTask_ReturnToSeq(task);
@@ -833,7 +833,7 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
     switch (*seq) {
     case 0:
         RecordSave_ClearMatchInProgress(record);
-        if (func_02017b8c(menu->param.gameData) == 0) {
+        if (GameData_GetCounter(menu->param.gameData) == 0) {
             *seq = 6;
         } else {
             *seq = 1;
@@ -854,7 +854,7 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         GFL_SndBGMPlay(SEQ_ME_BPGET, SND_CHANNEL_MASK_ALL);
         text = GFL_MsgDataLoadStrbufNew(menu->param.msgData, EntreeForest_Text_ReceivedBp);
         copyVarForText(menu->wordSet, 0, GetGameDataPlayerInfo(menu->param.gameData));
-        WordSetNumber(menu->wordSet, 1, func_02017b8c(menu->param.gameData), 2, 0, 1);
+        WordSetNumber(menu->wordSet, 1, GameData_GetCounter(menu->param.gameData), 2, 0, 1);
         GFL_WordSetFormatStrbuf(menu->wordSet, menu->strBuf, text);
         GFL_StrBufFree(text);
         WifiBattleMatchMsgBox_PrintStr(menu->param.msgBox, menu->strBuf, 3);
@@ -869,10 +869,10 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         break;
     case 5:
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
-            score = func_0201795c(menu->param.gameData);
-            points = func_02017b8c(menu->param.gameData);
+            score = GameData_GetBSubwayScoreData(menu->param.gameData);
+            points = GameData_GetCounter(menu->param.gameData);
             BSubwayScoreData_AddBattlePoints(score, points);
-            func_02017bb4(menu->param.gameData);
+            GameData_ResetCounter(menu->param.gameData);
             if (points != 0) {
                 RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(menu->param.gameData)), 0x21, points);
             }
@@ -884,11 +884,11 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         *seq = 7;
         break;
     case 7:
-        func_0201782c(menu->param.gameData);
+        GameData_StartSave(menu->param.gameData);
         *seq = 8;
         break;
     case 8:
-        switch (func_02017850(menu->param.gameData)) {
+        switch (GameData_UpdateSave(menu->param.gameData)) {
         case 2:
         case 3:
             GCTX_HIDUnblockSoftReset(0x40);

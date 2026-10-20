@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Export and pack Pokémon battle sprites, icons, and footprints.
 
-    pokemon_graphics.py extract data/pokemon
-    pokemon_graphics.py pack data/pokemon black2|white2 OUTPUT...
+    pokemon_graphics.py extract res/pokemon
+    pokemon_graphics.py pack res/pokemon black2|white2 OUTPUT...
 
 Images are indexed PNGs: their pixel indices select colors in the adjacent
 JASC palette. Nitro cell, animation, and other binary resources remain separate
@@ -18,7 +18,7 @@ from pathlib import Path
 
 from narc import read_narc, write_narc
 from species_data import directory
-from nitro_2d import (character_pixels, palette_colors, patch_characters, patch_palette,
+from nitro_2d import (character_pixels, palette_colors, palette_indices, patch_characters, patch_palette,
                       read_indexed_png, read_palette, write_indexed_png, write_palette)
 
 
@@ -41,10 +41,10 @@ FORM_FOOTPRINTS = (("giratina", 1), ("shaymin", 1), ("kyurem", 1), ("kyurem", 2)
 
 @lru_cache(maxsize=1)
 def species_names():
-    """Returns the directories of the species of data/constants/species.txt, in order: the national Pokédex's, then
+    """Returns the directories of the species of generated/species.txt, in order: the national Pokédex's, then
     the egg, the bad egg and the Pokéstar Studios species."""
     return [directory(re.match(r"SPECIES_[A-Z0-9_]+", line).group(0))
-            for line in (ROOT / "data/constants/species.txt").read_text().splitlines()
+            for line in (ROOT / "generated/species.txt").read_text().splitlines()
             if line.startswith("SPECIES_")]
 
 
@@ -57,7 +57,7 @@ def national_species():
 @lru_cache(maxsize=2)
 def form_names(musical=False):
     """Returns the species and form of each form sprite group, from its species' forms (sprite_offset and count) in
-    data/pokemon. The musical sprites follow Black and White's species data instead (ARCID_PERSONAL_BW1, a/3/0/2,
+    res/pokemon. The musical sprites follow Black and White's species data instead (ARCID_PERSONAL_BW1, a/3/0/2,
     which MusicalMcss_GetDataIDBase reads), whose offsets differ and which has no source. Forms told apart only by
     their palette (palette_forms, Arceus) have no groups."""
     records = read_narc((EXTRACTED / "a/3/0/2").read_bytes()) if musical else None
@@ -67,7 +67,7 @@ def form_names(musical=False):
             _, sprite_offset, count = struct.unpack_from("<HHB", records[number], 0x1C)
             palette_only = records[number][0x21] >> 7 & 1
         else:
-            data = json.loads((ROOT / "data/pokemon" / species / "data.json").read_text())
+            data = json.loads((ROOT / "res/pokemon" / species / "data.json").read_text())
             sprite_offset, count = data["forms"]["sprite_offset"], data["forms"]["count"]
             palette_only = data["palette_forms"]
         if count <= 1 or palette_only:
@@ -228,32 +228,6 @@ def current_colors(root, archive_name, archive, index, options):
     colors = read_palette(path)
     bank = options["palette_bank"] if kind == "icons" else 0
     return colors[bank * 16:(bank + 1) * 16]
-
-
-def palette_indices(path, pixels, png_colors, colors):
-    """Returns a PNG's pixels as indices of the sprite's palette: its own indices where the PNG's palette agrees with
-    the sprite's, as exported, or else the sprite's index of the same color, where an editor reordered or compacted
-    the PNG's palette on saving. Index 0 is transparent and stays 0."""
-    def color5(color):
-        return tuple(round(axis * 31 / 255) for axis in color)
-
-    target = [color5(color) for color in colors]
-    mapping = {0: 0}
-    for i in sorted(set(pixels) - {0}):
-        if i >= len(png_colors):
-            raise ValueError(f"{path}: a pixel's index {i} is outside the PNG's palette")
-        color = color5(png_colors[i])
-        if i < len(target) and target[i] == color:
-            mapping[i] = i
-            continue
-        matches = [j for j, other in enumerate(target) if j and other == color]
-        if not matches:
-            raise ValueError(f"{path}: the PNG's color {png_colors[i]} is not in the sprite's palette; change the "
-                             "palette's colors in its .pal file")
-        mapping[i] = matches[0]
-    if all(i == j for i, j in mapping.items()):
-        return pixels
-    return bytes(mapping[i] for i in pixels)
 
 
 def export(root):

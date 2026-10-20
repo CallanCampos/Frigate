@@ -1,5 +1,9 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/zones.h"
 #include "field/encounter.h"
 #include "field/encounter_effect.h"
 #include "field/event_data.h"
@@ -25,7 +29,6 @@
 #include "field/field_nogrid_mapper.h"
 #include "field/field_palace.h"
 #include "field/field_player.h"
-#include "field/field_pokemon_form.h"
 #include "field/field_prop.h"
 #include "field/field_rail.h"
 #include "field/field_scene_area.h"
@@ -60,7 +63,6 @@
 #include "gfl/msg.h"
 #include "gfl/net.h"
 #include "gfl/overlay.h"
-#include "gfl/proc.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/sound.h"
 #include "gfl/tcb.h"
@@ -125,6 +127,16 @@ static const LightSetup sFieldLights[4] = {
 
 static const LightSetupList FIELD_LIGHT_SETUP = { sFieldLights, 4 };
 
+// The tables of one size are declared in this order because MWCC lays out objects of the same size by where each was
+// declared: it is one that gives the ROM's .rodata, not the original's, which is unknown
+static const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE1[] = {
+    FieldRenderPhase1_Fieldmap,
+    NULL,
+    NULL,
+};
+
+static const VecFx32 DEFAULT_FIELDCAMERA_TGT = { 0, 0, 0 };
+
 static const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE2[] = {
     FieldRenderPhase2_Fieldmap,
     FieldRenderPhase2_FieldEffect,
@@ -132,13 +144,6 @@ static const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE2[] = {
 };
 
 static const VecFx32 DEFAULT_FIELDCAMERA_POS = { 0, 0x40000, 0x80000 };
-static const VecFx32 DEFAULT_FIELDCAMERA_TGT = { 0, 0, 0 };
-
-static const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE1[] = {
-    FieldRenderPhase1_Fieldmap,
-    NULL,
-    NULL,
-};
 
 static const GXRgb FIELD_DEFAULT_EDGE_COLOR_TABLE[8] = {
     0x294a, 0x294a, 0x294a, 0x294a, 0x294a, 0x294a, 0x294a, 0x294a
@@ -150,13 +155,13 @@ static const ClActSysSetup FIELD_CLACT_SETUP = {
     0, 0, 0, 0x200, 4, 0x7c, 4, 0x7c, 0, 0x48, 0x40, 0x40, 0x40, 0x10, 0x10,
 };
 
-static const GXRgb FIELD_STD_PALETTE[16] = { 0x7ffe };
-
 // clang-format off
 static const u32 FIELD_DEFAULT_FOG_TABLE[8] = {
     0x0c080400, 0x1c181410, 0x2c282420, 0x3c383430, 0x4c484440, 0x5c585450, 0x6c686460, 0x7c787470,
 };
 // clang-format on
+
+static const GXRgb FIELD_STD_PALETTE[16] = { 0x7ffe };
 
 static const BGSysVRAMConfig FIELDMAP_VRAM_CONFIG = { 8, 0, 0x80, 0, 0x10, 0, 0x100, 0, 7, 0x40, 0x100010, 0x10 };
 
@@ -168,9 +173,6 @@ static const FieldRoutine FIELDMAP_ROUTINES[][2] = {
     { FieldRoutine_MapUnload, FieldRoutine_MapUnload },
     { FieldRoutine_Close, FieldRoutine_Close },
 };
-
-static const VecFx32 DEFAULT_FIELDCAMERA_UP = { 0, 0x1000, 0 };
-static const VecFx32 FIELD_WILD_EFFECT_SCALE = { 0x7000, 0x7000, 0x7000 };
 
 // clang-format off
 static const FieldMapConfig MAP_CONFIGS[] = {
@@ -206,68 +208,6 @@ static const FieldMapConfig MAP_CONFIGS[] = {
 };
 // clang-format on
 
-BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work) {
-    GameSystem *gsys = param;
-
-    switch (*seq) {
-    case 0: {
-        Field **procWork;
-        u32 heapSize = GetFieldmapZoneHeapSize(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys))) - 0xf000;
-
-        GFL_HeapCreateChild(HEAPID_USER, HEAPID_FIELDMAP, heapSize);
-        GFL_HeapCreateChild(HEAPID_USER, 0x70, 0xf000);
-        GFL_HeapCreateChild(HEAPID_FIELDMAP, 0x50, 0xc000);
-        GFL_HeapCreateRoot(g_FieldHeapMemory, 0x10000, 0x89);
-        GFL_HeapCreateChild(0x89, 0x92, 0x6400);
-        GFL_HeapCreateChild(0x89, 0x93, 0x7400);
-        GFL_HeapCreateChild(0x89, 0x96, 0x500);
-        procWork = GFL_ProcInitSubsystem(proc, sizeof(Field *), HEAPID_FIELDMAP);
-        *procWork = Field_Create(gsys, HEAPID_FIELDMAP);
-        GSYS_SetField(gsys, *procWork);
-        (*seq)++;
-        break;
-    }
-    case 1:
-        if (!func_02016b34(gsys)) {
-            GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
-
-            switch (GameCommSys_BootCheck(comm)) {
-            case 1:
-            case 2:
-                GameCommSys_ExitReq(comm);
-                break;
-            }
-        }
-        CheckResetKeldeoOrdinaryForme(gsys);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL FieldmapProc_Update(GameProc *proc, int *seq, void *param, void *work) {
-    if (Field_CallRoutines(param, *(Field **)work) == TRUE) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL FieldmapProc_End(GameProc *proc, int *seq, void *param, void *work) {
-    GameSystem *gsys = param;
-
-    Field_Free(*(Field **)work);
-    GSYS_SetField(gsys, NULL);
-    GFL_ProcReleaseSubsystem(proc);
-    GFL_HeapDelete(0x96);
-    GFL_HeapDelete(0x92);
-    GFL_HeapDelete(0x93);
-    GFL_HeapDelete(0x89);
-    GFL_HeapDelete(0x50);
-    GFL_HeapDelete(0x70);
-    GFL_HeapDelete(HEAPID_FIELDMAP);
-    CheckResetKeldeoOrdinaryForme(gsys);
-    return TRUE;
-}
-
 Field *Field_Create(GameSystem *gsys, HeapID heapId) {
     Field *field = GFL_HeapAllocate(heapId, sizeof(Field), TRUE, "fieldmap.c", 0x22b);
     u32 season = 0;
@@ -283,19 +223,19 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
         season = GameSystem_GetSeason(gsys);
     } else if (func_02018f60(areaId)) {
         if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
-            season = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
+            season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
     } else if (func_02018f78(areaId)) {
         season = func_02017b70(field->gameData);
     } else if (func_02018f90(areaId)) {
-        WbtSystem **wbt = func_020179f0(field->gameData);
+        WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
             season = func_ov036_021c98f4(*wbt);
         }
     }
     field->areaData = AreaData_Create(heapId, areaId, season);
-    ResortWork_UpdateRecords(func_02017b84(field->gameData), GameData_GetSaveControl(field->gameData));
+    ResortWork_UpdateRecords(GameData_GetResortWork(field->gameData), GameData_GetSaveControl(field->gameData));
     field->ctrlVTable = GetZoneFieldmapCtrlVTable(field->zoneId);
     return field;
 }
@@ -306,7 +246,7 @@ void Field_Free(Field *field) {
     AreaData_Free(field->areaData);
     GFL_HeapFree(field);
     GSYS_SetField(gsys, NULL);
-    func_0203e874(0, 0);
+    WmIcon_SetPos(0, 0);
 }
 
 u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
@@ -314,11 +254,11 @@ u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
 
     GFL_BGSysSetVRAMBanks(&FIELDMAP_VRAM_CONFIG);
     FieldG2D_Init(field);
-    ClActSys_Create(&FIELD_CLACT_SETUP, &FIELDMAP_VRAM_CONFIG, 0x89);
+    ClActSys_Create(&FIELD_CLACT_SETUP, &FIELDMAP_VRAM_CONFIG, HEAPID_FIELD_CLACT);
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);
     BmpWin_InitAllocator(heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_G3DSysCreate(0, 3, 0, 1, FX32_ONE, field->heapId, FieldG3D_InitCallback);
     FieldG3D_Init(field);
     field->g3DMapper = FieldG3DMapper_Create(field->heapId, GameData_GetSeason(field->gameData));
@@ -342,11 +282,11 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
 
     switch (field->subroutinePhase) {
     case 0:
-        func_ov012_0215ef28(gameData, field->zoneId);
+        ZoneChange_OnFieldLoad(gameData, field->zoneId);
         field->msgBGSys = CreateFieldMsgBGSystem(field->heapId, field->g3dCamera);
         field->moneyWin = NULL;
-        field->placeName = FieldPlaceName_Create(gsys, 0x93, field->msgBGSys);
-        field->unk34 = func_ov036_021b5b7c(gsys, field->heapId);
+        field->placeName = FieldPlaceName_Create(gsys, HEAPID_FIELD_PLACE_NAME, field->msgBGSys);
+        field->unk34 = FieldFMissionInfo_Create(gsys, field->heapId);
         field->skillMapEff =
             FieldSkillMapEff_Create(FieldStatus_GetFlashPerms(GameData_GetFieldStatus(field->gameData)), field->heapId);
         field->cameraSystem = FieldCamera_Create(GetZoneDefaultCameraIndex(field->zoneId), 0, field->g3dCamera,
@@ -402,7 +342,8 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         VecFx32 *pos = &playerState->position;
         u8 season;
 
-        if (FieldPlayerState_GetExState(playerState) == 1 && !GetZoneFlagsEnableCycling(field->zoneId)) {
+        if (FieldPlayerState_GetExState(playerState) == FLD_PLAYER_EXSTATE_CYCLING &&
+            !GetZoneFlagsEnableCycling(field->zoneId)) {
             SetPlayerSpecialState(playerState, 0);
         }
         field->player = FieldPlayer_Create(playerState, field, pos, getTrainerGender(GetGameDataPlayerInfo(gameData)),
@@ -424,10 +365,10 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
             field->lightSystem = FieldLight_Create(lightsId, daySeconds, GameSystem_GetSeason(gsys), field->fog,
                                                    field->g3dLights, field->heapId);
         }
-        field->weatherSystem =
-            func_ov036_02199004(field->cameraSystem, field->lightSystem, field->fog, field->fogCtrl,
-                                GameData_GetFieldSoundSystem(field->gameData), GameSystem_GetSeason(gsys), 0x92);
-        SetWeatherInit(field->weatherSystem, GetNowWeather(field->gameData), 0x92);
+        field->weatherSystem = func_ov036_02199004(field->cameraSystem, field->lightSystem, field->fog, field->fogCtrl,
+                                                   GameData_GetFieldSoundSystem(field->gameData),
+                                                   GameSystem_GetSeason(gsys), HEAPID_FIELD_WEATHER);
+        SetWeatherInit(field->weatherSystem, GetNowWeather(field->gameData), HEAPID_FIELD_WEATHER);
         Field_CheckGiveDiamondDustMedal(field);
         season = GameData_GetSeason(field->gameData);
         field->lensFlare = FieldLensFlare_Create(gsys, field->gameData, field->expObjSystem, season,
@@ -444,8 +385,8 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->encountSystem = EncSys_Create(field);
         GameCommSys_FieldCreate(GSYS_GetGameCommSystem(gsys), field);
         field->asyncProcManager = FieldAsyncProcManager_Create(field, field->heapId, 0x20);
-        field->particleSystem = func_ov036_021bb590(0x50);
-        field->g3dCi = Fld3DCi_Create(0x50, field->particleSystem);
+        field->particleSystem = FieldParticle_Create(HEAPID_FIELD_PARTICLE);
+        field->g3dCi = Fld3DCi_Create(HEAPID_FIELD_PARTICLE, field->particleSystem);
         field->encEff = EncEff_Create(field->heapId, field);
         FesGimmick_BindPlayer(field->fesGimmick, field->fieldEffects, field->player);
         field->dayCare =
@@ -473,12 +414,12 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
             } while (FldActSys_IsAsyncLoadPending(field->actorSystem) == TRUE);
         }
         while (func_ov036_0219917c(field->weatherSystem)) {
-            FieldWeather_Update(field->weatherSystem, 0x92);
+            FieldWeather_Update(field->weatherSystem, HEAPID_FIELD_WEATHER);
         }
         FieldG3D_Update(field);
         FieldG3D_RenderPhase1(field);
         FieldG3D_RenderPhase2(field);
-        func_0204b794();
+        ClActSys_Draw();
         if (field->msgBGSys != NULL) {
             func_ov036_021878d0(field->msgBGSys);
         }
@@ -524,20 +465,20 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     }
     if (field->effectRunningFlag) {
         Field_RenderStart(field);
-        func_0204b794();
+        ClActSys_Draw();
         return 0;
     }
     GCTX_HIDResetFrameCount();
     Field_CheckDoRealTimeLoad(field);
     if (!GSYS_GetEventRunningFlag(gsys)) {
         field->ctrlVTable->update(field, &field->playerPos);
-        func_ov012_02162f44(field->gameData);
+        EvTime_Update(field->gameData);
     }
     if (field->placeName != NULL) {
         func_ov036_021b4ff8(field->placeName);
     }
     if (field->unk34 != NULL) {
-        func_ov036_021b5c28(field->unk34);
+        FieldFMissionInfo_Update(field->unk34);
     }
     FieldSkillMapEff_Update(field->skillMapEff);
     FieldPlayer_SyncState(field->player);
@@ -567,7 +508,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     FieldG3DMapper_SetPlayerPos(field->g3DMapper, &field->playerPos);
     FieldG3D_Update(field);
     func_ov036_021c20e0(*GameData_GetPleasureBoatPtr(field->gameData));
-    func_0204b794();
+    ClActSys_Draw();
     Field_RenderStart(field);
     return 0;
 }
@@ -575,7 +516,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
 void Field_RenderStart(Field *field) {
     GFL_G3DSysResetGeometryCounter();
     FieldCamera_CalcTransform(field->cameraSystem, GCTX_HIDGetHeldKeys());
-    field->actorYOffset = func_ov036_0218132c(field);
+    field->actorYOffset = Field_CalcActorYOffset(field);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     FieldG3D_RenderPhase1(field);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
@@ -597,7 +538,7 @@ u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
         func_ov036_021b5064(field->placeName);
     }
     if (field->unk34 != NULL) {
-        func_ov036_021b5c78(field->unk34);
+        FieldFMissionInfo_UpdateDisplay(field->unk34);
     }
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     FieldG3D_RenderPhase2(field);
@@ -612,13 +553,13 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     func_ov036_021b65d4(field->fesGimmick);
     EncEff_Free(field->encEff);
     Fld3DCi_Free(field->g3dCi);
-    func_ov036_021bb658(field->particleSystem);
+    FieldParticle_Free(field->particleSystem);
     GSYS_SetEventProvider(gsys, NULL, NULL);
     FieldPlayer_SyncState(field->player);
     FieldAsyncProcManager_Free(field->asyncProcManager);
     GameCommSys_FieldDelete(GSYS_GetGameCommSystem(gsys), field);
     if (field->unk34 != NULL) {
-        func_ov036_021b5bfc(field->unk34);
+        FieldFMissionInfo_Free(field->unk34);
     }
     if (field->placeName != NULL) {
         FieldPlaceName_Free(field->placeName);
@@ -673,7 +614,7 @@ u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
     GFL_TCBRemove(field->asyncActorMatLoadTCB);
     FieldG3DMapper_Free(field->g3DMapper);
     FieldG3D_Free(field);
-    func_0204b758();
+    ClActSys_Delete();
     BmpWin_FreeAllocator();
     Field_FreeGraphicsSystems(field);
     if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
@@ -721,10 +662,10 @@ BOOL Field_ToggleCycling(Field *field) {
     BOOL changed = FALSE;
     u32 exState = FieldPlayer_GetExState(field->player);
 
-    if (exState == 1) {
+    if (exState == FLD_PLAYER_EXSTATE_CYCLING) {
         FieldPlayer_SetSpecialSeq(field->player, 1);
         changed = TRUE;
-    } else if (exState == 0) {
+    } else if (exState == FLD_PLAYER_EXSTATE_NONE) {
         changed = TRUE;
         GFL_SndSEPlay(SEQ_SE_BICYCLE);
         FieldPlayer_SetSpecialSeq(field->player, 2);
@@ -881,7 +822,7 @@ void Field_SetMoneyWin(Field *field, void *moneyWin) {
     field->moneyWin = moneyWin;
 }
 
-DayCareSave *Field_GetDayCare(Field *field) {
+DayCare *Field_GetDayCare(Field *field) {
     return field->dayCare;
 }
 
@@ -946,11 +887,17 @@ void FieldG3D_InitCallback(void) {
     GFL_G3DSysSetSwapBufferParams(GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z);
 }
 
+// The field's camera at its default place: a 40-degree perspective at 4:3, from 1 to 1024 units
+static inline G3DCamera *FieldG3D_CreateCamera(HeapID heapId) {
+    VecFx32 up = { 0, FX32_ONE, 0 };
+
+    return GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)),
+                               FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0, &DEFAULT_FIELDCAMERA_POS, &up,
+                               &DEFAULT_FIELDCAMERA_TGT, heapId);
+}
+
 void FieldG3D_Init(Field *field) {
     BlActScene *scene;
-    u8 polyId;
-    VecFx32 scale;
-    VecFx32 up;
 
     field->actorBlAct = BlActSys_Create(0x40, 0x80, FldActSys_VRAMUploadFunc, field->heapId);
     scene = BlActSys_GetScene(field->actorBlAct);
@@ -959,16 +906,17 @@ void FieldG3D_Init(Field *field) {
     field->effectBlAct = BlActSys_Create(0x3a, 0x50, FldActSys_VRAMUploadFunc, field->heapId);
     field->wildEffectBlAct = BlActSys_Create(0x1e, 0x28, FldActSys_VRAMUploadFunc, field->heapId);
     scene = BlActSys_GetScene(field->wildEffectBlAct);
-    scale = FIELD_WILD_EFFECT_SCALE;
-    BlActScene_SetScale(scene, &scale);
-    polyId = 0;
-    BlActScene_SetBasePolyID(scene, &polyId);
+    {
+        VecFx32 scale = { FX32_CONST(7), FX32_CONST(7), FX32_CONST(7) };
+        u8 polyId;
+
+        BlActScene_SetScale(scene, &scale);
+        polyId = 0;
+        BlActScene_SetBasePolyID(scene, &polyId);
+    }
     Field_LoadActorMatColorPreset(field);
-    up = DEFAULT_FIELDCAMERA_UP;
     field->g3DObjSystem = FieldG3DObjSystem_Create(field->heapId, 0x40, 0x40);
-    field->g3dCamera = GFL_G3DCameraCreate(
-        G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0,
-        FX32_ONE, FX32_CONST(1024), 0, &DEFAULT_FIELDCAMERA_POS, &up, &DEFAULT_FIELDCAMERA_TGT, field->heapId);
+    field->g3dCamera = FieldG3D_CreateCamera(field->heapId);
     field->g3dLights = GFL_G3DLightCreate(&FIELD_LIGHT_SETUP, field->heapId);
     GFL_G3DCameraFlush(field->g3dCamera);
     GFL_G3DLightFlush(field->g3dLights);
@@ -983,7 +931,7 @@ void FieldG3D_Update(Field *field) {
     FieldNoGridMapper_UpdateCamera(field->noGridMapper);
     FieldCameraArea_Update(field->sceneArea, &field->playerPos);
     FieldFogCtrl_Update(field->fogCtrl, field->heapId);
-    FieldWeather_Update(field->weatherSystem, 0x92);
+    FieldWeather_Update(field->weatherSystem, HEAPID_FIELD_WEATHER);
     FieldLensFlare_Update(field->lensFlare, field->cameraSystem);
     FieldFog_Update(field->fog);
     FieldLight_Update(field->lightSystem, RTC_ConvertDaySecondsCached());
@@ -1031,7 +979,7 @@ void FldActSys_AsyncMatLoadTCBFunc(TCB *tcb, void *data) {
             FieldG3DObjSystem_SetupResources(field->g3DObjSystem);
         }
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     if (field->dispControl != NULL) {
         FieldDispControl_Update(field->dispControl);
     }
@@ -1053,7 +1001,7 @@ void Field_LoadEdgeColorTable(AreaData *area, u16 zoneId) {
     } else {
         G3X_EdgeMarking(TRUE);
     }
-    GFL_ArcSysRead(g_FieldEdgeColorTable, 0xf, tableId);
+    GFL_ArcSysRead(g_FieldEdgeColorTable, ARCID_AREA_EDGE_COLOR_TABLES, tableId);
     g_FieldEdgeColorTable[7] = 0x4210;
     G3X_SetEdgeColorTable(g_FieldEdgeColorTable);
 }
@@ -1077,18 +1025,19 @@ void Field_InitActorSystem(Field *field) {
                           field->colorPostFX);
     FldActSys_InitBlAct(field->actorSystem, field->actorBlAct, 0x20);
     FldActSys_LoadCachedBlact(field->actorSystem);
-    FldActSys_LoadStaticBlact(actorSystem,
-                              FieldPlayer_GetObjCodeByExState(getTrainerGender(GetGameDataPlayerInfo(gameData)), 0));
+    FldActSys_LoadStaticBlact(
+        actorSystem,
+        FieldPlayer_GetObjCodeByExState(getTrainerGender(GetGameDataPlayerInfo(gameData)), FLD_PLAYER_EXSTATE_NONE));
     FesGimmick_BindActorSystem(field->fesGimmick, actorSystem);
     FieldActorG3DSystem_Create(field->actorSystem, field->g3DObjSystem);
-    func_ov012_021667cc(field->actorSystem, func_ov036_021863d8(field->cameraSystem));
-    func_ov012_02166d48(field->actorSystem);
-    func_ov012_021673e0(actorSystem, func_ov036_021813b8(field->zoneId));
+    FldActSys_InitDraw(field->actorSystem, func_ov036_021863d8(field->cameraSystem));
+    FldActSys_WakeUpAllActors(field->actorSystem);
+    FldActSys_SetShadowsEnabled(actorSystem, func_ov036_021813b8(field->zoneId));
 }
 
 void Field_SuspendActorSystem(Field *field) {
     FldActSys_SuspendAllActors(field->actorSystem);
-    func_ov012_02166764(field->actorSystem);
+    FldActSys_DetachField(field->actorSystem);
     field->actorSystem = NULL;
 }
 
@@ -1155,7 +1104,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     EventData_Reset(eventData);
     EventData_LoadEntities(eventData, zoneId, GameData_GetSeason(gameData));
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
-    func_ov012_0215ee10(gameData, field);
+    ZoneChange_OnSeamless(gameData, field);
     Field_SwapZoneBGM(field, zoneId);
     Field_SwapFog(field, zoneId);
     Field_SwapWeather(field, zoneId);
@@ -1173,7 +1122,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     resetRebattleTrainers(GameData_GetEventWork(gameData));
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     Field_HotswapSpawnActors(field, gameData, actorSystem, eventData, zoneId);
-    func_ov012_021683f4(field->gameSystem, zoneId);
+    FestMission_OnZoneEnter(field->gameSystem, zoneId);
     func_ov036_021b6660(field->fesGimmick);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     func_ov012_02153668(GSYS_GetGameCommSystem(field->gameSystem));
@@ -1196,7 +1145,7 @@ void Field_SwapZoneBGM(Field *field, u32 zoneId) {
     u32 exState = FieldPlayerState_GetExState(GameData_GetPlayerState(gameData));
 
     ISS_ChangeZone(iss, zoneId);
-    if (exState != 2) {
+    if (exState != FLD_PLAYER_EXSTATE_SURF) {
         FieldSnd_ChangeZoneBGM(fieldSound, gameData, zoneId);
     }
 }
@@ -1258,7 +1207,7 @@ void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId) {
         if (isOther == FALSE) {
             city = GameData_GetMyCityState(field->gameData);
         } else {
-            city = func_0201722c(field->gameData, 0);
+            city = GameData_GetCityState(field->gameData, 0);
         }
         func_ov036_021852f4(field->g3DMapper, city, isOther);
     }
@@ -1285,7 +1234,7 @@ void Field_LoadSceneArea(Field *field, u32 zoneId) {
 
         ResetSceneArea(field->sceneArea);
         ResetSceneAreaLoader(field->sceneAreaLoader);
-        LoadCameraDataToSceneAreaLoader(field->sceneAreaLoader, 1, cameraId, 0x96);
+        LoadCameraDataToSceneAreaLoader(field->sceneAreaLoader, 1, cameraId, HEAPID_FIELD_SCENEAREA);
         cameraData = GetFldSceneAreaLoaderCameraData(field->sceneAreaLoader);
         count = GetFldSceneAreaLoaderCamCount(field->sceneAreaLoader);
         BuildSceneArea(field->sceneArea, cameraData, count,
@@ -1413,13 +1362,13 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     FieldAsyncProcManager_Draw(field->asyncProcManager);
     FieldWeather_Draw(field->weatherSystem);
     FieldExpObj_Draw(field->expObjSystem);
-    func_ov036_021bb674();
+    FieldParticle_DrawAndUpdateAll();
     Fld3DCi_Draw(field->g3dCi);
 }
 
 void FieldRenderPhase2_FieldEffect(Field *field) {
     G3X_SetClearColor(0, 0, 0x7fff, 0, FALSE);
-    func_ov036_021bb674();
+    FieldParticle_DrawAndUpdateAll();
     Fld3DCi_Draw(field->g3dCi);
 }
 
@@ -1500,12 +1449,12 @@ void *Field_GetColorPostFX(Field *field) {
     return field->colorPostFX;
 }
 
-fx32 func_ov036_02181324(Field *field) {
+fx32 Field_GetActorYOffset(Field *field) {
     return field->actorYOffset;
 }
 
 // How far below the camera the actors are drawn, from the camera's pitch
-fx32 func_ov036_0218132c(Field *field) {
+fx32 Field_CalcActorYOffset(Field *field) {
     u16 *pitch = func_ov036_021863c4(field->cameraSystem);
     fx32 cos = FX_CosIdx(*pitch);
     fx32 offset;
@@ -1521,7 +1470,7 @@ fx32 func_ov036_0218132c(Field *field) {
 }
 
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId) {
-    if (zoneId == 0x78 && !GameData_IsMapReplaceEventSet(field->gameData, 0)) {
+    if (zoneId == ZONE_OPELUCID_CITY && !GameData_IsMapReplaceEventSet(field->gameData, 0)) {
         return 0xfffffff;
     }
     return GetZoneFogIndex(zoneId);
@@ -1535,41 +1484,41 @@ u32 GetObjectProjectionMatrixOffset(u16 zoneId) {
 }
 
 BOOL func_ov036_021813b8(u16 zoneId) {
-    if (zoneId == 0x249) {
+    if (zoneId == ZONE_NIMBASA_CITY_17) {
         return FALSE;
     }
     if (IsZone150Or151(zoneId) == TRUE) {
         return FALSE;
     }
-    if (zoneId == 0xf1) {
+    if (zoneId == ZONE_ABYSSAL_RUINS) {
         return FALSE;
     }
-    if (zoneId == 0xf2) {
+    if (zoneId == ZONE_ABYSSAL_RUINS_2) {
         return FALSE;
     }
-    if (zoneId == 0xf3) {
+    if (zoneId == ZONE_ABYSSAL_RUINS_3) {
         return FALSE;
     }
-    if (zoneId == 0xf4) {
+    if (zoneId == ZONE_ABYSSAL_RUINS_4) {
         return FALSE;
     }
     return TRUE;
 }
 
 BOOL IsZoneTwoPassLoad(u16 zoneId) {
-    if (zoneId == 0x6c)
+    if (zoneId == ZONE_MISTRALTON_CITY_GYM)
         return TRUE;
-    if (zoneId == 0x249)
+    if (zoneId == ZONE_NIMBASA_CITY_17)
         return TRUE;
-    if (zoneId == 0x8f)
+    if (zoneId == ZONE_POKEMON_LEAGUE_8)
         return TRUE;
     return FALSE;
 }
 
 BOOL func_ov036_0218141c(u16 zoneId) {
     switch (zoneId) {
-    case 0x1de:
-    case 0x1df:
+    case ZONE_WHITE_TREEHOLLOW:
+    case ZONE_BLACK_TOWER:
         return TRUE;
     }
     return FALSE;
@@ -1590,7 +1539,7 @@ void SetupLoadZoneMapTypeData(u16 zoneId, AreaData *area, FieldG3DMapperConfig *
         config->chunkDatIds = GetMapMatrixChunkIDs(matrix);
     }
     config->isSharedTexResource = TRUE;
-    config->textures.arcId = 14;
+    config->textures.arcId = ARCID_AREA_MAP_TEX;
     config->textures.fileId = AreaData_GetTexSetID(area);
     config->terrainAnmInfo.srtAnimeId = AreaData_GetSRTAnmID(area);
     config->terrainAnmInfo.patAnimeId = AreaData_GetPatAnmID(area);

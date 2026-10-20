@@ -76,8 +76,8 @@ void func_02016b0c(GameSystem *gsys, u32 a1);
 u8 func_02016b14(GameSystem *gsys);
 void func_02016b24(GameSystem *gsys, u32 value);
 u8 func_02016b2c(GameSystem *gsys);
-u32 func_02016b34(GameSystem *gsys);
-void func_02016b40(GameSystem *gsys, u32 value);
+u32 GSYS_IsCGearOn(GameSystem *gsys);
+void GSYS_SetCGearOn(GameSystem *gsys, u32 value);
 BOOL func_02016bec(GameSystem *gsys);
 ISS *GameSystem_GetISS(GameSystem *gsys);
 u32 getStatusOfFesMission(LinkFestival *festival);
@@ -89,7 +89,7 @@ void GSYS_StartFieldmapProc(GameSystem *gsys);
 void func_02016bf8(GameSystem *gsys);
 void GSYS_SetField(GameSystem *gsys, Field *field);
 
-// Overlay 36's field map process (fieldmap.c), declared here until its header has it
+// Overlay 36's field map process (fieldmap_proc.c), declared here until its header has it
 extern const GameProcFunctions FIELDMAP_PROC_FUNCS;
 
 #endif // POKEBW2_SYSTEM_GAME_SYSTEM_H

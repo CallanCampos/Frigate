@@ -89,59 +89,9 @@ static void func_ov194_021c5dcc(u32 param, fx32 frame);
 static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 paletteMask);
 static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask);
 
-// The cell actor systems of the trade, and of the trade demo, which has only a few sprites
-static const ClActSysSetup sClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 128, 128, 128, 128, 16, 16 };
+// The cell actor systems of the trade demo, which has only a few sprites, and of the trade
 static const ClActSysSetup sDemoClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 5, 5, 5, 5, 16, 16 };
-
-static const BGSysVRAMConfig sVRAMConfig = {
-    GX_VRAM_BG_64_E,   GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_0123_H,
-    GX_VRAM_OBJ_16_G,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_0_F,     GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
-};
-
-// The initial of each species' English name, from 0 for A, which the search by initial looks for. The two after the
-// last species are the egg's
-static u8 sSpeciesInitials[] = {
-    0xff, 0x01, 0x08, 0x15, 0x02, 0x02, 0x02, 0x12, 0x16, 0x01, 0x02, 0x0c, 0x01, 0x16, 0x0a, 0x01, 0x0f, 0x0f, 0x0f,
-    0x11, 0x11, 0x12, 0x05, 0x04, 0x00, 0x0f, 0x11, 0x12, 0x12, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x02, 0x02, 0x15,
-    0x0d, 0x09, 0x16, 0x19, 0x06, 0x0e, 0x06, 0x15, 0x0f, 0x0f, 0x15, 0x15, 0x03, 0x03, 0x0c, 0x0f, 0x0f, 0x06, 0x0c,
-    0x0f, 0x06, 0x00, 0x0f, 0x0f, 0x0f, 0x00, 0x0a, 0x00, 0x0c, 0x0c, 0x0c, 0x01, 0x16, 0x15, 0x13, 0x13, 0x06, 0x06,
-    0x06, 0x0f, 0x11, 0x12, 0x12, 0x0c, 0x0c, 0x05, 0x03, 0x03, 0x12, 0x03, 0x06, 0x0c, 0x12, 0x02, 0x06, 0x07, 0x06,
-    0x0e, 0x03, 0x07, 0x0a, 0x0a, 0x15, 0x04, 0x04, 0x04, 0x02, 0x0c, 0x07, 0x07, 0x0b, 0x0a, 0x16, 0x11, 0x11, 0x02,
-    0x13, 0x0a, 0x07, 0x12, 0x06, 0x12, 0x12, 0x12, 0x0c, 0x12, 0x09, 0x04, 0x0c, 0x0f, 0x13, 0x0c, 0x06, 0x0b, 0x03,
-    0x04, 0x15, 0x09, 0x05, 0x0f, 0x0e, 0x0e, 0x0a, 0x0a, 0x00, 0x12, 0x00, 0x19, 0x0c, 0x03, 0x03, 0x03, 0x0c, 0x0c,
-    0x02, 0x01, 0x0c, 0x02, 0x10, 0x13, 0x13, 0x02, 0x05, 0x12, 0x05, 0x07, 0x0d, 0x0b, 0x0b, 0x12, 0x00, 0x02, 0x02,
-    0x0b, 0x0f, 0x02, 0x08, 0x13, 0x13, 0x0d, 0x17, 0x0c, 0x05, 0x00, 0x01, 0x0c, 0x00, 0x12, 0x0f, 0x07, 0x12, 0x09,
-    0x00, 0x12, 0x12, 0x18, 0x16, 0x10, 0x04, 0x14, 0x0c, 0x12, 0x0c, 0x14, 0x16, 0x06, 0x0f, 0x05, 0x03, 0x06, 0x12,
-    0x12, 0x06, 0x10, 0x12, 0x12, 0x07, 0x12, 0x13, 0x14, 0x12, 0x0c, 0x12, 0x0f, 0x02, 0x11, 0x0e, 0x03, 0x0c, 0x12,
-    0x07, 0x07, 0x0a, 0x0f, 0x03, 0x0f, 0x12, 0x12, 0x13, 0x07, 0x12, 0x04, 0x0c, 0x0c, 0x01, 0x11, 0x04, 0x12, 0x0b,
-    0x0f, 0x13, 0x0b, 0x07, 0x02, 0x13, 0x06, 0x12, 0x13, 0x02, 0x01, 0x0c, 0x0c, 0x12, 0x0f, 0x0c, 0x19, 0x0b, 0x16,
-    0x12, 0x01, 0x02, 0x03, 0x0b, 0x0b, 0x0b, 0x12, 0x0d, 0x12, 0x13, 0x12, 0x16, 0x0f, 0x11, 0x0a, 0x06, 0x12, 0x0c,
-    0x12, 0x01, 0x12, 0x15, 0x12, 0x0d, 0x0d, 0x12, 0x16, 0x0b, 0x04, 0x0c, 0x07, 0x00, 0x0d, 0x12, 0x03, 0x12, 0x0c,
-    0x00, 0x0b, 0x00, 0x0c, 0x0c, 0x04, 0x0c, 0x0f, 0x0c, 0x15, 0x08, 0x11, 0x06, 0x12, 0x02, 0x12, 0x16, 0x16, 0x0d,
-    0x02, 0x13, 0x12, 0x06, 0x12, 0x13, 0x15, 0x05, 0x02, 0x02, 0x12, 0x00, 0x19, 0x12, 0x0b, 0x12, 0x01, 0x16, 0x02,
-    0x02, 0x01, 0x02, 0x0b, 0x02, 0x00, 0x00, 0x05, 0x0c, 0x02, 0x0a, 0x12, 0x01, 0x03, 0x03, 0x13, 0x02, 0x00, 0x16,
-    0x12, 0x06, 0x12, 0x12, 0x16, 0x02, 0x07, 0x06, 0x11, 0x0b, 0x01, 0x12, 0x12, 0x01, 0x0c, 0x0c, 0x11, 0x11, 0x11,
-    0x0b, 0x0b, 0x0a, 0x06, 0x11, 0x09, 0x03, 0x13, 0x06, 0x13, 0x02, 0x0c, 0x08, 0x0f, 0x0f, 0x04, 0x12, 0x12, 0x12,
-    0x01, 0x01, 0x0a, 0x0a, 0x12, 0x0b, 0x0b, 0x01, 0x11, 0x02, 0x11, 0x12, 0x01, 0x01, 0x16, 0x0c, 0x02, 0x15, 0x0f,
-    0x01, 0x05, 0x02, 0x02, 0x12, 0x06, 0x00, 0x03, 0x03, 0x01, 0x0b, 0x0c, 0x07, 0x06, 0x0f, 0x02, 0x12, 0x12, 0x01,
-    0x01, 0x01, 0x0c, 0x07, 0x02, 0x12, 0x06, 0x06, 0x06, 0x0c, 0x11, 0x0b, 0x07, 0x07, 0x12, 0x03, 0x02, 0x13, 0x02,
-    0x05, 0x0b, 0x0c, 0x12, 0x00, 0x16, 0x0c, 0x0b, 0x11, 0x13, 0x04, 0x0c, 0x13, 0x18, 0x0b, 0x06, 0x06, 0x0c, 0x0f,
-    0x06, 0x0f, 0x03, 0x05, 0x11, 0x14, 0x0c, 0x00, 0x03, 0x0f, 0x07, 0x11, 0x06, 0x02, 0x0f, 0x0c, 0x03, 0x12, 0x00,
-    0x15, 0x12, 0x12, 0x12, 0x13, 0x0f, 0x04, 0x0e, 0x03, 0x12, 0x0f, 0x16, 0x0b, 0x07, 0x12, 0x0f, 0x0b, 0x0f, 0x12,
-    0x0f, 0x12, 0x0f, 0x12, 0x0c, 0x0c, 0x0f, 0x13, 0x14, 0x01, 0x19, 0x11, 0x01, 0x06, 0x16, 0x12, 0x03, 0x04, 0x00,
-    0x13, 0x06, 0x02, 0x13, 0x0f, 0x12, 0x13, 0x12, 0x12, 0x12, 0x0b, 0x15, 0x16, 0x12, 0x02, 0x16, 0x0f, 0x0b, 0x01,
-    0x12, 0x0a, 0x0a, 0x03, 0x03, 0x0c, 0x03, 0x02, 0x12, 0x12, 0x12, 0x18, 0x02, 0x13, 0x02, 0x00, 0x00, 0x13, 0x06,
-    0x19, 0x19, 0x0c, 0x02, 0x06, 0x06, 0x06, 0x12, 0x03, 0x11, 0x03, 0x12, 0x15, 0x15, 0x15, 0x03, 0x12, 0x04, 0x0a,
-    0x04, 0x05, 0x00, 0x05, 0x09, 0x00, 0x09, 0x06, 0x05, 0x05, 0x0a, 0x0a, 0x0a, 0x13, 0x04, 0x04, 0x04, 0x01, 0x0b,
-    0x0b, 0x02, 0x00, 0x05, 0x07, 0x02, 0x01, 0x02, 0x12, 0x00, 0x12, 0x0c, 0x0c, 0x03, 0x06, 0x06, 0x0f, 0x01, 0x01,
-    0x11, 0x01, 0x15, 0x0c, 0x07, 0x03, 0x03, 0x19, 0x07, 0x0b, 0x15, 0x02, 0x13, 0x15, 0x13, 0x13, 0x11, 0x19, 0x0b,
-    0x0a, 0x0a, 0x0c, 0x06, 0x04, 0x01,
-};
-
-// The upper screen's camera: what it looks at, from where
-static const VecFx32 sCameraTarget = { 0, 0, 0 };
-static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(200) };
+static const ClActSysSetup sClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 128, 128, 128, 128, 16, 16 };
 
 static const Light sLights[] = {
     { { 0, -FX16_ONE, 0 }, GX_RGB(16, 16, 16) },
@@ -150,26 +100,10 @@ static const Light sLights[] = {
     { { 0, -FX16_ONE, 0 }, GX_RGB(16, 16, 16) },
 };
 
-// The trade's display, and the trade demo's, whose lower screen shows a bitmap BG
-static const BGSysLCDConfig sLCDConfigs[] = {
-    { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D },
-    { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D },
-};
-
-// Where the windows of the letters of the search by initial go, in tiles
-static u32 sInitialWindowPos[][2] = {
-    { 1, 9 },   { 4, 9 },   { 7, 9 },  { 10, 9 }, { 13, 9 },  { 16, 9 },  { 19, 9 },  { 22, 9 },  { 25, 9 },
-    { 28, 9 },  { 1, 12 },  { 4, 12 }, { 7, 12 }, { 10, 12 }, { 13, 12 }, { 16, 12 }, { 19, 12 }, { 22, 12 },
-    { 25, 12 }, { 28, 12 }, { 1, 15 }, { 4, 15 }, { 7, 15 },  { 10, 15 }, { 13, 15 }, { 16, 15 },
-};
-
-// Where the icons of the Pokémon of a negotiation go, for each side: in the row on the main screen, and on the sub
-// screen's panels
-static const u32 sNegoIconPosMain[6][2] = {
-    { 32, 96 }, { 64, 96 }, { 96, 96 }, { 168, 96 }, { 200, 96 }, { 232, 96 },
-};
-static const u32 sNegoIconPosSub[6][2] = {
-    { 24, 46 }, { 24, 94 }, { 24, 142 }, { 152, 46 }, { 152, 94 }, { 152, 142 },
+static const BGSysVRAMConfig sVRAMConfig = {
+    GX_VRAM_BG_64_E,   GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_0123_H,
+    GX_VRAM_OBJ_16_G,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_0_F,     GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
 
 // The colour of a Pokémon's slot, an index into the box palette: none for an empty slot, the species' colour, or the
@@ -242,7 +176,7 @@ void func_ov194_021c2c64(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c2c84(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     int screen;
 
     if (PokemonTrade_IsNegoType(wk)) {
@@ -266,7 +200,7 @@ void func_ov194_021c2d0c(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c2d34(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 12, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
@@ -276,7 +210,7 @@ void func_ov194_021c2d74(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c2d78(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 17, 4, 0, 0xc0, wk->heapId);
     wk->bg7Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 13, 7, 0, FALSE, wk->heapId);
@@ -310,16 +244,19 @@ void func_ov194_021c2e6c(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_PLTT_COMMON] == 0) {
         ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
 
-        wk->objRes[TRADE_OBJRES_CHAR_COMMON] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_SUB, wk->heapId);
-        wk->objRes[TRADE_OBJRES_PLTT_COMMON] = func_0204bbb8(arc, func_0202d810(), CLACT_VRAM_SUB, 0, 0, 3, wk->heapId);
-        wk->objRes[TRADE_OBJRES_CELL_COMMON] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), wk->heapId);
+        wk->objRes[TRADE_OBJRES_CHAR_COMMON] =
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        wk->objRes[TRADE_OBJRES_PLTT_COMMON] =
+            ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, wk->heapId);
+        wk->objRes[TRADE_OBJRES_CELL_COMMON] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                                      AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
         GFL_ArcToolFree(arc);
     }
 }
 
 void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
     u32 screens[] = { 27, 28 };
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, screens[page], 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     if (side) {
@@ -327,7 +264,7 @@ void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
     } else {
         GFL_BGSysMoveBG(4, 0, 0);
     }
-    func_0204c124(wk->actors[2], FALSE);
+    ClActor_SetVisible(wk->actors[2], FALSE);
     GFL_ArcToolFree(arc);
     GFL_BGSysSetBGEnabled(4, TRUE);
 }
@@ -402,10 +339,10 @@ void func_ov194_021c30b8(PokemonTradeWork *wk) {
 static void func_ov194_021c3128(PokemonTradeWork *wk, u32 chars) {
     int i;
 
-    wk->stripScreens[0] = GFL_ArcSysReadHeapNew(0x67, 14, wk->heapId);
-    wk->stripScreens[1] = GFL_ArcSysReadHeapNew(0x67, 15, wk->heapId);
-    wk->stripScreens[2] = GFL_ArcSysReadHeapNew(0x67, 25, wk->heapId);
-    wk->stripScreens[3] = GFL_ArcSysReadHeapNew(0x67, 26, wk->heapId);
+    wk->stripScreens[0] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 14, wk->heapId);
+    wk->stripScreens[1] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 15, wk->heapId);
+    wk->stripScreens[2] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 25, wk->heapId);
+    wk->stripScreens[3] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 26, wk->heapId);
     for (i = 0; i < SCREEN_WIDTH * 24; i++) {
         wk->stripScreens[0][SCREEN_CELLS + i] += CHAR_POS(chars);
         wk->stripScreens[1][SCREEN_CELLS + i] += CHAR_POS(chars);
@@ -510,9 +447,9 @@ void func_ov194_021c3480(PokemonTradeWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
 
     wk->objRes[TRADE_OBJRES_PLTT_ICON] =
-        func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x60, wk->heapId);
+        ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x60, wk->heapId);
     wk->objRes[TRADE_OBJRES_CELL_ICON] =
-        func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
     for (i = 0; i < ICON_COLUMNS; i++) {
         for (j = 0; j < COLUMN_ROWS; j++) {
             setup.x = 0;
@@ -520,17 +457,17 @@ void func_ov194_021c3480(PokemonTradeWork *wk) {
             setup.sequence = 1;
             setup.priority = 16;
             setup.bgPriority = 3;
-            wk->iconChars[i][j] = func_0204b81c(arc, 0x55e, FALSE, CLACT_VRAM_SUB, wk->heapId);
-            wk->icons[i][j] = func_0204c040(wk->clactUnit, wk->iconChars[i][j], wk->objRes[TRADE_OBJRES_PLTT_ICON],
-                                            wk->objRes[TRADE_OBJRES_CELL_ICON], &setup, CLACT_VRAM_SUB, wk->heapId);
+            wk->iconChars[i][j] = ClActSys_LoadChars(arc, 0x55e, FALSE, CLACT_VRAM_SUB, wk->heapId);
+            wk->icons[i][j] = ClActor_Create(wk->clactUnit, wk->iconChars[i][j], wk->objRes[TRADE_OBJRES_PLTT_ICON],
+                                             wk->objRes[TRADE_OBJRES_CELL_ICON], &setup, CLACT_VRAM_SUB, wk->heapId);
             setup.sequence = 0;
             setup.priority = 15;
             wk->iconCursors[i][j] =
-                func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                              wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+                ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                               wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
             func_0204c520(wk->icons[i][j], FALSE);
-            func_0204c124(wk->icons[i][j], FALSE);
-            func_0204c124(wk->iconCursors[i][j], FALSE);
+            ClActor_SetVisible(wk->icons[i][j], FALSE);
+            ClActor_SetVisible(wk->iconCursors[i][j], FALSE);
             func_0204c520(wk->iconCursors[i][j], TRUE);
         }
     }
@@ -542,15 +479,15 @@ static void func_ov194_021c3614(PokemonTradeWork *wk, int index) {
 
     for (i = 0; i < COLUMN_ROWS; i++) {
         if (wk->icons[index][i] != NULL) {
-            func_0204c108(wk->icons[index][i]);
+            ClActor_Delete(wk->icons[index][i]);
             wk->icons[index][i] = NULL;
         }
         if (wk->iconCursors[index][i] != NULL) {
-            func_0204c108(wk->iconCursors[index][i]);
+            ClActor_Delete(wk->iconCursors[index][i]);
             wk->iconCursors[index][i] = NULL;
         }
         if (wk->iconChars[index][i] != 0) {
-            func_0204b98c(wk->iconChars[index][i]);
+            ClActSys_FreeChars(wk->iconChars[index][i]);
             wk->iconChars[index][i] = 0;
         }
     }
@@ -564,11 +501,11 @@ void func_ov194_021c368c(PokemonTradeWork *wk) {
         func_ov194_021c3614(wk, i);
     }
     if (wk->objRes[TRADE_OBJRES_PLTT_ICON] != 0) {
-        func_0204bcd0(wk->objRes[TRADE_OBJRES_PLTT_ICON]);
+        ClActSys_FreePltt(wk->objRes[TRADE_OBJRES_PLTT_ICON]);
         wk->objRes[TRADE_OBJRES_PLTT_ICON] = 0;
     }
     if (wk->objRes[TRADE_OBJRES_CELL_ICON] != 0) {
-        func_0204be64(wk->objRes[TRADE_OBJRES_CELL_ICON]);
+        ClActSys_FreeCellAnims(wk->objRes[TRADE_OBJRES_CELL_ICON]);
         wk->objRes[TRADE_OBJRES_CELL_ICON] = 0;
     }
     if (wk->iconCharData != NULL) {
@@ -584,33 +521,39 @@ void func_ov194_021c36e4(PokemonTradeWork *wk) {
     func_ov194_021c0aac(wk);
     for (i = 0; i < 10; i++) {
         if (wk->actors[i] != NULL) {
-            func_0204c108(wk->actors[i]);
+            ClActor_Delete(wk->actors[i]);
             wk->actors[i] = NULL;
         }
     }
     for (i = TRADE_OBJRES_PLTT; i < TRADE_OBJRES_CHAR; i++) {
         if (wk->objRes[i] != 0) {
-            func_0204bcd0(wk->objRes[i]);
+            ClActSys_FreePltt(wk->objRes[i]);
             wk->objRes[i] = 0;
         }
     }
     for (; i < TRADE_OBJRES_CELL; i++) {
         if (wk->objRes[i] != 0) {
-            func_0204b98c(wk->objRes[i]);
+            ClActSys_FreeChars(wk->objRes[i]);
             wk->objRes[i] = 0;
         }
     }
     for (; i < TRADE_OBJRES_COUNT; i++) {
         if (wk->objRes[i] != 0) {
-            func_0204be64(wk->objRes[i]);
+            ClActSys_FreeCellAnims(wk->objRes[i]);
             wk->objRes[i] = 0;
         }
     }
 }
 
 static void func_ov194_021c3770(int column, int row, ClActorPos *pos) {
-    pos->x = (column + 1) * 24;
-    pos->y = row * 24 + 72;
+    // A column's width and a row's height, and where the first row is. They are the first bytes of the file's
+    // .rodata, though their reads fold
+    static const u8 width = 24;
+    static const u8 height = 24;
+    static const u8 top = 72;
+
+    pos->x = (column + 1) * width;
+    pos->y = row * height + top;
 }
 
 // The Pokémon in a column's row of the strip, and whether it is in the party
@@ -647,16 +590,56 @@ void func_ov194_021c3820(PokemonTradeWork *wk) {
 
     for (i = 0; i < COLUMN_ROWS; i++) {
         for (j = 0; j < ICON_COLUMNS; j++) {
-            if (func_0204c138(wk->iconCursors[j][i])) {
+            if (ClActor_IsVisible(wk->iconCursors[j][i])) {
                 ClActorPos pos;
 
-                func_0204c178(wk->iconCursors[j][i], &pos, CLACT_VRAM_SUB);
+                ClActor_GetSurfacePos(wk->iconCursors[j][i], &pos, CLACT_VRAM_SUB);
                 wk->touchX = pos.x;
                 wk->touchY = pos.y;
             }
         }
     }
 }
+
+// The initial of each species' English name, from 0 for A, which the search by initial looks for. The two after the
+// last species are the egg's
+static u8 sSpeciesInitials[] = {
+    0xff, 0x01, 0x08, 0x15, 0x02, 0x02, 0x02, 0x12, 0x16, 0x01, 0x02, 0x0c, 0x01, 0x16, 0x0a, 0x01, 0x0f, 0x0f, 0x0f,
+    0x11, 0x11, 0x12, 0x05, 0x04, 0x00, 0x0f, 0x11, 0x12, 0x12, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x02, 0x02, 0x15,
+    0x0d, 0x09, 0x16, 0x19, 0x06, 0x0e, 0x06, 0x15, 0x0f, 0x0f, 0x15, 0x15, 0x03, 0x03, 0x0c, 0x0f, 0x0f, 0x06, 0x0c,
+    0x0f, 0x06, 0x00, 0x0f, 0x0f, 0x0f, 0x00, 0x0a, 0x00, 0x0c, 0x0c, 0x0c, 0x01, 0x16, 0x15, 0x13, 0x13, 0x06, 0x06,
+    0x06, 0x0f, 0x11, 0x12, 0x12, 0x0c, 0x0c, 0x05, 0x03, 0x03, 0x12, 0x03, 0x06, 0x0c, 0x12, 0x02, 0x06, 0x07, 0x06,
+    0x0e, 0x03, 0x07, 0x0a, 0x0a, 0x15, 0x04, 0x04, 0x04, 0x02, 0x0c, 0x07, 0x07, 0x0b, 0x0a, 0x16, 0x11, 0x11, 0x02,
+    0x13, 0x0a, 0x07, 0x12, 0x06, 0x12, 0x12, 0x12, 0x0c, 0x12, 0x09, 0x04, 0x0c, 0x0f, 0x13, 0x0c, 0x06, 0x0b, 0x03,
+    0x04, 0x15, 0x09, 0x05, 0x0f, 0x0e, 0x0e, 0x0a, 0x0a, 0x00, 0x12, 0x00, 0x19, 0x0c, 0x03, 0x03, 0x03, 0x0c, 0x0c,
+    0x02, 0x01, 0x0c, 0x02, 0x10, 0x13, 0x13, 0x02, 0x05, 0x12, 0x05, 0x07, 0x0d, 0x0b, 0x0b, 0x12, 0x00, 0x02, 0x02,
+    0x0b, 0x0f, 0x02, 0x08, 0x13, 0x13, 0x0d, 0x17, 0x0c, 0x05, 0x00, 0x01, 0x0c, 0x00, 0x12, 0x0f, 0x07, 0x12, 0x09,
+    0x00, 0x12, 0x12, 0x18, 0x16, 0x10, 0x04, 0x14, 0x0c, 0x12, 0x0c, 0x14, 0x16, 0x06, 0x0f, 0x05, 0x03, 0x06, 0x12,
+    0x12, 0x06, 0x10, 0x12, 0x12, 0x07, 0x12, 0x13, 0x14, 0x12, 0x0c, 0x12, 0x0f, 0x02, 0x11, 0x0e, 0x03, 0x0c, 0x12,
+    0x07, 0x07, 0x0a, 0x0f, 0x03, 0x0f, 0x12, 0x12, 0x13, 0x07, 0x12, 0x04, 0x0c, 0x0c, 0x01, 0x11, 0x04, 0x12, 0x0b,
+    0x0f, 0x13, 0x0b, 0x07, 0x02, 0x13, 0x06, 0x12, 0x13, 0x02, 0x01, 0x0c, 0x0c, 0x12, 0x0f, 0x0c, 0x19, 0x0b, 0x16,
+    0x12, 0x01, 0x02, 0x03, 0x0b, 0x0b, 0x0b, 0x12, 0x0d, 0x12, 0x13, 0x12, 0x16, 0x0f, 0x11, 0x0a, 0x06, 0x12, 0x0c,
+    0x12, 0x01, 0x12, 0x15, 0x12, 0x0d, 0x0d, 0x12, 0x16, 0x0b, 0x04, 0x0c, 0x07, 0x00, 0x0d, 0x12, 0x03, 0x12, 0x0c,
+    0x00, 0x0b, 0x00, 0x0c, 0x0c, 0x04, 0x0c, 0x0f, 0x0c, 0x15, 0x08, 0x11, 0x06, 0x12, 0x02, 0x12, 0x16, 0x16, 0x0d,
+    0x02, 0x13, 0x12, 0x06, 0x12, 0x13, 0x15, 0x05, 0x02, 0x02, 0x12, 0x00, 0x19, 0x12, 0x0b, 0x12, 0x01, 0x16, 0x02,
+    0x02, 0x01, 0x02, 0x0b, 0x02, 0x00, 0x00, 0x05, 0x0c, 0x02, 0x0a, 0x12, 0x01, 0x03, 0x03, 0x13, 0x02, 0x00, 0x16,
+    0x12, 0x06, 0x12, 0x12, 0x16, 0x02, 0x07, 0x06, 0x11, 0x0b, 0x01, 0x12, 0x12, 0x01, 0x0c, 0x0c, 0x11, 0x11, 0x11,
+    0x0b, 0x0b, 0x0a, 0x06, 0x11, 0x09, 0x03, 0x13, 0x06, 0x13, 0x02, 0x0c, 0x08, 0x0f, 0x0f, 0x04, 0x12, 0x12, 0x12,
+    0x01, 0x01, 0x0a, 0x0a, 0x12, 0x0b, 0x0b, 0x01, 0x11, 0x02, 0x11, 0x12, 0x01, 0x01, 0x16, 0x0c, 0x02, 0x15, 0x0f,
+    0x01, 0x05, 0x02, 0x02, 0x12, 0x06, 0x00, 0x03, 0x03, 0x01, 0x0b, 0x0c, 0x07, 0x06, 0x0f, 0x02, 0x12, 0x12, 0x01,
+    0x01, 0x01, 0x0c, 0x07, 0x02, 0x12, 0x06, 0x06, 0x06, 0x0c, 0x11, 0x0b, 0x07, 0x07, 0x12, 0x03, 0x02, 0x13, 0x02,
+    0x05, 0x0b, 0x0c, 0x12, 0x00, 0x16, 0x0c, 0x0b, 0x11, 0x13, 0x04, 0x0c, 0x13, 0x18, 0x0b, 0x06, 0x06, 0x0c, 0x0f,
+    0x06, 0x0f, 0x03, 0x05, 0x11, 0x14, 0x0c, 0x00, 0x03, 0x0f, 0x07, 0x11, 0x06, 0x02, 0x0f, 0x0c, 0x03, 0x12, 0x00,
+    0x15, 0x12, 0x12, 0x12, 0x13, 0x0f, 0x04, 0x0e, 0x03, 0x12, 0x0f, 0x16, 0x0b, 0x07, 0x12, 0x0f, 0x0b, 0x0f, 0x12,
+    0x0f, 0x12, 0x0f, 0x12, 0x0c, 0x0c, 0x0f, 0x13, 0x14, 0x01, 0x19, 0x11, 0x01, 0x06, 0x16, 0x12, 0x03, 0x04, 0x00,
+    0x13, 0x06, 0x02, 0x13, 0x0f, 0x12, 0x13, 0x12, 0x12, 0x12, 0x0b, 0x15, 0x16, 0x12, 0x02, 0x16, 0x0f, 0x0b, 0x01,
+    0x12, 0x0a, 0x0a, 0x03, 0x03, 0x0c, 0x03, 0x02, 0x12, 0x12, 0x12, 0x18, 0x02, 0x13, 0x02, 0x00, 0x00, 0x13, 0x06,
+    0x19, 0x19, 0x0c, 0x02, 0x06, 0x06, 0x06, 0x12, 0x03, 0x11, 0x03, 0x12, 0x15, 0x15, 0x15, 0x03, 0x12, 0x04, 0x0a,
+    0x04, 0x05, 0x00, 0x05, 0x09, 0x00, 0x09, 0x06, 0x05, 0x05, 0x0a, 0x0a, 0x0a, 0x13, 0x04, 0x04, 0x04, 0x01, 0x0b,
+    0x0b, 0x02, 0x00, 0x05, 0x07, 0x02, 0x01, 0x02, 0x12, 0x00, 0x12, 0x0c, 0x0c, 0x03, 0x06, 0x06, 0x0f, 0x01, 0x01,
+    0x11, 0x01, 0x15, 0x0c, 0x07, 0x03, 0x03, 0x19, 0x07, 0x0b, 0x15, 0x02, 0x13, 0x15, 0x13, 0x13, 0x11, 0x19, 0x0b,
+    0x0a, 0x0a, 0x0c, 0x06, 0x04, 0x01,
+};
 
 // Whether a species has the initial searched for
 static BOOL func_ov194_021c3888(PokemonTradeWork *wk, int species) {
@@ -675,7 +658,7 @@ BOOL func_ov194_021c38a8(u32 species, u32 initial) {
 
 // Greys an icon out or not
 void func_ov194_021c38bc(PokemonTradeWork *wk, ClActor *icon, BOOL grey) {
-    func_0204c318(icon, grey ? 1 : 0);
+    ClActor_SetObjMode(icon, grey ? 1 : 0);
 }
 
 static void func_ov194_021c38d4(PokemonTradeWork *wk, int column, int row, BoxPkm *pkm, BOOL isParty, int index) {
@@ -703,8 +686,8 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
     ClActorPos pos;
     ClActorPos screenPos;
 
-    if (column == wk->cursorColumn && !func_0203d554()) {
-        func_0204c124(wk->iconCursors[index][wk->cursorRow], TRUE);
+    if (column == wk->cursorColumn && !GCTX_HIDIsUsingTouch()) {
+        ClActor_SetVisible(wk->iconCursors[index][wk->cursorRow], TRUE);
     }
     for (i = 0; i < COLUMN_ROWS; i++) {
         int species, form, sex;
@@ -724,7 +707,7 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
         species = entry->species;
         sex = entry->sex;
         if (species == wk->iconSpecies[index][i] && form == wk->iconForms[index][i] && sex == wk->iconSexes[index][i]) {
-            func_0204c124(wk->icons[index][i], TRUE);
+            ClActor_SetVisible(wk->icons[index][i], TRUE);
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
         } else if (species != wk->iconSpecies[index][i] ||
                    (species == wk->iconSpecies[index][i] && form != wk->iconForms[index][i]) ||
@@ -735,11 +718,11 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             wk->iconForms[index][i] = form;
             wk->iconSexes[index][i] = sex;
             func_ov194_021c3770(column, i, &pos);
-            func_0204c40c(wk->icons[index][i], &proxy);
+            ClActor_GetImageProxy(wk->icons[index][i], &proxy);
             box = PokemonTrade_GetColumnBox(column, wk);
             slot = PokemonTrade_GetColumnSlot(column, i);
             slot += box * 30;
-            func_0204c178(wk->icons[index][i], &screenPos, CLACT_VRAM_SUB);
+            ClActor_GetSurfacePos(wk->icons[index][i], &screenPos, CLACT_VRAM_SUB);
             if (async == TRUE && screenPos.x >= -16 && screenPos.x <= 272) {
                 if (!NNS_GfdRegisterNewVramTransferTask(35, proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
                                                         wk->iconCharData + slot * 0x200, 0x200)) {
@@ -755,9 +738,9 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
                     0x200);
             }
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
-            func_0204c378(wk->icons[index][i], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
+            ClActor_SetPalette(wk->icons[index][i], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
             func_0204c520(wk->icons[index][i], FALSE);
-            func_0204c124(wk->icons[index][i], TRUE);
+            ClActor_SetVisible(wk->icons[index][i], TRUE);
         }
         if (!PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL) && func_ov194_021c3888(wk, species)) {
             wk->iconMarked[index][i] = TRUE;
@@ -825,7 +808,7 @@ void func_ov194_021c3c68(BoxSaveAccessor *boxes, PokemonTradeWork *wk, BOOL asyn
         wk->firstColumn = column;
         for (i = 0; i < ICON_COLUMNS; i++) {
             for (j = 0; j < COLUMN_ROWS; j++) {
-                func_0204c124(wk->iconCursors[i][j], FALSE);
+                ClActor_SetVisible(wk->iconCursors[i][j], FALSE);
                 wk->iconMarked[i][j] = FALSE;
             }
         }
@@ -872,18 +855,18 @@ static void func_ov194_021c3d2c(PokemonTradeWork *wk) {
             pos.x = wrap + (x - wk->scrollX);
             pos.y = y;
             markPos = pos;
-            if (func_ov194_021be45c(wk, column, j) && func_0203d554() == TRUE) {
+            if (func_ov194_021be45c(wk, column, j) && GCTX_HIDIsUsingTouch() == TRUE) {
                 pos.y -= 8;
-                func_0204c438(wk->icons[index][j], 11);
+                ClActor_SetPriority(wk->icons[index][j], 11);
             } else {
-                func_0204c438(wk->icons[index][j], 28 - i);
+                ClActor_SetPriority(wk->icons[index][j], 28 - i);
             }
-            func_0204c140(wk->icons[index][j], &pos, CLACT_VRAM_SUB);
+            ClActor_SetSurfacePos(wk->icons[index][j], &pos, CLACT_VRAM_SUB);
             if (wk->iconMarked[index][j]) {
                 wk->iconPos[index][j] = markPos;
             }
             pos.y = y + 3;
-            func_0204c140(wk->iconCursors[index][j], &pos, CLACT_VRAM_SUB);
+            ClActor_SetSurfacePos(wk->iconCursors[index][j], &pos, CLACT_VRAM_SUB);
         }
         column++;
     }
@@ -937,7 +920,7 @@ static void func_ov194_021c3f68(PokemonTradeWork *wk) {
 
     for (i = 0; i < ICON_COLUMNS; i++) {
         for (j = 0; j < COLUMN_ROWS; j++) {
-            func_0204c124(wk->icons[i][j], FALSE);
+            ClActor_SetVisible(wk->icons[i][j], FALSE);
         }
     }
 }
@@ -953,7 +936,7 @@ ClActor *func_ov194_021c3fa8(PokemonTradeWork *wk, int x, int y, int *box, int *
         for (j = 0; j < COLUMN_ROWS; j++) {
             ClActorPos pos;
 
-            func_0204c178(wk->icons[i][j], &pos, CLACT_VRAM_SUB);
+            ClActor_GetSurfacePos(wk->icons[i][j], &pos, CLACT_VRAM_SUB);
             if (pos.x <= x && x < pos.x + 24 && pos.y <= y && y < pos.y + 24) {
                 if (box != NULL) {
                     iconColumn = wk->iconColumns[i][j];
@@ -1023,14 +1006,14 @@ void func_ov194_021c4088(PokemonTradeWork *wk, BOOL other) {
         GFL_BGSysCreateBG(7, &setup, BGMODE_EXTENDED);
     }
     if (!other) {
-        arc = GFL_ArcSysCreateFileHandle(0x68, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE_DEMO, wk->heapId);
         GFL_G2DIOLoadArcNCLRDefault(arc, 5, 6, 0x6000, 0, wk->heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 4, 7, 0, 0, FALSE, wk->heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 6, 7, 0, 0, FALSE, wk->heapId);
         GFL_BGSysMoveBG(7, BG_MOVE_SET_X, 0);
         GFL_ArcToolFree(arc);
     } else {
-        arc = GFL_ArcSysCreateFileHandle(0x69, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE_2D, wk->heapId);
         GFL_G2DIOLoadArcNCLRDefault(arc, 1, 6, 0x6000, 0, wk->heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 0, 7, 0, 0, FALSE, wk->heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 2, 7, 0, 0, FALSE, wk->heapId);
@@ -1143,6 +1126,17 @@ static void func_ov194_021c4324(void) {
 
 // Sets up the 3D system and the upper screen's camera
 void func_ov194_021c43c0(PokemonTradeWork *wk) {
+    // Nothing reads it, but the original's .rodata has these 16 zero bytes after the camera's vectors. Its type and
+    // name are a guess: the eight colors that G3X_SetEdgeColorTable takes, which overlay 207's p_sta_sys.c sets in
+    // the same place, just before G3X_EdgeMarking(FALSE), in a setup otherwise like this one. These four are declared
+    // in the only order that gives the original's .rodata, not for a reason the code shows
+    static const GXRgb sEdgeColors[8] = { 0 };
+    // The camera: where it is, what it looks at, and which way is up. Nothing reads the up either: the camera is
+    // given the local copy below, whose initializer the original has as well; copying sCameraUp into it loses that
+    static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(200) };
+    static const VecFx32 sCameraTarget = { 0, 0, 0 };
+    static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
+
     GFL_G3DSysCreate(FALSE, 2, FALSE, 1, 0, HEAPID_TAIL(wk->heapId), func_ov194_021c4324);
     {
         HeapID heapId = HEAPID_TAIL(wk->heapId);
@@ -1252,6 +1246,12 @@ void func_ov194_021c45a8(PokemonTradeWork *wk) {
     }
 }
 
+// The trade's display, and the trade demo's, whose lower screen shows a bitmap BG
+static const BGSysLCDConfig sLCDConfigs[] = {
+    { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D },
+    { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D },
+};
+
 // Sets the display up for the trade, or for the trade demo
 void func_ov194_021c45ec(int config) {
     GFL_BGSysSetLCDConfig(&sLCDConfigs[config]);
@@ -1260,20 +1260,20 @@ void func_ov194_021c45ec(int config) {
 // Loads the sprites of the upper screen once
 void func_ov194_021c4600(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_CHAR_MAIN] == 0) {
-        ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+        ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
-        wk->objRes[TRADE_OBJRES_CHAR_MAIN] = func_0204b81c(arc, 21, FALSE, CLACT_VRAM_MAIN, wk->heapId);
-        wk->objRes[TRADE_OBJRES_PLTT_MAIN] = func_0204bbb8(arc, 18, CLACT_VRAM_MAIN, 0xc0, 0, 6, wk->heapId);
-        wk->objRes[TRADE_OBJRES_CELL_MAIN] = func_0204bde0(arc, 20, 19, wk->heapId);
+        wk->objRes[TRADE_OBJRES_CHAR_MAIN] = ClActSys_LoadChars(arc, 21, FALSE, CLACT_VRAM_MAIN, wk->heapId);
+        wk->objRes[TRADE_OBJRES_PLTT_MAIN] = ClActSys_LoadPlttRange(arc, 18, CLACT_VRAM_MAIN, 0xc0, 0, 6, wk->heapId);
+        wk->objRes[TRADE_OBJRES_CELL_MAIN] = ClActSys_LoadCellAnims(arc, 20, 19, wk->heapId);
         GFL_ArcToolFree(arc);
     }
 }
 
 void func_ov194_021c466c(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_CHAR_MAIN] != 0) {
-        func_0204b98c(wk->objRes[TRADE_OBJRES_CHAR_MAIN]);
-        func_0204bcd0(wk->objRes[TRADE_OBJRES_PLTT_MAIN]);
-        func_0204be64(wk->objRes[TRADE_OBJRES_CELL_MAIN]);
+        ClActSys_FreeChars(wk->objRes[TRADE_OBJRES_CHAR_MAIN]);
+        ClActSys_FreePltt(wk->objRes[TRADE_OBJRES_PLTT_MAIN]);
+        ClActSys_FreeCellAnims(wk->objRes[TRADE_OBJRES_CELL_MAIN]);
         wk->objRes[TRADE_OBJRES_CHAR_MAIN] = 0;
         wk->objRes[TRADE_OBJRES_PLTT_MAIN] = 0;
         wk->objRes[TRADE_OBJRES_CELL_MAIN] = 0;
@@ -1283,25 +1283,25 @@ void func_ov194_021c466c(PokemonTradeWork *wk) {
 // Loads the sprites of the lower screen, and shows the one at the bottom of the strip
 void func_ov194_021c46a4(PokemonTradeWork *wk) {
     ClActorSetup setup;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
-    wk->objRes[TRADE_OBJRES_CHAR_SUB] = func_0204b81c(arc, 24, FALSE, CLACT_VRAM_SUB, wk->heapId);
-    wk->objRes[TRADE_OBJRES_PLTT_SUB] = func_0204bbb8(arc, 18, CLACT_VRAM_SUB, 0xc0, 0, 6, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CELL_SUB] = func_0204bde0(arc, 23, 22, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CHAR_SUB] = ClActSys_LoadChars(arc, 24, FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->objRes[TRADE_OBJRES_PLTT_SUB] = ClActSys_LoadPlttRange(arc, 18, CLACT_VRAM_SUB, 0xc0, 0, 6, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CELL_SUB] = ClActSys_LoadCellAnims(arc, 23, 22, wk->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 128;
     setup.y = 180;
     setup.sequence = 2;
     setup.priority = 14;
     setup.bgPriority = 0;
-    wk->actors[2] = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                                  wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+    wk->actors[2] = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                                   wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[2], FALSE);
-    func_0204c124(wk->actors[2], TRUE);
+    ClActor_SetVisible(wk->actors[2], TRUE);
 }
 
 void func_ov194_021c475c(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 29, 2, 0, CHAR_POS(wk->bg2Chars), 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
@@ -1319,47 +1319,47 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     setup.sequence = 19;
     setup.priority = 14;
     setup.bgPriority = 1;
-    wk->actors[3] = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                                  wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+    wk->actors[3] = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                                   wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[3], TRUE);
-    func_0204c124(wk->actors[3], TRUE);
+    ClActor_SetVisible(wk->actors[3], TRUE);
     setup.x = 96;
     setup.y = 16;
     setup.sequence = 0;
     setup.priority = 11;
     setup.bgPriority = 1;
-    wk->actors[4] = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                                  wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+    wk->actors[4] = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                                   wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[4], TRUE);
-    if (func_0203d554()) {
-        func_0204c124(wk->actors[4], FALSE);
+    if (GCTX_HIDIsUsingTouch()) {
+        ClActor_SetVisible(wk->actors[4], FALSE);
     }
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     pkm0 = func_0201d624(PokemonTrade_GetPkm(wk, 0));
     pkm1 = func_0201d624(PokemonTrade_GetPkm(wk, 1));
     wk->objRes[TRADE_OBJRES_CHAR_ICON0] =
-        func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
     wk->objRes[TRADE_OBJRES_CHAR_ICON1] =
-        func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm1), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(pkm1), FALSE, CLACT_VRAM_SUB, wk->heapId);
     iconSetup.x = 96;
     iconSetup.y = 12;
     iconSetup.sequence = 0;
     iconSetup.priority = 12;
     iconSetup.bgPriority = 1;
     wk->actors[5] =
-        func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON0], wk->objRes[TRADE_OBJRES_PLTT_ICON],
-                      wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
+        ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON0], wk->objRes[TRADE_OBJRES_PLTT_ICON],
+                       wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[5], FALSE);
-    func_0204c124(wk->actors[5], TRUE);
-    func_0204c378(wk->actors[5], PokeIcon_GetPaletteOfPkm(pkm0), CLACT_VRAM_SUB);
+    ClActor_SetVisible(wk->actors[5], TRUE);
+    ClActor_SetPalette(wk->actors[5], PokeIcon_GetPaletteOfPkm(pkm0), CLACT_VRAM_SUB);
     iconSetup.x = 160;
     wk->actors[6] =
-        func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON1], wk->objRes[TRADE_OBJRES_PLTT_ICON],
-                      wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
+        ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON1], wk->objRes[TRADE_OBJRES_PLTT_ICON],
+                       wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[6], FALSE);
-    func_0204c124(wk->actors[6], TRUE);
-    func_0204c378(wk->actors[6], PokeIcon_GetPaletteOfPkm(pkm1), CLACT_VRAM_SUB);
+    ClActor_SetVisible(wk->actors[6], TRUE);
+    ClActor_SetPalette(wk->actors[6], PokeIcon_GetPaletteOfPkm(pkm1), CLACT_VRAM_SUB);
     GFL_ArcToolFree(arc);
 }
 
@@ -1370,46 +1370,53 @@ void func_ov194_021c4970(PokemonTradeWork *wk, int side, BOOL level) {
     if (level) {
         pos.x = 96;
         pos.y = 12;
-        func_0204c140(wk->actors[5], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(wk->actors[5], &pos, CLACT_VRAM_SUB);
         pos.x = 160;
         pos.y = 12;
-        func_0204c140(wk->actors[6], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(wk->actors[6], &pos, CLACT_VRAM_SUB);
     } else {
         pos.x = 96;
         pos.y = side == 0 ? 8 : 12;
-        func_0204c140(wk->actors[5], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(wk->actors[5], &pos, CLACT_VRAM_SUB);
         pos.x = 160;
         pos.y = side != 0 ? 8 : 12;
-        func_0204c140(wk->actors[6], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(wk->actors[6], &pos, CLACT_VRAM_SUB);
     }
 }
 
 void func_ov194_021c49e8(PokemonTradeWork *wk) {
     if (wk->actors[3] != NULL) {
-        func_0204c108(wk->actors[3]);
+        ClActor_Delete(wk->actors[3]);
     }
     if (wk->actors[4] != NULL) {
-        func_0204c108(wk->actors[4]);
+        ClActor_Delete(wk->actors[4]);
     }
     if (wk->actors[5] != NULL) {
-        func_0204c108(wk->actors[5]);
+        ClActor_Delete(wk->actors[5]);
     }
     if (wk->actors[6] != NULL) {
-        func_0204c108(wk->actors[6]);
+        ClActor_Delete(wk->actors[6]);
     }
     wk->actors[3] = NULL;
     wk->actors[4] = NULL;
     wk->actors[5] = NULL;
     wk->actors[6] = NULL;
     if (wk->objRes[TRADE_OBJRES_CHAR_ICON0] != 0) {
-        func_0204b98c(wk->objRes[TRADE_OBJRES_CHAR_ICON0]);
+        ClActSys_FreeChars(wk->objRes[TRADE_OBJRES_CHAR_ICON0]);
     }
     if (wk->objRes[TRADE_OBJRES_CHAR_ICON1] != 0) {
-        func_0204b98c(wk->objRes[TRADE_OBJRES_CHAR_ICON1]);
+        ClActSys_FreeChars(wk->objRes[TRADE_OBJRES_CHAR_ICON1]);
     }
     wk->objRes[TRADE_OBJRES_CHAR_ICON0] = 0;
     wk->objRes[TRADE_OBJRES_CHAR_ICON1] = 0;
 }
+
+// Where the windows of the letters of the search by initial go, in tiles
+static u32 sInitialWindowPos[][2] = {
+    { 1, 9 },   { 4, 9 },   { 7, 9 },  { 10, 9 }, { 13, 9 },  { 16, 9 },  { 19, 9 },  { 22, 9 },  { 25, 9 },
+    { 28, 9 },  { 1, 12 },  { 4, 12 }, { 7, 12 }, { 10, 12 }, { 13, 12 }, { 16, 12 }, { 19, 12 }, { 22, 12 },
+    { 25, 12 }, { 28, 12 }, { 1, 15 }, { 4, 15 }, { 7, 15 },  { 10, 15 }, { 13, 15 }, { 16, 15 },
+};
 
 // Opens the search by initial: its screen, and a window for each letter
 void func_ov194_021c4a68(PokemonTradeWork *wk) {
@@ -1418,7 +1425,7 @@ void func_ov194_021c4a68(PokemonTradeWork *wk) {
 
     GFL_BGSysSetBGEnabled(4, FALSE);
     GFL_BGSysSetBGEnabled(6, FALSE);
-    arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 16, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_BGSysQueueScrLoad(4);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_X, -4);
@@ -1446,10 +1453,10 @@ void func_ov194_021c4b88(PokemonTradeWork *wk) {
     GFL_BGSysMoveBG(4, BG_MOVE_SET_X, 0);
     GFL_BGSysMoveBG(6, BG_MOVE_SET_X, 0);
     if (wk->actors[2] != NULL) {
-        func_0204c124(wk->actors[2], TRUE);
+        ClActor_SetVisible(wk->actors[2], TRUE);
     }
     if (wk->actors[7] != NULL) {
-        func_0204c124(wk->actors[7], TRUE);
+        ClActor_SetVisible(wk->actors[7], TRUE);
     }
     for (i = 0; i < NELEMS(wk->initialWindows); i++) {
         if (wk->initialWindows[i] != NULL) {
@@ -1475,11 +1482,11 @@ void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     }
     if (sprite->actor != NULL) {
         if (item == ITEM_NONE) {
-            func_0204c124(sprite->actor, FALSE);
+            ClActor_SetVisible(sprite->actor, FALSE);
             return;
         }
-        func_0204c488(sprite->actor, mail);
-        func_0204c124(sprite->actor, TRUE);
+        ClActor_SetSequence(sprite->actor, mail);
+        ClActor_SetVisible(sprite->actor, TRUE);
         return;
     }
     if (item != ITEM_NONE) {
@@ -1513,7 +1520,7 @@ void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
 
 void func_ov194_021c4cfc(PokemonTradeSprite *sprite) {
     if (sprite->actor != NULL) {
-        func_0204c108(sprite->actor);
+        ClActor_Delete(sprite->actor);
         UIObjRes_Free(&sprite->res);
         sprite->actor = NULL;
     }
@@ -1528,9 +1535,9 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
 
     if (sprite->actor != NULL) {
         if (!pokerus) {
-            func_0204c124(sprite->actor, FALSE);
+            ClActor_SetVisible(sprite->actor, FALSE);
         } else {
-            func_0204c124(sprite->actor, TRUE);
+            ClActor_SetVisible(sprite->actor, TRUE);
         }
         return;
     }
@@ -1549,10 +1556,10 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
     }
     setup.flags = 0;
     setup.arcId = getUINarcIdx();
-    setup.paletteFile = func_0202d8b0();
-    setup.charFile = func_0202d8b4();
-    setup.cellFile = func_0202d8b8(2);
-    setup.animFile = func_0202d8bc(2);
+    setup.paletteFile = AppMenuCommon_GetStatusIconPaletteFile();
+    setup.charFile = AppMenuCommon_GetStatusIconCharFile();
+    setup.cellFile = AppMenuCommon_GetStatusIconCellFile(2);
+    setup.animFile = AppMenuCommon_GetStatusIconAnimFile(2);
     setup.paletteStart = 0;
     setup.paletteCount = 1;
     UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);
@@ -1573,9 +1580,9 @@ static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         // The same test of an existing icon as func_ov194_021c4d18's, though it can only be shown here
         if (sprite->actor != NULL) {
             if (!cured) {
-                func_0204c124(sprite->actor, FALSE);
+                ClActor_SetVisible(sprite->actor, FALSE);
             } else {
-                func_0204c124(sprite->actor, TRUE);
+                ClActor_SetVisible(sprite->actor, TRUE);
             }
             return;
         }
@@ -1635,21 +1642,21 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
         }
         if (icon != NULL) {
             if (anim == -1) {
-                func_0204c124(icon, FALSE);
+                ClActor_SetVisible(icon, FALSE);
             } else if (isEgg && i == 6) {
-                func_0204c124(icon, FALSE);
+                ClActor_SetVisible(icon, FALSE);
             } else {
-                func_0204c488(icon, anim);
-                func_0204c124(icon, TRUE);
+                ClActor_SetSequence(icon, anim);
+                ClActor_SetVisible(icon, TRUE);
             }
         } else {
             wk->markIcons.icons[i] = UIObjRes_CreateActor(&wk->markIcons.res, wk->clactUnit, xs[i] * 8, 101,
                                                           anim == -1 ? anims[i * 2] : anim, wk->heapId);
             icon = wk->markIcons.icons[i];
             if (anim == -1) {
-                func_0204c124(icon, FALSE);
+                ClActor_SetVisible(icon, FALSE);
             } else if (isEgg && i == 6) {
-                func_0204c124(icon, FALSE);
+                ClActor_SetVisible(icon, FALSE);
             }
         }
     }
@@ -1661,7 +1668,7 @@ void func_ov194_021c5060(PokemonTradeWork *wk) {
 
     for (i = 0; i < 8; i++) {
         if (marks->icons[i] != NULL) {
-            func_0204c108(marks->icons[i]);
+            ClActor_Delete(marks->icons[i]);
             marks->icons[i] = NULL;
         }
     }
@@ -1679,9 +1686,9 @@ void func_ov194_021c5098(PokemonTradeWork *wk, u32 palette, u32 type) {
 
 void func_ov194_021c50d8(PokemonTradeWork *wk, int side, int index) {
     if (wk->negoIcons[side][index] != NULL) {
-        func_0204c108(wk->negoIcons[side][index]);
+        ClActor_Delete(wk->negoIcons[side][index]);
         wk->negoIcons[side][index] = NULL;
-        func_0204b98c(wk->negoIconChars[side][index]);
+        ClActSys_FreeChars(wk->negoIconChars[side][index]);
     }
 }
 
@@ -1690,10 +1697,19 @@ void func_ov194_021c510c(PokemonTradeWork *wk, int side, BOOL visible) {
 
     for (i = 0; i < 3; i++) {
         if (wk->negoIcons[side][i] != NULL) {
-            func_0204c124(wk->negoIcons[side][i], visible);
+            ClActor_SetVisible(wk->negoIcons[side][i], visible);
         }
     }
 }
+
+// Where the icons of the Pokémon of a negotiation go, for each side: in the row on the main screen, and on the sub
+// screen's panels
+static const u32 sNegoIconPosMain[6][2] = {
+    { 32, 96 }, { 64, 96 }, { 96, 96 }, { 168, 96 }, { 200, 96 }, { 232, 96 },
+};
+static const u32 sNegoIconPosSub[6][2] = {
+    { 24, 46 }, { 24, 94 }, { 24, 142 }, { 152, 46 }, { 152, 94 }, { 152, 142 },
+};
 
 // Sets up the icon of a Pokémon offered in a negotiation, in the row of the main screen or on the sub screen's panel
 void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pkm, BOOL onMain, BOOL visible) {
@@ -1715,13 +1731,14 @@ void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pk
     setup.sequence = 1;
     setup.priority = 16;
     setup.bgPriority = 1;
-    wk->negoIconChars[side][index] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(boxPkm), FALSE, vramType, wk->heapId);
+    wk->negoIconChars[side][index] =
+        ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(boxPkm), FALSE, vramType, wk->heapId);
     wk->negoIcons[side][index] =
-        func_0204c040(wk->clactUnit, wk->negoIconChars[side][index], wk->objRes[TRADE_OBJRES_PLTT_NEGO],
-                      wk->objRes[TRADE_OBJRES_CELL_NEGO], &setup, vramType, wk->heapId);
-    func_0204c378(wk->negoIcons[side][index], PokeIcon_GetPaletteOfPkm(boxPkm), CLACT_VRAM_SUB);
+        ClActor_Create(wk->clactUnit, wk->negoIconChars[side][index], wk->objRes[TRADE_OBJRES_PLTT_NEGO],
+                       wk->objRes[TRADE_OBJRES_CELL_NEGO], &setup, vramType, wk->heapId);
+    ClActor_SetPalette(wk->negoIcons[side][index], PokeIcon_GetPaletteOfPkm(boxPkm), CLACT_VRAM_SUB);
     func_0204c520(wk->negoIcons[side][index], FALSE);
-    func_0204c124(wk->negoIcons[side][index], visible);
+    ClActor_SetVisible(wk->negoIcons[side][index], visible);
     GFL_ArcToolFree(arc);
 }
 
@@ -1738,7 +1755,7 @@ void func_ov194_021c5244(PokemonTradeWork *wk, int side, int index) {
                 if (i == side && j == index) {
                     pos.y -= 4;
                 }
-                func_0204c140(wk->negoIcons[i][j], &pos, CLACT_VRAM_SUB);
+                ClActor_SetSurfacePos(wk->negoIcons[i][j], &pos, CLACT_VRAM_SUB);
             }
         }
     }
@@ -1763,9 +1780,9 @@ void func_ov194_021c52e0(PokemonTradeWork *wk, int column, int row, int x, int y
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
-    wk->actors[9] = func_0204c040(wk->clactUnit, wk->iconChars[column][row], wk->objRes[TRADE_OBJRES_PLTT_ICON],
-                                  wk->objRes[TRADE_OBJRES_CELL_ICON], &setup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c378(wk->actors[9], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
+    wk->actors[9] = ClActor_Create(wk->clactUnit, wk->iconChars[column][row], wk->objRes[TRADE_OBJRES_PLTT_ICON],
+                                   wk->objRes[TRADE_OBJRES_CELL_ICON], &setup, CLACT_VRAM_SUB, wk->heapId);
+    ClActor_SetPalette(wk->actors[9], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
 }
 
 // Lets the carried icon go: it flies on in the direction the stylus moved it and curves off to the upper left
@@ -1774,7 +1791,7 @@ void func_ov194_021c5348(PokemonTradeWork *wk) {
     VecFx32 points[4];
     fx32 x, y, dx, dy, length;
 
-    func_0204c178(wk->actors[9], &pos, CLACT_VRAM_SUB);
+    ClActor_GetSurfacePos(wk->actors[9], &pos, CLACT_VRAM_SUB);
     dx = (pos.x - wk->heldPrevPos.x) * FX32_ONE;
     dy = (pos.y - wk->heldPrevPos.y) * FX32_ONE;
     points[0].x = pos.x * FX32_ONE;
@@ -1805,7 +1822,7 @@ BOOL func_ov194_021c5460(PokemonTradeWork *wk) {
         if (wk->curveTimer == 0) {
             return TRUE;
         }
-        func_0204c178(wk->actors[9], &pos, CLACT_VRAM_SUB);
+        ClActor_GetSurfacePos(wk->actors[9], &pos, CLACT_VRAM_SUB);
         if (pos.y < 0) {
             wk->curveTimer = 1;
         }
@@ -1815,7 +1832,7 @@ BOOL func_ov194_021c5460(PokemonTradeWork *wk) {
             func_ov194_021c60a0(&wk->curve);
             pos.x = wk->curve.pos.x / FX32_ONE;
             pos.y = wk->curve.pos.y / FX32_ONE;
-            func_0204c140(wk->actors[9], &pos, CLACT_VRAM_SUB);
+            ClActor_SetSurfacePos(wk->actors[9], &pos, CLACT_VRAM_SUB);
         }
     }
     return FALSE;
@@ -1823,7 +1840,7 @@ BOOL func_ov194_021c5460(PokemonTradeWork *wk) {
 
 void func_ov194_021c54ec(PokemonTradeWork *wk) {
     if (wk->actors[9] != NULL) {
-        func_0204c108(wk->actors[9]);
+        ClActor_Delete(wk->actors[9]);
         wk->actors[9] = NULL;
     }
 }
@@ -1844,27 +1861,27 @@ void func_ov194_021c551c(PokemonTradeWork *wk, int index) {
         setup.priority = 50;
         setup.bgPriority = 1;
         wk->stampButtons[index] =
-            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                          wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+            ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                           wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     }
     func_0204c520(wk->stampButtons[index], TRUE);
-    func_0204c124(wk->stampButtons[index], TRUE);
+    ClActor_SetVisible(wk->stampButtons[index], TRUE);
 }
 
 void func_ov194_021c5594(PokemonTradeWork *wk, int index, BOOL visible) {
-    func_0204c124(wk->stampButtons[index], visible);
+    ClActor_SetVisible(wk->stampButtons[index], visible);
 }
 
 void func_ov194_021c55ac(PokemonTradeWork *wk, int index) {
     if (wk->stampButtons[index] != NULL) {
-        func_0204c108(wk->stampButtons[index]);
+        ClActor_Delete(wk->stampButtons[index]);
         wk->stampButtons[index] = NULL;
     }
 }
 
 // Plays the animation of a stamp's button being pressed
 void func_ov194_021c55c8(PokemonTradeWork *wk, u32 index) {
-    func_0204c488(wk->stampButtons[index], index + 15);
+    ClActor_SetSequence(wk->stampButtons[index], index + 15);
 }
 
 // Shows a stamp in a side's balloon
@@ -1878,33 +1895,33 @@ void func_ov194_021c55e4(PokemonTradeWork *wk, u32 index, int side) {
     setup.bgPriority = 0;
     if (wk->stamps[side * 2] == NULL) {
         wk->stamps[side * 2] =
-            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_MAIN], wk->objRes[TRADE_OBJRES_PLTT_MAIN],
-                          wk->objRes[TRADE_OBJRES_CELL_MAIN], &setup, CLACT_VRAM_MAIN, wk->heapId);
+            ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_MAIN], wk->objRes[TRADE_OBJRES_PLTT_MAIN],
+                           wk->objRes[TRADE_OBJRES_CELL_MAIN], &setup, CLACT_VRAM_MAIN, wk->heapId);
         func_0204c520(wk->stamps[side * 2], TRUE);
-        func_0204c124(wk->stamps[side * 2], TRUE);
+        ClActor_SetVisible(wk->stamps[side * 2], TRUE);
     } else {
-        func_0204c124(wk->stamps[side * 2], TRUE);
+        ClActor_SetVisible(wk->stamps[side * 2], TRUE);
     }
     if (wk->stamps[side * 2 + 1] == NULL) {
         setup.priority = 0;
         setup.sequence = index;
         wk->stamps[side * 2 + 1] =
-            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_MAIN], wk->objRes[TRADE_OBJRES_PLTT_MAIN],
-                          wk->objRes[TRADE_OBJRES_CELL_MAIN], &setup, CLACT_VRAM_MAIN, wk->heapId);
+            ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_MAIN], wk->objRes[TRADE_OBJRES_PLTT_MAIN],
+                           wk->objRes[TRADE_OBJRES_CELL_MAIN], &setup, CLACT_VRAM_MAIN, wk->heapId);
         func_0204c520(wk->stamps[side * 2 + 1], TRUE);
-        func_0204c124(wk->stamps[side * 2 + 1], TRUE);
+        ClActor_SetVisible(wk->stamps[side * 2 + 1], TRUE);
     } else {
-        func_0204c488(wk->stamps[side * 2 + 1], index);
+        ClActor_SetSequence(wk->stamps[side * 2 + 1], index);
     }
 }
 
 void func_ov194_021c56b8(PokemonTradeWork *wk, int side) {
     if (wk->stamps[side * 2 + 1] != NULL) {
-        func_0204c108(wk->stamps[side * 2 + 1]);
+        ClActor_Delete(wk->stamps[side * 2 + 1]);
         wk->stamps[side * 2 + 1] = NULL;
     }
     if (wk->stamps[side * 2] != NULL) {
-        func_0204c108(wk->stamps[side * 2]);
+        ClActor_Delete(wk->stamps[side * 2]);
         wk->stamps[side * 2] = NULL;
     }
 }
@@ -1918,7 +1935,7 @@ void func_ov194_021c56f8(PokemonTradeWork *wk, int cursor) {
 
     if (cursor == -1) {
         if (wk->negoCursor != NULL) {
-            func_0204c124(wk->negoCursor, FALSE);
+            ClActor_SetVisible(wk->negoCursor, FALSE);
         }
         return;
     }
@@ -1929,52 +1946,55 @@ void func_ov194_021c56f8(PokemonTradeWork *wk, int cursor) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->negoCursor =
-            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                          wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+            ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                           wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     }
     func_0204c520(wk->negoCursor, TRUE);
-    func_0204c124(wk->negoCursor, TRUE);
-    func_0204c140(wk->negoCursor, &positions[cursor], CLACT_VRAM_SUB);
+    ClActor_SetVisible(wk->negoCursor, TRUE);
+    ClActor_SetSurfacePos(wk->negoCursor, &positions[cursor], CLACT_VRAM_SUB);
 }
 
 void func_ov194_021c57a8(PokemonTradeWork *wk) {
     if (wk->negoCursor != NULL) {
-        func_0204c108(wk->negoCursor);
+        ClActor_Delete(wk->negoCursor);
         wk->negoCursor = NULL;
     }
 }
 
 // Slides the panels of a negotiation in, each side from its edge, 4 pixels a frame; TRUE when they are in
 BOOL func_ov194_021c57c4(PokemonTradeWork *wk) {
+    // The 4 of the file's .rodata, though its reads fold. Whose it is is a guess: as the 4 of func_ov194_021c5244's
+    // icon raise it gives the same layout, but this is the 4 the file uses most
+    static const int speed = 4;
     ClActorPos pos, leftPos, rightPos;
     int i;
 
     if (wk->panelSlide < 128) {
-        wk->panelSlide += 4;
+        wk->panelSlide += speed;
     } else {
         return TRUE;
     }
     for (i = 0; i < 8; i++) {
-        func_0204c178(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
+        ClActor_GetSurfacePos(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
         if (i / 4) {
-            pos.x += 4;
+            pos.x += speed;
         } else {
-            pos.x -= 4;
+            pos.x -= speed;
         }
-        func_0204c140(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
     }
     for (i = 0; i < 3; i++) {
         if (wk->negoIcons[0][i] != NULL) {
-            func_0204c178(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
-            leftPos.x -= 4;
-            func_0204c140(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
+            ClActor_GetSurfacePos(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
+            leftPos.x -= speed;
+            ClActor_SetSurfacePos(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
         }
     }
     for (i = 0; i < 3; i++) {
         if (wk->negoIcons[1][i] != NULL) {
-            func_0204c178(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
-            rightPos.x += 4;
-            func_0204c140(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
+            ClActor_GetSurfacePos(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
+            rightPos.x += speed;
+            ClActor_SetSurfacePos(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
         }
     }
     GFL_BGSysMoveBG(5, BG_MOVE_SET_X, -wk->panelSlide);
@@ -1988,28 +2008,28 @@ static void func_ov194_021c58b4(PokemonTradeWork *wk) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        func_0204c178(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
+        ClActor_GetSurfacePos(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
         if (i / 4) {
             pos.x -= 128;
-            func_0204c468(wk->negoPanels[i], 3);
+            ClActor_SetBgPriority(wk->negoPanels[i], 3);
         } else {
             pos.x += 128;
         }
-        func_0204c140(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(wk->negoPanels[i], &pos, CLACT_VRAM_SUB);
     }
     for (i = 0; i < 3; i++) {
         if (wk->negoIcons[0][i] != NULL) {
-            func_0204c178(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
+            ClActor_GetSurfacePos(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
             leftPos.x += 128;
-            func_0204c140(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
+            ClActor_SetSurfacePos(wk->negoIcons[0][i], &leftPos, CLACT_VRAM_SUB);
         }
     }
     for (i = 0; i < 3; i++) {
         if (wk->negoIcons[1][i] != NULL) {
-            func_0204c178(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
+            ClActor_GetSurfacePos(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
             rightPos.x -= 128;
-            func_0204c140(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
-            func_0204c468(wk->negoIcons[1][i], 3);
+            ClActor_SetSurfacePos(wk->negoIcons[1][i], &rightPos, CLACT_VRAM_SUB);
+            ClActor_SetBgPriority(wk->negoIcons[1][i], 3);
         }
     }
     GFL_BGSysSetBGPriority(4, 2);
@@ -2021,7 +2041,7 @@ void func_ov194_021c5994(PokemonTradeWork *wk) {
     ArcTool *arc;
 
     wk->cursorImage = LoadCursorImageEndOfHeap(6, 15, 0, wk->heapId);
-    arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     wk->bg5Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 13, 5, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 7, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 7, 5, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
@@ -2061,14 +2081,14 @@ void func_ov194_021c5abc(PokemonTradeWork *wk) {
         { 96, 32 }, { 104, 64 }, { 104, 112 }, { 104, 160 }, { 224, 32 }, { 232, 64 }, { 232, 112 }, { 232, 160 },
     };
     ClActorSetup setup;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     int i;
 
-    wk->negoPanelPltt = func_0204bbb8(arc, 0, CLACT_VRAM_SUB, 0x1c0, 0, 1, wk->heapId);
-    wk->negoPanelCells = func_0204bde0(arc, 2, 1, wk->heapId);
+    wk->negoPanelPltt = ClActSys_LoadPlttRange(arc, 0, CLACT_VRAM_SUB, 0x1c0, 0, 1, wk->heapId);
+    wk->negoPanelCells = ClActSys_LoadCellAnims(arc, 2, 1, wk->heapId);
     for (i = 0; i < 8; i++) {
         wk->negoBitmaps[i] = GFL_BitmapCreate(16, 6, 32, wk->heapId);
-        wk->negoPanelChars[i] = func_0204b81c(arc, 3, FALSE, CLACT_VRAM_SUB, wk->heapId);
+        wk->negoPanelChars[i] = ClActSys_LoadChars(arc, 3, FALSE, CLACT_VRAM_SUB, wk->heapId);
     }
     for (i = 0; i < 8; i++) {
         setup.x = positions[i].x;
@@ -2076,9 +2096,9 @@ void func_ov194_021c5abc(PokemonTradeWork *wk) {
         setup.sequence = 0;
         setup.priority = 0;
         setup.bgPriority = 1;
-        wk->negoPanels[i] = func_0204c040(wk->clactUnit, wk->negoPanelChars[i], wk->negoPanelPltt, wk->negoPanelCells,
-                                          &setup, CLACT_VRAM_SUB, wk->heapId);
-        func_0204c124(wk->negoPanels[i], TRUE);
+        wk->negoPanels[i] = ClActor_Create(wk->clactUnit, wk->negoPanelChars[i], wk->negoPanelPltt, wk->negoPanelCells,
+                                           &setup, CLACT_VRAM_SUB, wk->heapId);
+        ClActor_SetVisible(wk->negoPanels[i], TRUE);
     }
     GFL_ArcToolFree(arc);
 }
@@ -2088,28 +2108,28 @@ void func_ov194_021c5bf0(PokemonTradeWork *wk) {
 
     for (i = 0; i < 8; i++) {
         if (wk->negoPanels[i] != NULL) {
-            func_0204c108(wk->negoPanels[i]);
+            ClActor_Delete(wk->negoPanels[i]);
             wk->negoPanels[i] = NULL;
             GFL_BitmapFree(wk->negoBitmaps[i]);
             wk->negoBitmaps[i] = NULL;
-            func_0204b98c(wk->negoPanelChars[i]);
+            ClActSys_FreeChars(wk->negoPanelChars[i]);
             wk->negoPanelChars[i] = 0;
         }
     }
     if (wk->negoPanelPltt != 0) {
-        func_0204bcd0(wk->negoPanelPltt);
+        ClActSys_FreePltt(wk->negoPanelPltt);
         wk->negoPanelPltt = 0;
     }
 #ifdef BUGFIX
     if (wk->negoPanelCells != 0) {
-        func_0204be64(wk->negoPanelCells);
+        ClActSys_FreeCellAnims(wk->negoPanelCells);
         wk->negoPanelCells = 0;
     }
 #else
     // BUG: This tests the palette again, freed just above, so the cells are never freed, and it would free a panel's
     // characters
     if (wk->negoPanelPltt != 0) {
-        func_0204be64(wk->negoPanelChars[2]);
+        ClActSys_FreeCellAnims(wk->negoPanelChars[2]);
         wk->negoPanelPltt = 0;
     }
 #endif
@@ -2122,7 +2142,7 @@ void func_ov194_021c5c80(PokemonTradeWork *wk) {
     int i, j;
 
     for (i = 0; i < 8; i++) {
-        u32 dest = func_0204bb80(wk->negoPanelChars[i], TRUE);
+        u32 dest = ClActSys_GetCharVramAddr(wk->negoPanelChars[i], TRUE);
         u8 *pixels = GFL_BitmapGetPixelData(wk->negoBitmaps[i]);
 
         DC_FlushRange(pixels, GFL_BitmapCalcPixelDataSize(wk->negoBitmaps[i]));
@@ -2135,7 +2155,7 @@ void func_ov194_021c5c80(PokemonTradeWork *wk) {
 
 // Shows the background of a side's panel on the sub screen
 void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     NNSG2dScreenData *screen;
     void *file;
     u16 *cells;
@@ -2181,20 +2201,20 @@ void func_ov194_021c5dd8(PokemonTradeWork *wk, u8 x, u8 y) {
     setup.priority = 0;
     setup.bgPriority = 0;
     func_ov194_021c5e5c(wk);
-    wk->boxCursor = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
-                                  wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c124(wk->boxCursor, TRUE);
+    wk->boxCursor = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
+                                   wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
+    ClActor_SetVisible(wk->boxCursor, TRUE);
     func_0204c520(wk->boxCursor, TRUE);
     wk->boxCursorDone = FALSE;
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov194_021c5dcc;
-    func_0204c5b0(wk->boxCursor, &callback);
+    ClActor_SetAnimCallback(wk->boxCursor, &callback);
 }
 
 void func_ov194_021c5e5c(PokemonTradeWork *wk) {
     if (wk->boxCursor != NULL) {
-        func_0204c108(wk->boxCursor);
+        ClActor_Delete(wk->boxCursor);
         wk->boxCursor = NULL;
         wk->boxCursorDone = FALSE;
     }

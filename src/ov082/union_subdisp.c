@@ -27,7 +27,7 @@
 #include "system/gf_font.h"
 #include "system/pms_draw.h"
 #include "system/printsys.h"
-#include "text/system/0400.h"
+#include "text/system/union_subdisp.h"
 
 // The Union Room's touch screen, named after the ROM's "union_subdisp.c". Five icons at the bottom pick what the
 // player wants to do, and the three lines above show the Union Room's chat of what the players around say, newest
@@ -155,7 +155,7 @@ static inline void UnionSubdisp_ShowSelected(const UnionSubdisp *work) {
     }
     for (i = 0; i < ICON_COUNT ? TRUE : FALSE; i++) {
         if (sIconStates[i] == work->selected) {
-            func_0204c378(work->actors[i], 1, 1);
+            ClActor_SetPalette(work->actors[i], 1, 1);
             return;
         }
     }
@@ -180,12 +180,12 @@ UnionSubdisp *UnionSubdisp_Create(GameSystem *gsys) {
     PMSDraw_SetBackColor(work->pmsDraw, 0);
     sys = GameCommSys_GetWork(comm);
     if (sys != NULL) {
-        work->selected = func_ov028_021710c8(sys);
+        work->selected = UnionMain_GetSituUnk02(sys);
         UnionSubdisp_DrawAllLines(work, &sys->visitorList);
         UnionSubdisp_ShowSelected(work);
     }
-    func_02042ba8(FALSE, HEAPID_FIELDMAP);
-    func_0203e84c();
+    GFL_NetSetIconScreen(FALSE, HEAPID_FIELDMAP);
+    WmIcon_Show();
     G2S_SetWndOBJInsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3 |
                                  GX_WND_PLANEMASK_OBJ,
                              FALSE);
@@ -211,7 +211,7 @@ void UnionSubdisp_Free(UnionSubdisp *work) {
     UnionSubdisp_FreeUnit(work);
     GFL_HeapFree(work);
     G2S_BlendNone();
-    func_0203e860();
+    WmIcon_Hide();
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
 }
 
@@ -219,7 +219,7 @@ void UnionSubdisp_Free(UnionSubdisp *work) {
 // a BOOL the compiler folds it into the caller's test, and the original keeps it as a value
 static inline u32 UnionSubdisp_FlushPrint(PrintWindow *print, PrintQueue *queue) {
     if (print->flushPending != 0) {
-        if (func_02021c1c(queue, BmpWin_GetBitmap(print->window)) == 0) {
+        if (PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(print->window)) == 0) {
             BmpWin_FlushChar(print->window);
             print->flushPending = 0;
         }
@@ -234,13 +234,13 @@ void UnionSubdisp_Update(UnionSubdisp *work, BOOL active) {
     int i;
 
     GameCommSys_GetWork(GSYS_GetGameCommSystem(work->gsys));
-    func_0203e84c();
+    WmIcon_Show();
     if (active == TRUE) {
         G2S_BlendNone();
     } else {
         G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x3f, -8);
     }
-    func_02021a3c(work->queue);
+    PrintQueue_Main(work->queue);
     PMSDraw_Main(work->pmsDraw);
     for (i = 0; i < LINE_COUNT; i++) {
         if (work->content[i] == CONTENT_MESSAGE) {
@@ -257,12 +257,12 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
         UnionSelf *self = &sys->situ;
 
         if (self->changed == 1) {
-            func_ov036_021b445c(sys, NULL, self->look, self->state);
+            UnionChat_AppendLine(sys, NULL, self->look, self->state);
             self->changed = 0;
         }
         UnionSubdisp_UpdateChat(work, &sys->visitorList);
         if (sys->visitorList.count >= 3) {
-            func_0204c124(work->actors[ACTOR_KNOB], TRUE);
+            ClActor_SetVisible(work->actors[ACTOR_KNOB], TRUE);
         }
     }
     if (active == 1) {
@@ -300,23 +300,23 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
         UnionSubdisp_UpdateFlash(work, &sys->visitorList);
     }
     if (GameCommSys_BootCheck(comm) == 3 && sys != NULL) {
-        func_ov028_021710bc(sys, work->selected);
+        UnionMain_SetSituUnk02(sys, work->selected);
     }
 }
 
 static void UnionSubdisp_InitUnit(UnionSubdisp *work) {
-    work->unit = func_0204bf1c(12, 5, HEAPID_FIELDMAP);
-    work->queue = func_02021998(HEAPID_FIELDMAP);
+    work->unit = ClActUnit_Create(12, 5, HEAPID_FIELDMAP);
+    work->queue = PrintQueue_CreateDefault(HEAPID_FIELDMAP);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_FIELDMAP);
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0400, HEAPID_FIELDMAP);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_UNION_SUBDISP, HEAPID_FIELDMAP);
 }
 
 static void UnionSubdisp_FreeUnit(UnionSubdisp *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_FontFree(work->font);
-    func_02021c44(work->queue);
-    func_02021a18(work->queue);
-    func_0204bf98(work->unit);
+    PrintQueue_Clear(work->queue);
+    PrintQueue_Free(work->queue);
+    ClActUnit_Delete(work->unit);
 }
 
 static void UnionSubdisp_InitBG(UnionSubdisp *work, ArcTool *arc) {
@@ -399,15 +399,15 @@ static void UnionSubdisp_FreeWindows(UnionSubdisp *work) {
 }
 
 static void UnionSubdisp_InitIconResources(UnionSubdisp *work, ArcTool *arc) {
-    work->iconPalette = func_0204bbb8(arc, 0x13, 1, 0, 0, 3, HEAPID_FIELDMAP);
-    work->iconChars = func_0204b81c(arc, 0xe, FALSE, TRUE, HEAPID_FIELDMAP);
-    work->iconCellAnims = func_0204bde0(arc, 0xc, 0xd, HEAPID_FIELDMAP);
+    work->iconPalette = ClActSys_LoadPlttRange(arc, 0x13, 1, 0, 0, 3, HEAPID_FIELDMAP);
+    work->iconChars = ClActSys_LoadChars(arc, 0xe, FALSE, TRUE, HEAPID_FIELDMAP);
+    work->iconCellAnims = ClActSys_LoadCellAnims(arc, 0xc, 0xd, HEAPID_FIELDMAP);
 }
 
 static void UnionSubdisp_FreeIconResources(UnionSubdisp *work) {
-    func_0204bcd0(work->iconPalette);
-    func_0204b98c(work->iconChars);
-    func_0204be64(work->iconCellAnims);
+    ClActSys_FreePltt(work->iconPalette);
+    ClActSys_FreeChars(work->iconChars);
+    ClActSys_FreeCellAnims(work->iconCellAnims);
 }
 
 static void UnionSubdisp_InitIcons(UnionSubdisp *work, ArcTool *arc) {
@@ -417,22 +417,22 @@ static void UnionSubdisp_InitIcons(UnionSubdisp *work, ArcTool *arc) {
     for (i = 0; i <= ICON_COUNT - 1; i++) {
         setup.x = 0x30 * i + 0x20;
         setup.sequence = i;
-        work->actors[i] = func_0204c040(work->unit, work->iconChars, work->iconPalette, work->iconCellAnims, &setup, 1,
-                                        HEAPID_FIELDMAP);
+        work->actors[i] = ClActor_Create(work->unit, work->iconChars, work->iconPalette, work->iconCellAnims, &setup, 1,
+                                         HEAPID_FIELDMAP);
     }
     setup.sequence = 5;
     setup.x = KNOB_X;
     setup.y = TRACK_BOTTOM;
     work->actors[ACTOR_KNOB] =
-        func_0204c040(work->unit, work->iconChars, work->iconPalette, work->iconCellAnims, &setup, 1, HEAPID_FIELDMAP);
-    func_0204c124(work->actors[ACTOR_KNOB], FALSE);
+        ClActor_Create(work->unit, work->iconChars, work->iconPalette, work->iconCellAnims, &setup, 1, HEAPID_FIELDMAP);
+    ClActor_SetVisible(work->actors[ACTOR_KNOB], FALSE);
 }
 
 static void UnionSubdisp_FreeIcons(UnionSubdisp *work) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(work->actors[i]);
+        ClActor_Delete(work->actors[i]);
     }
 }
 
@@ -442,7 +442,7 @@ static BOOL UnionSubdisp_UpdateIcons(UnionSubdisp *work, UnionSystem *sys) {
     u32 y;
     int i;
 
-    if (!func_0203dac8(&x, &y)) {
+    if (!GFL_HIDGetTouchPressedPoint(&x, &y)) {
         return FALSE;
     }
     for (i = 0; i <= ICON_COUNT - 1; i++) {
@@ -452,7 +452,7 @@ static BOOL UnionSubdisp_UpdateIcons(UnionSubdisp *work, UnionSystem *sys) {
         s16 right;
         s16 left;
 
-        func_0204c178(work->actors[i], &pos, 1);
+        ClActor_GetSurfacePos(work->actors[i], &pos, 1);
         top = pos.y - 10;
         bottom = pos.y + 10;
         right = pos.x + 10;
@@ -481,9 +481,9 @@ static void UnionSubdisp_SelectIcon(UnionSubdisp *work, u32 icon) {
     }
     for (i = 0; i <= ICON_COUNT - 1 ? TRUE : FALSE; i++) {
         if (i == icon && work->selected != 0) {
-            func_0204c378(work->actors[i], 1, 1);
+            ClActor_SetPalette(work->actors[i], 1, 1);
         } else {
-            func_0204c378(work->actors[i], 0, 1);
+            ClActor_SetPalette(work->actors[i], 0, 1);
         }
     }
 }
@@ -510,7 +510,7 @@ static void UnionSubdisp_UpdateChat(UnionSubdisp *work, UnionVisitorList *list) 
 
         for (index = list->drawnEnd; index <= list->viewEnd; index++) {
             if (index > -1) {
-                UnionVisitor *chat = func_ov036_021b4620(list, index);
+                UnionVisitor *chat = UnionChat_GetLine(list, index);
 
                 GFL_ASSERT(chat != NULL);
                 UnionSubdisp_DrawLine(work, chat, index);
@@ -567,19 +567,19 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
 
             switch (chat->kind) {
             case UNION_CHAT_KIND_ENTERED:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_IveEnteredUnionRoom);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_IveEnteredUnionRoom);
                 break;
             case UNION_CHAT_KIND_BATTLE:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchBattleIconIf);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchBattleIconIf);
                 break;
             case UNION_CHAT_KIND_TRADE:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchTradeIconIf);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchTradeIconIf);
                 break;
             case UNION_CHAT_KIND_DRAW:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchDrawIconIf);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchDrawIconIf);
                 break;
             case UNION_CHAT_KIND_SPIN_TRADE:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchSpinTradeIcon);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchSpinTradeIcon);
                 break;
             default:
                 return;
@@ -595,16 +595,16 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
     }
     name = GFL_StrBufCreate(8, HEAPID_FIELDMAP);
     GFL_StrBufLoadString(name, chat->name);
-    func_02021c7c(work->queue, BmpWin_GetBitmap(*window), 0, 0, name, work->font, PRINT_COLOR_LINE);
+    PrintQueue_PrintColor(work->queue, BmpWin_GetBitmap(*window), 0, 0, name, work->font, PRINT_COLOR_LINE);
     GFL_StrBufFree(name);
     if (chat->subKind != 0) {
-        u32 message = Bank0400_Text_Friend;
+        u32 message = UnionSubdisp_Text_Friend;
 
         if (chat->subKind != 1) {
-            message = Bank0400_Text_Player;
+            message = UnionSubdisp_Text_Player;
         }
         strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, message);
-        func_02021c7c(work->queue, BmpWin_GetBitmap(*window), 0x74, 0, strbuf, work->font, PRINT_COLOR_LINE);
+        PrintQueue_PrintColor(work->queue, BmpWin_GetBitmap(*window), 0x74, 0, strbuf, work->font, PRINT_COLOR_LINE);
         GFL_StrBufFree(strbuf);
     }
 }
@@ -622,7 +622,7 @@ static void UnionSubdisp_DrawAllLines(UnionSubdisp *work, UnionVisitorList *list
     }
     write_pos = list->viewEnd - oldest - 1;
     for (view_no = list->viewEnd; view_no > oldest; view_no--) {
-        chat = func_ov036_021b4620(list, view_no);
+        chat = UnionChat_GetLine(list, view_no);
         GFL_ASSERT(chat != NULL);
         GFL_ASSERT(write_pos > -1);
         UnionSubdisp_DrawLine(work, chat, write_pos);
@@ -648,7 +648,7 @@ static void UnionSubdisp_MoveLine(UnionSubdisp *work, u8 from, u8 to, UnionVisit
         BmpWin_FlushChar(work->windows[to]);
         return;
     }
-    UnionSubdisp_DrawLine(work, func_ov036_021b4620(list, index - 2 + from), to);
+    UnionSubdisp_DrawLine(work, UnionChat_GetLine(list, index - 2 + from), to);
 }
 
 // Scrolls the lines by delta lines, drawing the ones that come in
@@ -666,7 +666,7 @@ static void UnionSubdisp_ScrollLines(UnionSubdisp *work, UnionVisitorList *list,
             write_pos++;
         }
         for (write_pos = LINE_COUNT - offset; write_pos < LINE_COUNT; write_pos++) {
-            chat = func_ov036_021b4620(list, list->viewEnd - 2 + write_pos);
+            chat = UnionChat_GetLine(list, list->viewEnd - 2 + write_pos);
             GFL_ASSERT(chat != NULL);
             UnionSubdisp_DrawLine(work, chat, write_pos);
         }
@@ -677,7 +677,7 @@ static void UnionSubdisp_ScrollLines(UnionSubdisp *work, UnionVisitorList *list,
             write_pos--;
         }
         for (write_pos = -1 - offset; write_pos > -1; write_pos--) {
-            chat = func_ov036_021b4620(list, list->viewEnd - 2 + write_pos);
+            chat = UnionChat_GetLine(list, list->viewEnd - 2 + write_pos);
             GFL_ASSERT_MSG(chat != NULL, "view_no=%d, write_pos=%d, offset=%d\n", list->viewEnd, write_pos, offset);
             UnionSubdisp_DrawLine(work, chat, write_pos);
         }
@@ -691,12 +691,12 @@ static BOOL UnionSubdisp_UpdateKnobTouch(UnionSubdisp *work) {
     u32 y;
     BOOL held = TRUE;
 
-    if (!func_0203da84(&x, &y)) {
+    if (!GFL_HIDGetTouchHeldPoint(&x, &y)) {
         return FALSE;
     }
-    func_0204c178(work->actors[ACTOR_KNOB], &pos, 1);
+    ClActor_GetSurfacePos(work->actors[ACTOR_KNOB], &pos, 1);
     if (work->holdingKnob == 0) {
-        if (!func_0203da48()) {
+        if (!GFL_HIDIsTouchPressed()) {
             return FALSE;
         }
         if (pos.x - 11 <= x && pos.x + 11 >= x && pos.y - 11 <= y && pos.y + 11 >= y) {
@@ -709,7 +709,7 @@ static BOOL UnionSubdisp_UpdateKnobTouch(UnionSubdisp *work) {
             y = TRACK_BOTTOM;
         }
         pos.y = y;
-        func_0204c140(work->actors[ACTOR_KNOB], &pos, 1);
+        ClActor_SetSurfacePos(work->actors[ACTOR_KNOB], &pos, 1);
         return TRUE;
     }
     return FALSE;
@@ -732,7 +732,7 @@ static void UnionSubdisp_DragKnob(UnionSubdisp *work, UnionVisitorList *list) {
     int i;
     int line;
 
-    func_0204c178(work->actors[ACTOR_KNOB], &pos, 1);
+    ClActor_GetSurfacePos(work->actors[ACTOR_KNOB], &pos, 1);
     offset = (pos.y - TRACK_TOP) << 8;
     range = UnionSubdisp_GetScrollRange(list);
     step = UnionSubdisp_GetScrollStep(list, range);
@@ -771,7 +771,7 @@ static void UnionSubdisp_PlaceKnob(UnionSubdisp *work, UnionVisitorList *list) {
     }
     pos.y = TRACK_BOTTOM - (((list->count - list->viewEnd) * step) >> 8);
     pos.x = KNOB_X;
-    func_0204c140(work->actors[ACTOR_KNOB], &pos, 1);
+    ClActor_SetSurfacePos(work->actors[ACTOR_KNOB], &pos, 1);
 }
 
 // How many lines the knob moves over
@@ -798,13 +798,13 @@ static BOOL UnionSubdisp_UpdateTrackTouch(UnionSubdisp *work) {
     u32 x;
     u32 y;
 
-    if (!func_0203dac8(&x, &y)) {
+    if (!GFL_HIDGetTouchPressedPoint(&x, &y)) {
         return FALSE;
     }
     if (x >= TRACK_LEFT && x <= 0xff && y >= TRACK_TOP && y <= TRACK_BOTTOM) {
         pos.x = KNOB_X;
         pos.y = y;
-        func_0204c140(work->actors[ACTOR_KNOB], &pos, 1);
+        ClActor_SetSurfacePos(work->actors[ACTOR_KNOB], &pos, 1);
         return TRUE;
     }
     return FALSE;
@@ -818,7 +818,7 @@ static BOOL UnionSubdisp_UpdateLineTouch(UnionSystem *sys, UnionSubdisp *work, U
     int index;
     UnionVisitor *visitor;
 
-    if (!func_0203dac8(&x, &y)) {
+    if (!GFL_HIDGetTouchPressedPoint(&x, &y)) {
         return FALSE;
     }
     if (x <= 0xe8) {
@@ -837,7 +837,7 @@ static BOOL UnionSubdisp_UpdateLineTouch(UnionSystem *sys, UnionSubdisp *work, U
             index = list->viewEnd - 2 + line;
         }
         UnionSubdisp_StartFlash(work, list, index);
-        visitor = func_ov036_021b4620(list, index);
+        visitor = UnionChat_GetLine(list, index);
         if (visitor != NULL) {
             MI_CpuCopy8(visitor->mac, sys->situ.mac78, 6);
         }

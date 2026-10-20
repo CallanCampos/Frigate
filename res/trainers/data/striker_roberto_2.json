@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Roberto",
+    "class": "TRAINER_CLASS_STRIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_CARBOS",
+    "party": [
+        {
+            "species": "SPECIES_TAILLOW",
+            "form": 0,
+            "level": 62,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "form": 0,
+            "level": 62,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 62,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Let me tell you about the strength\nof the team you create when{be00}\nyou put a strong Pokémon at the core.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "...You taught me!\nYou are great!"
+        },
+        {
+            "type": 15,
+            "text": "I can give a pretty\ngreat lecture, too!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "It looks like a team built around\na strong Pokémon--that is, an ace--{be00}\nhas advantages and disadvantages."
+        }
+    ]
+}

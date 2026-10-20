@@ -112,21 +112,50 @@ def save_names(names: list[tuple[str, int, str]]):
 
 def apply(module: str, addr: int, name: str, pairs) -> list[str]:
     """Renames a symbol in every version. Returns the old names."""
-    old_names = []
-    old = set_name(PRIMARY, module, addr, name)
-    if old is None:
+    def prepare(version, address):
+        path = symbol_files(version).get(module)
+        if path is not None:
+            lines = path.read_text().splitlines()
+            for i, line in enumerate(lines):
+                match = SYMBOL_RE.match(line)
+                if match and int(match.group(4), 16) == address and match.group(2) in ("function", "data", "bss"):
+                    old = match.group(1)
+                    lines[i] = name + line[len(old):]
+                    return old, path, "\n".join(lines) + "\n"
+        return None
+
+    primary = prepare(PRIMARY, addr)
+    if primary is None:
         sys.exit(f"{PRIMARY}: no symbol at {module} {addr:#010x}")
-    old_names.append(old)
+    planned = [primary]
+    mapper = None
     for other in OTHERS:
         other_addr = pairs[other].get((module, addr))
         if other_addr is None:
-            print(f"{other}: {name} has no counterpart, only renamed in {PRIMARY}")
-            continue
-        old = set_name(other, module, other_addr, name)
-        if old is None:
+            # add-data creates labels absent from the version maps. Use the same section/function mapping as
+            # config fixes, but require name evidence: a coincident address can belong to version-only data.
+            from tools.decomp.config_fixes import AddressMapper
+            if mapper is None:
+                mapper = AddressMapper()
+            try:
+                other_addr = mapper.map(module, addr, other)
+            except SystemExit:
+                other_addr = None
+            counterpart = prepare(other, other_addr) if other_addr is not None else None
+            prefix = re.escape(module.rsplit("/", 1)[-1]) + "_" if module.startswith("overlays/") else ""
+            generated = re.compile(rf"^(func|data|bss)_{prefix}{addr:08x}$")
+            if counterpart is None or not (counterpart[0] in (primary[0], name) or generated.fullmatch(counterpart[0])):
+                print(f"{other}: {name} has no counterpart, only renamed in {PRIMARY}")
+                continue
+        else:
+            counterpart = prepare(other, other_addr)
+        if counterpart is None:
             sys.exit(f"{other}: no symbol at {module} {other_addr:#010x}")
-        old_names.append(old)
-    return old_names
+        planned.append(counterpart)
+    # Resolve every counterpart before writing, so a missing explicit pair cannot leave a partial rename.
+    for old, path, text in planned:
+        path.write_text(text)
+    return [old for old, path, text in planned]
 
 
 def is_static(source: Path, name: str) -> bool:

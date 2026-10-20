@@ -17,7 +17,7 @@
 #include "system/bmp_oam.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
-#include "text/system/0008.h"
+#include "text/system/br_res.h"
 
 // The digits' animations: the ten large digits after an empty place, then the same small. The bar follows
 #define SEQ_SMALL 11
@@ -34,7 +34,7 @@ static void BrCodeInDisp_LoadButtonTextPltt(BrCodeInWork *wk);
 static void BrCodeInDisp_AddButtonText(BrCodeInWork *wk, int button, int x, int y, int unused);
 
 // The names of Back and OK
-static const u32 sBrCodeInButtonMessages[BR_CODEIN_BUTTON_COUNT] = { Bank0008_Text_Quit, Bank0008_Text_Ok };
+static const u32 sBrCodeInButtonMessages[BR_CODEIN_BUTTON_COUNT] = { BrRes_Text_Quit, BrRes_Text_Ok };
 
 // Takes the resources of the digits, the cursors and the buttons from the ones the screen loaded
 void BrCodeInDisp_GetResources(BrCodeInWork *wk) {
@@ -62,14 +62,14 @@ void BrCodeInDisp_Free(BrCodeInWork *wk) {
     int i;
 
     for (i = 0; i < wk->codeMax; i++) {
-        func_0204c108(wk->code[i].actor);
+        ClActor_Delete(wk->code[i].actor);
     }
     for (i = 0; i < BR_CODEIN_BAR_COUNT; i++) {
-        func_0204c108(wk->bar[i].actor);
-        func_0204c108(wk->btn[i].actor);
+        ClActor_Delete(wk->bar[i].actor);
+        ClActor_Delete(wk->btn[i].actor);
     }
     for (i = 0; i < BR_CODEIN_CURSOR_COUNT; i++) {
-        func_0204c108(wk->cur[i].actor);
+        ClActor_Delete(wk->cur[i].actor);
     }
     BrCodeInDisp_FreeBmpOam(wk);
 }
@@ -94,18 +94,18 @@ void BrCodeInDisp_AddCodeActors(BrCodeInWork *wk) {
             setup.y = CODE_Y;
             setup.sequence = SEQ_BAR;
             wk->bar[bar].actor =
-                func_0204c040(unit, wk->charRes[BR_CODEIN_RES_CODE], wk->plttRes[BR_CODEIN_RES_CODE],
-                              wk->cellAnimRes[BR_CODEIN_RES_CODE], &setup, CLACT_SURFACE_SUB, wk->heapId);
-            func_0204c318(wk->bar[bar].actor, GX_OAM_MODE_XLU);
+                ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_CODE], wk->plttRes[BR_CODEIN_RES_CODE],
+                               wk->cellAnimRes[BR_CODEIN_RES_CODE], &setup, CLACT_SURFACE_SUB, wk->heapId);
+            ClActor_SetObjMode(wk->bar[bar].actor, GX_OAM_MODE_XLU);
             bar++;
         } else {
             setup.x = CODE_X + i * 8;
             setup.y = CODE_Y;
             setup.sequence = BrCodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size);
             wk->code[digit].actor =
-                func_0204c040(unit, wk->charRes[BR_CODEIN_RES_CODE], wk->plttRes[BR_CODEIN_RES_CODE],
-                              wk->cellAnimRes[BR_CODEIN_RES_CODE], &setup, CLACT_SURFACE_SUB, wk->heapId);
-            func_0204c318(wk->code[digit].actor, GX_OAM_MODE_XLU);
+                ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_CODE], wk->plttRes[BR_CODEIN_RES_CODE],
+                               wk->cellAnimRes[BR_CODEIN_RES_CODE], &setup, CLACT_SURFACE_SUB, wk->heapId);
+            ClActor_SetObjMode(wk->code[digit].actor, GX_OAM_MODE_XLU);
             digit++;
         }
     }
@@ -121,33 +121,33 @@ void BrCodeInDisp_AddCursorActors(BrCodeInWork *wk) {
     setup.priority = 0;
     setup.bgPriority = 0;
     wk->cur[BR_CODEIN_CURSOR_CODE].actor =
-        func_0204c040(unit, wk->charRes[BR_CODEIN_RES_CURSOR], wk->plttRes[BR_CODEIN_RES_CURSOR],
-                      wk->cellAnimRes[BR_CODEIN_RES_CURSOR], &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c318(wk->cur[BR_CODEIN_CURSOR_CODE].actor, GX_OAM_MODE_XLU);
+        ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_CURSOR], wk->plttRes[BR_CODEIN_RES_CURSOR],
+                       wk->cellAnimRes[BR_CODEIN_RES_CURSOR], &setup, CLACT_SURFACE_SUB, wk->heapId);
+    ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_CODE].actor, GX_OAM_MODE_XLU);
     wk->cur[BR_CODEIN_CURSOR_KEY].actor =
-        func_0204c040(unit, wk->charRes[BR_CODEIN_RES_CURSOR], wk->plttRes[BR_CODEIN_RES_CURSOR],
-                      wk->cellAnimRes[BR_CODEIN_RES_CURSOR], &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c318(wk->cur[BR_CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
+        ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_CURSOR], wk->plttRes[BR_CODEIN_RES_CURSOR],
+                       wk->cellAnimRes[BR_CODEIN_RES_CURSOR], &setup, CLACT_SURFACE_SUB, wk->heapId);
+    ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
     wk->cur[BR_CODEIN_CURSOR_PRESS].actor =
-        func_0204c040(unit, wk->charRes[BR_CODEIN_RES_CURSOR], wk->plttRes[BR_CODEIN_RES_CURSOR],
-                      wk->cellAnimRes[BR_CODEIN_RES_CURSOR], &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c318(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
+        ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_CURSOR], wk->plttRes[BR_CODEIN_RES_CURSOR],
+                       wk->cellAnimRes[BR_CODEIN_RES_CURSOR], &setup, CLACT_SURFACE_SUB, wk->heapId);
+    ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
     BrCodeInDisp_SetCodeCursor(wk, 0);
-    func_0204c488(wk->cur[BR_CODEIN_CURSOR_CODE].actor, 0);
+    ClActor_SetSequence(wk->cur[BR_CODEIN_CURSOR_CODE].actor, 0);
     func_0204c520(wk->cur[BR_CODEIN_CURSOR_CODE].actor, TRUE);
     wk->cur[BR_CODEIN_CURSOR_KEY].move.x = 0;
     wk->cur[BR_CODEIN_CURSOR_KEY].move.y = 0;
     wk->cur[BR_CODEIN_CURSOR_KEY].state = 1;
     BrCodeInDisp_SetKeyCursor(wk, 0);
-    func_0204c488(wk->cur[BR_CODEIN_CURSOR_KEY].actor, wk->cur[BR_CODEIN_CURSOR_KEY].state);
+    ClActor_SetSequence(wk->cur[BR_CODEIN_CURSOR_KEY].actor, wk->cur[BR_CODEIN_CURSOR_KEY].state);
     func_0204c520(wk->cur[BR_CODEIN_CURSOR_KEY].actor, TRUE);
-    func_0204c318(wk->cur[BR_CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
+    ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
     wk->cur[BR_CODEIN_CURSOR_PRESS].move.x = 0;
     wk->cur[BR_CODEIN_CURSOR_PRESS].move.y = 0;
     wk->cur[BR_CODEIN_CURSOR_PRESS].state = 1;
     BrCodeInDisp_SetKeyCursor(wk, 0);
-    func_0204c488(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, wk->cur[BR_CODEIN_CURSOR_PRESS].state);
-    func_0204c318(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
+    ClActor_SetSequence(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, wk->cur[BR_CODEIN_CURSOR_PRESS].state);
+    ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
     func_0204c520(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, TRUE);
     BrCodeInDisp_SetCursorVisible(wk, BR_CODEIN_CURSOR_KEY, FALSE);
     BrCodeInDisp_SetCursorVisible(wk, BR_CODEIN_CURSOR_PRESS, FALSE);
@@ -163,25 +163,25 @@ void BrCodeInDisp_AddButtonActors(BrCodeInWork *wk) {
     setup.sequence = 0;
     setup.priority = CODE_PRIORITY;
     setup.bgPriority = 0;
-    wk->btn[0].actor = func_0204c040(unit, wk->charRes[BR_CODEIN_RES_BUTTON], wk->plttRes[BR_CODEIN_RES_BUTTON],
-                                     wk->cellAnimRes[BR_CODEIN_RES_BUTTON], &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c318(wk->btn[0].actor, GX_OAM_MODE_XLU);
+    wk->btn[0].actor = ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_BUTTON], wk->plttRes[BR_CODEIN_RES_BUTTON],
+                                      wk->cellAnimRes[BR_CODEIN_RES_BUTTON], &setup, CLACT_SURFACE_SUB, wk->heapId);
+    ClActor_SetObjMode(wk->btn[0].actor, GX_OAM_MODE_XLU);
     setup.sequence = 1;
-    wk->btn[1].actor = func_0204c040(unit, wk->charRes[BR_CODEIN_RES_BUTTON], wk->plttRes[BR_CODEIN_RES_BUTTON],
-                                     wk->cellAnimRes[BR_CODEIN_RES_BUTTON], &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c318(wk->btn[1].actor, GX_OAM_MODE_XLU);
+    wk->btn[1].actor = ClActor_Create(unit, wk->charRes[BR_CODEIN_RES_BUTTON], wk->plttRes[BR_CODEIN_RES_BUTTON],
+                                      wk->cellAnimRes[BR_CODEIN_RES_BUTTON], &setup, CLACT_SURFACE_SUB, wk->heapId);
+    ClActor_SetObjMode(wk->btn[1].actor, GX_OAM_MODE_XLU);
     pos.x = wk->rects[BR_CODEIN_RECT_BACK].left;
     pos.y = wk->rects[BR_CODEIN_RECT_BACK].top + 16;
-    func_0204c140(wk->btn[0].actor, &pos, CLACT_SURFACE_SUB);
-    func_0204c488(wk->btn[0].actor, 0);
+    ClActor_SetSurfacePos(wk->btn[0].actor, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSequence(wk->btn[0].actor, 0);
     pos.x = wk->rects[BR_CODEIN_RECT_OK].left;
     pos.y = wk->rects[BR_CODEIN_RECT_OK].top + 16;
-    func_0204c140(wk->btn[1].actor, &pos, CLACT_SURFACE_SUB);
-    func_0204c488(wk->btn[1].actor, 1);
+    ClActor_SetSurfacePos(wk->btn[1].actor, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSequence(wk->btn[1].actor, 1);
 }
 
 void BrCodeInDisp_SetCursorVisible(BrCodeInWork *wk, int cursor, BOOL visible) {
-    func_0204c124(wk->cur[cursor].actor, visible);
+    ClActor_SetVisible(wk->cur[cursor].actor, visible);
 }
 
 // Puts the code's cursor under a digit
@@ -190,9 +190,9 @@ void BrCodeInDisp_SetCodeCursor(BrCodeInWork *wk, int digit) {
     ClActor *actor = wk->code[digit].actor;
 
     wk->cur[BR_CODEIN_CURSOR_CODE].state = digit;
-    func_0204c178(actor, &pos, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(actor, &pos, CLACT_SURFACE_SUB);
     pos.y += 16;
-    func_0204c140(wk->cur[BR_CODEIN_CURSOR_CODE].actor, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->cur[BR_CODEIN_CURSOR_CODE].actor, &pos, CLACT_SURFACE_SUB);
 }
 
 // Puts the keys' cursor on a key and restarts its animation
@@ -203,8 +203,8 @@ void BrCodeInDisp_SetKeyCursor(BrCodeInWork *wk, int key) {
 
     pos.x = width / 2 + wk->rects[BR_CODEIN_RECT_KEYS + key].left;
     pos.y = height / 2 + wk->rects[BR_CODEIN_RECT_KEYS + key].top;
-    func_0204c140(wk->cur[BR_CODEIN_CURSOR_KEY].actor, &pos, CLACT_SURFACE_SUB);
-    func_0204c4d4(wk->cur[BR_CODEIN_CURSOR_KEY].actor, 0);
+    ClActor_SetSurfacePos(wk->cur[BR_CODEIN_CURSOR_KEY].actor, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetAnimTime(wk->cur[BR_CODEIN_CURSOR_KEY].actor, 0);
 }
 
 // Gives the keys' cursors their animations, and hides the keys' cursor while a press flashes or the touch screen is
@@ -213,11 +213,11 @@ void BrCodeInDisp_UpdateCursors(BrCodeInWork *wk) {
     int i;
 
     for (i = BR_CODEIN_CURSOR_KEY; i < BR_CODEIN_CURSOR_COUNT; i++) {
-        int sequence = func_0204c4a0(wk->cur[i].actor);
+        int sequence = ClActor_GetSequence(wk->cur[i].actor);
 
         if (sequence == SEQ_CURSOR_PRESS) {
-            if (!func_0204c560(wk->cur[i].actor)) {
-                func_0204c488(wk->cur[i].actor, wk->cur[i].state);
+            if (!ClActor_IsAnimActive(wk->cur[i].actor)) {
+                ClActor_SetSequence(wk->cur[i].actor, wk->cur[i].state);
                 if (wk->touchMode == TRUE) {
                     BrCodeInDisp_SetCursorVisible(wk, BR_CODEIN_CURSOR_KEY, FALSE);
                 } else {
@@ -227,9 +227,9 @@ void BrCodeInDisp_UpdateCursors(BrCodeInWork *wk) {
             }
         } else {
             if (sequence != wk->cur[i].state) {
-                func_0204c488(wk->cur[i].actor, wk->cur[i].state);
+                ClActor_SetSequence(wk->cur[i].actor, wk->cur[i].state);
             }
-            if (func_0204c4a0(wk->cur[i].actor) != SEQ_CURSOR_PRESS) {
+            if (ClActor_GetSequence(wk->cur[i].actor) != SEQ_CURSOR_PRESS) {
                 if (wk->touchMode == TRUE) {
                     BrCodeInDisp_SetCursorVisible(wk, BR_CODEIN_CURSOR_KEY, FALSE);
                 } else {
@@ -282,10 +282,10 @@ void BrCodeInDisp_SetCodePositions(BrCodeInWork *wk, BOOL move) {
                 x += 8;
             }
         }
-        func_0204c178(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
+        ClActor_GetSurfacePos(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
         if (!move) {
             pos.x = x;
-            func_0204c140(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
         } else {
             wk->code[i].move.x = (x - pos.x) / 4;
             wk->code[i].move.y = 0;
@@ -293,7 +293,7 @@ void BrCodeInDisp_SetCodePositions(BrCodeInWork *wk, BOOL move) {
             wk->code[i].move.scale = 0;
         }
         if (i == wk->bar[bar].state && bar != BR_CODEIN_BAR_COUNT) {
-            func_0204c178(wk->bar[bar].actor, &barPos, CLACT_SURFACE_SUB);
+            ClActor_GetSurfacePos(wk->bar[bar].actor, &barPos, CLACT_SURFACE_SUB);
             if (wk->largeStart == wk->largeEnd) {
                 x += 8;
             } else if (i > wk->largeStart && i < wk->largeEnd) {
@@ -303,7 +303,7 @@ void BrCodeInDisp_SetCodePositions(BrCodeInWork *wk, BOOL move) {
             }
             if (!move) {
                 barPos.x = x;
-                func_0204c140(wk->bar[bar].actor, &barPos, CLACT_SURFACE_SUB);
+                ClActor_SetSurfacePos(wk->bar[bar].actor, &barPos, CLACT_SURFACE_SUB);
             } else {
                 wk->bar[bar].move.x = (x - barPos.x) / 4;
                 wk->bar[bar].move.y = 0;
@@ -329,7 +329,7 @@ void BrCodeInDisp_UpdateCodeRects(BrCodeInWork *wk) {
             halfWidth = 4;
             halfHeight = 8;
         }
-        func_0204c178(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
+        ClActor_GetSurfacePos(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
         wk->code[i].rect->top = pos.y - halfHeight;
         wk->code[i].rect->left = pos.x - halfWidth;
         wk->code[i].rect->bottom = pos.y + halfHeight;

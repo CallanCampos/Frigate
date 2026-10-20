@@ -1,8 +1,0 @@
-AspertiaGate_Text_HeyCantGoWithout = Hey! {0100:0}!\nYou can't go without...{be01}\n...Oh?{be01}
-AspertiaGate_Text_YoureOkGoingAway = You're with {0101:1}!{be01}\nOK. This is a going-away gift!\nDon't be shy. Take it.{be01}
-AspertiaGate_Text_WhenPokemonGetHurt = When Pokémon get hurt, take it easy\nand go to a Pokémon Center.
-AspertiaGate_Text_HowJourney = {0100:0},\nhow is your journey?
-AspertiaGate_Text_HmmSeeSee = Hmm...\nI see. I see!{be01}
-AspertiaGate_Text_LoveReadNewsInformation = I love to read news and information\nabout the city displayed{be00}\non the electric bulletin board{be00}\non the wall!
-AspertiaGate_Text_RememberDayPassedGate = Remember that?{be01}\nThe day you passed this gate\nwith your Pokémon for the first time.
-\pad{fc}

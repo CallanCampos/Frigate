@@ -1,8 +1,8 @@
 #include "dsprot/dsprot_internal.h"
 
-// The cipher DS Protect encrypts its code with, in the game's copy (overlay 337): the code of dsprot_cipher.c, which
-// its copy in overlay 165 has too, without the .ctor entry, since DSProt_Init runs the decryption here. The ROM doesn't
-// name this file; it is named for what it does.
+// The cipher DS Protect encrypts its code with, in the game's copy (overlay 337): the cipher of dsprot_cipher.c, the
+// copy in overlay 165, without its .ctor entry, since DSProt_Init runs the decryption here. The ROM doesn't name this
+// file; it is named for what it does.
 
 typedef u32 (*DSProtBranchTypeFunc)(u32 instruction);
 typedef u32 (*DSProtNextFunc)(DSProtCipherState *state);
@@ -33,19 +33,20 @@ u32 DSProt_GetBranchTypeMulti(u32 instruction) {
 }
 
 void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength) {
+    // The order of these declarations sets the locals' registers
     int i;
-    u32 *tableEnd;
+    u32 j;
     u32 keyIndex;
+    u32 *tableEnd;
     u32 value;
     u32 *table;
-    u32 j;
 
     state->offset = 0xaa;
-    keyIndex = 0;
-    value = 0x03020100;
     state->i = 0;
     state->j = 0;
-    j = keyIndex;
+    keyIndex = 0;
+    j = 0;
+    value = 0x03020100;
     table = (u32 *)state->table;
     tableEnd = (u32 *)(state->table + 256);
     do {
@@ -54,17 +55,16 @@ void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength)
         value += 0x04040404;
     } while (table < tableEnd);
     for (i = 255; i >= 0; i--) {
-        u8 swap = state->table[i];
-        u8 other;
+        u8 temp;
 
-        j = (j + key[keyIndex] + swap) & 0xff;
-        other = state->table[j];
-        state->table[j] = swap;
+        j = (state->table[i] + (j + key[keyIndex])) & 0xff;
+        temp = state->table[j];
+        state->table[j] = state->table[i];
+        state->table[i] = temp;
         keyIndex++;
         if (keyIndex >= keyLength) {
             keyIndex = 0;
         }
-        state->table[i] = other;
     }
 }
 
@@ -82,95 +82,88 @@ u32 DSProt_Rc4NextMulti(DSProtCipherState *state) {
 }
 
 int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
-    u32 i;
-    u8 *in;
-    u32 sum;
+    // The SDK's u32 is unsigned long, which MWCC treats differently from unsigned int when indexing
+    unsigned long i;
+    u8 sum;
 
     sum = 0;
     if (size & 3) {
         return -1;
     }
     for (i = 0; i < size; i += 4) {
-        u32 total;
-
-        in = src + i;
-        switch (((DSProtBranchTypeFunc)(sCipherFunctionsMulti[0] - 0x2200))(*(u32 *)in)) {
+        switch (((DSProtBranchTypeFunc)(sCipherFunctionsMulti[0] - 0x2200))(*(u32 *)(src + i))) {
         case 1:
-            in[3] ^= 1;
+            src[i + 3] ^= 1;
         case 2:
-            *(u32 *)(dest + i) = (*(u32 *)in & 0xff000000 ^ 0x1000000) | ((*(u32 *)in & 0xffffff) + 0x882 & 0xffffff);
+            *(u32 *)(dest + i) =
+                ((*(u32 *)(src + i) & 0xff000000) ^ 0x1000000) | (((*(u32 *)(src + i) & 0xffffff) + 0x882) & 0xffffff);
             break;
         case 3:
-            *(u32 *)in ^= 0x1000000;
+            *(u32 *)(src + i) ^= 0x1000000;
         default: {
             u32 byte;
 
-            byte = in[0] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            byte = src[i] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
             state->offset = byte;
             dest[i] = byte;
-            byte = in[1] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            byte = src[i + 1] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
             state->offset = byte;
             dest[i + 1] = byte;
-            byte = in[2] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            byte = src[i + 2] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
             state->offset = byte;
             dest[i + 2] = byte;
             break;
         }
         }
-        total = sum + in[3];
-        dest[i + 3] = total;
-        sum = total & 0xff;
+        // The running sum is the byte just written, so it wraps at 8 bits
+        dest[i + 3] = sum + src[i + 3];
+        sum = dest[i + 3];
         state->offset -= sum;
     }
     return 0;
 }
 
+// Decrypts one byte with the next value of the cipher, and keeps the encrypted byte as the state's offset
+static inline u32 DSProt_DecryptByteMulti(DSProtCipherState *state, u32 byte) {
+    u32 out = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+
+    state->offset = byte;
+    return out;
+}
+
 int DSProt_DecryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
-    u32 i;
-    u32 sum;
+    // The SDK's u32 is unsigned long, which MWCC treats differently from unsigned int when indexing
+    unsigned long i;
+    u8 sum;
 
     sum = 0;
     if (size & 3) {
         return -1;
     }
     for (i = 0; i < size; i += 4) {
-        u8 *in = src + i;
-        u32 last = in[3];
+        u32 last = src[i + 3];
         u32 word;
-        u32 byte;
 
-        in[3] = last - sum;
+        src[i + 3] = last - sum;
         sum = last;
-        word = *(u32 *)in;
+        word = *(u32 *)(src + i);
         switch (((DSProtBranchTypeFunc)(sCipherFunctionsMulti[0] - 0x2200))(word)) {
         case 1:
-            in[3] ^= 1;
+            src[i + 3] ^= 1;
         case 3:
-            *(u32 *)(dest + i) = (word & 0xff000000 ^ 0x1000000) | ((word & 0xffffff) + 0xfffff77e & 0xffffff);
+            *(u32 *)(dest + i) = ((word & 0xff000000) ^ 0x1000000) | (((word & 0xffffff) + 0xfffff77e) & 0xffffff);
             break;
         case 2:
-            byte = in[0];
-            dest[i] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = byte;
-            byte = in[1];
-            dest[i + 1] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = byte;
-            byte = in[2];
-            dest[i + 2] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = byte;
-            dest[i + 3] = in[3] ^ 1;
+            dest[i] = DSProt_DecryptByteMulti(state, src[i]);
+            dest[i + 1] = DSProt_DecryptByteMulti(state, src[i + 1]);
+            dest[i + 2] = DSProt_DecryptByteMulti(state, src[i + 2]);
+            dest[i + 3] = src[i + 3] ^ 1;
             break;
         default:
-            byte = in[0];
-            dest[i] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = byte;
-            byte = in[1];
-            dest[i + 1] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = byte;
-            byte = in[2];
-            dest[i + 2] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = byte;
-            dest[i + 3] = in[3];
+            dest[i] = DSProt_DecryptByteMulti(state, src[i]);
+            dest[i + 1] = DSProt_DecryptByteMulti(state, src[i + 1]);
+            dest[i + 2] = DSProt_DecryptByteMulti(state, src[i + 2]);
+            dest[i + 3] = src[i + 3];
             break;
         }
         state->offset -= last;
@@ -192,7 +185,7 @@ int DSProt_DecryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size) {
     return ((DSProtCodeFunc)(sCipherFunctionsMulti[2] - 0x2200))(&state, src, dest, size) == -1 ? -1 : 0;
 }
 
-// Hand-written, run from .ctor when the overlay is loaded: has DSProt_DecryptMulti decrypt this file's functions
+// Hand-written, run by DSProt_Init: has DSProt_DecryptMulti decrypt this file's functions
 // clang-format off
 asm void DSProt_DecryptCipherMulti(void) {
     orr r0, pc, #0

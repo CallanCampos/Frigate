@@ -201,6 +201,66 @@ class StaticReferenceTests(unittest.TestCase):
                      'Alias kind:label addr:0x02100000')
         self.assertEqual(add_source_file.externally_used_statics(self.source, self.version), ['Local'])
 
+    def run_main(self, *arguments):
+        with patch('sys.argv', ['mark_complete.py', *arguments]), contextlib.redirect_stdout(io.StringIO()):
+            return mark_complete.main()
+
+    def mirror_complete_owner(self):
+        other = self.root / 'config/w2_us/arm9/overlays/ov011'
+        other.mkdir(parents=True)
+        for owner in (self.owner, other):
+            (owner / 'delinks.txt').write_text(
+                f'{self.source}:\n    complete\n    .text start:0x02100000 end:0x02100020\n')
+        return other
+
+    def test_incomplete_both_versions_bypasses_static_check_and_is_idempotent(self):
+        other = self.mirror_complete_owner()
+        with patch.object(mark_complete, 'externally_used_statics', side_effect=AssertionError('must not check')):
+            self.assertEqual(self.run_main('--incomplete', self.source), 0)
+            snapshot = {p: p.read_bytes() for p in self.root.rglob('delinks.txt')}
+            self.assertEqual(self.run_main('--incomplete', self.source), 0)
+        self.assertEqual(snapshot, {p: p.read_bytes() for p in self.root.rglob('delinks.txt')})
+        for owner in (self.owner, other):
+            self.assertEqual((owner / 'delinks.txt').read_text(),
+                             f'{self.source}:\n    .text start:0x02100000 end:0x02100020\n')
+
+    def test_missing_requested_source_prevents_all_changes(self):
+        self.mirror_complete_owner()
+        before = {p: p.read_bytes() for p in self.root.rglob('delinks.txt')}
+        self.assertEqual(self.run_main('--incomplete', self.source, 'src/missing.c'), 1)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.root.rglob('delinks.txt')})
+
+    def test_invalid_later_owner_prevents_all_changes(self):
+        other = self.mirror_complete_owner()
+        (other / 'delinks.txt').write_text(
+            f'{self.source}:\n    complete\n    .text start:0x02100020 end:0x02100000\n')
+        before = {p: p.read_bytes() for p in self.root.rglob('delinks.txt')}
+        self.assertEqual(self.run_main('--incomplete', self.source), 1)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.root.rglob('delinks.txt')})
+
+    def test_duplicate_owner_prevents_all_changes(self):
+        other = self.mirror_complete_owner()
+        duplicate = other.parent / 'ov012'
+        duplicate.mkdir()
+        (duplicate / 'delinks.txt').write_bytes((other / 'delinks.txt').read_bytes())
+        before = {p: p.read_bytes() for p in self.root.rglob('delinks.txt')}
+        self.assertEqual(self.run_main('--incomplete', self.source), 1)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.root.rglob('delinks.txt')})
+
+    def test_white_only_registration_remains_valid(self):
+        other = self.mirror_complete_owner()
+        (self.owner / 'delinks.txt').write_text('')
+        self.assertEqual(self.run_main('--incomplete', self.source), 0)
+        self.assertNotIn('complete', (other / 'delinks.txt').read_text())
+
+    def test_default_still_marks_complete_and_is_idempotent(self):
+        self.relocs()
+        self.assertEqual(self.run_main(self.source), 0)
+        before = (self.owner / 'delinks.txt').read_bytes()
+        self.assertEqual(self.run_main(self.source), 0)
+        self.assertEqual(before, (self.owner / 'delinks.txt').read_bytes())
+        self.assertIn('    complete\n', before.decode())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -175,7 +175,8 @@ static BOOL CodeIn_StateError(CodeInWork *wk) {
         wk->seq++;
         break;
     case 1:
-        if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) ||
+            GFL_HIDIsTouchPressed()) {
             CodeInDisp_DrawMessage(wk->window, wk->param.mode, wk->font, wk->param.max);
             CodeIn_SetState(wk, CODEIN_STATE_INPUT);
         }
@@ -210,21 +211,21 @@ static BOOL CodeIn_StateMove(CodeInWork *wk) {
             if (wk->code[i].move.wait == 0) {
                 continue;
             }
-            func_0204c178(wk->code[i].actor, &pos, 0);
+            ClActor_GetSurfacePos(wk->code[i].actor, &pos, 0);
             pos.x += wk->code[i].move.x;
             pos.y += wk->code[i].move.y;
-            func_0204c140(wk->code[i].actor, &pos, 0);
+            ClActor_SetSurfacePos(wk->code[i].actor, &pos, 0);
             wk->code[i].move.wait--;
             if (i >= wk->largeStart && i < wk->largeEnd) {
                 scale.x = sCodeInScalesLarge[wk->code[i].move.scale];
                 scale.y = sCodeInScalesLarge[wk->code[i].move.scale];
-                func_0204c270(wk->code[i].actor, &scale);
+                ClActor_SetScale(wk->code[i].actor, &scale);
                 wk->code[i].move.scale++;
             }
             if (i >= wk->smallStart && i < wk->smallEnd) {
                 scale.x = sCodeInScalesSmall[wk->code[i].move.scale];
                 scale.y = sCodeInScalesSmall[wk->code[i].move.scale];
-                func_0204c270(wk->code[i].actor, &scale);
+                ClActor_SetScale(wk->code[i].actor, &scale);
                 wk->code[i].move.scale++;
             }
         }
@@ -232,18 +233,18 @@ static BOOL CodeIn_StateMove(CodeInWork *wk) {
             if (wk->bar[i].move.wait == 0) {
                 continue;
             }
-            func_0204c178(wk->bar[i].actor, &barPos, 0);
+            ClActor_GetSurfacePos(wk->bar[i].actor, &barPos, 0);
             barPos.x += wk->bar[i].move.x;
             barPos.y += wk->bar[i].move.y;
-            func_0204c140(wk->bar[i].actor, &barPos, 0);
+            ClActor_SetSurfacePos(wk->bar[i].actor, &barPos, 0);
             wk->bar[i].move.wait--;
         }
         if (wk->code[0].move.wait == 0) {
             for (i = wk->largeStart; i < wk->largeEnd; i++) {
-                func_0204c488(wk->code[i].actor, CodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
+                ClActor_SetSequence(wk->code[i].actor, CodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
             }
             for (i = wk->smallStart; i < wk->smallEnd; i++) {
-                func_0204c488(wk->code[i].actor, CodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
+                ClActor_SetSequence(wk->code[i].actor, CodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
             }
             wk->seq++;
         }
@@ -256,7 +257,7 @@ static BOOL CodeIn_StateMove(CodeInWork *wk) {
             }
             scale.x = sCodeInScalesLarge[wk->code[i].move.scale];
             scale.y = sCodeInScalesLarge[wk->code[i].move.scale];
-            func_0204c270(wk->code[i].actor, &scale);
+            ClActor_SetScale(wk->code[i].actor, &scale);
             wk->code[i].move.scale++;
         }
         for (i = wk->smallStart; i < wk->smallEnd; i++) {
@@ -265,7 +266,7 @@ static BOOL CodeIn_StateMove(CodeInWork *wk) {
             }
             scale.x = sCodeInScalesSmall[wk->code[i].move.scale];
             scale.y = sCodeInScalesSmall[wk->code[i].move.scale];
-            func_0204c270(wk->code[i].actor, &scale);
+            ClActor_SetScale(wk->code[i].actor, &scale);
             wk->code[i].move.scale++;
         }
         wk->count++;
@@ -380,9 +381,9 @@ static void CodeIn_HandleKeys(CodeInWork *wk) {
             CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
             CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_PRESS, TRUE);
             CodeInDisp_SetCursorOnKey(wk, key, CODEIN_CURSOR_PRESS);
-            func_0204c488(wk->code[digit].actor,
-                          CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
-            func_0204c488(wk->cur[CODEIN_CURSOR_PRESS].actor, 3);
+            ClActor_SetSequence(wk->code[digit].actor,
+                                CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
+            ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, 3);
             group = wk->code[digit].group;
             next = digit + 1;
             if (next == wk->codeMax) {
@@ -494,7 +495,7 @@ static void CodeIn_Confirm(CodeInWork *wk) {
     for (i = 0; i < wk->codeMax; i++) {
         if (wk->code[i].state == 0) {
             wk->code[i].state = 1;
-            func_0204c488(wk->code[i].actor, CodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
+            ClActor_SetSequence(wk->code[i].actor, CodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
         }
         GFL_WordSetFormatNumber(digit, wk->code[i].state - 1, 1, 1, TRUE);
         GFL_StrBufConcat(wk->param.str, digit);
@@ -521,11 +522,11 @@ static void CodeIn_Backspace(CodeInWork *wk) {
     }
     digit = wk->cur[CODEIN_CURSOR_CODE].state;
     wk->code[digit].state = 0;
-    func_0204c488(wk->code[digit].actor, CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
+    ClActor_SetSequence(wk->code[digit].actor, CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
     group = wk->code[digit].group;
     if (digit > 0) {
-        func_0204c488(wk->code[digit - 1].actor,
-                      CodeInDisp_GetCodeSequence(wk->code[digit - 1].state, wk->code[digit - 1].size));
+        ClActor_SetSequence(wk->code[digit - 1].actor,
+                            CodeInDisp_GetCodeSequence(wk->code[digit - 1].state, wk->code[digit - 1].size));
         prevGroup = wk->code[digit - 1].group;
         if (group != prevGroup) {
             wk->next = CODEIN_NEXT_FOCUS;
@@ -613,15 +614,15 @@ static void CodeIn_ButtonCallback(u32 button, u32 event, void *work) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 digit = wk->cur[CODEIN_CURSOR_CODE].state;
                 wk->code[digit].state = button - CODEIN_RECT_KEYS + 1;
-                func_0204c488(wk->code[digit].actor,
-                              CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
+                ClActor_SetSequence(wk->code[digit].actor,
+                                    CodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
                 CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, TRUE);
                 key = button - CODEIN_RECT_KEYS;
                 CodeInDisp_SetKeyCursor(wk, key);
                 CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
                 CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_PRESS, TRUE);
                 CodeInDisp_SetCursorOnKey(wk, key, CODEIN_CURSOR_PRESS);
-                func_0204c488(wk->cur[CODEIN_CURSOR_PRESS].actor, 3);
+                ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, 3);
                 group = wk->code[digit].group;
                 next = digit + 1;
                 if (next == wk->codeMax) {

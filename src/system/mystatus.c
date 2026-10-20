@@ -14,23 +14,23 @@ u32 PlayerInfo_GetSize(void) {
     return sizeof(PlayerInfo);
 }
 
-PlayerInfo *func_02008b0c(u32 heapId) {
+PlayerInfo *PlayerInfo_Create(u32 heapId) {
     PlayerInfo *info = GFL_HeapAllocate(heapId, sizeof(PlayerInfo), FALSE, "mystatus.c", 52);
-    func_02008b40(info);
+    PlayerInfo_Init(info);
     return info;
 }
 
-void func_02008b34(const PlayerInfo *src, PlayerInfo *dest) {
+void PlayerInfo_Copy(const PlayerInfo *src, PlayerInfo *dest) {
     MI_CpuCopy8(src, dest, sizeof(PlayerInfo));
 }
 
-void func_02008b40(PlayerInfo *info) {
+void PlayerInfo_Init(PlayerInfo *info) {
     MI_CpuFill8(info, 0, sizeof(PlayerInfo));
     info->region = 2;
-    func_02008c00(info, GAME_VERSION);
+    PlayerInfo_SetVersion(info, GAME_VERSION);
 }
 
-BOOL func_02008b5c(const PlayerInfo *info) {
+BOOL PlayerInfo_IsNameEmpty(const PlayerInfo *info) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -79,11 +79,11 @@ u16 getTrainerID(PlayerInfo *info) {
     return info->id;
 }
 
-s32 func_02008bdc(PlayerInfo *info) {
+s32 PlayerInfo_GetProfileId(PlayerInfo *info) {
     return info->profileId;
 }
 
-void func_02008be0(PlayerInfo *info, s32 profileId) {
+void PlayerInfo_InitProfileId(PlayerInfo *info, s32 profileId) {
     if (info->profileId == 0) {
         info->profileId = profileId;
     }
@@ -93,11 +93,11 @@ void setTrainerGender(PlayerInfo *info, u32 gender) {
     info->gender = gender;
 }
 
-u32 getTrainerGender(PlayerInfo *info) {
+u32 getTrainerGender(const PlayerInfo *info) {
     return info->gender;
 }
 
-u8 func_02008bf4(PlayerInfo *info) {
+u8 func_02008bf4(const PlayerInfo *info) {
     return info->unk1C;
 }
 
@@ -105,11 +105,11 @@ void func_02008bf8(PlayerInfo *info, u8 value) {
     info->unk1C = value;
 }
 
-u8 func_02008bfc(PlayerInfo *info) {
+u8 PlayerInfo_GetVersion(PlayerInfo *info) {
     return info->version;
 }
 
-void func_02008c00(PlayerInfo *info, u8 value) {
+void PlayerInfo_SetVersion(PlayerInfo *info, u8 value) {
     info->version = value;
 }
 
@@ -117,7 +117,7 @@ u8 TrainerInfo_GetRegion(PlayerInfo *info) {
     return info->region;
 }
 
-void func_02008c08(PlayerInfo *info, u8 value) {
+void PlayerInfo_SetRegion(PlayerInfo *info, u8 value) {
     info->region = value;
 }
 
@@ -129,7 +129,7 @@ u8 UnityTowerVisitor_GetProvince(PlayerInfo *info) {
     return info->province;
 }
 
-void func_02008c14(PlayerInfo *info, int country, int province) {
+void PlayerInfo_SetCountryAndProvince(PlayerInfo *info, int country, int province) {
     info->country = country;
     info->province = province;
 }

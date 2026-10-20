@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Shield Dust",
-    "description": "Blocks the added effects\nof attacks taken."
-}

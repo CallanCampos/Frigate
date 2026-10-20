@@ -1,3 +1,0 @@
-OpelucidCity8_Text_AbleGetKnowHer = I was able to get to know\nher through trading Pokémon!{be01}\nOur battle styles, tastes,\nand ways of thinking are different,{be00}\nbut it's more interesting that way!
-OpelucidCity8_Text_ThereSomePokemonEvolve = There are some Pokémon that evolve by\ntrading parts of their bodies!{be01}\nWe might evolve by exchanging\nour thoughts and opinions!
-\pad{54}

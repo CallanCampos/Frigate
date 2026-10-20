@@ -1,0 +1,11 @@
+CasteliaCity10_Text_EveryoneWeveArrivedCastelia = Everyone, we've arrived at\nCastelia City!{be01}
+CasteliaCity10_Text_CasteliaCityItsMuch = {0100:1}: So this is Castelia City...\nIt's much bigger than I'd heard!{be01}\nBut, it doesn't matter!{be01}\nI'm going to find Team Plasma\nno matter where they run!{be01}
+CasteliaCity10_Text_OhYeahHereLets = Oh yeah. {0100:0}!{be01}\nHere, let's register each other's\nXtransceiver number.{be01}\nWe didn't even need to in Aspertia.\nWe could see each other anytime!{be01}
+CasteliaCity10_Text_ThatsStrangeShipSailing = That's a strange ship.\nA sailing ship in this day and age?{be01}
+CasteliaCity10_Text_WhatCanWouldLike = What can I do for you?\nWould you like to sail to Virbank City?
+CasteliaCity10_Text_CoursePleaseStepWay = Of course!\nPlease, step this way!{be01}
+CasteliaCity10_Text_OkThenPleaseCome = OK then! Please come talk to me\nwhenever you'd like to board!
+CasteliaCity10_Text_WhenJustCantStand = When you just can't stand it anymore,\nscream at the ocean!
+CasteliaCity10_Text_BlackSailingShipWhat = That black sailing ship...\nWhat could it be?
+CasteliaCity10_Text_BlackSailingShipWhat_2 = That black sailing ship...\nWhat could it have been?
+\pad{9e}

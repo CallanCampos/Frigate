@@ -199,6 +199,25 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
             sys.exit(f"{version} {module}: {source} has no {section}")
         return path, "\n".join(lines) + "\n"
 
+    if action == "remove_section":
+        path = config_dir(version, module) / "delinks.txt"
+        lines = path.read_text().splitlines()
+        source, section = argument.rsplit(":", 1)
+        try:
+            start = lines.index(f"{source}:")
+        except ValueError:
+            sys.exit(f"{version} {module}: {source} is not registered")
+        for i in range(start + 1, len(lines)):
+            if not lines[i].startswith(" "):
+                break
+            if lines[i].split()[0] == section:
+                match = re.search(r"start:(0x[0-9a-f]+)", lines[i])
+                if match is None or int(match.group(1), 16) != addr:
+                    sys.exit(f"{version} {module}: {source} {section} does not start at {addr:#010x}")
+                del lines[i]
+                return path, "\n".join(lines) + "\n"
+        return
+
     if action == "add_section":
         # A section that a registered source file turns out to have, such as an object it defines that its neighbour
         # reaches through a symbol. The argument is source:section:size, and the address is the section's start
@@ -398,6 +417,11 @@ def main():
     command.add_argument("section", help="e.g. .bss")
     command.add_argument("size", help="the section's size, e.g. 0x408")
     command.add_argument("addresses", nargs="+", help="the section's start")
+    command = commands.add_parser("remove-section", help="remove a section assigned to the wrong source file")
+    command.add_argument("module")
+    command.add_argument("source", help="the source file as delinks.txt names it")
+    command.add_argument("section", help="e.g. .bss")
+    command.add_argument("addresses", nargs="+", help="the section's original start")
     commands.add_parser("apply", help="apply every fix in config/fixes.txt")
     args = parser.parse_args()
 
@@ -419,6 +443,7 @@ def main():
                                                                       else [])]),
                 "section_start": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "section_end": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
+                "remove_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "add_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}:{getattr(args, 'size', '')}"}
     argument = argument.get(action, "")
     if action == "remove_orphan_reloc":
@@ -428,9 +453,12 @@ def main():
     for address in args.addresses:
         addr = int(address, 16)
         apply_everywhere(mapper, args.module, addr, action, argument)
-        # One fix of each kind per address: a word can need its symbol removed and a relocation added
-        fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)] + [
-            (args.module, addr, action, argument)]
+        # One fix of each kind per address: a word can need its symbol removed and a relocation added. Recording a
+        # file's section boundary again replaces its earlier record: fixes replay in address order, so an older
+        # record of the same boundary at a higher address would undo a move down.
+        fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)
+                 and not (action in ("section_start", "section_end") and (f[0], f[2], f[3]) == (args.module, action, argument))
+                 ] + [(args.module, addr, action, argument)]
         print(f"{action} {args.module} {addr:#010x} {argument}".rstrip())
     save_fixes(fixes)
 

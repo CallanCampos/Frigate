@@ -213,7 +213,7 @@ void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
     MI_CpuFill8(work->params, 0, sizeof(work->params));
     MI_CpuFill8(work->actors, 0, sizeof(work->actors));
-    func_ov012_02168348(mission->unk1C, func_ov012_02168320(zoneId), &rand);
+    FestMission_InitRand(mission->unk1C, FestMission_GetMissionZone(zoneId), &rand);
     FesMissionPeople_PickPlaces(gsys, work, mission, zoneId, &rand);
     FesMissionPeople_AddZone(work, zoneId);
     if (work->actorCount != 0) {
@@ -237,7 +237,7 @@ void FesMissionPeople_LoadSpecies(FesGimmick *gimmick, FesMissionWork *work) {
     default:
         return;
     }
-    arc = func_02014590(gimmick->festival);
+    arc = LinkFestival_GetArchive(gimmick->festival);
     size = GFL_ArcToolGetDataLength(arc, fileId);
     work->speciesCount = size;
     if (size > 0x500) {
@@ -295,12 +295,12 @@ static void FesMissionPeople_PlaceActors(GameSystem *gsys, FesMissionWork *work,
             if (place->isRail == FALSE) {
                 const s32 *coords = (const s32 *)place->pos.grid;
 
-                func_ov012_021682c0(&npc, coords[0], coords[1], FX32_CONST(coords[2]));
+                ZoneNPC_SetGridPos(&npc, coords[0], coords[1], FX32_CONST(coords[2]));
                 npc.moveCode = 2;
             } else {
                 const u16 *values = &place->pos.rail.componentId;
 
-                func_ov012_021682d4(&npc, values[0], values[1], values[2]);
+                ZoneNPC_SetRailPos(&npc, values[0], values[1], values[2]);
                 npc.moveCode = 70;
             }
             npc.uid = 236 + i;
@@ -346,7 +346,7 @@ static BOOL FesMissionPeople_PickPlaces(GameSystem *gsys, FesMissionWork *work, 
         return FALSE;
     }
     pattern = (mission->unk8_0 >> (level * 3)) & 7;
-    work->actorCount = sActorCounts[pattern][func_ov012_021683a8(rand, 8, NULL, 0)];
+    work->actorCount = sActorCounts[pattern][FestMission_RandExcluding(rand, 8, NULL, 0)];
     if (work->actorCount > work->placeCount) {
         work->actorCount = work->placeCount;
     }
@@ -354,7 +354,7 @@ static BOOL FesMissionPeople_PickPlaces(GameSystem *gsys, FesMissionWork *work, 
         return FALSE;
     }
     for (i = 0; i < work->actorCount; i++) {
-        work->placeIndex[i] = func_ov012_021683a8(rand, work->placeCount, pickedPlaces, i);
+        work->placeIndex[i] = FestMission_RandExcluding(rand, work->placeCount, pickedPlaces, i);
         FesMissionPeople_SetParams(work, mission, i, rand, pickedParams);
         pickedPlaces[i] = work->placeIndex[i];
     }
@@ -387,7 +387,7 @@ static void FesMissionPeople_SetParams(FesMissionWork *work, FestMission *missio
 
 static void FesMissionPeople_SetRandomParam(FesMissionWork *work, FestMission *mission, u8 index,
                                             MATHRandContext32 *rand) {
-    work->params[index][0] = sRandomParams[func_ov012_021683a8(rand, 30, NULL, 0)];
+    work->params[index][0] = sRandomParams[FestMission_RandExcluding(rand, 30, NULL, 0)];
 }
 
 static void FesMissionPeople_SetAnswerParams(FesMissionWork *work, FestMission *mission, u8 index,
@@ -401,13 +401,13 @@ static void FesMissionPeople_SetAnswerParams(FesMissionWork *work, FestMission *
         variant = 0;
     }
     work->params[index][2] = variant;
-    first = func_ov012_021683a8(rand, 3, NULL, 0) + 1;
-    second = func_ov012_021683a8(rand, 2, NULL, 0);
+    first = FestMission_RandExcluding(rand, 3, NULL, 0) + 1;
+    second = FestMission_RandExcluding(rand, 2, NULL, 0);
     for (i = 0; i < 2; i++) {
         work->params[index][(i + second) % 2] = (first + i) % 3;
     }
-    if (func_ov012_021683a8(rand, 100, NULL, 0) < 5) {
-        work->params[index][func_ov012_021683a8(rand, 2, NULL, 0)] = 3;
+    if (FestMission_RandExcluding(rand, 100, NULL, 0) < 5) {
+        work->params[index][FestMission_RandExcluding(rand, 2, NULL, 0)] = 3;
     }
 }
 
@@ -419,7 +419,7 @@ static void FesMissionPeople_SetShopParams(FesMissionWork *work, FestMission *mi
     int i;
     u32 roll;
 
-    roll = func_ov012_021683a8(rand, 100, NULL, 0);
+    roll = FestMission_RandExcluding(rand, 100, NULL, 0);
     for (i = 0; i < 16; i++) {
         total += sShopWeights[i];
         if (roll < total) {
@@ -439,7 +439,7 @@ static void FesMissionPeople_SetBattleParam(FesMissionWork *work, FestMission *m
     if (variant >= 3) {
         variant = 0;
     }
-    pick = func_ov012_021683a8(rand, 6, picked, index);
+    pick = FestMission_RandExcluding(rand, 6, picked, index);
     work->params[index][0] = sBattleParams[variant][pick];
     picked[index] = pick;
 }
@@ -452,7 +452,7 @@ static void FesMissionPeople_SetWeightedParam(FesMissionWork *work, FestMission 
     u32 roll;
     const FesMissionWeightedValue *values = sWeightedParams[mission->unk0_20];
 
-    roll = func_ov012_021683a8(rand, 100, NULL, 0);
+    roll = FestMission_RandExcluding(rand, 100, NULL, 0);
     for (i = 0; i < 16; i++) {
         total += values[i].weight;
         if (roll < total) {
@@ -465,7 +465,7 @@ static void FesMissionPeople_SetWeightedParam(FesMissionWork *work, FestMission 
 
 static void FesMissionPeople_SetSpeciesParam(FesMissionWork *work, FestMission *mission, u8 index,
                                              MATHRandContext32 *rand, u32 *picked) {
-    u32 pick = func_ov012_021683a8(rand, work->speciesCount / 2, picked, index);
+    u32 pick = FestMission_RandExcluding(rand, work->speciesCount / 2, picked, index);
 
     work->params[index][0] = work->species[pick];
     picked[index] = pick;

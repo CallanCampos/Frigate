@@ -37,16 +37,16 @@ typedef struct {
 
 static WmIcon *loadWifiStrengthIcons(u32 unused, u32 heapId, u32 x, u32 y, u32 type, WmIcon *icon, u32 screen,
                                      u32 subOam, int level);
-static void func_0203e520(WmIcon *icon);
-static u32 func_0203e5ac(WmIcon *icon);
-static u32 func_0203e5ec(u32 engine, u32 charNo);
-static void func_0203e65c(WmIcon *icon, int level);
-static void func_0203e664(WmIcon *icon);
-static void func_0203e694(WmIcon *icon, BOOL top, HeapID heapId);
+static void WmIcon_WriteOam(WmIcon *icon);
+static u32 WmIcon_GetEngineOfIcon(WmIcon *icon);
+static u32 WmIcon_GetCharNo(u32 engine, u32 charNo);
+static void WmIcon_SetLevel(WmIcon *icon, int level);
+static void WmIcon_Free(WmIcon *icon);
+static void WmIcon_MoveIcon(WmIcon *icon, BOOL top, HeapID heapId);
 static u32 getObjBank(u32 engine);
-static void func_0203e6cc(u32 engine, u32 type, HeapID heapId);
+static void WmIcon_LoadGraphics(u32 engine, u32 type, HeapID heapId);
 static void copyEmptyOAM(void);
-static void func_0203e890(u32 screen);
+static void WmIcon_SetDefaultScreen(u32 screen);
 
 // Two OBJ off the bottom of the screen
 static const u32 sEmptyOam[8] = { 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0 };
@@ -75,13 +75,13 @@ static WmIcon *loadWifiStrengthIcons(u32 unused, u32 heapId, u32 x, u32 y, u32 t
     icon->screen = screen;
     icon->visible = FALSE;
     icon->oam = (GXOamAttr *)HW_OAM;
-    func_0203e6cc(func_0203e5ac(icon), icon->type, heapId);
+    WmIcon_LoadGraphics(WmIcon_GetEngineOfIcon(icon), icon->type, heapId);
     return icon;
 }
 
-static void func_0203e520(WmIcon *icon) {
-    u32 engine = func_0203e5ac(icon);
-    u32 charNo = func_0203e5ec(engine, icon->level);
+static void WmIcon_WriteOam(WmIcon *icon) {
+    u32 engine = WmIcon_GetEngineOfIcon(icon);
+    u32 charNo = WmIcon_GetCharNo(engine, icon->level);
     GXOamAttr *oam;
 
     if (engine == 1) {
@@ -105,7 +105,7 @@ static void func_0203e520(WmIcon *icon) {
     }
 }
 
-static u32 func_0203e5ac(WmIcon *icon) {
+static u32 WmIcon_GetEngineOfIcon(WmIcon *icon) {
     switch (icon->screen) {
     case WM_ICON_SCREEN_TOP:
         if (GX_GetDispSelect() == GX_DISP_SELECT_MAIN_SUB) {
@@ -122,7 +122,7 @@ static u32 func_0203e5ac(WmIcon *icon) {
 }
 
 // The character name of character charNo in the OBJ VRAM's mapping
-static u32 func_0203e5ec(u32 engine, u32 charNo) {
+static u32 WmIcon_GetCharNo(u32 engine, u32 charNo) {
     GXOBJVRamModeChar mode;
 
     if (engine == 1) {
@@ -146,13 +146,13 @@ static u32 func_0203e5ec(u32 engine, u32 charNo) {
     }
 }
 
-static void func_0203e65c(WmIcon *icon, int level) {
+static void WmIcon_SetLevel(WmIcon *icon, int level) {
     if (level < 4) {
         icon->level = level;
     }
 }
 
-static void func_0203e664(WmIcon *icon) {
+static void WmIcon_Free(WmIcon *icon) {
     GXOamAttr *oam = (GXOamAttr *)HW_OAM;
 
     oam[0].attr01 = WM_ICON_ATTR01_HIDDEN;
@@ -169,10 +169,10 @@ static void func_0203e664(WmIcon *icon) {
     GFL_HeapFree(icon);
 }
 
-static void func_0203e694(WmIcon *icon, BOOL top, HeapID heapId) {
+static void WmIcon_MoveIcon(WmIcon *icon, BOOL top, HeapID heapId) {
     icon->screen = top ? WM_ICON_SCREEN_TOP : WM_ICON_SCREEN_BOTTOM;
     icon->subOam = TRUE;
-    func_0203e6cc(func_0203e5ac(icon), icon->type, heapId);
+    WmIcon_LoadGraphics(WmIcon_GetEngineOfIcon(icon), icon->type, heapId);
 }
 
 static u32 getObjBank(u32 engine) {
@@ -184,14 +184,14 @@ static u32 getObjBank(u32 engine) {
     return 0;
 }
 
-static void func_0203e6cc(u32 engine, u32 type, HeapID heapId) {
+static void WmIcon_LoadGraphics(u32 engine, u32 type, HeapID heapId) {
     u32 obj;
     ArcTool *arc;
     WmIconFiles files;
     u32 pltt;
 
     arc = GFL_ArcSysCreateFileHandle(getWifiIconNarcIdxNum(), HEAPID_TAIL(heapId));
-    func_020116b0(&files);
+    WmIconFiles_Init(&files);
     if (engine == 1) {
         pltt = 1;
         obj = 0;
@@ -209,7 +209,7 @@ static void copyEmptyOAM(void) {
     GXS_LoadOAM(sEmptyOam, 0, sizeof(sEmptyOam));
 }
 
-void func_0203e76c(u32 x, u32 y, u32 type, HeapID heapId) {
+void WmIcon_Create(u32 x, u32 y, u32 type, HeapID heapId) {
     copyEmptyOAM();
     if (sWmIcon.icon != NULL) {
         u32 screen;
@@ -219,64 +219,64 @@ void func_0203e76c(u32 x, u32 y, u32 type, HeapID heapId) {
         subOam = sWmIcon.icon->subOam;
         screen = sWmIcon.icon->screen;
         level = sWmIcon.icon->level;
-        func_0203e7dc();
+        WmIcon_Delete();
         sWmIcon.icon = loadWifiStrengthIcons(0, heapId, x, y, type, sWmIcon.icon, screen, subOam, level);
     } else {
         sWmIcon.icon = loadWifiStrengthIcons(0, heapId, x, y, type, sWmIcon.icon, sWmIcon.screen, FALSE, 3);
     }
 }
 
-void func_0203e7dc(void) {
+void WmIcon_Delete(void) {
     copyEmptyOAM();
     if (sWmIcon.icon != NULL) {
-        func_0203e664(sWmIcon.icon);
+        WmIcon_Free(sWmIcon.icon);
         sWmIcon.icon = NULL;
     }
 }
 
-void func_0203e7f8(int level) {
+void WmIcon_SetStrength(int level) {
     if (sWmIcon.icon != NULL) {
-        func_0203e65c(sWmIcon.icon, level);
+        WmIcon_SetLevel(sWmIcon.icon, level);
     }
 }
 
-void func_0203e810(BOOL top, HeapID heapId) {
-    func_0203e890(top ? WM_ICON_SCREEN_TOP : WM_ICON_SCREEN_BOTTOM);
+void WmIcon_SetScreen(BOOL top, HeapID heapId) {
+    WmIcon_SetDefaultScreen(top ? WM_ICON_SCREEN_TOP : WM_ICON_SCREEN_BOTTOM);
     if (sWmIcon.icon != NULL) {
-        func_0203e694(sWmIcon.icon, top, heapId);
+        WmIcon_MoveIcon(sWmIcon.icon, top, heapId);
     }
 }
 
-void func_0203e838(void) {
+void WmIcon_Update(void) {
     if (sWmIcon.icon != NULL) {
-        func_0203e520(sWmIcon.icon);
+        WmIcon_WriteOam(sWmIcon.icon);
     }
 }
 
-void func_0203e84c(void) {
+void WmIcon_Show(void) {
     if (sWmIcon.icon != NULL) {
         sWmIcon.icon->visible = TRUE;
     }
 }
 
-void func_0203e860(void) {
+void WmIcon_Hide(void) {
     if (sWmIcon.icon != NULL) {
         sWmIcon.icon->visible = FALSE;
     }
 }
 
-void func_0203e874(u16 x, u16 y) {
+void WmIcon_SetPos(u16 x, u16 y) {
     sWmIcon.x = x;
     sWmIcon.y = y;
 }
 
-static void func_0203e890(u32 screen) {
+static void WmIcon_SetDefaultScreen(u32 screen) {
     sWmIcon.screen = screen;
 }
 
-u32 func_0203e8b0(void) {
+u32 WmIcon_GetEngine(void) {
     if (sWmIcon.icon != NULL) {
-        return func_0203e5ac(sWmIcon.icon);
+        return WmIcon_GetEngineOfIcon(sWmIcon.icon);
     }
     return 1;
 }

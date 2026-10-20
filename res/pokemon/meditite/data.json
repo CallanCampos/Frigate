@@ -1,0 +1,205 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Meditite",
+    "pokedex": {
+        "category": "Meditate Pokémon",
+        "entry": "It always trains deep in mountains.\nIt levitates when it heightens its\nspiritual power through meditation.",
+        "height": "2'00\"",
+        "weight": "24.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Meditite",
+                "category": "Meditate Pokémon",
+                "entry": "It always trains deep in mountains.\nIt levitates when it heightens its\nspiritual power through meditation.",
+                "height": "2'00\"",
+                "weight": "24.7 lbs."
+            },
+            "fr": {
+                "name": "Méditikka",
+                "category": "Pokémon Méditation",
+                "entry": "Son entraînement d'ermite lui\npermet de léviter par le seul\npouvoir de la méditation.",
+                "height": "0,6 m",
+                "weight": "11,2 kg"
+            },
+            "de": {
+                "name": "Meditie",
+                "category": "Meditation",
+                "entry": "Trainiert tief in den Bergen. Erhöht\nes seine spirituelle Kraft durch\nMeditation, kann es schweben.",
+                "height": "0,6 m",
+                "weight": "11,2 kg"
+            },
+            "it": {
+                "name": "Meditite",
+                "category": "Pokémon Meditazione",
+                "entry": "Si allena in montagna per elevare il suo\npotere spirituale. Con la meditazione\nriesce a levitare.",
+                "height": "0,6 m",
+                "weight": "11,2 kg"
+            },
+            "ko": {
+                "name": "요가랑",
+                "category": "명상포켓몬",
+                "entry": "평상시는 깊은 산속에서 수행한다.\n명상을 하고 정신력을\n높이면 몸이 떠오른다.",
+                "height": "0.6 m",
+                "weight": "11.2 kg"
+            },
+            "es": {
+                "name": "Meditite",
+                "category": "Pokémon Meditador",
+                "entry": "Se entrena en la profundidad de las\nmontañas. Cuando aumenta su poder\nespiritual con meditación, levita.",
+                "height": "0,6 m",
+                "weight": "11,2 kg"
+            },
+            "ja": {
+                "name": "アサナン",
+                "category": "めいそうポケモン",
+                "entry": "いつもは\\x{3000}やまおくで\\x{3000}しゅぎょう。\nめいそうをして\\x{3000}せいしんりょくを\nたかめると\\x{3000}からだが\\x{3000}うかびあがる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 40,
+        "defense": 55,
+        "speed": 60,
+        "special_attack": 40,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_FIGHTING", "TYPE_PSYCHIC" ],
+    "catch_rate": 180,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_PURE_POWER", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 56,
+    "height": 6,
+    "weight": 112,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BIDE" ],
+            [ 4, "MOVE_MEDITATE" ],
+            [ 8, "MOVE_CONFUSION" ],
+            [ 11, "MOVE_DETECT" ],
+            [ 15, "MOVE_HIDDEN_POWER" ],
+            [ 18, "MOVE_MIND_READER" ],
+            [ 22, "MOVE_FEINT" ],
+            [ 25, "MOVE_CALM_MIND" ],
+            [ 29, "MOVE_FORCE_PALM" ],
+            [ 32, "MOVE_HI_JUMP_KICK" ],
+            [ 36, "MOVE_PSYCH_UP" ],
+            [ 39, "MOVE_ACUPRESSURE" ],
+            [ 43, "MOVE_POWER_TRICK" ],
+            [ 46, "MOVE_REVERSAL" ],
+            [ 50, "MOVE_RECOVER" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM67",
+            "TM70",
+            "TM77",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FIRE_PUNCH",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_FORESIGHT",
+            "MOVE_FAKE_OUT",
+            "MOVE_BATON_PASS",
+            "MOVE_DYNAMIC_PUNCH",
+            "MOVE_POWER_SWAP",
+            "MOVE_GUARD_SWAP",
+            "MOVE_PSYCHO_CUT",
+            "MOVE_BULLET_PUNCH",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_SECRET_POWER"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 37,
+            "species": "SPECIES_MEDICHAM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MEDITITE",
+    "cry_volume": 120
+}

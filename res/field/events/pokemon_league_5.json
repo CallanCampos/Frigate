@@ -1,0 +1,99 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_93",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 15,
+                "z": 7,
+                "y": 786432
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_POKEMON_LEAGUE_2",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 232,
+                "y": 0,
+                "z": 488,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 5,
+            "var": "EVENT_WORK_0x4000",
+            "value": 0,
+            "type": 0,
+            "grid": {
+                "x": 15,
+                "z": 29,
+                "width": 1,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        },
+        {
+            "script": 7,
+            "var": "EVENT_WORK_0x400a",
+            "value": 555,
+            "type": 0,
+            "grid": {
+                "x": 18,
+                "z": 5,
+                "width": 1,
+                "height": 1,
+                "y": 192
+            },
+            "unk14": 0
+        },
+        {
+            "script": 6,
+            "var": "EVENT_WORK_0x4001",
+            "value": 0,
+            "type": 0,
+            "rail": {
+                "component": 0,
+                "front": 1,
+                "side": -1,
+                "front_span": 1,
+                "side_span": 3
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": [
+        {
+            "type": 2,
+            "script": 1
+        },
+        {
+            "type": 4,
+            "script": 2
+        },
+        {
+            "type": 3,
+            "script": 3
+        }
+    ]
+}

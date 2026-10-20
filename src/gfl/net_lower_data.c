@@ -47,10 +47,10 @@ typedef struct {
 
 static NetLdataWork *netLdataWork;
 
-static BOOL func_02043c1c(int size);
-static BOOL func_02043d10(int type);
+static BOOL NetLdata_SendPiece(int size);
+static BOOL NetLdata_SendHeader(int type);
 
-void func_02043868(HeapID heapId, BOOL a1) {
+void NetLdata_Init(HeapID heapId, BOOL a1) {
     u8 i;
 
     GFL_ASSERT(netLdataWork == NULL);
@@ -68,7 +68,7 @@ void func_02043868(HeapID heapId, BOOL a1) {
     }
 }
 
-void func_020438dc(void) {
+void NetLdata_Exit(void) {
     u8 i;
 
     GFL_ASSERT(netLdataWork != NULL);
@@ -84,7 +84,7 @@ void func_020438dc(void) {
     netLdataWork = NULL;
 }
 
-void func_0204393c(void *data, u32 size, int dest, BOOL fromServer) {
+void NetLdata_StartSend(void *data, u32 size, int dest, BOOL fromServer) {
     GFL_ASSERT(netLdataWork != NULL);
     GFL_ASSERT(netLdataWork->sendData == NULL);
     netLdataWork->sendData = data;
@@ -96,7 +96,7 @@ void func_0204393c(void *data, u32 size, int dest, BOOL fromServer) {
     netLdataWork->sendDone = FALSE;
 }
 
-void func_020439a4(u32 bufferSize, int netId, HeapID heapId, void *buffer) {
+void NetLdata_SetRecvBuffer(u32 bufferSize, int netId, HeapID heapId, void *buffer) {
     GFL_ASSERT(netLdataWork != NULL);
     GFL_ASSERT(netLdataWork->postWork[netId] == NULL);
     netLdataWork->postWork[netId] = GFL_HeapAllocate(heapId, sizeof(NetLdataPost), TRUE, "net_lower_data.c", 210);
@@ -105,7 +105,7 @@ void func_020439a4(u32 bufferSize, int netId, HeapID heapId, void *buffer) {
     netLdataWork->postWork[netId]->allocated = FALSE;
 }
 
-void func_02043a1c(int netId) {
+void NetLdata_FreeRecvBuffer(int netId) {
     GFL_ASSERT(netLdataWork != NULL);
     GFL_ASSERT(netLdataWork->postWork[netId] != NULL);
     if (netLdataWork->postWork[netId]->allocated == TRUE) {
@@ -115,56 +115,56 @@ void func_02043a1c(int netId) {
     netLdataWork->postWork[netId] = NULL;
 }
 
-void *func_02043a80(int netId) {
+void *NetLdata_GetRecvBuffer(int netId) {
     GFL_ASSERT(netLdataWork != NULL);
     GFL_ASSERT(netLdataWork->postWork[netId] != NULL);
     return netLdataWork->postWork[netId]->buffer;
 }
 
-u32 func_02043ac8(int netId) {
+u32 NetLdata_GetRecvSize(int netId) {
     GFL_ASSERT(netLdataWork != NULL);
     GFL_ASSERT(netLdataWork->postWork[netId] != NULL);
     return netLdataWork->postWork[netId]->recvSize;
 }
 
-BOOL func_02043b10(void) {
+BOOL NetLdata_IsSendDone(void) {
     if (netLdataWork == NULL) {
         return FALSE;
     }
     return netLdataWork->sendDone;
 }
 
-BOOL func_02043b24(int netId) {
+BOOL NetLdata_IsRecvDone(int netId) {
     if (netLdataWork == NULL || netLdataWork->postWork[netId] == NULL) {
         return FALSE;
     }
     return netLdataWork->postWork[netId]->done;
 }
 
-void func_02043b44(void) {
-    if (netLdataWork == NULL || netLdataWork->sendData == NULL || func_02042788() != TRUE) {
+void NetLdata_Update(void) {
+    if (netLdataWork == NULL || netLdataWork->sendData == NULL || GFL_NetIsInitialized() != TRUE) {
         return;
     }
     if (netLdataWork->sendStart == TRUE) {
-        if (func_02043d10(NET_LDATA_HEADER_START) == TRUE) {
+        if (NetLdata_SendHeader(NET_LDATA_HEADER_START) == TRUE) {
             netLdataWork->sendStart = FALSE;
         }
     } else if (netLdataWork->sentSize < netLdataWork->sendSize) {
         if (netLdataWork->unk3C == TRUE) {
-            GFLNetInitData *ini = func_02042e84();
+            GFLNetInitData *ini = GFL_NetGetInitData();
             int size;
 
             // What fits in the packet after what is already queued
             if (netLdataWork->fromServer == TRUE) {
-                size = ini->unk6C - func_0203fbcc() - 16;
+                size = ini->unk6C - NetSystem_GetMPRingUsed() - 16;
             } else {
-                size = ini->maxSendSize - func_0203fbb8() - 16;
+                size = ini->maxSendSize - NetSystem_GetSendRingUsed() - 16;
             }
             if (size > 16) {
                 if (netLdataWork->sentSize + size > netLdataWork->sendSize) {
                     size = netLdataWork->sendSize - netLdataWork->sentSize;
                 }
-                if (func_02043c1c(size) == TRUE) {
+                if (NetLdata_SendPiece(size) == TRUE) {
                     netLdataWork->sentSize += size;
                     if (netLdataWork->unk38 == TRUE) {
                         netLdataWork->unk3C = FALSE;
@@ -173,38 +173,38 @@ void func_02043b44(void) {
             }
         }
     } else if (netLdataWork->sendDone == FALSE) {
-        if (func_02043d10(NET_LDATA_HEADER_END) == TRUE) {
+        if (NetLdata_SendHeader(NET_LDATA_HEADER_END) == TRUE) {
             netLdataWork->sendDone = TRUE;
             netLdataWork->sendData = NULL;
         }
     }
     if (netLdataWork->unk40 == TRUE) {
-        if (func_02043d10(NET_LDATA_HEADER_2) == TRUE) {
+        if (NetLdata_SendHeader(NET_LDATA_HEADER_2) == TRUE) {
             netLdataWork->unk40 = FALSE;
         }
     }
 }
 
-static BOOL func_02043c1c(int size) {
+static BOOL NetLdata_SendPiece(int size) {
     void *data = (u8 *)netLdataWork->sendData + netLdataWork->sentSize;
     NetHandle *handle;
 
     if (netLdataWork->fromServer == TRUE) {
-        handle = func_02040414(GFL_NET_NETID_SERVER);
+        handle = NetHandle_Get(GFL_NET_NETID_SERVER);
     } else {
-        handle = func_02040440();
+        handle = NetHandle_GetOwn();
     }
-    return func_02042c9c(handle, netLdataWork->dest, 14, size, data, 0, TRUE, TRUE);
+    return GFL_NetSendCommandToBits(handle, netLdataWork->dest, 14, size, data, 0, TRUE, TRUE);
 }
 
-void *func_02043c64(int netId, void *work, int size) {
+void *NetLdata_GetRecvPtr(int netId, void *work, int size) {
     GFLNetInitData *ini;
 
     if (netId == GFL_NET_NETID_SERVER) {
         netId = 0;
     }
     if (netLdataWork != NULL && netLdataWork->postWork[netId] != NULL) {
-        ini = func_02042e84();
+        ini = GFL_NetGetInitData();
         if (netLdataWork == NULL || netLdataWork->postWork[netId] == NULL) {
             return NULL;
         }
@@ -213,7 +213,7 @@ void *func_02043c64(int netId, void *work, int size) {
     return NULL;
 }
 
-void func_02043ca0(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetLdata_RecvData(int netId, int size, const void *data, void *work, NetHandle *handle) {
     GFLNetInitData *ini;
 
     if (netId == GFL_NET_NETID_SERVER) {
@@ -222,34 +222,34 @@ void func_02043ca0(int netId, int size, const void *data, void *work, NetHandle 
     if (netLdataWork == NULL || netLdataWork->postWork[netId] == NULL) {
         return;
     }
-    ini = func_02042e84();
+    ini = GFL_NetGetInitData();
     if (netLdataWork == NULL || netLdataWork->postWork[netId] == NULL) {
         return;
     }
-    if (handle != func_02040440() && !ini->bMPMode) {
+    if (handle != NetHandle_GetOwn() && !ini->bMPMode) {
         return;
     }
     netLdataWork->postWork[netId]->recvSize += size;
-    if (netLdataWork->unk38 == TRUE && netId != func_02042a6c(func_02040440())) {
+    if (netLdataWork->unk38 == TRUE && netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         netLdataWork->unk40 = TRUE;
     }
 }
 
-static BOOL func_02043d10(int type) {
+static BOOL NetLdata_SendHeader(int type) {
     NetHandle *handle;
     NetLdataHeader header;
 
     if (netLdataWork->fromServer == TRUE) {
-        handle = func_02040414(GFL_NET_NETID_SERVER);
+        handle = NetHandle_Get(GFL_NET_NETID_SERVER);
     } else {
-        handle = func_02040440();
+        handle = NetHandle_GetOwn();
     }
     header.type = type;
     header.size = netLdataWork->sendSize;
-    return func_02042c9c(handle, netLdataWork->dest, 15, sizeof(NetLdataHeader), &header, 0, TRUE, FALSE);
+    return GFL_NetSendCommandToBits(handle, netLdataWork->dest, 15, sizeof(NetLdataHeader), &header, 0, TRUE, FALSE);
 }
 
-void func_02043d6c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetLdata_RecvHeader(int netId, int size, const void *data, void *work, NetHandle *handle) {
     NetLdataHeader *header = data;
     GFLNetInitData *ini;
 
@@ -259,11 +259,11 @@ void func_02043d6c(int netId, int size, const void *data, void *work, NetHandle 
     if (netLdataWork == NULL || netLdataWork->postWork[netId] == NULL) {
         return;
     }
-    ini = func_02042e84();
+    ini = GFL_NetGetInitData();
     if (netLdataWork == NULL || netLdataWork->postWork[netId] == NULL) {
         return;
     }
-    if (handle != func_02040440() && !ini->bMPMode) {
+    if (handle != NetHandle_GetOwn() && !ini->bMPMode) {
         return;
     }
     switch (header->type) {
@@ -282,7 +282,7 @@ void func_02043d6c(int netId, int size, const void *data, void *work, NetHandle 
         }
         break;
     case NET_LDATA_HEADER_2:
-        if (netId != func_02042a6c(func_02040440())) {
+        if (netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
             netLdataWork->unk3C = TRUE;
         }
         break;

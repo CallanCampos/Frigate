@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_THROH",
+    "moves": [ "MOVE_EARTHQUAKE", "MOVE_STORM_THROW", "MOVE_PAYBACK", "MOVE_ROCK_SLIDE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_EXPERT_BELT",
+    "form": 0
+}

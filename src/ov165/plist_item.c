@@ -301,7 +301,7 @@ u32 PokeList_ShowItemResult(PokeListWork *wk, u32 move) {
         PokeListMessage_FreeWordSet(wk, wk->message);
         name = GFL_StrBufCreate(12, wk->heapId);
         PokeParty_GetParam(wk->pkm, PKM_PARAM_NICKNAME, name);
-        func_0202d2c8(name);
+        GameBeaconSys_SendNickname(name);
         GFL_StrBufFree(name);
         for (i = 0; i < 6; i++) {
             wk->prevStats[i] = PokeParty_GetParam(wk->pkm, sStatParams[i], NULL);
@@ -452,7 +452,7 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
                 bigGain = TRUE;
             }
             name = GFL_MsgDataLoadStrbufNew(wk->msgData, 0xa1 + i);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), 0, i * 16, name, wk->font, 0x440);
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), 0, i * 16, name, wk->font, 0x440);
             GFL_StrBufFree(name);
             format = GFL_MsgDataLoadStrbufNew(wk->msgData, 0xa8);
             str = GFL_StrBufCreate(32, wk->heapId);
@@ -460,7 +460,8 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
             WordSetNumber(wordSet, 0, gain, 3, 0, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, str, format);
             width = GFL_FontGetBlockWidth(str, wk->font, 0);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), 104 - width, i * 16, str, wk->font, 0x440);
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), 104 - width, i * 16, str, wk->font,
+                                  0x440);
             GFL_StrBufFree(format);
             GFL_StrBufFree(str);
             GFL_WordSetSystemFree(wordSet);
@@ -469,21 +470,22 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
             u8 x = bigGain == TRUE ? 72 : 80;
             StrBuf *plus = GFL_MsgDataLoadStrbufNew(wk->msgData, 0xa7);
 
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), x, row * 16, plus, wk->font, 0x440);
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), x, row * 16, plus, wk->font,
+                                  0x440);
             GFL_StrBufFree(plus);
         }
         wk->subState = 1;
         break;
     }
     case 1:
-        if (func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow)) == FALSE) {
+        if (PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow)) == FALSE) {
             BmpWin_Transfer(wk->statsWindow);
             wk->subState = 2;
         }
         break;
     case 2:
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) ||
-            func_0203da48() == TRUE) {
+            GFL_HIDIsTouchPressed() == TRUE) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             wk->subState = 3;
         }
@@ -502,7 +504,8 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
             WordSetNumber(wordSet, 0, stat, 3, 0, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, str, format);
             width = GFL_FontGetBlockWidth(str, wk->font, 0);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), 104 - width, i * 16, str, wk->font, 0x440);
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow), 104 - width, i * 16, str, wk->font,
+                                  0x440);
             GFL_StrBufFree(format);
             GFL_StrBufFree(str);
             GFL_WordSetSystemFree(wordSet);
@@ -511,14 +514,14 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
         break;
     }
     case 4:
-        if (func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow)) == FALSE) {
+        if (PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->statsWindow)) == FALSE) {
             BmpWin_Transfer(wk->statsWindow);
             wk->subState = 5;
         }
         break;
     case 5:
         if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) ||
-            func_0203da48() == TRUE) {
+            GFL_HIDIsTouchPressed() == TRUE) {
             wk->subState = 6;
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             BmpWin_ClearScreen(wk->statsWindow);

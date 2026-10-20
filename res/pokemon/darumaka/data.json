@@ -1,0 +1,145 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Darumaka",
+    "pokedex": {
+        "category": "Zen Charm Pokémon",
+        "entry": "When it sleeps, it pulls its limbs\ninto its body and its internal fire\ngoes down to 1,100° F.",
+        "height": "2'00\"",
+        "weight": "82.7 lbs.",
+        "languages": {
+            "ja": {
+                "category": "だるまポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 90,
+        "defense": 45,
+        "speed": 50,
+        "special_attack": 15,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_RAWST_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_HUSTLE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_INNER_FOCUS",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 63,
+    "height": 6,
+    "weight": 375,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 3, "MOVE_ROLLOUT" ],
+            [ 6, "MOVE_INCINERATE" ],
+            [ 9, "MOVE_RAGE" ],
+            [ 11, "MOVE_FIRE_FANG" ],
+            [ 14, "MOVE_HEADBUTT" ],
+            [ 17, "MOVE_UPROAR" ],
+            [ 19, "MOVE_FACADE" ],
+            [ 22, "MOVE_FIRE_PUNCH" ],
+            [ 25, "MOVE_WORK_UP" ],
+            [ 27, "MOVE_THRASH" ],
+            [ 30, "MOVE_BELLY_DRUM" ],
+            [ 33, "MOVE_FLARE_BLITZ" ],
+            [ 35, "MOVE_TAUNT" ],
+            [ 39, "MOVE_SUPERPOWER" ],
+            [ 42, "MOVE_OVERHEAT" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM74",
+            "TM80",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_SUPERPOWER",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_SLEEP_TALK",
+            "MOVE_FOCUS_PUNCH",
+            "MOVE_FOCUS_ENERGY",
+            "MOVE_ENDURE",
+            "MOVE_HAMMER_ARM",
+            "MOVE_TAKE_DOWN",
+            "MOVE_FLAME_WHEEL",
+            "MOVE_ENCORE",
+            "MOVE_YAWN"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 35,
+            "species": "SPECIES_DARMANITAN"
+        }
+    ],
+    "regional_dex_number": 102,
+    "baby_species": "SPECIES_DARUMAKA",
+    "cry_volume": 120
+}

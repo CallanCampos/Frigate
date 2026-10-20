@@ -88,17 +88,17 @@ PStaOamActor *PStaOam_CreateActor(PStaOam *oam, const PStaOamSetup *setup) {
     for (row = 0; row < rows; row++) {
         for (col = 0; col < cols; col++) {
             mapping = PStaOam_LoadCellAnims(oam, setup->vramType, arc);
-            actor->chars[row * cols + col] = func_0204b81c(arc, 9, FALSE, setup->vramType, oam->heapId);
+            actor->chars[row * cols + col] = ClActSys_LoadChars(arc, 9, FALSE, setup->vramType, oam->heapId);
             actorSetup.x = setup->x + col * OAM_CELL_WIDTH;
             actorSetup.y = setup->y + row * OAM_CELL_HEIGHT;
             actorSetup.priority = setup->priority;
             actorSetup.bgPriority = setup->bgPriority;
             actor->actors[row * cols + col] =
-                func_0204c040(oam->unit, actor->chars[row * cols + col], setup->palette, oam->cellAnims[mapping],
-                              &actorSetup, setup->surface, oam->heapId);
+                ClActor_Create(oam->unit, actor->chars[row * cols + col], setup->palette, oam->cellAnims[mapping],
+                               &actorSetup, setup->surface, oam->heapId);
             // The palette is set on the actor of the column in the first row, whatever the row. Every bitmap of the
             // summary screen is one row tall, so it is the same actor, and a second row would overflow the arrays
-            func_0204c378(actor->actors[col], (u8)setup->paletteOffset, 0);
+            ClActor_SetPalette(actor->actors[col], (u8)setup->paletteOffset, 0);
         }
     }
     GFL_ArcToolFree(arc);
@@ -111,8 +111,8 @@ void PStaOam_FreeActor(PStaOamActor *actor) {
 
     for (row = 0; row < actor->rows; row++) {
         for (col = 0; col < actor->cols; col++) {
-            func_0204b98c(actor->chars[row * actor->cols + col]);
-            func_0204c108(actor->actors[row * actor->cols + col]);
+            ClActSys_FreeChars(actor->chars[row * actor->cols + col]);
+            ClActor_Delete(actor->actors[row * actor->cols + col]);
         }
     }
     GFL_HeapFree(actor);
@@ -124,7 +124,7 @@ void PStaOam_SetVisible(PStaOamActor *actor, BOOL visible) {
 
     for (row = 0; row < actor->rows; row++) {
         for (col = 0; col < actor->cols; col++) {
-            func_0204c124(actor->actors[row * actor->cols + col], visible);
+            ClActor_SetVisible(actor->actors[row * actor->cols + col], visible);
         }
     }
 }
@@ -162,7 +162,7 @@ void PStaOam_Upload(PStaOamActor *actor) {
             } else {
                 size = CELL_LINE_SIZE;
             }
-            dest = func_0204bb80(actor->chars[row * actor->cols + col], actor->vramType);
+            dest = ClActSys_GetCharVramAddr(actor->chars[row * actor->cols + col], actor->vramType);
             for (line = 0; line < CELL_LINES; line++) {
                 if (row != actor->rows - 1 || lastLines == 0 || line < lastLines) {
                     upload(pixels + (offset + line * (tileCols * 32)), dest, size);
@@ -184,7 +184,7 @@ void PStaOam_SetPosition(PStaOamActor *actor, s16 x, s16 y) {
         for (col = 0; col < actor->cols; col++) {
             pos.x = x + col * OAM_CELL_WIDTH;
             pos.y = y + row * OAM_CELL_HEIGHT;
-            func_0204c140(actor->actors[row * actor->cols + col], &pos, actor->surface);
+            ClActor_SetSurfacePos(actor->actors[row * actor->cols + col], &pos, actor->surface);
         }
     }
 }
@@ -222,7 +222,7 @@ static u32 PStaOam_LoadCellAnims(PStaOam *oam, u32 vramType, ArcTool *arc) {
     if (oam->cellAnims[mapping] != CELL_ANIMS_NONE) {
         return mapping;
     }
-    oam->cellAnims[mapping] = func_0204bde0(arc, 79, 130, oam->heapId);
+    oam->cellAnims[mapping] = ClActSys_LoadCellAnims(arc, 79, 130, oam->heapId);
     return mapping;
 }
 
@@ -231,7 +231,7 @@ static void PStaOam_FreeCellAnims(PStaOam *oam) {
 
     for (i = 0; i < CELL_MAPPING_COUNT; i++) {
         if (oam->cellAnims[i] != CELL_ANIMS_NONE) {
-            func_0204be64(oam->cellAnims[i]);
+            ClActSys_FreeCellAnims(oam->cellAnims[i]);
             oam->cellAnims[i] = CELL_ANIMS_NONE;
         }
     }

@@ -214,7 +214,7 @@ static void Sandstorm_AddGrains(WeatherTask *task, int count, HeapID heapId) {
             size = 4;
             grain->speedY += grain->speedY / 2;
         }
-        func_0204c504(actor, size);
+        ClActor_SetAnimFrame(actor, size);
         pos.x = -6 - GFL_RandomLC(24);
         pos.y = GFL_RandomLC(192) - 64;
         func_ov036_02199c80(obj, &pos);

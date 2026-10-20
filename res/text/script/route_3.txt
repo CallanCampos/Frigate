@@ -1,0 +1,19 @@
+Route3_Text_HeeeyComeHere = Heeey, {0100:0}!\nCome here!{be01}
+Route3_Text_HeeeyComeHere_2 = Heeey, {0100:0}!\nCome here!{be01}
+Route3_Text_PokemonHaveBeenSince = My Pokémon have been with me\nsince I was little!{be01}\nThey are always just\nraring to battle!
+Route3_Text_KnowHowManyPeople = You know how many people use\nProtect or Detect in Double Battles?{be00}\nThat's the time to use Feint!
+Route3_Text_PokemonTrainerHavePokemon = Pokémon Trainer!\nDo you have a Pokémon Egg?
+Route3_Text_WowItsPokemonEgg = Wow! It's a Pokémon Egg!\nIt feels sort of warm!{be00}\nA Pokémon will hatch from this, right?
+Route3_Text_TeacherSaysLiesLead = Teacher says that\nlies lead to a life of crime!
+Route3_Text_AwwOldGuyNext = Aww...{be01}\nThe old guy next door said he didn't\nknow when they'd find another Egg...{be01}\nBut I really want to see one!
+Route3_Text_SometimesTheyLetBig = Sometimes they let my big brother\nplay together with Pokémon, too!
+Route3_Text_DontHaveBicycleCan = Don't you have a Bicycle?\nCan you even ride one?
+Route3_Text_GoGoPeopleWho = Go! Go! People who ride Bicycles\nare so cool!
+Route3_Text_HeyComeShowHabitat = Hey! Come on!\nShow me your Habitat List!{be01}\nI want to see all of Route 3's Pokémon!\nThe ones in the tall grass, the ones{be00}\nyou fish for, and the ones on the water!{be01}
+Route3_Text_IfFillUpHabitat = If you fill up the Habitat List,\nI'd like you to tell me!{be01}\nI want to see all of Route 3's Pokémon!\nThe ones in the tall grass, the ones{be00}\nyou fish for, and the ones on the water.{be00}\nGot it?
+Route3_Text_OhReallyNeverKnew = Oh... Really?{be01}\nI never knew there were this\nmany Pokémon on Route 3!{be01}\nPokémon Trainer, that's amazing!\nI'm so moved, I'll give you this!{be01}
+Route3_Text_PokemonTrainersSureGood = Pokémon Trainers sure\nare good at meeting Pokémon.
+Route3_Text_Route3 = Route 3
+Route3_Text_TrainerTipsTapYellow = Trainer Tips!\n{be01}\nTap the yellow button at the top of a\nPC Box to switch to Group Move mode.{be01}\nIt lets you move groups\nof Pokémon in your PC Boxes.
+Route3_Text_PokemonDayCareWe = Pokémon Day Care\nWe Take Care of Your Precious Pokémon
+\pad{a8}

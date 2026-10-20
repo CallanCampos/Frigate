@@ -1,9 +1,13 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
+#include "field/field_water_current.h"
 #include "gfl/sound.h"
 #include "system/game_event.h"
 
@@ -33,9 +37,9 @@ typedef struct EventWaterCurrentMove {
 
 const WaterCurrentTile *GetWaterCurrentTileConfig(u32 tileClass);
 BOOL IsTileWaterCurrent_(u32 tileClass);
-const WaterCurrentTileAcmd *func_ov036_021c24f0(u32 tileClass);
-u16 func_ov036_021c2610(EventWaterCurrentMove *work);
-u16 func_ov036_021c2620(EventWaterCurrentMove *work);
+const WaterCurrentTileAcmd *GetWaterCurrentFlowTileConfig(u32 tileClass);
+u16 WaterCurrent_GetTileAcmd(EventWaterCurrentMove *work);
+u16 WaterCurrent_GetFlowAcmd(EventWaterCurrentMove *work);
 void func_ov036_021c2714(EventWaterCurrentMove *work);
 void func_ov036_021c2734(EventWaterCurrentMove *work);
 
@@ -71,7 +75,7 @@ BOOL IsTileWaterCurrent_(u32 tileClass) {
     return FALSE;
 }
 
-const WaterCurrentTileAcmd *func_ov036_021c24f0(u32 tileClass) {
+const WaterCurrentTileAcmd *GetWaterCurrentFlowTileConfig(u32 tileClass) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
@@ -82,10 +86,8 @@ const WaterCurrentTileAcmd *func_ov036_021c24f0(u32 tileClass) {
     return NULL;
 }
 
-u16 func_ov036_021c2630(EventWaterCurrentMove *work);
+u16 WaterCurrent_GetTileClass(EventWaterCurrentMove *work);
 GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data);
-GameEvent *EventWaterCurrentMove_Create(GameEvent *parent, GameSystem *gsys, Field *field);
-BOOL IsTileWaterCurrent(u32 tileClass);
 void func_ov036_021c2750(EventWaterCurrentMove *work);
 void func_ov036_021c268c(EventWaterCurrentMove *work);
 void func_ov036_021c26dc(EventWaterCurrentMove *work);
@@ -99,17 +101,17 @@ GameEventReturnCode func_ov036_021c2514(GameEvent *event, u32 *state, void *data
 
     switch (*state) {
     case 0:
-        if (!IsTileWaterCurrent_(func_ov036_021c2630(work))) {
+        if (!IsTileWaterCurrent_(WaterCurrent_GetTileClass(work))) {
             *state = 2;
         } else {
-            func_ov036_021a4514((FieldEffectTask *)func_ov036_0219a5c4(work->player), FALSE);
+            func_ov036_021a4514(func_ov036_0219a5c4(work->player), FALSE);
             func_ov036_021c2750(work);
             *state = 1;
         }
         break;
     case 1:
         func_ov036_021c2750(work);
-        if (func_ov012_02166ecc(work->actor)) {
+        if (FldAct_CheckAcmdEnd(work->actor)) {
             func_ov036_021c268c(work);
             func_ov036_021c26dc(work);
             func_ov036_021c26ec(work);
@@ -140,9 +142,9 @@ GameEvent *EventWaterCurrentMove_Create(GameEvent *parent, GameSystem *gsys, Fie
     work->tile = NULL;
     work->flowTile = NULL;
     work->flowing = FALSE;
-    work->flowPlayer = GFL_SndSeqGetPlayerIndex(0x55e);
-    work->endPlayer = GFL_SndSeqGetPlayerIndex(0x6e2);
-    work->loopPlayer = GFL_SndSeqGetPlayerIndex(0x768);
+    work->flowPlayer = GFL_SndSeqGetPlayerIndex(SEQ_SE_DANSA);
+    work->endPlayer = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_83);
+    work->loopPlayer = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_129);
     return event;
 }
 
@@ -150,21 +152,21 @@ BOOL IsTileWaterCurrent(u32 tileClass) {
     return IsTileWaterCurrent_(tileClass);
 }
 
-u16 func_ov036_021c2610(EventWaterCurrentMove *work) {
+u16 WaterCurrent_GetTileAcmd(EventWaterCurrentMove *work) {
     if (work->tile) {
         return work->tile->acmd;
     }
     return 0;
 }
 
-u16 func_ov036_021c2620(EventWaterCurrentMove *work) {
+u16 WaterCurrent_GetFlowAcmd(EventWaterCurrentMove *work) {
     if (work->flowTile) {
         return work->flowTile->acmd;
     }
     return 0;
 }
 
-u16 func_ov036_021c2630(EventWaterCurrentMove *work) {
+u16 WaterCurrent_GetTileClass(EventWaterCurrentMove *work) {
     VecFx32 pos;
 
     FieldPlayer_GetWPos(work->player, &pos);
@@ -173,11 +175,11 @@ u16 func_ov036_021c2630(EventWaterCurrentMove *work) {
 
 void func_ov036_021c2654(EventWaterCurrentMove *work) {
     if (work->flowTile) {
-        FldAct_SetAcmd(work->actor, func_ov036_021c2620(work));
+        FldAct_SetAcmd(work->actor, WaterCurrent_GetFlowAcmd(work));
         func_ov036_021c2714(work);
         work->flowing = TRUE;
     } else if (work->tile) {
-        FldAct_SetAcmd(work->actor, func_ov036_021c2610(work));
+        FldAct_SetAcmd(work->actor, WaterCurrent_GetTileAcmd(work));
     }
 }
 
@@ -199,34 +201,34 @@ void func_ov036_021c268c(EventWaterCurrentMove *work) {
 }
 
 void func_ov036_021c26dc(EventWaterCurrentMove *work) {
-    work->tile = GetWaterCurrentTileConfig(func_ov036_021c2630(work));
+    work->tile = GetWaterCurrentTileConfig(WaterCurrent_GetTileClass(work));
 }
 
 void func_ov036_021c26ec(EventWaterCurrentMove *work) {
-    work->flowTile = func_ov036_021c24f0(func_ov036_021c2630(work));
+    work->flowTile = GetWaterCurrentFlowTileConfig(WaterCurrent_GetTileClass(work));
 }
 
 void func_ov036_021c26fc(EventWaterCurrentMove *work) {
-    func_ov036_021a4514((FieldEffectTask *)func_ov036_0219a5c4(work->player), TRUE);
+    func_ov036_021a4514(func_ov036_0219a5c4(work->player), TRUE);
     func_ov036_0219ac0c(work->player);
 }
 
 void func_ov036_021c2714(EventWaterCurrentMove *work) {
     if (!func_02005cbc()) {
         GFL_SndPlayerStop(work->loopPlayer);
-        GFL_SEPlayKeepVol(0x55e, work->flowPlayer);
+        GFL_SEPlayKeepVol(SEQ_SE_DANSA, work->flowPlayer);
     }
 }
 
 void func_ov036_021c2734(EventWaterCurrentMove *work) {
     if (!func_02005cbc()) {
-        GFL_SEPlayKeepVol(0x6e2, work->endPlayer);
+        GFL_SEPlayKeepVol(SEQ_SE_FLD_83, work->endPlayer);
     }
 }
 
 void func_ov036_021c2750(EventWaterCurrentMove *work) {
     if (!func_02005cbc() && !work->flowing && !GFL_SndPlayerIsActive(work->loopPlayer)) {
-        GFL_SEPlayKeepVol(0x768, work->loopPlayer);
+        GFL_SEPlayKeepVol(SEQ_SE_FLD_129, work->loopPlayer);
     }
 }
 

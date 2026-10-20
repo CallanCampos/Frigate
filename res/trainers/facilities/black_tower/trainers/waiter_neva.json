@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Neva",
+    "class": "TRAINER_CLASS_WAITER",
+    "pokemon": [
+        "cleffa_1",
+        "lotad_1",
+        "burmy_1",
+        "togepi_1",
+        "hoppip_1",
+        "ledyba_1",
+        "gothita_1",
+        "duskull_1",
+        "baltoy_1",
+        "venonat_1",
+        "swablu_1",
+        "mime_jr_1",
+        "chikorita_1",
+        "seel_1",
+        "eevee_1",
+        "drowzee_1",
+        "spoink_1",
+        "tentacool_1",
+        "frillish_1",
+        "mantyke_1"
+    ]
+}

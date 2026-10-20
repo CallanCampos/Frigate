@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_RELICANTH",
+    "moves": [ "MOVE_ROCK_SLIDE", "MOVE_WATERFALL", "MOVE_ROCK_POLISH", "MOVE_YAWN" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_ROCK_GEM",
+    "form": 0
+}

@@ -5,6 +5,7 @@
 #include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/mystery_gift_pokemon.h"
 #include "field/pdw_postman.h"
@@ -166,8 +167,8 @@ PdwPostmanItem *func_ov033_02177bd4(GameData *gameData, HeapID heapId, DreamWorl
     i = 0;
     n = 0;
     for (; i < 20; i++) {
-        item = func_02009a18(dreamWorld, i);
-        quantity = func_02009a38(dreamWorld, i);
+        item = DreamWorldSave_GetItem(dreamWorld, i);
+        quantity = DreamWorldSave_GetItemCount(dreamWorld, i);
         if (item != 0 && BagSave_CheckAvailItemSpace(bag, item, quantity, heapId) == TRUE) {
             result[n].item = item;
             result[n].quantity = quantity;
@@ -186,10 +187,10 @@ void func_ov033_02177c48(GameData *gameData, HeapID heapId, DreamWorldSave *drea
 
     bag = GameData_GetBag(gameData);
     for (i = 0; i < 20; i++) {
-        item = func_02009a18(dreamWorld, i);
-        quantity = func_02009a38(dreamWorld, i);
+        item = DreamWorldSave_GetItem(dreamWorld, i);
+        quantity = DreamWorldSave_GetItemCount(dreamWorld, i);
         if (item != 0 && BagSave_AddItem(bag, item, quantity, heapId) == TRUE) {
-            func_02009a6c(dreamWorld, i);
+            DreamWorldSave_ClearItem(dreamWorld, i);
         }
     }
 }
@@ -205,8 +206,8 @@ u32 func_ov033_02177c8c(GameData *gameData, HeapID heapId, DreamWorldSave *dream
     i = 0;
     count = 0;
     for (; i < 20; i++) {
-        item = func_02009a18(dreamWorld, i);
-        quantity = func_02009a38(dreamWorld, i);
+        item = DreamWorldSave_GetItem(dreamWorld, i);
+        quantity = DreamWorldSave_GetItemCount(dreamWorld, i);
         if (item != 0 && BagSave_CheckAvailItemSpace(bag, item, quantity, heapId) == FALSE) {
             count++;
         }
@@ -225,8 +226,8 @@ u16 func_ov033_02177cd4(GameData *gameData, HeapID heapId, DreamWorldSave *dream
     i = 0;
     count = 0;
     for (; i < 20; i++) {
-        item = func_02009a18(dreamWorld, i);
-        quantity = func_02009a38(dreamWorld, i);
+        item = DreamWorldSave_GetItem(dreamWorld, i);
+        quantity = DreamWorldSave_GetItemCount(dreamWorld, i);
         if (item != 0 && BagSave_CheckAvailItemSpace(bag, item, quantity, heapId) == FALSE) {
             if (count == position) {
                 return item;
@@ -265,7 +266,7 @@ BOOL func_ov033_02177d78(VM *vm, FieldScriptEnv *env) {
     u8 kind = func_ov033_02178428(save);
 
     if (kind != sGiftHandlers[kind].kind) {
-        func_0200aa54(save);
+        MysteryGiftSave_Free(save);
         return FALSE;
     }
     switch (mode) {
@@ -307,7 +308,7 @@ BOOL func_ov033_02177d78(VM *vm, FieldScriptEnv *env) {
         *result = func_ov033_02177f84(kind, env, gameData, gift);
         break;
     }
-    func_0200aa54(save);
+    MysteryGiftSave_Free(save);
     return FALSE;
 }
 
@@ -446,7 +447,7 @@ PartyPkm *func_ov033_021780d8(FieldScriptEnv *env, MysteryGift *gift) {
 
     heapId = FieldScriptEnv_GetHeapID(env);
     gameData = FieldScriptEnv_GetGameData(env);
-    return func_ov012_02153160(gift, heapId, gameData);
+    return CreateMysteryGiftPokemon(gift, heapId, gameData);
 }
 
 BOOL doesPartyHaveSpace(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
@@ -625,7 +626,7 @@ u32 func_ov033_02178338(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env
     FieldScriptEnv_GetHeapID(env);
     value = func_ov033_021782d0(gift);
     copyVarForText(wordSet, 0, playerInfo);
-    func_02024868(wordSet, 1, value, 0);
+    WordSet_LoadFestivalMission(wordSet, 1, value, 0);
     return 12;
 }
 
@@ -641,13 +642,13 @@ u32 func_ov033_02178374(WordSet *wordSet, MysteryGift *gift, FieldScriptEnv *env
 }
 
 MysteryGift *func_ov033_021783a8(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
-    if (!func_0200a800(save, slot)) {
+    if (!MysteryGiftSave_IsSlotUsed(save, slot)) {
         return NULL;
     }
-    if (func_0200a820(save, slot) == TRUE) {
+    if (MysteryGiftSave_IsCardDelivered(save, slot) == TRUE) {
         return NULL;
     }
-    if (!func_0200a71c(save, slot, gift)) {
+    if (!MysteryGiftSave_GetCard(save, slot, gift)) {
         return NULL;
     }
     if (gift->kind == 0) {
@@ -672,7 +673,7 @@ MysteryGift *func_ov033_021783f8(MysteryGiftSave *save, u32 *slot, MysteryGift *
 }
 
 void func_ov033_02178420(MysteryGiftSave *save, u32 slot) {
-    func_0200a858(save, slot);
+    MysteryGiftSave_SetCardDelivered(save, slot);
 }
 
 u8 func_ov033_02178428(MysteryGiftSave *save) {

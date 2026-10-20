@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TENTACRUEL",
+    "moves": [ "MOVE_TOXIC_SPIKES", "MOVE_SCALD", "MOVE_GIGA_DRAIN", "MOVE_BARRIER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_APICOT_BERRY",
+    "form": 0
+}

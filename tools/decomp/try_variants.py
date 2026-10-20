@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from configure import MWCC_VERSION  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.compiler_probe import lib_compiler  # noqa: E402
+from tools.decomp.compiler_probe import probe_defaults  # noqa: E402
 
 
 def definition_span(source: str, name: str) -> tuple[int, int]:
@@ -36,10 +36,24 @@ def definition_span(source: str, name: str) -> tuple[int, int]:
     return match.start(), i
 
 
+DEFINITION_NAME = re.compile(r"^[A-Za-z][^\n;{}=]*?\b([A-Za-z_]\w*)\([^;{]*\)\s*\{", re.M)
+
+
+def has_definition(source: str, name: str) -> bool:
+    return re.search(r"^[A-Za-z][^\n;{}]*\b" + re.escape(name) + r"\([^;{]*\)\s*\{", source, re.M) is not None
+
+
 def with_variant(source: str, name: str, variant: str) -> str:
+    """Returns the source with the function's definition replaced by the variant. A function the variant defines
+    before it (a static inline, say) replaces the source's definition of that name, so that applying a variant again,
+    or one after another kept one, doesn't define it twice."""
+    variant_start, _ = definition_span(variant, name)
+    for helper in DEFINITION_NAME.findall(variant[:variant_start]):
+        if helper != name and has_definition(source, helper):
+            helper_start, helper_end = definition_span(source, helper)
+            source = source[:helper_start] + source[helper_end:].lstrip("\n")
     start, end = definition_span(source, name)
     result = source[:start] + variant + source[end:]
-    variant_start, _ = definition_span(variant, name)
     signature = variant[variant_start : variant.index("{", variant_start)].strip()
     prototype = re.search(r"^[A-Za-z][^\n;{}=]*\b" + re.escape(name) + r"\([^;{]*\);", result, re.M)
     if prototype and prototype.start() < start:
@@ -82,8 +96,8 @@ def main():
     args = parser.parse_args()
 
     if args.compiler is None:
-        lib = lib_compiler(args.source)
-        args.compiler = lib[0] if lib else MWCC_VERSION.removeprefix("dsi/")
+        compiler, _ = probe_defaults(args.source)
+        args.compiler = compiler or MWCC_VERSION.removeprefix("dsi/")
     original = args.source.read_text()
     variants = [v.strip() for path in args.variants for v in path.read_text().split("=====") if v.strip()]
 

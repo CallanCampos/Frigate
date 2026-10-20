@@ -1,6 +1,9 @@
 // The camera of the entrance events, and the events of a warp that play the entrance, such as a door: where the player
 // goes in, walks and comes out
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/entrance_camera.h"
 #include "field/event_action_call.h"
 #include "field/event_entrance_effect.h"
@@ -70,18 +73,18 @@ typedef struct {
 void func_ov036_021b7ee8(void *dest, u32 index);
 void FieldCamera_ChangeRefPos(FieldCamera *camera, const VecFx32 *target);
 
-static void func_ov036_021b7428(WarpSequence *warp);
+static void EventWarpSequence_StartWalkTask(WarpSequence *warp);
 static BOOL EventWarpSequence_UpdateTCB(WarpSequence *warp);
-static GameEventReturnCode func_ov036_021b748c(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventWarpSequence_WalkTaskCallback(GameEvent *event, u32 *state, void *data);
 static void EventWarpSequenceOut_ChangeToZoneBGM(WarpOutData *out);
 static BOOL EventWarpSequenceOut_ShouldKeepBGM(WarpOutData *out);
 static BOOL EventWarpSequenceOut_CheckISSPersist(WarpOutData *out);
 static u32 EventWarpSequenceOut_GetPlayerExState(WarpOutData *out);
-static void func_ov036_021b76fc(WarpOutData *out, GameEvent *event);
-static void func_ov036_021b7718(WarpOutData *out, GameEvent *event);
-static void func_ov036_021b7998(WarpInData *in);
-static void func_ov036_021b79ac(WarpInData *in, GameEvent *event);
-static void func_ov036_021b79cc(WarpInData *in, GameEvent *event);
+static void EventWarpSequenceOut_FadeOutBGM(WarpOutData *out, GameEvent *event);
+static void EventWarpSequenceOut_PlayTransition(WarpOutData *out, GameEvent *event);
+static void EventWarpSequenceIn_FadeInBGM(WarpInData *in);
+static void EventWarpSequenceIn_ChainBGMFadeIn(WarpInData *in, GameEvent *event);
+static void EventWarpSequenceIn_PlayTransition(WarpInData *in, GameEvent *event);
 static void func_ov036_021b7a20(WarpInData *in);
 EntranceCamera *func_ov036_021b7af8(HeapID heapId);
 void func_ov036_021b7b14(void *camera);
@@ -162,9 +165,9 @@ GameEventReturnCode func_ov036_021b73b4(GameEvent *event, u32 *state, void *work
     case 0:
         EventWarpSequenceOut_ChangeToZoneBGM(out);
         if (warp->outTransition != 2) {
-            GFL_SndSEPlay(0x559);
+            GFL_SndSEPlay(SEQ_SE_KAIDAN);
         }
-        func_ov036_021b7718(out, event);
+        EventWarpSequenceOut_PlayTransition(out, event);
         (*state)++;
         break;
     case 1:
@@ -188,7 +191,7 @@ GameEventReturnCode func_ov036_021b73f8(GameEvent *event, u32 *state, void *work
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021b7428(WarpSequence *warp) {
+static void EventWarpSequence_StartWalkTask(WarpSequence *warp) {
     MMSys *mmSys = Field_GetActorSystem(warp->field);
     FieldActor *player = FieldPlayer_GetActor(Field_GetPlayer(warp->field));
     FieldActor *pair;
@@ -213,7 +216,7 @@ static BOOL EventWarpSequence_UpdateTCB(WarpSequence *warp) {
     return TRUE;
 }
 
-static GameEventReturnCode func_ov036_021b748c(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventWarpSequence_WalkTaskCallback(GameEvent *event, u32 *state, void *work) {
     WarpInData *in = work;
 
     if (EventWarpSequence_UpdateTCB(in->warp)) {
@@ -226,8 +229,8 @@ GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp) {
     GameEvent *event;
     WarpInData *data;
 
-    func_ov036_021b7428(warp);
-    event = GameEvent_Create(gsys, NULL, func_ov036_021b748c, sizeof(WarpInData));
+    EventWarpSequence_StartWalkTask(warp);
+    event = GameEvent_Create(gsys, NULL, EventWarpSequence_WalkTaskCallback, sizeof(WarpInData));
     data = GameEvent_GetData(event);
     data->warp = warp;
     return event;
@@ -240,19 +243,19 @@ GameEventReturnCode func_ov036_021b74c8(GameEvent *event, u32 *state, void *work
     switch (*state) {
     case 0:
         if (EventWarpSequenceOut_ShouldKeepBGM(out)) {
-            func_ov036_021b76fc(out, event);
+            EventWarpSequenceOut_FadeOutBGM(out, event);
         } else {
             EventWarpSequenceOut_ChangeToZoneBGM(out);
         }
-        func_ov036_021b7428(warp);
+        EventWarpSequence_StartWalkTask(warp);
         (*state)++;
         break;
     case 1:
         if (EventWarpSequence_UpdateTCB(warp)) {
             if (warp->outTransition != 2) {
-                GFL_SndSEPlay(0x559);
+                GFL_SndSEPlay(SEQ_SE_KAIDAN);
             }
-            func_ov036_021b7718(out, event);
+            EventWarpSequenceOut_PlayTransition(out, event);
             (*state)++;
         }
         break;
@@ -321,7 +324,7 @@ GameEventReturnCode func_ov036_021b7604(GameEvent *event, u32 *state, void *work
     switch (*state) {
     case 0:
         EventWarpSequenceOut_ChangeToZoneBGM(out);
-        GFL_SndSEPlay(0x736);
+        GFL_SndSEPlay(SEQ_SE_FLD_102);
         GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(gsys, field, 2, 0));
         (*state)++;
         break;
@@ -341,7 +344,7 @@ static BOOL EventWarpSequenceOut_ShouldKeepBGM(WarpOutData *out) {
     if (GameData_IsZoneBGMOverriden(gameData, (u16)warp->spawn.zoneId)) {
         return FALSE;
     }
-    if (EventWarpSequenceOut_GetPlayerExState(out) == 1 && GameData_GetNowBGM(gameData) == 0x3f4) {
+    if (EventWarpSequenceOut_GetPlayerExState(out) == 1 && GameData_GetNowBGM(gameData) == SEQ_BGM_BICYCLE) {
         return FALSE;
     }
     return TRUE;
@@ -370,14 +373,14 @@ static void EventWarpSequenceOut_ChangeToZoneBGM(WarpOutData *out) {
     warp->unk48 = 1;
 }
 
-static void func_ov036_021b76fc(WarpOutData *out, GameEvent *event) {
+static void EventWarpSequenceOut_FadeOutBGM(WarpOutData *out, GameEvent *event) {
     WarpSequence *warp = out->warp;
 
     GameEvent_ChainNext(event, EventBGMFadeOut_Create(warp->gsys, 30));
     warp->unk4C = 1;
 }
 
-static void func_ov036_021b7718(WarpOutData *out, GameEvent *event) {
+static void EventWarpSequenceOut_PlayTransition(WarpOutData *out, GameEvent *event) {
     WarpSequence *warp = out->warp;
     GameSystem *gsys = warp->gsys;
     Field *field = warp->field;
@@ -442,9 +445,9 @@ GameEventReturnCode func_ov036_021b77d0(GameEvent *event, u32 *state, void *work
     switch (*state) {
     case 0:
         if (warp->unk48 != 0) {
-            func_ov036_021b7998(in);
+            EventWarpSequenceIn_FadeInBGM(in);
         }
-        func_ov036_021b79cc(in, event);
+        EventWarpSequenceIn_PlayTransition(in, event);
         (*state)++;
         break;
     case 1:
@@ -478,14 +481,14 @@ GameEventReturnCode func_ov036_021b7848(GameEvent *event, u32 *state, void *work
 
     switch (*state) {
     case 0:
-        func_ov036_021b79cc(in, event);
+        EventWarpSequenceIn_PlayTransition(in, event);
         (*state)++;
         break;
     case 1:
         if (warp->unk48 != 0) {
-            func_ov036_021b7998(in);
+            EventWarpSequenceIn_FadeInBGM(in);
         } else if (warp->unk4C != 0) {
-            func_ov036_021b79ac(in, event);
+            EventWarpSequenceIn_ChainBGMFadeIn(in, event);
         }
         (*state)++;
         break;
@@ -543,7 +546,7 @@ GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *work
     switch (*state) {
     case 0:
         if (warp->unk48 != 0) {
-            func_ov036_021b7998(in);
+            EventWarpSequenceIn_FadeInBGM(in);
         }
         (*state)++;
         break;
@@ -558,13 +561,13 @@ GameEventReturnCode func_ov036_021b793c(GameEvent *event, u32 *state, void *work
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021b7998(WarpInData *in) {
+static void EventWarpSequenceIn_FadeInBGM(WarpInData *in) {
     GameData *gameData = in->warp->gameData;
 
     FieldSnd_FadeInImmediate(GameData_GetFieldSoundSystem(gameData), gameData);
 }
 
-static void func_ov036_021b79ac(WarpInData *in, GameEvent *event) {
+static void EventWarpSequenceIn_ChainBGMFadeIn(WarpInData *in, GameEvent *event) {
     WarpSequence *warp = in->warp;
     GameSystem *gsys = warp->gsys;
 
@@ -572,7 +575,7 @@ static void func_ov036_021b79ac(WarpInData *in, GameEvent *event) {
     GameEvent_ChainNext(event, EventBGMFadeIn_Create(gsys, 6));
 }
 
-static void func_ov036_021b79cc(WarpInData *in, GameEvent *event) {
+static void EventWarpSequenceIn_PlayTransition(WarpInData *in, GameEvent *event) {
     WarpSequence *warp = in->warp;
     GameSystem *gsys = warp->gsys;
     Field *field = warp->field;
@@ -709,11 +712,7 @@ void func_ov036_021b7b60(EntranceCamera *camera) {
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
-        {
-            VecFx32 zero = { 0, 0, 0 };
-
-            FieldCamera_GetAnimationCoords(camera->camera, dst);
-        }
+        FieldCamera_GetAnimationCoords(camera->camera, dst);
         switch (dir) {
         case 0:
             dst->distance = 0x2d << 14;

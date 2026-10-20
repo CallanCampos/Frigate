@@ -28,6 +28,6 @@ typedef struct {
     ColosseumPlayers players;
 } ColosseumBattleParam;
 
-GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, ColosseumBattleParam *param);
+GameEvent *EventColosseumBattle_Create(GameSystem *gsys, Field *field, u32 category, ColosseumBattleParam *param);
 
 #endif // POKEBW2_FIELD_EVENT_COLOSSEUM_BATTLE_H

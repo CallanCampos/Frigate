@@ -185,7 +185,7 @@ typedef struct {
 } UnionVisitorList;
 
 // The line of the ring that the index calls for, or NULL if it is empty
-UnionVisitor *func_ov036_021b4620(UnionVisitorList *list, u32 index);
+UnionVisitor *UnionChat_GetLine(UnionVisitorList *list, u32 index);
 
 // The command the system is running: a row of union_main.c's sUnionCommands, or UNION_SUBPROC_ID_NULL
 typedef struct {

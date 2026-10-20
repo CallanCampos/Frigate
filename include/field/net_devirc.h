@@ -9,7 +9,7 @@
 // functions over a small packet system (NetIrcSys) and over the card's infrared chip, which it talks to through the
 // backup SPI bus (as src/ov338/ir_check.c does)
 
-// The device table that main's func_020116c0 gives for the infrared net type
+// The device table that main's NetDefine_LoadDevice gives for the infrared net type
 const GFLNetDevTable *NetDevIrc_GetTable(void);
 // How many frames the link may go without a peer before it reports an error, 0 for no limit
 void NetDevIrc_SetTimeout(u32 frames);
