@@ -17,7 +17,8 @@ enum {
 };
 
 // sentence is the starting sentence in PMSI_MODE_SENTENCE, or NULL for an empty one; unused is always 0
-PMSIParam *PMSIParam_Create(u32 mode, u32 unused, const PMSData *sentence, BOOL flag3, SaveControl *save, u32 heapId);
+PMSIParam *PMSIParam_Create(u32 mode, u32 unused, const PMSData *sentence, BOOL hasNumbers, SaveControl *save,
+                            u32 heapId);
 void PMSIParam_Free(PMSIParam *param);
 void PMSIParam_SetWord(PMSIParam *param, u16 word);
 void PMSIParam_SetSentence(PMSIParam *param, const PMSData *sentence);
