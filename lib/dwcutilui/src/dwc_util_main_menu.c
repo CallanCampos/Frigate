@@ -73,13 +73,13 @@ static void func_ov182_021ae51c(void) {
         DWCUtilButtonSprites_Exit();
         DWCUtilMsg_Close(gDWCUtilMsg);
         DWCUtilMsg_Exit();
-        func_ov182_021b780c();
+        DWCUtilWifiSettings_Exit();
         DWCUtilMain_Finish();
     }
 }
 
 void func_ov182_021ae574(void) {
-    func_ov182_021b77dc();
+    DWCUtilWifiSettings_Init();
     DWCUtilMsg_Init();
     DWCUtilButtonSprites_Init();
     DWCUtilBgOverlay_Init();

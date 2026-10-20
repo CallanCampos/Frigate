@@ -127,7 +127,7 @@ static void func_ov182_021b5464(void) {
     int status;
 
     for (i = 0; i < SCREEN_AP_CONNECTIONS; i++) {
-        status = func_ov182_021b7b0c(i);
+        status = DWCUtilWifiSettings_GetStatus(i);
         if (status == DWC_BM_CONNECTION_UNUSED) {
             status = 3;
         } else {
@@ -221,7 +221,7 @@ static void func_ov182_021b564c(void) {
         sScreenAp.work->end = SCREEN_AP_CHOSEN;
         if (sScreenAp.cursor >= SCREEN_AP_FIRST_ERASE) {
             index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
-            if (func_ov182_021b7b0c(index) == DWC_BM_CONNECTION_UNUSED) {
+            if (DWCUtilWifiSettings_GetStatus(index) == DWC_BM_CONNECTION_UNUSED) {
                 DWCUtilSound_PlaySe(9);
                 DWCUtilUiObject_SetState(-1);
                 return;
@@ -234,7 +234,7 @@ static void func_ov182_021b564c(void) {
             return;
         }
         if (sScreenAp.cursor <= 2) {
-            func_ov182_021b7b20(sScreenAp.cursor);
+            DWCUtilWifiSettings_EditConnection(sScreenAp.cursor);
         }
         DWCUtilSound_PlaySe(6);
         func_ov182_021b5b3c();
@@ -258,7 +258,7 @@ static void func_ov182_021b573c(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         if (sScreenAp.work->end == SCREEN_AP_CHOSEN &&
             (sScreenAp.cursor == SCREEN_AP_WIDE_BUTTON ||
-             func_ov182_021b781c()->connection.status != DWC_BM_CONNECTION_UNUSED)) {
+             DWCUtilWifiSettings_GetEdit()->connection.status != DWC_BM_CONNECTION_UNUSED)) {
             DWCUtilUiObject_Exit();
         }
         DWCUtilFade_Start(3, 1, 1, 8);
@@ -301,12 +301,12 @@ static void func_ov182_021b5790(void) {
         case 1:
         case 2:
             DWCUtilMain_SetLayout(2, 0);
-            if (func_ov182_021b781c()->connection.status == DWC_BM_CONNECTION_UNUSED) {
+            if (DWCUtilWifiSettings_GetEdit()->connection.status == DWC_BM_CONNECTION_UNUSED) {
                 DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
             } else {
                 DWCUtilMain_SetScreenArgs(0, 0);
-                func_ov182_021b43f8(0);
-                DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+                DWCUtilAddressSettings_SetFrom(0);
+                DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
             }
             break;
         case SCREEN_AP_WIDE_BUTTON:
@@ -446,7 +446,7 @@ static void func_ov182_021b5a48(void) {
     switch (DWCUtilDialog_GetChoice()) {
     case 1:
         DWCUtilSound_PlaySe(0xe);
-        func_ov182_021b7e78(index);
+        DWCUtilWifiSettings_Erase(index);
         DWCUtilCell_Copy(0, 0x56, DWCUtilOam_GetEntry(sScreenAp.work->buttons[index], 0));
         DWCUtilOam_SetNodePosition(sScreenAp.work->buttons[index], -1, sScreenApButtonPos[index][0],
                                    sScreenApButtonPos[index][1]);
@@ -484,7 +484,7 @@ static void func_ov182_021b5b3c(void) {
     if (sScreenAp.cursor <= SCREEN_AP_WIDE_BUTTON) {
         DWCUtilBgBuffer_LoadPaletteRow(sScreenAp.work->palette, rows[sScreenAp.cursor], rows[sScreenAp.cursor]);
         if (sScreenAp.cursor != SCREEN_AP_WIDE_BUTTON) {
-            status = func_ov182_021b7b0c(sScreenAp.cursor);
+            status = DWCUtilWifiSettings_GetStatus(sScreenAp.cursor);
             if (status > 2) {
                 status = 3;
             }

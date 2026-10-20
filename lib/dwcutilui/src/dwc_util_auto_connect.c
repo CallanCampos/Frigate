@@ -78,7 +78,7 @@ static void DWCUtilAutoConnect_LoadGraphics(void) {
 // Starts auto-connect with the connection being edited, or with the console's settings when the utility was started
 // for that, and the task that waits for its result
 static void DWCUtilAutoConnect_StartAutoConnect(void) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     DWCAcParam param;
     int from;
 
@@ -146,7 +146,7 @@ static void DWCUtilAutoConnect_WaitFadeOut(void) {
 // Once auto-connect is down, puts the Wi-Fi ID back into the first two pages of the settings, and goes on to the
 // message of a success or to the error screen
 static void DWCUtilAutoConnect_EndAutoConnect(void) {
-    DWCBmNtrPage *pages = (DWCBmNtrPage *)func_ov182_021b7e6c();
+    DWCBmNtrPage *pages = (DWCBmNtrPage *)DWCUtilWifiSettings_GetPages();
 
     if (DWCAc_Destroy()) {
         MI_CpuCopy8(DWCBm_GetPackedWifiIdInfo(), pages[0].wifiId, DWC_BM_PACKED_SIZE);

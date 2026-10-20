@@ -43,7 +43,7 @@ void DWCUtilAossSession_Init(void) {
 void DWCUtilAossSession_Exit(BOOL saveKeys) {
     DWC_Aoss_Shutdown();
     if (saveKeys && sAoss.param->error == 0 && sAoss.done == TRUE) {
-        func_ov182_021b7d80(&sAoss.param->result);
+        DWCUtilWifiSettings_SaveAossResult(&sAoss.param->result);
     }
     DWCUtilHeap_FreeAndNull(&sAoss.param);
 }

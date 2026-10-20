@@ -233,8 +233,8 @@ static void DWCUtilError_WaitFadeOut(void) {
         } else {
             DWCUtilMain_SetLayout(2, 0);
             DWCUtilMain_SetScreenArgs(0, 0);
-            func_ov182_021b43f8(0);
-            DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+            DWCUtilAddressSettings_SetFrom(0);
+            DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
         }
     }
 }

@@ -70,7 +70,7 @@ void DWCUtilWepKeyboard_Init(void) {
     sWepKeyboard = DWCUtilHeap_AllocClear(sizeof(DWCUtilWepKeyboard), 4);
     DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (field == 0) {
-        func_ov182_021b7a08(sWepKeyboard->str);
+        DWCUtilWifiSettings_GetSsid(sWepKeyboard->str);
         sWepKeyboard->length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
     DWCUtilWepKeyboard_LoadGraphics();
@@ -244,7 +244,7 @@ static void DWCUtilWepKeyboard_Exit(void) {
     if (fromList == 0) {
         DWCUtilMain_SetLayout(2, 1);
         DWCUtilMain_SetScreenArgs(0, field);
-        DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
     } else if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
         DWCUtilMain_SetLayout(0, 1);
         DWCUtilMain_SetScreenArgs(1, 0);
@@ -316,7 +316,7 @@ static void DWCUtilWepKeyboard_WaitConfirmChoice(void) {
 
 // Takes the text into the connection being edited as its SSID or its WEP key, or goes back to the keyboard
 static void DWCUtilWepKeyboard_TakeText(void) {
-    void (*take[2])(const u8 *) = { func_ov182_021b7854, func_ov182_021b7874 };
+    void (*take[2])(const u8 *) = { DWCUtilWifiSettings_SetSsid, DWCUtilWifiSettings_SetWepKey };
     int field;
 
     if (!DWCUtilDialog_IsOpen()) {

@@ -49,11 +49,11 @@ void DWCUtilBgOverlay_Show(int index) {
 }
 
 void DWCUtilBgOverlay_ShowConnectionSet(void) {
-    DWCUtilBgOverlay_Show(func_ov182_021b781c()->index + 5);
+    DWCUtilBgOverlay_Show(DWCUtilWifiSettings_GetEdit()->index + 5);
 }
 
 void DWCUtilBgOverlay_ShowConnectionList(void) {
-    DWCUtilBgOverlay_Show(func_ov182_021b781c()->index + 2);
+    DWCUtilBgOverlay_Show(DWCUtilWifiSettings_GetEdit()->index + 2);
 }
 
 static void DWCUtilBgOverlay_UploadTask(DWCUtilTask *task, void *arg) {

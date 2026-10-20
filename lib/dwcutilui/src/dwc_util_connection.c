@@ -62,7 +62,7 @@ void DWCUtilConnection_SaveResult(void) {
     if (DWCUtilAc_GetResult(&result) != TRUE) {
         OS_Terminate();
     }
-    func_ov182_021b7c60(&result);
+    DWCUtilWifiSettings_SaveAcResult(&result);
 }
 
 static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status) {

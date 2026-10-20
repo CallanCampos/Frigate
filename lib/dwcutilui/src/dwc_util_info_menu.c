@@ -190,7 +190,7 @@ static void func_ov182_021aed98(void) {
 static void func_ov182_021aedb0(void) {
     func_ov182_021aedcc();
     DWCUtilGfxResource_ShowMessage(0x19);
-    func_ov182_021b7ea0();
+    DWCUtilWifiSettings_EraseAll();
     DWCUtilMain_SetUpdate(func_ov182_021aee1c);
 }
 

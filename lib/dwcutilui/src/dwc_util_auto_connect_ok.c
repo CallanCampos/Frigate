@@ -89,7 +89,7 @@ static void DWCUtilAutoConnectOk_WaitFadeOut(void) {
     DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from == 0) {
         DWCUtilMain_SetScreenArgs(0, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
     } else {
         DWCUtilMain_SetUpdate(func_ov182_021ae748);
     }

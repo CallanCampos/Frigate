@@ -33,7 +33,7 @@ void DWCUtilAutoConnectIntro_Init(void) {
         DWCUtilBgOverlay_ShowConnectionSet();
     }
     if (from == 1) {
-        func_ov182_021b7bb0();
+        DWCUtilWifiSettings_Save();
     }
     DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_FadeIn);
 }

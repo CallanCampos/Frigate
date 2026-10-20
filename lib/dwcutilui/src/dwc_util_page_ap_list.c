@@ -446,15 +446,15 @@ static void func_ov182_021b136c(void) {
     G2_SetBG2Offset(0, 0);
     if (!sApList->confirmed) {
         DWCUtilApScan_Exit();
-        func_ov182_021b7b20(func_ov182_021b781c()->index);
+        DWCUtilWifiSettings_EditConnection(DWCUtilWifiSettings_GetEdit()->index);
         DWCUtilMain_SetLayout(2, 0);
         DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
     } else if (sApListPos.cursor == AP_LIST_BUTTON) {
         DWCUtilApScan_Exit();
         DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021b5000);
+        DWCUtilMain_SetUpdate(DWCUtilApSearch_Init);
     } else {
-        func_ov182_021b7854(sApList->entries[sApList->chosen].ssid);
+        DWCUtilWifiSettings_SetSsid(sApList->entries[sApList->chosen].ssid);
         DWCUtilMain_SetLayout(0, 0);
         if (sApList->entries[sApList->chosen].security != 0) {
             DWCUtilMain_SetLayout(0, 1);

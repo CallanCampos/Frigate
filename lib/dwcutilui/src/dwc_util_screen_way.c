@@ -71,7 +71,7 @@ static const u16 sScreenWayCursorRects[2][SCREEN_WAY_BUTTONS][4] = {
 static DWCUtilScreenWay sScreenWay;
 
 void func_ov182_021b5bb8(void) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
 
     sScreenWay.chosen = FALSE;
     if (sScreenWay.left == 0) {
@@ -222,7 +222,7 @@ static void func_ov182_021b5f4c(void) {
     switch (sScreenWay.cursor) {
     case 0:
         DWCUtilMain_SetLayout(2, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021b5000);
+        DWCUtilMain_SetUpdate(DWCUtilApSearch_Init);
         break;
     case 1:
         DWCUtilMain_SetLayout(2, 1);
@@ -235,8 +235,8 @@ static void func_ov182_021b5f4c(void) {
     case 3:
         DWCUtilMain_SetLayout(2, 0);
         DWCUtilMain_SetScreenArgs(0, 0);
-        func_ov182_021b43f8(1);
-        DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+        DWCUtilAddressSettings_SetFrom(1);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
         break;
     }
 }

@@ -43,26 +43,26 @@ typedef struct DWCUtilAddressEdit {
     u8 result;
 } DWCUtilAddressEdit;
 
-static void func_ov182_021b2210(void);
-static void func_ov182_021b2290(void);
-static void func_ov182_021b22c8(void);
-static void func_ov182_021b2324(void);
-static void func_ov182_021b233c(void);
-static void func_ov182_021b2348(void);
-static BOOL func_ov182_021b2510(int min);
+static void DWCUtilAddressEdit_LoadGraphics(void);
+static void DWCUtilAddressEdit_FadeIn(void);
+static void DWCUtilAddressEdit_OpenKeypad(void);
+static void DWCUtilAddressEdit_WaitKeypad(void);
+static void DWCUtilAddressEdit_Main(void);
+static void DWCUtilAddressEdit_HandleInput(void);
+static BOOL DWCUtilAddressEdit_IsNumberFull(int min);
 static void func_ov182_021b2568(void);
-static void func_ov182_021b256c(void);
-static void func_ov182_021b2580(void);
-static void func_ov182_021b25a4(void);
-static void func_ov182_021b2604(void);
-static void func_ov182_021b267c(void);
-static void func_ov182_021b26f4(void);
-static void func_ov182_021b272c(void);
-static void func_ov182_021b2764(void);
-static void func_ov182_021b27d4(void);
-static BOOL func_ov182_021b281c(void);
-static void func_ov182_021b28f0(void);
-static void func_ov182_021b2910(void);
+static void DWCUtilAddressEdit_EndEntry(void);
+static void DWCUtilAddressEdit_CloseKeypad(void);
+static void DWCUtilAddressEdit_WaitKeypadClosed(void);
+static void DWCUtilAddressEdit_ExitToSettings(void);
+static void DWCUtilAddressEdit_DrawDigits(void);
+static void DWCUtilAddressEdit_UpdateCursor(void);
+static void DWCUtilAddressEdit_WaitConfirm(void);
+static void DWCUtilAddressEdit_WaitConfirmClosed(void);
+static void DWCUtilAddressEdit_PadDigits(void);
+static BOOL DWCUtilAddressEdit_IsValid(void);
+static void DWCUtilAddressEdit_WaitInvalidDialog(void);
+static void DWCUtilAddressEdit_WaitInvalidClosed(void);
 
 // Where each digit is drawn
 static const u8 sAddressEditDigitX[ADDRESS_EDIT_DIGITS] = {
@@ -71,9 +71,10 @@ static const u8 sAddressEditDigitX[ADDRESS_EDIT_DIGITS] = {
 
 static DWCUtilAddressEdit *sAddressEdit;
 
-void func_ov182_021b2120(void) {
+void DWCUtilAddressEdit_Init(void) {
     void (*read[5])(u8 *) = {
-        func_ov182_021b7a24, func_ov182_021b7a50, func_ov182_021b7a7c, func_ov182_021b7aac, func_ov182_021b7adc,
+        DWCUtilWifiSettings_GetIp,   DWCUtilWifiSettings_GetNetmask, DWCUtilWifiSettings_GetGateway,
+        DWCUtilWifiSettings_GetDns1, DWCUtilWifiSettings_GetDns2,
     };
     u8 msgIndices[5] = { 0x3f, 0x40, 0x41, 0x42, 0x43 };
     int field;
@@ -89,19 +90,19 @@ void func_ov182_021b2120(void) {
         MI_CpuFill8(edit->digits, 0, sizeof(edit->digits));
         sAddressEdit->group = 0;
     }
-    func_ov182_021b2210();
+    DWCUtilAddressEdit_LoadGraphics();
     DWCUtilBgOverlay_Show(field + 0xb);
     DWCUtilScreen_Start(msgIndices[field], -1, 0);
     DWCUtilGfxResource_ShowStep(2);
     sAddressEdit->text = DWCUtilText_CreateBg(0, 0);
     sAddressEdit->cursor = DWCUtilCell_AllocOam(0, 0x3f);
     G2_SetOBJPriority(sAddressEdit->cursor, 3);
-    func_ov182_021b26f4();
-    func_ov182_021b267c();
-    DWCUtilMain_SetUpdate(func_ov182_021b2290);
+    DWCUtilAddressEdit_UpdateCursor();
+    DWCUtilAddressEdit_DrawDigits();
+    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_FadeIn);
 }
 
-static void func_ov182_021b2210(void) {
+static void DWCUtilAddressEdit_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
@@ -113,15 +114,15 @@ static void func_ov182_021b2210(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b2290(void) {
+static void DWCUtilAddressEdit_FadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021b22c8);
+    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_OpenKeypad);
 }
 
-static void func_ov182_021b22c8(void) {
+static void DWCUtilAddressEdit_OpenKeypad(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilMenu_Open();
         DWCUtilSound_PlaySe(0x14);
@@ -129,27 +130,27 @@ static void func_ov182_021b22c8(void) {
             DWCUtilMenu_SetLeftEnabled(FALSE);
             DWCUtilMenu_SetRightEnabled(FALSE);
         } else {
-            if (func_ov182_021b2510(26)) {
+            if (DWCUtilAddressEdit_IsNumberFull(26)) {
                 DWCUtilMenu_SetDigitsEnabled(FALSE);
             }
             DWCUtilMenu_SetRightEnabled(FALSE);
         }
-        DWCUtilMain_SetUpdate(func_ov182_021b2324);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitKeypad);
     }
 }
 
-static void func_ov182_021b2324(void) {
+static void DWCUtilAddressEdit_WaitKeypad(void) {
     if (DWCUtilMenu_GetKey() != 0x1f) {
-        DWCUtilMain_SetUpdate(func_ov182_021b233c);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_Main);
     }
 }
 
-static void func_ov182_021b233c(void) {
-    func_ov182_021b2348();
+static void DWCUtilAddressEdit_Main(void) {
+    DWCUtilAddressEdit_HandleInput();
     func_ov182_021b2568();
 }
 
-static void func_ov182_021b2348(void) {
+static void DWCUtilAddressEdit_HandleInput(void) {
     int key = DWCUtilMenu_GetKey();
     u8 *digits;
     int first;
@@ -182,10 +183,10 @@ static void func_ov182_021b2348(void) {
     case 0x12:
         sAddressEdit->result = ADDRESS_EDIT_CANCELLED;
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(func_ov182_021b256c);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_EndEntry);
         return;
     case 0x13:
-        if (func_ov182_021b281c()) {
+        if (DWCUtilAddressEdit_IsValid()) {
             DWCUtilSound_PlaySe(6);
             sAddressEdit->result = ADDRESS_EDIT_ENTERED;
         } else {
@@ -194,12 +195,12 @@ static void func_ov182_021b2348(void) {
         }
         sAddressEdit->group = ADDRESS_EDIT_LAST_GROUP;
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
-        func_ov182_021b26f4();
-        func_ov182_021b27d4();
-        DWCUtilMain_SetUpdate(func_ov182_021b256c);
+        DWCUtilAddressEdit_UpdateCursor();
+        DWCUtilAddressEdit_PadDigits();
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_EndEntry);
         return;
     default:
-        if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && func_ov182_021b2510(26)) {
+        if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && DWCUtilAddressEdit_IsNumberFull(26)) {
             break;
         }
         DWCUtilSound_PlaySe(1);
@@ -210,7 +211,7 @@ static void func_ov182_021b2348(void) {
         } else if (digits[first + 1] == 0) {
             digits[first + 1] = digits[first + 2];
             digits[first + 2] = key;
-            if (func_ov182_021b2510(26)) {
+            if (DWCUtilAddressEdit_IsNumberFull(26)) {
                 if (sAddressEdit->group < ADDRESS_EDIT_LAST_GROUP) {
                     sAddressEdit->group++;
                 }
@@ -229,17 +230,17 @@ static void func_ov182_021b2348(void) {
         } else {
             DWCUtilMenu_SetRightEnabled(FALSE);
         }
-        if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && func_ov182_021b2510(26)) {
+        if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && DWCUtilAddressEdit_IsNumberFull(26)) {
             DWCUtilMenu_SetDigitsEnabled(FALSE);
         }
         break;
     }
-    func_ov182_021b267c();
-    func_ov182_021b26f4();
+    DWCUtilAddressEdit_DrawDigits();
+    DWCUtilAddressEdit_UpdateCursor();
 }
 
 // Whether the number the cursor is on has three digits, or is at least min
-static BOOL func_ov182_021b2510(int min) {
+static BOOL DWCUtilAddressEdit_IsNumberFull(int min) {
     u8 number[4];
     u8 *group = &sAddressEdit->digits[sAddressEdit->group * 3];
     int i;
@@ -263,38 +264,38 @@ static BOOL func_ov182_021b2510(int min) {
 static void func_ov182_021b2568(void) {
 }
 
-static void func_ov182_021b256c(void) {
+static void DWCUtilAddressEdit_EndEntry(void) {
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021b2580);
+    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_CloseKeypad);
 }
 
-static void func_ov182_021b2580(void) {
+static void DWCUtilAddressEdit_CloseKeypad(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilMenu_Close();
         DWCUtilSound_PlaySe(0x15);
-        DWCUtilMain_SetUpdate(func_ov182_021b25a4);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitKeypadClosed);
     }
 }
 
 // Once the keypad has closed, asks whether to keep the address, or shows that it isn't valid
-static void func_ov182_021b25a4(void) {
+static void DWCUtilAddressEdit_WaitKeypadClosed(void) {
     if (!DWCUtilMenu_IsOpen()) {
         if (sAddressEdit->result == ADDRESS_EDIT_CANCELLED) {
-            DWCUtilMain_SetUpdate(func_ov182_021b2604);
+            DWCUtilMain_SetUpdate(DWCUtilAddressEdit_ExitToSettings);
             return;
         }
         if (sAddressEdit->result == ADDRESS_EDIT_INVALID) {
             DWCUtilDialog_Open(6, 3, 1, -1, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b28f0);
+            DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitInvalidDialog);
             return;
         }
         DWCUtilDialog_Open(0x47, 2, 1, -1, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021b272c);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitConfirm);
     }
 }
 
 // Frees the screen and goes back to the connection's settings, on the address's row
-static void func_ov182_021b2604(void) {
+static void DWCUtilAddressEdit_ExitToSettings(void) {
     int field;
 
     DWCUtilScreen_Stop();
@@ -309,12 +310,12 @@ static void func_ov182_021b2604(void) {
     }
     DWCUtilMain_SetLayout(2, 1);
     DWCUtilMain_SetScreenArgs(0, field + 3);
-    DWCUtilMain_SetUpdate(func_ov182_021b2d48);
+    DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
     DWCUtilHeap_FreeAndNull(&sAddressEdit);
 }
 
 // Draws the digits, one at a time, as a string of one character
-static void func_ov182_021b267c(void) {
+static void DWCUtilAddressEdit_DrawDigits(void) {
     // The size of a digit
     static const u16 charSize[2] = { 11, 16 };
     u16 rect[4] = { 0, 0x29, charSize[0], charSize[1] };
@@ -332,7 +333,7 @@ static void func_ov182_021b267c(void) {
 }
 
 // Moves the cursor under the last digit of its number
-static void func_ov182_021b26f4(void) {
+static void DWCUtilAddressEdit_UpdateCursor(void) {
     int group = sAddressEdit->group;
 
     if (group > ADDRESS_EDIT_LAST_GROUP) {
@@ -341,7 +342,7 @@ static void func_ov182_021b26f4(void) {
     DWCUtilOam_SetPosition(sAddressEdit->cursor, sAddressEditDigitX[group * 3 + 2], 0x28);
 }
 
-static void func_ov182_021b272c(void) {
+static void DWCUtilAddressEdit_WaitConfirm(void) {
     sAddressEdit->result = DWCUtilDialog_GetChoice();
     switch (sAddressEdit->result) {
     case 0:
@@ -354,30 +355,31 @@ static void func_ov182_021b272c(void) {
         return;
     }
     DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(func_ov182_021b2764);
+    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitConfirmClosed);
 }
 
 // Takes the address into the connection being edited, or goes back to the keypad
-static void func_ov182_021b2764(void) {
+static void DWCUtilAddressEdit_WaitConfirmClosed(void) {
     void (*take[5])(const u8 *) = {
-        func_ov182_021b7990, func_ov182_021b79a8, func_ov182_021b79c0, func_ov182_021b79d8, func_ov182_021b79f0,
+        DWCUtilWifiSettings_SetIp,   DWCUtilWifiSettings_SetNetmask, DWCUtilWifiSettings_SetGateway,
+        DWCUtilWifiSettings_SetDns1, DWCUtilWifiSettings_SetDns2,
     };
     int field;
 
     if (!DWCUtilDialog_IsOpen()) {
         if (sAddressEdit->result == 0) {
             G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b22c8);
+            DWCUtilMain_SetUpdate(DWCUtilAddressEdit_OpenKeypad);
             return;
         }
         DWCUtilMain_GetScreenArgs(&field, NULL);
         take[field](sAddressEdit->digits);
-        DWCUtilMain_SetUpdate(func_ov182_021b2604);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_ExitToSettings);
     }
 }
 
 // Fills each number's empty and leading digits: blanks, and a 0 for a number of none
-static void func_ov182_021b27d4(void) {
+static void DWCUtilAddressEdit_PadDigits(void) {
     u8 *group;
     int i;
     int j;
@@ -391,11 +393,11 @@ static void func_ov182_021b27d4(void) {
             group[j] = j == 2 ? '0' : ' ';
         }
     }
-    func_ov182_021b267c();
+    DWCUtilAddressEdit_DrawDigits();
 }
 
 // Whether every number is at most 255, and the address is a subnet mask of contiguous bits, or a usable address
-static BOOL func_ov182_021b281c(void) {
+static BOOL DWCUtilAddressEdit_IsValid(void) {
     u8 *group;
     int i;
     u8 max[4] = "255";
@@ -417,7 +419,7 @@ static BOOL func_ov182_021b281c(void) {
             }
         }
     }
-    func_ov182_021b7ff0(sAddressEdit->digits, address);
+    DWCUtilWifiSettings_DigitsToAddress(sAddressEdit->digits, address);
     result = FALSE;
     DWCUtilMain_GetScreenArgs(&field, NULL);
     if (field == 1) {
@@ -440,17 +442,17 @@ static BOOL func_ov182_021b281c(void) {
     return result;
 }
 
-static void func_ov182_021b28f0(void) {
+static void DWCUtilAddressEdit_WaitInvalidDialog(void) {
     if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
         DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(func_ov182_021b2910);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitInvalidClosed);
     }
 }
 
-static void func_ov182_021b2910(void) {
+static void DWCUtilAddressEdit_WaitInvalidClosed(void) {
     if (!DWCUtilDialog_IsOpen()) {
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021b22c8);
+        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_OpenKeypad);
     }
 }

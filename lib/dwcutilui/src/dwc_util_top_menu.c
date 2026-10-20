@@ -122,7 +122,7 @@ static void func_ov182_021af808(void) {
 // The move's callback: once the settings are sent they are erased here
 static void func_ov182_021af870(int event) {
     if (event == DWC_UTIL_MOVE_EVENT_DONE) {
-        func_ov182_021b7ea0();
+        DWCUtilWifiSettings_EraseAll();
         sMoveResult = 1;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(0x10);

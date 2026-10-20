@@ -8,8 +8,8 @@
 #include "nitro/os.h"
 #include "stdlib.h"
 
-static void func_ov182_021b7f08(int index);
-static int func_ov182_021b803c(u8 digit);
+static void DWCUtilWifiSettings_WritePage(int index);
+static int DWCUtilWifiSettings_ParseHexDigit(u8 digit);
 
 #define DWC_UTIL_SETTINGS_PAGES 4
 #define DWC_UTIL_SETTINGS_CONNECTIONS 3
@@ -24,34 +24,34 @@ static const u8 sWifiSettingsZeroAddress[4] = { 0, 0, 0, 0 };
 
 static DWCUtilWifiSettings *sWifiSettings;
 
-void func_ov182_021b77dc(void) {
+void DWCUtilWifiSettings_Init(void) {
     sWifiSettings = DWCUtilHeap_AllocClear(sizeof(DWCUtilWifiSettings), 32);
     MATHi_CRC16InitTableRev(&sWifiSettings->crcTable, 0xa001);
     DWCBm_ReadAllNtrPages(sWifiSettings);
 }
 
-void func_ov182_021b780c(void) {
+void DWCUtilWifiSettings_Exit(void) {
     DWCUtilHeap_FreeAndNull(&sWifiSettings);
 }
 
-DWCUtilSettingsEdit *func_ov182_021b781c(void) {
+DWCUtilSettingsEdit *DWCUtilWifiSettings_GetEdit(void) {
     return &sWifiSettings->edit;
 }
 
-void func_ov182_021b782c(BOOL autoAddress) {
+void DWCUtilWifiSettings_SetAutoAddress(BOOL autoAddress) {
     sWifiSettings->edit.autoAddress = autoAddress;
 }
 
-void func_ov182_021b7840(BOOL autoDns) {
+void DWCUtilWifiSettings_SetAutoDns(BOOL autoDns) {
     sWifiSettings->edit.autoDns = autoDns;
 }
 
-void func_ov182_021b7854(const u8 *ssid) {
+void DWCUtilWifiSettings_SetSsid(const u8 *ssid) {
     MI_CpuCopy8(ssid, sWifiSettings->edit.connection.ssid, sizeof(sWifiSettings->edit.connection.ssid));
     sWifiSettings->edit.connection.status = 0;
 }
 
-void func_ov182_021b7874(const u8 *key) {
+void DWCUtilWifiSettings_SetWepKey(const u8 *key) {
     int i;
     int length;
     u8 *dest;
@@ -66,7 +66,7 @@ void func_ov182_021b7874(const u8 *key) {
         sWifiSettings->edit.connection.wepKeyText = 0;
         dest = sWifiSettings->edit.connection.wepKey[0];
         for (i = 0; i < length; i += 2) {
-            *dest = (func_ov182_021b803c(key[i]) << 4) + func_ov182_021b803c(key[i + 1]);
+            *dest = (DWCUtilWifiSettings_ParseHexDigit(key[i]) << 4) + DWCUtilWifiSettings_ParseHexDigit(key[i + 1]);
             dest++;
         }
         break;
@@ -93,65 +93,65 @@ void func_ov182_021b7874(const u8 *key) {
     }
 }
 
-void func_ov182_021b7990(const u8 *digits) {
-    func_ov182_021b7ff0(digits, sWifiSettings->edit.connection.ip);
+void DWCUtilWifiSettings_SetIp(const u8 *digits) {
+    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.ip);
 }
 
-void func_ov182_021b79a8(const u8 *digits) {
-    func_ov182_021b7ff0(digits, sWifiSettings->edit.netmask);
+void DWCUtilWifiSettings_SetNetmask(const u8 *digits) {
+    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.netmask);
 }
 
-void func_ov182_021b79c0(const u8 *digits) {
-    func_ov182_021b7ff0(digits, sWifiSettings->edit.connection.gateway);
+void DWCUtilWifiSettings_SetGateway(const u8 *digits) {
+    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.gateway);
 }
 
-void func_ov182_021b79d8(const u8 *digits) {
-    func_ov182_021b7ff0(digits, sWifiSettings->edit.connection.dns[0]);
+void DWCUtilWifiSettings_SetDns1(const u8 *digits) {
+    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.dns[0]);
 }
 
-void func_ov182_021b79f0(const u8 *digits) {
-    func_ov182_021b7ff0(digits, sWifiSettings->edit.connection.dns[1]);
+void DWCUtilWifiSettings_SetDns2(const u8 *digits) {
+    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.dns[1]);
 }
 
-void func_ov182_021b7a08(u8 *ssid) {
+void DWCUtilWifiSettings_GetSsid(u8 *ssid) {
     MI_CpuCopy8(sWifiSettings->edit.connection.ssid, ssid, sizeof(sWifiSettings->edit.connection.ssid));
 }
 
-void func_ov182_021b7a24(u8 *digits) {
+void DWCUtilWifiSettings_GetIp(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.ip;
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void func_ov182_021b7a50(u8 *digits) {
+void DWCUtilWifiSettings_GetNetmask(u8 *digits) {
     u8 *address = sWifiSettings->edit.netmask;
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void func_ov182_021b7a7c(u8 *digits) {
+void DWCUtilWifiSettings_GetGateway(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.gateway;
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void func_ov182_021b7aac(u8 *digits) {
+void DWCUtilWifiSettings_GetDns1(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.dns[0];
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void func_ov182_021b7adc(u8 *digits) {
+void DWCUtilWifiSettings_GetDns2(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.dns[1];
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-u8 func_ov182_021b7b0c(int index) {
+u8 DWCUtilWifiSettings_GetStatus(int index) {
     return sWifiSettings->pages[index].connection.status;
 }
 
-void func_ov182_021b7b20(int index) {
+void DWCUtilWifiSettings_EditConnection(int index) {
     DWCUtilWifiSettings *settings = sWifiSettings;
 
     settings->edit.connection = settings->pages[index].connection;
@@ -170,7 +170,7 @@ void func_ov182_021b7b20(int index) {
     DWCBm_MakeMask(settings->pages[index].connection.netmaskBits, sWifiSettings->edit.netmask);
 }
 
-void func_ov182_021b7bb0(void) {
+void DWCUtilWifiSettings_Save(void) {
     DWCUtilWifiSettings *settings = sWifiSettings;
     DWCUtilSettingsEdit *edit = &settings->edit;
     DWCBmConnection *connection = &settings->pages[edit->index].connection;
@@ -190,10 +190,10 @@ void func_ov182_021b7bb0(void) {
     } else {
         MI_CpuCopy8(edit->connection.dns, connection->dns, 8);
     }
-    func_ov182_021b7f08(edit->index);
+    DWCUtilWifiSettings_WritePage(edit->index);
 }
 
-void func_ov182_021b7c60(const DWCUtilAcResult *result) {
+void DWCUtilWifiSettings_SaveAcResult(const DWCUtilAcResult *result) {
     DWCUtilWifiSettings *settings = sWifiSettings;
     DWCUtilSettingsEdit *edit = &settings->edit;
     int length = 0;
@@ -226,10 +226,10 @@ void func_ov182_021b7c60(const DWCUtilAcResult *result) {
     MI_CpuFill8(edit->netmask, 0, 4);
     edit->autoAddress = TRUE;
     edit->autoDns = TRUE;
-    func_ov182_021b7bb0();
+    DWCUtilWifiSettings_Save();
 }
 
-void func_ov182_021b7d80(const AossResult *result) {
+void DWCUtilWifiSettings_SaveAossResult(const AossResult *result) {
     DWCUtilWifiSettings *settings = sWifiSettings;
     DWCUtilSettingsEdit *edit = &settings->edit;
 
@@ -250,22 +250,22 @@ void func_ov182_021b7d80(const AossResult *result) {
     MI_CpuFill8(edit->netmask, 0, 4);
     edit->autoAddress = TRUE;
     edit->autoDns = TRUE;
-    func_ov182_021b7bb0();
+    DWCUtilWifiSettings_Save();
 }
 
-u8 *func_ov182_021b7e6c(void) {
+u8 *DWCUtilWifiSettings_GetPages(void) {
     return (u8 *)sWifiSettings;
 }
 
-void func_ov182_021b7e78(int index) {
+void DWCUtilWifiSettings_Erase(int index) {
     DWCUtilWifiSettings *settings = sWifiSettings;
 
     MI_CpuFill8(&settings->pages[index], 0, offsetof(DWCBmConnection, usedMask));
     settings->pages[index].connection.status = DWC_BM_CONNECTION_UNUSED;
-    func_ov182_021b7f08(index);
+    DWCUtilWifiSettings_WritePage(index);
 }
 
-void func_ov182_021b7ea0(void) {
+void DWCUtilWifiSettings_EraseAll(void) {
     DWCBmWifiIdInfo info;
     const u8 *packed;
     int i;
@@ -280,12 +280,12 @@ void func_ov182_021b7ea0(void) {
         MI_CpuCopy8(packed, sWifiSettings->pages[i].wifiId, DWC_BM_PACKED_SIZE);
     }
     for (i = 0; i < DWC_UTIL_SETTINGS_PAGES; i++) {
-        func_ov182_021b7f08(i);
+        DWCUtilWifiSettings_WritePage(i);
     }
 }
 
 // Writes a page to the NVRAM, with the first two, which keep the mask of the connections in use, when that changes
-static void func_ov182_021b7f08(int index) {
+static void DWCUtilWifiSettings_WritePage(int index) {
     u8 status = sWifiSettings->pages[index].connection.status;
     u32 bit = 1 << index;
     BOOL used = FALSE;
@@ -322,7 +322,7 @@ static void func_ov182_021b7f08(int index) {
     DWCUtilHeap_FreeAndNull(&scratch);
 }
 
-void func_ov182_021b7ff0(const u8 *digits, u8 *address) {
+void DWCUtilWifiSettings_DigitsToAddress(const u8 *digits, u8 *address) {
     u8 number[4];
     int i;
     int j;
@@ -341,7 +341,7 @@ void func_ov182_021b7ff0(const u8 *digits, u8 *address) {
 }
 
 // The value of a hex digit
-static int func_ov182_021b803c(u8 digit) {
+static int DWCUtilWifiSettings_ParseHexDigit(u8 digit) {
     if (digit <= '9') {
         return digit - '0';
     }
