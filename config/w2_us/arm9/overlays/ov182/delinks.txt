@@ -192,6 +192,7 @@ lib/dwcutilui/src/dwc_util_msg_resource.c:
     .bss        start:0x021c40ec end:0x021c40f0
 
 lib/dwcutilui/src/dwc_util_move.c:
+    complete
     .text       start:0x021ae174 end:0x021ae418
     .data       start:0x021c0bcc end:0x021c0c2c
     .bss        start:0x021c40f0 end:0x021c40f4

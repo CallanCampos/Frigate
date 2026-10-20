@@ -3075,7 +3075,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   rooted one case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
-  in the ranges before it.
+  in the ranges before it. Empty cases count as cases, so the number of them sets the ranges, not which ones:
+  `DWCUtilMove_UpdateTask` (`dwc_util_move.c`) has a table from 0 to 20 and compares for 23, 26, 29 and 34 only with
+  four empty labels between 1 and 20 beside its four handled cases there (8 in a span of 20); with every unhandled
+  state listed the table took in 34, and with none there was no table.
 - A three-case `switch` is not range-folded where the `||` chain over the same values is, which frees a register:
   the tournament download's `TDownload_SelectTouch` and `TDownload_SavedTouch` test their touched button with
   `switch (touched) { case 3: case 4: case 5: }`. A constant stored to a spilled local as the last statement of a
