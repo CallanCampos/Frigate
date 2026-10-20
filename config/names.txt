@@ -770,6 +770,7 @@
 . 0x020108dc MemoryLinkSave_Merge
 . 0x0201090c MemoryLinkSave_CanMerge
 . 0x0201098c mergeData
+. 0x02010b0c MemoryLinkSave_GetValue
 . 0x02010b90 MemoryLinkSave_IsMemoryFlagSet
 . 0x02010bc0 MemoryLinkSave_GetVar
 . 0x02010bcc MemoryLinkSave_IsPlayerLinked

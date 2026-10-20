@@ -169,7 +169,7 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
            (changed[MEMORY_LINK_PART_UNK2C] << 2);
 }
 
-u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest) {
+u32 MemoryLinkSave_GetValue(MemoryLinkSave *link, u32 kind, void *dest) {
     switch (kind) {
     case MEMORY_LINK_KIND_MUSICAL_TOTAL_POINTS:
         return link->memories.musicalTotalPoints;

@@ -51,7 +51,7 @@ typedef struct MemoryLinkSave {
     MemoryLinkMemories memories;
 } MemoryLinkSave; // size: 0x1dc
 
-// What func_02010b0c gives
+// What MemoryLinkSave_GetValue gives
 enum {
     MEMORY_LINK_KIND_MUSICAL_TOTAL_POINTS,
     MEMORY_LINK_KIND_MUSICAL_SHOW_COUNT,
@@ -73,7 +73,7 @@ BOOL MemoryLinkSave_Merge(MemoryLinkSave *link, const MemoryLinkData *data, Save
 // save would change
 BOOL MemoryLinkSave_CanMerge(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save);
 // A value of a kind, MEMORY_LINK_KIND_*, copied to dest for some kinds
-u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest);
+u32 MemoryLinkSave_GetValue(MemoryLinkSave *link, u32 kind, void *dest);
 // A flag and a variable of the memories
 BOOL MemoryLinkSave_IsMemoryFlagSet(MemoryLinkSave *link, int index);
 u16 MemoryLinkSave_GetVar(MemoryLinkSave *link, u32 index);

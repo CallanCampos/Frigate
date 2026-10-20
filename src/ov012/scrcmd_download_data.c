@@ -81,7 +81,8 @@ BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
     case 1: {
         u16 current = FALSE;
 
-        if (func_02010b0c(data, MEMORY_LINK_KIND_MUSICAL_TOTAL_POINTS, NULL) <= MusicalSave_GetTotalPoints(musical)) {
+        if (MemoryLinkSave_GetValue(data, MEMORY_LINK_KIND_MUSICAL_TOTAL_POINTS, NULL) <=
+            MusicalSave_GetTotalPoints(musical)) {
             current = TRUE;
         }
         *result = current;
@@ -98,7 +99,7 @@ BOOL s02B7_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env) {
     void *data = SaveControl_GetMemoryLink(save);
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
     u16 *result = ScriptReadVar(vm, env);
-    const u8 *props = (const u8 *)func_02010b0c(data, MEMORY_LINK_KIND_PROPS, NULL);
+    const u8 *props = (const u8 *)MemoryLinkSave_GetValue(data, MEMORY_LINK_KIND_PROPS, NULL);
     int i;
 
     *result = FALSE;
