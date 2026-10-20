@@ -3187,7 +3187,7 @@ static u8 ResearchGraph_ClampU8(int value) {
 static void ResearchGraph_RequestCommRestart(ResearchGraph *wk) {
     GameCommSys *comm = GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk));
 
-    func_0202be14(comm, TRUE);
+    GameCommSys_SetInResearchGraph(comm, TRUE);
     if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_INTRUDE) {
         GameCommSys_ExitReq(comm);
     }
@@ -3209,5 +3209,5 @@ static BOOL ResearchGraph_RestartComm(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_EndComm(ResearchGraph *wk) {
-    func_0202be14(GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk)), FALSE);
+    GameCommSys_SetInResearchGraph(GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk)), FALSE);
 }

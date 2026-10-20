@@ -1592,8 +1592,13 @@
 . 0x0202bdf4 GameCommSys_GetWork
 . 0x0202bdfc GameCommSys_GetLastCommNo
 . 0x0202be0c GameComm_SetSeq
+. 0x0202be14 GameCommSys_SetInResearchGraph
+. 0x0202be28 GameCommSys_SetInFunfestMission
+. 0x0202be3c GameCommSys_IsInResearchGraphOrMission
 . 0x0202be54 GameCommSys_ClearUnk24
 . 0x0202be64 GameCommSys_LogPlayers
+. 0x0202bf68 GameCommSys_LogPassPowerReceived
+. 0x0202bf7c GameCommSys_LogMissionJoined
 . 0x0202bf94 GameBeaconSys_Create
 . 0x0202c00c GameBeaconSys_SetGameSystem
 . 0x0202c038 GameBeaconSys_Update

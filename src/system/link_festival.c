@@ -170,7 +170,7 @@ void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined)
     ClearLinkFestivalData(festival);
     FestMissionConfig_Start(&festival->config, mission, joined);
     LinkFestival_SetState(festival, 1);
-    func_0202be28(GSYS_GetGameCommSystem(festival->gsys), TRUE);
+    GameCommSys_SetInFunfestMission(GSYS_GetGameCommSystem(festival->gsys), TRUE);
     LinkFestival_SetCurrentRecord(festival, &festival->config);
     SetFesGimmickResidentEnable(mission, TRUE);
     GameData_SetFunfestMission(festival->gameData, TRUE);
@@ -200,7 +200,7 @@ u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival) {
     GameData_SetFunfestMission(festival->gameData, FALSE);
     SetFesGimmickResidentEnable(&festival->config, FALSE);
     FestMissionConfig_Clear(&festival->config);
-    func_0202be28(GSYS_GetGameCommSystem(festival->gsys), FALSE);
+    GameCommSys_SetInFunfestMission(GSYS_GetGameCommSystem(festival->gsys), FALSE);
     ClearLinkFestivalData(festival);
     if (GameData_GetNowBGM(festival->gameData) != SEQ_BGM_FES) {
         return 0xffffffff;

@@ -302,7 +302,7 @@ static void GameBeaconSearch_SetupBeacon(BeaconSearchBeacon *beacon, GameData *g
     beacon->connectMax = 3;
     beacon->unk2_0 = NetSystem_HasErrorChecked();
     beacon->unk2_1 = 0;
-    beacon->unk3_0 = func_0202be3c(commSys);
+    beacon->unk3_0 = GameCommSys_IsInResearchGraphOrMission(commSys);
     beacon->trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
     beacon->isDSi = OS_IsRunOnTwl();
     beacon->unk2_6 = FALSE;

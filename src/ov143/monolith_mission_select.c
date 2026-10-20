@@ -588,7 +588,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         if (mfw->timer == 0 || GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             MonolithMission_ClearMessage(mfw);
-            func_0202bf7c(GSYS_GetGameCommSystem(screen->param->gsys));
+            GameCommSys_LogMissionJoined(GSYS_GetGameCommSystem(screen->param->gsys));
             MonolithTool_SetPanelPulse(screen, TRUE, 1);
             MonolithTool_SetTextCursor(screen, &mfw->startButton, 1, 0xff, 3);
             if (GFL_HIDIsTouchPressed()) {
