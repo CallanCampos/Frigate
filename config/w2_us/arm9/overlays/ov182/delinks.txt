@@ -39,6 +39,7 @@ lib/dwcutilui/src/dwc_util_screen.c:
     .bss        start:0x021c406c end:0x021c4070
 
 lib/dwcutilui/src/dwc_util_ui_effect.c:
+    complete
     .text       start:0x021ab080 end:0x021ab1bc
     .rodata     start:0x021bfb58 end:0x021bfb64
     .bss        start:0x021c4064 end:0x021c4068
