@@ -11,7 +11,11 @@
 enum {
     DWC_WCM_EVENT_UNKNOWN = 1,
     DWC_WCM_EVENT_FAILED,
-    DWC_WCM_EVENT_FOUND_AP = 5,
+    // These two only from the copy of the wrapper in dwcutil_ac.c: the WCM ended, and a search went once through the
+    // channels
+    DWC_WCM_EVENT_TERMINATED,
+    DWC_WCM_EVENT_SEARCH_AROUND,
+    DWC_WCM_EVENT_FOUND_AP,
     DWC_WCM_EVENT_STARTED,
     DWC_WCM_EVENT_SEARCHING = 8,
     DWC_WCM_EVENT_SEARCH_FAILED,
