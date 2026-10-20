@@ -95,8 +95,9 @@ typedef struct {
     s16 vctEnabled;
     int idleFrames[DWCRAP_NETID_MAX];
     int retryCount;
-    int unk790;
-    u16 unk794;
+    // Whether the peer's voice chat is on, from the bit 8 of its packets' headers, and this side's, sent there
+    int peerVctReady;
+    u16 vctReady;
     u16 unk796;
     u32 connectBits;
     u8 sendSeq;
@@ -108,7 +109,8 @@ typedef struct {
     u8 userDataDirty;
     u8 reportError;
     u8 unk7A4;
-    u8 unk7A5;
+    // What the match's connection attempts are answered (FALSE refuses them)
+    u8 acceptConnect;
     u8 sendReady;
     u8 ackPending;
     u8 connected;
@@ -185,8 +187,8 @@ int DWCRap_Init(void *userData, DWCFriendData *friendList) {
     _dWork->lastNetId = -1;
     _dWork->vctEnabled = 0;
     _dWork->unk79E = 0;
-    _dWork->unk794 = 1;
-    _dWork->unk790 = 1;
+    _dWork->vctReady = 1;
+    _dWork->peerVctReady = 1;
     _dWork->unk796 = 1;
     _dWork->userData = userData;
     _dWork->friendList = friendList;
@@ -301,7 +303,7 @@ static void DWCRap_NewClientCallback(int index, void *param) {
 }
 
 static BOOL DWCRap_AttemptCallback(void *param) {
-    return _dWork->unk7A5;
+    return _dWork->acceptConnect;
 }
 
 // clang-format off
@@ -410,7 +412,7 @@ int DWCRap_Process(int a0) {
         if (_dWork->vctEnabled != 0) {
             DWCRap_StartVct(netInit->heapId);
         }
-        _dWork->unk794 = 0;
+        _dWork->vctReady = 0;
         DWCRap_SetState(DWCRAP_STATE_CONNECTED_IDLE);
         _dWork->errorCode = 1000;
         return 1000;
@@ -456,7 +458,7 @@ BOOL DWCRap_SendPacket(const void *data, int size, int type) {
     if (_dWork->sending != 0) {
         return FALSE;
     }
-    _dWork->header.word = type | (_dWork->unk794 << 8);
+    _dWork->header.word = type | (_dWork->vctReady << 8);
     _dWork->sendSeq++;
     _dWork->header.bytes[2] = _dWork->sendSeq;
     MI_CpuCopy8(data, _dWork->data, size);
@@ -606,9 +608,9 @@ static void DWCRap_SendCallback(int size, u8 aid, void *param) {
 
 static void DWCRap_SetUnk790(u32 header) {
     if (header & 0x100) {
-        _dWork->unk790 = 1;
+        _dWork->peerVctReady = 1;
     } else {
-        _dWork->unk790 = 0;
+        _dWork->peerVctReady = 0;
     }
 }
 
@@ -792,7 +794,7 @@ static BOOL DWCRap_CanPing(void) {
 static BOOL DWCRap_SendIdlePing(int index) {
     if (_dWork->sending == 0 && DWCRap_CanPing() && (func_ov011_02160344() & 0xfffe)) {
         _dWork->sending = 1;
-        _dWork->header.word = 2 | (_dWork->unk794 << 8);
+        _dWork->header.word = 2 | (_dWork->vctReady << 8);
         DWC_SendReliableBitmap(func_ov011_02160344(), &_dWork->header, 4);
         _dWork->idleFrames[index] = 0;
         return TRUE;
@@ -807,7 +809,7 @@ static u32 DWCRap_Update(void) {
     func_ov011_0215fc50();
     DWCRap_UpdateFriendStatus();
     if (_dWork->vctActive != 0) {
-        if (_dWork->unk794 == 1 && _dWork->unk790 == 1 && _dWork->unk796 == 1) {
+        if (_dWork->vctReady == 1 && _dWork->peerVctReady == 1 && _dWork->unk796 == 1) {
             DWCRapVChat_Update(FALSE);
         } else {
             DWCRapVChat_Update(TRUE);
@@ -853,14 +855,14 @@ static void DWCRap_VctEndCallback(void) {
 }
 
 void func_ov011_021515a4(void) {
-    _dWork->unk794 = 1;
+    _dWork->vctReady = 1;
 }
 
 static void DWCRap_StartVct(HeapID heapId) {
     int mode;
 
-    _dWork->unk794 = 1;
-    _dWork->unk790 = 1;
+    _dWork->vctReady = 1;
+    _dWork->peerVctReady = 1;
     _dWork->unk796 = 1;
     if (_dWork->vctActive == 0) {
         switch (_dWork->vctMode) {
@@ -905,7 +907,7 @@ void DWCRap_ResetVoiceChat(void) {
     if (_dWork != NULL) {
         _dWork->vctActive = 0;
         _dWork->lastConnectBits = 0;
-        _dWork->unk794 = 0;
+        _dWork->vctReady = 0;
     }
 }
 
@@ -1345,7 +1347,7 @@ int DWCRap_GetStatus(void) {
 }
 
 void func_ov011_02151fec(int a0) {
-    _dWork->unk7A5 = a0;
+    _dWork->acceptConnect = a0;
 }
 
 BOOL DWCRap_IsEnding(void) {
