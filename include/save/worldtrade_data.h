@@ -13,8 +13,10 @@ struct WorldTradeData {
     u8 unkDC[0x10];
     u16 flag;
     u16 unkEE;
-    u32 unkF0;
-    u32 unkF4;
+    // When the deposited Pokémon was traded away, and when the player last traded for a deposited one, as
+    // year << 24 | month << 16 | day << 8 | week
+    u32 depositTradeDate;
+    u32 exchangeDate;
 }; // size: 0xf8
 
 u32 WorldTradeData_GetBlockSize(void);

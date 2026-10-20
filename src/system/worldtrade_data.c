@@ -42,11 +42,11 @@ void WorldTradeData_SetPkm(WorldTradeData *data, PartyPkm *pkm, u32 box) {
 }
 
 void func_0200b4ec(WorldTradeData *data, u32 value) {
-    data->unkF0 = value;
+    data->depositTradeDate = value;
 }
 
 void func_0200b4f4(WorldTradeData *data, u32 value) {
-    data->unkF4 = value;
+    data->exchangeDate = value;
 }
 
 u16 func_0200b4fc(WorldTradeData *data) {
