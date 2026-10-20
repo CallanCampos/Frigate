@@ -65,11 +65,7 @@ static u8 PADDING[64] = { 0x80 };
     }
 
 void func_ov011_021719fc(HashContext *context) {
-    context->count[0] = context->count[1] = 0;
-    context->state[0] = 0x67452301;
-    context->state[1] = 0xefcdab89;
-    context->state[2] = 0x98badcfe;
-    context->state[3] = 0x10325476;
+    func_ov011_021719fcInline(context);
 }
 
 void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
