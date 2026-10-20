@@ -416,3 +416,10 @@ lib/dwcutilui/src/dwc_util_sound.c:
     .text       start:0x021b8090 end:0x021b8194
     .data       start:0x021c1434 end:0x021c144c
     .bss        start:0x021c41a8 end:0x021c41ac
+
+lib/dwcutilui/src/dwc_util_sub_screen.c:
+    complete
+    .text       start:0x021b8194 end:0x021b8874
+    .rodata     start:0x021c0474 end:0x021c04a8
+    .data       start:0x021c144c end:0x021c14c4
+    .bss        start:0x021c41ac end:0x021c41b4

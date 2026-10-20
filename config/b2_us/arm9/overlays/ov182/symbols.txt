@@ -1283,9 +1283,9 @@ sApScanWpaOui kind:data(any) addr:0x021c03e0
 sApScanNoBssid kind:data(any) addr:0x021c03e4
 sApScanParam kind:data(any) addr:0x021c03ec
 sWifiSettingsZeroAddress kind:data(any) addr:0x021c0430
-data_ov182_021c0434 kind:data(any) addr:0x021c0434
-data_ov182_021c0443 kind:data(any) addr:0x021c0443
-data_ov182_021c0452 kind:data(any) addr:0x021c0452
+sSubScreenCells kind:data(any) addr:0x021c0434
+sSubScreenPalettes kind:data(any) addr:0x021c0443
+sSubScreenPositions kind:data(any) addr:0x021c0452
 data_ov182_021c0468 kind:data(any) addr:0x021c0468
 data_ov182_021c046e kind:data(any) addr:0x021c046e
 data_ov182_021c0478 kind:data(any) addr:0x021c0478
@@ -1474,7 +1474,7 @@ data_ov182_021c1420 kind:data(any) addr:0x021c1420
 data_ov182_021c1434 kind:data(any) addr:0x021c1434
 data_ov182_021c1448 kind:data(any) addr:0x021c1448
 data_ov182_021c145c kind:data(any) addr:0x021c145c
-data_ov182_021c1470 kind:data(any) addr:0x021c1470
+sSubScreenNames kind:data(any) addr:0x021c1470
 data_ov182_021c1484 kind:data(any) addr:0x021c1484
 data_ov182_021c1498 kind:data(any) addr:0x021c1498
 data_ov182_021c14ac kind:data(any) addr:0x021c14ac
@@ -1661,8 +1661,8 @@ sScrollbar kind:bss addr:0x021c415c
 sApScan kind:bss addr:0x021c4160
 sWifiSettings kind:bss addr:0x021c4164
 sSound kind:bss addr:0x021c4168
-data_ov182_021c416c kind:bss addr:0x021c416c
-data_ov182_021c4170 kind:bss addr:0x021c4170
+sSubScreenData kind:bss addr:0x021c416c
+sSubScreenRow kind:bss addr:0x021c4170
 data_ov182_021c4174 kind:bss addr:0x021c4174
 data_ov182_021c4178 kind:bss addr:0x021c4178
 data_ov182_021c417c kind:bss addr:0x021c417c

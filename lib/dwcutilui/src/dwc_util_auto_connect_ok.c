@@ -7,6 +7,7 @@
 #include "dwc_util_main_menu.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sub_screen.h"
 #include "dwc_util_text.h"
 #include "nitro/gx.h"
 

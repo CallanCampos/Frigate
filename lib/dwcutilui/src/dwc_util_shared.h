@@ -20,17 +20,6 @@
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 
-// The rows of buttons of the two layouts; func_ov182_021b849c starts the task that moves them away,
-// func_ov182_021b854c is whether that task runs and func_ov182_021b87b0 whether they are idle
-void func_ov182_021b8154(int variant);
-void func_ov182_021b84c0(int variant);
-void func_ov182_021b849c(void);
-BOOL func_ov182_021b854c(void);
-BOOL func_ov182_021b87b0(void);
-
-// Loads the sub screen's BG 1 of one of the layouts at the next VBlank
-void func_ov182_021b87d0(int layout);
-
 // A dialog over the main screen with the message (as DWCUtilScreen_Start shows it) and the buttons of a layout.
 // func_ov182_021b8f14 is the button chosen, -2 until one is; func_ov182_021b8eec closes the dialog, and
 // func_ov182_021b8f24 is TRUE until it has closed
