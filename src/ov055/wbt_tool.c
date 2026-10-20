@@ -161,7 +161,7 @@ u8 WbtTool_GetPartyMainType(PokeParty *party, u64 seed) {
 }
 
 static void WbtTournament_LoadWinCounts(GameData *gameData, u16 *counts) {
-    void *save = func_020179f8(gameData);
+    void *save = GameData_GetWbtSave(gameData);
     int i;
 
     for (i = 0; i < 29; i++) {

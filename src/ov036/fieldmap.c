@@ -226,7 +226,7 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
             season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
     } else if (func_02018f78(areaId)) {
-        season = func_02017b70(field->gameData);
+        season = GameData_GetJoinAvenueSeason(field->gameData);
     } else if (func_02018f90(areaId)) {
         WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 

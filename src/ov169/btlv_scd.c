@@ -460,7 +460,7 @@ BtlvScd *BtlvScd_Create(BtlvCore *core, BtlMainModule *mainModule, BtlPokeCon *p
     scd->typeCount = BattleClient_GetAudienceSize(client);
     scd->typeMask = BattleClient_GetAudienceMask(client);
     scd->noCancel = func_ov167_0219c9c0(mainModule);
-    scd->keyCursorFlag = func_020174c8(GetGameData(scd->mainModule));
+    scd->keyCursorFlag = GameData_GetBattleKeyCursorFlag(GetGameData(scd->mainModule));
     scd->printQueue = PrintQueue_CreateDefault(scd->heapId);
     BtlvScd_ClearProcs(scd);
     return scd;
@@ -532,7 +532,7 @@ BOOL BtlvScd_IsIdle(BtlvScd *scd) {
 }
 
 void BtlvScd_Delete(BtlvScd *scd) {
-    func_020174bc(GetGameData(scd->mainModule), scd->keyCursorFlag);
+    GameData_SetBattleKeyCursorFlag(GetGameData(scd->mainModule), scd->keyCursorFlag);
     PrintQueue_Free(scd->printQueue);
     GFL_StrBufFree(scd->strbuf);
     BtlvInput_Delete(scd->input);

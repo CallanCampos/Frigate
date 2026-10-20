@@ -844,7 +844,7 @@ static void MedalBoxApp_VBlank(TCB *tcb, void *data) {
 
 // Starts at the column of the medal the cursor was on the last time
 static void MedalBoxApp_InitColumn(MedalBoxApp *work) {
-    u8 medal = func_02017b58(work->param->gameData);
+    u8 medal = GameData_GetMedalBoxCursorMedal(work->param->gameData);
     int index = MedalBoxDataSys_FindMedal(&work->data, medal);
 
     if (medal != 0xff) {
@@ -1096,7 +1096,7 @@ static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
 // Puts the cursor on the medal it was on the last time, if the keys are in use
 static void MedalBoxApp_RestoreCursor(MedalBoxApp *work) {
     if (!GCTX_HIDIsUsingTouch()) {
-        u8 medal = func_02017b58(work->param->gameData);
+        u8 medal = GameData_GetMedalBoxCursorMedal(work->param->gameData);
         int index = MedalBoxDataSys_FindMedal(&work->data, medal);
 
         if (medal != 0xff) {
@@ -1822,7 +1822,7 @@ static void MedalBoxApp_SetCursor(MedalBoxApp *work, u8 cursor, BOOL keys) {
 // Shows or hides the cursor, and remembers its medal for the next time
 static void MedalBoxApp_SetCursorMode(MedalBoxApp *work, int mode, u8 medal) {
     work->cursorMode = mode;
-    func_02017b4c(work->param->gameData, medal);
+    GameData_SetMedalBoxCursorMedal(work->param->gameData, medal);
     switch (work->cursorMode) {
     case CURSOR_TOUCH:
         MedalBoxApp_DrawInfo(work, NULL, FALSE);

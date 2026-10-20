@@ -127,7 +127,7 @@ BOOL LocalTvtCallData_CanCall(LocalTvtCallData *data, u16 person) {
         u32 stage = LocalTvtSecret_GetStage(callCount);
         u32 unk0378 = LocalTvtSecret_GetStage0378(stage);
         u32 zoneId = PlayerState_GetZoneID(GameData_GetPlayerState(data->gameData));
-        BOOL inZone = func_02017af0(data->gameData, zoneId);
+        BOOL inZone = GameData_IsSecretCallZone(data->gameData, zoneId);
 
         if (callCount == LocalTvtSecret_GetStageCount(stage)) {
             u32 i;

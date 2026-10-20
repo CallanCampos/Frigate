@@ -4,7 +4,7 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// The Pokémon World Tournament's save data, from func_020179f8. It counts to 9999 for each of 29 tournaments
+// The Pokémon World Tournament's save data, from GameData_GetWbtSave. It counts to 9999 for each of 29 tournaments
 // (wbt_savedata.c, a descriptive name). It is 0x5c bytes into the Trial House's save block, 0x3f
 
 #define WBT_TOURNAMENT_COUNT 29

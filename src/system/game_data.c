@@ -1,6 +1,7 @@
 #include "system/game_data.h"
 #include "types.h"
 #include "constants/directions.h"
+#include "constants/zones.h"
 #include "field/calender.h"
 #include "field/encounter.h"
 #include "field/event_data.h"
@@ -172,8 +173,11 @@ static const u16 DIRECTION_TO_3D_ANGLE[] = {
     0xc000, // DIR_RIGHT
 };
 
+// The zones that the secret Xtransceiver calls can be made from (as sLocalTvtSecretZones in local_tvt_calldata.c)
 static const u32 sPickValues[] = {
-    62, 96, 107, 406, 412, 458, 329, 331, 337, 348, 365, 368, 370, 374, 383,
+    ZONE_NIMBASA_CITY,  ZONE_DRIFTVEIL_CITY, ZONE_MISTRALTON_CITY, ZONE_LACUNOSA_TOWN, ZONE_UNDELLA_TOWN,
+    ZONE_LENTIMAS_TOWN, ZONE_ROUTE_5,        ZONE_ROUTE_6,         ZONE_ROUTE_7,       ZONE_ROUTE_9,
+    ZONE_ROUTE_11,      ZONE_ROUTE_12,       ZONE_ROUTE_13,        ZONE_ROUTE_14,      ZONE_ROUTE_16,
 };
 
 GameData *GameData_Create(HeapID heapId) {
@@ -251,7 +255,7 @@ GameData *GameData_Create(HeapID heapId) {
     gameData->medalBoxCursorMedal = 0xff;
     gameData->lensFlareEntryIdx = 67;
 
-    func_02017a78(gameData);
+    GameData_DrawSecretCallZones(gameData);
     return gameData;
 }
 
@@ -444,11 +448,11 @@ void GameData_SetLastSubscreen(GameData *gameData, u8 subscreen) {
     gameData->lastSubscreen = subscreen;
 }
 
-u8 func_020173ec(GameData *gameData) {
+u8 GameData_GetFieldMenuItem(GameData *gameData) {
     return gameData->fieldMenuItem;
 }
 
-void func_020173f8(GameData *gameData, u8 value) {
+void GameData_SetFieldMenuItem(GameData *gameData, u8 value) {
     gameData->fieldMenuItem = value;
 }
 
@@ -517,11 +521,11 @@ void GameData_SetLastBtlResult(GameData *gameData, u32 result) {
     gameData->lastBtlResult = result;
 }
 
-void func_020174bc(GameData *gameData, u8 value) {
+void GameData_SetBattleKeyCursorFlag(GameData *gameData, u8 value) {
     gameData->battleKeyCursorFlag = value;
 }
 
-u8 func_020174c8(GameData *gameData) {
+u8 GameData_GetBattleKeyCursorFlag(GameData *gameData) {
     return gameData->battleKeyCursorFlag;
 }
 
@@ -850,7 +854,7 @@ BSubwayScoreData *GameData_GetBSubwayScoreData(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BSUBWAY_SCORE);
 }
 
-void *func_02017968(GameData *gameData) {
+void *GameData_GetBSubwayWifiData(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BSUBWAY_3A);
 }
 
@@ -886,7 +890,7 @@ void *getTimeSigSaveBlock(GameData *gameData) {
     return getTimeSigBlkAddress(gameData->saveControl);
 }
 
-void *func_020179c8(GameData *gameData) {
+void *GameData_GetHallOfFameTeam(GameData *gameData) {
     return SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_40);
 }
 
@@ -906,7 +910,7 @@ WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData) {
     return &gameData->wbtSystem;
 }
 
-void *func_020179f8(GameData *gameData) {
+void *GameData_GetWbtSave(GameData *gameData) {
     return TrialHouseSave_GetWbtSave(gameData->saveControl);
 }
 
@@ -955,7 +959,7 @@ void SetScrPluginNo(GameData *gameData, u32 pluginNo) {
 }
 
 // Draws the three picks, again while two of them are the same
-void func_02017a78(GameData *gameData) {
+void GameData_DrawSecretCallZones(GameData *gameData) {
     int tries = 0;
     int i, j;
     BOOL different;
@@ -982,7 +986,7 @@ void func_02017a78(GameData *gameData) {
 }
 
 // Whether the value is one of the three picks
-BOOL func_02017af0(GameData *gameData, u32 value) {
+BOOL GameData_IsSecretCallZone(GameData *gameData, u32 value) {
     int i;
 
     for (i = 0; i < GAME_DATA_PICK_MAX; i++) {
@@ -1017,19 +1021,19 @@ void GameData_SetFunfestMission(GameData *gameData, BOOL flag) {
     gameData->funfestMission = flag;
 }
 
-void func_02017b4c(GameData *gameData, u8 value) {
+void GameData_SetMedalBoxCursorMedal(GameData *gameData, u8 value) {
     gameData->medalBoxCursorMedal = value;
 }
 
-u8 func_02017b58(GameData *gameData) {
+u8 GameData_GetMedalBoxCursorMedal(GameData *gameData) {
     return gameData->medalBoxCursorMedal;
 }
 
-void func_02017b64(GameData *gameData, u8 a1) {
+void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1) {
     gameData->joinAvenueSeason = a1;
 }
 
-u8 func_02017b70(GameData *gameData) {
+u8 GameData_GetJoinAvenueSeason(GameData *gameData) {
     return gameData->joinAvenueSeason;
 }
 

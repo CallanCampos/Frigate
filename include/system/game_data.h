@@ -62,8 +62,8 @@ u16 GameData_GetMyCity(GameData *gameData);
 // The C-Gear power request, which GameData_SaveCGearPowerRequest puts aside
 u8 GameData_GetCGearPowerRequest(GameData *gameData);
 void GameData_SetCGearPowerRequest(GameData *gameData, u8 value);
-// A byte of the game data, which func_020173f8 sets
-u8 func_020173ec(GameData *gameData);
+// The field menu item selected last
+u8 GameData_GetFieldMenuItem(GameData *gameData);
 // Save block 0x39, the Battle Subway's scores
 BSubwayScoreData *GameData_GetBSubwayScoreData(GameData *gameData);
 BSubwayScrWork *GameData_GetBSubwayScrWork(GameData *gameData);
@@ -132,7 +132,7 @@ BOOL GameData_IsFunfestMission(GameData *gameData);
 // Sets whether a Funfest mission is running
 void GameData_SetFunfestMission(GameData *gameData, BOOL flag);
 u32 GameData_GetLensFlareEntryIdx(GameData *gameData);
-void func_020173f8(GameData *gameData, u8 value);
+void GameData_SetFieldMenuItem(GameData *gameData, u8 value);
 void GameData_SetLensFlareEntryIdx(GameData *gameData, u32 index);
 void GameData_SetNextZone(GameData *gameData, ZoneSpawnInfo *spawn);
 ZoneSpawnInfo *GetGameDataNowSpawnZone(GameData *gameData);
@@ -165,10 +165,10 @@ PokewoodSystem **GameData_GetPokewoodSystemPtr(GameData *gameData);
 // Where the Pokémon World Tournament keeps its WbtSystem while the player is at the tournament
 WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData);
 // The Pokémon World Tournament's save data
-void *func_020179f8(GameData *gameData);
+void *GameData_GetWbtSave(GameData *gameData);
 // The save's play time
 PlayTime *GameData_GetPlayTime(GameData *gameData);
-void func_02017b64(GameData *gameData, u8 a1);
+void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1);
 ResortWork *GameData_GetResortWork(GameData *gameData);
 u32 GetScrPluginNo(GameData *gameData);
 void SetScrPluginNo(GameData *gameData, u32 pluginNo);
@@ -178,7 +178,7 @@ void SetNowWeather(GameData *gameData, u8 weather);
 u32 GetNowWeather(GameData *gameData);
 BOOL GameData_CheckEventsPaused(GameData *gameData);
 // The Battle Subway's save data
-void *func_02017968(GameData *gameData);
+void *GameData_GetBSubwayWifiData(GameData *gameData);
 // Where the Trial House work is kept
 TrialHouseWork **GetTrialHouseWkPPtr(GameData *gameData);
 // The follower of field/pair_sys.h
@@ -189,20 +189,20 @@ u8 GameData_Is30FPSSkipFrame(GameData *gameData);
 BOOL GameData_Is30FPSMode(GameData *gameData);
 u32 getCurrentStepTotal(GameData *gameData);
 void setCurrentStepTotal(GameData *gameData, u32 stepTotal);
-// A byte of the game data, which overlay 169 uses
-void func_020174bc(GameData *gameData, u8 value);
-u8 func_020174c8(GameData *gameData);
+// Set by the battle input when the player uses the keys, kept between battles
+void GameData_SetBattleKeyCursorFlag(GameData *gameData, u8 value);
+u8 GameData_GetBattleKeyCursorFlag(GameData *gameData);
 // Sets the option that GameData_IsCGearOn returns
 void GameData_SetCGearOn(GameData *gameData, BOOL flag);
-// Save block 0x40
-void *func_020179c8(GameData *gameData);
-// Draws three different values of fifteen at random, and whether a value is one of the three
-void func_02017a78(GameData *gameData);
-BOOL func_02017af0(GameData *gameData, u32 value);
-// A byte of the game data, 0xff at first, which overlay 145 uses
-void func_02017b4c(GameData *gameData, u8 value);
-u8 func_02017b58(GameData *gameData);
-u8 func_02017b70(GameData *gameData);
+// Save block 0x40, the Hall of Fame team
+void *GameData_GetHallOfFameTeam(GameData *gameData);
+// Draws three different zones of fifteen that the secret calls can be made from, and whether a zone is one of them
+void GameData_DrawSecretCallZones(GameData *gameData);
+BOOL GameData_IsSecretCallZone(GameData *gameData, u32 value);
+// The medal under the Medal Box cursor, 0xff at first, and the season of the Join Avenue areas
+void GameData_SetMedalBoxCursorMedal(GameData *gameData, u8 value);
+u8 GameData_GetMedalBoxCursorMedal(GameData *gameData);
+u8 GameData_GetJoinAvenueSeason(GameData *gameData);
 CityState *GameData_GetCityState(GameData *gameData, u32 index);
 
 #endif // POKEBW2_SYSTEM_GAME_DATA_H

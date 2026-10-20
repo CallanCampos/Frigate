@@ -168,7 +168,7 @@ BOOL WbtCmd_MakeRentalParty(VM *vm, FieldScriptEnv *env) {
 
 // Sets three variables to the Trainers that the save's three entries name, for those with unk8_0 of at least 3
 BOOL WbtCmd_GetSlotTrainerObjCodes(VM *vm, FieldScriptEnv *env) {
-    void *save = func_020179f8(FieldScriptEnv_GetGameData(env));
+    void *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u16 *var1 = ScriptReadVar(vm, env);
     u16 *var2 = ScriptReadVar(vm, env);
     u16 *var3 = ScriptReadVar(vm, env);
@@ -194,7 +194,7 @@ BOOL WbtCmd_GetSlotTrainerObjCodes(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL WbtCmd_GetSlot(VM *vm, FieldScriptEnv *env) {
-    void *save = func_020179f8(FieldScriptEnv_GetGameData(env));
+    void *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u16 index = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 

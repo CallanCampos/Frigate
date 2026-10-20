@@ -238,7 +238,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
         FieldMenu_UpdateCursor(menu);
         FieldMenu_SetOpeningScroll(menu);
     } else {
-        FieldMenu_SetCursorItem(menu, func_020173ec(gameData));
+        FieldMenu_SetCursorItem(menu, GameData_GetFieldMenuItem(gameData));
         menu->cursorDirty = TRUE;
         if (menu->keyMode) {
             ClActor_SetVisible(menu->cursor, TRUE);

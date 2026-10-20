@@ -331,7 +331,8 @@ static void BSubwayRecords_InitData(BSubwayRecordsWork *wk, BSubwayRecordsParam 
     wk->strbuf = GFL_StrBufCreate(0x40, HEAPID_BSUBWAY_RECORDS);
     wk->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_BSUBWAY_RECORDS);
     wk->vblankTcb = GFL_VBlankTCBAdd(BSubwayRecords_VBlank, wk, 0);
-    wk->records = BSubwayWifiData_AllocLeaders(func_02017968(wk->param->gameData), HEAPID_BSUBWAY_RECORDS);
+    wk->records =
+        BSubwayWifiData_AllocLeaders(GameData_GetBSubwayWifiData(wk->param->gameData), HEAPID_BSUBWAY_RECORDS);
     wk->count = BSubwayWifiLeader_CountList(wk->records);
     BSubwayRecords_InitPages(wk);
 }

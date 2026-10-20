@@ -400,7 +400,7 @@ static BOOL WifiBSubway_ProcInit(GameProc *proc, u32 *state, void *paramPtr, voi
     wk->adventure = getSaveAdventureDataBlk(save);
     wk->wifiList = GameData_GetWifiList(gameData);
     wk->playerInfo = GetGameDataPlayerInfo(gameData);
-    wk->wifiData = func_02017968(gameData);
+    wk->wifiData = GameData_GetBSubwayWifiData(gameData);
     wk->score = GameData_GetBSubwayScoreData(gameData);
     WifiBSubwayRoom_Init(&wk->room);
     WifiBSubwayUpload_Init(&wk->upload, HEAPID_WIFI_BSUBWAY);
@@ -732,7 +732,7 @@ static u32 WifiBSubwayUpload_WaitCheckName(WifiBSubwayUpload *upload, HeapID hea
 // Sends the player's profile and fills the record
 static void WifiBSubwayUpload_SetProfile(WifiBSubwayUpload *upload, GameData *gameData, WifiBSubwayError *error) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    BSubwayWifiData *wifiData = func_02017968(gameData);
+    BSubwayWifiData *wifiData = GameData_GetBSubwayWifiData(gameData);
     BSubwayScoreData *score = GameData_GetBSubwayScoreData(gameData);
     PlayerInfo *playerInfo = upload->playerInfo;
 

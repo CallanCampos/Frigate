@@ -343,7 +343,7 @@ static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, const LocalTvtPersonS
             }
             LocalTvtCallData_AddCall(setup->callData, LOCAL_TVT_CALL_SECRET, SECRET_CALL_MAX);
         }
-        func_02017a78(secret->gameData);
+        GameData_DrawSecretCallZones(secret->gameData);
         LocalTvtPerson_End(person);
         return TRUE;
     }
