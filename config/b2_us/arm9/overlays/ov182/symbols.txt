@@ -1566,7 +1566,7 @@ data_ov182_021c27b8 kind:bss addr:0x021c27b8 ambiguous
 sPeerMac kind:bss addr:0x021c28c0
 sCipherKey kind:bss addr:0x021c28c8
 data_ov182_021c28ca kind:bss addr:0x021c28ca
-gAossAp kind:bss addr:0x021c2940
+gAossApAlloc kind:bss addr:0x021c2940
 gAossApFree kind:bss addr:0x021c294c
 sAossApMessages kind:bss addr:0x021c2950
 sAossApQueue kind:bss addr:0x021c2960

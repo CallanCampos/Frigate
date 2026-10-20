@@ -257,7 +257,7 @@ static AossSession sSession;
 static AossWork sAoss;
 
 static void *Aoss_Alloc(u32 size) {
-    return gAossAp.alloc(size);
+    return gAossApAlloc(size);
 }
 
 static void Aoss_Free(void *ptr) {
@@ -274,7 +274,7 @@ int DWC_Aoss_Start(AossParam *param) {
     } else {
         result = 0;
     }
-    if (gAossAp.alloc == NULL || gAossApFree == NULL) {
+    if (gAossApAlloc == NULL || gAossApFree == NULL) {
         result = -1;
     }
     if (result == -1) {
@@ -1800,7 +1800,7 @@ static void Aoss_ScrambleSwap(u8 *block, int length, u8 *work) {
 
 static void *Soc_Alloc(u32 name, s32 size) {
     if (size > 0) {
-        return gAossAp.alloc(size);
+        return gAossApAlloc(size);
     }
     return NULL;
 }

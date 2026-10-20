@@ -664,6 +664,11 @@ Same instructions, registers swapped.
   spellings with one variable leave 26 bytes of registers. The decryption's bytes go through a `static inline` that
   returns the xor and stores the encrypted byte into the state, which splits their live ranges so that the first
   lands in `r7` and the next two in `fp`.
+- Under MWCC 2.0 a loop over an allocation that is freed after it walks the pointer itself when the source does: in
+  `AossAp_Scan` (`dwc_aoss_ap.c`) `Wifi_ConvertBss(descs, &scanList->ap[i]); descs++;`, with the start kept in a
+  second local (`buffer = descs;` before the search) for the free, steps `descs` in its saved register
+  (`adds r4, #0xc0`) and spills `buffer`; indexing `&descs[i]` makes a new induction pointer and keeps `descs` on the
+  stack, 4 bytes over.
 
 ## Stack slots
 
@@ -3288,10 +3293,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the ROM's order, then the count, then the table. `cgtool.c` declares its two 12-byte joint tables in reverse and
   its 16-byte texture-matrix table after them, which the size puts last. The compiled object's symbol table shows the
   order.
-- MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
-  and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
-  the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a
-  jump table only when every value of the range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
+- MWCC 2.0 without `-ipa file` reaches a file's statics and globals defined with an initializer (`= NULL`, `= 0`,
+  `= { 0 }`) from one shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`), and a tentative definition or another
+  file's global by its own address. It lays the initialized ones out first in `.bss`. A "struct" of words reached from
+  that anchor is separate statics: `dwc_aoss_ap.c`'s `gAossApAlloc`, `gAossApOnModeChange`, `gAossApBlock` and
+  `gAossApFree`, four `= NULL` globals, give `DWC_Aoss_Init` its one literal for `0x021c2940` and the free callback at
+  + 0xc, while `dwc_aoss.c` loads the callback by its own address. It emits a jump table only when every value of the
+  range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
