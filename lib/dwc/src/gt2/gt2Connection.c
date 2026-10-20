@@ -191,7 +191,7 @@ void func_ov011_0217d080(GTI2Connection *connection, BOOL hard) {
 void func_ov011_0217d0b4(GTI2Connection *connection) {
     if (connection->state != 7) {
         connection->state = 7;
-        func_ov011_02171920(connection->socket->connections, &connection);
+        TableRemove(connection->socket->connections, &connection);
         func_ov011_021715a4(connection->socket->closedConnections, &connection);
     }
 }

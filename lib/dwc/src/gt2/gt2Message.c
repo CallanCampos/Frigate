@@ -385,7 +385,7 @@ static BOOL func_ov011_0217d8c0(GTI2Connection *connection, int type, int sequen
     message.length = length;
     message.type = type;
     message.serialNumber = sequence;
-    func_ov011_02171600(connection->incomingMessages, &message, func_ov011_0217d8b4);
+    ArrayInsertSorted(connection->incomingMessages, &message, func_ov011_0217d8b4);
     if (count + 1 != func_ov011_02171588(connection->incomingMessages)) {
         *dropped = TRUE;
         return TRUE;

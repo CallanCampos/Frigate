@@ -1,17 +1,17 @@
 #include "dwc/ext.h"
 #include "dwc/md5.h"
 
-// GameSpy's MD5 (md5c.c): RSA's reference MD5, from RFC 1321, whose names the static functions carry in their
-// comments. The others' names, from pret/pokerevo's Wii build, are in dwc/md5.h
+// GameSpy's MD5 (md5c.c): RSA's reference MD5, from RFC 1321, whose names the static functions carry. MD5Transform
+// keeps its address, with its name in the comment: NitroWiFi's SSL has a function of that name in this overlay
 
-// RFC 1321's MD5Transform, Encode, Decode, MD5_memcpy and MD5_memset
+// RFC 1321's MD5Transform, and its helpers
 static void func_ov011_02171af0(u32 state[4], const u8 block[64]);
-static void func_ov011_02172338(u8 *output, u32 *input, u32 length);
-static void func_ov011_02172368(u32 *output, const u8 *input, u32 length);
-static void func_ov011_021723a0(void *output, const void *input, u32 length);
-static void func_ov011_021723a8(void *output, int value, u32 length);
+static void Encode(u8 *output, u32 *input, u32 length);
+static void Decode(u32 *output, const u8 *input, u32 length);
+static void MD5_memcpy(void *output, const void *input, u32 length);
+static void MD5_memset(void *output, int value, u32 length);
 // Writes a digest as hex digits
-static void func_ov011_021723b0(u8 digest[16], char *output);
+static void MD5Print(u8 digest[16], char *output);
 
 static u8 PADDING[64] = { 0x80 };
 
@@ -81,7 +81,7 @@ void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
     context->count[1] += (inputLen >> 29);
     partLen = 64 - index;
     if (inputLen >= partLen) {
-        func_ov011_021723a0(&context->buffer[index], input, partLen);
+        MD5_memcpy(&context->buffer[index], input, partLen);
         func_ov011_02171af0(context->state, context->buffer);
         for (i = partLen; i + 63 < inputLen; i += 64) {
             func_ov011_02171af0(context->state, &input[i]);
@@ -90,7 +90,7 @@ void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
     } else {
         i = 0;
     }
-    func_ov011_021723a0(&context->buffer[index], &input[i], inputLen - i);
+    MD5_memcpy(&context->buffer[index], &input[i], inputLen - i);
 }
 
 void func_ov011_02171a9c(u8 digest[16], HashContext *context) {
@@ -98,13 +98,13 @@ void func_ov011_02171a9c(u8 digest[16], HashContext *context) {
     u32 index;
     u32 padLen;
 
-    func_ov011_02172338(bits, context->count, 8);
+    Encode(bits, context->count, 8);
     index = (context->count[0] >> 3) & 0x3f;
     padLen = (index < 56) ? (56 - index) : (120 - index);
     func_ov011_02171a24(context, PADDING, padLen);
     func_ov011_02171a24(context, bits, 8);
-    func_ov011_02172338(digest, context->state, 16);
-    func_ov011_021723a8(context, 0, sizeof(*context));
+    Encode(digest, context->state, 16);
+    MD5_memset(context, 0, sizeof(*context));
 }
 
 static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
@@ -114,7 +114,7 @@ static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
     u32 d = state[3];
     u32 x[16];
 
-    func_ov011_02172368(x, block, 64);
+    Decode(x, block, 64);
 
     FF(a, b, c, d, x[0], S11, 0xd76aa478);
     FF(d, a, b, c, x[1], S12, 0xe8c7b756);
@@ -189,10 +189,10 @@ static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
     state[2] += c;
     state[3] += d;
 
-    func_ov011_021723a8(x, 0, sizeof(x));
+    MD5_memset(x, 0, sizeof(x));
 }
 
-static void func_ov011_02172338(u8 *output, u32 *input, u32 length) {
+static void Encode(u8 *output, u32 *input, u32 length) {
     u32 i;
     u32 j;
 
@@ -204,7 +204,7 @@ static void func_ov011_02172338(u8 *output, u32 *input, u32 length) {
     }
 }
 
-static void func_ov011_02172368(u32 *output, const u8 *input, u32 length) {
+static void Decode(u32 *output, const u8 *input, u32 length) {
     u32 i;
     u32 j;
 
@@ -214,16 +214,16 @@ static void func_ov011_02172368(u32 *output, const u8 *input, u32 length) {
     }
 }
 
-static void func_ov011_021723a0(void *output, const void *input, u32 length) {
+static void MD5_memcpy(void *output, const void *input, u32 length) {
     memcpy(output, input, length);
 }
 
-static void func_ov011_021723a8(void *output, int value, u32 length) {
+static void MD5_memset(void *output, int value, u32 length) {
     memset(output, value, length);
 }
 
 // Writes the digest as 32 hex digits and an end
-static void func_ov011_021723b0(u8 digest[16], char *output) {
+static void MD5Print(u8 digest[16], char *output) {
     static const char hexDigits[] = "0123456789abcdef";
     u32 i;
 
@@ -234,12 +234,12 @@ static void func_ov011_021723b0(u8 digest[16], char *output) {
     output[32] = '\0';
 }
 
-void func_ov011_021723e8(const u8 *input, u32 length, char *output) {
+void MD5Digest(const u8 *input, u32 length, char *output) {
     HashContext context;
     u8 digest[16];
 
     func_ov011_021719fc(&context);
     func_ov011_02171a24(&context, input, length);
     func_ov011_02171a9c(digest, &context);
-    func_ov011_021723b0(digest, output);
+    MD5Print(digest, output);
 }

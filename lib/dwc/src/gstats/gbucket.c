@@ -24,7 +24,7 @@ void *BucketNew(GBucketSet *set, char *name, BucketType type, void *initialvalue
     bucket.vals.sval = NULL;
     bucket.nvals = 1;
     DoSet(&bucket, initialvalue);
-    func_ov011_021718dc(set->buckets, &bucket);
+    TableEnter(set->buckets, &bucket);
     return DoGet(DoFind(set, name));
 }
 
@@ -191,5 +191,5 @@ static GBucket *DoFind(GBucketSet *set, char *name) {
         set = g_buckets;
     }
     key.name = name;
-    return func_ov011_02171964(set->buckets, &key);
+    return TableLookup(set->buckets, &key);
 }

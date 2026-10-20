@@ -121,7 +121,7 @@ static void func_ov011_0217d344(void *element, void *clientData) {
 }
 
 void func_ov011_0217d350(GTI2Socket *socket) {
-    func_ov011_021719a4(socket->connections, func_ov011_0217d344, NULL);
+    TableMapSafe(socket->connections, func_ov011_0217d344, NULL);
 }
 
 int func_ov011_0217d364(GTI2Connection *connection) {

@@ -48,7 +48,7 @@ GTI2Connection *func_ov011_0217e7a4(GTI2Socket *socket, u32 ip, u16 port) {
     key.ip = ip;
     key.port = port;
     keyPointer = &key;
-    found = func_ov011_02171964(socket->connections, &keyPointer);
+    found = TableLookup(socket->connections, &keyPointer);
     if (found != NULL) {
         return *found;
     }
@@ -82,15 +82,14 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     socket->incomingBufferSize = incomingBufferSize;
     socket->outgoingBufferSize = outgoingBufferSize;
     socket->onSocketError = onSocketError;
-    socket->connections =
-        func_ov011_02171830(sizeof(GTI2Connection *), 0x20, 2, func_ov011_0217e768, func_ov011_0217e77c, NULL);
+    socket->connections = TableNew2(sizeof(GTI2Connection *), 0x20, 2, func_ov011_0217e768, func_ov011_0217e77c, NULL);
     if (socket->connections == NULL) {
         gsifree(socket);
         return 1;
     }
     socket->closedConnections = func_ov011_02171514(sizeof(GTI2Connection *), 4, func_ov011_0217e798);
     if (socket->closedConnections == NULL) {
-        func_ov011_0217187c(socket->connections);
+        TableFree(socket->connections);
         gsifree(socket);
         return 1;
     }
@@ -102,7 +101,7 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
         socket->protocolOffset = protocol;
     }
     if (socket->handle == -1) {
-        func_ov011_0217187c(socket->connections);
+        TableFree(socket->connections);
         func_ov011_02171558(socket->closedConnections);
         gsifree(socket);
         return 3;
@@ -114,7 +113,7 @@ int func_ov011_0217e7cc(GTI2Socket **socketOut, const char *localAddress, int ou
     if (protocol != 3) {
         if (bind(socket->handle, &address, sizeof(address)) == -1) {
             closesocket(socket->handle);
-            func_ov011_0217187c(socket->connections);
+            TableFree(socket->connections);
             func_ov011_02171558(socket->closedConnections);
             gsifree(socket);
             return 3;
@@ -134,7 +133,7 @@ void func_ov011_0217e944(GTI2Socket *socket) {
         return;
     }
     closesocket(socket->handle);
-    func_ov011_0217187c(socket->connections);
+    TableFree(socket->connections);
     func_ov011_02171558(socket->closedConnections);
     gsifree(socket);
     SocketShutDown();
@@ -187,7 +186,7 @@ int func_ov011_0217e984(GTI2Socket *socket, GTI2Connection **connectionOut, u32 
         if (connection->receiveFilters == NULL) {
             goto fail;
         }
-        func_ov011_021718dc(socket->connections, &connection);
+        TableEnter(socket->connections, &connection);
         *connectionOut = func_ov011_0217e7a4(socket, ip, port);
         if (*connectionOut != NULL) {
             return 0;
@@ -230,7 +229,7 @@ void func_ov011_0217eac8(GTI2Connection *connection) {
             }
         }
     } else {
-        func_ov011_02171920(connection->socket->connections, &connection);
+        TableRemove(connection->socket->connections, &connection);
     }
 }
 
@@ -291,7 +290,7 @@ static int func_ov011_0217ec68(void *element, void *clientData) {
 BOOL func_ov011_0217eca0(GTI2Socket *socket) {
     u32 now = current_time();
 
-    if (func_ov011_021719cc(socket->connections, func_ov011_0217ec68, &now)) {
+    if (TableMapSafe2(socket->connections, func_ov011_0217ec68, &now)) {
         return FALSE;
     }
     return TRUE;
