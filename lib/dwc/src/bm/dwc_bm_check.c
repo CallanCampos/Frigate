@@ -149,12 +149,12 @@ static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
         return 0;
     }
 
-    usedMask = pages[0].usedMask;
+    usedMask = pages[0].connection.usedMask;
     if (!valid[0]) {
         usedMask = 0;
         func_0205e540(pages, 0);
         if (valid[1]) {
-            usedMask = pages[1].usedMask;
+            usedMask = pages[1].connection.usedMask;
             MI_CpuCopy8(pages[1].wifiId, pages[0].wifiId, DWC_BM_PACKED_SIZE);
         }
     }
@@ -180,8 +180,8 @@ static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
             lost = TRUE;
         }
     }
-    pages[0].usedMask = newUsedMask;
-    pages[1].usedMask = newUsedMask;
+    pages[0].connection.usedMask = newUsedMask;
+    pages[1].connection.usedMask = newUsedMask;
     if (!func_0205e668(pages, table)) {
         return DWC_BM_CHECK_WRITE_FAILED;
     }
@@ -224,11 +224,11 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
         return ntrResult;
     }
 
-    usedMask = pages[0].ntr.usedMask;
+    usedMask = pages[0].ntr.connection.usedMask;
     if (!valid[0]) {
         func_0205e56c(pages, 0);
         if (valid[1]) {
-            usedMask = pages[1].ntr.usedMask;
+            usedMask = pages[1].ntr.connection.usedMask;
         } else {
             usedMask = 7;
         }
@@ -249,8 +249,8 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
             lost = TRUE;
         }
     }
-    pages[0].ntr.usedMask = newUsedMask;
-    pages[1].ntr.usedMask = newUsedMask;
+    pages[0].ntr.connection.usedMask = newUsedMask;
+    pages[1].ntr.connection.usedMask = newUsedMask;
     if (!func_0205e714(pages, table)) {
         return DWC_BM_CHECK_WRITE_FAILED;
     }

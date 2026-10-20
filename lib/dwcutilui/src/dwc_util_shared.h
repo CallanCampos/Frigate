@@ -25,7 +25,6 @@
 // the mask and the gateway, and the DNS servers
 struct DWCUtilSettingsEdit {
     DWCBmConnection connection;
-    u8 unk_ef;
     u8 netmask[4];
     u8 index;
     u8 autoAddress;

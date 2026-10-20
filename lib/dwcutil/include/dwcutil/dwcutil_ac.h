@@ -24,7 +24,9 @@ typedef struct DWCUtilAcResult {
     // 0 for none, 1 to 3 for WEP keys of 40, 104 and 128 bits
     int wepMode;
     int unk_24;
-    u8 unk_28[0xc0];
+    // The four WEP keys, of the length that wepMode says
+    u8 wepKeys[4][0x20];
+    u8 unk_a8[0x40];
 } DWCUtilAcResult;
 
 // Starts the test; TRUE, or a negative error
