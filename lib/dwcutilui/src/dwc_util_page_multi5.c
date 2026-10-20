@@ -50,7 +50,7 @@ static BOOL DWCUtilPageMulti5_IsLidClosed(void) {
 }
 
 void DWCUtilPageMulti5_Init(void) {
-    func_ov182_021ae134(DWCUtilPageMulti5_OnMoveEvent);
+    DWCUtilMove_Start(DWCUtilPageMulti5_OnMoveEvent);
     sMoveWaitEnd = MOVE_WAIT_CANCELLED;
     DWCUtilPageMulti5_LoadGraphics();
     DWCUtilGfxResource_ShowMessage(0x1c);
@@ -114,7 +114,7 @@ static void DWCUtilPageMulti5_HandleChoice(void) {
 
 static void DWCUtilPageMulti5_DisableButtons(void) {
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
-        func_ov182_021ae1d4();
+        DWCUtilMove_End();
     }
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
@@ -125,7 +125,7 @@ static void DWCUtilPageMulti5_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) != 0) {
         return;
     }
-    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !func_ov182_021ae210()) {
+    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !DWCUtilMove_HasEnded()) {
         return;
     }
     DWCUtilUiObject_Exit();
@@ -146,7 +146,7 @@ static void DWCUtilPageMulti5_WaitFadeOut(void) {
     if (!DWCUtilUiObject_IsIdle()) {
         return;
     }
-    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !func_ov182_021ae210()) {
+    if (sMoveWaitEnd == MOVE_WAIT_CANCELLED && !DWCUtilMove_HasEnded()) {
         return;
     }
     DWCUtilUiEffect_Destroy();
@@ -158,10 +158,10 @@ static void DWCUtilPageMulti5_WaitFadeOut(void) {
     DWCUtilDisplay_HidePlanes(0, 0x15);
     if (sMoveWaitEnd == MOVE_WAIT_CANCELLED) {
         DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021af25c);
+        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     } else if (sMoveWaitEnd == MOVE_WAIT_EVENT) {
         DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021aff3c);
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
     } else {
         DWCUtilMain_SetLayout(0, 1);
         DWCUtilMain_SetUpdate(DWCUtilPageMove_Init);
@@ -177,6 +177,6 @@ static void DWCUtilPageMulti5_OnMoveEvent(int event) {
         sMoveWaitEnd = MOVE_WAIT_EVENT;
         DWCUtilSound_PlaySe(0x12);
     }
-    func_ov182_021ae224(NULL);
+    DWCUtilMove_SetCallback(NULL);
     DWCUtilMain_SetUpdate(DWCUtilPageMulti5_DisableButtons);
 }

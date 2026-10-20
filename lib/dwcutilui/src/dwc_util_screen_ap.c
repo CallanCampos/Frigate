@@ -213,7 +213,7 @@ static void DWCUtilScreenAp_HandleChoice(void) {
             break;
         case 1:
             DWCUtilUiObject_Disable();
-            DWCUtilMain_SetUpdate(func_ov182_021ae4f4);
+            DWCUtilMain_SetUpdate(DWCUtilMainMenu_ExitUtility);
             return;
         }
         break;
@@ -294,7 +294,7 @@ static void DWCUtilScreenAp_WaitFadeOut(void) {
     DWCUtilDisplay_HidePlanes(0, 0x14);
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
         DWCUtilMain_SetLayout(0, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021ae748);
+        DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
     } else {
         switch (sScreenAp.cursor) {
         case 0:

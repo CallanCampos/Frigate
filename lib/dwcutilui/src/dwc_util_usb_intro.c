@@ -79,7 +79,7 @@ static void func_ov182_021b69b8(void) {
 }
 
 static void func_ov182_021b69c8(void) {
-    func_ov182_021aec10Inline();
+    DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
 static void func_ov182_021b69f0(void) {

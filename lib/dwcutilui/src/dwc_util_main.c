@@ -71,7 +71,7 @@ int DWC_StartUtility(void *work, int language, int param) {
     DWCUtilMain_InitSystem();
     DWCUtilMain_InitGraphics();
     DWCUtilSound_Init();
-    DWCUtilMain_SetUpdate(func_ov182_021ae574);
+    DWCUtilMain_SetUpdate(DWCUtilMainMenu_InitUtility);
     do {
         DWCUtilTouch_Update();
         sMain.update();

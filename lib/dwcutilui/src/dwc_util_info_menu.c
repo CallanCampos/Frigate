@@ -19,57 +19,57 @@
 #include "nitro/os.h"
 #include "nitro/pm.h"
 
-static void func_ov182_021aeb30(void);
-static void func_ov182_021aeb80(void);
-static void func_ov182_021aebb8(void);
-static void func_ov182_021aebe0(void);
-static void func_ov182_021aec00(void);
-static void func_ov182_021aec10(void);
+static void DWCUtilInfoMenu_LoadEraseGraphics(void);
+static void DWCUtilInfoMenu_EraseFadeIn(void);
+static void DWCUtilInfoMenu_EraseWaitFadeIn(void);
+static void DWCUtilInfoMenu_EraseWaitButtons(void);
+static void DWCUtilInfoMenu_EraseMain(void);
+static void DWCUtilInfoMenu_EraseHandleInput(void);
 static void func_ov182_021aec38(void);
-static void func_ov182_021aec3c(void);
-static void func_ov182_021aec84(void);
-static void func_ov182_021aec9c(void);
-static void func_ov182_021aece0(void);
-static void func_ov182_021aed60(void);
-static void func_ov182_021aed98(void);
-static void func_ov182_021aedb0(void);
-static void func_ov182_021aedcc(void);
-static void func_ov182_021aee1c(void);
-static void func_ov182_021aee40(void);
-static void func_ov182_021aee60(void);
-static void func_ov182_021aee80(void);
-static void func_ov182_021aee90(void);
+static void DWCUtilInfoMenu_EraseHandleChoice(void);
+static void DWCUtilInfoMenu_EraseDisableButtons(void);
+static void DWCUtilInfoMenu_EraseFadeOut(void);
+static void DWCUtilInfoMenu_EraseWaitFadeOut(void);
+static void DWCUtilInfoMenu_EraseWaitDialog(void);
+static void DWCUtilInfoMenu_EraseWaitDialogClosed(void);
+static void DWCUtilInfoMenu_EraseSettings(void);
+static void DWCUtilInfoMenu_LoadErasedGraphics(void);
+static void DWCUtilInfoMenu_ErasedFadeIn(void);
+static void DWCUtilInfoMenu_ErasedWaitFadeIn(void);
+static void DWCUtilInfoMenu_ErasedWaitButtons(void);
+static void DWCUtilInfoMenu_ErasedMain(void);
+static void DWCUtilInfoMenu_ErasedHandleInput(void);
 static void func_ov182_021aeea4(void);
-static void func_ov182_021aeea8(void);
-static void func_ov182_021aeec4(void);
-static void func_ov182_021aeedc(void);
-static void func_ov182_021aef10(void);
-static void func_ov182_021aef5c(void);
-static void func_ov182_021aefac(void);
-static void func_ov182_021af0f8(void);
-static void func_ov182_021af130(void);
-static void func_ov182_021af158(void);
-static void func_ov182_021af178(void);
-static void func_ov182_021af188(void);
+static void DWCUtilInfoMenu_ErasedHandleChoice(void);
+static void DWCUtilInfoMenu_ErasedDisableButtons(void);
+static void DWCUtilInfoMenu_ErasedFadeOut(void);
+static void DWCUtilInfoMenu_PowerOff(void);
+static void DWCUtilInfoMenu_LoadInfoGraphics(void);
+static void DWCUtilInfoMenu_DrawConsoleInfo(void);
+static void DWCUtilInfoMenu_InfoFadeIn(void);
+static void DWCUtilInfoMenu_InfoWaitFadeIn(void);
+static void DWCUtilInfoMenu_InfoWaitButtons(void);
+static void DWCUtilInfoMenu_InfoMain(void);
+static void DWCUtilInfoMenu_InfoHandleInput(void);
 static void func_ov182_021af19c(void);
-static void func_ov182_021af1a0(void);
-static void func_ov182_021af1bc(void);
-static void func_ov182_021af1d4(void);
-static void func_ov182_021af20c(void);
+static void DWCUtilInfoMenu_InfoHandleChoice(void);
+static void DWCUtilInfoMenu_InfoDisableButtons(void);
+static void DWCUtilInfoMenu_InfoFadeOut(void);
+static void DWCUtilInfoMenu_InfoWaitFadeOut(void);
 
 // Whether the player confirmed the erasing
 static u8 sErase;
 
-void func_ov182_021aeafc(void) {
+void DWCUtilInfoMenu_InitErase(void) {
     sErase = FALSE;
-    func_ov182_021aeb30();
+    DWCUtilInfoMenu_LoadEraseGraphics();
     DWCUtilBgOverlay_Show(0x12);
     DWCUtilScreen_Start(0x3b, -1, 0);
     DWCUtilGfxResource_ShowMessage(0x17);
-    DWCUtilMain_SetUpdate(func_ov182_021aeb80);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseFadeIn);
 }
 
-static void func_ov182_021aeb30(void) {
+static void DWCUtilInfoMenu_LoadEraseGraphics(void) {
     DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -78,74 +78,74 @@ static void func_ov182_021aeb30(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021aeb80(void) {
+static void DWCUtilInfoMenu_EraseFadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021aebb8);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitFadeIn);
 }
 
-static void func_ov182_021aebb8(void) {
+static void DWCUtilInfoMenu_EraseWaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(3);
-        DWCUtilMain_SetUpdate(func_ov182_021aebe0);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitButtons);
     }
 }
 
-static void func_ov182_021aebe0(void) {
+static void DWCUtilInfoMenu_EraseWaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021aec00);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseMain);
     }
 }
 
-static void func_ov182_021aec00(void) {
-    func_ov182_021aec10();
+static void DWCUtilInfoMenu_EraseMain(void) {
+    DWCUtilInfoMenu_EraseHandleInput();
     func_ov182_021aec38();
-    func_ov182_021aec3c();
+    DWCUtilInfoMenu_EraseHandleChoice();
 }
 
-static void func_ov182_021aec10(void) {
-    func_ov182_021aec10Inline();
+static void DWCUtilInfoMenu_EraseHandleInput(void) {
+    DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
 static void func_ov182_021aec38(void) {
 }
 
-static void func_ov182_021aec3c(void) {
+static void DWCUtilInfoMenu_EraseHandleChoice(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(func_ov182_021aec84);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseDisableButtons);
         break;
     case 1:
         DWCUtilSound_PlaySe(6);
         DWCUtilDialog_Open(0x18, 0, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(func_ov182_021aed60);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitDialog);
         break;
     }
 }
 
-static void func_ov182_021aec84(void) {
+static void DWCUtilInfoMenu_EraseDisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021aec9c);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseFadeOut);
 }
 
-static void func_ov182_021aec9c(void) {
+static void DWCUtilInfoMenu_EraseFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sErase) {
             DWCUtilFade_Start(3, 1, 1, 8);
         }
         DWCUtilFade_Start(3, 0, 0x15, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021aece0);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitFadeOut);
     }
 }
 
-static void func_ov182_021aece0(void) {
+static void DWCUtilInfoMenu_EraseWaitFadeOut(void) {
     if (DWCUtilFade_IsActive(0) == 0 && (sErase || DWCUtilFade_IsActive(1) == 0) && DWCUtilUiObject_IsIdle()) {
         DWCUtilText_DestroyScreenBg(0);
         if (!sErase) {
@@ -155,16 +155,16 @@ static void func_ov182_021aece0(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sErase) {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021af25c);
+            DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
         } else {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021aedb0);
+            DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseSettings);
         }
     }
 }
 
 // The confirmation: 1 erases the settings
-static void func_ov182_021aed60(void) {
+static void DWCUtilInfoMenu_EraseWaitDialog(void) {
     switch (DWCUtilDialog_GetChoice()) {
     case 1:
         DWCUtilSound_PlaySe(0xe);
@@ -177,24 +177,24 @@ static void func_ov182_021aed60(void) {
         return;
     }
     DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(func_ov182_021aed98);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitDialogClosed);
 }
 
-static void func_ov182_021aed98(void) {
+static void DWCUtilInfoMenu_EraseWaitDialogClosed(void) {
     if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilMain_SetUpdate(func_ov182_021aec84);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseDisableButtons);
     }
 }
 
 // Erases the settings, and tells the player to turn the console off
-static void func_ov182_021aedb0(void) {
-    func_ov182_021aedcc();
+static void DWCUtilInfoMenu_EraseSettings(void) {
+    DWCUtilInfoMenu_LoadErasedGraphics();
     DWCUtilGfxResource_ShowMessage(0x19);
     DWCUtilWifiSettings_EraseAll();
-    DWCUtilMain_SetUpdate(func_ov182_021aee1c);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedFadeIn);
 }
 
-static void func_ov182_021aedcc(void) {
+static void DWCUtilInfoMenu_LoadErasedGraphics(void) {
     DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -203,33 +203,33 @@ static void func_ov182_021aedcc(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021aee1c(void) {
+static void DWCUtilInfoMenu_ErasedFadeIn(void) {
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021aee40);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedWaitFadeIn);
 }
 
-static void func_ov182_021aee40(void) {
+static void DWCUtilInfoMenu_ErasedWaitFadeIn(void) {
     if (DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(5);
-        DWCUtilMain_SetUpdate(func_ov182_021aee60);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedWaitButtons);
     }
 }
 
-static void func_ov182_021aee60(void) {
+static void DWCUtilInfoMenu_ErasedWaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021aee80);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedMain);
     }
 }
 
-static void func_ov182_021aee80(void) {
-    func_ov182_021aee90();
+static void DWCUtilInfoMenu_ErasedMain(void) {
+    DWCUtilInfoMenu_ErasedHandleInput();
     func_ov182_021aeea4();
-    func_ov182_021aeea8();
+    DWCUtilInfoMenu_ErasedHandleChoice();
 }
 
-static void func_ov182_021aee90(void) {
+static void DWCUtilInfoMenu_ErasedHandleInput(void) {
     if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
@@ -238,44 +238,44 @@ static void func_ov182_021aee90(void) {
 static void func_ov182_021aeea4(void) {
 }
 
-static void func_ov182_021aeea8(void) {
+static void DWCUtilInfoMenu_ErasedHandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilMain_SetUpdate(func_ov182_021aeec4);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedDisableButtons);
     }
 }
 
-static void func_ov182_021aeec4(void) {
+static void DWCUtilInfoMenu_ErasedDisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021aeedc);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedFadeOut);
 }
 
-static void func_ov182_021aeedc(void) {
+static void DWCUtilInfoMenu_ErasedFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilFade_Start(3, 1, 0x3f, 0x40);
         DWCUtilFade_Start(3, 0, 0x3f, 0x40);
-        DWCUtilMain_SetUpdate(func_ov182_021aef10);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_PowerOff);
     }
 }
 
 // Turns the console off once both screens have faded out
-static void func_ov182_021aef10(void) {
+static void DWCUtilInfoMenu_PowerOff(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         OS_SpinWaitSysCycles(0x800000);
         PM_ForceToPowerOff();
     }
 }
 
-void func_ov182_021aef34(void) {
-    func_ov182_021aef5c();
+void DWCUtilInfoMenu_InitInfo(void) {
+    DWCUtilInfoMenu_LoadInfoGraphics();
     DWCUtilBgOverlay_Show(0x11);
     DWCUtilScreen_Start(0x3a, -1, 0);
-    func_ov182_021aefac();
-    DWCUtilMain_SetUpdate(func_ov182_021af0f8);
+    DWCUtilInfoMenu_DrawConsoleInfo();
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoFadeIn);
 }
 
-static void func_ov182_021aef5c(void) {
+static void DWCUtilInfoMenu_LoadInfoGraphics(void) {
     DWCUtilGfxResource_Load("char/jb5Info.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -286,7 +286,7 @@ static void func_ov182_021aef5c(void) {
 
 // Writes the console's MAC address and its Wi-Fi ID, in four groups of four digits, the last of them the ID's last
 // digit and three zeros
-static void func_ov182_021aefac(void) {
+static void DWCUtilInfoMenu_DrawConsoleInfo(void) {
     u64 id;
     int i;
     DWCBmWifiIdInfo info;
@@ -320,35 +320,35 @@ static void func_ov182_021aefac(void) {
     DWCUtilText_MarkDirty(textObj);
 }
 
-static void func_ov182_021af0f8(void) {
+static void DWCUtilInfoMenu_InfoFadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021af130);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoWaitFadeIn);
 }
 
-static void func_ov182_021af130(void) {
+static void DWCUtilInfoMenu_InfoWaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(2);
-        DWCUtilMain_SetUpdate(func_ov182_021af158);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoWaitButtons);
     }
 }
 
-static void func_ov182_021af158(void) {
+static void DWCUtilInfoMenu_InfoWaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021af178);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoMain);
     }
 }
 
-static void func_ov182_021af178(void) {
-    func_ov182_021af188();
+static void DWCUtilInfoMenu_InfoMain(void) {
+    DWCUtilInfoMenu_InfoHandleInput();
     func_ov182_021af19c();
-    func_ov182_021af1a0();
+    DWCUtilInfoMenu_InfoHandleChoice();
 }
 
-static void func_ov182_021af188(void) {
+static void DWCUtilInfoMenu_InfoHandleInput(void) {
     if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
@@ -357,35 +357,35 @@ static void func_ov182_021af188(void) {
 static void func_ov182_021af19c(void) {
 }
 
-static void func_ov182_021af1a0(void) {
+static void DWCUtilInfoMenu_InfoHandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(func_ov182_021af1bc);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoDisableButtons);
     }
 }
 
-static void func_ov182_021af1bc(void) {
+static void DWCUtilInfoMenu_InfoDisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021af1d4);
+    DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoFadeOut);
 }
 
-static void func_ov182_021af1d4(void) {
+static void DWCUtilInfoMenu_InfoFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         DWCUtilFade_Start(3, 1, 1, 8);
         DWCUtilFade_Start(3, 0, 0x15, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021af20c);
+        DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoWaitFadeOut);
     }
 }
 
-static void func_ov182_021af20c(void) {
+static void DWCUtilInfoMenu_InfoWaitFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
         DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
         DWCUtilDisplay_HidePlanes(1, 1);
         DWCUtilDisplay_HidePlanes(0, 0x15);
         DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021af25c);
+        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     }
 }

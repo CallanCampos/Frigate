@@ -91,7 +91,7 @@ static void DWCUtilAutoConnectOk_WaitFadeOut(void) {
         DWCUtilMain_SetScreenArgs(0, 0);
         DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
     } else {
-        DWCUtilMain_SetUpdate(func_ov182_021ae748);
+        DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
     }
 }
 
@@ -107,7 +107,7 @@ static void DWCUtilAutoConnectOk_UpdateTimer(void) {
             break;
         case 1:
             if (from != 0) {
-                DWCUtilMain_SetUpdate(func_ov182_021ae4f4);
+                DWCUtilMain_SetUpdate(DWCUtilMainMenu_ExitUtility);
                 return;
             }
             break;

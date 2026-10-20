@@ -15,31 +15,31 @@
 #include "dwc_util_ui_object.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021afbd8(void);
-static void func_ov182_021afc28(void);
-static void func_ov182_021afc60(void);
-static void func_ov182_021afc80(void);
-static void func_ov182_021afca0(void);
-static void func_ov182_021afcb0(void);
+static void DWCUtilPromptYesNo_LoadGraphics(void);
+static void DWCUtilPromptYesNo_FadeIn(void);
+static void DWCUtilPromptYesNo_WaitFadeIn(void);
+static void DWCUtilPromptYesNo_WaitButtons(void);
+static void DWCUtilPromptYesNo_Main(void);
+static void DWCUtilPromptYesNo_HandleInput(void);
 static void func_ov182_021afcd8(void);
-static void func_ov182_021afcdc(void);
-static void func_ov182_021afd10(void);
-static void func_ov182_021afd28(void);
-static void func_ov182_021afd6c(void);
+static void DWCUtilPromptYesNo_HandleChoice(void);
+static void DWCUtilPromptYesNo_DisableButtons(void);
+static void DWCUtilPromptYesNo_FadeOut(void);
+static void DWCUtilPromptYesNo_WaitFadeOut(void);
 
 // Whether the player answered yes
 static u8 sYes;
 
-void func_ov182_021afba4(void) {
+void DWCUtilPromptYesNo_Init(void) {
     sYes = FALSE;
-    func_ov182_021afbd8();
+    DWCUtilPromptYesNo_LoadGraphics();
     DWCUtilBgOverlay_Show(0x13);
     DWCUtilScreen_Start(0x3c, -1, 0);
     DWCUtilGfxResource_ShowMessage(0x1b);
-    DWCUtilMain_SetUpdate(func_ov182_021afc28);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_FadeIn);
 }
 
-static void func_ov182_021afbd8(void) {
+static void DWCUtilPromptYesNo_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -48,42 +48,42 @@ static void func_ov182_021afbd8(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021afc28(void) {
+static void DWCUtilPromptYesNo_FadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021afc60);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitFadeIn);
 }
 
-static void func_ov182_021afc60(void) {
+static void DWCUtilPromptYesNo_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(3);
-        DWCUtilMain_SetUpdate(func_ov182_021afc80);
+        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitButtons);
     }
 }
 
-static void func_ov182_021afc80(void) {
+static void DWCUtilPromptYesNo_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021afca0);
+        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_Main);
     }
 }
 
-static void func_ov182_021afca0(void) {
-    func_ov182_021afcb0();
+static void DWCUtilPromptYesNo_Main(void) {
+    DWCUtilPromptYesNo_HandleInput();
     func_ov182_021afcd8();
-    func_ov182_021afcdc();
+    DWCUtilPromptYesNo_HandleChoice();
 }
 
-static void func_ov182_021afcb0(void) {
-    func_ov182_021aec10Inline();
+static void DWCUtilPromptYesNo_HandleInput(void) {
+    DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
 static void func_ov182_021afcd8(void) {
 }
 
-static void func_ov182_021afcdc(void) {
+static void DWCUtilPromptYesNo_HandleChoice(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
         DWCUtilSound_PlaySe(7);
@@ -95,27 +95,27 @@ static void func_ov182_021afcdc(void) {
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(func_ov182_021afd10);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_DisableButtons);
 }
 
-static void func_ov182_021afd10(void) {
+static void DWCUtilPromptYesNo_DisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021afd28);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_FadeOut);
 }
 
-static void func_ov182_021afd28(void) {
+static void DWCUtilPromptYesNo_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sYes) {
             DWCUtilFade_Start(3, 1, 1, 8);
         }
         DWCUtilFade_Start(3, 0, 0x15, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021afd6c);
+        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitFadeOut);
     }
 }
 
-static void func_ov182_021afd6c(void) {
+static void DWCUtilPromptYesNo_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(0) == 0 && (sYes || DWCUtilFade_IsActive(1) == 0) && DWCUtilUiObject_IsIdle()) {
         DWCUtilText_DestroyScreenBg(0);
         if (!sYes) {
@@ -125,10 +125,10 @@ static void func_ov182_021afd6c(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sYes) {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021af25c);
+            DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
         } else {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021afa28);
+            DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitInstructions);
         }
     }
 }

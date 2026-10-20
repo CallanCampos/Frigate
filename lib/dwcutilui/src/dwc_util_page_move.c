@@ -36,7 +36,7 @@ static void DWCUtilPageMove_OnMoveEvent(int event);
 static DWCUtilPageMove sPageMove;
 
 void DWCUtilPageMove_Init(void) {
-    const MBUserInfo *user = func_ov182_021ae240();
+    const MBUserInfo *user = DWCUtilMove_GetChildUser();
     DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
     u16 name[MB_USER_NAME_LENGTH + 1];
 
@@ -47,7 +47,7 @@ void DWCUtilPageMove_Init(void) {
     MI_CpuCopy16(user->name, name, user->nameLength * 2);
     DWCUtilText_DrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
     DWCUtilText_MarkDirty(text);
-    func_ov182_021ae224(DWCUtilPageMove_OnMoveEvent);
+    DWCUtilMove_SetCallback(DWCUtilPageMove_OnMoveEvent);
     DWCUtilDialog_Open(0x1d, 4, 0, -1, 0);
     DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeIn);
 }
@@ -94,7 +94,7 @@ static void DWCUtilPageMove_Main(void) {
     default:
         return;
     }
-    func_ov182_021ae224(NULL);
+    DWCUtilMove_SetCallback(NULL);
     DWCUtilDialog_Close();
     DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeOut);
 }
@@ -119,9 +119,9 @@ static void DWCUtilPageMove_FadeOut(void) {
 static void DWCUtilPageMove_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         if (!sPageMove.interrupted && sPageMove.yes == TRUE) {
-            func_ov182_021ae238();
+            DWCUtilMove_StartSending();
         } else {
-            func_ov182_021ae1d4();
+            DWCUtilMove_End();
         }
         DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitMoveEnd);
     }
@@ -129,7 +129,7 @@ static void DWCUtilPageMove_WaitFadeOut(void) {
 
 // Waits for the end of the move, unless it goes on
 static void DWCUtilPageMove_WaitMoveEnd(void) {
-    if ((sPageMove.interrupted || !sPageMove.yes) && !func_ov182_021ae210()) {
+    if ((sPageMove.interrupted || !sPageMove.yes) && !DWCUtilMove_HasEnded()) {
         return;
     }
     DWCUtilText_DestroyScreenBg(0);
@@ -140,12 +140,12 @@ static void DWCUtilPageMove_WaitMoveEnd(void) {
     }
     DWCUtilMain_SetLayout(0, 1);
     if (sPageMove.interrupted) {
-        DWCUtilMain_SetUpdate(func_ov182_021aff3c);
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
     } else if (!sPageMove.yes) {
         DWCUtilDisplay_HidePlanes(1, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021af25c);
+        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     } else {
-        DWCUtilMain_SetUpdate(func_ov182_021af714);
+        DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitMove);
     }
 }
 

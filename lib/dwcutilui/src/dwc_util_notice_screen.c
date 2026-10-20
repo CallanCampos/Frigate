@@ -21,28 +21,28 @@ typedef struct DWCUtilNoticeScreen {
     u8 yes;
 } DWCUtilNoticeScreen;
 
-static void func_ov182_021aff68(void);
-static void func_ov182_021affb8(void);
-static void func_ov182_021b0000(void);
-static void func_ov182_021b0028(void);
-static void func_ov182_021b0050(void);
-static void func_ov182_021b0060(void);
+static void DWCUtilNoticeScreen_LoadGraphics(void);
+static void DWCUtilNoticeScreen_FadeIn(void);
+static void DWCUtilNoticeScreen_WaitFadeIn(void);
+static void DWCUtilNoticeScreen_WaitButtons(void);
+static void DWCUtilNoticeScreen_Main(void);
+static void DWCUtilNoticeScreen_HandleInput(void);
 static void func_ov182_021b0088(void);
-static void func_ov182_021b008c(void);
-static void func_ov182_021b00c0(void);
-static void func_ov182_021b00d8(void);
-static void func_ov182_021b011c(void);
+static void DWCUtilNoticeScreen_HandleChoice(void);
+static void DWCUtilNoticeScreen_DisableButtons(void);
+static void DWCUtilNoticeScreen_FadeOut(void);
+static void DWCUtilNoticeScreen_WaitFadeOut(void);
 
 static DWCUtilNoticeScreen sNoticeScreen;
 
-void func_ov182_021aff3c(void) {
-    func_ov182_021aff68();
+void DWCUtilNoticeScreen_Init(void) {
+    DWCUtilNoticeScreen_LoadGraphics();
     DWCUtilGfxResource_ShowMessage(0x20);
     sNoticeScreen.subScreen = DWCUtilScreen_Start(0x3c, -1, 0);
-    DWCUtilMain_SetUpdate(func_ov182_021affb8);
+    DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_FadeIn);
 }
 
-static void func_ov182_021aff68(void) {
+static void DWCUtilNoticeScreen_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -51,44 +51,44 @@ static void func_ov182_021aff68(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021affb8(void) {
+static void DWCUtilNoticeScreen_FadeIn(void) {
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
     if (sNoticeScreen.subScreen) {
         DWCUtilFade_Start(2, 1, 1, 8);
         DWCUtilDisplay_ShowPlanes(1, 1);
     }
-    DWCUtilMain_SetUpdate(func_ov182_021b0000);
+    DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_WaitFadeIn);
 }
 
-static void func_ov182_021b0000(void) {
+static void DWCUtilNoticeScreen_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(3);
-        DWCUtilMain_SetUpdate(func_ov182_021b0028);
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_WaitButtons);
     }
 }
 
-static void func_ov182_021b0028(void) {
-    if (DWCUtilUiObject_GetState() != -2 && func_ov182_021ae210()) {
+static void DWCUtilNoticeScreen_WaitButtons(void) {
+    if (DWCUtilUiObject_GetState() != -2 && DWCUtilMove_HasEnded()) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021b0050);
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Main);
     }
 }
 
-static void func_ov182_021b0050(void) {
-    func_ov182_021b0060();
+static void DWCUtilNoticeScreen_Main(void) {
+    DWCUtilNoticeScreen_HandleInput();
     func_ov182_021b0088();
-    func_ov182_021b008c();
+    DWCUtilNoticeScreen_HandleChoice();
 }
 
-static void func_ov182_021b0060(void) {
-    func_ov182_021aec10Inline();
+static void DWCUtilNoticeScreen_HandleInput(void) {
+    DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
 static void func_ov182_021b0088(void) {
 }
 
-static void func_ov182_021b008c(void) {
+static void DWCUtilNoticeScreen_HandleChoice(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 1:
         sNoticeScreen.yes = TRUE;
@@ -101,27 +101,27 @@ static void func_ov182_021b008c(void) {
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(func_ov182_021b00c0);
+    DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_DisableButtons);
 }
 
-static void func_ov182_021b00c0(void) {
+static void DWCUtilNoticeScreen_DisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021b00d8);
+    DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_FadeOut);
 }
 
-static void func_ov182_021b00d8(void) {
+static void DWCUtilNoticeScreen_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sNoticeScreen.yes) {
             DWCUtilFade_Start(3, 1, 1, 8);
         }
         DWCUtilFade_Start(3, 0, 0x15, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021b011c);
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b011c(void) {
+static void DWCUtilNoticeScreen_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
         DWCUtilText_DestroyScreenBg(0);
         if (!sNoticeScreen.yes) {
@@ -131,7 +131,7 @@ static void func_ov182_021b011c(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sNoticeScreen.yes) {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021af25c);
+            DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
         } else {
             DWCUtilMain_SetLayout(0, 1);
             DWCUtilMain_SetUpdate(DWCUtilPageMulti5_Init);

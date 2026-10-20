@@ -22,15 +22,15 @@ typedef struct DWCUtilMove {
     u8 ended;
 } DWCUtilMove;
 
-static void func_ov182_021ae1e8(DWCUtilTask *task, void *arg);
-static void func_ov182_021ae254(DWCUtilTask *task, void *arg);
+static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg);
+static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg);
 
 static DownloadPlaySysGame sGame = {
     "dwc:/move/child.srl", NULL, NULL, "dwc:/move/banner.char", "dwc:/move/banner.plt", 0x159, 0,
 };
 static DWCUtilMove *sMove;
 
-void func_ov182_021ae134(DWCUtilMoveCallback callback) {
+void DWCUtilMove_Start(DWCUtilMoveCallback callback) {
     DownloadPlaySysGame game;
 
     sMove = DWCUtilHeap_AllocClear(sizeof(DWCUtilMove), 32);
@@ -45,40 +45,40 @@ void func_ov182_021ae134(DWCUtilMoveCallback callback) {
     if (!func_ov182_021ba918()) {
         OS_Terminate();
     }
-    sMove->task = DWCUtilTask_Create(0, func_ov182_021ae254, NULL, 0x78);
+    sMove->task = DWCUtilTask_Create(0, DWCUtilMove_UpdateTask, NULL, 0x78);
 }
 
-void func_ov182_021ae1d4(void) {
-    DWCUtilTask_Create(0, func_ov182_021ae1e8, NULL, 0x78);
+void DWCUtilMove_End(void) {
+    DWCUtilTask_Create(0, DWCUtilMove_EndTask, NULL, 0x78);
 }
 
-static void func_ov182_021ae1e8(DWCUtilTask *task, void *arg) {
+static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg) {
     if (func_ov182_021ba81c()) {
         sMove->ended = TRUE;
         DWCUtilTask_QueueRemoval(0, task);
     }
 }
 
-BOOL func_ov182_021ae210(void) {
+BOOL DWCUtilMove_HasEnded(void) {
     if (sMove == NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021ae224(DWCUtilMoveCallback callback) {
+void DWCUtilMove_SetCallback(DWCUtilMoveCallback callback) {
     sMove->callback = callback;
 }
 
-void func_ov182_021ae238(void) {
+void DWCUtilMove_StartSending(void) {
     func_ov182_021ba950();
 }
 
-const MBUserInfo *func_ov182_021ae240(void) {
+const MBUserInfo *DWCUtilMove_GetChildUser(void) {
     return &sMove->user;
 }
 
-static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
+static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
     u8 state;
     u8 changed;
 
