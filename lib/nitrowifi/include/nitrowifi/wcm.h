@@ -33,6 +33,8 @@ enum {
     WCM_NOTIFY_CONNECT,
     WCM_NOTIFY_DISCONNECT,
     WCM_NOTIFY_FOUND_AP,
+    WCM_NOTIFY_SEARCH_AROUND, // A search went once through the channels
+    WCM_NOTIFY_TERMINATE,     // The WCM ended without being asked
 };
 
 // What the calls answer; the call was taken, and the notification follows

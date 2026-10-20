@@ -1,5 +1,6 @@
 #include "dwc_util_move.h"
 #include "app/download_play_sys.h"
+#include "dwc_util_connection.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_main.h"
 #include "dwc_util_msg_resource.h"
@@ -73,7 +74,7 @@ void func_ov182_021ae238(void) {
     func_ov182_021ba950();
 }
 
-const void *func_ov182_021ae240(void) {
+const MBUserInfo *func_ov182_021ae240(void) {
     return &sMove->user;
 }
 

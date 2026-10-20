@@ -304,3 +304,66 @@ lib/dwc/src/gscommon/gs_screen_print.c:
     .text       start:0x02171420 end:0x0217150c
     .data       start:0x02187790 end:0x02187794
     .bss        start:0x021909a4 end:0x021917a8
+
+lib/dwc/src/gstats/gbucket.c:
+    complete
+    .text       start:0x0217bb70 end:0x0217beec
+    .bss        start:0x021917b0 end:0x021917c0
+
+lib/dwc/src/gstats/gstats.c:
+    .text       start:0x0217beec end:0x0217c7c8
+    .rodata     start:0x021850e8 end:0x021851f8
+    .data       start:0x02188f9c end:0x021890f0
+    .bss        start:0x021917c0 end:0x02191bfc
+
+lib/dwc/src/gt2/gt2Auth.c:
+    complete
+    .text       start:0x0217c7c8 end:0x0217c984
+    .data       start:0x021890f0 end:0x02189114
+
+lib/dwc/src/natneg/NATify.c:
+    complete
+    .text       start:0x0217eed0 end:0x0217f4d0
+    .data       start:0x02189134 end:0x02189244
+    .bss        start:0x02191c2c end:0x02191e78
+
+lib/dwc/src/natneg/natneg.c:
+    .text       start:0x0217f4d0 end:0x021807b4
+    .data       start:0x02189244 end:0x02189dd4
+    .bss        start:0x02191e78 end:0x02192180
+
+lib/dwc/src/qr2/qr2.c:
+    .text       start:0x021807b4 end:0x02181ff0
+    .rodata     start:0x021851f8 end:0x02185200
+    .data       start:0x02189dd4 end:0x0218b310
+    .bss        start:0x02192180 end:0x021922d8
+
+lib/dwc/src/qr2/qr2regkeys.c:
+    .text       start:0x02181ff0 end:0x02182080
+    .data       start:0x0218b310 end:0x0218b8bc
+
+lib/dwc/src/serverbrowsing/sb_crypt.c:
+    complete
+    .text       start:0x02182080 end:0x02182260
+
+lib/dwc/src/serverbrowsing/sb_queryengine.c:
+    complete
+    .text       start:0x02182260 end:0x02182904
+    .data       start:0x0218b8bc end:0x0218b8ec
+
+lib/dwc/src/serverbrowsing/sb_server.c:
+    complete
+    .text       start:0x02182904 end:0x02182fa4
+    .data       start:0x0218b8ec end:0x0218b9b0
+    .bss        start:0x021922d8 end:0x021922e4
+
+lib/dwc/src/serverbrowsing/sb_serverbrowsing.c:
+    complete
+    .text       start:0x02182fa4 end:0x02183438
+    .data       start:0x0218b9b0 end:0x0218b9f0
+
+lib/dwc/src/serverbrowsing/sb_serverlist.c:
+    complete
+    .text       start:0x02183438 end:0x02185008
+    .data       start:0x0218b9f0 end:0x0218ba40
+    .bss        start:0x021922e4 end:0x02192300

@@ -56,6 +56,13 @@ flags = [
 # The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
 # exponent, which only -ipa file gives
 "auth/dwc_auth.c" = ["-ipa file"]
+# GameSpy's NAT detection and negotiation (overlay 11) reach their statics from one base too
+"natneg/NATify.c" = ["-ipa file"]
+"natneg/natneg.c" = ["-ipa file"]
+# And two files of GameSpy's server browser (overlay 11): a server's shared texts and null server, and the list's master
+# server and sorted list
+"serverbrowsing/sb_server.c" = ["-ipa file"]
+"serverbrowsing/sb_serverlist.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does

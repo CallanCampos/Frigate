@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-1044 of 1688 functions are in source files.
+1296 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -151,6 +151,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gpiTransfer.c` | `0x0217b5fc`–`0x0217b6a8` | 2 | complete | descriptive |
 | `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
 | `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
+| `gbucket.c` | `0x0217bb30`–`0x0217beac` | 14 | complete | descriptive |
+| `gstats.c` | `0x0217beac`–`0x0217c788` | 28 | partial | descriptive |
+| `gt2Auth.c` | `0x0217c788`–`0x0217c944` | 4 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
@@ -158,6 +161,15 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gt2Message.c` | `0x0217d3ac`–`0x0217e768` | 51 | partial | descriptive |
 | `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
+| `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
+| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
+| `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | partial | descriptive |
+| `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
+| `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |
+| `sb_queryengine.c` | `0x02182220`–`0x021828c4` | 20 | complete | descriptive |
+| `sb_server.c` | `0x021828c4`–`0x02182f64` | 36 | complete | descriptive |
+| `sb_serverbrowsing.c` | `0x02182f64`–`0x021833f8` | 17 | complete | descriptive |
+| `sb_serverlist.c` | `0x021833f8`–`0x02184fc8` | 55 | complete | descriptive |
 
 ### Overlay 12
 
@@ -1764,7 +1776,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-372 of 1113 functions are in source files.
+646 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1786,6 +1798,21 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_msg_resource.c` | `0x021ae084`–`0x021ae134` | 6 | complete | descriptive |
 | `dwc_util_move.c` | `0x021ae134`–`0x021ae3d8` | 8 | partial | descriptive |
 | `dwc_util_connection.c` | `0x021ae3d8`–`0x021ae4f4` | 7 | complete | descriptive |
+| `dwc_util_main_menu.c` | `0x021ae4f4`–`0x021aeafc` | 19 | partial | descriptive |
+| `dwc_util_info_menu.c` | `0x021aeafc`–`0x021af25c` | 39 | complete | descriptive |
+| `dwc_util_option_menu.c` | `0x021af25c`–`0x021af714` | 14 | complete | descriptive |
+| `dwc_util_top_menu.c` | `0x021af714`–`0x021afba4` | 34 | complete | descriptive |
+| `dwc_util_prompt_yes_no.c` | `0x021afba4`–`0x021afdec` | 12 | complete | descriptive |
+| `dwc_util_timed_notice.c` | `0x021afdec`–`0x021aff3c` | 9 | complete | descriptive |
+| `dwc_util_notice_screen.c` | `0x021aff3c`–`0x021b0198` | 12 | complete | descriptive |
+| `dwc_util_page_move.c` | `0x021b0198`–`0x021b0420` | 12 | complete | descriptive |
+| `dwc_util_page_multi5.c` | `0x021b0420`–`0x021b06d8` | 14 | complete | descriptive |
+| `dwc_util_page_step3.c` | `0x021b06d8`–`0x021b0ad0` | 18 | complete | descriptive |
+| `dwc_util_page_multi4.c` | `0x021b0ad0`–`0x021b0c28` | 9 | complete | descriptive |
+| `dwc_util_page_ap_list.c` | `0x021b0c28`–`0x021b19f4` | 28 | complete | descriptive |
+| `dwc_util_wep_keyboard.c` | `0x021b19f4`–`0x021b2120` | 19 | complete | descriptive |
+| `dwc_util_address_edit.c` | `0x021b2120`–`0x021b293c` | 21 | complete | descriptive |
+| `dwc_util_error.c` | `0x021b293c`–`0x021b2d48` | 14 | complete | descriptive |
 | `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |

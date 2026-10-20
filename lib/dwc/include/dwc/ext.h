@@ -59,15 +59,6 @@ char *strstr(const char *s, const char *find);
 
 // Gets the token and the challenge that the player logs in to the authentication service with
 void func_ov011_0215f9b4(const char **authToken, const char **challenge);
-// The secret key of the game
-extern char data_ov011_021918bc[];
-
-// Overlay 11's GameSpy code that GT2 (dwc/gt2Main.h) calls and that isn't decompiled yet, gt2Auth.c's challenges: a
-// random challenge of 32 characters, the response to one (both return the buffer) and whether a response is the right
-// one
-u8 *func_ov011_0217c7ec(u8 *challenge);
-u8 *func_ov011_0217c87c(u8 *response, const u8 *challenge);
-BOOL func_ov011_0217c91c(const u8 *response, const u8 *expected);
 
 // The login ticket of the player's profile, which the Wi-Fi library keeps; returns FALSE if it has none
 BOOL func_ov011_0215f9e0(SakeLoginTicket *ticket);

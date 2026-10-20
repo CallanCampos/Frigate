@@ -7,6 +7,7 @@
 #include "dwc_util_fade.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_irq.h"
+#include "dwc_util_main_menu.h"
 #include "dwc_util_oam.h"
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_rom_resource.h"
@@ -41,8 +42,8 @@ typedef struct DWCUtilMain {
     void (*update)(void);
     u32 value0;
     u32 value1;
-    u32 value2;
-    u32 value3;
+    int value2;
+    int value3;
 } DWCUtilMain;
 
 static char sNasUrl[] = "https://nas.nintendowifi.net/ac";
@@ -229,12 +230,12 @@ void func_ov182_021adfd4(u32 *value0, u32 *value1) {
     }
 }
 
-void func_ov182_021adff0(u32 value2, u32 value3) {
+void func_ov182_021adff0(int value2, int value3) {
     sMain.value2 = value2;
     sMain.value3 = value3;
 }
 
-void func_ov182_021adffc(u32 *value2, u32 *value3) {
+void func_ov182_021adffc(int *value2, int *value3) {
     if (value2 != NULL) {
         *value2 = sMain.value2;
     }

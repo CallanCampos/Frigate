@@ -1952,6 +1952,7 @@ overlays/ov069 0x0217cb1e reloc_module overlay(28)
 overlays/ov070 0x0217d5a4 reloc_addend 4
 overlays/ov070 0x0217f25c reloc_addend 4
 overlays/ov070 0x0217f93c remove_reloc
+overlays/ov070 0x0217f97c remove_reloc
 overlays/ov070 0x0217fc64 remove_symbol
 overlays/ov071 0x021e8ea6 reloc_module overlay(36)
 overlays/ov074 0x021e90c6 reloc_module overlay(36)
@@ -2567,6 +2568,8 @@ overlays/ov182 0x021bd8e4 remove_symbol
 overlays/ov182 0x021bdaf9 remove_symbol
 overlays/ov182 0x021bdb41 remove_symbol
 overlays/ov182 0x021bfb54 add_data data_ov182_021bfb54
+overlays/ov182 0x021c40bc section_end lib/dwcutilui/src/dwc_util_connection.c:.bss
+overlays/ov182 0x021c40bc section_start lib/dwcutilui/src/dwc_util_main_menu.c:.bss
 overlays/ov185 0x0219e83c reloc_module overlay(139)
 overlays/ov185 0x0219ea34 reloc_module overlay(139)
 overlays/ov185 0x0219eb18 reloc_addend 2
