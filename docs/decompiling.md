@@ -41,6 +41,12 @@ match. `--incomplete` removes that marker when a natural rewrite no longer match
 fallback. Both operations validate all requested owners before changing any version. Removing completion skips the
 external-static check because the C object is no longer linked.
 
+`tools/decomp/check_section_bounds.py` checks overlay 036's source-file boundaries against the configured symbol
+extents in both versions. Unknown sizes extend to the next symbol or the containing module section's end, so
+alignment padding between sections is excluded. Known sizes are checked as recorded. This catches file boundaries
+inside objects; it does not establish original source ownership, uncovered ranges, or matching C data. Its isolated
+regressions run with `python3 -m unittest tools.decomp.test_check_section_bounds` without ROMs or generated files.
+
 `tools/decomp/try_variants.py src/... FUNC variants.c` puts each variant of a function, separated by lines of
 `=====`, in place of its definition and probes it with the file's compiler, keeping the first that matches. `--score`
 adds each variant's count of differing aligned lines, to tell apart variants of the same size.
