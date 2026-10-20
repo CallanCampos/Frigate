@@ -41,13 +41,14 @@ struct GameSystem {
     u32 unk28;
     ISS *iss;
     LinkFestival *festival;
-    u8 unk34;
+    // Set when a communication error is found, so that the field shows it, and cleared with the error
+    u8 netErrorPending;
     // Whether an event ran at the start of the frame
     u8 eventRunning;
-    // Nonzero keeps GSYS_TryBootGameComm from starting the field's communication
-    u8 unk36;
-    // Set when the console wakes with the communication on
-    u8 unk37_0 : 1;
+    // Nonzero keeps GSYS_TryBootGameComm from starting the field's communication (the scripts pause it)
+    u8 gameCommPaused;
+    // Set when the low battery turned the C-Gear off, until the C-Gear screen has handled it
+    u8 lowBatteryCGearOff : 1;
 };
 
 extern const GameProcFunctions GAMESYSTEM_PROC_FUNCTIONS;
