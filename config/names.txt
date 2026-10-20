@@ -685,6 +685,7 @@
 . 0x0200f700 Misc_AddMetTrainer
 . 0x0200f770 Misc_IsMetTrainer
 . 0x0200f798 Misc_GetFlag
+. 0x0200f7d8 Misc_GetHollowRival
 . 0x0200f7dc Misc_SetFlag
 . 0x0200fa28 MedalBox_SetLastMedal
 . 0x0200fa44 MedalBox_GetLastMedal

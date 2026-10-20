@@ -10,7 +10,7 @@
 #define SAVE_BLOCK_MISC 0x42
 
 void *getHollow_RivalBlk(SaveControl *save) {
-    return func_0200f7d8(SaveControl_GetBlockPtr(save, SAVE_BLOCK_MISC));
+    return Misc_GetHollowRival(SaveControl_GetBlockPtr(save, SAVE_BLOCK_MISC));
 }
 
 void HollowRivalSave_SetValue(void *block, u32 index, u16 value) {

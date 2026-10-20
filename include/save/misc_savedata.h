@@ -43,7 +43,7 @@ u32 getSizeofHollow_RivalData(void);
 void clearHollowRivalData(RivalDataSave *data);
 
 BOOL Misc_GetFlag(RivalDataSave *data, int flag);
-void *func_0200f7d8(RivalDataSave *data);
+void *Misc_GetHollowRival(RivalDataSave *data);
 void Misc_SetFlag(RivalDataSave *data, int flag);
 
 // The kind of thing in a Hidden Hollow, 0 when it is empty
