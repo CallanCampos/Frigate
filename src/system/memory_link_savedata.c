@@ -82,7 +82,7 @@ BOOL MemoryLinkSave_CanMerge(MemoryLinkSave *link, const MemoryLinkData *data, S
             const MemoryLinkPlayer *player = &link->players[i];
 
             if (data->player.id != player->id || !wcharscmp(player->name, data->player.name) ||
-                data->player.gender != player->gender || data->player.unk15 != player->unk15) {
+                data->player.gender != player->gender || data->player.version != player->version) {
                 result = FALSE;
                 break;
             }
@@ -132,7 +132,7 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
             }
         }
     }
-    if (src->unk2A != 0) {
+    if (src->musicalShowCount != 0) {
         MusicalSave *musical = getAddressOfMusicalDataInfo(save);
 
         if (!MusicalSave_GetDownloadedProps(musical)) {
@@ -142,8 +142,8 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
             if (differs || (!differs && hasAll)) {
                 changed[MEMORY_LINK_PART_MUSICAL] = TRUE;
                 if (apply) {
-                    dest->unk28 = src->unk28;
-                    dest->unk2A = src->unk2A;
+                    dest->musicalTotalPoints = src->musicalTotalPoints;
+                    dest->musicalShowCount = src->musicalShowCount;
                     MI_CpuCopy8(src->props, dest->props, sizeof(src->props));
                 }
             }
@@ -171,10 +171,10 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
 
 u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest) {
     switch (kind) {
-    case MEMORY_LINK_KIND_UNK28:
-        return link->memories.unk28;
-    case MEMORY_LINK_KIND_UNK2A:
-        return link->memories.unk2A;
+    case MEMORY_LINK_KIND_MUSICAL_TOTAL_POINTS:
+        return link->memories.musicalTotalPoints;
+    case MEMORY_LINK_KIND_MUSICAL_SHOW_COUNT:
+        return link->memories.musicalShowCount;
     case MEMORY_LINK_KIND_UNK2C_0:
     case MEMORY_LINK_KIND_UNK2C_0 + 1:
     case MEMORY_LINK_KIND_UNK2C_0 + 2:

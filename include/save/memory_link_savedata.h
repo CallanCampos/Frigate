@@ -19,7 +19,7 @@ typedef struct {
     u32 id;
     u16 name[8];
     u8 gender;
-    u8 unk15;
+    u8 version;
     // Set in the Memory Link's data once the save is linked
     u8 linked;
 } MemoryLinkPlayer; // size: 0x18
@@ -32,8 +32,9 @@ typedef struct {
     u16 vars[MEMORY_LINK_VAR_COUNT];
     // The musical props owned
     u8 props[0x20];
-    u16 unk28;
-    u16 unk2A;
+    // The points of all the musical's shows and the shows played, from the save's musical block (MusicalSave)
+    u16 musicalTotalPoints;
+    u16 musicalShowCount;
     u8 unk2C[MEMORY_LINK_UNK2C_COUNT][0x3c];
 } MemoryLinkMemories; // size: 0x194
 
@@ -52,8 +53,8 @@ typedef struct MemoryLinkSave {
 
 // What func_02010b0c gives
 enum {
-    MEMORY_LINK_KIND_UNK28,
-    MEMORY_LINK_KIND_UNK2A,
+    MEMORY_LINK_KIND_MUSICAL_TOTAL_POINTS,
+    MEMORY_LINK_KIND_MUSICAL_SHOW_COUNT,
     // Copies an entry of unk2C to dest
     MEMORY_LINK_KIND_UNK2C_0,
     MEMORY_LINK_KIND_UNK2C_5 = MEMORY_LINK_KIND_UNK2C_0 + MEMORY_LINK_UNK2C_COUNT - 1,
