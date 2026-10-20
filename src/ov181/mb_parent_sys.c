@@ -981,7 +981,7 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B || (hit == 0 && wk->startMenu == FALSE)) {
                 wk->cancelSeq = 1;
                 ClActor_SetSequence(wk->cancelButton, 9);
-                func_0204c520(wk->cancelButton, TRUE);
+                ClActor_SetAutoAnim(wk->cancelButton, TRUE);
                 GFL_SndSEPlay(SEQ_SE_CANCEL1);
             } else if (MBP_IsBootableAll()) {
                 MBP_StartRebootAll();

@@ -234,7 +234,7 @@ static void DeliveryBeacon_DecryptData(DeliveryBeaconWork *pWork) {
 }
 
 static void DeliveryBeacon_SeqStartNet(void *work) {
-    func_02042968();
+    GFL_NetStartScan();
     DeliveryBeacon_SetSeqWithLine(work, DeliveryBeacon_SeqReceive, 471);
 }
 

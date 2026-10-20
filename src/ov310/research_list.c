@@ -1649,7 +1649,7 @@ static void ResearchList_UpdateCurrentIcon(ResearchList *wk) {
     pos.x = ResearchList_GetItemScreenX(wk, current);
     pos.y = ResearchList_GetItemScreenTop(wk, current) + 10;
     ClActor_SetSurfacePos(actor, &pos, 0);
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     ClActor_SetVisible(actor, TRUE);
 }
 

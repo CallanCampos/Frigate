@@ -1139,7 +1139,7 @@ static void PselCursor_Load(PselWork *wk) {
     setup.bgPriority = 2;
     wk->cursor = ClActor_Create(PselGraphic_GetClActUnit(wk->graphic), wk->cursorChars, wk->cursorPltt,
                                 wk->cursorCellAnim, &setup, 0, wk->heapId);
-    func_0204c520(wk->cursor, TRUE);
+    ClActor_SetAutoAnim(wk->cursor, TRUE);
     PselCursor_Show(wk, FALSE);
 }
 

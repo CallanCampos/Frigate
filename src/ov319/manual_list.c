@@ -215,7 +215,7 @@ static void ManualList_LoadGraphics(ManualList *list) {
         list->scrollBar = ClActor_Create(ManualGraphic_GetClActUnit(list->common->graphic), list->chars, list->palette,
                                          list->cellAnims, &setup, 1, list->common->heapId);
         ClActor_SetVisible(list->scrollBar, FALSE);
-        func_0204c520(list->scrollBar, TRUE);
+        ClActor_SetAutoAnim(list->scrollBar, TRUE);
     }
     {
         ClActorSetup setup = { 0, -8, 1, 0, 2 };
@@ -225,7 +225,7 @@ static void ManualList_LoadGraphics(ManualList *list) {
             list->marks[i] = ClActor_Create(ManualGraphic_GetClActUnit(list->common->graphic), list->chars,
                                             list->palette, list->cellAnims, &setup, 1, list->common->heapId);
             ClActor_SetVisible(list->marks[i], FALSE);
-            func_0204c520(list->marks[i], TRUE);
+            ClActor_SetAutoAnim(list->marks[i], TRUE);
         }
     }
     ManualList_CreateMenu(list);

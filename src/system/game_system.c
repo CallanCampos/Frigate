@@ -217,8 +217,8 @@ static void GSYS_Create(GameSystem *gsys, HeapID heapId, GameSystemProcData *pro
     gsys->unk28 = 0;
     gsys->iss = ISS_Create(gsys->gameData, heapId);
     gsys->festival = CreateLinkFestival(heapId, gsys);
-    gsys->unk36 = 0;
-    gsys->unk37_0 = FALSE;
+    gsys->gameCommPaused = 0;
+    gsys->lowBatteryCGearOff = FALSE;
     GSYS_SetupUICallback(gsys);
     GSYS_SetupSleepCheckCallback(gsys);
     InitZoneDataSystem(heapId);
@@ -346,12 +346,12 @@ LinkFestival *GSYS_GetLinkFestival(GameSystem *gsys) {
     return gsys->festival;
 }
 
-void func_02016b0c(GameSystem *gsys, u32 a1) {
-    gsys->unk34 = a1;
+void GSYS_SetNetErrorPending(GameSystem *gsys, u32 a1) {
+    gsys->netErrorPending = a1;
 }
 
-u8 func_02016b14(GameSystem *gsys) {
-    return gsys->unk34;
+u8 GSYS_IsNetErrorPending(GameSystem *gsys) {
+    return gsys->netErrorPending;
 }
 
 ISS *GameSystem_GetISS(GameSystem *gsys) {
@@ -362,12 +362,12 @@ GameCommSys *GSYS_GetGameCommSystem(GameSystem *gsys) {
     return gsys->comm;
 }
 
-void func_02016b24(GameSystem *gsys, u32 value) {
-    gsys->unk36 = value;
+void GSYS_SetGameCommPaused(GameSystem *gsys, u32 value) {
+    gsys->gameCommPaused = value;
 }
 
-u8 func_02016b2c(GameSystem *gsys) {
-    return gsys->unk36;
+u8 GSYS_IsGameCommPaused(GameSystem *gsys) {
+    return gsys->gameCommPaused;
 }
 
 u32 GSYS_IsCGearOn(GameSystem *gsys) {
@@ -382,8 +382,9 @@ static BOOL GSYS_CanBootGameComm(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
     u16 zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
 
-    if (gsys->unk36 == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() && GSYS_IsCGearOn(gsys) == TRUE &&
-        Intrude_CanBootGameComm(gsys) == TRUE && !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE) &&
+    if (gsys->gameCommPaused == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() &&
+        GSYS_IsCGearOn(gsys) == TRUE && Intrude_CanBootGameComm(gsys) == TRUE &&
+        !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE) &&
         CGearSettings_IsOn(CGearSettings_GetFromGameData(gsys->gameData))) {
         return TRUE;
     }
@@ -394,28 +395,28 @@ BOOL GSYS_TryBootGameComm(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
     if (!GFL_NetIsInitialized() && !GameCommSys_BootCheck(comm) && GSYS_CanBootGameComm(gsys) == TRUE) {
-        GameCommSys_Boot(comm, 1, gsys);
+        GameCommSys_Boot(comm, GAME_COMM_NO_BEACON_SEARCH, gsys);
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02016bec(GameSystem *gsys) {
-    return gsys->unk37_0;
+BOOL GSYS_IsLowBatteryCGearOff(GameSystem *gsys) {
+    return gsys->lowBatteryCGearOff;
 }
 
-void func_02016bf8(GameSystem *gsys) {
-    gsys->unk37_0 = FALSE;
+void GSYS_ClearLowBatteryCGearOff(GameSystem *gsys) {
+    gsys->lowBatteryCGearOff = FALSE;
 }
 
-// The UI callback: turns the communication setting off and remembers that it did
+// The low battery callback: turns the C-Gear off and remembers that it did
 static void GSYS_UICallback(void *work) {
     GameSystem *gsys = work;
 
     if (GSYS_IsCGearOn(gsys)) {
         GSYS_SetCGearOn(gsys, FALSE);
         GameData_SetCGearPowerRequest(GSYS_GetGameData(gsys), 0);
-        gsys->unk37_0 = TRUE;
+        gsys->lowBatteryCGearOff = TRUE;
     }
 }
 

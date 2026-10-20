@@ -527,7 +527,7 @@ static void BScenarioGraphic_CreateActors(BScenarioWork *work, u32 surface, cons
         if (setups->flags & 1) {
             animated = TRUE;
         }
-        func_0204c520(actors[i], animated);
+        ClActor_SetAutoAnim(actors[i], animated);
         if (setups->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -663,7 +663,7 @@ void BScenarioGraphic_SetButtonAnim(BScenarioWork *work, int button, u32 sequenc
     ClActor **actors = work->buttonActors;
 
     ClActor_SetSequence(actors[button], sequence);
-    func_0204c520(actors[button], TRUE);
+    ClActor_SetAutoAnim(actors[button], TRUE);
 }
 
 BOOL BScenarioGraphic_IsButtonAnimating(BScenarioWork *work, int button) {

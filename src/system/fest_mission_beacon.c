@@ -123,7 +123,7 @@ void FestMissionLog_AddPlayer(FestMissionLog *log, GameData *gameData, u8 joined
     entry.own = TRUE;
     entry.trainerId = getTrainerID(info);
     entry.gender = getTrainerGender(info);
-    entry.look = func_02008bf4(info);
+    entry.look = PlayerInfo_GetUnionView(info);
     if (entry.gender == GENDER_FEMALE) {
         entry.look -= 8;
     }
@@ -194,7 +194,7 @@ void FestMissionOffers_AddBeacon(LinkFestival *festival, const GameBeacon *beaco
     FestMissionOffer offer;
     int index;
 
-    if (!func_0202cf98(beacon)) {
+    if (!GameBeacon_HasMissionInfo(beacon)) {
         return;
     }
     index = FestMissionOffers_Find(festival, beacon);
@@ -285,11 +285,11 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
     if (FestMission_CheckFuncs[header->kind](info)) {
         return TRUE;
     }
-    if (!func_0202cf98(beacon)) {
+    if (!GameBeacon_HasMissionInfo(beacon)) {
         return FALSE;
     }
     if (info->seconds > FEST_MISSION_SECONDS_MAX || info->count > FEST_MISSION_SCORE_MAX || info->unk8_30 >= 3 ||
-        info->unk10_9 >= 4 || info->unk4_10 > 100 || info->unk10_0 > 50) {
+        info->extraSecondsIndex >= 4 || info->unk4_10 > 100 || info->unk10_0 > 50) {
         return TRUE;
     }
     if (PML_ItemIsDummy(info->unk4_0) || PML_ItemIsUnholdable(info->unk4_0) || info->unk4_0 == ITEM_MASTER_BALL) {
@@ -458,7 +458,7 @@ static int FestMissionOffers_Find(LinkFestival *festival, const GameBeacon *beac
     if (getStatusOfFesMission(festival) != 0 && FestMissionConfig_IsSame(&festival->config, &config)) {
         return FEST_MISSION_OFFER_REJECT;
     }
-    if (func_020149b0(festival, &config)) {
+    if (LinkFestival_ShouldSkipOffer(festival, &config)) {
         return FEST_MISSION_OFFER_REJECT;
     }
     return FEST_MISSION_OFFER_NEW;

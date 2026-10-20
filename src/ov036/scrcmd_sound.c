@@ -410,7 +410,7 @@ static GameEventReturnCode EventPokeVoicePlay_Callback(GameEvent *event, u32 *st
     PokeVoiceEvent *voice = data;
     u32 handle;
 
-    if (func_02005cbc()) {
+    if (GFL_SndIsLoadThreadRunning()) {
         return GAMEEVENT_CONTINUE;
     }
     if (voice->chatter) {

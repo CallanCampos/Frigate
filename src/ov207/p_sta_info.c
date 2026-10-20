@@ -269,7 +269,7 @@ static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
             color = PRINT_COLOR(3, 4, 0);
         }
         PML_PkmGetParam(pkm, PKM_PARAM_OT_NAME, name);
-        func_0202437c(nameWordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(nameWordSet, 0, name, 0, 1, 2);
         PStatus_PrintFormattedToWindow(wk, info->windows[3], nameWordSet, 14, 65, 1, color);
         GFL_WordSetSystemFree(nameWordSet);
         GFL_StrBufFree(name);
@@ -463,11 +463,11 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
         WordSetNumber(wordSet, 1, metMonth, 2, 0, 1);
         WordSetNumber(wordSet, 2, metDay, 2, 0, 1);
         WordSetNumber(wordSet, 3, metLevel, 3, 0, 1);
-        func_0202437c(wordSet, 4, metPlace, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 4, metPlace, 0, 1, 2);
         WordSetNumber(wordSet, 5, eggYear, 2, 2, 1);
         WordSetNumber(wordSet, 6, eggMonth, 2, 0, 1);
         WordSetNumber(wordSet, 7, eggDay, 2, 0, 1);
-        func_0202437c(wordSet, 8, eggPlace, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 8, eggPlace, 0, 1, 2);
         str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], msg);
         GFL_WordSetFormatStrbuf(wordSet, buf, str);
         PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, buf, wk->font,

@@ -588,7 +588,7 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         if (mfw->timer == 0 || GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
             MonolithMission_ClearMessage(mfw);
-            func_0202bf7c(GSYS_GetGameCommSystem(screen->param->gsys));
+            GameCommSys_LogMissionJoined(GSYS_GetGameCommSystem(screen->param->gsys));
             MonolithTool_SetPanelPulse(screen, TRUE, 1);
             MonolithTool_SetTextCursor(screen, &mfw->startButton, 1, 0xff, 3);
             if (GFL_HIDIsTouchPressed()) {
@@ -1298,7 +1298,7 @@ static void MonolithMission_CreateIcons(MonolithScreenParam *screen, MonolithMis
         mfw->icons[i] =
             ClActor_Create(screen->work->clactUnit, screen->work->actorRes[1].chars, screen->work->actorRes[1].palette,
                            screen->work->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
-        func_0204c520(mfw->icons[i], TRUE);
+        ClActor_SetAutoAnim(mfw->icons[i], TRUE);
         if (icon->palette != 0) {
             ClActor_SetPalette(mfw->icons[i], (u8)icon->palette, TRUE);
         }
@@ -1328,7 +1328,7 @@ static void MonolithMission_SetIconVisible(MonolithMissionWork *mfw, int index, 
 
 static void MonolithMission_SetIconSequence(MonolithMissionWork *mfw, int index, int sequence) {
     ClActor_SetSequence(mfw->icons[index], sequence);
-    func_0204c520(mfw->icons[index], TRUE);
+    ClActor_SetAutoAnim(mfw->icons[index], TRUE);
 }
 
 // Shows the markers of the new missions among the rows on the screen
@@ -1624,7 +1624,7 @@ static void MonolithMission_ShowStartMessage(MonolithScreenParam *screen, Monoli
     str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
     FestivalText_LoadMission(mfw->festText, mfw->ids[mfw->cursor], level, &mission);
     FestMission_GetMessage(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
-    func_0202437c(screen->work->wordSet, 0, str, 0, 1, 2);
+    GFL_WordSetSetStrbuf(screen->work->wordSet, 0, str, 0, 1, 2);
     GFL_StrBufFree(str);
     level = mfw->level + 1;
     if (mfw->flags & MONOLITH_MISSION_FLAG_CHEAT) {

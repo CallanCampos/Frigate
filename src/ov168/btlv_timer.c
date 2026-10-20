@@ -80,7 +80,7 @@ void BtlvTimer_Start(BtlvTimer *timer, s32 battleLimit, s32 commandLimit) {
                 setup.sequence = sequences[i][j];
                 timer->actors[i][j] = ClActor_Create(timer->units[i], timer->chars, timer->palette, timer->cellAnims,
                                                      &setup, 0, timer->heapId);
-                func_0204c520(timer->actors[i][j], TRUE);
+                ClActor_SetAutoAnim(timer->actors[i][j], TRUE);
             }
         }
     }

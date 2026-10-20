@@ -10,11 +10,11 @@
 
 #define SAVE_BLOCK_POKEWOOD 0x47
 #define POKEWOOD_SCORE_NONE (-9999)
-#define POKEWOOD_UNK348_MAX 99
+#define POKEWOOD_LEVEL_POINTS_MAX 99
 
 static void getFlagPos(int movie, int *word, int *bit);
 static u32 *getFlagList(PokewoodSave *save, u32 list);
-static void func_0201110c(PokewoodSave *save, u32 movie);
+static void PokewoodSave_UnlockMovie(PokewoodSave *save, u32 movie);
 
 u32 PokewoodSave_GetSize(void) {
     return sizeof(PokewoodSave);
@@ -27,7 +27,7 @@ void PokewoodSave_Init(PokewoodSave *save) {
     for (i = 0; i < POKEWOOD_MOVIE_COUNT; i++) {
         save->records[i].score = POKEWOOD_SCORE_NONE;
     }
-    func_0201110c(save, 0);
+    PokewoodSave_UnlockMovie(save, 0);
     PokewoodSave_SetFlag(save, 3, 0);
     PokewoodSave_SetLevelBit(save, 0, 1);
 }
@@ -44,13 +44,13 @@ static void getFlagPos(int movie, int *word, int *bit) {
 static u32 *getFlagList(PokewoodSave *save, u32 list) {
     switch (list) {
     case 0:
-        return save->flags0;
+        return save->unlockedMovies;
     case 1:
         return save->flags1;
     case 2:
         return save->flags2;
     case 3:
-        return save->flags3;
+        return save->announcedMovies;
     case 4:
         return save->flags4;
     case 5:
@@ -79,11 +79,11 @@ void PokewoodSave_SetFlag(PokewoodSave *save, u32 list, u32 movie) {
     flags[word] |= 1 << bit;
 }
 
-BOOL func_02011100(PokewoodSave *save, u32 movie) {
+BOOL PokewoodSave_IsMovieUnlocked(PokewoodSave *save, u32 movie) {
     return PokewoodSave_CheckFlag(save, 0, movie);
 }
 
-static void func_0201110c(PokewoodSave *save, u32 movie) {
+static void PokewoodSave_UnlockMovie(PokewoodSave *save, u32 movie) {
     PokewoodSave_SetFlag(save, 0, movie);
 }
 
@@ -124,21 +124,21 @@ void func_020111a8(PokewoodSave *save, u32 slot, u8 value) {
     save->slots[slot] = value;
 }
 
-s16 func_020111b0(PokewoodSave *save) {
-    if (save->unk348 > POKEWOOD_UNK348_MAX || save->unk348 < 0) {
-        save->unk348 = 0;
+s16 PokewoodSave_GetLevelPoints(PokewoodSave *save) {
+    if (save->levelPoints > POKEWOOD_LEVEL_POINTS_MAX || save->levelPoints < 0) {
+        save->levelPoints = 0;
     }
-    return save->unk348;
+    return save->levelPoints;
 }
 
-void func_020111d0(PokewoodSave *save, int amount) {
-    save->unk348 += (s16)amount;
-    if (save->unk348 > POKEWOOD_UNK348_MAX) {
-        save->unk348 = POKEWOOD_UNK348_MAX;
+void PokewoodSave_AddLevelPoints(PokewoodSave *save, int amount) {
+    save->levelPoints += (s16)amount;
+    if (save->levelPoints > POKEWOOD_LEVEL_POINTS_MAX) {
+        save->levelPoints = POKEWOOD_LEVEL_POINTS_MAX;
     }
 }
 
-int func_020111ec(int value) {
+int PokewoodSave_GetLevelOfPoints(int value) {
     if (value >= 0 && value < 20) {
         return 0;
     }
@@ -151,7 +151,7 @@ int func_020111ec(int value) {
     if (value >= 70 && value < 95) {
         return 3;
     }
-    if (value >= 95 && value <= POKEWOOD_UNK348_MAX) {
+    if (value >= 95 && value <= POKEWOOD_LEVEL_POINTS_MAX) {
         return 4;
     }
     return 0;

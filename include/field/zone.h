@@ -233,7 +233,7 @@ BOOL IsZoneAbyssalRuinsStrengthRock(u16 zoneId);
 BOOL IsMetLocationEntralink(u16 location);
 BOOL GetIsZoneRoute14Or15(u16 zoneId);
 // Whether the zone is a normal field zone: not the Union Room, Entralink or the like
-BOOL func_02018c38(u16 zoneId);
+BOOL IsZoneNormal(u16 zoneId);
 BOOL IsZoneEntralinkHub(u16 zoneId);
 BOOL GetZoneIsEntreeForest(u16 zoneId);
 BOOL IsZoneGameCommDisabled(u16 zoneId);

@@ -1016,7 +1016,7 @@ static u32 WifiNoteData_AddFriend(WifiNoteData *data, StrBuf *code, StrBuf *name
                 if (!DWC_CheckFriendKey(WifiList_GetMyUserData(wifiList), key)) {
                     return 1;
                 }
-                if (!func_02011980(wifiList, key, &index)) {
+                if (!WifiList_FindFriendKey(wifiList, key, &index)) {
                     return 2;
                 }
                 DWC_CreateFriendKeyToken(WifiList_GetFriendData(wifiList, i), key);
@@ -1310,7 +1310,7 @@ static void WifiNoteDraw_InitActors(WifiNoteDraw *draw, HeapID heapId) {
     for (i = 0; i < 2; i++) {
         draw->arrows[i] = ClActor_Create(draw->unit, draw->chars[1], draw->palettes[1], draw->cellAnims[1],
                                          &sWifiNoteButtonSetups[i], 0, heapId);
-        func_0204c520(draw->arrows[i], TRUE);
+        ClActor_SetAutoAnim(draw->arrows[i], TRUE);
         ClActor_SetVisible(draw->arrows[i], FALSE);
     }
     draw->returnButton = ClActor_Create(draw->unit, draw->chars[1], draw->palettes[1], draw->cellAnims[1],
@@ -1343,12 +1343,12 @@ static void WifiNoteDraw_SetArrowsAnimating(WifiNoteDraw *draw, BOOL animating) 
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_0204c520(draw->arrows[i], animating);
+        ClActor_SetAutoAnim(draw->arrows[i], animating);
     }
 }
 
 static void WifiNoteDraw_StartArrowAnim(WifiNoteDraw *draw, u32 arrow, u16 sequence) {
-    func_0204c520(draw->arrows[arrow], TRUE);
+    ClActor_SetAutoAnim(draw->arrows[arrow], TRUE);
     ClActor_SetSequence(draw->arrows[arrow], sequence);
     ClActor_RestartAnim(draw->arrows[arrow]);
 }
@@ -2518,7 +2518,7 @@ static void WifiNoteFriendList_StartErase(WifiNoteFriendList *list, WifiNoteDraw
     ClActor_SetSequence(list->eraser, 1);
     ClActor_RestartAnim(list->eraser);
     list->eraserFrame = 0;
-    func_0204c520(list->eraser, TRUE);
+    ClActor_SetAutoAnim(list->eraser, TRUE);
     pos.x = sWifiNoteFriendListPos[list->pos].x * 8;
     pos.y = sWifiNoteFriendListPos[list->pos].y * 8 - 4;
     ClActor_SetSurfacePos(list->eraser, &pos, 0);
@@ -2547,7 +2547,7 @@ static BOOL WifiNoteFriendList_UpdateErase(WifiNoteFriendList *list, WifiNoteDra
 static void WifiNoteFriendList_EndErase(WifiNoteFriendList *list, WifiNoteDraw *draw) {
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     ClActor_SetVisible(list->eraser, FALSE);
-    func_0204c520(list->eraser, FALSE);
+    ClActor_SetAutoAnim(list->eraser, FALSE);
 }
 
 static void WifiNoteListArea_Init(WifiNoteListArea *area, WifiNoteDraw *draw, const WifiNoteScreenArea *screenArea,
@@ -3238,7 +3238,7 @@ static void WifiNoteFriendInfo_Draw(WifiNoteFriendInfo *info, WifiNoteData *data
     }
     {
         ClActorSetup setup = { 56, 80, 0, 0, 0 };
-        u32 trainerClass = func_0202b5e8(
+        u32 trainerClass = UnionView_GetTrainerClass(
             WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_TRAINER_VIEW));
         ArcTool *arc = MakeTrGraArcHandle(heapId);
 
@@ -3677,13 +3677,13 @@ static BOOL WifiNoteFriendList_UpdateButton(WifiNoteFriendList *list) {
 static void WifiNoteDraw_StartReturnAnim(WifiNoteDraw *draw) {
     ClActor_SetAnimTime(draw->returnButton, 0);
     ClActor_SetSequence(draw->returnButton, 9);
-    func_0204c520(draw->returnButton, TRUE);
+    ClActor_SetAutoAnim(draw->returnButton, TRUE);
 }
 
 static void WifiNoteDraw_StartExitAnim(WifiNoteDraw *draw) {
     ClActor_SetAnimTime(draw->exitButton, 0);
     ClActor_SetSequence(draw->exitButton, 8);
-    func_0204c520(draw->exitButton, TRUE);
+    ClActor_SetAutoAnim(draw->exitButton, TRUE);
 }
 
 // Darkens the screen behind a message, or shows it as it is

@@ -388,7 +388,7 @@ static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
     UIObjRes_Load(&wk->objRes, &setup, unit, wk->heapId);
     wk->scrollBar = UIObjRes_CreateActor(&wk->objRes, unit, 240, SCROLL_BAR_TOP, 16, wk->heapId);
     ClActor_SetBgPriority(wk->scrollBar, 1);
-    func_0204c520(wk->scrollBar, TRUE);
+    ClActor_SetAutoAnim(wk->scrollBar, TRUE);
     PMSSelect_BGLoad(&wk->bg, wk->heapId, wk->font, wk->queue, wk->msgData);
     PMSSelect_BGResetPlateFade(&wk->bg);
     wk->bg.blinkCount = 0;

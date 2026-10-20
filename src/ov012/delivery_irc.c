@@ -327,7 +327,7 @@ static void DeliveryIrc_SeqWaitConnect(void *work) {
 }
 
 static void DeliveryIrc_SeqConnect(void *work) {
-    func_020429f8(NULL);
+    GFL_NetChangeoverConnect(NULL);
     DeliveryIrc_SetSeqWithLine(work, DeliveryIrc_SeqWaitConnect, 439);
 }
 

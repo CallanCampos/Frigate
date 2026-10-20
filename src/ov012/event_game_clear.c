@@ -281,7 +281,7 @@ void EventGameClear_NextState(GameClearWork *work, u32 *state) {
 }
 
 void func_ov012_0215a670(GameClearWork *work) {
-    func_0200cb08(getTrainerCardDataBlkAddress(work->gameData), 0x5a0);
+    TrainerCard_SetHallOfFameMinutes(getTrainerCardDataBlkAddress(work->gameData), 0x5a0);
 }
 
 void EventGameClear_GiveMonotypeMedals(GameClearWork *work) {

@@ -181,7 +181,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
         // fallthrough
     case BEACON_VIEW_EVENT_MENU:
     case BEACON_VIEW_EVENT_MENU_WIFI:
-        func_0202d7b8(work->status, 0);
+        BeaconStatus_SetLogTop(work->status, 0);
         GameData_SetCGearPowerRequest(work->gameData, 0);
         event = EventFieldMenuReturn_Create(work->gsys, work->field, 0);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_RETURN);
@@ -241,7 +241,8 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
         work->unk88 = 0;
         break;
     case BEACON_VIEW_EVENT_GREETING:
-        event = EventPhraseInput_Create(work->gsys, work->field, NULL, 7, (u16 *)func_0202d7d0(work->status));
+        event = EventPhraseInput_Create(work->gsys, work->field, NULL, 7,
+                                        (u16 *)BeaconStatus_GetGreetingChanged(work->status));
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_GREETING);
         break;
     case BEACON_VIEW_EVENT_MISSION_START: {
@@ -397,7 +398,7 @@ static void BeaconView_InitData(BeaconViewWork *work) {
     work->status = GameData_GetBeaconStatus(work->gameData);
     work->log = BeaconStatus_GetInfoTable(work->status);
     work->logCount = GameBeaconInfoTable_GetCount(work->log);
-    work->top = func_0202d7ac(work->status);
+    work->top = BeaconStatus_GetLogTop(work->status);
     if (work->logCount < BEACON_VIEW_LINE_MAX) {
         work->viewCount = work->logCount;
     } else {
@@ -410,11 +411,11 @@ static void BeaconView_InitData(BeaconViewWork *work) {
     work->wifiList = GameData_GetWifiList(work->gameData);
     work->bag = GameData_GetBag(work->gameData);
     work->trainerCard = getTrainerCardData_wrapper(save);
-    work->passerbyCount = func_0200c924(work->trainerCard);
+    work->passerbyCount = TrainerCard_GetPasserbyCount(work->trainerCard);
     info = SaveControl_GetPlayerInfo(save);
     work->trainerId = (u16)getIDAsUInt(info);
     work->gender = getTrainerGender(info);
-    work->unk3D = func_02008bf4(info);
+    work->unk3D = PlayerInfo_GetUnionView(info);
     work->version = GAME_VERSION;
     work->newTable = GameBeaconInfoTable_Alloc(work->heapId);
     work->beacon = GameBeacon_Alloc(work->heapId);
@@ -707,8 +708,8 @@ static ClActor *BeaconView_AddActor(BeaconViewWork *work, u32 chars, u32 palette
     setup.bgPriority = bgPriority;
     setup.priority = priority;
     actor = ClActor_Create(work->clUnit, chars, palette, cellAnims, &setup, 0, work->resHeapId);
-    func_0204c520(actor, FALSE);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
+    ClActor_SetDrawAnim(actor, FALSE);
     return actor;
 }
 
@@ -726,7 +727,7 @@ static void BeaconView_AddScreenActors(BeaconViewWork *work) {
             work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0], sBeaconViewActorSetups[i].x,
             sBeaconViewActorSetups[i].y, sBeaconViewActorSetups[i].sequence, sBeaconViewActorSetups[i].bgPriority, 2);
         ClActor_SetVisible(work->actors[i], TRUE);
-        func_0204c520(work->actors[i], i < BEACON_VIEW_ACTOR_UP ? TRUE : FALSE);
+        ClActor_SetAutoAnim(work->actors[i], i < BEACON_VIEW_ACTOR_UP ? TRUE : FALSE);
     }
 }
 
@@ -769,7 +770,7 @@ static void BeaconView_InitPanel(BeaconViewWork *work, u8 id) {
                                        work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
                                        work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0],
                                        panel->x + 188, panel->y + 12, 22, 3, id + 11);
-    func_0204c520(panel->medal, TRUE);
+    ClActor_SetAutoAnim(panel->medal, TRUE);
     for (i = 0; i < BEACON_VIEW_PANEL_DIGITS; i++) {
         panel->digits[i] =
             BeaconView_AddActor(work, work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CHARS].ids[0],

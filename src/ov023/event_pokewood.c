@@ -360,7 +360,7 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
     GFL_HeapFree(buffer);
     setup->unkDD_3 = 1;
     setup->unkDF = movie;
-    grade = func_020111ec(func_020111b0(save));
+    grade = PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save));
     setup->unk128 = sGradeTicks[grade].base + GFL_RandomLC(sGradeTicks[grade].range);
     setup->unk129 = grade;
     return setup;
@@ -945,7 +945,7 @@ void EventPokewood_UnlockMovies(PokewoodSave *save, GameData *gameData, u32 movi
             }
             break;
         case 3:
-            if (func_020111ec(func_020111b0(save)) >= sMovieUnlocks[i].param) {
+            if (PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save)) >= sMovieUnlocks[i].param) {
                 PokewoodSave_SetFlag(save, 0, i);
                 EventPokewood_OnMovieUnlocked(save, i);
             }

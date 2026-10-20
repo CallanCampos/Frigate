@@ -97,8 +97,8 @@ int WorldTrade_MyPoke_Init(WorldTradeWork *wk, int seq) {
     MyPoke_BmpWinInit(wk);
     MyPoke_SetCellActor(wk);
 
-    WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0], func_0201d620(pkm),
-                               &wk->uploadPokemonData.postSimple, &wk->print);
+    WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0],
+                               PokeParty_GetBoxPkm(pkm), &wk->uploadPokemonData.postSimple, &wk->print);
     WorldTrade_PokeInfoPrint2(wk->msgManager, &wk->infoWin[7], GetPlayerName(wk->param->mystatus), pkm,
                               &wk->infoWin[12], &wk->print);
     WorldTrade_MyPokeWantPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[9],
@@ -232,7 +232,7 @@ static void MyPoke_SetCellActor(WorldTradeWork *wk) {
     wk->pokemonAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->pokemonAct, TRUE);
+    ClActor_SetAutoAnim(wk->pokemonAct, TRUE);
     ClActor_SetSequence(wk->pokemonAct, 36);
     ClActor_SetBgPriority(wk->pokemonAct, 1);
     ClActor_SetVisible(wk->pokemonAct, TRUE);
@@ -534,7 +534,7 @@ void WorldTrade_PokeInfoPrint2(MsgData *msgManager, BmpWin **win, u16 *name, Par
 
 void WorldTrade_TransPokeGraphic(PartyPkm *pkm) {
     NNSG2dCharacterData *charData;
-    void *buf = LoadSingleCellSpindaGraphicsByBoxData(&charData, func_0201d620(pkm), 0, HEAPID_WORLDTRADE);
+    void *buf = LoadSingleCellSpindaGraphicsByBoxData(&charData, PokeParty_GetBoxPkm(pkm), 0, HEAPID_WORLDTRADE);
     u32 arcId;
     u32 palette;
 

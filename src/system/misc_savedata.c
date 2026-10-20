@@ -74,8 +74,8 @@ const u16 *getPtrToRivalName(RivalDataSave *data) {
     return data->rivalName;
 }
 
-void *func_0200f7d8(RivalDataSave *data) {
-    return data->unkB4;
+void *Misc_GetHollowRival(RivalDataSave *data) {
+    return data->hollowRival;
 }
 
 void Misc_SetFlag(RivalDataSave *data, int flag) {

@@ -148,7 +148,7 @@ BOOL UnionComm_InitWait(u32 *seq, void *param, void *work) {
 
     if (unisys->commState >= 2) {
         unisys->commState = 3;
-        func_02042a10(0);
+        GFL_NetStartSearch(0);
         return TRUE;
     }
     return FALSE;
@@ -158,7 +158,7 @@ void UnionComm_OnNetReady(void *work) {
     UnionSystem *unisys = work;
 
     unisys->commState = 2;
-    func_02042f50(FALSE);
+    GFL_NetSetRejectNegotiated(FALSE);
 }
 
 BOOL UnionComm_Exit(u32 *seq, void *param, void *work) {
@@ -267,7 +267,7 @@ static BOOL UnionComm_UpdateLink(UnionSystem *unisys) {
     case 5:
         if (unisys->commState >= 2) {
             unisys->commState = 3;
-            func_02042a10(0);
+            GFL_NetStartSearch(0);
             unisys->linkState = 0;
         }
         break;
@@ -322,7 +322,7 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
         break;
     case 1:
         if (MATH_CountPopulation(self->mycomm.doneMask) >= GFL_NetGetNegotiatedCount()) {
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             self->mycomm.step++;
         }
         break;
@@ -487,7 +487,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->unk07_5 = self->unk02;
     beacon->activity = self->activity;
     copyName(unisys->param->playerInfo->name, beacon->name, 8);
-    beacon->look = func_02008bf4(unisys->param->playerInfo);
+    beacon->look = PlayerInfo_GetUnionView(unisys->param->playerInfo);
     beacon->gender = getTrainerGender(unisys->param->playerInfo);
     beacon->trainerId = getIDAsUInt(unisys->param->playerInfo);
     beacon->state = self->state;
@@ -614,7 +614,7 @@ void UnionGroup_Init(UnionSystem *unisys, UnionGroup *group) {
     UnionGroup_ResetTargets(group);
     self = &group->members[0];
     OS_GetMacAddress(self->mac);
-    self->look = func_02008bf4(unisys->param->playerInfo);
+    self->look = PlayerInfo_GetUnionView(unisys->param->playerInfo);
     self->gender = getTrainerGender(unisys->param->playerInfo);
     self->used = TRUE;
     group->unk44 = 0xffff;

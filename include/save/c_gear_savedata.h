@@ -14,11 +14,13 @@
 struct CGearSettings {
     // Which panel sits in each of the six places
     u8 panels[CGEAR_PANEL_MAX];
-    u8 unk06;
+    // Whether the C-Gear was on when it last showed, so that it plays its startup once it has been turned on
+    u8 wasOn;
     // Whether the C-Gear is on, which the start menu reads to know if it was on when the game was saved
     u8 on;
     u8 colors[CGEAR_COLOR_MAX];
-    u8 unk0B;
+    // The skin, of the built-in ones
+    u8 skin;
     // The CRC of the downloaded skin, and whether there is one
     u16 skinCrc;
     u8 skinValid;
@@ -39,8 +41,8 @@ u32 CGearSettings_GetSize(void);
 void CGearSettings_Init(CGearSettings *settings);
 void CGearSettings_SetOn(CGearSettings *settings, u8 on);
 u8 CGearSettings_IsOn(CGearSettings *settings);
-void func_020098c4(CGearSettings *settings, u8 value);
-u8 func_020098c8(CGearSettings *settings);
+void CGearSettings_SetSkin(CGearSettings *settings, u8 value);
+u8 CGearSettings_GetSkin(CGearSettings *settings);
 void CGearSettings_SetSkinValid(CGearSettings *settings, u8 valid);
 u8 CGearSettings_GetSkinValid(CGearSettings *settings);
 void CGearSettings_SetSkinCrc(CGearSettings *settings, u16 crc);
@@ -49,8 +51,8 @@ void CGearSettings_SetPanel(CGearSettings *settings, u32 place, u32 panel);
 u8 CGearSettings_GetPanel(CGearSettings *settings, u32 place);
 void CGearSettings_SetColor(CGearSettings *settings, s32 index, u8 color);
 u8 CGearSettings_GetColor(CGearSettings *settings, s32 index);
-void func_02009910(CGearSettings *settings, u32 value);
-u8 func_02009914(CGearSettings *settings);
+void CGearSettings_SetWasOn(CGearSettings *settings, u32 value);
+u8 CGearSettings_GetWasOn(CGearSettings *settings);
 CGearSettings *CGearSettings_GetFromSave(SaveControl *save);
 CGearSettings *CGearSettings_GetFromGameData(GameData *gameData);
 

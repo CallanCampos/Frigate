@@ -98,10 +98,10 @@ BOOL MCSS_IsFading(MCSS *mcss);
 void MCSS_SetNoShadow(MCSS *mcss, u32 a1);
 void MCSS_SetShadowAlpha(MCSS *mcss, u32 a1);
 void MCSS_SetPositionOffset(MCSS *mcss, VecFx32 *a1);
-u16 func_0201ade8(MCSS *mcss);
-u16 func_0201ade0(MCSS *mcss);
-s16 func_0201adf0(MCSS *mcss);
-s16 func_0201adf8(MCSS *mcss);
+u16 MCSS_GetHeight(MCSS *mcss);
+u16 MCSS_GetWidth(MCSS *mcss);
+s16 MCSS_GetOffsetX(MCSS *mcss);
+s16 MCSS_GetOffsetY(MCSS *mcss);
 // The sprite's multi-cell animation, whose animation controller NNS_G2dSetAnimCtrlCallBackFunctor takes
 NNSG2dMultiCellAnimation *MCSS_GetMultiCellAnimation(MCSS *mcss);
 void MCSS_SetLoopAnimation(MCSS *mcss);
@@ -116,18 +116,18 @@ void MCSS_GetScale(MCSS *mcss, VecFx32 *out);
 void MCSS_GetScaleOffset(MCSS *mcss, VecFx32 *out);
 void MCSS_GetRotation(MCSS *mcss, VecFx32 *out);
 void MCSS_SetRotation(MCSS *mcss, const VecFx32 *in);
-void func_0201ac28(MCSS *mcss, VecFx32 *out);
-void func_0201ac40(MCSS *mcss, VecFx32 *in);
+void MCSS_GetShadowScaleOffset(MCSS *mcss, VecFx32 *out);
+void MCSS_SetShadowScaleOffset(MCSS *mcss, VecFx32 *in);
 void MCSS_SetShadowRotZ(MCSS *mcss, u16 value);
 void MCSS_ToggleFlipV(MCSS *mcss);
 BOOL MCSS_IsPaused(MCSS *mcss);
-void func_0201ad04(MCSS *mcss);
-void func_0201ad4c(MCSS *mcss);
+void MCSS_FreezeAnimation(MCSS *mcss);
+void MCSS_UnfreezeAnimation(MCSS *mcss);
 BOOL MCSS_IsHidden(MCSS *mcss);
 void MCSS_ToggleHidden(MCSS *mcss);
 u16 MCSS_GetAnimationCount(MCSS *mcss);
-u8 func_0201add0(MCSS *mcss);
-u16 func_0201add8(MCSS *mcss, u8 index);
+u8 MCSS_GetIdleNodeCount(MCSS *mcss);
+u16 MCSS_GetIdleNode(MCSS *mcss, u8 index);
 u8 func_0201ae00(MCSS *mcss);
 void MCSS_TraverseNodes(MCSS *mcss, u32 param,
                         BOOL (*func)(u32 param, const NNSG2dMultiCellHierarchyData *node, NNSG2dCellAnimation *cellAnim,
@@ -135,7 +135,7 @@ void MCSS_TraverseNodes(MCSS *mcss, u32 param,
 u8 MCSS_GetMosaic(MCSS *mcss);
 void MCSS_SetMosaic(MCSSSystem *system, MCSS *mcss, int level);
 void MCSS_SetAnimSpeed(MCSS *mcss, fx32 speed);
-u16 func_0201afa8(MCSS *mcss);
+u16 MCSS_GetSequenceCount(MCSS *mcss);
 void MCSS_BlendPalette(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color);
 void MCSS_ResetPalette(MCSSSystem *system, MCSS *mcss);
 void MCSS_SetReverse(MCSS *mcss, BOOL flag);

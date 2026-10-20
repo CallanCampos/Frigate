@@ -428,7 +428,7 @@ static void PStaSub_PrintInfo(PStatusWork *wk, PStaSubWork *sub, BoxPkm *pkm) {
     u32 sex;
 
     PML_PkmGetParam(pkm, PKM_PARAM_NICKNAME, name);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData, 0);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(sub->nameWindow), 25, 1, str, wk->font,

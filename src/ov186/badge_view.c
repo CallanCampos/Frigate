@@ -601,7 +601,7 @@ static void BadgeView_AddActors(BadgeViewWork *wk) {
         setup.priority = BADGE_ACTOR_COUNT - i;
         wk->actors[i] = ClActor_Create(wk->unit, wk->res[def->charRes], wk->res[def->paletteRes], wk->res[def->cellRes],
                                        &setup, def->surface, HEAPID_TRAINER_CARD_SCREEN);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
 }
 

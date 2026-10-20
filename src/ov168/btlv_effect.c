@@ -346,7 +346,7 @@ void BtlvEffect_Exit(void) {
         Particle_Free();
         BtlvEffvm_Delete(sBtlvEffect->effvm);
         GFL_TCBRemove(sBtlvEffect->vblankTask);
-        func_0203a610(sBtlvEffect->tcbManager);
+        GFL_TCBMgrDelete(sBtlvEffect->tcbManager);
         GFL_HeapFree(sBtlvEffect->tcbManagerBuffer);
         GFL_HeapFree(sBtlvEffect);
         sBtlvEffect = NULL;

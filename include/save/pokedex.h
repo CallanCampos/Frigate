@@ -29,8 +29,8 @@ struct PokeDexSave {
     u32 magic;
     u32 nationalObtained : 1;
     u32 habitatListEnabled : 1;
-    // Set to 1 with the Pokédex (func_0200d1dc)
-    u32 unk4_2 : 8;
+    // Set to 1 when the player is given the Pokédex, which the list's search and the detail screen check
+    u32 given : 8;
     // Which Pokédex the detail screen counts (PokeDex_GetMode)
     u32 mode : 2;
     // The species that the Pokédex's list was last on
@@ -57,7 +57,7 @@ void PokeDex_SetNationalObtained(PokeDexSave *pokedex);
 void PokeDex_EnableHabitatList(PokeDexSave *pokedex);
 BOOL PokeDex_IsHabitatListEnabled(PokeDexSave *pokedex);
 void givePlayerPokedex(PokeDexSave *pokedex);
-u32 func_0200d1dc(PokeDexSave *pokedex);
+u32 PokeDex_IsGiven(PokeDexSave *pokedex);
 // Which Pokédex the detail screen counts: 0 the regional one, 1 the national one, 2 the national one once obtained
 u32 PokeDex_GetMode(PokeDexSave *pokedex);
 // Sets which Pokédex the detail screen counts, with PokeDex_GetMode's values
@@ -76,7 +76,7 @@ void PokeDex_GetShownSexRareForm(PokeDexSave *pokedex, u16 species, u32 *sex, u3
 // Whether the Pokédex has seen the species in that sex, shininess and form
 BOOL PokeDex_HasSeenVariant(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form);
 // The personality of the Spinda the Pokédex shows, for index 0
-u32 func_0200da18(PokeDexSave *pokedex, u32 index);
+u32 PokeDex_GetSpindaPersonality(PokeDexSave *pokedex, u32 index);
 // Whether the Pokédex has the species' entry in a language
 BOOL PokeDex_HasLanguage(PokeDexSave *pokedex, u16 species, u32 language);
 u16 PokeDex_GetSeenNoNational(PokeDexSave *pokedex);

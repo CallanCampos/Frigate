@@ -402,7 +402,7 @@ static void Search_SetCellActor(WorldTradeWork *wk) {
     wk->cursorAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->cursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
     ClActor_SetSequence(wk->cursorAct, sSearchCursorPos[0][2]);
     ClActor_SetBgPriority(wk->cursorAct, 1);
     if (GCTX_HIDIsUsingTouch() == TRUE) {

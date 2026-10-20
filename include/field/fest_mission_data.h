@@ -82,8 +82,8 @@ typedef struct {
     u8 resultMessageId;
     FestMissionHeader header;
     u32 unk18;
-    // The seed of the mission's random choices (overlay 26)
-    u32 unk1C;
+    // The seed of the mission's random choices (FestMissionConfig's seed)
+    u32 seed;
     u8 unk20[0xc];
 } FestMission;
 

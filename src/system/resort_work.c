@@ -34,7 +34,7 @@ void ResortWork_UpdateRecords(ResortWork *work, SaveControl *save) {
     work->values[1] = RecordGet(records, 0x1e);
     work->values[2] = RecordGet(records, 0x7f) + RecordGet(records, 0x80);
     work->values[3] = RecordGet(records, 0x16);
-    work->values[4] = func_0200c924(trainerCard);
+    work->values[4] = TrainerCard_GetPasserbyCount(trainerCard);
 
     sum = 0;
     sum += RecordGet(records, 0xd);

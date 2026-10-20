@@ -104,7 +104,7 @@ static const SaveBlockDef SAVEDATA_INIT[SAVE_BLOCK_MAX] = {
     { SAVE_BLOCK_ADVENTURE, getSizeofAdventureDataBlk, (SaveBlockInit)initAdventureDataBlk },
     { SAVE_BLOCK_RECORDS, GameRecords_GetSize, (SaveBlockInit)initTrainerCardInfoBlk },
     { SAVE_BLOCK_PMS, PMSWordSave_GetSize, (SaveBlockInit)PMSWordSave_Init },
-    { SAVE_BLOCK_MAIL, MailBox_GetSize, (SaveBlockInit)func_020097a8 },
+    { SAVE_BLOCK_MAIL, MailBox_GetSize, (SaveBlockInit)MailBox_Clear },
     { SAVE_BLOCK_FIELD_ACTORS, ActorSave_GetBlockSize, (SaveBlockInit)ActorSave_Init },
     { SAVE_BLOCK_MUSICAL, MusicalSave_GetSize, (SaveBlockInit)MusicalSave_Init },
     { SAVE_BLOCK_RESH_ZEK, ReshZekSave_GetSize, (SaveBlockInit)ReshZekSave_Init },

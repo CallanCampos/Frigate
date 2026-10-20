@@ -237,7 +237,7 @@ void MusShotInfo_Main(MusShotInfo *info) {
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             info->state = MUS_SHOT_INFO_STATE_RETURN;
             ClActor_SetSequence(info->returnButton, 9);
-            func_0204c520(info->returnButton, TRUE);
+            ClActor_SetAutoAnim(info->returnButton, TRUE);
         }
         break;
     case MUS_SHOT_INFO_STATE_RETURN:

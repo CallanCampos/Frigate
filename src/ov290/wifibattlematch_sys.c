@@ -458,7 +458,7 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
     param->unk34 = sys->unk22C;
     param->unk38 = sys->unk778;
     param->unk40 = &sys->unk8AC;
-    param->record = func_0200f2d4(getRecordBlkAddress(GameData_GetSaveControl(sys->param.gameData)));
+    param->record = RecordSave_GetRndMatchData(getRecordBlkAddress(GameData_GetSaveControl(sys->param.gameData)));
     if (GFL_SndBGMGetID() != SEQ_BGM_WCS) {
         GFL_SndBGMPlay(SEQ_BGM_WCS, SND_CHANNEL_MASK_ALL);
     }
@@ -538,10 +538,10 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
         }
         param->regulation = PokeRegulation_LoadNew(fileId, heapId);
     } else if (sys->mode == 0) {
-        param->regulation = func_0200b530(
+        param->regulation = TournamentEntry_GetRegulation(
             TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0));
     } else if (sys->mode == 1) {
-        param->regulation = func_0200b530(
+        param->regulation = TournamentEntry_GetRegulation(
             TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 1));
     } else {
         GFL_ASSERT(0);
@@ -655,8 +655,8 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         regulation = PokeRegulation_LoadNew(fileId, heapId);
         ownsRegulation = TRUE;
     } else if (sys->mode == 0) {
-        regulation = func_0200b530(TournamentBlock_GetEntry(tournament, 0));
-        switch (Regulation_GetParam(regulation, 0x15)) {
+        regulation = TournamentEntry_GetRegulation(TournamentBlock_GetEntry(tournament, 0));
+        switch (Regulation_GetParam(regulation, REGULATION_PARAM_BATTLE_TYPE)) {
         case 0:
             BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
@@ -674,8 +674,8 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
             break;
         }
     } else if (sys->mode == 1) {
-        regulation = func_0200b530(TournamentBlock_GetEntry(tournament, 1));
-        switch (Regulation_GetParam(regulation, 0x15)) {
+        regulation = TournamentEntry_GetRegulation(TournamentBlock_GetEntry(tournament, 1));
+        switch (Regulation_GetParam(regulation, REGULATION_PARAM_BATTLE_TYPE)) {
         case 0:
             BtlSetup_SetNet1v1Single(param->setup, sys->param.gameData, NetHandle_GetOwn(), 2, heapId);
             break;
@@ -700,8 +700,8 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
     } else if (sys->mode == 2) {
         battleType = sys->param.unk4 + 0x1c;
     } else {
-        param0D = Regulation_GetParam(regulation, 0xd);
-        value = Regulation_GetParam(regulation, 0x15);
+        param0D = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
+        value = Regulation_GetParam(regulation, REGULATION_PARAM_BATTLE_TYPE);
         if (param0D >= 2) {
             param0D = 1;
         }
@@ -713,8 +713,8 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         param->setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
     } else if (sys->mode == 0) {
         entry = TournamentBlock_GetEntry(tournament, 0);
-        value = TournamentEntry_GetField(entry, 0xb);
-        param12 = Regulation_GetParam(func_0200b530(entry), 0x12);
+        value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
+        param12 = Regulation_GetParam(TournamentEntry_GetRegulation(entry), REGULATION_PARAM_18);
         if (value == 1) {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_WCS;
             param->setup->fieldSituation.unk12 = SEQ_BGM_WIN5;
@@ -729,8 +729,8 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         }
     } else if (sys->mode == 1) {
         entry = TournamentBlock_GetEntry(tournament, 1);
-        value = TournamentEntry_GetField(entry, 0xb);
-        param12 = Regulation_GetParam(func_0200b530(entry), 0x12);
+        value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
+        param12 = Regulation_GetParam(TournamentEntry_GetRegulation(entry), REGULATION_PARAM_18);
         if (value == 1) {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_WCS;
             param->setup->fieldSituation.unk12 = SEQ_BGM_WIN5;
@@ -781,8 +781,8 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
     BattleRec_UnloadToolOverlay();
     if (sys->mode == 0) {
         entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0);
-        regulation = func_0200b530(entry);
-        value = TournamentEntry_GetField(entry, 2);
+        regulation = TournamentEntry_GetRegulation(entry);
+        value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
         if (result == 0) {
             WifiBattleMatchSys_BuildReport(&sys->report, sys->party, sys->otherParty, sys->otherPlayer, regulation,
                                            value, setup, &sys->battleResult, 0);
@@ -945,10 +945,10 @@ static void *WifiBattleMatchSys_CreateResultParam(WifiBattleMatchChain *chain, H
         } else {
             GFL_ASSERT(0);
         }
-        regulation = func_0200b530(
+        regulation = TournamentEntry_GetRegulation(
             TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), index));
-        param0D = Regulation_GetParam(regulation, 0xd);
-        value = Regulation_GetParam(regulation, 0x15);
+        param0D = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
+        value = Regulation_GetParam(regulation, REGULATION_PARAM_BATTLE_TYPE);
         if (param0D >= 2) {
             param0D = 1;
         }
@@ -1107,8 +1107,8 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
     WifiBattleMatchSys_CountAlive(setup, &alive[0], &alive[1]);
     report->aliveOwn = alive[0];
     report->aliveOther = alive[1];
-    report->battleType = Regulation_GetParam(regulation, 0x15);
-    report->unkFlag = Regulation_GetParam(regulation, 0xd);
+    report->battleType = Regulation_GetParam(regulation, REGULATION_PARAM_BATTLE_TYPE);
+    report->unkFlag = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
 }
 
 static void WifiBattleMatchSys_CountAlive(const BtlSetup *setup, u8 *own, u8 *other) {

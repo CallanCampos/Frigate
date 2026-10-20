@@ -326,7 +326,7 @@ void MonolithTool_CreateReturnButton(MonolithWork *wk, MonolithReturnButton *but
     ClActor *actor = ClActor_Create(wk->clactUnit, wk->actorRes[1].chars, wk->actorRes[1].palette,
                                     wk->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
 
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     button->actor = actor;
 }
 
@@ -363,7 +363,7 @@ ClActor *MonolithTool_CreateActor(MonolithWork *wk, s16 x, s16 y, u16 sequence) 
 
     actor = ClActor_Create(wk->clactUnit, wk->actorRes[1].chars, wk->actorRes[1].palette, wk->actorRes[1].cellAnims,
                            &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     return actor;
 }
 

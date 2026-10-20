@@ -164,7 +164,7 @@ BOOL s02C2_RepelRearm(VM *vm, FieldScriptEnv *env) {
 
         EncountSave_SetRepelSteps(save, steps);
         BagSave_SubItem(bag, repel, 1, heapId);
-        func_0202d384(repel);
+        GameBeaconSys_SendItemUse(repel);
         GFL_SndSEPlay(SEQ_SE_SYS_92);
         *result = repel;
     }

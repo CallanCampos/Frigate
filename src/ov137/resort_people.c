@@ -260,7 +260,7 @@ static void ResortPerson_GetOccupantPos(ResortPerson *person, u16 *x, u16 *z, u1
     if (index % 2 == 0) {
         column = 1;
     }
-    func_02039538(ResortShopData_GetShopParam(row, column + 6), x, z, dir);
+    ResortLayout_GetOccupantPlace(ResortShopData_GetShopParam(row, column + 6), x, z, dir);
     *x += ResortBinary_Get(person->unk2c, index, 1);
     *z += ResortBinary_Get(person->unk2c, index, 2);
 }
@@ -286,7 +286,7 @@ static void ResortPerson_SetupRecordNpc(ResortPerson *person, const ResortPerson
 }
 
 static void ResortPerson_GetRecordPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
-    func_02039578(ResortData_GetParam(person->data, 31, NULL), x, z, dir);
+    ResortLayout_GetRecordPlace(ResortData_GetParam(person->data, 31, NULL), x, z, dir);
 }
 
 static void ResortPerson_CreateActor(ResortPerson *person, const ResortPersonSetup *setup) {

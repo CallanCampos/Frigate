@@ -291,7 +291,7 @@ static u8 GimmickFunfestLevels_ShowLevels(GameData *gameData, FieldExpObjSystem 
 }
 
 static EntralinkCommWork *GetCommWork(GameCommSys *comm) {
-    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNK2) {
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_INTRUDE) {
         return GameCommSys_GetWork(comm);
     }
     return NULL;

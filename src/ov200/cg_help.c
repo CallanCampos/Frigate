@@ -362,7 +362,7 @@ static void CGHelp_LoadGraphics(CGHelp *help) {
         help->actors[i] = ClActor_Create(help->clActUnit, help->chars[i], help->palette, help->cellAnims[i],
                                          &actorSetup, CLACT_SURFACE_SUB, help->heapId);
         ClActor_SetVisible(help->actors[i], FALSE);
-        func_0204c520(help->actors[i], FALSE);
+        ClActor_SetAutoAnim(help->actors[i], FALSE);
     }
 }
 
@@ -467,7 +467,7 @@ static void CGHelp_HandleInput(CGHelp *help) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         break;
     }
-    if (func_02016bec(help->param->gsys) == TRUE) {
+    if (GSYS_IsLowBatteryCGearOff(help->param->gsys) == TRUE) {
         AppTaskMenuWin_SetFlashing(help->quitButton, TRUE);
         help->state = STATE_CLOSE;
     }

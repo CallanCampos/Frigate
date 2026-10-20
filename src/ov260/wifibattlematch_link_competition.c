@@ -450,9 +450,10 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 3:
-        if (link->param->account->unk5 == TournamentEntry_GetField(entry, 10)) {
+        if (link->param->account->unk5 == TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B)) {
             *seq = 4;
-        } else if (TournamentEntry_GetField(entry, 10) == 4 || TournamentEntry_GetField(entry, 10) == 5) {
+        } else if (TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B) == 4 ||
+                   TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B) == 5) {
             *seq = 7;
         } else {
             *seq = 4;
@@ -484,9 +485,9 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         WifiBattleMatchLinkRequest request;
 
         MI_CpuFill8(&request, 0, sizeof(request));
-        request.unk1 = TournamentEntry_GetField(entry, 10);
+        request.unk1 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
-        link->param->account->unk5 = TournamentEntry_GetField(entry, 10);
+        link->param->account->unk5 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
         WifiBattleMatchNet_StartPostRequest(link->net, &request, HEAPID_WIFIBATTLEMATCH_LINK);
         *seq = 8;
         break;
@@ -560,7 +561,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 15:
-        if (TournamentEntry_GetField(entry, 2) == 0) {
+        if (TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID) == 0) {
             *seq = 18;
         } else {
             *seq = 16;
@@ -611,7 +612,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 19:
-        if (TournamentEntry_GetField(entry, 2) == 0) {
+        if (TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID) == 0) {
             *seq = 42;
         } else {
             *seq = 20;
@@ -818,7 +819,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
 
         MI_CpuCopy8(&link->serverEntry, link->entry, sizeof(link->serverEntry));
         BattleBoxSave_ClearFlags(battleBox, 1);
-        TournamentEntry_SetField(link->entry, 10, 1);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 1);
         RndMatchData_SetParam(param->record, 10, 0, 0);
         RndMatchData_SetParam(param->record, 10, 1, 0);
         RndMatchData_SetParam(param->record, 10, 2, 0);
@@ -1032,7 +1033,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
             break;
         }
         invalidFlags = 0;
-        regulation = func_0200b530(link->entry);
+        regulation = TournamentEntry_GetRegulation(link->entry);
         invalid = PokeRegulation_CheckParty(regulation, (PokeParty *)player->partyData, &invalidFlags);
         otherInvalid = PokeRegulation_PartyHasEgg(regulation, (PokeParty *)player->partyData);
         if (invalid == 0 && otherInvalid == 0) {
@@ -1133,7 +1134,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
         previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
         party = convertBoxedPokeSetToParty(battleBox, HEAPID_TAIL(HEAPID_WIFIBATTLEMATCH));
         BattleBoxSave_SetFlags(battleBox, 1);
-        TournamentEntry_SetField(link->entry, 10, 2);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 2);
         TournamentTeam_SetFromParty(previous, party);
         GFL_HeapFree(party);
         *seq = 23;
@@ -1477,7 +1478,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         MI_CpuFill8(&condition, 0, sizeof(condition));
         condition.rating = link->param->unk34->unk10;
         condition.disconnects = link->param->unk34->unk4;
-        condition.cup = TournamentEntry_GetField(entry, 2);
+        condition.cup = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
         condition.matches = link->param->unk34->unk8 + link->param->unk34->unkC;
         WifiBattleMatchNet_StartMatch(link->net, 0, 0, param->param->unk4, &condition);
         link->unkE4 = 0;
@@ -1554,8 +1555,8 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
                 otherPlayer->info.gender = GENDER_MALE;
                 fixCount++;
             }
-            if (otherPlayer->info.unk1C >= 16) {
-                otherPlayer->info.unk1C = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
+            if (otherPlayer->info.unionView >= 16) {
+                otherPlayer->info.unionView = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
                 fixCount++;
             }
             if (!Country_IsValidPlace(otherPlayer->info.country, otherPlayer->info.province,
@@ -1597,7 +1598,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 16:
         flags = 0;
-        regulation = func_0200b530(link->entry);
+        regulation = TournamentEntry_GetRegulation(link->entry);
         if (PokeRegulation_CheckParty(regulation, (PokeParty *)param->otherPlayer->partyData, &flags) == 0) {
             *seq = 17;
         } else {
@@ -2436,13 +2437,13 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         if (valid) {
             RTC_ConvertSecondToDateTime(&date, &time, RTC_ConvertDateTimeToSecond(&date, &time));
         }
-        startDate.year = TournamentEntry_GetField(entry, 4);
-        startDate.month = TournamentEntry_GetField(entry, 5);
-        startDate.day = TournamentEntry_GetField(entry, 6);
+        startDate.year = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR);
+        startDate.month = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH);
+        startDate.day = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY);
         startDate.week = RTC_WEEK_SUNDAY;
-        endDate.year = TournamentEntry_GetField(entry, 7);
-        endDate.month = TournamentEntry_GetField(entry, 8);
-        endDate.day = TournamentEntry_GetField(entry, 9);
+        endDate.year = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_YEAR);
+        endDate.month = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH);
+        endDate.day = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY);
         endDate.week = RTC_WEEK_SUNDAY;
         startDay = RTC_ConvertDateToDay(&startDate);
         endDay = RTC_ConvertDateToDay(&endDate);
@@ -2491,7 +2492,7 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
 
         link->hadBattleBox = BattleBoxSave_CheckFlags(battleBox, 1);
         BattleBoxSave_ClearFlags(battleBox, 1);
-        TournamentEntry_SetField(link->entry, 10, 3);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 3);
         GameData_StartSave(param->param->gameData);
         *seq = 7;
         break;
@@ -2633,7 +2634,7 @@ static void WifiBattleMatchLink_CompetitionTaskUnregister(WifiBattleMatchTask *t
         break;
     case 9:
         BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(param->param->gameData)), 1);
-        TournamentEntry_SetField(link->entry, 10, 4);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 4);
         GameData_StartSave(param->param->gameData);
         *seq = 10;
         break;
@@ -2746,16 +2747,18 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     previous =
         TournamentBlock_GetTeam(getTournamentBlockAddress(GameData_GetSaveControl(link->param->param->gameData)), 0);
     MI_CpuFill8(&info, 0, sizeof(info));
-    MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
-    info.startDate = WifiBattleMatchLink_PackBytes(
-        TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-    info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8),
-                                                 TournamentEntry_GetField(entry, 9));
-    info.look = func_02008bf4(playerInfo);
+    MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
+    info.startDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),
+                                                   TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH),
+                                                   TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY));
+    info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_YEAR),
+                                                 TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH),
+                                                 TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY));
+    info.look = PlayerInfo_GetUnionView(playerInfo);
     info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
     first = RndMatchData_GetParam(link->param->record, 10, 1);
     info.unkA4 = first + RndMatchData_GetParam(link->param->record, 10, 2);
-    info.variant = TournamentEntry_GetField(entry, 11);
+    info.variant = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
     if (info.unkA4 == 0 && info.unkA0 == 0) {
         info.unkA0 = 1500;
     }
@@ -2800,7 +2803,8 @@ static void WifiBattleMatchLink_CompetitionCreatePartnerCard(WifiBattleMatchLink
         unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
         link->partnerCard = WifiBattleMatchPartnerCard_Create(
             (const LiveBattleMatchPlayerData *)partner, unit, link->res, link->font, link->printQueue, link->msgData,
-            link->wordSet, 0, 1, TournamentEntry_GetField(link->entry, 11), HEAPID_WIFIBATTLEMATCH_LINK);
+            link->wordSet, 0, 1, TournamentEntry_GetField(link->entry, TOURNAMENT_FIELD_VARIANT),
+            HEAPID_WIFIBATTLEMATCH_LINK);
     }
 }
 
@@ -2961,7 +2965,7 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer 
     player->unk4C = WifiBattleMatchNet_GetRecordId(link->net);
     player->gsid = WifiList_GetMyGSID(GameData_GetWifiList(link->param->param->gameData));
     entry = link->entry;
-    player->entryField2 = TournamentEntry_GetField(entry, 2);
+    player->entryField2 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
     player->checksum = CRC16_350bytes(entry);
 }
 
@@ -2997,7 +3001,7 @@ static BOOL WifiBattleMatchLink_CompetitionCompareParties(PokeParty *party, Poke
             PartyPkm *pkm = PokeParty_GetPkm(party, i);
             PartyPkm *otherPkm = PokeParty_GetPkm(otherParty, i);
 
-            if (GFL_STD_MemCmp(func_0201d620(pkm), func_0201d620(otherPkm), PML_GetPkmRawSize()) != 0) {
+            if (GFL_STD_MemCmp(PokeParty_GetBoxPkm(pkm), PokeParty_GetBoxPkm(otherPkm), PML_GetPkmRawSize()) != 0) {
                 return FALSE;
             }
         }

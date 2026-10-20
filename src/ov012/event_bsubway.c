@@ -309,7 +309,7 @@ static GameEventReturnCode EventBSubwayRecords_Callback(GameEvent *event, u32 *s
     switch (*state) {
     case 0:
         data->param.gameData = GSYS_GetGameData(data->gsys);
-        bsubwaySave = func_02017968(data->param.gameData);
+        bsubwaySave = GameData_GetBSubwayWifiData(data->param.gameData);
         data->param.rank = BSubwayWifiData_GetLeaderRank(bsubwaySave);
         data->param.trainNumber = BSubwayWifiData_GetLeaderRoom(bsubwaySave);
         GameEvent_ChainNext(event,

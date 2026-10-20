@@ -522,7 +522,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
     if (wk->param->box == BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
         copyPkmIntoPartyBlk(wk->party, wk->param->slot, pkm);
     } else {
-        BoxSaveAccessor_SetPkm(wk->boxes, wk->param->box, wk->param->slot, func_0201d624(pkm));
+        BoxSaveAccessor_SetPkm(wk->boxes, wk->param->box, wk->param->slot, PokeParty_ToBoxPkm(pkm));
     }
     switch (wk->type) {
     case 2:

@@ -320,7 +320,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         break;
     case 6:
         if (work->joined) {
-            func_02014774(work->festival, work->joined);
+            LinkFestival_StartTimer(work->festival, work->joined);
         }
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
@@ -456,7 +456,7 @@ static void FestMission_Print(FestMissionEventWork *work) {
 
     GFL_MsgDataLoadStrbuf(work->msgData, EventFestMission_Text_Empty, work->strbuf);
     FestMission_GetMessage(work->festText, work->formatted, &work->mission, work->tailHeapId);
-    func_0202437c(work->wordSet, 0, work->formatted, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, work->formatted, 0, 1, 2);
     FestMission_PrintLine(work, work->strbuf, 0, 0);
     FestMission_GetResultMessage(work->festText, work->strbuf, &work->mission, work->heapId);
     FestMission_PrintLine(work, work->strbuf, 0, 2);

@@ -119,7 +119,7 @@ static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
             work->balls[i].actor =
                 ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, work->heapId);
             ClActor_GetSurfacePos(work->balls[i].actor, &work->balls[i].pos, 0);
-            func_0204c520(work->balls[i].actor, TRUE);
+            ClActor_SetAutoAnim(work->balls[i].actor, TRUE);
             ClActor_SetSequence(work->balls[i].actor, data_ov168_021f3e60[param->side][param->balls[i]]);
             work->balls[i].sequence = data_ov168_021f3e60[2][param->balls[i]];
             work->balls[i].wait = (i + 1) * 6;
@@ -134,7 +134,7 @@ static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
         work->balls[i].actor =
             ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, work->heapId);
         ClActor_GetSurfacePos(work->balls[i].actor, &work->balls[i].pos, 0);
-        func_0204c520(work->balls[i].actor, TRUE);
+        ClActor_SetAutoAnim(work->balls[i].actor, TRUE);
         ClActor_SetSequence(work->balls[i].actor, data_ov168_021f3e60[param->side][4]);
         work->balls[i].sequence = data_ov168_021f3e60[param->side][4];
         work->balls[i].wait = 0;

@@ -526,7 +526,7 @@ void WbtBattle_EndBattle(WbtSystem *sys, GameData *gameData, BtlSetup *setup) {
         break;
     }
     opponent = WbtBattle_GetOpponent(sys);
-    save = func_020179f8(gameData);
+    save = GameData_GetWbtSave(gameData);
     if (sys->tournament != 3 && opponent->unk2 < 54) {
         u8 slot = WbtBattle_GetRoundSlot(sys->round);
 

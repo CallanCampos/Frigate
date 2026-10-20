@@ -392,7 +392,7 @@ static void Deposit_SetCellActor(WorldTradeWork *wk) {
                        wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                        wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
     ClActor_SetSequence(wk->subCursorAct, 12);
-    func_0204c520(wk->subCursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->subCursorAct, TRUE);
     ClActor_StopAnim(wk->subCursorAct);
     ClActor_SetVisible(wk->subCursorAct, FALSE);
 
@@ -953,7 +953,7 @@ void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
     dtd->trainerID = getIDAsUInt(wk->param->mystatus);
     dtd->countryCode = UnityTowerVisitor_GetCountry(wk->param->mystatus);
     dtd->localCode = UnityTowerVisitor_GetProvince(wk->param->mystatus);
-    dtd->trainerType = func_02008bf4(wk->param->mystatus);
+    dtd->trainerType = PlayerInfo_GetUnionView(wk->param->mystatus);
     dtd->gender = getTrainerGender(wk->param->mystatus);
 #ifdef BLACK2
     dtd->versionCode = VERSION_BLACK2;

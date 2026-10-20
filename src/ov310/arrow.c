@@ -180,8 +180,8 @@ static void Arrow_ShowPiece(Arrow *arrow, u8 index) {
     ClActor_SetSequence(actor, sequence);
     ClActor_SetAnimTime(actor, 0);
     ClActor_SetPlayMode(actor, 1);
-    func_0204c520(actor, TRUE);
-    func_0204c53c(actor, FX32_CONST(18));
+    ClActor_SetAutoAnim(actor, TRUE);
+    ClActor_SetAutoAnimSpeed(actor, FX32_CONST(18));
     ClActor_StartAnim(actor);
     ClActor_SetVisible(actor, TRUE);
 }

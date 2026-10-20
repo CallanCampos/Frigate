@@ -564,7 +564,7 @@ void BtlNet_StartTiming(u8 id) {
     if (sWork != NULL) {
         sWork->timingNo = id;
         sWork->timingPending = TRUE;
-        func_02040b38(sWork->netHandle, id, 1, sWork->clientMask);
+        NetHandle_SendTimingPairToMachines(sWork->netHandle, id, 1, sWork->clientMask);
     }
 }
 
@@ -581,7 +581,7 @@ BOOL BtlNet_CheckTiming(u8 id) {
                 return done;
             }
         } else {
-            func_02040b38(sWork->netHandle, id, 1, sWork->clientMask);
+            NetHandle_SendTimingPairToMachines(sWork->netHandle, id, 1, sWork->clientMask);
         }
         return FALSE;
     }

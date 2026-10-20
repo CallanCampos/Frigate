@@ -912,7 +912,7 @@ static void ZukanDetailMap_CreateActors(ZukanDetailMapParam *param, ZukanDetailM
         }
         for (i = 0; i < ACTOR_COUNT; i++) {
             ClActor_SetSequence(wk->actors[i], anims[i]);
-            func_0204c520(wk->actors[i], TRUE);
+            ClActor_SetAutoAnim(wk->actors[i], TRUE);
             ClActor_SetBgPriority(wk->actors[i], bgPriorities[i]);
             ClActor_SetPriority(wk->actors[i], priorities[i]);
             ClActor_SetVisible(wk->actors[i], FALSE);
@@ -960,7 +960,7 @@ static void ZukanDetailMap_CreateAreas(ZukanDetailMapParam *param, ZukanDetailMa
         wk->areas[i] = ClActor_Create(wk->unit, wk->areaChars, wk->areaPalette, wk->areaCellAnims, &setup,
                                       CLACT_SURFACE_MAIN, param->heapId);
         ClActor_SetSequence(wk->areas[i], TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_ANIM));
-        func_0204c520(wk->areas[i], TRUE);
+        ClActor_SetAutoAnim(wk->areas[i], TRUE);
         ClActor_SetBgPriority(wk->areas[i], 2);
         ClActor_SetPriority(wk->areas[i], 4);
         ClActor_SetVisible(wk->areas[i], FALSE);
@@ -1006,7 +1006,7 @@ static void ZukanDetailMap_CreatePlaces(ZukanDetailMapParam *param, ZukanDetailM
                 wk->places[i].state = PLACE_SHOWN;
                 wk->places[i].actor = ClActor_Create(wk->unit2, wk->mapChars, wk->mapPalette, wk->mapCellAnims, &setup,
                                                      CLACT_SURFACE_MAIN, param->heapId);
-                func_0204c520(wk->places[i].actor, TRUE);
+                ClActor_SetAutoAnim(wk->places[i].actor, TRUE);
                 ClActor_SetVisible(wk->places[i].actor, TRUE);
                 ClActor_SetObjMode(wk->places[i].actor, 1);
             }
@@ -1217,7 +1217,7 @@ static void ZukanDetailMap_UpdateArrow(ZukanDetailMapParam *param, ZukanDetailMa
     }
     if (wk->arrow != ACTOR_NONE && !ClActor_IsAnimActive(wk->actors[wk->arrow])) {
         ClActor_SetSequence(wk->actors[wk->arrow], anim);
-        func_0204c520(wk->actors[other], TRUE);
+        ClActor_SetAutoAnim(wk->actors[other], TRUE);
         ClActor_SetSequence(wk->actors[other], otherAnim);
         wk->arrow = ACTOR_NONE;
         if (wk->state == MAP_STATE_MAP || wk->state == MAP_STATE_PLACE) {
@@ -1255,7 +1255,7 @@ static ClActor *ZukanDetailMap_CreateIcon(u32 *chars, u32 palette, u32 cellAnims
     setup.bgPriority = 0;
     *chars = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
     actor = ClActor_Create(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
-    func_0204c520(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
     ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     ClActor_SetObjMode(actor, 0);
     GFL_ArcToolFree(arc);
@@ -2054,7 +2054,7 @@ static void ZukanDetailMap_ChangeSeason(ZukanDetailMapParam *param, ZukanDetailM
         other = ACTOR_SEASON_NEXT;
     }
     ClActor_SetSequence(wk->actors[wk->arrow], anim);
-    func_0204c520(wk->actors[other], FALSE);
+    ClActor_SetAutoAnim(wk->actors[other], FALSE);
     ClActor_SetAnimTime(wk->actors[other], 0);
     ZukanDetailTouchbar_SetActive(touchbar, FALSE);
     if (touch == TRUE) {

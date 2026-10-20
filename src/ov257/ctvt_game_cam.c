@@ -384,7 +384,7 @@ static void CtvtGameCamActors_Init(CtvtGameCamActors *clact, ClActUnit *unit, He
     clact->actors[2] =
         ClActor_Create(unit, clact->resources[0], clact->resources[1], clact->resources[2], &setup, 0, heapId);
     ClActor_SetVisible(clact->actors[2], FALSE);
-    func_0204c520(clact->actors[2], TRUE);
+    ClActor_SetAutoAnim(clact->actors[2], TRUE);
 
     setup.sequence = 3;
     setup.bgPriority = 0;

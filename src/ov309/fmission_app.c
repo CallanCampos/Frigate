@@ -960,7 +960,7 @@ static void FMissionApp_PrintLog(FMissionApp *work, int window) {
         work->shownTrainerId = work->logEntries[next].trainerId;
     }
     format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppUnitTexts[unit].log);
-    func_0202437c(work->wordSet, 0, work->shownName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, work->shownName, 0, 1, 2);
     WordSetNumber(work->wordSet, 1, work->shownScore, 4, 0, TRUE);
     strbuf = GFL_StrBufCreate(64, work->heapId);
     GFL_WordSetFormatStrbuf(work->wordSet, strbuf, format);

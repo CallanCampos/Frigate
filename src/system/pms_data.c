@@ -80,7 +80,7 @@ void PMSData_InitPreset(PMSData *data, u32 preset) {
     }
 }
 
-void func_02029c68(PMSData *data) {
+void PMSData_InitGreeting(PMSData *data) {
     PMSData_Init(data, 0);
     data->id = 1;
     data->words[0] = PMS_WORD_TRAINER_TRAINER;

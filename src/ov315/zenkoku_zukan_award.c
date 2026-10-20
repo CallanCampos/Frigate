@@ -467,7 +467,7 @@ static void ZenkokuZukanAward_InitRibbon(ZenkokuZukanAwardWork *wk) {
     wk->ribbon = ClActor_Create(ZenkokuZukanAwardGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
                                 wk->cellAnims, sZenkokuZukanAwardRibbonSetup, 0, wk->heapId);
     ClActor_SetVisible(wk->ribbon, TRUE);
-    func_0204c520(wk->ribbon, TRUE);
+    ClActor_SetAutoAnim(wk->ribbon, TRUE);
 }
 
 static void ZenkokuZukanAward_FreeRibbon(ZenkokuZukanAwardWork *wk) {

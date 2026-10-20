@@ -292,7 +292,7 @@ void PStaSkill_CreateActors(PStatusWork *wk, PStaSkillWork *skill) {
         ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
                        wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
     ClActor_SetVisible(skill->actors[3], FALSE);
-    func_0204c520(skill->actors[3], TRUE);
+    ClActor_SetAutoAnim(skill->actors[3], TRUE);
     setup.sequence = 2;
     setup.priority = 4;
     setup.bgPriority = 0;
@@ -300,7 +300,7 @@ void PStaSkill_CreateActors(PStatusWork *wk, PStaSkillWork *skill) {
         ClActor_Create(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(9)], wk->clResources[PSTA_RES_PLTT(11)],
                        wk->clResources[PSTA_RES_CELL(8)], &setup, 0, wk->heapId);
     ClActor_SetVisible(skill->actors[4], FALSE);
-    func_0204c520(skill->actors[4], TRUE);
+    ClActor_SetAutoAnim(skill->actors[4], TRUE);
     for (i = 0; i < skill->moveCount; i++) {
         PStaSkill_CreatePlate(wk, skill, &skill->plates[i], i);
     }

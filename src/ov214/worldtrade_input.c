@@ -490,7 +490,7 @@ WorldTradeInputWork *WorldTrade_Input_Init(WorldTradeInputHeader *header, int fr
     BGWinFrame_InitFrame(wk->bgWinFrm, 0, 2, 32, 20);
     WorldTrade_CLACT_PosChange(wk->cursorAct, 144, 40);
     ClActor_SetSequence(wk->cursorAct, 4);
-    func_0204c520(wk->cursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
     ClActor_SetVisible(wk->cursorAct, FALSE);
     wk->numFont = WorldTrade_NumFontCreate(15, 14, 2, HEAPID_WORLDTRADE);
     WorldTrade_PrintInit(&wk->print, header->config);
@@ -792,7 +792,7 @@ static void Input_NamePageRefresh(WorldTradeInputWork *wk, int move) {
     }
     if (move < 0) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        func_0204c520(wk->arrowAct[1], TRUE);
+        ClActor_SetAutoAnim(wk->arrowAct[1], TRUE);
         ClActor_SetSequence(wk->arrowAct[1], 39);
         if (wk->page != 0) {
             wk->page--;
@@ -801,7 +801,7 @@ static void Input_NamePageRefresh(WorldTradeInputWork *wk, int move) {
         }
     } else {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        func_0204c520(wk->arrowAct[0], TRUE);
+        ClActor_SetAutoAnim(wk->arrowAct[0], TRUE);
         ClActor_SetSequence(wk->arrowAct[0], 38);
         if (wk->page < max) {
             wk->page++;
@@ -957,7 +957,7 @@ static u32 Input_SexSelectMain(WorldTradeInputWork *wk) {
 static void Input_LevelPageRefresh(WorldTradeInputWork *wk, int move) {
     if (move < 0) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        func_0204c520(wk->arrowAct[1], TRUE);
+        ClActor_SetAutoAnim(wk->arrowAct[1], TRUE);
         ClActor_SetSequence(wk->arrowAct[1], 39);
         if (wk->page != 0) {
             wk->page--;
@@ -966,7 +966,7 @@ static void Input_LevelPageRefresh(WorldTradeInputWork *wk, int move) {
         }
     } else {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        func_0204c520(wk->arrowAct[0], TRUE);
+        ClActor_SetAutoAnim(wk->arrowAct[0], TRUE);
         ClActor_SetSequence(wk->arrowAct[0], 38);
         if (wk->page < 2) {
             wk->page++;
@@ -1213,7 +1213,7 @@ static void Input_NationPageRefresh(WorldTradeInputWork *wk, int move) {
     }
     if (move < 0) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        func_0204c520(wk->arrowAct[1], TRUE);
+        ClActor_SetAutoAnim(wk->arrowAct[1], TRUE);
         ClActor_SetSequence(wk->arrowAct[1], 39);
         if (wk->page != 0) {
             wk->page--;
@@ -1222,7 +1222,7 @@ static void Input_NationPageRefresh(WorldTradeInputWork *wk, int move) {
         }
     } else {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
-        func_0204c520(wk->arrowAct[0], TRUE);
+        ClActor_SetAutoAnim(wk->arrowAct[0], TRUE);
         ClActor_SetSequence(wk->arrowAct[0], 38);
         if (wk->page < max) {
             wk->page++;
@@ -1404,8 +1404,8 @@ static u32 Input_SeqWinIn(WorldTradeInputWork *wk) {
             ClActor_SetVisible(wk->cursorAct, TRUE);
         }
         if (wk->type == INPUT_MODE_LEVEL) {
-            func_0204c520(wk->arrowAct[0], FALSE);
-            func_0204c520(wk->arrowAct[1], FALSE);
+            ClActor_SetAutoAnim(wk->arrowAct[0], FALSE);
+            ClActor_SetAutoAnim(wk->arrowAct[1], FALSE);
             ClActor_SetSequence(wk->arrowAct[0], 38);
             ClActor_SetSequence(wk->arrowAct[1], 39);
             WorldTrade_CLACT_PosChange(wk->arrowAct[0], 228, 120);
@@ -1732,8 +1732,8 @@ static u32 Input_SeqPokeNameInit(WorldTradeInputWork *wk) {
         ClActor_SetSequence(wk->arrowAct[0], 38);
         ClActor_SetSequence(wk->arrowAct[1], 39);
     }
-    func_0204c520(wk->arrowAct[0], FALSE);
-    func_0204c520(wk->arrowAct[1], FALSE);
+    ClActor_SetAutoAnim(wk->arrowAct[0], FALSE);
+    ClActor_SetAutoAnim(wk->arrowAct[1], FALSE);
     ClActor_SetVisible(wk->arrowAct[0], TRUE);
     ClActor_SetVisible(wk->arrowAct[1], TRUE);
     wk->seq = WI_SEQ_POKENAME_MAIN;
@@ -2010,8 +2010,8 @@ static u32 Input_SeqNationInit(WorldTradeInputWork *wk) {
         ClActor_SetSequence(wk->arrowAct[0], 38);
         ClActor_SetSequence(wk->arrowAct[1], 39);
     }
-    func_0204c520(wk->arrowAct[0], FALSE);
-    func_0204c520(wk->arrowAct[1], FALSE);
+    ClActor_SetAutoAnim(wk->arrowAct[0], FALSE);
+    ClActor_SetAutoAnim(wk->arrowAct[1], FALSE);
     ClActor_SetVisible(wk->arrowAct[0], TRUE);
     ClActor_SetVisible(wk->arrowAct[1], TRUE);
     wk->seq = WI_SEQ_NATION_MAIN;

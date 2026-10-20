@@ -581,7 +581,7 @@ static void TDownloadUtil_CreateActors(TDownloadWork *wk, u32 surface, const TDo
         if (data->flags & 1) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (data->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -648,12 +648,12 @@ static void TDownloadUtil_SetActorAnim(TDownloadWork *wk, int kind, int index, i
     if (kind == T_DOWNLOAD_ACTOR_OBJ) {
         if (index < T_DOWNLOAD_OBJ_COUNT) {
             ClActor_SetSequence(wk->actors[index], anim);
-            func_0204c520(wk->actors[index], TRUE);
+            ClActor_SetAutoAnim(wk->actors[index], TRUE);
         }
     } else if (kind == T_DOWNLOAD_ACTOR_BUTTON) {
         if (index < T_DOWNLOAD_BUTTON_COUNT) {
             ClActor_SetSequence(wk->buttons[index], anim);
-            func_0204c520(wk->buttons[index], TRUE);
+            ClActor_SetAutoAnim(wk->buttons[index], TRUE);
         }
     }
 }
@@ -821,7 +821,7 @@ void TDownloadUtil_PrintMessage(TDownloadWork *wk, int window, u32 message, BOOL
         name = GFL_StrBufCreate(128, wk->heapId);
         strbuf = GFL_StrBufCreate(128, wk->heapId);
         TDownloadSave_LoadString(wk, record, 0, name);
-        func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
         GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
         TDownloadUtil_Print(wk, window, 0, 0, strbuf, 0, 0x440);
         GFL_StrBufFree(format);
@@ -874,7 +874,7 @@ void TDownloadUtil_PrintSlotInfo(TDownloadWork *wk, int type, int index) {
     name = GFL_StrBufCreate(128, wk->heapId);
     buf = GFL_StrBufCreate(128, wk->heapId);
     TDownloadSave_LoadString(wk, data, 0, name);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], unused[0]);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, format);
     TDownloadUtil_Print(wk, 0, 112, 0, buf, 2, 0x31a0);
@@ -1038,7 +1038,7 @@ static void TDownloadUtil_PrintItemAt(TDownloadWork *wk, PrintWindow *window, Pr
     name = GFL_StrBufCreate(128, wk->heapId);
     buf = GFL_StrBufCreate(128, wk->heapId);
     TDownloadSave_LoadString(wk, data, 0, name);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, format);
     PrintWindow_Print(window, queue, 0, y, buf, wk->font, color);
@@ -1403,7 +1403,7 @@ void TDownloadUtil_PrintSlotName(TDownloadWork *wk, int type, int slot) {
     name = GFL_StrBufCreate(128, wk->heapId);
     buf = GFL_StrBufCreate(128, wk->heapId);
     TDownloadSave_LoadString(wk, data, 0, name);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, buf, format);
     TDownloadUtil_Print(wk, T_DOWNLOAD_WINDOW_SLOT + slot, 0, 4, buf, 0, 0x39e2);

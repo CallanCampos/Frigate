@@ -22,16 +22,17 @@ struct TrainerGameInfoSave {
     u32 badges;
     u16 faveSpecies;
     u8 faveForm : 6;
-    u8 unk0a_6 : 1;
-    u8 unk0a_7 : 1;
-    u8 unk0b;
+    u8 faveIsEgg : 1;
+    u8 faveIsFemale : 1;
+    // Set when the Unova Link can send keys, for the start menu to say so once
+    u8 keyNotice;
     // The keyboard that each mode of the name entry last used
     u8 keyboardTypes[TRAINER_GAME_INFO_KEYBOARD_COUNT];
     u32 palParkHighScore : 28;
     u32 palParkResult : 4;
-    // Two counters that stop at TRAINER_GAME_INFO_COUNT_MAX
-    u32 unk1c;
-    u32 unk20;
+    // How many players thanked the player and how many passed by, up to TRAINER_GAME_INFO_COUNT_MAX
+    u32 thankedCount;
+    u32 passerbyCount;
     u16 greeting[TRAINER_GAME_INFO_MESSAGE_LENGTH];
     u16 thanks[TRAINER_GAME_INFO_MESSAGE_LENGTH];
     u8 surveyRank;
@@ -47,18 +48,19 @@ struct TrainerGameInfoSave {
     u8 unkdc[4];
     // The color of the Battle Recorder
     u32 battleRecorderColor;
-    u16 unke4;
+    // Set to a day at the game's end: the minutes left while the gates' boards show the Hall of Fame
+    u16 hallOfFameMinutes;
     u8 unke6[0xa];
 };
 
 // The size of the block
 u32 TrainerGameInfo_GetSize(void);
 void TrainerGameInfo_Init(TrainerGameInfoSave *info);
-void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 a3, int a4);
-void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *a3, int *a4);
-// Add one to the counters at 0x1c and 0x20, and return them
-u32 func_0200c910(TrainerGameInfoSave *info);
-u32 func_0200c928(TrainerGameInfoSave *info);
+void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 isEgg, int sex);
+void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *isEgg, int *isFemale);
+// Add one to the thanked and passerby counts, and return them
+u32 TrainerGameInfo_IncThankedCount(TrainerGameInfoSave *info);
+u32 TrainerGameInfo_IncPasserbyCount(TrainerGameInfoSave *info);
 // The species of the party that beat a Gym
 void SetGymDefeatPartyData(TrainerGameInfoSave *info, u32 gym, const u16 *species);
 void GetGymDefeatPartyData(TrainerGameInfoSave *info, u32 gym, u16 *species);

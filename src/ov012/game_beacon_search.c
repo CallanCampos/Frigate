@@ -116,7 +116,7 @@ void *GameBeaconSearch_Init(u32 *seq, void *param) {
     work->gameData = gameData;
     work->commSys = commSys;
     work->unkE = 0x267;
-    if (GameCommSys_GetLastCommNo(commSys) == 2 && func_0202be08(commSys) == 5) {
+    if (GameCommSys_GetLastCommNo(commSys) == GAME_COMM_NO_INTRUDE && func_0202be08(commSys) == 5) {
         GameBeaconSearch_StartType35Wait(work);
     }
     return work;
@@ -217,7 +217,7 @@ static BeaconSearchFound *GameBeaconSearch_ScanBeacons(BeaconSearchWork *work, i
         return NULL;
     }
     if (work->state == 1) {
-        func_02042a10(0);
+        GFL_NetStartSearch(0);
         work->state = 2;
         return NULL;
     }
@@ -302,7 +302,7 @@ static void GameBeaconSearch_SetupBeacon(BeaconSearchBeacon *beacon, GameData *g
     beacon->connectMax = 3;
     beacon->unk2_0 = NetSystem_HasErrorChecked();
     beacon->unk2_1 = 0;
-    beacon->unk3_0 = func_0202be3c(commSys);
+    beacon->unk3_0 = GameCommSys_IsInResearchGraphOrMission(commSys);
     beacon->trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
     beacon->isDSi = OS_IsRunOnTwl();
     beacon->unk2_6 = FALSE;

@@ -156,7 +156,7 @@ void NetLdata_Update(void) {
 
             // What fits in the packet after what is already queued
             if (netLdataWork->fromServer == TRUE) {
-                size = ini->unk6C - NetSystem_GetMPRingUsed() - 16;
+                size = ini->parentPacketSize - NetSystem_GetMPRingUsed() - 16;
             } else {
                 size = ini->maxSendSize - NetSystem_GetSendRingUsed() - 16;
             }

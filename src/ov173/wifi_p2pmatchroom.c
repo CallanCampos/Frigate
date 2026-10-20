@@ -573,8 +573,8 @@ static void WifiMcr_ClactActorAddCore(MCR_CLACT *clact, u32 heapId) {
 
     ClActor_SetVisible(clact->exitCursor, FALSE);
     ClActor_SetVisible(clact->cursor, FALSE);
-    func_0204c520(clact->exitCursor, TRUE);
-    func_0204c520(clact->cursor, TRUE);
+    ClActor_SetAutoAnim(clact->exitCursor, TRUE);
+    ClActor_SetAutoAnim(clact->cursor, TRUE);
 }
 
 static void WifiMcr_ClactActorDelCore(MCR_CLACT *clact) {

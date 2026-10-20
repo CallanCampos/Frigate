@@ -659,7 +659,7 @@ static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCou
         if (entries->flags & 1) {
             animated = TRUE;
         }
-        func_0204c520(actors[i], animated);
+        ClActor_SetAutoAnim(actors[i], animated);
         if (entries->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -710,11 +710,11 @@ static void PkwdCount_PlayAnim(PkwdCountWork *wk, int isSub, int index, u32 sequ
     if (isSub == 0) {
         if (index < MAIN_ACTOR_COUNT) {
             ClActor_SetSequence(wk->mainActors[index], (u16)sequence);
-            func_0204c520(wk->mainActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->mainActors[index], TRUE);
         }
     } else if (index < SUB_ACTOR_COUNT) {
         ClActor_SetSequence(wk->subActors[index], (u16)sequence);
-        func_0204c520(wk->subActors[index], TRUE);
+        ClActor_SetAutoAnim(wk->subActors[index], TRUE);
     }
 }
 
@@ -931,7 +931,7 @@ static void PkwdCount_PrintTitle(PkwdCountWork *wk) {
     lineId = sPkwdCountTaglines[wk->param->movie][wk->param->gender];
     if (wk->param->title != NULL) {
         buf = GFL_StrBufCreate(0x100, wk->heapId);
-        func_0202437c(wordSet, 0, wk->param->title, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, wk->param->title, 0, 1, 2);
         tagline = GFL_MsgDataLoadStrbufNew(wk->msgData[0], lineId);
         GFL_WordSetFormatStrbuf(wordSet, buf, tagline);
         PkwdCount_PrintText(wk, 1, 0x68, 0, buf, ALIGN_CENTER, PRINT_COLOR(1, 2, 0));

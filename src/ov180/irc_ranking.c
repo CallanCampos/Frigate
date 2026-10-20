@@ -1178,7 +1178,7 @@ static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) 
             } else if (entry->value == prevValue) {
                 entry->rank = prevRank;
             }
-            met = func_0200b014(log, i);
+            met = TrainerLogSave_IsEntryMale(log, i);
             if (self == i) {
                 u32 base = 1;
 
@@ -1216,7 +1216,7 @@ static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) 
                 }
                 entry->palette = base + 1;
             }
-            func_0200b024(log, i, &entry->species, &entry->form, &entry->sex, &entry->isEgg);
+            TrainerLogSave_GetEntryPokemon(log, i, &entry->species, &entry->form, &entry->sex, &entry->isEgg);
             prevValue = entry->value;
             prevRank = entry->rank;
         }

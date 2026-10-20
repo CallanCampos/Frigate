@@ -647,7 +647,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             PaletteFade_FreeBuffer(wk->paletteFade, PALFADE_BUFFER_SUB_BG);
             PaletteFade_FreeBuffer(wk->paletteFade, PALFADE_BUFFER_SUB_OBJ);
             PaletteFade_Free(wk->paletteFade);
-            func_0203a610(wk->tcbManager);
+            GFL_TCBMgrDelete(wk->tcbManager);
             GFL_HeapFree(wk->tcbBuffer);
             wk->tcbManager = NULL;
             wk->tcbBuffer = NULL;
@@ -1027,7 +1027,7 @@ static void ShinkaDemo_InitActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     for (i = 0; i < ACTOR_COUNT; i++) {
         wk->actors[i] = ClActor_Create(ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
                                        wk->cellAnims, &sActorSetups[i], 0, wk->graphicHeapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
     }
     wk->actorsCreated = TRUE;
 }
@@ -1052,7 +1052,7 @@ static void ShinkaDemo_StartActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     if (wk->actorsCreated) {
         for (i = 0; i < ACTOR_COUNT; i++) {
             ClActor_SetAnimFrame(wk->actors[i], 0);
-            func_0204c520(wk->actors[i], TRUE);
+            ClActor_SetAutoAnim(wk->actors[i], TRUE);
         }
     }
 }
@@ -1299,7 +1299,7 @@ static StrBuf *ShinkaDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 mes
         for (i = 0; i < NELEMS(words); i++) {
             switch (words[i].type) {
             case WORD_STRBUF:
-                func_0202437c(wordSet, i, words[i].value, 0, 1, 0);
+                GFL_WordSetSetStrbuf(wordSet, i, words[i].value, 0, 1, 0);
                 break;
             case WORD_SPECIES:
                 setPartyPokemonSpeciesNameToStrbuf(wordSet, i, words[i].value);

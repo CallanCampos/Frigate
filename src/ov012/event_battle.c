@@ -242,7 +242,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
         func_ov036_021b67d8(Field_GetFesGimmick(field), party);
     }
     if (flags & 2) {
-        if (func_02018f60(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {
+        if (AreaData_IsInfinityDungeon(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {
             u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
 
             setup->fieldSituation.env.terrain =

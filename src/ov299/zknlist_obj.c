@@ -107,7 +107,7 @@ void ZknListObj_Update(ZknListWork *wk) {
         BlinkPalAnm_Main(wk->blinkAnm);
     }
     for (i = 0; i < ZKNLIST_OBJ_COUNT; i++) {
-        if (wk->actors[i] != NULL && func_0204c534(wk->actors[i]) != TRUE) {
+        if (wk->actors[i] != NULL && ClActor_IsAutoAnim(wk->actors[i]) != TRUE) {
             ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
         }
     }
@@ -126,7 +126,7 @@ void ZknListObj_EndAnm(ZknListWork *wk, u32 id) {
 
 void ZknListObj_SetAnm(ZknListWork *wk, u32 id, u32 anm) {
     ZknListObj_SetAnmSeq(wk, id, anm);
-    func_0204c520(wk->actors[id], TRUE);
+    ClActor_SetAutoAnim(wk->actors[id], TRUE);
 }
 
 u32 ZknListObj_GetAnm(ZknListWork *wk, u32 id) {
@@ -287,13 +287,13 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
         template.palette = wk->paletteRes[template.palette];
         template.cells = wk->cellRes[template.cells];
         wk->actors[i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[i], FALSE);
     }
     if (wk->param->count <= ZKNLIST_ROW_COUNT) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_SCROLL_BAR, FALSE);
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_SCROLL_RAIL, FALSE);
     }
-    if (func_0200d1dc(wk->param->pokedex) == 0) {
+    if (PokeDex_IsGiven(wk->param->pokedex) == 0) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_START, FALSE);
     }
     if (habitat == FALSE) {
@@ -394,7 +394,7 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
                                     HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         arc = MakePokeGraArcHandle(HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         if (species == SPECIES_SPINDA) {
-            personality = func_0200da18(wk->param->pokedex, 0);
+            personality = PokeDex_GetSpindaPersonality(wk->param->pokedex, 0);
         } else {
             personality = 0;
         }
@@ -411,7 +411,7 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
     template.palette = wk->paletteRes[template.palette];
     template.cells = wk->cellRes[template.cells];
     wk->actors[id] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-    func_0204c5c8(wk->actors[id], FALSE);
+    ClActor_SetDrawAnim(wk->actors[id], FALSE);
 
     // BUG: for the unknown picture the form is whatever the stack holds, since nothing read it from the Pokédex
     personal = PML_PersonalLoad(species, form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
@@ -436,7 +436,7 @@ static void ZknListObj_CreateIcons(ZknListWork *wk) {
         template.setup.y = i * ROW_HEIGHT + 8;
         template.chars = wk->charRes[CHAR_RES_ICON + i];
         wk->actors[ZKNLIST_OBJ_ICON + i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[ZKNLIST_OBJ_ICON + i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[ZKNLIST_OBJ_ICON + i], FALSE);
     }
 
     template = icon;
@@ -447,11 +447,11 @@ static void ZknListObj_CreateIcons(ZknListWork *wk) {
         template.chars = wk->charRes[CHAR_RES_ICON_SUB + i];
         template.surface = CLACT_SURFACE_SUB;
         wk->actors[ZKNLIST_OBJ_ICON_SUB + i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[ZKNLIST_OBJ_ICON_SUB + i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[ZKNLIST_OBJ_ICON_SUB + i], FALSE);
         ZknListObj_SetBlend(wk, ZKNLIST_OBJ_ICON_SUB + i, TRUE);
 
         wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], FALSE);
         ClActor_SetObjMode(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], OAM_MODE_OBJWND);
     }
     for (i = 0; i < ZKNLIST_ICON_COUNT; i++) {

@@ -375,7 +375,7 @@ static void ZkndTbarItem_Init(ZkndTbarItem *item, ClActUnit *unit, const ZkndTba
     item->anim = item->icon.activeAnim;
     setup.sequence = item->icon.activeAnim;
     item->actor = ClActor_Create(unit, chars, palette, cellAnims, &setup, engine, heapId);
-    func_0204c520(item->actor, TRUE);
+    ClActor_SetAutoAnim(item->actor, TRUE);
     switch (item->type) {
     case ZKND_TBAR_TYPE_PUSH:
         item->callback = ZkndTbarItem_PushCallback;

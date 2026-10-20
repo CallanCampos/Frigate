@@ -708,7 +708,7 @@ static void Guru2Receipt_CreateActors(Guru2ReceiptWork *wk) {
         wk->actors[i] = ClActor_Create(wk->actorUnit, wk->resources[GURU2_RECEIPT_RES_CHAR + i],
                                        wk->resources[GURU2_RECEIPT_RES_PLTT + i], wk->resources[GURU2_RECEIPT_RES_CELL],
                                        &setup, 0, HEAPID_GURU2);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
         ClActor_SetSequence(wk->actors[i], 0);
         ClActor_SetVisible(wk->actors[i], FALSE);
     }
@@ -989,7 +989,7 @@ static int Guru2ReceiptSeq_StartSend(Guru2ReceiptWork *wk, int procSeq) {
     if (wk->unk4813 == 0) {
         if (Guru2Comm_Send(wk->g2c, GURU2_NET_CMD_START, NULL, 0) == TRUE) {
             wk->seq = GURU2_RECEIPT_SEQ_START;
-            func_02042e9c(TRUE);
+            GFL_NetSetDisconnectError(TRUE);
         }
     }
     return procSeq;
@@ -1081,7 +1081,7 @@ static int Guru2ReceiptSeq_ParentCancelWait(Guru2ReceiptWork *wk, int procSeq) {
 static int Guru2ReceiptSeq_ParentCancelSync(Guru2ReceiptWork *wk, int procSeq) {
     NetHandle_GetOwn();
     wk->syncBits = wk->unk480C ^ Guru2Receipt_GetJoined(wk);
-    func_02040b38(NetHandle_GetOwn(), 0xcf, 40, (u16)wk->syncBits);
+    NetHandle_SendTimingPairToMachines(NetHandle_GetOwn(), 0xcf, 40, (u16)wk->syncBits);
     wk->seq = GURU2_RECEIPT_SEQ_PARENT_CANCEL_SYNC_WAIT;
     Guru2Receipt_SeqEnd(wk);
     return procSeq;
@@ -1394,7 +1394,7 @@ static void Guru2Receipt_UpdateActors(Guru2ReceiptWork *wk) {
         switch (wk->actorStates[i]) {
         case GURU2_RECEIPT_ACTOR_APPEAR: {
             int gender = getTrainerGender(&wk->members[i].member->info);
-            int look = func_02008bf4(&wk->members[i].member->info);
+            int look = PlayerInfo_GetUnionView(&wk->members[i].member->info);
 
             if (i == NetSystem_GetNetId()) {
                 ClActor_SetSequence(wk->actors[i], 4);
@@ -1434,7 +1434,7 @@ static void Guru2Receipt_FreeTrainerPalette(Guru2ReceiptWork *wk) {
     GFL_HeapFree(wk->trainerPaletteFile);
 }
 
-// The row of the trainer palette file for each appearance (func_02008bf4)
+// The row of the trainer palette file for each appearance (PlayerInfo_GetUnionView)
 static const u8 sLookPalettes[16] = { 2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0 };
 
 // Gives a member's actor the palette and characters of the member's appearance

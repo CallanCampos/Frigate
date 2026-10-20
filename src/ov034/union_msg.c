@@ -485,7 +485,7 @@ static void UnionMsg_SetupWordSet(UnionSystem *unisys) {
 
     strbuf = GFL_StrBufCreate(0x20, UNION_HEAPID);
     GFL_StrBufLoadString(strbuf, name);
-    func_0202437c(unisys->wordset, 0, strbuf, gender, TRUE, language);
+    GFL_WordSetSetStrbuf(unisys->wordset, 0, strbuf, gender, TRUE, language);
     GFL_StrBufFree(strbuf);
     copyVarForText(unisys->wordset, 1, playerInfo);
 
@@ -516,7 +516,7 @@ static void UnionMsg_SetupWordSet(UnionSystem *unisys) {
         break;
     }
     strbuf = GFL_MsgDataLoadStrbufNew(unisys->msgdata, messageId);
-    func_0202437c(unisys->wordset, 2, strbuf, gender, TRUE, language);
+    GFL_WordSetSetStrbuf(unisys->wordset, 2, strbuf, gender, TRUE, language);
     GFL_StrBufFree(strbuf);
 
     if (situ->mycomm.target != NULL && situ->mycomm.target->beacon.country != 0) {

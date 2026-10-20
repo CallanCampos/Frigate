@@ -121,13 +121,13 @@ u16 LocalTvtCallData_GetExtraMsg(LocalTvtCallData *data, u16 person) {
 
 BOOL LocalTvtCallData_CanCall(LocalTvtCallData *data, u16 person) {
     if (person == LOCAL_TVT_CALL_SECRET) {
-        BOOL unk74 = func_0200ff74(data->save) == 0;
+        BOOL unk74 = HollowRivalSave_GetMeeting(data->save) == 0;
         BOOL flag = HollowRivalSave_GetFlag(data->save, LOCAL_TVT_CALL_SECRET);
         u32 callCount = LocalTvtCallData_GetCallCount(data, LOCAL_TVT_CALL_SECRET);
         u32 stage = LocalTvtSecret_GetStage(callCount);
         u32 unk0378 = LocalTvtSecret_GetStage0378(stage);
         u32 zoneId = PlayerState_GetZoneID(GameData_GetPlayerState(data->gameData));
-        BOOL inZone = func_02017af0(data->gameData, zoneId);
+        BOOL inZone = GameData_IsSecretCallZone(data->gameData, zoneId);
 
         if (callCount == LocalTvtSecret_GetStageCount(stage)) {
             u32 i;
@@ -229,8 +229,8 @@ void LocalTvtCallData_AddCall(LocalTvtCallData *data, u16 person, u32 max) {
     }
 }
 
-void LocalTvtCallData_Set0200ff68(LocalTvtCallData *data, u32 value) {
-    func_0200ff68(data->save, value);
+void LocalTvtCallData_SetMeeting(LocalTvtCallData *data, u32 value) {
+    HollowRivalSave_SetMeeting(data->save, value);
 }
 
 static LocalTvtCallEntry *LocalTvtCallData_GetEntry(LocalTvtCallData *data, u16 person) {
@@ -247,19 +247,19 @@ static LocalTvtCallEntry *LocalTvtCallData_GetEntry(LocalTvtCallData *data, u16 
     return NULL;
 }
 
-void LocalTvtCallData_Set0200ff78(LocalTvtCallData *data) {
-    func_0200ff78(data->save, 1);
+void LocalTvtCallData_SetMeetingToday(LocalTvtCallData *data) {
+    HollowRivalSave_SetMeetingToday(data->save, 1);
 }
 
-BOOL LocalTvtCallData_Get0200ff8c(LocalTvtCallData *data) {
-    return func_0200ff8c(data->save);
+BOOL LocalTvtCallData_IsMeetingToday(LocalTvtCallData *data) {
+    return HollowRivalSave_IsMeetingToday(data->save);
 }
 
-void LocalTvtCallData_Reset0200ffcc(LocalTvtCallData *data) {
-    if (func_0200ffcc(data->save)) {
-        func_0200ff68(data->save, 0);
-        func_0200ff94(data->save, 0);
-        func_0200ffb8(data->save, 0);
+void LocalTvtCallData_ClearMeetingIfMet(LocalTvtCallData *data) {
+    if (HollowRivalSave_IsMet(data->save)) {
+        HollowRivalSave_SetMeeting(data->save, 0);
+        HollowRivalSave_SetHasSpecies(data->save, 0);
+        HollowRivalSave_SetMet(data->save, 0);
     }
 }
 

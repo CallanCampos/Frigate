@@ -14,7 +14,7 @@ void NetIw_Free(void);
 void NetIw_FreeIfIdle(void);
 // Whether it is running
 BOOL NetIw_IsRunning(void);
-void func_0204307c(void *a0);
+void NetIw_SetPeerFilter(void *a0);
 void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work)))(void *work);
 // Adds a MAC address to the ones collected
 void NetIw_AddCollectedMac(const u8 *mac);
@@ -24,9 +24,9 @@ void NetIw_GetCollectedMac(u8 *mac, int index);
 void NetIw_Update(void);
 // The command handler for the MAC addresses another machine collected
 void NetIw_RecvCollectedMacs(int netId, int size, const void *data, void *work, NetHandle *handle);
-BOOL func_020437a0(void);
+BOOL NetIw_FinishCollecting(void);
 void NetIw_OverrideNetId(int netId);
-u8 func_0204381c(void);
+u8 NetIw_GetLinkedCount(void);
 void NetIw_SetGameCommandBase(int gameCommandBase);
 
 #endif // POKEBW2_GFL_NET_IRC_WIRELESS_H

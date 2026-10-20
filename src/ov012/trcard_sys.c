@@ -201,7 +201,7 @@ static BOOL TrainerCardSys_Exit(GameProc *proc, u32 *state, void *param, void *w
     TrainerCardSysWork *wk = work;
 
     if (cardParam->canEdit) {
-        u32 value = func_02008bf4(GetGameDataPlayerInfo(cardParam->gameData));
+        u32 value = PlayerInfo_GetUnionView(GetGameDataPlayerInfo(cardParam->gameData));
 
         if (wk->unk34 != value) {
             GameBeaconSys_SetTrainerView(value);
@@ -457,18 +457,18 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     if (isSnapshot == TRUE) {
         PlayTime *playTime = (PlayTime *)GameData_GetPlayTime(gameData);
 
-        data->unk06 = func_02008bf4(playerInfo);
+        data->unk06 = PlayerInfo_GetUnionView(playerInfo);
         data->isOwn = FALSE;
         data->playTime = NULL;
         data->playHours = PlayTime_GetHours(playTime);
         data->playMinutes = PlayTime_GetMinutes(playTime);
     } else {
-        data->unk06 = func_02008bf4(playerInfo);
+        data->unk06 = PlayerInfo_GetUnionView(playerInfo);
         data->isOwn = TRUE;
         data->playTime = (PlayTime *)GameData_GetPlayTime(gameData);
     }
-    data->unk48 = func_020091e8(timeSig);
-    data->unk04_4 = func_02009204(timeSig);
+    data->unk48 = TimeSigSave_GetPersonality(timeSig);
+    data->unk04_4 = TimeSigSave_GetSignBlinks(timeSig);
     CGearPhrases_Get(cgear, 0, &data->greeting);
     RTC_ConvertSecondToDateTime(&date, &time, adventureTime->startSeconds);
     data->startYear = date.year;
@@ -495,7 +495,7 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     data->unk4C = TrainerCardData_SumRecords(records, 4, 999999999);
     data->unk50 = TrainerCardData_SumRecords(records, 5, 999999999);
     data->unk54 = TrainerCardData_SumRecords(records, 6, 999999999);
-    data->unk58 = func_0200c924(card);
+    data->unk58 = TrainerCard_GetPasserbyCount(card);
     data->unk5C = TrainerCardData_SumRecords(records, 7, 9999);
     highLink = getHighLinkBlockAddress(save);
     passPowerData = PassPowerData_Create(heapId);
@@ -524,7 +524,7 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     }
     data->seenCount = countSeenDexPokes(pokedex, heapId);
     data->unk04_3 = TimeSigSave_HasSignature(timeSig);
-    MI_CpuCopy8(func_020091a8(timeSig), data->unk74, sizeof(data->unk74));
+    MI_CpuCopy8(TimeSigSave_GetSignature(timeSig), data->unk74, sizeof(data->unk74));
     data->canEdit = canEdit;
 }
 

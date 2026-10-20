@@ -384,7 +384,7 @@ static void WbtMakeMatch_PickTypeExpert(WbtMakeMatch *m, WbtBracketEntry *result
 
 // Picks the eight Trainers of the tournament, the player first
 static void WbtMakeMatch_PickBracket(GameData *gameData, WbtMatchParam *param, WbtBracketEntry *result) {
-    WbtMakeMatch *m = WbtMakeMatch_Create(param->heapId, func_020179f8(gameData), param);
+    WbtMakeMatch *m = WbtMakeMatch_Create(param->heapId, GameData_GetWbtSave(gameData), param);
 
     switch (param->tournament) {
     default:
@@ -539,7 +539,7 @@ static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *e
 
 static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *gameData) {
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    void *wbtSave = func_020179f8(gameData);
+    void *wbtSave = GameData_GetWbtSave(gameData);
     u16 objCode = 0xe7;
     u8 isFemale = 0;
     u8 gender = getTrainerGender(playerInfo);

@@ -273,7 +273,7 @@ static void JoinAvenueProfile_SetFromPlayerInfo(JoinAvenueProfile *profile, Play
     profile->gender = getTrainerGender(playerInfo);
     profile->version = PlayerInfo_GetVersion(playerInfo);
     profile->language = TrainerInfo_GetRegion(playerInfo);
-    profile->trainerType = UnionView_GetTrainerType(func_02008bf4(playerInfo));
+    profile->trainerType = UnionView_GetTrainerType(PlayerInfo_GetUnionView(playerInfo));
 }
 
 static void JoinAvenueProfile_SetFromGameData(JoinAvenueProfile *profile, GameData *gameData) {

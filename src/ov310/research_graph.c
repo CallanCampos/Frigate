@@ -2036,7 +2036,7 @@ static void ResearchGraph_PrintAnswer(ResearchGraph *wk) {
     name = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_DATA_ANSWERS], answerId);
     str = GFL_StrBufCreate(0x80, wk->heapId);
     WordSetNumber(wk->wordSet, 0, index + 1, 2, 1, 1);
-    func_0202437c(wk->wordSet, 1, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 1, name, 0, 1, 2);
     WordSetNumber(wk->wordSet, 2, total, 5, 1, 1);
     WordSetNumber(wk->wordSet, 3, percent, 3, 1, 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
@@ -2062,7 +2062,7 @@ static void ResearchGraph_PrintPlayerAnswer(ResearchGraph *wk) {
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 14);
     name = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_DATA_ANSWERS], answerId);
     str = GFL_StrBufCreate(0x80, wk->heapId);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
     BGFont_SetVisible(wk->bgFonts[BG_FONT_PLAYER_ANSWER], TRUE);
     BGFont_PrintStr(wk->bgFonts[BG_FONT_PLAYER_ANSWER], str);
@@ -2147,8 +2147,8 @@ static void ResearchGraph_UpdateArrows(ResearchGraph *wk) {
     ClActor_SetSurfacePos(right, &pos, 0);
     ClActor_SetVisible(left, TRUE);
     ClActor_SetVisible(right, TRUE);
-    func_0204c520(left, TRUE);
-    func_0204c520(right, TRUE);
+    ClActor_SetAutoAnim(left, TRUE);
+    ClActor_SetAutoAnim(right, TRUE);
 }
 
 static void ResearchGraph_SetArrowsVisible(ResearchGraph *wk, BOOL visible) {
@@ -2199,7 +2199,7 @@ static void ResearchGraph_UpdateMarker(ResearchGraph *wk) {
     pos.y = y;
     ClActor_SetSurfacePos(marker, &pos, entry->surface);
     ClActor_SetVisible(marker, TRUE);
-    func_0204c520(marker, TRUE);
+    ClActor_SetAutoAnim(marker, TRUE);
     ClActor_SetPlayMode(marker, 2);
 }
 
@@ -3187,8 +3187,8 @@ static u8 ResearchGraph_ClampU8(int value) {
 static void ResearchGraph_RequestCommRestart(ResearchGraph *wk) {
     GameCommSys *comm = GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk));
 
-    func_0202be14(comm, TRUE);
-    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNK2) {
+    GameCommSys_SetInResearchGraph(comm, TRUE);
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_INTRUDE) {
         GameCommSys_ExitReq(comm);
     }
 }
@@ -3203,11 +3203,11 @@ static BOOL ResearchGraph_RestartComm(ResearchGraph *wk) {
         return TRUE;
     default:
         return TRUE;
-    case GAME_COMM_NO_UNK2:
+    case GAME_COMM_NO_INTRUDE:
         return FALSE;
     }
 }
 
 static void ResearchGraph_EndComm(ResearchGraph *wk) {
-    func_0202be14(GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk)), FALSE);
+    GameCommSys_SetInResearchGraph(GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk)), FALSE);
 }

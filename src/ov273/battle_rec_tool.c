@@ -439,7 +439,7 @@ static BOOL BattleRecTool_StoreSetupParams(const BtlSetup *setup, BattleRecSetup
     rec->env = setup->fieldSituation.env;
     rec->rand = setup->rand;
     rec->bgm = setup->fieldSituation.bgm;
-    rec->unk2E = setup->fieldSituation.unk12;
+    rec->winBgm = setup->fieldSituation.unk12;
     rec->battleType = setup->battleType;
     rec->battleStyle = setup->battleStyle;
     rec->unk33_4 = setup->fieldSituation.unk1a;
@@ -454,7 +454,7 @@ static BOOL BattleRecTool_LoadSetupParams(BtlSetup *setup, const BattleRecSetup 
     setup->fieldSituation.env = rec->env;
     setup->rand = rec->rand;
     setup->fieldSituation.bgm = rec->bgm;
-    setup->fieldSituation.unk12 = rec->unk2E;
+    setup->fieldSituation.unk12 = rec->winBgm;
     setup->battleType = rec->battleType;
     setup->battleStyle = rec->battleStyle;
     setup->fieldSituation.unk1a = rec->unk33_4;

@@ -11,63 +11,72 @@ enum {
     // The message of the regulation's name in the regulations' text bank
     REGULATION_PARAM_NAME,
     REGULATION_PARAM_1,
-    REGULATION_PARAM_2,
-    REGULATION_PARAM_3,
-    REGULATION_PARAM_4,
-    REGULATION_PARAM_5,
-    REGULATION_PARAM_6,
-    REGULATION_PARAM_7,
-    REGULATION_PARAM_8,
+    REGULATION_PARAM_MIN_COUNT,
+    REGULATION_PARAM_MAX_COUNT,
+    REGULATION_PARAM_LEVEL,
+    REGULATION_PARAM_LEVEL_MODE,
+    REGULATION_PARAM_MAX_LEVEL_TOTAL,
+    REGULATION_PARAM_ALLOW_SAME_SPECIES,
+    REGULATION_PARAM_ALLOW_SAME_ITEM,
     // Bit arrays, which only Regulation_CheckParamBit reads
-    REGULATION_PARAM_BITS_A,
-    REGULATION_PARAM_BITS_5C,
-    REGULATION_PARAM_11,
-    REGULATION_PARAM_12,
-    REGULATION_PARAM_13,
+    REGULATION_PARAM_BANNED_SPECIES,
+    REGULATION_PARAM_BANNED_ITEMS,
+    REGULATION_PARAM_REQUIRED_SPECIES,
+    REGULATION_PARAM_REQUIRED_FORM,
+    REGULATION_PARAM_LAUNCHER,
     // A bit array as well
     REGULATION_PARAM_BITS_AC,
     REGULATION_PARAM_15,
     REGULATION_PARAM_16,
-    REGULATION_PARAM_17,
+    REGULATION_PARAM_ALLOW_NICKNAMES,
     REGULATION_PARAM_18,
     REGULATION_PARAM_SHOW_PARTNERS,
     REGULATION_PARAM_TIME_LIMIT,
     REGULATION_PARAM_BATTLE_TYPE,
-    REGULATION_PARAM_22
+    REGULATION_PARAM_MAX_BATTLES
 };
 
 struct Regulation {
     u8 name;
     u8 unk1;
-    u8 unk2;
-    u8 unk3;
-    u8 unk4;
-    u8 unk5;
-    u16 unk6;
-    u8 unk8;
-    u8 unk9;
-    u8 unkA[0x52];
-    u8 unk5C[0x4c];
-    u16 unkA8;
-    u8 unkAA;
-    u8 unkAB;
+    // How many Pokémon may be entered
+    u8 minCount;
+    u8 maxCount;
+    // The level, and how it applies: 0 not, 1 a minimum, 2 a maximum, 3 a cap, 4 the level of all, 5 a raise to it
+    u8 level;
+    u8 levelMode;
+    // The most that the levels of the team may add up to
+    u16 maxLevelTotal;
+    // Whether two Pokémon of a species, and two of a held item, may be entered
+    u8 allowSameSpecies;
+    u8 allowSameItem;
+    // A bit for each species and each item that is banned
+    u8 bannedSpecies[0x52];
+    u8 bannedItems[0x4c];
+    // The Pokémon that the team must have
+    u16 requiredSpecies;
+    u8 requiredForm;
+    // The Wonder Launcher: 2 leaves it to the players
+    u8 launcher;
     u8 unkAC[0x7];
     u8 unkB3;
     u8 unkB4;
-    u8 unkB5;
+    // Whether nicknames are kept
+    u8 allowNicknames;
     u8 unkB6;
     u8 unkB7;
     // Whether the partners' teams are shown in the selection, and its time limit
     u8 showPartners;
     u8 timeLimit;
-    u8 unkBA;
-    u8 unkBB;
+    u8 battleType;
+    // How many battles may be played
+    u8 maxBattles;
 }; // size: 0xbc
 
 // What func_0200b760 fills in from a regulation
 typedef struct {
     u8 unk0[0x7];
-    u8 unk7;
+    u8 launcher;
 } RegulationUnkAC;
 
 // The rules of a battle, such as the level cap

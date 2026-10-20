@@ -575,7 +575,7 @@ static void ZukanAreaList_StateDecide(ZukanAreaListWork *wk) {
         ClActor *frame = ZukanAreaListView_GetActor(&wk->view, ZUKAN_AREA_LIST_OBJ_MARK_FRAME);
 
         ClActor_SetSequence(frame, ClActor_GetSequence(frame) + 1);
-        func_0204c520(frame, TRUE);
+        ClActor_SetAutoAnim(frame, TRUE);
         ZukanAreaListView_SetActorAnim(&wk->view, ZUKAN_AREA_LIST_OBJ_DECIDE, 40);
     }
     case 2:

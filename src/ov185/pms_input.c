@@ -287,7 +287,7 @@ static PMSInputWork *PMSInput_ConstructWork(GameProc *proc, PMSIParam *param) {
 
     wk->param = param;
     wk->inputMode = PMSIParam_GetMode(param);
-    wk->keyMode = func_02029b40(wk->param);
+    wk->keyMode = PMSIParam_IsUsingTouch(wk->param);
     PMSIParam_GetResult(wk->param, wk->words, &wk->sentence);
     if (wk->inputMode == PMSI_MODE_SENTENCE) {
         PMSInput_SetupSentenceWork(&wk->sentenceWk, &wk->sentence);
@@ -348,10 +348,10 @@ static void PMSInput_SentenceSetDirect(PMSInputSentenceWork *swk, PMSData *sente
 }
 
 static void PMSInput_DestructWork(PMSInputWork *wk, GameProc *proc) {
-    func_02029b48(wk->param, wk->keyMode);
+    PMSIParam_SetUsingTouch(wk->param, wk->keyMode);
     GFL_BMN_Delete(wk->bmn);
     PMSIView_Delete(wk->vwk);
-    func_0203a610(wk->tcbMgr);
+    GFL_TCBMgrDelete(wk->tcbMgr);
     GFL_HeapFree(wk->tcbMem);
     PMSIData_Delete(wk->dwk);
     PMSISearch_Delete(wk->search);

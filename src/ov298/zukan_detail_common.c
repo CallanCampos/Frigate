@@ -249,7 +249,7 @@ void ZukanDetailPalFade_Free(ZukanDetailPalFade *fade) {
         PaletteFade_FreeBuffer(fade->palette, 0);
     }
     PaletteFade_Free(fade->palette);
-    func_0203a610(fade->tcbMgr);
+    GFL_TCBMgrDelete(fade->tcbMgr);
     GFL_HeapFree(fade->tcbBuffer);
     GFL_HeapFree(fade);
 }

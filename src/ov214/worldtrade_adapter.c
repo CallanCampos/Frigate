@@ -87,7 +87,7 @@ void WorldTrade_BoxPkmToPartyPkm(BoxPkm *pkm, PartyPkm *dest) {
 }
 
 BoxPkm *WorldTrade_GetBoxPkm(PartyPkm *pkm) {
-    return func_0201d624(pkm);
+    return PokeParty_ToBoxPkm(pkm);
 }
 
 int WorldTrade_GetStrWidth(WorldTradePrint *print, u8 font, StrBuf *str, int spacing) {

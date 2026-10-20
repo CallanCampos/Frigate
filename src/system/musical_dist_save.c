@@ -85,7 +85,7 @@ BOOL MusicalDist_WriteStep(void *work) {
             StrBuf *title;
             u32 size;
 
-            func_0200af08(musical, 1);
+            MusicalSave_SetHasDistProgram(musical, 1);
             arc = GFL_ArcSysCreateMemoryHandle(wk->data, wk->header.size, HEAPID_TAIL(wk->heapId));
             file = GFL_ArcToolReadHeapNewLZGetLen(arc, 1, FALSE, HEAPID_TAIL(wk->heapId), &size);
             msgData = GFL_MsgDataCreateFromHandle(file, HEAPID_TAIL(wk->heapId));

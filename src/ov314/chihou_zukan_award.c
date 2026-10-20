@@ -431,7 +431,7 @@ static void ChihouZukanAward_InitRibbon(ChihouZukanAwardWork *wk) {
     wk->ribbon = ClActor_Create(ChihouZukanAwardGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
                                 wk->cellAnims, sChihouZukanAwardRibbonSetup, 0, wk->heapId);
     ClActor_SetVisible(wk->ribbon, TRUE);
-    func_0204c520(wk->ribbon, TRUE);
+    ClActor_SetAutoAnim(wk->ribbon, TRUE);
 }
 
 static void ChihouZukanAward_FreeRibbon(ChihouZukanAwardWork *wk) {

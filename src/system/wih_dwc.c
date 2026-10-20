@@ -319,5 +319,5 @@ void WihDwc_SetBestLinkLevel(u8 linkLevel) {
     }
 }
 
-void func_02012edc(void) {
+void WihDwc_OnParentNotFound(void) {
 }

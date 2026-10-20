@@ -1123,17 +1123,17 @@ BOOL ResortCmd_SetOccupantWords(VM *vm, FieldScriptEnv *env) {
 
                     joinAveTextHandler(person, JOIN_AVE_PARAM_NAME, text);
                     GFL_StrBufLoadString(strbuf, text);
-                    func_0202437c(wordSet, 0, strbuf, unk2, 1, 2);
+                    GFL_WordSetSetStrbuf(wordSet, 0, strbuf, unk2, 1, 2);
                     GFL_StrBufFree(strbuf);
                     strbuf = GFL_StrBufCreate(9, HEAPID_TAIL(heapId));
                     joinAveTextHandler(person, 88, text);
                     GFL_StrBufLoadString(strbuf, text);
-                    func_0202437c(wordSet, 1, strbuf, 2, 1, 2);
+                    GFL_WordSetSetStrbuf(wordSet, 1, strbuf, 2, 1, 2);
                     GFL_StrBufFree(strbuf);
                     strbuf = GFL_StrBufCreate(9, HEAPID_TAIL(heapId));
                     joinAveTextHandler(person, 89, text);
                     GFL_StrBufLoadString(strbuf, text);
-                    func_0202437c(wordSet, 2, strbuf, 2, 1, 2);
+                    GFL_WordSetSetStrbuf(wordSet, 2, strbuf, 2, 1, 2);
                     GFL_StrBufFree(strbuf);
                     *var = value;
                     break;
@@ -1171,7 +1171,7 @@ BOOL ResortCmd_SetNPCWord(VM *vm, FieldScriptEnv *env) {
     unk = ResortCmd_GetNPC(field);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
     strbuf = GFL_MsgDataLoadStrbufNew(msgData, ResortNPC_GetTextEntry(unk, id, column + 7));
-    func_0202437c(wordSet, index, strbuf, 2, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strbuf, 2, 1, 2);
     GFL_StrBufFree(strbuf);
     GFL_MsgDataFree(msgData);
     return FALSE;
@@ -1369,7 +1369,7 @@ BOOL ResortCmd_DescribeOccupant(VM *vm, FieldScriptEnv *env) {
 
             if (target != 0 && wanted == ++n) {
                 strbuf = GFL_MsgDataLoadStrbufNew(msgData, i + 280);
-                func_0202437c(wordSet, 1, strbuf, 2, 1, 2);
+                GFL_WordSetSetStrbuf(wordSet, 1, strbuf, 2, 1, 2);
                 WordSetNumber(wordSet, 2, target, 1, 0, 1);
                 GFL_StrBufFree(strbuf);
                 break;

@@ -776,7 +776,7 @@ static void GPowerApp_AddActors(GPowerApp *work, u32 vramType, const GPowerAppAc
         if (setups->flags & ACTOR_AUTO_ANIM) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (setups->flags & ACTOR_FLIP_Y) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -859,12 +859,12 @@ static void GPowerApp_SetActorAnim(GPowerApp *work, int type, int index, u32 seq
     if (type == ACTOR_BUTTON) {
         if (index < BUTTON_COUNT) {
             ClActor_SetSequence(work->buttons[index], (u16)sequence);
-            func_0204c520(work->buttons[index], TRUE);
+            ClActor_SetAutoAnim(work->buttons[index], TRUE);
         }
     } else if (type == ACTOR_RETURN) {
         if (index < 1) {
             ClActor_SetSequence(work->returnButton[index], (u16)sequence);
-            func_0204c520(work->returnButton[index], TRUE);
+            ClActor_SetAutoAnim(work->returnButton[index], TRUE);
         }
     }
 }
@@ -1165,9 +1165,9 @@ static void GPowerApp_DrawActivePowers(GPowerApp *work) {
         number = GFL_StrBufCreate(0x40, work->heapId);
         time = GFL_StrBufCreate(0x40, work->heapId);
         GFL_WordSetFormatNumber(number, seconds / 60, 2, 2, TRUE);
-        func_0202437c(work->wordSet, 0, number, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, number, 0, 1, 2);
         GFL_WordSetFormatNumber(number, seconds % 60, 2, 2, TRUE);
-        func_0202437c(work->wordSet, 1, number, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 1, number, 0, 1, 2);
         GFL_WordSetFormatStrbuf(work->wordSet, time, format);
         GPowerApp_PrintWindow(work, WINDOW_ACTIVE_TIME + i, 0, 0, time, PRINT_ALIGN_LEFT, COLOR_TEXT);
         GFL_StrBufFree(format);
@@ -1248,12 +1248,12 @@ static void GPowerApp_PrintMessage(GPowerApp *work, BOOL isShort) {
         StrBuf *name = GFL_MsgDataLoadStrbufNew(work->msgData[1], work->param->highLinkIds[work->cursor]);
         StrBuf *number;
 
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         number = GFL_StrBufCreate(0x40, work->heapId);
         GFL_WordSetFormatNumber(number, work->prices[work->cursor], 4, 1, TRUE);
-        func_0202437c(work->wordSet, 1, number, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 1, number, 0, 1, 2);
         GFL_WordSetFormatNumber(number, work->param->itemCount, 4, 1, TRUE);
-        func_0202437c(work->wordSet, 2, number, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 2, number, 0, 1, 2);
         GFL_WordSetFormatStrbuf(work->wordSet, message, format);
         GPowerApp_PrintWindow(work, WINDOW_MESSAGE, 0, 0, message, PRINT_ALIGN_LEFT, COLOR_TEXT);
         GFL_StrBufFree(format);
@@ -1266,9 +1266,9 @@ static void GPowerApp_PrintMessage(GPowerApp *work, BOOL isShort) {
         StrBuf *number = GFL_StrBufCreate(0x40, work->heapId);
 
         GFL_WordSetFormatNumber(number, work->prices[work->cursor], 4, 1, TRUE);
-        func_0202437c(work->wordSet, 0, number, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, number, 0, 1, 2);
         GFL_WordSetFormatNumber(number, work->param->itemCount, 4, 1, TRUE);
-        func_0202437c(work->wordSet, 1, number, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 1, number, 0, 1, 2);
         GFL_WordSetFormatStrbuf(work->wordSet, message, format);
         GPowerApp_PrintWindow(work, WINDOW_MESSAGE, 0, 0, message, PRINT_ALIGN_LEFT, COLOR_TEXT);
         GFL_StrBufFree(format);
@@ -1288,7 +1288,7 @@ static void GPowerApp_SetMessageVisible(GPowerApp *work, BOOL visible) {
 }
 
 static BOOL GPowerApp_IsAborted(GPowerApp *work) {
-    return func_02016bec(work->param->gsys);
+    return GSYS_IsLowBatteryCGearOff(work->param->gsys);
 }
 
 static void GPowerApp_InitPowers(GPowerApp *work) {

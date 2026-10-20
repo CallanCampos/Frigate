@@ -458,7 +458,7 @@ static void PokeListDemo_Fuse(PokeListWork *wk, int form, int kyuremPos, int par
     addPkmToDex(wk->param->pokedex, kyurem);
     PokeParty_RemovePkm(wk->param->party, partnerPos);
     BagSave_SwitchOwnedDNASplicers(wk->param->bag, 0);
-    func_0200cc34(wk->param->shortcut, 7);
+    ShortcutSave_SwitchDNASplicers(wk->param->shortcut, 7);
 }
 
 static void PokeListDemo_Separate(PokeListWork *wk, PartyPkm *kyurem) {
@@ -466,7 +466,7 @@ static void PokeListDemo_Separate(PokeListWork *wk, PartyPkm *kyurem) {
     PokeParty_ChangeForme(kyurem, 0);
     PokeParty_AddPkm(wk->param->party, ReshZekSave_GetPkm(wk->param->reshZek));
     BagSave_SwitchOwnedDNASplicers(wk->param->bag, 1);
-    func_0200cc34(wk->param->shortcut, 8);
+    ShortcutSave_SwitchDNASplicers(wk->param->shortcut, 8);
 }
 
 // Replaces the moves of Kyurem's old form with those of its new one, keeping the PP within the new maximum

@@ -575,7 +575,7 @@ static void LocalTvtCallItem_Init(LocalTvtCallItem *item, const LocalTvtCallSele
     setup.priority = 32;
     item->plate = ClActor_Create(unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
     ClActor_SetVisible(item->plate, TRUE);
-    func_0204c520(item->plate, TRUE);
+    ClActor_SetAutoAnim(item->plate, TRUE);
     setup.x = 18;
     setup.sequence = LIST_ANIM_ICON;
     setup.priority = 16;

@@ -1261,7 +1261,7 @@ static void ShopUI_CreateActors(ShopUIWork *wk) {
                                    &sActorSetups[2], 0, wk->heapId);
     wk->actors[3] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
                                    &sActorSetups[3], 0, wk->heapId);
-    func_0204c520(wk->actors[3], TRUE);
+    ClActor_SetAutoAnim(wk->actors[3], TRUE);
     wk->actors[4] = ClActor_Create(wk->clactUnit, wk->res[2].chars, wk->res[2].palette, wk->res[2].cellAnims,
                                    &sActorSetups[4], 0, wk->heapId);
     ClActor_SetVisible(wk->actors[1], FALSE);

@@ -18,8 +18,8 @@
 // beacon_status.c's struct, which its header doesn't give
 struct BeaconStatus {
     GameBeaconInfoTable table;
-    u8 unkB80[2];
-    u8 unkB82;
+    u8 greetingChanged[2];
+    u8 logTop;
     // The records reached whose Pass Powers are still to be offered, the oldest first
     u8 recordCount;
     u8 records[BEACON_STATUS_RECORD_MAX];

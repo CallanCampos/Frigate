@@ -595,7 +595,7 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
         setup.sequence = wk->buttons[i].anim;
         wk->buttons[i].actor =
             ClActor_Create(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
-        func_0204c520(wk->buttons[i].actor, TRUE);
+        ClActor_SetAutoAnim(wk->buttons[i].actor, TRUE);
         ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
 }
@@ -667,7 +667,7 @@ static void ZukanDetailInfo_GetPokemon(ZukanDetailInfoParam *param, ZukanDetailI
 
     PokeDex_GetShownSexRareForm(pokedex, shown, &shownSex, &shownRare, &shownForm, param->heapId);
     if (shown == SPECIES_SPINDA) {
-        shownPersonality = func_0200da18(pokedex, shownPersonality);
+        shownPersonality = PokeDex_GetSpindaPersonality(pokedex, shownPersonality);
     }
     shownCaught = PokeDex_IsCaught(pokedex, shown);
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {

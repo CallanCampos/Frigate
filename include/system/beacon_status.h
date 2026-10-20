@@ -13,9 +13,9 @@ void BeaconStatus_Free(BeaconStatus *status);
 // Returns the status, which the log of received beacons (game_beacon.h's GameBeaconInfoTable_GetCount) is at the start
 // of
 GameBeaconInfoTable *BeaconStatus_GetInfoTable(BeaconStatus *status);
-u8 func_0202d7ac(BeaconStatus *status);
-void func_0202d7b8(BeaconStatus *status, u8 value);
+u8 BeaconStatus_GetLogTop(BeaconStatus *status);
+void BeaconStatus_SetLogTop(BeaconStatus *status, u8 value);
 StrBuf *BeaconStatus_GetGreeting(BeaconStatus *status);
-u8 *func_0202d7d0(BeaconStatus *status);
+u8 *BeaconStatus_GetGreetingChanged(BeaconStatus *status);
 
 #endif // POKEBW2_SYSTEM_BEACON_STATUS_H
