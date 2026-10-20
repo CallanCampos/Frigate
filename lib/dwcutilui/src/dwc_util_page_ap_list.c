@@ -1,6 +1,7 @@
 #include "dwc_util_page_ap_list.h"
 #include "dwc_util_ap_search.h"
 #include "dwc_util_auto_connect_intro.h"
+#include "dwc_util_bg_buffer.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_button_sprites.h"
 #include "dwc_util_cell.h"

@@ -1656,7 +1656,7 @@ sAutoConnectOkFrames kind:bss addr:0x021c4180
 sUsbDoneFrames kind:bss addr:0x021c4184
 sUsbIntroYes kind:bss addr:0x021c4188
 sUsbSetupState kind:bss addr:0x021c418c
-data_ov182_021c4150 kind:bss addr:0x021c4190
+sBgBuffer kind:bss addr:0x021c4190
 data_ov182_021c415c kind:bss addr:0x021c419c
 data_ov182_021c4160 kind:bss addr:0x021c41a0
 data_ov182_021c4164 kind:bss addr:0x021c41a4

@@ -1,4 +1,5 @@
 #include "dwc_util_main_menu.h"
+#include "dwc_util_bg_buffer.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_button_sprites.h"
 #include "dwc_util_cell.h"

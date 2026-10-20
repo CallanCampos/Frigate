@@ -3,6 +3,7 @@
 #include "dwc/ext.h"
 #include "dwc_util_address_edit.h"
 #include "dwc_util_auto_connect.h"
+#include "dwc_util_bg_buffer.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_button_sprites.h"
 #include "dwc_util_cell.h"
