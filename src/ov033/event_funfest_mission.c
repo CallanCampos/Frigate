@@ -49,7 +49,7 @@ GameEventReturnCode func_ov033_02176d9c(GameEvent *event, u32 *state, void *data
         break;
     case 1:
         GimmickFunfestLevels_PlayStartEffect(gsys);
-        if (GameCommSys_BootCheck(commSys) != 2) {
+        if (GameCommSys_BootCheck(commSys) != GAME_COMM_NO_INTRUDE) {
             gameData = GSYS_GetGameData(gsys);
             positionPtr = (s32 *)&position;
             positionPtr[0] = 0;

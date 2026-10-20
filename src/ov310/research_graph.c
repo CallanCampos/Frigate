@@ -3188,7 +3188,7 @@ static void ResearchGraph_RequestCommRestart(ResearchGraph *wk) {
     GameCommSys *comm = GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk));
 
     func_0202be14(comm, TRUE);
-    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNK2) {
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_INTRUDE) {
         GameCommSys_ExitReq(comm);
     }
 }
@@ -3203,7 +3203,7 @@ static BOOL ResearchGraph_RestartComm(ResearchGraph *wk) {
         return TRUE;
     default:
         return TRUE;
-    case GAME_COMM_NO_UNK2:
+    case GAME_COMM_NO_INTRUDE:
         return FALSE;
     }
 }

@@ -13,8 +13,8 @@ enum GameCommNo {
     GAME_COMM_NO_NULL,
     // The field's beacon search (overlay 12's game_beacon_search.c)
     GAME_COMM_NO_BEACON_SEARCH,
-    // Has no callbacks
-    GAME_COMM_NO_UNK2,
+    // Entralink (Intrude_GetCommWork), which has no callbacks of its own here
+    GAME_COMM_NO_INTRUDE,
     // The Union Room (overlay 28)
     GAME_COMM_NO_UNION,
     // The musical (overlay 211)

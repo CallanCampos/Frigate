@@ -395,7 +395,7 @@ BOOL GSYS_TryBootGameComm(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
 
     if (!GFL_NetIsInitialized() && !GameCommSys_BootCheck(comm) && GSYS_CanBootGameComm(gsys) == TRUE) {
-        GameCommSys_Boot(comm, 1, gsys);
+        GameCommSys_Boot(comm, GAME_COMM_NO_BEACON_SEARCH, gsys);
         return TRUE;
     }
     return FALSE;

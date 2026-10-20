@@ -116,7 +116,7 @@ void *GameBeaconSearch_Init(u32 *seq, void *param) {
     work->gameData = gameData;
     work->commSys = commSys;
     work->unkE = 0x267;
-    if (GameCommSys_GetLastCommNo(commSys) == 2 && func_0202be08(commSys) == 5) {
+    if (GameCommSys_GetLastCommNo(commSys) == GAME_COMM_NO_INTRUDE && func_0202be08(commSys) == 5) {
         GameBeaconSearch_StartType35Wait(work);
     }
     return work;

@@ -117,7 +117,7 @@ GameEventReturnCode func_ov036_021ba6dc(GameEvent *event, u32 *state, void *data
     switch (*state) {
     case 0:
         DisableAllActorsMovement(Field_GetActorSystem(field));
-        if (GameCommSys_GetLastCommNo(GSYS_GetGameCommSystem(gsys)) == 2) {
+        if (GameCommSys_GetLastCommNo(GSYS_GetGameCommSystem(gsys)) == GAME_COMM_NO_INTRUDE) {
             if (GameData_IsForceSeasonSync(GSYS_GetGameData(gsys)) == TRUE) {
                 GFL_NetErrMarkShown();
                 next = EventFieldSubprocessTransition_Create(gsys, field, OVERLAY_ID(36), &data_ov036_021d1760, gsys);

@@ -53,8 +53,9 @@ struct GameCommSys {
     // An exit requested while booting
     u8 exitReq : 1;
     u8 exitReqAgain : 1;
-    u8 unkFlag2 : 1;
-    u8 unkFlag3 : 1;
+    // Set while the research graph (research_graph.c) is shown, and while a Funfest mission runs
+    u8 inResearchGraph : 1;
+    u8 inFunfestMission : 1;
     u8 commNo;
     u8 lastCommNo;
     u32 unk8;
@@ -94,7 +95,7 @@ static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
         NULL,
         NULL,
     },
-    [GAME_COMM_NO_UNK2] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+    [GAME_COMM_NO_INTRUDE] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
     [GAME_COMM_NO_UNION] = {
         UnionComm_Init,
         UnionComm_InitWait,
@@ -321,15 +322,15 @@ static void GameComm_SetSeq(GameCommSeq *seq, u8 next) {
 }
 
 void func_0202be14(GameCommSys *comm, BOOL flag) {
-    comm->unkFlag2 = flag;
+    comm->inResearchGraph = flag;
 }
 
 void func_0202be28(GameCommSys *comm, BOOL flag) {
-    comm->unkFlag3 = flag;
+    comm->inFunfestMission = flag;
 }
 
 BOOL func_0202be3c(GameCommSys *comm) {
-    if (comm->unkFlag2 || comm->unkFlag3) {
+    if (comm->inResearchGraph || comm->inFunfestMission) {
         return TRUE;
     }
     return FALSE;
