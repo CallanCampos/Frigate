@@ -526,7 +526,7 @@ BOOL func_ov036_02194f94(FieldActor *actor) {
     func_ov036_02195624(actor);
     RailUnit_GetCalcPos(unit, &pos);
     SetActorWPosValue(actor, &pos);
-    if (func_ov036_021b09f4(unit)) {
+    if (RailUnit_IsMovePending(unit)) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x440);
