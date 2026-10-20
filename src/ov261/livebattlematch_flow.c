@@ -110,7 +110,7 @@ LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *
     MI_CpuFill8(wk, 0, sizeof(LiveBattleMatchFlow));
     wk->param = *param;
     wk->heapId = heapId;
-    wk->hasVideo = func_0200bb80();
+    wk->hasVideo = BattleRec_HasVideo();
     WifiBattleMatchRes_LoadBG(wk->param.seq, TRUE, heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 0x40, heapId);
     wk->msgMain = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PHRASE_INPUT, heapId);

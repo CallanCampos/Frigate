@@ -415,6 +415,9 @@
 . 0x0200bb00 BattleRec_AllocVideo
 . 0x0200bb24 BattleRec_Init
 . 0x0200bb5c BattleRec_FreeVideo
+. 0x0200bb80 BattleRec_HasVideo
+. 0x0200bbb4 BattleRec_DecryptBody
+. 0x0200bbdc BattleRec_EncryptBody
 . 0x0200bc04 BattleRec_LoadSlot
 . 0x0200bc9c BattleRec_LoadToCurrent
 . 0x0200bcd0 BattleRec_LoadVideo

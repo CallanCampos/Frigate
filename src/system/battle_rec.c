@@ -64,7 +64,7 @@ void clearVSPlayerBlk(BattleRecVideo *video) {
     MIi_CpuClear32(0, video, sizeof(BattleRecVideo));
 }
 
-BOOL func_0200bb80(void) {
+BOOL BattleRec_HasVideo(void) {
     if (addUpDataStream((u8 *)&data_02140f64->body, sizeof(BattleRecBody)) != 0) {
         return TRUE;
     }
@@ -75,11 +75,11 @@ void clearVSPlayer(void) {
     clearVSPlayerBlk(data_02140f64);
 }
 
-void func_0200bbb4(void) {
+void BattleRec_DecryptBody(void) {
     __decryptData(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 
-void func_0200bbdc(void) {
+void BattleRec_EncryptBody(void) {
     decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 

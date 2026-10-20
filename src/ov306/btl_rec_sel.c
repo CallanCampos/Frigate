@@ -654,7 +654,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
                                                          &wk->saveSeq, &wk->saveSubSeq);
         }
         if (wk->saveResult == 2 || wk->saveResult == 3) {
-            func_0200bbb4();
+            BattleRec_DecryptBody();
             WaitIcon_Free(wk->waitIcon);
             if (wk->saveResult == 2) {
                 GFL_SndSEPlay(SEQ_SE_SAVE);

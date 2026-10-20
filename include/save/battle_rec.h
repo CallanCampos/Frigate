@@ -192,10 +192,10 @@ void BattleRec_FreeVideo(BattleRecVideo *video);
 u32 getSizeOfVSPlayer(void);
 void clearVSPlayerBlk(BattleRecVideo *video);
 // Whether the loaded video's body has anything in it
-BOOL func_0200bb80(void);
+BOOL BattleRec_HasVideo(void);
 // Decrypt and encrypt the loaded video's body
-void func_0200bbb4(void);
-void func_0200bbdc(void);
+void BattleRec_DecryptBody(void);
+void BattleRec_EncryptBody(void);
 // Loads the saved video of a slot (0 is the player's own, 1 to 3 the downloaded ones). result is 1 if it loaded,
 // 0 if there is none, 2 if its CRCs are wrong and 3 if the load failed
 void BattleRec_LoadToCurrent(SaveControl *save, HeapID heapId, u32 *result, u32 slot);
