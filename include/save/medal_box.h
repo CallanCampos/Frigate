@@ -36,7 +36,8 @@ struct MedalBox {
     // The medal obtained last, or 0xff
     u8 lastMedal;
     u8 rank;
-    u8 unk3FE;
+    // Set once the Medal Box has shown its manual, which it shows the first time it opens
+    u8 manualShown;
     u8 padding3FF;
     // The Pokédex's habitat list
     u8 habitatList[0x96];

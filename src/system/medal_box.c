@@ -147,11 +147,11 @@ u32 MedalBox_GetObtainedCount(MedalBox *box, BOOL countEarned) {
 }
 
 u8 func_0200fb28(MedalBox *box) {
-    return box->unk3FE;
+    return box->manualShown;
 }
 
 void func_0200fb34(MedalBox *box) {
-    box->unk3FE = TRUE;
+    box->manualShown = TRUE;
 }
 
 MedalBox *SaveControl_GetMedalBox(SaveControl *save) {
