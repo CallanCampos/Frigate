@@ -151,7 +151,7 @@ BOOL ghiEncryptorSetTwlRootCA(const char *url, GHICertList *rootCA) {
     entry.refCount = 1;
     index = func_ov011_021716ac(sRootCAList, &entry, ghiCompareRootCAEntries, 0, TRUE);
     if (index == -1) {
-        func_ov011_02171600(sRootCAList, &entry, ghiCompareRootCAEntries);
+        ArrayInsertSorted(sRootCAList, &entry, ghiCompareRootCAEntries);
     } else {
         gsifree(entry.url);
         ((GHIRootCAEntry *)func_ov011_0217158c(sRootCAList, index))->refCount++;

@@ -2,10 +2,9 @@
 #include "dwc/ext.h"
 #include "dwc/gt2Socket.h"
 
-// GameSpy GT2's calls into the app's callbacks (gt2Callback.c). The functions' names, from pret/pokerevo's Wii build,
-// are in dwc/gt2Callback.h
+// GameSpy GT2's calls into the app's callbacks (gt2Callback.c)
 
-BOOL func_ov011_0217c9f4(GTI2Socket *socket) {
+BOOL gti2SocketErrorCallback(GTI2Socket *socket) {
     if (socket == NULL) {
         return TRUE;
     }
@@ -16,14 +15,14 @@ BOOL func_ov011_0217c9f4(GTI2Socket *socket) {
     socket->onSocketError(socket);
     socket->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
-        func_ov011_0217e944(socket);
+        gti2CloseSocket(socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217ca30(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, u32 latency,
-                         const void *message, int length) {
+BOOL gti2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, u32 latency,
+                                const void *message, int length) {
     if (socket == NULL || connection == NULL) {
         return TRUE;
     }
@@ -40,13 +39,13 @@ BOOL func_ov011_0217ca30(GTI2Socket *socket, GTI2Connection *connection, u32 ip,
     socket->callbackLevel--;
     connection->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
-        func_ov011_0217e944(socket);
+        gti2CloseSocket(socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cab0(GTI2Connection *connection, int result, const void *message, int length) {
+BOOL gti2ConnectedCallback(GTI2Connection *connection, int result, const void *message, int length) {
     if (connection == NULL) {
         return TRUE;
     }
@@ -64,13 +63,13 @@ BOOL func_ov011_0217cab0(GTI2Connection *connection, int result, const void *mes
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
-        func_ov011_0217e944(connection->socket);
+        gti2CloseSocket(connection->socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cb10(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+BOOL gti2ReceivedCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
     if (connection == NULL) {
         return TRUE;
     }
@@ -87,13 +86,13 @@ BOOL func_ov011_0217cb10(GTI2Connection *connection, const void *message, int le
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
-        func_ov011_0217e944(connection->socket);
+        gti2CloseSocket(connection->socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cb6c(GTI2Connection *connection, int reason) {
+BOOL gti2ClosedCallback(GTI2Connection *connection, int reason) {
     if (connection == NULL) {
         return TRUE;
     }
@@ -106,13 +105,13 @@ BOOL func_ov011_0217cb6c(GTI2Connection *connection, int reason) {
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
-        func_ov011_0217e944(connection->socket);
+        gti2CloseSocket(connection->socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cbbc(GTI2Connection *connection, u32 latency) {
+BOOL gti2PingCallback(GTI2Connection *connection, u32 latency) {
     if (connection == NULL) {
         return TRUE;
     }
@@ -125,13 +124,13 @@ BOOL func_ov011_0217cbbc(GTI2Connection *connection, u32 latency) {
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
-        func_ov011_0217e944(connection->socket);
+        gti2CloseSocket(connection->socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cc0c(GTI2Connection *connection, int filterId, const void *message, int length, BOOL reliable) {
+BOOL gti2SendFilterCallback(GTI2Connection *connection, int filterId, const void *message, int length, BOOL reliable) {
     GTI2FilterCallback *filter;
 
     if (connection == NULL) {
@@ -151,13 +150,14 @@ BOOL func_ov011_0217cc0c(GTI2Connection *connection, int filterId, const void *m
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
-        func_ov011_0217e944(connection->socket);
+        gti2CloseSocket(connection->socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cc8c(GTI2Connection *connection, int filterId, const void *message, int length, BOOL reliable) {
+BOOL gti2ReceiveFilterCallback(GTI2Connection *connection, int filterId, const void *message, int length,
+                               BOOL reliable) {
     GTI2FilterCallback *filter;
 
     if (connection == NULL) {
@@ -177,14 +177,14 @@ BOOL func_ov011_0217cc8c(GTI2Connection *connection, int filterId, const void *m
     connection->callbackLevel--;
     connection->socket->callbackLevel--;
     if (connection->socket->close && connection->socket->callbackLevel == 0) {
-        func_ov011_0217e944(connection->socket);
+        gti2CloseSocket(connection->socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cd0c(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, BOOL reset,
-                         const void *message, int length, BOOL send) {
+BOOL gti2DumpCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, BOOL reset, const void *message,
+                      int length, BOOL send) {
     GTI2DumpCallback callback;
 
     if (socket == NULL) {
@@ -212,13 +212,14 @@ BOOL func_ov011_0217cd0c(GTI2Socket *socket, GTI2Connection *connection, u32 ip,
         connection->callbackLevel--;
     }
     if (socket->close && socket->callbackLevel == 0) {
-        func_ov011_0217e944(socket);
+        gti2CloseSocket(socket);
         return FALSE;
     }
     return TRUE;
 }
 
-BOOL func_ov011_0217cd98(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length, BOOL *handled) {
+BOOL gti2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length,
+                                     BOOL *handled) {
     *handled = FALSE;
     if (socket == NULL) {
         return TRUE;
@@ -234,7 +235,7 @@ BOOL func_ov011_0217cd98(GTI2Socket *socket, u32 ip, u16 port, const void *messa
     *handled = socket->onUnrecognizedMessage(socket, ip, port, message, length);
     socket->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
-        func_ov011_0217e944(socket);
+        gti2CloseSocket(socket);
         return FALSE;
     }
     return TRUE;

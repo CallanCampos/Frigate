@@ -8,7 +8,7 @@
 // name is a guess.
 
 void NetBgmVolume_Set(u16 trackMask, s32 volume) {
-    if (!GFL_NetIsWifi() || func_ov011_02151dec() == 0) {
+    if (!GFL_NetIsWifi() || DWCRap_IsVoiceChatEnabled() == 0) {
         GFL_SndBGMSetVolume(trackMask, volume);
     }
 }

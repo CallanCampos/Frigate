@@ -20,29 +20,29 @@ typedef struct DWCTransportHeader {
 } DWCTransportHeader;
 
 // The file's own functions, which aren't static: as statics MWCC inlines the small ones into their callers
-void func_ov011_02168818(void);
-void func_ov011_02168828(void);
-BOOL func_ov011_02168864(void);
-BOOL func_ov011_0216887c(void);
-BOOL func_ov011_0216888c(DWCTransportSendFunc send);
-BOOL func_ov011_0216890c(GTI2Connection *connection, const void *data, int size);
-BOOL func_ov011_021689a4(u8 aid, int type);
-void func_ov011_02168c28(DWCTransportHeader *header, int type, int size);
-u16 func_ov011_02168c44(const void *data);
-int func_ov011_02168c74(int type);
-BOOL func_ov011_02168cd0(u32 timeout);
-u32 func_ov011_02168cf0(void);
-DWCTransportConnection *func_ov011_02169018(u8 aid);
-u8 func_ov011_02169028(u8 aid);
-u8 func_ov011_0216903c(u8 aid);
-void func_ov011_02169050(u8 aid, const void *data, int size, BOOL reliable);
-void func_ov011_02169144(GTI2Connection *connection, const void *data, int size);
-void func_ov011_021691f0(GTI2Connection *connection, const void *data, int size);
-void func_ov011_02169328(u8 aid, const void *data, int size);
-void func_ov011_021693a0(u8 aid, const void *data, int size);
-void func_ov011_02169434(u8 aid, const void *data, int size);
-int func_ov011_02169490(u8 aid);
-void func_ov011_021694ac(GTI2Connection *connection);
+void DWCs_InitSendPool(void);
+void DWCs_ClearSendPool(void);
+BOOL DWCs_HasSendPoolSpace(void);
+BOOL DWCs_FlushSendPool(void);
+BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send);
+BOOL DWCs_AddToSendPool(GTI2Connection *connection, const void *data, int size);
+BOOL DWCi_IsSendableReliable(u8 aid, int type);
+void DWCs_EncodeHeader(DWCTransportHeader *header, int type, int size);
+u16 DWCs_DecodeHeader(const void *data);
+int DWCs_GetRequiredHeaderSize(int type);
+BOOL DWC_SetConnectionKeepAliveTime(u32 timeout);
+u32 DWC_GetConnectionKeepAliveTime(void);
+DWCTransportConnection *DWCs_GetTransConnection(u8 aid);
+u8 DWCs_GetSendState(u8 aid);
+u8 DWCs_GetRecvState(u8 aid);
+void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable);
+void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, int size);
+void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, int size);
+void DWCs_RecvDataHeader(u8 aid, const void *data, int size);
+void DWCs_RecvDataBody(u8 aid, const void *data, int size);
+void DWCs_RecvSystemDataBody(u8 aid, const void *data, int size);
+int DWCs_GetOutgoingBufferFreeSize(u8 aid);
+void DWCs_ResetLastRecvTime(GTI2Connection *connection);
 
 // A copy of data that GT2 could not take yet, to be sent again to its connection
 typedef struct TransportSendNode {
@@ -67,12 +67,12 @@ static struct {
 } sSendPool;
 static DWCTransportInfo *sTransport;
 
-void func_ov011_02168818(void) {
+void DWCs_InitSendPool(void) {
     sSendPool.head = NULL;
     sSendPool.size = 0;
 }
 
-void func_ov011_02168828(void) {
+void DWCs_ClearSendPool(void) {
     TransportSendNode *node = sSendPool.head;
 
     while (node != NULL) {
@@ -85,18 +85,18 @@ void func_ov011_02168828(void) {
     sSendPool.size = 0;
 }
 
-BOOL func_ov011_02168864(void) {
+BOOL DWCs_HasSendPoolSpace(void) {
     if (sSendPool.size < 0x6000) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov011_0216887c(void) {
-    return func_ov011_0216888c(func_ov011_0217d290);
+BOOL DWCs_FlushSendPool(void) {
+    return DWCs_FlushSendPoolWith(func_ov011_0217d290);
 }
 
-BOOL func_ov011_0216888c(DWCTransportSendFunc send) {
+BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
     TransportSendNode *node = sSendPool.head;
     int tries;
 
@@ -130,7 +130,7 @@ BOOL func_ov011_0216888c(DWCTransportSendFunc send) {
     return node == NULL;
 }
 
-BOOL func_ov011_0216890c(GTI2Connection *connection, const void *data, int size) {
+BOOL DWCs_AddToSendPool(GTI2Connection *connection, const void *data, int size) {
     TransportSendNode **link = &sSendPool.head;
     TransportSendNode *node;
 
@@ -158,55 +158,55 @@ BOOL func_ov011_0216890c(GTI2Connection *connection, const void *data, int size)
     return TRUE;
 }
 
-BOOL func_ov011_02168998(u8 netId) {
-    return func_ov011_021689a4(netId, 1);
+BOOL DWC_IsSendableReliable(u8 netId) {
+    return DWCi_IsSendableReliable(netId, 1);
 }
 
-BOOL func_ov011_021689a4(u8 aid, int type) {
-    if (DWCi_IsError() || (type == 1 && !func_ov011_02160370(aid))) {
+BOOL DWCi_IsSendableReliable(u8 aid, int type) {
+    if (DWCi_IsError() || (type == 1 && !DWC_IsValidAID(aid))) {
         return FALSE;
     }
-    if (!func_ov011_02160588(aid)) {
+    if (!DWCi_IsValidAID(aid)) {
         return FALSE;
     }
-    if (func_ov011_02169028(aid) == 1) {
+    if (DWCs_GetSendState(aid) == 1) {
         return FALSE;
     }
-    if (func_ov011_02169490(aid) < func_ov011_02168c74(type)) {
+    if (DWCs_GetOutgoingBufferFreeSize(aid) < DWCs_GetRequiredHeaderSize(type)) {
         return FALSE;
     }
-    if (func_ov011_02168864()) {
+    if (DWCs_HasSendPoolSpace()) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov011_02168a08(u8 aid, const void *data, int size) {
-    return func_ov011_02168a1c(1, aid, data, size);
+BOOL DWC_SendReliable(u8 aid, const void *data, int size) {
+    return DWCi_SendReliable(1, aid, data, size);
 }
 
-BOOL func_ov011_02168a1c(int type, u8 aid, const void *data, int size) {
-    DWCTransportConnection *connection = func_ov011_02169018(aid);
+BOOL DWCi_SendReliable(int type, u8 aid, const void *data, int size) {
+    DWCTransportConnection *connection = DWCs_GetTransConnection(aid);
     int n;
     DWCTransportHeader header;
 
-    if (!func_ov011_021689a4(aid, type)) {
+    if (!DWCi_IsSendableReliable(aid, type)) {
         return FALSE;
     }
     connection->sendState = 1;
     connection->sendBuffer = data;
     connection->sendingSize = 0;
     connection->requestSendSize = size;
-    func_ov011_02168c28(&header, type, size);
-    func_ov011_02169050(aid, &header, sizeof(DWCTransportHeader), TRUE);
+    DWCs_EncodeHeader(&header, type, size);
+    DWCs_Send(aid, &header, sizeof(DWCTransportHeader), TRUE);
     n = sTransport->sendSplitMax;
     if (size <= n) {
         n = size;
     }
-    if (n > func_ov011_02169490(aid)) {
+    if (n > DWCs_GetOutgoingBufferFreeSize(aid)) {
         return TRUE;
     }
-    func_ov011_02169050(aid, data, n, TRUE);
+    DWCs_Send(aid, data, n, TRUE);
     connection->sendingSize += n;
     n = connection->requestSendSize;
     if (connection->sendingSize == n) {
@@ -221,14 +221,14 @@ BOOL func_ov011_02168a1c(int type, u8 aid, const void *data, int size) {
     return TRUE;
 }
 
-u32 func_ov011_02168ad4(u32 netIds, const void *data, int size) {
+u32 DWC_SendReliableBitmap(u32 netIds, const void *data, int size) {
     u8 i;
 
     for (i = 0; i < 32; i++) {
         u32 bit = (i != 0) ? 1 << i : 1;
 
-        if ((netIds & bit) && i != func_ov011_021602c0()) {
-            if (!func_ov011_02168a08(i, data, size)) {
+        if ((netIds & bit) && i != DWC_GetMyAID()) {
+            if (!DWC_SendReliable(i, data, size)) {
                 netIds &= ~bit;
             }
         }
@@ -236,27 +236,27 @@ u32 func_ov011_02168ad4(u32 netIds, const void *data, int size) {
     return netIds;
 }
 
-BOOL func_ov011_02168b18(u8 aid, const void *data, int size) {
+BOOL DWC_SendUnreliable(u8 aid, const void *data, int size) {
     if (DWCi_IsError()) {
         return FALSE;
     }
-    if (!func_ov011_02160370(aid)) {
+    if (!DWC_IsValidAID(aid)) {
         return FALSE;
     }
     if (size > 0x5b6) {
         return FALSE;
     }
-    func_ov011_021690a4(func_ov011_021602c0(), aid, data, size, TRUE);
+    DWCi_SendUnreliable(DWC_GetMyAID(), aid, data, size, TRUE);
     if (sTransport->sendCallback != NULL) {
         sTransport->sendCallback(size, aid, sTransport->sendParam);
     }
     return TRUE;
 }
 
-BOOL func_ov011_02168b84(u8 netId, void *buffer, int size) {
-    DWCTransportConnection *connection = func_ov011_02169018(netId);
+BOOL DWC_SetRecvBuffer(u8 netId, void *buffer, int size) {
+    DWCTransportConnection *connection = DWCs_GetTransConnection(netId);
 
-    if (func_ov011_0216903c(netId) == 2) {
+    if (DWCs_GetRecvState(netId) == 2) {
         return FALSE;
     }
     connection->recvBuffer = buffer;
@@ -267,7 +267,7 @@ BOOL func_ov011_02168b84(u8 netId, void *buffer, int size) {
     return TRUE;
 }
 
-BOOL func_ov011_02168bb0(DWCSendFunc func, void *param) {
+BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -276,7 +276,7 @@ BOOL func_ov011_02168bb0(DWCSendFunc func, void *param) {
     return TRUE;
 }
 
-BOOL func_ov011_02168bd8(DWCRecvFunc func, void *param) {
+BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -285,7 +285,7 @@ BOOL func_ov011_02168bd8(DWCRecvFunc func, void *param) {
     return TRUE;
 }
 
-BOOL func_ov011_02168c00(DWCTimeoutFunc func, void *param) {
+BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -294,13 +294,13 @@ BOOL func_ov011_02168c00(DWCTimeoutFunc func, void *param) {
     return TRUE;
 }
 
-void func_ov011_02168c28(DWCTransportHeader *header, int type, int size) {
+void DWCs_EncodeHeader(DWCTransportHeader *header, int type, int size) {
     strncpy(header->magic, "DT", 2);
     header->type = type;
     header->size = size;
 }
 
-u16 func_ov011_02168c44(const void *data) {
+u16 DWCs_DecodeHeader(const void *data) {
     DWCTransportHeader header;
 
     MI_CpuCopy8(data, &header, sizeof(DWCTransportHeader));
@@ -311,7 +311,7 @@ u16 func_ov011_02168c44(const void *data) {
 }
 
 // The room in GT2's buffer that sending data of a kind needs
-int func_ov011_02168c74(int type) {
+int DWCs_GetRequiredHeaderSize(int type) {
     int n;
 
     switch (type) {
@@ -320,7 +320,7 @@ int func_ov011_02168c74(int type) {
     case 3:
         return 0xc;
     case 4:
-        n = func_ov011_02168024() - 1;
+        n = DWCi_GetNumNodeInfo() - 1;
         if (n == 0) {
             return 0x10;
         }
@@ -330,7 +330,7 @@ int func_ov011_02168c74(int type) {
     }
 }
 
-BOOL func_ov011_02168ca4(u8 netId, int timeout) {
+BOOL DWC_SetRecvTimeoutTime(u8 netId, int timeout) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -339,7 +339,7 @@ BOOL func_ov011_02168ca4(u8 netId, int timeout) {
     return TRUE;
 }
 
-BOOL func_ov011_02168cd0(u32 timeout) {
+BOOL DWC_SetConnectionKeepAliveTime(u32 timeout) {
     if (sTransport == NULL || timeout == 0) {
         return FALSE;
     }
@@ -347,42 +347,42 @@ BOOL func_ov011_02168cd0(u32 timeout) {
     return TRUE;
 }
 
-u32 func_ov011_02168cf0(void) {
+u32 DWC_GetConnectionKeepAliveTime(void) {
     if (sTransport != NULL) {
         return sTransport->keepAliveTimeout;
     }
     return 0;
 }
 
-void func_ov011_02168d0c(DWCTransportInfo *info) {
+void DWCi_InitTransport(DWCTransportInfo *info) {
     sTransport = info;
     MI_CpuFill8(info, 0, sizeof(DWCTransportInfo));
     sTransport->sendSplitMax = 0x5b9;
-    func_ov011_02168cd0(20000);
-    func_ov011_02168818();
+    DWC_SetConnectionKeepAliveTime(20000);
+    DWCs_InitSendPool();
 }
 
-void func_ov011_02168d40(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
     if (sTransport == NULL || message == NULL || length == 0) {
         return;
     }
-    func_ov011_021694ac(connection);
+    DWCs_ResetLastRecvTime(connection);
     if (reliable) {
-        func_ov011_02169144(connection, message, length);
+        DWCs_HandleReliableMessage(connection, message, length);
     } else {
-        func_ov011_021691f0(connection, message, length);
+        DWCs_HandleUnreliableMessage(connection, message, length);
     }
 }
 
-void func_ov011_02168d80(GTI2Connection *connection, u32 latency) {
+void DWCi_PingCallback(GTI2Connection *connection, u32 latency) {
     if (sTransport->pingCallback != NULL) {
-        u8 aid = func_ov011_021604ec(connection);
+        u8 aid = DWCi_GetConnectionAID(connection);
 
         sTransport->pingCallback(latency, aid, sTransport->pingParam);
     }
 }
 
-void func_ov011_02168db0(void) {
+void DWCi_TransportProcess(void) {
     u8 *aids;
     int count;
     int i;
@@ -394,38 +394,38 @@ void func_ov011_02168db0(void) {
     if (sTransport == NULL) {
         return;
     }
-    count = func_ov011_021602f0(&aids);
+    count = DWC_GetAIDList(&aids);
     now = OS_GetTick();
-    timeout = func_ov011_02168cf0();
-    if (func_ov011_02160408() || (func_ov011_02167f3c() && func_ov011_021677e8())) {
+    timeout = DWC_GetConnectionKeepAliveTime();
+    if (DWC_IsServerMyself() || (DWCi_IsSvDownState() && DWCi_IsServerNodeMyself())) {
         for (i = 0; i < count; i++) {
             aid = aids[i];
-            if (aid != func_ov011_021602c0()) {
-                connection = func_ov011_02169018(aid);
+            if (aid != DWC_GetMyAID()) {
+                connection = DWCs_GetTransConnection(aid);
                 if ((u32)OS_TicksToMilliSeconds(now - connection->lastRecvTime) > timeout) {
-                    func_ov011_02160710(aid);
-                    func_ov011_021679c8(TRUE);
+                    DWCi_CloseConnectionHard(aid);
+                    DWCi_SendServerPoll(TRUE);
                 }
             }
         }
     } else {
-        aid = func_ov011_02160d6c();
-        if (aid != 0xff && aid != func_ov011_021602c0()) {
-            connection = func_ov011_02169018(aid);
+        aid = DWCi_GetServerOrSubServerAID();
+        if (aid != 0xff && aid != DWC_GetMyAID()) {
+            connection = DWCs_GetTransConnection(aid);
             if ((u32)OS_TicksToMilliSeconds(now - connection->lastRecvTime) > timeout) {
-                func_ov011_02160710(aid);
+                DWCi_CloseConnectionHard(aid);
             }
         }
     }
     for (i = 0; i < count; i++) {
         aid = aids[i];
-        func_ov011_0216887c();
-        if (func_ov011_02160370(aid)) {
+        DWCs_FlushSendPool();
+        if (DWC_IsValidAID(aid)) {
             u64 current = OS_GetTick();
             u32 limit;
             DWCTimeoutFunc callback;
 
-            connection = func_ov011_02169018(aid);
+            connection = DWCs_GetTransConnection(aid);
             callback = sTransport->recvTimeoutCallback;
             if (callback != NULL) {
                 limit = connection->recvTimeout;
@@ -435,18 +435,18 @@ void func_ov011_02168db0(void) {
                 }
             }
         }
-        if (aid != func_ov011_021602c0() && func_ov011_02169028(aid) == 1) {
+        if (aid != DWC_GetMyAID() && DWCs_GetSendState(aid) == 1) {
             int total;
             int n;
 
-            connection = func_ov011_02169018(aid);
+            connection = DWCs_GetTransConnection(aid);
             n = connection->requestSendSize - connection->sendingSize;
             total = sTransport->sendSplitMax;
             if (n <= total) {
                 total = n;
             }
-            if (func_ov011_02169490(aid) >= total) {
-                func_ov011_02169050(aid, connection->sendBuffer + connection->sendingSize, total, TRUE);
+            if (DWCs_GetOutgoingBufferFreeSize(aid) >= total) {
+                DWCs_Send(aid, connection->sendBuffer + connection->sendingSize, total, TRUE);
                 connection->sendingSize += total;
                 n = connection->requestSendSize;
                 if (connection->sendingSize == n) {
@@ -463,7 +463,7 @@ void func_ov011_02168db0(void) {
     }
 }
 
-void func_ov011_02168fa4(u8 aid) {
+void DWCi_ClearTransConnection(u8 aid) {
     if (sTransport != NULL) {
         sTransport->connections[aid].sendingSize = 0;
         sTransport->connections[aid].recvingSize = 0;
@@ -477,37 +477,37 @@ void func_ov011_02168fa4(u8 aid) {
     }
 }
 
-void func_ov011_02168fec(void) {
+void DWCi_ShutdownTransport(void) {
     sTransport = NULL;
-    func_ov011_02168828();
+    DWCs_ClearSendPool();
 }
 
-void func_ov011_02169000(u8 aid) {
+void DWCi_ResetLastSomeDataRecvTimeByAid(u8 aid) {
     u64 now = OS_GetTick();
 
-    func_ov011_02169018(aid)->lastRecvTime = now;
+    DWCs_GetTransConnection(aid)->lastRecvTime = now;
 }
 
-DWCTransportConnection *func_ov011_02169018(u8 aid) {
+DWCTransportConnection *DWCs_GetTransConnection(u8 aid) {
     return &sTransport->connections[aid];
 }
 
-u8 func_ov011_02169028(u8 aid) {
+u8 DWCs_GetSendState(u8 aid) {
     return sTransport->connections[aid].sendState;
 }
 
-u8 func_ov011_0216903c(u8 aid) {
+u8 DWCs_GetRecvState(u8 aid) {
     return sTransport->connections[aid].recvState;
 }
 
 // Sends data to a machine; reliable data that GT2 can't take now goes to the pool, and is lost with an error when the
 // pool is full
-void func_ov011_02169050(u8 aid, const void *data, int size, BOOL reliable) {
-    GTI2Connection *connection = func_ov011_021604b0(aid);
+void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable) {
+    GTI2Connection *connection = DWCi_GetGT2Connection(aid);
 
     if (reliable) {
-        if (!func_ov011_0216887c() || func_ov011_0217d290(connection, data, size, reliable)) {
-            if (!func_ov011_0216890c(connection, data, size)) {
+        if (!DWCs_FlushSendPool() || func_ov011_0217d290(connection, data, size, reliable)) {
+            if (!DWCs_AddToSendPool(connection, data, size)) {
                 DWCi_SetError(DWC_ERROR_NETWORK, -0x17d5e);
             }
         }
@@ -516,17 +516,17 @@ void func_ov011_02169050(u8 aid, const void *data, int size, BOOL reliable) {
     }
 }
 
-void func_ov011_021690a4(u8 from, u8 aid, const void *data, int size, BOOL relay) {
+void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay) {
     GTI2Connection *connection;
     BOOL viaServer = FALSE;
     TransportRelayHeader *header;
 
-    connection = func_ov011_021604b0(aid);
+    connection = DWCi_GetGT2Connection(aid);
     if (connection == NULL) {
-        if (func_ov011_02160408()) {
+        if (DWC_IsServerMyself()) {
             return;
         }
-        connection = func_ov011_021604b0(func_ov011_02168250(0)->aid);
+        connection = DWCi_GetGT2Connection(DWCi_GetNodeInfoByIndex(0)->aid);
         if (connection == NULL) {
             return;
         }
@@ -552,29 +552,29 @@ void func_ov011_021690a4(u8 from, u8 aid, const void *data, int size, BOOL relay
     }
 }
 
-void func_ov011_02169144(GTI2Connection *connection, const void *data, int size) {
-    u8 aid = func_ov011_021604ec(connection);
+void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, int size) {
+    u8 aid = DWCi_GetConnectionAID(connection);
     u16 type;
 
     if (aid == 0xff) {
         DWCi_SetError(DWC_ERROR_NETWORK, -0x17d68);
         return;
     }
-    switch (func_ov011_0216903c(aid)) {
+    switch (DWCs_GetRecvState(aid)) {
     case 0:
-        type = func_ov011_02168c44(data);
+        type = DWCs_DecodeHeader(data);
         if (type >= 2 && type < 5) {
-            func_ov011_02169328(aid, data, size);
+            DWCs_RecvDataHeader(aid, data, size);
         }
         break;
     case 1:
-        func_ov011_02169328(aid, data, size);
+        DWCs_RecvDataHeader(aid, data, size);
         break;
     case 2:
-        func_ov011_021693a0(aid, data, size);
+        DWCs_RecvDataBody(aid, data, size);
         break;
     case 3:
-        func_ov011_02169434(aid, data, size);
+        DWCs_RecvSystemDataBody(aid, data, size);
         break;
     case 4:
         sTransport->connections[aid].recvState = 1;
@@ -587,9 +587,9 @@ void func_ov011_02169144(GTI2Connection *connection, const void *data, int size)
     }
 }
 
-void func_ov011_021691f0(GTI2Connection *connection, const void *data, int size) {
+void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, int size) {
     const u8 *bytes = data;
-    u8 aid = func_ov011_021604ec(connection);
+    u8 aid = DWCi_GetConnectionAID(connection);
     BOOL relayed = FALSE;
     BOOL forMe = FALSE;
     u32 aids;
@@ -601,7 +601,7 @@ void func_ov011_021691f0(GTI2Connection *connection, const void *data, int size)
         return;
     }
     if ((u32)size >= 0x14 && strncmp(data, "\xbbI\xccM", 4) == 0) {
-        func_ov011_0216731c(bytes, size);
+        DWCi_ProcessGT2MatchCommand(bytes, size);
         return;
     }
     if (size >= 8 && memcmp(data, "F\xfcW", 3) == 0) {
@@ -612,8 +612,8 @@ void func_ov011_021691f0(GTI2Connection *connection, const void *data, int size)
 
         aid = header->aid;
         MI_CpuCopy8(&header->aids, &aids, 4);
-        if (!func_ov011_02160408()) {
-            u8 own = func_ov011_021602c0();
+        if (!DWC_IsServerMyself()) {
+            u8 own = DWC_GetMyAID();
 
             forMe = TRUE;
             if (!(aids & (1 << own))) {
@@ -622,10 +622,10 @@ void func_ov011_021691f0(GTI2Connection *connection, const void *data, int size)
         } else {
             for (i = 0; i < 32; i++) {
                 if (aids & (1 << i)) {
-                    if (i == func_ov011_021602c0()) {
+                    if (i == DWC_GetMyAID()) {
                         forMe = TRUE;
                     } else {
-                        func_ov011_021690a4(aid, i, data, size, FALSE);
+                        DWCi_SendUnreliable(aid, i, data, size, FALSE);
                     }
                 }
             }
@@ -650,13 +650,13 @@ void func_ov011_021691f0(GTI2Connection *connection, const void *data, int size)
     }
 }
 
-void func_ov011_02169328(u8 aid, const void *data, int size) {
+void DWCs_RecvDataHeader(u8 aid, const void *data, int size) {
     DWCTransportConnection *connection = &sTransport->connections[aid];
     DWCTransportHeader header;
     u16 type;
 
-    connection->lastRecvState = func_ov011_0216903c(aid);
-    type = func_ov011_02168c44(data);
+    connection->lastRecvState = DWCs_GetRecvState(aid);
+    type = DWCs_DecodeHeader(data);
     switch (type) {
     case 1:
         if (size != sizeof(DWCTransportHeader)) {
@@ -680,11 +680,11 @@ void func_ov011_02169328(u8 aid, const void *data, int size) {
     connection->lastRecvType = type;
 }
 
-void func_ov011_021693a0(u8 aid, const void *data, int size) {
+void DWCs_RecvDataBody(u8 aid, const void *data, int size) {
     DWCTransportConnection *connection = &sTransport->connections[aid];
     int total;
 
-    if (func_ov011_0216903c(aid) == 2) {
+    if (DWCs_GetRecvState(aid) == 2) {
         if (connection->recvingSize + size > connection->recvBufferSize) {
             DWCi_SetError(DWC_ERROR_NETWORK, -0x17d54);
             return;
@@ -706,8 +706,8 @@ void func_ov011_021693a0(u8 aid, const void *data, int size) {
     }
 }
 
-void func_ov011_02169434(u8 aid, const void *data, int size) {
-    DWCTransportConnection *connection = func_ov011_02169018(aid);
+void DWCs_RecvSystemDataBody(u8 aid, const void *data, int size) {
+    DWCTransportConnection *connection = DWCs_GetTransConnection(aid);
     void *copy;
 
     connection->recvState = connection->lastRecvState;
@@ -721,15 +721,15 @@ void func_ov011_02169434(u8 aid, const void *data, int size) {
             return;
         }
         MI_CpuCopy8(data, copy, size);
-        func_ov011_02162930(aid, connection->lastRecvType, copy);
+        DWCi_ProcessMatchSynPacket(aid, connection->lastRecvType, copy);
         DWC_Free(4, copy, 0);
         break;
     }
 }
 
 // The free space of GT2's buffer to a machine, less what the transport keeps for itself
-int func_ov011_02169490(u8 aid) {
-    int n = func_ov011_0217d394(func_ov011_021604b0(aid)) - 0x207;
+int DWCs_GetOutgoingBufferFreeSize(u8 aid) {
+    int n = func_ov011_0217d394(DWCi_GetGT2Connection(aid)) - 0x207;
 
     if (n <= 0) {
         return 0;
@@ -737,12 +737,12 @@ int func_ov011_02169490(u8 aid) {
     return n;
 }
 
-void func_ov011_021694ac(GTI2Connection *connection) {
-    u8 aid = func_ov011_021604ec(connection);
+void DWCs_ResetLastRecvTime(GTI2Connection *connection) {
+    u8 aid = DWCi_GetConnectionAID(connection);
 
-    if (aid < 0x20 && aid != func_ov011_021602c0()) {
+    if (aid < 0x20 && aid != DWC_GetMyAID()) {
         u64 now = OS_GetTick();
 
-        func_ov011_02169018(aid)->lastRecvTime = now;
+        DWCs_GetTransConnection(aid)->lastRecvTime = now;
     }
 }

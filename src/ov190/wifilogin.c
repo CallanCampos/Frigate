@@ -616,7 +616,7 @@ static void WifiLogin_StateStartFadeOut(WifiLoginWork *work) {
 // Connects to the Nintendo Wi-Fi Connection
 static void WifiLogin_StateConnect(WifiLoginWork *work) {
     if (!WifiLogin_CheckNetError(work)) {
-        if (func_ov011_0215de44("", work->param->buffer)) {
+        if (DWC_SVLGetTokenAsync("", work->param->buffer)) {
             WifiLogin_SetState(work, WifiLogin_StateWaitConnect);
         } else {
             WifiLogin_CheckNetError(work);
@@ -630,7 +630,7 @@ static void WifiLogin_StateStartConnect(WifiLoginWork *work) {
 
 static void WifiLogin_StateWaitConnect(WifiLoginWork *work) {
     if (!WifiLogin_CheckNetError(work)) {
-        int connection = func_ov011_0215dea8();
+        int connection = DWC_SVLProcess();
 
         if (connection == 3) {
             WifiLogin_SetState(work, WifiLogin_StateRunCallback);

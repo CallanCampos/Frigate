@@ -31,15 +31,14 @@ static void RefStringFree(void *elem) {
 
 HashTable *SBRefStrHash(SBServerList *slist) {
     if (g_SBRefStrList == NULL) {
-        g_SBRefStrList =
-            func_ov011_02171830(sizeof(SBRefString), 100, 2, RefStringHash, RefStringCompare, RefStringFree);
+        g_SBRefStrList = TableNew2(sizeof(SBRefString), 100, 2, RefStringHash, RefStringCompare, RefStringFree);
     }
     return g_SBRefStrList;
 }
 
 void SBRefStrHashCleanup(SBServerList *slist) {
-    if (g_SBRefStrList != NULL && func_ov011_021718ac(g_SBRefStrList) == 0) {
-        func_ov011_0217187c(g_SBRefStrList);
+    if (g_SBRefStrList != NULL && TableCount(g_SBRefStrList) == 0) {
+        TableFree(g_SBRefStrList);
         g_SBRefStrList = NULL;
     }
 }
@@ -47,7 +46,7 @@ void SBRefStrHashCleanup(SBServerList *slist) {
 void SBServerFree(void *elem) {
     SBServer *server = *(SBServer **)elem;
 
-    func_ov011_0217187c(server->keyvals);
+    TableFree(server->keyvals);
     server->keyvals = NULL;
     gsifree(server);
 }
@@ -57,7 +56,7 @@ void SBServerAddKeyValue(SBServer *server, const char *keyname, const char *valu
 
     kv.key = SBRefStr(NULL, keyname);
     kv.value = SBRefStr(NULL, value);
-    func_ov011_021718dc(server->keyvals, &kv);
+    TableEnter(server->keyvals, &kv);
     gsDebugFormat(4, 4, 0x10, "SBServerAddKeyValue added %s\\%s\r\n", keyname, value);
 }
 
@@ -76,7 +75,7 @@ const char *SBServerGetStringValueA(SBServer *server, const char *keyname, const
         return NULL;
     }
     kv.key = keyname;
-    ptr = func_ov011_02171964(server->keyvals, &kv);
+    ptr = TableLookup(server->keyvals, &kv);
     // An empty value counts as none
     if (ptr == NULL || strlen(ptr->value) == 0) {
         return def;
@@ -427,7 +426,7 @@ SBServer *SBAllocServer(SBServerList *slist, u32 publicip, u16 publicport) {
     if (server == NULL) {
         return NULL;
     }
-    server->keyvals = func_ov011_02171830(sizeof(SBKeyValuePair), 8, 4, KeyValHashKey, KeyValCompareKey, KeyValFree);
+    server->keyvals = TableNew2(sizeof(SBKeyValuePair), 8, 4, KeyValHashKey, KeyValCompareKey, KeyValFree);
     if (server->keyvals == NULL) {
         gsifree(server);
         return NULL;

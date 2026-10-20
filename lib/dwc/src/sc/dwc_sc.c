@@ -35,7 +35,7 @@ int Sc_Startup(int gameId, int server) {
 
     gsCoreInitialize();
     ScClient_SetServers(server);
-    func_ov011_0215f9b4(&authToken, &challenge);
+    DWCi_GetAuthInfo(&authToken, &challenge);
     sScState.loginDone = 0;
     error = wsLoginRemoteAuth(0, gameId, authToken, challenge, Sc_OnLogin, NULL);
     if (error != 0) {

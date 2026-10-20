@@ -108,53 +108,53 @@ typedef struct NasRootCert {
     u8 *exponent;
 } NasRootCert;
 
-static void func_ov011_02169594(void);
-static void func_ov011_02169604(void);
-static void func_ov011_021696a0(void);
-static int func_ov011_02169764(int mode);
-static void func_ov011_0216981c(void *arg);
-static int func_ov011_02169a14(void);
-static int func_ov011_02169b18(void);
-static int func_ov011_02169cb0(DWCHttp *http, const char *gsbrcd, const u16 *ingamesn);
-static void func_ov011_02169dcc(int step);
-static void func_ov011_02169e2c(void);
-static BOOL func_ov011_02169fc8(NasAuthInfo *info);
-static BOOL func_ov011_02169fe4(NasAuthInfo *info, const DWCBmWifiIdInfo *user);
-static BOOL func_ov011_0216a1a4(DWCHttp *http, const NasAuthInfo *info, BOOL sendSsid);
-static int func_ov011_0216a408(DWCHttp *http, const DWCHttpParam *param);
-static BOOL func_ov011_0216a4d0(DWCHttp *http);
-static void func_ov011_0216a53c(DWCHttp *http, u32 priority);
-static void func_ov011_0216a5c0(DWCHttp *http);
-static BOOL func_ov011_0216a5ec(DWCHttp *http);
-static void func_ov011_0216a640(DWCHttp *http);
-static CPSInAddr func_ov011_0216a68c(DWCHttp *http);
-static BOOL func_ov011_0216a69c(DWCHttp *http);
-static void func_ov011_0216a748(void *arg);
-static void func_ov011_0216a984(DWCHttp *http);
-static int func_ov011_0216a9f4(DWCHttp *http);
-static int func_ov011_0216aa80(DWCHttp *http, const char *name, const char *value);
-static int func_ov011_0216ab18(DWCHttp *http, const char *name, const void *value, int size);
-static int func_ov011_0216abcc(DWCHttp *http, const char *text);
-static int func_ov011_0216ac28(int result, DWCHttpSslConnection *con, int index);
-static int func_ov011_0216ac3c(DWCHttp *http, DWCHttpBuffer *buffer, int size);
-static void func_ov011_0216ac70(DWCHttp *http, DWCHttpBuffer *buffer);
-static int func_ov011_0216ac94(DWCHttp *http, DWCHttpBuffer *buffer, int extra);
-static int func_ov011_0216acf4(DWCHttp *http, const char *url);
-static int func_ov011_0216addc(DWCHttp *http, NasFieldTable *table, const char *label, const char *value);
-static int func_ov011_0216aea0(DWCHttp *http, BOOL headersOnly);
-static const char *func_ov011_0216b068(DWCHttp *http, const char *label);
-static int func_ov011_0216b0a0(DWCHttp *http, const char *label, char *dest, int size);
-static int func_ov011_0216b0d4(DWCHttp *http, const char *label, char *dest, int size);
-static void func_ov011_0216b100(DWCHttp *http, DWCHttpLabelValue *fields, int count);
-static void func_ov011_0216b2e0(void);
-static void func_ov011_0216b334(void *arg);
-static void func_ov011_0216bbb8(int state);
-static BOOL func_ov011_0216bbe4(const u16 **words, int count, const char *type, int timeout, char *flags,
-                                int *profaneCount, const char *region);
-static BOOL func_ov011_0216bf90(void);
-static void *func_ov011_0216c13c(u32 name, u32 size);
-static void func_ov011_0216c148(u32 name, void *ptr, u32 size);
-static BOOL func_ov011_0216c3c8(void);
+static void DWCi_Auth_StartThread(void);
+static void DWC_Auth_Abort(void);
+static void DWC_Auth_Join(void);
+static int DWCi_Auth_SendRequest(int mode);
+static void DWCi_Auth_Thread(void *arg);
+static int DWCi_Auth_HandleResponse(void);
+static int DWCi_Auth_ParseResult(void);
+static int DWCi_Auth_AddPostItems(DWCHttp *http, const char *gsbrcd, const u16 *ingamesn);
+static void DWCi_Auth_SetError(int step);
+static void DWCi_Auth_ClearResult(void);
+static BOOL DWCi_Auth_GetCurrentInfo(NasAuthInfo *info);
+static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user);
+static BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, const NasAuthInfo *info, BOOL sendSsid);
+static int DWC_Http_Create(DWCHttp *http, const DWCHttpParam *param);
+static BOOL DWC_Http_FinishHeader(DWCHttp *http);
+static void DWC_Http_StartThread(DWCHttp *http, u32 priority);
+static void DWC_Http_Abort(DWCHttp *http);
+static BOOL DWCi_Http_SleepUnlessAborted(DWCHttp *http);
+static void DWCi_Http_RegisterSocket(DWCHttp *http);
+static CPSInAddr DWCi_Http_ResolveHost(DWCHttp *http);
+static BOOL DWCi_Http_ParseContentLength(DWCHttp *http);
+static void DWCi_Http_Thread(void *arg);
+static void DWC_Http_Destroy(DWCHttp *http);
+static int DWCi_Http_MakeRequestLine(DWCHttp *http);
+static int DWC_Http_Add_HeaderItem(DWCHttp *http, const char *name, const char *value);
+static int DWC_Http_Add_PostBase64Item(DWCHttp *http, const char *name, const void *value, int size);
+static int DWC_Http_Add_Body(DWCHttp *http, const char *text);
+static int DWCi_Http_VerifyCertificate(int result, DWCHttpSslConnection *con, int index);
+static int DWCi_Http_AllocBuffer(DWCHttp *http, DWCHttpBuffer *buffer, int size);
+static void DWCi_Http_FreeBuffer(DWCHttp *http, DWCHttpBuffer *buffer);
+static int DWCi_Http_GrowBuffer(DWCHttp *http, DWCHttpBuffer *buffer, int extra);
+static int DWCi_Http_ParseUrl(DWCHttp *http, const char *url);
+static int DWCi_Http_AddLabelValue(DWCHttp *http, NasFieldTable *table, const char *label, const char *value);
+static int DWC_Http_ParseResult(DWCHttp *http, BOOL headersOnly);
+static const char *DWC_Http_GetResult(DWCHttp *http, const char *label);
+static int DWC_Http_GetBase64DecodedResult(DWCHttp *http, const char *label, char *dest, int size);
+static int DWC_Http_GetRawResult(DWCHttp *http, const char *label, char *dest, int size);
+static void DWCi_Http_FreeLabelValues(DWCHttp *http, DWCHttpLabelValue *fields, int count);
+static void DWCi_Netcheck_StartThread(void);
+static void DWCi_Netcheck_Thread(void *arg);
+static void DWCi_Netcheck_SetError(int state);
+static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *type, int timeout, char *flags,
+                                   int *profaneCount, const char *region);
+static BOOL DWCi_Prof_ParseResult(void);
+static void *DWCi_Prof_Alloc(u32 name, u32 size);
+static void DWCi_Prof_Free(u32 name, void *ptr, u32 size);
+static BOOL DWCi_Svl_ParseResult(void);
 
 // The root certificates (defined at the end of the file)
 static u8 sNasCert0Key[256];
@@ -212,7 +212,9 @@ static struct {
     NasPrWork *work;
     int unk_08;
     CPSInAddr ip;
-    int unk_10;
+    // Whether a redirect (302) counts as reaching the network, which nothing sets (the SDK's
+    // DWC_Netcheck_SetAllow302)
+    int allow302;
 } sPr;
 static int sTestServer;
 static DWCHttp sHttp;
@@ -237,15 +239,15 @@ static struct {
 static DWCHttpParam sConfig = { "", 0, 0x1000, NULL, NULL, 0, 20000 };
 static char sDefaultUrl[] = "https://nas.nintendowifi.net/ac";
 
-void func_ov011_021694d4(const char *url) {
+void DWC_Auth_SetCustomNas(const char *url) {
     sConfig.url = url;
 }
 
-const char *func_ov011_021694e0(void) {
+const char *DWCi_Auth_GetCustomNas(void) {
     return sConfig.url;
 }
 
-int func_ov011_021694ec(const DWCAuthParam *init, DWCHttp *http) {
+int DWC_Auth_Create(const DWCAuthParam *init, DWCHttp *http) {
     DWCHttpAlloc alloc = init->alloc;
 
     if (sNas.work != NULL) {
@@ -263,31 +265,31 @@ int func_ov011_021694ec(const DWCAuthParam *init, DWCHttp *http) {
     sNas.work->param = *init;
     sNas.work->param.ingamesn[0x19] = 0;
     sNas.work->param.gsbrcd[0xb] = 0;
-    sNas.work->step = func_ov011_02169764(1);
+    sNas.work->step = DWCi_Auth_SendRequest(1);
     if (sNas.work->step == 0) {
         sNas.testMode = 0;
-        func_ov011_02169594();
+        DWCi_Auth_StartThread();
         return 0;
     }
     return sNas.work->step;
 }
 
-static void func_ov011_02169594(void) {
+static void DWCi_Auth_StartThread(void) {
     OS_InitMutex(&sNas.work->lock);
     sNas.work->cancel = 0;
     if (sNas.work->thread.id == 0 || OS_IsThreadTerminated(&sNas.work->thread)) {
-        OS_CreateThread(&sNas.work->thread, func_ov011_0216981c, &sNas.work, sNas.work->stack + 0x1000, 0x1000, 16);
+        OS_CreateThread(&sNas.work->thread, DWCi_Auth_Thread, &sNas.work, sNas.work->stack + 0x1000, 0x1000, 16);
         OS_WakeupThreadDirect(&sNas.work->thread);
     }
 }
 
-static void func_ov011_02169604(void) {
+static void DWC_Auth_Abort(void) {
     if (sNas.work != NULL) {
         OS_LockMutex(&sNas.work->lock);
         sNas.work->cancel = 1;
         OS_UnlockMutex(&sNas.work->lock);
         if (sNas.work->http != NULL) {
-            func_ov011_0216a5c0(sNas.work->http);
+            DWC_Http_Abort(sNas.work->http);
         }
         if (sNas.work->thread.id != 0 && !OS_IsThreadTerminated(&sNas.work->thread)) {
             OS_JoinThread(&sNas.work->thread);
@@ -295,27 +297,27 @@ static void func_ov011_02169604(void) {
     }
 }
 
-void func_ov011_02169668(void) {
+void DWC_Auth_Destroy(void) {
     NasWork *work = sNas.work;
 
     if (work != NULL) {
         DWCHttpFree free = work->param.free;
 
         if (work->http != NULL) {
-            func_ov011_0216a984(work->http);
+            DWC_Http_Destroy(work->http);
         }
         free(0, sNas.work, 0);
         sNas.work = NULL;
     }
 }
 
-static void func_ov011_021696a0(void) {
+static void DWC_Auth_Join(void) {
     if (sNas.work->thread.id != 0 && !OS_IsThreadTerminated(&sNas.work->thread)) {
         OS_JoinThread(&sNas.work->thread);
     }
 }
 
-int func_ov011_021696d0(void) {
+int DWC_Auth_GetError(void) {
     int step;
 
     if (sNas.work == NULL) {
@@ -327,7 +329,7 @@ int func_ov011_021696d0(void) {
     return step;
 }
 
-void func_ov011_02169704(DWCAuthResult *out) {
+void DWC_Auth_GetResult(DWCAuthResult *out) {
     if (sNas.work == NULL) {
         MI_CpuFill8(out, 0, sizeof(DWCAuthResult));
         // BUG: without a login, the answer is then copied from where its work would be, near address 0
@@ -344,30 +346,30 @@ void func_ov011_02169704(DWCAuthResult *out) {
     }
 }
 
-static int func_ov011_02169764(int mode) {
+static int DWCi_Auth_SendRequest(int mode) {
     if (strcmp(sConfig.url, sDefaultUrl) != 0) {
         sConfig.ignoreCa = 1;
     }
     sConfig.alloc = sNas.work->param.alloc;
     sConfig.free = sNas.work->param.free;
-    if (func_ov011_0216a408(sNas.work->http, &sConfig) != 0) {
+    if (DWC_Http_Create(sNas.work->http, &sConfig) != 0) {
         return 4;
     }
     if (mode == 1) {
         DWCBm_GetWifiIdInfo(&sNas.userInfo);
     }
-    sNas.work->step = func_ov011_02169cb0(sNas.work->http, sNas.work->param.gsbrcd, sNas.work->param.ingamesn);
+    sNas.work->step = DWCi_Auth_AddPostItems(sNas.work->http, sNas.work->param.gsbrcd, sNas.work->param.ingamesn);
     if (sNas.work->step != 0) {
         return 4;
     }
-    if (func_ov011_0216a4d0(sNas.work->http) != 0) {
+    if (DWC_Http_FinishHeader(sNas.work->http) != 0) {
         return 4;
     }
-    func_ov011_0216a53c(sNas.work->http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+    DWC_Http_StartThread(sNas.work->http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
     return 0;
 }
 
-static void func_ov011_0216981c(void *arg) {
+static void DWCi_Auth_Thread(void *arg) {
     int retries = 0;
     int mode;
     u64 start;
@@ -380,41 +382,41 @@ static void func_ov011_0216981c(void *arg) {
         if (sNas.work->http->result != 8) {
             sNas.work->result.returnCode = 20100;
             if (sNas.work->http->result == 7) {
-                func_ov011_02169dcc(0x14);
+                DWCi_Auth_SetError(0x14);
                 return;
             }
             if (retries > 2) {
                 if (sNas.work->http->result == 2) {
-                    func_ov011_02169dcc(9);
+                    DWCi_Auth_SetError(9);
                 } else if (sNas.work->http->result == 3) {
-                    func_ov011_02169dcc(0xb);
+                    DWCi_Auth_SetError(0xb);
                 } else {
-                    func_ov011_02169dcc(0xd);
+                    DWCi_Auth_SetError(0xd);
                 }
                 return;
             }
             retries++;
             mode = 1;
         } else {
-            result = func_ov011_02169a14();
+            result = DWCi_Auth_HandleResponse();
             switch (result) {
             case 0x15:
-                func_ov011_02169dcc(0x15);
+                DWCi_Auth_SetError(0x15);
                 return;
             case 0x10:
                 if (retries > 2) {
-                    func_ov011_02169dcc(0x10);
+                    DWCi_Auth_SetError(0x10);
                     return;
                 }
                 retries++;
                 mode = 0;
                 break;
             case 0x11:
-                func_ov011_02169dcc(result);
+                DWCi_Auth_SetError(result);
                 return;
             default:
                 if (retries >= 2) {
-                    func_ov011_02169dcc(result);
+                    DWCi_Auth_SetError(result);
                     return;
                 }
                 retries++;
@@ -428,15 +430,15 @@ static void func_ov011_0216981c(void *arg) {
             if (sNas.work->cancel == 1) {
                 sNas.work->result.returnCode = 20100;
                 OS_UnlockMutex(&sNas.work->lock);
-                func_ov011_02169dcc(0x14);
+                DWCi_Auth_SetError(0x14);
                 return;
             }
             OS_UnlockMutex(&sNas.work->lock);
             OS_Sleep(5000);
         }
-        func_ov011_0216a984(sNas.work->http);
+        DWC_Http_Destroy(sNas.work->http);
         OS_LockMutex(&sNas.work->lock);
-        sNas.work->step = func_ov011_02169764(mode);
+        sNas.work->step = DWCi_Auth_SendRequest(mode);
         if (sNas.work->step != 0) {
             sNas.work->result.returnCode = 20100;
             OS_UnlockMutex(&sNas.work->lock);
@@ -446,16 +448,16 @@ static void func_ov011_0216981c(void *arg) {
     }
 }
 
-static int func_ov011_02169a14(void) {
+static int DWCi_Auth_HandleResponse(void) {
     DWCHttpAlloc alloc = sNas.work->param.alloc;
     DWCHttpFree free = sNas.work->param.free;
     void *buffer;
 
-    if (func_ov011_0216aea0(sNas.work->http, 0) != 1) {
+    if (DWC_Http_ParseResult(sNas.work->http, 0) != 1) {
         sNas.work->result.returnCode = 20100;
         return 0xe;
     }
-    if (func_ov011_02169b18() != 0) {
+    if (DWCi_Auth_ParseResult() != 0) {
         return 0xe;
     }
     if (sNas.work->result.returnCode < 20100) {
@@ -493,18 +495,18 @@ static int func_ov011_02169a14(void) {
     return 0x12;
 }
 
-static int func_ov011_02169b18(void) {
+static int DWCi_Auth_ParseResult(void) {
     char *end = NULL;
     int httpResult;
     int returnCode;
 
-    end = (char *)func_ov011_0216b068(sNas.work->http, "Date");
+    end = (char *)DWC_Http_GetResult(sNas.work->http, "Date");
     if (end != NULL) {
-        func_ov011_0215dffc(end);
+        DWCi_SetNasTimeFromDateHeader(end);
     }
     end = NULL;
     errno = 0;
-    httpResult = atol(func_ov011_0216b068(sNas.work->http, "httpresult"));
+    httpResult = atol(DWC_Http_GetResult(sNas.work->http, "httpresult"));
     if (errno == ERANGE) {
         sNas.work->result.returnCode = 20101;
         return 0xc;
@@ -513,7 +515,7 @@ static int func_ov011_02169b18(void) {
         sNas.work->result.returnCode = httpResult + 23000;
         return 0x12;
     }
-    if (func_ov011_0216b0a0(sNas.work->http, "returncd", sNas.work->result.retcode, 4) <= 0) {
+    if (DWC_Http_GetBase64DecodedResult(sNas.work->http, "returncd", sNas.work->result.retcode, 4) <= 0) {
         sNas.work->result.returnCode = 20101;
         return 0xe;
     }
@@ -529,11 +531,11 @@ static int func_ov011_02169b18(void) {
         sNas.work->result.challenge[0] = 0;
         sNas.work->result.datetime[0] = 0;
         sNas.work->result.cookie[0] = 0;
-        func_ov011_0216b0a0(sNas.work->http, "token", sNas.work->result.token, 0x12d);
-        func_ov011_0216b0a0(sNas.work->http, "locator", sNas.work->result.locator, 0x33);
-        func_ov011_0216b0a0(sNas.work->http, "challenge", sNas.work->result.challenge, 9);
-        func_ov011_0216b0a0(sNas.work->http, "datetime", sNas.work->result.datetime, 0xf);
-        func_ov011_0216b0d4(sNas.work->http, "Set-Cookie", sNas.work->result.cookie, 0x41);
+        DWC_Http_GetBase64DecodedResult(sNas.work->http, "token", sNas.work->result.token, 0x12d);
+        DWC_Http_GetBase64DecodedResult(sNas.work->http, "locator", sNas.work->result.locator, 0x33);
+        DWC_Http_GetBase64DecodedResult(sNas.work->http, "challenge", sNas.work->result.challenge, 9);
+        DWC_Http_GetBase64DecodedResult(sNas.work->http, "datetime", sNas.work->result.datetime, 0xf);
+        DWC_Http_GetRawResult(sNas.work->http, "Set-Cookie", sNas.work->result.cookie, 0x41);
         sNas.work->result.cookie[0x2b] = 0;
         if (returnCode != 40) {
             sNas.succeeded = 1;
@@ -544,56 +546,56 @@ static int func_ov011_02169b18(void) {
     return 0;
 }
 
-static int func_ov011_02169cb0(DWCHttp *http, const char *gameCode, const u16 *name) {
+static int DWCi_Auth_AddPostItems(DWCHttp *http, const char *gameCode, const u16 *name) {
     NasAuthInfo info;
 
     if (sNas.userInfo.id == 0) {
-        if (func_ov011_0216ab18(http, "action", "acctcreate", strlen("acctcreate")) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "action", "acctcreate", strlen("acctcreate")) != 0) {
             return 8;
         }
     } else {
-        if (func_ov011_0216ab18(http, "action", "login", strlen("login")) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "action", "login", strlen("login")) != 0) {
             return 8;
         }
-        if (func_ov011_0216ab18(http, "gsbrcd", gameCode, strlen(gameCode)) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "gsbrcd", gameCode, strlen(gameCode)) != 0) {
             return 8;
         }
     }
-    if (!func_ov011_02169fe4(&info, &sNas.userInfo)) {
+    if (!DWCi_Auth_GetInfo(&info, &sNas.userInfo)) {
         return 5;
     }
-    if (!func_ov011_0216a1a4(http, &info, sSendSsid)) {
+    if (!DWCi_Auth_AddCommonItems(http, &info, sSendSsid)) {
         return 8;
     }
     if (sNas.testMode == 1) {
-        if (func_ov011_0216ab18(http, "iswfc", "Y", strlen("Y")) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "iswfc", "Y", strlen("Y")) != 0) {
             return 8;
         }
     }
     if (wcslen(name) != 0) {
-        if (func_ov011_0216ab18(http, "ingamesn", name, wcslen(name) * 2) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "ingamesn", name, wcslen(name) * 2) != 0) {
             return 8;
         }
     }
     return 0;
 }
 
-static void func_ov011_02169dcc(int step) {
+static void DWCi_Auth_SetError(int step) {
     OS_LockMutex(&sNas.work->lock);
     sNas.work->step = step;
     OS_UnlockMutex(&sNas.work->lock);
 }
 
-BOOL func_ov011_02169df8(int server) {
+BOOL DWCi_Auth_InitInterface(int server) {
     switch (server) {
     case 0:
-        func_ov011_021694d4("https://nas.test.nintendowifi.net/ac");
+        DWC_Auth_SetCustomNas("https://nas.test.nintendowifi.net/ac");
         break;
     case 2:
-        func_ov011_021694d4("https://nas.dev.nintendowifi.net/ac");
+        DWC_Auth_SetCustomNas("https://nas.dev.nintendowifi.net/ac");
         break;
     case 1:
-        func_ov011_021694d4("https://nas.nintendowifi.net/ac");
+        DWC_Auth_SetCustomNas("https://nas.nintendowifi.net/ac");
         break;
     default:
         return FALSE;
@@ -601,41 +603,42 @@ BOOL func_ov011_02169df8(int server) {
     return TRUE;
 }
 
-static void func_ov011_02169e2c(void) {
+static void DWCi_Auth_ClearResult(void) {
     sResult.done = 0;
     sResult.succeeded = 0;
     sResult.code = 0;
     MI_CpuFill8(&sHttp, 0, sizeof(DWCHttp));
 }
 
-BOOL func_ov011_02169e50(const u16 *ingamesn, const char *gsbrcd, u64 userId, DWCHttpAlloc alloc, DWCHttpFree free) {
-    func_ov011_02169e2c();
+BOOL DWCi_Auth_StartAuthentication(const u16 *ingamesn, const char *gsbrcd, u64 userId, DWCHttpAlloc alloc,
+                                   DWCHttpFree free) {
+    DWCi_Auth_ClearResult();
     MI_CpuCopy8(ingamesn, sInit.ingamesn, sizeof(sInit.ingamesn));
     MI_CpuCopy8(gsbrcd, sInit.gsbrcd, sizeof(sInit.gsbrcd));
     sInit.alloc = alloc;
     sInit.free = free;
     sResult.startTime = OS_GetTick();
     sResult.userId = userId;
-    return func_ov011_021694ec(&sInit, &sHttp) == 0 ? TRUE : FALSE;
+    return DWC_Auth_Create(&sInit, &sHttp) == 0 ? TRUE : FALSE;
 }
 
-void func_ov011_02169eb0(void) {
-    func_ov011_02169604();
-    func_ov011_02169668();
+void DWCi_Auth_AbortAuthentication(void) {
+    DWC_Auth_Abort();
+    DWC_Auth_Destroy();
 }
 
-void func_ov011_02169ebc(void) {
+void DWCi_Auth_ProcessAuthentication(void) {
     DWCAuthResult done;
     DWCAuthResult failed;
-    int step = func_ov011_021696d0();
+    int step = DWC_Auth_GetError();
     int code;
 
     if (step == 0x15) {
-        func_ov011_02169704(&done);
+        DWC_Auth_GetResult(&done);
         if (done.returnCode == 20002) {
-            func_ov011_02169668();
-            func_ov011_02169e2c();
-            if (func_ov011_021694ec(&sInit, &sHttp) == 0) {
+            DWC_Auth_Destroy();
+            DWCi_Auth_ClearResult();
+            if (DWC_Auth_Create(&sInit, &sHttp) == 0) {
                 return;
             }
             code = -20100;
@@ -645,8 +648,8 @@ void func_ov011_02169ebc(void) {
             return;
         }
     } else if (step != 0) {
-        func_ov011_02169704(&failed);
-        func_ov011_02169668();
+        DWC_Auth_GetResult(&failed);
+        DWC_Auth_Destroy();
         code = failed.returnCode;
     } else {
         return;
@@ -656,33 +659,33 @@ void func_ov011_02169ebc(void) {
     sResult.code = code;
 }
 
-BOOL func_ov011_02169f34(void) {
+BOOL DWCi_Auth_IsFinished(void) {
     return sResult.done;
 }
 
-BOOL func_ov011_02169f40(void) {
+BOOL DWCi_Auth_IsSucceeded(void) {
     return sResult.succeeded;
 }
 
-int func_ov011_02169f4c(void) {
+int DWCi_Auth_GetErrorCode(void) {
     return sResult.code;
 }
 
-void func_ov011_02169f58(char *token, char *challenge) {
+void DWCi_Auth_GetGameSpyToken(char *token, char *challenge) {
     DWCAuthResult status;
 
-    func_ov011_02169704(&status);
+    DWC_Auth_GetResult(&status);
     strncpy(token, status.token, 0x12d);
     token[0x12c] = 0;
     strncpy(challenge, status.challenge, 9);
     challenge[8] = 0;
 }
 
-void func_ov011_02169f90(void) {
-    func_ov011_02169668();
+void DWCi_Auth_EndAuthentication(void) {
+    DWC_Auth_Destroy();
 }
 
-u64 func_ov011_02169f98(void) {
+u64 DWCi_Auth_GetConsoleUserId(void) {
     DWCBmWifiId ids;
 
     DWCBm_GetWifiId(&ids);
@@ -692,21 +695,21 @@ u64 func_ov011_02169f98(void) {
     return ids.pendingId;
 }
 
-BOOL func_ov011_02169fb8(void) {
+BOOL DWCi_Auth_HasConsoleUserId(void) {
     DWCBmWifiId ids;
 
     DWCBm_GetWifiId(&ids);
     return ids.isSet;
 }
 
-static BOOL func_ov011_02169fc8(NasAuthInfo *info) {
+static BOOL DWCi_Auth_GetCurrentInfo(NasAuthInfo *info) {
     DWCBmWifiIdInfo user;
 
     DWCBm_GetWifiIdInfo(&user);
-    return func_ov011_02169fe4(info, &user);
+    return DWCi_Auth_GetInfo(info, &user);
 }
 
-static BOOL func_ov011_02169fe4(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
+static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
     u16 channel;
     u8 mac[6];
     RTCDate date;
@@ -778,65 +781,65 @@ static BOOL func_ov011_02169fe4(NasAuthInfo *info, const DWCBmWifiIdInfo *user) 
     return TRUE;
 }
 
-static BOOL func_ov011_0216a1a4(DWCHttp *http, const NasAuthInfo *info, int sendSsid) {
+static BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, const NasAuthInfo *info, int sendSsid) {
     char text[0x21];
 
     OS_SNPrintf(text, 0x21, "%03d%03d", 5, 3);
-    if (func_ov011_0216ab18(http, "sdkver", text, strlen(text)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "sdkver", text, strlen(text)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "userid", info->userId, strlen(info->userId)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "userid", info->userId, strlen(info->userId)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "passwd", info->password, strlen(info->password)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "passwd", info->password, strlen(info->password)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "bssid", info->bssid, strlen(info->bssid)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "bssid", info->bssid, strlen(info->bssid)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "apinfo", info->apInfo, strlen(info->apInfo)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "apinfo", info->apInfo, strlen(info->apInfo)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "gamecd", info->gameCode, strlen(info->gameCode)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "gamecd", info->gameCode, strlen(info->gameCode)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "makercd", info->makerCode, strlen(info->makerCode)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "makercd", info->makerCode, strlen(info->makerCode)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "unitcd", info->unitCode, strlen(info->unitCode)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "unitcd", info->unitCode, strlen(info->unitCode)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "macadr", info->macAddress, strlen(info->macAddress)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "macadr", info->macAddress, strlen(info->macAddress)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "lang", info->language, strlen(info->language)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "lang", info->language, strlen(info->language)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "birth", info->birthday, strlen(info->birthday)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "birth", info->birthday, strlen(info->birthday)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "devtime", info->deviceTime, strlen(info->deviceTime)) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "devtime", info->deviceTime, strlen(info->deviceTime)) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216ab18(http, "devname", info->deviceName, wcslen(info->deviceName) * 2) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "devname", info->deviceName, wcslen(info->deviceName) * 2) != 0) {
         return FALSE;
     }
     if (sendSsid == 1) {
-        if (func_ov011_0216ab18(http, "ssid", info->ssid, strlen(info->ssid)) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "ssid", info->ssid, strlen(info->ssid)) != 0) {
             return FALSE;
         }
     }
     OS_SNPrintf(text, 0x21, "Nitro WiFi SDK/%d.%d", 5, 3);
-    if (func_ov011_0216aa80(http, "User-Agent", text) != 0) {
+    if (DWC_Http_Add_HeaderItem(http, "User-Agent", text) != 0) {
         return FALSE;
     }
-    if (func_ov011_0216aa80(http, "HTTP_X_GAMECD", info->gameCode) != 0) {
+    if (DWC_Http_Add_HeaderItem(http, "HTTP_X_GAMECD", info->gameCode) != 0) {
         return FALSE;
     }
     return TRUE;
 }
 
-static int func_ov011_0216a408(DWCHttp *http, const DWCHttpParam *config) {
+static int DWC_Http_Create(DWCHttp *http, const DWCHttpParam *config) {
     DWCHttpAlloc alloc = config->alloc;
 
     MI_CpuFill8(http, 0, sizeof(DWCHttp));
@@ -853,39 +856,39 @@ static int func_ov011_0216a408(DWCHttp *http, const DWCHttpParam *config) {
         http->result = 1;
         return 1;
     }
-    if (func_ov011_0216ac3c(http, &http->response, http->param.bufferSize) == 0) {
+    if (DWCi_Http_AllocBuffer(http, &http->response, http->param.bufferSize) == 0) {
         http->result = 1;
         return 1;
     }
-    if (func_ov011_0216acf4(http, config->url) == 0) {
+    if (DWCi_Http_ParseUrl(http, config->url) == 0) {
         http->result = 1;
         return 1;
     }
-    http->result = func_ov011_0216a9f4(http);
+    http->result = DWCi_Http_MakeRequestLine(http);
     if (http->result == 0) {
         http->started = 0xff;
     }
     return http->result;
 }
 
-static BOOL func_ov011_0216a4d0(DWCHttp *http) {
+static BOOL DWC_Http_FinishHeader(DWCHttp *http) {
     char length[8];
     int size;
 
-    if (func_ov011_0216aa80(http, "Connection", "close") != 0) {
+    if (DWC_Http_Add_HeaderItem(http, "Connection", "close") != 0) {
         return TRUE;
     }
     size = strlen(strstr(http->request.start, "\r\n\r\n") + 4);
     if (size != 0) {
         OS_SNPrintf(length, 7, "%d", size);
-        if (func_ov011_0216aa80(http, "Content-Length", length) != 0) {
+        if (DWC_Http_Add_HeaderItem(http, "Content-Length", length) != 0) {
             return TRUE;
         }
     }
     return FALSE;
 }
 
-static void func_ov011_0216a53c(DWCHttp *http, u32 priority) {
+static void DWC_Http_StartThread(DWCHttp *http, u32 priority) {
     http->cancelled = 0;
     OS_InitMutex(&http->cancelLock);
     OS_InitMutex(&http->lock);
@@ -895,12 +898,12 @@ static void func_ov011_0216a53c(DWCHttp *http, u32 priority) {
         sTestServer = 0;
     }
     if (http->thread.id == 0 || OS_IsThreadTerminated(&http->thread)) {
-        OS_CreateThread(&http->thread, func_ov011_0216a748, http, http->stack + 0x1000, 0x1000, priority);
+        OS_CreateThread(&http->thread, DWCi_Http_Thread, http, http->stack + 0x1000, 0x1000, priority);
         OS_WakeupThreadDirect(&http->thread);
     }
 }
 
-static void func_ov011_0216a5c0(DWCHttp *http) {
+static void DWC_Http_Abort(DWCHttp *http) {
     if (http->started == 0xff) {
         OS_LockMutex(&http->cancelLock);
         http->cancelled = 1;
@@ -908,7 +911,7 @@ static void func_ov011_0216a5c0(DWCHttp *http) {
     }
 }
 
-static BOOL func_ov011_0216a5ec(DWCHttp *http) {
+static BOOL DWCi_Http_SleepUnlessAborted(DWCHttp *http) {
     if (http->secure == 1) {
         OS_GetLowEntropyData(http->entropy);
         CPS_SslAddRandomSeed(http->entropy, 0x20);
@@ -923,7 +926,7 @@ static BOOL func_ov011_0216a5ec(DWCHttp *http) {
     return TRUE;
 }
 
-static void func_ov011_0216a640(DWCHttp *http) {
+static void DWCi_Http_RegisterSocket(DWCHttp *http) {
     MI_CpuFill8(&http->soc, 0, sizeof(CPSSoc));
     http->soc.rcvbuf_size = 0xb68;
     http->soc.rcvbuf = http->rcvBuffer;
@@ -932,11 +935,11 @@ static void func_ov011_0216a640(DWCHttp *http) {
     CPS_SocRegister(&http->soc);
 }
 
-static CPSInAddr func_ov011_0216a68c(DWCHttp *http) {
+static CPSInAddr DWCi_Http_ResolveHost(DWCHttp *http) {
     return CPS_Resolve(http->host);
 }
 
-static BOOL func_ov011_0216a69c(DWCHttp *http) {
+static BOOL DWCi_Http_ParseContentLength(DWCHttp *http) {
     DWCHttpBuffer *response = &http->response;
     char *text = response->start;
     char *body;
@@ -967,7 +970,7 @@ static BOOL func_ov011_0216a69c(DWCHttp *http) {
     return TRUE;
 }
 
-static void func_ov011_0216a748(void *arg) {
+static void DWCi_Http_Thread(void *arg) {
     static void *sNasRootCerts[12] = { &sNasCert10, &sNasCert9, &sNasCert11, &sNasCert12, &sNasCert1, &sNasCert2,
                                        &sNasCert3,  &sNasCert0, &sNasCert8,  &sNasCert7,  &sNasCert4, &sNasCert5 };
     DWCHttp *http = arg;
@@ -988,8 +991,8 @@ static void func_ov011_0216a748(void *arg) {
     if (timeout <= 0) {
         timeout = 60000;
     }
-    func_ov011_0216a640(http);
-    ip = func_ov011_0216a68c(http);
+    DWCi_Http_RegisterSocket(http);
+    ip = DWCi_Http_ResolveHost(http);
     if (ip == 0) {
         http->result = 2;
         return;
@@ -998,7 +1001,7 @@ static void func_ov011_0216a748(void *arg) {
     CPS_SocUse();
     if (http->secure == 1) {
         MI_CpuFill8(&http->con, 0, sizeof(DWCHttpSslConnection));
-        http->con.validateCertificate = func_ov011_0216ac28;
+        http->con.validateCertificate = DWCi_Http_VerifyCertificate;
         http->con.hostname = http->host;
         soc->con = &http->con;
         CPS_SslSetNamedParams(sNasRootCerts, 12);
@@ -1018,7 +1021,7 @@ static void func_ov011_0216a748(void *arg) {
         goto cleanup;
     }
     CPS_SocFlush();
-    if (!func_ov011_0216a5ec(http)) {
+    if (!DWCi_Http_SleepUnlessAborted(http)) {
         http->result = 7;
         goto cleanup;
     }
@@ -1055,7 +1058,7 @@ static void func_ov011_0216a748(void *arg) {
                 http->bodyLength += size;
                 OS_UnlockMutex(&http->lock);
             } else {
-                headersDone = func_ov011_0216a69c(http);
+                headersDone = DWCi_Http_ParseContentLength(http);
             }
             if (length > size) {
                 CPS_SocConsume(length);
@@ -1070,7 +1073,7 @@ static void func_ov011_0216a748(void *arg) {
             http->result = 6;
             goto cleanup;
         }
-        if (!func_ov011_0216a5ec(http)) {
+        if (!DWCi_Http_SleepUnlessAborted(http)) {
             http->result = 7;
             goto cleanup;
         }
@@ -1088,13 +1091,13 @@ cleanup:
     CPS_SocUnRegister();
 }
 
-static void func_ov011_0216a984(DWCHttp *http) {
+static void DWC_Http_Destroy(DWCHttp *http) {
     DWCHttpFree free = http->param.free;
 
     if (http != NULL) {
-        func_ov011_0216b100(http, http->fields, 0x20);
-        func_ov011_0216ac70(http, &http->response);
-        func_ov011_0216ac70(http, &http->request);
+        DWCi_Http_FreeLabelValues(http, http->fields, 0x20);
+        DWCi_Http_FreeBuffer(http, &http->response);
+        DWCi_Http_FreeBuffer(http, &http->request);
         if (http->rcvBuffer != NULL) {
             free(0, http->rcvBuffer, 0);
             http->rcvBuffer = NULL;
@@ -1107,7 +1110,7 @@ static void func_ov011_0216a984(DWCHttp *http) {
     }
 }
 
-static int func_ov011_0216a9f4(DWCHttp *http) {
+static int DWCi_Http_MakeRequestLine(DWCHttp *http) {
     DWCHttpBuffer *request = &http->request;
     const char *format = "POST /%s HTTP/1.0\r\nContent-type: application/x-www-form-urlencoded\r\nHost: %s\r\n\r\n";
     int length;
@@ -1116,14 +1119,14 @@ static int func_ov011_0216a9f4(DWCHttp *http) {
         format = "GET /%s HTTP/1.0\r\nHost: %s\r\n\r\n";
     }
     length = strlen(http->host) + (strlen(format) - 4 + strlen(http->path));
-    if (func_ov011_0216ac3c(http, &http->request, length + 0x400) != 1) {
+    if (DWCi_Http_AllocBuffer(http, &http->request, length + 0x400) != 1) {
         return 1;
     }
     request->cur += OS_SNPrintf(request->cur, request->capacity, format, http->path, http->host);
     return 0;
 }
 
-static int func_ov011_0216aa80(DWCHttp *http, const char *name, const char *value) {
+static int DWC_Http_Add_HeaderItem(DWCHttp *http, const char *name, const char *value) {
     int length;
     DWCHttpBuffer *request = &http->request;
     char *line;
@@ -1131,7 +1134,7 @@ static int func_ov011_0216aa80(DWCHttp *http, const char *name, const char *valu
 
     length = strlen(value) + (strlen("%s: %s\r\n") - 4 + strlen(name));
     if (length + 1 > request->end - request->cur) {
-        if (func_ov011_0216ac94(http, request, length - (request->end - request->cur) + 1) == 0) {
+        if (DWCi_Http_GrowBuffer(http, request, length - (request->end - request->cur) + 1) == 0) {
             return 1;
         }
     }
@@ -1143,7 +1146,7 @@ static int func_ov011_0216aa80(DWCHttp *http, const char *name, const char *valu
     return 0;
 }
 
-static int func_ov011_0216ab18(DWCHttp *http, const char *name, const void *value, int size) {
+static int DWC_Http_Add_PostBase64Item(DWCHttp *http, const char *name, const void *value, int size) {
     DWCHttpBuffer *request = &http->request;
     const char *format = "%s=";
     int encoded;
@@ -1158,7 +1161,7 @@ static int func_ov011_0216ab18(DWCHttp *http, const char *name, const void *valu
     length = encoded + (strlen(format) - 2 + strlen(name));
     room = request->end - request->cur;
     if (length > room) {
-        if (func_ov011_0216ac94(http, request, length - room + 1) == 0) {
+        if (DWCi_Http_GrowBuffer(http, request, length - room + 1) == 0) {
             return 1;
         }
         room = request->end - request->cur;
@@ -1172,7 +1175,7 @@ static int func_ov011_0216ab18(DWCHttp *http, const char *name, const void *valu
     return 0;
 }
 
-static int func_ov011_0216abcc(DWCHttp *http, const char *text) {
+static int DWC_Http_Add_Body(DWCHttp *http, const char *text) {
     int length;
     DWCHttpBuffer *request = &http->request;
     int room;
@@ -1181,7 +1184,7 @@ static int func_ov011_0216abcc(DWCHttp *http, const char *text) {
     length = strlen(text);
     room = request->end - request->cur;
     if (length > room) {
-        if (func_ov011_0216ac94(http, request, length - room + 1) == 0) {
+        if (DWCi_Http_GrowBuffer(http, request, length - room + 1) == 0) {
             return 1;
         }
         room = request->end - request->cur;
@@ -1194,14 +1197,14 @@ static int func_ov011_0216abcc(DWCHttp *http, const char *text) {
     return 0;
 }
 
-static int func_ov011_0216ac28(int result, DWCHttpSslConnection *con, int index) {
+static int DWCi_Http_VerifyCertificate(int result, DWCHttpSslConnection *con, int index) {
     if (result & 0x8000) {
         result &= ~0x8000;
     }
     return result;
 }
 
-static int func_ov011_0216ac3c(DWCHttp *http, DWCHttpBuffer *buffer, int size) {
+static int DWCi_Http_AllocBuffer(DWCHttp *http, DWCHttpBuffer *buffer, int size) {
     DWCHttpAlloc alloc = http->param.alloc;
 
     if (size == 0) {
@@ -1217,7 +1220,7 @@ static int func_ov011_0216ac3c(DWCHttp *http, DWCHttpBuffer *buffer, int size) {
     return 1;
 }
 
-static void func_ov011_0216ac70(DWCHttp *http, DWCHttpBuffer *buffer) {
+static void DWCi_Http_FreeBuffer(DWCHttp *http, DWCHttpBuffer *buffer) {
     DWCHttpFree free = http->param.free;
 
     if (buffer->start != NULL) {
@@ -1226,7 +1229,7 @@ static void func_ov011_0216ac70(DWCHttp *http, DWCHttpBuffer *buffer) {
     MI_CpuFill8(buffer, 0, sizeof(DWCHttpBuffer));
 }
 
-static int func_ov011_0216ac94(DWCHttp *http, DWCHttpBuffer *buffer, int extra) {
+static int DWCi_Http_GrowBuffer(DWCHttp *http, DWCHttpBuffer *buffer, int extra) {
     DWCHttpAlloc alloc = http->param.alloc;
     DWCHttpFree free = http->param.free;
     char *start;
@@ -1250,7 +1253,7 @@ static int func_ov011_0216ac94(DWCHttp *http, DWCHttpBuffer *buffer, int extra) 
     return 1;
 }
 
-static int func_ov011_0216acf4(DWCHttp *http, const char *url) {
+static int DWCi_Http_ParseUrl(DWCHttp *http, const char *url) {
     char *port = NULL;
     char *found;
 
@@ -1292,7 +1295,7 @@ static int func_ov011_0216acf4(DWCHttp *http, const char *url) {
     return 1;
 }
 
-static int func_ov011_0216addc(DWCHttp *http, NasFieldTable *table, const char *name, const char *value) {
+static int DWCi_Http_AddLabelValue(DWCHttp *http, NasFieldTable *table, const char *name, const char *value) {
     DWCHttpAlloc alloc = http->param.alloc;
     DWCHttpFree free = http->param.free;
 
@@ -1320,7 +1323,7 @@ static int func_ov011_0216addc(DWCHttp *http, NasFieldTable *table, const char *
     return 0;
 }
 
-static int func_ov011_0216aea0(DWCHttp *http, int headersOnly) {
+static int DWC_Http_ParseResult(DWCHttp *http, int headersOnly) {
     NasFieldTable table;
     char savedColon;
     char savedEnd;
@@ -1351,7 +1354,7 @@ static int func_ov011_0216aea0(DWCHttp *http, int headersOnly) {
     status = space + 1;
     saved = status[3];
     status[3] = 0;
-    if (func_ov011_0216addc(http, &table, "httpresult", status) != 1) {
+    if (DWCi_Http_AddLabelValue(http, &table, "httpresult", status) != 1) {
         status[3] = saved;
         return 0;
     }
@@ -1383,7 +1386,7 @@ static int func_ov011_0216aea0(DWCHttp *http, int headersOnly) {
         }
         savedEnd = *eol;
         *eol = 0;
-        if (func_ov011_0216addc(http, &table, line, value) != 1) {
+        if (DWCi_Http_AddLabelValue(http, &table, line, value) != 1) {
             *colon = savedColon;
             *eol = savedEnd;
             return 0;
@@ -1413,7 +1416,7 @@ static int func_ov011_0216aea0(DWCHttp *http, int headersOnly) {
             savedEnd = *amp;
             *amp = 0;
         }
-        if (func_ov011_0216addc(http, &table, name, value) != 1) {
+        if (DWCi_Http_AddLabelValue(http, &table, name, value) != 1) {
             *equals = savedEquals;
             if (amp != NULL) {
                 *amp = savedEnd;
@@ -1429,7 +1432,7 @@ static int func_ov011_0216aea0(DWCHttp *http, int headersOnly) {
     return 1;
 }
 
-static const char *func_ov011_0216b068(DWCHttp *http, const char *name) {
+static const char *DWC_Http_GetResult(DWCHttp *http, const char *name) {
     int i;
 
     for (i = 0; i < 32; i++) {
@@ -1443,8 +1446,8 @@ static const char *func_ov011_0216b068(DWCHttp *http, const char *name) {
     return NULL;
 }
 
-static int func_ov011_0216b0a0(DWCHttp *http, const char *name, char *dest, int size) {
-    const char *value = func_ov011_0216b068(http, name);
+static int DWC_Http_GetBase64DecodedResult(DWCHttp *http, const char *name, char *dest, int size) {
+    const char *value = DWC_Http_GetResult(http, name);
     u32 length;
 
     if (value == NULL) {
@@ -1457,8 +1460,8 @@ static int func_ov011_0216b0a0(DWCHttp *http, const char *name, char *dest, int 
     return length;
 }
 
-static int func_ov011_0216b0d4(DWCHttp *http, const char *name, char *dest, int size) {
-    const char *value = func_ov011_0216b068(http, name);
+static int DWC_Http_GetRawResult(DWCHttp *http, const char *name, char *dest, int size) {
+    const char *value = DWC_Http_GetResult(http, name);
     int length;
 
     if (value == NULL) {
@@ -1472,7 +1475,7 @@ static int func_ov011_0216b0d4(DWCHttp *http, const char *name, char *dest, int 
     return 1;
 }
 
-static void func_ov011_0216b100(DWCHttp *http, DWCHttpLabelValue *fields, int count) {
+static void DWCi_Http_FreeLabelValues(DWCHttp *http, DWCHttpLabelValue *fields, int count) {
     DWCHttpFree free = http->param.free;
     int i;
 
@@ -1488,7 +1491,7 @@ static void func_ov011_0216b100(DWCHttp *http, DWCHttpLabelValue *fields, int co
     }
 }
 
-int func_ov011_0216b14c(const DWCAcMemFuncs *init) {
+int DWC_Netcheck_Create(const DWCAcMemFuncs *init) {
     DWCHttpAlloc alloc = init->alloc;
 
     if (sPr.work != NULL) {
@@ -1510,19 +1513,19 @@ int func_ov011_0216b14c(const DWCAcMemFuncs *init) {
     }
     sSendSsid = 0;
     OS_InitMutex(&sPr.work->lock);
-    func_ov011_0216b2e0();
+    DWCi_Netcheck_StartThread();
     return 0;
 }
 
-void func_ov011_0216b1d4(void) {
+void DWC_Netcheck_Destroy(void) {
     DWCHttpFree free = sPr.work->memFuncs.free;
 
     if (sPr.http != NULL) {
-        func_ov011_0216a984(sPr.http);
+        DWC_Http_Destroy(sPr.http);
         free(0, sPr.http, 0);
         sPr.http = NULL;
     }
-    func_ov011_02169668();
+    DWC_Auth_Destroy();
     if (sPr.work != NULL) {
         if (sPr.work->redirectUrl != NULL) {
             free(0, sPr.work->redirectUrl, 0);
@@ -1537,12 +1540,12 @@ void func_ov011_0216b1d4(void) {
     }
 }
 
-void func_ov011_0216b24c(void) {
+void DWC_Netcheck_Abort(void) {
     if (sPr.work != NULL) {
         if (sPr.http != NULL) {
-            func_ov011_0216a5c0(sPr.http);
+            DWC_Http_Abort(sPr.http);
         }
-        func_ov011_02169604();
+        DWC_Auth_Abort();
         if (sPr.work->thread.id != 0 && !OS_IsThreadTerminated(&sPr.work->thread)) {
             OS_JoinThread(&sPr.work->thread);
         }
@@ -1550,7 +1553,7 @@ void func_ov011_0216b24c(void) {
     }
 }
 
-u32 func_ov011_0216b2a4(void) {
+u32 DWC_Netcheck_GetError(void) {
     int state;
 
     OS_LockMutex(&sPr.work->lock);
@@ -1559,13 +1562,13 @@ u32 func_ov011_0216b2a4(void) {
     return state;
 }
 
-u32 func_ov011_0216b2cc(void) {
+u32 DWC_Netcheck_GetReturnCode(void) {
     return sPr.work->result;
 }
 
-static void func_ov011_0216b2e0(void) {
+static void DWCi_Netcheck_StartThread(void) {
     if (sPr.work->thread.id == 0 || OS_IsThreadTerminated(&sPr.work->thread)) {
-        OS_CreateThread(&sPr.work->thread, func_ov011_0216b334, sPr.work, sPr.work->stack + 0x1000, 0x1000, 16);
+        OS_CreateThread(&sPr.work->thread, DWCi_Netcheck_Thread, sPr.work, sPr.work->stack + 0x1000, 0x1000, 16);
         OS_WakeupThreadDirect(&sPr.work->thread);
     }
 }
@@ -1576,7 +1579,7 @@ static struct {
     const char *url;
 } sConnTest = { 1, "http://conntest.nintendowifi.net/" };
 
-static void func_ov011_0216b334(void *arg) {
+static void DWCi_Netcheck_Thread(void *arg) {
     DWCHttpAlloc alloc = sPr.work->memFuncs.alloc;
     DWCHttpFree free = sPr.work->memFuncs.free;
     char *url = NULL;
@@ -1603,10 +1606,10 @@ static void func_ov011_0216b334(void *arg) {
         sPrConfig.free = free;
         sPrConfig.timeout = 20000;
         sPr.work->result = -2;
-        if (func_ov011_0216a408(sPr.http, &sPrConfig) != 0 || func_ov011_0216a4d0(sPr.http) != 0) {
+        if (DWC_Http_Create(sPr.http, &sPrConfig) != 0 || DWC_Http_FinishHeader(sPr.http) != 0) {
             break;
         }
-        func_ov011_0216a53c(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+        DWC_Http_StartThread(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
         if (sPr.http->thread.id != 0 && !OS_IsThreadTerminated(&sPr.http->thread)) {
             OS_JoinThread(&sPr.http->thread);
         }
@@ -1617,17 +1620,17 @@ static void func_ov011_0216b334(void *arg) {
         if (sPr.http->result != 8) {
             goto closed;
         }
-        if (func_ov011_0216aea0(sPr.http, 0) != 1) {
+        if (DWC_Http_ParseResult(sPr.http, 0) != 1) {
             goto badResponse;
         }
-        status = atol(func_ov011_0216b068(sPr.http, "httpresult"));
+        status = atol(DWC_Http_GetResult(sPr.http, "httpresult"));
         if (errno == ERANGE) {
             goto reportBadResponse;
         }
         if (status == 200) {
             sPr.ip = sPr.http->ip;
         } else if (status != 302) {
-            func_ov011_0216a984(sPr.http);
+            DWC_Http_Destroy(sPr.http);
             code = 10;
             goto done;
         } else {
@@ -1644,7 +1647,7 @@ static void func_ov011_0216b334(void *arg) {
                 strncpy(sPr.work->redirectUrl, location, strlen(location) + 1);
             } else {
                 sPr.work->result = -6;
-                func_ov011_0216a984(sPr.http);
+                DWC_Http_Destroy(sPr.http);
                 sPrConfig.url = sConfig.url;
                 sPrConfig.get = 0;
                 sPrConfig.bufferSize = 0x200;
@@ -1654,42 +1657,42 @@ static void func_ov011_0216b334(void *arg) {
                 if (strcmp(sConfig.url, "https://nas.nintendowifi.net/ac") != 0) {
                     sPrConfig.ignoreCa = 1;
                 }
-                if (func_ov011_0216a408(sPr.http, &sPrConfig) != 0) {
+                if (DWC_Http_Create(sPr.http, &sPrConfig) != 0) {
                     goto noRequest;
                 }
-                if (!func_ov011_02169fc8(&info) || !func_ov011_0216a1a4(sPr.http, &info, 1)) {
-                    func_ov011_0216a984(sPr.http);
+                if (!DWCi_Auth_GetCurrentInfo(&info) || !DWCi_Auth_AddCommonItems(sPr.http, &info, 1)) {
+                    DWC_Http_Destroy(sPr.http);
                     code = 8;
                     goto done;
                 }
-                if (func_ov011_0216ab18(sPr.http, "action", "message", 7) != 0) {
+                if (DWC_Http_Add_PostBase64Item(sPr.http, "action", "message", 7) != 0) {
                     goto badRequest;
                 }
-                if (func_ov011_0216ab18(sPr.http, "HotSpotResponse", sPr.work->hotspotUrl,
-                                        strlen(sPr.work->hotspotUrl)) != 0) {
+                if (DWC_Http_Add_PostBase64Item(sPr.http, "HotSpotResponse", sPr.work->hotspotUrl,
+                                                strlen(sPr.work->hotspotUrl)) != 0) {
                     goto badRequest;
                 }
                 free(0, sPr.work->hotspotUrl, 0);
                 sPr.work->hotspotUrl = NULL;
-                if (func_ov011_0216a4d0(sPr.http) != 0) {
+                if (DWC_Http_FinishHeader(sPr.http) != 0) {
                     goto noRequest;
                 }
-                func_ov011_0216a53c(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+                DWC_Http_StartThread(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
                 if (sPr.http->thread.id != 0 && !OS_IsThreadTerminated(&sPr.http->thread)) {
                     OS_JoinThread(&sPr.http->thread);
                 }
                 if (sPr.http->result == 2) {
                     sPr.work->result = -1;
                 } else if (sPr.http->result == 8) {
-                    func_ov011_0216a984(sPr.http);
+                    DWC_Http_Destroy(sPr.http);
                     code = 7;
                     goto done;
                 }
-                func_ov011_0216a984(sPr.http);
+                DWC_Http_Destroy(sPr.http);
                 goto closedCode;
             }
         }
-        func_ov011_0216a984(sPr.http);
+        DWC_Http_Destroy(sPr.http);
         DWCBm_GetWifiIdInfo(&userInfo);
         if (userInfo.id == 0) {
             sPr.work->result = -3;
@@ -1697,29 +1700,29 @@ static void func_ov011_0216b334(void *arg) {
             sPrInit.gsbrcd[0] = 0;
             sPrInit.alloc = sPr.work->memFuncs.alloc;
             sPrInit.free = sPr.work->memFuncs.free;
-            if (func_ov011_021694ec(&sPrInit, sPr.http) != 0) {
+            if (DWC_Auth_Create(&sPrInit, sPr.http) != 0) {
                 code = 5;
                 goto done;
             }
-            func_ov011_021696a0();
-            if (func_ov011_021696d0() != 0x15) {
-                if (func_ov011_021696d0() == 9) {
+            DWC_Auth_Join();
+            if (DWC_Auth_GetError() != 0x15) {
+                if (DWC_Auth_GetError() == 9) {
                     nasStatus.returnCode = -1;
                 } else {
-                    func_ov011_02169704(&nasStatus);
-                    if (sPr.unk_10 == 1 && (nasStatus.returnCode == -23302 || func_ov011_021696d0() == 0xb)) {
+                    DWC_Auth_GetResult(&nasStatus);
+                    if (sPr.allow302 == 1 && (nasStatus.returnCode == -23302 || DWC_Auth_GetError() == 0xb)) {
                         sPr.work->result = 0;
-                        func_ov011_02169668();
+                        DWC_Auth_Destroy();
                         code = 0xb;
                         goto done;
                     }
                 }
                 sPr.work->result = nasStatus.returnCode;
-                func_ov011_02169668();
+                DWC_Auth_Destroy();
                 code = 6;
                 goto done;
             }
-            func_ov011_02169668();
+            DWC_Auth_Destroy();
         }
         if (status == 200) {
             goto finished;
@@ -1734,22 +1737,22 @@ static void func_ov011_0216b334(void *arg) {
         if (strcmp(sConfig.url, "https://nas.nintendowifi.net/ac") != 0) {
             sPrConfig.ignoreCa = 1;
         }
-        if (func_ov011_0216a408(sPr.http, &sPrConfig) != 0) {
+        if (DWC_Http_Create(sPr.http, &sPrConfig) != 0) {
             break;
         }
-        if (!func_ov011_02169fc8(&info) || !func_ov011_0216a1a4(sPr.http, &info, 1) ||
-            func_ov011_0216ab18(sPr.http, "action", "parse", 5) != 0) {
+        if (!DWCi_Auth_GetCurrentInfo(&info) || !DWCi_Auth_AddCommonItems(sPr.http, &info, 1) ||
+            DWC_Http_Add_PostBase64Item(sPr.http, "action", "parse", 5) != 0) {
             goto badRequest;
         }
-        if (func_ov011_0216ab18(sPr.http, "HTML", sPr.work->redirectUrl, strlen(sPr.work->redirectUrl)) != 0) {
+        if (DWC_Http_Add_PostBase64Item(sPr.http, "HTML", sPr.work->redirectUrl, strlen(sPr.work->redirectUrl)) != 0) {
             goto badRequest;
         }
         free(0, sPr.work->redirectUrl, 0);
         sPr.work->redirectUrl = NULL;
-        if (func_ov011_0216a4d0(sPr.http) != 0) {
+        if (DWC_Http_FinishHeader(sPr.http) != 0) {
             break;
         }
-        func_ov011_0216a53c(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+        DWC_Http_StartThread(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
         if (sPr.http->thread.id != 0 && !OS_IsThreadTerminated(&sPr.http->thread)) {
             OS_JoinThread(&sPr.http->thread);
         }
@@ -1759,8 +1762,8 @@ static void func_ov011_0216b334(void *arg) {
             goto closed;
         }
         if (status == 3) {
-            func_ov011_0216a984(sPr.http);
-            if (sPr.unk_10 != 1) {
+            DWC_Http_Destroy(sPr.http);
+            if (sPr.allow302 != 1) {
                 goto closedCode;
             }
             goto finished;
@@ -1768,44 +1771,44 @@ static void func_ov011_0216b334(void *arg) {
         if (status != 8) {
             goto closed;
         }
-        if (func_ov011_0216aea0(sPr.http, 0) != 1) {
+        if (DWC_Http_ParseResult(sPr.http, 0) != 1) {
             goto badResponse;
         }
-        status = atol(func_ov011_0216b068(sPr.http, "httpresult"));
+        status = atol(DWC_Http_GetResult(sPr.http, "httpresult"));
         if (errno == ERANGE) {
             goto badResponse;
         }
         if (status != 200) {
-            func_ov011_0216a984(sPr.http);
-            if (sPr.unk_10 != 1 || status != 302) {
+            DWC_Http_Destroy(sPr.http);
+            if (sPr.allow302 != 1 || status != 302) {
                 goto reportBadResponse;
             }
             goto finished;
         }
-        if (func_ov011_0216b0a0(sPr.http, "returncd", returnText, 4) <= 0) {
+        if (DWC_Http_GetBase64DecodedResult(sPr.http, "returncd", returnText, 4) <= 0) {
             goto badAnswer;
         }
         returnCode = atol(returnText);
         if (errno == ERANGE) {
             goto badAnswer;
         }
-        if (sPr.unk_10 == 1 && returnCode == 0x72) {
+        if (sPr.allow302 == 1 && returnCode == 0x72) {
             goto finished;
         }
         if (returnCode >= 100) {
-            func_ov011_0216a984(sPr.http);
+            DWC_Http_Destroy(sPr.http);
             code = 6;
             goto done;
         }
-        length = func_ov011_0216b0a0(sPr.http, "url", NULL, 0);
+        length = DWC_Http_GetBase64DecodedResult(sPr.http, "url", NULL, 0);
         if (length <= 0) {
             goto badAnswer;
         }
-        dataLength = func_ov011_0216b0a0(sPr.http, "data", NULL, 0);
+        dataLength = DWC_Http_GetBase64DecodedResult(sPr.http, "data", NULL, 0);
         if (dataLength <= 0) {
             goto badAnswer;
         }
-        waitLength = func_ov011_0216b0a0(sPr.http, "wait", NULL, 0);
+        waitLength = DWC_Http_GetBase64DecodedResult(sPr.http, "wait", NULL, 0);
         url = alloc(0, length + 1);
         if (url == NULL) {
             goto noMemory;
@@ -1820,19 +1823,19 @@ static void func_ov011_0216b334(void *arg) {
                 goto noMemory;
             }
         }
-        length = func_ov011_0216b0a0(sPr.http, "url", url, length + 1);
+        length = DWC_Http_GetBase64DecodedResult(sPr.http, "url", url, length + 1);
         if (length < 0) {
             goto badAnswer;
         }
         url[length] = 0;
-        length = func_ov011_0216b0a0(sPr.http, "data", data, dataLength + 1);
+        length = DWC_Http_GetBase64DecodedResult(sPr.http, "data", data, dataLength + 1);
         if (length < 0) {
             goto badAnswer;
         }
         data[length] = 0;
         waitMs = 0;
         if (waitLength > 0) {
-            length = func_ov011_0216b0a0(sPr.http, "wait", waitText, waitLength + 1);
+            length = DWC_Http_GetBase64DecodedResult(sPr.http, "wait", waitText, waitLength + 1);
             if (length < 0) {
                 goto badAnswer;
             }
@@ -1846,7 +1849,7 @@ static void func_ov011_0216b334(void *arg) {
                 waitMs = 180000;
             }
         }
-        func_ov011_0216a984(sPr.http);
+        DWC_Http_Destroy(sPr.http);
         sPr.work->result = -5;
         sPrConfig.url = url;
         sPrConfig.get = 0;
@@ -1854,16 +1857,16 @@ static void func_ov011_0216b334(void *arg) {
         sPrConfig.alloc = alloc;
         sPrConfig.free = free;
         sPrConfig.timeout = 120000;
-        if (func_ov011_0216a408(sPr.http, &sPrConfig) != 0) {
+        if (DWC_Http_Create(sPr.http, &sPrConfig) != 0) {
             break;
         }
-        if (func_ov011_0216abcc(sPr.http, data) != 0) {
+        if (DWC_Http_Add_Body(sPr.http, data) != 0) {
             goto badRequest;
         }
-        if (func_ov011_0216a4d0(sPr.http) != 0) {
+        if (DWC_Http_FinishHeader(sPr.http) != 0) {
             break;
         }
-        func_ov011_0216a53c(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+        DWC_Http_StartThread(sPr.http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
         if (sPr.http->thread.id != 0 && !OS_IsThreadTerminated(&sPr.http->thread)) {
             OS_JoinThread(&sPr.http->thread);
         }
@@ -1874,7 +1877,7 @@ static void func_ov011_0216b334(void *arg) {
         if (sPr.http->result != 8) {
             goto closed;
         }
-        if (func_ov011_0216aea0(sPr.http, 1) != 1) {
+        if (DWC_Http_ParseResult(sPr.http, 1) != 1) {
             goto badResponse;
         }
         location = sPr.http->response.start;
@@ -1886,40 +1889,40 @@ static void func_ov011_0216b334(void *arg) {
             goto noMemory;
         }
         strncpy(sPr.work->hotspotUrl, location, strlen(location) + 1);
-        func_ov011_0216a984(sPr.http);
+        DWC_Http_Destroy(sPr.http);
         OS_Sleep(waitMs);
     }
 noRequest:
-    func_ov011_0216a984(sPr.http);
+    DWC_Http_Destroy(sPr.http);
     code = 1;
     goto done;
 closed:
-    func_ov011_0216a984(sPr.http);
+    DWC_Http_Destroy(sPr.http);
 closedCode:
     code = 3;
     goto done;
 badResponse:
-    func_ov011_0216a984(sPr.http);
+    DWC_Http_Destroy(sPr.http);
 reportBadResponse:
     code = 2;
     goto done;
 noMemory:
-    func_ov011_0216a984(sPr.http);
+    DWC_Http_Destroy(sPr.http);
     code = 4;
     goto done;
 badRequest:
-    func_ov011_0216a984(sPr.http);
+    DWC_Http_Destroy(sPr.http);
     code = 8;
     goto done;
 badAnswer:
-    func_ov011_0216a984(sPr.http);
+    DWC_Http_Destroy(sPr.http);
     code = 9;
     goto done;
 finished:
     sPr.work->result = 0;
     code = 0xb;
 done:
-    func_ov011_0216bbb8(code);
+    DWCi_Netcheck_SetError(code);
     if (url != NULL) {
         free(0, url, 0);
     }
@@ -1931,14 +1934,14 @@ done:
     }
 }
 
-static void func_ov011_0216bbb8(int state) {
+static void DWCi_Netcheck_SetError(int state) {
     OS_LockMutex(&sPr.work->lock);
     sPr.work->state = state;
     OS_UnlockMutex(&sPr.work->lock);
 }
 
-static BOOL func_ov011_0216bbe4(const u16 **words, int count, const char *type, int timeout, char *flags,
-                                int *profaneCount, const char *region) {
+static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *type, int timeout, char *flags,
+                                   int *profaneCount, const char *region) {
     u16 *joined = NULL;
     int total = 0;
     int limit;
@@ -1978,17 +1981,17 @@ static BOOL func_ov011_0216bbe4(const u16 **words, int count, const char *type, 
             config.url = sWords->url;
             config.get = 0;
             config.bufferSize = 0x400;
-            config.alloc = func_ov011_0216c13c;
-            config.free = func_ov011_0216c148;
+            config.alloc = DWCi_Prof_Alloc;
+            config.free = DWCi_Prof_Free;
             config.ignoreCa = 0;
             config.timeout = timeout > 0 ? timeout : 10000;
-            if (func_ov011_0216a408(&sWords->http, &config) == 0) {
+            if (DWC_Http_Create(&sWords->http, &config) == 0) {
                 sWords->active = 1;
-                if (func_ov011_02169fc8(&info) && func_ov011_0216a1a4(&sWords->http, &info, sSendSsid) &&
-                    func_ov011_0216ab18(&sWords->http, "wregion", region, 1) == 0 &&
-                    func_ov011_0216ab18(&sWords->http, "wenc", "UTF-16LE", 8) == 0 &&
-                    (type == NULL || func_ov011_0216ab18(&sWords->http, "wtype", type, 4) == 0) &&
-                    func_ov011_0216abcc(&sWords->http, "&wtype=") == 0) {
+                if (DWCi_Auth_GetCurrentInfo(&info) && DWCi_Auth_AddCommonItems(&sWords->http, &info, sSendSsid) &&
+                    DWC_Http_Add_PostBase64Item(&sWords->http, "wregion", region, 1) == 0 &&
+                    DWC_Http_Add_PostBase64Item(&sWords->http, "wenc", "UTF-16LE", 8) == 0 &&
+                    (type == NULL || DWC_Http_Add_PostBase64Item(&sWords->http, "wtype", type, 4) == 0) &&
+                    DWC_Http_Add_Body(&sWords->http, "&wtype=") == 0) {
                     joined = DWC_Alloc(0, total * 2);
                     if (joined != NULL) {
                         position = 0;
@@ -2001,11 +2004,11 @@ static BOOL func_ov011_0216bbe4(const u16 **words, int count, const char *type, 
                             joined[next] = 9;
                             position = next + 1;
                         }
-                        if (func_ov011_0216ab18(&sWords->http, "words", joined, (total - 1) * 2) == 0) {
+                        if (DWC_Http_Add_PostBase64Item(&sWords->http, "words", joined, (total - 1) * 2) == 0) {
                             DWC_Free(0, joined, 0);
                             joined = NULL;
-                            if (func_ov011_0216a4d0(&sWords->http) == 0) {
-                                func_ov011_0216a53c(&sWords->http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+                            if (DWC_Http_FinishHeader(&sWords->http) == 0) {
+                                DWC_Http_StartThread(&sWords->http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
                                 if (sWords->http.thread.id != 0) {
                                     return TRUE;
                                 }
@@ -2021,7 +2024,7 @@ static BOOL func_ov011_0216bbe4(const u16 **words, int count, const char *type, 
     }
     if (sWords != NULL) {
         if (sWords->active == 1) {
-            func_ov011_0216a984(&sWords->http);
+            DWC_Http_Destroy(&sWords->http);
         }
         DWC_Free(0, sWords, 0);
         sWords = NULL;
@@ -2029,8 +2032,8 @@ static BOOL func_ov011_0216bbe4(const u16 **words, int count, const char *type, 
     return FALSE;
 }
 
-BOOL func_ov011_0216bea4(const u16 **words, int count, const char *type, int timeout, char *flags, int *profaneCount,
-                         int mode) {
+BOOL DWC_CheckProfanityExAsync(const u16 **words, int count, const char *type, int timeout, char *flags,
+                               int *profaneCount, int mode) {
     char region;
 
     if (mode == 0x80) {
@@ -2038,10 +2041,10 @@ BOOL func_ov011_0216bea4(const u16 **words, int count, const char *type, int tim
     } else {
         region = ROM_REGION;
     }
-    return func_ov011_0216bbe4(words, count, type, timeout, flags, profaneCount, &region);
+    return DWCi_Prof_StartRequest(words, count, type, timeout, flags, profaneCount, &region);
 }
 
-int func_ov011_0216bed4(void) {
+int DWC_CheckProfanityProcess(void) {
     int result;
     u32 code;
 
@@ -2055,7 +2058,7 @@ int func_ov011_0216bed4(void) {
         }
         switch (sWords->http.result) {
         case DWC_HTTP_DONE:
-            if (!func_ov011_0216bf90()) {
+            if (!DWCi_Prof_ParseResult()) {
                 result = 3;
             } else {
                 result = 2;
@@ -2079,13 +2082,13 @@ int func_ov011_0216bed4(void) {
     } else {
         return 1;
     }
-    func_ov011_0216a984(&sWords->http);
+    DWC_Http_Destroy(&sWords->http);
     DWC_Free(0, sWords, 0);
     sWords = NULL;
     return result;
 }
 
-static BOOL func_ov011_0216bf90(void) {
+static BOOL DWCi_Prof_ParseResult(void) {
     const char *names[8] = { "prwordsJ", "prwordsE", "prwordsP", "prwordsK", "prwordsC" };
     int gotAny = 0;
     u32 i;
@@ -2098,18 +2101,18 @@ static BOOL func_ov011_0216bf90(void) {
     int status;
     int j;
 
-    if (func_ov011_0216aea0(http, 0) != 0) {
-        text = func_ov011_0216b068(http, "Date");
+    if (DWC_Http_ParseResult(http, 0) != 0) {
+        text = DWC_Http_GetResult(http, "Date");
         if (text != NULL) {
-            func_ov011_0215dffc(text);
+            DWCi_SetNasTimeFromDateHeader(text);
         }
-        text = func_ov011_0216b068(http, "httpresult");
+        text = DWC_Http_GetResult(http, "httpresult");
         if (text != NULL) {
             status = atol(text);
             if (errno == ERANGE || status != 200) {
                 goto fail;
             }
-            length = func_ov011_0216b0a0(http, "returncd", returnText, 4);
+            length = DWC_Http_GetBase64DecodedResult(http, "returncd", returnText, 4);
             if (length > 0) {
                 returnCode = atol(returnText);
                 if (errno != 0x22) {
@@ -2119,7 +2122,7 @@ static BOOL func_ov011_0216bf90(void) {
                     }
                     for (i = 0; i < 7; i++) {
                         if (names[i] != NULL) {
-                            length = func_ov011_0216b0a0(http, names[i], flagText, 0x33);
+                            length = DWC_Http_GetBase64DecodedResult(http, names[i], flagText, 0x33);
                             if (length < 0) {
                                 goto fail;
                             }
@@ -2136,7 +2139,7 @@ static BOOL func_ov011_0216bf90(void) {
                             }
                         }
                     }
-                    length = func_ov011_0216b0a0(http, "prwords", flagText, 0x33);
+                    length = DWC_Http_GetBase64DecodedResult(http, "prwords", flagText, 0x33);
                     if (length < 0 || length == 0 || length < sWords->count) {
                         goto fail;
                     }
@@ -2161,15 +2164,15 @@ fail:
     return FALSE;
 }
 
-static void *func_ov011_0216c13c(u32 name, u32 size) {
+static void *DWCi_Prof_Alloc(u32 name, u32 size) {
     return DWC_Alloc(0, size);
 }
 
-static void func_ov011_0216c148(u32 name, void *ptr, u32 size) {
+static void DWCi_Prof_Free(u32 name, void *ptr, u32 size) {
     DWC_Free(0, ptr, size);
 }
 
-BOOL func_ov011_0216c154(DWCHttpAlloc alloc, DWCHttpFree free) {
+BOOL DWC_Svl_Init(DWCHttpAlloc alloc, DWCHttpFree free) {
     if (sLocator != NULL) {
         DWCi_SetError(9, -24100);
         return FALSE;
@@ -2185,15 +2188,15 @@ BOOL func_ov011_0216c154(DWCHttpAlloc alloc, DWCHttpFree free) {
     return TRUE;
 }
 
-void func_ov011_0216c1a8(void) {
+void DWC_Svl_Cleanup(void) {
     if (sLocator != NULL) {
-        func_ov011_0216a984(&sLocator->http);
+        DWC_Http_Destroy(&sLocator->http);
         sLocator->free(0, sLocator, 0);
         sLocator = NULL;
     }
 }
 
-BOOL func_ov011_0216c1cc(const char *service, DWCSvlResult *result) {
+BOOL DWC_Svl_GetTokenAsync(const char *service, DWCSvlResult *result) {
     DWCHttpParam config;
     NasAuthInfo info;
     NasLocator *locator;
@@ -2215,36 +2218,36 @@ BOOL func_ov011_0216c1cc(const char *service, DWCSvlResult *result) {
         config.ignoreCa = 0;
     }
     config.timeout = 20000;
-    if (func_ov011_0216a408(&locator->http, &config) != 0) {
+    if (DWC_Http_Create(&locator->http, &config) != 0) {
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    if (!func_ov011_02169fc8(&info) || !func_ov011_0216a1a4(&sLocator->http, &info, 0)) {
-        func_ov011_0216a984(&sLocator->http);
+    if (!DWCi_Auth_GetCurrentInfo(&info) || !DWCi_Auth_AddCommonItems(&sLocator->http, &info, 0)) {
+        DWC_Http_Destroy(&sLocator->http);
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    if (func_ov011_0216ab18(&sLocator->http, "action", "SVCLOC", 6) != 0 ||
-        func_ov011_0216ab18(&sLocator->http, "svc", service, 4) != 0) {
-        func_ov011_0216a984(&sLocator->http);
+    if (DWC_Http_Add_PostBase64Item(&sLocator->http, "action", "SVCLOC", 6) != 0 ||
+        DWC_Http_Add_PostBase64Item(&sLocator->http, "svc", service, 4) != 0) {
+        DWC_Http_Destroy(&sLocator->http);
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    if (func_ov011_0216a4d0(&sLocator->http) != 0) {
-        func_ov011_0216a984(&sLocator->http);
+    if (DWC_Http_FinishHeader(&sLocator->http) != 0) {
+        DWC_Http_Destroy(&sLocator->http);
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    func_ov011_0216a53c(&sLocator->http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
+    DWC_Http_StartThread(&sLocator->http, OS_GetThreadPriority(OSi_ThreadInfo.current) - 1);
     if (sLocator->http.thread.id == 0) {
-        func_ov011_0216a984(&sLocator->http);
+        DWC_Http_Destroy(&sLocator->http);
         DWCi_SetError(9, -24100);
         return FALSE;
     }
     return TRUE;
 }
 
-int func_ov011_0216c344(void) {
+int DWC_Svl_Process(void) {
     if (sLocator == NULL) {
         return 0;
     }
@@ -2254,17 +2257,17 @@ int func_ov011_0216c344(void) {
     if (OS_IsThreadTerminated(&sLocator->http.thread) == 1) {
         switch (sLocator->http.result) {
         case 8:
-            if (func_ov011_0216c3c8() == 0) {
-                func_ov011_0216a984(&sLocator->http);
+            if (DWCi_Svl_ParseResult() == 0) {
+                DWC_Http_Destroy(&sLocator->http);
                 return 4;
             }
-            func_ov011_0216a984(&sLocator->http);
+            DWC_Http_Destroy(&sLocator->http);
             return 3;
         case 7:
-            func_ov011_0216a984(&sLocator->http);
+            DWC_Http_Destroy(&sLocator->http);
             return 5;
         default:
-            func_ov011_0216a984(&sLocator->http);
+            DWC_Http_Destroy(&sLocator->http);
             DWCi_SetError(0x10, -24101);
             return 4;
         }
@@ -2272,7 +2275,7 @@ int func_ov011_0216c344(void) {
     return 2;
 }
 
-static BOOL func_ov011_0216c3c8(void) {
+static BOOL DWCi_Svl_ParseResult(void) {
     DWCHttp *http = &sLocator->http;
     char text[4];
     const char *date;
@@ -2280,15 +2283,15 @@ static BOOL func_ov011_0216c3c8(void) {
     int status;
     int returnCode;
 
-    if (func_ov011_0216aea0(http, 0) == 0) {
+    if (DWC_Http_ParseResult(http, 0) == 0) {
         DWCi_SetError(0xf, -25101);
         return FALSE;
     }
-    date = func_ov011_0216b068(http, "Date");
+    date = DWC_Http_GetResult(http, "Date");
     if (date != NULL) {
-        func_ov011_0215dffc(date);
+        DWCi_SetNasTimeFromDateHeader(date);
     }
-    httpResult = func_ov011_0216b068(http, "httpresult");
+    httpResult = DWC_Http_GetResult(http, "httpresult");
     if (httpResult == NULL) {
         DWCi_SetError(0xf, -25101);
         return FALSE;
@@ -2302,7 +2305,7 @@ static BOOL func_ov011_0216c3c8(void) {
         DWCi_SetError(0xf, -25000 - status);
         return FALSE;
     }
-    if (func_ov011_0216b0a0(http, "returncd", text, 4) <= 0) {
+    if (DWC_Http_GetBase64DecodedResult(http, "returncd", text, 4) <= 0) {
         DWCi_SetError(0xf, -25101);
         return FALSE;
     }
@@ -2315,9 +2318,9 @@ static BOOL func_ov011_0216c3c8(void) {
         DWCi_SetError(0xf, -24000 - returnCode);
         return FALSE;
     }
-    if (func_ov011_0216b0a0(http, "svchost", sLocator->result->svlhost, 0x40) < 0 ||
-        func_ov011_0216b0a0(http, "servicetoken", sLocator->result->svltoken, 0x12c) < 0 ||
-        func_ov011_0216b0a0(http, "statusdata", text, 1) < 0) {
+    if (DWC_Http_GetBase64DecodedResult(http, "svchost", sLocator->result->svlhost, 0x40) < 0 ||
+        DWC_Http_GetBase64DecodedResult(http, "servicetoken", sLocator->result->svltoken, 0x12c) < 0 ||
+        DWC_Http_GetBase64DecodedResult(http, "statusdata", text, 1) < 0) {
         DWCi_SetError(0xf, -25101);
         return FALSE;
     }

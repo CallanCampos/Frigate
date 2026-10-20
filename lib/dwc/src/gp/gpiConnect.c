@@ -190,7 +190,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     } else {
         passphrase = iconnection->password;
     }
-    func_ov011_021723e8((const u8 *)passphrase, strlen(passphrase), data->passwordHash);
+    MD5Digest((const u8 *)passphrase, strlen(passphrase), data->passwordHash);
     if (iconnection->partnerID != 0) {
         OS_SPrintf(partnerBuffer, "%d@", iconnection->partnerID);
     } else {
@@ -207,7 +207,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     }
     OS_SPrintf(buffer, "%s%s%s%s%s%s", data->passwordHash, "                                                ", user,
                data->userChallenge, data->serverChallenge, data->passwordHash);
-    func_ov011_021723e8((const u8 *)buffer, strlen(buffer), response);
+    MD5Digest((const u8 *)buffer, strlen(buffer), response);
     if (iconnection->infoCaching) {
         gpiFindProfileByUser(connection, iconnection->nick, iconnection->email, &profile);
         if (profile != NULL) {
@@ -423,7 +423,7 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
         // The server proves that it knows the password with the challenges the other way around
         OS_SPrintf(buffer, "%s%s%s%s%s%s", data->passwordHash, "                                                ", user,
                    data->serverChallenge, data->userChallenge, data->passwordHash);
-        func_ov011_021723e8((const u8 *)buffer, strlen(buffer), check);
+        MD5Digest((const u8 *)buffer, strlen(buffer), check);
         if (!gpiValueForKey(input, "\\proof\\", buffer, 0x200)) {
             GPI_UNEXPECTED_DATA(connection, "Unexepected data was received from the server.");
         }

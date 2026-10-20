@@ -179,8 +179,8 @@ void gsXmlFreeReader(SoapReader *reader) {
 }
 
 void gsXmlResetReader(SoapReader *reader) {
-    func_ov011_02171770(reader->attributes);
-    func_ov011_02171770(reader->elements);
+    ArrayClear(reader->attributes);
+    ArrayClear(reader->elements);
     gsXmlMoveToStart(reader);
 }
 
@@ -307,7 +307,7 @@ static BOOL gsiXmlUtilParseElement(SoapReader *reader, char *text, int length, i
             return FALSE;
         }
         if (store) {
-            func_ov011_0217167c(reader->elements, &element, element.index);
+            ArrayReplaceAt(reader->elements, &element, element.index);
         }
         if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
             return FALSE;

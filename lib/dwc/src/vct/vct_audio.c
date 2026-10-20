@@ -562,7 +562,7 @@ BOOL VCT_SendPending(void) {
             break;
         }
         sSendQueue.pendingMask &= ~(0x80000000 >> leading);
-        func_ov011_02168b18(31 - leading, sSendQueue.sending, sPacketSize);
+        DWC_SendUnreliable(31 - leading, sSendQueue.sending, sPacketSize);
         if (sSendQueue.pendingMask == 0) {
             sSendQueue.readIndex++;
             sSendQueue.sending = NULL;

@@ -226,7 +226,7 @@ void func_02012edc(void);
 // The device table for a GFL_NET_TYPE_*, from outside the library
 const GFLNetDevTable *NetDefine_LoadDevice(int type);
 void NetDefine_UnloadDevice(int type);
-// GFL_SndBGMSetVolume, unless a connection is up and overlay 11's func_ov011_02151dec returns TRUE
+// GFL_SndBGMSetVolume, unless a connection is up and overlay 11's DWCRap_IsVoiceChatEnabled returns TRUE
 void NetBgmVolume_Set(u16 trackMask, s32 volume);
 
 // net.c: starts and ends the network, and passes calls to the device and the other parts of the library

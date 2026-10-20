@@ -23,8 +23,8 @@ BOOL DWCAc_StepTeardown(u8 *state) {
             return TRUE;
         }
     } else if (*state == 14) {
-        func_ov011_0216b24c();
-        func_ov011_0216b1d4();
+        DWC_Netcheck_Abort();
+        DWC_Netcheck_Destroy();
         *state = 12;
     } else if (*state < 18) {
         if (DWCAc_StepSocTeardown() == TRUE) {

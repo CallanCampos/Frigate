@@ -189,7 +189,7 @@ void SBServerListSort(SBServerList *slist, BOOL ascending, SortInfo sortinfo) {
     slist->currsortinfo = sortinfo;
     slist->sortascending = ascending;
     g_sortserverlist = slist;
-    func_ov011_02171698(slist->servers, comparator);
+    ArraySort(slist->servers, comparator);
 }
 
 void SBServerListAppendServer(SBServerList *slist, SBServer *server) {
@@ -273,7 +273,7 @@ void SBServerListClear(SBServerList *slist) {
     for (i = 0; i < nservers; i++) {
         AddServerToDeadlist(slist, *(SBServer **)func_ov011_0217158c(slist->servers, i));
     }
-    func_ov011_02171770(slist->servers);
+    ArrayClear(slist->servers);
     SBFreeDeadList(slist);
 }
 
@@ -287,14 +287,14 @@ const char *SBRefStr(SBServerList *slist, const char *str) {
     SBRefString *val;
 
     ref.str = str;
-    val = func_ov011_02171964(SBRefStrHash(slist), &ref);
+    val = TableLookup(SBRefStrHash(slist), &ref);
     if (val != NULL) {
         val->refcount++;
         return val->str;
     }
     ref.str = goastrdup(str);
     ref.refcount = 1;
-    func_ov011_021718dc(SBRefStrHash(slist), &ref);
+    TableEnter(SBRefStrHash(slist), &ref);
     return ref.str;
 }
 
@@ -303,13 +303,13 @@ void SBReleaseStr(SBServerList *slist, const char *str) {
     SBRefString *val;
 
     ref.str = str;
-    val = func_ov011_02171964(SBRefStrHash(slist), &ref);
+    val = TableLookup(SBRefStrHash(slist), &ref);
     if (val == NULL) {
         return;
     }
     val->refcount--;
     if (val->refcount == 0) {
-        func_ov011_02171920(SBRefStrHash(slist), &ref);
+        TableRemove(SBRefStrHash(slist), &ref);
     }
 }
 

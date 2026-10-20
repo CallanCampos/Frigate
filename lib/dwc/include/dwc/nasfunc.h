@@ -7,9 +7,10 @@
 
 // DWC's login to the Nintendo authentication server (dwc_nasfunc.c, overlay 11): the login's thread, the HTTP client
 // that it and the other requests to the server use, the connection test, the profanity check and the service locator.
-// The ROM names none of it. The type names follow the SDK's (DWCHttp, DWCAuthParam and the others, recalled from it);
-// the functions keep their addresses. The functions that the game calls are in dwc/dwc.h, and the connection test's
-// in dwc/ac.h.
+// The ROM names none of it. The type names follow the SDK's (DWCHttp, DWCAuthParam and the others, recalled from it),
+// and so do the functions that NitroDWC's headers (auth/dwc_auth.h, dwc_http.h, dwc_netcheck.h, dwc_prof.h and
+// dwc_svl.h) and the Wii DWC's dwc_auth_interface.c declare; the others' names are ours, in their style. The functions
+// that the game calls are in dwc/dwc.h, and the connection test's in dwc/ac.h.
 
 // The allocator and the deallocator of a request, with a name (0 here) first, as DWC_Alloc and DWC_Free take them
 typedef void *(*DWCHttpAlloc)(u32 name, u32 size);
@@ -121,36 +122,37 @@ typedef struct DWCSvlResult {
     char svltoken[0x12d];
 } DWCSvlResult;
 
-// The steps of the login (func_ov011_021696d0): 0 while it runs, 0x14 once cancelled, 0x15 once done, and the others
+// The steps of the login (DWC_Auth_GetError): 0 while it runs, 0x14 once cancelled, 0x15 once done, and the others
 // for its errors
 
 // Starts the login with its parameters and an HTTP client, returning 0 if it started
-int func_ov011_021694ec(const DWCAuthParam *param, DWCHttp *http);
+int DWC_Auth_Create(const DWCAuthParam *param, DWCHttp *http);
 // Lets go of the login's memory
-void func_ov011_02169668(void);
+void DWC_Auth_Destroy(void);
 // The login's step, and the server's answer, with a negative error for a failure
-int func_ov011_021696d0(void);
-void func_ov011_02169704(DWCAuthResult *result);
+int DWC_Auth_GetError(void);
+void DWC_Auth_GetResult(DWCAuthResult *result);
 
 // The login that the friends' match runs: starts it with the player's name, the game's code and the user ID, and runs
 // it; whether it is over, whether it worked and its error; the token and the challenge that it got; and the end of it
-BOOL func_ov011_02169e50(const u16 *ingamesn, const char *gsbrcd, u64 userId, DWCHttpAlloc alloc, DWCHttpFree free);
-void func_ov011_02169eb0(void);
-void func_ov011_02169ebc(void);
-BOOL func_ov011_02169f34(void);
-BOOL func_ov011_02169f40(void);
-int func_ov011_02169f4c(void);
-void func_ov011_02169f58(char *token, char *challenge);
-void func_ov011_02169f90(void);
+BOOL DWCi_Auth_StartAuthentication(const u16 *ingamesn, const char *gsbrcd, u64 userId, DWCHttpAlloc alloc,
+                                   DWCHttpFree free);
+void DWCi_Auth_AbortAuthentication(void);
+void DWCi_Auth_ProcessAuthentication(void);
+BOOL DWCi_Auth_IsFinished(void);
+BOOL DWCi_Auth_IsSucceeded(void);
+int DWCi_Auth_GetErrorCode(void);
+void DWCi_Auth_GetGameSpyToken(char *token, char *challenge);
+void DWCi_Auth_EndAuthentication(void);
 // The console's user ID, or its pending one while none is confirmed; and whether it has one
-u64 func_ov011_02169f98(void);
-BOOL func_ov011_02169fb8(void);
+u64 DWCi_Auth_GetConsoleUserId(void);
+BOOL DWCi_Auth_HasConsoleUserId(void);
 
 // The service locator: makes its memory, lets go of it, asks for a service and runs the request, which answers 0 when
 // there is none, 1 when it did not start, 2 while it runs, 3 once done, 4 for an error and 5 once cancelled
-BOOL func_ov011_0216c154(DWCHttpAlloc alloc, DWCHttpFree free);
-void func_ov011_0216c1a8(void);
-BOOL func_ov011_0216c1cc(const char *service, DWCSvlResult *result);
-int func_ov011_0216c344(void);
+BOOL DWC_Svl_Init(DWCHttpAlloc alloc, DWCHttpFree free);
+void DWC_Svl_Cleanup(void);
+BOOL DWC_Svl_GetTokenAsync(const char *service, DWCSvlResult *result);
+int DWC_Svl_Process(void);
 
 #endif // POKEBW2_DWC_NASFUNC_H
