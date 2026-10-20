@@ -18,13 +18,15 @@ typedef struct {
 // The event that walks the player into the entrance
 GameEvent *func_ov036_021b74a0(GameSystem *gsys, WarpSequence *warp);
 
-// The entrance camera: create, free, set up for a warp, start, finish, and whether it has started and ended
-EntranceCamera *func_ov036_021b7a34(Field *field);
-void func_ov036_021b7a58(EntranceCamera *camera);
-void func_ov036_021b7a68(EntranceCamera *camera, const EntranceCameraParam *param);
-void func_ov036_021b7ac0(EntranceCamera *camera);
-void func_ov036_021b7ad4(EntranceCamera *camera);
+// The entrance camera's lifetime, parameters and animation
+EntranceCamera *EntranceCamera_Create(Field *field);
+void EntranceCamera_Destroy(EntranceCamera *camera);
+void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam *param);
+void EntranceCamera_StartAnimation(EntranceCamera *camera);
+void EntranceCamera_FinishCamera(EntranceCamera *camera);
+// The selected arrival or departure configuration flag
 BOOL func_ov036_021b7ae0(EntranceCamera *camera);
-BOOL func_ov036_021b7ae8(EntranceCamera *camera);
+// Whether the configured animation has a duration of zero frames
+BOOL EntranceCamera_HasZeroFrames(EntranceCamera *camera);
 
 #endif // POKEBW2_FIELD_ENTRANCE_CAMERA_H
