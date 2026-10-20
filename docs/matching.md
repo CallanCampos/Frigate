@@ -3344,6 +3344,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   relocations, and two with the same contents only by the code that loads them: `btlv_scu.c`'s four 12-byte
   encounter step tables, two of them identical, needed their own declaration order, found by trying the orders of
   the four.
+- An object at an address that isn't a multiple of 4 shares its section with the one before it, since the linker
+  starts each section on a 4-byte boundary. So a run out of size order inside packed data means the objects'
+  boundaries are wrong, not that they have sections of their own: `dwc_util_address_settings.c`'s 24 bytes of "row
+  rectangles" at 0xa, after a 3- and a 7-byte table, are three 8-byte rectangles, which make its one shared section
+  ascend (3, 7, 8, 8, 8, 9, 9, 11, 15, 18, 24, 48); split, they give the ROM's `.rodata` and
+  `DWCUtilAddressSettings_GetTouchedItem` its offsets from the section's base.
 - When structured reorderings don't reach the shared section's tie order, invert the model: the heapsort permutation
   depends only on the sequence of sizes by declaration slot, so for a given sequence the ROM's layout forces which
   object every slot must hold, exactly. Search the size sequences instead of the orders — anneal with the forced
