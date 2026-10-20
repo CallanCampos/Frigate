@@ -3,6 +3,7 @@
 #include "dwc_util_auto_connect_intro.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_cell.h"
+#include "dwc_util_dialog.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
@@ -14,8 +15,10 @@
 #include "dwc_util_page_ap_list.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_string.h"
 #include "dwc_util_text.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // The longest text, and the font's character of the space

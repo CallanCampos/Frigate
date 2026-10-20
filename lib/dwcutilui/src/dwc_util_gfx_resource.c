@@ -4,6 +4,7 @@
 #include "dwc_util_msg_resource.h"
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sub_screen.h"
 #include "dwc_util_text.h"
 #include "dwc_util_ui_object.h"
 #include "nitro/os.h"

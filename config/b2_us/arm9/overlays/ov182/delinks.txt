@@ -368,3 +368,69 @@ lib/dwcutilui/src/dwc_util_auto_connect_intro.c:
     .text       start:0x021b6588 end:0x021b6728
     .rodata     start:0x021c03cc end:0x021c03d8
     .data       start:0x021c1334 end:0x021c1348
+
+lib/dwcutilui/src/dwc_util_usb_done.c:
+    complete
+    .text       start:0x021b6728 end:0x021b688c
+    .data       start:0x021c1348 end:0x021c135c
+    .bss        start:0x021c4144 end:0x021c4148
+
+lib/dwcutilui/src/dwc_util_usb_intro.c:
+    complete
+    .text       start:0x021b688c end:0x021b6b00
+    .data       start:0x021c135c end:0x021c13a0
+    .bss        start:0x021c4148 end:0x021c414c
+
+lib/dwcutilui/src/dwc_util_usb_setup.c:
+    complete
+    .text       start:0x021b6b00 end:0x021b6f38
+    .data       start:0x021c13a0 end:0x021c13e4
+    .bss        start:0x021c414c end:0x021c4150
+
+lib/dwcutilui/src/dwc_util_bg_buffer.c:
+    complete
+    .text       start:0x021b6f38 end:0x021b70a0
+    .bss        start:0x021c4150 end:0x021c415c
+
+lib/dwcutilui/src/dwc_util_scrollbar.c:
+    complete
+    .text       start:0x021b70a0 end:0x021b74d4
+    .rodata     start:0x021c03d8 end:0x021c03e0
+    .bss        start:0x021c415c end:0x021c4160
+
+lib/dwcutilui/src/dwc_util_ap_scan.c:
+    complete
+    .text       start:0x021b74d4 end:0x021b77dc
+    .rodata     start:0x021c03e0 end:0x021c0430
+    .bss        start:0x021c4160 end:0x021c4164
+
+lib/dwcutilui/src/dwc_util_wifi_settings.c:
+    complete
+    .text       start:0x021b77dc end:0x021b8050
+    .rodata     start:0x021c0430 end:0x021c0434
+    .data       start:0x021c13e4 end:0x021c13f4
+    .bss        start:0x021c4164 end:0x021c4168
+
+lib/dwcutilui/src/dwc_util_sound.c:
+    complete
+    .text       start:0x021b8050 end:0x021b8154
+    .data       start:0x021c13f4 end:0x021c140c
+    .bss        start:0x021c4168 end:0x021c416c
+
+lib/dwcutilui/src/dwc_util_sub_screen.c:
+    complete
+    .text       start:0x021b8154 end:0x021b8834
+    .rodata     start:0x021c0434 end:0x021c0468
+    .data       start:0x021c140c end:0x021c1484
+    .bss        start:0x021c416c end:0x021c4174
+
+lib/dwcutilui/src/dwc_util_usb_scan.c:
+    .text       start:0x021b8834 end:0x021b8cf0
+    .rodata     start:0x021c0468 end:0x021c04bc
+    .bss        start:0x021c4174 end:0x021c4178
+
+lib/dwcutilui/src/dwc_util_dialog.c:
+    complete
+    .text       start:0x021b8cf0 end:0x021b93e8
+    .rodata     start:0x021c04bc end:0x021c0580
+    .bss        start:0x021c4178 end:0x021c417c

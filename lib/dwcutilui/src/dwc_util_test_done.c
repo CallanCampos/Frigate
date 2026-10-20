@@ -6,6 +6,7 @@
 #include "dwc_util_main.h"
 #include "dwc_util_page_multi4.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "nitro/gx.h"
 
 static void func_ov182_021b4b94(void);

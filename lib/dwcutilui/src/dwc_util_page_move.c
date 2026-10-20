@@ -1,4 +1,5 @@
 #include "dwc_util_page_move.h"
+#include "dwc_util_dialog.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
@@ -8,6 +9,7 @@
 #include "dwc_util_option_menu.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_text.h"
 #include "dwc_util_top_menu.h"
 #include "nitro/gx.h"

@@ -1,6 +1,7 @@
 #include "dwc_util_aoss_session.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_wifi_settings.h"
 #include "dwcutil/dwc_aoss.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

@@ -28,6 +28,7 @@ typedef struct DWCUtilAcResult {
     int wepMode;
     // How many WEP keys there are
     int unk_24;
+    // The four WEP keys, of the length that wepMode says
     u8 keys[4][0x20];
     u8 passphrase[0x40];
 } DWCUtilAcResult;

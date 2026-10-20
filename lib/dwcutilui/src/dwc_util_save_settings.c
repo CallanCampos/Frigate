@@ -1,5 +1,6 @@
 #include "dwc_util_save_settings.h"
 #include "dwc_util_bg_overlay.h"
+#include "dwc_util_dialog.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
@@ -7,6 +8,7 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_ap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 static void func_ov182_021b4420(void);

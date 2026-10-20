@@ -1,5 +1,7 @@
 #include "dwc_util_ap_search.h"
+#include "dwc_util_ap_scan.h"
 #include "dwc_util_bg_overlay.h"
+#include "dwc_util_dialog.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
@@ -8,10 +10,12 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_way.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_effect.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // How the search ended, and the frames it has scanned for

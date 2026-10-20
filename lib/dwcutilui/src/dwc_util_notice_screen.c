@@ -2,12 +2,14 @@
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
+#include "dwc_util_info_menu.h"
 #include "dwc_util_main.h"
 #include "dwc_util_move.h"
 #include "dwc_util_option_menu.h"
 #include "dwc_util_page_multi5.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
@@ -80,12 +82,7 @@ static void func_ov182_021b0050(void) {
 }
 
 static void func_ov182_021b0060(void) {
-    if (func_ov182_021bc798(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
-    }
-    if (func_ov182_021bc798(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
-    }
+    func_ov182_021aec10Inline();
 }
 
 static void func_ov182_021b0088(void) {

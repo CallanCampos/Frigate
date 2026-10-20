@@ -1,6 +1,7 @@
 #include "dwc_util_screen_way.h"
 #include "dwc_util_address_settings.h"
 #include "dwc_util_ap_search.h"
+#include "dwc_util_bg_buffer.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_button_sprites.h"
 #include "dwc_util_display.h"
@@ -12,9 +13,11 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_ap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
 #include "dwc_util_test_start.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // The buttons: the search for an access point, the AOSS setup, the third setup and the settings by hand

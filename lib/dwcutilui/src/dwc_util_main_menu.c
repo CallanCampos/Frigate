@@ -1,4 +1,5 @@
 #include "dwc_util_main_menu.h"
+#include "dwc_util_bg_buffer.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_button_sprites.h"
 #include "dwc_util_cell.h"
@@ -13,9 +14,12 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_ap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
+#include "dwc_util_sub_screen.h"
 #include "dwc_util_task.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // The choice on the first screen, and the palette whose rows light up the chosen button

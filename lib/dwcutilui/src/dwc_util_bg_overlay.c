@@ -5,6 +5,7 @@
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_task.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
