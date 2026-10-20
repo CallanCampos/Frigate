@@ -143,8 +143,8 @@ void func_ov182_021b688c(void);
 
 // The message before the connection test
 void func_ov182_021b6588(void);
-// The connection test with auto-connect (its file is not written yet)
-void func_ov182_021b6104(void);
+// The message after a successful connection test with auto-connect (its file is not written yet)
+void func_ov182_021b63dc(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

@@ -1275,7 +1275,7 @@ sScreenWayCursorRects kind:data(any) addr:0x021c0378
 data_ov182_021c037a kind:data(any) addr:0x021c037a
 data_ov182_021c037c kind:data(any) addr:0x021c037c
 data_ov182_021c037e kind:data(any) addr:0x021c037e
-data_ov182_021c03b8 kind:data(any) addr:0x021c03b8
+sAutoConnectParam kind:data(any) addr:0x021c03b8
 data_ov182_021c03cc kind:data(any) addr:0x021c03cc
 data_ov182_021c03d8 kind:data(any) addr:0x021c03d8
 data_ov182_021c03db kind:data(any) addr:0x021c03db
@@ -1651,7 +1651,7 @@ sApSearch kind:bss addr:0x021c4128
 sScreenAp kind:bss addr:0x021c412c
 data_ov182_021c4130 kind:bss addr:0x021c4130
 sScreenWay kind:bss addr:0x021c4134
-data_ov182_021c413c kind:bss addr:0x021c413c
+sAutoConnectSucceeded kind:bss addr:0x021c413c
 data_ov182_021c4140 kind:bss addr:0x021c4140
 data_ov182_021c4144 kind:bss addr:0x021c4144
 data_ov182_021c4148 kind:bss addr:0x021c4148
