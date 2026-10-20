@@ -801,7 +801,7 @@ int func_ov011_02160170(void) {
         return 1;
     }
     sMatchRoot.fm->unk_2d = 1;
-    func_ov011_0217d350(sMatchRoot.fm->socket);
+    gt2CloseAllConnectionsHard(sMatchRoot.fm->socket);
     while (func_ov011_02168024() > 1) {
         for (i = 0; i < func_ov011_02168024(); i++) {
             DWCNodeInfo *host = func_ov011_02168250(i);
@@ -945,7 +945,7 @@ GTI2Connection *func_ov011_021604b0(u8 aid) {
         return NULL;
     }
     for (i = 0; i < 0x20; i++) {
-        if (sConnections[i] != NULL && aid == ((MatchConnectionInfo *)func_ov011_0217d3a8(sConnections[i]))->aid) {
+        if (sConnections[i] != NULL && aid == ((MatchConnectionInfo *)gt2GetConnectionData(sConnections[i]))->aid) {
             return sConnections[i];
         }
     }
@@ -953,7 +953,7 @@ GTI2Connection *func_ov011_021604b0(u8 aid) {
 }
 
 u8 func_ov011_021604ec(GTI2Connection *connection) {
-    MatchConnectionInfo *info = func_ov011_0217d3a8(connection);
+    MatchConnectionInfo *info = gt2GetConnectionData(connection);
 
     if (info != NULL) {
         return info->aid;
@@ -986,7 +986,7 @@ static GTI2Connection **func_ov011_0216054c(s32 profileId, int a1) {
 
     for (i = 0; i < 0x20; i++) {
         if (sConnections[i] != NULL &&
-            profileId == ((MatchConnectionInfo *)func_ov011_0217d3a8(sConnections[i]))->profileId) {
+            profileId == ((MatchConnectionInfo *)gt2GetConnectionData(sConnections[i]))->profileId) {
             return func_ov011_02160540(i);
         }
     }
@@ -1001,7 +1001,7 @@ BOOL func_ov011_02160588(u8 netId) {
     int i;
 
     for (i = 0; i < 0x20; i++) {
-        if (sConnections[i] != NULL && netId == ((MatchConnectionInfo *)func_ov011_0217d3a8(sConnections[i]))->aid) {
+        if (sConnections[i] != NULL && netId == ((MatchConnectionInfo *)gt2GetConnectionData(sConnections[i]))->aid) {
             return TRUE;
         }
     }
@@ -1140,7 +1140,7 @@ int func_ov011_02160710(u8 netId) {
         func_ov011_0216093c(NULL, 0, 1, host->aid);
         return 0;
     }
-    func_ov011_0217d338(conn);
+    gt2CloseConnectionHard(conn);
     return 0;
 }
 
@@ -1246,7 +1246,7 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
     }
     if (error == 0) {
         if (!isNetId) {
-            connection = func_ov011_0217d3a8(conn);
+            connection = gt2GetConnectionData(conn);
             if (connection == NULL) {
                 return;
             }
@@ -1267,7 +1267,7 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
             sMatchRoot.fm->match.unk_44 = 1;
         }
         if (profileId == 0) {
-            profileId = ((MatchConnectionInfo *)func_ov011_0217d3a8(func_ov011_021604b0(id)))->profileId;
+            profileId = ((MatchConnectionInfo *)gt2GetConnectionData(func_ov011_021604b0(id)))->profileId;
         }
         if (!isNetId) {
             sConnections[connection->index] = NULL;
@@ -1371,7 +1371,7 @@ static void func_ov011_02160d1c(GTI2Connection *connection, u32 latency) {
 }
 
 static void func_ov011_02160d24(GTI2Socket *socket) {
-    sMatchRoot.socketError = GOAGetLastError(func_ov011_0217d39c(socket));
+    sMatchRoot.socketError = GOAGetLastError(gt2GetSocketSOCKET(socket));
     DWCi_SetError(9, -97003);
     sMatchRoot.fm->socket = NULL;
 }
@@ -1581,7 +1581,7 @@ static int func_ov011_021611a8(s32 profileId) {
     retries = 0;
     do {
         result =
-            qr2_init_socketA(&func_ov011_02167f6c()->qr2, func_ov011_0217d39c(func_ov011_02167f6c()->fm->socket),
+            qr2_init_socketA(&func_ov011_02167f6c()->qr2, gt2GetSocketSOCKET(func_ov011_02167f6c()->fm->socket),
                              func_ov011_0217d38c(func_ov011_02167f6c()->fm->socket), func_ov011_02167f6c()->gameName,
                              func_ov011_02167f6c()->secretKey, 1, 1, func_ov011_021670a4, func_ov011_021671b8,
                              func_ov011_021671bc, func_ov011_021671c0, func_ov011_0216723c, func_ov011_02167240, NULL);
@@ -2189,7 +2189,7 @@ static void func_ov011_02162440(GTI2Socket *socket, GTI2Connection *connection, 
     info->aid = func_ov011_02167f6c()->self.aid;
     info->profileId = func_ov011_02167f6c()->self.profileId;
     func_ov011_02169000(info->aid);
-    func_ov011_0217d3a4(connection, info);
+    gt2SetConnectionData(connection, info);
     func_ov011_02165280(2);
 }
 
@@ -2262,7 +2262,7 @@ static void func_ov011_02162640(GTI2Connection *connection, int result, const vo
         info->profileId = func_ov011_02167f6c()->unk_5ac.profileId;
     }
     func_ov011_02169000(info->aid);
-    func_ov011_0217d3a4(connection, info);
+    gt2SetConnectionData(connection, info);
     if (func_ov011_02167f6c()->state == 0xf || func_ov011_02167f6c()->unk_5a8 == 0xf) {
         func_ov011_02165280(0);
     } else {
@@ -2467,7 +2467,7 @@ static BOOL func_ov011_02162c68(int type, u32 code, s32 profileId) {
     if (func_ov011_02168024() > 1) {
         if (func_ov011_02167f6c()->unk_629 == 0) {
             func_ov011_02167f6c()->unk_629 = 2;
-            func_ov011_0217d350(func_ov011_02167f6c()->fm->socket);
+            gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
         }
     } else if (func_ov011_02167f6c()->matchType == 3) {
         func_ov011_02162880(0x16, -80430);
@@ -2805,7 +2805,7 @@ static int func_ov011_021635a0(int reset, u32 token, DWCNodeInfo *peer) {
     if (mismatch) {
         result = func_ov011_0216373c(&func_ov011_02167f6c()->target);
     } else {
-        u32 sock = func_ov011_0217d39c(func_ov011_02167f6c()->fm->socket);
+        u32 sock = gt2GetSocketSOCKET(func_ov011_02167f6c()->fm->socket);
 
         func_ov011_02167428(0, sock, 0, &func_ov011_02167f6c()->target);
         func_ov011_02167f6c()->unk_608 = 0;
@@ -2825,7 +2825,7 @@ static int func_ov011_0216373c(MatchTarget *target) {
         }
     }
     for (i = 0; i < 1; i++) {
-        result = NNBeginNegotiationWithSocket(func_ov011_0217d39c(func_ov011_02167f6c()->fm->socket), target->cookie,
+        result = NNBeginNegotiationWithSocket(gt2GetSocketSOCKET(func_ov011_02167f6c()->fm->socket), target->cookie,
                                               target->kind, func_ov011_02167424, func_ov011_02167428, target);
         if (result == 0 || result != 3) {
             break;
@@ -3168,7 +3168,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         if (func_ov011_02167f6c()->mode == 2 && func_ov011_02168388() == 1 &&
             func_ov011_0216054c(func_ov011_02167f6c()->self.profileId, 0) != NULL &&
             profileId == func_ov011_02167f6c()->self.profileId) {
-            func_ov011_0217d350(func_ov011_02167f6c()->fm->socket);
+            gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
         }
         if (func_ov011_02165164(profileId) == 0) {
             return 0;
@@ -3193,7 +3193,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         address.port = MATCH_SWAP16(hostPort);
         address.addr = hostIp;
         func_ov011_02167f6c()->target.kind = 1;
-        conn = func_ov011_0217d39c(func_ov011_02167f6c()->fm->socket);
+        conn = gt2GetSocketSOCKET(func_ov011_02167f6c()->fm->socket);
         func_ov011_02167428(0, conn, &address, &func_ov011_02167f6c()->target);
         func_ov011_02167f6c()->unk_608 = 0;
         break;
@@ -4063,7 +4063,7 @@ static void func_ov011_0216574c(void) {
         }
         func_ov011_02167f6c()->unk_62a = 1;
         if (hasConn != 0) {
-            func_ov011_0217d350(func_ov011_02167f6c()->fm->socket);
+            gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
         } else {
             if (func_ov011_02164b78(func_ov011_02165040(0)) != 0) {
                 return;
@@ -4090,7 +4090,7 @@ static void func_ov011_0216574c(void) {
     }
     if (hasConn != 0) {
         func_ov011_02167f6c()->unk_62a = 1;
-        func_ov011_0217d350(func_ov011_02167f6c()->fm->socket);
+        gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
     }
     func_ov011_021658a4();
 }
@@ -4183,7 +4183,7 @@ static int func_ov011_02165b7c(int profileId) {
     if (conn != NULL) {
         func_ov011_02167f6c()->unk_629 = 1;
         result = 1;
-        func_ov011_0217d338(*conn);
+        gt2CloseConnectionHard(*conn);
         func_ov011_02167f6c()->unk_629 = 0;
         func_ov011_02168184(profileId);
     } else {
@@ -4195,7 +4195,7 @@ static int func_ov011_02165b7c(int profileId) {
 
 static void func_ov011_02165bc8(void) {
     func_ov011_02167f6c()->unk_629 = 1;
-    func_ov011_0217d350(func_ov011_02167f6c()->fm->socket);
+    gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
     func_ov011_02167f6c()->unk_629 = 0;
 }
 
