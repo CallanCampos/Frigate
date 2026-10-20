@@ -40,27 +40,27 @@ BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig) {
 }
 
 u8 func_020091d0(TimeSigSave *timeSig) {
-    return timeSig->unk602;
+    return timeSig->unionViewChanged;
 }
 
 void func_020091dc(TimeSigSave *timeSig) {
-    timeSig->unk602 = 1;
+    timeSig->unionViewChanged = 1;
 }
 
 u16 func_020091e8(TimeSigSave *timeSig) {
-    return timeSig->unk600;
+    return timeSig->personality;
 }
 
 void func_020091f0(TimeSigSave *timeSig, u32 value) {
-    timeSig->unk600 = value;
+    timeSig->personality = value;
 }
 
 void func_020091f8(TimeSigSave *timeSig, u8 value) {
-    timeSig->unk603 = value;
+    timeSig->signBlinks = value;
 }
 
 BOOL func_02009204(TimeSigSave *timeSig) {
-    return timeSig->unk603;
+    return timeSig->signBlinks;
 }
 
 void saveSecondsTime(TimeSigSave *timeSig, u32 low, u32 high) {

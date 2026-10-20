@@ -18,9 +18,11 @@ typedef struct {
 // obtained, saved badge polish and the time it was last saved at
 struct TimeSigSave {
     u32 signature[0x180];
-    u16 unk600;
-    u8 unk602;
-    u8 unk603;
+    // The personality the card shows, 0 to 24 (the natures' names), whether the player changed the union view on
+    // the card, and whether the signature blinks between its two frames
+    u16 personality;
+    u8 unionViewChanged;
+    u8 signBlinks;
     TimeSigBadgeDate badgeDates[TIMESIG_BADGE_COUNT];
     union {
         s64 seconds;
