@@ -442,8 +442,8 @@ BOOL func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param) 
     return TRUE;
 }
 
-void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, u32 unk_28, DWCFriendData *friendList,
-                         int friendListLen) {
+void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, const u16 *playerName,
+                         DWCFriendData *friendList, int friendListLen) {
     int i = 0;
 
     sFriend.control = control;
@@ -459,7 +459,7 @@ void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, u3
     sFriend.control->updateSteps = 0;
     sFriend.control->persLogin = 0;
     sFriend.control->unk_24 = 0;
-    sFriend.control->unk_28 = unk_28;
+    sFriend.control->playerName = playerName;
     sFriend.control->updateCallback = NULL;
     sFriend.control->updateParam = NULL;
     sFriend.control->statusCallback = NULL;
@@ -564,8 +564,8 @@ BOOL func_ov011_0215e714(void) {
     return result;
 }
 
-void func_ov011_0215e72c(u32 unused1, u32 unused2, DWCUpdateServersCallback updateCallback, void *updateParam,
-                         DWCFriendStatusCallback statusCallback, void *statusParam,
+void func_ov011_0215e72c(const char *authToken, const char *partnerChallenge, DWCUpdateServersCallback updateCallback,
+                         void *updateParam, DWCFriendStatusCallback statusCallback, void *statusParam,
                          DWCDeleteFriendListCallback deleteCallback, void *deleteParam) {
     sFriend.control->updateCallback = updateCallback;
     sFriend.control->updateParam = updateParam;

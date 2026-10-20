@@ -38,7 +38,8 @@ typedef struct DWCFriendControl {
     // Nonzero while the persistent storage server is logged in to
     int persLogin;
     u32 unk_24;
-    u32 unk_28;
+    // The player's name
+    const u16 *playerName;
     DWCUpdateServersCallback updateCallback;
     void *updateParam;
     DWCFriendStatusCallback statusCallback;
@@ -101,12 +102,12 @@ u32 func_ov011_0215e32c(const u16 *str);
 // The friend list: starting it with its memory and the player's name, running it for a frame, whether its update runs,
 // starting the update with its callbacks, ending it with an error, and the callbacks of GP's buddy requests, buddy
 // authorizations and buddy statuses
-void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, u32 unk_28, DWCFriendData *friendList,
-                         int friendListLen);
+void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, const u16 *playerName,
+                         DWCFriendData *friendList, int friendListLen);
 void func_ov011_0215e584(void);
 BOOL func_ov011_0215e714(void);
-void func_ov011_0215e72c(u32 unused1, u32 unused2, DWCUpdateServersCallback updateCallback, void *updateParam,
-                         DWCFriendStatusCallback statusCallback, void *statusParam,
+void func_ov011_0215e72c(const char *authToken, const char *partnerChallenge, DWCUpdateServersCallback updateCallback,
+                         void *updateParam, DWCFriendStatusCallback statusCallback, void *statusParam,
                          DWCDeleteFriendListCallback deleteCallback, void *deleteParam);
 void func_ov011_0215e784(int error, int code);
 void func_ov011_0215e7d0(GPConnection *connection, GPRecvBuddyRequestArg *arg, void *param);

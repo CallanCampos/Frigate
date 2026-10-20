@@ -382,3 +382,9 @@ lib/dwc/src/auth/dwc_nasfunc.c:
     .text       start:0x02169514 end:0x0216c560
     .data       start:0x02185b28 end:0x02186ebc
     .bss        start:0x0218e964 end:0x021906d8
+
+lib/dwc/src/match/dwc_match.c:
+    .text       start:0x0215fa4c end:0x02168858
+    .rodata     start:0x02185054 end:0x0218506c
+    .data       start:0x021857fc end:0x02185b18
+    .bss        start:0x0218e058 end:0x0218e958

@@ -12,12 +12,13 @@
 #include "dwc/gstats.h"
 #include "dwc/gt2Main.h"
 #include "dwc/init.h"
+#include "dwc/match.h"
 #include "gfl/heap.h"
 #include "nitro/rtc.h"
 
 // Nintendo's Wi-Fi Connection library (NitroDWC), in main and overlay 11. The ROM names none of it; what these
-// functions do is read off their callers. The account and friend data are in dwc/account.h, the error in dwc/error.h
-// and the start in dwc/init.h
+// functions do is read off their callers. The account and friend data are in dwc/account.h, the error in dwc/error.h,
+// the start in dwc/init.h and the matchmaking in dwc/match.h
 
 // Starts connecting to the access point (FALSE if its memory can't be had); one of the calls that end the connection
 // after a server error; and the connection's state
@@ -27,7 +28,6 @@ BOOL func_ov011_0215dec0(void);
 BOOL func_ov011_0215de44(const char *apName, void *buffer);
 // The connection's state, 3 once connected, ending it after a state from 3 to 5
 int func_ov011_0215dea8(void);
-void func_ov011_0215fb78(void);
 int func_ov011_0215df40(void);
 
 // The server's date and time
@@ -38,65 +38,25 @@ BOOL func_ov011_0216bea4(const u16 **words, int count, const char *reserved, int
                          int *badWordCount, int region);
 int func_ov011_0216bed4(void);
 
-// Asked how well another machine fits a random match, and the function's work
-typedef int (*DWCEvalFunc)(int index, void *work);
-
-// Not in dwc_rap.c, past it in the overlay
-int func_ov011_02160344(void);
-
-// Overlay 11's: starting, logging in and the friend list
-void func_ov011_0215fa0c(void *userData, int productId, const char *gameName, const char *secretKey, int a4,
-                         DWCFriendData *friendList, int friendListLen);
-void func_ov011_0215fdf0(const u16 *name, const char *reserved, void (*callback)(int error), void *param);
-BOOL func_ov011_0215fe94(const char *name, void (*callback)(int error), void *userData,
-                         void (*statusCallback)(int index, u8 status, const char *location, void *param),
-                         void *statusParam, void (*deleteCallback)(int deleteIndex, int srcIndex, void *param),
-                         void *deleteParam);
-void func_ov011_0215fc50(void);
-void func_ov011_02160170(void);
+// Overlay 11's friend list (friend.c, whose other functions are in dwc/friend.h)
 BOOL func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param);
 u8 func_ov011_0215e410(const DWCFriendData *friendData, char *statusData, int *size);
 BOOL func_ov011_0215e47c(const char *statusData, int size);
 
-// Matching: with the key and number, anybody, or a friend, and the callbacks that tell how it went
-typedef void (*DWCMatchedFunc)(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
-typedef void (*DWCNewClientFunc)(int index, void *param);
-typedef BOOL (*DWCAttemptFunc)(void *param);
-BOOL func_ov011_0215fef8(int type, u8 numEntry, const char *query, DWCMatchedFunc matched, void *matchedParam,
-                         DWCNewClientFunc newClient, void *newClientParam, DWCEvalFunc eval, void *evalParam,
-                         DWCAttemptFunc attempt, int *attemptParam, void *param);
-BOOL func_ov011_0215ff7c(int type, u8 numEntry, DWCMatchedFunc matched, void *matchedParam, DWCNewClientFunc newClient,
-                         void *newClientParam, DWCAttemptFunc attempt, int *attemptParam, void *param);
-BOOL func_ov011_0215fff4(int type, int friendIndex, DWCMatchedFunc matched, void *matchedParam,
-                         DWCNewClientFunc newClient, void *newClientParam, DWCAttemptFunc attempt, int *attemptParam,
-                         void *param);
-BOOL func_ov011_02160ed4(int index, const char *key, const char *value);
-
-// The machines: their IDs and which are there
-u8 func_ov011_021602c0(void);
-BOOL func_ov011_021602a0(void);
-void func_ov011_02160284(u8 netId);
-BOOL func_ov011_02160370(u8 netId);
+// Overlay 11's transport, which sends to the machines of a match (dwc_transport.c; the rest is in dwc/transport.h)
 BOOL func_ov011_02168998(u8 netId);
 u32 func_ov011_02168ad4(u32 netIds, const void *data, int size);
 BOOL func_ov011_02168b84(u8 netId, void *buffer, int size);
 BOOL func_ov011_02168ca4(u8 netId, int timeout);
-// The functions called when data has been sent, when it has been received, when a connection has been closed and
-// when a machine has not sent for too long, with the parameter they were set with; the setters of the transport's
-// (dwc/transport.h) return FALSE while it isn't running
+// The functions called when data has been sent, when it has been received and when a machine has not sent for too
+// long, with the parameter they were set with; the setters of the transport's (dwc/transport.h) return FALSE while it
+// isn't running
 typedef void (*DWCSendFunc)(int size, u8 netId, void *param);
 typedef void (*DWCRecvFunc)(u8 netId, u8 *data, int size, void *param);
-typedef void (*DWCClosedFunc)(int error, BOOL a1, BOOL a2, u8 netId, int index, void *param);
 typedef void (*DWCTimeoutFunc)(u8 netId, void *param);
 BOOL func_ov011_02168bb0(DWCSendFunc func, void *param);
 BOOL func_ov011_02168bd8(DWCRecvFunc func, void *param);
-void func_ov011_02160150(DWCClosedFunc func, int a1);
 BOOL func_ov011_02168c00(DWCTimeoutFunc func, void *param);
-
-// Overlay 11's, used with the matching keys: adds a key with a value that is read when the match runs, and reads
-// a candidate's key
-u8 func_ov011_02160e10(u8 keyId, const char *key, const int *valueSrc);
-int func_ov011_02160f98(int index, const char *key, int defaultValue);
 
 // Overlay 11's, which the library's start in main (dwc_init.c) calls: chooses the servers that the library talks to
 // by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives), returning
@@ -108,57 +68,5 @@ BOOL func_ov011_02169df8(int server);
 // The settings utility (overlay 182) sets its own for as long as it runs
 void func_ov011_021694d4(const char *url);
 const char *func_ov011_021694e0(void);
-
-// Overlay 11's dwc_match.c, which is not written yet: what friend.c and dwc_transport.c call in it (its functions
-// that the game calls are above)
-
-// friend.c's: sets the player's status with the matching's texts (SCM, SCN, VER and LCK), returning GP's result; makes
-// the GT2 socket of the matching, returning GT2's result; keeps the profile ID that logged in, and registers the
-// matching's keys with qr2; and the LCK value of a buddy's status
-int func_ov011_02162d80(int status);
-int func_ov011_0216043c(void);
-void func_ov011_02168780(int profileId);
-void func_ov011_02168794(void);
-u8 func_ov011_021686c0(const GPBuddyStatus *status);
-
-// A machine of the match, as the match's list keeps it: its profile ID, its public and local addresses, the address
-// of the host it was reached through and its aid
-typedef struct DWCNodeInfo {
-    s32 profileId;
-    u32 publicIp;
-    u32 localIp;
-    u16 publicPort;
-    u16 localPort;
-    u32 hostIp;
-    u16 hostPort;
-    u8 aid;
-    u8 unk_17;
-    s32 unk_18;
-    u64 unk_1c;
-    u32 unk_24;
-} DWCNodeInfo;
-
-// The transport's: the GT2 connection to the machine with an aid (NULL if there is none) and the aid of a connection
-// (0xff if it has none); whether a connection to an aid is open; the number of machines; the node of an index of the
-// list; whether this machine is the server; the aids of the machines (returning their number); whether the match is
-// running and whether it is a match of a server; the server's aid (0xff if none); drops a machine; and redoes the
-// match after one was dropped (with TRUE)
-GTI2Connection *func_ov011_021604b0(u8 aid);
-u8 func_ov011_021604ec(GTI2Connection *connection);
-BOOL func_ov011_02160588(u8 aid);
-int func_ov011_02168024(void);
-DWCNodeInfo *func_ov011_02168250(int index);
-BOOL func_ov011_02160408(void);
-int func_ov011_021602f0(u8 **aids);
-BOOL func_ov011_02167f3c(void);
-BOOL func_ov011_021677e8(void);
-u8 func_ov011_02160d6c(void);
-int func_ov011_02160710(u8 aid);
-int func_ov011_021679c8(BOOL force);
-
-// The match's own data that the transport received from a machine (type 2 to 4), and a match command (a packet that
-// starts with 0xbb 'I' 0xcc 'M')
-void func_ov011_02162930(u8 aid, int type, const void *data);
-void func_ov011_0216731c(const u8 *data, int size);
 
 #endif // POKEBW2_DWC_DWC_H
