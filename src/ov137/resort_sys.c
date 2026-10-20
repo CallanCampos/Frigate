@@ -1809,7 +1809,7 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
     ResortSlots *slots = ResortSys_GetSlots(sys);
     ResortShopData *shopData = ResortSys_GetShopData(sys);
     ResortPersonData *made = NULL;
-    u32 row = func_020395a0((u16)kind);
+    u32 row = ResortLayout_GetSlotRow((u16)kind);
     u32 dataKind = ResortData_GetType(data);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     u16 slot;

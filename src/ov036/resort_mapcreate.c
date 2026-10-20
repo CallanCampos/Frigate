@@ -109,7 +109,8 @@ void func_ov036_021c8b40(ResortMapCreateWork *work, EventData *eventData) {
         } else {
             shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
             shop = ResortShopData_GetShop(shops, shopId);
-            func_02039560(ResortShopData_GetShopParam(shop, (i % 2 == 0 ? 1 : 0) + 6), &position[1], &position[0]);
+            ResortLayout_GetShopOffset(ResortShopData_GetShopParam(shop, (i % 2 == 0 ? 1 : 0) + 6), &position[1],
+                                       &position[0]);
             position[1] += ResortBinary_Get(table, i, 1);
             position[0] += ResortBinary_Get(table, i, 2);
             SetBGEntityLocation(eventData, entity, position[1], 0, position[0]);

@@ -2176,6 +2176,10 @@
 . 0x020394b0 JoinAvenue_ChooseShop
 . 0x0203950c ResortLayout_GetZoneId
 . 0x02039518 ResortLayout_GetZoneIndex
+. 0x02039538 ResortLayout_GetOccupantPlace
+. 0x02039560 ResortLayout_GetShopOffset
+. 0x02039578 ResortLayout_GetRecordPlace
+. 0x020395a0 ResortLayout_GetSlotRow
 . 0x020395ac ResortBinary_Load
 . 0x020395e4 ResortBinary_Free
 . 0x020395f8 ResortBinary_Get
