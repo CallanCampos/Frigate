@@ -2,6 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_PAGE_MULTI4_H
 
 #include "types.h"
+#include "dwc_util_auto_connect_intro.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_main.h"
