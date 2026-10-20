@@ -137,8 +137,8 @@ void func_ov182_021b715c(int pos);
 void func_ov182_021b7164(void);
 void func_ov182_021b7174(void);
 
-// The screen after the first screen of the connection settings' wide button
-void func_ov182_021b688c(void);
+// The setup of the Nintendo Wi-Fi USB Connector (its file is not written yet)
+void func_ov182_021b6b1c(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

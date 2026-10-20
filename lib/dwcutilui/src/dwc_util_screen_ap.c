@@ -17,6 +17,7 @@
 #include "dwc_util_shared.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_usb_intro.h"
 #include "nitro/gx.h"
 
 // The buttons of the screen, as the cursor goes over them: the three connections, the wide button, and the three

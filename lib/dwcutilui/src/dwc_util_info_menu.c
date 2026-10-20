@@ -104,12 +104,7 @@ static void func_ov182_021aec00(void) {
 }
 
 static void func_ov182_021aec10(void) {
-    if (func_ov182_021bc798(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
-    }
-    if (func_ov182_021bc798(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
-    }
+    func_ov182_021aec10Inline();
 }
 
 static void func_ov182_021aec38(void) {

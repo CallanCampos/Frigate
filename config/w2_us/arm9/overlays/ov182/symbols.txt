@@ -1654,7 +1654,7 @@ sScreenWay kind:bss addr:0x021c4174
 sAutoConnectSucceeded kind:bss addr:0x021c417c
 sAutoConnectOkFrames kind:bss addr:0x021c4180
 sUsbDoneFrames kind:bss addr:0x021c4184
-data_ov182_021c4148 kind:bss addr:0x021c4188
+sUsbIntroYes kind:bss addr:0x021c4188
 data_ov182_021c414c kind:bss addr:0x021c418c
 data_ov182_021c4150 kind:bss addr:0x021c4190
 data_ov182_021c415c kind:bss addr:0x021c419c

@@ -374,3 +374,9 @@ lib/dwcutilui/src/dwc_util_usb_done.c:
     .text       start:0x021b6728 end:0x021b688c
     .data       start:0x021c1348 end:0x021c135c
     .bss        start:0x021c4144 end:0x021c4148
+
+lib/dwcutilui/src/dwc_util_usb_intro.c:
+    complete
+    .text       start:0x021b688c end:0x021b6b00
+    .data       start:0x021c135c end:0x021c13a0
+    .bss        start:0x021c4148 end:0x021c414c
