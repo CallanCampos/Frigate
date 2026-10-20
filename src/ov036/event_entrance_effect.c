@@ -1,7 +1,10 @@
 // The events that play an entrance, such as a door, when the player comes out of it or goes into it during a warp:
 // the door's animations and sounds, the entrance camera, and the transitions. The name is descriptive; the ROM has no
 // string for this file
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/entrance_camera.h"
 #include "field/event_action_call.h"
 #include "field/event_entrance_effect.h"
@@ -53,39 +56,39 @@ typedef struct {
     BOOL continueDirect;
 } EntranceEffectWork;
 
-static void func_ov036_0219f180(Field *field);
-static void func_ov036_0219f1f8(EntranceEffectWork *work);
-static GameEventReturnCode func_ov036_0219f380(GameEvent *event, u32 *state, void *data);
-static void func_ov036_0219f558(EntranceEffectWork *work);
-static GameEventReturnCode func_ov036_0219f5dc(GameEvent *event, u32 *state, void *data);
+static void EntranceEffect_FreePlayerAcmd(Field *field);
+static void EntranceEffect_SetArrivalSteps(EntranceEffectWork *work);
+static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 *state, void *data);
+static void EntranceEffect_SetDepartureSteps(EntranceEffectWork *work);
+static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u32 *state, void *data);
 static u8 Field_GetPlayerDirection(Field *field);
-static void func_ov036_0219f7b0(Field *field, VecFx32 *pos);
-static void func_ov036_0219f7c0(Field *field, VecFx32 *pos);
-static void func_ov036_0219f7e4(Field *field, VecFx32 *pos);
-static void func_ov036_0219f83c(Field *field, VecFx32 *pos);
-static u8 func_ov036_0219f880(EntranceEffectWork *work);
-static u8 func_ov036_0219f890(EntranceEffectWork *work);
-static void func_ov036_0219f8a4(EntranceEffectWork *work);
-static void func_ov036_0219f8b8(EntranceEffectWork *work);
-static void func_ov036_0219f8d8(EntranceEffectWork *work);
-static BOOL func_ov036_0219f8e8(EntranceEffectWork *work);
-static BOOL func_ov036_0219f90c(EntranceEffectWork *work);
-static void func_ov036_0219f91c(EntranceEffectWork *work);
-static void func_ov036_0219f94c(EntranceEffectWork *work);
-static void func_ov036_0219f97c(GameEvent *event, EntranceEffectWork *work);
-static void func_ov036_0219f9c8(GameEvent *event, EntranceEffectWork *work);
-static BOOL func_ov036_0219f9f0(EntranceEffectWork *work);
+static void EntranceEffect_GetPlayerPosition(Field *field, VecFx32 *pos);
+static void EntranceEffect_GetFrontPosition(Field *field, VecFx32 *pos);
+static void EntranceEffect_GetGridFrontPosition(Field *field, VecFx32 *pos);
+static void EntranceEffect_GetRailFrontPosition(Field *field, VecFx32 *pos);
+static u8 EntranceEffect_GetStep(EntranceEffectWork *work);
+static u8 EntranceEffect_GetNextStep(EntranceEffectWork *work);
+static void EntranceEffect_AdvanceStep(EntranceEffectWork *work);
+static void EntranceEffect_CreateDoorHandle(EntranceEffectWork *work);
+static void EntranceEffect_FreeDoorHandle(EntranceEffectWork *work);
+static BOOL EntranceEffect_IsDoorAnimationDone(EntranceEffectWork *work);
+static BOOL EntranceEffect_HasDoor(EntranceEffectWork *work);
+static void EntranceEffect_OpenDoor(EntranceEffectWork *work);
+static void EntranceEffect_CloseDoor(EntranceEffectWork *work);
+static void EntranceEffect_ChainArrivalTransition(GameEvent *event, EntranceEffectWork *work);
+static void EntranceEffect_ChainDepartureTransition(GameEvent *event, EntranceEffectWork *work);
+static BOOL EntranceEffect_ShouldPlayStairsSound(EntranceEffectWork *work);
 
 void func_ov036_0219f178(Field *field, VecFx32 *pos) {
-    func_ov036_0219f7c0(field, pos);
+    EntranceEffect_GetFrontPosition(field, pos);
 }
 
-static void func_ov036_0219f180(Field *field) {
+static void EntranceEffect_FreePlayerAcmd(Field *field) {
     FldAct_FreeAcmd(FieldPlayer_GetActor(Field_GetPlayer(field)));
 }
 
 GameEvent *func_ov036_0219f190(WarpSequence *warp) {
-    GameEvent *event = GameEvent_Create(warp->gsys, NULL, func_ov036_0219f380, sizeof(EntranceEffectWork));
+    GameEvent *event = GameEvent_Create(warp->gsys, NULL, EntranceEffect_ArrivalCallback, sizeof(EntranceEffectWork));
     EntranceEffectWork *work = GameEvent_GetData(event);
 
     work->warp = warp;
@@ -98,17 +101,17 @@ GameEvent *func_ov036_0219f190(WarpSequence *warp) {
     work->cameraParam.transitionType = warp->transitionType;
     work->cameraParam.isArrival = TRUE;
     work->cameraParam.isDeparture = FALSE;
-    func_ov036_0219f7b0(warp->field, &work->pos);
-    func_ov036_0219f8b8(work);
-    func_ov036_0219f1f8(work);
+    EntranceEffect_GetPlayerPosition(warp->field, &work->pos);
+    EntranceEffect_CreateDoorHandle(work);
+    EntranceEffect_SetArrivalSteps(work);
     return event;
 }
 
-static void func_ov036_0219f1f8(EntranceEffectWork *work) {
+static void EntranceEffect_SetArrivalSteps(EntranceEffectWork *work) {
     WarpSequence *warp = work->warp;
     Field *field = warp->field;
 
-    if (func_ov036_0219f90c(work)) {
+    if (EntranceEffect_HasDoor(work)) {
         switch (Field_GetPlayerDirection(field)) {
         case DIR_UP:
         case DIR_DOWN:
@@ -171,7 +174,7 @@ static void func_ov036_0219f1f8(EntranceEffectWork *work) {
 }
 
 // The player comes out of the entrance
-static GameEventReturnCode func_ov036_0219f380(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EntranceEffect_ArrivalCallback(GameEvent *event, u32 *state, void *data) {
     EntranceEffectWork *work = data;
     WarpSequence *warp = work->warp;
     GameSystem *gsys = warp->gsys;
@@ -186,8 +189,8 @@ static GameEventReturnCode func_ov036_0219f380(GameEvent *event, u32 *state, voi
     case ENTRANCE_STEP_START:
         Field_SetPlayerHidden(field, TRUE);
         if (!FieldCamera_SupportsDelay(camera)) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
             break;
         }
         FieldCamera_FinishDelay(camera);
@@ -195,30 +198,30 @@ static GameEventReturnCode func_ov036_0219f380(GameEvent *event, u32 *state, voi
         break;
     case ENTRANCE_STEP_WAIT_DELAY:
         if (!FieldCamera_IsDelayActive(camera)) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
         }
         break;
     case ENTRANCE_STEP_TRANSITION:
         func_ov036_021b7a68(work->camera, &work->cameraParam);
         FieldSnd_FadeInImmediate(fieldSound, gameData);
-        func_ov036_0219f97c(event, work);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        EntranceEffect_ChainArrivalTransition(event, work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case ENTRANCE_STEP_2:
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case ENTRANCE_STEP_OPEN_DOOR:
-        func_ov036_0219f91c(work);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        EntranceEffect_OpenDoor(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case ENTRANCE_STEP_WAIT_OPEN:
-        if (func_ov036_0219f8e8(work) == TRUE) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+        if (EntranceEffect_IsDoorAnimationDone(work) == TRUE) {
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
         }
         break;
     case ENTRANCE_STEP_WALK:
@@ -228,47 +231,47 @@ static GameEventReturnCode func_ov036_0219f380(GameEvent *event, u32 *state, voi
             *state = ENTRANCE_STEP_WAIT_TIMER;
             break;
         }
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case ENTRANCE_STEP_CLOSE_DOOR:
-        func_ov036_0219f94c(work);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        EntranceEffect_CloseDoor(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case ENTRANCE_STEP_WAIT_TIMER:
         if (work->timer++ > 15) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
         }
         break;
     case ENTRANCE_STEP_CAMERA:
         func_ov036_021b7ac0(work->camera);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case ENTRANCE_STEP_WAIT_CLOSE:
-        if (func_ov036_0219f8e8(work) == TRUE) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+        if (EntranceEffect_IsDoorAnimationDone(work) == TRUE) {
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
         }
         break;
     case ENTRANCE_STEP_END:
         break;
     }
-    if (GSYS_GetNowEvent(gsys) == event && func_ov036_0219f880(work) == ENTRANCE_STEP_END &&
+    if (GSYS_GetNowEvent(gsys) == event && EntranceEffect_GetStep(work) == ENTRANCE_STEP_END &&
         FieldTaskManager_IsIdle(taskManager)) {
         func_ov036_021b7ad4(work->camera);
         FieldCamera_LoadDefaults(camera);
         func_ov036_021b7a58(work->camera);
-        func_ov036_0219f8d8(work);
+        EntranceEffect_FreeDoorHandle(work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
 GameEvent *func_ov036_0219f4e0(WarpSequence *warp) {
-    GameEvent *event = GameEvent_Create(warp->gsys, NULL, func_ov036_0219f5dc, sizeof(EntranceEffectWork));
+    GameEvent *event = GameEvent_Create(warp->gsys, NULL, EntranceEffect_DepartureCallback, sizeof(EntranceEffectWork));
     EntranceEffectWork *work = GameEvent_GetData(event);
 
     work->warp = warp;
@@ -281,9 +284,9 @@ GameEvent *func_ov036_0219f4e0(WarpSequence *warp) {
     work->cameraParam.transitionType = warp->unk10;
     work->cameraParam.isArrival = FALSE;
     work->cameraParam.isDeparture = TRUE;
-    func_ov036_0219f7c0(warp->field, &work->pos);
-    func_ov036_0219f8b8(work);
-    func_ov036_0219f558(work);
+    EntranceEffect_GetFrontPosition(warp->field, &work->pos);
+    EntranceEffect_CreateDoorHandle(work);
+    EntranceEffect_SetDepartureSteps(work);
     if (func_ov012_0215cd98(warp->unk10)) {
         work->continueDirect = TRUE;
     } else {
@@ -292,8 +295,8 @@ GameEvent *func_ov036_0219f4e0(WarpSequence *warp) {
     return event;
 }
 
-static void func_ov036_0219f558(EntranceEffectWork *work) {
-    if (func_ov036_0219f90c(work)) {
+static void EntranceEffect_SetDepartureSteps(EntranceEffectWork *work) {
+    if (EntranceEffect_HasDoor(work)) {
         work->steps[0] = 0;
         work->steps[1] = 3;
         work->steps[2] = 1;
@@ -314,7 +317,7 @@ static void func_ov036_0219f558(EntranceEffectWork *work) {
 }
 
 // The player goes into the entrance
-static GameEventReturnCode func_ov036_0219f5dc(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EntranceEffect_DepartureCallback(GameEvent *event, u32 *state, void *data) {
     EntranceEffectWork *work = data;
     WarpSequence *warp = work->warp;
     GameSystem *gsys = warp->gsys;
@@ -326,24 +329,24 @@ static GameEventReturnCode func_ov036_0219f5dc(GameEvent *event, u32 *state, voi
     switch (*state) {
     case 0:
         func_ov036_021b7a68(work->camera, &work->cameraParam);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
     case 1:
         func_ov036_021b7ac0(work->camera);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
     case 3:
-        func_ov036_0219f91c(work);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        EntranceEffect_OpenDoor(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {
             return GAMEEVENT_CONTINUE_DIRECT;
         }
@@ -355,17 +358,17 @@ static GameEventReturnCode func_ov036_0219f5dc(GameEvent *event, u32 *state, voi
         if (func_ov036_021b7ae0(work->camera) && func_ov036_021b7ae8(work->camera)) {
             *state = 9;
         } else {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
         }
         if (work->continueDirect) {
             return GAMEEVENT_CONTINUE_DIRECT;
         }
         break;
     case 4:
-        if (func_ov036_0219f8e8(work) == TRUE) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+        if (EntranceEffect_IsDoorAnimationDone(work) == TRUE) {
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
             if (work->continueDirect) {
                 return GAMEEVENT_CONTINUE_DIRECT;
             }
@@ -373,18 +376,18 @@ static GameEventReturnCode func_ov036_0219f5dc(GameEvent *event, u32 *state, voi
         break;
     case 9:
         if (work->timer++ > 15) {
-            *state = func_ov036_0219f890(work);
-            func_ov036_0219f8a4(work);
+            *state = EntranceEffect_GetNextStep(work);
+            EntranceEffect_AdvanceStep(work);
             if (work->continueDirect) {
                 return GAMEEVENT_CONTINUE_DIRECT;
             }
         }
         break;
     case 5:
-        func_ov036_0219f180(field);
+        EntranceEffect_FreePlayerAcmd(field);
         GameEvent_ChainNext(event, func_ov036_021b74a0(gsys, warp));
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         if (work->continueDirect) {
             return GAMEEVENT_CONTINUE_DIRECT;
         }
@@ -392,21 +395,21 @@ static GameEventReturnCode func_ov036_0219f5dc(GameEvent *event, u32 *state, voi
     case 6:
         FieldSnd_SetZoneBGM(fieldSound, gameData, warp->spawn.zoneId, warp->endSeason);
         warp->unk48 = TRUE;
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case 7:
-        if (func_ov036_0219f9f0(work)) {
-            GFL_SndSEPlay(0x559);
+        if (EntranceEffect_ShouldPlayStairsSound(work)) {
+            GFL_SndSEPlay(SEQ_SE_KAIDAN);
         }
-        func_ov036_0219f9c8(event, work);
-        *state = func_ov036_0219f890(work);
-        func_ov036_0219f8a4(work);
+        EntranceEffect_ChainDepartureTransition(event, work);
+        *state = EntranceEffect_GetNextStep(work);
+        EntranceEffect_AdvanceStep(work);
         break;
     case 8:
         func_ov036_021b7ad4(work->camera);
         func_ov036_021b7a58(work->camera);
-        func_ov036_0219f8d8(work);
+        EntranceEffect_FreeDoorHandle(work);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -416,20 +419,20 @@ static u8 Field_GetPlayerDirection(Field *field) {
     return FieldPlayer_GetFaceDir(Field_GetPlayer(field));
 }
 
-static void func_ov036_0219f7b0(Field *field, VecFx32 *pos) {
+static void EntranceEffect_GetPlayerPosition(Field *field, VecFx32 *pos) {
     FieldPlayer_GetWPos(Field_GetPlayer(field), pos);
 }
 
-static void func_ov036_0219f7c0(Field *field, VecFx32 *pos) {
+static void EntranceEffect_GetFrontPosition(Field *field, VecFx32 *pos) {
     if (Field_GetResolvedControllerTypeID(field) == 1) {
-        func_ov036_0219f83c(field, pos);
+        EntranceEffect_GetRailFrontPosition(field, pos);
     } else {
-        func_ov036_0219f7e4(field, pos);
+        EntranceEffect_GetGridFrontPosition(field, pos);
     }
 }
 
 // On the grid: a tile in front of the player, at the map's height there
-static void func_ov036_0219f7e4(Field *field, VecFx32 *pos) {
+static void EntranceEffect_GetGridFrontPosition(Field *field, VecFx32 *pos) {
     FieldPlayer *player = Field_GetPlayer(field);
     u16 dir = FieldPlayer_GetFaceDir(player);
     VecFx32 playerPos;
@@ -446,9 +449,9 @@ static void func_ov036_0219f7e4(Field *field, VecFx32 *pos) {
 }
 
 // On rails: a step in front of the player on its rail
-static void func_ov036_0219f83c(Field *field, VecFx32 *pos) {
+static void EntranceEffect_GetRailFrontPosition(Field *field, VecFx32 *pos) {
     FieldPlayer *player = Field_GetPlayer(field);
-    u32 dir = FieldPlayer_GetFaceDir(player);
+    u16 dir = FieldPlayer_GetFaceDir(player);
     FieldRailSystem *rail = FieldNoGridMapper_GetRailSystem(Field_GetNoGridMapper(field));
     VecFx32 front;
     RailPosition railPos;
@@ -458,33 +461,33 @@ static void func_ov036_0219f83c(Field *field, VecFx32 *pos) {
     *pos = front;
 }
 
-static u8 func_ov036_0219f880(EntranceEffectWork *work) {
+static u8 EntranceEffect_GetStep(EntranceEffectWork *work) {
     return work->steps[work->stepIndex];
 }
 
-static u8 func_ov036_0219f890(EntranceEffectWork *work) {
+static u8 EntranceEffect_GetNextStep(EntranceEffectWork *work) {
     return work->steps[(u8)(work->stepIndex + 1)];
 }
 
-static void func_ov036_0219f8a4(EntranceEffectWork *work) {
+static void EntranceEffect_AdvanceStep(EntranceEffectWork *work) {
     work->stepIndex++;
     work->timer = 0;
 }
 
-static void func_ov036_0219f8b8(EntranceEffectWork *work) {
+static void EntranceEffect_CreateDoorHandle(EntranceEffectWork *work) {
     work->door = FieldPropSystem_CreateHandleAtPos(FieldG3DMapper_GetBMSystem(Field_GetG3DMapper(work->warp->field)), 1,
                                                    &work->pos);
 }
 
-static void func_ov036_0219f8d8(EntranceEffectWork *work) {
+static void EntranceEffect_FreeDoorHandle(EntranceEffectWork *work) {
     if (work->door != NULL) {
         FieldPropHandle_Free(work->door);
     }
 }
 
 // Whether the door's animation is done, or there is no door
-static BOOL func_ov036_0219f8e8(EntranceEffectWork *work) {
-    if (!func_ov036_0219f90c(work)) {
+static BOOL EntranceEffect_IsDoorAnimationDone(EntranceEffectWork *work) {
+    if (!EntranceEffect_HasDoor(work)) {
         return TRUE;
     }
     if (FieldPropHandle_IsAnmFinished(work->door)) {
@@ -494,17 +497,17 @@ static BOOL func_ov036_0219f8e8(EntranceEffectWork *work) {
 }
 
 // Whether there is a door
-static BOOL func_ov036_0219f90c(EntranceEffectWork *work) {
+static BOOL EntranceEffect_HasDoor(EntranceEffectWork *work) {
     if (work->door != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov036_0219f91c(EntranceEffectWork *work) {
+static void EntranceEffect_OpenDoor(EntranceEffectWork *work) {
     u16 soundId;
 
-    if (func_ov036_0219f90c(work)) {
+    if (EntranceEffect_HasDoor(work)) {
         FieldPropHandle_CallAnmCmd(work->door, 0, 0);
         if (FieldPropHandle_GetAnimSoundID(work->door, &soundId)) {
             GFL_SndSEPlay(soundId);
@@ -512,10 +515,10 @@ static void func_ov036_0219f91c(EntranceEffectWork *work) {
     }
 }
 
-static void func_ov036_0219f94c(EntranceEffectWork *work) {
+static void EntranceEffect_CloseDoor(EntranceEffectWork *work) {
     u16 soundId;
 
-    if (func_ov036_0219f90c(work)) {
+    if (EntranceEffect_HasDoor(work)) {
         FieldPropHandle_CallAnmCmd(work->door, 1, 0);
         if (FieldPropHandle_GetAnimSoundID(work->door, &soundId)) {
             GFL_SndSEPlay(soundId);
@@ -523,7 +526,7 @@ static void func_ov036_0219f94c(EntranceEffectWork *work) {
     }
 }
 
-static void func_ov036_0219f97c(GameEvent *event, EntranceEffectWork *work) {
+static void EntranceEffect_ChainArrivalTransition(GameEvent *event, EntranceEffectWork *work) {
     WarpSequence *warp = work->warp;
     GameEvent *transition;
 
@@ -536,7 +539,7 @@ static void func_ov036_0219f97c(GameEvent *event, EntranceEffectWork *work) {
     GameEvent_ChainNext(event, transition);
 }
 
-static void func_ov036_0219f9c8(GameEvent *event, EntranceEffectWork *work) {
+static void EntranceEffect_ChainDepartureTransition(GameEvent *event, EntranceEffectWork *work) {
     WarpSequence *warp = work->warp;
     GameEvent *transition;
 
@@ -549,10 +552,10 @@ static void func_ov036_0219f9c8(GameEvent *event, EntranceEffectWork *work) {
 }
 
 // Whether to play the sound of going in without a door
-static BOOL func_ov036_0219f9f0(EntranceEffectWork *work) {
+static BOOL EntranceEffect_ShouldPlayStairsSound(EntranceEffectWork *work) {
     WarpSequence *warp = work->warp;
 
-    if (func_ov036_0219f90c(work)) {
+    if (EntranceEffect_HasDoor(work)) {
         return FALSE;
     }
     if (warp->outTransition != 2) {

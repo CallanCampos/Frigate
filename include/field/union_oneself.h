@@ -86,6 +86,6 @@ void UnionOneself_SetUpdateDisabled(UnionSystem *unisys, Field *field, u8 disabl
 // (main) whether the trainer ID is one in the rival data
 BOOL Misc_IsMetTrainer(RivalDataSave *rival, u32 trainerId);
 // (overlay 36) adds the player of a beacon heard to the visitors the field shows
-void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *entry, const u16 *look, u8 state);
+void UnionChat_AppendLine(UnionSystem *unisys, UnionBeaconEntry *entry, const u16 *look, u8 state);
 
 #endif // POKEBW2_FIELD_UNION_ONESELF_H

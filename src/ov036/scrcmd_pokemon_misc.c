@@ -90,8 +90,7 @@ BOOL s011E_TrainerCardSaveGymVictoryParty(VM *vm, FieldScriptEnv *env) {
     for (i = 0; i < 6; i++) {
         species[i] = 0;
     }
-    count = 0;
-    for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
+    for (i = 0, count = 0; i < PokeParty_GetPkmCount(party); i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 0) {
@@ -265,21 +264,17 @@ static BOOL PokeParty_CheckTutorMoveCompat(PartyPkm *pkm, u32 tutor) {
             return TRUE;
         }
         return FALSE;
-    case 2: {
-        BOOL yes = FALSE;
-
+    case 2:
         if (PokeParty_CheckMoveTutorNormal(pkm, 0)) {
             return TRUE;
         }
-        yes = TRUE;
         if (PokeParty_CheckMoveTutorNormal(pkm, 1)) {
-            return yes;
+            return TRUE;
         }
-        if (!PokeParty_CheckMoveTutorNormal(pkm, 2)) {
-            yes = FALSE;
+        if (PokeParty_CheckMoveTutorNormal(pkm, 2)) {
+            return TRUE;
         }
-        return yes;
-    }
+        return FALSE;
     }
     return FALSE;
 }
@@ -382,7 +377,7 @@ BOOL s01D4_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
             args.move = MOVE_DRACO_METEOR;
             break;
         default:
-            args.move = 0xa5;
+            args.move = MOVE_STRUGGLE;
             break;
         }
         args.picked = picked;
@@ -418,14 +413,14 @@ BOOL s0223_PokePartyGetHiddenPowerType(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u32 index = ScriptReadAny(vm, env);
     u8 tm = PML_ItemGetTMBitMask(ITEM_TM10);
-    u16 type;
 
-    if (!CheckGetPartyPokemon(env, index, &pkm) || !canPkmLearnTM_Wrapper(pkm, tm)) {
-        type = 0xffff;
+    if (!CheckGetPartyPokemon(env, index, &pkm)) {
+        *result = 0xffff;
+    } else if (!canPkmLearnTM_Wrapper(pkm, tm)) {
+        *result = 0xffff;
     } else {
-        type = getHiddenPowerType(pkm);
+        *result = getHiddenPowerType(pkm);
     }
-    *result = type;
     return FALSE;
 }
 

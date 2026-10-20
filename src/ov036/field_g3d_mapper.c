@@ -350,7 +350,7 @@ void FieldG3DMapper_GenLocators0(FieldG3DMapper *mapper, const VecFx32 *playerPo
     u32 layer;
     fx32 y;
     fx32 layerHeight;
-    fx32 span;
+    u32 span;
     u32 chunkId;
     s32 i;
     FieldChunkLocator *locator;
@@ -383,15 +383,19 @@ void FieldG3DMapper_GenLocators0(FieldG3DMapper *mapper, const VecFx32 *playerPo
 
 // The chunks around the player, within the matrix
 void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators) {
-    s32 width = mapper->matrixWidth;
-    s32 height = mapper->matrixHeight;
-    fx32 span = mapper->chunkSpan;
-    fx32 halfSpan = FX_Div(span, FX32_CONST(2));
+    s32 z;
+    s32 height;
+    s32 width;
+    u32 span;
+    fx32 halfSpan;
     s32 startX;
     s32 startZ;
-    s32 z;
     s32 x;
 
+    width = mapper->matrixWidth;
+    height = mapper->matrixHeight;
+    span = mapper->chunkSpan;
+    halfSpan = FX_Div(span, FX32_CONST(2));
     if (mapper->chunkLoadDiameterX % 2 == 0) {
         startX = func_ov036_02184fb8(mapper->chunkLoadDiameterX, span, playerPos->x);
     } else {
@@ -415,8 +419,8 @@ void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPo
             if (chunkX < 0 || chunkX >= width) {
                 continue;
             }
-            locator = &locators[x + mapper->chunkLoadDiameterX * z];
-            FieldChunkLocator_SetChunkID(locator, chunkX + width * chunkZ);
+            locator = &locators[x + z * mapper->chunkLoadDiameterX];
+            FieldChunkLocator_SetChunkID(locator, chunkX + chunkZ * width);
             FieldChunkLocator_SetPos(locator, halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), 0,
                                      halfSpan + FX_Mul(chunkZ << FX32_SHIFT, span));
         }
@@ -425,69 +429,80 @@ void FieldG3DMapper_GenLocators1(FieldG3DMapper *mapper, const VecFx32 *playerPo
 
 // The chunks around the player, wrapping around the matrix
 void FieldG3DMapper_GenLocators2(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators) {
-    u16 width = mapper->matrixWidth;
-    s32 height = mapper->matrixHeight;
-    fx32 span = mapper->chunkSpan;
-    fx32 halfSpan = FX_Div(span, FX32_CONST(2));
-    s32 startX = FieldG3DMapper_CalcChunkLoadAreaStart(mapper->chunkLoadDiameterX, span, playerPos->x);
-    s32 startZ = FieldG3DMapper_CalcChunkLoadAreaStart(mapper->chunkLoadDiameterZ, span, playerPos->z);
     s32 z;
     s32 x;
+    s32 startX;
+    s32 startZ;
+    s32 chunkX;
+    s32 chunkZ;
+    s32 height;
+    u16 width;
+    u32 span;
+    fx32 halfSpan;
+    s32 wrappedZ;
+    s32 wrappedX;
+    FieldChunkLocator *locator;
+    fx32 posZ;
 
+    width = mapper->matrixWidth;
+    height = mapper->matrixHeight;
+    span = mapper->chunkSpan;
+    halfSpan = FX_Div(span, FX32_CONST(2));
+    startX = FieldG3DMapper_CalcChunkLoadAreaStart(mapper->chunkLoadDiameterX, span, playerPos->x);
+    startZ = FieldG3DMapper_CalcChunkLoadAreaStart(mapper->chunkLoadDiameterZ, span, playerPos->z);
     for (z = 0; z < mapper->chunkLoadDiameterZ; z++) {
-        s32 chunkZ = startZ + z;
-        s32 wrappedZ = chunkZ % height;
-
+        chunkZ = startZ + z;
+        wrappedZ = chunkZ % height;
         if (wrappedZ < 0) {
             wrappedZ += height;
         }
         for (x = 0; x < mapper->chunkLoadDiameterX; x++) {
-            s32 chunkX = startX + x;
-            s32 wrappedX;
-            FieldChunkLocator *locator;
-
+            posZ = FX_Mul(chunkZ << FX32_SHIFT, span);
+            chunkX = startX + x;
             wrappedX = chunkX % width;
             if (wrappedX < 0) {
                 wrappedX += width;
             }
-            locator = &locators[x + mapper->chunkLoadDiameterX * z];
+            locator = &locators[x + z * mapper->chunkLoadDiameterX];
             FieldChunkLocator_SetChunkID(locator, wrappedX + wrappedZ * width);
-            FieldChunkLocator_SetPos(locator, halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), 0,
-                                     halfSpan + FX_Mul(chunkZ << FX32_SHIFT, span));
+            FieldChunkLocator_SetPos(locator, halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), 0, halfSpan + posZ);
         }
     }
 }
 
 // The player's layer of the matrix and the nearer of the layers above and below it
 void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators) {
-    u16 width = mapper->matrixWidth;
-    u32 matrixSize = width * mapper->matrixHeight;
-    fx32 span = mapper->chunkSpan;
-    fx32 halfSpan = FX_Div(span, FX32_CONST(2));
-    fx32 layerHeight = mapper->unk08;
-    s32 layer = FX_Div(playerPos->y, layerHeight) >> FX32_SHIFT;
+    u32 layer;
+    u32 matrixSize;
+    fx32 layerHeight;
+    fx32 halfSpan;
+    u16 width;
+    u32 span;
     s32 otherLayer;
     u32 chunkId;
     u32 index;
     s32 i;
     fx32 y;
-    u32 layerStart;
+    s32 x;
+    s32 z;
 
-    if ((u32)(playerPos->y - layerHeight * layer) > layerHeight / 2) {
+    width = mapper->matrixWidth;
+    matrixSize = width * mapper->matrixHeight;
+    span = mapper->chunkSpan;
+    halfSpan = FX_Div(span, FX32_CONST(2));
+    layerHeight = mapper->unk08;
+    layer = FX_Div(playerPos->y, layerHeight) >> FX32_SHIFT;
+    if (playerPos->y - layer * layerHeight > layerHeight / 2) {
         otherLayer = 1;
     } else {
         otherLayer = -1;
     }
     index = 0;
-    y = FX_Mul(layer << FX32_SHIFT, layerHeight);
-    layerStart = matrixSize * layer;
     for (i = 0; i < matrixSize; i++, index++) {
-        s32 x;
-        s32 z;
-
+        y = FX_Mul(layer << FX32_SHIFT, layerHeight);
         x = i % mapper->matrixWidth;
         z = i / mapper->matrixWidth;
-        chunkId = layerStart + width * z + x;
+        chunkId = layer * matrixSize + z * width + x;
         if (chunkId >= mapper->chunkIdCount) {
             chunkId = 0xffffffff;
         }
@@ -495,16 +510,11 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
         FieldChunkLocator_SetPos(&locators[index], halfSpan + FX_Mul(x << FX32_SHIFT, span), y,
                                  halfSpan + FX_Mul(z << FX32_SHIFT, span));
     }
-    otherLayer += layer;
-    y = FX_Mul(otherLayer << FX32_SHIFT, layerHeight);
-    layerStart = otherLayer * matrixSize;
     for (i = 0; i < matrixSize; i++, index++) {
-        s32 x;
-        s32 z;
-
+        y = FX_Mul((layer + otherLayer) << FX32_SHIFT, layerHeight);
         x = i % mapper->matrixWidth;
         z = i / mapper->matrixWidth;
-        chunkId = layerStart + width * z + x;
+        chunkId = (layer + otherLayer) * matrixSize + z * width + x;
         if (chunkId >= mapper->chunkIdCount) {
             chunkId = 0xffffffff;
         }

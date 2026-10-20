@@ -211,9 +211,9 @@ typedef struct {
     u8 battlePoints[4];
 } WbtTournamentInfo;
 
-extern const WbtTournamentInfo data_ov036_021d4920[15];
+extern const WbtTournamentInfo PWT_TOURNAMENT_INFO[15];
 
-const WbtTournamentInfo *func_ov036_021c98a4(s32 tournament);
+const WbtTournamentInfo *GetPWTTournamentInfo(s32 tournament);
 
 void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf);
 

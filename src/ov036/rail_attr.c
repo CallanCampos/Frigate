@@ -2,13 +2,13 @@
 // special tiles. The name is the ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_map.h"
 #include "field/field_rail.h"
 #include "field/zone.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
 
-#define ARC_RAIL_ATTR 78
 #define RAIL_ATTR_NONE 0xffffffff
 
 // A rail line's tiles, across it and along it
@@ -38,7 +38,7 @@ void FieldRailTilemap_Load(RailAttr *attr, u32 fileId, u32 heapId) {
     u32 i = 0;
     u32 offset;
 
-    attr->data = GFL_ArcSysReadHeapNewLZGetLen(ARC_RAIL_ATTR, fileId, FALSE, heapId, &attr->size);
+    attr->data = GFL_ArcSysReadHeapNewLZGetLen(ARCID_RAIL_HEADERS, fileId, FALSE, heapId, &attr->size);
     attr->count = *(u32 *)attr->data;
     attr->tilemaps = GFL_HeapAllocate(heapId, attr->count * sizeof(RailTilemap *), TRUE, "rail_attr.c", 134);
     offset = sizeof(u32);

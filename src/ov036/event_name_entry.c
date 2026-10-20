@@ -2,7 +2,9 @@
 // Hollow rival's and a Join Avenue passerby's. The name is descriptive: the ROM embeds none for this file
 #include "types.h"
 #include "app/name_entry.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/shortcut_menu.h"
@@ -142,7 +144,7 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     occupants = getAddressOfBeginningOfOccupants(save);
     info = JoinAvenue_GetInfo(save);
     person = JoinAvenueOccupants_GetPlayerPerson(occupants);
-    name = GFL_StrBufCreate(64, 0x8004);
+    name = GFL_StrBufCreate(64, HEAPID_TAIL(HEAPID_GAMEEVENT));
 
     switch (target) {
     case 0:
@@ -226,7 +228,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
 
             getAddressOfBeginningOfOccupants(save);
             info = JoinAvenue_GetInfo(save);
-            msgData = GFL_MsgSysLoadData(FALSE, 2, 0x6d, HEAPID_GAMEEVENT);
+            msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, HEAPID_GAMEEVENT);
             GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
             GFL_MsgDataFree(msgData);
             JoinAvenueInfo_SetParam(info, 0, (u32)name);

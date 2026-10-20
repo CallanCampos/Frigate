@@ -1,3 +1,5 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/union_comm.h"
 #include "field/union_eff.h"
@@ -17,17 +19,19 @@
 // What a line of the chat holds when it is for a player who has not given a MAC
 static const u8 NO_MAC[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-static UnionVisitor *func_ov036_021b45cc(UnionVisitorList *list);
-static BOOL func_ov036_021b464c(UnionVisitorList *list, const u8 *mac, u16 counter);
+static UnionVisitor *UnionChat_AllocateLine(UnionVisitorList *list);
+static BOOL UnionChat_IsNewBeacon(UnionVisitorList *list, const u8 *mac, u16 counter);
 
 // Adds a line to the chat: for a beacon heard, or for this player with a sentence
-void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *bpc, const u16 *mine_pmsdata, u8 mine_chat_type) {
+void UnionChat_AppendLine(UnionSystem *unisys, UnionBeaconEntry *bpc, const u16 *mine_pmsdata, u8 mine_chat_type) {
     UnionVisitorList *list = &unisys->visitorList;
     UnionVisitor *visitor;
 
+    // clang-format off
     GFL_ASSERT(bpc != NULL || mine_pmsdata != NULL);
-    if (bpc == NULL || func_ov036_021b464c(list, bpc->mac, bpc->beacon.counter)) {
-        visitor = func_ov036_021b45cc(list);
+    // clang-format on
+    if (bpc == NULL || UnionChat_IsNewBeacon(list, bpc->mac, bpc->beacon.counter)) {
+        visitor = UnionChat_AllocateLine(list);
         if (bpc == NULL) {
             PlayerInfo *info = unisys->param->playerInfo;
 
@@ -80,7 +84,7 @@ void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *bpc, const u16 *
 }
 
 // The next line of the ring to fill
-static UnionVisitor *func_ov036_021b45cc(UnionVisitorList *list) {
+static UnionVisitor *UnionChat_AllocateLine(UnionVisitorList *list) {
     UnionVisitor *visitor;
 
     if (list->count > 0 && list->unk438[1] == list->unk438[0]) {
@@ -97,7 +101,7 @@ static UnionVisitor *func_ov036_021b45cc(UnionVisitorList *list) {
     return visitor;
 }
 
-UnionVisitor *func_ov036_021b4620(UnionVisitorList *list, u32 index) {
+UnionVisitor *UnionChat_GetLine(UnionVisitorList *list, u32 index) {
     UnionVisitor *visitor = &list->visitors[index % UNION_VISITOR_MAX];
 
     if (GFL_STD_MemCmp(visitor->mac, NO_MAC, 6) == 0) {
@@ -108,7 +112,7 @@ UnionVisitor *func_ov036_021b4620(UnionVisitorList *list, u32 index) {
 
 // Whether the player whose MAC and counter are given has no line in the newest ones yet, or a line with a different
 // counter
-static BOOL func_ov036_021b464c(UnionVisitorList *list, const u8 *mac, u16 counter) {
+static BOOL UnionChat_IsNewBeacon(UnionVisitorList *list, const u8 *mac, u16 counter) {
     s32 i;
 
     for (i = list->count; i > list->count - UNION_VISITOR_MAX; i--) {
@@ -117,7 +121,7 @@ static BOOL func_ov036_021b464c(UnionVisitorList *list, const u8 *mac, u16 count
         if (i < 0) {
             return TRUE;
         }
-        visitor = func_ov036_021b4620(list, i);
+        visitor = UnionChat_GetLine(list, i);
         if (visitor != NULL && GFL_STD_MemCmp(visitor->mac, mac, 6) == 0) {
             if (visitor->unk18 != counter) {
                 return TRUE;

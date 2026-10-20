@@ -1,6 +1,7 @@
 // The script commands of the gyms' puzzles, which call into each gym's gimmick overlay. The ROM has no name for the
 // file; scrcmd_gym.c is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field_script.h"
 #include "field/field_sound.h"
 #include "field/gimmick_roller_coaster.h"
@@ -175,7 +176,7 @@ BOOL func_ov036_021aaf88(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021aafa8(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
     GameEvent *event = GymMistralton_StartCannon(gsys, VM_Read16(vm));
 
     if (event == NULL) {
@@ -186,7 +187,8 @@ BOOL func_ov036_021aafa8(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s02BB_Gym0601FanAmbienceStart(VM *vm, FieldScriptEnv *env) {
-    FieldSnd_PlayAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))), 0x819);
+    FieldSnd_PlayAmbience(GameData_GetFieldSoundSystem(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))),
+                          SEQ_SE_GYM_H02);
     return FALSE;
 }
 
@@ -262,7 +264,7 @@ BOOL func_ov036_021ab124(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov036_021ab134(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
 
     GymVirbank_StopModelAnimations(gsys, VM_Read16(vm));
     return TRUE;
@@ -277,7 +279,7 @@ BOOL func_ov036_021ab158(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
 
     GymHumilau_PlayLeaderSplash(gsys);
     return TRUE;
@@ -285,7 +287,7 @@ BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov036_021ab190(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
 
     GymHumilau_PlayLeaderWaves(gsys);
     return TRUE;
@@ -305,7 +307,7 @@ BOOL func_ov036_021ab1a8(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021ab1e0(VM *vm, FieldScriptEnv *env) {
-    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
     u8 a1 = VM_Read16(vm);

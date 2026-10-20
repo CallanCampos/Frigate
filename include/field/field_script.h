@@ -396,12 +396,4 @@ void AddItemToListMenu(FieldScriptEnv *env, u32 a1, u32 message, u32 value, StrB
 BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);
 BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4);
 
-// Script commands of overlay 36's fldeff_iaigiri.c, enceff.c and fldeff_ochiba.c, which are not written yet
-BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env);
-BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env);
-BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
-
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

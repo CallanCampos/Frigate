@@ -1,3 +1,5 @@
+// Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+
 #include "types.h"
 #include "field/field.h"
 #include "field/field_camera.h"

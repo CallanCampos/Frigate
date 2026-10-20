@@ -1,5 +1,10 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/items.h"
 #include "constants/pokemon.h"
+#include "constants/species.h"
 #include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_msgbg.h"
@@ -16,6 +21,7 @@
 #include "system/bmp_menulist.h"
 #include "system/gf_font.h"
 #include "system/poke_icon.h"
+#include "system/str_tool.h"
 #include "system/wordset.h"
 #include "text/system/0104.h"
 
@@ -52,46 +58,62 @@ typedef struct {
     u8 finish;
 } PartySelectList;
 
-static void func_ov036_021c3924(PartySelectList *psl);
-static void func_ov036_021c3344(PartySelectList *psl);
-static void func_ov036_021c3468(PartySelectList *psl);
-static void func_ov036_021c36b8(PartySelectList *psl);
-static void func_ov036_021c3750(PartySelectList *psl);
-static int func_ov036_021c3318(PartySelectList *psl, u32 *out);
-static void func_ov036_021c3864(PartySelectList *psl);
-static void func_ov036_021c3730(PartySelectList *psl);
-static void func_ov036_021c3600(PartySelectList *psl);
-static void func_ov036_021c340c(PartySelectList *psl);
-static void func_ov036_021c3950(PartySelectList *psl);
-static void func_ov036_021c3a2c(PartySelectList *psl);
-static void func_ov036_021c3a50(PartySelectList *psl, u32 messageId);
-static BOOL func_ov036_021c3a64(PartySelectList *psl);
-static void func_ov036_021c3968(PartySelectList *psl);
-static s32 func_ov036_021c39c0(PartySelectList *psl);
-static void func_ov036_021c39b4(PartySelectList *psl);
-static void func_ov036_021c3c18(PartySelectList *psl);
-static void func_ov036_021c3a44(PartySelectList *psl);
-static void func_ov036_021c3648(PartySelectList *psl, u32 mode);
-static void func_ov036_021c38b4(PartySelectList *psl, u32 mode);
-static void func_ov036_021c39cc(BmpMenuList *list, s32 value, u8 init);
-static void func_ov036_021c39e8(BmpMenuList *list, s32 value, u8 y);
-static void func_ov036_021c3bf0(PartySelectList *psl, u32 mode);
-static void func_ov036_021c3aa4(PartySelectList *psl);
-static void func_ov036_021c3abc(PartySelectList *psl, PokeParty *party);
-static void func_ov036_021c3a70(PartySelectList *psl);
+static void PartySelectList_CreateMessages(PartySelectList *psl);
+static void PartySelectList_LoadIconResources(PartySelectList *psl);
+static void PartySelectList_CreateIcons(PartySelectList *psl);
+static void PartySelectList_LoadItemResources(PartySelectList *psl);
+static void PartySelectList_CreateItemIcons(PartySelectList *psl);
+static int PartySelectList_GetResult(PartySelectList *psl, u32 *out);
+static void PartySelectList_DeleteItemIcons(PartySelectList *psl);
+static void PartySelectList_FreeItemResources(PartySelectList *psl);
+static void PartySelectList_DeleteIcons(PartySelectList *psl);
+static void PartySelectList_FreeIconResources(PartySelectList *psl);
+static void PartySelectList_FreeMessages(PartySelectList *psl);
+static void PartySelectList_CreateMessageWindow(PartySelectList *psl);
+static void PartySelectList_PrintMessage(PartySelectList *psl, u32 messageId);
+static BOOL PartySelectList_IsMessageDone(PartySelectList *psl);
+static void PartySelectList_CreateMenu(PartySelectList *psl);
+static u32 PartySelectList_UpdateMenu(PartySelectList *psl);
+static void PartySelectList_FreeMenu(PartySelectList *psl);
+static void PartySelectList_ClearPreview(PartySelectList *psl);
+static void PartySelectList_FreeMessageWindow(PartySelectList *psl);
+static void PartySelectList_ShowIcons(PartySelectList *psl, u32 mode);
+static void PartySelectList_ShowItemIcons(PartySelectList *psl, u32 mode);
+static void PartySelectList_CursorCallback(BmpMenuList *list, s32 value, u8 init);
+static void PartySelectList_RowColorCallback(BmpMenuList *list, s32 value, u8 y);
+static void PartySelectList_ShowPreview(PartySelectList *psl, u32 mode);
+static void PartySelectList_FreePreviewWindow(PartySelectList *psl);
+static void PartySelectList_DrawPartyDetails(PartySelectList *psl, PokeParty *party);
+static void PartySelectList_CreatePreviewWindow(PartySelectList *psl);
 
-static const ListMenuRow data_ov036_021d2508[3] = {
+static const ListMenuRow sPartySelectRows[] = {
     { Bank0104_Text_Party, { 0 } },
     { Bank0104_Text_BattleBox, { 1 } },
     { Bank0104_Text_Cancel, { 2 } },
 };
-static const ListMenuRequest data_ov036_021d2520 = { 3, 3,   0,    0x0d, 0x1000, 0x2f, 0, 1, 0,
-                                                     0, 0xc, 0x10, 0x12, 0xb,    0xd,  6, 0 };
+
+static const ListMenuRequest sPartySelectRequest = {
+    .count = NELEMS(sPartySelectRows),
+    .maxShown = 3,
+    .itemX = 13,
+    .fgColor = 1,
+    .bgColor = 15,
+    .shadowColor = 2,
+    .lineSpacing = 1,
+    .fontSizeX = 12,
+    .rowHeight = 16,
+    .x = 18,
+    .y = 11,
+    .width = 13,
+    .height = 6,
+};
 
 void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 partyOk, u32 bboxOk, HeapID heapId) {
     PartySelectList *psl;
 
+    // clang-format off
     GFL_ASSERT(temoti != NULL && bbox != NULL);
+    // clang-format on
     psl = GFL_HeapAllocate(heapId, sizeof(PartySelectList), TRUE, "party_select_list.c", 211);
     psl->field = field;
     psl->temoti = temoti;
@@ -100,25 +122,27 @@ void *func_ov036_021c3180(Field *field, PokeParty *temoti, PokeParty *bbox, u8 p
     psl->partyOk = partyOk;
     psl->bboxOk = bboxOk;
     psl->unit = ClActUnit_Create(32, 10, psl->heapId);
-    psl->font = GFL_FontCreate(23, 3, 0, 0, psl->heapId);
-    func_ov036_021c3924(psl);
-    func_ov036_021c3344(psl);
-    func_ov036_021c3468(psl);
-    func_ov036_021c36b8(psl);
-    func_ov036_021c3750(psl);
+    psl->font = GFL_FontCreate(ARCID_FONT, 3, 0, 0, psl->heapId);
+    PartySelectList_CreateMessages(psl);
+    PartySelectList_LoadIconResources(psl);
+    PartySelectList_CreateIcons(psl);
+    PartySelectList_LoadItemResources(psl);
+    PartySelectList_CreateItemIcons(psl);
     return psl;
 }
 
 int func_ov036_021c3218(void *select, u32 *out) {
     PartySelectList *psl = select;
-    int result = func_ov036_021c3318(psl, out);
+    int result = PartySelectList_GetResult(psl, out);
 
+    // clang-format off
     GFL_ASSERT(psl->finish == TRUE);
-    func_ov036_021c3864(psl);
-    func_ov036_021c3730(psl);
-    func_ov036_021c3600(psl);
-    func_ov036_021c340c(psl);
-    func_ov036_021c3950(psl);
+    // clang-format on
+    PartySelectList_DeleteItemIcons(psl);
+    PartySelectList_FreeItemResources(psl);
+    PartySelectList_DeleteIcons(psl);
+    PartySelectList_FreeIconResources(psl);
+    PartySelectList_FreeMessages(psl);
     GFL_FontFree(psl->font);
     ClActUnit_Delete(psl->unit);
     GFL_HeapFree(psl);
@@ -130,32 +154,38 @@ BOOL func_ov036_021c3278(void *select) {
 
     switch (psl->state) {
     case 0:
-        func_ov036_021c3a2c(psl);
-        func_ov036_021c3a50(psl, 3);
+        PartySelectList_CreateMessageWindow(psl);
+        PartySelectList_PrintMessage(psl, Bank0104_Text_PleaseSelectWhetherUse);
         psl->state++;
         break;
     case 1:
-        if (func_ov036_021c3a64(psl) == TRUE) {
-            func_ov036_021c3968(psl);
+        if (PartySelectList_IsMessageDone(psl) == TRUE) {
+            PartySelectList_CreateMenu(psl);
             psl->state++;
         }
         break;
     case 2:
         if (func_ov036_0218798c(psl->msgBGSys) == TRUE) {
-            s32 result = func_ov036_021c39c0(psl);
+            u32 result = PartySelectList_UpdateMenu(psl);
 
             if (result != BMPMENULIST_NULL) {
-                func_ov036_021c39b4(psl);
-                func_ov036_021c3c18(psl);
-                func_ov036_021c3a44(psl);
-                if (result == 2 || result == BMPMENULIST_CANCEL) {
+                PartySelectList_FreeMenu(psl);
+                PartySelectList_ClearPreview(psl);
+                PartySelectList_FreeMessageWindow(psl);
+                // Unsigned, so the cases are tested in the order 2, BMPMENULIST_CANCEL, BMPMENULIST_NULL
+                switch (result) {
+                case 2: // Cancel, chosen from the list or with B
+                case BMPMENULIST_CANCEL:
                     psl->cursor = 2;
-                } else if (result == BMPMENULIST_NULL) {
+                    psl->state++;
                     break;
-                } else {
+                case BMPMENULIST_NULL:
+                    break;
+                default:
                     psl->cursor = result;
+                    psl->state++;
+                    break;
                 }
-                psl->state++;
             }
         }
         break;
@@ -166,7 +196,7 @@ BOOL func_ov036_021c3278(void *select) {
     return FALSE;
 }
 
-static int func_ov036_021c3318(PartySelectList *psl, u32 *out) {
+static int PartySelectList_GetResult(PartySelectList *psl, u32 *out) {
     *out = 0;
     if (psl->cursor == 0 && psl->partyOk == 1) {
         *out = 1;
@@ -176,12 +206,12 @@ static int func_ov036_021c3318(PartySelectList *psl, u32 *out) {
     return psl->cursor;
 }
 
-static void func_ov036_021c3344(PartySelectList *psl) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(7, psl->heapId);
+static void PartySelectList_LoadIconResources(PartySelectList *psl) {
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, psl->heapId);
     int count;
     int i;
 
-    psl->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 0, 192, psl->heapId);
+    psl->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 192, psl->heapId);
     psl->iconCells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), psl->heapId);
     count = PokeParty_GetPkmCount(psl->temoti);
     for (i = 0; i < count; i++) {
@@ -198,7 +228,7 @@ static void func_ov036_021c3344(PartySelectList *psl) {
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov036_021c340c(PartySelectList *psl) {
+static void PartySelectList_FreeIconResources(PartySelectList *psl) {
     int count;
     int i;
 
@@ -216,7 +246,7 @@ static void func_ov036_021c340c(PartySelectList *psl) {
     ClActSys_FreePltt(psl->iconPalette);
 }
 
-static void func_ov036_021c3468(PartySelectList *psl) {
+static void PartySelectList_CreateIcons(PartySelectList *psl) {
     ClActorSetup setup = { 0, 32, 0, 21, 0 };
     int count = PokeParty_GetPkmCount(psl->temoti);
     int bboxCount;
@@ -275,7 +305,7 @@ static void func_ov036_021c3468(PartySelectList *psl) {
     }
 }
 
-static void func_ov036_021c3600(PartySelectList *psl) {
+static void PartySelectList_DeleteIcons(PartySelectList *psl) {
     int count = PokeParty_GetPkmCount(psl->temoti);
     int i;
 
@@ -290,7 +320,7 @@ static void func_ov036_021c3600(PartySelectList *psl) {
     }
 }
 
-static void func_ov036_021c3648(PartySelectList *psl, u32 mode) {
+static void PartySelectList_ShowIcons(PartySelectList *psl, u32 mode) {
     int i;
 
     for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
@@ -316,22 +346,22 @@ static void func_ov036_021c3648(PartySelectList *psl, u32 mode) {
     }
 }
 
-static void func_ov036_021c36b8(PartySelectList *psl) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x52, psl->heapId);
+static void PartySelectList_LoadItemResources(PartySelectList *psl) {
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, psl->heapId);
 
-    psl->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), 0, 0x120, 0, 1, psl->heapId);
+    psl->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), CLACT_VRAM_MAIN, 0x120, 0, 1, psl->heapId);
     psl->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(1), func_0202d89c(1), psl->heapId);
     psl->itemChars = ClActSys_LoadChars(arc, func_0202d894(), 0, 0, psl->heapId);
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov036_021c3730(PartySelectList *psl) {
+static void PartySelectList_FreeItemResources(PartySelectList *psl) {
     ClActSys_FreeChars(psl->itemChars);
     ClActSys_FreeCellAnims(psl->itemCells);
     ClActSys_FreePltt(psl->itemPalette);
 }
 
-static void func_ov036_021c3750(PartySelectList *psl) {
+static void PartySelectList_CreateItemIcons(PartySelectList *psl) {
     ClActorSetup setup = { 0, 40, 0, 20, 0 };
     int count = PokeParty_GetPkmCount(psl->temoti);
     int i;
@@ -339,7 +369,7 @@ static void func_ov036_021c3750(PartySelectList *psl) {
     for (i = 0; i < count; i++) {
         u32 item = PokeParty_GetParam(PokeParty_GetPkm(psl->temoti, i), PKM_PARAM_ITEM, NULL);
 
-        if (item != 0) {
+        if (item != ITEM_NONE) {
             if (PML_ItemIsMail(item) == TRUE) {
                 setup.sequence = 1;
             } else {
@@ -356,7 +386,7 @@ static void func_ov036_021c3750(PartySelectList *psl) {
         for (i = 0; i < count; i++) {
             u32 item = PokeParty_GetParam(PokeParty_GetPkm(psl->bbox, i), PKM_PARAM_ITEM, NULL);
 
-            if (item != 0) {
+            if (item != ITEM_NONE) {
                 if (PML_ItemIsMail(item) == TRUE) {
                     setup.sequence = 1;
                 } else {
@@ -371,7 +401,7 @@ static void func_ov036_021c3750(PartySelectList *psl) {
     }
 }
 
-static void func_ov036_021c3864(PartySelectList *psl) {
+static void PartySelectList_DeleteItemIcons(PartySelectList *psl) {
     int count = PokeParty_GetPkmCount(psl->temoti);
     int i;
 
@@ -390,7 +420,7 @@ static void func_ov036_021c3864(PartySelectList *psl) {
     }
 }
 
-static void func_ov036_021c38b4(PartySelectList *psl, u32 mode) {
+static void PartySelectList_ShowItemIcons(PartySelectList *psl, u32 mode) {
     int i;
 
     for (i = 0; i < PARTY_SELECT_LIST_MAX; i++) {
@@ -416,7 +446,7 @@ static void func_ov036_021c38b4(PartySelectList *psl, u32 mode) {
     }
 }
 
-static void func_ov036_021c3924(PartySelectList *psl) {
+static void PartySelectList_CreateMessages(PartySelectList *psl) {
     void *msgBGSys = Field_GetMsgBGSys(psl->field);
 
     psl->msgData = func_ov036_021879a0(msgBGSys, TEXT_BANK_0104);
@@ -424,38 +454,39 @@ static void func_ov036_021c3924(PartySelectList *psl) {
     psl->wordSet = GFL_WordSetSystemCreateDefault(psl->heapId);
 }
 
-static void func_ov036_021c3950(PartySelectList *psl) {
+static void PartySelectList_FreeMessages(PartySelectList *psl) {
     GFL_WordSetSystemFree(psl->wordSet);
     func_ov036_021879b8(psl->msgData);
 }
 
-static void func_ov036_021c3968(PartySelectList *psl) {
-    ListMenuOption *options = func_ov036_02187f0c(data_ov036_021d2508, 3, psl->msgData, psl->heapId);
+static void PartySelectList_CreateMenu(PartySelectList *psl) {
+    ListMenuOption *options =
+        func_ov036_02187f0c(sPartySelectRows, NELEMS(sPartySelectRows), psl->msgData, psl->heapId);
 
-    psl->list = func_ov036_02187e1c(psl->msgBGSys, &data_ov036_021d2520, options, 0, 0, func_ov036_021c39cc,
-                                    func_ov036_021c39e8, psl);
+    psl->list = func_ov036_02187e1c(psl->msgBGSys, &sPartySelectRequest, options, 0, 0, PartySelectList_CursorCallback,
+                                    PartySelectList_RowColorCallback, psl);
 }
 
-static void func_ov036_021c39b4(PartySelectList *psl) {
+static void PartySelectList_FreeMenu(PartySelectList *psl) {
     func_ov036_02187ea0(psl->list);
 }
 
-static s32 func_ov036_021c39c0(PartySelectList *psl) {
+static u32 PartySelectList_UpdateMenu(PartySelectList *psl) {
     return ListMenuUI_Update(psl->list);
 }
 
-static void func_ov036_021c39cc(BmpMenuList *list, s32 value, u8 init) {
+static void PartySelectList_CursorCallback(BmpMenuList *list, s32 value, u8 init) {
     PartySelectList *psl = BmpMenuList_GetWork(list);
 
     // The party or the Battle Box, and not a negative result
     if ((u32)value < 2) {
-        func_ov036_021c3bf0(psl, value);
+        PartySelectList_ShowPreview(psl, value);
     } else {
-        func_ov036_021c3c18(psl);
+        PartySelectList_ClearPreview(psl);
     }
 }
 
-static void func_ov036_021c39e8(BmpMenuList *list, s32 value, u8 y) {
+static void PartySelectList_RowColorCallback(BmpMenuList *list, s32 value, u8 y) {
     PartySelectList *psl = BmpMenuList_GetWork(list);
 
     if (value == 0 && psl->partyOk == 1) {
@@ -469,42 +500,42 @@ static void func_ov036_021c39e8(BmpMenuList *list, s32 value, u8 y) {
     BmpMenuList_SetOverrideColors(list, 1, 0, 2);
 }
 
-static void func_ov036_021c3a2c(PartySelectList *psl) {
+static void PartySelectList_CreateMessageWindow(PartySelectList *psl) {
     psl->infoWin = func_ov036_0218845c(psl->msgBGSys, psl->msgData);
 }
 
-static void func_ov036_021c3a44(PartySelectList *psl) {
+static void PartySelectList_FreeMessageWindow(PartySelectList *psl) {
     func_ov036_02188338(psl->infoWin);
 }
 
-static void func_ov036_021c3a50(PartySelectList *psl, u32 messageId) {
+static void PartySelectList_PrintMessage(PartySelectList *psl, u32 messageId) {
     func_ov036_0218836c(psl->infoWin, 0, 0, messageId);
 }
 
-static BOOL func_ov036_021c3a64(PartySelectList *psl) {
+static BOOL PartySelectList_IsMessageDone(PartySelectList *psl) {
     return func_ov036_021883e8(psl->infoWin);
 }
 
-static void func_ov036_021c3a70(PartySelectList *psl) {
+static void PartySelectList_CreatePreviewWindow(PartySelectList *psl) {
     if (psl->moneyWin == NULL) {
         psl->moneyWin = FieldMsgBG_CreateMoneyWin(psl->msgBGSys, psl->msgData, 1, 2, 30, 6);
     }
 }
 
-static void func_ov036_021c3aa4(PartySelectList *psl) {
+static void PartySelectList_FreePreviewWindow(PartySelectList *psl) {
     if (psl->moneyWin != NULL) {
         func_ov036_02187c1c(psl->moneyWin);
         psl->moneyWin = NULL;
     }
 }
 
-static void func_ov036_021c3abc(PartySelectList *psl, PokeParty *party) {
+static void PartySelectList_DrawPartyDetails(PartySelectList *psl, PokeParty *party) {
     StrBuf *text;
     StrBuf *format;
     int count;
     int i;
 
-    func_ov036_021c3a70(psl);
+    PartySelectList_CreatePreviewWindow(psl);
     func_ov036_02187c7c(psl->moneyWin);
     text = GFL_StrBufCreate(64, psl->heapId);
     format = GFL_StrBufCreate(64, psl->heapId);
@@ -522,19 +553,20 @@ static void func_ov036_021c3abc(PartySelectList *psl, PokeParty *party) {
             showSex = PokeParty_GetParam(pkm, PKM_PARAM_SHOW_SEX, NULL);
             level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
             sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
-            GFL_MsgDataLoadStrbuf(psl->msgData, 4, format);
-            WordSetNumber(psl->wordSet, 0, level, 3, 0, 1);
+            GFL_MsgDataLoadStrbuf(psl->msgData, Bank0104_Text_L, format);
+            WordSetNumber(psl->wordSet, 0, level, 3, NUM_PAD_NONE, TRUE);
             GFL_WordSetFormatStrbuf(psl->wordSet, text, format);
             offset = i * 40;
             func_ov036_02187c58(psl->moneyWin, offset, 32, text, 0x440, psl->font);
-            if (sex != 2) {
-                if ((species == 29 || species == 32) && showSex == 0) {
+            if (sex != GENDER_UNKNOWN) {
+                if ((species == SPECIES_NIDORAN_F || species == SPECIES_NIDORAN_M) && showSex == 0) {
                     continue;
                 }
-                if (sex == 0) {
-                    func_ov036_02187c34(psl->moneyWin, offset + 31, 16, 5);
+                // The male and the female sign
+                if (sex == GENDER_MALE) {
+                    func_ov036_02187c34(psl->moneyWin, offset + 31, 16, Bank0104_Text_Empty);
                 } else {
-                    func_ov036_02187c34(psl->moneyWin, offset + 31, 16, 6);
+                    func_ov036_02187c34(psl->moneyWin, offset + 31, 16, Bank0104_Text_Empty_2);
                 }
             }
         }
@@ -543,7 +575,7 @@ static void func_ov036_021c3abc(PartySelectList *psl, PokeParty *party) {
     GFL_StrBufFree(format);
 }
 
-static void func_ov036_021c3bf0(PartySelectList *psl, u32 mode) {
+static void PartySelectList_ShowPreview(PartySelectList *psl, u32 mode) {
     PokeParty *party;
 
     if (mode == 0) {
@@ -551,13 +583,13 @@ static void func_ov036_021c3bf0(PartySelectList *psl, u32 mode) {
     } else {
         party = psl->bbox;
     }
-    func_ov036_021c3abc(psl, party);
-    func_ov036_021c3648(psl, mode);
-    func_ov036_021c38b4(psl, mode);
+    PartySelectList_DrawPartyDetails(psl, party);
+    PartySelectList_ShowIcons(psl, mode);
+    PartySelectList_ShowItemIcons(psl, mode);
 }
 
-static void func_ov036_021c3c18(PartySelectList *psl) {
-    func_ov036_021c3aa4(psl);
-    func_ov036_021c3648(psl, 2);
-    func_ov036_021c38b4(psl, 2);
+static void PartySelectList_ClearPreview(PartySelectList *psl) {
+    PartySelectList_FreePreviewWindow(psl);
+    PartySelectList_ShowIcons(psl, 2);
+    PartySelectList_ShowItemIcons(psl, 2);
 }

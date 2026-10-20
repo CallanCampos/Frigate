@@ -366,7 +366,7 @@ void FieldSnd_PlayAmbience(FieldSound *fieldSound, u32 se) {
     }
 }
 
-void FieldSnd_PlayAmbienceEx(FieldSound *fieldSound, u32 se, u16 volume) {
+void FieldSnd_PlayAmbienceEx(FieldSound *fieldSound, u32 se, u32 volume) {
     if (!FieldAmbience_CheckSoundID(se)) {
         GFL_SndSEPlay(se);
         return;

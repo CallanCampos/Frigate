@@ -2,6 +2,7 @@
 // Marts), Battle Points (the BP shop) or shards (the move tutors, whose moves the menu lists). The name is the ROM's
 // own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/field_script.h"
@@ -208,8 +209,8 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env);
 static void ShopUI_Init(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subId);
 static void ShopUI_LoadCurrencyDispMsg(ShopUIWork *wk, u8 currency);
 static u32 ShopUI_GetBalance(ShopUIWork *wk);
-static void func_ov036_021ac0d0(ShopUIWork *wk);
-static void func_ov036_021ac1d0(ShopUIWork *wk);
+static void ShopUI_TryBuyItem(ShopUIWork *wk);
+static void ShopUI_TryBuyMove(ShopUIWork *wk);
 static void ShopUI_UpdateItemBrowse(ShopUIWork *wk);
 static u8 ShopUI_WaitAB(ShopUIWork *wk);
 static void ShopUI_SpendMoney(ShopUIWork *wk, u32 amount);
@@ -226,45 +227,36 @@ static void ShopUI_FreeText(ShopUIWork *wk);
 static void ShopUI_LoadG2D(ShopUIWork *wk);
 static void ShopUI_FreeBG(ShopUIWork *wk);
 static void ShopUI_CreateCellActors(ShopUIWork *wk);
-static void func_ov036_021acc38(ShopUIWork *wk);
+static void ShopUI_LoadItemIconResources(ShopUIWork *wk);
 static void ShopUI_LoadItemSprite(ShopUIWork *wk, u16 item);
-static void func_ov036_021acd50(ShopUIWork *wk);
+static void ShopUI_CreateActors(ShopUIWork *wk);
 static void ShopUI_SetupSprites(ShopUIWork *wk);
-static void func_ov036_021acea0(ShopUIWork *wk);
+static void ShopUI_FreeClActResources(ShopUIWork *wk);
 static void ShopUI_SetupBmpWin(ShopUIWork *wk);
 static void ShopUI_FreeSprites(ShopUIWork *wk);
 static void ShopUI_UpdateMoneyDisp(ShopUIWork *wk);
-static void func_ov036_021ad168(ShopUIWork *wk, u16 item);
-static void func_ov036_021ad21c(ShopUIWork *wk, u16 item);
+static void ShopUI_PrintBagCount(ShopUIWork *wk, u16 item);
+static void ShopUI_PrintDescription(ShopUIWork *wk, u16 item);
 static void ShopUI_UpdateItemAmountDisp(ShopUIWork *wk, u16 amount, u32 price);
 static void ShopUI_SetupMenuList(ShopUIWork *wk);
-static void func_ov036_021ad48c(PrintQueue *queue, GFLBitmap *bitmap, int x, int y, const StrBuf *strbuf, Font *font,
-                                u16 color);
-static void func_ov036_021ad4d0(BmpMenuList *list, s32 value, u8 y);
-static void func_ov036_021ad560(BmpMenuList *list, s32 value, u8 y);
-static void func_ov036_021ad64c(BmpMenuList *list, s32 value, u8 init);
-static void func_ov036_021ad6cc(ShopUIWork *wk);
+static void ShopUI_PrintToRow(PrintQueue *queue, GFLBitmap *bitmap, int x, int y, const StrBuf *strbuf, Font *font,
+                              u16 color);
+static void ShopUI_PrintPrice(BmpMenuList *list, s32 value, u8 y);
+static void ShopUI_PrintTMPrice(BmpMenuList *list, s32 value, u8 y);
+static void ShopUI_CursorCallback(BmpMenuList *list, s32 value, u8 init);
+static void ShopUI_FreeMenuList(ShopUIWork *wk);
 static BOOL func_ov036_021ad6e0(u32 event);
 static void ShopUI_SetStatusDialogue(ShopUIWork *wk, u32 msgId, u16 item, BOOL plural);
 static void ShopUI_SetBuyConfirmMessage(ShopUIWork *wk, u8 listMode);
-static void func_ov036_021ad848(BmpWin *window);
-static void func_ov036_021ad864(ShopUIWork *wk, u32 msgId);
-static void func_ov036_021ad8e8(ShopUIWork *wk, u32 msgId, u16 item, u32 price, u16 amount);
-static void func_ov036_021ad954(ShopUIWork *wk, u32 msgId, u16 item, u32 price);
+static void ShopUI_DrawMessageFrame(BmpWin *window);
+static void ShopUI_PrintMessageInFrame(ShopUIWork *wk, u32 msgId);
+static void ShopUI_PrintItemBuyMessage(ShopUIWork *wk, u32 msgId, u16 item, u32 price, u16 amount);
+static void ShopUI_PrintTMBuyMessage(ShopUIWork *wk, u32 msgId, u16 item, u32 price);
 static void ShopUI_SetupMoveBuyMsg(ShopUIWork *wk, u32 msgId, u16 move, u32 price);
 static u32 ShopUI_ChangeItemAmount(s16 *amount, u16 max, s32 delta);
 static u8 ShopUI_UpdateInput(ShopUIWork *wk);
-static void func_ov036_021adbd4(u32 index);
+static void ShopUI_ClearListScreen(u32 index);
 static void GetMoveTutorShopSortimentBits(GameSystem *gsys, u32 moveIndex, u32 tutor, u8 *learnable);
-
-// Six bytes that no code in the ROM reads, probably the data of a function stripped at link, which the original kept
-// in the shared constant pool. Reading them before their definition keeps them there; this inline accessor emits no
-// code
-const u8 sUnk021d091e[6];
-
-static inline u8 ShopUI_GetUnk021d091e(u32 index) {
-    return sUnk021d091e[index];
-}
 
 static const u8 BP_SHOP_ITEM_COUNTS[] = { 42, 18 };
 
@@ -272,10 +264,8 @@ static const u8 MOVE_TUTOR_SHOP_ITEM_COUNTS[] = { 15, 17, 13, 15 };
 
 static const ConfirmDialogSetup sConfirmDialogSetup = { 1, 24, 13, 11, 25 };
 
-const u8 sUnk021d091e[6] = { 0 };
-
 // The price's format for money and for Battle Points
-static const u32 SHOP_UI_CURRENCY_MSGIDS[] = { 25, 26 };
+static const u32 SHOP_UI_CURRENCY_MSGIDS[] = { ScrcmdShop_Text_Empty_10, ScrcmdShop_Text_Bp_3 };
 
 static const u16 MOVE_TUTOR_CURRENCY_ITEMS[] = { ITEM_RED_SHARD, ITEM_BLUE_SHARD, ITEM_YELLOW_SHARD, ITEM_GREEN_SHARD };
 
@@ -284,9 +274,11 @@ static const u8 BADGE_SHOP_DAT_IDS[] = { 0, 1, 1, 2, 2, 3, 3, 4, 5 };
 
 static const ShopWindowSetup sWindowShards = { 1, 5, 2, 5, 2, 11, 38 };
 
+static const ShopWindowSetup sWindowBP = { 1, 2, 2, 8, 2, 11, 38 };
+
 static const ShopWindowSetup sWindowList = { 1, 12, 1, 19, 16, 2, 54 };
 
-static const ShopWindowSetup sWindowAmount = { 1, 18, 15, 13, 2, 11, 447 };
+static const ShopWindowSetup sWindowInfo = { 1, 5, 18, 27, 6, 11, 469 };
 
 static const ShopWindowSetup sWindowTitle = { 1, 1, 1, 9, 2, 11, 20 };
 
@@ -294,13 +286,11 @@ static const ShopWindowSetup sWindowMoney = { 1, 1, 3, 9, 2, 11, 38 };
 
 static const ShopWindowSetup sWindowInBag = { 1, 1, 15, 15, 2, 11, 415 };
 
+static const ShopWindowSetup sWindowAmount = { 1, 18, 15, 13, 2, 11, 447 };
+
 static const ShopWindowSetup sWindowMoveInfo = { 1, 1, 18, 30, 6, 11, 469 };
 
-static const ShopWindowSetup sWindowInfo = { 1, 5, 18, 27, 6, 11, 469 };
-
 static const ShopWindowSetup sWindowMessage = { 1, 1, 19, 30, 4, 11, 631 };
-
-static const ShopWindowSetup sWindowBP = { 1, 2, 2, 8, 2, 11, 38 };
 
 // The level of a special mart for each value of KeyDataSave_GetProgress
 static const int sSpecialMartLevels[] = { 0, 2, 4, 6, 8, 10 };
@@ -510,16 +500,16 @@ static const MoveTutorShopItem *MOVE_TUTOR_SHOP_ITEMS[] = {
 };
 
 // The windows: the title, the balance, the list, how many the bag holds, the amount, the description and messages
+static const ShopWindowSetup *sBPShopWindows[] = {
+    &sWindowTitle, &sWindowBP, &sWindowList, &sWindowInBag, &sWindowAmount, &sWindowInfo, &sWindowMessage,
+};
+
 static const ShopWindowSetup *sMoveTutorWindows[] = {
     &sWindowTitle, &sWindowShards, &sWindowList, &sWindowInBag, &sWindowAmount, &sWindowMoveInfo, &sWindowMessage,
 };
 
 static const ShopWindowSetup *sMartWindows[] = {
     &sWindowTitle, &sWindowMoney, &sWindowList, &sWindowInBag, &sWindowAmount, &sWindowInfo, &sWindowMessage,
-};
-
-static const ShopWindowSetup *sBPShopWindows[] = {
-    &sWindowTitle, &sWindowBP, &sWindowList, &sWindowInBag, &sWindowAmount, &sWindowInfo, &sWindowMessage,
 };
 
 BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
@@ -804,21 +794,21 @@ static u32 ShopUI_GetBalance(ShopUIWork *wk) {
 }
 
 // Chooses an item: says why it can't be bought, or asks for the amount, or asks whether to buy one
-static void func_ov036_021ac0d0(ShopUIWork *wk) {
+static void ShopUI_TryBuyItem(ShopUIWork *wk) {
     u32 balance = ShopUI_GetBalance(wk);
     u16 owned = BagSave_GetItemCountByID(wk->bag, wk->item, wk->heapId);
 
     if (!BagSave_CheckAvailItemSpace(wk->bag, wk->item, 1, wk->heapId)) {
-        ShopUI_SetStatusDialogue(wk, 10, wk->item, FALSE);
+        ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_CantTakeAnyMore, wk->item, FALSE);
         wk->state = 12;
         wk->nextState = 4;
         return;
     }
     if (balance < wk->price) {
         if (wk->currency == SHOP_CURRENCY_MONEY) {
-            ShopUI_SetStatusDialogue(wk, 3, wk->item, FALSE);
+            ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_DontHaveEnoughMoney, wk->item, FALSE);
         } else {
-            ShopUI_SetStatusDialogue(wk, 16, wk->item, FALSE);
+            ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_DontHaveEnoughBp, wk->item, FALSE);
         }
         wk->state = 12;
         wk->nextState = 4;
@@ -831,7 +821,7 @@ static void func_ov036_021ac0d0(ShopUIWork *wk) {
         return;
     }
     if (wk->listMode == SHOP_LIST_ITEMS) {
-        ShopUI_SetStatusDialogue(wk, 4, wk->item, FALSE);
+        ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_CertainlyHowManyWould, wk->item, FALSE);
         wk->state = 12;
         wk->nextState = 2;
         wk->maxAmount = balance / wk->price;
@@ -849,9 +839,9 @@ static void func_ov036_021ac0d0(ShopUIWork *wk) {
 }
 
 // The same for a move
-static void func_ov036_021ac1d0(ShopUIWork *wk) {
+static void ShopUI_TryBuyMove(ShopUIWork *wk) {
     if (ShopUI_GetBalance(wk) < wk->price) {
-        ShopUI_SetStatusDialogue(wk, 32, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], TRUE);
+        ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_DontHaveEnough, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], TRUE);
         wk->state = 12;
         wk->nextState = 4;
         return;
@@ -884,9 +874,9 @@ static void ShopUI_UpdateItemBrowse(ShopUIWork *wk) {
     wk->tutorMoveIndex = wk->tutorMoveIndices[index];
     wk->amount = 1;
     if (wk->currency == SHOP_CURRENCY_SHARDS) {
-        func_ov036_021ac1d0(wk);
+        ShopUI_TryBuyMove(wk);
     } else {
-        func_ov036_021ac0d0(wk);
+        ShopUI_TryBuyItem(wk);
     }
 }
 
@@ -921,6 +911,9 @@ static void ShopUI_SpendMoney(ShopUIWork *wk, u32 amount) {
 }
 
 static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subId) {
+    // Six unused bytes retained with the shop menu resources.
+    static const u8 sUnk021d091e[6] = { 0 };
+
     u32 result;
 
     switch (wk->state) {
@@ -932,7 +925,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         ShopUI_UpdateItemBrowse(wk);
         break;
     case 2:
-        func_ov036_021ad168(wk, wk->item);
+        ShopUI_PrintBagCount(wk, wk->item);
         ShopUI_UpdateItemAmountDisp(wk, wk->amount, wk->price);
         ClActor_SetVisible(wk->actors[3], TRUE);
         wk->state = 3;
@@ -941,7 +934,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         wk->state = ShopUI_UpdateInput(wk);
         break;
     case 4:
-        func_ov036_021adbd4(0);
+        ShopUI_ClearListScreen(0);
         BmpWin_FlushMap(wk->windows[2]);
         BmpWin_FlushMap(wk->windows[5]);
         GFL_BGSysQueueScrLoad(1);
@@ -950,17 +943,17 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         wk->state = 1;
         break;
     case 5:
-        func_ov036_021adbd4(1);
+        ShopUI_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
         if (wk->listMode != SHOP_LIST_TMS) {
-            func_ov036_021ad168(wk, wk->item);
+            ShopUI_PrintBagCount(wk, wk->item);
         }
         wk->state = 7;
         break;
     case 6:
-        func_ov036_021adbd4(1);
+        ShopUI_ClearListScreen(1);
         BmpWin_FlushMap(wk->windows[2]);
         ClActor_SetVisible(wk->actors[3], FALSE);
         wk->confirmDialog = ShopUI_CreateConfirmDialog(&sConfirmDialogSetup, 1, 9, 0, wk->heapId);
@@ -977,7 +970,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
             } else {
                 wk->state = 8;
             }
-            func_ov036_021adbd4(1);
+            ShopUI_ClearListScreen(1);
             BmpMenuList_Redraw(wk->list);
             BmpWin_FlushMap(wk->windows[2]);
             GFL_BGSysQueueScrLoad(1);
@@ -987,7 +980,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         break;
     case 8:
         GFL_SndSEPlay(SEQ_SE_SYS_22);
-        ShopUI_SetStatusDialogue(wk, 9, wk->item, wk->amount > 1);
+        ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_HereThankPutAway, wk->item, wk->amount > 1);
         ShopUI_SpendMoney(wk, wk->price * wk->amount);
         ShopUI_UpdateMoneyDisp(wk);
         BagSave_AddItem(wk->bag, wk->item, wk->amount, wk->heapId);
@@ -995,7 +988,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         wk->nextState = 11;
         break;
     case 9:
-        ShopUI_SetStatusDialogue(wk, 33, wk->item, FALSE);
+        ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_PickPokemonWantLearn, wk->item, FALSE);
         wk->state = 12;
         wk->nextState = 10;
         break;
@@ -1007,7 +1000,7 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
     case 11:
         // A Premier Ball for ten Poké Balls
         if (wk->item == ITEM_POKE_BALL && wk->amount >= 10) {
-            ShopUI_SetStatusDialogue(wk, 15, wk->item, FALSE);
+            ShopUI_SetStatusDialogue(wk, ScrcmdShop_Text_AlsoGetPremierBall, wk->item, FALSE);
             BagSave_AddItem(wk->bag, ITEM_PREMIER_BALL, 1, wk->heapId);
             RecordAddOne(wk->records, 31);
             wk->state = 12;
@@ -1020,8 +1013,8 @@ static BOOL ShopUI_Update(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subI
         wk->state = ShopUI_WaitAB(wk);
         break;
     case 13:
-        func_ov036_021ad6cc(wk);
-        func_ov036_021acea0(wk);
+        ShopUI_FreeMenuList(wk);
+        ShopUI_FreeClActResources(wk);
         ShopUI_FreeSprites(wk);
         ShopUI_FreeBG(wk);
         ShopUI_FreeListMenu(wk);
@@ -1091,7 +1084,7 @@ static void ShopUI_LoadPokeMartItems(ShopUIWork *wk, u32 shopId, u32 fileId, u32
     }
     wk->entryCount = i;
     ShopUI_CheckSellingTMHM(wk->entries, wk->entryCount);
-    ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, 11, BMPMENULIST_CANCEL, wk->heapId);
+    ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, ScrcmdShop_Text_Cancel, BMPMENULIST_CANCEL, wk->heapId);
     GFL_HeapFree(items);
     GFL_HeapFree(counts);
     GFL_MsgDataFree(msgData);
@@ -1111,7 +1104,7 @@ static void ShopUI_LoadBPShopItems(ShopUIWork *wk, u32 index) {
         wk->entries[i].price = items[i].price;
     }
     wk->entryCount = i;
-    ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, 11, BMPMENULIST_CANCEL, wk->heapId);
+    ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, ScrcmdShop_Text_Cancel, BMPMENULIST_CANCEL, wk->heapId);
     GFL_MsgDataFree(msgData);
 }
 
@@ -1157,7 +1150,7 @@ static void ShopUI_LoadMoveTutorItems(ShopUIWork *wk, u32 tutor) {
         wk->tutorMoveIndices[index] = i;
     }
     wk->entryCount = i;
-    ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, 11, BMPMENULIST_CANCEL, wk->heapId);
+    ListMenuCore_AppendMsgOption(&wk->options[i], wk->msgData, ScrcmdShop_Text_Cancel, BMPMENULIST_CANCEL, wk->heapId);
     GFL_MsgDataFree(msgData);
 }
 
@@ -1224,7 +1217,7 @@ static void ShopUI_CreateCellActors(ShopUIWork *wk) {
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov036_021acc38(ShopUIWork *wk) {
+static void ShopUI_LoadItemIconResources(ShopUIWork *wk) {
     wk->res[2].palette =
         ClActSys_LoadPlttRange(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 2), 0, 32, 0, 1, wk->heapId);
     wk->res[2].chars = ClActSys_LoadChars(wk->iconArc, GetItemGraphicsDatID(ITEM_MASTER_BALL, 1), 0, 0, wk->heapId);
@@ -1259,7 +1252,7 @@ static void ShopUI_LoadItemSprite(ShopUIWork *wk, u16 item) {
     }
 }
 
-static void func_ov036_021acd50(ShopUIWork *wk) {
+static void ShopUI_CreateActors(ShopUIWork *wk) {
     wk->actors[0] = ClActor_Create(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims,
                                    &sActorSetups[0], 0, wk->heapId);
     wk->actors[1] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
@@ -1281,11 +1274,11 @@ static void ShopUI_SetupSprites(ShopUIWork *wk) {
     ClActUnit_SetActive(wk->clactUnit, TRUE);
     ShopUI_CreateCellActors(wk);
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, wk->heapId);
-    func_ov036_021acc38(wk);
-    func_ov036_021acd50(wk);
+    ShopUI_LoadItemIconResources(wk);
+    ShopUI_CreateActors(wk);
 }
 
-static void func_ov036_021acea0(ShopUIWork *wk) {
+static void ShopUI_FreeClActResources(ShopUIWork *wk) {
     ClActSys_FreeCellAnims(wk->res[2].cellAnims);
     ClActSys_FreeCellAnims(wk->res[1].cellAnims);
     ClActSys_FreeCellAnims(wk->res[0].cellAnims);
@@ -1369,7 +1362,7 @@ static void ShopUI_UpdateMoneyDisp(ShopUIWork *wk) {
 }
 
 // How many of the item the bag holds
-static void func_ov036_021ad168(ShopUIWork *wk, u16 item) {
+static void ShopUI_PrintBagCount(ShopUIWork *wk, u16 item) {
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdShop_Text_Bag);
     StrBuf *strbuf = GFL_StrBufCreate(20, wk->heapId);
     GFLBitmap *bitmap;
@@ -1386,7 +1379,7 @@ static void func_ov036_021ad168(ShopUIWork *wk, u16 item) {
 }
 
 // The description of the item or move at the cursor
-static void func_ov036_021ad21c(ShopUIWork *wk, u16 item) {
+static void ShopUI_PrintDescription(ShopUIWork *wk, u16 item) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(wk->windows[5]);
 
     GFL_BitmapFill(bitmap, 0);
@@ -1432,11 +1425,11 @@ static void ShopUI_SetupMenuList(ShopUIWork *wk) {
     BmpMenuListHeader header;
 
     header.options = wk->options;
-    header.cursorCallback = func_ov036_021ad64c;
+    header.cursorCallback = ShopUI_CursorCallback;
     if (wk->listMode == SHOP_LIST_ITEMS || wk->listMode == SHOP_LIST_MOVES) {
-        header.printCallback = func_ov036_021ad4d0;
+        header.printCallback = ShopUI_PrintPrice;
     } else {
-        header.printCallback = func_ov036_021ad560;
+        header.printCallback = ShopUI_PrintTMPrice;
     }
     header.count = ListMenuCore_GetFirstFreeIndex(wk->options);
     header.maxShown = 7;
@@ -1464,8 +1457,8 @@ static void ShopUI_SetupMenuList(ShopUIWork *wk) {
 }
 
 // Prints straight to the bitmap in the first row, and through the print queue below it
-static void func_ov036_021ad48c(PrintQueue *queue, GFLBitmap *bitmap, int x, int y, const StrBuf *strbuf, Font *font,
-                                u16 color) {
+static void ShopUI_PrintToRow(PrintQueue *queue, GFLBitmap *bitmap, int x, int y, const StrBuf *strbuf, Font *font,
+                              u16 color) {
     if (y <= 8) {
         GFL_TextRendererDrawToBitmapEx(bitmap, x, y, strbuf, font, color);
     } else {
@@ -1474,7 +1467,7 @@ static void func_ov036_021ad48c(PrintQueue *queue, GFLBitmap *bitmap, int x, int
 }
 
 // Prints an item's price at the right of its row
-static void func_ov036_021ad4d0(BmpMenuList *list, s32 value, u8 y) {
+static void ShopUI_PrintPrice(BmpMenuList *list, s32 value, u8 y) {
     ShopUIWork *wk = BmpMenuList_GetWork(list);
     s32 width;
     u32 windowWidth;
@@ -1486,12 +1479,12 @@ static void func_ov036_021ad4d0(BmpMenuList *list, s32 value, u8 y) {
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, wk->priceFormat);
     width = GFL_FontGetBlockWidth(wk->message, wk->font, 0);
     windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[2]));
-    func_ov036_021ad48c(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->message, wk->font,
-                        PRINT_COLOR(12, 13, 0));
+    ShopUI_PrintToRow(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->message, wk->font,
+                      PRINT_COLOR(12, 13, 0));
 }
 
 // The same for a TM, or that the bag holds it
-static void func_ov036_021ad560(BmpMenuList *list, s32 value, u8 y) {
+static void ShopUI_PrintTMPrice(BmpMenuList *list, s32 value, u8 y) {
     ShopUIWork *wk = BmpMenuList_GetWork(list);
     s32 width;
     u32 windowWidth;
@@ -1502,20 +1495,20 @@ static void func_ov036_021ad560(BmpMenuList *list, s32 value, u8 y) {
     if (BagSave_CheckAmount(wk->bag, wk->entries[value].item, 1, wk->heapId)) {
         width = GFL_FontGetBlockWidth(wk->ownedLabel, wk->font, 0);
         windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[2]));
-        func_ov036_021ad48c(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->ownedLabel,
-                            wk->font, PRINT_COLOR(12, 13, 0));
+        ShopUI_PrintToRow(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->ownedLabel,
+                          wk->font, PRINT_COLOR(12, 13, 0));
         return;
     }
     WordSetNumber(wk->wordSet, 1, wk->entries[value].price, 5, NUM_PAD_SPACE, 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, wk->priceFormat);
     width = GFL_FontGetBlockWidth(wk->message, wk->font, 0);
     windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[2]));
-    func_ov036_021ad48c(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->message, wk->font,
-                        PRINT_COLOR(12, 13, 0));
+    ShopUI_PrintToRow(wk->printQueue, BmpWin_GetBitmap(wk->windows[2]), windowWidth - width, y, wk->message, wk->font,
+                      PRINT_COLOR(12, 13, 0));
 }
 
 // Moves the cursor's arrow, and shows the description and icon of the entry at the cursor
-static void func_ov036_021ad64c(BmpMenuList *list, s32 value, u8 init) {
+static void ShopUI_CursorCallback(BmpMenuList *list, s32 value, u8 init) {
     ShopUIWork *wk = BmpMenuList_GetWork(list);
     ClActorPos pos;
     u16 listTop;
@@ -1526,19 +1519,19 @@ static void func_ov036_021ad64c(BmpMenuList *list, s32 value, u8 init) {
     pos.y = cursorRow * 16 + 22;
     ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
     if (value < NELEMS(wk->entries)) {
-        func_ov036_021ad21c(wk, wk->entries[value].item);
+        ShopUI_PrintDescription(wk, wk->entries[value].item);
         if (wk->listMode != SHOP_LIST_MOVES) {
             ShopUI_LoadItemSprite(wk, wk->entries[value].item);
         }
     } else {
-        func_ov036_021ad21c(wk, 0xffff);
+        ShopUI_PrintDescription(wk, 0xffff);
         if (wk->listMode != SHOP_LIST_MOVES) {
             ShopUI_LoadItemSprite(wk, 0xffff);
         }
     }
 }
 
-static void func_ov036_021ad6cc(ShopUIWork *wk) {
+static void ShopUI_FreeMenuList(ShopUIWork *wk) {
     u16 listTop;
     u16 cursorRow;
 
@@ -1570,29 +1563,29 @@ static void ShopUI_SetStatusDialogue(ShopUIWork *wk, u32 msgId, u16 item, BOOL p
 // Asks whether to buy the item, the TM or the move. The callers pass the list mode, which the menu's own replaces
 static void ShopUI_SetBuyConfirmMessage(ShopUIWork *wk, u8 listMode) {
     if (wk->listMode == SHOP_LIST_MOVES) {
-        ShopUI_SetupMoveBuyMsg(wk, 30, wk->item, wk->price);
+        ShopUI_SetupMoveBuyMsg(wk, ScrcmdShop_Text_GotWillOk, wk->item, wk->price);
     } else if (wk->listMode == SHOP_LIST_TMS) {
         if (wk->currency == SHOP_CURRENCY_BP) {
-            func_ov036_021ad954(wk, 8, wk->item, wk->price);
+            ShopUI_PrintTMBuyMessage(wk, ScrcmdShop_Text_NoWillBpOk, wk->item, wk->price);
         } else {
-            func_ov036_021ad954(wk, 7, wk->item, wk->price);
+            ShopUI_PrintTMBuyMessage(wk, ScrcmdShop_Text_NoWillOk, wk->item, wk->price);
         }
     } else {
         if (wk->currency == SHOP_CURRENCY_BP) {
-            func_ov036_021ad8e8(wk, 6, wk->item, wk->price, wk->amount);
+            ShopUI_PrintItemBuyMessage(wk, ScrcmdShop_Text_WillCostBpOk, wk->item, wk->price, wk->amount);
         } else {
-            func_ov036_021ad8e8(wk, 5, wk->item, wk->price, wk->amount);
+            ShopUI_PrintItemBuyMessage(wk, ScrcmdShop_Text_WantWillOk, wk->item, wk->price, wk->amount);
         }
     }
 }
 
-static void func_ov036_021ad848(BmpWin *window) {
+static void ShopUI_DrawMessageFrame(BmpWin *window) {
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
     BmpWin_DrawFrame(window, WINFRAME_TRANSFER_NOW, 228, 9);
 }
 
 // Prints a message in the frame that is there already
-static void func_ov036_021ad864(ShopUIWork *wk, u32 msgId) {
+static void ShopUI_PrintMessageInFrame(ShopUIWork *wk, u32 msgId) {
     StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->message, strbuf);
@@ -1604,35 +1597,29 @@ static void func_ov036_021ad864(ShopUIWork *wk, u32 msgId) {
 }
 
 // Asks whether to buy an amount of an item
-static void func_ov036_021ad8e8(ShopUIWork *wk, u32 msgId, u16 item, u32 price, u16 amount) {
-    func_ov036_021ad848(wk->windows[6]);
+static void ShopUI_PrintItemBuyMessage(ShopUIWork *wk, u32 msgId, u16 item, u32 price, u16 amount) {
+    ShopUI_DrawMessageFrame(wk->windows[6]);
     loadItemText(wk->wordSet, 0, item, FALSE, FALSE);
     WordSetNumber(wk->wordSet, 1, amount, 2, NUM_PAD_NONE, 1);
-    WordSetNumber(wk->wordSet, 2, amount * price, 7, NUM_PAD_NONE, 1);
-    func_ov036_021ad864(wk, msgId);
+    WordSetNumber(wk->wordSet, 2, (u32)amount * price, 7, NUM_PAD_NONE, 1);
+    ShopUI_PrintMessageInFrame(wk, msgId);
 }
 
 // Asks whether to buy a TM
-static void func_ov036_021ad954(ShopUIWork *wk, u32 msgId, u16 item, u32 price) {
-    func_ov036_021ad848(wk->windows[6]);
+static void ShopUI_PrintTMBuyMessage(ShopUIWork *wk, u32 msgId, u16 item, u32 price) {
+    ShopUI_DrawMessageFrame(wk->windows[6]);
     WordSetNumber(wk->wordSet, 0, item - ITEM_TM01 + 1, 2, NUM_PAD_ZERO, 1);
     loadMoveNameToStrbuf(wk->wordSet, 1, PML_ItemGetTMWazaID(item));
     WordSetNumber(wk->wordSet, 2, price, 5, NUM_PAD_NONE, 1);
-    func_ov036_021ad864(wk, msgId);
+    ShopUI_PrintMessageInFrame(wk, msgId);
 }
 
 static void ShopUI_SetupMoveBuyMsg(ShopUIWork *wk, u32 msgId, u16 move, u32 price) {
-    BOOL plural;
-
-    func_ov036_021ad848(wk->windows[6]);
+    ShopUI_DrawMessageFrame(wk->windows[6]);
     loadMoveNameToStrbuf(wk->wordSet, 0, move);
-    plural = FALSE;
-    if (price != 1) {
-        plural = TRUE;
-    }
-    loadItemText(wk->wordSet, 1, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], plural, FALSE);
+    loadItemText(wk->wordSet, 1, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], price != 1, FALSE);
     WordSetNumber(wk->wordSet, 2, price, 2, NUM_PAD_NONE, 1);
-    func_ov036_021ad864(wk, msgId);
+    ShopUI_PrintMessageInFrame(wk, msgId);
 }
 
 // Changes the amount by delta, wrapping around by one and stopping at the ends by ten. Returns 1 for more, 2 for less
@@ -1716,7 +1703,7 @@ static u8 ShopUI_UpdateInput(ShopUIWork *wk) {
     return 3;
 }
 
-static void func_ov036_021adbd4(u32 index) {
+static void ShopUI_ClearListScreen(u32 index) {
     GFL_BGSysFillScrArea(1, 0, sListRects[index].x, sListRects[index].y, sListRects[index].width,
                          sListRects[index].height, 0);
 }

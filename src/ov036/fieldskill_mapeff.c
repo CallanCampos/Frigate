@@ -41,9 +41,9 @@ void FieldSkillMapEff_SetupFlash(FieldSkillMapEff *effect, u32 flashPerms, HeapI
     if (flashPerms & 3) {
         effect->flash = FieldFlash_Create(heapId);
         if (flashPerms & 2) {
-            func_ov036_021c1c68(effect->flash, 2);
+            FieldFlash_RequestState(effect->flash, 2);
         } else {
-            func_ov036_021c1c68(effect->flash, 0);
+            FieldFlash_RequestState(effect->flash, 0);
         }
     } else {
         effect->flash = NULL;

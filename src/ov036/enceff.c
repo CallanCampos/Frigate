@@ -1,9 +1,13 @@
 // The encounter effects: EncEff_StartEvent starts an effect's event from enceff_data.c's table after loading the
 // overlays it needs, and the BGM and effect that a battle picks. The name is the ROM's own, from GFL_HeapAllocate's
 // file argument. Function and table names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "battle/trainer_data.h"
 #include "constants/pokemon.h"
+#include "constants/sound.h"
+#include "constants/species.h"
+#include "constants/zones.h"
 #include "field/encounter.h"
 #include "field/encounter_effect.h"
 #include "field/field.h"
@@ -51,15 +55,18 @@ typedef struct {
 static void EncEff_FreeWorkArea(EncEff *encEff);
 static void EncEff_LoadSubOvl(EncEff *encEff, u32 overlayId);
 static void EncEff_UnloadAllSubOverlays(EncEff *encEff);
-static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, void *data);
-static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *ids);
-static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
-static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
-static BOOL func_ov036_021c6448(u32 playerId, u32 id, TrainerIdList *ids);
-static BOOL func_ov036_021c6460(u32 id, TrainerIdList *ids);
+static GameEventReturnCode CountTrainersEvent_Callback(GameEvent *event, u32 *state, void *data);
+static int CountTrainersEvent_ScanParty(u32 playerId, GameData *gameData, TrainerIdList *ids);
+static int CountTrainersEvent_ScanBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
+static int CountTrainersEvent_ScanBattleBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
+static BOOL TrainerIdList_AddForeignId(u32 playerId, u32 id, TrainerIdList *ids);
+static BOOL TrainerIdList_AddUniqueId(u32 id, TrainerIdList *ids);
 
-static const u16 SPECIAL_TRAINER_BGM[14] = { 0x46c, 0x46f, 0x479, 0x4ee, 0x46a, 0x4ea, 0x471,
-                                             0x4e9, 0x4ec, 0x4eb, 0x4f3, 0x4ed, 0x4ea, 0x46d };
+static const u16 SPECIAL_TRAINER_BGM[14] = { SEQ_BGM_VS_GYMLEADER, SEQ_BGM_VS_SHITENNO,     SEQ_BGM_VS_SHIRONA,
+                                             SEQ_BGM_VS_HUE,       SEQ_BGM_VS_TRAINER,      SEQ_BGM_VS_ACHROMA,
+                                             SEQ_BGM_VS_SWAN_N,    SEQ_BGM_VS_NEO_PLASMA,   SEQ_BGM_VS_IRIS,
+                                             SEQ_BGM_VS_NEW_G_CIS, SEQ_BGM_VS_ELITE_PLASMA, SEQ_BGM_VS_BANJIROU,
+                                             SEQ_BGM_VS_ACHROMA,   SEQ_BGM_VS_RIVAL };
 
 static const u8 SPECIAL_TRAINER_ENCEFF[32] = { 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15,
                                                0x16, 0x05, 0x0a, 0x05, 0x18, 0x19, 0x1a, 0x1a, 0x1a, 0x1a, 0x17,
@@ -165,85 +172,85 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
     u16 music;
 
     switch (species) {
-    case 0x23b:
-        *bgm = 0x469;
+    case SPECIES_ZOROARK:
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x24;
         return;
-    case 0x283:
-        *bgm = 0x474;
+    case SPECIES_RESHIRAM:
+        *bgm = SEQ_BGM_VS_SHIN;
         *encEffect = 0x21;
         return;
-    case 0x284:
-        *bgm = 0x475;
+    case SPECIES_ZEKROM:
+        *bgm = SEQ_BGM_VS_MU;
         *encEffect = 0x21;
         return;
-    case 0x286:
+    case SPECIES_KYUREM:
         if (form == 1) {
-            *bgm = 0x4e7;
+            *bgm = SEQ_BGM_VS_KYURAMU;
         } else if (form == 2) {
-            *bgm = 0x4e8;
+            *bgm = SEQ_BGM_VS_KYUROMU;
         } else {
-            *bgm = 0x476;
+            *bgm = SEQ_BGM_VS_RAI;
         }
         *encEffect = 0x21;
         return;
-    case 0x27d:
-        *bgm = 0x469;
+    case SPECIES_VOLCARONA:
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
-    case 0x1ee:
-        *bgm = 0x478;
+    case SPECIES_VICTINI:
+        *bgm = SEQ_BGM_VS_SETPOKE;
         *encEffect = 0x20;
         return;
-    case 0x27e:
-    case 0x27f:
-    case 0x280:
-    case 0x287:
-        *bgm = 0x478;
+    case SPECIES_COBALION:
+    case SPECIES_TERRAKION:
+    case SPECIES_VIRIZION:
+    case SPECIES_KELDEO:
+        *bgm = SEQ_BGM_VS_SETPOKE;
         *encEffect = 0x23;
         return;
-    case 0x281:
-    case 0x282:
-    case 0x285:
-        *bgm = 0x477;
+    case SPECIES_TORNADUS:
+    case SPECIES_THUNDURUS:
+    case SPECIES_LANDORUS:
+        *bgm = SEQ_BGM_VS_MOVEPOKE;
         *encEffect = 0x22;
         return;
-    case 0x17c:
-    case 0x17d:
-    case 0x1e8:
-    case 0x264:
-        *bgm = 0x469;
+    case SPECIES_LATIAS:
+    case SPECIES_LATIOS:
+    case SPECIES_CRESSELIA:
+    case SPECIES_HAXORUS:
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
-    case 0x179:
-    case 0x17a:
-    case 0x17b:
-    case 0x1e6:
-        *bgm = 0x473;
+    case SPECIES_REGIROCK:
+    case SPECIES_REGICE:
+    case SPECIES_REGISTEEL:
+    case SPECIES_REGIGIGAS:
+        *bgm = SEQ_BGM_VS_REGI;
         *encEffect = 0x20;
         return;
-    case 0x1e0:
-    case 0x1e1:
-    case 0x1e2:
-        *bgm = 0x472;
+    case SPECIES_UXIE:
+    case SPECIES_MESPRIT:
+    case SPECIES_AZELF:
+        *bgm = SEQ_BGM_VS_UMA;
         *encEffect = 0x20;
         return;
-    case 0x1e5:
-        *bgm = 0x46e;
+    case SPECIES_HEATRAN:
+        *bgm = SEQ_BGM_VS_DPLEGEND;
         *encEffect = 0x20;
         return;
     }
 
     if (a2 == 1) {
-        *bgm = 0x469;
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
     }
     if (a2 == 4) {
-        if (parentZone == 0xd6) {
-            *bgm = 0x469;
+        if (parentZone == ZONE_VICTORY_ROAD_2) {
+            *bgm = SEQ_BGM_VS_TSUYOPOKE;
         } else {
-            *bgm = 0x468;
+            *bgm = SEQ_BGM_VS_NORAPOKE;
         }
         *encEffect = 2;
         return;
@@ -251,32 +258,32 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
     tileType = FieldPlayer_GetTileTypeUnder(Field_GetPlayer(field));
     tileClass = GetTileClass(tileType);
     if (GetTileFlags(tileType) & 2) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 2;
     } else if (MapTile_IsTallGrass(tileClass)) {
         if (a3) {
-            music = 0x469;
+            music = SEQ_BGM_VS_TSUYOPOKE;
             env = 1;
         } else {
-            music = 0x468;
+            music = SEQ_BGM_VS_NORAPOKE;
             env = 0;
         }
     } else if (MapTile_IsSwamp(tileClass)) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 0;
     } else if (IsTileSand(tileClass)) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 4;
     } else if (GetZoneIsHiddenGroto(zoneId)) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 0;
     } else {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 3;
     }
     *encEffect = env;
-    if (parentZone == 0xd6) {
-        *bgm = 0x469;
+    if (parentZone == ZONE_VICTORY_ROAD_2) {
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
     } else {
         *bgm = music;
     }
@@ -311,7 +318,7 @@ void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffec
             env = 7;
         }
     }
-    *bgm = 0x46a;
+    *bgm = SEQ_BGM_VS_TRAINER;
     *encEffect = env;
 }
 
@@ -320,7 +327,7 @@ BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *result = ScriptReadVar(vm, env);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021c6288, sizeof(CountTrainersEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, CountTrainersEvent_Callback, sizeof(CountTrainersEvent));
     PlayerInfo *player = GetGameDataPlayerInfo(gameData);
     CountTrainersEvent *data = GameEvent_GetData(event);
 
@@ -332,7 +339,7 @@ BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode CountTrainersEvent_Callback(GameEvent *event, u32 *state, void *data) {
     CountTrainersEvent *count = data;
     BOOL done = FALSE;
     GameData *gameData;
@@ -341,14 +348,14 @@ static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, voi
     gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
     switch (*state) {
     case 0:
-        func_ov036_021c6328(count->playerId, gameData, &count->ids);
+        CountTrainersEvent_ScanParty(count->playerId, gameData, &count->ids);
         (*state)++;
         break;
     case 1: {
         s32 box = count->box;
 
         for (i = 0; i < 2; i++) {
-            func_ov036_021c6384(count->playerId, gameData, box + i, &count->ids);
+            CountTrainersEvent_ScanBox(count->playerId, gameData, box + i, &count->ids);
             count->box++;
             if (count->box >= BOXES) {
                 (*state)++;
@@ -358,7 +365,7 @@ static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, voi
         break;
     }
     case 2:
-        func_ov036_021c63f0(count->playerId, gameData, 0, &count->ids);
+        CountTrainersEvent_ScanBattleBox(count->playerId, gameData, 0, &count->ids);
         done = TRUE;
         break;
     }
@@ -372,7 +379,7 @@ static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *ids) {
+static int CountTrainersEvent_ScanParty(u32 playerId, GameData *gameData, TrainerIdList *ids) {
     PokeParty *party = GameData_GetParty(gameData);
     int partyCount = PokeParty_GetPkmCount(party);
     int added = 0;
@@ -382,7 +389,7 @@ static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 0) {
-            if (func_ov036_021c6448(playerId, PokeParty_GetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
+            if (TrainerIdList_AddForeignId(playerId, PokeParty_GetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
                 added++;
             }
         }
@@ -390,7 +397,7 @@ static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *
     return added;
 }
 
-static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
+static int CountTrainersEvent_ScanBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
     BoxSaveAccessor *boxes = GameData_GetBoxSaveAccessor(gameData);
     int added = 0;
     int slot;
@@ -398,8 +405,8 @@ static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, Traine
     for (slot = 0; slot < 30; slot++) {
         if (BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             if (BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_IS_EGG, NULL) == 0) {
-                if (func_ov036_021c6448(playerId, BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_ID, NULL),
-                                        ids)) {
+                if (TrainerIdList_AddForeignId(
+                        playerId, BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_ID, NULL), ids)) {
                     added++;
                 }
             }
@@ -408,7 +415,7 @@ static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, Traine
     return added;
 }
 
-static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
+static int CountTrainersEvent_ScanBattleBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
     BattleBoxSave *battleBox;
     int slot;
     int added;
@@ -419,7 +426,7 @@ static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, Traine
         BoxPkm *pkm = getBoxSlotAddress(battleBox, box, slot);
 
         if (PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
-            if (func_ov036_021c6448(playerId, PML_PkmGetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
+            if (TrainerIdList_AddForeignId(playerId, PML_PkmGetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
                 added++;
             }
         }
@@ -427,16 +434,16 @@ static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, Traine
     return added;
 }
 
-static BOOL func_ov036_021c6448(u32 playerId, u32 id, TrainerIdList *ids) {
+static BOOL TrainerIdList_AddForeignId(u32 playerId, u32 id, TrainerIdList *ids) {
     BOOL added = FALSE;
 
     if (playerId != id) {
-        added = func_ov036_021c6460(id, ids);
+        added = TrainerIdList_AddUniqueId(id, ids);
     }
     return added;
 }
 
-static BOOL func_ov036_021c6460(u32 id, TrainerIdList *ids) {
+static BOOL TrainerIdList_AddUniqueId(u32 id, TrainerIdList *ids) {
     int i;
 
     if (ids->count >= MAX_TRAINER_IDS) {

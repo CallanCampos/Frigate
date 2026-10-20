@@ -19,7 +19,7 @@ BOOL func_ov036_0219d018(FieldPlayerNoGrid *nogrid);
 void FieldPlayerRail_SetRailPos(FieldPlayerNoGrid *nogrid, const RailPosition *pos);
 // swan's name, though it takes the rail player
 void FieldPlayerCore_GetRailPos(FieldPlayerNoGrid *nogrid, RailPosition *pos);
-void func_ov036_0219d044(FieldPlayerNoGrid *nogrid, u32 dir, RailPosition *pos);
+void func_ov036_0219d044(FieldPlayerNoGrid *nogrid, u16 dir, RailPosition *pos);
 void FieldPlayerRail_GetWorldPos(FieldPlayerNoGrid *nogrid, VecFx32 *pos);
 RailUnit *func_ov036_0219d05c(FieldPlayerNoGrid *nogrid);
 void func_ov036_0219d060(FieldPlayerNoGrid *nogrid);

@@ -480,6 +480,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- Cut-in text allocation heap IDs: pass `HEAPID_TAIL` at each call; saved `u32` and `HeapID` locals change
+  narrowing and sharing. (matching.md: "`fld3d_ci.c`'s `EventFieldEffectCutinSub_DrawStrToTexture`")
+
 - A constant built by `rsb`/`sub` from a small value already in a register (`mov r0, #5; rsb r0, r0, #0x204`): that
   value is a local built in steps. (matching.md: "A constant that a local holds and changes in steps")
 - An `and` with a bit-0 bit-field's width mask before an insert that masks again: the source masks the value before the

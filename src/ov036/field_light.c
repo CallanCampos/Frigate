@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_environment.h"
 #include "field/field_fog.h"
@@ -90,7 +91,7 @@ static void FieldLight_LoadDataCore(FieldLight *light, u32 arcId, u32 fileId);
 static void func_ov036_02197c00(FieldLight *light);
 static u32 FieldLight_GetUsedEntryIndex(FieldLight *light, s32 daySeconds);
 static s32 FieldLight_GetLightEndSecond(u32 season, const FieldLightEntry *entry);
-static void FieldLight_FlushCore(FieldLight *light, FieldFog *fog, G3DLight *lights);
+static void FieldLight_FlushCore(const FieldLight *light, FieldFog *fog, G3DLight *lights);
 static void FieldLightInterpolator_BeginDefault(FieldLightInterpolator *interpolator, const FieldLightEntry *from,
                                                 const FieldLightEntry *to);
 static void FieldLightInterpolator_Begin(FieldLightInterpolator *interpolator, const FieldLightEntry *from,
@@ -143,14 +144,12 @@ void FieldLight_Update(FieldLight *light, s32 daySeconds) {
 
             if (prevIndex < 0) {
                 prevEndSeconds = 0;
-                {
-                    s32 lastEndSeconds = FieldLight_GetLightEndSecond(light->season, &light->entries[light->count - 1]);
+                s32 lastEndSeconds = FieldLight_GetLightEndSecond(light->season, &light->entries[light->count - 1]);
 
-                    if (lastEndSeconds <= daySeconds) {
-                        prevEndSeconds = lastEndSeconds;
-                        wrapped = TRUE;
-                        endSeconds += 86400;
-                    }
+                if (lastEndSeconds <= daySeconds) {
+                    prevEndSeconds = lastEndSeconds;
+                    wrapped = TRUE;
+                    endSeconds += 86400;
                 }
             } else {
                 prevEndSeconds = FieldLight_GetLightEndSecond(light->season, &light->entries[prevIndex]);
@@ -213,7 +212,7 @@ BOOL FieldLight_IsFlashRunning(FieldLight *light) {
     return FieldLightFlashInfo_IsRunning(&light->flash);
 }
 
-static void FieldLight_FlushCore(FieldLight *light, FieldFog *fog, G3DLight *lights) {
+static void FieldLight_FlushCore(const FieldLight *light, FieldFog *fog, G3DLight *lights) {
     VecFx16 zeroDir = { 0, 0, 0 };
     GXRgb zeroColor = 0;
     s32 i;
@@ -237,7 +236,7 @@ static void FieldLight_FlushCore(FieldLight *light, FieldFog *fog, G3DLight *lig
 
 static void FieldLight_LoadData(FieldLight *light, u32 lightsId) {
     light->lightsId = lightsId;
-    FieldLight_LoadDataCore(light, 60, lightsId);
+    FieldLight_LoadDataCore(light, ARCID_LIGHTS_FIELD, lightsId);
 }
 
 static void FieldLight_LoadDataCore(FieldLight *light, u32 arcId, u32 fileId) {
@@ -278,12 +277,12 @@ static s32 FieldLight_GetLightEndSecond(u32 season, const FieldLightEntry *entry
 }
 
 static void FieldLightColorInterpolator_Set(FieldLightColorInterpolator *interpolator, GXRgb from, GXRgb to) {
-    interpolator->r = from & 0x1f;
-    interpolator->dr = (s16)(to & 0x1f) - interpolator->r;
-    interpolator->g = (from & 0x3e0) >> 5;
-    interpolator->dg = (s16)((to & 0x3e0) >> 5) - interpolator->g;
-    interpolator->b = (from & 0x7c00) >> 10;
-    interpolator->db = (s16)((to & 0x7c00) >> 10) - interpolator->b;
+    interpolator->r = from & GX_RGB_R_MASK;
+    interpolator->dr = (s16)(to & GX_RGB_R_MASK) - interpolator->r;
+    interpolator->g = (from & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
+    interpolator->dg = (s16)((to & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT) - interpolator->g;
+    interpolator->b = (from & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT;
+    interpolator->db = (s16)((to & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT) - interpolator->b;
 }
 
 static GXRgb FieldLightColorInterpolator_Calc(const FieldLightColorInterpolator *interpolator, s32 frame, s32 frames) {
@@ -465,11 +464,11 @@ void FieldColorPostFX_Apply(void *postFx, void *texture) {
     FieldColorPostFX *fx = postFx;
 
     if (fx && texture) {
-        if (GFL_G3DResCheckType(texture, 2)) {
+        if (GFL_G3DResCheckType(texture, G3D_RES_CHECK_TEX)) {
             NNSG3dResTex *tex = NNS_G3dGetTex(GFL_G3DResGetResData(texture));
 
             if (tex) {
-                int count = (u32)tex->plttInfo.sizePltt << 3 >> 1;
+                int count = (tex->plttInfo.sizePltt << 3) / sizeof(u16);
                 u16 *colors = (u16 *)((u8 *)tex + tex->plttInfo.ofsPlttData);
 
                 if (fx->lut) {

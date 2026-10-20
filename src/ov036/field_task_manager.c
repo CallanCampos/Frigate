@@ -152,7 +152,7 @@ static BOOL FieldActorSpinTask_CallbackDeaccel(void *work);
 static BOOL FieldPlayerMoveTask_Callback(void *work);
 static void FieldActorFallTask_CalcFallPos(VecFx32 *pos, f32 elapsed, f32 duration, f32 height);
 static BOOL FieldActorFallTask_Callback(void *work);
-static BOOL func_ov036_021c1444(void *work);
+static BOOL FieldWaitTask_Callback(void *work);
 static BOOL FieldFadeTask_Callback(void *work);
 static void FieldActorMoveTask_InterpVector(VecFx32 *dest, u32 elapsed, VecFx32 *vec, u32 duration);
 static BOOL FieldActorMoveTask_CallbackRel(void *work);
@@ -196,8 +196,7 @@ void FieldTaskManager_Update(FieldTaskManager *mgr) {
     }
 }
 
-void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, u32 a2) {
-    FieldTask *parent = (FieldTask *)a2;
+void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, FieldTask *parent) {
     int i;
 
     for (i = 0; i < mgr->count; i++) {
@@ -312,8 +311,8 @@ static BOOL FieldCameraMoveTaskZoom_Calc(void *taskData) {
         type = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         ratio = (f32)data->frame / (f32)data->duration;
-        start = (f32)data->start / 4096.0f;
-        target = (f32)data->target / 4096.0f;
+        start = FX_FX32_TO_F32(data->start);
+        target = FX_FX32_TO_F32(data->target);
         zoom = (1.0f - ratio) * start + ratio * target;
         FieldCamera_CoordsSetZoom(camera, FX32_CONST(zoom));
         FieldCamera_ChangeTransformType(camera, type);
@@ -582,7 +581,7 @@ static BOOL FieldActorSpinTask_CallbackDeaccel(void *work) {
     return FALSE;
 }
 
-FieldTask *FieldPlayerMoveTask_Create(Field *field, u32 duration, const VecFx32 *pos) {
+FieldTask *FieldPlayerMoveTask_Create(Field *field, u32 duration, VecFx32 *pos) {
     FieldTask *task =
         FieldTask_Create(Field_GetHeapID(field), sizeof(FieldPlayerMoveTask), FieldPlayerMoveTask_Callback);
     FieldPlayerMoveTask *data = FieldTask_GetData(task);
@@ -657,7 +656,7 @@ static void FieldActorFallTask_CalcFallPos(VecFx32 *pos, f32 elapsed, f32 durati
 
 static BOOL FieldActorFallTask_Callback(void *work) {
     FieldActorFallTask *data = work;
-    FieldPlayer *player = Field_GetPlayer(data->field);
+    Field_GetPlayer(data->field);
     FieldActor *actor = data->actor;
     VecFx32 pos;
 
@@ -665,7 +664,7 @@ static BOOL FieldActorFallTask_Callback(void *work) {
     case 0:
         FieldActorFallTask_CalcFallPos(&pos, data->frame, data->duration, data->height);
         SetActorWPosOffset(actor, &pos);
-        GFL_SndSEPlay(0x681);
+        GFL_SndSEPlay(SEQ_SE_FLD_16);
         data->state++;
         break;
     case 1:
@@ -674,7 +673,7 @@ static BOOL FieldActorFallTask_Callback(void *work) {
         SetActorWPosOffset(actor, &pos);
         if (data->duration <= data->frame) {
             func_ov036_021a3e74(actor, Field_GetFieldEffects(data->field));
-            GFL_SndSEPlay(0x682);
+            GFL_SndSEPlay(SEQ_SE_FLD_17);
             return TRUE;
         }
         break;
@@ -683,7 +682,7 @@ static BOOL FieldActorFallTask_Callback(void *work) {
 }
 
 FieldTask *FieldWaitTask_Create(Field *field, u16 wait) {
-    FieldTask *task = FieldTask_Create(Field_GetHeapID(field), sizeof(FieldWaitTask), func_ov036_021c1444);
+    FieldTask *task = FieldTask_Create(Field_GetHeapID(field), sizeof(FieldWaitTask), FieldWaitTask_Callback);
     FieldWaitTask *data = FieldTask_GetData(task);
 
     data->frame = 0;
@@ -691,7 +690,7 @@ FieldTask *FieldWaitTask_Create(Field *field, u16 wait) {
     return task;
 }
 
-static BOOL func_ov036_021c1444(void *work) {
+static BOOL FieldWaitTask_Callback(void *work) {
     FieldWaitTask *data = work;
 
     data->frame++;
@@ -919,7 +918,12 @@ FieldTask *FieldActorEffectTask_Create(Field *field, FieldActor *actor, u16 dura
 
     data->field = field;
     data->effects = Field_GetFieldEffects(field);
+    // BUG: The supplied actor is ignored in favor of the player's actor.
+#ifdef BUGFIX
+    data->actor = actor;
+#else
     data->actor = FieldPlayer_GetActor(player);
+#endif
     data->state = 0;
     data->frame = 0;
     data->duration = duration;
@@ -1014,8 +1018,8 @@ static BOOL FieldCameraShakeTask_Callback(void *work) {
         } else {
             VecFx32 target;
             VecFx32 eyeOffset;
-            fx32 offsetX = setup->amplitudeX * FX_SinCosTable_[(angle >> 4) * 2];
-            fx32 offsetY = setup->amplitudeY * FX_SinCosTable_[(angle >> 4) * 2];
+            fx32 offsetX = setup->amplitudeX * FX_SinIdx(angle);
+            fx32 offsetY = setup->amplitudeY * FX_SinIdx(angle);
             u8 mode;
 
             target = *data->bind;

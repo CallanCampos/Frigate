@@ -250,7 +250,7 @@ BOOL WbtTournament_WouldOpen(GameData *gameData, u32 won, u32 tournament) {
 
 u32 WbtTournament_GetRecord(u32 tournament, u32 type) {
     if (tournament != 2) {
-        type = func_ov036_021c98a4(tournament)->record;
+        type = GetPWTTournamentInfo(tournament)->record;
     }
     return type;
 }
@@ -261,8 +261,8 @@ u32 WbtTournament_FromRecord(int record) {
     if (record <= 16) {
         return 2;
     }
-    for (i = 0; i < NELEMS(data_ov036_021d4920); i++) {
-        if (record == data_ov036_021d4920[i].record) {
+    for (i = 0; i < NELEMS(PWT_TOURNAMENT_INFO); i++) {
+        if (record == PWT_TOURNAMENT_INFO[i].record) {
             return i + 1;
         }
     }
@@ -270,11 +270,11 @@ u32 WbtTournament_FromRecord(int record) {
 }
 
 u32 WbtTournament_GetKind(u32 tournament) {
-    return func_ov036_021c98a4(tournament)->kind;
+    return GetPWTTournamentInfo(tournament)->kind;
 }
 
 BOOL WbtTournament_IsInCategory(u32 tournament, u32 value) {
-    const WbtTournamentInfo *info = func_ov036_021c98a4(tournament);
+    const WbtTournamentInfo *info = GetPWTTournamentInfo(tournament);
 
     if (info->unk3 == value) {
         return TRUE;
@@ -283,13 +283,13 @@ BOOL WbtTournament_IsInCategory(u32 tournament, u32 value) {
 }
 
 u16 WbtTournament_GetTrainerArc(u32 tournament) {
-    return sUnk5Messages[func_ov036_021c98a4(tournament)->unk5];
+    return sUnk5Messages[GetPWTTournamentInfo(tournament)->unk5];
 }
 
 u32 WbtTournament_GetBattlePoints(u32 tournament, int style) {
     int index = WbtStyle_GetIndex(style);
 
-    return func_ov036_021c98a4(tournament)->battlePoints[index];
+    return GetPWTTournamentInfo(tournament)->battlePoints[index];
 }
 
 u8 WbtTool_GetDownloadedTrainerClass(u32 index) {

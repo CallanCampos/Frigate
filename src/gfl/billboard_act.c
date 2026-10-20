@@ -306,7 +306,7 @@ void BlActSys_SetActorVisible(BlActSys *sys, u32 actor, BOOL visible) {
     BlActScene_SetActorHidden(sys->scene, sys->handles[actor].actor, &visible);
 }
 
-BOOL BlActSys_IsActorVisible(BlActSys *sys, u32 actor) {
+BOOL BlActSys_IsActorVisible(BlActSys *sys, u16 actor) {
     return BlActScene_IsActorVisible(sys->scene, sys->handles[actor].actor);
 }
 
@@ -362,7 +362,7 @@ void BlActSys_ShareActorPltt(BlActSys *sys, u32 actor, u32 texMat) {
     BlActSys_TransferPltt(sys, dst);
 }
 
-u32 BlActSys_GetSceneActor(BlActSys *sys, u32 actor) {
+u32 BlActSys_GetSceneActor(BlActSys *sys, u16 actor) {
     return sys->handles[actor].actor;
 }
 
@@ -370,7 +370,7 @@ u16 BlActSys_GetMatByActor(BlActSys *sys, u32 actor) {
     return sys->handles[actor].texMat;
 }
 
-BOOL BlActSys_GetActorLastCmd(BlActSys *sys, u32 actor, u16 *cmd) {
+BOOL BlActSys_GetActorLastCmd(BlActSys *sys, u16 actor, u16 *cmd) {
     u16 last = sys->handles[actor].cmd;
 
     *cmd = last;

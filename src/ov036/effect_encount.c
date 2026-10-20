@@ -1,7 +1,10 @@
 // Phenomena: shaking grass, dust clouds, rippling water and flying shadows, which appear near the player as they walk
 // and start a battle or give an item when the player steps on them. The name is the ROM's own, from
 // GFL_HeapAllocate's file argument. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/items.h"
+#include "constants/zones.h"
 #include "field/encounter.h"
 #include "field/event_wild_battle.h"
 #include "field/festival.h"
@@ -48,7 +51,7 @@ struct EffectEncountState {
     u16 itemId;
 };
 
-// The area around the player that func_ov036_021a24a4 finds, in tiles
+// The area around the player that EffectEncount_GetSearchArea finds, in tiles
 typedef struct {
     s16 x;
     s16 z;
@@ -66,42 +69,47 @@ typedef struct {
 } EffectEncountArea;
 
 void func_ov036_021a2364(EncountSystem *system);
-static void func_ov036_021a23fc(EncountSystem *system);
-static void func_ov036_021a241c(EncountSystem *system, EffectEncountState *state);
-static BOOL func_ov036_021a246c(EncountState *encountState, EffectEncountState *state);
+static void EffectEncount_SuspendSpot(EncountSystem *system);
+static void EffectEncount_ResumeSpot(EncountSystem *system, EffectEncountState *state);
+static BOOL EffectEncount_UpdateStepCounter(EncountState *encountState, EffectEncountState *state);
 static void setShakingSpotOff(EncountState *encountState);
-static void func_ov036_021a24a4(EncountSystem *system, EffectEncountState *state, EffectEncountArea *area);
+static void EffectEncount_GetSearchArea(EncountSystem *system, EffectEncountState *state, EffectEncountArea *area);
 static void positionShakingSpot(EncountSystem *system, EffectEncountState *state, u32 kindMask);
-static void func_ov036_021a26ec(EncountSystem *system, EffectEncountState *state);
+static void EffectEncount_PlaceRandomCandidate(EncountSystem *system, EffectEncountState *state);
 static BOOL IsPositionOccupiedByActorAny(EncountSystem *system, s16 x, s16 y, s16 z, BOOL skipPlayer);
 static BOOL EncountSystem_CancelPhenomenonIfActorHitCore(EncountSystem *system);
 static void EncountSystem_CancelPhenomenonCore(EncountSystem *system, EffectEncountState *state);
-static void func_ov036_021a288c(EncountSystem *system, EffectEncountState *state, RareEncountSpot *spot);
-static void func_ov036_021a28c8(EffectEncountState *state);
+static void EffectEncount_CreateSpotEffect(EncountSystem *system, EffectEncountState *state, RareEncountSpot *spot);
+static void EffectEncount_FreeSpotEffect(EffectEncountState *state);
 static u16 EffectEncount_GenDustCloudItem(u16 zoneId);
 static u16 GetRandomWingItemID(void);
 static GameEvent *CallGivePhenomenonItem(EncountSystem *system, u16 itemId);
 
 // The steps between phenomena and their chance, for each setting of the zone's encounter data
-static const u8 data_ov036_021d02c4[3][2] = { { 20, 10 }, { 20, 10 }, { 5, 15 } };
+static const u8 sPhenomenonStepChances[3][2] = { { 20, 10 }, { 20, 10 }, { 5, 15 } };
 
 // The shards a dust cloud gives in the zones of DUST_CLOUD_SHARD_ZONES
-static const u16 DUST_CLOUD_ITEMS_SHARDS[4] = { 72, 73, 74, 75 };
+static const u16 DUST_CLOUD_ITEMS_SHARDS[4] = { ITEM_RED_SHARD, ITEM_BLUE_SHARD, ITEM_YELLOW_SHARD, ITEM_GREEN_SHARD };
 
 // The phenomena each kind of tile can have: 1 for grass, 2 for water and dust
-static const u8 data_ov036_021d02d2[10] = { 1, 1, 1, 1, 1, 2, 2, 1, 0, 0 };
+static const u8 sPhenomenonKindMasks[10] = { 1, 1, 1, 1, 1, 2, 2, 1, 0, 0 };
 
 // The rarer items of a dust cloud
-static const u16 DUST_CLOUD_ITEMS_NORMAL[10] = { 80, 81, 82, 83, 84, 85, 107, 108, 109, 110 };
+static const u16 DUST_CLOUD_ITEMS_NORMAL[10] = { ITEM_SUN_STONE,   ITEM_MOON_STONE, ITEM_FIRE_STONE,  ITEM_THUNDERSTONE,
+                                                 ITEM_WATER_STONE, ITEM_LEAF_STONE, ITEM_SHINY_STONE, ITEM_DUSK_STONE,
+                                                 ITEM_DAWN_STONE,  ITEM_OVAL_STONE };
 
 // The area around the player a phenomenon can appear in, left, right, up and down, all around for the first and in
 // one direction for the others
-static const s8 data_ov036_021d02f0[5][4] = {
+static const s8 sPhenomenonSearchOffsets[5][4] = {
     { -5, 5, -5, 5 }, { 0, 5, -5, 5 }, { -5, 0, -5, 5 }, { -5, 5, -5, 0 }, { -5, 5, 0, 5 },
 };
 
 static const u16 DUST_CLOUD_SHARD_ZONES[15] = {
-    0x1f7, 0x1f8, 0x1f9, 0x213, 0x214, 0x215, 0x216, 0x217, 0x218, 0x219, 0x21a, 0x21b, 0x21c, 0x21d, 0x21e,
+    ZONE_RELIC_PASSAGE,        ZONE_RELIC_PASSAGE_2,      ZONE_RELIC_PASSAGE_3,      ZONE_REVERSAL_MOUNTAIN_2,
+    ZONE_REVERSAL_MOUNTAIN_3,  ZONE_REVERSAL_MOUNTAIN_4,  ZONE_REVERSAL_MOUNTAIN_5,  ZONE_REVERSAL_MOUNTAIN_6,
+    ZONE_REVERSAL_MOUNTAIN_7,  ZONE_REVERSAL_MOUNTAIN_8,  ZONE_REVERSAL_MOUNTAIN_9,  ZONE_REVERSAL_MOUNTAIN_10,
+    ZONE_REVERSAL_MOUNTAIN_11, ZONE_REVERSAL_MOUNTAIN_12, ZONE_REVERSAL_MOUNTAIN_13,
 };
 
 static inline BOOL RareEncountSpot_IsAt(const RareEncountSpot *spot, const s16 *pos) {
@@ -123,12 +131,12 @@ void EffectEncountState_Free(EffectEncountState *state) {
 void PrepareFieldEncountSystem(EncountSystem *system, EffectEncountState *state) {
     state->fieldEffects = Field_GetFieldEffects(system->field);
     func_ov036_021a203c(system, state);
-    func_ov036_021a241c(system, state);
+    EffectEncount_ResumeSpot(system, state);
 }
 
 void func_ov036_021a202c(EncountSystem *system, EffectEncountState *state) {
-    func_ov036_021a23fc(system);
-    func_ov036_021a28c8(state);
+    EffectEncount_SuspendSpot(system);
+    EffectEncount_FreeSpotEffect(state);
 }
 
 void func_ov036_021a203c(EncountSystem *system, EffectEncountState *state) {
@@ -137,8 +145,8 @@ void func_ov036_021a203c(EncountSystem *system, EffectEncountState *state) {
     if (setting > 2) {
         setting = 0;
     }
-    state->steps = data_ov036_021d02c4[setting][0];
-    state->chance = data_ov036_021d02c4[setting][1];
+    state->steps = sPhenomenonStepChances[setting][0];
+    state->chance = sPhenomenonStepChances[setting][1];
 }
 
 void UpdatePhenomenon(EncountSystem *system) {
@@ -188,7 +196,7 @@ void UpdatePhenomenon(EncountSystem *system) {
     if (encountState->rareSpot.active) {
         return;
     }
-    if (!func_ov036_021a246c(encountState, state)) {
+    if (!EffectEncount_UpdateStepCounter(encountState, state)) {
         return;
     }
     chance = PassPower_ApplyExploringChance(state->chance);
@@ -198,7 +206,7 @@ void UpdatePhenomenon(EncountSystem *system) {
     }
     positionShakingSpot(system, state, kindMask);
     if (state->candidates.count != 0) {
-        func_ov036_021a26ec(system, state);
+        EffectEncount_PlaceRandomCandidate(system, state);
     }
 }
 
@@ -344,7 +352,7 @@ u16 func_ov036_021a23f0(EncountSystem *system) {
     return system->effectEncountState->itemId;
 }
 
-static void func_ov036_021a23fc(EncountSystem *system) {
+static void EffectEncount_SuspendSpot(EncountSystem *system) {
     RareEncountSpot *spot = &GameData_GetEncountState(system->gameData)->rareSpot;
 
     if (spot->active) {
@@ -352,7 +360,7 @@ static void func_ov036_021a23fc(EncountSystem *system) {
     }
 }
 
-static void func_ov036_021a241c(EncountSystem *system, EffectEncountState *state) {
+static void EffectEncount_ResumeSpot(EncountSystem *system, EffectEncountState *state) {
     RareEncountSpot *spot = &GameData_GetEncountState(system->gameData)->rareSpot;
 
     if (spot->active && spot->suspended) {
@@ -363,12 +371,12 @@ static void func_ov036_021a241c(EncountSystem *system, EffectEncountState *state
         if (zoneId != spot->zoneId || spot->triggered) {
             MI_CpuFill8(spot, 0, sizeof(RareEncountSpot));
         } else {
-            func_ov036_021a288c(system, state, spot);
+            EffectEncount_CreateSpotEffect(system, state, spot);
         }
     }
 }
 
-static BOOL func_ov036_021a246c(EncountState *encountState, EffectEncountState *state) {
+static BOOL EffectEncount_UpdateStepCounter(EncountState *encountState, EffectEncountState *state) {
     u16 steps = state->steps;
     u32 *counter = &encountState->phenomenonSteps;
 
@@ -385,7 +393,7 @@ static void setShakingSpotOff(EncountState *encountState) {
     encountState->phenomenonSteps = 0;
 }
 
-static void func_ov036_021a24a4(EncountSystem *system, EffectEncountState *state, EffectEncountArea *area) {
+static void EffectEncount_GetSearchArea(EncountSystem *system, EffectEncountState *state, EffectEncountArea *area) {
     FieldActor *actor = FieldPlayer_GetActor(Field_GetPlayer(system->field));
     const s8 *offsets;
     s16 minX, maxX, minZ, maxZ;
@@ -399,9 +407,9 @@ static void func_ov036_021a24a4(EncountSystem *system, EffectEncountState *state
     area->originX = area->x - area->blockTileX;
     area->originZ = area->z - area->blockTileZ;
     if (system->encData->flags != 2) {
-        offsets = data_ov036_021d02f0[GFL_RandomLCAlt(4) + 1];
+        offsets = sPhenomenonSearchOffsets[GFL_RandomLCAlt(4) + 1];
     } else {
-        offsets = data_ov036_021d02f0[0];
+        offsets = sPhenomenonSearchOffsets[0];
     }
     minX = area->blockTileX + offsets[0];
     if (minX < 0) {
@@ -441,7 +449,7 @@ static void positionShakingSpot(EncountSystem *system, EffectEncountState *state
     if (!FieldG3DMapper_CheckChunkHandleTerrainReady(mapper, chunk)) {
         return;
     }
-    func_ov036_021a24a4(system, state, &area);
+    EffectEncount_GetSearchArea(system, state, &area);
     z = area.minZ;
     pos.z = FX32_CONST(z * 16) + FX32_CONST(8);
     startX = FX32_CONST(area.minX * 16) + FX32_CONST(8);
@@ -454,20 +462,20 @@ static void positionShakingSpot(EncountSystem *system, EffectEncountState *state
 
             func_ov036_02185230(mapper, chunk, &pos, &terrain);
             kind = func_ov036_021a2e18(terrain.tileType);
-            if (kindMask & data_ov036_021d02d2[kind]) {
+            if (kindMask & sPhenomenonKindMasks[kind]) {
                 state->candidates.entries[state->candidates.count].kind = kind;
                 state->candidates.entries[state->candidates.count].x = x;
                 state->candidates.entries[state->candidates.count].z = z;
                 state->candidates.entries[state->candidates.count++].height = terrain.height;
             }
-            pos.x += FX32_ONE;
+            pos.x += FX32_CONST(16);
         }
-        pos.z += FX32_ONE;
+        pos.z += FX32_CONST(16);
     }
 }
 
 // Puts a phenomenon on one of the tiles found, if nothing stands there
-static void func_ov036_021a26ec(EncountSystem *system, EffectEncountState *state) {
+static void EffectEncount_PlaceRandomCandidate(EncountSystem *system, EffectEncountState *state) {
     u16 index = GFL_RandomLCAlt(state->candidates.count);
     EffectEncountCandidate *candidate = &state->candidates.entries[index];
     EncountState *encountState = GameData_GetEncountState(system->gameData);
@@ -488,7 +496,7 @@ static void func_ov036_021a26ec(EncountSystem *system, EffectEncountState *state
     spot->zoneId = Field_GetPlayerStateZoneID(system->field);
     spot->active = 1;
     setShakingSpotOff(encountState);
-    func_ov036_021a288c(system, state, spot);
+    EffectEncount_CreateSpotEffect(system, state, spot);
 }
 
 static BOOL IsPositionOccupiedByActorAny(EncountSystem *system, s16 x, s16 y, s16 z, BOOL skipPlayer) {
@@ -538,11 +546,11 @@ static BOOL EncountSystem_CancelPhenomenonIfActorHitCore(EncountSystem *system) 
 static void EncountSystem_CancelPhenomenonCore(EncountSystem *system, EffectEncountState *state) {
     EncountState *encountState = GameData_GetEncountState(system->gameData);
 
-    func_ov036_021a28c8(state);
+    EffectEncount_FreeSpotEffect(state);
     MI_CpuFill8(&encountState->rareSpot, 0, sizeof(RareEncountSpot));
 }
 
-static void func_ov036_021a288c(EncountSystem *system, EffectEncountState *state, RareEncountSpot *spot) {
+static void EffectEncount_CreateSpotEffect(EncountSystem *system, EffectEncountState *state, RareEncountSpot *spot) {
     if (state->effect == NULL) {
         state->effect = func_ov036_021a53f8(system, state->fieldEffects, spot->x, spot->z, spot->height, spot->kind);
         if (state->effect == NULL) {
@@ -551,7 +559,7 @@ static void func_ov036_021a288c(EncountSystem *system, EffectEncountState *state
     }
 }
 
-static void func_ov036_021a28c8(EffectEncountState *state) {
+static void EffectEncount_FreeSpotEffect(EffectEncountState *state) {
     if (state->effect != NULL) {
         func_ov036_021a3a70(state->effect);
         state->effect = NULL;
@@ -564,25 +572,25 @@ static u16 EffectEncount_GenDustCloudItem(u16 zoneId) {
 
     for (i = 0; i < 15; i++) {
         if (zoneId == DUST_CLOUD_SHARD_ZONES[i]) {
-            return DUST_CLOUD_ITEMS_SHARDS[roll / 250];
+            return DUST_CLOUD_ITEMS_SHARDS[roll / 250U];
         }
     }
     if (roll < 100) {
         return DUST_CLOUD_ITEMS_NORMAL[(u16)(GFL_RandomLCAlt(1000) / 100)];
     }
     if (roll < 950) {
-        return (u16)(GFL_RandomLCAlt(1700) / 100) + 548;
+        return (u16)(GFL_RandomLCAlt(1700) / 100) + ITEM_FIRE_GEM;
     }
-    return 229;
+    return ITEM_EVERSTONE;
 }
 
 static u16 GetRandomWingItemID(void) {
     u16 roll = GFL_RandomLCAlt(1000);
 
     if (roll < 900) {
-        return (u16)(GFL_RandomLCAlt(600) / 100) + 565;
+        return (u16)(GFL_RandomLCAlt(600) / 100) + ITEM_HEALTH_WING;
     }
-    return 571;
+    return ITEM_PRETTY_WING;
 }
 
 static GameEvent *CallGivePhenomenonItem(EncountSystem *system, u16 itemId) {

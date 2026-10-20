@@ -700,7 +700,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
 static GameEventReturnCode MistraltonBumpEvent_Run(GameEvent *event, u32 *state, void *eventData) {
     RideEvent *data = eventData;
     FieldTask *task;
-    u32 code;
+    u16 code;
     BOOL ready;
 
     Field_GetGimmickWorkBlock(data->field, WORK_BLOCK);

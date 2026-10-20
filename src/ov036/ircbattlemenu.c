@@ -1,7 +1,10 @@
 // The IR battle menu: the touch screen menu of the infrared (and Wi-Fi) battle start. The name is the ROM's string,
 // from GFL_HeapAllocate's calls. It is the older sibling of gsync_menu.c.
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/sound.h"
 #include "constants/text_banks.h"
 #include "field/event_irc.h"
 #include "gfl/arc.h"
@@ -43,6 +46,7 @@
 #include "system/text_speed.h"
 #include "system/time_icon.h"
 #include "system/wipe.h"
+#include "text/system/startmenu_2.h"
 
 #define IRC_MENU_BUTTON_WIN_MAX 4
 
@@ -117,51 +121,32 @@ struct IrcMenuWork {
     u8 unk307;
 };
 
-static void func_ov036_0218d0e8(IrcMenuWork *wk, IrcMenuStateFunc state);
+static void IrcMenu_SetState(IrcMenuWork *wk, IrcMenuStateFunc state);
 // Sets the state, from a line that the debug build reported
-static void func_ov036_0218d0ec(IrcMenuWork *wk, IrcMenuStateFunc state, int line);
-static void func_ov036_0218d0f4(IrcMenuWork *wk);
-static void func_ov036_0218d7a8(IrcMenuWork *wk);
-static void func_ov036_0218db28(IrcMenuWork *wk);
-static void func_ov036_0218dd30(IrcMenuWork *wk);
-static void func_ov036_0218ded0(IrcMenuWork *wk);
-static void func_ov036_0218e148(IrcMenuWork *wk);
-static void func_ov036_0218e25c(IrcMenuWork *wk);
-static void func_ov036_0218e358(IrcMenuWork *wk);
-static void func_ov036_0218e46c(IrcMenuWork *wk);
-static void func_ov036_0218db14(IrcMenuWork *wk);
-static void func_ov036_0218e0bc(IrcMenuWork *wk);
-static void func_ov036_0218de50(IrcMenuWork *wk);
-static void func_ov036_0218d8c0(IrcMenuWork *wk);
-static void func_ov036_0218e7cc(IrcMenuWork *wk);
-static void func_ov036_0218e978(IrcMenuWork *wk);
-static BOOL func_ov036_0218da38(u32 button, IrcMenuWork *wk);
-static BOOL func_ov036_0218dcc0(u32 button, IrcMenuWork *wk);
-static BOOL func_ov036_0218e010(u32 button, IrcMenuWork *wk);
-static BOOL func_ov036_0218de5c(u32 button, IrcMenuWork *wk);
-static BOOL func_ov036_0218e69c(IrcMenuWork *wk);
-static void func_ov036_0218e710(IrcMenuWork *wk, BOOL instant);
-// What the sub screen's palettes are brightened by in each color
-static u16 sIrcMenuBrightenAmounts[16] = { 0, 5, 15, 15, 15, 15, 15, 5, 5, 0, 0, 0, 0, 15, 15, 15 };
+static void IrcMenu_SetStateAtLine(IrcMenuWork *wk, IrcMenuStateFunc state, int line);
+static void IrcMenu_CreateBGs(IrcMenuWork *wk);
+static void IrcMenu_ShowMainMenu(IrcMenuWork *wk);
+static void IrcMenu_ShowPlayerCountMenu(IrcMenuWork *wk);
+static void IrcMenu_ShowBattleTypeMenu(IrcMenuWork *wk);
+static void IrcMenu_ShowBattleBoxMenu(IrcMenuWork *wk);
+static void IrcMenu_CreateMainButtons(IrcMenuWork *wk);
+static void IrcMenu_CreatePlayerCountButtons(IrcMenuWork *wk);
+static void IrcMenu_CreateBattleTypeButtons(IrcMenuWork *wk);
+static void IrcMenu_CreateBattleBoxButtons(IrcMenuWork *wk);
+static void IrcMenu_MainUpdate(IrcMenuWork *wk);
+static void IrcMenu_SubmenuUpdate(IrcMenuWork *wk);
+static void IrcMenu_BattleBoxUpdate(IrcMenuWork *wk);
+static void IrcMenu_StartExit(IrcMenuWork *wk);
+static void IrcMenu_AskSave(IrcMenuWork *wk);
+static void IrcMenu_WaitSaveQuestion(IrcMenuWork *wk);
+static BOOL IrcMenu_MainTouch(u32 button, IrcMenuWork *wk);
+static BOOL IrcMenu_PlayerCountTouch(u32 button, IrcMenuWork *wk);
+static BOOL IrcMenu_BattleTypeTouch(u32 button, IrcMenuWork *wk);
+static BOOL IrcMenu_BattleBoxTouch(u32 button, IrcMenuWork *wk);
+static BOOL IrcMenu_UpdateMessage(IrcMenuWork *wk);
+static void IrcMenu_PrintMessage(IrcMenuWork *wk, BOOL instant);
 
-static IrcMenuWinRect sWinRects2[] = {
-    { 8, 8, 24, 4 },
-    { 8, 14, 24, 4 },
-};
-
-static BGSysVRAMConfig sIrcMenuVRAMConfig = {
-    GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
-    GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
-};
-
-static IrcMenuWinRect sWinRects3[] = {
-    { 8, 2, 24, 4 },
-    { 8, 7, 24, 4 },
-    { 8, 12, 24, 4 },
-    { 8, 17, 24, 4 },
-};
-
+// The first menu's button windows, where its messages are centered in them, and its touch rectangles
 static IrcMenuWinRect sWinRectsA[] = {
     { 6, 6, 10, 4 },
     { 18, 6, 10, 4 },
@@ -169,15 +154,58 @@ static IrcMenuWinRect sWinRectsA[] = {
     { 6, 19, 16, 4 },
 };
 
-static void func_ov036_0218d0e8(IrcMenuWork *wk, IrcMenuStateFunc state) {
+static const s32 sCenterX[] = { 0x20, 0x21, 0x28, 0x2a };
+static const s32 sCenterY[] = { 8, 8, 16, 8 };
+
+static const TouchRect sTouchRectsA[] = {
+    { 0x20, 0x50, 0x10, 0x80 }, { 0x20, 0x50, 0x80, 0xf0 }, { 0x50, 0x80, 0x40, 0xc0 },
+    { 0x80, 0xb0, 0x18, 0x48 }, { 0xa0, 0xc0, 0xc0, 0xff }, { 0x50, 0x80, 0x08, 0x40 },
+    { 0x50, 0x80, 0xc0, 0xf8 }, { 0x90, 0xb0, 0x48, 0x90 }, { TOUCH_RECT_END, 0, 0, 0 },
+};
+
+// The two-button menus' windows, and the first two-button menu's touch rectangles
+static IrcMenuWinRect sWinRects2[] = {
+    { 8, 8, 24, 4 },
+    { 8, 14, 24, 4 },
+};
+
+static const TouchRect sTouchRects2[] = {
+    { 0x30, 0x58, 0x08, 0xf8 },
+    { 0x60, 0x88, 0x08, 0xf8 },
+    { 0xa0, 0xc0, 0xc0, 0x00 },
+    { TOUCH_RECT_END, 0, 0, 0 },
+};
+
+// The four-button menu's windows and touch rectangles
+static IrcMenuWinRect sWinRects3[] = {
+    { 8, 2, 24, 4 },
+    { 8, 7, 24, 4 },
+    { 8, 12, 24, 4 },
+    { 8, 17, 24, 4 },
+};
+
+static const TouchRect sTouchRects3[] = {
+    { 0x00, 0x20, 0x08, 0xf8 }, { 0x28, 0x48, 0x08, 0xf8 }, { 0x50, 0x70, 0x08, 0xf8 },
+    { 0x78, 0x98, 0x08, 0xf8 }, { 0xa0, 0xc0, 0xc0, 0x00 }, { TOUCH_RECT_END, 0, 0, 0 },
+};
+
+// The touch rectangles of the two-button menu whose choice becomes the event's useBattleBox
+static const TouchRect sBattleBoxTouchRects[] = {
+    { 0x38, 0x58, 0x08, 0xf8 },
+    { 0x68, 0x88, 0x08, 0xf8 },
+    { 0xa0, 0xc0, 0xc0, 0x00 },
+    { TOUCH_RECT_END, 0, 0, 0 },
+};
+
+static void IrcMenu_SetState(IrcMenuWork *wk, IrcMenuStateFunc state) {
     wk->state = state;
 }
 
-static void func_ov036_0218d0ec(IrcMenuWork *wk, IrcMenuStateFunc state, int line) {
-    func_ov036_0218d0e8(wk, state);
+static void IrcMenu_SetStateAtLine(IrcMenuWork *wk, IrcMenuStateFunc state, int line) {
+    IrcMenu_SetState(wk, state);
 }
 
-static void func_ov036_0218d0f4(IrcMenuWork *wk) {
+static void IrcMenu_CreateBGs(IrcMenuWork *wk) {
     {
         BGSetup setup = {
             0,
@@ -306,7 +334,7 @@ static void func_ov036_0218d0f4(IrcMenuWork *wk) {
 
 // Dims the first count palettes of the sub screen's BG or OBJ palettes. buffer is both the PaletteFade buffer and the
 // VRAM it loads from, whose IDs are the same for the sub screen
-static void func_ov036_0218d25c(IrcMenuWork *wk, u16 buffer, int count) {
+static void IrcMenu_DimPalettes(IrcMenuWork *wk, u16 buffer, int count) {
     PaletteFade *fade = PaletteFade_Create(wk->heapId);
     u16 *faded;
 
@@ -328,19 +356,19 @@ static void func_ov036_0218d25c(IrcMenuWork *wk, u16 buffer, int count) {
 }
 
 // Dims the sub screen behind a message, or restores it
-static void func_ov036_0218d2e0(IrcMenuWork *wk, BOOL dim) {
+static void IrcMenu_SetDimmed(IrcMenuWork *wk, BOOL dim) {
     if (dim) {
         MI_CpuCopy8((void *)HW_DB_OBJ_PLTT, wk->objPalettes, 0x200);
         MI_CpuCopy8((void *)HW_DB_BG_PLTT, wk->bgPalettes, 0x200);
-        func_ov036_0218d25c(wk, PALFADE_BUFFER_SUB_OBJ, 14);
-        func_ov036_0218d25c(wk, PALFADE_BUFFER_SUB_BG, 9);
+        IrcMenu_DimPalettes(wk, PALFADE_BUFFER_SUB_OBJ, 14);
+        IrcMenu_DimPalettes(wk, PALFADE_BUFFER_SUB_BG, 9);
     } else {
         GXS_LoadOBJPltt(wk->objPalettes, 0, 14 * 32);
         GXS_LoadBGPltt(wk->bgPalettes, 0, 9 * 32);
     }
 }
 
-static void func_ov036_0218d348(IrcMenuWork *wk) {
+static void IrcMenu_CreateWaitIcon(IrcMenuWork *wk) {
     if (wk->waitIcon != NULL) {
         WaitIcon_Free(wk->waitIcon);
         wk->waitIcon = NULL;
@@ -348,7 +376,7 @@ static void func_ov036_0218d348(IrcMenuWork *wk) {
     wk->waitIcon = WaitIcon_CreateTCBEx(wk->tcbMgr, wk->msgWin, 15, 16, wk->heapId);
 }
 
-static void func_ov036_0218d37c(IrcMenuWork *wk) {
+static void IrcMenu_ClearMessageWindow(IrcMenuWork *wk) {
     if (wk->waitIcon != NULL) {
         WaitIcon_Free(wk->waitIcon);
         wk->waitIcon = NULL;
@@ -358,15 +386,15 @@ static void func_ov036_0218d37c(IrcMenuWork *wk) {
     GFL_BGSysQueueScrLoad(5);
 }
 
-static void func_ov036_0218d3ac(IrcMenuWork *wk) {
-    func_ov036_0218d37c(wk);
+static void IrcMenu_FreeMessageWindow(IrcMenuWork *wk) {
+    IrcMenu_ClearMessageWindow(wk);
     BmpWin_Free(wk->msgWin);
     wk->msgWin = NULL;
 }
 
 // Creates the buttons' windows, with their messages centered on centerX and centerY where they are given
-static void func_ov036_0218d3c4(int count, const u32 *msgIds, IrcMenuWork *wk, IrcMenuWinRect *rects,
-                                const s32 *centerX, const s32 *centerY) {
+static void IrcMenu_CreateButtonWindows(int count, const u32 *msgIds, IrcMenuWork *wk, IrcMenuWinRect *rects,
+                                        const s32 *centerX, const s32 *centerY) {
     int i;
 
     GFL_BGSysClearScr(7);
@@ -410,7 +438,7 @@ static void func_ov036_0218d3c4(int count, const u32 *msgIds, IrcMenuWork *wk, I
     GFL_BGSysSetBGEnabled(7, TRUE);
 }
 
-static void func_ov036_0218d50c(IrcMenuWork *wk) {
+static void IrcMenu_FreeButtonWindows(IrcMenuWork *wk) {
     int i;
 
     if (wk->buttonMan != NULL) {
@@ -429,7 +457,7 @@ static void func_ov036_0218d50c(IrcMenuWork *wk) {
     wk->buttonCount = 0;
 }
 
-static void func_ov036_0218d554(u32 button, u32 event, void *work) {
+static void IrcMenu_ButtonCallback(u32 button, u32 event, void *work) {
     IrcMenuWork *wk = work;
 
     switch (event) {
@@ -444,7 +472,7 @@ static void func_ov036_0218d554(u32 button, u32 event, void *work) {
 }
 
 // Adds add's amount to each color's components, up to 31
-static void func_ov036_0218d568(u16 (*palettes)[16], const u16 *add, int count) {
+static void IrcMenu_BrightenPalettes(u16 (*palettes)[16], const u16 *add, int count) {
     int i, j;
 
     for (i = 0; i < count; i++) {
@@ -472,7 +500,10 @@ static void func_ov036_0218d568(u16 (*palettes)[16], const u16 *add, int count) 
     }
 }
 
-static void func_ov036_0218d5f0(IrcMenuWork *wk) {
+// What the sub screen's palettes are brightened by in each color
+static u16 sIrcMenuBrightenAmounts[16] = { 0, 5, 15, 15, 15, 15, 15, 5, 5, 0, 0, 0, 0, 15, 15, 15 };
+
+static void IrcMenu_LoadGraphics(IrcMenuWork *wk) {
     ArcTool *arc;
     void *file;
     NNSG2dPaletteData *palette;
@@ -480,9 +511,9 @@ static void func_ov036_0218d5f0(IrcMenuWork *wk) {
     wk->unk2F8 = 0;
     wk->strBuf = GFL_StrBufCreate(300, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x3e, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU_2, wk->heapId);
 
-    arc = GFL_ArcSysCreateFileHandle(28, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_IRCBATTLE, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0, wk->heapId);
     wk->mainBgChars = GFL_BGSysLoadArcNCGRDynamic(arc, 6, 0, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 13, 0, 0, CHAR_POS(wk->mainBgChars), 0, FALSE, wk->heapId);
@@ -493,7 +524,7 @@ static void func_ov036_0218d5f0(IrcMenuWork *wk) {
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, wk->heapId);
     MI_CpuCopy8(palette->rawData, wk->palettes[0], sizeof(wk->palettes[0]));
     MI_CpuCopy8(palette->rawData, wk->palettes[1], sizeof(wk->palettes[1]));
-    func_ov036_0218d568(wk->palettes[1], sIrcMenuBrightenAmounts, 8);
+    IrcMenu_BrightenPalettes(wk->palettes[1], sIrcMenuBrightenAmounts, 8);
     GFL_HeapFree(file);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, wk->heapId);
     wk->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, wk->heapId);
@@ -505,7 +536,7 @@ static void func_ov036_0218d5f0(IrcMenuWork *wk) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 11 * 0x20, 0x20, wk->heapId);
 }
 
-static void func_ov036_0218d768(IrcMenuWork *wk, u32 fileId) {
+static void IrcMenu_LoadSubscreenLayout(IrcMenuWork *wk, u32 fileId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC_MENU, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, fileId, 6, 0, CHAR_POS(wk->bgChars), 0, FALSE, wk->heapId);
@@ -513,27 +544,21 @@ static void func_ov036_0218d768(IrcMenuWork *wk, u32 fileId) {
     GFL_BGSysSetBGEnabled(6, TRUE);
 }
 
-static void func_ov036_0218d7a8(IrcMenuWork *wk) {
-    static const s32 sCenterX[] = { 0x20, 0x21, 0x28, 0x2a };
-    static const s32 sCenterY[] = { 8, 8, 16, 8 };
-    static const TouchRect sTouchRects[] = {
-        { 0x20, 0x50, 0x10, 0x80 }, { 0x20, 0x50, 0x80, 0xf0 }, { 0x50, 0x80, 0x40, 0xc0 },
-        { 0x80, 0xb0, 0x18, 0x48 }, { 0xa0, 0xc0, 0xc0, 0xff }, { 0x50, 0x80, 0x08, 0x40 },
-        { 0x50, 0x80, 0xc0, 0xf8 }, { 0x90, 0xb0, 0x48, 0x90 }, { TOUCH_RECT_END, 0, 0, 0 },
-    };
-    u32 msgIds[] = { 0, 1, 14, 13 };
+static void IrcMenu_ShowMainMenu(IrcMenuWork *wk) {
+    u32 msgIds[] = { Startmenu2_Text_Battle, Startmenu2_Text_Trade, Startmenu2_Text_FeelingCheck,
+                     Startmenu2_Text_FriendCode };
 
-    func_ov036_0218d768(wk, 11);
-    func_ov036_0218e148(wk);
-    func_ov036_0218d3c4(4, msgIds, wk, sWinRectsA, sCenterX, sCenterY);
-    wk->buttonMan = GFL_BMN_Create(sTouchRects, func_ov036_0218d554, wk, wk->heapId);
-    wk->touchFunc = func_ov036_0218da38;
-    func_ov036_0218d0ec(wk, func_ov036_0218db14, 833);
+    IrcMenu_LoadSubscreenLayout(wk, 11);
+    IrcMenu_CreateMainButtons(wk);
+    IrcMenu_CreateButtonWindows(4, msgIds, wk, sWinRectsA, sCenterX, sCenterY);
+    wk->buttonMan = GFL_BMN_Create(sTouchRectsA, IrcMenu_ButtonCallback, wk, wk->heapId);
+    wk->touchFunc = IrcMenu_MainTouch;
+    IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 833);
 }
 
-static void func_ov036_0218d824(IrcMenuWork *wk) {
+static void IrcMenu_FreeGraphics(IrcMenuWork *wk) {
     GFL_TextRndResetColorIndexLUT();
-    func_ov036_0218d50c(wk);
+    IrcMenu_FreeButtonWindows(wk);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, CHAR_POS(wk->frameChars), CHAR_SIZE(wk->frameChars));
     GFL_BGSysReleaseBG(5);
@@ -544,19 +569,19 @@ static void func_ov036_0218d824(IrcMenuWork *wk) {
     GFL_BGSysSetBGEnabled(5, FALSE);
 }
 
-static void func_ov036_0218d878(IrcMenuWork *wk) {
+static void IrcMenu_WaitExit(IrcMenuWork *wk) {
     if (GFL_WipeIsFinished()) {
         if (wk->mode != 12) {
             if (!GameCommSys_BootCheck(GSYS_GetGameCommSystem(EventIRC_GetGameSystem(wk->param)))) {
-                func_ov036_0218d0ec(wk, NULL, 866);
+                IrcMenu_SetStateAtLine(wk, NULL, 866);
             }
         } else {
-            func_ov036_0218d0ec(wk, NULL, 870);
+            IrcMenu_SetStateAtLine(wk, NULL, 870);
         }
     }
 }
 
-static void func_ov036_0218d8c0(IrcMenuWork *wk) {
+static void IrcMenu_StartExit(IrcMenuWork *wk) {
     wk->ending = TRUE;
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     if (wk->mode != 12) {
@@ -567,7 +592,7 @@ static void func_ov036_0218d8c0(IrcMenuWork *wk) {
     if (wk->mode >= 1 && wk->mode <= 8) {
         JoinAvenue_RecordActivity(30);
     }
-    func_ov036_0218d0ec(wk, func_ov036_0218d878, 901);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitExit, 901);
 }
 
 // Called by the touched button's actor once its animation ends
@@ -575,18 +600,18 @@ static void func_ov036_0218d938(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 12) {
-        func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 917);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 917);
         return;
     }
     if (Config_GetSaveBeforeIR((const Config *)getTrainerDataBlkAddress(EventIRC_GetSaveControl(wk->param))) == 1) {
-        func_ov036_0218d0ec(wk, func_ov036_0218e7cc, 920);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_AskSave, 920);
         return;
     }
     if ((u32)(wk->mode - 6) <= 2) {
-        func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 925);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 925);
         return;
     }
-    func_ov036_0218d0ec(wk, func_ov036_0218db28, 928);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 928);
 }
 
 static void func_ov036_0218d9a4(IrcMenuWork *wk) {
@@ -609,84 +634,78 @@ static void func_ov036_0218d9a8(IrcMenuWork *wk) {
     func_0204c520(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    func_ov036_0218d0ec(wk, func_ov036_0218d9a4, 968);
+    IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a4, 968);
 }
 
 static void func_ov036_0218da0c(IrcMenuWork *wk) {
-    if (func_ov036_0218e69c(wk) && GFL_HIDIsTouchPressed()) {
-        func_ov036_0218d3ac(wk);
-        func_ov036_0218d0ec(wk, func_ov036_0218db14, 980);
+    if (IrcMenu_UpdateMessage(wk) && GFL_HIDIsTouchPressed()) {
+        IrcMenu_FreeMessageWindow(wk);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 980);
     }
 }
 
-static BOOL func_ov036_0218da38(u32 button, IrcMenuWork *wk) {
+static BOOL IrcMenu_MainTouch(u32 button, IrcMenuWork *wk) {
     BOOL result = FALSE;
 
     wk->selected = button;
     switch (button) {
     case 0:
     case 5:
-        GFL_SndSEPlay(1850);
-        func_ov036_0218d0ec(wk, func_ov036_0218d9a8, 999);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 999);
         wk->mode = 1;
         result = TRUE;
         break;
     case 1:
     case 6:
         if (howManyPartyPokesAreNotEggs(GameData_GetParty(wk->gameData)) < 2) {
-            GFL_MsgDataLoadStrbuf(wk->msgData, 44, wk->strBuf);
-            func_ov036_0218e710(wk, FALSE);
-            func_ov036_0218d0ec(wk, func_ov036_0218da0c, 1011);
+            GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_NeedLeastTwoPokemon, wk->strBuf);
+            IrcMenu_PrintMessage(wk, FALSE);
+            IrcMenu_SetStateAtLine(wk, func_ov036_0218da0c, 1011);
         } else {
-            GFL_SndSEPlay(1850);
+            GFL_SndSEPlay(SEQ_SE_SYS_69);
             wk->mode = 6;
-            func_ov036_0218d0ec(wk, func_ov036_0218d9a8, 1017);
+            IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1017);
             result = TRUE;
         }
         break;
     case 2:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 8;
-        func_ov036_0218d0ec(wk, func_ov036_0218d9a8, 1023);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1023);
         result = TRUE;
         break;
     case 3:
     case 7:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 7;
-        func_ov036_0218d0ec(wk, func_ov036_0218d9a8, 1030);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1030);
         result = TRUE;
         break;
     case 4:
-        GFL_SndSEPlay(1851);
+        GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->mode = 12;
-        func_ov036_0218d0ec(wk, func_ov036_0218d9a8, 1037);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a8, 1037);
         break;
     }
     return result;
 }
 
-static void func_ov036_0218db14(IrcMenuWork *wk) {
+static void IrcMenu_MainUpdate(IrcMenuWork *wk) {
     if (GFL_WipeIsFinished()) {
         GFL_BMN_Main(wk->buttonMan);
     }
 }
 
-static void func_ov036_0218db28(IrcMenuWork *wk) {
-    static const TouchRect sTouchRects[] = {
-        { 0x30, 0x58, 0x08, 0xf8 },
-        { 0x60, 0x88, 0x08, 0xf8 },
-        { 0xa0, 0xc0, 0xc0, 0x00 },
-        { TOUCH_RECT_END, 0, 0, 0 },
-    };
-    u32 msgIds[] = { 3, 4 };
+static void IrcMenu_ShowPlayerCountMenu(IrcMenuWork *wk) {
+    u32 msgIds[] = { Startmenu2_Text_BattlesTwo, Startmenu2_Text_BattlesFour };
 
-    func_ov036_0218e25c(wk);
-    func_ov036_0218d768(wk, 12);
-    func_ov036_0218d3c4(2, msgIds, wk, sWinRects2, NULL, NULL);
-    wk->buttonMan = GFL_BMN_Create(sTouchRects, func_ov036_0218d554, wk, wk->heapId);
-    wk->touchFunc = func_ov036_0218dcc0;
-    func_ov036_0218d0ec(wk, func_ov036_0218e0bc, 1083);
+    IrcMenu_CreatePlayerCountButtons(wk);
+    IrcMenu_LoadSubscreenLayout(wk, 12);
+    IrcMenu_CreateButtonWindows(2, msgIds, wk, sWinRects2, NULL, NULL);
+    wk->buttonMan = GFL_BMN_Create(sTouchRects2, IrcMenu_ButtonCallback, wk, wk->heapId);
+    wk->touchFunc = IrcMenu_PlayerCountTouch;
+    IrcMenu_SetStateAtLine(wk, IrcMenu_SubmenuUpdate, 1083);
 }
 
 static void func_ov036_0218db94(u32 param, fx32 frame) {
@@ -694,12 +713,12 @@ static void func_ov036_0218db94(u32 param, fx32 frame) {
 
     if (wk->mode == 5) {
         if (BattleBoxSave_HasPkm(getBattleBox(wk->param->save))) {
-            func_ov036_0218d0ec(wk, func_ov036_0218ded0, 1100);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleBoxMenu, 1100);
         } else {
-            func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 1103);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 1103);
         }
     } else {
-        func_ov036_0218d0ec(wk, func_ov036_0218dd30, 1110);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleTypeMenu, 1110);
     }
 }
 
@@ -719,13 +738,13 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
     func_0204c520(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    func_ov036_0218d0ec(wk, func_ov036_0218dbec, 1146);
+    IrcMenu_SetStateAtLine(wk, func_ov036_0218dbec, 1146);
 }
 
 static void func_ov036_0218dc44(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
-    func_ov036_0218d0ec(wk, func_ov036_0218d7a8, 1155);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_ShowMainMenu, 1155);
 }
 
 static void func_ov036_0218dc58(IrcMenuWork *wk) {
@@ -740,45 +759,42 @@ static void func_ov036_0218dc5c(IrcMenuWork *wk) {
     func_0204c520(wk->actors[wk->selected], TRUE);
     ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
     ClActor_RestartAnim(wk->actors[wk->selected]);
-    func_ov036_0218d0ec(wk, func_ov036_0218dc58, 1179);
+    IrcMenu_SetStateAtLine(wk, func_ov036_0218dc58, 1179);
 }
 
-static BOOL func_ov036_0218dcc0(u32 button, IrcMenuWork *wk) {
+static BOOL IrcMenu_PlayerCountTouch(u32 button, IrcMenuWork *wk) {
     IrcMenuTouchResult result = IRC_MENU_TOUCH_HANDLED;
 
     wk->selected = button;
     switch (button) {
     case 0:
-        GFL_SndSEPlay(1850);
-        func_ov036_0218d0ec(wk, func_ov036_0218dbf0, 1196);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218dbf0, 1196);
         break;
     case 1:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 5;
-        func_ov036_0218d0ec(wk, func_ov036_0218dbf0, 1202);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218dbf0, 1202);
         break;
     case 2:
-        GFL_SndSEPlay(1851);
+        GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->mode = 12;
-        func_ov036_0218d0ec(wk, func_ov036_0218dc5c, 1208);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218dc5c, 1208);
         break;
     }
     return result;
 }
 
-static void func_ov036_0218dd30(IrcMenuWork *wk) {
-    static const TouchRect sTouchRects[] = {
-        { 0x00, 0x20, 0x08, 0xf8 }, { 0x28, 0x48, 0x08, 0xf8 }, { 0x50, 0x70, 0x08, 0xf8 },
-        { 0x78, 0x98, 0x08, 0xf8 }, { 0xa0, 0xc0, 0xc0, 0x00 }, { TOUCH_RECT_END, 0, 0, 0 },
-    };
-    u32 msgIds[] = { 5, 6, 7, 31 };
+static void IrcMenu_ShowBattleTypeMenu(IrcMenuWork *wk) {
+    u32 msgIds[] = { Startmenu2_Text_SingleBattle, Startmenu2_Text_DoubleBattle, Startmenu2_Text_TripleBattle,
+                     Startmenu2_Text_RotationBattle };
 
-    func_ov036_0218e358(wk);
-    func_ov036_0218d768(wk, 13);
-    func_ov036_0218d3c4(4, msgIds, wk, sWinRects3, NULL, NULL);
-    wk->buttonMan = GFL_BMN_Create(sTouchRects, func_ov036_0218d554, wk, wk->heapId);
-    wk->touchFunc = func_ov036_0218e010;
-    func_ov036_0218d0ec(wk, func_ov036_0218e0bc, 1237);
+    IrcMenu_CreateBattleTypeButtons(wk);
+    IrcMenu_LoadSubscreenLayout(wk, 13);
+    IrcMenu_CreateButtonWindows(4, msgIds, wk, sWinRects3, NULL, NULL);
+    wk->buttonMan = GFL_BMN_Create(sTouchRects3, IrcMenu_ButtonCallback, wk, wk->heapId);
+    wk->touchFunc = IrcMenu_BattleTypeTouch;
+    IrcMenu_SetStateAtLine(wk, IrcMenu_SubmenuUpdate, 1237);
 }
 
 static void func_ov036_0218dda0(u32 param, fx32 frame) {
@@ -787,12 +803,12 @@ static void func_ov036_0218dda0(u32 param, fx32 frame) {
     if (wk->choice == 2) {
         if (wk->mode == 5) {
             wk->mode = 1;
-            func_ov036_0218d0ec(wk, func_ov036_0218db28, 1254);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 1254);
         } else {
-            func_ov036_0218d0ec(wk, func_ov036_0218dd30, 1258);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleTypeMenu, 1258);
         }
     } else {
-        func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 1262);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 1262);
     }
 }
 
@@ -810,65 +826,59 @@ static void func_ov036_0218ddec(IrcMenuWork *wk) {
     func_0204c520(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    func_ov036_0218d0ec(wk, func_ov036_0218dde8, 1293);
+    IrcMenu_SetStateAtLine(wk, func_ov036_0218dde8, 1293);
 }
 
-static void func_ov036_0218de50(IrcMenuWork *wk) {
+static void IrcMenu_BattleBoxUpdate(IrcMenuWork *wk) {
     GFL_BMN_Main(wk->buttonMan);
 }
 
-static BOOL func_ov036_0218de5c(u32 button, IrcMenuWork *wk) {
+static BOOL IrcMenu_BattleBoxTouch(u32 button, IrcMenuWork *wk) {
     BOOL result = FALSE;
 
     wk->selected = button;
     switch (button) {
     case 1:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->choice = 0;
-        func_ov036_0218d0ec(wk, func_ov036_0218ddec, 1325);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218ddec, 1325);
         result = TRUE;
         break;
     case 0:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->choice = 1;
         result = TRUE;
-        func_ov036_0218d0ec(wk, func_ov036_0218ddec, 1331);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218ddec, 1331);
         break;
     case 2:
-        GFL_SndSEPlay(1851);
+        GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->choice = 2;
-        func_ov036_0218d0ec(wk, func_ov036_0218ddec, 1337);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218ddec, 1337);
         break;
     }
     return result;
 }
 
-static void func_ov036_0218ded0(IrcMenuWork *wk) {
-    static const TouchRect sTouchRects[] = {
-        { 0x38, 0x58, 0x08, 0xf8 },
-        { 0x68, 0x88, 0x08, 0xf8 },
-        { 0xa0, 0xc0, 0xc0, 0x00 },
-        { TOUCH_RECT_END, 0, 0, 0 },
-    };
-    u32 msgIds[] = { 40, 41 };
+static void IrcMenu_ShowBattleBoxMenu(IrcMenuWork *wk) {
+    u32 msgIds[] = { Startmenu2_Text_BattleUsingBattleBox, Startmenu2_Text_BattleUsingParty };
 
-    func_ov036_0218e46c(wk);
-    func_ov036_0218d768(wk, 13);
-    func_ov036_0218d3c4(2, msgIds, wk, sWinRects2, NULL, NULL);
-    wk->buttonMan = GFL_BMN_Create(sTouchRects, func_ov036_0218d554, wk, wk->heapId);
-    wk->touchFunc = func_ov036_0218de5c;
-    func_ov036_0218d0ec(wk, func_ov036_0218de50, 1366);
+    IrcMenu_CreateBattleBoxButtons(wk);
+    IrcMenu_LoadSubscreenLayout(wk, 13);
+    IrcMenu_CreateButtonWindows(2, msgIds, wk, sWinRects2, NULL, NULL);
+    wk->buttonMan = GFL_BMN_Create(sBattleBoxTouchRects, IrcMenu_ButtonCallback, wk, wk->heapId);
+    wk->touchFunc = IrcMenu_BattleBoxTouch;
+    IrcMenu_SetStateAtLine(wk, IrcMenu_BattleBoxUpdate, 1366);
 }
 
 static void func_ov036_0218df3c(u32 param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 12) {
-        func_ov036_0218d0ec(wk, func_ov036_0218db28, 1377);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 1377);
     } else if (BattleBoxSave_HasPkm(getBattleBox(wk->param->save))) {
-        func_ov036_0218d0ec(wk, func_ov036_0218ded0, 1382);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_ShowBattleBoxMenu, 1382);
     } else {
-        func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 1385);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 1385);
     }
 }
 
@@ -902,52 +912,52 @@ static void func_ov036_0218df98(IrcMenuWork *wk) {
     func_0204c520(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
-    func_ov036_0218d0ec(wk, func_ov036_0218df94, 1432);
+    IrcMenu_SetStateAtLine(wk, func_ov036_0218df94, 1432);
 }
 
-static BOOL func_ov036_0218e010(u32 button, IrcMenuWork *wk) {
+static BOOL IrcMenu_BattleTypeTouch(u32 button, IrcMenuWork *wk) {
     BOOL result = FALSE;
 
     wk->selected = button;
     switch (button) {
     case 0:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         result = TRUE;
         wk->mode = 1;
-        func_ov036_0218d0ec(wk, func_ov036_0218df98, 1466);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1466);
         break;
     case 1:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 2;
-        func_ov036_0218d0ec(wk, func_ov036_0218df98, 1472);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1472);
         result = TRUE;
         break;
     case 2:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 3;
-        func_ov036_0218d0ec(wk, func_ov036_0218df98, 1478);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1478);
         result = TRUE;
         break;
     case 3:
-        GFL_SndSEPlay(1850);
+        GFL_SndSEPlay(SEQ_SE_SYS_69);
         wk->mode = 4;
-        func_ov036_0218d0ec(wk, func_ov036_0218df98, 1484);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1484);
         result = TRUE;
         break;
     case 4:
-        GFL_SndSEPlay(1851);
+        GFL_SndSEPlay(SEQ_SE_SYS_70);
         wk->mode = 12;
-        func_ov036_0218d0ec(wk, func_ov036_0218df98, 1490);
+        IrcMenu_SetStateAtLine(wk, func_ov036_0218df98, 1490);
         break;
     }
     return result;
 }
 
-static void func_ov036_0218e0bc(IrcMenuWork *wk) {
+static void IrcMenu_SubmenuUpdate(IrcMenuWork *wk) {
     GFL_BMN_Main(wk->buttonMan);
 }
 
-static void func_ov036_0218e0c8(IrcMenuWork *wk) {
+static void IrcMenu_LoadButtonResources(IrcMenuWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC_MENU, wk->heapId);
 
     wk->clRes[3] = ClActSys_LoadChars(arc, 5, FALSE, 1, wk->heapId);
@@ -956,7 +966,7 @@ static void func_ov036_0218e0c8(IrcMenuWork *wk) {
     GFL_ArcToolFree(arc);
 }
 
-static void func_ov036_0218e124(IrcMenuWork *wk) {
+static void IrcMenu_DeleteButtonActors(IrcMenuWork *wk) {
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -967,14 +977,14 @@ static void func_ov036_0218e124(IrcMenuWork *wk) {
     }
 }
 
-static void func_ov036_0218e148(IrcMenuWork *wk) {
+static void IrcMenu_CreateMainButtons(IrcMenuWork *wk) {
     u8 x[] = { 128, 128, 128, 128, 224 };
     u8 y[] = { 96, 96, 96, 96, 177 };
     u8 sequences[] = { 2, 1, 3, 4, 0 };
     ClActorSetup setup;
     int i;
 
-    func_ov036_0218e124(wk);
+    IrcMenu_DeleteButtonActors(wk);
     for (i = 0; i < 5; i++) {
         setup.x = x[i];
         setup.y = y[i];
@@ -988,14 +998,14 @@ static void func_ov036_0218e148(IrcMenuWork *wk) {
     }
 }
 
-static void func_ov036_0218e25c(IrcMenuWork *wk) {
+static void IrcMenu_CreatePlayerCountButtons(IrcMenuWork *wk) {
     u8 x[] = { 128, 128, 224 };
     u8 y[] = { 72, 120, 177 };
     u8 sequences[] = { 9, 10, 0 };
     ClActorSetup setup;
     int i;
 
-    func_ov036_0218e124(wk);
+    IrcMenu_DeleteButtonActors(wk);
     for (i = 0; i < 3; i++) {
         setup.x = x[i];
         setup.y = y[i];
@@ -1009,14 +1019,14 @@ static void func_ov036_0218e25c(IrcMenuWork *wk) {
     }
 }
 
-static void func_ov036_0218e358(IrcMenuWork *wk) {
+static void IrcMenu_CreateBattleTypeButtons(IrcMenuWork *wk) {
     u8 x[] = { 128, 128, 128, 128, 224 };
     u8 y[] = { 24, 64, 104, 144, 177 };
     u8 sequences[] = { 5, 6, 7, 8, 0 };
     ClActorSetup setup;
     int i;
 
-    func_ov036_0218e124(wk);
+    IrcMenu_DeleteButtonActors(wk);
     for (i = 0; i < 5; i++) {
         setup.x = x[i];
         setup.y = y[i];
@@ -1030,14 +1040,14 @@ static void func_ov036_0218e358(IrcMenuWork *wk) {
     }
 }
 
-static void func_ov036_0218e46c(IrcMenuWork *wk) {
+static void IrcMenu_CreateBattleBoxButtons(IrcMenuWork *wk) {
     u8 x[] = { 128, 128, 224 };
     u8 y[] = { 72, 120, 177 };
     u8 sequences[] = { 17, 17, 0 };
     ClActorSetup setup;
     int i;
 
-    func_ov036_0218e124(wk);
+    IrcMenu_DeleteButtonActors(wk);
     for (i = 0; i < 3; i++) {
         setup.x = x[i];
         setup.y = y[i];
@@ -1054,7 +1064,7 @@ static void func_ov036_0218e46c(IrcMenuWork *wk) {
 static void func_ov036_0218e568(IrcMenuWork *wk, u32 a, u32 b, u32 c, u32 d) {
 }
 
-static void func_ov036_0218e56c(IrcMenuWork *wk) {
+static void IrcMenu_FreeActorsAndResources(IrcMenuWork *wk) {
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -1086,7 +1096,7 @@ static void func_ov036_0218e56c(IrcMenuWork *wk) {
     }
 }
 
-static void func_ov036_0218e600(IrcMenuWork *wk) {
+static void IrcMenu_CreateYesNoMenu(IrcMenuWork *wk) {
     AppTaskMenuInit init;
 
     init.heapId = wk->heapId;
@@ -1098,10 +1108,10 @@ static void func_ov036_0218e600(IrcMenuWork *wk) {
     init.width = 13;
     init.height = 3;
     wk->yesNoItems[0].str = GFL_StrBufCreate(100, wk->heapId);
-    GFL_MsgDataLoadStrbuf(wk->msgData, 26, wk->yesNoItems[0].str);
+    GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_Yes, wk->yesNoItems[0].str);
     wk->yesNoItems[0].color = PRINT_COLOR(14, 15, 3);
     wk->yesNoItems[1].str = GFL_StrBufCreate(100, wk->heapId);
-    GFL_MsgDataLoadStrbuf(wk->msgData, 27, wk->yesNoItems[1].str);
+    GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_No, wk->yesNoItems[1].str);
     wk->yesNoItems[1].color = PRINT_COLOR(14, 15, 3);
     wk->yesNoItems[0].type = 0;
     wk->yesNoItems[1].type = 0;
@@ -1111,7 +1121,7 @@ static void func_ov036_0218e600(IrcMenuWork *wk) {
     GFL_StrBufFree(wk->yesNoItems[1].str);
 }
 
-static BOOL func_ov036_0218e69c(IrcMenuWork *wk) {
+static BOOL IrcMenu_UpdateMessage(IrcMenuWork *wk) {
     if (wk->printStream != NULL) {
         if (wk->msgWin != NULL) {
             KeyCursor_Update(wk->keyCursor, wk->printStream, wk->msgWin);
@@ -1123,7 +1133,7 @@ static BOOL func_ov036_0218e69c(IrcMenuWork *wk) {
             break;
         case PRINT_STREAM_PAUSED:
             if (GFL_HIDIsTouchPressed()) {
-                GFL_SndSEPlay(1351);
+                GFL_SndSEPlay(SEQ_SE_MESSAGE);
                 PrintStream_Continue(wk->printStream);
             }
             break;
@@ -1139,7 +1149,7 @@ static BOOL func_ov036_0218e69c(IrcMenuWork *wk) {
 }
 
 // Prints strBuf in the message window, a character at a time or at once
-static void func_ov036_0218e710(IrcMenuWork *wk, BOOL instant) {
+static void IrcMenu_PrintMessage(IrcMenuWork *wk, BOOL instant) {
     BmpWin *win;
 
     if (wk->msgWin == NULL) {
@@ -1161,83 +1171,89 @@ static void func_ov036_0218e710(IrcMenuWork *wk, BOOL instant) {
     GFL_BGSysQueueScrLoad(5);
 }
 
-static void func_ov036_0218e7cc(IrcMenuWork *wk) {
-    func_ov036_0218d2e0(wk, TRUE);
+static void IrcMenu_AskSave(IrcMenuWork *wk) {
+    IrcMenu_SetDimmed(wk, TRUE);
     GFL_BGSysFillScrAsync(5, 0);
-    GFL_MsgDataLoadStrbuf(wk->msgData, 25, wk->strBuf);
-    func_ov036_0218e710(wk, FALSE);
-    func_ov036_0218d0ec(wk, func_ov036_0218e978, 0x76a);
+    GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_WouldLikeSaveGame, wk->strBuf);
+    IrcMenu_PrintMessage(wk, FALSE);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_WaitSaveQuestion, 0x76a);
 }
 
-static void func_ov036_0218e804(IrcMenuWork *wk) {
+static void IrcMenu_WaitSave(IrcMenuWork *wk) {
     if (GameData_UpdateSave(wk->gameData) == 2) {
-        func_ov036_0218d2e0(wk, FALSE);
+        IrcMenu_SetDimmed(wk, FALSE);
         BmpWin_ClearFrame(wk->msgWin, 2);
         BmpWin_ClearScreen(wk->msgWin);
         GFL_BGSysQueueScrLoad(5);
         if (wk->mode == 1) {
-            func_ov036_0218d0ec(wk, func_ov036_0218db28, 0x77f);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_ShowPlayerCountMenu, 0x77f);
         } else {
-            func_ov036_0218d0ec(wk, func_ov036_0218d8c0, 0x782);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_StartExit, 0x782);
         }
         wk->unk2F8 = 1;
     }
 }
 
-static void func_ov036_0218e864(IrcMenuWork *wk) {
-    if (func_ov036_0218e69c(wk)) {
+static void IrcMenu_StartSave(IrcMenuWork *wk) {
+    if (IrcMenu_UpdateMessage(wk)) {
         GameData_StartSave(wk->gameData);
-        func_ov036_0218d0ec(wk, func_ov036_0218e804, 0x797);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_WaitSave, 0x797);
     }
 }
 
-static void func_ov036_0218e88c(IrcMenuWork *wk) {
-    if (func_ov036_0218e69c(wk) && GFL_HIDIsTouchPressed()) {
-        func_ov036_0218d2e0(wk, FALSE);
+static void IrcMenu_WaitSaveErrorDismiss(IrcMenuWork *wk) {
+    if (IrcMenu_UpdateMessage(wk) && GFL_HIDIsTouchPressed()) {
+        IrcMenu_SetDimmed(wk, FALSE);
         GFL_BGSysClearScr(3);
-        func_ov036_0218d3ac(wk);
+        IrcMenu_FreeMessageWindow(wk);
         wk->mode = 12;
-        func_ov036_0218d0ec(wk, func_ov036_0218db14, 0x7ab);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 0x7ab);
     }
 }
 
-static void func_ov036_0218e8cc(IrcMenuWork *wk) {
+static void IrcMenu_HandleSaveAnswer(IrcMenuWork *wk) {
     if (AppTaskMenu_IsFlashFinished(wk->yesNoMenu)) {
         if (AppTaskMenu_GetCursorPos(wk->yesNoMenu) == 0) {
             if (func_0200746c(GameData_GetSaveControl(wk->gameData))) {
-                GFL_MsgDataLoadStrbuf(wk->msgData, 45, wk->strBuf);
-                func_ov036_0218e710(wk, FALSE);
-                func_ov036_0218d0ec(wk, func_ov036_0218e88c, 0x7c2);
+                GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_ThereAlreadySavedGame, wk->strBuf);
+                IrcMenu_PrintMessage(wk, FALSE);
+                IrcMenu_SetStateAtLine(wk, IrcMenu_WaitSaveErrorDismiss, 0x7c2);
             } else {
-                GFL_MsgDataLoadStrbuf(wk->msgData, 28, wk->strBuf);
-                func_ov036_0218e710(wk, TRUE);
-                func_ov036_0218d348(wk);
-                func_ov036_0218d0ec(wk, func_ov036_0218e864, 0x7c8);
+                GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_SavingDontTurnOff, wk->strBuf);
+                IrcMenu_PrintMessage(wk, TRUE);
+                IrcMenu_CreateWaitIcon(wk);
+                IrcMenu_SetStateAtLine(wk, IrcMenu_StartSave, 0x7c8);
             }
         } else {
-            func_ov036_0218d2e0(wk, FALSE);
+            IrcMenu_SetDimmed(wk, FALSE);
             GFL_BGSysClearScr(3);
-            func_ov036_0218d3ac(wk);
+            IrcMenu_FreeMessageWindow(wk);
             wk->mode = 12;
-            func_ov036_0218d0ec(wk, func_ov036_0218db14, 0x7d0);
+            IrcMenu_SetStateAtLine(wk, IrcMenu_MainUpdate, 0x7d0);
         }
         AppTaskMenu_Free(wk->yesNoMenu);
         wk->yesNoMenu = NULL;
     }
 }
 
-static void func_ov036_0218e978(IrcMenuWork *wk) {
-    if (func_ov036_0218e69c(wk)) {
-        func_ov036_0218e600(wk);
-        func_ov036_0218d0ec(wk, func_ov036_0218e8cc, 0x7e5);
+static void IrcMenu_WaitSaveQuestion(IrcMenuWork *wk) {
+    if (IrcMenu_UpdateMessage(wk)) {
+        IrcMenu_CreateYesNoMenu(wk);
+        IrcMenu_SetStateAtLine(wk, IrcMenu_HandleSaveAnswer, 0x7e5);
     }
 }
 
-static void func_ov036_0218e9a0(TCB *task, void *work) {
+static void IrcMenu_VBlank(TCB *task, void *work) {
     ClActSys_VBlank();
 }
 
-static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *work) {
+static BGSysVRAMConfig sIrcMenuVRAMConfig = {
+    GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
+    GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
+};
+
+static BOOL IrcMenu_Init(GameProc *proc, u32 *state, void *param, void *work) {
     IrcMenuWork *wk;
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_IRC_BATTLE_MENU, 0x18000);
@@ -1256,20 +1272,20 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysSetEnabledBGsB(0);
     ClActSys_Create(&data_02093f08, &sIrcMenuVRAMConfig, wk->heapId);
     wk->clUnit = ClActUnit_Create(40, 0, wk->heapId);
-    wk->vblankTask = GFL_VBlankTCBAdd(func_ov036_0218e9a0, wk, 0);
-    func_ov036_0218d0f4(wk);
-    func_ov036_0218d5f0(wk);
+    wk->vblankTask = GFL_VBlankTCBAdd(IrcMenu_VBlank, wk, 0);
+    IrcMenu_CreateBGs(wk);
+    IrcMenu_LoadGraphics(wk);
     wk->objPalettes = GFL_HeapAllocate(wk->heapId, 0x200, FALSE, "ircbattlemenu.c", 0x832);
     wk->bgPalettes = GFL_HeapAllocate(wk->heapId, 0x200, FALSE, "ircbattlemenu.c", 0x833);
     wk->tcbMgr = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 2, 0);
     wk->keyCursor = KeyCursor_Create(15, FALSE, TRUE, wk->heapId);
     wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
-    func_ov036_0218e0c8(wk);
+    IrcMenu_LoadButtonResources(wk);
     func_ov036_0218e568(wk, 0x39, 0x9a, 0, 10);
     func_ov036_0218e568(wk, 0xc8, 0x26, 1, 11);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
-    func_ov036_0218d0ec(wk, func_ov036_0218d7a8, 0x844);
+    IrcMenu_SetStateAtLine(wk, IrcMenu_ShowMainMenu, 0x844);
     wk->param = param;
     wk->gameData = GSYS_GetGameData(EventIRC_GetGameSystem(wk->param));
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
@@ -1280,7 +1296,7 @@ static BOOL func_ov036_0218e9a8(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL IrcMenu_Main(GameProc *proc, u32 *state, void *param, void *work) {
     IrcMenuWork *wk = work;
     IrcMenuStateFunc func = wk->state;
     BOOL done = TRUE;
@@ -1313,14 +1329,14 @@ static BOOL func_ov036_0218eb78(GameProc *proc, u32 *state, void *param, void *w
     return done;
 }
 
-static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL IrcMenu_End(GameProc *proc, u32 *state, void *param, void *work) {
     EventIRCWork *event = param;
     IrcMenuWork *wk = work;
 
     if (!GFL_WipeIsFinished()) {
         return FALSE;
     }
-    func_ov036_0218d824(wk);
+    IrcMenu_FreeGraphics(wk);
     EventIRC_SetMode(event, wk->mode);
     event->useBattleBox = wk->choice;
     if (wk->waitIcon != NULL) {
@@ -1329,7 +1345,7 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
     }
     GFL_HeapFree(wk->objPalettes);
     GFL_HeapFree(wk->bgPalettes);
-    func_ov036_0218e56c(wk);
+    IrcMenu_FreeActorsAndResources(wk);
     if (wk->printStream != NULL) {
         PrintStream_Delete(wk->printStream);
     }
@@ -1360,7 +1376,7 @@ static BOOL func_ov036_0218ec28(GameProc *proc, u32 *state, void *param, void *w
 }
 
 const GameProcFunctions IRC_MENU_PROC = {
-    func_ov036_0218e9a8,
-    func_ov036_0218eb78,
-    func_ov036_0218ec28,
+    IrcMenu_Init,
+    IrcMenu_Main,
+    IrcMenu_End,
 };

@@ -22,7 +22,7 @@
 #define VERSION_DRAGON SPECIES_ZEKROM
 #endif
 
-static BOOL func_ov036_021afb74(GameData *gameData, s32 species, u16 *box, u16 *slot);
+static BOOL func_ov036_021afb74(GameData *gameData, u16 species, u16 *boxOut, u16 *slotOut);
 
 // Swaps the party Pokémon at partyIdx with the player's own dragon of the version from a box, and takes the mail off
 // the one that holds it
@@ -67,7 +67,7 @@ void func_ov036_021afa2c(FieldScriptEnv *env, u32 partyIdx) {
 }
 
 // Finds the box slot of a Pokémon of the species that the player caught
-static BOOL func_ov036_021afb74(GameData *gameData, s32 species, u16 *boxOut, u16 *slotOut) {
+static BOOL func_ov036_021afb74(GameData *gameData, u16 species, u16 *boxOut, u16 *slotOut) {
     PlayerInfo *player;
     BoxSaveAccessor *boxes;
     s32 lastBox;
@@ -79,11 +79,11 @@ static BOOL func_ov036_021afb74(GameData *gameData, s32 species, u16 *boxOut, u1
     boxes = GameData_GetBoxSaveAccessor(gameData);
     lastBox = BoxSaveAccessor_GetLastOpenedBox(boxes);
     id = getIDAsUInt(player);
-    for (i = 0; i < 24; i++) {
-        s32 box = (i + lastBox) % 24;
+    for (i = 0; i < BOX_MAX_TRAY; i++) {
+        s32 box = (i + lastBox) % BOX_MAX_TRAY;
         s32 slot;
 
-        for (slot = 0; slot < 30; slot++) {
+        for (slot = 0; slot < BOX_MAX_POS; slot++) {
             if (BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
                 if (id == BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_ID, NULL)) {
                     if (species == BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_SPECIES, NULL)) {

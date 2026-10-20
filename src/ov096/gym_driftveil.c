@@ -742,7 +742,7 @@ static void DriftveilGym_MoveElevator(DriftveilGymElevatorEvent *ev) {
     pos.y = ev->height;
     FieldPlayer_SetWPos(ev->player, &pos);
     riderMatrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, ev->model);
-    riderMatrix->translation.y = ev->height - func_ov036_02181324(ev->field);
+    riderMatrix->translation.y = ev->height - Field_GetActorYOffset(ev->field);
 }
 
 // Shows the player's model on the elevator and hides the player, or the other way around once the ride is over

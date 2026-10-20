@@ -25,9 +25,9 @@ struct FieldCameraAnimationController {
 };
 
 static void FieldCameraCalc_EvCamera(FieldCamera *camera, void *arg);
-static u16 FieldCameraCalc_LerpAngle(const u16 *from, const u16 *to, u32 frames, u32 frame);
+static u16 FieldCameraCalc_LerpAngle(const u16 *from, const u16 *to, s32 frames, s32 frame);
 static s32 FieldCameraCalc_LerpScalar(const s32 *from, const s32 *to, s32 frames, s32 frame);
-static void FieldCameraCalc_LerpVector(const VecFx32 *from, const VecFx32 *to, u32 frames, u32 frame, VecFx32 *out);
+static void FieldCameraCalc_LerpVector(const VecFx32 *from, const VecFx32 *to, u16 frames, u16 frame, VecFx32 *out);
 static void FieldCamera_ClearAnimatorFunc(FieldCamera *camera);
 static void FieldCamera_GetAnimationCoords_(FieldCamera *camera, FieldCameraCoords *coords);
 static FieldCameraAnimationController *FieldCameraAnimationController_Create(HeapID heapId);
@@ -129,7 +129,7 @@ void FieldCameraAnm_SetLoadDefaultsAnimation(FieldCamera *camera, u16 frames) {
             FieldCamera_ReadDefaults(camera, &defaults);
             anim->end.pitch = defaults.pitch;
             anim->end.yaw = defaults.yaw;
-            anim->end.distance = defaults.zoom << 12;
+            anim->end.distance = defaults.zoom << FX32_SHIFT;
             anim->end.fov = defaults.fov;
             if (defaults.bind) {
                 anim->end.extraTranslation = defaults.target;
@@ -194,9 +194,13 @@ static void FieldCameraCalc_EvCamera(FieldCamera *camera, void *arg) {
     }
 }
 
-static void FieldCameraCalc_LerpVector(const VecFx32 *from, const VecFx32 *to, u32 frames, u32 frame, VecFx32 *out) {
+static void FieldCameraCalc_LerpVector(const VecFx32 *from, const VecFx32 *to, u16 frames, u16 frame, VecFx32 *out) {
     if (!frames) {
         *out = *to;
+        // BUG: Zero-frame interpolation falls through and can divide by zero.
+#ifdef BUGFIX
+        return;
+#endif
     }
     out->x = FieldCameraCalc_LerpScalar(&from->x, &to->x, frames, frame);
     out->y = FieldCameraCalc_LerpScalar(&from->y, &to->y, frames, frame);
@@ -215,7 +219,7 @@ static s32 FieldCameraCalc_LerpScalar(const s32 *from, const s32 *to, s32 frames
     return start + diff * frame / frames;
 }
 
-static u16 FieldCameraCalc_LerpAngle(const u16 *from, const u16 *to, u32 frames, u32 frame) {
+static u16 FieldCameraCalc_LerpAngle(const u16 *from, const u16 *to, s32 frames, s32 frame) {
     u16 start;
     u16 forward;
     u16 backward;

@@ -1,6 +1,11 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/sound.h"
+#include "constants/species.h"
+#include "constants/text_banks.h"
 #include "field/battle_cutin.h"
 #include "field/encounter_effect.h"
 #include "field/event_encounter_cutin.h"
@@ -29,6 +34,7 @@
 #include "gfl/str.h"
 #include "gfl/tcb.h"
 #include "nitro/math.h"
+#include "nnsys/gfd.h"
 #include "pml/poke_graphic.h"
 #include "pml/poke_party.h"
 #include "save/player_savedata.h"
@@ -39,6 +45,7 @@
 #include "system/gf_font.h"
 #include "system/str_tool.h"
 #include "system/wordset.h"
+#include "text/system/0368.h"
 
 // The field effects of the 3D scenes of archive 0x76 (fld3d_ci.c, after the file name that its allocations pass): the
 // Pokemon's sprite of a field move, the battle cut-ins and Alder's flight, with their particles, sounds and screen
@@ -188,34 +195,47 @@ struct Fld3DCi {
     Fld3DCiFade *fade;
 };
 
+// The default camera, as the field's (FieldG3D_CreateCamera): a 40-degree perspective at 4:3, from 1 to 1024 units.
+// The up vector is the inline's own local, so it takes the lowest stack slot of Fld3DCi_Create's frame, and its
+// initializer is listed in MWCC's size sort of the file's data where the inline is defined, before the tables
+static inline G3DCamera *Fld3DCi_CreateDefaultCamera(const VecFx32 *position, const VecFx32 *target, HeapID heapId) {
+    VecFx32 up = { 0, FX32_ONE, 0 };
+
+    return GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)),
+                               FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0, position, &up, target, heapId);
+}
+
 #define FIELD_EFFECT_COUNT 117
 
 static const Fld3DCiSoundKey data_ov036_021d1cd0[] = {
-    { 0x786, 25 }, { 0x8e4, 54 }, { 0x8e5, 55 }, { 0x8e5, 65 }, { 0x8e6, 89 }, { 0x8e7, 90 }, { 0x5f2, 150 }, { -1 },
+    { SEQ_SE_TDEMO_003, 25 },        { SEQ_SE_SW_CI_VSCHAMP_01, 54 },
+    { SEQ_SE_SW_CI_VSCHAMP_02, 55 }, { SEQ_SE_SW_CI_VSCHAMP_02, 65 },
+    { SEQ_SE_SW_CI_VSCHAMP_03, 89 }, { SEQ_SE_SW_CI_VSCHAMP_04, 90 },
+    { SEQ_SE_W009_01, 150 },         { -1 },
 };
 
 static const Fld3DCiSoundKey data_ov036_021d1d10[] = {
-    { 0x900, 2 },   { 0x901, 5 },   { 0x902, 169 }, { 0x903, 257 }, { 0x904, 260 }, { 0x905, 446 }, { 0x906, 447 },
-    { 0x907, 521 }, { 0x908, 540 }, { 0x8ff, 553 }, { 0x909, 560 }, { 0x90a, 575 }, { 0x90b, 576 }, { -1 },
+    { SEQ_SE_SW_KUSABI_IN_02, 2 },   { SEQ_SE_SW_KUSABI_IN_03, 5 },
+    { SEQ_SE_SW_KUSABI_IN_04, 169 }, { SEQ_SE_SW_KUSABI_IN_05, 257 },
+    { SEQ_SE_SW_KUSABI_IN_06, 260 }, { SEQ_SE_SW_KUSABI_IN_07, 446 },
+    { SEQ_SE_SW_KUSABI_IN_08, 447 }, { SEQ_SE_SW_KUSABI_IN_09, 521 },
+    { SEQ_SE_SW_KUSABI_IN_10, 540 }, { SEQ_SE_SW_KUSABI_IN_01, 553 },
+    { SEQ_SE_SW_KUSABI_IN_11, 560 }, { SEQ_SE_SW_KUSABI_IN_12, 575 },
+    { SEQ_SE_SW_KUSABI_IN_13, 576 }, { -1 },
 };
 
 static const Fld3DCiSoundKey data_ov036_021d1d80[] = {
-    { 0x900, 2 },   { 0x901, 5 },   { 0x902, 169 }, { 0x903, 257 }, { 0x904, 260 }, { 0x905, 446 }, { 0x906, 447 },
-    { 0x907, 521 }, { 0x908, 540 }, { 0x8ff, 553 }, { 0x909, 560 }, { 0x90a, 575 }, { 0x90b, 576 }, { -1 },
+    { SEQ_SE_SW_KUSABI_IN_02, 2 },   { SEQ_SE_SW_KUSABI_IN_03, 5 },
+    { SEQ_SE_SW_KUSABI_IN_04, 169 }, { SEQ_SE_SW_KUSABI_IN_05, 257 },
+    { SEQ_SE_SW_KUSABI_IN_06, 260 }, { SEQ_SE_SW_KUSABI_IN_07, 446 },
+    { SEQ_SE_SW_KUSABI_IN_08, 447 }, { SEQ_SE_SW_KUSABI_IN_09, 521 },
+    { SEQ_SE_SW_KUSABI_IN_10, 540 }, { SEQ_SE_SW_KUSABI_IN_01, 553 },
+    { SEQ_SE_SW_KUSABI_IN_11, 560 }, { SEQ_SE_SW_KUSABI_IN_12, 575 },
+    { SEQ_SE_SW_KUSABI_IN_13, 576 }, { -1 },
 };
 
-// The screen fades and the sound effects of each effect, by its fade speed
-static const Fld3DCiFadeKey *const FLD3DCI_FADE_ANIMATIONS[] = {
-    data_ov036_021d1ab8, data_ov036_021d1918, data_ov036_021d190c, data_ov036_021d181c, data_ov036_021d18f4,
-    data_ov036_021d18c4, data_ov036_021d1c44, data_ov036_021d18d0, data_ov036_021d1834, data_ov036_021d17d4,
-    data_ov036_021d1954, data_ov036_021d1930, data_ov036_021d1894, data_ov036_021d17ec, data_ov036_021d18e8,
-    data_ov036_021d17e0, data_ov036_021d1864, data_ov036_021d18a0, data_ov036_021d17f8, data_ov036_021d1840,
-    data_ov036_021d1948, data_ov036_021d1828, data_ov036_021d1924, data_ov036_021d1870, data_ov036_021d18ac,
-    data_ov036_021d1888, data_ov036_021d184c, data_ov036_021d1900, data_ov036_021d19e0, data_ov036_021d187c,
-    data_ov036_021d1858, data_ov036_021d1804, data_ov036_021d193c, data_ov036_021d1810, data_ov036_021d18b8,
-    data_ov036_021d18dc,
-};
-
+// The sound effects of each effect, by its fade speed. Declared before the fades, which puts the two tables in the
+// ROM's order in MWCC's size sort of the file's data
 static const Fld3DCiSoundKey *const data_ov036_021d1e80[] = {
     data_ov036_021d17ac, data_ov036_021d17b4, data_ov036_021d17bc, data_ov036_021d1c0c, data_ov036_021d1980,
     data_ov036_021d1990, data_ov036_021d1cd0, data_ov036_021d1a98, data_ov036_021d1b54, data_ov036_021d1b7c,
@@ -225,6 +245,18 @@ static const Fld3DCiSoundKey *const data_ov036_021d1e80[] = {
     data_ov036_021d1784, data_ov036_021d1960, data_ov036_021d1a10, data_ov036_021d1970, data_ov036_021d1adc,
     data_ov036_021d1a78, data_ov036_021d1b04, data_ov036_021d1b2c, data_ov036_021d1d10, data_ov036_021d1d80,
     data_ov036_021d1a28,
+};
+
+// The screen fades of each effect, by its fade speed
+static const Fld3DCiFadeKey *const FLD3DCI_FADE_ANIMATIONS[] = {
+    data_ov036_021d1ab8, data_ov036_021d1918, data_ov036_021d190c, data_ov036_021d181c, data_ov036_021d18f4,
+    data_ov036_021d18c4, data_ov036_021d1c44, data_ov036_021d18d0, data_ov036_021d1834, data_ov036_021d17d4,
+    data_ov036_021d1954, data_ov036_021d1930, data_ov036_021d1894, data_ov036_021d17ec, data_ov036_021d18e8,
+    data_ov036_021d17e0, data_ov036_021d1864, data_ov036_021d18a0, data_ov036_021d17f8, data_ov036_021d1840,
+    data_ov036_021d1948, data_ov036_021d1828, data_ov036_021d1924, data_ov036_021d1870, data_ov036_021d18ac,
+    data_ov036_021d1888, data_ov036_021d184c, data_ov036_021d1900, data_ov036_021d19e0, data_ov036_021d187c,
+    data_ov036_021d1858, data_ov036_021d1804, data_ov036_021d193c, data_ov036_021d1810, data_ov036_021d18b8,
+    data_ov036_021d18dc,
 };
 
 // The free heap each effect needs; the effects after the 71st need none
@@ -246,16 +278,16 @@ static BOOL Fld3DCi_UpdateActor1(Fld3DCi *ci);
 static BOOL Fld3DCi_UpdateActor2(Fld3DCi *ci);
 static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCiScene *scene, u8 effectId);
 static void Fld3DCi_FreeG3D(Fld3DCi *ci, Fld3DCiScene *scene);
-static void func_ov036_021bc0f4(Fld3DCi *ci, int id);
+static void Fld3DCi_CreateEmitter(Fld3DCi *ci, int id);
 static void func_ov036_021bc108(SPLEmitter *emitter);
 static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID heapId);
-static void func_ov036_021bc388(Fld3DCiScene *scene);
+static void Fld3DCi_FreeSceneTemplate(Fld3DCiScene *scene);
 static void Fld3DCi_RequestScreenCap(Fld3DCi *ci);
 static void Fld3DCi_ScreenCapTCB(TCB *tcb, void *work);
 static void Fld3DCi_BackupBGPriorities(Fld3DCi *ci);
 static void Fld3DCi_BackupScreenDispA(Fld3DCi *ci);
-static void func_ov036_021bc420(Fld3DCi *ci);
-static void func_ov036_021bc43c(Fld3DCi *ci);
+static void Fld3DCi_RestoreBGPriorities(Fld3DCi *ci);
+static void Fld3DCi_RestoreScreenDispA(Fld3DCi *ci);
 static GameEventReturnCode EventFieldEffectPokeSpriteSub_Callback(GameEvent *event, u32 *state, void *work);
 static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DCi *ci);
 static GameEventReturnCode EventFieldEffectFadeOutWhite_Callback(GameEvent *event, u32 *state, void *work);
@@ -269,7 +301,7 @@ static u32 NNS_G3DResTexGetTexRAMAddress(const NNSG3dResTex *tex, const char *na
 static u32 NNS_G3DResTexGetPltRAMAddress(const NNSG3dResTex *tex, const char *name);
 static void NNS_G3DNormalizeName(NNSG3dResName *dest, const char *name);
 static void EventFieldEffect_DimCaptureColor(void);
-static void func_ov036_021bcfcc(Fld3DCi *ci, Fld3DCiEvent *data);
+static void Fld3DCi_InitEventData(Fld3DCi *ci, Fld3DCiEvent *data);
 static void Fld3DCi_UpdateSound(Fld3DCi *ci, u8 speed);
 static void Fld3DCi_UpdateFade(Fld3DCi *ci, u8 speed);
 static void func_ov036_021bd074(TCB *tcb, void *work);
@@ -299,19 +331,16 @@ Fld3DCi *Fld3DCi_Create(HeapID heapId, FieldParticle *particleSystem) {
     {
         VecFx32 position = { 0, 0, FX32_CONST(128) };
         VecFx32 target = { 0, 0, 0 };
-        VecFx32 up = { 0, FX32_ONE, 0 };
 
-        ci->camera =
-            GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)),
-                                0x1555, 0, FX32_ONE, FX32_CONST(1024), 0, &position, &up, &target, heapId);
+        ci->camera = Fld3DCi_CreateDefaultCamera(&position, &target, heapId);
     }
     {
         VecFx32 position = { 0, 0, FX32_CONST(128) };
         VecFx32 target = { 0, 0, 0 };
-        VecFx32 up2 = { 0, FX32_ONE, 0 };
+        VecFx32 up = { 0, FX32_ONE, 0 };
 
         ci->camera2 = GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, 0x30000, -0x30000, -0x40000, 0x40000, FX32_ONE,
-                                          FX32_CONST(1024), 0, &position, &up2, &target, heapId);
+                                          FX32_CONST(1024), 0, &position, &up, &target, heapId);
     }
     ci->cameraSel = 0;
     return ci;
@@ -366,7 +395,7 @@ GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId) {
     ci->control = 0;
     ci->cameraSel = 0;
     event = GameEvent_Create(gsys, NULL, EventFieldEffect_Callback, 0x44);
-    func_ov036_021bcfcc(ci, GameEvent_GetData(event));
+    Fld3DCi_InitEventData(ci, GameEvent_GetData(event));
     return event;
 }
 
@@ -408,7 +437,7 @@ GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, Fld3DCi *ci, u32
     Fld3DCiEvent *data;
     const BattleCutinParam *cutin;
     CutinParam *cutinParam;
-    u8 header[2];
+    u8 header[4];
 
     GFL_OvlLoad(OVERLAY_ID(147));
     cutin = BattleCutinDB_GetParam(selection);
@@ -418,7 +447,7 @@ GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, Fld3DCi *ci, u32
         return NULL;
     }
     data = GameEvent_GetData(event);
-    func_ov036_021bcfcc(ci, data);
+    Fld3DCi_InitEventData(ci, data);
     data->scene.param = param;
     GFL_ArcSysReadRange(header, 0x10c, cutin->cutin, 0, 4);
     if (header[1] != 0 || header[0] != 0) {
@@ -489,8 +518,12 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         GX_SetBankForBG(8);
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 4, 0, 0);
         GFL_BGSysSetBGEnabled(2, 1);
-        data->scene.fogEnabled = FieldFog_IsEnabled(Field_GetFog(field));
-        FieldFog_SetEnabled(Field_GetFog(field), FALSE);
+        {
+            FieldFog *fog = Field_GetFog(field);
+
+            data->scene.fogEnabled = FieldFog_IsEnabled(fog);
+            FieldFog_SetEnabled(fog, FALSE);
+        }
         (*state)++;
         break;
     case 4:
@@ -500,7 +533,9 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
     case 5:
         (*state)++;
         if (ci->callback != NULL) {
-            GameEvent_ChainNext(event, GameEvent_Create(GameEvent_GetGameSystem(event), event, ci->callback, 0));
+            GameSystem *gameSystem = GameEvent_GetGameSystem(event);
+
+            GameEvent_ChainNext(event, GameEvent_Create(gameSystem, event, ci->callback, 0));
             break;
         }
     case 6:
@@ -515,11 +550,11 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         (*state)++;
         break;
     case 7:
-        GameEvent_ChainNext(event, GameEvent_Create(gsys, event,
-                                                    func_ov036_021bc828(ci->effectId)
-                                                        ? EventFieldEffectFadeInAllBlack_Callback
-                                                        : EventFieldEffectFadeInWhiteTop_Callback,
-                                                    0));
+        if (func_ov036_021bc828(ci->effectId)) {
+            GameEvent_ChainNext(event, GameEvent_Create(gsys, event, EventFieldEffectFadeInAllBlack_Callback, 0));
+        } else {
+            GameEvent_ChainNext(event, GameEvent_Create(gsys, event, EventFieldEffectFadeInWhiteTop_Callback, 0));
+        }
         (*state)++;
         break;
     case 8:
@@ -600,8 +635,8 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         func_ov036_021879c0(msgBGSys);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x1f18;
         GFL_BGSysClearBG(2);
-        func_ov036_021bc420(ci);
-        func_ov036_021bc43c(ci);
+        Fld3DCi_RestoreBGPriorities(ci);
+        Fld3DCi_RestoreScreenDispA(ci);
         Field_SetEffectRunningFlag(field, FALSE);
         if (data->scene.disableMovement) {
             EnableAllActorsMovement(Field_GetActorSystem(field));
@@ -621,7 +656,7 @@ static BOOL Fld3DCi_UpdateParticles(Fld3DCi *ci) {
             if (ci->particleDelay[0] != 0) {
                 ci->particleDelay[0]--;
             } else {
-                func_ov036_021bc0f4(ci, 0);
+                Fld3DCi_CreateEmitter(ci, 0);
                 ci->particleStarted[0] = TRUE;
             }
         }
@@ -629,14 +664,14 @@ static BOOL Fld3DCi_UpdateParticles(Fld3DCi *ci) {
             if (ci->particleDelay[1] != 0) {
                 ci->particleDelay[1]--;
             } else {
-                func_ov036_021bc0f4(ci, 1);
+                Fld3DCi_CreateEmitter(ci, 1);
                 ci->particleStarted[1] = TRUE;
             }
         }
         if (ci->particleStarted[0] != 0 && ci->particleStarted[1] != 0) {
             ci->particleDone = 1;
         }
-    } else if (func_ov036_021bb63c(ci->particleSystem)) {
+    } else if (FieldParticle_IsFinished(ci->particleSystem)) {
         return TRUE;
     }
     return FALSE;
@@ -697,12 +732,12 @@ static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCi
     int count;
     u8 header[4];
 
-    ci->particle = func_ov036_021bb5d0(ci->particleSystem);
+    ci->particle = FieldParticle_CreateSystem(ci->particleSystem);
     Fld3DCi_LoadG3DSceneTemplate(scene, effectId, ci->heapId);
     Fld3DCi_LoadG3DScene(ci, &scene->setup);
     if (scene->particle != 0xffff) {
         particleRes = FieldParticle_LoadResource(ci->particleSystem, 0x74, scene->particle);
-        func_ov036_021bb630(ci->particleSystem, particleRes, TRUE, NULL);
+        FieldParticle_SetResource(ci->particleSystem, particleRes, TRUE, NULL);
     } else {
         particleRes = NULL;
     }
@@ -752,13 +787,13 @@ static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCi
 }
 
 static void Fld3DCi_FreeG3D(Fld3DCi *ci, Fld3DCiScene *scene) {
-    func_ov036_021bc388(scene);
+    Fld3DCi_FreeSceneTemplate(scene);
     GFL_G3DMgrDeleteScene(ci->mgr, ci->scene);
     ci->scene = -1;
-    func_ov036_021bb60c(ci->particleSystem);
+    FieldParticle_DeleteSystem(ci->particleSystem);
 }
 
-static void func_ov036_021bc0f4(Fld3DCi *ci, int id) {
+static void Fld3DCi_CreateEmitter(Fld3DCi *ci, int id) {
     Particle_CreateEmitterWithCallback(ci->particle, id, func_ov036_021bc108, NULL);
 }
 
@@ -772,38 +807,40 @@ static void func_ov036_021bc108(SPLEmitter *emitter) {
 }
 
 static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID heapId) {
-    Fld3DCiFile fileData;
-    Fld3DCiFile *file = &fileData;
+    Fld3DCiFile file;
     u16 ids[8];
     u8 actorCount;
     u8 anim1Count;
     u8 anim2Count;
+    u8 modelStart;
     u8 anim1Start;
     u8 anim2Start;
     u8 total;
     u8 i;
     u8 j;
 
-    GFL_ArcSysRead(file, 0x76, fileId);
+    GFL_ArcSysRead(&file, 0x76, fileId);
     actorCount = 0;
     for (i = 0; i < 2; i++) {
-        if (file->models[i] != 0xffff) {
+        if (file.models[i] != 0xffff) {
             actorCount++;
         }
     }
     anim2Count = 0;
     anim1Count = 0;
     for (i = 0; i < 4; i++) {
-        if (file->animations1[i] != 0xffff) {
+        if (file.animations1[i] != 0xffff) {
             anim1Count++;
         }
     }
     for (i = 0; i < 4; i++) {
-        if (file->animations2[i] != 0xffff) {
+        if (file.animations2[i] != 0xffff) {
             anim2Count++;
         }
     }
-    anim1Start = actorCount;
+    // The scene's resources: the models, then the first animations, then the second ones
+    modelStart = 0;
+    anim1Start = modelStart + actorCount;
     anim2Start = anim1Start + anim1Count;
     total = actorCount + anim1Count + anim2Count;
     if (total != 0) {
@@ -824,25 +861,26 @@ static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID
     scene->actorCount = actorCount;
     scene->animation1Count = anim1Count;
     scene->animation2Count = anim2Count;
-    scene->particleDelay[0] = file->particleDelay[0];
-    scene->particleDelay[1] = file->particleDelay[1];
-    scene->actorDelay[0] = file->actorDelay[0];
-    scene->actorDelay[1] = file->actorDelay[1];
-    ids[0] = file->models[0];
-    ids[1] = file->models[1];
-    ids[2] = file->animations1[0];
-    ids[3] = file->animations1[1];
-    ids[4] = file->animations1[2];
-    ids[5] = file->animations2[0];
-    ids[6] = file->animations2[1];
-    ids[7] = file->animations2[2];
-    j = 0;
-    for (i = 0; i < 8; i++) {
-        if (ids[i] != 0xffff) {
-            scene->resources[j].arcId = 0x74;
-            scene->resources[j].fileId = ids[i];
-            scene->resources[j].type = 0;
-            j++;
+    scene->particleDelay[0] = file.particleDelay[0];
+    scene->particleDelay[1] = file.particleDelay[1];
+    scene->actorDelay[0] = file.actorDelay[0];
+    scene->actorDelay[1] = file.actorDelay[1];
+    ids[0] = file.models[0];
+    ids[1] = file.models[1];
+    ids[2] = file.animations1[0];
+    ids[3] = file.animations1[1];
+    ids[4] = file.animations1[2];
+    ids[5] = file.animations2[0];
+    ids[6] = file.animations2[1];
+    ids[7] = file.animations2[2];
+    // j walks the file's IDs, i counts the resources they add
+    i = 0;
+    for (j = 0; j < 8; j++) {
+        if (ids[j] != 0xffff) {
+            scene->resources[i].arcId = 0x74;
+            scene->resources[i].fileId = ids[j];
+            scene->resources[i].type = 0;
+            i++;
         }
     }
     for (i = 0; i < anim1Count; i++) {
@@ -854,9 +892,9 @@ static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID
         scene->animations2[i].index = 0;
     }
     for (i = 0; i < actorCount; i++) {
-        scene->actors[i].modelResource = i;
+        scene->actors[i].modelResource = modelStart + i;
         scene->actors[i].modelIndex = 0;
-        scene->actors[i].texResource = i;
+        scene->actors[i].texResource = modelStart + i;
     }
     if (actorCount >= 1) {
         scene->actors[0].animations = scene->animations1;
@@ -870,12 +908,12 @@ static void Fld3DCi_LoadG3DSceneTemplate(Fld3DCiScene *scene, u32 fileId, HeapID
     scene->setup.resourceCount = total;
     scene->setup.actorCount = actorCount;
     scene->setup.actors = scene->actors;
-    scene->particle = file->particle;
-    scene->dimCapture = file->dimCapture;
-    scene->fadeSpeed = file->fadeSpeed;
+    scene->particle = file.particle;
+    scene->dimCapture = file.dimCapture;
+    scene->fadeSpeed = file.fadeSpeed;
 }
 
-static void func_ov036_021bc388(Fld3DCiScene *scene) {
+static void Fld3DCi_FreeSceneTemplate(Fld3DCiScene *scene) {
     if (scene->animations1 != NULL) {
         GFL_HeapFree(scene->animations1);
     }
@@ -918,7 +956,7 @@ static void Fld3DCi_BackupScreenDispA(Fld3DCi *ci) {
     ci->enabledBGs = GFL_BGSysGetEnabledBGsA();
 }
 
-static void func_ov036_021bc420(Fld3DCi *ci) {
+static void Fld3DCi_RestoreBGPriorities(Fld3DCi *ci) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -926,7 +964,7 @@ static void func_ov036_021bc420(Fld3DCi *ci) {
     }
 }
 
-static void func_ov036_021bc43c(Fld3DCi *ci) {
+static void Fld3DCi_RestoreScreenDispA(Fld3DCi *ci) {
     GFL_BGSysSetEnabledBGsA(ci->enabledBGs);
 }
 
@@ -959,7 +997,7 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
     if (param->unk14 != 0 && param->unk18 != 0) {
         param->unk18--;
         if (param->unk18 == 0) {
-            if (param->species == 441) {
+            if (param->species == SPECIES_CHATOT) {
                 PokeVoiceChatterInfo info;
 
                 PokeVoice_CreateChatterInfo(&info);
@@ -988,6 +1026,71 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
         return TRUE;
     }
     return FALSE;
+}
+
+static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
+    PokeSpriteParam *param;
+    HeapID heapId = ci->heapId;
+    void *res;
+    u8 *charRaw;
+    u8 *pixels;
+    int i;
+    int j;
+    u32 texAddr;
+    u32 palAddr;
+    u32 charFile;
+    u32 palFile;
+    int tile;
+    NNSGfdTexKey texKey;
+    NNSGfdPlttKey palKey;
+
+    ci->bitmap = GFL_BitmapCreate(16, 16, 32, heapId);
+    res = GFL_G3DMgrGetResource(ci->mgr, 0);
+    texKey = GFL_G3DResGetTexVRAMHandle(res);
+    palKey = GFL_G3DResGetPltVRAMHandle(res);
+    texAddr = NNS_GfdGetTexKeyAddr(texKey);
+    palAddr = NNS_GfdGetPlttKeyAddr(palKey);
+    param = &ci->param.pokeSprite;
+    charFile = GetPokemonSingleCellCharacterDataNo(GetPokemonGraphicsARCID(), param->species, param->form, param->sex,
+                                                   param->rare, 0, param->egg);
+    palFile = GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), param->species, param->form, param->sex, param->rare,
+                                      0, param->egg);
+    tile = 0;
+    ci->character = NULL;
+    ci->palette = NULL;
+    ci->charData = GFL_G2DIOReadOBJNCGR(GetPokemonGraphicsARCID(), charFile, TRUE, &ci->character, heapId);
+    ci->paletteData = GFL_G2DIOReadNCLR(GetPokemonGraphicsARCID(), palFile, &ci->palette, heapId);
+    charRaw = ci->character->rawData;
+    pixels = GFL_BitmapGetPixelData(ci->bitmap);
+    MIi_CpuClear32(0, pixels, 0x2000);
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 8; j++) {
+            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
+            tile++;
+        }
+    }
+    for (i = 0; i < 8; i++) {
+        for (j = 8; j < 12; j++) {
+            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
+            tile++;
+        }
+    }
+    for (i = 8; i < 12; i++) {
+        for (j = 0; j < 8; j++) {
+            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
+            tile++;
+        }
+    }
+    for (i = 8; i < 12; i++) {
+        for (j = 8; j < 12; j++) {
+            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
+            tile++;
+        }
+    }
+    GFL_BitmapMakeLinear(ci->bitmap, FALSE, heapId);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(ci->bitmap), 0x2000);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, ci->palette->rawData, 32);
+    GFL_HeapGetFreeSize(ci->heapId);
 }
 
 static GameEventReturnCode EventFieldEffectFadeOutWhite_Callback(GameEvent *event, u32 *state, void *work) {
@@ -1052,12 +1155,193 @@ static BOOL func_ov036_021bc838(u16 effectId) {
     return FALSE;
 }
 
+static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *palName, u32 charFile, u32 palFile,
+                                 u8 width, u8 height, u8 srcStride, u8 srcOffset, u8 resource, u8 palOffset) {
+    void *res;
+    NNSG3dResTex *tex;
+    u32 texAddr;
+    u32 palAddr;
+    HeapID heapId = ci->heapId;
+    u8 *charRaw;
+    u8 *pixels;
+    int row;
+    int col;
+
+    res = GFL_G3DMgrGetResource(ci->mgr, resource);
+    GFL_G3DResGetTexVRAMHandle(res);
+    GFL_G3DResGetPltVRAMHandle(res);
+    tex = NNS_G3dGetTex(GFL_G3DResGetResData(res));
+    texAddr = NNS_G3DResTexGetTexRAMAddress(tex, texName);
+    palAddr = NNS_G3DResTexGetPltRAMAddress(tex, palName);
+    ci->character = NULL;
+    ci->palette = NULL;
+    ci->charData = GFL_G2DIOReadBGNCGR(ARCID_FLD3D_CI, charFile, TRUE, &ci->character, heapId);
+    ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FLD3D_CI, palFile, &ci->palette, heapId);
+    charRaw = ci->character->rawData;
+    pixels = GFL_BitmapGetPixelData(ci->bitmap);
+    MIi_CpuClear32(0, pixels, width * height * 32);
+    for (row = 0; row < height; row++) {
+        for (col = 0; col < width; col++) {
+            MIi_CpuCopy32(charRaw + (col + row * srcStride + srcOffset) * 32, pixels + (col + row * width) * 32, 32);
+        }
+    }
+    GFL_BitmapMakeLinear(ci->bitmap, FALSE, heapId);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(ci->bitmap),
+                                       width * height * 32);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, (u8 *)ci->palette->rawData + palOffset * 32,
+                                       32);
+    GFL_HeapGetFreeSize(ci->heapId);
+}
+
+static BOOL EventFieldEffectCutinSub_ControlEffect(GameEvent *event, Fld3DCi *ci) {
+    switch (ci->unk134) {
+    case 0:
+        if (ci->particleFinished != 0 && ci->actor1Finished != 0 && ci->actor2Finished != 0) {
+            ci->unk134++;
+        }
+        break;
+    case 1:
+        GFL_FadeSet(((Fld3DCiEvent *)GameEvent_GetData(event))->scene.param != 0 ? 12 : 3, 0, 16, -1);
+        ci->unk134++;
+    case 2:
+        if (!GFL_FadeIsRunning()) {
+            return TRUE;
+        }
+        break;
+    }
+    return FALSE;
+}
+
+static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u32 *state, void *work) {
+    Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
+    GameSystem *gsys = GameEvent_GetGameSystem(event);
+    PlayerInfo *info = GetGameDataPlayerInfo(GSYS_GetGameData(gsys));
+    RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
+    Fld3DCi *ci = data->ci;
+    CutinParam *param;
+    u32 charFile;
+    u32 palFile;
+
+    GSYS_GetField(gsys);
+    param = &ci->param.cutin;
+    switch (*state) {
+    case 0:
+        EventFieldEffectCutinSub_DrawStrToTexture(info, rival, ci, "name_up", "name_up_pl", param->animation,
+                                                  param->color, param->color2, FALSE);
+        (*state)++;
+        break;
+    case 1:
+        if (param->flag == 0) {
+            *state = 4;
+            break;
+        }
+        ci->bitmap = GFL_BitmapCreate(16, 16, 32, ci->heapId);
+        if (param->flag == 1) {
+            if (getTrainerGender(info) == 0) {
+                charFile = 0x2f;
+                palFile = 0x48;
+            } else {
+                charFile = 0x32;
+                palFile = 0x4a;
+            }
+            *state = 3;
+        } else {
+            if (getTrainerGender(info) == 0) {
+                charFile = 0x30;
+                palFile = 0x49;
+            } else {
+                charFile = 0x33;
+                palFile = 0x4b;
+            }
+            (*state)++;
+        }
+        Fld3DCi_ConvG2DToG3D(ci, "trsw_hero01", "trsw_hero01_pl", charFile, palFile, 16, 16, 16, 0, 0, 0);
+        break;
+    case 2:
+        GFL_BitmapFree(ci->bitmap);
+        GFL_HeapFree(ci->charData);
+        GFL_HeapFree(ci->paletteData);
+        ci->bitmap = GFL_BitmapCreate(16, 16, 32, ci->heapId);
+        if (getTrainerGender(info) == 0) {
+            charFile = 0x31;
+            palFile = 0x49;
+        } else {
+            charFile = 0x34;
+            palFile = 0x4b;
+        }
+        Fld3DCi_ConvG2DToG3D(ci, "trsw_hero02", "trsw_hero02_pl", charFile, palFile, 16, 16, 16, 0, 0, 1);
+        (*state)++;
+        break;
+    case 3:
+        GFL_BitmapFree(ci->bitmap);
+        GFL_HeapFree(ci->charData);
+        GFL_HeapFree(ci->paletteData);
+        EventFieldEffectCutinSub_DrawStrToTexture(info, rival, ci, "name_down", "name_down_pl", Bank0368_Text_Empty,
+                                                  param->color, param->color2, TRUE);
+        (*state)++;
+        break;
+    case 4:
+        ci->srt.translation.x = 0;
+        ci->srt.translation.y = 0;
+        ci->srt.translation.z = FX32_CONST(-700);
+        GFL_G3DSysSetSwapBufferParams(0, 0);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32 *state, void *work) {
+    Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
+    Fld3DCi *ci = data->ci;
+    BitmapConvParam *param = &ci->param.bitmapConv.conv;
+    Fld3DCiBitmapEntry *entry;
+    u32 offset;
+    u8 width;
+    u8 height;
+    u8 srcStride;
+    u8 srcOffset;
+
+    switch (*state) {
+    case 0:
+        param->entries = GFL_ArcSysReadHeapNewRange(0x10c, param->file, ci->heapId, 4, param->count * 0x30);
+        param->index = 0;
+        (*state)++;
+    case 1:
+        offset = param->index * 0x30;
+        entry = (Fld3DCiBitmapEntry *)((u8 *)param->entries + offset);
+        width = entry->width;
+        height = entry->height;
+        srcStride = entry->srcStride;
+        srcOffset = entry->srcOffset;
+        if (width == 0) {
+            width = 16;
+        }
+        if (height == 0) {
+            height = 16;
+        }
+        ci->bitmap = GFL_BitmapCreate(width, height, 32, ci->heapId);
+        entry = (Fld3DCiBitmapEntry *)((u8 *)param->entries + offset);
+        Fld3DCi_ConvG2DToG3D(ci, entry->texName, entry->palName, entry->charFile, entry->palFile, width, height,
+                             srcStride, srcOffset, entry->resource, entry->palOffset);
+        GFL_HeapFree(ci->charData);
+        GFL_HeapFree(ci->paletteData);
+        GFL_BitmapFree(ci->bitmap);
+        param->index++;
+        if (param->index == param->count) {
+            GFL_HeapFree(param->entries);
+            return TRUE;
+        }
+        break;
+    }
+    return FALSE;
+}
+
 static u32 func_ov036_021bccf0(const NNSG3dResTex *tex, const NNSG3dResDictTexData *data) {
-    return (data->texImageParam << 16 >> 13) + (tex->texInfo.vramKey << 16 >> 13);
+    return (data->texImageParam << 16 >> 13) + NNS_GfdGetTexKeyAddr(tex->texInfo.vramKey);
 }
 
 static u32 func_ov036_021bcd00(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *data) {
-    return (data->offset << 3) + ((tex->plttInfo.vramKey & 0xffff) << 3);
+    return (data->offset << 3) + NNS_GfdGetPlttKeyAddr(tex->plttInfo.vramKey);
 }
 
 static u32 NNS_G3DResTexGetTexRAMAddress(const NNSG3dResTex *tex, const char *name) {
@@ -1099,6 +1383,63 @@ static void NNS_G3DNormalizeName(NNSG3dResName *dest, const char *name) {
     }
 }
 
+static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDataSave *rival, Fld3DCi *ci,
+                                                      const char *texName, const char *palName, u32 messageId,
+                                                      u16 color, u16 color2, BOOL measure) {
+    MsgData *msgData;
+    void *res = GFL_G3DMgrGetResource(ci->mgr, 0);
+    HeapID heapId = ci->heapId;
+    u16 *raw;
+    StrBuf *str;
+    StrBuf *name;
+    WordSet *wordSet;
+    u32 width;
+    G3DTextDrawResource resource;
+
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0368, heapId);
+    if (messageId == Bank0368_Text_Empty) {
+        wordSet = GFL_WordSetSystemCreateDefault(HEAPID_TAIL(heapId));
+        str = GFL_StrBufCreate(8, HEAPID_TAIL(heapId));
+        name = GFL_MsgDataLoadStrbufNew(msgData, messageId);
+        copyVarForText(wordSet, 0, info);
+        GFL_WordSetFormatStrbuf(wordSet, str, name);
+        GFL_StrBufFree(name);
+        GFL_WordSetSystemFree(wordSet);
+    } else if (messageId == Bank0368_Text_Empty_2) {
+        wordSet = GFL_WordSetSystemCreateDefault(HEAPID_TAIL(heapId));
+        str = GFL_StrBufCreate(8, HEAPID_TAIL(heapId));
+        name = GFL_MsgDataLoadStrbufNew(msgData, messageId);
+        GFL_WordSetLoadStr(wordSet, 0, getPtrToRivalName(rival));
+        GFL_WordSetFormatStrbuf(wordSet, str, name);
+        GFL_StrBufFree(name);
+        GFL_WordSetSystemFree(wordSet);
+    } else {
+        name = GFL_MsgDataLoadStrbufNew(msgData, messageId);
+        str = GFL_StrBufCreate(16, HEAPID_TAIL(heapId));
+        GFL_StrBufUncompress(str, name);
+        GFL_StrBufFree(name);
+    }
+    width = 0;
+    if (measure) {
+        Font *font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, heapId);
+
+        width = GFL_FontGetBlockWidth(str, font, 0);
+        GFL_FontFree(font);
+        width = 60 - width;
+        if ((s32)width < 0) {
+            width = 0;
+        }
+    }
+    ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FONT, 5, &ci->palette, heapId);
+    raw = ci->palette->rawData;
+    raw[1] = color;
+    raw[2] = color2;
+    G3DTextDraw_CreateResource(res, texName, (u32)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
+    GFL_HeapFree(ci->paletteData);
+    GFL_HeapFree(str);
+    GFL_MsgDataFree(msgData);
+}
+
 GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 actorId) {
     GameEvent *event = EventFieldEffect_Create(gsys, ci, 30);
 
@@ -1130,7 +1471,7 @@ static void EventFieldEffect_DimCaptureColor(void) {
     GX_SetBankForBG(banks);
 }
 
-static void func_ov036_021bcfcc(Fld3DCi *ci, Fld3DCiEvent *data) {
+static void Fld3DCi_InitEventData(Fld3DCi *ci, Fld3DCiEvent *data) {
     MI_CpuFill8(data, 0, sizeof(Fld3DCiEvent));
     data->ci = ci;
     data->scene.disableMovement = 0;
@@ -1241,311 +1582,4 @@ static BOOL Fld3DCiFade_IsRunning(Fld3DCiFade *fade) {
         return TRUE;
     }
     return FALSE;
-}
-
-static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *palName, u32 charFile, u32 palFile,
-                                 u8 width, u8 height, u8 srcStride, u8 srcOffset, u8 resource, u8 palOffset) {
-    HeapID heapId = ci->heapId;
-    void *res;
-    NNSG3dResTex *tex;
-    u32 texAddr;
-    u32 palAddr;
-    u8 *charRaw;
-    u8 *pixels;
-    u32 size;
-    int row;
-    int col;
-
-    res = GFL_G3DMgrGetResource(ci->mgr, resource);
-    GFL_G3DResGetTexVRAMHandle(res);
-    GFL_G3DResGetPltVRAMHandle(res);
-    tex = NNS_G3dGetTex(GFL_G3DResGetResData(res));
-    texAddr = NNS_G3DResTexGetTexRAMAddress(tex, texName);
-    palAddr = NNS_G3DResTexGetPltRAMAddress(tex, palName);
-    ci->character = NULL;
-    ci->palette = NULL;
-    ci->charData = GFL_G2DIOReadBGNCGR(ARCID_FLD3D_CI, charFile, TRUE, &ci->character, heapId);
-    ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FLD3D_CI, palFile, &ci->palette, heapId);
-    charRaw = ci->character->rawData;
-    pixels = GFL_BitmapGetPixelData(ci->bitmap);
-    size = height * width * 32;
-    MIi_CpuClear32(0, pixels, size);
-    for (row = 0; row < height; row++) {
-        for (col = 0; col < width; col++) {
-            MIi_CpuCopy32(charRaw + (srcOffset + col + row * srcStride) * 32, pixels + (col + row * width) * 32, 32);
-        }
-    }
-    GFL_BitmapMakeLinear(ci->bitmap, FALSE, heapId);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(ci->bitmap), size);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, (u8 *)ci->palette->rawData + palOffset * 32,
-                                       32);
-    GFL_HeapGetFreeSize(heapId);
-}
-
-static BOOL EventFieldEffectCutinSub_ControlEffect(GameEvent *event, Fld3DCi *ci) {
-    switch (ci->unk134) {
-    case 0:
-        if (ci->particleFinished != 0 && ci->actor1Finished != 0 && ci->actor2Finished != 0) {
-            ci->unk134++;
-        }
-        break;
-    case 1:
-        GFL_FadeSet(((Fld3DCiEvent *)GameEvent_GetData(event))->scene.param != 0 ? 12 : 3, 0, 16, -1);
-        ci->unk134++;
-    case 2:
-        if (!GFL_FadeIsRunning()) {
-            return TRUE;
-        }
-        break;
-    }
-    return FALSE;
-}
-
-static GameEventReturnCode EventFieldEffectCutinSub_Callback(GameEvent *event, u32 *state, void *work) {
-    Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
-    GameSystem *gsys = GameEvent_GetGameSystem(event);
-    PlayerInfo *info = GetGameDataPlayerInfo(GSYS_GetGameData(gsys));
-    RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
-    Fld3DCi *ci = data->ci;
-    CutinParam *param;
-    u32 charFile;
-    u32 palFile;
-
-    GSYS_GetField(gsys);
-    param = &ci->param.cutin;
-    switch (*state) {
-    case 0:
-        EventFieldEffectCutinSub_DrawStrToTexture(info, rival, ci, "name_up", "name_up_pl", param->animation,
-                                                  param->color, param->color2, FALSE);
-        (*state)++;
-        break;
-    case 1:
-        if (param->flag == 0) {
-            *state = 4;
-            break;
-        }
-        ci->bitmap = GFL_BitmapCreate(16, 16, 32, ci->heapId);
-        if (param->flag == 1) {
-            if (getTrainerGender(info) == 0) {
-                charFile = 0x2f;
-                palFile = 0x48;
-            } else {
-                charFile = 0x32;
-                palFile = 0x4a;
-            }
-            *state = 3;
-        } else {
-            if (getTrainerGender(info) == 0) {
-                charFile = 0x30;
-                palFile = 0x49;
-            } else {
-                charFile = 0x33;
-                palFile = 0x4b;
-            }
-            (*state)++;
-        }
-        Fld3DCi_ConvG2DToG3D(ci, "trsw_hero01", "trsw_hero01_pl", charFile, palFile, 16, 16, 16, 0, 0, 0);
-        break;
-    case 2:
-        GFL_BitmapFree(ci->bitmap);
-        GFL_HeapFree(ci->charData);
-        GFL_HeapFree(ci->paletteData);
-        ci->bitmap = GFL_BitmapCreate(16, 16, 32, ci->heapId);
-        if (getTrainerGender(info) == 0) {
-            charFile = 0x31;
-            palFile = 0x49;
-        } else {
-            charFile = 0x34;
-            palFile = 0x4b;
-        }
-        Fld3DCi_ConvG2DToG3D(ci, "trsw_hero02", "trsw_hero02_pl", charFile, palFile, 16, 16, 16, 0, 0, 1);
-        (*state)++;
-        break;
-    case 3:
-        GFL_BitmapFree(ci->bitmap);
-        GFL_HeapFree(ci->charData);
-        GFL_HeapFree(ci->paletteData);
-        EventFieldEffectCutinSub_DrawStrToTexture(info, rival, ci, "name_down", "name_down_pl", 0, param->color,
-                                                  param->color2, TRUE);
-        (*state)++;
-        break;
-    case 4:
-        ci->srt.translation.x = 0;
-        ci->srt.translation.y = 0;
-        ci->srt.translation.z = FX32_CONST(-700);
-        GFL_G3DSysSetSwapBufferParams(0, 0);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-static GameEventReturnCode EventFld3DCiBitmapConv_Callback(GameEvent *event, u32 *state, void *work) {
-    Fld3DCiEvent *data = GameEvent_GetData(GameEvent_GetReturnEvent(event));
-    Fld3DCi *ci = data->ci;
-    BitmapConvParam *param = &ci->param.bitmapConv.conv;
-    Fld3DCiBitmapEntry *entry;
-    u32 offset;
-    u8 width;
-    u8 height;
-    u8 srcStride;
-    u8 srcOffset;
-
-    switch (*state) {
-    case 0:
-        param->entries = GFL_ArcSysReadHeapNewRange(0x10c, param->file, ci->heapId, 4, param->count * 0x30);
-        param->index = 0;
-        (*state)++;
-    case 1:
-        offset = param->index * 0x30;
-        entry = (Fld3DCiBitmapEntry *)((u8 *)param->entries + offset);
-        width = entry->width;
-        height = entry->height;
-        srcStride = entry->srcStride;
-        srcOffset = entry->srcOffset;
-        if (width == 0) {
-            width = 16;
-        }
-        if (height == 0) {
-            height = 16;
-        }
-        ci->bitmap = GFL_BitmapCreate(width, height, 32, ci->heapId);
-        entry = (Fld3DCiBitmapEntry *)((u8 *)param->entries + offset);
-        Fld3DCi_ConvG2DToG3D(ci, entry->texName, entry->palName, entry->charFile, entry->palFile, width, height,
-                             srcStride, srcOffset, entry->resource, entry->palOffset);
-        GFL_HeapFree(ci->charData);
-        GFL_HeapFree(ci->paletteData);
-        GFL_BitmapFree(ci->bitmap);
-        param->index++;
-        if (param->index == param->count) {
-            GFL_HeapFree(param->entries);
-            return TRUE;
-        }
-        break;
-    }
-    return FALSE;
-}
-
-static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDataSave *rival, Fld3DCi *ci,
-                                                      const char *texName, const char *palName, u32 messageId,
-                                                      u16 color, u16 color2, BOOL measure) {
-    MsgData *msgData;
-    void *res = GFL_G3DMgrGetResource(ci->mgr, 0);
-    HeapID heapId = ci->heapId;
-    u16 *raw;
-    StrBuf *str;
-    StrBuf *name;
-    WordSet *wordSet;
-    u32 strHeapId;
-    u32 width;
-    G3DTextDrawResource resource;
-
-    msgData = GFL_MsgSysLoadData(FALSE, 2, 0x170, heapId);
-    if (messageId == 0) {
-        strHeapId = (heapId & 0x7fff) | 0x8000;
-        wordSet = GFL_WordSetSystemCreateDefault(strHeapId);
-        str = GFL_StrBufCreate(8, strHeapId);
-        name = GFL_MsgDataLoadStrbufNew(msgData, messageId);
-        copyVarForText(wordSet, 0, info);
-        GFL_WordSetFormatStrbuf(wordSet, str, name);
-        GFL_StrBufFree(name);
-        GFL_WordSetSystemFree(wordSet);
-    } else if (messageId == 14) {
-        strHeapId = (heapId & 0x7fff) | 0x8000;
-        wordSet = GFL_WordSetSystemCreateDefault(strHeapId);
-        str = GFL_StrBufCreate(8, strHeapId);
-        name = GFL_MsgDataLoadStrbufNew(msgData, messageId);
-        GFL_WordSetLoadStr(wordSet, 0, getPtrToRivalName(rival));
-        GFL_WordSetFormatStrbuf(wordSet, str, name);
-        GFL_StrBufFree(name);
-        GFL_WordSetSystemFree(wordSet);
-    } else {
-        name = GFL_MsgDataLoadStrbufNew(msgData, messageId);
-        str = GFL_StrBufCreate(16, (heapId & 0x7fff) | 0x8000);
-        GFL_StrBufUncompress(str, name);
-        GFL_StrBufFree(name);
-    }
-    width = 0;
-    if (measure) {
-        Font *font = GFL_FontCreate(0x17, 0, 0, 0, heapId);
-
-        width = GFL_FontGetBlockWidth(str, font, 0);
-        GFL_FontFree(font);
-        width = 60 - width;
-        if ((s32)width < 0) {
-            width = 0;
-        }
-    }
-    ci->paletteData = GFL_G2DIOReadNCLR(0x17, 5, &ci->palette, heapId);
-    raw = ci->palette->rawData;
-    raw[1] = color;
-    raw[2] = color2;
-    G3DTextDraw_CreateResource(res, texName, (u32)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
-    GFL_HeapFree(ci->paletteData);
-    GFL_HeapFree(str);
-    GFL_MsgDataFree(msgData);
-}
-
-static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
-    PokeSpriteParam *param;
-    HeapID heapId = ci->heapId;
-    void *res;
-    u8 *charRaw;
-    u8 *pixels;
-    int i;
-    int j;
-    u32 texAddr;
-    u32 palAddr;
-    u32 charFile;
-    u32 palFile;
-    int tile;
-    NNSGfdTexKey texKey;
-    NNSGfdPlttKey palKey;
-
-    ci->bitmap = GFL_BitmapCreate(16, 16, 32, heapId);
-    res = GFL_G3DMgrGetResource(ci->mgr, 0);
-    texKey = GFL_G3DResGetTexVRAMHandle(res);
-    palKey = GFL_G3DResGetPltVRAMHandle(res);
-    texAddr = (u16)texKey << 3;
-    palAddr = (u16)palKey << 3;
-    param = &ci->param.pokeSprite;
-    charFile = GetPokemonSingleCellCharacterDataNo(GetPokemonGraphicsARCID(), param->species, param->form, param->sex,
-                                                   param->rare, 0, param->egg);
-    palFile = GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), param->species, param->form, param->sex, param->rare,
-                                      0, param->egg);
-    tile = 0;
-    ci->character = NULL;
-    ci->palette = NULL;
-    ci->charData = GFL_G2DIOReadOBJNCGR(GetPokemonGraphicsARCID(), charFile, TRUE, &ci->character, heapId);
-    ci->paletteData = GFL_G2DIOReadNCLR(GetPokemonGraphicsARCID(), palFile, &ci->palette, heapId);
-    charRaw = ci->character->rawData;
-    pixels = GFL_BitmapGetPixelData(ci->bitmap);
-    MIi_CpuClear32(0, pixels, 0x2000);
-    for (i = 0; i < 8; i++) {
-        for (j = 0; j < 8; j++) {
-            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
-            tile++;
-        }
-    }
-    for (i = 0; i < 8; i++) {
-        for (j = 8; j < 12; j++) {
-            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
-            tile++;
-        }
-    }
-    for (i = 8; i < 12; i++) {
-        for (j = 0; j < 8; j++) {
-            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
-            tile++;
-        }
-    }
-    for (i = 8; i < 12; i++) {
-        for (j = 8; j < 12; j++) {
-            MIi_CpuCopy32(charRaw + tile * 32, pixels + 0x440 + (j + i * 16) * 32, 32);
-            tile++;
-        }
-    }
-    GFL_BitmapMakeLinear(ci->bitmap, FALSE, heapId);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(ci->bitmap), 0x2000);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, ci->palette->rawData, 32);
-    GFL_HeapGetFreeSize(ci->heapId);
 }

@@ -164,6 +164,7 @@ RailUnit *FieldRailSystem_AcquireUnit(FieldRailSystem *rail);
 void FieldRailSystem_ReleaseUnit(FieldRailSystem *rail, RailUnit *unit);
 void FieldRailSystem_SetCameraParent(FieldRailSystem *rail, RailUnit *unit);
 void FieldRailSystem_ClearCameraParent(FieldRailSystem *rail);
+void FieldRailSystem_GetCameraParentPos(FieldRailSystem *rail, VecFx32 *pos);
 // Does nothing: what is left of a check whether the rails are loaded and active
 void func_ov036_021b0398(FieldRailSystem *rail);
 // Updates the camera from its parent unit when the unit asks for it, the camera is dirty or force is set
@@ -186,7 +187,7 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
 void func_ov036_021b06ec(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos);
 s32 func_ov036_021b0704(FieldRailSystem *rail, const RailPosition *pos);
 void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos);
-void func_ov036_021b0774(RailUnit *unit, RailPosition *pos);
+void func_ov036_021b0774(const RailUnit *unit, RailPosition *pos);
 // Whether the rail position is on the rail data
 BOOL func_ov036_021b0794(RailUnit *unit, const RailPosition *pos);
 // The rail and world position a step from the unit in a direction, kept until the unit moves, and whether there is one
@@ -204,12 +205,35 @@ u32 func_ov036_021b0a8c(RailUnit *unit);
 BOOL func_ov036_021b0a94(RailUnit *unit, u32 speed, u32 dir);
 // Moves the unit on with its step
 void func_ov036_021b0ac0(RailUnit *unit);
+FieldCamera *FieldRailSystem_GetFieldCamera(FieldRailSystem *rail);
+RailUnit *FieldRailSystem_GetCameraParentUnit(FieldRailSystem *rail);
+RailPoint *FieldRailSystem_GetPoint(FieldRailSystem *rail, u32 id);
+RailLine *FieldRailSystem_GetLine(FieldRailSystem *rail, u32 id);
+RailCurve *GetRailHnd2Curve(FieldRailSystem *rail, u32 id);
+fx32 FieldRailSystem_GetTileWidth(FieldRailSystem *rail);
+RailUnit *func_ov036_021b0c00(FieldRailSystem *rail);
+void func_ov036_021b0c04(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out);
+u16 RailUnit_IsOnLine(RailUnit *unit);
+RailLine *GetCurrentLine(RailUnit *unit);
+s32 GetCurrentLinePosV(RailUnit *unit);
+s32 GetCurrentLineLength(RailUnit *unit);
+s32 GetCurrentLinePosH(RailUnit *unit);
+s32 func_ov036_021b0cb8(RailUnit *unit);
+fx32 RailUnit_GetTileWidth(RailUnit *unit);
+RailCamera *GetRailCameraByCamHandler(RailUnit *unit);
+void func_ov036_021b0cc8(RailUnit *unit, VecFx32 *pos);
+void func_ov036_021b0cdc(RailUnit *unit, s32 front, VecFx32 *pos);
+RailPoint *GetCurrentRailLinePoint1(RailUnit *unit);
+RailPoint *GetCurrentRailLinePoint2(RailUnit *unit);
+RailCurve *RailUnit_GetCurve(RailUnit *unit);
+RailCamera *GetRailCameraByPoint(RailUnit *unit, RailPoint *point);
+s32 func_ov036_021b0d2c(s32 value);
 // Whether two positions are within dist of each other across and half a tile up or down
 BOOL func_ov036_021b0d64(const VecFx32 *a, const VecFx32 *b, fx32 dist);
 // Writes the unit's rail position to three script variables, or sets it from three values
-void SetWkToActorRailPos(RailUnit *unit, u16 *a1, u16 *a2, u16 *a3);
+void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3);
 void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3);
-// The curves' conversions between rail and world positions
+// field_rail_func.c: the curves' conversions between rail and world positions
 void RailMath_RailToWorldNoCurve(RailUnit *unit, VecFx32 *out);
 void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out);
 void RailMath_RailToWorldSlerpXYZ(RailUnit *unit, VecFx32 *out);

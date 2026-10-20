@@ -45,9 +45,9 @@ void GameBeacon_BroadcastReceivedPassPower(u32 passPower);
 void GameBeacon_BroadcastThanks(GameData *gameData, u16 value);
 void GameBeacon_BroadcastPokestarShooting(u8 value);
 void GameBeacon_BroadcastPokestarWatching(u8 value);
-void GameBeacon_BroadcastTournamentChallenge(u8 value);
-void GameBeacon_BroadcastTournamentWin(u8 value, u8 kind);
-void GameBeacon_BroadcastTournamentLoss(u8 value, u8 extra);
+void GameBeacon_BroadcastTournamentChallenge(u16 value);
+void GameBeacon_BroadcastTournamentWin(u16 value, u8 kind);
+void GameBeacon_BroadcastTournamentLoss(u16 value, u8 extra);
 // Sends a beacon of type 0x39, if GameBeaconSys_CanSendType allows it
 void GameBeacon_BroadcastJoinAvenueShopping(void);
 void GameBeacon_BroadcastAreaChallenge(u8 extra, u16 value);

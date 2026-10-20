@@ -89,16 +89,16 @@ void func_ov036_021c2e70(FieldActor *actor, FieldEffects *effects) {
 
     CopyActorWPos(actor, &pos);
     switch (GetActorFaceDir(actor)) {
-    case 0:
+    case DIR_UP:
         pos.z -= FX32_CONST(16);
         break;
-    case 1:
+    case DIR_DOWN:
         pos.z += FX32_CONST(16);
         break;
-    case 2:
+    case DIR_LEFT:
         pos.x -= FX32_CONST(16);
         break;
-    case 3:
+    case DIR_RIGHT:
         pos.x += FX32_CONST(16);
         break;
     }
@@ -135,14 +135,14 @@ static void func_ov036_021c2f5c(FieldEffectTask *task, void *data) {
     GFL_G3DMdlFree(work->mdl);
 }
 
-// End once every animation has
+// Steps the animations, and ends the task once every one has reached its end
 static void func_ov036_021c2f80(FieldEffectTask *task, void *data) {
     IaigiriTask *work = data;
     int i;
     BOOL done = TRUE;
 
     for (i = 0; i < IAIGIRI_ANM_COUNT; i++) {
-        if (GFL_G3DActorStepAnmFrame(work->actor, i, FX32_ONE) == 1) {
+        if (GFL_G3DActorStepAnmFrame(work->actor, i, FX32_ONE) == TRUE) {
             done = FALSE;
         }
     }
@@ -237,23 +237,17 @@ BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env) {
 BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
     u16 *depletedId = ScriptReadVar(vm, env);
     u16 *remains = ScriptReadVar(vm, env);
-    BOOL result;
 
     *depletedId = PassPower_GetDepletedID();
-    if (*depletedId != 0x30) {
-        void *data = PassPowerData_Create(0x8015);
+    if (*depletedId != PASS_POWER_NONE) {
+        void *data = PassPowerData_Create(HEAPID_TAIL(HEAPID_FIELDMAP));
 
         PassPower_Deactivate(*depletedId, data);
         PassPowerData_Free(data);
-        if (PassPower_GetDepletedID() != 0x30) {
-            result = TRUE;
-        } else {
-            result = FALSE;
-        }
+        *remains = PassPower_GetDepletedID() != PASS_POWER_NONE;
     } else {
-        result = FALSE;
+        *remains = FALSE;
     }
-    *remains = result;
     return FALSE;
 }
 

@@ -1,9 +1,13 @@
+// GetPWTTournamentInfo and PWT_TOURNAMENT_INFO are our descriptive names for the tournament metadata.
+
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/moves.h"
 #include "constants/pokemon.h"
+#include "constants/sound.h"
 #include "constants/species.h"
 #include "constants/text_banks.h"
+#include "constants/zones.h"
 #include "field/field.h"
 #include "field/field_effect.h"
 #include "field/field_g3dobj.h"
@@ -29,49 +33,50 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/vm.h"
+#include "text/system/scrcmd_bsubway_wbt_party.h"
 
 // clang-format off
-const WbtTournamentInfo data_ov036_021d4920[15] = {
-    { 0x4, 17, 2, 1, 2, { 0, 0, 0, 0 } },
-    { 0x11, 0, 2, 2, 2, { 2, 2, 3, 3 } },
-    { 0x5, 29, 1, 4, 0, { 2, 2, 3, 3 } },
-    { 0x6, 18, 1, 0, 0, { 1, 1, 2, 2 } },
-    { 0x7, 19, 2, 0, 1, { 1, 1, 2, 2 } },
-    { 0x8, 20, 2, 1, 1, { 2, 2, 3, 3 } },
-    { 0x9, 21, 2, 1, 1, { 2, 2, 3, 3 } },
-    { 0xa, 22, 2, 1, 1, { 2, 2, 3, 3 } },
-    { 0xb, 23, 2, 1, 1, { 2, 2, 3, 3 } },
-    { 0xc, 24, 2, 1, 2, { 0, 0, 0, 0 } },
-    { 0x6, 18, 1, 0, 0, { 1, 0, 0, 0 } },
-    { 0xd, 25, 1, 1, 0, { 1, 1, 2, 2 } },
-    { 0xe, 26, 2, 1, 2, { 2, 2, 3, 3 } },
-    { 0xf, 27, 1, 0, 0, { 1, 1, 2, 2 } },
-    { 0x10, 28, 2, 1, 2, { 2, 2, 3, 3 } },
+const WbtTournamentInfo PWT_TOURNAMENT_INFO[15] = {
+    { ScrcmdBsubwayWbtParty_Text_ChampionsTournament, 17, 2, 1, 2, { 0, 0, 0, 0 } },
+    { ScrcmdBsubwayWbtParty_Text_TypeExpertTournament, 0, 2, 2, 2, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_DownloadTournament, 29, 1, 4, 0, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_DriftveilTournament, 18, 1, 0, 0, { 1, 1, 2, 2 } },
+    { ScrcmdBsubwayWbtParty_Text_UnovaLeadersTournament, 19, 2, 0, 1, { 1, 1, 2, 2 } },
+    { ScrcmdBsubwayWbtParty_Text_KantoLeadersTournament, 20, 2, 1, 1, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_JohtoLeadersTournament, 21, 2, 1, 1, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_HoennLeadersTournament, 22, 2, 1, 1, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_SinnohLeadersTournament, 23, 2, 1, 1, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_WorldLeadersTournament, 24, 2, 1, 2, { 0, 0, 0, 0 } },
+    { ScrcmdBsubwayWbtParty_Text_DriftveilTournament, 18, 1, 0, 0, { 1, 0, 0, 0 } },
+    { ScrcmdBsubwayWbtParty_Text_RentalTournament, 25, 1, 1, 0, { 1, 1, 2, 2 } },
+    { ScrcmdBsubwayWbtParty_Text_RentalMasterTournament, 26, 2, 1, 2, { 2, 2, 3, 3 } },
+    { ScrcmdBsubwayWbtParty_Text_MixTournament, 27, 1, 0, 0, { 1, 1, 2, 2 } },
+    { ScrcmdBsubwayWbtParty_Text_MixMasterTournament, 28, 2, 1, 2, { 2, 2, 3, 3 } },
 };
 
 // clang-format on
 
 // clang-format off
 const HabitatListHeader HABITAT_LIST_HEADERS[57] = {
-    { 0x9b8, 0x1ab, 0x18, 0 }, { 0x9c0, 0x1b5, 0x17, 0 }, { 0x9c1, 0x1be, 0x1c, 0 },
-    { 0x9c2, 0x1bc, 0x1a, 0 }, { 0x9b9, 0x1c0, 0x1d, 0 }, { 0x9c3, 0x1c8, 0x20, 0 },
-    { 0x9ac, 0x1c, 0x22, 0 }, { 0x9c4, 0x1ef, 0x1e, 0 }, { 0x9c5, 0x146, 0x0, 0 },
-    { 0x9c6, 0x9d, 0x29, 0 }, { 0x9c7, 0xa0, 0x15, 0 }, { 0x9c8, 0x149, 0x9, 0 },
-    { 0x9c9, 0x17f, 0x8, 0 }, { 0x9ca, 0x181, 0x37, 0 }, { 0x9cb, 0xfd, 0x35, 0 },
-    { 0x9cc, 0x14b, 0xd, 0 }, { 0x9cd, 0x1f7, 0x7, 0 }, { 0x9f0, 0x1fa, 0x3, 0 },
-    { 0x9ce, 0x14d, 0x31, 0 }, { 0x9cf, 0xc2, 0x39, 0 }, { 0x9d0, 0x151, 0x13, 0 },
-    { 0x9d1, 0x152, 0x27, 0 }, { 0x9d2, 0x1cd, 0x25, 0 }, { 0x9d3, 0x1ce, 0x1b, 0 },
-    { 0x9b5, 0x19c, 0xc, 0 }, { 0x9d4, 0x172, 0x32, 0 }, { 0x9d5, 0xf0, 0xe, 0 },
-    { 0x9d6, 0x176, 0x38, 0 }, { 0x9d7, 0x178, 0xb, 0 }, { 0x9d8, 0x170, 0x2f, 0 },
-    { 0x9d9, 0xff, 0x5, 0 }, { 0x9da, 0x16d, 0x2a, 0 }, { 0x9db, 0x15c, 0x1f, 0 },
-    { 0x9dc, 0x203, 0x36, 0 }, { 0x9dd, 0x1cf, 0x2, 0 }, { 0x9de, 0x17a, 0x1, 0 },
-    { 0x9bf, 0x107, 0xa, 0 }, { 0x9ba, 0x1d1, 0x24, 0 }, { 0x9df, 0x1da, 0x28, 0 },
-    { 0x9e0, 0xe6, 0x12, 0 }, { 0x9e1, 0x1db, 0x2d, 0 }, { 0x9e2, 0x23d, 0x14, 0 },
-    { 0x9e3, 0x159, 0x19, 0 }, { 0x9e4, 0x15a, 0x2e, 0 }, { 0x9b0, 0x71, 0x34, 0 },
-    { 0x9e5, 0xcd, 0x6, 0 }, { 0x9e6, 0xc6, 0x4, 0 }, { 0x9e7, 0x9a, 0x23, 0 },
-    { 0x9e8, 0x141, 0x33, 0 }, { 0x9e9, 0x144, 0xf, 0 }, { 0x9aa, 0x6, 0x16, 0 },
-    { 0x9ea, 0x98, 0x26, 0 }, { 0x9ec, 0x13f, 0x30, 0 }, { 0x9eb, 0x13d, 0x2c, 0 },
-    { 0x9ed, 0x1a7, 0x2b, 0 }, { 0x9ee, 0x183, 0x11, 0 }, { 0x9ef, 0xee, 0x21, 0 },
+    { 0x9b8, ZONE_ASPERTIA_CITY, 0x18, 0 }, { 0x9c0, ZONE_ROUTE_19, 0x17, 0 }, { 0x9c1, ZONE_ROUTE_20, 0x1c, 0 },
+    { 0x9c2, ZONE_FLOCCESY_RANCH, 0x1a, 0 }, { 0x9b9, ZONE_VIRBANK_CITY, 0x1d, 0 }, { 0x9c3, ZONE_VIRBANK_COMPLEX, 0x20, 0 },
+    { 0x9ac, ZONE_CASTELIA_CITY, 0x22, 0 }, { 0x9c4, ZONE_CASTELIA_SEWERS, 0x1e, 0 }, { 0x9c5, ZONE_ROUTE_4, 0x0, 0 },
+    { 0x9c6, ZONE_DESERT_RESORT, 0x29, 0 }, { 0x9c7, ZONE_RELIC_CASTLE, 0x15, 0 }, { 0x9c8, ZONE_ROUTE_5, 0x9, 0 },
+    { 0x9c9, ZONE_ROUTE_16, 0x8, 0 }, { 0x9ca, ZONE_LOSTLORN_FOREST, 0x37, 0 }, { 0x9cb, ZONE_DRIFTVEIL_DRAWBRIDGE, 0x35, 0 },
+    { 0x9cc, ZONE_ROUTE_6, 0xd, 0 }, { 0x9cd, ZONE_RELIC_PASSAGE, 0x7, 0 }, { 0x9f0, ZONE_CLAY_TUNNEL, 0x3, 0 },
+    { 0x9ce, ZONE_MISTRALTON_CAVE, 0x31, 0 }, { 0x9cf, ZONE_CHARGESTONE_CAVE, 0x39, 0 }, { 0x9d0, ZONE_ROUTE_7, 0x13, 0 },
+    { 0x9d1, ZONE_CELESTIAL_TOWER_2, 0x27, 0 }, { 0x9d2, ZONE_REVERSAL_MOUNTAIN, 0x25, 0 }, { 0x9d3, ZONE_STRANGE_HOUSE, 0x1b, 0 },
+    { 0x9b5, ZONE_UNDELLA_TOWN, 0xc, 0 }, { 0x9d4, ZONE_ROUTE_13, 0x32, 0 }, { 0x9d5, ZONE_UNDELLA_BAY, 0xe, 0 },
+    { 0x9d6, ZONE_ROUTE_14, 0x38, 0 }, { 0x9d7, ZONE_ABUNDANT_SHRINE, 0xb, 0 }, { 0x9d8, ZONE_ROUTE_12, 0x2f, 0 },
+    { 0x9d9, ZONE_VILLAGE_BRIDGE, 0x5, 0 }, { 0x9da, ZONE_ROUTE_11, 0x2a, 0 }, { 0x9db, ZONE_ROUTE_9, 0x1f, 0 },
+    { 0x9dc, ZONE_SEASIDE_CAVE, 0x36, 0 }, { 0x9dd, ZONE_ROUTE_21, 0x2, 0 }, { 0x9de, ZONE_ROUTE_15, 0x1, 0 },
+    { 0x9bf, ZONE_MARVELOUS_BRIDGE, 0xa, 0 }, { 0x9ba, ZONE_HUMILAU_CITY, 0x24, 0 }, { 0x9df, ZONE_ROUTE_22, 0x28, 0 },
+    { 0x9e0, ZONE_GIANT_CHASM, 0x12, 0 }, { 0x9e1, ZONE_ROUTE_23, 0x2d, 0 }, { 0x9e2, ZONE_VICTORY_ROAD, 0x14, 0 },
+    { 0x9e3, ZONE_ROUTE_8, 0x19, 0 }, { 0x9e4, ZONE_MOOR_OF_ICIRRUS, 0x2e, 0 }, { 0x9b0, ZONE_ICIRRUS_CITY, 0x34, 0 },
+    { 0x9e5, ZONE_DRAGONSPIRAL_TOWER, 0x6, 0 }, { 0x9e6, ZONE_TWIST_MOUNTAIN, 0x4, 0 }, { 0x9e7, ZONE_PINWHEEL_FOREST, 0x23, 0 },
+    { 0x9e8, ZONE_ROUTE_3, 0x33, 0 }, { 0x9e9, ZONE_WELLSPRING_CAVE, 0xf, 0 }, { 0x9aa, ZONE_STRIATON_CITY, 0x16, 0 },
+    { 0x9ea, ZONE_DREAMYARD, 0x26, 0 }, { 0x9ec, ZONE_ROUTE_2, 0x30, 0 }, { 0x9eb, ZONE_ROUTE_1, 0x2c, 0 },
+    { 0x9ed, ZONE_ROUTE_17, 0x2b, 0 }, { 0x9ee, ZONE_ROUTE_18, 0x11, 0 }, { 0x9ef, ZONE_P2_LABORATORY, 0x21, 0 },
 };
 
 // clang-format on
@@ -96,7 +101,7 @@ void func_ov036_021c97b8(OchibaEffectArgs *args) {
     work->sys = sys;
     work->resGroup = FieldG3DObjSystem_AddResGroup(sys, &request, FALSE);
     work->obj = FieldG3DObjSystem_AddObj(sys, work->resGroup, 0, &position);
-    GFL_SndSEPlay(0x87e);
+    GFL_SndSEPlay(SEQ_SE_OCHIBA_01);
     GFL_TCBMgrAddTask(tcbManager, func_ov036_021c9870, work, 0);
 }
 
@@ -111,15 +116,15 @@ void func_ov036_021c9870(TCB *tcb, void *data) {
     }
 }
 
-const WbtTournamentInfo *func_ov036_021c98a4(s32 tournament) {
+const WbtTournamentInfo *GetPWTTournamentInfo(s32 tournament) {
     if (tournament == 0 || tournament >= 16) {
         tournament = 4;
     }
-    return &data_ov036_021d4920[tournament - 1];
+    return &PWT_TOURNAMENT_INFO[tournament - 1];
 }
 
 void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf) {
-    u16 name = func_ov036_021c98a4(tournament)->name;
+    u16 name = GetPWTTournamentInfo(tournament)->name;
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, heapId);
 
     if (msgData != NULL) {

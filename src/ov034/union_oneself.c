@@ -200,7 +200,7 @@ static void UnionOneself_CheckParentEntry(UnionSystem *unisys, UnionBeaconEntry 
     UnionSelf *situ = &unisys->situ;
     u8 ownMac[6];
 
-    func_ov036_021b445c(unisys, entry, NULL, 0);
+    UnionChat_AppendLine(unisys, entry, NULL, 0);
     if (situ->step == 0 && situ->nextStep == 0 && entry->beacon.unk0A == 5 && entry->timeout != 0) {
         OS_GetMacAddress(ownMac);
         if (GFL_STD_MemCmp(entry, ownMac, 6) == 0 &&

@@ -9,7 +9,7 @@ struct FieldTask {
     FieldTaskCallback callback;
 };
 
-static void func_ov036_021c08e8(FieldTask *task);
+static void FieldTask_SetStartedCore(FieldTask *task);
 static void FieldTask_ReqEnd(FieldTask *task);
 static void FieldTask_ExecCallback(FieldTask *task);
 
@@ -32,7 +32,7 @@ void FieldTask_Run(FieldTask *task) {
 }
 
 void FieldTask_SetStarted(FieldTask *task) {
-    func_ov036_021c08e8(task);
+    FieldTask_SetStartedCore(task);
 }
 
 void *FieldTask_GetData(FieldTask *task) {
@@ -54,7 +54,7 @@ FieldTaskCallback FieldTask_GetCallback(FieldTask *task) {
     return task->callback;
 }
 
-static void func_ov036_021c08e8(FieldTask *task) {
+static void FieldTask_SetStartedCore(FieldTask *task) {
     task->state = 1;
 }
 

@@ -89,7 +89,7 @@ void GSYS_StartFieldmapProc(GameSystem *gsys);
 void func_02016bf8(GameSystem *gsys);
 void GSYS_SetField(GameSystem *gsys, Field *field);
 
-// Overlay 36's field map process (fieldmap.c), declared here until its header has it
+// Overlay 36's field map process (fieldmap_proc.c), declared here until its header has it
 extern const GameProcFunctions FIELDMAP_PROC_FUNCS;
 
 #endif // POKEBW2_SYSTEM_GAME_SYSTEM_H

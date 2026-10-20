@@ -117,7 +117,7 @@ BOOL Sunny_Main(WeatherTask *task, u32 arg, HeapID heapId);
 BOOL Sunny_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId);
 BOOL Sunny_FadeOut(WeatherTask *task, u32 arg, HeapID heapId);
 BOOL Sunny_Exit(WeatherTask *task, u32 arg, HeapID heapId);
-void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u32 season,
+void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u16 season,
                           HeapID heapId);
 void func_ov036_021990d8(void *weather);
 void FieldWeather_Update(void *weather, HeapID heapId);

@@ -1,6 +1,9 @@
 // The electric effects of Chargestone Cave (d06denki): the sparks over a stone and the glow of a stone's mark. The name
 // is the ROM's own, from GFL_HeapAllocate's file argument.
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
 #include "gfl/g3d.h"
@@ -64,35 +67,35 @@ typedef struct {
     G3DModel *mdl;
 } MarkTask;
 
-static void func_ov036_021c27c0(FieldEffectD06Denki *effect);
-static void func_ov036_021c2858(FieldEffectD06Denki *effect);
+static void D06Denki_LoadResources(FieldEffectD06Denki *effect);
+static void D06Denki_FreeResources(FieldEffectD06Denki *effect);
 void FieldTerrainEffectElec_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021c28fc(FieldEffectTask *task, void *work);
-static void func_ov036_021c2900(FieldEffectTask *task, void *work);
-static void func_ov036_021c2910(FieldEffectTask *task, void *work);
-static void func_ov036_021c2a04(FieldEffectTask *task, void *work);
-static void func_ov036_021c2a84(FieldEffectTask *task, void *work);
-static void func_ov036_021c2ab0(FieldEffectTask *task, void *work);
-static void func_ov036_021c2b28(FieldEffectTask *task, void *work);
-static void func_ov036_021c2bd0(FieldEffectTask *task, void *work);
-static void func_ov036_021c2c34(FieldEffectTask *task, void *work);
-static void func_ov036_021c2c54(FieldEffectTask *task, void *work);
-static void func_ov036_021c2c80(FieldEffectTask *task, void *work);
+static void SparkTask_Update(FieldEffectTask *task, void *work);
+static void SparkTask_Draw(FieldEffectTask *task, void *work);
+static void StoneTask_Init(FieldEffectTask *task, void *work);
+static void StoneTask_Delete(FieldEffectTask *task, void *work);
+static void StoneTask_Update(FieldEffectTask *task, void *work);
+static void StoneTask_Draw(FieldEffectTask *task, void *work);
+static void MarkTask_Init(FieldEffectTask *task, void *work);
+static void MarkTask_Delete(FieldEffectTask *task, void *work);
+static void MarkTask_Update(FieldEffectTask *task, void *work);
+static void MarkTask_Draw(FieldEffectTask *task, void *work);
 
 void *func_ov036_021c2788(FieldEffects *effects, HeapID heapId) {
     FieldEffectD06Denki *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectD06Denki), TRUE, "fldeff_d06denki.c", 169);
 
     effect->effects = effects;
-    func_ov036_021c27c0(effect);
+    D06Denki_LoadResources(effect);
     return effect;
 }
 
 void func_ov036_021c27ac(FieldEffects *effects, void *data) {
-    func_ov036_021c2858(data);
+    D06Denki_FreeResources(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021c27c0(FieldEffectD06Denki *effect) {
+static void D06Denki_LoadResources(FieldEffectD06Denki *effect) {
     u32 mdlIds[D06DENKI_MDL_COUNT] = { 80, 78, 79, 81 };
     u32 anmIds[D06DENKI_ANM_COUNT] = { 106, 124, 125, 126, 127 };
     u32 i;
@@ -111,7 +114,7 @@ static void func_ov036_021c27c0(FieldEffectD06Denki *effect) {
     GFL_G3DActorBindAnm(effect->actor, 0);
 }
 
-static void func_ov036_021c2858(FieldEffectD06Denki *effect) {
+static void D06Denki_FreeResources(FieldEffectD06Denki *effect) {
     u32 i;
 
     GFL_G3DAnmFree(effect->anm);
@@ -127,15 +130,15 @@ static void func_ov036_021c2858(FieldEffectD06Denki *effect) {
 }
 
 static const FieldEffectTaskVTable STONE_TASK_VTABLE = {
-    sizeof(StoneTask), func_ov036_021c2a04, func_ov036_021c2a84, func_ov036_021c2ab0, func_ov036_021c2b28,
+    sizeof(StoneTask), StoneTask_Init, StoneTask_Delete, StoneTask_Update, StoneTask_Draw,
 };
 
 static const FieldEffectTaskVTable SPARK_TASK_VTABLE = {
-    sizeof(SparkTask), FieldTerrainEffectElec_Init, func_ov036_021c28fc, func_ov036_021c2900, func_ov036_021c2910,
+    sizeof(SparkTask), FieldTerrainEffectElec_Init, func_ov036_021c28fc, SparkTask_Update, SparkTask_Draw,
 };
 
 static const FieldEffectTaskVTable MARK_TASK_VTABLE = {
-    sizeof(MarkTask), func_ov036_021c2bd0, func_ov036_021c2c34, func_ov036_021c2c54, func_ov036_021c2c80,
+    sizeof(MarkTask), MarkTask_Init, MarkTask_Delete, MarkTask_Update, MarkTask_Draw,
 };
 
 void func_ov036_021c289c(FieldActor *actor, void *effects) {
@@ -154,13 +157,13 @@ void FieldTerrainEffectElec_Init(FieldEffectTask *task, void *work) {
 
     sparkTask->effect = params->effect;
     func_ov036_021a3ae8(task, &params->pos);
-    GFL_SndSEPlay(1698);
+    GFL_SndSEPlay(SEQ_SE_FLD_49);
 }
 
 static void func_ov036_021c28fc(FieldEffectTask *task, void *work) {
 }
 
-static void func_ov036_021c2900(FieldEffectTask *task, void *work) {
+static void SparkTask_Update(FieldEffectTask *task, void *work) {
     SparkTask *sparkTask = work;
 
     if (sparkTask->done == TRUE) {
@@ -168,7 +171,7 @@ static void func_ov036_021c2900(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c2910(FieldEffectTask *task, void *work) {
+static void SparkTask_Draw(FieldEffectTask *task, void *work) {
     SparkTask *sparkTask = work;
 
     if (sparkTask->done == FALSE) {
@@ -225,7 +228,7 @@ u8 func_ov036_021c29f0(FieldEffectTask *task) {
     return TRUE;
 }
 
-static void func_ov036_021c2a04(FieldEffectTask *task, void *work) {
+static void StoneTask_Init(FieldEffectTask *task, void *work) {
     StoneTask *stoneTask = work;
     StoneTaskParams *params = func_ov036_021a3ac8(task);
 
@@ -241,7 +244,7 @@ static void func_ov036_021c2a04(FieldEffectTask *task, void *work) {
     stoneTask->glowActor = GFL_G3DActorCreate(stoneTask->glowMdl, NULL, 0);
 }
 
-static void func_ov036_021c2a84(FieldEffectTask *task, void *work) {
+static void StoneTask_Delete(FieldEffectTask *task, void *work) {
     StoneTask *stoneTask = work;
 
     GFL_G3DAnmFree(stoneTask->anms[0]);
@@ -252,7 +255,7 @@ static void func_ov036_021c2a84(FieldEffectTask *task, void *work) {
     GFL_G3DMdlFree(stoneTask->glowMdl);
 }
 
-static void func_ov036_021c2ab0(FieldEffectTask *task, void *work) {
+static void StoneTask_Update(FieldEffectTask *task, void *work) {
     StoneTask *stoneTask = work;
 
     if (FldAct_IsInUse(stoneTask->actor)) {
@@ -274,7 +277,7 @@ static void func_ov036_021c2ab0(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c2b28(FieldEffectTask *task, void *work) {
+static void StoneTask_Draw(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     StoneTask *stoneTask = work;
 
@@ -306,7 +309,7 @@ void func_ov036_021c2bac(FieldEffectTask *task) {
     }
 }
 
-static void func_ov036_021c2bd0(FieldEffectTask *task, void *work) {
+static void MarkTask_Init(FieldEffectTask *task, void *work) {
     MarkTask *markTask = work;
     SparkTaskParams *params = func_ov036_021a3ac8(task);
 
@@ -320,7 +323,7 @@ static void func_ov036_021c2bd0(FieldEffectTask *task, void *work) {
     GFL_G3DActorBindAnm(markTask->actor, 1);
 }
 
-static void func_ov036_021c2c34(FieldEffectTask *task, void *work) {
+static void MarkTask_Delete(FieldEffectTask *task, void *work) {
     MarkTask *markTask = work;
 
     GFL_G3DAnmFree(markTask->anms[0]);
@@ -329,7 +332,7 @@ static void func_ov036_021c2c34(FieldEffectTask *task, void *work) {
     GFL_G3DMdlFree(markTask->mdl);
 }
 
-static void func_ov036_021c2c54(FieldEffectTask *task, void *work) {
+static void MarkTask_Update(FieldEffectTask *task, void *work) {
     MarkTask *markTask = work;
 
     GFL_G3DActorStepAnmFrameLoop(markTask->actor, 0, FX32_ONE);
@@ -340,7 +343,7 @@ static void func_ov036_021c2c54(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c2c80(FieldEffectTask *task, void *work) {
+static void MarkTask_Draw(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     MarkTask *markTask = work;
 

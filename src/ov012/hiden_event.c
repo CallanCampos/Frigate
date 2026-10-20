@@ -373,7 +373,7 @@ GameEventReturnCode EventFlash_Callback(GameEvent *event, u32 *state, void *data
             status2 = GameData_GetFieldStatus(gameData);
             FieldStatus_SetFlashUsed(status, TRUE);
             GameBeacon_BroadcastFieldMove(0x94);
-            func_ov036_021c1c68(flash, 1);
+            FieldFlash_RequestState(flash, 1);
             flags = FieldStatus_GetFlashPerms(status2);
             flags &= ~FLD_FLASH_ALLOW;
             flags |= FLD_FLASH_ACTIVE;
@@ -384,7 +384,7 @@ GameEventReturnCode EventFlash_Callback(GameEvent *event, u32 *state, void *data
         ++*state;
         break;
     case 2:
-        if (func_ov036_021c1c6c(flash) == 3)
+        if (FieldFlash_GetState(flash) == 3)
             return GAMEEVENT_DONE;
         break;
     }

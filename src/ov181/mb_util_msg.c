@@ -112,7 +112,7 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
         setup.bg = msgBg;
         setup.framePalette = 12;
         setup.winPalette = 14;
-        msg->talkWin = func_ov036_0218b1f8(&setup);
+        msg->talkWin = TalkMsgWinSys_Create(&setup);
     } else {
         msg->talkWin = NULL;
     }
@@ -125,7 +125,7 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
 
 void MBUtilMsg_Delete(MBUtilMsg *msg) {
     if (msg->talkWin != NULL) {
-        func_ov036_0218b320(msg->talkWin);
+        TalkMsgWinSys_Free(msg->talkWin);
         GFL_OvlUnload(OVERLAY_ID(36));
     }
     if (msg->menu != NULL) {

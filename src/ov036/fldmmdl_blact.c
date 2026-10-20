@@ -1,7 +1,10 @@
 // The billboard actors of the field actors: which materials they share, and the loading and unloading of their
 // resources, which spreads over frames. The name is the ROM's own, from GFL_HeapAllocate's file argument.
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/field_actor.h"
+#include "field/fldmmdl_drawdata.h"
 #include "gfl/arc.h"
 #include "gfl/blact.h"
 #include "gfl/g3d.h"
@@ -87,64 +90,51 @@ struct FieldBlAct {
     UnloadEntry *unloader;
 };
 
-typedef struct {
-    u16 x;
-    u16 y;
-} BillboardScale;
-
-typedef struct {
-    u16 width;
-    u16 height;
-} BillboardSize;
-
-// The scale of a billboard actor, and the size of its faces in pixels, by its billboard size
-static const BillboardScale BILLBOARD_SCALES[3] = { { 0x2000, 0x2000 }, { 0x1000, 0x1000 }, { 0x4000, 0x4000 } };
-static const BillboardSize MMDL_BILLBOARD_SIZES_INT[3] = { { 32, 32 }, { 16, 16 }, { 64, 64 } };
-
 static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, void *resource, u32 sizeIdx, u32 atlasIdx);
-static void func_ov036_02193700(BlActSys *sys, u32 texMat);
+static void FieldBlAct_FreeSingleUseMaterial(BlActSys *sys, u32 texMat);
 static u16 FldActSys_AddBlActDefault(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat);
 static u16 FldActSys_AddBlAct(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat, u32 lights);
 static u16 FldAct_InitBlActWithMat(FieldActor *actor, u16 mat);
-static u16 func_ov036_0219396c(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat, u16 palMat);
-static u16 func_ov036_021939a0(FieldActor *actor, u16 mat, u16 palMat);
+static u16 FldActSys_AddBlActWithPalette(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat, u16 palMat);
+static u16 FldAct_InitBlActWithPalette(FieldActor *actor, u16 mat, u16 palMat);
 static u16 FldAct_InitBlActExistMat(FieldActor *actor, u16 objCode);
 static void FieldBlAct_UnbindActorObjCode(FieldBlAct *blact, FieldActor *actor, u16 index, u16 objCode);
-static void func_ov036_02193bc0(BlActSys *sys, u32 actor, void *data);
+static void FieldBlAct_ActorCallback(BlActSys *sys, u32 actor, void *data);
 static void FldBlAct_CreateMatCache(MatCache *cache, int count, HeapID heapId);
-static void func_ov036_02193c24(MatCache *cache);
+static void FldBlAct_FreeMatCache(MatCache *cache);
 static void FldBlAct_RegistCachedMat(MatCache *cache, u16 objCode, u16 mat, u16 flags);
-static void func_ov036_02193c5c(MatCache *cache, u16 objCode);
-static BOOL func_ov036_02193c88(MatCache *cache, u16 objCode, u16 *mat, u16 *flags);
+static void FldBlAct_RemoveCachedMat(MatCache *cache, u16 objCode);
+static BOOL FldBlAct_FindCachedMat(MatCache *cache, u16 objCode, u16 *mat, u16 *flags);
 static void FldBlAct_InitMatCache(FieldBlAct *blact, int count);
-static void func_ov036_02193ce4(FieldBlAct *blact);
-static void func_ov036_02193d14(FieldBlAct *blact, void *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx, u32 flags);
-static void func_ov036_02193d54(FieldBlAct *blact, const FieldActorConfig *config, u32 flags);
-static void func_ov036_02193d88(FieldBlAct *blact, u16 objCode);
+static void FldBlAct_FreeCachedMaterials(FieldBlAct *blact);
+static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, void *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx,
+                                        u32 flags);
+static void FldBlAct_LoadConfigMaterial(FieldBlAct *blact, const FieldActorConfig *config, u32 flags);
+static void FldBlAct_UnloadCachedMaterial(FieldBlAct *blact, u16 objCode);
 static BOOL FieldBlAct_FindCachedObjMat(FieldBlAct *blact, u16 objCode, u16 *mat, u16 *flags);
 static void FldBlAct_InitLoader(FieldBlAct *blact);
-static void func_ov036_02193e70(FieldBlAct *blact);
+static void FldBlAct_FreeLoader(FieldBlAct *blact);
 static BOOL FieldBlAct_IsAsyncLoadPending(FieldBlAct *blact);
 static void FldBlAct_ReqAsyncLoad(FieldBlAct *blact, u16 objCode, u8 sizeIdx, u8 atlasIdx, u16 fileId, u32 flags);
 static void FldBlAct_UpdateAsyncRead(FieldBlAct *blact);
 static BOOL FldBlAct_ExecAsyncRead(FieldBlAct *blact, u16 objCode, u8 sizeIdx, u8 atlasIdx, u16 fileId, u32 flags);
 static void FieldBlAct_FinishAsyncMatLoad(FieldBlAct *blact);
 static BOOL FldBlAct_CheckAsyncLoading(FieldBlAct *blact, u16 objCode, u16 *flags);
-static BOOL func_ov036_02194144(FieldBlAct *blact, u16 objCode);
+static BOOL FldBlAct_CancelAsyncLoad(FieldBlAct *blact, u16 objCode);
 static void FldAct_InitBlActNewMat(FieldBlAct *blact, FieldActor *actor, const FieldActorConfig *config, u16 *index,
                                    void (*callback)(u16 index, void *data), void *callbackData, const VecFx32 *pos);
-static void func_ov036_02194254(FieldBlAct *blact, PendingActor *pending);
+static void FldBlAct_SetupPendingActor(FieldBlAct *blact, PendingActor *pending);
 static void FldBlAct_UpdateAsyncActorSetup(FieldBlAct *blact);
-static BOOL func_ov036_02194334(FieldBlAct *blact, u16 objCode, FieldActor *exclude);
-static void func_ov036_02194374(FieldBlAct *blact, FieldActor *actor);
-static void func_ov036_021943e8(PendingActor *pending);
+static BOOL FldBlAct_HasOtherPendingActor(FieldBlAct *blact, u16 objCode, FieldActor *exclude);
+static void FldBlAct_CancelPendingActor(FieldBlAct *blact, FieldActor *actor);
+static void FldBlAct_ClearPendingActor(PendingActor *pending);
 static void FldBlAct_InitUnloader(FieldBlAct *blact);
-static void func_ov036_021944e4(FieldBlAct *blact);
-static void func_ov036_02194514(FieldBlAct *blact, UnloadEntry *entry);
+static void FldBlAct_FreeUnloader(FieldBlAct *blact);
+static void FldBlAct_UpdateUnloadEntry(FieldBlAct *blact, UnloadEntry *entry);
 static void FldBlAct_UpdateAsyncDelete(FieldBlAct *blact);
-static BOOL func_ov036_02194620(FieldBlAct *blact, FieldActor *actor, u16 index);
-static const Ov036Unk021cf1c8 *func_ov036_02194650(u32 ctrlType);
-static u16 func_ov036_0219465c(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, void *resource, int mode);
+static BOOL FldBlAct_IsUnloadPending(FieldBlAct *blact, FieldActor *actor, u16 index);
+static const FieldBillboardAnimSet *FieldBlAct_GetBillboardAnimSet(u32 ctrlType);
+static u16 FldBlAct_LoadMaterial(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, void *resource, int mode);
 
 // The scale of the billboard actors' scene
 static const VecFx32 BLACT_SCENE_SCALE = { 0x7000, 0x7000, 0x7000 };
@@ -180,7 +170,7 @@ static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, void *resource, u32 
     return material;
 }
 
-static void func_ov036_02193700(BlActSys *sys, u32 texMat) {
+static void FieldBlAct_FreeSingleUseMaterial(BlActSys *sys, u32 texMat) {
     u16 material = BlActSys_GetTexMatMaterial(sys, texMat);
     BlActScene *scene = BlActSys_GetScene(sys);
 
@@ -212,9 +202,9 @@ void FldActSys_InitBlAct(MMSys *system, BlActSys *sys, u32 count) {
 void func_ov036_021937a4(MMSys *system) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(system);
 
-    func_ov036_021944e4(blact);
-    func_ov036_02193e70(blact);
-    func_ov036_02193ce4(blact);
+    FldBlAct_FreeUnloader(blact);
+    FldBlAct_FreeLoader(blact);
+    FldBlAct_FreeCachedMaterials(blact);
     GFL_HeapFree(blact);
     FldActSys_BindFieldBlAct(system, NULL);
 }
@@ -254,7 +244,7 @@ void FldActSys_LoadStaticBlact(MMSys *system, u16 objCode) {
     FieldActorConfig config;
 
     GetNPCMdlInfoForOBJCODE(system, objCode, &config);
-    func_ov036_02193d54(blact, &config, 0);
+    FldBlAct_LoadConfigMaterial(blact, &config, 0);
 }
 
 void FldActSys_LoadCachedBlact(MMSys *system) {
@@ -265,7 +255,7 @@ void FldActSys_LoadCachedBlact(MMSys *system) {
 
     for (i = 0; i < count; i++) {
         GetMMSysMdlInfoCacheEntry(system, i, &config);
-        func_ov036_02193d54(blact, &config, 0);
+        FldBlAct_LoadConfigMaterial(blact, &config, 0);
     }
 }
 
@@ -277,7 +267,7 @@ static u16 FldActSys_AddBlAct(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrl
     FieldBlAct *blact = FldActSys_GetFieldBlAct(system);
     BlActActorRequest request;
     u16 actor;
-    const Ov036Unk021cf1c8 *anims;
+    const FieldBillboardAnimSet *anims;
     BlActSys *sys;
     const BillboardScale *scale = &BILLBOARD_SCALES[sizeIdx];
 
@@ -288,12 +278,12 @@ static u16 FldActSys_AddBlAct(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrl
     request.alpha = 31;
     request.visible = TRUE;
     request.lights = lights;
-    request.callback = func_ov036_02193bc0;
+    request.callback = FieldBlAct_ActorCallback;
     request.callbackData = blact;
     actor = BlActSys_ExecActorRequests(blact->sys, blact->firstMat, &request, 1, 0);
-    anims = func_ov036_02194650(ctrlType);
-    if (anims->unk0 != NULL) {
-        BlActSys_SetActorAnims(blact->sys, actor, anims->unk0, anims->unk4);
+    anims = FieldBlAct_GetBillboardAnimSet(ctrlType);
+    if (anims->animations != NULL) {
+        BlActSys_SetActorAnims(blact->sys, actor, anims->animations, anims->count);
         sys = blact->sys;
         BlActSys_SetActorAnim(sys, actor, 0);
         BlActSys_SetActorAnimating(sys, actor, TRUE);
@@ -310,7 +300,7 @@ static u16 FldAct_InitBlActWithMat(FieldActor *actor, u16 mat) {
     return FldActSys_AddBlActDefault(system, &pos, config->billboardSize, config->spriteControllerType, mat);
 }
 
-static u16 func_ov036_0219396c(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat, u16 palMat) {
+static u16 FldActSys_AddBlActWithPalette(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat, u16 palMat) {
     u16 actor = FldActSys_AddBlActDefault(system, pos, sizeIdx, ctrlType, mat);
 
     if (palMat != BLACT_NONE) {
@@ -319,13 +309,14 @@ static u16 func_ov036_0219396c(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctr
     return actor;
 }
 
-static u16 func_ov036_021939a0(FieldActor *actor, u16 mat, u16 palMat) {
+static u16 FldAct_InitBlActWithPalette(FieldActor *actor, u16 mat, u16 palMat) {
     MMSys *system = GetActorMModelSystem(actor);
     const FieldActorConfig *config = GetActorMdlInfo(actor);
     VecFx32 pos;
 
     CopyActorPosAllAdd(actor, &pos);
-    return func_ov036_0219396c(system, &pos, config->billboardSize, config->spriteControllerType, mat, palMat);
+    return FldActSys_AddBlActWithPalette(system, &pos, config->billboardSize, config->spriteControllerType, mat,
+                                         palMat);
 }
 
 static u16 FldAct_InitBlActExistMat(FieldActor *actor, u16 objCode) {
@@ -359,7 +350,7 @@ static void FieldBlAct_UnbindActorObjCode(FieldBlAct *blact, FieldActor *actor, 
         }
         if (info[0] & 1) {
             if (!FldAct_CheckObjCodeShared(actor, objCode)) {
-                func_ov036_02193d88(blact, objCode);
+                FldBlAct_UnloadCachedMaterial(blact, objCode);
             }
         }
     }
@@ -370,10 +361,10 @@ void func_ov036_02193ac0(FieldActor *actor, u32 index) {
     FieldBlAct *blact = FldActSys_GetFieldBlAct(GetActorMModelSystem(actor));
 
     if (index == BLACT_NONE) {
-        func_ov036_02194374(blact, actor);
+        FldBlAct_CancelPendingActor(blact, actor);
         return;
     }
-    if (func_ov036_02194620(blact, actor, index) != TRUE) {
+    if (FldBlAct_IsUnloadPending(blact, actor, index) != TRUE) {
         FieldBlAct_UnbindActorObjCode(blact, actor, index, objCode);
         BlActSys_DeleteActors(blact->sys, (u16)index, 1);
     }
@@ -407,7 +398,7 @@ void func_ov036_02193b7c(MMSys *system, u16 *out) {
     out[1] = BLACT_NONE;
 }
 
-static void func_ov036_02193bc0(BlActSys *sys, u32 actor, void *data) {
+static void FieldBlAct_ActorCallback(BlActSys *sys, u32 actor, void *data) {
     FieldBlAct *blact = data;
 
     blact->callbackFlag |= 1;
@@ -438,7 +429,7 @@ static void FldBlAct_CreateMatCache(MatCache *cache, int count, HeapID heapId) {
     } while (count != 0);
 }
 
-static void func_ov036_02193c24(MatCache *cache) {
+static void FldBlAct_FreeMatCache(MatCache *cache) {
     GFL_HeapFree(cache->entries);
 }
 
@@ -458,7 +449,7 @@ static void FldBlAct_RegistCachedMat(MatCache *cache, u16 objCode, u16 mat, u16 
     } while (i < cache->count);
 }
 
-static void func_ov036_02193c5c(MatCache *cache, u16 objCode) {
+static void FldBlAct_RemoveCachedMat(MatCache *cache, u16 objCode) {
     int i = 0;
     MatCacheEntry *entry = cache->entries;
 
@@ -474,7 +465,7 @@ static void func_ov036_02193c5c(MatCache *cache, u16 objCode) {
     } while (i < cache->count);
 }
 
-static BOOL func_ov036_02193c88(MatCache *cache, u16 objCode, u16 *mat, u16 *flags) {
+static BOOL FldBlAct_FindCachedMat(MatCache *cache, u16 objCode, u16 *mat, u16 *flags) {
     int i = 0;
     MatCacheEntry *entry = cache->entries;
 
@@ -501,52 +492,53 @@ static void FldBlAct_InitMatCache(FieldBlAct *blact, int count) {
     FldBlAct_CreateMatCache(&blact->cache, count, FldActSys_GetFieldHeapID(blact->system));
 }
 
-static void func_ov036_02193ce4(FieldBlAct *blact) {
+static void FldBlAct_FreeCachedMaterials(FieldBlAct *blact) {
     MatCacheEntry *entry = blact->cache.entries;
     int i = 0;
 
     do {
         if (entry->objCode != BLACT_NONE) {
-            func_ov036_02193d88(blact, entry->objCode);
+            FldBlAct_UnloadCachedMaterial(blact, entry->objCode);
         }
         i++;
         entry++;
     } while (i < blact->cache.count);
-    func_ov036_02193c24(&blact->cache);
+    FldBlAct_FreeMatCache(&blact->cache);
 }
 
-static void func_ov036_02193d14(FieldBlAct *blact, void *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx, u32 flags) {
+static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, void *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx,
+                                        u32 flags) {
     int mode = -1;
     u16 mat;
 
     if (flags & 2) {
         mode = 2;
     }
-    mat = func_ov036_0219465c(blact, objCode, sizeIdx, atlasIdx, resource, mode);
+    mat = FldBlAct_LoadMaterial(blact, objCode, sizeIdx, atlasIdx, resource, mode);
     FldBlAct_RegistCachedMat(&blact->cache, objCode, mat, flags);
 }
 
-static void func_ov036_02193d54(FieldBlAct *blact, const FieldActorConfig *config, u32 flags) {
+static void FldBlAct_LoadConfigMaterial(FieldBlAct *blact, const FieldActorConfig *config, u32 flags) {
     const FieldActorResGroup *group = GetNPCMdlInfoG2DRscGroup(config);
     void *resource = GFL_G3DSysReadArcToolResource(GetMMSysDataArcHandle(blact->system), group->res1);
 
-    func_ov036_02193d14(blact, resource, config->uid, config->billboardSize, config->spriteAtlasSize, flags);
+    FldBlAct_LoadCachedMaterial(blact, resource, config->uid, config->billboardSize, config->spriteAtlasSize, flags);
 }
 
-static void func_ov036_02193d88(FieldBlAct *blact, u16 objCode) {
+static void FldBlAct_UnloadCachedMaterial(FieldBlAct *blact, u16 objCode) {
     u16 info[2];
 
-    func_ov036_02193c88(&blact->cache, objCode, &info[0], &info[1]);
+    FldBlAct_FindCachedMat(&blact->cache, objCode, &info[0], &info[1]);
     if (info[1] & 2) {
         BlActSys_FreeMaterials(blact->sys, info[0], 1);
     } else {
-        func_ov036_02193700(blact->sys, info[0]);
+        FieldBlAct_FreeSingleUseMaterial(blact->sys, info[0]);
     }
-    func_ov036_02193c5c(&blact->cache, objCode);
+    FldBlAct_RemoveCachedMat(&blact->cache, objCode);
 }
 
 static BOOL FieldBlAct_FindCachedObjMat(FieldBlAct *blact, u16 objCode, u16 *mat, u16 *flags) {
-    return func_ov036_02193c88(&blact->cache, objCode, mat, flags);
+    return FldBlAct_FindCachedMat(&blact->cache, objCode, mat, flags);
 }
 
 static void FldBlAct_InitLoader(FieldBlAct *blact) {
@@ -570,7 +562,7 @@ static void FldBlAct_InitLoader(FieldBlAct *blact) {
     blact->loader = loader;
 }
 
-static void func_ov036_02193e70(FieldBlAct *blact) {
+static void FldBlAct_FreeLoader(FieldBlAct *blact) {
     AsyncLoader *loader = blact->loader;
     AsyncResource *resource;
     PendingActor *actor;
@@ -626,11 +618,10 @@ static BOOL FieldBlAct_IsAsyncLoadPending(FieldBlAct *blact) {
 }
 
 static void FldBlAct_ReqAsyncLoad(FieldBlAct *blact, u16 objCode, u8 sizeIdx, u8 atlasIdx, u16 fileId, u32 flags) {
-    AsyncLoader *loader = blact->loader;
-    AsyncRead *read = loader->reads;
     u32 i;
+    AsyncRead *read;
 
-    for (i = 0; i < loader->readCount; i++, read++) {
+    for (i = 0, read = blact->loader->reads; i < blact->loader->readCount; i++, read++) {
         if (read->objCode == BLACT_NONE) {
             read->objCode = objCode;
             read->sizeIdx = sizeIdx;
@@ -710,8 +701,8 @@ static void FieldBlAct_FinishAsyncMatLoad(FieldBlAct *blact) {
         for (; i < loader->resourceCount; i++, resource++) {
             if (resource->resource != NULL && resource->state == 1) {
                 resource->state = 0;
-                func_ov036_02193d14(blact, resource->resource, resource->objCode, resource->sizeIdx, resource->atlasIdx,
-                                    resource->flags);
+                FldBlAct_LoadCachedMaterial(blact, resource->resource, resource->objCode, resource->sizeIdx,
+                                            resource->atlasIdx, resource->flags);
                 resource->resource = NULL;
             }
         }
@@ -719,19 +710,18 @@ static void FieldBlAct_FinishAsyncMatLoad(FieldBlAct *blact) {
 }
 
 static BOOL FldBlAct_CheckAsyncLoading(FieldBlAct *blact, u16 objCode, u16 *flags) {
-    AsyncLoader *loader = blact->loader;
-    AsyncResource *resource;
     u32 i;
-    AsyncRead *read = loader->reads;
+    AsyncRead *read;
+    u32 j;
+    AsyncResource *resource;
 
-    for (i = 0; i < loader->readCount; i++, read++) {
+    for (i = 0, read = blact->loader->reads; i < blact->loader->readCount; i++, read++) {
         if (read->objCode == objCode) {
             *flags = read->flags;
             return TRUE;
         }
     }
-    resource = loader->resources;
-    for (i = 0; i < loader->resourceCount; i++, resource++) {
+    for (j = 0, resource = blact->loader->resources; j < blact->loader->resourceCount; j++, resource++) {
         if (resource->objCode == objCode && resource->resource != NULL) {
             *flags = resource->flags;
             return TRUE;
@@ -740,20 +730,19 @@ static BOOL FldBlAct_CheckAsyncLoading(FieldBlAct *blact, u16 objCode, u16 *flag
     return FALSE;
 }
 
-static BOOL func_ov036_02194144(FieldBlAct *blact, u16 objCode) {
-    AsyncLoader *loader = blact->loader;
-    AsyncResource *resource;
+static BOOL FldBlAct_CancelAsyncLoad(FieldBlAct *blact, u16 objCode) {
     u32 i;
-    AsyncRead *read = loader->reads;
+    AsyncRead *read;
+    u32 j;
+    AsyncResource *resource;
 
-    for (i = 0; i < loader->readCount; i++, read++) {
+    for (i = 0, read = blact->loader->reads; i < blact->loader->readCount; i++, read++) {
         if (read->objCode == objCode) {
             read->objCode = BLACT_NONE;
             return TRUE;
         }
     }
-    resource = loader->resources;
-    for (i = 0; i < loader->resourceCount; i++, resource++) {
+    for (j = 0, resource = blact->loader->resources; j < blact->loader->resourceCount; j++, resource++) {
         if (resource->resource != NULL && resource->objCode == objCode) {
             resource->state = 0;
             GFL_G3DResFree(resource->resource);
@@ -782,9 +771,10 @@ static void FldAct_InitBlActNewMat(FieldBlAct *blact, FieldActor *actor, const F
             pending->ctrlType = config->spriteControllerType;
             FieldBlAct_FindCachedObjMat(blact, pending->objCode, &info[1], &info[0]);
             if (info[1] == BLACT_NONE && !FldBlAct_CheckAsyncLoading(blact, pending->objCode, &info[0])) {
+                const FieldActorResGroup *group = GetNPCMdlInfoG2DRscGroup(config);
+
                 info[0] = 1;
-                FldBlAct_ReqAsyncLoad(blact, pending->objCode, pending->sizeIdx, pending->atlasIdx,
-                                      GetNPCMdlInfoG2DRscGroup(config)->res1, 1);
+                FldBlAct_ReqAsyncLoad(blact, pending->objCode, pending->sizeIdx, pending->atlasIdx, group->res1, 1);
             }
             pending->callback = callback;
             pending->callbackData = callbackData;
@@ -797,7 +787,7 @@ static void FldAct_InitBlActNewMat(FieldBlAct *blact, FieldActor *actor, const F
     }
 }
 
-static void func_ov036_02194254(FieldBlAct *blact, PendingActor *pending) {
+static void FldBlAct_SetupPendingActor(FieldBlAct *blact, PendingActor *pending) {
     u16 index;
     u16 mat;
     u16 flags;
@@ -805,16 +795,17 @@ static void func_ov036_02194254(FieldBlAct *blact, PendingActor *pending) {
 
     pending->state = 0;
     if (pending->resource != NULL) {
-        mat = func_ov036_0219465c(blact, pending->objCode, pending->sizeIdx, pending->atlasIdx, pending->resource, 1);
+        mat = FldBlAct_LoadMaterial(blact, pending->objCode, pending->sizeIdx, pending->atlasIdx, pending->resource, 1);
         pending->resource = NULL;
         FieldBlAct_FindCachedObjMat(blact, pending->objCode, &palMat, &flags);
     } else {
         FieldBlAct_FindCachedObjMat(blact, pending->objCode, &mat, &flags);
     }
     if (pending->actor != NULL) {
-        index = func_ov036_021939a0(pending->actor, mat, palMat);
+        index = FldAct_InitBlActWithPalette(pending->actor, mat, palMat);
     } else {
-        index = func_ov036_0219396c(blact->system, &pending->pos, pending->sizeIdx, pending->ctrlType, mat, palMat);
+        index = FldActSys_AddBlActWithPalette(blact->system, &pending->pos, pending->sizeIdx, pending->ctrlType, mat,
+                                              palMat);
     }
     *pending->index = index;
     if (pending->callback != NULL) {
@@ -834,14 +825,14 @@ static void FldBlAct_UpdateAsyncActorSetup(FieldBlAct *blact) {
     for (; i < limit; i++, pending++) {
         if (pending->index != NULL && pending->state == 1) {
             if (FieldBlAct_FindCachedObjMat(blact, pending->objCode, &info[0], &info[1]) == TRUE) {
-                func_ov036_02194254(blact, pending);
-                func_ov036_021943e8(pending);
+                FldBlAct_SetupPendingActor(blact, pending);
+                FldBlAct_ClearPendingActor(pending);
             }
         }
     }
 }
 
-static BOOL func_ov036_02194334(FieldBlAct *blact, u16 objCode, FieldActor *exclude) {
+static BOOL FldBlAct_HasOtherPendingActor(FieldBlAct *blact, u16 objCode, FieldActor *exclude) {
     u32 i = 0;
     u16 limit = GetActorLimit(blact->system);
     PendingActor *pending = blact->loader->actors;
@@ -855,7 +846,7 @@ static BOOL func_ov036_02194334(FieldBlAct *blact, u16 objCode, FieldActor *excl
     return FALSE;
 }
 
-static void func_ov036_02194374(FieldBlAct *blact, FieldActor *actor) {
+static void FldBlAct_CancelPendingActor(FieldBlAct *blact, FieldActor *actor) {
     u32 i = 0;
     u16 limit = GetActorLimit(blact->system);
     PendingActor *pending = blact->loader->actors;
@@ -865,21 +856,21 @@ static void func_ov036_02194374(FieldBlAct *blact, FieldActor *actor) {
         if (pending->index != NULL && pending->actor == actor) {
             pending->state = 0;
             if (FldBlAct_CheckAsyncLoading(blact, pending->objCode, &flags) == TRUE && (flags & 1)) {
-                if (!func_ov036_02194334(blact, pending->objCode, pending->actor)) {
-                    func_ov036_02194144(blact, pending->objCode);
+                if (!FldBlAct_HasOtherPendingActor(blact, pending->objCode, pending->actor)) {
+                    FldBlAct_CancelAsyncLoad(blact, pending->objCode);
                 }
             }
             if (pending->resource != NULL) {
                 GFL_G3DResFree(pending->resource);
                 pending->resource = NULL;
             }
-            func_ov036_021943e8(pending);
+            FldBlAct_ClearPendingActor(pending);
             return;
         }
     }
 }
 
-static void func_ov036_021943e8(PendingActor *pending) {
+static void FldBlAct_ClearPendingActor(PendingActor *pending) {
     pending->state = 0;
     MI_CpuFill8(pending, 0, sizeof(PendingActor));
 }
@@ -901,7 +892,12 @@ void FldAct_SwapObjCode(FieldActor *actor, u16 newObjCode) {
         FldAct_UpdateBlInfoForNewObjCode(actor, newObjCode);
         return;
     }
+    // BUG: The search repeatedly checks the first slot instead of advancing to the next entry.
+#ifdef BUGFIX
+    for (i = 0; i < 4; i++, entry++) {
+#else
     for (i = 0; i < 4; i++) {
+#endif
         if (entry->actor == NULL) {
             break;
         }
@@ -915,7 +911,6 @@ void FldAct_SwapObjCode(FieldActor *actor, u16 newObjCode) {
     entry->objCode = FldAct_GetObjCode(actor);
     entry->newObjCode = newObjCode;
     FldAct_UpdateBlInfoForNewObjCode(actor, newObjCode);
-    i = 0;
     if (FldAct_GetBlActIdx(actor, 0) != BLACT_NONE) {
         FieldBlAct_UnbindActorObjCode(blact, actor, entry->index, entry->objCode);
         BlActSys_DeleteActors(blact->sys, entry->index, 1);
@@ -928,7 +923,7 @@ static void FldBlAct_InitUnloader(FieldBlAct *blact) {
                                        "fldmmdl_blact.c", 2449);
 }
 
-static void func_ov036_021944e4(FieldBlAct *blact) {
+static void FldBlAct_FreeUnloader(FieldBlAct *blact) {
     UnloadEntry *entry = blact->unloader;
     int i;
 
@@ -943,7 +938,7 @@ static void func_ov036_021944e4(FieldBlAct *blact) {
     }
 }
 
-static void func_ov036_02194514(FieldBlAct *blact, UnloadEntry *entry) {
+static void FldBlAct_UpdateUnloadEntry(FieldBlAct *blact, UnloadEntry *entry) {
     FieldActor *actor = entry->actor;
     u16 index = FldAct_GetBlActIdx(actor, 0);
     u16 objCode;
@@ -985,13 +980,13 @@ static void FldBlAct_UpdateAsyncDelete(FieldBlAct *blact) {
     if (entry != NULL) {
         for (i = 0; i < 4; i++, entry++) {
             if (entry->actor != NULL) {
-                func_ov036_02194514(blact, entry);
+                FldBlAct_UpdateUnloadEntry(blact, entry);
             }
         }
     }
 }
 
-static BOOL func_ov036_02194620(FieldBlAct *blact, FieldActor *actor, u16 index) {
+static BOOL FldBlAct_IsUnloadPending(FieldBlAct *blact, FieldActor *actor, u16 index) {
     UnloadEntry *entry = blact->unloader;
     int i;
 
@@ -1005,11 +1000,11 @@ static BOOL func_ov036_02194620(FieldBlAct *blact, FieldActor *actor, u16 index)
     return FALSE;
 }
 
-static const Ov036Unk021cf1c8 *func_ov036_02194650(u32 ctrlType) {
-    return &data_ov036_021cf1c8[ctrlType];
+static const FieldBillboardAnimSet *FieldBlAct_GetBillboardAnimSet(u32 ctrlType) {
+    return &FIELD_BILLBOARD_ANIM_SETS[ctrlType];
 }
 
-static u16 func_ov036_0219465c(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, void *resource, int mode) {
+static u16 FldBlAct_LoadMaterial(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, void *resource, int mode) {
     BlActMatRequest request;
     const BillboardSize *size;
 
