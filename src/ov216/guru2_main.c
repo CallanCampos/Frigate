@@ -940,7 +940,7 @@ BOOL Guru2Main_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2Main_FreeDiscBump(g2m);
     Guru2Main_FreeButton(g2m);
     Guru2Main_FreeBonus(g2m);
-    func_0203a610(g2m->tcbManager);
+    GFL_TCBMgrDelete(g2m->tcbManager);
     GFL_HeapFree(g2m->tcbBuffer);
     Guru2Main_FreeBG3D(g2m);
     Guru2Main_FreeDisc(g2m);

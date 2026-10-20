@@ -265,7 +265,7 @@ FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffect
 static void func_ov036_021a38d0(FieldEffects *effects) {
     if (effects->taskStore != NULL) {
         func_ov036_021a3958(effects->taskStore);
-        func_0203a610(effects->tcbMgr);
+        GFL_TCBMgrDelete(effects->tcbMgr);
         GFL_HeapFree(effects->tcbMgrWork);
     }
 }

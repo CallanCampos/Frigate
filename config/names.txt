@@ -2257,6 +2257,7 @@
 . 0x02039980 ResortWork_Set
 . 0x02039988 CRYPTO_RC4Init
 . 0x02039a08 CRYPTO_RC4Encrypt
+. 0x0203a610 GFL_TCBMgrDelete
 . 0x0203ad44 SaveData_InitWithBuffer
 . 0x0203ad7c SaveData_GetData
 . 0x0203adac SaveData_GetChangedSize

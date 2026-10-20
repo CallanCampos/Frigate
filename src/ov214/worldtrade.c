@@ -175,7 +175,7 @@ static BOOL WorldTradeProc_End(GameProc *proc, u32 *state, void *param, void *wo
     GFL_MsgDataFree(wk->countryNameManager);
     GFL_WordSetSystemFree(wk->wordSet);
 
-    func_0203a610(wk->tcbManager);
+    GFL_TCBMgrDelete(wk->tcbManager);
     GFL_HeapFree(wk->tcbBuffer);
     FreeGameProcManager(wk->procManager);
     GFL_HeapFree(wk->demoPokemon);

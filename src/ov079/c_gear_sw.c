@@ -2191,7 +2191,7 @@ static void CGearSw_Exit(CGearSw *work) {
     GFL_NetResetIconPos();
     GFL_NetSetIconScreen(FALSE, work->heapId);
     GFL_TCBRemove(work->vblankTcb);
-    func_0203a610(work->tcbMgr);
+    GFL_TCBMgrDelete(work->tcbMgr);
     GFL_HeapFree(work->tcbMgrBuffer);
     GFL_TCBExMgrFreeTasks(work->tcbExMgr);
     GFL_TCBExMgrFree(work->tcbExMgr);

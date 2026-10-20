@@ -620,7 +620,7 @@ void BtlvInput_Delete(BtlvInput *work) {
         if (work->fingerCursor != NULL) {
             BtlvFingerCursor_Delete(work->fingerCursor);
         }
-        func_0203a610(work->tcbMgr);
+        GFL_TCBMgrDelete(work->tcbMgr);
         GFL_HeapFree(work->tcbMgrBuf);
         GFL_HeapFree(work);
     }

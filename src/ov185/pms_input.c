@@ -351,7 +351,7 @@ static void PMSInput_DestructWork(PMSInputWork *wk, GameProc *proc) {
     PMSIParam_SetUsingTouch(wk->param, wk->keyMode);
     GFL_BMN_Delete(wk->bmn);
     PMSIView_Delete(wk->vwk);
-    func_0203a610(wk->tcbMgr);
+    GFL_TCBMgrDelete(wk->tcbMgr);
     GFL_HeapFree(wk->tcbMem);
     PMSIData_Delete(wk->dwk);
     PMSISearch_Delete(wk->search);

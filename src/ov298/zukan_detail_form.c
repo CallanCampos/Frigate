@@ -1476,7 +1476,7 @@ static void ZukanDetailForm_CreateMCSS(ZukanDetailFormParam *param, ZukanDetailF
 static void ZukanDetailForm_FreeMCSS(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common) {
     MCSSSys_CloseArc(wk->mcssSys);
     MCSSSys_Free(wk->mcssSys);
-    func_0203a610(wk->tcbMgr);
+    GFL_TCBMgrDelete(wk->tcbMgr);
     GFL_HeapFree(wk->tcbBuffer);
 }
 

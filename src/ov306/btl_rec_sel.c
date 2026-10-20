@@ -1411,7 +1411,7 @@ static void BtlRecSel_FreePaletteFade(BtlRecSelParam *param, BtlRecSelWork *work
     PaletteFade_FreeBuffer(work->fade, 0);
     PaletteFade_FreeBuffer(work->fade, 2);
     PaletteFade_Free(work->fade);
-    func_0203a610(work->tcbManager);
+    GFL_TCBMgrDelete(work->tcbManager);
     GFL_HeapFree(work->tcbManagerWork);
 }
 

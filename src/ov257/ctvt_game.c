@@ -2469,7 +2469,7 @@ static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
             game->players[i] = NULL;
         }
     }
-    func_0203a610(game->playerTcbManager);
+    GFL_TCBMgrDelete(game->playerTcbManager);
     if (game->playerTcbManager != NULL) {
         GFL_HeapFree(game->playerTcbManager);
         game->playerTcbManager = NULL;
@@ -2478,7 +2478,7 @@ static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
         GFL_HeapFree(game->playerTcbBuffer);
         game->playerTcbBuffer = NULL;
     }
-    func_0203a610(game->tcbManager);
+    GFL_TCBMgrDelete(game->tcbManager);
     if (game->tcbManager != NULL) {
         GFL_HeapFree(game->tcbManager);
         game->tcbManager = NULL;

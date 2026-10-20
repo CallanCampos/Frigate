@@ -606,7 +606,7 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
 }
 
 u32 FieldRoutine_Close(GameSystem *gsys, Field *field) {
-    func_0203a610(field->tcbManager);
+    GFL_TCBMgrDelete(field->tcbManager);
     GFL_HeapFree(field->tcbManagerHeap);
     FieldDispControl_Free(field->dispControl);
     field->dispControl = NULL;

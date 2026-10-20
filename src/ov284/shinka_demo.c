@@ -647,7 +647,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             PaletteFade_FreeBuffer(wk->paletteFade, PALFADE_BUFFER_SUB_BG);
             PaletteFade_FreeBuffer(wk->paletteFade, PALFADE_BUFFER_SUB_OBJ);
             PaletteFade_Free(wk->paletteFade);
-            func_0203a610(wk->tcbManager);
+            GFL_TCBMgrDelete(wk->tcbManager);
             GFL_HeapFree(wk->tcbBuffer);
             wk->tcbManager = NULL;
             wk->tcbBuffer = NULL;

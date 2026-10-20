@@ -819,7 +819,7 @@ static void Dowsing_FreeFade(DowsingWork *work) {
     PaletteFade_FreeBuffer(work->paletteFade, 1);
     PaletteFade_FreeBuffer(work->paletteFade, 3);
     PaletteFade_Free(work->paletteFade);
-    func_0203a610(work->tcbManager);
+    GFL_TCBMgrDelete(work->tcbManager);
     GFL_HeapFree(work->tcbMemory);
 }
 
