@@ -15,9 +15,10 @@
 typedef struct NetState NetState;
 typedef void (*NetStateFunc)(NetState *state);
 
+// How the changeover alternates: 0 between parent and child, or it stays the parent or the child
 enum {
-    NET_STATE_MODE_CHILD = 1,
-    NET_STATE_MODE_PARENT,
+    NET_STATE_MODE_PARENT = 1,
+    NET_STATE_MODE_CHILD,
 };
 
 struct NetState {
@@ -33,19 +34,23 @@ struct NetState {
     u8 aMacAddress[6];
     // Frames to wait, which some states count down
     u16 timer;
-    s8 unk48;
+    // The Wi-Fi friend to connect to, -1 for anybody and -2 for a match the caller started
+    s8 friendIndex;
     u8 unk49;
-    u8 unk4A;
+    // Set when the other machine asked to disconnect (base command 11)
+    u8 disconnectReceived;
     u8 unk4B;
     u8 unk4C;
     u8 errorFlag;
     s8 errorCode;
     u8 unk4F;
-    u8 unk50;
+    // What the last call set the device's disconnect error to
+    u8 disconnectError;
     // Whether ending the network has been requested
     u8 ending;
     u8 unk52;
-    u8 unk53;
+    // Whether the changeover connects as a child to parentMac rather than scanning
+    u8 useParentMac;
     u8 unk54[2];
     u8 mode;
     u8 parentMac[6];
@@ -281,7 +286,7 @@ static void func_02041534(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     if (sys->pDevTable->isIdle()) {
-        if (state->unk53 && state->mode != NET_STATE_MODE_CHILD) {
+        if (state->useParentMac && state->mode != NET_STATE_MODE_PARENT) {
             if (func_0203eec0(TRUE, state->parentMac, 0x200, func_020412d4)) {
                 NetState_SetFuncLine(_pNetState, func_02041940, NetState_GetShortWait(state), 571);
             }
@@ -342,7 +347,7 @@ static void func_020416c8(NetState *state) {
         NetState_SetFuncLine(_pNetState, func_0204165c, 0, 695);
         return;
     }
-    if (state->mode != NET_STATE_MODE_CHILD && sys->pDevTable->hasBeacons(0)) {
+    if (state->mode != NET_STATE_MODE_PARENT && sys->pDevTable->hasBeacons(0)) {
         if (state->timer != 0) {
             state->timer--;
         } else {
@@ -432,7 +437,7 @@ static void func_02041940(NetState *state) {
         NetState_SetFuncLine(_pNetState, func_020417e8, 0, 889);
         return;
     }
-    if (state->mode == NET_STATE_MODE_PARENT) {
+    if (state->mode == NET_STATE_MODE_CHILD) {
         return;
     }
     if (state->timer != 0) {
@@ -469,7 +474,7 @@ void func_02041a30(int a0, void (*callback)(void *work), int a2) {
         _pNetState->connectCallback = callback;
         NetState_SetFuncLine(_pNetState, func_020419a8, MATH_Rand32(&_pNetState->rand, 30), 956);
     } else {
-        if (_pNetState->unk53 && _pNetState->mode != NET_STATE_MODE_CHILD) {
+        if (_pNetState->useParentMac && _pNetState->mode != NET_STATE_MODE_PARENT) {
             func_0203eec0(TRUE, _pNetState->parentMac, 0x200, func_020412d4);
         } else {
             func_0203ede0(1, 0x200);
@@ -482,18 +487,18 @@ void func_02041a30(int a0, void (*callback)(void *work), int a2) {
 static void func_02041af4(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (_pNetState->mode == NET_STATE_MODE_PARENT && _pNetState->func == func_02041940 &&
+    if (_pNetState->mode == NET_STATE_MODE_CHILD && _pNetState->func == func_02041940 &&
         sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_02041910, 0, 982);
     }
-    if (_pNetState->mode == NET_STATE_MODE_CHILD && _pNetState->func == func_020416c8) {
+    if (_pNetState->mode == NET_STATE_MODE_PARENT && _pNetState->func == func_020416c8) {
         NetState_SetFuncLine(_pNetState, func_020415ec, 0, 991);
     }
 }
 
 static void func_02041b70(int mode, int a1, const u8 *mac) {
     GFL_NetGetSys();
-    _pNetState->unk53 = a1;
+    _pNetState->useParentMac = a1;
     _pNetState->mode = mode;
     if (mac != NULL) {
         MI_CpuCopy8(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));
@@ -514,17 +519,17 @@ static void func_02041bc8(NetState *state) {
 
 void func_02041c00(int mode, int a1, const u8 *mac) {
     GFL_NetGetSys();
-    _pNetState->unk53 = a1;
+    _pNetState->useParentMac = a1;
     _pNetState->mode = mode;
     if (mac != NULL) {
         MI_CpuCopy8(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));
     } else {
         MI_CpuFill8(_pNetState->parentMac, 0xff, sizeof(_pNetState->parentMac));
     }
-    if (_pNetState->mode == NET_STATE_MODE_PARENT) {
+    if (_pNetState->mode == NET_STATE_MODE_CHILD) {
         NetState_SetFuncLine(_pNetState, func_020415ec, 0, 1062);
     }
-    if (_pNetState->mode == NET_STATE_MODE_CHILD) {
+    if (_pNetState->mode == NET_STATE_MODE_PARENT) {
         NetState_SetFuncLine(_pNetState, func_02041bc8, 0, 1070);
         func_02041bc8(_pNetState);
     }
@@ -677,7 +682,7 @@ static void func_02041f78(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
     GFLNetInitData *ini = GFL_NetGetInitData();
 
-    if (!sys->pDevTable->connectFriend(state->unk48, ini->maxConnectNum, 0)) {
+    if (!sys->pDevTable->connectFriend(state->friendIndex, ini->maxConnectNum, 0)) {
         NetSystem_ResetBuffersIfAllocated();
         NetHandle_FreeAll(sys);
         NetHandle_InitAll(sys);
@@ -689,7 +694,7 @@ BOOL func_02041fd0(int a0) {
     if (a0 != -1 && !func_0203ecac(a0)) {
         return FALSE;
     }
-    _pNetState->unk48 = a0;
+    _pNetState->friendIndex = a0;
     NetState_SetFuncLine(_pNetState, func_02041f78, 0, 1466);
     return TRUE;
 }
@@ -697,7 +702,7 @@ BOOL func_02041fd0(int a0) {
 BOOL func_0204200c(void) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    _pNetState->unk48 = -2;
+    _pNetState->friendIndex = -2;
     NetSystem_ResetBuffersIfAllocated();
     NetHandle_FreeAll(sys);
     NetHandle_InitAll(sys);
@@ -708,7 +713,7 @@ BOOL func_0204200c(void) {
 BOOL func_0204204c(void) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    _pNetState->unk48 = -2;
+    _pNetState->friendIndex = -2;
     NetSystem_ResetBuffersIfAllocated();
     NetHandle_FreeAll(sys);
     NetHandle_InitAll(sys);
@@ -717,7 +722,7 @@ BOOL func_0204204c(void) {
 }
 
 void func_0204208c(void) {
-    _pNetState->unk48 = -1;
+    _pNetState->friendIndex = -1;
     NetState_SetFuncLine(_pNetState, func_02041f78, 0, 1539);
 }
 
@@ -785,11 +790,11 @@ void func_020421ac(BOOL a0) {
 
 void func_020421f8(int netId, int size, const void *data, void *work, NetHandle *handle) {
     func_020421ac(TRUE);
-    _pNetState->unk4A = TRUE;
+    _pNetState->disconnectReceived = TRUE;
 }
 
 u8 func_02042210(void) {
-    return _pNetState->unk4A;
+    return _pNetState->disconnectReceived;
 }
 
 BOOL NetState_IsWifiConnecting(void) {
@@ -886,7 +891,7 @@ void func_02042424(int a0) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     if (_pNetState != NULL) {
-        _pNetState->unk50 = a0;
+        _pNetState->disconnectError = a0;
     }
     sys->pDevTable->setDisconnectError(a0);
 }
