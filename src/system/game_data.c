@@ -706,7 +706,7 @@ static void GameData_LoadBackup(GameData *gameData) {
 
     HighLinkSave_GetLevels(gameData->saveControl, GameData_GetMyPassPowerLevels(gameData));
     cityState = GameData_GetMyCityState(gameData);
-    func_0200af9c(getReshZekBlkAddress(gameData->saveControl), (u32 *)cityState);
+    ReshZekSave_GetCityState(getReshZekBlkAddress(gameData->saveControl), (u32 *)cityState);
     GimmickState_LoadSave(gameData->saveControl, &gameData->gimmickState);
 
     playerSave = gameData->playerSave;
@@ -740,7 +740,7 @@ static void GameData_SaveBackup(GameData *gameData) {
 
     HighLinkSave_SetLevels(gameData->saveControl, GameData_GetMyPassPowerLevels(gameData));
     cityState = GameData_GetMyCityState(gameData);
-    func_0200af8c(getReshZekBlkAddress(gameData->saveControl), (u32 *)cityState);
+    ReshZekSave_SetCityState(getReshZekBlkAddress(gameData->saveControl), (u32 *)cityState);
     GimmickState_StoreSave(&gameData->gimmickState, gameData->saveControl);
 
     playerSave = gameData->playerSave;

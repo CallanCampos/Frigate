@@ -362,6 +362,8 @@
 . 0x0200af6c MusicalSave_GetProps
 . 0x0200af74 ReshZekSave_GetSize
 . 0x0200af78 ReshZekSave_Init
+. 0x0200af8c ReshZekSave_SetCityState
+. 0x0200af9c ReshZekSave_GetCityState
 . 0x0200afa8 ReshZekSave_GetPkm
 . 0x0200afac ReshZekSave_SetPkm
 . 0x0200afbc TrainerLogSave_Get

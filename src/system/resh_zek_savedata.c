@@ -20,11 +20,11 @@ ReshZekSave *getReshZekBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_RESH_ZEK);
 }
 
-void func_0200af8c(ReshZekSave *reshZek, const u32 *src) {
+void ReshZekSave_SetCityState(ReshZekSave *reshZek, const u32 *src) {
     MI_CpuCopy8(src, &reshZek->cityState, sizeof(reshZek->cityState));
 }
 
-void func_0200af9c(ReshZekSave *reshZek, u32 *dest) {
+void ReshZekSave_GetCityState(ReshZekSave *reshZek, u32 *dest) {
     MI_CpuCopy8(&reshZek->cityState, dest, sizeof(reshZek->cityState));
 }
 
