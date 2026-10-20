@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-1044 of 1688 functions are in source files.
+1296 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -151,6 +151,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gpiTransfer.c` | `0x0217b5fc`–`0x0217b6a8` | 2 | complete | descriptive |
 | `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
 | `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
+| `gbucket.c` | `0x0217bb30`–`0x0217beac` | 14 | complete | descriptive |
+| `gstats.c` | `0x0217beac`–`0x0217c788` | 28 | partial | descriptive |
+| `gt2Auth.c` | `0x0217c788`–`0x0217c944` | 4 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
@@ -158,6 +161,15 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gt2Message.c` | `0x0217d3ac`–`0x0217e768` | 51 | partial | descriptive |
 | `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
+| `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
+| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
+| `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | partial | descriptive |
+| `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
+| `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |
+| `sb_queryengine.c` | `0x02182220`–`0x021828c4` | 20 | complete | descriptive |
+| `sb_server.c` | `0x021828c4`–`0x02182f64` | 36 | complete | descriptive |
+| `sb_serverbrowsing.c` | `0x02182f64`–`0x021833f8` | 17 | complete | descriptive |
+| `sb_serverlist.c` | `0x021833f8`–`0x02184fc8` | 55 | complete | descriptive |
 
 ### Overlay 12
 

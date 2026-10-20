@@ -1,5 +1,6 @@
 #include "dwc/gt2Connection.h"
 #include "dwc/ext.h"
+#include "dwc/gt2Auth.h"
 #include "dwc/gt2Callback.h"
 #include "dwc/gt2Message.h"
 #include "dwc/gt2Socket.h"
@@ -51,8 +52,8 @@ int func_ov011_0217ce38(GTI2Connection *connection, const void *message, int len
     if (callbacks != NULL) {
         connection->callbacks = *callbacks;
     }
-    func_ov011_0217c7ec(challenge);
-    func_ov011_0217c87c(connection->response, challenge);
+    gti2GetChallenge(challenge);
+    gti2GetResponse(connection->response, challenge);
     func_ov011_0217e2c0(connection, challenge);
     connection->state = 0;
     return 0;

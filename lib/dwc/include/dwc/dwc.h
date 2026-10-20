@@ -6,6 +6,9 @@
 #include "dwc/connectinet.h"
 #include "dwc/error.h"
 #include "dwc/gsMemory.h"
+// GameSpy's stats (gstats.c): the game's name, which the server URLs are made from, the secret key and the stats
+// server's host, which the start sets
+#include "dwc/gstats.h"
 #include "dwc/init.h"
 #include "gfl/heap.h"
 #include "nitro/rtc.h"
@@ -96,11 +99,6 @@ int func_ov011_02160f98(int index, const char *key, int defaultValue);
 // by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives). It also
 // gives GameSpy its memory functions (malloc, free, realloc and memalign), with dwc/gsMemory.h's gsiMemoryCallbacksSet
 void func_ov011_02169df8(int server);
-// A text with the library's service name, which the server URLs are made from; the start copies the game's name
-// into it
-extern char data_ov011_021917bc[];
-// The host name of the game stats server, 64 bytes, which the start sets
-extern char data_ov011_02188fe4[];
 
 // Overlay 11's, in a file that is not written yet: sets the URL of the Nintendo authentication server, and reads it.
 // The settings utility (overlay 182) sets its own for as long as it runs

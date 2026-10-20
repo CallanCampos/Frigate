@@ -156,7 +156,7 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
         Gdb_RunLibrary();
         return Gdb_SetStartupError(error);
     }
-    Sake_SetGame(sGdb.sake, data_ov011_021917bc, gameId, data_ov011_021918bc);
+    Sake_SetGame(sGdb.sake, gcd_gamename, gameId, gcd_secret_key);
     Sake_SetLoginTicket(sGdb.sake, ((const GdbUserData *)userData)->profileId, &ticket);
     Gdb_SetUrls(server);
     DWC_InitGHTTP(0);
@@ -697,27 +697,25 @@ static void Gdb_SetUrls(int server) {
     switch (server) {
     case 1:
         OS_SNPrintf(gSakeStorageUrl, 128,
-                    "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                    data_ov011_021917bc);
+                    "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx", gcd_gamename);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         OS_SNPrintf(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(uploadUrl);
         OS_SNPrintf(downloadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     case 0:
     default:
         OS_SNPrintf(gSakeStorageUrl, 128,
-                    "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                    data_ov011_021917bc);
+                    "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx", gcd_gamename);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         OS_SNPrintf(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(uploadUrl);
         OS_SNPrintf(downloadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     }
