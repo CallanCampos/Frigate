@@ -780,9 +780,14 @@
 . 0x02011064 getFlagList
 . 0x020110ac PokewoodSave_CheckFlag
 . 0x020110d4 PokewoodSave_SetFlag
+. 0x02011100 PokewoodSave_IsMovieUnlocked
+. 0x0201110c PokewoodSave_UnlockMovie
 . 0x02011130 PokewoodSave_UpdateRecord
 . 0x0201117c PokewoodSave_MarkRecordSeen
 . 0x02011194 PokewoodSave_GetRecord
+. 0x020111b0 PokewoodSave_GetLevelPoints
+. 0x020111d0 PokewoodSave_AddLevelPoints
+. 0x020111ec PokewoodSave_GetLevelOfPoints
 . 0x0201122c PokewoodSave_GetLevelBit
 . 0x02011240 PokewoodSave_SetLevelBit
 . 0x02011270 PokewoodSave_GetLastSeries

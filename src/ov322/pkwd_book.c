@@ -2512,7 +2512,7 @@ static void PkwdBook_ListMovies(PkwdBookWork *wk) {
     int i;
 
     for (i = 0; i < LIST_MOVIE_COUNT; i++) {
-        if (func_02011100(wk->param->save, i) == TRUE) {
+        if (PokewoodSave_IsMovieUnlocked(wk->param->save, i) == TRUE) {
             wk->movies[count].movie = i;
             if (!func_02011118(wk->param->save, i)) {
                 wk->movies[count].isNew = TRUE;

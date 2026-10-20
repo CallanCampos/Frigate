@@ -367,7 +367,7 @@ static BOOL PokewoodCmd_GetNewUnlockKind(VM *vm, FieldScriptEnv *env) {
 static BOOL PokewoodCmd_TestAndSetLevelBit(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSave *save = Pokewood_GetSave(env);
-    u32 level = func_020111ec(func_020111b0(save));
+    u32 level = PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save));
 
     *var = PokewoodSave_GetLevelBit(save, level);
     PokewoodSave_SetLevelBit(save, level, 1);

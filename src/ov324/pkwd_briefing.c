@@ -1490,7 +1490,7 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
     GFL_WordSetFormatStrbuf(text->wordSet, strbuf, text->credits[CREDIT_PLAYER_ROLE]);
     GFL_StrBufFree(text->credits[CREDIT_PLAYER_ROLE]);
     text->credits[CREDIT_PLAYER_ROLE] = strbuf;
-    PkwdBriefingText_SetStar(text, func_020111ec(func_020111b0(save)), starLevel);
+    PkwdBriefingText_SetStar(text, PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save)), starLevel);
 }
 
 static void PkwdBriefingText_FreeCredits(PkwdBriefingText *text) {

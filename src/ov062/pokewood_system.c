@@ -209,7 +209,7 @@ void Pokewood_CheckMedals(GameData *gameData) {
     if (PokewoodSave_CountFlags(save, 2) == POKEWOOD_MOVIE_COUNT) {
         MedalBox_GiveMedal(box, 0xd9);
     }
-    if (func_020111ec(func_020111b0(save)) >= 2) {
+    if (PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(save)) >= 2) {
         MedalBox_DiscoverMedal(box, 0xd9);
     }
     count = PokewoodSave_CountFlags(save, 4);
@@ -268,7 +268,7 @@ void PokewoodSystem_AddGradePoints(GameData *gameData, PokewoodSystem *sys, u32 
     PokewoodSave *save = PokewoodSave_Get(gameData);
 
     if (func_020111a0(save, slot) == 0) {
-        func_020111d0(save, sAmounts[result]);
+        PokewoodSave_AddLevelPoints(save, sAmounts[result]);
     }
 }
 

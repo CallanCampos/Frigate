@@ -111,7 +111,7 @@ PokewoodSave *PokewoodSave_Get(GameData *gameData);
 BOOL PokewoodSave_CheckFlag(PokewoodSave *save, u32 list, u32 movie);
 void PokewoodSave_SetFlag(PokewoodSave *save, u32 list, u32 movie);
 // PokewoodSave_CheckFlag for list 0, whether a movie is unlocked, and for list 1
-BOOL func_02011100(PokewoodSave *save, u32 movie);
+BOOL PokewoodSave_IsMovieUnlocked(PokewoodSave *save, u32 movie);
 BOOL func_02011118(PokewoodSave *save, u32 movie);
 // PokewoodSave_SetFlag for list 1
 void func_02011124(PokewoodSave *save, u32 movie);
@@ -124,9 +124,9 @@ PokewoodRecord *PokewoodSave_GetRecord(PokewoodSave *save, u32 movie);
 u8 func_020111a0(PokewoodSave *save, u32 slot);
 void func_020111a8(PokewoodSave *save, u32 slot, u8 value);
 // The level points, 0 to 99, adding to them, and the level from 0 to 4 that points give
-s16 func_020111b0(PokewoodSave *save);
-void func_020111d0(PokewoodSave *save, int amount);
-int func_020111ec(int value);
+s16 PokewoodSave_GetLevelPoints(PokewoodSave *save);
+void PokewoodSave_AddLevelPoints(PokewoodSave *save, int amount);
+int PokewoodSave_GetLevelOfPoints(int value);
 // A bit for each of those levels
 BOOL PokewoodSave_GetLevelBit(PokewoodSave *save, u32 bit);
 void PokewoodSave_SetLevelBit(PokewoodSave *save, u32 bit, u32 value);
