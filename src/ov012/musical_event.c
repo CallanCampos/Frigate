@@ -538,15 +538,15 @@ static void MusicalEvent_TakeShot(MusicalEventWork *work) {
         }
         for (j = 0; j < 8; j++) {
             shot->pokes[pos].equips[j].itemId = 0xff;
-            shot->pokes[pos].equips[j].unk2 = 0;
-            shot->pokes[pos].equips[j].unk4 = 10;
+            shot->pokes[pos].equips[j].rotation = 0;
+            shot->pokes[pos].equips[j].pos = 10;
         }
         for (j = 0; j < 9; j++) {
             if (poke->equips[j].itemId != 0xff) {
                 slot = poke->equips[j].slot;
                 shot->pokes[pos].equips[slot].itemId = poke->equips[j].itemId;
-                shot->pokes[pos].equips[slot].unk2 = poke->equips[j].unk2;
-                shot->pokes[pos].equips[slot].unk4 = j;
+                shot->pokes[pos].equips[slot].rotation = poke->equips[j].unk2;
+                shot->pokes[pos].equips[slot].pos = j;
             }
         }
     }
@@ -636,15 +636,15 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
     u8 j;
     u16 *otherTotal;
     u32 chance;
-    MusicalSaveUnk1E0 *entry;
+    MusicalAudienceGift *entry;
 
     props = GFL_HeapAllocate(HEAPID_GAMEEVENT, 40, TRUE, "musical_event.c", 1041);
     total = 0;
     for (i = 0; i < 10; i++) {
         entry = func_0200ae6c(work->musicalSave, i);
-        entry->unk0 = 4;
-        entry->unk1 = 0;
-        entry->unk2 = 0;
+        entry->topKind = 4;
+        entry->hasProp = 0;
+        entry->prop = 0;
     }
     if (work->online == FALSE) {
         total = func_0200af38(work->musicalSave) + MusicalEvent_GetPoints(work, work->playerPos);
@@ -689,11 +689,11 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
     for (i = 0; i < count; i++) {
         entry = func_0200ae6c(work->musicalSave, order[i]);
         chance = MusicalEvent_GetPoints(work, work->playerPos);
-        entry->unk0 = winner;
+        entry->topKind = winner;
         if ((u8)GFL_RandomLCAlt(100) < chance && numProps != 0) {
             index = GFL_RandomLCAlt(numProps);
-            entry->unk1 = 1;
-            entry->unk2 = props[index];
+            entry->hasProp = 1;
+            entry->prop = props[index];
             for (; index < numProps - 1; index++) {
                 props[index] = props[index + 1];
             }

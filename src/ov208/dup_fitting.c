@@ -957,10 +957,10 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     }
     work->badgeFrame = 0;
     {
-        MusicalSaveUnk1B0 *saved = func_0200ad44(work->param->save);
+        MusicalSaveEquip *saved = func_0200ad44(work->param->save);
 
         for (i = 0; i < 8; i++) {
-            if (saved[i].unk0 != DUP_FITTING_EQUIP_NONE) {
+            if (saved[i].pos != DUP_FITTING_EQUIP_NONE) {
                 DupFitting_AddStageItem(work, saved[i].itemId);
             }
         }
@@ -2166,7 +2166,7 @@ static void DupFitting_RotateHeld(DupFittingWork *work) {
 }
 
 static void DupFitting_SaveWornItems(DupFittingWork *work) {
-    MusicalSaveUnk1B0 *saved = func_0200ad44(work->param->save);
+    MusicalSaveEquip *saved = func_0200ad44(work->param->save);
     DupFittingItemNode *node;
     u8 i = 0;
 
@@ -2176,7 +2176,7 @@ static void DupFitting_SaveWornItems(DupFittingWork *work) {
         u16 pos = DupFittingItemNode_GetEquipPos(node);
 
         MusPokeDraw_GetEquipPos(work->poke, pos);
-        saved[i].unk0 = pos;
+        saved[i].pos = pos;
         saved[i].itemId = DupFittingItemNode_GetEntry(node)->itemId;
         saved[i].rotation = work->param->poke->equips[pos].unk2;
         work->param->poke->equips[pos].itemId = DupFittingItemNode_GetEntry(node)->itemId;
