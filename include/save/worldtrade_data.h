@@ -28,8 +28,8 @@ void WorldTradeData_GetPkm(WorldTradeData *data, PartyPkm *pkm);
 PartyPkm *WorldTradeData_GetPkmPtr(WorldTradeData *data);
 // Its callers pass the box the Pokémon came from as well, which it ignores
 void WorldTradeData_SetPkm(WorldTradeData *data, PartyPkm *pkm, u32 box);
-void func_0200b4ec(WorldTradeData *data, u32 value);
-void func_0200b4f4(WorldTradeData *data, u32 value);
+void WorldTradeData_SetDepositTradeDate(WorldTradeData *data, u32 value);
+void WorldTradeData_SetExchangeDate(WorldTradeData *data, u32 value);
 u16 func_0200b4fc(WorldTradeData *data);
 
 #endif // POKEBW2_SAVE_WORLDTRADE_DATA_H

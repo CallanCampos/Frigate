@@ -388,6 +388,8 @@
 . 0x0200b4b8 WorldTradeData_GetPkm
 . 0x0200b4d0 WorldTradeData_GetPkmPtr
 . 0x0200b4d4 WorldTradeData_SetPkm
+. 0x0200b4ec WorldTradeData_SetDepositTradeDate
+. 0x0200b4f4 WorldTradeData_SetExchangeDate
 . 0x0200b50c Regulation_Create
 . 0x0200b524 Regulation_Copy
 . 0x0200b574 Regulation_GetParam

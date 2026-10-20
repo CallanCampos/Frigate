@@ -1584,9 +1584,9 @@ static void Upload_TradeDateUpDate(WorldTradeData *data, int type) {
     func_ov011_0215dda8(&date, &time);
     value = (date.year << 24) | ((date.month & 0xff) << 16) | ((date.day & 0xff) << 8) | date.week;
     if (type == 1) {
-        func_0200b4f4(data, value);
+        WorldTradeData_SetExchangeDate(data, value);
     } else {
-        func_0200b4ec(data, value);
+        WorldTradeData_SetDepositTradeDate(data, value);
     }
 }
 
