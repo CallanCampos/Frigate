@@ -1,7 +1,7 @@
 // The camera of the entrance events, and the events of a warp that play the entrance, such as a door: where the player
 // goes in, walks and comes out
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
-// Additional camera API, helper and table names are our descriptive guesses.
+// Additional camera API, struct member, helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/entrance_camera.h"
@@ -32,7 +32,7 @@ struct EntranceCamera {
     FieldCameraAnimation animation;
     FieldCameraAnimationController *controller;
     EntranceCameraParam param;
-    BOOL started;
+    BOOL configured;
     BOOL unk68;
     BOOL unk6c;
 };
@@ -630,7 +630,7 @@ void EntranceCamera_Configure(EntranceCamera *camera, const EntranceCameraParam 
             break;
         }
     }
-    camera->started = TRUE;
+    camera->configured = TRUE;
 }
 
 void EntranceCamera_StartAnimation(EntranceCamera *camera) {
@@ -666,7 +666,7 @@ void EntranceCamera_Init(EntranceCamera *camera, Field *field) {
     MI_CpuFill8(camera, 0, sizeof(EntranceCamera));
     camera->field = field;
     camera->camera = Field_GetCameraSystem(field);
-    camera->started = FALSE;
+    camera->configured = FALSE;
 }
 
 void EntranceCamera_CreateController(EntranceCamera *camera, HeapID heapId) {
