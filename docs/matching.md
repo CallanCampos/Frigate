@@ -8,6 +8,14 @@ tools that show the differences.
 
 ## Registers
 
+- A constant kept in a register for the whole function that is not ours (the original's `movs r7, #1` with every 0
+  built where it is used, where ours keeps 0 in `r7`) can come from a store that the optimizer drops. `wcm_dsi.c`'s
+  `func_02769e60`, which does at once what `wcm.c`'s reset request and its completion do, matches only with the
+  request's `work->resetPending = 1;` before the completion's `work->resetPending = 0;`: the dead store is removed,
+  but the 1 it used is the constant kept.
+- A static assigned in both arms of an `if`/`else` is stored and then read through a second load of its address
+  (`ldr r0, =s; strb r1, [r0]; ldr r1, =s; ldrb r1, [r1]`), where a ternary assigned to it keeps the address for the
+  read: `wcm_dsi.c`'s `func_0276a9e4` sets `sConnectIndex` from the access point's capability bit so.
 - A handle parameter cast inside, `SOCL_Connect(int s, ...) { SOCLSocket *socket = (SOCLSocket *)s;`, and a `void *`
   parameter cast to a block-scoped typed pointer where it is used (`SOC_RecvFrom`'s `SocAddrIn *addr = from;`) are
   allocated differently from typed parameters: NitroWiFi's `SOCL_Connect` (8 bytes) and `SOC_RecvFrom` (20 bytes)
@@ -2402,7 +2410,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   condition must stay `which == 0`, since `which ? B : A` still builds 1 first.
 - A flag set to 0 and then to 1 under a branch (`movs #0`, `cmp`, `beq`, `movs #1`) is
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
-  also needs the call before it in the argument list read into a local first.
+  also needs the call before it in the argument list read into a local first. For a `u16` parameter the local also
+  saves the narrowing that a comparison or a ternary as the argument gets (`lsls`, `lsrs`): `wcm_dsi.c`'s
+  `func_02769b80` passes `NWM_Connect` its `u16 authMode = 0;`, set to 1 under the shared-key option.
 - A 0/1 comparison flag is built set-then-clear (`movs r5, #1; beq; movs r5, #0`) when its register is free at
   the `cmp`, and with branches (`bne; movs r1, #1; b; movs r1, #0`) when its register is an operand of the
   `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
@@ -2412,7 +2422,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   throughout (`bne; adds r4, r5`, where `int` arms give `beq; adds r5, r4`) also has enum constants for both arms:
   `btlv_effvm.c`'s `BtlvEffvm_GetDefenderPositions` stores
   `(wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY` into its `int` array. One enum arm,
-  a cast of the whole ternary, or the condition inverted stays 5 bytes off.
+  a cast of the whole ternary, or the condition inverted stays 5 bytes off. A 0/1 argument laid out 0 first after a
+  `bne` is the same: `wcm_dsi.c`'s `func_0276a0ac` passes `x == WCM_OPTION_POWER_ACTIVE ? NWM_POWER_MODE_ACTIVE :
+  NWM_POWER_MODE_SAVE`, where `? 0 : 1`, `? FALSE : TRUE`, `!=` and casts all give `beq` and the 1 first.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
   on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just

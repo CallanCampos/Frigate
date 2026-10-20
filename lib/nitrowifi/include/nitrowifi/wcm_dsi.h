@@ -3,9 +3,9 @@
 
 #include "types.h"
 
-// Descriptive header for WCM's DSi backend in LTD. These helpers share WCM's work, globals and notifications;
-// their underlying wireless primitives are separate from this WCM-level interface. The original source filename,
-// SDK symbol names and exact object boundaries remain unconfirmed, so the functions retain their default names.
+// WCM's DSi backend (wcm_dsi.c), in the LTD autoload's .ltdmain: the steps that wcm.c takes through TwlSDK's NWM in
+// mode 2. They share WCM's work, globals and notifications. The ROM names none of them, so the file has a descriptive
+// name and the functions keep their default names.
 s32 func_02769930(void);
 s32 func_02769a30(void);
 s32 func_02769aa4(const u8 *bssid, const u8 *essid, u32 option);

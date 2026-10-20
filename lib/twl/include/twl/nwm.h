@@ -33,6 +33,41 @@ typedef struct NWMBssDesc {
     u8 elements[];
 } NWMBssDesc;
 
+// The start of the event that a command's callback gets: the number of the command it answers and its result
+typedef struct NWMEventHeader {
+    u16 cmd;
+    u16 result;
+} NWMEventHeader;
+
+// The event of a scan (NWM_StartScan): the channel scanned, as its bit, and the access points found on it
+typedef struct NWMScanEvent {
+    NWMEventHeader header;
+    u32 channel;
+    u16 unk_08;
+    u16 bssDescCount;
+    u32 unk_0c;
+    NWMBssDesc *bssDesc[32];
+    u16 linkLevel[32];
+} NWMScanEvent;
+
+// The event of the command 8, which connects: the association ID, and the status of a failed connection
+typedef struct NWMConnectEvent {
+    NWMEventHeader header;
+    u8 unk_04[0xa];
+    u16 aid;
+    u16 status;
+} NWMConnectEvent;
+
+// The event of a frame received in the buffer of NWM_SetReceivingFrameBuffer: the frame, which begins with its 802.3
+// header, and its length
+typedef struct NWMReceiveEvent {
+    NWMEventHeader header;
+    u16 index;
+    s16 rssi;
+    u32 length;
+    u8 *frame;
+} NWMReceiveEvent;
+
 // What a scan is asked for. The command takes its fields from here, and the library zeroes the buffer
 typedef struct NWMScanParam {
     u8 *buffer;
@@ -92,6 +127,10 @@ NWMRetCode func_027032e0(NWMCallback callback, u32 index, const NWMBlockParam *b
 NWMRetCode NWM_Disconnect(NWMCallback callback);
 // The command 0xd (the name is a guess from the state): the mode is 0 to 3, and the 0x50 bytes of data go along
 NWMRetCode NWM_Connect(NWMCallback callback, u32 mode, u32 arg, const void *data, u16 arg2);
+// The argument of the command 0xe, which WCM gives it from its power saving option after it connects (the names are
+// guesses from that)
+enum { NWM_POWER_MODE_ACTIVE, NWM_POWER_MODE_SAVE };
+
 // The command 0xe
 NWMRetCode func_027035f4(NWMCallback callback, u32 arg);
 // NWM_SendFrame: sends the frame, whose first 12 bytes the library fills with the two MAC addresses. The callback runs

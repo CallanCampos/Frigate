@@ -5636,6 +5636,7 @@ ltd_autoload_0 0x02769594 PM_GetAutoExit
 ltd_autoload_0 0x0276aebc sPriority
 ltd_autoload_0 0x0276b0ec PMi_PostExitCallbackList
 ltd_autoload_0 0x0276b0f0 PMi_BatteryLowCallbackInfo
+ltd_autoload_0 0x0276b100 sConnectIndex
 ltd_autoload_0 0x0276b104 sCameraInitialized
 ltd_autoload_0 0x0276b108 sUnused
 ltd_autoload_0 0x0276b10c sCameraWork

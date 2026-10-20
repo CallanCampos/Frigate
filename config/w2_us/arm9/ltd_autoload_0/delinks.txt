@@ -96,3 +96,8 @@ lib/twl/src/dsp/dsp_g711_image.c:
 lib/twl/src/dsp/dsp_graphics_image.c:
     complete
     .rodata     start:0x0272ecec end:0x02767480
+
+lib/nitrowifi/src/wcm/wcm_dsi.c:
+    complete
+    .ltdmain    start:0x02769930 end:0x0276ae98
+    .bss        start:0x0276b100 end:0x0276b104
