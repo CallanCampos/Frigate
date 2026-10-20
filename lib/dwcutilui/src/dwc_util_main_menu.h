@@ -8,10 +8,10 @@
 // The ROM does not embed this source file's name; dwc_util_main_menu.c is descriptive.
 
 // Ends the utility once the screens have faded out
-void func_ov182_021ae4f4(void);
+void DWCUtilMainMenu_ExitUtility(void);
 // The utility's first screen, which loads the graphics and the message file
-void func_ov182_021ae574(void);
+void DWCUtilMainMenu_InitUtility(void);
 // The choice between the connection settings and the options
-void func_ov182_021ae748(void);
+void DWCUtilMainMenu_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_MAIN_MENU_H

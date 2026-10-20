@@ -6,11 +6,11 @@
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
-static BOOL func_ov182_021b8934(void);
-static void func_ov182_021b89fc(void *arg);
-static void func_ov182_021b8a58(const WMStartScanExCallback *cb);
-static void func_ov182_021b8b48(const WMStartScanExCallback *cb);
-static void func_ov182_021b8c18(DWCUtilTask *task, void *arg);
+static BOOL DWCUtilUsbScan_StartScan(void);
+static void DWCUtilUsbScan_WmCallback(void *arg);
+static void DWCUtilUsbScan_ListConnectors(const WMStartScanExCallback *cb);
+static void DWCUtilUsbScan_CheckConnectors(const WMStartScanExCallback *cb);
+static void DWCUtilUsbScan_FirstResultTask(DWCUtilTask *task, void *arg);
 
 #define USB_SCAN_CONNECTORS 16
 // How long the first scan lists the connectors before it gives a result
@@ -34,7 +34,7 @@ typedef struct DWCUtilUsbScan {
     // The task that gives the result of the first scan
     DWCUtilTask *task;
     // TRUE while the wireless is stopped, 2 once WM_End's callback came: volatile, as the WM callback sets it from
-    // the ARM7's interrupt while func_ov182_021b895c waits for it
+    // the ARM7's interrupt while DWCUtilUsbScan_Stop waits for it
     volatile u8 stopping;
     // A result found while there was no callback
     u8 pending;
@@ -53,13 +53,13 @@ static const WMScanExParam sUsbScanParam = {
 
 static DWCUtilUsbScan *sUsbScan;
 
-BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback) {
+BOOL DWCUtilUsbScan_Start(DWCUtilUsbScanCallback callback) {
     OSOwnerInfo info;
 
-    sUsbScan = func_ov182_021bc4d8(sizeof(DWCUtilUsbScan), 32);
+    sUsbScan = DWCUtilHeap_AllocClear(sizeof(DWCUtilUsbScan), 32);
     sUsbScan->callback = callback;
     sUsbScan->startTick = OS_GetTick();
-    if (WM_Initialize(sUsbScan, func_ov182_021b89fc, 3) == WM_ERRCODE_OPERATING) {
+    if (WM_Initialize(sUsbScan, DWCUtilUsbScan_WmCallback, 3) == WM_ERRCODE_OPERATING) {
         do {
             WM_ReadStatus(&sUsbScan->status);
         } while (sUsbScan->status.state != WM_STATE_IDLE);
@@ -70,51 +70,51 @@ BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback) {
         MI_CpuCopy8(sUsbScanSsid, sUsbScan->param.ssid, 8);
         sUsbScan->param.ssid[9] = TRUE;
         MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
-        if (func_ov182_021b8934()) {
-            sUsbScan->task = func_ov182_021bd200(0, func_ov182_021b8c18, NULL, 120);
+        if (DWCUtilUsbScan_StartScan()) {
+            sUsbScan->task = DWCUtilTask_Create(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
             return TRUE;
         }
     }
-    func_ov182_021bc4f0(&sUsbScan);
+    DWCUtilHeap_FreeAndNull(&sUsbScan);
     return FALSE;
 }
 
-static BOOL func_ov182_021b8934(void) {
-    if (WM_StartScanEx(func_ov182_021b89fc, &sUsbScan->param) == WM_ERRCODE_OPERATING) {
+static BOOL DWCUtilUsbScan_StartScan(void) {
+    if (WM_StartScanEx(DWCUtilUsbScan_WmCallback, &sUsbScan->param) == WM_ERRCODE_OPERATING) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov182_021b895c(void) {
+BOOL DWCUtilUsbScan_Stop(void) {
     sUsbScan->stopping = TRUE;
     WM_ReadStatus(&sUsbScan->status);
     if (sUsbScan->status.state != WM_STATE_IDLE) {
-        if (WM_Reset(func_ov182_021b89fc) != WM_ERRCODE_OPERATING) {
+        if (WM_Reset(DWCUtilUsbScan_WmCallback) != WM_ERRCODE_OPERATING) {
             return FALSE;
         }
         do {
             WM_ReadStatus(&sUsbScan->status);
         } while (sUsbScan->status.state != WM_STATE_IDLE);
     }
-    if (WM_End(func_ov182_021b89fc) != WM_ERRCODE_OPERATING) {
+    if (WM_End(DWCUtilUsbScan_WmCallback) != WM_ERRCODE_OPERATING) {
         return FALSE;
     }
     if (sUsbScan->task != NULL) {
-        func_ov182_021bd280(0, sUsbScan->task);
+        DWCUtilTask_Remove(0, sUsbScan->task);
     }
     while (sUsbScan->stopping != 2) {
     }
-    func_ov182_021bc4f0(&sUsbScan);
+    DWCUtilHeap_FreeAndNull(&sUsbScan);
     return TRUE;
 }
 
-void func_ov182_021b89e8(DWCUtilUsbScanCallback callback) {
+void DWCUtilUsbScan_SetCallback(DWCUtilUsbScanCallback callback) {
     sUsbScan->callback = callback;
 }
 
 // The callback of the wireless: the scan is started again after each channel, and takes the connectors found
-static void func_ov182_021b89fc(void *arg) {
+static void DWCUtilUsbScan_WmCallback(void *arg) {
     WMStartScanExCallback *cb = arg;
 
     if (cb->errcode == WM_ERRCODE_SUCCESS) {
@@ -126,14 +126,14 @@ static void func_ov182_021b89fc(void *arg) {
             switch (cb->state) {
             case WM_STATECODE_PARENT_FOUND:
                 if (sUsbScan->listed) {
-                    func_ov182_021b8b48(cb);
+                    DWCUtilUsbScan_CheckConnectors(cb);
                 } else {
-                    func_ov182_021b8a58(cb);
+                    DWCUtilUsbScan_ListConnectors(cb);
                 }
-                func_ov182_021b8934();
+                DWCUtilUsbScan_StartScan();
                 break;
             case WM_STATECODE_PARENT_NOT_FOUND:
-                func_ov182_021b8934();
+                DWCUtilUsbScan_StartScan();
                 break;
             default:
                 OS_Terminate();
@@ -145,7 +145,7 @@ static void func_ov182_021b89fc(void *arg) {
 
 // The first scan: keeps the connectors found, and gives the result at once when one that didn't take the console
 // starts to
-static void func_ov182_021b8a58(const WMStartScanExCallback *cb) {
+static void DWCUtilUsbScan_ListConnectors(const WMStartScanExCallback *cb) {
     int i;
     int j;
 
@@ -182,7 +182,7 @@ static void func_ov182_021b8a58(const WMStartScanExCallback *cb) {
 }
 
 // The scans after the first: a connector that didn't take the console and now does is the result
-static void func_ov182_021b8b48(const WMStartScanExCallback *cb) {
+static void DWCUtilUsbScan_CheckConnectors(const WMStartScanExCallback *cb) {
     int i;
     DWCUtilUsbScan *scan;
     int count;
@@ -221,7 +221,7 @@ static void func_ov182_021b8b48(const WMStartScanExCallback *cb) {
 
 // The result of the first scan, once it has run for USB_SCAN_TIME: a connector that takes the console, some that do
 // and some that don't, or none; with only connectors that don't, the scans go on
-static void func_ov182_021b8c18(DWCUtilTask *task, void *arg) {
+static void DWCUtilUsbScan_FirstResultTask(DWCUtilTask *task, void *arg) {
     DWCUtilUsbScan *scan;
     OSTick now = OS_GetTick();
     BOOL ready;
@@ -258,6 +258,6 @@ static void func_ov182_021b8c18(DWCUtilTask *task, void *arg) {
         }
         sUsbScan->task = NULL;
         sUsbScan->listed = TRUE;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }

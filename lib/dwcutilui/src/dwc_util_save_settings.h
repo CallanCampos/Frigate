@@ -7,6 +7,6 @@
 // console's Wi-Fi settings, shows the message of the save, and goes back to the first screen of the connection
 // settings.
 // The ROM does not embed this source file's name; dwc_util_save_settings.c is descriptive.
-void func_ov182_021b4404(void);
+void DWCUtilSaveSettings_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SAVE_SETTINGS_H

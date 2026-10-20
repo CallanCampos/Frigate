@@ -13,19 +13,19 @@
 // The connection utility's message after a successful AOSS setup, which stays for 120 frames, before the message of
 // the connection test.
 // The ROM does not embed this source file's name; dwc_util_page_multi4.c is named after its screen, char/xb4Multi.
-void func_ov182_021b0ad0(void);
+void DWCUtilPageMulti4_Init(void);
 
 // The end of the message once both screens have faded out: it goes on to the message of the connection test.
-// dwc_util_test_done.c has the same function, func_ov182_021b4c58
-static inline void func_ov182_021b0bb8Inline(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021bbf7c(0);
+// dwc_util_test_done.c has the same function, DWCUtilTestDone_WaitFadeOut
+static inline void DWCUtilPageMulti4_WaitFadeOutInline(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adff0(0, 1);
-        func_ov182_021adfbc(func_ov182_021b6588);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetScreenArgs(0, 1);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
     }
 }
 

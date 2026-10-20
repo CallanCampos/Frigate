@@ -22,13 +22,13 @@ BOOL DWCUtilScreen_Start(int msgIndex, int slot, int value) {
         return FALSE;
     }
 
-    func_ov182_021ab67c(sBlankScreenPath, GXS_LoadBG0Scr);
+    DWCUtilGfxResource_Load(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
-    text = func_ov182_021bbdec(1, 0);
-    str = func_ov182_021ae118(data_ov182_021c40b8, msgIndex, slot, value);
-    flags = func_ov182_021ab7b4();
-    func_ov182_021bc0a4(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
-    func_ov182_021bc184(text);
+    text = DWCUtilText_CreateBg(1, 0);
+    str = DWCUtilMsg_GetWithDigit(gDWCUtilMsg, msgIndex, slot, value);
+    flags = DWCUtilGfxResource_GetTextFlags();
+    DWCUtilText_DrawRect(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
+    DWCUtilText_MarkDirty(text);
     sScreenActive = TRUE;
     return TRUE;
 }
@@ -37,7 +37,7 @@ BOOL DWCUtilScreen_Stop(void) {
     if (!sScreenActive) {
         return FALSE;
     }
-    func_ov182_021bbf7c(1);
+    DWCUtilText_DestroyScreenBg(1);
     sScreenActive = FALSE;
     return TRUE;
 }

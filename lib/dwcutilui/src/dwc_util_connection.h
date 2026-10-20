@@ -9,13 +9,13 @@
 // The ROM does not embed this source file's name; dwc_util_connection.c is descriptive.
 
 // The message file of the utility's language, which the first screen opens (dwc_util_main_menu.c)
-extern DWCUtilMsg *data_ov182_021c40b8;
+extern DWCUtilMsg *gDWCUtilMsg;
 
-void func_ov182_021ae3d8(void);
-void func_ov182_021ae424(void);
+void DWCUtilConnection_Start(void);
+void DWCUtilConnection_Stop(void);
 // 0 while the test works, 1 and 2 at its two steps, 3 once it connected with a WEP key or none, 4 when it failed, 5
 // when it connected otherwise
-int func_ov182_021ae440(void);
-void func_ov182_021ae4b0(void);
+int DWCUtilConnection_GetState(void);
+void DWCUtilConnection_SaveResult(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_CONNECTION_H

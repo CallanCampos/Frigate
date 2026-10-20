@@ -54,7 +54,7 @@ void func_ov182_021ba768(DownloadPlaySysContext *context, const DownloadPlaySysG
     OS_GetTick();
     DWCBm_ReadAllNtrPages(sDownloadPlaySysWork->backupPages);
     OS_GetTick();
-    sDownloadPlaySysWork->sendData = func_ov182_021b7e6c();
+    sDownloadPlaySysWork->sendData = DWCUtilWifiSettings_GetPages();
 }
 
 // Asks the flow to end from the state it is in, and says whether it took the request. The states that ended the

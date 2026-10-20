@@ -17,14 +17,14 @@ enum {
 };
 
 // Slides the row of a step in, and shows the row of another step in its place
-void func_ov182_021b8154(int step);
-void func_ov182_021b84c0(int step);
-// Slides the row out and frees it; func_ov182_021b854c is whether a slide runs, func_ov182_021b87b0 whether no row is
-// sliding out
-void func_ov182_021b849c(void);
-BOOL func_ov182_021b854c(void);
-BOOL func_ov182_021b87b0(void);
+void DWCUtilSubScreen_SlideInRow(int step);
+void DWCUtilSubScreen_ChangeRow(int step);
+// Slides the row out and frees it; DWCUtilSubScreen_IsSliding is whether a slide runs, DWCUtilSubScreen_IsNotSlidingOut
+// whether no row is sliding out
+void DWCUtilSubScreen_SlideOutRow(void);
+BOOL DWCUtilSubScreen_IsSliding(void);
+BOOL DWCUtilSubScreen_IsNotSlidingOut(void);
 // Loads a screen as the sub screen's BG 1 at the next VBlank
-void func_ov182_021b87d0(int screen);
+void DWCUtilSubScreen_LoadScreen(int screen);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SUB_SCREEN_H

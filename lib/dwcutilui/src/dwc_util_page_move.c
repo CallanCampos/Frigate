@@ -21,39 +21,39 @@ typedef struct DWCUtilPageMove {
     u8 yes;
 } DWCUtilPageMove;
 
-static void func_ov182_021b021c(void);
-static void func_ov182_021b026c(void);
-static void func_ov182_021b0290(void);
-static void func_ov182_021b02a8(void);
-static void func_ov182_021b02c4(void);
+static void DWCUtilPageMove_LoadGraphics(void);
+static void DWCUtilPageMove_FadeIn(void);
+static void DWCUtilPageMove_WaitFadeIn(void);
+static void DWCUtilPageMove_WaitDialog(void);
+static void DWCUtilPageMove_Main(void);
 static void func_ov182_021b030c(void);
 static void func_ov182_021b0310(void);
-static void func_ov182_021b0314(void);
-static void func_ov182_021b0350(void);
-static void func_ov182_021b0390(void);
-static void func_ov182_021b0414(int event);
+static void DWCUtilPageMove_FadeOut(void);
+static void DWCUtilPageMove_WaitFadeOut(void);
+static void DWCUtilPageMove_WaitMoveEnd(void);
+static void DWCUtilPageMove_OnMoveEvent(int event);
 
 static DWCUtilPageMove sPageMove;
 
-void func_ov182_021b0198(void) {
-    const MBUserInfo *user = func_ov182_021ae240();
-    DWCUtilText *text = func_ov182_021bbdec(0, 0);
+void DWCUtilPageMove_Init(void) {
+    const MBUserInfo *user = DWCUtilMove_GetChildUser();
+    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
     u16 name[MB_USER_NAME_LENGTH + 1];
 
     sPageMove.yes = FALSE;
     sPageMove.interrupted = FALSE;
-    func_ov182_021b021c();
+    DWCUtilPageMove_LoadGraphics();
     MI_CpuClear16(name, sizeof(name));
     MI_CpuCopy16(user->name, name, user->nameLength * 2);
-    func_ov182_021bc0a4(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
-    func_ov182_021bc184(text);
-    func_ov182_021ae224(func_ov182_021b0414);
-    func_ov182_021b8cf0(0x1d, 4, 0, -1, 0);
-    func_ov182_021adfbc(func_ov182_021b026c);
+    DWCUtilText_DrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
+    DWCUtilText_MarkDirty(text);
+    DWCUtilMove_SetCallback(DWCUtilPageMove_OnMoveEvent);
+    DWCUtilDialog_Open(0x1d, 4, 0, -1, 0);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeIn);
 }
 
-static void func_ov182_021b021c(void) {
-    func_ov182_021ab67c("char/jb5Move.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilPageMove_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/jb5Move.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -61,42 +61,43 @@ static void func_ov182_021b021c(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b026c(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b0290);
+static void DWCUtilPageMove_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeIn);
 }
 
-static void func_ov182_021b0290(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b02a8);
+static void DWCUtilPageMove_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitDialog);
     }
 }
 
-static void func_ov182_021b02a8(void) {
-    if (func_ov182_021b8f14() != -2) {
-        func_ov182_021adfbc(func_ov182_021b02c4);
+static void DWCUtilPageMove_WaitDialog(void) {
+    if (DWCUtilDialog_GetChoice() != -2) {
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_Main);
     }
 }
 
-static void func_ov182_021b02c4(void) {
+static void DWCUtilPageMove_Main(void) {
     func_ov182_021b030c();
     func_ov182_021b0310();
-    switch (func_ov182_021b8f14()) {
+    switch (DWCUtilDialog_GetChoice()) {
     case 0:
         sPageMove.yes = FALSE;
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
         sPageMove.yes = TRUE;
-        func_ov182_021b80f4(0xe);
+        DWCUtilSound_PlaySe(0xe);
         break;
     default:
         return;
     }
-    func_ov182_021ae224(NULL);
-    func_ov182_021b8eec();
-    func_ov182_021adfbc(func_ov182_021b0314);
+    DWCUtilMove_SetCallback(NULL);
+    DWCUtilDialog_Close();
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeOut);
 }
 
 static void func_ov182_021b030c(void) {
@@ -105,50 +106,51 @@ static void func_ov182_021b030c(void) {
 static void func_ov182_021b0310(void) {
 }
 
-static void func_ov182_021b0314(void) {
-    if (!func_ov182_021b8f24()) {
+static void DWCUtilPageMove_FadeOut(void) {
+    if (!DWCUtilDialog_IsOpen()) {
         if (!sPageMove.yes) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b0350);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeOut);
     }
 }
 
 // Sends the settings, or ends the move
-static void func_ov182_021b0350(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+static void DWCUtilPageMove_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         if (!sPageMove.interrupted && sPageMove.yes == TRUE) {
-            func_ov182_021ae238();
+            DWCUtilMove_StartSending();
         } else {
-            func_ov182_021ae1d4();
+            DWCUtilMove_End();
         }
-        func_ov182_021adfbc(func_ov182_021b0390);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitMoveEnd);
     }
 }
 
 // Waits for the end of the move, unless it goes on
-static void func_ov182_021b0390(void) {
-    if ((sPageMove.interrupted || !sPageMove.yes) && !func_ov182_021ae210()) {
+static void DWCUtilPageMove_WaitMoveEnd(void) {
+    if ((sPageMove.interrupted || !sPageMove.yes) && !DWCUtilMove_HasEnded()) {
         return;
     }
-    func_ov182_021bbf7c(0);
-    func_ov182_021bc228(0, 0x15);
+    DWCUtilText_DestroyScreenBg(0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sPageMove.yes) {
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     }
-    func_ov182_021adfc8(0, 1);
+    DWCUtilMain_SetLayout(0, 1);
     if (sPageMove.interrupted) {
-        func_ov182_021adfbc(func_ov182_021aff3c);
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
     } else if (!sPageMove.yes) {
-        func_ov182_021bc228(1, 1);
-        func_ov182_021adfbc(func_ov182_021af25c);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     } else {
-        func_ov182_021adfbc(func_ov182_021af714);
+        DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitMove);
     }
 }
 
-static void func_ov182_021b0414(int event) {
+static void DWCUtilPageMove_OnMoveEvent(int event) {
     sPageMove.interrupted = TRUE;
 }

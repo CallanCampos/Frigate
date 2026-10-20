@@ -8,6 +8,6 @@
 // test (dwc_util_page_multi4.h). A failure shows a dialog, and the utility goes back to the choice of the setup.
 // The ROM does not embed this source file's name; dwc_util_page_step3.c is named after its screen's characters,
 // char/ybBgStep3.
-void func_ov182_021b06f4(void);
+void DWCUtilPageStep3_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_PAGE_STEP3_H

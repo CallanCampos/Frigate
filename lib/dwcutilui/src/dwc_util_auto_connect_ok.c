@@ -11,107 +11,109 @@
 #include "dwc_util_text.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021b6400(void);
-static void func_ov182_021b6448(void);
-static void func_ov182_021b646c(void);
-static void func_ov182_021b6484(void);
+static void DWCUtilAutoConnectOk_LoadGraphics(void);
+static void DWCUtilAutoConnectOk_FadeIn(void);
+static void DWCUtilAutoConnectOk_WaitFadeIn(void);
+static void DWCUtilAutoConnectOk_Main(void);
 static void func_ov182_021b6490(void);
-static void func_ov182_021b6494(void);
-static void func_ov182_021b64cc(void);
-static void func_ov182_021b6540(void);
+static void DWCUtilAutoConnectOk_FadeOut(void);
+static void DWCUtilAutoConnectOk_WaitFadeOut(void);
+static void DWCUtilAutoConnectOk_UpdateTimer(void);
 
 // The frames since the message appeared
 static u8 sAutoConnectOkFrames;
 
-void func_ov182_021b63dc(void) {
+void DWCUtilAutoConnectOk_Init(void) {
     sAutoConnectOkFrames = 0;
-    func_ov182_021b6400();
-    func_ov182_021ab6f0(0x2d);
-    func_ov182_021adfbc(func_ov182_021b6448);
+    DWCUtilAutoConnectOk_LoadGraphics();
+    DWCUtilGfxResource_ShowMessage(0x2d);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_FadeIn);
 }
 
-static void func_ov182_021b6400(void) {
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilAutoConnectOk_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b6448(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b646c);
+static void DWCUtilAutoConnectOk_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_WaitFadeIn);
 }
 
-static void func_ov182_021b646c(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b6484);
+static void DWCUtilAutoConnectOk_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_Main);
     }
 }
 
-static void func_ov182_021b6484(void) {
-    func_ov182_021b6540();
+static void DWCUtilAutoConnectOk_Main(void) {
+    DWCUtilAutoConnectOk_UpdateTimer();
     func_ov182_021b6490();
 }
 
 static void func_ov182_021b6490(void) {
 }
 
-static void func_ov182_021b6494(void) {
+static void DWCUtilAutoConnectOk_FadeOut(void) {
     int from;
 
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from != 0) {
-        func_ov182_021b849c();
+        DWCUtilSubScreen_SlideOutRow();
     }
-    func_ov182_021bbac4(3, 1, 1, 8);
-    func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021b64cc);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_WaitFadeOut);
 }
 
 // Once the fades and the buttons are done, back to the settings of the connection, or to the menu that the utility
 // was started from
-static void func_ov182_021b64cc(void) {
+static void DWCUtilAutoConnectOk_WaitFadeOut(void) {
     int from;
 
-    if (func_ov182_021bbaac(1) != 0 || func_ov182_021bbaac(0) != 0) {
+    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
         return;
     }
-    if (!func_ov182_021b87b0()) {
+    if (!DWCUtilSubScreen_IsNotSlidingOut()) {
         return;
     }
-    func_ov182_021bbf7c(0);
+    DWCUtilText_DestroyScreenBg(0);
     DWCUtilScreen_Stop();
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x15);
-    func_ov182_021adfc8(2, 1);
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetLayout(2, 1);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from == 0) {
-        func_ov182_021adff0(0, 0);
-        func_ov182_021adfbc(func_ov182_021b2d48);
+        DWCUtilMain_SetScreenArgs(0, 0);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
     } else {
-        func_ov182_021adfbc(func_ov182_021ae748);
+        DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
     }
 }
 
 // After three seconds, ends the utility's run when it was started for the connection test alone
-static void func_ov182_021b6540(void) {
+static void DWCUtilAutoConnectOk_UpdateTimer(void) {
     int from;
 
     sAutoConnectOkFrames++;
     if (sAutoConnectOkFrames >= 180) {
-        func_ov182_021adffc(NULL, &from);
-        switch (func_ov182_021ae024()) {
+        DWCUtilMain_GetScreenArgs(NULL, &from);
+        switch (DWCUtilMain_GetStartScreen()) {
         case 0:
             break;
         case 1:
             if (from != 0) {
-                func_ov182_021adfbc(func_ov182_021ae4f4);
+                DWCUtilMain_SetUpdate(DWCUtilMainMenu_ExitUtility);
                 return;
             }
             break;
         }
-        func_ov182_021adfbc(func_ov182_021b6494);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_FadeOut);
     }
 }

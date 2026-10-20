@@ -23,7 +23,7 @@ typedef struct DWCUtilBanks {
 
 static DWCUtilBanks sBanks;
 
-void func_ov182_021bcf38(void) {
+void DWCUtilBank_Init(void) {
     sBanks.bg = GX_DisableBankForBG();
     sBanks.obj = GX_DisableBankForOBJ();
     sBanks.bgExtPltt = GX_DisableBankForBGExtPltt();
@@ -38,15 +38,15 @@ void func_ov182_021bcf38(void) {
     sBanks.arm7 = GX_DisableBankForARM7();
     sBanks.lcdc = GX_DisableBankForLCDC();
     GX_SetBankForARM7(sBanks.arm7);
-    func_ov182_021bd040();
+    DWCUtilBank_ClearVram();
 }
 
-void func_ov182_021bcf9c(void) {
+void DWCUtilBank_Exit(void) {
     GX_DisableBankForBG();
     GX_DisableBankForOBJ();
     GX_DisableBankForSubBG();
     GX_DisableBankForSubOBJ();
-    func_ov182_021bd040();
+    DWCUtilBank_ClearVram();
     GX_SetBankForBG(sBanks.bg);
     GX_SetBankForOBJ(sBanks.obj);
     GX_SetBankForBGExtPltt(sBanks.bgExtPltt);
@@ -71,7 +71,7 @@ void func_ov182_021bcf9c(void) {
     G2S_SetBG3Offset(0, 0);
 }
 
-void func_ov182_021bd040(void) {
+void DWCUtilBank_ClearVram(void) {
     GX_SetBankForLCDC(GX_VRAM_A | GX_VRAM_B | GX_VRAM_E | GX_VRAM_F | GX_VRAM_G | GX_VRAM_H | GX_VRAM_I);
     // Banks A and B, and E to I
     MI_CpuClearFast((void *)HW_LCDC_VRAM_A, 0x40000);

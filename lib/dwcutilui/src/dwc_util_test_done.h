@@ -7,6 +7,6 @@
 // frames, before the message of the connection test with auto-connect (as dwc_util_page_multi4.h's after an AOSS
 // setup).
 // The ROM does not embed this source file's name; dwc_util_test_done.c is descriptive.
-void func_ov182_021b4b68(void);
+void DWCUtilTestDone_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_TEST_DONE_H

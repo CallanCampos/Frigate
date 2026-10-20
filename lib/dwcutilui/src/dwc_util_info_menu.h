@@ -9,16 +9,16 @@
 // erases the connections and the Wi-Fi ID and then turns the console off, and the console's information, its MAC
 // address and its Wi-Fi ID.
 // The ROM does not embed this source file's name; dwc_util_info_menu.c is descriptive.
-void func_ov182_021aeafc(void);
-void func_ov182_021aef34(void);
+void DWCUtilInfoMenu_InitErase(void);
+void DWCUtilInfoMenu_InitInfo(void);
 
 // The keys of a screen with two buttons: A presses the first button, B the second, once they are idle.
 // dwc_util_prompt_yes_no.c, dwc_util_notice_screen.c and dwc_util_usb_intro.c have the same function
-static inline void func_ov182_021aec10Inline(void) {
-    if (func_ov182_021bc798(1)) {
+static inline void DWCUtilInfoMenu_EraseHandleInputInline(void) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(1);
     }
-    if (func_ov182_021bc798(2)) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }

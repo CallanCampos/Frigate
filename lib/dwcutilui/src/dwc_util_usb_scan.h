@@ -14,12 +14,12 @@ enum {
 typedef void (*DWCUtilUsbScanCallback)(int result);
 
 // The connection utility's search for the Nintendo Wi-Fi USB Connector: a scan for the access points whose SSID starts
-// with NWCUSBAP, which calls the callback with a result. func_ov182_021b8834 starts it (FALSE when it couldn't),
-// func_ov182_021b895c ends it (FALSE when the wireless couldn't be stopped), and func_ov182_021b89e8 changes the
+// with NWCUSBAP, which calls the callback with a result. DWCUtilUsbScan_Start starts it (FALSE when it couldn't),
+// DWCUtilUsbScan_Stop ends it (FALSE when the wireless couldn't be stopped), and DWCUtilUsbScan_SetCallback changes the
 // callback; with none, a connector found is kept for the next callback.
 // The ROM does not embed this source file's name; dwc_util_usb_scan.c is descriptive.
-BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback);
-BOOL func_ov182_021b895c(void);
-void func_ov182_021b89e8(DWCUtilUsbScanCallback callback);
+BOOL DWCUtilUsbScan_Start(DWCUtilUsbScanCallback callback);
+BOOL DWCUtilUsbScan_Stop(void);
+void DWCUtilUsbScan_SetCallback(DWCUtilUsbScanCallback callback);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_USB_SCAN_H
