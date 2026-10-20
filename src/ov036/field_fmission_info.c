@@ -48,9 +48,9 @@ enum {
 #define FMISSION_TIME_DIGITS 2
 
 // The actors. At the bottom, slid up into place: with more than one player in the mission, a label and the digits of
-// func_0201482c's count; the score's label and digits; the mission's icon; and the highlight of a rising score, a flash
-// over the digits and a sign beside the icon. At the top, slid down: the time's panel, its colon, the minutes, the
-// seconds, and the highlight of time gained
+// LinkFestival_GetShownScore's count; the score's label and digits; the mission's icon; and the highlight of a rising
+// score, a flash over the digits and a sign beside the icon. At the top, slid down: the time's panel, its colon, the
+// minutes, the seconds, and the highlight of time gained
 enum {
     FMISSION_ACTOR_GROUP_LABEL,
     FMISSION_ACTOR_GROUP_DIGITS,
@@ -351,7 +351,7 @@ static void FieldFMissionInfo_UpdateTime(FieldFMissionInfo *info, BOOL force) {
 static void FieldFMissionInfo_UpdateGroupCount(FieldFMissionInfo *info) {
     if (info->groupVisible) {
         ClActor_SetVisible(info->actors[FMISSION_ACTOR_GROUP_LABEL], TRUE);
-        FieldFMissionInfo_SetNumber(info, func_0201482c(info->festival), FMISSION_COUNT_DIGITS,
+        FieldFMissionInfo_SetNumber(info, LinkFestival_GetShownScore(info->festival), FMISSION_COUNT_DIGITS,
                                     FMISSION_ACTOR_GROUP_DIGITS, FALSE);
     }
 }
@@ -370,7 +370,7 @@ static void FieldFMissionInfo_GetScoreLayout(int mode, int score, u16 *iconX, u1
 static void FieldFMissionInfo_UpdateScore(FieldFMissionInfo *info) {
     int i;
     int mode = info->config->info.unk10_6;
-    int score = func_02014828(info->festival);
+    int score = LinkFestival_GetShownTotal(info->festival);
     u16 iconX;
     u16 scoreX;
 
@@ -458,9 +458,9 @@ static void FieldFMissionInfo_SlideTask(TCBEx *task, void *data) {
 static void FieldFMissionInfo_UpdateScoreHighlight(FieldFMissionInfo *info) {
     u32 score = LinkFestival_GetTotalScore(info->festival);
 
-    if (func_02014828(info->festival) < score) {
+    if (LinkFestival_GetShownTotal(info->festival) < score) {
         info->scoreTimer = FMISSION_HIGHLIGHT_FRAMES;
-        func_02014830(info->festival, score);
+        LinkFestival_SetShownTotal(info->festival, score);
         GFL_SndSEPlay(SEQ_SE_SW_FES_04);
         if (!info->scoreAnim) {
             TCBEx *task;
@@ -493,9 +493,9 @@ static void FieldFMissionInfo_ScoreHighlightTask(TCBEx *task, void *data) {
 }
 
 static void FieldFMissionInfo_UpdateTimeHighlight(FieldFMissionInfo *info) {
-    if (func_02014838(info->festival)) {
+    if (LinkFestival_GetSecondsGained(info->festival)) {
         info->timeTimer = FMISSION_HIGHLIGHT_FRAMES;
-        func_0201483c(info->festival);
+        LinkFestival_ClearSecondsGained(info->festival);
         if (!info->timeAnim) {
             TCBEx *task;
             FieldFMissionBlink *blink;

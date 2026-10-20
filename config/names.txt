@@ -953,10 +953,17 @@
 . 0x020145dc LinkFestival_GetSecondsLeft
 . 0x020145ec LinkFestival_GetRanking
 . 0x020146fc LinkFestival_GetLog
+. 0x02014708 LinkFestival_GetViewLog
 . 0x02014710 LinkFestival_GetPassPowers
 . 0x0201472c LinkFestival_StartMission
+. 0x02014774 LinkFestival_StartTimer
 . 0x020147a8 LinkFestival_SetState
 . 0x020147bc LinkFestival_GetState
+. 0x02014828 LinkFestival_GetShownTotal
+. 0x0201482c LinkFestival_GetShownScore
+. 0x02014830 LinkFestival_SetShownTotal
+. 0x02014838 LinkFestival_GetSecondsGained
+. 0x0201483c LinkFestival_ClearSecondsGained
 . 0x02014844 LinkFestival_IsNewZoneFromOutside
 . 0x02014864 LinkFestival_GetEntries
 . 0x02014870 LinkFestival_GetTotalScore
@@ -965,6 +972,7 @@
 . 0x02014920 LinkFestival_AddMissionScore
 . 0x0201494c LinkFestival_GetMemberCount
 . 0x02014964 LinkFestival_AddRecord
+. 0x020149b0 LinkFestival_ShouldSkipOffer
 . 0x02014a00 LinkFestival_UpdateBest
 . 0x02014a4c LinkFestival_IsBestChanged
 . 0x02014a54 LinkFestival_IsBestMine

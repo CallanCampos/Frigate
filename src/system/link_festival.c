@@ -151,7 +151,7 @@ void *LinkFestival_GetLog(LinkFestival *festival) {
     return &festival->log;
 }
 
-void *func_02014708(LinkFestival *festival) {
+void *LinkFestival_GetViewLog(LinkFestival *festival) {
     return &festival->viewLog;
 }
 
@@ -176,7 +176,7 @@ void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined)
     GameData_SetFunfestMission(festival->gameData, TRUE);
 }
 
-void func_02014774(LinkFestival *festival, u32 arg1) {
+void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1) {
     if (isFesMissionAvailable(&festival->config)) {
         if (festival->config.unk24 == -1) {
             FestMissionConfig_StartTimer(&festival->config);
@@ -209,24 +209,24 @@ u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival) {
     return GetMapBGMIDByPlayerState2(festival->gameData, zoneId, GameData_GetSeason(festival->gameData));
 }
 
-u16 func_02014828(LinkFestival *festival) {
+u16 LinkFestival_GetShownTotal(LinkFestival *festival) {
     return festival->shownTotal;
 }
 
-u16 func_0201482c(LinkFestival *festival) {
+u16 LinkFestival_GetShownScore(LinkFestival *festival) {
     return festival->shownScore;
 }
 
-void func_02014830(LinkFestival *festival, u16 value) {
+void LinkFestival_SetShownTotal(LinkFestival *festival, u16 value) {
     festival->shownTotal = value;
     festival->shownScore = festival->config.missionId;
 }
 
-u16 func_02014838(LinkFestival *festival) {
+u16 LinkFestival_GetSecondsGained(LinkFestival *festival) {
     return festival->secondsGained;
 }
 
-void func_0201483c(LinkFestival *festival) {
+void LinkFestival_ClearSecondsGained(LinkFestival *festival) {
     festival->secondsGained = 0;
 }
 
@@ -333,7 +333,7 @@ void LinkFestival_AddRecord(LinkFestival *festival, void *mission) {
     FestMissionOffers_Remove(festival, mission);
 }
 
-BOOL func_020149b0(LinkFestival *festival, FestMissionConfig *config) {
+BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config) {
     FestMissionInfo *info = (FestMissionInfo *)config;
 
     if (info->index == 0) {

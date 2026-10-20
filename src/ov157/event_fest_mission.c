@@ -320,7 +320,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
         break;
     case 6:
         if (work->joined) {
-            func_02014774(work->festival, work->joined);
+            LinkFestival_StartTimer(work->festival, work->joined);
         }
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;

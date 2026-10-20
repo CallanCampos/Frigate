@@ -458,7 +458,7 @@ static int FestMissionOffers_Find(LinkFestival *festival, const GameBeacon *beac
     if (getStatusOfFesMission(festival) != 0 && FestMissionConfig_IsSame(&festival->config, &config)) {
         return FEST_MISSION_OFFER_REJECT;
     }
-    if (func_020149b0(festival, &config)) {
+    if (LinkFestival_ShouldSkipOffer(festival, &config)) {
         return FEST_MISSION_OFFER_REJECT;
     }
     return FEST_MISSION_OFFER_NEW;

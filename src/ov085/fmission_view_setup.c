@@ -360,7 +360,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
 
     view->beaconStatus = GameData_GetBeaconStatus(view->gameData);
     view->newLog = LinkFestival_GetLog(view->festival);
-    view->log = func_02014708(view->festival);
+    view->log = LinkFestival_GetViewLog(view->festival);
     view->passPowers = LinkFestival_GetPassPowers(view->festival);
     view->logCount = FMissionLogFV_GetCount(view->log);
     view->logTop = FMissionLogFV_GetTop(view->log);
