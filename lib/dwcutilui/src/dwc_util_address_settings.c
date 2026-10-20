@@ -19,6 +19,7 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_screen_ap.h"
 #include "dwc_util_screen_way.h"
+#include "dwc_util_scrollbar.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_string.h"
 #include "dwc_util_task.h"

@@ -115,17 +115,6 @@ void func_ov182_021b7ff0(const u8 *digits, u8 *address);
 // Makes the connection of the console's Wi-Fi settings the one being edited
 void func_ov182_021b7b20(int index);
 
-// The scroll bar of a list: its handle (kind 1 or 2, none for 0) travels range pixels down from x, y. Its event is 1
-// to 3 when the handle is grabbed, dragged and let go, 4 and 6 when an arrow is pressed and 5 and 7 when it is let go
-void func_ov182_021b70a0(int kind, int range, int x, int y, int pos);
-void func_ov182_021b711c(void);
-u8 func_ov182_021b7144(void);
-u8 func_ov182_021b7150(void);
-void func_ov182_021b715c(int pos);
-// Unlocks and locks the scroll bar
-void func_ov182_021b7164(void);
-void func_ov182_021b7174(void);
-
 // The search for the Nintendo Wi-Fi USB Connector and its results (its file is not written yet)
 enum {
     DWC_UTIL_USB_SCAN_NONE,
@@ -136,6 +125,10 @@ typedef void (*DWCUtilUsbScanCallback)(int result);
 BOOL func_ov182_021b8834(DWCUtilUsbScanCallback callback);
 BOOL func_ov182_021b895c(void);
 void func_ov182_021b89e8(DWCUtilUsbScanCallback callback);
+
+// The volume and the pitch of the sound effect (their file is not written yet)
+void func_ov182_021b810c(int volume);
+void func_ov182_021b8120(u32 trackMask, int pitch);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

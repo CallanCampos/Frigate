@@ -1277,8 +1277,8 @@ data_ov182_021c037c kind:data(any) addr:0x021c037c
 data_ov182_021c037e kind:data(any) addr:0x021c037e
 sAutoConnectParam kind:data(any) addr:0x021c03b8
 data_ov182_021c03cc kind:data(any) addr:0x021c03cc
-data_ov182_021c03d8 kind:data(any) addr:0x021c03d8
-data_ov182_021c03db kind:data(any) addr:0x021c03db
+sScrollbarCells kind:data(any) addr:0x021c03d8
+sScrollbarHandleLengths kind:data(any) addr:0x021c03db
 data_ov182_021c03e0 kind:data(any) addr:0x021c03e0
 data_ov182_021c03e4 kind:data(any) addr:0x021c03e4
 data_ov182_021c03ec kind:data(any) addr:0x021c03ec
@@ -1657,7 +1657,7 @@ sUsbDoneFrames kind:bss addr:0x021c4144
 sUsbIntroYes kind:bss addr:0x021c4148
 sUsbSetupState kind:bss addr:0x021c414c
 sBgBuffer kind:bss addr:0x021c4150
-data_ov182_021c415c kind:bss addr:0x021c415c
+sScrollbar kind:bss addr:0x021c415c
 data_ov182_021c4160 kind:bss addr:0x021c4160
 data_ov182_021c4164 kind:bss addr:0x021c4164
 data_ov182_021c4168 kind:bss addr:0x021c4168
