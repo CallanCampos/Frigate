@@ -288,24 +288,24 @@ Regulation *WbtSystem_GetRegulation(WbtSystem *sys) {
         int i;
 
         MI_CpuFill8(&sys->regulation, 0, sizeof(sys->regulation));
-        sys->regulation.unk2 = downloaded->unk0;
-        sys->regulation.unk3 = downloaded->unk1;
-        sys->regulation.unk4 = downloaded->unk2;
-        sys->regulation.unk5 = downloaded->unk3;
-        sys->regulation.unk6 = downloaded->unk4;
-        sys->regulation.unk8 = downloaded->unk6;
-        sys->regulation.unk9 = downloaded->unk7;
+        sys->regulation.minCount = downloaded->unk0;
+        sys->regulation.maxCount = downloaded->unk1;
+        sys->regulation.level = downloaded->unk2;
+        sys->regulation.levelMode = downloaded->unk3;
+        sys->regulation.maxLevelTotal = downloaded->unk4;
+        sys->regulation.allowSameSpecies = downloaded->unk6;
+        sys->regulation.allowSameItem = downloaded->unk7;
         for (i = 0; i < 0x52; i++) {
-            sys->regulation.unkA[i] = downloaded->unk8[i];
+            sys->regulation.bannedSpecies[i] = downloaded->unk8[i];
         }
         for (i = 0; i < 0x4c; i++) {
-            sys->regulation.unk5C[i] = downloaded->unk5A[i];
+            sys->regulation.bannedItems[i] = downloaded->unk5A[i];
         }
-        sys->regulation.unkBA = downloaded->unkA7;
+        sys->regulation.battleType = downloaded->unkA7;
     } else {
         PokeRegulation_Load(WbtSystem_GetRegulationId(sys), &sys->regulation);
         if (sys->tournament == 11 || sys->tournament == 4) {
-            sys->regulation.unk4 = 25;
+            sys->regulation.level = 25;
         }
     }
     return &sys->regulation;

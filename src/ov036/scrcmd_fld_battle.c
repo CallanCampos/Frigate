@@ -100,7 +100,7 @@ static u16 *Regulation_ListCaughtSpecies(Regulation *regulation, GameData *gameD
     species =
         GFL_HeapAllocate(HEAPID_TAIL(heapId), REGULATION_LIST_MAX * sizeof(u16), TRUE, "scrcmd_fld_battle.c", 172);
     for (; i < REGULATION_SPECIES_COUNT; i++) {
-        if ((1 << (i % 8)) & regulation->unkA[i / 8] && PokeDex_IsCaught(pokedex, i)) {
+        if ((1 << (i % 8)) & regulation->bannedSpecies[i / 8] && PokeDex_IsCaught(pokedex, i)) {
             if (*count >= REGULATION_LIST_MAX) {
                 break;
             }

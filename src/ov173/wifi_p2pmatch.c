@@ -2816,8 +2816,8 @@ static int WifiP2PMatch_StatePartySendTiming(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0x68: both parties are sent. Says how many Pokémon to choose
 static int WifiP2PMatch_StatePartySendWait(WIFIP2PMATCH_WORK *wk, int seq) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x11, 10)) {
-        u32 min = Regulation_GetParam(wk->regulation, REGULATION_PARAM_2);
-        u32 max = Regulation_GetParam(wk->regulation, REGULATION_PARAM_3);
+        u32 min = Regulation_GetParam(wk->regulation, REGULATION_PARAM_MIN_COUNT);
+        u32 max = Regulation_GetParam(wk->regulation, REGULATION_PARAM_MAX_COUNT);
 
         u32 msgId;
 

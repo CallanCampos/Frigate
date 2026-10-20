@@ -643,7 +643,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         info.unkA0 = LiveMatchData_GetCount(results, 1);
         info.unkA2 = LiveMatchData_GetCount(results, 2);
         info.unkA4 = LiveMatchData_GetCount(results, 0);
-        info.unkA6 = Regulation_GetParam(regulation, 0x16);
+        info.unkA6 = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES);
         info.look = PlayerInfo_GetUnionView(playerInfo);
         info.startDate = DigitalCardCheck_PackBytes(
             TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));

@@ -1579,15 +1579,15 @@ static void func_ov165_0219c20c(PokeListWork *wk) {
             }
         }
         result = PokeRegulation_CheckPicked(regulation, wk->param->party, picked);
-        if (regulation->unk2 > wk->enteredCount) {
-            PokeList_ShowMessage(wk, regulation->unk2 + 0x60, TRUE, PokeList_MessageDoneSelect);
+        if (regulation->minCount > wk->enteredCount) {
+            PokeList_ShowMessage(wk, regulation->minCount + 0x60, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
-        } else if (regulation->unk3 < wk->enteredCount) {
-            PokeList_ShowMessage(wk, regulation->unk3 + 0x66, TRUE, PokeList_MessageDoneSelect);
+        } else if (regulation->maxCount < wk->enteredCount) {
+            PokeList_ShowMessage(wk, regulation->maxCount + 0x66, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
         } else if (result == 1) {
             PokeListMessage_CreateWordSet(wk, wk->message);
-            PokeListMessage_SetNumber(wk, wk->message, 0, regulation->unk6, 3);
+            PokeListMessage_SetNumber(wk, wk->message, 0, regulation->maxLevelTotal, 3);
             PokeList_ShowMessage(wk, 0x9e, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
             PokeListMessage_FreeWordSet(wk, wk->message);
@@ -2185,7 +2185,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             PokeListPlate_SetEntry(wk, wk->plates[wk->cursorPos], wk->enteredCount);
             wk->enteredCount++;
             PokeList_ShowModeMessage(wk);
-            if (wk->enteredCount == regulation->unk3) {
+            if (wk->enteredCount == regulation->maxCount) {
                 full = TRUE;
             }
             wk->state = 2;
@@ -2196,7 +2196,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             PokeList_ShowMessage(wk, 0x9d, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
         } else if (result == 4) {
-            PokeList_ShowMessage(wk, regulation->unk3 + 0x66, TRUE, PokeList_MessageDoneSelect);
+            PokeList_ShowMessage(wk, regulation->maxCount + 0x66, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
         }
         wk->pkm = NULL;
@@ -2950,7 +2950,7 @@ void PokeList_TimeUp(PokeListWork *wk) {
                 for (i = 0; i < 6; i++) {
                     wk->param->picked[i] = 0;
                 }
-                for (i = 0; i < regulation->unk2; i++) {
+                for (i = 0; i < regulation->minCount; i++) {
                     wk->param->picked[i] = i + 1;
                 }
             }

@@ -657,7 +657,7 @@ static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, vo
         Regulation *regulation = func_0200b530(wk->entry);
         u32 played = LiveMatchData_GetCount(wk->record, 0);
 
-        if (played >= Regulation_GetParam(regulation, 0x16)) {
+        if (played >= Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES)) {
             WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepQuit);
         } else {
             *seq = 5;
@@ -1036,7 +1036,7 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
             Regulation *regulation = func_0200b530(wk->entry);
 
             wk->frames = 0;
-            Regulation_GetParam(regulation, 0x13);
+            Regulation_GetParam(regulation, REGULATION_PARAM_SHOW_PARTNERS);
             *seq = 38;
         }
         break;
@@ -1158,7 +1158,7 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
         Regulation *regulation = func_0200b530(wk->entry);
         u32 played = LiveMatchData_GetCount(wk->record, 0);
 
-        if (played >= Regulation_GetParam(regulation, 0x16)) {
+        if (played >= Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES)) {
             *seq = 2;
         } else {
             *seq = 16;
@@ -1379,7 +1379,7 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         card.unkA0 = LiveMatchData_GetCount(wk->record, 1);
         card.unkA2 = LiveMatchData_GetCount(wk->record, 2);
         card.unkA4 = LiveMatchData_GetCount(wk->record, 0);
-        card.unkA6 = Regulation_GetParam(regulation, 0x16);
+        card.unkA6 = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES);
         card.look = PlayerInfo_GetUnionView(info);
         MI_CpuCopy8(func_0200b794(wk->entry), card.data, sizeof(card.data));
         card.startDate =

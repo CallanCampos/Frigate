@@ -188,7 +188,7 @@ static void BattleSelect_SetupPokeList(BattleSelectParam *param, BattleSelectWor
     PokeListParam_Setup(pokeList, param->gameData, 0x1a, param->party);
     PokeRegulation_ApplyLevelToParty(regulation, pokeList->party);
     pokeList->regulation = regulation;
-    switch (regulation->unkBA) {
+    switch (regulation->battleType) {
     case 0:
         pokeList->unk48 = 0;
         pokeList->partnerCount = 1;

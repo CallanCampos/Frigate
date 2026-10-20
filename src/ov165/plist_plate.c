@@ -687,15 +687,15 @@ u32 PokeListPlate_CheckEntry(PokeListWork *wk, PokeListPlate *plate) {
             u32 otherSpecies = PokeParty_GetParam(other, PKM_PARAM_SPECIES, NULL);
             u32 otherItem = PokeParty_GetParam(other, PKM_PARAM_ITEM, NULL);
 
-            if (species == otherSpecies && regulation->unk8 == 0) {
+            if (species == otherSpecies && regulation->allowSameSpecies == 0) {
                 return 2;
             }
-            if (item == otherItem && item != 0 && regulation->unk9 == 0) {
+            if (item == otherItem && item != 0 && regulation->allowSameItem == 0) {
                 return 3;
             }
         }
     }
-    if (wk->enteredCount == regulation->unk3) {
+    if (wk->enteredCount == regulation->maxCount) {
         return 4;
     }
     return 0;

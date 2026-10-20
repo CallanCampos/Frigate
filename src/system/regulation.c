@@ -63,35 +63,35 @@ u32 Regulation_GetParam(Regulation *regulation, u32 param) {
     case REGULATION_PARAM_1:
         value = regulation->unk1;
         break;
-    case REGULATION_PARAM_2:
-        value = regulation->unk2;
+    case REGULATION_PARAM_MIN_COUNT:
+        value = regulation->minCount;
         break;
-    case REGULATION_PARAM_3:
-        value = regulation->unk3;
+    case REGULATION_PARAM_MAX_COUNT:
+        value = regulation->maxCount;
         break;
-    case REGULATION_PARAM_4:
-        value = regulation->unk4;
+    case REGULATION_PARAM_LEVEL:
+        value = regulation->level;
         break;
-    case REGULATION_PARAM_5:
-        value = regulation->unk5;
+    case REGULATION_PARAM_LEVEL_MODE:
+        value = regulation->levelMode;
         break;
-    case REGULATION_PARAM_6:
-        value = regulation->unk6;
+    case REGULATION_PARAM_MAX_LEVEL_TOTAL:
+        value = regulation->maxLevelTotal;
         break;
-    case REGULATION_PARAM_7:
-        value = regulation->unk8;
+    case REGULATION_PARAM_ALLOW_SAME_SPECIES:
+        value = regulation->allowSameSpecies;
         break;
-    case REGULATION_PARAM_8:
-        value = regulation->unk9;
+    case REGULATION_PARAM_ALLOW_SAME_ITEM:
+        value = regulation->allowSameItem;
         break;
-    case REGULATION_PARAM_11:
-        value = regulation->unkA8;
+    case REGULATION_PARAM_REQUIRED_SPECIES:
+        value = regulation->requiredSpecies;
         break;
-    case REGULATION_PARAM_12:
-        value = regulation->unkAA;
+    case REGULATION_PARAM_REQUIRED_FORM:
+        value = regulation->requiredForm;
         break;
-    case REGULATION_PARAM_13:
-        value = regulation->unkAB;
+    case REGULATION_PARAM_LAUNCHER:
+        value = regulation->launcher;
         break;
     case REGULATION_PARAM_15:
         value = regulation->unkB3;
@@ -99,8 +99,8 @@ u32 Regulation_GetParam(Regulation *regulation, u32 param) {
     case REGULATION_PARAM_16:
         value = regulation->unkB4;
         break;
-    case REGULATION_PARAM_17:
-        value = regulation->unkB5;
+    case REGULATION_PARAM_ALLOW_NICKNAMES:
+        value = regulation->allowNicknames;
         break;
     case REGULATION_PARAM_18:
         value = regulation->unkB6;
@@ -112,10 +112,10 @@ u32 Regulation_GetParam(Regulation *regulation, u32 param) {
         value = regulation->timeLimit;
         break;
     case REGULATION_PARAM_BATTLE_TYPE:
-        value = regulation->unkBA;
+        value = regulation->battleType;
         break;
-    case REGULATION_PARAM_22:
-        value = regulation->unkBB;
+    case REGULATION_PARAM_MAX_BATTLES:
+        value = regulation->maxBattles;
         break;
     }
     return value;
@@ -133,52 +133,52 @@ void Regulation_SetParam(Regulation *regulation, u32 param, int value) {
             regulation->unk1 = value;
         }
         break;
-    case REGULATION_PARAM_2:
+    case REGULATION_PARAM_MIN_COUNT:
         if (value < 6) {
-            regulation->unk2 = value;
+            regulation->minCount = value;
         }
         break;
-    case REGULATION_PARAM_3:
+    case REGULATION_PARAM_MAX_COUNT:
         if (value < 6) {
-            regulation->unk3 = value;
+            regulation->maxCount = value;
         }
         break;
-    case REGULATION_PARAM_4:
+    case REGULATION_PARAM_LEVEL:
         if (value <= 100) {
-            regulation->unk4 = value;
+            regulation->level = value;
         }
         break;
-    case REGULATION_PARAM_5:
+    case REGULATION_PARAM_LEVEL_MODE:
         if (value <= 6) {
-            regulation->unk5 = value;
+            regulation->levelMode = value;
         }
         break;
-    case REGULATION_PARAM_6:
+    case REGULATION_PARAM_MAX_LEVEL_TOTAL:
         if (value <= 600) {
-            regulation->unk6 = value;
+            regulation->maxLevelTotal = value;
         }
         break;
-    case REGULATION_PARAM_7:
+    case REGULATION_PARAM_ALLOW_SAME_SPECIES:
         if (value < 2) {
-            regulation->unk8 = value;
+            regulation->allowSameSpecies = value;
         }
         break;
-    case REGULATION_PARAM_8:
+    case REGULATION_PARAM_ALLOW_SAME_ITEM:
         if (value < 2) {
-            regulation->unk9 = value;
+            regulation->allowSameItem = value;
         }
         break;
-    case REGULATION_PARAM_11:
+    case REGULATION_PARAM_REQUIRED_SPECIES:
         if (value < 686) {
-            regulation->unkA8 = value;
+            regulation->requiredSpecies = value;
         }
         break;
-    case REGULATION_PARAM_12:
-        regulation->unkAA = value;
+    case REGULATION_PARAM_REQUIRED_FORM:
+        regulation->requiredForm = value;
         break;
-    case REGULATION_PARAM_13:
+    case REGULATION_PARAM_LAUNCHER:
         if (value < 2) {
-            regulation->unkAB = value;
+            regulation->launcher = value;
         }
         break;
     case REGULATION_PARAM_15:
@@ -187,9 +187,9 @@ void Regulation_SetParam(Regulation *regulation, u32 param, int value) {
     case REGULATION_PARAM_16:
         regulation->unkB4 = value;
         break;
-    case REGULATION_PARAM_17:
+    case REGULATION_PARAM_ALLOW_NICKNAMES:
         if (value < 2) {
-            regulation->unkB5 = value;
+            regulation->allowNicknames = value;
         }
         break;
     case REGULATION_PARAM_18:
@@ -207,11 +207,11 @@ void Regulation_SetParam(Regulation *regulation, u32 param, int value) {
         break;
     case REGULATION_PARAM_BATTLE_TYPE:
         if (value < 6) {
-            regulation->unkBA = value;
+            regulation->battleType = value;
         }
         break;
-    case REGULATION_PARAM_22:
-        regulation->unkBB = value;
+    case REGULATION_PARAM_MAX_BATTLES:
+        regulation->maxBattles = value;
         break;
     }
 }
@@ -221,13 +221,13 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index) {
     int bit = index % 8;
 
     switch (param) {
-    case REGULATION_PARAM_BITS_A:
-        if (regulation->unkA[byte] & (1 << bit)) {
+    case REGULATION_PARAM_BANNED_SPECIES:
+        if (regulation->bannedSpecies[byte] & (1 << bit)) {
             return TRUE;
         }
         break;
-    case REGULATION_PARAM_BITS_5C:
-        if (regulation->unk5C[byte] & (1 << bit)) {
+    case REGULATION_PARAM_BANNED_ITEMS:
+        if (regulation->bannedItems[byte] & (1 << bit)) {
             return TRUE;
         }
         break;
@@ -242,9 +242,9 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index) {
 
 void func_0200b760(Regulation *regulation, RegulationUnkAC *out) {
     MI_CpuFill8(out, 0, sizeof(RegulationUnkAC));
-    out->unk7 = Regulation_GetParam(regulation, REGULATION_PARAM_13);
-    if (out->unk7 >= 2) {
-        out->unk7 = 1;
+    out->launcher = Regulation_GetParam(regulation, REGULATION_PARAM_LAUNCHER);
+    if (out->launcher >= 2) {
+        out->launcher = 1;
     }
     MI_CpuCopy8(regulation->unkAC, out->unk0, sizeof(out->unk0));
 }

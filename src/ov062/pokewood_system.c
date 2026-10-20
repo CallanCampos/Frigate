@@ -67,8 +67,8 @@ void PokewoodSystem_SetupPokeList(PokewoodSystem *sys, GameData *gameData, PokeL
     PokeListParam_Setup(param, gameData, 0x16, GameData_GetParty(gameData));
     PokeRegulation_Load(POKEWOOD_REGULATION, &sys->regulation);
     movie = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, sys->movie, HEAPID_GAMEEVENT);
-    sys->regulation.unk2 = movie->castCount;
-    sys->regulation.unk3 = movie->castCount;
+    sys->regulation.minCount = movie->castCount;
+    sys->regulation.maxCount = movie->castCount;
     GFL_HeapFree(movie);
     sys->unkCE = 0x11;
     sys->unkCF = 1;
@@ -142,7 +142,7 @@ void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty 
     heapId = HEAPID_TAIL(sys->heapId);
     copy = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), FALSE, "pokewood_system.c", 269);
     PokeParty_ClearPkm(copy);
-    count = sys->regulation.unk3;
+    count = sys->regulation.maxCount;
     for (i = 0; i < count; i++) {
         slot = sys->castSlots[i];
         if (slot == 0) {
@@ -280,7 +280,7 @@ void PokewoodSystem_UpdateCastFame(GameData *gameData, PokewoodSystem *sys) {
     int count;
 
     if (sys->unkD8 != 0) {
-        count = sys->regulation.unk3;
+        count = sys->regulation.maxCount;
         for (i = 0; i < count; i++) {
             pkm = PokeParty_GetPkm(party, sys->castSlots[i] - 1);
             fame = PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL);

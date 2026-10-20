@@ -351,9 +351,9 @@ static void UnionOneself_FreeBoxParty(PokeParty *party) {
 static void UnionOneself_SetRegulation(UnionSystem *unisys, u32 activity) {
     PokeRegulation_Load(UnionOneself_GetRegulationFile(activity), unisys->alloc.regulation);
     if (UnionOneself_IsDoubleActivity(activity) == TRUE) {
-        Regulation_SetParam(unisys->alloc.regulation, 13, 1);
+        Regulation_SetParam(unisys->alloc.regulation, REGULATION_PARAM_LAUNCHER, 1);
     } else {
-        Regulation_SetParam(unisys->alloc.regulation, 13, 0);
+        Regulation_SetParam(unisys->alloc.regulation, REGULATION_PARAM_LAUNCHER, 0);
     }
 }
 
