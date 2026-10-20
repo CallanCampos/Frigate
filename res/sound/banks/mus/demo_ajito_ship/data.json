@@ -1,0 +1,506 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_DEMO_AJITO_SHIP", null, null, null ],
+    "instruments": [
+        {
+            "program": 86,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+            "wave": 7,
+            "base_key": "E2",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 87,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+            "wave": 0,
+            "base_key": "Gs4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "D1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 8,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 63,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 2,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 1,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 4,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 3,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 37,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Ds5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 5,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 6,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 38,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 11,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 10,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 12,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 40,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 15,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 14,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 13,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 14,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 17,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 16,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 10,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DEMO_AJITO_SHIP",
+                    "wave": 18,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

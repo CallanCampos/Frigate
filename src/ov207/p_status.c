@@ -97,7 +97,7 @@ static BOOL PStatus_ProcInit(GameProc *proc, u32 *state, void *data, void *work)
                 param->mode = PSTATUS_MODE_1;
                 param->fromFieldMenu = FALSE;
             }
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         wk->param = param;
         *state = 1;

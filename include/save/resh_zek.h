@@ -12,15 +12,15 @@ struct ReshZekSave {
 }; // size: 0xe0
 
 // The size of the block and its init
-u32 func_0200af74(void);
-void func_0200af78(ReshZekSave *reshZek);
+u32 ReshZekSave_GetSize(void);
+void ReshZekSave_Init(ReshZekSave *reshZek);
 ReshZekSave *getReshZekBlkAddress(SaveControl *save);
 // Copies the word at the start in and out
 void func_0200af8c(ReshZekSave *reshZek, const u32 *src);
 void func_0200af9c(ReshZekSave *reshZek, u32 *dest);
 // The fused Pokémon, and storing one
-PartyPkm *func_0200afa8(ReshZekSave *reshZek);
-void func_0200afac(ReshZekSave *reshZek, const PartyPkm *pkm);
+PartyPkm *ReshZekSave_GetPkm(ReshZekSave *reshZek);
+void ReshZekSave_SetPkm(ReshZekSave *reshZek, const PartyPkm *pkm);
 
 // Unresolved save-init target. This label preserves the relocation's current overlay-11 address selection;
 // it does not identify the intended implementation or conflate it with the SDK's RSSI conversion function.

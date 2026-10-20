@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_aspertia_city.h"
@@ -19,8 +20,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_BG 3
-// The archive of the models and the BG's graphics, which has no name yet
-#define GIMMICK_ARCID 0x12f
 // The archive of the models
 #define GIMMICK_MODEL_ARCID 300
 // The BG's palette in that archive, one for each version
@@ -39,12 +38,12 @@ typedef struct {
     BOOL bgLoaded;
 } GimmickWork;
 
-static void func_ov112_021eed60(GimmickWork *work);
-static void func_ov112_021eee00(GimmickWork *work);
-static void func_ov112_021eee0c(GimmickWork *work);
-static void func_ov112_021eeec8(GimmickWork *work);
-static void func_ov112_021eeed4(GimmickWork *work);
-static void func_ov112_021eeee0(FieldExpObjSystem *system, u8 season);
+static void AspertiaCity_LoadBG(GimmickWork *work);
+static void AspertiaCity_FreeBG(GimmickWork *work);
+static void AspertiaCity_LoadModels(GimmickWork *work);
+static void AspertiaCity_FreeScene(GimmickWork *work);
+static void AspertiaCity_StepAnimations(GimmickWork *work);
+static void AspertiaCity_ShowSeasonModel(FieldExpObjSystem *system, u8 season);
 
 static const G3DSceneAnimationSetup sSpringAnimations[] = { { 1, 0 }, { 2, 0 } };
 static const G3DSceneAnimationSetup sWinterAnimations[] = { { 10, 0 }, { 11, 0 } };
@@ -70,7 +69,7 @@ static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActo
 // How many animations each season's model has
 static const u32 sAnimationCounts[SEASON_COUNT] = { 2, 2, 2, 2 };
 
-void func_ov112_021eec80(Field *field) {
+void AspertiaCity_Init(Field *field) {
     GimmickWork *work;
 
     Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(GimmickWork));
@@ -79,33 +78,33 @@ void func_ov112_021eec80(Field *field) {
     work->expObj = Field_GetExpObjSystem(field);
     work->bgWanted = FALSE;
     work->bgLoaded = FALSE;
-    func_ov112_021eee0c(work);
+    AspertiaCity_LoadModels(work);
 }
 
-void func_ov112_021eecb8(Field *field) {
+void AspertiaCity_End(Field *field) {
     GimmickWork *work;
 
     work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
     if (work->bgLoaded == TRUE) {
-        func_ov112_021eee00(work);
+        AspertiaCity_FreeBG(work);
     }
-    func_ov112_021eeec8(work);
+    AspertiaCity_FreeScene(work);
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
-void func_ov112_021eece0(Field *field) {
+void AspertiaCity_Update(Field *field) {
     GimmickWork *work;
 
     work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
     if (work->bgWanted == TRUE) {
-        func_ov112_021eed60(work);
+        AspertiaCity_LoadBG(work);
         work->bgWanted = FALSE;
         work->bgLoaded = TRUE;
     }
-    func_ov112_021eeed4(work);
+    AspertiaCity_StepAnimations(work);
 }
 
-void func_ov112_021eed04(GameSystem *gsys) {
+void AspertiaCity_PlaySeasonModel(GameSystem *gsys) {
     GameData *gameData;
     GimmickWork *work;
     u8 season;
@@ -118,12 +117,12 @@ void func_ov112_021eed04(GameSystem *gsys) {
     case 1:
     case 2:
     case 3:
-        func_ov112_021eeee0(work->expObj, season);
+        AspertiaCity_ShowSeasonModel(work->expObj, season);
         break;
     }
 }
 
-void func_ov112_021eed44(GameSystem *gsys) {
+void AspertiaCity_RequestBG(GameSystem *gsys) {
     GameData *gameData;
     GimmickWork *work;
 
@@ -132,7 +131,7 @@ void func_ov112_021eed44(GameSystem *gsys) {
     work->bgWanted = TRUE;
 }
 
-static void func_ov112_021eed60(GimmickWork *work) {
+static void AspertiaCity_LoadBG(GimmickWork *work) {
     HeapID heapId;
     ArcTool *arc;
 
@@ -155,7 +154,7 @@ static void func_ov112_021eed60(GimmickWork *work) {
 
         GFL_BGSysCreateBG(GIMMICK_BG, &setup, 0);
     }
-    arc = GFL_ArcSysCreateFileHandle(GIMMICK_ARCID, HEAPID_TAIL(heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GIMMICK, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, GIMMICK_BG_NCLR, 0, 0, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 6, GIMMICK_BG, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, GIMMICK_BG, 0, 0, FALSE, heapId);
@@ -164,12 +163,12 @@ static void func_ov112_021eed60(GimmickWork *work) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
 }
 
-static void func_ov112_021eee00(GimmickWork *work) {
+static void AspertiaCity_FreeBG(GimmickWork *work) {
     GFL_BGSysReleaseBG(GIMMICK_BG);
 }
 
 // Loads the four models, hidden and with their animations stopped at their first frame
-static void func_ov112_021eee0c(GimmickWork *work) {
+static void AspertiaCity_LoadModels(GimmickWork *work) {
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
     int i;
@@ -183,7 +182,7 @@ static void func_ov112_021eee0c(GimmickWork *work) {
         matrix->translation.x = FX32_CONST(744);
         matrix->translation.y = FX32_CONST(16);
         matrix->translation.z = FX32_CONST(12216);
-        func_ov036_021b8248(work->expObj, 0, i, 0);
+        FieldExpObj_SetActorCulling(work->expObj, 0, i, 0);
         FieldExpObj_SetActorHidden(work->expObj, 0, i, TRUE);
         for (j = 0; j < count; j++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, i, j);
@@ -194,16 +193,16 @@ static void func_ov112_021eee0c(GimmickWork *work) {
     }
 }
 
-static void func_ov112_021eeec8(GimmickWork *work) {
+static void AspertiaCity_FreeScene(GimmickWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov112_021eeed4(GimmickWork *work) {
+static void AspertiaCity_StepAnimations(GimmickWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
 // Shows the season's model and plays its animations from their first frame
-static void func_ov112_021eeee0(FieldExpObjSystem *system, u8 season) {
+static void AspertiaCity_ShowSeasonModel(FieldExpObjSystem *system, u8 season) {
     FieldExpObjAnm *anm;
     int count;
     int i;

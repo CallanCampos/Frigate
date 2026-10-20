@@ -1,0 +1,13 @@
+CasteliaCity12_Text_IrisCanGoInside = Iris: You can go inside\nthe sewers from here!{be01}\nWhaddaya think?\nSeems pretty suspicious, right?{be01}
+CasteliaCity12_Text_DidFindTeamPlasma = {0100:1}: {0100:0}!\nDid you find Team Plasma?!
+CasteliaCity12_Text_UhThanksButDont = Uh, thanks...{be01}\nBut you don't need to lie just\nso I won't be disappointed!{be01}
+CasteliaCity12_Text_AughThoseDirtyPokemon = Augh! Those dirty Pokémon thieves!{be01}
+CasteliaCity12_Text_MeansOnlyPlaceStill = That means the only place\nI still haven't checked is...{be01}\n{0100:0}!\nHelp me out!{be01}
+CasteliaCity12_Text_IrisYepSewersPerfect = Iris: Yep! The sewers are\na perfect place for hiding!
+CasteliaCity12_Text_IrisFriendHeSeemed = Iris: Your friend...{be01}\nHe seemed pretty mad.\nDid everything go OK in the sewers?{be01}
+CasteliaCity12_Text_WhatGoingNowRan = So what are you going to do now?{be01}\nYou ran into Gym Leader Burgh\nin the sewers, didn't you?{be01}\nMaybe you should go to the Pokémon Gym\nand see how far you've come!{be01}\nI'm sure battling will help your Pokémon\ncome to understand you better{be00}\nas a Trainer, too!
+CasteliaCity12_Text_SomeTrainersEvenToughen = Some Trainers even toughen up\ntheir Pokémon in the sewers...
+CasteliaCity12_Text_WhatWantGoInto = What?\nYou want to go into the sewers?{be01}\nWell, OK... But watch out\nfor wild Pokémon.
+CasteliaCity12_Text_BecauseTideSometimesMight = Because of the tide, you sometimes\nmight not be able to get into{be00}\nthe Castelia Sewers.{be00}\nIt depends on the season.
+CasteliaCity12_Text_StickUpThumbsCurl = Stick up your thumbs, and curl in\nyour fingers.{be01}\nThis is a thumbs-up pose. That means OK!\nIn some places, it also means well done!
+\pad{34}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Leaf Guard",
+    "description": "Prevents problems with\nstatus in sunny weather."
+}

@@ -1,0 +1,20 @@
+Route20_Text_PokemonBattlesBeginWhen = Pokémon battles begin\nwhen eyes meet!{be00}\nThat's a rule for Trainers!
+Route20_Text_ComeKidWithoutSingle = Come on! A kid without a single\nGym Badge continuing on past here?{be01}\nBattle with the Trainers and Pokémon\nin this area, then battle some more!
+Route20_Text_ComeKidWithoutSingle_2 = Come on! A kid without a single\nGym Badge continuing on past here?{be01}\nBattle with the Trainers and Pokémon\nin this area, then battle some more!{be01}
+Route20_Text_HeyGleamingThingThere = Hey! That gleaming thing there\nis the Basic Badge!{be01}\nBut don't get a swelled head!\nIt's a rough world out there!{be00}\nHere, I'll show you!{be01}
+Route20_Text_AllRightImBeat = All right... I'm beat!{be01}\nWith dependable Pokémon like that,\neven a kid like you can{be00}\nhold your own against an adult. Yup!
+Route20_Text_Route20 = Route 20
+Route20_Text_Wait = {0100:0}! Wait!{be01}
+Route20_Text_CherenComeTwo = Cheren: Come with me, you two.{be01}
+Route20_Text_SeeDarkTallGrass = See the dark tall grass here?{be01}\nIt's rare, but sometimes two\nPokémon pop out at the same time.{be01}\nAlso, the Pokémon that hide in\ndark grass are slightly stronger.{be01}\nSo be careful if you walk through.{be01}
+Route20_Text_IfYoureGoingChallenge = If you're going to challenge the\nnext Gym, it's the Virbank Gym.{be00}\nThese might help!{be01}
+Route20_Text_HereSome = Here are some for you, {0100:1}!{be01}
+Route20_Text_BothBestIfNeed = Both of you, do your best!{be01}\nIf you need anything,\ncall me on the Xtransceiver.{be01}
+Route20_Text_CherenSureKnowsLot = {0100:1}: Cheren sure knows a lot.{be01}\nAnd he fought those\nTeam Plasma thugs, too...{be01}
+Route20_Text_IveDecidedImGoing = I've decided!\nI'm going to get stronger than him!{be01}\nYou should...{be01}\nDo your best! Fill up the Pokédex\nand have my back. Got it?{be01}
+Route20_Text_HaveGetStrongerThan = I have to get stronger\nthan Team Plasma!
+Route20_Text_YeeshReallyHateWhen = Yeesh! I really hate it when\npeople won't let things go!{be01}
+Route20_Text_NowThinkAboutIf = Now that I think about it...{be01}\nIf I run this way, no one can help me!\nI have to head toward the ocean!{be01}\nSo, with that in mind...{be01}\nI'm going to flee again!\nGood-bye, Virbank City!{be01}
+Route20_Text_WellTheyreReallyGood = {0100:1}: Well, they're\nreally good at running, anyway...{be01}\nStill, she just said something useful!{be01}\nThey must be moving around by boat!{be01}\nCastelia City has a big port...\nI wonder if they headed there.{be01}\nOK! Let’s go back to Virbank\nand look for someone who looks like{be00}\nthey know a lot about ships.{be01}\nIf I remember right, there was a place\nto board boats on the docks.{be01}
+Route20_Text_HelpCheckRoute20 = {0100:1}: Help me check Route 20!
+\pad{06}

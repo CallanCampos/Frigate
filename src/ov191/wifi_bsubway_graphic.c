@@ -104,7 +104,7 @@ WifiBSubwayGraphic *WifiBSubwayGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     WifiBSubwayBG_Init(&graphic->bg, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(WifiBSubwayGraphic_VBlank, graphic, 0);
     return graphic;
@@ -113,7 +113,7 @@ WifiBSubwayGraphic *WifiBSubwayGraphic_Create(u32 layout, HeapID heapId) {
 void WifiBSubwayGraphic_Free(WifiBSubwayGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     WifiBSubwayBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

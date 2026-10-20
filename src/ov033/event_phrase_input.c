@@ -37,9 +37,9 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
     save = GameData_GetSaveControl(data->gameData);
     data->trainerInfo = getTrainerGameInfoAddress(save);
     save = GameData_GetSaveControl(data->gameData);
-    data->saveBlock = func_020114f0(save);
+    data->saveBlock = CGearName_GetFromSave(save);
     data->playerInfo = GetGameDataPlayerInfo(data->gameData);
-    data->unk18 = func_020174d4(data->gameData);
+    data->unk18 = GameData_GetBeaconStatus(data->gameData);
     data->nameEntry.mode = mode;
     data->nameEntry.gender = getTrainerGender(data->playerInfo);
     data->nameEntry.gameInfo = data->trainerInfo;
@@ -73,7 +73,7 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
         GFL_StrBufLoadString(data->nameEntry.name, TrainerGameInfo_GetThanks(data->trainerInfo));
         break;
     case 15:
-        GFL_StrBufLoadString(data->nameEntry.name, func_0201150c(data->saveBlock));
+        GFL_StrBufLoadString(data->nameEntry.name, CGearName_Get(data->saveBlock));
         break;
     }
     return event;
@@ -124,15 +124,15 @@ void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *para
         TrainerGameInfo_SetThanks(data->trainerInfo, param->name);
         break;
     case 15:
-        func_020114fc(data->saveBlock, param->name);
+        CGearName_Set(data->saveBlock, param->name);
         break;
     case 7:
         GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
-        func_ov012_021603ec(param->name, param->unk34);
+        GameBeacon_BroadcastPhrase(param->name, param->unk34);
         break;
     case 14:
         GFL_StrBufCopy(BeaconStatus_GetGreeting(data->unk18), data->nameEntry.name);
-        func_ov012_021603ec(param->name, param->unk34);
+        GameBeacon_BroadcastPhrase(param->name, param->unk34);
         break;
     }
 }
@@ -152,9 +152,9 @@ BOOL func_ov033_021777dc(VM *vm, FieldScriptEnv *env) {
     ScriptReadAny(vm, env);
     ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
-    save = func_020179e4(gameData);
+    save = GameData_GetDreamWorldSave(gameData);
     if (input == 0) {
-        if (func_020099f4(save) == 1 && func_020099e0(save) == 1) {
+        if (DreamWorldSave_GetIDShown(save) == 1 && func_020099e0(save) == 1) {
             *result = 1;
         } else {
             *result = 0;
@@ -181,12 +181,12 @@ BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env) {
     input2 = ScriptReadAny(vm, env);
     ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
-    save = func_020179e4(gameData);
+    save = GameData_GetDreamWorldSave(gameData);
     switch (input) {
     case 0:
         *result = 1;
         for (i = 0; i < 5; i++) {
-            value = func_02009a98(save, i);
+            value = DreamWorldSave_GetResult(save, i);
             if (value == NULL) {
                 *result = 0;
             } else if (*value == 0x7e || *value == 0) {
@@ -195,7 +195,7 @@ BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 1:
-        if (func_02009ae0(save) == 0x7f) {
+        if (DreamWorldSave_GetResultIndex(save) == 0x7f) {
             *result = 0;
         } else {
             *result = 1;
@@ -212,7 +212,7 @@ BOOL func_ov033_02177844(VM *vm, FieldScriptEnv *env) {
         func_02009b30(save, 0);
         break;
     case 4:
-        func_02009af8(save, input2);
+        DreamWorldSave_SetResultIndex(save, input2);
         break;
     }
     return FALSE;
@@ -235,10 +235,10 @@ BOOL func_ov033_02177908(VM *vm, FieldScriptEnv *env) {
     gameData = FieldScriptEnv_GetGameData(env);
     heapId = FieldScriptEnv_GetHeapID(env);
     wordSet = ScriptWork_GetWordSet(work);
-    save = func_020179e4(gameData);
+    save = GameData_GetDreamWorldSave(gameData);
     input = ScriptReadAny(vm, env);
     index = ScriptReadAny(vm, env);
-    phrase = func_02009a98(save, index);
+    phrase = DreamWorldSave_GetResult(save, index);
     if (phrase != NULL && *phrase != 0x7e && *phrase != 0) {
         strbuf = GFL_StrBufCreate(14, heapId);
         GFL_StrBufLoadFixedString(strbuf, phrase + 1, 13);

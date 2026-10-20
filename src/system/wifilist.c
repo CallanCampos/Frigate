@@ -49,11 +49,11 @@ void initWifi(WifiList *wifiList) {
     GFL_OvlLoad(OVERLAY_ID(27));
 }
 
-DWCUserData *func_02009f7c(WifiList *wifiList) {
+DWCUserData *WifiList_GetMyUserData(WifiList *wifiList) {
     return &wifiList->myUserData;
 }
 
-u32 func_02009f80(WifiList *wifiList, u32 index, u32 param) {
+u32 WifiList_GetFriendParam(WifiList *wifiList, u32 index, u32 param) {
     u32 value = 0;
 
     switch (param) {
@@ -91,7 +91,7 @@ u32 func_02009f80(WifiList *wifiList, u32 index, u32 param) {
     return value;
 }
 
-void func_0200a034(WifiList *wifiList, u32 index, u32 param, u32 value) {
+void WifiList_SetFriendParam(WifiList *wifiList, u32 index, u32 param, u32 value) {
     switch (param) {
     case WIFI_LIST_FRIEND_ID:
         wifiList->friends[index].id = value;
@@ -117,54 +117,54 @@ void func_0200a034(WifiList *wifiList, u32 index, u32 param, u32 value) {
     }
 }
 
-DWCFriendData *func_0200a0e4(WifiList *wifiList, u32 index) {
+DWCFriendData *WifiList_GetFriendData(WifiList *wifiList, u32 index) {
     return &wifiList->friendData[index];
 }
 
-u16 *func_0200a0f0(WifiList *wifiList, u32 index) {
+u16 *WifiList_GetFriendName(WifiList *wifiList, u32 index) {
     return wifiList->friends[index].name;
 }
 
-void func_0200a100(WifiList *wifiList, u32 index, StrBuf *dest) {
+void WifiList_LoadFriendName(WifiList *wifiList, u32 index, StrBuf *dest) {
     GFL_StrBufLoadFixedString(dest, wifiList->friends[index].name, 16);
 }
 
-void func_0200a11c(WifiList *wifiList, u32 index, const StrBuf *src) {
+void WifiList_StoreFriendName(WifiList *wifiList, u32 index, const StrBuf *src) {
     GFL_StrBufStoreString(src, wifiList->friends[index].name, 16);
 }
 
-BOOL func_0200a138(WifiList *wifiList, u32 index) {
+BOOL WifiList_IsFriendValid(WifiList *wifiList, u32 index) {
     if (index >= WIFI_LIST_FRIEND_MAX) {
         return FALSE;
     }
     return DWC_IsValidFriendData(&wifiList->friendData[index]);
 }
 
-u32 func_0200a150(WifiList *wifiList) {
+u32 WifiList_CountFriends(WifiList *wifiList) {
     s32 i;
     u32 count = 0;
 
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        if (func_0200a138(wifiList, i)) {
+        if (WifiList_IsFriendValid(wifiList, i)) {
             count++;
         }
     }
     return count;
 }
 
-u32 func_0200a170(WifiList *wifiList) {
+u32 WifiList_GetFriendSlotCount(WifiList *wifiList) {
     u32 last = 0;
     s32 i;
 
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        if (func_0200a138(wifiList, i)) {
+        if (WifiList_IsFriendValid(wifiList, i)) {
             last = i + 1;
         }
     }
     return last;
 }
 
-void func_0200a190(WifiList *wifiList, u32 index) {
+void WifiList_RemoveFriend(WifiList *wifiList, u32 index) {
     s32 i;
     s32 last = WIFI_LIST_FRIEND_MAX - 1;
 
@@ -186,12 +186,12 @@ static void moveFriend(WifiList *wifiList, u32 dest, u32 src) {
     MI_CpuFill8(&wifiList->friendData[src], 0, sizeof(DWCFriendData));
 }
 
-void func_0200a258(WifiList *wifiList) {
+void WifiList_CompactFriends(WifiList *wifiList) {
     s32 i;
     s32 empty = -1;
 
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        if (func_0200a138(wifiList, i)) {
+        if (WifiList_IsFriendValid(wifiList, i)) {
             if (empty != -1) {
                 moveFriend(wifiList, empty, i);
                 // Starts over from the first slot; the original writes empty from i
@@ -204,7 +204,7 @@ void func_0200a258(WifiList *wifiList) {
     }
 }
 
-void func_0200a29c(WifiList *wifiList, u32 index) {
+void WifiList_SetFriendLastDateToNow(WifiList *wifiList, u32 index) {
     RTCDate date;
 
     RTC_GetCachedDate(&date);
@@ -213,7 +213,7 @@ void func_0200a29c(WifiList *wifiList, u32 index) {
     wifiList->friends[index].lastDay = date.day;
 }
 
-void func_0200a2d4(WifiList *wifiList, s32 index, u32 wins, u32 losses, u32 draws) {
+void WifiList_AddFriendRecord(WifiList *wifiList, s32 index, u32 wins, u32 losses, u32 draws) {
     if (index < 0 || index >= WIFI_LIST_FRIEND_MAX) {
         return;
     }
@@ -229,10 +229,10 @@ void func_0200a2d4(WifiList *wifiList, s32 index, u32 wins, u32 losses, u32 draw
     if (wifiList->friends[index].draws > WIFI_LIST_RECORD_MAX) {
         wifiList->friends[index].draws = WIFI_LIST_RECORD_MAX;
     }
-    func_0200a29c(wifiList, index);
+    WifiList_SetFriendLastDateToNow(wifiList, index);
 }
 
-void func_0200a340(WifiList *wifiList, s32 srcIndex, s32 destIndex) {
+void WifiList_MergeFriendRecord(WifiList *wifiList, s32 srcIndex, s32 destIndex) {
     if (destIndex < 0 || destIndex >= WIFI_LIST_FRIEND_MAX || srcIndex < 0 || srcIndex >= WIFI_LIST_FRIEND_MAX) {
         return;
     }
@@ -251,24 +251,24 @@ void func_0200a340(WifiList *wifiList, s32 srcIndex, s32 destIndex) {
     MI_CpuFill8(&wifiList->friends[srcIndex], 0, sizeof(WifiListFriend));
 }
 
-void func_0200a3c4(const DWCUserData *userData, DWCFriendData *token) {
+void WifiList_CreateExchangeTokenFromUserData(const DWCUserData *userData, DWCFriendData *token) {
     DWC_CreateExchangeToken(userData, token);
 }
 
-void func_0200a3cc(WifiList *wifiList, DWCFriendData *token) {
-    DWC_CreateExchangeToken(func_02009f7c(wifiList), token);
+void WifiList_CreateExchangeToken(WifiList *wifiList, DWCFriendData *token) {
+    DWC_CreateExchangeToken(WifiList_GetMyUserData(wifiList), token);
 }
 
 s32 WifiList_GetMyGSID(WifiList *wifiList) {
-    DWCUserData *userData = func_02009f7c(wifiList);
+    DWCUserData *userData = WifiList_GetMyUserData(wifiList);
     DWCFriendData token;
 
-    func_0200a3cc(wifiList, &token);
+    WifiList_CreateExchangeToken(wifiList, &token);
     return DWC_GetGsProfileId(userData, &token);
 }
 
-BOOL func_0200a400(WifiList *wifiList) {
-    DWCUserData *userData = func_02009f7c(wifiList);
+BOOL WifiList_HasValidProfile(WifiList *wifiList) {
+    DWCUserData *userData = WifiList_GetMyUserData(wifiList);
 
     if (DWC_CheckHasProfile(userData) && DWC_CheckValidConsole(userData)) {
         return TRUE;
@@ -276,27 +276,27 @@ BOOL func_0200a400(WifiList *wifiList) {
     return FALSE;
 }
 
-WifiList *func_0200a424(SaveControl *save) {
+WifiList *SaveControl_GetWifiList(SaveControl *save) {
     WifiList *wifiList = SaveControl_GetBlockPtr(save, SAVE_BLOCK_WIFI_LIST);
     // The original fetches the first name and drops it
-    func_0200a0f0(wifiList, 0);
+    WifiList_GetFriendName(wifiList, 0);
     return wifiList;
 }
 
-BOOL func_0200a438(WifiList *wifiList, PlayerInfo *info, u32 *friendIndex) {
+BOOL WifiList_FindFriendByPlayerInfo(WifiList *wifiList, PlayerInfo *info, u32 *friendIndex) {
     u32 id = getIDAsUInt(info);
     u32 gender = getTrainerGender(info);
-    return func_0200a46c(wifiList, GetPlayerName(info), id, gender, friendIndex);
+    return WifiList_FindFriend(wifiList, GetPlayerName(info), id, gender, friendIndex);
 }
 
-BOOL func_0200a46c(WifiList *wifiList, const u16 *name, u32 id, u32 gender, u32 *friendIndex) {
+BOOL WifiList_FindFriend(WifiList *wifiList, const u16 *name, u32 id, u32 gender, u32 *friendIndex) {
     u8 i;
 
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        if (func_0200a138(wifiList, i) == TRUE) {
-            u32 friendId = func_02009f80(wifiList, i, WIFI_LIST_FRIEND_ID);
+        if (WifiList_IsFriendValid(wifiList, i) == TRUE) {
+            u32 friendId = WifiList_GetFriendParam(wifiList, i, WIFI_LIST_FRIEND_ID);
             if (friendId == id) {
-                u32 friendGender = func_02009f80(wifiList, i, WIFI_LIST_FRIEND_GENDER);
+                u32 friendGender = WifiList_GetFriendParam(wifiList, i, WIFI_LIST_FRIEND_GENDER);
                 if (friendGender == gender) {
                     if (friendIndex != NULL) {
                         *friendIndex = i;
@@ -309,26 +309,26 @@ BOOL func_0200a46c(WifiList *wifiList, const u16 *name, u32 id, u32 gender, u32 
     return FALSE;
 }
 
-u32 func_0200a4b8(void) {
+u32 PalPadFriendList_GetSize(void) {
     return sizeof(PalPadFriendList);
 }
 
-void func_0200a4c0(PalPadFriendList *list) {
-    MI_CpuFill8(list, 0, func_0200a4b8());
+void PalPadFriendList_Init(PalPadFriendList *list) {
+    MI_CpuFill8(list, 0, PalPadFriendList_GetSize());
 }
 
-s32 func_0200a4d4(PalPadFriendList *list, u32 id) {
+s32 PalPadFriendList_FindPlayer(PalPadFriendList *list, u32 id) {
     s32 i;
 
     for (i = 0; i < PAL_PAD_PLAYER_MAX; i++) {
-        if (func_02008bfc(&list->players[i]) != 0 && id == getIDAsUInt(&list->players[i])) {
+        if (PlayerInfo_GetVersion(&list->players[i]) != 0 && id == getIDAsUInt(&list->players[i])) {
             return i;
         }
     }
     return -1;
 }
 
-void func_0200a504(PalPadFriendList *list, PlayerInfo *info) {
+void PalPadFriendList_AddPlayer(PalPadFriendList *list, PlayerInfo *info) {
     u32 id = getIDAsUInt(info);
     u32 size = PlayerInfo_GetSize();
     s32 index;
@@ -336,7 +336,7 @@ void func_0200a504(PalPadFriendList *list, PlayerInfo *info) {
     if (id == 0) {
         return;
     }
-    index = func_0200a4d4(list, id);
+    index = PalPadFriendList_FindPlayer(list, id);
     if (index != -1) {
         func_02008bf8(&list->players[index], func_02008bf4(info));
         return;
@@ -345,46 +345,46 @@ void func_0200a504(PalPadFriendList *list, PlayerInfo *info) {
     MI_CpuCopy8(info, list, size);
 }
 
-u32 func_0200a55c(PalPadFriendList *list, u32 index) {
+u32 PalPadFriendList_GetPlayerId(PalPadFriendList *list, u32 index) {
     if (index >= PAL_PAD_PLAYER_MAX) {
         index = 0;
     }
     return getIDAsUInt(&list->players[index]);
 }
 
-PlayerInfo *func_0200a570(PalPadFriendList *list, u32 index) {
+PlayerInfo *PalPadFriendList_GetPlayer(PalPadFriendList *list, u32 index) {
     if (index >= PAL_PAD_PLAYER_MAX) {
         return NULL;
     }
-    if (func_0200a55c(list, index) == 0) {
+    if (PalPadFriendList_GetPlayerId(list, index) == 0) {
         return NULL;
     }
     return &list->players[index];
 }
 
-BOOL func_0200a590(PalPadFriendList *list, u32 id) {
-    if (func_0200a4d4(list, id) != -1) {
+BOOL PalPadFriendList_HasPlayer(PalPadFriendList *list, u32 id) {
+    if (PalPadFriendList_FindPlayer(list, id) != -1) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_0200a5a8(PalPadFriendList *list) {
+u32 PalPadFriendList_CountPlayers(PalPadFriendList *list) {
     s32 i;
 
     for (i = 0; i < PAL_PAD_PLAYER_MAX; i++) {
-        if (func_02008bfc(&list->players[i]) == 0) {
+        if (PlayerInfo_GetVersion(&list->players[i]) == 0) {
             break;
         }
     }
     return i;
 }
 
-u32 func_0200a5c4(PalPadFriendList *list) {
+u32 PalPadFriendList_GetTradeCount(PalPadFriendList *list) {
     return list->tradeCount;
 }
 
-void func_0200a5cc(PalPadFriendList *list) {
+void PalPadFriendList_IncrementTradeCount(PalPadFriendList *list) {
     list->tradeCount++;
     if (list->tradeCount > PAL_PAD_TRADE_COUNT_MAX) {
         list->tradeCount = PAL_PAD_TRADE_COUNT_MAX;

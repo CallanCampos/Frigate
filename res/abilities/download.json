@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Download",
+    "description": "Adjusts power according\nto a foe's defenses."
+}

@@ -1,0 +1,109 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_RATTATA", 15, 15 ],
+                [ "SPECIES_COTTONEE", 15, 15 ],
+                [ "SPECIES_PIDOVE", 15, 15 ],
+                [ "SPECIES_BUNEARY", 15, 15 ],
+                [ "SPECIES_RATTATA", 16, 16 ],
+                [ "SPECIES_COTTONEE", 16, 16 ],
+                [ "SPECIES_PIDOVE", 16, 16 ],
+                [ "SPECIES_BUNEARY", 16, 16 ],
+                [ "SPECIES_COTTONEE", 17, 17 ],
+                [ "SPECIES_EEVEE", 18, 18 ],
+                [ "SPECIES_COTTONEE", 17, 17 ],
+                [ "SPECIES_EEVEE", 18, 18 ]
+            ],
+            "white2": [
+                [ "SPECIES_RATTATA", 15, 15 ],
+                [ "SPECIES_PETILIL", 15, 15 ],
+                [ "SPECIES_PIDOVE", 15, 15 ],
+                [ "SPECIES_SKITTY", 15, 15 ],
+                [ "SPECIES_RATTATA", 16, 16 ],
+                [ "SPECIES_PETILIL", 16, 16 ],
+                [ "SPECIES_PIDOVE", 16, 16 ],
+                [ "SPECIES_SKITTY", 16, 16 ],
+                [ "SPECIES_PETILIL", 17, 17 ],
+                [ "SPECIES_EEVEE", 18, 18 ],
+                [ "SPECIES_PETILIL", 17, 17 ],
+                [ "SPECIES_EEVEE", 18, 18 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_RATTATA", 16, 16 ],
+                [ "SPECIES_COTTONEE", 16, 16 ],
+                [ "SPECIES_PIDOVE", 16, 16 ],
+                [ "SPECIES_BUNEARY", 16, 16 ],
+                [ "SPECIES_RATTATA", 17, 17 ],
+                [ "SPECIES_COTTONEE", 17, 17 ],
+                [ "SPECIES_PIDOVE", 17, 17 ],
+                [ "SPECIES_BUNEARY", 17, 17 ],
+                [ "SPECIES_COTTONEE", 18, 18 ],
+                [ "SPECIES_EEVEE", 19, 19 ],
+                [ "SPECIES_COTTONEE", 18, 18 ],
+                [ "SPECIES_EEVEE", 19, 19 ]
+            ],
+            "white2": [
+                [ "SPECIES_RATTATA", 16, 16 ],
+                [ "SPECIES_PETILIL", 16, 16 ],
+                [ "SPECIES_PIDOVE", 16, 16 ],
+                [ "SPECIES_SKITTY", 16, 16 ],
+                [ "SPECIES_RATTATA", 17, 17 ],
+                [ "SPECIES_PETILIL", 17, 17 ],
+                [ "SPECIES_PIDOVE", 17, 17 ],
+                [ "SPECIES_SKITTY", 17, 17 ],
+                [ "SPECIES_PETILIL", 18, 18 ],
+                [ "SPECIES_EEVEE", 19, 19 ],
+                [ "SPECIES_PETILIL", 18, 18 ],
+                [ "SPECIES_EEVEE", 19, 19 ]
+            ]
+        },
+        "shaking_grass": {
+            "black2": [
+                [ "SPECIES_AUDINO", 15, 15 ],
+                [ "SPECIES_AUDINO", 15, 15 ],
+                [ "SPECIES_AUDINO", 16, 16 ],
+                [ "SPECIES_AUDINO", 16, 16 ],
+                [ "SPECIES_AUDINO", 17, 17 ],
+                [ "SPECIES_AUDINO", 17, 17 ],
+                [ "SPECIES_AUDINO", 18, 18 ],
+                [ "SPECIES_AUDINO", 18, 18 ],
+                [ "SPECIES_LOPUNNY", 18, 18 ],
+                [ "SPECIES_WHIMSICOTT", 18, 18 ],
+                [ "SPECIES_LOPUNNY", 18, 18 ],
+                [ "SPECIES_WHIMSICOTT", 18, 18 ]
+            ],
+            "white2": [
+                [ "SPECIES_AUDINO", 15, 15 ],
+                [ "SPECIES_AUDINO", 15, 15 ],
+                [ "SPECIES_AUDINO", 16, 16 ],
+                [ "SPECIES_AUDINO", 16, 16 ],
+                [ "SPECIES_AUDINO", 17, 17 ],
+                [ "SPECIES_AUDINO", 17, 17 ],
+                [ "SPECIES_AUDINO", 18, 18 ],
+                [ "SPECIES_AUDINO", 18, 18 ],
+                [ "SPECIES_DELCATTY", 18, 18 ],
+                [ "SPECIES_LILLIGANT", 18, 18 ],
+                [ "SPECIES_DELCATTY", 18, 18 ],
+                [ "SPECIES_LILLIGANT", 18, 18 ]
+            ]
+        },
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

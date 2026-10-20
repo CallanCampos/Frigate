@@ -1,0 +1,3 @@
+BtlvCore_Text_JustHaveUsePoke = You just have to use a Poké Ball\nafter lowering its HP!
+BtlvCore_Text_BiancaUsedPokeBall = Bianca used\na Poké Ball!
+\pad{84}

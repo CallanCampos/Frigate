@@ -51,12 +51,12 @@ void setPokewoodBlk(const void *src) {
     MIi_CpuCopy32(src, sBlock, sizeof(PokewoodBlock));
 }
 
-u32 func_02010644(SaveControl *save, HeapID heapId, u32 slot) {
+u32 Pokewood_LoadDownloadedMovie(SaveControl *save, HeapID heapId, u32 slot) {
     u32 block = getSlotExtraBlock(slot);
     u32 result;
 
     MI_CpuFill8(sBlock, 0, POKEWOOD_EXTRA_BLOCK_SIZE);
-    result = func_02007560(save, block, heapId, sBlock, POKEWOOD_EXTRA_BLOCK_SIZE);
+    result = SaveControl_LoadExtraBlock(save, block, heapId, sBlock, POKEWOOD_EXTRA_BLOCK_SIZE);
     freeIntermediateSaveExtraBlksAfterLoad(save, block);
     if (result == 0) {
         return 0;
@@ -79,7 +79,7 @@ u32 loadPokewoodAndCheck(SaveControl *save, HeapID heapId, u32 slot) {
     return 2;
 }
 
-u32 func_020106ec(GameData *gameData, HeapID heapId, u32 slot, u16 *state) {
+u32 Pokewood_SaveDownloadedMovie(GameData *gameData, HeapID heapId, u32 slot, u16 *state) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     u32 block = getSlotExtraBlock(slot);
     RTCDate date;
@@ -97,13 +97,13 @@ u32 func_020106ec(GameData *gameData, HeapID heapId, u32 slot, u16 *state) {
         setBlockField(POKEWOOD_BLOCK_FIELD_DATE, dateValue);
         setBlockField(POKEWOOD_BLOCK_FIELD_TIME, timeValue);
         sBlock->crc = getCRC16(sBlock, POKEWOOD_BLOCK_CRC_SIZE);
-        func_020075b8(save, block, heapId, sBlock, POKEWOOD_EXTRA_BLOCK_SIZE);
-        func_020178c4(gameData, block);
+        SaveControl_InitExtraBlock(save, block, heapId, sBlock, POKEWOOD_EXTRA_BLOCK_SIZE);
+        GameData_StartSaveBlock(gameData, block);
         (*state)++;
         break;
     }
     case 1:
-        result = func_020178f4(gameData, block);
+        result = GameData_UpdateSaveBlock(gameData, block);
         if (result == 2 || result == 3) {
             freeIntermediateSaveExtraBlksAfterLoad2(save, block);
             return result;
@@ -113,7 +113,7 @@ u32 func_020106ec(GameData *gameData, HeapID heapId, u32 slot, u16 *state) {
     return 0;
 }
 
-BOOL func_020107b0(void) {
+BOOL Pokewood_IsLoadedMovieValid(void) {
     if (addUpDataStream((const u8 *)sBlock, POKEWOOD_EXTRA_BLOCK_SIZE) != 0 &&
         sBlock->crc == getCRC16(sBlock, POKEWOOD_BLOCK_CRC_SIZE)) {
         return TRUE;
@@ -125,7 +125,7 @@ PokewoodBlock *getPokewoodBlock(void) {
     return sBlock;
 }
 
-u32 func_020107f0(u32 field, u32 a1) {
+u32 Pokewood_GetLoadedMovieField(u32 field, u32 a1) {
     switch (field) {
     case POKEWOOD_BLOCK_FIELD_UNKDF:
         return sBlock->info.unkDF;

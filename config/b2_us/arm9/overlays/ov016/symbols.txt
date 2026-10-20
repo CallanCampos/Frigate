@@ -1,2 +1,2 @@
-func_ov016_0216e660 kind:function(thumb,size=0xf4) addr:0x0216e660
-func_ov016_0216e754 kind:function(thumb,size=0x34) addr:0x0216e754
+EventEggDemo_Callback kind:function(thumb,size=0xf4) addr:0x0216e660
+EventEggDemo_Create kind:function(thumb,size=0x34) addr:0x0216e754

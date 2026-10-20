@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Anders",
+    "class": "TRAINER_CLASS_HARLEQUIN_233",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DWEBBLE",
+            "form": 0,
+            "level": 20,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SWADLOON",
+            "form": 0,
+            "level": 20,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You're just one step away from\nbeing able to challenge Burgh!{be01}\nBut, before that, I have to\ntry to stop you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your battling style is almost\nas artistic as Burgh!"
+        },
+        {
+            "type": 2,
+            "text": "Burgh remodeled this Gym in order to\nbetter understand the feelings Pokémon{be00}\nthat wrap themselves in cocoons have.{be01}\n...Unfortunately, we can never seem to\nfind our way around as a result."
+        }
+    ]
+}

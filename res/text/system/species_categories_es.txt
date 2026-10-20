@@ -1,0 +1,2 @@
+\from{species.pokedex.es.category}
+\pad{d0}

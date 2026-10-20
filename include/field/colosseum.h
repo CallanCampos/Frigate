@@ -29,7 +29,7 @@ typedef struct {
 } ColosseumMember;
 
 struct UnionColosseum {
-    CommPlayerSys *commPlayer; // from func_ov012_021613d0
+    CommPlayerSys *commPlayer; // from CommPlayer_Init
     u8 unk04[0x14];
     ColosseumMember members[COLOSSEUM_MEMBER_MAX];
     u8 unkC8_0 : 1;
@@ -58,7 +58,7 @@ struct UnionColosseum {
     u8 unk171;
     u8 unk172[4];
     u8 unk176[2];
-    void *unk178; // a table of the field's players (see func_ov036_021c3f34)
+    CommEntryMenu *entryMenu; // the menu that gathers the players for a multi battle
     u8 unk17C[3];
     u8 unk17F;
 };
@@ -70,27 +70,27 @@ BOOL Colosseum_SendMember(const void *member, BOOL toParent);
 BOOL Colosseum_SendCard(const TrainerCardData *card);
 BOOL Colosseum_SendCardHead(const TrainerCardData *card);
 BOOL Colosseum_SendChoice(const ColosseumChoice *choice);
-BOOL func_ov028_021725c8(UnionColosseum *colosseum);
+BOOL Colosseum_SendUnk4(UnionColosseum *colosseum);
 BOOL Colosseum_SendParty(const PokeParty *party);
 BOOL Colosseum_SendResult(const void *result);
-BOOL func_ov028_02172704(void);
-BOOL func_ov028_02172748(void);
-BOOL func_ov028_02172818(void);
+BOOL Colosseum_SendUnk8(void);
+BOOL Colosseum_SendUnk9(void);
+BOOL Colosseum_SendUnkD(void);
 
 // The colosseum's work, made for the player and freed
 UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const PlayerInfo *info, u32 flag);
 void Colosseum_Free(UnionColosseum *colosseum, GameSystem *gsys);
-void func_ov028_021729a0(UnionColosseum *colosseum, BOOL value);
-void func_ov028_021729bc(UnionColosseum *colosseum, u32 value);
-u8 func_ov028_021729dc(const UnionColosseum *colosseum);
-void func_ov028_02172a1c(UnionColosseum *colosseum);
-void func_ov028_02172a50(UnionColosseum *colosseum);
-u8 func_ov028_02172ae8(UnionColosseum *colosseum, u32 netId, ColosseumChoice *choice);
-void func_ov028_02172b14(UnionColosseum *colosseum);
-BOOL func_ov028_02172b20(const UnionColosseum *colosseum);
-void func_ov028_02172b4c(UnionColosseum *colosseum, BOOL keepOwn);
+void Colosseum_SetUnkC8_0(UnionColosseum *colosseum, BOOL value);
+void Colosseum_SetUnkDC(UnionColosseum *colosseum, u32 value);
+u8 Colosseum_GetUnkDD(const UnionColosseum *colosseum);
+void Colosseum_SendVoteReplies(UnionColosseum *colosseum);
+void Colosseum_UpdateReadySync(UnionColosseum *colosseum);
+u8 Colosseum_TakeChoice(UnionColosseum *colosseum, u32 netId, ColosseumChoice *choice);
+void Colosseum_ResetUnk171(UnionColosseum *colosseum);
+BOOL Colosseum_AreAllPartiesReceived(const UnionColosseum *colosseum);
+void Colosseum_ClearParties(UnionColosseum *colosseum, BOOL keepOwn);
 void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, ColosseumPlayers *players, u32 unused);
-void func_ov028_02172c60(ColosseumPlayers *players);
+void Colosseum_ClearPlayers(ColosseumPlayers *players);
 
 // What colosseum_comm.c and colosseum.c use of each other
 BOOL Colosseum_SendUnk5(UnionColosseum *colosseum, u32 netId, u32 value);

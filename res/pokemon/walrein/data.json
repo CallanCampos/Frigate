@@ -1,0 +1,172 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Walrein",
+    "pokedex": {
+        "category": "Ice Break Pokémon",
+        "entry": "Not only does its thick blubber keep it\nwarm, it also protects it from attacks.\nIt shatters ice with its prized tusks.",
+        "height": "4'07\"",
+        "weight": "332.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Walrein",
+                "category": "Ice Break Pokémon",
+                "entry": "It shatters ice with its big tusks.\nIts thick blubber repels not only\nthe cold, but also enemy attacks.",
+                "height": "4'07\"",
+                "weight": "332.0 lbs."
+            },
+            "fr": {
+                "name": "Kaimorse",
+                "category": "Pokémon Brise Glace",
+                "entry": "Il brise la glace avec ses grosses\ndéfenses. Sa graisse le protège du\nfroid, mais aussi des attaques.",
+                "height": "1,4 m",
+                "weight": "150,6 kg"
+            },
+            "de": {
+                "name": "Walraisa",
+                "category": "Eisbrecher",
+                "entry": "Mit seinen Stoßzähnen bricht es\ndurch Eis. Eine Speckschicht\nschützt es vor Kälte und Angriffen.",
+                "height": "1,4 m",
+                "weight": "150,6 kg"
+            },
+            "it": {
+                "name": "Walrein",
+                "category": "Pokémon Spaccagelo",
+                "entry": "Frantuma il ghiaccio con le zanne.\nLo spesso strato adiposo respinge\nil freddo e gli attacchi nemici.",
+                "height": "1,4 m",
+                "weight": "150,6 kg"
+            },
+            "ko": {
+                "name": "씨카이저",
+                "category": "얼음깨기포켓몬",
+                "entry": "큰 얼음을 이빨로 부순다.\n두꺼운 지방은 추위뿐만 아니라\n상대의 공격도 이겨낸다.",
+                "height": "1.4 m",
+                "weight": "150.6 kg"
+            },
+            "es": {
+                "name": "Walrein",
+                "category": "Pokémon Rompehielo",
+                "entry": "Rompe el hielo con sus colmillos.\nSu gruesa capa de grasa le protege\ndel frío y de los enemigos.",
+                "height": "1,4 m",
+                "weight": "150,6 kg"
+            },
+            "ja": {
+                "name": "トドゼルガ",
+                "category": "こおりわりポケモン",
+                "entry": "おおきな\\x{3000}こおりを\\x{3000}キバで\\x{3000}くだく。\nあつい\\x{3000}しぼうは\\x{3000}さむさだけでなく\nてきの\\x{3000}こうげきも\\x{3000}はねかえす。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 110,
+        "attack": 80,
+        "defense": 90,
+        "speed": 65,
+        "special_attack": 95,
+        "special_defense": 90
+    },
+    "types": [ "TYPE_ICE", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 3,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_THICK_FAT", "ABILITY_ICE_BODY" ],
+    "hidden_ability": "ABILITY_OBLIVIOUS",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 239,
+    "height": 14,
+    "weight": 1506,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CRUNCH" ],
+            [ 1, "MOVE_POWDER_SNOW" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 1, "MOVE_ENCORE" ],
+            [ 7, "MOVE_ENCORE" ],
+            [ 13, "MOVE_ICE_BALL" ],
+            [ 19, "MOVE_BODY_SLAM" ],
+            [ 25, "MOVE_AURORA_BEAM" ],
+            [ 31, "MOVE_HAIL" ],
+            [ 32, "MOVE_SWAGGER" ],
+            [ 39, "MOVE_REST" ],
+            [ 39, "MOVE_SNORE" ],
+            [ 44, "MOVE_ICE_FANG" ],
+            [ 52, "MOVE_BLIZZARD" ],
+            [ 65, "MOVE_SHEER_COLD" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM68",
+            "TM78",
+            "TM79",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_IRON_HEAD",
+            "MOVE_BLOCK",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 245,
+    "baby_species": "SPECIES_SPHEAL",
+    "cry_volume": 112
+}

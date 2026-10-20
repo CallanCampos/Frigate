@@ -26,11 +26,11 @@ static MysteryGift *getCard(MysteryGiftSave *save, u32 slot);
 static void encrypt(MysteryGiftSave *save);
 static void decrypt(MysteryGiftSave *save);
 
-u32 func_0200a5f0(void) {
+u32 MysteryGiftSaveData_GetSize(void) {
     return sizeof(MysteryGiftSaveData);
 }
 
-void func_0200a5f8(MysteryGiftSaveData *data) {
+void MysteryGiftSaveData_Init(MysteryGiftSaveData *data) {
     MysteryGiftSave save;
 
     MI_CpuFill8(&save, 0, sizeof(MysteryGiftSave));
@@ -40,7 +40,7 @@ void func_0200a5f8(MysteryGiftSaveData *data) {
     encrypt(&save);
 }
 
-BOOL func_0200a628(u32 kind) {
+BOOL MysteryGift_IsValidKind(u32 kind) {
     if (kind != 0 && kind < 5) {
         return TRUE;
     }
@@ -52,7 +52,7 @@ static BOOL hasFreeSlot(MysteryGiftSave *save) {
     u32 max = getCardMax(save);
 
     for (i = 0; i < max; i++) {
-        if (!func_0200a628(getCard(save, i)->kind)) {
+        if (!MysteryGift_IsValidKind(getCard(save, i)->kind)) {
             return TRUE;
         }
     }
@@ -65,7 +65,7 @@ static BOOL isSlotUsed(MysteryGiftSave *save, u32 slot) {
 
     getCardMax(save);
     // BUG: the bound is the save's twelve cards whatever the kind; the gifts outside the save have three
-    if (slot < MG_CARD_MAX && func_0200a628(card->kind)) {
+    if (slot < MG_CARD_MAX && MysteryGift_IsValidKind(card->kind)) {
         return TRUE;
     }
     return FALSE;
@@ -86,13 +86,13 @@ static void removeCard(MysteryGiftSave *save, u32 slot) {
 static MysteryGift *getUsedCard(MysteryGiftSave *save, u32 slot) {
     MysteryGift *card = getCard(save, slot);
 
-    if (slot < getCardMax(save) && func_0200a628(card->kind)) {
+    if (slot < getCardMax(save) && MysteryGift_IsValidKind(card->kind)) {
         return card;
     }
     return NULL;
 }
 
-BOOL func_0200a71c(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
+BOOL MysteryGiftSave_GetCard(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
     BOOL found = FALSE;
     MysteryGift *card;
 
@@ -107,7 +107,7 @@ BOOL func_0200a71c(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
     return found;
 }
 
-BOOL func_0200a750(MysteryGiftSave *save, const MysteryGift *gift) {
+BOOL MysteryGiftSave_AddCard(MysteryGiftSave *save, const MysteryGift *gift) {
     BOOL saved = FALSE;
     u32 max = getCardMax(save);
     u32 i;
@@ -116,7 +116,7 @@ BOOL func_0200a750(MysteryGiftSave *save, const MysteryGift *gift) {
     if (hasFreeSlot(save) == TRUE) {
         for (i = 0; i < max; i++) {
             MysteryGift *card = getCard(save, i);
-            if (!func_0200a628(card->kind)) {
+            if (!MysteryGift_IsValidKind(card->kind)) {
                 MI_CpuCopy8(gift, card, sizeof(MysteryGift));
                 saved = TRUE;
                 break;
@@ -127,7 +127,7 @@ BOOL func_0200a750(MysteryGiftSave *save, const MysteryGift *gift) {
     return saved;
 }
 
-void func_0200a7b0(MysteryGiftSave *save, u32 slot) {
+void MysteryGiftSave_RemoveCard(MysteryGiftSave *save, u32 slot) {
     u32 max = getCardMax(save);
 
     decrypt(save);
@@ -138,7 +138,7 @@ void func_0200a7b0(MysteryGiftSave *save, u32 slot) {
     encrypt(save);
 }
 
-BOOL func_0200a7e4(MysteryGiftSave *save) {
+BOOL MysteryGiftSave_HasFreeSlot(MysteryGiftSave *save) {
     BOOL free;
 
     decrypt(save);
@@ -147,7 +147,7 @@ BOOL func_0200a7e4(MysteryGiftSave *save) {
     return free;
 }
 
-BOOL func_0200a800(MysteryGiftSave *save, u32 slot) {
+BOOL MysteryGiftSave_IsSlotUsed(MysteryGiftSave *save, u32 slot) {
     BOOL used;
 
     decrypt(save);
@@ -156,7 +156,7 @@ BOOL func_0200a800(MysteryGiftSave *save, u32 slot) {
     return used;
 }
 
-BOOL func_0200a820(MysteryGiftSave *save, u32 slot) {
+BOOL MysteryGiftSave_IsCardDelivered(MysteryGiftSave *save, u32 slot) {
     BOOL delivered = FALSE;
     u32 max = getCardMax(save);
 
@@ -168,7 +168,7 @@ BOOL func_0200a820(MysteryGiftSave *save, u32 slot) {
     return delivered;
 }
 
-void func_0200a858(MysteryGiftSave *save, u32 slot) {
+void MysteryGiftSave_SetCardDelivered(MysteryGiftSave *save, u32 slot) {
     u32 max = getCardMax(save);
 
     decrypt(save);
@@ -178,7 +178,7 @@ void func_0200a858(MysteryGiftSave *save, u32 slot) {
     encrypt(save);
 }
 
-BOOL func_0200a88c(MysteryGiftSave *save) {
+BOOL MysteryGiftSave_HasAnyCard(MysteryGiftSave *save) {
     u32 i;
     BOOL any = FALSE;
     u32 max = getCardMax(save);
@@ -193,7 +193,7 @@ BOOL func_0200a88c(MysteryGiftSave *save) {
     return any;
 }
 
-BOOL func_0200a8c4(MysteryGiftSave *save, u32 id) {
+BOOL MysteryGiftSave_IsIdReceived(MysteryGiftSave *save, u32 id) {
     BOOL received = FALSE;
     u8 *flags = getReceivedFlags(save);
 
@@ -205,7 +205,7 @@ BOOL func_0200a8c4(MysteryGiftSave *save, u32 id) {
     return received;
 }
 
-void func_0200a900(MysteryGiftSave *save, u32 id) {
+void MysteryGiftSave_SetIdReceived(MysteryGiftSave *save, u32 id) {
     u8 *flags = getReceivedFlags(save);
 
     decrypt(save);
@@ -215,7 +215,7 @@ void func_0200a900(MysteryGiftSave *save, u32 id) {
     encrypt(save);
 }
 
-BOOL func_0200a938(const MysteryGiftRecvData *data) {
+BOOL MysteryGiftRecvData_CheckCRC(const MysteryGiftRecvData *data) {
     s32 i;
     s32 count = 0;
 
@@ -231,7 +231,7 @@ BOOL func_0200a938(const MysteryGiftRecvData *data) {
     return FALSE;
 }
 
-void func_0200a970(MysteryGiftSave *save, u32 slot1, u32 slot2) {
+void MysteryGiftSave_SwapCards(MysteryGiftSave *save, u32 slot1, u32 slot2) {
     MysteryGift temp;
 
     decrypt(save);
@@ -245,45 +245,45 @@ void func_0200a970(MysteryGiftSave *save, u32 slot1, u32 slot2) {
     encrypt(save);
 }
 
-void func_0200a9d4(MysteryGiftSave *save, GameData *gameData) {
-    if (func_0200aa6c(save) == MG_DATA_OUTSIDE) {
+void MysteryGiftSave_StartSave(MysteryGiftSave *save, GameData *gameData) {
+    if (MysteryGiftSave_GetKind(save) == MG_DATA_OUTSIDE) {
         SaveOutside_StartSave(save->outside);
     } else {
-        func_0201782c(gameData);
+        GameData_StartSave(gameData);
     }
 }
 
-u32 func_0200a9f4(MysteryGiftSave *save, GameData *gameData) {
-    if (func_0200aa6c(save) == MG_DATA_OUTSIDE) {
+u32 MysteryGiftSave_SaveStep(MysteryGiftSave *save, GameData *gameData) {
+    if (MysteryGiftSave_GetKind(save) == MG_DATA_OUTSIDE) {
         if (SaveOutside_Save(save->outside)) {
             return 2;
         }
         return 0;
     }
-    return func_02017850(gameData);
+    return GameData_UpdateSave(gameData);
 }
 
 MysteryGiftSave *mysteryGiftBlock(SaveControl *save, u32 mode, HeapID heapId) {
     MysteryGiftSave *giftSave = GFL_HeapAllocate(heapId, sizeof(MysteryGiftSave), FALSE, "mystery_data.c", 608);
     MI_CpuFill8(giftSave, 0, sizeof(MysteryGiftSave));
-    func_0200aa74(giftSave, save, mode, heapId);
+    MysteryGiftSave_Load(giftSave, save, mode, heapId);
     return giftSave;
 }
 
-void func_0200aa54(MysteryGiftSave *save) {
-    func_0200aaec(save);
+void MysteryGiftSave_Free(MysteryGiftSave *save) {
+    MysteryGiftSave_Unload(save);
     GFL_HeapFree(save);
 }
 
-u32 func_0200aa64(MysteryGiftSave *save) {
+u32 MysteryGiftSave_GetCardMax(MysteryGiftSave *save) {
     return getCardMax(save);
 }
 
-u32 func_0200aa6c(MysteryGiftSave *save) {
+u32 MysteryGiftSave_GetKind(MysteryGiftSave *save) {
     return getKind(save);
 }
 
-void func_0200aa74(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapID heapId) {
+void MysteryGiftSave_Load(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapID heapId) {
     BOOL useSave;
 
     MI_CpuFill8(giftSave, 0, sizeof(MysteryGiftSave));
@@ -313,7 +313,7 @@ void func_0200aa74(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapI
     }
 }
 
-void func_0200aaec(MysteryGiftSave *save) {
+void MysteryGiftSave_Unload(MysteryGiftSave *save) {
     switch (save->kind) {
     case MG_DATA_OUTSIDE:
         SaveOutside_Free(save->outside);

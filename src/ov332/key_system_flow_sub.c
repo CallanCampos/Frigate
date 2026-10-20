@@ -119,7 +119,7 @@ void KeySystemKeyState_Init(KeySystemKeyState *keys, KeyInfoSave *keyInfo) {
     MI_CpuFill8(keys, 0, sizeof(KeySystemKeyState));
     keys->version = GAME_VERSION;
     for (i = 0; i < KEY_SYSTEM_KEY_COUNT; i++) {
-        keys->unlocked[i] = func_020104c4(keyInfo, i);
+        keys->unlocked[i] = KeyInfo_IsKeyUnlocked(keyInfo, i);
         keys->enabled[i] = keyEnabler(keyInfo, i);
     }
 }
@@ -129,10 +129,10 @@ void KeySystemKeyState_Save(KeySystemKeyState *keys, KeyInfoSave *keyInfo) {
 
     for (i = 0; i < KEY_SYSTEM_KEY_COUNT; i++) {
         if (keys->unlocked[i]) {
-            func_020104b0(keyInfo, i);
+            KeyInfo_UnlockKey(keyInfo, i);
         }
         if (keys->enabled[i]) {
-            func_020104e0(keyInfo, i);
+            KeyInfo_EnableKey(keyInfo, i);
         }
     }
 }
@@ -218,10 +218,10 @@ void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemC
     }
     // The locks of the items
     for (i = 4; i <= 6; i++) {
-        func_0204c124(KeySystemClAct_Create(clact, i, heapId), FALSE);
+        ClActor_SetVisible(KeySystemClAct_Create(clact, i, heapId), FALSE);
     }
     // The cursor at the setting
-    func_0204c124(KeySystemClAct_Create(clact, 7, heapId), FALSE);
+    ClActor_SetVisible(KeySystemClAct_Create(clact, 7, heapId), FALSE);
     MI_CpuFill8(&setup, 0, sizeof(KeySystemListSetup));
     setup.bg = 1;
     setup.unk04 = 14;
@@ -242,7 +242,7 @@ void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemC
 
             pos.x = (setup.items[i].x + setup.items[i].width - 1) * 8;
             pos.y = (setup.items[i].y + 1) * 8;
-            func_0204c140(lock, &pos, CLACT_SURFACE_MAIN);
+            ClActor_SetSurfacePos(lock, &pos, CLACT_SURFACE_MAIN);
         }
     }
     keySelect->setup(keySelect, &setup);
@@ -315,8 +315,8 @@ static inline void KeySystemKeySelect_MoveCursor(ClActor *cursor, const KeySyste
 
     pos.x = (setup->items[index].x - 2) * 8;
     pos.y = (setup->items[index].y + 1) * 8;
-    func_0204c140(cursor, &pos, CLACT_SURFACE_MAIN);
-    func_0204c124(cursor, TRUE);
+    ClActor_SetSurfacePos(cursor, &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetVisible(cursor, TRUE);
 }
 
 static void KeySystemKeySelect_SetupDifficulty(KeySystemKeySelect *keySelect, KeySystemListSetup *setup) {
@@ -329,10 +329,10 @@ static void KeySystemKeySelect_SetupDifficulty(KeySystemKeySelect *keySelect, Ke
     setup->items[3].msgId = 7;
     keySelect->select = KeySystemKeySelect_SelectDifficulty;
     if (!keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_EASY)) {
-        func_0204c124(KeySystemClAct_GetActor(keySelect->clact, 4), TRUE);
+        ClActor_SetVisible(KeySystemClAct_GetActor(keySelect->clact, 4), TRUE);
     }
     if (!keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_CHALLENGE)) {
-        func_0204c124(KeySystemClAct_GetActor(keySelect->clact, 6), TRUE);
+        ClActor_SetVisible(KeySystemClAct_GetActor(keySelect->clact, 6), TRUE);
     }
     cursor = KeySystemClAct_GetActor(keySelect->clact, 7);
     KeySystemKeySelect_MoveCursor(cursor, setup, GetGameDifficulty(keySelect->keyInfo));
@@ -378,7 +378,7 @@ static void KeySystemKeySelect_SetupCity(KeySystemKeySelect *keySelect, KeySyste
     setup->items[2].msgId = 7;
     keySelect->select = KeySystemKeySelect_SelectCity;
     if (!keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_CITY)) {
-        func_0204c124(KeySystemClAct_GetActor(keySelect->clact, 5), TRUE);
+        ClActor_SetVisible(KeySystemClAct_GetActor(keySelect->clact, 5), TRUE);
     }
     cursor = KeySystemClAct_GetActor(keySelect->clact, 7);
     KeySystemKeySelect_MoveCursor(cursor, setup, KeyInfo_GetCityKey(keySelect->keyInfo));
@@ -411,7 +411,7 @@ static int KeySystemKeySelect_SelectCity(int index, KeySystemKeySelect *keySelec
         if (index == 1 && !keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_CITY)) {
             return KEY_SELECT_LOCKED;
         }
-        func_02010550(keySelect->keyInfo, index);
+        KeyInfo_SetCityKey(keySelect->keyInfo, index);
         setup = KeySystemList_GetSetup(*keySelect->list);
         KeySystemKeySelect_MoveCursor(KeySystemClAct_GetActor(keySelect->clact, 7), setup, index);
     }
@@ -428,19 +428,19 @@ static void KeySystemKeySelect_SetupChamber(KeySystemKeySelect *keySelect, KeySy
     setup->items[3].msgId = 7;
     keySelect->select = KeySystemKeySelect_SelectChamber;
     if (!keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_IRON)) {
-        func_0204c124(KeySystemClAct_GetActor(keySelect->clact, 5), TRUE);
+        ClActor_SetVisible(KeySystemClAct_GetActor(keySelect->clact, 5), TRUE);
     }
     if (!keyEnabler(keySelect->keyInfo, KEY_SYSTEM_KEY_ICEBERG)) {
-        func_0204c124(KeySystemClAct_GetActor(keySelect->clact, 6), TRUE);
+        ClActor_SetVisible(KeySystemClAct_GetActor(keySelect->clact, 6), TRUE);
     }
     cursor = KeySystemClAct_GetActor(keySelect->clact, 7);
-    KeySystemKeySelect_MoveCursor(cursor, setup, func_020105a0(keySelect->keyInfo));
+    KeySystemKeySelect_MoveCursor(cursor, setup, KeyInfo_GetChamberKey(keySelect->keyInfo));
 }
 
 static int KeySystemKeySelect_SelectChamber(int index, KeySystemKeySelect *keySelect) {
     const KeySystemListSetup *setup;
 
-    if (index == func_020105a0(keySelect->keyInfo)) {
+    if (index == KeyInfo_GetChamberKey(keySelect->keyInfo)) {
         return KEY_SELECT_CURRENT;
     }
     if (index < 3) {
@@ -456,7 +456,7 @@ static int KeySystemKeySelect_SelectChamber(int index, KeySystemKeySelect *keySe
             }
             break;
         }
-        func_0201058c(keySelect->keyInfo, index);
+        KeyInfo_SetChamberKey(keySelect->keyInfo, index);
         setup = KeySystemList_GetSetup(*keySelect->list);
         KeySystemKeySelect_MoveCursor(KeySystemClAct_GetActor(keySelect->clact, 7), setup, index);
     }
@@ -476,7 +476,7 @@ u16 KeySystemFlow_GetCityMsg(KeyInfoSave *keyInfo) {
 }
 
 u16 KeySystemFlow_GetChamberMsg(KeyInfoSave *keyInfo) {
-    return func_020105a0(keyInfo) + 94;
+    return KeyInfo_GetChamberKey(keyInfo) + 94;
 }
 
 u16 KeySystemFlow_GetSettingsMsg(KeyInfoSave *keyInfo, u16 item) {
@@ -598,7 +598,7 @@ void KeySystemKeyAnim_Start(KeySystemKeyAnim *anim, u32 key, MsgData *msgData, u
         }
 #endif
     }
-    func_0204c378(anim->keyActor, palette, 1);
+    ClActor_SetPalette(anim->keyActor, palette, 1);
     if (enabled) {
         anim->func = KeySystemKeyAnim_Show;
     } else {
@@ -629,9 +629,9 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         break;
     case 2:
         KeySystemAccelMove_Init(&anim->move, &sPlateUpStart, &sPlateUpEnd, FX32_CONST(-3), PLATE_UP_FRAMES);
-        func_0204c124(anim->plateActor, TRUE);
-        func_0204c124(anim->lockActor, TRUE);
-        func_0204c488(anim->lockActor, 7);
+        ClActor_SetVisible(anim->plateActor, TRUE);
+        ClActor_SetVisible(anim->lockActor, TRUE);
+        ClActor_SetSequence(anim->lockActor, 7);
         BmpOam_ActorSetDrawEnable(KeySystemOamText_GetActor(anim->text), TRUE);
         anim->state++;
     case 3: {
@@ -644,10 +644,10 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         }
         KeySystemAccelMove_GetPos(&anim->move, &pos);
         actorPos = pos;
-        func_0204c140(anim->plateActor, &actorPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->plateActor, &actorPos, CLACT_SURFACE_MAIN);
         actorPos = pos;
         actorPos.x += 56;
-        func_0204c140(anim->lockActor, &actorPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->lockActor, &actorPos, CLACT_SURFACE_MAIN);
         actor = KeySystemOamText_GetActor(anim->text);
         actorPos = pos;
         actorPos.x -= 64;
@@ -663,20 +663,20 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         break;
     case 5:
         KeySystemTween_Init(&anim->tween, &sKeyInStart, &sKeyInEnd, KEY_IN_FRAMES);
-        func_0204c124(anim->keyActor, TRUE);
-        func_0204c488(anim->keyActor, 8);
+        ClActor_SetVisible(anim->keyActor, TRUE);
+        ClActor_SetSequence(anim->keyActor, 8);
         func_0204c520(anim->keyActor, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_02);
         anim->state++;
     case 6: {
         ClActorPos pos;
 
-        if (KeySystemTween_Update(&anim->tween) && func_0204c510(anim->keyActor) == 0) {
-            func_0204c550(anim->keyActor);
+        if (KeySystemTween_Update(&anim->tween) && ClActor_GetAnimFrame(anim->keyActor) == 0) {
+            ClActor_StopAnim(anim->keyActor);
             anim->state++;
         }
         KeySystemTween_GetPos(&anim->tween, &pos);
-        func_0204c140(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
         break;
     }
     case 7:
@@ -687,42 +687,42 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         break;
     case 8:
         KeySystemTween_Init(&anim->tween, &sKeyOutStart, &sKeyOutEnd, KEY_OUT_FRAMES);
-        func_0204c488(anim->keyActor, 9);
+        ClActor_SetSequence(anim->keyActor, 9);
         anim->state++;
     case 9: {
         ClActorPos pos;
 
-        if (KeySystemTween_Update(&anim->tween) && !func_0204c560(anim->keyActor)) {
+        if (KeySystemTween_Update(&anim->tween) && !ClActor_IsAnimActive(anim->keyActor)) {
             GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_03);
-            func_0204c124(anim->keyActor, FALSE);
+            ClActor_SetVisible(anim->keyActor, FALSE);
             anim->state++;
         }
         KeySystemTween_GetPos(&anim->tween, &pos);
-        func_0204c140(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
         break;
     }
     case 10:
-        func_0204c488(anim->lockActor, 12);
+        ClActor_SetSequence(anim->lockActor, 12);
         func_0204c520(anim->lockActor, TRUE);
         anim->state++;
         break;
     case 11:
-        if (!func_0204c560(anim->lockActor)) {
-            func_0204c124(anim->lockActor, FALSE);
+        if (!ClActor_IsAnimActive(anim->lockActor)) {
+            ClActor_SetVisible(anim->lockActor, FALSE);
             anim->state++;
         }
         break;
     case 12:
-        func_0204c140(anim->effectActor, &sEffectPos, CLACT_SURFACE_MAIN);
-        func_0204c124(anim->effectActor, TRUE);
-        func_0204c488(anim->effectActor, 11);
+        ClActor_SetSurfacePos(anim->effectActor, &sEffectPos, CLACT_SURFACE_MAIN);
+        ClActor_SetVisible(anim->effectActor, TRUE);
+        ClActor_SetSequence(anim->effectActor, 11);
         func_0204c520(anim->effectActor, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_04);
         anim->state++;
         break;
     case 13:
-        if (!func_0204c560(anim->effectActor)) {
-            func_0204c124(anim->effectActor, FALSE);
+        if (!ClActor_IsAnimActive(anim->effectActor)) {
+            ClActor_SetVisible(anim->effectActor, FALSE);
             anim->state++;
         }
         break;
@@ -751,17 +751,17 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         BmpOamActor *actor;
 
         if (KeySystemTween_Update(&anim->tween)) {
-            func_0204c124(anim->plateActor, FALSE);
-            func_0204c124(anim->lockActor, FALSE);
+            ClActor_SetVisible(anim->plateActor, FALSE);
+            ClActor_SetVisible(anim->lockActor, FALSE);
             BmpOam_ActorSetDrawEnable(KeySystemOamText_GetActor(anim->text), FALSE);
             anim->state++;
         }
         KeySystemTween_GetPos(&anim->tween, &pos);
         actorPos = pos;
-        func_0204c140(anim->plateActor, &actorPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->plateActor, &actorPos, CLACT_SURFACE_MAIN);
         actorPos = pos;
         actorPos.x += 56;
-        func_0204c140(anim->lockActor, &actorPos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->lockActor, &actorPos, CLACT_SURFACE_MAIN);
         actor = KeySystemOamText_GetActor(anim->text);
         actorPos = pos;
         actorPos.x -= 64;
@@ -785,19 +785,19 @@ static BOOL KeySystemKeyAnim_Show(KeySystemKeyAnim *anim) {
     switch (anim->state) {
     case 0:
         KeySystemTween_Init(&anim->tween, &sShowInStart, &sShowInEnd, SHOW_IN_FRAMES);
-        func_0204c124(anim->keyActor, TRUE);
+        ClActor_SetVisible(anim->keyActor, TRUE);
         func_0204c520(anim->keyActor, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_02);
         anim->state++;
     case 1: {
         ClActorPos pos;
 
-        if (KeySystemTween_Update(&anim->tween) && func_0204c510(anim->keyActor) == 0) {
-            func_0204c550(anim->keyActor);
+        if (KeySystemTween_Update(&anim->tween) && ClActor_GetAnimFrame(anim->keyActor) == 0) {
+            ClActor_StopAnim(anim->keyActor);
             anim->state++;
         }
         KeySystemTween_GetPos(&anim->tween, &pos);
-        func_0204c140(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
         break;
     }
     case 2:
@@ -826,7 +826,7 @@ static BOOL KeySystemKeyAnim_Show(KeySystemKeyAnim *anim) {
             anim->state++;
         }
         KeySystemTween_GetPos(&anim->tween, &pos);
-        func_0204c140(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(anim->keyActor, &pos, CLACT_SURFACE_MAIN);
         break;
     }
     case 7:

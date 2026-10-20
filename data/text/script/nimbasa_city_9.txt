@@ -1,9 +1,0 @@
-NimbasaCity9_Text_WeLoveSportsWatching = We love sports.\nWatching games is great, but we enjoy{be00}\nwatching practices, too!
-NimbasaCity9_Text_NewStylesBasketballTennis = New styles of basketball and tennis\ncreated by people and Pokémon...{be00}\nThese may be advanced forms of sports.
-NimbasaCity9_Text_HeyNowThereAh = Hey! Now! There!\nAh! No! No, no!{be01}\nYes! Yes, yes!\nThat's right! Ha!{be01}\nWhy don't you do it like I said?!
-NimbasaCity9_Text_WatchThemPracticeQuietly = I watch them practice quietly.\nBecause I trust the athletes!
-NimbasaCity9_Text_HmHumCanCopy = Hm-hum! I can copy that play in my\nnext game.
-NimbasaCity9_Text_DidSeeThatsGreat = Did you see it?\nThat's a great muscle move!{be01}\nGood muscle! Good hustle!
-NimbasaCity9_Text_OhCouldOnceLifetime = Oh! This could be a once-in-a-lifetime\ngame! I might witness history!
-NimbasaCity9_Text_WoooowCooooolSomedayWant = Woooow! Coooool!\nSomeday I want to be on that court!
-NimbasaCity9_Text_BelieveBigMoneyNo = I believe in big money!\n...No, I mean I will gain glory!

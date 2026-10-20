@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Wonder Guard",
-    "description": "Only supereffective\nmoves will hit."
-}

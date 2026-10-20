@@ -50,8 +50,6 @@
 // Generation 4 globe's code (pokeplatinum's wifi_earth) moved to this game's libraries
 
 #define HEAPID_GEONET 0x7c
-// The globe's models and the screens' graphics
-#define ARCID_GEONET 194
 // The places of the globe: member 18 has those of the countries, and each country with regions has a member of its
 // own
 #define ARCID_GEONET_PLACE 52
@@ -425,7 +423,7 @@ static BOOL GeonetProc_Init(GameProc *proc, u32 *state, void *param, void *procW
     }
     work->myCountry = UnityTowerVisitor_GetCountry(work->playerInfo);
     work->myRegion = UnityTowerVisitor_GetProvince(work->playerInfo);
-    work->foreignRegionMet = func_02009c38(work->survey);
+    work->foreignRegionMet = UnityTower_HasMetForeignRegion(work->survey);
     work->buttons[BUTTON_VIEW] = NULL;
     work->buttons[BUTTON_QUIT] = NULL;
     Geonet_SetVRAMBanks();
@@ -435,8 +433,8 @@ static BOOL GeonetProc_Init(GameProc *proc, u32 *state, void *param, void *procW
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_SUB_MAIN);
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 32, 32);
     work->keyCursor = KeyCursor_Create(15, TRUE, FALSE, work->heapId);
-    work->queue = func_02021998(work->heapId);
-    func_02042ba8(TRUE, work->heapId);
+    work->queue = PrintQueue_CreateDefault(work->heapId);
+    GFL_NetSetIconScreen(TRUE, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     Geonet_LoadPlaces(work);
     return TRUE;
@@ -452,7 +450,7 @@ static BOOL GeonetProc_Main(GameProc *proc, u32 *state, void *param, void *procW
         Geonet_Draw(work);
     }
     Geonet_UpdateButtons(work);
-    func_02021a3c(work->queue);
+    PrintQueue_Main(work->queue);
     return result;
 }
 
@@ -481,15 +479,15 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
 
     work->keysPressed = GCTX_HIDGetPressedKeys();
     work->keysHeld = GCTX_HIDGetHeldKeys();
-    if (func_0203d9c8(sGeonetTouchRects) != TOUCH_RECT_NONE) {
-        work->touchHeld = func_0203da84(&work->touchX, &work->touchY);
+    if (GFL_HIDGetTouchHeldRect(sGeonetTouchRects) != TOUCH_RECT_NONE) {
+        work->touchHeld = GFL_HIDGetTouchHeldPoint(&work->touchX, &work->touchY);
     } else {
         work->touchHeld = FALSE;
     }
     if (work->touchHeld == TRUE) {
-        work->touchPressed = func_0203da48();
+        work->touchPressed = GFL_HIDIsTouchPressed();
     } else {
-        work->touchPressed = func_0203dac8(&work->touchX, &work->touchY);
+        work->touchPressed = GFL_HIDGetTouchPressedPoint(&work->touchX, &work->touchY);
     }
 
     switch (*state) {
@@ -531,7 +529,7 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
         }
         break;
     case SEQ_MENU:
-        if (func_02021c0c(work->queue)) {
+        if (PrintQueue_IsEmpty(work->queue)) {
             u32 choice = BmpMenuList_Update(work->list);
 
             if (choice != BMPMENULIST_NULL) {
@@ -589,7 +587,7 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
         }
         break;
     case SEQ_COUNTRY_SELECT:
-        if (func_02021c0c(work->queue)) {
+        if (PrintQueue_IsEmpty(work->queue)) {
             u32 choice = BmpMenuList_Update(work->list);
 
             if (choice != BMPMENULIST_NULL) {
@@ -630,7 +628,7 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
         }
         break;
     case SEQ_REGION_SELECT:
-        if (func_02021c0c(work->queue)) {
+        if (PrintQueue_IsEmpty(work->queue)) {
             u32 choice = BmpMenuList_Update(work->list);
 
             if (choice != BMPMENULIST_NULL) {
@@ -668,7 +666,7 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
         switch (ConfirmDialog_Update(work->yesNo)) {
         case 0:
             Geonet_ClosePlaceWindow(work);
-            func_02009b84(work->survey, work->playerInfo, work->selCountry, work->selRegion);
+            UnityTower_SetOwnRegion(work->survey, work->playerInfo, work->selCountry, work->selRegion);
             GameBeaconSys_SetCountryRegion(work->selCountry, work->selRegion);
             work->myCountry = work->selCountry;
             work->myRegion = work->selRegion;
@@ -704,7 +702,7 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
         u16 zoom = work->zoom;
         u32 index;
 
-        if (!func_02021c0c(work->queue)) {
+        if (!PrintQueue_IsEmpty(work->queue)) {
             break;
         }
         Geonet_ReadTouch(work);
@@ -797,8 +795,8 @@ static BOOL GeonetProc_End(GameProc *proc, u32 *state, void *param, void *procWo
     GeonetWork *work = procWork;
     int heapId = work->heapId;
 
-    func_02021c44(work->queue);
-    func_02021a18(work->queue);
+    PrintQueue_Clear(work->queue);
+    PrintQueue_Free(work->queue);
     GFL_BGSysSetBGEnabled(6, FALSE);
     GFL_BGSysSetBGEnabled(2, FALSE);
     GFL_BGSysSetBGEnabled(7, FALSE);
@@ -900,7 +898,7 @@ static void Geonet_AddPlace(GeonetWork *work, int index, s16 x, s16 y, u16 count
     angles.z = 0;
     Geonet_GetPlaceRotation(&rotation, &angles);
     work->places[index].rotation = rotation;
-    work->places[index].state = func_02009ba4(work->survey, country, region);
+    work->places[index].state = UnityTower_GetRegionState(work->survey, country, region);
     work->places[index].country = country;
     work->places[index].region = region;
 }
@@ -932,7 +930,7 @@ static void Geonet_ReadTouch(GeonetWork *work) {
     int moveY;
 
     work->touchKeys = 0;
-    button = func_0203da0c(sGeonetButtonRects);
+    button = GFL_HIDGetTouchPressedRect(sGeonetButtonRects);
     if (button == BUTTON_VIEW) {
         keys = PAD_BUTTON_X;
     } else if (button == BUTTON_QUIT) {
@@ -1123,23 +1121,23 @@ static BOOL Geonet_PrintMessage(GeonetWork *work, u32 message, BOOL close) {
         GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_INFO].window), 15);
         work->message = GFL_StrBufCreate(0x400, work->heapId);
         GFL_MsgDataLoadStrbuf(work->msgData, message, work->message);
-        work->stream = func_02022268(work->windows[WINDOW_INFO].window, 0, 0, work->message, work->font,
-                                     func_02017bcc(), work->tcbManager, 0, work->heapId, 15);
+        work->stream = PrintStream_Create(work->windows[WINDOW_INFO].window, 0, 0, work->message, work->font,
+                                          TextSpeed_GetCurrentWait(), work->tcbManager, 0, work->heapId, 15);
         work->messageState = 1;
         break;
     case 1: {
-        u32 streamState = func_020223b4(work->stream);
+        u32 streamState = PrintStream_GetState(work->stream);
 
         KeyCursor_Update(work->keyCursor, work->stream, work->windows[WINDOW_INFO].window);
         switch (streamState) {
         case PRINT_STREAM_RUNNING:
             if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) {
-                func_020223e0(work->stream, 0);
+                PrintStream_SkipWait(work->stream, 0);
             }
             break;
         case PRINT_STREAM_PAUSED:
             if ((work->keysPressed & PAD_BUTTON_A) || (work->keysPressed & PAD_BUTTON_B)) {
-                func_020223bc(work->stream);
+                PrintStream_Continue(work->stream);
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             break;
@@ -1152,7 +1150,7 @@ static BOOL Geonet_PrintMessage(GeonetWork *work, u32 message, BOOL close) {
     case 2:
         if (close || (work->keysPressed & PAD_BUTTON_A)) {
             GFL_StrBufFree(work->message);
-            func_020223cc(work->stream);
+            PrintStream_Delete(work->stream);
             work->messageState = 0;
             done = TRUE;
         }
@@ -1711,10 +1709,10 @@ static u32 Geonet_GetDistance(const GeonetAngles *a, const GeonetAngles *b) {
     int x = MATH_ABS(a->x - b->x);
     int y = MATH_ABS(a->y - b->y);
 
-    if (x > func_020443b4(180)) {
+    if (x > GFL_MathDegToAngleIdx(180)) {
         x = 0xffff - x;
     }
-    if (y > func_020443b4(180)) {
+    if (y > GFL_MathDegToAngleIdx(180)) {
         y = 0xffff - y;
     }
     return FX_Sqrt((x * x + y * y) << FX32_SHIFT) >> FX32_SHIFT;

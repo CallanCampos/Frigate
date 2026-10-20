@@ -53,7 +53,7 @@ u16 *PlayerSave_GetReturnZoneIDPtr(PlayerSave *playerSave);
 PlayerSave *SaveControl_GetPlayerSave(SaveControl *save);
 void SaveControl_SavePlayerState(SaveControl *save, const PlayerState *state);
 void SaveControl_LoadPlayerState(SaveControl *save, PlayerState *state);
-void func_02008fb8(SaveControl *save, SaveLocation *location);
+void SaveControl_GetPlayerLocation(SaveControl *save, SaveLocation *location);
 void PlayerSave_SaveFieldStatus(PlayerSave *playerSave, FieldStatus *status);
 void PlayerSave_LoadFieldStatus(PlayerSave *playerSave, FieldStatus *status);
 void PlayerSave_SaveSeason(PlayerSave *playerSave, u8 season);

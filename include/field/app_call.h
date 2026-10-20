@@ -46,7 +46,12 @@ struct FieldAppCallInput {
 
 // The apps of FIELD_PROC_LINK_LIST, by index
 #define FIELD_APP_POKELIST 0
+#define FIELD_APP_ZUKAN 1
 #define FIELD_APP_BAG 2
+#define FIELD_APP_TRAINER_CARD 3
+#define FIELD_APP_SAVE 4
+#define FIELD_APP_CONFIG 5
+#define FIELD_APP_INF_DUNGEON_RETIRE 6
 #define FIELD_APP_POKESTATUS 7
 #define FIELD_APP_MAIL 10
 #define FIELD_APP_SHINKA_DEMO 11
@@ -100,46 +105,47 @@ extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;
 extern const GameProcFunctions MEDALBOX_PROC_FUNCTIONS;
 
 // Overlay 12: the trainer card's param, whose canEdit is FALSE in the Union Room
-void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit);
+void *TrainerCardParam_Create(GameData *gameData, HeapID heapId, BOOL canEdit);
 
-void *func_ov012_0215b7d8(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215b9cc(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215bb44(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bb70(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215bcf0(FieldAppCallWork *work, void *param);
-u32 func_ov012_0215bd1c(GameSystem *gsys);
-void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215bdd0(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bef4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215bf58(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bf8c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215bff8(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c094(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c0cc(FieldAppCallWork *work, void *param);
-void func_ov012_0215c0dc(FieldAppCallWork *work, s32 appParam);
-void *func_ov012_0215c10c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c138(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c218(FieldAppCallWork *work, void *param);
-void func_ov012_0215c2c8(void *param);
+void *FieldAppCall_CreatePokeListParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetPokeListResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateZukanParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetZukanResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreatePStatusParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetPStatusResult(FieldAppCallWork *work, void *param);
+u32 FieldAppCall_GetBagMode(GameSystem *gsys);
+void *FieldAppCall_CreateBagParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetBagResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateTrainerCardParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetTrainerCardResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateTownMapParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateConfigParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetConfigResult(FieldAppCallWork *work, void *param);
+void FieldAppCall_CallSave(FieldAppCallWork *work, s32 appParam);
+void *FieldAppCall_CreateWifiNoteParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetWifiNoteResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateMailParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetMailResult(FieldAppCallWork *work, void *param);
+void FieldAppCall_FreeMailParam(void *param);
 void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c3a4(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c3d0(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c3fc(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c438(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c474(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c488(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
-u32 func_ov012_0215c4b4(FieldAppCallWork *work, void *param);
+u32 FieldAppCall_GetShinkaDemoResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateBattleRecorderParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId,
+                                             const void *prevParam);
+u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateXtransceiverParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetXtransceiverResult(FieldAppCallWork *work, void *param);
+void *FieldAppCall_CreateMedalBoxParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
+u32 FieldAppCall_GetMedalBoxResult(FieldAppCallWork *work, void *param);
 
 GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, void *data);
 GameEvent *EventFieldAppCall_Create(FieldAppCallInput *input, u16 code);
 void EventFieldAppCall_ConvAppResultToEventType(u32 result, u32 *eventType);
-void func_ov012_0215b754(FieldAppCallWork *work);
-void func_ov012_0215b76c(FieldAppCallParam *param, FieldAppCallInput *input, FieldAppCallPredicate canRetry,
-                         FieldAppCallPredicate callback1, FieldAppCallPredicate callback2, void *arg);
+void FieldAppCall_ClearBagFreeSpaceFilter(FieldAppCallWork *work);
+void FieldAppCallParam_Init(FieldAppCallParam *param, FieldAppCallInput *input, FieldAppCallPredicate canRetry,
+                            FieldAppCallPredicate callback1, FieldAppCallPredicate callback2, void *arg);
 BOOL FieldAppCallParam_CanRetry(FieldAppCallParam *param);
-BOOL func_ov012_0215b7a8(FieldAppCallParam *param);
-BOOL func_ov012_0215b7c0(FieldAppCallParam *param);
+BOOL FieldAppCallParam_RunCallback1(FieldAppCallParam *param);
+BOOL FieldAppCallParam_RunCallback2(FieldAppCallParam *param);
 
 #endif // POKEBW2_FIELD_APP_CALL_H

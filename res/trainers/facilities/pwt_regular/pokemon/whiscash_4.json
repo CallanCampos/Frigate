@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_WHISCASH",
+    "moves": [ "MOVE_REST", "MOVE_SLEEP_TALK", "MOVE_FISSURE", "MOVE_MUDDY_WATER" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

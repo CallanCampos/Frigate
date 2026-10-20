@@ -13,12 +13,12 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// The move effect func_ov167_021d3094 starts, which BtlvEffect_StartMove reads
+// The move effect BtlvScu_StartMoveEffect starts, which BtlvEffect_StartMove reads
 typedef struct BtlvMoveEffectParam {
     u16 move;          // 0x00
     u32 attackerPos;   // 0x04
     u32 targetPos;     // 0x08
-    u8 unk0C;          // 0x0C arg5 of func_ov167_021d3094
+    u8 unk0C;          // 0x0C arg5 of BtlvScu_StartMoveEffect
     u8 unk0D;          // 0x0D its arg6
     s32 unk10;         // 0x10 its arg4, PML_MoveGetParam(move, 27); BtlvEffect_StartMove keeps a byte of it
 } BtlvMoveEffectParam; // size 0x14
@@ -91,15 +91,15 @@ void BtlvEffect_AddGaugeByPkm(PokeDexSave *pokedex, PartyPkm *pkm, u32 viewPos);
 void BtlvEffect_DelGauge(u32 viewPos);
 void BtlvEffect_CalcGaugeHP(u32 viewPos, s32 hp);
 void BtlvEffect_CalcGaugeHPAtOnce(u32 viewPos, s32 hp);
-void BtlvEffect_CalcGaugeExp(u8 pos, s32 exp, BattleMon *mon);
-void BtlvEffect_CalcGaugeExpLevelUp(u8 pos, BattleMon *mon);
+void BtlvEffect_CalcGaugeExp(u32 viewPos, s32 exp, BattleMon *mon);
+void BtlvEffect_CalcGaugeExpLevelUp(u32 viewPos, BattleMon *mon);
 void BtlvEffect_SetGaugeFlag(void);
 BOOL BtlvEffect_CheckExecuteGauge(void);
 void BtlvEffect_SetGaugeDrawEnableBySide(BOOL visible, u32 side);
 void BtlvEffect_SetGaugeDrawEnable(BOOL visible, u32 viewPos);
 void BtlvEffect_SetGaugeStatus(u32 status, u8 pos);
 void BtlvEffect_GaugeAction(u32 viewPos);
-BOOL BtlvEffect_CheckGaugeExist(u8 pos);
+BOOL BtlvEffect_CheckGaugeExist(u32 viewPos);
 BOOL BtlvEffect_GetGaugeStatus(u32 viewPos, u32 *color, u32 *status);
 void BtlvEffect_AddBallGauge(const BtlvBGaugeParam *param);
 void BtlvEffect_DelBallGauge(u32 side);

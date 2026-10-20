@@ -26,10 +26,6 @@
 // The heap of the trainer card screen and of the badge case
 #define HEAPID_TRAINER_CARD_SCREEN 0x27
 
-// a/0/3/9, the screens' graphics, and a/0/4/0, the trainer pictures of the union room appearances
-#define ARCID_TRAINER_CARD_GRA 39
-#define ARCID_TRAINER_CARD_UNION_GRA 40
-
 // The Y button's shortcuts of the card's front, its back and the badge case
 #define SHORTCUT_TRAINER_CARD_FRONT 24
 #define SHORTCUT_TRAINER_CARD_BACK 25

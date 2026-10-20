@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DEWGONG",
+    "moves": [ "MOVE_RAIN_DANCE", "MOVE_REST", "MOVE_SURF", "MOVE_STOCKPILE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_SALAC_BERRY",
+    "form": 0
+}

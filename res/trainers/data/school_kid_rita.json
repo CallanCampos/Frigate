@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rita",
+    "class": "TRAINER_CLASS_SCHOOL_KID_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 5,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_IGGLYBUFF",
+            "form": 0,
+            "level": 63,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LICKILICKY",
+            "form": 0,
+            "level": 63,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'm going to review everything I learned\nin the Trainers' School!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I'll have to work on that move some more..."
+        },
+        {
+            "type": 2,
+            "text": "What kind of person is that Cheren guy\nat Aspertia City's Trainers' School?"
+        }
+    ]
+}

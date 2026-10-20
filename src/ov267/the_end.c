@@ -92,7 +92,7 @@ static BOOL TheEnd_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->param = param;
     wk->graphic = TheEndGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(1, 1);
     GFL_BGSysSetBGPriority(2, 0);
     wk->vblankTask = GFL_VBlankTCBAdd(TheEnd_VBlank, wk, 1);
@@ -115,8 +115,8 @@ static BOOL TheEnd_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     TheEnd_Unused(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     TheEndGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -169,7 +169,7 @@ static BOOL TheEnd_Main(GameProc *proc, u32 *state, void *param, void *work) {
     case STEP_END:
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     TheEndGraphic_Update(wk->graphic);
     return FALSE;
 }

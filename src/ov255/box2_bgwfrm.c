@@ -14,61 +14,61 @@
 // marking frame. The ROM doesn't name this file; box2_bgwfrm.c is a guess after box2_main.c. None of these functions
 // has a name yet
 
-static void func_ov255_021d36f4(BGWinFrame *frames, u32 index, u32 datId);
-static void func_ov255_021d3898(BGWinFrame *frames);
-static void func_ov255_021d3a08(Box2SysWork *syswk);
+static void LoadFrameScreen(BGWinFrame *frames, u32 index, u32 datId);
+static void PutMenuOffscreen(BGWinFrame *frames);
+static void InitMessageFrame(Box2SysWork *syswk);
 
-void func_ov255_021d364c(Box2SysWork *syswk) {
+void Box2Frame_Init(Box2SysWork *syswk) {
     Box2AppWork *app = syswk->app;
 
     app->bgWinFrame = BGWinFrame_Create(BGWINFRAME_TRANSFER_VBLANK, 12, HEAPID_BOX2_APP);
-    func_ov255_021cec40(app);
-    func_ov255_021d3a08(syswk);
-    func_ov255_021cec98(syswk);
-    func_ov255_021cecc4(syswk);
+    Box2Bmp_InitMenuFrames(app);
+    InitMessageFrame(syswk);
+    Box2Bmp_InitPartyButton(syswk);
+    Box2Bmp_InitBoxListButton(syswk);
 
     BGWinFrame_InitFrame(app->bgWinFrame, 8, 1, 11, 15);
     if (syswk->param->mode == 4) {
-        func_ov255_021d36f4(app->bgWinFrame, 8, 8);
+        LoadFrameScreen(app->bgWinFrame, 8, 8);
     } else {
-        func_ov255_021d36f4(app->bgWinFrame, 8, 9);
+        LoadFrameScreen(app->bgWinFrame, 8, 9);
     }
 
     BGWinFrame_InitFrame(app->bgWinFrame, 7, 1, 11, 15);
-    func_ov255_021d36f4(app->bgWinFrame, 7, 10);
-    func_ov255_021ceea4(syswk);
+    LoadFrameScreen(app->bgWinFrame, 7, 10);
+    Box2Bmp_InitMarkingFrame(syswk);
 
     BGWinFrame_InitFrame(app->bgWinFrame, 9, 1, 11, 21);
-    func_ov255_021d36f4(app->bgWinFrame, 9, 11);
+    LoadFrameScreen(app->bgWinFrame, 9, 11);
 
-    func_ov255_021d3898(app->bgWinFrame);
+    PutMenuOffscreen(app->bgWinFrame);
 }
 
-void func_ov255_021d36e8(Box2AppWork *app) {
+void Box2Frame_Delete(Box2AppWork *app) {
     BGWinFrame_Delete(app->bgWinFrame);
 }
 
-static void func_ov255_021d36f4(BGWinFrame *frames, u32 index, u32 datId) {
+static void LoadFrameScreen(BGWinFrame *frames, u32 index, u32 datId) {
     BGWinFrame_LoadScreen(frames, index, ARCID_BOX2, datId, TRUE);
 }
 
-void func_ov255_021d3704(BGWinFrame *frames) {
+void Box2Frame_PutPartyLeft(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 8, 2, 6);
 }
 
-void func_ov255_021d3714(BGWinFrame *frames) {
+void Box2Frame_PutPartyRight(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 8, 21, 6);
 }
 
-void func_ov255_021d3724(BGWinFrame *frames) {
+void Box2Frame_PutPartyLeftBelow(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 8, 2, 24);
 }
 
-void func_ov255_021d3734(BGWinFrame *frames) {
+void Box2Frame_PutPartyRightBelow(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 8, 21, 24);
 }
 
-void func_ov255_021d3744(BGWinFrame *frames) {
+void Box2Frame_SlidePartyUp(BGWinFrame *frames) {
     s8 x, y;
 
     BGWinFrame_GetPos(frames, 8, &x, &y);
@@ -77,7 +77,7 @@ void func_ov255_021d3744(BGWinFrame *frames) {
     }
 }
 
-void func_ov255_021d3778(BGWinFrame *frames) {
+void Box2Frame_SlidePartyDown(BGWinFrame *frames) {
     s8 x, y;
 
     BGWinFrame_GetPos(frames, 8, &x, &y);
@@ -86,15 +86,15 @@ void func_ov255_021d3778(BGWinFrame *frames) {
     }
 }
 
-void func_ov255_021d37b0(BGWinFrame *frames) {
+void Box2Frame_SlidePartyRight(BGWinFrame *frames) {
     BGWinFrame_StartMove(frames, 8, 1, 0, 19);
 }
 
-void func_ov255_021d37c4(BGWinFrame *frames) {
+void Box2Frame_SlidePartyLeft(BGWinFrame *frames) {
     BGWinFrame_StartMove(frames, 8, -1, 0, 19);
 }
 
-BOOL func_ov255_021d37d8(Box2SysWork *syswk) {
+BOOL Box2Frame_PartyMoveStep(Box2SysWork *syswk) {
     s8 prevX, prevY, x, y;
     BOOL moving;
     BOOL ret;
@@ -103,7 +103,7 @@ BOOL func_ov255_021d37d8(Box2SysWork *syswk) {
     moving = BGWinFrame_MoveStep(syswk->app->bgWinFrame, 8);
     BGWinFrame_GetPos(syswk->app->bgWinFrame, 8, &x, &y);
     if (prevX != x || prevY != y) {
-        func_ov255_021d00d4(syswk);
+        Box2Obj_MovePartyIconsWithFrame(syswk);
     }
     ret = FALSE;
     if (moving) {
@@ -112,7 +112,7 @@ BOOL func_ov255_021d37d8(Box2SysWork *syswk) {
     return ret;
 }
 
-BOOL func_ov255_021d3834(BGWinFrame *frames) {
+BOOL Box2Frame_IsPartyAtRight(BGWinFrame *frames) {
     s8 x, y;
 
     BGWinFrame_GetPos(frames, 8, &x, &y);
@@ -122,7 +122,7 @@ BOOL func_ov255_021d3834(BGWinFrame *frames) {
     return FALSE;
 }
 
-BOOL func_ov255_021d3858(BGWinFrame *frames) {
+BOOL Box2Frame_IsPartyAtLeft(BGWinFrame *frames) {
     s8 x, y;
 
     BGWinFrame_GetPos(frames, 8, &x, &y);
@@ -132,7 +132,7 @@ BOOL func_ov255_021d3858(BGWinFrame *frames) {
     return FALSE;
 }
 
-BOOL func_ov255_021d387c(BGWinFrame *frames) {
+BOOL Box2Frame_IsPartyUp(BGWinFrame *frames) {
     s8 x, y;
 
     BGWinFrame_GetPos(frames, 8, &x, &y);
@@ -142,7 +142,7 @@ BOOL func_ov255_021d387c(BGWinFrame *frames) {
     return FALSE;
 }
 
-static void func_ov255_021d3898(BGWinFrame *frames) {
+static void PutMenuOffscreen(BGWinFrame *frames) {
     u32 i;
 
     for (i = 0; i < 6; i++) {
@@ -150,7 +150,7 @@ static void func_ov255_021d3898(BGWinFrame *frames) {
     }
 }
 
-void func_ov255_021d38bc(BGWinFrame *frames) {
+void Box2Frame_ShowMenu(BGWinFrame *frames) {
     u32 i;
 
     for (i = 0; i < 6; i++) {
@@ -158,7 +158,7 @@ void func_ov255_021d38bc(BGWinFrame *frames) {
     }
 }
 
-void func_ov255_021d38e0(BGWinFrame *frames) {
+void Box2Frame_HideMenu(BGWinFrame *frames) {
     u32 i;
 
     for (i = 0; i < 6; i++) {
@@ -167,7 +167,7 @@ void func_ov255_021d38e0(BGWinFrame *frames) {
     }
 }
 
-void func_ov255_021d390c(BGWinFrame *frames) {
+void Box2Frame_SlideMenuIn(BGWinFrame *frames) {
     s8 x, y;
     u16 i = 0;
 
@@ -179,7 +179,7 @@ void func_ov255_021d390c(BGWinFrame *frames) {
     }
 }
 
-void func_ov255_021d3954(BGWinFrame *frames) {
+void Box2Frame_SlideMenuOut(BGWinFrame *frames) {
     s8 x, y;
     u16 i = 0;
 
@@ -191,7 +191,7 @@ void func_ov255_021d3954(BGWinFrame *frames) {
     }
 }
 
-BOOL func_ov255_021d399c(BGWinFrame *frames) {
+BOOL Box2Frame_MenuMoveStep(BGWinFrame *frames) {
     BOOL moving = FALSE;
     u32 i;
 
@@ -203,7 +203,7 @@ BOOL func_ov255_021d399c(BGWinFrame *frames) {
     return moving;
 }
 
-BOOL func_ov255_021d39c0(BGWinFrame *frames) {
+BOOL Box2Frame_IsMenuOnScreen(BGWinFrame *frames) {
     s8 x, y;
     BOOL ret = FALSE;
 
@@ -214,7 +214,7 @@ BOOL func_ov255_021d39c0(BGWinFrame *frames) {
     return ret;
 }
 
-BOOL func_ov255_021d39e4(BGWinFrame *frames) {
+BOOL Box2Frame_IsMenuIn(BGWinFrame *frames) {
     s8 x, y;
     BOOL ret = FALSE;
 
@@ -225,43 +225,43 @@ BOOL func_ov255_021d39e4(BGWinFrame *frames) {
     return ret;
 }
 
-static void func_ov255_021d3a08(Box2SysWork *syswk) {
+static void InitMessageFrame(Box2SysWork *syswk) {
     u16 *screen = GFL_BGSysIsScrHeapExists(0);
 
     BGWinFrame_InitFrame(syswk->app->bgWinFrame, 6, 0, 32, 3);
     BGWinFrame_SetScreen(syswk->app->bgWinFrame, 6, screen + 32 * 21);
 }
 
-void func_ov255_021d3a38(BGWinFrame *frames) {
+void Box2Frame_PutMessage(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 6, 0, 21);
 }
 
-void func_ov255_021d3a48(Box2AppWork *app) {
+void Box2Frame_ShowPartyButton(Box2AppWork *app) {
     BGWinFrame_Put(app->bgWinFrame, 10, 0, 21);
 }
 
-void func_ov255_021d3a58(Box2AppWork *app) {
+void Box2Frame_HidePartyButton(Box2AppWork *app) {
     BGWinFrame_Hide(app->bgWinFrame, 10);
 }
 
-void func_ov255_021d3a64(Box2AppWork *app) {
+void Box2Frame_ShowBoxListButton(Box2AppWork *app) {
     BGWinFrame_Put(app->bgWinFrame, 11, 0, 21);
 }
 
-void func_ov255_021d3a74(Box2AppWork *app) {
+void Box2Frame_HideBoxListButton(Box2AppWork *app) {
     BGWinFrame_Hide(app->bgWinFrame, 11);
 }
 
-void func_ov255_021d3a80(BGWinFrame *frames) {
+void Box2Frame_SlideMarkingIn(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 7, 21, 24);
     BGWinFrame_StartMove(frames, 7, 0, -1, 19);
 }
 
-void func_ov255_021d3aa4(BGWinFrame *frames) {
+void Box2Frame_SlideMarkingOut(BGWinFrame *frames) {
     BGWinFrame_StartMove(frames, 7, 0, 1, 19);
 }
 
-BOOL func_ov255_021d3ab8(Box2SysWork *syswk) {
+BOOL Box2Frame_MarkingMoveStep(Box2SysWork *syswk) {
     s8 prevX, prevY, x, y;
     BOOL moving;
 
@@ -269,21 +269,21 @@ BOOL func_ov255_021d3ab8(Box2SysWork *syswk) {
     moving = BGWinFrame_MoveStep(syswk->app->bgWinFrame, 7);
     BGWinFrame_GetPos(syswk->app->bgWinFrame, 7, &x, &y);
     if (prevX != x || prevY != y) {
-        func_ov255_021d1364(syswk);
+        Box2Obj_MoveMarkIcons(syswk);
     }
     return moving;
 }
 
-void func_ov255_021d3b10(BGWinFrame *frames) {
+void Box2Frame_SlideBoxListIn(BGWinFrame *frames) {
     BGWinFrame_Put(frames, 9, 32, 0);
     BGWinFrame_StartMove(frames, 9, -1, 0, 11);
 }
 
-void func_ov255_021d3b34(BGWinFrame *frames) {
+void Box2Frame_SlideBoxListOut(BGWinFrame *frames) {
     BGWinFrame_StartMove(frames, 9, 1, 0, 11);
 }
 
-BOOL func_ov255_021d3b48(BGWinFrame *frames) {
+BOOL Box2Frame_IsBoxListIn(BGWinFrame *frames) {
     s8 x, y;
 
     BGWinFrame_GetPos(frames, 9, &x, &y);

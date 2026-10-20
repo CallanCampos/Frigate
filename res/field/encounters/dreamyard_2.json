@@ -1,0 +1,35 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 3,
+            "shaking_grass": 0,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [
+            [ "SPECIES_RATICATE", 64, 64 ],
+            [ "SPECIES_GOLBAT", 64, 64 ],
+            [ "SPECIES_WATCHOG", 65, 65 ],
+            [ "SPECIES_JIGGLYPUFF", 65, 65 ],
+            [ "SPECIES_MUNNA", 65, 65 ],
+            [ "SPECIES_MUNNA", 66, 66 ],
+            [ "SPECIES_LIEPARD", 65, 65 ],
+            [ "SPECIES_LIEPARD", 66, 66 ],
+            [ "SPECIES_RATICATE", 67, 67 ],
+            [ "SPECIES_GOLBAT", 67, 67 ],
+            [ "SPECIES_RATICATE", 67, 67 ],
+            [ "SPECIES_GOLBAT", 67, 67 ]
+        ],
+        "shaking_grass": [],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

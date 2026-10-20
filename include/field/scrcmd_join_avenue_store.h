@@ -11,7 +11,7 @@
 
 BOOL s02C6_JoinAvenueStoreStart(VM *vm, FieldScriptEnv *env);
 BOOL s02C6_JoinAvenueStoreEnd(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_0216acfc(VM *vm, FieldScriptEnv *env);
+BOOL s02CB_PokewoodGetLevel(VM *vm, FieldScriptEnv *env);
 BOOL s02E3_LensFlareRequest(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_JOIN_AVENUE_STORE_H

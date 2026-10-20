@@ -1,3 +1,0 @@
-\from{species.pokedex.fr.height}
-\from{species.pokedex.fr.forms.height}
-\pad{be}

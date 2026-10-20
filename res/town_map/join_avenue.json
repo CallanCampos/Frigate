@@ -1,0 +1,44 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_JOIN_AVENUE",
+    "type": 3,
+    "radius": 12,
+    "position": {
+        "x": 132,
+        "y": 104
+    },
+    "cursor": {
+        "x": 132,
+        "y": 104
+    },
+    "hit": {
+        "start": {
+            "x": 132,
+            "y": 100
+        },
+        "end": {
+            "x": 132,
+            "y": 108
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_JOIN_AVENUE",
+    "shown_by": null,
+    "description": "TownMap_Text_BigAvenueKeepsDeveloping",
+    "landmarks": [
+        "TownMap_Text_CurrentAvenueRank",
+        "TownMap_Text_RecommendedInvited",
+        "TownMap_Text_CurrentVisitors",
+        "TownMap_Text_Empty_2",
+        "TownMap_Text_Empty_3",
+        "TownMap_Text_Empty_4"
+    ],
+    "area": {
+        "animation": 1,
+        "x": 124,
+        "y": 96
+    }
+}

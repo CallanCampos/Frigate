@@ -27,7 +27,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/0479.h"
+#include "text/system/zknsearch_main.h"
 
 // The Pokédex's search screen: its BGs and graphics, its fades and the touch bar that slides in
 
@@ -51,10 +51,11 @@ static const BGSysVRAMConfig sZknSearchVRAMConfig = {
 
 // The messages of the types, and of none
 static const u16 sZknSearchTypeMsgs[ZKNSEARCH_TYPE_COUNT + 1] = {
-    Bank0479_Text_Normal, Bank0479_Text_Fighting, Bank0479_Text_Flying,   Bank0479_Text_Poison,  Bank0479_Text_Ground,
-    Bank0479_Text_Rock,   Bank0479_Text_Bug,      Bank0479_Text_Ghost,    Bank0479_Text_Steel,   Bank0479_Text_Fire,
-    Bank0479_Text_Water,  Bank0479_Text_Grass,    Bank0479_Text_Electric, Bank0479_Text_Psychic, Bank0479_Text_Ice,
-    Bank0479_Text_Dragon, Bank0479_Text_Dark,     Bank0479_Text_Empty_9,
+    ZknsearchMain_Text_Normal,   ZknsearchMain_Text_Fighting, ZknsearchMain_Text_Flying, ZknsearchMain_Text_Poison,
+    ZknsearchMain_Text_Ground,   ZknsearchMain_Text_Rock,     ZknsearchMain_Text_Bug,    ZknsearchMain_Text_Ghost,
+    ZknsearchMain_Text_Steel,    ZknsearchMain_Text_Fire,     ZknsearchMain_Text_Water,  ZknsearchMain_Text_Grass,
+    ZknsearchMain_Text_Electric, ZknsearchMain_Text_Psychic,  ZknsearchMain_Text_Ice,    ZknsearchMain_Text_Dragon,
+    ZknsearchMain_Text_Dark,     ZknsearchMain_Text_Empty_9,
 };
 
 // The shapes in the order of the list
@@ -72,7 +73,7 @@ static void ZknSearchMain_VBlankTask(TCB *tcb, void *data) {
     ZknSearchWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
     if (wk->bgRequest == ZKNSEARCH_BG_REQUEST_ON) {
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG3, TRUE);
@@ -353,9 +354,10 @@ void ZknSearchMain_LoadGraphics(void) {
 
     // The touch bar, at the bottom of BG 0
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
-    chars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20, HEAPID_ZUKAN_SEARCH);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 0, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
+    chars = GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20,
+                                HEAPID_ZUKAN_SEARCH);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 0, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
     GFL_BGSysSetScrPaletteNo(0, 0, TOUCHBAR_Y, 32, TOUCHBAR_HEIGHT, 14);
     GFL_BGSysQueueScrLoad(0);
     GFL_ArcToolFree(arc);
@@ -426,16 +428,16 @@ void ZknSearchMain_ExitWindow(void) {
 }
 
 void ZknSearchMain_InitMsg(ZknSearchWork *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0479, HEAPID_ZUKAN_SEARCH);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZKNSEARCH_MAIN, HEAPID_ZUKAN_SEARCH);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_SEARCH);
-    wk->printQueue = func_02021998(HEAPID_ZUKAN_SEARCH);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_SEARCH);
     wk->strbuf = GFL_StrBufCreate(0x80, HEAPID_ZUKAN_SEARCH);
 }
 
 void ZknSearchMain_ExitMsg(ZknSearchWork *wk) {
     GFL_StrBufFree(wk->strbuf);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->font);
     GFL_MsgDataFree(wk->msgData);

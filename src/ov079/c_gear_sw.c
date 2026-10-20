@@ -493,7 +493,7 @@ static void CGearSw_AddTouchEffect(CGearSw *work, int x, int y) {
         CGearSw_SetActorPos(effect->actor, x, y);
     } else {
         effect->actor = CGearSw_AddActor(work, x, y, work->marker + 28, 2, 3, 0);
-        func_0204c124(effect->actor, TRUE);
+        ClActor_SetVisible(effect->actor, TRUE);
         func_0204c5c8(effect->actor, TRUE);
     }
 }
@@ -512,8 +512,8 @@ static CGearSwTouchEffect *CGearSw_GetFreeTouchEffect(CGearSw *work) {
         if (work->touchEffects[i].actor == NULL) {
             return &work->touchEffects[i];
         }
-        frame = func_0204c510(work->touchEffects[i].actor);
-        time = func_0204c4f8(work->touchEffects[i].actor);
+        frame = ClActor_GetAnimFrame(work->touchEffects[i].actor);
+        time = ClActor_GetAnimTime(work->touchEffects[i].actor);
         if (frame > oldestFrame || (frame == oldestFrame && time > oldestTime)) {
             oldestFrame = frame;
             oldestTime = time;
@@ -528,12 +528,12 @@ static BOOL CGearSw_UpdateTouchEffect(CGearSw *work) {
     case 0:
         CGearSw_SetActorPos(work->actors[ACTOR_TOUCH], work->touchX, work->touchY);
         CGearSw_SetActorAnim(work->actors[ACTOR_TOUCH], work->marker + 28);
-        func_0204c124(work->actors[ACTOR_TOUCH], TRUE);
+        ClActor_SetVisible(work->actors[ACTOR_TOUCH], TRUE);
         work->effectSeq++;
         break;
     case 1:
-        if (!func_0204c560(work->actors[ACTOR_TOUCH])) {
-            func_0204c124(work->actors[ACTOR_TOUCH], FALSE);
+        if (!ClActor_IsAnimActive(work->actors[ACTOR_TOUCH])) {
+            ClActor_SetVisible(work->actors[ACTOR_TOUCH], FALSE);
             work->effectSeq = 0;
             return TRUE;
         }
@@ -616,8 +616,8 @@ static void CGearSw_SetLampPattern(CGearSw *work, int pattern, int lamp, BOOL in
         slow = 0;
         light = 0;
     }
-    bits = func_02012be4(GameData_GetWifiList(work->gameData));
-    intrude = func_ov012_02153658(comm);
+    bits = WihDwc_GetStatus(GameData_GetWifiList(work->gameData));
+    intrude = Intrude_GetAlertState(comm);
     if (alert) {
         if (intrude == 3) {
             CGearSw_TryLampPattern(work, 1, 3, fast, pattern, lamp);
@@ -937,7 +937,7 @@ static void CGearSw_ShowAlert(CGearSw *work, BOOL alert) {
     if (alert) {
         fraction = 8;
         CGearSw_SetActorAnim(work->actors[ACTOR_RADAR], 14);
-        func_0204c378(work->actors[ACTOR_NOTICE], 1, 0);
+        ClActor_SetPalette(work->actors[ACTOR_NOTICE], 1, 0);
         func_0204c520(work->actors[ACTOR_NOTICE], FALSE);
     } else {
         fraction = 0;
@@ -946,7 +946,7 @@ static void CGearSw_ShowAlert(CGearSw *work, BOOL alert) {
         } else {
             CGearSw_SetActorAnim(work->actors[ACTOR_RADAR], 12);
         }
-        func_0204c378(work->actors[ACTOR_NOTICE], 0, 0);
+        ClActor_SetPalette(work->actors[ACTOR_NOTICE], 0, 0);
         func_0204c520(work->actors[ACTOR_NOTICE], TRUE);
     }
     PaletteFade_BlendPalettes(work->fade, PALFADE_BUFFER_SUB_OBJ, 0x20, fraction, sDarkColors[work->gender]);
@@ -1008,18 +1008,19 @@ static void CGearSw_LoadObjRes(CGearSw *work, int gender) {
     NNSG2dPaletteData *palette;
     void *file;
 
-    work->objRes[0] = func_0204bba0(work->arc, work->gender + 14, 1, 0, work->heapId);
-    work->objRes[1] = func_0204b81c(work->arc, 16, FALSE, 1, work->heapId);
-    work->objRes[2] = func_0204b81c(work->arc, work->gender * SKIN_COUNT + work->skin + 19, FALSE, 1, work->heapId);
-    work->objRes[3] = func_0204bde0(work->arc, 17, 18, work->heapId);
-    work->objRes[4] = func_0204bde0(work->arc, 29, 30, work->heapId);
+    work->objRes[0] = ClActSys_LoadPltt(work->arc, work->gender + 14, 1, 0, work->heapId);
+    work->objRes[1] = ClActSys_LoadChars(work->arc, 16, FALSE, 1, work->heapId);
+    work->objRes[2] =
+        ClActSys_LoadChars(work->arc, work->gender * SKIN_COUNT + work->skin + 19, FALSE, 1, work->heapId);
+    work->objRes[3] = ClActSys_LoadCellAnims(work->arc, 17, 18, work->heapId);
+    work->objRes[4] = ClActSys_LoadCellAnims(work->arc, 29, 30, work->heapId);
 
     file = GFL_G2DIOReadNCLRArc(work->arc, 13, &palette, work->heapId);
     MIi_CpuCopy16(&((u16 *)palette->rawData)[9 * 16], work->beaconColors, sizeof(work->beaconColors));
     GFL_HeapFree(file);
 
-    func_02042f2c(200, 10);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetMoveIcon(200, 10);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
 }
 
 static void CGearSw_LoadSkinChars(CGearSw *work) {
@@ -1028,7 +1029,7 @@ static void CGearSw_LoadSkinChars(CGearSw *work) {
         GFL_ArcToolReadHeapNew(work->arc, work->gender * SKIN_COUNT + work->skin + 19, HEAPID_TAIL(work->heapId));
 
     NNS_G2dGetUnpackedCharacterData(file, &character);
-    func_0204ba40(work->objRes[2], character);
+    ClActSys_ReplaceCharData(work->objRes[2], character);
     GFL_HeapFree(file);
 }
 
@@ -1158,7 +1159,7 @@ static int CGearSw_GetTouchedButton(CGearSw *work) {
     }
     MI_CpuCopy8(sCGearSwButtonRects, &rects[MARKER_COUNT], sizeof(sCGearSwButtonRects));
     rects[MARKER_COUNT + NELEMS(sCGearSwButtonRects)].top = TOUCH_RECT_END;
-    touched = func_0203da0c(rects);
+    touched = GFL_HIDGetTouchPressedRect(rects);
     if (touched == TOUCH_RECT_NONE || (!work->beacons && touched != TOUCH_POWER)) {
         touched = TOUCH_RECT_NONE;
     }
@@ -1171,7 +1172,7 @@ static int CGearSw_GetTouchedColorButton(CGearSw *work) {
     if (!work->beacons || !work->editing) {
         return TOUCH_RECT_NONE;
     }
-    touched = func_0203da0c(sColorButtonRects);
+    touched = GFL_HIDGetTouchPressedRect(sColorButtonRects);
     if (touched == TOUCH_RECT_NONE || touched % 2 == 0) {
         return TOUCH_RECT_NONE;
     }
@@ -1182,12 +1183,12 @@ static void CGearSw_DragMarker(CGearSw *work) {
     u32 x;
     u32 y;
 
-    if (!func_0203da84(&x, &y)) {
+    if (!GFL_HIDGetTouchHeldPoint(&x, &y)) {
         u32 pos = CGearSw_FindMarkerPos(work, work->marker, work->touchX, work->touchY);
 
         if (pos != 0xff) {
             work->markerPos[work->marker] = pos;
-            func_020098f4(work->settings, work->marker, pos);
+            CGearSettings_SetColor(work->settings, work->marker, pos);
         }
         CGearSw_PlaceMarker(work, work->marker, work->markerPos[work->marker]);
         CGearSw_SetDragging(work, work->marker, FALSE);
@@ -1209,7 +1210,7 @@ static void CGearSw_UpdateTouch(CGearSw *work) {
         CGearSw_DragMarker(work);
         return;
     }
-    if (!func_0203da48()) {
+    if (!GFL_HIDIsTouchPressed()) {
         return;
     }
     touched = CGearSw_GetTouchedButton(work);
@@ -1219,7 +1220,7 @@ static void CGearSw_UpdateTouch(CGearSw *work) {
     if (touched == TOUCH_RECT_NONE) {
         return;
     }
-    func_0203d564(TRUE);
+    GCTX_HIDSetUsingTouch(TRUE);
     switch (touched) {
     case TOUCH_MARKER:
     case TOUCH_MARKER + 1:
@@ -1269,7 +1270,7 @@ static void CGearSw_UpdateTouch(CGearSw *work) {
         GFL_SndSEPlay(SEQ_SE_MSCL_07);
         work->panels[panel]++;
         work->panels[panel] %= 6;
-        func_020098dc(work->settings, panel, work->panels[panel]);
+        CGearSettings_SetPanel(work->settings, panel, work->panels[panel]);
         if (panel == PANEL_COUNT) {
             CGearSw_LoadSkinColors(work, work->panels[panel]);
         } else {
@@ -1334,9 +1335,9 @@ static ClActor *CGearSw_AddActor(CGearSw *work, s16 x, s16 y, u8 anim, u8 bgPrio
     setup.sequence = anim;
     setup.priority = priority;
     setup.bgPriority = bgPriority;
-    actor = func_0204c040(work->unit, work->objRes[1 + res], work->objRes[0], work->objRes[3 + res], &setup, 0,
-                          work->heapId);
-    func_0204c124(actor, FALSE);
+    actor = ClActor_Create(work->unit, work->objRes[1 + res], work->objRes[0], work->objRes[3 + res], &setup, 0,
+                           work->heapId);
+    ClActor_SetVisible(actor, FALSE);
     func_0204c520(actor, TRUE);
     func_0204c5c8(actor, FALSE);
     return actor;
@@ -1349,32 +1350,32 @@ static void CGearSw_SetMarkerMode(CGearSw *work, int marker, int mode) {
     switch (mode) {
     case MARKER_NORMAL:
         CGearSw_SetActorAnim(work->actors[actor], marker);
-        func_0204c124(work->actors[actor], TRUE);
+        ClActor_SetVisible(work->actors[actor], TRUE);
         CGearSw_SetActorAnim(work->actors[actor + 1], marker + 22);
-        func_0204c438(work->actors[actor + 1], 6);
+        ClActor_SetPriority(work->actors[actor + 1], 6);
         func_0204c5c8(work->actors[actor + 1], FALSE);
-        func_0204c124(work->actors[actor + 1], TRUE);
+        ClActor_SetVisible(work->actors[actor + 1], TRUE);
         break;
     case MARKER_EDIT:
         CGearSw_SetActorAnim(work->actors[actor], marker);
-        func_0204c124(work->actors[actor], TRUE);
+        ClActor_SetVisible(work->actors[actor], TRUE);
         CGearSw_SetActorAnim(work->actors[actor + 1], marker + 25);
-        func_0204c438(work->actors[actor + 1], 6);
+        ClActor_SetPriority(work->actors[actor + 1], 6);
         func_0204c5c8(work->actors[actor + 1], TRUE);
-        func_0204c124(work->actors[actor + 1], TRUE);
+        ClActor_SetVisible(work->actors[actor + 1], TRUE);
         break;
     case MARKER_DRAG:
-        func_0204c124(work->actors[actor], FALSE);
+        ClActor_SetVisible(work->actors[actor], FALSE);
         CGearSw_SetActorAnim(work->actors[actor + 1], marker + 25);
-        func_0204c438(work->actors[actor + 1], 0);
+        ClActor_SetPriority(work->actors[actor + 1], 0);
         func_0204c5c8(work->actors[actor + 1], TRUE);
-        func_0204c124(work->actors[actor + 1], TRUE);
+        ClActor_SetVisible(work->actors[actor + 1], TRUE);
         break;
     }
 }
 
 static void CGearSw_GetMarkerPos(CGearSw *work, int marker, ClActorPos *pos) {
-    func_0204c178(work->actors[ACTOR_MARKER + marker * 2], pos, 0);
+    ClActor_GetSurfacePos(work->actors[ACTOR_MARKER + marker * 2], pos, 0);
 }
 
 static void CGearSw_SetMarkerPos(CGearSw *work, int marker, s16 x, s16 y) {
@@ -1389,7 +1390,7 @@ static void CGearSw_SetMarkerVisible(CGearSw *work, int marker, BOOL visible) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_0204c124(work->actors[ACTOR_MARKER + marker * 2 + i], visible);
+        ClActor_SetVisible(work->actors[ACTOR_MARKER + marker * 2 + i], visible);
     }
 }
 
@@ -1398,12 +1399,12 @@ static void CGearSw_SetActorPos(ClActor *actor, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(actor, &pos, 0);
+    ClActor_SetSurfacePos(actor, &pos, 0);
 }
 
 static void CGearSw_SetActorAnim(ClActor *actor, u32 anim) {
-    func_0204c488(actor, anim);
-    func_0204c56c(actor);
+    ClActor_SetSequence(actor, anim);
+    ClActor_RestartAnim(actor);
 }
 
 static void CGearSw_AddActors(CGearSw *work) {
@@ -1435,7 +1436,7 @@ static void CGearSw_SetActorsVisible(CGearSw *work, BOOL visible) {
 
     for (i = 0; i < TOUCH_EFFECT_COUNT; i++) {
         if (work->touchEffects[i].actor != NULL) {
-            func_0204c124(work->touchEffects[i].actor, visible);
+            ClActor_SetVisible(work->touchEffects[i].actor, visible);
         }
     }
     for (i = 0; i < ACTOR_TOUCH; i++) {
@@ -1443,15 +1444,15 @@ static void CGearSw_SetActorsVisible(CGearSw *work, BOOL visible) {
             // Without the beacons only the clock, the battery and the power button show
             if (i > ACTOR_POWER) {
                 if (work->beacons || !visible) {
-                    func_0204c124(work->actors[i], visible);
+                    ClActor_SetVisible(work->actors[i], visible);
                 }
             } else {
-                func_0204c124(work->actors[i], visible);
+                ClActor_SetVisible(work->actors[i], visible);
             }
         }
     }
     if (!work->noticeShown) {
-        func_0204c124(work->actors[ACTOR_NOTICE], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_NOTICE], FALSE);
     }
     if (visible == TRUE) {
         CGearSw_UpdateClock(work);
@@ -1678,7 +1679,7 @@ static void CGearSw_UpdateBeacons(CGearSw *work) {
                                      PALFADE_BUFFER_SUB_OBJ, 0x51 + shown, 2);
                 if (!work->noticeShown) {
                     work->noticeShown = TRUE;
-                    func_0204c124(work->actors[ACTOR_NOTICE], TRUE);
+                    ClActor_SetVisible(work->actors[ACTOR_NOTICE], TRUE);
                 }
                 shown++;
             }
@@ -1756,14 +1757,14 @@ static void CGearSw_SetPanelVisible(CGearSw *work, int panel, BOOL visible) {
     switch (panel) {
     case 0:
         if (work->beacons) {
-            func_0204c124(work->actors[ACTOR_LOGO], visible);
+            ClActor_SetVisible(work->actors[ACTOR_LOGO], visible);
             if (work->noticeShown) {
-                func_0204c124(work->actors[ACTOR_NOTICE], visible);
+                ClActor_SetVisible(work->actors[ACTOR_NOTICE], visible);
             }
         }
         break;
     case 2:
-        func_0204c124(work->actors[ACTOR_TITLE], visible);
+        ClActor_SetVisible(work->actors[ACTOR_TITLE], visible);
         break;
     case 4:
         for (i = 0; i <= ACTOR_RADAR; i++) {
@@ -1773,7 +1774,7 @@ static void CGearSw_SetPanelVisible(CGearSw *work, int panel, BOOL visible) {
             if (!work->beacons && i > ACTOR_POWER) {
                 continue;
             }
-            func_0204c124(work->actors[i], visible);
+            ClActor_SetVisible(work->actors[i], visible);
         }
         break;
     }
@@ -1783,7 +1784,7 @@ static void CGearSw_LoadColors(CGearSw *work) {
     int i;
 
     for (i = 0; i < PANEL_COUNT + 1; i++) {
-        work->panels[i] = func_020098e8(work->settings, (u8)i);
+        work->panels[i] = CGearSettings_GetPanel(work->settings, (u8)i);
         if (i < PANEL_COUNT) {
             CGearSw_LoadPanelColors(work, i, work->panels[i]);
         } else {
@@ -1818,7 +1819,7 @@ static void CGearSw_PlaceMarkers(CGearSw *work) {
     int i;
 
     for (i = 0; i < MARKER_COUNT; i++) {
-        work->markerPos[i] = func_02009900(work->settings, i);
+        work->markerPos[i] = CGearSettings_GetColor(work->settings, i);
         CGearSw_PlaceMarker(work, i, work->markerPos[i]);
     }
 }
@@ -1902,11 +1903,11 @@ static void CGearSw_InitGraphics(CGearSw *work, BOOL startup) {
     work->gender = getTrainerGender(GetGameDataPlayerInfo(work->gameData)) & 1;
     work->skin = func_020098c8(work->settings);
     for (i = 0; i < PANEL_COUNT + 1; i++) {
-        work->panels[i] = func_020098e8(work->settings, (u8)i);
+        work->panels[i] = CGearSettings_GetPanel(work->settings, (u8)i);
     }
-    work->unit = func_0204bf1c(84, 0, work->heapId);
-    work->renderer = func_0204be9c(&sSurfaceSetup, 1, work->heapId);
-    func_0204c018(work->unit, work->renderer);
+    work->unit = ClActUnit_Create(84, 0, work->heapId);
+    work->renderer = ClActRenderer_Create(&sSurfaceSetup, 1, work->heapId);
+    ClActUnit_SetRenderer(work->unit, work->renderer);
     func_0204bff0(work->unit, TRUE);
     CGearSw_LoadBG(work, work->gender, work->skin, TRUE);
     CGearSw_LoadObjRes(work, work->gender);
@@ -1924,27 +1925,27 @@ static void CGearSw_FreeObjects(CGearSw *work) {
     CGearSw_ShowPanels(work);
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (work->actors[i] != NULL) {
-            func_0204c108(work->actors[i]);
+            ClActor_Delete(work->actors[i]);
             work->actors[i] = NULL;
         }
     }
     for (i = 0; i < TOUCH_EFFECT_COUNT; i++) {
         if (work->touchEffects[i].actor != NULL) {
-            func_0204c108(work->touchEffects[i].actor);
+            ClActor_Delete(work->touchEffects[i].actor);
             work->touchEffects[i].actor = NULL;
         }
     }
-    func_0204be64(work->objRes[4]);
-    func_0204be64(work->objRes[3]);
-    func_0204b98c(work->objRes[2]);
-    func_0204b98c(work->objRes[1]);
-    func_0204bcd0(work->objRes[0]);
+    ClActSys_FreeCellAnims(work->objRes[4]);
+    ClActSys_FreeCellAnims(work->objRes[3]);
+    ClActSys_FreeChars(work->objRes[2]);
+    ClActSys_FreeChars(work->objRes[1]);
+    ClActSys_FreePltt(work->objRes[0]);
 }
 
 static void CGearSw_ExitGraphics(CGearSw *work) {
     CGearSw_FreeObjects(work);
-    func_0204becc(work->renderer);
-    func_0204bf98(work->unit);
+    ClActRenderer_Delete(work->renderer);
+    ClActUnit_Delete(work->unit);
     GFL_BGSysSetBGEnabled(7, FALSE);
     GFL_BGSysSetBGEnabled(6, FALSE);
     GFL_BGSysSetBGEnabled(5, FALSE);
@@ -1966,45 +1967,45 @@ static void CGearSw_UpdateClock(CGearSw *work) {
 
     RTC_GetCachedTime(&time);
     frame = time.hour / 12 + 1;
-    if (frame != func_0204c4a0(work->actors[ACTOR_CLOCK])) {
+    if (frame != ClActor_GetSequence(work->actors[ACTOR_CLOCK])) {
         CGearSw_SetActorAnim(work->actors[ACTOR_CLOCK], frame);
     }
     actor = work->actors[ACTOR_CLOCK_DIGIT];
     frame = time.hour / 10;
-    if (frame != func_0204c510(actor)) {
-        func_0204c504(actor, frame);
+    if (frame != ClActor_GetAnimFrame(actor)) {
+        ClActor_SetAnimFrame(actor, frame);
     }
     actor = work->actors[ACTOR_CLOCK_DIGIT + 1];
     frame = time.hour % 10;
-    if (frame != func_0204c510(actor)) {
-        func_0204c504(actor, frame);
+    if (frame != ClActor_GetAnimFrame(actor)) {
+        ClActor_SetAnimFrame(actor, frame);
     }
     // The colon blinks
     frame = time.second & 1;
     actor = work->actors[ACTOR_CLOCK];
-    if (frame != func_0204c510(actor)) {
-        func_0204c504(actor, frame);
+    if (frame != ClActor_GetAnimFrame(actor)) {
+        ClActor_SetAnimFrame(actor, frame);
     }
     actor = work->actors[ACTOR_CLOCK_DIGIT + 2];
     frame = time.minute / 10;
-    if (frame != func_0204c510(actor)) {
-        func_0204c504(actor, frame);
+    if (frame != ClActor_GetAnimFrame(actor)) {
+        ClActor_SetAnimFrame(actor, frame);
     }
     actor = work->actors[ACTOR_CLOCK_DIGIT + 3];
     frame = time.minute % 10;
-    if (frame != func_0204c510(actor)) {
-        func_0204c504(actor, frame);
+    if (frame != ClActor_GetAnimFrame(actor)) {
+        ClActor_SetAnimFrame(actor, frame);
     }
     actor = work->actors[ACTOR_BATTERY];
     if (OS_IsRunOnTwl()) {
         frame = CGearSw_GetBatteryFrame();
-        if (frame != func_0204c510(actor)) {
-            func_0204c504(actor, frame);
+        if (frame != ClActor_GetAnimFrame(actor)) {
+            ClActor_SetAnimFrame(actor, frame);
         }
     } else {
         frame = GCTX_HIDGetBatteryLevel() == 5 ? 1 : 0;
-        if (frame != func_0204c510(actor)) {
-            func_0204c504(actor, frame);
+        if (frame != ClActor_GetAnimFrame(actor)) {
+            ClActor_SetAnimFrame(actor, frame);
         }
     }
 }
@@ -2069,11 +2070,11 @@ static BOOL CGearSw_LoadSkin(CGearSw *work, GameSystem *gsys) {
     CGearPictureSave *picture = GFL_HeapAllocate(HEAPID_FIELD_MENU, 0x2800, FALSE, "c_gear_sw.c", 3980);
     SaveControl *save = GameData_GetSaveControl(work->gameData);
 
-    if (func_02007560(save, 4, HEAPID_FIELD_MENU, picture, 0x2800) == 1) {
+    if (SaveControl_LoadExtraBlock(save, 4, HEAPID_FIELD_MENU, picture, 0x2800) == 1) {
         u16 crc = getCRC16(picture, sizeof(CGearPictureSave));
 
-        if (crc == func_020098d8(func_02009918(save))) {
-            if (func_0200ce5c(picture)) {
+        if (crc == CGearSettings_GetSkinCrc(CGearSettings_GetFromSave(save))) {
+            if (CGearPictureSave_IsValid(picture)) {
                 loaded = TRUE;
                 GFL_BGSysLoadChar(5, picture, 0x1fe0, 0);
                 GFL_BGSysUploadStdPalette(5, &picture->chars[0x1fe0], 0x20, 13 * 0x20);
@@ -2127,7 +2128,7 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
     work->gsys = gsys;
     work->gameData = GSYS_GetGameData(gsys);
     work->active = TRUE;
-    work->beacons = func_02016b34(work->gsys);
+    work->beacons = GSYS_IsCGearOn(work->gsys);
     work->unk30d = TRUE;
     work->touchAction = ACTION_NONE;
     work->action = ACTION_NONE;
@@ -2143,7 +2144,7 @@ static void CGearSw_Init(CGearSw *work, CGearSettings *settings, FieldSubscreen 
     }
     CGearSw_InitBG(work);
     CGearSw_InitGraphics(work, startup);
-    if (func_020098d0(work->settings)) {
+    if (CGearSettings_GetSkinValid(work->settings)) {
         CGearSw_LoadSkin(work, gsys);
     }
     work->fade = PaletteFade_Create(HEAPID_FIELD_MENU);
@@ -2187,8 +2188,8 @@ static void CGearSw_Exit(CGearSw *work) {
     CGearSwFlash_Exit(&work->flash);
     GCTX_HIDSetSleepCallback(NULL, NULL);
     GCTX_HIDSetWakeCallback(NULL, NULL);
-    func_02042f40();
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetResetIconPos();
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     GFL_TCBRemove(work->vblankTcb);
     func_0203a610(work->tcbMgr);
     GFL_HeapFree(work->tcbMgrBuffer);
@@ -2238,7 +2239,7 @@ void CGearSw_Update(CGearSw *work, BOOL active) {
     }
     CGearSw_SetActive(work, active);
     if (!CGearSw_IsDark(work)) {
-        u32 intrude = func_ov012_02153658(GSYS_GetGameCommSystem(work->gsys));
+        u32 intrude = Intrude_GetAlertState(GSYS_GetGameCommSystem(work->gsys));
 
         CGearSw_UpdateIntrudeAlert(work, intrude);
         CGearSw_UpdateCallAlert(work, intrude);
@@ -2289,7 +2290,7 @@ BOOL CGearSw_Reload(CGearSw *work) {
     return FALSE;
 }
 
-GameEvent *CGearSw_CheckEvent(CGearSw *work, BOOL enabled) {
+GameEvent *CGearSw_CheckEvent(CGearSw *work, BOOL enabled, FieldSubscreen *subscreen) {
     GameEvent *event = NULL;
     Field *field;
 
@@ -2366,7 +2367,7 @@ static BOOL CGearSw_UpdateButtonAnim(CGearSw *work) {
     case 1:
         func_0204c520(work->actors[work->buttonActor], TRUE);
         func_0204c520(work->actors[work->buttonActor + 1], TRUE);
-        if (!func_0204c560(work->actors[work->buttonActor])) {
+        if (!ClActor_IsAnimActive(work->actors[work->buttonActor])) {
             work->effectSeq = 0;
             return TRUE;
         }
@@ -2574,15 +2575,15 @@ static GameEventReturnCode CGearSw_EventMain(GameEvent *event, u32 *state, void 
         next = CallIRC(work->gsys, field, NULL, TRUE);
         break;
     case ACTION_TVT:
-        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(17), func_ov017_0216e79c, NULL);
+        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(17), EventCommTvt_Create, NULL);
         break;
     case ACTION_RADAR:
-        next =
-            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(18), (GameEventProvider)func_ov018_0216e708, field);
+        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(18), (GameEventProvider)EventResearchRadar_Create,
+                                               field);
         break;
     case ACTION_LOG:
         GameBeaconSys_ClearNotice(1);
-        func_0201740c(work->gameData, 1);
+        GameData_SetCGearPowerRequest(work->gameData, 1);
         next = EventFieldMenuReturn_Create(work->gsys, field, 4);
         break;
     case ACTION_HELP: {
@@ -2612,7 +2613,7 @@ static void CGearSw_FreeTouchEffects(CGearSw *work) {
 
     for (i = 0; i < TOUCH_EFFECT_COUNT; i++) {
         if (work->touchEffects[i].actor != NULL) {
-            func_0204c108(work->touchEffects[i].actor);
+            ClActor_Delete(work->touchEffects[i].actor);
             work->touchEffects[i].actor = NULL;
         }
     }
@@ -2623,7 +2624,7 @@ static BOOL CGearSw_AreTouchEffectsFinished(CGearSw *work) {
     int i;
 
     for (i = 0; i < TOUCH_EFFECT_COUNT; i++) {
-        if (work->touchEffects[i].actor != NULL && func_0204c560(work->touchEffects[i].actor)) {
+        if (work->touchEffects[i].actor != NULL && ClActor_IsAnimActive(work->touchEffects[i].actor)) {
             finished = FALSE;
             break;
         }
@@ -2640,7 +2641,7 @@ static void CGearSw_StateRefused(CGearSw *work) {
 }
 
 static void CGearSw_SetActive(CGearSw *work, BOOL active) {
-    if (!func_02042788() && work->beacons) {
+    if (!GFL_NetIsInitialized() && work->beacons) {
         CGearSw_SetCommDark(work);
     } else {
         CGearSw_ClearCommDark(work);
@@ -2670,7 +2671,7 @@ static void CGearSw_UpdateIntrudeAlert(CGearSw *work, u32 state) {
 // Rings while the Xtransceiver is called
 static void CGearSw_UpdateCallAlert(CGearSw *work, u32 state) {
     if (state == 0) {
-        u32 bits = func_02012be4(GameData_GetWifiList(work->gameData));
+        u32 bits = WihDwc_GetStatus(GameData_GetWifiList(work->gameData));
         FieldSound *fieldSound = GameData_GetFieldSoundSystem(work->gameData);
 
         if (bits & 8) {

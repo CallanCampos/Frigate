@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Scrappy",
-    "description": "Enables moves to hit\nGhost-type Pokémon."
-}

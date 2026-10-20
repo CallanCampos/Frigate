@@ -35,8 +35,7 @@
 // no next one, and the screen fades out. Where this file ends and b_scenario_graphic.c starts is a guess: the
 // functions from BScenarioMain_CountScriptLines to BScenarioMain_LoadBG refer to no data of either.
 
-// The battle's graphics archive, and its files
-#define ARCID_BATTLE_SCENARIO 100
+// The files of ARCID_BTLV
 #define FILE_LABEL_PALETTE 15
 #define FILE_POSITIONS 41
 
@@ -318,9 +317,9 @@ static void BScenarioMain_Task(TCB *tcb, void *data) {
 static BOOL BScenarioMain_Finish(TCB *tcb, BScenarioWork *work) {
     int i;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         if (work->param->abort == 1) {
-            func_02021c44(work->printQueue);
+            PrintQueue_Clear(work->printQueue);
         } else {
             return FALSE;
         }
@@ -344,10 +343,10 @@ static BOOL BScenarioMain_Finish(TCB *tcb, BScenarioWork *work) {
     GFL_HeapFree(work->positions);
     GFL_WordSetSystemFree(work->wordSet);
     BScenarioGraphic_FreeWindows(work);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_FontFree(work->smallFont);
     work->param->done = TRUE;
-    func_0203d564(!(work->flags & BSCENARIO_FLAG_KEY_CLOSE));
+    GCTX_HIDSetUsingTouch(!(work->flags & BSCENARIO_FLAG_KEY_CLOSE));
     GFL_TCBRemove(tcb);
     GFL_HeapFree(work);
     return TRUE;
@@ -385,13 +384,13 @@ static void BScenarioMain_Init(BScenarioWork *work) {
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, work->param->heapId);
-    work->printQueue = func_020219a8(0x800, work->param->heapId);
+    work->printQueue = PrintQueue_Create(0x800, work->param->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->param->heapId);
-    work->positions = GFL_ArcSysReadHeapNew(ARCID_BATTLE_SCENARIO, FILE_POSITIONS, work->param->heapId);
+    work->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD, FILE_POSITIONS, work->param->heapId);
     work->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEWOOD_LINES, work->param->heapId);
     // The films' scripts are the 41 message files from 314
-    work->msgData[1] =
-        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0314 + work->scenario, work->param->heapId);
+    work->msgData[1] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_B_SCENARIO_MOVIE_00 + work->scenario,
+                                          work->param->heapId);
     BScenarioMain_InitBG(work);
     BScenarioMain_LoadBG(work);
     BScenarioMain_CountScriptLines(work);
@@ -403,7 +402,7 @@ static void BScenarioMain_Init(BScenarioWork *work) {
     BScenarioMain_StartWipe(work);
     BScenarioMain_InitPalettes(work);
     work->flags |= BSCENARIO_FLAG_REFRESH;
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         work->flags |= BSCENARIO_FLAG_KEYS;
     }
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, 8, 3);
@@ -518,11 +517,10 @@ static void BScenarioMain_InitPalettes(BScenarioWork *work) {
     PaletteFade_LoadFromVRAM(work->paletteFade, 1, 0, 0x100);
     PaletteFade_LoadFromVRAM(work->paletteFade, 1, 0xa0, 0x60);
     PaletteFade_LoadNCLR(work->paletteFade, ARCID_FONT, 6, work->param->heapId, 1, 0x20, 0x80);
-    PaletteFade_LoadNCLR(work->paletteFade, ARCID_BATTLE_SCENARIO, FILE_LABEL_PALETTE, work->param->heapId, 1, 0x20,
-                         0x90);
-    PaletteFade_LoadNCLR(work->paletteFade, ARCID_BATTLE_SCENARIO, sBScenarioSeriesPalettes[series % 4],
-                         work->param->heapId, 1, 0x60, 0xa0);
-    func_02042ba8(FALSE, work->param->heapId);
+    PaletteFade_LoadNCLR(work->paletteFade, ARCID_PKWD, FILE_LABEL_PALETTE, work->param->heapId, 1, 0x20, 0x90);
+    PaletteFade_LoadNCLR(work->paletteFade, ARCID_PKWD, sBScenarioSeriesPalettes[series % 4], work->param->heapId, 1,
+                         0x60, 0xa0);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, 0, 0x1e0);
     PaletteFade_StartFade(work->paletteFade, 10, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
 }
@@ -603,7 +601,7 @@ static void BScenarioMain_SummaryInput(BScenarioWork *work) {
     BOOL touched = FALSE;
     BOOL refresh = FALSE;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         return;
     }
     if (work->flags & BSCENARIO_FLAG_REFRESH) {
@@ -801,7 +799,7 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
     BOOL touched = FALSE;
     BOOL redraw = FALSE;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         return;
     }
     if (work->flags & BSCENARIO_FLAG_REFRESH) {
@@ -1088,7 +1086,7 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
     BOOL touched = FALSE;
     BOOL refresh = FALSE;
 
-    if (!func_02021c0c(work->printQueue)) {
+    if (!PrintQueue_IsEmpty(work->printQueue)) {
         return;
     }
     if (work->flags & BSCENARIO_FLAG_REFRESH) {

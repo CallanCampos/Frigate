@@ -5,6 +5,7 @@
 #include "types.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
@@ -67,7 +68,7 @@ BtlvBGauge *BtlvBGauge_Create(const BtlvBGaugeParam *param, HeapID heapId) {
     work = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(BtlvBGauge), TRUE, "btlv_b_gauge.c", 0x7e);
     work->param = *param;
     work->heapId = HEAPID_TAIL(heapId);
-    work->unit = func_0204bf1c(7, 0, work->heapId);
+    work->unit = ClActUnit_Create(7, 0, work->heapId);
     if (param->mode != 2) {
         BtlvBGauge_LoadResources(work);
     }
@@ -83,7 +84,7 @@ BtlvBGauge *BtlvBGauge_Create(const BtlvBGaugeParam *param, HeapID heapId) {
 
 void BtlvBGauge_Delete(BtlvBGauge *work) {
     BtlvBGauge_FreeResources(work);
-    func_0204bf98(work->unit);
+    ClActUnit_Delete(work->unit);
     GFL_HeapFree(work);
 }
 
@@ -100,12 +101,12 @@ static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
     s32 x;
     BtlvBGaugeParam *param;
 
-    arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(work->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(work->heapId));
     work->loaded = TRUE;
-    work->chars = func_0204b81c(arc, 0x1cb, FALSE, 0, work->heapId);
-    work->cellAnims = func_0204bde0(arc, 0x1cd, 0x1ce, work->heapId);
-    work->palette = func_0204bba0(arc, 0x1cc, 0, 0xc0, work->heapId);
-    PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), 2, func_0204bdc0(work->palette, FALSE) / 2, 0x20);
+    work->chars = ClActSys_LoadChars(arc, 0x1cb, FALSE, 0, work->heapId);
+    work->cellAnims = ClActSys_LoadCellAnims(arc, 0x1cd, 0x1ce, work->heapId);
+    work->palette = ClActSys_LoadPltt(arc, 0x1cc, 0, 0xc0, work->heapId);
+    PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), 2, ClActSys_GetPlttVramAddr(work->palette, FALSE) / 2, 0x20);
 
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
@@ -116,10 +117,10 @@ static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
         setup.y = data_ov168_021f3e50[param->side].ballY;
         for (i = 0; i < 6; i++) {
             work->balls[i].actor =
-                func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, work->heapId);
-            func_0204c178(work->balls[i].actor, &work->balls[i].pos, 0);
+                ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, work->heapId);
+            ClActor_GetSurfacePos(work->balls[i].actor, &work->balls[i].pos, 0);
             func_0204c520(work->balls[i].actor, TRUE);
-            func_0204c488(work->balls[i].actor, data_ov168_021f3e60[param->side][param->balls[i]]);
+            ClActor_SetSequence(work->balls[i].actor, data_ov168_021f3e60[param->side][param->balls[i]]);
             work->balls[i].sequence = data_ov168_021f3e60[2][param->balls[i]];
             work->balls[i].wait = (i + 1) * 6;
             work->balls[i].restX = x;
@@ -131,10 +132,10 @@ static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
         setup.x = data_ov168_021f3e50[param->side].frameX + (param->side == 0 ? 0x80 : -0x80);
         setup.y = data_ov168_021f3e50[param->side].frameY;
         work->balls[i].actor =
-            func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, work->heapId);
-        func_0204c178(work->balls[i].actor, &work->balls[i].pos, 0);
+            ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, work->heapId);
+        ClActor_GetSurfacePos(work->balls[i].actor, &work->balls[i].pos, 0);
         func_0204c520(work->balls[i].actor, TRUE);
-        func_0204c488(work->balls[i].actor, data_ov168_021f3e60[param->side][4]);
+        ClActor_SetSequence(work->balls[i].actor, data_ov168_021f3e60[param->side][4]);
         work->balls[i].sequence = data_ov168_021f3e60[param->side][4];
         work->balls[i].wait = 0;
         work->balls[i].restX = work->balls[i].slideEndX = data_ov168_021f3e50[param->side].frameX;
@@ -149,11 +150,11 @@ static void BtlvBGauge_FreeResources(BtlvBGauge *work) {
 
     if (work->loaded == TRUE) {
         for (i = 0; i < 7; i++) {
-            func_0204c108(work->balls[i].actor);
+            ClActor_Delete(work->balls[i].actor);
         }
-        func_0204b98c(work->chars);
-        func_0204bcd0(work->palette);
-        func_0204be64(work->cellAnims);
+        ClActSys_FreeChars(work->chars);
+        ClActSys_FreePltt(work->palette);
+        ClActSys_FreeCellAnims(work->cellAnims);
         work->loaded = FALSE;
     }
 }
@@ -187,9 +188,9 @@ static void BtlvBGauge_SlideTask(TCB *tcb, void *data) {
                     task->gauge->balls[i].pos.x = task->gauge->balls[i].slideEndX;
                     task->gauge->balls[i].speed = 0;
                 }
-                func_0204c140(task->gauge->balls[i].actor, &task->gauge->balls[i].pos, 0);
+                ClActor_SetSurfacePos(task->gauge->balls[i].actor, &task->gauge->balls[i].pos, 0);
                 if (task->gauge->balls[i].speed == 0) {
-                    func_0204c488(task->gauge->balls[i].actor, task->gauge->balls[i].sequence);
+                    ClActor_SetSequence(task->gauge->balls[i].actor, task->gauge->balls[i].sequence);
                     switch (task->gauge->balls[i].sequence) {
                     case 9:
                         se = SEQ_SE_TB_KARA;
@@ -228,7 +229,7 @@ static void BtlvBGauge_SlideTask(TCB *tcb, void *data) {
                 }
                 moving = TRUE;
             }
-            func_0204c140(task->gauge->balls[i].actor, &task->gauge->balls[i].pos, 0);
+            ClActor_SetSurfacePos(task->gauge->balls[i].actor, &task->gauge->balls[i].pos, 0);
         }
         if (moving == FALSE) {
             BtlvEffect_EndTask(tcb);

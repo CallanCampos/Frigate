@@ -1,0 +1,56 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN_10",
+            "warp": 1,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 136,
+                "y": 32,
+                "z": 40,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN",
+            "warp": 5,
+            "unk4": 3,
+            "transition": 4,
+            "grid": {
+                "x": 216,
+                "y": 32,
+                "z": 120,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN",
+            "warp": 3,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 136,
+                "y": 32,
+                "z": 248,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 2,
+            "script": 1
+        }
+    ]
+}

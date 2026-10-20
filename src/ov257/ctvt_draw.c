@@ -124,33 +124,6 @@ static void CtvtDraw_UpdateCancel(CommTvtWork *sys, CtvtDraw *draw);
 
 static const u16 sUnusedColors[] = { 0x1c13, 0x1313, 0x1c1c, 0x4e73, 0x739c };
 
-// The animations of each tool's button, when not chosen and when chosen
-static const u8 sPenButtonAnims[] = { 1, 2 };
-static const u8 sPickButtonAnims[] = { 3, 4 };
-static const u8 sEraserButtonAnims[] = { 5, 6 };
-static const u8 sStampButtonAnims[] = { 7, 8 };
-
-static const int sPens[] = { DRAW_PEN_ROUND, DRAW_PEN_SMALL, DRAW_PEN_DOT };
-
-static const int sStamps[] = { DRAW_PEN_HEART, DRAW_PEN_POKE_BALL, DRAW_PEN_FACE, DRAW_PEN_STAR, DRAW_PEN_DROP };
-
-static const TouchRect sStampButtons[CTVT_DRAW_TOUCH_MAX] = {
-    { 0x98, 0xa8, 0x60, 0x70 }, { 0x98, 0xa8, 0x70, 0x80 }, { 0x98, 0xa8, 0x80, 0x90 },
-    { 0x98, 0xa8, 0x90, 0xa0 }, { 0x98, 0xa8, 0xa0, 0xb0 }, { TOUCH_RECT_END },
-};
-
-static const TouchRect sToolButtons[CTVT_DRAW_TOUCH_MAX] = {
-    { 0xa8, 0xc0, 0x04, 0x1c }, { 0xa8, 0xc0, 0x2c, 0x44 }, { 0xa8, 0xc0, 0x54, 0x6c }, { 0xa8, 0xc0, 0x7c, 0x94 },
-    { 0xa8, 0xc0, 0xbc, 0xd4 }, { 0xa8, 0xc0, 0xe0, 0xf8 }, { TOUCH_RECT_END },
-};
-
-static const TouchRect sPenButtons[CTVT_DRAW_TOUCH_MAX] = {
-    { 0x98, 0xa8, 0x08, 0x18 },
-    { 0x98, 0xa8, 0x18, 0x28 },
-    { 0x98, 0xa8, 0x28, 0x38 },
-    { TOUCH_RECT_END },
-};
-
 CtvtDraw *CtvtDraw_Create(CommTvtWork *sys, HeapID heapId) {
     CtvtDraw *draw = GFL_HeapAllocate(heapId, sizeof(CtvtDraw), TRUE, "ctvt_draw.c", 219);
 
@@ -169,9 +142,9 @@ void CtvtDraw_Delete(CommTvtWork *sys, CtvtDraw *draw) {
 // The resources of the actors are the system's: characters, palette and cells
 static inline ClActor *CtvtDraw_CreateActor(CommTvtWork *sys, int chars, int palette, int cells,
                                             const ClActorSetup *setup, u16 surface, HeapID heapId) {
-    return func_0204c040(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
-                         CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, surface,
-                         heapId);
+    return ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, chars),
+                          CommTvt_GetObjResource(sys, palette), CommTvt_GetObjResource(sys, cells), setup, surface,
+                          heapId);
 }
 
 void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
@@ -190,7 +163,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     GX_SetDispSelect(0);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     GFL_BGSysClearScr(0);
-    GFL_G2DIOLoadNSCRSync(arc, func_0202d828(), 0, 0x60, 0, 0x600, FALSE, heapId);
+    GFL_G2DIOLoadNSCRSync(arc, AppMenuCommon_GetBarScreenFile(), 0, 0x60, 0, 0x600, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(0, 0, 21, 32, 3, 0);
     GFL_BGSysLoadScr(0);
     GFL_BGSysMoveBG(0, 3, 0);
@@ -224,7 +197,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     draw->buttons[5] = CtvtDraw_CreateActor(sys, 7, 3, 10, &setup, 0, heapId);
     func_0204c520(draw->buttons[5], TRUE);
     for (i = 0; i < CTVT_DRAW_BUTTONS; i++) {
-        func_0204c124(draw->buttons[i], TRUE);
+        ClActor_SetVisible(draw->buttons[i], TRUE);
     }
 
     setup.x = 56;
@@ -245,26 +218,26 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     setup.sequence = 1;
     draw->menuItems[4] = CtvtDraw_CreateActor(sys, 6, 2, 10, &setup, 1, heapId);
     for (i = 0; i < CTVT_DRAW_MENU_ITEMS; i++) {
-        func_0204c124(draw->menuItems[i], FALSE);
+        ClActor_SetVisible(draw->menuItems[i], FALSE);
     }
 
     setup.x = 16;
     setup.y = 160;
     setup.sequence = 15;
     draw->penMenu = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
-    func_0204c124(draw->penMenu, FALSE);
+    ClActor_SetVisible(draw->penMenu, FALSE);
     setup.x = 136;
     setup.y = 160;
     setup.sequence = 16;
     draw->stampMenu = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
-    func_0204c124(draw->stampMenu, FALSE);
+    ClActor_SetVisible(draw->stampMenu, FALSE);
     setup.priority = 0;
     draw->menuCursor = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
-    func_0204c124(draw->menuCursor, FALSE);
+    ClActor_SetVisible(draw->menuCursor, FALSE);
     setup.sequence = 25;
     setup.priority = 2;
     draw->selectFrame = CtvtDraw_CreateActor(sys, 4, 0, 8, &setup, 0, heapId);
-    func_0204c124(draw->selectFrame, FALSE);
+    ClActor_SetVisible(draw->selectFrame, FALSE);
     CtvtDraw_RefreshButtons(sys, draw);
     draw->menuWindow = NULL;
     draw->messageWindow = NULL;
@@ -275,7 +248,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     draw->titleWindow = BmpWin_CreateDynamic(4, 3, 1, 28, 2, 10, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(draw->titleWindow), 0);
     str = GFL_MsgDataLoadStrbufNew(msgData, 11);
-    func_02021c7c(queue, BmpWin_GetBitmap(draw->titleWindow), 1, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(draw->titleWindow), 1, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     draw->titleWindowPending = TRUE;
     draw->state = DRAW_STATE_FADE_IN;
@@ -294,7 +267,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     draw->waitSound = FALSE;
     *(vu16 *)(HW_BG_PLTT + 0x21a) = draw->color & 0x7fff;
     CtvtDraw_PrintMenu(sys, draw, FALSE);
-    func_02042ba8(TRUE, heapId);
+    GFL_NetSetIconScreen(TRUE, heapId);
     func_ov257_021aae44(sys);
 }
 
@@ -314,7 +287,7 @@ void CtvtDraw_Leave(CommTvtWork *sys, CtvtDraw *draw) {
             draw->tool = DRAW_TOOL_STAMP;
         }
     }
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     BmpWin_ClearFrame(draw->menuWindow, 0);
     CtvtDraw_ClearWindow(draw->menuWindow);
     BmpWin_Free(draw->menuWindow);
@@ -326,17 +299,17 @@ void CtvtDraw_Leave(CommTvtWork *sys, CtvtDraw *draw) {
         draw->messageWindow = NULL;
     }
     for (i = 0; i < CTVT_DRAW_MENU_ITEMS; i++) {
-        func_0204c108(draw->menuItems[i]);
+        ClActor_Delete(draw->menuItems[i]);
     }
     for (i = 0; i < CTVT_DRAW_BUTTONS; i++) {
-        func_0204c108(draw->buttons[i]);
+        ClActor_Delete(draw->buttons[i]);
     }
-    func_0204c108(draw->selectFrame);
-    func_0204c108(draw->menuCursor);
-    func_0204c124(draw->stampMenu, FALSE);
-    func_0204c108(draw->stampMenu);
-    func_0204c124(draw->penMenu, FALSE);
-    func_0204c108(draw->penMenu);
+    ClActor_Delete(draw->selectFrame);
+    ClActor_Delete(draw->menuCursor);
+    ClActor_SetVisible(draw->stampMenu, FALSE);
+    ClActor_Delete(draw->stampMenu);
+    ClActor_SetVisible(draw->penMenu, FALSE);
+    ClActor_Delete(draw->penMenu);
     GFL_BGSysClearScr(0);
     GFL_BGSysLoadScr(0);
     GFL_BGSysMoveBG(0, 3, 0);
@@ -414,7 +387,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         draw->waitSound = TRUE;
         break;
     case DRAW_STATE_WAIT_DISCONNECTED:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
             func_ov257_021aab14(sys, TRUE);
@@ -438,7 +411,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         break;
     case DRAW_STATE_WAIT_PARENT_LEFT:
         draw->waitFrames++;
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) ||
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) ||
             draw->waitFrames >= 300) {
             draw->state = DRAW_STATE_SYNC_EXIT;
         }
@@ -465,7 +438,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         draw->waitSound = TRUE;
         break;
     case DRAW_STATE_WAIT_ALONE:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             draw->exit = TRUE;
             draw->state = DRAW_STATE_FADE_OUT;
             func_ov257_021aab14(sys, TRUE);
@@ -482,7 +455,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     if (draw->menuWindowPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(draw->menuWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(draw->menuWindow))) {
             BmpWin_DrawFrame(draw->menuWindow, 2, 0x140, 9);
             BmpWin_FlushChar(draw->menuWindow);
             BmpWin_FlushMap(draw->menuWindow);
@@ -490,11 +463,11 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
             draw->menuWindowPending = FALSE;
             if (draw->menuExpanded == TRUE) {
                 for (i = 0; i < CTVT_DRAW_MENU_ITEMS; i++) {
-                    func_0204c124(draw->menuItems[i], TRUE);
+                    ClActor_SetVisible(draw->menuItems[i], TRUE);
                 }
             } else {
                 for (i = 0; i < CTVT_DRAW_MENU_ITEMS; i++) {
-                    func_0204c124(draw->menuItems[i], FALSE);
+                    ClActor_SetVisible(draw->menuItems[i], FALSE);
                 }
             }
         }
@@ -502,7 +475,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     if (draw->titleWindowPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(draw->titleWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(draw->titleWindow))) {
             BmpWin_FlushChar(draw->titleWindow);
             BmpWin_FlushMap(draw->titleWindow);
             GFL_BGSysLoadScr(4);
@@ -512,7 +485,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     if (draw->messageWindowPending == TRUE && draw->messageWindow != NULL) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(draw->messageWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(draw->messageWindow))) {
             BmpWin_FlushChar(draw->messageWindow);
             BmpWin_FlushMap(draw->messageWindow);
             GFL_BGSysLoadScr(0);
@@ -523,13 +496,13 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DSI_VGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NONE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DS_LCD);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_SEPIA01);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_DOWN) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_QVGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_MONO);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_CIF);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NEGATIVE);
         }
     }
     if (CommTvt_GetSelfIndex(sys) == 0 && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_L) &&
@@ -549,17 +522,18 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
 
         draw->cursorColor = GX_RGB(level, level, level);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0xde, &draw->cursorColor, sizeof(draw->cursorColor));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0xde, &draw->cursorColor,
+                                       sizeof(draw->cursorColor));
     return COMM_TVT_MODE_DRAW;
 }
 
 static void CtvtDraw_UpdateMenu(CommTvtWork *sys, CtvtDraw *draw) {
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) && draw->menuWindowPending == FALSE) {
-        if (func_0204c560(draw->buttons[5]) == FALSE || func_0204c4a0(draw->buttons[5]) == 1) {
+        if (ClActor_IsAnimActive(draw->buttons[5]) == FALSE || ClActor_GetSequence(draw->buttons[5]) == 1) {
             draw->state = DRAW_STATE_DRAW;
             draw->slideTarget = 0;
             CtvtDraw_PrintMenu(sys, draw, TRUE);
-            func_0204c488(draw->buttons[5], 1);
+            ClActor_SetSequence(draw->buttons[5], 1);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
     } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
@@ -573,16 +547,43 @@ static void CtvtDraw_UpdateMenu(CommTvtWork *sys, CtvtDraw *draw) {
     }
 }
 
-static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
-    s32 hit = func_0203da0c(sToolButtons);
+// The animations of each tool's button, when not chosen and when chosen
+static const u8 sPenButtonAnims[] = { 1, 2 };
+static const u8 sPickButtonAnims[] = { 3, 4 };
+static const u8 sEraserButtonAnims[] = { 5, 6 };
+static const u8 sStampButtonAnims[] = { 7, 8 };
 
-    if (hit == DRAW_TOOL_PEN && func_0204c138(draw->menuCursor) == FALSE) {
+static const int sPens[] = { DRAW_PEN_ROUND, DRAW_PEN_SMALL, DRAW_PEN_DOT };
+
+static const int sStamps[] = { DRAW_PEN_HEART, DRAW_PEN_POKE_BALL, DRAW_PEN_FACE, DRAW_PEN_STAR, DRAW_PEN_DROP };
+
+static const TouchRect sStampButtons[CTVT_DRAW_TOUCH_MAX] = {
+    { 0x98, 0xa8, 0x60, 0x70 }, { 0x98, 0xa8, 0x70, 0x80 }, { 0x98, 0xa8, 0x80, 0x90 },
+    { 0x98, 0xa8, 0x90, 0xa0 }, { 0x98, 0xa8, 0xa0, 0xb0 }, { TOUCH_RECT_END },
+};
+
+static const TouchRect sToolButtons[CTVT_DRAW_TOUCH_MAX] = {
+    { 0xa8, 0xc0, 0x04, 0x1c }, { 0xa8, 0xc0, 0x2c, 0x44 }, { 0xa8, 0xc0, 0x54, 0x6c }, { 0xa8, 0xc0, 0x7c, 0x94 },
+    { 0xa8, 0xc0, 0xbc, 0xd4 }, { 0xa8, 0xc0, 0xe0, 0xf8 }, { TOUCH_RECT_END },
+};
+
+static const TouchRect sPenButtons[CTVT_DRAW_TOUCH_MAX] = {
+    { 0x98, 0xa8, 0x08, 0x18 },
+    { 0x98, 0xa8, 0x18, 0x28 },
+    { 0x98, 0xa8, 0x28, 0x38 },
+    { TOUCH_RECT_END },
+};
+
+static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
+    s32 hit = GFL_HIDGetTouchPressedRect(sToolButtons);
+
+    if (hit == DRAW_TOOL_PEN && ClActor_IsVisible(draw->menuCursor) == FALSE) {
         draw->tool = DRAW_TOOL_PEN;
         draw->stampChosen = FALSE;
         CtvtDraw_RefreshButtons(sys, draw);
         draw->inputHandled = TRUE;
         draw->penMenuOpen = TRUE;
-        func_0204c124(draw->penMenu, TRUE);
+        ClActor_SetVisible(draw->penMenu, TRUE);
         func_0204c520(draw->penMenu, TRUE);
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
@@ -598,13 +599,13 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         draw->inputHandled = TRUE;
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
-    if (hit == DRAW_TOOL_STAMP && func_0204c138(draw->menuCursor) == FALSE) {
+    if (hit == DRAW_TOOL_STAMP && ClActor_IsVisible(draw->menuCursor) == FALSE) {
         draw->tool = DRAW_TOOL_STAMP;
         draw->stampChosen = TRUE;
         CtvtDraw_RefreshButtons(sys, draw);
         draw->inputHandled = TRUE;
         draw->stampMenuOpen = TRUE;
-        func_0204c124(draw->stampMenu, TRUE);
+        ClActor_SetVisible(draw->stampMenu, TRUE);
         func_0204c520(draw->stampMenu, TRUE);
         GFL_SndSEPlay(SEQ_SE_SYS_45);
     }
@@ -615,7 +616,7 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         GFL_SndSEPlay(SEQ_SE_SYS_48);
     }
     if (draw->penMenuOpen == TRUE) {
-        s32 pen = func_0203da0c(sPenButtons);
+        s32 pen = GFL_HIDGetTouchPressedRect(sPenButtons);
 
         if (pen != TOUCH_RECT_NONE) {
             draw->pen = sPens[pen];
@@ -623,18 +624,18 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
             {
                 ClActorPos pos = { 0x10, 0xa0 };
 
-                func_0204c124(draw->menuCursor, TRUE);
-                func_0204c56c(draw->menuCursor);
+                ClActor_SetVisible(draw->menuCursor, TRUE);
+                ClActor_RestartAnim(draw->menuCursor);
                 func_0204c520(draw->menuCursor, TRUE);
-                func_0204c488(draw->menuCursor, pen + 17);
-                func_0204c140(draw->menuCursor, &pos, 0);
+                ClActor_SetSequence(draw->menuCursor, pen + 17);
+                ClActor_SetSurfacePos(draw->menuCursor, &pos, 0);
             }
-            func_0204c124(draw->selectFrame, FALSE);
+            ClActor_SetVisible(draw->selectFrame, FALSE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
     }
     if (draw->stampMenuOpen == TRUE) {
-        s32 stamp = func_0203da0c(sStampButtons);
+        s32 stamp = GFL_HIDGetTouchPressedRect(sStampButtons);
 
         if (stamp != TOUCH_RECT_NONE) {
             draw->stamp = sStamps[stamp];
@@ -643,13 +644,13 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
             {
                 ClActorPos pos = { 0x88, 0xa0 };
 
-                func_0204c124(draw->menuCursor, TRUE);
-                func_0204c56c(draw->menuCursor);
+                ClActor_SetVisible(draw->menuCursor, TRUE);
+                ClActor_RestartAnim(draw->menuCursor);
                 func_0204c520(draw->menuCursor, TRUE);
-                func_0204c488(draw->menuCursor, stamp + 20);
-                func_0204c140(draw->menuCursor, &pos, 0);
+                ClActor_SetSequence(draw->menuCursor, stamp + 20);
+                ClActor_SetSurfacePos(draw->menuCursor, &pos, 0);
             }
-            func_0204c124(draw->selectFrame, FALSE);
+            ClActor_SetVisible(draw->selectFrame, FALSE);
         }
     }
     if (((GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || hit == 5) &&
@@ -657,10 +658,10 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         draw->state = DRAW_STATE_MENU;
         draw->slideTarget = CTVT_DRAW_SLIDE;
         draw->inputHandled = TRUE;
-        if (func_0203da2c() == TRUE) {
+        if (GFL_HIDIsTouchHeld() == TRUE) {
             u32 x, y;
 
-            func_0203da84(&x, &y);
+            GFL_HIDGetTouchHeldPoint(&x, &y);
             draw->stroking = TRUE;
             draw->lastX = x;
             draw->lastY = y;
@@ -668,18 +669,18 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         CtvtDraw_PrintMenu(sys, draw, FALSE);
         CtvtDraw_CloseMenus(sys, draw);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_0204c488(draw->buttons[5], 9);
+        ClActor_SetSequence(draw->buttons[5], 9);
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_SELECT | PAD_BUTTON_START)) {
         func_ov257_021aab1c(sys);
         CtvtDraw_RefreshButtons(sys, draw);
         GFL_SndSEPlay(SEQ_SE_SYS_48);
     }
-    if (func_0204c138(draw->menuCursor) == TRUE && func_0204c560(draw->menuCursor) == FALSE) {
+    if (ClActor_IsVisible(draw->menuCursor) == TRUE && ClActor_IsAnimActive(draw->menuCursor) == FALSE) {
         CtvtDraw_CloseMenus(sys, draw);
     }
-    if (draw->penMenuOpen == TRUE && func_0204c560(draw->penMenu) == FALSE &&
-        func_0204c138(draw->selectFrame) == FALSE) {
+    if (draw->penMenuOpen == TRUE && ClActor_IsAnimActive(draw->penMenu) == FALSE &&
+        ClActor_IsVisible(draw->selectFrame) == FALSE) {
         ClActorPos pos = { 0x10, 0xa0 };
 
         switch (draw->pen) {
@@ -692,11 +693,11 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
         case DRAW_PEN_ROUND:
             break;
         }
-        func_0204c140(draw->selectFrame, &pos, 0);
-        func_0204c124(draw->selectFrame, TRUE);
+        ClActor_SetSurfacePos(draw->selectFrame, &pos, 0);
+        ClActor_SetVisible(draw->selectFrame, TRUE);
     }
-    if (draw->stampMenuOpen == TRUE && func_0204c560(draw->stampMenu) == FALSE &&
-        func_0204c138(draw->selectFrame) == FALSE) {
+    if (draw->stampMenuOpen == TRUE && ClActor_IsAnimActive(draw->stampMenu) == FALSE &&
+        ClActor_IsVisible(draw->selectFrame) == FALSE) {
         ClActorPos pos = { 0x88, 0xa0 };
 
         switch (draw->stamp) {
@@ -713,8 +714,8 @@ static void CtvtDraw_UpdateDraw(CommTvtWork *sys, CtvtDraw *draw) {
             pos.x += 32;
             break;
         }
-        func_0204c140(draw->selectFrame, &pos, 0);
-        func_0204c124(draw->selectFrame, TRUE);
+        ClActor_SetSurfacePos(draw->selectFrame, &pos, 0);
+        ClActor_SetVisible(draw->selectFrame, TRUE);
     }
 }
 
@@ -725,14 +726,14 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     DrawSystem *drawSystem;
     DrawCommand *cmd;
 
-    func_0203dac8(&x, &y);
+    GFL_HIDGetTouchPressedPoint(&x, &y);
     if (func_ov257_021aab2c(sys) == TRUE) {
         return;
     }
-    if (func_0203da2c() == FALSE) {
+    if (GFL_HIDIsTouchHeld() == FALSE) {
         draw->stroking = FALSE;
     }
-    if (func_0203da48() == TRUE && draw->inputHandled == FALSE && draw->state == DRAW_STATE_DRAW && y >= 168) {
+    if (GFL_HIDIsTouchPressed() == TRUE && draw->inputHandled == FALSE && draw->state == DRAW_STATE_DRAW && y >= 168) {
         if (draw->tool == DRAW_TOOL_PICK) {
             if (draw->stampChosen == FALSE) {
                 draw->tool = DRAW_TOOL_PEN;
@@ -744,7 +745,7 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
         CtvtDraw_CloseMenus(sys, draw);
         return;
     }
-    if ((draw->state == DRAW_STATE_MENU || draw->state == DRAW_STATE_DRAW) && func_0203da48() == TRUE &&
+    if ((draw->state == DRAW_STATE_MENU || draw->state == DRAW_STATE_DRAW) && GFL_HIDIsTouchPressed() == TRUE &&
         draw->inputHandled == FALSE && draw->tool == DRAW_TOOL_STAMP) {
         BOOL full;
 
@@ -766,16 +767,16 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
             }
         }
     }
-    if (func_0203da48() == TRUE && draw->inputHandled == FALSE) {
+    if (GFL_HIDIsTouchPressed() == TRUE && draw->inputHandled == FALSE) {
         if (draw->tool == DRAW_TOOL_PICK) {
-            u16 *screen = (u16 *)G2_GetBG2ScrPtr() + y * 256 + x;
+            u16 *screen = (u16 *)((u32)G2_GetBG2ScrPtr() + x * 2 + y * 512);
             u16 *camera;
 
             G2_GetBG3ScrPtr();
             if (CommTvt_IsZoomed(sys) == TRUE) {
-                camera = (u16 *)G2_GetBG3ScrPtr() + (y / 2) * 256 + x / 2;
+                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + (x / 2) * 2 + (y / 2) * 512);
             } else {
-                camera = (u16 *)G2_GetBG3ScrPtr() + y * 256 + x;
+                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + x * 2 + y * 512);
             }
             if (*screen & CTVT_DRAW_OPAQUE) {
                 draw->color = *screen;
@@ -802,7 +803,7 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     if ((draw->tool == DRAW_TOOL_PEN || draw->tool == DRAW_TOOL_ERASER) && draw->stroking == TRUE) {
         u32 touchX, touchY;
 
-        func_0203da84(&touchX, &touchY);
+        GFL_HIDGetTouchHeldPoint(&touchX, &touchY);
         if (draw->stroking == TRUE) {
             if (draw->lastX != 0xffff && draw->lastY != 0xffff) {
                 BOOL full;
@@ -842,7 +843,7 @@ static void CtvtDraw_UpdateSlide(CommTvtWork *sys, CtvtDraw *draw) {
     BOOL moved = FALSE;
     u8 i;
 
-    if (func_0204c560(draw->buttons[5]) == FALSE || func_0204c4a0(draw->buttons[5]) == 1) {
+    if (ClActor_IsAnimActive(draw->buttons[5]) == FALSE || ClActor_GetSequence(draw->buttons[5]) == 1) {
         if (draw->slideTarget < draw->slide) {
             draw->slide -= CTVT_DRAW_SLIDE;
             moved = TRUE;
@@ -856,41 +857,41 @@ static void CtvtDraw_UpdateSlide(CommTvtWork *sys, CtvtDraw *draw) {
         for (i = 0; i < CTVT_DRAW_BUTTONS; i++) {
             ClActorPos pos;
 
-            func_0204c178(draw->buttons[i], &pos, 0);
+            ClActor_GetSurfacePos(draw->buttons[i], &pos, 0);
             pos.y = draw->slide + 180;
             if (i == 5) {
                 pos.y -= 12;
             }
-            func_0204c140(draw->buttons[i], &pos, 0);
+            ClActor_SetSurfacePos(draw->buttons[i], &pos, 0);
         }
     }
 }
 
 static void CtvtDraw_RefreshButtons(CommTvtWork *sys, CtvtDraw *draw) {
-    func_0204c488(draw->buttons[0], sPenButtonAnims[draw->tool == DRAW_TOOL_PEN ? 1 : 0]);
-    func_0204c488(draw->buttons[1], sPickButtonAnims[draw->tool == DRAW_TOOL_PICK ? 1 : 0]);
-    func_0204c488(draw->buttons[2], sEraserButtonAnims[draw->tool == DRAW_TOOL_ERASER ? 1 : 0]);
-    func_0204c488(draw->buttons[3], sStampButtonAnims[draw->tool == DRAW_TOOL_STAMP ? 1 : 0]);
+    ClActor_SetSequence(draw->buttons[0], sPenButtonAnims[draw->tool == DRAW_TOOL_PEN ? 1 : 0]);
+    ClActor_SetSequence(draw->buttons[1], sPickButtonAnims[draw->tool == DRAW_TOOL_PICK ? 1 : 0]);
+    ClActor_SetSequence(draw->buttons[2], sEraserButtonAnims[draw->tool == DRAW_TOOL_ERASER ? 1 : 0]);
+    ClActor_SetSequence(draw->buttons[3], sStampButtonAnims[draw->tool == DRAW_TOOL_STAMP ? 1 : 0]);
     if (func_ov257_021aab18(sys) == TRUE) {
-        func_0204c488(draw->buttons[4], 12);
+        ClActor_SetSequence(draw->buttons[4], 12);
     } else {
-        func_0204c488(draw->buttons[4], 10);
+        ClActor_SetSequence(draw->buttons[4], 10);
     }
     if (draw->tool != DRAW_TOOL_PEN && draw->penMenuOpen == TRUE) {
         draw->penMenuOpen = FALSE;
-        func_0204c124(draw->penMenu, FALSE);
-        func_0204c56c(draw->penMenu);
-        func_0204c4d4(draw->penMenu, 0);
+        ClActor_SetVisible(draw->penMenu, FALSE);
+        ClActor_RestartAnim(draw->penMenu);
+        ClActor_SetAnimTime(draw->penMenu, 0);
         func_0204c520(draw->penMenu, FALSE);
-        func_0204c124(draw->selectFrame, FALSE);
+        ClActor_SetVisible(draw->selectFrame, FALSE);
     }
     if (draw->tool != DRAW_TOOL_STAMP && draw->stampMenuOpen == TRUE) {
         draw->stampMenuOpen = FALSE;
-        func_0204c124(draw->stampMenu, FALSE);
-        func_0204c56c(draw->stampMenu);
-        func_0204c4d4(draw->stampMenu, 0);
+        ClActor_SetVisible(draw->stampMenu, FALSE);
+        ClActor_RestartAnim(draw->stampMenu);
+        ClActor_SetAnimTime(draw->stampMenu, 0);
         func_0204c520(draw->stampMenu, FALSE);
-        func_0204c124(draw->selectFrame, FALSE);
+        ClActor_SetVisible(draw->selectFrame, FALSE);
     }
 }
 
@@ -898,7 +899,7 @@ static inline void CtvtDraw_PrintMenuItem(PrintQueue *queue, CtvtDraw *draw, Msg
                                           Font *font) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
 
-    func_02021c7c(queue, BmpWin_GetBitmap(draw->menuWindow), x, y, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(draw->menuWindow), x, y, str, font, 0x440);
     GFL_StrBufFree(str);
 }
 
@@ -909,7 +910,7 @@ static void CtvtDraw_PrintMenu(CommTvtWork *sys, CtvtDraw *draw, BOOL expanded) 
     BmpWin *oldWindow = draw->menuWindow;
 
     if (oldWindow != NULL) {
-        func_02021c44(queue);
+        PrintQueue_Clear(queue);
         BmpWin_ClearFrame(draw->menuWindow, 2);
         BmpWin_ClearScreen(draw->menuWindow);
     }
@@ -971,10 +972,10 @@ static void CtvtDraw_PrintMessage(CommTvtWork *sys, CtvtDraw *draw, u32 msgId) {
         y = 1;
     }
     draw->messageWindow = BmpWin_CreateDynamic(0, 1, y, 30, 4, 10, TRUE);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(draw->messageWindow), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-    func_02021c7c(queue, BmpWin_GetBitmap(draw->messageWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(draw->messageWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(draw->messageWindow);
     BmpWin_FlushMap(draw->messageWindow);
@@ -985,17 +986,17 @@ static void CtvtDraw_PrintMessage(CommTvtWork *sys, CtvtDraw *draw, u32 msgId) {
 static void CtvtDraw_CloseMenus(CommTvtWork *sys, CtvtDraw *draw) {
     draw->penMenuOpen = FALSE;
     draw->stampMenuOpen = FALSE;
-    func_0204c56c(draw->penMenu);
-    func_0204c56c(draw->stampMenu);
-    func_0204c56c(draw->menuCursor);
-    func_0204c4d4(draw->penMenu, 0);
-    func_0204c4d4(draw->stampMenu, 0);
+    ClActor_RestartAnim(draw->penMenu);
+    ClActor_RestartAnim(draw->stampMenu);
+    ClActor_RestartAnim(draw->menuCursor);
+    ClActor_SetAnimTime(draw->penMenu, 0);
+    ClActor_SetAnimTime(draw->stampMenu, 0);
     func_0204c520(draw->penMenu, FALSE);
     func_0204c520(draw->stampMenu, FALSE);
-    func_0204c124(draw->penMenu, FALSE);
-    func_0204c124(draw->stampMenu, FALSE);
-    func_0204c124(draw->menuCursor, FALSE);
-    func_0204c124(draw->selectFrame, FALSE);
+    ClActor_SetVisible(draw->penMenu, FALSE);
+    ClActor_SetVisible(draw->stampMenu, FALSE);
+    ClActor_SetVisible(draw->menuCursor, FALSE);
+    ClActor_SetVisible(draw->selectFrame, FALSE);
 }
 
 // A parent that leaves the drawing mode while a minigame is being cancelled waits for the others
@@ -1009,11 +1010,11 @@ static void CtvtDraw_UpdateCancel(CommTvtWork *sys, CtvtDraw *draw) {
     case 0:
         break;
     case 1:
-        func_02040624(func_02040440(), 10, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 32);
         draw->syncState = 2;
         break;
     case 2:
-        if (func_02040664(func_02040440(), 10, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 32) == TRUE) {
             CtvtTalk_SetGameCancelled(talk, FALSE);
             draw->syncState = 0;
         }

@@ -353,11 +353,11 @@ BOOL Box2Main_ButtonAnmMain(Box2SysWork *syswk);
 // Starts the press animation of a frame's button
 void Box2Main_SetFrameButtonAnm(Box2SysWork *syswk, u32 frame);
 void Box2Main_InitSettings(Box2SysWork *syswk);
-void func_ov255_021bc018(Box2SysWork *syswk);
+void Box2Main_PutMessageFrame(Box2SysWork *syswk);
 // Shows the previous or next box
 void Box2Main_ScrollTray(Box2SysWork *syswk, BOOL right);
-void func_ov255_021bc09c(Box2SysWork *syswk, u32 a1);
-void func_ov255_021bc0c0(Box2SysWork *syswk);
+void Box2Main_StartBoxListScroll(Box2SysWork *syswk, u32 a1);
+void Box2Main_OpenBoxList(Box2SysWork *syswk);
 BOOL Box2Main_IsTrayScrollRight(Box2SysWork *syswk, u32 from, u32 to);
 // Shows the cursor and leaves touch mode
 void Box2Main_ShowCursor(Box2SysWork *syswk);
@@ -411,10 +411,10 @@ BOOL Box2Main_VFuncPartyInPokeMove(Box2SysWork *syswk);
 BOOL Box2Main_VFuncTrayScrollLeft(Box2SysWork *syswk);
 BOOL Box2Main_VFuncTrayScrollRight(Box2SysWork *syswk);
 BOOL Box2Main_VFuncFrameMove(Box2SysWork *syswk);
-BOOL func_ov255_021c05cc(Box2SysWork *syswk);
+BOOL Box2Main_VFuncMarkingFrameMove(Box2SysWork *syswk);
 BOOL Box2Main_VFuncPartyFrameMove(Box2SysWork *syswk);
-BOOL func_ov255_021c05e8(Box2SysWork *syswk);
-BOOL func_ov255_021c0604(Box2SysWork *syswk);
+BOOL Box2Main_VFuncBoxListSlideOut(Box2SysWork *syswk);
+BOOL Box2Main_VFuncBoxListSlideIn(Box2SysWork *syswk);
 BOOL Box2Main_VFuncPartyOutTouch(Box2SysWork *syswk);
 BOOL Box2Main_VFuncPartyInTouch(Box2SysWork *syswk);
 BOOL Box2Main_VFuncCursorMove(Box2SysWork *syswk);
@@ -446,7 +446,7 @@ void Box2Main_SetRangeFlags(Box2SysWork *syswk);
 u32 Box2Main_GetRangeCount(Box2AppWork *app);
 BOOL Box2Main_RangePutCheck(Box2SysWork *syswk, u32 tray, int pos);
 u32 Box2Main_GetRowWidth(Box2SysWork *syswk, u32 pos);
-void func_ov255_021c2804(Box2SysWork *syswk);
-void func_ov255_021c2854(Box2SysWork *syswk, u32 pos);
+void Box2Main_UpdateRangeIconsTouch(Box2SysWork *syswk);
+void Box2Main_UpdateRangeIconsPos(Box2SysWork *syswk, u32 pos);
 
 #endif // POKEBW2_APP_BOX2_MAIN_H

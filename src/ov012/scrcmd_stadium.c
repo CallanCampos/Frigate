@@ -95,7 +95,7 @@ BOOL s01E5_StadiumResetTrainerFlags(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02159f90(VM *vm, FieldScriptEnv *env) {
+BOOL s0249_GetRandomDistinctSix(VM *vm, FieldScriptEnv *env) {
     u16 *results[6];
 
     FieldScriptEnv_GetScriptWork(env);

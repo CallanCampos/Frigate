@@ -100,4 +100,9 @@ int func_ov011_02160f98(int index, const char *key, int defaultValue);
 // gives GameSpy its memory functions (malloc, free, realloc and memalign), with dwc/gsMemory.h's gsiMemoryCallbacksSet
 void func_ov011_02169df8(int server);
 
+// Overlay 11's, in a file that is not written yet: sets the URL of the Nintendo authentication server, and reads it.
+// The settings utility (overlay 182) sets its own for as long as it runs
+void func_ov011_021694d4(const char *url);
+const char *func_ov011_021694e0(void);
+
 #endif // POKEBW2_DWC_DWC_H

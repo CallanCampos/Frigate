@@ -1,0 +1,7 @@
+BtlServerFlow3_Text_Confirm = CONFIRM
+BtlServerFlow3_Text_Cancel = CANCEL
+BtlServerFlow3_Text_PleaseEnterPhraseWord = Please enter a phrase or word.
+BtlServerFlow3_Text_StopGivingPokemonMail = Stop giving the Pokémon Mail?
+BtlServerFlow3_Text_Yes = YES
+BtlServerFlow3_Text_No = NO
+\pad{d4}

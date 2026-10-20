@@ -28,24 +28,24 @@ struct ElboardMessageArg {
     WordSet *wordSet;
 };
 
-GameEvent *func_ov104_021f02fc(GameSystem *gsys, Field *field, u32 duration);
-GameEventReturnCode func_ov104_021f0160(GameEvent *event, u32 *state, void *data);
-BOOL func_ov104_021f0324(GimmickGateBoardEntry *entry, u32 arc, u32 index);
-BOOL func_ov104_021f0334(GimmickGateBoardEntry *entry, u16 zone);
-BOOL func_ov104_021f037c(GimmickGateBoardEntry *entry);
-void func_ov104_021efc8c(Elboard *state);
-void func_ov104_021efcc4(Elboard *state, u32 value);
-s32 func_ov104_021efcf0(Elboard *state);
-u16 func_ov104_021efcf4(Elboard *state);
-void func_ov104_021efcfc(Elboard *state, fx32 time);
-void func_ov104_021efc6c(Elboard *state, const ElboardMessageArg *arg);
-u8 func_ov104_021efcf8(Elboard *state);
-ElboardMessage *func_ov104_021efe88(Elboard *state, const ElboardMessageArg *arg, u32 index);
-void func_ov104_021f0080(ElboardMessage *message);
-void func_ov104_021f0094(ElboardMessage *message);
-void func_ov104_021f00bc(Elboard *state, ElboardMessage *message, u32 amount);
-void func_ov104_021f0130(ElboardMessage *message);
-BOOL func_ov104_021f0150(void *dest, u32 arcId, u32 fileId);
-Elboard *func_ov104_021efbd8(ElboardInit *init);
+GameEvent *GimmickGateEvent_Create(GameSystem *gsys, Field *field, u32 duration);
+GameEventReturnCode GimmickGateEvent_ViewBoard(GameEvent *event, u32 *state, void *data);
+BOOL GimmickGateBoardEntry_Load(GimmickGateBoardEntry *entry, u32 arc, u32 index);
+BOOL GimmickGateBoardEntry_MatchesZone(GimmickGateBoardEntry *entry, u16 zone);
+BOOL GimmickGateBoardEntry_MatchesVersion(GimmickGateBoardEntry *entry);
+void Elboard_Free(Elboard *state);
+void Elboard_Update(Elboard *state, u32 value);
+s32 Elboard_GetTime(Elboard *state);
+u16 Elboard_GetHeapID(Elboard *state);
+void Elboard_SetTime(Elboard *state, fx32 time);
+void Elboard_AddMessage(Elboard *state, const ElboardMessageArg *arg);
+u8 Elboard_GetMessageCount(Elboard *state);
+ElboardMessage *ElboardMessage_Create(Elboard *state, const ElboardMessageArg *arg, u32 index);
+void ElboardMessage_Free(ElboardMessage *message);
+void ElboardMessage_Start(ElboardMessage *message);
+void Elboard_UpdateMessage(Elboard *state, ElboardMessage *message, u32 amount);
+void ElboardMessage_Stop(ElboardMessage *message);
+BOOL GimmickGateZoneData_Load(void *dest, u32 arcId, u32 fileId);
+Elboard *Elboard_Create(ElboardInit *init);
 
 #endif // POKEBW2_FIELD_GIMMICK_OBJ_ELBOARD_H

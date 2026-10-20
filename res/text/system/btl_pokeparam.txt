@@ -1,0 +1,22 @@
+BtlPokeparam_Text_Empty = {0100:0}
+BtlPokeparam_Text_Id = ID {0204:0}
+BtlPokeparam_Text_WhenGroupReadyButton = When the group is ready:\nA Button: Proceed   B Button: Cancel
+BtlPokeparam_Text_GroupOk = Is this group OK?
+BtlPokeparam_Text_CancelSpinTrade = Cancel the Spin Trade?
+BtlPokeparam_Text_SpinTradeWillCanceled = The Spin Trade will be canceled.
+BtlPokeparam_Text_MemberHasDroppedOut = A member has dropped out.
+BtlPokeparam_Text_ThereNoMembersSpin = There are no members.\nThe Spin Trade will be canceled.
+BtlPokeparam_Text_PleaseWaitBButton = Please wait.\nB Button: Cancel
+BtlPokeparam_Text_MemberDroppedOutSpin = A member dropped out.\nThe Spin Trade will be canceled.
+BtlPokeparam_Text_CancelSpinTrade_2 = Cancel the Spin Trade?
+BtlPokeparam_Text_SpinTradeWillCanceled_2 = The Spin Trade will be canceled.
+BtlPokeparam_Text_Empty_2 =                               \x{ffff}
+BtlPokeparam_Text_Empty_3 =                                  \x{ffff}
+BtlPokeparam_Text_IfLeaderDropsOut = If the leader drops out, the group will\nbe disbanded. Is that OK?
+BtlPokeparam_Text_HasLeft = {0100:0} has left.
+BtlPokeparam_Text_LeaderDroppedOutGroup = The leader, {0100:0}, dropped out,\nso the group will be disbanded.
+BtlPokeparam_Text_SeekingSpinTrade = Seeking a Spin Trade!
+BtlPokeparam_Text_Empty_4 =             \x{ffff}
+BtlPokeparam_Text_Yes = Yes
+BtlPokeparam_Text_No = No
+\pad{88}

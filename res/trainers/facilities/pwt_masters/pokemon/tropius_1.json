@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TROPIUS",
+    "moves": [ "MOVE_SUNNY_DAY", "MOVE_AIR_SLASH", "MOVE_SOLAR_BEAM", "MOVE_ATTRACT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_YACHE_BERRY",
+    "form": 0
+}

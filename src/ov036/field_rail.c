@@ -70,7 +70,7 @@ static void func_ov036_021b1e18(RailDisabledLines *disabled);
 static void func_ov036_021b1e2c(RailDisabledLines *disabled, u16 lineId);
 static void func_ov036_021b1e50(RailDisabledLines *disabled, u16 lineId);
 static BOOL func_ov036_021b1e74(RailDisabledLines *disabled, u16 lineId);
-static BOOL func_ov036_021b1e8c(RailDisabledLines *disabled, RailLine *line, RailDataHandle *data);
+static BOOL func_ov036_021b1e8c(RailDisabledLines *disabled, RailLine *line, const RailDataHandle *data);
 static RailLine *func_ov036_021b1ec4(RailDisabledLines *disabled, RailDataHandle *data, u32 lineId);
 static void func_ov036_021b1ee4(RailDisabledLines *disabled, RailUnit *move, s32 dy, s32 dx, u32 dir);
 static BOOL func_ov036_021b1f74(RailDisabledLines *disabled, RailLine *line, s32 front, s32 side, RailDataHandle *data,
@@ -82,7 +82,7 @@ static void func_ov036_021b211c(const char *prefix, VecFx32 *pos, const char *su
 static void func_ov036_021b2120(const char *prefix, RailPoint *point, const char *suffix);
 static void func_ov036_021b2130(RailUnit *unit);
 static int func_ov036_021b2184(RailDataHandle *data, RailPoint *point);
-static int func_ov036_021b21b0(RailDataHandle *data, RailLine *line);
+static int func_ov036_021b21b0(const RailDataHandle *data, RailLine *line);
 static BOOL func_ov036_021b21dc(const VecFx32 *a, const VecFx32 *b, const VecFx32 *p3, const VecFx32 *p4,
                                 const VecFx32 *p5, VecFx32 *out);
 static void func_ov036_021b2404(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t);
@@ -514,8 +514,8 @@ void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir) {
     func_ov036_021b1bac(unit, &from);
     unit->side = savedSide;
     savedFront = unit->front;
-    nextFront = savedFront + 16;
     length = unit->length;
+    nextFront = savedFront + 16;
     if (nextFront < length) {
         unit->front = savedFront + 16;
         unit->side = 0;
@@ -811,11 +811,12 @@ static u32 func_ov036_021b0f00(RailUnit *unit, RailLine *line, u32 dir, s32 fron
     }
     if ((front >= length || front < 0)) {
         if (front >= length) {
-            next = GetLineContinueInDirection(GetRailPoint(unit->handle, line->pointB), line->dir, unit->handle,
-                                              unit->disabled, TRUE);
+            RailPoint *point = GetRailPoint(unit->handle, line->pointB);
+            next = GetLineContinueInDirection(point, line->dir, unit->handle, unit->disabled, TRUE);
         } else {
-            next = GetLineContinueInDirection(GetRailPoint(unit->handle, line->pointA), func_ov036_021b1d88(line->dir),
-                                              unit->handle, unit->disabled, TRUE);
+            RailPoint *point = GetRailPoint(unit->handle, line->pointA);
+            next =
+                GetLineContinueInDirection(point, func_ov036_021b1d88(line->dir), unit->handle, unit->disabled, TRUE);
         }
         if (next == NULL) {
             if (front > length) {
@@ -1012,7 +1013,6 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
     RailLine *next1;
     RailLine *next2;
     BOOL flag;
-    s32 tileLen;
     s32 width;
     s32 r;
     s32 ax;
@@ -1037,7 +1037,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
         }
         if (next0 != NULL && !flag) {
             func_ov036_021b2060(point, m->handle);
-            tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+            s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
             width = GetLerpedLineWidthByLineYPos(next0, m->front - len, tileLen, m->handle);
             r = func_ov036_021b0f00(m, next0, dir, m->front - len, m->side, tileLen, width);
             if (r != 0) {
@@ -1047,7 +1047,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
         if (next1 != NULL && m->side <= 0) {
             if (func_ov036_021b1028(m->handle, next1, point)) {
                 func_ov036_021b2060(point, m->handle);
-                tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
+                s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
                 width = GetLerpedLineWidthByLineYPos(next1, -m->side, tileLen, m->handle);
                 r = func_ov036_021b0f00(m, next1, dir, -m->side, m->front - len, tileLen, width);
                 if (r != 0) {
@@ -1055,7 +1055,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                 }
             } else if (func_ov036_021b1040(m->handle, next1, point)) {
                 func_ov036_021b2060(point, m->handle);
-                tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
+                s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
                 width = GetLerpedLineWidthByLineYPos(next1, tileLen + m->side, tileLen, m->handle);
                 r = func_ov036_021b0f00(m, next1, dir, tileLen + m->side, -(m->front - len), tileLen, width);
                 if (r != 0) {
@@ -1066,7 +1066,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
         if (next2 != NULL && m->side >= 0) {
             if (func_ov036_021b1028(m->handle, next2, point)) {
                 func_ov036_021b2060(point, m->handle);
-                tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
+                s32 tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
                 width = GetLerpedLineWidthByLineYPos(next2, m->side, tileLen, m->handle);
                 r = func_ov036_021b0f00(m, next2, dir, m->side, -(m->front - len), tileLen, width);
                 if (r != 0) {
@@ -1074,7 +1074,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                 }
             } else if (func_ov036_021b1040(m->handle, next2, point)) {
                 func_ov036_021b2060(point, m->handle);
-                tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
+                s32 tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
                 width = GetLerpedLineWidthByLineYPos(next2, tileLen - m->side, tileLen, m->handle);
                 r = func_ov036_021b0f00(m, next2, dir, tileLen - m->side, m->front - len, tileLen, width);
                 if (r != 0) {
@@ -1103,7 +1103,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                 if (next0 != NULL) {
                     if (func_ov036_021b1028(m->handle, next0, point)) {
                         func_ov036_021b2060(point, m->handle);
-                        tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                         ax = m->side;
                         if (ax < 0) {
                             ax = -ax;
@@ -1120,7 +1120,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                     }
                     if (func_ov036_021b1040(m->handle, next0, point)) {
                         func_ov036_021b2060(point, m->handle);
-                        tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                         ax = m->side;
                         if (ax < 0) {
                             ax = -ax;
@@ -1141,7 +1141,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                 if (next0 != NULL) {
                     if (func_ov036_021b1028(m->handle, next0, point)) {
                         func_ov036_021b2060(point, m->handle);
-                        tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                         ax = m->side;
                         if (ax < 0) {
                             ax = -ax;
@@ -1158,7 +1158,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                     }
                     if (func_ov036_021b1040(m->handle, next0, point)) {
                         func_ov036_021b2060(point, m->handle);
-                        tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                         ax = m->side;
                         if (ax < 0) {
                             ax = -ax;
@@ -1187,7 +1187,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
             if (next0 != NULL) {
                 if (func_ov036_021b1028(m->handle, next0, point)) {
                     func_ov036_021b2060(point, m->handle);
-                    tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                     width = GetLerpedLineWidthByLineYPos(next0, m->side, tileLen, m->handle);
                     r = func_ov036_021b0f00(m, next0, dir, m->side, -m->front, tileLen, width);
                     if (r != 0) {
@@ -1196,7 +1196,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                 }
                 if (func_ov036_021b1040(m->handle, next0, point)) {
                     func_ov036_021b2060(point, m->handle);
-                    tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                     width = GetLerpedLineWidthByLineYPos(next0, tileLen - m->side, tileLen, m->handle);
                     r = func_ov036_021b0f00(m, next0, dir, tileLen - m->side, m->front, tileLen, width);
                     if (r != 0) {
@@ -1209,7 +1209,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
             if (next0 != NULL) {
                 if (func_ov036_021b1028(m->handle, next0, point)) {
                     func_ov036_021b2060(point, m->handle);
-                    tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                     width = GetLerpedLineWidthByLineYPos(next0, m->side, tileLen, m->handle);
                     r = func_ov036_021b0f00(m, next0, dir, m->side, len - m->front, tileLen, width);
                     if (r != 0) {
@@ -1218,7 +1218,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
                 }
                 if (func_ov036_021b1040(m->handle, next0, point)) {
                     func_ov036_021b2060(point, m->handle);
-                    tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
                     width = GetLerpedLineWidthByLineYPos(next0, tileLen - m->side, tileLen, m->handle);
                     r = func_ov036_021b0f00(m, next0, dir, tileLen - m->side, -(len - m->front), tileLen, width);
                     if (r != 0) {
@@ -1251,7 +1251,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
     }
     if (next2 != NULL && !flag) {
         func_ov036_021b2060(point, m->handle);
-        tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
+        s32 tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
         ax = m->front;
         if (ax < 0) {
             ax = -ax;
@@ -1269,7 +1269,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
     if (next0 != NULL && m->side <= 0) {
         if (func_ov036_021b1028(m->handle, next0, point)) {
             func_ov036_021b2060(point, m->handle);
-            tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+            s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
             width = GetLerpedLineWidthByLineYPos(next0, -m->side, tileLen, m->handle);
             r = func_ov036_021b0f00(m, next0, dir, -m->side, m->front, tileLen, width);
             if (r != 0) {
@@ -1277,7 +1277,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
             }
         } else if (func_ov036_021b1040(m->handle, next0, point)) {
             func_ov036_021b2060(point, m->handle);
-            tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
+            s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
             width = GetLerpedLineWidthByLineYPos(next0, tileLen + m->side, tileLen, m->handle);
             r = func_ov036_021b0f00(m, next0, dir, tileLen + m->side, -m->front, tileLen, width);
             if (r != 0) {
@@ -1288,7 +1288,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
     if (next1 != NULL && m->side >= 0) {
         if (func_ov036_021b1028(m->handle, next1, point)) {
             func_ov036_021b2060(point, m->handle);
-            tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
+            s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
             width = GetLerpedLineWidthByLineYPos(next1, m->side, tileLen, m->handle);
             r = func_ov036_021b0f00(m, next1, dir, m->side, -m->front, tileLen, width);
             if (r != 0) {
@@ -1297,7 +1297,7 @@ static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
         }
         if (func_ov036_021b1040(m->handle, next1, point)) {
             func_ov036_021b2060(point, m->handle);
-            tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
+            s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
             width = GetLerpedLineWidthByLineYPos(next1, tileLen - m->side, tileLen, m->handle);
             r = func_ov036_021b0f00(m, next1, dir, tileLen - m->side, m->front, tileLen, width);
             if (r != 0) {
@@ -1544,7 +1544,7 @@ static BOOL func_ov036_021b1e74(RailDisabledLines *disabled, u16 lineId) {
     return FALSE;
 }
 
-static BOOL func_ov036_021b1e8c(RailDisabledLines *disabled, RailLine *line, RailDataHandle *data) {
+static BOOL func_ov036_021b1e8c(RailDisabledLines *disabled, RailLine *line, const RailDataHandle *data) {
     u32 index = 0;
     s32 i;
 
@@ -1717,7 +1717,7 @@ static int func_ov036_021b2184(RailDataHandle *data, RailPoint *point) {
     return 0;
 }
 
-static int func_ov036_021b21b0(RailDataHandle *data, RailLine *line) {
+static int func_ov036_021b21b0(const RailDataHandle *data, RailLine *line) {
     int i;
 
     for (i = 0; i < data->lineCount; i++) {
@@ -1753,15 +1753,13 @@ static BOOL func_ov036_021b21dc(const VecFx32 *a, const VecFx32 *b, const VecFx3
         return FALSE;
     }
     t = FX_Div(num, denom);
-    if (len < t) {
+    if (t > len) {
         return FALSE;
     }
     if (t <= 0x1000) {
         return FALSE;
     }
-    out->x = p4->x + FX_Mul(dir.x, t);
-    out->y = p4->y + FX_Mul(dir.y, t);
-    out->z = p4->z + FX_Mul(dir.z, t);
+    VEC_Set(out, p4->x + FX_Mul(dir.x, t), p4->y + FX_Mul(dir.y, t), p4->z + FX_Mul(dir.z, t));
     return TRUE;
 }
 
@@ -1947,28 +1945,24 @@ BOOL RailMath_WorldToRailNoCurve(u32 lineId, FieldRailSystem *rail, const VecFx3
     VecFx32 cross;
     VecFx32 a;
     VecFx32 b;
-    RailPosition check;
     fx32 along;
-    u32 front;
-    s32 length;
-    s32 base;
+    RailPosition check;
     s32 w0;
     s32 w1;
+    s32 length;
+    u32 front;
+    s32 base;
     s32 i;
 
     if (!func_ov036_021b3830(p0, p1, pos, &hit, &along, &cross)) {
         return FALSE;
     }
-    a.x = pos->x;
-    a.z = pos->z;
-    b.x = hit.x;
-    b.z = hit.z;
-    a.y = 0;
-    b.y = 0;
+    VEC_Set(&a, pos->x, 0, pos->z);
+    VEC_Set(&b, hit.x, 0, hit.z);
     front = FX_Div(VEC_Distance(&a, &b), tileWidth) >> 12;
     GetRailHnd2Curve(rail, line->curveId);
-    length = line->length;
-    base = length * 16 - (FX_Div(along, tileWidth) >> 12);
+    length = line->length * 16;
+    base = length - (FX_Div(along, tileWidth) >> 12);
     for (i = 0; i < 4; i++) {
         if (lineId == p0->lineIds[i]) {
             w0 = p0->widths[i];
@@ -1977,14 +1971,14 @@ BOOL RailMath_WorldToRailNoCurve(u32 lineId, FieldRailSystem *rail, const VecFx3
             w1 = p1->widths[i];
         }
     }
-    if (front <= w0 + (u32)(base * (w1 - w0)) / (u32)(length * 16) + 0x10) {
+    if (front <= w0 + (u32)(base * (w1 - w0)) / (u32)length + 0x10) {
         outPos->componentIsLine = 1;
         outPos->componentId = lineId;
         outPos->railDirection = 3;
-        if (cross.y < 0) {
-            outPos->posSide = -func_ov036_021b0d2c(front);
-        } else {
+        if (cross.y >= 0) {
             outPos->posSide = func_ov036_021b0d2c(front);
+        } else {
+            outPos->posSide = -func_ov036_021b0d2c(front);
         }
         outPos->posFront = func_ov036_021b0d2c(base);
         func_ov036_021b0c04(rail, outPos, &check);
@@ -2002,20 +1996,19 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
     RailLine *line = FieldRailSystem_GetLine(rail, lineId);
     RailPoint *p0 = FieldRailSystem_GetPoint(rail, line->pointA);
     RailPoint *p1 = FieldRailSystem_GetPoint(rail, line->pointB);
-    VecFx32 hit;
-    VecFx32 cross;
     VecFx32 cur;
     VecFx32 prev;
     VecFx32 d;
     VecFx32 e;
     VecFx32 dn;
+    VecFx32 hit;
+    VecFx32 cross;
+    VecFx32 b;
+    VecFx32 a;
     VecFx32 n1;
     VecFx32 n2;
-    VecFx32 crossStep;
-    VecFx32 a;
-    VecFx32 b;
-    RailPosition check;
     fx32 along;
+    RailPosition check;
     RailUnit *unit;
     u32 length;
     fx32 tileWidth;
@@ -2032,11 +2025,13 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
     outPos->posFront = 0;
     unit = func_ov036_021b0c00(rail);
     RailUnit_SetRailPos(unit, outPos);
-    length = GetCurrentLineLength(unit);
+    length = GetCurrentLineLength(unit) >> 4;
     RailUnit_GetCalcPos(unit, &cur);
-    prev = cur;
+    prev.x = cur.x;
+    prev.y = cur.y;
+    prev.z = cur.z;
     tileWidth = FieldRailSystem_GetTileWidth(rail);
-    if (length >> 4 > 1) {
+    if (length > 1) {
         do {
             s32 width;
             fx32 mag;
@@ -2053,7 +2048,7 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
             mag = VEC_Mag(&d);
             VEC_Normalize(&d, &n1);
             VEC_Normalize(&e, &n2);
-            VEC_CrossProduct(&n1, &n2, &crossStep);
+            VEC_CrossProduct(&n1, &n2, &cross);
             d = dn;
             ratio = FX_Div(VEC_Mag(&e), mag);
             VEC_Normalize(&e, &e);
@@ -2075,7 +2070,7 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
                 a.y = 0;
                 a.z = hit.z;
                 if ((u32)(FX_Div(VEC_Distance(&b, &a), tileWidth) >> 12) <= width + 0x10) {
-                    if (crossStep.y < 0) {
+                    if (cross.y < 0) {
                         outPos->posSide = -func_ov036_021b0d2c(FX_Div(VEC_Distance(&b, &a), tileWidth) >> 12);
                     } else {
                         outPos->posSide = func_ov036_021b0d2c(FX_Div(VEC_Distance(&b, &a), tileWidth) >> 12);
@@ -2088,9 +2083,11 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
                     return TRUE;
                 }
             }
-            prev = cur;
+            prev.x = cur.x;
+            prev.y = cur.y;
+            prev.z = cur.z;
             step++;
-        } while (step < length >> 4);
+        } while (step < length);
     }
     return FALSE;
 }
@@ -2172,21 +2169,16 @@ void func_ov036_021b2cfc(FieldRailSystem *rail) {
     } else if (diff <= -0x8000) {
         diff += 0x10000;
     }
-    {
-        fx32 pitchStep = FX_Mul(diff << 12, t);
-
-        diff = (u16)yaw1 - yaw0;
-        if (diff >= 0x8000) {
-            diff -= 0x10000;
-        } else if (diff <= -0x8000) {
-            diff += 0x10000;
-        }
-        u16 yaw = yaw0 + (FX_Mul(diff << 12, t) >> 12);
-        u16 pitch = pitch0 + (pitchStep >> 12);
-
-        FieldCamera_CoordsSetYaw(camera, yaw);
-        FieldCamera_CoordsSetPitch(camera, pitch);
+    pitch0 = pitch0 + (FX_Mul(diff << 12, t) >> 12);
+    diff = (u16)yaw1 - yaw0;
+    if (diff >= 0x8000) {
+        diff -= 0x10000;
+    } else if (diff <= -0x8000) {
+        diff += 0x10000;
     }
+    yaw0 = yaw0 + (FX_Mul(diff << 12, t) >> 12);
+    FieldCamera_CoordsSetYaw(camera, yaw0);
+    FieldCamera_CoordsSetPitch(camera, pitch0);
     FieldCamera_CoordsSetZoom(camera, zoom0 + FX_Mul(zoom1 - zoom0, t));
 }
 
@@ -2311,25 +2303,29 @@ void func_ov036_021b3164(FieldRailSystem *rail) {
 
 static void func_ov036_021b3194(FieldRailSystem *rail, u16 angle, s32 dist, VecFx32 *target) {
     FieldCamera *camera = FieldRailSystem_GetFieldCamera(rail);
-    VecFx32 eye;
-    VecFx32 base;
     VecFx32 diff;
+    VecFx32 base;
     VecFx32 dir;
+    VecFx32 eye;
     fx32 horiz;
+    fx32 y;
 
     FieldCamera_SetTransformType(camera, 2);
     FieldCamera_ClearBind(camera);
     base = *target;
-    eye.y = base.y;
+    y = base.y;
     base.y = 0;
     FieldRailSystem_GetCameraParentPos(rail, &diff);
     diff.y = 0;
     VEC_Subtract(&diff, &base, &diff);
     VEC_Normalize(&diff, &dir);
-    eye.y += FX_Mul(FX_SinIdx(angle), dist);
+    eye.y = FX_Mul(FX_SinIdx(angle), dist);
     horiz = FX_Mul(FX_CosIdx(angle), dist);
-    eye.x = FX_Mul(dir.x, horiz) + base.x;
-    eye.z = FX_Mul(dir.z, horiz) + base.z;
+    eye.x = FX_Mul(dir.x, horiz);
+    eye.z = FX_Mul(dir.z, horiz);
+    eye.x += base.x;
+    eye.y += y;
+    eye.z += base.z;
     FieldCamera_CoordsSetTarget(camera, target);
     FieldCamera_CoordsSetEye(camera, &eye);
 }
@@ -2493,17 +2489,19 @@ void func_ov036_021b365c(FieldRailSystem *rail) {
     RailPoint *p0 = GetCurrentRailLinePoint1(unit);
     RailPoint *p1 = GetCurrentRailLinePoint2(unit);
     FieldCamera *camera = FieldRailSystem_GetFieldCamera(rail);
-    RailCamera *c0;
     RailCamera *c1;
+    RailCamera *c0;
     s32 length;
     s32 posV;
     fx32 t;
-    u16 pitch0;
-    u16 yaw0;
-    s32 zoom0;
-    s32 yaw1;
     s32 zoom1;
+    u16 yaw1;
+    s32 zoom0;
+    u16 yaw0;
+    u16 pitch0;
     s32 diff;
+    u16 pitch;
+    u16 yaw;
     VecFx32 offset;
 
     FieldCamera_SetTransformType(camera, 0);
@@ -2524,21 +2522,16 @@ void func_ov036_021b365c(FieldRailSystem *rail) {
     } else if (diff <= -0x8000) {
         diff += 0x10000;
     }
-    {
-        fx32 pitchStep = FX_Mul(diff << 12, t);
-
-        diff = (u16)yaw1 - yaw0;
-        if (diff >= 0x8000) {
-            diff -= 0x10000;
-        } else if (diff <= -0x8000) {
-            diff += 0x10000;
-        }
-        u16 yaw = yaw0 + (FX_Mul(diff << 12, t) >> 12);
-        u16 pitch = pitch0 + (pitchStep >> 12);
-
-        FieldCamera_CoordsSetYaw(camera, yaw);
-        FieldCamera_CoordsSetPitch(camera, pitch);
+    pitch = pitch0 + (FX_Mul(diff << 12, t) >> 12);
+    diff = yaw1 - yaw0;
+    if (diff >= 0x8000) {
+        diff -= 0x10000;
+    } else if (diff <= -0x8000) {
+        diff += 0x10000;
     }
+    yaw = yaw0 + (FX_Mul(diff << 12, t) >> 12);
+    FieldCamera_CoordsSetYaw(camera, yaw);
+    FieldCamera_CoordsSetPitch(camera, pitch);
     FieldCamera_CoordsSetZoom(camera, zoom0 + FX_Mul(zoom1 - zoom0, t));
     offset.x = c0->unk10 + FX_Mul(c1->unk10 - c0->unk10, t);
     offset.y = c0->unk14 + FX_Mul(c1->unk14 - c0->unk14, t);
@@ -2584,11 +2577,9 @@ static BOOL func_ov036_021b3830(RailPoint *p0, RailPoint *p1, const VecFx32 *pos
     VEC_Normalize(&toPos, &b);
     VEC_CrossProduct(&a, &b, cross);
     mult = *along;
-    out->x = FX_Mul(lineDir.x, mult);
-    out->y = FX_Mul(lineDir.y, mult);
-    out->z = FX_Mul(lineDir.z, mult);
+    VEC_Set(out, FX_Mul(ndir.x, mult), FX_Mul(ndir.y, mult), FX_Mul(ndir.z, mult));
     VEC_Add(&p1->pos, out, out);
-    if (VEC_Distance(pos, out) > 0xfffff) {
+    if (VEC_Distance(pos, out) >= 0x100000) {
         return FALSE;
     }
     dy = pos->y - out->y;

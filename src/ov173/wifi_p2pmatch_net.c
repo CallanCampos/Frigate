@@ -53,11 +53,11 @@ void WifiP2PMatchNet_CommandInit(void *work) {
     const NetCommand *commands = WifiP2PMatchNet_CommandTableGet();
     int num = WifiP2PMatchNet_CommandNumGet();
 
-    func_02040c20(WIFIP2PMATCH_NET_CMD_BASE, commands, num, work);
+    NetCommand_AddTable(WIFIP2PMATCH_NET_CMD_BASE, commands, num, work);
 }
 
 void WifiP2PMatchNet_CommandExit(void *work) {
-    func_02040c64(WIFIP2PMATCH_NET_CMD_BASE);
+    NetCommand_RemoveTable(WIFIP2PMATCH_NET_CMD_BASE);
 }
 
 static void WifiP2PMatchNet_RecvUnused0(int netId, int size, const void *data, void *work, NetHandle *handle) {

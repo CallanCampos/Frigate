@@ -15,8 +15,6 @@
 
 // The demo's heap, a child of HEAPID_USER
 #define HEAPID_DENDOU_DEMO 0x8d
-// The demo's graphics and particles
-#define ARCID_DENDOU_DEMO 213
 
 typedef struct {
     PokeParty *party;

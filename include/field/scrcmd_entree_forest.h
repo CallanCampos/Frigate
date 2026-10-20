@@ -10,7 +10,7 @@
 
 BOOL s021C_EntreeForestStartBattle(VM *vm, FieldScriptEnv *env);
 BOOL s021B_EntreeForestSpawnAllPkm(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02164b94(VM *vm, FieldScriptEnv *env);
+BOOL s021D_EntreeForestRemovePkm(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02164bcc(VM *vm, FieldScriptEnv *env);
 BOOL s021A_WordSetLoadEntreeForestPkmName(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02164c68(VM *vm, FieldScriptEnv *env);

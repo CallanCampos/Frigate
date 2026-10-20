@@ -5,18 +5,18 @@ WeatherData SUNNY_WEATHER = {
     { 0 },
     sizeof(u32),
     {
-        func_ov074_021e90c0,
-        func_ov074_021e9108,
-        func_ov074_021e9170,
-        func_ov074_021e91b8,
-        func_ov074_021e91bc,
-        func_ov074_021e91e0,
-        func_ov074_021e91f4,
+        Sunny_Init,
+        Sunny_FadeIn,
+        Sunny_InitNoFade,
+        Sunny_Main,
+        Sunny_InitFadeOut,
+        Sunny_FadeOut,
+        Sunny_Exit,
     },
     NULL,
 };
 
-BOOL func_ov074_021e90c0(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_Init(WeatherTask *task, u32 arg, HeapID heapId) {
     u32 *state;
 
     if (func_ov036_02199a00(task)) {
@@ -31,7 +31,7 @@ BOOL func_ov074_021e90c0(WeatherTask *task, u32 arg, HeapID heapId) {
     return TRUE;
 }
 
-BOOL func_ov074_021e9108(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     u32 *state = func_ov036_021997e4(task);
     if (*state == 0) {
         if (func_ov036_02199a14(task)) {
@@ -49,7 +49,7 @@ BOOL func_ov074_021e9108(WeatherTask *task, u32 arg, HeapID heapId) {
     return FALSE;
 }
 
-BOOL func_ov074_021e9170(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     if (func_ov036_02199a14(task)) {
         u32 value = func_ov036_02199a2c(task);
         func_ov036_0219990c(task, func_ov036_02199a38(task), value, arg);
@@ -60,25 +60,25 @@ BOOL func_ov074_021e9170(WeatherTask *task, u32 arg, HeapID heapId) {
     return TRUE;
 }
 
-BOOL func_ov074_021e91b8(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_Main(WeatherTask *task, u32 arg, HeapID heapId) {
     return FALSE;
 }
 
-BOOL func_ov074_021e91bc(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
     if (func_ov036_02199a14(task)) {
         func_ov036_021999bc(task, 0x7fff, 0x50, arg);
     }
     return TRUE;
 }
 
-BOOL func_ov074_021e91e0(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_FadeOut(WeatherTask *task, u32 arg, HeapID heapId) {
     if (func_ov036_021999dc(task)) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov074_021e91f4(WeatherTask *task, u32 arg, HeapID heapId) {
+BOOL Sunny_Exit(WeatherTask *task, u32 arg, HeapID heapId) {
     if (func_ov036_02199a14(task)) {
         func_ov036_02199948(task, arg);
     }

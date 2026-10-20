@@ -2,39 +2,55 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
 
 #include "types.h"
+#include "dwc/bm.h"
+#include "dwc_util_cell.h"
+#include "dwc_util_display.h"
+#include "dwc_util_heap.h"
+#include "dwc_util_list.h"
+#include "dwc_util_oam.h"
+#include "dwc_util_oam_buf.h"
+#include "dwc_util_task.h"
+#include "dwc_util_text.h"
+#include "dwc_util_touch.h"
+#include "dwc_util_vram_alloc.h"
+#include "dwcutil/dwc_aoss.h"
+#include "dwcutil/dwcutil_ac.h"
 #include "nitro/gx.h"
+#include "struct_decls.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
-void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32));
-void *func_ov182_021bbdec(int kind, int flags);
-void *func_ov182_021ae118(void *work, void *param, int arg1, int arg2);
-void *func_ov182_021ab7b4(void);
-void func_ov182_021bc0a4(void *object, int kind, int flags, int priority, int size, int count, void *resource,
-                         void *work);
-void func_ov182_021bc184(void *object);
-void func_ov182_021bbf7c(int kind);
 
-extern void *data_ov182_021c40b8;
+// The copy of a connection of the console's Wi-Fi settings that the screens edit, and which connection it is
+struct DWCUtilSettingsEdit {
+    DWCBmConnection connection;
+    u8 unk_ef[5];
+    u8 index;
+};
 
-void *func_ov182_021bc4d8(int size, int align);
-GXOamAttr *func_ov182_021bb960(int screen, int resource);
-void *func_ov182_021bd200(int priority, void (*callback)(void *task), int arg, int period);
-void func_ov182_021bd280(int priority, void *task);
-void func_ov182_021bcc9c(GXOamAttr *oam);
-void func_ov182_021bc4f0(void *work);
-void func_ov182_021bb914(int screen, int resource, GXOamAttr *oam);
+DWCUtilSettingsEdit *func_ov182_021b781c(void);
+// Takes the WEP keys that the AOSS setup got into the connection being edited
+void func_ov182_021b7d80(const AossResult *result);
+// Takes the SSID and the WEP mode of the access point that the connection test connected to
+void func_ov182_021b7c60(const DWCUtilAcResult *result);
 
-// The utility's object and task helpers, in the same later files. A task's
-// callback is handed the task it was created for.
-void *func_ov182_021bb97c(int screen, int resource, int arg);
-void func_ov182_021bb690(void *object);
-GXOamAttr *func_ov182_021bb6ec(void *object, int index);
-void func_ov182_021bb7e0(void *object, int index, int x, int y);
-void func_ov182_021bb878(void *object, int index, int value);
-void func_ov182_021bb8bc(void *object, int index, int *x, int *y);
-void func_ov182_021bc1c0(const void *position, const void *size, void *rect);
-BOOL func_ov182_021bc888(const void *rect);
-void func_ov182_021bd264(void *task, void (*callback)(void *task));
-void func_ov182_021bd268(int priority, void *task);
+// The rows of buttons of the two layouts
+void func_ov182_021b8154(int variant);
+void func_ov182_021b84c0(int variant);
+
+// The utility's message file, which a later file opens
+extern DWCUtilMsg *data_ov182_021c40b8;
+
+// The utility's sound: its start and its end, around the main loop
+void func_ov182_021b8050(void);
+void func_ov182_021b80d4(void);
+// Starts the sound effect, from the utility's sound archive
+void func_ov182_021b80f4(int seq);
+
+// The update function of the utility's first screen
+void func_ov182_021ae574(void);
+
+// The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
+// dwc_util_task.c's that no file claims yet
+extern const u16 data_ov182_021c059c[4];
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H

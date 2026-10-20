@@ -49,7 +49,8 @@ BASH_RULES = [
     ),
 ]
 
-PROTECTED_PATHS = re.compile(r"(^|/)(orig|extract|build)/|\.sha1$|(^|/)\.venv/")
+# The checkout's and each worktree's own orig/, extract/, build/ and .venv/, but not tools/build/
+PROTECTED_PATHS = re.compile(r"^(\.claude/worktrees/[^/]+/)?(orig|extract|build|\.venv)/|\.sha1$")
 
 
 def main():

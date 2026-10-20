@@ -103,14 +103,14 @@ BOOL VCT_ReceivePacket(u8 aid, void *data, int size) {
 // Hands a packet to the voice or the control side by its type, returning 0 for one that has been dealt with, 1 for
 // one that has given an event and 2 for one that does not belong to the library
 static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result) {
-    VCTVoicePacket *packet = data;
+    VCTVoicePacket *voice = data;
+    VCTControlPacket *control = data;
     u64 now;
-    u8 type;
 
     if (data == NULL) {
         return 0;
     }
-    if (packet->magic != VCT_PACKET_MAGIC) {
+    if (voice->magic != VCT_PACKET_MAGIC) {
         return 2;
     }
     if (gVCTSettings.mode == 0 || !sLibrary.initialized) {
@@ -119,14 +119,13 @@ static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result)
     result->event = 0;
     result->session = NULL;
     now = OS_GetTick();
-    type = packet->type;
-    if ((type & 0xf0) == VCT_TYPE_VOICE) {
+    if ((voice->type & 0xf0) == VCT_TYPE_VOICE) {
         sLibrary.receivedCount++;
-        VCT_HandleVoicePacket(aid, packet, size, now);
+        VCT_HandleVoicePacket(aid, voice, size, now);
         return 0;
     }
-    if (type == VCT_TYPE_CONTROL || type == VCT_TYPE_BROADCAST) {
-        return VCT_HandleControlPacket(aid, data, size, result) != FALSE ? 1 : 0;
+    if (control->type == VCT_TYPE_CONTROL || control->type == VCT_TYPE_BROADCAST) {
+        return VCT_HandleControlPacket(aid, control, size, result) != FALSE ? 1 : 0;
     }
     return 0;
 }

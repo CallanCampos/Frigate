@@ -73,7 +73,7 @@ static BOOL Manual_Init(GameProc *proc, u32 *state, void *param, void *data) {
     GFL_BGSysSetBGPriority(7, 0);
     work->vblankTask = GFL_VBlankTCBAdd(Manual_VBlank, work, 1);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     work->topParam.cursor = 0;
     work->categoryParam.scroll = 0;
     work->categoryParam.cursor = 0;

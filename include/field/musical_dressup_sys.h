@@ -16,8 +16,8 @@ typedef struct {
     MusicalSave *save;
 } MusicalDressUpParam;
 
-MusicalDressUpParam *func_ov012_02151f5c(HeapID heapId, MusicalPoke *poke, SaveControl *save);
-void func_ov012_02151f88(MusicalDressUpParam *param);
+MusicalDressUpParam *MusicalDressUpParam_Create(HeapID heapId, MusicalPoke *poke, SaveControl *save);
+void MusicalDressUpParam_Free(MusicalDressUpParam *param);
 
 extern GameProcFunctions data_ov012_0216dfc4;
 

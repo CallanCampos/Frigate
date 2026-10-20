@@ -143,8 +143,8 @@ void GFL_G3DSysCheckSwapBuffers(void);
 void GFL_G3DSysReset(void);
 void GFL_G3DSysSetSwapBufferParams(u32 sortMode, u32 bufferMode);
 // Whether the texture and palette VRAM managers are frame ones
-BOOL func_02049228(void);
-BOOL func_02049238(void);
+BOOL GFL_G3DSysUsesFrmTexVramMgr(void);
+BOOL GFL_G3DSysUsesFrmPlttVramMgr(void);
 // Resources, each a file of a model, textures or an animation
 void *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
 void *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId);

@@ -211,8 +211,8 @@ static void BmpMenu_PrintOptions(BmpMenu *menu) {
             PrintQueue *queue = menu->header.queue;
             u8 y = menu->y + (menu->fontSizeY + menu->header.lineSpacing) * row;
 
-            func_02021c54(queue, BmpWin_GetBitmap(printWindow->window), x, y,
-                          menu->header.options[row + column * menu->header.yCount].text, menu->header.font);
+            PrintQueue_Print(queue, BmpWin_GetBitmap(printWindow->window), x, y,
+                             menu->header.options[row + column * menu->header.yCount].text, menu->header.font);
             printWindow->flushPending = TRUE;
         }
         x += columnWidth;
@@ -261,7 +261,7 @@ BmpMenu *ShopUI_CreateConfirmDialog(const ConfirmDialogSetup *setup, u16 frameCh
     header.fontSizeY = GFL_FontGetCharHeight(header.font);
     header.fontSizeX = 10;
     PrintWindow_Init(header.printWindow, window);
-    header.queue = func_02021998(heapId);
+    header.queue = PrintQueue_CreateDefault(heapId);
     header.printed = FALSE;
 
     menu = BmpMenu_Add(&header, 14, 0, cursorPos, heapId, PAD_BUTTON_B);
@@ -301,7 +301,7 @@ u32 ConfirmDialog_Update(BmpMenu *menu) {
 }
 
 BOOL ConfirmDialog_IsPrinted(BmpMenu *menu) {
-    BOOL done = func_02021a3c(menu->header.queue);
+    BOOL done = PrintQueue_Main(menu->header.queue);
 
     if (!menu->header.printed && done) {
         BmpWin_FlushChar(menu->header.printWindow->window);
@@ -313,8 +313,8 @@ BOOL ConfirmDialog_IsPrinted(BmpMenu *menu) {
 void ConfirmDialog_Free(BmpMenu *menu) {
     BmpWin *window = menu->header.printWindow->window;
 
-    func_02021c44(menu->header.queue);
-    func_02021a18(menu->header.queue);
+    PrintQueue_Clear(menu->header.queue);
+    PrintQueue_Free(menu->header.queue);
     GFL_HeapFree(menu->header.printWindow);
     BmpWin_ClearFrame(window, WINFRAME_TRANSFER_NOW);
     GFL_FontFree(menu->header.font);

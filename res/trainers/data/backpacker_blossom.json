@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Blossom",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 25,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "City Pokémon or\nPokémon that live in the forest...{be00}\nWhich do you prefer?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I love both kinds of Pokémon,\nbut I don't like losing!"
+        },
+        {
+            "type": 2,
+            "text": "The best place for humans to live isn't\nnecessarily the best place for Pokémon.{be01}\nOf course, the best place for me to\nlive is in my bed!"
+        }
+    ]
+}

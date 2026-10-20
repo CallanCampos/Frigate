@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cam & Abby",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SAWK",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "I mainly play on offense.\nMy friend is mainly defense.{be01}\nI will show you the teamwork\nof football fans!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Cam: The teamwork of your Pokémon\nis outstanding!{be01}\nAbby: I'm super impressed!"
+        },
+        {
+            "type": 5,
+            "text": "If what you want to do is different\nfrom what your partner wants to do,{be00}\nit's hard to win a Double Battle!"
+        },
+        {
+            "type": 6,
+            "text": "You know, football is a team sport!\nPlease prepare at least two Pokémon!"
+        },
+        {
+            "type": 7,
+            "text": "Double Battles!{be01}\nThis is the best way to feel\nthe heat of the game of football!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "The right play can turn a game around...\nPokémon battles are the same, too!"
+        },
+        {
+            "type": 10,
+            "text": "Double Battles!{be01}\nYou need at least two Pokémon\nto feel the heat of the game of football!"
+        }
+    ]
+}

@@ -138,7 +138,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         ++*state;
     case 1:
         if (func_ov036_0219a580(work->player) == 1) {
-            func_ov012_021670f4(work->actor, 0);
+            FldAct_SetDrawStatus(work->actor, 0);
             func_ov012_02167564(work->actor, work->flag5B);
             GFL_SndSEPlay(0x684);
             ++*state;
@@ -170,11 +170,11 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
             func_ov033_02179614(work);
             if (result == 1) {
                 func_ov033_02179650(work);
-                func_ov012_021670f4(work->actor, 3);
+                FldAct_SetDrawStatus(work->actor, 3);
                 party = BtlSetup_GetParty(work->battleSetup, 1);
                 pkm = PokeParty_GetPkm(party, 0);
                 species = PokeParty_GetParam(pkm, 5, NULL);
-                func_ov012_0216063c(0x1c, species);
+                GameBeacon_BroadcastMission(0x1c, species);
                 EventScriptCall_Start(event, 0x2796, NULL, 0, HEAPID_FIELDMAP);
                 *state = 10;
             } else if (result == 2) {
@@ -200,7 +200,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
             }
             BtlSetup_Free(work->battleSetup);
         }
-        func_ov012_021670f4(work->actor, 1);
+        FldAct_SetDrawStatus(work->actor, 1);
         EventScriptCall_Start(event, 0x2792 + *state, NULL, 0, 0x15);
         *state = 8;
         break;
@@ -215,7 +215,7 @@ GameEventReturnCode EventFieldFishing_Callback(GameEvent *event, u32 *state, voi
         return GAMEEVENT_DONE;
     case 10:
         RecordAddOne(work->records, 8);
-        func_02038bc8(13);
+        JoinAvenue_RecordActivity(13);
         battleMode = work->isPhenomenon == 1 ? 1 : 4;
         next = EventWildBattleCall_Create(work->gsys, work->field, work->battleSetup, 0, battleMode);
         GameEvent_Replace(event, next);
@@ -255,7 +255,7 @@ void func_ov033_021795e8(FishingEventWork *work) {
     void *effects;
 
     effects = Field_GetFieldEffects(work->field);
-    func_ov012_021670f4(work->actor, 2);
+    FldAct_SetDrawStatus(work->actor, 2);
     work->effect2C = func_ov036_021b3f14(effects, work->actor, 0, 1);
     func_ov036_021a5968(work->effect30, 1);
 }

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ARIADOS",
+    "moves": [ "MOVE_POISON_JAB", "MOVE_STRUGGLE_BUG", "MOVE_ELECTROWEB", "MOVE_SUCKER_PUNCH" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_PAYAPA_BERRY",
+    "form": 0
+}

@@ -13,111 +13,111 @@ struct EncounterCutinWork {
 };
 
 // The create functions of the encounter effects that show a cut-in, by the cut-in they show
-GameEvent *func_ov146_021f59e0(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create01(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 1, param);
 }
 
-GameEvent *func_ov146_021f59ec(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create02(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 2, param);
 }
 
-GameEvent *func_ov146_021f59f8(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create03(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 3, param);
 }
 
-GameEvent *func_ov146_021f5a04(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create04(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 4, param);
 }
 
-GameEvent *func_ov146_021f5a10(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create05(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 5, param);
 }
 
-GameEvent *func_ov146_021f5a1c(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create06(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 6, param);
 }
 
-GameEvent *func_ov146_021f5a28(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create07(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 7, param);
 }
 
-GameEvent *func_ov146_021f5a34(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create08(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 8, param);
 }
 
-GameEvent *func_ov146_021f5a40(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create09(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 9, param);
 }
 
-GameEvent *func_ov146_021f5a4c(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create10(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 10, param);
 }
 
-GameEvent *func_ov146_021f5a58(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create11(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 11, param);
 }
 
-GameEvent *func_ov146_021f5a64(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create12(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 12, param);
 }
 
-GameEvent *func_ov146_021f5a70(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create00(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 0, param);
 }
 
-GameEvent *func_ov146_021f5a7c(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create15(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 15, param);
 }
 
-GameEvent *func_ov146_021f5a88(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create14(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 14, param);
 }
 
-GameEvent *func_ov146_021f5a94(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create16(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 16, param);
 }
 
-GameEvent *func_ov146_021f5aa0(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create13(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 13, param);
 }
 
-GameEvent *func_ov146_021f5aac(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create17(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 17, param);
 }
 
-GameEvent *func_ov146_021f5ab8(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create18(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 18, param);
 }
 
-GameEvent *func_ov146_021f5ac4(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create19(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 19, param);
 }
 
-GameEvent *func_ov146_021f5ad0(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create20(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 20, param);
 }
 
-GameEvent *func_ov146_021f5adc(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create21(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 21, param);
 }
 
-GameEvent *func_ov146_021f5ae8(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create22(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 22, param);
 }
 
-GameEvent *func_ov146_021f5af4(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create23(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 23, param);
 }
 
-GameEvent *func_ov146_021f5b00(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create24(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 24, param);
 }
 
-GameEvent *func_ov146_021f5b0c(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create25(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 25, param);
 }
 
-GameEvent *func_ov146_021f5b18(GameSystem *gsys, Field *field, u32 param) {
+GameEvent *EventEncountEffectCutin_Create26(GameSystem *gsys, Field *field, u32 param) {
     return EventEncountEffectCutin_Create(gsys, field, 26, param);
 }
 

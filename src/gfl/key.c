@@ -256,21 +256,21 @@ void GFL_HIDClearKeypadState(SystemUI *ui) {
     keypad->typedNext = 0;
 }
 
-void func_0203df90(SystemUI *ui, u32 pressed, u32 pressed30) {
+void GFL_HIDSetPressedKeys(SystemUI *ui, u32 pressed, u32 pressed30) {
     KeypadManager *keypad = GFL_HIDGetKeypadManager(ui);
 
     keypad->pressed30 = pressed30;
     keypad->pressed = pressed;
 }
 
-void func_0203dfa0(SystemUI *ui, u32 held, u32 held30) {
+void GFL_HIDSetHeldKeys(SystemUI *ui, u32 held, u32 held30) {
     KeypadManager *keypad = GFL_HIDGetKeypadManager(ui);
 
     keypad->held30 = held30;
     keypad->held = held;
 }
 
-void func_0203dfb0(SystemUI *ui, u32 typed, u32 typed30) {
+void GFL_HIDSetTypedKeys(SystemUI *ui, u32 typed, u32 typed30) {
     KeypadManager *keypad = GFL_HIDGetKeypadManager(ui);
 
     keypad->typed30 = typed30;

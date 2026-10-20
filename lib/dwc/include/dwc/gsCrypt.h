@@ -13,7 +13,7 @@ typedef struct RsaPublicKey {
 } RsaPublicKey;
 
 // Checks a PKCS #1 signature of an MD5 or SHA-1 hash with a public key: 0 when it is right, below 0 when it isn't
-int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, int hashSize, const u8 *signature,
-                               int signatureSize);
+int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, u32 hashSize, const u8 *signature,
+                               u32 signatureSize);
 
 #endif // POKEBW2_DWC_GSCRYPT_H

@@ -1,8 +1,8 @@
-func_ov164_021998c0 kind:function(thumb,size=0x8) addr:0x02199900
-func_ov164_021998c8 kind:function(thumb,size=0xc) addr:0x02199908
-func_ov164_021998d4 kind:function(thumb,size=0x70) addr:0x02199914
-func_ov164_02199944 kind:function(thumb,size=0x40) addr:0x02199984
-func_ov164_02199984 kind:function(thumb,size=0x22) addr:0x021999c4
-func_ov164_021999a8 kind:function(thumb,size=0x12) addr:0x021999e8
-func_ov164_021999bc kind:function(thumb,size=0x2a) addr:0x021999fc
+NetSync_Init kind:function(thumb,size=0x8) addr:0x02199900
+NetSync_Exit kind:function(thumb,size=0xc) addr:0x02199908
+NetSync_Update kind:function(thumb,size=0x70) addr:0x02199914
+NetSync_Send kind:function(thumb,size=0x40) addr:0x02199984
+NetSync_RecvCallback kind:function(thumb,size=0x22) addr:0x021999c4
+NetSync_StartTiming kind:function(thumb,size=0x12) addr:0x021999e8
+NetSync_IsTimingDone kind:function(thumb,size=0x2a) addr:0x021999fc
 data_ov164_021999e8 kind:data(any) addr:0x02199a28

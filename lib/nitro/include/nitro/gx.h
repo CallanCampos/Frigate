@@ -115,9 +115,12 @@ typedef u16 GXRgb;
 // A window's effect enable, above its planes
 #define GX_WND_EFFECT_SHIFT 5
 
-#define GX_OAM_MODE_NORMAL 0
-#define GX_OAM_MODE_XLU 1
-#define GX_OAM_MODE_BITMAPOBJ 3
+typedef enum {
+    GX_OAM_MODE_NORMAL = 0,
+    GX_OAM_MODE_XLU = 1,
+    GX_OAM_MODE_OBJWND = 2,
+    GX_OAM_MODE_BITMAPOBJ = 3,
+} GXOamMode;
 
 // OAM attributes. Bitmap OBJ take an alpha in place of a palette
 typedef union {
@@ -171,6 +174,7 @@ typedef int GXOamShape;
 #define GX_OAM_ATTR2_NAME_SHIFT 0
 #define GX_OAM_ATTR2_NAME_MASK 0x03ff
 #define GX_OAM_ATTR2_PRIORITY_SHIFT 10
+#define GX_OAM_ATTR2_PRIORITY_MASK 0x0c00
 #define GX_OAM_ATTR2_CPARAM_SHIFT 12
 
 #define GX_OAM_EFFECT_NONE 0
@@ -208,6 +212,7 @@ typedef int GXOamShape;
 #define GX_OAM_ATTR01_MOSAIC_MASK 0x00001000
 #define GX_OAM_EFFECT_AFFINE 0x00000100
 #define GX_OAM_EFFECT_AFFINE_DOUBLE 0x00000300
+#define GX_OAM_EFFECT_NODISPLAY 0x00000200
 
 static inline u32 G2_GetOBJEffect(const GXOamAttr *oam) {
     u32 rs = oam->attr01 & GX_OAM_ATTR01_RSENABLE_MASK;
@@ -256,6 +261,15 @@ static inline void G2_SetOBJCharName(GXOamAttr *oam, int name) {
 
 static inline void G2_SetOBJColorMode(GXOamAttr *oam, int color) {
     oam->attr01 = (oam->attr01 & ~GX_OAM_ATTR01_CM_MASK) | (color << GX_OAM_ATTR01_CM_SHIFT);
+}
+
+static inline void G2_SetOBJPriority(GXOamAttr *oam, int priority) {
+    oam->attr2 = (u16)((oam->attr2 & ~GX_OAM_ATTR2_PRIORITY_MASK) | (priority << GX_OAM_ATTR2_PRIORITY_SHIFT));
+}
+
+static inline void G2_SetOBJMode(GXOamAttr *oam, int mode, int cParam) {
+    oam->attr01 = (oam->attr01 & ~GX_OAM_ATTR01_MODE_MASK) | (mode << GX_OAM_ATTR01_MODE_SHIFT);
+    oam->attr2 = (u16)((oam->attr2 & ~GX_OAM_ATTR2_CPARAM_MASK) | (cParam << GX_OAM_ATTR2_CPARAM_SHIFT));
 }
 
 #define GX_PLANEMASK_BG0 0x01
@@ -465,12 +479,17 @@ typedef enum {
 
 typedef enum {
     GX_BG_SCRBASE_0x0000 = 0,
+    GX_BG_SCRBASE_0x6000 = 12,
+    GX_BG_SCRBASE_0x6800 = 13,
+    GX_BG_SCRBASE_0x7000 = 14,
+    GX_BG_SCRBASE_0x7800 = 15,
     GX_BG_SCRBASE_0xf800 = 31,
 } GXBGScrBase;
 
 typedef enum {
     GX_BG_CHARBASE_0x00000 = 0,
     GX_BG_CHARBASE_0x04000 = 1,
+    GX_BG_CHARBASE_0x08000 = 2,
     GX_BG_CHARBASE_0x10000 = 4,
     GX_BG_CHARBASE_0x3c000 = 15,
 } GXBGCharBase;
@@ -893,23 +912,23 @@ static inline void G2S_SetWndOutsidePlane(int wnd, BOOL effect) {
 // A window's rectangle, from (x1, y1) to before (x2, y2). NitroSDK's G2_SetWnd0Position, G2_SetWnd1Position and their
 // G2S_ forms
 static inline void G2_SetWnd0Position(int x1, int y1, int x2, int y2) {
-    reg_G2_WIN0H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2_WIN0V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2_WIN0H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2_WIN0V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2_SetWnd1Position(int x1, int y1, int x2, int y2) {
-    reg_G2_WIN1H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2_WIN1V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2_WIN1H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2_WIN1V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2S_SetWnd0Position(int x1, int y1, int x2, int y2) {
-    reg_G2S_DB_WIN0H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2S_DB_WIN0V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2S_DB_WIN0H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2S_DB_WIN0V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2S_SetWnd1Position(int x1, int y1, int x2, int y2) {
-    reg_G2S_DB_WIN1H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2S_DB_WIN1V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2S_DB_WIN1H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2S_DB_WIN1V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2_BlendNone(void) {
@@ -1535,19 +1554,19 @@ u32 GX_ResetBankForSubBG(void);             // swan's gfxAcquireBGBanksB
 u32 GX_ResetBankForSubOBJ(void);            // swan's gfxAcquireObjBanksB
 u32 GX_ResetBankForSubBGExtPltt(void);      // swan's gfxAcquireBGExtPltBanksB
 u32 GX_ResetBankForSubOBJExtPltt(void);     // swan's gfxAcquireObjExtPltBanksB
-void GX_DisableBankForBG(void);             // swan's gfxDisableBGBanksA
-void GX_DisableBankForOBJ(void);            // swan's gfxDisableObjBanksA
-void GX_DisableBankForBGExtPltt(void);      // swan's gfxDisableBGExtPltBanksA
-void GX_DisableBankForOBJExtPltt(void);     // swan's gfxDisableObjExtPltBanksA
-void GX_DisableBankForTex(void);            // swan's gfxDisableTextureBanks
-void GX_DisableBankForTexPltt(void);        // swan's gfxDisablePaletteBanks
-void GX_DisableBankForClearImage(void);     // swan's gfxDisableRearPlaneImageBanks
-void GX_DisableBankForARM7(void);           // swan's gfxDisablePlainARM7Banks
-void GX_DisableBankForLCDC(void);           // swan's gfxDisableLCDCBanks
-void GX_DisableBankForSubBG(void);          // swan's gfxDisableBGBanksB
-void GX_DisableBankForSubOBJ(void);         // swan's gfxDisableObjBanksB
-void GX_DisableBankForSubBGExtPltt(void);   // swan's gfxDisableBGExtPltBanksB
-void GX_DisableBankForSubOBJExtPltt(void);  // swan's gfxDisableObjExtPltBanksB
+u32 GX_DisableBankForBG(void);              // swan's gfxDisableBGBanksA
+u32 GX_DisableBankForOBJ(void);             // swan's gfxDisableObjBanksA
+u32 GX_DisableBankForBGExtPltt(void);       // swan's gfxDisableBGExtPltBanksA
+u32 GX_DisableBankForOBJExtPltt(void);      // swan's gfxDisableObjExtPltBanksA
+u32 GX_DisableBankForTex(void);             // swan's gfxDisableTextureBanks
+u32 GX_DisableBankForTexPltt(void);         // swan's gfxDisablePaletteBanks
+u32 GX_DisableBankForClearImage(void);      // swan's gfxDisableRearPlaneImageBanks
+u32 GX_DisableBankForARM7(void);            // swan's gfxDisablePlainARM7Banks
+u32 GX_DisableBankForLCDC(void);            // swan's gfxDisableLCDCBanks
+u32 GX_DisableBankForSubBG(void);           // swan's gfxDisableBGBanksB
+u32 GX_DisableBankForSubOBJ(void);          // swan's gfxDisableObjBanksB
+u32 GX_DisableBankForSubBGExtPltt(void);    // swan's gfxDisableBGExtPltBanksB
+u32 GX_DisableBankForSubOBJExtPltt(void);   // swan's gfxDisableObjExtPltBanksB
 u32 GX_GetBankForLCDC(void);                // swan's gfxGetLCDCBanks
 u32 GX_GetBankForTex(void);                 // swan's gfxGetTextureBanks
 u32 GX_GetBankForOBJExtPltt(void);          // swan's gfxGetObjExtPltBanksA
@@ -1644,6 +1663,14 @@ static inline void GXS_SetVisiblePlane(int plane) {
         (u32)((reg_GXS_DB_DISPCNT & ~REG_GX_DISPCNT_DISPLAY_MASK) | (plane << REG_GX_DISPCNT_DISPLAY_SHIFT));
 }
 
+static inline int GX_GetVisiblePlane(void) {
+    return (int)((reg_GX_DISPCNT & REG_GX_DISPCNT_DISPLAY_MASK) >> REG_GX_DISPCNT_DISPLAY_SHIFT);
+}
+
+static inline int GXS_GetVisiblePlane(void) {
+    return (int)((reg_GXS_DB_DISPCNT & REG_GX_DISPCNT_DISPLAY_MASK) >> REG_GX_DISPCNT_DISPLAY_SHIFT);
+}
+
 static inline void GX_SetOBJVRamModeChar(GXOBJVRamModeChar mode) {
     reg_GX_DISPCNT = (u32)((reg_GX_DISPCNT & ~(REG_GX_DISPCNT_EXOBJ_CH_MASK | REG_GX_DISPCNT_OBJMAP_CH_MASK)) | mode);
 }
@@ -1669,6 +1696,10 @@ static inline void GXS_SetOBJVRamModeBmp(GXOBJVRamModeBmp mode) {
 
 static inline void GXS_DispOn(void) {
     reg_GXS_DB_DISPCNT |= REG_GXS_DB_DISPCNT_MODE_MASK;
+}
+
+static inline void GXS_DispOff(void) {
+    reg_GXS_DB_DISPCNT &= ~REG_GXS_DB_DISPCNT_MODE_MASK;
 }
 
 // NitroSDK's G3X_Reset, G3X_InitMtxStack and G3X_GetBoxTestResult. The box test result is 0 when

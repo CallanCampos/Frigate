@@ -2,6 +2,7 @@
 // is descriptive. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/scrcmd_menu.h"
 #include "system/game_event.h"

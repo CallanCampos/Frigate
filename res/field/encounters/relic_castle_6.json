@@ -1,0 +1,35 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": [
+            [ "SPECIES_YAMASK", 27, 27 ],
+            [ "SPECIES_SANDILE", 27, 27 ],
+            [ "SPECIES_YAMASK", 28, 28 ],
+            [ "SPECIES_SANDILE", 28, 28 ],
+            [ "SPECIES_SANDSLASH", 28, 28 ],
+            [ "SPECIES_SANDSLASH", 29, 29 ],
+            [ "SPECIES_YAMASK", 29, 29 ],
+            [ "SPECIES_KROKOROK", 29, 29 ],
+            [ "SPECIES_YAMASK", 30, 30 ],
+            [ "SPECIES_KROKOROK", 30, 30 ],
+            [ "SPECIES_YAMASK", 30, 30 ],
+            [ "SPECIES_KROKOROK", 30, 30 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

@@ -1,9 +1,9 @@
-func_ov105_021eec80 kind:function(thumb,size=0x2a) addr:0x021eecc0
-func_ov105_021eecac kind:function(thumb,size=0x1a) addr:0x021eecec
-func_ov105_021eecc8 kind:function(thumb,size=0xc) addr:0x021eed08
-func_ov105_021eecd4 kind:function(thumb,size=0x150) addr:0x021eed14
-func_ov105_021eee24 kind:function(thumb,size=0x2) addr:0x021eee64
-func_ov105_021eee28 kind:function(thumb,size=0x2) addr:0x021eee68
+LeagueStatue_Init kind:function(thumb,size=0x2a) addr:0x021eecc0
+LeagueStatue_End kind:function(thumb,size=0x1a) addr:0x021eecec
+LeagueStatue_Update kind:function(thumb,size=0xc) addr:0x021eed08
+LeagueStatue_LoadScene kind:function(thumb,size=0x150) addr:0x021eed14
+LeagueStatue_DummyInit kind:function(thumb,size=0x2) addr:0x021eee64
+LeagueStatue_DummyEnd kind:function(thumb,size=0x2) addr:0x021eee68
 data_ov105_021eee2c kind:data(any) addr:0x021eee6c
 data_ov105_021eee30 kind:data(any) addr:0x021eee70
 data_ov105_021eee34 kind:data(any) addr:0x021eee74

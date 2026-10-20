@@ -8,7 +8,7 @@
 // an error) and then the socket. pokediamond's NitroWiFi names the object socl_close.o and its functions, except the
 // two that ask about the socket's state, which this version added.
 
-static int SOCLi_CloseCallBack(SOCLCommandPacket *packet);
+static int SOCLi_CloseCallBack(void *arg);
 static void SOCLi_CleanupSocket(SOCLSocket *socket);
 static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe);
 
@@ -71,30 +71,31 @@ int SOCL_Close(int socket) {
     OS_RestoreInterrupts(irq);
     s->state |= SOCLI_STATE_CLOSING | SOCLI_STATE_CLOSE_CALLED;
     if (SOCLi_SocketIsTCP(s)) {
-        SOCLi_SendCommandPacket(s->send_pipe, NULL);
+        SOCLi_SendCommandPacket(&s->send_pipe->base, NULL);
         SOCLiSocketCount[0]--;
     } else {
         SOCLiSocketCount[1]--;
     }
     packet = SOCLi_CreateCommandPacket(SOCLi_CloseCallBack, s, 1);
-    packet->reply_queue = NULL;
+    packet->h.reply_queue = NULL;
     SOCLi_SendCommandPacketToCtrlPipe(s, packet);
     return 0;
 }
 
-static int SOCLi_CloseCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
+static int SOCLi_CloseCallBack(void *arg) {
+    SOCLiCommandClose *cpacket = (SOCLiCommandClose *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
     u32 irq;
 
     if (SOCLi_SocketIsTCP(socket)) {
-        OS_JoinThread(&SOCLi_GetSendPipe(socket)->base.thread);
+        OS_JoinThread(&socket->send_pipe->base.thread);
         CPS_TcpShutdown();
         CPS_TcpClose();
         CPS_SocRelease();
     }
     CPS_SocUnRegister();
     socket->state &= ~(SOCLI_STATE_BINDING | SOCLI_STATE_CONNECTED);
-    SOCLi_SendCommandPacket(socket->flag == 2 ? socket->send_pipe : socket->recv_pipe, NULL);
+    SOCLi_SendCommandPacket(socket->flag == 2 ? &socket->send_pipe->base : &socket->recv_pipe->base, NULL);
     irq = OS_DisableInterrupts();
     SOCLi_SocketUnregister(socket);
     SOCLi_SocketRegisterTrash(socket);
@@ -113,10 +114,10 @@ static void SOCLi_CleanupSocket(SOCLSocket *socket) {
     socket->state = 0;
     flag = socket->flag;
     if (SOCLi_ModeIsTCP(flag)) {
-        SOCLi_FreeCommandPipe(socket->send_pipe);
-        SOCLi_FreeCommandPipe(socket->recv_pipe);
+        SOCLi_FreeCommandPipe(&socket->send_pipe->base);
+        SOCLi_FreeCommandPipe(&socket->recv_pipe->base);
     } else if (flag == 1) {
-        SOCLUdpPacket *udp = SOCLi_GetRecvPipe(socket)->udp_head;
+        SOCLUdpPacket *udp = socket->recv_pipe->udp_head;
 
         while (udp != NULL) {
             SOCLUdpPacket *next = udp->next;
@@ -124,13 +125,13 @@ static void SOCLi_CleanupSocket(SOCLSocket *socket) {
             SOCLiConfigPtr->free(udp);
             udp = next;
         }
-        SOCLi_GetRecvPipe(socket)->udp_queued = 0;
-        SOCLi_GetRecvPipe(socket)->udp_tail = NULL;
-        SOCLi_GetRecvPipe(socket)->udp_head = NULL;
-        OS_WakeupThread(&SOCLi_GetRecvPipe(socket)->udp_wait);
-        SOCLi_FreeCommandPipe(socket->recv_pipe);
+        socket->recv_pipe->udp_queued = 0;
+        socket->recv_pipe->udp_tail = NULL;
+        socket->recv_pipe->udp_head = NULL;
+        OS_WakeupThread(&socket->recv_pipe->udp_wait);
+        SOCLi_FreeCommandPipe(&socket->recv_pipe->base);
     } else if (flag == 2) {
-        SOCLi_FreeCommandPipe(socket->send_pipe);
+        SOCLi_FreeCommandPipe(&socket->send_pipe->base);
     }
     irq = OS_DisableInterrupts();
     SOCLi_SocketUnregister(socket);
@@ -153,8 +154,8 @@ static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
     if (OS_ReceiveMessage(&pipe->queue, &message, OS_MESSAGE_NOBLOCK)) {
         do {
             if (message != NULL) {
-                if (((SOCLCommandPacket *)message)->reply_queue != NULL) {
-                    OS_SendMessage(((SOCLCommandPacket *)message)->reply_queue, (OSMessage)SOCL_ECANCELED,
+                if (((SOCLCommandPacket *)message)->h.reply_queue != NULL) {
+                    OS_SendMessage(((SOCLCommandPacket *)message)->h.reply_queue, (OSMessage)SOCL_ECANCELED,
                                    OS_MESSAGE_NOBLOCK);
                 }
                 SOCLi_FreeCommandPacket(message);

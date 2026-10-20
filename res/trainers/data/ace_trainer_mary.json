@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Mary",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TIRTOUGA",
+            "form": 0,
+            "level": 34,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAGMAR",
+            "form": 0,
+            "level": 34,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey! My Pokémon are great.\nLook, look!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Argh!!"
+        },
+        {
+            "type": 2,
+            "text": "I am called an Ace Trainer, but\nthat doesn't sit well with me.{be01}\n'Cause I just love Pokémon,\nand I just want to be strong!"
+        }
+    ]
+}

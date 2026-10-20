@@ -17,6 +17,6 @@ struct CommTvtParam {
     u8 parentMac[6];
 };
 
-extern const GameProcFunctions COMM_TVT_PROC_FUNCTIONS;
+extern GameProcFunctions COMM_TVT_PROC_FUNCTIONS;
 
 #endif // POKEBW2_APP_COMM_TVT_H

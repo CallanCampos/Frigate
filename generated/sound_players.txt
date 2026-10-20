@@ -1,0 +1,9 @@
+# Sound players, which play sequences, with the names that the sound archive's symbols give them, in its order
+# (bootstrapped from the ROM). Each is a slot of swan_sound_data.sdat; res/sound/ has their sources (sound_data.py)
+PLAYER_BGM
+PLAYER_SE_SYS
+PLAYER_SE_1
+PLAYER_SE_2
+PLAYER_SE_PSG
+PLAYER_SE_3
+PLAYER_BGM2

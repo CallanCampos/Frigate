@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Chalina",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "level": 54,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_CIRCLE_THROW", "MOVE_FACADE", "MOVE_ROCK_TOMB", "MOVE_ENDURE" ]
+        },
+        {
+            "species": "SPECIES_SAWK",
+            "form": 0,
+            "level": 54,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_LOW_SWEEP", "MOVE_RETALIATE", "MOVE_PAYBACK", "MOVE_ENDURE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Life is all about overcoming hurdles!\nCould you be a hurdle for me?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I couldn't overcome the hurdle you\npresented to me..."
+        },
+        {
+            "type": 2,
+            "text": "If you can't overcome a hurdle, you can\nalways just go around it.{be01}\nHead up here, and you'll find the\ngreatest hurdle for Trainers:{be00}\nthe Pokémon League."
+        }
+    ]
+}

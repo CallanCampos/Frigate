@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Aspen",
+    "class": "TRAINER_CLASS_SMASHER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_ZINC",
+    "party": [
+        {
+            "species": "SPECIES_WHIMSICOTT",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LILLIGANT",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The world championships are coming soon!\nI will practice volleys{be00}\nby using you as a wall!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh, whew! Must...catch...my breath.\nThat was some good training..."
+        },
+        {
+            "type": 15,
+            "text": "Huh huh huh...\nLemme...catch...my breath...{be01}"
+        },
+        {
+            "type": 16,
+            "text": "You and I have just met.\nLet's start the game from the beginning!"
+        }
+    ]
+}

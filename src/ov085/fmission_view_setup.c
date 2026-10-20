@@ -11,6 +11,7 @@
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_menu.h"
+#include "field/field_msgbg.h"
 #include "field/field_pass_power.h"
 #include "field/fmission_log_accessor_fv.h"
 #include "field/fmission_view.h"
@@ -58,11 +59,6 @@
 
 #define OVERLAY_EVENT_FESTIVAL OVERLAY_ID(21)
 #define OVERLAY_EVENT_PASS_POWER OVERLAY_ID(14)
-#define OVERLAY_FIELD_PASS_POWER OVERLAY_ID(156)
-
-// The archives of the view's graphics and of the players' icons
-#define ARCID_FMISSION_VIEW 259
-#define ARCID_FMISSION_VIEW_ICON 31
 
 // What the view's event does before it hands over to the screen's event
 enum {
@@ -209,15 +205,16 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         u32 args = 0;
 
         event = FMissionViewSetup_CreateCallEvent(
-            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_FESTIVAL, func_ov021_0216e80c, &args),
+            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_FESTIVAL, EventFestival_Create, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_INFO);
         break;
     }
     case FMISSION_VIEW_EVENT_QUIT:
-        event = FMissionViewSetup_CreateCallEvent(
-            view,
-            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION, func_ov157_021f5ae4, view->field),
-            CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
+        event = FMissionViewSetup_CreateCallEvent(view,
+                                                  GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION,
+                                                                                  EventFestMissionRetire_Create,
+                                                                                  view->field),
+                                                  CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
         break;
     case FMISSION_VIEW_EVENT_PASS_POWER: {
         u32 args = 1;
@@ -225,7 +222,7 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         event = FMissionViewSetup_CreateCallEvent(
             view,
             GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_PASS_POWER,
-                                            (GameEventProvider)func_ov014_0216e8ac, &args),
+                                            (GameEventProvider)EventPassPower_Create, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_PASS_POWER);
         break;
     }
@@ -361,10 +358,10 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
     SaveControl *save;
     PlayerInfo *info;
 
-    view->beaconStatus = func_020174d4(view->gameData);
-    view->newLog = func_020146fc(view->festival);
+    view->beaconStatus = GameData_GetBeaconStatus(view->gameData);
+    view->newLog = LinkFestival_GetLog(view->festival);
     view->log = func_02014708(view->festival);
-    view->passPowers = func_02014710(view->festival);
+    view->passPowers = LinkFestival_GetPassPowers(view->festival);
     view->logCount = FMissionLogFV_GetCount(view->log);
     view->logTop = FMissionLogFV_GetTop(view->log);
     if (view->logCount < FMISSION_VIEW_PANEL_COUNT) {
@@ -393,7 +390,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
 }
 
 static void FMissionViewSetup_FreeData(FMissionView *view) {
-    func_ov027_02170b00(view->festText);
+    FestivalText_Free(view->festText);
     PassPowerData_Free(view->passPowerData);
     GFL_HeapFree(view->newEntry);
     GFL_HeapFree(view->unk54);
@@ -406,13 +403,13 @@ static void FMissionViewSetup_InitSystems(FMissionView *view) {
     view->fade = PaletteFade_Create(view->heapId);
     PaletteFade_AllocBuffer(view->fade, PALFADE_BUFFER_SUB_BG, 0x1c0, view->heapId);
     PaletteFade_AllocBuffer(view->fade, PALFADE_BUFFER_SUB_OBJ, 0x200, view->heapId);
-    view->printQueue = func_02021998(view->heapId);
-    func_02021a20(view->printQueue, TRUE);
-    func_02021a34(view->printQueue, 500);
+    view->printQueue = PrintQueue_CreateDefault(view->heapId);
+    PrintQueue_SetQueueAlways(view->printQueue, TRUE);
+    PrintQueue_SetTimeLimit(view->printQueue, 500);
     view->font = func_ov036_0218799c(Field_GetMsgBGSys(view->field));
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     view->wordSet = GFL_WordSetSystemCreateDefault(view->heapId);
-    view->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0040, view->heapId);
+    view->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_FMISSION_VIEW_SETUP, view->heapId);
     view->tmpStr = GFL_StrBufCreate(217, view->heapId);
     view->message = GFL_StrBufCreate(217, view->heapId);
     view->messageCopy = GFL_StrBufCreate(217, view->heapId);
@@ -424,9 +421,9 @@ static void FMissionViewSetup_FreeSystems(FMissionView *view) {
     GFL_StrBufFree(view->tmpStr);
     GFL_MsgDataFree(view->msgData);
     GFL_WordSetSystemFree(view->wordSet);
-    func_02021c44(view->printQueue);
-    func_02021a18(view->printQueue);
-    func_020232d8();
+    PrintQueue_Clear(view->printQueue);
+    PrintQueue_Free(view->printQueue);
+    GFL_TextRndResetColorIndexLUT();
     PaletteFade_FreeBuffer(view->fade, PALFADE_BUFFER_SUB_OBJ);
     PaletteFade_FreeBuffer(view->fade, PALFADE_BUFFER_SUB_BG);
     PaletteFade_Free(view->fade);
@@ -482,7 +479,7 @@ static void FMissionViewSetup_FreeMenu(FMissionView *view) {
 }
 
 static void FMissionViewSetup_LoadResources(FMissionView *view, ArcTool *arc) {
-    ArcTool *iconArc = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_VIEW_ICON, view->tmpHeapId);
+    ArcTool *iconArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, view->tmpHeapId);
     int i;
 
     {
@@ -524,13 +521,13 @@ static void FMissionViewSetup_FreeResources(FMissionView *view) {
 static void FMissionViewSetup_InitActors(FMissionView *view, ArcTool *arc) {
     int i;
 
-    view->clUnit = func_0204bf1c(64, 0, view->fieldHeapId);
+    view->clUnit = ClActUnit_Create(64, 0, view->fieldHeapId);
     {
         ClActSurfaceSetup surface = { 0, 0, 256, 192, 1, 2 };
 
-        view->renderer = func_0204be9c(&surface, 1, view->heapId);
+        view->renderer = ClActRenderer_Create(&surface, 1, view->heapId);
     }
-    func_0204c018(view->clUnit, view->renderer);
+    ClActUnit_SetRenderer(view->clUnit, view->renderer);
     view->bmpOam = BmpOam_Init(view->heapId, view->clUnit);
     FMissionViewSetup_InitButtons(view);
     for (i = 0; i < FMISSION_VIEW_PANEL_COUNT; i++) {
@@ -548,8 +545,8 @@ static void FMissionViewSetup_FreeActors(FMissionView *view) {
     }
     FMissionViewSetup_FreeButtons(view);
     BmpOam_Exit(view->bmpOam);
-    func_0204becc(view->renderer);
-    func_0204bf98(view->clUnit);
+    ClActRenderer_Delete(view->renderer);
+    ClActUnit_Delete(view->clUnit);
 }
 
 static void FMissionViewSetup_InitWin(FMissionView *view, BeaconViewWin *win, u8 bg, u8 palette, u8 x, u8 y, u8 width,
@@ -595,16 +592,16 @@ static void FMissionViewSetup_LoadRes(FMissionView *view, FMissionViewRes *res, 
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_PALETTE].count; i++) {
         res->lists[FMISSION_VIEW_RES_PALETTE].ids[i] =
-            func_0204bba0(arc, setup[FMISSION_VIEW_RES_PALETTE].fileId + i, CLACT_VRAM_SUB, 0, view->fieldHeapId);
+            ClActSys_LoadPltt(arc, setup[FMISSION_VIEW_RES_PALETTE].fileId + i, CLACT_VRAM_SUB, 0, view->fieldHeapId);
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_CHARS].count; i++) {
-        res->lists[FMISSION_VIEW_RES_CHARS].ids[i] = func_0204b81c(arc, setup[FMISSION_VIEW_RES_CHARS].fileId + i,
-                                                                   compressed, CLACT_VRAM_SUB, view->fieldHeapId);
+        res->lists[FMISSION_VIEW_RES_CHARS].ids[i] = ClActSys_LoadChars(arc, setup[FMISSION_VIEW_RES_CHARS].fileId + i,
+                                                                        compressed, CLACT_VRAM_SUB, view->fieldHeapId);
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_CELL_ANIMS].count; i++) {
         res->lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[i] =
-            func_0204bde0(arc, setup[FMISSION_VIEW_RES_CELL_ANIMS].fileId + i * 2,
-                          setup[FMISSION_VIEW_RES_CELL_ANIMS].fileId + 1 + i * 2, view->fieldHeapId);
+            ClActSys_LoadCellAnims(arc, setup[FMISSION_VIEW_RES_CELL_ANIMS].fileId + i * 2,
+                                   setup[FMISSION_VIEW_RES_CELL_ANIMS].fileId + 1 + i * 2, view->fieldHeapId);
     }
 }
 
@@ -612,13 +609,13 @@ static void FMissionViewSetup_FreeRes(FMissionView *view, FMissionViewRes *res) 
     int i;
 
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_CELL_ANIMS].count; i++) {
-        func_0204be64(res->lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[i]);
+        ClActSys_FreeCellAnims(res->lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[i]);
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_CHARS].count; i++) {
-        func_0204b98c(res->lists[FMISSION_VIEW_RES_CHARS].ids[i]);
+        ClActSys_FreeChars(res->lists[FMISSION_VIEW_RES_CHARS].ids[i]);
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_PALETTE].count; i++) {
-        func_0204bcd0(res->lists[FMISSION_VIEW_RES_PALETTE].ids[i]);
+        ClActSys_FreePltt(res->lists[FMISSION_VIEW_RES_PALETTE].ids[i]);
     }
     for (i = 0; i < FMISSION_VIEW_RES_TYPE_COUNT; i++) {
         if (res->lists[i].ids != NULL) {
@@ -637,7 +634,7 @@ static ClActor *FMissionViewSetup_AddActor(FMissionView *view, u32 chars, u32 pa
     setup.sequence = sequence;
     setup.bgPriority = bgPriority;
     setup.priority = priority;
-    actor = func_0204c040(view->clUnit, chars, palette, cellAnims, &setup, CLACT_SURFACE_MAIN, view->fieldHeapId);
+    actor = ClActor_Create(view->clUnit, chars, palette, cellAnims, &setup, CLACT_SURFACE_MAIN, view->fieldHeapId);
     func_0204c520(actor, FALSE);
     func_0204c5c8(actor, FALSE);
     return actor;
@@ -655,7 +652,7 @@ static void FMissionViewSetup_InitButtons(FMissionView *view) {
             view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
             view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0], sFMissionViewButtonPos[i].x,
             sFMissionViewButtonPos[i].y, (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT, 1, 1);
-        func_0204c124(view->buttons[i], TRUE);
+        ClActor_SetVisible(view->buttons[i], TRUE);
         func_0204c520(view->buttons[i], TRUE);
     }
 }
@@ -664,8 +661,8 @@ static void FMissionViewSetup_FreeButtons(FMissionView *view) {
     int i;
 
     for (i = 0; i < FMISSION_VIEW_BUTTON_COUNT; i++) {
-        func_0204c124(view->buttons[i], FALSE);
-        func_0204c108(view->buttons[i]);
+        ClActor_SetVisible(view->buttons[i], FALSE);
+        ClActor_Delete(view->buttons[i]);
     }
 }
 
@@ -713,16 +710,16 @@ static void FMissionViewSetup_InitPanel(FMissionView *view, u8 index) {
                                    view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
                                    view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0],
                                    panel->x + 16, panel->y + 16, 0, 3, index + 6);
-    func_0204c378(panel->icon, (u8)(index + 9), 1);
+    ClActor_SetPalette(panel->icon, (u8)(index + 9), 1);
     FMissionViewSetup_InitLine(view, &panel->lines[0], 8, 2, panel->x + 48, panel->y + 4);
     panel->strs[0] = GFL_StrBufCreate(8, view->heapId);
     FMissionViewSetup_InitLine(view, &panel->lines[1], 24, 2, panel->x + 48, panel->y + 20);
     panel->strs[1] = GFL_StrBufCreate(41, view->heapId);
     FMissionViewSetup_InitLine(view, &panel->lines[2], 12, 2, panel->x + 128, panel->y + 4);
     panel->strs[2] = GFL_StrBufCreate(24, view->heapId);
-    func_0204c124(panel->frame, FALSE);
-    func_0204c124(panel->markActor, FALSE);
-    func_0204c124(panel->icon, FALSE);
+    ClActor_SetVisible(panel->frame, FALSE);
+    ClActor_SetVisible(panel->markActor, FALSE);
+    ClActor_SetVisible(panel->icon, FALSE);
 }
 
 static void FMissionViewSetup_FreePanel(FMissionView *view, u8 index) {
@@ -733,11 +730,11 @@ static void FMissionViewSetup_FreePanel(FMissionView *view, u8 index) {
         GFL_StrBufFree(panel->strs[i]);
         BeaconViewOam_Free(&panel->lines[i]);
     }
-    func_0204c124(panel->icon, FALSE);
-    func_0204c108(panel->icon);
-    func_0204c124(panel->markActor, FALSE);
-    func_0204c108(panel->markActor);
-    func_0204c124(panel->frame, FALSE);
-    func_0204c108(panel->frame);
+    ClActor_SetVisible(panel->icon, FALSE);
+    ClActor_Delete(panel->icon);
+    ClActor_SetVisible(panel->markActor, FALSE);
+    ClActor_Delete(panel->markActor);
+    ClActor_SetVisible(panel->frame, FALSE);
+    ClActor_Delete(panel->frame);
     MI_CpuFill8(panel, 0, sizeof(FMissionViewPanel));
 }

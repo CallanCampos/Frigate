@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dan",
+    "class": "TRAINER_CLASS_LINEBACKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_POTION",
+    "party": [
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 25,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TIMBURR",
+            "form": 0,
+            "level": 25,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "POWER!{be01}\nPower is essential for both\nPokémon and football!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Didn't I have enough power...?"
+        },
+        {
+            "type": 15,
+            "text": "I may not have enough power...\nBut I'm not lacking in kindness!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I am training to be the very best\nwith my Pokémon!"
+        }
+    ]
+}

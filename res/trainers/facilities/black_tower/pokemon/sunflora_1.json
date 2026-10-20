@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SUNFLORA",
+    "moves": [ "MOVE_SEED_BOMB", "MOVE_RAZOR_LEAF", "MOVE_MEGA_DRAIN", "MOVE_LEECH_SEED" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_NONE",
+    "form": 0
+}

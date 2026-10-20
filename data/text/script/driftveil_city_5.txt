@@ -1,6 +1,0 @@
-DriftveilCity5_Text_WelcomeDriftveilContinentalHotel = Welcome to the\nDriftveil Continental Hotel!{be01}\nThere are no open rooms,\nbut feel free to relax in the lobby.
-DriftveilCity5_Text_GuiltyPleasureNewestFilms = My guilty pleasure is the newest films\nfrom Pokéstar Studios.
-DriftveilCity5_Text_DriftveilsGoneChangedMuch = Driftveil's gone and changed so much,\nI thought I'd been hornswoggled!
-DriftveilCity5_Text_ImGoingWatchPokemon = I'm going to watch... ♪\nThe Pokémon World Tournament! ♪{be01}\nHuh? The Pokémon World Tournament\nis in the southernmost part of town.
-DriftveilCity5_Text_TerrificTrainerLetShare = A terrific Trainer!\nLet me share a training tip with you.{be01}\nDuring a battle with a Trainer, even if\nyour Pokémon's items are taken away,{be00}\ndon't worry.{be01}\nThey will be returned to you safely\nafter the battle.{be01}\n...But disposable items seem\nto disappear.
-\pad{14}

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "field/battle_cutin.h"
 #include "field/encounter_effect.h"
@@ -9,6 +10,7 @@
 #include "field/field_environment.h"
 #include "field/field_event.h"
 #include "field/field_fog.h"
+#include "field/field_msgbg.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -721,7 +723,7 @@ static void EventFieldEffect_LoadGraphics(GameEvent *event, Fld3DCi *ci, Fld3DCi
     ci->particleDelay[1] = scene->particleDelay[1];
     ci->actorDelay[0] = scene->actorDelay[0];
     ci->actorDelay[1] = scene->actorDelay[1];
-    count = particleRes != NULL ? func_020503f0(particleRes) : 0;
+    count = particleRes != NULL ? Particle_GetResourceEmitterCount(particleRes) : 0;
     if (count == 2) {
         ci->particleStarted[0] = 0;
         ci->particleStarted[1] = 0;
@@ -757,7 +759,7 @@ static void Fld3DCi_FreeG3D(Fld3DCi *ci, Fld3DCiScene *scene) {
 }
 
 static void func_ov036_021bc0f4(Fld3DCi *ci, int id) {
-    func_0205007c(ci->particle, id, func_ov036_021bc108, NULL);
+    Particle_CreateEmitterWithCallback(ci->particle, id, func_ov036_021bc108, NULL);
 }
 
 static void func_ov036_021bc108(SPLEmitter *emitter) {
@@ -1262,8 +1264,8 @@ static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *p
     palAddr = NNS_G3DResTexGetPltRAMAddress(tex, palName);
     ci->character = NULL;
     ci->palette = NULL;
-    ci->charData = GFL_G2DIOReadBGNCGR(0x10b, charFile, TRUE, &ci->character, heapId);
-    ci->paletteData = GFL_G2DIOReadNCLR(0x10b, palFile, &ci->palette, heapId);
+    ci->charData = GFL_G2DIOReadBGNCGR(ARCID_FLD3D_CI, charFile, TRUE, &ci->character, heapId);
+    ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FLD3D_CI, palFile, &ci->palette, heapId);
     charRaw = ci->character->rawData;
     pixels = GFL_BitmapGetPixelData(ci->bitmap);
     size = height * width * 32;

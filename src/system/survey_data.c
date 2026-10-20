@@ -104,21 +104,21 @@ int GetSurveyAnswerMsgIDCount(int question) {
     return sAnswerMsgIdCounts[question];
 }
 
-u8 func_02011450(u8 question) {
+u8 SurveyQuestion_GetBitCount(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return 0;
     }
     return sQuestions[question].bits;
 }
 
-u8 func_02011464(u8 question) {
+u8 SurveyQuestion_GetFirstAnswer(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return 0;
     }
     return sQuestions[question].firstAnswer;
 }
 
-u8 func_02011478(u8 question) {
+u8 SurveyQuestion_GetFirstBit(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return 0;
     }

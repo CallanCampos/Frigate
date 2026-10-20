@@ -58,7 +58,17 @@ class Overlay:
                 self.relocs.append((int(match.group(1), 16), match.group(2), int(match.group(3), 16), match.group(4)))
         image = image_path.read_bytes()
         base = self.sections[".text"][0]
-        self.strings = {base + m.start(): m.group(1).decode() for m in re.finditer(rb"([a-z_0-9]+\.c)\x00", image)}
+        self.strings = {}
+        targets = {target for _, _, target, module in self.relocs if module == self.module}
+        for m in re.finditer(rb"([a-z_0-9]+\.c)\x00", image):
+            # A match that starts off a 4-byte boundary may have picked up the end of the object before the literal:
+            # the last byte of a palette (0x63, 'c') makes "ctalkmsgwin.c" of overlay 36's "talkmsgwin.c". Start at the
+            # boundary when the code refers to it; a name at the end of a longer literal is really unaligned
+            addr, name = base + m.start(), m.group(1).decode()
+            skip = -addr % 4
+            if skip and len(name) - skip > len(".c") and addr + skip in targets:
+                addr, name = addr + skip, name[skip:]
+            self.strings[addr] = name
         self.files = {}
         current = None
         for line in delinks.splitlines():

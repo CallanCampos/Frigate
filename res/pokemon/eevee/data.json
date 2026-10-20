@@ -1,0 +1,208 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Eevee",
+    "pokedex": {
+        "category": "Evolution Pokémon",
+        "entry": "Thanks to its unstable genetic makeup,\nthis special Pokémon conceals many\ndifferent possible evolutions.",
+        "height": "1'00\"",
+        "weight": "14.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Eevee",
+                "category": "Evolution Pokémon",
+                "entry": "Because its genetic makeup is\nirregular, it quickly changes its\nform due to a variety of causes.",
+                "height": "1'00\"",
+                "weight": "14.3 lbs."
+            },
+            "fr": {
+                "name": "Évoli",
+                "category": "Pokémon Évolutif",
+                "entry": "Son ADN particulier lui permet de\ns'adapter très rapidement à son\nenvironnement.",
+                "height": "0,3 m",
+                "weight": "6,5 kg"
+            },
+            "de": {
+                "name": "Evoli",
+                "category": "Evolution",
+                "entry": "Aufgrund einer genetischen Anomalie\nkann es sehr schnell seine Form\nverändern.",
+                "height": "0,3 m",
+                "weight": "6,5 kg"
+            },
+            "it": {
+                "name": "Eevee",
+                "category": "Pokémon Evoluzione",
+                "entry": "È dotato di un corredo genetico\ninstabile e, per cause diverse, può\nassumere altre forme rapidamente.",
+                "height": "0,3 m",
+                "weight": "6,5 kg"
+            },
+            "ko": {
+                "name": "이브이",
+                "category": "진화포켓몬",
+                "entry": "유전자가 불규칙하기 때문에\n여러 가지 이유에 의해 바로\n모습의 형태가 바뀐다.",
+                "height": "0.3 m",
+                "weight": "6.5 kg"
+            },
+            "es": {
+                "name": "Eevee",
+                "category": "Pokémon Evolución",
+                "entry": "Su composición genética es algo\nirregular, por eso cambia de forma\nmuy rápido y por diversas causas.",
+                "height": "0,3 m",
+                "weight": "6,5 kg"
+            },
+            "ja": {
+                "name": "イーブイ",
+                "category": "しんかポケモン",
+                "entry": "いでんしが\\x{3000}ふきそくなため\nさまざまな\\x{3000}りゆうに\\x{3000}よって\\x{3000}すぐに\nすがたかたちが\\x{3000}かわってしまう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 55,
+        "defense": 50,
+        "speed": 55,
+        "special_attack": 45,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 35,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_ADAPTABILITY" ],
+    "hidden_ability": "ABILITY_ANTICIPATION",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 65,
+    "height": 3,
+    "weight": 65,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HELPING_HAND" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 5, "MOVE_SAND_ATTACK" ],
+            [ 9, "MOVE_GROWL" ],
+            [ 13, "MOVE_QUICK_ATTACK" ],
+            [ 17, "MOVE_BITE" ],
+            [ 21, "MOVE_COVET" ],
+            [ 25, "MOVE_TAKE_DOWN" ],
+            [ 29, "MOVE_CHARM" ],
+            [ 33, "MOVE_BATON_PASS" ],
+            [ 37, "MOVE_DOUBLE_EDGE" ],
+            [ 41, "MOVE_LAST_RESORT" ],
+            [ 45, "MOVE_TRUMP_CARD" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM67",
+            "TM83",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_LAST_RESORT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_CHARM",
+            "MOVE_FLAIL",
+            "MOVE_ENDURE",
+            "MOVE_CURSE",
+            "MOVE_TICKLE",
+            "MOVE_WISH",
+            "MOVE_YAWN",
+            "MOVE_FAKE_TEARS",
+            "MOVE_COVET",
+            "MOVE_DETECT",
+            "MOVE_NATURAL_GIFT",
+            "MOVE_STORED_POWER",
+            "MOVE_SYNCHRONOISE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL_MOSS_ROCK",
+            "param": 0,
+            "species": "SPECIES_LEAFEON"
+        },
+        {
+            "method": "EVO_METHOD_LEVEL_ICE_ROCK",
+            "param": 0,
+            "species": "SPECIES_GLACEON"
+        },
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_THUNDERSTONE",
+            "species": "SPECIES_JOLTEON"
+        },
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_WATER_STONE",
+            "species": "SPECIES_VAPOREON"
+        },
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_FIRE_STONE",
+            "species": "SPECIES_FLAREON"
+        },
+        {
+            "method": "EVO_METHOD_FRIENDSHIP_DAY",
+            "param": 0,
+            "species": "SPECIES_ESPEON"
+        },
+        {
+            "method": "EVO_METHOD_FRIENDSHIP_NIGHT",
+            "param": 0,
+            "species": "SPECIES_UMBREON"
+        }
+    ],
+    "regional_dex_number": 91,
+    "baby_species": "SPECIES_EEVEE",
+    "cry_volume": 107
+}

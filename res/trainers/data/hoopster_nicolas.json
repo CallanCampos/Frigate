@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Nicolas",
+    "class": "TRAINER_CLASS_HOOPSTER",
+    "battle_style": "BTL_STYLE_TRIPLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MAGBY",
+            "form": 0,
+            "level": 42,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAGMAR",
+            "form": 0,
+            "level": 42,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAGBY",
+            "form": 0,
+            "level": 42,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "You don't even have three healthy\nPokémon? That's just odd!"
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "Fooling you fair and square!\nThat's what we call a trick play!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "What the hoops?\nI was the one who was tricked!"
+        },
+        {
+            "type": 2,
+            "text": "How are you gonna get past an opponent?\nThat's vital for battles and basketball."
+        }
+    ]
+}

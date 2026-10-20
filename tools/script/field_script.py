@@ -664,7 +664,7 @@ def main():
 
     base, plugins, plugin_zones, global_scripts = load_commands()
     files = read_narc((args.extract / ARCHIVE).read_bytes())
-    # The files are named after their constants in data/constants/field_scripts.txt, in its order
+    # The files are named after their constants in generated/field_scripts.txt, in its order
     paths = ordered_files("field_scripts", "SCRIPTS_", args.output, ".s")
     if len(paths) != len(files):
         sys.exit(f"{len(files)} files in the archive and {len(paths)} in field_scripts.txt")
@@ -688,8 +688,8 @@ def main():
             return lines[message] if message < len(lines) else None
         return lookup
 
-    # The IDs of the script message files' messages, from data/text/script/ (text_ids.py), by file and message
-    bank_paths = ordered_files("script_text_banks", "SCRIPT_TEXT_", Path("data/text/script"), ".txt")
+    # The IDs of the script message files' messages, from res/text/script/ (text_ids.py), by file and message
+    bank_paths = ordered_files("script_text_banks", "SCRIPT_TEXT_", Path("res/text/script"), ".txt")
     id_cache: dict[int, dict[int, str]] = {}
 
     def ids_for(index):

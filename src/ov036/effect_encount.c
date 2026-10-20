@@ -247,7 +247,7 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
             u16 itemId = GetRandomWingItemID();
 
             event = CallGivePhenomenonItem(system, itemId);
-            func_ov012_0216063c(0x19, itemId);
+            GameBeacon_BroadcastMission(0x19, itemId);
             gaveItem = TRUE;
         }
     } else if (spot->kind == 4) {
@@ -257,7 +257,7 @@ GameEvent *CreateRandomPhenomenonEvent(EncountSystem *system) {
             u16 itemId = EffectEncount_GenDustCloudItem(spot->zoneId);
 
             event = CallGivePhenomenonItem(system, itemId);
-            func_ov012_0216063c(0x1a, itemId);
+            GameBeacon_BroadcastMission(0x1a, itemId);
             gaveItem = TRUE;
         }
     } else {
@@ -507,7 +507,7 @@ static BOOL IsPositionOccupiedByActorAny(EncountSystem *system, s16 x, s16 y, s1
         }
         const FieldActorConfig *config;
 
-        if (!func_ov012_02166ecc(actor)) {
+        if (!FldAct_CheckAcmdEnd(actor)) {
             continue;
         }
         if (actor == player && skipPlayer) {

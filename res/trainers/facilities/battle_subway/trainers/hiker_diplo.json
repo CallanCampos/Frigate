@@ -1,0 +1,25 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Diplo",
+    "class": "TRAINER_CLASS_HIKER",
+    "pokemon": [
+        "roggenrola_2",
+        "mienfoo_2",
+        "sandile_2",
+        "golett_2",
+        "timburr_2",
+        "dwebble_2",
+        "drilbur_2",
+        "scraggy_2",
+        "krokorok_2",
+        "tirtouga_2",
+        "palpitoad_2",
+        "boldore_2",
+        "archen_2"
+    ],
+    "messages": [
+        "I'm a Fisherman, so I have my rod here,\nbut this is cumbersome.",
+        "I won the battle, but\nI did not need this rod at all.",
+        "Ah... This rod is so cumbersome!\nI will quit fishing!"
+    ]
+}

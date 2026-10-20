@@ -700,14 +700,14 @@ enum {
 };
 
 // Which of an OAM's attributes the renderer overwrites
-enum {
+typedef enum NNSG2dRendererOverwriteParam {
     NNS_G2D_RND_OVERWRITE_NONE = 0,
     NNS_G2D_RND_OVERWRITE_PRIORITY = 1 << 0,
     NNS_G2D_RND_OVERWRITE_PLTTNO = 1 << 1,
     NNS_G2D_RND_OVERWRITE_MOSAIC = 1 << 2,
     NNS_G2D_RND_OVERWRITE_OBJMODE = 1 << 3,
     NNS_G2D_RND_OVERWRITE_PLTTNO_OFFS = 1 << 4,
-};
+} NNSG2dRendererOverwriteParam;
 
 typedef struct NNSG2dRendererInstance {
     NNSG2dRndCoreInstance rendererCore;
@@ -728,8 +728,29 @@ void NNS_G2dInitRenderer(NNSG2dRendererInstance *rend);
 void NNS_G2dAddRendererTargetSurface(NNSG2dRendererInstance *rend, NNSG2dRenderSurface *surface);
 void NNS_G2dInitRenderSurface(NNSG2dRenderSurface *surface);
 
-// The width and height in pixels of each OAM shape and size, by [shape][size]. The names are guesses: the tables are
-// defined by a file before g2d_CellTransferManager.c
+static inline void NNS_G2dSetRendererOverwritePriority(NNSG2dRendererInstance *rend, u16 priority) {
+    rend->overwritePriority = priority;
+}
+
+static inline void NNS_G2dSetRendererOverwriteMosaicFlag(NNSG2dRendererInstance *rend, BOOL overwriteMosaicFlag) {
+    rend->overwriteMosaicFlag = overwriteMosaicFlag;
+}
+
+static inline void NNS_G2dSetRendererOverwriteOBJMode(NNSG2dRendererInstance *rend, GXOamMode overwriteObjMode) {
+    rend->overwriteObjMode = overwriteObjMode;
+}
+
+// The flag's enum type keeps a caller's own complement from folding into the one in the body (docs/matching.md)
+static inline void NNS_G2dSetRendererOverwriteEnable(NNSG2dRendererInstance *rend, NNSG2dRendererOverwriteParam flag) {
+    rend->overwriteEnableFlag |= flag;
+}
+
+static inline void NNS_G2dSetRendererOverwriteDisable(NNSG2dRendererInstance *rend, NNSG2dRendererOverwriteParam flag) {
+    rend->overwriteEnableFlag &= ~flag;
+}
+
+// The width and height in pixels of each OAM shape and size, by [shape][size] (g2d_OAM.c). The names are
+// pokediamond's
 extern const u16 NNSi_objSizeWTbl[3][4];
 extern const u16 NNSi_objSizeHTbl[3][4];
 
@@ -1024,6 +1045,15 @@ typedef struct {
     int hSpace;
     int vSpace;
 } NNSG2dTextCanvas;
+
+// NitroSystem's NNS_G2dTextCanvasInit
+static inline void NNS_G2dTextCanvasInit(NNSG2dTextCanvas *pTxn, const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont,
+                                         int hSpace, int vSpace) {
+    pTxn->pCanvas = pCC;
+    pTxn->pFont = pFont;
+    pTxn->hSpace = hSpace;
+    pTxn->vSpace = vSpace;
+}
 
 typedef struct {
     s8 x;

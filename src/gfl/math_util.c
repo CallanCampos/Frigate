@@ -5,45 +5,45 @@
 // Trigonometry in whole degrees and a point's distance from a line. The file's name is a guess, after pokeplatinum's
 // math_util.c, which has the same helpers
 
-static int func_02044404(int x1, int y1, int x2, int y2, int x3, int y3);
+static int GFL_MathSignedPointLineDistance(int x1, int y1, int x2, int y2, int x3, int y3);
 
-fx16 func_02044304(u16 degrees) {
+fx16 GFL_MathSinDeg(u16 degrees) {
     if (degrees >= 360) {
         return 0;
     }
     return FX_SinIdx(degrees * 0xffff / 360);
 }
 
-fx16 func_02044330(u16 degrees) {
+fx16 GFL_MathCosDeg(u16 degrees) {
     if (degrees >= 360) {
         return 0;
     }
     return FX_CosIdx(degrees * 0xffff / 360);
 }
 
-fx16 func_02044360(u16 degrees) {
+fx16 GFL_MathSinDegWrap(u16 degrees) {
     return FX_SinIdx(degrees % 360 * 0xffff / 360);
 }
 
-fx16 func_02044388(u16 degrees) {
+fx16 GFL_MathCosDegWrap(u16 degrees) {
     return FX_CosIdx(degrees % 360 * 0xffff / 360);
 }
 
-u16 func_020443b4(u16 degrees) {
+u16 GFL_MathDegToAngleIdx(u16 degrees) {
     if (degrees >= 360) {
         return 0;
     }
     return degrees * 0xffff / 360;
 }
 
-int func_020443d8(int x1, int y1, int x2, int y2, int x3, int y3, int radius) {
-    int dist = func_02044404(x1, y1, x2, y2, x3, y3);
+int GFL_MathArcAngle(int x1, int y1, int x2, int y2, int x3, int y3, int radius) {
+    int dist = GFL_MathSignedPointLineDistance(x1, y1, x2, y2, x3, y3);
     int circumference = FX_MulFunc((radius * 2) << FX32_SHIFT, FX32_CONST(3.14)) >> FX32_SHIFT;
 
     return (dist << 16) / circumference;
 }
 
-static int func_02044404(int x1, int y1, int x2, int y2, int x3, int y3) {
+static int GFL_MathSignedPointLineDistance(int x1, int y1, int x2, int y2, int x3, int y3) {
     VecFx32 a;
     VecFx32 b;
     VecFx32 dir;

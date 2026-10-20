@@ -225,11 +225,11 @@ static void DeleteSave_Delete(DeleteSaveWork *wk, u32 *state) {
         GFL_OvlLoad(OVERLAY_ID(331));
         SaveOutside_Erase(HEAPID_SAVEDATA_DELETE);
         GFL_OvlUnload(OVERLAY_ID(331));
-        func_02011558(HEAPID_SAVEDATA_DELETE);
+        DreamRadar_EraseSaveData(HEAPID_SAVEDATA_DELETE);
         func_020074ac(save);
         for (i = 0; i < SAVE_BLOCK_COUNT; i++) {
-            if (func_020074ec(save, i, HEAPID_SAVEDATA_DELETE) == TRUE) {
-                func_020076a4(save, i, HEAPID_SAVEDATA_DELETE);
+            if (SaveControl_OpenExtraBlock(save, i, HEAPID_SAVEDATA_DELETE) == TRUE) {
+                SaveControl_ClearExtraBlock(save, i, HEAPID_SAVEDATA_DELETE);
             }
             freeIntermediateSaveExtraBlksAfterLoad(save, i);
         }
@@ -344,8 +344,8 @@ static void DeleteSave_Print(DeleteSaveWork *wk, u32 messageId) {
     GFL_MsgDataLoadStrbuf(wk->msgData, messageId, wk->strbuf);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->window), 15);
     BmpWin_DrawFrame(wk->window, WINFRAME_TRANSFER_NONE, 1, 14);
-    wk->printStream = func_02022268(wk->window, 0, 0, wk->strbuf, wk->font, func_02017c50(0), wk->tcbManager, 10,
-                                    HEAPID_SAVEDATA_DELETE, 15);
+    wk->printStream = PrintStream_Create(wk->window, 0, 0, wk->strbuf, wk->font, TextSpeed_GetWait(0), wk->tcbManager,
+                                         10, HEAPID_SAVEDATA_DELETE, 15);
     wk->continued = FALSE;
     BmpWin_Transfer(wk->window);
 }
@@ -354,19 +354,19 @@ static void DeleteSave_Print(DeleteSaveWork *wk, u32 messageId) {
 static BOOL DeleteSave_UpdatePrint(DeleteSaveWork *wk) {
     GFL_TCBExMgrUpdate(wk->tcbManager);
     KeyCursor_Update(wk->keyCursor, wk->printStream, wk->window);
-    switch (func_020223b4(wk->printStream)) {
+    switch (PrintStream_GetState(wk->printStream)) {
     case PRINT_STREAM_RUNNING:
         wk->continued = FALSE;
         break;
     case PRINT_STREAM_PAUSED:
         if (wk->continued == FALSE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            func_020223bc(wk->printStream);
+            PrintStream_Continue(wk->printStream);
             wk->continued = TRUE;
         }
         break;
     case PRINT_STREAM_DONE:
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
         wk->continued = FALSE;
         return FALSE;
     }

@@ -1,0 +1,4 @@
+UnityTower_Text_ReturnCasteliaCity = Return to Castelia City?
+UnityTower_Text_WellThenPleaseBoard = Well then, please board the ship!{be01}
+UnityTower_Text_PleaseBoardShipConvenience = Please board the ship\nat your convenience.
+\pad{98}

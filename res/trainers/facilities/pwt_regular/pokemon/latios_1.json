@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LATIOS",
+    "moves": [ "MOVE_CALM_MIND", "MOVE_LUSTER_PURGE", "MOVE_DRAGON_PULSE", "MOVE_REST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

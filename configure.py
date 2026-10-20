@@ -19,11 +19,13 @@ import tempfile
 import tomllib
 import urllib.request
 import zipfile
+from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
 from tools.data.gen_constants import ordered_files  # noqa: E402
+from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
 
 VERSIONS = {
@@ -126,8 +128,8 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
     return libraries
 
 
-# Files of a library built with other flags than the rest of it, from file_flags in its library.toml: each flag
-# replaces the library's flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb",
+# Per-source overrides from library.toml and config/compiler_flags.toml: each flag
+# replaces the default flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb",
 # "-O2,p" replaces "-O4,p")
 FILE_FLAGS: dict[str, list[str]] = {}
 
@@ -142,33 +144,94 @@ def flag_option(flag: str) -> str:
 
 
 def file_flags(source: Path, flags: list[str]) -> list[str]:
-    """Returns the flags of a library's source file: the library's, with the file's own in place of the same options."""
-    overrides = FILE_FLAGS.get((ROOT / source).resolve().relative_to(ROOT).as_posix(), [])
+    """Returns source defaults with the file's overrides in place of the same options."""
+    try:
+        relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return list(flags)
+    overrides = FILE_FLAGS.get(relative, [])
     options = {flag_option(flag) for flag in overrides}
     return [flag for flag in flags if flag_option(flag) not in options] + overrides
 
 
+def load_source_flags(path: Path) -> dict[str, list[str]]:
+    """Loads game source overrides; library overrides stay in their library.toml files."""
+    with path.open("rb") as stream:
+        manifest = tomllib.load(stream)
+    if set(manifest) - {"file_flags"}:
+        raise ValueError(f"{path}: unknown compiler settings")
+    overrides = manifest.get("file_flags", {})
+    if not isinstance(overrides, dict):
+        raise ValueError(f"{path}: file_flags must be a table")
+    for source, flags in overrides.items():
+        relative = Path(source)
+        if (not relative.parts or relative.is_absolute() or relative.as_posix() != source or ".." in relative.parts
+                or relative.parts[0] != "src" or relative.suffix != ".c"
+                or not (ROOT / relative).is_file()
+                or (ROOT / relative).resolve().relative_to(ROOT).as_posix() != source):
+            raise ValueError(f"{path}: invalid game source path {source!r}")
+        if (not isinstance(flags, list) or any(not isinstance(flag, str) or not flag.strip()
+                or not flag.startswith("-") for flag in flags)):
+            raise ValueError(f"{path}: {source}: flags must be nonempty option strings")
+        for flag in flags:
+            words = shlex.split(flag)
+            if any(word.startswith("-") for word in words[1:]):
+                raise ValueError(f"{path}: {source}: each flag must set one option")
+        options = [flag_option(flag) for flag in flags]
+        if len(set(options)) != len(options):
+            raise ValueError(f"{path}: {source}: repeated compiler option")
+    return overrides
+
+
 LIBRARIES = load_libraries()
+FILE_FLAGS.update(load_source_flags(ROOT / "config/compiler_flags.toml"))
 # Header search path of every source file, the game's and the libraries': the game's headers, each library's public
-# headers, and the headers the build generates from the constant lists in data/constants/ (see
+# headers, and the headers the build generates from the constant lists in generated/ (see
 # tools/data/gen_constants.py). A library's private headers sit beside its sources.
 GENERATED_INCLUDE_DIR = "build/include/generated"
 INCLUDE_DIRS = ["include", *(p.relative_to(ROOT).as_posix() for p in sorted(LIB_DIR.glob("*/include"))),
                 GENERATED_INCLUDE_DIR]
+# Binaries that the game embeds as they are, which no compiler of ours can build: the DSP's programs. The build takes
+# their bytes from the base ROM (tools/build/rom_blob.py) into an include file under rom/ of the generated headers, which
+# the source file that defines the array includes as its initializer. Each maps that include file to the extracted
+# module, the module's config directory and the array's symbol. Both versions have the same bytes, so they come from
+# the first version built, and the other version's SHA1 check covers its own.
+ROM_BLOBS = {
+    "rom/dsp/dsp_g711_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_G711Image"),
+    "rom/dsp/dsp_graphics_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_GraphicsImage"),
+}
 
 
 def library_of(source: Path) -> tuple[str, list[str]] | None:
     """Returns the compiler and flags of the library a source file belongs to, or None for the game's own code."""
-    relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    try:
+        relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return None
     library = next((library for prefix, library in LIBRARIES.items() if relative.startswith(prefix)), None)
     return (library[0], file_flags(source, library[1])) if library else None
+
+
+@dataclass(frozen=True)
+class SourceCompiler:
+    compiler: str
+    flags: tuple[str, ...]
+    is_library: bool
+
+
+def source_compiler(source: Path) -> SourceCompiler:
+    """Returns effective build settings without changing library membership for game files."""
+    library = library_of(source)
+    if library:
+        return SourceCompiler(library[0], tuple(library[1]), True)
+    return SourceCompiler(MWCC_VERSION, tuple(file_flags(source, CC_FLAGS)), False)
 
 
 # Archives assembled from source, which replace their extracted counterparts in the ROM: the scripts. Each maps its path
 # under files/ to the directory of its members, one assembly file each, in archive order.
 ARCHIVES = {
-    "a/0/5/6": "data/field_scripts",  # Field scripts, see tools/script/field_script.py
-    "a/1/6/9": "data/tr_ai",  # Trainer AI scripts, see tools/script/tr_ai_script.py
+    "a/0/5/6": "res/field/scripts",  # Field scripts, see tools/script/field_script.py
+    "a/1/6/9": "res/trainers/ai",  # Trainer AI scripts, see tools/script/tr_ai_script.py
 }
 
 # The constant list that names and orders each assembled archive's files, and the prefix of its constants
@@ -180,52 +243,61 @@ ARCHIVE_LISTS = {"a/0/5/6": ("field_scripts", "SCRIPTS_"), "a/1/6/9": ("tr_ai_sc
 # so those are inputs too.
 DATA_PACKS = [
     # Species data, level-up moves, evolutions, baby species, experience tables and egg moves
-    ("tools/data/species_data.py", "data/pokemon",
+    ("tools/data/species_data.py", "res/pokemon",
      ["a/0/1/6", "a/0/1/8", "a/0/1/9", "a/0/2/0", "a/0/1/7", "a/1/2/4"], False),
-    ("tools/data/pokemon_graphics.py", "data/pokemon",
+    ("tools/data/pokemon_graphics.py", "res/pokemon",
      ["a/0/0/4", "a/0/0/7", "a/0/5/1", "a/1/6/5", "a/2/2/9"], True),
-    ("tools/data/pokemon_cries.py", "data/pokemon",
-     ["swan_sound_data.sdat", "a/1/9/1"], True),
-    ("tools/data/move_data.py", "data/moves", ["a/0/2/1"], False),  # Move data
-    ("tools/data/item_data.py", "data/items", ["a/0/2/4"], False),  # Item data
+    ("tools/data/pokemon_cries.py", "res/pokemon", ["a/1/9/1"], True),  # The cries' volumes
+    # The sound archive: sequences, banks, wave archives, players, groups and streams, and the Pokémon's cries
+    ("tools/data/sound_data.py", "res/sound", ["swan_sound_data.sdat"], False, ["res/pokemon"]),
+    ("tools/data/move_data.py", "res/moves", ["a/0/2/1"], False),  # Move data
+    ("tools/data/item_data.py", "res/items", ["a/0/2/4"], False),  # Item data
+    ("tools/data/item_icon_data.py", "res/items", ["a/0/2/5"], True),  # Item icons
+    # The field actors' models: their table and their sprites' and 3D models' graphics
+    ("tools/data/field_actor_data.py", "res/field/actors", ["a/0/4/7", "a/0/4/8"], False),
     # Trainers, their parties, and the table of their messages with its offsets
-    ("tools/data/trainer_data.py", "data/trainers", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
-    ("tools/data/encounter_data.py", "data/encounters", ["a/1/2/7"], True),  # Wild encounters
-    # Zone headers, which give each zone the number of its events in data/events/order.json
-    ("tools/data/zone_data.py", "data/zones", ["a/0/1/2"], False, ["data/events"]),
-    ("tools/data/trade_data.py", "data/trades", ["a/1/6/3"], False),  # In-game trades
-    ("tools/data/map_matrix_data.py", "data/map_matrices", ["a/0/0/9"], False),  # Map matrices
+    ("tools/data/trainer_data.py", "res/trainers/data", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
+    # Trainer sprites, front and back, and a/0/6/3, a copy of the back sprites
+    ("tools/data/trainer_graphics.py", "res/trainers/sprites", ["a/0/7/1", "a/0/7/2", "a/0/6/3"], True),
+    ("tools/data/encounter_data.py", "res/field/encounters", ["a/1/2/7"], True),  # Wild encounters
+    # Zone headers, which give each zone the number of its events in res/field/events/order.json
+    ("tools/data/zone_data.py", "res/field/zones", ["a/0/1/2"], False, ["res/field/events"]),
+    ("tools/data/trade_data.py", "res/field/trades", ["a/1/6/3"], False),  # In-game trades
+    ("tools/data/map_matrix_data.py", "res/field/matrices", ["a/0/0/9"], False),  # Map matrices
     # Map models, whose GLBs show the map texture sets' PNGs, which name the textures they bind
-    ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True, ["data/map_texture_sets"]),
+    ("tools/data/map_model_data.py", "res/field/maps/models", ["a/0/0/8"], True, ["res/field/maps/textures"]),
     # Field prop models, which their bundles' textures go with in the same way
-    ("tools/data/field_prop_model_data.py", "data/field_prop_models/exterior", ["a/2/2/5"], True,
-     ["data/field_prop_textures/exterior", "data/field_prop_models/field_prop_model.schema.json"]),
-    ("tools/data/field_prop_model_data.py", "data/field_prop_models/interior", ["a/2/2/6"], True,
-     ["data/field_prop_textures/interior", "data/field_prop_models/field_prop_model.schema.json"]),
-    ("tools/data/map_texture_data.py", "data/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
-    ("tools/data/map_texture_data.py", "data/field_prop_textures/exterior", ["a/1/7/4"], True),
-    ("tools/data/map_texture_data.py", "data/field_prop_textures/interior", ["a/1/7/5"], True),
-    ("tools/data/area_data.py", "data/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
-    ("tools/data/light_data.py", "data/lights", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
+    ("tools/data/field_prop_model_data.py", "res/field/props/exterior/models", ["a/2/2/5"], True,
+     ["res/field/props/exterior/textures", "res/field/props/field_prop_model.schema.json"]),
+    ("tools/data/field_prop_model_data.py", "res/field/props/interior/models", ["a/2/2/6"], True,
+     ["res/field/props/interior/textures", "res/field/props/field_prop_model.schema.json"]),
+    ("tools/data/map_texture_data.py", "res/field/maps/textures", ["a/0/1/4"], True),  # Map texture PNG sources
+    ("tools/data/map_texture_data.py", "res/field/props/exterior/textures", ["a/1/7/4"], True),
+    ("tools/data/map_texture_data.py", "res/field/props/interior/textures", ["a/1/7/5"], True),
+    ("tools/data/area_data.py", "res/field/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
+    ("tools/data/light_data.py", "res/lighting", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
     # The town map's places, whose texts are messages of town_map.txt
-    ("tools/data/town_map_data.py", "data/town_map", ["a/0/8/5"], True, ["data/text/system/town_map.txt"]),
+    ("tools/data/town_map_data.py", "res/town_map", ["a/0/8/5"], True, ["res/text/system/town_map.txt"]),
     # The battle facilities' trainers and Pokémon; the Battle Subway's are also the Trial House's
-    ("tools/data/facility_data.py", "data/facilities/battle_subway", ["a/2/1/2", "a/2/1/1"], False,
-     ["data/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/battle_subway", ["a/2/1/2", "a/2/1/1"], False,
+     ["res/trainers/facilities"]),
     # The Black Tower, White Treehollow in White 2
-    ("tools/data/facility_data.py", "data/facilities/black_tower", ["a/2/6/2", "a/2/6/1"], False,
-     ["data/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/black_tower", ["a/2/6/2", "a/2/6/1"], False,
+     ["res/trainers/facilities"]),
     # The Pokémon World Tournament's three pools of trainers, each with the single sets' archive, and its rental sets
-    ("tools/data/facility_data.py", "data/facilities/pwt_regular", ["a/2/4/9", "a/2/5/0", "a/2/4/8"], False,
-     ["data/facilities"]),
-    ("tools/data/facility_data.py", "data/facilities/pwt_leaders", ["a/2/5/2", "a/2/5/3", "a/2/5/1"], False,
-     ["data/facilities"]),
-    ("tools/data/facility_data.py", "data/facilities/pwt_masters", ["a/2/5/5", "a/2/5/6", "a/2/5/4"], False,
-     ["data/facilities"]),
-    ("tools/data/facility_data.py", "data/facilities/pwt_rental", ["a/2/5/7"], False, ["data/facilities"]),
-    # The zones' events, in the order of data/events/order.json
-    ("tools/data/event_data.py", "data/events", ["a/1/2/6"], False),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_regular", ["a/2/4/9", "a/2/5/0", "a/2/4/8"], False,
+     ["res/trainers/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_leaders", ["a/2/5/2", "a/2/5/3", "a/2/5/1"], False,
+     ["res/trainers/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_masters", ["a/2/5/5", "a/2/5/6", "a/2/5/4"], False,
+     ["res/trainers/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_rental", ["a/2/5/7"], False, ["res/trainers/facilities"]),
+    # The zones' events, in the order of res/field/events/order.json
+    ("tools/data/event_data.py", "res/field/events", ["a/1/2/6"], False),
 ]
+# The 2D graphics archives, each a directory of res/graphics/ named after its ARCID_* constant, which gives its file
+DATA_PACKS += [("tools/data/graphics_archive.py", f"res/graphics/{directory.name}", [directory_archive(directory)], True)
+               for directory in sorted(GRAPHICS.iterdir()) if directory.is_dir()]
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
 # tutor bits (tools/data/species_data.py). A packer also depends on the modules of tools/ that it imports
 # (script_imports).
@@ -263,14 +335,14 @@ def script_imports(script: str) -> list[str]:
     return sorted(found)
 
 # The data in JSON that the text takes messages from, with \from{...} lines (tools/text/text_sources.py)
-TEXT_DATA_DIRS = ["data/pokemon", "data/moves", "data/items", "data/trainers", "data/abilities", "data/types",
-                  "data/trades", "data/facilities", "data/trainer_classes", "data/natures", "data/places"]
+TEXT_DATA_DIRS = ["res/pokemon", "res/moves", "res/items", "res/trainers/data", "res/abilities", "res/types",
+                  "res/field/trades", "res/trainers/facilities", "res/trainers/classes", "res/natures", "res/field/places"]
 
 # Text archives built from source, by tools/text/text_data.py: each maps its path under files/ to the directory of its
 # message files, one text file each, in archive order
 TEXT_ARCHIVES = {
-    "a/0/0/2": "data/text/system",  # System messages
-    "a/0/0/3": "data/text/script",  # Script messages
+    "a/0/0/2": "res/text/system",  # System messages
+    "a/0/0/3": "res/text/script",  # Script messages
 }
 
 LD_FLAGS = [
@@ -447,12 +519,16 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             variables={"config": str(arm9_config)})
     n.build([lcf_file, objects_file], "lcf", dsd_configs, implicit=[extract_dir / "config.yaml"],
             variables={"config": str(arm9_config)})
-    link_lcf = lcf_file
+    # NitroSDK's linker symbols, which dsd's linker script doesn't define, see tools/build/lcf_symbols.py
+    link_lcf = build_dir / "arm9_symbols.lcf"
+    n.build([link_lcf], "lcf_symbols", [lcf_file, "config/linker_symbols.toml"],
+            implicit=["tools/build/lcf_symbols.py"])
     if shift:
         # Padding in the linker script moves the code and data after it, see tools/build/shift_lcf.py
-        link_lcf = build_dir / "arm9_shifted.lcf"
-        n.build([link_lcf], "shift_lcf", [lcf_file], implicit=["tools/build/shift_lcf.py"],
+        shifted_lcf = build_dir / "arm9_shifted.lcf"
+        n.build([shifted_lcf], "shift_lcf", [link_lcf], implicit=["tools/build/shift_lcf.py"],
                 variables={"amount": hex(shift)})
+        link_lcf = shifted_lcf
 
     # Source files are listed in delinks.txt by their path. Complete files are linked from the compiled object, and
     # incomplete ones are still compiled so objdiff can compare them.
@@ -467,9 +543,7 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             obj = build_dir / source.with_suffix(".o")
             rule = next((f"mwcc_{i}" for i, lib in enumerate(LIBRARIES) if str(source).startswith(lib)), "mwcc")
             variables = {"defines": defines, "dep": obj.with_suffix(".d")}
-            library = library_of(source)
-            if library:
-                variables["flags"] = " ".join(library[1])
+            variables["flags"] = " ".join(source_compiler(source).flags)
             n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
             compiled.append(obj)
         objects.append(f["object_to_link"])
@@ -508,7 +582,7 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         if matching:
             checks.append(archive_ok)
 
-    constant_sources = sorted(str(p.relative_to(ROOT)) for p in [*(ROOT / "data" / "constants").glob("*.txt"),
+    constant_sources = sorted(str(p.relative_to(ROOT)) for p in [*(ROOT / "generated").glob("*.txt"),
                                                                   *(ROOT / "include" / "constants").glob("*.h")])
     for script, data_dir, paths, per_version, *other_dirs in DATA_PACKS:
         outputs = [files_dir / path for path in paths]
@@ -632,7 +706,7 @@ def main():
     n.rule("delink", "$dsd delink --config-path $config", "Delinking $config")
     n.rule("lcf", "$dsd lcf --config-path $config", "Generating linker script for $config")
     # mwccarm writes the dependency file next to the object, with Windows paths that fix_depfile.py converts
-    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} {' '.join(CC_FLAGS)} "
+    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} $flags "
            "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
            depfile="$dep", deps="gcc")
     # The older compilers (SPL's 1.2/base) warn when MWCIncludes, their system include path, isn't set. The code finds its
@@ -642,6 +716,7 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
+    n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Scripts go through the C preprocessor, so that they can include the constant headers
@@ -676,13 +751,13 @@ def main():
     # Formats the sources and headers in place with clang-format and .clang-format
     n.rule("format", "clang-format -i $in", "Formatting")
 
-    # The constant headers are generated from the committed lists in data/constants/, so that the C code, the data
+    # The constant headers are generated from the committed lists in generated/, so that the C code, the data
     # files and the scripts share one source of truth, and a mod only edits the list. Compiles depend on them
     # order-only; the depfiles rebuild what includes a changed header. A header that comes out the same is not
     # rewritten, and restat keeps its users from recompiling.
     n.rule("gen_constants", "$python tools/data/gen_constants.py $in $out", "Generating $out", restat="1")
     constant_headers = []
-    for source in sorted((ROOT / "data" / "constants").glob("*.txt")):
+    for source in sorted((ROOT / "generated").glob("*.txt")):
         header = Path(GENERATED_INCLUDE_DIR) / "constants" / source.with_suffix(".h").name
         n.build([header], "gen_constants", [source.relative_to(ROOT)], implicit=["tools/data/gen_constants.py"])
         constant_headers.append(header)
@@ -691,7 +766,7 @@ def main():
     n.rule("text_ids", "$python tools/text/text_ids.py $in $out", "Generating $out", restat="1")
     text_tools = ["tools/text/text_ids.py", *DATA_PACK_TOOLS]
     from_data = sorted(str(p.relative_to(ROOT)) for d in TEXT_DATA_DIRS for p in (ROOT / d).rglob("*.json"))
-    from_data += sorted(str(p.relative_to(ROOT)) for p in (ROOT / "data" / "constants").glob("*.txt"))
+    from_data += sorted(str(p.relative_to(ROOT)) for p in (ROOT / "generated").glob("*.txt"))
     for source_dir in TEXT_ARCHIVES.values():
         for source in sorted((ROOT / source_dir).glob("*.txt")):
             header = Path(GENERATED_INCLUDE_DIR) / "text" / source.parent.name / source.with_suffix(".h").name
@@ -702,9 +777,18 @@ def main():
     # The easy chat words, numbered across their categories' message files (tools/text/pms_words.py)
     n.rule("pms_words", "$python tools/text/pms_words.py $out", "Generating $out", restat="1")
     pms_words_header = Path(GENERATED_INCLUDE_DIR) / "constants" / "pms_words.h"
-    n.build([pms_words_header], "pms_words", [f"data/text/system/{file}.txt" for _, file, _ in PMS_WORD_CATEGORIES],
+    n.build([pms_words_header], "pms_words", [f"res/text/system/{file}.txt" for _, file, _ in PMS_WORD_CATEGORIES],
             implicit=["tools/text/pms_words.py", *text_tools, *from_data])
     constant_headers.append(pms_words_header)
+    # The embedded binaries, from the first version's extracted ROM
+    n.rule("rom_blob", "$python tools/build/rom_blob.py $module $in $name $out", "Generating $out", restat="1")
+    for include, (module, config_dir, name) in ROM_BLOBS.items():
+        output = Path(GENERATED_INCLUDE_DIR) / include
+        symbols = Path("config") / versions[0] / "arm9" / config_dir / "symbols.txt"
+        n.build([output], "rom_blob", [symbols],
+                implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
+                variables={"module": str(Path("extract") / versions[0] / module), "name": name})
+        constant_headers.append(output)
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []
@@ -715,7 +799,7 @@ def main():
 
     # objdiff.json covers one version, the primary one if it is being built
     objdiff_version = versions[0]
-    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py"],
+    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py", "configure.py", "config/compiler_flags.toml"],
             variables={"version": objdiff_version})
     n.build(["report"], "phony", [Path("build") / objdiff_version / "report.json"])
     n.build(["progress"], "phony", [f"{objdiff_version}_progress"])
@@ -723,11 +807,11 @@ def main():
     # The data directories too: adding, removing or renaming a file changes its directory's time, so the build lists
     # the data files again
     source_dirs = [d for _, d, *_ in DATA_PACKS] + list(ARCHIVES.values())
-    source_dirs += list(TEXT_ARCHIVES.values()) + ["data/constants"]
+    source_dirs += list(TEXT_ARCHIVES.values()) + ["generated"]
     data_dirs = sorted({str(p.relative_to(ROOT)) for d in source_dirs for p in [ROOT / d, *(ROOT / d).rglob("*")]
                         if p.is_dir()})
     n.build(["build.ninja"], "configure", ["configure.py"],
-            implicit=[*configs, *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
+            implicit=[*configs, "config/compiler_flags.toml", *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
                       *data_dirs])
     sources = sorted(str(p.relative_to(ROOT)) for pattern in ("src/**/*.c", "lib/*/src/**/*.[ch]", "include/**/*.h",
                                                                "lib/*/include/**/*.h") for p in ROOT.glob(pattern))

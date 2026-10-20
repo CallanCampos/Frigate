@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MINUN",
+    "moves": [ "MOVE_VOLT_SWITCH", "MOVE_CHARM", "MOVE_FAKE_TEARS", "MOVE_THUNDER_WAVE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_ELECTRIC_GEM",
+    "form": 0
+}

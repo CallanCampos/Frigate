@@ -100,8 +100,8 @@ BOOL GCTX_HIDIsLidClosed(void);
 BOOL GetIsShouldUICallback(void);
 void GFL_HIDDoSoftReset(u32 parameter);
 // Sets whether the player is using the touch screen rather than the keys, and returns it
-BOOL func_0203d554(void);
-void func_0203d564(BOOL touch);
+BOOL GCTX_HIDIsUsingTouch(void);
+void GCTX_HIDSetUsingTouch(BOOL touch);
 void GFL_HIDResetFrameCount(SystemUI *ui);
 void GFL_HIDSetUpdateRate(SystemUI *ui, u8 rate);
 u8 GFL_HIDGetUpdateRate(SystemUI *ui);

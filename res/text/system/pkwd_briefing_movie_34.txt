@@ -1,0 +1,22 @@
+PkwdBriefingMovie34_Text_StoryStartsCertainInventor = {bd02}This is a story that starts\n{bd02}with a certain inventor...
+PkwdBriefingMovie34_Text_HisAssistantBetrayedHim = {bd02}His assistant betrayed him and\n{bd02}changed F-00's programming and memory,\n{bd02}which caused it to go wild...
+PkwdBriefingMovie34_Text_ItsLifeRobotAppeared = {bd02}Its life as a robot\n{bd02}appeared to be near an end...
+PkwdBriefingMovie34_Text_Empty = なし
+PkwdBriefingMovie34_Text_Empty_2 = なし
+PkwdBriefingMovie34_Text_Empty_3 = なし
+PkwdBriefingMovie34_Text_Empty_4 = なし
+PkwdBriefingMovie34_Text_Empty_5 = なし
+PkwdBriefingMovie34_Text_Empty_6 = なし
+PkwdBriefingMovie34_Text_Empty_7 = なし
+PkwdBriefingMovie34_Text_StoryStartsCertainInventor_2 = {bd02}This is a story that starts\n{bd02}with a certain inventor...
+PkwdBriefingMovie34_Text_HerAssistantBetrayedHer = {bd02}Her assistant betrayed her and\n{bd02}changed F-00's programming and memory,\n{bd02}which caused it to go wild...
+PkwdBriefingMovie34_Text_ItsLifeRobotAppeared_2 = {bd02}Its life as a robot\n{bd02}appeared to be near an end...
+PkwdBriefingMovie34_Text_Empty_8 = なし
+PkwdBriefingMovie34_Text_Empty_9 = なし
+PkwdBriefingMovie34_Text_Empty_10 = なし
+PkwdBriefingMovie34_Text_Empty_11 = なし
+PkwdBriefingMovie34_Text_Empty_12 = なし
+PkwdBriefingMovie34_Text_Empty_13 = なし
+PkwdBriefingMovie34_Text_Empty_14 = なし
+PkwdBriefingMovie34_Text_Empty_15 = なし
+\pad{88}

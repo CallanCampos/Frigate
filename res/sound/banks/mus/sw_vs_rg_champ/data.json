@@ -1,0 +1,680 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_SW_VS_RG_CHAMP", null, null, null ],
+    "instruments": [
+        {
+            "program": 45,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 0,
+            "base_key": "G2",
+            "attack": 120,
+            "decay": 100,
+            "sustain": 127,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 46,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 22,
+            "base_key": "As2",
+            "attack": 127,
+            "decay": 80,
+            "sustain": 1,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 51,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 8,
+            "base_key": "C2",
+            "attack": 127,
+            "decay": 125,
+            "sustain": 120,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 63,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 4,
+            "base_key": "G2",
+            "attack": 127,
+            "decay": 100,
+            "sustain": 110,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 64,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 3,
+            "base_key": "E3",
+            "attack": 127,
+            "decay": 100,
+            "sustain": 110,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 65,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 2,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 100,
+            "sustain": 110,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 90,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 10,
+            "base_key": "B2",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 100,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 91,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 11,
+            "base_key": "B2",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 100,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 92,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 12,
+            "base_key": "E3",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 100,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 93,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 9,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 124,
+            "pan": 64
+        },
+        {
+            "program": 95,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+            "wave": 7,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "B1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 13,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 18,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 18,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 21,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 19,
+                    "base_key": "Ds2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 118,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 20,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 23,
+                    "base_key": "F2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 10
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 23,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 23,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 23,
+                    "base_key": "Gs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 25,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 25,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 25,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 25,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 110
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 26,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 26,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 26,
+                    "base_key": "Ds3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 110
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 26,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 118
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 24,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 104
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 24,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 112
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 24,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 120
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 6,
+                    "base_key": "Gs3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 6,
+                    "base_key": "Gs3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 6,
+                    "base_key": "Gs3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 6,
+                    "base_key": "Gs3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 6,
+                    "base_key": "Gs3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 1,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 1,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 5,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                }
+            ]
+        },
+        {
+            "program": 62,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 3,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 2,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 30,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 15,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 14,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 22,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 16,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 17,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 39,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 28,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 27,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 8,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 30,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RG_CHAMP",
+                    "wave": 29,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

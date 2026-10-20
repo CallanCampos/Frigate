@@ -84,7 +84,7 @@ static BOOL Demo3D_Init(GameProc *proc, u32 *state, void *param, void *work) {
     demo->param = demoParam;
     demo->graphic = Demo3DGraphic_Create(1, demoParam->demoId, demo->heapId);
     demo->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_INTRO_BTL_SERVER_FLOW, demo->heapId);
-    demo->printQueue = func_02021998(demo->heapId);
+    demo->printQueue = PrintQueue_CreateDefault(demo->heapId);
     GFL_BGSysSetBGEnabled(6, FALSE);
     GFL_BGSysSetBGEnabled(4, FALSE);
     GFL_BGSysSetBGEnabled(3, FALSE);
@@ -114,7 +114,7 @@ static BOOL Demo3D_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     Demo3D_FreeSoundGroups(demo->param->demoId);
     Demo3DExp_Free(demo->exp);
     GFL_MsgDataFree(demo->msgData);
-    func_02021a18(demo->printQueue);
+    PrintQueue_Free(demo->printQueue);
     Demo3DEngine_Free(demo->engine);
     Demo3DGraphic_Free(demo->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -130,7 +130,7 @@ static BOOL Demo3D_Main(GameProc *proc, u32 *state, void *param, void *work) {
     u32 elapsed;
 
     Demo3DExp_Main(demo->exp);
-    func_02021a3c(demo->printQueue);
+    PrintQueue_Main(demo->printQueue);
     Demo3DGraphic_Update(demo->graphic);
     ended = Demo3DEngine_Main(demo->engine, demo->droppedFrames);
     vblank = OS_GetVBlankCount();
@@ -235,7 +235,7 @@ static void Demo3D_LoadSoundGroups(u32 demoId) {
 
     for (i = 0; i < DEMO3D_SOUND_GROUP_COUNT; i++) {
         if (demoId == sDemo3DSoundGroups[i].demoId) {
-            NNSSndHeapHandle heap = func_02005ce4();
+            NNSSndHeapHandle heap = GFL_SndGetHeap();
             NNS_SndHeapSaveState(heap);
             NNS_SndArcLoadGroup(sDemo3DSoundGroups[i].group, heap);
         }
@@ -247,7 +247,7 @@ static void Demo3D_FreeSoundGroups(u32 demoId) {
 
     for (i = 0; i < DEMO3D_SOUND_GROUP_COUNT; i++) {
         if (demoId == sDemo3DSoundGroups[i].demoId) {
-            NNSSndHeapHandle heap = func_02005ce4();
+            NNSSndHeapHandle heap = GFL_SndGetHeap();
             NNS_SndHeapLoadState(heap, NNS_SndHeapGetCurrentLevel(heap));
         }
     }

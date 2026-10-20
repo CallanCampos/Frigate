@@ -1,18 +1,15 @@
-// clang-format off
-// MSL's <string.h>, before dwc/ext.h's declarations: the ROM builds the memsets of the buddy statuses in place, as MWCC
-// does only for the memset that <string.h> declares (clang-format would sort it after dwc/ext.h)
 #include <string.h>
-#include "dwc/gpiBuddy.h"
+// Before dwc/ext.h: MWCC builds the memsets of the buddy statuses in place, as the ROM does, only when <string.h>
+// declares memset first
 #include "dwc/darray.h"
 #include "dwc/ext.h"
+#include "dwc/gpiBuddy.h"
 #include "dwc/gpiBuffer.h"
 #include "dwc/gpiCallback.h"
 #include "dwc/gpiKeys.h"
 #include "dwc/gpiPeer.h"
 #include "dwc/gpiProfile.h"
 #include "dwc/gpiUtility.h"
-
-// clang-format on
 
 // GameSpy GP's buddy messages and buddy list (gpiBuddy.c). The functions' names, from pret/pokerevo's Wii build and
 // GameSpy's later SDK, are in dwc/gp.h

@@ -1,0 +1,178 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Espeon",
+    "pokedex": {
+        "category": "Sun Pokémon",
+        "entry": "Its fur is so sensitive, it can feel\nminute shifts in the air and predict the\nweather...and its foes' thoughts.",
+        "height": "2'11\"",
+        "weight": "58.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Espeon",
+                "category": "Sun Pokémon",
+                "entry": "Its fur is so sensitive, it can\nsense minute shifts in the air\nand predict the weather.",
+                "height": "2'11\"",
+                "weight": "58.4 lbs."
+            },
+            "fr": {
+                "name": "Mentali",
+                "category": "Pokémon Soleil",
+                "entry": "Sa fourrure est si sensible qu'il\npeut détecter les vibrations de\nl'air et prédire le temps qu'il fera.",
+                "height": "0,9 m",
+                "weight": "26,5 kg"
+            },
+            "de": {
+                "name": "Psiana",
+                "category": "Sonne",
+                "entry": "Kann durch sein Fell geringste\nLuftveränderungen wahrnehmen\nund das Wetter vorhersagen.",
+                "height": "0,9 m",
+                "weight": "26,5 kg"
+            },
+            "it": {
+                "name": "Espeon",
+                "category": "Pokémon Sole",
+                "entry": "Con il pelo sensibile riesce ad analizzare\nle correnti d'aria e a prevedere\nle condizioni atmosferiche.",
+                "height": "0,9 m",
+                "weight": "26,5 kg"
+            },
+            "ko": {
+                "name": "에브이",
+                "category": "태양포켓몬",
+                "entry": "전신에 나있는 털이 민감하다.\n아주 적은 공기의 진동도 느껴\n앞으로의 날씨를 맞춘다.",
+                "height": "0.9 m",
+                "weight": "26.5 kg"
+            },
+            "es": {
+                "name": "Espeon",
+                "category": "Pokémon Sol",
+                "entry": "Su pelaje es tan sensible que puede\npercibir cualquier cambio en el aire\ny predecir el tiempo.",
+                "height": "0,9 m",
+                "weight": "26,5 kg"
+            },
+            "ja": {
+                "name": "エーフィ",
+                "category": "たいようポケモン",
+                "entry": "ぜんしんの\\x{3000}たいもうは\\x{3000}びんかん。\nわずかな\\x{3000}くうきの\\x{3000}ゆれも\\x{3000}かんじて\nこれからの\\x{3000}てんきを\\x{3000}あててしまう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 65,
+        "defense": 60,
+        "speed": 110,
+        "special_attack": 130,
+        "special_defense": 95
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 35,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_SYNCHRONIZE", "ABILITY_SYNCHRONIZE" ],
+    "hidden_ability": "ABILITY_MAGIC_BOUNCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 184,
+    "height": 9,
+    "weight": 265,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HELPING_HAND" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 5, "MOVE_SAND_ATTACK" ],
+            [ 9, "MOVE_CONFUSION" ],
+            [ 13, "MOVE_QUICK_ATTACK" ],
+            [ 17, "MOVE_SWIFT" ],
+            [ 21, "MOVE_PSYBEAM" ],
+            [ 25, "MOVE_FUTURE_SIGHT" ],
+            [ 29, "MOVE_PSYCH_UP" ],
+            [ 33, "MOVE_MORNING_SUN" ],
+            [ 37, "MOVE_PSYCHIC" ],
+            [ 41, "MOVE_LAST_RESORT" ],
+            [ 45, "MOVE_POWER_SWAP" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM83",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGIC_COAT",
+            "MOVE_LAST_RESORT",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 95,
+    "baby_species": "SPECIES_EEVEE",
+    "cry_volume": 110
+}

@@ -17,7 +17,8 @@ first appear in the source, each 4-aligned, shared from the first use), so this 
 question such as overlay 136's.
 
 Objects are given in declaration order as NAME:SIZE. A local initializer is marked with a trailing `@`, as in BG1:32@,
-and a global that no code refers to with a trailing `!`, as in UNK:4!.
+and a global that no code refers to with a trailing `!`, as in UNK:4!. Tentative `.bss` definitions (`static T x;`)
+go last, in the reverse of their declarations (libVCT's vct_audio.c).
 
 The list must be complete, or the prediction is silently wrong: every function-local initializer counts, down to an
 8-byte struct (btlv_input.c's layout was declared unreachable until BtlvInput_StartTileAnim's ClActorSetup was

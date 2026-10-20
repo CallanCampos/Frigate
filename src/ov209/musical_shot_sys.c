@@ -187,7 +187,7 @@ static BOOL MusicalShotSys_Main(GameProc *proc, u32 *state, void *param, void *w
 
     MusShotPhoto_Main(sys->photo);
     MusShotInfo_Main(sys->info);
-    func_0204b794();
+    ClActSys_Draw();
     if (MusShotInfo_IsFinished(sys->info) == TRUE) {
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 6, 1, sys->heapId);
         return TRUE;
@@ -196,7 +196,7 @@ static BOOL MusicalShotSys_Main(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void MusicalShotSys_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void MusicalShotSys_InitGraphics(MusicalShotSys *sys) {
@@ -218,7 +218,7 @@ static void MusicalShotSys_InitGraphics(MusicalShotSys *sys) {
 }
 
 static void MusicalShotSys_ExitGraphics(MusicalShotSys *sys) {
-    func_0204b758();
+    ClActSys_Delete();
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
 }

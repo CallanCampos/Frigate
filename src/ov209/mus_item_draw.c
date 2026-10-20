@@ -93,8 +93,8 @@ void MusItemDraw_UpdateSystem(MusItemDrawSys *sys) {
             MusItemDraw_GetFaceSize(item, &width, &height);
             scaleX = item->scaleX * width;
             scaleY = item->scaleY * height;
-            func_0204ea5c(sys->blact, item->actor, &scaleX, &scaleY);
-            func_0204eba0(sys->blact, item->actor, &item->rotation);
+            BlActScene_SetActorScale(sys->blact, item->actor, &scaleX, &scaleY);
+            BlActScene_SetActorRotation(sys->blact, item->actor, &item->rotation);
             sys->items[i].update = FALSE;
         }
     }
@@ -114,29 +114,29 @@ static void MusItemDraw_GetFaceSize(MusItemDraw *item, u8 *width, u8 *height) {
     u16 texWidth;
     u16 texHeight;
 
-    func_0204e4d0(MusItemData_GetTexSize(item->data), &texWidth, &texHeight);
+    BlAct_GetTexDimensions(MusItemData_GetTexSize(item->data), &texWidth, &texHeight);
     *width = texWidth / 32;
     *height = texHeight / 32;
 }
 
 BOOL MusItemDraw_CanEquipPos(MusItemDraw *item, s32 pos) {
-    return func_ov210_021eef98(item->data, pos);
+    return MusItemData_CanEquipAtPos(item->data, pos);
 }
 
 BOOL MusItemDraw_ItemCanEquipPos(MusItemDrawSys *sys, u16 itemId, s32 pos) {
-    return func_ov210_021ef018(MusItemData_GetItem(sys->itemData, itemId), pos);
+    return MusItemData_CanEquipInGroup(MusItemData_GetItem(sys->itemData, itemId), pos);
 }
 
 BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, s32 pos) {
-    return func_ov210_021ef088(MusItemData_GetItem(sys->itemData, itemId), pos);
+    return MusItemData_IsCategoryOfGroup(MusItemData_GetItem(sys->itemData, itemId), pos);
 }
 
 BOOL MusItemDraw_GetItemFlag7(MusItemDraw *item) {
-    return func_ov210_021ef0f4(item->data);
+    return MusItemData_GetFlag7(item->data);
 }
 
 BOOL MusItemDraw_GetItemFlag9(MusItemDraw *item) {
-    return func_ov210_021ef104(item->data);
+    return MusItemData_GetFlag9(item->data);
 }
 
 void *MusItemDraw_LoadTexResource(u16 itemId) {
@@ -213,7 +213,7 @@ static MusItemDraw *MusItemDraw_InitActor(MusItemDrawSys *sys, u16 index, const 
 void MusItemDraw_DelItem(MusItemDrawSys *sys, MusItemDraw *item) {
     BlActScene_ClearActorMaterial(sys->blact, item->actor);
     if (item->ownMaterial == TRUE) {
-        func_0204e73c(sys->blact, item->material);
+        BlActScene_FreeMaterialVramIfTex(sys->blact, item->material);
     }
     item->active = FALSE;
     item->update = FALSE;
@@ -223,9 +223,9 @@ void MusItemDraw_ChangeItem(MusItemDrawSys *sys, MusItemDraw *item, u16 itemId, 
     item->texFileId = MusItemDraw_GetTexFileId(itemId);
     item->data = MusItemData_GetItem(sys->itemData, itemId);
     item->shadow = FALSE;
-    func_0204ea08(sys->blact, item->actor, &material);
+    BlActScene_SetActorMaterial(sys->blact, item->actor, &material);
     if (item->ownMaterial == TRUE) {
-        func_0204e73c(sys->blact, item->material);
+        BlActScene_FreeMaterialVramIfTex(sys->blact, item->material);
     }
     item->ownMaterial = FALSE;
     item->material = material;
@@ -238,8 +238,8 @@ void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, void *
         u32 plttAddr;
         NNSGfdPlttKey plttKey;
 
-        func_0204e7e8(sys->blact, item->material, &plttAddr);
-        func_0204e820(sys->blact, item->material, &plttKey);
+        BlActScene_GetMaterialPlttAddr(sys->blact, item->material, &plttAddr);
+        BlActScene_GetMaterialPlttKey(sys->blact, item->material, &plttKey);
         NNS_GfdRegisterNewVramTransferTask(1, plttAddr, sys->shadowPalette, NNS_GfdGetPlttKeySize(plttKey));
         item->shadow = TRUE;
     }

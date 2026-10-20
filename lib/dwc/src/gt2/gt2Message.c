@@ -1,8 +1,11 @@
-#include "dwc/gt2Message.h"
+#include <string.h>
+// Before dwc/ext.h: MWCC builds the packets' 2-byte memcpys in place, as the ROM does, only when
+// <string.h> declares them first
 #include "dwc/ext.h"
 #include "dwc/gt2Auth.h"
 #include "dwc/gt2Callback.h"
 #include "dwc/gt2Connection.h"
+#include "dwc/gt2Message.h"
 #include "dwc/gt2Socket.h"
 
 // GameSpy GT2's messages (gt2Message.c). The functions' names, from pret/pokerevo's Wii build, are in
@@ -1007,25 +1010,16 @@ static BOOL func_ov011_0217e4e0(GTI2Connection *connection, const u8 *data, int 
 }
 
 BOOL func_ov011_0217e598(GTI2Connection *connection) {
-    const u8 *magic;
     u16 prefix;
-    const u8 *src;
-    u8 *dest;
     u8 packet[10];
     int length = 0;
 
     if (connection->socket->protocol == 2) {
         prefix = 5;
-        src = (const u8 *)&prefix;
-        dest = packet;
-        dest[0] = src[0];
-        dest[1] = src[1];
+        memcpy(packet, &prefix, 2);
         length += 2;
     }
-    magic = (const u8 *)"\xfe\xfe";
-    dest = packet + length;
-    dest[0] = magic[0];
-    dest[1] = magic[1];
+    memcpy(packet + length, "\xfe\xfe", 2);
     packet[length + 2] = 0x64;
     func_ov011_0217d3c4(packet, length + 3, connection->expectedSerialNumber);
     if (!func_ov011_0217cf18(connection, packet, length + 5)) {
@@ -1040,22 +1034,13 @@ static BOOL func_ov011_0217e608(GTI2Connection *connection, u16 first, u16 last)
     u16 prefix;
     u8 packet[10];
     int length = 0;
-    const u8 *magic;
-    const u8 *src;
-    u8 *dest;
 
     if (connection->socket->protocol == 2) {
         prefix = 7;
-        src = (const u8 *)&prefix;
-        dest = packet;
-        dest[0] = src[0];
-        dest[1] = src[1];
+        memcpy(packet, &prefix, 2);
         length += 2;
     }
-    magic = (const u8 *)"\xfe\xfe";
-    dest = packet + length;
-    dest[0] = magic[0];
-    dest[1] = magic[1];
+    memcpy(packet + length, "\xfe\xfe", 2);
     packet[length + 2] = 0x65;
     func_ov011_0217d3c4(packet, length + 3, first);
     length += 5;
@@ -1082,24 +1067,15 @@ BOOL func_ov011_0217e694(GTI2Connection *connection) {
 // Sends an address the note that its connection is closed
 static BOOL func_ov011_0217e6a4(GTI2Socket *socket, u32 ip, u16 port) {
     u16 prefix;
-    u8 packet[10];
+    u8 packet[5];
     int length = 0;
-    const u8 *magic;
-    const u8 *src;
-    u8 *dest;
 
     if (socket->protocol == 2) {
         prefix = 3;
-        src = (const u8 *)&prefix;
-        dest = packet;
-        dest[0] = src[0];
-        dest[1] = src[1];
+        memcpy(packet, &prefix, 2);
         length += 2;
     }
-    magic = (const u8 *)"\xfe\xfe";
-    dest = packet + length;
-    dest[0] = magic[0];
-    dest[1] = magic[1];
+    memcpy(packet + length, "\xfe\xfe", 2);
     packet[length + 2] = 0x68;
     if (!func_ov011_0217eb34(socket, ip, port, packet, length + 3)) {
         return FALSE;

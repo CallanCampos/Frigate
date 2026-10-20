@@ -1,6 +1,6 @@
-func_ov109_021eec80 kind:function(thumb,size=0x74) addr:0x021eec80
-func_ov109_021eecf4 kind:function(thumb,size=0x44) addr:0x021eecf4
-func_ov109_021eed38 kind:function(thumb,size=0xae) addr:0x021eed38
+SkyarrowBridge_Setup kind:function(thumb,size=0x74) addr:0x021eec80
+SkyarrowBridge_End kind:function(thumb,size=0x44) addr:0x021eecf4
+SkyarrowBridge_Update kind:function(thumb,size=0xae) addr:0x021eed38
 SkyarrowBridge_Init kind:function(thumb,size=0x14e) addr:0x021eede8
 SkyarrowBridge_LoadWaitRanges kind:function(thumb,size=0x44) addr:0x021eef38
 SkyarrowBridge_LoadBGMParams kind:function(thumb,size=0x14) addr:0x021eef7c

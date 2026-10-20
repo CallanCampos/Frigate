@@ -42,31 +42,31 @@ static const CygnusPokemon sPokemon[] = {
 static CygnusSaveData sCardData;
 
 // The buffer is one word larger than the data, and nothing uses it: the data is read into sCardData
-void *func_02011510(HeapID heapId) {
+void *DreamRadar_AllocBuffer(HeapID heapId) {
     return GFL_HeapAllocate(heapId, sizeof(CygnusSaveData) + 4, TRUE, "cygnus_save_control.c", 41);
 }
 
-void func_02011528(void *buffer) {
+void DreamRadar_FreeBuffer(void *buffer) {
     GFL_HeapFree(buffer);
 }
 
 void ReadDreamRadarSaveData(void *buffer) {
-    func_0203bf30(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
+    BackupSystem_Read(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
 }
 
-void func_02011544(void) {
-    func_0203bee8(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
+void DreamRadar_WriteSaveData(void) {
+    BackupSystem_WriteWait(CYGNUS_DATA_CARD_OFFSET, &sCardData, sizeof(CygnusSaveData));
 }
 
 // Erases the card's data
-void func_02011558(HeapID heapId) {
+void DreamRadar_EraseSaveData(HeapID heapId) {
     CygnusSaveData *data = GFL_HeapAllocate(heapId, sizeof(CygnusSaveData), TRUE, "cygnus_save_control.c", 117);
 
-    func_0203bee8(CYGNUS_DATA_CARD_OFFSET, data, sizeof(CygnusSaveData));
+    BackupSystem_WriteWait(CYGNUS_DATA_CARD_OFFSET, data, sizeof(CygnusSaveData));
     GFL_HeapFree(data);
 }
 
-void *func_02011588(void *buffer) {
+void *DreamRadar_GetSaveData(void *buffer) {
     return &sCardData;
 }
 
@@ -77,13 +77,13 @@ static BOOL IsDreamRadarSaveValid(void *buffer) {
     return FALSE;
 }
 
-BOOL func_020115a8(HeapID heapId) {
-    void *buffer = func_02011510(heapId);
+BOOL DreamRadar_LoadAndCheckSaveData(HeapID heapId) {
+    void *buffer = DreamRadar_AllocBuffer(heapId);
     BOOL valid;
 
     ReadDreamRadarSaveData(buffer);
     valid = IsDreamRadarSaveValid(buffer);
-    func_02011528(buffer);
+    DreamRadar_FreeBuffer(buffer);
     return valid;
 }
 
@@ -91,15 +91,15 @@ static void updateCardData(SaveControl *save) {
     DreamRadarSave *radar = GetDreamRadarSaveBlock(save);
     u32 received = GetDreamRadarFlag(radar, DREAM_RADAR_FLAG_RECEIVED);
 
-    func_020113c4(&sCardData, GetDreamRadarFlag(radar, DREAM_RADAR_FLAG_SEED), received);
+    CygnusSaveData_Store(&sCardData, GetDreamRadarFlag(radar, DREAM_RADAR_FLAG_SEED), received);
 }
 
-void func_020115f0(SaveControl *save) {
+void DreamRadar_MarkRead(SaveControl *save) {
     updateCardData(save);
-    func_02011544();
+    DreamRadar_WriteSaveData();
 }
 
-BOOL func_020115fc(u32 word) {
+BOOL DreamRadar_IsPokemonWord(u32 word) {
     u32 i;
 
     for (i = 0; i < NELEMS(sPokemon); i++) {
@@ -110,7 +110,7 @@ BOOL func_020115fc(u32 word) {
     return FALSE;
 }
 
-void func_02011624(u32 word, u16 *species, u8 *form, u8 *sex) {
+void DreamRadar_GetPokemonByWord(u32 word, u16 *species, u8 *form, u8 *sex) {
     u32 i;
 
     for (i = 0; i < NELEMS(sPokemon); i++) {
@@ -129,7 +129,7 @@ void func_02011624(u32 word, u16 *species, u8 *form, u8 *sex) {
     }
 }
 
-u32 func_0201167c(u32 word) {
+u32 DreamRadar_GetPokemonBit(u32 word) {
     u32 i;
 
     for (i = 0; i < NELEMS(sPokemon); i++) {

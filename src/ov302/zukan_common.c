@@ -112,7 +112,7 @@ u32 ZukanCommon_CreateList(PokeDexSave *pokedex, u16 **list, HeapID heapId) {
     u32 last;
     u32 i;
 
-    if (func_0200d1f8(pokedex) == 1) {
+    if (PokeDex_GetMode(pokedex) == 1) {
         count = ZukanSearchEngine_LoadList(0, heapId, &species);
     } else {
         count = ZukanSearchEngine_LoadList(1, heapId, &species);
@@ -143,7 +143,7 @@ static BOOL ZukanCommon_IsInHabitat(PokeDexSave *pokedex, const ZukanHabitatFile
 
 void ZukanCommon_SelectSeen(PokeDexSave *pokedex, const u16 *list, u16 count) {
     u16 first = 0xffff;
-    u16 current = func_0200d214(pokedex);
+    u16 current = PokeDex_GetLastSpecies(pokedex);
     u16 i;
 
     for (i = 0; i < count; i++) {
@@ -157,12 +157,12 @@ void ZukanCommon_SelectSeen(PokeDexSave *pokedex, const u16 *list, u16 count) {
         }
     }
     if (first != 0xffff) {
-        func_0200d200(pokedex, first);
+        PokeDex_SetLastSpecies(pokedex, first);
     }
 }
 
 BOOL ZukanCommon_IsFirstShown(PokeDexSave *pokedex) {
-    if (func_0200d1f8(pokedex) == 1) {
+    if (PokeDex_GetMode(pokedex) == 1) {
         return TRUE;
     }
     if (PokeDex_IsCaught(pokedex, SPECIES_VICTINI) == 1 || PokeDex_IsSeen(pokedex, SPECIES_VICTINI) == 1) {
@@ -172,7 +172,7 @@ BOOL ZukanCommon_IsFirstShown(PokeDexSave *pokedex) {
 }
 
 void ZukanCommon_InitCriteria(PokeDexSave *pokedex, ZukanSearchCriteria *criteria) {
-    if (func_0200d1f8(pokedex) == 1) {
+    if (PokeDex_GetMode(pokedex) == 1) {
         criteria->regional = 0;
     } else {
         criteria->regional = 1;
@@ -203,8 +203,8 @@ void ZukanCommon_ScrollBGs(u8 bg1, u8 bg2, int *timer) {
 }
 
 ClActor *ZukanCommon_CreateActor(ClActUnit *unit, const ZukanActorTemplate *template, HeapID heapId) {
-    return func_0204c040(unit, template->chars, template->palette, template->cells, &template->setup, template->surface,
-                         heapId);
+    return ClActor_Create(unit, template->chars, template->palette, template->cells, &template->setup,
+                          template->surface, heapId);
 }
 
 u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **outList, HeapID heapId) {
@@ -220,9 +220,9 @@ u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **ou
     u32 n = 0;
 
     total = 0;
-    zone = func_02010d78(habitat);
-    type = func_02010d98(habitat);
-    season = func_02010d88(habitat);
+    zone = ZukanHabitatSave_GetZone(habitat);
+    type = ZukanHabitatSave_GetType(habitat);
+    season = ZukanHabitatSave_GetSeason(habitat);
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_HABITAT, heapId);
     areaFile = ZukanCommon_GetAreaFile(zone);
     if (areaFile < 0) {
@@ -265,7 +265,7 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
             BOOL flag = EventWork_FlagGet(eventWork, entry->flag);
 
             if (current == TRUE) {
-                if (entry->zone != func_02010d78(habitat)) {
+                if (entry->zone != ZukanHabitatSave_GetZone(habitat)) {
                     flag = FALSE;
                 }
             }
@@ -333,7 +333,7 @@ void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *pa
     int index;
     int i;
     ZukanHabitatFile countFile;
-    void *habitatSave = func_02010cb8(GameData_GetSaveControl(param->gameData));
+    void *habitatSave = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(param->gameData));
     ZukanHabitatFile file;
 
     pokedex = GameData_GetPokedex(param->gameData);
@@ -374,7 +374,7 @@ void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *pa
                 ZukanCommon_GetHabitatStates(area->states, &file, pokedex);
                 slot = habitatIndex;
                 for (j = 0; j < 3; j++) {
-                    u8 done = func_02010cc4(habitatSave, slot, j);
+                    u8 done = ZukanHabitatSave_GetHabitatField(habitatSave, slot, j);
 
                     if (area->conditions[j] == 1) {
                         switch (area->states[j]) {

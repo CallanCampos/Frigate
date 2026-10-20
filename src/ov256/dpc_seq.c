@@ -98,7 +98,7 @@ static u32 DpcSeq_Init(DendouPCWork *wk) {
     DpcObj_Init(wk);
     DpcSeq_PageChange(wk);
     DpcMain_SetBlend();
-    func_02042ba8(TRUE, HEAPID_DENDOU_PC);
+    GFL_NetSetIconScreen(TRUE, HEAPID_DENDOU_PC);
     DpcMain_InitVBlank(wk);
 
     return DpcSeq_SetFadeIn(wk, DPCSEQ_PAGE_MAIN);
@@ -125,7 +125,7 @@ static u32 DpcSeq_Release(DendouPCWork *wk) {
 }
 
 static u32 DpcSeq_Wipe(DendouPCWork *wk) {
-    if (func_02021c0c(wk->printQueue) == TRUE && GFL_WipeIsFinished() == TRUE) {
+    if (PrintQueue_IsEmpty(wk->printQueue) == TRUE && GFL_WipeIsFinished() == TRUE) {
         return wk->wipeNext;
     }
     return DPCSEQ_WIPE;
@@ -141,7 +141,7 @@ static u32 DpcSeq_ButtonAnime(DendouPCWork *wk) {
 static u32 DpcSeq_PageMain(DendouPCWork *wk) {
     u32 ret;
 
-    if (func_02021c0c(wk->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(wk->printQueue) == FALSE) {
         return DPCSEQ_PAGE_MAIN;
     }
 
@@ -234,7 +234,7 @@ static u32 DpcSeq_PokeMain(DendouPCWork *wk) {
     u32 ret;
     s8 pos;
 
-    if (func_02021c0c(wk->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(wk->printQueue) == FALSE) {
         return DPCSEQ_POKE_MAIN;
     }
 

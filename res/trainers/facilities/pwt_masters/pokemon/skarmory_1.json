@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SKARMORY",
+    "moves": [ "MOVE_CURSE", "MOVE_ROOST", "MOVE_AERIAL_ACE", "MOVE_STEALTH_ROCK" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

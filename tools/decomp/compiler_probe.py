@@ -20,24 +20,20 @@ from elftools.elf.relocation import RelocationSection
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
-from configure import ENCODING_FLAG, INCLUDE_DIRS, library_of, mwcc_command  # noqa: E402
+from configure import ENCODING_FLAG, INCLUDE_DIRS, source_compiler, mwcc_command  # noqa: E402
 
-DEFAULT_FLAGS = (
-    "-O4,p -proc arm946e -thumb -interworking -enum int -char signed -fp soft -lang=c99 -Cpp_exceptions off -gccext,on -gccinc "
-    f"-inline on,noauto -ipa file -requireprotos -nolink -msgstyle gcc -w off {ENCODING_FLAG}"
-)
 # Preprocessor defines of each game version, as in configure.py
 VERSION_DEFINES = {"b2_us": ["BLACK2"], "w2_us": ["WHITE2"]}
 SYMBOL_RE = re.compile(r"^(\S+) kind:function\((\w+),size=(0x[0-9a-f]+)\S*\) addr:(0x[0-9a-f]+)")
 
 
-def lib_compiler(source: Path) -> tuple[str, str] | None:
-    """Returns the compiler and flags of a library built with its own, from its library.toml as in configure.py."""
-    try:
-        library = library_of(source)
-    except ValueError:
-        return None
-    return (library[0], " ".join(library[1]) + " -w off") if library else None
+def probe_defaults(source: Path) -> tuple[str | None, str]:
+    """Uses build settings with the probe's intentional debug/warning policy."""
+    settings = source_compiler(source)
+    if settings.is_library:
+        return settings.compiler, " ".join(settings.flags) + " -w off"
+    flags = [flag for flag in settings.flags if flag not in ("-sym on", ENCODING_FLAG)]
+    return None, " ".join([*flags, "-w off", ENCODING_FLAG])
 
 
 def load_modules(version: str) -> dict[str, tuple[Path, int]]:
@@ -191,11 +187,11 @@ def main():
                         "does not shift the rest")
     args = parser.parse_args()
 
-    lib = lib_compiler(args.source)
+    compiler, flags = probe_defaults(args.source)
     if args.compilers is None:
-        args.compilers = lib[0] if lib else "all"
+        args.compilers = compiler or "all"
     if args.flags is None:
-        args.flags = lib[1] if lib else DEFAULT_FLAGS
+        args.flags = flags
     functions = set(args.functions.split(",")) if args.functions else None
 
     if args.opt:
@@ -205,6 +201,7 @@ def main():
     modules = load_modules(args.version)
 
     results: dict[str, dict[str, str]] = {}
+    failed: list[str] = []
     with tempfile.TemporaryDirectory() as tmp:
         for compiler in compilers:
             obj = Path(tmp) / f"{compiler.replace('/', '_')}.o"
@@ -220,7 +217,12 @@ def main():
             ]
             proc = subprocess.run(command, capture_output=True, text=True)
             if proc.returncode != 0:
-                print(f"{compiler}: compile failed\n{proc.stdout}{proc.stderr}")
+                # Every function shows the failure, so that --mismatches can't read it as all matching
+                print(f"{compiler}: compile failed\n{proc.stdout}{proc.stderr}", file=sys.stderr)
+                failed.append(compiler)
+                for name in defined_functions(args.source):
+                    if functions is None or name in functions:
+                        results.setdefault(name, {})[compiler] = "no compile"
                 continue
             compiled = compiled_functions(obj)
             # MWCC drops a static function that nothing references, which would otherwise pass unnoticed
@@ -261,6 +263,7 @@ def main():
         if args.mismatches and all(status == "MATCH" for status in row.values()):
             continue
         print(f"{name:{width}s}  " + "  ".join(f"{row.get(c, '-'):>12s}" for c in compilers))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

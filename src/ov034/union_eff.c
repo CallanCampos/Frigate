@@ -88,7 +88,7 @@ BOOL UnionEff_IsPlayerOnSpot(Field *field) {
     FieldPlayer_GetWPos(player, &pos);
     pos.x = (pos.x >> 4) / FX32_ONE;
     pos.z = (pos.z >> 4) / FX32_ONE;
-    func_0201754c(state);
+    PlayerState_GetRotation(state);
     for (i = 0; i < 1; i++) {
         if (pos.x == spots[i][0] && pos.z == spots[i][1]) {
             return TRUE;
@@ -118,7 +118,7 @@ int UnionEff_GetKindStep(int kind) {
 BOOL UnionEff_IsFriendBeacon(WifiList *wifiList, const UnionBeacon *beacon) {
     u32 friendIndex;
 
-    if (func_0200a46c(wifiList, beacon->name, beacon->trainerId, beacon->gender, &friendIndex) == TRUE) {
+    if (WifiList_FindFriend(wifiList, beacon->name, beacon->trainerId, beacon->gender, &friendIndex) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -260,7 +260,7 @@ static void UnionEff_UpdateFocus(FocusMan *focus_man) {
     UnionEffSlot *slot = &focus_man->slot[0];
 
     if (slot->g3dActor != NULL) {
-        if (func_ov012_0216749c(slot->actor) == TRUE) {
+        if (FldAct_IsInUse(slot->actor) == TRUE) {
             UnionEff_StepFocusSlot(slot);
         } else {
             UnionEff_FreeFocusSlot(slot);
@@ -272,7 +272,7 @@ static void UnionEff_DrawFocus(FocusMan *focus_man) {
     SRTMatrix mtx = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE }, { 0 } };
 
     MTX_Identity33_(&mtx.rotation);
-    if (focus_man->slot[0].g3dActor != NULL && func_ov012_0216749c(focus_man->slot[0].actor) == TRUE) {
+    if (focus_man->slot[0].g3dActor != NULL && FldAct_IsInUse(focus_man->slot[0].actor) == TRUE) {
         UnionEff_DrawFocusSlot(&focus_man->slot[0], &mtx);
     }
 }
@@ -369,7 +369,7 @@ static void UnionEff_UpdateMarks(MarkMan *mark_man) {
         UnionEffSlot *slot = &mark_man->slot[i];
 
         if (slot->g3dActor != NULL) {
-            if (func_ov012_0216749c(slot->actor) == TRUE) {
+            if (FldAct_IsInUse(slot->actor) == TRUE) {
                 UnionEff_StepMarkSlot(slot);
             } else {
                 UnionEff_FreeMarkSlot(slot);
@@ -386,7 +386,7 @@ static void UnionEff_DrawMarks(MarkMan *mark_man) {
     for (i = 0; i < MARK_SLOT_MAX; i++) {
         UnionEffSlot *slot = &mark_man->slot[i];
 
-        if (slot->g3dActor != NULL && func_ov012_0216749c(slot->actor) == TRUE) {
+        if (slot->g3dActor != NULL && FldAct_IsInUse(slot->actor) == TRUE) {
             UnionEff_DrawMarkSlot(slot, &mtx);
         }
     }

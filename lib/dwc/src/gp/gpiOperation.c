@@ -1,17 +1,14 @@
-// clang-format off
-// MSL's <string.h>, before dwc/ext.h's declarations: the ROM builds gpiFailedOpCallback's small memsets in place, as
-// MWCC does only for the memset that <string.h> declares (clang-format would sort it after dwc/ext.h)
 #include <string.h>
-#include "dwc/gpiOperation.h"
+// Before dwc/ext.h: MWCC builds gpiFailedOpCallback's small memsets in place, as the ROM does, only when <string.h>
+// declares memset first
 #include "dwc/ext.h"
 #include "dwc/gpiCallback.h"
 #include "dwc/gpiConnect.h"
 #include "dwc/gpiInfo.h"
+#include "dwc/gpiOperation.h"
 #include "dwc/gpiProfile.h"
 #include "dwc/gpiUnique.h"
 #include "dwc/gpiUtility.h"
-
-// clang-format on
 
 // GameSpy GP's operations in progress (gpiOperation.c). The functions' names, from pret/pokerevo's Wii build, are in
 // dwc/gp.h

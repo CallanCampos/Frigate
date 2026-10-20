@@ -1,0 +1,102 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 2,
+            "grid": {
+                "x": 1,
+                "y": 8,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_76",
+            "movement": 16,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 9,
+                "z": 11,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_18",
+            "movement": 16,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 3,
+                "z": 6,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_ASPERTIA_CITY",
+            "warp": 0,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 232,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_19",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 1,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 24,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 2,
+            "var": "EVENT_WORK_0x40e0",
+            "value": 0,
+            "type": 0,
+            "grid": {
+                "x": 1,
+                "z": 11,
+                "width": 7,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": []
+}

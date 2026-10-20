@@ -1,0 +1,42 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Cosmic Power",
+    "description": "The user absorbs a mystical power from\nspace to raise its Defense and\nSp. Def stats.",
+    "type": "TYPE_PSYCHIC",
+    "quality": "MOVE_QUALITY_STAT_CHANGE",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_DEF_SPD_UP",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [
+        {
+            "stat": "BATTLEMON_DEFENSE_STAGE",
+            "stages": 1,
+            "chance": 0
+        },
+        {
+            "stat": "BATTLEMON_SP_DEFENSE_STAGE",
+            "stages": 1,
+            "chance": 0
+        }
+    ],
+    "flags": [ "MOVE_FLAG_SNATCH" ]
+}

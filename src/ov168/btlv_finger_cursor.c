@@ -5,6 +5,7 @@
 #include "types.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -35,14 +36,14 @@ static const ClActorSetupEx data_ov168_021f3ef4 = { { 0, 0, 0, 0, 0 }, { 0, 0 },
 
 BtlvFingerCursor *BtlvFingerCursor_Create(PaletteFade *fade, u32 paletteRow, HeapID heapId) {
     BtlvFingerCursor *cursor = GFL_HeapAllocate(heapId, sizeof(BtlvFingerCursor), TRUE, "btlv_finger_cursor.c", 0x52);
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(heapId));
 
     cursor->heapId = heapId;
-    cursor->chars = func_0204b81c(arc, 0x1e7, FALSE, CLACT_VRAM_SUB, heapId);
-    cursor->cellAnims = func_0204bde0(arc, 0x1e9, 0x1ea, heapId);
-    cursor->palette = func_0204bbb8(arc, 0x1e8, CLACT_VRAM_SUB, paletteRow * 32, 0, 1, heapId);
-    PaletteFade_LoadFromVRAM(fade, PALFADE_VRAM_SUB_OBJ, func_0204bdc0(cursor->palette, TRUE) / 2, 0x20);
-    cursor->unit = func_0204bf1c(1, 0, heapId);
+    cursor->chars = ClActSys_LoadChars(arc, 0x1e7, FALSE, CLACT_VRAM_SUB, heapId);
+    cursor->cellAnims = ClActSys_LoadCellAnims(arc, 0x1e9, 0x1ea, heapId);
+    cursor->palette = ClActSys_LoadPlttRange(arc, 0x1e8, CLACT_VRAM_SUB, paletteRow * 32, 0, 1, heapId);
+    PaletteFade_LoadFromVRAM(fade, PALFADE_VRAM_SUB_OBJ, ClActSys_GetPlttVramAddr(cursor->palette, TRUE) / 2, 0x20);
+    cursor->unit = ClActUnit_Create(1, 0, heapId);
     GFL_ArcToolFree(arc);
     cursor->task = GFL_TCBMgrAddTask(BtlvEffect_GetTCBManager(), BtlvFingerCursor_Task, cursor, 0);
     return cursor;
@@ -51,10 +52,10 @@ BtlvFingerCursor *BtlvFingerCursor_Create(PaletteFade *fade, u32 paletteRow, Hea
 void BtlvFingerCursor_Delete(BtlvFingerCursor *cursor) {
     GFL_TCBRemove(cursor->task);
     BtlvFingerCursor_RemoveActor(cursor);
-    func_0204b98c(cursor->chars);
-    func_0204be64(cursor->cellAnims);
-    func_0204bcd0(cursor->palette);
-    func_0204bf98(cursor->unit);
+    ClActSys_FreeChars(cursor->chars);
+    ClActSys_FreeCellAnims(cursor->cellAnims);
+    ClActSys_FreePltt(cursor->palette);
+    ClActUnit_Delete(cursor->unit);
     GFL_HeapFree(cursor);
 }
 
@@ -72,11 +73,11 @@ BOOL BtlvFingerCursor_Start(BtlvFingerCursor *cursor, s32 x, s32 y, u32 wait, s3
     setup.base.x = x;
     setup.base.y = y;
     cursor->actor =
-        func_0204c0a4(cursor->unit, cursor->chars, cursor->palette, cursor->cellAnims, &setup, 1, cursor->heapId);
-    func_0204c488(cursor->actor, 0);
-    func_0204c4d4(cursor->actor, 0);
+        ClActor_CreateEx(cursor->unit, cursor->chars, cursor->palette, cursor->cellAnims, &setup, 1, cursor->heapId);
+    ClActor_SetSequence(cursor->actor, 0);
+    ClActor_SetAnimTime(cursor->actor, 0);
     func_0204c520(cursor->actor, TRUE);
-    func_0204c124(cursor->actor, TRUE);
+    ClActor_SetVisible(cursor->actor, TRUE);
     if (wait != 0) {
         cursor->wait = wait;
     } else {
@@ -94,13 +95,13 @@ BOOL BtlvFingerCursor_Start(BtlvFingerCursor *cursor, s32 x, s32 y, u32 wait, s3
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.frame = 0;
     callback.func = BtlvFingerCursor_AnimCallback;
-    func_0204c5b0(cursor->actor, &callback);
+    ClActor_SetAnimCallback(cursor->actor, &callback);
     return TRUE;
 }
 
 void BtlvFingerCursor_RemoveActor(BtlvFingerCursor *cursor) {
     if (cursor->actor != NULL) {
-        func_0204c108(cursor->actor);
+        ClActor_Delete(cursor->actor);
         cursor->actor = NULL;
     }
 }
@@ -118,13 +119,13 @@ static void BtlvFingerCursor_AnimCallback(u32 param, fx32 frame) {
         if (--cursor->wait == 0) {
             ClActorCallback callback;
 
-            func_0204c488(cursor->actor, 1);
+            ClActor_SetSequence(cursor->actor, 1);
             cursor->seq++;
             callback.param = (u32)cursor;
             callback.type = CLACT_CALLBACK_FRAME;
             callback.frame = cursor->tapFrame;
             callback.func = BtlvFingerCursor_AnimCallback;
-            func_0204c5b0(cursor->actor, &callback);
+            ClActor_SetAnimCallback(cursor->actor, &callback);
         }
         break;
     case 1: {
@@ -136,11 +137,11 @@ static void BtlvFingerCursor_AnimCallback(u32 param, fx32 frame) {
         callback.type = CLACT_CALLBACK_EVERY_FRAME;
         callback.frame = 0;
         callback.func = BtlvFingerCursor_AnimCallback;
-        func_0204c5b0(cursor->actor, &callback);
+        ClActor_SetAnimCallback(cursor->actor, &callback);
         break;
     }
     case 2:
-        func_0204c124(cursor->actor, FALSE);
+        ClActor_SetVisible(cursor->actor, FALSE);
         cursor->touched = FALSE;
         cursor->seq++;
         break;
@@ -153,7 +154,7 @@ static void BtlvFingerCursor_Task(TCB *tcb, void *data) {
     BtlvFingerCursor *cursor = data;
 
     if (cursor->actor != NULL && cursor->touched && --cursor->hideWait == 0) {
-        func_0204c124(cursor->actor, FALSE);
+        ClActor_SetVisible(cursor->actor, FALSE);
         cursor->touched = FALSE;
     }
 }

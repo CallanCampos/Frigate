@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GOTHORITA",
+    "moves": [ "MOVE_PSYBEAM", "MOVE_CHARGE_BEAM", "MOVE_FUTURE_SIGHT", "MOVE_FAKE_TEARS" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_HARDY",
+    "item": "ITEM_PERSIM_BERRY",
+    "form": 0
+}

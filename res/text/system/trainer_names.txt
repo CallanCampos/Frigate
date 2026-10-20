@@ -1,0 +1,3 @@
+TrainerNames_Text_Empty = \c--
+\from{trainers.name}
+\pad{8e}

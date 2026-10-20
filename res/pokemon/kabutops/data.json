@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Kabutops",
+    "pokedex": {
+        "category": "Shellfish Pokémon",
+        "entry": "It is thought that this Pokémon\ncame onto land because its\nprey adapted to life on land.",
+        "height": "4'03\"",
+        "weight": "89.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Kabutops",
+                "category": "Shellfish Pokémon",
+                "entry": "It is thought that this Pokémon\ncame onto land because its\nprey adapted to life on land.",
+                "height": "4'03\"",
+                "weight": "89.3 lbs."
+            },
+            "fr": {
+                "name": "Kabutops",
+                "category": "Pokémon Carapace",
+                "entry": "On pense que ce Pokémon est\nvenu sur la terre ferme pour\nsuivre l'évolution de ses proies.",
+                "height": "1,3 m",
+                "weight": "40,5 kg"
+            },
+            "de": {
+                "name": "Kabutops",
+                "category": "Schaltier",
+                "entry": "Man geht davon aus, dass dieses\nPokémon an Land kam, weil seine Beute\nebenfalls irgendwann an Land lebte.",
+                "height": "1,3 m",
+                "weight": "40,5 kg"
+            },
+            "it": {
+                "name": "Kabutops",
+                "category": "Pokémon Crostaceo",
+                "entry": "Pokémon probabilmente giunto sulla\nterraferma perché le sue prede si\nerano adattate a vivere lì.",
+                "height": "1,3 m",
+                "weight": "40,5 kg"
+            },
+            "ko": {
+                "name": "투구푸스",
+                "category": "껍질포켓몬",
+                "entry": "투구푸스의 먹이가 육상 생활을\n시작했기 때문에 투구푸스 역시\n육지에 올라온 것으로 추측된다.",
+                "height": "1.3 m",
+                "weight": "40.5 kg"
+            },
+            "es": {
+                "name": "Kabutops",
+                "category": "Pokémon Marisco",
+                "entry": "Se cree que este Pokémon cambió de\nhábitat y pasó del mar a la tierra\nbuscando nuevas presas.",
+                "height": "1,3 m",
+                "weight": "40,5 kg"
+            },
+            "ja": {
+                "name": "カブトプス",
+                "category": "こうらポケモン",
+                "entry": "えものが\\x{3000}りくじょうせいかつを\nはじめたため\\x{3000}カブトプスも\\x{3000}りくに\nあがったと\\x{3000}かんがえられている。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 115,
+        "defense": 105,
+        "speed": 80,
+        "special_attack": 65,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_ROCK", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_BATTLE_ARMOR" ],
+    "hidden_ability": "ABILITY_WEAK_ARMOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 13,
+    "weight": 405,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FEINT" ],
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 1, "MOVE_ABSORB" ],
+            [ 1, "MOVE_LEER" ],
+            [ 6, "MOVE_ABSORB" ],
+            [ 11, "MOVE_LEER" ],
+            [ 16, "MOVE_MUD_SHOT" ],
+            [ 21, "MOVE_SAND_ATTACK" ],
+            [ 26, "MOVE_ENDURE" ],
+            [ 31, "MOVE_AQUA_JET" ],
+            [ 36, "MOVE_MEGA_DRAIN" ],
+            [ 40, "MOVE_SLASH" ],
+            [ 45, "MOVE_METAL_SOUND" ],
+            [ 54, "MOVE_ANCIENT_POWER" ],
+            [ 63, "MOVE_WRING_OUT" ],
+            [ 72, "MOVE_NIGHT_SLASH" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM55",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM75",
+            "TM80",
+            "TM81",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_LOW_KICK",
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_KABUTO",
+    "cry_volume": 110
+}

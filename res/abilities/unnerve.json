@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Unnerve",
+    "description": "Makes the foe nervous and\nunable to eat Berries."
+}

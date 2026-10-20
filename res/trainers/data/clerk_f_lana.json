@@ -1,0 +1,64 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lana",
+    "class": "TRAINER_CLASS_CLERK_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WEAVILE",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_BRICK_BREAK", "MOVE_SWORDS_DANCE", "MOVE_ICE_SHARD" ]
+        },
+        {
+            "species": "SPECIES_CRYOGONAL",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_BLIZZARD", "MOVE_SHEER_COLD", "MOVE_CONFUSE_RAY", "MOVE_ACID_ARMOR" ]
+        },
+        {
+            "species": "SPECIES_VANILLUXE",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_BLIZZARD", "MOVE_SHEER_COLD", "MOVE_HAIL", "MOVE_EXPLOSION" ]
+        },
+        {
+            "species": "SPECIES_MAMOSWINE",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_BLIZZARD", "MOVE_EARTHQUAKE", "MOVE_STONE_EDGE", "MOVE_ICE_SHARD" ]
+        },
+        {
+            "species": "SPECIES_LAPRAS",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_BLIZZARD", "MOVE_SURF", "MOVE_HYDRO_PUMP", "MOVE_ICE_SHARD" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "What... Can it be that love is even stronger\nthan hatred?"
+        }
+    ]
+}

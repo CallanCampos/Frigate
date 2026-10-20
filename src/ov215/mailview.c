@@ -29,9 +29,8 @@
 // The mail screen's graphics (overlay 215's mailview.c): its BGs, palettes, windows, buttons and the mail's text,
 // loaded a step at a time by MailView_Load. The names are ours
 
-// The mail graphics' archive, which no header names yet. A design's files are its palette, its characters
+// The files of a design in ARCID_MAILBOX, the mail graphics' archive: its palette, its characters
 // MAIL_FILE_CHAR_BASE files on, and its screen MAIL_FILE_SCREEN_BASE files on
-#define ARCID_MAIL 0x99
 #define MAIL_FILE_CHAR_BASE 12
 #define MAIL_FILE_SCREEN_BASE 24
 // The screen of the buttons, with the write phase's frame
@@ -116,17 +115,17 @@ BOOL MailView_Unload(MailSysWork *work) {
 }
 
 static void MailView_CreatePMSDraw(MailSysWork *work) {
-    work->pmsQueue = func_02021998(work->heapId);
-    work->pmsClUnit = func_0204bf1c(8, 1, work->heapId);
+    work->pmsQueue = PrintQueue_CreateDefault(work->heapId);
+    work->pmsClUnit = ClActUnit_Create(8, 1, work->heapId);
     work->pmsDraw = PMSDraw_Create(work->pmsClUnit, 0, work->pmsQueue, work->font, 0, 4, work->heapId);
     PMSDraw_SetBackColor(work->pmsDraw, 0);
 }
 
 static void MailView_DeletePMSDraw(MailSysWork *work) {
     PMSDraw_Delete(work->pmsDraw);
-    func_02021a18(work->pmsQueue);
+    PrintQueue_Free(work->pmsQueue);
     work->pmsQueue = NULL;
-    func_0204bf98(work->pmsClUnit);
+    ClActUnit_Delete(work->pmsClUnit);
 }
 
 static void MailView_SetVRAMBanks(MailSysWork *work) {
@@ -179,7 +178,7 @@ static void MailView_ReleaseBGs(MailSysWork *work) {
 
 static void MailView_LoadGraphics(MailSysWork *work) {
     u32 design = work->edit->design;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAIL, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAILBOX, work->heapId);
 
     LoadSysMsgBox(0, 1, 4, 0, work->heapId);
     LoadSysMsgBox(0, 13, 6, 0, work->heapId);
@@ -199,7 +198,7 @@ static void MailView_LoadGraphics(MailSysWork *work) {
     PaletteFade_LoadNCLR(work->palFade, ARCID_FONT, 5, work->heapId, 0, 0x20, 0x50);
     PaletteFade_LoadNCLR(work->palFade, ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(0), work->heapId, 0, 0x20, 0x40);
     PaletteFade_LoadNCLR(work->palFade, ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(1), work->heapId, 0, 0x20, 0x60);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_ArcToolFree(arc);
     GFL_BGSysFillScrArea(4, 0x2001, 0, 0, 32, 32, 0x11);
     GFL_BGSysQueueScrLoad(4);
@@ -207,7 +206,7 @@ static void MailView_LoadGraphics(MailSysWork *work) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
     if (work->phase != MAIL_PHASE_VIEW) {
-        arc = GFL_ArcSysCreateFileHandle(ARCID_MAIL, work->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_MAILBOX, work->heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, MAIL_FILE_WRITE_SCREEN, 2, 0, screenSize, TRUE, work->heapId);
         GFL_ArcToolFree(arc);
         work->onKeyMode = MailSys_OnKeyMode;
@@ -241,7 +240,7 @@ static void MailView_CreateWindows(MailSysWork *work) {
         work->entries[i].win = work->windows[i];
         work->entries[i].drawn = FALSE;
     }
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     for (i = 0; i < 7; i++) {
         GFL_BitmapFill(BmpWin_GetBitmap(work->windows[i]), 0);
         if (i < 5) {
@@ -272,7 +271,7 @@ static void MailView_DeleteWindows(MailSysWork *work) {
         GFL_StrBufFree(work->buttonItems[0].str);
         GFL_StrBufFree(work->buttonItems[1].str);
     }
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     work->printQueue = NULL;
     for (i = 0; i < 7; i++) {
         BmpWin_ClearScreenNow(work->windows[i]);
@@ -298,8 +297,8 @@ static void MailView_PrintMail(MailSysWork *work) {
     if (work->phase == MAIL_PHASE_VIEW) {
         PrintQueue *queue = work->printQueue;
 
-        func_02021c7c(queue, BmpWin_GetBitmap(work->entries[5].win), 0, 2, work->edit->name, work->font,
-                      PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(queue, BmpWin_GetBitmap(work->entries[5].win), 0, 2, work->edit->name, work->font,
+                              PRINT_COLOR(1, 2, 0));
         work->entries[5].drawn = TRUE;
         BmpWin_TransferNow(work->windows[5]);
     }
@@ -307,16 +306,16 @@ static void MailView_PrintMail(MailSysWork *work) {
 
 static void MailView_CreateClAct(MailSysWork *work) {
     ClActSys_Create(&data_02093f08, &MailSys_VRAMConfig, work->heapId);
-    work->clUnit = func_0204bf1c(4, 0, work->heapId);
-    func_0204c028(work->clUnit);
+    work->clUnit = ClActUnit_Create(4, 0, work->heapId);
+    ClActUnit_UseSystemRenderer(work->clUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
 }
 
 // The counterpart of MailView_CreateClAct, which the ROM places after it (0x021a8d58). Whether it belongs to this file
 // or starts mb_seq.c is a guess: it frees what MailView_CreateClAct made
 static void MailView_DeleteClAct(MailSysWork *work) {
-    func_0204bf98(work->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(work->clUnit);
+    ClActSys_Delete();
 }

@@ -87,7 +87,7 @@ ThAwardGraphic *ThAwardGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     ThAwardBG_Init(&graphic->bg, heapId);
     ThAwardClAct_Init(&graphic->clact, &sThAwardVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(ThAwardGraphic_VBlank, graphic, 0);
@@ -98,7 +98,7 @@ void ThAwardGraphic_Free(ThAwardGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     ThAwardClAct_Free(&graphic->clact);
     ThAwardBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -158,24 +158,24 @@ static void ThAwardBG_VBlank(ThAwardBG *bg) {
 static void ThAwardClAct_Init(ThAwardClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(ThAwardClAct));
     ClActSys_Create(&sThAwardClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void ThAwardClAct_Free(ThAwardClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(ThAwardClAct));
 }
 
 static void ThAwardClAct_Update(ThAwardClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void ThAwardClAct_VBlank(ThAwardClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *ThAwardClAct_GetUnit(ThAwardClAct *clact) {

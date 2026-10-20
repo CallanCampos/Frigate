@@ -1,0 +1,43 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_PSYCHIC_F",
+            "movement": 3,
+            "type": 1,
+            "flag": 0,
+            "script": 3391,
+            "direction": "DIR_UP",
+            "params": [ 3, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 7,
+                "z": 6,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_STRANGE_HOUSE_6",
+            "warp": 3,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 104,
+                "y": 0,
+                "z": 216,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

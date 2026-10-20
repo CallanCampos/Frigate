@@ -30,8 +30,8 @@ static inline void GFL_STD_MemCopy(const void *src, void *dest, u32 size) {
     MI_CpuCopy8(src, dest, size);
 }
 
-static void func_020076d0(void);
-static void func_020076f8(void);
+static void SaveControl_ClearOutsideGifts(void);
+static void SaveControl_ClearOutsideKeys(void);
 
 static SaveControl *SaveControlWork;
 
@@ -52,7 +52,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     ctrl->memoryLink = GFL_HeapAllocate(heapId, sizeof(MemoryLinkSave), TRUE, "save_control.c", 87);
     zero476Bytes(ctrl->memoryLink);
 
-    result = func_0203ae4c(ctrl->sv, HEAPID_USER);
+    result = SaveData_Load(ctrl->sv, HEAPID_USER);
     if ((result == SAVE_LOAD_RESULT_OK || result == SAVE_LOAD_RESULT_OK_PARTIAL) && func_02008df4(ctrl) == TRUE) {
         result = SAVE_LOAD_RESULT_NONE;
     }
@@ -68,8 +68,8 @@ SaveControl *SaveControl_Create(HeapID heapId) {
             ctrl->errors |= SAVE_CONTROL_ERROR_PARTIAL;
         }
         for (i = SAVE_EXTRA_ID_BATTLE_REC_0; i < SAVE_EXTRA_ID_MAX; i++) {
-            if (func_02008e24(ctrl, i) == TRUE) {
-                extraResult = func_020074ec(ctrl, i, HEAPID_USER);
+            if (TrainerDataSave_IsMarkerSet(ctrl, i) == TRUE) {
+                extraResult = SaveControl_OpenExtraBlock(ctrl, i, HEAPID_USER);
                 freeIntermediateSaveExtraBlksAfterLoad(ctrl, i);
                 switch (extraResult) {
                 case SAVE_LOAD_RESULT_OK:
@@ -112,7 +112,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     ctrl->keysBroken = SaveOutside_IsKeysBroken(outside);
     keyData = SaveOutside_GetKeyData(outside);
     if (ctrl->keysLoaded && !ctrl->keysBroken) {
-        GFL_STD_MemCopy(func_02010470(keyData), ctrl->memoryLink, sizeof(MemoryLinkSave));
+        GFL_STD_MemCopy(KeySystemData_GetMemoryLink(keyData), ctrl->memoryLink, sizeof(MemoryLinkSave));
     }
     SaveOutside_Free(outside);
     GFL_OvlUnload(OVERLAY_SAVE_OUTSIDE);
@@ -123,7 +123,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
         ctrl->errors |= SAVE_CONTROL_ERROR_KEYS_BROKEN;
     }
 
-    if (!func_020115a8(HEAPID_TAIL(HEAPID_USER)) || ctrl->newGame == TRUE || !ctrl->dataExists) {
+    if (!DreamRadar_LoadAndCheckSaveData(HEAPID_TAIL(HEAPID_USER)) || ctrl->newGame == TRUE || !ctrl->dataExists) {
         ctrl->unk8 = TRUE;
     } else {
         ctrl->unk8 = FALSE;
@@ -145,21 +145,21 @@ SaveControl *SaveControl_GetInstance(void) {
     return SaveControlWork;
 }
 
-u32 func_02007324(SaveControl *save) {
+u32 SaveControl_Reload(SaveControl *save) {
     u32 result;
     u32 extraResult;
     MusicalSave *musical;
     SaveExtraID i;
 
-    result = func_0203ae4c(save->sv, HEAPID_USER);
+    result = SaveData_Load(save->sv, HEAPID_USER);
     switch (result) {
     case SAVE_LOAD_RESULT_OK:
     case SAVE_LOAD_RESULT_OK_PARTIAL:
         save->dataExists = TRUE;
         musical = getAddressOfMusicalDataInfo(save);
         func_0200af08(musical, FALSE);
-        if (func_02008e24(save, SAVE_EXTRA_ID_MUSICAL_DIST) == TRUE) {
-            extraResult = func_020074ec(save, SAVE_EXTRA_ID_MUSICAL_DIST, HEAPID_USER);
+        if (TrainerDataSave_IsMarkerSet(save, SAVE_EXTRA_ID_MUSICAL_DIST) == TRUE) {
+            extraResult = SaveControl_OpenExtraBlock(save, SAVE_EXTRA_ID_MUSICAL_DIST, HEAPID_USER);
             freeIntermediateSaveExtraBlksAfterLoad(save, SAVE_EXTRA_ID_MUSICAL_DIST);
             switch (extraResult) {
             case SAVE_LOAD_RESULT_OK:
@@ -171,7 +171,7 @@ u32 func_02007324(SaveControl *save) {
         if (save->errors != 0) {
             for (i = SAVE_EXTRA_ID_BATTLE_REC_0; i < SAVE_EXTRA_ID_MAX; i++) {
                 if (save->errors & SAVE_CONTROL_ERROR_EXTRA(i)) {
-                    func_02008e60(save, i);
+                    TrainerDataSave_ClearMarker(save, i);
                 }
             }
         }
@@ -180,31 +180,31 @@ u32 func_02007324(SaveControl *save) {
     return result;
 }
 
-void func_020073ac(SaveControl *save) {
+void SaveControl_StartSave(SaveControl *save) {
     save->unk3 = func_02008df4(save);
     func_02008e14(save);
-    func_0203aeb4(save->sv);
+    SaveData_SaveStart(save->sv);
 }
 
-u32 func_020073c4(SaveControl *save) {
+u32 SaveControl_ContinueSave(SaveControl *save) {
     u32 result;
 
     if (save->giftsLoaded == TRUE || save->giftsBroken == TRUE) {
-        func_020076d0();
+        SaveControl_ClearOutsideGifts();
         save->giftsLoaded = FALSE;
         save->giftsBroken = FALSE;
         return SAVE_RESULT_CONTINUE;
     }
     if (save->keysBroken == TRUE) {
-        func_020076f8();
+        SaveControl_ClearOutsideKeys();
         save->keysLoaded = FALSE;
         save->keysBroken = FALSE;
         return SAVE_RESULT_CONTINUE;
     }
-    result = func_0203aecc(save->sv);
+    result = SaveData_SaveStep(save->sv);
     if (result == SAVE_RESULT_OK && func_02008df4(save) == FALSE) {
         if (save->unk8) {
-            func_020115f0(save);
+            DreamRadar_MarkRead(save);
             save->unk8 = FALSE;
         }
         save->newGame = FALSE;
@@ -213,30 +213,30 @@ u32 func_020073c4(SaveControl *save) {
     return result;
 }
 
-void func_02007424(SaveControl *save) {
-    func_0203af00(save->sv);
+void SaveControl_CancelSave(SaveControl *save) {
+    SaveData_SaveCancel(save->sv);
     if (save->unk3 == TRUE) {
         func_02008e04(save);
     }
 }
 
-u32 func_0200743c(SaveControl *save) {
-    return func_0203b080(save->sv);
+u32 SaveControl_GetBytesWritten(SaveControl *save) {
+    return SaveData_GetBytesWritten(save->sv);
 }
 
 void *SaveControl_GetBlockPtr(SaveControl *save, u32 block) {
     return SaveData_GetBlockPtr(save->sv, block);
 }
 
-void *func_02007454(SaveControl *save, u32 *size) {
-    return func_0203ad7c(save->sv, size);
+void *SaveControl_GetUploadData(SaveControl *save, u32 *size) {
+    return SaveData_GetData(save->sv, size);
 }
 
 u32 SaveControl_GetStatus(SaveControl *save) {
     return save->newGame;
 }
 
-u32 func_02007464(SaveControl *save) {
+u32 SaveControl_GetErrors(SaveControl *save) {
     return save->errors;
 }
 
@@ -251,66 +251,66 @@ BOOL func_0200746c(SaveControl *save) {
     return FALSE;
 }
 
-u8 func_0200748c(SaveControl *save) {
+u8 SaveControl_GetGiftsLoaded(SaveControl *save) {
     return save->giftsLoaded;
 }
 
-void func_02007490(SaveControl *save, u32 value) {
+void SaveControl_SetGiftsLoaded(SaveControl *save, u32 value) {
     save->giftsLoaded = value;
 }
 
-u8 func_02007494(SaveControl *save) {
+u8 SaveControl_GetGiftsBroken(SaveControl *save) {
     return save->giftsBroken;
 }
 
-void func_02007498(SaveControl *save, u32 value) {
+void SaveControl_SetGiftsBroken(SaveControl *save, u32 value) {
     save->giftsBroken = value;
 }
 
-void func_0200749c(SaveControl *save) {
+void SaveControl_InitNewGame(SaveControl *save) {
     save->newGame = TRUE;
     save->unk2 = TRUE;
     initSaveBlkCallbacks(save->sv);
 }
 
 void func_020074ac(SaveControl *save) {
-    func_0203adb4(save->sv, HEAPID_USER);
+    SaveData_Erase(save->sv, HEAPID_USER);
 }
 
 void func_020074b8(SaveControl *save, u32 *a1, u32 *a2) {
-    func_0203adac(save->sv, a1, a2);
+    SaveData_GetChangedSize(save->sv, a1, a2);
 }
 
-BOOL func_020074c4(SaveControl *save, u32 block, u32 copy, void *dest, u32 size) {
-    return func_0203bf48(save->sv, block, copy, dest, size);
+BOOL SaveControl_ReadBlockCopy(SaveControl *save, u32 block, u32 copy, void *dest, u32 size) {
+    return SaveData_ReadBlockFromCard(save->sv, block, copy, dest, size);
 }
 
-void *func_020074d8(SaveControl *save) {
+void *SaveControl_GetMemoryLink(SaveControl *save) {
     return save->memoryLink;
 }
 
-u8 func_020074dc(SaveControl *save) {
+u8 SaveControl_GetKeysLoaded(SaveControl *save) {
     return save->keysLoaded;
 }
 
-void func_020074e0(SaveControl *save, u32 value) {
+void SaveControl_SetKeysLoaded(SaveControl *save, u32 value) {
     save->keysLoaded = value;
 }
 
-u8 func_020074e4(SaveControl *save) {
+u8 SaveControl_GetKeysBroken(SaveControl *save) {
     return save->keysBroken;
 }
 
-void func_020074e8(SaveControl *save, u32 value) {
+void SaveControl_SetKeysBroken(SaveControl *save, u32 value) {
     save->keysBroken = value;
 }
 
-u32 func_020074ec(SaveControl *save, u32 block, HeapID heapId) {
+u32 SaveControl_OpenExtraBlock(SaveControl *save, u32 block, HeapID heapId) {
     save->sv_extra[block] = SaveData_InitMain(&sv_extra_blk_data[block], heapId);
-    if (func_02008e24(save, block) == FALSE) {
+    if (TrainerDataSave_IsMarkerSet(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
     }
-    return func_0203b018(save->sv_extra[block], heapId, *func_02008e74(save, block));
+    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *func_02008e74(save, block));
 }
 
 void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *ctrl, u32 extra_id) {
@@ -319,16 +319,16 @@ void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *ctrl, u32 extra_id) {
     ctrl->sv_extra[extra_id] = NULL;
 }
 
-u32 func_02007560(SaveControl *save, u32 block, HeapID heapId, void *buffer, u32 size) {
-    save->sv_extra[block] = func_0203ad44(&sv_extra_blk_data[block], heapId, buffer, size, TRUE);
-    if (func_02008e24(save, block) == FALSE) {
+u32 SaveControl_LoadExtraBlock(SaveControl *save, u32 block, HeapID heapId, void *buffer, u32 size) {
+    save->sv_extra[block] = SaveData_InitWithBuffer(&sv_extra_blk_data[block], heapId, buffer, size, TRUE);
+    if (TrainerDataSave_IsMarkerSet(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
     }
-    return func_0203b018(save->sv_extra[block], heapId, *func_02008e74(save, block));
+    return SaveData_LoadWithCount(save->sv_extra[block], heapId, *func_02008e74(save, block));
 }
 
-void func_020075b8(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size) {
-    save->sv_extra[block] = func_0203ad44(&sv_extra_blk_data[block], heapId, buffer, size, FALSE);
+void SaveControl_InitExtraBlock(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size) {
+    save->sv_extra[block] = SaveData_InitWithBuffer(&sv_extra_blk_data[block], heapId, buffer, size, FALSE);
 }
 
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *ctrl, u32 extra_id) {
@@ -337,15 +337,15 @@ void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *ctrl, u32 extra_id) {
     ctrl->sv_extra[extra_id] = NULL;
 }
 
-void func_0200760c(SaveControl *ctrl, u32 extra_id) {
+void SaveControl_StartExtraSave(SaveControl *ctrl, u32 extra_id) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
-    func_02008e48(ctrl, extra_id);
-    func_0203af08(ctrl->sv, ctrl->sv_extra[extra_id], func_02008e74(ctrl, extra_id));
+    TrainerDataSave_SetMarker(ctrl, extra_id);
+    SaveData_DualSaveStart(ctrl->sv, ctrl->sv_extra[extra_id], func_02008e74(ctrl, extra_id));
 }
 
-u32 func_0200764c(SaveControl *ctrl, u32 extra_id) {
+u32 SaveControl_ContinueExtraSave(SaveControl *ctrl, u32 extra_id) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
-    return func_0203af18(ctrl->sv, ctrl->sv_extra[extra_id]);
+    return SaveData_DualSaveStep(ctrl->sv, ctrl->sv_extra[extra_id]);
 }
 
 void *getAddressOfExtraSaveBlk(SaveControl *ctrl, u32 extra_id, u32 arg2) {
@@ -353,22 +353,22 @@ void *getAddressOfExtraSaveBlk(SaveControl *ctrl, u32 extra_id, u32 arg2) {
     return SaveData_GetBlockPtr(ctrl->sv_extra[extra_id], arg2);
 }
 
-void func_020076a4(SaveControl *ctrl, u32 extra_id, HeapID heapId) {
+void SaveControl_ClearExtraBlock(SaveControl *ctrl, u32 extra_id, HeapID heapId) {
     GFL_ASSERT(ctrl->sv_extra[extra_id] != NULL);
-    func_0203adb4(ctrl->sv_extra[extra_id], heapId);
+    SaveData_Erase(ctrl->sv_extra[extra_id], heapId);
 }
 
 // Erases the gifts outside the save, by clearing the start of both copies' headers
-static void func_020076d0(void) {
+static void SaveControl_ClearOutsideGifts(void) {
     u32 zero = 0;
 
-    func_0203bee8(SAVE_OUTSIDE_GIFTS_ADDR, &zero, sizeof(zero));
-    func_0203bee8(SAVE_OUTSIDE_GIFTS_BACKUP_ADDR, &zero, sizeof(zero));
+    BackupSystem_WriteWait(SAVE_OUTSIDE_GIFTS_ADDR, &zero, sizeof(zero));
+    BackupSystem_WriteWait(SAVE_OUTSIDE_GIFTS_BACKUP_ADDR, &zero, sizeof(zero));
 }
 
 // Erases the keys outside the save
-static void func_020076f8(void) {
+static void SaveControl_ClearOutsideKeys(void) {
     u32 zero = 0;
 
-    func_0203bee8(SAVE_OUTSIDE_KEYS_ADDR, &zero, sizeof(zero));
+    BackupSystem_WriteWait(SAVE_OUTSIDE_KEYS_ADDR, &zero, sizeof(zero));
 }

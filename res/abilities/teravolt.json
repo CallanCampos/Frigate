@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Teravolt",
+    "description": "Moves can be used\nregardless of Abilities."
+}

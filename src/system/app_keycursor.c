@@ -87,7 +87,7 @@ void KeyCursor_Draw(KeyCursor *cursor, GFLBitmap *bitmap, u16 bgColor) {
 void KeyCursor_Update(KeyCursor *cursor, PrintStream *stream, BmpWin *window) {
     BOOL pressed;
 
-    switch (func_020223b4(stream)) {
+    switch (PrintStream_GetState(stream)) {
     case PRINT_STREAM_DONE:
         if (cursor->showWhenDone == FALSE) {
             cursor->erased = FALSE;
@@ -100,7 +100,7 @@ void KeyCursor_Update(KeyCursor *cursor, PrintStream *stream, BmpWin *window) {
             pressed = GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B);
         }
         if (pressed == FALSE && cursor->touch) {
-            pressed = func_0203da48();
+            pressed = GFL_HIDIsTouchPressed();
         }
 
         if (pressed) {
@@ -126,7 +126,7 @@ BOOL KeyCursor_UpdateWait(KeyCursor *cursor, BmpWin *window) {
         pressed = GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B);
     }
     if (pressed == FALSE && cursor->touch) {
-        pressed = func_0203da48();
+        pressed = GFL_HIDIsTouchPressed();
     }
 
     if (pressed) {

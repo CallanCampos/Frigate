@@ -6,6 +6,7 @@
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_lens_flare.h"
+#include "field/field_msgbg.h"
 #include "field/fld_exp_obj.h"
 #include "field/zone.h"
 #include "gfl/bg_sys.h"
@@ -36,8 +37,6 @@ typedef struct {
 u32 func_ov036_021b88cc(u32 type);
 u32 func_ov036_021b88fc(u32 from, u32 to);
 u32 func_ov036_021b892c(u32 from, u32 to);
-GameEvent *func_ov036_021b8800(GameSystem *gsys, Field *field, u8 startSeason, u8 endSeason,
-                               EventSeasonBannerCallback callback, void *callbackArg);
 GameEvent *func_ov036_021b895c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
 GameEvent *func_ov036_021b899c(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
 GameEvent *func_ov036_021b89dc(GameSystem *gsys, Field *field);
@@ -437,7 +436,7 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
         reg_GX_DISPCAPCNT = 0x80330010;
         OS_WaitVBlankIntr();
         OS_WaitVBlankIntr();
-        config = data_ov036_021d1624;
+        config = gEnterBuildingLCDConfig;
         GFL_BGSysSetLCDConfig(&config);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x4084;
         GX_SetBankForBG(8);
@@ -474,7 +473,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         MIi_CpuClearFast(0, (void *)0x6800000, 0x20000);
         GX_DisableBankForLCDC();
         GX_SetBankForBG(8);
-        func_ov012_02160e88();
+        resetBuildingEnterVBlankCallback();
         (*state)++;
         break;
     case 2:

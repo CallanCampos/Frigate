@@ -61,4 +61,10 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
 - A header comment that cites the algorithm's reference implementation (md5.c's RFC 1321 FF/GG/HH/II) or denies
   copying, instead of saying it was written from the asm.
 - A `static asm` function not guarded from clang-format (crypt.c's were mangled into one line).
-- A goto used as an early return (`goto end` in DS Protect's checks) — but a shared cleanup, error or retry label is fine.
+- A goto used as an early return — but a shared cleanup, error or retry label is fine, and so is a labelled tail block that does real work for
+  several paths (`goto TRANS_NONINTERP` in `nsbca.c`), or a goto that another decompilation of the same library also
+  writes, marked `// style-ok: goto-return` with that evidence (DS Protect's `goto end` in its emulator checks, as pret's
+  pokeheartgold `mac_owner.c` jumps to `EXIT`; the user's ruling of 2026-10-19).
+- A `static inline` written to `return` from inside a loop so that the caller jumps to its shared tail, the forbidden
+  goto under another name, with parameters for each caller's codes (`DSProt_CheckMacZero(args, mac, setCode, flag,
+  zeroCode)` for DS Protect's MAC loop, PR #395).

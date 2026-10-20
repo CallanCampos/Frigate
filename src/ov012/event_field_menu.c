@@ -1,3 +1,5 @@
+// The field menu's event (a descriptive name), which opens the app chosen on the touch screen's menu. Names from
+// swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -14,6 +16,11 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+static u32 FieldMenu_GetAppId(u32 index);
+static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg);
+static BOOL FieldMenu_CanLeaveField(FieldAppCallInput *input, void *arg);
+static BOOL FieldMenu_OnAppEnd(FieldAppCallInput *input, void *arg);
+
 GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     FieldSubscreen *subscreen = Field_GetSubscreen(field);
     GameEvent *event = GameEvent_Create(gsys, NULL, EventFieldMenu_Callback, sizeof(FieldMenuWork));
@@ -29,9 +36,9 @@ GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     work->appCall.gameSystem = gsys;
     work->appCall.field = field;
     work->appCall.parent = event;
-    work->appCall.canRetry = func_ov012_0215aa74;
-    work->appCall.callback1 = func_ov012_0215aa90;
-    work->appCall.callback2 = func_ov012_0215aa94;
+    work->appCall.canRetry = FieldMenu_CanRetry;
+    work->appCall.callback1 = FieldMenu_CanLeaveField;
+    work->appCall.callback2 = FieldMenu_OnAppEnd;
     work->appCall.arg = work;
     work->appCall.appParam = -1;
     screenId = FieldSubscreen_GetScreenID(subscreen);
@@ -47,7 +54,7 @@ GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
         break;
     }
     work->appCall.screenId = work->screenId;
-    func_0203d564(TRUE);
+    GCTX_HIDSetUsingTouch(TRUE);
     return event;
 }
 
@@ -89,10 +96,10 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         returnSubscreen = FieldSubscreen_GetReturnSubscreen(Field_GetSubscreen(work->field));
         if (returnSubscreen == 3) {
             work->state = 2;
-            func_ov036_021984e4(Field_GetSubscreen(work->field));
+            FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         } else if (returnSubscreen == 4) {
             work->state = 3;
-            func_ov036_021984e4(Field_GetSubscreen(work->field));
+            FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         }
         break;
     case 2:
@@ -100,7 +107,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         selection = func_ov036_02198854(Field_GetSubscreen(work->field));
         func_020173f8(gameData, selection);
         work->unk10 = func_ov036_02198854(Field_GetSubscreen(work->field));
-        work->appCall.appId = func_ov012_0215aa68(selection);
+        work->appCall.appId = FieldMenu_GetAppId(selection);
         work->state = 5;
         break;
     case 3:
@@ -114,7 +121,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
     case 4:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(GSYS_GetField(work->gameSystem), &action);
-        func_ov012_02159418(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
+        HiddenEventArgs_Set(&args, work->appCall.partySlot, work->appCall.eventId, work->appCall.eventValue);
         next = CreateHidenEvent(work->appCall.eventId, &args, &action);
         if (next == NULL) {
             return GAMEEVENT_DONE;
@@ -156,4 +163,58 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         break;
     }
     return GAMEEVENT_CONTINUE;
+}
+
+// The app each item of the field menu opens, an index of FIELD_PROC_LINK_LIST, or -1 for none
+static const s32 sFieldMenuAppIds[9] = {
+    -1,
+    FIELD_APP_POKELIST,
+    FIELD_APP_ZUKAN,
+    FIELD_APP_BAG,
+    FIELD_APP_TRAINER_CARD,
+    FIELD_APP_SAVE,
+    FIELD_APP_CONFIG,
+    -1,
+    FIELD_APP_INF_DUNGEON_RETIRE,
+};
+
+static u32 FieldMenu_GetAppId(u32 index) {
+    return sFieldMenuAppIds[index];
+}
+
+static BOOL FieldMenu_CanRetry(FieldAppCallInput *input, void *arg) {
+    FieldMenuWork *menu = arg;
+    FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
+
+    if (input->eventType == 0) {
+        func_ov036_0219886c(subscreen, menu->unk10);
+    }
+    return TRUE;
+}
+
+static BOOL FieldMenu_CanLeaveField(FieldAppCallInput *input, void *arg) {
+    return TRUE;
+}
+
+static BOOL FieldMenu_OnAppEnd(FieldAppCallInput *input, void *arg) {
+    FieldMenuWork *menu = arg;
+    GameData *gameData = GSYS_GetGameData(menu->gameSystem);
+
+    switch (input->eventType) {
+    case 4:
+        GameData_SetLastSubscreen(gameData, 6);
+        break;
+    case 0:
+        GameData_SetLastSubscreen(gameData, 1);
+        break;
+    case 5:
+        GameData_SetLastSubscreen(gameData, 0);
+        break;
+    case 1:
+    case 2:
+    case 3:
+        GameData_SetLastSubscreen(gameData, menu->screenId);
+        break;
+    }
+    return TRUE;
 }

@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": "AREA_GIANT_CHASM_2",
+    "matrix": "MAP_MATRIX_UNDERGROUND_RUINS_2",
+    "scripts": "SCRIPTS_UNDERGROUND_RUINS_2",
+    "text": "SCRIPT_TEXT_UNDERGROUND_RUINS_2",
+    "bgm": "SEQ_BGM_SW_D_REGI",
+    "encounters": "ENCOUNTERS_UNDERGROUND_RUINS_2",
+    "enc_slot": 6,
+    "parent": "ZONE_CLAY_TUNNEL",
+    "place": "PLACE_UNDERGROUND_RUINS",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 4,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

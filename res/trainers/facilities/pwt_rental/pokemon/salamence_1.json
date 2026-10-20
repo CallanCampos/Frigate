@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SALAMENCE",
+    "moves": [ "MOVE_ROOST", "MOVE_SCARY_FACE", "MOVE_DRAGON_TAIL", "MOVE_EARTHQUAKE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_NAUGHTY",
+    "item": "ITEM_YACHE_BERRY",
+    "form": 0
+}

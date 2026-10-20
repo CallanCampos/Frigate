@@ -9,6 +9,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "field/fld_btl_inst_event.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"
@@ -42,13 +43,13 @@ typedef struct {
     u32 unk18;
 } BtlInstTrainerMsgWork;
 
-static GameEventReturnCode func_ov012_02161d54(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode func_ov012_02161f18(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventBtlInstPokeSelect_Callback(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventBtlInstTrainerMsg_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEvent *func_ov012_02161c88(GameSystem *gsys, u32 a1, u32 mode, u32 regulationId, PokeParty *party, u8 *picked,
-                               u32 *choice, u32 *result, PokeParty *entered) {
+GameEvent *EventBtlInstPokeSelect_Create(GameSystem *gsys, u32 a1, u32 mode, u32 regulationId, PokeParty *party,
+                                         u8 *picked, u32 *choice, u32 *result, PokeParty *entered) {
     Field *field = GSYS_GetField(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02161d54, sizeof(BtlInstPokeSelectWork));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventBtlInstPokeSelect_Callback, sizeof(BtlInstPokeSelectWork));
     BtlInstPokeSelectWork *work = GameEvent_GetData(event);
     PokeListParam *partyParam;
     PStatusParam *summaryParam;
@@ -81,7 +82,7 @@ GameEvent *func_ov012_02161c88(GameSystem *gsys, u32 a1, u32 mode, u32 regulatio
     return event;
 }
 
-static GameEventReturnCode func_ov012_02161d54(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventBtlInstPokeSelect_Callback(GameEvent *event, u32 *state, void *data) {
     BtlInstPokeSelectWork *work = data;
     GameSystem *gsys = work->gsys;
     int i, count;
@@ -127,13 +128,13 @@ static GameEventReturnCode func_ov012_02161d54(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov012_02161e6c(GameSystem *gsys, BSubwayTrainer *trainers, u32 index, u16 actorId) {
+GameEvent *EventBtlInstTrainerMsg_Create(GameSystem *gsys, BSubwayTrainer *trainers, u32 index, u16 actorId) {
     GameEvent *event;
     GameData *gameData = GSYS_GetGameData(gsys);
     void *msgBGSys = Field_GetMsgBGSys(GSYS_GetField(gsys));
     BtlInstTrainerMsgWork *work;
 
-    event = GameEvent_Create(gsys, NULL, func_ov012_02161f18, sizeof(BtlInstTrainerMsgWork));
+    event = GameEvent_Create(gsys, NULL, EventBtlInstTrainerMsg_Callback, sizeof(BtlInstTrainerMsgWork));
     work = GameEvent_GetData(event);
     work->gsys = gsys;
     if (trainers->message.type == 0xffff) {
@@ -152,7 +153,7 @@ GameEvent *func_ov012_02161e6c(GameSystem *gsys, BSubwayTrainer *trainers, u32 i
     return event;
 }
 
-static GameEventReturnCode func_ov012_02161f18(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventBtlInstTrainerMsg_Callback(GameEvent *event, u32 *state, void *data) {
     BtlInstTrainerMsgWork *work = data;
 
     switch (*state) {

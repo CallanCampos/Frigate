@@ -98,7 +98,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         EventGameClear_NextState(work, state);
         break;
     case 11:
-        if (!func_020104c4(getKeyInfoSaveBlk(save), work->unovaLinkParam.key)) {
+        if (!KeyInfo_IsKeyUnlocked(getKeyInfoSaveBlk(save), work->unovaLinkParam.key)) {
             GSYS_QueueProcAsEvent(event, OVERLAY_ID(332), &UNOVA_LINK_PROC_FUNCTIONS, &work->unovaLinkParam);
         }
         EventGameClear_NextState(work, state);
@@ -116,7 +116,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         break;
     case 14:
         GSYS_QueueProcAsEvent(event, OVERLAY_THE_END, &THE_END_PROC_FUNCTIONS, &work->ov267Param);
-        func_02016b40(gsys, 0);
+        GSYS_SetCGearOn(gsys, 0);
         EventGameClear_NextState(work, state);
         break;
     case 15:
@@ -174,7 +174,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
             break;
         }
         if (GFL_SndBGMIsPlaying() == TRUE) {
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
         }
         EventGameClear_NextState(work, state);
         break;
@@ -201,7 +201,7 @@ GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param) {
     work->ov295Param.param = param;
     func_ov012_02159220(gameData);
     SetGameClearGameData(work);
-    func_ov012_0215a50c(work);
+    SetGameClearStaffRollParam(work);
     work->unovaLinkParam.gameData = gameData;
     work->unovaLinkParam.mode = UNOVA_LINK_MODE_GAME_CLEAR;
 #ifdef BLACK2
@@ -216,15 +216,15 @@ GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param) {
 void SetGameClearGameData(GameClearWork *work) {
     work->ov265Param.party = GameData_GetParty(work->gameData);
     work->ov265Param.playerInfo = GetGameDataPlayerInfo(work->gameData);
-    work->ov265Param.playTime = func_02017a40(work->gameData);
+    work->ov265Param.playTime = GameData_GetPlayTime(work->gameData);
 }
 
-void func_ov012_0215a50c(GameClearWork *work) {
+void SetGameClearStaffRollParam(GameClearWork *work) {
     u32 value;
 
     work->staffRollParam.skippable = work->unk08 == 1;
     work->staffRollParam.playerInfo = GetGameDataPlayerInfo(work->gameData);
-    value = func_02008a84((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(work->gameData)));
+    value = Config_GetKanji((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(work->gameData)));
     work->staffRollParam.unk04 = value;
     work->ov267Param.unk00 = value;
 }

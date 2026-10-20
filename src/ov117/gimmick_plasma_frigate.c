@@ -512,7 +512,7 @@ static void GimmickPlasmaFrigate_InitModel(FieldExpObjSystem *expObj, u16 model,
     matrix->translation.x = pos.x;
     matrix->translation.y = y;
     matrix->translation.z = z;
-    func_ov036_021b8248(expObj, 0, model, 1);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 1);
     FieldExpObj_SetActorHidden(expObj, 0, model, FALSE);
     for (i = 0; i < animCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);
@@ -579,7 +579,7 @@ static void GimmickPlasmaFrigate_ShowPanelOff(PlasmaFrigateWork *work, u16 model
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 0);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 0, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, FieldExpObjAnm_GetLastFrame(anm));
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 1);
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 2);
 }
@@ -591,7 +591,7 @@ static void GimmickPlasmaFrigate_ShowPanelOn(PlasmaFrigateWork *work, u16 model)
     u16 linkedModel;
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 2, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 2, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 2, FieldExpObjAnm_GetLastFrame(anm));
     if (GimmickPlasmaFrigate_IsPanelListed(model) == TRUE) {
         linkedModel = 0;
         if (GimmickPlasmaFrigate_FindLinkedModel(work, model, &linkedModel) == FALSE) {
@@ -601,7 +601,7 @@ static void GimmickPlasmaFrigate_ShowPanelOn(PlasmaFrigateWork *work, u16 model)
     if (showLit == TRUE) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 1);
         FieldExpObj_SetAnm(work->expObj, 0, model, 1, TRUE);
-        FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, FieldExpObjAnm_GetLastFrame(anm));
     }
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 0);
 }
@@ -626,7 +626,7 @@ static void GimmickPlasmaFrigate_ShowFirstEnd(PlasmaFrigateWork *work, u16 index
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 0);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 0, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, FieldExpObjAnm_GetLastFrame(anm));
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 1);
 }
 
@@ -636,7 +636,7 @@ static void GimmickPlasmaFrigate_ShowSecondEnd(PlasmaFrigateWork *work, u16 inde
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 1);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 1, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, FieldExpObjAnm_GetLastFrame(anm));
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 0);
 }
 
@@ -650,7 +650,7 @@ static void GimmickPlasmaFrigate_ShowGroupASecondEnd(PlasmaFrigateWork *work, u1
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 1);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 1, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, FieldExpObjAnm_GetLastFrame(anm));
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 0);
 }
 
@@ -674,7 +674,7 @@ static void GimmickPlasmaFrigate_ShowGroupBFirstEnd(PlasmaFrigateWork *work, u16
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 0);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 0, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 0, FieldExpObjAnm_GetLastFrame(anm));
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 1);
 }
 
@@ -683,7 +683,7 @@ static void GimmickPlasmaFrigate_ShowGroupBSecondEnd(PlasmaFrigateWork *work, u1
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, 1);
 
     FieldExpObj_SetAnm(work->expObj, 0, model, 1, TRUE);
-    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, func_ov036_021b8580(anm));
+    FieldExpObj_SetAnmFrame(work->expObj, 0, model, 1, FieldExpObjAnm_GetLastFrame(anm));
     GimmickPlasmaFrigate_StopAnimation(work->expObj, model, 0);
 }
 

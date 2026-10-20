@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_DRIFTVEIL_DRAWBRIDGE",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 103,
+        "y": 89
+    },
+    "cursor": {
+        "x": 103,
+        "y": 89
+    },
+    "hit": {
+        "start": {
+            "x": 103,
+            "y": 85
+        },
+        "end": {
+            "x": 103,
+            "y": 93
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_DrawbridgeRaisesLowersDepending",
+    "landmarks": [],
+    "area": {
+        "animation": 13,
+        "x": 81,
+        "y": 86
+    }
+}

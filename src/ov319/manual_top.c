@@ -165,7 +165,7 @@ static void ManualTop_CreateMenu(ManualTop *top) {
         top->wins[i] = AppTaskMenuWin_Create(top->res, &items[i], 1, (i + 1) * 3, 30, top->common->heapId);
         GFL_StrBufFree(items[i].str);
     }
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         AppTaskMenuWin_SetActive(top->wins[top->param->cursor], TRUE);
     }
 }
@@ -181,7 +181,7 @@ static void ManualTop_FreeGraphics(ManualTop *top) {
 static void ManualTop_FreeMenu(ManualTop *top) {
     u8 i;
 
-    func_02021c44(top->common->queue);
+    PrintQueue_Clear(top->common->queue);
     for (i = 0; i < BUTTON_COUNT; i++) {
         AppTaskMenuWin_Free(top->wins[i]);
     }
@@ -191,22 +191,22 @@ static void ManualTop_FreeMenu(ManualTop *top) {
 
 // Moves the cursor with the keys, or picks a button by touch. Returns whether a button was picked
 static BOOL ManualTop_UpdateCursor(ManualTop *top) {
-    s32 touched = func_0203da0c(sManualTopTouchRects);
+    s32 touched = GFL_HIDGetTouchPressedRect(sManualTopTouchRects);
 
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         if (touched >= 0 && touched <= BUTTON_COUNT - 1) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             AppTaskMenuWin_SetActive(top->wins[top->param->cursor], FALSE);
         }
     } else if (GCTX_HIDGetPressedKeys() != 0) {
         if (!(GCTX_HIDGetPressedKeys() & (PAD_BUTTON_B | PAD_BUTTON_X))) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             AppTaskMenuWin_SetActive(top->wins[top->param->cursor], TRUE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             return FALSE;
         }
     }
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             AppTaskMenuWin_SetFlashing(top->wins[top->param->cursor], TRUE);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);

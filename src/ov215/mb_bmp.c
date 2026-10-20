@@ -62,7 +62,7 @@ void MailBox_CreateWindows(MailBoxWork *work) {
     BmpWin_InitAllocator(HEAPID_MAILBOX_VIEW);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_MAILBOX_VIEW);
     work->view->tcbManager = GFL_TCBExMgrCreate(HEAPID_MAILBOX_VIEW, HEAPID_MAILBOX_VIEW, 32, 32);
-    work->view->printQueue = func_02021998(HEAPID_MAILBOX_VIEW);
+    work->view->printQueue = PrintQueue_CreateDefault(HEAPID_MAILBOX_VIEW);
     for (i = 0; i < MAILBOX_WINDOW_COUNT; i++) {
         const MailBoxWindowTemplate *template = &sWindowTemplates[i];
 
@@ -87,7 +87,7 @@ void MailBox_CreateWindows(MailBoxWork *work) {
 void MailBox_FreeWindows(MailBoxWork *work) {
     u32 i;
 
-    func_02021a18(work->view->printQueue);
+    PrintQueue_Free(work->view->printQueue);
     GFL_TCBExMgrFree(work->view->tcbManager);
     for (i = 0; i < MAILBOX_WINDOW_COUNT; i++) {
         BmpWin_Free(work->view->windows[i]);
@@ -108,7 +108,7 @@ static void MailBox_PrintString(BmpWin *window, StrBuf *str, MailBoxPrintState *
     } else if (align == MAILBOX_ALIGN_CENTER) {
         x -= GFL_FontGetBlockWidth(str, font, 0) / 2;
     }
-    func_02021c7c(queue, BmpWin_GetBitmap(state->window), x, y, str, font, color);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(state->window), x, y, str, font, color);
     state->printing = TRUE;
 }
 
@@ -136,13 +136,13 @@ void MailBox_DrawMailFrame(MailBoxWork *work, u32 frame, u32 windowIndex, u32 ma
     printState = &work->view->printStates[windowIndex];
     GFL_BitmapFill(tileA, 4);
     GFL_BitmapFill(tileB, 4);
-    GFL_StrBufLoadString(work->view->strbuf, func_02009734(mail));
+    GFL_StrBufLoadString(work->view->strbuf, MailData_GetTrainerName(mail));
     for (i = 0; i < 8; i++) {
         GFL_BitmapCopyArea(BmpWin_GetBitmap(window), tileA, 0, 0, i * 8, 0, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
         GFL_BitmapCopyArea(BmpWin_GetBitmap(window), tileB, 0, 0, i * 8, 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(window), 4);
-    if (func_0200974c(mail) == 0) {
+    if (MailData_GetTrainerGender(mail) == 0) {
         MailBox_PrintString(window, work->view->strbuf, printState, work->view->printQueue, 0, 0, work->font,
                             PRINT_COLOR(5, 6, 4), MAILBOX_ALIGN_LEFT);
     } else {
@@ -175,9 +175,9 @@ static void MailBox_RegisterAuthorName(MailBoxWork *work, int unused) {
     StrBuf *name = GFL_StrBufCreate(16, HEAPID_MAILBOX_VIEW);
 
     // The original fetches the name twice and drops the first result
-    func_02009734(mail);
-    GFL_StrBufLoadString(name, func_02009734(mail));
-    func_0202437c(work->view->wordSet, 0, name, func_0200974c(mail), 1, 2);
+    MailData_GetTrainerName(mail);
+    GFL_StrBufLoadString(name, MailData_GetTrainerName(mail));
+    func_0202437c(work->view->wordSet, 0, name, MailData_GetTrainerGender(mail), 1, 2);
     GFL_StrBufFree(name);
 }
 
@@ -185,8 +185,8 @@ static void MailBox_PrintMessage(MailBoxWork *work) {
     BmpWin *window = work->view->windows[MAILBOX_WIN_MESSAGE];
 
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
-    work->view->stream = func_02022268(window, 0, 0, work->view->strbuf, work->font, func_02017bcc(),
-                                       work->view->tcbManager, 0, HEAPID_MAILBOX_VIEW, 15);
+    work->view->stream = PrintStream_Create(window, 0, 0, work->view->strbuf, work->font, TextSpeed_GetCurrentWait(),
+                                            work->view->tcbManager, 0, HEAPID_MAILBOX_VIEW, 15);
 }
 
 void MailBox_PrintWhatWouldYouLike(MailBoxWork *work) {
@@ -238,7 +238,7 @@ void MailBox_PrintMail(MailBoxWork *work) {
     BmpWin *window;
 
     for (i = 0; i < 3; i++) {
-        PMSData *sentence = func_0200976c(work->view->mails[work->mailIndex], i);
+        PMSData *sentence = MailData_GetMessage(work->view->mails[work->mailIndex], i);
 
         if (PMSData_IsNotEmpty(sentence)) {
             PMSDraw_Print(work->view->pmsDraw, work->view->windows[MAILBOX_WIN_SENTENCE_1 + i], sentence, i);
@@ -252,7 +252,7 @@ void MailBox_PrintMail(MailBoxWork *work) {
         PMSDraw_Print(work->view->pmsDraw, work->view->windows[MAILBOX_WIN_STAMP], &work->view->stampSentence, 3);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(work->view->windows[MAILBOX_WIN_AUTHOR]), 0);
-    GFL_StrBufLoadString(work->view->strbuf, func_02009734(work->view->mails[work->mailIndex]));
+    GFL_StrBufLoadString(work->view->strbuf, MailData_GetTrainerName(work->view->mails[work->mailIndex]));
     MailBox_PrintString(work->view->windows[MAILBOX_WIN_AUTHOR], work->view->strbuf,
                         &work->view->printStates[MAILBOX_WIN_AUTHOR], work->view->printQueue, 0, 2, work->font,
                         PRINT_COLOR(1, 2, 0), MAILBOX_ALIGN_LEFT);

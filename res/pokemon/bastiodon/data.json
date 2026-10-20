@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Bastiodon",
+    "pokedex": {
+        "category": "Shield Pokémon",
+        "entry": "When they lined up side by side, no\nfoe could break through. They\nshielded their young in that way.",
+        "height": "4'03\"",
+        "weight": "329.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Bastiodon",
+                "category": "Shield Pokémon",
+                "entry": "When they lined up side by side, no\nfoe could break through. They\nshielded their young in that way.",
+                "height": "4'03\"",
+                "weight": "329.6 lbs."
+            },
+            "fr": {
+                "name": "Bastiodon",
+                "category": "Pokémon Bouclier",
+                "entry": "En groupe, ils protègent leurs\npetits en formant autour d'eux\nune impénétrable muraille.",
+                "height": "1,3 m",
+                "weight": "149,5 kg"
+            },
+            "de": {
+                "name": "Bollterus",
+                "category": "Schutzschild",
+                "entry": "Stellen sie sich Seite an Seite,\nkann kein Gegner hindurchbrechen.\nSo schützen sie auch ihre Jungen.",
+                "height": "1,3 m",
+                "weight": "149,5 kg"
+            },
+            "it": {
+                "name": "Bastiodon",
+                "category": "Pokémon Schermo",
+                "entry": "Se si mettono uno di fianco all'altro\nnessun nemico riesce a passare.\nProteggono così i loro cuccioli.",
+                "height": "1,3 m",
+                "weight": "149,5 kg"
+            },
+            "ko": {
+                "name": "바리톱스",
+                "category": "실드포켓몬",
+                "entry": "옆에 한 줄로 세우면 어떤\n포켓몬이라도 돌파하지 못한다.\n그렇게 하여 아기를 지켜냈다.",
+                "height": "1.3 m",
+                "weight": "149.5 kg"
+            },
+            "es": {
+                "name": "Bastiodon",
+                "category": "Pokémon Escudo",
+                "entry": "Se alineaban y creaban una barrera\nque ningún enemigo podía cruzar.\nAsí protegían a sus crías.",
+                "height": "1,3 m",
+                "weight": "149,5 kg"
+            },
+            "ja": {
+                "name": "トリデプス",
+                "category": "シールドポケモン",
+                "entry": "よこいちれつに\\x{3000}ならぶと\\x{3000}どんな\nポケモンでも\\x{3000}とっぱ\\x{3000}できない。\nそうやって\\x{3000}こどもを\\x{3000}まもっていた。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff14}\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 52,
+        "defense": 168,
+        "speed": 30,
+        "special_attack": 47,
+        "special_defense": 138
+    },
+    "types": [ "TYPE_ROCK", "TYPE_STEEL" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SOUNDPROOF",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 13,
+    "weight": 1495,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_PROTECT" ],
+            [ 1, "MOVE_TAUNT" ],
+            [ 1, "MOVE_METAL_SOUND" ],
+            [ 6, "MOVE_TAUNT" ],
+            [ 10, "MOVE_METAL_SOUND" ],
+            [ 15, "MOVE_TAKE_DOWN" ],
+            [ 19, "MOVE_IRON_DEFENSE" ],
+            [ 24, "MOVE_SWAGGER" ],
+            [ 28, "MOVE_ANCIENT_POWER" ],
+            [ 30, "MOVE_BLOCK" ],
+            [ 36, "MOVE_ENDURE" ],
+            [ 43, "MOVE_METAL_BURST" ],
+            [ 51, "MOVE_IRON_HEAD" ],
+            [ 58, "MOVE_HEAVY_SLAM" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM59",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_MAGIC_COAT",
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_OUTRAGE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SHIELDON",
+    "cry_volume": 120
+}

@@ -1,5 +1,0 @@
-{
-    "$schema": "../../facility.schema.json",
-    "class": "TRAINER_CLASS_SUBWAY_BOSS_102",
-    "pokemon": [ "eelektross_1", "archeops_4" ]
-}

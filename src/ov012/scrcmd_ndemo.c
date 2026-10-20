@@ -23,7 +23,7 @@ BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_NDEMO);
     GFL_OvlLoad(OVERLAY_ID(155));
-    event = func_ov155_021f59e0(a0, a1, a2, gsys, env);
+    event = EventFaceUpStart_Create(a0, a1, a2, gsys, env);
     if (event == NULL) {
         return TRUE;
     }
@@ -33,7 +33,7 @@ BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env) {
 
 BOOL s01CB_NDemoReadyTalkMotion(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
-    func_ov155_021f5d0c(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
+    FaceUp_StartTalk(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 
@@ -49,7 +49,7 @@ BOOL s01CA_NDemoEnd(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL FieldScriptSubEventFinish_NDemo(FinishScriptSubEventsWork *work, u32 *state) {
-    func_ov155_021f5cf8(GSYS_GetField(work->gsys));
+    FaceUp_FreeNow(GSYS_GetField(work->gsys));
     FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_NDEMO);
     GFL_OvlUnload(OVERLAY_ID(155));
     return TRUE;
@@ -60,7 +60,7 @@ static GameEventReturnCode EventNDemoEnd_Callback(GameEvent *event, u32 *state, 
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov155_021f5cd0(gsys));
+        GameEvent_ChainNext(event, EventFaceUpEnd_Create(gsys));
         (*state)++;
         break;
     case 1:

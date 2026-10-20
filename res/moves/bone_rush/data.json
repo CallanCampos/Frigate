@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Bone Rush",
+    "description": "The user strikes the target with a hard\nbone two to five times in a row.",
+    "type": "TYPE_GROUND",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 25,
+    "accuracy": 90,
+    "pp": 10,
+    "priority": 0,
+    "hits": {
+        "min": 2,
+        "max": 5
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_MULTI_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

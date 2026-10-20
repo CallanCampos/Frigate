@@ -1,4 +1,0 @@
-TwistMountain2_Text_WinterSnowPilesUp = In winter, snow piles up\nall over Twist Mountain.{be01}\nIt gets totally white!
-TwistMountain2_Text_WhitenessSnowHidesImpurities = Whiteness of snow hides impurities,\nand blackness of night conceals worries.
-TwistMountain2_Text_TwistTwistTwistingMountain = Twist and twist, twisting mountain. ♪\nSpiraling up like a fountain. ♪
-TwistMountain2_Text_WhenWalkSnowFeet = When you walk on snow,\nyour feet sink deeper than usual.{be01}\nThe sensation is so powerful\nand gripping!

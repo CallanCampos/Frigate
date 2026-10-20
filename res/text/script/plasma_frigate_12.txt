@@ -1,0 +1,15 @@
+PlasmaFrigate12_Text_TeamPlasmaWho = Team Plasma: Who are you?{be01}
+PlasmaFrigate12_Text_JustLetKnowYoure = {0100:1}: Just to let you know...\nYou're about to feel my rage!{be01}
+PlasmaFrigate12_Text_TeamPlasmaUghWe = Team Plasma: Ugh...!\nWe have to tell the others.{be01}
+PlasmaFrigate12_Text_TeamPlasmaOhNo = Team Plasma: Oh no! At this rate,\nthey'll get through our barriers!{be01}
+PlasmaFrigate12_Text_TheyDidntHavePurrloin = {0100:1}: They didn't have\nPurrloin with them!{be01}
+PlasmaFrigate12_Text_BarriersHuh = Barriers, huh...{be01}
+PlasmaFrigate12_Text_TheresDeviceWhereEnter = And there's a device where\nyou enter a password here...{be01}
+PlasmaFrigate12_Text_MeansWeEitherHave = That means...{be01}\nWe either have to find the password,\nor get it out of Team Plasma,{be00}\nto deactivate the barriers.{be01}\n{0100:0}!\nLet's split up and find that password!{be01}
+PlasmaFrigate12_Text_ThereDeviceSeemsCard = There is a device...{be01}\nIt seems that a card key is necessary\nto enter a password.
+PlasmaFrigate12_Text_ThereDeviceSeemsEntering = There is a device...\nIt seems to be for entering a password.{be01}\nWill you enter a password?
+PlasmaFrigate12_Text_PasswordNotCorrect = The password is not correct.
+PlasmaFrigate12_Text_SucceededEnteringPassword = You succeeded in\nentering the password!
+PlasmaFrigate12_Text_AllBarriersWereDeactivated = All the barriers were deactivated,\nand now you can proceed!
+PlasmaFrigate12_Text_CarefulBarriersElectrified = Be careful!\nThe barriers are electrified!
+\pad{c6}

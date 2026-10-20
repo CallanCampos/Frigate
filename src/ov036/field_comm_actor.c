@@ -1,6 +1,7 @@
 // The actors of the other players in a field communication. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/field_actor.h"
 #include "field/field_comm_actor.h"
 #include "gfl/heap.h"
@@ -135,11 +136,11 @@ static FieldActor *FieldCommActor_Add(FldCommActSys *sys, u16 modelId, const u16
     actor = CreateNewActorByEntityNoWKOBJCODE(actorSystem, &npc, 0);
     func_ov036_0218b110(actor, dir, pos, hidden, entry);
     SetActorWPosAll(actor, pos, func_ov036_0218b128(*dir));
-    func_ov012_0216763c(actor, TRUE);
-    func_ov012_02167788(actor, TRUE);
+    FldAct_SetHeightCalcDisabled(actor, TRUE);
+    FldAct_SetMapAttrDisabled(actor, TRUE);
     SetActorFlag32(actor, TRUE);
-    func_ov012_02167580(actor, FALSE);
-    func_ov012_02167754(actor, TRUE);
+    SetActorCollisionEnabled(actor, FALSE);
+    FldAct_SetIgnoreDisableAll(actor, TRUE);
     func_ov012_021677bc(actor, TRUE);
     return actor;
 }
@@ -168,7 +169,7 @@ void func_ov036_0218b060(FieldActor *actor) {
         if (link->entry->unk6 != 0) {
             u16 objCode = FldAct_GetObjCode(actor);
 
-            if (objCode == 0xe7 || objCode == 0xf0) {
+            if (objCode == OBJ_CODE_HERO || objCode == OBJ_CODE_HEROINE) {
                 s32 dx;
                 s32 dz;
                 s32 dist = 0;
@@ -188,7 +189,7 @@ void func_ov036_0218b060(FieldActor *actor) {
             }
         }
     }
-    func_ov012_021670f4(actor, state);
+    FldAct_SetDrawStatus(actor, state);
     if (link->hidden != NULL) {
         BOOL hide = FALSE;
 

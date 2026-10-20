@@ -1,0 +1,221 @@
+{
+    "$schema": "groups.schema.json",
+    "GROUP_GLOBAL": [
+        {
+            "sequence": "SEQ_SE_MESSAGE",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SELECT1",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SELECT2",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SELECT4",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_DECIDE1",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_DECIDE2",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_DECIDE3",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_CANCEL1",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_CANCEL2",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_CANCEL3",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_OPEN1",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_CLOSE1",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_BEEP",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_DANSA",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_WALL_HIT",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_BICYCLE",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_07",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_08",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_09",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_10",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_11",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_12",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_13",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_14",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_31",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_32",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_49",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_84",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_85",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_91",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_120",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_FLD_122",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SYS_35",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_MSCL_07",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SYS_100",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SYS_11",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SYS_79",
+            "load": 7
+        }
+    ],
+    "GROUP_LCG01": [
+        {
+            "sequence": "SEQ_SE_LCG_02",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_03",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_04",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_05",
+            "load": 7
+        }
+    ],
+    "GROUP_LCG02": [
+        {
+            "sequence": "SEQ_SE_LCG_06",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_07",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_08",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_09",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_LCG_01",
+            "load": 7
+        }
+    ],
+    "GROUP_KYUREM02_B": [
+        {
+            "sequence": "SEQ_SE_SW_KYUREON_02_01",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SW_KYUREON_02_02",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SW_KYUREON_02_03",
+            "load": 7
+        }
+    ],
+    "GROUP_KYUREM02_W": [
+        {
+            "sequence": "SEQ_SE_SW_KYUREON_02_01",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SW_KYUREON_02_02",
+            "load": 7
+        },
+        {
+            "sequence": "SEQ_SE_SW_KYUREON_02_03",
+            "load": 7
+        }
+    ]
+}

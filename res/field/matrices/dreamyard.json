@@ -1,0 +1,7 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ "MAP_MODEL_DREAMYARD_M_DUN0101_00_00", "MAP_MODEL_DREAMYARD_M_DUN0101_01_00" ],
+        [ "MAP_MODEL_DREAMYARD_M_DUN0101_00_01", "MAP_MODEL_DREAMYARD_M_DUN0101_01_01" ]
+    ]
+}

@@ -10,10 +10,10 @@
 
 void CGearPhrases_Init(PMSData *phrases) {
     func_02029c68(&phrases[0]);
-    func_02029bfc(&phrases[1], 0);
-    func_02029bfc(&phrases[2], 1);
-    func_02029bfc(&phrases[3], 2);
-    func_02029bfc(&phrases[4], 3);
+    PMSData_InitPreset(&phrases[1], 0);
+    PMSData_InitPreset(&phrases[2], 1);
+    PMSData_InitPreset(&phrases[3], 2);
+    PMSData_InitPreset(&phrases[4], 3);
 }
 
 void *CGearPhrases_GetBlock(SaveControl *save) {

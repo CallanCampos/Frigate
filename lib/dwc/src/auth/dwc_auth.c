@@ -1,3 +1,6 @@
+#include <string.h>
+// Before dwc/ext.h: MWCC builds Auth_OnResponse's memset of the result in place, as the ROM does, only when
+// <string.h> declares memset first
 #include "dwc/auth.h"
 #include "dwc/ext.h"
 
@@ -55,26 +58,31 @@ char *Auth_GetUrl(void) {
 
 static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *userData) {
     AuthRequest *request = userData;
-    AuthResult result = { 0 };
+    AuthResult result;
+    AuthCertificate *certificate = &result.certificate;
     HashContext context;
 
+    // As in GameSpy's login callbacks, the certificate is marked invalid before the whole result is cleared
+    certificate->valid = FALSE;
+    memset(&result, 0, sizeof(result));
     if (status == 0) {
-        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "LoginRemoteAuthResult") ||
-            !gsXmlReadChildAsInt(reader, "responseCode", &result.responseCode)) {
+        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "LoginRemoteAuthResult")) {
+            result.error = AUTH_ERROR_BAD_RESPONSE;
+        } else if (!gsXmlReadChildAsInt(reader, "responseCode", &result.responseCode)) {
             result.error = AUTH_ERROR_BAD_RESPONSE;
         } else if (result.responseCode != 0) {
             result.error = 7;
-        } else if (!gsXmlMoveToChild(reader, "certificate") || !Auth_ReadCertificate(&result.certificate, reader) ||
+        } else if (!gsXmlMoveToChild(reader, "certificate") || !Auth_ReadCertificate(certificate, reader) ||
                    !gsXmlMoveToParent(reader) ||
                    !gsXmlReadChildAsLargeInt(reader, "peerkeyprivate", &result.keys.privateKey)) {
             result.error = AUTH_ERROR_BAD_RESPONSE;
         } else {
-            memcpy(&result.keys.modulus, &result.certificate.peerKeyModulus, sizeof(BigNum));
+            memcpy(&result.keys.modulus, &certificate->peerKeyModulus, sizeof(BigNum));
             func_ov011_021719fc(&context);
             gsLargeIntAddToMD5(&result.keys.privateKey, &context);
             func_ov011_02171a9c(result.keys.proof, &context);
-            result.certificate.valid = Auth_CheckCertificate(&result.certificate);
-            if (!result.certificate.valid) {
+            certificate->valid = Auth_CheckCertificate(certificate);
+            if (!certificate->valid) {
                 result.error = AUTH_ERROR_BAD_CERTIFICATE;
             }
         }

@@ -38,7 +38,7 @@ void DpcBmp_Exit(DendouPCWork *wk) {
 void DpcBmp_PrintUpdate(DendouPCWork *wk) {
     u32 i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < DPCBMP_WIN_MAX; i++) {
         PrintWindow_Flush(&wk->win[i], wk->printQueue);
     }

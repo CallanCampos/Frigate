@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_CASTELIA_CITY",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_BUILDING1_2",
+    "srt_animation": 0,
+    "pattern_animation": null,
+    "exterior": true,
+    "lights": 146,
+    "edge_color_table": 0,
+    "actor_material_color": 1
+}

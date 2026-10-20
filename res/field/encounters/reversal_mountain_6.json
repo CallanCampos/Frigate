@@ -1,0 +1,64 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 1
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_SPOINK", 31, 31 ],
+                [ "SPECIES_WOOBAT", 32, 32 ],
+                [ "SPECIES_BOLDORE", 32, 32 ],
+                [ "SPECIES_SKORUPI", 33, 33 ],
+                [ "SPECIES_BOLDORE", 34, 34 ],
+                [ "SPECIES_WOOBAT", 34, 34 ],
+                [ "SPECIES_GRUMPIG", 35, 35 ],
+                [ "SPECIES_SKORUPI", 35, 35 ],
+                [ "SPECIES_WOOBAT", 35, 35 ],
+                [ "SPECIES_BOLDORE", 35, 35 ],
+                [ "SPECIES_WOOBAT", 35, 35 ],
+                [ "SPECIES_BOLDORE", 35, 35 ]
+            ],
+            "white2": [
+                [ "SPECIES_NUMEL", 31, 31 ],
+                [ "SPECIES_WOOBAT", 32, 32 ],
+                [ "SPECIES_BOLDORE", 32, 32 ],
+                [ "SPECIES_SKORUPI", 33, 33 ],
+                [ "SPECIES_BOLDORE", 34, 34 ],
+                [ "SPECIES_WOOBAT", 34, 34 ],
+                [ "SPECIES_CAMERUPT", 35, 35 ],
+                [ "SPECIES_SKORUPI", 35, 35 ],
+                [ "SPECIES_WOOBAT", 35, 35 ],
+                [ "SPECIES_BOLDORE", 35, 35 ],
+                [ "SPECIES_WOOBAT", 35, 35 ],
+                [ "SPECIES_BOLDORE", 35, 35 ]
+            ]
+        },
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_EXCADRILL", 32, 32 ],
+            [ "SPECIES_EXCADRILL", 32, 32 ],
+            [ "SPECIES_EXCADRILL", 33, 33 ],
+            [ "SPECIES_EXCADRILL", 33, 33 ],
+            [ "SPECIES_EXCADRILL", 34, 34 ],
+            [ "SPECIES_EXCADRILL", 34, 34 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}
