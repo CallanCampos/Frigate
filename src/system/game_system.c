@@ -346,11 +346,11 @@ LinkFestival *GSYS_GetLinkFestival(GameSystem *gsys) {
     return gsys->festival;
 }
 
-void func_02016b0c(GameSystem *gsys, u32 a1) {
+void GSYS_SetNetErrorPending(GameSystem *gsys, u32 a1) {
     gsys->netErrorPending = a1;
 }
 
-u8 func_02016b14(GameSystem *gsys) {
+u8 GSYS_IsNetErrorPending(GameSystem *gsys) {
     return gsys->netErrorPending;
 }
 
@@ -362,11 +362,11 @@ GameCommSys *GSYS_GetGameCommSystem(GameSystem *gsys) {
     return gsys->comm;
 }
 
-void func_02016b24(GameSystem *gsys, u32 value) {
+void GSYS_SetGameCommPaused(GameSystem *gsys, u32 value) {
     gsys->gameCommPaused = value;
 }
 
-u8 func_02016b2c(GameSystem *gsys) {
+u8 GSYS_IsGameCommPaused(GameSystem *gsys) {
     return gsys->gameCommPaused;
 }
 
@@ -401,11 +401,11 @@ BOOL GSYS_TryBootGameComm(GameSystem *gsys) {
     return FALSE;
 }
 
-BOOL func_02016bec(GameSystem *gsys) {
+BOOL GSYS_IsLowBatteryCGearOff(GameSystem *gsys) {
     return gsys->lowBatteryCGearOff;
 }
 
-void func_02016bf8(GameSystem *gsys) {
+void GSYS_ClearLowBatteryCGearOff(GameSystem *gsys) {
     gsys->lowBatteryCGearOff = FALSE;
 }
 

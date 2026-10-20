@@ -208,7 +208,7 @@ u32 BeaconDetailSub_Input(BeaconDetailWork *work) {
     u32 touched = TouchBar_GetTouched(work->touchBar);
     u32 keys = GCTX_HIDGetPressedKeys();
 
-    if (func_02016bec(work->param->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->param->gsys)) {
         work->param->unk0A = TRUE;
         return BEACON_DETAIL_SEQ_FADE_OUT;
     }

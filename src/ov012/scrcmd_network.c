@@ -83,7 +83,7 @@ BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env) {
         GameCommSys_ExitReq(commSys);
         break;
     }
-    func_02016b24(gsys, 1);
+    GSYS_SetGameCommPaused(gsys, 1);
     FieldScriptSubEvent_Register(11);
     return TRUE;
 }
@@ -92,7 +92,7 @@ BOOL s013E_GameCommResume(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
 
     gsys = FieldScriptEnv_GetGameSystem(env);
-    func_02016b24(gsys, 0);
+    GSYS_SetGameCommPaused(gsys, 0);
     GSYS_TryBootGameComm(gsys);
     FieldScriptSubEvent_Unregister(11);
     return TRUE;
@@ -102,7 +102,7 @@ BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state) {
     GameSystem *gsys;
 
     gsys = work->gsys;
-    func_02016b24(gsys, 0);
+    GSYS_SetGameCommPaused(gsys, 0);
     GSYS_TryBootGameComm(gsys);
     return TRUE;
 }

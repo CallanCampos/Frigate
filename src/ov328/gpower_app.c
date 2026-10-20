@@ -1288,7 +1288,7 @@ static void GPowerApp_SetMessageVisible(GPowerApp *work, BOOL visible) {
 }
 
 static BOOL GPowerApp_IsAborted(GPowerApp *work) {
-    return func_02016bec(work->param->gsys);
+    return GSYS_IsLowBatteryCGearOff(work->param->gsys);
 }
 
 static void GPowerApp_InitPowers(GPowerApp *work) {

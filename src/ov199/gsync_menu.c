@@ -936,7 +936,7 @@ static BOOL GSyncMenu_ProcMain(GameProc *proc, u32 *state, void *param, void *wo
     if (!wk->ending) {
         GSYS_TryBootGameComm(wk->gsys);
     }
-    if (GFL_WipeIsFinished() && func_02016bec(wk->gsys)) {
+    if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(wk->gsys)) {
         wk->result = GSYNC_RESULT_NONE;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);

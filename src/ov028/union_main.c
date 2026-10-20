@@ -62,7 +62,7 @@ void UnionMain_Update(GameCommSys *comm, Field *field) {
     if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNION) {
         unisys = GameCommSys_GetWork(comm);
         GFL_ASSERT(unisys != NULL);
-        if (func_02016b14(Field_GetGameSystem(field)) == TRUE) {
+        if (GSYS_IsNetErrorPending(Field_GetGameSystem(field)) == TRUE) {
             return;
         }
         if (GSYS_CheckNowEvent(unisys->param->gsys) == TRUE) {

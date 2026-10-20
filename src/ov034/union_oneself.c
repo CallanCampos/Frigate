@@ -502,7 +502,7 @@ static BOOL UnionOneself_StepNetErrorRun(UnionSystem *unisys, UnionSelf *situ, F
         break;
     case 2:
         if (GFL_NetErrCheck()) {
-            func_02016b0c(unisys->param->gsys, 1);
+            GSYS_SetNetErrorPending(unisys->param->gsys, 1);
             return FALSE;
         }
         UnionComm_RequestLink1(unisys);
@@ -2860,7 +2860,7 @@ static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *sit
         }
         if (GFL_NetErrCheck()) {
             UnionMsg_FreeAll(unisys);
-            func_02016b0c(unisys->param->gsys, 1);
+            GSYS_SetNetErrorPending(unisys->param->gsys, 1);
             return FALSE;
         }
         UnionComm_RequestLink1(unisys);

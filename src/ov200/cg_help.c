@@ -467,7 +467,7 @@ static void CGHelp_HandleInput(CGHelp *help) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         break;
     }
-    if (func_02016bec(help->param->gsys) == TRUE) {
+    if (GSYS_IsLowBatteryCGearOff(help->param->gsys) == TRUE) {
         AppTaskMenuWin_SetFlashing(help->quitButton, TRUE);
         help->state = STATE_CLOSE;
     }

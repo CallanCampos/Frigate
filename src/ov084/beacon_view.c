@@ -380,7 +380,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
 static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
     u32 state = func_ov012_02153650(work->commSys);
 
-    if (func_02016bec(work->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return TRUE;
     }
@@ -633,7 +633,7 @@ static int BeaconView_CheckThanksTouch(BeaconViewWork *work) {
     BeaconViewTouch touch;
     int hit;
 
-    if (func_02016bec(work->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return THANKS_END;
     }

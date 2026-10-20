@@ -1320,7 +1320,7 @@ static BOOL IrcMenu_Main(GameProc *proc, u32 *state, void *param, void *work) {
     if (!wk->ending) {
         GSYS_TryBootGameComm(EventIRC_GetGameSystem(wk->param));
     }
-    if (GFL_WipeIsFinished() && func_02016bec(EventIRC_GetGameSystem(wk->param))) {
+    if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(EventIRC_GetGameSystem(wk->param))) {
         wk->mode = 12;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);

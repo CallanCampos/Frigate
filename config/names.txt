@@ -991,10 +991,16 @@
 . 0x020166d0 GameSystem_DSProtNop2
 . 0x020168ec GameSystem_GetWorkSize
 . 0x02016a40 GSYS_UpdateGameCommBoot
+. 0x02016b0c GSYS_SetNetErrorPending
+. 0x02016b14 GSYS_IsNetErrorPending
+. 0x02016b24 GSYS_SetGameCommPaused
+. 0x02016b2c GSYS_IsGameCommPaused
 . 0x02016b34 GSYS_IsCGearOn
 . 0x02016b40 GSYS_SetCGearOn
 . 0x02016b4c GSYS_CanBootGameComm
 . 0x02016bb4 GSYS_TryBootGameComm
+. 0x02016bec GSYS_IsLowBatteryCGearOff
+. 0x02016bf8 GSYS_ClearLowBatteryCGearOff
 . 0x02016c08 GSYS_UICallback
 . 0x02016c4c GSYS_ClearUICallback
 . 0x02016c58 GSYS_SleepCheckCallback

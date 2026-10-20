@@ -364,7 +364,7 @@ BOOL MusComm_Exit(u32 *seq, void *param, void *work_) {
         break;
     case 10:
         if (GFL_NetErrCheck()) {
-            func_02016b0c(work->gsys, 1);
+            GSYS_SetNetErrorPending(work->gsys, 1);
         }
         GFL_NetExit(NULL);
         return TRUE;

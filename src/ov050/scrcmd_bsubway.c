@@ -924,7 +924,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         GFL_NetErrMarkShown();
         break;
     case 414:
-        func_02016b0c(gsys, 1);
+        GSYS_SetNetErrorPending(gsys, 1);
         break;
     case 415:
         *retWk = FALSE;

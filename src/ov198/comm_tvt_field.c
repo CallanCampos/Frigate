@@ -988,7 +988,7 @@ static BOOL CommTvtFieldApp_Main(GameProc *proc, u32 *state, void *param, void *
     if (GFL_WipeIsFinished() && !wk->leaving) {
         GSYS_TryBootGameComm(wk->gsys);
     }
-    if (GFL_WipeIsFinished() && func_02016bec(wk->gsys)) {
+    if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(wk->gsys)) {
         wk->mode = 2;
         result = TRUE;
         Wipe_SetScreenCovered(0, 0);

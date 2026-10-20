@@ -650,7 +650,7 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
     case 21:
     case 22:
         if (GFL_NetErrCheck()) {
-            func_02016b0c(gsys, 1);
+            GSYS_SetNetErrorPending(gsys, 1);
             *result = 1;
         } else if (commWork != NULL && commWork->ircMatch.netError == 1) {
             *result = TRUE;

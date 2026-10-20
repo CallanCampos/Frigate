@@ -73,13 +73,13 @@ BOOL GSYS_CheckNowEvent(GameSystem *gsys);
 void GSYS_QueueProc(GameSystem *gsys, s32 overlayId, const GameProcFunctions *functions, void *param);
 void GSYS_QueueProcAsEvent(GameEvent *event, s32 overlayId, const GameProcFunctions *functions, void *param);
 BOOL GSYS_TryBootGameComm(GameSystem *gsys);
-void func_02016b0c(GameSystem *gsys, u32 a1);
-u8 func_02016b14(GameSystem *gsys);
-void func_02016b24(GameSystem *gsys, u32 value);
-u8 func_02016b2c(GameSystem *gsys);
+void GSYS_SetNetErrorPending(GameSystem *gsys, u32 a1);
+u8 GSYS_IsNetErrorPending(GameSystem *gsys);
+void GSYS_SetGameCommPaused(GameSystem *gsys, u32 value);
+u8 GSYS_IsGameCommPaused(GameSystem *gsys);
 u32 GSYS_IsCGearOn(GameSystem *gsys);
 void GSYS_SetCGearOn(GameSystem *gsys, u32 value);
-BOOL func_02016bec(GameSystem *gsys);
+BOOL GSYS_IsLowBatteryCGearOff(GameSystem *gsys);
 ISS *GameSystem_GetISS(GameSystem *gsys);
 u32 getStatusOfFesMission(LinkFestival *festival);
 
@@ -87,7 +87,7 @@ void GSYS_SetEventProvider(GameSystem *gsys, void *provider, void *data);
 GameEvent *GSYS_GetNowEvent(GameSystem *gsys);
 void GSYS_SetNowEvent(GameSystem *gsys, GameEvent *event);
 void GSYS_StartFieldmapProc(GameSystem *gsys);
-void func_02016bf8(GameSystem *gsys);
+void GSYS_ClearLowBatteryCGearOff(GameSystem *gsys);
 void GSYS_SetField(GameSystem *gsys, Field *field);
 
 // Overlay 36's field map process (fieldmap_proc.c), declared here until its header has it
