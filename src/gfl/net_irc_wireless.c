@@ -21,19 +21,23 @@ typedef struct {
     // The init data the networks are started with, the game's with the callbacks below swapped for this file's
     GFLNetInitData aNetInit;
     void *work;
-    void *unk74;
+    // The filter of the infrared machines to link with (func_0204307c)
+    void *peerFilter;
     // The game's callbacks from its init data
-    void *(*unk18)(void *work);
-    int (*unk1C)(void *work);
+    void *(*getBeaconData)(void *work);
+    int (*getBeaconSize)(void *work);
     void (*exitCallback)(void *work);
-    void (*unk84)(void *work);
+    // Called once the wireless network is connected
+    void (*connectCallback)(void *work);
     void (*unk88)(void *work, BOOL a1);
     void (*unk8C)(void *work);
     NetIwCollectMac collect;
-    u8 unkB4[0x4c];
+    // The game's beacon data, which the beacons send after the collected MAC addresses
+    u8 gameBeacon[0x4c];
     // Frames left to wait
     u8 timer;
-    u8 unk101;
+    // Set from the infrared link until the wireless network starts, while the networks are switched
+    u8 switchingToWireless;
     // Set when the network has connected and when it has ended
     u8 connected;
     u8 ended;
@@ -44,9 +48,11 @@ typedef struct {
     // The ID to use in place of netId, plus 1, or 0
     u8 netIdOverride;
     u8 maxConnectNum;
-    u8 unk108;
+    // How many machines linked over infrared
+    u8 linkedCount;
     u8 state;
-    u8 unk10A;
+    // Set by NetIw_OverrideNetId
+    u8 netIdOverridden;
     u8 gameCommandBase;
 } NetIrcWireless;
 
@@ -61,7 +67,7 @@ static int func_02043748(void *work);
 const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     NetIrcWireless *sys;
 
-    if (NetIwSys != NULL && NetIwSys->unk101 == TRUE) {
+    if (NetIwSys != NULL && NetIwSys->switchingToWireless == TRUE) {
         return pNetInit;
     }
     sys =
@@ -69,8 +75,8 @@ const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     sys->aNetInit = *pNetInit;
     sys->work = work;
     sys->exitCallback = pNetInit->endCallback;
-    sys->unk18 = pNetInit->getBeaconData;
-    sys->unk1C = pNetInit->getBeaconSize;
+    sys->getBeaconData = pNetInit->getBeaconData;
+    sys->getBeaconSize = pNetInit->getBeaconSize;
     sys->aNetInit.bNetType = 3;
     sys->aNetInit.endCallback = NetIw_EndedCallback;
     sys->aNetInit.getBeaconData = func_02043720;
@@ -92,7 +98,7 @@ void NetIw_Free(void) {
 }
 
 void NetIw_FreeIfIdle(void) {
-    if (NetIwSys != NULL && NetIwSys->unk101 == 0) {
+    if (NetIwSys != NULL && NetIwSys->switchingToWireless == 0) {
         NetIw_Free();
     }
 }
@@ -105,7 +111,7 @@ BOOL NetIw_IsRunning(void) {
 }
 
 void func_0204307c(void *a0) {
-    NetIwSys->unk74 = a0;
+    NetIwSys->peerFilter = a0;
 }
 
 void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1),
@@ -114,7 +120,7 @@ void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1
         return a0;
     }
     if (a0 != NULL) {
-        NetIwSys->unk84 = a0;
+        NetIwSys->connectCallback = a0;
     }
     if (a1 != NULL) {
         NetIwSys->unk88 = a1;
@@ -192,7 +198,7 @@ void NetIw_Update(void) {
     switch (sys->state) {
     case 0:
         if (sys->connected == TRUE) {
-            sys->unk101 = TRUE;
+            sys->switchingToWireless = TRUE;
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0);
             NetIw_SetState(sys, 1);
         }
@@ -218,11 +224,11 @@ void NetIw_Update(void) {
             if (NetIwSys->unk8C != NULL) {
                 NetIwSys->unk8C(NetIwSys->work);
             }
-            if (sys->unk10A && sys->aNetInit.maxConnectNum == 4 && sys->netId == 0) {
+            if (sys->netIdOverridden && sys->aNetInit.maxConnectNum == 4 && sys->netId == 0) {
                 NetIw_SetState(sys, 14);
-                sys->unk108++;
+                sys->linkedCount++;
             } else if (sys->netId == 0 && sys->aNetInit.maxConnectNum == 4) {
-                sys->unk108++;
+                sys->linkedCount++;
                 GFL_NetExit(NULL);
                 sys->unk88(sys->work, TRUE);
                 NetIw_SetState(sys, 4);
@@ -250,14 +256,14 @@ void NetIw_Update(void) {
         break;
     case 5:
         if (GFL_NetIsInitialized() == TRUE) {
-            GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->unk74);
+            GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->peerFilter);
             func_020429f8(NetIw_ConnectedCallback);
             NetIw_SetState(sys, 6);
         }
         break;
     case 6:
         if (sys->connected == TRUE) {
-            sys->unk101 = TRUE;
+            sys->switchingToWireless = TRUE;
             if (GFL_NetSendCommand(NetHandle_GetOwn(), 9, sizeof(NetIwCollectMac), &NetIwSys->collect)) {
                 NetIw_SetState(sys, 7);
             }
@@ -287,7 +293,7 @@ void NetIw_Update(void) {
             sys->aNetInit.endCallback = sys->exitCallback;
             sys->aNetInit.bMPMode = sys->bMPMode;
             GFL_NetInit(&sys->aNetInit, NULL, sys->work);
-            NetIwSys->unk101 = FALSE;
+            NetIwSys->switchingToWireless = FALSE;
             NetIw_SetState(sys, 10);
         }
         break;
@@ -340,13 +346,13 @@ void NetIw_Update(void) {
         break;
     case 13:
         if (sys->netId != 0) {
-            if (sys->unk84 != NULL) {
-                sys->unk84(sys->work);
+            if (sys->connectCallback != NULL) {
+                sys->connectCallback(sys->work);
             }
             NetIw_FreeIfIdle();
         } else if (NetHandle_CountNegotiated() >= sys->maxConnectNum) {
-            if (sys->unk84 != NULL) {
-                sys->unk84(sys->work);
+            if (sys->connectCallback != NULL) {
+                sys->connectCallback(sys->work);
             }
             NetIw_FreeIfIdle();
         }
@@ -363,7 +369,7 @@ void NetIw_Update(void) {
         break;
     case 15:
         if (GFL_NetIsInitialized() == TRUE) {
-            GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->unk74);
+            GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->peerFilter);
             func_020429f8(NetIw_ConnectedCallback);
             NetIw_SetState(sys, 16);
         }
@@ -371,7 +377,7 @@ void NetIw_Update(void) {
     case 16:
         if (sys->connected == TRUE) {
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0);
-            NetIwSys->unk101 = TRUE;
+            NetIwSys->switchingToWireless = TRUE;
             NetIw_SetState(sys, 17);
         }
         break;
@@ -388,9 +394,9 @@ void NetIw_Update(void) {
             if (NetIwSys->unk8C != NULL) {
                 NetIwSys->unk8C(NetIwSys->work);
             }
-            if (sys->unk10A && sys->unk108 < 3) {
-                sys->unk108++;
-                if (sys->unk108 >= 3) {
+            if (sys->netIdOverridden && sys->linkedCount < 3) {
+                sys->linkedCount++;
+                if (sys->linkedCount >= 3) {
                     NetIw_SetState(sys, 9);
                 } else {
                     NetIw_SetState(sys, 14);
@@ -409,7 +415,7 @@ static void *func_02043720(void *work) {
     if (sys == NULL) {
         return NULL;
     }
-    MI_CpuCopy8(sys->unk18(work), sys->unkB4, sizeof(sys->unkB4));
+    MI_CpuCopy8(sys->getBeaconData(work), sys->gameBeacon, sizeof(sys->gameBeacon));
     return &sys->collect;
 }
 
@@ -419,7 +425,7 @@ static int func_02043748(void *work) {
     if (sys == NULL) {
         return 0;
     }
-    return sys->unk1C(work) + sizeof(NetIwCollectMac);
+    return sys->getBeaconSize(work) + sizeof(NetIwCollectMac);
 }
 
 void NetIw_RecvCollectedMacs(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -444,7 +450,7 @@ BOOL func_020437a0(void) {
         return FALSE;
     }
     if (NetIwSys->state == 16) {
-        NetIwSys->maxConnectNum = NetIwSys->unk108 + 1;
+        NetIwSys->maxConnectNum = NetIwSys->linkedCount + 1;
         GFL_NetExit(NULL);
         NetIwSys->state = 9;
         return TRUE;
@@ -456,7 +462,7 @@ void NetIw_OverrideNetId(int netId) {
     GFL_ASSERT(NetIwSys);
     if (NetIwSys != NULL) {
         NetIwSys->netIdOverride = netId + 1;
-        NetIwSys->unk10A = TRUE;
+        NetIwSys->netIdOverridden = TRUE;
     }
 }
 
@@ -464,7 +470,7 @@ u8 func_0204381c(void) {
     if (NetIwSys == NULL) {
         return 0;
     }
-    return NetIwSys->unk108;
+    return NetIwSys->linkedCount;
 }
 
 void NetIw_SetGameCommandBase(int gameCommandBase) {
