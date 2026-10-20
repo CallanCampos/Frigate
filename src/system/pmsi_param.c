@@ -105,7 +105,7 @@ PMSWordSave *PMSIParam_GetWordSave(const PMSIParam *param) {
     return param->wordSave;
 }
 
-BOOL func_02029a74(const PMSIParam *param) {
+BOOL PMSIParam_AreMovesEnabled(const PMSIParam *param) {
     return param->movesEnabled;
 }
 
@@ -161,10 +161,10 @@ void PMSIParam_SetResult(PMSIParam *param, const u16 *words, const PMSData *sent
     param->sentence = *sentence;
 }
 
-BOOL func_02029b40(const PMSIParam *param) {
+BOOL PMSIParam_IsUsingTouch(const PMSIParam *param) {
     return GCTX_HIDIsUsingTouch();
 }
 
-void func_02029b48(PMSIParam *param, BOOL touch) {
+void PMSIParam_SetUsingTouch(PMSIParam *param, BOOL touch) {
     GCTX_HIDSetUsingTouch(touch);
 }

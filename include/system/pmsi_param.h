@@ -30,14 +30,14 @@ void PMSIParam_GetSentence(const PMSIParam *param, PMSData *sentence);
 u32 PMSIParam_GetMode(const PMSIParam *param);
 void *PMSIParam_GetPokeDex(const PMSIParam *param);
 PMSWordSave *PMSIParam_GetWordSave(const PMSIParam *param);
-BOOL func_02029a74(const PMSIParam *param);
+BOOL PMSIParam_AreMovesEnabled(const PMSIParam *param);
 BOOL PMSIParam_HasStartSentence(const PMSIParam *param);
 BOOL PMSIParam_HasNumbers(const PMSIParam *param);
 // The result, in words or sentence by the mode
 void PMSIParam_GetResult(const PMSIParam *param, u16 *words, PMSData *sentence);
 // Sets the result and whether it differs from the starting value
 void PMSIParam_SetResult(PMSIParam *param, const u16 *words, const PMSData *sentence);
-BOOL func_02029b40(const PMSIParam *param);
-void func_02029b48(PMSIParam *param, BOOL touch);
+BOOL PMSIParam_IsUsingTouch(const PMSIParam *param);
+void PMSIParam_SetUsingTouch(PMSIParam *param, BOOL touch);
 
 #endif // POKEBW2_SYSTEM_PMSI_PARAM_H

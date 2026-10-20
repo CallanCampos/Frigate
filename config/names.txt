@@ -1561,11 +1561,14 @@
 . 0x02029a68 PMSIParam_GetMode
 . 0x02029a6c PMSIParam_GetPokeDex
 . 0x02029a70 PMSIParam_GetWordSave
+. 0x02029a74 PMSIParam_AreMovesEnabled
 . 0x02029a7c PMSIParam_HasStartSentence
 . 0x02029a84 PMSIParam_HasNumbers
 . 0x02029a8c PMSIParam_GetResult
 . 0x02029ac0 IsSameAsStart
 . 0x02029b04 PMSIParam_SetResult
+. 0x02029b40 PMSIParam_IsUsingTouch
+. 0x02029b48 PMSIParam_SetUsingTouch
 . 0x02029b54 SinWaveTable_Make
 . 0x02029bb0 PMSData_Clear
 . 0x02029bc8 PMSData_Init
