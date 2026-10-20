@@ -9743,6 +9743,9 @@ overlays/ov036 0x021bfa68 JoinAvenueNameEntry_Create
 overlays/ov036 0x021bfb88 JoinAvenueNameEntry_Callback
 overlays/ov036 0x021bfc9c RivalNameEntry_Create
 overlays/ov036 0x021bfcf4 RivalNameEntry_Callback
+overlays/ov036 0x021c05d4 FieldCameraZoomTCB_CreateLinear
+overlays/ov036 0x021c06bc FieldCameraZoomTCB_LinearCallback
+overlays/ov036 0x021c070c FieldCameraZoomTCB_CalcLinear
 overlays/ov036 0x021c08e8 FieldTask_SetStartedCore
 overlays/ov036 0x021c1444 FieldWaitTask_Callback
 overlays/ov036 0x021c1c68 FieldFlash_RequestState

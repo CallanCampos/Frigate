@@ -263,9 +263,6 @@ typedef struct {
 
 // Shakes the camera; the task ends when the shake does
 FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup *setup);
-// Tasks that move the camera's zoom over frames: this one by a distance from its current zoom
-void FieldCameraZoomTCB_Create(Field *field, u32 frames, fx32 distance);
-void func_ov036_021c05d4(Field *field, u32 frames, fx32 distance);
 FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, const VecFx32 *target, HeapID heapId);
 void FieldCamera_Free(FieldCamera *camera);
 // The camera's pitch
