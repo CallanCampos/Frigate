@@ -990,7 +990,7 @@ BOOL s007C_PlayerSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
     func_ov036_021b0e38(unit, a, b, c);
-    func_ov036_021b0774(unit, &railPos);
+    RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;
 }
@@ -1005,7 +1005,7 @@ BOOL s007D_ActorSetRailPos(VM *vm, FieldScriptEnv *env) {
     RailUnit *unit = FldAct_GetRailUnit(actor);
 
     func_ov036_021b0e38(unit, a, b, c);
-    func_ov036_021b0774(unit, &railPos);
+    RailUnit_GetRailPos(unit, &railPos);
     SetActorInitedPositionRail(actor, &railPos);
     return FALSE;
 }
