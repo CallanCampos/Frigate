@@ -669,6 +669,10 @@ Same instructions, registers swapped.
   second local (`buffer = descs;` before the search) for the free, steps `descs` in its saved register
   (`adds r4, #0xc0`) and spills `buffer`; indexing `&descs[i]` makes a new induction pointer and keeps `descs` on the
   stack, 4 bytes over.
+- A parameter reused as a loop counter is allocated apart from a local counter, even when the parameter is otherwise
+  dead: `dwc_aoss.c`'s `Crc32_MakeTable(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
+  (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
+  `u32 value; int i; int bit;` declared in that order.
 
 ## Stack slots
 
