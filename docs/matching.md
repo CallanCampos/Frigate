@@ -1673,6 +1673,10 @@ Same instructions, scheduled in another order.
   `GX_PACK_DIFFAMB_PARAM(getColorData_(...), getColorData_(...), result->prmMatColor0 & 0x8000)` in one expression
   MWCC tests the kept bit before the calls and spills it (12 bytes larger). It matches with two calls into locals, the
   store of the first word, and then the other two calls.
+- An SDK inline written from memory can match every user that doesn't care about its order of terms and still be
+  wrong. `nitro/gx.h`'s `G2_SetOBJPosition` ORed x before y, and only `DWCUtilKeyboard_MoveRow` (`dwc_util_keyboard.c`)
+  showed it; NitroSDK's `g2_oam.h` masks both fields at once and ORs y first, which matches every user. Check such an
+  inline against the SDK's own definition before writing a local copy with its terms swapped.
 
 ## An instruction too many or too few
 

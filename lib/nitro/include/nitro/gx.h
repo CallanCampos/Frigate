@@ -237,8 +237,8 @@ static inline void G2_SetOBJEffect(GXOamAttr *oam, u32 effect, int rsParam) {
 }
 
 static inline void G2_SetOBJPosition(GXOamAttr *oam, int x, int y) {
-    oam->attr01 = (oam->attr01 & ~(GX_OAM_ATTR01_X_MASK | GX_OAM_ATTR01_Y_MASK)) |
-                  ((x & 0x1ff) << GX_OAM_ATTR01_X_SHIFT) | ((y & 0xff) << GX_OAM_ATTR01_Y_SHIFT);
+    oam->attr01 = (oam->attr01 & ~(GX_OAM_ATTR01_Y_MASK | GX_OAM_ATTR01_X_MASK)) | (y & GX_OAM_ATTR01_Y_MASK) |
+                  ((x & (GX_OAM_ATTR01_X_MASK >> GX_OAM_ATTR01_X_SHIFT)) << GX_OAM_ATTR01_X_SHIFT);
 }
 
 static inline void G2_SetOBJAttr(GXOamAttr *oam, int x, int y, int priority, int mode, BOOL mosaic, int effect,
