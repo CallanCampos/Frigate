@@ -311,7 +311,7 @@ static void DWCUtilScreenAp_WaitFadeOut(void) {
             break;
         case SCREEN_AP_WIDE_BUTTON:
             DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b688c);
+            DWCUtilMain_SetUpdate(DWCUtilUsbIntro_Init);
             break;
         }
     }
