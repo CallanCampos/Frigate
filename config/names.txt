@@ -789,6 +789,8 @@
 . 0x02010e58 FestRecords_AddCompleted
 . 0x02010e78 FestRecords_GetMostParticipants
 . 0x02010e80 FestRecords_UpdateMostParticipants
+. 0x02010e94 FestRecords_GetTopScores
+. 0x02010e9c FestRecords_AddTopScore
 . 0x02010ebc FestRecords_GetMissionCount
 . 0x02010ed4 FestRecords_UpdateMissionCount
 . 0x02010f14 FestRecords_GetMissionBest
@@ -797,6 +799,8 @@
 . 0x02010f80 FestRecords_UpdateMissionLevel
 . 0x02010fb0 FestRecords_IsMissionNew
 . 0x02010fc0 FestRecords_ClearMissionNew
+. 0x02010fd4 FestRecords_GetLevelPoints
+. 0x02010fe4 FestRecords_SetLevelPoints
 . 0x02010ff4 PokewoodSave_GetSize
 . 0x02010ffc PokewoodSave_Init
 . 0x02011040 PokewoodSave_Get

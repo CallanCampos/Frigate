@@ -47,14 +47,14 @@ void FestRecords_AddCompleted(FunfestSave *save);
 // Keeps the most participants, up to 100
 void FestRecords_UpdateMostParticipants(FunfestSave *save, u32 count);
 // Counts one more top score in a mission with other players, up to 9999
-void func_02010e9c(FunfestSave *save);
+void FestRecords_AddTopScore(FunfestSave *save);
 // Keep a mission's count and best value, up to 9999, if they are more than the record's: TRUE when they were kept
 BOOL FestRecords_UpdateMissionCount(FunfestSave *save, u32 mission, u32 count);
 BOOL FestRecords_UpdateMissionBest(FunfestSave *save, u32 mission, u32 best);
 // Keeps the level cleared of a mission if it is higher than the record's
 void FestRecords_UpdateMissionLevel(FunfestSave *save, u32 mission, int level);
 // The points left over toward the next White (0) and Black (1) pass power level, up to 99
-u8 func_02010fd4(FunfestSave *save, int index);
-void func_02010fe4(FunfestSave *save, int index, u32 value);
+u8 FestRecords_GetLevelPoints(FunfestSave *save, int index);
+void FestRecords_SetLevelPoints(FunfestSave *save, int index, u32 value);
 
 #endif // POKEBW2_SAVE_FUNFEST_SAVEDATA_H

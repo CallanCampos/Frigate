@@ -82,13 +82,13 @@ void FestRecords_UpdateMostParticipants(FunfestSave *save, u32 count) {
     }
 }
 
-u16 func_02010e94(void *a0) {
+u16 FestRecords_GetTopScores(void *a0) {
     FunfestSave *save = a0;
 
     return save->topScores;
 }
 
-void func_02010e9c(FunfestSave *save) {
+void FestRecords_AddTopScore(FunfestSave *save) {
     if (save->topScores + 1 <= FUNFEST_COUNT_MAX) {
         save->topScores++;
     }
@@ -168,14 +168,14 @@ void FestRecords_ClearMissionNew(void *records, u8 mission) {
     }
 }
 
-u8 func_02010fd4(FunfestSave *save, int index) {
+u8 FestRecords_GetLevelPoints(FunfestSave *save, int index) {
     if (index >= FUNFEST_LEVEL_POINTS_COUNT) {
         return 0;
     }
     return save->levelPoints[index];
 }
 
-void func_02010fe4(FunfestSave *save, int index, u32 value) {
+void FestRecords_SetLevelPoints(FunfestSave *save, int index, u32 value) {
     if (index < FUNFEST_LEVEL_POINTS_COUNT && value < FUNFEST_LEVEL_POINTS_MAX) {
         save->levelPoints[index] = value;
     }

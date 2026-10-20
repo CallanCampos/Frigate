@@ -311,7 +311,7 @@ u16 FestRecords_AddHosted(void *records);
 u16 FestRecords_AddJoined(void *records);
 u16 FestRecords_GetCompleted(void *a0);
 u8 FestRecords_GetMostParticipants(void *a0);
-u16 func_02010e94(void *a0);
+u16 FestRecords_GetTopScores(void *a0);
 // A Funfest mission's record in FestRecords_GetFromSave's block, by the mission's index, which is 0 for an index past
 // the missions: a 14-bit count, another count, the highest level cleared (0 to 4) and whether the mission is new, which
 // FestRecords_ClearMissionNew clears
