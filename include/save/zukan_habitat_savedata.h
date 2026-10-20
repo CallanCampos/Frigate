@@ -31,8 +31,9 @@ typedef struct ZukanHabitatSave {
     u16 zone;
     u8 season;
     u8 type;
-    u8 unk94;
-    u8 unk95;
+    // Whether the messages of every Pokémon's habitat seen and caught have been shown
+    u8 seenMessageShown;
+    u8 caughtMessageShown;
 } ZukanHabitatSave; // size: 0x96
 
 // A habitat's flag, and setting it

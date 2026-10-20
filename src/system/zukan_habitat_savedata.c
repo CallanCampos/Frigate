@@ -94,17 +94,17 @@ u8 ZukanHabitatSave_GetType(void *data) {
 }
 
 u8 func_02010da0(ZukanHabitatSave *save) {
-    return save->unk94;
+    return save->seenMessageShown;
 }
 
 u8 func_02010da8(ZukanHabitatSave *save) {
-    return save->unk95;
+    return save->caughtMessageShown;
 }
 
 void func_02010db0(ZukanHabitatSave *save) {
-    save->unk94 = TRUE;
+    save->seenMessageShown = TRUE;
 }
 
 void func_02010db8(ZukanHabitatSave *save) {
-    save->unk95 = TRUE;
+    save->caughtMessageShown = TRUE;
 }
