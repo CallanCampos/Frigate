@@ -73,10 +73,10 @@ int DWC_StartUtility(void *work, int language, int param) {
     DWCUtilSound_Init();
     DWCUtilMain_SetUpdate(func_ov182_021ae574);
     do {
-        func_ov182_021bc5bc();
+        DWCUtilTouch_Update();
         sMain.update();
         DWCUtilTask_Run(0);
-        func_ov182_021bca28();
+        DWCUtilTouch_UpdateLid();
         func_ov182_021bd0ac();
         OS_WaitVBlankIntr();
     } while (!sMain.finished);
@@ -130,8 +130,8 @@ static void DWCUtilMain_InitSystem(void) {
     DWCUtilIrq_Init();
     DWCUtilTask_Init();
     DWCUtilRomResource_Init();
-    func_ov182_021bc544();
-    func_ov182_021bba6c();
+    DWCUtilTouch_Init();
+    DWCUtilFade_Init();
     work = DWCUtilHeap_AllocClear(DWC_BM_WORK_SIZE, 0x20);
     DWC_BM_Init(work);
     DWCUtilHeap_FreeAndNull(&work);
@@ -186,10 +186,10 @@ static void DWCUtilMain_InitGraphics(void) {
     GX_SetBGScrOffset(GX_BGSCROFFSET_0x00000);
     GX_SetBGCharOffset(GX_BGCHAROFFSET_0x00000);
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
-    func_ov182_021bbc50();
-    func_ov182_021bcbc8();
+    DWCUtilText_Init();
+    DWCUtilOamBuf_Init();
     DWCUtilVramAlloc_Init();
-    func_ov182_021bb480();
+    DWCUtilOam_Init();
     GX_DispOn();
     GXS_DispOn();
     GX_VBlankIntr(TRUE);
@@ -200,13 +200,13 @@ static void DWCUtilMain_Exit(void) {
     GXS_DispOff();
     func_ov182_021bd0c8();
     PM_SetLCDPower(TRUE);
-    func_ov182_021bc598();
+    DWCUtilTouch_Exit();
     DWCUtilIrq_Exit();
     DWCUtilSound_Exit();
-    func_ov182_021bb54c();
-    func_ov182_021bcc5c();
-    func_ov182_021bbd00();
-    func_ov182_021bba9c();
+    DWCUtilOam_Exit();
+    DWCUtilOamBuf_Exit();
+    DWCUtilText_Exit();
+    DWCUtilFade_Exit();
     DWCUtilRomResource_Exit();
     DWCUtilTask_Exit();
     DWCUtilHeap_Exit();

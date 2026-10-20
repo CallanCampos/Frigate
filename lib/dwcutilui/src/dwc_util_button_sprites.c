@@ -11,49 +11,49 @@ static const u8 sPairCells[6][2] = { { 0x0a, 0x0b }, { 0x04, 0x05 }, { 0x02, 0x0
                                      { 0x0c, 0x0d }, { 0xe5, 0x00 }, { 0x26, 0x00 } };
 static DWCUtilButtonSprites *sButtonSprites;
 
-void func_ov182_021ab7c8(void) {
+void DWCUtilButtonSprites_Init(void) {
     sButtonSprites = DWCUtilHeap_AllocClear(sizeof(DWCUtilButtonSprites), 4);
 }
 
-void func_ov182_021ab7dc(void) {
-    func_ov182_021ab8e4();
+void DWCUtilButtonSprites_Exit(void) {
+    DWCUtilButtonSprites_Hide();
     DWCUtilHeap_FreeAndNull(&sButtonSprites);
 }
 
-void func_ov182_021ab7f0(int pair, int x0, int x1, int y) {
+void DWCUtilButtonSprites_ShowPair(int pair, int x0, int x1, int y) {
     int i;
 
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     for (i = 0; i < 2; i++) {
-        sButtonSprites->sprites[i] = func_ov182_021bb97c(0, sPairCells[pair][i], TRUE);
-        func_ov182_021bb878(sButtonSprites->sprites[i], -1, 1);
+        sButtonSprites->sprites[i] = DWCUtilCell_AllocOamRun(0, sPairCells[pair][i], TRUE);
+        DWCUtilOam_SetPriority(sButtonSprites->sprites[i], -1, 1);
     }
-    func_ov182_021bb7e0(sButtonSprites->sprites[0], -1, x0, y);
-    func_ov182_021bb7e0(sButtonSprites->sprites[1], -1, x1, y);
+    DWCUtilOam_SetNodePosition(sButtonSprites->sprites[0], -1, x0, y);
+    DWCUtilOam_SetNodePosition(sButtonSprites->sprites[1], -1, x1, y);
 }
 
-void func_ov182_021ab85c(int x0, int x1, int y0, int y1) {
+void DWCUtilButtonSprites_ShowFour(int x0, int x1, int y0, int y1) {
     int cell = 6;
     int i;
 
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     for (i = 0; i < 4; i++) {
-        sButtonSprites->sprites[i] = func_ov182_021bb97c(0, cell, TRUE);
-        func_ov182_021bb878(sButtonSprites->sprites[i], -1, 1);
+        sButtonSprites->sprites[i] = DWCUtilCell_AllocOamRun(0, cell, TRUE);
+        DWCUtilOam_SetPriority(sButtonSprites->sprites[i], -1, 1);
         cell++;
     }
-    func_ov182_021bb7e0(sButtonSprites->sprites[0], -1, x0, y0);
-    func_ov182_021bb7e0(sButtonSprites->sprites[1], -1, x1, y0);
-    func_ov182_021bb7e0(sButtonSprites->sprites[2], -1, x0, y1);
-    func_ov182_021bb7e0(sButtonSprites->sprites[3], -1, x1, y1);
+    DWCUtilOam_SetNodePosition(sButtonSprites->sprites[0], -1, x0, y0);
+    DWCUtilOam_SetNodePosition(sButtonSprites->sprites[1], -1, x1, y0);
+    DWCUtilOam_SetNodePosition(sButtonSprites->sprites[2], -1, x0, y1);
+    DWCUtilOam_SetNodePosition(sButtonSprites->sprites[3], -1, x1, y1);
 }
 
-void func_ov182_021ab8e4(void) {
+void DWCUtilButtonSprites_Hide(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
         if (sButtonSprites->sprites[i] != NULL) {
-            func_ov182_021bb690(sButtonSprites->sprites[i]);
+            DWCUtilOam_Free(sButtonSprites->sprites[i]);
             sButtonSprites->sprites[i] = NULL;
         }
     }

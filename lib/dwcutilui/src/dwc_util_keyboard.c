@@ -173,47 +173,47 @@ void func_ov182_021abb10(void) {
     sKeyboard->backspaceEnabled = TRUE;
     sKeyboard->charsEnabled = TRUE;
     for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-        sKeyboard->charOams[i] = func_ov182_021bb960(0, 0x34);
+        sKeyboard->charOams[i] = DWCUtilCell_AllocOam(0, 0x34);
         G2_SetOBJEffect(sKeyboard->charOams[i], GX_OAM_EFFECT_NODISPLAY, 0);
         G2_SetOBJPriority(sKeyboard->charOams[i], 3);
     }
     for (i = 0; i < KEYBOARD_SPECIAL_KEYS; i++) {
-        sKeyboard->specialOams[i] = func_ov182_021bb960(0, sSpecialCells[i]);
+        sKeyboard->specialOams[i] = DWCUtilCell_AllocOam(0, sSpecialCells[i]);
         G2_SetOBJEffect(sKeyboard->specialOams[i], GX_OAM_EFFECT_NODISPLAY, 0);
         G2_SetOBJPriority(sKeyboard->specialOams[i], 3);
     }
     for (i = 0; i < 2; i++) {
-        sKeyboard->buttons[i] = func_ov182_021bb97c(0, sButtonCells[i], TRUE);
-        func_ov182_021bb6f8(sKeyboard->buttons[i], -1, 0x200, 0);
-        func_ov182_021bb878(sKeyboard->buttons[i], -1, 3);
+        sKeyboard->buttons[i] = DWCUtilCell_AllocOamRun(0, sButtonCells[i], TRUE);
+        DWCUtilOam_SetEffect(sKeyboard->buttons[i], -1, 0x200, 0);
+        DWCUtilOam_SetPriority(sKeyboard->buttons[i], -1, 3);
     }
     label[1] = 0;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 4; j++) {
-            DWCUtilText *text = func_ov182_021bbd3c(0, sLabelSize[0], sLabelSize[1], 0, &objCount, 0);
+            DWCUtilText *text = DWCUtilText_CreateObj(0, sLabelSize[0], sLabelSize[1], 0, &objCount, 0);
 
             sKeyboard->labels[i][j] = text;
             n = j * 12;
             rect[0] = 0;
             for (k = 0; k < 12; k++, n++) {
                 label[0] = sKeyLabels[i][n];
-                func_ov182_021bc0a4(sKeyboard->labels[i][j], rect[0], rect[1], rect[2], rect[3], 2, 0x480, label);
+                DWCUtilText_DrawRect(sKeyboard->labels[i][j], rect[0], rect[1], rect[2], rect[3], 2, 0x480, label);
                 rect[0] += 0x12;
             }
             if (i == 0) {
-                sKeyboard->labelNodes[j] = func_ov182_021bb594(0, objCount, TRUE);
+                sKeyboard->labelNodes[j] = DWCUtilOam_Alloc(0, objCount, TRUE);
             }
         }
     }
-    sKeyboard->cursor = func_ov182_021bb97c(0, 0x40, TRUE);
-    func_ov182_021bb6f8(sKeyboard->cursor, -1, 0x200, 0);
-    func_ov182_021bb878(sKeyboard->cursor, -1, 2);
+    sKeyboard->cursor = DWCUtilCell_AllocOamRun(0, 0x40, TRUE);
+    DWCUtilOam_SetEffect(sKeyboard->cursor, -1, 0x200, 0);
+    DWCUtilOam_SetPriority(sKeyboard->cursor, -1, 2);
     sKeyboard->task = DWCUtilTask_Create(0, func_ov182_021abddc, NULL, 0x78);
     func_ov182_021ac608(sKeyboard->mode, 0, 0xc0);
 }
 
 void func_ov182_021abd6c(void) {
-    func_ov182_021bb690(sKeyboard->cursor);
+    DWCUtilOam_Free(sKeyboard->cursor);
     DWCUtilTask_SetCallback(sKeyboard->task, func_ov182_021acbac);
 }
 
@@ -288,7 +288,7 @@ static void func_ov182_021abf44(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sKeyboard->buttons[0], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sKeyboard->buttons[0], 0, &x, &y);
     y -= 12;
     if (y > 0xaa) {
         func_ov182_021ac608(sKeyboard->mode, 4, y);
@@ -310,11 +310,11 @@ static void func_ov182_021abfb0(void) {
     u16 rect[4];
     int i;
 
-    if (func_ov182_021bc888(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
         sKeyboard->touched = -1;
         for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-            func_ov182_021bc1c0(&sCharKeyPositions[i], sCharKeySize, rect);
-            if (func_ov182_021bc888(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sCharKeyPositions[i], sCharKeySize, rect);
+            if (DWCUtilTouch_IsTriggeredIn(rect)) {
                 if (!sKeyboard->charsEnabled) {
                     DWCUtilSound_PlaySe(9);
                     return;
@@ -325,8 +325,8 @@ static void func_ov182_021abfb0(void) {
             }
         }
         for (i = 0; i < KEYBOARD_SPECIAL_KEYS; i++) {
-            func_ov182_021bc1c0(&sSpecialPositions[i], &sSpecialSizes[i], rect);
-            if (func_ov182_021bc888(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[i], &sSpecialSizes[i], rect);
+            if (DWCUtilTouch_IsTriggeredIn(rect)) {
                 if ((i == 3 && !sKeyboard->backspaceEnabled) || (i == 2 && !sKeyboard->charsEnabled)) {
                     DWCUtilSound_PlaySe(9);
                     return;
@@ -337,8 +337,8 @@ static void func_ov182_021abfb0(void) {
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
-            if (func_ov182_021bc888(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            if (DWCUtilTouch_IsTriggeredIn(rect)) {
                 DWCUtilSound_PlaySe(0);
                 sKeyboard->touched = i + KEYBOARD_FIRST_BUTTON;
                 return;
@@ -354,12 +354,12 @@ static void func_ov182_021ac0e8(void) {
 
     i = 0;
     sKeyboard->key = 0;
-    if (!func_ov182_021bc948(data_ov182_021c059c)) {
+    if (!DWCUtilTouch_IsReleasedIn(gDWCUtilTouchScreenRect)) {
         return;
     }
     do {
-        func_ov182_021bc1c0(&sCharKeyPositions[i], sCharKeySize, rect);
-        if (func_ov182_021bc948(rect)) {
+        DWCUtilDisplay_SetRectFromSize(&sCharKeyPositions[i], sCharKeySize, rect);
+        if (DWCUtilTouch_IsReleasedIn(rect)) {
             if (sKeyboard->touched != i) {
                 return;
             }
@@ -375,8 +375,8 @@ static void func_ov182_021ac0e8(void) {
     } while (i < KEYBOARD_CHAR_KEYS);
     j = 2;
     do {
-        func_ov182_021bc1c0(&sSpecialPositions[j], &sSpecialSizes[j], rect);
-        if (func_ov182_021bc948(rect)) {
+        DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[j], &sSpecialSizes[j], rect);
+        if (DWCUtilTouch_IsReleasedIn(rect)) {
             if (sKeyboard->touched != j + KEYBOARD_FIRST_SPECIAL) {
                 return;
             }
@@ -392,8 +392,8 @@ static void func_ov182_021ac0e8(void) {
     } while (j < KEYBOARD_SPECIAL_KEYS);
     j = 0;
     do {
-        func_ov182_021bc1c0(&sButtonPositions[j], sButtonSize, rect);
-        if (func_ov182_021bc948(rect)) {
+        DWCUtilDisplay_SetRectFromSize(&sButtonPositions[j], sButtonSize, rect);
+        if (DWCUtilTouch_IsReleasedIn(rect)) {
             if (sKeyboard->touched != j + KEYBOARD_FIRST_BUTTON) {
                 return;
             }
@@ -404,8 +404,8 @@ static void func_ov182_021ac0e8(void) {
         }
         j++;
     } while (j < 2);
-    func_ov182_021bc1c0(&sSpecialPositions[0], &sSpecialSizes[0], rect);
-    if (func_ov182_021bc948(rect)) {
+    DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[0], &sSpecialSizes[0], rect);
+    if (DWCUtilTouch_IsReleasedIn(rect)) {
         if (sKeyboard->touched == KEYBOARD_FIRST_SPECIAL) {
             func_ov182_021ac2bc();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL;
@@ -413,8 +413,8 @@ static void func_ov182_021ac0e8(void) {
             return;
         }
     } else {
-        func_ov182_021bc1c0(&sSpecialPositions[1], &sSpecialSizes[1], rect);
-        if (func_ov182_021bc948(rect) && sKeyboard->touched == KEYBOARD_FIRST_SPECIAL + 1) {
+        DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[1], &sSpecialSizes[1], rect);
+        if (DWCUtilTouch_IsReleasedIn(rect) && sKeyboard->touched == KEYBOARD_FIRST_SPECIAL + 1) {
             func_ov182_021ac2e4();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL + 1;
             func_ov182_021ac898();
@@ -437,10 +437,10 @@ static void func_ov182_021ac30c(void) {
     int i;
     int key;
 
-    if (func_ov182_021bc828(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsTouchedIn(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-            func_ov182_021bc1c0(&sCharKeyPositions[i], sCharKeySize, rect);
-            if (func_ov182_021bc828(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sCharKeyPositions[i], sCharKeySize, rect);
+            if (DWCUtilTouch_IsTouchedIn(rect)) {
                 if (sKeyboard->touched != i) {
                     goto release;
                 }
@@ -449,8 +449,8 @@ static void func_ov182_021ac30c(void) {
             }
         }
         for (i = 2; i < KEYBOARD_SPECIAL_KEYS; i++) {
-            func_ov182_021bc1c0(&sSpecialPositions[i], &sSpecialSizes[i], rect);
-            if (func_ov182_021bc828(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[i], &sSpecialSizes[i], rect);
+            if (DWCUtilTouch_IsTouchedIn(rect)) {
                 if (sKeyboard->touched == i + KEYBOARD_FIRST_SPECIAL) {
                     func_ov182_021ac448(i + KEYBOARD_FIRST_SPECIAL);
                     if (i != 3) {
@@ -473,8 +473,8 @@ static void func_ov182_021ac30c(void) {
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
-            if (func_ov182_021bc828(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            if (DWCUtilTouch_IsTouchedIn(rect)) {
                 i += KEYBOARD_FIRST_BUTTON;
                 if (sKeyboard->touched != i) {
                     break;
@@ -504,19 +504,19 @@ static void func_ov182_021ac448(int key) {
 static void func_ov182_021ac478(void) {
     int key;
 
-    if (func_ov182_021bc7c8(0x20)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x20)) {
         func_ov182_021ac928(0);
     }
-    if (func_ov182_021bc7c8(0x40)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x40)) {
         func_ov182_021ac928(1);
     }
-    if (func_ov182_021bc7c8(0x10)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x10)) {
         func_ov182_021ac928(2);
     }
-    if (func_ov182_021bc7c8(0x80)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x80)) {
         func_ov182_021ac928(3);
     }
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         key = sKeyboard->cursorPos;
         if (key < KEYBOARD_CHAR_KEYS) {
             if (!sKeyboard->charsEnabled) {
@@ -559,7 +559,7 @@ static void func_ov182_021ac478(void) {
         }
         sKeyboard->key = sButtonKeys[key - KEYBOARD_FIRST_BUTTON];
     }
-    if (func_ov182_021bc7c8(2)) {
+    if (DWCUtilTouch_IsKeyRepeated(2)) {
         if (!sKeyboard->backspaceEnabled) {
             if (sKeyboard->errorPlayed) {
                 return;
@@ -569,13 +569,13 @@ static void func_ov182_021ac478(void) {
             return;
         }
         sKeyboard->key = KEYBOARD_BACKSPACE;
-    } else if (func_ov182_021bc7f8(2)) {
+    } else if (DWCUtilTouch_IsKeyReleased(2)) {
         sKeyboard->errorPlayed = FALSE;
     }
-    if (func_ov182_021bc798(0x400)) {
+    if (DWCUtilTouch_IsKeyPressed(0x400)) {
         func_ov182_021ac2bc();
     }
-    if (func_ov182_021bc798(0x800)) {
+    if (DWCUtilTouch_IsKeyPressed(0x800)) {
         func_ov182_021ac2e4();
     }
 }
@@ -595,7 +595,7 @@ static void func_ov182_021ac608(int mode, int row, int y) {
         G2_SetOBJPosition(sKeyboard->charOams[index], sCharKeyPositions[index].x, y);
     }
     if (row < 4) {
-        func_ov182_021bc124(sKeyboard->labels[mode][row], sCharKeyPositions[row * 12].x, y, sKeyboard->labelNodes[row],
+        DWCUtilText_ShowObj(sKeyboard->labels[mode][row], sCharKeyPositions[row * 12].x, y, sKeyboard->labelNodes[row],
                             2);
     }
     special = FX_ModS32(row + 3, 4);
@@ -604,8 +604,8 @@ static void func_ov182_021ac608(int mode, int row, int y) {
         G2_SetOBJPosition(sKeyboard->specialOams[special], sSpecialPositions[special].x, y);
     }
     for (i = 0; i < buttonCounts[row]; i++) {
-        func_ov182_021bb6f8(sKeyboard->buttons[i], -1, 0, 0);
-        func_ov182_021bb7e0(sKeyboard->buttons[i], -1, sButtonPositions[i].x, y);
+        DWCUtilOam_SetEffect(sKeyboard->buttons[i], -1, 0, 0);
+        DWCUtilOam_SetNodePosition(sKeyboard->buttons[i], -1, sButtonPositions[i].x, y);
     }
 }
 
@@ -636,7 +636,7 @@ static void func_ov182_021ac808(int key, int pressed) {
     } else if (key - KEYBOARD_FIRST_SPECIAL < KEYBOARD_SPECIAL_KEYS) {
         G2_SetOBJMode(sKeyboard->specialOams[key - KEYBOARD_FIRST_SPECIAL], GX_OAM_MODE_NORMAL, sKeyPalettes[pressed]);
     } else {
-        func_ov182_021bb778(sKeyboard->buttons[key - KEYBOARD_FIRST_BUTTON], -1, 0, sButtonPalettes[pressed]);
+        DWCUtilOam_SetMode(sKeyboard->buttons[key - KEYBOARD_FIRST_BUTTON], -1, 0, sButtonPalettes[pressed]);
     }
 }
 
@@ -664,10 +664,10 @@ static void func_ov182_021ac898(void) {
         cell = 0x40;
         break;
     }
-    func_ov182_021bb914(0, cell, func_ov182_021bb6ec(sKeyboard->cursor, 0));
-    func_ov182_021bb878(sKeyboard->cursor, -1, 2);
-    func_ov182_021bb7e0(sKeyboard->cursor, -1, sCursorPositions[sKeyboard->cursorPos].x,
-                        sCursorPositions[sKeyboard->cursorPos].y);
+    DWCUtilCell_Copy(0, cell, DWCUtilOam_GetEntry(sKeyboard->cursor, 0));
+    DWCUtilOam_SetPriority(sKeyboard->cursor, -1, 2);
+    DWCUtilOam_SetNodePosition(sKeyboard->cursor, -1, sCursorPositions[sKeyboard->cursorPos].x,
+                               sCursorPositions[sKeyboard->cursorPos].y);
 }
 
 static void func_ov182_021ac928(int direction) {
@@ -806,7 +806,7 @@ static void func_ov182_021ac928(int direction) {
 }
 
 static void func_ov182_021acbac(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(func_ov182_021bb6ec(sKeyboard->buttons[0], 0)).attr01 + 12;
+    int y = (u8)DWCUtilOam_ReadAttr01(DWCUtilOam_GetEntry(sKeyboard->buttons[0], 0)).attr01 + 12;
 
     func_ov182_021ac608(sKeyboard->mode, 4, y);
     if (y >= 0xc0) {
@@ -857,20 +857,20 @@ static void func_ov182_021accec(DWCUtilTask *task, void *arg) {
     DWCUtilTask_QueueRemoval(0, task);
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 4; j++) {
-            func_ov182_021bbdcc(sKeyboard->labels[i][j]);
+            DWCUtilText_DestroyObj(sKeyboard->labels[i][j]);
             if (i == 0) {
-                func_ov182_021bb690(sKeyboard->labelNodes[j]);
+                DWCUtilOam_Free(sKeyboard->labelNodes[j]);
             }
         }
     }
     for (i = 0; i < 2; i++) {
-        func_ov182_021bb690(sKeyboard->buttons[i]);
+        DWCUtilOam_Free(sKeyboard->buttons[i]);
     }
     for (i = 0; i < KEYBOARD_SPECIAL_KEYS; i++) {
-        func_ov182_021bcc9c(sKeyboard->specialOams[i]);
+        DWCUtilOamBuf_Free(sKeyboard->specialOams[i]);
     }
     for (i = 0; i < KEYBOARD_CHAR_KEYS; i++) {
-        func_ov182_021bcc9c(sKeyboard->charOams[i]);
+        DWCUtilOamBuf_Free(sKeyboard->charOams[i]);
     }
     DWCUtilHeap_FreeAndNull(&sKeyboard);
 }

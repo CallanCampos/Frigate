@@ -57,15 +57,15 @@ static u8 sMoveResult;
 
 void func_ov182_021af714(void) {
     func_ov182_021af740();
-    func_ov182_021ab6f0(0x1e);
+    DWCUtilGfxResource_ShowMessage(0x1e);
     DWCUtilUiEffect_Init(0);
-    func_ov182_021ab9fc(1);
+    DWCUtilLinkIcon_Init(1);
     DWCUtilSound_PlaySe(0xb);
     DWCUtilMain_SetUpdate(func_ov182_021af790);
 }
 
 static void func_ov182_021af740(void) {
-    func_ov182_021ab67c("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -74,13 +74,13 @@ static void func_ov182_021af740(void) {
 }
 
 static void func_ov182_021af790(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021af7b4);
 }
 
 static void func_ov182_021af7b4(void) {
-    if (func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(0) == 0) {
         func_ov182_021ae224(func_ov182_021af870);
         DWCUtilMain_SetUpdate(func_ov182_021af7d8);
     }
@@ -98,16 +98,16 @@ static void func_ov182_021af7e8(void) {
 }
 
 static void func_ov182_021af7ec(void) {
-    func_ov182_021bbac4(3, 0, 0x15, 8);
+    DWCUtilFade_Start(3, 0, 0x15, 8);
     DWCUtilMain_SetUpdate(func_ov182_021af808);
 }
 
 static void func_ov182_021af808(void) {
-    if (func_ov182_021bbaac(0) == 0 && func_ov182_021ae210()) {
-        func_ov182_021aba70();
+    if (DWCUtilFade_IsActive(0) == 0 && func_ov182_021ae210()) {
+        DWCUtilLinkIcon_Exit();
         DWCUtilUiEffect_Destroy();
-        func_ov182_021bbf7c(0);
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilText_DestroyScreenBg(0);
+        DWCUtilDisplay_HidePlanes(0, 0x15);
         DWCUtilMain_SetLayout(0, 1);
         if (sMoveResult == 0) {
             DWCUtilMain_SetUpdate(func_ov182_021aff3c);
@@ -143,7 +143,7 @@ static void func_ov182_021af870(int event) {
 // The settings were sent: the player is told to turn the console off
 static void func_ov182_021af8bc(void) {
     func_ov182_021af8d4();
-    func_ov182_021ab6f0(0x1f);
+    DWCUtilGfxResource_ShowMessage(0x1f);
     DWCUtilMain_SetUpdate(func_ov182_021af910);
 }
 
@@ -156,14 +156,14 @@ static void func_ov182_021af8d4(void) {
 }
 
 static void func_ov182_021af910(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021af934);
 }
 
 static void func_ov182_021af934(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(5);
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(5);
         DWCUtilMain_SetUpdate(func_ov182_021af954);
     }
 }
@@ -182,7 +182,7 @@ static void func_ov182_021af974(void) {
 }
 
 static void func_ov182_021af984(void) {
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -199,21 +199,21 @@ static void func_ov182_021af99c(void) {
 
 static void func_ov182_021af9b8(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021af9d0);
 }
 
 static void func_ov182_021af9d0(void) {
-    if (func_ov182_021bbaac(1) == 0) {
-        func_ov182_021bbac4(3, 1, 0x3f, 0x40);
-        func_ov182_021bbac4(3, 0, 0x3f, 0x40);
+    if (DWCUtilFade_IsActive(1) == 0) {
+        DWCUtilFade_Start(3, 1, 0x3f, 0x40);
+        DWCUtilFade_Start(3, 0, 0x3f, 0x40);
         DWCUtilMain_SetUpdate(func_ov182_021afa04);
     }
 }
 
 // Turns the console off once both screens have faded out
 static void func_ov182_021afa04(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         OS_SpinWaitSysCycles(0x800000);
         PM_ForceToPowerOff();
     }
@@ -221,7 +221,7 @@ static void func_ov182_021afa04(void) {
 
 void func_ov182_021afa28(void) {
     func_ov182_021afa40();
-    func_ov182_021ab6f0(0x1a);
+    DWCUtilGfxResource_ShowMessage(0x1a);
     DWCUtilMain_SetUpdate(func_ov182_021afa7c);
 }
 
@@ -234,14 +234,14 @@ static void func_ov182_021afa40(void) {
 }
 
 static void func_ov182_021afa7c(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021afaa0);
 }
 
 static void func_ov182_021afaa0(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(4);
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(4);
         DWCUtilMain_SetUpdate(func_ov182_021afac8);
     }
 }
@@ -260,7 +260,7 @@ static void func_ov182_021afae8(void) {
 }
 
 static void func_ov182_021afaf8(void) {
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -277,22 +277,22 @@ static void func_ov182_021afb10(void) {
 
 static void func_ov182_021afb2c(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021afb44);
 }
 
 static void func_ov182_021afb44(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
-        func_ov182_021bbac4(3, 0, 0x15, 8);
+        DWCUtilFade_Start(3, 0, 0x15, 8);
         DWCUtilMain_SetUpdate(func_ov182_021afb6c);
     }
 }
 
 static void func_ov182_021afb6c(void) {
-    if (func_ov182_021bbaac(0) == 0 && DWCUtilUiObject_IsIdle()) {
-        func_ov182_021bbf7c(0);
-        func_ov182_021bc228(0, 0x15);
+    if (DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
+        DWCUtilText_DestroyScreenBg(0);
+        DWCUtilDisplay_HidePlanes(0, 0x15);
         DWCUtilMain_SetLayout(0, 1);
         DWCUtilMain_SetUpdate(func_ov182_021b043c);
     }

@@ -22,15 +22,15 @@ static void func_ov182_021b4544(void);
 
 void func_ov182_021b4404(void) {
     func_ov182_021b4420();
-    func_ov182_021ab9ac();
+    DWCUtilBgOverlay_ShowConnectionSet();
     func_ov182_021b7bb0();
     DWCUtilMain_SetUpdate(func_ov182_021b4488);
 }
 
 static void func_ov182_021b4420(void) {
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb4None.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb4None.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -38,16 +38,16 @@ static void func_ov182_021b4420(void) {
 }
 
 static void func_ov182_021b4488(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x14, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x14);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x14, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x14);
     DWCUtilMain_SetUpdate(func_ov182_021b44c0);
 }
 
 // Shows the message of the save once the screens have faded in
 static void func_ov182_021b44c0(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         func_ov182_021b8cf0(0x44, 5, 1, -1, 0);
         DWCUtilMain_SetUpdate(func_ov182_021b44f4);
     }
@@ -68,16 +68,16 @@ static void func_ov182_021b4518(void) {
 }
 
 static void func_ov182_021b451c(void) {
-    func_ov182_021bbac4(3, 1, 1, 8);
-    func_ov182_021bbac4(3, 0, 0x14, 8);
+    DWCUtilFade_Start(3, 1, 1, 8);
+    DWCUtilFade_Start(3, 0, 0x14, 8);
     DWCUtilMain_SetUpdate(func_ov182_021b4544);
 }
 
 static void func_ov182_021b4544(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x14);
+        DWCUtilDisplay_HidePlanes(1, 1);
+        DWCUtilDisplay_HidePlanes(0, 0x14);
         DWCUtilMain_SetLayout(2, 1);
         DWCUtilMain_SetUpdate(func_ov182_021b536c);
     }

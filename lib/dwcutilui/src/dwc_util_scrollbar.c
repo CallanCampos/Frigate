@@ -63,16 +63,16 @@ void func_ov182_021b70a0(int kind, int range, u16 x, u16 y, int pos) {
     sScrollbar->kind = kind;
     sScrollbar->range = range;
     sScrollbar->pos = pos;
-    func_ov182_021bc1a8(x, y, sScrollbar->origin);
-    sScrollbar->handle = func_ov182_021bb97c(0, sScrollbarCells[kind], TRUE);
-    func_ov182_021bb7e0(sScrollbar->handle, -1, x, y + pos);
-    func_ov182_021bb878(sScrollbar->handle, -1, 1);
+    DWCUtilDisplay_SetPoint(x, y, sScrollbar->origin);
+    sScrollbar->handle = DWCUtilCell_AllocOamRun(0, sScrollbarCells[kind], TRUE);
+    DWCUtilOam_SetNodePosition(sScrollbar->handle, -1, x, y + pos);
+    DWCUtilOam_SetPriority(sScrollbar->handle, -1, 1);
     sScrollbar->task = DWCUtilTask_Create(0, func_ov182_021b7184, NULL, 0x80);
 }
 
 void func_ov182_021b711c(void) {
     DWCUtilTask_Remove(0, sScrollbar->task);
-    func_ov182_021bb690(sScrollbar->handle);
+    DWCUtilOam_Free(sScrollbar->handle);
     DWCUtilHeap_FreeAndNull(&sScrollbar);
 }
 
@@ -109,7 +109,7 @@ static void func_ov182_021b7184(DWCUtilTask *task, void *arg) {
                 DWCUtilSound_PlaySe(0x16);
                 DWCUtilSound_SetVolume(0);
                 sScrollbar->event = DWC_UTIL_SCROLLBAR_GRAB;
-                func_ov182_021bc9e4(sScrollbar->grabPoint);
+                DWCUtilTouch_GetPoint(sScrollbar->grabPoint);
                 sScrollbar->grabPos = sScrollbar->pos;
                 sScrollbar->state = SCROLLBAR_DRAGGING;
             }
@@ -153,8 +153,8 @@ static void func_ov182_021b726c(void) {
     int pos;
     int max;
 
-    if (func_ov182_021bc828(data_ov182_021c059c)) {
-        func_ov182_021bc9e4(point);
+    if (DWCUtilTouch_IsTouchedIn(gDWCUtilTouchScreenRect)) {
+        DWCUtilTouch_GetPoint(point);
         if (point[0] >= sScrollbar->origin[0] - 30) {
             pos = sScrollbar->grabPos + (point[1] - sScrollbar->grabPoint[1]);
             if (pos < 0) {
@@ -216,7 +216,7 @@ static void func_ov182_021b7368(void) {
     int pos;
     int max;
 
-    func_ov182_021bc9e4(point);
+    DWCUtilTouch_GetPoint(point);
     length = sScrollbarHandleLengths[sScrollbar->kind];
     pos = point[1] - sScrollbar->origin[1] - length / 2;
     if (pos < 0) {
@@ -237,18 +237,18 @@ static int func_ov182_021b73ac(void) {
     int part;
 
     func_ov182_021b7434(SCROLLBAR_PART_HANDLE, rect);
-    if (func_ov182_021bc8e8(rect)) {
+    if (DWCUtilTouch_IsRepeatedIn(rect)) {
         return SCROLLBAR_PART_HANDLE;
     }
     for (part = SCROLLBAR_PART_UP; part <= SCROLLBAR_PART_DOWN; part++) {
         func_ov182_021b7434(part, rect);
-        if (func_ov182_021bc8e8(rect)) {
+        if (DWCUtilTouch_IsRepeatedIn(rect)) {
             return part;
         }
     }
     part = SCROLLBAR_PART_BAR;
     func_ov182_021b7434(SCROLLBAR_PART_BAR, rect);
-    if (!func_ov182_021bc888(rect)) {
+    if (!DWCUtilTouch_IsTriggeredIn(rect)) {
         part = SCROLLBAR_PART_NONE;
     }
     return part;
@@ -261,7 +261,7 @@ static int func_ov182_021b7408(int part) {
 
     for (i = SCROLLBAR_PART_UP; i <= SCROLLBAR_PART_DOWN; i++) {
         func_ov182_021b7434(i, rect);
-        if (func_ov182_021bc828(rect)) {
+        if (DWCUtilTouch_IsTouchedIn(rect)) {
             return i;
         }
     }
@@ -296,6 +296,6 @@ static void func_ov182_021b7434(int part, u16 *rect) {
 }
 
 static void func_ov182_021b74b0(int pos) {
-    func_ov182_021bb7e0(sScrollbar->handle, -1, sScrollbar->origin[0], pos + sScrollbar->origin[1]);
+    DWCUtilOam_SetNodePosition(sScrollbar->handle, -1, sScrollbar->origin[0], pos + sScrollbar->origin[1]);
     sScrollbar->pos = pos;
 }

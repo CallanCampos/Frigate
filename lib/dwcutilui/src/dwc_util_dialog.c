@@ -91,23 +91,23 @@ void func_ov182_021b8cf0(int msgIndex, int layout, BOOL fade, int slot, int valu
     sDialog->choice = -2;
     sDialog->fade = fade;
     G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1f, 0);
-    sDialog->frame = func_ov182_021bb97c(0, sDialogFrameCells[layout], FALSE);
-    func_ov182_021bb7e0(sDialog->frame, -1, 0x100, 0);
-    func_ov182_021bb878(sDialog->frame, -1, 0);
+    sDialog->frame = DWCUtilCell_AllocOamRun(0, sDialogFrameCells[layout], FALSE);
+    DWCUtilOam_SetNodePosition(sDialog->frame, -1, 0x100, 0);
+    DWCUtilOam_SetPriority(sDialog->frame, -1, 0);
     for (i = 0; i < sDialogButtonCounts[layout]; i++) {
-        sDialog->buttons[i] = func_ov182_021bb97c(0, sDialogButtonCells[layout][i], FALSE);
-        func_ov182_021bb7e0(sDialog->buttons[i], -1, 0x100, 0);
-        func_ov182_021bb878(sDialog->buttons[i], -1, 0);
+        sDialog->buttons[i] = DWCUtilCell_AllocOamRun(0, sDialogButtonCells[layout][i], FALSE);
+        DWCUtilOam_SetNodePosition(sDialog->buttons[i], -1, 0x100, 0);
+        DWCUtilOam_SetPriority(sDialog->buttons[i], -1, 0);
     }
-    sDialog->text = func_ov182_021bbd3c(0, 0x20, 0xc, 1, &textObjCount, 0);
-    sDialog->textObjects = func_ov182_021bb594(0, textObjCount, FALSE);
-    func_ov182_021bc0a4(sDialog->text, 0, 0, sDialogTextSizes[layout][0], sDialogTextSizes[layout][1], 2,
-                        func_ov182_021ab7b4(), str);
-    func_ov182_021bc124(sDialog->text, 0x100, 0, sDialog->textObjects, 0);
-    func_ov182_021bc354(0, 0, 0x1f, FALSE);
-    func_ov182_021bc354(0, 1, 0x1f, textEffects[sDialog->layout]);
-    func_ov182_021bc354(0, 3, 0x1f, TRUE);
-    func_ov182_021bc278(0, 1, sDialogWindowRect);
+    sDialog->text = DWCUtilText_CreateObj(0, 0x20, 0xc, 1, &textObjCount, 0);
+    sDialog->textObjects = DWCUtilOam_Alloc(0, textObjCount, FALSE);
+    DWCUtilText_DrawRect(sDialog->text, 0, 0, sDialogTextSizes[layout][0], sDialogTextSizes[layout][1], 2,
+                         DWCUtilGfxResource_GetTextFlags(), str);
+    DWCUtilText_ShowObj(sDialog->text, 0x100, 0, sDialog->textObjects, 0);
+    DWCUtilDisplay_SetWindowPlanes(0, 0, 0x1f, FALSE);
+    DWCUtilDisplay_SetWindowPlanes(0, 1, 0x1f, textEffects[sDialog->layout]);
+    DWCUtilDisplay_SetWindowPlanes(0, 3, 0x1f, TRUE);
+    DWCUtilDisplay_SetWindow(0, 1, sDialogWindowRect);
     func_ov182_021b90f4(0xc0);
     GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
     if (fade) {
@@ -147,7 +147,7 @@ static void func_ov182_021b8f74(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sDialog->frame, 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sDialog->frame, 0, &x, &y);
     y -= 12;
     if (y > sDialogFramePositions[sDialog->layout][1]) {
         func_ov182_021b90f4(y);
@@ -168,17 +168,17 @@ static void func_ov182_021b8fe8(DWCUtilTask *task, void *arg) {
     int i;
 
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
-        func_ov182_021bc1c0(sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][i]],
-                            sDialogButtonSizes[sDialog->layout], rect);
-        if (func_ov182_021bc888(rect)) {
+        DWCUtilDisplay_SetRectFromSize(sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][i]],
+                                       sDialogButtonSizes[sDialog->layout], rect);
+        if (DWCUtilTouch_IsTriggeredIn(rect)) {
             sDialog->choice = i;
             break;
         }
     }
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         sDialog->choice = sDialogKeyButtons[sDialog->layout][0];
     }
-    if (func_ov182_021bc798(2)) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         sDialog->choice = sDialogKeyButtons[sDialog->layout][1];
     }
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
@@ -207,13 +207,14 @@ static void func_ov182_021b90f4(int y) {
     int bottom;
     int top;
 
-    func_ov182_021bb7e0(sDialog->frame, -1, sDialogFramePositions[sDialog->layout][0], y);
-    func_ov182_021bb7e0(sDialog->textObjects, -1, sDialogFramePositions[sDialog->layout][0] + 8, y + 8);
+    DWCUtilOam_SetNodePosition(sDialog->frame, -1, sDialogFramePositions[sDialog->layout][0], y);
+    DWCUtilOam_SetNodePosition(sDialog->textObjects, -1, sDialogFramePositions[sDialog->layout][0] + 8, y + 8);
     func_ov182_021b9208(sDialog->frame, y);
     func_ov182_021b9208(sDialog->textObjects, y);
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         pos = sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][i]];
-        func_ov182_021bb7e0(sDialog->buttons[i], -1, pos[0], y + pos[1] - sDialogFramePositions[sDialog->layout][1]);
+        DWCUtilOam_SetNodePosition(sDialog->buttons[i], -1, pos[0],
+                                   y + pos[1] - sDialogFramePositions[sDialog->layout][1]);
         func_ov182_021b9208(sDialog->buttons[i], y);
     }
     top = (u8)y;
@@ -226,39 +227,39 @@ static void func_ov182_021b90f4(int y) {
     if (bottom > 0xc0) {
         bottom = 0xc0;
     }
-    func_ov182_021bc1b0(sDialogFramePositions[sDialog->layout][0], top,
-                        sDialogFramePositions[sDialog->layout][0] + sDialogWindowSizes[sDialog->layout][0], bottom,
-                        rect);
-    func_ov182_021bc278(0, 0, rect);
+    DWCUtilDisplay_SetRect(sDialogFramePositions[sDialog->layout][0], top,
+                           sDialogFramePositions[sDialog->layout][0] + sDialogWindowSizes[sDialog->layout][0], bottom,
+                           rect);
+    DWCUtilDisplay_SetWindow(0, 0, rect);
 }
 
 // Hides the objects of a node that are above top or below the screen
 static void func_ov182_021b9208(DWCUtilOamNode *node, int top) {
-    int count = func_ov182_021bb6f4(node);
+    int count = DWCUtilOam_GetCount(node);
     int x;
     int y;
     int effect;
     int i;
 
     for (i = 0; i < count; i++) {
-        func_ov182_021bb8bc(node, i, &x, &y);
+        DWCUtilOam_GetNodePosition(node, i, &x, &y);
         if (y >= top && y < 0xc0) {
             effect = 0;
         } else {
             effect = 0x200;
         }
-        func_ov182_021bb6f8(node, i, effect, 0);
+        DWCUtilOam_SetEffect(node, i, effect, 0);
     }
 }
 
 // Lights the button chosen
 static void func_ov182_021b9250(int button) {
-    func_ov182_021bb914(0, sDialogButtonCells[sDialog->layout][button] + 1,
-                        func_ov182_021bb6ec(sDialog->buttons[button], 0));
-    func_ov182_021bb7e0(sDialog->buttons[button], -1,
-                        sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][0],
-                        sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][1]);
-    func_ov182_021bb878(sDialog->buttons[button], -1, 0);
+    DWCUtilCell_Copy(0, sDialogButtonCells[sDialog->layout][button] + 1,
+                     DWCUtilOam_GetEntry(sDialog->buttons[button], 0));
+    DWCUtilOam_SetNodePosition(sDialog->buttons[button], -1,
+                               sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][0],
+                               sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][1]);
+    DWCUtilOam_SetPriority(sDialog->buttons[button], -1, 0);
 }
 
 static void func_ov182_021b92c8(DWCUtilTask *task, void *arg) {
@@ -273,7 +274,7 @@ static void func_ov182_021b92ec(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sDialog->frame, 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sDialog->frame, 0, &x, &y);
     y += 12;
     func_ov182_021b90f4(y);
     if (y >= 0xc0) {
@@ -297,14 +298,14 @@ static void func_ov182_021b9378(DWCUtilTask *task, void *arg) {
     int i;
 
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
-    func_ov182_021bb690(sDialog->frame);
-    func_ov182_021bb690(sDialog->textObjects);
+    DWCUtilOam_Free(sDialog->frame);
+    DWCUtilOam_Free(sDialog->textObjects);
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         if (sDialog->buttons[i] != NULL) {
-            func_ov182_021bb690(sDialog->buttons[i]);
+            DWCUtilOam_Free(sDialog->buttons[i]);
         }
     }
-    func_ov182_021bbdcc(sDialog->text);
+    DWCUtilText_DestroyObj(sDialog->text);
     DWCUtilTask_QueueRemoval(1, task);
     DWCUtilHeap_FreeAndNull(&sDialog);
 }

@@ -48,19 +48,19 @@ static BOOL func_ov182_021b4cc8(void) {
 void func_ov182_021b4ce4(void) {
     sTestStartPassed = FALSE;
     func_ov182_021b4d28();
-    func_ov182_021ab9ac();
+    DWCUtilBgOverlay_ShowConnectionSet();
     DWCUtilScreen_Start(0x37, -1, 0);
-    func_ov182_021ab6a4(2);
-    func_ov182_021ab6f0(0x24);
+    DWCUtilGfxResource_ShowStep(2);
+    DWCUtilGfxResource_ShowMessage(0x24);
     DWCUtilUiEffect_Init(0);
     DWCUtilSound_PlaySe(0xb);
     DWCUtilMain_SetUpdate(func_ov182_021b4d98);
 }
 
 static void func_ov182_021b4d28(void) {
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -69,18 +69,18 @@ static void func_ov182_021b4d28(void) {
 }
 
 static void func_ov182_021b4d98(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021b4dd0);
 }
 
 // Starts the test once the screens have faded in
 static void func_ov182_021b4dd0(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         func_ov182_021ae3d8();
-        func_ov182_021ab6d0(1);
+        DWCUtilGfxResource_ShowButtons(1);
         DWCUtilMain_SetUpdate(func_ov182_021b4e00);
     }
 }
@@ -101,7 +101,7 @@ static void func_ov182_021b4e20(void) {
 }
 
 static void func_ov182_021b4e3c(void) {
-    if (func_ov182_021bc798(2)) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     } else if (func_ov182_021b4cc8()) {
         DWCUtilUiObject_SetStateIfIdle(0);
@@ -122,32 +122,33 @@ static void func_ov182_021b4e64(void) {
 
 static void func_ov182_021b4e84(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021b4e9c);
 }
 
 static void func_ov182_021b4e9c(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         if (!sTestStartPassed) {
             DWCUtilUiObject_Exit();
         }
         if (!sTestStartPassed) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(3, 1, 1, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x14, 8);
+        DWCUtilFade_Start(3, 0, 0x14, 8);
         DWCUtilMain_SetUpdate(func_ov182_021b4ee4);
     }
 }
 
 static void func_ov182_021b4ee4(void) {
-    if (func_ov182_021bbaac(0) == 0 && (sTestStartPassed || func_ov182_021bbaac(1) == 0) && DWCUtilUiObject_IsIdle()) {
+    if (DWCUtilFade_IsActive(0) == 0 && (sTestStartPassed || DWCUtilFade_IsActive(1) == 0) &&
+        DWCUtilUiObject_IsIdle()) {
         DWCUtilUiEffect_Destroy();
-        func_ov182_021bbf7c(0);
+        DWCUtilText_DestroyScreenBg(0);
         if (!sTestStartPassed) {
             DWCUtilScreen_Stop();
-            func_ov182_021bc228(1, 1);
+            DWCUtilDisplay_HidePlanes(1, 1);
         }
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sTestStartPassed) {
             func_ov182_021ae424();
             DWCUtilMain_SetLayout(2, 1);

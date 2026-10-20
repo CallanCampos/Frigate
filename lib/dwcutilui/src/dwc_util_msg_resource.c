@@ -27,7 +27,7 @@ static DWCUtilMsgWork *sMsgWork;
 
 void DWCUtilMsg_Init(void) {
     sMsgWork = DWCUtilHeap_AllocClear(sizeof(DWCUtilMsgWork), 4);
-    sMsgWork->freeMsgs = func_ov182_021bb9c8(8, (u8 *)sMsgWork->msgs, sizeof(DWCUtilMsg));
+    sMsgWork->freeMsgs = DWCUtilStack_CreateFilled(8, (u8 *)sMsgWork->msgs, sizeof(DWCUtilMsg));
 }
 
 void DWCUtilMsg_Exit(void) {
@@ -38,7 +38,7 @@ DWCUtilMsg *DWCUtilMsg_Open(const char *path) {
     u32 size;
     DWCUtilMsgFile *file;
     DWCUtilMsgInfo *info;
-    DWCUtilMsg *msg = func_ov182_021bba38(sMsgWork->freeMsgs);
+    DWCUtilMsg *msg = DWCUtilStack_Pop(sMsgWork->freeMsgs);
 
     file = DWCUtilRomResource_LoadFile(path, &size, 4);
     msg->file = file;
@@ -50,7 +50,7 @@ DWCUtilMsg *DWCUtilMsg_Open(const char *path) {
 
 void DWCUtilMsg_Close(DWCUtilMsg *msg) {
     DWCUtilRomResource_FreeFile(msg->file);
-    func_ov182_021bba00(sMsgWork->freeMsgs, msg);
+    DWCUtilStack_Push(sMsgWork->freeMsgs, msg);
 }
 
 u16 *DWCUtilMsg_Get(DWCUtilMsg *msg, int index) {

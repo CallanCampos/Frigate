@@ -27,24 +27,24 @@ struct DWCUtilText {
     } u;
 };
 
-void func_ov182_021bbc50(void);
-void func_ov182_021bbd00(void);
+void DWCUtilText_Init(void);
+void DWCUtilText_Exit(void);
 // A canvas of OBJ characters, width by height characters, on the screen, and the number of OAM entries it needs
-DWCUtilText *func_ov182_021bbd3c(int screen, int width, int height, s16 fromFront, int *objCount, int font);
-void func_ov182_021bbdcc(DWCUtilText *text);
-// The screen's BG 0 canvas, uploaded at the next VBlank after each func_ov182_021bc184
-DWCUtilText *func_ov182_021bbdec(int screen, int font);
-void func_ov182_021bbed4(DWCUtilTask *task, void *arg);
-void func_ov182_021bbf38(DWCUtilText *text);
-void func_ov182_021bbf7c(int screen);
-void func_ov182_021bbf98(DWCUtilText *text, int x, int y, int cl, u32 flags, const void *str);
-void func_ov182_021bc004(DWCUtilText *text, int x, int y, int cl, u16 ch, int font);
+DWCUtilText *DWCUtilText_CreateObj(int screen, int width, int height, s16 fromFront, int *objCount, int font);
+void DWCUtilText_DestroyObj(DWCUtilText *text);
+// The screen's BG 0 canvas, uploaded at the next VBlank after each DWCUtilText_MarkDirty
+DWCUtilText *DWCUtilText_CreateBg(int screen, int font);
+void DWCUtilText_UploadTask(DWCUtilTask *task, void *arg);
+void DWCUtilText_DestroyBg(DWCUtilText *text);
+void DWCUtilText_DestroyScreenBg(int screen);
+void DWCUtilText_Draw(DWCUtilText *text, int x, int y, int cl, u32 flags, const void *str);
+void DWCUtilText_DrawChar(DWCUtilText *text, int x, int y, int cl, u16 ch, int font);
 // Draws the string with each character centered in a cell of cellWidth pixels
-void func_ov182_021bc030(DWCUtilText *text, int x, int y, int cl, int cellWidth, const u16 *str, int font);
-void func_ov182_021bc0a4(DWCUtilText *text, int x, int y, int w, int h, int cl, u32 flags, const void *str);
-void func_ov182_021bc118(DWCUtilText *text, int cl);
+void DWCUtilText_DrawCentered(DWCUtilText *text, int x, int y, int cl, int cellWidth, const u16 *str, int font);
+void DWCUtilText_DrawRect(DWCUtilText *text, int x, int y, int w, int h, int cl, u32 flags, const void *str);
+void DWCUtilText_Clear(DWCUtilText *text, int cl);
 // Shows the OBJ canvas at x, y in the run of OAM entries
-void func_ov182_021bc124(DWCUtilText *text, int x, int y, DWCUtilOamNode *node, int priority);
-void func_ov182_021bc184(DWCUtilText *text);
+void DWCUtilText_ShowObj(DWCUtilText *text, int x, int y, DWCUtilOamNode *node, int priority);
+void DWCUtilText_MarkDirty(DWCUtilText *text);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_TEXT_H

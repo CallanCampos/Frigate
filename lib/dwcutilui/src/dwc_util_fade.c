@@ -20,20 +20,20 @@ typedef struct DWCUtilFade {
 
 static DWCUtilFade *sFades;
 
-static void func_ov182_021bbb40(DWCUtilTask *task, void *arg);
-static void func_ov182_021bbc2c(DWCUtilTask *task, void *arg);
+static void DWCUtilFade_UpdateTask(DWCUtilTask *task, void *arg);
+static void DWCUtilFade_WaitTask(DWCUtilTask *task, void *arg);
 
-void func_ov182_021bba6c(void) {
+void DWCUtilFade_Init(void) {
     sFades = DWCUtilHeap_AllocClear(sizeof(DWCUtilFade) * 2, 4);
     G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, DWC_UTIL_FADE_PLANES, 16);
     G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, DWC_UTIL_FADE_PLANES, 16);
 }
 
-void func_ov182_021bba9c(void) {
+void DWCUtilFade_Exit(void) {
     DWCUtilHeap_FreeAndNull(&sFades);
 }
 
-u8 func_ov182_021bbaac(int screen) {
+u8 DWCUtilFade_IsActive(int screen) {
     DWCUtilFade *fade;
 
     if (screen == 1) {
@@ -44,7 +44,7 @@ u8 func_ov182_021bbaac(int screen) {
     return fade->active;
 }
 
-BOOL func_ov182_021bbac4(int type, int screen, u32 planes, int length) {
+BOOL DWCUtilFade_Start(int type, int screen, u32 planes, int length) {
     s8 start[4] = { -16, 0, 16, 0 };
     DWCUtilFade *fade;
 
@@ -61,7 +61,7 @@ BOOL func_ov182_021bbac4(int type, int screen, u32 planes, int length) {
     } else {
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, planes, start[type]);
     }
-    fade->task = DWCUtilTask_Create(1, func_ov182_021bbb40, fade, 200);
+    fade->task = DWCUtilTask_Create(1, DWCUtilFade_UpdateTask, fade, 200);
     fade->frame = 0;
     fade->type = type;
     fade->length = length;
@@ -69,7 +69,7 @@ BOOL func_ov182_021bbac4(int type, int screen, u32 planes, int length) {
     return TRUE;
 }
 
-static void func_ov182_021bbb40(DWCUtilTask *task, void *arg) {
+static void DWCUtilFade_UpdateTask(DWCUtilTask *task, void *arg) {
     // Bit 0: the brightness falls to 0; bit 4: it is a darkening
     u8 flags[4] = { 0x11, 0x10, 0x01, 0x00 };
     s8 end[4] = { 0, -16, 0, 16 };
@@ -96,20 +96,20 @@ static void func_ov182_021bbb40(DWCUtilTask *task, void *arg) {
     }
 }
 
-BOOL func_ov182_021bbbf4(int length) {
+BOOL DWCUtilFade_StartWait(int length) {
     DWCUtilFade *fade = sFades;
 
     if (fade->active) {
         return FALSE;
     }
-    fade->task = DWCUtilTask_Create(1, func_ov182_021bbc2c, fade, 200);
+    fade->task = DWCUtilTask_Create(1, DWCUtilFade_WaitTask, fade, 200);
     fade->frame = 0;
     fade->length = length;
     fade->active = TRUE;
     return TRUE;
 }
 
-static void func_ov182_021bbc2c(DWCUtilTask *task, void *arg) {
+static void DWCUtilFade_WaitTask(DWCUtilTask *task, void *arg) {
     DWCUtilFade *fade = arg;
 
     fade->frame++;

@@ -30,8 +30,8 @@ void DWCUtilTask_Init(void) {
 
         sTaskLists[i].count = count;
         sTaskLists[i].tasks = DWCUtilHeap_AllocClear(count * sizeof(DWCUtilTask), 4);
-        sTaskLists[i].freeTasks = func_ov182_021bb9c8(count, (u8 *)sTaskLists[i].tasks, sizeof(DWCUtilTask));
-        sTaskLists[i].removals = func_ov182_021bb9ac(count);
+        sTaskLists[i].freeTasks = DWCUtilStack_CreateFilled(count, (u8 *)sTaskLists[i].tasks, sizeof(DWCUtilTask));
+        sTaskLists[i].removals = DWCUtilStack_Create(count);
         sTaskLists[i].list = DWCUtilList_Create();
         sTaskLists[i].head.priority = 0;
         sTaskLists[i].tail.priority = 0xff;
@@ -46,7 +46,7 @@ void DWCUtilTask_Exit(void) {
 
     for (i = 0; i < 2; i++) {
         DWCUtilList_Destroy(sTaskLists[i].list);
-        func_ov182_021bb9ec(sTaskLists[i].freeTasks);
+        DWCUtilStack_Destroy(sTaskLists[i].freeTasks);
     }
     DWCUtilHeap_FreeAndNull(&sTaskLists);
 }
@@ -60,7 +60,7 @@ void DWCUtilTask_Run(int list) {
             task->callback(task, task->arg);
         }
         for (i = 0; i < sTaskLists[list].count; i++) {
-            task = func_ov182_021bba38(sTaskLists[list].removals);
+            task = DWCUtilStack_Pop(sTaskLists[list].removals);
             if (task == NULL) {
                 break;
             }
@@ -74,7 +74,7 @@ DWCUtilTask *DWCUtilTask_Create(int list, DWCUtilTaskCallback callback, void *ar
 }
 
 DWCUtilTask *DWCUtilTask_CreateEx(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg) {
-    DWCUtilTask *task = func_ov182_021bba38(sTaskLists[list].freeTasks);
+    DWCUtilTask *task = DWCUtilStack_Pop(sTaskLists[list].freeTasks);
     DWCUtilTask *position;
     u32 irq;
 
@@ -100,7 +100,7 @@ void DWCUtilTask_SetCallback(DWCUtilTask *task, DWCUtilTaskCallback callback) {
 }
 
 void DWCUtilTask_QueueRemoval(int list, DWCUtilTask *task) {
-    func_ov182_021bba00(sTaskLists[list].removals, task);
+    DWCUtilStack_Push(sTaskLists[list].removals, task);
 }
 
 void DWCUtilTask_Remove(int list, DWCUtilTask *task) {
@@ -112,7 +112,7 @@ void DWCUtilTask_Destroy(int list, DWCUtilTask *task) {
         DWCUtilHeap_FreeAndNull(&task->arg);
     }
     DWCUtilList_Remove(task);
-    func_ov182_021bba00(sTaskLists[list].freeTasks, task);
+    DWCUtilStack_Push(sTaskLists[list].freeTasks, task);
 }
 
 void DWCUtilTask_SetActive(int list, u8 active) {

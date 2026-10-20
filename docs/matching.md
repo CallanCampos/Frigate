@@ -3405,7 +3405,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
-  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, and
+  `dwc_util_error.c`'s `DWCUtilGfxResource_Load("char/jb4Error.nsc.l", ...)`, link only with the literal, and
   `dwc_util_main_menu.c`'s message paths, each padded to 4 bytes, are literals too.
 - MWCC shares a file's equal string literals, so one string in two places of the ROM's `.data` of one file, each
   4-aligned, is not two uses of one literal. `dwc_util_info_menu.c` loads `char/yb5Multi.nsc.l` in two functions and

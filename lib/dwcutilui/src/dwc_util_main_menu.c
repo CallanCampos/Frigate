@@ -58,19 +58,19 @@ static char *sMsgPaths[7] = {
 static DWCUtilMainMenu sMainMenu;
 
 void func_ov182_021ae4f4(void) {
-    func_ov182_021bbac4(3, 1, 0x3f, 0x14);
-    func_ov182_021bbac4(3, 0, 0x3f, 0x14);
+    DWCUtilFade_Start(3, 1, 0x3f, 0x14);
+    DWCUtilFade_Start(3, 0, 0x3f, 0x14);
     DWCUtilMain_SetUpdate(func_ov182_021ae51c);
 }
 
 static void func_ov182_021ae51c(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilTask_SetActive(0, 0);
         DWCUtilTask_SetActive(1, 0);
-        func_ov182_021bb8fc(1);
-        func_ov182_021bb8fc(0);
-        func_ov182_021ab95c();
-        func_ov182_021ab7dc();
+        DWCUtilCell_Unload(1);
+        DWCUtilCell_Unload(0);
+        DWCUtilBgOverlay_Exit();
+        DWCUtilButtonSprites_Exit();
         DWCUtilMsg_Close(data_ov182_021c40b8);
         DWCUtilMsg_Exit();
         func_ov182_021b780c();
@@ -81,48 +81,48 @@ static void func_ov182_021ae51c(void) {
 void func_ov182_021ae574(void) {
     func_ov182_021b77dc();
     DWCUtilMsg_Init();
-    func_ov182_021ab7c8();
-    func_ov182_021ab90c();
+    DWCUtilButtonSprites_Init();
+    DWCUtilBgOverlay_Init();
     DWCUtilScreen_Reset();
     if (DWCUtilMain_GetLanguage() == 1 && DWCUtilMain_HasFlag(2)) {
         data_ov182_021c40b8 = DWCUtilMsg_Open("msg/usa.bmg.l");
     } else {
         data_ov182_021c40b8 = DWCUtilMsg_Open(sMsgPaths[DWCUtilMain_GetLanguage()]);
     }
-    func_ov182_021bb8dc(1, func_ov182_021ab63c("char/jtMain.nce.l"));
-    func_ov182_021bb8dc(0, func_ov182_021ab63c("char/jbMain.nce.l"));
-    func_ov182_021ab67c("char/jtBgMain.ncg.l", GXS_LoadBG1Char);
-    func_ov182_021ab67c("char/jtBgMain.ncl.l", GXS_LoadBGPltt);
-    func_ov182_021ab67c("char/jtObjMain.ncg.l", GXS_LoadOBJ);
-    func_ov182_021ab67c("char/xtObjMain.ncl.l", GXS_LoadOBJPltt);
-    func_ov182_021ab67c("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/jbObjMain.ncg.l", GX_LoadOBJ);
-    func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCUtilCell_Load(1, DWCUtilGfxResource_LocalizePath("char/jtMain.nce.l"));
+    DWCUtilCell_Load(0, DWCUtilGfxResource_LocalizePath("char/jbMain.nce.l"));
+    DWCUtilGfxResource_Load("char/jtBgMain.ncg.l", GXS_LoadBG1Char);
+    DWCUtilGfxResource_Load("char/jtBgMain.ncl.l", GXS_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/jtObjMain.ncg.l", GXS_LoadOBJ);
+    DWCUtilGfxResource_Load("char/xtObjMain.ncl.l", GXS_LoadOBJPltt);
+    DWCUtilGfxResource_Load("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/jbObjMain.ncg.l", GX_LoadOBJ);
+    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     switch (DWCUtilMain_GetStartScreen()) {
     case 0:
-        func_ov182_021ab67c("char/jtTop.nsc.l", GXS_LoadBG1Scr);
+        DWCUtilGfxResource_Load("char/jtTop.nsc.l", GXS_LoadBG1Scr);
         break;
     case 1:
-        func_ov182_021ab67c("char/jtStep1.nsc.l", GXS_LoadBG1Scr);
+        DWCUtilGfxResource_Load("char/jtStep1.nsc.l", GXS_LoadBG1Scr);
         break;
     }
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG1Priority(3);
-    func_ov182_021bc1dc(1, 2);
-    func_ov182_021bc1dc(0, 2);
+    DWCUtilDisplay_ShowPlanes(1, 2);
+    DWCUtilDisplay_ShowPlanes(0, 2);
     DWCUtilMain_SetUpdate(func_ov182_021ae6d0);
 }
 
 static void func_ov182_021ae6d0(void) {
-    func_ov182_021bbac4(2, 1, 2, 0x14);
-    func_ov182_021bbac4(2, 0, 2, 0x14);
+    DWCUtilFade_Start(2, 1, 2, 0x14);
+    DWCUtilFade_Start(2, 0, 2, 0x14);
     DWCUtilMain_SetUpdate(func_ov182_021ae6f8);
 }
 
 static void func_ov182_021ae6f8(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         switch (DWCUtilMain_GetStartScreen()) {
         case 0:
             DWCUtilMain_SetLayout(0, 1);
@@ -138,21 +138,21 @@ static void func_ov182_021ae6f8(void) {
 
 void func_ov182_021ae748(void) {
     func_ov182_021ae7a0();
-    func_ov182_021ab96c(0);
+    DWCUtilBgOverlay_Show(0);
     DWCUtilScreen_Start(0x2e, -1, 0);
     func_ov182_021b87d0(4);
-    func_ov182_021ab85c(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
-                        sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
+    DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
+                                  sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
     DWCUtilMain_SetUpdate(func_ov182_021ae838);
 }
 
 static void func_ov182_021ae7a0(void) {
     char palettePath[] = "char/ybBgStep11.ncl.l";
 
-    func_ov182_021ab67c("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/jb2Menu.nsc.l", GX_LoadBG2Scr);
-    sMainMenu.palette = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(palettePath), NULL, 4);
+    DWCUtilGfxResource_Load("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/jb2Menu.nsc.l", GX_LoadBG2Scr);
+    sMainMenu.palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -160,16 +160,16 @@ static void func_ov182_021ae7a0(void) {
 }
 
 static void func_ov182_021ae838(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x14, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x14);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x14, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x14);
     DWCUtilMain_SetUpdate(func_ov182_021ae870);
 }
 
 static void func_ov182_021ae870(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(0);
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(0);
         DWCUtilMain_SetUpdate(func_ov182_021ae89c);
     }
 }
@@ -191,25 +191,25 @@ static void func_ov182_021ae8cc(void) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        if (func_ov182_021bc888(sButtonRects[i])) {
+        if (DWCUtilTouch_IsTriggeredIn(sButtonRects[i])) {
             DWCUtilUiObject_SetStateIfIdle(1);
             sMainMenu.selection = i;
-            func_ov182_021ab85c(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
-                                sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
+            DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
+                                          sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
             return;
         }
     }
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(1);
-    } else if (func_ov182_021bc798(2)) {
+    } else if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (func_ov182_021bc7c8(0x40)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
         func_ov182_021aea8c(1);
-    } else if (func_ov182_021bc7c8(0x80)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
         func_ov182_021aea8c(3);
-    } else if (func_ov182_021bc7c8(0x20)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x20)) {
         func_ov182_021aea8c(0);
-    } else if (func_ov182_021bc7c8(0x10)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x10)) {
         func_ov182_021aea8c(2);
     }
 }
@@ -233,25 +233,25 @@ static void func_ov182_021ae994(void) {
 
 static void func_ov182_021ae9cc(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021ae9e4);
 }
 
 static void func_ov182_021ae9e4(void) {
-    if (func_ov182_021bbaac(1) == 0) {
-        func_ov182_021bbac4(3, 1, 1, 8);
-        func_ov182_021bbac4(3, 0, 0x16, 8);
+    if (DWCUtilFade_IsActive(1) == 0) {
+        DWCUtilFade_Start(3, 1, 1, 8);
+        DWCUtilFade_Start(3, 0, 0x16, 8);
         DWCUtilMain_SetUpdate(func_ov182_021aea18);
     }
 }
 
 static void func_ov182_021aea18(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab8e4();
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilButtonSprites_Hide();
         DWCUtilScreen_Stop();
         DWCUtilRomResource_FreeFile(sMainMenu.palette);
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x14);
+        DWCUtilDisplay_HidePlanes(1, 1);
+        DWCUtilDisplay_HidePlanes(0, 0x14);
         switch (sMainMenu.selection) {
         case 0:
             DWCUtilMain_SetLayout(1, 0);
@@ -270,8 +270,8 @@ static void func_ov182_021aea8c(int direction) {
     if (direction != 1 && direction != 3) {
         sMainMenu.selection ^= 1;
         DWCUtilSound_PlaySe(8);
-        func_ov182_021ab85c(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
-                            sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
+        DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
+                                      sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
     }
 }
 
@@ -279,5 +279,5 @@ static void func_ov182_021aea8c(int direction) {
 static void func_ov182_021aead4(void) {
     u8 rows[2] = { 1, 2 };
 
-    func_ov182_021b7014(sMainMenu.palette, rows[sMainMenu.selection], rows[sMainMenu.selection]);
+    DWCUtilBgBuffer_LoadPaletteRow(sMainMenu.palette, rows[sMainMenu.selection], rows[sMainMenu.selection]);
 }

@@ -32,7 +32,7 @@ static const DWCUtilTextPos sStrPositions[7] = {
 };
 static char sPath[0x40];
 
-char *func_ov182_021ab63c(const char *path) {
+char *DWCUtilGfxResource_LocalizePath(const char *path) {
     int language;
 
     strncpy(sPath, path, sizeof(sPath) - 1);
@@ -47,17 +47,17 @@ char *func_ov182_021ab63c(const char *path) {
     return sPath;
 }
 
-void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32)) {
+void DWCUtilGfxResource_Load(const char *path, void (*upload)(const void *, u32, u32)) {
     u32 size;
     void *data;
 
-    data = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(path), &size, 4);
+    data = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(path), &size, 4);
     DC_FlushRange(data, size);
     upload(data, 0, size);
     DWCUtilRomResource_FreeFile(data);
 }
 
-void func_ov182_021ab6a4(int variant) {
+void DWCUtilGfxResource_ShowStep(int variant) {
     u32 layout;
 
     DWCUtilMain_GetLayout(&layout, NULL);
@@ -68,7 +68,7 @@ void func_ov182_021ab6a4(int variant) {
     }
 }
 
-void func_ov182_021ab6d0(int variant) {
+void DWCUtilGfxResource_ShowButtons(int variant) {
     u32 layout;
 
     DWCUtilMain_GetLayout(NULL, &layout);
@@ -77,25 +77,26 @@ void func_ov182_021ab6d0(int variant) {
     }
 }
 
-void func_ov182_021ab6f0(int msgIndex) {
-    DWCUtilText *text = func_ov182_021bbdec(0, 0);
+void DWCUtilGfxResource_ShowMessage(int msgIndex) {
+    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
     u16 *str = DWCUtilMsg_Get(data_ov182_021c40b8, msgIndex);
 
-    func_ov182_021bc0a4(text, sMsgBox.x, sMsgBox.y, sMsgBox.width, sMsgBox.height, 2, func_ov182_021ab7b4(), str);
-    func_ov182_021bc184(text);
+    DWCUtilText_DrawRect(text, sMsgBox.x, sMsgBox.y, sMsgBox.width, sMsgBox.height, 2,
+                         DWCUtilGfxResource_GetTextFlags(), str);
+    DWCUtilText_MarkDirty(text);
 }
 
-void func_ov182_021ab738(const void *str, int msgIndex) {
-    DWCUtilText *text = func_ov182_021bbdec(0, 0);
+void DWCUtilGfxResource_ShowMessageWithString(const void *str, int msgIndex) {
+    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
     u16 *msg = DWCUtilMsg_Get(data_ov182_021c40b8, msgIndex);
 
-    func_ov182_021bc0a4(text, sStrMsgBox.x, sStrMsgBox.y, sStrMsgBox.width, sStrMsgBox.height, 2, func_ov182_021ab7b4(),
-                        msg);
-    func_ov182_021bbf98(text, sStrPositions[DWCUtilMain_GetLanguage()].x, sStrPositions[DWCUtilMain_GetLanguage()].y, 2,
-                        0x209, str);
-    func_ov182_021bc184(text);
+    DWCUtilText_DrawRect(text, sStrMsgBox.x, sStrMsgBox.y, sStrMsgBox.width, sStrMsgBox.height, 2,
+                         DWCUtilGfxResource_GetTextFlags(), msg);
+    DWCUtilText_Draw(text, sStrPositions[DWCUtilMain_GetLanguage()].x, sStrPositions[DWCUtilMain_GetLanguage()].y, 2,
+                     0x209, str);
+    DWCUtilText_MarkDirty(text);
 }
 
-u32 func_ov182_021ab7b4(void) {
+u32 DWCUtilGfxResource_GetTextFlags(void) {
     return sTextFlags[DWCUtilMain_GetLanguage()];
 }

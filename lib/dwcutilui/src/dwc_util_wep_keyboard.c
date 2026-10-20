@@ -74,15 +74,15 @@ void func_ov182_021b19f4(void) {
         sWepKeyboard->length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
     func_ov182_021b1ab4();
-    func_ov182_021ab96c(field + 9);
+    DWCUtilBgOverlay_Show(field + 9);
     if (fromList == 1) {
         DWCUtilScreen_Start(0x35, -1, 0);
     } else {
         DWCUtilScreen_Start(msgIndices[field], -1, 0);
     }
-    func_ov182_021ab6a4(2);
-    sWepKeyboard->text = func_ov182_021bbdec(0, 0);
-    sWepKeyboard->cursor = func_ov182_021bb960(0, 0x3e);
+    DWCUtilGfxResource_ShowStep(2);
+    sWepKeyboard->text = DWCUtilText_CreateBg(0, 0);
+    sWepKeyboard->cursor = DWCUtilCell_AllocOam(0, 0x3e);
     G2_SetOBJPriority(sWepKeyboard->cursor, 3);
     func_ov182_021b1f04();
     func_ov182_021b1e74();
@@ -97,10 +97,10 @@ static const u8 sWepKeyboardColumnX[16] = {
 };
 
 static void func_ov182_021b1ab4(void) {
-    func_ov182_021ab67c("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb4Edit.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb4Edit.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(2);
@@ -109,15 +109,15 @@ static void func_ov182_021b1ab4(void) {
 }
 
 static void func_ov182_021b1b34(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
 }
 
 static void func_ov182_021b1b6c(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         func_ov182_021abb10();
         DWCUtilSound_PlaySe(0x14);
         if (sWepKeyboard->length == 0) {
@@ -195,12 +195,12 @@ static void func_ov182_021b1d00(void) {
 }
 
 static void func_ov182_021b1d04(void) {
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021b1d18);
 }
 
 static void func_ov182_021b1d18(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         func_ov182_021abd6c();
         DWCUtilSound_PlaySe(0x15);
         DWCUtilMain_SetUpdate(func_ov182_021b1d3c);
@@ -235,11 +235,11 @@ static void func_ov182_021b1dc4(void) {
     int fromList;
 
     DWCUtilScreen_Stop();
-    func_ov182_021bcc9c(sWepKeyboard->cursor);
-    func_ov182_021bbf7c(0);
-    func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x15);
+    DWCUtilOamBuf_Free(sWepKeyboard->cursor);
+    DWCUtilText_DestroyScreenBg(0);
+    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCUtilDisplay_HidePlanes(1, 1);
+    DWCUtilDisplay_HidePlanes(0, 0x15);
     DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (fromList == 0) {
         DWCUtilMain_SetLayout(2, 1);
@@ -267,7 +267,7 @@ static void func_ov182_021b1e74(void) {
     rect[1] = sWepKeyboardRowY[0];
     rect[2] = sWepKeyboardCharSize[0];
     rect[3] = sWepKeyboardCharSize[1];
-    func_ov182_021bc118(sWepKeyboard->text, 0);
+    DWCUtilText_Clear(sWepKeyboard->text, 0);
     str[1] = 0;
     for (i = 0, column = 0; i < WEP_KEYBOARD_LENGTH; i++, column++) {
         if (i == 16) {
@@ -280,9 +280,9 @@ static void func_ov182_021b1e74(void) {
             str[0] = sWepKeyboard->str[i];
         }
         rect[0] = sWepKeyboardColumnX[column];
-        func_ov182_021bc0a4(sWepKeyboard->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
+        DWCUtilText_DrawRect(sWepKeyboard->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
     }
-    func_ov182_021bc184(sWepKeyboard->text);
+    DWCUtilText_MarkDirty(sWepKeyboard->text);
 }
 
 // Moves the cursor after the text

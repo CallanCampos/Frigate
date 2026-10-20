@@ -90,11 +90,11 @@ void func_ov182_021b2120(void) {
         sAddressEdit->group = 0;
     }
     func_ov182_021b2210();
-    func_ov182_021ab96c(field + 0xb);
+    DWCUtilBgOverlay_Show(field + 0xb);
     DWCUtilScreen_Start(msgIndices[field], -1, 0);
-    func_ov182_021ab6a4(2);
-    sAddressEdit->text = func_ov182_021bbdec(0, 0);
-    sAddressEdit->cursor = func_ov182_021bb960(0, 0x3f);
+    DWCUtilGfxResource_ShowStep(2);
+    sAddressEdit->text = DWCUtilText_CreateBg(0, 0);
+    sAddressEdit->cursor = DWCUtilCell_AllocOam(0, 0x3f);
     G2_SetOBJPriority(sAddressEdit->cursor, 3);
     func_ov182_021b26f4();
     func_ov182_021b267c();
@@ -102,10 +102,10 @@ void func_ov182_021b2120(void) {
 }
 
 static void func_ov182_021b2210(void) {
-    func_ov182_021ab67c("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb4EditAddr.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb4EditAddr.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(2);
@@ -114,15 +114,15 @@ static void func_ov182_021b2210(void) {
 }
 
 static void func_ov182_021b2290(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021b22c8);
 }
 
 static void func_ov182_021b22c8(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         func_ov182_021acd80();
         DWCUtilSound_PlaySe(0x14);
         if (sAddressEdit->group == 0) {
@@ -264,12 +264,12 @@ static void func_ov182_021b2568(void) {
 }
 
 static void func_ov182_021b256c(void) {
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021b2580);
 }
 
 static void func_ov182_021b2580(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         func_ov182_021acf7c();
         DWCUtilSound_PlaySe(0x15);
         DWCUtilMain_SetUpdate(func_ov182_021b25a4);
@@ -298,11 +298,11 @@ static void func_ov182_021b2604(void) {
     int field;
 
     DWCUtilScreen_Stop();
-    func_ov182_021bcc9c(sAddressEdit->cursor);
-    func_ov182_021bbf7c(0);
-    func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x15);
+    DWCUtilOamBuf_Free(sAddressEdit->cursor);
+    DWCUtilText_DestroyScreenBg(0);
+    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCUtilDisplay_HidePlanes(1, 1);
+    DWCUtilDisplay_HidePlanes(0, 0x15);
     DWCUtilMain_GetScreenArgs(&field, NULL);
     if (field >= 3) {
         field++;
@@ -321,14 +321,14 @@ static void func_ov182_021b267c(void) {
     u16 str[2];
     int i;
 
-    func_ov182_021bc118(sAddressEdit->text, 0);
+    DWCUtilText_Clear(sAddressEdit->text, 0);
     str[1] = 0;
     for (i = 0; i < ADDRESS_EDIT_DIGITS; i++) {
         str[0] = sAddressEdit->digits[i];
         rect[0] = sAddressEditDigitX[i];
-        func_ov182_021bc0a4(sAddressEdit->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
+        DWCUtilText_DrawRect(sAddressEdit->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
     }
-    func_ov182_021bc184(sAddressEdit->text);
+    DWCUtilText_MarkDirty(sAddressEdit->text);
 }
 
 // Moves the cursor under the last digit of its number

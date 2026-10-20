@@ -26,12 +26,12 @@ static u8 sAutoConnectOkFrames;
 void func_ov182_021b63dc(void) {
     sAutoConnectOkFrames = 0;
     func_ov182_021b6400();
-    func_ov182_021ab6f0(0x2d);
+    DWCUtilGfxResource_ShowMessage(0x2d);
     DWCUtilMain_SetUpdate(func_ov182_021b6448);
 }
 
 static void func_ov182_021b6400(void) {
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -39,13 +39,13 @@ static void func_ov182_021b6400(void) {
 }
 
 static void func_ov182_021b6448(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021b646c);
 }
 
 static void func_ov182_021b646c(void) {
-    if (func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(0) == 0) {
         DWCUtilMain_SetUpdate(func_ov182_021b6484);
     }
 }
@@ -65,8 +65,8 @@ static void func_ov182_021b6494(void) {
     if (from != 0) {
         func_ov182_021b849c();
     }
-    func_ov182_021bbac4(3, 1, 1, 8);
-    func_ov182_021bbac4(3, 0, 0x15, 8);
+    DWCUtilFade_Start(3, 1, 1, 8);
+    DWCUtilFade_Start(3, 0, 0x15, 8);
     DWCUtilMain_SetUpdate(func_ov182_021b64cc);
 }
 
@@ -75,16 +75,16 @@ static void func_ov182_021b6494(void) {
 static void func_ov182_021b64cc(void) {
     int from;
 
-    if (func_ov182_021bbaac(1) != 0 || func_ov182_021bbaac(0) != 0) {
+    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
         return;
     }
     if (!func_ov182_021b87b0()) {
         return;
     }
-    func_ov182_021bbf7c(0);
+    DWCUtilText_DestroyScreenBg(0);
     DWCUtilScreen_Stop();
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x15);
+    DWCUtilDisplay_HidePlanes(1, 1);
+    DWCUtilDisplay_HidePlanes(0, 0x15);
     DWCUtilMain_SetLayout(2, 1);
     DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from == 0) {

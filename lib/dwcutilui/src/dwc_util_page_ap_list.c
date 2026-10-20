@@ -127,12 +127,12 @@ void func_ov182_021b0c28(void) {
     }
     sApList->count = func_ov182_021b7630(&sApList->entries);
     func_ov182_021b0cb4();
-    func_ov182_021ab9ac();
+    DWCUtilBgOverlay_ShowConnectionSet();
     DWCUtilScreen_Start(0x34, -1, 0);
-    func_ov182_021ab6a4(2);
+    DWCUtilGfxResource_ShowStep(2);
     func_ov182_021b0d74();
     func_ov182_021b0de4();
-    sApList->text = func_ov182_021bbdec(0, 0);
+    sApList->text = DWCUtilText_CreateBg(0, 0);
     sApList->vblankTask = DWCUtilTask_Create(1, func_ov182_021b17bc, NULL, 0x6e);
     func_ov182_021b14c0();
     func_ov182_021b17f8();
@@ -143,11 +143,11 @@ static void func_ov182_021b0cb4(void) {
     char backPath[] = "char/xb4ApListBack.nsc.l";
     char palettePath[] = "char/ybBgStep31.ncl.l";
 
-    func_ov182_021ab67c("char/jb4ApList.nsc.l", GX_LoadBG3Scr);
-    sApList->backScreen = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(backPath), NULL, 4);
-    func_ov182_021b6f38(sApList->backScreen);
-    func_ov182_021b6f98();
-    sApList->palette = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(palettePath), NULL, 4);
+    DWCUtilGfxResource_Load("char/jb4ApList.nsc.l", GX_LoadBG3Scr);
+    sApList->backScreen = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(backPath), NULL, 4);
+    DWCUtilBgBuffer_Init(sApList->backScreen);
+    DWCUtilBgBuffer_MarkDirty();
+    sApList->palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -188,15 +188,15 @@ static void func_ov182_021b0de4(void) {
         rows = AP_LIST_ROWS + 1;
     }
     for (i = 0; i < rows; i++) {
-        sApList->securityOams[i] = func_ov182_021bb960(0, 0x2e);
-        sApList->signalOams[i] = func_ov182_021bb960(0, 0x18);
+        sApList->securityOams[i] = DWCUtilCell_AllocOam(0, 0x2e);
+        sApList->signalOams[i] = DWCUtilCell_AllocOam(0, 0x18);
     }
     for (kind = 0; kind < NELEMS(sApListSecurityCells); kind++) {
-        func_ov182_021bb914(0, sApListSecurityCells[kind], sApList->securityOams[0]);
+        DWCUtilCell_Copy(0, sApListSecurityCells[kind], sApList->securityOams[0]);
         sApList->securityChars[kind] = sApList->securityOams[0]->attr2 & GX_OAM_ATTR2_NAME_MASK;
     }
     for (level = 0; level < NELEMS(sApListSignalCells); level++) {
-        func_ov182_021bb914(0, sApListSignalCells[level], sApList->signalOams[0]);
+        DWCUtilCell_Copy(0, sApListSignalCells[level], sApList->signalOams[0]);
         sApList->signalChars[level] = sApList->signalOams[0]->attr2 & GX_OAM_ATTR2_NAME_MASK;
     }
     for (i = 0; i < rows; i++) {
@@ -206,16 +206,16 @@ static void func_ov182_021b0de4(void) {
 }
 
 static void func_ov182_021b0ebc(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x1d, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x1d);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x1d, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x1d);
     DWCUtilMain_SetUpdate(func_ov182_021b0ef4);
 }
 
 static void func_ov182_021b0ef4(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(0);
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(0);
         DWCUtilMain_SetUpdate(func_ov182_021b0f20);
     }
 }
@@ -239,10 +239,10 @@ static void func_ov182_021b0f50(void) {
     if (sApList->scrollTask != NULL || sApList->dragging) {
         return;
     }
-    if (func_ov182_021bc888(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
         sApList->touched = -1;
         for (i = 0; i < NELEMS(sApListRowRects); i++) {
-            if (func_ov182_021bc888(sApListRowRects[i])) {
+            if (DWCUtilTouch_IsTriggeredIn(sApListRowRects[i])) {
                 if (i < AP_LIST_ROWS) {
                     sApList->touched = i;
                     break;
@@ -254,9 +254,9 @@ static void func_ov182_021b0f50(void) {
             }
         }
     }
-    if (func_ov182_021bc948(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsReleasedIn(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < AP_LIST_ROWS; i++) {
-            if (func_ov182_021bc948(sApListRowRects[i])) {
+            if (DWCUtilTouch_IsReleasedIn(sApListRowRects[i])) {
                 if (sApList->touched != i) {
                     break;
                 }
@@ -271,26 +271,26 @@ static void func_ov182_021b0f50(void) {
             }
         }
     }
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(1);
         func_ov182_021b7174();
-    } else if (func_ov182_021bc798(2)) {
+    } else if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (func_ov182_021bc7c8(0x200)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x200)) {
         func_ov182_021b193c();
-    } else if (func_ov182_021bc7f8(0x200)) {
+    } else if (DWCUtilTouch_IsKeyReleased(0x200)) {
         sApList->atEnd = FALSE;
-    } else if (func_ov182_021bc7c8(0x100)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x100)) {
         func_ov182_021b18f8();
-    } else if (func_ov182_021bc7f8(0x100)) {
+    } else if (DWCUtilTouch_IsKeyReleased(0x100)) {
         sApList->atEnd = FALSE;
-    } else if (func_ov182_021bc7c8(0x40)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
         func_ov182_021b182c(1);
-    } else if (func_ov182_021bc7f8(0x40)) {
+    } else if (DWCUtilTouch_IsKeyReleased(0x40)) {
         sApList->atEnd = FALSE;
-    } else if (func_ov182_021bc7c8(0x80)) {
+    } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
         func_ov182_021b182c(3);
-    } else if (func_ov182_021bc7f8(0x80)) {
+    } else if (DWCUtilTouch_IsKeyReleased(0x80)) {
         sApList->atEnd = FALSE;
     }
 }
@@ -312,7 +312,7 @@ static void func_ov182_021b10c8(void) {
         break;
     case 2:
         if (sApList->dragDelay == 0) {
-            func_ov182_021ab8e4();
+            DWCUtilButtonSprites_Hide();
             sApListPos.scroll = FX_DivS32(func_ov182_021b7144() * sApList->scrollMax, sApList->barLength);
             func_ov182_021b14c0();
             sApList->dragDelay = 4;
@@ -400,19 +400,19 @@ static void func_ov182_021b1254(void) {
 
 static void func_ov182_021b1308(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021b1320);
 }
 
 static void func_ov182_021b1320(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         if (sApList->confirmed) {
             DWCUtilUiObject_Exit();
         } else {
             DWCUtilUiObject_Disable();
         }
-        func_ov182_021bbac4(3, 1, 1, 8);
-        func_ov182_021bbac4(3, 0, 0x1d, 8);
+        DWCUtilFade_Start(3, 1, 1, 8);
+        DWCUtilFade_Start(3, 0, 0x1d, 8);
         DWCUtilMain_SetUpdate(func_ov182_021b136c);
     }
 }
@@ -421,27 +421,27 @@ static void func_ov182_021b1320(void) {
 static void func_ov182_021b136c(void) {
     int i;
 
-    if (func_ov182_021bbaac(1) != 0 || func_ov182_021bbaac(0) != 0 || !DWCUtilUiObject_IsIdle()) {
+    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0 || !DWCUtilUiObject_IsIdle()) {
         return;
     }
     DWCUtilTask_Remove(1, sApList->vblankTask);
     for (i = 0; i < AP_LIST_ROWS + 1; i++) {
         if (sApList->securityOams[i] != NULL) {
-            func_ov182_021bcc9c(sApList->securityOams[i]);
+            DWCUtilOamBuf_Free(sApList->securityOams[i]);
         }
         if (sApList->signalOams[i] != NULL) {
-            func_ov182_021bcc9c(sApList->signalOams[i]);
+            DWCUtilOamBuf_Free(sApList->signalOams[i]);
         }
     }
-    func_ov182_021bbf38(sApList->text);
+    DWCUtilText_DestroyBg(sApList->text);
     func_ov182_021b711c();
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     DWCUtilScreen_Stop();
-    func_ov182_021b6f78();
+    DWCUtilBgBuffer_Exit();
     DWCUtilRomResource_FreeFile(sApList->backScreen);
     DWCUtilRomResource_FreeFile(sApList->palette);
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x1d);
+    DWCUtilDisplay_HidePlanes(1, 1);
+    DWCUtilDisplay_HidePlanes(0, 0x1d);
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     if (!sApList->confirmed) {
@@ -476,7 +476,7 @@ static void func_ov182_021b14c0(void) {
     int row;
     int index;
 
-    func_ov182_021bc118(sApList->text, 0);
+    DWCUtilText_Clear(sApList->text, 0);
     if (rows > AP_LIST_ROWS + 1) {
         rows = AP_LIST_ROWS + 1;
     }
@@ -486,7 +486,7 @@ static void func_ov182_021b14c0(void) {
     for (row = 0; row < rows; row++) {
         func_ov182_021b15fc(top++, row);
     }
-    func_ov182_021bc184(sApList->text);
+    DWCUtilText_MarkDirty(sApList->text);
     func_ov182_021b1658();
 }
 
@@ -509,14 +509,14 @@ static void func_ov182_021b1528(int index, int row) {
     for (i = 0; i < count; i++) {
         line[i] = sApList->entries[index].ssid[i];
     }
-    func_ov182_021bc030(sApList->text, 10, y, 2, 10, line, 1);
+    DWCUtilText_DrawCentered(sApList->text, 10, y, 2, 10, line, 1);
     if (length > 16) {
         MI_CpuFill8(line, 0, sizeof(line));
         for (i = 0; i < length - 16; i++) {
             line[i] = sApList->entries[index].ssid[16 + i];
         }
         y += 12;
-        func_ov182_021bc030(sApList->text, 10, y, 2, 10, line, 1);
+        DWCUtilText_DrawCentered(sApList->text, 10, y, 2, 10, line, 1);
     }
 }
 
@@ -550,7 +550,7 @@ static void func_ov182_021b16d4(DWCUtilTask *task, void *arg) {
     int offset;
 
     func_ov182_021b7174();
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     if (sApListPos.scroll > 4) {
         sApListPos.scroll -= 4;
     } else {
@@ -580,7 +580,7 @@ static void func_ov182_021b1754(DWCUtilTask *task, void *arg) {
     int offset;
 
     func_ov182_021b7174();
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     sApListPos.scroll += 4;
     offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
     if (offset >= 4) {
@@ -613,8 +613,8 @@ static void func_ov182_021b17f8(void) {
     if (cursor >= AP_LIST_ROWS) {
         pair = 3;
     }
-    func_ov182_021ab7f0(pair, sApListCursorRects[cursor][0], sApListCursorRects[cursor][2],
-                        sApListCursorRects[cursor][1]);
+    DWCUtilButtonSprites_ShowPair(pair, sApListCursorRects[cursor][0], sApListCursorRects[cursor][2],
+                                  sApListCursorRects[cursor][1]);
 }
 
 // Moves the cursor up (1) or down (3), scrolling the list at its ends
@@ -707,7 +707,7 @@ static void func_ov182_021b193c(void) {
 static void func_ov182_021b1994(void) {
     u8 rows[] = { 2 };
 
-    func_ov182_021b7014(sApList->palette, rows[0], rows[0]);
+    DWCUtilBgBuffer_LoadPaletteRow(sApList->palette, rows[0], rows[0]);
 }
 
 static void func_ov182_021b19b4(void) {

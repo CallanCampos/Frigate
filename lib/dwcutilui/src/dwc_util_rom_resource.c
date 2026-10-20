@@ -55,7 +55,7 @@ void DWCUtilRomResource_Init(void) {
     size = FS_LoadArchiveTables(&sResource->archive, NULL, 0);
     sResource->tables = DWCUtilHeap_AllocClear(size, 4);
     FS_LoadArchiveTables(&sResource->archive, sResource->tables, size);
-    sResource->openFileStack = func_ov182_021bb9c8(32, (u8 *)sResource->openFiles, sizeof(void *));
+    sResource->openFileStack = DWCUtilStack_CreateFilled(32, (u8 *)sResource->openFiles, sizeof(void *));
     OS_SPrintf(path, "%s:/", sArchiveName);
     FS_ChangeDir(path);
 }
@@ -107,7 +107,7 @@ void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
     u32 length;
     int alignment;
 
-    func_ov182_021bba38(sResource->openFileStack);
+    DWCUtilStack_Pop(sResource->openFileStack);
     FS_InitFile(&file);
     if (!FS_OpenFile(&file, path)) {
         OS_Terminate();
@@ -144,7 +144,7 @@ void *DWCUtilRomResource_LoadFile(const char *path, u32 *size, int align) {
 
 void DWCUtilRomResource_FreeFile(void *data) {
     DWCUtilHeap_FreeAndNull(&data);
-    func_ov182_021bba00(sResource->openFileStack, data);
+    DWCUtilStack_Push(sResource->openFileStack, data);
 }
 
 BOOL DWCUtilRomResource_EndsWith(const char *str, const char *suffix, int length) {

@@ -23,7 +23,7 @@ void DWCUtilUiEffect_Init(u8 variant) {
 
     sEffect = DWCUtilHeap_AllocClear(sizeof(DWCUtilUiEffect), 4);
     sEffect->variant = variant;
-    sEffect->oam = func_ov182_021bb960(0, 0x47);
+    sEffect->oam = DWCUtilCell_AllocOam(0, 0x47);
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0xfffff3ff) | (mode << 8);
     sEffect->oam->attr01 &= 0xfffff3ff;
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0x0fff) | (sEffectData[variant] << 12);
@@ -33,7 +33,7 @@ void DWCUtilUiEffect_Init(u8 variant) {
 
 void DWCUtilUiEffect_Destroy(void) {
     DWCUtilTask_Remove(1, sEffect->task);
-    func_ov182_021bcc9c(sEffect->oam);
+    DWCUtilOamBuf_Free(sEffect->oam);
     DWCUtilHeap_FreeAndNull(&sEffect);
 }
 
@@ -41,7 +41,7 @@ static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg) {
     u8 palette;
 
     sEffect->frame = FX_ModS32(sEffect->frame + 1, 40);
-    func_ov182_021bb914(0, FX_DivS32(sEffect->frame, 5) + 0x47, sEffect->oam);
+    DWCUtilCell_Copy(0, FX_DivS32(sEffect->frame, 5) + 0x47, sEffect->oam);
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0xfffff3ff) | 0x400;
     palette = sEffectData[sEffect->variant];
     sEffect->oam->attr01 &= 0xfffff3ff;

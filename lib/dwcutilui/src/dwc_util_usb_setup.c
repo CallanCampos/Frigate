@@ -62,12 +62,12 @@ void func_ov182_021b6b1c(void) {
 
     sUsbSetupState = USB_SETUP_RUNNING;
     func_ov182_021b6b8c();
-    func_ov182_021ab96c(8);
-    func_ov182_021ab6a4(2);
+    DWCUtilBgOverlay_Show(8);
+    DWCUtilGfxResource_ShowStep(2);
     OS_GetOwnerInfo(&info);
     MI_CpuClear16(nickName, sizeof(nickName));
     MI_CpuCopy16(info.nickName, nickName, info.nickNameLength * 2);
-    func_ov182_021ab738(nickName, 0x28);
+    DWCUtilGfxResource_ShowMessageWithString(nickName, 0x28);
     DWCUtilUiEffect_Init(0);
     func_ov182_021b8834(func_ov182_021b6dcc);
     DWCUtilSound_PlaySe(0xb);
@@ -75,9 +75,9 @@ void func_ov182_021b6b1c(void) {
 }
 
 static void func_ov182_021b6b8c(void) {
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/jb4Usb.nsc.l", GX_LoadBG2Scr);
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/jb4Usb.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -86,14 +86,14 @@ static void func_ov182_021b6b8c(void) {
 }
 
 static void func_ov182_021b6bfc(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
+    DWCUtilFade_Start(2, 0, 0x15, 8);
+    DWCUtilDisplay_ShowPlanes(0, 0x15);
     DWCUtilMain_SetUpdate(func_ov182_021b6c20);
 }
 
 static void func_ov182_021b6c20(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(2);
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(2);
         DWCUtilMain_SetUpdate(func_ov182_021b6c40);
     }
 }
@@ -113,7 +113,7 @@ static void func_ov182_021b6c60(void) {
 
 // B, or closing the lid, presses the button that cancels
 static void func_ov182_021b6c70(void) {
-    if (func_ov182_021bc798(2)) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     } else if (func_ov182_021b6b00()) {
         DWCUtilUiObject_SetStateIfIdle(0);
@@ -134,32 +134,32 @@ static void func_ov182_021b6c98(void) {
 
 static void func_ov182_021b6cc8(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021b6ce0);
 }
 
 static void func_ov182_021b6ce0(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (sUsbSetupState == USB_SETUP_CANCEL || sUsbSetupState == USB_SETUP_RETRY) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(3, 1, 1, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
+        DWCUtilFade_Start(3, 0, 0x15, 8);
         DWCUtilMain_SetUpdate(func_ov182_021b6d28);
     }
 }
 
 static void func_ov182_021b6d28(void) {
-    if (func_ov182_021bbaac(0) == 0 && (sUsbSetupState != USB_SETUP_CANCEL || func_ov182_021bbaac(1) == 0) &&
+    if (DWCUtilFade_IsActive(0) == 0 && (sUsbSetupState != USB_SETUP_CANCEL || DWCUtilFade_IsActive(1) == 0) &&
         DWCUtilUiObject_IsIdle()) {
         func_ov182_021b895c();
         DWCUtilUiEffect_Destroy();
-        func_ov182_021bbf7c(0);
+        DWCUtilText_DestroyScreenBg(0);
         if (sUsbSetupState == USB_SETUP_CANCEL || sUsbSetupState == USB_SETUP_RETRY) {
             DWCUtilScreen_Stop();
-            func_ov182_021bc228(1, 1);
+            DWCUtilDisplay_HidePlanes(1, 1);
         }
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, 0x15);
         if (sUsbSetupState == USB_SETUP_CANCEL) {
             DWCUtilMain_SetLayout(2, 1);
             DWCUtilMain_SetUpdate(func_ov182_021b536c);

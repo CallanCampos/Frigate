@@ -21,7 +21,7 @@ void DWCUtilVramAlloc_Init(void) {
 
     sVramScreens = DWCUtilHeap_AllocClear(sizeof(DWCUtilVramScreen) * 2, 4);
     for (i = 0; i < 2; i++) {
-        sVramScreens[i].freeNodes = func_ov182_021bb9c8(32, (u8 *)sVramScreens[i].nodes, sizeof(DWCUtilVramNode));
+        sVramScreens[i].freeNodes = DWCUtilStack_CreateFilled(32, (u8 *)sVramScreens[i].nodes, sizeof(DWCUtilVramNode));
         sVramScreens[i].list = DWCUtilList_Create();
         sVramScreens[i].head.pos = 0x300;
         sVramScreens[i].tail.pos = 0x400;
@@ -31,7 +31,7 @@ void DWCUtilVramAlloc_Init(void) {
 }
 
 DWCUtilVramNode *DWCUtilVramAlloc_Alloc(int screen, int size, s16 fromFront, u32 *pos) {
-    DWCUtilVramNode *node = func_ov182_021bba38(sVramScreens[screen].freeNodes);
+    DWCUtilVramNode *node = DWCUtilStack_Pop(sVramScreens[screen].freeNodes);
     DWCUtilVramNode *position;
     int units = (size + 3 & ~3) >> 2;
     u32 irq;
@@ -83,5 +83,5 @@ void DWCUtilVramAlloc_Free(DWCUtilVramNode *node) {
     if (node >= sVramScreens[1].nodes) {
         screen = 1;
     }
-    func_ov182_021bba00(sVramScreens[screen].freeNodes, node);
+    DWCUtilStack_Push(sVramScreens[screen].freeNodes, node);
 }

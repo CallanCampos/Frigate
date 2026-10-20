@@ -205,20 +205,20 @@ void func_ov182_021b2d48(void) {
     } else {
         DWCUtilScreen_Start(0x45, -1, 0);
     }
-    func_ov182_021ab6a4(1);
-    func_ov182_021ab9c0();
+    DWCUtilGfxResource_ShowStep(1);
+    DWCUtilBgOverlay_ShowConnectionList();
     func_ov182_021b70a0(2, 0x55, 0xf1, 0x41, sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
-    sAddressSettings.work->text = func_ov182_021bbdec(0, 1);
+    sAddressSettings.work->text = DWCUtilText_CreateBg(0, 1);
     for (i = 0; i < 7; i++) {
-        sAddressSettings.work->marks[i] = func_ov182_021bb960(0, 0x29);
+        sAddressSettings.work->marks[i] = DWCUtilCell_AllocOam(0, 0x29);
     }
     switch (edit->connection.status) {
     case 1:
-        sAddressSettings.work->setupIcon = func_ov182_021bb960(0, 0x50);
+        sAddressSettings.work->setupIcon = DWCUtilCell_AllocOam(0, 0x50);
         G2_SetOBJPriority(sAddressSettings.work->setupIcon, 3);
         break;
     case 2:
-        sAddressSettings.work->setupIcon = func_ov182_021bb960(0, 0x51);
+        sAddressSettings.work->setupIcon = DWCUtilCell_AllocOam(0, 0x51);
         G2_SetOBJPriority(sAddressSettings.work->setupIcon, 3);
         break;
     }
@@ -235,16 +235,18 @@ static void func_ov182_021b2e6c(void) {
     char litPalettePath[] = "char/ybBgStep21.ncl.l";
 
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE(0x18000));
-    func_ov182_021ab67c("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021ab67c("char/jbBgStep2.ncg.l", GX_LoadBG3Char);
-    func_ov182_021ab67c("char/jbBgStep21.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c(palettePath, GX_LoadBGPltt);
-    func_ov182_021ab67c("char/jb3List.nsc.l", GX_LoadBG3Scr);
-    sAddressSettings.work->backScreen = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(backPath), NULL, 4);
-    func_ov182_021b6f38(sAddressSettings.work->backScreen);
-    func_ov182_021b6f98();
-    sAddressSettings.work->palettes[0] = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(palettePath), NULL, 4);
-    sAddressSettings.work->palettes[1] = DWCUtilRomResource_LoadFile(func_ov182_021ab63c(litPalettePath), NULL, 4);
+    DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
+    DWCUtilGfxResource_Load("char/jbBgStep2.ncg.l", GX_LoadBG3Char);
+    DWCUtilGfxResource_Load("char/jbBgStep21.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load(palettePath, GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/jb3List.nsc.l", GX_LoadBG3Scr);
+    sAddressSettings.work->backScreen = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(backPath), NULL, 4);
+    DWCUtilBgBuffer_Init(sAddressSettings.work->backScreen);
+    DWCUtilBgBuffer_MarkDirty();
+    sAddressSettings.work->palettes[0] =
+        DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
+    sAddressSettings.work->palettes[1] =
+        DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(litPalettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -267,15 +269,15 @@ static void func_ov182_021b2fac(void) {
 }
 
 static void func_ov182_021b2fd4(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x1d, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x1d);
+    DWCUtilFade_Start(2, 1, 1, 8);
+    DWCUtilFade_Start(2, 0, 0x1d, 8);
+    DWCUtilDisplay_ShowPlanes(1, 1);
+    DWCUtilDisplay_ShowPlanes(0, 0x1d);
     DWCUtilMain_SetUpdate(func_ov182_021b300c);
 }
 
 static void func_ov182_021b300c(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilMain_SetUpdate(func_ov182_021b3030);
     }
 }
@@ -289,17 +291,17 @@ static void func_ov182_021b303c(void) {
     if (sAddressSettings.work->scrollTask != NULL || sAddressSettings.work->dragging || func_ov182_021b31c4()) {
         return;
     }
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         func_ov182_021b3220(sAddressSettings.cursor);
         return;
     }
-    if (func_ov182_021bc798(2)) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilSound_PlaySe(7);
         sAddressSettings.work->chosen = ADDRESS_ITEM_BACK;
         DWCUtilMain_SetUpdate(func_ov182_021b34f8);
         return;
     }
-    if (func_ov182_021bc7c8(0x200)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x200)) {
         if (sAddressSettings.scroll == ADDRESS_SCROLL_MAX) {
             if (!sAddressSettings.work->atEnd) {
                 DWCUtilSound_PlaySe(9);
@@ -311,11 +313,11 @@ static void func_ov182_021b303c(void) {
         sAddressSettings.work->scrollTask = DWCUtilTask_Create(0, func_ov182_021b3f24, NULL, 0x78);
         return;
     }
-    if (func_ov182_021bc7f8(0x200)) {
+    if (DWCUtilTouch_IsKeyReleased(0x200)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x100)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x100)) {
         if (sAddressSettings.scroll == 0) {
             if (!sAddressSettings.work->atEnd) {
                 DWCUtilSound_PlaySe(9);
@@ -327,31 +329,31 @@ static void func_ov182_021b303c(void) {
         sAddressSettings.work->scrollTask = DWCUtilTask_Create(0, func_ov182_021b3eac, NULL, 0x78);
         return;
     }
-    if (func_ov182_021bc7f8(0x100)) {
+    if (DWCUtilTouch_IsKeyReleased(0x100)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x40)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x40)) {
         func_ov182_021b40e8(1);
         return;
     }
-    if (func_ov182_021bc7f8(0x40)) {
+    if (DWCUtilTouch_IsKeyReleased(0x40)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x80)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x80)) {
         func_ov182_021b40e8(3);
         return;
     }
-    if (func_ov182_021bc7f8(0x80)) {
+    if (DWCUtilTouch_IsKeyReleased(0x80)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x20)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x20)) {
         func_ov182_021b40e8(0);
         return;
     }
-    if (func_ov182_021bc7c8(0x10)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x10)) {
         func_ov182_021b40e8(2);
     }
 }
@@ -473,7 +475,7 @@ static void func_ov182_021b3390(void) {
         break;
     case 2:
         if (sAddressSettings.work->dragDelay == 0) {
-            func_ov182_021ab8e4();
+            DWCUtilButtonSprites_Hide();
             sAddressSettings.scroll = func_ov182_021b7144() * ADDRESS_SCROLL_MAX / ADDRESS_BAR_LENGTH;
             func_ov182_021b3740();
             sAddressSettings.work->dragDelay = 4;
@@ -524,14 +526,14 @@ static void func_ov182_021b3390(void) {
 
 static void func_ov182_021b34f8(void) {
     func_ov182_021b7174();
-    func_ov182_021bbbf4(8);
+    DWCUtilFade_StartWait(8);
     DWCUtilMain_SetUpdate(func_ov182_021b3510);
 }
 
 static void func_ov182_021b3510(void) {
-    if (func_ov182_021bbaac(1) == 0) {
-        func_ov182_021bbac4(3, 1, 1, 8);
-        func_ov182_021bbac4(3, 0, 0x1d, 8);
+    if (DWCUtilFade_IsActive(1) == 0) {
+        DWCUtilFade_Start(3, 1, 1, 8);
+        DWCUtilFade_Start(3, 0, 0x1d, 8);
         DWCUtilMain_SetUpdate(func_ov182_021b3544);
     }
 }
@@ -542,31 +544,31 @@ static void func_ov182_021b3544(void) {
     DWCUtilSettingsEdit *edit;
     void (*next)(void);
 
-    if (func_ov182_021bbaac(1) != 0 || func_ov182_021bbaac(0) != 0) {
+    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
         return;
     }
     DWCUtilTask_Remove(0, sAddressSettings.work->task);
     DWCUtilTask_Remove(1, sAddressSettings.work->vblankTask);
     for (i = 0; i < 7; i++) {
-        func_ov182_021bcc9c(sAddressSettings.work->marks[i]);
+        DWCUtilOamBuf_Free(sAddressSettings.work->marks[i]);
     }
     if (sAddressSettings.work->setupIcon != NULL) {
-        func_ov182_021bcc9c(sAddressSettings.work->setupIcon);
+        DWCUtilOamBuf_Free(sAddressSettings.work->setupIcon);
     }
     func_ov182_021b711c();
-    func_ov182_021bbf7c(0);
-    func_ov182_021ab8e4();
+    DWCUtilText_DestroyScreenBg(0);
+    DWCUtilButtonSprites_Hide();
     if (sAddressSettings.work->chosen != ADDRESS_ITEM_SAVE) {
         DWCUtilScreen_Stop();
     }
-    func_ov182_021b6f78();
+    DWCUtilBgBuffer_Exit();
     DWCUtilRomResource_FreeFile(sAddressSettings.work->backScreen);
     for (i = 0; i < 2; i++) {
         DWCUtilRomResource_FreeFile(sAddressSettings.work->palettes[i]);
     }
-    func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x1d);
+    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCUtilDisplay_HidePlanes(1, 1);
+    DWCUtilDisplay_HidePlanes(0, 0x1d);
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE_0x10000);
@@ -635,16 +637,16 @@ static void func_ov182_021b3740(void) {
     int top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     int index;
 
-    func_ov182_021bc118(sAddressSettings.work->text, 0);
+    DWCUtilText_Clear(sAddressSettings.work->text, 0);
     for (i = 0, index = top; i < 5; i++, index++) {
         func_ov182_021b37b4(index, i);
     }
-    func_ov182_021b6fac(sAddressSettings.work->backScreen + sAddressScreenOffsets[top], 0, 0x1e, 0x13);
+    DWCUtilBgBuffer_CopyRows(sAddressSettings.work->backScreen + sAddressScreenOffsets[top], 0, 0x1e, 0x13);
     for (i = 0; i < 5; i++, top++) {
         func_ov182_021b38c0(top, i);
     }
-    func_ov182_021b6f98();
-    func_ov182_021bc184(sAddressSettings.work->text);
+    DWCUtilBgBuffer_MarkDirty();
+    DWCUtilText_MarkDirty(sAddressSettings.work->text);
     func_ov182_021b3bc4();
 }
 
@@ -842,7 +844,7 @@ static void func_ov182_021b39fc(int mark, int frame, int row) {
         }
     }
     if (sAddressMarkCells[mark][frame] != 0) {
-        func_ov182_021bb914(0, sAddressMarkCells[mark][frame], *oam);
+        DWCUtilCell_Copy(0, sAddressMarkCells[mark][frame], *oam);
         DWCUtilOam_SetPosition(*oam, x[mark], 0);
         G2_SetOBJPriority(*oam, 3);
         return;
@@ -875,7 +877,7 @@ static void func_ov182_021b3a9c(const u8 *str, int row) {
     if (length <= 16) {
         y += 5;
     }
-    func_ov182_021bc030(sAddressSettings.work->text, 0x48, y, 2, 8, line, 1);
+    DWCUtilText_DrawCentered(sAddressSettings.work->text, 0x48, y, 2, 8, line, 1);
     if (length > 16) {
         MI_CpuFill8(line, 0, sizeof(line));
         for (i = 0; i < length - 16; i++) {
@@ -885,7 +887,7 @@ static void func_ov182_021b3a9c(const u8 *str, int row) {
                 line[i] = str[16 + i];
             }
         }
-        func_ov182_021bc030(sAddressSettings.work->text, 0x48, y + 12, 2, 8, line, 1);
+        DWCUtilText_DrawCentered(sAddressSettings.work->text, 0x48, y + 12, 2, 8, line, 1);
     }
 }
 
@@ -896,7 +898,7 @@ static void func_ov182_021b3b6c(const u8 *address, int row) {
 
     OS_SNPrintf(digits, sizeof(digits), "%3d.%3d.%3d.%3d", address[0], address[1], address[2], address[3]);
     DWCUtilString_Widen(str, (u8 *)digits, 16);
-    func_ov182_021bc030(sAddressSettings.work->text, 0x5f, row * ADDRESS_ROW_HEIGHT + 8, 2, 7, str, 1);
+    DWCUtilText_DrawCentered(sAddressSettings.work->text, 0x5f, row * ADDRESS_ROW_HEIGHT + 8, 2, 7, str, 1);
 }
 
 // Moves the marks and the setup's icon to the rows' places from the scroll, and has the BGs follow at the next VBlank
@@ -947,13 +949,14 @@ static int func_ov182_021b3ce0(void) {
     int top;
     int i;
 
-    if (!func_ov182_021bc888(data_ov182_021c059c)) {
+    if (!DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
         return ADDRESS_ITEM_NONE;
     }
     top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     rect = sAddressRowRects[0];
     for (i = 0; i < 4; i++) {
-        if (top != ADDRESS_ROW_AUTO_ADDRESS && top != ADDRESS_ROW_AUTO_DNS && func_ov182_021bc9a8(rect.coords)) {
+        if (top != ADDRESS_ROW_AUTO_ADDRESS && top != ADDRESS_ROW_AUTO_DNS &&
+            DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
             return sAddressRowItems[top];
         }
         top++;
@@ -964,12 +967,12 @@ static int func_ov182_021b3ce0(void) {
         if (top == ADDRESS_ROW_AUTO_ADDRESS) {
             rect = sAddressRowRects[2];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_ADDRESS_YES;
             }
             rect = sAddressRowRects[1];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_ADDRESS_NO;
             }
             break;
@@ -981,12 +984,12 @@ static int func_ov182_021b3ce0(void) {
         if (top == ADDRESS_ROW_AUTO_DNS) {
             rect = sAddressRowRects[2];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_DNS_YES;
             }
             rect = sAddressRowRects[1];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_DNS_NO;
             }
             break;
@@ -994,7 +997,7 @@ static int func_ov182_021b3ce0(void) {
         top++;
     }
     for (i = 0; i < 3; i++) {
-        if (func_ov182_021bc888(sAddressButtonRects[i].coords)) {
+        if (DWCUtilTouch_IsTriggeredIn(sAddressButtonRects[i].coords)) {
             return i + ADDRESS_ITEM_TEST;
         }
     }
@@ -1026,7 +1029,7 @@ static void func_ov182_021b3eac(DWCUtilTask *task, void *arg) {
     int offset;
 
     func_ov182_021b7174();
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     if (sAddressSettings.scroll > 6) {
         sAddressSettings.scroll -= 6;
     } else {
@@ -1056,7 +1059,7 @@ static void func_ov182_021b3f24(DWCUtilTask *task, void *arg) {
     int offset;
 
     func_ov182_021b7174();
-    func_ov182_021ab8e4();
+    DWCUtilButtonSprites_Hide();
     sAddressSettings.scroll += 6;
     offset = FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     if (offset >= 6) {
@@ -1092,13 +1095,13 @@ static void func_ov182_021b3fd8(void) {
     int index = rects[sAddressSettings.cursor];
 
     if (index >= 3) {
-        func_ov182_021ab7f0(3, sAddressCursorRects[index].coords[0], sAddressCursorRects[index].coords[2],
-                            sAddressCursorRects[index].coords[1]);
+        DWCUtilButtonSprites_ShowPair(3, sAddressCursorRects[index].coords[0], sAddressCursorRects[index].coords[2],
+                                      sAddressCursorRects[index].coords[1]);
         return;
     }
     rect = sAddressCursorRects[index];
     rect.coords[1] += sAddressSettings.row * ADDRESS_ROW_HEIGHT;
-    func_ov182_021ab7f0(1, rect.coords[0], rect.coords[2], rect.coords[1]);
+    DWCUtilButtonSprites_ShowPair(1, rect.coords[0], rect.coords[2], rect.coords[1]);
 }
 
 // Puts the cursor on the item of its row, the chosen answer of a row of DHCP
@@ -1260,8 +1263,9 @@ static void func_ov182_021b40e8(int direction) {
 
 // Lights up the chosen button: its row of the palette
 static void func_ov182_021b4278(void) {
-    func_ov182_021b7014(sAddressSettings.work->palettes[1], sAddressButtonPalettes[sAddressSettings.cursor - 0xb],
-                        sAddressButtonPalettes[sAddressSettings.cursor - 0xb]);
+    DWCUtilBgBuffer_LoadPaletteRow(sAddressSettings.work->palettes[1],
+                                   sAddressButtonPalettes[sAddressSettings.cursor - 0xb],
+                                   sAddressButtonPalettes[sAddressSettings.cursor - 0xb]);
 }
 
 // Counts down the frames that the answers stay lit
@@ -1327,7 +1331,7 @@ static void func_ov182_021b43b0(void) {
     if (func_ov182_021b8f14() == 0) {
         DWCUtilSound_PlaySe(6);
         func_ov182_021b8eec();
-        func_ov182_021b7060(sAddressSettings.work->palettes[0]);
+        DWCUtilBgBuffer_LoadPalette(sAddressSettings.work->palettes[0]);
         DWCUtilMain_SetUpdate(func_ov182_021b43e0);
     }
 }

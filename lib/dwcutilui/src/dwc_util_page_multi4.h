@@ -18,11 +18,11 @@ void func_ov182_021b0ad0(void);
 // The end of the message once both screens have faded out: it goes on to the message of the connection test.
 // dwc_util_test_done.c has the same function, func_ov182_021b4c58
 static inline void func_ov182_021b0bb8Inline(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021bbf7c(0);
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilDisplay_HidePlanes(1, 1);
+        DWCUtilDisplay_HidePlanes(0, 0x15);
         DWCUtilMain_SetLayout(0, 0);
         DWCUtilMain_SetScreenArgs(0, 1);
         DWCUtilMain_SetUpdate(func_ov182_021b6588);

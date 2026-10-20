@@ -48,11 +48,11 @@ void DWCUtilUiObject_Init(int variant) {
     sUiObject->state = -2;
     sUiObject->variant = variant;
     for (i = 0; i < count; i++) {
-        sUiObject->objects[i] = func_ov182_021bb97c(0, sUiResources[variant][i], 1);
-        func_ov182_021bb878(sUiObject->objects[i], -1, 1);
+        sUiObject->objects[i] = DWCUtilCell_AllocOamRun(0, sUiResources[variant][i], 1);
+        DWCUtilOam_SetPriority(sUiObject->objects[i], -1, 1);
     }
-    sUiObject->objects[2] = func_ov182_021bb97c(0, 1, 1);
-    func_ov182_021bb878(sUiObject->objects[2], -1, 1);
+    sUiObject->objects[2] = DWCUtilCell_AllocOamRun(0, 1, 1);
+    DWCUtilOam_SetPriority(sUiObject->objects[2], -1, 1);
     DWCUtilUiObject_SetPosition(0xc0);
     sUiObject->task = DWCUtilTask_Create(0, DWCUtilUiObject_Raise, NULL, 0x78);
 }
@@ -98,9 +98,9 @@ static void DWCUtilUiObject_SetPosition(int y) {
     int count = sCounts[sUiObject->variant];
     int i;
 
-    func_ov182_021bb7e0(sUiObject->objects[2], -1, 0, y);
+    DWCUtilOam_SetNodePosition(sUiObject->objects[2], -1, 0, y);
     for (i = 0; i < count; i++) {
-        func_ov182_021bb7e0(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x, y + 4);
+        DWCUtilOam_SetNodePosition(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x, y + 4);
     }
 }
 
@@ -108,7 +108,7 @@ static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sUiObject->objects[2], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sUiObject->objects[2], 0, &x, &y);
     y -= 4;
     DWCUtilUiObject_SetPosition(y);
     if (y <= 0xa8) {
@@ -137,18 +137,18 @@ static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
             return;
         }
         for (i = 0; i < count; i++) {
-            func_ov182_021bc1c0(&sPositions[sPosIndex[sUiObject->variant][i]], sHitSize, rect);
-            if (!func_ov182_021bc888(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sPositions[sPosIndex[sUiObject->variant][i]], sHitSize, rect);
+            if (!DWCUtilTouch_IsTriggeredIn(rect)) {
                 continue;
             }
             if (sUiObject->selectTask != NULL) {
                 break;
             }
             resource = sUiResources[sUiObject->variant][i];
-            func_ov182_021bb914(0, resource + 1, func_ov182_021bb6ec(sUiObject->objects[i], 0));
-            func_ov182_021bb7e0(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x,
-                                sPositions[sPosIndex[sUiObject->variant][i]].y);
-            func_ov182_021bb878(sUiObject->objects[i], -1, 1);
+            DWCUtilCell_Copy(0, resource + 1, DWCUtilOam_GetEntry(sUiObject->objects[i], 0));
+            DWCUtilOam_SetNodePosition(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x,
+                                       sPositions[sPosIndex[sUiObject->variant][i]].y);
+            DWCUtilOam_SetPriority(sUiObject->objects[i], -1, 1);
             sUiObject->selectTask = DWCUtilTask_Create(0, DWCUtilUiObject_Revert, NULL, 0x6e);
             sUiObject->state = i;
             return;
@@ -161,7 +161,7 @@ static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sUiObject->objects[2], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sUiObject->objects[2], 0, &x, &y);
     y += 4;
     DWCUtilUiObject_SetPosition(y);
     if (y >= 0xc0) {
@@ -178,10 +178,10 @@ static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg) {
     }
     for (i = 0; i < 2; i++) {
         if (sUiObject->objects[i] != NULL) {
-            func_ov182_021bb690(sUiObject->objects[i]);
+            DWCUtilOam_Free(sUiObject->objects[i]);
         }
     }
-    func_ov182_021bb690(sUiObject->objects[2]);
+    DWCUtilOam_Free(sUiObject->objects[2]);
     DWCUtilHeap_FreeAndNull(&sUiObject);
 }
 
@@ -197,8 +197,8 @@ static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg) {
     count = sCounts[sUiObject->variant];
     for (i = 0; i < count; i++) {
         resource = sUiResources[sUiObject->variant][i];
-        func_ov182_021bb914(0, resource, func_ov182_021bb6ec(sUiObject->objects[i], 0));
-        func_ov182_021bb878(sUiObject->objects[i], -1, 1);
+        DWCUtilCell_Copy(0, resource, DWCUtilOam_GetEntry(sUiObject->objects[i], 0));
+        DWCUtilOam_SetPriority(sUiObject->objects[i], -1, 1);
     }
     DWCUtilUiObject_SetPosition(0xa8);
     sUiObject->counter = 0;
