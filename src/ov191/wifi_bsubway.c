@@ -660,7 +660,7 @@ static void WifiBSubwayRoom_SavePlayers(WifiBSubwayRoom *room, BSubwayWifiData *
     RTCTime time;
     RTCDate date;
 
-    func_ov011_0215dda8(&date, &time);
+    DWC_GetDateTime(&date, &time);
     BSubwayWifiData_SetPlayers(wifiData, room->data.players, room->rank, room->number);
     BSubwayWifiData_SetRoomFlag(wifiData, room->rank, room->number, &date);
 }
@@ -1255,7 +1255,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
             u32 number = wk->inputNumber;
             u32 count = WifiBSubwayRoom_GetCount(&wk->room);
 
-            func_ov011_0215dda8(&date, &time);
+            DWC_GetDateTime(&date, &time);
             if (number < 1 || number > count) {
                 wk->seq = 16;
             } else if (BSubwayWifiData_GetRoomFlag(wk->wifiData, rank, number, &date)) {

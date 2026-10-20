@@ -2432,7 +2432,7 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         if (!GFL_NetIsInitialized()) {
             GFL_NetErrAbort();
         }
-        valid = func_ov011_0215dda8(&date, &time);
+        valid = DWC_GetDateTime(&date, &time);
         if (valid) {
             RTC_ConvertSecondToDateTime(&date, &time, RTC_ConvertDateTimeToSecond(&date, &time));
         }

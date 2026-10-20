@@ -268,7 +268,7 @@ static u32 DWCRap_UpdateLogin(void) {
                                      &_dWork, DWCRap_DeleteFriendCallback, &_dWork)) {
                 NetState_RecordError(0, 0, 0, 0x3ee);
             } else {
-                func_ov011_0215e4d4(DWCRap_BuddyCallback, NULL);
+                DWC_SetBuddyFriendCallback(DWCRap_BuddyCallback, NULL);
                 func_ov011_0215fc50();
             }
         }
@@ -1107,7 +1107,7 @@ static void DWCRap_UpdateFriendStatus(void) {
 
         if (DWC_IsBuddyFriendData(&_dWork->friendList[index])) {
             int size;
-            u8 status = func_ov011_0215e410(&_dWork->friendList[index], _dWork->friendStatusData[index], &size);
+            u8 status = DWC_GetFriendStatusData(&_dWork->friendList[index], _dWork->friendStatusData[index], &size);
 
             if (size < 1) {
                 _dWork->friendStatus[index] = 0;
@@ -1123,7 +1123,7 @@ static void DWCRap_UpdateFriendStatus(void) {
 // clang-format off
 void DWCRap_SetOwnStatusData(const char *data, int size) {
     GFL_ASSERT(size <= MYDWC_STATUS_DATA_SIZE_MAX);
-    func_ov011_0215e47c(data, size);
+    DWC_SetOwnStatusData(data, size);
 }
 // clang-format on
 

@@ -8,8 +8,9 @@
 
 // Overlay 11's friend list and login (friend.c, a guessed name: the ROM names none of DWC's files): the date of the
 // authentication server, the text of the friends' statuses, the friend list that DWC keeps in step with GameSpy's
-// buddy list, and the login to GameSpy's GP with the token of the authentication server. The ROM names none of it;
-// the functions that dwc/dwc.h and dwc/ext.h declare are there, and the layouts' names are ours, from their use.
+// buddy list, and the login to GameSpy's GP with the token of the authentication server. The ROM names none of it:
+// the functions are named after the SDK's (see friend.c), and so is DWCFriendControl, the SDK's layout with the
+// profile IDs added; the other layouts' names are ours, from their use. dwc/dwc.h and dwc/ext.h declare the rest.
 
 // The callbacks of the friend list's update: its end, with whether the list changed; a friend's status; a friend
 // that was a copy of another and was deleted; and a friend that became a buddy
@@ -89,51 +90,52 @@ typedef struct DWCLoginControl {
 
 // The server's date and time, and the "Date" header of the authentication server's answer, such as
 // "Fri, 03 Mar 2006 01:28:13 GMT", which it is kept from (FALSE if the header can't be read)
-BOOL func_ov011_0215dffc(const char *dateHeader);
+BOOL DWCi_SetNasTimeFromDateHeader(const char *dateHeader);
 
 // The texts of the statuses: a text of sep, key, sep and value written to out, or appended to it, both returning the
 // text's length, and the value of a key read to dest (only measured if dest is NULL), returning its length or -1
-int func_ov011_0215e160(const char *key, const char *value, char *out, char sep);
-int func_ov011_0215e188(const char *key, const char *value, char *out, char sep);
-int func_ov011_0215e1b0(const char *key, char *dest, const char *text, char sep);
+int DWC_SetCommonKeyValueString(const char *key, const char *value, char *out, char sep);
+int DWC_AddCommonKeyValueString(const char *key, const char *value, char *out, char sep);
+int DWC_GetCommonValueString(const char *key, char *dest, const char *text, char sep);
 
 // A random number below max (all 32 bits if max is 0), from a generator seeded with the console's address and clock
-u32 func_ov011_0215e25c(u32 max);
+u32 DWCi_GetMathRand32(u32 max);
 // The length of a text of u16 characters
-u32 func_ov011_0215e32c(const u16 *str);
+u32 DWCi_WStrLen(const u16 *str);
 
 // The friend list: starting it with its memory and the player's name, running it for a frame, whether its update runs,
 // starting the update with its callbacks, ending it with an error, and the callbacks of GP's buddy requests, buddy
 // authorizations and buddy statuses
-void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, const u16 *playerName,
-                         DWCFriendData *friendList, int friendListLen);
-void func_ov011_0215e584(void);
-BOOL func_ov011_0215e714(void);
-void func_ov011_0215e72c(const char *authToken, const char *partnerChallenge, DWCUpdateServersCallback updateCallback,
-                         void *updateParam, DWCFriendStatusCallback statusCallback, void *statusParam,
-                         DWCDeleteFriendListCallback deleteCallback, void *deleteParam);
-void func_ov011_0215e784(int error, int code);
-void func_ov011_0215e7d0(GPConnection *connection, GPRecvBuddyRequestArg *arg, void *param);
-BOOL func_ov011_0215e7fc(GPConnection *connection, GPRecvBuddyAuthArg *arg, void *param);
-void func_ov011_0215e81c(GPConnection *connection, GPRecvBuddyStatusArg *arg, void *param);
+void DWCi_FriendInit(DWCFriendControl *control, GPConnection *connection, const u16 *playerName,
+                     DWCFriendData *friendList, int friendListLen);
+void DWCi_FriendProcess(void);
+BOOL DWCi_IsUpdatingServers(void);
+void DWCi_UpdateServersAsync(const char *authToken, const char *partnerChallenge,
+                             DWCUpdateServersCallback updateCallback, void *updateParam,
+                             DWCFriendStatusCallback statusCallback, void *statusParam,
+                             DWCDeleteFriendListCallback deleteCallback, void *deleteParam);
+void DWCi_StopFriendProcess(int error, int code);
+void DWCi_GPRecvBuddyRequestCallback(GPConnection *connection, GPRecvBuddyRequestArg *arg, void *param);
+BOOL DWCi_GPRecvBuddyAuthCallback(GPConnection *connection, GPRecvBuddyAuthArg *arg, void *param);
+void DWCi_GPRecvBuddyStatusCallback(GPConnection *connection, GPRecvBuddyStatusArg *arg, void *param);
 // A friend's profile ID (0 if it has none), the index of a profile ID in the friend list (-1 if it isn't), noting that
 // GP was run, setting the player's status (-1 and NULL keep the last ones) and ending the friend list
-int func_ov011_0215e880(int index);
-int func_ov011_0215e8b4(int profileId);
-void func_ov011_0215e8f4(void);
-int func_ov011_0215e914(int status, const char *statusString, const char *locationString);
-void func_ov011_0215e9d0(void);
+int DWCi_GetProfileIDFromList(int index);
+int DWCi_GetFriendListIndex(int profileId);
+void DWCi_InitGPProcessCount(void);
+int DWCi_SetGPStatus(int status, const char *statusString, const char *locationString);
+void DWCi_ShutdownFriend(void);
 void func_ov011_0215f2c0(void);
 void func_ov011_0215f2cc(void);
 
 // The login: starting it with its memory, starting the login to the authentication server, running it for a frame, the
 // user data, ending it with an error, and ending it
-void func_ov011_0215f410(DWCLoginControl *control, DWCUserData *userData, GPConnection *connection, int productId,
-                         u32 gameCode, const u16 *playerName, DWCLoginCallback callback, void *param);
-BOOL func_ov011_0215f45c(void);
-void func_ov011_0215f480(void);
-DWCUserData *func_ov011_0215f51c(void);
-void func_ov011_0215f530(int error, int code);
-void func_ov011_0215f560(void);
+void DWCi_LoginInit(DWCLoginControl *control, DWCUserData *userData, GPConnection *connection, int productId,
+                    u32 gameCode, const u16 *playerName, DWCLoginCallback callback, void *param);
+BOOL DWCi_LoginAsync(void);
+void DWCi_LoginProcess(void);
+DWCUserData *DWCi_GetUserData(void);
+void DWCi_StopLogin(int error, int code);
+void DWCi_ShutdownLogin(void);
 
 #endif // POKEBW2_DWC_FRIEND_H

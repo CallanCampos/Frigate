@@ -506,10 +506,9 @@ void func_ov011_0215fa0c(DWCUserData *userData, int productId, const char *secre
     sMatchRoot.fm->closedCallback = NULL;
     sMatchRoot.fm->closedParam = NULL;
     func_ov011_0216051c();
-    func_ov011_0215f410(&sMatchRoot.fm->login, userData, &sMatchRoot.fm->gp, productId, userData->gameCode,
-                        sMatchRoot.fm->name, func_ov011_0216076c, NULL);
-    func_ov011_0215e4f0(&sMatchRoot.fm->friendControl, &sMatchRoot.fm->gp, sMatchRoot.fm->name, friendList,
-                        friendListLen);
+    DWCi_LoginInit(&sMatchRoot.fm->login, userData, &sMatchRoot.fm->gp, productId, userData->gameCode,
+                   sMatchRoot.fm->name, func_ov011_0216076c, NULL);
+    DWCi_FriendInit(&sMatchRoot.fm->friendControl, &sMatchRoot.fm->gp, sMatchRoot.fm->name, friendList, friendListLen);
     func_ov011_02161048(&sMatchRoot.fm->match, &sMatchRoot.fm->gp, sMatchRoot.fm, &sMatchRoot.fm->callbacks,
                         gcd_gamename, gcd_secret_key, friendList, friendListLen);
     func_ov011_02168d0c(&sMatchRoot.fm->match.transport);
@@ -547,8 +546,8 @@ void func_ov011_0215fb78(void) {
             gpDestroy(&sMatchRoot.fm->gp);
             sMatchRoot.fm->gp = NULL;
         }
-        func_ov011_0215f560();
-        func_ov011_0215e9d0();
+        DWCi_ShutdownLogin();
+        DWCi_ShutdownFriend();
         func_ov011_02162e44();
         func_ov011_02168fec();
         if (sMatchRoot.fm->socket != NULL) {
@@ -578,42 +577,45 @@ void func_ov011_0215fc50(void) {
             if (func_ov011_02160604(gpSetCallback(&sMatchRoot.fm->gp, 3, func_ov011_02160870, 0))) {
                 return;
             }
-            if (func_ov011_02160604(gpSetCallback(&sMatchRoot.fm->gp, 7, (GPCallback)func_ov011_0215e7fc, 0))) {
+            if (func_ov011_02160604(
+                    gpSetCallback(&sMatchRoot.fm->gp, 7, (GPCallback)DWCi_GPRecvBuddyAuthCallback, 0))) {
                 return;
             }
-            if (func_ov011_02160604(gpSetCallback(&sMatchRoot.fm->gp, 1, (GPCallback)func_ov011_0215e7d0, 0))) {
+            if (func_ov011_02160604(
+                    gpSetCallback(&sMatchRoot.fm->gp, 1, (GPCallback)DWCi_GPRecvBuddyRequestCallback, 0))) {
                 return;
             }
-            if (func_ov011_02160604(gpSetCallback(&sMatchRoot.fm->gp, 2, (GPCallback)func_ov011_0215e81c, 0))) {
+            if (func_ov011_02160604(
+                    gpSetCallback(&sMatchRoot.fm->gp, 2, (GPCallback)DWCi_GPRecvBuddyStatusCallback, 0))) {
                 return;
             }
             func_ov011_021605b4(2);
-            if (func_ov011_0215f45c() == 0) {
-                func_ov011_0215f530(2, -20100);
+            if (DWCi_LoginAsync() == 0) {
+                DWCi_StopLogin(2, -20100);
             }
             break;
         case 2:
-            func_ov011_0215f530(3, -20110);
+            DWCi_StopLogin(3, -20110);
             return;
         case 3:
-            func_ov011_0215f530(4, -20101);
+            DWCi_StopLogin(4, -20101);
             return;
         }
         break;
     case 2:
-        func_ov011_0215f480();
+        DWCi_LoginProcess();
         break;
     case 3:
-        func_ov011_0215e584();
+        DWCi_FriendProcess();
         func_ov011_021617b4(0);
         break;
     case 4:
         func_ov011_021617b4(1);
-        func_ov011_0215e584();
+        DWCi_FriendProcess();
         break;
     case 5:
         func_ov011_02168db0();
-        func_ov011_0215e584();
+        DWCi_FriendProcess();
         if (sMatchRoot.fm->match.mode == 2 || sMatchRoot.fm->match.mode == 3) {
             func_ov011_021617b4(1);
         } else if (sMatchRoot.fm->socket != NULL) {
@@ -645,8 +647,8 @@ BOOL func_ov011_0215fdf0(const u16 *name, const char *reserved, void (*callback)
         len = 0;
     } else {
         MIi_CpuClear16(0, sMatchRoot.fm->name, 0x34);
-        if (func_ov011_0215e32c(name) <= 0x19) {
-            len = func_ov011_0215e32c(name);
+        if (DWCi_WStrLen(name) <= 0x19) {
+            len = DWCi_WStrLen(name);
         } else {
             len = 0x19;
         }
@@ -654,7 +656,7 @@ BOOL func_ov011_0215fdf0(const u16 *name, const char *reserved, void (*callback)
     }
     sMatchRoot.fm->name[len] = 0;
     if (DWC_GetInetStatus() != 4) {
-        func_ov011_0215f530(2, -60010);
+        DWCi_StopLogin(2, -60010);
         return FALSE;
     }
     func_ov011_021605b4(1);
@@ -666,13 +668,13 @@ BOOL func_ov011_0215fe94(const char *name, void (*callback)(int error), void *us
                          void (*statusCallback)(int index, u8 status, const char *location, void *param),
                          void *statusParam, void (*deleteCallback)(int deleteIndex, int srcIndex, void *param),
                          void *deleteParam) {
-    if (DWCi_IsError() || sMatchRoot.fm->state < 3 || func_ov011_0215e714()) {
+    if (DWCi_IsError() || sMatchRoot.fm->state < 3 || DWCi_IsUpdatingServers()) {
         return FALSE;
     }
     sMatchRoot.fm->updateCallback = (DWCUpdateServersCallback)callback;
     sMatchRoot.fm->updateParam = userData;
-    func_ov011_0215e72c(sMatchRoot.fm->login.authToken, sMatchRoot.fm->login.partnerChallenge, func_ov011_021607a8, 0,
-                        statusCallback, statusParam, deleteCallback, deleteParam);
+    DWCi_UpdateServersAsync(sMatchRoot.fm->login.authToken, sMatchRoot.fm->login.partnerChallenge, func_ov011_021607a8,
+                            0, statusCallback, statusParam, deleteCallback, deleteParam);
     return TRUE;
 }
 
@@ -725,7 +727,7 @@ BOOL func_ov011_0215fff4(int type, int friendIndex, DWCMatchedFunc matched, void
     sMatchRoot.fm->matchedCallback = matched;
     sMatchRoot.fm->matchedParam = matchedParam;
     func_ov011_021605b4(4);
-    profileId = func_ov011_0215e880(friendIndex);
+    profileId = DWCi_GetProfileIDFromList(friendIndex);
     if (profileId == 0 || gpIsBuddy(&sMatchRoot.fm->gp, profileId) == 0) {
         error = 0xb;
         goto fail;
@@ -741,9 +743,9 @@ BOOL func_ov011_0215fff4(int type, int friendIndex, DWCMatchedFunc matched, void
         error = 0x15;
         goto fail;
     }
-    func_ov011_0215e1b0("SCM", value, status.statusString, '/');
+    DWC_GetCommonValueString("SCM", value, status.statusString, '/');
     scm = strtoul(value, NULL, 10);
-    func_ov011_0215e1b0("SCN", value, status.statusString, '/');
+    DWC_GetCommonValueString("SCN", value, status.statusString, '/');
     scn = strtoul(value, NULL, 10);
     if (scn == scm) {
         error = 0xc;
@@ -928,7 +930,7 @@ int func_ov011_0216043c(void) {
         return 0;
     }
     result =
-        func_ov011_0217d144(&sMatchRoot.fm->socket, func_ov011_0217ed14(0, func_ov011_0215e25c(0x4000) + 0xc000, NULL),
+        func_ov011_0217d144(&sMatchRoot.fm->socket, func_ov011_0217ed14(0, DWCi_GetMathRand32(0x4000) + 0xc000, NULL),
                             sMatchRoot.fm->sendBufSize, sMatchRoot.fm->recvBufSize, func_ov011_02160d24);
     if (func_ov011_021606a4(result)) {
         return result;
@@ -1063,12 +1065,12 @@ static int func_ov011_02160604(int result) {
     switch (sMatchRoot.fm->state) {
     case 1:
         code -= 61000;
-        func_ov011_0215f530(type, code);
+        DWCi_StopLogin(type, code);
         break;
     case 2:
         code -= 61000;
         if (sMatchRoot.fm->login.state < 1) {
-            func_ov011_0215f530(type, code);
+            DWCi_StopLogin(type, code);
         }
         break;
     case 4:
@@ -1079,7 +1081,7 @@ static int func_ov011_02160604(int result) {
         code -= 91000;
         break;
     }
-    func_ov011_0215e784(type, code);
+    DWCi_StopFriendProcess(type, code);
     return result;
 }
 
@@ -1119,7 +1121,7 @@ static int func_ov011_021606a4(int result) {
         break;
     }
     if (type != 0) {
-        func_ov011_0215f530(type, code - 67000);
+        DWCi_StopLogin(type, code - 67000);
     }
     return result;
 }
@@ -1148,7 +1150,7 @@ static void func_ov011_0216076c(int error, int profileId, void *param) {
     if (error == 0) {
         sMatchRoot.fm->profileId = profileId;
         func_ov011_021605b4(3);
-        func_ov011_0215e8f4();
+        DWCi_InitGPProcessCount();
     } else {
         func_ov011_021605b4(0);
     }
@@ -1287,7 +1289,7 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
             if (host->profileId != sMatchRoot.fm->match.profileId && func_ov011_021604b0(host->aid) == NULL) {
                 if (sMatchRoot.fm->closedCallback != NULL) {
                     sMatchRoot.fm->closedCallback(error, closeType == 0, isHost, host->aid,
-                                                  func_ov011_0215e8b4(host->profileId), sMatchRoot.fm->closedParam);
+                                                  DWCi_GetFriendListIndex(host->profileId), sMatchRoot.fm->closedParam);
                 }
                 func_ov011_021605c8(host->aid);
             } else {
@@ -1333,7 +1335,7 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
         qr2_send_statechanged(sMatchRoot.fm->match.qr2);
     }
     if (sMatchRoot.fm->closedCallback != NULL && hadHost) {
-        sMatchRoot.fm->closedCallback(error, closeType == 0, isHost, id, func_ov011_0215e8b4(profileId),
+        sMatchRoot.fm->closedCallback(error, closeType == 0, isHost, id, DWCi_GetFriendListIndex(profileId),
                                       sMatchRoot.fm->closedParam);
     }
     if (sMatchRoot.fm->unk_2d == 0 && sMatchRoot.fm->match.mode == 2) {
@@ -2308,7 +2310,7 @@ static void func_ov011_02162880(int type, int code) {
         }
         work = func_ov011_02167f6c();
         isHost = func_ov011_02167f6c()->mode == 2;
-        work->notifyFunc(type, 0, flag, isHost, func_ov011_0215e8b4(func_ov011_02167f6c()->unk_680),
+        work->notifyFunc(type, 0, flag, isHost, DWCi_GetFriendListIndex(func_ov011_02167f6c()->unk_680),
                          func_ov011_02167f6c()->notifyParam);
         func_ov011_021631a8();
     }
@@ -2377,7 +2379,7 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
                 func_ov011_02167f6c()->unk_630 = value;
             }
             if (func_ov011_02166604(0) == func_ov011_02167f6c()->unk_650) {
-                nextId = func_ov011_0215e25c(0xfffffffe);
+                nextId = DWCi_GetMathRand32(0xfffffffe);
                 func_ov011_02167f6c()->unk_7c8 = nextId + 1;
                 func_ov011_021660f8();
                 func_ov011_02167f6c()->unk_62c = 0;
@@ -2493,18 +2495,18 @@ int func_ov011_02162d80(int status) {
     int players;
 
     OS_SNPrintf(number, 12, "%u", func_ov011_02167f6c()->unk_17 + 1);
-    func_ov011_0215e160("SCM", number, text, '/');
+    DWC_SetCommonKeyValueString("SCM", number, text, '/');
     players = func_ov011_02168024();
     if (func_ov011_02167f6c()->matchType == 2 && players == 0) {
         players = 1;
     }
     OS_SNPrintf(number, 12, "%u", players);
-    func_ov011_0215e188("SCN", number, text, '/');
+    DWC_AddCommonKeyValueString("SCN", number, text, '/');
     OS_SNPrintf(number, 12, "%u", 0x5a);
-    func_ov011_0215e188("VER", number, text, '/');
+    DWC_AddCommonKeyValueString("VER", number, text, '/');
     OS_SNPrintf(number, 12, "%u", func_ov011_021685a0() != 0);
-    func_ov011_0215e188("LCK", number, text, '/');
-    return func_ov011_0215e914(status, text, NULL);
+    DWC_AddCommonKeyValueString("LCK", number, text, '/');
+    return DWCi_SetGPStatus(status, text, NULL);
 }
 
 static void func_ov011_02162e44(void) {
@@ -2529,7 +2531,7 @@ static void func_ov011_02162e80(int mode) {
     func_ov011_02167f6c()->retries = 0;
     func_ov011_02167f6c()->unk_5f8 = 0;
     work = func_ov011_02167f6c();
-    work->unk_5fa = func_ov011_0215e25c(0x10000);
+    work->unk_5fa = DWCi_GetMathRand32(0x10000);
     func_ov011_02167f6c()->unk_5fc = 0;
     func_ov011_02167f6c()->unk_600 = 0;
     func_ov011_02167f6c()->unk_608 = 0;
@@ -2680,7 +2682,7 @@ static int func_ov011_0216322c(u32 pid) {
             roll = func_ov011_02167f6c()->unk_7a8 != 0 ? 2 : 0;
             func_ov011_02167f6c()->unk_7a8 ^= 1;
         } else {
-            roll = func_ov011_0215e25c(100) < sMatchChance[0] ? 2 : 0;
+            roll = DWCi_GetMathRand32(100) < sMatchChance[0] ? 2 : 0;
         }
         len = func_ov011_021634a0(text, func_ov011_02167f6c()->profileId, func_ov011_02167f6c()->unk_17,
                                   func_ov011_02167f6c()->matchType, roll);
@@ -2778,7 +2780,7 @@ static int func_ov011_021635a0(int reset, u32 token, DWCNodeInfo *peer) {
             mismatch = 0;
         }
         if (mismatch) {
-            func_ov011_02167f6c()->unk_5fa = func_ov011_0215e25c(0x10000);
+            func_ov011_02167f6c()->unk_5fa = DWCi_GetMathRand32(0x10000);
             func_ov011_02167f6c()->target.cookie = token;
         } else {
             hostInfo[0] = SOC_GetHostID();
@@ -3020,7 +3022,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
                 ((func_ov011_02167f6c()->matchType != 0 && func_ov011_02167f6c()->matchType != 1) ||
                  func_ov011_02167f6c()->unk_0d != 0) &&
                 func_ov011_02167f6c()->newClientCallback != NULL) {
-                func_ov011_02167f6c()->newClientCallback(func_ov011_0215e8b4(profileId),
+                func_ov011_02167f6c()->newClientCallback(DWCi_GetFriendListIndex(profileId),
                                                          func_ov011_02167f6c()->newClientParam);
             }
             host = func_ov011_02168224();
@@ -3218,7 +3220,8 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
             func_ov011_02167f6c()->pending.profileId = id;
         }
         if (func_ov011_02167f6c()->newClientCallback != NULL) {
-            func_ov011_02167f6c()->newClientCallback(func_ov011_0215e8b4(id), func_ov011_02167f6c()->newClientParam);
+            func_ov011_02167f6c()->newClientCallback(DWCi_GetFriendListIndex(id),
+                                                     func_ov011_02167f6c()->newClientParam);
         }
         break;
     }
@@ -3442,7 +3445,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
 // Tells the game about the match, passing on the match's player and the game's own parameter
 static inline void MatchNotify(int error, BOOL cancel, BOOL self, BOOL isServer) {
     func_ov011_02167f6c()->notifyFunc(error, cancel, self, isServer,
-                                      func_ov011_0215e8b4(func_ov011_02167f6c()->unk_680),
+                                      DWCi_GetFriendListIndex(func_ov011_02167f6c()->unk_680),
                                       func_ov011_02167f6c()->notifyParam);
 }
 
@@ -3515,7 +3518,7 @@ static int func_ov011_0216484c(int profileId, int ip, int port, int nodeType, in
             return 3;
         }
         if (func_ov011_02167f6c()->matchType == 1) {
-            if (gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0 || func_ov011_0215e8b4(profileId) == -1) {
+            if (gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0 || DWCi_GetFriendListIndex(profileId) == -1) {
                 return 0xff;
             }
             if (func_ov011_02166528(profileId) == 0) {
@@ -3523,7 +3526,7 @@ static int func_ov011_0216484c(int profileId, int ip, int port, int nodeType, in
                 return 3;
             }
         } else if (func_ov011_02167f6c()->matchType == 2) {
-            if (gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0 || func_ov011_0215e8b4(profileId) == -1) {
+            if (gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0 || DWCi_GetFriendListIndex(profileId) == -1) {
                 return 0xff;
             }
         }
@@ -3666,7 +3669,7 @@ static int func_ov011_02164b98(int profileId, int flag) {
     data[6] = func_ov011_02167f6c()->unk_798;
     data[7] = func_ov011_02167f6c()->unk_7b0;
     data[8] = func_ov011_02167f6c()->userData;
-    func_ov011_02167f6c()->unk_634 = func_ov011_0215e25c(-2) + 1;
+    func_ov011_02167f6c()->unk_634 = DWCi_GetMathRand32(-2) + 1;
     data[9] = func_ov011_02167f6c()->unk_634;
     data[10] = func_ov011_02167f6c()->unk_5a4 != 0;
     return func_ov011_021637d8(1, profileId, ip, port, data, 11);
@@ -3687,7 +3690,7 @@ static int func_ov011_02164d64(int a0, int a1, int a2) {
     func_ov011_02167f6c()->mode = 3;
     for (i = 0; i < func_ov011_02167f6c()->friendCount;) {
         profileId = DWC_GetGsProfileId(
-            func_ov011_0215f51c(),
+            DWCi_GetUserData(),
             &func_ov011_02167f6c()->friendList[func_ov011_02167f6c()->friendOrder[func_ov011_02167f6c()->unk_621]]);
         if (profileId != 0 && profileId != -1 &&
             DWCi_IsValidFriendData(
@@ -4613,7 +4616,7 @@ static BOOL func_ov011_02166528(int profileId) {
         return FALSE;
     }
     for (i = 0; i < func_ov011_02167f6c()->friendCount; i++) {
-        int friendIndex = func_ov011_0215e880(func_ov011_02167f6c()->friendOrder[i]);
+        int friendIndex = DWCi_GetProfileIDFromList(func_ov011_02167f6c()->friendOrder[i]);
 
         if (friendIndex > 0 && friendIndex == profileId) {
             return TRUE;
@@ -4765,7 +4768,7 @@ static int func_ov011_0216672c(int result) {
     }
     switch (func_ov011_021603a4()) {
     case 2:
-        func_ov011_0215f530(type, code - 64000);
+        DWCi_StopLogin(type, code - 64000);
         break;
     case 4:
         func_ov011_02162880(type, code - 84000);
@@ -5079,7 +5082,7 @@ static BOOL func_ov011_02166e4c(int sortAfter) {
                 if (rank > 0x7fffff) {
                     rank = 0x7fffff;
                 }
-                SBServerAddIntKeyValue(server, "dwc_eval", func_ov011_0215e25c(0x100) | (rank << 8));
+                SBServerAddIntKeyValue(server, "dwc_eval", DWCi_GetMathRand32(0x100) | (rank << 8));
             } else {
                 ServerBrowserRemoveServer(func_ov011_02167f6c()->sb, server);
                 i--;
@@ -5087,7 +5090,7 @@ static BOOL func_ov011_02166e4c(int sortAfter) {
                 continue;
             }
         } else {
-            SBServerAddIntKeyValue(server, "dwc_eval", func_ov011_0215e25c(0x80));
+            SBServerAddIntKeyValue(server, "dwc_eval", DWCi_GetMathRand32(0x80));
         }
     }
     if (sortAfter != 0 && ServerBrowserCount(func_ov011_02167f6c()->sb) != 0) {
@@ -5115,7 +5118,7 @@ static void func_ov011_02166f8c(void) {
             }
             total += sMatchWeights[i];
         }
-        pick = func_ov011_0215e25c(100);
+        pick = DWCi_GetMathRand32(100);
         for (i = 0; i < ServerBrowserCount(func_ov011_02167f6c()->sb); i++) {
             int previous;
 
@@ -5465,7 +5468,7 @@ BOOL func_ov011_021677e8(void) {
 static u32 func_ov011_02167810(void) {
     MatchControl *match = func_ov011_02167f6c();
 
-    return match->profileId + func_ov011_0215e25c(10000000) + 100000000;
+    return match->profileId + DWCi_GetMathRand32(10000000) + 100000000;
 }
 
 static void func_ov011_02167838(MatchCheckFunc a, const void *userData, u32 c) {
@@ -6090,7 +6093,7 @@ u8 func_ov011_021686c0(const GPBuddyStatus *status) {
     u8 result = 0;
     char text[4] = { 0, 0, 0, 0 };
 
-    if (func_ov011_0215e1b0("LCK", text, status->statusString, '/') > 0) {
+    if (DWC_GetCommonValueString("LCK", text, status->statusString, '/') > 0) {
         result = strtoul(text, NULL, 10);
     }
     return result;

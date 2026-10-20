@@ -1,7 +1,10 @@
 // Overlay 11's friend list and login (friend.c, a guessed name: the ROM embeds none for DWC's files; Thumb). It keeps
 // the server's date from the authentication server's answer, reads and writes the texts of the friends' statuses, keeps
 // the friend list in step with GameSpy's buddy list and logs in to GameSpy's GP with the authentication server's
-// token. The layouts are in dwc/friend.h.
+// token. The layouts are in dwc/friend.h. The functions carry the names they have in the SDK (NitroDWC's and the Wii
+// DWC's dwc_nonport.c, dwc_nasfunc.c, dwc_common.c, dwc_friend.c and dwc_login.c); the static DWCi_HandleGPError of
+// the last two is DWCi_HandleFriendGPError and DWCi_HandleLoginGPError here, and the functions that BW2's DWC added
+// have names of ours after them.
 
 #include "dwc/friend.h"
 #include "dwc/bm.h"
@@ -34,36 +37,37 @@ typedef struct NasLogin {
 // The seconds of a century, which the clock's seconds wrap at
 #define SECONDS_PER_CENTURY 0xbc191380
 
-static u64 func_ov011_0215dd74(void);
-static const char *func_ov011_0215dd7c(void);
-static char *func_ov011_0215dd84(void);
-static u8 func_ov011_0215e344(const DWCFriendData *friendData, char *location);
-static u8 func_ov011_0215e354(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *location);
-static u8 func_ov011_0215e420(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *statusData, int *size);
-static void func_ov011_0215e980(int index);
-static int func_ov011_0215e9dc(void);
-static void func_ov011_0215ea34(void);
-static void func_ov011_0215ea50(DWCFriendData *friendList, int friendListLen);
-static void func_ov011_0215ebf8(void);
-static void func_ov011_0215ec14(DWCFriendData *friendList, int index, int srcIndex);
-static BOOL func_ov011_0215ec48(DWCFriendData *friendList, int index, int profileId);
-static int func_ov011_0215ecbc(DWCFriendData *friendList, int friendListLen, int profileId);
-static int func_ov011_0215ed88(int profileId);
-static BOOL func_ov011_0215edac(const DWCFriendData *friendData, GPBuddyStatus *status);
-static int func_ov011_0215ee18(int result);
-static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchResponseArg *arg, void *param);
-static void func_ov011_0215f004(GPConnection *connection, GPGetInfoResponseArg *arg, void *param);
-static void func_ov011_0215f198(GPConnection *connection, GPGetInfoResponseArg *arg, void *param);
-static int func_ov011_0215f2b4(void);
-static void func_ov011_0215f2d8(GPConnection *connection, GPGetReverseBuddiesListResponseArg *arg, void *param);
-static void func_ov011_0215f57c(void);
-static int func_ov011_0215f59c(int result);
-static void func_ov011_0215f5f0(GPConnection *connection, GPConnectResponseArg *arg, void *param);
-static void func_ov011_0215f700(GPCallback callback, int nextState);
-static BOOL func_ov011_0215f748(void);
-static void func_ov011_0215f820(void);
-static void func_ov011_0215f8a8(GPConnection *connection, GPGetInfoResponseArg *arg, void *param);
-static BOOL func_ov011_0215f998(void);
+static u64 DWCi_Np_GetConsoleId(void);
+static const char *DWCi_Np_GetConsoleName(void);
+static char *DWCi_Np_GetAppGameName(void);
+static u8 DWC_GetFriendStatus(const DWCFriendData *friendData, char *location);
+static u8 DWC_GetFriendStatusSC(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *location);
+static u8 DWC_GetFriendStatusDataSC(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *statusData, int *size);
+static void DWCi_CallBuddyFriendCallback(int index);
+static int DWCi_GPProcess(void);
+static void DWCi_CloseFriendProcess(void);
+static void DWCi_UpdateFriendReq(DWCFriendData *friendList, int friendListLen);
+static void DWCi_EndUpdateServers(void);
+static void DWCi_DeleteFriendFromList(DWCFriendData *friendList, int index, int srcIndex);
+static BOOL DWCi_RefreshFriendListForth(DWCFriendData *friendList, int index, int profileId);
+static int DWCi_RefreshFriendListAll(DWCFriendData *friendList, int friendListLen, int profileId);
+static int DWCi_GPSendBuddyRequest(int profileId);
+static BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData *friendData, GPBuddyStatus *status);
+static int DWCi_HandleFriendGPError(int result);
+static void DWCi_GPProfileSearchCallback(GPConnection *connection, GPProfileSearchResponseArg *arg, void *param);
+static void DWCi_GPGetInfoCallback_RecvBuddyRequest(GPConnection *connection, GPGetInfoResponseArg *arg, void *param);
+static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection *connection, GPGetInfoResponseArg *arg, void *param);
+static int DWCi_GetPersCallbackLevel(void);
+static void DWCi_GPGetReverseBuddiesListCallback(GPConnection *connection, GPGetReverseBuddiesListResponseArg *arg,
+                                                 void *param);
+static void DWCi_CloseLogin(void);
+static int DWCi_HandleLoginGPError(int result);
+static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseArg *arg, void *param);
+static void DWCi_GPConnect(GPCallback callback, int nextState);
+static BOOL DWCi_RemoteLogin(void);
+static void DWCi_RemoteLoginProcess(void);
+static void DWCi_GPGetInfoCallback(GPConnection *connection, GPGetInfoResponseArg *arg, void *param);
+static BOOL DWCi_CheckLogin(void);
 
 static const char *sMonthNames[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -84,16 +88,16 @@ static s64 sDateLocalSeconds;
 static BOOL sDateValid;
 static NasLogin *sNasLogin;
 
-static u64 func_ov011_0215dd74(void) {
+static u64 DWCi_Np_GetConsoleId(void) {
     return 0;
 }
 
-static const char *func_ov011_0215dd7c(void) {
+static const char *DWCi_Np_GetConsoleName(void) {
     return "NDS";
 }
 
 // The game's code from the ROM's header, as a text
-static char *func_ov011_0215dd84(void) {
+static char *DWCi_Np_GetAppGameName(void) {
     static char gameCode[5];
 
     MI_CpuCopy8((void *)(HW_ROM_HEADER_BUF + 0xc), gameCode, 4);
@@ -101,7 +105,7 @@ static char *func_ov011_0215dd84(void) {
     return gameCode;
 }
 
-BOOL func_ov011_0215dda8(RTCDate *date, RTCTime *time) {
+BOOL DWC_GetDateTime(RTCDate *date, RTCTime *time) {
     s64 seconds;
 
     if (!sDateValid) {
@@ -125,7 +129,7 @@ BOOL func_ov011_0215dda8(RTCDate *date, RTCTime *time) {
     return TRUE;
 }
 
-BOOL func_ov011_0215de44(const char *apName, void *buffer) {
+BOOL DWC_SVLGetTokenAsync(const char *svc, void *buffer) {
     DWCBmWifiId id;
     BOOL started;
 
@@ -136,10 +140,10 @@ BOOL func_ov011_0215de44(const char *apName, void *buffer) {
     if (!func_ov011_0216c154(DWC_Alloc, DWC_Free)) {
         return FALSE;
     }
-    if (strlen(apName) == 0) {
+    if (strlen(svc) == 0) {
         started = func_ov011_0216c1cc("0000", buffer);
     } else {
-        started = func_ov011_0216c1cc(apName, buffer);
+        started = func_ov011_0216c1cc(svc, buffer);
     }
     if (!started) {
         func_ov011_0216c1a8();
@@ -148,7 +152,7 @@ BOOL func_ov011_0215de44(const char *apName, void *buffer) {
     return TRUE;
 }
 
-int func_ov011_0215dea8(void) {
+int DWC_SVLProcess(void) {
     int state = func_ov011_0216c344();
 
     if ((u32)(state - 3) <= 2) {
@@ -157,7 +161,7 @@ int func_ov011_0215dea8(void) {
     return state;
 }
 
-BOOL func_ov011_0215dec0(void) {
+BOOL DWC_NASLoginAsync(void) {
     if (sNasLogin != NULL) {
         OS_Terminate();
     }
@@ -174,7 +178,7 @@ BOOL func_ov011_0215dec0(void) {
     return TRUE;
 }
 
-int func_ov011_0215df40(void) {
+int DWC_NASLoginProcess(void) {
     DWCAuthResult result;
 
     if (sNasLogin == NULL) {
@@ -209,7 +213,7 @@ int func_ov011_0215df40(void) {
     }
 }
 
-BOOL func_ov011_0215dffc(const char *dateHeader) {
+BOOL DWCi_SetNasTimeFromDateHeader(const char *dateHeader) {
     RTCDate date;
     RTCTime time;
     char text[0x20];
@@ -268,17 +272,17 @@ BOOL func_ov011_0215dffc(const char *dateHeader) {
     return FALSE;
 }
 
-int func_ov011_0215e160(const char *key, const char *value, char *out, char sep) {
+int DWC_SetCommonKeyValueString(const char *key, const char *value, char *out, char sep) {
     OS_SNPrintf(out, 0x1000, "%c%s%c%s", sep, key, sep, value);
     return strlen(out);
 }
 
-int func_ov011_0215e188(const char *key, const char *value, char *out, char sep) {
-    func_ov011_0215e160(key, value, strchr(out, 0), sep);
+int DWC_AddCommonKeyValueString(const char *key, const char *value, char *out, char sep) {
+    DWC_SetCommonKeyValueString(key, value, strchr(out, 0), sep);
     return strlen(out);
 }
 
-int func_ov011_0215e1b0(const char *key, char *dest, const char *text, char sep) {
+int DWC_GetCommonValueString(const char *key, char *dest, const char *text, char sep) {
     char *pair = strchr(text, sep);
 
     if (pair == NULL) {
@@ -321,7 +325,7 @@ int func_ov011_0215e1b0(const char *key, char *dest, const char *text, char sep)
     }
 }
 
-u32 func_ov011_0215e25c(u32 max) {
+u32 DWCi_GetMathRand32(u32 max) {
     if (sRandom.x == 0 && sRandom.mul == 0 && sRandom.add == 0) {
         u64 seed;
 
@@ -332,7 +336,7 @@ u32 func_ov011_0215e25c(u32 max) {
     return MATH_Rand32(&sRandom, max);
 }
 
-u32 func_ov011_0215e32c(const u16 *str) {
+u32 DWCi_WStrLen(const u16 *str) {
     u32 length = 0;
 
     while (str[length] != 0) {
@@ -341,27 +345,27 @@ u32 func_ov011_0215e32c(const u16 *str) {
     return length;
 }
 
-static u8 func_ov011_0215e344(const DWCFriendData *friendData, char *location) {
-    return func_ov011_0215e354(friendData, NULL, NULL, location);
+static u8 DWC_GetFriendStatus(const DWCFriendData *friendData, char *location) {
+    return DWC_GetFriendStatusSC(friendData, NULL, NULL, location);
 }
 
 // A friend's status, and from a status text of the matching (status 6) its SCM and SCN values
-static u8 func_ov011_0215e354(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *location) {
+static u8 DWC_GetFriendStatusSC(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *location) {
     char number[4];
     GPBuddyStatus status;
     u8 result;
 
-    if (func_ov011_0215edac(friendData, &status)) {
+    if (DWCi_GetFriendBuddyStatus(friendData, &status)) {
         if (status.status == 6) {
             if (scm != NULL) {
-                if (func_ov011_0215e1b0("SCM", number, status.statusString, '/') > 0) {
+                if (DWC_GetCommonValueString("SCM", number, status.statusString, '/') > 0) {
                     *scm = strtoul(number, NULL, 10);
                 } else {
                     *scm = 0;
                 }
             }
             if (scn != NULL) {
-                if (func_ov011_0215e1b0("SCN", number, status.statusString, '/') > 0) {
+                if (DWC_GetCommonValueString("SCN", number, status.statusString, '/') > 0) {
                     *scn = strtoul(number, NULL, 10);
                 } else {
                     *scn = 0;
@@ -393,13 +397,13 @@ static u8 func_ov011_0215e354(const DWCFriendData *friendData, u8 *scm, u8 *scn,
     return 0;
 }
 
-u8 func_ov011_0215e410(const DWCFriendData *friendData, char *statusData, int *size) {
-    return func_ov011_0215e420(friendData, NULL, NULL, statusData, size);
+u8 DWC_GetFriendStatusData(const DWCFriendData *friendData, char *statusData, int *size) {
+    return DWC_GetFriendStatusDataSC(friendData, NULL, NULL, statusData, size);
 }
 
-static u8 func_ov011_0215e420(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *statusData, int *size) {
+static u8 DWC_GetFriendStatusDataSC(const DWCFriendData *friendData, u8 *scm, u8 *scn, char *statusData, int *size) {
     char encoded[0x100];
-    u8 status = func_ov011_0215e354(friendData, scm, scn, encoded);
+    u8 status = DWC_GetFriendStatusSC(friendData, scm, scn, encoded);
 
     if (status == 0) {
         *size = -1;
@@ -413,12 +417,12 @@ static u8 func_ov011_0215e420(const DWCFriendData *friendData, u8 *scm, u8 *scn,
     return status;
 }
 
-BOOL func_ov011_0215e47c(const char *statusData, int size) {
+BOOL DWC_SetOwnStatusData(const char *statusData, int size) {
     char encoded[0x100];
     int length;
     BOOL result;
 
-    if (sFriend.control == NULL || !func_ov011_0215f998()) {
+    if (sFriend.control == NULL || !DWCi_CheckLogin()) {
         return FALSE;
     }
     length = DWC_Base64Encode((const u8 *)statusData, size, encoded, 0xff);
@@ -427,13 +431,13 @@ BOOL func_ov011_0215e47c(const char *statusData, int size) {
     }
     result = FALSE;
     encoded[length] = 0;
-    if (func_ov011_0215e914(-1, 0, encoded) == 0) {
+    if (DWCi_SetGPStatus(-1, 0, encoded) == 0) {
         result = TRUE;
     }
     return result;
 }
 
-BOOL func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param) {
+BOOL DWC_SetBuddyFriendCallback(void (*callback)(int index, void *param), void *param) {
     if (sFriend.control == NULL) {
         return FALSE;
     }
@@ -442,8 +446,8 @@ BOOL func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param) 
     return TRUE;
 }
 
-void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, const u16 *playerName,
-                         DWCFriendData *friendList, int friendListLen) {
+void DWCi_FriendInit(DWCFriendControl *control, GPConnection *connection, const u16 *playerName,
+                     DWCFriendData *friendList, int friendListLen) {
     int i = 0;
 
     sFriend.control = control;
@@ -478,7 +482,7 @@ void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, co
     }
 }
 
-void func_ov011_0215e584(void) {
+void DWCi_FriendProcess(void) {
     int count;
     int added;
     int i;
@@ -488,11 +492,11 @@ void func_ov011_0215e584(void) {
     }
     if (sFriend.control->friendList == NULL) {
         if (sFriend.control->connection != NULL && *sFriend.control->connection != NULL) {
-            func_ov011_0215e9dc();
+            DWCi_GPProcess();
         }
         return;
     }
-    if (func_ov011_0215f2b4() != 0 || IsStatsConnected()) {
+    if (DWCi_GetPersCallbackLevel() != 0 || IsStatsConnected()) {
         sFriend.inPersistThink = TRUE;
         sFriend.closeStats = FALSE;
         PersistThink();
@@ -503,7 +507,7 @@ void func_ov011_0215e584(void) {
         }
     }
     if (sFriend.control->connection != NULL && *sFriend.control->connection != NULL) {
-        if (func_ov011_0215e9dc() != 0) {
+        if (DWCi_GPProcess() != 0) {
             return;
         }
         if (sFriend.control->state == 0) {
@@ -512,7 +516,7 @@ void func_ov011_0215e584(void) {
         if (sFriend.control->friendList != NULL && sFriend.control->buddyUpdateState != 3 &&
             sFriend.control->gpProcessCount > 7) {
             if (sFriend.control->buddyUpdateState <= 1) {
-                func_ov011_0215ea50(sFriend.control->friendList, sFriend.control->friendListLen);
+                DWCi_UpdateFriendReq(sFriend.control->friendList, sFriend.control->friendListLen);
             }
             if (sFriend.control->buddyUpdateIdx >= sFriend.control->friendListLen) {
                 sFriend.control->buddyUpdateState = 3;
@@ -531,23 +535,24 @@ void func_ov011_0215e584(void) {
             }
             if (count == 0) {
                 sFriend.control->updateSteps = 0;
-                func_ov011_0215ebf8();
+                DWCi_EndUpdateServers();
                 return;
             }
             sFriend.control->profileIds = DWC_Alloc(4, count * sizeof(int));
             if (sFriend.control->profileIds == NULL) {
-                func_ov011_0215e784(DWC_ERROR_FATAL, -70001);
+                DWCi_StopFriendProcess(DWC_ERROR_FATAL, -70001);
                 return;
             }
             for (i = 0; i < sFriend.control->friendListLen; i++) {
                 if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID) {
                     sFriend.control->profileIds[added] =
-                        DWC_GetGsProfileId(func_ov011_0215f51c(), &sFriend.control->friendList[i]);
+                        DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i]);
                     added++;
                 }
             }
-            if (func_ov011_0215ee18(gpGetReverseBuddiesList(sFriend.control->connection, sFriend.control->profileIds,
-                                                            count, 0, (GPCallback)func_ov011_0215f2d8, NULL)) != 0) {
+            if (DWCi_HandleFriendGPError(
+                    gpGetReverseBuddiesList(sFriend.control->connection, sFriend.control->profileIds, count, 0,
+                                            (GPCallback)DWCi_GPGetReverseBuddiesListCallback, NULL)) != 0) {
                 return;
             }
         }
@@ -555,7 +560,7 @@ void func_ov011_0215e584(void) {
     }
 }
 
-BOOL func_ov011_0215e714(void) {
+BOOL DWCi_IsUpdatingServers(void) {
     BOOL result = FALSE;
 
     if (sFriend.control != NULL && sFriend.control->state == 1) {
@@ -564,9 +569,10 @@ BOOL func_ov011_0215e714(void) {
     return result;
 }
 
-void func_ov011_0215e72c(const char *authToken, const char *partnerChallenge, DWCUpdateServersCallback updateCallback,
-                         void *updateParam, DWCFriendStatusCallback statusCallback, void *statusParam,
-                         DWCDeleteFriendListCallback deleteCallback, void *deleteParam) {
+void DWCi_UpdateServersAsync(const char *authToken, const char *partnerChallenge,
+                             DWCUpdateServersCallback updateCallback, void *updateParam,
+                             DWCFriendStatusCallback statusCallback, void *statusParam,
+                             DWCDeleteFriendListCallback deleteCallback, void *deleteParam) {
     sFriend.control->updateCallback = updateCallback;
     sFriend.control->updateParam = updateParam;
     sFriend.control->statusCallback = statusCallback;
@@ -584,34 +590,34 @@ void func_ov011_0215e72c(const char *authToken, const char *partnerChallenge, DW
     sFriend.control->updateSteps++;
 }
 
-void func_ov011_0215e784(int error, int code) {
+void DWCi_StopFriendProcess(int error, int code) {
     if (sFriend.control != NULL && error != DWC_ERROR_NONE) {
         DWCi_SetError(error, code);
-        if (func_ov011_0215e714()) {
+        if (DWCi_IsUpdatingServers()) {
             if (sFriend.control->profileIds != NULL) {
                 DWC_Free(4, sFriend.control->profileIds, 0);
                 sFriend.control->profileIds = NULL;
             }
             sFriend.control->updateCallback(error, sFriend.control->friendListChanged, sFriend.control->updateParam);
         }
-        func_ov011_0215ea34();
+        DWCi_CloseFriendProcess();
     }
 }
 
-void func_ov011_0215e7d0(GPConnection *connection, GPRecvBuddyRequestArg *arg, void *param) {
+void DWCi_GPRecvBuddyRequestCallback(GPConnection *connection, GPRecvBuddyRequestArg *arg, void *param) {
     if (sFriend.control->friendList != NULL) {
-        gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)func_ov011_0215f004, NULL);
+        gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)DWCi_GPGetInfoCallback_RecvBuddyRequest, NULL);
     }
 }
 
-BOOL func_ov011_0215e7fc(GPConnection *connection, GPRecvBuddyAuthArg *arg, void *param) {
-    gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)func_ov011_0215f198, NULL);
+BOOL DWCi_GPRecvBuddyAuthCallback(GPConnection *connection, GPRecvBuddyAuthArg *arg, void *param) {
+    gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)DWCi_GPGetInfoCallback_RecvAuthMessage, NULL);
     return TRUE;
 }
 
-void func_ov011_0215e81c(GPConnection *connection, GPRecvBuddyStatusArg *arg, void *param) {
+void DWCi_GPRecvBuddyStatusCallback(GPConnection *connection, GPRecvBuddyStatusArg *arg, void *param) {
     GPBuddyStatus status;
-    int index = func_ov011_0215e8b4(arg->profile);
+    int index = DWCi_GetFriendListIndex(arg->profile);
 
     if (index == -1) {
         if (gpIsBuddy(connection, arg->profile)) {
@@ -623,43 +629,43 @@ void func_ov011_0215e81c(GPConnection *connection, GPRecvBuddyStatusArg *arg, vo
     }
 }
 
-int func_ov011_0215e880(int index) {
+int DWCi_GetProfileIDFromList(int index) {
     DWCFriendData *friendList = sFriend.control->friendList;
     int profileId;
 
     if (friendList == NULL) {
         return 0;
     }
-    profileId = DWC_GetGsProfileId(func_ov011_0215f51c(), &friendList[index]);
+    profileId = DWC_GetGsProfileId(DWCi_GetUserData(), &friendList[index]);
     if (profileId != 0 && profileId != -1) {
         return profileId;
     }
     return 0;
 }
 
-int func_ov011_0215e8b4(int profileId) {
+int DWCi_GetFriendListIndex(int profileId) {
     int i;
 
     if (sFriend.control == NULL || profileId == 0) {
         return -1;
     }
     for (i = 0; i < sFriend.control->friendListLen; i++) {
-        if (profileId == func_ov011_0215e880(i)) {
+        if (profileId == DWCi_GetProfileIDFromList(i)) {
             return i;
         }
     }
     return -1;
 }
 
-void func_ov011_0215e8f4(void) {
+void DWCi_InitGPProcessCount(void) {
     if (sFriend.control != NULL) {
         sFriend.control->gpProcessCount = 0;
         sFriend.control->lastGpProcess = OS_GetTick();
     }
 }
 
-int func_ov011_0215e914(int status, const char *statusString, const char *locationString) {
-    if (sFriend.control == NULL || !func_ov011_0215f998()) {
+int DWCi_SetGPStatus(int status, const char *statusString, const char *locationString) {
+    if (sFriend.control == NULL || !DWCi_CheckLogin()) {
         return 0;
     }
     if (status == -1) {
@@ -675,25 +681,25 @@ int func_ov011_0215e914(int status, const char *statusString, const char *locati
 }
 
 // Tells the game that a friend became a buddy, and its status
-static void func_ov011_0215e980(int index) {
+static void DWCi_CallBuddyFriendCallback(int index) {
     GPBuddyStatus status;
 
     if (sFriend.control->buddyCallback != NULL && sFriend.control->state != 1) {
         sFriend.control->buddyCallback(index, sFriend.control->buddyParam);
     }
     if (sFriend.control->statusCallback != NULL) {
-        u8 result = func_ov011_0215e344(&sFriend.control->friendList[index], status.locationString);
+        u8 result = DWC_GetFriendStatus(&sFriend.control->friendList[index], status.locationString);
 
         sFriend.control->statusCallback(index, result, status.locationString, sFriend.control->statusParam);
     }
 }
 
-void func_ov011_0215e9d0(void) {
+void DWCi_ShutdownFriend(void) {
     sFriend.control = NULL;
 }
 
 // Runs GP every 300 milliseconds
-static int func_ov011_0215e9dc(void) {
+static int DWCi_GPProcess(void) {
     int result = 0;
     OSTick now = OS_GetTick();
     DWCFriendControl *control = sFriend.control;
@@ -706,7 +712,7 @@ static int func_ov011_0215e9dc(void) {
     return result;
 }
 
-static void func_ov011_0215ea34(void) {
+static void DWCi_CloseFriendProcess(void) {
     if (sFriend.control != NULL) {
         sFriend.control->state = 0;
         sFriend.control->buddyUpdateState = 0;
@@ -716,7 +722,7 @@ static void func_ov011_0215ea34(void) {
 
 // Confirms the friends that are buddies, deletes the buddies that aren't friends, and asks the friends that aren't
 // buddies to be, looking up the profile of a login ID first
-static void func_ov011_0215ea50(DWCFriendData *friendList, int friendListLen) {
+static void DWCi_UpdateFriendReq(DWCFriendData *friendList, int friendListLen) {
     int count;
     int index;
     char loginName[0x18];
@@ -724,11 +730,11 @@ static void func_ov011_0215ea50(DWCFriendData *friendList, int friendListLen) {
     int i;
 
     if (sFriend.control->buddyUpdateState == 0) {
-        func_ov011_0215ee18(gpGetNumBuddies(sFriend.control->connection, &count));
+        DWCi_HandleFriendGPError(gpGetNumBuddies(sFriend.control->connection, &count));
         for (index = 0; index < count; index++) {
-            func_ov011_0215ee18(gpGetBuddyStatus(sFriend.control->connection, index, &status));
+            DWCi_HandleFriendGPError(gpGetBuddyStatus(sFriend.control->connection, index, &status));
             for (i = 0; i < friendListLen; i++) {
-                if (status.profile == func_ov011_0215e880(i)) {
+                if (status.profile == DWCi_GetProfileIDFromList(i)) {
                     if (!DWCi_Acc_IsAuthentic(&friendList[i])) {
                         DWCi_Acc_CreateProfileIdToken(&friendList[i], status.profile);
                         DWCi_Acc_SetAuthentic(&friendList[i]);
@@ -741,7 +747,7 @@ static void func_ov011_0215ea50(DWCFriendData *friendList, int friendListLen) {
                 }
             }
             if (i == friendListLen) {
-                func_ov011_0215ee18(gpDeleteBuddy(sFriend.control->connection, status.profile));
+                DWCi_HandleFriendGPError(gpDeleteBuddy(sFriend.control->connection, status.profile));
                 count--;
                 index--;
             }
@@ -753,20 +759,20 @@ static void func_ov011_0215ea50(DWCFriendData *friendList, int friendListLen) {
             continue;
         }
         {
-            int profileId = func_ov011_0215e880(sFriend.control->buddyUpdateIdx);
+            int profileId = DWCi_GetProfileIDFromList(sFriend.control->buddyUpdateIdx);
 
             if (profileId != 0) {
-                if (!func_ov011_0215ec48(friendList, sFriend.control->buddyUpdateIdx, profileId)) {
-                    func_ov011_0215ee18(gpGetBuddyIndex(sFriend.control->connection, profileId, &index));
+                if (!DWCi_RefreshFriendListForth(friendList, sFriend.control->buddyUpdateIdx, profileId)) {
+                    DWCi_HandleFriendGPError(gpGetBuddyIndex(sFriend.control->connection, profileId, &index));
                     if (index == -1) {
-                        func_ov011_0215ed88(profileId);
+                        DWCi_GPSendBuddyRequest(profileId);
                         DWCi_Acc_SetFlag5(&friendList[sFriend.control->buddyUpdateIdx], TRUE);
                     }
                 }
-            } else if (DWC_GetGsProfileId(func_ov011_0215f51c(), &friendList[sFriend.control->buddyUpdateIdx]) == -1) {
-                DWCi_Acc_GetLoginName(func_ov011_0215f51c(), &friendList[sFriend.control->buddyUpdateIdx], loginName);
+            } else if (DWC_GetGsProfileId(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx]) == -1) {
+                DWCi_Acc_GetLoginName(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx], loginName);
                 gpProfileSearch(sFriend.control->connection, NULL, NULL, NULL, NULL, loginName, 0, 0,
-                                (GPCallback)func_ov011_0215ee6c, (void *)sFriend.control->buddyUpdateIdx);
+                                (GPCallback)DWCi_GPProfileSearchCallback, (void *)sFriend.control->buddyUpdateIdx);
                 sFriend.control->buddyUpdateState = 2;
                 return;
             }
@@ -774,13 +780,13 @@ static void func_ov011_0215ea50(DWCFriendData *friendList, int friendListLen) {
     }
 }
 
-static void func_ov011_0215ebf8(void) {
+static void DWCi_EndUpdateServers(void) {
     sFriend.control->updateCallback(DWC_ERROR_NONE, sFriend.control->friendListChanged, sFriend.control->updateParam);
     sFriend.control->state = 2;
 }
 
 // Deletes a friend that is a copy of the one at srcIndex
-static void func_ov011_0215ec14(DWCFriendData *friendList, int index, int srcIndex) {
+static void DWCi_DeleteFriendFromList(DWCFriendData *friendList, int index, int srcIndex) {
     if (sFriend.control != NULL) {
         MI_CpuFill8(&friendList[index], 0, sizeof(DWCFriendData));
         if (sFriend.control->deleteCallback != NULL) {
@@ -790,7 +796,7 @@ static void func_ov011_0215ec14(DWCFriendData *friendList, int index, int srcInd
 }
 
 // Deletes a friend, or the earlier friend, that has the same profile ID, keeping the confirmed one
-static BOOL func_ov011_0215ec48(DWCFriendData *friendList, int index, int profileId) {
+static BOOL DWCi_RefreshFriendListForth(DWCFriendData *friendList, int index, int profileId) {
     DWCFriendData *friendData = &friendList[index];
     int i;
 
@@ -798,13 +804,13 @@ static BOOL func_ov011_0215ec48(DWCFriendData *friendList, int index, int profil
         return FALSE;
     }
     for (i = 0; i < index; i++) {
-        int otherId = func_ov011_0215e880(i);
+        int otherId = DWCi_GetProfileIDFromList(i);
 
         if (otherId != 0 && otherId == profileId) {
             if (DWCi_Acc_IsAuthentic(friendData) && !DWCi_Acc_IsAuthentic(&friendList[i])) {
-                func_ov011_0215ec14(friendList, i, index);
+                DWCi_DeleteFriendFromList(friendList, i, index);
             } else {
-                func_ov011_0215ec14(friendList, index, i);
+                DWCi_DeleteFriendFromList(friendList, index, i);
             }
             sFriend.control->friendListChanged = 1;
             return TRUE;
@@ -814,12 +820,12 @@ static BOOL func_ov011_0215ec48(DWCFriendData *friendList, int index, int profil
 }
 
 // Merges the friends that have the same profile ID, returning the index of the one that has the given ID
-static int func_ov011_0215ecbc(DWCFriendData *friendList, int friendListLen, int profileId) {
+static int DWCi_RefreshFriendListAll(DWCFriendData *friendList, int friendListLen, int profileId) {
     int found = -1;
     int i;
 
     for (i = 0; i < friendListLen; i++) {
-        int id = func_ov011_0215e880(i);
+        int id = DWCi_GetProfileIDFromList(i);
         int j;
 
         if (id == 0) {
@@ -829,7 +835,7 @@ static int func_ov011_0215ecbc(DWCFriendData *friendList, int friendListLen, int
             found = i;
         }
         for (j = i + 1; j < friendListLen; j++) {
-            if (id == func_ov011_0215e880(j)) {
+            if (id == DWCi_GetProfileIDFromList(j)) {
                 if (DWC_GetFriendDataType(&friendList[i]) == DWC_FRIEND_TYPE_FRIEND_KEY &&
                     DWC_GetFriendDataType(&friendList[j]) == DWC_FRIEND_TYPE_PROFILE_ID) {
                     DWCi_Acc_CreateProfileIdToken(&friendList[i], id);
@@ -840,7 +846,7 @@ static int func_ov011_0215ecbc(DWCFriendData *friendList, int friendListLen, int
                         DWCi_Acc_SetFlag4(&sFriend.control->friendList[i], TRUE);
                     }
                 }
-                func_ov011_0215ec14(friendList, j, i);
+                DWCi_DeleteFriendFromList(friendList, j, i);
                 sFriend.control->friendListChanged = 1;
             }
         }
@@ -848,22 +854,22 @@ static int func_ov011_0215ecbc(DWCFriendData *friendList, int friendListLen, int
     return found;
 }
 
-static int func_ov011_0215ed88(int profileId) {
+static int DWCi_GPSendBuddyRequest(int profileId) {
     int result = gpSendBuddyRequest(sFriend.control->connection, profileId, "");
 
-    func_ov011_0215ee18(result);
+    DWCi_HandleFriendGPError(result);
     return result;
 }
 
-static BOOL func_ov011_0215edac(const DWCFriendData *friendData, GPBuddyStatus *status) {
+static BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData *friendData, GPBuddyStatus *status) {
     int index = 0;
     BOOL result = FALSE;
     int profileId;
 
-    if (sFriend.control == NULL || !func_ov011_0215f998()) {
+    if (sFriend.control == NULL || !DWCi_CheckLogin()) {
         return FALSE;
     }
-    profileId = DWC_GetGsProfileId(func_ov011_0215f51c(), friendData);
+    profileId = DWC_GetGsProfileId(DWCi_GetUserData(), friendData);
     if (profileId > 0 && gpGetBuddyIndex(sFriend.control->connection, profileId, &index)) {
         return result;
     }
@@ -877,7 +883,7 @@ static BOOL func_ov011_0215edac(const DWCFriendData *friendData, GPBuddyStatus *
 }
 
 // Ends the friend list's update for an error of GP, returning it
-static int func_ov011_0215ee18(int result) {
+static int DWCi_HandleFriendGPError(int result) {
     int error = result;
     int code;
 
@@ -902,12 +908,12 @@ static int func_ov011_0215ee18(int result) {
         code = error - 26;
         break;
     }
-    func_ov011_0215e784(error, code - 71000);
+    DWCi_StopFriendProcess(error, code - 71000);
     return result;
 }
 
 // The profile search of a login ID: the friend becomes the profile, as a buddy if it is one already
-static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchResponseArg *arg, void *param) {
+static void DWCi_GPProfileSearchCallback(GPConnection *connection, GPProfileSearchResponseArg *arg, void *param) {
     int index = (int)param;
     int i;
     int buddyIndex;
@@ -918,7 +924,7 @@ static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchRespons
             return;
         }
         for (i = 0; i < arg->numMatches; i++) {
-            if (func_ov011_0215ec48(sFriend.control->friendList, index, arg->matches[i].profile)) {
+            if (DWCi_RefreshFriendListForth(sFriend.control->friendList, index, arg->matches[i].profile)) {
                 sFriend.control->buddyUpdateIdx++;
                 sFriend.control->buddyUpdateState = 1;
                 arg->more = GP_DONE;
@@ -926,9 +932,9 @@ static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchRespons
             }
         }
         for (i = 0; i < arg->numMatches; i++) {
-            func_ov011_0215ee18(gpGetBuddyIndex(connection, arg->matches[i].profile, &buddyIndex));
+            DWCi_HandleFriendGPError(gpGetBuddyIndex(connection, arg->matches[i].profile, &buddyIndex));
             if (buddyIndex == -1) {
-                func_ov011_0215ed88(arg->matches[i].profile);
+                DWCi_GPSendBuddyRequest(arg->matches[i].profile);
                 DWCi_Acc_SetFlag5(&sFriend.control->friendList[index], TRUE);
             } else {
                 DWCi_Acc_CreateProfileIdToken(&sFriend.control->friendList[index], arg->matches[0].profile);
@@ -937,7 +943,7 @@ static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchRespons
                 if (DWC_IsBuddyFriendData(&sFriend.control->friendList[index])) {
                     DWCi_Acc_SetFlag4(&sFriend.control->friendList[index], TRUE);
                 }
-                func_ov011_0215e980(index);
+                DWCi_CallBuddyFriendCallback(index);
                 sFriend.control->buddyUpdateIdx++;
                 sFriend.control->buddyUpdateState = 1;
                 arg->more = GP_DONE;
@@ -952,7 +958,7 @@ static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchRespons
         return;
     }
     if (arg->result != 0) {
-        if (func_ov011_0215ee18(arg->result) != 0) {
+        if (DWCi_HandleFriendGPError(arg->result) != 0) {
             return;
         }
     } else if (sFriend.control->state == 1 ||
@@ -964,7 +970,7 @@ static void func_ov011_0215ee6c(GPConnection *connection, GPProfileSearchRespons
 
 // The info of a profile that asked to be a buddy: the request is accepted if the profile is a friend (by its login
 // name in the last name, or by its profile ID and game code), and denied if not
-static void func_ov011_0215f004(GPConnection *connection, GPGetInfoResponseArg *arg, void *param) {
+static void DWCi_GPGetInfoCallback_RecvBuddyRequest(GPConnection *connection, GPGetInfoResponseArg *arg, void *param) {
     BOOL found = FALSE;
     BOOL wasBuddy = FALSE;
     char gameCode[5];
@@ -976,7 +982,7 @@ static void func_ov011_0215f004(GPConnection *connection, GPGetInfoResponseArg *
     }
     for (i = 0; i < sFriend.control->friendListLen; i++) {
         if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_LOGIN_ID) {
-            DWCi_Acc_GetLoginName(func_ov011_0215f51c(), &sFriend.control->friendList[i], loginName);
+            DWCi_Acc_GetLoginName(DWCi_GetUserData(), &sFriend.control->friendList[i], loginName);
             if (strcmp(loginName, arg->lastname) == 0) {
                 if (DWC_IsBuddyFriendData(&sFriend.control->friendList[i])) {
                     wasBuddy = TRUE;
@@ -987,10 +993,10 @@ static void func_ov011_0215f004(GPConnection *connection, GPGetInfoResponseArg *
             }
         } else if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID ||
                    DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_FRIEND_KEY) {
-            u32 code = func_ov011_0215f51c()->gameCode;
+            u32 code = DWCi_GetUserData()->gameCode;
 
             OS_SNPrintf(gameCode, 5, "%c%c%c%c", (u8)(code >> 24), (u8)(code >> 16), (u8)(code >> 8), (u8)code);
-            if (arg->profile == DWC_GetGsProfileId(func_ov011_0215f51c(), &sFriend.control->friendList[i]) &&
+            if (arg->profile == DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i]) &&
                 memcmp(gameCode, &arg->lastname[9], 4) == 0) {
                 if (DWC_IsBuddyFriendData(&sFriend.control->friendList[i])) {
                     wasBuddy = TRUE;
@@ -1003,13 +1009,13 @@ static void func_ov011_0215f004(GPConnection *connection, GPGetInfoResponseArg *
     if (found) {
         int index;
 
-        func_ov011_0215ed88(arg->profile);
-        index = func_ov011_0215ecbc(sFriend.control->friendList, sFriend.control->friendListLen, arg->profile);
+        DWCi_GPSendBuddyRequest(arg->profile);
+        index = DWCi_RefreshFriendListAll(sFriend.control->friendList, sFriend.control->friendListLen, arg->profile);
         DWCi_Acc_SetBuddyFlag(&sFriend.control->friendList[index], TRUE);
         if (DWC_IsBuddyFriendData(&sFriend.control->friendList[index])) {
             DWCi_Acc_SetFlag4(&sFriend.control->friendList[index], TRUE);
             if (!wasBuddy) {
-                func_ov011_0215e980(index);
+                DWCi_CallBuddyFriendCallback(index);
                 sFriend.control->friendListChanged = 1;
             }
         }
@@ -1019,7 +1025,7 @@ static void func_ov011_0215f004(GPConnection *connection, GPGetInfoResponseArg *
 }
 
 // The info of a profile that authorized our buddy request: the friend it is becomes a confirmed buddy
-static void func_ov011_0215f198(GPConnection *connection, GPGetInfoResponseArg *arg, void *param) {
+static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection *connection, GPGetInfoResponseArg *arg, void *param) {
     int i;
     char loginName[0x18];
     BOOL found = FALSE;
@@ -1028,7 +1034,7 @@ static void func_ov011_0215f198(GPConnection *connection, GPGetInfoResponseArg *
     if (arg->result == 0) {
         for (i = 0; i < sFriend.control->friendListLen; i++) {
             if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_LOGIN_ID) {
-                DWCi_Acc_GetLoginName(func_ov011_0215f51c(), &sFriend.control->friendList[i], loginName);
+                DWCi_Acc_GetLoginName(DWCi_GetUserData(), &sFriend.control->friendList[i], loginName);
                 if (strcmp(loginName, arg->lastname) == 0) {
                     DWCi_Acc_CreateProfileIdToken(&sFriend.control->friendList[i], arg->profile);
                     DWCi_Acc_SetAuthentic(&sFriend.control->friendList[i]);
@@ -1036,7 +1042,7 @@ static void func_ov011_0215f198(GPConnection *connection, GPGetInfoResponseArg *
                 }
             } else if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID ||
                        DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_FRIEND_KEY) {
-                if (arg->profile == DWC_GetGsProfileId(func_ov011_0215f51c(), &sFriend.control->friendList[i])) {
+                if (arg->profile == DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i])) {
                     if (DWCi_Acc_IsAuthentic(&sFriend.control->friendList[i]) == TRUE) {
                         wasAuthentic = TRUE;
                     } else {
@@ -1048,21 +1054,22 @@ static void func_ov011_0215f198(GPConnection *connection, GPGetInfoResponseArg *
             }
         }
         if (found) {
-            int index = func_ov011_0215ecbc(sFriend.control->friendList, sFriend.control->friendListLen, arg->profile);
+            int index =
+                DWCi_RefreshFriendListAll(sFriend.control->friendList, sFriend.control->friendListLen, arg->profile);
 
             if (!wasAuthentic) {
                 DWCi_Acc_SetBuddyFlag(&sFriend.control->friendList[index], TRUE);
                 if (DWC_IsBuddyFriendData(&sFriend.control->friendList[index])) {
                     DWCi_Acc_SetFlag4(&sFriend.control->friendList[index], TRUE);
                 }
-                func_ov011_0215e980(index);
+                DWCi_CallBuddyFriendCallback(index);
             }
             sFriend.control->friendListChanged = 1;
         }
     }
 }
 
-static int func_ov011_0215f2b4(void) {
+static int DWCi_GetPersCallbackLevel(void) {
     return sFriend.control->persLogin;
 }
 
@@ -1076,24 +1083,25 @@ void func_ov011_0215f2cc(void) {
 
 // The reverse buddies of the profile IDs: a friend whose profile has the player as a buddy gets the buddy flag, and
 // one that hasn't loses it
-static void func_ov011_0215f2d8(GPConnection *connection, GPGetReverseBuddiesListResponseArg *arg, void *param) {
+static void DWCi_GPGetReverseBuddiesListCallback(GPConnection *connection, GPGetReverseBuddiesListResponseArg *arg,
+                                                 void *param) {
     int i;
     int j;
 
-    if (func_ov011_0215e714()) {
+    if (DWCi_IsUpdatingServers()) {
         if (sFriend.control->profileIds != NULL) {
             DWC_Free(4, sFriend.control->profileIds, 0);
             sFriend.control->profileIds = NULL;
         }
         if (arg->result != 0) {
-            func_ov011_0215ebf8();
+            DWCi_EndUpdateServers();
             return;
         }
         for (i = 0; i < sFriend.control->friendListLen; i++) {
             if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID) {
                 for (j = 0; j < arg->numOfUniqueMatchs; j++) {
                     if (arg->matches[j].profile ==
-                        DWC_GetGsProfileId(func_ov011_0215f51c(), &sFriend.control->friendList[i])) {
+                        DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i])) {
                         if (!DWCi_Acc_IsBuddyFlag(&sFriend.control->friendList[i])) {
                             sFriend.control->friendListChanged = 1;
                             DWCi_Acc_SetBuddyFlag(&sFriend.control->friendList[i], TRUE);
@@ -1113,12 +1121,12 @@ static void func_ov011_0215f2d8(GPConnection *connection, GPGetReverseBuddiesLis
                 }
             }
         }
-        func_ov011_0215ebf8();
+        DWCi_EndUpdateServers();
     }
 }
 
-void func_ov011_0215f410(DWCLoginControl *control, DWCUserData *userData, GPConnection *connection, int productId,
-                         u32 gameCode, const u16 *playerName, DWCLoginCallback callback, void *param) {
+void DWCi_LoginInit(DWCLoginControl *control, DWCUserData *userData, GPConnection *connection, int productId,
+                    u32 gameCode, const u16 *playerName, DWCLoginCallback callback, void *param) {
     sLogin = control;
     MI_CpuFill8(control, 0, sizeof(DWCLoginControl));
     sLogin->connection = connection;
@@ -1132,8 +1140,8 @@ void func_ov011_0215f410(DWCLoginControl *control, DWCUserData *userData, GPConn
     func_ov011_02169fb8();
 }
 
-BOOL func_ov011_0215f45c(void) {
-    if (func_ov011_0215f748()) {
+BOOL DWCi_LoginAsync(void) {
+    if (DWCi_RemoteLogin()) {
         sLogin->state = 1;
         sLogin->connecting = FALSE;
         return TRUE;
@@ -1141,14 +1149,14 @@ BOOL func_ov011_0215f45c(void) {
     return FALSE;
 }
 
-void func_ov011_0215f480(void) {
+void DWCi_LoginProcess(void) {
     if (sLogin != NULL && !DWCi_IsError()) {
         switch (sLogin->state) {
         case 0:
         case 5:
             break;
         case 1:
-            func_ov011_0215f820();
+            DWCi_RemoteLoginProcess();
             return;
         case 2:
         case 3:
@@ -1157,7 +1165,7 @@ void func_ov011_0215f480(void) {
                 gpProcess(sLogin->connection);
             }
             if (sLogin->connecting && OS_TicksToMilliSeconds(OS_GetTick() - sLogin->connectTick) > 60000) {
-                func_ov011_0215f530(DWC_ERROR_NETWORK, -61070);
+                DWCi_StopLogin(DWC_ERROR_NETWORK, -61070);
                 sLogin->connecting = FALSE;
             }
             break;
@@ -1165,31 +1173,31 @@ void func_ov011_0215f480(void) {
     }
 }
 
-DWCUserData *func_ov011_0215f51c(void) {
+DWCUserData *DWCi_GetUserData(void) {
     if (sLogin != NULL) {
         return sLogin->userData;
     }
     return NULL;
 }
 
-void func_ov011_0215f530(int error, int code) {
+void DWCi_StopLogin(int error, int code) {
     if (sLogin != NULL && error != DWC_ERROR_NONE) {
         DWCi_SetError(error, code);
         if (sLogin->callback != NULL) {
             sLogin->callback(error, 0, sLogin->param);
         }
-        func_ov011_0215f57c();
+        DWCi_CloseLogin();
     }
 }
 
-void func_ov011_0215f560(void) {
+void DWCi_ShutdownLogin(void) {
     if (!func_ov011_02169f34()) {
         func_ov011_02169eb0();
     }
     sLogin = NULL;
 }
 
-static void func_ov011_0215f57c(void) {
+static void DWCi_CloseLogin(void) {
     if (sLogin != NULL) {
         func_ov011_02169f90();
         sLogin->state = 0;
@@ -1198,7 +1206,7 @@ static void func_ov011_0215f57c(void) {
 }
 
 // Ends the login for an error of GP, returning it
-static int func_ov011_0215f59c(int result) {
+static int DWCi_HandleLoginGPError(int result) {
     int error = result;
     int code;
 
@@ -1223,33 +1231,33 @@ static int func_ov011_0215f59c(int result) {
         code = error - 26;
         break;
     }
-    func_ov011_0215f530(error, code - 61000);
+    DWCi_StopLogin(error, code - 61000);
     return result;
 }
 
 // GP's login: it sets the profile's info and, logged in with the user data's profile, ends the login, or else looks
 // up the info of the profile that it logged in to
-static void func_ov011_0215f5f0(GPConnection *connection, GPConnectResponseArg *arg, void *param) {
+static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseArg *arg, void *param) {
     char consoleId[0x21];
     char userId[0x33];
 
     sLogin->connecting = FALSE;
-    OS_SNPrintf(consoleId, 0x1f, "%s:%016llu", func_ov011_0215dd7c(), func_ov011_0215dd74());
-    if (func_ov011_0215f59c(gpSetInfos(connection, GP_INFO_FIRSTNAME, consoleId)) != 0) {
+    OS_SNPrintf(consoleId, 0x1f, "%s:%016llu", DWCi_Np_GetConsoleName(), DWCi_Np_GetConsoleId());
+    if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_FIRSTNAME, consoleId)) != 0) {
         return;
     }
     DWCi_Acc_EncodeBase32(func_ov011_02169f98(), 43, userId);
-    if (func_ov011_0215f59c(gpSetInfos(connection, GP_INFO_AIMNAME, userId)) != 0) {
+    if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_AIMNAME, userId)) != 0) {
         return;
     }
-    if (func_ov011_0215f59c(gpSetInfos(connection, GP_INFO_ZIPCODE, func_ov011_0215dd84())) != 0) {
+    if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_ZIPCODE, DWCi_Np_GetAppGameName())) != 0) {
         return;
     }
     if (arg->result == 0) {
         if (sLogin->state == 2) {
             if (sLogin->userData->gsProfileId == arg->profile) {
                 sLogin->state = 5;
-                if (func_ov011_0215f59c(func_ov011_02162d80(1)) != 0) {
+                if (DWCi_HandleLoginGPError(func_ov011_02162d80(1)) != 0) {
                     return;
                 }
                 sLogin->callback(DWC_ERROR_NONE, arg->profile, sLogin->param);
@@ -1259,33 +1267,33 @@ static void func_ov011_0215f5f0(GPConnection *connection, GPConnectResponseArg *
                 func_ov011_02168780(arg->profile);
                 func_ov011_02168794();
             } else {
-                func_ov011_0215f530(DWC_ERROR_NETWORK, -60000);
+                DWCi_StopLogin(DWC_ERROR_NETWORK, -60000);
             }
         } else if (sLogin->state == 3) {
-            if (func_ov011_0215f59c(gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)func_ov011_0215f8a8, NULL)) !=
-                0) {
+            if (DWCi_HandleLoginGPError(
+                    gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)DWCi_GPGetInfoCallback, NULL)) != 0) {
                 return;
             }
         }
     } else {
-        func_ov011_0215f59c(arg->result);
+        DWCi_HandleLoginGPError(arg->result);
     }
 }
 
 // Connects to GP with the authentication server's token, going to the given state
-static void func_ov011_0215f700(GPCallback callback, int nextState) {
+static void DWCi_GPConnect(GPCallback callback, int nextState) {
     OSTick now = OS_GetTick();
 
     sLogin->connectTick = now;
     sLogin->connecting = TRUE;
-    if (func_ov011_0215f59c(gpConnectPreAuthenticated(sLogin->connection, sLogin->authToken, sLogin->partnerChallenge,
-                                                      1, 0, callback, NULL)) == 0) {
+    if (DWCi_HandleLoginGPError(gpConnectPreAuthenticated(sLogin->connection, sLogin->authToken,
+                                                          sLogin->partnerChallenge, 1, 0, callback, NULL)) == 0) {
         sLogin->state = nextState;
     }
 }
 
 // Starts the login to the authentication server with the user data's login ID, or a temporary one until it has one
-static BOOL func_ov011_0215f748(void) {
+static BOOL DWCi_RemoteLogin(void) {
     u64 userId;
 
     if (DWCi_Acc_HasAuthenticLoginId(sLogin->userData)) {
@@ -1308,35 +1316,35 @@ static BOOL func_ov011_0215f748(void) {
 }
 
 // Waits for the authentication server, then connects to GP with the profile of the user data, or looks for it
-static void func_ov011_0215f820(void) {
+static void DWCi_RemoteLoginProcess(void) {
     func_ov011_02169ebc();
     if (func_ov011_02169f34()) {
         if (func_ov011_02169f40()) {
             func_ov011_02169f58(sLogin->authToken, sLogin->partnerChallenge);
             func_ov011_02169f90();
             if (DWCi_Acc_HasAuthenticLoginId(sLogin->userData)) {
-                func_ov011_0215f700((GPCallback)func_ov011_0215f5f0, 2);
+                DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 2);
                 return;
             }
             DWCi_Acc_SetUserId(&sLogin->tempLoginId, func_ov011_02169f98());
-            func_ov011_0215f700((GPCallback)func_ov011_0215f5f0, 3);
+            DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 3);
             return;
         }
         {
             int error = func_ov011_02169f4c();
 
             if (error <= -29000) {
-                func_ov011_0215f530(DWC_ERROR_FATAL, error);
+                DWCi_StopLogin(DWC_ERROR_FATAL, error);
                 return;
             }
-            func_ov011_0215f530(DWC_ERROR_AUTH_ANY, error);
+            DWCi_StopLogin(DWC_ERROR_AUTH_ANY, error);
         }
     }
 }
 
 // The info of the profile that GP logged in to without the user data's: a new profile gets the login name, and once
 // the profile has it, the login ID is authenticated for the profile and GP logs in again with it
-static void func_ov011_0215f8a8(GPConnection *connection, GPGetInfoResponseArg *arg, void *param) {
+static void DWCi_GPGetInfoCallback(GPConnection *connection, GPGetInfoResponseArg *arg, void *param) {
     char loginName[0x16];
     char userName[0x15];
     char tempName[0x15];
@@ -1345,17 +1353,17 @@ static void func_ov011_0215f8a8(GPConnection *connection, GPGetInfoResponseArg *
         if (sLogin->state == 3) {
             if (arg->lastname[0] == 0) {
                 DWCi_Acc_CreateLoginName(&sLogin->userData->pseudo, sLogin->gameCode, loginName);
-                if (func_ov011_0215f59c(gpSetInfos(connection, GP_INFO_LASTNAME, loginName)) != 0) {
+                if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_LASTNAME, loginName)) != 0) {
                     return;
                 }
                 sLogin->state = 4;
-                if (func_ov011_0215f59c(
-                        gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)func_ov011_0215f8a8, NULL)) != 0) {
+                if (DWCi_HandleLoginGPError(
+                        gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)DWCi_GPGetInfoCallback, NULL)) != 0) {
                     return;
                 }
             } else {
                 gpDisconnect(connection);
-                func_ov011_0215f748();
+                DWCi_RemoteLogin();
                 sLogin->state = 1;
             }
         } else if (sLogin->state == 4) {
@@ -1364,11 +1372,11 @@ static void func_ov011_0215f8a8(GPConnection *connection, GPGetInfoResponseArg *
                 DWCi_Acc_CreateLoginName(&sLogin->tempLoginId, sLogin->gameCode, tempName);
                 DWCi_Acc_SetAuthenticLoginId(sLogin->userData, &sLogin->tempLoginId, arg->profile);
                 gpDisconnect(connection);
-                func_ov011_0215f700((GPCallback)func_ov011_0215f5f0, 2);
+                DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 2);
                 return;
             }
-            if (func_ov011_0215f59c(gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)func_ov011_0215f8a8, NULL)) !=
-                0) {
+            if (DWCi_HandleLoginGPError(
+                    gpGetInfo(connection, arg->profile, 0, 0, (GPCallback)DWCi_GPGetInfoCallback, NULL)) != 0) {
                 return;
             }
         }
@@ -1376,15 +1384,15 @@ static void func_ov011_0215f8a8(GPConnection *connection, GPGetInfoResponseArg *
 }
 
 // Whether GP is logged in
-static BOOL func_ov011_0215f998(void) {
+static BOOL DWCi_CheckLogin(void) {
     if (sLogin != NULL && sLogin->state == 5) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov011_0215f9b4(const char **authToken, const char **challenge) {
-    if (!func_ov011_0215f998()) {
+BOOL DWCi_GetAuthInfo(const char **authToken, const char **challenge) {
+    if (!DWCi_CheckLogin()) {
         return FALSE;
     }
     *authToken = sLogin->authToken;
@@ -1392,8 +1400,8 @@ BOOL func_ov011_0215f9b4(const char **authToken, const char **challenge) {
     return TRUE;
 }
 
-BOOL func_ov011_0215f9e0(SakeLoginTicket *ticket) {
-    if (!func_ov011_0215f998()) {
+BOOL DWCi_GetLoginTicket(SakeLoginTicket *ticket) {
+    if (!DWCi_CheckLogin()) {
         return FALSE;
     }
     if (gpGetLoginTicket(sLogin->connection, (GPLoginTicket *)ticket) == 0) {

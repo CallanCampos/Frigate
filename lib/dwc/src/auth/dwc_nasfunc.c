@@ -500,7 +500,7 @@ static int func_ov011_02169b18(void) {
 
     end = (char *)func_ov011_0216b068(sNas.work->http, "Date");
     if (end != NULL) {
-        func_ov011_0215dffc(end);
+        DWCi_SetNasTimeFromDateHeader(end);
     }
     end = NULL;
     errno = 0;
@@ -2101,7 +2101,7 @@ static BOOL func_ov011_0216bf90(void) {
     if (func_ov011_0216aea0(http, 0) != 0) {
         text = func_ov011_0216b068(http, "Date");
         if (text != NULL) {
-            func_ov011_0215dffc(text);
+            DWCi_SetNasTimeFromDateHeader(text);
         }
         text = func_ov011_0216b068(http, "httpresult");
         if (text != NULL) {
@@ -2286,7 +2286,7 @@ static BOOL func_ov011_0216c3c8(void) {
     }
     date = func_ov011_0216b068(http, "Date");
     if (date != NULL) {
-        func_ov011_0215dffc(date);
+        DWCi_SetNasTimeFromDateHeader(date);
     }
     httpResult = func_ov011_0216b068(http, "httpresult");
     if (httpResult == NULL) {

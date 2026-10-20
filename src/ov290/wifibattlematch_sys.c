@@ -1095,7 +1095,7 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
             report->ownGenders[i] = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
         }
     }
-    ret = func_ov011_0215dda8(&date, &time);
+    ret = DWC_GetDateTime(&date, &time);
     GFL_ASSERT(ret);
     report->year = date.year;
     report->month = date.month;

@@ -20,18 +20,18 @@
 // functions do is read off their callers. The account and friend data are in dwc/account.h, the error in dwc/error.h,
 // the start in dwc/init.h and the matchmaking in dwc/match.h
 
-// Starts connecting to the access point (FALSE if its memory can't be had); one of the calls that end the connection
-// after a server error; and the connection's state
-BOOL func_ov011_0215dec0(void);
-// Starts the connection to the Nintendo Wi-Fi Connection with the access point's name (an empty one takes the
-// default) and the buffer of the connection, returning FALSE if it could not start
-BOOL func_ov011_0215de44(const char *apName, void *buffer);
-// The connection's state, 3 once connected, ending it after a state from 3 to 5
-int func_ov011_0215dea8(void);
-int func_ov011_0215df40(void);
+// Starts the login to Nintendo's authentication server (FALSE if its memory can't be had), one of the calls that end
+// the connection after a server error
+BOOL DWC_NASLoginAsync(void);
+// Asks the service locator for the token of a service (an empty one takes "0000") into the buffer, returning FALSE if
+// it could not start
+BOOL DWC_SVLGetTokenAsync(const char *svc, void *buffer);
+// The states of the token's request and of the login, 3 once done; the request ends after a state from 3 to 5
+int DWC_SVLProcess(void);
+int DWC_NASLoginProcess(void);
 
 // The server's date and time
-BOOL func_ov011_0215dda8(RTCDate *date, RTCTime *time);
+BOOL DWC_GetDateTime(RTCDate *date, RTCTime *time);
 
 // Asks the server whether count words are bad, and runs the request, returning 2 once it succeeded
 BOOL func_ov011_0216bea4(const u16 **words, int count, const char *reserved, int timeout, char *result,
@@ -39,9 +39,9 @@ BOOL func_ov011_0216bea4(const u16 **words, int count, const char *reserved, int
 int func_ov011_0216bed4(void);
 
 // Overlay 11's friend list (friend.c, whose other functions are in dwc/friend.h)
-BOOL func_ov011_0215e4d4(void (*callback)(int index, void *param), void *param);
-u8 func_ov011_0215e410(const DWCFriendData *friendData, char *statusData, int *size);
-BOOL func_ov011_0215e47c(const char *statusData, int size);
+BOOL DWC_SetBuddyFriendCallback(void (*callback)(int index, void *param), void *param);
+u8 DWC_GetFriendStatusData(const DWCFriendData *friendData, char *statusData, int *size);
+BOOL DWC_SetOwnStatusData(const char *statusData, int size);
 
 // Overlay 11's transport, which sends to the machines of a match (dwc_transport.c; the rest is in dwc/transport.h)
 BOOL func_ov011_02168998(u8 netId);

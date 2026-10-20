@@ -715,7 +715,7 @@ static void WifiBattleMatchNet_GetLoginDate(u8 *dest) {
     if (!GFL_NetIsInitialized()) {
         GFL_NetErrAbort();
     }
-    if (!func_ov011_0215dda8(&date, &time)) {
+    if (!DWC_GetDateTime(&date, &time)) {
         GFL_NetErrAbort();
     }
     MI_CpuFill8(dest, 0, 6);
