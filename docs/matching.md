@@ -1804,6 +1804,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `field--` and `field++` load the field again before the subtraction, even right after comparing it, where
   `field = field - 1` reuses the register: the phrase input's `PMSInput_SentenceKey` moves its edit position the
   second way.
+- A word loaded from a stack slot and stored straight back (`ldr r0, [sp]; str r0, [sp]`) right after a copy into a
+  local is a field assigned to itself through a cast: MWCC drops `x = x;` and every identity on it (`x += 0`, `x | 0`,
+  an identity static inline), but keeps `x = (u32)x;`, even with the field's own type. DWC's `DWCs_RecvDataHeader`
+  (`dwc_transport.c`) and `DWCi_ProcessGT2MatchCommand` and `DWCi_QR2ClientMsgCallback` (`dwc_match.c`) match only
+  so after `MI_CpuCopy8` of a received header, which reads as a byte order conversion that is the identity on the DS;
+  with no such conversion known in DWC, the three stay rows.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
   DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
