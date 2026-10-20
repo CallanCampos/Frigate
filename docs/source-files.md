@@ -472,7 +472,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | complete | string at `0x0217c624` |
 | `unity_visitor.c` | `0x0217aa1c`–`0x0217ac70` | 6 | complete | descriptive |
 | `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | complete | string at `0x0217c630` |
-| `bsubway_scr.c` | `0x0217b468`–`0x0217c340` | 39 | partial | string at `0x0217c640` |
+| `bsubway_scr.c` | `0x0217b468`–`0x0217c094` | 32 | complete | string at `0x0217c640` |
+| `bsubway_trainers.c` | `0x0217c094`–`0x0217c340` | 7 | complete | descriptive; trainer selection and team construction |
 
 ### Overlay 34
 
