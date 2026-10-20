@@ -1907,7 +1907,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `nhttp_rap.c` | `0x0219ce80`–`0x0219d410` | 25 | partial | string at `0x021acffc` |
+| `nhttp_rap.c` | `0x0219ce80`–`0x0219d410` | 25 | complete | string at `0x021acffc` |
 | `nhttp_rap_evilcheck.c` | `0x0219d410`–`0x0219d504` | 6 | complete | string at `0x021ad0ac` |
 | `dpw_profile.c` | `0x0219d504`–`0x0219d550` | 1 | complete | descriptive |
 | `nhttp_os.c` | `0x0219d550`–`0x0219d60c` | 8 | partial | descriptive |

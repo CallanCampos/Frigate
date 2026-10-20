@@ -42,13 +42,9 @@ typedef struct WifiConnectParam {
 
 // The memory functions the client was started with, the block it gave the WCM, and a function to tell when the mode
 // of the client changes (never set)
-typedef struct AossApWork {
-    DWCAossAllocFunc alloc;         // 0x00
-    void (*onModeChange)(int mode); // 0x04
-    void *block;                    // 0x08
-} AossApWork;
-
-extern AossApWork gAossAp;
+extern DWCAossAllocFunc gAossApAlloc;
+extern void (*gAossApOnModeChange)(int mode);
+extern void *gAossApBlock;
 extern DWCAossFreeFunc gAossApFree;
 
 // Scans for access points and lists them in memory from alloc; 0 if it ended well

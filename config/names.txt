@@ -19623,7 +19623,7 @@ overlays/ov182 0x021c1e20 sCrcTable
 overlays/ov182 0x021c2220 sApInfo
 overlays/ov182 0x021c28c0 sPeerMac
 overlays/ov182 0x021c28c8 sCipherKey
-overlays/ov182 0x021c2940 gAossAp
+overlays/ov182 0x021c2940 gAossApAlloc
 overlays/ov182 0x021c294c gAossApFree
 overlays/ov182 0x021c2950 sAossApMessages
 overlays/ov182 0x021c2960 sAossApQueue
@@ -19632,7 +19632,8 @@ overlays/ov182 0x021c2a40 sWep
 overlays/ov182 0x021c2aa0 sWcm
 overlays/ov182 0x021c2ac8 sBssid
 overlays/ov182 0x021c2ad0 sEssid
-overlays/ov182 0x021c2af0 sAcWork
+overlays/ov182 0x021c2af0 sAcHasSsid
+overlays/ov182 0x021c2b40 sAcSecure
 overlays/ov182 0x021c2b70 sAcWcmCallback
 overlays/ov182 0x021c2b74 sAcEvents
 overlays/ov182 0x021c2b84 sAcSocMutex

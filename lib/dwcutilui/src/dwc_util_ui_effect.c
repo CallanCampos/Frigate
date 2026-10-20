@@ -11,9 +11,14 @@ typedef struct DWCUtilUiEffect {
     u8 padding[2];
 } DWCUtilUiEffect;
 
-// The first three bytes map the screen variant to an OBJ palette. The rest of
-// this ROM table is retained until its remaining values can be named.
-static const u8 sEffectData[12] = { 0x0e, 0x04, 0x05, 0x00, 0xe6, 0x00, 0x8b, 0x00, 0x00, 0x00, 0xa8, 0x00 };
+// The OBJ palette of each screen variant, and where the effect is drawn: the first position is the one used
+static const struct {
+    u8 palettes[3];
+    struct {
+        u16 x;
+        u16 y;
+    } positions[2];
+} sEffectData = { { 0x0e, 0x04, 0x05 }, { { 0xe6, 0x8b }, { 0x00, 0xa8 } } };
 static DWCUtilUiEffect *sEffect;
 
 static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg);
@@ -25,9 +30,8 @@ void DWCUtilUiEffect_Init(u8 variant) {
     sEffect->variant = variant;
     sEffect->oam = DWCUtilCell_AllocOam(0, 0x47);
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0xfffff3ff) | (mode << 8);
-    sEffect->oam->attr01 &= 0xfffff3ff;
-    sEffect->oam->attr2 = (sEffect->oam->attr2 & 0x0fff) | (sEffectData[variant] << 12);
-    sEffect->oam->attr01 = (sEffect->oam->attr01 & 0xfe00ff00) | 0x00e6008b;
+    G2_SetOBJMode(sEffect->oam, GX_OAM_MODE_NORMAL, sEffectData.palettes[variant]);
+    G2_SetOBJPosition(sEffect->oam, sEffectData.positions[0].x, sEffectData.positions[0].y);
     sEffect->task = DWCUtilTask_Create(1, DWCUtilUiEffect_Update, NULL, 0x78);
 }
 
@@ -38,13 +42,12 @@ void DWCUtilUiEffect_Destroy(void) {
 }
 
 static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg) {
-    u8 palette;
+    int cell;
 
     sEffect->frame = FX_ModS32(sEffect->frame + 1, 40);
-    DWCUtilCell_Copy(0, FX_DivS32(sEffect->frame, 5) + 0x47, sEffect->oam);
-    sEffect->oam->attr2 = (sEffect->oam->attr2 & 0xfffff3ff) | 0x400;
-    palette = sEffectData[sEffect->variant];
-    sEffect->oam->attr01 &= 0xfffff3ff;
-    sEffect->oam->attr2 = (sEffect->oam->attr2 & 0x0fff) | (palette << 12);
-    sEffect->oam->attr01 = (sEffect->oam->attr01 & 0xfe00ff00) | 0x00e6008b;
+    cell = FX_DivS32(sEffect->frame, 5) + 0x47;
+    DWCUtilCell_Copy(0, cell, sEffect->oam);
+    G2_SetOBJPriority(sEffect->oam, 1);
+    G2_SetOBJMode(sEffect->oam, GX_OAM_MODE_NORMAL, sEffectData.palettes[sEffect->variant]);
+    G2_SetOBJPosition(sEffect->oam, sEffectData.positions[0].x, sEffectData.positions[0].y);
 }

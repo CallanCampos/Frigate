@@ -664,6 +664,15 @@ Same instructions, registers swapped.
   spellings with one variable leave 26 bytes of registers. The decryption's bytes go through a `static inline` that
   returns the xor and stores the encrypted byte into the state, which splits their live ranges so that the first
   lands in `r7` and the next two in `fp`.
+- Under MWCC 2.0 a loop over an allocation that is freed after it walks the pointer itself when the source does: in
+  `AossAp_Scan` (`dwc_aoss_ap.c`) `Wifi_ConvertBss(descs, &scanList->ap[i]); descs++;`, with the start kept in a
+  second local (`buffer = descs;` before the search) for the free, steps `descs` in its saved register
+  (`adds r4, #0xc0`) and spills `buffer`; indexing `&descs[i]` makes a new induction pointer and keeps `descs` on the
+  stack, 4 bytes over.
+- A parameter reused as a loop counter is allocated apart from a local counter, even when the parameter is otherwise
+  dead: `dwc_aoss.c`'s `Crc32_MakeTable(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
+  (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
+  `u32 value; int i; int bit;` declared in that order.
 
 ## Stack slots
 
@@ -1664,6 +1673,10 @@ Same instructions, scheduled in another order.
   `GX_PACK_DIFFAMB_PARAM(getColorData_(...), getColorData_(...), result->prmMatColor0 & 0x8000)` in one expression
   MWCC tests the kept bit before the calls and spills it (12 bytes larger). It matches with two calls into locals, the
   store of the first word, and then the other two calls.
+- An SDK inline written from memory can match every user that doesn't care about its order of terms and still be
+  wrong. `nitro/gx.h`'s `G2_SetOBJPosition` ORed x before y, and only `DWCUtilKeyboard_MoveRow` (`dwc_util_keyboard.c`)
+  showed it; NitroSDK's `g2_oam.h` masks both fields at once and ORs y first, which matches every user. Check such an
+  inline against the SDK's own definition before writing a local copy with its terms swapped.
 
 ## An instruction too many or too few
 
@@ -1804,6 +1817,26 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `field--` and `field++` load the field again before the subtraction, even right after comparing it, where
   `field = field - 1` reuses the register: the phrase input's `PMSInput_SentenceKey` moves its edit position the
   second way.
+- A word loaded from a stack slot and stored straight back (`ldr r0, [sp]; str r0, [sp]`) right after a copy into a
+  local is a field assigned to itself through a cast: MWCC drops `x = x;` and every identity on it (`x += 0`, `x | 0`,
+  an identity static inline), but keeps `x = (u32)x;`, even with the field's own type. DWC's `DWCs_RecvDataHeader`
+  (`dwc_transport.c`) and `DWCi_ProcessGT2MatchCommand` and `DWCi_QR2ClientMsgCallback` (`dwc_match.c`) match only
+  so after `MI_CpuCopy8` of a received header, which reads as a byte order conversion that is the identity on the DS;
+  with no such conversion known in DWC, the three stay rows.
+- A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
+  frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
+  DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
+  `OS_SNPrintf(buffer, 0x200, "%s%dv%s", "GPCM", 0x5a, "MAT")`, whose format takes three, and matches without it.
+- A load through a pointer parameter that the original keeps after unrelated stores (to stack locals or a struct)
+  moves above them when the pointee is `const`: DWC's `DWCi_MatchGPRecvBuddyMsgCallback` and `func_ov011_02162958`
+  (`dwc_match.c`) match with `u8 *str` and `u32 *msg`, where `const` hoisted the first byte's load over a stack
+  argument's store and the reads of the message over the copies of fields.
+- `x ? x : 0x2000` and `if (x == 0) { x = 0x2000; }` build the constant differently (`movs r0, #4; lsls r4, r0,
+  #0xb` against `movs r4, #2; lsls r4, r4, #0xc`): DWC's `DWC_InitFriendsMatch` matches with
+  `fm->sendBufSize = sendBufSize ? sendBufSize : 0x2000;`.
+- A 0 loaded once from the literal pool, stored to one local's slot and copied from there to the others, is a local
+  zeroed by a statement after the early returns, not at its declaration: DWC's `DWCi_Prof_StartRequest`
+  (`dwc_nasfunc.c`) matches with `total = 0;` just before its loop.
 - A compound assignment to a narrow field narrows its right side first: `work->checkFlag &= 0xff ^ (1 << waza);` on a
   `u8` shifts the mask down to a byte before the `and`, while `work->checkFlag = work->checkFlag & (0xff ^ (1 << waza));`
   ands the full mask, as the PC box's `Box2Main_PokeFreeWazaCheck` does.
@@ -2688,6 +2721,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `long`, its `u16` stack parameter `span` is loaded again from its slot for the clamp (`add r0, sp, #0x10; ldrh r0,
   [r0]; cmp r5, r0`), while `span - width` and `span - 1` share one load; with `s32 index` the comparison uses that
   load's register too (`cmp r5, r2`) and the function is 4 bytes short.
+- An element offset worked out again after a branch joins (`subs #0x64; muls` once more before a call), with the
+  parameter and the offset in swapped saved registers, where the original keeps one offset to the end, is an index
+  local set once the parameter is final: DWC's `DWC_AddMatchKeyInt` and `DWC_AddMatchKeyString` (`dwc_match.c`)
+  match with `index = keyId - 100;` after the key ID is picked and `sKeys[index]` for every field from there on.
+  `sKeys[keyId - 100]` written at each use was 8 and 12 bytes long; it also matched with `qr2_register_keyA` taking
+  its key ID as a `u8`, which GameSpy's prototype doesn't.
 
 ## Loops
 
@@ -3069,7 +3108,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   rooted one case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
-  in the ranges before it.
+  in the ranges before it. Empty cases count as cases, so the number of them sets the ranges, not which ones:
+  `DWCUtilMove_UpdateTask` (`dwc_util_move.c`) has a table from 0 to 20 and compares for 23, 26, 29 and 34 only with
+  four empty labels between 1 and 20 beside its four handled cases there (8 in a span of 20); with every unhandled
+  state listed the table took in 34, and with none there was no table.
 - A three-case `switch` is not range-folded where the `||` chain over the same values is, which frees a register:
   the tournament download's `TDownload_SelectTouch` and `TDownload_SavedTouch` test their touched button with
   `switch (touched) { case 3: case 4: case 5: }`. A constant stored to a spilled local as the last statement of a
@@ -3291,10 +3333,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the ROM's order, then the count, then the table. `cgtool.c` declares its two 12-byte joint tables in reverse and
   its 16-byte texture-matrix table after them, which the size puts last. The compiled object's symbol table shows the
   order.
-- MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
-  and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
-  the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a
-  jump table only when every value of the range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
+- MWCC 2.0 without `-ipa file` reaches a file's statics and globals defined with an initializer (`= NULL`, `= 0`,
+  `= { 0 }`) from one shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`), and a tentative definition or another
+  file's global by its own address. It lays the initialized ones out first in `.bss`, in the size heapsort of every
+  initialized object defined above the first function (`.data` and `.rodata` ones included), which
+  `rodata_order.py`'s `heapsort` of the reversed list predicts. A "struct" of words reached from that anchor, laid out
+  in size order in the ROM, is separate statics: `dwc_aoss_ap.c`'s `gAossApAlloc`, `gAossApOnModeChange`,
+  `gAossApBlock` and `gAossApFree`, four `= NULL` globals, give `DWC_Aoss_Init` its one literal for `0x021c2940` and
+  the free callback at + 0xc, while `dwc_aoss.c` loads the callback by its own address; `dwcutil_ac.c`'s work area is
+  32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
+  `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
+  so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
@@ -3324,6 +3373,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   relocations, and two with the same contents only by the code that loads them: `btlv_scu.c`'s four 12-byte
   encounter step tables, two of them identical, needed their own declaration order, found by trying the orders of
   the four.
+- An object at an address that isn't a multiple of 4 shares its section with the one before it, since the linker
+  starts each section on a 4-byte boundary. So a run out of size order inside packed data means the objects'
+  boundaries are wrong, not that they have sections of their own: `dwc_util_address_settings.c`'s 24 bytes of "row
+  rectangles" at 0xa, after a 3- and a 7-byte table, are three 8-byte rectangles, which make its one shared section
+  ascend (3, 7, 8, 8, 8, 9, 9, 11, 15, 18, 24, 48); split, they give the ROM's `.rodata` and
+  `DWCUtilAddressSettings_GetTouchedItem` its offsets from the section's base.
 - When structured reorderings don't reach the shared section's tie order, invert the model: the heapsort permutation
   depends only on the sequence of sizes by declaration slot, so for a given sequence the ROM's layout forces which
   object every slot must hold, exactly. Search the size sequences instead of the orders — anneal with the forced
