@@ -138,6 +138,10 @@ static inline void MI_CpuCopy16(const void *src, void *dest, u32 size) {
     MIi_CpuCopy16(src, dest, size);
 }
 
+static inline void MI_CpuCopy32(const void *src, void *dest, u32 size) {
+    MIi_CpuCopy32(src, dest, size);
+}
+
 static inline void MI_CpuFill16(void *dest, u16 data, u32 size) {
     MIi_CpuClear16(data, dest, size);
 }

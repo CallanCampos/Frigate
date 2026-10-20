@@ -100,3 +100,7 @@ lib/twl/src/dsp/dsp_graphics_image.c:
 lib/twl/src/card/card_hash.c:
     .ltdmain    start:0x02767674 end:0x02767f08
     .bss        start:0x0276af74 end:0x0276b03c
+
+lib/twl/src/mi/mi_ndma.c:
+    .ltdmain    start:0x02767f08 end:0x027683d4
+    .bss        start:0x0276b03c end:0x0276b07c

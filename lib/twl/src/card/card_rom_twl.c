@@ -9,7 +9,7 @@
 static u32 CARDi_ReadSecureRom(void *arg, void *dst, u32 src, u32 len);
 static u32 CARDi_ReadSecureRomWithDMA(void *arg, void *dst, u32 src, u32 len);
 
-const CARDDmaInterface CARDi_NdmaInterface = { func_02768370, MI_StopNDma };
+const CARDDmaInterface CARDi_NdmaInterface = { MIi_CardNDmaRecv, MI_StopNDma };
 
 static u32 sSecureAreaStart;
 static u32 sSecureAreaSize;

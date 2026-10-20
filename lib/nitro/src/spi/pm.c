@@ -454,7 +454,7 @@ void PM_ForceToPowerOff(void) {
     OS_DisableInterrupts();
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        func_02768298();
+        MI_StopAllNDma();
     }
     for (;;) {
         OS_Halt();
