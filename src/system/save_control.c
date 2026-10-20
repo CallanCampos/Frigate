@@ -125,9 +125,9 @@ SaveControl *SaveControl_Create(HeapID heapId) {
     }
 
     if (!DreamRadar_LoadAndCheckSaveData(HEAPID_TAIL(HEAPID_USER)) || ctrl->newGame == TRUE || !ctrl->dataExists) {
-        ctrl->unk8 = TRUE;
+        ctrl->markDreamRadarRead = TRUE;
     } else {
-        ctrl->unk8 = FALSE;
+        ctrl->markDreamRadarRead = FALSE;
     }
     return ctrl;
 }
@@ -182,7 +182,7 @@ u32 SaveControl_Reload(SaveControl *save) {
 }
 
 void SaveControl_StartSave(SaveControl *save) {
-    save->unk3 = TrainerDataSave_IsIntroSave(save);
+    save->wasIntroSave = TrainerDataSave_IsIntroSave(save);
     TrainerDataSave_ClearIntroSave(save);
     SaveData_SaveStart(save->sv);
 }
@@ -204,9 +204,9 @@ u32 SaveControl_ContinueSave(SaveControl *save) {
     }
     result = SaveData_SaveStep(save->sv);
     if (result == SAVE_RESULT_OK && TrainerDataSave_IsIntroSave(save) == FALSE) {
-        if (save->unk8) {
+        if (save->markDreamRadarRead) {
             DreamRadar_MarkRead(save);
-            save->unk8 = FALSE;
+            save->markDreamRadarRead = FALSE;
         }
         save->newGame = FALSE;
         save->dataExists = TRUE;
@@ -216,7 +216,7 @@ u32 SaveControl_ContinueSave(SaveControl *save) {
 
 void SaveControl_CancelSave(SaveControl *save) {
     SaveData_SaveCancel(save->sv);
-    if (save->unk3 == TRUE) {
+    if (save->wasIntroSave == TRUE) {
         TrainerDataSave_SetIntroSave(save);
     }
 }

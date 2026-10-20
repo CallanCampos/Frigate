@@ -109,14 +109,14 @@ struct SaveControl {
     // Cleared when both copies of the save loaded right
     u8 unk2;
     // TrainerDataSave_IsIntroSave at the start of a save, which canceling restores
-    u8 unk3;
+    u8 wasIntroSave;
     // What SaveOutside told of the data outside the save
     u8 giftsLoaded;
     u8 giftsBroken;
     u8 keysLoaded;
     u8 keysBroken;
     // The next save calls DreamRadar_MarkRead, which marks Dream Radar's data on the card as read
-    u8 unk8;
+    u8 markDreamRadarRead;
     u32 errors;
     SaveData *sv;
     SaveData *sv_extra[SAVE_EXTRA_ID_MAX];
