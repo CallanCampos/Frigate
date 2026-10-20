@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/name_entry.h"
 #include "constants/arc.h"
+#include "constants/pokemon.h"
 #include "constants/script_text_banks.h"
 #include "field/survey.h"
 #include "gfl/heap.h"
@@ -69,18 +70,18 @@ static void TrainerGameInfo_ClearKeyboardTypes(TrainerGameInfoSave *info) {
     MI_CpuFill8(info->keyboardTypes, 0, TRAINER_GAME_INFO_KEYBOARD_COUNT);
 }
 
-void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 a3, int a4) {
+void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 isEgg, int sex) {
     info->faveSpecies = species;
     info->faveForm = form;
-    info->unk0a_6 = a3;
-    info->unk0a_7 = a4 == 1;
+    info->faveIsEgg = isEgg;
+    info->faveIsFemale = sex == GENDER_FEMALE;
 }
 
-void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *a3, int *a4) {
+void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *isEgg, int *isFemale) {
     *species = info->faveSpecies;
     *form = info->faveForm;
-    *a3 = info->unk0a_6;
-    *a4 = info->unk0a_7;
+    *isEgg = info->faveIsEgg;
+    *isFemale = info->faveIsFemale;
 }
 
 u32 TrainerGameInfo_GetPalParkHighScore(TrainerGameInfoSave *info) {
@@ -100,25 +101,25 @@ void TrainerGameInfo_SetPalParkResult(TrainerGameInfoSave *info, u8 result) {
 }
 
 u32 func_0200c90c(TrainerCardSave *trainerCard) {
-    return trainerCard->unk1c;
+    return trainerCard->thankedCount;
 }
 
 u32 func_0200c910(TrainerGameInfoSave *info) {
-    if (info->unk1c < TRAINER_GAME_INFO_COUNT_MAX) {
-        info->unk1c++;
+    if (info->thankedCount < TRAINER_GAME_INFO_COUNT_MAX) {
+        info->thankedCount++;
     }
-    return info->unk1c;
+    return info->thankedCount;
 }
 
 u32 func_0200c924(TrainerCardSave *trainerCard) {
-    return trainerCard->unk20;
+    return trainerCard->passerbyCount;
 }
 
 u32 func_0200c928(TrainerGameInfoSave *info) {
-    if (info->unk20 < TRAINER_GAME_INFO_COUNT_MAX) {
-        info->unk20++;
+    if (info->passerbyCount < TRAINER_GAME_INFO_COUNT_MAX) {
+        info->passerbyCount++;
     }
-    return info->unk20;
+    return info->passerbyCount;
 }
 
 const u16 *TrainerGameInfo_GetGreeting(TrainerGameInfoSave *info) {
@@ -226,11 +227,11 @@ void TrainerGameInfo_SetStartMenuFlags(TrainerGameInfoSave *info, u32 value) {
 }
 
 u32 func_0200ca74(TrainerGameInfoSave *info) {
-    return info->unk0b;
+    return info->keyNotice;
 }
 
 void func_0200ca78(TrainerGameInfoSave *info, u32 value) {
-    info->unk0b = value;
+    info->keyNotice = value;
 }
 
 u16 TrainerGameInfo_GetSurveyQuestion(TrainerGameInfoSave *info) {
@@ -289,18 +290,18 @@ u32 getOneShotDRKeyFromSave(TrainerCardSave *trainerCard, int flag) {
 }
 
 u16 func_0200cb00(TrainerCardSave *trainerCard) {
-    return trainerCard->unke4;
+    return trainerCard->hallOfFameMinutes;
 }
 
 void func_0200cb08(TrainerCardSave *trainerCard, u16 value) {
-    trainerCard->unke4 = value;
+    trainerCard->hallOfFameMinutes = value;
 }
 
 void func_0200cb10(TrainerGameInfoSave *info, u16 minutes) {
-    if (minutes <= info->unke4) {
-        info->unke4 -= minutes;
+    if (minutes <= info->hallOfFameMinutes) {
+        info->hallOfFameMinutes -= minutes;
     } else {
-        info->unke4 = 0;
+        info->hallOfFameMinutes = 0;
     }
 }
 
