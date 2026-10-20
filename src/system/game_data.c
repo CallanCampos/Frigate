@@ -770,7 +770,7 @@ void GameData_StartSave(GameData *gameData) {
 int GameData_UpdateSave(GameData *gameData) {
     int result;
 
-    if (func_02005cbc() == TRUE) {
+    if (GFL_SndIsLoadThreadRunning() == TRUE) {
         return 0;
     }
 
@@ -812,7 +812,7 @@ void GameData_StartSaveBlock(GameData *gameData, u32 block) {
 u32 GameData_UpdateSaveBlock(GameData *gameData, u32 block) {
     u32 result;
 
-    if (func_02005cbc() == TRUE) {
+    if (GFL_SndIsLoadThreadRunning() == TRUE) {
         return 0;
     }
 

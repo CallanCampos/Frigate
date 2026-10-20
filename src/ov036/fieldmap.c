@@ -428,7 +428,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         field->subroutinePhase++;
     case 1:
         if (FieldStatus_CheckContinueFlag(GameData_GetFieldStatus(field->gameData)) == TRUE &&
-            IsZoneTwoPassLoad(field->zoneId) == TRUE && func_02005cbc()) {
+            IsZoneTwoPassLoad(field->zoneId) == TRUE && GFL_SndIsLoadThreadRunning()) {
             return 0;
         }
         if (FieldStatus_GetNewLoadFlag(GameData_GetFieldStatus(field->gameData))) {

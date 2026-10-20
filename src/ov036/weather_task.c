@@ -576,7 +576,7 @@ void func_ov036_02199bf8(WeatherTask *task) {
 }
 
 void func_ov036_02199c08(WeatherTask *task, u32 sound) {
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         if (task->sound.ambience != 0) {
             FieldSnd_PlayAmbience(task->fieldSound, sound);
         } else {
@@ -586,7 +586,7 @@ void func_ov036_02199c08(WeatherTask *task, u32 sound) {
 }
 
 void func_ov036_02199c30(WeatherTask *task, u32 sound, u32 a2) {
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         if (task->sound.ambience != 0) {
             FieldSnd_PlayAmbienceEx(task->fieldSound, sound, a2);
         } else {
@@ -944,7 +944,7 @@ static void func_ov036_0219a258(WeatherSound *sound, u32 ambience) {
 
 static void func_ov036_0219a25c(WeatherSound *sound, FieldSound *fieldSound, u32 se) {
     func_ov036_0219a298(sound, fieldSound);
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         sound->state = 1;
         sound->se = se;
         if (sound->ambience != 0) {
@@ -970,7 +970,7 @@ static void func_ov036_0219a298(WeatherSound *sound, FieldSound *fieldSound) {
 }
 
 static void func_ov036_0219a2c4(WeatherSound *sound, FieldSound *fieldSound) {
-    if (sound->state == 2 && !func_02005cbc()) {
+    if (sound->state == 2 && !GFL_SndIsLoadThreadRunning()) {
         sound->state = 1;
         if (sound->ambience != 0) {
             FieldSnd_PlayAmbience(fieldSound, sound->se);

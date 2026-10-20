@@ -18,6 +18,9 @@
 . 0x0200595c GFL_SndBGMStack_GetDepth
 . 0x02005968 GFL_SndBGMStack_GetHandle
 . 0x02005980 GFL_SndBGMStack_LoadSeq
+. 0x020059d8 GFL_SndBGMStack_SaveSeqLevel
+. 0x020059fc GFL_SndBGMStack_SetLoadedSeq
+. 0x02005a24 GFL_SndBGMStack_FreeSeq
 . 0x02005a5c GFL_SndBGMStack_Push
 . 0x02005aa8 GFL_SndBGMStack_Pop
 . 0x02005af4 GFL_SndBGMStack_Preload
@@ -26,6 +29,7 @@
 . 0x02005c80 GFL_SndSetStereo
 . 0x02005c94 GFL_SndBGMGetHandle
 . 0x02005ca4 GFL_SndBGMGetRequestedID
+. 0x02005cbc GFL_SndIsLoadThreadRunning
 . 0x02005ce4 GFL_SndGetHeap
 . 0x02005d6c GFL_SndSetSeqVerifyCallback
 . 0x02005d78 StopBGM
@@ -43,8 +47,10 @@
 . 0x02006404 IsLoadThreadDone
 . 0x02006424 GFL_SndBGMLoadStep
 . 0x020064b8 GFL_SndBGMSetLoadedData
+. 0x02006528 GFL_SndReplaceWave
 . 0x02006564 GFL_SndBGMStartSeq
 . 0x02006574 GFL_SndBGMStopSeq
+. 0x02006588 GFL_SndBGMClearLoadedData
 . 0x02006e0c SndMic_AddCount
 . 0x02006e3c SndMic_IsOverLimit
 . 0x02006e54 SndMic_StartSampling
