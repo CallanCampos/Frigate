@@ -36,59 +36,59 @@ u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index) {
 }
 
 void func_0200ff68(HollowRivalSave *hollowRival, u32 value) {
-    hollowRival->unk10 = value;
+    hollowRival->meeting = value;
 }
 
 void func_0200ff6c(void *block) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk10 = 0;
+    hollowRival->meeting = 0;
 }
 
 u16 func_0200ff74(void *block) {
     HollowRivalSave *hollowRival = block;
 
-    return hollowRival->unk10;
+    return hollowRival->meeting;
 }
 
 void func_0200ff78(void *rival, u32 value) {
     HollowRivalSave *hollowRival = rival;
 
-    hollowRival->unk11_0 = value;
+    hollowRival->meetingToday = value;
 }
 
 BOOL func_0200ff8c(HollowRivalSave *hollowRival) {
-    return hollowRival->unk11_0;
+    return hollowRival->meetingToday;
 }
 
 void func_0200ff94(void *block, u32 value) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk11_1 = value;
+    hollowRival->hasSpecies = value;
 }
 
 BOOL func_0200ffa8(HollowRivalSave *hollowRival) {
-    return hollowRival->unk11_1;
+    return hollowRival->hasSpecies;
 }
 
 void func_0200ffb0(void *block, u16 value) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk12 = value;
+    hollowRival->species = value;
 }
 
 u16 func_0200ffb4(HollowRivalSave *hollowRival) {
-    return hollowRival->unk12;
+    return hollowRival->species;
 }
 
 void func_0200ffb8(void *block, u32 value) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk11_2 = value;
+    hollowRival->met = value;
 }
 
 BOOL func_0200ffcc(HollowRivalSave *hollowRival) {
-    return hollowRival->unk11_2;
+    return hollowRival->met;
 }
 
 BOOL func_0200ffd4(void *block, int index) {

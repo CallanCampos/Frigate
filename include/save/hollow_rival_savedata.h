@@ -12,11 +12,13 @@
 typedef struct {
     u8 values[HOLLOW_RIVAL_INDEX_COUNT];
     u8 flags[HOLLOW_RIVAL_INDEX_COUNT];
-    u8 unk10;
-    u8 unk11_0 : 1;
-    u8 unk11_1 : 1;
-    u8 unk11_2 : 1;
-    u16 unk12;
+    // The meeting the secret caller arranged (2: the Ferris wheel in Nimbasa City), and whether it was arranged today
+    u8 meeting;
+    u8 meetingToday : 1;
+    // Whether the scripts stored a species, and whether the meeting has happened
+    u8 hasSpecies : 1;
+    u8 met : 1;
+    u16 species;
     u8 unk14[4];
 } HollowRivalSave;
 
