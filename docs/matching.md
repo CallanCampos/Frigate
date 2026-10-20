@@ -1804,6 +1804,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `field--` and `field++` load the field again before the subtraction, even right after comparing it, where
   `field = field - 1` reuses the register: the phrase input's `PMSInput_SentenceKey` moves its edit position the
   second way.
+- A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
+  frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
+  DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
+  `OS_SNPrintf(buffer, 0x200, "%s%dv%s", "GPCM", 0x5a, "MAT")`, whose format takes three, and matches without it.
+- A load through a pointer parameter that the original keeps after unrelated stores (to stack locals or a struct)
+  moves above them when the pointee is `const`: DWC's `DWCi_MatchGPRecvBuddyMsgCallback` and `func_ov011_02162958`
+  (`dwc_match.c`) match with `u8 *str` and `u32 *msg`, where `const` hoisted the first byte's load over a stack
+  argument's store and the reads of the message over the copies of fields.
+- `x ? x : 0x2000` and `if (x == 0) { x = 0x2000; }` build the constant differently (`movs r0, #4; lsls r4, r0,
+  #0xb` against `movs r4, #2; lsls r4, r4, #0xc`): DWC's `DWC_InitFriendsMatch` matches with
+  `fm->sendBufSize = sendBufSize ? sendBufSize : 0x2000;`.
 - A 0 loaded once from the literal pool, stored to one local's slot and copied from there to the others, is a local
   zeroed by a statement after the early returns, not at its declaration: DWC's `DWCi_Prof_StartRequest`
   (`dwc_nasfunc.c`) matches with `total = 0;` just before its loop.
@@ -2688,6 +2699,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `long`, its `u16` stack parameter `span` is loaded again from its slot for the clamp (`add r0, sp, #0x10; ldrh r0,
   [r0]; cmp r5, r0`), while `span - width` and `span - 1` share one load; with `s32 index` the comparison uses that
   load's register too (`cmp r5, r2`) and the function is 4 bytes short.
+- An element offset worked out again after a branch joins (`subs #0x64; muls` once more before a call), with the
+  parameter and the offset in swapped saved registers, where the original keeps one offset to the end, is an index
+  local set once the parameter is final: DWC's `DWC_AddMatchKeyInt` and `DWC_AddMatchKeyString` (`dwc_match.c`)
+  match with `index = keyId - 100;` after the key ID is picked and `sKeys[index]` for every field from there on.
+  `sKeys[keyId - 100]` written at each use was 8 and 12 bytes long; it also matched with `qr2_register_keyA` taking
+  its key ID as a `u8`, which GameSpy's prototype doesn't.
 
 ## Loops
 
