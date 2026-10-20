@@ -1997,12 +1997,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   so, `u8 kinds[3] = { FALSE, FALSE, FALSE };`, also makes MWCC load memory again after each store to the array, where
   with assignments it keeps the first load: the Pokédex habitat map reads `wk->habitat` again for each of its three
   tests of a place's habitats.
-- Thumb has no `sp`-relative `ldrh` or `ldrb`, so a field of a struct local is loaded through a fresh
+- Thumb has no `sp`-relative `ldrh` or `ldrb`, so a field of a struct local can be loaded through a fresh
   `add rN, sp, #off`, even when a saved register already holds the local's address for calls; a pointer
-  `p = &header` is propagated and folded back the same way. A load through the saved register (`ldrh r1, [r6]`) means
-  a raw buffer read through a typed pointer: `msgdata.c`'s `GFL_MsgDataLoadHeader` declares
+  `p = &header` is propagated and folded back the same way. In `msgdata.c`'s `GFL_MsgDataLoadHeader`, a raw buffer
+  read through a typed pointer gives the saved-register load (`ldrh r1, [r6]`): it declares
   `u8 buf[sizeof(MsgFileHeader)]` and `MsgFileHeader *header`, and assigns `header = (MsgFileHeader *)buf;` just before
   the call that first takes it. Assigned at its declaration, the `add` is hoisted above an earlier call.
+  A saved base shared by several stack locals does not establish a raw source buffer: `effect_encount.c`'s matched
+  `IsPositionOccupiedByActorAny` keeps `sp + 0xc`, its `index` slot, in `r7` and reads its ordinary `GridPos pos` at
+  `sp + 0x14` through `r7 + 8`, `r7 + 0xa` and `r7 + 0xc`.
 - The initializer's stores happen at the declaration, so an array cleared by an initializer after some calls is
   declared in an inner block opened there: the forms page's `BOOL hasSex[3] = { FALSE, FALSE, FALSE };` follows the
   Pokédex reads in a block around the rest of the gathering, and `BOOL seenRare[2] = { FALSE, FALSE };` sits in the
