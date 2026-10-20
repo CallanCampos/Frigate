@@ -1006,10 +1006,11 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
         if (absOffset < 0) {
             absOffset = -absOffset;
         }
-        if (absOffset <= width) {
+        if (width < absOffset) {
+            outsideWidth = TRUE;
+        } else {
             return dir;
         }
-        outsideWidth = TRUE;
     }
     if (next0 != NULL && !outsideWidth) {
         RailPoint_CheckConnections(point, unit->handle);
@@ -1094,10 +1095,11 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
         if (absOffset < 0) {
             absOffset = -absOffset;
         }
-        if (absOffset <= width) {
+        if (width < absOffset) {
+            outsideWidth = TRUE;
+        } else {
             return dir;
         }
-        outsideWidth = TRUE;
     }
     if (next2 != NULL && !outsideWidth) {
         RailPoint_CheckConnections(point, unit->handle);
