@@ -392,7 +392,7 @@ static void Deposit_SetCellActor(WorldTradeWork *wk) {
                        wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                        wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
     ClActor_SetSequence(wk->subCursorAct, 12);
-    func_0204c520(wk->subCursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->subCursorAct, TRUE);
     ClActor_StopAnim(wk->subCursorAct);
     ClActor_SetVisible(wk->subCursorAct, FALSE);
 

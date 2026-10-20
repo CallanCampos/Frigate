@@ -596,7 +596,7 @@ void Dowsing_UpdateAltFrame(DowsingWork *work, BOOL active) {
         }
         if (work->signal == SIGNAL_CLOSEST && work->restartIcon) {
             ClActor_SetSequence(work->icons[ICON_CLOSEST].actor, 0);
-            func_0204c520(work->icons[ICON_CLOSEST].actor, TRUE);
+            ClActor_SetAutoAnim(work->icons[ICON_CLOSEST].actor, TRUE);
             ClActor_SetAnimTime(work->icons[ICON_CLOSEST].actor, 0);
             work->restartIcon = FALSE;
         }
@@ -679,7 +679,7 @@ static void Dowsing_InitIcons(DowsingWork *work) {
         setup.priority = i;
         work->icons[i].actor = ClActor_Create(work->unit, work->icons[i].chars, work->iconPalette,
                                               work->icons[i].cellAnims, &setup, 1, work->heapId);
-        func_0204c520(work->icons[i].actor, TRUE);
+        ClActor_SetAutoAnim(work->icons[i].actor, TRUE);
         ClActor_SetObjMode(work->icons[i].actor, 1);
     }
     GFL_ArcToolFree(arc);
@@ -745,8 +745,8 @@ static void Dowsing_InitButton(DowsingWork *work) {
     setup.y = BUTTON_Y;
     work->button = ClActor_Create(work->unit, work->buttonChars, work->buttonPalette, work->buttonCellAnims, &setup, 1,
                                   work->heapId);
-    func_0204c520(work->button, TRUE);
-    func_0204c53c(work->button, 1 << 13);
+    ClActor_SetAutoAnim(work->button, TRUE);
+    ClActor_SetAutoAnimSpeed(work->button, 1 << 13);
     ClActor_SetSequence(work->button, 0);
     GFL_ArcToolFree(arc);
     work->buttonState = BUTTON_WAIT;

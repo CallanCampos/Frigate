@@ -314,7 +314,7 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     partnerPkm->icon = ClActor_Create(wk->partnerUnit, partnerPkm->iconChars, wk->clResources[CL_RES_PLTT(7)],
                                       wk->clResources[CL_RES_CELL(7)], &iconSetup, 1, wk->heapId);
     ClActor_SetPalette(partnerPkm->icon, palette, 1);
-    func_0204c520(partnerPkm->icon, TRUE);
+    ClActor_SetAutoAnim(partnerPkm->icon, TRUE);
     item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
     itemSetup.x = x + 32;
     itemSetup.y = y + 16;

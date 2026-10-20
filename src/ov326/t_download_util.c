@@ -581,7 +581,7 @@ static void TDownloadUtil_CreateActors(TDownloadWork *wk, u32 surface, const TDo
         if (data->flags & 1) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (data->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -648,12 +648,12 @@ static void TDownloadUtil_SetActorAnim(TDownloadWork *wk, int kind, int index, i
     if (kind == T_DOWNLOAD_ACTOR_OBJ) {
         if (index < T_DOWNLOAD_OBJ_COUNT) {
             ClActor_SetSequence(wk->actors[index], anim);
-            func_0204c520(wk->actors[index], TRUE);
+            ClActor_SetAutoAnim(wk->actors[index], TRUE);
         }
     } else if (kind == T_DOWNLOAD_ACTOR_BUTTON) {
         if (index < T_DOWNLOAD_BUTTON_COUNT) {
             ClActor_SetSequence(wk->buttons[index], anim);
-            func_0204c520(wk->buttons[index], TRUE);
+            ClActor_SetAutoAnim(wk->buttons[index], TRUE);
         }
     }
 }

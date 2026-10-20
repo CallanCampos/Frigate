@@ -1558,7 +1558,7 @@ WifiBattleMatchLinkIcon *WifiBattleMatchLinkIcon_Create(ClActUnit *unit, WifiBat
         ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c520(icon->actors[0], TRUE);
+    ClActor_SetAutoAnim(icon->actors[0], TRUE);
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 1;
@@ -1566,7 +1566,7 @@ WifiBattleMatchLinkIcon *WifiBattleMatchLinkIcon_Create(ClActUnit *unit, WifiBat
         ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c520(icon->actors[1], TRUE);
+    ClActor_SetAutoAnim(icon->actors[1], TRUE);
     return icon;
 }
 

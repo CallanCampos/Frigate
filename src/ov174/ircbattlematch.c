@@ -418,7 +418,7 @@ static void IrcBattleMatch_CreateActor(IrcBattleMatch *work, s16 x, s16 y, int s
         setup.bgPriority = 2;
         work->actors[slot] = ClActor_Create(work->actUnit, work->actorChars, work->actorPalette, work->actorCells,
                                             &setup, CLACT_SURFACE_MAIN, work->heapId);
-        func_0204c520(work->actors[slot], TRUE);
+        ClActor_SetAutoAnim(work->actors[slot], TRUE);
         ClActor_SetVisible(work->actors[slot], TRUE);
         ClActor_SetAffineMode(work->actors[slot], 2);
     }
@@ -1635,8 +1635,8 @@ static void IrcBattleMatch_StateConnectLoop(IrcBattleMatch *work) {
             IrcBattleMatch_FreeActor(work, 5);
             work->messagePending = FALSE;
             if (work->actors[0] != NULL) {
-                func_0204c520(work->actors[0], FALSE);
-                func_0204c520(work->actors[2], FALSE);
+                ClActor_SetAutoAnim(work->actors[0], FALSE);
+                ClActor_SetAutoAnim(work->actors[2], FALSE);
             }
         }
         IrcBattleMatch_MoveActor(work, 0, -2, 0);

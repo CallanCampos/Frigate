@@ -1706,10 +1706,10 @@ static void WifiP2PMatch_ShowPokeIcons(WIFIP2PMATCH_WORK *wk, BOOL first) {
     for (i = 0; i < 6; i++) {
         if (wk->pokeIcons[i] != NULL) {
             if (first) {
-                func_0204c520(wk->pokeIcons[i], TRUE);
+                ClActor_SetAutoAnim(wk->pokeIcons[i], TRUE);
                 ClActor_SetVisible(wk->pokeIcons[i], TRUE);
             } else {
-                func_0204c520(wk->pokeIcons[i], FALSE);
+                ClActor_SetAutoAnim(wk->pokeIcons[i], FALSE);
                 ClActor_SetVisible(wk->pokeIcons[i], FALSE);
             }
         }
@@ -1717,10 +1717,10 @@ static void WifiP2PMatch_ShowPokeIcons(WIFIP2PMATCH_WORK *wk, BOOL first) {
     for (i = 6; i < 12; i++) {
         if (wk->pokeIcons[i] != NULL) {
             if (first) {
-                func_0204c520(wk->pokeIcons[i], FALSE);
+                ClActor_SetAutoAnim(wk->pokeIcons[i], FALSE);
                 ClActor_SetVisible(wk->pokeIcons[i], FALSE);
             } else {
-                func_0204c520(wk->pokeIcons[i], TRUE);
+                ClActor_SetAutoAnim(wk->pokeIcons[i], TRUE);
                 ClActor_SetVisible(wk->pokeIcons[i], TRUE);
             }
         }
@@ -1732,7 +1732,7 @@ static void WifiP2PMatch_HidePokeIcons(WIFIP2PMATCH_WORK *wk) {
 
     for (i = 0; i < 12; i++) {
         if (wk->pokeIcons[i] != NULL) {
-            func_0204c520(wk->pokeIcons[i], FALSE);
+            ClActor_SetAutoAnim(wk->pokeIcons[i], FALSE);
             ClActor_SetVisible(wk->pokeIcons[i], FALSE);
         }
     }

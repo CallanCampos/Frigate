@@ -359,7 +359,7 @@ static void MedalInfoViewer_HandleInput(MedalInfoViewer *viewer) {
 
 static void MedalInfoViewer_ExitToField(MedalInfoViewer *viewer) {
     ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_EXIT], MEDAL_INFO_SEQ_EXIT_PRESSED);
-    func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
+    ClActor_SetAutoAnim(viewer->actors[MEDAL_INFO_ACTOR_EXIT], TRUE);
     MedalInfoViewer_SetState(viewer, MEDAL_INFO_STATE_WAIT_BUTTON);
     GFL_SndSEPlay(SEQ_SE_CLOSE1);
     viewer->result = MEDAL_INFO_RESULT_FIELD;
@@ -367,7 +367,7 @@ static void MedalInfoViewer_ExitToField(MedalInfoViewer *viewer) {
 
 static void MedalInfoViewer_Back(MedalInfoViewer *viewer) {
     ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_BACK], MEDAL_INFO_SEQ_BACK_PRESSED);
-    func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_BACK], TRUE);
+    ClActor_SetAutoAnim(viewer->actors[MEDAL_INFO_ACTOR_BACK], TRUE);
     MedalInfoViewer_SetState(viewer, MEDAL_INFO_STATE_WAIT_BUTTON);
     GFL_SndSEPlay(SEQ_SE_CANCEL1);
     viewer->result = MEDAL_INFO_RESULT_BACK;
@@ -377,7 +377,7 @@ static void MedalInfoViewer_Prev(MedalInfoViewer *viewer) {
     if (viewer->index > 0 && viewer->param->count > 1) {
         ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_PRESSED);
         ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_OFF);
-        func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_PREV], TRUE);
+        ClActor_SetAutoAnim(viewer->actors[MEDAL_INFO_ACTOR_PREV], TRUE);
         ClActor_SetAnimTime(viewer->actors[MEDAL_INFO_ACTOR_PREV], 0);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         MedalInfoViewer_ShowPrev(viewer);
@@ -388,7 +388,7 @@ static void MedalInfoViewer_Next(MedalInfoViewer *viewer) {
     if (viewer->param->count > viewer->index + 1) {
         ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_NEXT], MEDAL_INFO_SEQ_NEXT_PRESSED);
         ClActor_SetSequence(viewer->actors[MEDAL_INFO_ACTOR_PREV], MEDAL_INFO_SEQ_PREV_OFF);
-        func_0204c520(viewer->actors[MEDAL_INFO_ACTOR_NEXT], TRUE);
+        ClActor_SetAutoAnim(viewer->actors[MEDAL_INFO_ACTOR_NEXT], TRUE);
         ClActor_SetAnimTime(viewer->actors[MEDAL_INFO_ACTOR_NEXT], 0);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         MedalInfoViewer_ShowNext(viewer);

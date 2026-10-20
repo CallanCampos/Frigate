@@ -474,7 +474,7 @@ static void BSubwayRecords_CreateActors(BSubwayRecordsWork *wk) {
         setup.priority = 0;
         wk->actors[i] = ClActor_Create(wk->clUnits[0], wk->objRes[def->charIndex], wk->objRes[def->palIndex],
                                        wk->objRes[def->cellIndex], &setup, 0, HEAPID_BSUBWAY_RECORDS);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
 }
 

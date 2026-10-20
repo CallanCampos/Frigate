@@ -776,7 +776,7 @@ static void GPowerApp_AddActors(GPowerApp *work, u32 vramType, const GPowerAppAc
         if (setups->flags & ACTOR_AUTO_ANIM) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (setups->flags & ACTOR_FLIP_Y) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -859,12 +859,12 @@ static void GPowerApp_SetActorAnim(GPowerApp *work, int type, int index, u32 seq
     if (type == ACTOR_BUTTON) {
         if (index < BUTTON_COUNT) {
             ClActor_SetSequence(work->buttons[index], (u16)sequence);
-            func_0204c520(work->buttons[index], TRUE);
+            ClActor_SetAutoAnim(work->buttons[index], TRUE);
         }
     } else if (type == ACTOR_RETURN) {
         if (index < 1) {
             ClActor_SetSequence(work->returnButton[index], (u16)sequence);
-            func_0204c520(work->returnButton[index], TRUE);
+            ClActor_SetAutoAnim(work->returnButton[index], TRUE);
         }
     }
 }

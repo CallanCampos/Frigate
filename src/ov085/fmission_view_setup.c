@@ -637,8 +637,8 @@ static ClActor *FMissionViewSetup_AddActor(FMissionView *view, u32 chars, u32 pa
     setup.bgPriority = bgPriority;
     setup.priority = priority;
     actor = ClActor_Create(view->clUnit, chars, palette, cellAnims, &setup, CLACT_SURFACE_MAIN, view->fieldHeapId);
-    func_0204c520(actor, FALSE);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
+    ClActor_SetDrawAnim(actor, FALSE);
     return actor;
 }
 
@@ -655,7 +655,7 @@ static void FMissionViewSetup_InitButtons(FMissionView *view) {
             view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0], sFMissionViewButtonPos[i].x,
             sFMissionViewButtonPos[i].y, (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT, 1, 1);
         ClActor_SetVisible(view->buttons[i], TRUE);
-        func_0204c520(view->buttons[i], TRUE);
+        ClActor_SetAutoAnim(view->buttons[i], TRUE);
     }
 }
 

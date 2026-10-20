@@ -631,7 +631,7 @@ static void func_ov036_0218d9a8(IrcMenuWork *wk) {
     } else if (index == 7) {
         index = 3;
     }
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a4, 968);
@@ -735,7 +735,7 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218db94;
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218dbec, 1146);
@@ -756,7 +756,7 @@ static void func_ov036_0218dc5c(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218dc44;
-    func_0204c520(wk->actors[wk->selected], TRUE);
+    ClActor_SetAutoAnim(wk->actors[wk->selected], TRUE);
     ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
     ClActor_RestartAnim(wk->actors[wk->selected]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218dc58, 1179);
@@ -823,7 +823,7 @@ static void func_ov036_0218ddec(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218dda0;
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218dde8, 1293);
@@ -909,7 +909,7 @@ static void func_ov036_0218df98(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218df3c;
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218df94, 1432);
@@ -992,7 +992,7 @@ static void IrcMenu_CreateMainButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1013,7 +1013,7 @@ static void IrcMenu_CreatePlayerCountButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1034,7 +1034,7 @@ static void IrcMenu_CreateBattleTypeButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1055,7 +1055,7 @@ static void IrcMenu_CreateBattleBoxButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }

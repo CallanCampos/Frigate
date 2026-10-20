@@ -399,7 +399,7 @@ static BOOL IrcCompatMenu_Main(GameProc *proc, u32 *state, void *param, void *wo
         if (GFL_FadeIsRunning()) {
             break;
         }
-        func_0204c520(IrcCompatMenuGraphic_GetActor(&wk->graphic, ACTOR_BACKGROUND), TRUE);
+        ClActor_SetAutoAnim(IrcCompatMenuGraphic_GetActor(&wk->graphic, ACTOR_BACKGROUND), TRUE);
         IrcCompatMenuScroll_Start(&wk->scroll);
         GFL_SndBGMPlay(SEQ_ME_AISHOU_KIDOU, SND_CHANNEL_MASK_ALL);
         *state = 3;
@@ -534,7 +534,7 @@ static void IrcCompatMenuClAct_Init(IrcCompatMenuClAct *clact, const BGSysVRAMCo
                                           CLACT_SURFACE_SUB, heapId);
         ClActor_SetVisible(clact->actors[i], FALSE);
         ClActor_SetBgPriority(clact->actors[i], 3);
-        func_0204c520(clact->actors[i], TRUE);
+        ClActor_SetAutoAnim(clact->actors[i], TRUE);
     }
     setup.x = 129;
     setup.y = 104;
@@ -543,7 +543,7 @@ static void IrcCompatMenuClAct_Init(IrcCompatMenuClAct *clact, const BGSysVRAMCo
         ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
     ClActor_SetVisible(clact->actors[ACTOR_BACKGROUND], TRUE);
     ClActor_SetBgPriority(clact->actors[ACTOR_BACKGROUND], 2);
-    func_0204c520(clact->actors[ACTOR_BACKGROUND], FALSE);
+    ClActor_SetAutoAnim(clact->actors[ACTOR_BACKGROUND], FALSE);
 }
 
 static void IrcCompatMenuClAct_Free(IrcCompatMenuClAct *clact) {

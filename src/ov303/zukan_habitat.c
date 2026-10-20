@@ -626,7 +626,7 @@ static void ZukanHabitat_SeqLeaveCursor(ZukanHabitatWork *wk) {
     case 0:
         ClActor_SetAnimTime(actor, 0);
         ClActor_SetSequence(actor, 9);
-        func_0204c520(actor, TRUE);
+        ClActor_SetAutoAnim(actor, TRUE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         wk->step++;
         break;
@@ -635,7 +635,7 @@ static void ZukanHabitat_SeqLeaveCursor(ZukanHabitatWork *wk) {
             ZukanHabitat_SetCursor(wk, wk->cursor, FALSE);
             ZukanHabitat_ShowListButtons(wk);
             ClActor_SetSequence(actor, 1);
-            func_0204c520(actor, TRUE);
+            ClActor_SetAutoAnim(actor, TRUE);
             ClActor_SetAnimTime(actor, 0);
             ZukanHabitat_SetSequence(wk, SEQ_LIST, ACTION_NONE);
         }
@@ -798,7 +798,7 @@ static void ZukanHabitat_SeqButton(ZukanHabitatWork *wk) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         }
         ClActor_SetAnimTime(actor, 0);
-        func_0204c520(actor, TRUE);
+        ClActor_SetAutoAnim(actor, TRUE);
         wk->step++;
         break;
     case 1:
@@ -840,7 +840,7 @@ static void ZukanHabitat_SeqChangeSeason(ZukanHabitatWork *wk) {
             }
         }
         ClActor_SetAnimFrame(pressed, 0);
-        func_0204c520(pressed, TRUE);
+        ClActor_SetAutoAnim(pressed, TRUE);
         ZukanHabitat_UpdateList(wk);
         ZukanHabitat_UpdateTabs(wk);
         GFL_SndSEPlay(SEQ_SE_SELECT3);
@@ -898,7 +898,7 @@ static void ZukanHabitat_SeqChangeArea(ZukanHabitatWork *wk) {
         }
         ClActor_SetAnimTime(actor, 0);
         ClActor_SetSequence(actor, anim);
-        func_0204c520(actor, TRUE);
+        ClActor_SetAutoAnim(actor, TRUE);
         ClActor_StartAnim(actor);
         wk->step++;
         // fallthrough
@@ -977,13 +977,13 @@ static void ZukanHabitat_SeqChangeType(ZukanHabitatWork *wk) {
         actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + wk->type);
         ClActor_SetAnimTime(actor, 0);
         ClActor_SetSequence(actor, anims[wk->type]);
-        func_0204c520(actor, TRUE);
+        ClActor_SetAutoAnim(actor, TRUE);
         wk->step++;
         break;
     case 1:
         actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + wk->type);
         if (!ClActor_IsAnimActive(actor)) {
-            func_0204c520(actor, FALSE);
+            ClActor_SetAutoAnim(actor, FALSE);
             ClActor_SetSequence(actor, anims[wk->type]);
             ClActor_SetAnimTime(actor, 0);
             wk->step++;

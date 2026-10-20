@@ -254,7 +254,7 @@ static void CreateActors(Box2SysWork *syswk) {
 static ClActor *CreateActor(Box2AppWork *app, const Box2ActorData *data) {
     ClActor *actor = ClActor_Create(app->clunit, app->chrRes[data->chr], app->palRes[data->pal],
                                     app->cellRes[data->cell], &data->setup, data->surface, HEAPID_BOX2_APP);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetDrawAnim(actor, FALSE);
     return actor;
 }
 
@@ -278,7 +278,7 @@ void Box2Obj_UpdateAnim(Box2AppWork *app) {
     u32 i;
 
     for (i = 0; i < 49; i++) {
-        if (app->actors[i] != NULL && func_0204c534(app->actors[i]) != TRUE) {
+        if (app->actors[i] != NULL && ClActor_IsAutoAnim(app->actors[i]) != TRUE) {
             ClActor_SetAnimSpeed(app->actors[i], FX32_ONE);
         }
     }
@@ -292,7 +292,7 @@ void Box2Obj_SetAnim(Box2AppWork *app, u32 id, u32 anim) {
 
 void Box2Obj_SetAnimAndPlay(Box2AppWork *app, u32 id, u32 anim) {
     Box2Obj_SetAnim(app, id, anim);
-    func_0204c520(app->actors[id], TRUE);
+    ClActor_SetAutoAnim(app->actors[id], TRUE);
 }
 
 BOOL Box2Obj_IsAnimActive(Box2AppWork *app, u32 id) {

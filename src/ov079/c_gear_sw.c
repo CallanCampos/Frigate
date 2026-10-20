@@ -494,7 +494,7 @@ static void CGearSw_AddTouchEffect(CGearSw *work, int x, int y) {
     } else {
         effect->actor = CGearSw_AddActor(work, x, y, work->marker + 28, 2, 3, 0);
         ClActor_SetVisible(effect->actor, TRUE);
-        func_0204c5c8(effect->actor, TRUE);
+        ClActor_SetDrawAnim(effect->actor, TRUE);
     }
 }
 
@@ -924,7 +924,7 @@ static void CGearSw_SetDark(CGearSw *work, BOOL dark) {
         animate = FALSE;
     }
     for (; i < NELEMS(sDarkActors); i++) {
-        func_0204c520(work->actors[sDarkActors[i]], animate);
+        ClActor_SetAutoAnim(work->actors[sDarkActors[i]], animate);
     }
     PaletteFade_BlendPalettes(work->fade, PALFADE_BUFFER_SUB_OBJ, 0x3fff, fraction, sDarkColors[work->gender]);
     PaletteFade_BlendPalettes(work->fade, PALFADE_BUFFER_SUB_BG, 0x3e, fraction, sDarkColors[work->gender]);
@@ -938,7 +938,7 @@ static void CGearSw_ShowAlert(CGearSw *work, BOOL alert) {
         fraction = 8;
         CGearSw_SetActorAnim(work->actors[ACTOR_RADAR], 14);
         ClActor_SetPalette(work->actors[ACTOR_NOTICE], 1, 0);
-        func_0204c520(work->actors[ACTOR_NOTICE], FALSE);
+        ClActor_SetAutoAnim(work->actors[ACTOR_NOTICE], FALSE);
     } else {
         fraction = 0;
         if (work->radarNotice) {
@@ -947,7 +947,7 @@ static void CGearSw_ShowAlert(CGearSw *work, BOOL alert) {
             CGearSw_SetActorAnim(work->actors[ACTOR_RADAR], 12);
         }
         ClActor_SetPalette(work->actors[ACTOR_NOTICE], 0, 0);
-        func_0204c520(work->actors[ACTOR_NOTICE], TRUE);
+        ClActor_SetAutoAnim(work->actors[ACTOR_NOTICE], TRUE);
     }
     PaletteFade_BlendPalettes(work->fade, PALFADE_BUFFER_SUB_OBJ, 0x20, fraction, sDarkColors[work->gender]);
 }
@@ -1338,8 +1338,8 @@ static ClActor *CGearSw_AddActor(CGearSw *work, s16 x, s16 y, u8 anim, u8 bgPrio
     actor = ClActor_Create(work->unit, work->objRes[1 + res], work->objRes[0], work->objRes[3 + res], &setup, 0,
                            work->heapId);
     ClActor_SetVisible(actor, FALSE);
-    func_0204c520(actor, TRUE);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetAutoAnim(actor, TRUE);
+    ClActor_SetDrawAnim(actor, FALSE);
     return actor;
 }
 
@@ -1353,7 +1353,7 @@ static void CGearSw_SetMarkerMode(CGearSw *work, int marker, int mode) {
         ClActor_SetVisible(work->actors[actor], TRUE);
         CGearSw_SetActorAnim(work->actors[actor + 1], marker + 22);
         ClActor_SetPriority(work->actors[actor + 1], 6);
-        func_0204c5c8(work->actors[actor + 1], FALSE);
+        ClActor_SetDrawAnim(work->actors[actor + 1], FALSE);
         ClActor_SetVisible(work->actors[actor + 1], TRUE);
         break;
     case MARKER_EDIT:
@@ -1361,14 +1361,14 @@ static void CGearSw_SetMarkerMode(CGearSw *work, int marker, int mode) {
         ClActor_SetVisible(work->actors[actor], TRUE);
         CGearSw_SetActorAnim(work->actors[actor + 1], marker + 25);
         ClActor_SetPriority(work->actors[actor + 1], 6);
-        func_0204c5c8(work->actors[actor + 1], TRUE);
+        ClActor_SetDrawAnim(work->actors[actor + 1], TRUE);
         ClActor_SetVisible(work->actors[actor + 1], TRUE);
         break;
     case MARKER_DRAG:
         ClActor_SetVisible(work->actors[actor], FALSE);
         CGearSw_SetActorAnim(work->actors[actor + 1], marker + 25);
         ClActor_SetPriority(work->actors[actor + 1], 0);
-        func_0204c5c8(work->actors[actor + 1], TRUE);
+        ClActor_SetDrawAnim(work->actors[actor + 1], TRUE);
         ClActor_SetVisible(work->actors[actor + 1], TRUE);
         break;
     }
@@ -1416,18 +1416,18 @@ static void CGearSw_AddActors(CGearSw *work) {
     for (i = 0; i < 4; i++) {
         x += sClockDigitSteps[i];
         work->actors[ACTOR_CLOCK_DIGIT + i] = CGearSw_AddActor(work, x, 18, 0, 1, 1, 0);
-        func_0204c520(work->actors[ACTOR_CLOCK_DIGIT + i], FALSE);
+        ClActor_SetAutoAnim(work->actors[ACTOR_CLOCK_DIGIT + i], FALSE);
     }
     for (i = 0; i < ACTOR_COUNT - ACTOR_CLOCK; i++) {
         work->actors[ACTOR_CLOCK + i] =
             CGearSw_AddActor(work, sActorData[i].x, sActorData[i].y, sActorData[i].anim, sActorData[i].bgPriority,
                              sActorData[i].priority, sActorData[i].res);
     }
-    func_0204c520(work->actors[ACTOR_CLOCK], FALSE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_CLOCK], FALSE);
     if (OS_IsRunOnTwl()) {
         CGearSw_SetActorAnim(work->actors[ACTOR_BATTERY], 4);
     }
-    func_0204c5c8(work->actors[ACTOR_TOUCH], TRUE);
+    ClActor_SetDrawAnim(work->actors[ACTOR_TOUCH], TRUE);
     CGearSw_UpdateClock(work);
 }
 
@@ -1908,7 +1908,7 @@ static void CGearSw_InitGraphics(CGearSw *work, BOOL startup) {
     work->unit = ClActUnit_Create(84, 0, work->heapId);
     work->renderer = ClActRenderer_Create(&sSurfaceSetup, 1, work->heapId);
     ClActUnit_SetRenderer(work->unit, work->renderer);
-    func_0204bff0(work->unit, TRUE);
+    ClActUnit_SetVisibleAnimOnly(work->unit, TRUE);
     CGearSw_LoadBG(work, work->gender, work->skin, TRUE);
     CGearSw_LoadObjRes(work, work->gender);
     CGearSw_AddActors(work);
@@ -2360,13 +2360,13 @@ static BOOL CGearSw_UpdateButtonAnim(CGearSw *work) {
     switch (work->effectSeq) {
     case 0:
         CGearSw_SetActorAnim(work->actors[work->buttonActor], work->buttonAnim);
-        func_0204c520(work->actors[work->buttonActor], TRUE);
-        func_0204c520(work->actors[work->buttonActor + 1], TRUE);
+        ClActor_SetAutoAnim(work->actors[work->buttonActor], TRUE);
+        ClActor_SetAutoAnim(work->actors[work->buttonActor + 1], TRUE);
         work->effectSeq++;
         break;
     case 1:
-        func_0204c520(work->actors[work->buttonActor], TRUE);
-        func_0204c520(work->actors[work->buttonActor + 1], TRUE);
+        ClActor_SetAutoAnim(work->actors[work->buttonActor], TRUE);
+        ClActor_SetAutoAnim(work->actors[work->buttonActor + 1], TRUE);
         if (!ClActor_IsAnimActive(work->actors[work->buttonActor])) {
             work->effectSeq = 0;
             return TRUE;

@@ -638,7 +638,7 @@ static void WinRecord_CreateActors(WinRecordWork *wk, u32 surface, const WinReco
         if (data->flags & 1) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (data->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -720,17 +720,17 @@ static void WinRecord_SetActorAnim(WinRecordWork *wk, int kind, int index, int a
     if (kind == WIN_RECORD_ACTOR_SCROLL) {
         if (index < WIN_RECORD_SCROLL_ACTOR_COUNT) {
             ClActor_SetSequence(wk->scrollActors[index], anim);
-            func_0204c520(wk->scrollActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->scrollActors[index], TRUE);
         }
     } else if (kind == WIN_RECORD_ACTOR_BUTTON) {
         if (index < WIN_RECORD_BUTTON_COUNT) {
             ClActor_SetSequence(wk->buttons[index], anim);
-            func_0204c520(wk->buttons[index], TRUE);
+            ClActor_SetAutoAnim(wk->buttons[index], TRUE);
         }
     } else if (kind == WIN_RECORD_ACTOR_TRAINER) {
         if (index < WIN_RECORD_TRAINER_ACTOR_COUNT) {
             ClActor_SetSequence(wk->trainer[index], anim);
-            func_0204c520(wk->trainer[index], TRUE);
+            ClActor_SetAutoAnim(wk->trainer[index], TRUE);
         }
     }
 }

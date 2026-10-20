@@ -1346,7 +1346,7 @@ static void ResortShop_CreateActors(ResortShopWork *wk, const ClActorSetup *icon
                                    &sActorSetups[2], 0, wk->heapId);
     wk->actors[3] = ClActor_Create(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
                                    &sActorSetups[3], 0, wk->heapId);
-    func_0204c520(wk->actors[3], TRUE);
+    ClActor_SetAutoAnim(wk->actors[3], TRUE);
     wk->actors[4] = ClActor_Create(wk->clactUnit, wk->res[2].chars, wk->res[2].palette, wk->res[2].cellAnims, iconSetup,
                                    0, wk->heapId);
     ClActor_SetPalette(wk->actors[4], 0, 1);

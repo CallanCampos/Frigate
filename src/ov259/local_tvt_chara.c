@@ -590,12 +590,12 @@ static void LocalTvtFace_LoadGraphics(LocalTvtFace *face, LocalTvtChara *chara, 
     setup.sequence = 0;
     face->eyes = ClActor_Create(chara->setup.unit, face->chars, face->palette, face->cellAnims, &setup, 0, heapId);
     ClActor_SetVisible(face->eyes, FALSE);
-    func_0204c520(face->eyes, TRUE);
+    ClActor_SetAutoAnim(face->eyes, TRUE);
     ClActor_StopAnim(face->eyes);
     setup.sequence = 1;
     face->mouth = ClActor_Create(chara->setup.unit, face->chars, face->palette, face->cellAnims, &setup, 0, heapId);
     ClActor_SetVisible(face->mouth, FALSE);
-    func_0204c520(face->mouth, TRUE);
+    ClActor_SetAutoAnim(face->mouth, TRUE);
     ClActor_StopAnim(face->mouth);
 }
 
@@ -707,7 +707,7 @@ static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, 
     face->objectActor = ClActor_Create(chara->setup.unit, face->objectChars, face->objectPalette, face->objectCellAnims,
                                        &setup, 0, heapId);
     ClActor_SetVisible(face->objectActor, FALSE);
-    func_0204c520(face->objectActor, TRUE);
+    ClActor_SetAutoAnim(face->objectActor, TRUE);
     ClActor_SetAnimTime(face->objectActor, GFL_RandomLCAlt(0x4000));
 }
 
@@ -755,7 +755,7 @@ static void LocalTvtChara_CreateCursor(LocalTvtChara *chara) {
     chara->cursor = ClActor_Create(chara->setup.unit, chara->cursorChars, chara->cursorPalette, chara->cursorCellAnims,
                                    &setup, 0, chara->heapId);
     ClActor_SetVisible(chara->cursor, FALSE);
-    func_0204c520(chara->cursor, TRUE);
+    ClActor_SetAutoAnim(chara->cursor, TRUE);
 }
 
 static void LocalTvtChara_FreeCursor(LocalTvtChara *chara) {

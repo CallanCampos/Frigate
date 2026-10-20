@@ -291,7 +291,7 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     setup.bgPriority = 0;
     talk->talkButton = CtvtTalk_CreateActor(sys, 6, 2, 10, &setup, heapId);
     ClActor_SetVisible(talk->talkButton, TRUE);
-    func_0204c520(talk->talkButton, TRUE);
+    ClActor_SetAutoAnim(talk->talkButton, TRUE);
 
     talk->voiceIconState = 0;
     talk->state = TALK_STATE_FADE_IN;
@@ -900,7 +900,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             talk->state = TALK_STATE_FADE_OUT;
             talk->next = TALK_NEXT_DRAW;
             ClActor_SetSequence(talk->exitButton, 20);
-            func_0204c520(talk->exitButton, TRUE);
+            ClActor_SetAutoAnim(talk->exitButton, TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
     }
@@ -911,7 +911,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             CtvtTalk_OpenGameWindow(sys, talk);
             talk->state = TALK_STATE_INVITE;
             ClActor_SetSequence(talk->gameButtons[0], 36);
-            func_0204c520(talk->gameButtons[0], TRUE);
+            ClActor_SetAutoAnim(talk->gameButtons[0], TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
         if (CommTvt_GetSelfIndex(sys) == 0 && func_ov257_021aab3c(sys) == FALSE &&
@@ -920,7 +920,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
             CtvtTalk_OpenGameWindow(sys, talk);
             talk->state = TALK_STATE_INVITE;
             ClActor_SetSequence(talk->gameButtons[1], 37);
-            func_0204c520(talk->gameButtons[1], TRUE);
+            ClActor_SetAutoAnim(talk->gameButtons[1], TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_45);
         }
         if (talk->gameInvited == TRUE) {

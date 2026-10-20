@@ -499,7 +499,7 @@ static void IrcCompatClAct_Init(IrcCompatClAct *clact, const BGSysVRAMConfig *vr
     ClActor_SetVisible(clact->actors[ACTOR_BACKGROUND], FALSE);
     ClActor_SetBgPriority(clact->actors[ACTOR_BACKGROUND], 0);
     ClActor_SetPriority(clact->actors[ACTOR_BACKGROUND], 0);
-    func_0204c520(clact->actors[ACTOR_BACKGROUND], TRUE);
+    ClActor_SetAutoAnim(clact->actors[ACTOR_BACKGROUND], TRUE);
     ClActor_SetSequence(clact->actors[ACTOR_BACKGROUND], 11);
     for (i = 0; i < 3; i++) {
         ClActor_SetVisible(clact->actors[i], FALSE);

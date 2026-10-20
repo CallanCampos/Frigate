@@ -595,7 +595,7 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
         setup.sequence = wk->buttons[i].anim;
         wk->buttons[i].actor =
             ClActor_Create(unit, wk->chars, wk->palette, wk->cellAnims, &setup, surface, param->heapId);
-        func_0204c520(wk->buttons[i].actor, TRUE);
+        ClActor_SetAutoAnim(wk->buttons[i].actor, TRUE);
         ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
 }

@@ -502,7 +502,7 @@ static void PStatus_CreateActors(PStatusWork *wk) {
         setup.sequence = sequences[i];
         wk->buttons[i] =
             ClActor_Create(wk->actorUnit, chars, wk->clResources[PSTA_RES_PLTT(0)], cellAnims, &setup, 0, wk->heapId);
-        func_0204c520(wk->buttons[i], TRUE);
+        ClActor_SetAutoAnim(wk->buttons[i], TRUE);
         ClActor_SetVisible(wk->buttons[i], TRUE);
     }
     setup.x = 0;

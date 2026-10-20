@@ -477,7 +477,7 @@ static void CommTvtField_InitActors(CommTvtFieldWork *wk) {
         setup.bgPriority = 2;
         wk->actors[i] =
             ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], TRUE);
     }
@@ -488,7 +488,7 @@ static void CommTvtField_InitActors(CommTvtFieldWork *wk) {
     setup.bgPriority = 2;
     wk->actors[3] =
         ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c520(wk->actors[3], TRUE);
+    ClActor_SetAutoAnim(wk->actors[3], TRUE);
     ClActor_SetVisible(wk->actors[3], TRUE);
     ClActor_SetObjMode(wk->actors[3], TRUE);
     setup.x = 128;
@@ -498,7 +498,7 @@ static void CommTvtField_InitActors(CommTvtFieldWork *wk) {
     setup.bgPriority = 2;
     wk->actors[4] =
         ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c520(wk->actors[4], TRUE);
+    ClActor_SetAutoAnim(wk->actors[4], TRUE);
     ClActor_SetVisible(wk->actors[4], FALSE);
     ClActor_SetObjMode(wk->actors[4], TRUE);
     setup.x = 128;
@@ -508,7 +508,7 @@ static void CommTvtField_InitActors(CommTvtFieldWork *wk) {
     setup.bgPriority = 2;
     wk->actors[5] =
         ClActor_Create(wk->unit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
-    func_0204c520(wk->actors[5], TRUE);
+    ClActor_SetAutoAnim(wk->actors[5], TRUE);
     ClActor_SetVisible(wk->actors[5], FALSE);
     ClActor_SetObjMode(wk->actors[5], TRUE);
 }
@@ -619,7 +619,7 @@ static void CommTvtField_StartPress(CommTvtFieldWork *wk) {
     } else if (index == 4) {
         index = 1;
     }
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     CommTvtField_SetFuncLine(wk, CommTvtField_Idle, 912);
@@ -777,14 +777,14 @@ static void CommTvtField_AnimateIcon(CommTvtFieldWork *wk) {
     case 0:
     case 1:
         if (ClActor_GetSequence(wk->actors[0]) == 20) {
-            func_0204c520(wk->actors[0], FALSE);
+            ClActor_SetAutoAnim(wk->actors[0], FALSE);
             ClActor_SetSequence(wk->actors[0], 12);
         }
         break;
     case 2:
     case 3:
         if (ClActor_GetSequence(wk->actors[0]) == 12) {
-            func_0204c520(wk->actors[0], TRUE);
+            ClActor_SetAutoAnim(wk->actors[0], TRUE);
             ClActor_SetSequence(wk->actors[0], 20);
         }
         break;
@@ -832,7 +832,7 @@ static void CommTvtField_UpdateCalls(CommTvtFieldWork *wk) {
             ClActor_SetSequence(wk->actors[3], 16);
         }
         if (ClActor_GetSequence(wk->actors[1]) == 11) {
-            func_0204c520(wk->actors[1], TRUE);
+            ClActor_SetAutoAnim(wk->actors[1], TRUE);
             ClActor_SetSequence(wk->actors[1], 19);
         }
     } else {
@@ -842,7 +842,7 @@ static void CommTvtField_UpdateCalls(CommTvtFieldWork *wk) {
         BmpWin_FlushChar(wk->nameWindow);
         CommTvtField_SetCallMode(wk);
         if (ClActor_GetSequence(wk->actors[1]) == 19) {
-            func_0204c520(wk->actors[1], FALSE);
+            ClActor_SetAutoAnim(wk->actors[1], FALSE);
             ClActor_SetSequence(wk->actors[1], 11);
         }
         if (ClActor_GetSequence(wk->actors[3]) == 16) {

@@ -2147,8 +2147,8 @@ static void ResearchGraph_UpdateArrows(ResearchGraph *wk) {
     ClActor_SetSurfacePos(right, &pos, 0);
     ClActor_SetVisible(left, TRUE);
     ClActor_SetVisible(right, TRUE);
-    func_0204c520(left, TRUE);
-    func_0204c520(right, TRUE);
+    ClActor_SetAutoAnim(left, TRUE);
+    ClActor_SetAutoAnim(right, TRUE);
 }
 
 static void ResearchGraph_SetArrowsVisible(ResearchGraph *wk, BOOL visible) {
@@ -2199,7 +2199,7 @@ static void ResearchGraph_UpdateMarker(ResearchGraph *wk) {
     pos.y = y;
     ClActor_SetSurfacePos(marker, &pos, entry->surface);
     ClActor_SetVisible(marker, TRUE);
-    func_0204c520(marker, TRUE);
+    ClActor_SetAutoAnim(marker, TRUE);
     ClActor_SetPlayMode(marker, 2);
 }
 

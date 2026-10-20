@@ -589,8 +589,8 @@ static void PokeList_CreateActors(PokeListWork *wk) {
                                 wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
     wk->subCursor = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(0)], wk->clResources[CL_RES_PLTT(0)],
                                    wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
-    func_0204c520(wk->cursor, TRUE);
-    func_0204c520(wk->subCursor, TRUE);
+    ClActor_SetAutoAnim(wk->cursor, TRUE);
+    ClActor_SetAutoAnim(wk->subCursor, TRUE);
     ClActor_SetVisible(wk->cursor, FALSE);
     ClActor_SetVisible(wk->subCursor, FALSE);
     setup.x = 224;
@@ -600,18 +600,18 @@ static void PokeList_CreateActors(PokeListWork *wk) {
     setup.bgPriority = 0;
     wk->exitButton = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
                                     wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
-    func_0204c520(wk->exitButton, TRUE);
+    ClActor_SetAutoAnim(wk->exitButton, TRUE);
     setup.x = 204;
     setup.sequence = 0;
     wk->shortcutButton = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
                                         wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
-    func_0204c520(wk->shortcutButton, TRUE);
+    ClActor_SetAutoAnim(wk->shortcutButton, TRUE);
     setup.y = 172;
     setup.x = 184;
     setup.sequence = 6;
     wk->shortcutMark = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
                                       wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
-    func_0204c520(wk->shortcutMark, TRUE);
+    ClActor_SetAutoAnim(wk->shortcutMark, TRUE);
 }
 
 static void PokeList_FreeActors(PokeListWork *wk) {

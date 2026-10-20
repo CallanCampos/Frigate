@@ -197,7 +197,7 @@ static void PokeListPlate_CreateActors(PokeListWork *wk, PokeListPlate *plate) {
     ballSetup.bgPriority = 2;
     plate->ball = ClActor_Create(plate->unit, wk->clResources[CL_RES_CHAR(1)], wk->clResources[CL_RES_PLTT(0)],
                                  wk->clResources[CL_RES_CELL(1)], &ballSetup, 0, wk->heapId);
-    func_0204c520(plate->ball, TRUE);
+    ClActor_SetAutoAnim(plate->ball, TRUE);
     hpBarSetup.x = 84;
     hpBarSetup.y = 28;
     hpBarSetup.sequence = 0;
@@ -249,7 +249,7 @@ static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
     plate->icon = ClActor_Create(plate->unit, plate->iconChars, wk->clResources[CL_RES_PLTT(6)],
                                  wk->clResources[CL_RES_CELL(7)], &setup, 0, wk->heapId);
     ClActor_SetPalette(plate->icon, palette, 1);
-    func_0204c520(plate->icon, TRUE);
+    ClActor_SetAutoAnim(plate->icon, TRUE);
     ClActor_SetVisible(plate->icon, plate->pkm != NULL ? TRUE : FALSE);
 }
 

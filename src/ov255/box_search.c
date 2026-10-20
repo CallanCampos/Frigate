@@ -683,7 +683,7 @@ static void BoxSearch_LoadObjs(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId
             UIObjRes_CreateActor(&wk->objRes[data->res], unit, data_ov255_021d9394[i].x, data->y, data->anim, heapId);
         ClActor_SetBgPriority(wk->actors[i], data->bgPriority);
         ClActor_SetVisible(wk->actors[i], data->visible);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
         ClActor_SetVisible(wk->actors[i], FALSE);
     }
     GFL_BGSysLoadNCLRDefault(ARCID_BOX2, 94, 1, 9 * 0x20, 0x20, heapId);
@@ -2434,7 +2434,7 @@ static u32 GetMark(BoxSearchWork *wk, u32 mark) {
 static void SetActorAnim(BoxSearchWork *wk, u32 actor, u32 anim) {
     ClActor_SetAnimTime(wk->actors[actor], 0);
     ClActor_SetSequence(wk->actors[actor], anim);
-    func_0204c520(wk->actors[actor], TRUE);
+    ClActor_SetAutoAnim(wk->actors[actor], TRUE);
 }
 
 // Shows each marking on or off

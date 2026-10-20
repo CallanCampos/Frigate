@@ -1240,9 +1240,9 @@ static void CommBtlDemoResult_Update(CommBtlDemoResult *result) {
     CommBtlDemo_IsSingle(result->type);
     if (result->timer == 30) {
         ClActor_SetVisible(result->countActors[0], TRUE);
-        func_0204c520(result->countActors[0], TRUE);
+        ClActor_SetAutoAnim(result->countActors[0], TRUE);
         ClActor_SetVisible(result->countActors[1], TRUE);
-        func_0204c520(result->countActors[1], TRUE);
+        ClActor_SetAutoAnim(result->countActors[1], TRUE);
     }
     result->timer++;
 }
@@ -1263,7 +1263,7 @@ static void CommBtlDemoResult_ShowLabel(CommBtlDemoResult *result, u32 label, u3
         break;
     }
     ClActor_SetVisible(result->labels[label], TRUE);
-    func_0204c520(result->labels[label], TRUE);
+    ClActor_SetAutoAnim(result->labels[label], TRUE);
     ClActor_ChangeSequence(result->labels[label], anim);
 }
 

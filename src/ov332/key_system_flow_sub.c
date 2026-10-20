@@ -665,7 +665,7 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         KeySystemTween_Init(&anim->tween, &sKeyInStart, &sKeyInEnd, KEY_IN_FRAMES);
         ClActor_SetVisible(anim->keyActor, TRUE);
         ClActor_SetSequence(anim->keyActor, 8);
-        func_0204c520(anim->keyActor, TRUE);
+        ClActor_SetAutoAnim(anim->keyActor, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_02);
         anim->state++;
     case 6: {
@@ -703,7 +703,7 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
     }
     case 10:
         ClActor_SetSequence(anim->lockActor, 12);
-        func_0204c520(anim->lockActor, TRUE);
+        ClActor_SetAutoAnim(anim->lockActor, TRUE);
         anim->state++;
         break;
     case 11:
@@ -716,7 +716,7 @@ static BOOL KeySystemKeyAnim_Unlock(KeySystemKeyAnim *anim) {
         ClActor_SetSurfacePos(anim->effectActor, &sEffectPos, CLACT_SURFACE_MAIN);
         ClActor_SetVisible(anim->effectActor, TRUE);
         ClActor_SetSequence(anim->effectActor, 11);
-        func_0204c520(anim->effectActor, TRUE);
+        ClActor_SetAutoAnim(anim->effectActor, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_04);
         anim->state++;
         break;
@@ -786,7 +786,7 @@ static BOOL KeySystemKeyAnim_Show(KeySystemKeyAnim *anim) {
     case 0:
         KeySystemTween_Init(&anim->tween, &sShowInStart, &sShowInEnd, SHOW_IN_FRAMES);
         ClActor_SetVisible(anim->keyActor, TRUE);
-        func_0204c520(anim->keyActor, TRUE);
+        ClActor_SetAutoAnim(anim->keyActor, TRUE);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_02);
         anim->state++;
     case 1: {

@@ -534,7 +534,7 @@ static void Report_FreeActors(ReportScreen *wk) {
 static void Report_ShowBarIcon(ReportScreen *wk, int index) {
     ClActor_SetAnimTime(wk->actors[REPORT_BAR_FIRST + index], 0);
     ClActor_SetSequence(wk->actors[REPORT_BAR_FIRST + index], 1);
-    func_0204c520(wk->actors[REPORT_BAR_FIRST + index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[REPORT_BAR_FIRST + index], TRUE);
 }
 
 static void Report_FillBar(ReportScreen *wk) {

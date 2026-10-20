@@ -1645,7 +1645,7 @@ static ClActor *ZukanDetailForm_CreateIcon(ArcTool *arc, u32 *chars, u32 palette
     setup.bgPriority = 0;
     *chars = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
     actor = ClActor_Create(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
-    func_0204c520(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
     ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     ClActor_SetObjMode(actor, 0);
     return actor;
@@ -2306,7 +2306,7 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
                                        wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].palette],
                                        wk->resources[ZUKAN_DETAIL_FORM_ACTORS[i].cellAnims], &setup, CLACT_SURFACE_MAIN,
                                        param->heapId);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
         ClActor_SetVisible(wk->actors[i], FALSE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -2387,7 +2387,7 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
         wk->buttons[i].actor =
             ClActor_Create(wk->unit, wk->resources[wk->buttons[i].chars], wk->resources[wk->buttons[i].palette],
                            wk->resources[wk->buttons[i].cellAnims], &setup, CLACT_SURFACE_MAIN, param->heapId);
-        func_0204c520(wk->buttons[i].actor, TRUE);
+        ClActor_SetAutoAnim(wk->buttons[i].actor, TRUE);
         ClActor_SetObjMode(wk->buttons[i].actor, 1);
     }
     wk->pushed = BUTTON_NONE;
@@ -2474,7 +2474,7 @@ static FormButton ZukanDetailForm_GetButtonInput(ZukanDetailFormParam *param, Zu
                 other = BUTTON_ARROW_L;
             }
             if (other != BUTTON_NONE) {
-                func_0204c520(wk->buttons[other].actor, FALSE);
+                ClActor_SetAutoAnim(wk->buttons[other].actor, FALSE);
                 ClActor_SetAnimTime(wk->buttons[other].actor, 0);
             }
             wk->pushed = button;
@@ -2533,7 +2533,7 @@ static void ZukanDetailForm_UpdateButtons(ZukanDetailFormParam *param, ZukanDeta
                 other = BUTTON_ARROW_L;
             }
             if (other != BUTTON_NONE && wk->buttons[other].state == BUTTON_STATE_NONE) {
-                func_0204c520(wk->buttons[other].actor, TRUE);
+                ClActor_SetAutoAnim(wk->buttons[other].actor, TRUE);
                 ClActor_SetSequence(wk->buttons[other].actor, wk->buttons[other].activeAnim);
             }
             wk->pushed = BUTTON_NONE;

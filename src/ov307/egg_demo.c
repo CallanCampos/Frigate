@@ -456,7 +456,7 @@ static void EggDemo_InitActors(EggDemoParam *param, EggDemoWork *wk) {
     for (i = 0; i < ACTOR_COUNT; i++) {
         wk->actors[i] = ClActor_Create(EggDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette, wk->cellAnims,
                                        &sActorSetups[i], 0, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
     }
 }
 
@@ -476,7 +476,7 @@ static void EggDemo_StartActors(EggDemoParam *param, EggDemoWork *wk) {
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         ClActor_SetAnimFrame(wk->actors[i], 0);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
 }
 

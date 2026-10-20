@@ -920,7 +920,7 @@ static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, const Weathe
     obj->task = task;
     obj->actor = ClActor_Create(unit, res->chars, res->palette, res->cells, &WEATHER_OBJ_SETUP, 0, heapId);
     ClActor_SetVisible(obj->actor, FALSE);
-    func_0204c5c8(obj->actor, FALSE);
+    ClActor_SetDrawAnim(obj->actor, FALSE);
 }
 
 static void func_ov036_0219a23c(WeatherObj *obj) {

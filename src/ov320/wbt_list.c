@@ -888,7 +888,7 @@ static void WbtList_CreateActors(WbtList *work, u32 vramType, const WbtListActor
         if (setups->flags & ACTOR_FLAG_ANIMATE) {
             animate = TRUE;
         }
-        func_0204c520(work->actors[i], animate);
+        ClActor_SetAutoAnim(work->actors[i], animate);
         if (setups->flags & ACTOR_FLAG_FLIP_Y) {
             ClActor_SetFlip(work->actors[i], 1, TRUE);
         }
@@ -959,7 +959,7 @@ static void WbtList_FreeObjects(WbtList *work) {
 
 static void WbtList_SetActorAnim(WbtList *work, s32 actor, s32 sequence) {
     ClActor_SetSequence(work->actors[actor], sequence);
-    func_0204c520(work->actors[actor], TRUE);
+    ClActor_SetAutoAnim(work->actors[actor], TRUE);
 }
 
 static void WbtList_SetActorVisible(WbtList *work, s32 actor, BOOL visible) {
@@ -1291,7 +1291,7 @@ static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side) {
     index += side * LINE_VALUE_COUNT;
     ClActor_SetSequence(work->actors[ACTOR_LINE + line], sWbtListLines[drawn + (index + LINE_SEQUENCE)]);
     ClActor_SetVisible(work->actors[ACTOR_LINE + line], TRUE);
-    func_0204c520(work->actors[ACTOR_LINE + line], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_LINE + line], TRUE);
     position = sWbtListLines[index + LINE_POSITION];
     // The sum's order folds the column into the load's base, as *(data + pos + 1) does
     flags = *(sWbtListLines + index + LINE_FLAGS);

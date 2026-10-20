@@ -159,7 +159,7 @@ static void PokemonTradeDemoMiddle_CreateSprite(PokemonTradeWork *wk) {
         wk->work3D->actor =
             ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO], wk->objRes[TRADE_OBJRES_PLTT_DEMO],
                            wk->objRes[TRADE_OBJRES_CELL_DEMO], &setup, 0, wk->heapId);
-        func_0204c520(wk->work3D->actor, TRUE);
+        ClActor_SetAutoAnim(wk->work3D->actor, TRUE);
         ClActor_SetVisible(wk->work3D->actor, TRUE);
     } else {
         ClActor_RestartAnim(wk->work3D->actor);

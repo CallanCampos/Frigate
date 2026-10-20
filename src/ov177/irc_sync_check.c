@@ -603,7 +603,7 @@ static void IrcSyncCheckClAct_Init(IrcSyncCheckClAct *clact, const BGSysVRAMConf
                                           CLACT_SURFACE_SUB, heapId);
         ClActor_SetVisible(clact->actors[i], FALSE);
         ClActor_SetBgPriority(clact->actors[i], 3);
-        func_0204c520(clact->actors[i], TRUE);
+        ClActor_SetAutoAnim(clact->actors[i], TRUE);
         ClActor_SetSequence(clact->actors[i], 0);
     }
 }

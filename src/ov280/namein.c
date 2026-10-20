@@ -624,7 +624,7 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
         setup.y = -32;
         setup.sequence = i - 15;
         objs->actors[i] = ClActor_Create(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
-        func_0204c520(objs->actors[i], TRUE);
+        ClActor_SetAutoAnim(objs->actors[i], TRUE);
         ClActor_SetVisible(objs->actors[i], FALSE);
     }
 
@@ -869,7 +869,7 @@ static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, P
     for (i = 0; i < NAME_SLOT_COUNT; i++) {
         pos.x = offset + i * 14;
         ClActor_SetSequence(box->slots[i], 1);
-        func_0204c520(box->slots[i], TRUE);
+        ClActor_SetAutoAnim(box->slots[i], TRUE);
         ClActor_SetSurfacePos(box->slots[i], &pos, 0);
         ClActor_SetVisible(box->slots[i], TRUE);
     }
@@ -2791,7 +2791,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     setup.x = x;
     setup.y = y;
     icon->actor = ClActor_Create(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 0, heapId);
-    func_0204c520(icon->actor, TRUE);
+    ClActor_SetAutoAnim(icon->actor, TRUE);
     switch (type) {
     case ICON_TYPE_PLAYER:
         if (species == 0) {
@@ -3005,7 +3005,7 @@ static int NameEntryObjs_UpdateSelectors(NameEntryObjs *objs) {
             touch.x = x;
             touch.y = y;
             if (NameEntry_PointInRect(&rect, &touch)) {
-                func_0204c520(NameEntryObjs_Get(objs, i), TRUE);
+                ClActor_SetAutoAnim(NameEntryObjs_Get(objs, i), TRUE);
                 ClActor_SetAnimTime(NameEntryObjs_Get(objs, i), 0);
                 ClActor_RestartAnim(NameEntryObjs_Get(objs, i));
                 return i - 21;

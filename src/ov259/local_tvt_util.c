@@ -1040,7 +1040,7 @@ static void LocalTvtReturnIcon_Init(LocalTvtReturnIcon *icon, ClActUnit *unit, H
     setup.y = BAR_Y * 8;
     icon->actor = ClActor_Create(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 1, heapId);
     ClActor_SetVisible(icon->actor, TRUE);
-    func_0204c520(icon->actor, TRUE);
+    ClActor_SetAutoAnim(icon->actor, TRUE);
 }
 
 static void LocalTvtReturnIcon_Exit(LocalTvtReturnIcon *icon) {

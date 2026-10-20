@@ -2463,7 +2463,7 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
         work->sparkles[i] = ClActor_Create(work->clactUnit, work->clactRes[2], work->clactRes[5], work->clactRes[8],
                                            &sparkle, CLACT_SURFACE_SUB, work->heapId);
         ClActor_SetVisible(work->sparkles[i], TRUE);
-        func_0204c520(work->sparkles[i], TRUE);
+        ClActor_SetAutoAnim(work->sparkles[i], TRUE);
         ClActor_SetObjMode(work->sparkles[i], 0);
         work->sparkleTimer[i] = 0;
     }
@@ -2475,12 +2475,12 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
     work->okMark = ClActor_Create(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
                                   CLACT_SURFACE_MAIN, work->heapId);
     ClActor_SetVisible(work->okMark, FALSE);
-    func_0204c520(work->okMark, TRUE);
+    ClActor_SetAutoAnim(work->okMark, TRUE);
     setup.sequence = 2;
     work->touchEffect = ClActor_Create(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
                                        CLACT_SURFACE_MAIN, work->heapId);
     ClActor_SetVisible(work->touchEffect, FALSE);
-    func_0204c520(work->touchEffect, TRUE);
+    ClActor_SetAutoAnim(work->touchEffect, TRUE);
 }
 
 static void DupFitting_FreeSparkles(DupFittingWork *work) {

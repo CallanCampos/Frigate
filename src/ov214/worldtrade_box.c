@@ -330,7 +330,7 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
     wk->cursorAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->cursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
     ClActor_SetSequence(wk->cursorAct, 4);
     if (GCTX_HIDIsUsingTouch() == TRUE) {
         ClActor_SetVisible(wk->cursorAct, FALSE);
@@ -395,7 +395,7 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
     ClActor_SetSequence(wk->fingerAct, 12);
-    func_0204c520(wk->fingerAct, TRUE);
+    ClActor_SetAutoAnim(wk->fingerAct, TRUE);
     ClActor_StopAnim(wk->fingerAct);
     ClActor_SetVisible(wk->fingerAct, FALSE);
 
@@ -613,14 +613,14 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
     if (touch != -1) {
         switch (touch) {
         case 31:
-            func_0204c520(wk->boxArrowAct[0], TRUE);
+            ClActor_SetAutoAnim(wk->boxArrowAct[0], TRUE);
             ClActor_SetSequence(wk->boxArrowAct[0], 38);
             wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, 1);
             Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
             GFL_SndSEPlay(0x548);
             break;
         case 32:
-            func_0204c520(wk->boxArrowAct[1], TRUE);
+            ClActor_SetAutoAnim(wk->boxArrowAct[1], TRUE);
             ClActor_SetSequence(wk->boxArrowAct[1], 39);
             wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, -1);
             Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
@@ -708,7 +708,7 @@ static void Box_CursorControl(WorldTradeWork *wk) {
             if (next == 99 || next == 101) {
                 u8 arrow = next == 101 ? 0 : 1;
 
-                func_0204c520(wk->boxArrowAct[arrow], TRUE);
+                ClActor_SetAutoAnim(wk->boxArrowAct[arrow], TRUE);
                 ClActor_SetSequence(wk->boxArrowAct[arrow], arrow + 38);
                 wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, next - 100);
                 Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);

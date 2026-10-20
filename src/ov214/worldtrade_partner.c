@@ -251,7 +251,7 @@ static void Partner_SetCellActor(WorldTradeWork *wk) {
     wk->pokemonAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->pokemonAct, TRUE);
+    ClActor_SetAutoAnim(wk->pokemonAct, TRUE);
     ClActor_SetSequence(wk->pokemonAct, 36);
     ClActor_SetVisible(wk->pokemonAct, TRUE);
     GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);

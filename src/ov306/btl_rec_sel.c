@@ -1278,7 +1278,7 @@ static ClActor *BtlRecSel_CreateIcon(ClActUnit *unit, HeapID heapId, u32 vramTyp
     actor = UIObjRes_CreateActor(res, unit, x, y, anim, heapId);
     ClActor_SetBgPriority(actor, bgPriority);
     ClActor_SetPriority(actor, priority);
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     return actor;
 }

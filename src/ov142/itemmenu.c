@@ -636,7 +636,7 @@ static void ItemMenu_StateWaitMessage(ItemMenuWork *work) {
         ItemMenu_UpdateList(work);
         work->listDirty = TRUE;
         ItemMenuDisp_UpdateScrollBar(work);
-        func_0204c520(work->scrollBar, TRUE);
+        ClActor_SetAutoAnim(work->scrollBar, TRUE);
         ItemMenuDisp_SetButtonsActive(work, TRUE);
         ItemMenu_ReturnToList(work);
     }
@@ -842,7 +842,7 @@ static void ItemMenu_StateItemMenu(ItemMenuWork *work) {
                 ItemMenu_ToggleItemRegistration(work, work->cursorRow);
                 ItemMenu_UpdateList(work);
                 ItemMenuDisp_SetButtonsActive(work, TRUE);
-                func_0204c520(work->scrollBar, TRUE);
+                ClActor_SetAutoAnim(work->scrollBar, TRUE);
                 ItemMenu_ReturnToList(work);
             }
             break;
@@ -861,7 +861,7 @@ static void ItemMenu_StateItemMenu(ItemMenuWork *work) {
             }
             ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
             ItemMenuDisp_SetButtonsActive(work, TRUE);
-            func_0204c520(work->scrollBar, TRUE);
+            ClActor_SetAutoAnim(work->scrollBar, TRUE);
             ItemMenu_ReturnToList(work);
             break;
         case 11:
@@ -920,7 +920,7 @@ static void ItemMenu_StateSelectItem(ItemMenuWork *work) {
         ItemMenu_OpenItemMenu(work);
         ItemMenuDisp_SetItemMenuMessage(work, work->item);
         ItemMenuDisp_ShowMessageNow(work);
-        func_0204c520(work->scrollBar, FALSE);
+        ClActor_SetAutoAnim(work->scrollBar, FALSE);
         ItemMenu_SetState(work, ItemMenu_StateItemMenu);
     }
 }
@@ -1072,7 +1072,7 @@ static void ItemMenu_StateTMBootUp(ItemMenuWork *work) {
         } else {
             ItemMenuDisp_ClearMsgWindow(work);
             GFL_BGSysClearScr(3);
-            func_0204c520(work->scrollBar, TRUE);
+            ClActor_SetAutoAnim(work->scrollBar, TRUE);
             ItemMenuDisp_SetButtonsActive(work, TRUE);
             if (GCTX_HIDIsUsingTouch() == TRUE) {
                 ItemMenuDisp_HideItemInfo(work);
@@ -1131,7 +1131,7 @@ static void ItemMenu_StateReturnToList(ItemMenuWork *work) {
         ItemMenu_UpdateList(work);
         work->listDirty = TRUE;
         ItemMenuDisp_UpdateScrollBar(work);
-        func_0204c520(work->scrollBar, TRUE);
+        ClActor_SetAutoAnim(work->scrollBar, TRUE);
         ItemMenuDisp_SetButtonsActive(work, TRUE);
         ItemMenu_ReturnToList(work);
     }
@@ -1161,7 +1161,7 @@ static void ItemMenu_StateTossConfirm(ItemMenuWork *work) {
             ItemMenuDisp_ShowMessageNow(work);
             ItemMenu_SetState(work, ItemMenu_StateWaitTossMessage);
         } else {
-            func_0204c520(work->scrollBar, TRUE);
+            ClActor_SetAutoAnim(work->scrollBar, TRUE);
             ItemMenuDisp_SetButtonsActive(work, TRUE);
             ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
             ItemMenu_ReturnToList(work);
@@ -1223,7 +1223,7 @@ static void ItemMenu_StateSell(ItemMenuWork *work) {
     s32 price;
     u32 important;
 
-    func_0204c520(work->scrollBar, FALSE);
+    ClActor_SetAutoAnim(work->scrollBar, FALSE);
     price = GetItemParam(work->item, ITEM_PARAM_PRICE, work->heapId);
     important = GetItemParam(work->item, ITEM_PARAM_IMPORTANT, work->heapId);
     if (price == 0 || important != 0) {
@@ -1340,7 +1340,7 @@ static void ItemMenu_StateSellEnd(ItemMenuWork *work) {
     work->listDirty = TRUE;
     ItemMenuDisp_UpdateScrollBar(work);
     ItemMenuDisp_HideMoney(work);
-    func_0204c520(work->scrollBar, TRUE);
+    ClActor_SetAutoAnim(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
     ItemMenu_ReturnToList(work);
 }
@@ -1532,7 +1532,7 @@ static void ItemMenu_StateFreeSpaceWaitMessage(ItemMenuWork *work) {
     work->listDirty = TRUE;
     ItemMenuDisp_UpdateScrollBar(work);
     ItemMenuDisp_ClearMsgWindow(work);
-    func_0204c520(work->scrollBar, TRUE);
+    ClActor_SetAutoAnim(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
     ItemMenuDisp_SetBackButtonActive(work, TRUE);
     ItemMenu_ReturnToList(work);
@@ -2109,7 +2109,7 @@ static void ItemMenu_StateWaitFadeIn(ItemMenuWork *work) {
     BOOL busy = ItemMenuDisp_SlidePocketTabs(work);
 
     if (finished == TRUE && busy == FALSE) {
-        func_0204c520(work->scrollBar, TRUE);
+        ClActor_SetAutoAnim(work->scrollBar, TRUE);
         ItemMenu_ReturnToList(work);
     }
 }
@@ -2374,7 +2374,7 @@ static void ItemMenu_PressButton(ItemMenuWork *work, u32 button, ItemMenuState n
     work->buttonAnim = button;
     ClActor_SetAnimTime(work->buttons[work->buttonAnim], 0);
     ClActor_SetSequence(work->buttons[work->buttonAnim], anim);
-    func_0204c520(work->buttons[work->buttonAnim], TRUE);
+    ClActor_SetAutoAnim(work->buttons[work->buttonAnim], TRUE);
     work->buttonAnimNext = next;
     ItemMenu_SetState(work, ItemMenu_StateWaitButton);
 }
@@ -2406,7 +2406,7 @@ static void ItemMenu_PressPocketArrow(ItemMenuWork *work, s32 oldPocket, BOOL ri
     work->buttonAnimTimer = 6;
     ClActor_SetAnimTime(work->buttons[work->buttonAnim], 0);
     ClActor_SetSequence(work->buttons[work->buttonAnim], anim);
-    func_0204c520(work->buttons[work->buttonAnim], TRUE);
+    ClActor_SetAutoAnim(work->buttons[work->buttonAnim], TRUE);
     work->buttonAnimNext = next;
     ItemMenu_SetState(work, ItemMenu_StateWaitPocketArrow);
 }
@@ -2439,7 +2439,7 @@ static s32 ItemMenu_GetQuantityButton(void) {
 
 static void ItemMenu_StateTossCancel(ItemMenuWork *work) {
     ItemMenu_HideQuantity(work);
-    func_0204c520(work->scrollBar, TRUE);
+    ClActor_SetAutoAnim(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
     ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
     ItemMenu_ReturnToList(work);
@@ -2447,7 +2447,7 @@ static void ItemMenu_StateTossCancel(ItemMenuWork *work) {
 
 static void ItemMenu_StateSellCancel(ItemMenuWork *work) {
     ItemMenu_HideQuantity(work);
-    func_0204c520(work->scrollBar, TRUE);
+    ClActor_SetAutoAnim(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
     ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
     ItemMenu_SetState(work, ItemMenu_StateSellEnd);
@@ -2470,7 +2470,7 @@ static void ItemMenu_FreePaletteFade(ItemMenuWork *work) {
 static void ItemMenu_StateOpenSortMenu(ItemMenuWork *work) {
     if (ClActor_IsAnimActive(work->sortButton) == FALSE) {
         ClActor_SetSequence(work->sortButton, 0);
-        func_0204c520(work->scrollBar, FALSE);
+        ClActor_SetAutoAnim(work->scrollBar, FALSE);
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_HowWantSortItems, work->expandBuf);
         ItemMenuDisp_ShowMessage(work, FALSE);
         ItemMenuDisp_SetButtonsActive(work, FALSE);
@@ -2560,7 +2560,7 @@ static void ItemMenu_StateSortMenu(ItemMenuWork *work) {
                 ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
                 ItemMenuDisp_SetButtonsActive(work, TRUE);
                 done = TRUE;
-                func_0204c520(work->scrollBar, TRUE);
+                ClActor_SetAutoAnim(work->scrollBar, TRUE);
                 ItemMenu_ReturnToList(work);
                 break;
             }
@@ -2649,7 +2649,7 @@ static void ItemMenu_StateFilterDone(ItemMenuWork *work) {
 static void ItemMenu_StateOpenFilterMenu(ItemMenuWork *work) {
     if (ClActor_IsAnimActive(work->filterButton) == FALSE) {
         ClActor_SetSequence(work->filterButton, 2);
-        func_0204c520(work->scrollBar, FALSE);
+        ClActor_SetAutoAnim(work->scrollBar, FALSE);
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SelectTypeItemWant, work->expandBuf);
         ItemMenuDisp_ShowMessage(work, FALSE);
         ItemMenuDisp_SetButtonsActive(work, FALSE);
@@ -2788,7 +2788,7 @@ static void ItemMenu_StateFilterMenu(ItemMenuWork *work) {
                 ItemMenu_SetKeyMode(work, GCTX_HIDIsUsingTouch() ? FALSE : TRUE);
                 ItemMenuDisp_SetButtonsActive(work, TRUE);
                 done = TRUE;
-                func_0204c520(work->scrollBar, TRUE);
+                ClActor_SetAutoAnim(work->scrollBar, TRUE);
                 ItemMenu_ReturnToList(work);
                 break;
             }
@@ -2814,7 +2814,7 @@ static void ItemMenu_StateSortWaitMessage(ItemMenuWork *work) {
     ItemMenuDisp_UpdateScrollBar(work);
     ItemMenu_UpdateList(work);
     ItemMenuDisp_ClearMsgWindow(work);
-    func_0204c520(work->scrollBar, TRUE);
+    ClActor_SetAutoAnim(work->scrollBar, TRUE);
     ItemMenuDisp_SetButtonsActive(work, TRUE);
     ItemMenu_ReturnToList(work);
 }

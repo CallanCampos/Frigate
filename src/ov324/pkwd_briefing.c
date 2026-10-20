@@ -1872,7 +1872,7 @@ static void PkwdBriefingAudience_Init(PkwdBriefingAudience *audience, HeapID hea
         setup.priority = 128 - i;
         audience->actors[i] = ClActor_Create(audience->unit, audience->chars, audience->palette, audience->cellAnims,
                                              &setup, CLACT_SURFACE_SUB, heapId);
-        func_0204c520(audience->actors[i], FALSE);
+        ClActor_SetAutoAnim(audience->actors[i], FALSE);
         ClActor_SetVisible(audience->actors[i], TRUE);
         ClActor_SetPalette(audience->actors[i], sPkwdBriefingSeats[i].palette, 1);
     }
@@ -2093,7 +2093,7 @@ static void PkwdBriefing_UpdateAudience(PkwdBriefingWork *wk) {
             if (wk->audience.delays[i] != 0) {
                 wk->audience.delays[i]--;
             } else {
-                func_0204c520(wk->audience.actors[i], TRUE);
+                ClActor_SetAutoAnim(wk->audience.actors[i], TRUE);
             }
         }
     }

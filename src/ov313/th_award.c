@@ -397,7 +397,7 @@ static void ThAward_InitIcons(ThAwardWork *wk) {
         wk->iconActors[i] = ClActor_Create(ThAwardGraphic_GetClActUnit(wk->graphic), wk->icons[i].chars,
                                            wk->icons[0].palette, wk->icons[i].cellAnims, &setup, 0, wk->heapId);
         ClActor_SetSequence(wk->iconActors[i], 1);
-        func_0204c520(wk->iconActors[i], FALSE);
+        ClActor_SetAutoAnim(wk->iconActors[i], FALSE);
         ClActor_SetPalette(wk->iconActors[i], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
     }
     GFL_ArcToolFree(arc);
@@ -442,7 +442,7 @@ static void ThAward_InitRankIcons(ThAwardWork *wk) {
         wk->rankActors[i] = ClActor_Create(ThAwardGraphic_GetClActUnit(wk->graphic), wk->rankChars, wk->rankPalette,
                                            wk->rankCellAnims, &setup, 0, wk->heapId);
         ClActor_SetSequence(wk->rankActors[i], 0);
-        func_0204c520(wk->rankActors[i], TRUE);
+        ClActor_SetAutoAnim(wk->rankActors[i], TRUE);
     }
 }
 

@@ -791,7 +791,7 @@ static void MedalBoxApp_InitActors(MedalBoxApp *work) {
         ClActor_SetSequence(actors[ACTOR_SPARKLE + i], 4);
         ClActor_SetVisible(work->actors[ACTOR_SPARKLE + i], FALSE);
         ClActor_SetBgPriority(actors[ACTOR_SPARKLE + i], 3);
-        func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
+        ClActor_SetAutoAnim(actors[ACTOR_SPARKLE + i], TRUE);
         ClActor_SetPriority(actors[ACTOR_SPARKLE + i], 1);
     }
     pos.x = 0x80;
@@ -1287,10 +1287,10 @@ static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
         MedalBoxApp_SetCursorMode(work, CURSOR_HIDDEN, 0xff);
         if (work->scrollDir == 1) {
             ClActor_SetSequence(work->actors[ACTOR_RIGHT], 13);
-            func_0204c520(work->actors[ACTOR_RIGHT], TRUE);
+            ClActor_SetAutoAnim(work->actors[ACTOR_RIGHT], TRUE);
         } else {
             ClActor_SetSequence(work->actors[ACTOR_LEFT], 12);
-            func_0204c520(work->actors[ACTOR_LEFT], TRUE);
+            ClActor_SetAutoAnim(work->actors[ACTOR_LEFT], TRUE);
         }
         GFL_SndSEPlay(SEQ_SE_MD_02);
         work->subSeq++;
@@ -1860,12 +1860,12 @@ static void MedalBoxApp_UpdateSparkles(MedalBoxApp *work) {
                 ClActor_SetSequence(actors[ACTOR_SPARKLE + i], 4);
                 ClActor_SetSurfacePos(actors[ACTOR_SPARKLE + i], &pos, 0);
                 ClActor_SetVisible(work->actors[ACTOR_SPARKLE + i], TRUE);
-                func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
+                ClActor_SetAutoAnim(actors[ACTOR_SPARKLE + i], TRUE);
             } else {
                 ClActor_SetSequence(actors[ACTOR_SPARKLE + i], 4);
                 ClActor_SetSurfacePos(actors[ACTOR_SPARKLE + i], &pos, 0);
                 ClActor_SetVisible(work->actors[ACTOR_SPARKLE + i], FALSE);
-                func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
+                ClActor_SetAutoAnim(actors[ACTOR_SPARKLE + i], TRUE);
             }
         }
     }
@@ -1898,7 +1898,7 @@ static BOOL MedalBoxApp_SeqExit(MedalBoxApp *work) {
     switch (work->subSeq) {
     case 0:
         ClActor_SetSequence(button, 8);
-        func_0204c520(button, TRUE);
+        ClActor_SetAutoAnim(button, TRUE);
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
         work->subSeq++;
         break;
@@ -1927,7 +1927,7 @@ static BOOL MedalBoxApp_SeqReturn(MedalBoxApp *work) {
     switch (work->subSeq) {
     case 0:
         ClActor_SetSequence(button, 9);
-        func_0204c520(button, TRUE);
+        ClActor_SetAutoAnim(button, TRUE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         work->subSeq++;
         break;
@@ -2053,7 +2053,7 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), FALSE);
         ClActor_SetSequence(work->actors[ACTOR_MENU], 1);
-        func_0204c520(work->actors[ACTOR_MENU], TRUE);
+        ClActor_SetAutoAnim(work->actors[ACTOR_MENU], TRUE);
         // A change of the view keeps the cursor's column
         if (work->shown[column].count != 0 && work->cursorMode == CURSOR_SHOWN) {
             work->nextColumn = work->shown[column].column;

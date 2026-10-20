@@ -1830,7 +1830,7 @@ static void BtlvInput_LoadTypeIcons(BtlvInput *work) {
         s.priority = 0x80 - i;
         work->typeActors[i] =
             ClActor_Create(work->typeUnit, work->chars, work->typePalette, work->typeCellAnims, &s, 1, work->heapId);
-        func_0204c520(work->typeActors[i], FALSE);
+        ClActor_SetAutoAnim(work->typeActors[i], FALSE);
         ClActor_SetVisible(work->typeActors[i], TRUE);
         ClActor_SetPalette(work->typeActors[i], data_ov168_021f3a70[i].palette, 1);
     }
@@ -1901,13 +1901,13 @@ void BtlvInput_SetTypeIconVisible(BtlvInput *work, BOOL visible, int index, int 
     ClActor_SetVisible(work->typeActors[index], visible);
     if (visible) {
         ClActor_SetSequence(work->typeActors[index], sequence);
-        func_0204c520(work->typeActors[index], TRUE);
+        ClActor_SetAutoAnim(work->typeActors[index], TRUE);
         ClActor_SetPalette(work->typeActors[index], data_ov168_021f3a70[index].palette, 1);
     }
 }
 
 void BtlvInput_StartTypeIconAnim(BtlvInput *work, int index) {
-    func_0204c520(work->typeActors[index], TRUE);
+    ClActor_SetAutoAnim(work->typeActors[index], TRUE);
 }
 
 u32 BtlvInput_GetTypeMask(BtlvInput *work) {
@@ -2234,7 +2234,7 @@ static void BtlvInput_StartTileAnim(BtlvInput *work, int set, int which) {
             ClActor_Create(param->unit, work->chars, work->palette, work->cellAnims, &setup, 1, work->heapId);
         ClActor_SetSurfacePos(param->actors[i], &data_ov168_021f3b28[set].pos[i], 1);
         ClActor_SetAffineMode(param->actors[i], 2);
-        func_0204c520(param->actors[i], TRUE);
+        ClActor_SetAutoAnim(param->actors[i], TRUE);
         ClActor_SetSequence(param->actors[i], data_ov168_021f3b28[set].sequences[which]);
     }
     BtlvInput_AddTask(work, GFL_TCBMgrAddTask(work->tcbMgr, BtlvInput_TileAnimTask, param, 0), BtlvInput_TileAnimEnd);
@@ -2820,7 +2820,7 @@ static void BtlvInput_CreatePartyIcons(BtlvInput *work, const BtlvInputCommandPa
         work->iconActors[i].actor = ClActor_Create(work->iconUnit, work->iconChars[i], work->iconPalette,
                                                    work->iconCellAnims, &data_ov168_021f35f2, 1, work->heapId);
         ClActor_SetSurfacePos(work->iconActors[i].actor, &data_ov168_021f3780[work->rule][i], 1);
-        func_0204c520(work->iconActors[i].actor, TRUE);
+        ClActor_SetAutoAnim(work->iconActors[i].actor, TRUE);
         if (param->pokePos == i) {
             ClActor_SetSequence(work->iconActors[i].actor, 1);
         } else if (windows == 0) {
@@ -2891,14 +2891,14 @@ static void BtlvInput_CreateBallSlideActors(BtlvInput *work, int index) {
     pos.x = xs[index - 1] + 304;
     pos.y = ys[index - 1] + 32;
     ClActor_SetSurfacePos(work->actors210[0], &pos, 1);
-    func_0204c520(work->actors210[0], TRUE);
+    ClActor_SetAutoAnim(work->actors210[0], TRUE);
     ClActor_SetSequence(work->actors210[0], index + 14);
     work->actors210[1] = ClActor_Create(work->unit20c, work->chars, work->palette, work->cellAnims,
                                         &data_ov168_021f35f2, 1, work->heapId);
     pos.x = 304;
     pos.y = 32;
     ClActor_SetSurfacePos(work->actors210[1], &pos, 1);
-    func_0204c520(work->actors210[1], TRUE);
+    ClActor_SetAutoAnim(work->actors210[1], TRUE);
     ClActor_SetSequence(work->actors210[1], 14);
     ClActor_SetPalette(work->actors210[1], (u8)palettes[index - 1], 0);
     data = GFL_HeapAllocate(HEAPID_TAIL(work->heapId), sizeof(BtlvInputWorkTask), FALSE, "btlv_input.c", 5461);
@@ -2945,7 +2945,7 @@ static void BtlvInput_CreatePokeListIcons(BtlvInput *work, int side) {
         actors[i].actor = ClActor_Create(work->pokeUnit, work->chars, work->palette, work->cellAnims,
                                          &data_ov168_021f35f2, 1, work->heapId);
         ClActor_SetSurfacePos(actors[i].actor, &pos, 1);
-        func_0204c520(actors[i].actor, TRUE);
+        ClActor_SetAutoAnim(actors[i].actor, TRUE);
         ClActor_SetSequence(actors[i].actor, base + work->pokeEntries[side][i].iconAnim);
         pos.x += step;
     }
@@ -2976,7 +2976,7 @@ static void BtlvInput_CreateCursorActors(BtlvInput *work) {
     for (i = 0; i < 6; i++) {
         work->cursorActors[i].actor = ClActor_Create(work->cursorUnit, work->chars2, work->palette, work->cellAnims2,
                                                      &data_ov168_021f35f2, 1, work->heapId);
-        func_0204c520(work->cursorActors[i].actor, TRUE);
+        ClActor_SetAutoAnim(work->cursorActors[i].actor, TRUE);
         ClActor_SetSequence(work->cursorActors[i].actor, sequences[i]);
         ClActor_SetVisible(work->cursorActors[i].actor, FALSE);
     }
@@ -3024,7 +3024,7 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     pos.x = 128;
     pos.y = 80;
     ClActor_SetSurfacePos(work->actor21c, &pos, 1);
-    func_0204c520(work->actor21c, TRUE);
+    ClActor_SetAutoAnim(work->actor21c, TRUE);
     ClActor_SetSequence(work->actor21c, 20);
 
     strbuf = GFL_StrBufCreate(16, work->heapId);

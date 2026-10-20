@@ -2781,6 +2781,8 @@
 . 0x0204bf98 ClActUnit_Delete
 . 0x0204bfd4 ClActUnit_SetActive
 . 0x0204bfe8 ClActUnit_IsActive
+. 0x0204bff0 ClActUnit_SetVisibleAnimOnly
+. 0x0204c004 ClActUnit_SetSharedParams
 . 0x0204c018 ClActUnit_SetRenderer
 . 0x0204c028 ClActUnit_UseSystemRenderer
 . 0x0204c040 ClActor_Create
@@ -2830,6 +2832,9 @@
 . 0x0204c4f8 ClActor_GetAnimTime
 . 0x0204c504 ClActor_SetAnimFrame
 . 0x0204c510 ClActor_GetAnimFrame
+. 0x0204c520 ClActor_SetAutoAnim
+. 0x0204c534 ClActor_IsAutoAnim
+. 0x0204c53c ClActor_SetAutoAnimSpeed
 . 0x0204c540 ClActor_StartAnim
 . 0x0204c550 ClActor_StopAnim
 . 0x0204c560 ClActor_IsAnimActive
@@ -2837,6 +2842,7 @@
 . 0x0204c584 ClActor_SetPlayMode
 . 0x0204c5b0 ClActor_SetAnimCallback
 . 0x0204c5bc ClActor_ClearAnimCallback
+. 0x0204c5c8 ClActor_SetDrawAnim
 . 0x0204c5e4 ClActRenderer_InitForSystem
 . 0x0204c614 ClActSys_SetUpdating
 . 0x0204c628 ClActSys_IsUpdating

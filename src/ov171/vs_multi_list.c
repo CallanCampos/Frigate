@@ -655,7 +655,7 @@ static void VsMultiList_CreateActors(VsMultiListWork *wk) {
         } else {
             u16 item;
 
-            func_0204c520(wk->actors[i], TRUE);
+            ClActor_SetAutoAnim(wk->actors[i], TRUE);
             ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(wk->pkm[i])), TRUE);
             item = PokeParty_GetParam(wk->pkm[i], PKM_PARAM_ITEM, NULL);
             if (item == 0) {

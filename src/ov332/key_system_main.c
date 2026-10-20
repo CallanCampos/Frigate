@@ -646,7 +646,7 @@ ClActor *KeySystemClAct_Create(KeySystemClAct *clact, u32 id, HeapID heapId) {
     }
     clact->actors[id] = ClActor_Create(clact->unit, clact->resources[1], clact->resources[0], clact->resources[2],
                                        &setup, surface, heapId);
-    func_0204c520(clact->actors[id], autoAnim);
+    ClActor_SetAutoAnim(clact->actors[id], autoAnim);
     ClActor_SetVisible(clact->actors[id], visible);
     ClActor_SetAffineMode(clact->actors[id], affineMode);
     return clact->actors[id];

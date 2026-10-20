@@ -465,10 +465,10 @@ void func_ov194_021c3480(PokemonTradeWork *wk) {
             wk->iconCursors[i][j] =
                 ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                                wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
-            func_0204c520(wk->icons[i][j], FALSE);
+            ClActor_SetAutoAnim(wk->icons[i][j], FALSE);
             ClActor_SetVisible(wk->icons[i][j], FALSE);
             ClActor_SetVisible(wk->iconCursors[i][j], FALSE);
-            func_0204c520(wk->iconCursors[i][j], TRUE);
+            ClActor_SetAutoAnim(wk->iconCursors[i][j], TRUE);
         }
     }
     GFL_ArcToolFree(arc);
@@ -739,7 +739,7 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             }
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
             ClActor_SetPalette(wk->icons[index][i], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
-            func_0204c520(wk->icons[index][i], FALSE);
+            ClActor_SetAutoAnim(wk->icons[index][i], FALSE);
             ClActor_SetVisible(wk->icons[index][i], TRUE);
         }
         if (!PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL) && func_ov194_021c3888(wk, species)) {
@@ -1296,7 +1296,7 @@ void func_ov194_021c46a4(PokemonTradeWork *wk) {
     setup.bgPriority = 0;
     wk->actors[2] = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                                    wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c520(wk->actors[2], FALSE);
+    ClActor_SetAutoAnim(wk->actors[2], FALSE);
     ClActor_SetVisible(wk->actors[2], TRUE);
 }
 
@@ -1321,7 +1321,7 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     setup.bgPriority = 1;
     wk->actors[3] = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                                    wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c520(wk->actors[3], TRUE);
+    ClActor_SetAutoAnim(wk->actors[3], TRUE);
     ClActor_SetVisible(wk->actors[3], TRUE);
     setup.x = 96;
     setup.y = 16;
@@ -1330,7 +1330,7 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     setup.bgPriority = 1;
     wk->actors[4] = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                                    wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c520(wk->actors[4], TRUE);
+    ClActor_SetAutoAnim(wk->actors[4], TRUE);
     if (GCTX_HIDIsUsingTouch()) {
         ClActor_SetVisible(wk->actors[4], FALSE);
     }
@@ -1350,14 +1350,14 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     wk->actors[5] =
         ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON0], wk->objRes[TRADE_OBJRES_PLTT_ICON],
                        wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c520(wk->actors[5], FALSE);
+    ClActor_SetAutoAnim(wk->actors[5], FALSE);
     ClActor_SetVisible(wk->actors[5], TRUE);
     ClActor_SetPalette(wk->actors[5], PokeIcon_GetPaletteOfPkm(pkm0), CLACT_VRAM_SUB);
     iconSetup.x = 160;
     wk->actors[6] =
         ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON1], wk->objRes[TRADE_OBJRES_PLTT_ICON],
                        wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c520(wk->actors[6], FALSE);
+    ClActor_SetAutoAnim(wk->actors[6], FALSE);
     ClActor_SetVisible(wk->actors[6], TRUE);
     ClActor_SetPalette(wk->actors[6], PokeIcon_GetPaletteOfPkm(pkm1), CLACT_VRAM_SUB);
     GFL_ArcToolFree(arc);
@@ -1737,7 +1737,7 @@ void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pk
         ClActor_Create(wk->clactUnit, wk->negoIconChars[side][index], wk->objRes[TRADE_OBJRES_PLTT_NEGO],
                        wk->objRes[TRADE_OBJRES_CELL_NEGO], &setup, vramType, wk->heapId);
     ClActor_SetPalette(wk->negoIcons[side][index], PokeIcon_GetPaletteOfPkm(boxPkm), CLACT_VRAM_SUB);
-    func_0204c520(wk->negoIcons[side][index], FALSE);
+    ClActor_SetAutoAnim(wk->negoIcons[side][index], FALSE);
     ClActor_SetVisible(wk->negoIcons[side][index], visible);
     GFL_ArcToolFree(arc);
 }
@@ -1864,7 +1864,7 @@ void func_ov194_021c551c(PokemonTradeWork *wk, int index) {
             ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                            wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     }
-    func_0204c520(wk->stampButtons[index], TRUE);
+    ClActor_SetAutoAnim(wk->stampButtons[index], TRUE);
     ClActor_SetVisible(wk->stampButtons[index], TRUE);
 }
 
@@ -1897,7 +1897,7 @@ void func_ov194_021c55e4(PokemonTradeWork *wk, u32 index, int side) {
         wk->stamps[side * 2] =
             ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_MAIN], wk->objRes[TRADE_OBJRES_PLTT_MAIN],
                            wk->objRes[TRADE_OBJRES_CELL_MAIN], &setup, CLACT_VRAM_MAIN, wk->heapId);
-        func_0204c520(wk->stamps[side * 2], TRUE);
+        ClActor_SetAutoAnim(wk->stamps[side * 2], TRUE);
         ClActor_SetVisible(wk->stamps[side * 2], TRUE);
     } else {
         ClActor_SetVisible(wk->stamps[side * 2], TRUE);
@@ -1908,7 +1908,7 @@ void func_ov194_021c55e4(PokemonTradeWork *wk, u32 index, int side) {
         wk->stamps[side * 2 + 1] =
             ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_MAIN], wk->objRes[TRADE_OBJRES_PLTT_MAIN],
                            wk->objRes[TRADE_OBJRES_CELL_MAIN], &setup, CLACT_VRAM_MAIN, wk->heapId);
-        func_0204c520(wk->stamps[side * 2 + 1], TRUE);
+        ClActor_SetAutoAnim(wk->stamps[side * 2 + 1], TRUE);
         ClActor_SetVisible(wk->stamps[side * 2 + 1], TRUE);
     } else {
         ClActor_SetSequence(wk->stamps[side * 2 + 1], index);
@@ -1949,7 +1949,7 @@ void func_ov194_021c56f8(PokemonTradeWork *wk, int cursor) {
             ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                            wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     }
-    func_0204c520(wk->negoCursor, TRUE);
+    ClActor_SetAutoAnim(wk->negoCursor, TRUE);
     ClActor_SetVisible(wk->negoCursor, TRUE);
     ClActor_SetSurfacePos(wk->negoCursor, &positions[cursor], CLACT_VRAM_SUB);
 }
@@ -2204,7 +2204,7 @@ void func_ov194_021c5dd8(PokemonTradeWork *wk, u8 x, u8 y) {
     wk->boxCursor = ClActor_Create(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_SUB], wk->objRes[TRADE_OBJRES_PLTT_SUB],
                                    wk->objRes[TRADE_OBJRES_CELL_SUB], &setup, CLACT_VRAM_SUB, wk->heapId);
     ClActor_SetVisible(wk->boxCursor, TRUE);
-    func_0204c520(wk->boxCursor, TRUE);
+    ClActor_SetAutoAnim(wk->boxCursor, TRUE);
     wk->boxCursorDone = FALSE;
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;

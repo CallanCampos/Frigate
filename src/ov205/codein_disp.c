@@ -163,13 +163,13 @@ void CodeInDisp_AddCursorActors(CodeInWork *wk) {
                        wk->cellAnimRes[CODEIN_RES_CURSOR], &setup, 0, HEAPID_CODEIN);
     CodeInDisp_SetCodeCursor(wk, 0);
     ClActor_SetSequence(wk->cur[CODEIN_CURSOR_CODE].actor, 0);
-    func_0204c520(wk->cur[CODEIN_CURSOR_CODE].actor, TRUE);
+    ClActor_SetAutoAnim(wk->cur[CODEIN_CURSOR_CODE].actor, TRUE);
     wk->cur[CODEIN_CURSOR_KEY].move.x = 0;
     wk->cur[CODEIN_CURSOR_KEY].move.y = 0;
     wk->cur[CODEIN_CURSOR_KEY].state = 1;
     CodeInDisp_SetKeyCursor(wk, 0);
     ClActor_SetSequence(wk->cur[CODEIN_CURSOR_KEY].actor, wk->cur[CODEIN_CURSOR_KEY].state);
-    func_0204c520(wk->cur[CODEIN_CURSOR_KEY].actor, TRUE);
+    ClActor_SetAutoAnim(wk->cur[CODEIN_CURSOR_KEY].actor, TRUE);
     ClActor_SetObjMode(wk->cur[CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
     wk->cur[CODEIN_CURSOR_PRESS].move.x = 0;
     wk->cur[CODEIN_CURSOR_PRESS].move.y = 0;
@@ -177,7 +177,7 @@ void CodeInDisp_AddCursorActors(CodeInWork *wk) {
     CodeInDisp_SetKeyCursor(wk, 0);
     ClActor_SetSequence(wk->cur[CODEIN_CURSOR_PRESS].actor, wk->cur[CODEIN_CURSOR_PRESS].state);
     ClActor_SetObjMode(wk->cur[CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
-    func_0204c520(wk->cur[CODEIN_CURSOR_PRESS].actor, TRUE);
+    ClActor_SetAutoAnim(wk->cur[CODEIN_CURSOR_PRESS].actor, TRUE);
     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_KEY, FALSE);
     CodeInDisp_SetCursorVisible(wk, CODEIN_CURSOR_PRESS, FALSE);
 }

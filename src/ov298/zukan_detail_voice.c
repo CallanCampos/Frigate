@@ -632,7 +632,7 @@ static void ZukanDetailVoice_CreateActors(ZukanDetailVoiceParam *param, ZukanDet
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
-    func_0204c520(wk->actors[ACTOR_ICON], TRUE);
+    ClActor_SetAutoAnim(wk->actors[ACTOR_ICON], TRUE);
 }
 
 static void ZukanDetailVoice_FreeActors(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,

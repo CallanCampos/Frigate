@@ -102,7 +102,7 @@ void DpcObj_Animate(DendouPCWork *wk) {
     u32 i;
 
     for (i = 0; i < DPCOBJ_MAX; i++) {
-        if (wk->actors[i] != NULL && func_0204c534(wk->actors[i]) != TRUE) {
+        if (wk->actors[i] != NULL && ClActor_IsAutoAnim(wk->actors[i]) != TRUE) {
             ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
         }
     }
@@ -118,7 +118,7 @@ void DpcObj_SetVisible(DendouPCWork *wk, u32 id, BOOL visible) {
 void DpcObj_SetAnime(DendouPCWork *wk, u32 id, u32 sequence) {
     ClActor_SetAnimTime(wk->actors[id], 0);
     ClActor_SetSequence(wk->actors[id], sequence);
-    func_0204c520(wk->actors[id], TRUE);
+    ClActor_SetAutoAnim(wk->actors[id], TRUE);
 }
 
 BOOL DpcObj_IsAnimating(DendouPCWork *wk, u32 id) {

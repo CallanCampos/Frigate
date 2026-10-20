@@ -64,7 +64,7 @@ void WorldTrade_SubLcdActorAdd(WorldTradeWork *wk) {
     wk->subAct[0] = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR],
                                    wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT],
                                    wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-    func_0204c520(wk->subAct[0], TRUE);
+    ClActor_SetAutoAnim(wk->subAct[0], TRUE);
     ClActor_SetBgPriority(wk->subAct[0], 2);
     ClActor_SetSequence(wk->subAct[0], 3);
     ClActor_SetVisible(wk->subAct[0], TRUE);
@@ -74,7 +74,7 @@ void WorldTrade_SubLcdActorAdd(WorldTradeWork *wk) {
             ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
                            wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
                            wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-        func_0204c520(wk->subAct[1 + i], TRUE);
+        ClActor_SetAutoAnim(wk->subAct[1 + i], TRUE);
         ClActor_SetSequence(wk->subAct[1 + i], i * 4 + 14);
         ClActor_SetVisible(wk->subAct[1 + i], FALSE);
         SubLcd_ActPos(wk->subAct[1 + i], sSubLcdObjPos[i].x, sSubLcdObjPos[i].y);
@@ -86,7 +86,7 @@ void WorldTrade_SubLcdActorAdd(WorldTradeWork *wk) {
         ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
                        wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
                        wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-    func_0204c520(wk->partnerCursorAct, TRUE);
+    ClActor_SetAutoAnim(wk->partnerCursorAct, TRUE);
     ClActor_SetSequence(wk->partnerCursorAct, 43);
     ClActor_SetVisible(wk->partnerCursorAct, FALSE);
     SubLcd_ActPos(wk->partnerCursorAct, 128, 82);
@@ -95,7 +95,7 @@ void WorldTrade_SubLcdActorAdd(WorldTradeWork *wk) {
     wk->promptDsAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
                                      wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
                                      wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-    func_0204c520(wk->promptDsAct, TRUE);
+    ClActor_SetAutoAnim(wk->promptDsAct, TRUE);
     ClActor_SetSequence(wk->promptDsAct, 42);
     WorldTrade_ActPos(wk->promptDsAct, 55, wk->drawOffset + 168);
     ClActor_SetVisible(wk->promptDsAct, FALSE);

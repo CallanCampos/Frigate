@@ -63,7 +63,7 @@ void MailBox_CreateOBJs(MailBoxWork *work) {
     MailBox_LoadActorResources(work->view);
     for (i = 0; i < 8; i++) {
         work->view->actors[i] = MailBox_CreateActor(work->view, &sActorTemplates[i]);
-        func_0204c520(work->view->actors[i], TRUE);
+        ClActor_SetAutoAnim(work->view->actors[i], TRUE);
     }
     if (work->view->mailCount <= MAILBOX_PAGE_SIZE) {
         MailBox_SetActorVisible(work->view, MAILBOX_ACTOR_PREV_PAGE, FALSE);

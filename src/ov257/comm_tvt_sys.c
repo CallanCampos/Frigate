@@ -601,7 +601,7 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
         ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, 4), CommTvt_GetObjResource(sys, 0),
                        CommTvt_GetObjResource(sys, 8), &setup, 0, sys->heapId);
     ClActor_SetVisible(sys->talkerCursor, FALSE);
-    func_0204c520(sys->talkerCursor, TRUE);
+    ClActor_SetAutoAnim(sys->talkerCursor, TRUE);
 
     if (getTrainerGender(player) == GENDER_MALE) {
         file = GFL_G2DIOReadNCLRArc(sys->arc, 7, &palette, sys->heapId);

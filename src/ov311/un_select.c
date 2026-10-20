@@ -1012,7 +1012,7 @@ static ClActor *UnSelect_CreateActor(ClActUnit *unit, UnSelectActorTemplate *tem
     ClActor *actor = ClActor_Create(unit, template->chars, template->palette, template->cells, &template->setup,
                                     template->surface, HEAPID_UN_SELECT);
 
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     return actor;
 }
 

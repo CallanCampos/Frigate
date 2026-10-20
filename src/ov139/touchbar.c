@@ -342,7 +342,7 @@ static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *
     icon->anim = icon->item.anims[0];
     setup.sequence = icon->item.anims[0];
     icon->actor = ClActor_Create(unit, chars, palette, cellAnims, &setup, surface, heapId);
-    func_0204c520(icon->actor, TRUE);
+    ClActor_SetAutoAnim(icon->actor, TRUE);
     switch (icon->kind) {
     case TOUCHBAR_KIND_PRESS:
         icon->onTouch = TouchBarIcon_OnTouchPress;

@@ -708,8 +708,8 @@ static ClActor *BeaconView_AddActor(BeaconViewWork *work, u32 chars, u32 palette
     setup.bgPriority = bgPriority;
     setup.priority = priority;
     actor = ClActor_Create(work->clUnit, chars, palette, cellAnims, &setup, 0, work->resHeapId);
-    func_0204c520(actor, FALSE);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
+    ClActor_SetDrawAnim(actor, FALSE);
     return actor;
 }
 
@@ -727,7 +727,7 @@ static void BeaconView_AddScreenActors(BeaconViewWork *work) {
             work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0], sBeaconViewActorSetups[i].x,
             sBeaconViewActorSetups[i].y, sBeaconViewActorSetups[i].sequence, sBeaconViewActorSetups[i].bgPriority, 2);
         ClActor_SetVisible(work->actors[i], TRUE);
-        func_0204c520(work->actors[i], i < BEACON_VIEW_ACTOR_UP ? TRUE : FALSE);
+        ClActor_SetAutoAnim(work->actors[i], i < BEACON_VIEW_ACTOR_UP ? TRUE : FALSE);
     }
 }
 
@@ -770,7 +770,7 @@ static void BeaconView_InitPanel(BeaconViewWork *work, u8 id) {
                                        work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_PALETTE].ids[0],
                                        work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CELLS].ids[0],
                                        panel->x + 188, panel->y + 12, 22, 3, id + 11);
-    func_0204c520(panel->medal, TRUE);
+    ClActor_SetAutoAnim(panel->medal, TRUE);
     for (i = 0; i < BEACON_VIEW_PANEL_DIGITS; i++) {
         panel->digits[i] =
             BeaconView_AddActor(work, work->res[BEACON_VIEW_RES_COMMON].lists[BEACON_VIEW_RES_CHARS].ids[0],

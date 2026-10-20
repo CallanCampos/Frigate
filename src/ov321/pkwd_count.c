@@ -659,7 +659,7 @@ static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCou
         if (entries->flags & 1) {
             animated = TRUE;
         }
-        func_0204c520(actors[i], animated);
+        ClActor_SetAutoAnim(actors[i], animated);
         if (entries->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -710,11 +710,11 @@ static void PkwdCount_PlayAnim(PkwdCountWork *wk, int isSub, int index, u32 sequ
     if (isSub == 0) {
         if (index < MAIN_ACTOR_COUNT) {
             ClActor_SetSequence(wk->mainActors[index], (u16)sequence);
-            func_0204c520(wk->mainActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->mainActors[index], TRUE);
         }
     } else if (index < SUB_ACTOR_COUNT) {
         ClActor_SetSequence(wk->subActors[index], (u16)sequence);
-        func_0204c520(wk->subActors[index], TRUE);
+        ClActor_SetAutoAnim(wk->subActors[index], TRUE);
     }
 }
 

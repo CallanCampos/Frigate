@@ -314,9 +314,9 @@ static ClActor *PMSDrawRes_CreateIcon(PMSDrawRes *res, HeapID heapId) {
     ClActor *icon = ClActor_Create(res->unit, res->chars, res->palette, res->cellAnims, &setup, res->vramType, heapId);
 
     ClActor_SetVisible(icon, FALSE);
-    func_0204c520(icon, TRUE);
+    ClActor_SetAutoAnim(icon, TRUE);
     if (GCTX_HIDGetUpdateRate() == 30) {
-        func_0204c53c(icon, FX32_CONST(2));
+        ClActor_SetAutoAnimSpeed(icon, FX32_CONST(2));
     }
     return icon;
 }

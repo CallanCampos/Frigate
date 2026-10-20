@@ -802,7 +802,7 @@ static void BChoiceMain_CreateActors(BChoiceWork *work, u32 surface, const BChoi
         if (setups->flags & 1) {
             animated = TRUE;
         }
-        func_0204c520(actors[i], animated);
+        ClActor_SetAutoAnim(actors[i], animated);
         if (setups->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }

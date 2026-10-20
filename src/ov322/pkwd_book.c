@@ -1347,7 +1347,7 @@ static void PkwdBook_CreateActors(PkwdBookWork *wk, u32 surface, const PkwdBookA
         if (entries->flags & 1) {
             animated = TRUE;
         }
-        func_0204c520(actors[i], animated);
+        ClActor_SetAutoAnim(actors[i], animated);
         if (entries->flags & 2) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -1424,27 +1424,27 @@ static void PkwdBook_PlayAnim(PkwdBookWork *wk, int group, int index, u32 sequen
     if (group == GROUP_TRAINER) {
         if (index < TRAINER_ACTOR_COUNT) {
             ClActor_SetSequence(wk->trainerActors[index], (u16)sequence);
-            func_0204c520(wk->trainerActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->trainerActors[index], TRUE);
         }
     } else if (group == GROUP_BAR) {
         if (index < BAR_ACTOR_COUNT) {
             ClActor_SetSequence(wk->barActors[index], (u16)sequence);
-            func_0204c520(wk->barActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->barActors[index], TRUE);
         }
     } else if (group == GROUP_POKE_ICON) {
         if (index < POKE_ICON_COUNT) {
             ClActor_SetSequence(wk->pokeIcons[index], (u16)sequence);
-            func_0204c520(wk->pokeIcons[index], TRUE);
+            ClActor_SetAutoAnim(wk->pokeIcons[index], TRUE);
         }
     } else if (group == GROUP_TYPE_ICON) {
         if (index < TYPE_ICON_COUNT) {
             ClActor_SetSequence(wk->typeIcons[index], (u16)sequence);
-            func_0204c520(wk->typeIcons[index], TRUE);
+            ClActor_SetAutoAnim(wk->typeIcons[index], TRUE);
         }
     } else if (group == GROUP_MARK) {
         if (index < MARK_ACTOR_COUNT) {
             ClActor_SetSequence(wk->markActors[index], (u16)sequence);
-            func_0204c520(wk->markActors[index], TRUE);
+            ClActor_SetAutoAnim(wk->markActors[index], TRUE);
         }
     }
 }

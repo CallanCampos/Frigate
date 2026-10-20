@@ -481,17 +481,17 @@ static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, 
     setup.bgPriority = 0;
     menu->cursor =
         ClActor_Create(menu->actUnit, menu->menuChars, menu->menuPalette, menu->menuCellAnims, &setup, 0, menu->heapId);
-    func_0204c53c(menu->cursor, FX32_ONE);
-    func_0204c520(menu->cursor, TRUE);
+    ClActor_SetAutoAnimSpeed(menu->cursor, FX32_ONE);
+    ClActor_SetAutoAnim(menu->cursor, TRUE);
     ClActor_SetBgPriority(menu->cursor, 2);
     setup.x = 0xe0;
     setup.y = 0xa8;
     menu->returnButton = ClActor_Create(menu->actUnit, menu->commonChars, menu->commonPalette, menu->commonCellAnims,
                                         &setup, 0, menu->heapId);
-    func_0204c53c(menu->returnButton, FX32_ONE);
-    func_0204c520(menu->returnButton, TRUE);
+    ClActor_SetAutoAnimSpeed(menu->returnButton, FX32_ONE);
+    ClActor_SetAutoAnim(menu->returnButton, TRUE);
     ClActor_SetVisible(menu->returnButton, TRUE);
-    func_0204c53c(menu->returnButton, FX32_CONST(2));
+    ClActor_SetAutoAnimSpeed(menu->returnButton, FX32_CONST(2));
 }
 
 void FieldMenu_LoadBar(HeapID heapId, BOOL hideBg4) {
@@ -824,8 +824,8 @@ static void FieldMenu_CreateItem(FieldMenu *menu, FieldMenuItem *item, const Fie
         actorSetup.affineMode = 2;
         item->icon = ClActor_CreateEx(menu->actUnit, item->chars, menu->menuPalette, item->cellAnims, &actorSetup, 0,
                                       menu->heapId);
-        func_0204c53c(item->icon, FX32_ONE);
-        func_0204c520(item->icon, TRUE);
+        ClActor_SetAutoAnimSpeed(item->icon, FX32_ONE);
+        ClActor_SetAutoAnim(item->icon, TRUE);
         ClActor_SetSequence(item->icon, 0);
         if (item->itemId == FIELD_MENU_ITEM_NONE) {
             ClActor_SetVisible(item->icon, FALSE);

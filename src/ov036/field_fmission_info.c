@@ -209,8 +209,8 @@ static void FieldFMissionInfo_LoadResources(FieldFMissionInfo *info, ArcTool *ar
         info->renderer = ClActRenderer_Create(&surface, 1, info->heapId);
     }
     ClActUnit_SetRenderer(info->unit, info->renderer);
-    func_0204bff0(info->unit, TRUE);
-    func_0204c004(info->unit, TRUE);
+    ClActUnit_SetVisibleAnimOnly(info->unit, TRUE);
+    ClActUnit_SetSharedParams(info->unit, TRUE);
     info->palette = ClActSys_LoadPlttRange(arc, FMISSION_FILE_PALETTE, CLACT_VRAM_MAIN, 160, 0, 1, info->heapId);
     info->chars = ClActSys_LoadChars(arc, FMISSION_FILE_CHARS, TRUE, CLACT_VRAM_MAIN, info->heapId);
     info->cellAnims = ClActSys_LoadCellAnims(arc, FMISSION_FILE_CELLS, FMISSION_FILE_ANIMS, info->heapId);
@@ -237,8 +237,8 @@ static ClActor *FieldFMissionInfo_CreateActor(FieldFMissionInfo *info, s16 x, s1
     setup.priority = priority;
     actor = ClActor_Create(info->unit, info->chars, info->palette, info->cellAnims, &setup, CLACT_SURFACE_MAIN,
                            info->heapId);
-    func_0204c520(actor, FALSE);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
+    ClActor_SetDrawAnim(actor, FALSE);
     ClActor_SetVisible(actor, FALSE);
     return actor;
 }
@@ -264,11 +264,11 @@ static void FieldFMissionInfo_CreateActors(FieldFMissionInfo *info) {
             FieldFMissionInfo_CreateActor(info, (i + FMISSION_TIME_DIGITS) * 8 + 209, 4, FMISSION_SEQ_DIGIT, 1);
     }
     info->actors[FMISSION_ACTOR_COLON] = FieldFMissionInfo_CreateActor(info, 219, 4, FMISSION_SEQ_COLON, 1);
-    func_0204c520(info->actors[FMISSION_ACTOR_COLON], TRUE);
+    ClActor_SetAutoAnim(info->actors[FMISSION_ACTOR_COLON], TRUE);
     info->actors[FMISSION_ACTOR_SCORE_FLASH] = FieldFMissionInfo_CreateActor(info, 40, 172, FMISSION_SEQ_FLASH, 0);
     info->actors[FMISSION_ACTOR_TIME_FLASH] = FieldFMissionInfo_CreateActor(info, 208, 4, FMISSION_SEQ_FLASH, 0);
-    func_0204c520(info->actors[FMISSION_ACTOR_SCORE_FLASH], TRUE);
-    func_0204c520(info->actors[FMISSION_ACTOR_TIME_FLASH], TRUE);
+    ClActor_SetAutoAnim(info->actors[FMISSION_ACTOR_SCORE_FLASH], TRUE);
+    ClActor_SetAutoAnim(info->actors[FMISSION_ACTOR_TIME_FLASH], TRUE);
     info->actors[FMISSION_ACTOR_SCORE_GAIN] = FieldFMissionInfo_CreateActor(info, 104, 180, FMISSION_SEQ_SCORE_GAIN, 2);
     info->actors[FMISSION_ACTOR_TIME_GAIN] = FieldFMissionInfo_CreateActor(info, 104, 4, FMISSION_SEQ_TIME_GAIN, 2);
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {

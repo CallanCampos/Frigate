@@ -485,7 +485,7 @@ static void MysteryCardView_LoadGraphics(MysteryCardView *view, HeapID heapId) {
         }
         view->arrows[i] =
             ClActor_Create(view->setup.unit, view->chars, view->palette, view->cellAnims, &actorSetup, 0, heapId);
-        func_0204c520(view->arrows[i], TRUE);
+        ClActor_SetAutoAnim(view->arrows[i], TRUE);
         ClActor_SetVisible(view->arrows[i], FALSE);
         if (i == 0) {
             ClActor_SetFlip(view->arrows[i], 1, TRUE);

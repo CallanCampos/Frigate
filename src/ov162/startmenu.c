@@ -1288,7 +1288,7 @@ static void StartMenu_InitObj(StartMenuWork *wk) {
     for (i = 0; i <= 3; i++) {
         wk->actors[i] = ClActor_Create(wk->clactUnit, wk->chars[OBJ_RES_NEW], wk->palettes[OBJ_RES_NEW],
                                        wk->cellAnims[OBJ_RES_NEW], &sNewActorSetup, 0, HEAPID_STARTMENU);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
         ClActor_SetVisible(wk->actors[i], FALSE);
     }
     wk->actors[ACTOR_WFC_SETTINGS] =

@@ -414,7 +414,7 @@ static void FMissionAppDraw_AddActors(FMissionApp *work, u32 vramType, const FMi
         if (setups->flags & ACTOR_AUTO_ANIM) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (setups->flags & ACTOR_FLIP_Y) {
             ClActor_SetFlip(actors[i], 1, TRUE);
         }
@@ -508,13 +508,13 @@ static void FMissionAppDraw_FreeObj(FMissionApp *work) {
 void FMissionAppDraw_SetActorAnim(FMissionApp *work, int type, int index, u32 sequence) {
     if (type == FMISSION_APP_ACTOR_UPPER) {
         ClActor_SetSequence(work->upperActors[index], (u16)sequence);
-        func_0204c520(work->upperActors[index], TRUE);
+        ClActor_SetAutoAnim(work->upperActors[index], TRUE);
     } else if (type == FMISSION_APP_ACTOR_LOWER) {
         ClActor_SetSequence(work->lowerActors[index], (u16)sequence);
-        func_0204c520(work->lowerActors[index], TRUE);
+        ClActor_SetAutoAnim(work->lowerActors[index], TRUE);
     } else if (type == FMISSION_APP_ACTOR_RECORD) {
         ClActor_SetSequence(work->recordActors[index], (u16)sequence);
-        func_0204c520(work->recordActors[index], TRUE);
+        ClActor_SetAutoAnim(work->recordActors[index], TRUE);
     }
 }
 

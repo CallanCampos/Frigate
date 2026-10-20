@@ -1298,7 +1298,7 @@ static void MonolithMission_CreateIcons(MonolithScreenParam *screen, MonolithMis
         mfw->icons[i] =
             ClActor_Create(screen->work->clactUnit, screen->work->actorRes[1].chars, screen->work->actorRes[1].palette,
                            screen->work->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
-        func_0204c520(mfw->icons[i], TRUE);
+        ClActor_SetAutoAnim(mfw->icons[i], TRUE);
         if (icon->palette != 0) {
             ClActor_SetPalette(mfw->icons[i], (u8)icon->palette, TRUE);
         }
@@ -1328,7 +1328,7 @@ static void MonolithMission_SetIconVisible(MonolithMissionWork *mfw, int index, 
 
 static void MonolithMission_SetIconSequence(MonolithMissionWork *mfw, int index, int sequence) {
     ClActor_SetSequence(mfw->icons[index], sequence);
-    func_0204c520(mfw->icons[index], TRUE);
+    ClActor_SetAutoAnim(mfw->icons[index], TRUE);
 }
 
 // Shows the markers of the new missions among the rows on the screen

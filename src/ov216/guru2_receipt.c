@@ -708,7 +708,7 @@ static void Guru2Receipt_CreateActors(Guru2ReceiptWork *wk) {
         wk->actors[i] = ClActor_Create(wk->actorUnit, wk->resources[GURU2_RECEIPT_RES_CHAR + i],
                                        wk->resources[GURU2_RECEIPT_RES_PLTT + i], wk->resources[GURU2_RECEIPT_RES_CELL],
                                        &setup, 0, HEAPID_GURU2);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
         ClActor_SetSequence(wk->actors[i], 0);
         ClActor_SetVisible(wk->actors[i], FALSE);
     }

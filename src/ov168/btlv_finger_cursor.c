@@ -76,7 +76,7 @@ BOOL BtlvFingerCursor_Start(BtlvFingerCursor *cursor, s32 x, s32 y, u32 wait, s3
         ClActor_CreateEx(cursor->unit, cursor->chars, cursor->palette, cursor->cellAnims, &setup, 1, cursor->heapId);
     ClActor_SetSequence(cursor->actor, 0);
     ClActor_SetAnimTime(cursor->actor, 0);
-    func_0204c520(cursor->actor, TRUE);
+    ClActor_SetAutoAnim(cursor->actor, TRUE);
     ClActor_SetVisible(cursor->actor, TRUE);
     if (wait != 0) {
         cursor->wait = wait;

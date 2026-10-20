@@ -2158,7 +2158,7 @@ static void func_ov194_021ba5f0(PokemonTradeWork *wk) {
     if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
         if (wk->unk1088) {
             if (x >= 64 && x < 192 && y >= 168 && y < 188) {
-                func_0204c520(wk->actors[2], TRUE);
+                ClActor_SetAutoAnim(wk->actors[2], TRUE);
                 wk->scrollSpeed = (x - wk->scrollTouchX) * 2;
                 wk->scrollTouchX = x;
                 wk->scrollX -= wk->scrollSpeed;
@@ -2504,7 +2504,7 @@ static void func_ov194_021babc4(PokemonTradeWork *wk) {
         }
         wk->unk1088 = 0;
         wk->unkF5C = 0;
-        func_0204c520(wk->actors[2], FALSE);
+        ClActor_SetAutoAnim(wk->actors[2], FALSE);
     }
     func_ov194_021ba5f0(wk);
     if (GFL_HIDIsTouchHeld()) {

@@ -499,7 +499,7 @@ static void MicTest_CreateActors(MicTestWork *wk, HeapID heapId) {
         wk->actors[i] = ClActor_Create(wk->unit, wk->resources[actor->resource], wk->resources[actor->resource + 1],
                                        wk->resources[actor->resource + 2], &sMicTestActorSetups[actor->setup],
                                        (u16)actor->surface, heapId);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
     for (i = 0; i < NOTE_COUNT; i++) {
         ClActor_SetVisible(wk->actors[ACTOR_NOTE_FIRST + i], FALSE);

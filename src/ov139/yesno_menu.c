@@ -114,7 +114,7 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
                                                TwoChoiceMenu_GetActorPos(menu->cursor, i, 1), i, menu->heapId);
         ClActor_SetBgPriority(menu->actors[i], menu->actorPriority);
         ClActor_SetVisible(menu->actors[i], FALSE);
-        func_0204c520(menu->actors[i], FALSE);
+        ClActor_SetAutoAnim(menu->actors[i], FALSE);
     }
     if (menu->isSub == FALSE) {
         GFL_BGSysSetBGEnabledA(0x10, TRUE);
@@ -180,7 +180,7 @@ void TwoChoiceMenu_Open(TwoChoiceMenu *menu, StrBuf *first, StrBuf *second) {
     if (!GCTX_HIDIsUsingTouch()) {
         for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
             ClActor_SetVisible(menu->actors[i], TRUE);
-            func_0204c520(menu->actors[i], TRUE);
+            ClActor_SetAutoAnim(menu->actors[i], TRUE);
         }
     }
 }
@@ -196,7 +196,7 @@ void TwoChoiceMenu_Close(TwoChoiceMenu *menu) {
     BmpWin_Transfer(menu->secondWindow);
     for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
         ClActor_SetVisible(menu->actors[i], FALSE);
-        func_0204c520(menu->actors[i], FALSE);
+        ClActor_SetAutoAnim(menu->actors[i], FALSE);
     }
     menu->state = TWO_CHOICE_MENU_STATE_CLOSED;
 }
@@ -284,7 +284,7 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
         if (!decided && GCTX_HIDIsUsingTouch() == TRUE && keys != 0) {
             for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
                 ClActor_SetVisible(menu->actors[i], TRUE);
-                func_0204c520(menu->actors[i], TRUE);
+                ClActor_SetAutoAnim(menu->actors[i], TRUE);
             }
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             GCTX_HIDSetUsingTouch(FALSE);
@@ -292,7 +292,7 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
         if (decided) {
             for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
                 ClActor_SetVisible(menu->actors[i], FALSE);
-                func_0204c520(menu->actors[i], FALSE);
+                ClActor_SetAutoAnim(menu->actors[i], FALSE);
             }
             menu->state = TWO_CHOICE_MENU_STATE_FLASHING;
             menu->flashPalette = 0;

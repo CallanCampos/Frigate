@@ -362,7 +362,7 @@ static void CGHelp_LoadGraphics(CGHelp *help) {
         help->actors[i] = ClActor_Create(help->clActUnit, help->chars[i], help->palette, help->cellAnims[i],
                                          &actorSetup, CLACT_SURFACE_SUB, help->heapId);
         ClActor_SetVisible(help->actors[i], FALSE);
-        func_0204c520(help->actors[i], FALSE);
+        ClActor_SetAutoAnim(help->actors[i], FALSE);
     }
 }
 

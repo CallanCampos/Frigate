@@ -1495,12 +1495,12 @@ static void WazaOshie_InitActors(WazaOshieWork *work, ArcTool *arc) {
         work->actors[i] = ClActor_Create(
             work->unit, work->chars[sWazaOshieActors[i].chars], work->palettes[sWazaOshieActors[i].palette],
             work->cellAnims[sWazaOshieActors[i].cellAnims], &setup, sWazaOshieActors[i].surface, HEAPID_WAZA_OSHIE);
-        func_0204c520(work->actors[i], FALSE);
+        ClActor_SetAutoAnim(work->actors[i], FALSE);
     }
-    func_0204c520(work->actors[ACTOR_RETURN], TRUE);
-    func_0204c520(work->actors[ACTOR_CURSOR], TRUE);
-    func_0204c520(work->actors[ACTOR_ARROW_UP], TRUE);
-    func_0204c520(work->actors[ACTOR_ARROW_DOWN], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_RETURN], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_CURSOR], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_ARROW_UP], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_ARROW_DOWN], TRUE);
 }
 
 // Moves the cursor's actor to a row of the list, an arrow or the buttons, with the frame for each

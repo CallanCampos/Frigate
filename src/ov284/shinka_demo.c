@@ -1027,7 +1027,7 @@ static void ShinkaDemo_InitActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     for (i = 0; i < ACTOR_COUNT; i++) {
         wk->actors[i] = ClActor_Create(ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
                                        wk->cellAnims, &sActorSetups[i], 0, wk->graphicHeapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
     }
     wk->actorsCreated = TRUE;
 }
@@ -1052,7 +1052,7 @@ static void ShinkaDemo_StartActors(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     if (wk->actorsCreated) {
         for (i = 0; i < ACTOR_COUNT; i++) {
             ClActor_SetAnimFrame(wk->actors[i], 0);
-            func_0204c520(wk->actors[i], TRUE);
+            ClActor_SetAutoAnim(wk->actors[i], TRUE);
         }
     }
 }
