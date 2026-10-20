@@ -61,11 +61,13 @@ struct LinkFestival {
     // The frames between two calls of func_0202d5cc, and those left until the next
     u16 beaconInterval;
     u16 beaconTimer;
-    u16 unk10;
-    u16 unk12;
-    u16 unk14;
+    // The total and the player's score that the field's mission panel shows, and the seconds gained that it has not
+    // shown yet
+    u16 shownTotal;
+    u16 shownScore;
+    u16 secondsGained;
     u16 zoneId;
-    // The total that unk14 was last raised for
+    // The total that secondsGained was last raised for
     u16 lastTotal;
     ArcTool *archive;
     // File 0 of the archive: every mission's FestMissionHeader (field/fest_mission_data.h)
@@ -73,13 +75,14 @@ struct LinkFestival {
     FestMissionConfig config;
     // The two parts of config
     FestMissionInfo *info;
-    void *unk54;
+    // The FestMissionHeader at the start of config
+    void *missionHeader;
     FestMissionRecord records[LINK_FESTIVAL_RECORD_COUNT];
     // The current mission
     FestMissionRecord current;
     LinkFestivalBest *best;
-    // A second log, which func_02014708 gives
-    FestMissionLog unk37C;
+    // The log that the mission viewer lists, which it moves the entries of log into
+    FestMissionLog viewLog;
     FestMissionLog log;
     FestMissionPassPowers passPowers;
     FestMissionOffers offers;

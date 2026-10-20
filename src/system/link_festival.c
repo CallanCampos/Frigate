@@ -39,7 +39,7 @@ LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys) {
     festival->headers = FestMissionData_LoadHeaders(festival->archive, heapId);
     ClearFesMissionCfg(&festival->config);
     festival->info = (FestMissionInfo *)&festival->config;
-    festival->unk54 = &festival->config.type;
+    festival->missionHeader = &festival->config.type;
     festival->best = LinkFestivalBest_Create(heapId);
     ClearLinkFestivalData(festival);
     festival->beaconInterval = 600;
@@ -65,7 +65,7 @@ void LinkFestival_Update(LinkFestival *festival) {
                 u32 added = FestMissionConfig_AddSeconds(&festival->config, gain);
 
                 festival->lastTotal = total;
-                festival->unk14 += (u16)added;
+                festival->secondsGained += (u16)added;
             }
         }
         LinkFestival_TickMissionBeacon(festival);
@@ -152,7 +152,7 @@ void *LinkFestival_GetLog(LinkFestival *festival) {
 }
 
 void *func_02014708(LinkFestival *festival) {
-    return &festival->unk37C;
+    return &festival->viewLog;
 }
 
 void *LinkFestival_GetPassPowers(LinkFestival *festival) {
@@ -210,24 +210,24 @@ u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival) {
 }
 
 u16 func_02014828(LinkFestival *festival) {
-    return festival->unk10;
+    return festival->shownTotal;
 }
 
 u16 func_0201482c(LinkFestival *festival) {
-    return festival->unk12;
+    return festival->shownScore;
 }
 
 void func_02014830(LinkFestival *festival, u16 value) {
-    festival->unk10 = value;
-    festival->unk12 = festival->config.missionId;
+    festival->shownTotal = value;
+    festival->shownScore = festival->config.missionId;
 }
 
 u16 func_02014838(LinkFestival *festival) {
-    return festival->unk14;
+    return festival->secondsGained;
 }
 
 void func_0201483c(LinkFestival *festival) {
-    festival->unk14 = 0;
+    festival->secondsGained = 0;
 }
 
 // Whether the player came to a new zone from outside the Entralink
@@ -459,15 +459,15 @@ static void ClearLinkFestivalData(LinkFestival *festival) {
     festival->recordCount = 0;
     festival->recordIndex = 0;
     festival->beaconTimer = 0;
-    festival->unk10 = 0;
-    festival->unk12 = 0;
-    festival->unk14 = 0;
+    festival->shownTotal = 0;
+    festival->shownScore = 0;
+    festival->secondsGained = 0;
     festival->lastTotal = 0;
     festival->zoneId = 0xffff;
     MI_CpuFill8(festival->entries, 0, sizeof(festival->entries));
     festival->bestChanged = FALSE;
     FestMissionLog_Clear(&festival->log);
-    FestMissionLog_Clear(&festival->unk37C);
+    FestMissionLog_Clear(&festival->viewLog);
     FestMissionPassPowers_Clear(&festival->passPowers);
     LinkFestival_SetState(festival, 0);
 }
