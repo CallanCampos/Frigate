@@ -7,6 +7,7 @@
 #include "dwc_util_main.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_test_connect.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_effect.h"

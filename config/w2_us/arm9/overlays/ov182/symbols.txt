@@ -1644,7 +1644,7 @@ sErrorCode kind:bss addr:0x021c4148
 sAddressSettings kind:bss addr:0x021c414c
 data_ov182_021c4114 kind:bss addr:0x021c4154
 sTestProgressPassed kind:bss addr:0x021c4158
-data_ov182_021c411c kind:bss addr:0x021c415c
+sTestConnectPassed kind:bss addr:0x021c415c
 data_ov182_021c4120 kind:bss addr:0x021c4160
 data_ov182_021c4124 kind:bss addr:0x021c4164
 data_ov182_021c4128 kind:bss addr:0x021c4168

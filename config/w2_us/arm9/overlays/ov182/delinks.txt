@@ -311,3 +311,9 @@ lib/dwcutilui/src/dwc_util_test_progress.c:
     .text       start:0x021b45c8 end:0x021b48a4
     .data       start:0x021c11a4 end:0x021c11b8
     .bss        start:0x021c4158 end:0x021c415c
+
+lib/dwcutilui/src/dwc_util_test_connect.c:
+    complete
+    .text       start:0x021b48a4 end:0x021b4ba8
+    .data       start:0x021c11b8 end:0x021c11cc
+    .bss        start:0x021c415c end:0x021c4160
