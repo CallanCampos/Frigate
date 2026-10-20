@@ -146,11 +146,11 @@ u32 MedalBox_GetObtainedCount(MedalBox *box, BOOL countEarned) {
     return count;
 }
 
-u8 func_0200fb28(MedalBox *box) {
+u8 MedalBox_IsManualShown(MedalBox *box) {
     return box->manualShown;
 }
 
-void func_0200fb34(MedalBox *box) {
+void MedalBox_SetManualShown(MedalBox *box) {
     box->manualShown = TRUE;
 }
 

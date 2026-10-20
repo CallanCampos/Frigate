@@ -1080,7 +1080,7 @@ static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
         ClActor_SetSurfacePos(work->actors[ACTOR_INFO_MEDAL], &pos, 1);
         if (coverDone && caseDone) {
             // The first time, a manual falls out of the case
-            if (func_0200fb28(work->medalBox) == TRUE) {
+            if (MedalBox_IsManualShown(work->medalBox) == TRUE) {
                 MedalBoxApp_RestoreCursor(work);
                 MedalBoxApp_SetSeq(work, SEQ_MAIN);
             } else {
@@ -2498,7 +2498,7 @@ static BOOL MedalBoxApp_SeqManual(MedalBoxApp *work) {
         GX_SetVisibleWnd(GX_WNDMASK_OW);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 2);
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), TRUE);
-        func_0200fb34(work->medalBox);
+        MedalBox_SetManualShown(work->medalBox);
         MedalBoxApp_RestoreCursor(work);
         MedalBoxApp_SetSeq(work, SEQ_MAIN);
         work->subSeq++;

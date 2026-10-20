@@ -66,8 +66,8 @@ void MedalBox_GetMedalDate(MedalBox *box, u16 medal, u8 *year, u8 *month, u8 *da
 u32 MedalBox_GetNextRankRequirement(MedalBox *box);
 // The medals obtained, and with countEarned also those hinted at and those earned on a date
 u32 MedalBox_GetObtainedCount(MedalBox *box, BOOL countEarned);
-u8 func_0200fb28(MedalBox *box);
-void func_0200fb34(MedalBox *box);
+u8 MedalBox_IsManualShown(MedalBox *box);
+void MedalBox_SetManualShown(MedalBox *box);
 MedalBox *SaveControl_GetMedalBox(SaveControl *save);
 // The Pokédex's habitat list in the block
 void *MedalBox_GetHabitatList(MedalBox *box);

@@ -688,6 +688,8 @@
 . 0x0200f7dc Misc_SetFlag
 . 0x0200fa28 MedalBox_SetLastMedal
 . 0x0200fa44 MedalBox_GetLastMedal
+. 0x0200fb28 MedalBox_IsManualShown
+. 0x0200fb34 MedalBox_SetManualShown
 . 0x0200fb4c MedalBox_GetHabitatList
 . 0x0200fe80 WbtSave_Init
 . 0x0200fea0 TrialHouseSave_GetWbtSave
