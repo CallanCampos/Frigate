@@ -1267,11 +1267,11 @@ data_ov182_021c02d4 kind:data(any) addr:0x021c0314
 data_ov182_021c02d8 kind:data(any) addr:0x021c0318
 data_ov182_021c02dc kind:data(any) addr:0x021c031c
 data_ov182_021c02f4 kind:data(any) addr:0x021c0334
-data_ov182_021c02f8 kind:data(any) addr:0x021c0338
-data_ov182_021c02ff kind:data(any) addr:0x021c033f
+sScreenWayMsgSlots kind:data(any) addr:0x021c0338
+sScreenWayMoves kind:data(any) addr:0x021c033f
 data_ov182_021c0320 kind:data(any) addr:0x021c0360
-data_ov182_021c0338 kind:data(any) addr:0x021c0378
-data_ov182_021c0378 kind:data(any) addr:0x021c03b8
+sScreenWayTouchRects kind:data(any) addr:0x021c0378
+sScreenWayCursorRects kind:data(any) addr:0x021c03b8
 data_ov182_021c037a kind:data(any) addr:0x021c03ba
 data_ov182_021c037c kind:data(any) addr:0x021c03bc
 data_ov182_021c037e kind:data(any) addr:0x021c03be
@@ -1650,7 +1650,7 @@ sTestStartPassed kind:bss addr:0x021c4164
 sApSearch kind:bss addr:0x021c4168
 sScreenAp kind:bss addr:0x021c416c
 data_ov182_021c4130 kind:bss addr:0x021c4170
-data_ov182_021c4134 kind:bss addr:0x021c4174
+sScreenWay kind:bss addr:0x021c4174
 data_ov182_021c413c kind:bss addr:0x021c417c
 data_ov182_021c4140 kind:bss addr:0x021c4180
 data_ov182_021c4144 kind:bss addr:0x021c4184

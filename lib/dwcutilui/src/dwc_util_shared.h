@@ -141,8 +141,6 @@ void func_ov182_021b7174(void);
 // The screen after the first screen of the connection settings' wide button
 void func_ov182_021b688c(void);
 
-// The choice of the setup of a connection
-void func_ov182_021b5bb8(void);
 // The message before the connection test
 void func_ov182_021b6588(void);
 // The connection test with auto-connect (its file is not written yet)

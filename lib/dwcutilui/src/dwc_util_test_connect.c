@@ -6,6 +6,7 @@
 #include "dwc_util_gfx_resource.h"
 #include "dwc_util_main.h"
 #include "dwc_util_screen.h"
+#include "dwc_util_screen_way.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_test_done.h"
 #include "dwc_util_text.h"

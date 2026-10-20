@@ -13,6 +13,7 @@
 #include "dwc_util_oam.h"
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_screen.h"
+#include "dwc_util_screen_way.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"

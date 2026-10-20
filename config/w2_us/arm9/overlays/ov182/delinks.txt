@@ -342,3 +342,10 @@ lib/dwcutilui/src/dwc_util_screen_ap.c:
     .rodata     start:0x021c0280 end:0x021c0334
     .data       start:0x021c1268 end:0x021c12d8
     .bss        start:0x021c416c end:0x021c4174
+
+lib/dwcutilui/src/dwc_util_screen_way.c:
+    complete
+    .text       start:0x021b5bf8 end:0x021b6144
+    .rodata     start:0x021c0334 end:0x021c03f8
+    .data       start:0x021c12d8 end:0x021c131c
+    .bss        start:0x021c4174 end:0x021c417c
