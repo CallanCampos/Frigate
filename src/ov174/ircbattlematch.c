@@ -1270,21 +1270,21 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
         init.gameCommandBase = 0x2c;
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
-        init.unk6E = 0x11;
+        init.negotiationCommandBase = 0x11;
         init.gameCommandBase = 0x13;
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
-        init.unk6C = work->param->musicalNetInit->unk6C;
+        init.parentPacketSize = work->param->musicalNetInit->parentPacketSize;
         work->shownCount = -1;
         break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
-        init.unk6E = 0x11;
+        init.negotiationCommandBase = 0x11;
         init.gameCommandBase = 0x12;
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
-        init.unk6C = work->param->musicalNetInit->unk6C;
+        init.parentPacketSize = work->param->musicalNetInit->parentPacketSize;
         work->shownCount = -1;
         break;
     }

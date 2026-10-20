@@ -32,7 +32,7 @@ void func_020425a0(int a0, int a1, HeapID parentHeapId, HeapID heapId) {
     const GFLNetDevTable *pDevTable = NetDefine_LoadDevice(GFL_NET_TYPE_WIFI);
 
     if (pDevTable != NULL) {
-        pDevTable->unk00(a0, a1);
+        pDevTable->prepare(a0, a1);
     }
     NetDefine_UnloadDevice(GFL_NET_TYPE_WIFI);
     if (parentHeapId != heapId) {
@@ -53,7 +53,7 @@ void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), v
     }
     pNet = GFL_HeapAllocate(pNetInit->heapId, sizeof(GFLNetSys), TRUE, "net.c", 106);
     sNet.pNet = pNet;
-    pNet->unk352 = TRUE;
+    pNet->rejectNegotiated = TRUE;
     pNet->pDevTable = NetDefine_LoadDevice(pNetInit->bNetType);
     GFL_ASSERT(pNet->pDevTable);
     if (pNetInit->bNetType == 4) {
@@ -64,7 +64,7 @@ void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), v
     case GFL_NET_TYPE_WIFI:
     case GFL_NET_TYPE_WIFI_LOBBY:
     case GFL_NET_TYPE_WIFI_GTS:
-        pNet->pDevTable->unk00(pNetInit->parentHeapId, 0);
+        pNet->pDevTable->prepare(pNetInit->parentHeapId, 0);
         GFL_HeapCreateChild(pNetInit->parentHeapId, pNetInit->wifiHeapId | HEAPID_TAIL_BIT, pNetInit->wifiHeapSize);
         break;
     case 3:
@@ -104,7 +104,7 @@ BOOL GFL_NetIsInitialized(void) {
     if (pNet == NULL) {
         return FALSE;
     }
-    return pNet->pDevTable->unk6C();
+    return pNet->pDevTable->isRunning();
 }
 
 BOOL GFL_NetIsEnded(void) {
@@ -124,8 +124,8 @@ static void GFL_NetFinishExit(void *work) {
     if (pNet->exitCallback != NULL) {
         pNet->exitCallback(pNet->devWork);
     }
-    if (pNet->aNetInit.unk2C != NULL) {
-        pNet->aNetInit.unk2C(pNet->devWork);
+    if (pNet->aNetInit.endCallback != NULL) {
+        pNet->aNetInit.endCallback(pNet->devWork);
     }
     NetHandle_FreeAll(pNet);
     NetDefine_UnloadDevice(type);
@@ -181,13 +181,13 @@ void *GFL_NetGetBeaconData(int index) {
     if (pNet == NULL) {
         return NULL;
     }
-    return pNet->pDevTable->unk28(index);
+    return pNet->pDevTable->getBeaconData(index);
 }
 
 u8 *GFL_NetGetBeaconMac(int index) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    return pNet->pDevTable->unk2C(index);
+    return pNet->pDevTable->getBeaconMac(index);
 }
 
 BOOL GFL_NetMainWhileWaiting(void) {
@@ -309,7 +309,7 @@ void func_02042a50(int a0) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->pDevTable != NULL) {
-        pNet->pDevTable->unkC4(a0);
+        pNet->pDevTable->setTimeout(a0);
     }
 }
 
@@ -331,8 +331,8 @@ BOOL GFL_NetIsNegotiated(u8 netId) {
 void func_02042a9c(NetHandle *handle, int a1) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    if (pNet->pDevTable->unkB8 != NULL) {
-        pNet->pDevTable->unkB8(a1);
+    if (pNet->pDevTable->setAcceptConnect != NULL) {
+        pNet->pDevTable->setAcceptConnect(a1);
     }
 }
 
@@ -340,7 +340,7 @@ BOOL GFL_NetIsNotInitialized(void) {
     if (sNet.pNet == NULL) {
         return TRUE;
     }
-    if (!GFL_NetGetSys()->pDevTable->unk6C()) {
+    if (!GFL_NetGetSys()->pDevTable->isRunning()) {
         return TRUE;
     }
     return FALSE;
@@ -484,8 +484,8 @@ u8 GFL_NetGetGameCommandBase(void) {
 int func_02042d48(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    if (pNet->aNetInit.unk44 != NULL) {
-        return pNet->aNetInit.unk44(pNet->devWork);
+    if (pNet->aNetInit.getUserData != NULL) {
+        return pNet->aNetInit.getUserData(pNet->devWork);
     }
     return 0;
 }
@@ -493,8 +493,8 @@ int func_02042d48(void) {
 int func_02042d64(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    if (pNet->aNetInit.unk40 != NULL) {
-        return pNet->aNetInit.unk40(pNet->devWork);
+    if (pNet->aNetInit.getFriendData != NULL) {
+        return pNet->aNetInit.getFriendData(pNet->devWork);
     }
     return 0;
 }
@@ -543,14 +543,14 @@ u16 func_02042df4(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     GFL_ASSERT(pNet);
-    return pNet->aNetInit.unk6C;
+    return pNet->aNetInit.parentPacketSize;
 }
 
 void func_02042e18(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    if (pNet->aNetInit.unk30 != NULL) {
-        pNet->aNetInit.unk30(pNet->devWork);
+    if (pNet->aNetInit.childConnectCallback != NULL) {
+        pNet->aNetInit.childConnectCallback(pNet->devWork);
     }
 }
 
@@ -565,8 +565,8 @@ void func_02042e30(int a0) {
 void func_02042e54(int a0) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
-    if (pNet->aNetInit.unk24 != NULL) {
-        pNet->aNetInit.unk24(NetHandle_GetOwn(), a0, pNet->devWork);
+    if (pNet->aNetInit.errorCallback != NULL) {
+        pNet->aNetInit.errorCallback(NetHandle_GetOwn(), a0, pNet->devWork);
     }
 }
 
@@ -622,8 +622,8 @@ void func_02042f10(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet != NULL) {
-        pNet->aNetInit.unk2C = NULL;
-        pNet->aNetInit.unk1C = NULL;
+        pNet->aNetInit.endCallback = NULL;
+        pNet->aNetInit.getBeaconSize = NULL;
     }
 }
 
@@ -644,9 +644,9 @@ void GFL_NetResetIconPos(void) {
 void func_02042f50(BOOL a0) {
     if (sNet.pNet != NULL) {
         if (a0 == TRUE) {
-            sNet.pNet->unk352 = TRUE;
+            sNet.pNet->rejectNegotiated = TRUE;
         } else {
-            sNet.pNet->unk352 = FALSE;
+            sNet.pNet->rejectNegotiated = FALSE;
         }
     }
 }

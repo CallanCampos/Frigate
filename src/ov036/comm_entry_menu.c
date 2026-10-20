@@ -378,7 +378,7 @@ static inline u8 *CommEntryMenu_GetShownMac(CommEntryMenu *menu, int row) {
 
 // This machine's beacon, which the activity's network setup gives
 static inline CommEntryBeacon *CommEntryMenu_GetBeacon(void) {
-    return GFL_NetGetInitData()->unk18(GFL_NetGetWork());
+    return GFL_NetGetInitData()->getBeaconData(GFL_NetGetWork());
 }
 
 // Whether the member of a network ID is one the leader checks on before the activity starts

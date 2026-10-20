@@ -46,7 +46,7 @@ BOOL NetState_SetError(u8 a0);
 void NetState_ClearError(void);
 u8 NetState_GetError(void);
 // Records a network error: its code, and type nonzero to set the network error
-void NetState_RecordError(int code, u32 a1, u32 a2, int type);
+void NetState_RecordError(int code, u32 errorType, u32 error, int type);
 void NetState_ClearWifiError(void);
 GFLNetErrorInfo *NetState_GetErrorInfo(void);
 BOOL NetState_IsWifiBattleError(void);

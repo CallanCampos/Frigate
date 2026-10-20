@@ -146,7 +146,7 @@ static void NetState_FinishEnd(NetState *state) {
     void (*callback)(void *work);
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk74()) {
+    if (sys->pDevTable->isEnded()) {
 
         NetCommand_Exit();
         WmIcon_Delete();
@@ -280,7 +280,7 @@ static u32 NetState_GetLongWait(NetState *state) {
 static void func_02041534(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk78()) {
+    if (sys->pDevTable->isIdle()) {
         if (state->unk53 && state->mode != NET_STATE_MODE_CHILD) {
             if (func_0203eec0(TRUE, state->parentMac, 0x200, func_020412d4)) {
                 NetState_SetFuncLine(_pNetState, func_02041940, NetState_GetShortWait(state), 571);
@@ -294,7 +294,7 @@ static void func_02041534(NetState *state) {
 static void func_020415bc(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk78()) {
+    if (sys->pDevTable->isIdle()) {
         NetState_SetFuncLine(_pNetState, func_02041534, 0, 595);
     }
 }
@@ -302,7 +302,7 @@ static void func_020415bc(NetState *state) {
 static void func_020415ec(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk10(1, 0)) {
+    if (sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_020415bc, 0, 603);
     }
 }
@@ -310,7 +310,7 @@ static void func_020415ec(NetState *state) {
 static void func_02041624(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk10(1, 0)) {
+    if (sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_02041534, 0, 632);
     }
 }
@@ -342,7 +342,7 @@ static void func_020416c8(NetState *state) {
         NetState_SetFuncLine(_pNetState, func_0204165c, 0, 695);
         return;
     }
-    if (state->mode != NET_STATE_MODE_CHILD && sys->pDevTable->unk38(0)) {
+    if (state->mode != NET_STATE_MODE_CHILD && sys->pDevTable->hasBeacons(0)) {
         if (state->timer != 0) {
             state->timer--;
         } else {
@@ -363,7 +363,7 @@ static BOOL func_02041774(void) {
 static void func_02041798(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk78() && func_0203ed68(0, 0x200, 0, func_02041774)) {
+    if (sys->pDevTable->isIdle() && func_0203ed68(0, 0x200, 0, func_02041774)) {
         state->unk4C = FALSE;
         NetState_SetFuncLine(_pNetState, func_02041750, 30, 754);
     }
@@ -406,7 +406,7 @@ static void func_020418a0(NetState *state) {
 
     GFL_NetGetInitData();
     sys = GFL_NetGetSys();
-    if (sys->pDevTable->unkA8() == TRUE && NetHandle_SendNegotiation()) {
+    if (sys->pDevTable->isPeerSeen() == TRUE && NetHandle_SendNegotiation()) {
         if (NetIw_IsRunning() == TRUE) {
             NetState_SetFuncLine(_pNetState, func_02041854, 0, 842);
             return;
@@ -422,7 +422,7 @@ static void func_020418a0(NetState *state) {
 static void func_02041910(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk78()) {
+    if (sys->pDevTable->isIdle()) {
         NetState_SetFuncLine(_pNetState, func_02041798, 0, 871);
     }
 }
@@ -446,14 +446,14 @@ static void func_02041940(NetState *state) {
 static void func_020419a8(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unkAC() == TRUE) {
-        sys->pDevTable->unkB4();
+    if (sys->pDevTable->isLinked() == TRUE) {
+        sys->pDevTable->startLink();
         NetState_SetFuncLine(_pNetState, func_020418a0, 0, 923);
         return;
     }
     if (state->timer == 0) {
         state->timer = MATH_Rand32(&state->rand, 30) + 15;
-        sys->pDevTable->unk08(0);
+        sys->pDevTable->start(0);
     } else {
         state->timer--;
     }
@@ -482,7 +482,8 @@ void func_02041a30(int a0, void (*callback)(void *work), int a2) {
 static void func_02041af4(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (_pNetState->mode == NET_STATE_MODE_PARENT && _pNetState->func == func_02041940 && sys->pDevTable->unk10(1, 0)) {
+    if (_pNetState->mode == NET_STATE_MODE_PARENT && _pNetState->func == func_02041940 &&
+        sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_02041910, 0, 982);
     }
     if (_pNetState->mode == NET_STATE_MODE_CHILD && _pNetState->func == func_020416c8) {
@@ -506,7 +507,7 @@ static void func_02041b70(int mode, int a1, const u8 *mac) {
 static void func_02041bc8(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk10(1, 0)) {
+    if (sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_02041910, 0, 1031);
     }
 }
@@ -534,7 +535,7 @@ static void NetState_ExitIfAlone(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     if (ini->bNetType == 3 || ini->bNetType == 4) {
-        if (!sys->pDevTable->unkAC()) {
+        if (!sys->pDevTable->isLinked()) {
             GFL_NetExit(0);
         }
     } else if (!(GFL_NetGetSys()->pDevTable->getConnectBits() & 0xfffe)) {
@@ -560,11 +561,11 @@ static void func_02041d20(NetState *state) {
 
     GFL_NetGetInitData();
     sys = GFL_NetGetSys();
-    if (sys->pDevTable->unk78()) {
-        if (sys->pDevTable->unk14(0)) {
+    if (sys->pDevTable->isIdle()) {
+        if (sys->pDevTable->end(0)) {
             NetState_FinishEnd(state);
         }
-    } else if (!sys->pDevTable->unk6C() && sys->pDevTable->unk14(0)) {
+    } else if (!sys->pDevTable->isRunning() && sys->pDevTable->end(0)) {
         NetState_FinishEnd(state);
     }
 }
@@ -572,7 +573,7 @@ static void func_02041d20(NetState *state) {
 static void func_02041d70(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk10(1, 0)) {
+    if (sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_02041d20, 0, 1178);
     }
 }
@@ -647,7 +648,7 @@ static void NetState_WifiConnecting(NetState *state) {
         NetState_SetFuncLine(_pNetState, NetState_WifiConnected, 0, 1393);
         return;
     }
-    if (sys->pDevTable->unkAC()) {
+    if (sys->pDevTable->isLinked()) {
         NetState_SetFuncLine(_pNetState, NetState_WifiConnected, 0, 1397);
         return;
     }
@@ -676,7 +677,7 @@ static void func_02041f78(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
     GFLNetInitData *ini = GFL_NetGetInitData();
 
-    if (!sys->pDevTable->unk50(state->unk48, ini->maxConnectNum, 0)) {
+    if (!sys->pDevTable->connectFriend(state->unk48, ini->maxConnectNum, 0)) {
         NetSystem_ResetBuffersIfAllocated();
         NetHandle_FreeAll(sys);
         NetHandle_InitAll(sys);
@@ -754,7 +755,7 @@ static void func_0204212c(NetState *state) {
     if (!state->unk4B) {
         a0 = TRUE;
     }
-    if (sys->pDevTable->unk54(a0, 0)) {
+    if (sys->pDevTable->close(a0, 0)) {
         NetSystem_ResetBuffersIfAllocated();
         NetHandle_FreeAll(sys);
         NetHandle_InitAll(sys);
@@ -811,18 +812,18 @@ static void func_02042264(NetState *state) {
     GFL_NetGetInitData();
     sys = GFL_NetGetSys();
     sys->pDevTable->update(1);
-    if (sys->pDevTable->unk78()) {
-        sys->pDevTable->unk14(0);
+    if (sys->pDevTable->isIdle()) {
+        sys->pDevTable->end(0);
         NetState_FinishEnd(state);
         return;
     }
-    if (!sys->pDevTable->unk6C()) {
-        sys->pDevTable->unk14(0);
+    if (!sys->pDevTable->isRunning()) {
+        sys->pDevTable->end(0);
         NetState_FinishEnd(state);
         return;
     }
-    if (sys->pDevTable->unk74()) {
-        sys->pDevTable->unk14(0);
+    if (sys->pDevTable->isEnded()) {
+        sys->pDevTable->end(0);
         NetState_FinishEnd(state);
     }
 }
@@ -831,7 +832,7 @@ static void func_020422cc(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     sys->pDevTable->update(0);
-    if (sys->pDevTable->unk10(1, 0)) {
+    if (sys->pDevTable->disconnect(1, 0)) {
         NetState_SetFuncLine(_pNetState, func_02042264, 0, 1784);
     }
 }
@@ -842,7 +843,7 @@ void func_0204230c(void (*callback)(void *work)) {
 
         GCTX_HIDUnblockSoftReset(1);
         _pNetState->endCallback = callback;
-        sys->pDevTable->unk54(TRUE, 0);
+        sys->pDevTable->close(TRUE, 0);
         NetState_SetFuncLine(_pNetState, func_020422cc, 5, 1807);
     }
 }
@@ -887,7 +888,7 @@ void func_02042424(int a0) {
     if (_pNetState != NULL) {
         _pNetState->unk50 = a0;
     }
-    sys->pDevTable->unk8C(a0);
+    sys->pDevTable->setDisconnectError(a0);
 }
 
 static void func_02042450(void) {
@@ -917,7 +918,7 @@ u8 NetState_GetError(void) {
     return 0;
 }
 
-void NetState_RecordError(int code, u32 a1, u32 a2, int type) {
+void NetState_RecordError(int code, u32 errorType, u32 error, int type) {
     NetState *state = _pNetState;
 
     if (state != NULL) {
@@ -925,8 +926,8 @@ void NetState_RecordError(int code, u32 a1, u32 a2, int type) {
             code = -code;
         }
         state->error.code = code;
-        _pNetState->error.unk4 = a1;
-        _pNetState->error.unk8 = a2;
+        _pNetState->error.errorType = errorType;
+        _pNetState->error.error = error;
         _pNetState->error.type = type;
         if (type) {
             NetSystem_SetError();
@@ -946,8 +947,8 @@ void NetState_ClearWifiError(void) {
                                 "|| pNetIni->bNetType==GFL_NET_TYPE_WIFI_GTS");
         }
         _pNetState->error.code = 0;
-        _pNetState->error.unk4 = 0;
-        _pNetState->error.unk8 = 0;
+        _pNetState->error.errorType = 0;
+        _pNetState->error.error = 0;
         _pNetState->error.type = 0;
     }
 }

@@ -297,7 +297,7 @@ u32 KeySystemNet_CheckError(KeySystemNet *net) {
             return KEY_SYSTEM_NET_ERROR;
         }
         if (GFL_NetErrCheck()) {
-            switch (NetState_GetErrorInfo()->unk4) {
+            switch (NetState_GetErrorInfo()->errorType) {
             case 1:
             case 2:
             case 3:

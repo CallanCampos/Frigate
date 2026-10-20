@@ -859,7 +859,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         p_wk->flag164 = TRUE;
     }
     if (GFL_NetErrCheck() == 1) {
-        if (netError->unk4 == 6 || netError->unk4 == 3) {
+        if (netError->errorType == 6 || netError->errorType == 3) {
             WifiBattleMatchNet_EndRequests(p_wk);
             return 2;
         }

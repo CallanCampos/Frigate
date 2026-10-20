@@ -303,7 +303,7 @@ static void WifiLogin_StateStartNet(WifiLoginWork *work) {
         sNetInit.wifiHeapSize = 0x6e000;
     }
     if (work->param->unkC != 0xa) {
-        sNetInit.unk40 = NULL;
+        sNetInit.getFriendData = NULL;
     }
     sNetInit.gameCommandBase = work->param->unkC;
     sGameType = work->param->unkC;
@@ -374,7 +374,7 @@ static void WifiLogin_StateOpenConfirmError(WifiLoginWork *work) {
 // Stops at a network error and tells the player, returning whether there was one
 static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
     if (GFL_NetErrCheck()) {
-        switch (NetState_GetErrorInfo()->unk4) {
+        switch (NetState_GetErrorInfo()->errorType) {
         case 1:
         case 2:
         case 3:

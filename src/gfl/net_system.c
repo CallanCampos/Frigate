@@ -87,7 +87,7 @@ typedef struct {
         NetSystem_SetError();                                                                                          \
         err = NetState_GetErrorInfo();                                                                                 \
         if (!err->type) {                                                                                              \
-            NetState_RecordError(err->code, err->unk4, err->unk8, line);                                               \
+            NetState_RecordError(err->code, err->errorType, err->error, line);                                         \
         }                                                                                                              \
     } while (0)
 
@@ -143,8 +143,8 @@ static void NetRecvState_Reset(NetRecvState *state) {
 static int NetSystem_GetParentPacketSize(void) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->aNetInit.bMPMode && sys->aNetInit.unk6C) {
-        return sys->aNetInit.unk6C;
+    if (sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize) {
+        return sys->aNetInit.parentPacketSize;
     }
     return GFL_NetGetMaxSendSize() * GFL_NetGetMaxConnectNum();
 }
@@ -229,9 +229,9 @@ BOOL NetSystem_StartWireless(int size, HeapID heapId) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    NetSystem_Alloc(size, heapId, sys->aNetInit.bMPMode && sys->aNetInit.unk6C);
+    NetSystem_Alloc(size, heapId, sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize);
     sys->pDevTable->init(ini->heapId, sys, 0, sys->devWork);
-    sys->pDevTable->unk08(0);
+    sys->pDevTable->start(0);
     sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
     return TRUE;
 }
@@ -239,7 +239,7 @@ BOOL NetSystem_StartWireless(int size, HeapID heapId) {
 int func_0203ecac(int a0) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    return sys->pDevTable->unk90(a0);
+    return sys->pDevTable->canConnectFriend(a0);
 }
 
 static BOOL NetSystem_RecvInfraredCallback(u16 netId, u8 *data, u16 size) {
@@ -250,7 +250,7 @@ BOOL NetSystem_StartInfrared(int a0) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     GFLNetSys *sys = GFL_NetGetSys();
 
-    ini->unk66 = a0;
+    ini->changeTgid = a0;
     sys->pDevTable->setRecvCallback(NetSystem_RecvInfraredCallback);
     NetSystem_Alloc(0x80, ini->heapId, FALSE);
     NetSystem_ResetMachine(0);
@@ -284,12 +284,12 @@ int func_0203ed68(int a0, int size, int a2, BOOL (*callback)(void)) {
     GFLNetSys *sys = GFL_NetGetSys();
     BOOL useSysSize;
 
-    ini->unk66 = a0;
+    ini->changeTgid = a0;
     sys->pDevTable->setDisconnectCallback(func_0203ed18);
     sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
-    useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+    useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
     NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
-    return sys->pDevTable->unk40(a2, callback);
+    return sys->pDevTable->startParent(a2, callback);
 }
 
 BOOL func_0203ede0(int a0, int size) {
@@ -297,12 +297,12 @@ BOOL func_0203ede0(int a0, int size) {
     BOOL result;
 
     sys->pDevTable->setDisconnectCallback(func_0203ed40);
-    result = sys->pDevTable->unk44(a0, 0);
+    result = sys->pDevTable->startScan(a0, 0);
     if (result == TRUE) {
         BOOL useSysSize;
 
         sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
-        useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+        useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
         NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
         sState.recvState = 4;
     }
@@ -314,7 +314,7 @@ BOOL func_0203ee50(int size) {
     BOOL result;
 
     sys->pDevTable->setDisconnectCallback(func_0203ed40);
-    result = sys->pDevTable->unkBC();
+    result = sys->pDevTable->startSearch();
     if (result == TRUE) {
         sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
         NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, FALSE);
@@ -327,7 +327,7 @@ void func_0203eea4(int a0) {
     GFLNetSys *sys = GFL_NetGetSys();
 
     if (sys->pDevTable != NULL) {
-        sys->pDevTable->unkC0(a0);
+        sys->pDevTable->holdScan(a0);
     }
 }
 
@@ -337,12 +337,12 @@ int func_0203eec0(BOOL a0, const u8 *mac, int size, void (*callback)(void)) {
 
     sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
     if (a0) {
-        BOOL useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+        BOOL useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
 
         NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
         sState.recvState = 4;
     }
-    return sys->pDevTable->unk48(a0, mac, 0, 0, callback);
+    return sys->pDevTable->startChild(a0, mac, 0, 0, callback);
 }
 
 void NetSystem_Free(void) {
@@ -486,11 +486,11 @@ static void func_0203f234(void) {
     int i;
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk58()) {
+    if (sys->pDevTable->isDataSharing()) {
         if (sNetSys->unk1EB) {
             NetSystem_BuildSendPacket(TRUE);
         }
-        if (sys->pDevTable->unk5C(sNetSys->sendData) == TRUE) {
+        if (sys->pDevTable->stepDataSharing(sNetSys->sendData) == TRUE) {
             int dataSize;
             int machineMax;
 
@@ -513,13 +513,13 @@ static void func_0203f2cc(void) {
     if (NetQueue_IsEmpty(&sNetSys->sendQueue)) {
         GFL_NetSendCommand(NetHandle_GetOwn(), 0x10, 0, NULL);
     }
-    if (sys->pDevTable->unk9C != NULL) {
-        sys->pDevTable->unk9C();
+    if (sys->pDevTable->poll != NULL) {
+        sys->pDevTable->poll();
     }
-    if (sys->pDevTable->unk6C() == TRUE) {
+    if (sys->pDevTable->isRunning() == TRUE) {
         int dataSize = GFL_NetGetMaxSendSize();
 
-        if (sys->pDevTable->unkA0() == TRUE && NetSystem_BuildSendPacket(FALSE)) {
+        if (sys->pDevTable->canSend() == TRUE && NetSystem_BuildSendPacket(FALSE)) {
             NetSystem_SendInfraredPacket(sNetSys->sendData, dataSize);
             sState.recvState = 4;
         }
@@ -560,7 +560,7 @@ static void NetSystem_SendInfraredPacket(u8 *data, int size) {
 
     GFL_NetGetInitData();
     sys = GFL_NetGetSys();
-    if (!sys->pDevTable->unkA4() || !sys->pDevTable->unkAC()) {
+    if (!sys->pDevTable->isSendTurn() || !sys->pDevTable->isLinked()) {
         GFL_ASSERT(0);
         return;
     }
@@ -617,7 +617,7 @@ static void NetSystem_UpdateMPSendStep(void) {
                 NetSystem_SetSendState(1, 1134);
             }
         } else if (GFL_NetGetInitData()->bNetType == 3 || GFL_NetGetInitData()->bNetType == 4) {
-            if (!sys->pDevTable->unkA0()) {
+            if (!sys->pDevTable->canSend()) {
                 NetSystem_SetSendState(1, 1141);
             } else {
                 if (sNetSys->mpSendData[PACKET_SIZE] == 0) {
@@ -1074,7 +1074,7 @@ BOOL NetSystem_IsDeviceReady(void) {
     if (sNetSys != NULL && (ini->bNetType == 1 || ini->bNetType == 2 || ini->bNetType == 3 || ini->bNetType == 4)) {
         return TRUE;
     }
-    return sys->pDevTable->unk6C();
+    return sys->pDevTable->isRunning();
 }
 
 u16 NetSystem_GetNetId(void) {

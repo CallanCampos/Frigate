@@ -311,7 +311,7 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
     u32 error = MYSTERY_NET_ERROR_NONE;
 
     if (GFL_NetErrCheck()) {
-        switch (NetState_GetErrorInfo()->unk4) {
+        switch (NetState_GetErrorInfo()->errorType) {
         case 1:
         case 2:
         case 3:

@@ -184,7 +184,7 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
     if (GFL_NetIsInitialized()) {
         error = NetState_GetErrorInfo();
         if (GFL_NetErrCheck()) {
-            switch (error->unk4) {
+            switch (error->errorType) {
             case 1:
             case 2:
                 if (a0 == 0) {

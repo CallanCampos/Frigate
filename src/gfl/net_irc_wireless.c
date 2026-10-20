@@ -68,13 +68,13 @@ const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
         GFL_HeapAllocate(HEAPID_TAIL(pNetInit->parentHeapId), sizeof(NetIrcWireless), TRUE, "net_irc_wireless.c", 114);
     sys->aNetInit = *pNetInit;
     sys->work = work;
-    sys->exitCallback = pNetInit->unk2C;
-    sys->unk18 = pNetInit->unk18;
-    sys->unk1C = pNetInit->unk1C;
+    sys->exitCallback = pNetInit->endCallback;
+    sys->unk18 = pNetInit->getBeaconData;
+    sys->unk1C = pNetInit->getBeaconSize;
     sys->aNetInit.bNetType = 3;
-    sys->aNetInit.unk2C = NetIw_EndedCallback;
-    sys->aNetInit.unk18 = func_02043720;
-    sys->aNetInit.unk1C = func_02043748;
+    sys->aNetInit.endCallback = NetIw_EndedCallback;
+    sys->aNetInit.getBeaconData = func_02043720;
+    sys->aNetInit.getBeaconSize = func_02043748;
     sys->bMPMode = sys->aNetInit.bMPMode;
     sys->aNetInit.bMPMode = FALSE;
     sys->maxConnectNum = sys->aNetInit.maxConnectNum;
@@ -238,7 +238,7 @@ void NetIw_Update(void) {
     case 4:
         if (!GFL_NetIsInitialized()) {
             sys->aNetInit.bNetType = 3;
-            sys->aNetInit.unk2C = NetIw_EndedCallback;
+            sys->aNetInit.endCallback = NetIw_EndedCallback;
             if (sys->gameCommandBase != 0) {
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
             }
@@ -250,7 +250,7 @@ void NetIw_Update(void) {
         break;
     case 5:
         if (GFL_NetIsInitialized() == TRUE) {
-            GFL_NetGetSys()->pDevTable->unkC8(NetIwSys->unk74);
+            GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->unk74);
             func_020429f8(NetIw_ConnectedCallback);
             NetIw_SetState(sys, 6);
         }
@@ -280,11 +280,11 @@ void NetIw_Update(void) {
     case 9:
         if (GFL_NetIsNotInitialized()) {
             if (sys->gameCommandBase != 0) {
-                sys->aNetInit.unk6E = 0;
+                sys->aNetInit.negotiationCommandBase = 0;
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
             }
             sys->aNetInit.bNetType = 0;
-            sys->aNetInit.unk2C = sys->exitCallback;
+            sys->aNetInit.endCallback = sys->exitCallback;
             sys->aNetInit.bMPMode = sys->bMPMode;
             GFL_NetInit(&sys->aNetInit, NULL, sys->work);
             NetIwSys->unk101 = FALSE;
@@ -354,7 +354,7 @@ void NetIw_Update(void) {
     case 14:
         if (!GFL_NetIsInitialized()) {
             sys->aNetInit.bNetType = 3;
-            sys->aNetInit.unk2C = NetIw_EndedCallback;
+            sys->aNetInit.endCallback = NetIw_EndedCallback;
             sys->connected = FALSE;
             sys->ended = FALSE;
             GFL_NetInit(&sys->aNetInit, NULL, sys->work);
@@ -363,7 +363,7 @@ void NetIw_Update(void) {
         break;
     case 15:
         if (GFL_NetIsInitialized() == TRUE) {
-            GFL_NetGetSys()->pDevTable->unkC8(NetIwSys->unk74);
+            GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->unk74);
             func_020429f8(NetIw_ConnectedCallback);
             NetIw_SetState(sys, 16);
         }

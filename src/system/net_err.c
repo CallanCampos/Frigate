@@ -270,7 +270,7 @@ void GFL_NetErrUpdate(void) {
                            info->type == NET_ERR_INFO_TYPE_FIRST + 8) {
                     g_GflNetErr.message = WifiError_Text_CommunicationError;
                 } else {
-                    g_GflNetErr.message = DWCRap_GetErrorKind(info->code, info->unk4);
+                    g_GflNetErr.message = DWCRap_GetErrorKind(info->code, info->errorType);
                 }
             }
         }
@@ -419,7 +419,7 @@ void GFL_NetErrRecord(void) {
             work->stateError = NetState_GetError();
             if (work->netType == GFL_NET_TYPE_WIFI || work->netType == GFL_NET_TYPE_WIFI_LOBBY ||
                 work->netType == GFL_NET_TYPE_WIFI_GTS) {
-                if (work->info.unk4 == 1 || work->info.unk4 == 2) {
+                if (work->info.errorType == 1 || work->info.errorType == 2) {
                     work->check = NET_ERR_CHECK_END;
                 } else {
                     work->check = NET_ERR_CHECK_RETRY;

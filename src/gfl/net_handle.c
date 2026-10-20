@@ -228,7 +228,7 @@ BOOL NetHandle_SendNegotiation(void) {
             OS_GetMacAddress(data);
             data[6] = netId;
             data[7] = ini->gameCommandBase;
-            data[8] = ini->unk6E;
+            data[8] = ini->negotiationCommandBase;
             return GFL_NetSendCommand(handle, 3, sizeof(data), data);
         } else if (handle->state < NET_HANDLE_STATE_SEND_NEGOTIATION) {
             handle->state++;
@@ -399,14 +399,14 @@ void NetHandle_RecvNegotiation(int netId, int size, u8 *data, void *work, NetHan
             negotiation->netId = data[6];
             OS_GetMacAddress(negotiation->serverMac);
             if (data[8] != 0) {
-                if (data[6] != 0 && data[7] != ini->gameCommandBase && ini->unk6E == data[8]) {
-                    negotiation->unkF = ini->unk6E;
-                    negotiation->unkE = ini->unk6E;
+                if (data[6] != 0 && data[7] != ini->gameCommandBase && ini->negotiationCommandBase == data[8]) {
+                    negotiation->unkF = ini->negotiationCommandBase;
+                    negotiation->unkE = ini->negotiationCommandBase;
                     return;
                 }
-                if (data[6] == 0 && data[7] == ini->gameCommandBase && ini->unk6E == data[8]) {
-                    negotiation->unkF = ini->unk6E;
-                    negotiation->unkE = ini->unk6E;
+                if (data[6] == 0 && data[7] == ini->gameCommandBase && ini->negotiationCommandBase == data[8]) {
+                    negotiation->unkF = ini->negotiationCommandBase;
+                    negotiation->unkE = ini->negotiationCommandBase;
                     return;
                 }
                 negotiation->unkF = 0xff;
@@ -424,7 +424,7 @@ void NetHandle_RecvNegotiation(int netId, int size, u8 *data, void *work, NetHan
 static void NetHandle_Reject(NetHandle *handle) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->unk352 == 0) {
+    if (sys->rejectNegotiated == 0) {
         if (handle->state != NET_HANDLE_STATE_NEGOTIATED) {
             handle->state = NET_HANDLE_STATE_REJECTED;
         }
@@ -442,11 +442,11 @@ void NetHandle_RecvNegotiationReply(int netId, int size, NetNegotiation *negotia
         handle->state = NET_HANDLE_STATE_NEGOTIATED;
         return;
     }
-    if (ini->unk6E != 0) {
-        if (ini->unk6E != negotiation->unkF) {
+    if (ini->negotiationCommandBase != 0) {
+        if (ini->negotiationCommandBase != negotiation->unkF) {
             NetHandle_Reject(handle);
         }
-        if (ini->unk6E != negotiation->unkE) {
+        if (ini->negotiationCommandBase != negotiation->unkE) {
             NetHandle_Reject(handle);
         }
     } else {
