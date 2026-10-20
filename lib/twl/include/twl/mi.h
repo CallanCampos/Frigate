@@ -19,11 +19,32 @@ typedef enum {
     MI_WRAM_DSP,
 } MIWramProc;
 
-int MI_FreeWram(MIWram wram, MIWramProc proc);
-int MI_CancelWram(MIWram wram, MIWramProc proc);
+// mi_sharedWram_twl.c: the DSi part of the shared WRAM manager
 
 // The setup of the shared WRAM's manager, which NitroSDK's MI_Init (mi_sharedWram.c's func_02078000) calls on a DSi
-void func_02768818(void);
+void MIi_InitWramManagerCore(void);
+// The banks' registers: the processor that each bank is given to and whether it is enabled, by WRAM and for each
+void MI_SetWramBankMaster_A(int bank, MIWramProc proc);
+void MI_SetWramBankMaster_B(int bank, MIWramProc proc);
+void MI_SetWramBankMaster_C(int bank, MIWramProc proc);
+void MI_SetWramBankMaster(MIWram wram, int bank, MIWramProc proc);
+void MI_SetWramBankEnable_A(int bank, BOOL enable);
+void MI_SetWramBankEnable_B(int bank, BOOL enable);
+void MI_SetWramBankEnable_C(int bank, BOOL enable);
+void MI_SetWramBankEnable(MIWram wram, int bank, BOOL enable);
+MIWramProc MI_GetWramBankMaster_A(int bank);
+MIWramProc MI_GetWramBankMaster_B(int bank);
+MIWramProc MI_GetWramBankMaster_C(int bank);
+// The processor that the hardware gives the bank to
+MIWramProc MI_GetWramBankMaster(MIWram wram, int bank);
+// Where each WRAM is in the ARM9's memory, and any of them
+void *MI_GetWramMapStart_A(void);
+void *MI_GetWramMapStart_B(void);
+void *MI_GetWramMapStart_C(void);
+void *MI_GetWramMapStart(MIWram wram);
+// Frees every bank that proc has, and cancels proc's reservations; each returns how many banks it changed
+int MI_FreeWram(MIWram wram, MIWramProc proc);
+int MI_CancelWram(MIWram wram, MIWramProc proc);
 
 // mi_ndma.c: the DSi's four new DMA channels
 
@@ -105,21 +126,16 @@ void MIi_CameraNDmaRecv(u32 ndmaNo, void *dest, u32 unitWords, u32 length, BOOL 
 void MI_SendNDmaGXCommandAsync(u32 ndmaNo, const void *src, u32 length, MINDmaCallback callback, void *arg);
 void MI_SendNDmaGXCommandAsyncFast(u32 ndmaNo, const void *src, u32 length, MINDmaCallback callback, void *arg);
 
-// The banks of the shared WRAM B and C go from one processor to another by their slots. One byte per bank of WRAM B:
-// its master, and the slot it has in the master's memory. WRAM C's follow
+// The banks of the shared WRAM A, B and C go from one processor to another by their slots. One byte per bank of WRAM
+// A: its master, and the slot it has in the master's memory. WRAM B's and C's follow
+#define reg_MBK_A ((vu8 *)0x04004040)
 #define reg_MBK_B ((vu8 *)0x04004044)
 #define reg_MBK_C ((vu8 *)0x0400404c)
-// Whether the bank is given to a processor
-BOOL func_0276919c(MIWram wram, int bank);
-// The processor that the hardware gives the bank to
-MIWramProc func_02768770(MIWram wram, int bank);
-// Gives count free banks from bank to proc
-int MI_AllocWramSlot(MIWram wram, int bank, int count, MIWramProc proc);
-// Takes the banks back from proc
-int MI_FreeWramSlot(MIWram wram, int bank, int count, MIWramProc proc);
-// Where WRAM B is in the ARM9's memory, WRAM C, and either of them
-void *func_027687a0(void);
-void *func_027687bc(void);
-void *func_027687d8(MIWram wram);
+// Whether the manager has given the bank to a processor
+BOOL MIi_IsWramSlotUsed(MIWram wram, int slot);
+// Gives the count banks from slot to proc if they are free, and returns their address (0 if not)
+u32 MI_AllocWramSlot(MIWram wram, int slot, int count, MIWramProc proc);
+// Takes the banks back from proc, and returns how many it had
+int MI_FreeWramSlot(MIWram wram, int slot, int count, MIWramProc proc);
 
 #endif // POKEBW2_TWL_MI_H
