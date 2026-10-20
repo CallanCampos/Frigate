@@ -617,13 +617,13 @@ BOOL POKE_NET_GetSvlToken(void) {
     if (gPOKE_NET_Control.HasSvlToken == TRUE) {
         return TRUE;
     }
-    if (!func_ov011_0215de44("", &result)) {
+    if (!DWC_SVLGetTokenAsync("", &result)) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_GETSVL;
         return FALSE;
     }
 
     for (;;) {
-        int state = func_ov011_0215dea8();
+        int state = DWC_SVLProcess();
 
         if (state == DWC_SVL_STATE_SUCCESS) {
             POKE_NET_Memcpy(gPOKE_NET_Control.Auth.SvlToken, result.svltoken, sizeof(result.svltoken));

@@ -83,29 +83,29 @@ static const s8 sNavigation[14][4] = {
 
 static DWCUtilMenu *sMenu;
 
-static void func_ov182_021acff0(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad038(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad080(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad0c8(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad110(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad15c(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad170(void);
-static void func_ov182_021ad294(void);
-static void func_ov182_021ad3b4(void);
-static void func_ov182_021ad4ec(int key);
-static void func_ov182_021ad518(void);
-static void func_ov182_021ad634(int row, u32 y);
-static void func_ov182_021ad7ac(int key, int pressed);
-static void func_ov182_021ad838(void);
-static void func_ov182_021ad894(int direction);
-static void func_ov182_021ad90c(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad948(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad97c(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad9b0(DWCUtilTask *task, void *arg);
-static void func_ov182_021ad9e4(DWCUtilTask *task, void *arg);
-static void func_ov182_021ada18(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideInRow0Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideInRow1Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideInRow2Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideInRow3Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideInButtonsTask(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_UpdateTask(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_HandleTouchStart(void);
+static void DWCUtilMenu_HandleTouchEnd(void);
+static void DWCUtilMenu_HandleTouchHold(void);
+static void DWCUtilMenu_SetPressedKey(int key);
+static void DWCUtilMenu_HandlePad(void);
+static void DWCUtilMenu_MoveRow(int row, u32 y);
+static void DWCUtilMenu_DrawKey(int key, int pressed);
+static void DWCUtilMenu_DrawCursor(void);
+static void DWCUtilMenu_MoveCursor(int direction);
+static void DWCUtilMenu_SlideOutButtonsTask(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideOutRow3Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideOutRow2Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideOutRow1Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_SlideOutRow0Task(DWCUtilTask *task, void *arg);
+static void DWCUtilMenu_DestroyTask(DWCUtilTask *task, void *arg);
 
-void func_ov182_021acd80(void) {
+void DWCUtilMenu_Open(void) {
     DWCUtilMenuRect rect = { 0, 1, 0, 0 };
     int objCount;
     u16 label[2];
@@ -115,178 +115,178 @@ void func_ov182_021acd80(void) {
 
     rect.width = 0x1c;
     rect.height = 0x14;
-    sMenu = func_ov182_021bc4d8(sizeof(DWCUtilMenu), 4);
+    sMenu = DWCUtilHeap_AllocClear(sizeof(DWCUtilMenu), 4);
     sMenu->code = 0x1f;
     sMenu->cursorPos = 0;
     sMenu->leftEnabled = TRUE;
     sMenu->digitsEnabled = TRUE;
     sMenu->rightEnabled = TRUE;
     for (i = 0; i < 10; i++) {
-        sMenu->keyOams[i] = func_ov182_021bb960(0, 0x36);
+        sMenu->keyOams[i] = DWCUtilCell_AllocOam(0, 0x36);
         G2_SetOBJEffect(sMenu->keyOams[i], GX_OAM_EFFECT_NODISPLAY, 0);
         G2_SetOBJPriority(sMenu->keyOams[i], 3);
     }
     for (i = 0; i < 2; i++) {
-        sMenu->arrowOams[i] = func_ov182_021bb960(0, sArrowCells[i]);
+        sMenu->arrowOams[i] = DWCUtilCell_AllocOam(0, sArrowCells[i]);
         G2_SetOBJEffect(sMenu->arrowOams[i], GX_OAM_EFFECT_NODISPLAY, 0);
         G2_SetOBJPriority(sMenu->arrowOams[i], 3);
     }
     for (i = 0; i < 2; i++) {
-        sMenu->buttons[i] = func_ov182_021bb97c(0, sButtonCells[i], TRUE);
-        func_ov182_021bb6f8(sMenu->buttons[i], -1, GX_OAM_EFFECT_NODISPLAY, 0);
-        func_ov182_021bb878(sMenu->buttons[i], -1, 3);
+        sMenu->buttons[i] = DWCUtilCell_AllocOamRun(0, sButtonCells[i], TRUE);
+        DWCUtilOam_SetEffect(sMenu->buttons[i], -1, GX_OAM_EFFECT_NODISPLAY, 0);
+        DWCUtilOam_SetPriority(sMenu->buttons[i], -1, 3);
     }
     label[1] = 0;
     for (i = 0; i < 4; i++) {
-        sMenu->rows[i] = func_ov182_021bbd3c(0, 0xc, 4, 0, &objCount, 0);
+        sMenu->rows[i] = DWCUtilText_CreateObj(0, 0xc, 4, 0, &objCount, 0);
         rect.x = 0;
         for (j = 0, k = i * 3; j < 3; j++, k++) {
             label[0] = sLabels[k];
-            func_ov182_021bc0a4(sMenu->rows[i], rect.x, rect.y, rect.width, rect.height, 2, 0x480, label);
+            DWCUtilText_DrawRect(sMenu->rows[i], rect.x, rect.y, rect.width, rect.height, 2, 0x480, label);
             rect.x += 0x20;
         }
-        sMenu->rowNodes[i] = func_ov182_021bb594(0, objCount, FALSE);
+        sMenu->rowNodes[i] = DWCUtilOam_Alloc(0, objCount, FALSE);
     }
-    sMenu->cursor = func_ov182_021bb97c(0, 0x44, TRUE);
-    func_ov182_021bb6f8(sMenu->cursor, -1, GX_OAM_EFFECT_NODISPLAY, 0);
-    func_ov182_021bb878(sMenu->cursor, -1, 2);
-    sMenu->task = func_ov182_021bd200(0, func_ov182_021acff0, NULL, 0x78);
-    func_ov182_021ad634(0, 0xc0);
+    sMenu->cursor = DWCUtilCell_AllocOamRun(0, 0x44, TRUE);
+    DWCUtilOam_SetEffect(sMenu->cursor, -1, GX_OAM_EFFECT_NODISPLAY, 0);
+    DWCUtilOam_SetPriority(sMenu->cursor, -1, 2);
+    sMenu->task = DWCUtilTask_Create(0, DWCUtilMenu_SlideInRow0Task, NULL, 0x78);
+    DWCUtilMenu_MoveRow(0, 0xc0);
 }
 
-void func_ov182_021acf7c(void) {
-    func_ov182_021bb690(sMenu->cursor);
-    func_ov182_021bd264(sMenu->task, func_ov182_021ad90c);
+void DWCUtilMenu_Close(void) {
+    DWCUtilOam_Free(sMenu->cursor);
+    DWCUtilTask_SetCallback(sMenu->task, DWCUtilMenu_SlideOutButtonsTask);
 }
 
-u8 func_ov182_021acf9c(void) {
+u8 DWCUtilMenu_GetKey(void) {
     return sMenu->code;
 }
 
-void func_ov182_021acfac(u8 enabled) {
+void DWCUtilMenu_SetLeftEnabled(u8 enabled) {
     sMenu->leftEnabled = enabled;
 }
 
-void func_ov182_021acfbc(u8 enabled) {
+void DWCUtilMenu_SetDigitsEnabled(u8 enabled) {
     sMenu->digitsEnabled = enabled;
 }
 
-void func_ov182_021acfcc(u8 enabled) {
+void DWCUtilMenu_SetRightEnabled(u8 enabled) {
     sMenu->rightEnabled = enabled;
 }
 
-BOOL func_ov182_021acfdc(void) {
+BOOL DWCUtilMenu_IsOpen(void) {
     if (sMenu != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov182_021acff0(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideInRow0Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[0]).attr01 - 12;
 
     if (y > 0x4c) {
-        func_ov182_021ad634(0, y);
+        DWCUtilMenu_MoveRow(0, y);
         return;
     }
-    func_ov182_021ad634(0, 0x4c);
-    func_ov182_021ad634(1, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad038);
+    DWCUtilMenu_MoveRow(0, 0x4c);
+    DWCUtilMenu_MoveRow(1, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInRow1Task);
 }
 
-static void func_ov182_021ad038(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideInRow1Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[3]).attr01 - 12;
 
     if (y > 0x63) {
-        func_ov182_021ad634(1, y);
+        DWCUtilMenu_MoveRow(1, y);
         return;
     }
-    func_ov182_021ad634(1, 0x63);
-    func_ov182_021ad634(2, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad080);
+    DWCUtilMenu_MoveRow(1, 0x63);
+    DWCUtilMenu_MoveRow(2, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInRow2Task);
 }
 
-static void func_ov182_021ad080(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideInRow2Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[6]).attr01 - 12;
 
     if (y > 0x7a) {
-        func_ov182_021ad634(2, y);
+        DWCUtilMenu_MoveRow(2, y);
         return;
     }
-    func_ov182_021ad634(2, 0x7a);
-    func_ov182_021ad634(3, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad0c8);
+    DWCUtilMenu_MoveRow(2, 0x7a);
+    DWCUtilMenu_MoveRow(3, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInRow3Task);
 }
 
-static void func_ov182_021ad0c8(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideInRow3Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[9]).attr01 - 12;
 
     if (y > 0x91) {
-        func_ov182_021ad634(3, y);
+        DWCUtilMenu_MoveRow(3, y);
         return;
     }
-    func_ov182_021ad634(3, 0x91);
-    func_ov182_021ad634(4, 0xc0);
-    func_ov182_021bd264(task, func_ov182_021ad110);
+    DWCUtilMenu_MoveRow(3, 0x91);
+    DWCUtilMenu_MoveRow(4, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInButtonsTask);
 }
 
-static void func_ov182_021ad110(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideInButtonsTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sMenu->buttons[0], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sMenu->buttons[0], 0, &x, &y);
     y -= 12;
     if (y > 0xaa) {
-        func_ov182_021ad634(4, y);
+        DWCUtilMenu_MoveRow(4, y);
         return;
     }
-    func_ov182_021ad634(4, 0xaa);
-    func_ov182_021ad838();
-    func_ov182_021bd264(task, func_ov182_021ad15c);
+    DWCUtilMenu_MoveRow(4, 0xaa);
+    DWCUtilMenu_DrawCursor();
+    DWCUtilTask_SetCallback(task, DWCUtilMenu_UpdateTask);
 }
 
-static void func_ov182_021ad15c(DWCUtilTask *task, void *arg) {
-    func_ov182_021ad170();
-    func_ov182_021ad294();
-    func_ov182_021ad3b4();
-    func_ov182_021ad518();
+static void DWCUtilMenu_UpdateTask(DWCUtilTask *task, void *arg) {
+    DWCUtilMenu_HandleTouchStart();
+    DWCUtilMenu_HandleTouchEnd();
+    DWCUtilMenu_HandleTouchHold();
+    DWCUtilMenu_HandlePad();
 }
 
 // The start of a touch: which key it is on
-static void func_ov182_021ad170(void) {
+static void DWCUtilMenu_HandleTouchStart(void) {
     u16 rect[4];
     int i;
 
-    if (func_ov182_021bc888(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
         sMenu->touched = -1;
         for (i = 0; i < 10; i++) {
-            func_ov182_021bc1c0(&sKeyPositions[i], sKeySize, rect);
-            if (func_ov182_021bc888(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sKeyPositions[i], sKeySize, rect);
+            if (DWCUtilTouch_IsTriggeredIn(rect)) {
                 if (!sMenu->digitsEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sMenu->touched = i;
                 return;
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sArrowPositions[i], sArrowSize, rect);
-            if (func_ov182_021bc888(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sArrowPositions[i], sArrowSize, rect);
+            if (DWCUtilTouch_IsTriggeredIn(rect)) {
                 if ((i == 0 && !sMenu->leftEnabled) || (i == 1 && !sMenu->rightEnabled)) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     return;
                 }
-                func_ov182_021b80f4(0);
+                DWCUtilSound_PlaySe(0);
                 sMenu->touched = i + 10;
                 return;
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
-            if (func_ov182_021bc888(rect)) {
-                func_ov182_021b80f4(0);
+            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            if (DWCUtilTouch_IsTriggeredIn(rect)) {
+                DWCUtilSound_PlaySe(0);
                 sMenu->touched = i + 12;
                 return;
             }
@@ -295,45 +295,45 @@ static void func_ov182_021ad170(void) {
 }
 
 // The end of a touch: the key it chooses, if it ends on the key it started on
-static void func_ov182_021ad294(void) {
+static void DWCUtilMenu_HandleTouchEnd(void) {
     u16 rect[4];
     int i;
 
     sMenu->code = 0;
-    if (func_ov182_021bc948(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsReleasedIn(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < 10; i++) {
-            func_ov182_021bc1c0(&sKeyPositions[i], sKeySize, rect);
-            if (func_ov182_021bc948(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sKeyPositions[i], sKeySize, rect);
+            if (DWCUtilTouch_IsReleasedIn(rect)) {
                 if (sMenu->touched != i) {
                     return;
                 }
                 sMenu->code = sDigitCodes[i];
                 sMenu->cursorPos = i;
-                func_ov182_021ad838();
+                DWCUtilMenu_DrawCursor();
                 return;
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sArrowPositions[i], sArrowSize, rect);
-            if (func_ov182_021bc948(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sArrowPositions[i], sArrowSize, rect);
+            if (DWCUtilTouch_IsReleasedIn(rect)) {
                 if (sMenu->touched != i + 10) {
                     return;
                 }
                 sMenu->code = sArrowCodes[i];
                 sMenu->cursorPos = i + 10;
-                func_ov182_021ad838();
+                DWCUtilMenu_DrawCursor();
                 return;
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
-            if (func_ov182_021bc948(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            if (DWCUtilTouch_IsReleasedIn(rect)) {
                 if (sMenu->touched != i + 12) {
                     return;
                 }
                 sMenu->code = sButtonCodes[i];
                 sMenu->cursorPos = i + 12;
-                func_ov182_021ad838();
+                DWCUtilMenu_DrawCursor();
                 return;
             }
         }
@@ -341,14 +341,14 @@ static void func_ov182_021ad294(void) {
 }
 
 // A held touch: the key it holds is shown pressed, and the left arrow repeats
-static void func_ov182_021ad3b4(void) {
+static void DWCUtilMenu_HandleTouchHold(void) {
     u16 rect[4];
     int i;
 
-    if (func_ov182_021bc828(data_ov182_021c059c)) {
+    if (DWCUtilTouch_IsTouchedIn(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < 10; i++) {
-            func_ov182_021bc1c0(&sKeyPositions[i], sKeySize, rect);
-            if (func_ov182_021bc828(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sKeyPositions[i], sKeySize, rect);
+            if (DWCUtilTouch_IsTouchedIn(rect)) {
                 if (sMenu->touched != i) {
                     goto released;
                 }
@@ -356,12 +356,12 @@ static void func_ov182_021ad3b4(void) {
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sArrowPositions[i], sArrowSize, rect);
-            if (func_ov182_021bc828(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sArrowPositions[i], sArrowSize, rect);
+            if (DWCUtilTouch_IsTouchedIn(rect)) {
                 if (sMenu->touched != i + 10) {
                     goto released;
                 }
-                func_ov182_021ad4ec(i + 10);
+                DWCUtilMenu_SetPressedKey(i + 10);
                 if (i != 0) {
                     goto clear;
                 }
@@ -370,7 +370,7 @@ static void func_ov182_021ad3b4(void) {
                     return;
                 }
                 if (!sMenu->leftEnabled) {
-                    func_ov182_021b80f4(9);
+                    DWCUtilSound_PlaySe(9);
                     sMenu->touched = -1;
                     return;
                 }
@@ -380,8 +380,8 @@ static void func_ov182_021ad3b4(void) {
             }
         }
         for (i = 0; i < 2; i++) {
-            func_ov182_021bc1c0(&sButtonPositions[i], sButtonSize, rect);
-            if (func_ov182_021bc828(rect)) {
+            DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
+            if (DWCUtilTouch_IsTouchedIn(rect)) {
                 if (sMenu->touched == i + 12) {
                     i += 12;
                     goto held;
@@ -393,48 +393,48 @@ static void func_ov182_021ad3b4(void) {
 released:
     i = -1;
 held:
-    func_ov182_021ad4ec(i);
+    DWCUtilMenu_SetPressedKey(i);
 clear:
     sMenu->repeat = 0;
 }
 
-static void func_ov182_021ad4ec(int key) {
+static void DWCUtilMenu_SetPressedKey(int key) {
     if (key != sMenu->pressed) {
-        func_ov182_021ad7ac(key, TRUE);
-        func_ov182_021ad7ac(sMenu->pressed, FALSE);
+        DWCUtilMenu_DrawKey(key, TRUE);
+        DWCUtilMenu_DrawKey(sMenu->pressed, FALSE);
         sMenu->pressed = key;
     }
 }
 
 // The keys: the D-pad moves the cursor, A chooses its key and B is the left arrow
-static void func_ov182_021ad518(void) {
+static void DWCUtilMenu_HandlePad(void) {
     int key;
 
-    if (func_ov182_021bc7c8(0x20)) {
-        func_ov182_021ad894(0);
+    if (DWCUtilTouch_IsKeyRepeated(0x20)) {
+        DWCUtilMenu_MoveCursor(0);
     }
-    if (func_ov182_021bc7c8(0x40)) {
-        func_ov182_021ad894(1);
+    if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+        DWCUtilMenu_MoveCursor(1);
     }
-    if (func_ov182_021bc7c8(0x10)) {
-        func_ov182_021ad894(2);
+    if (DWCUtilTouch_IsKeyRepeated(0x10)) {
+        DWCUtilMenu_MoveCursor(2);
     }
-    if (func_ov182_021bc7c8(0x80)) {
-        func_ov182_021ad894(3);
+    if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+        DWCUtilMenu_MoveCursor(3);
     }
-    if (func_ov182_021bc798(1)) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         key = sMenu->cursorPos;
         if (key < 10) {
             if (sMenu->digitsEnabled) {
                 sMenu->code = sDigitCodes[key];
                 return;
             }
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             return;
         }
         if (key - 10 < 2) {
             if ((key - 10 == 0 && !sMenu->leftEnabled) || (key - 10 == 1 && !sMenu->rightEnabled)) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 return;
             }
             sMenu->code = sArrowCodes[key - 10];
@@ -442,22 +442,22 @@ static void func_ov182_021ad518(void) {
         }
         sMenu->code = sButtonCodes[key - 12];
     }
-    if (func_ov182_021bc7c8(2)) {
+    if (DWCUtilTouch_IsKeyRepeated(2)) {
         if (!sMenu->leftEnabled) {
             if (!sMenu->buzzed) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sMenu->buzzed = TRUE;
             }
         } else {
             sMenu->code = 0x10;
         }
-    } else if (func_ov182_021bc7f8(2)) {
+    } else if (DWCUtilTouch_IsKeyReleased(2)) {
         sMenu->buzzed = FALSE;
     }
 }
 
 // Moves a row of keys to y: rows 0 to 3 of keys, with the arrows on row 3, and row 4 of the buttons
-static void func_ov182_021ad634(int row, u32 y) {
+static void DWCUtilMenu_MoveRow(int row, u32 y) {
     const u8 keyCounts[5] = { 3, 3, 3, 1, 0 };
     const u8 arrowCounts[5] = { 0, 0, 0, 2, 0 };
     const u8 buttonCounts[5] = { 0, 0, 0, 0, 2 };
@@ -472,7 +472,7 @@ static void func_ov182_021ad634(int row, u32 y) {
         key++;
     }
     if (row < 4) {
-        func_ov182_021bc124(sMenu->rows[row], sKeyPositions[row * 3].x, y, sMenu->rowNodes[row], 2);
+        DWCUtilText_ShowObj(sMenu->rows[row], sKeyPositions[row * 3].x, y, sMenu->rowNodes[row], 2);
     }
     for (i = 0; i < arrowCounts[row]; i++) {
         G2_SetOBJEffect(sMenu->arrowOams[i], GX_OAM_EFFECT_NONE, 0);
@@ -481,12 +481,12 @@ static void func_ov182_021ad634(int row, u32 y) {
             ((sMenu->arrowOams[i]->attr01 & ~(GX_OAM_ATTR01_X_MASK | GX_OAM_ATTR01_Y_MASK)) | (y & 0xff));
     }
     for (i = 0; i < buttonCounts[row]; i++) {
-        func_ov182_021bb6f8(sMenu->buttons[i], -1, GX_OAM_EFFECT_NONE, 0);
-        func_ov182_021bb7e0(sMenu->buttons[i], -1, sButtonPositions[i].x, y);
+        DWCUtilOam_SetEffect(sMenu->buttons[i], -1, GX_OAM_EFFECT_NONE, 0);
+        DWCUtilOam_SetNodePosition(sMenu->buttons[i], -1, sButtonPositions[i].x, y);
     }
 }
 
-static void func_ov182_021ad7ac(int key, int pressed) {
+static void DWCUtilMenu_DrawKey(int key, int pressed) {
     if (key < 0) {
         return;
     }
@@ -495,22 +495,23 @@ static void func_ov182_021ad7ac(int key, int pressed) {
     } else if (key - 10 < 2) {
         G2_SetOBJMode(sMenu->arrowOams[key - 10], GX_OAM_MODE_NORMAL, sKeyPalettes[pressed]);
     } else {
-        func_ov182_021bb778(sMenu->buttons[key - 12], -1, GX_OAM_MODE_NORMAL, sButtonEffects[pressed]);
+        DWCUtilOam_SetMode(sMenu->buttons[key - 12], -1, GX_OAM_MODE_NORMAL, sButtonEffects[pressed]);
     }
 }
 
-static void func_ov182_021ad838(void) {
+static void DWCUtilMenu_DrawCursor(void) {
     int cell = 0x44;
 
     if (sMenu->cursorPos > 11) {
         cell = 0x45;
     }
-    func_ov182_021bb914(0, cell, func_ov182_021bb6ec(sMenu->cursor, 0));
-    func_ov182_021bb878(sMenu->cursor, -1, 2);
-    func_ov182_021bb7e0(sMenu->cursor, -1, sCursorPositions[sMenu->cursorPos].x, sCursorPositions[sMenu->cursorPos].y);
+    DWCUtilCell_Copy(0, cell, DWCUtilOam_GetEntry(sMenu->cursor, 0));
+    DWCUtilOam_SetPriority(sMenu->cursor, -1, 2);
+    DWCUtilOam_SetNodePosition(sMenu->cursor, -1, sCursorPositions[sMenu->cursorPos].x,
+                               sCursorPositions[sMenu->cursorPos].y);
 }
 
-static void func_ov182_021ad894(int direction) {
+static void DWCUtilMenu_MoveCursor(int direction) {
     int previous = sMenu->cursorPos;
 
     sMenu->cursorPos = sNavigation[previous][direction];
@@ -529,71 +530,71 @@ static void func_ov182_021ad894(int direction) {
             sMenu->cursorPos = 2;
         }
     }
-    func_ov182_021ad838();
-    func_ov182_021b80f4(8);
+    DWCUtilMenu_DrawCursor();
+    DWCUtilSound_PlaySe(8);
 }
 
-static void func_ov182_021ad90c(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(func_ov182_021bb6ec(sMenu->buttons[0], 0)).attr01 + 12;
+static void DWCUtilMenu_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
+    int y = (u8)DWCUtilOam_ReadAttr01(DWCUtilOam_GetEntry(sMenu->buttons[0], 0)).attr01 + 12;
 
-    func_ov182_021ad634(4, y);
+    DWCUtilMenu_MoveRow(4, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad948);
+        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow3Task);
     }
 }
 
-static void func_ov182_021ad948(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[9]).attr01 + 12;
 
-    func_ov182_021ad634(3, y);
+    DWCUtilMenu_MoveRow(3, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad97c);
+        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow2Task);
     }
 }
 
-static void func_ov182_021ad97c(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[6]).attr01 + 12;
 
-    func_ov182_021ad634(2, y);
+    DWCUtilMenu_MoveRow(2, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad9b0);
+        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow1Task);
     }
 }
 
-static void func_ov182_021ad9b0(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[3]).attr01 + 12;
 
-    func_ov182_021ad634(1, y);
+    DWCUtilMenu_MoveRow(1, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ad9e4);
+        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow0Task);
     }
 }
 
-static void func_ov182_021ad9e4(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_SlideOutRow0Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sMenu->keyOams[0]).attr01 + 12;
 
-    func_ov182_021ad634(0, y);
+    DWCUtilMenu_MoveRow(0, y);
     if (y >= 0xc0) {
-        func_ov182_021bd264(task, func_ov182_021ada18);
+        DWCUtilTask_SetCallback(task, DWCUtilMenu_DestroyTask);
     }
 }
 
-static void func_ov182_021ada18(DWCUtilTask *task, void *arg) {
+static void DWCUtilMenu_DestroyTask(DWCUtilTask *task, void *arg) {
     int i;
 
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
     for (i = 0; i < 4; i++) {
-        func_ov182_021bb690(sMenu->rowNodes[i]);
-        func_ov182_021bbdcc(sMenu->rows[i]);
+        DWCUtilOam_Free(sMenu->rowNodes[i]);
+        DWCUtilText_DestroyObj(sMenu->rows[i]);
     }
     for (i = 0; i < 2; i++) {
-        func_ov182_021bb690(sMenu->buttons[i]);
+        DWCUtilOam_Free(sMenu->buttons[i]);
     }
     for (i = 0; i < 2; i++) {
-        func_ov182_021bcc9c(sMenu->arrowOams[i]);
+        DWCUtilOamBuf_Free(sMenu->arrowOams[i]);
     }
     for (i = 0; i < 10; i++) {
-        func_ov182_021bcc9c(sMenu->keyOams[i]);
+        DWCUtilOamBuf_Free(sMenu->keyOams[i]);
     }
-    func_ov182_021bc4f0(&sMenu);
+    DWCUtilHeap_FreeAndNull(&sMenu);
 }

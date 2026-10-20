@@ -8,6 +8,6 @@
 // point takes its SSID into the connection being edited and goes on to its WEP key, or to the connection test when it
 // has no security; an access point with a security the utility can't set shows a dialog.
 // The ROM does not embed this source file's name; dwc_util_page_ap_list.c is named after its screen, char/jb4ApList.
-void func_ov182_021b0c28(void);
+void DWCUtilPageApList_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_PAGE_AP_LIST_H

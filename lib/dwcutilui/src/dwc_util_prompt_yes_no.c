@@ -15,32 +15,32 @@
 #include "dwc_util_ui_object.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021afbd8(void);
-static void func_ov182_021afc28(void);
-static void func_ov182_021afc60(void);
-static void func_ov182_021afc80(void);
-static void func_ov182_021afca0(void);
-static void func_ov182_021afcb0(void);
+static void DWCUtilPromptYesNo_LoadGraphics(void);
+static void DWCUtilPromptYesNo_FadeIn(void);
+static void DWCUtilPromptYesNo_WaitFadeIn(void);
+static void DWCUtilPromptYesNo_WaitButtons(void);
+static void DWCUtilPromptYesNo_Main(void);
+static void DWCUtilPromptYesNo_HandleInput(void);
 static void func_ov182_021afcd8(void);
-static void func_ov182_021afcdc(void);
-static void func_ov182_021afd10(void);
-static void func_ov182_021afd28(void);
-static void func_ov182_021afd6c(void);
+static void DWCUtilPromptYesNo_HandleChoice(void);
+static void DWCUtilPromptYesNo_DisableButtons(void);
+static void DWCUtilPromptYesNo_FadeOut(void);
+static void DWCUtilPromptYesNo_WaitFadeOut(void);
 
 // Whether the player answered yes
 static u8 sYes;
 
-void func_ov182_021afba4(void) {
+void DWCUtilPromptYesNo_Init(void) {
     sYes = FALSE;
-    func_ov182_021afbd8();
-    func_ov182_021ab96c(0x13);
+    DWCUtilPromptYesNo_LoadGraphics();
+    DWCUtilBgOverlay_Show(0x13);
     DWCUtilScreen_Start(0x3c, -1, 0);
-    func_ov182_021ab6f0(0x1b);
-    func_ov182_021adfbc(func_ov182_021afc28);
+    DWCUtilGfxResource_ShowMessage(0x1b);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_FadeIn);
 }
 
-static void func_ov182_021afbd8(void) {
-    func_ov182_021ab67c("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilPromptYesNo_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -48,87 +48,89 @@ static void func_ov182_021afbd8(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021afc28(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021afc60);
+static void DWCUtilPromptYesNo_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitFadeIn);
 }
 
-static void func_ov182_021afc60(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(3);
-        func_ov182_021adfbc(func_ov182_021afc80);
+static void DWCUtilPromptYesNo_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(3);
+        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitButtons);
     }
 }
 
-static void func_ov182_021afc80(void) {
+static void DWCUtilPromptYesNo_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021afca0);
+        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_Main);
     }
 }
 
-static void func_ov182_021afca0(void) {
-    func_ov182_021afcb0();
+static void DWCUtilPromptYesNo_Main(void) {
+    DWCUtilPromptYesNo_HandleInput();
     func_ov182_021afcd8();
-    func_ov182_021afcdc();
+    DWCUtilPromptYesNo_HandleChoice();
 }
 
-static void func_ov182_021afcb0(void) {
-    func_ov182_021aec10Inline();
+static void DWCUtilPromptYesNo_HandleInput(void) {
+    DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
 static void func_ov182_021afcd8(void) {
 }
 
-static void func_ov182_021afcdc(void) {
+static void DWCUtilPromptYesNo_HandleChoice(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         sYes = TRUE;
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021afd10);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_DisableButtons);
 }
 
-static void func_ov182_021afd10(void) {
+static void DWCUtilPromptYesNo_DisableButtons(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021afd28);
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_FadeOut);
 }
 
-static void func_ov182_021afd28(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+static void DWCUtilPromptYesNo_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sYes) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021afd6c);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitFadeOut);
     }
 }
 
-static void func_ov182_021afd6c(void) {
-    if (func_ov182_021bbaac(0) == 0 && (sYes || func_ov182_021bbaac(1) == 0) && DWCUtilUiObject_IsIdle()) {
-        func_ov182_021bbf7c(0);
+static void DWCUtilPromptYesNo_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(0) == 0 && (sYes || DWCUtilFade_IsActive(1) == 0) && DWCUtilUiObject_IsIdle()) {
+        DWCUtilText_DestroyScreenBg(0);
         if (!sYes) {
             DWCUtilScreen_Stop();
-            func_ov182_021bc228(1, 1);
+            DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sYes) {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021af25c);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
         } else {
-            func_ov182_021adfc8(0, 1);
-            func_ov182_021adfbc(func_ov182_021afa28);
+            DWCUtilMain_SetLayout(0, 1);
+            DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitInstructions);
         }
     }
 }

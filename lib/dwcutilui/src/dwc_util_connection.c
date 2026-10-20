@@ -5,31 +5,32 @@
 #include "dwcutil/dwcutil_ac.h"
 #include "nitro/os.h"
 
-static void func_ov182_021ae4cc(const DWCUtilAcStatus *status);
-static void *func_ov182_021ae4e0(u32 size);
-static void func_ov182_021ae4ec(void *ptr);
+static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status);
+static void *DWCUtilConnection_Alloc(u32 size);
+static void DWCUtilConnection_Free(void *ptr);
 
 // Defined in this file, which doesn't read it, since dwc_util_main_menu.c reaches its own .bss from the address of
 // its first static
-DWCUtilMsg *data_ov182_021c40b8;
+DWCUtilMsg *gDWCUtilMsg;
 static DWCUtilAcStatus *sStatus;
 
-void func_ov182_021ae3d8(void) {
-    sStatus = func_ov182_021bc4d8(sizeof(DWCUtilAcStatus), -4);
-    if (DWCUtilAc_Start(0xf, 0x40, func_ov182_021ae4cc, func_ov182_021ae4e0, func_ov182_021ae4ec, 0x800) != TRUE) {
+void DWCUtilConnection_Start(void) {
+    sStatus = DWCUtilHeap_AllocClear(sizeof(DWCUtilAcStatus), -4);
+    if (DWCUtilAc_Start(0xf, 0x40, DWCUtilConnection_OnStatus, DWCUtilConnection_Alloc, DWCUtilConnection_Free,
+                        0x800) != TRUE) {
         OS_Terminate();
     }
     OS_Sleep(10);
 }
 
-void func_ov182_021ae424(void) {
+void DWCUtilConnection_Stop(void) {
     if (DWCUtilAc_Cancel() != TRUE) {
         OS_Terminate();
     }
-    func_ov182_021bc4f0(&sStatus);
+    DWCUtilHeap_FreeAndNull(&sStatus);
 }
 
-int func_ov182_021ae440(void) {
+int DWCUtilConnection_GetState(void) {
     DWCUtilAcResult result;
 
     switch (sStatus->state) {
@@ -46,7 +47,7 @@ int func_ov182_021ae440(void) {
         if (DWCUtilAc_GetResult(&result) != TRUE) {
             OS_Terminate();
         }
-        if (result.wepMode >= 0 && result.wepMode <= 3 && result.unk_24 == 1) {
+        if (result.wepMode >= 0 && result.wepMode <= 3 && result.keyCount == 1) {
             return 3;
         }
         return 5;
@@ -55,23 +56,23 @@ int func_ov182_021ae440(void) {
     }
 }
 
-void func_ov182_021ae4b0(void) {
+void DWCUtilConnection_SaveResult(void) {
     DWCUtilAcResult result;
 
     if (DWCUtilAc_GetResult(&result) != TRUE) {
         OS_Terminate();
     }
-    func_ov182_021b7c60(&result);
+    DWCUtilWifiSettings_SaveAcResult(&result);
 }
 
-static void func_ov182_021ae4cc(const DWCUtilAcStatus *status) {
+static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status) {
     *sStatus = *status;
 }
 
-static void *func_ov182_021ae4e0(u32 size) {
-    return func_ov182_021bc4d8(size, 32);
+static void *DWCUtilConnection_Alloc(u32 size) {
+    return DWCUtilHeap_AllocClear(size, 32);
 }
 
-static void func_ov182_021ae4ec(void *ptr) {
-    func_ov182_021bc51c(ptr);
+static void DWCUtilConnection_Free(void *ptr) {
+    DWCUtilHeap_Free(ptr);
 }

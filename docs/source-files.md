@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-1296 of 1688 functions are in source files.
+1506 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -119,6 +119,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `dwc_match.c` | `0x0215fa0c`–`0x02168818` | 210 | partial | descriptive |
 | `gsAvailable.c` | `0x0216c520`–`0x0216c764` | 5 | complete | descriptive |
 | `gsCore.c` | `0x0216c764`–`0x0216cac0` | 11 | complete | descriptive |
 | `gsCrypt.c` | `0x0216cac0`–`0x0216cc2c` | 1 | complete | descriptive |
@@ -637,7 +638,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_field.c` | `0x021c71d4`–`0x021c73dc` | 7 | complete | descriptive |
 | `scrcmd_pep_quiz.c` | `0x021c73dc`–`0x021c7498` | 1 | complete | descriptive |
 | `scrcmd_poke_disp.c` | `0x021c7498`–`0x021c7b38` | 17 | complete | descriptive |
-| `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | partial | descriptive |
+| `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | complete | descriptive |
 | `fld_vreq.c` | `0x021c7fd8`–`0x021c81f4` | 14 | complete | string at `0x021d56f0` |
 | `field_palace_sys.c` | `0x021c81f4`–`0x021c83e8` | 6 | complete | string at `0x021d56fc` |
 | `field_goout_effect.c` | `0x021c83e8`–`0x021c8808` | 11 | complete | string at `0x021d5710` |

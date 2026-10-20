@@ -17,32 +17,32 @@ typedef struct DWCUtilOamScreen {
 
 static DWCUtilOamScreen *sScreens;
 
-void func_ov182_021bb480(void) {
+void DWCUtilOam_Init(void) {
     int i;
 
-    sScreens = func_ov182_021bc4d8(sizeof(DWCUtilOamScreen) * 2, 4);
+    sScreens = DWCUtilHeap_AllocClear(sizeof(DWCUtilOamScreen) * 2, 4);
     for (i = 0; i < 2; i++) {
-        sScreens[i].freeNodes = func_ov182_021bb9c8(32, (u8 *)sScreens[i].nodes, sizeof(DWCUtilOamNode));
-        sScreens[i].list = func_ov182_021bcb3c();
-        sScreens[i].head.oam = func_ov182_021bccd8(i, 64);
-        sScreens[i].tail.oam = func_ov182_021bccd8(i, 127) + 1;
-        func_ov182_021bcbbc(sScreens[i].list, &sScreens[i].head);
-        func_ov182_021bcbb0(sScreens[i].list, &sScreens[i].tail);
+        sScreens[i].freeNodes = DWCUtilStack_CreateFilled(32, (u8 *)sScreens[i].nodes, sizeof(DWCUtilOamNode));
+        sScreens[i].list = DWCUtilList_Create();
+        sScreens[i].head.oam = DWCUtilOamBuf_GetEntry(i, 64);
+        sScreens[i].tail.oam = DWCUtilOamBuf_GetEntry(i, 127) + 1;
+        DWCUtilList_Prepend(sScreens[i].list, &sScreens[i].head);
+        DWCUtilList_Append(sScreens[i].list, &sScreens[i].tail);
     }
 }
 
-void func_ov182_021bb54c(void) {
+void DWCUtilOam_Exit(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_ov182_021bcb58(sScreens[i].list);
-        func_ov182_021bb9ec(sScreens[i].freeNodes);
+        DWCUtilList_Destroy(sScreens[i].list);
+        DWCUtilStack_Destroy(sScreens[i].freeNodes);
     }
-    func_ov182_021bc4f0(&sScreens);
+    DWCUtilHeap_FreeAndNull(&sScreens);
 }
 
-DWCUtilOamNode *func_ov182_021bb594(int screen, int count, BOOL fromFront) {
-    DWCUtilOamNode *node = func_ov182_021bba38(sScreens[screen].freeNodes);
+DWCUtilOamNode *DWCUtilOam_Alloc(int screen, int count, BOOL fromFront) {
+    DWCUtilOamNode *node = DWCUtilStack_Pop(sScreens[screen].freeNodes);
     DWCUtilOamNode *position;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
 
@@ -54,7 +54,7 @@ DWCUtilOamNode *func_ov182_021bb594(int screen, int count, BOOL fromFront) {
 
             if (end + count <= next->oam) {
                 node->oam = end;
-                func_ov182_021bcb90(next, node);
+                DWCUtilList_InsertBefore(next, node);
                 break;
             }
             position = next;
@@ -70,7 +70,7 @@ DWCUtilOamNode *func_ov182_021bb594(int screen, int count, BOOL fromFront) {
 
             if (start >= prev->oam + prev->count) {
                 node->oam = start;
-                func_ov182_021bcb90(position, node);
+                DWCUtilList_InsertBefore(position, node);
                 break;
             }
             position = prev;
@@ -84,7 +84,7 @@ DWCUtilOamNode *func_ov182_021bb594(int screen, int count, BOOL fromFront) {
     return node;
 }
 
-void func_ov182_021bb690(DWCUtilOamNode *node) {
+void DWCUtilOam_Free(DWCUtilOamNode *node) {
     GXOamAttr *oam = node->oam;
     int screen = 0;
     int i;
@@ -93,22 +93,22 @@ void func_ov182_021bb690(DWCUtilOamNode *node) {
         G2_SetOBJEffect(oam, GX_OAM_EFFECT_NODISPLAY, 0);
         oam++;
     }
-    func_ov182_021bcb6c(node);
+    DWCUtilList_Remove(node);
     if (node >= sScreens[1].nodes) {
         screen = 1;
     }
-    func_ov182_021bba00(sScreens[screen].freeNodes, node);
+    DWCUtilStack_Push(sScreens[screen].freeNodes, node);
 }
 
-GXOamAttr *func_ov182_021bb6ec(DWCUtilOamNode *node, int index) {
+GXOamAttr *DWCUtilOam_GetEntry(DWCUtilOamNode *node, int index) {
     return &node->oam[index];
 }
 
-int func_ov182_021bb6f4(DWCUtilOamNode *node) {
+int DWCUtilOam_GetCount(DWCUtilOamNode *node) {
     return node->count;
 }
 
-void func_ov182_021bb6f8(DWCUtilOamNode *node, int index, int effect, int rsParam) {
+void DWCUtilOam_SetEffect(DWCUtilOamNode *node, int index, int effect, int rsParam) {
     GXOamAttr *oam = node->oam;
     int i;
 
@@ -121,7 +121,7 @@ void func_ov182_021bb6f8(DWCUtilOamNode *node, int index, int effect, int rsPara
     }
 }
 
-void func_ov182_021bb778(DWCUtilOamNode *node, int index, int mode, int cParam) {
+void DWCUtilOam_SetMode(DWCUtilOamNode *node, int index, int mode, int cParam) {
     GXOamAttr *oam = node->oam;
     int i;
 
@@ -134,7 +134,7 @@ void func_ov182_021bb778(DWCUtilOamNode *node, int index, int mode, int cParam) 
     }
 }
 
-void func_ov182_021bb7e0(DWCUtilOamNode *node, int index, int x, int y) {
+void DWCUtilOam_SetNodePosition(DWCUtilOamNode *node, int index, int x, int y) {
     int i;
     int firstX;
     int firstY;
@@ -157,7 +157,7 @@ void func_ov182_021bb7e0(DWCUtilOamNode *node, int index, int x, int y) {
     }
 }
 
-void func_ov182_021bb878(DWCUtilOamNode *node, int index, int priority) {
+void DWCUtilOam_SetPriority(DWCUtilOamNode *node, int index, int priority) {
     GXOamAttr *oam = node->oam;
     int i;
 
@@ -170,6 +170,6 @@ void func_ov182_021bb878(DWCUtilOamNode *node, int index, int priority) {
     }
 }
 
-void func_ov182_021bb8bc(DWCUtilOamNode *node, int index, int *x, int *y) {
+void DWCUtilOam_GetNodePosition(DWCUtilOamNode *node, int index, int *x, int *y) {
     DWCUtilOam_GetPosition(&node->oam[index], x, y);
 }

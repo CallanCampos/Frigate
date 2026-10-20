@@ -10,29 +10,29 @@
 #include "dwc_util_sound.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021b6758(void);
-static void func_ov182_021b67a8(void);
-static void func_ov182_021b67cc(void);
-static void func_ov182_021b67e4(void);
+static void DWCUtilUsbDone_LoadGraphics(void);
+static void DWCUtilUsbDone_FadeIn(void);
+static void DWCUtilUsbDone_WaitFadeIn(void);
+static void DWCUtilUsbDone_Main(void);
 static void func_ov182_021b67f0(void);
-static void func_ov182_021b67f4(void);
-static void func_ov182_021b681c(void);
-static void func_ov182_021b686c(void);
+static void DWCUtilUsbDone_FadeOut(void);
+static void DWCUtilUsbDone_WaitFadeOut(void);
+static void DWCUtilUsbDone_CountFrames(void);
 
 // The frames since the message appeared
 static u8 sUsbDoneFrames;
 
-void func_ov182_021b6728(void) {
+void DWCUtilUsbDone_Init(void) {
     sUsbDoneFrames = 0;
-    func_ov182_021b6758();
-    func_ov182_021ab96c(8);
-    func_ov182_021ab6f0(0x29);
-    func_ov182_021b80f4(0x10);
-    func_ov182_021adfbc(func_ov182_021b67a8);
+    DWCUtilUsbDone_LoadGraphics();
+    DWCUtilBgOverlay_Show(8);
+    DWCUtilGfxResource_ShowMessage(0x29);
+    DWCUtilSound_PlaySe(0x10);
+    DWCUtilMain_SetUpdate(DWCUtilUsbDone_FadeIn);
 }
 
-static void func_ov182_021b6758(void) {
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilUsbDone_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -40,48 +40,50 @@ static void func_ov182_021b6758(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b67a8(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b67cc);
+static void DWCUtilUsbDone_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilUsbDone_WaitFadeIn);
 }
 
-static void func_ov182_021b67cc(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b67e4);
+static void DWCUtilUsbDone_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilMain_SetUpdate(DWCUtilUsbDone_Main);
     }
 }
 
-static void func_ov182_021b67e4(void) {
-    func_ov182_021b686c();
+static void DWCUtilUsbDone_Main(void) {
+    DWCUtilUsbDone_CountFrames();
     func_ov182_021b67f0();
 }
 
 static void func_ov182_021b67f0(void) {
 }
 
-static void func_ov182_021b67f4(void) {
-    func_ov182_021bbac4(3, 1, 1, 8);
-    func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021b681c);
+static void DWCUtilUsbDone_FadeOut(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilMain_SetUpdate(DWCUtilUsbDone_WaitFadeOut);
 }
 
 // Once both screens have faded out, goes on to the message before the connection test with auto-connect
-static void func_ov182_021b681c(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021bbf7c(0);
+static void DWCUtilUsbDone_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adff0(0, 2);
-        func_ov182_021adfbc(func_ov182_021b6588);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetScreenArgs(0, 2);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
     }
 }
 
-static void func_ov182_021b686c(void) {
+static void DWCUtilUsbDone_CountFrames(void) {
     sUsbDoneFrames++;
     if (sUsbDoneFrames >= 120) {
-        func_ov182_021adfbc(func_ov182_021b67f4);
+        DWCUtilMain_SetUpdate(DWCUtilUsbDone_FadeOut);
     }
 }

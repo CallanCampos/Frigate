@@ -9,73 +9,75 @@
 #include "dwc_util_text.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021afe10(void);
-static void func_ov182_021afe58(void);
-static void func_ov182_021afe7c(void);
-static void func_ov182_021afe9c(void);
+static void DWCUtilTimedNotice_LoadGraphics(void);
+static void DWCUtilTimedNotice_FadeIn(void);
+static void DWCUtilTimedNotice_WaitFadeIn(void);
+static void DWCUtilTimedNotice_Main(void);
 static void func_ov182_021afea8(void);
-static void func_ov182_021afeac(void);
-static void func_ov182_021afed4(void);
-static void func_ov182_021aff1c(void);
+static void DWCUtilTimedNotice_FadeOut(void);
+static void DWCUtilTimedNotice_WaitFadeOut(void);
+static void DWCUtilTimedNotice_CountFrames(void);
 
 // The frames the notice has been shown
 static u8 sFrames;
 
-void func_ov182_021afdec(void) {
+void DWCUtilTimedNotice_Init(void) {
     sFrames = 0;
-    func_ov182_021afe10();
-    func_ov182_021ab6f0(0x21);
-    func_ov182_021adfbc(func_ov182_021afe58);
+    DWCUtilTimedNotice_LoadGraphics();
+    DWCUtilGfxResource_ShowMessage(0x21);
+    DWCUtilMain_SetUpdate(DWCUtilTimedNotice_FadeIn);
 }
 
-static void func_ov182_021afe10(void) {
-    func_ov182_021ab67c("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilTimedNotice_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021afe58(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021afe7c);
+static void DWCUtilTimedNotice_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilTimedNotice_WaitFadeIn);
 }
 
-static void func_ov182_021afe7c(void) {
-    if (func_ov182_021bbaac(0) == 0 && func_ov182_021ae210()) {
-        func_ov182_021adfbc(func_ov182_021afe9c);
+static void DWCUtilTimedNotice_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0 && DWCUtilMove_HasEnded()) {
+        DWCUtilMain_SetUpdate(DWCUtilTimedNotice_Main);
     }
 }
 
-static void func_ov182_021afe9c(void) {
-    func_ov182_021aff1c();
+static void DWCUtilTimedNotice_Main(void) {
+    DWCUtilTimedNotice_CountFrames();
     func_ov182_021afea8();
 }
 
 static void func_ov182_021afea8(void) {
 }
 
-static void func_ov182_021afeac(void) {
-    func_ov182_021bbac4(3, 1, 1, 8);
-    func_ov182_021bbac4(3, 0, 0x15, 8);
-    func_ov182_021adfbc(func_ov182_021afed4);
+static void DWCUtilTimedNotice_FadeOut(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilMain_SetUpdate(DWCUtilTimedNotice_WaitFadeOut);
 }
 
-static void func_ov182_021afed4(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021bbf7c(0);
+static void DWCUtilTimedNotice_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 1);
-        func_ov182_021adfbc(func_ov182_021af25c);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCUtilMain_SetLayout(0, 1);
+        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     }
 }
 
-static void func_ov182_021aff1c(void) {
+static void DWCUtilTimedNotice_CountFrames(void) {
     sFrames++;
     if (sFrames >= 120) {
-        func_ov182_021adfbc(func_ov182_021afeac);
+        DWCUtilMain_SetUpdate(DWCUtilTimedNotice_FadeOut);
     }
 }

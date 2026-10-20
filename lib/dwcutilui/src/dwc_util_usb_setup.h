@@ -8,6 +8,6 @@
 // dwc_util_usb_done.h. When none is found, it goes back to the screen before (dwc_util_usb_intro.h), and B, or closing
 // the lid, back to the first screen of the connection settings.
 // The ROM does not embed this source file's name; dwc_util_usb_setup.c is descriptive.
-void func_ov182_021b6b1c(void);
+void DWCUtilUsbSetup_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_USB_SETUP_H

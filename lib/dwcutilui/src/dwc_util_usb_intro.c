@@ -14,35 +14,35 @@
 #include "dwc_util_usb_setup.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021b68c8(void);
-static void func_ov182_021b6938(void);
-static void func_ov182_021b6970(void);
-static void func_ov182_021b6998(void);
-static void func_ov182_021b69b8(void);
-static void func_ov182_021b69c8(void);
+static void DWCUtilUsbIntro_LoadGraphics(void);
+static void DWCUtilUsbIntro_FadeIn(void);
+static void DWCUtilUsbIntro_WaitFadeIn(void);
+static void DWCUtilUsbIntro_WaitButtons(void);
+static void DWCUtilUsbIntro_Main(void);
+static void DWCUtilUsbIntro_HandleInput(void);
 static void func_ov182_021b69f0(void);
-static void func_ov182_021b69f4(void);
-static void func_ov182_021b6a28(void);
-static void func_ov182_021b6a40(void);
-static void func_ov182_021b6a84(void);
+static void DWCUtilUsbIntro_HandleChoice(void);
+static void DWCUtilUsbIntro_DisableButtons(void);
+static void DWCUtilUsbIntro_FadeOut(void);
+static void DWCUtilUsbIntro_WaitFadeOut(void);
 
 // Whether the player chose to set up the connector
 static u8 sUsbIntroYes;
 
-void func_ov182_021b688c(void) {
+void DWCUtilUsbIntro_Init(void) {
     sUsbIntroYes = FALSE;
-    func_ov182_021b68c8();
-    func_ov182_021ab96c(8);
+    DWCUtilUsbIntro_LoadGraphics();
+    DWCUtilBgOverlay_Show(8);
     DWCUtilScreen_Start(0x38, -1, 0);
-    func_ov182_021ab6a4(1);
-    func_ov182_021ab6f0(0x27);
-    func_ov182_021adfbc(func_ov182_021b6938);
+    DWCUtilGfxResource_ShowStep(1);
+    DWCUtilGfxResource_ShowMessage(0x27);
+    DWCUtilMain_SetUpdate(DWCUtilUsbIntro_FadeIn);
 }
 
-static void func_ov182_021b68c8(void) {
-    func_ov182_021ab67c("char/jbBgStep2.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep2.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb3Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilUsbIntro_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/jbBgStep2.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep2.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb3Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -50,87 +50,89 @@ static void func_ov182_021b68c8(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b6938(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b6970);
+static void DWCUtilUsbIntro_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilUsbIntro_WaitFadeIn);
 }
 
-static void func_ov182_021b6970(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(6);
-        func_ov182_021adfbc(func_ov182_021b6998);
+static void DWCUtilUsbIntro_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(6);
+        DWCUtilMain_SetUpdate(DWCUtilUsbIntro_WaitButtons);
     }
 }
 
-static void func_ov182_021b6998(void) {
+static void DWCUtilUsbIntro_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b69b8);
+        DWCUtilMain_SetUpdate(DWCUtilUsbIntro_Main);
     }
 }
 
-static void func_ov182_021b69b8(void) {
-    func_ov182_021b69c8();
+static void DWCUtilUsbIntro_Main(void) {
+    DWCUtilUsbIntro_HandleInput();
     func_ov182_021b69f0();
-    func_ov182_021b69f4();
+    DWCUtilUsbIntro_HandleChoice();
 }
 
-static void func_ov182_021b69c8(void) {
-    func_ov182_021aec10Inline();
+static void DWCUtilUsbIntro_HandleInput(void) {
+    DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
 static void func_ov182_021b69f0(void) {
 }
 
-static void func_ov182_021b69f4(void) {
+static void DWCUtilUsbIntro_HandleChoice(void) {
     switch (DWCUtilUiObject_GetState()) {
     case 0:
-        func_ov182_021b80f4(7);
+        DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        func_ov182_021b80f4(6);
+        DWCUtilSound_PlaySe(6);
         sUsbIntroYes = TRUE;
         break;
     default:
         return;
     }
-    func_ov182_021adfbc(func_ov182_021b6a28);
+    DWCUtilMain_SetUpdate(DWCUtilUsbIntro_DisableButtons);
 }
 
-static void func_ov182_021b6a28(void) {
+static void DWCUtilUsbIntro_DisableButtons(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b6a40);
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilUsbIntro_FadeOut);
 }
 
-static void func_ov182_021b6a40(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+static void DWCUtilUsbIntro_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sUsbIntroYes) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b6a84);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilUsbIntro_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b6a84(void) {
-    if (func_ov182_021bbaac(0) == 0 && (sUsbIntroYes || func_ov182_021bbaac(1) == 0) && DWCUtilUiObject_IsIdle()) {
-        func_ov182_021bbf7c(0);
+static void DWCUtilUsbIntro_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(0) == 0 && (sUsbIntroYes || DWCUtilFade_IsActive(1) == 0) && DWCUtilUiObject_IsIdle()) {
+        DWCUtilText_DestroyScreenBg(0);
         if (!sUsbIntroYes) {
             DWCUtilScreen_Stop();
-            func_ov182_021bc228(1, 1);
+            DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sUsbIntroYes) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
         } else {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b6b1c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(DWCUtilUsbSetup_Init);
         }
     }
 }

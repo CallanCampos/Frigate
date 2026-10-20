@@ -1833,8 +1833,8 @@ static void WifiP2PMatch_ClosePartyMenu(WIFIP2PMATCH_WORK *wk) {
 // Starts the voice chat if both sides have it on, and tells the friends whether the player is using it
 static void WifiP2PMatch_StartVChat(WIFIP2PMATCH_WORK *wk) {
     if (wk->parent->vchat[0] && wk->parent->vchat[1]) {
-        func_ov011_02151e40(1);
-        func_ov011_021515a4();
+        DWCRap_SetVoiceChatEnabled(1);
+        DWCRap_SetVoiceChatReady();
         DWCRap_StartVoiceChat();
         WifiP2PMatch_BgmVolumeFadeStart(wk, 42);
         WIFI_STATUS_SetUseVChat(wk->myStatus, TRUE);
@@ -4600,7 +4600,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         }
         wk->unk1C8 = 0;
     } else if (wk->preConnect != -1 && DWCRap_GetLastNetId() == -1) {
-        func_ov011_02151e40(0);
+        DWCRap_SetVoiceChatEnabled(0);
         WIFI_STATUS_SetUseVChat(wk->myStatus, WIFI_STATUS_GetVChatStatus(wk->myStatus));
         WifiP2PMatch_SetFriendNameWord(wk, wk->preConnect);
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
@@ -4609,13 +4609,13 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (WifiP2PMatch_IsConnectFailed(wk) && wk->preConnect != -1) {
-        WifiP2PMatch_SetFriendNameWord(wk, func_ov011_02151e24());
+        WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetLastIndex());
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
     }
-    if (func_ov011_02151dec() == 1 && DWCRap_GetLastNetId() == -1) {
-        func_ov011_02151e40(0);
+    if (DWCRap_IsVoiceChatEnabled() == 1 && DWCRap_GetLastNetId() == -1) {
+        DWCRap_SetVoiceChatEnabled(0);
         WIFI_STATUS_SetUseVChat(wk->myStatus, WIFI_STATUS_GetVChatStatus(wk->myStatus));
     }
 
@@ -4696,7 +4696,7 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     if (WifiP2PMatch_IsConnectFailed(wk) && wk->preConnect != -1) {
-        WifiP2PMatch_SetFriendNameWord(wk, func_ov011_02151e24());
+        WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetLastIndex());
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
@@ -4708,8 +4708,8 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
             WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WantsJoin, FALSE);
         }
         wk->unk1C8 = 0;
-    } else if (func_ov011_02151e24() != -1) {
-        WifiP2PMatch_SetFriendNameWord(wk, func_ov011_02151e24());
+    } else if (DWCRap_GetLastIndex() != -1) {
+        WifiP2PMatch_SetFriendNameWord(wk, DWCRap_GetLastIndex());
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FailedRespond, FALSE);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FAILED;
         return seq;
@@ -4869,7 +4869,7 @@ static int WifiP2PMatch_StateVChatStart(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // Shows whether the friend is talking
 static void WifiP2PMatch_DrawVChatTalkIcon(WIFIP2PMATCH_WORK *wk) {
-    if (func_ov011_02151de4()) {
+    if (DWCRap_GetVoiceChatSpeaking()) {
         WifiP2PMatch_IconWrite(&wk->icon, 1, 2, 1, 0x3c, 0);
     } else {
         WifiP2PMatch_IconWrite(&wk->icon, 1, 2, 1, 0x33, 0);
@@ -5674,7 +5674,7 @@ static int WifiP2PMatch_StateWaitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq) {
 }
 
 static void WifiP2PMatch_ResetVChatVolume(void) {
-    func_ov011_02151e40(0);
+    DWCRap_SetVoiceChatEnabled(0);
 }
 
 // State 0x24: the menu of a friend who is looking for someone to play with

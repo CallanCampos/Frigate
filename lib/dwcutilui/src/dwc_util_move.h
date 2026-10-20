@@ -10,7 +10,7 @@
 // The ROM does not embed this source file's name; dwc_util_move.c is descriptive.
 
 enum {
-    // A console downloaded the program, whose player func_ov182_021ae240 returns
+    // A console downloaded the program, whose player DWCUtilMove_GetChildUser returns
     DWC_UTIL_MOVE_EVENT_ENTERED,
     DWC_UTIL_MOVE_EVENT_CHILD_LEFT,
     DWC_UTIL_MOVE_EVENT_DONE,
@@ -20,12 +20,12 @@ enum {
 
 typedef void (*DWCUtilMoveCallback)(int event);
 
-void func_ov182_021ae134(DWCUtilMoveCallback callback);
-// Ends the move; func_ov182_021ae210 says when it has ended
-void func_ov182_021ae1d4(void);
-BOOL func_ov182_021ae210(void);
-void func_ov182_021ae224(DWCUtilMoveCallback callback);
-void func_ov182_021ae238(void);
-const MBUserInfo *func_ov182_021ae240(void);
+void DWCUtilMove_Start(DWCUtilMoveCallback callback);
+// Ends the move; DWCUtilMove_HasEnded says when it has ended
+void DWCUtilMove_End(void);
+BOOL DWCUtilMove_HasEnded(void);
+void DWCUtilMove_SetCallback(DWCUtilMoveCallback callback);
+void DWCUtilMove_StartSending(void);
+const MBUserInfo *DWCUtilMove_GetChildUser(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_MOVE_H

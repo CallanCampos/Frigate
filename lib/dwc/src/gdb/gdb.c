@@ -144,7 +144,7 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     if (sGdb.state != 0) {
         return 0x12;
     }
-    if (!func_ov011_0215f9e0(&ticket)) {
+    if (!DWCi_GetLoginTicket(&ticket)) {
         Gdb_Printf(282, "DWCi_GetLoginTicket failed.\n");
         DWCi_SetError(8, Gdb_GetErrorCode(1, 4));
         return 4;

@@ -365,7 +365,7 @@ static int SendBroadcast(VCTSession *session, VCTControlPacket *packet) {
     for (aid = 0; aid < VCT_AID_MAX; aid++) {
         if ((sSessionState.mask & (aid != 0 ? 1 << aid : 1)) && aid != gVCTSettings.aid) {
             packet->to = aid;
-            if (func_ov011_02168a08(aid, packet, sizeof(VCTControlPacket))) {
+            if (DWC_SendReliable(aid, packet, sizeof(VCTControlPacket))) {
                 sent++;
             }
         }
@@ -398,7 +398,7 @@ static BOOL SendControl(VCTSession *session, VCTControlPacket *packet) {
     if (packet->type == VCT_TYPE_BROADCAST && packet->command == 4) {
         SendBroadcast((VCTSession *)session, packet);
     } else {
-        if (!func_ov011_02168a08(session->aid, packet, sizeof(VCTControlPacket))) {
+        if (!DWC_SendReliable(session->aid, packet, sizeof(VCTControlPacket))) {
             return FALSE;
         }
     }

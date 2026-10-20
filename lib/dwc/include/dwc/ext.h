@@ -57,11 +57,12 @@ char *strstr(const char *s, const char *find);
 // The formatted texts of NitroSDK's OS (OS_SPrintf, OS_SNPrintf and OS_VSNPrintf) are in nitro/os.h,
 // NitroSDK's STD's (STD_TSNPrintf) in nitro/std.h, and the Wi-Fi library's one error in dwc/error.h
 
-// Gets the token and the challenge that the player logs in to the authentication service with
-void func_ov011_0215f9b4(const char **authToken, const char **challenge);
+// Gets the token and the challenge that the player logs in to the authentication service with, returning FALSE (and
+// leaving them) while the player isn't logged in
+BOOL DWCi_GetAuthInfo(const char **authToken, const char **challenge);
 
 // The login ticket of the player's profile, which the Wi-Fi library keeps; returns FALSE if it has none
-BOOL func_ov011_0215f9e0(SakeLoginTicket *ticket);
+BOOL DWCi_GetLoginTicket(SakeLoginTicket *ticket);
 // Overlay 189's, which keep the list of the hosts that may be reached: adds the host of a URL, or removes it (the
 // second), returning a BOOL
 BOOL DWCi_SetGHTTPRootCA(const char *url);

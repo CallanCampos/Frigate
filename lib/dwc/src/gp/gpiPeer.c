@@ -163,7 +163,7 @@ static int gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *
             }
             // The signature is the digest of our password with our profile and the peer's
             OS_SPrintf(buffer, "%s%d%d", iconnection->password, iconnection->profileid, pid);
-            func_ov011_021723e8((const u8 *)buffer, strlen(buffer), sigCheck);
+            MD5Digest((const u8 *)buffer, strlen(buffer), sigCheck);
             if (strcmp(sig, sigCheck) != 0) {
                 gpiAppendStringToBuffer(connection, &peer->outputBuffer, "\\anack\\");
                 gpiAppendStringToBuffer(connection, &peer->outputBuffer, "\\final\\");

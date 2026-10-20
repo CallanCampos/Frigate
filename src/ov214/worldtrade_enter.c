@@ -149,12 +149,12 @@ static int Enter_Start(WorldTradeWork *wk) {
 }
 
 static int Enter_InternetConnect(WorldTradeWork *wk) {
-    func_ov011_0215dec0();
+    DWC_NASLoginAsync();
     return TRUE;
 }
 
 static int Enter_InternetConnectWait(WorldTradeWork *wk) {
-    switch (func_ov011_0215df40()) {
+    switch (DWC_NASLoginProcess()) {
     case 3:
         return 1;
     case 0:
@@ -551,7 +551,7 @@ static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
         break;
     case 3:
         DpwTr_End();
-        func_ov011_0215fb78();
+        DWC_ShutdownFriendsMatch();
         DWC_CleanupInet();
         wk->localSeq++;
         break;

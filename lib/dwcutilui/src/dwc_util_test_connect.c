@@ -18,44 +18,44 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static BOOL func_ov182_021b4864(void);
-static void func_ov182_021b48ac(void);
-static void func_ov182_021b48fc(void);
-static void func_ov182_021b4920(void);
-static void func_ov182_021b4940(void);
-static void func_ov182_021b4960(void);
-static void func_ov182_021b497c(void);
+static BOOL DWCUtilTestConnect_IsLidClosed(void);
+static void DWCUtilTestConnect_LoadGraphics(void);
+static void DWCUtilTestConnect_FadeIn(void);
+static void DWCUtilTestConnect_WaitFadeIn(void);
+static void DWCUtilTestConnect_WaitButtons(void);
+static void DWCUtilTestConnect_Main(void);
+static void DWCUtilTestConnect_HandleInput(void);
 static void func_ov182_021b49a0(void);
-static void func_ov182_021b49a4(void);
-static void func_ov182_021b49c4(void);
-static void func_ov182_021b49dc(void);
-static void func_ov182_021b4a20(void);
-static void func_ov182_021b4a9c(void);
-static void func_ov182_021b4b30(void);
-static void func_ov182_021b4b50(void);
+static void DWCUtilTestConnect_HandleChoice(void);
+static void DWCUtilTestConnect_DisableButtons(void);
+static void DWCUtilTestConnect_FadeOut(void);
+static void DWCUtilTestConnect_WaitFadeOut(void);
+static void DWCUtilTestConnect_PollTest(void);
+static void DWCUtilTestConnect_WaitDialog(void);
+static void DWCUtilTestConnect_WaitDialogClosed(void);
 
 // Whether the test connected; FALSE when it was ended or failed
 static u8 sTestConnectPassed;
 
 // A copy of gfl/ui.c's GCTX_HIDIsLidClosed
-static BOOL func_ov182_021b4864(void) {
+static BOOL DWCUtilTestConnect_IsLidClosed(void) {
     if (PAD_DetectFold()) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021b4880(void) {
+void DWCUtilTestConnect_Init(void) {
     sTestConnectPassed = FALSE;
-    func_ov182_021b48ac();
-    func_ov182_021ab9ac();
-    func_ov182_021ab6f0(0x2a);
+    DWCUtilTestConnect_LoadGraphics();
+    DWCUtilBgOverlay_ShowConnectionSet();
+    DWCUtilGfxResource_ShowMessage(0x2a);
     DWCUtilUiEffect_Init(2);
-    func_ov182_021adfbc(func_ov182_021b48fc);
+    DWCUtilMain_SetUpdate(DWCUtilTestConnect_FadeIn);
 }
 
-static void func_ov182_021b48ac(void) {
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilTestConnect_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -63,38 +63,39 @@ static void func_ov182_021b48ac(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b48fc(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b4920);
+static void DWCUtilTestConnect_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilTestConnect_WaitFadeIn);
 }
 
-static void func_ov182_021b4920(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(1);
-        func_ov182_021adfbc(func_ov182_021b4940);
+static void DWCUtilTestConnect_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(1);
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_WaitButtons);
     }
 }
 
-static void func_ov182_021b4940(void) {
+static void DWCUtilTestConnect_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b4960);
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_Main);
     }
 }
 
-static void func_ov182_021b4960(void) {
+static void DWCUtilTestConnect_Main(void) {
     OS_Sleep(10);
-    func_ov182_021b4a9c();
-    func_ov182_021b497c();
+    DWCUtilTestConnect_PollTest();
+    DWCUtilTestConnect_HandleInput();
     func_ov182_021b49a0();
-    func_ov182_021b49a4();
+    DWCUtilTestConnect_HandleChoice();
 }
 
-static void func_ov182_021b497c(void) {
-    if (func_ov182_021bc798(2)) {
+static void DWCUtilTestConnect_HandleInput(void) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (func_ov182_021b4864()) {
+    } else if (DWCUtilTestConnect_IsLidClosed()) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -103,89 +104,90 @@ static void func_ov182_021b49a0(void) {
 }
 
 // The button ends the test
-static void func_ov182_021b49a4(void) {
+static void DWCUtilTestConnect_HandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
-        func_ov182_021b8138();
-        func_ov182_021b80f4(7);
-        func_ov182_021adfbc(func_ov182_021b49c4);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(7);
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_DisableButtons);
     }
 }
 
-static void func_ov182_021b49c4(void) {
+static void DWCUtilTestConnect_DisableButtons(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b49dc);
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilTestConnect_FadeOut);
 }
 
-static void func_ov182_021b49dc(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+static void DWCUtilTestConnect_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sTestConnectPassed) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b4a20);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b4a20(void) {
-    if (func_ov182_021bbaac(0) == 0 && (sTestConnectPassed || func_ov182_021bbaac(1) == 0) &&
+static void DWCUtilTestConnect_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(0) == 0 && (sTestConnectPassed || DWCUtilFade_IsActive(1) == 0) &&
         DWCUtilUiObject_IsIdle()) {
         DWCUtilUiEffect_Destroy();
-        func_ov182_021bbf7c(0);
+        DWCUtilText_DestroyScreenBg(0);
         if (!sTestConnectPassed) {
             DWCUtilScreen_Stop();
-            func_ov182_021bc228(1, 1);
+            DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
-        func_ov182_021ae424();
+        DWCUtilConnection_Stop();
         if (!sTestConnectPassed) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b5bb8);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
         } else {
-            func_ov182_021adfc8(0, 0);
-            func_ov182_021adfbc(func_ov182_021b4b68);
+            DWCUtilMain_SetLayout(0, 0);
+            DWCUtilMain_SetUpdate(DWCUtilTestDone_Init);
         }
     }
 }
 
 // What the test reports: a connection with a WEP key or none is taken into the connection being edited
-static void func_ov182_021b4a9c(void) {
-    switch (func_ov182_021ae440()) {
+static void DWCUtilTestConnect_PollTest(void) {
+    switch (DWCUtilConnection_GetState()) {
     case 3:
         sTestConnectPassed = TRUE;
-        func_ov182_021b8138();
-        func_ov182_021ae4b0();
-        func_ov182_021adfbc(func_ov182_021b49c4);
+        DWCUtilSound_StopSe();
+        DWCUtilConnection_SaveResult();
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_DisableButtons);
         break;
     case 4:
         sTestConnectPassed = FALSE;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(9);
-        func_ov182_021b8cf0(0xd, 1, 1, -1, 0);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(9);
+        DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b4b30);
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_WaitDialog);
         break;
     case 5:
         sTestConnectPassed = FALSE;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(0x12);
-        func_ov182_021b8cf0(0xe, 1, 1, -1, 0);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(0x12);
+        DWCUtilDialog_Open(0xe, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b4b30);
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_WaitDialog);
         break;
     }
 }
 
-static void func_ov182_021b4b30(void) {
-    if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
-        func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b4b50);
+static void DWCUtilTestConnect_WaitDialog(void) {
+    if (DWCUtilDialog_GetChoice() == 0) {
+        DWCUtilSound_PlaySe(6);
+        DWCUtilDialog_Close();
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_WaitDialogClosed);
     }
 }
 
-static void func_ov182_021b4b50(void) {
-    if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b49c4);
+static void DWCUtilTestConnect_WaitDialogClosed(void) {
+    if (!DWCUtilDialog_IsOpen()) {
+        DWCUtilMain_SetUpdate(DWCUtilTestConnect_DisableButtons);
     }
 }

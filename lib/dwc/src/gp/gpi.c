@@ -62,7 +62,7 @@ void gpiDestroy(GPConnection *connection) {
 
     gpiDisconnect(connection, TRUE);
     gpiStatusInfoKeysDestroy(connection);
-    func_ov011_0217187c(iconnection->profileList.profileTable);
+    TableFree(iconnection->profileList.profileTable);
     gsifree(iconnection);
     *connection = NULL;
 }

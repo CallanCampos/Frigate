@@ -499,7 +499,7 @@ void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u
     if (!GFL_NetIsInitialized()) {
         GFL_NetErrAbort();
     }
-    func_ov011_02160170();
+    DWC_CloseAllConnectionsHard();
     WifiBattleMatchNet_SetMatchKey(p_wk, 0, modValue);
     WifiBattleMatchNet_SetMatchKey(p_wk, 1, a3);
     WifiBattleMatchNet_SetMatchKey(p_wk, 2, 1);
@@ -537,7 +537,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
     case 0:
         if (DWCRap_StartMatchQuery(p_wk->matchQuery, 2, p_wk->evalFunc, p_wk)) {
             NetState_WaitWifiMatch();
-            func_ov011_02151e40(0);
+            DWCRap_SetVoiceChatEnabled(0);
             p_wk->matchState = 1;
         } else {
             NetState_WifiDisconnect(TRUE);
@@ -715,7 +715,7 @@ static void WifiBattleMatchNet_GetLoginDate(u8 *dest) {
     if (!GFL_NetIsInitialized()) {
         GFL_NetErrAbort();
     }
-    if (!func_ov011_0215dda8(&date, &time)) {
+    if (!DWC_GetDateTime(&date, &time)) {
         GFL_NetErrAbort();
     }
     MI_CpuFill8(dest, 0, 6);
@@ -734,7 +734,7 @@ static void WifiBattleMatchNet_SetMatchKey(WifiBattleMatchNet *p_wk, u32 index, 
     key = &p_wk->matchKeys[index];
     MI_CpuCopy8(sMatchKeyNames[index], key->name, 3);
     key->name[3] = '\0';
-    key->keyId = func_ov011_02160e10(key->keyId, key->name, &key->value);
+    key->keyId = DWC_AddMatchKeyInt(key->keyId, key->name, &key->value);
 }
 
 static int WifiBattleMatchNet_EvalAlias(int index, void *work) {
@@ -757,10 +757,10 @@ static int WifiBattleMatchNet_Eval(int index, void *work) {
     int ratioGap;
     int score;
 
-    rating = func_ov011_02160f98(index, p_wk->matchKeys[3].name, -1);
-    disconnects = func_ov011_02160f98(index, p_wk->matchKeys[5].name, -1);
-    matches = func_ov011_02160f98(index, p_wk->matchKeys[6].name, -1);
-    cup = func_ov011_02160f98(index, p_wk->matchKeys[4].name, -1);
+    rating = DWC_GetMatchIntValue(index, p_wk->matchKeys[3].name, -1);
+    disconnects = DWC_GetMatchIntValue(index, p_wk->matchKeys[5].name, -1);
+    matches = DWC_GetMatchIntValue(index, p_wk->matchKeys[6].name, -1);
+    cup = DWC_GetMatchIntValue(index, p_wk->matchKeys[4].name, -1);
 
     if (rating == -1 && disconnects == -1 && cup == -1 && matches == -1) {
         return 0;
@@ -2624,13 +2624,13 @@ void WifiBattleMatchNet_StartNameCheck(WifiBattleMatchNet *p_wk, PlayerInfo *inf
     }
     p_wk->nameCheck.words = p_wk->nameCheck.name;
     p_wk->nameCheck.badWordCount = 0;
-    func_ov011_0216bea4(&p_wk->nameCheck.words, 1, NULL, 0, &p_wk->nameCheck.result, &p_wk->nameCheck.badWordCount,
-                        0x80);
+    DWC_CheckProfanityExAsync(&p_wk->nameCheck.words, 1, NULL, 0, &p_wk->nameCheck.result,
+                              &p_wk->nameCheck.badWordCount, 0x80);
     GFL_StrBufFree(name);
 }
 
 BOOL WifiBattleMatchNet_NameCheckMain(WifiBattleMatchNet *p_wk, u32 *out) {
-    BOOL done = func_ov011_0216bed4() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == 2;
 
     if (done) {
         *out = p_wk->nameCheck.badWordCount > 0;

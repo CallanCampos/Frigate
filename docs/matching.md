@@ -300,6 +300,10 @@ Same instructions, registers swapped.
 - Variables declared in an inner block are allocated apart from the function's variables of the same name: in
   `ShinkaDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
   while the other branches keep theirs in registers.
+- `s02A1_MedalGetMostCompleteCategory` declares its ranking-loop counter `s32 j;` first in the function, before
+  `fx32 best = 0;`. With `j` in that position, `best` takes `r5` and both loop counters take `r4`; with `j` declared
+  inside the ranking block, those registers exchange. The unsigned medal counter and signed ranking counter remain
+  separate variables.
 - Two values that the original keeps in one register, one dead before the other is set, were one variable: the PC
   box's `GetDepositBlock` keeps the party position and then its result in the same variable, where two
   variables get two registers.
@@ -967,7 +971,7 @@ Same code, other `sp` offsets or frame size.
 - A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
   returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
   register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key
-  position updates, `func_ov182_021acff0` and its neighbours; they match only when `attr01` is read through
+  position updates, `DWCUtilMenu_SlideInRow0Task` and its neighbours; they match only when `attr01` is read through
   `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
   which returns a one-word struct, as in `(u8)ReadAttr01(sMenu->keyOams[0]).attr01 - 12`. Reading `oam->attr01`
   directly leaves no slot.
@@ -1409,7 +1413,7 @@ Same instructions, scheduled in another order.
   before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
   `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
   The pointer can be a parameter or a local: `field_rail.c`'s line searches `func_ov036_021b21b0` and
-  `func_ov036_021b1e8c` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
+  `RailDisabledLines_ContainsLine` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
   `FieldBlAct_IsAsyncLoadPending` with `const AsyncLoader *loader = blact->loader;` (its own field read through a
   plain pointer). In `SetWkToActorRailPos` neither a `const` local nor a `const` parameter of a `static inline`
   helper stops the hoist, so the count there is held some other way.
@@ -3405,7 +3409,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
-  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, and
+  `dwc_util_error.c`'s `DWCUtilGfxResource_Load("char/jb4Error.nsc.l", ...)`, link only with the literal, and
   `dwc_util_main_menu.c`'s message paths, each padded to 4 bytes, are literals too.
 - MWCC shares a file's equal string literals, so one string in two places of the ROM's `.data` of one file, each
   4-aligned, is not two uses of one literal. `dwc_util_info_menu.c` loads `char/yb5Multi.nsc.l` in two functions and

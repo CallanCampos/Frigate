@@ -17,18 +17,18 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static void func_ov182_021b2954(void);
-static void func_ov182_021b29a4(void);
-static void func_ov182_021b2bbc(void);
-static void func_ov182_021b2be0(void);
-static void func_ov182_021b2c08(void);
-static void func_ov182_021b2c28(void);
-static void func_ov182_021b2c38(void);
+static void DWCUtilError_LoadGraphics(void);
+static void DWCUtilError_DrawMessage(void);
+static void DWCUtilError_FadeIn(void);
+static void DWCUtilError_WaitFadeIn(void);
+static void DWCUtilError_WaitButtons(void);
+static void DWCUtilError_Main(void);
+static void DWCUtilError_HandleInput(void);
 static void func_ov182_021b2c4c(void);
-static void func_ov182_021b2c50(void);
-static void func_ov182_021b2c6c(void);
-static void func_ov182_021b2c84(void);
-static void func_ov182_021b2cbc(void);
+static void DWCUtilError_HandleChoice(void);
+static void DWCUtilError_DisableButtons(void);
+static void DWCUtilError_FadeOut(void);
+static void DWCUtilError_WaitFadeOut(void);
 
 // The font of the message by language, the message's box (left, top, width and height), and where the code is drawn
 // by language
@@ -41,14 +41,14 @@ static const u16 sErrorCodePos[7][2] = {
 // The DWC error code that the screen shows
 static int sErrorCode;
 
-void func_ov182_021b293c(void) {
-    func_ov182_021b2954();
-    func_ov182_021b29a4();
-    func_ov182_021adfbc(func_ov182_021b2bbc);
+void DWCUtilError_Init(void) {
+    DWCUtilError_LoadGraphics();
+    DWCUtilError_DrawMessage();
+    DWCUtilMain_SetUpdate(DWCUtilError_FadeIn);
 }
 
-static void func_ov182_021b2954(void) {
-    func_ov182_021ab67c("char/jb4Error.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilError_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/jb4Error.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -57,7 +57,7 @@ static void func_ov182_021b2954(void) {
 }
 
 // Draws the error code and the message of its kind
-static void func_ov182_021b29a4(void) {
+static void DWCUtilError_DrawMessage(void) {
     int type = 0;
     int from;
     int code;
@@ -68,7 +68,7 @@ static void func_ov182_021b29a4(void) {
     u16 x;
     u16 y;
 
-    func_ov182_021adffc(NULL, &from);
+    DWCUtilMain_GetScreenArgs(NULL, &from);
     code = sErrorCode;
     if (code >= -20099) {
         type = 0;
@@ -148,46 +148,47 @@ static void func_ov182_021b29a4(void) {
         type = 2;
     }
 
-    text = func_ov182_021bbdec(0, sErrorFonts[func_ov182_021ae018()]);
-    msg = func_ov182_021ae108(data_ov182_021c40b8, type);
+    text = DWCUtilText_CreateBg(0, sErrorFonts[DWCUtilMain_GetLanguage()]);
+    msg = DWCUtilMsg_Get(gDWCUtilMsg, type);
     OS_SNPrintf(digits, sizeof(digits), "%d", -sErrorCode);
-    func_ov182_021bcf10(str, (u8 *)digits, 8);
-    y = sErrorCodePos[func_ov182_021ae018()][1];
-    x = sErrorCodePos[func_ov182_021ae018()][0];
-    func_ov182_021bc030(text, x, y, 2, 10, str, 0);
-    func_ov182_021bc0a4(text, sErrorMsgRect[0], sErrorMsgRect[1], sErrorMsgRect[2], sErrorMsgRect[3], 2,
-                        func_ov182_021ab7b4(), msg);
-    func_ov182_021bc184(text);
+    DWCUtilString_Widen(str, (u8 *)digits, 8);
+    y = sErrorCodePos[DWCUtilMain_GetLanguage()][1];
+    x = sErrorCodePos[DWCUtilMain_GetLanguage()][0];
+    DWCUtilText_DrawCentered(text, x, y, 2, 10, str, 0);
+    DWCUtilText_DrawRect(text, sErrorMsgRect[0], sErrorMsgRect[1], sErrorMsgRect[2], sErrorMsgRect[3], 2,
+                         DWCUtilGfxResource_GetTextFlags(), msg);
+    DWCUtilText_MarkDirty(text);
 }
 
-static void func_ov182_021b2bbc(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b2be0);
+static void DWCUtilError_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeIn);
 }
 
-static void func_ov182_021b2be0(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(4);
-        func_ov182_021adfbc(func_ov182_021b2c08);
+static void DWCUtilError_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(4);
+        DWCUtilMain_SetUpdate(DWCUtilError_WaitButtons);
     }
 }
 
-static void func_ov182_021b2c08(void) {
+static void DWCUtilError_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b2c28);
+        DWCUtilMain_SetUpdate(DWCUtilError_Main);
     }
 }
 
-static void func_ov182_021b2c28(void) {
-    func_ov182_021b2c38();
+static void DWCUtilError_Main(void) {
+    DWCUtilError_HandleInput();
     func_ov182_021b2c4c();
-    func_ov182_021b2c50();
+    DWCUtilError_HandleChoice();
 }
 
-static void func_ov182_021b2c38(void) {
-    if (func_ov182_021bc798(1)) {
+static void DWCUtilError_HandleInput(void) {
+    if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -195,50 +196,51 @@ static void func_ov182_021b2c38(void) {
 static void func_ov182_021b2c4c(void) {
 }
 
-static void func_ov182_021b2c50(void) {
+static void DWCUtilError_HandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
-        func_ov182_021b80f4(6);
-        func_ov182_021adfbc(func_ov182_021b2c6c);
+        DWCUtilSound_PlaySe(6);
+        DWCUtilMain_SetUpdate(DWCUtilError_DisableButtons);
     }
 }
 
-static void func_ov182_021b2c6c(void) {
+static void DWCUtilError_DisableButtons(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b2c84);
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilError_FadeOut);
 }
 
-static void func_ov182_021b2c84(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+static void DWCUtilError_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
-        func_ov182_021bbac4(3, 1, 1, 8);
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b2cbc);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeOut);
     }
 }
 
 // Goes back to the first screen of the connection settings, or to the settings of the connection
-static void func_ov182_021b2cbc(void) {
+static void DWCUtilError_WaitFadeOut(void) {
     int from;
 
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0 && DWCUtilUiObject_IsIdle()) {
-        func_ov182_021bbf7c(0);
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
+        DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x15);
-        func_ov182_021adffc(NULL, &from);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCUtilMain_GetScreenArgs(NULL, &from);
         if (from != 0) {
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b536c);
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
         } else {
-            func_ov182_021adfc8(2, 0);
-            func_ov182_021adff0(0, 0);
-            func_ov182_021b43f8(0);
-            func_ov182_021adfbc(func_ov182_021b2d48);
+            DWCUtilMain_SetLayout(2, 0);
+            DWCUtilMain_SetScreenArgs(0, 0);
+            DWCUtilAddressSettings_SetFrom(0);
+            DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
         }
     }
 }
 
-void func_ov182_021b2d3c(int code) {
+void DWCUtilError_SetCode(int code) {
     sErrorCode = code;
 }

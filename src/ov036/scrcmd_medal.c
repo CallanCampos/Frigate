@@ -156,6 +156,7 @@ BOOL s02A0_MedalIsObtained(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s02A1_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env) {
+    s32 j;
     fx32 best = 0;
     fx32 obtained[5] = { 0 };
     fx32 total[5] = { 0 };
@@ -176,7 +177,6 @@ BOOL s02A1_MedalGetMostCompleteCategory(VM *vm, FieldScriptEnv *env) {
     GFL_ArcToolFree(arc);
     {
         u32 categories[5] = { 4, 3, 1, 2, 0 };
-        s32 j;
         u32 category;
         fx32 ratio;
 

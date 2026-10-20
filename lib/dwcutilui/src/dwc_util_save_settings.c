@@ -11,53 +11,53 @@
 #include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021b4420(void);
-static void func_ov182_021b4488(void);
-static void func_ov182_021b44c0(void);
-static void func_ov182_021b44f4(void);
+static void DWCUtilSaveSettings_LoadGraphics(void);
+static void DWCUtilSaveSettings_FadeIn(void);
+static void DWCUtilSaveSettings_WaitFadeIn(void);
+static void DWCUtilSaveSettings_Main(void);
 static void func_ov182_021b4514(void);
 static void func_ov182_021b4518(void);
-static void func_ov182_021b451c(void);
-static void func_ov182_021b4544(void);
+static void DWCUtilSaveSettings_FadeOut(void);
+static void DWCUtilSaveSettings_WaitFadeOut(void);
 
-void func_ov182_021b4404(void) {
-    func_ov182_021b4420();
-    func_ov182_021ab9ac();
-    func_ov182_021b7bb0();
-    func_ov182_021adfbc(func_ov182_021b4488);
+void DWCUtilSaveSettings_Init(void) {
+    DWCUtilSaveSettings_LoadGraphics();
+    DWCUtilBgOverlay_ShowConnectionSet();
+    DWCUtilWifiSettings_Save();
+    DWCUtilMain_SetUpdate(DWCUtilSaveSettings_FadeIn);
 }
 
-static void func_ov182_021b4420(void) {
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb4None.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilSaveSettings_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb4None.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b4488(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x14, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x14);
-    func_ov182_021adfbc(func_ov182_021b44c0);
+static void DWCUtilSaveSettings_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilSaveSettings_WaitFadeIn);
 }
 
 // Shows the message of the save once the screens have faded in
-static void func_ov182_021b44c0(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021b8cf0(0x44, 5, 1, -1, 0);
-        func_ov182_021adfbc(func_ov182_021b44f4);
+static void DWCUtilSaveSettings_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilDialog_Open(0x44, 5, 1, -1, 0);
+        DWCUtilMain_SetUpdate(DWCUtilSaveSettings_Main);
     }
 }
 
-static void func_ov182_021b44f4(void) {
+static void DWCUtilSaveSettings_Main(void) {
     func_ov182_021b4514();
     func_ov182_021b4518();
-    if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b451c);
+    if (!DWCUtilDialog_IsOpen()) {
+        DWCUtilMain_SetUpdate(DWCUtilSaveSettings_FadeOut);
     }
 }
 
@@ -67,18 +67,18 @@ static void func_ov182_021b4514(void) {
 static void func_ov182_021b4518(void) {
 }
 
-static void func_ov182_021b451c(void) {
-    func_ov182_021bbac4(3, 1, 1, 8);
-    func_ov182_021bbac4(3, 0, 0x14, 8);
-    func_ov182_021adfbc(func_ov182_021b4544);
+static void DWCUtilSaveSettings_FadeOut(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilMain_SetUpdate(DWCUtilSaveSettings_WaitFadeOut);
 }
 
-static void func_ov182_021b4544(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
+static void DWCUtilSaveSettings_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x14);
-        func_ov182_021adfc8(2, 1);
-        func_ov182_021adfbc(func_ov182_021b536c);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+        DWCUtilMain_SetLayout(2, 1);
+        DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
     }
 }

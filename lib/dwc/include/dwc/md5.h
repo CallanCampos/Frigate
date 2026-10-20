@@ -5,8 +5,9 @@
 
 // GameSpy's MD5 (md5c.c), in overlay 11: RSA's reference MD5 (RFC 1321), with a function that gives the digest of some
 // bytes as 32 hex digits. The ROM has no names for the file or its functions: the file is named after GameSpy's, as
-// pret/pokerevo's Wii build has it (asm/SDK/DWC/gamespy/md5c.s), and so are the functions in the comments beside
-// them, while the symbols keep their addresses
+// pret/pokerevo's Wii build has it (asm/SDK/DWC/gamespy/md5c.s), and so are the functions. MD5Init, MD5Update and
+// MD5Final keep their addresses, with their names in the comments: NitroWiFi's SSL (lib/nitrowifi/src/ssl/md5.c) has
+// functions of the same names in this overlay
 
 // The state of a hash (RFC 1321's MD5_CTX): the four words of the state, the count of bits hashed and the bytes of
 // the block not hashed yet
@@ -28,7 +29,7 @@ static inline void func_ov011_021719fcInline(HashContext *context) {
     context->state[2] = 0x98badcfe;
     context->state[3] = 0x10325476;
 }
-// MD5Digest: writes the digest of size bytes as 32 hex digits and an end
-void func_ov011_021723e8(const u8 *data, u32 size, char *output);
+// Writes the digest of size bytes as 32 hex digits and an end
+void MD5Digest(const u8 *data, u32 size, char *output);
 
 #endif // POKEBW2_DWC_MD5_H

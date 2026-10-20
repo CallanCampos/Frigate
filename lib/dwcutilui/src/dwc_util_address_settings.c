@@ -113,44 +113,44 @@ typedef struct DWCUtilAddressSettingsState {
     DWCUtilAddressSettings *work;
 } DWCUtilAddressSettingsState;
 
-static void func_ov182_021b2e6c(void);
-static void func_ov182_021b2fac(void);
-static void func_ov182_021b2fd4(void);
-static void func_ov182_021b300c(void);
-static void func_ov182_021b3030(void);
-static void func_ov182_021b303c(void);
-static BOOL func_ov182_021b31c4(void);
-static void func_ov182_021b3220(int item);
-static void func_ov182_021b331c(BOOL autoAddress);
-static void func_ov182_021b3368(BOOL autoDns);
-static void func_ov182_021b3390(void);
-static void func_ov182_021b34f8(void);
-static void func_ov182_021b3510(void);
-static void func_ov182_021b3544(void);
-static void func_ov182_021b3740(void);
-static void func_ov182_021b37b4(int index, int row);
-static void func_ov182_021b38c0(int index, int row);
-static BOOL func_ov182_021b3998(int item);
-static void func_ov182_021b39fc(int mark, int frame, int row);
-static void func_ov182_021b3a9c(const u8 *str, int row);
-static void func_ov182_021b3b6c(const u8 *address, int row);
-static void func_ov182_021b3bc4(void);
-static int func_ov182_021b3ce0(void);
-static int func_ov182_021b3e68(int index);
-static int func_ov182_021b3e94(int row);
-static void func_ov182_021b3eac(DWCUtilTask *task, void *arg);
-static void func_ov182_021b3f24(DWCUtilTask *task, void *arg);
-static void func_ov182_021b3f84(DWCUtilTask *task, void *arg);
-static void func_ov182_021b3fd8(void);
-static void func_ov182_021b4060(void);
-static void func_ov182_021b40c8(int item);
-static void func_ov182_021b40e8(int direction);
-static void func_ov182_021b4278(void);
-static void func_ov182_021b4298(DWCUtilTask *task, void *arg);
-static void func_ov182_021b42c8(void);
-static BOOL func_ov182_021b4334(void);
-static void func_ov182_021b43b0(void);
-static void func_ov182_021b43e0(void);
+static void DWCUtilAddressSettings_LoadGraphics(void);
+static void DWCUtilAddressSettings_InitCursor(void);
+static void DWCUtilAddressSettings_FadeIn(void);
+static void DWCUtilAddressSettings_WaitFadeIn(void);
+static void DWCUtilAddressSettings_Main(void);
+static void DWCUtilAddressSettings_HandleInput(void);
+static BOOL DWCUtilAddressSettings_HandleTouch(void);
+static void DWCUtilAddressSettings_ChooseItem(int item);
+static void DWCUtilAddressSettings_SetAutoAddress(BOOL autoAddress);
+static void DWCUtilAddressSettings_SetAutoDns(BOOL autoDns);
+static void DWCUtilAddressSettings_HandleScrollbar(void);
+static void DWCUtilAddressSettings_StartExit(void);
+static void DWCUtilAddressSettings_FadeOut(void);
+static void DWCUtilAddressSettings_WaitFadeOut(void);
+static void DWCUtilAddressSettings_DrawRows(void);
+static void DWCUtilAddressSettings_DrawRowText(int index, int row);
+static void DWCUtilAddressSettings_DrawRowMarks(int index, int row);
+static BOOL DWCUtilAddressSettings_IsItemEnabled(int item);
+static void DWCUtilAddressSettings_ShowMark(int mark, int frame, int row);
+static void DWCUtilAddressSettings_DrawString(const u8 *str, int row);
+static void DWCUtilAddressSettings_DrawAddress(const u8 *address, int row);
+static void DWCUtilAddressSettings_MoveMarks(void);
+static int DWCUtilAddressSettings_GetTouchedItem(void);
+static int DWCUtilAddressSettings_GetScreenRow(int index);
+static int DWCUtilAddressSettings_GetListRow(int row);
+static void DWCUtilAddressSettings_ScrollUpTask(DWCUtilTask *task, void *arg);
+static void DWCUtilAddressSettings_ScrollDownTask(DWCUtilTask *task, void *arg);
+static void DWCUtilAddressSettings_ScrollBgTask(DWCUtilTask *task, void *arg);
+static void DWCUtilAddressSettings_ShowCursor(void);
+static void DWCUtilAddressSettings_SetCursorFromRow(void);
+static void DWCUtilAddressSettings_SetCursor(int item);
+static void DWCUtilAddressSettings_MoveCursor(int direction);
+static void DWCUtilAddressSettings_LightButton(void);
+static void DWCUtilAddressSettings_UpdateLitTask(DWCUtilTask *task, void *arg);
+static void DWCUtilAddressSettings_LightAnswer(void);
+static BOOL DWCUtilAddressSettings_IsValid(void);
+static void DWCUtilAddressSettings_WaitInvalidDialog(void);
+static void DWCUtilAddressSettings_WaitInvalidClosed(void);
 
 static DWCUtilAddressSettingsState sAddressSettings;
 
@@ -191,60 +191,62 @@ static const DWCUtilAddressRect sAddressCursorRects[6] = {
     { { 0x82, 0x18, 0xee, 0x2c } }, { { 0x82, 0xa9, 0xee, 0xbd } }, { { 0x02, 0xa9, 0x6e, 0xbd } },
 };
 
-void func_ov182_021b2d48(void) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+void DWCUtilAddressSettings_Init(void) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     int i;
 
-    sAddressSettings.work = func_ov182_021bc4d8(sizeof(DWCUtilAddressSettings), 4);
+    sAddressSettings.work = DWCUtilHeap_AllocClear(sizeof(DWCUtilAddressSettings), 4);
     sAddressSettings.work->savedAutoDns = edit->autoDns;
     sAddressSettings.work->lastButton = ADDRESS_ITEM_SAVE;
-    func_ov182_021b2fac();
-    func_ov182_021b2e6c();
+    DWCUtilAddressSettings_InitCursor();
+    DWCUtilAddressSettings_LoadGraphics();
     if (sAddressSettings.from == 0) {
-        DWCUtilScreen_Start(0x30, sAddressTitleLabels[func_ov182_021ae018()], edit->index + 1);
+        DWCUtilScreen_Start(0x30, sAddressTitleLabels[DWCUtilMain_GetLanguage()], edit->index + 1);
     } else {
         DWCUtilScreen_Start(0x45, -1, 0);
     }
-    func_ov182_021ab6a4(1);
-    func_ov182_021ab9c0();
-    func_ov182_021b70a0(2, 0x55, 0xf1, 0x41, sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
-    sAddressSettings.work->text = func_ov182_021bbdec(0, 1);
+    DWCUtilGfxResource_ShowStep(1);
+    DWCUtilBgOverlay_ShowConnectionList();
+    DWCUtilScrollbar_Create(2, 0x55, 0xf1, 0x41, sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
+    sAddressSettings.work->text = DWCUtilText_CreateBg(0, 1);
     for (i = 0; i < 7; i++) {
-        sAddressSettings.work->marks[i] = func_ov182_021bb960(0, 0x29);
+        sAddressSettings.work->marks[i] = DWCUtilCell_AllocOam(0, 0x29);
     }
     switch (edit->connection.status) {
     case 1:
-        sAddressSettings.work->setupIcon = func_ov182_021bb960(0, 0x50);
+        sAddressSettings.work->setupIcon = DWCUtilCell_AllocOam(0, 0x50);
         G2_SetOBJPriority(sAddressSettings.work->setupIcon, 3);
         break;
     case 2:
-        sAddressSettings.work->setupIcon = func_ov182_021bb960(0, 0x51);
+        sAddressSettings.work->setupIcon = DWCUtilCell_AllocOam(0, 0x51);
         G2_SetOBJPriority(sAddressSettings.work->setupIcon, 3);
         break;
     }
-    sAddressSettings.work->vblankTask = func_ov182_021bd200(1, func_ov182_021b3f84, NULL, 0x6e);
-    sAddressSettings.work->task = func_ov182_021bd200(0, func_ov182_021b4298, NULL, 0x78);
-    func_ov182_021b3740();
-    func_ov182_021b3fd8();
-    func_ov182_021adfbc(func_ov182_021b2fd4);
+    sAddressSettings.work->vblankTask = DWCUtilTask_Create(1, DWCUtilAddressSettings_ScrollBgTask, NULL, 0x6e);
+    sAddressSettings.work->task = DWCUtilTask_Create(0, DWCUtilAddressSettings_UpdateLitTask, NULL, 0x78);
+    DWCUtilAddressSettings_DrawRows();
+    DWCUtilAddressSettings_ShowCursor();
+    DWCUtilMain_SetUpdate(DWCUtilAddressSettings_FadeIn);
 }
 
-static void func_ov182_021b2e6c(void) {
+static void DWCUtilAddressSettings_LoadGraphics(void) {
     char backPath[] = "char/jb3ListBack.nsc.l";
     char palettePath[] = "char/ybBgStep2.ncl.l";
     char litPalettePath[] = "char/ybBgStep21.ncl.l";
 
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE(0x18000));
-    func_ov182_021ab67c("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021ab67c("char/jbBgStep2.ncg.l", GX_LoadBG3Char);
-    func_ov182_021ab67c("char/jbBgStep21.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c(palettePath, GX_LoadBGPltt);
-    func_ov182_021ab67c("char/jb3List.nsc.l", GX_LoadBG3Scr);
-    sAddressSettings.work->backScreen = func_ov182_021bb37c(func_ov182_021ab63c(backPath), NULL, 4);
-    func_ov182_021b6f38(sAddressSettings.work->backScreen);
-    func_ov182_021b6f98();
-    sAddressSettings.work->palettes[0] = func_ov182_021bb37c(func_ov182_021ab63c(palettePath), NULL, 4);
-    sAddressSettings.work->palettes[1] = func_ov182_021bb37c(func_ov182_021ab63c(litPalettePath), NULL, 4);
+    DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
+    DWCUtilGfxResource_Load("char/jbBgStep2.ncg.l", GX_LoadBG3Char);
+    DWCUtilGfxResource_Load("char/jbBgStep21.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load(palettePath, GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/jb3List.nsc.l", GX_LoadBG3Scr);
+    sAddressSettings.work->backScreen = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(backPath), NULL, 4);
+    DWCUtilBgBuffer_Init(sAddressSettings.work->backScreen);
+    DWCUtilBgBuffer_MarkDirty();
+    sAddressSettings.work->palettes[0] =
+        DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
+    sAddressSettings.work->palettes[1] =
+        DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(litPalettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -254,11 +256,11 @@ static void func_ov182_021b2e6c(void) {
 }
 
 // The cursor and the scroll start at the top unless the screen comes back from a row's keyboard or keypad
-static void func_ov182_021b2fac(void) {
+static void DWCUtilAddressSettings_InitCursor(void) {
     int again;
 
-    func_ov182_021b781c();
-    func_ov182_021adffc(NULL, &again);
+    DWCUtilWifiSettings_GetEdit();
+    DWCUtilMain_GetScreenArgs(NULL, &again);
     if (again == 0) {
         sAddressSettings.scroll = 0;
         sAddressSettings.cursor = 0;
@@ -266,171 +268,174 @@ static void func_ov182_021b2fac(void) {
     }
 }
 
-static void func_ov182_021b2fd4(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x1d, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x1d);
-    func_ov182_021adfbc(func_ov182_021b300c);
+static void DWCUtilAddressSettings_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ,
+                      8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilAddressSettings_WaitFadeIn);
 }
 
-static void func_ov182_021b300c(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021adfbc(func_ov182_021b3030);
+static void DWCUtilAddressSettings_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Main);
     }
 }
 
-static void func_ov182_021b3030(void) {
-    func_ov182_021b303c();
-    func_ov182_021b3390();
+static void DWCUtilAddressSettings_Main(void) {
+    DWCUtilAddressSettings_HandleInput();
+    DWCUtilAddressSettings_HandleScrollbar();
 }
 
-static void func_ov182_021b303c(void) {
-    if (sAddressSettings.work->scrollTask != NULL || sAddressSettings.work->dragging || func_ov182_021b31c4()) {
+static void DWCUtilAddressSettings_HandleInput(void) {
+    if (sAddressSettings.work->scrollTask != NULL || sAddressSettings.work->dragging ||
+        DWCUtilAddressSettings_HandleTouch()) {
         return;
     }
-    if (func_ov182_021bc798(1)) {
-        func_ov182_021b3220(sAddressSettings.cursor);
+    if (DWCUtilTouch_IsKeyPressed(1)) {
+        DWCUtilAddressSettings_ChooseItem(sAddressSettings.cursor);
         return;
     }
-    if (func_ov182_021bc798(2)) {
-        func_ov182_021b80f4(7);
+    if (DWCUtilTouch_IsKeyPressed(2)) {
+        DWCUtilSound_PlaySe(7);
         sAddressSettings.work->chosen = ADDRESS_ITEM_BACK;
-        func_ov182_021adfbc(func_ov182_021b34f8);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_StartExit);
         return;
     }
-    if (func_ov182_021bc7c8(0x200)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x200)) {
         if (sAddressSettings.scroll == ADDRESS_SCROLL_MAX) {
             if (!sAddressSettings.work->atEnd) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sAddressSettings.work->atEnd = TRUE;
             }
             return;
         }
-        func_ov182_021b80f4(0x13);
-        sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3f24, NULL, 0x78);
+        DWCUtilSound_PlaySe(0x13);
+        sAddressSettings.work->scrollTask = DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
         return;
     }
-    if (func_ov182_021bc7f8(0x200)) {
+    if (DWCUtilTouch_IsKeyReleased(0x200)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x100)) {
+    if (DWCUtilTouch_IsKeyRepeated(0x100)) {
         if (sAddressSettings.scroll == 0) {
             if (!sAddressSettings.work->atEnd) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sAddressSettings.work->atEnd = TRUE;
             }
             return;
         }
-        func_ov182_021b80f4(0x13);
-        sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3eac, NULL, 0x78);
+        DWCUtilSound_PlaySe(0x13);
+        sAddressSettings.work->scrollTask = DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
         return;
     }
-    if (func_ov182_021bc7f8(0x100)) {
+    if (DWCUtilTouch_IsKeyReleased(0x100)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x40)) {
-        func_ov182_021b40e8(1);
+    if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+        DWCUtilAddressSettings_MoveCursor(1);
         return;
     }
-    if (func_ov182_021bc7f8(0x40)) {
+    if (DWCUtilTouch_IsKeyReleased(0x40)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x80)) {
-        func_ov182_021b40e8(3);
+    if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+        DWCUtilAddressSettings_MoveCursor(3);
         return;
     }
-    if (func_ov182_021bc7f8(0x80)) {
+    if (DWCUtilTouch_IsKeyReleased(0x80)) {
         sAddressSettings.work->atEnd = FALSE;
         return;
     }
-    if (func_ov182_021bc7c8(0x20)) {
-        func_ov182_021b40e8(0);
+    if (DWCUtilTouch_IsKeyRepeated(0x20)) {
+        DWCUtilAddressSettings_MoveCursor(0);
         return;
     }
-    if (func_ov182_021bc7c8(0x10)) {
-        func_ov182_021b40e8(2);
+    if (DWCUtilTouch_IsKeyRepeated(0x10)) {
+        DWCUtilAddressSettings_MoveCursor(2);
     }
 }
 
 // A touch of a row or a button: TRUE when the touch is on one
-static BOOL func_ov182_021b31c4(void) {
+static BOOL DWCUtilAddressSettings_HandleTouch(void) {
     int item;
 
-    func_ov182_021b781c();
-    item = func_ov182_021b3ce0();
+    DWCUtilWifiSettings_GetEdit();
+    item = DWCUtilAddressSettings_GetTouchedItem();
     if (item == ADDRESS_ITEM_NONE) {
         return FALSE;
     }
-    if (!func_ov182_021b3998(item)) {
-        func_ov182_021b80f4(9);
+    if (!DWCUtilAddressSettings_IsItemEnabled(item)) {
+        DWCUtilSound_PlaySe(9);
         return TRUE;
     }
-    func_ov182_021b40c8(item);
+    DWCUtilAddressSettings_SetCursor(item);
     switch (item) {
     case ADDRESS_ITEM_AUTO_ADDRESS_YES:
     case ADDRESS_ITEM_AUTO_ADDRESS_NO:
     case ADDRESS_ITEM_AUTO_DNS_YES:
     case ADDRESS_ITEM_AUTO_DNS_NO:
-        func_ov182_021b42c8();
+        DWCUtilAddressSettings_LightAnswer();
     }
-    func_ov182_021b3220(item);
+    DWCUtilAddressSettings_ChooseItem(item);
     return TRUE;
 }
 
 // Chooses an item: an answer of DHCP takes effect, a row opens its keyboard or keypad, a button tests, saves or goes
 // back
-static void func_ov182_021b3220(int item) {
-    if (!func_ov182_021b3998(item)) {
-        func_ov182_021b80f4(9);
+static void DWCUtilAddressSettings_ChooseItem(int item) {
+    if (!DWCUtilAddressSettings_IsItemEnabled(item)) {
+        DWCUtilSound_PlaySe(9);
         return;
     }
     // The answers of a row of DHCP are yes (0) and no (1), the one chosen turns DHCP on when it is not no
     switch (item) {
     case ADDRESS_ITEM_AUTO_ADDRESS_YES:
     case ADDRESS_ITEM_AUTO_ADDRESS_NO:
-        func_ov182_021b80f4(6);
-        func_ov182_021b331c(((item - ADDRESS_ITEM_AUTO_ADDRESS_YES) ^ 1) != 0);
+        DWCUtilSound_PlaySe(6);
+        DWCUtilAddressSettings_SetAutoAddress(((item - ADDRESS_ITEM_AUTO_ADDRESS_YES) ^ 1) != 0);
         return;
     case ADDRESS_ITEM_AUTO_DNS_YES:
     case ADDRESS_ITEM_AUTO_DNS_NO:
-        func_ov182_021b80f4(6);
-        func_ov182_021b3368(((item - ADDRESS_ITEM_AUTO_DNS_YES) ^ 1) != 0);
+        DWCUtilSound_PlaySe(6);
+        DWCUtilAddressSettings_SetAutoDns(((item - ADDRESS_ITEM_AUTO_DNS_YES) ^ 1) != 0);
         return;
     }
     sAddressSettings.work->chosen = item;
     if (item == ADDRESS_ITEM_TEST || item == ADDRESS_ITEM_SAVE) {
-        func_ov182_021b4278();
-        if (!func_ov182_021b4334()) {
-            func_ov182_021b80f4(9);
-            func_ov182_021b8cf0(6, 1, 1, -1, 0);
-            func_ov182_021adfbc(func_ov182_021b43b0);
+        DWCUtilAddressSettings_LightButton();
+        if (!DWCUtilAddressSettings_IsValid()) {
+            DWCUtilSound_PlaySe(9);
+            DWCUtilDialog_Open(6, 1, 1, -1, 0);
+            DWCUtilMain_SetUpdate(DWCUtilAddressSettings_WaitInvalidDialog);
             return;
         }
         if (item == ADDRESS_ITEM_TEST) {
-            func_ov182_021b80f4(6);
+            DWCUtilSound_PlaySe(6);
         } else {
-            func_ov182_021b80f4(0xe);
+            DWCUtilSound_PlaySe(0xe);
         }
     } else if (item == ADDRESS_ITEM_BACK) {
-        func_ov182_021b4278();
-        func_ov182_021b80f4(7);
+        DWCUtilAddressSettings_LightButton();
+        DWCUtilSound_PlaySe(7);
     } else {
-        func_ov182_021b80f4(6);
-        func_ov182_021b39fc(0, 1, func_ov182_021b3e68(sAddressItemRows[item]));
-        func_ov182_021b3bc4();
+        DWCUtilSound_PlaySe(6);
+        DWCUtilAddressSettings_ShowMark(0, 1, DWCUtilAddressSettings_GetScreenRow(sAddressItemRows[item]));
+        DWCUtilAddressSettings_MoveMarks();
     }
-    func_ov182_021b7174();
-    func_ov182_021adfbc(func_ov182_021b34f8);
+    DWCUtilScrollbar_Lock();
+    DWCUtilMain_SetUpdate(DWCUtilAddressSettings_StartExit);
 }
 
 // DHCP for the address: without it, DHCP can't give the DNS servers either; with it, they come from DHCP again if
 // they did
-static void func_ov182_021b331c(BOOL autoAddress) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static void DWCUtilAddressSettings_SetAutoAddress(BOOL autoAddress) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     BOOL autoDns;
 
     if (edit->autoAddress == autoAddress) {
@@ -442,23 +447,23 @@ static void func_ov182_021b331c(BOOL autoAddress) {
         sAddressSettings.work->savedAutoDns = edit->autoDns;
         autoDns = FALSE;
     }
-    func_ov182_021b782c(autoAddress);
-    func_ov182_021b7840(autoDns);
-    func_ov182_021b3740();
+    DWCUtilWifiSettings_SetAutoAddress(autoAddress);
+    DWCUtilWifiSettings_SetAutoDns(autoDns);
+    DWCUtilAddressSettings_DrawRows();
 }
 
-static void func_ov182_021b3368(BOOL autoDns) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static void DWCUtilAddressSettings_SetAutoDns(BOOL autoDns) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
 
     if (edit->autoDns != autoDns) {
         sAddressSettings.work->savedAutoDns = autoDns;
-        func_ov182_021b7840(autoDns);
-        func_ov182_021b3740();
+        DWCUtilWifiSettings_SetAutoDns(autoDns);
+        DWCUtilAddressSettings_DrawRows();
     }
 }
 
 // The scroll bar: its handle dragged, or its arrows
-static void func_ov182_021b3390(void) {
+static void DWCUtilAddressSettings_HandleScrollbar(void) {
     int offset;
 
     if (sAddressSettings.work->scrollTask != NULL) {
@@ -467,52 +472,54 @@ static void func_ov182_021b3390(void) {
     if (sAddressSettings.work->dragDelay != 0) {
         sAddressSettings.work->dragDelay--;
     }
-    switch (func_ov182_021b7150()) {
+    switch (DWCUtilScrollbar_GetEvent()) {
     case 1:
         sAddressSettings.work->dragging = TRUE;
         break;
     case 2:
         if (sAddressSettings.work->dragDelay == 0) {
-            func_ov182_021ab8e4();
-            sAddressSettings.scroll = func_ov182_021b7144() * ADDRESS_SCROLL_MAX / ADDRESS_BAR_LENGTH;
-            func_ov182_021b3740();
+            DWCUtilButtonSprites_Hide();
+            sAddressSettings.scroll = DWCUtilScrollbar_GetPos() * ADDRESS_SCROLL_MAX / ADDRESS_BAR_LENGTH;
+            DWCUtilAddressSettings_DrawRows();
             sAddressSettings.work->dragDelay = 4;
         }
         break;
     case 3:
         sAddressSettings.work->dragging = FALSE;
-        sAddressSettings.scroll = func_ov182_021b7144() * ADDRESS_SCROLL_MAX / ADDRESS_BAR_LENGTH;
-        func_ov182_021b80f4(0x13);
-        func_ov182_021b3740();
+        sAddressSettings.scroll = DWCUtilScrollbar_GetPos() * ADDRESS_SCROLL_MAX / ADDRESS_BAR_LENGTH;
+        DWCUtilSound_PlaySe(0x13);
+        DWCUtilAddressSettings_DrawRows();
         offset = FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
         if (offset == 0) {
-            func_ov182_021b4060();
+            DWCUtilAddressSettings_SetCursorFromRow();
         } else if (offset < 16) {
-            sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3eac, NULL, 0x78);
+            sAddressSettings.work->scrollTask = DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
         } else {
-            sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3f24, NULL, 0x78);
+            sAddressSettings.work->scrollTask =
+                DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
         }
         break;
     case 4:
         if (sAddressSettings.scroll == 0) {
             if (!sAddressSettings.work->barAtEnd) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sAddressSettings.work->barAtEnd = TRUE;
             }
         } else {
-            func_ov182_021b80f4(0x13);
-            sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3eac, NULL, 0x78);
+            DWCUtilSound_PlaySe(0x13);
+            sAddressSettings.work->scrollTask = DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
         }
         break;
     case 6:
         if (sAddressSettings.scroll == ADDRESS_SCROLL_MAX) {
             if (!sAddressSettings.work->barAtEnd) {
-                func_ov182_021b80f4(9);
+                DWCUtilSound_PlaySe(9);
                 sAddressSettings.work->barAtEnd = TRUE;
             }
         } else {
-            func_ov182_021b80f4(0x13);
-            sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3f24, NULL, 0x78);
+            DWCUtilSound_PlaySe(0x13);
+            sAddressSettings.work->scrollTask =
+                DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
         }
         break;
     case 5:
@@ -522,60 +529,62 @@ static void func_ov182_021b3390(void) {
     }
 }
 
-static void func_ov182_021b34f8(void) {
-    func_ov182_021b7174();
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b3510);
+static void DWCUtilAddressSettings_StartExit(void) {
+    DWCUtilScrollbar_Lock();
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilAddressSettings_FadeOut);
 }
 
-static void func_ov182_021b3510(void) {
-    if (func_ov182_021bbaac(1) == 0) {
-        func_ov182_021bbac4(3, 1, 1, 8);
-        func_ov182_021bbac4(3, 0, 0x1d, 8);
-        func_ov182_021adfbc(func_ov182_021b3544);
+static void DWCUtilAddressSettings_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(
+            DWC_UTIL_FADE_TO_WHITE, 0,
+            GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_WaitFadeOut);
     }
 }
 
 // Frees the screen and goes on to what was chosen
-static void func_ov182_021b3544(void) {
+static void DWCUtilAddressSettings_WaitFadeOut(void) {
     int i;
     DWCUtilSettingsEdit *edit;
     void (*next)(void);
 
-    if (func_ov182_021bbaac(1) != 0 || func_ov182_021bbaac(0) != 0) {
+    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
         return;
     }
-    func_ov182_021bd280(0, sAddressSettings.work->task);
-    func_ov182_021bd280(1, sAddressSettings.work->vblankTask);
+    DWCUtilTask_Remove(0, sAddressSettings.work->task);
+    DWCUtilTask_Remove(1, sAddressSettings.work->vblankTask);
     for (i = 0; i < 7; i++) {
-        func_ov182_021bcc9c(sAddressSettings.work->marks[i]);
+        DWCUtilOamBuf_Free(sAddressSettings.work->marks[i]);
     }
     if (sAddressSettings.work->setupIcon != NULL) {
-        func_ov182_021bcc9c(sAddressSettings.work->setupIcon);
+        DWCUtilOamBuf_Free(sAddressSettings.work->setupIcon);
     }
-    func_ov182_021b711c();
-    func_ov182_021bbf7c(0);
-    func_ov182_021ab8e4();
+    DWCUtilScrollbar_Destroy();
+    DWCUtilText_DestroyScreenBg(0);
+    DWCUtilButtonSprites_Hide();
     if (sAddressSettings.work->chosen != ADDRESS_ITEM_SAVE) {
         DWCUtilScreen_Stop();
     }
-    func_ov182_021b6f78();
-    func_ov182_021bb420(sAddressSettings.work->backScreen);
+    DWCUtilBgBuffer_Exit();
+    DWCUtilRomResource_FreeFile(sAddressSettings.work->backScreen);
     for (i = 0; i < 2; i++) {
-        func_ov182_021bb420(sAddressSettings.work->palettes[i]);
+        DWCUtilRomResource_FreeFile(sAddressSettings.work->palettes[i]);
     }
-    func_ov182_021ab67c("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    func_ov182_021bc228(1, 1);
-    func_ov182_021bc228(0, 0x1d);
+    DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
+    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE_0x10000);
     switch (sAddressSettings.work->chosen) {
     case ADDRESS_ITEM_SSID:
     case ADDRESS_ITEM_WEP_KEY:
-        func_ov182_021adff0(sAddressSettings.work->chosen, 0);
-        func_ov182_021adfc8(2, 0);
-        next = func_ov182_021b19f4;
+        DWCUtilMain_SetScreenArgs(sAddressSettings.work->chosen, 0);
+        DWCUtilMain_SetLayout(2, 0);
+        next = DWCUtilWepKeyboard_Init;
         break;
     case ADDRESS_ITEM_IP:
     case ADDRESS_ITEM_NETMASK:
@@ -586,12 +595,12 @@ static void func_ov182_021b3544(void) {
         if (sAddressSettings.work->chosen >= ADDRESS_ITEM_DNS1) {
             i -= 2;
         }
-        func_ov182_021adfc8(2, 0);
-        func_ov182_021adff0(i, 0);
-        next = func_ov182_021b2120;
+        DWCUtilMain_SetLayout(2, 0);
+        DWCUtilMain_SetScreenArgs(i, 0);
+        next = DWCUtilAddressEdit_Init;
         break;
     case ADDRESS_ITEM_TEST:
-        edit = func_ov182_021b781c();
+        edit = DWCUtilWifiSettings_GetEdit();
         edit->connection.netmaskBits = DWCBm_CountMaskBits(edit->netmask);
         if (edit->autoAddress) {
             MI_CpuFill8(edit->connection.ip, 0, sizeof(edit->connection.ip));
@@ -602,61 +611,61 @@ static void func_ov182_021b3544(void) {
         if (edit->autoDns) {
             MI_CpuFill8(edit->connection.dns, 0, sizeof(edit->connection.dns));
         }
-        func_ov182_021adfc8(2, 0);
-        func_ov182_021adff0(0, 0);
-        next = func_ov182_021b6104;
+        DWCUtilMain_SetLayout(2, 0);
+        DWCUtilMain_SetScreenArgs(0, 0);
+        next = DWCUtilAutoConnect_Init;
         break;
     case ADDRESS_ITEM_SAVE:
-        func_ov182_021adfc8(0, 0);
-        next = func_ov182_021b4404;
+        DWCUtilMain_SetLayout(0, 0);
+        next = DWCUtilSaveSettings_Init;
         break;
     case ADDRESS_ITEM_BACK:
         if (sAddressSettings.from == 0) {
-            func_ov182_021adfc8(2, 1);
-            next = func_ov182_021b536c;
+            DWCUtilMain_SetLayout(2, 1);
+            next = DWCUtilScreenAp_Init;
         } else {
-            edit = func_ov182_021b781c();
-            func_ov182_021b7b20(edit->index);
-            func_ov182_021adfc8(0, 1);
-            next = func_ov182_021b5bb8;
+            edit = DWCUtilWifiSettings_GetEdit();
+            DWCUtilWifiSettings_EditConnection(edit->index);
+            DWCUtilMain_SetLayout(0, 1);
+            next = DWCUtilScreenWay_Init;
         }
         break;
     default:
         goto end;
     }
-    func_ov182_021adfbc(next);
+    DWCUtilMain_SetUpdate(next);
 end:
-    func_ov182_021bc4f0(&sAddressSettings.work);
+    DWCUtilHeap_FreeAndNull(&sAddressSettings.work);
 }
 
 // Draws the rows on the screen from the scroll
-static void func_ov182_021b3740(void) {
+static void DWCUtilAddressSettings_DrawRows(void) {
     int i;
     int top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     int index;
 
-    func_ov182_021bc118(sAddressSettings.work->text, 0);
+    DWCUtilText_Clear(sAddressSettings.work->text, 0);
     for (i = 0, index = top; i < 5; i++, index++) {
-        func_ov182_021b37b4(index, i);
+        DWCUtilAddressSettings_DrawRowText(index, i);
     }
-    func_ov182_021b6fac(sAddressSettings.work->backScreen + sAddressScreenOffsets[top], 0, 0x1e, 0x13);
+    DWCUtilBgBuffer_CopyRows(sAddressSettings.work->backScreen + sAddressScreenOffsets[top], 0, 0x1e, 0x13);
     for (i = 0; i < 5; i++, top++) {
-        func_ov182_021b38c0(top, i);
+        DWCUtilAddressSettings_DrawRowMarks(top, i);
     }
-    func_ov182_021b6f98();
-    func_ov182_021bc184(sAddressSettings.work->text);
-    func_ov182_021b3bc4();
+    DWCUtilBgBuffer_MarkDirty();
+    DWCUtilText_MarkDirty(sAddressSettings.work->text);
+    DWCUtilAddressSettings_MoveMarks();
 }
 
 // The text of a row: the SSID, the WEP key as stars, or an address of the connection's own
-static void func_ov182_021b37b4(int index, int row) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static void DWCUtilAddressSettings_DrawRowText(int index, int row) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     u8 stars[33];
     int length;
 
     switch (index) {
     case ADDRESS_ROW_SSID:
-        func_ov182_021b3a9c(edit->connection.ssid, row);
+        DWCUtilAddressSettings_DrawString(edit->connection.ssid, row);
         return;
     case ADDRESS_ROW_WEP_KEY:
         switch (edit->connection.wepMode) {
@@ -676,38 +685,38 @@ static void func_ov182_021b37b4(int index, int row) {
         }
         MI_CpuFill8(stars, 0, sizeof(stars));
         memset(stars, '*', length);
-        func_ov182_021b3a9c(stars, row);
+        DWCUtilAddressSettings_DrawString(stars, row);
         return;
     case ADDRESS_ROW_IP:
         if (!edit->autoAddress) {
-            func_ov182_021b3b6c(edit->connection.ip, row);
+            DWCUtilAddressSettings_DrawAddress(edit->connection.ip, row);
         }
         break;
     case ADDRESS_ROW_NETMASK:
         if (!edit->autoAddress) {
-            func_ov182_021b3b6c(edit->netmask, row);
+            DWCUtilAddressSettings_DrawAddress(edit->netmask, row);
         }
         break;
     case ADDRESS_ROW_GATEWAY:
         if (!edit->autoAddress) {
-            func_ov182_021b3b6c(edit->connection.gateway, row);
+            DWCUtilAddressSettings_DrawAddress(edit->connection.gateway, row);
         }
         break;
     case ADDRESS_ROW_DNS1:
         if (!edit->autoDns) {
-            func_ov182_021b3b6c(edit->connection.dns[0], row);
+            DWCUtilAddressSettings_DrawAddress(edit->connection.dns[0], row);
         }
         break;
     case ADDRESS_ROW_DNS2:
         if (!edit->autoDns) {
-            func_ov182_021b3b6c(edit->connection.dns[1], row);
+            DWCUtilAddressSettings_DrawAddress(edit->connection.dns[1], row);
         }
     }
 }
 
 // The marks of a row: its arrow, or its two answers lit as they were touched and greyed when they can't be chosen
-static void func_ov182_021b38c0(int index, int row) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static void DWCUtilAddressSettings_DrawRowMarks(int index, int row) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     int mark;
     int frame;
     int other;
@@ -718,7 +727,7 @@ static void func_ov182_021b38c0(int index, int row) {
     case ADDRESS_ROW_WEP_KEY:
         mark = 0;
         frame = 0;
-        if (func_ov182_021b3998(ADDRESS_ITEM_SSID)) {
+        if (DWCUtilAddressSettings_IsItemEnabled(ADDRESS_ITEM_SSID)) {
             break;
         }
         frame = 2;
@@ -739,7 +748,7 @@ static void func_ov182_021b38c0(int index, int row) {
         if (sAddressSettings.work->lit[1] != 0) {
             lit = TRUE;
         }
-        func_ov182_021b39fc(other, lit, row);
+        DWCUtilAddressSettings_ShowMark(other, lit, row);
         break;
     case ADDRESS_ROW_IP:
     case ADDRESS_ROW_NETMASK:
@@ -770,7 +779,7 @@ static void func_ov182_021b38c0(int index, int row) {
         if (sAddressSettings.work->lit[3] != 0) {
             lit = TRUE;
         }
-        func_ov182_021b39fc(other, lit, row);
+        DWCUtilAddressSettings_ShowMark(other, lit, row);
         break;
     case ADDRESS_ROW_DNS1:
     case ADDRESS_ROW_DNS2:
@@ -786,12 +795,12 @@ static void func_ov182_021b38c0(int index, int row) {
         frame = 2;
         break;
     }
-    func_ov182_021b39fc(mark, frame, row);
+    DWCUtilAddressSettings_ShowMark(mark, frame, row);
 }
 
 // Whether an item can be chosen: not the SSID or the key of a connection that a setup made, nor what DHCP gives
-static BOOL func_ov182_021b3998(int item) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static BOOL DWCUtilAddressSettings_IsItemEnabled(int item) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     BOOL result = TRUE;
 
     switch (item) {
@@ -824,7 +833,7 @@ static BOOL func_ov182_021b3998(int item) {
 }
 
 // Shows a mark of a row in a frame, the marks of the answers of the two rows of DHCP in their own entries
-static void func_ov182_021b39fc(int mark, int frame, int row) {
+static void DWCUtilAddressSettings_ShowMark(int mark, int frame, int row) {
     u16 x[5];
     GXOamAttr **oam;
 
@@ -835,14 +844,14 @@ static void func_ov182_021b39fc(int mark, int frame, int row) {
     x[4] = 0x8f;
     oam = &sAddressSettings.work->marks[row];
     if (mark == 1 || mark == 2) {
-        if (func_ov182_021b3e94(row) == ADDRESS_ROW_AUTO_ADDRESS) {
+        if (DWCUtilAddressSettings_GetListRow(row) == ADDRESS_ROW_AUTO_ADDRESS) {
             oam = &sAddressSettings.work->marks[5];
         } else {
             oam = &sAddressSettings.work->marks[6];
         }
     }
     if (sAddressMarkCells[mark][frame] != 0) {
-        func_ov182_021bb914(0, sAddressMarkCells[mark][frame], *oam);
+        DWCUtilCell_Copy(0, sAddressMarkCells[mark][frame], *oam);
         DWCUtilOam_SetPosition(*oam, x[mark], 0);
         G2_SetOBJPriority(*oam, 3);
         return;
@@ -851,7 +860,7 @@ static void func_ov182_021b39fc(int mark, int frame, int row) {
 }
 
 // The SSID or the key of a row, on two lines when it is longer than 16 characters, a space shown as its own character
-static void func_ov182_021b3a9c(const u8 *str, int row) {
+static void DWCUtilAddressSettings_DrawString(const u8 *str, int row) {
     u16 line[17];
     int length;
     int i;
@@ -859,7 +868,7 @@ static void func_ov182_021b3a9c(const u8 *str, int row) {
     int y;
 
     MI_CpuFill8(line, 0, sizeof(line));
-    length = func_ov182_021bcef8(str, 32);
+    length = DWCUtilString_Length(str, 32);
     count = length;
     if (count > 16) {
         count = 16;
@@ -875,7 +884,7 @@ static void func_ov182_021b3a9c(const u8 *str, int row) {
     if (length <= 16) {
         y += 5;
     }
-    func_ov182_021bc030(sAddressSettings.work->text, 0x48, y, 2, 8, line, 1);
+    DWCUtilText_DrawCentered(sAddressSettings.work->text, 0x48, y, 2, 8, line, 1);
     if (length > 16) {
         MI_CpuFill8(line, 0, sizeof(line));
         for (i = 0; i < length - 16; i++) {
@@ -885,22 +894,22 @@ static void func_ov182_021b3a9c(const u8 *str, int row) {
                 line[i] = str[16 + i];
             }
         }
-        func_ov182_021bc030(sAddressSettings.work->text, 0x48, y + 12, 2, 8, line, 1);
+        DWCUtilText_DrawCentered(sAddressSettings.work->text, 0x48, y + 12, 2, 8, line, 1);
     }
 }
 
 // An address of a row, as four numbers of three places
-static void func_ov182_021b3b6c(const u8 *address, int row) {
+static void DWCUtilAddressSettings_DrawAddress(const u8 *address, int row) {
     u16 str[16];
     char digits[16];
 
     OS_SNPrintf(digits, sizeof(digits), "%3d.%3d.%3d.%3d", address[0], address[1], address[2], address[3]);
-    func_ov182_021bcf10(str, (u8 *)digits, 16);
-    func_ov182_021bc030(sAddressSettings.work->text, 0x5f, row * ADDRESS_ROW_HEIGHT + 8, 2, 7, str, 1);
+    DWCUtilString_Widen(str, (u8 *)digits, 16);
+    DWCUtilText_DrawCentered(sAddressSettings.work->text, 0x5f, row * ADDRESS_ROW_HEIGHT + 8, 2, 7, str, 1);
 }
 
 // Moves the marks and the setup's icon to the rows' places from the scroll, and has the BGs follow at the next VBlank
-static void func_ov182_021b3bc4(void) {
+static void DWCUtilAddressSettings_MoveMarks(void) {
     int top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     int y = 0x34 - FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     int i;
@@ -942,18 +951,19 @@ static void func_ov182_021b3bc4(void) {
 }
 
 // What a touch is on, ADDRESS_ITEM_NONE for nothing
-static int func_ov182_021b3ce0(void) {
+static int DWCUtilAddressSettings_GetTouchedItem(void) {
     DWCUtilAddressRect rect;
     int top;
     int i;
 
-    if (!func_ov182_021bc888(data_ov182_021c059c)) {
+    if (!DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
         return ADDRESS_ITEM_NONE;
     }
     top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     rect = sAddressRowRects[0];
     for (i = 0; i < 4; i++) {
-        if (top != ADDRESS_ROW_AUTO_ADDRESS && top != ADDRESS_ROW_AUTO_DNS && func_ov182_021bc9a8(rect.coords)) {
+        if (top != ADDRESS_ROW_AUTO_ADDRESS && top != ADDRESS_ROW_AUTO_DNS &&
+            DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
             return sAddressRowItems[top];
         }
         top++;
@@ -964,12 +974,12 @@ static int func_ov182_021b3ce0(void) {
         if (top == ADDRESS_ROW_AUTO_ADDRESS) {
             rect = sAddressRowRects[2];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_ADDRESS_YES;
             }
             rect = sAddressRowRects[1];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_ADDRESS_NO;
             }
             break;
@@ -981,12 +991,12 @@ static int func_ov182_021b3ce0(void) {
         if (top == ADDRESS_ROW_AUTO_DNS) {
             rect = sAddressRowRects[2];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_DNS_YES;
             }
             rect = sAddressRowRects[1];
             rect.coords[1] += i * ADDRESS_ROW_HEIGHT;
-            if (func_ov182_021bc9a8(rect.coords)) {
+            if (DWCUtilTouch_IsTriggeredInArea(rect.coords)) {
                 return ADDRESS_ITEM_AUTO_DNS_NO;
             }
             break;
@@ -994,7 +1004,7 @@ static int func_ov182_021b3ce0(void) {
         top++;
     }
     for (i = 0; i < 3; i++) {
-        if (func_ov182_021bc888(sAddressButtonRects[i].coords)) {
+        if (DWCUtilTouch_IsTriggeredIn(sAddressButtonRects[i].coords)) {
             return i + ADDRESS_ITEM_TEST;
         }
     }
@@ -1002,7 +1012,7 @@ static int func_ov182_021b3ce0(void) {
 }
 
 // The row on the screen that a row of the list is on, -1 when it isn't shown
-static int func_ov182_021b3e68(int index) {
+static int DWCUtilAddressSettings_GetScreenRow(int index) {
     int top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     int i;
 
@@ -1015,18 +1025,18 @@ static int func_ov182_021b3e68(int index) {
 }
 
 // The row of the list that a row on the screen shows
-static int func_ov182_021b3e94(int row) {
+static int DWCUtilAddressSettings_GetListRow(int row) {
     int top = FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
 
     return top + row;
 }
 
 // Scrolls the list up by 6 pixels a frame, until it rests on a row
-static void func_ov182_021b3eac(DWCUtilTask *task, void *arg) {
+static void DWCUtilAddressSettings_ScrollUpTask(DWCUtilTask *task, void *arg) {
     int offset;
 
-    func_ov182_021b7174();
-    func_ov182_021ab8e4();
+    DWCUtilScrollbar_Lock();
+    DWCUtilButtonSprites_Hide();
     if (sAddressSettings.scroll > 6) {
         sAddressSettings.scroll -= 6;
     } else {
@@ -1034,45 +1044,45 @@ static void func_ov182_021b3eac(DWCUtilTask *task, void *arg) {
     }
     offset = FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     if (offset == ADDRESS_ROW_HEIGHT - 6) {
-        func_ov182_021b3740();
+        DWCUtilAddressSettings_DrawRows();
         return;
     }
     if (offset > ADDRESS_ROW_HEIGHT - 6) {
         sAddressSettings.scroll += ADDRESS_ROW_HEIGHT - offset;
         offset = 0;
     }
-    func_ov182_021b3bc4();
+    DWCUtilAddressSettings_MoveMarks();
     if (offset == 0) {
-        func_ov182_021b715c(sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
-        func_ov182_021b7164();
-        func_ov182_021b4060();
+        DWCUtilScrollbar_SetPos(sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
+        DWCUtilScrollbar_Unlock();
+        DWCUtilAddressSettings_SetCursorFromRow();
         sAddressSettings.work->scrollTask = NULL;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }
 
 // Scrolls the list down by 6 pixels a frame, until it rests on a row
-static void func_ov182_021b3f24(DWCUtilTask *task, void *arg) {
+static void DWCUtilAddressSettings_ScrollDownTask(DWCUtilTask *task, void *arg) {
     int offset;
 
-    func_ov182_021b7174();
-    func_ov182_021ab8e4();
+    DWCUtilScrollbar_Lock();
+    DWCUtilButtonSprites_Hide();
     sAddressSettings.scroll += 6;
     offset = FX_ModS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     if (offset >= 6) {
-        func_ov182_021b3bc4();
+        DWCUtilAddressSettings_MoveMarks();
         return;
     }
     sAddressSettings.scroll -= offset;
-    func_ov182_021b3740();
-    func_ov182_021b715c(sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
-    func_ov182_021b7164();
-    func_ov182_021b4060();
+    DWCUtilAddressSettings_DrawRows();
+    DWCUtilScrollbar_SetPos(sAddressSettings.scroll * ADDRESS_BAR_LENGTH / ADDRESS_SCROLL_MAX);
+    DWCUtilScrollbar_Unlock();
+    DWCUtilAddressSettings_SetCursorFromRow();
     sAddressSettings.work->scrollTask = NULL;
-    func_ov182_021bd268(0, task);
+    DWCUtilTask_QueueRemoval(0, task);
 }
 
-static void func_ov182_021b3f84(DWCUtilTask *task, void *arg) {
+static void DWCUtilAddressSettings_ScrollBgTask(DWCUtilTask *task, void *arg) {
     int top;
     int offset;
 
@@ -1086,32 +1096,32 @@ static void func_ov182_021b3f84(DWCUtilTask *task, void *arg) {
 }
 
 // Frames the item the cursor is on
-static void func_ov182_021b3fd8(void) {
+static void DWCUtilAddressSettings_ShowCursor(void) {
     u8 rects[14] = { 0, 0, 1, 2, 0, 0, 0, 1, 2, 0, 0, 3, 4, 5 };
     DWCUtilAddressRect rect;
     int index = rects[sAddressSettings.cursor];
 
     if (index >= 3) {
-        func_ov182_021ab7f0(3, sAddressCursorRects[index].coords[0], sAddressCursorRects[index].coords[2],
-                            sAddressCursorRects[index].coords[1]);
+        DWCUtilButtonSprites_ShowPair(3, sAddressCursorRects[index].coords[0], sAddressCursorRects[index].coords[2],
+                                      sAddressCursorRects[index].coords[1]);
         return;
     }
     rect = sAddressCursorRects[index];
     rect.coords[1] += sAddressSettings.row * ADDRESS_ROW_HEIGHT;
-    func_ov182_021ab7f0(1, rect.coords[0], rect.coords[2], rect.coords[1]);
+    DWCUtilButtonSprites_ShowPair(1, rect.coords[0], rect.coords[2], rect.coords[1]);
 }
 
 // Puts the cursor on the item of its row, the chosen answer of a row of DHCP
-static void func_ov182_021b4060(void) {
+static void DWCUtilAddressSettings_SetCursorFromRow(void) {
     DWCUtilSettingsEdit *edit;
     int index;
 
     if (sAddressSettings.cursor == ADDRESS_ITEM_TEST || sAddressSettings.cursor == ADDRESS_ITEM_SAVE ||
         sAddressSettings.cursor == ADDRESS_ITEM_BACK) {
-        func_ov182_021b3fd8();
+        DWCUtilAddressSettings_ShowCursor();
         return;
     }
-    edit = func_ov182_021b781c();
+    edit = DWCUtilWifiSettings_GetEdit();
     index = sAddressSettings.row + FX_DivS32(sAddressSettings.scroll, ADDRESS_ROW_HEIGHT);
     switch (index) {
     case ADDRESS_ROW_AUTO_ADDRESS:
@@ -1132,18 +1142,18 @@ static void func_ov182_021b4060(void) {
         sAddressSettings.cursor = sAddressRowItems[index];
         break;
     }
-    func_ov182_021b3fd8();
+    DWCUtilAddressSettings_ShowCursor();
 }
 
-static void func_ov182_021b40c8(int item) {
+static void DWCUtilAddressSettings_SetCursor(int item) {
     sAddressSettings.cursor = item;
-    sAddressSettings.row = func_ov182_021b3e68(sAddressItemRows[item]);
-    func_ov182_021b3fd8();
+    sAddressSettings.row = DWCUtilAddressSettings_GetScreenRow(sAddressItemRows[item]);
+    DWCUtilAddressSettings_ShowCursor();
 }
 
 // Moves the cursor: right (0), up (1), left (2) or down (3), scrolling the list at its ends
-static void func_ov182_021b40e8(int direction) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static void DWCUtilAddressSettings_MoveCursor(int direction) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
     u8 cursor = sAddressSettings.cursor;
     int moved = 0;
 
@@ -1179,7 +1189,7 @@ static void func_ov182_021b40e8(int direction) {
             if (sAddressSettings.work->atEnd) {
                 return;
             }
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             sAddressSettings.work->atEnd = TRUE;
             return;
         }
@@ -1187,8 +1197,8 @@ static void func_ov182_021b40e8(int direction) {
             sAddressSettings.cursor = ADDRESS_ITEM_SSID;
             sAddressSettings.row = 0;
             sAddressSettings.scroll = 0;
-            func_ov182_021b3740();
-            func_ov182_021b715c(0);
+            DWCUtilAddressSettings_DrawRows();
+            DWCUtilScrollbar_SetPos(0);
         } else {
             moved = 2;
         }
@@ -1200,13 +1210,13 @@ static void func_ov182_021b40e8(int direction) {
             sAddressSettings.cursor = ADDRESS_ITEM_DNS2;
             sAddressSettings.row = 3;
             sAddressSettings.scroll = ADDRESS_SCROLL_MAX;
-            func_ov182_021b3740();
-            func_ov182_021b715c(ADDRESS_BAR_LENGTH);
+            DWCUtilAddressSettings_DrawRows();
+            DWCUtilScrollbar_SetPos(ADDRESS_BAR_LENGTH);
         } else if (direction == 3) {
             if (sAddressSettings.work->atEnd) {
                 return;
             }
-            func_ov182_021b80f4(9);
+            DWCUtilSound_PlaySe(9);
             sAddressSettings.work->atEnd = TRUE;
             return;
         } else if (cursor == ADDRESS_ITEM_SAVE) {
@@ -1220,16 +1230,18 @@ static void func_ov182_021b40e8(int direction) {
             if (sAddressSettings.row != 0) {
                 sAddressSettings.row--;
             } else {
-                func_ov182_021b80f4(0x13);
-                sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3eac, NULL, 0x78);
+                DWCUtilSound_PlaySe(0x13);
+                sAddressSettings.work->scrollTask =
+                    DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollUpTask, NULL, 0x78);
                 return;
             }
         } else if (direction == 3) {
             if (sAddressSettings.row < 3) {
                 sAddressSettings.row++;
             } else {
-                func_ov182_021b80f4(0x13);
-                sAddressSettings.work->scrollTask = func_ov182_021bd200(0, func_ov182_021b3f24, NULL, 0x78);
+                DWCUtilSound_PlaySe(0x13);
+                sAddressSettings.work->scrollTask =
+                    DWCUtilTask_Create(0, DWCUtilAddressSettings_ScrollDownTask, NULL, 0x78);
                 return;
             }
         } else {
@@ -1245,41 +1257,42 @@ static void func_ov182_021b40e8(int direction) {
             } else {
                 break;
             }
-            func_ov182_021b80f4(8);
-            func_ov182_021b3fd8();
+            DWCUtilSound_PlaySe(8);
+            DWCUtilAddressSettings_ShowCursor();
         }
         break;
     }
     if (moved != 2) {
-        func_ov182_021b80f4(8);
+        DWCUtilSound_PlaySe(8);
         if (moved == 0) {
-            func_ov182_021b4060();
+            DWCUtilAddressSettings_SetCursorFromRow();
         }
     }
 }
 
 // Lights up the chosen button: its row of the palette
-static void func_ov182_021b4278(void) {
-    func_ov182_021b7014(sAddressSettings.work->palettes[1], sAddressButtonPalettes[sAddressSettings.cursor - 0xb],
-                        sAddressButtonPalettes[sAddressSettings.cursor - 0xb]);
+static void DWCUtilAddressSettings_LightButton(void) {
+    DWCUtilBgBuffer_LoadPaletteRow(sAddressSettings.work->palettes[1],
+                                   sAddressButtonPalettes[sAddressSettings.cursor - 0xb],
+                                   sAddressButtonPalettes[sAddressSettings.cursor - 0xb]);
 }
 
 // Counts down the frames that the answers stay lit
-static void func_ov182_021b4298(DWCUtilTask *task, void *arg) {
+static void DWCUtilAddressSettings_UpdateLitTask(DWCUtilTask *task, void *arg) {
     int i;
 
     for (i = 0; i < 4; i++) {
         if (sAddressSettings.work->lit[i] != 0) {
             sAddressSettings.work->lit[i]--;
             if (sAddressSettings.work->lit[i] == 0) {
-                func_ov182_021b3740();
+                DWCUtilAddressSettings_DrawRows();
             }
         }
     }
 }
 
 // Lights the touched answer for 20 frames, and the other answer of its row no longer
-static void func_ov182_021b42c8(void) {
+static void DWCUtilAddressSettings_LightAnswer(void) {
     u8 items[4] = { ADDRESS_ITEM_AUTO_ADDRESS_YES, ADDRESS_ITEM_AUTO_ADDRESS_NO, ADDRESS_ITEM_AUTO_DNS_YES,
                     ADDRESS_ITEM_AUTO_DNS_NO };
     int i;
@@ -1299,8 +1312,8 @@ static void func_ov182_021b42c8(void) {
 
 // Whether the settings can be saved: an SSID, a usable DNS server unless DHCP gives them, and a usable address and
 // gateway that suit the mask unless DHCP gives them
-static BOOL func_ov182_021b4334(void) {
-    DWCUtilSettingsEdit *edit = func_ov182_021b781c();
+static BOOL DWCUtilAddressSettings_IsValid(void) {
+    DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
 
     if (edit->connection.ssid[0] == 0) {
         return FALSE;
@@ -1323,21 +1336,21 @@ static BOOL func_ov182_021b4334(void) {
     return TRUE;
 }
 
-static void func_ov182_021b43b0(void) {
-    if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
-        func_ov182_021b8eec();
-        func_ov182_021b7060(sAddressSettings.work->palettes[0]);
-        func_ov182_021adfbc(func_ov182_021b43e0);
+static void DWCUtilAddressSettings_WaitInvalidDialog(void) {
+    if (DWCUtilDialog_GetChoice() == 0) {
+        DWCUtilSound_PlaySe(6);
+        DWCUtilDialog_Close();
+        DWCUtilBgBuffer_LoadPalette(sAddressSettings.work->palettes[0]);
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_WaitInvalidClosed);
     }
 }
 
-static void func_ov182_021b43e0(void) {
-    if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b3030);
+static void DWCUtilAddressSettings_WaitInvalidClosed(void) {
+    if (!DWCUtilDialog_IsOpen()) {
+        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Main);
     }
 }
 
-void func_ov182_021b43f8(int from) {
+void DWCUtilAddressSettings_SetFrom(int from) {
     sAddressSettings.from = from;
 }

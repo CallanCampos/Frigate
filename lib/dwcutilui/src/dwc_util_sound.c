@@ -4,7 +4,7 @@
 #include "dwc_util_task.h"
 #include "nnsys/snd.h"
 
-static void func_ov182_021b814c(DWCUtilTask *task, void *arg);
+static void DWCUtilSound_UpdateTask(DWCUtilTask *task, void *arg);
 
 typedef struct DWCUtilSound {
     NNSSndArc arc;
@@ -17,12 +17,12 @@ typedef struct DWCUtilSound {
 
 static DWCUtilSound *sSound;
 
-void func_ov182_021b8050(void) {
+void DWCUtilSound_Init(void) {
     u32 size;
     int i;
 
-    sSound = func_ov182_021bc4d8(sizeof(DWCUtilSound), 4);
-    sSound->data = func_ov182_021bb37c("sound/sound_data.sdat.l", &size, 32);
+    sSound = DWCUtilHeap_AllocClear(sizeof(DWCUtilSound), 4);
+    sSound->data = DWCUtilRomResource_LoadFile("sound/sound_data.sdat.l", &size, 32);
     NNS_SndInit();
     NNS_SndArcInitOnMemory(&sSound->arc, sSound->data);
     NNS_SndArcPlayerSetup(NULL);
@@ -32,30 +32,30 @@ void func_ov182_021b8050(void) {
         NNS_SndPlayerSetPlayableSeqCount(i, 1);
         NNS_SndPlayerSetAllocatableChannel(i, 0);
     }
-    sSound->task = func_ov182_021bd200(0, func_ov182_021b814c, NULL, 200);
+    sSound->task = DWCUtilTask_Create(0, DWCUtilSound_UpdateTask, NULL, 200);
 }
 
-void func_ov182_021b80d4(void) {
-    func_ov182_021bd268(0, sSound->task);
-    func_ov182_021bc4f0(&sSound);
+void DWCUtilSound_Exit(void) {
+    DWCUtilTask_QueueRemoval(0, sSound->task);
+    DWCUtilHeap_FreeAndNull(&sSound);
 }
 
-void func_ov182_021b80f4(int seq) {
+void DWCUtilSound_PlaySe(int seq) {
     NNS_SndArcPlayerStartSeqArc(&sSound->handle, 0, seq);
 }
 
-void func_ov182_021b810c(int volume) {
+void DWCUtilSound_SetVolume(int volume) {
     NNS_SndPlayerSetVolume(&sSound->handle, volume);
 }
 
-void func_ov182_021b8120(u32 trackMask, int pitch) {
+void DWCUtilSound_SetTrackPitch(u32 trackMask, int pitch) {
     NNS_SndPlayerSetTrackPitch(&sSound->handle, trackMask, pitch);
 }
 
-void func_ov182_021b8138(void) {
+void DWCUtilSound_StopSe(void) {
     NNS_SndPlayerStopSeq(&sSound->handle, 0);
 }
 
-static void func_ov182_021b814c(DWCUtilTask *task, void *arg) {
+static void DWCUtilSound_UpdateTask(DWCUtilTask *task, void *arg) {
     NNS_SndMain();
 }

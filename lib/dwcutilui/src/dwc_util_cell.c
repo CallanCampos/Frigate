@@ -16,18 +16,18 @@ typedef struct DWCUtilCell {
 
 static DWCUtilCell *sCells[2];
 
-void func_ov182_021bb8dc(int screen, const char *path) {
+void DWCUtilCell_Load(int screen, const char *path) {
     u32 size;
 
-    sCells[screen] = func_ov182_021bb37c(path, &size, 4);
+    sCells[screen] = DWCUtilRomResource_LoadFile(path, &size, 4);
 }
 
-void func_ov182_021bb8fc(int screen) {
-    func_ov182_021bb420(sCells[screen]);
+void DWCUtilCell_Unload(int screen) {
+    DWCUtilRomResource_FreeFile(sCells[screen]);
     sCells[screen] = NULL;
 }
 
-void func_ov182_021bb914(int screen, int cell, GXOamAttr *oam) {
+void DWCUtilCell_Copy(int screen, int cell, GXOamAttr *oam) {
     DWCUtilCell *cells = sCells[screen];
     const u16 *attrs = (const u16 *)((const u8 *)cells + cells[cell].offset);
     u16 count = cells[cell].count;
@@ -41,23 +41,23 @@ void func_ov182_021bb914(int screen, int cell, GXOamAttr *oam) {
     }
 }
 
-GXOamAttr *func_ov182_021bb960(int screen, int cell) {
-    GXOamAttr *oam = func_ov182_021bcc80(screen);
+GXOamAttr *DWCUtilCell_AllocOam(int screen, int cell) {
+    GXOamAttr *oam = DWCUtilOamBuf_Alloc(screen);
 
-    func_ov182_021bb914(screen, cell, oam);
+    DWCUtilCell_Copy(screen, cell, oam);
     return oam;
 }
 
-DWCUtilOamNode *func_ov182_021bb97c(int screen, int cell, BOOL fromFront) {
-    DWCUtilOamNode *node = func_ov182_021bb594(screen, sCells[screen][cell].count, fromFront);
+DWCUtilOamNode *DWCUtilCell_AllocOamRun(int screen, int cell, BOOL fromFront) {
+    DWCUtilOamNode *node = DWCUtilOam_Alloc(screen, sCells[screen][cell].count, fromFront);
 
-    func_ov182_021bb914(screen, cell, func_ov182_021bb6ec(node, 0));
+    DWCUtilCell_Copy(screen, cell, DWCUtilOam_GetEntry(node, 0));
     return node;
 }
 
 // The stack has a slot more than its items: pushing into the last one stops the game
-DWCUtilStack *func_ov182_021bb9ac(int count) {
-    DWCUtilStack *stack = func_ov182_021bc4d8((count + 1) * sizeof(void *) + 8, 4);
+DWCUtilStack *DWCUtilStack_Create(int count) {
+    DWCUtilStack *stack = DWCUtilHeap_AllocClear((count + 1) * sizeof(void *) + 8, 4);
 
     stack->capacity = count + 1;
     stack->head = 0;
@@ -65,8 +65,8 @@ DWCUtilStack *func_ov182_021bb9ac(int count) {
     return stack;
 }
 
-DWCUtilStack *func_ov182_021bb9c8(int count, u8 *first, int stride) {
-    DWCUtilStack *stack = func_ov182_021bb9ac(count);
+DWCUtilStack *DWCUtilStack_CreateFilled(int count, u8 *first, int stride) {
+    DWCUtilStack *stack = DWCUtilStack_Create(count);
     int i;
 
     for (i = 0; i < count; i++) {
@@ -77,11 +77,11 @@ DWCUtilStack *func_ov182_021bb9c8(int count, u8 *first, int stride) {
     return stack;
 }
 
-void func_ov182_021bb9ec(DWCUtilStack *stack) {
-    func_ov182_021bc4f0(&stack);
+void DWCUtilStack_Destroy(DWCUtilStack *stack) {
+    DWCUtilHeap_FreeAndNull(&stack);
 }
 
-void func_ov182_021bba00(DWCUtilStack *stack, void *item) {
+void DWCUtilStack_Push(DWCUtilStack *stack, void *item) {
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
     int next = FX_ModS32(stack->tail + 1, stack->capacity);
 
@@ -93,7 +93,7 @@ void func_ov182_021bba00(DWCUtilStack *stack, void *item) {
     OS_EnableIrqMask(irq);
 }
 
-void *func_ov182_021bba38(DWCUtilStack *stack) {
+void *DWCUtilStack_Pop(DWCUtilStack *stack) {
     void *item = NULL;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
 
