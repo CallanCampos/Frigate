@@ -104,30 +104,30 @@ static BOOL MusicalShotSys_Init(GameProc *proc, u32 *state, void *param, void *w
             shot->pokes[i].name[5] = 0;
             for (j = 0; j < 8; j++) {
                 shot->pokes[i].equips[j].itemId = 0xff;
-                shot->pokes[i].equips[j].unk2 = 0;
-                shot->pokes[i].equips[j].unk4 = 10;
+                shot->pokes[i].equips[j].rotation = 0;
+                shot->pokes[i].equips[j].pos = 10;
             }
             shot->pokes[i].equips[0].itemId = 11;
-            shot->pokes[i].equips[0].unk2 = 0;
-            shot->pokes[i].equips[0].unk4 = 7;
+            shot->pokes[i].equips[0].rotation = 0;
+            shot->pokes[i].equips[0].pos = 7;
             shot->pokes[i].equips[1].itemId = 11;
-            shot->pokes[i].equips[1].unk2 = 0;
-            shot->pokes[i].equips[1].unk4 = 8;
+            shot->pokes[i].equips[1].rotation = 0;
+            shot->pokes[i].equips[1].pos = 8;
             shot->pokes[i].equips[2].itemId = 11;
-            shot->pokes[i].equips[2].unk2 = 0;
-            shot->pokes[i].equips[2].unk4 = 6;
+            shot->pokes[i].equips[2].rotation = 0;
+            shot->pokes[i].equips[2].pos = 6;
             shot->pokes[i].equips[3].itemId = 11;
-            shot->pokes[i].equips[3].unk2 = 0;
-            shot->pokes[i].equips[3].unk4 = 4;
+            shot->pokes[i].equips[3].rotation = 0;
+            shot->pokes[i].equips[3].pos = 4;
             shot->pokes[i].equips[4].itemId = 11;
-            shot->pokes[i].equips[4].unk2 = 0;
-            shot->pokes[i].equips[4].unk4 = 2;
+            shot->pokes[i].equips[4].rotation = 0;
+            shot->pokes[i].equips[4].pos = 2;
             shot->pokes[i].equips[5].itemId = 11;
-            shot->pokes[i].equips[5].unk2 = 0;
-            shot->pokes[i].equips[5].unk4 = 1;
+            shot->pokes[i].equips[5].rotation = 0;
+            shot->pokes[i].equips[5].pos = 1;
             shot->pokes[i].equips[6].itemId = 11;
-            shot->pokes[i].equips[6].unk2 = 0;
-            shot->pokes[i].equips[6].unk4 = 0;
+            shot->pokes[i].equips[6].rotation = 0;
+            shot->pokes[i].equips[6].pos = 0;
         }
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_R) {
             sys->param->askSave = TRUE;

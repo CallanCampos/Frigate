@@ -83,9 +83,9 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
     u32 rule;
 
     if (unk48) {
-        Regulation_SetParam(wk->club->regulation, 13, TRUE);
+        Regulation_SetParam(wk->club->regulation, REGULATION_PARAM_LAUNCHER, TRUE);
     } else {
-        Regulation_SetParam(wk->club->regulation, 13, FALSE);
+        Regulation_SetParam(wk->club->regulation, REGULATION_PARAM_LAUNCHER, FALSE);
     }
 
     switch (mode) {

@@ -18,7 +18,7 @@ void TrainerDataSave_Init(TrainerDataSave *data) {
     Config_Init(&data->config);
     PlayerInfo_Init(&data->playerInfo);
     PlayTime_Init(&data->playTime);
-    data->unk2C = 0;
+    data->isIntroSave = 0;
 }
 
 PlayerInfo *SaveControl_GetPlayerInfo(SaveControl *save) {
@@ -35,19 +35,19 @@ PlayTime *SaveControl_GetPlayTime(SaveControl *save) {
     return &data->playTime;
 }
 
-u8 func_02008df4(SaveControl *save) {
+u8 TrainerDataSave_IsIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    return data->unk2C;
+    return data->isIntroSave;
 }
 
-void func_02008e04(SaveControl *save) {
+void TrainerDataSave_SetIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    data->unk2C = 1;
+    data->isIntroSave = 1;
 }
 
-void func_02008e14(SaveControl *save) {
+void TrainerDataSave_ClearIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    data->unk2C = 0;
+    data->isIntroSave = 0;
 }
 
 BOOL TrainerDataSave_IsMarkerSet(SaveControl *save, u32 index) {
@@ -65,9 +65,9 @@ void TrainerDataSave_ClearMarker(SaveControl *save, u32 index) {
     data->markers[index] = 0;
 }
 
-u32 *func_02008e74(SaveControl *save, u32 index) {
+u32 *TrainerDataSave_GetExtraSaveCount(SaveControl *save, u32 index) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    return &data->unk5C[index];
+    return &data->extraSaveCounts[index];
 }
 
 void TrainerDataSave_StorePlayerInfo(SaveControl *save, PlayerState *state) {

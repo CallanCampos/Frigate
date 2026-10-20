@@ -558,7 +558,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         (*state)++;
         break;
     case 8:
-        if (func_02005cbc()) {
+        if (GFL_SndIsLoadThreadRunning()) {
             break;
         }
         (*state)++;

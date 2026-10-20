@@ -291,7 +291,8 @@ StrBuf *BrBtnData_CreateStr(const BrBtnDataSys *cp_wk, const BrBtnData *cp_data,
     if (isName) {
         if (cp_wk->setup.recordInfo->isValid[id]) {
             wordset = GFL_WordSetSystemCreateDefault(HEAPID_TAIL(heapId));
-            func_0202437c(wordset, 0, cp_wk->setup.recordInfo->name[id], cp_wk->setup.recordInfo->sex[id], TRUE, 2);
+            GFL_WordSetSetStrbuf(wordset, 0, cp_wk->setup.recordInfo->name[id], cp_wk->setup.recordInfo->sex[id], TRUE,
+                                 2);
             src = GFL_MsgDataLoadStrbufNew(msg, BrBtnData_GetParam(cp_data, BR_BTN_DATA_PARAM_MSGID));
             str = GFL_StrBufCreate(GFL_StrBufGetCharCount(src) + 7, heapId);
             GFL_WordSetFormatStrbuf(wordset, str, src);

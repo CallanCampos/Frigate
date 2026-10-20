@@ -29,7 +29,7 @@ s32 TextSpeed_GetCurrentWait(void) {
     return sTextSpeedWaits[speed];
 }
 
-s32 func_02017bf0(void) {
+s32 TextSpeed_GetFasterWait(void) {
     u32 speed = Config_GetTextSpeed(&getTrainerDataBlkAddress(sSaveControl)->config);
 
     switch (speed) {
@@ -46,7 +46,7 @@ s32 func_02017bf0(void) {
     return TextSpeed_GetWait(speed);
 }
 
-s32 func_02017c20(void) {
+s32 TextSpeed_GetSlowerWait(void) {
     u32 speed = Config_GetTextSpeed(&getTrainerDataBlkAddress(sSaveControl)->config);
 
     switch (speed) {

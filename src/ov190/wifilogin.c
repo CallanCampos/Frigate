@@ -303,12 +303,12 @@ static void WifiLogin_StateStartNet(WifiLoginWork *work) {
         sNetInit.wifiHeapSize = 0x6e000;
     }
     if (work->param->unkC != 0xa) {
-        sNetInit.unk40 = NULL;
+        sNetInit.getFriendData = NULL;
     }
     sNetInit.gameCommandBase = work->param->unkC;
     sGameType = work->param->unkC;
     GFL_NetInit(&sNetInit, NULL, work);
-    func_020423e0();
+    NetState_StartWifiLogin();
     if (work->param->unk8 == 0) {
         GFL_NetSetIconScreen(FALSE, work->heapId);
     } else {
@@ -374,7 +374,7 @@ static void WifiLogin_StateOpenConfirmError(WifiLoginWork *work) {
 // Stops at a network error and tells the player, returning whether there was one
 static BOOL WifiLogin_CheckNetError(WifiLoginWork *work) {
     if (GFL_NetErrCheck()) {
-        switch (NetState_GetErrorInfo()->unk4) {
+        switch (NetState_GetErrorInfo()->errorType) {
         case 1:
         case 2:
         case 3:
@@ -417,7 +417,7 @@ static void WifiLogin_StateWaitResetConfirm(WifiLoginWork *work) {
                 TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
 
             BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(work->gameData)), 1);
-            TournamentEntry_SetField(entry, 10, 5);
+            TournamentEntry_SetField(entry, TOURNAMENT_FIELD_UNK15B, 5);
             work->param->result = 0;
             initWifi(work->wifiList);
             WifiLogin_SetState(work, WifiLogin_StateStartNet);
@@ -452,8 +452,8 @@ static void WifiLogin_StateWaitProfileConfirm(WifiLoginWork *work) {
         if (answer == 0) {
             void *entry =
                 TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
-            u32 field2 = TournamentEntry_GetField(entry, 2);
-            u32 field10 = TournamentEntry_GetField(entry, 10);
+            u32 field2 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
+            u32 field10 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
 
             if (field2 != 0 && field10 >= 1 && field10 <= 4) {
                 WifiLoginMessage_ClearTitle(work->msg);

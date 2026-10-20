@@ -27,7 +27,7 @@ struct UnionBootParam {
 // A player met, in a group's list and in the beacon
 typedef struct {
     u8 mac[6];
-    u8 look; // func_02008bf4's appearance
+    u8 look; // PlayerInfo_GetUnionView's appearance
     u8 gender : 1;
     u8 used : 1;
 } UnionMember;

@@ -255,7 +255,9 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         break;
     case FMISSION_VIEW_EVENT_GREETING:
         event = FMissionViewSetup_CreateCallEvent(
-            view, EventPhraseInput_Create(view->gsys, view->field, NULL, 14, (u16 *)func_0202d7d0(view->beaconStatus)),
+            view,
+            EventPhraseInput_Create(view->gsys, view->field, NULL, 14,
+                                    (u16 *)BeaconStatus_GetGreetingChanged(view->beaconStatus)),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_GREETING);
         break;
     default:
@@ -360,7 +362,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
 
     view->beaconStatus = GameData_GetBeaconStatus(view->gameData);
     view->newLog = LinkFestival_GetLog(view->festival);
-    view->log = func_02014708(view->festival);
+    view->log = LinkFestival_GetViewLog(view->festival);
     view->passPowers = LinkFestival_GetPassPowers(view->festival);
     view->logCount = FMissionLogFV_GetCount(view->log);
     view->logTop = FMissionLogFV_GetTop(view->log);
@@ -376,11 +378,11 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
     view->wifiList = GameData_GetWifiList(view->gameData);
     view->bag = GameData_GetBag(view->gameData);
     view->trainerCard = getTrainerCardData_wrapper(save);
-    view->unk33C = func_0200c924(view->trainerCard);
+    view->unk33C = TrainerCard_GetPasserbyCount(view->trainerCard);
     info = SaveControl_GetPlayerInfo(save);
     view->trainerId = getTrainerID(info);
     view->gender = getTrainerGender(info);
-    view->unk3D = func_02008bf4(info);
+    view->unk3D = PlayerInfo_GetUnionView(info);
     view->version = GAME_VERSION;
     view->entry = FMissionLogFV_AllocEntry(view->heapId);
     view->unk54 = FMissionLogFV_AllocEntry(view->heapId);
@@ -635,8 +637,8 @@ static ClActor *FMissionViewSetup_AddActor(FMissionView *view, u32 chars, u32 pa
     setup.bgPriority = bgPriority;
     setup.priority = priority;
     actor = ClActor_Create(view->clUnit, chars, palette, cellAnims, &setup, CLACT_SURFACE_MAIN, view->fieldHeapId);
-    func_0204c520(actor, FALSE);
-    func_0204c5c8(actor, FALSE);
+    ClActor_SetAutoAnim(actor, FALSE);
+    ClActor_SetDrawAnim(actor, FALSE);
     return actor;
 }
 
@@ -653,7 +655,7 @@ static void FMissionViewSetup_InitButtons(FMissionView *view) {
             view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0], sFMissionViewButtonPos[i].x,
             sFMissionViewButtonPos[i].y, (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT, 1, 1);
         ClActor_SetVisible(view->buttons[i], TRUE);
-        func_0204c520(view->buttons[i], TRUE);
+        ClActor_SetAutoAnim(view->buttons[i], TRUE);
     }
 }
 

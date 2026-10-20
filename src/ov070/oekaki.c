@@ -589,7 +589,7 @@ static void Oekaki_CreateActors(OekakiWork *wk) {
         wk->cursors[i] =
             ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_MAIN].chars, wk->resources[OEKAKI_RES_MAIN].palette,
                            wk->resources[OEKAKI_RES_MAIN].cellAnims, &setup, 0, HEAPID_OEKAKI);
-        func_0204c520(wk->cursors[i], TRUE);
+        ClActor_SetAutoAnim(wk->cursors[i], TRUE);
         ClActor_SetSequence(wk->cursors[i], i);
         ClActor_SetVisible(wk->cursors[i], FALSE);
     }
@@ -599,7 +599,7 @@ static void Oekaki_CreateActors(OekakiWork *wk) {
         wk->buttons[i] =
             ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_MAIN].chars, wk->resources[OEKAKI_RES_MAIN].palette,
                            wk->resources[OEKAKI_RES_MAIN].cellAnims, &setup, 0, HEAPID_OEKAKI);
-        func_0204c520(wk->buttons[i], TRUE);
+        ClActor_SetAutoAnim(wk->buttons[i], TRUE);
         ClActor_SetSequence(wk->buttons[i], sButtonData[i].sequence);
         if (i >= OEKAKI_BUTTON_END) {
             ClActor_SetBgPriority(wk->buttons[i], 2);
@@ -612,7 +612,7 @@ static void Oekaki_CreateActors(OekakiWork *wk) {
         wk->nameActors[i] =
             ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_SUB].chars, wk->resources[OEKAKI_RES_SUB].palette,
                            wk->resources[OEKAKI_RES_SUB].cellAnims, &setup, 1, HEAPID_OEKAKI);
-        func_0204c520(wk->nameActors[i], TRUE);
+        ClActor_SetAutoAnim(wk->nameActors[i], TRUE);
         ClActor_SetSequence(wk->nameActors[i], i);
         ClActor_SetPriority(wk->nameActors[i], 1);
         ClActor_SetVisible(wk->nameActors[i], FALSE);
@@ -622,7 +622,7 @@ static void Oekaki_CreateActors(OekakiWork *wk) {
     wk->endButton =
         ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_COMMON].chars, wk->resources[OEKAKI_RES_COMMON].palette,
                        wk->resources[OEKAKI_RES_COMMON].cellAnims, &setup, 0, HEAPID_OEKAKI);
-    func_0204c520(wk->endButton, TRUE);
+    ClActor_SetAutoAnim(wk->endButton, TRUE);
     ClActor_SetSequence(wk->endButton, 1);
     ClActor_SetVisible(wk->endButton, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
@@ -1091,7 +1091,7 @@ static int Oekaki_SeqParentEndMsg(OekakiWork *wk, int seq) {
 static int Oekaki_SeqParentEndMsgWait(OekakiWork *wk, int seq) {
     if (Oekaki_IsMessageDone(wk)) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_PARENT_END_SYNC_WAIT);
-        func_02040b38(NetHandle_GetOwn(), 200, 0x29, (u16)wk->shareBit);
+        NetHandle_SendTimingPairToMachines(NetHandle_GetOwn(), 200, 0x29, (u16)wk->shareBit);
     }
     Oekaki_DrawOthers(wk);
     return seq;

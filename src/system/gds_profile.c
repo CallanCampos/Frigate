@@ -77,7 +77,7 @@ void GdsProfile_SetFromGameData(GdsProfile *profile, GameData *gameData) {
     }
     CGearPhrases_Get(sentences, 0, &profile->introduction.pms);
     profile->birthMonth = ownerInfo.birthday.month;
-    profile->unionView = func_02008bf4(playerInfo);
+    profile->unionView = PlayerInfo_GetUnionView(playerInfo);
     profile->version = GAME_VERSION;
     profile->language = GAME_LANGUAGE;
     profile->crc = getCRC16(profile, offsetof(GdsProfile, crc));

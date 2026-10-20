@@ -669,7 +669,7 @@ static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index
             GFLNetErrorInfo *info = NetState_GetErrorInfo();
 
             if (info->type == 0) {
-                NetState_RecordError(info->code, info->unk4, info->unk8, 0x3f1);
+                NetState_RecordError(info->code, info->errorType, info->error, 0x3f1);
             }
         }
         NetHandle_Forget(aid);

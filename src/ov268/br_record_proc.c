@@ -233,7 +233,7 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     case BR_RECORD_MODE_OTHER3:
         p_wk->header = BattleRec_GetHeader();
         p_wk->profile = getVSPlayerAllocation();
-        p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
+        p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_SECURE, 0);
         p_wk->canSave = FALSE;
         break;
     case BR_RECORD_MODE_CODEIN:
@@ -800,8 +800,8 @@ static void BrRecord_SeqSecureSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
         GFL_ASSERT(p_wk->p_param->mode <= BR_RECODE_PROC_OTHER_02);
         if (BattleRecOv_SaveSecureVideo(p_wk->p_param->gameData, p_wk->p_param->mode, &p_wk->saveSeq, &p_wk->saveSeq2,
                                         p_wk->heapId) == 2) {
-            func_0200bbb4();
-            p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
+            BattleRec_DecryptBody();
+            p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_SECURE, 0);
             *p_seq = SEQ_FADEOUT_START;
         }
         break;
@@ -1002,7 +1002,7 @@ static void BrRecord_CreateInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
             str = GFL_StrBufCreate(0x80, p_wk->heapId);
             name = GdsProfile_CreateNameStrBuf(p_wk->profile, p_wk->heapId);
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
-            func_0202437c(wordSet, 0, name, GdsProfile_GetSex(p_wk->profile), 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, name, GdsProfile_GetSex(p_wk->profile), 1, 2);
             GFL_WordSetFormatStrbuf(wordSet, str, src);
             GFL_StrBufFree(name);
             GFL_StrBufFree(src);

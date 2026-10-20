@@ -25,8 +25,9 @@ typedef struct {
     u8 mac[6];
     u8 netId;
     u8 valid;
-    u8 unkE;
-    u8 unkF;
+    // The command bases of the machine and of the server, which must match the machine's own
+    u8 machineCommandBase;
+    u8 serverCommandBase;
 } NetNegotiation;
 
 struct NetHandle {
@@ -44,7 +45,8 @@ struct NetHandle {
     u8 unk42[2];
     u16 timingRecv;
     u16 timingSend;
-    u8 unk48;
+    // The machines that the timing is sent to, which command 7 sends with it
+    u8 timingNetIds;
     u8 timingSendPending;
     u8 state;
     u8 unk4B[3];
@@ -81,7 +83,7 @@ void NetHandle_RecvForget(int netId, int size, u8 *data);
 // Forgets a machine, as when it disconnects
 void NetHandle_Forget(int netID);
 void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHandle *handle);
-void func_02040b38(NetHandle *handle, int a1, int a2, int a3);
-void func_02040b68(NetHandle *handle, int value);
+void NetHandle_SendTimingPairToMachines(NetHandle *handle, int a1, int a2, int a3);
+void NetHandle_SetNegotiationCommandBase(NetHandle *handle, int value);
 
 #endif // POKEBW2_GFL_NET_HANDLE_H

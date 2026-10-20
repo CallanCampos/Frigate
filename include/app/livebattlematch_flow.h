@@ -80,7 +80,7 @@ void TournamentTeam_Clear(void *record);
 // Fills an entry of the block's other entries with the team's species and moves
 void TournamentTeam_SetFromParty(void *record, PokeParty *party);
 // Whether the battle video that is loaded is whole
-BOOL func_0200bb80(void);
+BOOL BattleRec_HasVideo(void);
 // The live competition's record: clears it and gives it this console's address, adds to a result by an amount, gets and
 // sets the 6-byte address of a result by its place and a byte after it, and whether an address is among the results
 void LiveMatchData_Init(void *record);

@@ -151,8 +151,8 @@ void TrCardBmp_DrawUnionView(TrainerCardWork *wk, u32 view, BOOL flush) {
     StrBuf *strbuf;
     u32 width;
 
-    if (func_020091d0(getTimeSigSaveBlock(wk->param->gameData))) {
-        strbuf = GFL_MsgDataLoadStrbufNew(msgData, func_0202b5fc(view));
+    if (TimeSigSave_IsUnionViewChanged(getTimeSigSaveBlock(wk->param->gameData))) {
+        strbuf = GFL_MsgDataLoadStrbufNew(msgData, UnionView_GetClassNameId(view));
     } else {
         strbuf = GFL_MsgDataLoadStrbufNew(msgData, 0);
     }
@@ -216,7 +216,7 @@ static void TrCardBmp_FormatAvenueLabel(TrainerCardWork *wk, StrBuf *dest, int l
     StrBuf *name = GFL_StrBufCreate(21, wk->heapId);
 
     GFL_StrBufLoadFixedString(name, wk->ownData->avenueName, 21);
-    func_0202437c(wk->wordSet, 7, name, 0, 0, 0);
+    GFL_WordSetSetStrbuf(wk->wordSet, 7, name, 0, 0, 0);
     GFL_WordSetFormatStrbuf(wk->wordSet, dest, wk->labels[label]);
     GFL_StrBufFree(name);
 }

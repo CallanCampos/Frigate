@@ -359,7 +359,7 @@ u32 PokeVoice_Play(u32 species, u32 form, u32 pan, u32 chorus, u32 chorusVolume,
     u16 handle;
 
     // Waits until the sound thread has loaded the next BGM
-    while (func_02005cbc() == TRUE) {
+    while (GFL_SndIsLoadThreadRunning() == TRUE) {
         OS_Sleep(2);
     }
     handle = PokeVoice_Load(species, form, pan, chorus, chorusVolume, chorusSpeed, reverse, chatterInfo);

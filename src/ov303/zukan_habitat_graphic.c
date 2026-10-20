@@ -511,12 +511,12 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
     graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 20, 60, 24, HEAPID_ZUKAN_HABITAT);
     ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT], 1);
-    func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT], TRUE);
+    ClActor_SetAutoAnim(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_LEFT], TRUE);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 236, 60, 22, HEAPID_ZUKAN_HABITAT);
     ClActor_SetBgPriority(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT], 1);
-    func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT], TRUE);
+    ClActor_SetAutoAnim(graphic->actors[ZUKAN_HABITAT_OBJ_SEASON_RIGHT], TRUE);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_FRAME] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 128, 96, 31, HEAPID_ZUKAN_HABITAT);
@@ -525,7 +525,7 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
 
     graphic->actors[ZUKAN_HABITAT_OBJ_STAMP] =
         UIObjRes_CreateActor(&graphic->objRes, graphic->unit, 224, 20, 27, HEAPID_ZUKAN_HABITAT);
-    func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], FALSE);
+    ClActor_SetAutoAnim(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], FALSE);
     ClActor_SetVisible(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], FALSE);
     ClActor_SetAffineMode(graphic->actors[ZUKAN_HABITAT_OBJ_STAMP], 2);
 
@@ -560,7 +560,7 @@ static void ZukanHabitatGraphic_CreateActors(ZukanHabitatGraphic *graphic) {
     graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER] =
         UIObjRes_CreateActor(&graphic->mapRes, graphic->unit, 0, 0, 6, HEAPID_ZUKAN_HABITAT);
     ClActor_SetVisible(graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER], FALSE);
-    func_0204c520(graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER], TRUE);
+    ClActor_SetAutoAnim(graphic->actors[ZUKAN_HABITAT_OBJ_PLAYER], TRUE);
 
     graphic->actors[ZUKAN_HABITAT_OBJ_AREA] =
         UIObjRes_CreateActor(&graphic->areaRes, graphic->unit, 0, 0, 0, HEAPID_ZUKAN_HABITAT);
@@ -603,7 +603,7 @@ static ClActor *ZukanHabitatGraphic_CreateIcon(ZukanHabitatGraphic *graphic, u32
     graphic->icons[cell] = UIObjRes_CreateActor(&graphic->iconRes[cell], graphic->unit, 0, 0, 1, HEAPID_ZUKAN_HABITAT);
     ClActor_SetPriority(graphic->icons[cell], 2);
     ClActor_SetBgPriority(graphic->icons[cell], 1);
-    func_0204c520(graphic->icons[cell], FALSE);
+    ClActor_SetAutoAnim(graphic->icons[cell], FALSE);
     ClActor_SetPalette(graphic->icons[cell], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
     return graphic->icons[cell];
 }
@@ -808,7 +808,7 @@ static void ZukanHabitatGraphic_LoadIcon(ZukanHabitatGraphic *graphic, u8 cell) 
 void ZukanHabitatGraphic_AnimateIcon(ZukanHabitatGraphic *graphic, u8 cell, BOOL play) {
     if (graphic->icons[cell] != NULL) {
         ClActor_StartAnim(graphic->icons[cell]);
-        func_0204c520(graphic->icons[cell], play);
+        ClActor_SetAutoAnim(graphic->icons[cell], play);
     }
 }
 
@@ -943,7 +943,7 @@ void ZukanHabitatGraphic_StartActorAnim(ZukanHabitatGraphic *graphic, u32 actor,
 
     ClActor_SetSequence(act, anim);
     ClActor_SetAnimTime(act, 0);
-    func_0204c520(act, TRUE);
+    ClActor_SetAutoAnim(act, TRUE);
     ClActor_SetVisible(act, TRUE);
 }
 
@@ -1037,7 +1037,7 @@ static void ZukanHabitatGraphic_CreatePlaces(ZukanHabitatGraphic *graphic) {
                 graphic->places[i].actor =
                     UIObjRes_CreateActor(&graphic->mapRes, graphic->unit, x, y, anim, HEAPID_ZUKAN_HABITAT);
                 ClActor_SetVisible(graphic->places[i].actor, TRUE);
-                func_0204c520(graphic->places[i].actor, TRUE);
+                ClActor_SetAutoAnim(graphic->places[i].actor, TRUE);
                 ClActor_SetObjMode(graphic->places[i].actor, 0);
             }
         } else {

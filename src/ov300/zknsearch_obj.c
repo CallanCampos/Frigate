@@ -86,7 +86,7 @@ void ZknSearchObj_Update(ZknSearchWork *wk) {
     u32 i;
 
     for (i = 0; i < ZKNSEARCH_OBJ_COUNT; i++) {
-        if (wk->actors[i] != NULL && func_0204c534(wk->actors[i]) != TRUE) {
+        if (wk->actors[i] != NULL && ClActor_IsAutoAnim(wk->actors[i]) != TRUE) {
             ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
         }
     }
@@ -100,7 +100,7 @@ void ZknSearchObj_SetAnmSeq(ZknSearchWork *wk, u32 id, u32 anm) {
 
 void ZknSearchObj_SetAnm(ZknSearchWork *wk, u32 id, u32 anm) {
     ZknSearchObj_SetAnmSeq(wk, id, anm);
-    func_0204c520(wk->actors[id], TRUE);
+    ClActor_SetAutoAnim(wk->actors[id], TRUE);
 }
 
 u32 ZknSearchObj_GetAnm(ZknSearchWork *wk, u32 id) {

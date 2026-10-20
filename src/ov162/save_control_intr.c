@@ -53,7 +53,7 @@ void SaveControlIntr_Start(SaveControlIntr *intr) {
     }
     SaveControl_StartSave(intr->save);
     if (intr->disabled == FALSE) {
-        func_02008e04(intr->save);
+        TrainerDataSave_SetIntroSave(intr->save);
         intr->flag4 = SaveControl_GetGiftsLoaded(intr->save);
         intr->flag5 = SaveControl_GetGiftsBroken(intr->save);
         intr->flag6 = SaveControl_GetKeysLoaded(intr->save);

@@ -197,7 +197,7 @@ static void PokeListPlate_CreateActors(PokeListWork *wk, PokeListPlate *plate) {
     ballSetup.bgPriority = 2;
     plate->ball = ClActor_Create(plate->unit, wk->clResources[CL_RES_CHAR(1)], wk->clResources[CL_RES_PLTT(0)],
                                  wk->clResources[CL_RES_CELL(1)], &ballSetup, 0, wk->heapId);
-    func_0204c520(plate->ball, TRUE);
+    ClActor_SetAutoAnim(plate->ball, TRUE);
     hpBarSetup.x = 84;
     hpBarSetup.y = 28;
     hpBarSetup.sequence = 0;
@@ -231,7 +231,7 @@ static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
     ClActorSetup setup;
 
     if (plate->pkm != NULL) {
-        BoxPkm *pkm = func_0201d624(plate->pkm);
+        BoxPkm *pkm = PokeParty_ToBoxPkm(plate->pkm);
 
         file = PokeIcon_GetFileOfPkm(pkm);
         palette = PokeIcon_GetPaletteOfPkm(pkm);
@@ -249,7 +249,7 @@ static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
     plate->icon = ClActor_Create(plate->unit, plate->iconChars, wk->clResources[CL_RES_PLTT(6)],
                                  wk->clResources[CL_RES_CELL(7)], &setup, 0, wk->heapId);
     ClActor_SetPalette(plate->icon, palette, 1);
-    func_0204c520(plate->icon, TRUE);
+    ClActor_SetAutoAnim(plate->icon, TRUE);
     ClActor_SetVisible(plate->icon, plate->pkm != NULL ? TRUE : FALSE);
 }
 
@@ -445,7 +445,7 @@ static void PokeListPlate_DrawEgg(PokeListWork *wk, PokeListPlate *plate) {
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     StrBuf *name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
 
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     PokeList_PrintWordSetString(wk, plate->window, wordSet, 3, 41, 9, 0x440);
     GFL_StrBufFree(name);
     GFL_WordSetSystemFree(wordSet);
@@ -687,15 +687,15 @@ u32 PokeListPlate_CheckEntry(PokeListWork *wk, PokeListPlate *plate) {
             u32 otherSpecies = PokeParty_GetParam(other, PKM_PARAM_SPECIES, NULL);
             u32 otherItem = PokeParty_GetParam(other, PKM_PARAM_ITEM, NULL);
 
-            if (species == otherSpecies && regulation->unk8 == 0) {
+            if (species == otherSpecies && regulation->allowSameSpecies == 0) {
                 return 2;
             }
-            if (item == otherItem && item != 0 && regulation->unk9 == 0) {
+            if (item == otherItem && item != 0 && regulation->allowSameItem == 0) {
                 return 3;
             }
         }
     }
-    if (wk->enteredCount == regulation->unk3) {
+    if (wk->enteredCount == regulation->maxCount) {
         return 4;
     }
     return 0;

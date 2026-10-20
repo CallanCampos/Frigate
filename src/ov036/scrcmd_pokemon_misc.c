@@ -607,7 +607,7 @@ BOOL s022F_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env) {
         empty[0] = GFL_StrBufGetTerminator();
         GFL_StrBufLoadString(buf, empty);
     }
-    func_0202437c(wordSet, wordIndex, buf, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 0, 1, 2);
     return FALSE;
 }
 

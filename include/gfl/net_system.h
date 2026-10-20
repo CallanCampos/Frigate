@@ -8,13 +8,13 @@
 // number, and reading the commands in the packets that arrive
 
 BOOL NetSystem_StartWireless(int size, HeapID heapId);
-int func_0203ecac(int a0);
+int NetSystem_CanConnectFriend(int a0);
 BOOL NetSystem_StartInfrared(int a0);
-int func_0203ed68(int a0, int size, int a2, BOOL (*callback)(void));
-BOOL func_0203ede0(int a0, int size);
-BOOL func_0203ee50(int size);
-void func_0203eea4(int a0);
-int func_0203eec0(BOOL a0, const u8 *mac, int size, void (*callback)(void));
+int NetSystem_StartParent(int a0, int size, int a2, BOOL (*callback)(void));
+BOOL NetSystem_StartScan(int a0, int size);
+BOOL NetSystem_StartSearch(int size);
+void NetSystem_HoldScan(int a0);
+int NetSystem_StartChild(BOOL a0, const u8 *mac, int size, void (*callback)(void));
 void NetSystem_Free(void);
 // Forgets what has arrived from a machine, as when it disconnects
 void NetSystem_ForgetMachine(u32 netId);
@@ -38,13 +38,13 @@ BOOL NetSystem_HasErrorChecked(void);
 // Whether a command is waiting to be sent
 BOOL NetSystem_HasQueuedCommand(u16 command, int dest);
 BOOL NetSystem_IsSendQueueEmpty(void);
-void func_02040104(u8 a0);
-void func_02040118(BOOL a0);
+void NetSystem_SetWifiConnected(u8 a0);
+void NetSystem_SetMPSendEnabled(BOOL a0);
 // Sets and clears the network error
 void NetSystem_SetError(void);
 void NetSystem_ClearError(void);
-void func_02040180(void);
-BOOL func_02040198(void);
+void NetSystem_Stop(void);
+BOOL NetSystem_IsDataShareOk(void);
 // A network ID, or GFL_NET_NETID_SERVER for one past the last machine
 int NetSystem_ClampNetId(int netId);
 

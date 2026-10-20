@@ -1586,10 +1586,10 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     case 1:
         pkm = Mystery_CreateGiftPokemon(&recv->gift, HEAPID_TAIL(heapId), gameData);
         arc = MakePokeGraArcHandle(heapId);
-        effect->palette = PokeGra_LoadClActPaletteByBoxData(arc, func_0201d624(pkm), 0, 0, 0x1c0, heapId);
-        effect->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(func_0201d624(pkm), 0, 2, 0, heapId);
-        effect->chars = PokeGra_LoadClActCharsByBoxData(arc, func_0201d624(pkm), 0, 0, heapId);
-        effect->height = Mystery_GetSpriteBottom(func_0201d624(pkm), heapId) - 48;
+        effect->palette = PokeGra_LoadClActPaletteByBoxData(arc, PokeParty_ToBoxPkm(pkm), 0, 0, 0x1c0, heapId);
+        effect->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(PokeParty_ToBoxPkm(pkm), 0, 2, 0, heapId);
+        effect->chars = PokeGra_LoadClActCharsByBoxData(arc, PokeParty_ToBoxPkm(pkm), 0, 0, heapId);
+        effect->height = Mystery_GetSpriteBottom(PokeParty_ToBoxPkm(pkm), heapId) - 48;
         effect->height = MATH_CLAMP(effect->height, 0, 48);
         GFL_ArcToolFree(arc);
         GFL_HeapFree(pkm);

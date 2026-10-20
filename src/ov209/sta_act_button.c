@@ -169,7 +169,7 @@ static void StaActButton_InitGraphic(StaActButton *sys) {
     sys->effect = ClActor_Create(sys->clactUnit, sys->chars[2], sys->palettes[2], sys->cellAnims[2], &effectSetup,
                                  CLACT_SURFACE_SUB, sys->heapId);
     ClActor_SetVisible(sys->effect, FALSE);
-    func_0204c520(sys->effect, TRUE);
+    ClActor_SetAutoAnim(sys->effect, TRUE);
 }
 
 // Copies the prop's texture, of the BlAct size `size`, into the characters of the prop's cell

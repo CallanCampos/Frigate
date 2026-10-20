@@ -610,7 +610,7 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
     setup0.bgPriority = 2;
     disp->actors[0] = ClActor_Create(disp->clUnit, disp->chars, disp->palette, disp->cellAnims, &setup0,
                                      CLACT_SURFACE_SUB, disp->heapId);
-    func_0204c520(disp->actors[0], TRUE);
+    ClActor_SetAutoAnim(disp->actors[0], TRUE);
     ClActor_SetVisible(disp->actors[0], TRUE);
 
     setup1.x = 128;
@@ -620,7 +620,7 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
     setup1.bgPriority = 2;
     disp->actors[1] = ClActor_Create(disp->clUnit, disp->chars, disp->palette, disp->cellAnims, &setup1,
                                      CLACT_SURFACE_SUB, disp->heapId);
-    func_0204c520(disp->actors[1], TRUE);
+    ClActor_SetAutoAnim(disp->actors[1], TRUE);
     ClActor_SetVisible(disp->actors[1], TRUE);
 
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 6, 16);

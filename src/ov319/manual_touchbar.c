@@ -408,7 +408,7 @@ static void ManualTouchBar_CreateArrows(ManualTouchBar *bar) {
         bar->arrows[i] = ClActor_Create(ManualGraphic_GetClActUnit(bar->common->graphic), bar->chars, bar->palette,
                                         bar->cellAnims, &sManualTouchBarArrows[i].setup, 1, bar->common->heapId);
         ClActor_SetVisible(bar->arrows[i], FALSE);
-        func_0204c520(bar->arrows[i], TRUE);
+        ClActor_SetAutoAnim(bar->arrows[i], TRUE);
     }
 }
 

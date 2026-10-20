@@ -34,7 +34,7 @@ void FesMissionHollow_Setup(RivalSelectContext *context) {
     int i;
 
     MI_CpuFill8(entries, 0, sizeof(RivalEntry) * 10);
-    FestMission_InitRand(mission->unk1C, 0, &rand);
+    FestMission_InitRand(mission->seed, 0, &rand);
     for (i = 0; i < 20; i++) {
         hollows[i] = i;
     }

@@ -689,7 +689,7 @@ MysteryList *MysteryList_Create(const MysteryListSetup *setup, HeapID heapId) {
     ClActor_SetSurfacePos(list->cursor, &pos, 0);
     ClActor_SetVisible(list->cursor, TRUE);
     ClActor_SetSequence(list->cursor, list->cursorSequence);
-    func_0204c520(list->cursor, TRUE);
+    ClActor_SetAutoAnim(list->cursor, TRUE);
     return list;
 }
 

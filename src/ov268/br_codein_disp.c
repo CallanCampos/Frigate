@@ -134,13 +134,13 @@ void BrCodeInDisp_AddCursorActors(BrCodeInWork *wk) {
     ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
     BrCodeInDisp_SetCodeCursor(wk, 0);
     ClActor_SetSequence(wk->cur[BR_CODEIN_CURSOR_CODE].actor, 0);
-    func_0204c520(wk->cur[BR_CODEIN_CURSOR_CODE].actor, TRUE);
+    ClActor_SetAutoAnim(wk->cur[BR_CODEIN_CURSOR_CODE].actor, TRUE);
     wk->cur[BR_CODEIN_CURSOR_KEY].move.x = 0;
     wk->cur[BR_CODEIN_CURSOR_KEY].move.y = 0;
     wk->cur[BR_CODEIN_CURSOR_KEY].state = 1;
     BrCodeInDisp_SetKeyCursor(wk, 0);
     ClActor_SetSequence(wk->cur[BR_CODEIN_CURSOR_KEY].actor, wk->cur[BR_CODEIN_CURSOR_KEY].state);
-    func_0204c520(wk->cur[BR_CODEIN_CURSOR_KEY].actor, TRUE);
+    ClActor_SetAutoAnim(wk->cur[BR_CODEIN_CURSOR_KEY].actor, TRUE);
     ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_KEY].actor, GX_OAM_MODE_XLU);
     wk->cur[BR_CODEIN_CURSOR_PRESS].move.x = 0;
     wk->cur[BR_CODEIN_CURSOR_PRESS].move.y = 0;
@@ -148,7 +148,7 @@ void BrCodeInDisp_AddCursorActors(BrCodeInWork *wk) {
     BrCodeInDisp_SetKeyCursor(wk, 0);
     ClActor_SetSequence(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, wk->cur[BR_CODEIN_CURSOR_PRESS].state);
     ClActor_SetObjMode(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, GX_OAM_MODE_XLU);
-    func_0204c520(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, TRUE);
+    ClActor_SetAutoAnim(wk->cur[BR_CODEIN_CURSOR_PRESS].actor, TRUE);
     BrCodeInDisp_SetCursorVisible(wk, BR_CODEIN_CURSOR_KEY, FALSE);
     BrCodeInDisp_SetCursorVisible(wk, BR_CODEIN_CURSOR_PRESS, FALSE);
 }

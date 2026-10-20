@@ -400,7 +400,7 @@ void StaActing_Term(StaActing *stage) {
         GFL_SndBGMStopSeq();
     }
     if (stage->strmPlaying == TRUE) {
-        func_02006588();
+        GFL_SndBGMClearLoadedData();
     }
     GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
@@ -963,7 +963,7 @@ void StaActing_StopSeq(StaActing *stage) {
 }
 
 void StaActing_PlayWave(StaActing *stage, u16 waveArc, u16 a2, u16 a3) {
-    func_02006528(waveArc, a2, stage->sound[2], a3);
+    GFL_SndReplaceWave(waveArc, a2, stage->sound[2], a3);
 }
 
 void StaActing_PlayBgm(StaActing *stage, u32 bgm) {

@@ -30,8 +30,8 @@ struct RivalDataSave {
     unsigned long metTrainerCount;
     u32 flags[MISC_FLAG_COUNT / 32];
     u16 rivalName[MISC_RIVAL_NAME_LENGTH];
-    // The data that getHollow_RivalBlk's file keeps
-    u8 unkB4[0x18];
+    // The HollowRivalSave that getHollow_RivalBlk gives
+    u8 hollowRival[0x18];
     HiddenHollow hollows[HIDDEN_HOLLOW_COUNT];
     u8 hollowNum;
     u8 paddingF5[3];
@@ -43,7 +43,7 @@ u32 getSizeofHollow_RivalData(void);
 void clearHollowRivalData(RivalDataSave *data);
 
 BOOL Misc_GetFlag(RivalDataSave *data, int flag);
-void *func_0200f7d8(RivalDataSave *data);
+void *Misc_GetHollowRival(RivalDataSave *data);
 void Misc_SetFlag(RivalDataSave *data, int flag);
 
 // The kind of thing in a Hidden Hollow, 0 when it is empty

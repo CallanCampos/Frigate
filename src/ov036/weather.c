@@ -90,8 +90,8 @@ void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void 
     renderer = ClActRenderer_Create(&WEATHER_SURFACE_SETUP, 1, heapId);
     weather->renderer = renderer;
     ClActUnit_SetRenderer(weather->actUnit, renderer);
-    func_0204bff0(weather->actUnit, TRUE);
-    func_0204c004(weather->actUnit, TRUE);
+    ClActUnit_SetVisibleAnimOnly(weather->actUnit, TRUE);
+    ClActUnit_SetSharedParams(weather->actUnit, TRUE);
     for (i = 0; i < 2; i++) {
         weather->tasks[i] =
             func_ov036_021993e0(weather->actUnit, camera, light, fog, fogCtrl, weather->layers, sound, season, heapId);

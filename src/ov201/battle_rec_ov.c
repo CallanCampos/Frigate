@@ -16,7 +16,7 @@ u32 BattleRecOv_SaveVideo(GameData *gameData, u32 slot, BOOL secure, u16 *seq, u
     switch (*seq) {
     case 0:
         if (secure == TRUE) {
-            data_02140f64->header.unk2A = secure;
+            data_02140f64->header.secure = secure;
             data_02140f64->header.magic = BATTLE_REC_MAGIC;
             data_02140f64->header.crc = getCRC16(&data_02140f64->header, BATTLE_REC_HEADER_CRC_SIZE);
         }
@@ -48,7 +48,7 @@ u32 BattleRecOv_SaveDataNumber(GameData *gameData, u64 dataNumber, u16 *seq, u16
 u32 BattleRecOv_SaveSecureVideo(GameData *gameData, u32 slot, u16 *seq, u16 *saveSeq, HeapID heapId) {
     switch (*seq) {
     case 0:
-        data_02140f64->header.unk2A = TRUE;
+        data_02140f64->header.secure = TRUE;
         data_02140f64->header.magic = BATTLE_REC_MAGIC;
         data_02140f64->header.crc = getCRC16(&data_02140f64->header, BATTLE_REC_HEADER_CRC_SIZE);
         decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));

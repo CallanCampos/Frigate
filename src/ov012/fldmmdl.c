@@ -218,7 +218,7 @@ void FldActSys_AttachField(MMSys *system, HeapID heapId, GameData *gameData, Fie
 }
 
 static void FldActSys_FreeFieldResources(MMSys *system) {
-    func_0203a610(system->tcbMgr);
+    GFL_TCBMgrDelete(system->tcbMgr);
     GFL_HeapFree(system->tcbMgrHeap);
     GFL_ArcToolFree(system->dataArc);
     ClearMMSysFlag(system, 0x10);

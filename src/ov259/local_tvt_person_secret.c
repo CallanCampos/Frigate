@@ -275,7 +275,7 @@ static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, const LocalTvtPerson
         u32 messageId;
 
         male = LocalTvtCallData_IsPlayerMale(setup->callData);
-        LocalTvtCallData_Reset0200ffcc(setup->callData);
+        LocalTvtCallData_ClearMeetingIfMet(setup->callData);
         // The same message again if the player asks again in this call
         if (!secret->chatted) {
             secret->chatMsg = LocalTvtSecret_GetChatMsg(secret->surveyAnswers, setup->callData, setup->message);
@@ -336,14 +336,14 @@ static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, const LocalTvtPersonS
             LocalTvtSecret_GetStage(LocalTvtCallData_GetCallCount(setup->callData, LOCAL_TVT_CALL_SECRET));
             unk10 = LocalTvtSecret_GetStage10(setup->callData);
             if (unk10 != 0) {
-                LocalTvtCallData_Set0200ff68(setup->callData, unk10);
+                LocalTvtCallData_SetMeeting(setup->callData, unk10);
                 if (unk10 == 1 || unk10 == 2) {
-                    LocalTvtCallData_Set0200ff78(setup->callData);
+                    LocalTvtCallData_SetMeetingToday(setup->callData);
                 }
             }
             LocalTvtCallData_AddCall(setup->callData, LOCAL_TVT_CALL_SECRET, SECRET_CALL_MAX);
         }
-        func_02017a78(secret->gameData);
+        GameData_DrawSecretCallZones(secret->gameData);
         LocalTvtPerson_End(person);
         return TRUE;
     }
@@ -414,7 +414,7 @@ static u32 LocalTvtSecret_GetStage10(LocalTvtCallData *data) {
     u32 unk10 = LocalTvtSecret_GetStage10Of(
         LocalTvtSecret_GetStage(LocalTvtCallData_GetCallCount(data, LOCAL_TVT_CALL_SECRET)));
 
-    if (LocalTvtCallData_Get0200ff8c(data)) {
+    if (LocalTvtCallData_IsMeetingToday(data)) {
         unk10 = 0;
     }
     return unk10;

@@ -1216,7 +1216,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
             case CTVT_GAME_TYPE_BALLOONS:
                 game->playState = CTVT_GAME_PLAY_BALLOON_START;
                 ClActor_SetVisible(game->startSign, TRUE);
-                func_0204c520(game->startSign, TRUE);
+                ClActor_SetAutoAnim(game->startSign, TRUE);
                 ClActor_RestartAnim(game->startSign);
                 break;
             }
@@ -1604,7 +1604,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
         game->introActors[i] = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4],
                                               &setup, CLACT_SURFACE_SUB, heapId);
         ClActor_SetVisible(game->introActors[i], TRUE);
-        func_0204c520(game->introActors[i], TRUE);
+        ClActor_SetAutoAnim(game->introActors[i], TRUE);
     }
     MI_CpuFill8(&setupEx, 0, sizeof(ClActorSetupEx));
     setupEx.base.x = 60;
@@ -1621,7 +1621,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     game->targetSigns[0] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
                                             &setupEx, CLACT_SURFACE_MAIN, heapId);
     ClActor_SetVisible(game->targetSigns[0], FALSE);
-    func_0204c520(game->targetSigns[0], TRUE);
+    ClActor_SetAutoAnim(game->targetSigns[0], TRUE);
     setupEx.base.x = 200;
     setupEx.base.y = 90;
     setupEx.base.sequence = 14;
@@ -1629,7 +1629,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     game->targetSigns[1] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
                                             &setupEx, CLACT_SURFACE_MAIN, heapId);
     ClActor_SetVisible(game->targetSigns[1], FALSE);
-    func_0204c520(game->targetSigns[1], TRUE);
+    ClActor_SetAutoAnim(game->targetSigns[1], TRUE);
     game->tcbBuffer = GFL_HeapAllocate(game->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "ctvt_game.c", 2945);
     game->tcbManager = GFL_TCBMgrCreate(8, game->tcbBuffer);
     for (i = 0; i < 8; i++) {
@@ -1650,7 +1650,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     GFL_BitmapFill(BmpWin_GetBitmap(game->infoWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, 59);
     name = GFL_MsgDataLoadStrbufNew(msgData, 67 + selfNetId);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
@@ -1710,7 +1710,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
         game->introActors[i] = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4],
                                               &setup, CLACT_SURFACE_SUB, heapId);
         ClActor_SetVisible(game->introActors[i], TRUE);
-        func_0204c520(game->introActors[i], TRUE);
+        ClActor_SetAutoAnim(game->introActors[i], TRUE);
     }
     setup.x = 128;
     setup.y = 96;
@@ -1736,7 +1736,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     game->pumpAir = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
                                    CLACT_SURFACE_MAIN, heapId);
     ClActor_SetVisible(game->pumpAir, FALSE);
-    func_0204c520(game->pumpAir, TRUE);
+    ClActor_SetAutoAnim(game->pumpAir, TRUE);
     setup.x = 65;
     setup.y = 122;
     setup.priority = 3;
@@ -1754,7 +1754,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
         game->rightPuffs[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
                                              &setup, CLACT_SURFACE_MAIN, heapId);
         ClActor_SetVisible(game->rightPuffs[i], FALSE);
-        func_0204c520(game->rightPuffs[i], TRUE);
+        ClActor_SetAutoAnim(game->rightPuffs[i], TRUE);
     }
     setup.x = 20;
     setup.y = 170;
@@ -1763,7 +1763,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
         game->leftPuffs[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
                                             &setup, CLACT_SURFACE_MAIN, heapId);
         ClActor_SetVisible(game->leftPuffs[i], FALSE);
-        func_0204c520(game->leftPuffs[i], TRUE);
+        ClActor_SetAutoAnim(game->leftPuffs[i], TRUE);
     }
     game->tcbBuffer = GFL_HeapAllocate(game->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "ctvt_game.c", 3214);
     game->tcbManager = GFL_TCBMgrCreate(8, game->tcbBuffer);
@@ -1857,7 +1857,7 @@ static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
         ClActor_SetVisible(game->introActors[i], FALSE);
     }
     ClActor_SetVisible(game->pump, TRUE);
-    func_0204c520(game->pump, TRUE);
+    ClActor_SetAutoAnim(game->pump, TRUE);
     ClActor_SetVisible(game->pumpBase, TRUE);
     ClActor_SetVisible(game->pumpAir, TRUE);
     GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 6, 0, 0, 0xe0, game->heapId);
@@ -1944,7 +1944,7 @@ static BOOL CtvtGame_UpdateBalloonStart(CommTvtWork *sys, CtvtGame *game) {
             pos.x += 128;
             ClActor_SetSequence(game->startSign, 48);
             ClActor_SetSurfacePos(game->startSign, &pos, CLACT_SURFACE_SUB);
-            func_0204c520(game->startSign, TRUE);
+            ClActor_SetAutoAnim(game->startSign, TRUE);
             ClActor_RestartAnim(game->startSign);
             ClActor_SetSequence(game->pump, 40);
         }
@@ -2053,7 +2053,7 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
                     }
                 }
             }
-            func_0204c520(game->pump, TRUE);
+            ClActor_SetAutoAnim(game->pump, TRUE);
             ClActor_RestartAnim(game->pump);
         }
         if (!ClActor_IsAnimActive(game->pump)) {
@@ -2371,18 +2371,18 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
             ClActor_SetVisible(game->winBanner, TRUE);
             ClActor_SetVisible(game->winBursts[0], TRUE);
             ClActor_SetVisible(game->winBursts[1], TRUE);
-            func_0204c520(game->winBursts[0], TRUE);
-            func_0204c520(game->winBursts[1], TRUE);
+            ClActor_SetAutoAnim(game->winBursts[0], TRUE);
+            ClActor_SetAutoAnim(game->winBursts[1], TRUE);
             ClActor_RestartAnim(game->winBursts[0]);
             ClActor_RestartAnim(game->winBursts[1]);
             ClActor_SetVisible(game->winFlashes[0], TRUE);
             ClActor_SetVisible(game->winFlashes[1], TRUE);
-            func_0204c520(game->winFlashes[0], TRUE);
-            func_0204c520(game->winFlashes[1], TRUE);
+            ClActor_SetAutoAnim(game->winFlashes[0], TRUE);
+            ClActor_SetAutoAnim(game->winFlashes[1], TRUE);
             ClActor_RestartAnim(game->winFlashes[0]);
             ClActor_RestartAnim(game->winFlashes[1]);
             ClActor_SetVisible(game->winGlow, TRUE);
-            func_0204c520(game->winGlow, TRUE);
+            ClActor_SetAutoAnim(game->winGlow, TRUE);
             ClActor_RestartAnim(game->winGlow);
             game->resultState = 3;
         } else if (game->players[selfNetId]->rank == 2) {
@@ -2398,24 +2398,24 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
             ClActor_SetVisible(game->winFlashes[0], FALSE);
             ClActor_SetVisible(game->winFlashes[1], FALSE);
             ClActor_SetVisible(game->crown, TRUE);
-            func_0204c520(game->crown, TRUE);
+            ClActor_SetAutoAnim(game->crown, TRUE);
             ClActor_RestartAnim(game->crown);
             game->resultState = 6;
         }
         break;
     case 4:
         ClActor_SetVisible(game->rankSign, TRUE);
-        func_0204c520(game->rankSign, TRUE);
+        ClActor_SetAutoAnim(game->rankSign, TRUE);
         ClActor_RestartAnim(game->rankSign);
         game->resultTimer = 0;
         game->resultState = 7;
         break;
     case 5:
         ClActor_SetVisible(game->rankSign, TRUE);
-        func_0204c520(game->rankSign, TRUE);
+        ClActor_SetAutoAnim(game->rankSign, TRUE);
         ClActor_RestartAnim(game->rankSign);
         ClActor_SetVisible(game->tryAgainSign, TRUE);
-        func_0204c520(game->tryAgainSign, TRUE);
+        ClActor_SetAutoAnim(game->tryAgainSign, TRUE);
         ClActor_RestartAnim(game->tryAgainSign);
         game->resultTimer = 0;
         game->resultState = 7;
@@ -2425,11 +2425,11 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
             ClActor_SetVisible(game->crown, FALSE);
             for (i = 0; i < 6; i++) {
                 ClActor_SetVisible(game->crownSparkles[i], TRUE);
-                func_0204c520(game->crownSparkles[i], TRUE);
+                ClActor_SetAutoAnim(game->crownSparkles[i], TRUE);
                 ClActor_RestartAnim(game->crownSparkles[i]);
             }
             ClActor_SetVisible(game->rankSign, TRUE);
-            func_0204c520(game->rankSign, TRUE);
+            ClActor_SetAutoAnim(game->rankSign, TRUE);
             ClActor_RestartAnim(game->rankSign);
             game->resultTimer = 0;
             game->resultState = 7;
@@ -2469,7 +2469,7 @@ static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
             game->players[i] = NULL;
         }
     }
-    func_0203a610(game->playerTcbManager);
+    GFL_TCBMgrDelete(game->playerTcbManager);
     if (game->playerTcbManager != NULL) {
         GFL_HeapFree(game->playerTcbManager);
         game->playerTcbManager = NULL;
@@ -2478,7 +2478,7 @@ static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
         GFL_HeapFree(game->playerTcbBuffer);
         game->playerTcbBuffer = NULL;
     }
-    func_0203a610(game->tcbManager);
+    GFL_TCBMgrDelete(game->tcbManager);
     if (game->tcbManager != NULL) {
         GFL_HeapFree(game->tcbManager);
         game->tcbManager = NULL;
@@ -2891,7 +2891,7 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
     GFL_BitmapFill(BmpWin_GetBitmap(game->messageWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     name = GFL_MsgDataLoadStrbufNew(msgData, CtvtGame_GetType(game) + 62);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
@@ -3665,7 +3665,7 @@ static void CtvtGamePlayer_InitResult(CommTvtWork *sys, CtvtGamePlayer *player) 
             digitSetup.bgPriority = 1;
             player->digits[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
                                                &digitSetup, CLACT_SURFACE_MAIN, game->heapId);
-            func_0204c520(player->digits[i], TRUE);
+            ClActor_SetAutoAnim(player->digits[i], TRUE);
             ClActor_SetAnimFrame(player->digits[i], i * 3);
         }
     }

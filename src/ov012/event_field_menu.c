@@ -87,7 +87,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
             actorSystem = Field_GetActorSystem(work->field);
             gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
             DisableAllActorsMovement(actorSystem);
-            func_020173f8(gameData, 1);
+            GameData_SetFieldMenuItem(gameData, 1);
             FieldSubscreen_ReqChange(Field_GetSubscreen(work->field), 1);
             work->state = 1;
         }
@@ -105,7 +105,7 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
     case 2:
         gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
         selection = func_ov036_02198854(Field_GetSubscreen(work->field));
-        func_020173f8(gameData, selection);
+        GameData_SetFieldMenuItem(gameData, selection);
         work->unk10 = func_ov036_02198854(Field_GetSubscreen(work->field));
         work->appCall.appId = FieldMenu_GetAppId(selection);
         work->state = 5;

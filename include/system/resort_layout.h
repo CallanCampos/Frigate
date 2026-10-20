@@ -13,10 +13,10 @@
 u16 ResortLayout_GetZoneId(u32 index);
 u32 ResortLayout_GetZoneIndex(u16 zoneId);
 // Positions on the grid and directions, from two tables of {u16 x, u16 z, u32 dir}: one of 48, one of 4
-void func_02039538(u16 index, u16 *x, u16 *z, u16 *dir);
+void ResortLayout_GetOccupantPlace(u16 index, u16 *x, u16 *z, u16 *dir);
 // The offset of a shop's entity
-void func_02039560(u16 index, u16 *x, u16 *y);
-void func_02039578(u16 index, u16 *x, u16 *z, u16 *dir);
-u32 func_020395a0(u32 index);
+void ResortLayout_GetShopOffset(u16 index, u16 *x, u16 *y);
+void ResortLayout_GetRecordPlace(u16 index, u16 *x, u16 *z, u16 *dir);
+u32 ResortLayout_GetSlotRow(u32 index);
 
 #endif // POKEBW2_SYSTEM_RESORT_LAYOUT_H

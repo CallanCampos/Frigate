@@ -756,8 +756,8 @@ static void ResearchTop_ShowNewIcon(ResearchTop *wk) {
     ClActor *actor = ResearchTop_GetActor(wk, 0);
 
     ClActor_SetVisible(actor, TRUE);
-    func_0204c520(actor, TRUE);
-    func_0204c53c(actor, FX32_ONE);
+    ClActor_SetAutoAnim(actor, TRUE);
+    ClActor_SetAutoAnimSpeed(actor, FX32_ONE);
     ClActor_SetAnimTime(actor, 0);
 }
 

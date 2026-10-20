@@ -158,7 +158,7 @@ int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
         irc->state = 3;
         break;
     case 3:
-        func_020429f8(NULL);
+        GFL_NetChangeoverConnect(NULL);
         irc->state = 4;
         break;
     case 4:

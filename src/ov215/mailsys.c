@@ -280,7 +280,7 @@ static MailEdit *MailSys_CreateEdit(MailData *mail, u32 heapId) {
     edit->design = MailData_GetDesign(mail);
     edit->unk09 = MailData_GetRegion(mail);
     edit->unk0A = MailData_GetGameVersion(mail);
-    edit->word = func_02009764(mail);
+    edit->word = MailData_GetStampWord(mail);
     for (i = 0; i < MAIL_WORD_COUNT; i++) {
         PMSData_Copy(&edit->words[i], MailData_GetMessage(mail, i));
     }
@@ -300,7 +300,7 @@ static void MailSys_ApplyEdit(MailData *mail, MailEdit *edit) {
     for (i = 0; i < MAIL_WORD_COUNT; i++) {
         MailData_SetMessage(mail, &edit->words[i], i);
     }
-    func_02009768(mail, edit->word);
+    MailData_SetStampWord(mail, edit->word);
     MailData_SetDesign(mail, edit->design);
 }
 

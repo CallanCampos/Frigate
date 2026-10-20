@@ -75,7 +75,7 @@ struct ReportScreen {
     TCB *vblankTcb;
     // Whether the bar fills
     BOOL barActive;
-    // What func_020074b8 gives: the size of the blocks that changed and of all of them
+    // What SaveControl_GetChangedSize gives: the size of the blocks that changed and of all of them
     u32 changedSize;
     u32 totalSize;
     // SaveControl_GetBytesWritten's count, times 256, at which the bar's next icon shows, and the step between two: a
@@ -175,7 +175,7 @@ BOOL Report_IsReady(ReportScreen *wk) {
 
 void Report_InitSave(ReportScreen *wk) {
     wk->save = GameData_GetSaveControl(GSYS_GetGameData(wk->gsys));
-    func_020074b8(wk->save, &wk->changedSize, &wk->totalSize);
+    SaveControl_GetChangedSize(wk->save, &wk->changedSize, &wk->totalSize);
     wk->barThreshold = wk->barStep = (wk->changedSize << 9) / REPORT_BAR_COUNT;
     wk->barCount = 0;
     wk->barWait = 0;
@@ -383,7 +383,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
             StrBuf *name = GFL_StrBufCreate(64, wk->heapId);
 
             GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
-            func_0202437c(wordSet, 0, name, 2, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, name, 2, 1, 2);
             GFL_StrBufFree(name);
         } else {
             loadLocationNameToStrbuf(wordSet, 0, ZoneData_GetPlaceNameID(zoneId));
@@ -425,7 +425,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
     }
 
     // The date and time of the last save, when there is one
-    if (!func_0200746c(save) && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
+    if (!SaveControl_IsNewGameOverSave(save) && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
         PlayTime *saveTime = SaveControl_GetPlayTime(save);
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_LAST_SAVE);
@@ -474,8 +474,8 @@ static void Report_CreateActors(ReportScreen *wk) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     for (i = 0; i < count; i++) {
-        wk->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(PokeParty_GetPkm(party, i))), FALSE,
-                                          CLACT_VRAM_SUB, wk->heapId);
+        wk->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(PokeParty_GetPkm(party, i))),
+                                          FALSE, CLACT_VRAM_SUB, wk->heapId);
     }
     wk->palettes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
     wk->cellAnims[0] =
@@ -496,7 +496,7 @@ static void Report_CreateActors(ReportScreen *wk) {
                                        CLACT_SURFACE_SUB, wk->heapId);
         ClActor_SetVisible(wk->actors[i], FALSE);
         setup.x += 32;
-        ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), TRUE);
+        ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm)), TRUE);
     }
 
     setup = sReportActorSetups[1];
@@ -534,7 +534,7 @@ static void Report_FreeActors(ReportScreen *wk) {
 static void Report_ShowBarIcon(ReportScreen *wk, int index) {
     ClActor_SetAnimTime(wk->actors[REPORT_BAR_FIRST + index], 0);
     ClActor_SetSequence(wk->actors[REPORT_BAR_FIRST + index], 1);
-    func_0204c520(wk->actors[REPORT_BAR_FIRST + index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[REPORT_BAR_FIRST + index], TRUE);
 }
 
 static void Report_FillBar(ReportScreen *wk) {

@@ -121,7 +121,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
     case 4:
         switch (Report_UpdateYesNoMenu(work)) {
         case 0:
-            if (func_0200746c(work->save) == TRUE) {
+            if (SaveControl_IsNewGameOverSave(work->save) == TRUE) {
                 Report_PrintMessage(work, 8);
                 *state = 14;
             } else {

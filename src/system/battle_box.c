@@ -70,7 +70,7 @@ void copySelectedPkmToBattleBlk(BattleBoxSave *battleBox, PokeParty *party) {
         PML_PkmInit(&battleBox->pkm[0][i]);
     }
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-        copyPkmIntoBattleBox(battleBox, 0, i, func_0201d624(PokeParty_GetPkm(party, i)));
+        copyPkmIntoBattleBox(battleBox, 0, i, PokeParty_ToBoxPkm(PokeParty_GetPkm(party, i)));
     }
 }
 

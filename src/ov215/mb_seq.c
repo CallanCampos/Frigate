@@ -659,7 +659,7 @@ static void MailBox_TakeMailItem(MailBoxWork *work) {
 }
 
 static void MailBox_EraseMail(MailBoxWork *work) {
-    func_020097d0(work->mails, 0, work->mailIndex);
+    MailBox_ResetMail(work->mails, 0, work->mailIndex);
 }
 
 static void MailBox_CreatePartyParam(MailBoxWork *work, u32 mode, u16 item, u16 mailIndex) {

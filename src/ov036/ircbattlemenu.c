@@ -631,7 +631,7 @@ static void func_ov036_0218d9a8(IrcMenuWork *wk) {
     } else if (index == 7) {
         index = 3;
     }
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218d9a4, 968);
@@ -735,7 +735,7 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218db94;
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218dbec, 1146);
@@ -756,7 +756,7 @@ static void func_ov036_0218dc5c(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218dc44;
-    func_0204c520(wk->actors[wk->selected], TRUE);
+    ClActor_SetAutoAnim(wk->actors[wk->selected], TRUE);
     ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
     ClActor_RestartAnim(wk->actors[wk->selected]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218dc58, 1179);
@@ -823,7 +823,7 @@ static void func_ov036_0218ddec(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218dda0;
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218dde8, 1293);
@@ -909,7 +909,7 @@ static void func_ov036_0218df98(IrcMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)wk;
     callback.func = func_ov036_0218df3c;
-    func_0204c520(wk->actors[index], TRUE);
+    ClActor_SetAutoAnim(wk->actors[index], TRUE);
     ClActor_SetAnimCallback(wk->actors[index], &callback);
     ClActor_RestartAnim(wk->actors[index]);
     IrcMenu_SetStateAtLine(wk, func_ov036_0218df94, 1432);
@@ -992,7 +992,7 @@ static void IrcMenu_CreateMainButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1013,7 +1013,7 @@ static void IrcMenu_CreatePlayerCountButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1034,7 +1034,7 @@ static void IrcMenu_CreateBattleTypeButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1055,7 +1055,7 @@ static void IrcMenu_CreateBattleBoxButtons(IrcMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 1;
         wk->actors[i] = ClActor_Create(wk->clUnit, wk->clRes[3], wk->clRes[1], wk->clRes[5], &setup, 1, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
         ClActor_SetVisible(wk->actors[i], TRUE);
         ClActor_SetObjMode(wk->actors[i], 1);
     }
@@ -1214,7 +1214,7 @@ static void IrcMenu_WaitSaveErrorDismiss(IrcMenuWork *wk) {
 static void IrcMenu_HandleSaveAnswer(IrcMenuWork *wk) {
     if (AppTaskMenu_IsFlashFinished(wk->yesNoMenu)) {
         if (AppTaskMenu_GetCursorPos(wk->yesNoMenu) == 0) {
-            if (func_0200746c(GameData_GetSaveControl(wk->gameData))) {
+            if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(wk->gameData))) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_ThereAlreadySavedGame, wk->strBuf);
                 IrcMenu_PrintMessage(wk, FALSE);
                 IrcMenu_SetStateAtLine(wk, IrcMenu_WaitSaveErrorDismiss, 0x7c2);
@@ -1320,7 +1320,7 @@ static BOOL IrcMenu_Main(GameProc *proc, u32 *state, void *param, void *work) {
     if (!wk->ending) {
         GSYS_TryBootGameComm(EventIRC_GetGameSystem(wk->param));
     }
-    if (GFL_WipeIsFinished() && func_02016bec(EventIRC_GetGameSystem(wk->param))) {
+    if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(EventIRC_GetGameSystem(wk->param))) {
         wk->mode = 12;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);

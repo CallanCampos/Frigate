@@ -338,7 +338,7 @@ void PalPadFriendList_AddPlayer(PalPadFriendList *list, PlayerInfo *info) {
     }
     index = PalPadFriendList_FindPlayer(list, id);
     if (index != -1) {
-        func_02008bf8(&list->players[index], func_02008bf4(info));
+        PlayerInfo_SetUnionView(&list->players[index], PlayerInfo_GetUnionView(info));
         return;
     }
     MI_CpuMove(list, &list->players[1], (PAL_PAD_PLAYER_MAX - 1) * size);

@@ -1082,10 +1082,12 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     }
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    card->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), card->surface, (card->iconPaletteSlot + 3) << 5, 0,
-                                               1, HEAPID_TAIL(heapId));
-    card->itemChars = ClActSys_LoadChars(arc, func_0202d894(), FALSE, card->surface, HEAPID_TAIL(heapId));
-    card->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(2), func_0202d89c(2), heapId);
+    card->itemPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), card->surface,
+                                               (card->iconPaletteSlot + 3) << 5, 0, 1, HEAPID_TAIL(heapId));
+    card->itemChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, card->surface, HEAPID_TAIL(heapId));
+    card->itemCells =
+        ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2), AppMenuCommon_GetItemIconAnimFile(2), heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.y = 168;
@@ -1239,7 +1241,7 @@ WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMa
         colorKind = stars == 5;
     }
     WifiBattleMatchView_PartnerWindows(card, data, font, printQueue, msgData, wordSet, colorKind, heapId);
-    WifiBattleMatchView_PartnerLoadBadge(card, func_02008bf4((PlayerInfo *)&data->info), unit, heapId);
+    WifiBattleMatchView_PartnerLoadBadge(card, PlayerInfo_GetUnionView((PlayerInfo *)&data->info), unit, heapId);
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 9, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     switch (kind) {
     case 2:
@@ -1556,7 +1558,7 @@ WifiBattleMatchLinkIcon *WifiBattleMatchLinkIcon_Create(ClActUnit *unit, WifiBat
         ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c520(icon->actors[0], TRUE);
+    ClActor_SetAutoAnim(icon->actors[0], TRUE);
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 1;
@@ -1564,7 +1566,7 @@ WifiBattleMatchLinkIcon *WifiBattleMatchLinkIcon_Create(ClActUnit *unit, WifiBat
         ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
                        WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c520(icon->actors[1], TRUE);
+    ClActor_SetAutoAnim(icon->actors[1], TRUE);
     return icon;
 }
 
@@ -1617,16 +1619,19 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
         pkm = PokeParty_GetPkm(party, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
-            list->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(pkm)), FALSE, CLACT_VRAM_MAIN,
-                                                HEAPID_TAIL(heapId));
+            list->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(pkm)), FALSE,
+                                                CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
         }
     }
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     i = 0;
-    list->itemPalette = ClActSys_LoadPlttRange(arc, func_0202d890(), CLACT_VRAM_MAIN, 256, i, 1, HEAPID_TAIL(heapId));
-    list->itemCells = ClActSys_LoadCellAnims(arc, func_0202d898(2), func_0202d89c(2), HEAPID_TAIL(heapId));
-    list->itemChars = ClActSys_LoadChars(arc, func_0202d894(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
+    list->itemPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), CLACT_VRAM_MAIN, 256, i, 1,
+                                               HEAPID_TAIL(heapId));
+    list->itemCells = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2),
+                                             AppMenuCommon_GetItemIconAnimFile(2), HEAPID_TAIL(heapId));
+    list->itemChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 24;
@@ -1639,7 +1644,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
             setup.x = i * 40 + 24;
             list->actors[i] =
                 ClActor_Create(unit, list->chars[i], list->palette, list->cells, &setup, CLACT_VRAM_MAIN, heapId);
-            ClActor_SetPalette(list->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), 0);
+            ClActor_SetPalette(list->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm)), 0);
             if (PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL)) {
                 itemSetup = setup;
                 itemSetup.x += 12;

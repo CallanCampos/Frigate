@@ -119,7 +119,7 @@ static BOOL GameClearSave_Init(GameProc *proc, u32 *state, void *param, void *wo
     save->msgBank = TEXT_BANK_GAME_CLEAR_SAVE;
     save->gameData = GSYS_GetGameData(gsys);
     save->playerInfo = GetGameDataPlayerInfo(save->gameData);
-    if (func_0200746c(GameData_GetSaveControl(save->gameData))) {
+    if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(save->gameData))) {
         save->cannotSave = TRUE;
     }
     return TRUE;
@@ -381,7 +381,7 @@ static void GameClearSave_CountClear(GameClearSave *save) {
     SaveControl *saveControl = GameData_GetSaveControl(save->gameData);
     GameRecords *records = GameData_GetRecords(save->gameData);
 
-    if (!func_0200746c(saveControl)) {
+    if (!SaveControl_IsNewGameOverSave(saveControl)) {
         RecordAdd(records, RECORD_HALL_OF_FAME_ENTRIES, 1);
     }
 }
@@ -405,7 +405,7 @@ static void GameClearSave_RegisterTeam(GameClearSave *save) {
     saveControl = GameData_GetSaveControl(save->gameData);
     SaveControl_OpenExtraBlock(saveControl, HALL_OF_FAME_BLOCK, HEAPID_GAMEEVENT);
     hallOfFame = getAddressOfExtraSaveBlk(saveControl, HALL_OF_FAME_BLOCK, 0);
-    if (!func_0200746c(saveControl)) {
+    if (!SaveControl_IsNewGameOverSave(saveControl)) {
         HallOfFameSave_AddTeam(hallOfFame, party, &date, HEAPID_GAMEEVENT);
         GameData_StartSaveBlock(save->gameData, HALL_OF_FAME_BLOCK);
         save->registered = TRUE;
@@ -415,7 +415,7 @@ static void GameClearSave_RegisterTeam(GameClearSave *save) {
 static void GameClearSave_FreeBlocks(GameClearSave *save) {
     SaveControl *saveControl = GameData_GetSaveControl(save->gameData);
 
-    if (!func_0200746c(saveControl)) {
+    if (!SaveControl_IsNewGameOverSave(saveControl)) {
         u32 state = GameData_UpdateSaveBlock(save->gameData, HALL_OF_FAME_BLOCK);
 
         if (state == 2 || state == 3) {

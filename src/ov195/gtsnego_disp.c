@@ -636,7 +636,7 @@ static void GtsNegoDisp_CreateCursor(GtsNegoDisp *disp) {
     setup.bgPriority = 2;
     disp->cursor = ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
                                   disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
-    func_0204c520(disp->cursor, TRUE);
+    ClActor_SetAutoAnim(disp->cursor, TRUE);
     ClActor_SetVisible(disp->cursor, FALSE);
     ClActor_SetObjMode(disp->cursor, GX_OAM_MODE_XLU);
 }
@@ -722,7 +722,7 @@ static void GtsNegoDisp_AddArrow(GtsNegoDisp *disp, int x, int y, BOOL right) {
             disp->arrows[i] =
                 ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
                                disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
-            func_0204c520(disp->arrows[i], TRUE);
+            ClActor_SetAutoAnim(disp->arrows[i], TRUE);
             ClActor_SetVisible(disp->arrows[i], TRUE);
             return;
         }
@@ -749,7 +749,7 @@ void GtsNegoDisp_PressArrow(GtsNegoDisp *disp, int arrow) {
         pressed = 3;
     }
     ClActor_SetSequence(disp->arrows[arrow], pressed);
-    func_0204c520(disp->arrows[arrow], TRUE);
+    ClActor_SetAutoAnim(disp->arrows[arrow], TRUE);
 }
 
 void GtsNegoDisp_ShowFriendList(GtsNegoDisp *disp, BOOL scrollable) {
@@ -899,7 +899,7 @@ static void GtsNegoDisp_CreateListFooter(GtsNegoDisp *disp) {
     disp->listFooter =
         ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_FOOTER], disp->res[GTSNEGO_RES_PLTT_FOOTER],
                        disp->res[GTSNEGO_RES_ANIM_FOOTER], &setup, 1, disp->heapId);
-    func_0204c520(disp->listFooter, TRUE);
+    ClActor_SetAutoAnim(disp->listFooter, TRUE);
     ClActor_SetVisible(disp->listFooter, TRUE);
 }
 
@@ -931,7 +931,7 @@ static void GtsNegoDisp_CreateListActors(GtsNegoDisp *disp, BOOL scrollable) {
         disp->listActors[i] =
             ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
                            disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
-        func_0204c520(disp->listActors[i], TRUE);
+        ClActor_SetAutoAnim(disp->listActors[i], TRUE);
         ClActor_SetVisible(disp->listActors[i], TRUE);
     }
 }
@@ -950,7 +950,7 @@ void GtsNegoDisp_FreeListActors(GtsNegoDisp *disp) {
 void GtsNegoDisp_SetKnobAnimating(GtsNegoDisp *disp, BOOL animating) {
     if (disp->listActors[GTSNEGO_LIST_ACTOR_KNOB] != NULL) {
         ClActor_RestartAnim(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB]);
-        func_0204c520(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], animating);
+        ClActor_SetAutoAnim(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], animating);
     }
 }
 
@@ -1033,7 +1033,7 @@ void GtsNegoDisp_CreateFriendIcon(GtsNegoDisp *disp, int row, int avatar) {
     disp->friendIcons[row] =
         ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_AVATAR + avatar], disp->res[GTSNEGO_RES_PLTT_AVATAR],
                        disp->res[GTSNEGO_RES_ANIM_AVATAR + avatar], &setup, 1, disp->heapId);
-    func_0204c520(disp->friendIcons[row], TRUE);
+    ClActor_SetAutoAnim(disp->friendIcons[row], TRUE);
     ClActor_SetVisible(disp->friendIcons[row], FALSE);
 }
 
@@ -1051,7 +1051,7 @@ void GtsNegoDisp_ShowFriendIcon(GtsNegoDisp *disp, int row, int x, int y) {
 // The icon of a person in a row of the list, the second row being the first on the screen
 void GtsNegoDisp_SetFriendIcon(GtsNegoDisp *disp, PlayerInfo *friend, int row) {
     if (friend != NULL) {
-        GtsNegoDisp_CreateFriendIcon(disp, row, func_02008bf4(friend));
+        GtsNegoDisp_CreateFriendIcon(disp, row, PlayerInfo_GetUnionView(friend));
         GtsNegoDisp_ShowFriendIcon(disp, row, 16, -(GTSNEGO_LIST_ROW_HEIGHT * 8) * (1 - row));
     }
 }
@@ -1183,14 +1183,14 @@ static void GtsNegoDisp_CreateSearchActors(GtsNegoDisp *disp) {
     disp->searchActors[0] =
         ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_MAIN], disp->res[GTSNEGO_RES_PLTT_MAIN],
                        disp->res[GTSNEGO_RES_ANIM_MAIN], &setup, 0, disp->heapId);
-    func_0204c520(disp->searchActors[0], TRUE);
+    ClActor_SetAutoAnim(disp->searchActors[0], TRUE);
     ClActor_SetVisible(disp->searchActors[0], TRUE);
     setup.sequence = 11;
     setup.priority = 1;
     disp->searchActors[1] =
         ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_MAIN], disp->res[GTSNEGO_RES_PLTT_MAIN],
                        disp->res[GTSNEGO_RES_ANIM_MAIN], &setup, 0, disp->heapId);
-    func_0204c520(disp->searchActors[1], TRUE);
+    ClActor_SetAutoAnim(disp->searchActors[1], TRUE);
     ClActor_SetVisible(disp->searchActors[1], TRUE);
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)disp;
@@ -1213,7 +1213,7 @@ void GtsNegoDisp_ShowPartner(GtsNegoDisp *disp, int avatar) {
 
     GFL_G2DIOLoadNSCRSync(arc, 15, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_ArcToolFree(arc);
-    func_0204c520(disp->searchActors[1], FALSE);
+    ClActor_SetAutoAnim(disp->searchActors[1], FALSE);
     ClActor_SetSequence(disp->searchActors[1], sequences[avatar] + 11);
     ClActor_SetAnimFrame(disp->searchActors[1], 4);
     ClActor_SetSequence(disp->searchActors[0], 28);

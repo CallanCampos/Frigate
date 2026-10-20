@@ -725,8 +725,8 @@ static void WifiBattleMatchLink_TaskRatingSearch(WifiBattleMatchTask *task, u32 
                 otherPlayer->info.gender = GENDER_MALE;
                 fixCount++;
             }
-            if (otherPlayer->info.unk1C >= 16) {
-                otherPlayer->info.unk1C = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
+            if (otherPlayer->info.unionView >= 16) {
+                otherPlayer->info.unionView = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
                 fixCount++;
             }
             if (!Country_IsValidPlace(otherPlayer->info.country, otherPlayer->info.province,
@@ -1530,8 +1530,8 @@ static void WifiBattleMatchLink_TaskFreeSearch(WifiBattleMatchTask *task, u32 *s
             if (otherPlayer->info.gender != GENDER_MALE && otherPlayer->info.gender != GENDER_FEMALE) {
                 otherPlayer->info.gender = GENDER_MALE;
             }
-            if (otherPlayer->info.unk1C >= 16) {
-                otherPlayer->info.unk1C = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
+            if (otherPlayer->info.unionView >= 16) {
+                otherPlayer->info.unionView = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
             }
             if (!Country_IsValidPlace(otherPlayer->info.country, otherPlayer->info.province,
                                       otherPlayer->info.region)) {
@@ -2026,7 +2026,7 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
         info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
         info.unkC = info.unk10 + info.unk12;
     }
-    info.look = func_02008bf4(playerInfo);
+    info.look = PlayerInfo_GetUnionView(playerInfo);
     link->card =
         WifiBattleMatchRankCard_Create(&info, titleMsg, playerInfo, unit, link->res, link->font, link->printQueue,
                                        link->msgData, link->wordSet, HEAPID_WIFIBATTLEMATCH_LINK);

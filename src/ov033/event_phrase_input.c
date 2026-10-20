@@ -242,7 +242,7 @@ BOOL func_ov033_02177908(VM *vm, FieldScriptEnv *env) {
     if (phrase != NULL && *phrase != 0x7e && *phrase != 0) {
         strbuf = GFL_StrBufCreate(14, heapId);
         GFL_StrBufLoadFixedString(strbuf, phrase + 1, 13);
-        func_0202437c(wordSet, input, strbuf, 0, 0, 2);
+        GFL_WordSetSetStrbuf(wordSet, input, strbuf, 0, 0, 2);
         GFL_StrBufFree(strbuf);
     }
     return FALSE;

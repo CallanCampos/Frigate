@@ -170,7 +170,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos
         work->clactActors[i] =
             ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, heapId);
         ClActor_SetVisible(work->clactActors[i], FALSE);
-        func_0204c520(work->clactActors[i], TRUE);
+        ClActor_SetAutoAnim(work->clactActors[i], TRUE);
     }
 
     work->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_4, heapId);

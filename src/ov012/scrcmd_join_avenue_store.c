@@ -25,7 +25,8 @@ BOOL s02C6_JoinAvenueStoreEnd(VM *vm, FieldScriptEnv *env) {
 
 BOOL s02CB_PokewoodGetLevel(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
-    u32 level = func_020111ec(func_020111b0(PokewoodSave_Get(FieldScriptEnv_GetGameData(env))));
+    u32 level =
+        PokewoodSave_GetLevelOfPoints(PokewoodSave_GetLevelPoints(PokewoodSave_Get(FieldScriptEnv_GetGameData(env))));
 
     if (level >= 5) {
         level = 0;

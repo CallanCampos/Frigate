@@ -194,7 +194,7 @@ BOOL doesPokeHavePokerus(BoxPkm *pkm);
 // The same two for a Pokémon of the party
 BOOL pokerusDuration(PartyPkm *pkm);
 BOOL pokeHasPkrs(PartyPkm *pkm);
-BoxPkm *func_0201d620(PartyPkm *pkm);
+BoxPkm *PokeParty_GetBoxPkm(PartyPkm *pkm);
 // Puts a move in a slot with its full PP and no PP Ups
 void PML_PkmSetMove(BoxPkm *pkm, u16 move, u8 slot);
 // How a nature changes a stat, in the order attack, defense, special attack, special defense and speed from 1:
@@ -270,7 +270,7 @@ PartyPkm *PokeParty_GetPkm(PokeParty *party, u32 index);
 // A flag of each slot, kept in the party
 BOOL PokeParty_GetSlotExists(PokeParty *party, u32 slot);
 void PokeParty_SetSlotExists(PokeParty *party, u32 slot, BOOL exists);
-BoxPkm *func_0201d624(PartyPkm *pkm);
+BoxPkm *PokeParty_ToBoxPkm(PartyPkm *pkm);
 // A new party Pokémon made from a box Pokémon, with its stats calculated
 PartyPkm *boxPkmRegenToPartyPkm(BoxPkm *pkm, HeapID heapId);
 int PokeParty_GetPkmCount(PokeParty *party);

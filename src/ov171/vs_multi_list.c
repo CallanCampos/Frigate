@@ -597,7 +597,7 @@ static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
         u16 icon;
 
         if (wk->pkm[i] != NULL) {
-            icon = PokeIcon_GetFileOfPkm(func_0201d624(wk->pkm[i]));
+            icon = PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(wk->pkm[i]));
         } else {
             icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
         }
@@ -614,9 +614,12 @@ static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
     wk->charRes[6] = ClActSys_LoadChars(uiArc, 65, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
     wk->palRes[1] = ClActSys_LoadPltt(uiArc, 66, CLACT_VRAM_MAIN, 128, HEAPID_VS_MULTI_LIST);
     wk->cellRes[1] = ClActSys_LoadCellAnims(uiArc, 69, 72, HEAPID_VS_MULTI_LIST);
-    wk->charRes[8] = ClActSys_LoadChars(uiArc, func_0202d958(2), FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
-    wk->palRes[3] = ClActSys_LoadPltt(uiArc, func_0202d954(), CLACT_VRAM_MAIN, 160, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[3] = ClActSys_LoadCellAnims(uiArc, func_0202d95c(2), func_0202d960(2), HEAPID_VS_MULTI_LIST);
+    wk->charRes[8] =
+        ClActSys_LoadChars(uiArc, AppMenuCommon_GetHpBarCharFile(2), FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
+    wk->palRes[3] =
+        ClActSys_LoadPltt(uiArc, AppMenuCommon_GetHpBarPaletteFile(), CLACT_VRAM_MAIN, 160, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[3] = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetHpBarCellFile(2), AppMenuCommon_GetHpBarAnimFile(2),
+                                            HEAPID_VS_MULTI_LIST);
     GFL_ArcToolFree(uiArc);
 }
 
@@ -652,8 +655,8 @@ static void VsMultiList_CreateActors(VsMultiListWork *wk) {
         } else {
             u16 item;
 
-            func_0204c520(wk->actors[i], TRUE);
-            ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(wk->pkm[i])), TRUE);
+            ClActor_SetAutoAnim(wk->actors[i], TRUE);
+            ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(wk->pkm[i])), TRUE);
             item = PokeParty_GetParam(wk->pkm[i], PKM_PARAM_ITEM, NULL);
             if (item == 0) {
                 ClActor_SetVisible(wk->actors[i + 6], FALSE);

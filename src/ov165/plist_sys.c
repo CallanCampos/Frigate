@@ -589,8 +589,8 @@ static void PokeList_CreateActors(PokeListWork *wk) {
                                 wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
     wk->subCursor = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(0)], wk->clResources[CL_RES_PLTT(0)],
                                    wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
-    func_0204c520(wk->cursor, TRUE);
-    func_0204c520(wk->subCursor, TRUE);
+    ClActor_SetAutoAnim(wk->cursor, TRUE);
+    ClActor_SetAutoAnim(wk->subCursor, TRUE);
     ClActor_SetVisible(wk->cursor, FALSE);
     ClActor_SetVisible(wk->subCursor, FALSE);
     setup.x = 224;
@@ -600,18 +600,18 @@ static void PokeList_CreateActors(PokeListWork *wk) {
     setup.bgPriority = 0;
     wk->exitButton = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
                                     wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
-    func_0204c520(wk->exitButton, TRUE);
+    ClActor_SetAutoAnim(wk->exitButton, TRUE);
     setup.x = 204;
     setup.sequence = 0;
     wk->shortcutButton = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
                                         wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
-    func_0204c520(wk->shortcutButton, TRUE);
+    ClActor_SetAutoAnim(wk->shortcutButton, TRUE);
     setup.y = 172;
     setup.x = 184;
     setup.sequence = 6;
     wk->shortcutMark = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
                                       wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
-    func_0204c520(wk->shortcutMark, TRUE);
+    ClActor_SetAutoAnim(wk->shortcutMark, TRUE);
 }
 
 static void PokeList_FreeActors(PokeListWork *wk) {
@@ -681,18 +681,24 @@ static void PokeList_LoadResources(PokeListWork *wk) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d82c(), 1, 0, 0, FALSE, wk->heapId);
 #endif
     GFL_BGSysSetScrPaletteNo(1, 0, 0, 0x40, 0x20, 0xb);
-    wk->clResources[CL_RES_PLTT(5)] = ClActSys_LoadPlttRange(commonArc, func_0202d954(), 0, 0xa0, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(6)] = ClActSys_LoadChars(commonArc, func_0202d958(2), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(6)] = ClActSys_LoadCellAnims(commonArc, func_0202d95c(2), func_0202d960(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(5)] =
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetHpBarPaletteFile(), 0, 0xa0, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(6)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetHpBarCharFile(2), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(6)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetHpBarCellFile(2),
+                                                             AppMenuCommon_GetHpBarAnimFile(2), wk->heapId);
     wk->clResources[CL_RES_PLTT(1)] =
         ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x120, 0, 3, wk->heapId);
     wk->clResources[CL_RES_CHAR(2)] =
         ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
     wk->clResources[CL_RES_CELL(2)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTouchBarCellFile(2),
                                                              AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(2)] = ClActSys_LoadPlttRange(commonArc, func_0202d890(), 0, 0x60, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(3)] = ClActSys_LoadChars(commonArc, func_0202d894(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(3)] = ClActSys_LoadCellAnims(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(2)] =
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetItemIconPaletteFile(), 0, 0x60, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(3)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetItemIconCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(3)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetItemIconCellFile(2),
+                                                             AppMenuCommon_GetItemIconAnimFile(2), wk->heapId);
     wk->clResources[CL_RES_PLTT(4)] =
         ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
     wk->clResources[CL_RES_CHAR(5)] =
@@ -1098,7 +1104,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
             PokeParty_SetParam(wk->pkm, PKM_PARAM_MAIL, (u32)mail);
             GFL_HeapFree(mail);
             PokeParty_SetParam(wk->pkm, PKM_PARAM_ITEM, wk->param->item);
-            func_020097d0(wk->param->unk08, 0, wk->param->unk6C);
+            MailBox_ResetMail(wk->param->unk08, 0, wk->param->unk6C);
             PokeList_ShowMessage(wk, 0x6c, TRUE, PokeList_MessageDoneExit);
         } else {
             PokeList_ShowMessage(wk, 0x6d, TRUE, PokeList_MessageDoneExit);
@@ -1573,15 +1579,15 @@ static void func_ov165_0219c20c(PokeListWork *wk) {
             }
         }
         result = PokeRegulation_CheckPicked(regulation, wk->param->party, picked);
-        if (regulation->unk2 > wk->enteredCount) {
-            PokeList_ShowMessage(wk, regulation->unk2 + 0x60, TRUE, PokeList_MessageDoneSelect);
+        if (regulation->minCount > wk->enteredCount) {
+            PokeList_ShowMessage(wk, regulation->minCount + 0x60, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
-        } else if (regulation->unk3 < wk->enteredCount) {
-            PokeList_ShowMessage(wk, regulation->unk3 + 0x66, TRUE, PokeList_MessageDoneSelect);
+        } else if (regulation->maxCount < wk->enteredCount) {
+            PokeList_ShowMessage(wk, regulation->maxCount + 0x66, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
         } else if (result == 1) {
             PokeListMessage_CreateWordSet(wk, wk->message);
-            PokeListMessage_SetNumber(wk, wk->message, 0, regulation->unk6, 3);
+            PokeListMessage_SetNumber(wk, wk->message, 0, regulation->maxLevelTotal, 3);
             PokeList_ShowMessage(wk, 0x9e, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
             PokeListMessage_FreeWordSet(wk, wk->message);
@@ -2179,7 +2185,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             PokeListPlate_SetEntry(wk, wk->plates[wk->cursorPos], wk->enteredCount);
             wk->enteredCount++;
             PokeList_ShowModeMessage(wk);
-            if (wk->enteredCount == regulation->unk3) {
+            if (wk->enteredCount == regulation->maxCount) {
                 full = TRUE;
             }
             wk->state = 2;
@@ -2190,7 +2196,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             PokeList_ShowMessage(wk, 0x9d, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
         } else if (result == 4) {
-            PokeList_ShowMessage(wk, regulation->unk3 + 0x66, TRUE, PokeList_MessageDoneSelect);
+            PokeList_ShowMessage(wk, regulation->maxCount + 0x66, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
         }
         wk->pkm = NULL;
@@ -2328,7 +2334,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             u32 hiden = PokeList_GetHidenResult(wk->pkm, wk->menuItem - 16);
 
             if (hiden == 22 || hiden == 23) {
-                if (func_02018c38(wk->param->zoneId) == FALSE) {
+                if (IsZoneNormal(wk->param->zoneId) == FALSE) {
                     PokeList_ShowMessage(wk, 0x51, TRUE, PokeList_MessageDoneSelect);
                 } else {
                     u32 maxHp = PokeParty_GetParam(wk->pkm, PKM_PARAM_MAX_HP, NULL);
@@ -2944,7 +2950,7 @@ void PokeList_TimeUp(PokeListWork *wk) {
                 for (i = 0; i < 6; i++) {
                     wk->param->picked[i] = 0;
                 }
-                for (i = 0; i < regulation->unk2; i++) {
+                for (i = 0; i < regulation->minCount; i++) {
                     wk->param->picked[i] = i + 1;
                 }
             }

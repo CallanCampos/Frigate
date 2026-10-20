@@ -135,7 +135,7 @@ u32 RecordGet(GameRecords *records, u32 id) {
     return value;
 }
 
-void func_020095e0(GameRecords *records) {
+void RecordFinishDay(GameRecords *records) {
     u32 i;
 
     for (i = 0; i < 5; i++) {

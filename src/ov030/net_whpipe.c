@@ -335,10 +335,10 @@ void NetWhpipe_UpdateGameBeacon(void) {
         GFLNetInitData *init = GFL_NetGetInitData();
         int size;
 
-        if (init->unk1C == NULL) {
+        if (init->getBeaconSize == NULL) {
             return;
         }
-        size = init->unk1C(work->gameWork);
+        size = init->getBeaconSize(work->gameWork);
         if (size > _BEACON_USER_SIZE_MAX) {
             OS_Terminate();
             return;
@@ -348,7 +348,7 @@ void NetWhpipe_UpdateGameBeacon(void) {
         info->gameId = init->unk4C.id.gameId;
         info->unk5 = 0;
         info->closed = work->entryClosed;
-        MI_CpuCopy8(init->unk18(work->gameWork), info->data, size);
+        MI_CpuCopy8(init->getBeaconData(work->gameWork), info->data, size);
         SetBeaconInfo(&work->info, sizeof(NetWhpipeBeaconInfo));
     }
 }
@@ -358,11 +358,11 @@ static void UpdateBeacon(void) {
     NetWhpipeBeaconInfo *info = &work->info;
     GFLNetInitData *init = GFL_NetGetInitData();
 
-    if (init->unk1C != NULL) {
-        int size = init->unk1C(work->gameWork);
+    if (init->getBeaconSize != NULL) {
+        int size = init->getBeaconSize(work->gameWork);
 
         GFL_ASSERT(size <= _BEACON_USER_SIZE_MAX);
-        MI_CpuCopy8(init->unk18(work->gameWork), info->data, size);
+        MI_CpuCopy8(init->getBeaconData(work->gameWork), info->data, size);
     }
     if (info->childCount != CountChildren()) {
         work->beaconCounter = 0;
@@ -418,7 +418,7 @@ static void Update(u16 count) {
     case WH_SYSSTATE_ERROR:
         if (work != NULL) {
             if (!work->stopped) {
-                func_02042e54(WH_GetLastError());
+                GFL_NetNotifyError(WH_GetLastError());
             }
             work->stopped = TRUE;
         }
@@ -626,7 +626,7 @@ static void StateStartParent(void *arg) {
         } else {
             channel = work->channel;
         }
-        if (init->unk66 != 0) {
+        if (init->changeTgid != 0) {
             work->tgid = WM_GetNextTgid();
         }
         NetWhpipe_UpdateGameBeacon();

@@ -161,7 +161,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
     u8 count;
     u8 value;
     u8 best;
-    MusicalSaveUnk1B0 *entries;
+    MusicalSaveEquip *entries;
 
     FieldScriptEnv_GetScriptWork(env);
     kind = VM_Read8(vm);
@@ -180,19 +180,19 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
     }
     switch (kind) {
     case 0:
-        *result = func_0200ae78(save);
+        *result = MusicalSave_GetShowCount(save);
         break;
     case 1:
-        *result = func_0200ae9c(save);
+        *result = MusicalSave_GetWinCount(save);
         break;
     case 2:
-        *result = func_0200aed4(save);
+        *result = MusicalSave_GetLastPoints(save);
         break;
     case 3:
         best = 0;
         mostIndex = 4;
         for (i = 0; i < 4; i++) {
-            value = func_0200aebc(save, i);
+            value = MusicalSave_GetPropKindCount(save, i);
             if (value > best) {
                 best = value;
                 mostIndex = i;
@@ -203,15 +203,15 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         *result = mostIndex;
         break;
     case 4:
-        *result = func_0200aee4(save);
+        *result = MusicalSave_GetProgram(save);
         break;
     case 5:
-        func_0200aef0(save, arg);
+        MusicalSave_SetProgram(save, arg);
         break;
     case 6:
         *result = 0;
         for (i = 0; i < 4; i++) {
-            if (func_0200aebc(save, i) != 0) {
+            if (MusicalSave_GetPropKindCount(save, i) != 0) {
                 *result = 1;
             }
         }
@@ -227,7 +227,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         best = 0xff;
         fewestIndex = 4;
         for (i = 0; i < 4; i++) {
-            value = func_0200aebc(save, i);
+            value = MusicalSave_GetPropKindCount(save, i);
             if (value <= best) {
                 best = value;
                 fewestIndex = i;
@@ -239,7 +239,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         best = 0;
         firstIndex = 4;
         for (i = 0; i < 4; i++) {
-            value = func_0200aebc(save, i);
+            value = MusicalSave_GetPropKindCount(save, i);
             if (value > best) {
                 best = value;
                 firstIndex = i;
@@ -253,7 +253,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         most = 0;
         second = 4;
         for (j = 0; j < 4; j++) {
-            value = func_0200aebc(save, j);
+            value = MusicalSave_GetPropKindCount(save, j);
             if (value > most) {
                 if (secondValue == most) {
                     second = 4;
@@ -286,16 +286,16 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 13:
-        entries = func_0200ad44(save);
+        entries = MusicalSave_GetEquips(save);
         *result = 0;
         for (i = 0; i < 8; i++) {
-            if (entries[i].unk0 != 10) {
+            if (entries[i].pos != 10) {
                 *result = 1;
             }
         }
         break;
     case 14:
-        if (func_0200aefc(save) == TRUE) {
+        if (MusicalSave_HasDistProgram(save) == TRUE) {
             *result = TRUE;
         } else {
             *result = FALSE;
@@ -343,11 +343,12 @@ BOOL s0166_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 arg = ScriptReadAny(vm, env);
     u8 kind = VM_Read8(vm);
     u16 *result = ScriptReadVar(vm, env);
-    MusicalSaveUnk1E0 *entry = func_0200ae6c(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), arg);
+    MusicalAudienceGift *entry =
+        MusicalSave_GetAudienceGift(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), arg);
 
     switch (kind) {
     case 0:
-        switch (entry->unk0) {
+        switch (entry->topKind) {
         case 0:
             *result = 24;
             break;
@@ -372,10 +373,10 @@ BOOL s0166_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
         *result = arg + 15;
         break;
     case 3:
-        *result = entry->unk1;
+        *result = entry->hasProp;
         break;
     case 4:
-        *result = entry->unk2;
+        *result = entry->prop;
         break;
     }
     return FALSE;
@@ -413,7 +414,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         save = getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env));
         str = GFL_StrBufCreate(0x26, heapId);
         GFL_StrBufLoadFixedString(str, MusicalSave_GetName(save), 0x26);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         break;
     case 1:
@@ -424,26 +425,26 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_MUSICAL, heapId);
         }
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 3);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
     case 2:
         str = MusicalEvent_GetProgramTitle(GameData_GetMusicalCommWork(gameData)->event, heapId);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         break;
     case 3:
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         str = GFL_MsgDataLoadStrbufNew(msgData, arg);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
     case 4:
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 4);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
@@ -457,7 +458,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         musical = getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env));
         for (i = 0; i < 4; i++) {
             order[i] = i;
-            points[i] = func_0200aebc(musical, i);
+            points[i] = MusicalSave_GetPropKindCount(musical, i);
         }
         for (i = 1; i < 4; i++) {
             for (j = 0; j < 4 - i; j++) {
@@ -493,7 +494,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         for (i = 0; i < 3; i++) {
             str = GFL_MsgDataLoadStrbufNew(msgData, messages[i]);
-            func_0202437c(wordSet, i, str, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, i, str, 0, 1, 2);
             GFL_StrBufFree(str);
         }
         GFL_MsgDataFree(msgData);
@@ -505,7 +506,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
 BOOL s0169_MusicalClearAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
-    func_0200ae6c(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), index)->unk1 = 0;
+    MusicalSave_GetAudienceGift(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), index)->hasProp = 0;
     return FALSE;
 }
 
@@ -649,7 +650,7 @@ BOOL s0167_MusicalComm(VM *vm, FieldScriptEnv *env) {
     case 21:
     case 22:
         if (GFL_NetErrCheck()) {
-            func_02016b0c(gsys, 1);
+            GSYS_SetNetErrorPending(gsys, 1);
             *result = 1;
         } else if (commWork != NULL && commWork->ircMatch.netError == 1) {
             *result = TRUE;

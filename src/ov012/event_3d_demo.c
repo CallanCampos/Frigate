@@ -35,8 +35,8 @@ GameEventReturnCode Event3DDemo_Callback(GameEvent *event, u32 *state, void *dat
 
     switch (*state) {
     case 0:
-        work->savedState = func_02016b2c(work->gameSystem);
-        func_02016b24(work->gameSystem, 1);
+        work->savedState = GSYS_IsGameCommPaused(work->gameSystem);
+        GSYS_SetGameCommPaused(work->gameSystem, 1);
         if (!GameCommSys_BootCheck(work->gameCommSys)) {
             *state += 2;
         } else {
@@ -57,7 +57,7 @@ GameEventReturnCode Event3DDemo_Callback(GameEvent *event, u32 *state, void *dat
         if (GSYS_GetProcMgrState(work->gameSystem)) {
             break;
         }
-        func_02016b24(work->gameSystem, work->savedState);
+        GSYS_SetGameCommPaused(work->gameSystem, work->savedState);
         if (work->demoId == 24 || work->demoId == 25) {
             GameEvent_ChainNext(event, CreateBGMFadeOutEvent(work->gameSystem, 0));
             if (work->demoId == 25) {

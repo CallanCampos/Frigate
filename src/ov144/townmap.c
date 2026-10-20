@@ -714,7 +714,7 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
         setup.sequence = TOWNMAP_ANIM_ZOOM_IN;
         appBar->zoomButton =
             ClActor_Create(unit, appBar->chars, appBar->pltt, appBar->cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c520(appBar->zoomButton, TRUE);
+        ClActor_SetAutoAnim(appBar->zoomButton, TRUE);
         ClActor_StopAnim(appBar->zoomButton);
     }
     {
@@ -819,7 +819,7 @@ static void TownMapCursor_Init(TownMapCursor *cursor, ClActor *actor, ClActor *r
     ClActor_SetPriority(cursor->cursor, 0);
     ClActor_SetBgPriority(cursor->ring, 2);
     ClActor_SetPriority(cursor->ring, 3);
-    func_0204c520(cursor->ring, TRUE);
+    ClActor_SetAutoAnim(cursor->ring, TRUE);
     // The cursor shows only while the keys are used
     if (!GCTX_HIDIsUsingTouch()) {
         ClActor_SetVisible(cursor->cursor, TRUE);
@@ -1448,7 +1448,7 @@ static void TownMapPlayer_Init(TownMapPlayer *player, TownMapPlace *place, ClAct
     ClActor_SetBgPriority(player->actor, 2);
     ClActor_SetPriority(player->actor, 2);
     ClActor_SetSequence(player->actor, TOWNMAP_ANIM_PLAYER);
-    func_0204c520(player->actor, TRUE);
+    ClActor_SetAutoAnim(player->actor, TRUE);
     if (place == NULL) {
         ClActor_SetVisible(player->actor, FALSE);
     }
@@ -1787,7 +1787,7 @@ static void TownMapPlaceName_Init(TownMapPlaceName *placeName, u8 bg, Font *font
     ClActor_SetPriority(placeName->plate, 1);
     ClActor_SetVisible(placeName->plate, TRUE);
     ClActor_SetSequence(placeName->plate, TOWNMAP_ANIM_NAME_PLATE);
-    func_0204c520(placeName->plate, TRUE);
+    ClActor_SetAutoAnim(placeName->plate, TRUE);
     ClActor_StopAnim(placeName->plate);
 }
 

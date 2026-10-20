@@ -636,7 +636,7 @@ static void BeaconViewPanel_SetMedals(BeaconViewWork *work, BeaconViewPanel *pan
         return;
     }
     panel->medalCount = GameBeacon_GetMedalCount(beacon);
-    panel->unkA = func_02013dc8(beacon);
+    panel->unkA = GameBeacon_GetFavoriteMedal(beacon);
     if (BeaconViewPanel_HasNoMedals(panel)) {
         BeaconView_SetActorAnim(panel->medal, 24);
     } else {
@@ -734,7 +734,7 @@ void BeaconView_ScrollLine(BeaconViewWork *work, int dir, u8 frames) {
         offset = work->top - 1;
         work->top--;
     }
-    func_0202d7b8(work->status, work->top);
+    BeaconStatus_SetLogTop(work->status, work->top);
     GameBeaconInfoTable_RingGet(work->log, work->beacon, &work->time, offset);
     dataIndex = GameBeaconInfoTable_RingIndex(work->log, offset);
     BeaconView_AddLine(work, work->beacon, dataIndex, dir, frames, 2);
@@ -935,7 +935,7 @@ void BeaconView_StartJump(BeaconViewWork *work, u8 top) {
         data->panels[i] = BeaconView_FindPanel(work, (u8)GameBeaconInfoTable_RingIndex(work->log, work->top + i));
     }
     work->top = top;
-    func_0202d7b8(work->status, work->top);
+    BeaconStatus_SetLogTop(work->status, work->top);
     BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
     BeaconView_UpdateArrows(work);
     BeaconView_PlaySE(SEQ_SE_SELECT4);
@@ -1000,7 +1000,7 @@ BOOL BeaconView_ShowBeaconMessage(BeaconViewWork *work, const GameBeacon *beacon
     case 50:
         return BeaconView_TakePassPower(work, beacon, TRUE);
     case 24:
-        GameBeacon_BroadcastThankedCount(func_0200c910((TrainerGameInfoSave *)work->trainerCard));
+        GameBeacon_BroadcastThankedCount(TrainerGameInfo_IncThankedCount((TrainerGameInfoSave *)work->trainerCard));
         break;
     }
     BeaconView_ShowTypeMessage(work, beacon);
@@ -1308,7 +1308,7 @@ static u32 BeaconView_CheckMissionRefusal(BeaconViewWork *work, FestMissionConfi
         }
         return 1;
     }
-    if (config->info.unk8_18 != 0 && !EventWork_FlagGet(eventWork, config->info.unk8_18)) {
+    if (config->info.requiredFlag != 0 && !EventWork_FlagGet(eventWork, config->info.requiredFlag)) {
         return 3;
     }
     return 0;
@@ -1330,7 +1330,7 @@ static void BeaconViewPanel_StartIcon(BeaconViewWork *work, BeaconViewPanel *pan
     } else {
         data->type = GameBeacon_GetType(beacon);
     }
-    BeaconViewPanel_SetIcon(work, panel, func_020140cc(data->type));
+    BeaconViewPanel_SetIcon(work, panel, GameBeacon_GetTypeIcon(data->type));
     BeaconViewPanel_SetIconVisible(panel, greeting ? FALSE : TRUE);
 }
 

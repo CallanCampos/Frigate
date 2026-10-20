@@ -615,7 +615,7 @@ BOOL GetZoneIsMusicalTheater(u16 zoneId) {
     return FALSE;
 }
 
-BOOL func_02018c38(u16 zoneId) {
+BOOL IsZoneNormal(u16 zoneId) {
     if (GetZoneIsUnionRoom(zoneId) || IsZone150Or151(zoneId) || IsZoneLEQ76(zoneId) || IsZoneEntralinkHub(zoneId) ||
         GetZoneIsEntralinkAny(zoneId)) {
         return FALSE;

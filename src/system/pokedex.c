@@ -310,11 +310,11 @@ BOOL PokeDex_IsHabitatListEnabled(PokeDexSave *pokedex) {
 }
 
 void givePlayerPokedex(PokeDexSave *pokedex) {
-    pokedex->unk4_2 = 1;
+    pokedex->given = 1;
 }
 
-u32 func_0200d1dc(PokeDexSave *pokedex) {
-    return pokedex->unk4_2;
+u32 PokeDex_IsGiven(PokeDexSave *pokedex) {
+    return pokedex->given;
 }
 
 void PokeDex_SetMode(PokeDexSave *pokedex, u32 mode) {
@@ -651,7 +651,7 @@ BOOL PokeDex_HasSeenVariant(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rar
     return FALSE;
 }
 
-u32 func_0200da18(PokeDexSave *pokedex, u32 index) {
+u32 PokeDex_GetSpindaPersonality(PokeDexSave *pokedex, u32 index) {
     if (index == 0) {
         return pokedex->spindaPersonality;
     }

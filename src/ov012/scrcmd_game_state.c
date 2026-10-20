@@ -215,7 +215,7 @@ BOOL s0138_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
 
     *present = SaveControl_IsDataAlreadyPresent(save);
     *status = SaveControl_GetStatus(save);
-    func_020074b8(save, &a1, &a2);
+    SaveControl_GetChangedSize(save, &a1, &a2);
     if (a1 * 3 < a2) {
         *result = 0;
     } else {
@@ -459,9 +459,9 @@ BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env) {
     PlayerState *playerState = GameData_GetPlayerState(gameData);
     void *timeSig = getTimeSigBlkAddress(GameData_GetSaveControl(gameData));
 
-    *value = func_0202b5e8(func_02008bf4(&playerState->playerInfo));
-    *flag = func_020091d0(timeSig);
-    func_020091dc(timeSig);
+    *value = UnionView_GetTrainerClass(PlayerInfo_GetUnionView(&playerState->playerInfo));
+    *flag = TimeSigSave_IsUnionViewChanged(timeSig);
+    TimeSigSave_SetUnionViewChanged(timeSig);
     return FALSE;
 }
 

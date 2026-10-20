@@ -357,7 +357,7 @@ static BOOL GameBeaconSys_CountSurveyAnswers(GameBeaconSystem *sys, const GameBe
         if (question == 0xff) {
             continue;
         }
-        if (fromBW1 && func_0201148c(question)) {
+        if (fromBW1 && SurveyQuestion_IsNewInB2W2(question)) {
             continue;
         }
         if (question == SURVEY_QUESTION_PLAY_TIME) {
@@ -439,7 +439,7 @@ static void GameBeacon_PrepareSend(GameBeacon *beacon, BOOL b2w2Only) {
     }
     // Black and White don't have these questions
     for (i = 0; i <= SURVEY_QUESTION_LAST; i++) {
-        if (func_0201148c(i)) {
+        if (SurveyQuestion_IsNewInB2W2(i)) {
             SurveySave_WriteAnswer(beacon->surveyAnswers, i, 0);
         }
     }
@@ -725,19 +725,19 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     beacon->favoriteColor = owner.favoriteColor;
     beacon->gender = getTrainerGender(player);
     if (beacon->gender == GENDER_MALE) {
-        beacon->trainerView = func_02008bf4(player);
+        beacon->trainerView = PlayerInfo_GetUnionView(player);
     } else {
-        beacon->trainerView = func_02008bf4(player) - 8;
+        beacon->trainerView = PlayerInfo_GetUnionView(player) - 8;
     }
     beacon->version = GAME_VERSION;
     beacon->language = GAME_LANGUAGE;
     beacon->country = UnityTowerVisitor_GetCountry(player);
     beacon->region = UnityTowerVisitor_GetProvince(player);
     beacon->surveyRank = TrainerGameInfo_GetSurveyRank(info);
-    beacon->unk08 = func_0200c90c(info);
-    beacon->unk04 = func_0200c924(info);
+    beacon->thankedCount = TrainerCard_GetThankedCount(info);
+    beacon->passerbyCount = TrainerCard_GetPasserbyCount(info);
     medalBox = SaveControl_GetMedalBox(save);
-    beacon->unk5B = MedalBox_GetLastMedal(medalBox);
+    beacon->favoriteMedal = MedalBox_GetLastMedal(medalBox);
     beacon->medalCount = MedalBox_GetObtainedCount(medalBox, 0);
     playTime = GameData_GetPlayTime(gameData);
     beacon->playHours = PlayTime_GetHours(playTime);
@@ -790,8 +790,8 @@ static void GameBeaconSendSlot_ResetHeader(GameBeaconSendSlot *slot, u8 targetVe
 
     slot->beacon.playHours = PlayTime_GetHours(playTime);
     slot->beacon.playMinutes = PlayTime_GetMinutes(playTime);
-    slot->beacon.unk08 = func_0200c90c(info);
-    slot->beacon.unk04 = func_0200c924(info);
+    slot->beacon.thankedCount = TrainerCard_GetThankedCount(info);
+    slot->beacon.passerbyCount = TrainerCard_GetPasserbyCount(info);
     slot->beacon.targetVersions = targetVersions;
     slot->beacon.missionWord = 0;
     slot->beacon.passPower = GAME_BEACON_PASS_POWER_NONE;
@@ -834,7 +834,7 @@ void GameBeaconSendSlot_SetMissionEx(GameBeaconSendSlot *slot, u16 type, u32 val
     }
     beacon->type = type;
     beacon->arg.mission.missionId = config->missionId;
-    beacon->missionWord = config->unk1C;
+    beacon->missionWord = config->seed;
     GameBeacon_ClearRecent(beacon);
     if (type != 0x3c) {
         FestMissionLog_AddBeacon(festival, &newSlot.beacon, LinkFestival_GetScore(festival), 2, 1);
@@ -851,14 +851,14 @@ BOOL GameBeacon_IsMissionType(const GameBeacon *beacon) {
     return TRUE;
 }
 
-BOOL func_0202cf98(const GameBeacon *beacon) {
+BOOL GameBeacon_HasMissionInfo(const GameBeacon *beacon) {
     if (beacon->type < 0x3c || beacon->type > 0x66) {
         return FALSE;
     }
     return TRUE;
 }
 
-u32 func_0202cfac(u32 a0, u16 a1) {
+u32 GameBeaconSys_AddMissionScore(u32 a0, u16 a1) {
     if (GameBeaconSys == NULL || GameBeaconSys->gsys == NULL) {
         return 0;
     }
@@ -976,10 +976,10 @@ void GameBeaconSys_SetMedalCount(u8 count) {
     slot->updated = TRUE;
 }
 
-void func_0202d194(u32 value) {
+void GameBeaconSys_SetFavoriteMedal(u32 value) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
-    slot->beacon.unk5B = value;
+    slot->beacon.favoriteMedal = value;
     slot->updated = TRUE;
 }
 
@@ -1033,14 +1033,14 @@ static BOOL GameBeaconSys_SendCaptureMission(u16 species, BOOL a1, BOOL a2) {
         type = 0x40;
         mission = 6;
     }
-    if (func_0202cfac(mission, species)) {
+    if (GameBeaconSys_AddMissionScore(mission, species)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, type, species);
         return TRUE;
     }
     return FALSE;
 }
 
-void func_0202d28c(u16 species, BOOL a1, BOOL a2) {
+void GameBeaconSys_SendDefeatMission(u16 species, BOOL a1, BOOL a2) {
     u16 type;
     u32 mission;
 
@@ -1054,7 +1054,7 @@ void func_0202d28c(u16 species, BOOL a1, BOOL a2) {
         type = 0x3f;
         mission = 5;
     }
-    if (func_0202cfac(mission, species)) {
+    if (GameBeaconSys_AddMissionScore(mission, species)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, type, species);
     }
 }
@@ -1098,8 +1098,8 @@ static void GameBeacon_SetPlayTime(GameBeacon *beacon, u16 hours) {
     GameBeacon_ClearRecent(beacon);
 }
 
-void func_0202d384(u16 item) {
-    if (func_0202cfac(0xb, item)) {
+void GameBeaconSys_SendItemUse(u16 item) {
+    if (GameBeaconSys_AddMissionScore(0xb, item)) {
         GameBeaconSendSlot_SetMission(&GameBeaconSys->mine, 0x45, item);
         return;
     }
@@ -1186,7 +1186,7 @@ static void GameBeacon_SetMyCGearRecord(const PMSData *record) {
     GameBeacon_SetCGearRecordFields(&GameBeaconSys->mine.beacon, record);
 }
 
-void func_0202d5cc(void) {
+void GameBeaconSys_SendMission(void) {
     u16 type = 0x3c;
 
     if (GameBeaconSys_CanSendType(type)) {

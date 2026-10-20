@@ -231,7 +231,7 @@ void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
         setup.priority = 32;
         CtvtCall_CreateActor(sys, &call->rows[i].frame, 5, 1, 9, &setup, heapId);
         ClActor_SetVisible(call->rows[i].frame, FALSE);
-        func_0204c520(call->rows[i].frame, TRUE);
+        ClActor_SetAutoAnim(call->rows[i].frame, TRUE);
 
         setup.x = 18;
         setup.sequence = CALL_CHECK_OFF;
@@ -257,7 +257,7 @@ void CtvtCall_Enter(CommTvtWork *sys, CtvtCall *call) {
     setup.bgPriority = 0;
     CtvtCall_CreateActor(sys, &call->returnButton, 6, 2, 10, &setup, heapId);
     ClActor_SetVisible(call->returnButton, TRUE);
-    func_0204c520(call->returnButton, TRUE);
+    ClActor_SetAutoAnim(call->returnButton, TRUE);
 
     setup.x = 248;
     setup.y = 24;

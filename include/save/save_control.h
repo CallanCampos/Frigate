@@ -108,15 +108,15 @@ struct SaveControl {
     u8 dataExists;
     // Cleared when both copies of the save loaded right
     u8 unk2;
-    // func_02008df4 at the start of a save, which canceling restores
-    u8 unk3;
+    // TrainerDataSave_IsIntroSave at the start of a save, which canceling restores
+    u8 wasIntroSave;
     // What SaveOutside told of the data outside the save
     u8 giftsLoaded;
     u8 giftsBroken;
     u8 keysLoaded;
     u8 keysBroken;
     // The next save calls DreamRadar_MarkRead, which marks Dream Radar's data on the card as read
-    u8 unk8;
+    u8 markDreamRadarRead;
     u32 errors;
     SaveData *sv;
     SaveData *sv_extra[SAVE_EXTRA_ID_MAX];
@@ -151,7 +151,7 @@ BOOL MusicalDist_WriteStep(void *work);
 void *getAddressOfExtraSaveBlk(SaveControl *save, u32 block, u32 arg2);
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *save, u32 block);
 u32 SaveControl_GetStatus(SaveControl *save);
-void func_020074b8(SaveControl *save, u32 *a1, u32 *a2);
+void SaveControl_GetChangedSize(SaveControl *save, u32 *changed, u32 *total);
 // The bytes written so far of the save in progress, SaveData_GetBytesWritten of the save's SaveData
 u32 SaveControl_GetBytesWritten(SaveControl *save);
 u32 SaveControl_GetErrors(SaveControl *save);
@@ -236,16 +236,16 @@ void KeyDataSave_SetMoney(KeyDataSave *keyData, u32 value);
 RivalDataSave *getHollow_RivalData(SaveControl *save);
 // Save block 0x42, and setting a byte of it
 void *getHollow_RivalBlk(SaveControl *save);
-void func_0200ff78(void *rival, u32 value);
+void HollowRivalSave_SetMeetingToday(void *rival, u32 value);
 // The rival's hollow data: a value of an index, a flag of an index, and the hollows visited
 void HollowRivalSave_SetValue(void *block, u32 index, u16 value);
 u16 HollowRivalSave_GetValue(void *block, u16 index);
 void HollowRivalSave_SetFlag(void *block, u16 index, u32 value);
-void func_0200ff6c(void *block);
-u16 func_0200ff74(void *block);
-void func_0200ff94(void *block, u32 value);
-void func_0200ffb0(void *block, u16 value);
-void func_0200ffb8(void *block, u32 value);
+void HollowRivalSave_ClearMeeting(void *block);
+u16 HollowRivalSave_GetMeeting(void *block);
+void HollowRivalSave_SetHasSpecies(void *block, u32 value);
+void HollowRivalSave_SetSpecies(void *block, u16 value);
+void HollowRivalSave_SetMet(void *block, u32 value);
 BOOL func_0200ffd4(void *block, int index);
 // The C-Gear's save block (getCGearDataBlkAddress)
 // Copies the C-Gear's record at index, 4 u16
@@ -254,8 +254,8 @@ void copyRivalNameIntoHollowBlock(RivalDataSave *data, const u16 *name);
 const u16 *getPtrToRivalName(RivalDataSave *data);
 u32 TrainerGameInfo_GetStartMenuFlags(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetStartMenuFlags(TrainerGameInfoSave *info, u32 value);
-u32 func_0200ca74(TrainerGameInfoSave *info);
-void func_0200ca78(TrainerGameInfoSave *info, u32 value);
+u32 TrainerGameInfo_GetKeyNotice(TrainerGameInfoSave *info);
+void TrainerGameInfo_SetKeyNotice(TrainerGameInfoSave *info, u32 value);
 u32 getBadgeCount(TrainerGameInfoSave *info);
 // Two bits for each of the start menu's items that are added later: TrainerGameInfo_AddStartMenuItemFlags sets bits,
 // and TrainerGameInfo_GetStartMenuItemFlags returns them. 1 marks the item as new
@@ -263,7 +263,7 @@ void TrainerGameInfo_AddStartMenuItemFlags(TrainerGameInfoSave *info, u32 item, 
 u8 TrainerGameInfo_GetStartMenuItemFlags(TrainerGameInfoSave *info, u32 item);
 BOOL SaveControl_IsDataAlreadyPresent(SaveControl *save);
 // Whether the save is of another game, which the report may not overwrite
-BOOL func_0200746c(SaveControl *save);
+BOOL SaveControl_IsNewGameOverSave(SaveControl *save);
 
 // Saving a step at a time: SaveControl_StartSave starts, SaveControl_ContinueSave continues and returns the status, and
 // SaveControl_CancelSave cancels
@@ -284,7 +284,7 @@ u8 SaveControl_GetKeysBroken(SaveControl *save);
 void SaveControl_SetKeysBroken(SaveControl *save, u32 value);
 // Used to delete the save data: SaveControl_OpenExtraBlock tells whether a block is in the save, and
 // SaveControl_ClearExtraBlock clears it
-void func_020074ac(SaveControl *save);
+void SaveControl_Erase(SaveControl *save);
 u32 SaveControl_OpenExtraBlock(SaveControl *save, u32 block, HeapID heapId);
 void SaveControl_InitExtraBlock(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size);
 // Reads one of the two copies of a block from the card
@@ -311,7 +311,7 @@ u16 FestRecords_AddHosted(void *records);
 u16 FestRecords_AddJoined(void *records);
 u16 FestRecords_GetCompleted(void *a0);
 u8 FestRecords_GetMostParticipants(void *a0);
-u16 func_02010e94(void *a0);
+u16 FestRecords_GetTopScores(void *a0);
 // A Funfest mission's record in FestRecords_GetFromSave's block, by the mission's index, which is 0 for an index past
 // the missions: a 14-bit count, another count, the highest level cleared (0 to 4) and whether the mission is new, which
 // FestRecords_ClearMissionNew clears

@@ -158,11 +158,11 @@ void FMissionLogEntryFV_SetWords(FestMissionLogEntry *entry, WordSet *wordSet, H
         break;
     case LOG_VALUE_TEXT:
         FMissionLogEntryFV_GetText(entry, name);
-        func_0202437c(wordSet, 0, name, entry->gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, name, entry->gender, 1, 2);
         break;
     case LOG_VALUE_PASS_POWER:
         FestMissionLogEntry_GetName(entry, name);
-        func_0202437c(wordSet, 0, name, entry->gender, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, name, entry->gender, 1, 2);
         loadPassPowerToStrbuf(wordSet, 1, entry->value);
         break;
     case LOG_VALUE_SPECIES:

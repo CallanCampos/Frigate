@@ -429,9 +429,9 @@ static void EggDemoView_AddMcss(EggDemoView *view) {
     scale.y = FX32_CONST(16);
     scale.z = FX32_ONE;
     MCSS_SetScale(view->mcss, &scale);
-    height = func_0201ade8(view->mcss);
-    top = func_0201adf8(view->mcss);
-    left = func_0201adf0(view->mcss);
+    height = MCSS_GetHeight(view->mcss);
+    top = MCSS_GetOffsetY(view->mcss);
+    left = MCSS_GetOffsetX(view->mcss);
     if (height > 96.0f) {
         height = 96.0f;
     }

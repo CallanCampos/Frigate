@@ -708,7 +708,7 @@ static void PkwdSelectScreen_CreateNewMarks(PkwdSelectScreenWork *wk) {
         setup.bgPriority = 2;
         wk->newMarks[i] = ClActor_Create(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->newRes.chars,
                                          wk->newRes.palette, wk->newRes.cellAnims, &setup, 0, HEAPID_PKWD_SELECTSCREEN);
-        func_0204c520(wk->newMarks[i], TRUE);
+        ClActor_SetAutoAnim(wk->newMarks[i], TRUE);
     }
 }
 
@@ -762,7 +762,7 @@ static void PkwdSelectScreen_CreateMarks(PkwdSelectScreenWork *wk) {
         setup.bgPriority = 1;
         wk->marks[i] = ClActor_Create(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->markRes.chars,
                                       wk->markRes.palette, wk->markRes.cellAnims, &setup, 1, HEAPID_PKWD_SELECTSCREEN);
-        func_0204c520(wk->marks[i], TRUE);
+        ClActor_SetAutoAnim(wk->marks[i], TRUE);
     }
 }
 
@@ -780,7 +780,7 @@ static void PkwdSelectScreen_SetMarkVisible(PkwdSelectScreenWork *wk, u32 mark, 
 
 static void PkwdSelectScreen_SetMarkSequence(PkwdSelectScreenWork *wk, u32 mark, s32 sequence) {
     ClActor_SetSequence(wk->marks[mark], sequence);
-    func_0204c520(wk->marks[mark], TRUE);
+    ClActor_SetAutoAnim(wk->marks[mark], TRUE);
 }
 
 // Sends the windows whose text is printed to VRAM

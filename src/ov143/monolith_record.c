@@ -293,7 +293,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
                              wk->font);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 15, str);
     PrintWindow_PrintNoColor(&rw->prints[5], wk->printQueue, 0, 0, str, wk->font);
-    value = func_02010e94(records);
+    value = FestRecords_GetTopScores(records);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 20, str);
     WordSetNumber(wk->wordSet, 0, value, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, expanded, str);

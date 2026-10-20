@@ -285,7 +285,7 @@ void DpcMain_LoadTeams(DendouPCWork *wk) {
     DpcMain_CreateTeamStrings(wk);
 
     if (wk->param->mode == DENDOU_PC_MODE_FIRST_CLEAR) {
-        HallOfFameTeam *team = func_020179c8(wk->param->gameData);
+        HallOfFameTeam *team = GameData_GetHallOfFameTeam(wk->param->gameData);
 
         wk->teams[0].count = HallOfFameTeam_GetPokemonCount(team);
         HallOfFameTeam_GetDate(team, &wk->teams[0].date);

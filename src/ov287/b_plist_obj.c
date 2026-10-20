@@ -137,7 +137,7 @@ static void BPlistObj_LoadPokeIconRes(BPlistWork *wk) {
 
     for (i = 0; i < 6; i++) {
         if (wk->pokemon[i].species != 0) {
-            res[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE,
+            res[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(wk->pokemon[i].pkm)), FALSE,
                                         CLACT_VRAM_SUB, wk->param->heapId);
         } else {
             res[i] = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB,
@@ -197,9 +197,12 @@ static void BPlistObj_LoadCursorRes(BPlistWork *wk) {
 static void BPlistObj_LoadPlateIconRes(BPlistWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(wk->param->heapId));
 
-    wk->charRes[25] = ClActSys_LoadChars(arc, func_0202d958(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[5] = ClActSys_LoadPltt(arc, func_0202d954(), CLACT_VRAM_SUB, 0x120, wk->param->heapId);
-    wk->cellRes[5] = ClActSys_LoadCellAnims(arc, func_0202d95c(0), func_0202d960(0), wk->param->heapId);
+    wk->charRes[25] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetHpBarCharFile(0), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[5] =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetHpBarPaletteFile(), CLACT_VRAM_SUB, 0x120, wk->param->heapId);
+    wk->cellRes[5] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetHpBarCellFile(0), AppMenuCommon_GetHpBarAnimFile(0),
+                                            wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 

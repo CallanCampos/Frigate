@@ -348,12 +348,12 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         break;
     case 12:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 0x14) == TRUE) {
-            func_02042a9c(NetHandle_GetOwn(), TRUE);
+            GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
             *step = 13;
         }
         break;
     case 13:
-        func_02042e9c(FALSE);
+        GFL_NetSetDisconnectError(FALSE);
         if (self->activity == 3) {
             param = subproc->arg;
             param->app = unisys->alloc.uniapp;

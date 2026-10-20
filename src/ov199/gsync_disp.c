@@ -464,7 +464,7 @@ static void GSyncDisp_CreateSubActorAt(GSyncDisp *disp, s16 x, s16 y) {
         disp->actors[GSYNC_DISP_ACTOR_SUB] =
             ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_SUB], disp->res[GSYNC_DISP_RES_PLTT_SUB],
                            disp->res[GSYNC_DISP_RES_CELL_SUB], &setup, CLACT_SURFACE_SUB, disp->heapId);
-        func_0204c520(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
+        ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
         ClActor_SetVisible(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
     }
 }
@@ -484,7 +484,7 @@ static void GSyncDisp_InitActor(GSyncDisp *disp, int index) {
         ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_ACTORS], disp->res[GSYNC_DISP_RES_PLTT_ACTORS],
                        disp->res[GSYNC_DISP_RES_CELL_ACTORS], &setup, CLACT_SURFACE_MAIN, disp->heapId);
     ClActor_SetAnimTime(disp->actors[index], 0);
-    func_0204c520(disp->actors[index], TRUE);
+    ClActor_SetAutoAnim(disp->actors[index], TRUE);
     ClActor_SetVisible(disp->actors[index], TRUE);
     ClActor_SetAffineMode(disp->actors[index], 2);
 }
@@ -536,19 +536,19 @@ void GSyncDisp_CreatePokeIcon(GSyncDisp *disp, BoxPkm *pkm, u32 surface) {
     disp->actors[GSYNC_DISP_ACTOR_POKE_ICON] =
         ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_POKE_ICON], disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON],
                        disp->res[GSYNC_DISP_RES_CELL_POKE_ICON], &setup, surface, disp->heapId);
-    func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], FALSE);
+    ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], FALSE);
     ClActor_SetVisible(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
     ClActor_SetPalette(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], PokeIcon_GetPaletteOfPkm(pkm), 1);
     GFL_ArcToolFree(arc);
 }
 
 void GSyncDisp_StartPokeIcon(GSyncDisp *disp) {
-    func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
+    ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
 }
 
 void GSyncDisp_PokeIconSequence1(GSyncDisp *disp) {
     ClActor_SetSequence(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], 1);
-    func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
+    ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
 }
 
 // The progress gauge's colors, the line where it is filled and the lines below it, then white
@@ -656,7 +656,7 @@ static void GSyncDisp_StartPokemonFloat(GSyncDisp *disp, int index) {
 
         ClActor_SetSurfacePos(actor, &pos, CLACT_SURFACE_MAIN);
         ClActor_SetScale(actor, &scale);
-        func_0204c520(actor, FALSE);
+        ClActor_SetAutoAnim(actor, FALSE);
         ClActor_SetVisible(actor, FALSE);
         ClActor_SetObjMode(actor, 1);
         ClActor_SetAffineMode(actor, 2);
@@ -680,7 +680,7 @@ static void GSyncDisp_StartItemFloat(GSyncDisp *disp, int index) {
 
         ClActor_SetSurfacePos(actor, &pos, CLACT_SURFACE_MAIN);
         ClActor_SetScale(actor, &scale);
-        func_0204c520(actor, FALSE);
+        ClActor_SetAutoAnim(actor, FALSE);
         ClActor_SetVisible(actor, FALSE);
         ClActor_SetObjMode(actor, 1);
         ClActor_SetAffineMode(actor, 2);
@@ -889,7 +889,7 @@ static void GSyncDisp_CreatePokemonFloatActor(GSyncDisp *disp) {
     disp->floatPokemonActor = ClActor_Create(
         disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_FLOAT_POKEMON], disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON],
         disp->res[GSYNC_DISP_RES_CELL_POKE_ICON], &setup, CLACT_SURFACE_MAIN, disp->heapId);
-    func_0204c520(disp->floatPokemonActor, FALSE);
+    ClActor_SetAutoAnim(disp->floatPokemonActor, FALSE);
     ClActor_SetVisible(disp->floatPokemonActor, FALSE);
     GFL_ArcToolFree(arc);
 }
@@ -914,6 +914,6 @@ static void GSyncDisp_CreateItemFloatActor(GSyncDisp *disp) {
     disp->floatItemActor =
         ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_ITEM], disp->res[GSYNC_DISP_RES_PLTT_ITEM],
                        disp->res[GSYNC_DISP_RES_CELL_ITEM], &setup, CLACT_SURFACE_MAIN, disp->heapId);
-    func_0204c520(disp->floatItemActor, FALSE);
+    ClActor_SetAutoAnim(disp->floatItemActor, FALSE);
     ClActor_SetVisible(disp->floatItemActor, FALSE);
 }

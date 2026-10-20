@@ -124,13 +124,13 @@ BOOL GFL_SndBGMStack_LoadSeq(u32 seq) {
     return result;
 }
 
-void func_020059d8(void) {
+void GFL_SndBGMStack_SaveSeqLevel(void) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
 
     entry->seqLevel = NNS_SndHeapSaveState(*sBGMStack.heap);
 }
 
-BOOL func_020059fc(u32 seq) {
+BOOL GFL_SndBGMStack_SetLoadedSeq(u32 seq) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
 
     entry->waveLevel = NNS_SndHeapSaveState(*sBGMStack.heap);
@@ -138,7 +138,7 @@ BOOL func_020059fc(u32 seq) {
     return TRUE;
 }
 
-void func_02005a24(void) {
+void GFL_SndBGMStack_FreeSeq(void) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
 
     if (sBGMStackEntries[sBGMStack.depth].active) {

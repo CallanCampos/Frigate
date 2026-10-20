@@ -61,23 +61,23 @@ u32 ResortLayout_GetZoneIndex(u16 zoneId) {
     return 0;
 }
 
-void func_02039538(u16 index, u16 *x, u16 *z, u16 *dir) {
+void ResortLayout_GetOccupantPlace(u16 index, u16 *x, u16 *z, u16 *dir) {
     *x = sPlaces[index].x;
     *z = sPlaces[index].z;
     *dir = sPlaces[index].dir;
 }
 
-void func_02039560(u16 index, u16 *x, u16 *y) {
+void ResortLayout_GetShopOffset(u16 index, u16 *x, u16 *y) {
     *x = sShopOffsets[index].x;
     *y = sShopOffsets[index].y;
 }
 
-void func_02039578(u16 index, u16 *x, u16 *z, u16 *dir) {
+void ResortLayout_GetRecordPlace(u16 index, u16 *x, u16 *z, u16 *dir) {
     *x = sPlaces2[index].x;
     *z = sPlaces2[index].z;
     *dir = sPlaces2[index].dir;
 }
 
-u32 func_020395a0(u32 index) {
+u32 ResortLayout_GetSlotRow(u32 index) {
     return sUnk[index];
 }

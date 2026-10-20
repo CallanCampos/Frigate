@@ -311,7 +311,7 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
     u32 error = MYSTERY_NET_ERROR_NONE;
 
     if (GFL_NetErrCheck()) {
-        switch (NetState_GetErrorInfo()->unk4) {
+        switch (NetState_GetErrorInfo()->errorType) {
         case 1:
         case 2:
         case 3:
@@ -378,7 +378,7 @@ static void MysteryNet_WirelessStart(MysteryNetSeq *seq, int *state, void *work)
         if (GFL_NetIsInitialized()) {
             GFL_NetSetIconScreen(TRUE, net->heapId);
             net->wifiWork = WihDwc_Create(4, net->heapId);
-            func_02042968();
+            GFL_NetStartScan();
             *state = 2;
         }
         break;

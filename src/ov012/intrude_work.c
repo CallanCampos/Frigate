@@ -18,8 +18,8 @@ BOOL Intrude_CanBootGameComm(GameSystem *gsys) {
 void *Intrude_GetCommWork(GameCommSys *commSys) {
     void *work = GameCommSys_GetWork(commSys);
 
-    if (GFL_NetErrCheck() || GameCommSys_BootCheck(commSys) != 2 || GameCommSys_IsTransitioning(commSys) == TRUE ||
-        work == NULL) {
+    if (GFL_NetErrCheck() || GameCommSys_BootCheck(commSys) != GAME_COMM_NO_INTRUDE ||
+        GameCommSys_IsTransitioning(commSys) == TRUE || work == NULL) {
         return NULL;
     }
     return work;

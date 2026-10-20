@@ -516,8 +516,8 @@ static u32 StartMenu_WaitPrint(StartMenuWork *wk) {
         if (StartMenu_CheckBrokenSave(wk) == TRUE) {
             return STATE_BROKEN_SAVE;
         }
-        if (func_0200ca74(wk->gameInfo) == TRUE) {
-            func_0200ca78(wk->gameInfo, 0);
+        if (TrainerGameInfo_GetKeyNotice(wk->gameInfo) == TRUE) {
+            TrainerGameInfo_SetKeyNotice(wk->gameInfo, 0);
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, FALSE);
             StartMenu_SetItemActorsVisible(wk, FALSE);
             return StartMenu_WipeIn(wk, STATE_KEY_NOTICE);
@@ -1133,7 +1133,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
         joinAvenueInfo = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(wk->save));
         name = GFL_StrBufCreate(64, HEAPID_STARTMENU);
         GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
-        func_0202437c(wk->wordSet, 0, name, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 2, 1, 2);
         GFL_StrBufFree(name);
     }
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, fmt);
@@ -1288,7 +1288,7 @@ static void StartMenu_InitObj(StartMenuWork *wk) {
     for (i = 0; i <= 3; i++) {
         wk->actors[i] = ClActor_Create(wk->clactUnit, wk->chars[OBJ_RES_NEW], wk->palettes[OBJ_RES_NEW],
                                        wk->cellAnims[OBJ_RES_NEW], &sNewActorSetup, 0, HEAPID_STARTMENU);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
         ClActor_SetVisible(wk->actors[i], FALSE);
     }
     wk->actors[ACTOR_WFC_SETTINGS] =

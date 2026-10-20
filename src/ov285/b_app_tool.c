@@ -30,7 +30,7 @@ void BAppCursor_CreateActors(BAppCursor *cursor, ClActUnit *unit, u32 chars, u32
         setup.sequence = i;
         cursor->corners[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, 1, cursor->heapId);
         ClActor_SetPalette(cursor->corners[i], 0, 1);
-        func_0204c520(cursor->corners[i], TRUE);
+        ClActor_SetAutoAnim(cursor->corners[i], TRUE);
     }
 }
 

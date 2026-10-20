@@ -634,7 +634,7 @@ BoxPkm *Box2Main_GetBoxPkm(Box2SysWork *syswk, u32 tray, u32 pos) {
             pos -= BOX2_PARTY_POS;
         }
         if (PokeParty_GetPkmCount(syswk->param->party) > pos) {
-            return func_0201d620(PokeParty_GetPkm(syswk->param->party, pos));
+            return PokeParty_GetBoxPkm(PokeParty_GetPkm(syswk->param->party, pos));
         }
     } else if (pos != BOX2_GET_NONE) {
         return BoxSaveAccessor_GetPkm(syswk->param->boxes, tray, pos);
@@ -663,7 +663,7 @@ static void PokeDataSwapBoxParty(Box2SysWork *syswk, Box2PokeMoveData *box, Box2
     pkm = boxPkmRegenToPartyPkm(Box2Main_GetBoxPkm(syswk, tray, box->dfPos), HEAPID_TAIL(HEAPID_BOX2_APP));
     index = party->dfPos - BOX2_PARTY_POS;
     BoxSaveAccessor_SetPkm(syswk->param->boxes, tray, box->dfPos,
-                           func_0201d624(PokeParty_GetPkm(syswk->param->party, index)));
+                           PokeParty_ToBoxPkm(PokeParty_GetPkm(syswk->param->party, index)));
     copyPkmIntoPartyBlk(syswk->param->party, index, pkm);
     GFL_HeapFree(pkm);
     Box2Obj_MakeTrayIconChar(syswk, tray);
@@ -723,7 +723,7 @@ static void PokeDataMovePartyToBox(Box2SysWork *syswk, Box2PokeMoveData *party) 
             index = x + (party->dfPos - BOX2_PARTY_POS + y * 2);
             if (index < count) {
                 BoxSaveAccessor_SetPkm(syswk->param->boxes, syswk->tray, x + (party->mvPos + y * 6),
-                                       func_0201d624(PokeParty_GetPkm(syswk->param->party, index)));
+                                       PokeParty_ToBoxPkm(PokeParty_GetPkm(syswk->param->party, index)));
                 moved |= 1 << index;
             }
         }
@@ -835,7 +835,7 @@ static void PokeDataPartyMoveToTray(Box2SysWork *syswk, u32 pos, u32 dstTray) {
                 Box2Main_RecalcPartyStats(syswk, i + BOX2_PARTY_POS);
                 PokeDex_RegistPkm(GameData_GetPokedex(syswk->param->gameData), pkm);
             }
-            BoxSaveAccessor_InsertPkmCore(syswk->param->boxes, box, func_0201d624(pkm));
+            BoxSaveAccessor_InsertPkmCore(syswk->param->boxes, box, PokeParty_ToBoxPkm(pkm));
         }
     }
 
