@@ -16,7 +16,7 @@
 #define GFL_NET_IRC_SEND_MAX 0x80
 
 static struct {
-    // The heap net.c makes its heaps under, once func_020425a0 has made it
+    // The heap net.c makes its heaps under, once GFL_NetBoot has made it
     HeapID parentHeapId;
     // The offset of BG 1 of the main engine
     int bg1Y;
@@ -28,7 +28,7 @@ static void GFL_NetFinishExit(void *work);
 static void GFL_NetSetInitIconPos(int x, int y);
 static void GFL_NetRefreshIcon(void);
 
-void func_020425a0(int a0, int a1, HeapID parentHeapId, HeapID heapId) {
+void GFL_NetBoot(int a0, int a1, HeapID parentHeapId, HeapID heapId) {
     const GFLNetDevTable *pDevTable = NetDefine_LoadDevice(GFL_NET_TYPE_WIFI);
 
     if (pDevTable != NULL) {
@@ -227,11 +227,11 @@ void GFL_NetStartAsChild(const u8 *mac) {
     NetState_ConnectMac(mac, FALSE);
 }
 
-void func_02042968(void) {
+void GFL_NetStartScan(void) {
     NetState_StartScan();
 }
 
-void func_02042970(void) {
+void GFL_NetStartServer(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     switch (pNet->aNetInit.bNetType) {
@@ -246,7 +246,7 @@ void func_02042970(void) {
     }
 }
 
-void func_020429a8(void (*callback)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work)) {
+void GFL_NetIwChangeoverConnect(void (*callback)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work)) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (NetIw_IsRunning() == TRUE) {
@@ -263,7 +263,7 @@ void GFL_NetIwGetCollectedMac(u8 *mac, int index) {
     NetIw_GetCollectedMac(mac, index);
 }
 
-void func_020429e8(void *a0) {
+void GFL_NetIwSetPeerFilter(void *a0) {
     func_0204307c(a0);
 }
 
@@ -271,29 +271,29 @@ void GFL_NetIwFree(void) {
     NetIw_Free();
 }
 
-void func_020429f8(void (*callback)(void *work)) {
+void GFL_NetChangeoverConnect(void (*callback)(void *work)) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     NetState_StartChangeover(pNet->aNetInit.heapId, callback, 1);
 }
 
-void func_02042a10(int unused) {
+void GFL_NetStartSearch(int unused) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     NetState_StartSearch();
 }
 
-void func_02042a1c(int a0) {
+void GFL_NetHoldScan(int a0) {
     if (GFL_NetIsInitialized()) {
         NetSystem_HoldScan(a0);
     }
 }
 
-void func_02042a30(int mode, int a1, const u8 *mac) {
+void GFL_NetSetChangeoverMode(int mode, int a1, const u8 *mac) {
     NetState_SetChangeoverMode(mode, a1, mac);
 }
 
-BOOL func_02042a38(void) {
+BOOL GFL_NetIwFinishCollecting(void) {
     return func_020437a0();
 }
 
@@ -301,11 +301,11 @@ void GFL_NetIwOverrideNetId(int a0) {
     NetIw_OverrideNetId(a0);
 }
 
-u8 func_02042a48(void) {
+u8 GFL_NetIwGetLinkedCount(void) {
     return func_0204381c();
 }
 
-void func_02042a50(int a0) {
+void GFL_NetSetTimeout(int a0) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->pDevTable != NULL) {
@@ -328,7 +328,7 @@ BOOL GFL_NetIsNegotiated(u8 netId) {
     return NetHandle_IsNegotiated(NetHandle_Get(netId));
 }
 
-void func_02042a9c(NetHandle *handle, int a1) {
+void GFL_NetSetAcceptConnect(NetHandle *handle, int a1) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->pDevTable->setAcceptConnect != NULL) {
@@ -481,7 +481,7 @@ u8 GFL_NetGetGameCommandBase(void) {
     return 0;
 }
 
-int func_02042d48(void) {
+int GFL_NetGetUserData(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.getUserData != NULL) {
@@ -490,7 +490,7 @@ int func_02042d48(void) {
     return 0;
 }
 
-int func_02042d64(void) {
+int GFL_NetGetFriendData(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.getFriendData != NULL) {
@@ -505,7 +505,7 @@ u8 func_02042d80(void) {
     return pNet->aNetInit.unk62;
 }
 
-void func_02042d8c(BOOL a0) {
+void GFL_NetSetMPSendEnabled(BOOL a0) {
     NetSystem_SetMPSendEnabled(a0);
 }
 
@@ -539,14 +539,14 @@ int GFL_NetGetMaxSendSize(void) {
     return pNet->aNetInit.maxSendSize;
 }
 
-u16 func_02042df4(void) {
+u16 GFL_NetGetParentPacketSize(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     GFL_ASSERT(pNet);
     return pNet->aNetInit.parentPacketSize;
 }
 
-void func_02042e18(void) {
+void GFL_NetNotifyChildConnect(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.childConnectCallback != NULL) {
@@ -562,7 +562,7 @@ void func_02042e30(int a0) {
     }
 }
 
-void func_02042e54(int a0) {
+void GFL_NetNotifyError(int a0) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet->aNetInit.errorCallback != NULL) {
@@ -585,7 +585,7 @@ void func_02042e94(u8 a0) {
     func_02042410(a0);
 }
 
-void func_02042e9c(BOOL a0) {
+void GFL_NetSetDisconnectError(BOOL a0) {
     NetState_SetDisconnectError(a0);
 }
 
@@ -618,7 +618,7 @@ void GFL_NetSetInitData(const GFLNetInitData *pNetInit) {
     MI_CpuCopy8(pNetInit, &GFL_NetGetSys()->aNetInit, sizeof(GFLNetInitData));
 }
 
-void func_02042f10(void) {
+void GFL_NetClearCallbacks(void) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     if (pNet != NULL) {
@@ -641,7 +641,7 @@ void GFL_NetResetIconPos(void) {
     GFL_NetRefreshIcon();
 }
 
-void func_02042f50(BOOL a0) {
+void GFL_NetSetRejectNegotiated(BOOL a0) {
     if (sNet.pNet != NULL) {
         if (a0 == TRUE) {
             sNet.pNet->rejectNegotiated = TRUE;

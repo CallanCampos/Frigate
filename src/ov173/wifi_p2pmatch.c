@@ -1845,7 +1845,7 @@ static void WifiP2PMatch_StartVChat(WIFIP2PMATCH_WORK *wk) {
 
 // State 0x41: connected. The side that called asks what to do; the other waits
 static int WifiP2PMatch_StateConnected(WIFIP2PMATCH_WORK *wk, int seq) {
-    func_02042a9c(NetHandle_GetOwn(), 0);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
     if (!GFL_NetIsParent()) {
         wk->result = 3;
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
@@ -1893,7 +1893,7 @@ static int WifiP2PMatch_StatePlayYesNo(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // State 0x44: the parent asks what to play; the child waits
 static int WifiP2PMatch_StateGameModeMessage(WIFIP2PMATCH_WORK *wk, int seq) {
-    func_02042a9c(NetHandle_GetOwn(), 0);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
     if (GFL_NetIsParent()) {
         wk->result = 3;
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
@@ -2991,7 +2991,7 @@ static int WifiP2PMatch_StateTalkEndTimingWait(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     func_02042e94(0);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     if (GFL_NetIsParent()) {
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_EndedConversation, FALSE);
     } else {
@@ -3005,7 +3005,7 @@ static int WifiP2PMatch_StateTalkEndTimingWait(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateDeclineReset(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     func_02042e94(0);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_DECLINE_MSG;
     return seq;
 }
@@ -3026,7 +3026,7 @@ static int WifiP2PMatch_StateDeclineMsg(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateCancelReset(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     func_02042e94(0);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     wk->seq = WIFIP2PMATCH_SEQ_CANCEL_MSG;
     return seq;
 }
@@ -3064,7 +3064,7 @@ static int WifiP2PMatch_StateRefusedMsg(WIFIP2PMATCH_WORK *wk, int seq) {
 // State 0x8e
 static int WifiP2PMatch_StateDisconnectStart(WIFIP2PMATCH_WORK *wk, int seq) {
     func_02042e94(0);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     wk->timer = 0;
     wk->seq = WIFIP2PMATCH_SEQ_CUT_CONNECTION;
     return seq;
@@ -3179,7 +3179,7 @@ static int WifiP2PMatch_StateUnableMsg(WIFIP2PMATCH_WORK *wk, int seq) {
     WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
     wk->result = 0;
     func_02042e94(0);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     if (GFL_NetIsParent()) {
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_FriendApparentlyUnableParticipate, FALSE);
     } else {
@@ -3191,7 +3191,7 @@ static int WifiP2PMatch_StateUnableMsg(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // State 0x79: back from a game. The child is asked to play again and the parent waits
 static int WifiP2PMatch_StateReturnFromGame(WIFIP2PMATCH_WORK *wk, int seq) {
-    func_02042a9c(NetHandle_GetOwn(), 0);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
     if (!GFL_NetIsParent()) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
         WifiP2PMatch_PrintMessage(wk, WifiP2pmatch_Text_WouldLikePlayAgain, FALSE);
@@ -3267,7 +3267,7 @@ static int WifiP2PMatch_StateGameStart(WIFIP2PMATCH_WORK *wk, int seq) {
         wk->endSeq = gameMode;
         return 2;
     default:
-        func_02042a9c(NetHandle_GetOwn(), 0);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
         if (GFL_NetIsParent()) {
             if (WifiP2PMatch_CheckParty(wk->regulation, wk->gameData, &flags) != 0 &&
                 WifiP2PMatch_CheckBattleBoxParty(wk->regulation, wk->battleBoxParty, &flags) != 0) {
@@ -3463,15 +3463,15 @@ static BOOL WifiP2PMatch_PassesRegulation(WIFIP2PMATCH_WORK *wk) {
 // The network's side of a status change
 static void WifiP2PMatch_ChangeNetStatus(WIFIP2PMATCH_WORK *wk, u32 status, u32 gameMode) {
     if (status == WIFIP2PMATCH_STATUS_WAIT) {
-        func_02042d8c(FALSE);
+        GFL_NetSetMPSendEnabled(FALSE);
         WifiP2PMatch_NetInit(wk, FALSE);
     } else if (WifiP2PMatch_IsBattlePlaying(status, gameMode)) {
-        func_02042d8c(TRUE);
+        GFL_NetSetMPSendEnabled(TRUE);
     }
     switch (status) {
     case 2:
     case 5:
-        func_02042a9c(NetHandle_GetOwn(), 1);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 1);
         break;
     case 0:
     case 1:
@@ -3479,7 +3479,7 @@ static void WifiP2PMatch_ChangeNetStatus(WIFIP2PMATCH_WORK *wk, u32 status, u32 
     case 4:
     case 6:
     default:
-        func_02042a9c(NetHandle_GetOwn(), 1);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 1);
         break;
     }
 }
@@ -4358,7 +4358,7 @@ static int WifiP2PMatch_StateRoomStart(WIFIP2PMATCH_WORK *wk, int seq) {
     wk->seq = WIFIP2PMATCH_SEQ_ROOM;
     WifiP2PMatch_RoomResume(wk);
     func_02042e94(0);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     return seq;
 }
 
@@ -4588,7 +4588,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
     if (WifiP2PMatch_IsConnected(wk) && wk->preConnect != -1) {
         GFL_SEPlayKeepVol(SEQ_SE_SYS_101, 0);
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_FRIEND_CONNECTED;
         return seq;
     }
@@ -4691,7 +4691,7 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
     if (WifiP2PMatch_IsConnected(wk) && wk->preConnect != -1) {
         GFL_SEPlayKeepVol(SEQ_SE_SYS_101, 0);
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         wk->seq = WIFIP2PMATCH_SEQ_FRIEND_CONNECTED;
         return seq;
     }
@@ -4972,7 +4972,7 @@ static int WifiP2PMatch_StateVChatEndTiming(WIFIP2PMATCH_WORK *wk, int seq) {
         } else {
             WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
             func_02042e94(0);
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x15, 10);
             wk->seq = WIFIP2PMATCH_SEQ_VCHAT_DISCONNECT_TIMING;
         }
@@ -5414,7 +5414,7 @@ static int WifiP2PMatch_StateFriendSelect(WIFIP2PMATCH_WORK *wk, int seq) {
     int game = 0;
     WIFI_STATUS *targetStatus = &wk->targetStatus;
 
-    func_02042a9c(NetHandle_GetOwn(), 0);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
     friendNo = WIFI_MCR_PlayerSelect(&wk->room);
     obj = WifiP2PMatch_GetMoveObj(wk, friendNo);
     WIFI_MCR_NpcPauseOn(&wk->room, obj, WIFI_MCR_GetRetWay(WifiP2PMatch_GetMoveObj(wk, 0)));
@@ -5831,7 +5831,7 @@ static int WifiP2PMatch_StateJoinWait(WIFIP2PMATCH_WORK *wk, int seq) {
         WifiP2PMatchNet_CommandInit(wk);
         wk->timer = 30;
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
     }
     return seq;
 }
@@ -6074,7 +6074,7 @@ static int WifiP2PMatch_StateConnectDataWait(WIFIP2PMATCH_WORK *wk, int seq) {
 static int WifiP2PMatch_StateConnectTiming(WIFIP2PMATCH_WORK *wk, int seq) {
     if (!WifiP2PMatch_CheckDisconnect(wk) && NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xf, 10)) {
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x12, 10);
         wk->seq = WIFIP2PMATCH_SEQ_CONNECT_END;
     }
@@ -6221,7 +6221,7 @@ static int WifiP2PMatch_StateRetryYesNoInit(WIFIP2PMATCH_WORK *wk, int seq) {
         return seq;
     }
     func_02042e94(0);
-    func_02042e9c(TRUE);
+    GFL_NetSetDisconnectError(TRUE);
     if (WifiP2PMatch_IsMessageEnd(wk)) {
         WifiP2PMatch_YesNoStart(wk);
         wk->seq = WIFIP2PMATCH_SEQ_RETRY_YES_NO;
@@ -7069,7 +7069,7 @@ static BOOL WifiP2PMatch_ProcMain(GameProc *proc, u32 *state, void *param, void 
             WifiP2PMatch_ClosePartyMenu(wk);
             WifiP2PMatch_FreeWindows(wk);
             func_02042e94(0);
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             WifiP2PMatch_ChangeMyStatus(wk, WIFIP2PMATCH_STATUS_WAIT, 2);
             wk->unk135A = 0;
             wk->timer = 20;

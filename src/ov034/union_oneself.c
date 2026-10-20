@@ -592,7 +592,7 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
     }
     switch (*seq) {
     case 0:
-        func_02042a30(1, 1, NULL);
+        GFL_NetSetChangeoverMode(1, 1, NULL);
         situ->wait = 0;
         (*seq)++;
         break;
@@ -610,8 +610,8 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
                     UnionComm_RequestLink0(unisys);
                     *seq = 4;
                 } else {
-                    func_02042e9c(TRUE);
-                    func_02042a9c(NetHandle_GetOwn(), 0);
+                    GFL_NetSetDisconnectError(TRUE);
+                    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
                     *seq = 2;
                 }
             } else {
@@ -634,7 +634,7 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
         if (situ->mycomm.unk10[6] == 1) {
             if (GFL_STD_MemCmp(situ->mycomm.unk10, situ->mycomm.unk4->mac, 6) != 0) {
                 if (UnionMain_SendUnk46_2(2) == TRUE) {
-                    func_02042e9c(FALSE);
+                    GFL_NetSetDisconnectError(FALSE);
                     *seq = 6;
                 }
             } else if (UnionMain_SendUnk46_2(1) == TRUE) {
@@ -711,13 +711,13 @@ static BOOL UnionOneself_StepAskedRun(UnionSystem *unisys, UnionSelf *situ, Fiel
     switch (*seq) {
     case 0:
         GFL_ASSERT(situ->mycomm.answer_pc != NULL);
-        func_02042a30(2, 1, situ->mycomm.answer_pc->mac);
+        GFL_NetSetChangeoverMode(2, 1, situ->mycomm.answer_pc->mac);
         situ->wait = 0;
         *seq = 1;
         break;
     case 1:
         if (GFL_NetGetNegotiatedCount() > 1) {
-            func_02042e9c(TRUE);
+            GFL_NetSetDisconnectError(TRUE);
             *seq = 3;
         } else {
             situ->wait++;
@@ -1721,14 +1721,14 @@ static BOOL UnionOneself_StepRecruitRun(UnionSystem *unisys, UnionSelf *situ, Fi
     case 0:
         situ->mycomm.unk46_0 = 1;
         UnionComm_SetCommandBase(situ->mycomm.unk19);
-        func_02042a30(2, 1, unisys->found[entryIndex].mac);
+        GFL_NetSetChangeoverMode(2, 1, unisys->found[entryIndex].mac);
         situ->wait = 0;
         (*seq)++;
         break;
     case 1:
         if (UnionMsg_IsPrintDone(unisys)) {
             if (GFL_NetGetNegotiatedCount() > 1) {
-                func_02042e9c(TRUE);
+                GFL_NetSetDisconnectError(TRUE);
                 needed = UnionMsg_GetTableByte(situ->mycomm.unk19);
                 if (needed <= GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
                     *seq = 4;
@@ -2057,7 +2057,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
             }
             break;
         }
-        func_02042e9c(FALSE);
+        GFL_NetSetDisconnectError(FALSE);
         if (GFL_NetIsParent() == TRUE) {
             info = GetGameDataPlayerInfo(unisys->param->gameData);
             clsys->entryMenu = CommEntryMenu_Create(info, field, UnionMsg_GetTableByte(situ->mycomm.unk19),
@@ -2085,7 +2085,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
     case 1:
         if (situ->mycomm.unk46_1 == 0) {
             if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0xc, 0x14) == TRUE) {
-                func_02042a9c(NetHandle_GetOwn(), 1);
+                GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 1);
                 (*seq)++;
             }
         } else {
@@ -2106,7 +2106,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
             switch (result) {
             case COMM_ENTRY_MENU_DONE:
                 *seq = 0x64;
-                func_02042e9c(TRUE);
+                GFL_NetSetDisconnectError(TRUE);
                 break;
             case COMM_ENTRY_MENU_CANCELLED:
                 *seq = 0xc8;
@@ -2831,7 +2831,7 @@ static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *sit
         break;
     case 5:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x13, 0x14) == TRUE) {
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             (*seq)++;
         }
         break;

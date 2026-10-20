@@ -375,7 +375,7 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
         }
         if (GFL_NetIsInitialized()) {
             GFL_NetSetIconScreen(TRUE, HEAPID_KEY_SYSTEM);
-            func_020429a8(KeySystemNet_OnConnect, KeySystemNet_OnStart, KeySystemNet_OnDisconnect);
+            GFL_NetIwChangeoverConnect(KeySystemNet_OnConnect, KeySystemNet_OnStart, KeySystemNet_OnDisconnect);
             (*state)++;
         }
         break;
@@ -396,7 +396,7 @@ static void KeySystemNet_SeqConnect(KeySystemSeq *seq, int *state, void *work) {
         NetCommand_AddTable(NET_COMMAND_BASE, sKeySystemNetCommands, 1, net);
         NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, NET_COMMAND_BASE >> 8);
         func_02042e94(TRUE);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         (*state)++;
         break;
     case 4:
@@ -434,7 +434,7 @@ static void KeySystemNet_SeqDisconnect(KeySystemSeq *seq, int *state, void *work
     case 1:
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 13, NET_COMMAND_BASE >> 8)) {
             func_02042e94(FALSE);
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             (*state)++;
         }
         break;

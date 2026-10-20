@@ -257,7 +257,7 @@ void NetIw_Update(void) {
     case 5:
         if (GFL_NetIsInitialized() == TRUE) {
             GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->peerFilter);
-            func_020429f8(NetIw_ConnectedCallback);
+            GFL_NetChangeoverConnect(NetIw_ConnectedCallback);
             NetIw_SetState(sys, 6);
         }
         break;
@@ -271,7 +271,7 @@ void NetIw_Update(void) {
         break;
     case 7:
         if (sys->connected == TRUE && GFL_NetSendCommand(NetHandle_GetOwn(), 1, 0, NULL)) {
-            func_02042a50(200);
+            GFL_NetSetTimeout(200);
             NetIw_SetState(sys, 8);
         }
         break;
@@ -300,10 +300,10 @@ void NetIw_Update(void) {
     case 10:
         if (GFL_NetIsInitialized() == TRUE) {
             if (sys->netId == 0) {
-                func_02042970();
+                GFL_NetStartServer();
                 NetIw_SetState(sys, 12);
             } else if (sys->aNetInit.maxConnectNum == 4) {
-                func_02042968();
+                GFL_NetStartScan();
                 NetIw_SetState(sys, 11);
             } else {
                 GFL_NetStartAsParent(sys->collect.macs[0]);
@@ -370,7 +370,7 @@ void NetIw_Update(void) {
     case 15:
         if (GFL_NetIsInitialized() == TRUE) {
             GFL_NetGetSys()->pDevTable->setPeerFilter(NetIwSys->peerFilter);
-            func_020429f8(NetIw_ConnectedCallback);
+            GFL_NetChangeoverConnect(NetIw_ConnectedCallback);
             NetIw_SetState(sys, 16);
         }
         break;

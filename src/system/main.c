@@ -128,7 +128,7 @@ static void GameInit(void) {
     GFL_OvlLoad(OVERLAY_ID(27));
     GFL_TextRndInit(0);
     g_MainMemoryPriorityBlocked = FALSE;
-    func_020425a0(1, 0, 1, 12);
+    GFL_NetBoot(1, 0, 1, 12);
     setupDownloadPlayConfig(12);
     downloadPlayConfigForWifi();
     GCTX_ProcMgrQueueProc(OVERLAY_NONE, &EVENT_TITLE_FUNCS, NULL);

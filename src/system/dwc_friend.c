@@ -37,8 +37,8 @@ static int compareFriendData(DWCFriendData *friendData, DWCUserData *userData, D
 
 static int findFriendData(DWCFriendData *friendData, int *index) {
     int i;
-    DWCUserData *userData = (DWCUserData *)func_02042d48();
-    DWCFriendData *friends = (DWCFriendData *)func_02042d64();
+    DWCUserData *userData = (DWCUserData *)GFL_NetGetUserData();
+    DWCFriendData *friends = (DWCFriendData *)GFL_NetGetFriendData();
     int count = func_02042d80();
 
     *index = -1;
@@ -91,7 +91,7 @@ int WifiList_FindFriendKey(WifiList *wifiList, u64 friendKey, int *index) {
 
 BOOL DWCFriend_UpdateFriendData(DWCFriendData *friendData) {
     BOOL isNew = FALSE;
-    DWCFriendData *friends = (DWCFriendData *)func_02042d64();
+    DWCFriendData *friends = (DWCFriendData *)GFL_NetGetFriendData();
     int index;
     int result;
 

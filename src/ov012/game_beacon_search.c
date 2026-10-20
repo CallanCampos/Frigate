@@ -217,7 +217,7 @@ static BeaconSearchFound *GameBeaconSearch_ScanBeacons(BeaconSearchWork *work, i
         return NULL;
     }
     if (work->state == 1) {
-        func_02042a10(0);
+        GFL_NetStartSearch(0);
         work->state = 2;
         return NULL;
     }

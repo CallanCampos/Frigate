@@ -418,7 +418,7 @@ static void Update(u16 count) {
     case WH_SYSSTATE_ERROR:
         if (work != NULL) {
             if (!work->stopped) {
-                func_02042e54(WH_GetLastError());
+                GFL_NetNotifyError(WH_GetLastError());
             }
             work->stopped = TRUE;
         }

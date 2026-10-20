@@ -1048,7 +1048,7 @@ static GameEventReturnCode EventBSubwayCommEnd_Callback(GameEvent *event, u32 *s
     switch (*state) {
     case 0:
         if (GFL_NetIsParent() == TRUE) {
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
         }
         if ((*bsw)->unkC_9 == TRUE) {
             BSubwayComm_RemoveCommands(*bsw);

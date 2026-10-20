@@ -939,7 +939,7 @@ void FieldG3D_Update(Field *field) {
     loading = FieldG3DMapper_Update(field->g3DMapper);
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     if (loading) {
-        func_02042a1c(2);
+        GFL_NetHoldScan(2);
     }
 }
 
@@ -1095,7 +1095,7 @@ void Field_SwapZoneByMatrix(Field *field) {
     VecFx32 pos;
     u32 zoneId;
 
-    func_02042a1c(2);
+    GFL_NetHoldScan(2);
     EncountSystem_CancelPhenomenon(field->encountSystem);
     GetPlayerZoneStateWPos(zoneState, &pos);
     zoneId = GetZoneIDAtMatrixXZWorld(matrix, pos.x, pos.z);

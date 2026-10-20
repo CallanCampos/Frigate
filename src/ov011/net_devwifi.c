@@ -90,7 +90,7 @@ static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL succ
 }
 
 static BOOL NetDevWifi_Start(void (*callback)(BOOL ok)) {
-    BOOL result = DWCRap_Init((void *)func_02042d48(), (DWCFriendData *)func_02042d64());
+    BOOL result = DWCRap_Init((void *)GFL_NetGetUserData(), (DWCFriendData *)GFL_NetGetFriendData());
 
     if (callback != NULL) {
         callback(TRUE);

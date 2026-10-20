@@ -427,7 +427,7 @@ CommEntryMenu *CommEntryMenu_Create(const PlayerInfo *info, Field *field, u32 mi
     if (mac != NULL) {
         MI_CpuCopy8(mac, menu->mac, sizeof(menu->mac));
     }
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     CommEntryMenu_AddCommands(menu);
     if (mode == COMM_ENTRY_MENU_MUSICAL) {
         menu->sendToAll = TRUE;
@@ -523,7 +523,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE) {
             menu->seq = 4;
         } else {
-            func_02042970();
+            GFL_NetStartServer();
             menu->seq++;
         }
         break;
@@ -577,7 +577,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         u32 answer = CommEntryMenu_AskGroupOk(menu);
 
         if (answer == COMM_ENTRY_ASK_YES) {
-            func_02042a9c(NetHandle_GetOwn(), 0);
+            GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
             menu->seq = 9;
         } else if (answer == COMM_ENTRY_ASK_NO) {
             if (CommEntryMenu_CountAccepted(menu) >= menu->maxCount) {
@@ -597,7 +597,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         u32 answer = CommEntryMenu_AskCancel(menu);
 
         if (answer == COMM_ENTRY_ASK_YES) {
-            func_02042a9c(NetHandle_GetOwn(), 0);
+            GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
             menu->seq = 13;
         } else if (answer == COMM_ENTRY_ASK_NO) {
             menu->seq = 5;
@@ -608,7 +608,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         if (CommEntryMenu_SendCheck(menu->sendToAll) == TRUE) {
             CommEntryMenu_SetReady(menu, GFL_NetGetHandleNetId(NetHandle_GetOwn()));
             menu->checkMask = menu->memberList.mask;
-            func_02042e9c(TRUE);
+            GFL_NetSetDisconnectError(TRUE);
             menu->seq = 10;
         }
         break;
@@ -725,7 +725,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         CommEntryMenu_FreeWindows(menu);
         menu->list.selected = NULL;
         CommEntryMenu_CreateLeaderList(menu);
-        func_02042968();
+        GFL_NetStartScan();
         menu->seq++;
         break;
     case 3:
@@ -1378,7 +1378,7 @@ static void CommEntryMenu_SetCancelled(CommEntryMenu *menu) {
 static void CommEntryMenu_SetChecked(CommEntryMenu *menu) {
     menu->checked = TRUE;
     menu->sendCheckReply = TRUE;
-    func_02042e9c(TRUE);
+    GFL_NetSetDisconnectError(TRUE);
 }
 
 // The number of members accepted

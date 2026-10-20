@@ -148,7 +148,7 @@ void MBComm_Update(MBCommSys *comm) {
     case MB_COMM_SEQ_WAIT_TIMING:
         if (GFL_NetIsHandleNegotiated(NetHandle_GetOwn()) == TRUE) {
             comm->seq = MB_COMM_SEQ_CONNECTED;
-            func_02042e9c(TRUE);
+            GFL_NetSetDisconnectError(TRUE);
             func_02042e94(TRUE);
         }
         break;
@@ -156,7 +156,7 @@ void MBComm_Update(MBCommSys *comm) {
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x40, 4) == TRUE) {
             comm->seq = MB_COMM_SEQ_DISCONNECTED;
             func_02042e94(FALSE);
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
         }
         break;
     case MB_COMM_SEQ_DISCONNECTED:
@@ -253,7 +253,7 @@ BOOL MBComm_IsNetEnded(MBCommSys *comm) {
 }
 
 void MBComm_Connect(MBCommSys *comm) {
-    func_02042970();
+    GFL_NetStartServer();
     comm->seq = MB_COMM_SEQ_WAIT_CONNECT;
 }
 

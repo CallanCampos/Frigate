@@ -334,7 +334,7 @@ void UnionApp_SetCallbacks(UnionApp *app, UnionAppMemberCallback onJoin, UnionAp
 
 BOOL UnionApp_CloseEntry(UnionApp *app) {
     if (app->entering == 0) {
-        func_02042a9c(NetHandle_GetOwn(), FALSE);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), FALSE);
         app->entryMode = UNION_APP_ENTRY_CLOSED;
         return TRUE;
     }
@@ -342,13 +342,13 @@ BOOL UnionApp_CloseEntry(UnionApp *app) {
 }
 
 void UnionApp_OpenEntry(UnionApp *app) {
-    func_02042a9c(NetHandle_GetOwn(), TRUE);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
     app->entryMode = UNION_APP_ENTRY_OPEN;
 }
 
 void UnionApp_LimitEntry(UnionApp *app, u8 limit) {
     if (GFL_NetIsInitialized()) {
-        func_02042a9c(NetHandle_GetOwn(), TRUE);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
         app->entryMode = UNION_APP_ENTRY_LIMITED;
         app->entryLimit = limit;
         app->entryCount = 0;

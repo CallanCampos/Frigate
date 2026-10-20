@@ -343,7 +343,7 @@ static void NetState_ChangeoverParentWait(NetState *state) {
 
     if (NetSystem_GetChildBits()) {
         NetState_EnterParent(GFL_NetGetInitData()->heapId);
-        func_02042e18();
+        GFL_NetNotifyChildConnect();
         NetState_SetFuncLine(_pNetState, NetState_ChangeoverParentNegotiate, 0, 695);
         return;
     }

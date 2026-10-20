@@ -253,7 +253,7 @@ void NetDefine_UnloadDevice(int type);
 void NetBgmVolume_Set(u16 trackMask, s32 volume);
 
 // net.c: starts and ends the network, and passes calls to the device and the other parts of the library
-void func_020425a0(int a0, int a1, HeapID parentHeapId, HeapID heapId);
+void GFL_NetBoot(int a0, int a1, HeapID parentHeapId, HeapID heapId);
 void GFL_NetInit(const GFLNetInitData *pNetInit, void (*callback)(void *work), void *work);
 BOOL GFL_NetIsInitialized(void);
 // Whether the network has ended
@@ -268,26 +268,26 @@ BOOL GFL_NetMainWhileWaiting(void);
 void GFL_NetUpdateDevice(void);
 void GFL_NetStartAsParent(const u8 *mac);
 void GFL_NetStartAsChild(const u8 *mac);
-void func_02042968(void);
-void func_02042970(void);
-void func_020429a8(void (*callback)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work));
+void GFL_NetStartScan(void);
+void GFL_NetStartServer(void);
+void GFL_NetIwChangeoverConnect(void (*callback)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work));
 void GFL_NetIwSetGameCommandBase(int a0);
 void GFL_NetIwGetCollectedMac(u8 *mac, int index);
-void func_020429e8(void *a0);
+void GFL_NetIwSetPeerFilter(void *a0);
 void GFL_NetIwFree(void);
-void func_020429f8(void (*callback)(void *work));
+void GFL_NetChangeoverConnect(void (*callback)(void *work));
 // The argument is unused
-void func_02042a10(int unused);
-void func_02042a1c(int a0);
-void func_02042a30(int mode, int a1, const u8 *mac);
-BOOL func_02042a38(void);
+void GFL_NetStartSearch(int unused);
+void GFL_NetHoldScan(int a0);
+void GFL_NetSetChangeoverMode(int mode, int a1, const u8 *mac);
+BOOL GFL_NetIwFinishCollecting(void);
 void GFL_NetIwOverrideNetId(int a0);
-u8 func_02042a48(void);
-void func_02042a50(int a0);
+u8 GFL_NetIwGetLinkedCount(void);
+void GFL_NetSetTimeout(int a0);
 u8 GFL_NetGetHandleNetId(NetHandle *handle);
 int GFL_NetGetNegotiatedCount(void);
 BOOL GFL_NetIsNegotiated(u8 netId);
-void func_02042a9c(NetHandle *handle, int a1);
+void GFL_NetSetAcceptConnect(NetHandle *handle, int a1);
 BOOL GFL_NetIsNotInitialized(void);
 // Whether the network is infrared, or Wi-Fi
 BOOL GFL_NetIsInfrared(void);
@@ -311,34 +311,34 @@ void GFL_NetSetGameCommandBase(u8 gameCommandBase, u8 unused);
 u8 GFL_NetGetGameCommandBase(void);
 // Whether the net game command base is one of the battle kinds
 BOOL func_02011844(void);
-int func_02042d48(void);
-int func_02042d64(void);
+int GFL_NetGetUserData(void);
+int GFL_NetGetFriendData(void);
 u8 func_02042d80(void);
-void func_02042d8c(BOOL a0);
+void GFL_NetSetMPSendEnabled(BOOL a0);
 // The game's work, which the callbacks get
 void *GFL_NetGetWork(void);
 void GFL_NetSetWork(void *work);
 // The number of machines, and the size of each machine's data in a packet
 int GFL_NetGetMaxConnectNum(void);
 int GFL_NetGetMaxSendSize(void);
-u16 func_02042df4(void);
-void func_02042e18(void);
+u16 GFL_NetGetParentPacketSize(void);
+void GFL_NetNotifyChildConnect(void);
 void func_02042e30(int a0);
-void func_02042e54(int a0);
+void GFL_NetNotifyError(int a0);
 GFLNetSys *GFL_NetGetSys(void);
 GFLNetInitData *GFL_NetGetInitData(void);
 void func_02042e94(u8 a0);
-void func_02042e9c(BOOL a0);
+void GFL_NetSetDisconnectError(BOOL a0);
 void *allocConfigDSSoftwareFeature(HeapID heapId, u32 size, const char *file, u16 line);
 void GFL_NetFreeAligned32(void *ptr);
 // Record and read back the offset of BG 1 of the main engine, which bg_sys.c sets whenever it changes
 void GFL_NetSetBG1Offset(int x, int y);
 void GFL_NetGetBG1Offset(int *x, int *y);
 void GFL_NetSetInitData(const GFLNetInitData *pNetInit);
-void func_02042f10(void);
+void GFL_NetClearCallbacks(void);
 BOOL GFL_NetHasError(void);
 void GFL_NetMoveIcon(int x, int y);
 void GFL_NetResetIconPos(void);
-void func_02042f50(BOOL a0);
+void GFL_NetSetRejectNegotiated(BOOL a0);
 
 #endif // POKEBW2_GFL_NET_H

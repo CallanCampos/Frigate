@@ -267,7 +267,7 @@ static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
 
 void func_ov194_021b772c(PokemonTradeWork *wk) {
     func_02042e94(FALSE);
-    func_02042e9c(FALSE);
+    GFL_NetSetDisconnectError(FALSE);
     NetState_WifiDisconnect(FALSE);
     wk->param->next = 3;
 }
@@ -1654,7 +1654,7 @@ static void func_ov194_021b9904(PokemonTradeWork *wk) {
 static void func_ov194_021b993c(PokemonTradeWork *wk) {
     if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 22, 8)) {
         func_02042e94(TRUE);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         wk->timer = 0;
         PokemonTrade_SetState(wk, func_ov194_021b9904);
     }
@@ -2805,7 +2805,7 @@ static BOOL PokemonTrade_Init(GameProc *proc, u32 *state, PokemonTradeParam *par
     if (PokemonTrade_IsNetwork(wk)) {
         NetCommand_AddTable(TRADE_NET_CMD_BASE, sNetCommands, NELEMS(sNetCommands), wk);
         func_02042e94(TRUE);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
     }
     wk->vblankTcb = GFL_VBlankTCBAdd(PokemonTrade_VBlank, wk, 0);
     wk->heldIcon = NULL;

@@ -707,7 +707,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
             return;
         }
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
     }
     GtsNegoMessage_ClearWindow(wk->msg);
     GtsNegoMessage_PrintShort(wk->msg, GtsnegoProc_Text_GettingInformationFromOther);
@@ -785,7 +785,7 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
             return;
         }
         friend = NULL;
-        func_02042d8c(FALSE);
+        GFL_NetSetMPSendEnabled(FALSE);
         // The token is made in the values' buffer, which they then overwrite
         WifiList_CreateExchangeTokenFromUserData(&wk->wifiList->myUserData, (DWCFriendData *)values);
         values[GTSNEGO_KEY_MY_ID] = wk->myId;
@@ -1500,7 +1500,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
 static void GtsNego_HandleDisconnect(GtsNegoWork *wk) {
     if (wk->param->result != GTSNEGO_RESULT_EXIT) {
         func_02042e94(0);
-        func_02042e9c(FALSE);
+        GFL_NetSetDisconnectError(FALSE);
         GtsNegoMessage_FreePMSDraw(wk->msg);
         GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
         GFL_BGSysSetBGEnabled(4, FALSE);

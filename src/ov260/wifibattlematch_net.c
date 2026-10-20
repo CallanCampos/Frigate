@@ -329,7 +329,7 @@ WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void
         GFL_ASSERT(0);
     }
     NetCommand_AddTable(0x2400, sNetCommands, 7, p_wk);
-    func_02042d8c(0);
+    GFL_NetSetMPSendEnabled(0);
     DWCRap_SetErrorFunc(WifiBattleMatchNet_OnDwcError, p_wk);
     DWCRap_SetEventFunc(WifiBattleMatchNet_OnDwcEvent, p_wk);
     return p_wk;
@@ -362,7 +362,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
     if (GFL_NetIsInitialized()) {
         if (GFL_NetErrCheck()) {
             func_02042e94(0);
-            func_02042e9c(0);
+            GFL_NetSetDisconnectError(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
                 GameData_CancelSave(p_wk->gameData);
@@ -412,7 +412,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
         }
         if (result != 0) {
             func_02042e94(0);
-            func_02042e9c(0);
+            GFL_NetSetDisconnectError(0);
             GFL_SndStop();
             if (GameData_CheckEventsPaused(p_wk->gameData)) {
                 GameData_CancelSave(p_wk->gameData);
@@ -562,7 +562,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
             p_wk->matchTimer = 0;
             p_wk->matchState = 3;
             func_02042e94(1);
-            func_02042e9c(1);
+            GFL_NetSetDisconnectError(1);
             break;
         default:
             WifiBattleMatchNet_ResetEnd(p_wk);
@@ -629,7 +629,7 @@ u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk) {
 
 void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk) {
     func_02042e94(0);
-    func_02042e9c(0);
+    GFL_NetSetDisconnectError(0);
     NetState_WifiDisconnect(TRUE);
 }
 
@@ -653,7 +653,7 @@ BOOL WifiBattleMatchNet_EndMain(WifiBattleMatchNet *p_wk) {
         break;
     case 2:
         func_02042e94(0);
-        func_02042e9c(0);
+        GFL_NetSetDisconnectError(0);
         p_wk->counter = 0;
         p_wk->phaseB++;
         break;

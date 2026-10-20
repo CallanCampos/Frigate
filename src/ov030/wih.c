@@ -1049,8 +1049,8 @@ BOOL WH_ParentConnect(u16 mode, u16 tgid, u16 channel, u16 maxEntry) {
     _pWmInfo->sParentParam.tgid = tgid;
     _pWmInfo->sParentParam.channel = channel;
     _pWmInfo->sParentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
-    if (func_02042df4() != 0) {
-        _pWmInfo->sParentParam.parentMaxSize = func_02042df4();
+    if (GFL_NetGetParentPacketSize() != 0) {
+        _pWmInfo->sParentParam.parentMaxSize = GFL_NetGetParentPacketSize();
     } else {
         _pWmInfo->sParentParam.parentMaxSize = GFL_NetGetMaxSendSize() * GFL_NetGetMaxConnectNum() + 4;
     }

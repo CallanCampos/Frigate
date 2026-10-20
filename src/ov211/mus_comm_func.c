@@ -330,7 +330,7 @@ BOOL MusComm_Exit(u32 *seq, void *param, void *work_) {
             NetCommand_RemoveTable(MUS_COMM_CMD_MSG);
         }
         if (work->ready == 1) {
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             MusComm_SendTiming(work, MUS_COMM_TIMING_START);
             *seq = 1;
         } else {
@@ -523,7 +523,7 @@ static void MusComm_Main(MusCommWork *work) {
     case MUS_COMM_STATE_IDLE:
         return;
     case MUS_COMM_STATE_BOOT:
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
         MusComm_SendTiming(work, MUS_COMM_TIMING_BOOT);
         work->state = MUS_COMM_STATE_BOOT_WAIT;
         break;

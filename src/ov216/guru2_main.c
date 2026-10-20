@@ -922,7 +922,7 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2Main_InitButton(g2m);
     Guru2Main_InitBonus(g2m);
     GFL_WipeSet(0, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 8, 1, HEAPID_GURU2);
-    func_02042e9c(TRUE);
+    GFL_NetSetDisconnectError(TRUE);
     return TRUE;
 }
 
@@ -1684,7 +1684,7 @@ static int Guru2MainSeq_SyncEndWait(Guru2MainWork *g2m) {
     if (!g2m->error) {
         if (NetHandle_IsTimingPairRecv(handle, GURU2_SYNC_END, GURU2_SYNC_CLASS)) {
             g2m->waitIcon = WaitIcon_Create(g2m->tcbManager, g2m->msg.msgWindow, 15, 16, HEAPID_GURU2);
-            func_02042e9c(FALSE);
+            GFL_NetSetDisconnectError(FALSE);
             NetCommand_RemoveTable(GURU2_NET_CMD_BASE);
             UnionApp_RequestStart(Guru2Main_GetUnionApp(g2m));
             g2m->seq = SEQ_END_WAIT;

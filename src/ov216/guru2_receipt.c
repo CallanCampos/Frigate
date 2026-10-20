@@ -989,7 +989,7 @@ static int Guru2ReceiptSeq_StartSend(Guru2ReceiptWork *wk, int procSeq) {
     if (wk->unk4813 == 0) {
         if (Guru2Comm_Send(wk->g2c, GURU2_NET_CMD_START, NULL, 0) == TRUE) {
             wk->seq = GURU2_RECEIPT_SEQ_START;
-            func_02042e9c(TRUE);
+            GFL_NetSetDisconnectError(TRUE);
         }
     }
     return procSeq;

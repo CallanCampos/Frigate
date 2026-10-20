@@ -256,7 +256,7 @@ void GFL_NetErrUpdate(void) {
 
     if (g_GflNetErr.state == NET_ERR_STATE_NONE && GFL_NetIsInitialized() == TRUE) {
         if (GFL_NetHasError() || NetSystem_HasError() || NetState_GetError()) {
-            func_02042f10();
+            GFL_NetClearCallbacks();
             GFL_NetErrRecord();
             netType = GFL_NetGetInitData()->bNetType;
             if (netType == GFL_NET_TYPE_WIFI || netType == GFL_NET_TYPE_WIFI_LOBBY ||

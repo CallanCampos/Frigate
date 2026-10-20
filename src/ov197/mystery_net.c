@@ -378,7 +378,7 @@ static void MysteryNet_WirelessStart(MysteryNetSeq *seq, int *state, void *work)
         if (GFL_NetIsInitialized()) {
             GFL_NetSetIconScreen(TRUE, net->heapId);
             net->wifiWork = WihDwc_Create(4, net->heapId);
-            func_02042968();
+            GFL_NetStartScan();
             *state = 2;
         }
         break;
