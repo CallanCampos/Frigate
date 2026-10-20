@@ -397,3 +397,9 @@ lib/dwcutilui/src/dwc_util_scrollbar.c:
     .text       start:0x021b70e0 end:0x021b7514
     .rodata     start:0x021c0418 end:0x021c0420
     .bss        start:0x021c419c end:0x021c41a0
+
+lib/dwcutilui/src/dwc_util_ap_scan.c:
+    complete
+    .text       start:0x021b7514 end:0x021b781c
+    .rodata     start:0x021c0420 end:0x021c0470
+    .bss        start:0x021c41a0 end:0x021c41a4

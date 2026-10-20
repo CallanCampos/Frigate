@@ -78,22 +78,6 @@ void func_ov182_021b8eec(void);
 int func_ov182_021b8f14(void);
 BOOL func_ov182_021b8f24(void);
 
-// An access point that the scan found
-struct DWCUtilApEntry {
-    u8 ssid[32];
-    u8 bssid[6];
-    u16 linkLevel;
-    // 0 for none, 1 for WEP, 2 for a security that the utility can't set
-    u8 security;
-};
-
-// The scan for access points: allocates it, starts it (TRUE when it started), and stops it (TRUE once it has stopped)
-void func_ov182_021b74d4(void);
-BOOL func_ov182_021b751c(void);
-BOOL func_ov182_021b75d0(void);
-// Stops the scan for access points and frees it, and the access points it found and their count
-void func_ov182_021b74f4(void);
-int func_ov182_021b7630(DWCUtilApEntry **entries);
 // Copies the SSID of the connection being edited, and takes an SSID or a WEP key into it
 void func_ov182_021b7a08(u8 *ssid);
 void func_ov182_021b7854(const u8 *ssid);

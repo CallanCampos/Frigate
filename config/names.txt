@@ -11321,6 +11321,9 @@ overlays/ov182 0x021c0378 sScreenWayCursorRects
 overlays/ov182 0x021c03b8 sAutoConnectParam
 overlays/ov182 0x021c03d8 sScrollbarCells
 overlays/ov182 0x021c03db sScrollbarHandleLengths
+overlays/ov182 0x021c03e0 sApScanWpaOui
+overlays/ov182 0x021c03e4 sApScanNoBssid
+overlays/ov182 0x021c03ec sApScanParam
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11400,6 +11403,7 @@ overlays/ov182 0x021c4148 sUsbIntroYes
 overlays/ov182 0x021c414c sUsbSetupState
 overlays/ov182 0x021c4150 sBgBuffer
 overlays/ov182 0x021c415c sScrollbar
+overlays/ov182 0x021c4160 sApScan
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

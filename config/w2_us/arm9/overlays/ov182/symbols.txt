@@ -1279,9 +1279,9 @@ sAutoConnectParam kind:data(any) addr:0x021c03f8
 data_ov182_021c03cc kind:data(any) addr:0x021c040c
 sScrollbarCells kind:data(any) addr:0x021c0418
 sScrollbarHandleLengths kind:data(any) addr:0x021c041b
-data_ov182_021c03e0 kind:data(any) addr:0x021c0420
-data_ov182_021c03e4 kind:data(any) addr:0x021c0424
-data_ov182_021c03ec kind:data(any) addr:0x021c042c
+sApScanWpaOui kind:data(any) addr:0x021c0420
+sApScanNoBssid kind:data(any) addr:0x021c0424
+sApScanParam kind:data(any) addr:0x021c042c
 data_ov182_021c0430 kind:data(any) addr:0x021c0470
 data_ov182_021c0434 kind:data(any) addr:0x021c0474
 data_ov182_021c0443 kind:data(any) addr:0x021c0483
@@ -1658,7 +1658,7 @@ sUsbIntroYes kind:bss addr:0x021c4188
 sUsbSetupState kind:bss addr:0x021c418c
 sBgBuffer kind:bss addr:0x021c4190
 sScrollbar kind:bss addr:0x021c419c
-data_ov182_021c4160 kind:bss addr:0x021c41a0
+sApScan kind:bss addr:0x021c41a0
 data_ov182_021c4164 kind:bss addr:0x021c41a4
 data_ov182_021c4168 kind:bss addr:0x021c41a8
 data_ov182_021c416c kind:bss addr:0x021c41ac

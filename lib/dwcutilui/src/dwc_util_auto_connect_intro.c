@@ -1,4 +1,5 @@
 #include "dwc_util_auto_connect_intro.h"
+#include "dwc_util_ap_scan.h"
 #include "dwc_util_auto_connect.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_display.h"
