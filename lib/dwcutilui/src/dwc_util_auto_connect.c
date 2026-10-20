@@ -2,6 +2,7 @@
 #include "app/download_play_sys.h"
 #include "dwc/ac.h"
 #include "dwc/bm.h"
+#include "dwc_util_auto_connect_ok.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_display.h"
 #include "dwc_util_error.h"

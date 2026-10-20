@@ -356,3 +356,9 @@ lib/dwcutilui/src/dwc_util_auto_connect.c:
     .rodata     start:0x021c03f8 end:0x021c040c
     .data       start:0x021c131c end:0x021c1360
     .bss        start:0x021c417c end:0x021c4180
+
+lib/dwcutilui/src/dwc_util_auto_connect_ok.c:
+    complete
+    .text       start:0x021b641c end:0x021b65c8
+    .data       start:0x021c1360 end:0x021c1374
+    .bss        start:0x021c4180 end:0x021c4184

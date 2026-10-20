@@ -1652,7 +1652,7 @@ sScreenAp kind:bss addr:0x021c412c
 data_ov182_021c4130 kind:bss addr:0x021c4130
 sScreenWay kind:bss addr:0x021c4134
 sAutoConnectSucceeded kind:bss addr:0x021c413c
-data_ov182_021c4140 kind:bss addr:0x021c4140
+sAutoConnectOkFrames kind:bss addr:0x021c4140
 data_ov182_021c4144 kind:bss addr:0x021c4144
 data_ov182_021c4148 kind:bss addr:0x021c4148
 data_ov182_021c414c kind:bss addr:0x021c414c
