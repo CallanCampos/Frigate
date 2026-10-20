@@ -212,7 +212,9 @@ static struct {
     NasPrWork *work;
     int unk_08;
     CPSInAddr ip;
-    int unk_10;
+    // Whether a redirect (302) counts as reaching the network, which nothing sets (the SDK's
+    // DWC_Netcheck_SetAllow302)
+    int allow302;
 } sPr;
 static int sTestServer;
 static DWCHttp sHttp;
@@ -1707,7 +1709,7 @@ static void func_ov011_0216b334(void *arg) {
                     nasStatus.returnCode = -1;
                 } else {
                     func_ov011_02169704(&nasStatus);
-                    if (sPr.unk_10 == 1 && (nasStatus.returnCode == -23302 || func_ov011_021696d0() == 0xb)) {
+                    if (sPr.allow302 == 1 && (nasStatus.returnCode == -23302 || func_ov011_021696d0() == 0xb)) {
                         sPr.work->result = 0;
                         func_ov011_02169668();
                         code = 0xb;
@@ -1760,7 +1762,7 @@ static void func_ov011_0216b334(void *arg) {
         }
         if (status == 3) {
             func_ov011_0216a984(sPr.http);
-            if (sPr.unk_10 != 1) {
+            if (sPr.allow302 != 1) {
                 goto closedCode;
             }
             goto finished;
@@ -1777,7 +1779,7 @@ static void func_ov011_0216b334(void *arg) {
         }
         if (status != 200) {
             func_ov011_0216a984(sPr.http);
-            if (sPr.unk_10 != 1 || status != 302) {
+            if (sPr.allow302 != 1 || status != 302) {
                 goto reportBadResponse;
             }
             goto finished;
@@ -1789,7 +1791,7 @@ static void func_ov011_0216b334(void *arg) {
         if (errno == ERANGE) {
             goto badAnswer;
         }
-        if (sPr.unk_10 == 1 && returnCode == 0x72) {
+        if (sPr.allow302 == 1 && returnCode == 0x72) {
             goto finished;
         }
         if (returnCode >= 100) {
