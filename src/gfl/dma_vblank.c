@@ -28,9 +28,9 @@ typedef struct {
 
 static DMAVBlankChannel *sDMAChannels;
 
-static void func_0204f8c8(int ch);
+static void DMAVBlank_WriteChannelControl(int ch);
 
-void func_0204f864(void) {
+void DMAVBlank_Update(void) {
     int ch;
 
     if (sDMAChannels == NULL) {
@@ -40,18 +40,18 @@ void func_0204f864(void) {
         if (sDMAChannels[ch].update) {
             sDMAChannels[ch].update = FALSE;
             if (sDMAChannels[ch].count != 0) {
-                func_0204f8c8(ch);
+                DMAVBlank_WriteChannelControl(ch);
                 sDMAChannels[ch].active = TRUE;
             }
         }
         if (sDMAChannels[ch].stop) {
             sDMAChannels[ch].stop = FALSE;
-            func_0204f8c8(ch);
+            DMAVBlank_WriteChannelControl(ch);
         }
     }
 }
 
-static void func_0204f8c8(int ch) {
+static void DMAVBlank_WriteChannelControl(int ch) {
     u32 mode = OS_DisableInterrupts();
     DMAVBlankChannel *channel = &sDMAChannels[ch];
 

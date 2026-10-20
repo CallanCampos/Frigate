@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Machika",
+    "class": "TRAINER_CLASS_SCHOOL_KID_F",
+    "pokemon": [
+        "bellossom_2",
+        "ludicolo_2",
+        "gothitelle_2",
+        "cradily_2",
+        "politoed_2",
+        "claydol_2",
+        "tentacruel_2",
+        "umbreon_2",
+        "blastoise_2",
+        "milotic_2"
+    ]
+}

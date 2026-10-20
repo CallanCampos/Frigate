@@ -584,10 +584,10 @@ static void GymInsect_InitObjects(GymInsectWork *wk) {
     }
     LoadFieldExpandObjData(wk->expObj, &sSceneSetup, 0);
     FieldExpObj_GetActorMatrixPtr(wk->expObj, 0, ACTOR_RIDE);
-    func_ov036_021b8248(wk->expObj, 0, ACTOR_RIDE, 1);
+    FieldExpObj_SetActorCulling(wk->expObj, 0, ACTOR_RIDE, 1);
     FieldExpObj_SetActorHidden(wk->expObj, 0, ACTOR_RIDE, TRUE);
     FieldExpObj_GetActorMatrixPtr(wk->expObj, 0, ACTOR_EFFECT);
-    func_ov036_021b8248(wk->expObj, 0, ACTOR_EFFECT, 1);
+    FieldExpObj_SetActorCulling(wk->expObj, 0, ACTOR_EFFECT, 1);
     FieldExpObj_SetActorHidden(wk->expObj, 0, ACTOR_EFFECT, TRUE);
     for (i = 0; i < NELEMS(sEffectAnimations); i++) {
         anm = FieldExpObj_GetAnmInfo(wk->expObj, 0, ACTOR_EFFECT, i);
@@ -598,7 +598,7 @@ static void GymInsect_InitObjects(GymInsectWork *wk) {
     for (j = 0; j < OBJECT_COUNT; j++) {
         object = ACTOR_OBJECT_0 + j;
         matrix = FieldExpObj_GetActorMatrixPtr(wk->expObj, 0, object);
-        func_ov036_021b8248(wk->expObj, 0, object, 1);
+        FieldExpObj_SetActorCulling(wk->expObj, 0, object, 1);
         tile = sObjectPositions[j];
         matrix->translation.x = FX32_CONST(tile[0] * 16) + FX32_CONST(8);
         matrix->translation.y = FX32_CONST(tile[1] * 16);
@@ -608,7 +608,7 @@ static void GymInsect_InitObjects(GymInsectWork *wk) {
             FieldExpObj_SetAnm(wk->expObj, 0, object, i, TRUE);
             FieldExpObjAnm_SetLooped(anm, FALSE);
             FieldExpObjAnm_SetPaused(anm, TRUE);
-            FieldExpObj_SetAnmFrame(wk->expObj, 0, object, i, func_ov036_021b8580(anm) * wk->objectFlags[j]);
+            FieldExpObj_SetAnmFrame(wk->expObj, 0, object, i, FieldExpObjAnm_GetLastFrame(anm) * wk->objectFlags[j]);
         }
     }
 }

@@ -1,0 +1,26 @@
+PmsWordsInitialO_Text_Oblivious = OBLIVIOUS
+PmsWordsInitialO_Text_Octazooka = OCTAZOOKA
+PmsWordsInitialO_Text_Octillery = OCTILLERY
+PmsWordsInitialO_Text_Oddish = ODDISH
+PmsWordsInitialO_Text_Odorsleuth = ODORSLEUTH
+PmsWordsInitialO_Text_Ohdear = OHDEAR
+PmsWordsInitialO_Text_Ohmy = OHMY
+PmsWordsInitialO_Text_Ohwell = OHWELL
+PmsWordsInitialO_Text_Ohwow = OHWOW
+PmsWordsInitialO_Text_Ohyeah = OHYEAH
+PmsWordsInitialO_Text_Ok = OK
+PmsWordsInitialO_Text_Okthen = OKTHEN
+PmsWordsInitialO_Text_Oldman = OLDMAN
+PmsWordsInitialO_Text_Omanyte = OMANYTE
+PmsWordsInitialO_Text_Omastar = OMASTAR
+PmsWordsInitialO_Text_Ominouswind = OMINOUSWIND
+PmsWordsInitialO_Text_Onix = ONIX
+PmsWordsInitialO_Text_Oops = OOPS
+PmsWordsInitialO_Text_Opponent = OPPONENT
+PmsWordsInitialO_Text_Oshawott = OSHAWOTT
+PmsWordsInitialO_Text_Outrage = OUTRAGE
+PmsWordsInitialO_Text_Overcoat = OVERCOAT
+PmsWordsInitialO_Text_Overgrow = OVERGROW
+PmsWordsInitialO_Text_Overheat = OVERHEAT
+PmsWordsInitialO_Text_Owntempo = OWNTEMPO
+\pad{44}

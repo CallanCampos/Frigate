@@ -1,6 +1,0 @@
-NacreneCity5_Text_Empty =        \x{ffff}
-NacreneCity5_Text_ImThinkingAboutBecoming = I'm thinking about becoming\nLoblolly's apprentice!
-NacreneCity5_Text_LoblollysFurnitureFinestAround = Loblolly's furniture is the finest around!\nIt's like furniture out of a dream.
-NacreneCity5_Text_SheSaidEvenIf = She said, even if I'm clumsy,\nif I keep at it, I can make furniture!
-NacreneCity5_Text_ImSurroundedByFurniture = I'm surrounded by furniture I admire!\nNow THIS is a dream world!
-\pad{cc}

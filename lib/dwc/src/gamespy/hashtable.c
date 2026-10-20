@@ -10,10 +10,10 @@ HashTable *func_ov011_02171818(int elementSize, int bucketCount, TableHashFunc h
 
 HashTable *func_ov011_02171830(int elementSize, int bucketCount, int bucketGrowBy, TableHashFunc hashFunc,
                                TableCompareFunc compareFunc, TableFreeFunc freeFunc) {
-    HashTable *table = func_ov011_0216dddc(sizeof(HashTable));
+    HashTable *table = gsimalloc(sizeof(HashTable));
     int i;
 
-    table->buckets = func_ov011_0216dddc(bucketCount * sizeof(DArray *));
+    table->buckets = gsimalloc(bucketCount * sizeof(DArray *));
     for (i = 0; i < bucketCount; i++) {
         table->buckets[i] = func_ov011_02171514(elementSize, bucketGrowBy, freeFunc);
     }
@@ -31,8 +31,8 @@ void func_ov011_0217187c(HashTable *table) {
         for (i = 0; i < table->bucketCount; i++) {
             func_ov011_02171558(table->buckets[i]);
         }
-        func_ov011_0216ddfc(table->buckets);
-        func_ov011_0216ddfc(table);
+        gsifree(table->buckets);
+        gsifree(table);
     }
 }
 

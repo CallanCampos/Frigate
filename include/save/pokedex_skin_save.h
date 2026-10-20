@@ -12,6 +12,6 @@ typedef struct {
     BOOL valid;
 } PokedexSkinSave; // size: 0x6204
 
-void func_0200f16c(void *block);
+void PokedexSkinSave_Init(void *block);
 
 #endif // POKEBW2_SAVE_POKEDEX_SKIN_SAVE_H

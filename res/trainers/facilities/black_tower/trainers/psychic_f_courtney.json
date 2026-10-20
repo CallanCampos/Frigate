@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Courtney",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "pokemon": [
+        "gengar_2",
+        "roserade_2",
+        "gardevoir_2",
+        "espeon_2",
+        "glaceon_2",
+        "typhlosion_2",
+        "magnezone_2",
+        "porygon_z_2",
+        "vanilluxe_2",
+        "magmortar_2"
+    ]
+}

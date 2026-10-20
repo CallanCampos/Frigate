@@ -1,0 +1,13 @@
+BtlvInput_Text_Empty = {0107:0}
+BtlvInput_Text_Pp = PP
+BtlvInput_Text_Empty_2 = {0201:0}/{0201:1}
+BtlvInput_Text_Empty_3 = {0102:0}⑭
+BtlvInput_Text_Empty_4 = {0102:0}⑮
+BtlvInput_Text_Empty_5 = {0102:0}
+BtlvInput_Text_Empty_6 = {0202:0}
+BtlvInput_Text_Empty_7 = /
+BtlvInput_Text_Empty_8 = {0201:0}
+BtlvInput_Text_PlaybackPausedPleaseWait = Playback paused...\nPlease wait a moment.
+BtlvInput_Text_DataCorruptedPlaybackCanceled = Data is corrupted.\nPlayback canceled.
+BtlvInput_Text_SkippingVideoPleaseWait = Skipping the video...\nPlease wait a moment.
+BtlvInput_Text_PlaybackStoppedPleaseWait = Playback stopped...\nPlease wait a moment.

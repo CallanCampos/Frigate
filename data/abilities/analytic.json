@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Analytic",
-    "description": "Boosts move power when\nthe Pokémon moves last."
-}

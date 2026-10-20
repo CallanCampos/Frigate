@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Caroll",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_FRAXURE",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_DUAL_CHOP", "MOVE_SLASH", "MOVE_ROCK_SMASH", "MOVE_DRAGON_DANCE" ]
+        },
+        {
+            "species": "SPECIES_VANILLUXE",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ICE_BEAM", "MOVE_FLASH_CANNON", "MOVE_ICICLE_SPEAR", "MOVE_ACID_ARMOR" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Are you sure you want to seriously take\non someone like me, who seriously fights{be00}\nwith her Pokémon?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This is the pain that comes from seriously\nfacing someone head-on..."
+        },
+        {
+            "type": 2,
+            "text": "I battle seriously, because I am after\nserious strength.{be01}\nThere's nothing worse than a\nhalfhearted opponent."
+        }
+    ]
+}

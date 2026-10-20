@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Overgrow",
+    "description": "Powers up Grass-type\nmoves in a pinch."
+}

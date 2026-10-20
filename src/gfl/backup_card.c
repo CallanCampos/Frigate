@@ -5,7 +5,7 @@
 #include "nitro/os.h"
 
 static void setCardWrittenVerified(void *arg);
-static void func_0203c1c0(u16 lockId, BOOL noResponse, BackupWriteErrorCallback callback);
+static void unlockBackupAndReportError(u16 lockId, BOOL noResponse, BackupWriteErrorCallback callback);
 
 // Whether the last write has ended
 static BOOL sWriteDone = TRUE;
@@ -27,9 +27,9 @@ BOOL identifyGameCardBackup(void) {
     return type != 0 ? TRUE : FALSE;
 }
 
-BOOL func_0203bfd4(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback) {
+BOOL writeFlashWaitSuccess(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback) {
     BOOL result;
-    u16 lockId = func_0203c07c(dest, src, size, callback);
+    u16 lockId = startWriteFlash(dest, src, size, callback);
 
     while (!finishBackupGetResult(lockId, &result, callback)) {
     }
@@ -56,7 +56,7 @@ static void setCardWrittenVerified(void *arg) {
     sWriteDone = TRUE;
 }
 
-u16 func_0203c07c(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback) {
+u16 startWriteFlash(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback) {
     u32 header;
     s32 lock_id = OS_GetLockID();
 
@@ -64,7 +64,7 @@ u16 func_0203c07c(u32 dest, const void *src, u32 size, BackupWriteErrorCallback 
     CARD_LockBackup(lock_id);
     sLocked = TRUE;
     if (!CARD_ReadBackup(0, &header, sizeof(header))) {
-        func_0203c1c0(lock_id, TRUE, callback);
+        unlockBackupAndReportError(lock_id, TRUE, callback);
     }
     sWriteDone = FALSE;
     CARD_WriteAndVerifyBackupAsync(dest, src, size, setCardWrittenVerified, NULL);
@@ -116,7 +116,7 @@ void cancelCardProcess(u16 lockId) {
     }
 }
 
-static void func_0203c1c0(u16 lockId, BOOL noResponse, BackupWriteErrorCallback callback) {
+static void unlockBackupAndReportError(u16 lockId, BOOL noResponse, BackupWriteErrorCallback callback) {
     CARD_UnlockBackup(lockId);
     OS_ReleaseLockID(lockId);
     sLocked = FALSE;

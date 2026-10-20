@@ -12,26 +12,26 @@
 
 #define SAVE_BLOCK_CGEAR 0x20
 
-u32 func_02009854(void) {
+u32 CGearSave_GetSize(void) {
     return sizeof(CGearSave);
 }
 
-void func_02009858(CGearSave *cgear) {
-    MI_CpuFill8(cgear, 0, func_02009854());
+void CGearSave_Init(CGearSave *cgear) {
+    MI_CpuFill8(cgear, 0, CGearSave_GetSize());
     CGearPhrases_Init(cgear->phrases);
-    func_02009890(&cgear->settings);
+    CGearSettings_Init(&cgear->settings);
     ShortcutSave_Init(&cgear->shortcuts);
-    func_020114a8(cgear->name);
+    CGearName_Init(cgear->name);
 }
 
-u32 func_0200988c(void) {
+u32 CGearSettings_GetSize(void) {
     return sizeof(CGearSettings);
 }
 
-void func_02009890(CGearSettings *settings) {
+void CGearSettings_Init(CGearSettings *settings) {
     s32 i;
 
-    MI_CpuFill8(settings, 0, func_0200988c());
+    MI_CpuFill8(settings, 0, CGearSettings_GetSize());
     for (i = 0; i < CGEAR_PANEL_MAX; i++) {
         settings->panels[i] = 0;
     }
@@ -40,11 +40,11 @@ void func_02009890(CGearSettings *settings) {
     settings->colors[2] = 9;
 }
 
-void func_020098bc(CGearSettings *settings, u8 on) {
+void CGearSettings_SetOn(CGearSettings *settings, u8 on) {
     settings->on = on;
 }
 
-u8 func_020098c0(CGearSettings *settings) {
+u8 CGearSettings_IsOn(CGearSettings *settings) {
     return settings->on;
 }
 
@@ -56,49 +56,49 @@ u8 func_020098c8(CGearSettings *settings) {
     return settings->unk0B;
 }
 
-void func_020098cc(CGearSettings *settings, u8 valid) {
+void CGearSettings_SetSkinValid(CGearSettings *settings, u8 valid) {
     settings->skinValid = valid;
 }
 
-u8 func_020098d0(CGearSettings *settings) {
+u8 CGearSettings_GetSkinValid(CGearSettings *settings) {
     return settings->skinValid;
 }
 
-void func_020098d4(CGearSettings *settings, u16 crc) {
+void CGearSettings_SetSkinCrc(CGearSettings *settings, u16 crc) {
     settings->skinCrc = crc;
 }
 
-u16 func_020098d8(CGearSettings *settings) {
+u16 CGearSettings_GetSkinCrc(CGearSettings *settings) {
     return settings->skinCrc;
 }
 
-void func_020098dc(CGearSettings *settings, u32 place, u32 panel) {
+void CGearSettings_SetPanel(CGearSettings *settings, u32 place, u32 panel) {
     if (place < CGEAR_PANEL_MAX && panel < CGEAR_PANEL_MAX) {
         settings->panels[place] = panel;
     }
 }
 
-u8 func_020098e8(CGearSettings *settings, u32 place) {
+u8 CGearSettings_GetPanel(CGearSettings *settings, u32 place) {
     if (place >= CGEAR_PANEL_MAX) {
         return 0;
     }
     return settings->panels[place];
 }
 
-void func_020098f4(CGearSettings *settings, s32 index, u8 color) {
+void CGearSettings_SetColor(CGearSettings *settings, s32 index, u8 color) {
     if (index < CGEAR_COLOR_MAX) {
         settings->colors[index] = color;
     }
 }
 
-u8 func_02009900(CGearSettings *settings, s32 index) {
+u8 CGearSettings_GetColor(CGearSettings *settings, s32 index) {
     if (index >= CGEAR_COLOR_MAX) {
         return 0;
     }
     return settings->colors[index];
 }
 
-void func_02009910(CGearSettings *settings, u8 value) {
+void func_02009910(CGearSettings *settings, u32 value) {
     settings->unk06 = value;
 }
 
@@ -106,11 +106,11 @@ u8 func_02009914(CGearSettings *settings) {
     return settings->unk06;
 }
 
-CGearSettings *func_02009918(SaveControl *save) {
+CGearSettings *CGearSettings_GetFromSave(SaveControl *save) {
     CGearSave *cgear = SaveControl_GetBlockPtr(save, SAVE_BLOCK_CGEAR);
     return &cgear->settings;
 }
 
-CGearSettings *func_02009924(GameData *gameData) {
-    return func_02009918(GameData_GetSaveControl(gameData));
+CGearSettings *CGearSettings_GetFromGameData(GameData *gameData) {
+    return CGearSettings_GetFromSave(GameData_GetSaveControl(gameData));
 }

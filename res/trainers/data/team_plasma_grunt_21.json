@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PAWNIARD",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PAWNIARD",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PAWNIARD",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "In my own way, I'm a strong part of this\nTeam Plasma group!{be00}\nPeople call me the Bisharp woman!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Great plans are\nalways interrupted."
+        },
+        {
+            "type": 2,
+            "text": "You getting in our way means that you\nfind us worth the time, doesn't it?{be01}\n...Being ignored would make us feel\nawfully lonely.{be01}\nEr, no, I mean even if you get in the\nway, we'll take over the world this time!"
+        }
+    ]
+}

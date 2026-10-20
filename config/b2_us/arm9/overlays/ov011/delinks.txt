@@ -28,11 +28,13 @@ lib/nitrowifi/src/cps/cps.c:
     .bss        start:0x0218ba0c end:0x0218dbe0
 
 lib/nitrowifi/src/soc/socl_startup.c:
+    complete
     .text       start:0x02155e34 end:0x02156000
     .data       start:0x0218546c end:0x02185474
     .bss        start:0x0218dbe0 end:0x0218dc20
 
 lib/nitrowifi/src/soc/socl_command.c:
+    complete
     .text       start:0x02156000 end:0x02156200
     .bss        start:0x0218dc20 end:0x0218dc44
 
@@ -41,17 +43,21 @@ lib/nitrowifi/src/soc/socl_create.c:
     .text       start:0x02156200 end:0x021564cc
 
 lib/nitrowifi/src/soc/socl_bind.c:
+    complete
     .text       start:0x021564cc end:0x021566d8
     .data       start:0x02185474 end:0x02185478
 
 lib/nitrowifi/src/soc/socl_read.c:
+    complete
     .text       start:0x021566d8 end:0x02156d8c
     .bss        start:0x0218dc44 end:0x0218dc4c
 
 lib/nitrowifi/src/soc/socl_write.c:
+    complete
     .text       start:0x02156d8c end:0x0215724c
 
 lib/nitrowifi/src/soc/socl_shutdown.c:
+    complete
     .text       start:0x0215724c end:0x021572f4
 
 lib/nitrowifi/src/soc/socl_close.c:
@@ -63,6 +69,7 @@ lib/nitrowifi/src/soc/socl_cleanup.c:
     .text       start:0x02157620 end:0x02157894
 
 lib/nitrowifi/src/soc/socl_poll.c:
+    complete
     .text       start:0x02157894 end:0x02157978
 
 lib/nitrowifi/src/soc/socl_misc.c:
@@ -89,6 +96,7 @@ lib/nitrowifi/src/ssl/ssl.c:
     .bss        start:0x0218dde8 end:0x0218df74
 
 lib/nitrowifi/src/ssl/md5.c:
+    complete
     .text       start:0x0215a6b4 end:0x0215ab04
     .data       start:0x0218553c end:0x021856bc
 
@@ -126,3 +134,173 @@ lib/dwc/src/gamespy/md5c.c:
     .text       start:0x021719fc end:0x0217241c
     .rodata     start:0x02185094 end:0x021850a8
     .data       start:0x02187754 end:0x02187794
+
+lib/dwc/src/gt2/gt2Buffer.c:
+    complete
+    .text       start:0x0217c944 end:0x0217c9f4
+
+lib/dwc/src/gt2/gt2Callback.c:
+    complete
+    .text       start:0x0217c9f4 end:0x0217ce00
+
+lib/dwc/src/gt2/gt2Connection.c:
+    complete
+    .text       start:0x0217ce00 end:0x0217d144
+
+lib/dwc/src/gt2/gt2Main.c:
+    complete
+    .text       start:0x0217d144 end:0x0217d3ac
+
+lib/dwc/src/gt2/gt2Message.c:
+    .text       start:0x0217d3ac end:0x0217e768
+    .data       start:0x021890d4 end:0x021890e0
+
+lib/dwc/src/gt2/gt2Socket.c:
+    complete
+    .text       start:0x0217e768 end:0x0217ed14
+
+lib/dwc/src/gt2/gt2Utility.c:
+    complete
+    .text       start:0x0217ed14 end:0x0217ee90
+    .data       start:0x021890e0 end:0x021890f4
+    .bss        start:0x02191bbc end:0x02191bec
+
+lib/dwc/src/gp/gp.c:
+    complete
+    .text       start:0x0217241c end:0x02172d68
+    .data       start:0x02187794 end:0x021878c0
+
+lib/dwc/src/gp/gpi.c:
+    complete
+    .text       start:0x02172d68 end:0x02173504
+    .data       start:0x021878c0 end:0x021879d4
+
+lib/dwc/src/gp/gpiBuddy.c:
+    complete
+    .text       start:0x02173504 end:0x02174dd4
+    .data       start:0x021879d4 end:0x02187c5c
+
+lib/dwc/src/gp/gpiBuffer.c:
+    .text       start:0x02174dd4 end:0x02175458
+    .data       start:0x02187c5c end:0x02187d5c
+    .bss        start:0x02191768 end:0x02191770
+
+lib/dwc/src/gp/gpiCallback.c:
+    complete
+    .text       start:0x02175458 end:0x02175750
+    .data       start:0x02187d5c end:0x02187d6c
+
+lib/dwc/src/gp/gpiConnect.c:
+    complete
+    .text       start:0x02175750 end:0x0217688c
+    .data       start:0x02187d6c end:0x0218822c
+
+lib/dwc/src/gp/gpiInfo.c:
+    complete
+    .text       start:0x0217688c end:0x02177cc0
+    .data       start:0x0218822c end:0x02188514
+
+lib/dwc/src/gp/gpiKeys.c:
+    complete
+    .text       start:0x02177cc0 end:0x02178084
+    .data       start:0x02188514 end:0x0218858c
+
+lib/dwc/src/gp/gpiOperation.c:
+    complete
+    .text       start:0x02178084 end:0x02178458
+    .data       start:0x0218858c end:0x021885e4
+
+lib/dwc/src/gp/gpiPeer.c:
+    complete
+    .text       start:0x02178458 end:0x02179220
+    .data       start:0x021885e4 end:0x02188964
+
+lib/dwc/src/gp/gpiProfile.c:
+    complete
+    .text       start:0x02179220 end:0x02179834
+    .data       start:0x02188964 end:0x021889d4
+
+lib/dwc/src/gp/gpiSearch.c:
+    .text       start:0x02179834 end:0x0217b5fc
+    .data       start:0x021889d4 end:0x02188e2c
+
+lib/dwc/src/gp/gpiTransfer.c:
+    complete
+    .text       start:0x0217b5fc end:0x0217b6a8
+    .data       start:0x02188e2c end:0x02188e5c
+
+lib/dwc/src/gp/gpiUnique.c:
+    complete
+    .text       start:0x0217b6a8 end:0x0217b7e0
+    .data       start:0x02188e5c end:0x02188eac
+
+lib/dwc/src/gp/gpiUtility.c:
+    complete
+    .text       start:0x0217b7e0 end:0x0217bb30
+    .data       start:0x02188eac end:0x02188f5c
+
+lib/dwc/src/gscommon/gsAvailable.c:
+    complete
+    .text       start:0x0216c520 end:0x0216c764
+    .data       start:0x02186e7c end:0x02186ea4
+    .bss        start:0x02190698 end:0x02190774
+
+lib/dwc/src/gscommon/gsCore.c:
+    complete
+    .text       start:0x0216c764 end:0x0216cac0
+    .bss        start:0x02190774 end:0x021907a0
+
+lib/dwc/src/gscommon/gsCrypt.c:
+    complete
+    .text       start:0x0216cac0 end:0x0216cc2c
+    .rodata     start:0x0218502c end:0x02185050
+
+lib/dwc/src/gscommon/gsDebug.c:
+    complete
+    .text       start:0x0216cc2c end:0x0216cd94
+    .data       start:0x02186ea4 end:0x02186eb4
+    .bss        start:0x021907a0 end:0x02190804
+
+lib/dwc/src/gscommon/gsLargeInt.c:
+    .text       start:0x0216cd94 end:0x0216dd9c
+    .data       start:0x02186eb4 end:0x02186ec4
+    .bss        start:0x02190804 end:0x02190894
+
+lib/dwc/src/gscommon/gsMemory.c:
+    complete
+    .text       start:0x0216dd9c end:0x0216de10
+    .data       start:0x02186ec4 end:0x02186ed4
+
+lib/dwc/src/gscommon/gsPlatformSocket.c:
+    .text       start:0x0216de10 end:0x0216e204
+    .data       start:0x02186ed4 end:0x02186f5c
+    .bss        start:0x02190894 end:0x02190904
+
+lib/dwc/src/gscommon/gsPlatformThread.c:
+    complete
+    .text       start:0x0216e204 end:0x0216e250
+
+lib/dwc/src/gscommon/gsPlatformUtil.c:
+    complete
+    .text       start:0x0216e250 end:0x0216ea4c
+    .rodata     start:0x02185050 end:0x02185094
+    .data       start:0x02186f5c end:0x02186ffc
+    .bss        start:0x02190904 end:0x02190928
+
+lib/dwc/src/gscommon/gsSoap.c:
+    complete
+    .text       start:0x0216ea4c end:0x0216ec58
+
+lib/dwc/src/gscommon/gsStringUtil.c:
+    complete
+    .text       start:0x0216ec58 end:0x0216eea8
+
+lib/dwc/src/gscommon/gsXML.c:
+    .text       start:0x0216fbf8 end:0x021713e0
+    .data       start:0x021874a0 end:0x02187750
+
+lib/dwc/src/gscommon/gs_screen_print.c:
+    complete
+    .text       start:0x021713e0 end:0x021714cc
+    .data       start:0x02187750 end:0x02187754
+    .bss        start:0x02190964 end:0x02191768

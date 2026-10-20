@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GOTHITA",
+    "moves": [ "MOVE_PSYBEAM", "MOVE_CHARGE_BEAM", "MOVE_FAKE_TEARS", "MOVE_TRICK_ROOM" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_PERSIM_BERRY",
+    "form": 0
+}

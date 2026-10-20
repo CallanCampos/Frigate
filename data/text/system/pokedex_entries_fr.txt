@@ -1,2 +1,0 @@
-\from{species.pokedex.fr.entry}
-\pad{40}

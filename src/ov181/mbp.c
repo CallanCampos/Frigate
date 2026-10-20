@@ -362,7 +362,7 @@ static void MBP_ParentStateCallback(u16 childAid, u32 status, void *arg) {
             sFilebuf = NULL;
         }
         if (sCWork != NULL) {
-            func_02042ed0(sCWork);
+            GFL_NetFreeAligned32(sCWork);
             sCWork = NULL;
         }
         break;
@@ -428,7 +428,7 @@ void MBP_FreeBuffers(void) {
         sFilebuf = NULL;
     }
     if (sCWork != NULL) {
-        func_02042ed0(sCWork);
+        GFL_NetFreeAligned32(sCWork);
         sCWork = NULL;
     }
 }

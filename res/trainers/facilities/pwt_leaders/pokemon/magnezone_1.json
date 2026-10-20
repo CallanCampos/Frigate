@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MAGNEZONE",
+    "moves": [ "MOVE_DISCHARGE", "MOVE_FLASH_CANNON", "MOVE_SIGNAL_BEAM", "MOVE_BARRIER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_AIR_BALLOON",
+    "form": 0
+}

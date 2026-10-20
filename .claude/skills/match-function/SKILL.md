@@ -52,8 +52,11 @@ Write 3 to 10 respellings at once in a scratchpad file, separated by lines of `=
 ```
 
 It keeps the first variant that matches, and otherwise restores the file. `--score` counts differing aligned lines,
-the measure of progress for variants of the same size. Keep the best variant with `--keep N` when it is better and
-still natural. Change one idea per variant, so the score says which idea mattered.
+the measure of progress for variants of the same size. It masks relocated words, so it never checks where a pool
+word points: when a near match differs around two pool words of one object, compare the order of the variant's
+relocations (`llvm-objdump -dr` on its object) with the original's pool words (`show_func.py`). Keep the best
+variant with `--keep N` when it is better and still natural. Change one idea per variant, so the score says which
+idea mattered.
 
 ## 4. Stop rules
 

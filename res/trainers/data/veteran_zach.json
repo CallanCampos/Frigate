@@ -1,0 +1,63 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Zach",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WEAVILE",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_ICE_SHARD", "MOVE_SHADOW_CLAW", "MOVE_SWORDS_DANCE" ]
+        },
+        {
+            "species": "SPECIES_TOXICROAK",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_POISON_JAB", "MOVE_BRICK_BREAK", "MOVE_STONE_EDGE", "MOVE_BULK_UP" ]
+        },
+        {
+            "species": "SPECIES_AGGRON",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_IRON_TAIL", "MOVE_STONE_EDGE", "MOVE_IRON_DEFENSE" ]
+        },
+        {
+            "species": "SPECIES_RAMPARDOS",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_ZEN_HEADBUTT", "MOVE_HEAD_SMASH", "MOVE_DRAGON_TAIL" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It has been two years since I secluded\nmyself here on Twist Mountain...{be01}\nNow I will take this chance to test the\nresults of my training!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Even the most intense training does not\nnecessarily guarantee victory..."
+        },
+        {
+            "type": 2,
+            "text": "If there are those like myself who\ndedicate their lives only to training...{be01}\nThen there are those like you who\ngrow through your journey?"
+        }
+    ]
+}

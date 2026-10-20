@@ -20,15 +20,9 @@ struct FieldMenuWork {
     FieldAppCallInput appCall;
 };
 
-extern const u32 data_ov012_0216cb74[9];
-
 GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *data);
 GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param);
 GameEvent *EventFieldMenu_CreateUnionRoom(GameSystem *gsys, Field *field, u16 param);
-BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg);
-BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg);
-BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg);
-u32 func_ov012_0215aa68(u32 index);
 
 // Overlay 36: the event that returns from the menu to the subscreen
 GameEvent *EventFieldMenuReturn_Create(GameSystem *gsys, Field *field, u32 screenId);

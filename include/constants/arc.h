@@ -171,4 +171,74 @@
 #define ARCID_GYM_HUMILAU 276
 #define ARCID_GIMMICK_EXPOBJ_MARINETUBE 295
 
+// The 2D graphics archives that the code loads by number, named after the source files that load them, or the
+// app's prefix where several do (docs/data.md, 2D graphics). Our names, not swan's
+#define ARCID_BTLV 11                     // btlv_scu.c, btlv_stage.c, pkwd_briefing.c
+#define ARCID_ERROR_WINDOW_GRA 22         // net_err.c, error_window_screen.c, wfc_user_info_warning.c
+#define ARCID_CONFIG_PANEL 27             // config_panel.c
+#define ARCID_IRCBATTLE 28                // ircbattlemenu.c, ircbattlematch.c
+#define ARCID_WIFI_2DCHAR 30              // wifi_2dchar.c, startmenu.c, worldtrade.c
+#define ARCID_WIFI_UNIONCHAR 31           // wifi_2dchar.c
+#define ARCID_WIFIP2PMATCH 32             // wifi_p2pmatch.c
+#define ARCID_TRAINER_CARD_GRA 39         // trainer_card.c, trcard_obj.c, badge_view.c
+#define ARCID_TRAINER_CARD_UNION_GRA 40   // trainer_card.c, badge_view.c
+#define ARCID_SCRCMD_SHOP 53              // scrcmd_shop.c, scrcmd_resort_shop.c
+#define ARCID_CODEIN 58                   // codein.c, br_codein.c
+#define ARCID_WIFI_NOTE 62                // wifi_note.c
+#define ARCID_FIELD_MENU 70               // field_menu.c, field_subscreen.c
+#define ARCID_PLIST 75                    // plist_sys.c, plist_battle.c, plist_menu.c
+#define ARCID_FIELD_PLACE_NAME 83         // field_place_name.c, namein.c
+#define ARCID_TOWNMAP_GRA 84              // townmap.c, townmap_grh.c, zukan_detail_map.c
+#define ARCID_ITEMMENU 87                 // itemmenu.c, itemmenu_disp.c
+#define ARCID_BTLV_EFFVM_BG 94            // btlv_effvm.c
+#define ARCID_B_BAG 98                    // b_bag_anm.c, b_bag_main.c, b_bag_obj.c
+#define ARCID_B_PLIST 99                  // b_plist_main.c, vs_multi_list.c
+#define ARCID_PKWD 100                    // pkwd_book.c, pkwd_record_monitor.c, pkwd_selectscreen.c
+#define ARCID_B_CHOICE 101                // b_choice_main.c
+#define ARCID_POKEMONTRADE 103            // pokemontrade_2d.c, pokemontrade_nego.c
+#define ARCID_POKEMONTRADE_DEMO 104       // pokemontrade_demo_common.c, pokemontrade_demo_down.c
+#define ARCID_POKEMONTRADE_2D 105         // pokemontrade_2d.c
+#define ARCID_MIC_TEST 107                // mictest.c
+#define ARCID_NAMEIN_GRAPHIC 119          // namein.c
+#define ARCID_WAZA_OSHIE 125              // waza_oshie_main.c
+#define ARCID_SHORTCUT_MENU 129           // shortcut_menu.c
+#define ARCID_LOCAL_TVT 132               // local_tvt_chara.c, local_tvt_util.c
+#define ARCID_WIFIBATTLEMATCH 134         // wifibattlematch_view.c
+#define ARCID_BR_RES 137                  // br_res.c
+#define ARCID_MB_PARENT_SYS 142           // mb_parent_sys.c
+#define ARCID_GTSNEGO_DISP 144            // gtsnego_disp.c
+#define ARCID_MAILBOX 153                 // mailview.c
+#define ARCID_DEMO3D_2D 159               // demo3d_cmdsys.c
+#define ARCID_TVT 170                     // comm_tvt_sys.c, local_tvt_chara.c, local_tvt_util.c
+#define ARCID_BEACON 171                  // beacon_view_setup.c, beacon_detail.c
+#define ARCID_COMM_BTL_DEMO 178           // comm_btl_demo.c
+#define ARCID_GURU2 180                   // guru2_main.c
+#define ARCID_GURU2_OBJ 181               // guru2_receipt.c, guru2_main.c
+#define ARCID_FLD_FACEUP 184              // fld_faceup.c
+#define ARCID_BTL_REC_SEL 185             // btl_rec_sel.c
+#define ARCID_OEKAKI 188                  // oekaki.c
+#define ARCID_REPORT 193                  // report.c
+#define ARCID_GEONET 194                  // geonet.c
+#define ARCID_TIME_ICON 195               // time_icon.c
+#define ARCID_FIELD_SAVEANIME 197         // field_saveanime.c
+#define ARCID_PSEL 202                    // psel.c
+#define ARCID_DENDOU_PC 210               // dpc_main.c
+#define ARCID_DENDOU_DEMO 213             // ddemo_main.c, ddemo_obj.c
+#define ARCID_MANUAL 218                  // manual_common.c
+#define ARCID_ASSERT_WINDOW_GRA 230       // net_err.c
+#define ARCID_BTLV_EFFVM_PAL_ANIM 231     // btlv_effvm.c
+#define ARCID_CTVT_GAME 233               // ctvt_game.c
+#define ARCID_MEDALBOX 236                // medalbox.c
+#define ARCID_MEDAL_INFO_VIEWER 237       // medal_info_viewer.c
+#define ARCID_MEDAL 238                   // medalbox.c, medal_info_viewer.c
+#define ARCID_CTVT_GAME_CAM 242           // ctvt_game_cam.c, ctvt_game.c
+#define ARCID_FIELD_FMISSION_INFO 243     // field_fmission_info.c
+#define ARCID_FMISSION_VIEW 259           // fmission_view_setup.c
+#define ARCID_FLD3D_CI 267                // fld3d_ci.c
+#define ARCID_FMISSION_APP 270            // fmission_app.c, fmission_app_draw.c
+#define ARCID_GPOWER_APP 285              // gpower_app.c
+#define ARCID_WBT_STADIUM_GIMMICK 291     // wbt_stadium_gimmick.c
+#define ARCID_GIMMICK_POKEWOOD_POSTER 294 // gimmick_pokewood_poster.c
+#define ARCID_GIMMICK 303                 // gimmick_aspertia_city.c, gimmick_league_center.c
+
 #endif // POKEBW2_CONSTANTS_ARC_H

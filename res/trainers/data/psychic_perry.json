@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Perry",
+    "class": "TRAINER_CLASS_PSYCHIC_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIGILYPH",
+            "form": 0,
+            "level": 23,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My Psychic-type Pokémon\njust started making noises.{be01}\nIs that because we're in the ruins...\nor is it because of you?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "So...strong!\nWho are you?!"
+        },
+        {
+            "type": 2,
+            "text": "Relic Castle...{be01}\nApparently people and Pokémon came\ntogether here to create Unova."
+        }
+    ]
+}

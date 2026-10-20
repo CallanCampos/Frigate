@@ -107,20 +107,20 @@ static PokeListPlate *PokeListPlate_CreateCore(PokeListWork *wk, u8 index, Party
     surfaceSetup.h = 192;
     surfaceSetup.screen = 0;
     surfaceSetup.culling = 0;
-    plate->renderer = func_0204be9c(&surfaceSetup, 1, wk->heapId);
-    plate->unit = func_0204bf1c(6, 0, wk->heapId);
-    func_0204c018(plate->unit, plate->renderer);
+    plate->renderer = ClActRenderer_Create(&surfaceSetup, 1, wk->heapId);
+    plate->unit = ClActUnit_Create(6, 0, wk->heapId);
+    ClActUnit_SetRenderer(plate->unit, plate->renderer);
     PokeListPlate_CreateActors(wk, plate);
     PokeListPlate_CreateIcon(wk, plate);
     pos.x = -x * 8;
     pos.y = -y * 8;
-    func_0204bedc(plate->renderer, 0, &pos);
+    ClActRenderer_SetSurfacePos(plate->renderer, 0, &pos);
     plate->window = BmpWin_CreateDynamic(1, windowX, y, 16, 6, 13, TRUE);
     if (pkm != NULL) {
         plate->isEgg = PokeParty_GetParam(plate->pkm, PKM_PARAM_IS_EGG, NULL);
         plate->hp = PokeParty_GetParam(plate->pkm, PKM_PARAM_HP, NULL);
         plate->targetHp = plate->hp;
-        func_0204c124(plate->hpBar, TRUE);
+        ClActor_SetVisible(plate->hpBar, TRUE);
         PokeListPlate_UpdateEntry(wk, plate);
         if (PokeList_IsBattle(wk) == TRUE) {
             for (i = 0; i < 6; i++) {
@@ -148,12 +148,12 @@ PokeListPlate *PokeListPlate_CreateEmpty(PokeListWork *wk, u8 index) {
 
 void PokeListPlate_Free(PokeListWork *wk, PokeListPlate *plate) {
     BmpWin_Free(plate->window);
-    func_0204c108(plate->icon);
-    func_0204c108(plate->ball);
-    func_0204c108(plate->hpBar);
-    func_0204becc(plate->renderer);
-    func_0204bf98(plate->unit);
-    func_0204b98c(plate->iconChars);
+    ClActor_Delete(plate->icon);
+    ClActor_Delete(plate->ball);
+    ClActor_Delete(plate->hpBar);
+    ClActRenderer_Delete(plate->renderer);
+    ClActUnit_Delete(plate->unit);
+    ClActSys_FreeChars(plate->iconChars);
     GFL_HeapFree(plate);
 }
 
@@ -163,7 +163,8 @@ BOOL PokeListPlate_IsPrinting(PokeListPlate *plate) {
 
 void PokeListPlate_Update(PokeListWork *wk, PokeListPlate *plate) {
     if (plate->isEmpty == FALSE) {
-        if (plate->nameDirty == TRUE && func_02021c1c(wk->printQueue, BmpWin_GetBitmap(plate->window)) == FALSE) {
+        if (plate->nameDirty == TRUE &&
+            PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(plate->window)) == FALSE) {
             plate->nameDirty = FALSE;
             BmpWin_Transfer(plate->window);
         }
@@ -178,7 +179,7 @@ void PokeListPlate_Update(PokeListWork *wk, PokeListPlate *plate) {
                 }
             }
             plate->bounceTimer++;
-            func_0204c140(plate->icon, &pos, 0);
+            ClActor_SetSurfacePos(plate->icon, &pos, 0);
         }
     }
 }
@@ -194,33 +195,33 @@ static void PokeListPlate_CreateActors(PokeListWork *wk, PokeListPlate *plate) {
     ballSetup.sequence = 0;
     ballSetup.priority = 1;
     ballSetup.bgPriority = 2;
-    plate->ball = func_0204c040(plate->unit, wk->clResources[CL_RES_CHAR(1)], wk->clResources[CL_RES_PLTT(0)],
-                                wk->clResources[CL_RES_CELL(1)], &ballSetup, 0, wk->heapId);
+    plate->ball = ClActor_Create(plate->unit, wk->clResources[CL_RES_CHAR(1)], wk->clResources[CL_RES_PLTT(0)],
+                                 wk->clResources[CL_RES_CELL(1)], &ballSetup, 0, wk->heapId);
     func_0204c520(plate->ball, TRUE);
     hpBarSetup.x = 84;
     hpBarSetup.y = 28;
     hpBarSetup.sequence = 0;
     hpBarSetup.priority = 0;
     hpBarSetup.bgPriority = 2;
-    plate->hpBar = func_0204c040(plate->unit, wk->clResources[CL_RES_CHAR(6)], wk->clResources[CL_RES_PLTT(5)],
-                                 wk->clResources[CL_RES_CELL(6)], &hpBarSetup, 0, wk->heapId);
-    func_0204c124(plate->hpBar, FALSE);
+    plate->hpBar = ClActor_Create(plate->unit, wk->clResources[CL_RES_CHAR(6)], wk->clResources[CL_RES_PLTT(5)],
+                                  wk->clResources[CL_RES_CELL(6)], &hpBarSetup, 0, wk->heapId);
+    ClActor_SetVisible(plate->hpBar, FALSE);
     itemSetup.x = 32;
     itemSetup.y = 24;
     itemSetup.sequence = 0;
     itemSetup.priority = 0;
     itemSetup.bgPriority = 2;
-    plate->itemIcon = func_0204c040(plate->unit, wk->clResources[CL_RES_CHAR(3)], wk->clResources[CL_RES_PLTT(2)],
-                                    wk->clResources[CL_RES_CELL(3)], &itemSetup, 0, wk->heapId);
-    func_0204c124(plate->itemIcon, FALSE);
+    plate->itemIcon = ClActor_Create(plate->unit, wk->clResources[CL_RES_CHAR(3)], wk->clResources[CL_RES_PLTT(2)],
+                                     wk->clResources[CL_RES_CELL(3)], &itemSetup, 0, wk->heapId);
+    ClActor_SetVisible(plate->itemIcon, FALSE);
     statusSetup.x = 32;
     statusSetup.y = 42;
     statusSetup.sequence = 0;
     statusSetup.priority = 0;
     statusSetup.bgPriority = 2;
-    plate->statusIcon = func_0204c040(plate->unit, wk->clResources[CL_RES_CHAR(5)], wk->clResources[CL_RES_PLTT(4)],
-                                      wk->clResources[CL_RES_CELL(5)], &statusSetup, 0, wk->heapId);
-    func_0204c124(plate->statusIcon, FALSE);
+    plate->statusIcon = ClActor_Create(plate->unit, wk->clResources[CL_RES_CHAR(5)], wk->clResources[CL_RES_PLTT(4)],
+                                       wk->clResources[CL_RES_CELL(5)], &statusSetup, 0, wk->heapId);
+    ClActor_SetVisible(plate->statusIcon, FALSE);
 }
 
 static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
@@ -238,18 +239,18 @@ static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
         file = PokeParty_GetIconIndex(1, 0, 0, TRUE);
         palette = PokeIcon_GetPalette(1, 0, 0, TRUE);
     }
-    plate->iconChars = func_0204b81c(arc, file, FALSE, 0, wk->heapId);
+    plate->iconChars = ClActSys_LoadChars(arc, file, FALSE, 0, wk->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 24;
     setup.y = 16;
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 2;
-    plate->icon = func_0204c040(plate->unit, plate->iconChars, wk->clResources[CL_RES_PLTT(6)],
-                                wk->clResources[CL_RES_CELL(7)], &setup, 0, wk->heapId);
-    func_0204c378(plate->icon, palette, 1);
+    plate->icon = ClActor_Create(plate->unit, plate->iconChars, wk->clResources[CL_RES_PLTT(6)],
+                                 wk->clResources[CL_RES_CELL(7)], &setup, 0, wk->heapId);
+    ClActor_SetPalette(plate->icon, palette, 1);
     func_0204c520(plate->icon, TRUE);
-    func_0204c124(plate->icon, plate->pkm != NULL ? TRUE : FALSE);
+    ClActor_SetVisible(plate->icon, plate->pkm != NULL ? TRUE : FALSE);
 }
 
 static void PokeListPlate_Draw(PokeListWork *wk, PokeListPlate *plate, BOOL numbersOnly) {
@@ -297,30 +298,30 @@ static void PokeListPlate_DrawInfo(PokeListWork *wk, PokeListPlate *plate, BOOL 
                 PokeList_DrawWordSetStringSmall(wk, plate->window, wordSet, 2, 9, 35, 0x440);
             }
             GFL_WordSetSystemFree(wordSet);
-            func_0204c124(plate->statusIcon, FALSE);
+            ClActor_SetVisible(plate->statusIcon, FALSE);
         } else {
             if (plate->hp == 0) {
-                func_0204c488(plate->statusIcon, 6);
+                ClActor_SetSequence(plate->statusIcon, 6);
             } else {
                 switch (GetStatusCond(plate->pkm)) {
                 case 1:
-                    func_0204c488(plate->statusIcon, 1);
+                    ClActor_SetSequence(plate->statusIcon, 1);
                     break;
                 case 2:
-                    func_0204c488(plate->statusIcon, 3);
+                    ClActor_SetSequence(plate->statusIcon, 3);
                     break;
                 case 3:
-                    func_0204c488(plate->statusIcon, 2);
+                    ClActor_SetSequence(plate->statusIcon, 2);
                     break;
                 case 4:
-                    func_0204c488(plate->statusIcon, 5);
+                    ClActor_SetSequence(plate->statusIcon, 5);
                     break;
                 case 5:
-                    func_0204c488(plate->statusIcon, 4);
+                    ClActor_SetSequence(plate->statusIcon, 4);
                     break;
                 }
             }
-            func_0204c124(plate->statusIcon, TRUE);
+            ClActor_SetVisible(plate->statusIcon, TRUE);
         }
     }
     if (plate->entry != POKELIST_ENTRY_EMPTY) {
@@ -334,7 +335,7 @@ static void PokeListPlate_DrawInfo(PokeListWork *wk, PokeListPlate *plate, BOOL 
             msgId = plate->entry + 0x8f;
         }
         PokeList_PrintString(wk, plate->window, msgId, 46, 31, 0x440);
-        func_0204c124(plate->hpBar, FALSE);
+        ClActor_SetVisible(plate->hpBar, FALSE);
     } else if (showLearn == TRUE) {
         u32 msgId;
 
@@ -351,12 +352,12 @@ static void PokeListPlate_DrawInfo(PokeListWork *wk, PokeListPlate *plate, BOOL 
             break;
         }
         PokeList_PrintString(wk, plate->window, msgId, 29, 31, 0x440);
-        func_0204c124(plate->hpBar, FALSE);
+        ClActor_SetVisible(plate->hpBar, FALSE);
     } else if (wk->param->mode == 16) {
         u32 msgId = PokeList_CanEvolveWithItem(wk, plate->pkm, wk->param->item) == FALSE ? 0x99 : 0x98;
 
         PokeList_PrintString(wk, plate->window, msgId, 46, 31, 0x440);
-        func_0204c124(plate->hpBar, FALSE);
+        ClActor_SetVisible(plate->hpBar, FALSE);
     } else if (wk->wasMode19 == TRUE) {
         u32 msgId = MusicalSystem_CanJoin(plate->pkm) == TRUE ? 0x9a : 0x9b;
 
@@ -387,14 +388,14 @@ static void PokeListPlate_DrawInfo(PokeListWork *wk, PokeListPlate *plate, BOOL 
     }
     item = PokeParty_GetParam(plate->pkm, PKM_PARAM_ITEM, NULL);
     if (item != 0) {
-        func_0204c124(plate->itemIcon, TRUE);
+        ClActor_SetVisible(plate->itemIcon, TRUE);
         if (PML_ItemIsMail(item) == TRUE) {
-            func_0204c488(plate->itemIcon, 1);
+            ClActor_SetSequence(plate->itemIcon, 1);
         } else {
-            func_0204c488(plate->itemIcon, 0);
+            ClActor_SetSequence(plate->itemIcon, 0);
         }
     } else {
-        func_0204c124(plate->itemIcon, FALSE);
+        ClActor_SetVisible(plate->itemIcon, FALSE);
     }
     {
         u32 color = PokeListPlate_GetHpColor(plate);
@@ -411,7 +412,7 @@ static void PokeListPlate_DrawInfo(PokeListWork *wk, PokeListPlate *plate, BOOL 
         } else if (color == HP_GAUGE_COLOR_GREEN) {
             sequence = 2;
         }
-        func_0204c488(plate->icon, sequence);
+        ClActor_SetSequence(plate->icon, sequence);
     }
     plate->nameDirty = TRUE;
 }
@@ -436,7 +437,7 @@ static void PokeListPlate_DrawHpBar(PokeListWork *wk, PokeListPlate *plate) {
         }
         GFL_BitmapFillArea(bitmap, 61, 27, width, 1, topColor);
         GFL_BitmapFillArea(bitmap, 61, 28, width, 1, bottomColor);
-        func_0204c124(plate->hpBar, TRUE);
+        ClActor_SetVisible(plate->hpBar, TRUE);
     }
 }
 
@@ -448,8 +449,8 @@ static void PokeListPlate_DrawEgg(PokeListWork *wk, PokeListPlate *plate) {
     PokeList_PrintWordSetString(wk, plate->window, wordSet, 3, 41, 9, 0x440);
     GFL_StrBufFree(name);
     GFL_WordSetSystemFree(wordSet);
-    func_0204c124(plate->hpBar, FALSE);
-    func_0204c488(plate->icon, 1);
+    ClActor_SetVisible(plate->hpBar, FALSE);
+    ClActor_SetSequence(plate->icon, 1);
     plate->nameDirty = TRUE;
 }
 
@@ -464,9 +465,9 @@ void PokeListPlate_SetSelected(PokeListWork *wk, PokeListPlate *plate, BOOL sele
         } else {
             PokeListPlate_SetPalette(wk, plate, 6);
         }
-        func_0204c488(plate->ball, 1);
+        ClActor_SetSequence(plate->ball, 1);
         PokeListPlate_GetIconPos(plate, 26, 19, &pos);
-        func_0204c140(plate->icon, &pos, 0);
+        ClActor_SetSurfacePos(plate->icon, &pos, 0);
         plate->bounceTimer = 0;
     } else {
         ClActorPos pos;
@@ -479,9 +480,9 @@ void PokeListPlate_SetSelected(PokeListWork *wk, PokeListPlate *plate, BOOL sele
         } else {
             PokeListPlate_SetPalette(wk, plate, 3);
         }
-        func_0204c488(plate->ball, 0);
+        ClActor_SetSequence(plate->ball, 0);
         PokeListPlate_GetIconPos(plate, 24, 16, &pos);
-        func_0204c140(plate->icon, &pos, 0);
+        ClActor_SetSurfacePos(plate->icon, &pos, 0);
     }
     plate->selected = selected;
 }
@@ -510,7 +511,7 @@ void PokeListPlate_DrawSlid(PokeListWork *wk, PokeListPlate *plate, int step) {
     BmpWin_SetPosX(plate->window, step + (x + 16));
     pos.x = -(x + step) * 8;
     pos.y = -y * 8;
-    func_0204bedc(plate->renderer, 0, &pos);
+    ClActRenderer_SetSurfacePos(plate->renderer, 0, &pos);
     GFL_BGSysLoadScrArea(2, x + 16 + step, y, 16, 6, wk->plateScreen->rawData,
                          sPlateScreenPos[plate->index != 0 ? 1 : 0][0], sPlateScreenPos[plate->index != 0 ? 1 : 0][1],
                          32, 32);
@@ -549,18 +550,18 @@ void PokeListPlate_SetPkm(PokeListWork *wk, PokeListPlate *plate, PartyPkm *pkm,
     plate->isEgg = PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL);
     plate->hp = PokeParty_GetParam(plate->pkm, PKM_PARAM_HP, NULL);
     plate->targetHp = plate->hp;
-    func_0204c108(plate->icon);
-    func_0204b98c(plate->iconChars);
+    ClActor_Delete(plate->icon);
+    ClActSys_FreeChars(plate->iconChars);
     GFL_BitmapFill(BmpWin_GetBitmap(plate->window), 0);
-    func_0204c124(plate->itemIcon, FALSE);
-    func_0204c124(plate->statusIcon, FALSE);
+    ClActor_SetVisible(plate->itemIcon, FALSE);
+    ClActor_SetVisible(plate->statusIcon, FALSE);
     origin.x = 0;
     origin.y = 0;
-    func_0204bedc(plate->renderer, 0, &origin);
+    ClActRenderer_SetSurfacePos(plate->renderer, 0, &origin);
     PokeListPlate_CreateIcon(wk, plate);
     pos.x = -(x + step) * 8;
     pos.y = -y * 8;
-    func_0204bedc(plate->renderer, 0, &pos);
+    ClActRenderer_SetSurfacePos(plate->renderer, 0, &pos);
     PokeListPlate_Draw(wk, plate, FALSE);
 }
 
@@ -708,7 +709,7 @@ static u8 PokeListPlate_GetHpColor(PokeListPlate *plate) {
 static void PokeListPlate_GetIconPos(PokeListPlate *plate, int x, int y, ClActorPos *pos) {
     ClActorPos surfacePos;
 
-    func_0204befc(plate->renderer, 0, &surfacePos);
+    ClActRenderer_GetSurfacePos(plate->renderer, 0, &surfacePos);
     pos->x = x - surfacePos.x;
     pos->y = y - surfacePos.y;
 }

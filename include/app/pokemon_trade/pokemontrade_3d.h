@@ -16,7 +16,7 @@ struct PokemonTrade3DWork {
     void *systemWork[9];
     // The sizes of the two sprites that the infrared trade's scene scales
     VecFx32 ircSpriteSizes[2];
-    // The size of each of the four Pokémon sprites, as func_0201ab70 gives it
+    // The size of each of the four Pokémon sprites, as MCSS_GetScale gives it
     VecFx32 spriteSizes[4];
     G3DCurve *cameraPosPath;
     G3DCurve *cameraTargetPath;

@@ -147,7 +147,7 @@ ZukanDetailGraphic *ZukanDetailGraphic_Create(u32 layout, HeapID heapId, BOOL wi
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     graphic->g3dCreated = FALSE;
     ZukanDetailBG_Init(&graphic->bg, heapId);
     ZukanDetailClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
@@ -163,7 +163,7 @@ void ZukanDetailGraphic_Free(ZukanDetailGraphic *graphic) {
     ZukanDetailGraphic_Free3D(graphic);
     ZukanDetailClAct_Free(&graphic->clact);
     ZukanDetailBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -249,24 +249,24 @@ static void ZukanDetailBG_VBlank(ZukanDetailBG *bg) {
 static void ZukanDetailClAct_Init(ZukanDetailClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(ZukanDetailClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(96, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(96, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void ZukanDetailClAct_Free(ZukanDetailClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(ZukanDetailClAct));
 }
 
 static void ZukanDetailClAct_Update(ZukanDetailClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void ZukanDetailClAct_VBlank(ZukanDetailClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *ZukanDetailClAct_GetUnit(ZukanDetailClAct *clact) {

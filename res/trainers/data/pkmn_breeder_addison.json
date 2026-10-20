@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Addison",
+    "class": "TRAINER_CLASS_PKMN_BREEDER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CAMERUPT",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GRUMPIG",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "We've just got to do what we can!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I feel like I understood what I could\ndo and what I couldn't."
+        },
+        {
+            "type": 2,
+            "text": "I'll try to increase the things I can\ndo and challenge you again!"
+        }
+    ]
+}

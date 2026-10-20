@@ -1,0 +1,24 @@
+NacreneCity11_Text_LenoraWhyHelloBurgh = Lenora: Why hello, Burgh.{be01}\nWhat's up?\nSuffering from artist's block again?{be01}
+NacreneCity11_Text_BurghHmmBonesPerhaps = Burgh: Hmm...\nBones, perhaps...{be01}
+NacreneCity11_Text_LenoraBonesMuseumCourse = Lenora: Bones...?{be01}\nThis is a museum,\nso of course we have bones.{be01}\nWhat are you looking for?\nYour next motif?{be01}
+NacreneCity11_Text_BurghMaybeMaybeNot = Burgh: Maybe...{be01}\nOr maybe not...{be01}\nMany Bug-type Pokémon have\nhard coverings, right?{be00}\nTheir so-called exoskeletons.{be01}\nSo I don't quite understand bones.\nNot at all, actually.{be01}
+NacreneCity11_Text_LenoraDidThinkWould = Lenora: So, did you think you would\nunderstand something about bones{be00}\nif you came here?{be01}\nSure thing!\nMake yourself at home!{be01}\nIf you'd like, I can have my husband\nexplain them to you.{be01}
+NacreneCity11_Text_BurghMmmWellStarters = Burgh: Mmm...{be01}\nWell, for starters, what do bones\nmean to you?{be01}
+NacreneCity11_Text_LenoraWhenLittleDad = Lenora: When I was little, my dad\nworked in a mine, and he would always{be00}\nbring home bones he dug up.{be01}\nI was just a child, but I was brought\nunder the spell of bones.{be01}\nWhat did the bones look like\nwhen they were part of a living being?{be01}\nWhy are they shaped the way they are?\nThings like that captivated me.{be01}
+NacreneCity11_Text_BurghOohhhKindUnderstand = Burgh: Oohhh...\nI kind of understand.{be01}\nI'm also fascinated by the functional,\nefficient designs of Bug-type Pokémon,{be00}\nsuch as the shape of their legs.{be01}
+NacreneCity11_Text_HeyThereWhatsEveryone = ???: Hey there!\nWhat's everyone all gathered up for?{be01}
+NacreneCity11_Text_BurghWhatBringsHere = Burgh: What brings you here?{be01}
+NacreneCity11_Text_ClayFoundFossilTwist = Clay: Found a Fossil\nin Twist Mountain.{be01}\nI came to have Lenora look at it and see\nif ya wanted to keep it here or somethin'.{be01}
+NacreneCity11_Text_BurghClayWhatBones = Burgh: Clay.\nWhat do bones mean to you?{be01}
+NacreneCity11_Text_ClayHmmWellNow = Clay: Hmm?\nWell now...{be01}\nNo matter who ya are or when ya die,\nbones are all that'll be left of ya.{be01}\nWhen ya think about it, it's amazin'.\nEven if ya die, ya can make money!{be00}\nSome Fossils are worth a lot, ya know!{be01}
+NacreneCity11_Text_LenoraCantTellIf = Lenora: I can't tell if you're kidding,\nbut of course you would think that way.{be01}\nBurgh is trying hard to think\nabout what bones mean to him.{be01}\nDon't be so flippant!{be01}\nSo what kind of Fossil have you got\nthere? Let me see.{be01}
+NacreneCity11_Text_ClayHereYaGo = Clay: Here ya go!{be01}\nWhaddaya think?{be01}\nIt's gotta be worth a mint\nas a specimen or as a collectible!{be00}\nWhich is it?{be01}
+NacreneCity11_Text_LenoraWellMeanGood = Lenora: Well, I mean this in a good way,\nbut it's an ordinary Fossil.{be01}\nIf it isn't worth much as a specimen,\nyou can't sell it for much.{be01}\nBut I'm curious about the soil\nattached to the Fossil...{be01}
+NacreneCity11_Text_BurghWhatMean = Burgh: What do you mean?{be01}
+NacreneCity11_Text_LenoraItsVerySubtle = Lenora: It's very subtle,\nbut it's a bit different from the soil{be00}\nI usually see from Twist Mountain.{be01}
+NacreneCity11_Text_ClayGuessTwistMountain = Clay: That so?{be01}\nGuess my Twist Mountain\nstill has unlimited potential!{be01}\nAll right!\nI'll keep on diggin' my Clay Tunnel!{be01}
+NacreneCity11_Text_HereBurghPlainOl = Here, Burgh!{be01}\nThat plain ol' Fossil's yours!{be01}\nHave a look at it\nand think about what bones mean to ya.{be01}
+NacreneCity11_Text_BurghThankLenoraGuess = Burgh: Thank you, Lenora.{be01}\nI guess it's OK that I have\nmy own perspective on what{be00}\nbones mean to me, right?{be01}
+NacreneCity11_Text_LenoraWhyNotClay = Lenora: Why not?{be01}\nYou, me, Clay...\nWe all have a different way of thinking{be00}\nabout what bones mean to us.{be01}\nIt would be kind of creepy if we all felt\nthe exact same way, right?{be01}\nAnyway, I feel sorry for this Fossil.{be01}\nIt's just resting, minding its own\nbusiness, and everyone is saying{be00}\nthis and that about it.{be01}
+NacreneCity11_Text_BurghKnowIllThank = Burgh: I know.{be01}\nI'll thank this Fossil\nby using it as a motif{be00}\nfor one of my works.{be01}\nSee you, Lenora.{be01}
+\pad{1c}

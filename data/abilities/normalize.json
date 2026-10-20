@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Normalize",
-    "description": "All the Pokémon's moves\nbecome the Normal type."
-}

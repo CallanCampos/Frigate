@@ -28,7 +28,7 @@ GameEventReturnCode EventCGearShutdown_Callback(GameEvent *event, u32 *state, vo
         if (FieldSubscreen_GetReturnSubscreen(data->subscreen) != 0xe) {
             break;
         }
-        func_ov036_021984e4(data->subscreen);
+        FieldSubscreen_ResetReturnSubscreen(data->subscreen);
         (*state)++;
         break;
     case 2:

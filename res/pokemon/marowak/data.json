@@ -1,0 +1,189 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Marowak",
+    "pokedex": {
+        "category": "Bone Keeper Pokémon",
+        "entry": "From its birth, this savage Pokémon\nconstantly holds bones. It is\nskilled in using them as weapons.",
+        "height": "3'03\"",
+        "weight": "99.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Marowak",
+                "category": "Bone Keeper Pokémon",
+                "entry": "From its birth, this savage Pokémon\nconstantly holds bones. It is\nskilled in using them as weapons.",
+                "height": "3'03\"",
+                "weight": "99.2 lbs."
+            },
+            "fr": {
+                "name": "Ossatueur",
+                "category": "Pokémon Gard'Os",
+                "entry": "Ce Pokémon sauvage possède des os\ndepuis sa naissance. Il s'en sert\npour combattre avec dextérité.",
+                "height": "1,0 m",
+                "weight": "45,0 kg"
+            },
+            "de": {
+                "name": "Knogga",
+                "category": "Knochenfan",
+                "entry": "Von Geburt an trägt dieses wilde\nPokémon Knochen. Es setzt sie\ntalentiert als Waffen ein.",
+                "height": "1,0 m",
+                "weight": "45,0 kg"
+            },
+            "it": {
+                "name": "Marowak",
+                "category": "Pokémon Guardaossi",
+                "entry": "Pokémon selvatico che tiene in mano\nun osso sin dalla nascita. Lo usa\nabilmente come arma.",
+                "height": "1,0 m",
+                "weight": "45,0 kg"
+            },
+            "ko": {
+                "name": "텅구리",
+                "category": "뼈다귀포켓몬",
+                "entry": "태어날 때부터 항상 지니고 있는\n뼈를 자유로이 사용한다.\n성격은 난폭하다.",
+                "height": "1.0 m",
+                "weight": "45.0 kg"
+            },
+            "es": {
+                "name": "Marowak",
+                "category": "Pokémon Apilahueso",
+                "entry": "Este Pokémon salvaje maneja huesos\nconstantemente desde su nacimiento\ny los usa como armas.",
+                "height": "1,0 m",
+                "weight": "45,0 kg"
+            },
+            "ja": {
+                "name": "ガラガラ",
+                "category": "ほねずきポケモン",
+                "entry": "うまれたときから\\x{3000}いつも\\x{3000}もっている\nホネを\\x{3000}じざいに\\x{3000}つかいこなす。\nせいかくは\\x{3000}きょうぼうだ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 80,
+        "defense": 110,
+        "speed": 45,
+        "special_attack": 50,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_THICK_CLUB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_ROCK_HEAD", "ABILITY_LIGHTNINGROD" ],
+    "hidden_ability": "ABILITY_BATTLE_ARMOR",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 149,
+    "height": 10,
+    "weight": 450,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_BONE_CLUB" ],
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 3, "MOVE_TAIL_WHIP" ],
+            [ 7, "MOVE_BONE_CLUB" ],
+            [ 11, "MOVE_HEADBUTT" ],
+            [ 13, "MOVE_LEER" ],
+            [ 17, "MOVE_FOCUS_ENERGY" ],
+            [ 21, "MOVE_BONEMERANG" ],
+            [ 23, "MOVE_RAGE" ],
+            [ 27, "MOVE_FALSE_SWIPE" ],
+            [ 33, "MOVE_THRASH" ],
+            [ 37, "MOVE_FLING" ],
+            [ 43, "MOVE_BONE_RUSH" ],
+            [ 49, "MOVE_ENDEAVOR" ],
+            [ 53, "MOVE_DOUBLE_EDGE" ],
+            [ 59, "MOVE_RETALIATE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM52",
+            "TM54",
+            "TM56",
+            "TM59",
+            "TM67",
+            "TM68",
+            "TM71",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_LOW_KICK",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ENDEAVOR",
+            "MOVE_OUTRAGE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CUBONE",
+    "cry_volume": 110
+}

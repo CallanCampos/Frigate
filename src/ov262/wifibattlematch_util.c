@@ -76,7 +76,7 @@ WifiBattleMatchMsgBox *WifiBattleMatchMsgBox_Create(u32 bg, u32 palette, u16 fra
     MI_CpuFill8(p_wk, 0, sizeof(WifiBattleMatchMsgBox));
     p_wk->bgColor = MSGBOX_BG_COLOR;
     p_wk->font = font;
-    p_wk->queue = func_02021998(heapId);
+    p_wk->queue = PrintQueue_CreateDefault(heapId);
     p_wk->mode = 4;
     p_wk->heapId = heapId;
     p_wk->strBuf = GFL_StrBufCreate(0x300, heapId);
@@ -94,7 +94,7 @@ WifiBattleMatchMsgBox *WifiBattleMatchMsgBox_Create(u32 bg, u32 palette, u16 fra
 
 void WifiBattleMatchMsgBox_Free(WifiBattleMatchMsgBox *p_wk) {
     if (p_wk->stream != NULL) {
-        func_020223cc(p_wk->stream);
+        PrintStream_Delete(p_wk->stream);
         p_wk->stream = NULL;
     }
     if (p_wk->waitIcon != NULL) {
@@ -108,12 +108,12 @@ void WifiBattleMatchMsgBox_Free(WifiBattleMatchMsgBox *p_wk) {
     BmpWin_ClearFrame(p_wk->window, WINFRAME_TRANSFER_NOW);
     BmpWin_Free(p_wk->window);
     GFL_StrBufFree(p_wk->strBuf);
-    func_02021a18(p_wk->queue);
+    PrintQueue_Free(p_wk->queue);
     GFL_HeapFree(p_wk);
 }
 
 void WifiBattleMatchMsgBox_Update(WifiBattleMatchMsgBox *p_wk) {
-    func_02021a3c(p_wk->queue);
+    PrintQueue_Main(p_wk->queue);
     switch (p_wk->mode) {
     case 2:
         PrintWindow_Flush(&p_wk->printWindow, p_wk->queue);
@@ -169,10 +169,10 @@ void WifiBattleMatchMsgBox_EnableKeyCursor(WifiBattleMatchMsgBox *p_wk) {
 
 // Prints the string that p_wk->strBuf holds, in a WIFIBATTLEMATCH_MSG_* way
 static void WifiBattleMatchUtil_MsgBoxStart(WifiBattleMatchMsgBox *p_wk, u32 mode) {
-    func_02021c44(p_wk->queue);
+    PrintQueue_Clear(p_wk->queue);
     GFL_BitmapFill(BmpWin_GetBitmap(p_wk->window), p_wk->bgColor);
     if (p_wk->stream != NULL) {
-        func_020223cc(p_wk->stream);
+        PrintStream_Delete(p_wk->stream);
         p_wk->stream = NULL;
     }
     if (p_wk->p_keycursor != NULL) {
@@ -194,15 +194,15 @@ static void WifiBattleMatchUtil_MsgBoxStart(WifiBattleMatchMsgBox *p_wk, u32 mod
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printsys, APP_PRINTSYS_COMMON_KEYS);
         p_wk->p_keycursor = KeyCursor_Create(p_wk->bgColor, TRUE, FALSE, p_wk->heapId);
-        p_wk->stream = func_02022268(p_wk->window, 0, 0, p_wk->strBuf, p_wk->font, func_02017bcc(), p_wk->tcbManager, 0,
-                                     p_wk->heapId, p_wk->bgColor);
+        p_wk->stream = PrintStream_Create(p_wk->window, 0, 0, p_wk->strBuf, p_wk->font, TextSpeed_GetCurrentWait(),
+                                          p_wk->tcbManager, 0, p_wk->heapId, p_wk->bgColor);
         p_wk->mode = 1;
         break;
     case WIFIBATTLEMATCH_MSG_STREAM:
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printsys, APP_PRINTSYS_COMMON_KEYS);
-        p_wk->stream = func_02022268(p_wk->window, 0, 0, p_wk->strBuf, p_wk->font, func_02017bcc(), p_wk->tcbManager, 0,
-                                     p_wk->heapId, p_wk->bgColor);
+        p_wk->stream = PrintStream_Create(p_wk->window, 0, 0, p_wk->strBuf, p_wk->font, TextSpeed_GetCurrentWait(),
+                                          p_wk->tcbManager, 0, p_wk->heapId, p_wk->bgColor);
         p_wk->mode = 3;
         break;
     }
@@ -338,7 +338,7 @@ void WifiBattleMatchTask_ReturnToSeq(WifiBattleMatchTask *task) {
 }
 
 // Counts a match in the records, by kind
-void func_ov262_021c5c94(GameData *gameData, u32 mode) {
+void WifiBattleMatch_RecordResult(GameData *gameData, u32 mode) {
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
 
     switch (mode) {
@@ -357,9 +357,9 @@ void func_ov262_021c5c94(GameData *gameData, u32 mode) {
     RecordAddOne(records, 0x11);
 }
 
-void func_ov262_021c5cd4(GameData *gameData, u32 mode) {
-    func_0200f368(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
+void WifiBattleMatch_RecordBattleTime(GameData *gameData, u32 mode) {
+    RecordSave_UpdateMatchSeconds(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
     if (mode != 3 && mode != 6) {
-        func_02017b98(gameData);
+        GameData_IncCounter(gameData);
     }
 }

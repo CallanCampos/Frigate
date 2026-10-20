@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Carol",
+    "class": "TRAINER_CLASS_NURSE",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL", "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": true,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BLISSEY",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I fight for my love of Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your love of Pokémon really came through..."
+        },
+        {
+            "type": 13,
+            "text": "That's your love of Pokémon!\nHere's my love of Pokémon!{be01}"
+        },
+        {
+            "type": 14,
+            "text": "My love of Pokémon will always make them\nfeel better."
+        }
+    ]
+}

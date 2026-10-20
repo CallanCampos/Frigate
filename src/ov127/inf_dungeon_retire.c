@@ -99,7 +99,7 @@ static GameEventReturnCode InfDungeonRetire_EventMain(GameEvent *event, u32 *sta
     case 1:
         returnScreen = FieldSubscreen_GetReturnSubscreen(Field_GetSubscreen(retire->field));
         if (returnScreen != 0) {
-            func_ov036_021984e4(Field_GetSubscreen(retire->field));
+            FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(retire->field));
             if (returnScreen == RETIRE_SUBSCREEN_RETURN) {
                 if (retire->screenId == 10 || retire->screenId == 4) {
                     FieldSubscreen *subscreen = Field_GetSubscreen(retire->field);
@@ -164,7 +164,7 @@ void InfDungeonRetire_Update(InfDungeonRetire *work) {
         break;
     }
     InfDungeonRetire_UpdateMenu(work);
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
 }
 
 void InfDungeonRetire_Free(InfDungeonRetire *work) {
@@ -174,13 +174,13 @@ void InfDungeonRetire_Free(InfDungeonRetire *work) {
 
 static void InfDungeonRetire_Init(InfDungeonRetire *work, HeapID heapId) {
     work->font = GFL_FontCreate(0x17, 0, 0, FALSE, heapId);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_INF_DUNGEON_RETIRE, heapId);
-    work->printQueue = func_02021998(heapId);
+    work->printQueue = PrintQueue_CreateDefault(heapId);
     InfDungeonRetire_InitBGs(work, heapId);
     InfDungeonRetire_InitMenuRes(work, heapId);
     InfDungeonRetire_InitWindow(work, heapId);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     func_ov036_02198884(work->subscreen, heapId);
 }
 
@@ -312,8 +312,8 @@ static void InfDungeonRetire_Exit(InfDungeonRetire *work) {
     InfDungeonRetire_FreeWindow(work);
     InfDungeonRetire_FreeMenuRes(work);
     InfDungeonRetire_FreeBGs(work);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_MsgDataFree(work->msgData);
     GFL_FontFree(work->font);
 }

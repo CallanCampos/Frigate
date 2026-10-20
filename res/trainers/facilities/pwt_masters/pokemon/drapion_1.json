@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DRAPION",
+    "moves": [ "MOVE_CROSS_POISON", "MOVE_NIGHT_SLASH", "MOVE_ICE_FANG", "MOVE_PROTECT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_SCOPE_LENS",
+    "form": 0
+}

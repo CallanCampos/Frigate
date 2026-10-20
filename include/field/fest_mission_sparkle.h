@@ -19,7 +19,7 @@ typedef struct {
     u8 found[FEST_SPARKLE_MAX];
 } FestSparkleZone;
 
-// The mission's work, which the festival keeps (func_02014864) and overlay 24 fills on entering a zone
+// The mission's work, which the festival keeps (LinkFestival_GetEntries) and overlay 24 fills on entering a zone
 typedef struct {
     u16 zoneId;
     u8 unk2;

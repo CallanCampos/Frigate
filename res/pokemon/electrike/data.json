@@ -1,0 +1,176 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Electrike",
+    "pokedex": {
+        "category": "Lightning Pokémon",
+        "entry": "Using electricity stored in its fur,\nit stimulates its muscles to\nheighten its reaction speed.",
+        "height": "2'00\"",
+        "weight": "33.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Electrike",
+                "category": "Lightning Pokémon",
+                "entry": "Using electricity stored in its fur,\nit stimulates its muscles to\nheighten its reaction speed.",
+                "height": "2'00\"",
+                "weight": "33.5 lbs."
+            },
+            "fr": {
+                "name": "Dynavolt",
+                "category": "Pokémon Orage",
+                "entry": "Il améliore ses réflexes en\nstimulant ses muscles grâce à\nl'électricité dans sa fourrure.",
+                "height": "0,6 m",
+                "weight": "15,2 kg"
+            },
+            "de": {
+                "name": "Frizelbliz",
+                "category": "Gewitter",
+                "entry": "Die Elektrizität, die es im Fell\nspeichert, nutzt es, um seine\nMuskeln zu stimulieren.",
+                "height": "0,6 m",
+                "weight": "15,2 kg"
+            },
+            "it": {
+                "name": "Electrike",
+                "category": "Pokémon Lampo",
+                "entry": "L'elettricità immagazzinata nella\npelliccia gli stimola i muscoli e aumenta\nla sua velocità di reazione.",
+                "height": "0,6 m",
+                "weight": "15,2 kg"
+            },
+            "ko": {
+                "name": "썬더라이",
+                "category": "천둥번개포켓몬",
+                "entry": "털에 모은 전기를 써서\n근육을 자극함으로써\n순발력을 높인다.",
+                "height": "0.6 m",
+                "weight": "15.2 kg"
+            },
+            "es": {
+                "name": "Electrike",
+                "category": "Pokémon Calambre",
+                "entry": "Estimula sus músculos y aumenta\nsus reflejos con la electricidad\nque almacena su pelaje.",
+                "height": "0,6 m",
+                "weight": "15,2 kg"
+            },
+            "ja": {
+                "name": "ラクライ",
+                "category": "いなずまポケモン",
+                "entry": "たいもうに\\x{3000}ためた\\x{3000}でんきを\\x{3000}つかい\nきんにくを\\x{3000}しげきすることで\nしゅんぱつりょくを\\x{3000}たかめる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 45,
+        "defense": 40,
+        "speed": 65,
+        "special_attack": 65,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_STATIC", "ABILITY_LIGHTNINGROD" ],
+    "hidden_ability": "ABILITY_MINUS",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 59,
+    "height": 6,
+    "weight": 152,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 4, "MOVE_THUNDER_WAVE" ],
+            [ 9, "MOVE_LEER" ],
+            [ 12, "MOVE_HOWL" ],
+            [ 17, "MOVE_QUICK_ATTACK" ],
+            [ 20, "MOVE_SPARK" ],
+            [ 25, "MOVE_ODOR_SLEUTH" ],
+            [ 28, "MOVE_BITE" ],
+            [ 33, "MOVE_THUNDER_FANG" ],
+            [ 36, "MOVE_ROAR" ],
+            [ 41, "MOVE_DISCHARGE" ],
+            [ 44, "MOVE_CHARGE" ],
+            [ 49, "MOVE_WILD_CHARGE" ],
+            [ 52, "MOVE_THUNDER" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM35",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM95",
+            "HM04"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_UPROAR", "MOVE_MAGNET_RISE", "MOVE_IRON_TAIL", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_CRUNCH",
+            "MOVE_HEADBUTT",
+            "MOVE_UPROAR",
+            "MOVE_CURSE",
+            "MOVE_SWIFT",
+            "MOVE_DISCHARGE",
+            "MOVE_ICE_FANG",
+            "MOVE_FIRE_FANG",
+            "MOVE_THUNDER_FANG",
+            "MOVE_SWITCHEROO",
+            "MOVE_ELECTRO_BALL",
+            "MOVE_SHOCK_WAVE",
+            "MOVE_FLAME_BURST"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 26,
+            "species": "SPECIES_MANECTRIC"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ELECTRIKE",
+    "cry_volume": 120
+}

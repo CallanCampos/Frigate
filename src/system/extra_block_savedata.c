@@ -15,15 +15,15 @@ void func_020103f8(void *block) {
     MI_CpuFill8(block, 0, func_020103f4());
 }
 
-u32 func_0201040c(void) {
+u32 WbtDownloadData_GetSize(void) {
     return sizeof(WbtDownloadData);
 }
 
-void func_02010414(void *block) {
-    MI_CpuFill8(block, 0, func_0201040c());
+void WbtDownloadData_Clear(void *block) {
+    MI_CpuFill8(block, 0, WbtDownloadData_GetSize());
 }
 
-BOOL func_02010428(void *data) {
+BOOL WbtDownloadData_IsCRCValid(void *data) {
     WbtDownloadData *download = data;
     u16 crc = download->crc;
 

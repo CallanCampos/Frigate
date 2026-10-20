@@ -55,7 +55,6 @@
 // ROM names only the overlay's other file, "pkwd_book_graphic.c", so the name of this one is our guess
 
 // The archives of the screen's graphics and of the movies' data, as in pkwd_selectscreen.c and event_pokewood.c
-#define ARCID_PKWD_BOOK_GRA 100
 #define ARCID_POKEWOOD_MOVIE 269
 
 #define MOVIE_COUNT 41
@@ -791,47 +790,47 @@ static const PkwdBookActorEntry sPkwdBookMarkActors[MARK_ACTOR_COUNT + 1] = {
 // The scripts of each movie, for a boy and then for a girl
 // clang-format off
 static const u16 sPkwdBookScriptBanks[MOVIE_COUNT * 2] = {
-    TEXT_BANK_0182, TEXT_BANK_0181,
-    TEXT_BANK_0184, TEXT_BANK_0183,
-    TEXT_BANK_0186, TEXT_BANK_0185,
-    TEXT_BANK_0188, TEXT_BANK_0187,
-    TEXT_BANK_0190, TEXT_BANK_0189,
-    TEXT_BANK_0192, TEXT_BANK_0191,
-    TEXT_BANK_0194, TEXT_BANK_0193,
-    TEXT_BANK_0196, TEXT_BANK_0195,
-    TEXT_BANK_0198, TEXT_BANK_0197,
-    TEXT_BANK_0200, TEXT_BANK_0199,
-    TEXT_BANK_0202, TEXT_BANK_0201,
-    TEXT_BANK_0204, TEXT_BANK_0203,
-    TEXT_BANK_0206, TEXT_BANK_0205,
-    TEXT_BANK_0208, TEXT_BANK_0207,
-    TEXT_BANK_0210, TEXT_BANK_0209,
-    TEXT_BANK_0212, TEXT_BANK_0211,
-    TEXT_BANK_0214, TEXT_BANK_0213,
-    TEXT_BANK_0216, TEXT_BANK_0215,
-    TEXT_BANK_0218, TEXT_BANK_0217,
-    TEXT_BANK_0220, TEXT_BANK_0219,
-    TEXT_BANK_0222, TEXT_BANK_0221,
-    TEXT_BANK_0224, TEXT_BANK_0223,
-    TEXT_BANK_0226, TEXT_BANK_0225,
-    TEXT_BANK_0228, TEXT_BANK_0227,
-    TEXT_BANK_0230, TEXT_BANK_0229,
-    TEXT_BANK_0232, TEXT_BANK_0231,
-    TEXT_BANK_0234, TEXT_BANK_0233,
-    TEXT_BANK_0236, TEXT_BANK_0235,
-    TEXT_BANK_0238, TEXT_BANK_0237,
-    TEXT_BANK_0240, TEXT_BANK_0239,
-    TEXT_BANK_0242, TEXT_BANK_0241,
-    TEXT_BANK_0244, TEXT_BANK_0243,
-    TEXT_BANK_0246, TEXT_BANK_0245,
-    TEXT_BANK_0248, TEXT_BANK_0247,
-    TEXT_BANK_0250, TEXT_BANK_0249,
-    TEXT_BANK_0252, TEXT_BANK_0251,
-    TEXT_BANK_0254, TEXT_BANK_0253,
-    TEXT_BANK_0256, TEXT_BANK_0255,
-    TEXT_BANK_0258, TEXT_BANK_0257,
-    TEXT_BANK_0260, TEXT_BANK_0259,
-    TEXT_BANK_0262, TEXT_BANK_0261,
+    TEXT_BANK_PKWD_BOOK_MOVIE_00_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_00_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_01_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_01_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_02_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_02_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_03_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_03_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_04_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_04_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_05_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_05_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_06_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_06_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_07_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_07_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_08_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_08_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_09_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_09_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_10_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_10_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_11_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_11_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_12_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_12_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_13_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_13_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_14_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_14_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_15_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_15_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_16_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_16_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_17_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_17_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_18_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_18_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_19_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_19_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_20_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_20_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_21_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_21_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_22_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_22_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_23_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_23_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_24_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_24_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_25_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_25_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_26_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_26_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_27_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_27_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_28_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_28_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_29_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_29_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_30_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_30_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_31_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_31_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_32_BOY, TEXT_BANK_PKWD_BOOK_MOVIE_32_GIRL,
+    TEXT_BANK_PKWD_BOOK_MOVIE_33_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_33_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_34_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_34_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_35_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_35_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_36_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_36_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_37_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_37_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_38_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_38_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_39_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_39_BOY,
+    TEXT_BANK_PKWD_BOOK_MOVIE_40_GIRL, TEXT_BANK_PKWD_BOOK_MOVIE_40_BOY,
 };
 
 // clang-format on
@@ -877,7 +876,7 @@ static BOOL PkwdBook_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->graphic = PkwdBookGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 64, wk->heapId);
     wk->menu = NULL;
     wk->menuRes = AppTaskMenuRes_Create(4, 11, wk->font, wk->printQueue, wk->heapId);
@@ -890,7 +889,7 @@ static BOOL PkwdBook_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBookWork *wk = work;
     HeapID heapId;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return FALSE;
     }
     if (wk->param->result != NULL) {
@@ -899,7 +898,7 @@ static BOOL PkwdBook_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBook_FreeScreen(wk);
     AppTaskMenuRes_Free(wk->menuRes);
     GFL_WordSetSystemFree(wk->wordSet);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     GFL_FontFree(wk->smallFont);
     PkwdBookGraphic_Free(wk->graphic);
@@ -982,7 +981,7 @@ static void PkwdBook_InitScreen(PkwdBookWork *wk) {
         wk->paletteFiles[i] = NULL;
         wk->textPaletteFiles[i] = NULL;
     }
-    wk->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD_BOOK_GRA, 42, wk->heapId);
+    wk->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD, 42, wk->heapId);
     wk->msgData[MSG_LINES] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEWOOD_LINES, wk->heapId);
     wk->msgData[MSG_SCRIPT] = NULL;
     wk->msgData[MSG_TRAINER_CLASSES] =
@@ -998,7 +997,7 @@ static void PkwdBook_InitScreen(PkwdBookWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 6, PALTYPE_SUB_BG, 10 * 0x20, 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 15, PALTYPE_SUB_BG, 13 * 0x20, 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
     PkwdBook_CreateWindows(wk, FALSE, PAGE_LIST);
@@ -1086,7 +1085,7 @@ static void PkwdBook_LoadGraphics(PkwdBookWork *wk) {
     u16 *screenBuf;
     int i;
     int page;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     for (i = 0; i < LOAD_COUNT_MAX; palette++, i++) {
         if (palette->target == 0xff) {
@@ -1129,9 +1128,10 @@ static void PkwdBook_LoadTouchBarBG(PkwdBookWork *wk, u32 bg, u32 palette) {
     int row;
     int col;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_SUB_BG, palette << 5, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, wk->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_SUB_BG, palette << 5, 0x20,
+                                wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, wk->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, wk->heapId);
     screenBuf = GFL_BGSysIsScrHeapExists(bg);
     for (row = 0; row < 24; row++) {
         for (col = 0; col < 32; col++) {
@@ -1154,7 +1154,7 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         void *screenFile;
         void *charFile;
 
-        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
         screen += graphicIdx;
         screenFile = GFL_G2DIOReadNSCRArc(arc, screen->fileId, FALSE, &screenData, wk->heapId);
         GFL_BGSysBufferScrDefault(2, screenData->rawData, 0x800);
@@ -1167,7 +1167,7 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         GFL_HeapFree(screenFile);
         GFL_HeapFree(charFile);
     } else {
-        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
         chars += graphicIdx;
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
         screen += graphicIdx;
@@ -1183,7 +1183,7 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
 static void PkwdBook_LoadFontPalette(PkwdBookWork *wk, u32 surface) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, wk->heapId);
 
-    wk->resources.named.fontPalette = func_0204bc48(arc, 6, surface, 12 * 0x20, wk->heapId);
+    wk->resources.named.fontPalette = ClActSys_LoadPlttEx(arc, 6, surface, 12 * 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -1196,13 +1196,13 @@ static void PkwdBook_LoadBarRes(PkwdBookWork *wk, u32 surface) {
     u32 animFile;
 
     PkwdBookGraphic_GetClActUnit(wk->graphic);
-    paletteFile = func_0202d810();
-    charsFile = func_0202d814();
-    cellFile = func_0202d818(2);
-    animFile = func_0202d81c(2);
-    wk->resources.named.barPalette = func_0204bbb8(arc, paletteFile, surface, 4 * 0x20, 0, 4, wk->heapId);
-    wk->resources.named.barChars = func_0204b81c(arc, charsFile, FALSE, surface, wk->heapId);
-    wk->resources.named.barCells = func_0204bde0(arc, cellFile, animFile, wk->heapId);
+    paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    charsFile = AppMenuCommon_GetTouchBarCharFile();
+    cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    animFile = AppMenuCommon_GetTouchBarAnimFile(2);
+    wk->resources.named.barPalette = ClActSys_LoadPlttRange(arc, paletteFile, surface, 4 * 0x20, 0, 4, wk->heapId);
+    wk->resources.named.barChars = ClActSys_LoadChars(arc, charsFile, FALSE, surface, wk->heapId);
+    wk->resources.named.barCells = ClActSys_LoadCellAnims(arc, cellFile, animFile, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -1210,12 +1210,13 @@ static void PkwdBook_LoadPokeIconRes(PkwdBookWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(wk->heapId));
     u32 i;
 
-    wk->resources.named.pokeIconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
+    wk->resources.named.pokeIconPalette =
+        ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
     wk->resources.named.pokeIconCells =
-        func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->heapId);
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->heapId);
     for (i = 0; i < POKE_ICON_COUNT; i++) {
         wk->resources.named.pokeIconChars[i] =
-            func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB, wk->heapId);
+            ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB, wk->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -1228,20 +1229,21 @@ static void PkwdBook_SetPokeIcon(PkwdBookWork *wk, u32 slot, u32 species, u32 se
     void *file = GFL_G2DIOReadOBJNCGRArc(arc, PokeParty_GetIconIndex(species, 1, sex, FALSE), FALSE, &charData,
                                          HEAPID_TAIL(wk->heapId));
 
-    func_0204ba40(wk->resources.named.pokeIconChars[slot], charData);
+    ClActSys_ReplaceCharData(wk->resources.named.pokeIconChars[slot], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->pokeIcons[slot], palette, 1);
+    ClActor_SetPalette(wk->pokeIcons[slot], palette, 1);
 }
 
 static void PkwdBook_LoadTypeIconRes(PkwdBookWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->heapId));
     u32 i;
 
-    wk->resources.named.typeIconPalette = func_0204bbb8(arc, 33, CLACT_VRAM_SUB, 8 * 0x20, 0, 3, wk->heapId);
-    wk->resources.named.typeIconCells = func_0204bde0(arc, 61, 64, wk->heapId);
+    wk->resources.named.typeIconPalette = ClActSys_LoadPlttRange(arc, 33, CLACT_VRAM_SUB, 8 * 0x20, 0, 3, wk->heapId);
+    wk->resources.named.typeIconCells = ClActSys_LoadCellAnims(arc, 61, 64, wk->heapId);
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
-        wk->resources.named.typeIconChars[i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, CLACT_VRAM_SUB, wk->heapId);
+        wk->resources.named.typeIconChars[i] =
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_SUB, wk->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -1250,12 +1252,13 @@ static void PkwdBook_LoadTypeIconRes(PkwdBookWork *wk) {
 static void PkwdBook_SetTypeIcon(PkwdBookWork *wk, u32 slot, u32 unused, u32 type) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, HEAPID_TAIL(wk->heapId));
     NNSG2dCharacterData *charData;
-    void *file = GFL_G2DIOReadOBJNCGRArc(arc, func_0202d7f4(type), FALSE, &charData, HEAPID_TAIL(wk->heapId));
+    void *file = GFL_G2DIOReadOBJNCGRArc(arc, AppMenuCommon_GetTypeIconCharFile(type), FALSE, &charData,
+                                         HEAPID_TAIL(wk->heapId));
 
-    func_0204ba40(wk->resources.named.typeIconChars[slot], charData);
+    ClActSys_ReplaceCharData(wk->resources.named.typeIconChars[slot], charData);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->typeIcons[slot], func_0202d7e8(type), 1);
+    ClActor_SetPalette(wk->typeIcons[slot], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void PkwdBook_LoadTrainerRes(PkwdBookWork *wk, u32 surface, u32 trainerClass) {
@@ -1277,13 +1280,14 @@ static void PkwdBook_SetTrainer(PkwdBookWork *wk, u32 trainerClass) {
 }
 
 static void PkwdBook_LoadActorResources(PkwdBookWork *wk, u32 surface, const PkwdBookActorRes *res) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     PkwdBookGraphic_GetClActUnit(wk->graphic);
-    wk->resources.slots[res->palette.slot] =
-        func_0204bbb8(arc, res->palette.fileId, surface, res->palette.offset, 0, res->palette.count, wk->heapId);
-    wk->resources.slots[res->chars.slot] = func_0204b81c(arc, res->chars.fileId, FALSE, surface, wk->heapId);
-    wk->resources.slots[res->cells.slot] = func_0204bde0(arc, res->cells.fileId, res->anims.fileId, wk->heapId);
+    wk->resources.slots[res->palette.slot] = ClActSys_LoadPlttRange(
+        arc, res->palette.fileId, surface, res->palette.offset, 0, res->palette.count, wk->heapId);
+    wk->resources.slots[res->chars.slot] = ClActSys_LoadChars(arc, res->chars.fileId, FALSE, surface, wk->heapId);
+    wk->resources.slots[res->cells.slot] =
+        ClActSys_LoadCellAnims(arc, res->cells.fileId, res->anims.fileId, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -1332,23 +1336,23 @@ static void PkwdBook_CreateActors(PkwdBookWork *wk, u32 surface, const PkwdBookA
         setup.sequence = entries->sequence;
         setup.priority = entries->priority;
         setup.bgPriority = entries->bgPriority;
-        actors[i] = func_0204c040(unit, wk->resources.slots[entries->charsSlot], wk->resources.slots[paletteSlot],
-                                  wk->resources.slots[cellSlot], &setup, surface, wk->heapId);
+        actors[i] = ClActor_Create(unit, wk->resources.slots[entries->charsSlot], wk->resources.slots[paletteSlot],
+                                   wk->resources.slots[cellSlot], &setup, surface, wk->heapId);
         visible = FALSE;
         if (entries->visible == 1) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         animated = FALSE;
         if (entries->flags & 1) {
             animated = TRUE;
         }
         func_0204c520(actors[i], animated);
         if (entries->flags & 2) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (entries->flags & 4) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
     }
 }
@@ -1367,48 +1371,48 @@ static void PkwdBook_InitActors(PkwdBookWork *wk) {
     PkwdBook_CreateActors(wk, CLACT_SURFACE_SUB, sPkwdBookTypeIconActors, &sPkwdBookTypeIconGroup);
     PkwdBook_CreateActors(wk, CLACT_SURFACE_SUB, sPkwdBookTrainerActors, &sPkwdBookTrainerGroup);
     PkwdBook_CreateActors(wk, CLACT_SURFACE_SUB, sPkwdBookMarkActors, &sPkwdBookMarkGroup);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     wk->bmpOam = BmpOam_Init(wk->heapId, unit);
     PkwdBook_CreateTextActors(wk, CLACT_SURFACE_SUB, sPkwdBookTextActors, RES_FONT_PALETTE);
-    func_0204c318(wk->markActors[MARK_PAGE], 1);
+    ClActor_SetObjMode(wk->markActors[MARK_PAGE], 1);
 }
 
 static void PkwdBook_FreeActors(PkwdBookWork *wk) {
     int i;
 
     for (i = 0; i < BAR_ACTOR_COUNT; i++) {
-        func_0204c108(wk->barActors[i]);
+        ClActor_Delete(wk->barActors[i]);
     }
     for (i = 0; i < POKE_ICON_COUNT; i++) {
-        func_0204c108(wk->pokeIcons[i]);
+        ClActor_Delete(wk->pokeIcons[i]);
     }
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
-        func_0204c108(wk->typeIcons[i]);
+        ClActor_Delete(wk->typeIcons[i]);
     }
-    func_0204c108(wk->trainerActors[0]);
+    ClActor_Delete(wk->trainerActors[0]);
     for (i = 0; i < MARK_ACTOR_COUNT; i++) {
-        func_0204c108(wk->markActors[i]);
+        ClActor_Delete(wk->markActors[i]);
     }
-    func_0204bcd0(wk->resources.named.barPalette);
-    func_0204b98c(wk->resources.named.barChars);
-    func_0204be64(wk->resources.named.barCells);
-    func_0204bcd0(wk->resources.named.pokeIconPalette);
+    ClActSys_FreePltt(wk->resources.named.barPalette);
+    ClActSys_FreeChars(wk->resources.named.barChars);
+    ClActSys_FreeCellAnims(wk->resources.named.barCells);
+    ClActSys_FreePltt(wk->resources.named.pokeIconPalette);
     for (i = 0; i < POKE_ICON_COUNT; i++) {
-        func_0204b98c(wk->resources.named.pokeIconChars[i]);
+        ClActSys_FreeChars(wk->resources.named.pokeIconChars[i]);
     }
-    func_0204be64(wk->resources.named.pokeIconCells);
-    func_0204bcd0(wk->resources.named.typeIconPalette);
+    ClActSys_FreeCellAnims(wk->resources.named.pokeIconCells);
+    ClActSys_FreePltt(wk->resources.named.typeIconPalette);
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
-        func_0204b98c(wk->resources.named.typeIconChars[i]);
+        ClActSys_FreeChars(wk->resources.named.typeIconChars[i]);
     }
-    func_0204be64(wk->resources.named.typeIconCells);
-    func_0204bcd0(wk->resources.named.trainerPalette);
-    func_0204b98c(wk->resources.named.trainerChars);
-    func_0204be64(wk->resources.named.trainerCells);
-    func_0204bcd0(wk->resources.named.markPalette);
-    func_0204b98c(wk->resources.named.markChars);
-    func_0204be64(wk->resources.named.markCells);
-    func_0204bcd0(wk->resources.named.fontPalette);
+    ClActSys_FreeCellAnims(wk->resources.named.typeIconCells);
+    ClActSys_FreePltt(wk->resources.named.trainerPalette);
+    ClActSys_FreeChars(wk->resources.named.trainerChars);
+    ClActSys_FreeCellAnims(wk->resources.named.trainerCells);
+    ClActSys_FreePltt(wk->resources.named.markPalette);
+    ClActSys_FreeChars(wk->resources.named.markChars);
+    ClActSys_FreeCellAnims(wk->resources.named.markCells);
+    ClActSys_FreePltt(wk->resources.named.fontPalette);
     for (i = 0; i < TEXT_ACTOR_COUNT; i++) {
         BmpOam_ActorDel(wk->textActors[i]);
         GFL_BitmapFree(wk->textBitmaps[i]);
@@ -1419,27 +1423,27 @@ static void PkwdBook_FreeActors(PkwdBookWork *wk) {
 static void PkwdBook_PlayAnim(PkwdBookWork *wk, int group, int index, u32 sequence) {
     if (group == GROUP_TRAINER) {
         if (index < TRAINER_ACTOR_COUNT) {
-            func_0204c488(wk->trainerActors[index], (u16)sequence);
+            ClActor_SetSequence(wk->trainerActors[index], (u16)sequence);
             func_0204c520(wk->trainerActors[index], TRUE);
         }
     } else if (group == GROUP_BAR) {
         if (index < BAR_ACTOR_COUNT) {
-            func_0204c488(wk->barActors[index], (u16)sequence);
+            ClActor_SetSequence(wk->barActors[index], (u16)sequence);
             func_0204c520(wk->barActors[index], TRUE);
         }
     } else if (group == GROUP_POKE_ICON) {
         if (index < POKE_ICON_COUNT) {
-            func_0204c488(wk->pokeIcons[index], (u16)sequence);
+            ClActor_SetSequence(wk->pokeIcons[index], (u16)sequence);
             func_0204c520(wk->pokeIcons[index], TRUE);
         }
     } else if (group == GROUP_TYPE_ICON) {
         if (index < TYPE_ICON_COUNT) {
-            func_0204c488(wk->typeIcons[index], (u16)sequence);
+            ClActor_SetSequence(wk->typeIcons[index], (u16)sequence);
             func_0204c520(wk->typeIcons[index], TRUE);
         }
     } else if (group == GROUP_MARK) {
         if (index < MARK_ACTOR_COUNT) {
-            func_0204c488(wk->markActors[index], (u16)sequence);
+            ClActor_SetSequence(wk->markActors[index], (u16)sequence);
             func_0204c520(wk->markActors[index], TRUE);
         }
     }
@@ -1448,23 +1452,23 @@ static void PkwdBook_PlayAnim(PkwdBookWork *wk, int group, int index, u32 sequen
 static void PkwdBook_SetActorVisible(PkwdBookWork *wk, int group, int index, BOOL visible) {
     if (group == GROUP_TRAINER) {
         if (index < TRAINER_ACTOR_COUNT) {
-            func_0204c124(wk->trainerActors[index], visible);
+            ClActor_SetVisible(wk->trainerActors[index], visible);
         }
     } else if (group == GROUP_BAR) {
         if (index < BAR_ACTOR_COUNT) {
-            func_0204c124(wk->barActors[index], visible);
+            ClActor_SetVisible(wk->barActors[index], visible);
         }
     } else if (group == GROUP_POKE_ICON) {
         if (index < POKE_ICON_COUNT) {
-            func_0204c124(wk->pokeIcons[index], visible);
+            ClActor_SetVisible(wk->pokeIcons[index], visible);
         }
     } else if (group == GROUP_TYPE_ICON) {
         if (index < TYPE_ICON_COUNT) {
-            func_0204c124(wk->typeIcons[index], visible);
+            ClActor_SetVisible(wk->typeIcons[index], visible);
         }
     } else if (group == GROUP_MARK) {
         if (index < MARK_ACTOR_COUNT) {
-            func_0204c124(wk->markActors[index], visible);
+            ClActor_SetVisible(wk->markActors[index], visible);
         }
     }
 }
@@ -1476,35 +1480,35 @@ static BOOL PkwdBook_IsActorAnimating(PkwdBookWork *wk, int group, int index) {
         if (index >= TRAINER_ACTOR_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->trainerActors[index])) {
+        if (!ClActor_IsAnimActive(wk->trainerActors[index])) {
             result = FALSE;
         }
     } else if (group == GROUP_BAR) {
         if (index >= BAR_ACTOR_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->barActors[index])) {
+        if (!ClActor_IsAnimActive(wk->barActors[index])) {
             result = FALSE;
         }
     } else if (group == GROUP_POKE_ICON) {
         if (index >= POKE_ICON_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->pokeIcons[index])) {
+        if (!ClActor_IsAnimActive(wk->pokeIcons[index])) {
             result = FALSE;
         }
     } else if (group == GROUP_TYPE_ICON) {
         if (index >= TYPE_ICON_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->typeIcons[index])) {
+        if (!ClActor_IsAnimActive(wk->typeIcons[index])) {
             result = FALSE;
         }
     } else if (group == GROUP_MARK) {
         if (index >= MARK_ACTOR_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(wk->markActors[index])) {
+        if (!ClActor_IsAnimActive(wk->markActors[index])) {
             result = FALSE;
         }
     }
@@ -1633,7 +1637,7 @@ static void PkwdBook_FreeWindows(PkwdBookWork *wk, BOOL isSub) {
 static void PkwdBook_UpdateText(PkwdBookWork *wk) {
     int i;
 
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         if (wk->subWindows[i].window != NULL) {
             PrintWindow_Flush(&wk->subWindows[i], wk->printQueue);
@@ -1748,7 +1752,7 @@ static void PkwdBook_PrintLabels(PkwdBookWork *wk, BOOL isSub, u32 page) {
 // Scrolls the lower screen's BG to the page once its text is printed
 static void PkwdBook_UpdateScroll(PkwdBookWork *wk) {
     if (wk->flags & FLAG_SCROLL_PENDING) {
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             PkwdBook_ScrollBG(wk, wk->page);
             wk->flags &= ~FLAG_SCROLL_PENDING;
         }
@@ -1839,7 +1843,7 @@ static void PkwdBook_RunList(PkwdBookWork *wk) {
         }
         break;
     case PAGE_STEP_LIST_WAIT_PRINT:
-        if (func_02021c0c(wk->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
             if (wk->flags & FLAG_SHOW_MOVIE) {
                 PkwdBook_ShowMovie(wk, TRUE);
                 wk->flags &= ~FLAG_SHOW_MOVIE;
@@ -1880,7 +1884,7 @@ static void PkwdBook_RunList(PkwdBookWork *wk) {
                 wk->pageStep = PAGE_STEP_INPUT;
                 PkwdBook_ShowMovie(wk, FALSE);
                 BlinkPalAnm_InitAnime(FrameList_GetBlinkAnm(wk->list));
-                if (func_0203d554() == TRUE) {
+                if (GCTX_HIDIsUsingTouch() == TRUE) {
                     FrameList_SetRowPalette(wk->list, (u16)wk->cursorPos, 0);
                 }
             }
@@ -1904,7 +1908,7 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
     BOOL cancel = FALSE;
     s32 result;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     result = PkwdBook_HandleListResult(wk, PkwdBook_UpdateList(wk));
@@ -1933,9 +1937,9 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
             wk->pageStep = PAGE_STEP_WAIT_RETURN;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             if (touch == 0) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             } else {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
         }
     }
@@ -2055,7 +2059,7 @@ static void PkwdBook_CastInput(PkwdBookWork *wk) {
     s32 action = 0;
     s32 touch;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     touch = PkwdBook_ReadTouch(wk, wk->page);
@@ -2091,9 +2095,9 @@ static void PkwdBook_CastInput(PkwdBookWork *wk) {
         wk->pageStep = PAGE_STEP_WAIT_RETURN;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         if (touch == 2) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         } else {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
     }
 }
@@ -2204,7 +2208,7 @@ static void PkwdBook_PokemonInput(PkwdBookWork *wk) {
     s32 action = 0;
     s32 touch;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return;
     }
     touch = PkwdBook_ReadTouch(wk, wk->page);
@@ -2240,9 +2244,9 @@ static void PkwdBook_PokemonInput(PkwdBookWork *wk) {
         wk->pageStep = PAGE_STEP_WAIT_RETURN;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         if (touch == 2) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         } else {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
     }
 }
@@ -2441,13 +2445,13 @@ static void PkwdBook_PlaceArrows(PkwdBookWork *wk, u32 page) {
 
         pos.x = PkwdBook_GetPosition(wk, positionIdx);
         pos.y = PkwdBook_GetPosition(wk, positionIdx + 1);
-        func_0204c140(wk->barActors[BAR_LEFT + i], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(wk->barActors[BAR_LEFT + i], &pos, CLACT_SURFACE_SUB);
     }
 }
 
 // The button of a page's touch bar that was touched this frame, or TOUCH_RECT_NONE
 static s32 PkwdBook_ReadTouch(PkwdBookWork *wk, u32 page) {
-    return func_0203da0c(sPkwdBookTouchRects[page]);
+    return GFL_HIDGetTouchPressedRect(sPkwdBookTouchRects[page]);
 }
 
 // Makes the party of a movie's cast
@@ -2536,7 +2540,7 @@ static void PkwdBook_TransferSeriesPalette(PkwdBookWork *wk, u32 series) {
 }
 
 static void PkwdBook_LoadSeriesPalettes(PkwdBookWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     int i;
 
     for (i = 0; i < SERIES_COUNT; i++) {
@@ -2569,7 +2573,7 @@ static void PkwdBook_ShowMovie(PkwdBookWork *wk, BOOL force) {
     BOOL visible = TRUE;
 
     if (!force) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             visible = FALSE;
         }
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, visible);
@@ -2587,7 +2591,7 @@ static void PkwdBook_CreateList(PkwdBookWork *wk) {
 
     setup.work = wk;
     PkwdBook_FreeList(wk);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 20, 6, 0, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_SUB_BG, 0, 0x20, wk->heapId);
     setup.callbacks = &sPkwdBookListCallbacks;
@@ -2856,14 +2860,14 @@ static void PkwdBook_UpdateScrollBar(PkwdBookWork *wk) {
     ClActorPos pos;
 
     if (wk->movieCount > LIST_ROWS) {
-        func_0204c178(wk->markActors[MARK_SCROLL_BAR], &pos, CLACT_SURFACE_SUB);
+        ClActor_GetSurfacePos(wk->markActors[MARK_SCROLL_BAR], &pos, CLACT_SURFACE_SUB);
         pos.y = FrameList_ClampBarPos(wk->list, pos.y);
         if (pos.y < 8) {
             pos.y = 8;
         } else if (pos.y > 160) {
             pos.y = 160;
         }
-        func_0204c140(wk->markActors[MARK_SCROLL_BAR], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(wk->markActors[MARK_SCROLL_BAR], &pos, CLACT_SURFACE_SUB);
     }
 }
 
@@ -2911,11 +2915,11 @@ static void PkwdBook_UpdateNewMarks(PkwdBookWork *wk, BOOL reset) {
         PkwdBook_SetActorVisible(wk, GROUP_MARK, MARK_NEW + i, visible);
     }
     for (i = 0; i < NEW_MARK_COUNT; i++) {
-        func_0204c178(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
+        ClActor_GetSurfacePos(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
         pos.x = PkwdBook_GetPosition(wk, (u32)(i + POSITION_NEW_MARKS) * 2);
         pos.y = PkwdBook_GetPosition(wk, (i + POSITION_NEW_MARKS) * 2 + 1);
         pos.y += (s16)(dir * 24);
-        func_0204c140(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
     }
     wk->lastScroll = scroll;
 }
@@ -2925,9 +2929,9 @@ static void PkwdBook_ScrollNewMarks(PkwdBookWork *wk, s16 delta) {
     int i;
 
     for (i = 0; i < NEW_MARK_COUNT; i++) {
-        func_0204c178(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
+        ClActor_GetSurfacePos(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
         pos.y -= delta;
-        func_0204c140(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(wk->markActors[MARK_NEW + i], &pos, CLACT_SURFACE_SUB);
     }
 }
 

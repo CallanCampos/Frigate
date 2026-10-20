@@ -1,1 +1,0 @@
-PlasmaFrigate17_Text_WarningWarningIntrudersVessel = Warning! Warning!\nIntruders in the vessel!{be00}\nEveryone, please respond.

@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "nitro/os.h"
-// For func_02005430, which this header declared before machine_use.c was told apart from main.c
+// For Machine_ProcessExitRequest, which this header declared before machine_use.c was told apart from main.c
 #include "system/machine_use.h"
 
 // The game's main file, with main, GameInit and GameUpdate. main is a name from swan
@@ -11,7 +11,7 @@
 
 void main(void);
 // Keeps the main loop from giving the ARM9 priority on the main memory while it is set
-void func_020051d8(BOOL blocked);
+void SetMainMemoryPriorityBlocked(BOOL blocked);
 
 // Declarations that belong to headers main.c does not own, to be moved there:
 // gfl/sound.h. The sound thread of snd_sys.c

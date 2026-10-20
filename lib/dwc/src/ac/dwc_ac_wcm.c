@@ -152,22 +152,23 @@ static int DWCAc_FindCandidate(const WMBssDesc *bss, DWCAcSearchWork *work) {
     return -1;
 }
 
-// Whether two BSSIDs are the same
-static inline BOOL DWCAc_IsSameBssid(const u8 *a, const u8 *b) {
-    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3] && a[4] == b[4] && a[5] == b[5];
+// Whether two BSSIDs are the same. The candidate's is passed as a `const void *`: as a `const u8 *`, MWCC folds the
+// list entry's offset into each byte's load, which the original doesn't
+static inline BOOL DWCAc_IsSameBssid(const u8 *a, const void *b) {
+    return a[0] == ((const u8 *)b)[0] && a[1] == ((const u8 *)b)[1] && a[2] == ((const u8 *)b)[2] &&
+           a[3] == ((const u8 *)b)[3] && a[4] == ((const u8 *)b)[4] && a[5] == ((const u8 *)b)[5];
 }
 
 // Puts the beacon among the candidates, as a new one or in place of the one it matches, and gives its place: the last
 // one, a place past the end of the list that DWCAc_SortCandidates then sorts it from
 static int DWCAc_AddCandidate(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
-    const WMBssDesc *candidates = work->candidates;
     int i;
     s16 count = work->candidateCount;
     int found = -1;
 
     for (i = 0; i < count; i++) {
-        if (DWCAc_IsSameBssid(bss->bssid, candidates[i].bssid) &&
-            strncmp(bss->ssid, candidates[i].ssid, bss->ssidLength) == 0) {
+        if (DWCAc_IsSameBssid(bss->bssid, work->candidates[i].bssid) &&
+            strncmp(bss->ssid, work->candidates[i].ssid, bss->ssidLength) == 0) {
             found = i;
             break;
         }

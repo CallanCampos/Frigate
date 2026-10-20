@@ -1,0 +1,195 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Onix",
+    "pokedex": {
+        "category": "Rock Snake Pokémon",
+        "entry": "Opening its large mouth, it ingests\nmassive amounts of soil and creates\nlong tunnels.",
+        "height": "28'10\"",
+        "weight": "463.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Onix",
+                "category": "Rock Snake Pokémon",
+                "entry": "It burrows through the ground\nat a speed of 50 mph while\nfeeding on large boulders.",
+                "height": "28'10\"",
+                "weight": "463.0 lbs."
+            },
+            "fr": {
+                "name": "Onix",
+                "category": "Pokémon Serpenroc",
+                "entry": "Il se nourrit des pierres qu'il\nrencontre en creusant le sol.\nIl peut creuser à 80 km/h!",
+                "height": "8,8 m",
+                "weight": "210,0 kg"
+            },
+            "de": {
+                "name": "Onix",
+                "category": "Felsnatter",
+                "entry": "Gräbt sich mit 80 km/h durch\nden Boden und ernährt sich\nvon großen Felsbrocken.",
+                "height": "8,8 m",
+                "weight": "210,0 kg"
+            },
+            "it": {
+                "name": "Onix",
+                "category": "Pokémon Serpesasso",
+                "entry": "Si muove sottoterra a una velocità di\n80 km/h nutrendosi di grossi massi.",
+                "height": "8,8 m",
+                "weight": "210,0 kg"
+            },
+            "ko": {
+                "name": "롱스톤",
+                "category": "돌뱀포켓몬",
+                "entry": "커다란 바위도 집어삼키며\n땅속을 뚫고 나간다.\n그 스피드는 시속 80km다.",
+                "height": "8.8 m",
+                "weight": "210.0 kg"
+            },
+            "es": {
+                "name": "Onix",
+                "category": "Pokémon Serp. Roca",
+                "entry": "Se desplaza excavando en la tierra\na 80 km/h a la vez que se alimenta\nde rocas.",
+                "height": "8,8 m",
+                "weight": "210,0 kg"
+            },
+            "ja": {
+                "name": "イワーク",
+                "category": "いわへびポケモン",
+                "entry": "おおきな\\x{3000}いわをも\\x{3000}くらいながら\nじめんのなかを\\x{3000}ほりすすむ。\nそのスピードは\\x{3000}じそく\\x{ff18}\\x{ff10}キロ。",
+                "height": "\\x{ff18}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff11}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 45,
+        "defense": 160,
+        "speed": 70,
+        "special_attack": 30,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_ROCK", "TYPE_GROUND" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_ROCK_HEAD", "ABILITY_STURDY" ],
+    "hidden_ability": "ABILITY_WEAK_ARMOR",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 77,
+    "height": 88,
+    "weight": 2100,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MUD_SPORT" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 1, "MOVE_BIND" ],
+            [ 4, "MOVE_CURSE" ],
+            [ 7, "MOVE_ROCK_THROW" ],
+            [ 10, "MOVE_RAGE" ],
+            [ 13, "MOVE_ROCK_TOMB" ],
+            [ 16, "MOVE_STEALTH_ROCK" ],
+            [ 19, "MOVE_ROCK_POLISH" ],
+            [ 22, "MOVE_SMACK_DOWN" ],
+            [ 25, "MOVE_DRAGON_BREATH" ],
+            [ 28, "MOVE_SLAM" ],
+            [ 31, "MOVE_SCREECH" ],
+            [ 34, "MOVE_ROCK_SLIDE" ],
+            [ 37, "MOVE_SAND_TOMB" ],
+            [ 40, "MOVE_IRON_TAIL" ],
+            [ 43, "MOVE_DIG" ],
+            [ 46, "MOVE_STONE_EDGE" ],
+            [ 49, "MOVE_DOUBLE_EDGE" ],
+            [ 52, "MOVE_SANDSTORM" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM66",
+            "TM69",
+            "TM71",
+            "TM74",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM82",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FLAIL",
+            "MOVE_BLOCK",
+            "MOVE_DEFENSE_CURL",
+            "MOVE_ROLLOUT",
+            "MOVE_ROCK_BLAST",
+            "MOVE_ROCK_CLIMB",
+            "MOVE_HEAVY_SLAM",
+            "MOVE_STEALTH_ROCK"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE_WITH_ITEM",
+            "param": "ITEM_METAL_COAT",
+            "species": "SPECIES_STEELIX"
+        }
+    ],
+    "regional_dex_number": 71,
+    "baby_species": "SPECIES_ONIX",
+    "cry_volume": 110
+}

@@ -7,4 +7,5 @@ src/flagged.c:30: asm: asm in game code
 src/flagged.c:36: todo: TODO/FIXME/XXX left in
 src/flagged.c:37: narration: comment narrates the matching: say what the code does
 src/flagged.c:38: bug: // BUG: with no #ifdef BUGFIX fix after it
+src/flagged.c:42: split-decl: a comment splits the declaration's specifiers from it: put the comment above
 src/flagged.c:6: prototype: `OtherFile_Function` is another file's: declare it in its owner's header

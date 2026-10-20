@@ -329,81 +329,91 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
 
 // The value of a translation component at the frame, without its fraction. With a step of two or four the animation
 // keeps a value for every second or fourth frame, and the frames between are made from the values around them, up to
-// the last frame that is interpolated
+// the last frame that is interpolated. This reader and the others end in blocks that several of their cases jump to:
+// `average` makes a frame between two stored values and `read` reads a stored one, and at a frame with a fraction
+// `plain` sets up the blend of a frame without a step and `blend` blends it with the next
 static void getTransData_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm) {
-    const void *data = (const u8 *)jntAnm + tInfo->offset;
     u32 f = frame >> FX32_SHIFT;
+    const void *data = (const u8 *)jntAnm + tInfo->offset;
     u32 info = tInfo->info;
+    u32 last;
     u32 idx;
-    BOOL average = FALSE;
 
-    if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-        u32 last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-
-        if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
-            if (f & 1) {
-                if (f > last) {
-                    f = (last >> 1) + 1;
-                } else {
-                    idx = f >> 1;
-                    average = TRUE;
-                }
-            } else {
-                f >>= 1;
-            }
-        } else {
-            u32 rem = f & 3;
-
-            if (rem != 0) {
-                if (f > last) {
-                    f = (last >> 2) + rem;
-                } else if (f & 1) {
-                    // The quarters next to a value are three parts of it and one of the other
-                    u32 idxA;
-                    u32 idxB;
-
-                    if (f & 2) {
-                        idxB = f >> 2;
-                        idxA = idxB + 1;
-                    } else {
-                        idxA = f >> 2;
-                        idxB = idxA + 1;
-                    }
-                    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-                        const fx16 *v = data;
-
-                        *value = (3 * v[idxA] + v[idxB]) >> 2;
-                    } else {
-                        const fx32 *v = data;
-
-                        *value = ((fx64)v[idxA] * 3 + v[idxB]) >> 2;
-                    }
-                    return;
-                } else {
-                    idx = f >> 2;
-                    average = TRUE;
-                }
-            } else {
-                f >>= 2;
-            }
-        }
+    if (!(info & NNS_G3D_JNTANM_TINFO_STEP_MASK)) {
+        idx = f;
+        goto read;
     }
 
-    if (average) {
-        // The frame between two stored values is their average
-        if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-            const fx16 *v = (const fx16 *)data + idx;
-
-            *value = (v[0] + v[1]) >> 1;
-        } else {
-            const fx32 *v = (const fx32 *)data + idx;
-
-            *value = (v[0] >> 1) + (v[1] >> 1);
+    last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+    if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
+        if (f & 1) {
+            if (f > last) {
+                idx = (last >> 1) + 1;
+                goto read;
+            }
+            idx = f >> 1;
+            goto average;
         }
-    } else if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-        *value = ((const fx16 *)data)[f];
+        idx = f >> 1;
+        goto read;
+    }
+    if (f & 3) {
+        if (f > last) {
+            idx = (last >> 2) + (f & 3);
+            goto read;
+        }
+        if (f & 1) {
+            u32 idxB;
+            fx32 a;
+            fx32 b;
+
+            // The quarters next to a value are three parts of it and one of the other
+            if (f & 2) {
+                idxB = f >> 2;
+                idx = idxB + 1;
+            } else {
+                idx = f >> 2;
+                idxB = idx + 1;
+            }
+            if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+                const fx16 *v = data;
+
+                a = v[idx];
+                b = v[idxB];
+                *value = (a + a + a + b) >> 2;
+            } else {
+                const fx32 *v = data;
+
+                a = v[idx];
+                b = v[idxB];
+                *value = ((fx64)a + a + a + b) >> 2;
+            }
+            return;
+        }
+        idx = f >> 2;
+        goto average;
+    }
+    idx = f >> 2;
+    goto read;
+
+average:
+    // The frame between two stored values is their average
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        const fx16 *v = data;
+
+        *value = (*(v + idx) + *(v + idx + 1)) >> 1;
     } else {
-        *value = ((const fx32 *)data)[f];
+        const fx32 *v = data;
+
+        *value = (*(v + idx) >> 1) + (*(v + idx + 1) >> 1);
+    }
+    return;
+
+read:
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        *value = ((const fx16 *)data)[idx];
+    } else {
+        *value = ((const fx32 *)data)[idx];
     }
 }
 
@@ -414,6 +424,12 @@ static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo
     const void *data = (const u8 *)jntAnm + tInfo->offset;
     u32 info = tInfo->info;
     u32 f = frame >> FX32_SHIFT;
+    u32 last;
+    fx32 ratio;
+    int mul;
+    int shift;
+    fx32 v0;
+    fx32 v1;
 
     if (f == jntAnm->numFrame - 1) {
         if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
@@ -424,10 +440,7 @@ static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo
             }
         }
         if (jntAnm->flag & NNS_G3D_JNTANM_OPTION_END_TO_START_INTERPOLATION) {
-            fx32 ratio = frame & 0xfff;
-            fx32 v0;
-            fx32 v1;
-
+            ratio = frame & 0xfff;
             if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
                 v0 = ((const fx16 *)data)[f];
                 v1 = ((const fx16 *)data)[0];
@@ -441,62 +454,59 @@ static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo
         } else {
             *value = ((const fx32 *)data)[f];
         }
-    } else {
-        fx32 ratio = frame & 0xfff;
-        fx32 v0;
-        int mul = 1;
-        int shift = 0;
-        fx32 v1;
-
-        if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-            u32 last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-
-            if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
-                if (f >= last) {
-                    f = last >> 1;
-                } else {
-                    ratio = frame & 0x1fff;
-                    f >>= 1;
-                    mul = 2;
-                    shift = 1;
-                }
-            } else {
-                if (f >= last) {
-                    f = (f >> 2) + (f & 3);
-                } else {
-                    ratio = frame & 0x3fff;
-                    f >>= 2;
-                    mul = 4;
-                    shift = 2;
-                }
-            }
-        }
-        if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-            const fx16 *p = (const fx16 *)data + f;
-
-            v0 = p[0];
-            v1 = p[1];
-        } else {
-            const fx32 *p = (const fx32 *)data + f;
-
-            v0 = p[0];
-            v1 = p[1];
-        }
-        *value = (v0 * mul + (((v1 - v0) * ratio) >> FX32_SHIFT)) >> shift;
+        return;
     }
+
+    if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
+        last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+        if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
+            if (f >= last) {
+                f = last >> 1;
+                goto plain;
+            }
+            f >>= 1;
+            ratio = frame & 0x1fff;
+            mul = 2;
+            shift = 1;
+            goto blend;
+        }
+        if (f >= last) {
+            f = (f >> 2) + (f & 3);
+            goto plain;
+        }
+        f >>= 2;
+        ratio = frame & 0x3fff;
+        mul = 4;
+        shift = 2;
+        goto blend;
+    }
+
+plain:
+    ratio = frame & 0xfff;
+    mul = 1;
+    shift = 0;
+
+blend:
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        const fx16 *v = data;
+
+        v0 = *(v + f);
+        v1 = *(v + f + 1);
+    } else {
+        const fx32 *v = data;
+
+        v0 = *(v + f);
+        v1 = *(v + f + 1);
+    }
+    *value = (v0 * mul + (((v1 - v0) * ratio) >> FX32_SHIFT)) >> shift;
 }
 
 // The same for the two values of a scale component, the scale and its inverse
 static void getScaleData_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm) {
-    const void *data;
-    u32 info;
-    u32 f;
+    u32 f = frame >> FX32_SHIFT;
+    const void *data = (const u8 *)jntAnm + tInfo->offset;
+    u32 info = tInfo->info;
     u32 idx;
-    BOOL average = FALSE;
-
-    f = frame >> FX32_SHIFT;
-    data = (const u8 *)jntAnm + tInfo->offset;
-    info = tInfo->info;
 
     if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
         u32 last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
@@ -504,85 +514,102 @@ static void getScaleData_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo 
         if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
             if (f & 1) {
                 if (f > last) {
-                    f = (last >> 1) + 1;
+                    idx = (last >> 1) + 1;
                 } else {
                     idx = f >> 1;
-                    average = TRUE;
+                    goto average;
                 }
             } else {
-                f >>= 1;
+                idx = f >> 1;
             }
         } else {
             u32 rem = f & 3;
 
             if (rem != 0) {
                 if (f > last) {
-                    f = (last >> 2) + rem;
+                    idx = (last >> 2) + rem;
                 } else if (f & 1) {
                     // The quarters next to a value are three parts of it and one of the other
-                    u32 idxA;
                     u32 idxB;
+                    fx32 a;
+                    fx32 b;
 
                     if (f & 2) {
                         idxB = f >> 2;
-                        idxA = idxB + 1;
+                        idx = idxB + 1;
                     } else {
-                        idxA = f >> 2;
-                        idxB = idxA + 1;
+                        idx = f >> 2;
+                        idxB = idx + 1;
                     }
                     if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
                         const ScaleData16 *v = data;
 
-                        value->scale = (3 * v[idxA].scale + v[idxB].scale) >> 2;
-                        value->invScale = (3 * v[idxA].invScale + v[idxB].invScale) >> 2;
+                        a = v[idx].scale;
+                        b = v[idxB].scale;
+                        value->scale = (a + (a << 1) + b) >> 2;
+                        a = v[idx].invScale;
+                        b = v[idxB].invScale;
+                        value->invScale = (a + (a << 1) + b) >> 2;
                     } else {
                         const ScaleData *v = data;
 
-                        value->scale = ((fx64)v[idxA].scale * 3 + v[idxB].scale) >> 2;
-                        value->invScale = ((fx64)v[idxA].invScale * 3 + v[idxB].invScale) >> 2;
+                        a = v[idx].scale;
+                        b = v[idxB].scale;
+                        value->scale = ((fx64)a + a + a + b) >> 2;
+                        a = v[idx].invScale;
+                        b = v[idxB].invScale;
+                        value->invScale = ((fx64)a + a + a + b) >> 2;
                     }
                     return;
                 } else {
                     idx = f >> 2;
-                    average = TRUE;
+                    goto average;
                 }
             } else {
-                f >>= 2;
+                idx = f >> 2;
             }
         }
-    }
-
-    if (!average) {
-        if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-            value->scale = ((const ScaleData16 *)data)[f].scale;
-            value->invScale = ((const ScaleData16 *)data)[f].invScale;
-        } else {
-            value->scale = ((const ScaleData *)data)[f].scale;
-            value->invScale = ((const ScaleData *)data)[f].invScale;
-        }
-    } else if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-        // The frame between two stored values is their average
-        const ScaleData16 *v = (const ScaleData16 *)data + idx;
-
-        value->scale = (v[0].scale + v[1].scale) >> 1;
-        value->invScale = (v[0].invScale + v[1].invScale) >> 1;
     } else {
-        const ScaleData *v = (const ScaleData *)data + idx;
+        idx = f;
+    }
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        const ScaleData16 *v = data;
 
-        value->scale = (v[0].scale + v[1].scale) >> 1;
-        value->invScale = (v[0].invScale + v[1].invScale) >> 1;
+        value->scale = v[idx].scale;
+        value->invScale = v[idx].invScale;
+    } else {
+        const ScaleData *v = data;
+
+        value->scale = v[idx].scale;
+        value->invScale = v[idx].invScale;
+    }
+    return;
+
+average:
+    // The frame between two stored values is their average
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        const ScaleData16 *v = data;
+
+        value->scale = ((v + idx)->scale + (v + idx + 1)->scale) >> 1;
+        value->invScale = ((v + idx)->invScale + (v + idx + 1)->invScale) >> 1;
+    } else {
+        const ScaleData *v = data;
+
+        value->scale = ((v + idx)->scale + (v + idx + 1)->scale) >> 1;
+        value->invScale = ((v + idx)->invScale + (v + idx + 1)->invScale) >> 1;
     }
 }
 
 static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo,
                                 const NNSG3dResJntAnm *jntAnm) {
-    u32 f = frame >> FX32_SHIFT;
     const void *data = (const u8 *)jntAnm + tInfo->offset;
     u32 info = tInfo->info;
+    u32 f = frame >> FX32_SHIFT;
+    u32 last;
     u32 next;
-    fx32 ratio = frame & 0xfff;
-    int mul = 1;
-    int shift = 0;
+    fx32 ratio;
+    int mul;
+    int shift;
     fx32 v0;
     fx32 w0;
     fx32 v1;
@@ -599,43 +626,57 @@ static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnm
         if (jntAnm->flag & NNS_G3D_JNTANM_OPTION_END_TO_START_INTERPOLATION) {
             // The last frame blends with the first
             next = 0;
-        } else {
-            if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-                value->scale = ((const ScaleData16 *)data)[f].scale;
-                value->invScale = ((const ScaleData16 *)data)[f].invScale;
-            } else {
-                value->scale = ((const ScaleData *)data)[f].scale;
-                value->invScale = ((const ScaleData *)data)[f].invScale;
-            }
-            return;
+            goto plain;
         }
-    } else {
-        if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-            u32 last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+        if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+            const ScaleData16 *v = data;
 
-            if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
-                if (f >= last) {
-                    f = last >> 1;
-                } else {
-                    f >>= 1;
-                    ratio = frame & 0x1fff;
-                    mul = 2;
-                    shift = 1;
-                }
-            } else {
-                if (f >= last) {
-                    f = (f >> 2) + (f & 3);
-                } else {
-                    f >>= 2;
-                    ratio = frame & 0x3fff;
-                    mul = 4;
-                    shift = 2;
-                }
-            }
+            value->scale = v[f].scale;
+            value->invScale = v[f].invScale;
+        } else {
+            const ScaleData *v = data;
+
+            value->scale = v[f].scale;
+            value->invScale = v[f].invScale;
         }
-        next = f + 1;
+        return;
     }
 
+    if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
+        last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+        if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
+            if (f >= last) {
+                f = last >> 1;
+                next = f + 1;
+                goto plain;
+            }
+            f >>= 1;
+            next = f + 1;
+            ratio = frame & 0x1fff;
+            mul = 2;
+            shift = 1;
+            goto blend;
+        }
+        if (f >= last) {
+            f = (f >> 2) + (f & 3);
+            next = f + 1;
+            goto plain;
+        }
+        f >>= 2;
+        next = f + 1;
+        ratio = frame & 0x3fff;
+        mul = 4;
+        shift = 2;
+        goto blend;
+    }
+    next = f + 1;
+
+plain:
+    ratio = frame & 0xfff;
+    mul = 1;
+    shift = 0;
+
+blend:
     if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
         const ScaleData16 *v = data;
 
@@ -663,8 +704,8 @@ static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo
     u32 f;
     u32 info;
     const u16 *data;
+    u32 last;
     u32 idx;
-    BOOL average = FALSE;
 
     ofsRot3 = jntAnm->ofsRot3;
     ofsRot5 = jntAnm->ofsRot5;
@@ -672,69 +713,71 @@ static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo
     info = tInfo->info;
     data = (const u16 *)((const u8 *)jntAnm + tInfo->offset);
 
-    if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-        u32 last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-
-        if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
-            if (f & 1) {
-                if (f > last) {
-                    f = (last >> 1) + 1;
-                } else {
-                    idx = f >> 1;
-                    average = TRUE;
-                }
-            } else {
-                f >>= 1;
-            }
-        } else {
-            u32 rem = f & 3;
-
-            if (rem != 0) {
-                if (f > last) {
-                    f = (last >> 2) + rem;
-                } else if (f & 1) {
-                    VecFx32 tmp[3];
-                    BOOL rot5 = FALSE;
-
-                    // The quarters next to a value are three parts of it and one of the other
-                    if (f & 2) {
-                        idx = f >> 2;
-                        f = idx + 1;
-                    } else {
-                        f >>= 2;
-                        idx = f + 1;
-                    }
-                    rot5 |= getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f]);
-                    rot5 |= getRotMtx_(tmp, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx]);
-                    rot[0].x = 3 * rot[0].x + tmp[0].x;
-                    rot[0].y = 3 * rot[0].y + tmp[0].y;
-                    rot[0].z = 3 * rot[0].z + tmp[0].z;
-                    rot[1].x = 3 * rot[1].x + tmp[1].x;
-                    rot[1].y = 3 * rot[1].y + tmp[1].y;
-                    rot[1].z = 3 * rot[1].z + tmp[1].z;
-                    VEC_Normalize(&rot[0], &rot[0]);
-                    VEC_Normalize(&rot[1], &rot[1]);
-                    if (!rot5) {
-                        rot[2].x = 3 * rot[2].x + tmp[2].x;
-                        rot[2].y = 3 * rot[2].y + tmp[2].y;
-                        rot[2].z = 3 * rot[2].z + tmp[2].z;
-                        VEC_Normalize(&rot[2], &rot[2]);
-                    } else {
-                        makeRotRow2_(rot);
-                    }
-                    return;
-                } else {
-                    idx = f >> 2;
-                    average = TRUE;
-                }
-            } else {
-                f >>= 2;
-            }
-        }
+    if (!(info & NNS_G3D_JNTANM_TINFO_STEP_MASK)) {
+        idx = f;
+        goto read;
     }
 
-    if (average) {
-        // The frame between two stored values is their average
+    last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+    if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
+        if (f & 1) {
+            if (f > last) {
+                idx = (last >> 1) + 1;
+                goto read;
+            }
+            idx = f >> 1;
+            goto average;
+        }
+        idx = f >> 1;
+        goto read;
+    }
+    if (f & 3) {
+        if (f > last) {
+            idx = (last >> 2) + (f & 3);
+            goto read;
+        }
+        if (f & 1) {
+            VecFx32 tmp[3];
+            BOOL rot5 = FALSE;
+            u32 idxB;
+
+            // The quarters next to a value are three parts of it and one of the other
+            if (f & 2) {
+                idxB = f >> 2;
+                idx = idxB + 1;
+            } else {
+                idx = f >> 2;
+                idxB = idx + 1;
+            }
+            rot5 |= getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx]);
+            rot5 |= getRotMtx_(tmp, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idxB]);
+            rot[0].x = 3 * rot[0].x + tmp[0].x;
+            rot[0].y = 3 * rot[0].y + tmp[0].y;
+            rot[0].z = 3 * rot[0].z + tmp[0].z;
+            rot[1].x = 3 * rot[1].x + tmp[1].x;
+            rot[1].y = 3 * rot[1].y + tmp[1].y;
+            rot[1].z = 3 * rot[1].z + tmp[1].z;
+            VEC_Normalize(&rot[0], &rot[0]);
+            VEC_Normalize(&rot[1], &rot[1]);
+            if (!rot5) {
+                rot[2].x = 3 * rot[2].x + tmp[2].x;
+                rot[2].y = 3 * rot[2].y + tmp[2].y;
+                rot[2].z = 3 * rot[2].z + tmp[2].z;
+                VEC_Normalize(&rot[2], &rot[2]);
+            } else {
+                makeRotRow2_(rot);
+            }
+            return;
+        }
+        idx = f >> 2;
+        goto average;
+    }
+    idx = f >> 2;
+    goto read;
+
+average:
+    // The frame between two stored values is their average
+    {
         VecFx32 tmp[3];
         BOOL rot5 = FALSE;
 
@@ -756,7 +799,11 @@ static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo
         } else {
             makeRotRow2_(rot);
         }
-    } else if (getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f])) {
+    }
+    return;
+
+read:
+    if (getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx])) {
         makeRotRow2_(rot);
     } else {
         VEC_Normalize(&rot[2], &rot[2]);
@@ -770,6 +817,7 @@ static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo 
     u32 ofsRot3;
     u32 info;
     u32 f;
+    u32 last;
     u32 next;
     const u16 *data;
     fx32 ratio;
@@ -783,8 +831,6 @@ static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo 
     f = frame >> FX32_SHIFT;
     info = tInfo->info;
     data = (const u16 *)((const u8 *)jntAnm + tInfo->offset);
-    ratio = frame & 0xfff;
-    mul = 1;
 
     if (f == jntAnm->numFrame - 1) {
         if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
@@ -797,39 +843,48 @@ static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo 
         if (jntAnm->flag & NNS_G3D_JNTANM_OPTION_END_TO_START_INTERPOLATION) {
             // The last frame blends with the first
             next = 0;
+            goto plain;
+        }
+        if (getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f])) {
+            makeRotRow2_(rot);
         } else {
-            if (getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f])) {
-                makeRotRow2_(rot);
-            } else {
-                VEC_Normalize(&rot[2], &rot[2]);
-            }
-            return;
+            VEC_Normalize(&rot[2], &rot[2]);
         }
-    } else {
-        if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-            u32 last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-
-            if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
-                if (f >= last) {
-                    f = last >> 1;
-                } else {
-                    f >>= 1;
-                    ratio = frame & 0x1fff;
-                    mul = 2;
-                }
-            } else {
-                if (f >= last) {
-                    f = (f >> 2) + (f & 3);
-                } else {
-                    f >>= 2;
-                    ratio = frame & 0x3fff;
-                    mul = 4;
-                }
-            }
-        }
-        next = f + 1;
+        return;
     }
 
+    if (info & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
+        last = (info & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+        if (info & NNS_G3D_JNTANM_TINFO_STEP_2) {
+            if (f >= last) {
+                f = last >> 1;
+                next = f + 1;
+                goto plain;
+            }
+            f >>= 1;
+            next = f + 1;
+            ratio = frame & 0x1fff;
+            mul = 2;
+            goto blend;
+        }
+        if (f >= last) {
+            f = (f >> 2) + (f & 3);
+            next = f + 1;
+            goto plain;
+        }
+        f >>= 2;
+        next = f + 1;
+        ratio = frame & 0x3fff;
+        mul = 4;
+        goto blend;
+    }
+    next = f + 1;
+
+plain:
+    ratio = frame & 0xfff;
+    mul = 1;
+
+blend:
     rot5 = FALSE;
     rot5 |= getRotMtx_(tmp0, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f]);
     rot5 |= getRotMtx_(tmp1, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[next]);

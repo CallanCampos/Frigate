@@ -118,18 +118,6 @@ static int Deposit_PokeNameSortListMake(ListMenuOption **menulist, MsgData *mons
                                         u16 *table, u8 *sinou, int num, int select, PokeDexSave *zukan);
 static u32 Deposit_BmpListMain(BmpMenuList *list, u16 *posBackup);
 
-static u16 sNameHeadTable[HEADWORD_NUM + 1] = {
-    0, 112, 184, 253, 315, 392, 463, 595, 637, 649,
-};
-
-// Not referred to
-WorldTradeSelectItem WorldTrade_SexSelectTable[] = {
-    { 0x82, 2 },
-    { 0x83, 0 },
-    { 0x84, 1 },
-    { 0x85, BMPMENULIST_CANCEL },
-};
-
 static int (*sDepositSubSeqTable[])(WorldTradeWork *wk) = {
     Deposit_SubSeqStart,
     Deposit_SubSeqMain,
@@ -150,8 +138,15 @@ static int (*sDepositSubSeqTable[])(WorldTradeWork *wk) = {
     Deposit_SubSeqMessageWait,
 };
 
-// The countries in the order of their names
-static const u16 sCountryListTbl[] = {
+static u16 sNameHeadTable[HEADWORD_NUM + 1] = {
+    0, 112, 184, 253, 315, 392, 463, 595, 637, 649,
+};
+
+// The countries in the order of their names. The explicit alignment is a guess, from the code of
+// WorldTrade_NationSortListMake, which reads the table: MWCC keeps the loop of a function that reads an aligned object
+// entered at its test (docs/matching.md). An alignment of 1, 2 or 4 gives the same code and layout, and the table's
+// address allows nothing above 4.
+static const u16 sCountryListTbl[] ATTRIBUTE_ALIGN(4) = {
     1,   2,   3,   6,   8,   9,   12,  13,  15,  16,  17,  18,  20,  21,  22,  23,  25,  27,  28,  29,  31,  33,
     34,  35,  36,  40,  42,  43,  45,  47,  48,  49,  51,  53,  54,  58,  60,  61,  62,  63,  64,  71,  72,  73,
     74,  76,  79,  80,  81,  82,  83,  84,  85,  87,  88,  90,  91,  92,  93,  94,  95,  96,  98,  99,  101, 102,
@@ -227,7 +222,7 @@ int WorldTrade_Deposit_End(WorldTradeWork *wk, int seq) {
     Deposit_BmpWinDelete(wk);
     Deposit_BgExit();
     WorldTrade_SubLcdBgExit(wk);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     WorldTrade_SubProcessUpdate(wk);
     return WT_SEQ_INIT;
 }
@@ -392,36 +387,37 @@ static void Deposit_SetCellActor(WorldTradeWork *wk) {
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 160;
     setup.y = 32;
-    wk->subCursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
-                                     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                     wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->subCursorAct, 12);
+    wk->subCursorAct =
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->subCursorAct, 12);
     func_0204c520(wk->subCursorAct, TRUE);
-    func_0204c550(wk->subCursorAct);
-    func_0204c124(wk->subCursorAct, FALSE);
+    ClActor_StopAnim(wk->subCursorAct);
+    ClActor_SetVisible(wk->subCursorAct, FALSE);
 
     setup.x = 228;
     setup.y = 117;
     wk->boxArrowAct[0] =
-        func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->boxArrowAct[0], 38);
-    func_0204c124(wk->boxArrowAct[0], FALSE);
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->boxArrowAct[0], 38);
+    ClActor_SetVisible(wk->boxArrowAct[0], FALSE);
 
     setup.x = 140;
     wk->boxArrowAct[1] =
-        func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                      wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->boxArrowAct[1], 39);
-    func_0204c124(wk->boxArrowAct[1], FALSE);
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->boxArrowAct[1], 39);
+    ClActor_SetVisible(wk->boxArrowAct[1], FALSE);
 }
 
 static void Deposit_DelCellActor(WorldTradeWork *wk) {
-    func_0204c108(wk->subCursorAct);
-    func_0204c108(wk->boxArrowAct[0]);
-    func_0204c108(wk->boxArrowAct[1]);
+    ClActor_Delete(wk->subCursorAct);
+    ClActor_Delete(wk->boxArrowAct[0]);
+    ClActor_Delete(wk->boxArrowAct[1]);
 }
 
 static void Deposit_InitWork(WorldTradeWork *wk) {
@@ -769,6 +765,14 @@ void WorldTrade_WantLevelPrint(BmpWin *win, MsgData *msgManager, int level, int 
     WorldTrade_WantLevelPrint_XY(win, msgManager, level, flag, 0, y, color, tblSelect, print);
 }
 
+// Not referred to
+WorldTradeSelectItem WorldTrade_SexSelectTable[] = {
+    { 0x82, 2 },
+    { 0x83, 0 },
+    { 0x84, 1 },
+    { 0x85, BMPMENULIST_CANCEL },
+};
+
 static const WorldTradeLevelTerm sSearchLevelMinMaxTable[SEARCH_LEVEL_SELECT_NUM] = {
     { 0xad, 0, 0 },   { 0xae, 1, 10 },  { 0xaf, 11, 20 }, { 0xb0, 21, 30 }, { 0xb1, 31, 40 },  { 0xb2, 41, 50 },
     { 0xb3, 51, 60 }, { 0xb4, 61, 70 }, { 0xb5, 71, 80 }, { 0xb6, 81, 90 }, { 0xb7, 91, 100 },
@@ -958,7 +962,7 @@ void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
 #endif
     dtd->langCode = 2;
     dtd->unk126 = getPlayerSurveys(wk->param->wifihistory);
-    dtd->unk127 = func_02009ca0(wk->param->wifihistory);
+    dtd->unk127 = UnityTower_GetCountryCount(wk->param->wifihistory);
     dtd->unkF7 = func_02009d28(wk->param->wifihistory);
 }
 
@@ -1091,8 +1095,7 @@ int WorldTrade_NationSortListMake(ListMenuOption **menulist, MsgData *countryNam
     int i;
 
     *menulist = ListMenuCore_CreateOptionList(num, HEAPID_WORLDTRADE);
-    // The loop test is a 0/1 value, which keeps the loop entered at its test (docs/matching.md)
-    for (i = 0; i < num ? TRUE : FALSE; i++) {
+    for (i = 0; i < num; i++) {
         ListMenuCore_AppendMsgOption(*menulist, countryNameManager, sCountryListTbl[first + i], first + i + 1,
                                      HEAPID_WORLDTRADE);
     }

@@ -19,13 +19,26 @@ void FieldFog_SetTable(FieldFog *fog, const u8 *table);
 void FieldFog_Flush(FieldFog *fog);
 u32 FieldFog_GetDepthShift(FieldFog *fog);
 void FieldFog_Animate(FieldFog *fog, u32 color, u32 depthShift, u32 duration);
+// The default densities, rising with depth; an animation between two offsets and depth shifts; and whether one runs
+void FieldFog_SetDefaultTable(FieldFog *fog);
+void FieldFog_AnimateEx(FieldFog *fog, s32 offsetStart, s32 offsetEnd, u32 depthShiftStart, u32 depthShiftEnd,
+                        u16 frameCount);
+BOOL FieldFog_IsAnimationRunning(FieldFog *fog);
 FieldFog *FieldFog_Create(HeapID heapId);
 void FieldFog_Free(FieldFog *fog);
 void FieldFog_Update(FieldFog *fog);
-void *FieldFogCtrl_Create(HeapID heapId);
-void FieldFogCtrl_Free(void *ctrl);
-void FieldFogCtrl_Update(void *ctrl, HeapID heapId);
-void FieldFogCtrl_RequestLoad(void *ctrl, u32 fogIndex, u32 lightIndex, BOOL a3);
-void FieldFogCtrl_Reset(void *ctrl);
+// field_zonefog.c: loads the zone's fog file, delay frames after a request
+FieldFogCtrl *FieldFogCtrl_Create(HeapID heapId);
+void FieldFogCtrl_Free(FieldFogCtrl *ctrl);
+void FieldFogCtrl_Update(FieldFogCtrl *ctrl, HeapID heapId);
+void FieldFogCtrl_RequestLoad(FieldFogCtrl *ctrl, u32 fileId, u32 staticLightIndex, s8 delay);
+// Whether a load is waiting for its delay
+u8 func_ov036_021977a4(FieldFogCtrl *ctrl);
+void FieldFogCtrl_Reset(FieldFogCtrl *ctrl);
+BOOL FieldFogCtrl_CheckArc(FieldFogCtrl *ctrl);
+BOOL FieldFogCtrl_IsStaticLightExists(FieldFogCtrl *ctrl);
+u32 FieldFogCtrl_GetFogParam0(FieldFogCtrl *ctrl);
+u32 FieldFogCtrl_GetFogParam1(FieldFogCtrl *ctrl);
+u32 FieldFogCtrl_GetStaticLightIndex(FieldFogCtrl *ctrl);
 
 #endif // POKEBW2_FIELD_FIELD_FOG_H

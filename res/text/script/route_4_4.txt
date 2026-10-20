@@ -1,0 +1,4 @@
+Route44_Text_WeMovedHereBecause = We moved here because I heard\nthis place would be developed more...
+Route44_Text_SinceConstructionWontFinished = Since construction won't be finished,\nguys like them hang around!
+Route44_Text_LovePlaceItsVery = I love this place!{be01}\nIt's very convenient, because it's\nclose to both Castelia and Nimbasa!
+\pad{28}

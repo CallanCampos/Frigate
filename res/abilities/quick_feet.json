@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Quick Feet",
+    "description": "Boosts Speed if there is\na status problem."
+}

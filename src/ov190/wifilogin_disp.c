@@ -598,9 +598,9 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
     GFL_G2DIOLoadNSCRSync(arc, 15, 0, 0, (u16)disp->mainChars, 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 16, 1, 0, (u16)disp->mainChars, 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 17, 2, 0, (u16)disp->mainChars, 0, FALSE, disp->heapId);
-    disp->chars = func_0204b81c(arc, 9, FALSE, CLACT_VRAM_SUB, disp->heapId);
-    disp->palette = func_0204bbb8(arc, 3, CLACT_VRAM_SUB, 0, 0, 3, disp->heapId);
-    disp->cellAnims = func_0204bde0(arc, 12, 25, disp->heapId);
+    disp->chars = ClActSys_LoadChars(arc, 9, FALSE, CLACT_VRAM_SUB, disp->heapId);
+    disp->palette = ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_SUB, 0, 0, 3, disp->heapId);
+    disp->cellAnims = ClActSys_LoadCellAnims(arc, 12, 25, disp->heapId);
     GFL_ArcToolFree(arc);
 
     setup0.x = 128;
@@ -608,20 +608,20 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
     setup0.sequence = 10;
     setup0.priority = 0;
     setup0.bgPriority = 2;
-    disp->actors[0] = func_0204c040(disp->clUnit, disp->chars, disp->palette, disp->cellAnims, &setup0,
-                                    CLACT_SURFACE_SUB, disp->heapId);
+    disp->actors[0] = ClActor_Create(disp->clUnit, disp->chars, disp->palette, disp->cellAnims, &setup0,
+                                     CLACT_SURFACE_SUB, disp->heapId);
     func_0204c520(disp->actors[0], TRUE);
-    func_0204c124(disp->actors[0], TRUE);
+    ClActor_SetVisible(disp->actors[0], TRUE);
 
     setup1.x = 128;
     setup1.y = 96;
     setup1.sequence = 11;
     setup1.priority = 1;
     setup1.bgPriority = 2;
-    disp->actors[1] = func_0204c040(disp->clUnit, disp->chars, disp->palette, disp->cellAnims, &setup1,
-                                    CLACT_SURFACE_SUB, disp->heapId);
+    disp->actors[1] = ClActor_Create(disp->clUnit, disp->chars, disp->palette, disp->cellAnims, &setup1,
+                                     CLACT_SURFACE_SUB, disp->heapId);
     func_0204c520(disp->actors[1], TRUE);
-    func_0204c124(disp->actors[1], TRUE);
+    ClActor_SetVisible(disp->actors[1], TRUE);
 
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 6, 16);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
@@ -633,7 +633,7 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
 
 static void WifiLoginDisp_InitClAct(WifiLoginDisp *disp) {
     ClActSys_Create(&data_02093f08, &sWifiLoginDispVRAMConfig, disp->heapId);
-    disp->clUnit = func_0204bf1c(40, 0, disp->heapId);
+    disp->clUnit = ClActUnit_Create(40, 0, disp->heapId);
     disp->vblankTask = GFL_VBlankTCBAdd(WifiLoginDisp_VBlank, disp, 0);
 }
 
@@ -648,7 +648,7 @@ static void WifiLoginDisp_UpdateWave(WifiLoginDisp *disp) {
             disp->scrollX = 1;
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void WifiLoginDisp_FreeClAct(WifiLoginDisp *disp) {
@@ -656,19 +656,19 @@ static void WifiLoginDisp_FreeClAct(WifiLoginDisp *disp) {
 
     for (i = 0; i < WIFILOGIN_DISP_ACTOR_COUNT; i++) {
         if (disp->actors[i] != NULL) {
-            func_0204c108(disp->actors[i]);
+            ClActor_Delete(disp->actors[i]);
             disp->actors[i] = NULL;
         }
     }
-    func_0204bcd0(disp->palette);
-    func_0204b98c(disp->chars);
-    func_0204be64(disp->cellAnims);
+    ClActSys_FreePltt(disp->palette);
+    ClActSys_FreeChars(disp->chars);
+    ClActSys_FreeCellAnims(disp->cellAnims);
     if (disp->hblankTask != NULL) {
         GFL_TCBRemove(disp->hblankTask);
     }
     GFL_TCBRemove(disp->vblankTask);
-    func_0204bf98(disp->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(disp->clUnit);
+    ClActSys_Delete();
 }
 
 // Offsets BG 1 of the main screen and BG 2 of the sub screen by the wave, a line at a time
@@ -689,7 +689,7 @@ static void WifiLoginDisp_VBlank(TCB *task, void *work) {
         GFL_BGSysMoveBG(7, BG_MOVE_SET_X, disp->scrollX - 1);
         GFL_BGSysMoveBG(2, BG_MOVE_SET_X, disp->scrollX - 1);
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 void WifiLoginDisp_SetUnk9C4(WifiLoginDisp *disp) {

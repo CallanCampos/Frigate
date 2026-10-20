@@ -128,7 +128,7 @@ BrPokeSearch *BrPokeSearch_Init(PokeDexSave *pokedex, BrRes *res, ClActUnit *uni
     p_wk->fade = fade;
     p_wk->unit = unit;
     p_wk->bmpoam = bmpoam;
-    p_wk->que = func_02021998(p_wk->heap_id);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heap_id);
     p_wk->monsno_table = BrPokeSearch_LoadMonsTable(HEAPID_TAIL(heapId), &p_wk->monsno_table_num);
     p_wk->ball_main = ballMain;
     p_wk->ball_sub = ballSub;
@@ -145,7 +145,7 @@ void BrPokeSearch_Exit(BrPokeSearch *p_wk) {
         p_wk->p_monsno_buff = NULL;
     }
     GFL_HeapFree(p_wk->monsno_table);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_HeapFree(p_wk);
 }
 
@@ -163,7 +163,7 @@ void BrPokeSearch_Main(BrPokeSearch *p_wk) {
             BOOL isTouch;
 
             p_wk->letter = BrPokeSearch_CheckTouch(p_wk);
-            isTouch = func_0203dac8(&x, &y);
+            isTouch = GFL_HIDGetTouchPressedPoint(&x, &y);
             if (BrBtn_GetTrg(p_wk->btn, x, y) & isTouch) {
                 BrPoint pos;
 
@@ -184,7 +184,7 @@ void BrPokeSearch_Main(BrPokeSearch *p_wk) {
 
             BrList_Main(p_wk->p_list);
             p_wk->species = BrList_GetSelect(p_wk->p_list);
-            isTouch = func_0203dac8(&x, &y);
+            isTouch = GFL_HIDGetTouchPressedPoint(&x, &y);
             if (BrBtn_GetTrg(p_wk->btn, x, y) & isTouch) {
                 BrPoint pos;
 
@@ -256,7 +256,7 @@ BOOL BrPokeSearch_PrintMain(BrPokeSearch *p_wk) {
             ret &= BrMsgWin_Main(p_wk->msgwin[i]);
         }
     }
-    return ret & func_02021a3c(p_wk->que);
+    return ret & PrintQueue_Main(p_wk->que);
 }
 
 void BrPokeSearch_StartUp(BrPokeSearch *p_wk) {
@@ -378,14 +378,14 @@ static void BrPokeSearch_ExitList(BrPokeSearch *p_wk) {
 }
 
 static u32 BrPokeSearch_CheckTouch(BrPokeSearch *p_wk) {
-    s32 letter = func_0203da0c(sc_pokesearch_touch_rects);
+    s32 letter = GFL_HIDGetTouchPressedRect(sc_pokesearch_touch_rects);
 
     if (letter != TOUCH_RECT_NONE) {
         if (p_wk->is_letter_seen[letter]) {
             u32 x, y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ball_sub, BR_BALL_EFFECT_SPREAD, &pos);

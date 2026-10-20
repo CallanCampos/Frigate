@@ -1,0 +1,15 @@
+PmsWordsInitialY_Text_Yaaah = YAAAH
+PmsWordsInitialY_Text_Yahoo = YAHOO
+PmsWordsInitialY_Text_Yamask = YAMASK
+PmsWordsInitialY_Text_Yanma = YANMA
+PmsWordsInitialY_Text_Yanmega = YANMEGA
+PmsWordsInitialY_Text_Yawn = YAWN
+PmsWordsInitialY_Text_Yay = YAY
+PmsWordsInitialY_Text_Yeah = YEAH
+PmsWordsInitialY_Text_Yeahyeah = YEAHYEAH
+PmsWordsInitialY_Text_Yep = YEP
+PmsWordsInitialY_Text_Yes = YES
+PmsWordsInitialY_Text_Yesterday = YESTERDAY
+PmsWordsInitialY_Text_Yo = YO
+PmsWordsInitialY_Text_You = YOU
+\pad{0e}

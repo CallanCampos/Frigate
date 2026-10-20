@@ -1,0 +1,13 @@
+Route2_Text_WhatCouldPerfectInstrument = What could be the perfect\ninstrument for me?{be01}\nFor example...{be01}\nI want a strong impact--\nan impact as strong as a Pokémon{be00}\nwith a tough Ability like Solid Rock{be00}\nthat reduces the power{be00}\nof supereffective moves!{be01}\nIf you have a Pokémon like that,\nplease show it to me!
+Route2_Text_ThAbilitySolidRock = Th-that {0101:0}...\nThat Ability is Solid Rock!{be01}\n{0101:0}\nis as hard as a rock!{be01}\nAnd has a rocking heart!{be01}\nIn other words, it has an impact\nthat rocks those who see it!{be01}\nSolid Rock... Like a hard rock...\nHard rock?!{be00}\nCould that be the sound{be00}\nI've been looking for?{be01}\nAt any rate, thanks!\nTake this, OK?{be01}
+Route2_Text_OhCantFitAny = Oh, you can't fit any\nmore in your Bag.
+Route2_Text_WhatFeelingCoursingThrough = What is this feeling\ncoursing through my veins?
+Route2_Text_JuggaJyaJaaaanDeedley = Jugga jya jaaaan!{be01}\nDeedley deeedly deeedly deeedly,\nmeedley meedley meedley meedley,{be00}\nMEEEEEEE!{be01}\nYeeeeah! Your {0101:0}'s\nhard-rockin' Ability opened my eyes!{be01}\nJuggah juggah jah!\nDuddah daaaaaah, bwan!{be01}\nThat's it! I should join Roxie's band!\nI could rock out with her! Dual guitars!{be00}\nAwesome!
+Route2_Text_KnowWhatKnowGuy = Know what?{be01}\nYou know the guy at the ledge\non Route 19? He's my rival!
+Route2_Text_PokemonArentFeelingWell = My Pokémon aren't feeling well,\nso I'm not walking in the tall grass.{be01}\nOh, wait... You have eight Badges!\nEep! I'm so embarrassed!{be01}\nYou already know this stuff!\nI shouldn't try to show off!
+Route2_Text_BattlesBetweenPokemonTrainers = Battles between Pokémon Trainers\nare serious affairs you can't run from!{be01}\nI mean, more than anything, you can't\nrun away from other Trainers{be00}\nin front of your beloved Pokémon!
+Route2_Text_Route2 = Route 2
+Route2_Text_Route2_2 = Route 2
+Route2_Text_TrainerTipsPokemonParticipate = Trainer Tips!{be01}\n\nPokémon that participate in battle\nreceive Exp. Points.{be01}\nHave your Pokémon battle often,\nand make them stronger and stronger!
+Route2_Text_TheresSomeGraffitiOther = There's some graffiti\non the other side of the signboard...{be01}\nNothing ventured, nothing gained.\nMedals await the adventurous!
+\pad{c4}

@@ -1,0 +1,175 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Oddish",
+    "pokedex": {
+        "category": "Weed Pokémon",
+        "entry": "It often plants its root feet in the\nground during the day and sows\nseeds as it walks about at night.",
+        "height": "1'08\"",
+        "weight": "11.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Oddish",
+                "category": "Weed Pokémon",
+                "entry": "It often plants its root feet in the\nground during the day and sows\nseeds as it walks about at night.",
+                "height": "1'08\"",
+                "weight": "11.9 lbs."
+            },
+            "fr": {
+                "name": "Mystherbe",
+                "category": "Pokémon Racine",
+                "entry": "En journée, il plante ses pieds-racines\ndans le sol. La nuit, il se promène en\nsemant des graines.",
+                "height": "0,5 m",
+                "weight": "5,4 kg"
+            },
+            "de": {
+                "name": "Myrapla",
+                "category": "Unkraut",
+                "entry": "Tagsüber verankert es sich mit\nseinen Wurzelfüßen im Boden.\nNachts wandert es und verteilt Samen.",
+                "height": "0,5 m",
+                "weight": "5,4 kg"
+            },
+            "it": {
+                "name": "Oddish",
+                "category": "Pokémon Malerba",
+                "entry": "Durante il giorno, pianta i piedi per\nterra come se fossero radici. Di notte\ncammina seminando.",
+                "height": "0,5 m",
+                "weight": "5,4 kg"
+            },
+            "ko": {
+                "name": "뚜벅쵸",
+                "category": "잡초포켓몬",
+                "entry": "낮에는 뿌리인 발을 땅에 박고\n움직이지 않을 때가 많다.\n밤에 돌아다니며 씨를 뿌린다.",
+                "height": "0.5 m",
+                "weight": "5.4 kg"
+            },
+            "es": {
+                "name": "Oddish",
+                "category": "Pokémon Hierbajo",
+                "entry": "Suele plantarse en el suelo durante\nel día. Por la noche se desplaza\nesparciendo semillas.",
+                "height": "0,5 m",
+                "weight": "5,4 kg"
+            },
+            "ja": {
+                "name": "ナゾノクサ",
+                "category": "ざっそうポケモン",
+                "entry": "ひるまは\\x{3000}ねっこの\\x{3000}あしを\\x{3000}じめんに\nうめて\\x{3000}うごかないことが\\x{3000}おおい。\nよる\\x{3000}あるきまわって\\x{3000}タネを\\x{3000}まく。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 50,
+        "defense": 55,
+        "speed": 30,
+        "special_attack": 75,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RUN_AWAY",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 64,
+    "height": 5,
+    "weight": 54,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ABSORB" ],
+            [ 5, "MOVE_SWEET_SCENT" ],
+            [ 9, "MOVE_ACID" ],
+            [ 13, "MOVE_POISON_POWDER" ],
+            [ 15, "MOVE_STUN_SPORE" ],
+            [ 17, "MOVE_SLEEP_POWDER" ],
+            [ 21, "MOVE_MEGA_DRAIN" ],
+            [ 25, "MOVE_LUCKY_CHANT" ],
+            [ 29, "MOVE_NATURAL_GIFT" ],
+            [ 33, "MOVE_MOONLIGHT" ],
+            [ 37, "MOVE_GIGA_DRAIN" ],
+            [ 41, "MOVE_PETAL_DANCE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_WORRY_SEED",
+            "MOVE_AFTER_YOU",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_RAZOR_LEAF",
+            "MOVE_FLAIL",
+            "MOVE_SYNTHESIS",
+            "MOVE_CHARM",
+            "MOVE_INGRAIN",
+            "MOVE_TICKLE",
+            "MOVE_TEETER_DANCE",
+            "MOVE_SECRET_POWER",
+            "MOVE_NATURE_POWER",
+            "MOVE_AFTER_YOU"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 21,
+            "species": "SPECIES_GLOOM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ODDISH",
+    "cry_volume": 110
+}

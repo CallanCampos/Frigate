@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Connor",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_IRON",
+    "party": [
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KROOKODILE",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I've practiced and practiced\nand become a great player!{be00}\nNow, let's play ball!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Game over!"
+        },
+        {
+            "type": 15,
+            "text": "Here's a gift to show my thanks to\nyou for coming!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Now, practice, practice, practice!{be01}\nPracticing over and over is the best way\nto be good at anything!{be01}\nMy hard work will make me a great player!"
+        }
+    ]
+}

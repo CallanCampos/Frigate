@@ -1,0 +1,23 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_ICIRRUS_CITY_GATE",
+            "warp": 0,
+            "unk4": 0,
+            "transition": 6,
+            "grid": {
+                "x": 2248,
+                "y": 80,
+                "z": 3256,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

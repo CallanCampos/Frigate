@@ -10,12 +10,12 @@
 // drive the rest, though no script in the game uses them
 #define GIMMICK_NUVEMA 0x20
 
-void func_ov133_021eec80(Field *field);
-void func_ov133_021eed84(Field *field);
-void func_ov133_021eed9c(Field *field);
+void GimmickNuvema_Init(Field *field);
+void GimmickNuvema_End(Field *field);
+void GimmickNuvema_Update(Field *field);
 // Shows the model and plays its animations
-void func_ov133_021eee1c(Field *field);
+void GimmickNuvema_PlayModel(Field *field);
 // Waits for the animations to finish
-GameEvent *func_ov133_021eee7c(GameSystem *gsys);
+GameEvent *GimmickNuvema_CreateWaitEvent(GameSystem *gsys);
 
 #endif // POKEBW2_FIELD_GIMMICK_NUVEMA_H

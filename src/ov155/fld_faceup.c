@@ -1,5 +1,7 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/fld_faceup.h"
 #include "gfl/arc.h"
@@ -21,9 +23,6 @@
 
 // The face-up (the file name is the ROM's): a close-up of a character's face over the field. The face is on BG 2 and
 // its eyes and mouth on BG 3, where two animations write the frames' map entries, which a VBlank task loads
-
-// The face-up's archive, a/1/8/4 (not in swan)
-#define ARCID_FLD_FACEUP 184
 
 // The script sub event of the message that the mouth moves with (scrcmd_work.c tests it as well)
 #define SCRIPT_SUB_EVENT_MSG 3
@@ -105,7 +104,7 @@ static const BGSetup sFaceBGSetup = {
     FALSE,
 };
 
-GameEvent *func_ov155_021f59e0(u8 type, u8 unused, u16 endBlack, GameSystem *gsys, FieldScriptEnv *env) {
+GameEvent *EventFaceUpStart_Create(u8 type, u8 unused, u16 endBlack, GameSystem *gsys, FieldScriptEnv *env) {
     FaceUpWork *work;
     Field *field = GSYS_GetField(gsys);
     u32 textSpeed;
@@ -126,7 +125,8 @@ GameEvent *func_ov155_021f59e0(u8 type, u8 unused, u16 endBlack, GameSystem *gsy
     FaceUpAnim_Init(&work->eyes);
     FaceUpAnim_Init(&work->mouth);
 
-    textSpeed = func_02008a14((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    textSpeed =
+        Config_GetTextSpeed((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     if (textSpeed == 0) {
         work->mouth.interval = 3;
     } else if (textSpeed == 1) {
@@ -254,20 +254,20 @@ static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
     GFL_BGSysSetBGEnabled(FACEUP_BG_PARTS, TRUE);
 }
 
-GameEvent *func_ov155_021f5cd0(GameSystem *gsys) {
+GameEvent *EventFaceUpEnd_Create(GameSystem *gsys) {
     if (*(FaceUpWork **)Field_GetNDemoDataHandle(GSYS_GetField(gsys)) == NULL) {
         return NULL;
     }
     return GameEvent_Create(gsys, NULL, EventFaceUpEnd_Callback, 0);
 }
 
-void func_ov155_021f5cf8(Field *field) {
+void FaceUp_FreeNow(Field *field) {
     FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
 
     FaceUp_Free(field, work);
 }
 
-void func_ov155_021f5d0c(Field *field) {
+void FaceUp_StartTalk(Field *field) {
     FaceUpWork *work = *(FaceUpWork **)Field_GetNDemoDataHandle(field);
 
     work->talkEnded = FALSE;

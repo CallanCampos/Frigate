@@ -164,21 +164,21 @@ static BOOL BrCodeIn_StateMove(BrCodeInWork *wk) {
             if (wk->code[i].move.wait == 0) {
                 continue;
             }
-            func_0204c178(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
+            ClActor_GetSurfacePos(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
             pos.x += wk->code[i].move.x;
             pos.y += wk->code[i].move.y;
-            func_0204c140(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(wk->code[i].actor, &pos, CLACT_SURFACE_SUB);
             wk->code[i].move.wait--;
             if (i >= wk->largeStart && i < wk->largeEnd) {
                 scale.x = sBrCodeInScalesLarge[wk->code[i].move.scale];
                 scale.y = sBrCodeInScalesLarge[wk->code[i].move.scale];
-                func_0204c270(wk->code[i].actor, &scale);
+                ClActor_SetScale(wk->code[i].actor, &scale);
                 wk->code[i].move.scale++;
             }
             if (i >= wk->smallStart && i < wk->smallEnd) {
                 scale.x = sBrCodeInScalesSmall[wk->code[i].move.scale];
                 scale.y = sBrCodeInScalesSmall[wk->code[i].move.scale];
-                func_0204c270(wk->code[i].actor, &scale);
+                ClActor_SetScale(wk->code[i].actor, &scale);
                 wk->code[i].move.scale++;
             }
         }
@@ -186,18 +186,20 @@ static BOOL BrCodeIn_StateMove(BrCodeInWork *wk) {
             if (wk->bar[i].move.wait == 0) {
                 continue;
             }
-            func_0204c178(wk->bar[i].actor, &barPos, CLACT_SURFACE_SUB);
+            ClActor_GetSurfacePos(wk->bar[i].actor, &barPos, CLACT_SURFACE_SUB);
             barPos.x += wk->bar[i].move.x;
             barPos.y += wk->bar[i].move.y;
-            func_0204c140(wk->bar[i].actor, &barPos, CLACT_SURFACE_SUB);
+            ClActor_SetSurfacePos(wk->bar[i].actor, &barPos, CLACT_SURFACE_SUB);
             wk->bar[i].move.wait--;
         }
         if (wk->code[0].move.wait == 0) {
             for (i = wk->largeStart; i < wk->largeEnd; i++) {
-                func_0204c488(wk->code[i].actor, BrCodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
+                ClActor_SetSequence(wk->code[i].actor,
+                                    BrCodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
             }
             for (i = wk->smallStart; i < wk->smallEnd; i++) {
-                func_0204c488(wk->code[i].actor, BrCodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
+                ClActor_SetSequence(wk->code[i].actor,
+                                    BrCodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
             }
             wk->seq++;
         }
@@ -210,7 +212,7 @@ static BOOL BrCodeIn_StateMove(BrCodeInWork *wk) {
             }
             scale.x = sBrCodeInScalesLarge[wk->code[i].move.scale];
             scale.y = sBrCodeInScalesLarge[wk->code[i].move.scale];
-            func_0204c270(wk->code[i].actor, &scale);
+            ClActor_SetScale(wk->code[i].actor, &scale);
             wk->code[i].move.scale++;
         }
         for (i = wk->smallStart; i < wk->smallEnd; i++) {
@@ -219,7 +221,7 @@ static BOOL BrCodeIn_StateMove(BrCodeInWork *wk) {
             }
             scale.x = sBrCodeInScalesSmall[wk->code[i].move.scale];
             scale.y = sBrCodeInScalesSmall[wk->code[i].move.scale];
-            func_0204c270(wk->code[i].actor, &scale);
+            ClActor_SetScale(wk->code[i].actor, &scale);
             wk->code[i].move.scale++;
         }
         wk->count++;
@@ -271,7 +273,7 @@ static void BrCodeIn_Confirm(BrCodeInWork *wk) {
 
         if (wk->code[i].state == 0) {
             wk->code[i].state = 1;
-            func_0204c488(wk->code[i].actor, BrCodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
+            ClActor_SetSequence(wk->code[i].actor, BrCodeInDisp_GetCodeSequence(wk->code[i].state, wk->code[i].size));
         }
         value = wk->code[i].state - 1;
         GFL_WordSetFormatNumber(digit, value, 1, 1, TRUE);
@@ -310,11 +312,12 @@ static void BrCodeIn_Backspace(BrCodeInWork *wk) {
     }
     digit = wk->cur[BR_CODEIN_CURSOR_CODE].state;
     wk->code[digit].state = 0;
-    func_0204c488(wk->code[digit].actor, BrCodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
+    ClActor_SetSequence(wk->code[digit].actor,
+                        BrCodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
     group = wk->code[digit].group;
     if (digit > 0) {
-        func_0204c488(wk->code[digit - 1].actor,
-                      BrCodeInDisp_GetCodeSequence(wk->code[digit - 1].state, wk->code[digit - 1].size));
+        ClActor_SetSequence(wk->code[digit - 1].actor,
+                            BrCodeInDisp_GetCodeSequence(wk->code[digit - 1].state, wk->code[digit - 1].size));
         prevGroup = wk->code[digit - 1].group;
         if (group != prevGroup) {
             wk->next = BR_CODEIN_NEXT_FOCUS;
@@ -378,7 +381,7 @@ static void BrCodeIn_ButtonCallback(u32 button, u32 event, void *work) {
             wk->cur[BR_CODEIN_CURSOR_KEY].move.x = 0;
             wk->cur[BR_CODEIN_CURSOR_KEY].move.y = 2;
             GFL_SndSEPlay(SEQ_SE_BREC_06);
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(wk->param.ballEff, BR_BALL_EFFECT_SPREAD, &pos);
@@ -390,7 +393,7 @@ static void BrCodeIn_ButtonCallback(u32 button, u32 event, void *work) {
             wk->cur[BR_CODEIN_CURSOR_KEY].move.x = 3;
             wk->cur[BR_CODEIN_CURSOR_KEY].move.y = 2;
             GFL_SndSEPlay(SEQ_SE_BREC_06);
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(wk->param.ballEff, BR_BALL_EFFECT_SPREAD, &pos);
@@ -409,14 +412,14 @@ static void BrCodeIn_ButtonCallback(u32 button, u32 event, void *work) {
             int nextGroup;
 
             if (wk->focus != 0) {
-                func_0203dac8(&x, &y);
+                GFL_HIDGetTouchPressedPoint(&x, &y);
                 pos.x = x;
                 pos.y = y;
                 BrBallEff_Start(wk->param.ballEff, BR_BALL_EFFECT_SPREAD, &pos);
                 digit = wk->cur[BR_CODEIN_CURSOR_CODE].state;
                 wk->code[digit].state = button - BR_CODEIN_RECT_KEYS + 1;
-                func_0204c488(wk->code[digit].actor,
-                              BrCodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
+                ClActor_SetSequence(wk->code[digit].actor,
+                                    BrCodeInDisp_GetCodeSequence(wk->code[digit].state, wk->code[digit].size));
                 group = wk->code[digit].group;
                 next = digit + 1;
                 if (next == wk->codeMax) {

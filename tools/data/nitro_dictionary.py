@@ -73,14 +73,17 @@ def replace_names(data, offset, names):
 
 
 def build_dictionary(names, records):
-    if len(names) != len(records) or any(len(record) != 4 for record in records):
-        raise ValueError("Nitro material binding dictionary needs four-byte records")
+    """Returns a dictionary of the names and their records, which all have one size: four bytes for a material's
+    bindings or a palette, eight for a texture."""
+    size = len(records[0]) if records else 4
+    if len(names) != len(records) or any(len(record) != size for record in records):
+        raise ValueError("Nitro dictionary needs a record of one size for each name")
     count = len(names)
     nodes = search_nodes(names)
-    result = bytearray(struct.pack("<BBHHH", 0, count, 16 + 24 * count, 8, 12 + 4 * count))
+    result = bytearray(struct.pack("<BBHHH", 0, count, 16 + (20 + size) * count, 8, 12 + 4 * count))
     for node in nodes:
         result.extend(bytes(node))
-    result.extend(struct.pack("<HH", 4, 4 + 4 * count))
+    result.extend(struct.pack("<HH", size, 4 + size * count))
     for record in records:
         result.extend(record)
     for name in names:

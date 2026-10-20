@@ -12,9 +12,6 @@
 
 #define DEMO3D_ID_COUNT 27
 
-// The 2D graphics that the commands load: the archive after ARCID_DEMO3D_RESOURCE. Our name
-#define ARCID_DEMO3D_2D 159
-
 // The commands of demo3d_cmd.c, in the order of its table
 enum {
     DEMO3D_CMD_NONE,

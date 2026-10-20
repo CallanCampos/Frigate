@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Toxic Boost",
+    "description": "Powers up physical\nattacks when poisoned."
+}

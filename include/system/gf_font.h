@@ -30,7 +30,7 @@ void GFL_TextRndGetGlobalColors(u8 *letter, u8 *shadow, u8 *background);
 BOOL GFL_TextRndCheckColorIndexChange(u8 letter, u8 shadow, u8 background);
 void GFL_TextRndUpdateColorIndexLUT(u8 letter, u8 shadow, u8 background);
 // Both call GFL_TextRndUpdateColorIndexLUT(1, 2, 0)
-void func_020232d0(void);
-void func_020232d8(void);
+void GFL_TextRndInitColorIndexLUT(void);
+void GFL_TextRndResetColorIndexLUT(void);
 
 #endif // POKEBW2_SYSTEM_GF_FONT_H

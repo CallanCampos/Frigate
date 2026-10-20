@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sophie",
+    "class": "TRAINER_CLASS_LADY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 40,
+    "reward": "ITEM_PEARL",
+    "party": [
+        {
+            "species": "SPECIES_ILLUMISE",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You!\nYou are a fan of that person.{be01}\nI can tell!\nBut that person is mine!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh no, oh why?\nI am sorry..."
+        },
+        {
+            "type": 15,
+            "text": "I can't let you have that person,\nbut take this instead...{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Come to think of it,\nthe more supporters there are,{be00}\nthe better.{be01}\nYou! Cheer until you lose your voice,\nand clap until your hands fall off!"
+        }
+    ]
+}

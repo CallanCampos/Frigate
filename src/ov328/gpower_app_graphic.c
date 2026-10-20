@@ -114,7 +114,7 @@ GPowerAppGraphic *GPowerAppGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GPowerAppBG_Init(&graphic->bg, heapId);
     GPowerAppClAct_Init(&graphic->clact, &sGPowerAppVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(GPowerAppGraphic_VBlank, graphic, 0);
@@ -125,7 +125,7 @@ void GPowerAppGraphic_Free(GPowerAppGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     GPowerAppClAct_Free(&graphic->clact);
     GPowerAppBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -191,24 +191,24 @@ static void GPowerAppBG_VBlank(GPowerAppBG *bg) {
 static void GPowerAppClAct_Init(GPowerAppClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(GPowerAppClAct));
     ClActSys_Create(&sGPowerAppClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void GPowerAppClAct_Free(GPowerAppClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(GPowerAppClAct));
 }
 
 static void GPowerAppClAct_Update(GPowerAppClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void GPowerAppClAct_VBlank(GPowerAppClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *GPowerAppClAct_GetUnit(GPowerAppClAct *clact) {

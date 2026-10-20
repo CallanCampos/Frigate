@@ -144,7 +144,7 @@ void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FieldEffectFootmark *footmark = FieldEffects_GetHandleData(effects, 5);
 
     params.footmark = footmark;
-    texture = func_ov036_021b4778(footmark, kind, GetActorFaceDir(actor), func_ov012_0216707c(actor));
+    texture = func_ov036_021b4778(footmark, kind, GetActorFaceDir(actor), GetActorLastFaceDir(actor));
     CopyActorWPos(actor, &pos);
     ConvGXZToVector(FldAct_GetInitGPosX(actor), FldAct_GetInitGPosZ(actor), &pos);
     // Footprints to the left or right, whose texture is the direction, sit a little further back.
@@ -216,8 +216,8 @@ static void func_ov036_021b4904(FieldEffectTask *task, void *work) {
         alpha = fmTask->alpha;
         blact = fmTask->params.footmark->blact;
         scene = BlActSys_GetScene(blact);
-        sceneActor = func_0204f750(blact, fmTask->actor);
-        func_0204ea78(scene, sceneActor, &alpha);
+        sceneActor = BlActSys_GetSceneActor(blact, fmTask->actor);
+        BlActScene_SetActorAlpha(scene, sceneActor, &alpha);
         break;
     }
 }

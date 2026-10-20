@@ -147,7 +147,7 @@ static BOOL MonolithStatus_Exit(GameProc *proc, u32 *state, void *param, void *w
     MonolithScreenParam *screen = param;
     MonolithStatusWork *sw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_BGSysSetEnabledBGsA(GX_PLANEMASK_BG3);

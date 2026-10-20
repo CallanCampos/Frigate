@@ -1,0 +1,188 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Metagross",
+    "pokedex": {
+        "category": "Iron Leg Pokémon",
+        "entry": "With four linked brains, it's more\nintelligent than a supercomputer, and\nit uses calculations to analyze foes.",
+        "height": "5'03\"",
+        "weight": "1212.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Metagross",
+                "category": "Iron Leg Pokémon",
+                "entry": "Metang combined to form it.\nWith four brains, it has the\nintelligence of a supercomputer.",
+                "height": "5'03\"",
+                "weight": "1212.5 lbs."
+            },
+            "fr": {
+                "name": "Métalosse",
+                "category": "Pokémon Pattefer",
+                "entry": "Il est né de la fusion de plusieurs\nMétang. Ses quatre cerveaux en\nfont l'égal d'un superordinateur.",
+                "height": "1,6 m",
+                "weight": "550,0 kg"
+            },
+            "de": {
+                "name": "Metagross",
+                "category": "Eisenfuß",
+                "entry": "Mehrere Metang bilden dieses Pokémon.\nMit seinen vier Gehirnen besitzt es die\nIntelligenz eines Supercomputers.",
+                "height": "1,6 m",
+                "weight": "550,0 kg"
+            },
+            "it": {
+                "name": "Metagross",
+                "category": "Pokémon Ferrarto",
+                "entry": "È formato dalla fusione di due Metang.\nHa quattro cervelli e l'intelligenza di\nun supercomputer.",
+                "height": "1,6 m",
+                "weight": "550,0 kg"
+            },
+            "ko": {
+                "name": "메타그로스",
+                "category": "무쇠다리포켓몬",
+                "entry": "메탕구가 합체해서 생겨났다.\n4개의 뇌를 가진 메타그로스는\n슈퍼컴퓨터 수준의 지능이다.",
+                "height": "1.6 m",
+                "weight": "550.0 kg"
+            },
+            "es": {
+                "name": "Metagross",
+                "category": "Pokémon Pata Hierro",
+                "entry": "Está formado por varios Metang.\nCon cuatro cerebros, tiene la\ninteligencia de un superordenador.",
+                "height": "1,6 m",
+                "weight": "550,0 kg"
+            },
+            "ja": {
+                "name": "メタグロス",
+                "category": "てつあしポケモン",
+                "entry": "メタングが\\x{3000}がったいして\\x{3000}うまれた。\n\\x{ff14}つの\\x{3000}のうを\\x{3000}もつ\\x{3000}メタグロスは\nスーパーコンピュータなみの\\x{3000}ちのう。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff15}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 135,
+        "defense": 130,
+        "speed": 70,
+        "special_attack": 95,
+        "special_defense": 90
+    },
+    "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+    "catch_rate": 3,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 3,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_METAL_COAT",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 40,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_CLEAR_BODY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_LIGHT_METAL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 270,
+    "height": 16,
+    "weight": 5500,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MAGNET_RISE" ],
+            [ 1, "MOVE_TAKE_DOWN" ],
+            [ 1, "MOVE_METAL_CLAW" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 20, "MOVE_CONFUSION" ],
+            [ 20, "MOVE_METAL_CLAW" ],
+            [ 23, "MOVE_PURSUIT" ],
+            [ 26, "MOVE_MIRACLE_EYE" ],
+            [ 29, "MOVE_ZEN_HEADBUTT" ],
+            [ 32, "MOVE_BULLET_PUNCH" ],
+            [ 35, "MOVE_SCARY_FACE" ],
+            [ 38, "MOVE_AGILITY" ],
+            [ 41, "MOVE_PSYCHIC" ],
+            [ 44, "MOVE_METEOR_MASH" ],
+            [ 45, "MOVE_HAMMER_ARM" ],
+            [ 53, "MOVE_IRON_DEFENSE" ],
+            [ 62, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM03",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM64",
+            "TM68",
+            "TM69",
+            "TM70",
+            "TM74",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_IRON_HEAD",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_GRAVITY",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_TRICK",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 264,
+    "baby_species": "SPECIES_BELDUM",
+    "cry_volume": 126
+}

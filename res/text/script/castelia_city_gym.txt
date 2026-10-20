@@ -1,0 +1,11 @@
+CasteliaCityGym_Text_WhenCocoonBreaksOpen = When the cocoon breaks open,\nthe one that pops out is--moi!{be01}\nOn that note, have a battle with moi!{be01}
+CasteliaCityGym_Text_HidingMakesBattleInstincts = Hiding makes battle instincts dull,\nyou know.{be01}
+CasteliaCityGym_Text_HidingMakesBattleInstincts_2 = Hiding makes battle instincts dull,\nyou know.
+CasteliaCityGym_Text_Empty =                                                          \x{ffff}
+CasteliaCityGym_Text_Empty_2 =                                                            \x{ffff}
+CasteliaCityGym_Text_ClydeHelloYoureProbably = Clyde: Hello! You're probably\ntired from wandering all over{be00}\nthe crowded streets of Castelia City{be00}\nlooking for Team Plasma and{be00}\nthe Gym Leader.{be01}\nSo, here,\nI'll give you this!{be01}
+CasteliaCityGym_Text_ThemeGymNoneOther = The theme of this Gym\nis none other than cocoons!{be01}\nYou head upward by going inside\nthe cocoons and traveling{be00}\nup the threads!{be01}\nThe threads are definitely\nconnected to Burgh...eventually!
+CasteliaCityGym_Text_WowThatsAmazingSwatted = Wow! That's amazing!{be01}\nYou swatted aside our Gym Leader\nBurgh's tricky attacks...{be01}\nI can barely imagine how much\nstronger you're going to get!
+CasteliaCityGym_Text_CasteliaPokemonGymGym = Castelia Pokémon Gym{be01}\nGym Leader: Burgh\nCertified Trainers:
+CasteliaCityGym_Text_CasteliaPokemonGymGym_2 = Castelia Pokémon Gym{be01}\nGym Leader: Burgh\nCertified Trainers:{be00}\n{0100:0}
+CasteliaCityGym_Text_CasteliaPokemonGymGym_3 = Castelia Pokémon Gym{be01}\nGym Leader: Burgh\nCertified Trainers:{be00}\n{0100:0}, {0100:1}

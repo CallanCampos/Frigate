@@ -1,10 +1,12 @@
-# Nintendo's DWC (Wi-Fi Connection), built apart from the game with the game's compiler, dsi/1.1p1. Most of DWC in
+# Nintendo's DWC (Wi-Fi Connection), built apart from the game with dsi/1.2. Every file compiles alike under dsi/1.1p1
+# and dsi/1.2 in both versions except dwc_account.c, whose DWCi_Acc_CreateLoginId loads entropy[i] through its own
+# indexed address only from dsi/1.2 on (to dsi/1.3p1), as the original does. Most of DWC in
 # overlays 189 and 260 is Thumb code, so Thumb is the default here; the voice chat library libVCT (overlay 29, vct/) is
 # ARM code at -O4,p and is set per file below. Probed on libVCT in all of dsi/1.1 to dsi/1.6sp2, 2.0/* and 1.2/*: dsi/1.1
 # to dsi/1.6sp2 compile it alike and best (41 of its first 96 functions matched at dsi/1.1p1, 31 at 2.0/*, 17 at
 # 1.2/sp3 and sp4, 10 at 1.2/base), -O4,s and -O2 match 28 and 27, and -inline made no gain. Other parts that differ
 # take their own file_flags entry.
-compiler = "dsi/1.1p1"
+compiler = "dsi/1.2"
 flags = [
     "-O4,p",               # Optimize for speed
     "-proc arm946e",       # ARM9 processor
@@ -23,12 +25,22 @@ flags = [
     "-msgstyle gcc",
 ]
 
-# libVCT is ARM code; vct.c also reaches its two objects from one base, as -ipa file does
+# libVCT is ARM code; vct.c and vct_audio.c also reach their statics from one base, as -ipa file does (vct_audio.c's
+# .bss is size-sorted, with the u16 first), and vct_session.c has its four 66-byte transition tables 4-aligned in
+# sections of their own, which only -ipa file gives
 [file_flags]
 "vct/vct_adpcm.c" = ["-nothumb"]
-"vct/vct_audio.c" = ["-nothumb"]
-"vct/vct_session.c" = ["-nothumb"]
-"vct/vct_dsp.c" = ["-nothumb"]
+"vct/vct_audio.c" = ["-nothumb", "-ipa file"]
+"vct/vct_buffer.c" = ["-nothumb"]
+"vct/vct_session.c" = ["-nothumb", "-ipa file"]
+# vct_dsp.c was one file once, but the ROM's range of it is four, each with its own `-ipa file` layout: the `.bss` runs
+# `sPacketPool`; `sNoiseFloor` with `sLoudnessHistory`; and `sEcho` with its arrays and buffers are each sorted by size
+# (the 2-byte `shift` first), which one file's statics could not be. The packet pool and the mixer compile alike with
+# or without it
+"vct/vct_packet_pool.c" = ["-nothumb"]
+"vct/vct_vad.c" = ["-nothumb", "-ipa file"]
+"vct/vct_dsp.c" = ["-nothumb", "-ipa file"]
+"vct/vct_mixer.c" = ["-nothumb"]
 "vct/vct.c" = ["-nothumb", "-ipa file"]
 # The signature check (overlay 189) is ARM code like NitroSDK's
 "crypt/crypt.c" = ["-nothumb"]
@@ -39,6 +51,11 @@ flags = [
 "nhttp/nhttp_thread.c" = ["-ipa file"]
 # So does the file of DWC that wraps the GameSpy HTTP client (overlay 189)
 "ghttp/dwc_ghttp.c" = ["-ipa file"]
+# ghttpEncryption.c's function names (__FUNCTION__) are sorted by size ahead of its other data, as -ipa file sorts them
+"ghttp/ghttpEncryption.c" = ["-ipa file"]
+# The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
+# exponent, which only -ipa file gives
+"auth/dwc_auth.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does

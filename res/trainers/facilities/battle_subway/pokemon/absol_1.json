@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ABSOL",
+    "moves": [ "MOVE_PAYBACK", "MOVE_MEAN_LOOK", "MOVE_HONE_CLAWS", "MOVE_BATON_PASS" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

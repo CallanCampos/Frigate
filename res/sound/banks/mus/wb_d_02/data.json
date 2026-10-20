@@ -1,0 +1,324 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_WB_D_02", null, null, null ],
+    "instruments": [
+        {
+            "program": 62,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_D_02",
+            "wave": 4,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 100,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "E5",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 14,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 25
+                }
+            ]
+        },
+        {
+            "program": 33,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 0,
+                    "base_key": "G2",
+                    "attack": 120,
+                    "decay": 100,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 45,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 3,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 2,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 1,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 3,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 5,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 115,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 6,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 115,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 42,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 8,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 10,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 9,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 7,
+                    "base_key": "B4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 34,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 12,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 11,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 13,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 30,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 16,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 15,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 18,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 17,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 38,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 19,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 10,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 20,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_02",
+                    "wave": 21,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

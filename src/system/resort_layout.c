@@ -46,11 +46,11 @@ static const ResortPlace sPlaces[48] = {
     { 4, 3, 3 }, { 4, 3, 3 }, { 2, 3, 2 }, { 2, 3, 2 }, { 1, 4, 2 }, { 3, 3, 3 }, { 3, 3, 3 }, { 4, 2, 3 },
 };
 
-u16 func_0203950c(u32 index) {
+u16 ResortLayout_GetZoneId(u32 index) {
     return sZones[index];
 }
 
-u32 func_02039518(u16 zoneId) {
+u32 ResortLayout_GetZoneIndex(u16 zoneId) {
     int i;
 
     for (i = 0; i < RESORT_ZONE_COUNT; i++) {

@@ -491,7 +491,7 @@ static void TDownloadUtil_ExitWindows(TDownloadWork *wk) {
         wk->streamStr = NULL;
     }
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
     }
 }
@@ -571,22 +571,22 @@ static void TDownloadUtil_CreateActors(TDownloadWork *wk, u32 surface, const TDo
         setup.sequence = data->anim;
         setup.priority = data->priority;
         setup.bgPriority = data->bgPriority;
-        actors[i] = func_0204c040(unit, wk->res[chars], wk->res[pltt], wk->res[cells], &setup, surface, wk->heapId);
+        actors[i] = ClActor_Create(unit, wk->res[chars], wk->res[pltt], wk->res[cells], &setup, surface, wk->heapId);
         visible = FALSE;
         if (data->visible == TRUE) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         autoAnim = FALSE;
         if (data->flags & 1) {
             autoAnim = TRUE;
         }
         func_0204c520(actors[i], autoAnim);
         if (data->flags & 2) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (data->flags & 4) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
         data++;
     }
@@ -597,23 +597,23 @@ static void TDownloadUtil_LoadObjRes(TDownloadWork *wk, u32 vramType, const TDow
     ClActUnit *unit = TDownloadGraphic_GetClActUnit(wk->graphic);
 
     wk->res[res->pltt.index] =
-        func_0204bbb8(arc, res->pltt.file, vramType, res->pltt.offset, 0, res->pltt.count, wk->heapId);
-    wk->res[res->chars.index] = func_0204b81c(arc, res->chars.file, FALSE, vramType, wk->heapId);
-    wk->res[res->cells.index] = func_0204bde0(arc, res->cells.file, res->anims.file, wk->heapId);
+        ClActSys_LoadPlttRange(arc, res->pltt.file, vramType, res->pltt.offset, 0, res->pltt.count, wk->heapId);
+    wk->res[res->chars.index] = ClActSys_LoadChars(arc, res->chars.file, FALSE, vramType, wk->heapId);
+    wk->res[res->cells.index] = ClActSys_LoadCellAnims(arc, res->cells.file, res->anims.file, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void TDownloadUtil_LoadUIRes(TDownloadWork *wk, u32 vramType) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
     ClActUnit *unit = TDownloadGraphic_GetClActUnit(wk->graphic);
-    u32 pltt = func_0202d810();
-    u32 chars = func_0202d814();
-    u32 cells = func_0202d818(2);
-    u32 anims = func_0202d81c(2);
+    u32 pltt = AppMenuCommon_GetTouchBarPaletteFile();
+    u32 chars = AppMenuCommon_GetTouchBarCharFile();
+    u32 cells = AppMenuCommon_GetTouchBarCellFile(2);
+    u32 anims = AppMenuCommon_GetTouchBarAnimFile(2);
 
-    wk->res[0] = func_0204bbb8(arc, pltt, vramType, 0x160, 0, 4, wk->heapId);
-    wk->res[1] = func_0204b81c(arc, chars, FALSE, vramType, wk->heapId);
-    wk->res[2] = func_0204bde0(arc, cells, anims, wk->heapId);
+    wk->res[0] = ClActSys_LoadPlttRange(arc, pltt, vramType, 0x160, 0, 4, wk->heapId);
+    wk->res[1] = ClActSys_LoadChars(arc, chars, FALSE, vramType, wk->heapId);
+    wk->res[2] = ClActSys_LoadCellAnims(arc, cells, anims, wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -624,35 +624,35 @@ static void TDownloadUtil_InitObj(TDownloadWork *wk) {
     TDownloadUtil_LoadUIRes(wk, 0);
     TDownloadUtil_CreateActors(wk, 0, sTDownloadObjActors, &sTDownloadObjActorRes);
     TDownloadUtil_CreateActors(wk, 0, sTDownloadButtonActors, &sTDownloadButtonActorRes);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }
 
 static void TDownloadUtil_ExitObj(TDownloadWork *wk) {
     int i;
 
     for (i = 0; i < T_DOWNLOAD_OBJ_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
     for (i = 0; i < T_DOWNLOAD_BUTTON_COUNT; i++) {
-        func_0204c108(wk->buttons[i]);
+        ClActor_Delete(wk->buttons[i]);
     }
-    func_0204bcd0(wk->res[3]);
-    func_0204b98c(wk->res[4]);
-    func_0204be64(wk->res[5]);
-    func_0204bcd0(wk->res[0]);
-    func_0204b98c(wk->res[1]);
-    func_0204be64(wk->res[2]);
+    ClActSys_FreePltt(wk->res[3]);
+    ClActSys_FreeChars(wk->res[4]);
+    ClActSys_FreeCellAnims(wk->res[5]);
+    ClActSys_FreePltt(wk->res[0]);
+    ClActSys_FreeChars(wk->res[1]);
+    ClActSys_FreeCellAnims(wk->res[2]);
 }
 
 static void TDownloadUtil_SetActorAnim(TDownloadWork *wk, int kind, int index, int anim) {
     if (kind == T_DOWNLOAD_ACTOR_OBJ) {
         if (index < T_DOWNLOAD_OBJ_COUNT) {
-            func_0204c488(wk->actors[index], anim);
+            ClActor_SetSequence(wk->actors[index], anim);
             func_0204c520(wk->actors[index], TRUE);
         }
     } else if (kind == T_DOWNLOAD_ACTOR_BUTTON) {
         if (index < T_DOWNLOAD_BUTTON_COUNT) {
-            func_0204c488(wk->buttons[index], anim);
+            ClActor_SetSequence(wk->buttons[index], anim);
             func_0204c520(wk->buttons[index], TRUE);
         }
     }
@@ -661,11 +661,11 @@ static void TDownloadUtil_SetActorAnim(TDownloadWork *wk, int kind, int index, i
 void TDownloadUtil_SetActorVisible(TDownloadWork *wk, int kind, int index, BOOL visible) {
     if (kind == T_DOWNLOAD_ACTOR_OBJ) {
         if (index < T_DOWNLOAD_OBJ_COUNT) {
-            func_0204c124(wk->actors[index], visible);
+            ClActor_SetVisible(wk->actors[index], visible);
         }
     } else if (kind == T_DOWNLOAD_ACTOR_BUTTON) {
         if (index < T_DOWNLOAD_BUTTON_COUNT) {
-            func_0204c124(wk->buttons[index], visible);
+            ClActor_SetVisible(wk->buttons[index], visible);
         }
     }
 }
@@ -677,14 +677,14 @@ BOOL TDownloadUtil_IsActorAnimating(TDownloadWork *wk, int kind, int index) {
         if (index >= T_DOWNLOAD_OBJ_COUNT) {
             return FALSE;
         }
-        if (func_0204c560(wk->actors[index]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->actors[index]) == FALSE) {
             animating = FALSE;
         }
     } else if (kind == T_DOWNLOAD_ACTOR_BUTTON) {
         if (index >= T_DOWNLOAD_BUTTON_COUNT) {
             return FALSE;
         }
-        if (func_0204c560(wk->buttons[index]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->buttons[index]) == FALSE) {
             animating = FALSE;
         }
     }
@@ -757,7 +757,7 @@ int TDownloadUtil_UpdateTaskMenu(TDownloadWork *wk) {
 
 static void TDownloadUtil_PrintStream(TDownloadWork *wk, int window, int message) {
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
     }
     if (wk->streamStr != NULL) {
@@ -765,8 +765,8 @@ static void TDownloadUtil_PrintStream(TDownloadWork *wk, int window, int message
         wk->streamStr = NULL;
     }
     wk->streamStr = GFL_MsgDataLoadStrbufNew(wk->msgData[0], sTDownloadMessages[message]);
-    wk->stream = func_02022268(wk->windows[window].window, 0, 0, wk->streamStr, wk->font, func_02017bcc(), wk->tcbEx, 4,
-                               wk->heapId, 15);
+    wk->stream = PrintStream_Create(wk->windows[window].window, 0, 0, wk->streamStr, wk->font,
+                                    TextSpeed_GetCurrentWait(), wk->tcbEx, 4, wk->heapId, 15);
 }
 
 BOOL TDownloadUtil_UpdateMessage(TDownloadWork *wk) {
@@ -1065,7 +1065,7 @@ void TDownloadUtil_MoveCursor(TDownloadWork *wk, int type, int pos) {
         index = pos + 27;
         cursor.y = TDownloadUtil_GetPosition(wk, index * 2 + 1);
     }
-    func_0204c140(wk->actors[2], &cursor, 0);
+    ClActor_SetSurfacePos(wk->actors[2], &cursor, 0);
     if (!(wk->objFlags & T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS)) {
         TDownloadUtil_SetActorAnim(wk, T_DOWNLOAD_ACTOR_OBJ, 2, 2);
     }
@@ -1158,14 +1158,14 @@ void TDownloadUtil_ShowPageButtons(TDownloadWork *wk, int tab) {
 void TDownloadUtil_ClampScrollBar(TDownloadWork *wk) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[0], &pos, 0);
+    ClActor_GetSurfacePos(wk->actors[0], &pos, 0);
     pos.y = FrameList_ClampBarPos(wk->list, pos.y);
     if (pos.y < 0x28) {
         pos.y = 0x28;
     } else if (pos.y > 0x98) {
         pos.y = 0x98;
     }
-    func_0204c140(wk->actors[0], &pos, 0);
+    ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
 }
 
 void TDownloadUtil_PrintDetails(TDownloadWork *wk, int type, int index, int tab) {
@@ -1288,7 +1288,7 @@ int TDownloadUtil_GetTouchedPage(TDownloadWork *wk, int tab) {
     int page = -1;
     u32 y, x;
 
-    if (func_0203da84(&x, &y) == TRUE) {
+    if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
         page = ScrollBar_GetValue(wk->pageCount[tab] - 1, y, 0x20, 0xa0, 0x10);
     }
     return page;
@@ -1299,10 +1299,10 @@ BOOL TDownloadUtil_UpdatePageBar(TDownloadWork *wk, int tab, int page, BOOL touc
     ClActorPos pos;
     u32 y, x;
 
-    func_0204c178(wk->actors[0], &pos, 0);
+    ClActor_GetSurfacePos(wk->actors[0], &pos, 0);
     if (touch == FALSE) {
         pos.y = ScrollBar_GetPos(wk->pageCount[tab] - 1, page, 0x20, 0xa0, 0x10);
-    } else if (func_0203da84(&x, &y) == TRUE) {
+    } else if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
         int diff = pos.y - y;
 
         if (diff < 0) {
@@ -1318,7 +1318,7 @@ BOOL TDownloadUtil_UpdatePageBar(TDownloadWork *wk, int tab, int page, BOOL touc
     } else if (pos.y > 0x98) {
         pos.y = 0x98;
     }
-    func_0204c140(wk->actors[0], &pos, 0);
+    ClActor_SetSurfacePos(wk->actors[0], &pos, 0);
     return moved;
 }
 
@@ -1341,9 +1341,9 @@ void TDownloadUtil_PrintTitle(TDownloadWork *wk, int mode, int tab) {
 
 int TDownloadUtil_GetTouch(TDownloadWork *wk, BOOL held, int mode) {
     if (held == FALSE) {
-        return func_0203da0c(sTDownloadTouchRects[mode]);
+        return GFL_HIDGetTouchPressedRect(sTDownloadTouchRects[mode]);
     }
-    return func_0203d9c8(sTDownloadTouchRects[mode]);
+    return GFL_HIDGetTouchHeldRect(sTDownloadTouchRects[mode]);
 }
 
 void TDownloadUtil_DimScreen(TDownloadWork *wk, BOOL show) {
@@ -1372,18 +1372,18 @@ void TDownloadUtil_DimScreenUpload(TDownloadWork *wk, BOOL show) {
 }
 
 void TDownloadUtil_PauseActors(TDownloadWork *wk, BOOL show) {
-    if (func_0204c138(wk->actors[0]) == TRUE) {
+    if (ClActor_IsVisible(wk->actors[0]) == TRUE) {
         if (show == TRUE) {
-            func_0204c550(wk->actors[0]);
+            ClActor_StopAnim(wk->actors[0]);
         } else {
-            func_0204c540(wk->actors[0]);
+            ClActor_StartAnim(wk->actors[0]);
         }
     }
-    if (func_0204c138(wk->actors[2]) == TRUE) {
+    if (ClActor_IsVisible(wk->actors[2]) == TRUE) {
         if (show == TRUE) {
-            func_0204c550(wk->actors[2]);
+            ClActor_StopAnim(wk->actors[2]);
         } else {
-            func_0204c540(wk->actors[2]);
+            ClActor_StartAnim(wk->actors[2]);
         }
     }
 }
@@ -1426,17 +1426,17 @@ void TDownloadUtil_UpdateCursorMode(TDownloadWork *wk, BOOL keys, BOOL touch, BO
     BOOL visible;
 
     if (keys == FALSE && touch == FALSE) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             visible = FALSE;
-        } else if (func_0203d554() == FALSE) {
+        } else if (GCTX_HIDIsUsingTouch() == FALSE) {
             visible = TRUE;
         }
     }
     if (touch == TRUE) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         visible = FALSE;
     } else if (keys == TRUE) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         visible = TRUE;
     }
     if (hide == TRUE) {

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VANILLISH",
+    "moves": [ "MOVE_ICE_BEAM", "MOVE_MIRROR_SHOT", "MOVE_MIRROR_COAT", "MOVE_HAIL" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_ICY_ROCK",
+    "form": 0
+}

@@ -1,0 +1,21 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Antoin",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "pokemon": [
+        "druddigon_2",
+        "altaria_2",
+        "flygon_2",
+        "kingdra_2",
+        "haxorus_2",
+        "dragonite_2",
+        "salamence_2",
+        "garchomp_2",
+        "hydreigon_2"
+    ],
+    "messages": [
+        "The job site is quite dangerous, but\nI'll have to keep working with Pokémon.",
+        "I have trained my Pokémon well,\nand it's ready to go to the job site.",
+        "Ugh. I cannot make money tomorrow\n'cause I am injured."
+    ]
+}

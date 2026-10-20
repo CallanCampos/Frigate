@@ -1,4 +1,0 @@
-AnvilleTown2_Text_WhyPeopleLoveTrains = Why do people love trains?{be01}\nMaybe it's the design--the way trains can\nrun so fast and still be so comfortable.{be01}\nAll the essential parts work together...\nSimple, but so beautiful!
-AnvilleTown2_Text_IsntAmazingHowJust = Isn't it amazing how,\njust by riding a train,{be00}\nyou can see such a variety of scenery?
-AnvilleTown2_Text_Tulaaa = Tulaaa...
-\pad{3a}

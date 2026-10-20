@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TRUBBISH",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ZANGOOSE",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It's not just our outfits that have\nchanged around here!{be01}\nWe're not living for the Pokémon anymore,\nbut for ourselves!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Whyyyy...?"
+        },
+        {
+            "type": 2,
+            "text": "Our king abandoned us...{be01}\nWe couldn't survive unless we changed\nthe way we thought..."
+        }
+    ]
+}

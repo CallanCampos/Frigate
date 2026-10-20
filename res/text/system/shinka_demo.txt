@@ -1,0 +1,4 @@
+ShinkaDemo_Text_WhatEvolving = What?\n{0102:0} is evolving!
+ShinkaDemo_Text_HuhStoppedEvolving = Huh? {0102:0}\nstopped evolving!
+ShinkaDemo_Text_CongratulationsEvolvedInto = Congratulations! Your {0102:0}\nevolved into {0101:1}!
+ShinkaDemo_Text_Empty =                           \x{ffff}

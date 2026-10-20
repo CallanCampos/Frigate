@@ -43,7 +43,9 @@ If you formatted, it was `clang-format -i` on your files only. Check that `git d
 ## 4. Document
 
 - `docs/nonmatching-functions.md`: add a row for each new mismatch and update or remove rows for functions that now
-  match or whose difference changed. Follow the table format as it is in this checkout.
+  match or whose difference changed. Follow the table format as it is in this checkout, and run
+  `.venv/bin/python tools/decomp/check_nonmatching_rows.py` (CI runs it too): every row's functions must be defined in
+  its file and be symbols at both of its addresses.
 - A lever that worked, or a `docs/matching.md` claim that turned out wrong: the `record-lesson` skill.
 - The workstream's memory file: what is done, and what is next.
 

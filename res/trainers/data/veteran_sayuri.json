@@ -1,0 +1,67 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sayuri",
+    "class": "TRAINER_CLASS_VETERAN_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_PP_MAX",
+    "party": [
+        {
+            "species": "SPECIES_RELICANTH",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_DOUBLE_EDGE", "MOVE_ANCIENT_POWER", "MOVE_WATERFALL", "MOVE_BLIZZARD" ]
+        },
+        {
+            "species": "SPECIES_MAGCARGO",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FIRE_BLAST", "MOVE_STONE_EDGE", "MOVE_GYRO_BALL", "MOVE_EARTHQUAKE" ]
+        },
+        {
+            "species": "SPECIES_GLACEON",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_BLIZZARD", "MOVE_RETURN", "MOVE_ICE_SHARD", "MOVE_SHADOW_BALL" ]
+        },
+        {
+            "species": "SPECIES_DRAGONITE",
+            "form": 0,
+            "level": 63,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_OUTRAGE", "MOVE_WING_ATTACK", "MOVE_WATERFALL", "MOVE_FIRE_PUNCH" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Wow, you have a lot of Badges.\nLet me see your skills!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "That fighting style reminds me\nof the old days!"
+        },
+        {
+            "type": 15,
+            "text": "A person like you should use\ntop-shelf items--like this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "No matter how old we get,\nlet's stay Trainers!"
+        }
+    ]
+}

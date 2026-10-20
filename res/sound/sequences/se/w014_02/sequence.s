@@ -1,0 +1,52 @@
+track_00:
+    note_wait 0
+    tempo 300
+    program 0
+    volume 127
+    bend_range 12
+    sweep_pitch 0
+    sweep_pitch 0
+    pan 64
+    mod_depth 0
+    expression 127
+    note C4, 127, 335
+    rest 132
+    volume 127
+    rest 12
+    volume 120
+    rest 12
+    volume 113
+    rest 12
+    volume 107
+    rest 12
+    volume 100
+    rest 12
+    volume 93
+    rest 12
+    volume 86
+    rest 12
+    volume 80
+    rest 12
+    volume 73
+    rest 12
+    volume 66
+    rest 12
+    volume 59
+    rest 12
+    volume 53
+    rest 12
+    volume 46
+    rest 12
+    volume 39
+    rest 12
+    volume 33
+    rest 12
+    volume 26
+    rest 12
+    volume 19
+    rest 12
+    volume 12
+    rest 12
+    volume 6
+    end
+    .byte 0xff, 0x00, 0x00

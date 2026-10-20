@@ -77,7 +77,7 @@ static void PlasmaFrigateDeck_LoadObjects(GimmickWork *work) {
             matrix = FieldExpObj_GetActorMatrixPtr(work->system, 0, i);
             VEC_Set(&matrix->translation, positions[i].x, positions[i].y, positions[i].z);
             MAT3_RotationEulerZYX(0, rotations[i], 0, &matrix->rotation);
-            func_ov036_021b8248(work->system, 0, i, 1);
+            FieldExpObj_SetActorCulling(work->system, 0, i, 1);
             FieldExpObj_SetActorHidden(work->system, 0, i, FALSE);
         }
     }

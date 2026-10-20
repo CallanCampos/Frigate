@@ -78,6 +78,7 @@ flags = [
 "mi/mi_sharedWram.c" = ["-thumb"]
 "mi/mi_wram.c" = ["-thumb"]
 "mi/mi_dma.c" = ["-thumb"]
+"mi/mi_dma_itcm.c" = ["-thumb"]
 "mi/mi_dma_gxcommand.c" = ["-thumb"]
 "mi/mi_memory.c" = ["-thumb"]
 "mi/mi_dma_card.c" = ["-thumb"]

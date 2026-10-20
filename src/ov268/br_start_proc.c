@@ -52,7 +52,7 @@ static BOOL BrStart_ProcInit(GameProc *proc, u32 *state, void *param, void *work
     MI_CpuFill8(wk, 0, sizeof(BrStartWork));
     wk->param = p;
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
-    wk->que = func_02021998(wk->heapId);
+    wk->que = PrintQueue_CreateDefault(wk->heapId);
     wk->ballEff[CLACT_SURFACE_MAIN] = BrBallEff_Init(p->unit, p->res, CLACT_SURFACE_MAIN, wk->heapId);
     wk->ballEff[CLACT_SURFACE_SUB] = BrBallEff_Init(p->unit, p->res, CLACT_SURFACE_SUB, wk->heapId);
     BrBallEff_SetAnmSeq(wk->ballEff[CLACT_SURFACE_MAIN], 1);
@@ -74,7 +74,7 @@ static BOOL BrStart_ProcExit(GameProc *proc, u32 *state, void *param, void *work
 
     BrBallEff_Exit(wk->ballEff[CLACT_SURFACE_MAIN]);
     BrBallEff_Exit(wk->ballEff[CLACT_SURFACE_SUB]);
-    func_02021a18(wk->que);
+    PrintQueue_Free(wk->que);
     BrSeq_Exit(wk->seq);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -84,7 +84,7 @@ static BOOL BrStart_ProcMain(GameProc *proc, u32 *state, void *param, void *work
     BrStartWork *wk = work;
 
     BrSeq_Main(wk->seq);
-    func_02021a3c(wk->que);
+    PrintQueue_Main(wk->que);
     BrBallEff_Main(wk->ballEff[CLACT_SURFACE_MAIN]);
     BrBallEff_Main(wk->ballEff[CLACT_SURFACE_SUB]);
     if (BrSeq_IsEnd(wk->seq)) {
@@ -171,7 +171,7 @@ static void BrStart_SeqOpen(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         }
         break;
     case SEQ_TOUCH_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             GFL_SndSEPlay(SEQ_SE_BREC_02);
             BrMsgWin_Exit(wk->msgWin);
             wk->msgWin = NULL;

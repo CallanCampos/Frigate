@@ -1,3 +1,0 @@
-StrangeHouse6_Text_DarkDreamHeardDads = In the dark dream...\nI heard my dad's voice...{be01}\nForget about the Lunar Wing...\nPlease stay here with me...{be01}
-StrangeHouse6_Text_ThereMarkingsWallWhere = There are markings on the wall\nwhere the portrait was hung...
-StrangeHouse6_Text_CouldThereAnotherPainting = Could there be another painting\nbehind the scratches?

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_CRADILY",
+    "moves": [ "MOVE_STONE_EDGE", "MOVE_RECOVER", "MOVE_SEED_BOMB", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_SASSY",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

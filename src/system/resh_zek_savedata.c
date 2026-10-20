@@ -8,11 +8,11 @@
 
 #define SAVE_BLOCK_RESH_ZEK 0x2b
 
-u32 func_0200af74(void) {
+u32 ReshZekSave_GetSize(void) {
     return sizeof(ReshZekSave);
 }
 
-void func_0200af78(ReshZekSave *reshZek) {
+void ReshZekSave_Init(ReshZekSave *reshZek) {
     ReshZekSave_UnresolvedInitTarget(reshZek);
 }
 
@@ -28,10 +28,10 @@ void func_0200af9c(ReshZekSave *reshZek, u32 *dest) {
     MI_CpuCopy8(&reshZek->unk0, dest, sizeof(reshZek->unk0));
 }
 
-PartyPkm *func_0200afa8(ReshZekSave *reshZek) {
+PartyPkm *ReshZekSave_GetPkm(ReshZekSave *reshZek) {
     return &reshZek->pkm;
 }
 
-void func_0200afac(ReshZekSave *reshZek, const PartyPkm *pkm) {
+void ReshZekSave_SetPkm(ReshZekSave *reshZek, const PartyPkm *pkm) {
     copyPartyPkm(pkm, &reshZek->pkm);
 }

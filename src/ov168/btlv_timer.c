@@ -6,6 +6,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_gauge.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -42,25 +43,25 @@ BtlvTimer *BtlvTimer_Create(HeapID heapId) {
     ArcTool *arc;
 
     timer->heapId = heapId;
-    arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(timer->heapId));
-    timer->units[0] = func_0204bf1c(TIMER_ACTOR_COUNT, 0, timer->heapId);
-    timer->units[1] = func_0204bf1c(TIMER_ACTOR_COUNT, 0, timer->heapId);
-    timer->chars = func_0204b81c(arc, 0x1ab, FALSE, CLACT_VRAM_MAIN, timer->heapId);
-    timer->cellAnims = func_0204bde0(arc, 0x1ac, 0x1ad, timer->heapId);
-    timer->palette = func_0204bba0(arc, BtlvGauge_PaletteFile(), CLACT_VRAM_MAIN, 0xe0, timer->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(timer->heapId));
+    timer->units[0] = ClActUnit_Create(TIMER_ACTOR_COUNT, 0, timer->heapId);
+    timer->units[1] = ClActUnit_Create(TIMER_ACTOR_COUNT, 0, timer->heapId);
+    timer->chars = ClActSys_LoadChars(arc, 0x1ab, FALSE, CLACT_VRAM_MAIN, timer->heapId);
+    timer->cellAnims = ClActSys_LoadCellAnims(arc, 0x1ac, 0x1ad, timer->heapId);
+    timer->palette = ClActSys_LoadPltt(arc, BtlvGauge_PaletteFile(), CLACT_VRAM_MAIN, 0xe0, timer->heapId);
     PaletteFade_LoadFromVRAM(BtlvEffect_GetPaletteFade(), PALFADE_VRAM_MAIN_OBJ,
-                             func_0204bdc0(timer->palette, FALSE) / 2, 0x20);
+                             ClActSys_GetPlttVramAddr(timer->palette, FALSE) / 2, 0x20);
     GFL_ArcToolFree(arc);
     return timer;
 }
 
 void BtlvTimer_Delete(BtlvTimer *timer) {
     BtlvTimer_DeleteActors(timer);
-    func_0204b98c(timer->chars);
-    func_0204be64(timer->cellAnims);
-    func_0204bcd0(timer->palette);
-    func_0204bf98(timer->units[0]);
-    func_0204bf98(timer->units[1]);
+    ClActSys_FreeChars(timer->chars);
+    ClActSys_FreeCellAnims(timer->cellAnims);
+    ClActSys_FreePltt(timer->palette);
+    ClActUnit_Delete(timer->units[0]);
+    ClActUnit_Delete(timer->units[1]);
     GFL_HeapFree(timer);
 }
 
@@ -77,8 +78,8 @@ void BtlvTimer_Start(BtlvTimer *timer, s32 battleLimit, s32 commandLimit) {
                 setup.x = xs[j];
                 setup.y = ys[i];
                 setup.sequence = sequences[i][j];
-                timer->actors[i][j] = func_0204c040(timer->units[i], timer->chars, timer->palette, timer->cellAnims,
-                                                    &setup, 0, timer->heapId);
+                timer->actors[i][j] = ClActor_Create(timer->units[i], timer->chars, timer->palette, timer->cellAnims,
+                                                     &setup, 0, timer->heapId);
                 func_0204c520(timer->actors[i][j], TRUE);
             }
         }
@@ -103,7 +104,7 @@ static void BtlvTimer_DeleteActors(BtlvTimer *timer) {
     for (i = 0; i < 2; i++) {
         for (j = 0; j < TIMER_ACTOR_COUNT; j++) {
             if (timer->actors[i][j] != NULL) {
-                func_0204c108(timer->actors[i][j]);
+                ClActor_Delete(timer->actors[i][j]);
                 timer->actors[i][j] = NULL;
             }
         }
@@ -125,7 +126,7 @@ void BtlvTimer_SetVisible(BtlvTimer *timer, int which, BOOL visible, BOOL restar
             timer->seqBase[which] = 0;
             BtlvTimer_Draw(timer, which);
         }
-        func_0204bfd4(timer->units[which], visible);
+        ClActUnit_SetActive(timer->units[which], visible);
     }
 }
 
@@ -163,29 +164,29 @@ static void BtlvTimer_Draw(BtlvTimer *timer, int which) {
     if (left == warnTimes[which]) {
         timer->seqBase[which] = 13;
     }
-    func_0204c488(timer->actors[which][0], label + timer->seqBase[which]);
+    ClActor_SetSequence(timer->actors[which][0], label + timer->seqBase[which]);
     if (minuteTens == 0) {
-        func_0204c124(timer->actors[which][1], FALSE);
+        ClActor_SetVisible(timer->actors[which][1], FALSE);
     } else {
-        func_0204c124(timer->actors[which][1], TRUE);
-        func_0204c488(timer->actors[which][1], minuteTens + 3 + timer->seqBase[which]);
+        ClActor_SetVisible(timer->actors[which][1], TRUE);
+        ClActor_SetSequence(timer->actors[which][1], minuteTens + 3 + timer->seqBase[which]);
     }
     if (minuteTens == 0 && minuteOnes == 0) {
-        func_0204c124(timer->actors[which][2], FALSE);
-        func_0204c124(timer->actors[which][3], FALSE);
+        ClActor_SetVisible(timer->actors[which][2], FALSE);
+        ClActor_SetVisible(timer->actors[which][3], FALSE);
     } else {
-        func_0204c124(timer->actors[which][2], TRUE);
-        func_0204c124(timer->actors[which][3], TRUE);
-        func_0204c488(timer->actors[which][2], minuteOnes + 3 + timer->seqBase[which]);
-        func_0204c488(timer->actors[which][3], timer->seqBase[which] + 2);
+        ClActor_SetVisible(timer->actors[which][2], TRUE);
+        ClActor_SetVisible(timer->actors[which][3], TRUE);
+        ClActor_SetSequence(timer->actors[which][2], minuteOnes + 3 + timer->seqBase[which]);
+        ClActor_SetSequence(timer->actors[which][3], timer->seqBase[which] + 2);
     }
     if (minuteTens == 0 && minuteOnes == 0 && secondTens == 0) {
-        func_0204c124(timer->actors[which][4], FALSE);
+        ClActor_SetVisible(timer->actors[which][4], FALSE);
     } else {
-        func_0204c124(timer->actors[which][4], TRUE);
-        func_0204c488(timer->actors[which][4], secondTens + 3 + timer->seqBase[which]);
+        ClActor_SetVisible(timer->actors[which][4], TRUE);
+        ClActor_SetSequence(timer->actors[which][4], secondTens + 3 + timer->seqBase[which]);
     }
-    func_0204c488(timer->actors[which][5], secondOnes + 3 + timer->seqBase[which]);
+    ClActor_SetSequence(timer->actors[which][5], secondOnes + 3 + timer->seqBase[which]);
 }
 
 static void BtlvTimer_Task(TCB *tcb, void *data) {

@@ -16,15 +16,15 @@ BOOL func_ov012_02169c1c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02169c2c(VM *vm, FieldScriptEnv *env) {
-    func_ov133_021eee1c(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
+BOOL s023C_NuvemaGimmickPlay(VM *vm, FieldScriptEnv *env) {
+    GimmickNuvema_PlayModel(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 
-BOOL func_ov012_02169c40(VM *vm, FieldScriptEnv *env) {
+BOOL s023D_NuvemaGimmickWaitAnim(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    ScriptWork_CallEvent(work, func_ov133_021eee7c(FieldScriptEnv_GetGameSystem(env)));
+    ScriptWork_CallEvent(work, GimmickNuvema_CreateWaitEvent(FieldScriptEnv_GetGameSystem(env)));
     return TRUE;
 }
 

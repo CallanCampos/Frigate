@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Volt Absorb",
-    "description": "Restores HP if hit by an\nElectric-type move."
-}

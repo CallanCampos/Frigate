@@ -9,17 +9,17 @@
 #include "system/area_data.h"
 #include "system/game_data.h"
 
-RivalEntry *func_ov073_021e8be0(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
-    return &entries[func_ov073_021e8d00(context, id)];
+RivalEntry *RivalSelect_GetEntry(RivalSelectContext *context, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
+    return &entries[RivalSelect_FindEntryIndex(context, id)];
 }
 
-void func_ov073_021e8bfc(RivalSelectContext *context, u32 id) {
+void RivalSelect_SelectOtherRandom(RivalSelectContext *context, u32 id) {
     u8 choices[10];
     int i;
-    u8 current = func_ov073_021e8d00(context, id);
+    u8 current = RivalSelect_FindEntryIndex(context, id);
     u8 count = 0;
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     u8 choice;
 
     if (current == 10) {
@@ -36,20 +36,20 @@ void func_ov073_021e8bfc(RivalSelectContext *context, u32 id) {
     entries[choice].selected = 1;
 }
 
-BOOL func_ov073_021e8c4c(RivalSelectContext *context) {
+BOOL RivalSelect_RemoveHollowActorIfMission(RivalSelectContext *context) {
     if (FesMissionHollow_IsActive(context)) {
-        func_ov073_021e8c64(context);
+        RivalSelect_RemoveHollowActor(context);
     }
     return FALSE;
 }
 
-BOOL func_ov073_021e8c64(RivalSelectContext *context) {
+BOOL RivalSelect_RemoveHollowActor(RivalSelectContext *context) {
     u8 rival;
     FieldActor *actor;
 
     if (func_02018fa8(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(context->field))) == TRUE) {
         rival = getHollowNum(getHollow_RivalData(GameData_GetSaveControl(context->gameData)));
-        if (func_ov073_021e8cac(context, rival) == TRUE) {
+        if (RivalSelect_IsSelectedAndActive(context, rival) == TRUE) {
             actor = FindFieldActor(context->actors, 0xe0);
             if (actor != NULL) {
                 DeleteActor(actor);
@@ -60,8 +60,8 @@ BOOL func_ov073_021e8c64(RivalSelectContext *context) {
     return FALSE;
 }
 
-BOOL func_ov073_021e8cac(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+BOOL RivalSelect_IsSelectedAndActive(RivalSelectContext *context, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id && entries[i].selected == 1 && entries[i].active != 0) {
@@ -71,8 +71,8 @@ BOOL func_ov073_021e8cac(RivalSelectContext *context, u32 id) {
     return FALSE;
 }
 
-void func_ov073_021e8cdc(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+void RivalSelect_SetActive(RivalSelectContext *context, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {
@@ -81,8 +81,8 @@ void func_ov073_021e8cdc(RivalSelectContext *context, u32 id) {
     }
 }
 
-u8 func_ov073_021e8d00(RivalSelectContext *context, u32 id) {
-    RivalEntry *entries = func_02014864(context->entryOwner);
+u8 RivalSelect_FindEntryIndex(RivalSelectContext *context, u32 id) {
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     int i;
     for (i = 0; i < 10; i++) {
         if (entries[i].id == id) {

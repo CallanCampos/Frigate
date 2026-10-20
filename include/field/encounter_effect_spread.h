@@ -20,14 +20,14 @@ typedef struct EncEffSpread {
     u16 nextCount;
 } EncEffSpread;
 
-GameEvent *func_ov154_021f6200(GameSystem *gsys, Field *field);
-GameEvent *func_ov154_021f623c(GameSystem *gsys);
-void func_ov154_021f626c(EncEffGrid *grid);
-void func_ov154_021f62b0(EncEffGrid *grid);
-BOOL func_ov154_021f6314(EncEffCell *cell);
-BOOL func_ov154_021f634c(int cell, EncEffSpread *spread);
-void func_ov154_021f637c(EncEffGrid *grid, int column, int row);
-void func_ov154_021f63bc(EncEffGrid *grid, int cell);
-void func_ov154_021f6420(EncEffGrid *grid);
+GameEvent *EncEffSpread_Create(GameSystem *gsys, Field *field);
+GameEvent *EncEffSpread_CreateGridEvent(GameSystem *gsys);
+void EncEffSpread_Init(EncEffGrid *grid);
+void EncEffSpread_Update(EncEffGrid *grid);
+BOOL EncEffSpread_UpdateCell(EncEffCell *cell);
+BOOL EncEffSpread_IsCellNext(int cell, EncEffSpread *spread);
+void EncEffSpread_AddCell(EncEffGrid *grid, int column, int row);
+void EncEffSpread_AddNeighbors(EncEffGrid *grid, int cell);
+void EncEffSpread_ShowNextWave(EncEffGrid *grid);
 
 #endif // POKEBW2_FIELD_ENCOUNTER_EFFECT_SPREAD_H

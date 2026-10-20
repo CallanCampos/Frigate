@@ -73,15 +73,15 @@ void *MedalBox_GetHabitatList(MedalBox *box);
 
 // The Pokédex's habitat list, kept in the medal box's block: the zone it shows, its season and its kind of habitat.
 // These functions come from a later file than the medal box's, which has no header yet
-void func_02010ca0(void *data);
-void *func_02010cb8(SaveControl *save);
-void func_02010d70(void *data, u16 zone);
-u16 func_02010d78(void *data);
-void func_02010d80(void *data, u32 season);
-u8 func_02010d88(void *data);
-void func_02010d90(void *data, u16 type);
-u8 func_02010d98(void *data);
+void ZukanHabitatSave_Init(void *data);
+void *SaveControl_GetZukanHabitatSave(SaveControl *save);
+void ZukanHabitatSave_SetZone(void *data, u16 zone);
+u16 ZukanHabitatSave_GetZone(void *data);
+void ZukanHabitatSave_SetSeason(void *data, u32 season);
+u8 ZukanHabitatSave_GetSeason(void *data);
+void ZukanHabitatSave_SetType(void *data, u16 type);
+u8 ZukanHabitatSave_GetType(void *data);
 // What the player has done of a habitat's kind of habitat
-u8 func_02010cc4(void *data, u8 habitat, u32 type);
+u8 ZukanHabitatSave_GetHabitatField(void *data, u8 habitat, u32 type);
 
 #endif // POKEBW2_SAVE_MEDAL_BOX_H

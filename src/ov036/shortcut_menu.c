@@ -132,13 +132,13 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     GFL_BGSysCreateBG(BG, &sBgSetup, 0);
     GFL_BGSysClearBG(BG);
     GFL_BGSysFillChar(BG, 0, 1, 0);
-    work->unit = func_0204bf1c(8, 0, heapId);
+    work->unit = ClActUnit_Create(8, 0, heapId);
 
-    arc = GFL_ArcSysCreateFileHandle(0x81, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_SHORTCUT_MENU, heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0x160, 0x40, heapId);
-    work->palette = func_0204bbb8(arc, 4, 0, 0x40, 0, 1, heapId);
-    work->chars = func_0204b81c(arc, 3, FALSE, 0, heapId);
-    work->cellAnims = func_0204bde0(arc, 2, 1, heapId);
+    work->palette = ClActSys_LoadPlttRange(arc, 4, 0, 0x40, 0, 1, heapId);
+    work->chars = ClActSys_LoadChars(arc, 3, FALSE, 0, heapId);
+    work->cellAnims = ClActSys_LoadCellAnims(arc, 2, 1, heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 6, 0, 0x140, 0x20, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 5, BG, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, BG, 0, 0, FALSE, heapId);
@@ -151,14 +151,14 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
         setup.sequence = i;
         setup.x = sActorX[i];
         work->clactActors[i] =
-            func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, heapId);
-        func_0204c124(work->clactActors[i], FALSE);
+            ClActor_Create(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, heapId);
+        ClActor_SetVisible(work->clactActors[i], FALSE);
         func_0204c520(work->clactActors[i], TRUE);
     }
 
     work->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_4, heapId);
     work->menuFont = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    work->menuQueue = func_020219a8(0x1000, heapId);
+    work->menuQueue = PrintQueue_Create(0x1000, heapId);
     shortcut = SaveControl_GetShortcutSaveCore(GameData_GetSaveControl(gameData));
     SetupMenu(work, work->listPos, work->menuMsgData, work->menuFont, work->menuQueue, shortcut, work->clactActors,
               heapId);
@@ -185,16 +185,16 @@ void func_ov036_021bf004(void *app) {
     GFL_BGSysSetBGEnabled(BG, FALSE);
     FreeMenu(work, work->listPos);
     for (i = 0; i < ACTORS; i++) {
-        func_0204c108(work->clactActors[i]);
+        ClActor_Delete(work->clactActors[i]);
     }
-    func_02021c44(work->menuQueue);
-    func_02021a18(work->menuQueue);
+    PrintQueue_Clear(work->menuQueue);
+    PrintQueue_Free(work->menuQueue);
     GFL_FontFree(work->menuFont);
     GFL_MsgDataFree(work->menuMsgData);
-    func_0204bcd0(work->palette);
-    func_0204b98c(work->chars);
-    func_0204be64(work->cellAnims);
-    func_0204bf98(work->unit);
+    ClActSys_FreePltt(work->palette);
+    ClActSys_FreeChars(work->chars);
+    ClActSys_FreeCellAnims(work->cellAnims);
+    ClActUnit_Delete(work->unit);
     GFL_BGSysFreeFilledChar(BG, 1, 0);
     GFL_BGSysReleaseBG(BG);
     GFL_HeapFree(work);
@@ -242,7 +242,7 @@ void func_ov036_021bf088(void *app) {
     }
     case STATE_CLOSING:
         for (i = 0; i < ACTORS; i++) {
-            func_0204c124(work->clactActors[i], FALSE);
+            ClActor_SetVisible(work->clactActors[i], FALSE);
         }
         work->scroll = 4;
         work->state = STATE_SCROLL_OUT;
@@ -259,7 +259,7 @@ void func_ov036_021bf088(void *app) {
 u32 func_ov036_021bf198(void *app) {
     ShortcutMenuApp *work = app;
 
-    func_02021a3c(work->menuQueue);
+    PrintQueue_Main(work->menuQueue);
     return PrintDone(work);
 }
 
@@ -379,17 +379,18 @@ static void OnCursorDown(ShortcutMenuApp *work, u16 value, u32 count, u32 *handl
 }
 
 static void ReadInput(ShortcutMenuApp *work) {
-    s32 count;
-    u16 listTop;
-    u16 cursorRow;
-    u16 index;
-    u16 selectIndex;
-    u16 buttonIndex;
-    u16 cursorIndex;
-    u32 handled = FALSE;
     s32 result = BMPMENULIST_NULL;
+    BOOL toggle = FALSE;
+    u32 handled = FALSE;
+    u16 cursorIndex;
+    u16 buttonIndex;
+    u16 selectIndex;
+    u16 index;
+    u16 cursorRow;
+    u16 listTop;
+    s32 count;
 
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     BmpMenuList_GetCursorIndex(work->list, &cursorIndex);
     count = BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT);
 
@@ -417,42 +418,41 @@ static void ReadInput(ShortcutMenuApp *work) {
     }
     if (work->mode == 0) {
         work->input = result;
-    } else if (work->mode == 1 && result != BMPMENULIST_NULL) {
-        if (result != 0) {
-            u8 newIndex;
-
+    } else if (work->mode == 1) {
+        if (result == BMPMENULIST_CANCEL) {
+            toggle = TRUE;
+        } else if (result != BMPMENULIST_NULL) {
             result = BmpMenuList_GetOptionValue(work->list, work->listTop + work->cursorRow);
             BmpMenuList_GetCursorIndex(work->list, &index);
             if (work->scrollDir != 0) {
-                newIndex = 0xff;
+                result = ShortcutSave_MoveItemToIndex(work->shortcut, result, 0xff);
             } else {
-                newIndex = (u8)index;
+                result = ShortcutSave_MoveItemToIndex(work->shortcut, result, (u8)index);
             }
-            result = ShortcutSave_MoveItemToIndex(work->shortcut, result, newIndex);
             FreeList(work, &listTop, &cursorRow);
             if (index - 1 == result) {
                 cursorRow--;
             }
             CreateList(work, listTop, cursorRow, work->heapId);
+            toggle = TRUE;
         }
-        handled = TRUE;
     }
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && work->mode == 0 &&
-        BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT) > 1) {
+        (u32)BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT) > 1) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        handled = TRUE;
+        toggle = TRUE;
     }
-    if (handled) {
+    if (toggle) {
         work->mode ^= 1;
         if (work->mode == 0) {
             int i;
 
             work->scrollDir = 0;
             for (i = 0; i < ACTORS; i++) {
-                func_0204c124(work->actors[i], FALSE);
+                ClActor_SetVisible(work->actors[i], FALSE);
             }
             RedrawHighlight(work->list, FALSE, FALSE);
-        } else {
+        } else if (work->mode == 1) {
             BmpMenuList_GetPos(work->list, &work->listTop, &work->cursorRow);
             work->showActors = TRUE;
         }
@@ -463,7 +463,8 @@ static BOOL PrintDone(ShortcutMenuApp *work) {
     PrintQueue *queue = work->queue;
     BOOL done = TRUE;
 
-    if (work->printWindow.flushPending && !func_02021c1c(queue, BmpWin_GetBitmap(work->printWindow.window))) {
+    if (work->printWindow.flushPending &&
+        !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(work->printWindow.window))) {
         BmpWin_FlushChar(work->printWindow.window);
         work->printWindow.flushPending = FALSE;
     }
@@ -477,7 +478,7 @@ static BOOL PrintDone(ShortcutMenuApp *work) {
         }
         if (work->showActors) {
             for (i = 0; i < ACTORS; i++) {
-                func_0204c124(work->actors[i], TRUE);
+                ClActor_SetVisible(work->actors[i], TRUE);
             }
             work->showActors = 0;
         }
@@ -555,7 +556,7 @@ static void CreateList(ShortcutMenuApp *work, u16 listTop, u16 cursorRow, HeapID
 
     work->options = ListMenuCore_CreateOptionList(count, heapId);
     for (i = 0; i < count; i++) {
-        u32 value = ShortcutSave_GetRegistItem(work->shortcut, i);
+        u32 value = ShortcutSave_GetRegistItem(work->shortcut, (u8)i);
 
         ListMenuCore_AppendMsgOption(work->options, work->msgData, value, value, heapId);
     }
@@ -609,9 +610,9 @@ static void SetActorsY(ShortcutMenuApp *work, u32 y) {
     int i;
 
     for (i = 0; i < ACTORS; i++) {
-        func_0204c178(work->actors[i], &pos, 0);
+        ClActor_GetSurfacePos(work->actors[i], &pos, 0);
         pos.y = y;
-        func_0204c140(work->actors[i], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[i], &pos, 0);
     }
 }
 

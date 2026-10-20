@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ignacio",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "pokemon": [
+        "floatzel_1",
+        "accelgor_1",
+        "zebstrika_1",
+        "rapidash_1",
+        "aerodactyl_1",
+        "starmie_1",
+        "jolteon_1",
+        "serperior_1",
+        "sceptile_1",
+        "crobat_1"
+    ]
+}

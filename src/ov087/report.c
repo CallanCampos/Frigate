@@ -78,8 +78,8 @@ struct ReportScreen {
     // What func_020074b8 gives: the size of the blocks that changed and of all of them
     u32 changedSize;
     u32 totalSize;
-    // func_0200743c's count, times 256, at which the bar's next icon shows, and the step between two: a tenth of
-    // the changed size times 512
+    // SaveControl_GetBytesWritten's count, times 256, at which the bar's next icon shows, and the step between two: a
+    // tenth of the changed size times 512
     u32 barThreshold;
     u32 barStep;
     u16 barCount;
@@ -121,7 +121,7 @@ ReportScreen *Report_Create(GameSystem *gsys, HeapID heapId) {
     Report_LoadGraphics(wk->heapId);
     Report_CreateActors(wk);
     Report_PrintWindows(wk);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     wk->vblankTcb = GFL_VBlankTCBAdd(Report_VBlank, wk, 0);
     return wk;
 }
@@ -138,10 +138,10 @@ void Report_Update(ReportScreen *wk) {
     PokeParty *party;
     u32 i;
 
-    if (!(wk->doneFlags & REPORT_DONE_ICONS) && func_02021c0c(wk->printQueue) == TRUE) {
+    if (!(wk->doneFlags & REPORT_DONE_ICONS) && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
         party = GameData_GetParty(GSYS_GetGameData(wk->gsys));
         for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-            func_0204c124(wk->actors[i], TRUE);
+            ClActor_SetVisible(wk->actors[i], TRUE);
         }
         wk->doneFlags |= REPORT_DONE_ICONS;
     }
@@ -150,7 +150,7 @@ void Report_Update(ReportScreen *wk) {
 void Report_UpdateAltFrame(ReportScreen *wk) {
     u32 i;
 
-    if (!(wk->doneFlags & REPORT_DONE_WINDOWS) && func_02021c0c(wk->printQueue) == TRUE) {
+    if (!(wk->doneFlags & REPORT_DONE_WINDOWS) && PrintQueue_IsEmpty(wk->printQueue) == TRUE) {
         GFL_BGSysSetBGEnabled(4, TRUE);
         GFL_BGSysSetBGEnabled(5, TRUE);
         GFL_BGSysSetBGEnabled(6, TRUE);
@@ -160,7 +160,7 @@ void Report_UpdateAltFrame(ReportScreen *wk) {
         GFL_BGSysQueueScrLoad(5);
         wk->doneFlags |= REPORT_DONE_WINDOWS;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
         PrintWindow_Flush(&wk->windows[i], wk->printQueue);
     }
@@ -195,7 +195,7 @@ void Report_StartBar(ReportScreen *wk) {
     BmpWin_ClearScreen(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     for (i = REPORT_BAR_FIRST; i <= REPORT_ACTOR_MAX - 1; i++) {
-        func_0204c124(wk->actors[i], TRUE);
+        ClActor_SetVisible(wk->actors[i], TRUE);
     }
     wk->barActive = TRUE;
 }
@@ -295,7 +295,7 @@ static void Report_ReleaseBGs(void) {
 }
 
 static void Report_LoadGraphics(HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(193, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_REPORT, heapId);
 
     // Each version has its own palette
 #ifdef BLACK2
@@ -323,7 +323,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
     SaveControl *save;
     u32 i;
 
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
         wk->windows[i].window =
             BmpWin_CreateDynamic(sWindowSetups[i].bg, sWindowSetups[i].x, sWindowSetups[i].y, sWindowSetups[i].width,
@@ -332,7 +332,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
     }
 
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0359, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_REPORT, wk->heapId);
     wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     strbuf = GFL_StrBufCreate(0x100, wk->heapId);
     gameData = GSYS_GetGameData(wk->gsys);
@@ -415,9 +415,9 @@ static void Report_PrintWindows(ReportScreen *wk) {
         PlayTime *playTime;
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_PLAY_TIME);
-        playTime = func_02017a40(gameData);
-        WordSetNumber(wordSet, 0, func_02008cec(playTime), 3, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 1, func_02008cf0(playTime), 2, NUM_PAD_ZERO, TRUE);
+        playTime = GameData_GetPlayTime(gameData);
+        WordSetNumber(wordSet, 0, PlayTime_GetHours(playTime), 3, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 1, PlayTime_GetMinutes(playTime), 2, NUM_PAD_ZERO, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, strbuf, fmt);
         PrintWindow_Print(&wk->windows[REPORT_WINDOW_PLAY_TIME], wk->printQueue, 0, 0, strbuf, wk->font,
                           PRINT_COLOR(15, 14, 0));
@@ -426,14 +426,14 @@ static void Report_PrintWindows(ReportScreen *wk) {
 
     // The date and time of the last save, when there is one
     if (!func_0200746c(save) && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
-        PlayTime *saveTime = func_02008de8(save);
+        PlayTime *saveTime = SaveControl_GetPlayTime(save);
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_LAST_SAVE);
-        WordSetNumber(wordSet, 0, func_02008d68(saveTime), 2, NUM_PAD_ZERO, TRUE);
-        WordSetNumber(wordSet, 1, func_02008d70(saveTime), 2, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 2, func_02008d78(saveTime), 2, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 3, func_02008d80(saveTime), 2, NUM_PAD_NONE, TRUE);
-        WordSetNumber(wordSet, 4, func_02008d88(saveTime), 2, NUM_PAD_ZERO, TRUE);
+        WordSetNumber(wordSet, 0, PlayTime_GetLastSavedYear(saveTime), 2, NUM_PAD_ZERO, TRUE);
+        WordSetNumber(wordSet, 1, PlayTime_GetLastSavedMonth(saveTime), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 2, PlayTime_GetLastSavedDay(saveTime), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 3, PlayTime_GetLastSavedHour(saveTime), 2, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, 4, PlayTime_GetLastSavedMinute(saveTime), 2, NUM_PAD_ZERO, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, strbuf, fmt);
         PrintWindow_Print(&wk->windows[REPORT_WINDOW_LAST_SAVE], wk->printQueue, 0, 4, strbuf, wk->font,
                           PRINT_COLOR(13, 12, 0));
@@ -454,7 +454,7 @@ static void Report_FreeWindows(ReportScreen *wk) {
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
         BmpWin_Free(wk->windows[i].window);
     }
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
 }
 
 // The first of the party's icons, and the first of the bar's
@@ -470,39 +470,40 @@ static void Report_CreateActors(ReportScreen *wk) {
     ClActorSetup setup;
     u32 i;
 
-    wk->actUnit = func_0204bf1c(REPORT_ACTOR_MAX, 0, wk->heapId);
+    wk->actUnit = ClActUnit_Create(REPORT_ACTOR_MAX, 0, wk->heapId);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     for (i = 0; i < count; i++) {
-        wk->chars[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(PokeParty_GetPkm(party, i))), FALSE,
-                                     CLACT_VRAM_SUB, wk->heapId);
+        wk->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(func_0201d624(PokeParty_GetPkm(party, i))), FALSE,
+                                          CLACT_VRAM_SUB, wk->heapId);
     }
-    wk->palettes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
-    wk->cellAnims[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->palettes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
+    wk->cellAnims[0] =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(arc);
 
-    arc = GFL_ArcSysCreateFileHandle(193, wk->heapId);
-    wk->chars[REPORT_BAR_FIRST] = func_0204b81c(arc, 4, TRUE, CLACT_VRAM_SUB, wk->heapId);
-    wk->palettes[1] = func_0204bbb8(arc, 5, CLACT_VRAM_SUB, 0x60, 0, 1, wk->heapId);
-    wk->cellAnims[1] = func_0204bde0(arc, 6, 7, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_REPORT, wk->heapId);
+    wk->chars[REPORT_BAR_FIRST] = ClActSys_LoadChars(arc, 4, TRUE, CLACT_VRAM_SUB, wk->heapId);
+    wk->palettes[1] = ClActSys_LoadPlttRange(arc, 5, CLACT_VRAM_SUB, 0x60, 0, 1, wk->heapId);
+    wk->cellAnims[1] = ClActSys_LoadCellAnims(arc, 6, 7, wk->heapId);
     GFL_ArcToolFree(arc);
 
     setup = sReportActorSetups[0];
     for (i = 0; i < count; i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
-        wk->actors[i] = func_0204c040(wk->actUnit, wk->chars[i], wk->palettes[0], wk->cellAnims[0], &setup,
-                                      CLACT_SURFACE_SUB, wk->heapId);
-        func_0204c124(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(wk->actUnit, wk->chars[i], wk->palettes[0], wk->cellAnims[0], &setup,
+                                       CLACT_SURFACE_SUB, wk->heapId);
+        ClActor_SetVisible(wk->actors[i], FALSE);
         setup.x += 32;
-        func_0204c378(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), TRUE);
+        ClActor_SetPalette(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), TRUE);
     }
 
     setup = sReportActorSetups[1];
     for (i = REPORT_BAR_FIRST; i <= REPORT_ACTOR_MAX - 1; i++) {
-        wk->actors[i] = func_0204c040(wk->actUnit, wk->chars[REPORT_BAR_FIRST], wk->palettes[1], wk->cellAnims[1],
-                                      &setup, CLACT_SURFACE_SUB, wk->heapId);
-        func_0204c124(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(wk->actUnit, wk->chars[REPORT_BAR_FIRST], wk->palettes[1], wk->cellAnims[1],
+                                       &setup, CLACT_SURFACE_SUB, wk->heapId);
+        ClActor_SetVisible(wk->actors[i], FALSE);
         setup.x += 12;
     }
 
@@ -514,25 +515,25 @@ static void Report_FreeActors(ReportScreen *wk) {
     u32 i;
 
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-        func_0204c108(wk->actors[i]);
-        func_0204b98c(wk->chars[i]);
+        ClActor_Delete(wk->actors[i]);
+        ClActSys_FreeChars(wk->chars[i]);
     }
     for (i = REPORT_BAR_FIRST; i <= REPORT_ACTOR_MAX - 1; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204b98c(wk->chars[REPORT_BAR_FIRST]);
-    func_0204bcd0(wk->palettes[0]);
-    func_0204bcd0(wk->palettes[1]);
-    func_0204be64(wk->cellAnims[0]);
-    func_0204be64(wk->cellAnims[1]);
-    func_0204bf98(wk->actUnit);
+    ClActSys_FreeChars(wk->chars[REPORT_BAR_FIRST]);
+    ClActSys_FreePltt(wk->palettes[0]);
+    ClActSys_FreePltt(wk->palettes[1]);
+    ClActSys_FreeCellAnims(wk->cellAnims[0]);
+    ClActSys_FreeCellAnims(wk->cellAnims[1]);
+    ClActUnit_Delete(wk->actUnit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, FALSE);
 }
 
 // Shows one of the bar's icons, from the start of its animation
 static void Report_ShowBarIcon(ReportScreen *wk, int index) {
-    func_0204c4d4(wk->actors[REPORT_BAR_FIRST + index], 0);
-    func_0204c488(wk->actors[REPORT_BAR_FIRST + index], 1);
+    ClActor_SetAnimTime(wk->actors[REPORT_BAR_FIRST + index], 0);
+    ClActor_SetSequence(wk->actors[REPORT_BAR_FIRST + index], 1);
     func_0204c520(wk->actors[REPORT_BAR_FIRST + index], TRUE);
 }
 
@@ -551,7 +552,7 @@ static void Report_VBlank(TCB *tcb, void *data) {
     u32 written;
 
     if (wk->barActive) {
-        written = func_0200743c(wk->save) << 8;
+        written = SaveControl_GetBytesWritten(wk->save) << 8;
         if (wk->barWait != REPORT_BAR_WAIT) {
             wk->barWait++;
         }
@@ -571,7 +572,7 @@ static void Report_VBlank(TCB *tcb, void *data) {
             Report_FillBar(wk);
             wk->barCount = REPORT_BAR_COUNT;
         }
-        func_0204b794();
-        func_0204b7c8();
+        ClActSys_Draw();
+        ClActSys_VBlank();
     }
 }

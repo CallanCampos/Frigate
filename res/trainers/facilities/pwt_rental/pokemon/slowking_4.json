@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SLOWKING",
+    "moves": [ "MOVE_PSYCHIC", "MOVE_SURF", "MOVE_ICE_BEAM", "MOVE_TRICK_ROOM" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_QUIET",
+    "item": "ITEM_LUM_BERRY",
+    "form": 0
+}

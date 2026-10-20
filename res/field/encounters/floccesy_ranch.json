@@ -1,0 +1,82 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": {
+            "black2": [
+                [ "SPECIES_BASCULIN", 5, 15 ],
+                [ "SPECIES_AZURILL", 5, 15 ],
+                [ "SPECIES_BASCULIN", 5, 15 ],
+                [ "SPECIES_BASCULIN", 5, 15 ],
+                [ "SPECIES_BASCULIN", 5, 15 ]
+            ],
+            "white2": [
+                [ "SPECIES_BASCULIN", 5, 15, 1 ],
+                [ "SPECIES_AZURILL", 5, 15 ],
+                [ "SPECIES_BASCULIN", 5, 15, 1 ],
+                [ "SPECIES_BASCULIN", 5, 15, 1 ],
+                [ "SPECIES_BASCULIN", 5, 15, 1 ]
+            ]
+        },
+        "rippling_surf": {
+            "black2": [
+                [ "SPECIES_BASCULIN", 5, 15, 1 ],
+                [ "SPECIES_MARILL", 5, 15 ],
+                [ "SPECIES_BASCULIN", 5, 15, 1 ],
+                [ "SPECIES_AZUMARILL", 5, 15 ],
+                [ "SPECIES_AZUMARILL", 5, 15 ]
+            ],
+            "white2": [
+                [ "SPECIES_BASCULIN", 5, 15 ],
+                [ "SPECIES_MARILL", 5, 15 ],
+                [ "SPECIES_BASCULIN", 5, 15 ],
+                [ "SPECIES_AZUMARILL", 5, 15 ],
+                [ "SPECIES_AZUMARILL", 5, 15 ]
+            ]
+        },
+        "fishing": {
+            "black2": [
+                [ "SPECIES_POLIWAG", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60 ],
+                [ "SPECIES_POLIWAG", 50, 70 ],
+                [ "SPECIES_POLIWAG", 50, 70 ],
+                [ "SPECIES_POLIWAG", 50, 70 ]
+            ],
+            "white2": [
+                [ "SPECIES_POLIWAG", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60, 1 ],
+                [ "SPECIES_POLIWAG", 50, 70 ],
+                [ "SPECIES_POLIWAG", 50, 70 ],
+                [ "SPECIES_POLIWAG", 50, 70 ]
+            ]
+        },
+        "rippling_fishing": {
+            "black2": [
+                [ "SPECIES_POLIWHIRL", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60, 1 ],
+                [ "SPECIES_POLIWHIRL", 50, 70 ],
+                [ "SPECIES_POLITOED", 50, 70 ],
+                [ "SPECIES_POLITOED", 50, 70 ]
+            ],
+            "white2": [
+                [ "SPECIES_POLIWHIRL", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60 ],
+                [ "SPECIES_POLIWHIRL", 50, 70 ],
+                [ "SPECIES_POLITOED", 50, 70 ],
+                [ "SPECIES_POLITOED", 50, 70 ]
+            ]
+        }
+    }
+}

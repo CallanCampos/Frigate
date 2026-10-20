@@ -1,0 +1,6 @@
+StriatonCityPokemonCenter_Text_IfWereGymLeader = If I were a Gym Leader,\nI wouldn't have quit...{be00}\nI would've felt like it was a waste.
+StriatonCityPokemonCenter_Text_CatchingLotsPokemonHaving = Catching lots of Pokémon?{be01}\nHaving a lot of Pokémon\nmakes looking at the Pokédex{be00}\nor the PC Box so much fun!
+StriatonCityPokemonCenter_Text_OhShayminWhenComes = Oh, Shaymin!{be01}\nWhen it comes to Shaymin,\nGracidea flowers are important!{be01}\nI have a lot of Gracidea flowers,\nso let me share one with you.{be01}
+StriatonCityPokemonCenter_Text_SinceEarlyTimesSinnoh = Since early times in Sinnoh, people\nmade a bouquet of Gracidea flowers{be00}\nto give someone to show their{be00}\nfeelings of appreciation.{be01}\nIsn't that interesting?{be01}\nBy giving a Gracidea bouquet,\nyou don't have to say a word and{be00}\nsomeone will know how grateful you are.{be01}\nQuite a delightful custom!
+StriatonCityPokemonCenter_Text_KnowAboutGracideaFlowers = Do you know about Gracidea flowers?{be01}\nSince early times in Sinnoh, people\nmade a bouquet of Gracidea flowers{be00}\nto give someone to show their{be00}\nfeelings of appreciation.
+\pad{32}

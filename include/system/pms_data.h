@@ -25,7 +25,7 @@ void PMSData_Clear(PMSData *data);
 void PMSData_Init(PMSData *data, u16 type);
 void PMSData_InitWithSentence(PMSData *data, u16 type, u16 id);
 // One of four fixed sentences
-void func_02029bfc(PMSData *data, u32 preset);
+void PMSData_InitPreset(PMSData *data, u32 preset);
 void func_02029c68(PMSData *data);
 StrBuf *PMSData_ToString(const PMSData *data, u32 heapId);
 // The sentence with its first wordCount words filled in
@@ -35,9 +35,9 @@ StrBuf *PMSData_GetSentenceString(const PMSData *data, u32 heapId);
 BOOL PMSData_IsNotEmpty(const PMSData *data);
 // Whether every word the sentence has a command for is filled in
 BOOL PMSData_IsComplete(const PMSData *data, HeapID heapId);
-u16 func_02029df8(const PMSData *data, u32 index);
+u16 PMSData_GetWordIndex(const PMSData *data, u32 index);
 u16 PMSData_GetWord(const PMSData *data, u32 index);
-BOOL func_02029e1c(const PMSData *data, u32 index);
+BOOL PMSData_IsWordNumber(const PMSData *data, u32 index);
 BOOL PMSWord_IsNumber(u16 word);
 int PMSWord_GetNumber(u16 word);
 u16 PMSData_GetType(const PMSData *data);

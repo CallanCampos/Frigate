@@ -20,7 +20,7 @@ typedef struct {
     u8 unk14[4];
 } HollowRivalSave;
 
-u8 func_0200ff60(HollowRivalSave *hollowRival, u16 index);
+u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index);
 void func_0200ff68(HollowRivalSave *hollowRival, u32 value);
 BOOL func_0200ff8c(HollowRivalSave *hollowRival);
 BOOL func_0200ffa8(HollowRivalSave *hollowRival);

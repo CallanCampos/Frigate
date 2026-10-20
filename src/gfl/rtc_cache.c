@@ -25,7 +25,7 @@ static RTCCache sRTCCache;
 static void RTCCache_ReadDone(int result, void *arg);
 static void RTCCache_Read(RTCCache *cache);
 
-void func_02044170(void) {
+void RTCCache_Init(void) {
     RTC_Init();
     MI_CpuFill8(&sRTCCache, 0, sizeof(RTCCache));
     sRTCCache.valid = FALSE;
@@ -34,7 +34,7 @@ void func_02044170(void) {
     RTCCache_Read(&sRTCCache);
 }
 
-void func_02044198(void) {
+void RTCCache_Update(void) {
     if (sRTCCache.busy == FALSE) {
         sRTCCache.frames++;
         if (sRTCCache.frames > 10) {
@@ -82,7 +82,7 @@ s64 RTC_ConvertSecondsCached(void) {
     return RTC_ConvertDateTimeToSecond(&sRTCCache.date, &sRTCCache.time);
 }
 
-int func_02044298(const RTCDate *date) {
+int RTC_GetDayOfYear(const RTCDate *date) {
     int days;
     RTCDate firstDay;
 

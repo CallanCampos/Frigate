@@ -49,6 +49,7 @@ extern const char data_ov182_021c1958[]; // key sharing would not start
 extern const char data_ov182_021c1988[]; // the end of the parent mode failed
 extern const char data_ov182_021c19b0[]; // the receive buffer size
 extern const char data_ov182_021c19c8[]; // the send buffer size
+extern const char data_ov182_021c19e0[]; // how busy the measured channel was
 extern const char data_ov182_021c19f8[]; // the channel that was chosen
 extern const char data_ov182_021c1a10[]; // the connect mode that is not a parent one
 extern const char data_ov182_021c1a2c[]; // the data sharing had nothing to send

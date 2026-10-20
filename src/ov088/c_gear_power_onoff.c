@@ -183,7 +183,7 @@ CGearPowerOnOff *CGearPowerOnOff_Create(FieldSubscreen *subscreen, GameSystem *g
 
     if (!isWirelessEnabled()) {
         work->mode = MODE_NO_WIRELESS;
-    } else if (func_02016b34(gsys) == TRUE) {
+    } else if (GSYS_IsCGearOn(gsys) == TRUE) {
         work->mode = MODE_POWER_OFF;
     } else {
         work->mode = MODE_POWER_ON;
@@ -202,18 +202,18 @@ void CGearPowerOnOff_Update(CGearPowerOnOff *work, BOOL active) {
         FieldSubscreen_SaveReturnSubscreen(work->subscreen, 14);
         work->finished = TRUE;
     }
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
 }
 
 static void CGearPowerOnOff_Init(CGearPowerOnOff *work, HeapID heapId) {
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_S019A_CGEAR_CONTROL_WARNING, heapId);
-    work->printQueue = func_02021998(heapId);
+    work->printQueue = PrintQueue_CreateDefault(heapId);
     CGearPowerOnOff_InitBG(work, heapId);
     CGearPowerOnOff_CreateMenuRes(work, heapId);
     CGearPowerOnOff_CreateWindows(work, heapId);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     func_ov036_02198884(work->subscreen, heapId);
 }
 
@@ -222,8 +222,8 @@ static void CGearPowerOnOff_Exit(CGearPowerOnOff *work) {
     CGearPowerOnOff_FreeWindows(work);
     CGearPowerOnOff_FreeMenuRes(work);
     CGearPowerOnOff_ExitBG(work);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_MsgDataFree(work->msgData);
     GFL_FontFree(work->font);
 }
@@ -300,7 +300,7 @@ static void CGearPowerOnOff_CreateWindows(CGearPowerOnOff *work, HeapID heapId) 
 
 static void CGearPowerOnOff_FreeWindows(CGearPowerOnOff *work) {
     if (work->printStream != NULL) {
-        func_020223cc(work->printStream);
+        PrintStream_Delete(work->printStream);
         work->printStream = NULL;
         GFL_StrBufFree(work->printStr);
         work->printStr = NULL;
@@ -372,7 +372,7 @@ static BOOL CGearPowerOnOff_SeqPowerOn(CGearPowerOnOff *work) {
         CGearPowerOnOff_PrintMessage(work, work->messageWindow, MSG_ASK_POWER_ON);
         CGearPowerOnOff_PrintMessage(work, work->explanationWindow, MSG_EXPLANATION);
         CGearPowerOnOff_CreateYesNo(work, work->heapId);
-        func_0201740c(GSYS_GetGameData(work->gsys), 0);
+        GameData_SetCGearPowerRequest(GSYS_GetGameData(work->gsys), 0);
         work->seq++;
         break;
     case 1:
@@ -383,7 +383,7 @@ static BOOL CGearPowerOnOff_SeqPowerOn(CGearPowerOnOff *work) {
     case 2:
         if (CGearPowerOnOff_IsYesNoFinished(work)) {
             if (CGearPowerOnOff_GetYesNoPos(work) == YESNO_YES) {
-                func_02016b40(work->gsys, 1);
+                GSYS_SetCGearOn(work->gsys, 1);
                 GSYS_TryBootGameComm(work->gsys);
                 work->seq = 3;
             } else {
@@ -429,7 +429,7 @@ static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
         CGearPowerOnOff_PrintMessage(work, work->messageWindow, MSG_ASK_POWER_OFF);
         CGearPowerOnOff_PrintMessage(work, work->explanationWindow, MSG_EXPLANATION);
         CGearPowerOnOff_CreateYesNo(work, work->heapId);
-        func_0201740c(GSYS_GetGameData(work->gsys), 0);
+        GameData_SetCGearPowerRequest(GSYS_GetGameData(work->gsys), 0);
         work->seq++;
         break;
     case 1:
@@ -456,7 +456,7 @@ static BOOL CGearPowerOnOff_SeqPowerOff(CGearPowerOnOff *work) {
             if (GameCommSys_BootCheck(work->comm)) {
                 break;
             }
-            func_02016b40(work->gsys, 0);
+            GSYS_SetCGearOn(work->gsys, 0);
         }
         work->seq++;
         break;
@@ -476,7 +476,7 @@ static BOOL CGearPowerOnOff_SeqNoWireless(CGearPowerOnOff *work) {
         BmpWin_FlushChar(work->explanationWindow);
         BmpWin_FlushMap(work->explanationWindow);
         CGearPowerOnOff_PrintMessage(work, work->explanationWindow, MSG_NO_WIRELESS);
-        func_0201740c(GSYS_GetGameData(work->gsys), 0);
+        GameData_SetCGearPowerRequest(GSYS_GetGameData(work->gsys), 0);
         work->seq++;
         break;
     case 1:
@@ -485,7 +485,7 @@ static BOOL CGearPowerOnOff_SeqNoWireless(CGearPowerOnOff *work) {
         }
         break;
     case 2:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             work->seq++;
         }
         break;

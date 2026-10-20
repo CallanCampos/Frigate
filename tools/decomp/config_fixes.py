@@ -428,9 +428,12 @@ def main():
     for address in args.addresses:
         addr = int(address, 16)
         apply_everywhere(mapper, args.module, addr, action, argument)
-        # One fix of each kind per address: a word can need its symbol removed and a relocation added
-        fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)] + [
-            (args.module, addr, action, argument)]
+        # One fix of each kind per address: a word can need its symbol removed and a relocation added. Recording a
+        # file's section boundary again replaces its earlier record: fixes replay in address order, so an older
+        # record of the same boundary at a higher address would undo a move down.
+        fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)
+                 and not (action in ("section_start", "section_end") and (f[0], f[2], f[3]) == (args.module, action, argument))
+                 ] + [(args.module, addr, action, argument)]
         print(f"{action} {args.module} {addr:#010x} {argument}".rstrip())
     save_fixes(fixes)
 

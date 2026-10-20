@@ -1,0 +1,401 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_SW_GYM_E_02", null, null, null ],
+    "instruments": [
+        {
+            "program": 19,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 9,
+            "base_key": "E1",
+            "attack": 127,
+            "decay": 100,
+            "sustain": 120,
+            "release": 114,
+            "pan": 64
+        },
+        {
+            "program": 22,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 10,
+            "base_key": "E4",
+            "attack": 127,
+            "decay": 100,
+            "sustain": 120,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 24,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 11,
+            "base_key": "E6",
+            "attack": 127,
+            "decay": 100,
+            "sustain": 120,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 61,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 17,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 70,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 14,
+            "base_key": "C3",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 89,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 2,
+            "base_key": "D1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 90,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 3,
+            "base_key": "Ds1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 91,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 4,
+            "base_key": "E1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 92,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 5,
+            "base_key": "F1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 93,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 6,
+            "base_key": "Fs1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 94,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 7,
+            "base_key": "G1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 99,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 15,
+            "base_key": "C3",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 100,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 12,
+            "base_key": "F2",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 102,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 19,
+            "base_key": "E2",
+            "attack": 127,
+            "decay": 30,
+            "sustain": 1,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 103,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 20,
+            "base_key": "E3",
+            "attack": 127,
+            "decay": 30,
+            "sustain": 1,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 126,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+            "wave": 1,
+            "base_key": "C1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 109,
+            "type": "drums",
+            "first_key": "A1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 13,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 18,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 8,
+                    "base_key": "F2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 0,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 96
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 0,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 96
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 0,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 96
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 0,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 96
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 16,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 106
+                }
+            ]
+        },
+        {
+            "program": [ 11, 12, 101 ],
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 19,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Fs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 20,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_GYM_E_02",
+                    "wave": 21,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

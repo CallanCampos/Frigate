@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BLISSEY",
+    "moves": [ "MOVE_ATTRACT", "MOVE_THUNDER_WAVE", "MOVE_HEAL_PULSE", "MOVE_AROMATHERAPY" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

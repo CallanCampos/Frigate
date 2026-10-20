@@ -38,59 +38,59 @@ u32 getUINarcIdx(void) {
     return ARCID_APP_MENU_COMMON;
 }
 
-u32 func_0202d7e4(void) {
+u32 AppMenuCommon_GetTypeIconPaletteFile(void) {
     return 0x21;
 }
 
-u8 func_0202d7e8(u8 type) {
+u8 AppMenuCommon_GetTypeIconPaletteIndex(u8 type) {
     return sTypeIconPalettes[type];
 }
 
-u32 func_0202d7f4(u8 type) {
+u32 AppMenuCommon_GetTypeIconCharFile(u8 type) {
     return 0x22 + type;
 }
 
-u32 func_0202d7f8(u32 mapping) {
+u32 AppMenuCommon_GetTypeIconCellFile(u32 mapping) {
     return 0x3b + mapping;
 }
 
-u32 func_0202d7fc(u32 mapping) {
+u32 AppMenuCommon_GetTypeIconAnimFile(u32 mapping) {
     return 0x3e + mapping;
 }
 
-u8 func_0202d800(u8 index) {
+u8 AppMenuCommon_GetCategoryIconPaletteIndex(u8 index) {
     return sIconPalettes[index];
 }
 
-u32 func_0202d80c(u8 index) {
+u32 AppMenuCommon_GetCategoryIconCharFile(u8 index) {
     return 0x38 + index;
 }
 
-u32 func_0202d810(void) {
+u32 AppMenuCommon_GetTouchBarPaletteFile(void) {
     return 0x13;
 }
 
-u32 func_0202d814(void) {
+u32 AppMenuCommon_GetTouchBarCharFile(void) {
     return 0x14;
 }
 
-u32 func_0202d818(u32 mapping) {
+u32 AppMenuCommon_GetTouchBarCellFile(u32 mapping) {
     return 0x15 + mapping;
 }
 
-u32 func_0202d81c(u32 mapping) {
+u32 AppMenuCommon_GetTouchBarAnimFile(u32 mapping) {
     return 0x18 + mapping;
 }
 
-u32 func_0202d820(void) {
+u32 AppMenuCommon_GetBarBgPaletteFile(void) {
     return 0x1b;
 }
 
-u32 func_0202d824(void) {
+u32 AppMenuCommon_GetBarBgCharFile(void) {
     return 0x1c;
 }
 
-u32 func_0202d828(void) {
+u32 AppMenuCommon_GetBarScreenFile(void) {
     return BAR_SCREEN_FILE;
 }
 
@@ -144,19 +144,19 @@ u32 func_0202d8ac(u32 mapping) {
     return 0x4e + mapping;
 }
 
-u32 func_0202d8b0(void) {
+u32 AppMenuCommon_GetStatusIconPaletteFile(void) {
     return 0xb;
 }
 
-u32 func_0202d8b4(void) {
+u32 AppMenuCommon_GetStatusIconCharFile(void) {
     return 0xc;
 }
 
-u32 func_0202d8b8(u32 mapping) {
+u32 AppMenuCommon_GetStatusIconCellFile(u32 mapping) {
     return 0xd + mapping;
 }
 
-u32 func_0202d8bc(u32 mapping) {
+u32 AppMenuCommon_GetStatusIconAnimFile(u32 mapping) {
     return 0x10 + mapping;
 }
 
@@ -182,41 +182,41 @@ u32 AppMenuCommon_GetStatusIcon(PartyPkm *pkm) {
     return APP_STATUS_ICON_NONE;
 }
 
-u32 func_0202d90c(u32 mapping) {
+u32 AppMenuCommon_GetPokemonSpriteCellFile(u32 mapping) {
     return 0x51 + mapping;
 }
 
-u32 func_0202d910(u32 mapping) {
+u32 AppMenuCommon_GetPokemonSpriteAnimFile(u32 mapping) {
     return 0x54 + mapping;
 }
 
-u32 func_0202d914(u32 mapping) {
+u32 AppMenuCommon_GetTrainerSpriteCellFile(u32 mapping) {
     return 0xa6 + mapping;
 }
 
-u32 func_0202d918(u32 mapping) {
+u32 AppMenuCommon_GetTrainerSpriteAnimFile(u32 mapping) {
     return 0xa9 + mapping;
 }
 
-u32 func_0202d91c(u32 ball) {
+u32 AppMenuCommon_GetBallPaletteFile(u32 ball) {
     if (ball == 0) {
         ball = 4;
     }
     return 0x56 + ball;
 }
 
-u32 func_0202d928(u32 ball) {
+u32 AppMenuCommon_GetBallCharFile(u32 ball) {
     if (ball == 0) {
         ball = 4;
     }
     return 0x6f + ball;
 }
 
-u32 func_0202d934(u32 ball, u32 mapping) {
+u32 AppMenuCommon_GetBallCellFile(u32 ball, u32 mapping) {
     return 0x89 + mapping;
 }
 
-u32 func_0202d93c(u32 ball, u32 mapping) {
+u32 AppMenuCommon_GetBallAnimFile(u32 ball, u32 mapping) {
     return 0x8c + mapping;
 }
 

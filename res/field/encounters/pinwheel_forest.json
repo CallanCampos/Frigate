@@ -1,0 +1,109 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_PALPITOAD", 54, 54 ],
+                [ "SPECIES_GURDURR", 54, 54 ],
+                [ "SPECIES_TOXICROAK", 55, 55 ],
+                [ "SPECIES_YANMA", 55, 55 ],
+                [ "SPECIES_GURDURR", 55, 55 ],
+                [ "SPECIES_GURDURR", 56, 56 ],
+                [ "SPECIES_SAWK", 55, 55 ],
+                [ "SPECIES_SAWK", 55, 55 ],
+                [ "SPECIES_PALPITOAD", 57, 57 ],
+                [ "SPECIES_SAWK", 57, 57 ],
+                [ "SPECIES_PALPITOAD", 57, 57 ],
+                [ "SPECIES_SAWK", 57, 57 ]
+            ],
+            "white2": [
+                [ "SPECIES_PALPITOAD", 54, 54 ],
+                [ "SPECIES_GURDURR", 54, 54 ],
+                [ "SPECIES_TOXICROAK", 55, 55 ],
+                [ "SPECIES_YANMA", 55, 55 ],
+                [ "SPECIES_GURDURR", 55, 55 ],
+                [ "SPECIES_GURDURR", 56, 56 ],
+                [ "SPECIES_THROH", 55, 55 ],
+                [ "SPECIES_THROH", 55, 55 ],
+                [ "SPECIES_PALPITOAD", 57, 57 ],
+                [ "SPECIES_THROH", 57, 57 ],
+                [ "SPECIES_PALPITOAD", 57, 57 ],
+                [ "SPECIES_THROH", 57, 57 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_PALPITOAD", 64, 64 ],
+                [ "SPECIES_GURDURR", 64, 64 ],
+                [ "SPECIES_TOXICROAK", 63, 63 ],
+                [ "SPECIES_YANMA", 63, 63 ],
+                [ "SPECIES_GURDURR", 63, 63 ],
+                [ "SPECIES_GURDURR", 64, 64 ],
+                [ "SPECIES_SAWK", 63, 63 ],
+                [ "SPECIES_SAWK", 63, 63 ],
+                [ "SPECIES_PALPITOAD", 65, 65 ],
+                [ "SPECIES_SAWK", 65, 65 ],
+                [ "SPECIES_PALPITOAD", 65, 65 ],
+                [ "SPECIES_SAWK", 65, 65 ]
+            ],
+            "white2": [
+                [ "SPECIES_PALPITOAD", 64, 64 ],
+                [ "SPECIES_GURDURR", 64, 64 ],
+                [ "SPECIES_TOXICROAK", 63, 63 ],
+                [ "SPECIES_YANMA", 63, 63 ],
+                [ "SPECIES_GURDURR", 63, 63 ],
+                [ "SPECIES_GURDURR", 64, 64 ],
+                [ "SPECIES_THROH", 63, 63 ],
+                [ "SPECIES_THROH", 63, 63 ],
+                [ "SPECIES_PALPITOAD", 65, 65 ],
+                [ "SPECIES_THROH", 65, 65 ],
+                [ "SPECIES_PALPITOAD", 65, 65 ],
+                [ "SPECIES_THROH", 65, 65 ]
+            ]
+        },
+        "shaking_grass": {
+            "black2": [
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_AUDINO", 55, 55 ],
+                [ "SPECIES_AUDINO", 55, 55 ],
+                [ "SPECIES_AUDINO", 56, 56 ],
+                [ "SPECIES_AUDINO", 56, 56 ],
+                [ "SPECIES_YANMEGA", 57, 57 ],
+                [ "SPECIES_SEISMITOAD", 57, 57 ],
+                [ "SPECIES_AUDINO", 57, 57 ],
+                [ "SPECIES_THROH", 57, 57 ],
+                [ "SPECIES_AUDINO", 57, 57 ],
+                [ "SPECIES_THROH", 57, 57 ]
+            ],
+            "white2": [
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_AUDINO", 55, 55 ],
+                [ "SPECIES_AUDINO", 55, 55 ],
+                [ "SPECIES_AUDINO", 56, 56 ],
+                [ "SPECIES_AUDINO", 56, 56 ],
+                [ "SPECIES_YANMEGA", 57, 57 ],
+                [ "SPECIES_SEISMITOAD", 57, 57 ],
+                [ "SPECIES_AUDINO", 57, 57 ],
+                [ "SPECIES_SAWK", 57, 57 ],
+                [ "SPECIES_AUDINO", 57, 57 ],
+                [ "SPECIES_SAWK", 57, 57 ]
+            ]
+        },
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

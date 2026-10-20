@@ -95,7 +95,7 @@ ZukanTorokuGraphic *ZukanTorokuGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     ZukanTorokuBG_Init(&graphic->bg, heapId);
     ZukanTorokuClAct_Init(&graphic->clact, &sZukanTorokuVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(ZukanTorokuGraphic_VBlank, graphic, 0);
@@ -106,7 +106,7 @@ void ZukanTorokuGraphic_Free(ZukanTorokuGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     ZukanTorokuClAct_Free(&graphic->clact);
     ZukanTorokuBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -172,24 +172,24 @@ static void ZukanTorokuBG_VBlank(ZukanTorokuBG *bg) {
 static void ZukanTorokuClAct_Init(ZukanTorokuClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(ZukanTorokuClAct));
     ClActSys_Create(&sZukanTorokuClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void ZukanTorokuClAct_Free(ZukanTorokuClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(ZukanTorokuClAct));
 }
 
 static void ZukanTorokuClAct_Update(ZukanTorokuClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void ZukanTorokuClAct_VBlank(ZukanTorokuClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *ZukanTorokuClAct_GetUnit(ZukanTorokuClAct *clact) {

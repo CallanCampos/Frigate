@@ -1123,8 +1123,8 @@ void BPlistBmp_OpenMessage(BPlistWork *work) {
 
 static void BPlistBmp_StartMessageStream(BPlistWork *work) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
-    work->printStream = func_02022268(work->msgWins[1].window, 0, 0, work->strBuf, work->param->font, func_02017bcc(),
-                                      work->tcbExMgr, 10, work->param->heapId, 15);
+    work->printStream = PrintStream_Create(work->msgWins[1].window, 0, 0, work->strBuf, work->param->font,
+                                           TextSpeed_GetCurrentWait(), work->tcbExMgr, 10, work->param->heapId, 15);
     BmpWin_Transfer(work->msgWins[1].window);
 }
 

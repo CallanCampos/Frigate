@@ -105,13 +105,13 @@ void TrCardBmp_Init(TrainerCardWork *wk) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, wk->heapId);
     GFL_BGSysQueueScrLoad(7);
     GFL_BGSysQueueScrLoad(4);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
 }
 
 void TrCardBmp_Exit(TrainerCardWork *wk) {
     u16 i;
 
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     for (i = 0; i < TRCARD_WIN_COUNT; i++) {
         BmpWin_Free(wk->win[i]);
     }
@@ -482,11 +482,11 @@ static void TrCardBmp_PrintPlayTime(TrainerCardWork *wk, BmpWin *win, int y, con
         TrCardBmp_PrintTimeNumber(wk, win, 216, 19, y, tmp, data->playHours, 3, 1, 173, 27, color);
         GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(win), 198, y, wk->colonBuf, wk->font, sTrCardBmpColors[color]);
     } else {
-        hours = func_02008cec(data->playTime);
+        hours = PlayTime_GetHours(data->playTime);
         if (hours > 999) {
             hours = 999;
         }
-        TrCardBmp_PrintTimeNumber(wk, win, 216, 0, y, tmp, func_02008cf0(data->playTime), 2, 2, 208, 16, color);
+        TrCardBmp_PrintTimeNumber(wk, win, 216, 0, y, tmp, PlayTime_GetMinutes(data->playTime), 2, 2, 208, 16, color);
         TrCardBmp_PrintTimeNumber(wk, win, 216, 19, y, tmp, hours, 3, 1, 173, 27, color);
         GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(win), 198, y, wk->colonBuf, wk->font, sTrCardBmpColors[color]);
     }

@@ -1,0 +1,183 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Swablu",
+    "pokedex": {
+        "category": "Cotton Bird Pokémon",
+        "entry": "For some reason, it likes\nto land on people's heads\nsoftly and act like it's a hat.",
+        "height": "1'04\"",
+        "weight": "2.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Swablu",
+                "category": "Cotton Bird Pokémon",
+                "entry": "It can't relax if it or its\nsurroundings are not clean.\nIt wipes off dirt with its wings.",
+                "height": "1'04\"",
+                "weight": "2.6 lbs."
+            },
+            "fr": {
+                "name": "Tylton",
+                "category": "Pokémon Oiseaucoton",
+                "entry": "Il ne se sent à l'aise que dans un\nmilieu propre et repousse la\npoussière avec ses ailes.",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "de": {
+                "name": "Wablu",
+                "category": "Wollvogel",
+                "entry": "Es kann nicht entspannen, wenn\nes oder seine Umgebung dreckig\nist. Säubert alles mit den Flügeln.",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "it": {
+                "name": "Swablu",
+                "category": "Pokémon Alidicotone",
+                "entry": "Non sta tranquillo se attorno a sé c'è\ndella sporcizia e la rimuove con le ali.",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "ko": {
+                "name": "파비코",
+                "category": "솜새포켓몬",
+                "entry": "자신도 주변도 깨끗하지 않으면\n진정되지 않는 성격의 포켓몬이다.\n더러움을 발견하면 날개로 닦는다.",
+                "height": "0.4 m",
+                "weight": "1.2 kg"
+            },
+            "es": {
+                "name": "Swablu",
+                "category": "Pokémon Ave Algodón",
+                "entry": "Si su cuerpo o su entorno no están\nlimpios, no puede relajarse. Utiliza\nsus alas para limpiar la suciedad.",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "ja": {
+                "name": "チルット",
+                "category": "わたどりポケモン",
+                "entry": "じぶんも\\x{3000}まわりも\\x{3000}きれいでないと\nおちつかない\\x{3000}せいかくの\\x{3000}ポケモン。\nよごれをみつけると\\x{3000}はねでふきとる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 40,
+        "defense": 60,
+        "speed": 50,
+        "special_attack": 40,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_DRAGON" ],
+    "abilities": [ "ABILITY_NATURAL_CURE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_CLOUD_NINE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 4,
+    "weight": 12,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PECK" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 4, "MOVE_ASTONISH" ],
+            [ 8, "MOVE_SING" ],
+            [ 10, "MOVE_FURY_ATTACK" ],
+            [ 13, "MOVE_SAFEGUARD" ],
+            [ 15, "MOVE_MIST" ],
+            [ 18, "MOVE_ROUND" ],
+            [ 21, "MOVE_NATURAL_GIFT" ],
+            [ 25, "MOVE_TAKE_DOWN" ],
+            [ 29, "MOVE_REFRESH" ],
+            [ 34, "MOVE_MIRROR_MOVE" ],
+            [ 39, "MOVE_COTTON_GUARD" ],
+            [ 42, "MOVE_DRAGON_PULSE" ],
+            [ 48, "MOVE_PERISH_SONG" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM88",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HEAL_BELL",
+            "MOVE_TAILWIND",
+            "MOVE_ROOST",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_AGILITY",
+            "MOVE_HAZE",
+            "MOVE_PURSUIT",
+            "MOVE_RAGE",
+            "MOVE_FEATHER_DANCE",
+            "MOVE_DRAGON_RUSH",
+            "MOVE_POWER_SWAP",
+            "MOVE_ROOST",
+            "MOVE_HYPER_VOICE",
+            "MOVE_STEEL_WING"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 35,
+            "species": "SPECIES_ALTARIA"
+        }
+    ],
+    "regional_dex_number": 246,
+    "baby_species": "SPECIES_SWABLU",
+    "cry_volume": 120
+}

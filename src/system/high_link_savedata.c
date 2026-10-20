@@ -34,11 +34,11 @@ void setupProbabilityTable(PassPowerLevel *levels) {
     probabilityLoop((SurveyProbabilityState *)levels);
 }
 
-u16 func_0200c5dc(void *levels) {
+u16 PassPowerLevel_GetWhite(void *levels) {
     return ((PassPowerLevel *)levels)->level1;
 }
 
-u16 func_0200c5e0(void *levels) {
+u16 PassPowerLevel_GetBlack(void *levels) {
     return ((PassPowerLevel *)levels)->level2;
 }
 
@@ -69,11 +69,11 @@ HighLinkSave *getHighLinkBlockAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_HIGH_LINK);
 }
 
-void func_0200c638(SaveControl *save, const PassPowerLevel *levels) {
+void HighLinkSave_SetLevels(SaveControl *save, const PassPowerLevel *levels) {
     getHighLinkBlockAddress(save)->levels = *levels;
 }
 
-void func_0200c650(SaveControl *save, PassPowerLevel *levels) {
+void HighLinkSave_GetLevels(SaveControl *save, PassPowerLevel *levels) {
     *levels = getHighLinkBlockAddress(save)->levels;
 }
 
@@ -102,7 +102,7 @@ void HighLinkSave_SetSpecialPowerFlag(HighLinkSave *save, u32 id) {
     }
 }
 
-void func_0200c6d8(HighLinkSave *save, u8 *dest, u32 a2) {
+void HighLinkSave_GetSpecialFlags(HighLinkSave *save, u8 *dest, u32 a2) {
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -111,9 +111,9 @@ void func_0200c6d8(HighLinkSave *save, u8 *dest, u32 a2) {
 }
 
 u64 HighLinkSave_CountPlaySeconds(HighLinkSave *save, PlayTime *playTime, u32 mode) {
-    u64 hours = func_02008cec(playTime);
-    u64 minutes = func_02008cf0(playTime);
-    u64 seconds = func_02008cf4(playTime);
+    u64 hours = PlayTime_GetHours(playTime);
+    u64 minutes = PlayTime_GetMinutes(playTime);
+    u64 seconds = PlayTime_GetSeconds(playTime);
     u64 now = minutes * 60 + hours * 3600 + seconds;
 
     switch (mode) {

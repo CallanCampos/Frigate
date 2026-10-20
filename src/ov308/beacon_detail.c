@@ -40,11 +40,6 @@
 // sender was doing, and the touch bar turns to the log's other beacons. The ROM has no name for this file;
 // "beacon_detail.c" is a guess from its graphic file's, "beacon_detail_gra.c"
 
-// The screen's graphics, the town map's and the trainers that the Union Room shows players as
-#define ARCID_BEACON_DETAIL 171
-#define ARCID_TOWNMAP_GRA 84
-#define ARCID_UNION_VIEW 31
-
 // How many beacons the log's list shows at once
 #define LOG_LIST_ROWS 4
 
@@ -174,7 +169,7 @@ static BOOL BeaconDetail_Main(GameProc *proc, u32 *state, void *param, void *dat
         return TRUE;
     }
     GFL_TCBExMgrUpdate(work->tcbManager);
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     BeaconDetail_UpdatePMSDraw(work);
     BeaconDetailGraphic_Update(work->graphic);
     return FALSE;
@@ -199,7 +194,7 @@ static u32 BeaconDetail_SeqInit(BeaconDetailWork *work) {
         work->seq++;
         break;
     case 1:
-        if (func_02021c0c(work->printQueue)) {
+        if (PrintQueue_IsEmpty(work->printQueue)) {
             work->seq = 0;
             return BEACON_DETAIL_SEQ_FADE_IN;
         }
@@ -253,8 +248,8 @@ static void BeaconDetail_InitData(BeaconDetailWork *work) {
     int count;
 
     work->beacon = GameBeacon_Alloc(work->heapId);
-    work->beaconStatus = func_020174d4(work->param->gameData);
-    work->infoTable = func_0202d7a8(work->beaconStatus);
+    work->beaconStatus = GameData_GetBeaconStatus(work->param->gameData);
+    work->infoTable = BeaconStatus_GetInfoTable(work->beaconStatus);
     count = GameBeaconInfoTable_GetCount(work->infoTable);
     work->index = 0xff;
     for (i = 0; i < count; i++) {
@@ -297,9 +292,9 @@ static void BeaconDetail_FreeData(BeaconDetailWork *work) {
 
 static void BeaconDetail_InitSystems(BeaconDetailWork *work) {
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 64, 128);
-    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON_DETAIL, work->heapId);
+    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON, work->heapId);
     GFL_TextRndUpdateColorIndexLUT(7, 8, 15);
-    work->printQueue = func_020219a8(0x800, work->heapId);
+    work->printQueue = PrintQueue_Create(0x800, work->heapId);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, work->heapId);
     work->wordSet = GFL_WordSetSystemCreate(8, 64, work->heapId);
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU, work->heapId);
@@ -318,9 +313,9 @@ static void BeaconDetail_FreeSystems(BeaconDetailWork *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_WordSetSystemFree(work->wordSet);
     GFL_FontFree(work->font);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
-    func_020232d8();
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
+    GFL_TextRndResetColorIndexLUT();
     GFL_TCBExMgrFree(work->tcbManager);
     GFL_ArcToolFree(work->arc);
 }
@@ -386,16 +381,16 @@ static void BeaconDetail_UpdateTouchBar(TouchBar *touchBar) {
 static void BeaconDetail_LoadObjRes(BeaconDetailWork *work, BeaconDetailObjRes *res,
                                     const BeaconDetailObjResFiles *files, ArcTool *arc) {
     MI_CpuFill8(res, 0, sizeof(BeaconDetailObjRes));
-    res->palette = func_0204bbb8(arc, files->paletteFile, files->vramType, files->paletteOffset * 0x20, 0,
-                                 files->paletteCount, work->heapId);
-    res->chars = func_0204b81c(arc, files->charFile, FALSE, files->vramType, work->heapId);
-    res->cellAnims = func_0204bde0(arc, files->cellFile, files->cellFile + 1, work->heapId);
+    res->palette = ClActSys_LoadPlttRange(arc, files->paletteFile, files->vramType, files->paletteOffset * 0x20, 0,
+                                          files->paletteCount, work->heapId);
+    res->chars = ClActSys_LoadChars(arc, files->charFile, FALSE, files->vramType, work->heapId);
+    res->cellAnims = ClActSys_LoadCellAnims(arc, files->cellFile, files->cellFile + 1, work->heapId);
 }
 
 static void BeaconDetail_FreeObjRes(BeaconDetailWork *work, BeaconDetailObjRes *res) {
-    func_0204be64(res->cellAnims);
-    func_0204b98c(res->chars);
-    func_0204bcd0(res->palette);
+    ClActSys_FreeCellAnims(res->cellAnims);
+    ClActSys_FreeChars(res->chars);
+    ClActSys_FreePltt(res->palette);
 }
 
 // The icons, the map's trainer with every view's characters and the palettes of the views, and a trainer picture
@@ -413,7 +408,7 @@ static void BeaconDetail_LoadObjs(BeaconDetailWork *work, ArcTool *arc) {
     {
         BeaconDetailObjResFiles files = { CLACT_VRAM_MAIN, 10, 1, 0, 49, 65 };
 
-        unionArc = GFL_ArcSysCreateFileHandle(ARCID_UNION_VIEW, work->tailHeapId);
+        unionArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, work->tailHeapId);
         BeaconDetail_LoadObjRes(work, &work->unionRes, &files, unionArc);
     }
     work->unionPalette.file = GFL_ArcToolReadHeapNew(unionArc, 0, work->heapId);
@@ -464,7 +459,7 @@ static ClActor *BeaconDetail_AddActor(BeaconDetailWork *work, ClActUnit *unit, B
     setup.sequence = anim;
     setup.bgPriority = bgPriority;
     setup.priority = priority;
-    return func_0204c040(unit, res->chars, res->palette, res->cellAnims, &setup, surface, work->heapId);
+    return ClActor_Create(unit, res->chars, res->palette, res->cellAnims, &setup, surface, work->heapId);
 }
 
 static void BeaconDetail_CreateMapActors(BeaconDetailWork *work) {
@@ -472,7 +467,7 @@ static void BeaconDetail_CreateMapActors(BeaconDetailWork *work) {
 
     work->actors[BEACON_DETAIL_ACTOR_TRAINER] =
         BeaconDetail_AddActor(work, unit, &work->unionRes, 128, 120, 0, 1, 2, CLACT_SURFACE_MAIN);
-    func_0204c378(work->actors[BEACON_DETAIL_ACTOR_TRAINER], 0, 1);
+    ClActor_SetPalette(work->actors[BEACON_DETAIL_ACTOR_TRAINER], 0, 1);
     work->actors[BEACON_DETAIL_ACTOR_RECENT] =
         BeaconDetail_AddActor(work, unit, &work->iconRes, 96, 120, 0, 2, 2, CLACT_SURFACE_MAIN);
 }
@@ -481,8 +476,8 @@ static void BeaconDetail_FreeMapActors(BeaconDetailWork *work) {
     int i;
 
     for (i = 0; i < BEACON_DETAIL_ACTOR_COUNT; i++) {
-        func_0204c124(work->actors[i], FALSE);
-        func_0204c108(work->actors[i]);
+        ClActor_SetVisible(work->actors[i], FALSE);
+        ClActor_Delete(work->actors[i]);
     }
 }
 
@@ -518,11 +513,11 @@ static void BeaconDetail_CreatePanels(BeaconDetailWork *work) {
         BeaconDetail_InitWindow(&panel->windows[BEACON_DETAIL_WINDOW_COUNTS], bg, i, 4, 19, 27, 4);
         panel->trainerActor =
             BeaconDetail_AddActor(work, unit, &work->trainerRes[i], 220, 44, 0, 1, i, CLACT_SURFACE_SUB);
-        func_0204c318(panel->trainerActor, GX_OAM_MODE_NORMAL);
-        func_0204c124(panel->trainerActor, FALSE);
+        ClActor_SetObjMode(panel->trainerActor, GX_OAM_MODE_NORMAL);
+        ClActor_SetVisible(panel->trainerActor, FALSE);
         panel->rankActor = BeaconDetail_AddActor(work, unit, &work->iconRes, 200, 80, 6, 0, i, CLACT_SURFACE_SUB);
-        func_0204c318(panel->rankActor, GX_OAM_MODE_XLU);
-        func_0204c124(panel->rankActor, FALSE);
+        ClActor_SetObjMode(panel->rankActor, GX_OAM_MODE_XLU);
+        ClActor_SetVisible(panel->rankActor, FALSE);
     }
 }
 
@@ -533,10 +528,10 @@ static void BeaconDetail_FreePanels(BeaconDetailWork *work) {
     for (i = 0; i < BEACON_DETAIL_PANEL_COUNT; i++) {
         BeaconDetailPanel *panel = &work->panels[i];
 
-        func_0204c124(panel->trainerActor, FALSE);
-        func_0204c108(panel->trainerActor);
-        func_0204c124(panel->rankActor, FALSE);
-        func_0204c108(panel->rankActor);
+        ClActor_SetVisible(panel->trainerActor, FALSE);
+        ClActor_Delete(panel->trainerActor);
+        ClActor_SetVisible(panel->rankActor, FALSE);
+        ClActor_Delete(panel->rankActor);
         BmpWin_Free(panel->windows[BEACON_DETAIL_WINDOW_COUNTS].window);
         for (j = 0; j < 2; j++) {
             BmpWin_Free(panel->windows[BEACON_DETAIL_WINDOW_FROM + j].window);

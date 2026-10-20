@@ -37,12 +37,12 @@ u16 PlayerState_CalcDirection(PlayerState *playerState);
 VecFx32 *PlayerState_GetWPos(PlayerState *playerState);
 RailPosition *PlayerState_GetRailPos(PlayerState *playerState);
 // Whether the player is on a rail, which PlayerState_SetIsRail sets
-u8 func_0201753c(PlayerState *playerState);
+u8 PlayerState_IsRail(PlayerState *playerState);
 u16 PlayerState_GetZoneID(PlayerState *playerState);
 void PlayerState_SetIsRail(PlayerState *playerState, BOOL isRail);
 void PlayerState_SetRailPos(PlayerState *playerState, const RailPosition *pos);
 void PlayerState_SetRotation(PlayerState *playerState, u16 angle);
-u16 func_0201754c(PlayerState *playerState); // the rotation that PlayerState_SetRotation sets
+u16 PlayerState_GetRotation(PlayerState *playerState); // the rotation that PlayerState_SetRotation sets
 void PlayerState_SetRotationByDir(PlayerState *playerState, u16 dir);
 void PlayerState_SetWPos(PlayerState *playerState, VecFx32 *pos);
 void PlayerState_SetZoneID(PlayerState *playerState, u16 zoneId);

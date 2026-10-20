@@ -1,0 +1,150 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Munna",
+    "pokedex": {
+        "category": "Dream Eater Pokémon",
+        "entry": "This Pokémon appears before people\nand Pokémon who are having nightmares\nand eats those dreams.",
+        "height": "2'00\"",
+        "weight": "51.4 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ゆめくいポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 76,
+        "attack": 25,
+        "defense": 45,
+        "speed": 24,
+        "special_attack": 67,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 10,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_FOREWARN", "ABILITY_SYNCHRONIZE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 58,
+    "height": 6,
+    "weight": 233,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PSYWAVE" ],
+            [ 1, "MOVE_DEFENSE_CURL" ],
+            [ 5, "MOVE_LUCKY_CHANT" ],
+            [ 7, "MOVE_YAWN" ],
+            [ 11, "MOVE_PSYBEAM" ],
+            [ 13, "MOVE_IMPRISON" ],
+            [ 17, "MOVE_MOONLIGHT" ],
+            [ 19, "MOVE_HYPNOSIS" ],
+            [ 23, "MOVE_ZEN_HEADBUTT" ],
+            [ 25, "MOVE_SYNCHRONOISE" ],
+            [ 29, "MOVE_NIGHTMARE" ],
+            [ 31, "MOVE_FUTURE_SIGHT" ],
+            [ 35, "MOVE_CALM_MIND" ],
+            [ 37, "MOVE_PSYCHIC" ],
+            [ 41, "MOVE_DREAM_EATER" ],
+            [ 43, "MOVE_TELEKINESIS" ],
+            [ 47, "MOVE_STORED_POWER" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM57",
+            "TM70",
+            "TM73",
+            "TM74",
+            "TM77",
+            "TM80",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_WORRY_SEED",
+            "MOVE_AFTER_YOU",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": [
+            "MOVE_SLEEP_TALK",
+            "MOVE_SECRET_POWER",
+            "MOVE_BARRIER",
+            "MOVE_MAGIC_COAT",
+            "MOVE_HELPING_HAND",
+            "MOVE_BATON_PASS",
+            "MOVE_SWIFT",
+            "MOVE_CURSE",
+            "MOVE_SONIC_BOOM"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_MOON_STONE",
+            "species": "SPECIES_MUSHARNA"
+        }
+    ],
+    "regional_dex_number": 86,
+    "baby_species": "SPECIES_MUNNA",
+    "cry_volume": 120
+}

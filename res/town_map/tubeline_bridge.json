@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_TUBELINE_BRIDGE",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 104,
+        "y": 41
+    },
+    "cursor": {
+        "x": 104,
+        "y": 41
+    },
+    "hit": {
+        "start": {
+            "x": 104,
+            "y": 37
+        },
+        "end": {
+            "x": 104,
+            "y": 45
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_SturdySteelBridgeWont",
+    "landmarks": [],
+    "area": {
+        "animation": 10,
+        "x": 91,
+        "y": 38
+    }
+}

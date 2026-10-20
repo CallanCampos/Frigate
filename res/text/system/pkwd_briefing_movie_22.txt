@@ -1,0 +1,22 @@
+PkwdBriefingMovie22_Text_PrinceFoundHimselfTrapped = {bd02}Prince {0100:1} found himself\n{bd02}trapped in a magical cage\n{bd02}by Bellelba, a woman who\n{bd02}called herself the magic queen.
+PkwdBriefingMovie22_Text_WhenHeLookedUp = {bd02}When he looked up,\n{bd02}he saw a familiar shape...
+PkwdBriefingMovie22_Text_Empty = なし
+PkwdBriefingMovie22_Text_Empty_2 = なし
+PkwdBriefingMovie22_Text_Empty_3 = なし
+PkwdBriefingMovie22_Text_Empty_4 = なし
+PkwdBriefingMovie22_Text_Empty_5 = なし
+PkwdBriefingMovie22_Text_Empty_6 = なし
+PkwdBriefingMovie22_Text_Empty_7 = なし
+PkwdBriefingMovie22_Text_Empty_8 = なし
+PkwdBriefingMovie22_Text_PrincessFoundHerselfTrapped = {bd02}Princess {0100:1} found herself\n{bd02}trapped in a magical cage\n{bd02}by Bellelba, a woman who\n{bd02}called herself the magic queen.
+PkwdBriefingMovie22_Text_WhenSheLookedUp = {bd02}When she looked up,\n{bd02}she saw a familiar shape...
+PkwdBriefingMovie22_Text_Empty_9 = なし
+PkwdBriefingMovie22_Text_Empty_10 = なし
+PkwdBriefingMovie22_Text_Empty_11 = なし
+PkwdBriefingMovie22_Text_Empty_12 = なし
+PkwdBriefingMovie22_Text_Empty_13 = なし
+PkwdBriefingMovie22_Text_Empty_14 = なし
+PkwdBriefingMovie22_Text_Empty_15 = なし
+PkwdBriefingMovie22_Text_Empty_16 = なし
+PkwdBriefingMovie22_Text_Empty_17 = なし
+\pad{c8}

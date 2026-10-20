@@ -16,7 +16,7 @@ static inline u16 CPS_SWAP16(u16 x) {
 #define CPS_PUT16(p, v) (*(u16 *)(p) = CPS_SWAP16(v))
 #define CPS_PUT32(p, v)                                                                                                \
     do {                                                                                                               \
-        CPS_PUT16((p), (u16)((v) >> 16));                                                                              \
+        CPS_PUT16((p), (u16)((u32)(v) >> 16));                                                                         \
         CPS_PUT16((u8 *)(p) + 2, (u16)(v));                                                                            \
     } while (0)
 // The same at an address of any alignment, byte by byte

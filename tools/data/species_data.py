@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""The species data in data/pokemon/, one JSON file per species and form, as pokeplatinum's res/pokemon/:
+"""The species data in res/pokemon/, one JSON file per species and form, as pokeplatinum's res/pokemon/:
 dump writes them from the ROM once, and pack builds the archives from them, which the build does.
 
-    species_data.py dump extract/b2_us/files data/pokemon
-    species_data.py pack data/pokemon PERSONAL LEVELUP EVOLUTIONS BABIES GROWTH EGG_MOVES
+    species_data.py dump extract/b2_us/files res/pokemon
+    species_data.py pack res/pokemon PERSONAL LEVELUP EVOLUTIONS BABIES GROWTH EGG_MOVES
 
 A record holds what the game keeps in four archives: the species data (a/0/1/6), its level-up moves (a/0/1/8), its
 evolutions (a/0/1/9) and its baby species (a/0/2/0), and a species' file its egg moves too (a/1/2/4).
 species.schema.json describes each field. The records are, in order:
 
-- the species of data/constants/species.txt, in data/pokemon/<species>/data.json, from SPECIES_NONE in none/: the
+- the species of generated/species.txt, in res/pokemon/<species>/data.json, from SPECIES_NONE in none/: the
   national Pokédex's, then from SPECIES_EGG the egg, the bad egg and the Pokéstar Studios species, which have no text
   here, since their names are lines of species_names.txt after the national Pokédex's and they have no Pokédex entry;
-- the forms that have records of their own, in data/pokemon/<species>/form_<n>.json, in the order of
-  data/pokemon/forms.json. A species' first form record is set from where its forms are.
+- the forms that have records of their own, in res/pokemon/<species>/form_<n>.json, in the order of
+  res/pokemon/forms.json. A species' first form record is set from where its forms are.
 
 The species data archive ends with the Unova Pokédex numbers of the species, which their files hold as
 regional_dex_number; the baby species archive has no entries for the forms.
@@ -22,7 +22,7 @@ A species' egg moves (a/1/2/4, one entry per species, a count and the moves) are
 SPECIES_NONE's entry is empty, so its file has none; only the national Pokédex's species have entries.
 Species records also keep cry_volume from a/1/9/1; pokemon_cries.py packs that archive.
 
-The experience tables of the growth rates (a/0/1/7) are data/pokemon/growth_rates.csv: a row per level from 0 to 100
+The experience tables of the growth rates (a/0/1/7) are res/pokemon/growth_rates.csv: a row per level from 0 to 100
 and a column per table, in archive order, each headed by its GROWTH_* constant. The two tables after the growth rates
 are copies of GROWTH_MEDIUM_FAST's that nothing names, headed EXTRA.
 """
@@ -98,7 +98,7 @@ def machine_name(bit: int) -> str:
 
 
 def directory(species: str) -> str:
-    """Returns a species' directory in data/pokemon/: its name, or for a Pokéstar Studios species, which is no
+    """Returns a species' directory in res/pokemon/: its name, or for a Pokéstar Studios species, which is no
     Pokémon but a movie's prop or costume, pokestar/ and its name there."""
     name = species.removeprefix("SPECIES_").lower()
     return f"pokestar/{name.removeprefix('pokestar_')}" if name.startswith("pokestar_") else name
@@ -369,10 +369,10 @@ def pack(root: Path, outputs: list[Path]):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/pokemon/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/pokemon/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the six archives from data/pokemon/")
+    pack_parser = commands.add_parser("pack", help="build the six archives from res/pokemon/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("outputs", type=Path, nargs=6, metavar="ARCHIVE",
                              help="the species data, level-up moves, evolutions, baby species, experience table and "

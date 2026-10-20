@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_NINETALES",
+    "moves": [ "MOVE_FIRE_BLAST", "MOVE_EXTRASENSORY", "MOVE_HYPNOSIS", "MOVE_DISABLE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_WIDE_LENS",
+    "form": 0
+}

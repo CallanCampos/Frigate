@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rival",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_RIVAL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_TARGET_HP" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_OSHAWOTT",
+            "form": 0,
+            "level": 5,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 1
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "I won't forget the pain you just\nput my partner through!"
+        },
+        {
+            "type": 20,
+            "text": "I've just got to trust my\npartner to pull off this move!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I couldn't achieve victory for my partner...\nI won't let myself forget this frustration!"
+        }
+    ]
+}

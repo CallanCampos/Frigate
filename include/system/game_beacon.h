@@ -43,12 +43,12 @@ typedef union {
         u16 unk06;
         u32 key;
     } gift;
-    // Types 0x3c to 0x67: the Funfest mission's data (func_02014594), and for type 0x67 a text
+    // Types 0x3c to 0x67: the Funfest mission's data (LinkFestival_FillMissionInfo), and for type 0x67 a text
     struct {
         u32 unk00;
         u16 text[8];
     } mission;
-    // A Join Avenue visitor's shop choice and extra data, of the type's argument (func_02037970)
+    // A Join Avenue visitor's shop choice and extra data, of the type's argument (JoinAvenueVisitor_StoreInBeacon)
     JoinAvenueBeaconPayload avenue;
     // The other views overlay 12's game_beacon_set.c fills its messages through
     u32 value32;
@@ -209,7 +209,7 @@ void GameBeaconSendSlot_SetMissionEx(GameBeaconSendSlot *slot, u16 type, u32 val
 BOOL GameBeacon_IsMissionType(const GameBeacon *beacon);
 // Whether the beacon's type is 0x3c to 0x66
 BOOL func_0202cf98(const GameBeacon *beacon);
-// 1 + func_02014920's result while a Funfest mission is on, else 0
+// 1 + LinkFestival_AddMissionScore's result while a Funfest mission is on, else 0
 u32 func_0202cfac(u32 a0, u16 a1);
 // Whether a beacon of type may replace the current one, by their priorities
 BOOL GameBeaconSys_CanSendType(u16 type);
@@ -234,23 +234,23 @@ void GameBeaconSys_SendCapture(u16 species, BOOL a1, BOOL a2);
 // Sends a Funfest mission beacon for a defeated species, of a wild battle of the kinds a1 and a2
 void func_0202d28c(u16 species, BOOL a1, BOOL a2);
 // Sends a beacon of type 0x10 with a battle Pokémon's nickname
-void func_0202d2c8(const StrBuf *nickname);
+void GameBeaconSys_SendNickname(const StrBuf *nickname);
 void GameBeaconSys_SendEvolution(u16 species, const StrBuf *nickname);
 // Sends a beacon of type 0x23 with an item, or the Funfest mission's
 void func_0202d384(u16 item);
 void GameBeacon_SetZone(u16 zoneId, GameData *gameData);
 // Set the beacon's recent event, of kinds 0 to 4
-void func_0202d4c8(GameBeacon *beacon, u16 species);
-void func_0202d4e0(GameBeacon *beacon, u16 species);
-void func_0202d4fc(GameBeacon *beacon, u16 item);
-void func_0202d518(GameBeacon *beacon, u16 item);
-void func_0202d534(GameBeacon *beacon, u16 item);
+void GameBeacon_SetRecentKind0(GameBeacon *beacon, u16 species);
+void GameBeacon_SetRecentKind1(GameBeacon *beacon, u16 species);
+void GameBeacon_SetRecentKind2(GameBeacon *beacon, u16 item);
+void GameBeacon_SetRecentKind3(GameBeacon *beacon, u16 item);
+void GameBeacon_SetRecentKind4(GameBeacon *beacon, u16 item);
 void GameBeacon_ClearRecent(GameBeacon *beacon);
 // Sends the Funfest mission beacon of type 0x3c
 void func_0202d5cc(void);
 void GameBeaconSys_SetAvenuePeople(JoinAvenuePersonList *list);
 // Checks overlay 338; when the check fails, the received beacons are hidden every HBlank
-void func_0202d6a8(void);
+void GameBeaconSys_CheckGenuineCard(void);
 
 // game_beacon_accessor.c: tables of received beacons and the readers of a beacon's fields
 
@@ -312,7 +312,7 @@ u8 func_02013cf0(GameBeacon *beacon);
 void GameBeacon_GetCGearRecord(const GameBeacon *beacon, PMSData *dest);
 u8 GameBeacon_GetSurveyRank(const GameBeacon *beacon);
 // The color of OS_GetFavoriteColorTable's table that the sender's favorite color is shown in
-void func_02013d38(u16 *dest, const GameBeacon *beacon);
+void GameBeacon_GetFavoriteColorRGB(u16 *dest, const GameBeacon *beacon);
 u8 GameBeacon_GetFavoriteColor(const GameBeacon *beacon);
 u16 GameBeacon_GetTrainerId(const GameBeacon *beacon);
 // The sender's trainer view, plus 8 for a female trainer
@@ -329,8 +329,8 @@ u8 func_02013dc8(const GameBeacon *beacon);
 u8 GameBeacon_GetMedalCount(const GameBeacon *beacon);
 void GameBeacon_GetGreeting(const GameBeacon *beacon, StrBuf *dest);
 // The message of a beacon of type 0x18 and the text of one of type 0x31; empty for other types
-void func_02013df4(const GameBeacon *beacon, StrBuf *dest);
-void func_02013e14(const GameBeacon *beacon, StrBuf *dest);
+void GameBeacon_GetMessage(const GameBeacon *beacon, StrBuf *dest);
+void GameBeacon_GetTextMessage(const GameBeacon *beacon, StrBuf *dest);
 // The beacon's recent event: its kind, GAME_BEACON_RECENT_NONE when invalid, its trainer (kinds 2 to 4) and its
 // species (kinds 0 and 1)
 u32 GameBeacon_GetRecentKind(const GameBeacon *beacon);

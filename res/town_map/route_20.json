@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_ROUTE_20",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 51,
+        "y": 129
+    },
+    "cursor": {
+        "x": 51,
+        "y": 129
+    },
+    "hit": {
+        "start": {
+            "x": 51,
+            "y": 125
+        },
+        "end": {
+            "x": 51,
+            "y": 133
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_AutumnFallenLeavesAccumulate",
+    "landmarks": [],
+    "area": {
+        "animation": 17,
+        "x": 39,
+        "y": 123
+    }
+}

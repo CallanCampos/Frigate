@@ -20,19 +20,17 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
 static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 frame, NNSG3dMatAnmResult *result);
 
 // The value of a scale or translation at a frame, from the words that say how its values are kept. The frames between
-// the stored ones are made from them, up to the last frame that is interpolated
+// the stored ones are made from them, up to the last frame that is interpolated. As in the rotation's reader, the two
+// cases between stored values jump to one block at the end, `average`
 static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, u32 frame) {
     const u8 *data;
     u32 last;
-    fx32 a;
-    fx32 b;
-    BOOL average;
+    u32 idx;
 
     if (info & NNS_G3D_SRTANM_ELEM_CONST) {
         return offset;
     }
     data = (const u8 *)anm + offset;
-    average = FALSE;
     if (info & NNS_G3D_SRTANM_ELEM_STEP_MASK) {
         last = info & NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK;
         if (info & NNS_G3D_SRTANM_ELEM_STEP_2) {
@@ -40,8 +38,8 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
                 if (frame > last) {
                     frame = (last >> 1) + 1;
                 } else {
-                    frame >>= 1;
-                    average = TRUE;
+                    idx = frame >> 1;
+                    goto average;
                 }
             } else {
                 frame >>= 1;
@@ -54,49 +52,55 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
                     frame = (last >> 2) + rem;
                 } else if (frame & 1) {
                     // The quarters next to a stored value are three parts of it and one of the other
-                    u32 idxA;
                     u32 idxB;
+                    fx32 a;
+                    fx32 b;
 
                     if (frame & 2) {
                         idxB = frame >> 2;
-                        idxA = idxB + 1;
+                        idx = idxB + 1;
                     } else {
-                        idxA = frame >> 2;
-                        idxB = idxA + 1;
+                        idx = frame >> 2;
+                        idxB = idx + 1;
                     }
                     if (info & NNS_G3D_SRTANM_ELEM_FX16) {
-                        a = ((const fx16 *)data)[idxA];
+                        a = ((const fx16 *)data)[idx];
                         b = ((const fx16 *)data)[idxB];
                     } else {
-                        a = ((const fx32 *)data)[idxA];
+                        a = ((const fx32 *)data)[idx];
                         b = ((const fx32 *)data)[idxB];
                     }
                     a *= 3;
                     return (a + b) >> 2;
                 } else {
-                    frame >>= 2;
-                    average = TRUE;
+                    idx = frame >> 2;
+                    goto average;
                 }
             } else {
                 frame >>= 2;
             }
         }
     }
-    if (!average) {
-        if (info & NNS_G3D_SRTANM_ELEM_FX16) {
-            return ((const fx16 *)data)[frame];
-        }
-        return ((const fx32 *)data)[frame];
-    }
-    // The frame between two stored values is their average
     if (info & NNS_G3D_SRTANM_ELEM_FX16) {
-        a = *((const fx16 *)data + frame);
-        b = *((const fx16 *)data + frame + 1);
-    } else {
-        a = *((const fx32 *)data + frame);
-        b = *((const fx32 *)data + frame + 1);
+        return ((const fx16 *)data)[frame];
     }
-    return (a + b) >> 1;
+    return ((const fx32 *)data)[frame];
+
+average:
+    // The frame between two stored values is their average
+    {
+        fx32 a;
+        fx32 b;
+
+        if (info & NNS_G3D_SRTANM_ELEM_FX16) {
+            a = *((const fx16 *)data + idx);
+            b = *((const fx16 *)data + idx + 1);
+        } else {
+            a = *((const fx32 *)data + idx);
+            b = *((const fx32 *)data + idx + 1);
+        }
+        return (a + b) >> 1;
+    }
 }
 
 // The same for a rotation, the sine and the cosine as one word, the cosine in the high half. Each is blended by itself
@@ -104,13 +108,12 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
     const SinCos *data;
     const SinCos *a;
     u32 last;
-    BOOL average;
+    u32 idx;
 
     if (info & NNS_G3D_SRTANM_ELEM_CONST) {
         return offset;
     }
     data = (const SinCos *)((const u8 *)anm + offset);
-    average = FALSE;
     if (info & NNS_G3D_SRTANM_ELEM_STEP_MASK) {
         last = info & NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK;
         if (info & NNS_G3D_SRTANM_ELEM_STEP_2) {
@@ -118,8 +121,8 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
                 if (frame > last) {
                     frame = (last >> 1) + 1;
                 } else {
-                    frame >>= 1;
-                    average = TRUE;
+                    idx = frame >> 1;
+                    goto average;
                 }
             } else {
                 frame >>= 1;
@@ -131,36 +134,36 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
                 if (frame > last) {
                     frame = (last >> 2) + rem;
                 } else if (frame & 1) {
-                    u32 idxA;
                     u32 idxB;
                     fx32 sinR;
                     fx32 cosR;
 
                     if (frame & 2) {
                         idxB = frame >> 2;
-                        idxA = idxB + 1;
+                        idx = idxB + 1;
                     } else {
-                        idxA = frame >> 2;
-                        idxB = idxA + 1;
+                        idx = frame >> 2;
+                        idxB = idx + 1;
                     }
-                    sinR = data[idxA].sinR;
-                    cosR = data[idxA].cosR;
+                    sinR = data[idx].sinR;
+                    cosR = data[idx].cosR;
                     sinR = (3 * sinR + data[idxB].sinR) >> 2;
                     cosR = (3 * cosR + data[idxB].cosR) >> 2;
                     return (u16)sinR | (cosR << 16);
                 } else {
-                    frame >>= 2;
-                    average = TRUE;
+                    idx = frame >> 2;
+                    goto average;
                 }
             } else {
                 frame >>= 2;
             }
         }
     }
-    if (!average) {
-        return data[frame].word;
-    }
-    a = data + frame;
+    return data[frame].word;
+
+average:
+    // The frame between two stored values is their average
+    a = data + idx;
     return (u16)((a->sinR + (a + 1)->sinR) >> 1) | (((a->cosR + (a + 1)->cosR) >> 1) << 16);
 }
 

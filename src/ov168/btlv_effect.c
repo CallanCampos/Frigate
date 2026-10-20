@@ -48,7 +48,7 @@ struct BtlvEffectSetup {
     BOOL multi;                // 0x20
     BtlvScu *scu;              // 0x24
     BtlMainModule *mainModule; // 0x28
-    u16 unk2C;                 // 0x2c  func_ov167_0219c988's value; 1 and 2 are special
+    u16 unk2C;                 // 0x2c  GetStudioMode's value; 1 and 2 are special
     u16 unk2E;                 // 0x2e  the scripted rules' unk24, read when unk2C != 0
     u32 unk30;                 // 0x30  func_ov167_0219c99c's value
 };
@@ -167,7 +167,7 @@ static void BtlvEffect_UpdateIdleEffect(void);
 static u32 data_ov168_021f3f50[] = { 0x24a, 0x24b };
 static u32 data_ov168_021f3f58[] = { 0x235, 0x24c, 0x24d, 0x24e, 0x24f, 0x250 };
 
-// Picked by func_ov167_0219c9b0 when func_ov167_0219c988 is 2
+// Picked by GetStudioMovieId when GetStudioMode is 2
 static u8 data_ov168_021f3f70[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
@@ -177,7 +177,7 @@ static BtlvEffect *sBtlvEffect;
 
 static u32 BtlvEffect_GetStudioMode(BtlMainModule *mainModule) {
     if (mainModule != NULL) {
-        return func_ov167_0219c988(mainModule);
+        return GetStudioMode(mainModule);
     }
     return 0;
 }
@@ -204,7 +204,7 @@ BtlvEffectSetup *BtlvEffect_Create(u32 battleStyle, u32 battleType, const BtlFie
     setup->unk30 = BtlvEffect_GetStudioParam(mainModule);
     setup->unk2C = BtlvEffect_GetStudioMode(mainModule);
     if (setup->unk2C != 0) {
-        setup->unk2E = func_ov167_0219e39c(mainModule)->unk24;
+        setup->unk2E = GetStudioRules(mainModule)->unk24;
     }
     for (i = 0; i < 4; i++) {
         setup->trainerTypes[i] = trainerTypes[i];
@@ -219,26 +219,26 @@ BtlvEffectSetup *BtlvEffect_CreateSetup(BtlMainModule *mainModule, BtlvScu *scu,
     for (i = 0; i < 4; i++) {
         trainerTypes[i] = 0;
     }
-    if (func_ov167_0219beec(mainModule) == TRUE) {
-        u8 side = func_ov167_0219c850(mainModule);
+    if (IsMultiMode(mainModule) == TRUE) {
+        u8 side = GetPlayerMultiTrainerIndex(mainModule);
         u8 playerId = GetPlayerClientID(mainModule);
-        u8 partnerId = func_ov167_0219c86c(mainModule);
+        u8 partnerId = GetPlayerAllyClientID(mainModule);
 
-        trainerTypes[side * 2] = func_ov167_0219d938(mainModule, playerId);
+        trainerTypes[side * 2] = GetClientTrainerClass(mainModule, playerId);
         if (partnerId != 4) {
-            trainerTypes[(side ^ 1) * 2] = func_ov167_0219d938(mainModule, partnerId);
+            trainerTypes[(side ^ 1) * 2] = GetClientTrainerClass(mainModule, partnerId);
         }
-        trainerTypes[1] = func_ov167_0219d938(mainModule, func_ov167_0219c8b8(mainModule, 0));
-        trainerTypes[3] = func_ov167_0219d938(mainModule, func_ov167_0219c8b8(mainModule, 1));
+        trainerTypes[1] = GetClientTrainerClass(mainModule, GetPlayerOpponentClientID(mainModule, 0));
+        trainerTypes[3] = GetClientTrainerClass(mainModule, GetPlayerOpponentClientID(mainModule, 1));
     } else {
-        trainerTypes[0] = func_ov167_0219d938(mainModule, GetPlayerClientID(mainModule));
-        trainerTypes[1] = func_ov167_0219d938(mainModule, func_ov167_0219c8b8(mainModule, 0));
+        trainerTypes[0] = GetClientTrainerClass(mainModule, GetPlayerClientID(mainModule));
+        trainerTypes[1] = GetClientTrainerClass(mainModule, GetPlayerOpponentClientID(mainModule, 0));
         trainerTypes[2] = 0;
         trainerTypes[3] = 0;
     }
     return BtlvEffect_Create(BtlSetup_GetBattleStyle(mainModule), BtlSetup_GetBattleType(mainModule),
-                             &GetFieldEffectData(mainModule)->env, func_ov167_0219beec(mainModule), trainerTypes,
-                             mainModule, scu, heapId);
+                             &GetFieldEffectData(mainModule)->env, IsMultiMode(mainModule), trainerTypes, mainModule,
+                             scu, heapId);
 }
 
 // NONMATCHING: 2 bytes. The seasonal test is `cmp r0, #0` where the game has `lsls r0, r0, #1` after the `ldrb`
@@ -266,7 +266,7 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     PaletteFade_AllocBuffer(sBtlvEffect->palFade, 3, 0x1e0, heapId);
     sBtlvEffect->mcss = BtlvMcss_Create(setup->battleStyle, sBtlvEffect->tcbManager, heapId);
     if (BtlvEffect_GetStudioMode(setup->mainModule) == 2) {
-        BtlvMcss_SetShadows(sBtlvEffect->mcss, data_ov168_021f3f70[func_ov167_0219c9b0(setup->mainModule)]);
+        BtlvMcss_SetShadows(sBtlvEffect->mcss, data_ov168_021f3f70[GetStudioMovieId(setup->mainModule)]);
     } else {
         BtlvMcss_SetShadows(sBtlvEffect->mcss, 1);
     }
@@ -308,10 +308,10 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     sBtlvEffect->timer = BtlvTimer_Create(heapId);
     sBtlvEffect->bg = BtlvBg_Create(sBtlvEffect->tcbManager, heapId);
     if (BtlvEffect_GetStudioMode(sBtlvEffect->setup.mainModule) == 1) {
-        BtlvClact_SetGauge(sBtlvEffect->clact, func_ov167_0219e39c(sBtlvEffect->setup.mainModule)->turnLimit, 0);
+        BtlvClact_SetGauge(sBtlvEffect->clact, GetStudioRules(sBtlvEffect->setup.mainModule)->turnLimit, 0);
     }
     BtlvMcss_SetFlatAll(sBtlvEffect->mcss);
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     for (i = 0; i < 8; i++) {
         sBtlvEffect->trainers[i] = -1;
     }
@@ -343,7 +343,7 @@ void BtlvEffect_Exit(void) {
         BtlvGauge_Delete(sBtlvEffect->gauge);
         BtlvTimer_Delete(sBtlvEffect->timer);
         BtlvBg_Delete(sBtlvEffect->bg);
-        func_0204fb4c();
+        Particle_Free();
         BtlvEffvm_Delete(sBtlvEffect->effvm);
         GFL_TCBRemove(sBtlvEffect->vblankTask);
         func_0203a610(sBtlvEffect->tcbManager);
@@ -372,7 +372,7 @@ void BtlvEffect_Main(void) {
         // The game reads the polygon list RAM count before each of these and drops it, likely what is left of a debug
         // print of the counts
         reg_G3X_RAM_COUNT;
-        func_0204f954();
+        Particle_DrawAndUpdateAll();
         reg_G3X_RAM_COUNT;
         GFL_G3DSysReqSwapBuffers();
     }
@@ -571,14 +571,14 @@ void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z) {
     case 1:
         if (trainerType == 0 || trainerType == 1) {
             trainerType = 0;
-            if (getTrainerGender(func_ov167_0219d97c(sBtlvEffect->setup.mainModule, 0))) {
+            if (getTrainerGender(GetClientPlayerInfo(sBtlvEffect->setup.mainModule, 0))) {
                 trainerType = 1;
             }
         }
         break;
     case 2:
         if (trainerType == 0 || trainerType == 1) {
-            trainerType = func_ov167_0219d938(sBtlvEffect->setup.mainModule, 0);
+            trainerType = GetClientTrainerClass(sBtlvEffect->setup.mainModule, 0);
         }
         break;
     }
@@ -683,16 +683,16 @@ void BtlvEffect_CalcGaugeHPAtOnce(u32 viewPos, s32 hp) {
     BtlvGauge_SetHpAtOnce(sBtlvEffect->gauge, viewPos, hp);
 }
 
-void BtlvEffect_CalcGaugeExp(u8 pos, s32 exp, BattleMon *mon) {
+void BtlvEffect_CalcGaugeExp(u32 viewPos, s32 exp, BattleMon *mon) {
     int level = GetBattleMonStat(mon, BATTLEMON_LEVEL);
 
     if (level < 100) {
-        BtlvGauge_StartExpGain(sBtlvEffect->gauge, pos, exp);
+        BtlvGauge_StartExpGain(sBtlvEffect->gauge, viewPos, exp);
     }
 }
 
-void BtlvEffect_CalcGaugeExpLevelUp(u8 pos, BattleMon *mon) {
-    BtlvGauge_StartLevelUp(sBtlvEffect->gauge, mon, pos);
+void BtlvEffect_CalcGaugeExpLevelUp(u32 viewPos, BattleMon *mon) {
+    BtlvGauge_StartLevelUp(sBtlvEffect->gauge, mon, viewPos);
 }
 
 void BtlvEffect_SetGaugeFlag(void) {
@@ -719,8 +719,8 @@ void BtlvEffect_GaugeAction(u32 viewPos) {
     BtlvGauge_StartShake(sBtlvEffect->gauge, viewPos);
 }
 
-BOOL BtlvEffect_CheckGaugeExist(u8 pos) {
-    return BtlvGauge_IsShown(sBtlvEffect->gauge, pos);
+BOOL BtlvEffect_CheckGaugeExist(u32 viewPos) {
+    return BtlvGauge_IsShown(sBtlvEffect->gauge, viewPos);
 }
 
 BOOL BtlvEffect_GetGaugeStatus(u32 viewPos, u32 *color, u32 *status) {
@@ -1154,7 +1154,7 @@ static void BtlvEffect_EndAllTasks(void) {
 }
 
 static void BtlvEffect_VBlankTask(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(sBtlvEffect->palFade);
 }
 
@@ -1321,7 +1321,7 @@ static void BtlvEffect_DelayedMoveTaskEnd(TCB *tcb) {
 
 static void BtlvEffect_UpdateIdleEffect(void) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    BOOL touched = func_0203da48();
+    BOOL touched = GFL_HIDIsTouchPressed();
     s32 pick;
     u32 effect;
 

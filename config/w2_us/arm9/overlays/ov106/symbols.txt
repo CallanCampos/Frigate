@@ -1,15 +1,15 @@
-func_ov106_021eec80 kind:function(thumb,size=0x2a) addr:0x021eecc0
-func_ov106_021eecac kind:function(thumb,size=0x1a) addr:0x021eecec
-func_ov106_021eecc8 kind:function(thumb,size=0xc) addr:0x021eed08
-func_ov106_021eecd4 kind:function(thumb,size=0x2e) addr:0x021eed14
-func_ov106_021eed04 kind:function(thumb,size=0x14) addr:0x021eed44
-func_ov106_021eed18 kind:function(thumb,size=0x30) addr:0x021eed58
-func_ov106_021eed48 kind:function(thumb,size=0x30) addr:0x021eed88
-func_ov106_021eed78 kind:function(thumb,size=0x4e) addr:0x021eedb8
-func_ov106_021eedc8 kind:function(thumb,size=0x32) addr:0x021eee08
-func_ov106_021eedfc kind:function(thumb,size=0x54) addr:0x021eee3c
-func_ov106_021eee50 kind:function(thumb,size=0x2) addr:0x021eee90
-func_ov106_021eee54 kind:function(thumb,size=0x2) addr:0x021eee94
+GimmickLeagueLift_Init kind:function(thumb,size=0x2a) addr:0x021eecc0
+GimmickLeagueLift_End kind:function(thumb,size=0x1a) addr:0x021eecec
+GimmickLeagueLift_Update kind:function(thumb,size=0xc) addr:0x021eed08
+GimmickLeagueLift_PlayLiftAnim kind:function(thumb,size=0x2e) addr:0x021eed14
+GimmickLeagueLift_StopLiftAnim kind:function(thumb,size=0x14) addr:0x021eed44
+GimmickLeagueLift_IsLiftAnimDone kind:function(thumb,size=0x30) addr:0x021eed58
+GimmickLeagueLift_HideArrivalModel kind:function(thumb,size=0x30) addr:0x021eed88
+GimmickLeagueLift_PlayArrivalModel kind:function(thumb,size=0x4e) addr:0x021eedb8
+GimmickLeagueLift_IsArrivalModelDone kind:function(thumb,size=0x32) addr:0x021eee08
+GimmickLeagueLift_LoadScene kind:function(thumb,size=0x54) addr:0x021eee3c
+GimmickLeagueLift_DummyInit kind:function(thumb,size=0x2) addr:0x021eee90
+GimmickLeagueLift_DummyEnd kind:function(thumb,size=0x2) addr:0x021eee94
 data_ov106_021eee58 kind:data(any) addr:0x021eee98
 data_ov106_021eee5c kind:data(any) addr:0x021eee9c
 data_ov106_021eee61 kind:data(any) addr:0x021eeea1 ambiguous

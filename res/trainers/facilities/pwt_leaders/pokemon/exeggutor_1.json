@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_EXEGGUTOR",
+    "moves": [ "MOVE_SOLAR_BEAM", "MOVE_PSYSHOCK", "MOVE_HYPNOSIS", "MOVE_SUNNY_DAY" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_TANGA_BERRY",
+    "form": 0
+}

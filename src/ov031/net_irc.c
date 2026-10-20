@@ -339,7 +339,7 @@ void NetIrc_Update(void) {
                 } else {
                     sys->running = FALSE;
                     sys->timedOut = TRUE;
-                    func_02040a9c(1 - NetIrc_GetNetId());
+                    NetHandle_Forget(1 - NetIrc_GetNetId());
                     IrcLink_Close();
                 }
             }
@@ -351,7 +351,7 @@ void NetIrc_Update(void) {
                 sys->running = FALSE;
                 sys->timedOut = TRUE;
                 sys->elapsed = 0xffff;
-                func_02040a9c(1 - NetIrc_GetNetId());
+                NetHandle_Forget(1 - NetIrc_GetNetId());
                 IrcLink_Close();
             }
         }

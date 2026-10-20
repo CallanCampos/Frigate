@@ -486,7 +486,7 @@ BOOL GetZoneIsUnionRoom(u16 zoneId) {
 
 BOOL IsZone150Or151(u16 zoneId) {
     zoneId = GetVersionedMapChangeZoneNum(zoneId);
-    if (zoneId == ZONE_150 || zoneId == ZONE_151) {
+    if (zoneId == ZONE_UNION_ROOM_COLOSSEUM || zoneId == ZONE_UNION_ROOM_COLOSSEUM_2) {
         return TRUE;
     }
     return FALSE;

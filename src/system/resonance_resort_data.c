@@ -219,7 +219,7 @@ static void JoinAvenueShop_Init(JoinAvenueShop *shop) {
     shop->id = 0xffff;
 }
 
-u32 func_020363e0(JoinAvenueShop *shop, u32 which) {
+u32 JoinAvenueShop_GetField(JoinAvenueShop *shop, u32 which) {
     switch (which) {
     case 0:
         return shop->id;
@@ -233,7 +233,7 @@ u32 func_020363e0(JoinAvenueShop *shop, u32 which) {
     return 0;
 }
 
-void func_0203640c(JoinAvenueShop *shop, u32 which, u32 value) {
+void JoinAvenueShop_SetField(JoinAvenueShop *shop, u32 which, u32 value) {
     switch (which) {
     case 0:
         shop->id = value;
@@ -250,14 +250,14 @@ void func_0203640c(JoinAvenueShop *shop, u32 which, u32 value) {
     }
 }
 
-BOOL func_02036434(JoinAvenueShop *shop, u32 bit) {
+BOOL JoinAvenueShop_GetFlag(JoinAvenueShop *shop, u32 bit) {
     if (shop->flags & (1 << bit)) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_02036448(JoinAvenueShop *shop, u32 bit, BOOL set) {
+void JoinAvenueShop_SetFlag(JoinAvenueShop *shop, u32 bit, BOOL set) {
     if (set) {
         shop->flags |= 1 << bit;
     } else {
@@ -271,7 +271,7 @@ static void JoinAvenueProfile_SetFromPlayerInfo(JoinAvenueProfile *profile, Play
     profile->country = UnityTowerVisitor_GetCountry(playerInfo);
     profile->region = UnityTowerVisitor_GetProvince(playerInfo);
     profile->gender = getTrainerGender(playerInfo);
-    profile->version = func_02008bfc(playerInfo);
+    profile->version = PlayerInfo_GetVersion(playerInfo);
     profile->language = TrainerInfo_GetRegion(playerInfo);
     profile->trainerType = UnionView_GetTrainerType(func_02008bf4(playerInfo));
 }
@@ -284,12 +284,12 @@ static void JoinAvenueProfile_SetFromGameData(JoinAvenueProfile *profile, GameDa
     JoinAvenueProfile_SetFromPlayerInfo(profile, GetGameDataPlayerInfo(gameData));
     MI_CpuCopy8(TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))),
                 profile->greeting, sizeof(profile->greeting));
-    answers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(gameData)));
-    profile->job = func_0200ec3c(answers, 26);
-    profile->hobby = func_0200ec3c(answers, 25);
-    playTime = func_02017a40(gameData);
-    profile->playHours = func_02008cec(playTime);
-    profile->playMinutes = func_02008cf0(playTime);
+    answers = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(gameData)));
+    profile->job = SurveySave_ReadAnswer(answers, 26);
+    profile->hobby = SurveySave_ReadAnswer(answers, 25);
+    playTime = GameData_GetPlayTime(gameData);
+    profile->playHours = PlayTime_GetHours(playTime);
+    profile->playMinutes = PlayTime_GetMinutes(playTime);
 }
 
 static void JoinAvenueProfile_SetFromBeacon(JoinAvenueProfile *profile, const GameBeacon *beacon) {
@@ -310,8 +310,8 @@ static void JoinAvenueProfile_SetFromBeacon(JoinAvenueProfile *profile, const Ga
         profile->trainerType = UnionView_GetTrainerType(beacon->trainerView + 8);
     }
     answers = (void *)beacon->surveyAnswers;
-    profile->job = func_0200ec3c(answers, 26);
-    profile->hobby = func_0200ec3c(answers, 25);
+    profile->job = SurveySave_ReadAnswer(answers, 26);
+    profile->hobby = SurveySave_ReadAnswer(answers, 25);
     profile->playHours = beacon->playHours;
     profile->playMinutes = beacon->playMinutes;
 }
@@ -396,10 +396,10 @@ static void JoinAvenueShopChoice_SetFromGameData(JoinAvenueShopChoice *choice, G
     MI_CpuFill8(choice, 0, sizeof(JoinAvenueShopChoice));
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     info = JoinAvenue_GetInfo(joinAvenue);
-    player = func_02038a18(getAddressOfBeginningOfOccupants(joinAvenue));
+    player = JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(joinAvenue));
     playerInfo = GetGameDataPlayerInfo(gameData);
     choice->rank = JoinAvenue_GetParam(info, 2, NULL);
-    choice->shopId = func_02038a20(player, playerInfo);
+    choice->shopId = JoinAvenuePerson_GetShopId(player, playerInfo);
     choice->unk0 = FALSE;
 }
 
@@ -453,7 +453,7 @@ static void JoinAvenueData_FillAdventure(JoinAvenueData *data, GameData *gameDat
 
     occupants = getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(save));
     for (i = 0; i < JOIN_AVE_OCCUPANT_COUNT; i++) {
-        person = func_02038860(occupants, i);
+        person = JoinAvenueOccupants_GetPerson(occupants, i);
         if (!JoinAvenuePerson_IsEmpty(person)) {
             switch (joinAveTextHandler(person, JOIN_AVE_PARAM_SHOP_KIND, NULL)) {
             case 5:
@@ -519,7 +519,7 @@ static BOOL JoinAvenueData_CheckAdventure(JoinAvenueData *data) {
 }
 
 static void JoinAvenueData_FillRecords1(JoinAvenueData *data, GameData *gameData) {
-    ResortWork *work = func_02017b84(gameData);
+    ResortWork *work = GameData_GetResortWork(gameData);
 
     MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
     data->records[0] = ResortWork_Get(work, 0);
@@ -540,7 +540,7 @@ static BOOL JoinAvenueData_CheckRecords1(JoinAvenueData *data) {
 }
 
 static void JoinAvenueData_FillRecords2(JoinAvenueData *data, GameData *gameData) {
-    ResortWork *work = func_02017b84(gameData);
+    ResortWork *work = GameData_GetResortWork(gameData);
 
     MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
     data->records[0] = ResortWork_Get(work, 4);
@@ -561,8 +561,8 @@ static BOOL JoinAvenueData_CheckRecords2(JoinAvenueData *data) {
 }
 
 static void JoinAvenueData_FillValues(JoinAvenueData *data, GameData *gameData) {
-    JoinAvenuePerson *player =
-        func_02038a18(getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))));
+    JoinAvenuePerson *player = JoinAvenueOccupants_GetPlayerPerson(
+        getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))));
     int i;
 
     MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
@@ -583,8 +583,8 @@ static BOOL JoinAvenueData_CheckValues(JoinAvenueData *data) {
 }
 
 static void JoinAvenueData_FillRecent(JoinAvenueData *data, GameData *gameData) {
-    JoinAvenuePerson *player =
-        func_02038a18(getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))));
+    JoinAvenuePerson *player = JoinAvenueOccupants_GetPlayerPerson(
+        getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))));
     int i;
 
     MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
@@ -611,7 +611,7 @@ static BOOL JoinAvenueData_CheckRecent(JoinAvenueData *data) {
 
 static void JoinAvenueData_FillMessage1(JoinAvenueData *data, GameData *gameData) {
     MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
-    MI_CpuCopy8((void *)joinAveTextHandler(func_02038a18(getAddressOfBeginningOfOccupants(
+    MI_CpuCopy8((void *)joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(
                                                SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData)))),
                                            JOIN_AVE_PARAM_MESSAGE1_RAW, NULL),
                 data, sizeof(JoinAvenueMessage));
@@ -640,7 +640,7 @@ static void getSpecialJoinAveTextToBuf(const JoinAvenueMessage *message, u16 *de
 
 static void JoinAvenueData_FillMessage2(JoinAvenueData *data, GameData *gameData) {
     MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
-    MI_CpuCopy8((void *)joinAveTextHandler(func_02038a18(getAddressOfBeginningOfOccupants(
+    MI_CpuCopy8((void *)joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(getAddressOfBeginningOfOccupants(
                                                SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData)))),
                                            JOIN_AVE_PARAM_MESSAGE2_RAW, NULL),
                 data, sizeof(JoinAvenueMessage));
@@ -667,23 +667,23 @@ static void JoinAvenue_GetMessage2(const JoinAvenueMessage *message, u16 *dest, 
     }
 }
 
-JoinAvenuePerson *func_02036d94(HeapID heapId) {
+JoinAvenuePerson *JoinAvenuePerson_Create(HeapID heapId) {
     JoinAvenuePerson *person =
         GFL_HeapAllocate(heapId, sizeof(JoinAvenuePerson), TRUE, "resonance_resort_data.c", 1360);
 
-    func_02036e14(person);
+    JoinAvenuePerson_Clear(person);
     return person;
 }
 
-void func_02036db8(JoinAvenuePerson *person) {
+void JoinAvenuePerson_Free(JoinAvenuePerson *person) {
     GFL_HeapFree(person);
 }
 
-void func_02036dc0(JoinAvenuePerson *person, GameData *gameData) {
+void JoinAvenuePerson_InitPlayer(JoinAvenuePerson *person, GameData *gameData) {
     int i;
     JoinAvenueData *data;
 
-    func_02036e14(person);
+    JoinAvenuePerson_Clear(person);
     JoinAvenueProfile_SetFromGameData(&person->profile, gameData);
     JoinAvenueShopChoice_SetFromGameData(&person->choice, gameData);
     for (data = person->data, i = 0; i < JOIN_AVE_DATA_COUNT; i++, data++) {
@@ -692,7 +692,7 @@ void func_02036dc0(JoinAvenuePerson *person, GameData *gameData) {
     person->dataMask = (1 << JOIN_AVE_DATA_COUNT) - 1;
 }
 
-void func_02036e14(JoinAvenuePerson *person) {
+void JoinAvenuePerson_Clear(JoinAvenuePerson *person) {
     MI_CpuFill8(person, 0, sizeof(JoinAvenuePerson));
     person->data[5].message.str[0] = GFL_StrBufGetTerminator();
     person->data[6].message.str[0] = GFL_StrBufGetTerminator();
@@ -704,7 +704,7 @@ BOOL JoinAvenuePerson_IsEmpty(JoinAvenuePerson *person) {
     return JoinAvenueProfile_IsEmpty(&person->profile);
 }
 
-BOOL func_02036e4c(JoinAvenuePerson *person, u32 index) {
+BOOL JoinAvenuePerson_HasExtraData(JoinAvenuePerson *person, u32 index) {
     if (person->dataMask & (1 << index)) {
         return TRUE;
     }
@@ -737,7 +737,7 @@ static void JoinAvenuePerson_Stamp(JoinAvenuePerson *person) {
 }
 
 static BOOL JoinAvenuePerson_SetFromVisitor(JoinAvenuePerson *person, const JoinAvenueVisitor *visitor) {
-    func_02036e14(person);
+    JoinAvenuePerson_Clear(person);
     JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_26, visitor->unk44);
     person->profile = visitor->profile;
     if (visitor->dataIndex < JOIN_AVE_DATA_COUNT) {
@@ -823,7 +823,7 @@ static u32 JoinAvenuePerson_MergeEntry(JoinAvenuePerson *person, const JoinAvenu
     return 1;
 }
 
-BOOL func_020370a4(JoinAvenuePerson *person) {
+BOOL JoinAvenuePerson_IsValid(JoinAvenuePerson *person) {
     JoinAvenueData *data;
     int i;
 
@@ -1273,11 +1273,11 @@ static BOOL JoinAvenuePerson_IsExpired(const JoinAvenuePerson *person, s64 now) 
     return expired;
 }
 
-u32 func_020378f8(JoinAvenuePerson *person, int count, u32 max) {
-    return func_0203941c(joinAveTextHandler(person, JOIN_AVE_PARAM_SEED, NULL), count, max);
+u32 JoinAvenuePerson_Random(JoinAvenuePerson *person, int count, u32 max) {
+    return JoinAvenue_RandomFromSeed(joinAveTextHandler(person, JOIN_AVE_PARAM_SEED, NULL), count, max);
 }
 
-JoinAvenueVisitor *func_02037910(HeapID heapId) {
+JoinAvenueVisitor *JoinAvenueVisitor_Create(HeapID heapId) {
     JoinAvenueVisitor *visitor =
         GFL_HeapAllocate(heapId, sizeof(JoinAvenueVisitor), TRUE, "resonance_resort_data.c", 2367);
 
@@ -1285,11 +1285,11 @@ JoinAvenueVisitor *func_02037910(HeapID heapId) {
     return visitor;
 }
 
-void func_02037930(JoinAvenueVisitor *visitor) {
+void JoinAvenueVisitor_Free(JoinAvenueVisitor *visitor) {
     GFL_HeapFree(visitor);
 }
 
-void func_02037938(JoinAvenueVisitor *visitor, int index, GameData *gameData) {
+void JoinAvenueVisitor_InitPlayer(JoinAvenueVisitor *visitor, int index, GameData *gameData) {
     JoinAvenueProfile_SetFromGameData(&visitor->profile, gameData);
     JoinAvenueShopChoice_SetFromGameData(&visitor->choice, gameData);
     visitor->unk44 = 8;
@@ -1300,13 +1300,13 @@ void func_02037938(JoinAvenueVisitor *visitor, int index, GameData *gameData) {
     visitor->dataIndex = index;
 }
 
-void func_02037970(JoinAvenueVisitor *visitor, GameBeacon *beacon) {
+void JoinAvenueVisitor_StoreInBeacon(JoinAvenueVisitor *visitor, GameBeacon *beacon) {
     MI_CpuCopy8(&visitor->choice, &GameBeacon_GetAvenuePayload(beacon)->choice, sizeof(JoinAvenueShopChoice));
     MI_CpuCopy8(&visitor->data, &GameBeacon_GetAvenuePayload(beacon)->data, sizeof(JoinAvenueData));
     beacon->arg.value = visitor->dataIndex;
 }
 
-void func_02037998(JoinAvenueVisitor *visitor, const GameBeacon *beacon, u32 a2) {
+void JoinAvenueVisitor_InitFromBeacon(JoinAvenueVisitor *visitor, const GameBeacon *beacon, u32 a2) {
     MI_CpuFill8(visitor, 0, sizeof(JoinAvenueVisitor));
     visitor->unk44 = a2;
     JoinAvenueProfile_SetFromBeacon(&visitor->profile, beacon);
@@ -1327,7 +1327,7 @@ static u16 JoinAvenueVisitor_GetTrainerId(const JoinAvenueVisitor *visitor) {
     return visitor->profile.trainerId;
 }
 
-BOOL func_020379f8(JoinAvenueVisitor *visitor) {
+BOOL JoinAvenueVisitor_IsValid(JoinAvenueVisitor *visitor) {
     if (!JoinAvenueProfile_IsValid(&visitor->profile)) {
         return FALSE;
     }
@@ -1343,41 +1343,41 @@ BOOL func_020379f8(JoinAvenueVisitor *visitor) {
     return TRUE;
 }
 
-JoinAvenueEntry *func_02037a40(HeapID heapId) {
+JoinAvenueEntry *JoinAvenueEntry_Create(HeapID heapId) {
     JoinAvenueEntry *entry = GFL_HeapAllocate(heapId, sizeof(JoinAvenueEntry), TRUE, "resonance_resort_data.c", 2566);
 
-    func_02037a70(entry);
+    JoinAvenueEntry_Clear(entry);
     return entry;
 }
 
-void func_02037a68(JoinAvenueEntry *entry) {
+void JoinAvenueEntry_Free(JoinAvenueEntry *entry) {
     GFL_HeapFree(entry);
 }
 
-void func_02037a70(JoinAvenueEntry *entry) {
+void JoinAvenueEntry_Clear(JoinAvenueEntry *entry) {
     MI_CpuFill8(entry, 0, sizeof(JoinAvenueEntry));
     entry->message1.str[0] = GFL_StrBufGetTerminator();
     entry->message2.str[0] = GFL_StrBufGetTerminator();
     entry->profile.greeting[0] = GFL_StrBufGetTerminator();
 }
 
-BOOL func_02037a90(JoinAvenueEntry *entry) {
+BOOL JoinAvenueEntry_IsEmpty(JoinAvenueEntry *entry) {
     return JoinAvenueProfile_IsEmpty(&entry->profile);
 }
 
-BOOL func_02037a98(JoinAvenueEntry *entry) {
+BOOL JoinAvenueEntry_IsValid(JoinAvenueEntry *entry) {
     if (entry->unk4E <= 1 && !JoinAvenueProfile_IsValid(&entry->profile)) {
         return FALSE;
     }
     return TRUE;
 }
 
-void func_02037ab4(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 species, u32 type) {
+void JoinAvenueEntry_Init(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 species, u32 type) {
     RTCDate date;
     u16 trainerId;
     u32 version;
 
-    func_02037a70(entry);
+    JoinAvenueEntry_Clear(entry);
     switch (type) {
     default:
         type = 6;
@@ -1390,7 +1390,7 @@ void func_02037ab4(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 species, 
     }
     entry->unk56 = type;
     trainerId = getTrainerID(playerInfo);
-    version = func_02008bfc(playerInfo);
+    version = PlayerInfo_GetVersion(playerInfo);
     entry->shopId = JoinAvenue_GetDefaultShop(trainerId, version);
     JoinAvenueProfile_SetFromPlayerInfo(&entry->profile, playerInfo);
     entry->species = species;
@@ -1401,7 +1401,7 @@ void func_02037ab4(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 species, 
     entry->seed = GFL_RandomLC(0);
 }
 
-u32 func_02037b38(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buffer) {
+u32 JoinAvenueEntry_GetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buffer) {
     switch (param) {
     case JOIN_AVE_PARAM_SLOT:
         return entry->slot;
@@ -1472,7 +1472,7 @@ u32 func_02037b38(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buf
     return 0;
 }
 
-void func_02037c70(JoinAvenueEntry *entry, JoinAvenuePersonParam param, u32 value) {
+void JoinAvenueEntry_SetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, u32 value) {
     switch (param) {
     case JOIN_AVE_PARAM_SLOT:
         entry->slot = value;
@@ -1561,31 +1561,31 @@ static BOOL JoinAvenueEntry_Copy(JoinAvenueEntry *entry, const JoinAvenueEntry *
     return TRUE;
 }
 
-u32 func_02037e34(JoinAvenueEntry *entry, int count, u32 max) {
-    return func_0203941c(func_02037b38(entry, JOIN_AVE_PARAM_SEED, NULL), count, max);
+u32 JoinAvenueEntry_Random(JoinAvenueEntry *entry, int count, u32 max) {
+    return JoinAvenue_RandomFromSeed(JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_SEED, NULL), count, max);
 }
 
-void func_02037e4c(JoinAvenueEntryList *list, u32 count) {
+void JoinAvenueEntryList_Init(JoinAvenueEntryList *list, u32 count) {
     u32 i = 0;
 
     MI_CpuFill8(list, 0, sizeof(JoinAvenueEntryList));
     list->count = count;
     for (; i < list->count; i++) {
-        func_02037a70(&list->entries[i]);
+        JoinAvenueEntry_Clear(&list->entries[i]);
     }
 }
 
-u32 func_02037e7c(JoinAvenueEntryList *list, JoinAvenueEntry *entry) {
+u32 JoinAvenueEntryList_Add(JoinAvenueEntryList *list, JoinAvenueEntry *entry) {
     BOOL skipFirst;
     u32 kind;
     JoinAvenueEntry *slot;
 
-    if (!func_02037a98(entry)) {
+    if (!JoinAvenueEntry_IsValid(entry)) {
         return 2;
     }
     skipFirst = FALSE;
     if (JoinAvenue_GetParam(sJoinAvenue.info, 7, NULL)) {
-        kind = func_02037b38(entry, JOIN_AVE_PARAM_SHOP_KIND, NULL);
+        kind = JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_SHOP_KIND, NULL);
         if (kind != 2 && kind != 3) {
             skipFirst = TRUE;
         }
@@ -1598,41 +1598,41 @@ u32 func_02037e7c(JoinAvenueEntryList *list, JoinAvenueEntry *entry) {
     return 0;
 }
 
-u32 func_02037ed4(JoinAvenueEntryList *list) {
+u32 JoinAvenueEntryList_GetCount(JoinAvenueEntryList *list) {
     return list->count;
 }
 
-u32 func_02037ed8(JoinAvenueEntryList *list) {
+u32 JoinAvenueEntryList_CountUsed(JoinAvenueEntryList *list) {
     u32 i;
     u32 count = 0;
 
     for (i = 0; i < list->count; i++) {
-        if (!func_02037a90(&list->entries[i])) {
+        if (!JoinAvenueEntry_IsEmpty(&list->entries[i])) {
             count++;
         }
     }
     return count;
 }
 
-JoinAvenueEntry *func_02037f04(JoinAvenueEntryList *list, u32 index) {
+JoinAvenueEntry *JoinAvenueEntryList_Get(JoinAvenueEntryList *list, u32 index) {
     return &list->entries[index];
 }
 
-BOOL func_02037f10(JoinAvenueEntryList *list, const JoinAvenueVisitor *visitor) {
+BOOL JoinAvenueEntryList_HasVisitor(JoinAvenueEntryList *list, const JoinAvenueVisitor *visitor) {
     if (JoinAvenueEntryList_Find(list, &visitor->profile) != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02037f24(JoinAvenueEntryList *list, const JoinAvenuePerson *person) {
+BOOL JoinAvenueEntryList_HasPerson(JoinAvenueEntryList *list, const JoinAvenuePerson *person) {
     if (JoinAvenueEntryList_Find(list, &person->profile) != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02037f38(JoinAvenueEntryList *list, const JoinAvenueEntry *entry) {
+BOOL JoinAvenueEntryList_MergeEntry(JoinAvenueEntryList *list, const JoinAvenueEntry *entry) {
     JoinAvenueEntry *found = JoinAvenueEntryList_Find(list, &entry->profile);
 
     if (found != NULL) {
@@ -1648,7 +1648,7 @@ static JoinAvenueEntry *JoinAvenueEntryList_FindEmpty(JoinAvenueEntryList *list,
     for (i = 0; i < list->count; i++) {
         JoinAvenueEntry *entry = &list->entries[i];
 
-        if ((!skipFirst || i != 0) && func_02037a90(entry)) {
+        if ((!skipFirst || i != 0) && JoinAvenueEntry_IsEmpty(entry)) {
             return entry;
         }
     }
@@ -1673,7 +1673,7 @@ JoinAvenuePersonList *JoinAvenuePersonList_Create(HeapID heapId, u32 count) {
     if (list == NULL) {
         return NULL;
     }
-    func_02037ffc(list, count);
+    JoinAvenuePersonList_Init(list, count);
     return list;
 }
 
@@ -1681,13 +1681,13 @@ void JoinAvenuePersonList_Free(JoinAvenuePersonList *list) {
     GFL_HeapFree(list);
 }
 
-void func_02037ffc(JoinAvenuePersonList *list, u32 count) {
+void JoinAvenuePersonList_Init(JoinAvenuePersonList *list, u32 count) {
     u32 i = 0;
 
     MI_CpuFill8(list, 0, sizeof(JoinAvenuePersonList));
     list->count = count;
     for (; i < list->count; i++) {
-        func_02036e14(&list->people[i]);
+        JoinAvenuePerson_Clear(&list->people[i]);
     }
 }
 
@@ -1695,7 +1695,7 @@ u32 JoinAvenuePersonList_GetCount(JoinAvenuePersonList *list) {
     return list->count;
 }
 
-u32 func_02038030(JoinAvenuePersonList *list) {
+u32 JoinAvenuePersonList_CountUsed(JoinAvenuePersonList *list) {
     u32 i;
     u32 count = 0;
 
@@ -1711,7 +1711,7 @@ JoinAvenuePerson *JoinAvenuePersonList_Get(JoinAvenuePersonList *list, u32 index
     return &list->people[index];
 }
 
-u32 func_0203806c(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) {
+u32 JoinAvenuePersonList_MergeVisitor(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) {
     JoinAvenuePerson *person = JoinAvenuePersonList_Find(list, &visitor->profile);
 
     if (person != NULL) {
@@ -1723,7 +1723,7 @@ u32 func_0203806c(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) 
     return 0;
 }
 
-u32 func_02038090(JoinAvenuePersonList *list, const JoinAvenuePerson *src) {
+u32 JoinAvenuePersonList_MergePerson(JoinAvenuePersonList *list, const JoinAvenuePerson *src) {
     JoinAvenuePerson *person = JoinAvenuePersonList_Find(list, &src->profile);
 
     if (person != NULL) {
@@ -1735,7 +1735,7 @@ u32 func_02038090(JoinAvenuePersonList *list, const JoinAvenuePerson *src) {
     return 0;
 }
 
-u32 func_020380b4(JoinAvenuePersonList *list, const JoinAvenueEntry *entry) {
+u32 JoinAvenuePersonList_MergeEntry(JoinAvenuePersonList *list, const JoinAvenueEntry *entry) {
     JoinAvenuePerson *person = JoinAvenuePersonList_Find(list, &entry->profile);
 
     if (person != NULL) {
@@ -1747,7 +1747,7 @@ u32 func_020380b4(JoinAvenuePersonList *list, const JoinAvenueEntry *entry) {
     return 0;
 }
 
-u32 func_020380d8(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) {
+u32 JoinAvenuePersonList_AddVisitor(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) {
     u16 trainerId;
     JoinAvenuePerson *person;
 
@@ -1765,7 +1765,7 @@ u32 func_020380d8(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) 
         }
         person = JoinAvenuePersonList_FindExpired(list);
         if (person != NULL) {
-            func_02036e14(person);
+            JoinAvenuePerson_Clear(person);
             JoinAvenuePerson_SetFromVisitor(person, visitor);
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, JOIN_AVE_STATUS_NEW);
             JoinAvenueInfo_AddVisitorId(sJoinAvenue.info, trainerId);
@@ -1775,7 +1775,7 @@ u32 func_020380d8(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor) 
     return 0;
 }
 
-u32 func_0203815c(JoinAvenuePersonList *list, const JoinAvenuePerson *src) {
+u32 JoinAvenuePersonList_AddPerson(JoinAvenuePersonList *list, const JoinAvenuePerson *src) {
     JoinAvenuePerson *person;
 
     if (list->locked) {
@@ -1789,7 +1789,7 @@ u32 func_0203815c(JoinAvenuePersonList *list, const JoinAvenuePerson *src) {
     }
     person = JoinAvenuePersonList_FindExpired(list);
     if (person != NULL) {
-        func_02036e14(person);
+        JoinAvenuePerson_Clear(person);
         JoinAvenuePerson_Copy(person, src);
         JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, JOIN_AVE_STATUS_NEW);
         return 1;
@@ -1835,7 +1835,8 @@ static JoinAvenuePerson *JoinAvenuePersonList_FindExpired(JoinAvenuePersonList *
     return NULL;
 }
 
-void func_02038274(JoinAvenuePerson *person, const JoinAvenuePerson *src, ResortShopData *shops, u32 slot, u16 row) {
+void JoinAvenuePerson_InitFromPerson(JoinAvenuePerson *person, const JoinAvenuePerson *src, ResortShopData *shops,
+                                     u32 slot, u16 row) {
     if (person != src) {
         *person = *src;
     }
@@ -1845,8 +1846,9 @@ void func_02038274(JoinAvenuePerson *person, const JoinAvenuePerson *src, Resort
     JoinAvenuePerson_SetupShopKind(person, shops);
 }
 
-void func_020382d8(JoinAvenuePerson *person, const JoinAvenueEntry *entry, ResortShopData *shops, u32 slot, u16 row) {
-    func_02036e14(person);
+void JoinAvenuePerson_InitFromEntry(JoinAvenuePerson *person, const JoinAvenueEntry *entry, ResortShopData *shops,
+                                    u32 slot, u16 row) {
+    JoinAvenuePerson_Clear(person);
     person->profile = entry->profile;
     person->data[5].message = entry->message1;
     person->data[6].message = entry->message2;
@@ -1866,13 +1868,13 @@ static void JoinAvenuePerson_SetupShop(JoinAvenuePerson *person, ResortShopData 
     u32 trainerId = joinAveTextHandler(person, JOIN_AVE_PARAM_TRAINER_ID, NULL);
     u32 version = joinAveTextHandler(person, JOIN_AVE_PARAM_VERSION, NULL);
     u32 unk18 = joinAveTextHandler(person, JOIN_AVE_PARAM_UNK_18, NULL);
-    u16 id = func_020394b0(shopId, trainerId, version, unk18, sJoinAvenue.info, shops);
+    u16 id = JoinAvenue_ChooseShop(shopId, trainerId, version, unk18, sJoinAvenue.info, shops);
     u16 level = ResortShopData_GetShopParam(ResortShopData_GetShop(shops, id), 2);
-    JoinAvenueShop *shop = func_02038470(person);
+    JoinAvenueShop *shop = JoinAvenuePerson_GetShop(person);
 
     JoinAvenueShop_Init(shop);
-    func_0203640c(shop, 0, id);
-    func_0203640c(shop, 1, level);
+    JoinAvenueShop_SetField(shop, 0, id);
+    JoinAvenueShop_SetField(shop, 1, level);
 }
 
 static void JoinAvenuePerson_AddVisitorData(JoinAvenuePerson *person, const JoinAvenueVisitor *visitor) {
@@ -1885,7 +1887,7 @@ static void JoinAvenuePerson_AddVisitorData(JoinAvenuePerson *person, const Join
     }
 }
 
-JoinAvenueShop *func_02038470(JoinAvenuePerson *person) {
+JoinAvenueShop *JoinAvenuePerson_GetShop(JoinAvenuePerson *person) {
     return &person->shop;
 }
 
@@ -1894,23 +1896,23 @@ static void JoinAvenuePerson_SetupShopKind(JoinAvenuePerson *person, ResortShopD
     person->shopKind = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shops, person), 0);
 }
 
-JoinAvenueRecord *func_020384a4(HeapID heapId) {
+JoinAvenueRecord *JoinAvenueRecord_Create(HeapID heapId) {
     JoinAvenueRecord *record =
         GFL_HeapAllocate(heapId, sizeof(JoinAvenueRecord), TRUE, "resonance_resort_data.c", 3859);
 
-    func_020384d4(record);
+    JoinAvenueRecord_Clear(record);
     return record;
 }
 
-void func_020384cc(JoinAvenueRecord *record) {
+void JoinAvenueRecord_Free(JoinAvenueRecord *record) {
     GFL_HeapFree(record);
 }
 
-void func_020384d4(JoinAvenueRecord *record) {
+void JoinAvenueRecord_Clear(JoinAvenueRecord *record) {
     MI_CpuFill8(record, 0, sizeof(JoinAvenueRecord));
 }
 
-BOOL func_020384e0(JoinAvenueRecord *record) {
+BOOL JoinAvenueRecord_IsEmpty(JoinAvenueRecord *record) {
     return JoinAvenueProfile_IsEmpty(&record->profile);
 }
 
@@ -1952,7 +1954,7 @@ static u32 JoinAvenueRecord_MergeEntry(JoinAvenueRecord *record, const JoinAvenu
     return 1;
 }
 
-u32 func_020385a8(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *buffer) {
+u32 JoinAvenueRecord_GetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *buffer) {
     switch (param) {
     case JOIN_AVE_PARAM_SLOT:
         return record->slot;
@@ -1992,7 +1994,7 @@ u32 func_020385a8(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *b
     return 0;
 }
 
-void func_02038680(JoinAvenueRecord *record, JoinAvenuePersonParam param, u32 value) {
+void JoinAvenueRecord_SetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, u32 value) {
     switch (param) {
     case JOIN_AVE_PARAM_SLOT:
         record->slot = value;
@@ -2021,8 +2023,9 @@ void func_02038680(JoinAvenueRecord *record, JoinAvenuePersonParam param, u32 va
     }
 }
 
-void func_020386f4(JoinAvenueRecord *record, const JoinAvenuePerson *person, u32 slot, u32 row, u16 shopKind) {
-    func_020384d4(record);
+void JoinAvenueRecord_InitFromPerson(JoinAvenueRecord *record, const JoinAvenuePerson *person, u32 slot, u32 row,
+                                     u16 shopKind) {
+    JoinAvenueRecord_Clear(record);
     record->profile = person->profile;
     record->year = person->year;
     record->month = person->month;
@@ -2034,7 +2037,8 @@ void func_020386f4(JoinAvenueRecord *record, const JoinAvenuePerson *person, u32
     record->row = row;
 }
 
-void func_02038778(JoinAvenueRecord *record, const JoinAvenueEntry *entry, u32 slot, u32 row, u16 shopKind) {
+void JoinAvenueRecord_InitFromEntry(JoinAvenueRecord *record, const JoinAvenueEntry *entry, u32 slot, u32 row,
+                                    u16 shopKind) {
     record->profile = entry->profile;
     record->year = entry->year;
     record->month = entry->month;
@@ -2046,75 +2050,75 @@ void func_02038778(JoinAvenueRecord *record, const JoinAvenueEntry *entry, u32 s
     record->row = row;
 }
 
-u32 func_020387f4(JoinAvenueRecord *record, int count, u32 max) {
-    return func_0203941c(func_020385a8(record, JOIN_AVE_PARAM_SEED, NULL), count, max);
+u32 JoinAvenueRecord_Random(JoinAvenueRecord *record, int count, u32 max) {
+    return JoinAvenue_RandomFromSeed(JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_SEED, NULL), count, max);
 }
 
-void func_0203880c(JoinAvenueOccupants *occupants) {
+void JoinAvenueOccupants_Init(JoinAvenueOccupants *occupants) {
     int i;
 
     MI_CpuFill8(occupants, 0, sizeof(JoinAvenueOccupants));
     for (i = 0; i < JOIN_AVE_OCCUPANT_COUNT; i++) {
-        func_02036e14(&occupants->people[i]);
+        JoinAvenuePerson_Clear(&occupants->people[i]);
     }
     for (i = 0; i < JOIN_AVE_RECORD_COUNT; i++) {
-        func_020384d4(&occupants->records[i]);
+        JoinAvenueRecord_Clear(&occupants->records[i]);
     }
-    func_02036e14(&occupants->player);
+    JoinAvenuePerson_Clear(&occupants->player);
     JoinAvenuePerson_SetParam(&occupants->player, JOIN_AVE_PARAM_SHOP_ID, 0);
 }
 
-JoinAvenuePerson *func_02038860(JoinAvenueOccupants *occupants, u32 index) {
+JoinAvenuePerson *JoinAvenueOccupants_GetPerson(JoinAvenueOccupants *occupants, u32 index) {
     return &occupants->people[index];
 }
 
-u32 func_02038868(JoinAvenueOccupants *occupants) {
+u32 JoinAvenueOccupants_CountPeople(JoinAvenueOccupants *occupants) {
     int i;
     u32 count = 0;
 
     for (i = 0; i < JOIN_AVE_OCCUPANT_COUNT; i++) {
-        if (!JoinAvenuePerson_IsEmpty(func_02038860(occupants, i))) {
+        if (!JoinAvenuePerson_IsEmpty(JoinAvenueOccupants_GetPerson(occupants, i))) {
             count++;
         }
     }
     return count;
 }
 
-JoinAvenueRecord *func_0203888c(JoinAvenueOccupants *occupants, u32 index) {
+JoinAvenueRecord *JoinAvenueOccupants_GetRecord(JoinAvenueOccupants *occupants, u32 index) {
     return &occupants->records[index];
 }
 
-u32 func_0203889c(JoinAvenueOccupants *occupants) {
+u32 JoinAvenueOccupants_CountRecords(JoinAvenueOccupants *occupants) {
     int i;
     u32 count = 0;
 
     for (i = 0; i < JOIN_AVE_RECORD_COUNT; i++) {
-        if (!func_020384e0(func_0203888c(occupants, i))) {
+        if (!JoinAvenueRecord_IsEmpty(JoinAvenueOccupants_GetRecord(occupants, i))) {
             count++;
         }
     }
     return count;
 }
 
-JoinAvenueRecord *func_020388c0(JoinAvenueOccupants *occupants) {
+JoinAvenueRecord *JoinAvenueOccupants_GetEmptyRecord(JoinAvenueOccupants *occupants) {
     int i;
 
     for (i = 0; i < JOIN_AVE_RECORD_COUNT; i++) {
-        JoinAvenueRecord *record = func_0203888c(occupants, i);
+        JoinAvenueRecord *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-        if (func_020384e0(record)) {
+        if (JoinAvenueRecord_IsEmpty(record)) {
             return record;
         }
     }
     return NULL;
 }
 
-u32 func_020388e8(JoinAvenueOccupants *occupants, const void *source, u32 kind) {
+u32 JoinAvenueOccupants_Merge(JoinAvenueOccupants *occupants, const void *source, u32 kind) {
     int i;
     u32 result;
 
     for (i = 0; i < JOIN_AVE_OCCUPANT_COUNT; i++) {
-        JoinAvenuePerson *person = func_02038860(occupants, i);
+        JoinAvenuePerson *person = JoinAvenueOccupants_GetPerson(occupants, i);
 
         if (!JoinAvenuePerson_IsEmpty(person) && sMergeFuncs[kind].personMatches(person, source)) {
             if (occupants->locked) {
@@ -2127,9 +2131,9 @@ u32 func_020388e8(JoinAvenueOccupants *occupants, const void *source, u32 kind) 
         }
     }
     for (i = 0; i < JOIN_AVE_RECORD_COUNT; i++) {
-        JoinAvenueRecord *record = func_0203888c(occupants, i);
+        JoinAvenueRecord *record = JoinAvenueOccupants_GetRecord(occupants, i);
 
-        if (!func_020384e0(record) && sMergeFuncs[kind].recordMatches(record, source)) {
+        if (!JoinAvenueRecord_IsEmpty(record) && sMergeFuncs[kind].recordMatches(record, source)) {
             if (occupants->locked) {
                 return 2;
             }
@@ -2142,35 +2146,35 @@ u32 func_020388e8(JoinAvenueOccupants *occupants, const void *source, u32 kind) 
     return 0;
 }
 
-void func_020389a0(JoinAvenueOccupants *occupants, BOOL fullDay) {
+void JoinAvenueOccupants_ResetDaily(JoinAvenueOccupants *occupants, BOOL fullDay) {
     int i;
 
     for (i = 0; i < JOIN_AVE_OCCUPANT_COUNT; i++) {
-        JoinAvenuePerson *person = func_02038860(occupants, i);
+        JoinAvenuePerson *person = JoinAvenueOccupants_GetPerson(occupants, i);
 
         if (!JoinAvenuePerson_IsEmpty(person) && !fullDay) {
-            JoinAvenueShop *shop = func_02038470(person);
+            JoinAvenueShop *shop = JoinAvenuePerson_GetShop(person);
 
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_30, 0);
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_37, 0);
             JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_SEED,
                                       gfRand(joinAveTextHandler(person, JOIN_AVE_PARAM_SEED, NULL)));
-            func_0203640c(shop, 3, 0);
+            JoinAvenueShop_SetField(shop, 3, 0);
         }
     }
 }
 
-void func_02038a0c(JoinAvenueOccupants *occupants, u32 locked) {
+void JoinAvenueOccupants_SetLocked(JoinAvenueOccupants *occupants, u32 locked) {
     occupants->locked = locked;
 }
 
-JoinAvenuePerson *func_02038a18(JoinAvenueOccupants *occupants) {
+JoinAvenuePerson *JoinAvenueOccupants_GetPlayerPerson(JoinAvenueOccupants *occupants) {
     return &occupants->player;
 }
 
-u32 func_02038a20(JoinAvenuePerson *person, PlayerInfo *playerInfo) {
+u32 JoinAvenuePerson_GetShopId(JoinAvenuePerson *person, PlayerInfo *playerInfo) {
     u16 shopId = joinAveTextHandler(person, JOIN_AVE_PARAM_SHOP_ID, NULL);
-    u8 version = func_02008bfc(playerInfo);
+    u8 version = PlayerInfo_GetVersion(playerInfo);
     u16 trainerId = getIDAsUInt(playerInfo);
 
     if (shopId == 0) {
@@ -2270,8 +2274,8 @@ static u32 JoinAvenue_GetDefaultShop(u16 trainerId, u16 version) {
     }
 }
 
-void func_02038bc8(u32 id) {
-    JoinAvenuePerson *player = func_02038a18(sJoinAvenue.occupants);
+void JoinAvenue_RecordActivity(u32 id) {
+    JoinAvenuePerson *player = JoinAvenueOccupants_GetPlayerPerson(sJoinAvenue.occupants);
     RTCDate today;
     RTCDate date;
     RTCDate dateA;
@@ -2380,7 +2384,7 @@ void func_02038bc8(u32 id) {
     }
 }
 
-void func_02038e54(JoinAvenueInfo *info) {
+void JoinAvenueInfo_Init(JoinAvenueInfo *info) {
     MsgData *msgData;
     StrBuf *str;
 
@@ -2473,7 +2477,7 @@ u32 JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer) {
     return 0;
 }
 
-void func_02039064(JoinAvenueInfo *info, u32 param, u32 value) {
+void JoinAvenueInfo_SetParam(JoinAvenueInfo *info, u32 param, u32 value) {
     switch (param) {
     case 0:
         wcharsncpy((const u16 *)value, info->name, NELEMS(info->name));
@@ -2561,7 +2565,7 @@ void func_02039064(JoinAvenueInfo *info, u32 param, u32 value) {
     }
 }
 
-void func_020392d4(JoinAvenueInfo *info, BOOL fullDay) {
+void JoinAvenueInfo_ResetDaily(JoinAvenueInfo *info, BOOL fullDay) {
     if (!fullDay) {
         MIi_CpuClear32(0xffffffff, info->visitorIds, sizeof(info->visitorIds));
         info->visitorIdIndex = 0;
@@ -2601,8 +2605,8 @@ static BOOL JoinAvenueInfo_HasVisitorId(const JoinAvenueInfo *info, u32 id) {
     return FALSE;
 }
 
-u32 func_020393e4(JoinAvenueInfo *info, int count, u32 max) {
-    return func_0203941c(JoinAvenue_GetParam(info, 4, NULL), count, max);
+u32 JoinAvenueInfo_Random(JoinAvenueInfo *info, int count, u32 max) {
+    return JoinAvenue_RandomFromSeed(JoinAvenue_GetParam(info, 4, NULL), count, max);
 }
 
 void setImportantJABlockAddresses(SaveControl *save) {
@@ -2612,7 +2616,7 @@ void setImportantJABlockAddresses(SaveControl *save) {
     sJoinAvenue.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
 }
 
-u32 func_0203941c(u32 seed, int count, u32 max) {
+u32 JoinAvenue_RandomFromSeed(u32 seed, int count, u32 max) {
     u64 state = seed;
     u32 result = 0;
     int i;
@@ -2635,7 +2639,8 @@ static u32 gfRand(u32 seed) {
     return ((u64)seed * GF_RAND_MULTIPLIER + GF_RAND_INCREMENT) >> 32;
 }
 
-u16 func_020394b0(u16 shopId, u16 trainerId, u16 version, BOOL unk18, JoinAvenueInfo *info, ResortShopData *shops) {
+u16 JoinAvenue_ChooseShop(u16 shopId, u16 trainerId, u16 version, BOOL unk18, JoinAvenueInfo *info,
+                          ResortShopData *shops) {
     u32 unk13 = JoinAvenue_GetParam(info, 13, NULL);
     const u16 *shop = ResortShopData_GetShop(shops, shopId);
     u16 level = ResortShopData_GetShopParam(shop, 2);

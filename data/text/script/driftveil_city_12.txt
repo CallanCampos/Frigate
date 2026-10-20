@@ -1,5 +1,0 @@
-DriftveilCity12_Text_WeCanLiveUnchanged = We can live unchanged,\nbecause we keep changing.{be01}\nI mean, Pokémon also evolve,\nbut their Natures stay the same.
-DriftveilCity12_Text_DriftveilCityRememberedHad = The Driftveil City that I remembered\nhad sort of a dowdy, you know,{be00}\nshabby look...
-DriftveilCity12_Text_OhPokemonHasSomething = Oh! The Pokémon has something\nin its mouth.{be01}
-DriftveilCity12_Text_Roooooar = Roooooar!
-\pad{12}

@@ -251,7 +251,7 @@ static s32 GetHeldRect(SystemUI *ui, const TouchRect *rects) {
     return TOUCH_RECT_NONE;
 }
 
-s32 func_0203d9c8(const TouchRect *rects) {
+s32 GFL_HIDGetTouchHeldRect(const TouchRect *rects) {
     return GetHeldRect(GCTX_HIDGetInstance(), rects);
 }
 
@@ -263,7 +263,7 @@ static s32 GetPressedRect(SystemUI *ui, const TouchRect *rects) {
     return TOUCH_RECT_NONE;
 }
 
-s32 func_0203da0c(const TouchRect *rects) {
+s32 GFL_HIDGetTouchPressedRect(const TouchRect *rects) {
     return GetPressedRect(GCTX_HIDGetInstance(), rects);
 }
 
@@ -272,7 +272,7 @@ static BOOL IsTouchHeld(SystemUI *ui) {
     return GetTouchHeld(ui);
 }
 
-BOOL func_0203da2c(void) {
+BOOL GFL_HIDIsTouchHeld(void) {
     return IsTouchHeld(GCTX_HIDGetInstance());
 }
 
@@ -281,7 +281,7 @@ static BOOL IsTouchPressed(SystemUI *ui) {
     return GetTouchPressed(ui);
 }
 
-BOOL func_0203da48(void) {
+BOOL GFL_HIDIsTouchPressed(void) {
     return IsTouchPressed(GCTX_HIDGetInstance());
 }
 
@@ -295,7 +295,7 @@ static BOOL GetHeldPoint(SystemUI *ui, u32 *x, u32 *y) {
     return FALSE;
 }
 
-BOOL func_0203da84(u32 *x, u32 *y) {
+BOOL GFL_HIDGetTouchHeldPoint(u32 *x, u32 *y) {
     return GetHeldPoint(GCTX_HIDGetInstance(), x, y);
 }
 
@@ -309,11 +309,11 @@ static BOOL GetPressedPoint(SystemUI *ui, u32 *x, u32 *y) {
     return FALSE;
 }
 
-BOOL func_0203dac8(u32 *x, u32 *y) {
+BOOL GFL_HIDGetTouchPressedPoint(u32 *x, u32 *y) {
     return GetPressedPoint(GCTX_HIDGetInstance(), x, y);
 }
 
-s32 func_0203dadc(const TouchRect *rects, u32 x, u32 y) {
+s32 GFL_HIDGetTouchRectAt(const TouchRect *rects, u32 x, u32 y) {
     return GetHitRect(rects, x, y);
 }
 
@@ -338,7 +338,7 @@ static void RestartSampling(SystemUI *ui) {
     }
 }
 
-void func_0203db44(void) {
+void GFL_HIDRestartTouchSampling(void) {
     RestartSampling(GCTX_HIDGetInstance());
 }
 
@@ -351,7 +351,7 @@ static void StopSampling(SystemUI *ui) {
     }
 }
 
-void func_0203db7c(void) {
+void GFL_HIDStopTouchSampling(void) {
     StopSampling(GCTX_HIDGetInstance());
 }
 
@@ -377,7 +377,7 @@ void GFL_HIDClearTouchState(SystemUI *ui) {
     tp->heldNext = 0;
 }
 
-void func_0203dbec(SystemUI *ui, u16 x, u16 y, u16 x30, u16 y30) {
+void GFL_HIDSetTouchPos(SystemUI *ui, u16 x, u16 y, u16 x30, u16 y30) {
     TouchpadManager *tp = getTouchpadBlock();
 
     tp->x30 = x30;
@@ -386,14 +386,14 @@ void func_0203dbec(SystemUI *ui, u16 x, u16 y, u16 x30, u16 y30) {
     tp->y = y;
 }
 
-void func_0203dc14(SystemUI *ui, u16 pressed, u16 pressed30) {
+void GFL_HIDSetTouchPressed(SystemUI *ui, u16 pressed, u16 pressed30) {
     TouchpadManager *tp = getTouchpadBlock();
 
     tp->pressed30 = pressed30;
     tp->pressed = pressed;
 }
 
-void func_0203dc2c(SystemUI *ui, u16 held, u16 held30) {
+void GFL_HIDSetTouchHeld(SystemUI *ui, u16 held, u16 held30) {
     TouchpadManager *tp = getTouchpadBlock();
 
     tp->held30 = held30;

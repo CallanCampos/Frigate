@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "John",
+    "class": "TRAINER_CLASS_HOOPSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_CALCIUM",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GIGALITH",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "No matter how much I sweat,\nI won't smell sweaty!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "A healthy sweat...\nBoy, I am glad that I am an athlete!"
+        },
+        {
+            "type": 15,
+            "text": "Here's what us athletes\ndo as a greeting!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "After a battle, take a bath!\nAfter eating, brush your teeth!"
+        }
+    ]
+}

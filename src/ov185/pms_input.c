@@ -222,7 +222,7 @@ BOOL PMSInput_Init(GameProc *proc, u32 *state, void *param, void *work) {
         wk = work;
         if (PMSIView_WaitCommandAll(wk->vwk)) {
             PMSInput_ChangeMainProc(wk, PMSInput_MainProcEditArea);
-            func_02042ba8(TRUE, HEAPID_PMS_INPUT);
+            GFL_NetSetIconScreen(TRUE, HEAPID_PMS_INPUT);
             return TRUE;
         }
         break;
@@ -377,7 +377,7 @@ static void PMSInput_ChangeMainProc(PMSInputWork *wk, PMSInputMainProc proc) {
 
 static BOOL PMSInput_KeyStatusChange(PMSInputWork *wk, u32 *seq) {
     if (wk->keyMode == KEY_MODE_TOUCH) {
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             return FALSE;
         }
         if (GCTX_HIDGetHeldKeys()) {
@@ -391,7 +391,7 @@ static BOOL PMSInput_KeyStatusChange(PMSInputWork *wk, u32 *seq) {
         if (GCTX_HIDGetHeldKeys()) {
             return FALSE;
         }
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             wk->keyMode = KEY_MODE_TOUCH;
             if (wk->ktChangeFunc) {
                 wk->ktChangeFunc(wk, seq);
@@ -534,7 +534,7 @@ static s32 PMSInput_WordTouchSingle(PMSInputWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    return func_0203da0c(sPMSInputWordSingleRects);
+    return GFL_HIDGetTouchPressedRect(sPMSInputWordSingleRects);
 }
 
 static s32 PMSInput_WordTouchDouble(PMSInputWork *wk) {
@@ -543,7 +543,7 @@ static s32 PMSInput_WordTouchDouble(PMSInputWork *wk) {
         { 16, 32, 136, 232 },   { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    return func_0203da0c(sPMSInputWordDoubleRects);
+    return GFL_HIDGetTouchPressedRect(sPMSInputWordDoubleRects);
 }
 
 static s32 PMSInput_SentenceTouchArea(PMSInputWork *wk) {
@@ -561,10 +561,10 @@ static s32 PMSInput_SentenceTouchArea(PMSInputWork *wk) {
         { 8, 39, 0, 19 },       { 8, 39, 236, 255 },    { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    if (!func_0203da48()) {
+    if (!GFL_HIDIsTouchPressed()) {
         return -1;
     }
-    hit = func_0203da0c(sPMSInputSentenceRects);
+    hit = GFL_HIDGetTouchPressedRect(sPMSInputSentenceRects);
     if (hit != -1) {
         if (PMSIParam_HasStartSentence(wk->param)) {
             if (hit == 2 || hit == 3 || hit == 4 || hit == 5) {
@@ -575,10 +575,10 @@ static s32 PMSInput_SentenceTouchArea(PMSInputWork *wk) {
         return hit;
     }
     count = PMSIView_GetSentenceEditPosMax(wk->vwk);
-    func_0203dac8(&x, &y);
+    GFL_HIDGetTouchPressedPoint(&x, &y);
     for (i = 0; i < count; i++) {
         PMSIView_GetSentenceWordArea(wk->vwk, rects, i);
-        if (func_0203dadc(rects, x, y) != -1) {
+        if (GFL_HIDGetTouchRectAt(rects, x, y) != -1) {
             return i + 6;
         }
     }
@@ -592,7 +592,7 @@ static s32 PMSInput_SentenceTouchType(PMSInputWork *wk) {
     if (PMSIParam_HasStartSentence(wk->param)) {
         return -1;
     }
-    if (!func_0203dac8(&x, &y)) {
+    if (!GFL_HIDGetTouchPressedPoint(&x, &y)) {
         return -1;
     }
     if (y <= 168 || (type = x / 24 - 1) < 0 || type >= SENTENCE_TYPE_COUNT) {
@@ -1228,7 +1228,7 @@ static int PMSInput_CategoryTouchButtons(PMSInputWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    s32 hit = func_0203da0c(sPMSInputCategoryButtonRects);
+    s32 hit = GFL_HIDGetTouchPressedRect(sPMSInputCategoryButtonRects);
 
     if (hit == -1) {
         return 0;
@@ -1251,7 +1251,7 @@ static s32 PMSInput_TouchReturnButton(PMSInputWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    return func_0203da0c(sPMSInputReturnButtonRects);
+    return GFL_HIDGetTouchPressedRect(sPMSInputReturnButtonRects);
 }
 
 static int PMSInput_CategoryTouchGroup(PMSInputWork *wk) {
@@ -1262,17 +1262,17 @@ static int PMSInput_CategoryTouchGroup(PMSInputWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    if (!func_0203da48()) {
+    if (!GFL_HIDIsTouchPressed()) {
         return -1;
     }
-    func_0203dac8(&x, &y);
+    GFL_HIDGetTouchPressedPoint(&x, &y);
     for (row = 0; row < 4; row++) {
         rects[0].top = row * 24 + 56;
         rects[0].bottom = rects[0].top + 16;
         for (col = 0; col < 3; col++) {
             rects[0].left = col * 80 + 12;
             rects[0].right = rects[0].left + 72;
-            if (func_0203dadc(rects, x, y) != -1) {
+            if (GFL_HIDGetTouchRectAt(rects, x, y) != -1) {
                 return row * 3 + col;
             }
         }
@@ -1288,7 +1288,7 @@ static s32 PMSInput_CategoryTouchSearchButtons(PMSInputWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    return func_0203da0c(rects);
+    return GFL_HIDGetTouchPressedRect(rects);
 }
 
 static int PMSInput_CategoryTouchInitial(PMSInputWork *wk) {
@@ -1307,7 +1307,7 @@ static int PMSInput_CategoryTouchInitial(PMSInputWork *wk) {
         rects[0].bottom = y + 64;
         rects[0].left = x + 8;
         rects[0].right = x + 24;
-        if (func_0203da0c(rects) != -1) {
+        if (GFL_HIDGetTouchPressedRect(rects) != -1) {
             return i;
         }
     }
@@ -1694,8 +1694,8 @@ static int PMSInput_WordWinTouchWord(PMSInputWork *wk) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    if (func_0203da0c(sPMSInputWordWinScrollBarRects) == 0) {
-        func_0203dac8(&x, &y);
+    if (GFL_HIDGetTouchPressedRect(sPMSInputWordWinScrollBarRects) == 0) {
+        GFL_HIDGetTouchPressedPoint(&x, &y);
         switch (PMSIView_GetWordWinScrollDir(wk->vwk, x, y)) {
         case 0:
             wk->scrollBarHeld = TRUE;
@@ -1713,7 +1713,7 @@ static int PMSInput_WordWinTouchWord(PMSInputWork *wk) {
             break;
         }
     }
-    func_0203dac8(&x, &y);
+    GFL_HIDGetTouchPressedPoint(&x, &y);
     pos = wk->wordWin.top * 2;
     done = FALSE;
     for (row = 0; row < WORDWIN_ROWS; row++) {
@@ -1722,7 +1722,7 @@ static int PMSInput_WordWinTouchWord(PMSInputWork *wk) {
         for (col = 0; col < 2; col++) {
             rects[0].left = col * 112 + 16;
             rects[0].right = rects[0].left + 102;
-            if (func_0203dadc(rects, x, y) != -1) {
+            if (GFL_HIDGetTouchRectAt(rects, x, y) != -1) {
                 wk->wordWin.selected = pos;
                 wk->wordWin.x = col;
                 wk->wordWin.y = row;
@@ -1744,7 +1744,7 @@ static int PMSInput_WordWinTouchWord(PMSInputWork *wk) {
 static BOOL PMSInput_WordWinTouchScrollBar(PMSInputWork *wk) {
     u32 x, y;
 
-    if (func_0203da84(&x, &y) == TRUE && wk->scrollBarHeld == TRUE) {
+    if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE && wk->scrollBarHeld == TRUE) {
         PMSIView_SetWordWinScrollBarY(wk->vwk, y);
         return TRUE;
     }

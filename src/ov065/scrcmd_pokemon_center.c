@@ -92,10 +92,10 @@ static void PokemonCenter_AcknowledgeMedal(FieldScriptEnv *env);
 static void PokemonCenter_DiscoverInitialMedals(FieldScriptEnv *env);
 static void PokemonCenter_CheckSpecialMedal(u16 medal, u32 check, u32 threshold, GameData *gameData, MedalBox *box,
                                             MedalCheckContext *ctx, HeapID heapId);
-static BOOL func_ov065_021e5c40(BOOL *typesCaught, u8 type1, u8 type2);
-static void func_ov065_021e5d1c(BoxPkm *pkm, MedalCheckContext *ctx);
-static void func_ov065_021e5e20(MedalCheckContext *ctx, PartyPkm *pkm);
-static u32 func_ov065_021e64d8(const u32 *flags, EventWork *eventWork, int count);
+static BOOL PokemonCenter_ClearCaughtTypes(BOOL *typesCaught, u8 type1, u8 type2);
+static void PokemonCenter_CheckBoxPkm(BoxPkm *pkm, MedalCheckContext *ctx);
+static void PokemonCenter_CheckPartyPkm(MedalCheckContext *ctx, PartyPkm *pkm);
+static u32 PokemonCenter_CountSetFlags(const u32 *flags, EventWork *eventWork, int count);
 
 BOOL PokemonCenterCmd_Medal(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
@@ -305,7 +305,7 @@ static BOOL PokemonCenter_CheckTypes(MedalCheckContext *ctx, GameData *gameData,
         for (i = 0; i <= MEDAL_TYPE_SPECIES_COUNT - 1; i++) {
             entry = &species[i];
             if (entry->counted == TRUE && PokeDex_IsCaught(pokedex, entry->species) == FALSE &&
-                func_ov065_021e5c40(ctx->typesCaught, entry->type1, entry->type2)) {
+                PokemonCenter_ClearCaughtTypes(ctx->typesCaught, entry->type1, entry->type2)) {
                 break;
             }
         }
@@ -315,7 +315,7 @@ static BOOL PokemonCenter_CheckTypes(MedalCheckContext *ctx, GameData *gameData,
 }
 
 // Clears the species' types, and returns TRUE if that cleared the last type left
-static BOOL func_ov065_021e5c40(BOOL *typesCaught, u8 type1, u8 type2) {
+static BOOL PokemonCenter_ClearCaughtTypes(BOOL *typesCaught, u8 type1, u8 type2) {
     BOOL cleared = FALSE;
     int i;
 
@@ -359,13 +359,13 @@ static BOOL PokemonCenter_CheckBoxes(MedalCheckContext *ctx, GameData *gameData,
         for (box = 0; box < 24; box++) {
             for (slot = 0; slot < 30; slot++) {
                 if (BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_SPECIES_VALID, NULL)) {
-                    func_ov065_021e5d1c(BoxSaveAccessor_GetPkm(boxes, box, slot), ctx);
+                    PokemonCenter_CheckBoxPkm(BoxSaveAccessor_GetPkm(boxes, box, slot), ctx);
                 }
             }
         }
         if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
             for (slot = 0; slot < 6; slot++) {
-                func_ov065_021e5d1c(getBoxSlotAddress(battleBox, 0, slot), ctx);
+                PokemonCenter_CheckBoxPkm(getBoxSlotAddress(battleBox, 0, slot), ctx);
             }
         }
         ctx->boxesDone = TRUE;
@@ -373,7 +373,7 @@ static BOOL PokemonCenter_CheckBoxes(MedalCheckContext *ctx, GameData *gameData,
     return TRUE;
 }
 
-static void func_ov065_021e5d1c(BoxPkm *pkm, MedalCheckContext *ctx) {
+static void PokemonCenter_CheckBoxPkm(BoxPkm *pkm, MedalCheckContext *ctx) {
     BOOL wasEncrypted;
 
     if (PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
@@ -404,7 +404,7 @@ static BOOL PokemonCenter_CheckParty(MedalCheckContext *ctx, GameData *gameData,
         for (i = 0; i < count; i++) {
             pkm = PokeParty_GetPkm(party, i);
             wasEncrypted = PokeParty_DecryptPkm(pkm);
-            func_ov065_021e5e20(ctx, pkm);
+            PokemonCenter_CheckPartyPkm(ctx, pkm);
             PokeParty_EncryptPkm(pkm, wasEncrypted);
         }
         ctx->partyDone = TRUE;
@@ -419,7 +419,7 @@ static BOOL PokemonCenter_CheckDayCare(MedalCheckContext *ctx, GameData *gameDat
     if (ctx->dayCareDone == FALSE) {
         for (i = 0; i < 2; i++) {
             if (DayCareSave_GetPkmStatus(dayCare, i)) {
-                func_ov065_021e5e20(ctx, DayCareSave_GetPkm(dayCare, i));
+                PokemonCenter_CheckPartyPkm(ctx, DayCareSave_GetPkm(dayCare, i));
             }
         }
         ctx->dayCareDone = TRUE;
@@ -427,7 +427,7 @@ static BOOL PokemonCenter_CheckDayCare(MedalCheckContext *ctx, GameData *gameDat
     return TRUE;
 }
 
-static void func_ov065_021e5e20(MedalCheckContext *ctx, PartyPkm *pkm) {
+static void PokemonCenter_CheckPartyPkm(MedalCheckContext *ctx, PartyPkm *pkm) {
     if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL) &&
         PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == FALSE) {
         if (ctx->anyPokerus == FALSE && PokeParty_GetParam(pkm, PKM_PARAM_POKERUS, NULL)) {
@@ -554,8 +554,8 @@ static BOOL PokemonCenter_IsType8Caught(MedalCheckContext *ctx, GameData *gameDa
     return PokemonCenter_IsTypeCaught(8, ctx, gameData, heapId);
 }
 
-static BOOL func_ov065_021e6064(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return func_0200ae58(getMusicalInfoBlkAddress(gameData));
+static BOOL PokemonCenter_HasAllMusicalProps(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+    return MusicalSave_HasAllProps(getMusicalInfoBlkAddress(gameData));
 }
 
 static BOOL PokemonCenter_CheckBoxCount(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
@@ -566,16 +566,18 @@ static BOOL PokemonCenter_CheckBoxCount(MedalCheckContext *ctx, GameData *gameDa
     return PokemonCenter_MeetsThreshold(ctx->boxCount, threshold);
 }
 
-static BOOL func_ov065_021e609c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(func_0201795c(gameData), 0), threshold);
+static BOOL PokemonCenter_CheckSingleStreak(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(GameData_GetBSubwayScoreData(gameData), 0),
+                                        threshold);
 }
 
-static BOOL func_ov065_021e60b4(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(func_0201795c(gameData), 1), threshold);
+static BOOL PokemonCenter_CheckDoubleStreak(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(GameData_GetBSubwayScoreData(gameData), 1),
+                                        threshold);
 }
 
-static BOOL func_ov065_021e60cc(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    void *block = func_0201795c(gameData);
+static BOOL PokemonCenter_CheckMultiStreak(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+    void *block = GameData_GetBSubwayScoreData(gameData);
     u16 a = BSubwayScoreData_GetMaxStreak(block, 2);
     u16 b = BSubwayScoreData_GetMaxStreak(block, 3);
 
@@ -585,13 +587,13 @@ static BOOL func_ov065_021e60cc(MedalCheckContext *ctx, GameData *gameData, u32 
     return PokemonCenter_MeetsThreshold(b, threshold);
 }
 
-static BOOL func_ov065_021e6100(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckFriendCount(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     u32 count = 0;
     int i;
     WifiList *wifiList = GameData_GetWifiList(gameData);
 
     for (i = 0; i < 32; i++) {
-        if (func_0200a138(wifiList, i) && func_02009f80(wifiList, i, 9) != 2) {
+        if (WifiList_IsFriendValid(wifiList, i) && WifiList_GetFriendParam(wifiList, i, 9) != 2) {
             count++;
         }
     }
@@ -656,8 +658,8 @@ static BOOL PokemonCenter_HasPokerus(MedalCheckContext *ctx, GameData *gameData,
     return result;
 }
 
-static BOOL func_ov065_021e6268(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(func_ov012_021682a0(GameData_GetMMSys(gameData)), threshold);
+static BOOL PokemonCenter_CheckStrengthRocks(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+    return PokemonCenter_MeetsThreshold(CountMovedStrengthRocks(GameData_GetMMSys(gameData)), threshold);
 }
 
 static BOOL func_ov065_021e6280(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
@@ -692,8 +694,8 @@ static BOOL func_ov065_021e630c(MedalCheckContext *ctx, GameData *gameData, u32 
         0xa5a, 0xa5b, 0xa5c, 0xa5d, 0xa5e, 0xa5f, 0xa60, 0xa61, 0xa62, 0xa63,
     };
 
-    return PokemonCenter_MeetsThreshold(func_ov065_021e64d8(flags, GameData_GetEventWork(gameData), NELEMS(flags)),
-                                        NELEMS(flags));
+    return PokemonCenter_MeetsThreshold(
+        PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
 static BOOL func_ov065_021e6340(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
@@ -702,25 +704,25 @@ static BOOL func_ov065_021e6340(MedalCheckContext *ctx, GameData *gameData, u32 
         0xa6d, 0xa6e, 0xa6f, 0xa70, 0xa71, 0xa72, 0xa73, 0xa74, 0xa75,
     };
 
-    return PokemonCenter_MeetsThreshold(func_ov065_021e64d8(flags, GameData_GetEventWork(gameData), NELEMS(flags)),
-                                        threshold);
+    return PokemonCenter_MeetsThreshold(
+        PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), threshold);
 }
 
 static BOOL func_ov065_021e6374(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     const u32 flags[] = { 0xa76, 0xa77, 0xa78, 0xa79, 0xa7a, 0xa7b, 0xa7c, 0xa7d, 0xa7e, 0xa7f };
 
-    return PokemonCenter_MeetsThreshold(func_ov065_021e64d8(flags, GameData_GetEventWork(gameData), NELEMS(flags)),
-                                        NELEMS(flags));
+    return PokemonCenter_MeetsThreshold(
+        PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
 static BOOL func_ov065_021e63a8(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     const u32 flags[] = { 0x9bd, 0x9be, 0x9bf };
 
-    return PokemonCenter_MeetsThreshold(func_ov065_021e64d8(flags, GameData_GetEventWork(gameData), NELEMS(flags)),
-                                        NELEMS(flags));
+    return PokemonCenter_MeetsThreshold(
+        PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
-static BOOL func_ov065_021e63dc(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_HasVisitedAllTowns(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     const u32 flags[] = {
         EVENT_FLAG_ARRIVED_ASPERTIA_CITY,   EVENT_FLAG_ARRIVED_FLOCCESY_TOWN,
         EVENT_FLAG_ARRIVED_VIRBANK_CITY,    EVENT_FLAG_ARRIVED_POKESTAR_STUDIOS,
@@ -736,8 +738,8 @@ static BOOL func_ov065_021e63dc(MedalCheckContext *ctx, GameData *gameData, u32 
         EVENT_FLAG_ARRIVED_NUVEMA_TOWN,     EVENT_FLAG_ARRIVED_BLACK_CITY_WHITE_FOREST,
     };
 
-    return PokemonCenter_MeetsThreshold(func_ov065_021e64d8(flags, GameData_GetEventWork(gameData), NELEMS(flags)),
-                                        NELEMS(flags));
+    return PokemonCenter_MeetsThreshold(
+        PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
 static BOOL func_ov065_021e6410(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
@@ -777,7 +779,7 @@ static BOOL func_ov065_021e64a0(MedalCheckContext *ctx, GameData *gameData, u32 
 }
 
 // Returns how many of the flags are set
-static u32 func_ov065_021e64d8(const u32 *flags, EventWork *eventWork, int count) {
+static u32 PokemonCenter_CountSetFlags(const u32 *flags, EventWork *eventWork, int count) {
     int i;
     u32 set = 0;
 
@@ -789,7 +791,7 @@ static u32 func_ov065_021e64d8(const u32 *flags, EventWork *eventWork, int count
     return set;
 }
 
-BOOL func_ov065_021e6508(VM *vm, FieldScriptEnv *env) {
+BOOL PokemonCenterCmd_GetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     RecordSave *record = func_0200f2bc(GameData_GetSaveControl(gameData));
@@ -798,17 +800,17 @@ BOOL func_ov065_021e6508(VM *vm, FieldScriptEnv *env) {
 
     switch (info) {
     case 0:
-        *var = func_0200f300(record);
+        *var = RecordSave_IsMatchInProgress(record);
         break;
     case 1:
-        *var = func_0200f308(record);
+        *var = RecordSave_IsMacAddressSame(record);
         break;
     case 2:
-        *var = func_0200f334(record);
+        *var = RecordSave_IsMatchTimedOut(record);
         break;
     case 3:
-        *var = func_02017b8c(gameData);
-        func_02017bb4(gameData);
+        *var = GameData_GetCounter(gameData);
+        GameData_ResetCounter(gameData);
         break;
     case 4:
         *var = func_0200f384(record);
@@ -817,12 +819,12 @@ BOOL func_ov065_021e6508(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov065_021e658c(VM *vm, FieldScriptEnv *env) {
+BOOL PokemonCenterCmd_SetMatchInProgress(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
 
-    func_0200f2dc(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
-    func_02017bb4(gameData);
+    RecordSave_SetMatchInProgress(getRecordBlkAddress(GameData_GetSaveControl(gameData)));
+    GameData_ResetCounter(gameData);
     return FALSE;
 }
 
@@ -852,13 +854,13 @@ BOOL func_ov065_021e65dc(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov065_021e6634(VM *vm, FieldScriptEnv *env) {
+BOOL PokemonCenterCmd_AddBattlePoints(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     RecordSave *record = getRecordBlkAddress(GameData_GetSaveControl(gameData));
     u16 value = ScriptReadAny(vm, env);
 
-    BSubwayScoreData_AddBattlePoints(func_0201795c(gameData), value);
+    BSubwayScoreData_AddBattlePoints(GameData_GetBSubwayScoreData(gameData), value);
     if (value != 0) {
         RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), 0x21, value);
     }
@@ -898,7 +900,7 @@ static MedalCheck sMedalChecks[] = {
     PokemonCenter_CheckBoxCount,
     func_ov065_021e64a0,
     NULL,
-    func_ov065_021e6268,
+    PokemonCenter_CheckStrengthRocks,
     func_ov065_021e6280,
     func_ov065_021e630c,
     PokemonCenter_HasNPokemon,
@@ -912,12 +914,12 @@ static MedalCheck sMedalChecks[] = {
     NULL,
     NULL,
     func_ov065_021e63a8,
-    func_ov065_021e63dc,
+    PokemonCenter_HasVisitedAllTowns,
     PokemonCenter_CheckCategory0,
     func_ov065_021e629c,
-    func_ov065_021e609c,
-    func_ov065_021e60b4,
-    func_ov065_021e60cc,
+    PokemonCenter_CheckSingleStreak,
+    PokemonCenter_CheckDoubleStreak,
+    PokemonCenter_CheckMultiStreak,
     func_ov065_021e6468,
     NULL,
     NULL,
@@ -940,8 +942,8 @@ static MedalCheck sMedalChecks[] = {
     PokemonCenter_CheckCategory1,
     func_ov065_021e62d4,
     NULL,
-    func_ov065_021e6064,
-    func_ov065_021e6100,
+    PokemonCenter_HasAllMusicalProps,
+    PokemonCenter_CheckFriendCount,
     NULL,
     NULL,
     NULL,

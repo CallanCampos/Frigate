@@ -1,0 +1,6 @@
+CasteliaCity20_Text_FriendWorriesAboutEveryones = My friend worries about everyone's\nhealth when they set off on journeys,{be00}\nso he always nicknames Pokémon{be00}\nhe trades “Gesundheit."{be01}\nI wonder how he's doing?
+CasteliaCity20_Text_GesundheitPan = Gesundheit: ...Pan?
+CasteliaCity20_Text_MrLockHeMysterious = Mr. Lock...\nHe was a mysterious man...
+CasteliaCity20_Text_TravelingTrainerUseAmulet = Traveling Trainer!{be01}\nUse this amulet to make sure\nyou are always smiling!{be01}
+CasteliaCity20_Text_WhenPokemonHoldingItem = When a Pokémon holding that item\nparticipates in battle, you get{be00}\nmore Prize Money!
+\pad{82}

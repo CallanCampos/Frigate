@@ -1,0 +1,187 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Golduck",
+    "pokedex": {
+        "category": "Duck Pokémon",
+        "entry": "When its forehead shines mysteriously,\nGolduck can use the full extent\nof its power.",
+        "height": "5'07\"",
+        "weight": "168.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Golduck",
+                "category": "Duck Pokémon",
+                "entry": "It is seen swimming dynamically and\nelegantly using its well-developed\nlimbs and flippers.",
+                "height": "5'07\"",
+                "weight": "168.9 lbs."
+            },
+            "fr": {
+                "name": "Akwakwak",
+                "category": "Pokémon Canard",
+                "entry": "Ses membres palmés et son corps\nparfaitement adapté font de lui\nun nageur exceptionnel.",
+                "height": "1,7 m",
+                "weight": "76,6 kg"
+            },
+            "de": {
+                "name": "Entoron",
+                "category": "Ente",
+                "entry": "Die gut ausgeprägten Flossen\nermöglichen einen sowohl eleganten\nals auch dynamischen Schwimmstil.",
+                "height": "1,7 m",
+                "weight": "76,6 kg"
+            },
+            "it": {
+                "name": "Golduck",
+                "category": "Pokémon Papero",
+                "entry": "Grazie alle sue poderose zampe palmate,\nnuota velocemente e con eleganza.",
+                "height": "1,7 m",
+                "weight": "76,6 kg"
+            },
+            "ko": {
+                "name": "골덕",
+                "category": "오리포켓몬",
+                "entry": "손바닥의 발달한 물갈퀴를 써서\n다이내믹하게, 그리고 품위있게\n헤엄치는 모습을 볼 수 있다.",
+                "height": "1.7 m",
+                "weight": "76.6 kg"
+            },
+            "es": {
+                "name": "Golduck",
+                "category": "Pokémon Pato",
+                "entry": "Sus desarrolladas extremidades y aletas\nle permiten nadar de forma elegante.",
+                "height": "1,7 m",
+                "weight": "76,6 kg"
+            },
+            "ja": {
+                "name": "ゴルダック",
+                "category": "あひるポケモン",
+                "entry": "てのひらの\\x{3000}はったつした\\x{3000}みずかきを\nつかって\\x{3000}ダイナミックに\\x{3000}そして\nゆうがに\\x{3000}およぐ\\x{3000}すがたをみかける。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff16}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 82,
+        "defense": 78,
+        "speed": 85,
+        "special_attack": 95,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_DAMP", "ABILITY_CLOUD_NINE" ],
+    "hidden_ability": "ABILITY_SWIFT_SWIM",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 175,
+    "height": 17,
+    "weight": 766,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_AQUA_JET" ],
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 4, "MOVE_TAIL_WHIP" ],
+            [ 8, "MOVE_WATER_GUN" ],
+            [ 11, "MOVE_DISABLE" ],
+            [ 15, "MOVE_CONFUSION" ],
+            [ 18, "MOVE_WATER_PULSE" ],
+            [ 22, "MOVE_FURY_SWIPES" ],
+            [ 25, "MOVE_SCREECH" ],
+            [ 29, "MOVE_ZEN_HEADBUTT" ],
+            [ 32, "MOVE_AQUA_TAIL" ],
+            [ 38, "MOVE_SOAK" ],
+            [ 43, "MOVE_PSYCH_UP" ],
+            [ 49, "MOVE_AMNESIA" ],
+            [ 54, "MOVE_HYDRO_PUMP" ],
+            [ 60, "MOVE_WONDER_ROOM" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM29",
+            "TM31",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM55",
+            "TM56",
+            "TM65",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_LOW_KICK",
+            "MOVE_ICE_PUNCH",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_WORRY_SEED",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 29,
+    "baby_species": "SPECIES_PSYDUCK",
+    "cry_volume": 110
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MANDIBUZZ",
+    "moves": [ "MOVE_DARK_PULSE", "MOVE_AIR_SLASH", "MOVE_NASTY_PLOT", "MOVE_ROOST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_SALAC_BERRY",
+    "form": 0
+}

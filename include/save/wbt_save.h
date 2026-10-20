@@ -20,16 +20,16 @@ typedef struct {
     u8 padding48[4];
 } WbtSave;
 
-// func_0200fe80, which clears it, is declared in save/trial_house.h, whose block it is part of
-void *func_0200fea0(SaveControl *save);
-u16 func_0200feac(void *save, u32 tournament);
-void func_0200feb4(void *save, u32 tournament);
+// WbtSave_Init, which clears it, is declared in save/trial_house.h, whose block it is part of
+void *TrialHouseSave_GetWbtSave(SaveControl *save);
+u16 WbtSave_GetCount(void *save, u32 tournament);
+void WbtSave_IncrementCount(void *save, u32 tournament);
 // Sets the count of a tournament's slot, and a bit of the table of Trainers beaten
-void func_0200ff28(void *save, u8 index, u16 value);
-BOOL func_0200fec8(WbtSave *wbt, int trainer);
-void func_0200fefc(void *save, int trainer);
-u16 func_0200ff34(void *save, u8 index);
+void WbtSave_SetSlot(void *save, u8 index, u16 value);
+BOOL WbtSave_IsTrainerBeaten(WbtSave *wbt, int trainer);
+void WbtSave_SetTrainerBeaten(void *save, int trainer);
+u16 WbtSave_GetSlot(void *save, u8 index);
 // Whether the checksum of a downloaded tournament's extra save block holds
-BOOL func_02010428(void *data);
+BOOL WbtDownloadData_IsCRCValid(void *data);
 
 #endif // POKEBW2_SAVE_WBT_SAVE_H

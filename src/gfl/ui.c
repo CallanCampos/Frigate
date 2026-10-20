@@ -308,13 +308,13 @@ static void sleepSetup(void) {
 
     if (PAD_DetectFold()) {
         if (!IsSleepBlocked(ui)) {
-            func_0203db7c();
+            GFL_HIDStopTouchSampling();
             CallSleepCallback(ui);
             PM_GoSleepMode(PM_TRIGGER_COVER_OPEN | PM_TRIGGER_CARD, 0, 0);
             CallInputCallback(ui);
             CallLidOpenCallback(ui);
             CallWakeCallback(ui);
-            func_0203db44();
+            GFL_HIDRestartTouchSampling();
             if (ui->lidClosed) {
                 ui->lidClosed = FALSE;
                 setBacklightBothScreens(ui->backlight);
@@ -339,23 +339,23 @@ void GFL_HIDDoSoftReset(u32 parameter) {
 
     GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
-    func_02042860(0);
+    GFL_NetExit(0);
     for (;;) {
-        if (func_02042ab8() && CARD_TryWaitBackupAsync()) {
+        if (GFL_NetIsNotInitialized() && CARD_TryWaitBackupAsync()) {
             setBacklightBothScreens(ui->backlight);
             OS_ResetSystem(parameter);
         }
         OS_WaitIrq(TRUE, OS_IE_V_BLANK);
-        func_020428e0();
+        GFL_NetMainWhileWaiting();
         GFL_FadeUpdate();
     }
 }
 
-BOOL func_0203d554(void) {
+BOOL GCTX_HIDIsUsingTouch(void) {
     return sSystemUI->usingTouch;
 }
 
-void func_0203d564(BOOL touch) {
+void GCTX_HIDSetUsingTouch(BOOL touch) {
     sSystemUI->usingTouch = touch;
 }
 
@@ -399,11 +399,11 @@ static void ApplyInputHook(SystemUI *ui) {
     HIDInputState state30;
 
     if (sInputHook != NULL && sInputHook(&state, &state30)) {
-        func_0203df90(ui, state.pressed, state30.pressed);
-        func_0203dfa0(ui, state.held, state30.held);
-        func_0203dfb0(ui, state.typed, state30.typed);
-        func_0203dbec(ui, state.touchX, state.touchY, state30.touchX, state30.touchY);
-        func_0203dc14(ui, state.touchPressed, state30.touchPressed);
-        func_0203dc2c(ui, state.touchHeld, state30.touchHeld);
+        GFL_HIDSetPressedKeys(ui, state.pressed, state30.pressed);
+        GFL_HIDSetHeldKeys(ui, state.held, state30.held);
+        GFL_HIDSetTypedKeys(ui, state.typed, state30.typed);
+        GFL_HIDSetTouchPos(ui, state.touchX, state.touchY, state30.touchX, state30.touchY);
+        GFL_HIDSetTouchPressed(ui, state.touchPressed, state30.touchPressed);
+        GFL_HIDSetTouchHeld(ui, state.touchHeld, state30.touchHeld);
     }
 }

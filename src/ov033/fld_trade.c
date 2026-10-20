@@ -31,8 +31,8 @@ FieldTradeInput *FieldTradeInput_Create(u32 heapId, u32 offerIndex) {
     input->offerIndex = offerIndex;
     input->offerData = GFL_ArcSysReadHeapNewRange(0xa3, offerIndex, heapId, 0, sizeof(FieldTradeOfferData));
     input->tradeData = GFL_HeapAllocate(heapId, sizeof(PartyPkm), FALSE, "fld_trade.c", 0x67);
-    input->trainer = func_02008b0c(heapId);
-    func_02008b40(input->trainer);
+    input->trainer = PlayerInfo_Create(heapId);
+    PlayerInfo_Init(input->trainer);
     nameBuf = FieldTradeInput_LoadName(heapId, input->offerData->nameMessageId);
     GFL_StrBufStoreString(nameBuf, name, 0x80);
     GFL_StrBufFree(nameBuf);
