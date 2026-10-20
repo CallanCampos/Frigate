@@ -29,10 +29,11 @@ typedef struct {
     u8 unk0;
     u8 unk1;
     u8 unk2;
-    u8 unk3_0 : 7;
+    // The grammatical gender of the word
+    u8 gender : 7;
     u8 unk3_7 : 1;
     // Whether the word gets a layout command in front of it
-    u8 unk4;
+    u8 addLayoutCmd;
 } WordSetAttr;
 
 typedef struct {
@@ -105,7 +106,7 @@ void GFL_WordSetSystemFree(WordSet *wordSet) {
 
 static void GFL_WordSetClearBufFlags(WordSetAttr *attr) {
     MI_CpuFill8(attr, 0, sizeof(WordSetAttr));
-    attr->unk4 = FALSE;
+    attr->addLayoutCmd = FALSE;
 }
 
 static void GFL_WordSetClearBuf(WordSet *wordSet, u32 index) {
@@ -134,11 +135,11 @@ static void GFL_WordSetLoadMsg(WordSet *wordSet, u32 index, u32 fileId, u32 mess
     }
 }
 
-void func_0202437c(WordSet *wordSet, u32 index, const StrBuf *strbuf, u32 a3, u32 a4, u32 a5) {
+void func_0202437c(WordSet *wordSet, u32 index, const StrBuf *strbuf, u32 gender, u32 a4, u32 a5) {
     WordSetAttr attr;
 
     GFL_WordSetClearBufFlags(&attr);
-    attr.unk3_0 = a3;
+    attr.gender = gender;
     attr.unk3_7 = a4 == 0 ? TRUE : FALSE;
     GFL_WordSetCopyStrbuf(wordSet, index, strbuf, &attr);
 }
@@ -226,7 +227,7 @@ void func_02024574(WordSet *wordSet, u32 index, u32 value) {
 
     PMSNumber_Validate(&copy, FALSE);
     if (index < wordSet->count) {
-        wordSet->bufs[index].attr.unk4 = copy;
+        wordSet->bufs[index].attr.addLayoutCmd = copy;
     }
 }
 
@@ -435,7 +436,7 @@ void GFL_WordSetFormatStrbuf(WordSet *wordSet, StrBuf *dest, const StrBuf *src) 
                 u32 i = GFL_WordSetGetCommandParameter(str, 0);
                 WordSetBuf *buf = &wordSet->bufs[i];
 
-                if (buf->attr.unk4) {
+                if (buf->attr.addLayoutCmd) {
                     u16 param = 0x54;
 
                     GFL_StrCmdBuild(buf->strbuf, 0xbd, 4, 1, &param);

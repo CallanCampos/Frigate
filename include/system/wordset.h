@@ -37,7 +37,7 @@ void copyVarForText(WordSet *wordSet, u32 index, PlayerInfo *playerInfo);
 // Puts a place name, from the place names' message file, in a word set
 void loadLocationNameToStrbuf(WordSet *wordSet, u32 index, u32 placeNameId);
 void loadMonthToStrbuf(WordSet *wordSet, u32 index, u32 month);
-void func_0202437c(WordSet *wordSet, u32 index, const StrBuf *strbuf, u32 a3, u32 a4, u32 a5);
+void func_0202437c(WordSet *wordSet, u32 index, const StrBuf *strbuf, u32 gender, u32 a4, u32 a5);
 
 // Formats a number as GFL_WordSetFormatNumber does
 void WordSetNumber(WordSet *wordSet, u32 index, s32 number, u32 digits, u32 pad, BOOL ascii);
