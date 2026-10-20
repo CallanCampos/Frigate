@@ -49,19 +49,33 @@ static void NHttpRap_BuildUrl(NHttpRap *rap, u32 index);
 static void NHttpRap_WriteHeader(NHttpRap *rap, int type);
 
 static void *sRootCertificates[1] = { data_ov011_021866c0 };
+
+// The request URL formats.
+static const char sUrlValidate[52] = "https://pkvldtprod.nintendo.co.jp/pokemon/validate";
+static const char sUrlAccountCreateData[68] = "https://en-ds.pokemon-gl.com/dsio/gw?p=account.createdata&tok=%s";
+static const char sUrlSavedataGetBw[100] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.getbw&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlSavedataUpload[100] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlSavedataDownload[104] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.download&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlAccountPlaystatus[104] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=account.playstatus&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlWorldbattleUpload[104] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=worldbattle.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlSleepilyBitlist[104] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=sleepily.bitlist&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlWorldbattleDownload[108] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=worldbattle.download&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlAccountCreateUpload[108] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=account.create.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
+static const char sUrlSavedataDownloadFinish[112] =
+    "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.download.finish&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s";
 static NHttpRapRequest sRequests[NHTTP_RAP_NUM_REQUESTS] = {
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=account.playstatus&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 0 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=sleepily.bitlist&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 0 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.download&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 0 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 1 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=account.createdata&tok=%s", 1 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=worldbattle.download&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 0 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=worldbattle.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 1 },
-    { "https://pkvldtprod.nintendo.co.jp/pokemon/validate", 1 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.download.finish&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s",
-      1 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=account.create.upload&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 1 },
-    { "https://en-ds.pokemon-gl.com/dsio/gw?p=savedata.getbw&gsid=%u&rom=%u&langcode=%u&dreamw=%u&tok=%s", 0 },
+    { sUrlAccountPlaystatus, 0 },   { sUrlSleepilyBitlist, 0 },   { sUrlSavedataDownload, 0 },
+    { sUrlSavedataUpload, 1 },      { sUrlAccountCreateData, 1 }, { sUrlWorldbattleDownload, 0 },
+    { sUrlWorldbattleUpload, 1 },   { sUrlValidate, 1 },          { sUrlSavedataDownloadFinish, 1 },
+    { sUrlAccountCreateUpload, 1 }, { sUrlSavedataGetBw, 0 },
 };
 static NHttpRap *sNHttpRap;
 
@@ -247,7 +261,8 @@ static void NHttpRap_WriteHeader(NHttpRap *rap, int type) {
     type &= 0xffff;
     if (rap != NULL) {
         rap->size = 0;
-        for (i = 0; (ch = rap->login->token[i]) != '\0'; i = rap->size) {
+        i = rap->size;
+        for (; (ch = rap->login->token[i]) != '\0'; i = rap->size) {
             rap->data[i] = ch;
             rap->size++;
         }
@@ -274,6 +289,7 @@ void NHttpRap_AddPostData(NHttpRap *rap, const void *data, u32 size) {
 }
 
 BOOL NHttpRap_SendValidate(NHttpRap *rap) {
+    static const u32 sValidateRequest = NHTTP_RAP_REQUEST_VALIDATE;
     int request;
     int result;
 
@@ -285,10 +301,9 @@ BOOL NHttpRap_SendValidate(NHttpRap *rap) {
         return FALSE;
     }
     MI_CpuFill8(rap->url, 0, 4);
-    STD_CopyString(rap->url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].url);
-    request =
-        NHTTPCreateConnection(sRequests[NHTTP_RAP_REQUEST_VALIDATE].url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].method,
-                              rap->answer, rap->answerSize, NHttpRap_RequestCallback, NULL);
+    STD_CopyString(rap->url, sRequests[sValidateRequest].url);
+    request = NHTTPCreateConnection(sRequests[sValidateRequest].url, sRequests[sValidateRequest].method, rap->answer,
+                                    rap->answerSize, NHttpRap_RequestCallback, NULL);
     if (request == 0) {
         int error = NHTTPGetError();
 
