@@ -406,7 +406,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | complete | descriptive |
 | `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | complete | descriptive |
 | `vct_audio.c` | `0x02193cb0`–`0x02194aa4` | 14 | partial | descriptive |
-| `vct_buffer.c` | `0x02194aa4`–`0x021956d4` | 25 | partial | descriptive |
+| `vct_buffer.c` | `0x02194aa4`–`0x021956d4` | 25 | complete | descriptive |
 | `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | complete | descriptive |
 | `vct_packet_pool.c` | `0x02196680`–`0x021967c0` | 4 | complete | descriptive |
 | `vct_vad.c` | `0x021967c0`–`0x02196a20` | 4 | complete | descriptive |
@@ -472,7 +472,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | complete | string at `0x0217c624` |
 | `unity_visitor.c` | `0x0217aa1c`–`0x0217ac70` | 6 | complete | descriptive |
 | `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | complete | string at `0x0217c630` |
-| `bsubway_scr.c` | `0x0217b468`–`0x0217c340` | 39 | partial | string at `0x0217c640` |
+| `bsubway_scr.c` | `0x0217b468`–`0x0217c094` | 32 | complete | string at `0x0217c640` |
+| `bsubway_trainers.c` | `0x0217c094`–`0x0217c340` | 7 | complete | descriptive; trainer selection and team construction |
 
 ### Overlay 34
 
@@ -1765,7 +1766,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `mb_parent_sys.c` | `0x0219ce80`–`0x0219eec8` | 28 | partial | string at `0x021a4354` |
 | `mbp.c` | `0x0219eec8`–`0x0219f580` | 16 | complete | string at `0x021a4650` |
 | `mb_comm_sys.c` | `0x0219f580`–`0x0219fc0c` | 47 | complete | string at `0x021a46a8` |
-| `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | partial | string at `0x021a46b8` |
+| `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | complete | string at `0x021a46b8` |
 | `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | partial | string at `0x021a46c8` |
 | `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | partial | descriptive |
 | `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | complete | descriptive |
@@ -2334,7 +2335,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
 | `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
 | `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
-| `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | partial | descriptive |
+| `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
 | `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 
 ### Overlay 261

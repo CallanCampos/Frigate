@@ -3,8 +3,10 @@
 
 // The rail system of the no-grid maps, where the player moves along rails. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except FieldRailSystem_Free, FieldRailSystem_Reset and
-// FieldRailSystem_SetLineEnabled. Layouts from swan's RailPoint, RailLine, RailCurve, RailCamera, RailDataHandle,
-// RailUnit and FieldRailSystem
+// FieldRailSystem_SetLineEnabled, RailUnit_GetMoveDirection, RailUnit_IsMovePending, RailUnit_GetLineDirection,
+// RailUnit_RequestMove and RailUnit_UpdateMove, which are our descriptive names. Layouts from swan's RailPoint,
+// RailLine, RailCurve, RailCamera, RailDataHandle, RailUnit and FieldRailSystem. Additional movement state field
+// names describe recovered behavior; direction follows swan's Direction field.
 
 #include "types.h"
 #include "field/zone.h"
@@ -87,13 +89,13 @@ struct RailDisabledLines {
 // Something that moves along the rails: the point it is at, or the line, with its position along the line (front)
 // and across it (side), in sixteenths of a tile
 struct RailUnit {
-    u16 onLine;
+    u16 onLine; // 0 point, 1 line, 2 no component
     u16 acquired;
     union {
         RailPoint *point;
         RailLine *line;
     } component;
-    u16 active;
+    u16 positionInitialized; // Set after a rail position is initialized
     s32 front;
     s32 length;
     s32 side;
@@ -102,12 +104,12 @@ struct RailUnit {
     u32 dir;
     RailDataHandle *handle;
     RailDisabledLines *disabled;
-    u8 pending;
-    s8 counter;
-    u16 pendingArgB;
-    u16 pendingArgA;
-    u8 unk32;
-    u8 unk33;
+    u8 movePending;
+    s8 moveProgress; // Attempted sixteenths toward the current 16-sixteenth request
+    u16 pendingDir;
+    u16 pendingSpeedIndex;
+    u8 direction;          // Placement/accepted move direction, distinct from dir in the stored rail position
+    u8 lastMoveSpeedIndex; // Accepted request speed index; placement initializes it to 1
     u8 unk34;
     VecFx32 calcPos;
     VecFx32 prevCalcPos;
@@ -195,16 +197,18 @@ u8 func_ov036_021b0814(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *o
 void func_ov036_021b0888(RailUnit *unit, VecFx32 *pos);
 void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos);
 void RailUnit_GetCalcPos(RailUnit *unit, VecFx32 *pos);
-u8 func_ov036_021b09ec(RailUnit *unit);
-// Whether the unit has a step to take
-u8 func_ov036_021b09f4(RailUnit *unit);
+// The placement direction or most recent accepted movement result
+u8 RailUnit_GetMoveDirection(RailUnit *unit);
+// Whether a move is queued or in progress
+u8 RailUnit_IsMovePending(RailUnit *unit);
 // The unit vector along the unit's line
 void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir);
-u32 func_ov036_021b0a8c(RailUnit *unit);
-// Starts a step of speed index speed in a direction, FALSE if the unit is already taking one
-BOOL func_ov036_021b0a94(RailUnit *unit, u32 speed, u32 dir);
-// Moves the unit on with its step
-void func_ov036_021b0ac0(RailUnit *unit);
+// The current line's direction; requires a unit placed on a line
+u32 RailUnit_GetLineDirection(RailUnit *unit);
+// Queues a move when idle. speedIndex must be 0..4 and dir a rail direction.
+BOOL RailUnit_RequestMove(RailUnit *unit, u32 speedIndex, u32 dir);
+// Attempts the indexed step, ending the request on completion or failure
+void RailUnit_UpdateMove(RailUnit *unit);
 FieldCamera *FieldRailSystem_GetFieldCamera(FieldRailSystem *rail);
 RailUnit *FieldRailSystem_GetCameraParentUnit(FieldRailSystem *rail);
 RailPoint *FieldRailSystem_GetPoint(FieldRailSystem *rail, u32 id);
@@ -213,6 +217,7 @@ RailCurve *GetRailHnd2Curve(FieldRailSystem *rail, u32 id);
 fx32 FieldRailSystem_GetTileWidth(FieldRailSystem *rail);
 RailUnit *func_ov036_021b0c00(FieldRailSystem *rail);
 void func_ov036_021b0c04(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out);
+// Returns the component tag: 0 point, 1 line, 2 no component
 u16 RailUnit_IsOnLine(RailUnit *unit);
 RailLine *GetCurrentLine(RailUnit *unit);
 s32 GetCurrentLinePosV(RailUnit *unit);

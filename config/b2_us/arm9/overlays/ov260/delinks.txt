@@ -71,6 +71,7 @@ lib/dwc/src/sc/dwc_competition.c:
     .bss        start:0x021c23d4 end:0x021c2454
 
 lib/dwc/src/gdb/gdb.c:
+    complete
     .text       start:0x021beaa0 end:0x021bf63c
     .data       start:0x021c1514 end:0x021c1ab8
     .bss        start:0x021c2454 end:0x021c24dc

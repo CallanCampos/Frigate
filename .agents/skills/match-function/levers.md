@@ -226,6 +226,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
+- Rail movement's cached line/length allocation differs between caller snapshots passed as parameters and snapshots
+  owned by directional inlines; the latter improves the still-partial function. (matching.md: "snapshot ownership")
 - A local slotted above the temporaries where the original's value sits among them: the expression written at each
   use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
 - A NitroSystem (2.0/sp2p2) function's spill slots in another order: locals are slotted function scope first, then
@@ -613,7 +615,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A -1 built from a shift's 1 (`sub rY, rX, #2`) where the original builds it alone (`mov; mvn`): a mask local set to
   `0xffffffff`, then `mask ^= 1 << bit;`. (matching.md: "the mask was a local set to all ones")
 - A struct local's field loaded through a fresh `add rN, sp, #off` where the original loads through a saved
-  register: a raw buffer read through a typed pointer. (matching.md: "a raw buffer read through a typed pointer")
+  register: a raw buffer read through a typed pointer in `GFL_MsgDataLoadHeader`; first distinguish a shared frame
+  base used for several locals. (matching.md: "a raw buffer")
 - A range test's subtraction repeated after a call, where the original keeps it in a saved register: the variable
   is an `int`, not a `u32`. (matching.md: "subtracts again at each test")
 - An object's address loaded from two literals in one function, where ours keeps one in a register: the object is a
