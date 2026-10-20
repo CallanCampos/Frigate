@@ -1234,16 +1234,16 @@ data_ov182_021c0108 kind:data(any) addr:0x021c0108
 sErrorFonts kind:data(any) addr:0x021c0110
 sErrorCodePos kind:data(any) addr:0x021c0120
 data_ov182_021c0122 kind:data(any) addr:0x021c0122
-data_ov182_021c013c kind:data(any) addr:0x021c013c
-data_ov182_021c013f kind:data(any) addr:0x021c013f
+sAddressButtonPalettes kind:data(any) addr:0x021c013c
+sAddressTitleLabels kind:data(any) addr:0x021c013f
 data_ov182_021c0150 kind:data(any) addr:0x021c0150 ambiguous
-data_ov182_021c015e kind:data(any) addr:0x021c015e
-data_ov182_021c0167 kind:data(any) addr:0x021c0167
-data_ov182_021c0170 kind:data(any) addr:0x021c0170
-data_ov182_021c017b kind:data(any) addr:0x021c017b
-data_ov182_021c018a kind:data(any) addr:0x021c018a
-data_ov182_021c019c kind:data(any) addr:0x021c019c
-data_ov182_021c01b4 kind:data(any) addr:0x021c01b4
+sAddressRowItems kind:data(any) addr:0x021c015e
+sAddressLabelOffsets kind:data(any) addr:0x021c0167
+sAddressItemRows kind:data(any) addr:0x021c0170
+sAddressMarkCells kind:data(any) addr:0x021c017b
+sAddressScreenOffsets kind:data(any) addr:0x021c018a
+sAddressButtonRects kind:data(any) addr:0x021c019c
+sAddressCursorRects kind:data(any) addr:0x021c01b4
 data_ov182_021c01b6 kind:data(any) addr:0x021c01b6
 data_ov182_021c01b8 kind:data(any) addr:0x021c01b8
 data_ov182_021c01e4 kind:data(any) addr:0x021c01e4
@@ -1641,7 +1641,7 @@ sApList kind:bss addr:0x021c40fc
 sWepKeyboard kind:bss addr:0x021c4100
 sAddressEdit kind:bss addr:0x021c4104
 sErrorCode kind:bss addr:0x021c4108
-data_ov182_021c410c kind:bss addr:0x021c410c
+sAddressSettings kind:bss addr:0x021c410c
 data_ov182_021c4114 kind:bss addr:0x021c4114
 data_ov182_021c4118 kind:bss addr:0x021c4118
 data_ov182_021c411c kind:bss addr:0x021c411c

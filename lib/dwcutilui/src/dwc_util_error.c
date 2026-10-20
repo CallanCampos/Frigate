@@ -1,4 +1,5 @@
 #include "dwc_util_error.h"
+#include "dwc_util_address_settings.h"
 #include "dwc_util_connection.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"

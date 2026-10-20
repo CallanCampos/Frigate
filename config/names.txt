@@ -11300,6 +11300,15 @@ overlays/ov182 0x021c00d2 sWepKeyboardColumnX
 overlays/ov182 0x021c00f4 sAddressEditDigitX
 overlays/ov182 0x021c0110 sErrorFonts
 overlays/ov182 0x021c0120 sErrorCodePos
+overlays/ov182 0x021c013c sAddressButtonPalettes
+overlays/ov182 0x021c013f sAddressTitleLabels
+overlays/ov182 0x021c015e sAddressRowItems
+overlays/ov182 0x021c0167 sAddressLabelOffsets
+overlays/ov182 0x021c0170 sAddressItemRows
+overlays/ov182 0x021c017b sAddressMarkCells
+overlays/ov182 0x021c018a sAddressScreenOffsets
+overlays/ov182 0x021c019c sAddressButtonRects
+overlays/ov182 0x021c01b4 sAddressCursorRects
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11364,6 +11373,7 @@ overlays/ov182 0x021c40fc sApList
 overlays/ov182 0x021c4100 sWepKeyboard
 overlays/ov182 0x021c4104 sAddressEdit
 overlays/ov182 0x021c4108 sErrorCode
+overlays/ov182 0x021c410c sAddressSettings
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

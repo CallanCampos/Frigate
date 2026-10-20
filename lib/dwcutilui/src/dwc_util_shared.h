@@ -55,6 +55,9 @@ void func_ov182_021b77dc(void);
 void func_ov182_021b780c(void);
 // Erases the connections of the console's Wi-Fi settings and makes a new Wi-Fi ID
 void func_ov182_021b7ea0(void);
+// Sets whether DHCP gives the address, the mask and the gateway, and the DNS servers, of the connection being edited
+void func_ov182_021b782c(BOOL autoAddress);
+void func_ov182_021b7840(BOOL autoDns);
 
 // Copies row src of the palette to BG palette row dest of the main screen at the next VBlank
 void func_ov182_021b7014(const void *palette, int src, int dest);
@@ -106,6 +109,10 @@ void func_ov182_021b7b20(int index);
 void func_ov182_021b6f38(const void *screen);
 void func_ov182_021b6f78(void);
 void func_ov182_021b6f98(void);
+// Copies rows of a screen of 32 entries a row into that copy, from an offset in the copy on, and loads a palette as the
+// main screen's BG palettes at the next VBlank
+void func_ov182_021b6fac(const u16 *src, int offset, int width, int rows);
+void func_ov182_021b7060(const void *palette);
 
 // The scroll bar of a list: its handle (kind 1 or 2, none for 0) travels range pixels down from x, y. Its event is 1
 // to 3 when the handle is grabbed, dragged and let go, 4 and 6 when an arrow is pressed and 5 and 7 when it is let go
@@ -126,9 +133,10 @@ void func_ov182_021b5bb8(void);
 void func_ov182_021b6588(void);
 // The screen of the button above the list of access points
 void func_ov182_021b5000(void);
-// The settings of a connection, and the row it starts on
-void func_ov182_021b2d48(void);
-void func_ov182_021b43f8(int row);
+// The save of the connection being edited (its file is not written yet)
+void func_ov182_021b4404(void);
+// The connection test with auto-connect (its file is not written yet)
+void func_ov182_021b6104(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet
