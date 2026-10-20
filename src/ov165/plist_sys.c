@@ -1104,7 +1104,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
             PokeParty_SetParam(wk->pkm, PKM_PARAM_MAIL, (u32)mail);
             GFL_HeapFree(mail);
             PokeParty_SetParam(wk->pkm, PKM_PARAM_ITEM, wk->param->item);
-            func_020097d0(wk->param->unk08, 0, wk->param->unk6C);
+            MailBox_ResetMail(wk->param->unk08, 0, wk->param->unk6C);
             PokeList_ShowMessage(wk, 0x6c, TRUE, PokeList_MessageDoneExit);
         } else {
             PokeList_ShowMessage(wk, 0x6d, TRUE, PokeList_MessageDoneExit);

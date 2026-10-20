@@ -185,11 +185,15 @@
 . 0x02009754 MailData_SetDesign
 . 0x0200975c MailData_GetRegion
 . 0x02009760 MailData_GetGameVersion
+. 0x02009764 MailData_GetStampWord
+. 0x02009768 MailData_SetStampWord
 . 0x0200976c MailData_GetMessage
 . 0x0200977c MailData_SetMessage
 . 0x02009790 MailBox_GetFromGameData
 . 0x020097a0 MailBox_GetSize
+. 0x020097a8 MailBox_Clear
 . 0x020097c4 MailBox_GetFreeSlot
+. 0x020097d0 MailBox_ResetMail
 . 0x020097e0 MailBox_SetMail
 . 0x020097f4 MailBox_CopyMail
 . 0x02009818 MailBox_FindFree

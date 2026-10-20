@@ -89,11 +89,11 @@ u8 MailData_GetGameVersion(const MailData *mail) {
     return mail->gameVersion;
 }
 
-u16 func_02009764(const MailData *mail) {
+u16 MailData_GetStampWord(const MailData *mail) {
     return mail->stampWord;
 }
 
-void func_02009768(MailData *mail, u16 value) {
+void MailData_SetStampWord(MailData *mail, u16 value) {
     mail->stampWord = value;
 }
 
@@ -118,7 +118,7 @@ u32 MailBox_GetSize(void) {
     return MAIL_COUNT * sizeof(MailData);
 }
 
-void func_020097a8(MailData *mails) {
+void MailBox_Clear(MailData *mails) {
     int i;
 
     for (i = 0; i < MAIL_COUNT; i++) {
@@ -130,7 +130,7 @@ s32 MailBox_GetFreeSlot(MailData *mails, u32 box) {
     return MailBox_FindFree(mails, MAIL_COUNT);
 }
 
-void func_020097d0(MailData *mails, u32 box, u32 index) {
+void MailBox_ResetMail(MailData *mails, u32 box, u32 index) {
     MailData *mail = MailBox_GetMail(mails, box, index);
 
     if (mail != NULL) {
