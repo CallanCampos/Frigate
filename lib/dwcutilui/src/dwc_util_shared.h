@@ -38,9 +38,13 @@ void func_ov182_021b7d80(const AossResult *result);
 // Takes the SSID and the WEP mode of the access point that the connection test connected to
 void func_ov182_021b7c60(const DWCUtilAcResult *result);
 
-// The rows of buttons of the two layouts
+// The rows of buttons of the two layouts; func_ov182_021b849c starts the task that moves them away,
+// func_ov182_021b854c is whether that task runs and func_ov182_021b87b0 whether they are idle
 void func_ov182_021b8154(int variant);
 void func_ov182_021b84c0(int variant);
+void func_ov182_021b849c(void);
+BOOL func_ov182_021b854c(void);
+BOOL func_ov182_021b87b0(void);
 
 // The utility's sound: its start and its end, around the main loop
 void func_ov182_021b8050(void);
@@ -55,6 +59,9 @@ void func_ov182_021b77dc(void);
 void func_ov182_021b780c(void);
 // Erases the connections of the console's Wi-Fi settings and makes a new Wi-Fi ID
 void func_ov182_021b7ea0(void);
+// The status of a connection of the console's Wi-Fi settings (DWCBmConnection.status), and erases one
+u8 func_ov182_021b7b0c(int index);
+void func_ov182_021b7e78(int index);
 // Saves the connection being edited into its connection of the console's Wi-Fi settings
 void func_ov182_021b7bb0(void);
 // Sets whether DHCP gives the address, the mask and the gateway, and the DNS servers, of the connection being edited
@@ -131,8 +138,9 @@ void func_ov182_021b715c(int pos);
 void func_ov182_021b7164(void);
 void func_ov182_021b7174(void);
 
-// The first screen of the connection settings
-void func_ov182_021b536c(void);
+// The screen after the first screen of the connection settings' wide button
+void func_ov182_021b688c(void);
+
 // The choice of the setup of a connection
 void func_ov182_021b5bb8(void);
 // The message before the connection test

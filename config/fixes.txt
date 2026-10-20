@@ -4002,6 +4002,8 @@ overlays/ov326 0x0219e218 reloc_module overlay(139)
 overlays/ov326 0x0219e22e reloc_module overlay(139)
 overlays/ov326 0x021a3178 add_data data_ov326_021a3178
 overlays/ov327 0x021b6964 reloc_module overlay(196)
+overlays/ov327 0x021b6bb0 reloc_module overlay(196)
+overlays/ov327 0x021b6be8 reloc_module overlay(196)
 overlays/ov328 0x0219ec58 add_data sGPowerAppMessages
 overlays/ov328 0x0219ed40 remove_symbol
 overlays/ov328 0x0219ee40 remove_symbol

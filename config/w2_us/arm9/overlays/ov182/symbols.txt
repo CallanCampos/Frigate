@@ -1253,12 +1253,12 @@ data_ov182_021c01f8 kind:data(any) addr:0x021c0238
 data_ov182_021c0210 kind:data(any) addr:0x021c0250
 data_ov182_021c0260_w2_us kind:data(any) addr:0x021c0260 ambiguous
 data_ov182_021c0228 kind:data(any) addr:0x021c0268
-data_ov182_021c0240 kind:data(any) addr:0x021c0280
-data_ov182_021c0244 kind:data(any) addr:0x021c0284
-data_ov182_021c024c kind:data(any) addr:0x021c028c
+sScreenApCells kind:data(any) addr:0x021c0280
+sScreenApMsgSlots kind:data(any) addr:0x021c0284
+sScreenApButtonPos kind:data(any) addr:0x021c028c
 data_ov182_021c024e kind:data(any) addr:0x021c028e
-data_ov182_021c0264 kind:data(any) addr:0x021c02a4
-data_ov182_021c029c kind:data(any) addr:0x021c02dc
+sScreenApTouchRects kind:data(any) addr:0x021c02a4
+sScreenApCursorRects kind:data(any) addr:0x021c02dc
 data_ov182_021c029e kind:data(any) addr:0x021c02de
 data_ov182_021c02a0 kind:data(any) addr:0x021c02e0
 data_ov182_021c02a2 kind:data(any) addr:0x021c02e2
@@ -1648,7 +1648,7 @@ sTestConnectPassed kind:bss addr:0x021c415c
 sTestDoneFrames kind:bss addr:0x021c4160
 sTestStartPassed kind:bss addr:0x021c4164
 sApSearch kind:bss addr:0x021c4168
-data_ov182_021c412c kind:bss addr:0x021c416c
+sScreenAp kind:bss addr:0x021c416c
 data_ov182_021c4130 kind:bss addr:0x021c4170
 data_ov182_021c4134 kind:bss addr:0x021c4174
 data_ov182_021c413c kind:bss addr:0x021c417c

@@ -335,3 +335,10 @@ lib/dwcutilui/src/dwc_util_ap_search.c:
     .text       start:0x021b5040 end:0x021b53ac
     .data       start:0x021c1224 end:0x021c1268
     .bss        start:0x021c4168 end:0x021c416c
+
+lib/dwcutilui/src/dwc_util_screen_ap.c:
+    complete
+    .text       start:0x021b53ac end:0x021b5bf8
+    .rodata     start:0x021c0280 end:0x021c0334
+    .data       start:0x021c1268 end:0x021c12d8
+    .bss        start:0x021c416c end:0x021c4174

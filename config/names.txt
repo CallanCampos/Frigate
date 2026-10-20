@@ -11309,6 +11309,11 @@ overlays/ov182 0x021c017b sAddressMarkCells
 overlays/ov182 0x021c018a sAddressScreenOffsets
 overlays/ov182 0x021c019c sAddressButtonRects
 overlays/ov182 0x021c01b4 sAddressCursorRects
+overlays/ov182 0x021c0240 sScreenApCells
+overlays/ov182 0x021c0244 sScreenApMsgSlots
+overlays/ov182 0x021c024c sScreenApButtonPos
+overlays/ov182 0x021c0264 sScreenApTouchRects
+overlays/ov182 0x021c029c sScreenApCursorRects
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11379,6 +11384,7 @@ overlays/ov182 0x021c411c sTestConnectPassed
 overlays/ov182 0x021c4120 sTestDoneFrames
 overlays/ov182 0x021c4124 sTestStartPassed
 overlays/ov182 0x021c4128 sApSearch
+overlays/ov182 0x021c412c sScreenAp
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
