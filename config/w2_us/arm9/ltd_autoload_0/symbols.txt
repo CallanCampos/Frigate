@@ -300,14 +300,14 @@ func_0276847c kind:function(thumb,size=0x2) addr:0x0276847c
 func_02768480 kind:function(arm,size=0xc) addr:0x02768480
 func_0276848c kind:function(thumb,size=0x2) addr:0x0276848c
 func_02768490 kind:function(arm,size=0xc) addr:0x02768490
-func_0276849c kind:function(thumb,size=0x88) addr:0x0276849c
+MIi_NDmaFIFOCallback kind:function(thumb,size=0x88) addr:0x0276849c
 func_02768524 kind:function(thumb,size=0x2) addr:0x02768524
 func_02768528 kind:function(arm,size=0xc) addr:0x02768528
 func_02768534 kind:function(thumb,size=0x2) addr:0x02768534
 func_02768538 kind:function(arm,size=0xc) addr:0x02768538
-func_02768544 kind:function(thumb,size=0x44) addr:0x02768544
+MIi_NDmaDMACallback kind:function(thumb,size=0x44) addr:0x02768544
 MI_SendNDmaGXCommandAsyncFast kind:function(thumb,size=0x74) addr:0x02768588
-func_027685fc kind:function(thumb,size=0x18) addr:0x027685fc
+MIi_NDmaDMAFastCallback kind:function(thumb,size=0x18) addr:0x027685fc
 func_02768644 kind:function(thumb,size=0xc) addr:0x02768644
 func_02768650 kind:function(thumb,size=0xc) addr:0x02768650
 func_0276865c kind:function(thumb,size=0xc) addr:0x0276865c
@@ -696,7 +696,7 @@ data_0276af04 kind:bss addr:0x0276af04
 sOuterContext kind:bss addr:0x0276af74
 sInnerContext kind:bss addr:0x0276afd8
 MIi_NDmaConfig kind:bss addr:0x0276b03c
-data_0276b07c kind:bss addr:0x0276b07c
+sGXNDmaState kind:bss addr:0x0276b07c
 data_0276b09c kind:bss addr:0x0276b09c
 data_0276b0a0 kind:bss addr:0x0276b0a0
 data_0276b0a4 kind:bss addr:0x0276b0a4

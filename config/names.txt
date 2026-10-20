@@ -5644,7 +5644,10 @@ ltd_autoload_0 0x0276831c MIi_StartCardNDma
 ltd_autoload_0 0x02768370 MIi_CardNDmaRecv
 ltd_autoload_0 0x02768378 MIi_CameraNDmaRecv
 ltd_autoload_0 0x027683d4 MI_SendNDmaGXCommandAsync
+ltd_autoload_0 0x0276849c MIi_NDmaFIFOCallback
+ltd_autoload_0 0x02768544 MIi_NDmaDMACallback
 ltd_autoload_0 0x02768588 MI_SendNDmaGXCommandAsyncFast
+ltd_autoload_0 0x027685fc MIi_NDmaDMAFastCallback
 ltd_autoload_0 0x02768c04 MI_AllocWramSlot
 ltd_autoload_0 0x02768cf8 MI_FreeWram
 ltd_autoload_0 0x02768d90 MI_FreeWramSlot
@@ -5659,6 +5662,7 @@ ltd_autoload_0 0x0276aebc sPriority
 ltd_autoload_0 0x0276af74 sOuterContext
 ltd_autoload_0 0x0276afd8 sInnerContext
 ltd_autoload_0 0x0276b03c MIi_NDmaConfig
+ltd_autoload_0 0x0276b07c sGXNDmaState
 ltd_autoload_0 0x0276b0ec PMi_PostExitCallbackList
 ltd_autoload_0 0x0276b0f0 PMi_BatteryLowCallbackInfo
 ltd_autoload_0 0x0276b104 sCameraInitialized
