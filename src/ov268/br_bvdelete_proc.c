@@ -318,7 +318,8 @@ static void BrBvDelete_CreateConfirm(BrBvDeleteWork *p_wk, BrBvDeleteProcParam *
     wordSet = BrRes_GetWordSet(p_param->res);
     src = GFL_MsgDataLoadStrbufNew(BrRes_GetMsgData(p_param->res), 0x141);
     str = GFL_StrBufCreate(0x80, p_wk->heapId);
-    func_0202437c(wordSet, 0, p_param->recordInfo->name[p_param->mode], p_param->recordInfo->sex[p_param->mode], 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, p_param->recordInfo->name[p_param->mode], p_param->recordInfo->sex[p_param->mode],
+                         1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(str);

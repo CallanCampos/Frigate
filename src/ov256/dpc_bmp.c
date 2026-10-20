@@ -165,14 +165,14 @@ void DpcBmp_PutPokeInfo(DendouPCWork *wk) {
 
     // The nickname and the trainer's name
     str = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlPokeparam3_Text_Name);
-    func_0202437c(wk->wordSet, 0, poke->nickname, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, poke->nickname, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->expandBuf, str);
     PrintStrAligned(&wk->win[DPCBMP_WIN_INFO], wk->printQueue, 0, 24, wk->expandBuf, wk->font, DPCBMP_COLOR_BLACK,
                     PRINT_ALIGN_LEFT);
     GFL_StrBufFree(str);
 
     str = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlPokeparam3_Text_Ot);
-    func_0202437c(wk->wordSet, 0, poke->trainerName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, poke->trainerName, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->expandBuf, str);
     PrintStrAligned(&wk->win[DPCBMP_WIN_INFO], wk->printQueue, 0, 48, wk->expandBuf, wk->font, DPCBMP_COLOR_BLACK,
                     PRINT_ALIGN_LEFT);

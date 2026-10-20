@@ -643,7 +643,7 @@ static void MedalInfoViewer_PrintMedal(MedalInfoViewer *viewer) {
     StrBuf *buf = GFL_StrBufCreate(49, viewer->heapId);
     StrBuf *fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_SMedalRally);
 
-    func_0202437c(wordSet, 0, viewer->entry->name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, viewer->entry->name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 8, 8, buf, viewer->fontText, MEDAL_INFO_COLOR_TEXT);
     GFL_StrBufFree(buf);
@@ -703,7 +703,7 @@ static void MedalInfoViewer_PrintNoMedal(MedalInfoViewer *viewer) {
     StrBuf *buf = GFL_StrBufCreate(49, viewer->heapId);
     StrBuf *fmt = GFL_MsgDataLoadStrbufNew(viewer->msgMain, MedalInfoViewer_Text_SMedalRally);
 
-    func_0202437c(wordSet, 0, viewer->entry->name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, viewer->entry->name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     PrintWindow_Print(&viewer->printWindow, viewer->printQueue, 8, 8, buf, viewer->fontText, MEDAL_INFO_COLOR_TEXT);
     GFL_StrBufFree(buf);

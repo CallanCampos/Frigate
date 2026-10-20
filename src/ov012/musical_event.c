@@ -952,7 +952,7 @@ void MusicalEvent_WordSetOwnerName(MusicalEventWork *work, u8 pos, WordSet *word
         msgId = MusicalProgram_GetNpcNameMsg(work->program, MusicalEvent_GetNpcIndex(work, index));
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_9, HEAPID_GAMEEVENT);
         name = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-        func_0202437c(wordSet, wordIndex, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, name, 0, 1, 2);
         GFL_StrBufFree(name);
         GFL_MsgDataFree(msgData);
     }
@@ -981,7 +981,7 @@ void MusicalEvent_WordSetPokeName(MusicalEventWork *work, u8 pos, WordSet *wordS
         msgId = MusicalProgram_GetNpcNameMsg(work->program, MusicalEvent_GetNpcIndex(work, index));
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MUSICAL_EVENT, HEAPID_GAMEEVENT);
         name = GFL_MsgDataLoadStrbufNew(msgData, msgId);
-        func_0202437c(wordSet, wordIndex, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, name, 0, 1, 2);
         GFL_StrBufFree(name);
         GFL_MsgDataFree(msgData);
     }

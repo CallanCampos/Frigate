@@ -836,7 +836,7 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
 
     name = GFL_StrBufCreate(64, wk->heapId);
     textCopy(wk->param->playerInfo->name, name);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], WinRecord_Text_Empty_3);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
@@ -851,7 +851,7 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
 
     number = GFL_StrBufCreate(64, wk->heapId);
     GFL_WordSetFormatNumber(number, wk->totalWins, 4, 1, TRUE);
-    func_0202437c(wk->wordSet, 0, number, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, number, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], WinRecord_Text_Empty_2);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
@@ -1176,7 +1176,7 @@ static void WinRecord_PrintItemAt(WinRecordWork *wk, PrintWindow *window, PrintQ
     GFL_StrBufFree(strbuf);
     number = GFL_StrBufCreate(64, wk->heapId);
     GFL_WordSetFormatNumber(number, wk->wins[wk->items[index]], 4, 1, TRUE);
-    func_0202437c(wk->wordSet, 0, number, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, number, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], WinRecord_Text_Empty_2);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);

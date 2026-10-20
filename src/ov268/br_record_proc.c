@@ -1002,7 +1002,7 @@ static void BrRecord_CreateInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
             str = GFL_StrBufCreate(0x80, p_wk->heapId);
             name = GdsProfile_CreateNameStrBuf(p_wk->profile, p_wk->heapId);
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
-            func_0202437c(wordSet, 0, name, GdsProfile_GetSex(p_wk->profile), 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, name, GdsProfile_GetSex(p_wk->profile), 1, 2);
             GFL_WordSetFormatStrbuf(wordSet, str, src);
             GFL_StrBufFree(name);
             GFL_StrBufFree(src);

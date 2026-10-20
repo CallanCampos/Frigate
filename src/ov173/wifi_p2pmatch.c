@@ -963,7 +963,7 @@ static void WifiP2PMatch_SetFriendNameWord(WIFIP2PMATCH_WORK *wk, int friendInde
         u32 gender = WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_GENDER);
 
         WifiList_LoadFriendName(wk->wifiList, friendIndex, wk->expStrBuf);
-        func_0202437c(wk->wordSet, 0, wk->expStrBuf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 0, wk->expStrBuf, gender, 1, 2);
     }
 }
 
@@ -6755,7 +6755,7 @@ static void WifiP2PMatch_ViewSetFriendNameWord(WIFIP2PMATCH_WORK *wk, int friend
     if (friendIndex != -1) {
         sex = WifiList_GetFriendParam(wk->wifiList, friendIndex, 9);
         WifiList_LoadFriendName(wk->wifiList, friendIndex, wk->expStrBuf);
-        func_0202437c(wk->view.wordSet, 0, wk->expStrBuf, sex, 1, 2);
+        GFL_WordSetSetStrbuf(wk->view.wordSet, 0, wk->expStrBuf, sex, 1, 2);
     }
 }
 

@@ -99,7 +99,7 @@ BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     strBuf = GFL_StrBufCreate(8, HEAPID_TAIL(HEAPID_USER));
     GFL_StrBufLoadString(strBuf, name);
-    func_0202437c(wordSet, wordIndex, strBuf, article, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, wordIndex, strBuf, article, 1, 2);
     GFL_StrBufFree(strBuf);
     return FALSE;
 }

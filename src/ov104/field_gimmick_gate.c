@@ -668,12 +668,12 @@ void GimmickGate_AddWeatherMessage(GimmickGateWork *work) {
         formatSet = GFL_WordSetSystemCreate(2, 0x100, work->heapId);
         template = GFL_MsgDataLoadStrbufNew(weatherMessages, GymInsect_Text_Empty_57);
         formatted = GFL_StrBufCreate(0x40, work->heapId);
-        func_0202437c(formatSet, 0, placeName, 0, 1, 0);
-        func_0202437c(formatSet, 1, weatherName, 0, 1, 0);
+        GFL_WordSetSetStrbuf(formatSet, 0, placeName, 0, 1, 0);
+        GFL_WordSetSetStrbuf(formatSet, 1, weatherName, 0, 1, 0);
         GFL_WordSetFormatStrbuf(formatSet, formatted, template);
         GFL_StrBufFree(template);
         GFL_WordSetSystemFree(formatSet);
-        func_0202437c(wordSet, i, formatted, 0, 1, 0);
+        GFL_WordSetSetStrbuf(wordSet, i, formatted, 0, 1, 0);
         GFL_StrBufFree(placeName);
         GFL_StrBufFree(weatherName);
         GFL_StrBufFree(formatted);
@@ -719,7 +719,7 @@ void GimmickGate_AddSwarmMessage(GimmickGateWork *work) {
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     msgData = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, work->heapId);
     zoneName = GFL_MsgDataLoadStrbufNew(msgData, ZoneData_GetPlaceNameID(zone));
-    func_0202437c(wordSet, 0, zoneName, 0, 1, 0);
+    GFL_WordSetSetStrbuf(wordSet, 0, zoneName, 0, 1, 0);
     GFL_StrBufFree(zoneName);
     GFL_MsgDataFree(msgData);
     arg.kind = sMessageKinds[2];

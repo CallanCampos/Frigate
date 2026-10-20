@@ -1650,7 +1650,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     GFL_BitmapFill(BmpWin_GetBitmap(game->infoWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, 59);
     name = GFL_MsgDataLoadStrbufNew(msgData, 67 + selfNetId);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
@@ -2891,7 +2891,7 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
     GFL_BitmapFill(BmpWin_GetBitmap(game->messageWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     name = GFL_MsgDataLoadStrbufNew(msgData, CtvtGame_GetType(game) + 62);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);

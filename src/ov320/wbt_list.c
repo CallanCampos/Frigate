@@ -1173,8 +1173,8 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
         words = 2;
     }
     if (work->mode == MODE_OPENING && words == 1) {
-        func_0202437c(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
-        func_0202437c(wordSet, 1, work->setup->unk9C, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 1, work->setup->unk9C, 0, 1, 2);
     } else {
         first = WbtList_GetMatchValue(work, MATCH_FIRST, 0);
         second = WbtList_GetMatchValue(work, MATCH_SECOND, 0);
@@ -1182,11 +1182,11 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
             first = WbtList_GetMatchValue(work, MATCH_WINNER, 0);
         }
         if (words == 2) {
-            func_0202437c(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
-            func_0202437c(wordSet, 1, work->setup->unk9C, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, work->setup->tournamentName, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 1, work->setup->unk9C, 0, 1, 2);
         } else {
-            func_0202437c(wordSet, 0, work->setup->entrants[first].name, 0, 1, 2);
-            func_0202437c(wordSet, 1, work->setup->entrants[second].name, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, work->setup->entrants[first].name, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 1, work->setup->entrants[second].name, 0, 1, 2);
         }
     }
     if (work->stream != NULL) {

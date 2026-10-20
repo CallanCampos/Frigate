@@ -703,7 +703,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             str = GFL_StrBufCreate(128, heapId);
             name = GdsProfile_CreateNameStrBuf(cp_profile, heapId);
             src = GFL_MsgDataLoadStrbufNew(msg, cp_data->msgID);
-            func_0202437c(wordset, 0, name, GdsProfile_GetSex(cp_profile), TRUE, 2);
+            GFL_WordSetSetStrbuf(wordset, 0, name, GdsProfile_GetSex(cp_profile), TRUE, 2);
             GFL_WordSetFormatStrbuf(wordset, str, src);
             GFL_StrBufFree(name);
             GFL_StrBufFree(src);

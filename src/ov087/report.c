@@ -383,7 +383,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
             StrBuf *name = GFL_StrBufCreate(64, wk->heapId);
 
             GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
-            func_0202437c(wordSet, 0, name, 2, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, name, 2, 1, 2);
             GFL_StrBufFree(name);
         } else {
             loadLocationNameToStrbuf(wordSet, 0, ZoneData_GetPlaceNameID(zoneId));

@@ -284,7 +284,7 @@ static BOOL PokewoodCmd_SetMessageWord(VM *vm, FieldScriptEnv *env) {
         GFL_MsgDataLoadStrbuf(msgData, msgId, strbuf);
         GFL_MsgDataFree(msgData);
     }
-    func_0202437c(wordSet, index, strbuf, 2, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strbuf, 2, 1, 2);
     return FALSE;
 }
 

@@ -60,7 +60,7 @@ BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
     StrBuf *strbuf = GFL_StrBufCreate(64, HEAPID_TAIL(heapId));
 
     GFL_StrBufLoadFixedString(strbuf, name, 8);
-    func_0202437c(wordSet, bufIndex, strbuf, value, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, bufIndex, strbuf, value, 1, 2);
     GFL_StrBufFree(strbuf);
     return FALSE;
 }

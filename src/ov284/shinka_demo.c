@@ -1299,7 +1299,7 @@ static StrBuf *ShinkaDemo_FormatMessage(HeapID heapId, MsgData *msgData, u32 mes
         for (i = 0; i < NELEMS(words); i++) {
             switch (words[i].type) {
             case WORD_STRBUF:
-                func_0202437c(wordSet, i, words[i].value, 0, 1, 0);
+                GFL_WordSetSetStrbuf(wordSet, i, words[i].value, 0, 1, 0);
                 break;
             case WORD_SPECIES:
                 setPartyPokemonSpeciesNameToStrbuf(wordSet, i, words[i].value);

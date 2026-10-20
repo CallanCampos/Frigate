@@ -204,7 +204,7 @@ static BOOL WbtCmd_SetTournamentNameWord(VM *vm, FieldScriptEnv *env) {
     StrBuf *strbuf = ScriptWork_GetAltStrBuf(work);
 
     WbtSystem_LoadTournamentName(sys, tournament, strbuf);
-    func_0202437c(wordSet, index, strbuf, 2, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strbuf, 2, 1, 2);
     return FALSE;
 }
 

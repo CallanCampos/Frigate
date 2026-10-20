@@ -812,7 +812,7 @@ static BOOL ResortShop_UpdateShop(GameSystem *gsys, ResortShopWork *wk, u8 mode,
                     2 +
                 3);
 
-        func_0202437c(wk->wordSet, 2, wk->selected->name, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 2, wk->selected->name, 2, 1, 2);
         if (BagSave_CheckAvailItemSpace(wk->bag, prize, 1, wk->heapId)) {
             ResortShop_PrintItemMessage(wk, wk->msgBase + 63, prize, 1);
             BagSave_AddItem(wk->bag, prize, 1, wk->heapId);
@@ -904,7 +904,7 @@ static BOOL ResortShop_UpdateRecords(GameSystem *gsys, ResortShopWork *wk, u8 mo
         joinAveTextHandler(wk->selected->person, JOIN_AVE_PARAM_NAME, name);
         GFL_StrBufLoadString(strbuf, name);
         gender = joinAveTextHandler(wk->selected->person, 2, NULL);
-        func_0202437c(wk->wordSet, 2, strbuf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 2, strbuf, gender, 1, 2);
         GFL_StrBufFree(strbuf);
         ResortShop_PrintMessage(wk, wk->msgs[2]);
         wk->state = 7;
@@ -1105,7 +1105,7 @@ static void ResortShop_MakeRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode
         label = GFL_StrBufCreate(64, wk->heapId);
         description = GFL_StrBufCreate(128, wk->heapId);
         WordSetNumber(wk->wordSet, 1, n + 1, 1, NUM_PAD_NONE, 1);
-        func_0202437c(wk->wordSet, 0, nameBuf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 0, nameBuf, gender, 1, 2);
         GFL_WordSetFormatStrbuf(wk->wordSet, label, labelFormat);
         WordSetNumber(wk->wordSet, 4, a, 2, NUM_PAD_ZERO, 1);
         WordSetNumber(wk->wordSet, 5, b, 2, NUM_PAD_NONE, 1);
@@ -1182,7 +1182,7 @@ static void ResortShop_SwapRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode
         nameBuf = GFL_StrBufCreate(8, wk->heapId);
         GFL_StrBufLoadString(nameBuf, name);
         WordSetNumber(wk->wordSet, 1, i + 1, 1, NUM_PAD_NONE, 1);
-        func_0202437c(wk->wordSet, 0, nameBuf, gender, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 0, nameBuf, gender, 1, 2);
         WordSetNumber(wk->wordSet, 4, a, 2, NUM_PAD_ZERO, 1);
         WordSetNumber(wk->wordSet, 5, b, 2, NUM_PAD_NONE, 1);
         WordSetNumber(wk->wordSet, 6, c, 2, NUM_PAD_NONE, 1);
@@ -1618,7 +1618,7 @@ static void ResortShop_PrintEntryMessage(ResortShopWork *wk, u32 msgId, ResortSh
     if (entry->kind == 0 && wk->mode == 0) {
         loadItemNameToStrbuf(wk->wordSet, 0, entry->item);
     } else {
-        func_0202437c(wk->wordSet, 0, entry->name, 2, 1, 2);
+        GFL_WordSetSetStrbuf(wk->wordSet, 0, entry->name, 2, 1, 2);
     }
     WordSetNumber(wk->wordSet, 1, entry->count, 2, NUM_PAD_NONE, 1);
     WordSetNumber(wk->wordSet, 2, entry->price, 7, NUM_PAD_NONE, 1);
@@ -1717,7 +1717,7 @@ static StrBuf *ResortShop_MakePersonDescription(ResortShopWork *wk, JoinAvenuePe
     u32 level = JoinAvenueShop_GetField(flags, 1);
     StrBuf *shopName = GFL_MsgDataLoadStrbufNew(msgData, shop + 280);
 
-    func_0202437c(wk->wordSet, 1, shopName, 2, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 1, shopName, 2, 1, 2);
     WordSetNumber(wk->wordSet, 2, level + 1, 2, NUM_PAD_NONE, 1);
     WordSetNumber(wk->wordSet, 4, a, 2, NUM_PAD_ZERO, 1);
     WordSetNumber(wk->wordSet, 5, b, 2, NUM_PAD_NONE, 1);
@@ -1741,7 +1741,7 @@ static void ResortShop_MakePersonEntry(ResortShopWork *wk, ResortPersonData *dat
     u8 gender = joinAveTextHandler(person, 2, NULL);
 
     WordSetNumber(wk->wordSet, 1, index + 1, 1, NUM_PAD_NONE, 1);
-    func_0202437c(wk->wordSet, 0, name, gender, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, gender, 1, 2);
     GFL_WordSetFormatStrbuf(wk->wordSet, label, format);
     GFL_StrBufFree(format);
     if (entry->label == NULL) {

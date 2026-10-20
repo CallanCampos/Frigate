@@ -445,7 +445,7 @@ static void PokeListPlate_DrawEgg(PokeListWork *wk, PokeListPlate *plate) {
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     StrBuf *name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
 
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     PokeList_PrintWordSetString(wk, plate->window, wordSet, 3, 41, 9, 0x440);
     GFL_StrBufFree(name);
     GFL_WordSetSystemFree(wordSet);

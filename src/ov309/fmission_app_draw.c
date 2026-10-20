@@ -675,7 +675,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         room = FMissionAppDraw_GetItemRoom(work, work->result.item);
         count = work->result.itemCount + work->result.bonusCount;
         if (count > room) {
@@ -704,7 +704,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         room = FMissionAppDraw_GetItemRoom(work, work->result.item2);
         count = work->result.item2Count;
         if (count > room) {
@@ -732,11 +732,11 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         GFL_StrBufFree(name);
         side = GFL_MsgDataLoadStrbufNew(work->msgData[0],
                                         sFMissionAppDrawMessages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
-        func_0202437c(work->wordSet, 1, side, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 1, side, 0, 1, 2);
         WordSetNumber(work->wordSet, 2, work->result.levels, 3, 0, TRUE);
         work->message = GFL_StrBufCreate(256, work->heapId);
         format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
@@ -748,7 +748,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
             work->msgData[0], sFMissionAppDrawMessages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
         StrBuf *format;
 
-        func_0202437c(work->wordSet, 0, side, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, side, 0, 1, 2);
         WordSetNumber(work->wordSet, 1, work->result.levels, 3, 0, TRUE);
         work->message = GFL_StrBufCreate(256, work->heapId);
         format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);

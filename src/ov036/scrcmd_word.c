@@ -340,7 +340,7 @@ BOOL s029B_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env) {
     JoinAvenue_GetParam(info, 0, name);
     strBuf = GFL_StrBufCreate(21, heapId);
     GFL_StrBufLoadString(strBuf, name);
-    func_0202437c(wordSet, index, strBuf, 2, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strBuf, 2, 1, 2);
     GFL_StrBufFree(strBuf);
     return FALSE;
 }

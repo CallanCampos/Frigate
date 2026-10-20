@@ -2680,7 +2680,7 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
     } else {
         name = GFL_StrBufClone(param->name, heapId);
         NameEntryParam_GetName(param, name);
-        func_0202437c(wordSet, 0, name, 0, 0, 0);
+        GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 0, 0);
         GFL_StrBufFree(name);
     }
     loadBoxNameForDisplay(wordSet, 1, (void *)param->unk10, param->unk14);

@@ -1624,7 +1624,7 @@ static void MonolithMission_ShowStartMessage(MonolithScreenParam *screen, Monoli
     str = GFL_StrBufCreate(37, HEAPID_MONOLITH);
     FestivalText_LoadMission(mfw->festText, mfw->ids[mfw->cursor], level, &mission);
     FestMission_GetMessage(mfw->festText, str, &mission, MONOLITH_MISSION_TEXT_HEAP);
-    func_0202437c(screen->work->wordSet, 0, str, 0, 1, 2);
+    GFL_WordSetSetStrbuf(screen->work->wordSet, 0, str, 0, 1, 2);
     GFL_StrBufFree(str);
     level = mfw->level + 1;
     if (mfw->flags & MONOLITH_MISSION_FLAG_CHEAT) {

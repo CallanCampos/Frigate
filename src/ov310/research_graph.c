@@ -2036,7 +2036,7 @@ static void ResearchGraph_PrintAnswer(ResearchGraph *wk) {
     name = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_DATA_ANSWERS], answerId);
     str = GFL_StrBufCreate(0x80, wk->heapId);
     WordSetNumber(wk->wordSet, 0, index + 1, 2, 1, 1);
-    func_0202437c(wk->wordSet, 1, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 1, name, 0, 1, 2);
     WordSetNumber(wk->wordSet, 2, total, 5, 1, 1);
     WordSetNumber(wk->wordSet, 3, percent, 3, 1, 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
@@ -2062,7 +2062,7 @@ static void ResearchGraph_PrintPlayerAnswer(ResearchGraph *wk) {
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 14);
     name = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_DATA_ANSWERS], answerId);
     str = GFL_StrBufCreate(0x80, wk->heapId);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
     BGFont_SetVisible(wk->bgFonts[BG_FONT_PLAYER_ANSWER], TRUE);
     BGFont_PrintStr(wk->bgFonts[BG_FONT_PLAYER_ANSWER], str);

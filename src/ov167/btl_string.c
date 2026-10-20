@@ -183,7 +183,7 @@ static void SetTrainerClassName(WordSet *wordSet, u8 index, u8 clientId) {
     StrBuf *name = GetBattleSetupParam(sWork.mainModule)->trainerNames[clientId];
 
     if (name != NULL && GFL_StrBufIsValid(name)) {
-        func_0202437c(wordSet, index, name, TrainerClass_GetSex(trainerClass), 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, index, name, TrainerClass_GetSex(trainerClass), 1, 2);
     } else {
         loadTrainerTypeText(wordSet, index, (u8)trainerClass);
     }
@@ -196,7 +196,7 @@ static void SetTrainerName(WordSet *wordSet, u8 index, u8 clientId) {
     if (clientId != 4) {
         if (IsClientNPCTrainer(sWork.mainModule, clientId)) {
             StrBuf *name = GetClientTrainerName(sWork.mainModule, clientId, &trainerClass);
-            func_0202437c(wordSet, index, name, TrainerClass_GetSex(trainerClass), 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, index, name, TrainerClass_GetSex(trainerClass), 1, 2);
         } else {
             copyVarForText(wordSet, index, GetClientPlayerInfo(sWork.mainModule, clientId));
         }

@@ -931,7 +931,7 @@ static void PkwdCount_PrintTitle(PkwdCountWork *wk) {
     lineId = sPkwdCountTaglines[wk->param->movie][wk->param->gender];
     if (wk->param->title != NULL) {
         buf = GFL_StrBufCreate(0x100, wk->heapId);
-        func_0202437c(wordSet, 0, wk->param->title, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 0, wk->param->title, 0, 1, 2);
         tagline = GFL_MsgDataLoadStrbufNew(wk->msgData[0], lineId);
         GFL_WordSetFormatStrbuf(wordSet, buf, tagline);
         PkwdCount_PrintText(wk, 1, 0x68, 0, buf, ALIGN_CENTER, PRINT_COLOR(1, 2, 0));

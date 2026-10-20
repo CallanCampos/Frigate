@@ -1799,8 +1799,8 @@ static void CommEntryMenu_BuildLeaderOptions(CommEntryMenu *menu) {
             GFL_WordSetFormatStrbuf(menu->wordSet, line, leaderFmt);
         } else {
             GFL_StrBufLoadString(empty, &eom);
-            func_0202437c(menu->wordSet, 1, empty, 0, 1, 2);
-            func_0202437c(menu->wordSet, 2, empty, 0, 1, 2);
+            GFL_WordSetSetStrbuf(menu->wordSet, 1, empty, 0, 1, 2);
+            GFL_WordSetSetStrbuf(menu->wordSet, 2, empty, 0, 1, 2);
             GFL_WordSetFormatStrbuf(menu->wordSet, line, emptyFmt);
         }
         AppendListMenuOption(menu->list.options, line, i, menu->heapId);

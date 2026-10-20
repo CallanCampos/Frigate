@@ -403,7 +403,7 @@ static BOOL BeaconView_CheckGreeting(BeaconViewWork *work) {
         return FALSE;
     }
     *changed = FALSE;
-    func_0202437c(work->wordSet, 0, BeaconStatus_GetGreeting(work->status), work->gender, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, BeaconStatus_GetGreeting(work->status), work->gender, 1, 2);
     BeaconView_ShowMessage(work, GameBeacon_Text_Said);
     return TRUE;
 }
@@ -417,7 +417,7 @@ static BOOL BeaconView_CheckPassPower(BeaconViewWork *work) {
             BeaconStatus_ClearGivenPassPower(work->status);
             return FALSE;
         }
-        func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
         BeaconView_OfferPassPower(work, passPower, FALSE, &work->pending);
         return TRUE;
     }
@@ -443,9 +443,9 @@ static BOOL BeaconView_CheckMission(BeaconViewWork *work) {
     if (!BeaconView_GetMissionOffer(work->festival, &config, work->strTemplate)) {
         return FALSE;
     }
-    func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
     FestMission_GetMessage(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
-    func_0202437c(work->wordSet, 1, work->strTemplate, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 1, work->strTemplate, 0, 1, 2);
     BeaconView_OfferMission(work, &config, &work->pending);
     return TRUE;
 }
@@ -602,7 +602,7 @@ static int BeaconView_UpdateThanks(BeaconViewWork *work) {
         u8 dataIndex = GameBeaconInfoTable_RingIndex(work->log, work->selected + work->top);
         BeaconViewPanel *panel = BeaconView_FindPanel(work, dataIndex);
 
-        func_0202437c(work->wordSet, 0, panel->name, panel->gender, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, panel->name, panel->gender, 1, 2);
         BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
         BeaconView_ShowMessage(work, GameBeacon_Text_Thanked);
         GameBeacon_BroadcastThanks(work->gameData, panel->trainerId);

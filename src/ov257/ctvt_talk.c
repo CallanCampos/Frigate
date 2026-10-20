@@ -1202,7 +1202,7 @@ static void CtvtTalk_PrintCountdown(CommTvtWork *sys, CtvtTalk *talk, u32 msgId,
     GFL_MsgDataLoadStrbuf(msgData, msgId, talk->message);
     nameId = CtvtGame_GetType(game) + 62;
     gameName = GFL_MsgDataLoadStrbufNew(msgData, nameId);
-    func_0202437c(wordSet, 0, gameName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, gameName, 0, 1, 2);
     WordSetNumber(wordSet, 1, count, 2, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, talk->expanded, talk->message);
     GFL_StrBufFree(gameName);
@@ -1226,11 +1226,11 @@ static void CtvtTalk_PrintGameMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgI
     GFL_BitmapFill(BmpWin_GetBitmap(talk->gameWindowSub), 15);
     message = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     if (name != NULL) {
-        func_0202437c(wordSet, index, name, index, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, index, name, index, 1, 2);
         index++;
     }
     gameName = GFL_MsgDataLoadStrbufNew(msgData, CtvtGame_GetType(game) + 62);
-    func_0202437c(wordSet, index, gameName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, gameName, 0, 1, 2);
     GFL_StrBufFree(gameName);
     GFL_WordSetFormatStrbuf(wordSet, talk->expanded, message);
     GFL_StrBufFree(message);

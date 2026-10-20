@@ -2401,8 +2401,8 @@ static void DupFitting_PrintItemName(DupFittingWork *work, DupFittingItemNode *n
 
     category += TitleS005dWordSetMusicalInfo_Text_Ear;
     categoryName = GFL_MsgDataLoadStrbufNew(work->categoryMsg, category);
-    func_0202437c(wordSet, 0, itemName, 0, 1, 2);
-    func_0202437c(wordSet, 1, categoryName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, itemName, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 1, categoryName, 0, 1, 2);
     DupFitting_PrintMessage(work, Title3_Text_PropLooksNice, wordSet);
     GFL_StrBufFree(categoryName);
     GFL_StrBufFree(itemName);
@@ -2443,7 +2443,7 @@ static void DupFitting_PrintCategory(DupFittingWork *work, s32 category) {
     }
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     name = GFL_MsgDataLoadStrbufNew(work->categoryMsg, messageId);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     DupFitting_PrintMessage(work, Title3_Text_PropsLookNiceWere, wordSet);
     GFL_StrBufFree(name);
     GFL_WordSetSystemFree(wordSet);

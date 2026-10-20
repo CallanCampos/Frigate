@@ -414,7 +414,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         save = getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env));
         str = GFL_StrBufCreate(0x26, heapId);
         GFL_StrBufLoadFixedString(str, MusicalSave_GetName(save), 0x26);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         break;
     case 1:
@@ -425,26 +425,26 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_MUSICAL, heapId);
         }
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 3);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
     case 2:
         str = MusicalEvent_GetProgramTitle(GameData_GetMusicalCommWork(gameData)->event, heapId);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         break;
     case 3:
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         str = GFL_MsgDataLoadStrbufNew(msgData, arg);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
     case 4:
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 4);
-        func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
@@ -494,7 +494,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         for (i = 0; i < 3; i++) {
             str = GFL_MsgDataLoadStrbufNew(msgData, messages[i]);
-            func_0202437c(wordSet, i, str, 0, 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, i, str, 0, 1, 2);
             GFL_StrBufFree(str);
         }
         GFL_MsgDataFree(msgData);

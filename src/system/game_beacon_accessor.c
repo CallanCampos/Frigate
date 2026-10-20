@@ -681,7 +681,7 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         return;
     }
     GameBeacon_GetName(beacon, str);
-    func_0202437c(wordSet, 0, str, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, str, 0, 1, 2);
     format = GameBeacon_GetTypeFormat(GameBeacon_GetType(beacon));
     switch (format) {
     case BEACON_FORMAT_TRAINER: {
@@ -700,7 +700,7 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         // fallthrough
     case BEACON_FORMAT_NICKNAME:
         GameBeacon_GetNickname(beacon, str);
-        func_0202437c(wordSet, 2, str, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 2, str, 0, 1, 2);
         break;
     case BEACON_FORMAT_ITEM:
         loadItemTextNameToStrbuf(wordSet, 1, GameBeacon_GetItem(beacon));
@@ -731,7 +731,7 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         break;
     case BEACON_FORMAT_TEXT:
         GameBeacon_GetTextMessage(beacon, str);
-        func_0202437c(wordSet, 1, str, GameBeacon_GetGender(beacon), 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 1, str, GameBeacon_GetGender(beacon), 1, 2);
         break;
     case BEACON_FORMAT_POKEWOOD:
         loadPokewoodLineToStrbuf(wordSet, 1, GameBeacon_GetPokewoodLine(beacon));

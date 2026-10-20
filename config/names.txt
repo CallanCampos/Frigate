@@ -1367,6 +1367,7 @@
 . 0x020232d0 GFL_TextRndInitColorIndexLUT
 . 0x020232d8 GFL_TextRndResetColorIndexLUT
 . 0x02023a38 GFL_BitReaderInit
+. 0x0202437c GFL_WordSetSetStrbuf
 . 0x0202483c WordSet_LoadPWTTournamentType
 . 0x02024868 WordSet_LoadFestivalMission
 . 0x02024d58 FreeCursorImageEndOfHeap

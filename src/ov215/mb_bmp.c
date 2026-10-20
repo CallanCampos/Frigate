@@ -177,7 +177,7 @@ static void MailBox_RegisterAuthorName(MailBoxWork *work, int unused) {
     // The original fetches the name twice and drops the first result
     MailData_GetTrainerName(mail);
     GFL_StrBufLoadString(name, MailData_GetTrainerName(mail));
-    func_0202437c(work->view->wordSet, 0, name, MailData_GetTrainerGender(mail), 1, 2);
+    GFL_WordSetSetStrbuf(work->view->wordSet, 0, name, MailData_GetTrainerGender(mail), 1, 2);
     GFL_StrBufFree(name);
 }
 

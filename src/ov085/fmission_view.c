@@ -475,7 +475,7 @@ static BOOL FMissionView_CheckGreeting(FMissionView *view) {
         return FALSE;
     }
     *changed = 0;
-    func_0202437c(view->wordSet, 0, BeaconStatus_GetGreeting(view->beaconStatus), view->gender, 1, 2);
+    GFL_WordSetSetStrbuf(view->wordSet, 0, BeaconStatus_GetGreeting(view->beaconStatus), view->gender, 1, 2);
     FMissionView_ShowMessage(view, FmissionViewSetup_Text_Said);
     return TRUE;
 }
@@ -1121,7 +1121,7 @@ static BOOL FMissionView_OfferEntryPassPower(FMissionView *view, FestMissionLogE
 }
 
 static BOOL FMissionView_OfferPassPower(FMissionView *view, u32 passPower, StrBuf *name, int received) {
-    func_0202437c(view->wordSet, 0, name, 2, 1, 2);
+    GFL_WordSetSetStrbuf(view->wordSet, 0, name, 2, 1, 2);
     return FMissionView_StartPassPower(view, passPower, received, &view->pending);
 }
 
