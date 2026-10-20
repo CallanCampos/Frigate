@@ -15,11 +15,13 @@ struct TrainerDataSave {
     Config config;
     PlayerInfo playerInfo;
     PlayTime playTime;
-    u8 unk2C;
+    // Set by the intro's save of a new game, which a load then treats as no save
+    u8 isIntroSave;
     u8 unk2D[3];
     // Each is TRAINER_DATA_MARKER_SET once something has happened
     u16 markers[TRAINER_DATA_MARKER_COUNT];
-    u32 unk5C[21];
+    // The save count of each extra save block
+    u32 extraSaveCounts[21];
 };
 
 u32 getSizeofTrainerData(void);
