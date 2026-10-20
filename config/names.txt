@@ -5698,6 +5698,7 @@ ltd_autoload_0 0x027692b8 OSi_EnterNDmaCallbackCore
 ltd_autoload_0 0x027692ec OSi_InitArenaExTwl
 ltd_autoload_0 0x02769318 OSi_IsAvailableWirelessTwl
 ltd_autoload_0 0x02769334 OSi_IsForceDisableWirelessTwl
+ltd_autoload_0 0x0276934c OSi_FindSystemTitleId
 ltd_autoload_0 0x027694dc PM_ReadyToExit
 ltd_autoload_0 0x0276952c PM_AppendPreExitCallback
 ltd_autoload_0 0x02769550 PM_InsertPreExitCallback
@@ -5714,6 +5715,7 @@ ltd_autoload_0 0x0276b0a0 sReplyDone
 ltd_autoload_0 0x0276b0a4 sReplyData
 ltd_autoload_0 0x0276b0a8 sRequestBusy
 ltd_autoload_0 0x0276b0ac sWramState
+ltd_autoload_0 0x0276b0dc OSi_SenderTitleId
 ltd_autoload_0 0x0276b0ec PMi_PostExitCallbackList
 ltd_autoload_0 0x0276b0f0 PMi_BatteryLowCallbackInfo
 ltd_autoload_0 0x0276b104 sCameraInitialized

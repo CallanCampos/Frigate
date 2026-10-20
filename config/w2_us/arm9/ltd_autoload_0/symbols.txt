@@ -375,7 +375,7 @@ func_02769304 kind:function(arm,size=0xc) addr:0x02769304
 func_02769310 kind:function(arm,size=0x8) addr:0x02769310
 OSi_IsAvailableWirelessTwl kind:function(thumb,size=0x1c) addr:0x02769318
 OSi_IsForceDisableWirelessTwl kind:function(thumb,size=0x18) addr:0x02769334
-func_0276934c kind:function(arm,size=0x90) addr:0x0276934c
+OSi_FindSystemTitleId kind:function(arm,size=0x90) addr:0x0276934c
 func_027693dc kind:function(thumb,size=0x22) addr:0x027693dc
 func_02769400 kind:function(thumb,size=0x2) addr:0x02769400
 func_02769404 kind:function(arm,size=0xc) addr:0x02769404
@@ -706,7 +706,7 @@ sReplyDone kind:bss addr:0x0276b0a0
 sReplyData kind:bss addr:0x0276b0a4
 sRequestBusy kind:bss addr:0x0276b0a8
 sWramState kind:bss addr:0x0276b0ac
-data_0276b0dc kind:bss addr:0x0276b0dc
+OSi_SenderTitleId kind:bss addr:0x0276b0dc
 data_0276b0e4 kind:bss addr:0x0276b0e4
 data_0276b0e8 kind:bss addr:0x0276b0e8
 PMi_PostExitCallbackList kind:bss addr:0x0276b0ec

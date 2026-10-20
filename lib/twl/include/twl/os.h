@@ -5,7 +5,8 @@
 #include "nitro/os.h"
 
 // TwlSDK's OS code in the LTD autoload: the DSi's parts of NitroSDK's OS functions, which main's OS code calls when
-// the game runs on a DSi. The functions keep their default names until the LTD autoload is analyzed
+// the game runs on a DSi (os_interrupt_twl.c, os_arena_twl.c, os_ownerInfoEx_twl.c and os_application_jump_twl.c).
+// The names are ours
 
 // The pointer to the DSi's system settings, which the system puts in the shared memory
 #define HW_TWL_SETTINGS_BUF_PTR 0x02fffdfc
@@ -40,10 +41,10 @@ void OSi_InitArenaExTwl(void);
 // Looks a title ID up in the list that the system leaves in the shared memory (a count of at most 0x76 at 0x02ffd800,
 // the 64-bit IDs from 0x02ffd850). Gives the first entry that equals titleId on the bits of mask and has bit 35 clear,
 // or 0 when there is none
-u64 func_0276934c(u64 titleId, u64 mask);
+u64 OSi_FindSystemTitleId(u64 titleId, u64 mask);
 
 // The title ID of the program that left the arguments, which os_application_jump.c keeps in the .bss of the DSi-only
-// LTD autoload. No file owns the word yet
-extern u64 data_0276b0dc;
+// LTD autoload (os_application_jump_twl.c)
+extern u64 OSi_SenderTitleId;
 
 #endif // POKEBW2_TWL_OS_H
