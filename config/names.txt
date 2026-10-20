@@ -16726,6 +16726,11 @@ overlays/ov182 0x021bfed0 sKeyPositions
 overlays/ov182 0x021bfef8 sKeypadCursorPositions
 overlays/ov182 0x021bff30 sKeypadNavigation
 overlays/ov182 0x021bff88 sClientName
+overlays/ov182 0x021bff98 sMainMenuButtonRects
+overlays/ov182 0x021bffa8 sMainMenuCursorRects
+overlays/ov182 0x021bffd0 sButtonRows
+overlays/ov182 0x021bffd8 sOptionMenuButtonRects
+overlays/ov182 0x021bfff0 sOptionMenuCursorRects
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -16741,6 +16746,7 @@ overlays/ov182 0x021c0994 sKeyLabels
 overlays/ov182 0x021c09a0 sSpecialSounds
 overlays/ov182 0x021c0b6c sNasUrl
 overlays/ov182 0x021c0bd0 sGame
+overlays/ov182 0x021c0c5c sMsgPaths
 overlays/ov182 0x021c18ac stateNames
 overlays/ov182 0x021c1b04 sKcFontPaths
 overlays/ov182 0x021c1b0c sFontPaths
@@ -16773,6 +16779,14 @@ overlays/ov182 0x021c408c sMain
 overlays/ov182 0x021c40ac sMsgWork
 overlays/ov182 0x021c40b0 sMove
 overlays/ov182 0x021c40b4 sStatus
+overlays/ov182 0x021c40bc sMainMenu
+overlays/ov182 0x021c40c4 sErase
+overlays/ov182 0x021c40c8 sOptionMenu
+overlays/ov182 0x021c40d4 sMoveResult
+overlays/ov182 0x021c40d8 sYes
+overlays/ov182 0x021c40dc sFrames
+overlays/ov182 0x021c40e0 sNoticeScreen
+overlays/ov182 0x021c40e4 sPageMove
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

@@ -1,4 +1,5 @@
 #include "dwc_util_gfx_resource.h"
+#include "dwc_util_connection.h"
 #include "dwc_util_main.h"
 #include "dwc_util_msg_resource.h"
 #include "dwc_util_rom_resource.h"

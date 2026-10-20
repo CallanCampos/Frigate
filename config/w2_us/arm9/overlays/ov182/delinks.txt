@@ -198,4 +198,53 @@ lib/dwcutilui/src/dwc_util_move.c:
 lib/dwcutilui/src/dwc_util_connection.c:
     complete
     .text       start:0x021ae418 end:0x021ae534
-    .bss        start:0x021c40f4 end:0x021c40f8
+    .bss        start:0x021c40f4 end:0x021c40fc
+
+lib/dwcutilui/src/dwc_util_main_menu.c:
+    .text       start:0x021ae534 end:0x021aeb3c
+    .rodata     start:0x021bffd4 end:0x021c0010
+    .data       start:0x021c0c2c end:0x021c0e14
+    .bss        start:0x021c40fc end:0x021c4104
+
+lib/dwcutilui/src/dwc_util_info_menu.c:
+    complete
+    .text       start:0x021aeb3c end:0x021af29c
+    .data       start:0x021c0e14 end:0x021c0e98
+    .bss        start:0x021c4104 end:0x021c4108
+
+lib/dwcutilui/src/dwc_util_option_menu.c:
+    complete
+    .text       start:0x021af29c end:0x021af754
+    .rodata     start:0x021c0010 end:0x021c0078
+    .data       start:0x021c0e98 end:0x021c0ec8
+    .bss        start:0x021c4108 end:0x021c4114
+
+lib/dwcutilui/src/dwc_util_top_menu.c:
+    complete
+    .text       start:0x021af754 end:0x021afbe4
+    .data       start:0x021c0ec8 end:0x021c0edc
+    .bss        start:0x021c4114 end:0x021c4118
+
+lib/dwcutilui/src/dwc_util_prompt_yes_no.c:
+    complete
+    .text       start:0x021afbe4 end:0x021afe2c
+    .data       start:0x021c0edc end:0x021c0ef0
+    .bss        start:0x021c4118 end:0x021c411c
+
+lib/dwcutilui/src/dwc_util_timed_notice.c:
+    complete
+    .text       start:0x021afe2c end:0x021aff7c
+    .data       start:0x021c0ef0 end:0x021c0f04
+    .bss        start:0x021c411c end:0x021c4120
+
+lib/dwcutilui/src/dwc_util_notice_screen.c:
+    complete
+    .text       start:0x021aff7c end:0x021b01d8
+    .data       start:0x021c0f04 end:0x021c0f18
+    .bss        start:0x021c4120 end:0x021c4124
+
+lib/dwcutilui/src/dwc_util_page_move.c:
+    complete
+    .text       start:0x021b01d8 end:0x021b0460
+    .data       start:0x021c0f18 end:0x021c0f2c
+    .bss        start:0x021c4124 end:0x021c4128

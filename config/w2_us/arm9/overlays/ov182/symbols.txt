@@ -1197,17 +1197,17 @@ data_ov182_021bff78 kind:data(any) addr:0x021bffb8
 data_ov182_021bff80 kind:data(any) addr:0x021bffc0
 sClientName kind:data(any) addr:0x021bffc8
 data_ov182_021bff94 kind:data(any) addr:0x021bffd4
-data_ov182_021bff98 kind:data(any) addr:0x021bffd8
-data_ov182_021bffa8 kind:data(any) addr:0x021bffe8
+sMainMenuButtonRects kind:data(any) addr:0x021bffd8
+sMainMenuCursorRects kind:data(any) addr:0x021bffe8
 data_ov182_021bffaa kind:data(any) addr:0x021bffea
 data_ov182_021bffac kind:data(any) addr:0x021bffec
 data_ov182_021bffae kind:data(any) addr:0x021bffee
 data_ov182_021bffb8 kind:data(any) addr:0x021bfff8
 data_ov182_021c0001_w2_us kind:data(any) addr:0x021c0001 ambiguous
-data_ov182_021bffd0 kind:data(any) addr:0x021c0010
-data_ov182_021bffd8 kind:data(any) addr:0x021c0018
+sButtonRows kind:data(any) addr:0x021c0010
+sOptionMenuButtonRects kind:data(any) addr:0x021c0018
 data_ov182_021c001c_w2_us kind:data(any) addr:0x021c001c ambiguous
-data_ov182_021bfff0 kind:data(any) addr:0x021c0030
+sOptionMenuCursorRects kind:data(any) addr:0x021c0030
 data_ov182_021bfff2 kind:data(any) addr:0x021c0032
 data_ov182_021bfff4 kind:data(any) addr:0x021c0034
 data_ov182_021bfff6 kind:data(any) addr:0x021c0036
@@ -1377,7 +1377,7 @@ data_ov182_021c0c1c kind:data(any) addr:0x021c0c5c
 data_ov182_021c0c2c kind:data(any) addr:0x021c0c6c
 data_ov182_021c0c3c kind:data(any) addr:0x021c0c7c
 data_ov182_021c0c4c kind:data(any) addr:0x021c0c8c
-data_ov182_021c0c5c kind:data(any) addr:0x021c0c9c
+sMsgPaths kind:data(any) addr:0x021c0c9c
 data_ov182_021c0c78 kind:data(any) addr:0x021c0cb8
 data_ov182_021c0c88 kind:data(any) addr:0x021c0cc8
 data_ov182_021c0c9c kind:data(any) addr:0x021c0cdc
@@ -1625,14 +1625,14 @@ sMsgWork kind:bss addr:0x021c40ec
 sMove kind:bss addr:0x021c40f0
 sStatus kind:bss addr:0x021c40f4
 data_ov182_021c40b8 kind:bss addr:0x021c40f8
-data_ov182_021c40bc kind:bss addr:0x021c40fc
-data_ov182_021c40c4 kind:bss addr:0x021c4104
-data_ov182_021c40c8 kind:bss addr:0x021c4108
-data_ov182_021c40d4 kind:bss addr:0x021c4114
-data_ov182_021c40d8 kind:bss addr:0x021c4118
-data_ov182_021c40dc kind:bss addr:0x021c411c
-data_ov182_021c40e0 kind:bss addr:0x021c4120
-data_ov182_021c40e4 kind:bss addr:0x021c4124
+sMainMenu kind:bss addr:0x021c40fc
+sErase kind:bss addr:0x021c4104
+sOptionMenu kind:bss addr:0x021c4108
+sMoveResult kind:bss addr:0x021c4114
+sYes kind:bss addr:0x021c4118
+sFrames kind:bss addr:0x021c411c
+sNoticeScreen kind:bss addr:0x021c4120
+sPageMove kind:bss addr:0x021c4124
 data_ov182_021c40e8 kind:bss addr:0x021c4128
 data_ov182_021c40ec kind:bss addr:0x021c412c
 data_ov182_021c40f4 kind:bss addr:0x021c4134

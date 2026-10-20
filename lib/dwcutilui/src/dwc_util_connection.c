@@ -8,6 +8,9 @@ static void func_ov182_021ae4cc(const DWCUtilAcStatus *status);
 static void *func_ov182_021ae4e0(u32 size);
 static void func_ov182_021ae4ec(void *ptr);
 
+// Defined in this file, which doesn't read it, since dwc_util_main_menu.c reaches its own .bss from the address of
+// its first static
+DWCUtilMsg *data_ov182_021c40b8;
 static DWCUtilAcStatus *sStatus;
 
 void func_ov182_021ae3d8(void) {

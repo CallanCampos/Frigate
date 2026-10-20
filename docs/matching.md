@@ -3408,6 +3408,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
   `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, and
   `dwc_util_main_menu.c`'s message paths, each padded to 4 bytes, are literals too.
+- MWCC shares a file's equal string literals, so one string in two places of the ROM's `.data` of one file, each
+  4-aligned, is not two uses of one literal. `dwc_util_info_menu.c` loads `char/yb5Multi.nsc.l` in two functions and
+  the ROM has a copy for each: the file links only with `-str noreuse` in its `file_flags`, which gives every use a
+  literal of its own, as `dwc_util_main_menu.c` needs for its two paths of the menu's graphics. `dwc_util_text.c`'s
+  two font tables share one string, so the flag is the file's, not its library's.
 - A global that no code refers to can be declared anywhere in the file, after functions too, and where it sits in
   the heapsort's list moves the local initializers around it: `mus_shot_photo.c` declares `MUS_SHOT_PHOTO_UNUSED`
   just before its last function, which gives the original's `.rodata` with no code change.

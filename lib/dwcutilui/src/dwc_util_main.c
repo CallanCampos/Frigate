@@ -7,6 +7,7 @@
 #include "dwc_util_fade.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_irq.h"
+#include "dwc_util_main_menu.h"
 #include "dwc_util_oam.h"
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_rom_resource.h"
