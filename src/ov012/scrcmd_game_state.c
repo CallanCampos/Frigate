@@ -215,7 +215,7 @@ BOOL s0138_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
 
     *present = SaveControl_IsDataAlreadyPresent(save);
     *status = SaveControl_GetStatus(save);
-    func_020074b8(save, &a1, &a2);
+    SaveControl_GetChangedSize(save, &a1, &a2);
     if (a1 * 3 < a2) {
         *result = 0;
     } else {

@@ -58,11 +58,14 @@
 . 0x0200743c SaveControl_GetBytesWritten
 . 0x02007454 SaveControl_GetUploadData
 . 0x02007464 SaveControl_GetErrors
+. 0x0200746c SaveControl_IsNewGameOverSave
 . 0x0200748c SaveControl_GetGiftsLoaded
 . 0x02007490 SaveControl_SetGiftsLoaded
 . 0x02007494 SaveControl_GetGiftsBroken
 . 0x02007498 SaveControl_SetGiftsBroken
 . 0x0200749c SaveControl_InitNewGame
+. 0x020074ac SaveControl_Erase
+. 0x020074b8 SaveControl_GetChangedSize
 . 0x020074c4 SaveControl_ReadBlockCopy
 . 0x020074d8 SaveControl_GetMemoryLink
 . 0x020074dc SaveControl_GetKeysLoaded

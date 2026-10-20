@@ -245,7 +245,7 @@ BOOL SaveControl_IsDataAlreadyPresent(SaveControl *save) {
     return save->dataExists;
 }
 
-BOOL func_0200746c(SaveControl *save) {
+BOOL SaveControl_IsNewGameOverSave(SaveControl *save) {
     if (SaveControl_GetStatus(save) == TRUE && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
         return TRUE;
     }
@@ -274,12 +274,12 @@ void SaveControl_InitNewGame(SaveControl *save) {
     initSaveBlkCallbacks(save->sv);
 }
 
-void func_020074ac(SaveControl *save) {
+void SaveControl_Erase(SaveControl *save) {
     SaveData_Erase(save->sv, HEAPID_USER);
 }
 
-void func_020074b8(SaveControl *save, u32 *a1, u32 *a2) {
-    SaveData_GetChangedSize(save->sv, a1, a2);
+void SaveControl_GetChangedSize(SaveControl *save, u32 *changed, u32 *total) {
+    SaveData_GetChangedSize(save->sv, changed, total);
 }
 
 BOOL SaveControl_ReadBlockCopy(SaveControl *save, u32 block, u32 copy, void *dest, u32 size) {

@@ -151,7 +151,7 @@ BOOL MusicalDist_WriteStep(void *work);
 void *getAddressOfExtraSaveBlk(SaveControl *save, u32 block, u32 arg2);
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *save, u32 block);
 u32 SaveControl_GetStatus(SaveControl *save);
-void func_020074b8(SaveControl *save, u32 *a1, u32 *a2);
+void SaveControl_GetChangedSize(SaveControl *save, u32 *changed, u32 *total);
 // The bytes written so far of the save in progress, SaveData_GetBytesWritten of the save's SaveData
 u32 SaveControl_GetBytesWritten(SaveControl *save);
 u32 SaveControl_GetErrors(SaveControl *save);
@@ -263,7 +263,7 @@ void TrainerGameInfo_AddStartMenuItemFlags(TrainerGameInfoSave *info, u32 item, 
 u8 TrainerGameInfo_GetStartMenuItemFlags(TrainerGameInfoSave *info, u32 item);
 BOOL SaveControl_IsDataAlreadyPresent(SaveControl *save);
 // Whether the save is of another game, which the report may not overwrite
-BOOL func_0200746c(SaveControl *save);
+BOOL SaveControl_IsNewGameOverSave(SaveControl *save);
 
 // Saving a step at a time: SaveControl_StartSave starts, SaveControl_ContinueSave continues and returns the status, and
 // SaveControl_CancelSave cancels
@@ -284,7 +284,7 @@ u8 SaveControl_GetKeysBroken(SaveControl *save);
 void SaveControl_SetKeysBroken(SaveControl *save, u32 value);
 // Used to delete the save data: SaveControl_OpenExtraBlock tells whether a block is in the save, and
 // SaveControl_ClearExtraBlock clears it
-void func_020074ac(SaveControl *save);
+void SaveControl_Erase(SaveControl *save);
 u32 SaveControl_OpenExtraBlock(SaveControl *save, u32 block, HeapID heapId);
 void SaveControl_InitExtraBlock(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size);
 // Reads one of the two copies of a block from the card

@@ -1214,7 +1214,7 @@ static void IrcMenu_WaitSaveErrorDismiss(IrcMenuWork *wk) {
 static void IrcMenu_HandleSaveAnswer(IrcMenuWork *wk) {
     if (AppTaskMenu_IsFlashFinished(wk->yesNoMenu)) {
         if (AppTaskMenu_GetCursorPos(wk->yesNoMenu) == 0) {
-            if (func_0200746c(GameData_GetSaveControl(wk->gameData))) {
+            if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(wk->gameData))) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, Startmenu2_Text_ThereAlreadySavedGame, wk->strBuf);
                 IrcMenu_PrintMessage(wk, FALSE);
                 IrcMenu_SetStateAtLine(wk, IrcMenu_WaitSaveErrorDismiss, 0x7c2);

@@ -75,7 +75,7 @@ struct ReportScreen {
     TCB *vblankTcb;
     // Whether the bar fills
     BOOL barActive;
-    // What func_020074b8 gives: the size of the blocks that changed and of all of them
+    // What SaveControl_GetChangedSize gives: the size of the blocks that changed and of all of them
     u32 changedSize;
     u32 totalSize;
     // SaveControl_GetBytesWritten's count, times 256, at which the bar's next icon shows, and the step between two: a
@@ -175,7 +175,7 @@ BOOL Report_IsReady(ReportScreen *wk) {
 
 void Report_InitSave(ReportScreen *wk) {
     wk->save = GameData_GetSaveControl(GSYS_GetGameData(wk->gsys));
-    func_020074b8(wk->save, &wk->changedSize, &wk->totalSize);
+    SaveControl_GetChangedSize(wk->save, &wk->changedSize, &wk->totalSize);
     wk->barThreshold = wk->barStep = (wk->changedSize << 9) / REPORT_BAR_COUNT;
     wk->barCount = 0;
     wk->barWait = 0;
@@ -425,7 +425,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
     }
 
     // The date and time of the last save, when there is one
-    if (!func_0200746c(save) && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
+    if (!SaveControl_IsNewGameOverSave(save) && SaveControl_IsDataAlreadyPresent(save) == TRUE) {
         PlayTime *saveTime = SaveControl_GetPlayTime(save);
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_LAST_SAVE);

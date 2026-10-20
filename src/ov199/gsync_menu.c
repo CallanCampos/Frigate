@@ -822,7 +822,7 @@ static void GSyncMenu_StateStartSave(GSyncMenuWork *wk) {
 static void GSyncMenu_StateSaveAnswer(GSyncMenuWork *wk) {
     if (AppTaskMenu_IsFlashFinished(wk->yesNoMenu)) {
         if (AppTaskMenu_GetCursorPos(wk->yesNoMenu) == 0) {
-            if (func_0200746c(GameData_GetSaveControl(wk->gameData))) {
+            if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(wk->gameData))) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, GsyncMenu_Text_ThereAlreadySavedGame, wk->strBuf);
                 GSyncMenu_PrintMessageStream(wk);
                 GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitMessageTouch, 1293);

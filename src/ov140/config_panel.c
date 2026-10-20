@@ -1866,7 +1866,7 @@ static void ConfigPanelSeq_Input(ConfigPanelSeq *seq, u32 *state, void *data) {
 
         // The save of another game can't be overwritten, so there is nothing to save before infrared
         {
-            BOOL otherSave = func_0200746c(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
+            BOOL otherSave = SaveControl_IsNewGameOverSave(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
             ConfigPanelOptions options;
 
             ConfigPanelScroll_GetOptions(&wk->scroll, &options);
