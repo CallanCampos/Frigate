@@ -446,7 +446,7 @@ static void BrCore_RndMatchBefore(void *param, void *work, const void *preParam,
     p->procSys = wk->procSys;
     p->unit = BrGraphic_GetClunit(wk->graphic);
     p->gameData = wk->param->mainParam->gameData;
-    p->record = func_0200f2d4(getRecordBlkAddress(save));
+    p->record = RecordSave_GetRndMatchData(getRecordBlkAddress(save));
 }
 
 static void BrCore_RndMatchAfter(void *param, void *work) {

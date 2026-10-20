@@ -458,7 +458,7 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
     param->unk34 = sys->unk22C;
     param->unk38 = sys->unk778;
     param->unk40 = &sys->unk8AC;
-    param->record = func_0200f2d4(getRecordBlkAddress(GameData_GetSaveControl(sys->param.gameData)));
+    param->record = RecordSave_GetRndMatchData(getRecordBlkAddress(GameData_GetSaveControl(sys->param.gameData)));
     if (GFL_SndBGMGetID() != SEQ_BGM_WCS) {
         GFL_SndBGMPlay(SEQ_BGM_WCS, SND_CHANNEL_MASK_ALL);
     }

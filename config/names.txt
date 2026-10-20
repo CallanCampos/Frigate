@@ -643,7 +643,9 @@
 . 0x0200f254 LiveMatchData_HasOpponent
 . 0x0200f29c RecordSave_GetSize
 . 0x0200f2a0 RecordSave_Init
+. 0x0200f2bc SaveControl_GetRecordSave
 . 0x0200f2d0 RecordSave_GetRndMatch
+. 0x0200f2d4 RecordSave_GetRndMatchData
 . 0x0200f2d8 RecordSave_GetLiveMatch
 . 0x0200f2dc RecordSave_SetMatchInProgress
 . 0x0200f2f8 RecordSave_ClearMatchInProgress

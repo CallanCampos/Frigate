@@ -28,7 +28,7 @@ void RecordSave_Init(RecordSave *record) {
     OS_GetMacAddress(record->macAddress);
 }
 
-RecordSave *func_0200f2bc(SaveControl *save) {
+RecordSave *SaveControl_GetRecordSave(SaveControl *save) {
     return getRecordBlkAddress(save);
 }
 
@@ -40,7 +40,7 @@ void *RecordSave_GetRndMatch(RecordSave *record) {
     return record->rndMatch;
 }
 
-void *func_0200f2d4(RecordSave *record) {
+void *RecordSave_GetRndMatchData(RecordSave *record) {
     return record->rndMatch;
 }
 

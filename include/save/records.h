@@ -83,9 +83,9 @@ void RecordSetTrialHousePoints(GameRecords *records, u32 points);
 u32 RecordSave_GetSize(void);
 void RecordSave_Init(RecordSave *record);
 // The same as getRecordBlkAddress, which save/save_control.h declares
-RecordSave *func_0200f2bc(SaveControl *save);
+RecordSave *SaveControl_GetRecordSave(SaveControl *save);
 // The results of the random matches
-void *func_0200f2d4(RecordSave *record);
+void *RecordSave_GetRndMatchData(RecordSave *record);
 void RecordSave_SetMatchInProgress(RecordSave *record);
 u8 RecordSave_IsMatchInProgress(RecordSave *record);
 u32 RecordSave_IsMacAddressSame(RecordSave *record);

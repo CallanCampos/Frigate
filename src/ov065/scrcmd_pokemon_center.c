@@ -794,7 +794,7 @@ static u32 PokemonCenter_CountSetFlags(const u32 *flags, EventWork *eventWork, i
 BOOL PokemonCenterCmd_GetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
-    RecordSave *record = func_0200f2bc(GameData_GetSaveControl(gameData));
+    RecordSave *record = SaveControl_GetRecordSave(GameData_GetSaveControl(gameData));
     u16 info = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
