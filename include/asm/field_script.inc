@@ -2947,15 +2947,13 @@
     .2byte \a1
     .endm
 
-    // func_ov036_021b018c
-    .macro Cmd_0221 a0, a1
+    .macro AnvilleTrainGetModelID a0, a1
     FieldCommand 545
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov036_021b01e0
-    .macro Cmd_0222 a0
+    .macro AnvilleTrainGetDailyIndex a0
     FieldCommand 546
     .2byte \a0
     .endm
