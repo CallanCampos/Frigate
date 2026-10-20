@@ -140,7 +140,7 @@ static BOOL MedalInfoBeacon_LogExit(GameProc *proc, u32 *state, void *param, voi
         if (count - shownLast < 4) {
             shownLast = count - 4;
         }
-        func_0202d7b8(status, shownLast);
+        BeaconStatus_SetLogTop(status, shownLast);
     }
     for (i = 0; i < logWork->viewerParam.count; i++) {
         GFL_StrBufFree(logWork->viewerParam.entries[i].name);

@@ -734,7 +734,7 @@ void BeaconView_ScrollLine(BeaconViewWork *work, int dir, u8 frames) {
         offset = work->top - 1;
         work->top--;
     }
-    func_0202d7b8(work->status, work->top);
+    BeaconStatus_SetLogTop(work->status, work->top);
     GameBeaconInfoTable_RingGet(work->log, work->beacon, &work->time, offset);
     dataIndex = GameBeaconInfoTable_RingIndex(work->log, offset);
     BeaconView_AddLine(work, work->beacon, dataIndex, dir, frames, 2);
@@ -935,7 +935,7 @@ void BeaconView_StartJump(BeaconViewWork *work, u8 top) {
         data->panels[i] = BeaconView_FindPanel(work, (u8)GameBeaconInfoTable_RingIndex(work->log, work->top + i));
     }
     work->top = top;
-    func_0202d7b8(work->status, work->top);
+    BeaconStatus_SetLogTop(work->status, work->top);
     BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
     BeaconView_UpdateArrows(work);
     BeaconView_PlaySE(SEQ_SE_SELECT4);

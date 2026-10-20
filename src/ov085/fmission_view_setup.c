@@ -255,7 +255,9 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         break;
     case FMISSION_VIEW_EVENT_GREETING:
         event = FMissionViewSetup_CreateCallEvent(
-            view, EventPhraseInput_Create(view->gsys, view->field, NULL, 14, (u16 *)func_0202d7d0(view->beaconStatus)),
+            view,
+            EventPhraseInput_Create(view->gsys, view->field, NULL, 14,
+                                    (u16 *)BeaconStatus_GetGreetingChanged(view->beaconStatus)),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_GREETING);
         break;
     default:

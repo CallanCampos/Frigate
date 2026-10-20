@@ -59,11 +59,11 @@ GameBeaconInfoTable *BeaconStatus_GetInfoTable(BeaconStatus *status) {
     return &status->table;
 }
 
-u8 func_0202d7ac(BeaconStatus *status) {
+u8 BeaconStatus_GetLogTop(BeaconStatus *status) {
     return status->logTop;
 }
 
-void func_0202d7b8(BeaconStatus *status, u8 value) {
+void BeaconStatus_SetLogTop(BeaconStatus *status, u8 value) {
     status->logTop = value;
 }
 
@@ -71,6 +71,6 @@ StrBuf *BeaconStatus_GetGreeting(BeaconStatus *status) {
     return status->greeting;
 }
 
-u8 *func_0202d7d0(BeaconStatus *status) {
+u8 *BeaconStatus_GetGreetingChanged(BeaconStatus *status) {
     return status->greetingChanged;
 }

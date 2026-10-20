@@ -397,7 +397,7 @@ static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
 
 // Shows the player's new greeting once it has been entered
 static BOOL BeaconView_CheckGreeting(BeaconViewWork *work) {
-    u16 *changed = (u16 *)func_0202d7d0(work->status);
+    u16 *changed = (u16 *)BeaconStatus_GetGreetingChanged(work->status);
 
     if (*changed == FALSE) {
         return FALSE;

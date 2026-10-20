@@ -181,7 +181,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
         // fallthrough
     case BEACON_VIEW_EVENT_MENU:
     case BEACON_VIEW_EVENT_MENU_WIFI:
-        func_0202d7b8(work->status, 0);
+        BeaconStatus_SetLogTop(work->status, 0);
         GameData_SetCGearPowerRequest(work->gameData, 0);
         event = EventFieldMenuReturn_Create(work->gsys, work->field, 0);
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_RETURN);
@@ -241,7 +241,8 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
         work->unk88 = 0;
         break;
     case BEACON_VIEW_EVENT_GREETING:
-        event = EventPhraseInput_Create(work->gsys, work->field, NULL, 7, (u16 *)func_0202d7d0(work->status));
+        event = EventPhraseInput_Create(work->gsys, work->field, NULL, 7,
+                                        (u16 *)BeaconStatus_GetGreetingChanged(work->status));
         event = BeaconView_CreateWaitEvent(work, event, EVENT_WAIT_BUTTON, BEACON_VIEW_ACTOR_GREETING);
         break;
     case BEACON_VIEW_EVENT_MISSION_START: {
@@ -397,7 +398,7 @@ static void BeaconView_InitData(BeaconViewWork *work) {
     work->status = GameData_GetBeaconStatus(work->gameData);
     work->log = BeaconStatus_GetInfoTable(work->status);
     work->logCount = GameBeaconInfoTable_GetCount(work->log);
-    work->top = func_0202d7ac(work->status);
+    work->top = BeaconStatus_GetLogTop(work->status);
     if (work->logCount < BEACON_VIEW_LINE_MAX) {
         work->viewCount = work->logCount;
     } else {

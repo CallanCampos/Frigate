@@ -469,7 +469,7 @@ static int FMissionView_GetHeldScroll(FMissionView *view) {
 
 // Shows the player's new greeting, once it was changed
 static BOOL FMissionView_CheckGreeting(FMissionView *view) {
-    u16 *changed = (u16 *)func_0202d7d0(view->beaconStatus);
+    u16 *changed = (u16 *)BeaconStatus_GetGreetingChanged(view->beaconStatus);
 
     if (*changed == 0) {
         return FALSE;

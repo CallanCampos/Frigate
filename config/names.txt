@@ -1736,7 +1736,10 @@
 . 0x0202d6fc BeaconStatus_Create
 . 0x0202d77c BeaconStatus_Free
 . 0x0202d7a8 BeaconStatus_GetInfoTable
+. 0x0202d7ac BeaconStatus_GetLogTop
+. 0x0202d7b8 BeaconStatus_SetLogTop
 . 0x0202d7c4 BeaconStatus_GetGreeting
+. 0x0202d7d0 BeaconStatus_GetGreetingChanged
 . 0x0202d7e4 AppMenuCommon_GetTypeIconPaletteFile
 . 0x0202d7e8 AppMenuCommon_GetTypeIconPaletteIndex
 . 0x0202d7f4 AppMenuCommon_GetTypeIconCharFile
