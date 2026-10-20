@@ -19,7 +19,8 @@ struct PlayerInfo {
     u8 region;
     // The game version the player started on, VERSION_BLACK2 or VERSION_WHITE2
     u8 version;
-    u8 unk1C;
+    // The look of the player in the Union Room and on the Wi-Fi, 0 to 7 for a male player and 8 to 15 for a female
+    u8 unionView;
     u8 gender;
     u8 unk1E[2];
 };

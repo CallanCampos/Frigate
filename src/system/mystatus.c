@@ -98,11 +98,11 @@ u32 getTrainerGender(const PlayerInfo *info) {
 }
 
 u8 func_02008bf4(const PlayerInfo *info) {
-    return info->unk1C;
+    return info->unionView;
 }
 
 void func_02008bf8(PlayerInfo *info, u8 value) {
-    info->unk1C = value;
+    info->unionView = value;
 }
 
 u8 PlayerInfo_GetVersion(PlayerInfo *info) {

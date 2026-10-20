@@ -725,8 +725,8 @@ static void WifiBattleMatchLink_TaskRatingSearch(WifiBattleMatchTask *task, u32 
                 otherPlayer->info.gender = GENDER_MALE;
                 fixCount++;
             }
-            if (otherPlayer->info.unk1C >= 16) {
-                otherPlayer->info.unk1C = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
+            if (otherPlayer->info.unionView >= 16) {
+                otherPlayer->info.unionView = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
                 fixCount++;
             }
             if (!Country_IsValidPlace(otherPlayer->info.country, otherPlayer->info.province,
@@ -1530,8 +1530,8 @@ static void WifiBattleMatchLink_TaskFreeSearch(WifiBattleMatchTask *task, u32 *s
             if (otherPlayer->info.gender != GENDER_MALE && otherPlayer->info.gender != GENDER_FEMALE) {
                 otherPlayer->info.gender = GENDER_MALE;
             }
-            if (otherPlayer->info.unk1C >= 16) {
-                otherPlayer->info.unk1C = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
+            if (otherPlayer->info.unionView >= 16) {
+                otherPlayer->info.unionView = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
             }
             if (!Country_IsValidPlace(otherPlayer->info.country, otherPlayer->info.province,
                                       otherPlayer->info.region)) {
