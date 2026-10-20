@@ -487,7 +487,7 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
     s32 z;
 
     width = mapper->matrixWidth;
-    matrixSize = width * mapper->matrixHeight;
+    matrixSize = mapper->matrixWidth * mapper->matrixHeight;
     span = mapper->chunkSpan;
     halfSpan = FX_Div(span, FX32_CONST(2));
     layerHeight = mapper->unk08;
