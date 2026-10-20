@@ -1286,9 +1286,9 @@ sWifiSettingsZeroAddress kind:data(any) addr:0x021c0430
 sSubScreenCells kind:data(any) addr:0x021c0434
 sSubScreenPalettes kind:data(any) addr:0x021c0443
 sSubScreenPositions kind:data(any) addr:0x021c0452
-data_ov182_021c0468 kind:data(any) addr:0x021c0468
-data_ov182_021c046e kind:data(any) addr:0x021c046e
-data_ov182_021c0478 kind:data(any) addr:0x021c0478
+sUsbScanNoBssid kind:data(any) addr:0x021c0468
+sUsbScanSsid kind:data(any) addr:0x021c046e
+sUsbScanParam kind:data(any) addr:0x021c0478
 data_ov182_021c04c0 kind:data(any) addr:0x021c04c0
 data_ov182_021c04c6 kind:data(any) addr:0x021c04c6
 data_ov182_021c04cc kind:data(any) addr:0x021c04cc
@@ -1663,7 +1663,7 @@ sWifiSettings kind:bss addr:0x021c4164
 sSound kind:bss addr:0x021c4168
 sSubScreenData kind:bss addr:0x021c416c
 sSubScreenRow kind:bss addr:0x021c4170
-data_ov182_021c4174 kind:bss addr:0x021c4174
+sUsbScan kind:bss addr:0x021c4174
 data_ov182_021c4178 kind:bss addr:0x021c4178
 data_ov182_021c417c kind:bss addr:0x021c417c
 gWork kind:bss addr:0x021c4180

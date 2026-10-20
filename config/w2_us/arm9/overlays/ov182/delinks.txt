@@ -423,3 +423,8 @@ lib/dwcutilui/src/dwc_util_sub_screen.c:
     .rodata     start:0x021c0474 end:0x021c04a8
     .data       start:0x021c144c end:0x021c14c4
     .bss        start:0x021c41ac end:0x021c41b4
+
+lib/dwcutilui/src/dwc_util_usb_scan.c:
+    .text       start:0x021b8874 end:0x021b8d30
+    .rodata     start:0x021c04a8 end:0x021c04fc
+    .bss        start:0x021c41b4 end:0x021c41b8

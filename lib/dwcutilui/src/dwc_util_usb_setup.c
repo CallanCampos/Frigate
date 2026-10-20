@@ -14,6 +14,7 @@
 #include "dwc_util_ui_object.h"
 #include "dwc_util_usb_done.h"
 #include "dwc_util_usb_intro.h"
+#include "dwc_util_usb_scan.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

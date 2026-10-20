@@ -11328,6 +11328,9 @@ overlays/ov182 0x021c0430 sWifiSettingsZeroAddress
 overlays/ov182 0x021c0434 sSubScreenCells
 overlays/ov182 0x021c0443 sSubScreenPalettes
 overlays/ov182 0x021c0452 sSubScreenPositions
+overlays/ov182 0x021c0468 sUsbScanNoBssid
+overlays/ov182 0x021c046e sUsbScanSsid
+overlays/ov182 0x021c0478 sUsbScanParam
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11413,6 +11416,7 @@ overlays/ov182 0x021c4164 sWifiSettings
 overlays/ov182 0x021c4168 sSound
 overlays/ov182 0x021c416c sSubScreenData
 overlays/ov182 0x021c4170 sSubScreenRow
+overlays/ov182 0x021c4174 sUsbScan
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
