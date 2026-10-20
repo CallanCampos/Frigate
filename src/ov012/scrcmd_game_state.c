@@ -460,8 +460,8 @@ BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env) {
     void *timeSig = getTimeSigBlkAddress(GameData_GetSaveControl(gameData));
 
     *value = func_0202b5e8(func_02008bf4(&playerState->playerInfo));
-    *flag = func_020091d0(timeSig);
-    func_020091dc(timeSig);
+    *flag = TimeSigSave_IsUnionViewChanged(timeSig);
+    TimeSigSave_SetUnionViewChanged(timeSig);
     return FALSE;
 }
 

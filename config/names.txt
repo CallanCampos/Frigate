@@ -153,7 +153,14 @@
 . 0x02008fb8 SaveControl_GetPlayerLocation
 . 0x02009184 TimeSigSave_GetSize
 . 0x0200918c TimeSigSave_Init
+. 0x020091a8 TimeSigSave_GetSignature
 . 0x020091ac TimeSigSave_HasSignature
+. 0x020091d0 TimeSigSave_IsUnionViewChanged
+. 0x020091dc TimeSigSave_SetUnionViewChanged
+. 0x020091e8 TimeSigSave_GetPersonality
+. 0x020091f0 TimeSigSave_SetPersonality
+. 0x020091f8 TimeSigSave_SetSignBlinks
+. 0x02009204 TimeSigSave_GetSignBlinks
 . 0x02009230 TimeSigSave_GetBadgeDate
 . 0x020092a8 TimeSigSave_GetBadgePolish
 . 0x020092b8 TimeSigSave_SetBadgePolish

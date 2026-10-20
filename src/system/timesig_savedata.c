@@ -22,7 +22,7 @@ void *getTimeSigBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TIMESIG);
 }
 
-void *func_020091a8(void *timeSig) {
+void *TimeSigSave_GetSignature(void *timeSig) {
     return timeSig;
 }
 
@@ -39,27 +39,27 @@ BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig) {
     return TRUE;
 }
 
-u8 func_020091d0(TimeSigSave *timeSig) {
+u8 TimeSigSave_IsUnionViewChanged(TimeSigSave *timeSig) {
     return timeSig->unionViewChanged;
 }
 
-void func_020091dc(TimeSigSave *timeSig) {
+void TimeSigSave_SetUnionViewChanged(TimeSigSave *timeSig) {
     timeSig->unionViewChanged = 1;
 }
 
-u16 func_020091e8(TimeSigSave *timeSig) {
+u16 TimeSigSave_GetPersonality(TimeSigSave *timeSig) {
     return timeSig->personality;
 }
 
-void func_020091f0(TimeSigSave *timeSig, u32 value) {
+void TimeSigSave_SetPersonality(TimeSigSave *timeSig, u32 value) {
     timeSig->personality = value;
 }
 
-void func_020091f8(TimeSigSave *timeSig, u8 value) {
+void TimeSigSave_SetSignBlinks(TimeSigSave *timeSig, u8 value) {
     timeSig->signBlinks = value;
 }
 
-BOOL func_02009204(TimeSigSave *timeSig) {
+BOOL TimeSigSave_GetSignBlinks(TimeSigSave *timeSig) {
     return timeSig->signBlinks;
 }
 

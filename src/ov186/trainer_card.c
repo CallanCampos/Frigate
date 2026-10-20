@@ -367,14 +367,15 @@ BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work) {
 
     if (!wk->data->unk04_5) {
         TrainerCard_PackSign(wk->signPixels, wk->data->unk74);
-        MI_CpuCopy8(wk->data->unk74, func_020091a8(getTimeSigSaveBlock(wk->param->gameData)), TRCARD_SIGN_BYTES);
+        MI_CpuCopy8(wk->data->unk74, TimeSigSave_GetSignature(getTimeSigSaveBlock(wk->param->gameData)),
+                    TRCARD_SIGN_BYTES);
     }
     if (cardParam->canEdit) {
         info = GetGameDataPlayerInfo(wk->param->gameData);
         timeSig = getTimeSigSaveBlock(wk->param->gameData);
         func_02008bf8(info, wk->data->unk06);
-        func_020091f0(timeSig, wk->data->unk48);
-        func_020091f8(timeSig, wk->data->unk04_4);
+        TimeSigSave_SetPersonality(timeSig, wk->data->unk48);
+        TimeSigSave_SetSignBlinks(timeSig, wk->data->unk04_4);
     }
     PMSDraw_Delete(wk->pmsDraw);
     TrainerCard_ResetAffine();
@@ -1420,7 +1421,7 @@ static void TrainerCard_HandleInput(TrainerCardWork *wk, int input, u32 *state) 
         break;
     case TRCARD_INPUT_UNION_VIEW:
         if (wk->param->shownData->canEdit) {
-            func_020091dc(getTimeSigSaveBlock(wk->param->gameData));
+            TimeSigSave_SetUnionViewChanged(getTimeSigSaveBlock(wk->param->gameData));
             GFL_SndSEPlay(SEQ_SE_SW_CARD_02);
             TrainerCard_NextUnionView(wk->data);
             TrCardBmp_DrawUnionView(wk, wk->data->unk06, TRUE);

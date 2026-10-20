@@ -467,8 +467,8 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
         data->isOwn = TRUE;
         data->playTime = (PlayTime *)GameData_GetPlayTime(gameData);
     }
-    data->unk48 = func_020091e8(timeSig);
-    data->unk04_4 = func_02009204(timeSig);
+    data->unk48 = TimeSigSave_GetPersonality(timeSig);
+    data->unk04_4 = TimeSigSave_GetSignBlinks(timeSig);
     CGearPhrases_Get(cgear, 0, &data->greeting);
     RTC_ConvertSecondToDateTime(&date, &time, adventureTime->startSeconds);
     data->startYear = date.year;
@@ -524,7 +524,7 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     }
     data->seenCount = countSeenDexPokes(pokedex, heapId);
     data->unk04_3 = TimeSigSave_HasSignature(timeSig);
-    MI_CpuCopy8(func_020091a8(timeSig), data->unk74, sizeof(data->unk74));
+    MI_CpuCopy8(TimeSigSave_GetSignature(timeSig), data->unk74, sizeof(data->unk74));
     data->canEdit = canEdit;
 }
 
