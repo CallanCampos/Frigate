@@ -458,7 +458,7 @@ void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, co
     sFriend.control->buddyUpdateState = 0;
     sFriend.control->updateSteps = 0;
     sFriend.control->persLogin = 0;
-    sFriend.control->unk_24 = 0;
+    sFriend.control->profileID = 0;
     sFriend.control->playerName = playerName;
     sFriend.control->updateCallback = NULL;
     sFriend.control->updateParam = NULL;
@@ -468,10 +468,10 @@ void func_ov011_0215e4f0(DWCFriendControl *control, GPConnection *connection, co
     sFriend.control->deleteParam = NULL;
     sFriend.control->buddyCallback = NULL;
     sFriend.control->buddyParam = NULL;
-    sFriend.control->unk_4c = 0;
-    sFriend.control->unk_50 = 0;
-    sFriend.control->unk_54 = 0;
-    sFriend.control->unk_58 = 0;
+    sFriend.control->persLoginCallback = 0;
+    sFriend.control->persLoginParam = 0;
+    sFriend.control->saveCallback = 0;
+    sFriend.control->loadCallback = 0;
     sFriend.control->profileIds = NULL;
     for (; i < friendListLen; i++) {
         DWCi_Acc_SetFlag5(&sFriend.control->friendList[i], FALSE);

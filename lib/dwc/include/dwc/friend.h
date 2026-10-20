@@ -37,7 +37,8 @@ typedef struct DWCFriendControl {
     u8 updateSteps;
     // Nonzero while the persistent storage server is logged in to
     int persLogin;
-    u32 unk_24;
+    // The player's profile ID, which nothing sets
+    u32 profileID;
     // The player's name
     const u16 *playerName;
     DWCUpdateServersCallback updateCallback;
@@ -48,10 +49,12 @@ typedef struct DWCFriendControl {
     void *deleteParam;
     DWCBuddyFriendCallback buddyCallback;
     void *buddyParam;
-    u32 unk_4c;
-    u32 unk_50;
-    u32 unk_54;
-    u32 unk_58;
+    // The callbacks of the persistent storage server's login, saving and loading, which nothing sets (the SDK's
+    // persLoginCallback, persLoginParam, saveCallback and loadCallback, in its order)
+    u32 persLoginCallback;
+    u32 persLoginParam;
+    u32 saveCallback;
+    u32 loadCallback;
     // The profile IDs whose reverse buddies are asked for
     int *profileIds;
 } DWCFriendControl;
