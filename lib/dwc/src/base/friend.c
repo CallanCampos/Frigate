@@ -137,26 +137,26 @@ BOOL DWC_SVLGetTokenAsync(const char *svc, void *buffer) {
     if (!id.isSet) {
         return FALSE;
     }
-    if (!func_ov011_0216c154(DWC_Alloc, DWC_Free)) {
+    if (!DWC_Svl_Init(DWC_Alloc, DWC_Free)) {
         return FALSE;
     }
     if (strlen(svc) == 0) {
-        started = func_ov011_0216c1cc("0000", buffer);
+        started = DWC_Svl_GetTokenAsync("0000", buffer);
     } else {
-        started = func_ov011_0216c1cc(svc, buffer);
+        started = DWC_Svl_GetTokenAsync(svc, buffer);
     }
     if (!started) {
-        func_ov011_0216c1a8();
+        DWC_Svl_Cleanup();
         return FALSE;
     }
     return TRUE;
 }
 
 int DWC_SVLProcess(void) {
-    int state = func_ov011_0216c344();
+    int state = DWC_Svl_Process();
 
     if ((u32)(state - 3) <= 2) {
-        func_ov011_0216c1a8();
+        DWC_Svl_Cleanup();
     }
     return state;
 }
@@ -174,7 +174,7 @@ BOOL DWC_NASLoginAsync(void) {
     MI_CpuCopy8("", sNasLogin->param.gsbrcd, 9);
     sNasLogin->param.alloc = DWC_Alloc;
     sNasLogin->param.free = DWC_Free;
-    func_ov011_021694ec(&sNasLogin->param, &sNasLogin->http);
+    DWC_Auth_Create(&sNasLogin->param, &sNasLogin->http);
     return TRUE;
 }
 
@@ -184,28 +184,28 @@ int DWC_NASLoginProcess(void) {
     if (sNasLogin == NULL) {
         return 0;
     }
-    switch (func_ov011_021696d0()) {
+    switch (DWC_Auth_GetError()) {
     case 0:
         return 2;
     case 0x15:
         MI_CpuFill8(&result, 0, sizeof(result));
-        func_ov011_02169704(&result);
-        func_ov011_02169668();
+        DWC_Auth_GetResult(&result);
+        DWC_Auth_Destroy();
         if (result.returnCode == 20002) {
-            func_ov011_021694ec(&sNasLogin->param, &sNasLogin->http);
+            DWC_Auth_Create(&sNasLogin->param, &sNasLogin->http);
             return 2;
         }
         DWC_Free(4, sNasLogin, sizeof(NasLogin));
         sNasLogin = NULL;
         return 3;
     case 0x14:
-        func_ov011_02169668();
+        DWC_Auth_Destroy();
         DWC_Free(4, sNasLogin, sizeof(NasLogin));
         sNasLogin = NULL;
         return 5;
     default:
-        func_ov011_02169704(&result);
-        func_ov011_02169668();
+        DWC_Auth_GetResult(&result);
+        DWC_Auth_Destroy();
         DWC_Free(4, sNasLogin, sizeof(NasLogin));
         sNasLogin = NULL;
         DWCi_SetError(DWC_ERROR_AUTH_ANY, result.returnCode);
@@ -1137,7 +1137,7 @@ void DWCi_LoginInit(DWCLoginControl *control, DWCUserData *userData, GPConnectio
     sLogin->callback = callback;
     sLogin->param = param;
     sLogin->userData = userData;
-    func_ov011_02169fb8();
+    DWCi_Auth_HasConsoleUserId();
 }
 
 BOOL DWCi_LoginAsync(void) {
@@ -1191,15 +1191,15 @@ void DWCi_StopLogin(int error, int code) {
 }
 
 void DWCi_ShutdownLogin(void) {
-    if (!func_ov011_02169f34()) {
-        func_ov011_02169eb0();
+    if (!DWCi_Auth_IsFinished()) {
+        DWCi_Auth_AbortAuthentication();
     }
     sLogin = NULL;
 }
 
 static void DWCi_CloseLogin(void) {
     if (sLogin != NULL) {
-        func_ov011_02169f90();
+        DWCi_Auth_EndAuthentication();
         sLogin->state = 0;
         sLogin->connecting = FALSE;
     }
@@ -1246,7 +1246,7 @@ static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseAr
     if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_FIRSTNAME, consoleId)) != 0) {
         return;
     }
-    DWCi_Acc_EncodeBase32(func_ov011_02169f98(), 43, userId);
+    DWCi_Acc_EncodeBase32(DWCi_Auth_GetConsoleUserId(), 43, userId);
     if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_AIMNAME, userId)) != 0) {
         return;
     }
@@ -1312,26 +1312,26 @@ static BOOL DWCi_RemoteLogin(void) {
         DWCi_Acc_CreateLoginName(&sLogin->tempLoginId, sLogin->gameCode, sLogin->loginName);
         userId = 0;
     }
-    return func_ov011_02169e50(sLogin->playerName, &sLogin->loginName[9], userId, DWC_Alloc, DWC_Free);
+    return DWCi_Auth_StartAuthentication(sLogin->playerName, &sLogin->loginName[9], userId, DWC_Alloc, DWC_Free);
 }
 
 // Waits for the authentication server, then connects to GP with the profile of the user data, or looks for it
 static void DWCi_RemoteLoginProcess(void) {
-    func_ov011_02169ebc();
-    if (func_ov011_02169f34()) {
-        if (func_ov011_02169f40()) {
-            func_ov011_02169f58(sLogin->authToken, sLogin->partnerChallenge);
-            func_ov011_02169f90();
+    DWCi_Auth_ProcessAuthentication();
+    if (DWCi_Auth_IsFinished()) {
+        if (DWCi_Auth_IsSucceeded()) {
+            DWCi_Auth_GetGameSpyToken(sLogin->authToken, sLogin->partnerChallenge);
+            DWCi_Auth_EndAuthentication();
             if (DWCi_Acc_HasAuthenticLoginId(sLogin->userData)) {
                 DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 2);
                 return;
             }
-            DWCi_Acc_SetUserId(&sLogin->tempLoginId, func_ov011_02169f98());
+            DWCi_Acc_SetUserId(&sLogin->tempLoginId, DWCi_Auth_GetConsoleUserId());
             DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 3);
             return;
         }
         {
-            int error = func_ov011_02169f4c();
+            int error = DWCi_Auth_GetErrorCode();
 
             if (error <= -29000) {
                 DWCi_StopLogin(DWC_ERROR_FATAL, error);

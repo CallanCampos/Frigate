@@ -34,9 +34,9 @@ int DWC_NASLoginProcess(void);
 BOOL DWC_GetDateTime(RTCDate *date, RTCTime *time);
 
 // Asks the server whether count words are bad, and runs the request, returning 2 once it succeeded
-BOOL func_ov011_0216bea4(const u16 **words, int count, const char *reserved, int timeout, char *result,
-                         int *badWordCount, int region);
-int func_ov011_0216bed4(void);
+BOOL DWC_CheckProfanityExAsync(const u16 **words, int count, const char *reserved, int timeout, char *result,
+                               int *badWordCount, int region);
+int DWC_CheckProfanityProcess(void);
 
 // Overlay 11's friend list (friend.c, whose other functions are in dwc/friend.h)
 BOOL DWC_SetBuddyFriendCallback(void (*callback)(int index, void *param), void *param);
@@ -62,11 +62,11 @@ BOOL func_ov011_02168c00(DWCTimeoutFunc func, void *param);
 // by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives), returning
 // FALSE for another. The start then gives GameSpy its memory functions (malloc, free, realloc and memalign), with
 // dwc/gsMemory.h's gsiMemoryCallbacksSet
-BOOL func_ov011_02169df8(int server);
+BOOL DWCi_Auth_InitInterface(int server);
 
 // Overlay 11's dwc_nasfunc.c (see dwc/nasfunc.h): sets the URL of the Nintendo authentication server, and reads it.
 // The settings utility (overlay 182) sets its own for as long as it runs
-void func_ov011_021694d4(const char *url);
-const char *func_ov011_021694e0(void);
+void DWC_Auth_SetCustomNas(const char *url);
+const char *DWCi_Auth_GetCustomNas(void);
 
 #endif // POKEBW2_DWC_DWC_H

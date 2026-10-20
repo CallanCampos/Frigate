@@ -543,7 +543,7 @@ static void GtsNego_StateSendPerson(GtsNegoWork *wk) {
 static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
     PlayerInfo *partner = wk->param->playerInfo2;
     BOOL bad = FALSE;
-    BOOL done = func_ov011_0216bed4() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == 2;
     u32 id;
 
     if (done) {
@@ -590,7 +590,7 @@ static void GtsNego_StateStartNameCheck(GtsNegoWork *wk) {
     }
     wk->nameCheck.words = wk->nameCheck.name;
     wk->nameCheck.badCount = 0;
-    func_ov011_0216bea4(&wk->nameCheck.words, 1, NULL, 0, &wk->nameCheck.result, &wk->nameCheck.badCount, 0x80);
+    DWC_CheckProfanityExAsync(&wk->nameCheck.words, 1, NULL, 0, &wk->nameCheck.result, &wk->nameCheck.badCount, 0x80);
     GFL_StrBufFree(name);
     GtsNego_ChangeState(wk, GtsNego_StateWaitNameCheck, 768);
 }

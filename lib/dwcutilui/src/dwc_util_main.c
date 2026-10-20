@@ -65,8 +65,8 @@ int DWC_StartUtility(void *work, int language, int param) {
     if (!func_ov182_021adc4c(language, param)) {
         return -1;
     }
-    nasUrl = func_ov011_021694e0();
-    func_ov011_021694d4(sNasUrl);
+    nasUrl = DWCi_Auth_GetCustomNas();
+    DWC_Auth_SetCustomNas(sNasUrl);
     sMain.finished = FALSE;
     func_ov182_021adc9c();
     func_ov182_021add40();
@@ -81,7 +81,7 @@ int DWC_StartUtility(void *work, int language, int param) {
         OS_WaitVBlankIntr();
     } while (!sMain.finished);
     func_ov182_021adf6c();
-    func_ov011_021694d4(nasUrl);
+    DWC_Auth_SetCustomNas(nasUrl);
     return 0;
 }
 

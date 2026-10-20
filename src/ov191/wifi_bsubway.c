@@ -701,14 +701,14 @@ static void WifiBSubwayUpload_CheckName(WifiBSubwayUpload *upload, GameData *gam
     }
     upload->nameCheck.words = upload->nameCheck.name;
     upload->nameCheck.badWordCount = 0;
-    func_ov011_0216bea4(&upload->nameCheck.words, 1, NULL, 0, &upload->nameCheck.result,
-                        &upload->nameCheck.badWordCount, sizeof(upload->sign));
+    DWC_CheckProfanityExAsync(&upload->nameCheck.words, 1, NULL, 0, &upload->nameCheck.result,
+                              &upload->nameCheck.badWordCount, sizeof(upload->sign));
     GFL_StrBufFree(name);
 }
 
 // Returns 0 until the check ends, 1 once it does, and 2 when the name was replaced
 static u32 WifiBSubwayUpload_WaitCheckName(WifiBSubwayUpload *upload, HeapID heapId) {
-    BOOL done = func_ov011_0216bed4() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == 2;
     BOOL bad;
 
     if (done) {

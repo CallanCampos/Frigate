@@ -62,7 +62,7 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
         }
     }
 
-    func_ov011_02169df8(server);
+    DWCi_Auth_InitInterface(server);
     sGameCode = gameCode;
     gsiMemoryCallbacksSet(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
     if (gameName != NULL) {

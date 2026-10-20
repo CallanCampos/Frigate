@@ -581,7 +581,8 @@ static int Upload_SubSeqNameCheckStart(WorldTradeWork *wk) {
     }
     wk->nameCheck.words = wk->nameCheck.name;
     wk->nameCheck.badWordCount = 0;
-    func_ov011_0216bea4(&wk->nameCheck.words, 1, NULL, 0, wk->nameCheck.result, &wk->nameCheck.badWordCount, 0x80);
+    DWC_CheckProfanityExAsync(&wk->nameCheck.words, 1, NULL, 0, wk->nameCheck.result, &wk->nameCheck.badWordCount,
+                              0x80);
     GFL_StrBufFree(name);
     wk->subprocessSeq = UPLOAD_SEQ_NAME_CHECK_WAIT;
     wk->timeoutCount = 0;
@@ -589,7 +590,7 @@ static int Upload_SubSeqNameCheckStart(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
-    BOOL done = func_ov011_0216bed4() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == 2;
     BOOL bad;
 
     if (done) {

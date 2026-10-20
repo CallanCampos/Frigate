@@ -59,7 +59,8 @@ typedef struct DWCAcMain {
     u8 apSeen : 4;  // the search sets it to 1 whenever the wireless manager reports an access point
     u8 addressInUse : 4; // 1 when the connection test failed with CPS saying that the address is in use (dwc_ac_soc.c)
     s32 error;           // 0x0c; what DWCAc_SetError was told
-    u32 testResult;      // the result of the connection test of overlay 11 (func_ov011_0216b2cc), kept by dwc_ac_soc.c
+    u32 testResult;      // the result of the connection test of overlay 11 (DWC_Netcheck_GetReturnCode), kept by
+                         // dwc_ac_soc.c
     u8 candidateResult;  // 0x14; DWCAcCandidate.result of the candidate that the connection works on
     u8 candidateType;    // 0x15; the type (DWCAc_GetApTypeOfId) of that candidate's target
     u8 maxState;         // 0x16; the highest state that DWCAc_SetState was given, from 1
@@ -326,13 +327,13 @@ BOOL DWCAc_StepTeardown(u8 *state);
 // Overlay 11's connection test and its teardown (0x0216b14c to 0x0216b2cc, one file that is not written yet), which
 // the states 13 and 14 of dwc_ac_soc.c run, by the 52xxx errors it leads to in dwc_ac_result.c. The first starts the
 // test from the memory functions (copied) and answers 0 once it is going, 4 if it has no memory;
-// func_ov011_0216b24c ends CPS's threads and func_ov011_0216b1d4 then lets go of its memory; func_ov011_0216b2a4
-// answers 0 while the test is not over, else its state (11 if it went well), and func_ov011_0216b2cc its result. They
-// are here, and not in dwc/dwc.h with overlay 11's other functions, for the DWCAcMemFuncs that the first takes
-int func_ov011_0216b14c(const DWCAcMemFuncs *funcs);
-void func_ov011_0216b1d4(void);
-void func_ov011_0216b24c(void);
-u32 func_ov011_0216b2a4(void);
-u32 func_ov011_0216b2cc(void);
+// DWC_Netcheck_Abort ends CPS's threads and DWC_Netcheck_Destroy then lets go of its memory; DWC_Netcheck_GetError
+// answers 0 while the test is not over, else its state (11 if it went well), and DWC_Netcheck_GetReturnCode its result.
+// They are here, and not in dwc/dwc.h with overlay 11's other functions, for the DWCAcMemFuncs that the first takes
+int DWC_Netcheck_Create(const DWCAcMemFuncs *funcs);
+void DWC_Netcheck_Destroy(void);
+void DWC_Netcheck_Abort(void);
+u32 DWC_Netcheck_GetError(void);
+u32 DWC_Netcheck_GetReturnCode(void);
 
 #endif // POKEBW2_DWC_AC_H

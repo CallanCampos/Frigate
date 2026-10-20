@@ -2624,13 +2624,13 @@ void WifiBattleMatchNet_StartNameCheck(WifiBattleMatchNet *p_wk, PlayerInfo *inf
     }
     p_wk->nameCheck.words = p_wk->nameCheck.name;
     p_wk->nameCheck.badWordCount = 0;
-    func_ov011_0216bea4(&p_wk->nameCheck.words, 1, NULL, 0, &p_wk->nameCheck.result, &p_wk->nameCheck.badWordCount,
-                        0x80);
+    DWC_CheckProfanityExAsync(&p_wk->nameCheck.words, 1, NULL, 0, &p_wk->nameCheck.result,
+                              &p_wk->nameCheck.badWordCount, 0x80);
     GFL_StrBufFree(name);
 }
 
 BOOL WifiBattleMatchNet_NameCheckMain(WifiBattleMatchNet *p_wk, u32 *out) {
-    BOOL done = func_ov011_0216bed4() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == 2;
 
     if (done) {
         *out = p_wk->nameCheck.badWordCount > 0;
