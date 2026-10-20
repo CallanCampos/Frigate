@@ -1282,7 +1282,7 @@ sScrollbarHandleLengths kind:data(any) addr:0x021c041b
 sApScanWpaOui kind:data(any) addr:0x021c0420
 sApScanNoBssid kind:data(any) addr:0x021c0424
 sApScanParam kind:data(any) addr:0x021c042c
-data_ov182_021c0430 kind:data(any) addr:0x021c0470
+sWifiSettingsZeroAddress kind:data(any) addr:0x021c0470
 data_ov182_021c0434 kind:data(any) addr:0x021c0474
 data_ov182_021c0443 kind:data(any) addr:0x021c0483
 data_ov182_021c0452 kind:data(any) addr:0x021c0492
@@ -1659,7 +1659,7 @@ sUsbSetupState kind:bss addr:0x021c418c
 sBgBuffer kind:bss addr:0x021c4190
 sScrollbar kind:bss addr:0x021c419c
 sApScan kind:bss addr:0x021c41a0
-data_ov182_021c4164 kind:bss addr:0x021c41a4
+sWifiSettings kind:bss addr:0x021c41a4
 data_ov182_021c4168 kind:bss addr:0x021c41a8
 data_ov182_021c416c kind:bss addr:0x021c41ac
 data_ov182_021c4170 kind:bss addr:0x021c41b0

@@ -13,6 +13,7 @@
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_effect.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // How the search ended, and the frames it has scanned for

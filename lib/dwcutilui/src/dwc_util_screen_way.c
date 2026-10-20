@@ -16,6 +16,7 @@
 #include "dwc_util_test_start.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // The buttons: the search for an access point, the AOSS setup, the third setup and the settings by hand

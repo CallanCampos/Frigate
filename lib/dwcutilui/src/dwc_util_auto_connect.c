@@ -16,6 +16,7 @@
 #include "dwc_util_task.h"
 #include "dwc_util_text.h"
 #include "dwc_util_ui_effect.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

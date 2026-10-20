@@ -15,6 +15,7 @@
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_text.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "stdlib.h"

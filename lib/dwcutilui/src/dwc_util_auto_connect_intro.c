@@ -8,6 +8,7 @@
 #include "dwc_util_main.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 static void func_ov182_021b65c8(void);

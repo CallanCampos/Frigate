@@ -20,23 +20,6 @@
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 
-// The copy of a connection of the console's Wi-Fi settings that the screens edit: the connection, its subnet mask as
-// four bytes (the connection keeps the number of its bits), which connection it is, and whether DHCP gives the address,
-// the mask and the gateway, and the DNS servers
-struct DWCUtilSettingsEdit {
-    DWCBmConnection connection;
-    u8 netmask[4];
-    u8 index;
-    u8 autoAddress;
-    u8 autoDns;
-};
-
-DWCUtilSettingsEdit *func_ov182_021b781c(void);
-// Takes the WEP keys that the AOSS setup got into the connection being edited
-void func_ov182_021b7d80(const AossResult *result);
-// Takes the SSID and the WEP mode of the access point that the connection test connected to
-void func_ov182_021b7c60(const DWCUtilAcResult *result);
-
 // The rows of buttons of the two layouts; func_ov182_021b849c starts the task that moves them away,
 // func_ov182_021b854c is whether that task runs and func_ov182_021b87b0 whether they are idle
 void func_ov182_021b8154(int variant);
@@ -53,20 +36,6 @@ void func_ov182_021b80f4(int seq);
 // Stops the music
 void func_ov182_021b8138(void);
 
-// Reads the console's Wi-Fi settings, and frees them
-void func_ov182_021b77dc(void);
-void func_ov182_021b780c(void);
-// Erases the connections of the console's Wi-Fi settings and makes a new Wi-Fi ID
-void func_ov182_021b7ea0(void);
-// The status of a connection of the console's Wi-Fi settings (DWCBmConnection.status), and erases one
-u8 func_ov182_021b7b0c(int index);
-void func_ov182_021b7e78(int index);
-// Saves the connection being edited into its connection of the console's Wi-Fi settings
-void func_ov182_021b7bb0(void);
-// Sets whether DHCP gives the address, the mask and the gateway, and the DNS servers, of the connection being edited
-void func_ov182_021b782c(BOOL autoAddress);
-void func_ov182_021b7840(BOOL autoDns);
-
 // Loads the sub screen's BG 1 of one of the layouts at the next VBlank
 void func_ov182_021b87d0(int layout);
 
@@ -77,27 +46,6 @@ void func_ov182_021b8cf0(int msgIndex, int layout, int flag, int slot, int value
 void func_ov182_021b8eec(void);
 int func_ov182_021b8f14(void);
 BOOL func_ov182_021b8f24(void);
-
-// Copies the SSID of the connection being edited, and takes an SSID or a WEP key into it
-void func_ov182_021b7a08(u8 *ssid);
-void func_ov182_021b7854(const u8 *ssid);
-void func_ov182_021b7874(const u8 *key);
-// The addresses of the connection being edited (its IP address, subnet mask, gateway and two DNS servers) as 12
-// digits, each number right-aligned in three, and back
-void func_ov182_021b7a24(u8 *digits);
-void func_ov182_021b7a50(u8 *digits);
-void func_ov182_021b7a7c(u8 *digits);
-void func_ov182_021b7aac(u8 *digits);
-void func_ov182_021b7adc(u8 *digits);
-void func_ov182_021b7990(const u8 *digits);
-void func_ov182_021b79a8(const u8 *digits);
-void func_ov182_021b79c0(const u8 *digits);
-void func_ov182_021b79d8(const u8 *digits);
-void func_ov182_021b79f0(const u8 *digits);
-// Converts 12 digits to an address
-void func_ov182_021b7ff0(const u8 *digits, u8 *address);
-// Makes the connection of the console's Wi-Fi settings the one being edited
-void func_ov182_021b7b20(int index);
 
 // The search for the Nintendo Wi-Fi USB Connector and its results (its file is not written yet)
 enum {

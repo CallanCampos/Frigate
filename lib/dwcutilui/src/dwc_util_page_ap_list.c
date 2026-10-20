@@ -24,6 +24,7 @@
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
 #include "dwc_util_wep_keyboard.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"

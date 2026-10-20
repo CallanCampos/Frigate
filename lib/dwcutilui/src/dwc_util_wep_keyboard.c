@@ -16,6 +16,7 @@
 #include "dwc_util_shared.h"
 #include "dwc_util_string.h"
 #include "dwc_util_text.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 
 // The longest text, and the font's character of the space

@@ -12,6 +12,7 @@
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
 #include "dwc_util_ui_object.h"
+#include "dwc_util_wifi_settings.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
 #include "nitro/pm.h"
