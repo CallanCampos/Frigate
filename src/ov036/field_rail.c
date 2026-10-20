@@ -11,6 +11,7 @@
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
+#include "nitro/math.h"
 #include "nitro/mi.h"
 
 static BOOL func_ov036_021b09fc(RailUnit *unit);
@@ -1227,7 +1228,7 @@ static inline s32 RailUnit_MoveLeft(RailUnit *unit, RailLine *line, s32 length, 
     s32 absOffset;
 
     RailUnit_ApplyLineStep(unit->disabled, unit, 0, -step, dir);
-    if (unit->side < 0 && unit->side % 16 == 0) {
+    if (unit->side < 0 && MATH_ABS(unit->side) % 16 == 0) {
         point = GetRailPoint(unit->handle, line->pointA);
         next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
         if (next0 != NULL) {
@@ -1308,7 +1309,7 @@ static inline s32 RailUnit_MoveLeft(RailUnit *unit, RailLine *line, s32 length, 
             }
         }
     }
-    if (unit->side < 0 && -unit->side <= unit->width) {
+    if (unit->side < 0 && MATH_ABS(unit->side) <= unit->width) {
         return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
     }
     return dir;
