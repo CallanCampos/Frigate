@@ -1040,6 +1040,7 @@
 . 0x02014db4 FestMissionConfig_Clear
 . 0x02014dcc FestMissionConfig_GetSecondsLeft
 . 0x02014e3c FestMissionConfig_HasTimeLeft
+. 0x02014e50 FestMissionConfig_IsActive
 . 0x02014e78 FestMissionConfig_IsTarget
 . 0x02014ee8 FestMissionConfig_AddScore
 . 0x02014f28 FestMissionConfig_AddSeconds

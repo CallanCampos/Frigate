@@ -10,7 +10,7 @@
 
 typedef BOOL (*FestMissionTargetFunc)(const FestMissionConfig *config, u32 value);
 
-static BOOL func_02014e50(FestMissionConfig *config);
+static BOOL FestMissionConfig_IsActive(FestMissionConfig *config);
 static u8 FestMissionConfig_GetExtraSeconds(FestMissionConfig *config);
 static BOOL FestMissionConfig_MatchesTarget(const FestMissionConfig *config, u32 value);
 static BOOL FestMissionConfig_AnyTarget(const FestMissionConfig *config, u32 value);
@@ -98,7 +98,7 @@ BOOL FestMissionConfig_HasTimeLeft(FestMissionConfig *config) {
     return FALSE;
 }
 
-static BOOL func_02014e50(FestMissionConfig *config) {
+static BOOL FestMissionConfig_IsActive(FestMissionConfig *config) {
     if (config->info.index != FEST_MISSION_NONE) {
         return TRUE;
     }
@@ -148,7 +148,7 @@ BOOL FestMissionConfig_IsTarget(FestMissionConfig *config, u32 kind, u32 value) 
 BOOL FestMissionConfig_AddScore(FestMissionConfig *config, u32 kind, u32 value, int count) {
     int score;
 
-    if (!func_02014e50(config)) {
+    if (!FestMissionConfig_IsActive(config)) {
         return FALSE;
     }
     if (!FestMissionConfig_IsTarget(config, kind, value)) {
