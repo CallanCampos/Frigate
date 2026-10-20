@@ -1,7 +1,7 @@
 // The rail system of the no-grid maps: the rail units that move along the lines and points of a map's rails, and
 // the camera the rails set. The name is the ROM's own, from GFL_HeapAllocate's file argument. The curves' conversions
 // between rail and world positions and the camera functions that follow in the ROM are field_rail_func.c
-// RailUnit_MoveOnLine is our descriptive name.
+// RailUnit_MoveOnLine and the RailDirection helpers are our descriptive names.
 #include "types.h"
 #include "field/field_rail.h"
 #include "gfl/heap.h"
@@ -39,9 +39,9 @@ static s32 GetLineTileLengthWorldSpace(RailLine *line, fx32 tileWidth, const Rai
 static s32 GetLerpedLineWidthByLineYPos(RailLine *line, s32 y, s32 length, const RailDataHandle *data);
 static u32 func_ov036_021b1cec(RailUnit *move, RailLine *line, s32 len, u32 arg);
 static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 dir, s32 extra, VecFx32 *out);
-static u32 func_ov036_021b1d88(u32 dir);
-static u32 func_ov036_021b1db8(u32 dir);
-static u32 func_ov036_021b1de8(u32 dir);
+static u32 RailDirection_GetOpposite(u32 dir);
+static u32 RailDirection_TurnRight(u32 dir);
+static u32 RailDirection_TurnLeft(u32 dir);
 static void func_ov036_021b1e18(RailDisabledLines *disabled);
 static void func_ov036_021b1e2c(RailDisabledLines *disabled, u16 lineId);
 static void func_ov036_021b1e50(RailDisabledLines *disabled, u16 lineId);
@@ -784,8 +784,8 @@ static u32 func_ov036_021b0f00(RailUnit *unit, RailLine *line, u32 dir, s32 fron
             next = GetLineContinueInDirection(point, line->dir, unit->handle, unit->disabled, TRUE);
         } else {
             point = GetRailPoint(unit->handle, line->pointA);
-            next =
-                GetLineContinueInDirection(point, func_ov036_021b1d88(line->dir), unit->handle, unit->disabled, TRUE);
+            next = GetLineContinueInDirection(point, RailDirection_GetOpposite(line->dir), unit->handle, unit->disabled,
+                                              TRUE);
         }
         if (next == NULL) {
             if (front > length) {
@@ -853,9 +853,9 @@ static void SetupLineWidthForLineChange(RailDataHandle *data, RailLine *line, s3
 
     nextWidth = 0;
     point = GetRailPoint(data, line->pointA);
-    l1 = GetLineContinueInDirection(point, func_ov036_021b1d88(line->dir), data, disabled, TRUE);
-    l2 = GetLineContinueInDirection(point, func_ov036_021b1de8(line->dir), data, disabled, TRUE);
-    l3 = GetLineContinueInDirection(point, func_ov036_021b1db8(line->dir), data, disabled, TRUE);
+    l1 = GetLineContinueInDirection(point, RailDirection_GetOpposite(line->dir), data, disabled, TRUE);
+    l2 = GetLineContinueInDirection(point, RailDirection_TurnLeft(line->dir), data, disabled, TRUE);
+    l3 = GetLineContinueInDirection(point, RailDirection_TurnRight(line->dir), data, disabled, TRUE);
     length = GetLineTileLengthWorldSpace(line, tileWidth, data);
     curWidth = GetLerpedLineWidthByLineYPos(line, 0, length, data);
 
@@ -991,8 +991,8 @@ static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
         point = GetRailPoint(unit->handle, line->pointB);
         outsideWidth = FALSE;
         next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
-        next1 = GetLineContinueInDirection(point, func_ov036_021b1de8(dir), unit->handle, unit->disabled, 0);
-        next2 = GetLineContinueInDirection(point, func_ov036_021b1db8(dir), unit->handle, unit->disabled, 0);
+        next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
+        next2 = GetLineContinueInDirection(point, RailDirection_TurnRight(dir), unit->handle, unit->disabled, 0);
         func_ov036_021b1ee4(unit->disabled, unit, step, 0, dir);
         if (length > unit->front) {
             width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
@@ -1064,9 +1064,9 @@ static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
         }
         return func_ov036_021b1cec(unit, line, length, dir);
     }
-    if (dir != func_ov036_021b1d88(line->dir)) {
-        if (dir != func_ov036_021b1db8(line->dir)) {
-            if (dir != func_ov036_021b1de8(line->dir)) {
+    if (dir != RailDirection_GetOpposite(line->dir)) {
+        if (dir != RailDirection_TurnRight(line->dir)) {
+            if (dir != RailDirection_TurnLeft(line->dir)) {
                 return 0;
             }
             func_ov036_021b1ee4(unit->disabled, unit, 0, -step, dir);
@@ -1213,8 +1213,8 @@ static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
     }
     point = GetRailPoint(unit->handle, line->pointA);
     outsideWidth = FALSE;
-    next0 = GetLineContinueInDirection(point, func_ov036_021b1db8(dir), unit->handle, unit->disabled, 0);
-    next1 = GetLineContinueInDirection(point, func_ov036_021b1de8(dir), unit->handle, unit->disabled, 0);
+    next0 = GetLineContinueInDirection(point, RailDirection_TurnRight(dir), unit->handle, unit->disabled, 0);
+    next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
     next2 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
     func_ov036_021b1ee4(unit->disabled, unit, -step, 0, dir);
     if (unit->front >= 0) {
@@ -1438,7 +1438,7 @@ static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 di
     return func_ov036_021b0794(rail->playerUnit, &rail->playerUnit->railPos);
 }
 
-static u32 func_ov036_021b1d88(u32 dir) {
+static u32 RailDirection_GetOpposite(u32 dir) {
     switch (dir) {
     case 1:
         return 3;
@@ -1452,7 +1452,7 @@ static u32 func_ov036_021b1d88(u32 dir) {
     return 0;
 }
 
-static u32 func_ov036_021b1db8(u32 dir) {
+static u32 RailDirection_TurnRight(u32 dir) {
     switch (dir) {
     case 1:
         return 2;
@@ -1466,7 +1466,7 @@ static u32 func_ov036_021b1db8(u32 dir) {
     return 0;
 }
 
-static u32 func_ov036_021b1de8(u32 dir) {
+static u32 RailDirection_TurnLeft(u32 dir) {
     switch (dir) {
     case 1:
         return 4;
@@ -1627,7 +1627,7 @@ static BOOL func_ov036_021b1ff0(RailLine *line, RailDataHandle *data) {
     if (dirB == 0) {
         return FALSE;
     }
-    if (dirB == func_ov036_021b1d88(line->dir)) {
+    if (dirB == RailDirection_GetOpposite(line->dir)) {
         return TRUE;
     }
     return FALSE;
@@ -1651,7 +1651,7 @@ static BOOL func_ov036_021b2060(RailPoint *point, RailDataHandle *data) {
             }
             if (point->dirs[i] != 0) {
                 for (j = i + 1; j < 4; j++) {
-                    if (point->dirs[i] == func_ov036_021b1d88(point->dirs[j]) &&
+                    if (point->dirs[i] == RailDirection_GetOpposite(point->dirs[j]) &&
                         line->dir != GetRailLine(data, point->lineIds[j])->dir) {
                         return FALSE;
                     }

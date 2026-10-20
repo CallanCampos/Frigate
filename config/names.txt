@@ -8645,6 +8645,9 @@ overlays/ov036 0x021b02c0 FieldRailSystem_Free
 overlays/ov036 0x021b02f8 FieldRailSystem_Reset
 overlays/ov036 0x021b05b8 FieldRailSystem_SetLineEnabled
 overlays/ov036 0x021b1290 RailUnit_MoveOnLine
+overlays/ov036 0x021b1d88 RailDirection_GetOpposite
+overlays/ov036 0x021b1db8 RailDirection_TurnRight
+overlays/ov036 0x021b1de8 RailDirection_TurnLeft
 overlays/ov036 0x021b3da8 FieldNoGridMapper_SetLineEnabled
 overlays/ov036 0x021b445c UnionChat_AppendLine
 overlays/ov036 0x021b45cc UnionChat_AllocateLine
