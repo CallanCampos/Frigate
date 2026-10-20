@@ -365,8 +365,8 @@ u64 BattleRec_GetHeaderValue(BattleRecHeader *header, u32 id, u32 index) {
         return 0;
     case BATTLE_REC_HEADER_DATA_NUMBER:
         return header->dataNumber;
-    case BATTLE_REC_HEADER_UNK2A:
-        return header->unk2A;
+    case BATTLE_REC_HEADER_SECURE:
+        return header->secure;
     case BATTLE_REC_HEADER_GENDER:
         return (header->formGender[index] & 0x80) >> 7;
     case BATTLE_REC_HEADER_VERSION:

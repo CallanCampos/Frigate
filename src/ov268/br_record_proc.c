@@ -233,7 +233,7 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     case BR_RECORD_MODE_OTHER3:
         p_wk->header = BattleRec_GetHeader();
         p_wk->profile = getVSPlayerAllocation();
-        p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
+        p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_SECURE, 0);
         p_wk->canSave = FALSE;
         break;
     case BR_RECORD_MODE_CODEIN:
@@ -801,7 +801,7 @@ static void BrRecord_SeqSecureSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
         if (BattleRecOv_SaveSecureVideo(p_wk->p_param->gameData, p_wk->p_param->mode, &p_wk->saveSeq, &p_wk->saveSeq2,
                                         p_wk->heapId) == 2) {
             func_0200bbb4();
-            p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
+            p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_SECURE, 0);
             *p_seq = SEQ_FADEOUT_START;
         }
         break;

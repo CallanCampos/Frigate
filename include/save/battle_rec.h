@@ -103,7 +103,8 @@ typedef struct {
     BtlFieldEnv env;
     u8 config[4];
     u16 bgm;
-    u16 unk2E;
+    // The music that plays when the battle is won
+    u16 winBgm;
     u16 unk30;
     u8 battleType : 5;
     u8 unk32_5 : 3;
@@ -131,7 +132,8 @@ struct BattleRecHeader {
     u16 counter;
     u16 mode;
     u16 magic;
-    u8 unk2A;
+    // Whether the video was saved as a secure one
+    u8 secure;
     u8 version;
     u8 unk2C[0xc];
     // The video's number, which the server gives it and the CRC leaves out
@@ -177,7 +179,7 @@ enum {
     BATTLE_REC_HEADER_COUNTER,
     BATTLE_REC_HEADER_MODE,
     BATTLE_REC_HEADER_DATA_NUMBER,
-    BATTLE_REC_HEADER_UNK2A,
+    BATTLE_REC_HEADER_SECURE,
     BATTLE_REC_HEADER_GENDER,
     BATTLE_REC_HEADER_VERSION,
 };
