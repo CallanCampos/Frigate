@@ -24,6 +24,7 @@ src/ov181/mb_comm_sys.c:
     .bss        start:0x021a47c8 end:0x021a47cc
 
 src/ov181/mb_util_msg.c:
+    complete
     .text       start:0x0219fc0c end:0x021a039c
     .data       start:0x021a46b8 end:0x021a46c8
 

@@ -1765,7 +1765,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `mb_parent_sys.c` | `0x0219ce80`–`0x0219eec8` | 28 | partial | string at `0x021a4354` |
 | `mbp.c` | `0x0219eec8`–`0x0219f580` | 16 | complete | string at `0x021a4650` |
 | `mb_comm_sys.c` | `0x0219f580`–`0x0219fc0c` | 47 | complete | string at `0x021a46a8` |
-| `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | partial | string at `0x021a46b8` |
+| `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | complete | string at `0x021a46b8` |
 | `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | partial | string at `0x021a46c8` |
 | `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | partial | descriptive |
 | `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | complete | descriptive |
