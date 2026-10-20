@@ -145,7 +145,10 @@ followed by three identical veneers. `mwldarm` does this only for a file listed 
 `-overlay` options, which must be how the SDK's response file places each overlay's objects; any other file shares one
 veneer per target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes
 `objects.txt` this way, while the LCF still places the objects. Before, a file that called the same far target twice,
-such as `camera_system.c`, couldn't be completed.
+such as `camera_system.c`, couldn't be completed. The LTD autoload's Thumb code (`.ltdmain`) gives every call its own
+veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
+moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and
+`-overlay LTD_AUTOLOAD_0`.
 
 ## Shifting
 
