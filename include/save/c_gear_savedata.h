@@ -14,11 +14,13 @@
 struct CGearSettings {
     // Which panel sits in each of the six places
     u8 panels[CGEAR_PANEL_MAX];
-    u8 unk06;
+    // Whether the C-Gear was on when it last showed, so that it plays its startup once it has been turned on
+    u8 wasOn;
     // Whether the C-Gear is on, which the start menu reads to know if it was on when the game was saved
     u8 on;
     u8 colors[CGEAR_COLOR_MAX];
-    u8 unk0B;
+    // The skin, of the built-in ones
+    u8 skin;
     // The CRC of the downloaded skin, and whether there is one
     u16 skinCrc;
     u8 skinValid;

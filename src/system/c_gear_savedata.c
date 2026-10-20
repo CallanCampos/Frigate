@@ -49,11 +49,11 @@ u8 CGearSettings_IsOn(CGearSettings *settings) {
 }
 
 void func_020098c4(CGearSettings *settings, u8 value) {
-    settings->unk0B = value;
+    settings->skin = value;
 }
 
 u8 func_020098c8(CGearSettings *settings) {
-    return settings->unk0B;
+    return settings->skin;
 }
 
 void CGearSettings_SetSkinValid(CGearSettings *settings, u8 valid) {
@@ -99,11 +99,11 @@ u8 CGearSettings_GetColor(CGearSettings *settings, s32 index) {
 }
 
 void func_02009910(CGearSettings *settings, u32 value) {
-    settings->unk06 = value;
+    settings->wasOn = value;
 }
 
 u8 func_02009914(CGearSettings *settings) {
-    return settings->unk06;
+    return settings->wasOn;
 }
 
 CGearSettings *CGearSettings_GetFromSave(SaveControl *save) {
